@@ -65,6 +65,7 @@ class AssetController {
 		    def col=sheet.getColumns()
 		    for(int c=0;c<col;c++){
 		    	def cellContent=sheet.getCell(c, 0).contents
+		    	// TODO : This logic should work with maps to avoid the need to have major if/else if logic
 		    	if(cellContent.equalsIgnoreCase("Server")){
 		    		 serverColNo=c;    		    		
 		    	}else if(cellContent.equalsIgnoreCase("Type")){
@@ -80,7 +81,7 @@ class AssetController {
 		    // Statement to check Headers if header are not found it will return Error message
 		    
 		    def headerSkipped =new StringBuffer()
-			   
+			// TODO : With the use of maps this can be reduced to a few lines of code which is more manageable.   
 		    if(serverColNo == null ){
 		    	headerSkipped.append("Server")
 		    }
