@@ -27,7 +27,6 @@ class AssetController {
     def upload = {  
    		 //get project Name 
 		     def projectId=params["projectName.id"]
-		     println "project======================"+projectId
 		     if(projectId == null){
 		    	 flash.message="Project Name is required"
 		    	 redirect(controller:"asset", action:"assetImport")
@@ -97,7 +96,7 @@ class AssetController {
 		   
 		    if(serverColNo == null  || typeColNo == null || snColNo == null || assetTagColNo == null){
 		    	
-		    	 flash.message="  Headers ${headerSkipped} not found, Please check it"
+		    	 flash.message="  Columns ${headerSkipped} not found, Please check it"
   		    	 redirect(controller:"asset", action:"assetImport")
 		    }
 		    def added = 0  
@@ -132,7 +131,7 @@ class AssetController {
 		    
     
 		    // generate error message  
-		    flash.message = "${added} Asset added."  
+		    flash.message = "${added} records added into Asset."  
 		    if (skipped.size() > 0) {  
 		     flash.message += "  Rows ${skipped.join(', ')} were skipped because they were incomplete"  
 		    }
@@ -157,7 +156,7 @@ class AssetController {
     		try{
     			workbook = Workbook.getWorkbook(new File(grailsApplication.metadata['app.file.path']));
     		}catch(Exception fileEx){
-    			flash.message="Please select proper Location and File"
+    			flash.message="Excel template not found "
       		    redirect(controller:"asset", action:"assetExport")
     		}
     		 
@@ -208,7 +207,7 @@ class AssetController {
 		    }
 		    if(serverColNo == null || typeColNo == null || snColNo == null || assetTagColNo == null){
 		    	
-		    	 flash.message="  Headers ${headerSkipped} not found, Please check it"
+		    	 flash.message="  Columns ${headerSkipped} not found, Please check it"
    		    	 redirect(controller:"asset", action:"assetExport")
 		    	
 		    }
