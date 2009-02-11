@@ -13,7 +13,6 @@ class UserLoginController {
 
     def show = {
         def userLoginInstance = UserLogin.get( params.id )
-        def projects = ProjectPartyRole.findAllWhere(party:userLoginInstance.person.party).project
         if(!userLoginInstance) {
             flash.message = "UserLogin not found with id ${params.id}"
             redirect(action:list)
