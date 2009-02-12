@@ -1,26 +1,33 @@
 class Party {
-	/*
-	 *  mapping for COLUMN Relation
-	 */
-	 
-	static mapping  = {	
-			 version false
-			 id column:'PARTY_ID'
-				 partyCreatedDate column:'PARTY_CREATED_DATE'
-	}
-	 /*
-	  * list of fields
-	  */
-	String partyName
-	Date partyCreatedDate
-	String toString(){
-		   return("$partyName")
-	}
+	Date dateCreated
+	Date lastUpdated
+	
 	/*
 	 * Fields Validations
 	 */
-	 static constraints = {
-		 partyName(blank:false,nullable:false)
-		 partyCreatedDate(blank:false,nullable:false)
-	 }
+	static constraints = {
+		dateCreated(blank:false, nullable:false)
+		lastUpdated(blank:true, nullable:true)
+	}
+
+	/*
+	 *  mapping for COLUMN Relation
+	 */
+	static mapping  = {	
+		version false
+		id column:'party_id'
+		tablePerHierarchy false
+	}
+	
+/*	
+	static id = {
+		idMapping(name:'partyId', column:'party_id', unsavedValue:0)
+		generator(class:'assigned')
+	}
+*/
+	
+	String toString(){
+		"$id : $dateCreated"
+	}
+	
 }

@@ -1,26 +1,14 @@
 class RoleType {
-	/*
-	 *  mapping for COLUMN Relation
-	 */
-	 
-	static mapping  = {	
-			 version false
-			 id column: 'ROLE_TYPE_ID'
-				 roleTypeCode column: 'CODE'
-	}
-	 /*
-	  * list of fields
-	  */
-	String roleTypeCode
+	String id
 	String description
-	String toString(){
-		   return("$roleTypeCode")
+
+	static constraints = {
+		id(blank:false, nullable:false, maxLength:20)
+		description(blank:true, nullable:true)
 	}
-	/*
-	 * Field Validations
-	 */
-	 static constraints = {
-		 roleTypeCode(blank:false,nullable:false)
-		 description(blank:true,nullable:true)
-	 }
+
+	static mapping  = {
+		version false
+		id column: 'role_type_code', generator: 'assigned'
+	}
 }

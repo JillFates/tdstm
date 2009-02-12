@@ -1,40 +1,34 @@
-class PartyRelationship {
-	/*
-	 *  mapping for COLUMN Relation
-	 */
-	 
-	static mapping  = {	
-			 version false
-			 id column: 'PARTY_RELATIONSHIP_ID'
-			 	partyIdFrom column: 'PARTY_ID_FROM'
-			 		partyIdTo column: 'PARTY_ID_TO'
-			 			roleTypeCodeFrom column: 'ROLE_TYPE_CODE_FROM'
-			 				roleTypeCodeTo column: 'ROLE_TYPE_CODE_TO'
-			 					partyRelationshipType column: 'PARTY_RELATIONSHIP_TYPE_ID'
-	}
-	 /*
-	  * list of fields
-	  */
+/**
+ * PartyRelationship is used to relate two parties into a relationship with roles.
+ */
+class PartyRelationship implements Serializable {
+	PartyRelationshipType partyRelationshipType
 	Party partyIdFrom
 	Party partyIdTo
 	RoleType roleTypeCodeFrom
 	RoleType roleTypeCodeTo
-	PartyRelationshipType partyRelationshipType
 	String statusCode
-	String comments
-	String toString(){
-		   return("$partyRelationshipTypeCode")
+	String comment
+
+	static constraints = {
+		partyRelationshipType( nullable:false )
+		partyIdFrom( nullable:false )
+		partyIdTo( nullable:false )
+		roleTypeCodeFrom( nullable:false )
+		roleTypeCodeTo( nullable:false )
+		statusCode( nullable:false, inList:['ENABLED', 'DISABLED'] )
+		comment (nullable:true)
 	}
-	/*
-	 * Field Validations
-	 */
-	 static constraints = {
-		 partyRelationshipType(blank:false,nullable:false)
-		 partyIdFrom(blank:false,nullable:false)
-		 partyIdTo(blank:false,nullable:false)
-		 roleTypeCodeFrom(blank:false,nullable:false)
-		 roleTypeCodeTo(blank:false,nullable:false)
-		 statusCode(blank:false,nullable:false)
-		 comments(blank:true,nullable:true)
-	 }
+	
+	static mapping  = {	
+		version false
+		id composite:['partyRelationshipType', 'partyIdFrom', 'partyIdTo', 'roleTypeCodeFrom', 'roleTypeCodeTo'], generator:'assigned', unique:true
+		columns {
+			roleTypeCodeFrom sqlType:'varchar(20)'
+			roleTypeCodeTo sqlType:'varchar(20)'
+			statusCode sqlType:'varchar(20)'
+		}
+		
+	}
+	
 }

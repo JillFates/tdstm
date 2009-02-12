@@ -1,25 +1,17 @@
-class PartyRole {
-	/*
-	 *  mapping for COLUMN Relation
-	 */
-	 
-	static mapping  = {
-			 version false
-			 id column:'PARTY_ROLE_ID'
-			role column:'ROLE_TYPE_ID'
-				party column:'PARTY_ID'
+/**
+ * PartyRole reflects the various roles that can be associated directly to a party.  Only disticted roles can be assigned.
+ */
+class PartyRole implements Serializable {
+	Party party
+	RoleType roleType
+
+	static mapping  = {	
+		version false
+		id composite:['party', 'roleType'], generator:'assigned', unique:true
+		columns {
+			roleType sqlType:'varchar(20)'
+		}
+		
 	}
-	 /*
-	  * list of fields
-	  */
-	  RoleType role
-	  Party party
-	  
-	/*
-	 * Fields Validations
-	 */
-	 static constraints = {
-			 role(blank:false,nullable:false)
-		 party(blank:false,nullable:false)
-	 }
+	
 }

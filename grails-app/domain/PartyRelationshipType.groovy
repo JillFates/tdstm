@@ -1,26 +1,14 @@
 class PartyRelationshipType {
-	/*
-	 *  mapping for COLUMN Relation
-	 */
-	 
-	static mapping  = {	
-			 version false
-			 id column: 'PARTY_RELATIONSHIP_TYPE_ID'
-				 partyRelationshipTypeCode column: 'CODE'
-	}
-	 /*
-	  * list of fields
-	  */
-	String partyRelationshipTypeCode
+	String id
 	String description
-	String toString(){
-		   return("$partyRelationshipTypeCode")
+
+	static constraints = {
+		id(blank:false, nullable:false, maxLength:20)
+		description(blank:true, nullable:true)
 	}
-	/*
-	 * Field Validations
-	 */
-	 static constraints = {
-		 partyRelationshipTypeCode(blank:false,nullable:false)
-		 description(blank:true,nullable:true)
-	 }
+
+	static mapping  = {
+		version false
+		id column: 'party_relationship_type_code', generator: 'assigned'
+	}
 }

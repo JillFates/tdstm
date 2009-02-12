@@ -1,36 +1,37 @@
-class Person extends Party{
-	/*
-	 *  mapping for COLUMN Relation
-	 */
-	 
-	static mapping  = {	
-			 version false
-			 party unique:true
-			 id column:'PERSON_ID'
-				 personCreatedDate column:'CREATED_DATE'
-					 personLastUpdated column:'LAST_UPDATED'
-	}
-	 /*
-	  * list of fields
-	  */
+class Person extends Party {
+
 	String firstName
 	String lastName
 	String nickName
-	Date personCreatedDate
-	Date personLastUpdated
 	String active
-	String toString(){
-		   return("$firstName")
-	}
+
 	/*
 	 * Fields Validations
 	 */
 	 static constraints = {
-		 firstName(blank:false,nullable:false,maxLength:64)
-		 active(blank:false,nullable:false)
-		 personCreatedDate(blank:false,nullable:false)
-		 lastName(blank:true,nullable:true,maxLength:64)
-		 nickName(blank:true,nullable:true,maxLength:64)
-		 personLastUpdated(blank:true,nullable:true)
+		 firstName(blank:false, nullable:false, maxLength:30)
+		 lastName(blank:true, nullable:true, maxLength:30)
+		 nickName(blank:true, nullable:true, maxLength:30)
+		 active(blank:false, nullable:false, inList:['Y','N'])
 	 }
+
+	/*
+	 *  mapping for COLUMN Relation
+	 */
+	static mapping  = {	
+		version false
+		tablePerHierarchy false
+		id column:'person_id'
+		columns {
+			firstName sqlType:'varchar(30)'
+			lastName sqlType:'varchar(30)'
+			nickName sqlType:'varchar(30)'
+			active sqlType:'char(1)'
+		}
+	}
+
+	String toString(){
+		"$firstName $lastName"
+	}
+
 }

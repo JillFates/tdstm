@@ -6,6 +6,8 @@ import org.springframework.web.multipart.*
 import org.springframework.web.multipart.commons.*
 class AssetController {
     
+	// TODO : Fix indentation 
+	
     def index = { redirect(action:list,params:params) }
     
     //upload , export
@@ -34,7 +36,7 @@ class AssetController {
 		     def project=Project.find("from Project p where p.id="+projectId)
 		     
 		    
-		     
+		     // TODO : remove excess spacing
 		     
 		     
 		     //delete previous records existed for Project
@@ -55,7 +57,10 @@ class AssetController {
 		    	 flash.message=grailsApplication.metadata['app.file.format']
 		    	 redirect(controller:"asset", action:"assetImport")
 		     }
-		     
+		    
+// TODO : All columns should be done using maps as this will get unwieldly to manage with 20+ columns.  Both the import and 
+// export should use the same map.
+			
 		     //check for column
 		    def serverColNo
 		    def typeColNo
@@ -79,7 +84,8 @@ class AssetController {
 		    }
 		     
 		    // Statement to check Headers if header are not found it will return Error message
-		    
+
+// TODO : map here too.		    
 		    def headerSkipped =new StringBuffer()
 			// TODO : With the use of maps this can be reduced to a few lines of code which is more manageable.   
 		    if(serverColNo == null ){
@@ -106,7 +112,11 @@ class AssetController {
 		     // get fields  
 		    def assetName = sheet.getCell(serverColNo, r).contents    		  
 		    def assetType = sheet.getCell(typeColNo, r).contents  
+
+// TODO : NEVER BUILD SQL like this - Use AssetType.findById( assetType )
+
 		    def assetTypeObj=AssetType.find("from AssetType where assetType='${assetType}'")    		    
+
 		    def serialNumber =sheet.getCell(snColNo, r).contents 
 		    def assetTag = sheet.getCell(assetTagColNo, r).contents    
 		    
@@ -116,10 +126,15 @@ class AssetController {
 		    		
 	    		       projectName:project,  
 	    		       assetType:assetTypeObj,  
+// TODO : NO Need to enclose variables in GString - performance waste and harder to read
+// The following line is legitimate.  Also note the space after the colon(:) - makes for easier reading.
+// 		assetnName: assetName
 	    		       assetName:"${assetName}",  
 	    		       assetTag:"${assetTag}",    		           		            		        
 	    		       serialNumber:"${serialNumber}",
 	    		       deviceFunction:"").save()
+					   
+// TODO : This logic will ALWAY return true since the asset is created.  It should be testing asset.save() and not called above.	   
 		    if (asset) {  
 		      added++  
 		    } else {  
@@ -169,12 +184,16 @@ class AssetController {
     		def book = Workbook.createWorkbook(response.getOutputStream(), workbook)
     		def sheetNo=1
     		def sheet = book.getSheet(sheetNo)
-    		
+			
+// TODO : Use the column map that is shared between both import and export.    		
+
     		 //check for column
     		def serverColNo
 		    def typeColNo
 		    def snColNo
 		    def assetTagColNo
+
+// TODO : The logic that reads the sheet should be able to be shared between import and export - refactor this out
 		    
 		    def col=sheet.getColumns()
 		    for(int c=0;c<col;c++){

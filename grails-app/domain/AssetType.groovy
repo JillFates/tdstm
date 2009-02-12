@@ -1,26 +1,25 @@
 class AssetType {
 	
-	/*
-	 *  mapping for COLUMN Relation
-	 */
-	 
-	static mapping  = {	
-			version false
-			id column:'ASSET_TYPE_ID'
-	}
-	 /*
-	  * list of fields
-	  */
+	String description
 	
-	String assetType
-	String toString(){
-		   return("$assetType")
-	}
 	/*
 	 * Fields Validations
 	 */
-	 static constraints = {
-		 assetType(blank:true,nullable:true)
-	 }
+	static constraints = {
+		id(blank:false, nullable:false, maxLength:20)
+		description(blank:true, nullable:true)
+	}
+
+	/*
+	 *  mapping for COLUMN Relation
+	 */
+	static mapping  = {
+		version false
+		id column: 'asset_type_code', generator: 'assigned'
+	}
+	
+	String toString(){
+		"$id : $description"
+	}
 
 }
