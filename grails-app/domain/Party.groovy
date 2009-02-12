@@ -6,12 +6,13 @@ class Party {
 	static mapping  = {	
 			 version false
 			 id column:'PARTY_ID'
-			partyName column:'PARTY_NAME'
+				 partyCreatedDate column:'PARTY_CREATED_DATE'
 	}
 	 /*
 	  * list of fields
 	  */
 	String partyName
+	Date partyCreatedDate
 	String toString(){
 		   return("$partyName")
 	}
@@ -20,5 +21,6 @@ class Party {
 	 */
 	 static constraints = {
 		 partyName(blank:false,nullable:false)
+		 partyCreatedDate(blank:false,nullable:false)
 	 }
 }

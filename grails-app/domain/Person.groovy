@@ -1,4 +1,4 @@
-class Person {
+class Person extends Party{
 	/*
 	 *  mapping for COLUMN Relation
 	 */
@@ -7,15 +7,17 @@ class Person {
 			 version false
 			 party unique:true
 			 id column:'PERSON_ID'
-			 party column:'PARTY_ID'
+				 personCreatedDate column:'CREATED_DATE'
+					 personLastUpdated column:'LAST_UPDATED'
 	}
 	 /*
 	  * list of fields
 	  */
 	String firstName
 	String lastName
-	// Party object reference
-	Party party
+	String nickName
+	Date personCreatedDate
+	Date personLastUpdated
 	String active
 	String toString(){
 		   return("$firstName")
@@ -25,8 +27,10 @@ class Person {
 	 */
 	 static constraints = {
 		 firstName(blank:false,nullable:false,maxLength:64)
-		 lastName(blank:false,nullable:false,maxLength:64)
-		 party(blank:false,nullable:false,unique:true)
-		 active(blank:true,nullable:true)
+		 active(blank:false,nullable:false)
+		 personCreatedDate(blank:false,nullable:false)
+		 lastName(blank:true,nullable:true,maxLength:64)
+		 nickName(blank:true,nullable:true,maxLength:64)
+		 personLastUpdated(blank:true,nullable:true)
 	 }
 }

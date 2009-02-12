@@ -12,7 +12,7 @@ class PartyRole {
 	 /*
 	  * list of fields
 	  */
-	  Role role
+	  RoleType role
 	  Party party
 	  
 	/*
