@@ -44,10 +44,16 @@
 								style="color:black">Export </g:link></td>
 						</tr>
 						<tr >
-							<td><g:link controller="role"
-								style="color:black">Role</g:link></td>
+							<td><g:link controller="roleType"
+								style="color:black">Role Type</g:link></td>
 								<td><g:link controller="partyRole"
 								style="color:black">Party Role</g:link></td>
+						</tr>
+						<tr >
+							<td><g:link controller="partyRelationshipType"
+								style="color:black">Party Relationship Type</g:link></td>
+								<td><g:link controller="partyRelationship"
+								style="color:black">Party Relationship</g:link></td>
 						</tr>
 						
                     </tbody>
