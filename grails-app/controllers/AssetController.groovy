@@ -8,8 +8,8 @@ class AssetController {
 
 	// TODO : Fix indentation
 
-    def index = { 
-		redirect( action:list, params:params ) 
+    def index = {
+		redirect( action:list, params:params )
 	}
 
     //upload , export
@@ -39,8 +39,8 @@ class AssetController {
 
         def project = Project.findById( projectId )
         //delete previous records existed for Project
-       
-        def assetDelete = Asset.executeUpdate("delete from Asset a where a.project = $project.id " )        
+
+        def assetDelete = Asset.executeUpdate("delete from Asset a where a.project = $project.id " )
 
         // get File
         MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request;
@@ -53,15 +53,15 @@ class AssetController {
         def map = [ "Server":null, "Type":null, "S/N":null, "AssetTag":null ]
         try{
             workbook = Workbook.getWorkbook( file.inputStream )
-            sheet = workbook.getSheet( sheetNo )        
+            sheet = workbook.getSheet( sheetNo )
 
             // TODO : All columns should be done using maps as this will get unwieldly to manage with 20+ columns.  Both the import and
             // export should use the same map.
 
             //check for column
-	    def col = sheet.getColumns()
+            def col = sheet.getColumns()
             def checkCol = checkHeader( col, map, sheet )
-            
+
             // Statement to check Headers if header are not found it will return Error message
 
             // TODO : map here too.
@@ -69,15 +69,14 @@ class AssetController {
                 flash.message = " Column Headers not found, Please check it."
                 redirect( controller:"asset", action:"assetImport" )
 
-            } else {                
+            } else {
                 def added = 0
                 def skipped = []
                 for ( int r = 1; r < sheet.rows; r++ ) {
                     // get fields
                     def assetName = sheet.getCell( map["Server"], r ).contents
-                    def assetType = sheet.getCell( map["Type"], r ).contents
-                    // we will change the below line once we solve the primary key(string) in AssetType
-                    def assetTypeObj = AssetType.find("from AssetType where id = '${assetType}'")
+                    def assetType = sheet.getCell( map["Type"], r ).contents                    
+                    def assetTypeObj = AssetType.findById(assetType)                   
                     def serialNumber = sheet.getCell( map["S/N"], r ).contents
                     def assetTag = sheet.getCell( map["AssetTag"], r ).contents
 
@@ -105,14 +104,13 @@ class AssetController {
                 if ( skipped.size() > 0 ) {
                     flash.message += "  Rows ${skipped.join(', ')} were skipped because they were incomplete."
                 }
+                workbook.close()
                 redirect( controller:"asset", action:"list" )
             }
         } catch( Exception ex ) {
             flash.message = grailsApplication.metadata[ 'app.file.format' ]
             redirect( controller:"asset", action:"assetImport" )
-        } finally {
-            workbook.close()
-        }
+        } 
     }
     /*
      * download data form Asset table into Excel file
@@ -131,8 +129,8 @@ class AssetController {
         def workbook
         def book
         try{
-            workbook = Workbook.getWorkbook( new File( grailsApplication.metadata['app.file.path'] ) )        
-
+            workbook = Workbook.getWorkbook( new File( grailsApplication.metadata['app.file.path'] ) )
+            
             //set MIME TYPE as Excel
             response.setContentType( "application/vnd.ms-excel" )
             response.setHeader( "Content-Disposition", "attachment; filename=ServerListExample.xls" )
@@ -143,18 +141,18 @@ class AssetController {
             def sheet = book.getSheet( sheetNo )
 
             // TODO : Use the column map that is shared between both import and export.
-            
+
             def map = [ "Server":null, "Type":null, "S/N":null, "AssetTag":null ]
-            //check for column          
+            //check for column
 
             def col = sheet.getColumns()
 
             //calling method to check for Header
 
             def checkCol = checkHeader( col, map, sheet )
-            
+
             // TODO : The logic that reads the sheet should be able to be shared between import and export - refactor this out
-       
+
             // Statement to check Headers if header are not found it will return Error message
             if ( checkCol == false ) {
 
@@ -162,20 +160,22 @@ class AssetController {
                 redirect( controller:"asset", action:"assetExport" )
 
             } else {
-                
+
                 //update data from asset table to EXCEL
                 def k = 0
                 for ( int r = 1; r < asset.size(); r++ ) {
-
-                    def assetName = new Label( map["Server"], r, asset.assetName[k] )
+                    
+                    def assetName = new Label( map["Server"], r, asset.assetName[k] )                    
                     sheet.addCell( assetName )
                     def assetType
+                    
                     // Statement to check null values
-                    if( asset.assetType[k] != null ) {
-                        assetType = new Label( map["Type"], r, asset.assetType[k] )
-                    } else {
+                   
+                    if( asset.assetType[k] != null ) {                       
+                        assetType = new Label( map["Type"], r, "${asset.assetType[k]}" )
+                    } else {                        
                         assetType = new Label( map["Type"], r, "" )
-                    }
+                    }                   
                     sheet.addCell( assetType )
 
                     def serialNumber = new Label( map["S/N"], r, asset.serialNumber[k] )
@@ -189,19 +189,17 @@ class AssetController {
 
 
                 book.write()
-
-                render( view:"assetExport" )
+                book.close()
+                render( view: "assetExport" )
             }
         } catch( Exception fileEx ) {
 
-            flash.message="Excel template not found "
+            flash.message = "Excel template not found "
             redirect( controller:"asset", action:"assetExport" )
-            
-        }finally{
-            book.close()
+
         }
     }
-	// check the sheet headers and return boolean value 
+	// check the sheet headers and return boolean value
     def checkHeader( def col, def map, def sheet ){
 
         for ( int c = 0; c < col; c++ ) {
