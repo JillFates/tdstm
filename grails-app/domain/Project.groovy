@@ -7,14 +7,14 @@ class Project extends PartyGroup {
 	Date completionDate	// Date that the project will finish
 
 	static constraints = {
-		name( )
+		name( ) // related party Group
 		projectCode( blank:false, nullable:false, unique:true )
 		description( blank:true, nullable:true )
 		trackChanges( blank:false, nullable:false, inList:['Y', 'N'] )
 		startDate( blank:true, nullable:true )
 		completionDate( blank:true, nullable:true )
-		dateCreated( )
-		lastModified( )
+		dateCreated( ) // related to party
+		lastUpdated( ) // related to party
 	}
 
 	static mapping  = {
