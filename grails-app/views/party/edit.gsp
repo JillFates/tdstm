@@ -17,11 +17,6 @@
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
-            <g:hasErrors bean="${partyInstance}">
-            <div class="errors">
-                <g:renderErrors bean="${partyInstance}" as="list" />
-            </div>
-            </g:hasErrors>
             <g:form method="post" >
                 <input type="hidden" name="id" value="${partyInstance?.id}" />
                 <div class="dialog">
@@ -30,13 +25,13 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="partyName">Party Name:</label>
+                                    <label for="dateCreated">Date Created:</label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:partyInstance,field:'partyName','errors')}">
-                                    <input type="text" id="partyName" name="partyName" value="${fieldValue(bean:partyInstance,field:'partyName')}"/>
-                                <g:hasErrors bean="${partyInstance}" field="partyName">
+                                <td valign="top" class="value ${hasErrors(bean:partyInstance,field:'dateCreated','errors')}">
+                                    <g:datePicker name="dateCreated" value="${partyInstance?.dateCreated}" ></g:datePicker>
+                                <g:hasErrors bean="${partyInstance}" field="dateCreated">
 					            <div class="errors">
-					                <g:renderErrors bean="${partyInstance}" as="list" field="partyName"/>
+					                <g:renderErrors bean="${partyInstance}" as="list" field="dateCreated"/>
 					            </div>
 					            </g:hasErrors>
                                 </td>
@@ -44,13 +39,13 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="partyCreatedDate">Party Created Date:</label>
+                                    <label for="lastUpdated">Last Updated:</label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:partyInstance,field:'partyCreatedDate','errors')}">
-                                    <g:datePicker name="partyCreatedDate" value="${partyInstance?.partyCreatedDate}" ></g:datePicker>
-                                <g:hasErrors bean="${partyInstance}" field="partyCreatedDate">
+                                <td valign="top" class="value ${hasErrors(bean:partyInstance,field:'lastUpdated','errors')}">
+                                    <g:datePicker name="lastUpdated" value="${partyInstance?.lastUpdated}" noSelection="['':'']"></g:datePicker>
+                                <g:hasErrors bean="${partyInstance}" field="lastUpdated">
 					            <div class="errors">
-					                <g:renderErrors bean="${partyInstance}" as="list" field="partyCreatedDate"/>
+					                <g:renderErrors bean="${partyInstance}" as="list" field="lastUpdated"/>
 					            </div>
 					            </g:hasErrors>
                                 </td>

@@ -23,9 +23,9 @@
                         
                    	        <g:sortableColumn property="id" title="Id" />
                         
-                   	        <g:sortableColumn property="partyName" title="Party Name" />
+                   	        <g:sortableColumn property="dateCreated" title="Date Created" />
                         
-                   	        <g:sortableColumn property="partyCreatedDate" title="Party Created Date" />
+                   	        <g:sortableColumn property="lastUpdated" title="Last Updated" />
                         
                         </tr>
                     </thead>
@@ -35,9 +35,9 @@
                         
                             <td><g:link action="show" id="${partyInstance.id}">${fieldValue(bean:partyInstance, field:'id')}</g:link></td>
                         
-                            <td>${fieldValue(bean:partyInstance, field:'partyName')}</td>
+                            <td>${fieldValue(bean:partyInstance, field:'dateCreated')}</td>
                         
-                            <td>${fieldValue(bean:partyInstance, field:'partyCreatedDate')}</td>
+                            <td>${fieldValue(bean:partyInstance, field:'lastUpdated')}</td>
                         
                         </tr>
                     </g:each>

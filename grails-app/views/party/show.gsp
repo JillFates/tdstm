@@ -30,16 +30,16 @@
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Party Name:</td>
+                            <td valign="top" class="name">Date Created:</td>
                             
-                            <td valign="top" class="value">${fieldValue(bean:partyInstance, field:'partyName')}</td>
+                            <td valign="top" class="value">${fieldValue(bean:partyInstance, field:'dateCreated')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Party Created Date:</td>
+                            <td valign="top" class="name">Last Updated:</td>
                             
-                            <td valign="top" class="value">${fieldValue(bean:partyInstance, field:'partyCreatedDate')}</td>
+                            <td valign="top" class="value">${fieldValue(bean:partyInstance, field:'lastUpdated')}</td>
                             
                         </tr>
                     
