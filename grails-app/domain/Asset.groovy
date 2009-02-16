@@ -11,7 +11,7 @@ class Asset {
 	 * Fields Validations
 	 */
 	static constraints = {
-		projectName( blank:false, nullable:false )
+		project( blank:false, nullable:false )
 		assetType( blank:true, nullable:true )
 		assetName( blank:true )
 		assetTag( blank:true )
