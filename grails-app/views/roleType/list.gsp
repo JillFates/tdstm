@@ -21,9 +21,7 @@
                     <thead>
                         <tr>
                         
-                   	        <g:sortableColumn property="id" title="Id" />
-                        
-                   	        <g:sortableColumn property="roleTypeCode" title="Role Type Code" />
+                   	        <g:sortableColumn property="id" title="Code" />
                         
                    	        <g:sortableColumn property="description" title="Description" />
                         
@@ -34,8 +32,6 @@
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                         
                             <td><g:link action="show" id="${roleTypeInstance.id}">${fieldValue(bean:roleTypeInstance, field:'id')}</g:link></td>
-                        
-                            <td>${fieldValue(bean:roleTypeInstance, field:'roleTypeCode')}</td>
                         
                             <td>${fieldValue(bean:roleTypeInstance, field:'description')}</td>
                         
