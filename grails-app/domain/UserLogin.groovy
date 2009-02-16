@@ -11,7 +11,7 @@ class UserLogin {
 	 static constraints = {
 		 person( blank: false, nullable: false )
 		 username( blank: false, unique:true, maxLength: 25 )
-		 password( blank: false, nullable: false, size: 5..20, password: true )
+		 password( blank: false, nullable: false, password: true )
 		 createdDate( blank: true, nullable: true )
 		 lastLogin( blank: true, nullable: true )
 	 }
@@ -23,7 +23,7 @@ class UserLogin {
 		version false
 		id column:'user_login_id'
 		username sqlType: 'varchar(25)'
-		password sqlType: 'varchar(30)'  
+		password sqlType: 'varchar(100)'  // size must me more than 20 because it will store encripted code
 	}
 
 	String toString(){
