@@ -11,4 +11,8 @@ class RoleType {
 		version false
 		id column: 'role_type_code', generator: 'assigned'
 	}
+
+	String toString(){
+		"$id : $description"
+	}
 }
