@@ -21,9 +21,9 @@
                     <thead>
                         <tr>
                         
-                   	        <g:sortableColumn property="id" title="Id" />
+                   	        <g:sortableColumn property="id" title="Code" />
                         
-                   	        <g:sortableColumn property="assetType" title="Asset Type" />
+                   	        <g:sortableColumn property="description" title="Description" />
                         
                         </tr>
                     </thead>
@@ -33,7 +33,7 @@
                         
                             <td><g:link action="show" id="${assetTypeInstance.id}">${fieldValue(bean:assetTypeInstance, field:'id')}</g:link></td>
                         
-                            <td>${fieldValue(bean:assetTypeInstance, field:'assetType')}</td>
+                            <td>${fieldValue(bean:assetTypeInstance, field:'description')}</td>
                         
                         </tr>
                     </g:each>

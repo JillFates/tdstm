@@ -23,16 +23,16 @@
 
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Id:</td>
+                            <td valign="top" class="name">Code:</td>
                             
                             <td valign="top" class="value">${fieldValue(bean:assetTypeInstance, field:'id')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Asset Type:</td>
+                            <td valign="top" class="name">Description:</td>
                             
-                            <td valign="top" class="value">${fieldValue(bean:assetTypeInstance, field:'assetType')}</td>
+                            <td valign="top" class="value">${fieldValue(bean:assetTypeInstance, field:'description')}</td>
                             
                         </tr>
                     
