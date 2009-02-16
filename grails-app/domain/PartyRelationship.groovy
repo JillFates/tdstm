@@ -17,7 +17,7 @@ class PartyRelationship implements Serializable {
 		roleTypeCodeFrom( nullable:false )
 		roleTypeCodeTo( nullable:false )
 		statusCode( nullable:false, inList:['ENABLED', 'DISABLED'] )
-		comment (nullable:true)
+		comment (blank:true,nullable:true)
 	}
 	
 	static mapping  = {	
