@@ -23,11 +23,26 @@
 
                     
                         <tr class="prop">
+                            <td valign="top" class="name">Id:</td>
+                            
+                            <td valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'id')}</td>
+                            
+                        </tr>
+                    
+                        <tr class="prop">
+                            <td valign="top" class="name">Person:</td>
+                            
+                            <td valign="top" class="value"><g:link controller="person" action="show" id="${userLoginInstance?.person?.id}">${userLoginInstance?.person?.encodeAsHTML()}</g:link></td>
+                            
+                        </tr>
+                    
+                        <tr class="prop">
                             <td valign="top" class="name">Username:</td>
                             
                             <td valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'username')}</td>
                             
                         </tr>
+                    
                     
                         <tr class="prop">
                             <td valign="top" class="name">Created Date:</td>
@@ -40,13 +55,6 @@
                             <td valign="top" class="name">Last Login:</td>
                             
                             <td valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'lastLogin')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Person:</td>
-                            
-                            <td valign="top" class="value"><g:link controller="person" action="show" id="${userLoginInstance?.person?.id}">${userLoginInstance?.person?.encodeAsHTML()}</g:link></td>
                             
                         </tr>
                     

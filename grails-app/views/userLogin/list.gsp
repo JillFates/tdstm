@@ -1,3 +1,5 @@
+
+
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -19,29 +21,31 @@
                     <thead>
                         <tr>
                         
+                   	        <g:sortableColumn property="id" title="Id" />
                         
+                   	        <th>Person</th>
+                   	    
                    	        <g:sortableColumn property="username" title="Username" />
                         
                    	        <g:sortableColumn property="createdDate" title="Created Date" />
                         
                    	        <g:sortableColumn property="lastLogin" title="Last Login" />
                         
-                   	        <th>Person</th>
-                   	    
                         </tr>
                     </thead>
                     <tbody>
                     <g:each in="${userLoginInstanceList}" status="i" var="userLoginInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                         
+                            <td><g:link action="show" id="${userLoginInstance.id}">${fieldValue(bean:userLoginInstance, field:'id')}</g:link></td>
                         
-                            <td><g:link action="show" id="${userLoginInstance.id}">${fieldValue(bean:userLoginInstance, field:'username')}</g:link></td>
+                            <td>${fieldValue(bean:userLoginInstance, field:'person')}</td>
+                        
+                            <td>${fieldValue(bean:userLoginInstance, field:'username')}</td>
                         
                             <td>${fieldValue(bean:userLoginInstance, field:'createdDate')}</td>
                         
                             <td>${fieldValue(bean:userLoginInstance, field:'lastLogin')}</td>
-                        
-                            <td>${fieldValue(bean:userLoginInstance, field:'person')}</td>
                         
                         </tr>
                     </g:each>
