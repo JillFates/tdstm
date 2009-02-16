@@ -23,16 +23,9 @@
 
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Id:</td>
+                            <td valign="top" class="name">Code:</td>
                             
                             <td valign="top" class="value">${fieldValue(bean:partyRelationshipTypeInstance, field:'id')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Party Relationship Type Code:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:partyRelationshipTypeInstance, field:'partyRelationshipTypeCode')}</td>
                             
                         </tr>
                     

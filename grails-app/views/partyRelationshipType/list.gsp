@@ -21,9 +21,7 @@
                     <thead>
                         <tr>
                         
-                   	        <g:sortableColumn property="id" title="Id" />
-                        
-                   	        <g:sortableColumn property="partyRelationshipTypeCode" title="Party Relationship Type Code" />
+                   	        <g:sortableColumn property="id" title="Code" />
                         
                    	        <g:sortableColumn property="description" title="Description" />
                         
@@ -34,8 +32,6 @@
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                         
                             <td><g:link action="show" id="${partyRelationshipTypeInstance.id}">${fieldValue(bean:partyRelationshipTypeInstance, field:'id')}</g:link></td>
-                        
-                            <td>${fieldValue(bean:partyRelationshipTypeInstance, field:'partyRelationshipTypeCode')}</td>
                         
                             <td>${fieldValue(bean:partyRelationshipTypeInstance, field:'description')}</td>
                         
