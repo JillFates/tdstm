@@ -1,5 +1,6 @@
 class AssetType {
 	
+	String id
 	String description
 	
 	/*
@@ -15,7 +16,7 @@ class AssetType {
 	 */
 	static mapping  = {
 		version false
-		id column: 'asset_type_code', generator: 'assigned'
+		id column: 'asset_type_code', generator: 'assigned', sqlType:'varchar(20)'
 	}
 	
 	String toString(){
