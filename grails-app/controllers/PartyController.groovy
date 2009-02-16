@@ -1,42 +1,42 @@
 class PartyController {
     
-    def index = { redirect(action:list,params:params) }
+    def index = { redirect( action:list, params:params ) }
 
     // the delete, save and update actions only accept POST requests
-    def allowedMethods = [delete:'POST', save:'POST', update:'POST']
-
+    def allowedMethods = [ delete:'POST', save:'POST', update:'POST' ]
+    
     def list = {
-        if(!params.max) params.max = 10
+        if( !params.max ) params.max = 10
         [ partyInstanceList: Party.list( params ) ]
     }
 
     def show = {
         def partyInstance = Party.get( params.id )
 
-        if(!partyInstance) {
+        if ( !partyInstance ) {
             flash.message = "Party not found with id ${params.id}"
-            redirect(action:list)
+            redirect( action:list )
         }
         else { return [ partyInstance : partyInstance ] }
     }
 
     def delete = {
         def partyInstance = Party.get( params.id )
-        if(partyInstance) {
+        if ( partyInstance ) {
             partyInstance.delete()
             flash.message = "Party ${params.id} deleted"
-            redirect(action:list)
+            redirect( action:list )
         }
         else {
             flash.message = "Party not found with id ${params.id}"
-            redirect(action:list)
+            redirect( action:list )
         }
     }
 
     def edit = {
         def partyInstance = Party.get( params.id )
 
-        if(!partyInstance) {
+        if ( !partyInstance ) {
             flash.message = "Party not found with id ${params.id}"
             redirect(action:list)
         }
@@ -47,19 +47,19 @@ class PartyController {
 
     def update = {
         def partyInstance = Party.get( params.id )
-        if(partyInstance) {
+        if ( partyInstance ) {
             partyInstance.properties = params
             if(!partyInstance.hasErrors() && partyInstance.save()) {
                 flash.message = "Party ${params.id} updated"
-                redirect(action:show,id:partyInstance.id)
+                redirect( action:show, id:partyInstance.id )
             }
             else {
-                render(view:'edit',model:[partyInstance:partyInstance])
+                render( view:'edit', model:[partyInstance:partyInstance] )
             }
         }
         else {
             flash.message = "Party not found with id ${params.id}"
-            redirect(action:edit,id:params.id)
+            redirect( action:edit, id:params.id )
         }
     }
 
@@ -73,10 +73,10 @@ class PartyController {
         def partyInstance = new Party(params)
         if(!partyInstance.hasErrors() && partyInstance.save()) {
             flash.message = "Party ${partyInstance.id} created"
-            redirect(action:show,id:partyInstance.id)
+            redirect( action:show, id:partyInstance.id )
         }
         else {
-            render(view:'create',model:[partyInstance:partyInstance])
+            render( view:'create', model:[partyInstance:partyInstance] )
         }
     }
 }
