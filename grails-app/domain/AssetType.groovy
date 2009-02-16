@@ -2,7 +2,7 @@ class AssetType {
 	
 	String id
 	String description
-	
+
 	/*
 	 * Fields Validations
 	 */
@@ -18,9 +18,8 @@ class AssetType {
 		version false
 		id column: 'asset_type_code', generator: 'assigned', sqlType:'varchar(20)'
 	}
-	
-	String toString(){
-		"$id : $description"
-	}
 
+	String toString() {
+		id
+    }
 }
