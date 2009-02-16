@@ -9,10 +9,10 @@ class Person extends Party {
 	 * Fields Validations
 	 */
 	 static constraints = {
-		 firstName(blank:false, nullable:false, maxLength:30)
-		 lastName(blank:true, nullable:true, maxLength:30)
-		 nickName(blank:true, nullable:true, maxLength:30)
-		 active(blank:false, nullable:false, inList:['Y','N'])
+		 firstName( blank:false, nullable:false, maxLength:30 )
+		 lastName( blank:true, nullable:true, maxLength:30 )
+		 nickName( blank:true, nullable:true, maxLength:30 )
+		 active( blank:false, nullable:false, inList:['Y','N'] )
 	 }
 
 	/*
