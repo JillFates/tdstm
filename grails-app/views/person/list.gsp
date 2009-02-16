@@ -23,15 +23,15 @@
                         
                    	        <g:sortableColumn property="id" title="Id" />
                         
-                   	        <g:sortableColumn property="partyName" title="Party Name" />
+                   	        <g:sortableColumn property="dateCreated" title="Date Created" />
                         
-                   	        <g:sortableColumn property="partyCreatedDate" title="Party Created Date" />
+                   	        <g:sortableColumn property="lastUpdated" title="Last Updated" />
                         
                    	        <g:sortableColumn property="firstName" title="First Name" />
                         
-                   	        <g:sortableColumn property="active" title="Active" />
+                   	        <g:sortableColumn property="lastName" title="Last Name" />
                         
-                   	        <g:sortableColumn property="personCreatedDate" title="Person Created Date" />
+                   	        <g:sortableColumn property="nickName" title="Nick Name" />
                         
                         </tr>
                     </thead>
@@ -41,15 +41,15 @@
                         
                             <td><g:link action="show" id="${personInstance.id}">${fieldValue(bean:personInstance, field:'id')}</g:link></td>
                         
-                            <td>${fieldValue(bean:personInstance, field:'partyName')}</td>
+                            <td>${fieldValue(bean:personInstance, field:'dateCreated')}</td>
                         
-                            <td>${fieldValue(bean:personInstance, field:'partyCreatedDate')}</td>
+                            <td>${fieldValue(bean:personInstance, field:'lastUpdated')}</td>
                         
                             <td>${fieldValue(bean:personInstance, field:'firstName')}</td>
                         
-                            <td>${fieldValue(bean:personInstance, field:'active')}</td>
+                            <td>${fieldValue(bean:personInstance, field:'lastName')}</td>
                         
-                            <td>${fieldValue(bean:personInstance, field:'personCreatedDate')}</td>
+                            <td>${fieldValue(bean:personInstance, field:'nickName')}</td>
                         
                         </tr>
                     </g:each>

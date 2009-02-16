@@ -30,16 +30,16 @@
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Party Name:</td>
+                            <td valign="top" class="name">Date Created:</td>
                             
-                            <td valign="top" class="value">${fieldValue(bean:personInstance, field:'partyName')}</td>
+                            <td valign="top" class="value">${fieldValue(bean:personInstance, field:'dateCreated')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Party Created Date:</td>
+                            <td valign="top" class="name">Last Updated:</td>
                             
-                            <td valign="top" class="value">${fieldValue(bean:personInstance, field:'partyCreatedDate')}</td>
+                            <td valign="top" class="value">${fieldValue(bean:personInstance, field:'lastUpdated')}</td>
                             
                         </tr>
                     
@@ -47,20 +47,6 @@
                             <td valign="top" class="name">First Name:</td>
                             
                             <td valign="top" class="value">${fieldValue(bean:personInstance, field:'firstName')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Active:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:personInstance, field:'active')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Person Created Date:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:personInstance, field:'personCreatedDate')}</td>
                             
                         </tr>
                     
@@ -79,9 +65,9 @@
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Person Last Updated:</td>
+                            <td valign="top" class="name">Active:</td>
                             
-                            <td valign="top" class="value">${fieldValue(bean:personInstance, field:'personLastUpdated')}</td>
+                            <td valign="top" class="value">${fieldValue(bean:personInstance, field:'active')}</td>
                             
                         </tr>
                     

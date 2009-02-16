@@ -17,11 +17,6 @@
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
-            <g:hasErrors bean="${personInstance}">
-            <div class="errors">
-                <g:renderErrors bean="${personInstance}" as="list" />
-            </div>
-            </g:hasErrors>
             <g:form method="post" >
                 <input type="hidden" name="id" value="${personInstance?.id}" />
                 <div class="dialog">
@@ -30,13 +25,13 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="partyName">Party Name:</label>
+                                    <label for="dateCreated">Date Created:</label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:personInstance,field:'partyName','errors')}">
-                                    <input type="text" id="partyName" name="partyName" value="${fieldValue(bean:personInstance,field:'partyName')}"/>
-                                <g:hasErrors bean="${personInstance}" field="partyName">
+                                <td valign="top" class="value ${hasErrors(bean:personInstance,field:'dateCreated','errors')}">
+                                    <g:datePicker name="dateCreated" value="${personInstance?.dateCreated}" ></g:datePicker>
+                                <g:hasErrors bean="${personInstance}" field="dateCreated">
 					            <div class="errors">
-					                <g:renderErrors bean="${personInstance}" as="list" field="partyName"/>
+					                <g:renderErrors bean="${personInstance}" as="list" field="dateCreated"/>
 					            </div>
 					            </g:hasErrors>
                                 </td>
@@ -44,13 +39,13 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="partyCreatedDate">Party Created Date:</label>
+                                    <label for="lastUpdated">Last Updated:</label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:personInstance,field:'partyCreatedDate','errors')}">
-                                    <g:datePicker name="partyCreatedDate" value="${personInstance?.partyCreatedDate}" ></g:datePicker>
-                                <g:hasErrors bean="${personInstance}" field="partyCreatedDate">
+                                <td valign="top" class="value ${hasErrors(bean:personInstance,field:'lastUpdated','errors')}">
+                                    <g:datePicker name="lastUpdated" value="${personInstance?.lastUpdated}" noSelection="['':'']"></g:datePicker>
+                                <g:hasErrors bean="${personInstance}" field="lastUpdated">
 					            <div class="errors">
-					                <g:renderErrors bean="${personInstance}" as="list" field="partyCreatedDate"/>
+					                <g:renderErrors bean="${personInstance}" as="list" field="lastUpdated"/>
 					            </div>
 					            </g:hasErrors>
                                 </td>
@@ -65,34 +60,6 @@
                                 <g:hasErrors bean="${personInstance}" field="firstName">
 					            <div class="errors">
 					                <g:renderErrors bean="${personInstance}" as="list" field="firstName"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="active">Active:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:personInstance,field:'active','errors')}">
-                                    <input type="text" id="active" name="active" value="${fieldValue(bean:personInstance,field:'active')}"/>
-                                <g:hasErrors bean="${personInstance}" field="active">
-					            <div class="errors">
-					                <g:renderErrors bean="${personInstance}" as="list" field="active"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="personCreatedDate">Person Created Date:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:personInstance,field:'personCreatedDate','errors')}">
-                                    <g:datePicker name="personCreatedDate" value="${personInstance?.personCreatedDate}" ></g:datePicker>
-                                <g:hasErrors bean="${personInstance}" field="personCreatedDate">
-					            <div class="errors">
-					                <g:renderErrors bean="${personInstance}" as="list" field="personCreatedDate"/>
 					            </div>
 					            </g:hasErrors>
                                 </td>
@@ -128,13 +95,13 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="personLastUpdated">Person Last Updated:</label>
+                                    <label for="active">Active:</label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:personInstance,field:'personLastUpdated','errors')}">
-                                    <g:datePicker name="personLastUpdated" value="${personInstance?.personLastUpdated}" noSelection="['':'']"></g:datePicker>
-                                <g:hasErrors bean="${personInstance}" field="personLastUpdated">
+                                <td valign="top" class="value ${hasErrors(bean:personInstance,field:'active','errors')}">
+                                    <g:select id="active" name="active" from="${personInstance.constraints.active.inList}" value="${personInstance.active}" ></g:select>
+                                <g:hasErrors bean="${personInstance}" field="active">
 					            <div class="errors">
-					                <g:renderErrors bean="${personInstance}" as="list" field="personLastUpdated"/>
+					                <g:renderErrors bean="${personInstance}" as="list" field="active"/>
 					            </div>
 					            </g:hasErrors>
                                 </td>
