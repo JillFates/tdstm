@@ -7,8 +7,8 @@ class AssetType {
 	 * Fields Validations
 	 */
 	static constraints = {
-		id(blank:false, nullable:false, maxLength:20)
-		description(blank:true, nullable:true)
+		id( blank:false, nullable:false, maxLength:20 )
+		description( blank:true, nullable:true )
 	}
 
 	/*
