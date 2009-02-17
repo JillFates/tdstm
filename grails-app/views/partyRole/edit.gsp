@@ -17,30 +17,13 @@
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
-            <g:hasErrors bean="${partyRoleInstance}">
-            <div class="errors">
-                <g:renderErrors bean="${partyRoleInstance}" as="list" />
-            </div>
-            </g:hasErrors>
             <g:form method="post" >
-                <input type="hidden" name="id" value="${partyRoleInstance?.id}" />
+                <input type="hidden" name="partyId" value="${partyRoleInstance?.party.id}" />
+                <input type="hidden" name="roleTypeId" value="${partyRoleInstance?.roleType.id}" />
+                
                 <div class="dialog">
                     <table>
                         <tbody>
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="role">Role:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:partyRoleInstance,field:'role','errors')}">
-                                    <g:select optionKey="id" from="${Role.list()}" name="role.id" value="${partyRoleInstance?.role?.id}" ></g:select>
-                                <g:hasErrors bean="${partyRoleInstance}" field="${role}">
-					            <div class="errors">
-					                <g:renderErrors bean="${partyRoleInstance}" as="list" field="${role}"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
@@ -48,9 +31,23 @@
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:partyRoleInstance,field:'party','errors')}">
                                     <g:select optionKey="id" from="${Party.list()}" name="party.id" value="${partyRoleInstance?.party?.id}" ></g:select>
-                                <g:hasErrors bean="${partyRoleInstance}" field="${party}">
+                                <g:hasErrors bean="${partyRoleInstance}" field="party">
 					            <div class="errors">
-					                <g:renderErrors bean="${partyRoleInstance}" as="list" field="${party}"/>
+					                <g:renderErrors bean="${partyRoleInstance}" as="list" field="party"/>
+					            </div>
+					            </g:hasErrors>
+                                </td>
+                            </tr> 
+                        
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="roleType">Role Type:</label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean:partyRoleInstance,field:'roleType','errors')}">
+                                    <g:select optionKey="id" from="${RoleType.list()}" name="roleType.id" value="${partyRoleInstance?.roleType?.id}" ></g:select>
+                                <g:hasErrors bean="${partyRoleInstance}" field="roleType">
+					            <div class="errors">
+					                <g:renderErrors bean="${partyRoleInstance}" as="list" field="roleType"/>
 					            </div>
 					            </g:hasErrors>
                                 </td>

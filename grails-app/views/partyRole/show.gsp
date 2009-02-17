@@ -23,23 +23,16 @@
 
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Id:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:partyRoleInstance, field:'id')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Role:</td>
-                            
-                            <td valign="top" class="value"><g:link controller="role" action="show" id="${partyRoleInstance?.role?.id}">${partyRoleInstance?.role?.encodeAsHTML()}</g:link></td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
                             <td valign="top" class="name">Party:</td>
                             
                             <td valign="top" class="value"><g:link controller="party" action="show" id="${partyRoleInstance?.party?.id}">${partyRoleInstance?.party?.encodeAsHTML()}</g:link></td>
+                            
+                        </tr>
+                    
+                        <tr class="prop">
+                            <td valign="top" class="name">Role Type:</td>
+                            
+                            <td valign="top" class="value"><g:link controller="roleType" action="show" id="${partyRoleInstance?.roleType?.id}">${partyRoleInstance?.roleType?.encodeAsHTML()}</g:link></td>
                             
                         </tr>
                     
@@ -48,7 +41,8 @@
             </div>
             <div class="buttons">
                 <g:form>
-                    <input type="hidden" name="id" value="${partyRoleInstance?.id}" />
+                    <input type="hidden" name="partyId" value="${partyRoleInstance?.party.id}" />
+                    <input type="hidden" name="roleTypeId" value="${partyRoleInstance?.roleType.id}" />
                     <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
                 </g:form>

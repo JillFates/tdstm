@@ -1,5 +1,4 @@
 
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -20,12 +19,9 @@
                 <table>
                     <thead>
                         <tr>
-                        
-                   	        <g:sortableColumn property="id" title="Id" />
-                        
-                   	        <th>Role</th>
-                   	    
                    	        <th>Party</th>
+                   	    
+                   	        <th>Role Type</th>
                    	    
                         </tr>
                     </thead>
@@ -33,11 +29,9 @@
                     <g:each in="${partyRoleInstanceList}" status="i" var="partyRoleInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                         
-                            <td><g:link action="show" id="${partyRoleInstance.id}">${fieldValue(bean:partyRoleInstance, field:'id')}</g:link></td>
+                            <td><g:link action="show" params="[partyId:partyRoleInstance?.party.id, roleTypeId:partyRoleInstance.roleType.id]"> ${partyRoleInstance?.party}</g:link></td>
                         
-                            <td>${fieldValue(bean:partyRoleInstance, field:'role')}</td>
-                        
-                            <td>${fieldValue(bean:partyRoleInstance, field:'party')}</td>
+                            <td>${fieldValue(bean:partyRoleInstance, field:'roleType')}</td>
                         
                         </tr>
                     </g:each>
