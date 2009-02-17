@@ -45,9 +45,9 @@
                     
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Created Date:</td>
+                            <td valign="top" class="name">Date Created:</td>
                             
-                            <td valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'createdDate')}</td>
+                            <td valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'dateCreated')}</td>
                             
                         </tr>
                     

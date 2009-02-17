@@ -67,13 +67,13 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="createdDate">Created Date:</label>
+                                    <label for="dateCreated">Date Created:</label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'createdDate','errors')}">
-                                    <g:datePicker name="createdDate" value="${userLoginInstance?.createdDate}" noSelection="['':'']"></g:datePicker>
-                                <g:hasErrors bean="${userLoginInstance}" field="createdDate">
+                                <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'dateCreated','errors')}">
+                                    <g:datePicker name="dateCreated" value="${userLoginInstance?.dateCreated}" noSelection="['':'']"></g:datePicker>
+                                <g:hasErrors bean="${userLoginInstance}" field="dateCreated">
 					            <div class="errors">
-					                <g:renderErrors bean="${userLoginInstance}" as="list" field="createdDate"/>
+					                <g:renderErrors bean="${userLoginInstance}" as="list" field="dateCreated"/>
 					            </div>
 					            </g:hasErrors>
                                 </td>

@@ -27,7 +27,7 @@
                    	    
                    	        <g:sortableColumn property="username" title="Username" />
                         
-                   	        <g:sortableColumn property="createdDate" title="Created Date" />
+                   	        <g:sortableColumn property="dateCreated" title="Date Created" />
                         
                    	        <g:sortableColumn property="lastLogin" title="Last Login" />
                         
@@ -43,7 +43,7 @@
                         
                             <td>${fieldValue(bean:userLoginInstance, field:'username')}</td>
                         
-                            <td>${fieldValue(bean:userLoginInstance, field:'createdDate')}</td>
+                            <td>${fieldValue(bean:userLoginInstance, field:'dateCreated')}</td>
                         
                             <td>${fieldValue(bean:userLoginInstance, field:'lastLogin')}</td>
                         
