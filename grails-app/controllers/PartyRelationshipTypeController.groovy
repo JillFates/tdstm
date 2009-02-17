@@ -4,12 +4,12 @@ class PartyRelationshipTypeController {
 
     // the delete, save and update actions only accept POST requests
     def allowedMethods = [ delete:'POST', save:'POST', update:'POST' ]
-    
+    // return PartyRelationshipType List 
     def list = {
         if( !params.max ) params.max = 10
         [ partyRelationshipTypeInstanceList: PartyRelationshipType.list( params ) ]
     }
-
+    // return PartyRelationshipType details
     def show = {
         def partyRelationshipTypeInstance = PartyRelationshipType.get( params.id )
 
@@ -19,7 +19,7 @@ class PartyRelationshipTypeController {
         }
         else { return [ partyRelationshipTypeInstance : partyRelationshipTypeInstance ] }
     }
-
+    // delete PartyRelationshipType details
     def delete = {
         def partyRelationshipTypeInstance = PartyRelationshipType.get( params.id )
         if ( partyRelationshipTypeInstance ) {
@@ -32,7 +32,7 @@ class PartyRelationshipTypeController {
             redirect( action:list )
         }
     }
-
+    // return PartyRelationshipType details to update form
     def edit = {
         def partyRelationshipTypeInstance = PartyRelationshipType.get( params.id )
 
@@ -44,9 +44,9 @@ class PartyRelationshipTypeController {
             return [ partyRelationshipTypeInstance : partyRelationshipTypeInstance ]
         }
     }
-
+    // update PartyRelationshipType details
     def update = {
-        def partyRelationshipTypeInstance = PartyRelationshipType.get( params.id[0] )
+        def partyRelationshipTypeInstance = PartyRelationshipType.get( params.partyRelTypeId )
         if ( partyRelationshipTypeInstance ) {
             partyRelationshipTypeInstance.properties = params
             if(!partyRelationshipTypeInstance.hasErrors() && partyRelationshipTypeInstance.save()) {
@@ -62,13 +62,13 @@ class PartyRelationshipTypeController {
             redirect( action:edit, id:params.id )
         }
     }
-
+    // provide create form for PartyRelationshipType
     def create = {
         def partyRelationshipTypeInstance = new PartyRelationshipType()
         partyRelationshipTypeInstance.properties = params
         return ['partyRelationshipTypeInstance':partyRelationshipTypeInstance]
     }
-
+    // save PartyRelationshipType details
     def save = {
         def partyRelationshipTypeInstance = new PartyRelationshipType(params)
         	partyRelationshipTypeInstance.id = params.id

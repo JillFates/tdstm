@@ -17,7 +17,7 @@
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if> <g:form method="post">
-	<input type="hidden" name="id"
+	<input type="hidden" name="partyRelTypeId"
 		value="${partyRelationshipTypeInstance?.id}" />
 	<div class="dialog">
 	<table>
