@@ -25,7 +25,7 @@
                     optionKey="id"
                     from="${Project.findAll()}"
                     name="projectName.id" id="projectNameId"
-                  value="${project?.projectName?.id}"></g:select></td>
+                  value="${project?.project?.id}"></g:select></td>
               </tr>
               <tr>
                 <td class="buttonR"><input class="button" type="submit" value="Export" /></td>
