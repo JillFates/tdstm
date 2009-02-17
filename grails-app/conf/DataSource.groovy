@@ -11,8 +11,20 @@ hibernate {
 }
 // environment specific settings
 environments {
+	
 	development {
 		dataSource {
+			/*
+			// TDS Transitional Manager
+			dbCreate = "create-drop" // one of 'create', 'create-drop','update'
+			url = "jdbc:mysql://localhost/tdstm"
+			driverClassName = "com.mysql.jdbc.Driver"
+			username = "tdstm"
+			password = "tdstm"
+			
+			logSql = true 
+			*/
+			
 			dbCreate = "create-drop" // one of 'create', 'create-drop','update'
 			url = "jdbc:hsqldb:mem:devDB"
 		}
@@ -25,8 +37,14 @@ environments {
 	}
 	production {
 		dataSource {
-			dbCreate = "update"
-			url = "jdbc:hsqldb:file:prodDb;shutdown=true"
+		// TDS Transitional Manager
+			dbCreate = "create-drop" // one of 'create', 'create-drop','update'
+			url = "jdbc:mysql://localhost/tdstm"
+			driverClassName = "com.mysql.jdbc.Driver"
+			username = "tdstm"
+			password = "tdstm"
+			
+			// logSql = true 
 		}
 	}
 }
