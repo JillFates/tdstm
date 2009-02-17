@@ -1,64 +1,66 @@
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="main" />
-        <title>JsecUser List</title>
-        <style type="text/css">
-        a:hover {
-    		text-decoration:underline;
-		}
-        </style>
-    </head>
-    <body>
-        <div class="nav">
-            <span class="menuButton"><g:link class="home" controller="auth" action="home">Home</g:link></span>
-        </div>
-        <div class="body">
-            <div >&nbsp;</div>
-            <div >
-                <table>
-                    <thead>
-                        <tr>
-                        
-                   	        <th colspan="2">List of Entities</th>
-                        
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr >
-							<td><g:link controller="party"
-								style="color:black">Party </g:link></td>
-							<td><g:link controller="assetType" 
-								style="color:black">Asset Type</g:link></td>
-						</tr>
-						<tr >
-							<td><g:link controller="person"
-								style="color:black">Person </g:link></td>
-							<td><g:link controller="asset" action="assetImport"
-								style="color:black">Import </g:link></td>
-						</tr>
-						<tr >
-							<td><g:link controller="userLogin"
-								style="color:black">User </g:link></td>
-								<td><g:link controller="asset" action="assetExport"
-								style="color:black">Export </g:link></td>
-						</tr>
-						<tr >
-							<td><g:link controller="roleType"
-								style="color:black">Role Type</g:link></td>
-								<td><g:link controller="partyRole"
-								style="color:black">Party Role</g:link></td>
-						</tr>
-						<tr >
-							<td><g:link controller="partyRelationshipType"
-								style="color:black">Party Relationship Type</g:link></td>
-								<td><g:link controller="partyRelationship"
-								style="color:black">Party Relationship</g:link></td>
-						</tr>
-						
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </body>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="layout" content="main" />
+<title>JsecUser List</title>
+<style type="text/css">
+a:hover {
+	text-decoration: underline;
+}
+</style>
+</head>
+<body>
+<div class="nav"><span class="menuButton"><g:link
+	class="home" controller="auth" action="home">Home</g:link></span></div>
+<div class="body">
+<div>&nbsp;</div>
+<div>
+<table>
+	<thead>
+		<tr>
+
+			<th colspan="2">List of Entities</th>
+
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><g:link controller="party" style="color:black">Party </g:link></td>
+			<td><g:link controller="partyType" style="color:black">Party Type</g:link></td>
+		</tr>
+		<tr>
+			<td><g:link controller="partyGroup" style="color:black">Party Group</g:link></td>
+			<td><g:link controller="roleType" style="color:black">Role Type</g:link></td>
+		</tr>
+		<tr>
+			<td><g:link controller="project" style="color:black">Project</g:link></td>
+			<td><g:link controller="partyRole" style="color:black">Party Role</g:link></td>
+
+		</tr>
+		<tr>
+			<td><g:link controller="person" style="color:black">Person </g:link></td>
+			<td><g:link controller="asset" action="assetImport"
+				style="color:black">Import </g:link></td>
+		</tr>
+		<tr>
+			<td><g:link controller="userLogin" style="color:black">User Login</g:link></td>
+
+			<td><g:link controller="asset" action="assetExport"
+				style="color:black">Export </g:link></td>
+		</tr>
+		<tr>
+			<td><g:link controller="partyRelationship" style="color:black">Party Relationship</g:link></td>
+			<td><g:link controller="partyRelationshipType"
+				style="color:black">Party Relationship Type</g:link></td>
+		</tr>
+		<tr>
+			<td><g:link controller="asset" style="color:black">Asset</g:link></td>
+			<td><g:link controller="assetType" style="color:black">Asset Type</g:link></td>
+		</tr>
+
+	</tbody>
+</table>
+</div>
+</div>
+</body>
 </html>
