@@ -32,7 +32,7 @@
                         <tr class="prop">
                             <td valign="top" class="name">Project Name:</td>
                             
-                            <td valign="top" class="value"><g:link controller="project" action="show" id="${assetInstance?.projectName?.id}">${assetInstance?.projectName?.encodeAsHTML()}</g:link></td>
+                            <td valign="top" class="value"><g:link controller="project" action="show" id="${assetInstance?.project?.id}">${assetInstance?.project?.encodeAsHTML()}</g:link></td>
                             
                         </tr>
                     
