@@ -37,16 +37,16 @@
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Party Id To:</td>
+                            <td valign="top" class="name">Role Type Code From:</td>
                             
-                            <td valign="top" class="value"><g:link controller="party" action="show" id="${partyRelationshipInstance?.partyIdTo?.id}">${partyRelationshipInstance?.partyIdTo?.encodeAsHTML()}</g:link></td>
+                            <td valign="top" class="value"><g:link controller="roleType" action="show" id="${partyRelationshipInstance?.roleTypeCodeFrom?.id}">${partyRelationshipInstance?.roleTypeCodeFrom?.encodeAsHTML()}</g:link></td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Role Type Code From:</td>
+                            <td valign="top" class="name">Party Id To:</td>
                             
-                            <td valign="top" class="value"><g:link controller="roleType" action="show" id="${partyRelationshipInstance?.roleTypeCodeFrom?.id}">${partyRelationshipInstance?.roleTypeCodeFrom?.encodeAsHTML()}</g:link></td>
+                            <td valign="top" class="value"><g:link controller="party" action="show" id="${partyRelationshipInstance?.partyIdTo?.id}">${partyRelationshipInstance?.partyIdTo?.encodeAsHTML()}</g:link></td>
                             
                         </tr>
                     

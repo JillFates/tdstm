@@ -13,8 +13,8 @@ class PartyRelationship implements Serializable {
 	static constraints = {
 		partyRelationshipType( nullable:false )
 		partyIdFrom( nullable:false )
-		partyIdTo( nullable:false )
 		roleTypeCodeFrom( nullable:false )
+		partyIdTo( nullable:false )
 		roleTypeCodeTo( nullable:false )
 		statusCode( nullable:false, inList:['ENABLED', 'DISABLED'] )
 		comment (blank:true,nullable:true)

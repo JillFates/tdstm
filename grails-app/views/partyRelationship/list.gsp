@@ -25,9 +25,9 @@
 
 			<th>Party Id From</th>
 
-			<th>Party Id To</th>
-
 			<th>Role Type Code From</th>
+
+			<th>Party Id To</th>
 
 			<th>Role Type Code To</th>
 
@@ -47,9 +47,9 @@
 
 				<td>${partyRelationshipInstance?.partyIdFrom}</td>
 
-				<td>${partyRelationshipInstance?.partyIdTo}</td>
-
 				<td>${partyRelationshipInstance?.roleTypeCodeFrom}</td>
+
+				<td>${partyRelationshipInstance?.partyIdTo}</td>
 
 				<td>${partyRelationshipInstance?.roleTypeCodeTo}</td>
 

@@ -43,20 +43,6 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="partyIdFrom">Party Id From:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:partyRelationshipInstance,field:'partyIdFrom','errors')}">
-                                    <g:select optionKey="id" from="${Party.list()}" name="partyIdFrom.id" value="${partyRelationshipInstance?.partyIdFrom?.id}" ></g:select>
-                                <g:hasErrors bean="${partyRelationshipInstance}" field="partyIdFrom">
-					            <div class="errors">
-					                <g:renderErrors bean="${partyRelationshipInstance}" as="list" field="partyIdFrom"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
                                     <label for="partyIdTo">Party Id To:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:partyRelationshipInstance,field:'partyIdTo','errors')}">
@@ -64,6 +50,20 @@
                                 <g:hasErrors bean="${partyRelationshipInstance}" field="partyIdTo">
 					            <div class="errors">
 					                <g:renderErrors bean="${partyRelationshipInstance}" as="list" field="partyIdTo"/>
+					            </div>
+					            </g:hasErrors>
+                                </td>
+                            </tr> 
+                        
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="partyIdFrom">Party Id From:</label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean:partyRelationshipInstance,field:'partyIdFrom','errors')}">
+                                    <g:select optionKey="id" from="${Party.list()}" name="partyIdFrom.id" value="${partyRelationshipInstance?.partyIdFrom?.id}" ></g:select>
+                                <g:hasErrors bean="${partyRelationshipInstance}" field="partyIdFrom">
+					            <div class="errors">
+					                <g:renderErrors bean="${partyRelationshipInstance}" as="list" field="partyIdFrom"/>
 					            </div>
 					            </g:hasErrors>
                                 </td>
