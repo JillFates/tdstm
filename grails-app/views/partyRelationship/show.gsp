@@ -23,13 +23,6 @@
 
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Id:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:partyRelationshipInstance, field:'id')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
                             <td valign="top" class="name">Party Relationship Type:</td>
                             
                             <td valign="top" class="value"><g:link controller="partyRelationshipType" action="show" id="${partyRelationshipInstance?.partyRelationshipType?.id}">${partyRelationshipInstance?.partyRelationshipType?.encodeAsHTML()}</g:link></td>
@@ -72,9 +65,9 @@
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Comments:</td>
+                            <td valign="top" class="name">Comment:</td>
                             
-                            <td valign="top" class="value">${fieldValue(bean:partyRelationshipInstance, field:'comments')}</td>
+                            <td valign="top" class="value">${fieldValue(bean:partyRelationshipInstance, field:'comment')}</td>
                             
                         </tr>
                     
@@ -83,7 +76,11 @@
             </div>
             <div class="buttons">
                 <g:form>
-                    <input type="hidden" name="id" value="${partyRelationshipInstance?.id}" />
+                    <input type="hidden" name="partyRelationshipTypeId" value="${partyRelationshipInstance?.partyRelationshipType.id}" />
+                    <input type="hidden" name="partyIdFromId" value="${partyRelationshipInstance?.partyIdFrom.id}" />
+                    <input type="hidden" name="partyIdToId" value="${partyRelationshipInstance?.partyIdTo.id}" />
+                    <input type="hidden" name="roleTypeCodeFromId" value="${partyRelationshipInstance?.roleTypeCodeFrom.id}" />
+                    <input type="hidden" name="roleTypeCodeToId" value="${partyRelationshipInstance?.roleTypeCodeTo.id}" />
                     <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
                 </g:form>

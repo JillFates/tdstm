@@ -18,7 +18,11 @@
             <div class="message">${flash.message}</div>
             </g:if>
             <g:form method="post" >
-                <input type="hidden" name="id" value="${partyRelationshipInstance?.id}" />
+                 <input type="hidden" name="partyRelationshipTypeId" value="${partyRelationshipInstance?.partyRelationshipType.id}" />
+                    <input type="hidden" name="partyIdFromId" value="${partyRelationshipInstance?.partyIdFrom.id}" />
+                    <input type="hidden" name="partyIdToId" value="${partyRelationshipInstance?.partyIdTo.id}" />
+                    <input type="hidden" name="roleTypeCodeFromId" value="${partyRelationshipInstance?.roleTypeCodeFrom.id}" />
+                    <input type="hidden" name="roleTypeCodeToId" value="${partyRelationshipInstance?.roleTypeCodeTo.id}" />
                 <div class="dialog">
                     <table>
                         <tbody>
@@ -98,7 +102,7 @@
                                     <label for="statusCode">Status Code:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:partyRelationshipInstance,field:'statusCode','errors')}">
-                                    <input type="text" id="statusCode" name="statusCode" value="${fieldValue(bean:partyRelationshipInstance,field:'statusCode')}"/>
+                                    <g:select id="statusCode" name="statusCode" from="${partyRelationshipInstance.constraints.statusCode.inList}" value="${partyRelationshipInstance.statusCode}" ></g:select>
                                 <g:hasErrors bean="${partyRelationshipInstance}" field="statusCode">
 					            <div class="errors">
 					                <g:renderErrors bean="${partyRelationshipInstance}" as="list" field="statusCode"/>
@@ -109,13 +113,13 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="comments">Comments:</label>
+                                    <label for="comment">Comment:</label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:partyRelationshipInstance,field:'comments','errors')}">
-                                    <input type="text" id="comments" name="comments" value="${fieldValue(bean:partyRelationshipInstance,field:'comments')}"/>
-                                <g:hasErrors bean="${partyRelationshipInstance}" field="comments">
+                                <td valign="top" class="value ${hasErrors(bean:partyRelationshipInstance,field:'comment','errors')}">
+                                    <input type="text" id="comment" name="comment" value="${fieldValue(bean:partyRelationshipInstance,field:'comment')}"/>
+                                <g:hasErrors bean="${partyRelationshipInstance}" field="comment">
 					            <div class="errors">
-					                <g:renderErrors bean="${partyRelationshipInstance}" as="list" field="comments"/>
+					                <g:renderErrors bean="${partyRelationshipInstance}" as="list" field="comment"/>
 					            </div>
 					            </g:hasErrors>
                                 </td>
