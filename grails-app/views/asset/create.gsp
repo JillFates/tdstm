@@ -23,13 +23,13 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="projectName">Project Name:</label>
+                                    <label for="project">Project :</label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:assetInstance,field:'projectName','errors')}">
-                                    <g:select optionKey="id" from="${Project.list()}" name="projectName.id" value="${assetInstance?.projectName?.id}" ></g:select>
-                                <g:hasErrors bean="${assetInstance}" field="projectName">
+                                <td valign="top" class="value ${hasErrors(bean:assetInstance,field:'project','errors')}">
+                                    <g:select optionKey="id" from="${Project.list()}" name="project.id" value="${assetInstance?.project?.id}" ></g:select>
+                                <g:hasErrors bean="${assetInstance}" field="project">
 					            <div class="errors">
-					                <g:renderErrors bean="${assetInstance}" as="list" field="projectName"/>
+					                <g:renderErrors bean="${assetInstance}" as="list" field="project"/>
 					            </div>
 					            </g:hasErrors>
                                 </td>
