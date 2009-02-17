@@ -36,7 +36,7 @@ class AssetTypeController {
     def edit = {
         def assetTypeInstance = AssetType.get( params.id )
 
-        if(!assetTypeInstance) {
+        if ( !assetTypeInstance ) {
             flash.message = "AssetType not found with id ${params.id}"
             redirect( action:list )
         }
@@ -46,7 +46,7 @@ class AssetTypeController {
     }
     // Update AssetType details 
     def update = {
-        def assetTypeInstance = AssetType.get( params.id[0] )
+        def assetTypeInstance = AssetType.get( params.assetTypeId )
         if ( assetTypeInstance ) {
             assetTypeInstance.properties = params
             if( !assetTypeInstance.hasErrors() && assetTypeInstance.save() ) {
