@@ -25,7 +25,7 @@ class PartyRelationshipController {
     	//	return PartyRelationship object by using composite PrimaryKey
 		def partyRelationshipInstance = PartyRelationship.get( new PartyRelationship( partyRelationshipType:PartyRelationshipType.get( params.partyRelationshipTypeId ), partyIdFrom:Party.get( params.partyIdFromId ), partyIdTo:Party.get( params.partyIdToId ), roleTypeCodeFrom:RoleType.get( params.roleTypeCodeFromId ), roleTypeCodeTo:RoleType.get( params.roleTypeCodeToId ) ) )
         if ( partyRelationshipInstance ) {
-            partyRelationshipInstance.delete()
+            partyRelationshipInstance.delete( flush:true )
             flash.message = "PartyRelationship deleted"
             redirect( action:list )
         }
@@ -51,9 +51,9 @@ class PartyRelationshipController {
     	//	return PartyRelationship object by using composite PrimaryKey
     	def partyRelDel = PartyRelationship.get( new PartyRelationship( partyRelationshipType:PartyRelationshipType.get( params.partyRelationshipTypeId ), partyIdFrom:Party.get( params.partyIdFromId ), partyIdTo:Party.get( params.partyIdToId ), roleTypeCodeFrom:RoleType.get( params.roleTypeCodeFromId ), roleTypeCodeTo:RoleType.get( params.roleTypeCodeToId ) ) )
         if ( partyRelDel ) {
+        	partyRelDel.delete( flush:true )
         	def partyRelationshipInstance = new PartyRelationship( params )
             if ( !partyRelationshipInstance.hasErrors() && partyRelationshipInstance.save( insert:true ) ) {
-            	partyRelDel.delete()
             	flash.message = "PartyRelationship updated"
                 redirect( action:show, params:[ partyRelationshipTypeId:partyRelationshipInstance.partyRelationshipType.id, partyIdFromId:partyRelationshipInstance.partyIdFrom.id, partyIdToId:partyRelationshipInstance.partyIdTo.id, roleTypeCodeFromId:partyRelationshipInstance.roleTypeCodeFrom.id, roleTypeCodeToId:partyRelationshipInstance.roleTypeCodeTo.id ] )
             }
