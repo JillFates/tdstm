@@ -3,44 +3,40 @@ class BootStrap {
 
     def init = { servletContext ->
 		//  Create PartyType records
-		def empParty = new PartyType( description:"Employees" )
-			empParty.id = "EMPLOYEE"
-			empParty.save( insert:true )
+		def personPartyType = new PartyType( description:"Person" )
+			personPartyType.id = "PERSON"
+			personPartyType.save( insert:true )
 	
-	    def contractParty = new PartyType( description:"Contractors" )
-			contractParty.id = "CONTRACT"
-			contractParty.save( insert:true )
+	    def groupPartyType = new PartyType( description:"PartyGroup" )
+			groupPartyType.id = "PARTY_GROUP"
+			groupPartyType.save( insert:true )
 	
-	    def consultParty = new PartyType( description:"Consultants" )
-			consultParty.id = "CONSULTANT"
-			consultParty.save( insert:true )
-
-		// TODO : Correct the parameters (i.e. partyName no longer valid)
-		// TODO : Create 3 people objects - no need to create parties due to inheritence.
 		// create Person Details
-		def personJohn = new Person( firstName:'John', lastName:'D', dateCreated:new Date(), active:'Y' ).save()
-		def personRalph = new Person( firstName:'Ralph', lastName:'D', dateCreated:new Date(), active:'Y' ).save()
-		def personLisa = new Person( firstName:'Lisa', lastName:'D', dateCreated:new Date(), active:'Y' ).save()
-		def personGeorge = new Person( firstName:'George', lastName:'D', dateCreated:new Date(), active:'Y' ).save()
+		def personJohn = new Person( firstName:'John', lastName:'Doherty', dateCreated:new Date(), active:'Y', partyType:personPartyType ).save()
+		def personRalph = new Person( firstName:'Ralph', lastName:'King', dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
+		def personLisa = new Person( firstName:'Lisa', lastName:'Angel', dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
+		def personGeorge = new Person( firstName:'George', lastName:'Washington', dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
 
 		// Create Projects
 		// need to create parent(party,partyGroup) records also due to inheritence
-		def acmeProject = new Project( dateCreated:new Date(), name:"Acme, Inc", projectCode:'ACME', description:'100 servers', trackChanges:'N' ).save();
-		def marioProject = new Project( dateCreated:new Date(), name:"Mario Brothers Co.", projectCode:'MARIO', description:'500 servers', trackChanges:'N' ).save();
+		def acmeProject = new Project( dateCreated:new Date(), name:"Acme, Inc", projectCode:'ACME', 
+			description:'100 servers', trackChanges:'N', partyType:groupPartyType ).save();
+		def marioProject = new Project( dateCreated:new Date(), name:"Mario Brothers Co.", projectCode:'MARIO', 
+			description:'500 servers', trackChanges:'N', partyType:groupPartyType ).save();
 
 		// Create Party Group
-		def tds = new PartyGroup( dateCreated:new Date(), name:"TDS" ).save()
-		def emc = new PartyGroup( dateCreated:new Date(), name:"EMC" ).save()
-		def trucks = new PartyGroup( dateCreated:new Date(), name:"TrucksRUs" ).save()
+		def tds = new PartyGroup( dateCreated:new Date(), name:"TDS", partyType:groupPartyType ).save()
+		def emc = new PartyGroup( dateCreated:new Date(), name:"EMC", partyType:groupPartyType ).save()
+		def trucks = new PartyGroup( dateCreated:new Date(), name:"TrucksRUs", partyType:groupPartyType ).save()
 
 		// Create User Details.
 	    def adminUserLisa = new UserLogin( person:personLisa, username: "lisa", password:new Sha1Hash("admin").toHex()  ).save()
 	    def userJohn = new UserLogin( person:personJohn, username: "john", password:new Sha1Hash("admin").toHex() ).save()
 	    def normalUserRalph = new UserLogin( person:personRalph, username:"ralph", password:new Sha1Hash("user").toHex() ).save()
 
-		// TODO : Complete the logic here to assign 2 of the above people to user logins with ADMIN and USER roles
 		// Notice that we are making the RoleType with code and description now
      	// create Roles.
+		// TODO : Should replace the dozen + inserts with a map and an iteratorg
 	    def adminRole = new RoleType( description:"Administrator" )
         adminRole.id = "ADMIN"
         adminRole.save( insert:true )
