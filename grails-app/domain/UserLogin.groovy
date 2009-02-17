@@ -12,7 +12,7 @@ class UserLogin {
 		 person( blank: false, nullable: false )
 		 username( blank: false, unique:true, maxLength: 25 )
 		 password( blank: false, nullable: false, password: true )
-		 dateCreated( blank: true, nullable: true )
+		 createdDate( blank: true, nullable: true )
 		 lastLogin( blank: true, nullable: true )
 	 }
 
