@@ -128,8 +128,18 @@ class AssetController {
         //get template Excel
         def workbook
         def book
-        try{
-            workbook = Workbook.getWorkbook( new File( grailsApplication.metadata['app.file.path'] ) )
+        try {
+        	// Statements to get context details
+        	def tempProtocol = request.getProtocol()
+        	def protocol = tempProtocol.substring(0,tempProtocol.indexOf("/"))
+        	def serverName = request.getServerName() 
+        	def serverPort = request.getServerPort()
+        	// construct application URL
+        	def appUrl = protocol + "://" + serverName + ":" + serverPort + "/" + grailsApplication.metadata['app.name']
+        	// get connection
+        	def url = new URL( appUrl + "/templates/ServerListExample.xls" )
+        	HttpURLConnection con = url.openConnection(); 
+            workbook = Workbook.getWorkbook( con.getInputStream() )
             
             //set MIME TYPE as Excel
             response.setContentType( "application/vnd.ms-excel" )
