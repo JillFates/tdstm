@@ -46,7 +46,7 @@ class RoleTypeController {
     }
     // update RoleType details
     def update = {
-        def roleTypeInstance = RoleType.get( params.id[0] )
+        def roleTypeInstance = RoleType.get( params.roleTypeId )
         if ( roleTypeInstance ) {
             roleTypeInstance.properties = params
             if(!roleTypeInstance.hasErrors() && roleTypeInstance.save()) {
