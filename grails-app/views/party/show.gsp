@@ -43,6 +43,13 @@
                             
                         </tr>
                     
+                        <tr class="prop">
+                            <td valign="top" class="name">Party Type:</td>
+                            
+                            <td valign="top" class="value"><g:link controller="partyType" action="show" id="${partyInstance?.partyType?.id}">${partyInstance?.partyType?.encodeAsHTML()}</g:link></td>
+                            
+                        </tr>
+                    
                     </tbody>
                 </table>
             </div>

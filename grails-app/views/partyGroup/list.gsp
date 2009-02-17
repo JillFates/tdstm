@@ -27,6 +27,8 @@
                         
                    	        <g:sortableColumn property="lastUpdated" title="Last Updated" />
                         
+                   	        <th>Party Type</th>
+                   	    
                    	        <g:sortableColumn property="name" title="Name" />
                         
                    	        <g:sortableColumn property="comment" title="Comment" />
@@ -42,6 +44,8 @@
                             <td>${fieldValue(bean:partyGroupInstance, field:'dateCreated')}</td>
                         
                             <td>${fieldValue(bean:partyGroupInstance, field:'lastUpdated')}</td>
+                        
+                            <td>${fieldValue(bean:partyGroupInstance, field:'partyType')}</td>
                         
                             <td>${fieldValue(bean:partyGroupInstance, field:'name')}</td>
                         

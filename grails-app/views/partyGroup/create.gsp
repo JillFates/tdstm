@@ -51,6 +51,20 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
+                                    <label for="partyType">Party Type:</label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean:partyGroupInstance,field:'partyType','errors')}">
+                                    <g:select optionKey="id" from="${PartyType.list()}" name="partyType.id" value="${partyGroupInstance?.partyType?.id}" noSelection="['null':'']"></g:select>
+                                <g:hasErrors bean="${partyGroupInstance}" field="partyType">
+					            <div class="errors">
+					                <g:renderErrors bean="${partyGroupInstance}" as="list" field="partyType"/>
+					            </div>
+					            </g:hasErrors>
+                                </td>
+                            </tr> 
+                        
+                            <tr class="prop">
+                                <td valign="top" class="name">
                                     <label for="name">Name:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:partyGroupInstance,field:'name','errors')}">

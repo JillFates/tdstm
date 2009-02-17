@@ -2,14 +2,26 @@ import org.jsecurity.crypto.hash.Sha1Hash
 class BootStrap {
 
     def init = { servletContext ->
+		//  Create PartyType records
+		def empParty = new PartyType( description:"Employees" )
+			empParty.id = "EMPLOYEE"
+			empParty.save( insert:true )
+	
+	    def contractParty = new PartyType( description:"Contractors" )
+			contractParty.id = "CONTRACT"
+			contractParty.save( insert:true )
+	
+	    def consultParty = new PartyType( description:"Consultants" )
+			consultParty.id = "CONSULTANT"
+			consultParty.save( insert:true )
 
 		// TODO : Correct the parameters (i.e. partyName no longer valid)
 		// TODO : Create 3 people objects - no need to create parties due to inheritence.
 		// create Person Details
 		def personJohn = new Person( firstName:'John', lastName:'D', dateCreated:new Date(), active:'Y' ).save()
-		def personRalph = new Person( firstName:'Ralph', dateCreated:new Date(), active:'Y' ).save()
-		def personLisa = new Person( firstName:'Lisa', dateCreated:new Date(), active:'Y' ).save()
-		def personGeorge = new Person( firstName:'George', dateCreated:new Date(), active:'Y' ).save()
+		def personRalph = new Person( firstName:'Ralph', lastName:'D', dateCreated:new Date(), active:'Y' ).save()
+		def personLisa = new Person( firstName:'Lisa', lastName:'D', dateCreated:new Date(), active:'Y' ).save()
+		def personGeorge = new Person( firstName:'George', lastName:'D', dateCreated:new Date(), active:'Y' ).save()
 
 		// Create Projects
 		// need to create parent(party,partyGroup) records also due to inheritence

@@ -44,6 +44,13 @@
                         </tr>
                     
                         <tr class="prop">
+                            <td valign="top" class="name">Party Type:</td>
+                            
+                            <td valign="top" class="value"><g:link controller="partyType" action="show" id="${partyGroupInstance?.partyType?.id}">${partyGroupInstance?.partyType?.encodeAsHTML()}</g:link></td>
+                            
+                        </tr>
+                    
+                        <tr class="prop">
                             <td valign="top" class="name">Name:</td>
                             
                             <td valign="top" class="value">${fieldValue(bean:partyGroupInstance, field:'name')}</td>

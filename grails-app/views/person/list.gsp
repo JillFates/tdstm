@@ -27,11 +27,11 @@
                         
                    	        <g:sortableColumn property="lastUpdated" title="Last Updated" />
                         
+                   	        <th>Party Type</th>
+                   	    
                    	        <g:sortableColumn property="firstName" title="First Name" />
                         
                    	        <g:sortableColumn property="lastName" title="Last Name" />
-                        
-                   	        <g:sortableColumn property="nickName" title="Nick Name" />
                         
                         </tr>
                     </thead>
@@ -45,11 +45,11 @@
                         
                             <td>${fieldValue(bean:personInstance, field:'lastUpdated')}</td>
                         
+                            <td>${fieldValue(bean:personInstance, field:'partyType')}</td>
+                        
                             <td>${fieldValue(bean:personInstance, field:'firstName')}</td>
                         
                             <td>${fieldValue(bean:personInstance, field:'lastName')}</td>
-                        
-                            <td>${fieldValue(bean:personInstance, field:'nickName')}</td>
                         
                         </tr>
                     </g:each>
