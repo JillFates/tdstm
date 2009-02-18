@@ -4,8 +4,7 @@
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
 <link rel="shortcut icon"
-	href="${createLinkTo(dir:'images',file:'tds.ico')}"
-	type="image/x-icon" />
+	href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 <g:layoutHead />
 <g:javascript library="application" />
 </head>
@@ -16,14 +15,24 @@
 <div class="logo">
 <table style="border: 0;">
 	<tr>
-		<td><a href="http://www.transitionaldata.com/" target="new" ><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" border="0" alt="tds" /></a> </td>
+		<td><a href="http://www.transitionaldata.com/" target="new"><img
+			src="${createLinkTo(dir:'images',file:'tds.jpg')}" border="0"
+			alt="tds" /></a></td>
 		<td style="padding-left: 20%"><jsec:isLoggedIn>
 			<strong>Welcome <jsec:principal />&nbsp;! </strong>
-			&nbsp;<g:link controller="auth" action="signOut" style="color: #328714">sign out</g:link>
+			&nbsp;<g:link controller="auth" action="signOut"
+				style="color: #328714">sign out</g:link>
 		</jsec:isLoggedIn></td>
 	</tr>
 </table>
-
+	<div class="nav">
+		<span class="menuButton"><g:link class="home" controller="auth" action="home" params="[actionType:'party']">Party</g:link></span>
+		<span class="menuButton"><g:link class="home" controller="auth" action="home" params="[actionType:'asset']">Asset</g:link></span>
+		<jsec:hasRole name="Administrator">
+		<span class="menuButton"><g:link class="home" controller="auth" action="home" params="[actionType:'masters']">Masters</g:link></span>
+		</jsec:hasRole>
+		
+	</div>
 </div>
 <div class="logo"></div>
 

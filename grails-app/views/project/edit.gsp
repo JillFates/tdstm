@@ -7,13 +7,14 @@
         <title>Edit Project</title>
     </head>
     <body>
-        <div class="nav">
-            <span class="menuButton"><g:link class="home" controller="auth" action="home">Home</g:link></span>
-            <span class="menuButton"><g:link class="list" action="list">Project List</g:link></span>
-            <span class="menuButton"><g:link class="create" action="create">New Project</g:link></span>
-        </div>
+        
         <div class="body">
             <h1>Edit Project</h1>
+            <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
+            <span class="menuButton"><g:link class="list" action="list">Project List</g:link></span>
+            <span class="menuButton"><g:link class="create" action="create">New Project</g:link></span>
+	        </div>
+	        <br>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
