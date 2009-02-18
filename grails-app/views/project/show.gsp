@@ -11,7 +11,7 @@
             <h1>Show Project</h1>
              <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
             <span class="menuButton"><g:link class="list" action="list">Project List</g:link></span>
-            <jsec:hasRole name="Administrator">
+            <jsec:hasRole name="ADMIN">
             <span class="menuButton"><g:link class="create" action="create">New Project</g:link></span>
             </jsec:hasRole>
         	</div>
@@ -97,7 +97,7 @@
                     </tbody>
                 </table>
             </div>
-            <jsec:hasRole name="Administrator">
+            <jsec:hasRole name="ADMIN">
             <div class="buttons">
                 <g:form>
                     <input type="hidden" name="id" value="${projectInstance?.id}" />

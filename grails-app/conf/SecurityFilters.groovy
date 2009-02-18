@@ -5,7 +5,7 @@ class SecurityFilters {
         partyCrud(controller: "(party|person|project|partyGroup)", action: "(create|edit|save|update|delete)") {
             before = {
                 accessControl {
-                    role("Administrator")
+                    role("ADMIN")
                 }
             }
         }
@@ -13,7 +13,7 @@ class SecurityFilters {
         userCrud(controller: "userLogin", action: "(edit|update|delete)") {
             before = {
                 accessControl {
-                    role("Administrator")
+                    role("ADMIN")
                 }
             }
         }
@@ -21,7 +21,7 @@ class SecurityFilters {
         crud(controller: "*", action: "delete") {
             before = {
                 accessControl {
-                    role("Administrator")
+                    role("ADMIN")
                 }
             }
         }

@@ -9,7 +9,7 @@
     <body>
         <div class="body">
             <h1>Project List</h1>
-            <jsec:hasRole name="Administrator">
+            <jsec:hasRole name="ADMIN">
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
             <span class="menuButton"><g:link class="create" action="create">New Project</g:link></span>
         	</div>

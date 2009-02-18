@@ -15,7 +15,7 @@
 <div class="dialog">
 <div class="nav" style="border: 1px solid #CCCCCC; height: 11px"><span
 	class="menuButton"><g:link class="list" action="list">Party List</g:link></span>
-<jsec:hasRole name="Administrator">
+<jsec:hasRole name="ADMIN">
 	<span class="menuButton"><g:link class="create" action="create">New Party</g:link></span>
 </jsec:hasRole></div>
 <br>
@@ -50,9 +50,9 @@
 		<tr class="prop">
 			<td valign="top" class="name">Party Type:</td>
 
-			<td valign="top" class="value"><jsec:hasRole name="Administrator"><g:link controller="partyType"
+			<td valign="top" class="value"><jsec:hasRole name="ADMIN"><g:link controller="partyType"
 				action="show" id="${partyInstance?.partyType?.id}">${partyInstance?.partyType?.encodeAsHTML()}</g:link></jsec:hasRole>
-			<jsec:lacksRole name="Administrator">${partyInstance?.partyType?.encodeAsHTML()}</jsec:lacksRole>
+			<jsec:lacksRole name="ADMIN">${partyInstance?.partyType?.encodeAsHTML()}</jsec:lacksRole>
 			</td>
 
 		</tr>
@@ -60,7 +60,7 @@
 	</tbody>
 </table>
 </div>
-<jsec:hasRole name="Administrator">
+<jsec:hasRole name="ADMIN">
 	<div class="buttons"><g:form>
 		<input type="hidden" name="id" value="${partyInstance?.id}" />
 		<span class="button"><g:actionSubmit class="edit" value="Edit" /></span>

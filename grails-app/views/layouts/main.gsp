@@ -28,7 +28,7 @@
 	<div class="nav">
 		<span class="menuButton"><g:link class="home" controller="auth" action="home" params="[actionType:'party']">Party</g:link></span>
 		<span class="menuButton"><g:link class="home" controller="auth" action="home" params="[actionType:'asset']">Asset</g:link></span>
-		<jsec:hasRole name="Administrator">
+		<jsec:hasRole name="ADMIN">
 		<span class="menuButton"><g:link class="home" controller="auth" action="home" params="[actionType:'masters']">Masters</g:link></span>
 		</jsec:hasRole>
 		
