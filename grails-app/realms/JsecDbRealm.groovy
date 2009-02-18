@@ -39,34 +39,23 @@ class JsecDbRealm {
     }
 
     def hasRole(principal, roleName) {
-    	/*
-        def criteria = JsecUserRoleRel.createCriteria()
-        def roles = criteria.list {
-            role {
-                eq('name', roleName)
-            }
-            user {
-                eq('username', principal)
-            }
-        }
+    	// retuen boolen true if principal has role
+        
+    	def person = UserLogin.findByUsername(principal).person
+        def roleType = RoleType.findByDescription(roleName)
+        def roles = PartyRole.findAllByPartyAndRoleType(person,roleType)
 
         return roles.size() > 0
-    */}
+    }
 
     def hasAllRoles(principal, roles) {
-    	/*
-        def criteria = JsecUserRoleRel.createCriteria()
-        def r = criteria.list {
-            role {
-                'in'('name', roles)
-            }
-            user {
-                eq('username', principal)
-            }
-        }
-
-        return r.size() == roles.size()
-    */}
+    	// need to implement 
+    	/*def person = UserLogin.findByUsername(principal).person
+         def roleType = RoleType.findAllByDescription(roles)
+         def r = PartyRole.findAllByPartyAndRoleType(person,roleType)
+        return r.size() == roles.size()*/
+        return true
+    }
     // method to get the permission, currently code is commented 
     def isPermitted(principal, requiredPermission) {/*
         // Does the user have the given permission directly associated
