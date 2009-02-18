@@ -1,14 +1,25 @@
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="layout" content="main" />
 <title>Login</title>
+<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
+<link rel="shortcut icon"
+	href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+<g:javascript library="application" />
 </head>
-
-<body  onload="document.loginForm.username.focus();" style="margin-top: 40px">
+<body>
+<div id="spinner" class="spinner" style="display: none;"><img
+	src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
+</div>
+<div class="logo">
+<table style="border: 0;">
+	<tr>
+		<td><a href="http://www.transitionaldata.com/" target="new"><img
+			src="${createLinkTo(dir:'images',file:'tds.jpg')}" border="0"
+			alt="tds" /></a></td>
+		
+	</tr>
+</table>
 <div class="mainbody" >
 <table width="100%" style="border: 0; vertical-align: top;" align="center" cellpadding="0"
 	cellspacing="0">
@@ -49,5 +60,7 @@
 	</tr>
 </table>
 </div>
+</div>
+<div class="logo"></div>
 </body>
 </html>

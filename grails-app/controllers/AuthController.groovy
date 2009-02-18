@@ -65,10 +65,18 @@ class AuthController {
     }
 
     def unauthorized = {
-        render 'You do not have permission to access this page.'
+        flash.message = 'You do not have permission to access this page.'
+        	render( view:'home' )
     }
     // method for home page
     def home = {
-    		render(view:'home')
+    	def actionType = params.actionType
+    	if ( actionType == "asset" ) {
+    		render( view:'asset' )
+    	} else if ( actionType == "masters" ) {
+    		render( view:'masters' )
+    	} else {
+    		render( view:'home' )
+    	}
     }
 }
