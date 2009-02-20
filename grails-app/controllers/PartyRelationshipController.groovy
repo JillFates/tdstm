@@ -49,22 +49,33 @@ class PartyRelationshipController {
     // update PartyRelationship using composite PrimaryKey
     def update = {
     	//	return PartyRelationship object by using composite PrimaryKey
-    	def partyRelDel = PartyRelationship.get( new PartyRelationship( partyRelationshipType:PartyRelationshipType.get( params.partyRelationshipTypeId ), partyIdFrom:Party.get( params.partyIdFromId ), partyIdTo:Party.get( params.partyIdToId ), roleTypeCodeFrom:RoleType.get( params.roleTypeCodeFromId ), roleTypeCodeTo:RoleType.get( params.roleTypeCodeToId ) ) )
-        if ( partyRelDel ) {
-        	partyRelDel.delete( flush:true )
-        	def partyRelationshipInstance = new PartyRelationship( params )
-            if ( !partyRelationshipInstance.hasErrors() && partyRelationshipInstance.save( insert:true ) ) {
-            	flash.message = "PartyRelationship updated"
-                redirect( action:show, params:[ partyRelationshipTypeId:partyRelationshipInstance.partyRelationshipType.id, partyIdFromId:partyRelationshipInstance.partyIdFrom.id, partyIdToId:partyRelationshipInstance.partyIdTo.id, roleTypeCodeFromId:partyRelationshipInstance.roleTypeCodeFrom.id, roleTypeCodeToId:partyRelationshipInstance.roleTypeCodeTo.id ] )
-            }
-            else {
-                render( view:'edit', model:[partyRelationshipInstance:partyRelationshipInstance] )
-            }
-        }
-        else {
-            flash.message = "PartyRelationship not found"
-            redirect( action:edit, id:params.id )
-        }
+    	def partyRelationshipInstance = PartyRelationship.get( new PartyRelationship( partyRelationshipType:PartyRelationshipType.get( params.partyRelationshipTypeId ), partyIdFrom:Party.get( params.partyIdFromId ), partyIdTo:Party.get( params.partyIdToId ), roleTypeCodeFrom:RoleType.get( params.roleTypeCodeFromId ), roleTypeCodeTo:RoleType.get( params.roleTypeCodeToId ) ) )
+    	def partyRelationshipUpdated = PartyRelationship.get( new PartyRelationship( partyRelationshipType:PartyRelationshipType.get( params.partyRelationshipType.id ), partyIdFrom:Party.get( params.partyIdFrom.id ), partyIdTo:Party.get( params.partyIdTo.id ), roleTypeCodeFrom:RoleType.get( params.roleTypeCodeFrom.id ), roleTypeCodeTo:RoleType.get( params.roleTypeCodeTo.id ) ) )
+	    
+    	if ( partyRelationshipInstance ) {
+	    	// statement to check , whether composite key updated or not
+	    	if ( partyRelationshipInstance == partyRelationshipUpdated ) {
+				partyRelationshipInstance.properties = params
+				if ( !partyRelationshipInstance.hasErrors() && partyRelationshipInstance.save() ) {
+		        	flash.message = "PartyRelationship updated"
+		        	redirect( action:show, params:[ partyRelationshipTypeId:partyRelationshipInstance.partyRelationshipType.id, partyIdFromId:partyRelationshipInstance.partyIdFrom.id, partyIdToId:partyRelationshipInstance.partyIdTo.id, roleTypeCodeFromId:partyRelationshipInstance.roleTypeCodeFrom.id, roleTypeCodeToId:partyRelationshipInstance.roleTypeCodeTo.id ] )
+				} else {
+					render( view:'edit', model:[partyRelationshipInstance:partyRelationshipInstance] )
+				}
+	    	} else {
+		    	// if composite key updated insert new record
+		    	def partyRelationship = new PartyRelationship( params )
+		    	if ( !partyRelationship.hasErrors() && partyRelationship.save( insert: true ) ) {
+		        	flash.message = "PartyRelationship updated"
+		        	redirect( action:show, params:[ partyRelationshipTypeId:partyRelationship.partyRelationshipType.id, partyIdFromId:partyRelationship.partyIdFrom.id, partyIdToId:partyRelationship.partyIdTo.id, roleTypeCodeFromId:partyRelationship.roleTypeCodeFrom.id, roleTypeCodeToId:partyRelationship.roleTypeCodeTo.id ] )
+		    	} else {
+		    		render( view:'edit', model:[partyRelationshipInstance:partyRelationship] )
+		    	}
+	    	}
+	    } else {
+	    	flash.message = "PartyRelationship not found"
+	        redirect( action:edit, id:params.id )
+	    }
     }
     // create from for PartyRelationship
     def create = {
