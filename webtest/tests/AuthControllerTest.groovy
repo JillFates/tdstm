@@ -5,9 +5,9 @@ class AuthControllerTest extends grails.util.WebTest {
 
         invoke( url: 'auth/login' )
         
-        selectForm(name:'loginForm')
-        setInputField(name:'username', value:'')
-        setInputField(name:'password', value:'')
+        selectForm( name: 'loginForm' )
+        setInputField( name: 'username', value:'' )
+        setInputField( name: 'password', value:'' )
 
         clickButton( label: 'Sign in' )
         
@@ -18,9 +18,9 @@ class AuthControllerTest extends grails.util.WebTest {
 
         invoke( url: 'auth/login' )
         
-        selectForm(name:'loginForm')
-        setInputField(name: 'username', value: 'john')
-        setInputField(name: 'password', value: 'john')
+        selectForm( name: 'loginForm' )
+        setInputField( name: 'username', value: 'john' )
+        setInputField( name: 'password', value: 'john' )
 
         clickButton( label: 'Sign in' )
         
@@ -31,18 +31,18 @@ class AuthControllerTest extends grails.util.WebTest {
 
         invoke( url: 'auth/login' )
 
-        selectForm(name: 'loginForm')
-        setInputField(name: 'username', value:'john')
-        setInputField(name: 'password', value:'admin')
+        selectForm( name: 'loginForm' )
+        setInputField( name: 'username', value:'john' )
+        setInputField( name: 'password', value:'admin' )
 
-        clickButton(label: 'Sign in')
+        clickButton( label: 'Sign in' )
 
     }
 
     //Attempt accessing secure page without being logged in.  Should be redirected to login page.
     def testSecurePageWithoutLogin() {
 
-        invoke( url: 'auth/login/home' )
+        invoke( url: 'auth/login/home', description:'Sign In to access secure Pages' )
 
     }
 
@@ -51,13 +51,13 @@ class AuthControllerTest extends grails.util.WebTest {
 
         invoke(url: 'auth/login')
 
-        selectForm(name: 'loginForm')
-        setInputField(name: 'username', value:'john')
-        setInputField(name: 'password', value:'admin')
+        selectForm( name: 'loginForm' )
+        setInputField( name: 'username', value:'john' )
+        setInputField( name: 'password', value:'admin' )
 
-        clickButton(label: 'Sign in')
+        clickButton( label: 'Sign in' )
         
-        invoke( url: 'party/list' )
+        clickLink( label:'Party' )
 
     }
 
@@ -67,14 +67,14 @@ class AuthControllerTest extends grails.util.WebTest {
         invoke( url: 'auth/login' )
 
         selectForm( name: 'loginForm' )
-        setInputField( name: 'username', value: 'john' )
-        setInputField( name: 'password', value: 'admin' )
+        setInputField( name: 'username', value: 'ralph' )
+        setInputField( name: 'password', value: 'user' )
 
-        clickButton(label: 'Sign in')
+        clickButton( label: 'Sign in' )
 
-        invoke( url: 'auth/signOut' )
+        clickLink( label: 'sign out' )
         
-        invoke( url: 'auth/login/home' )
+        invoke( url: 'auth/login/home' , description:'Sign In to access secure Pages' )
     }
     
 }
