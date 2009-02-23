@@ -34,6 +34,12 @@ class BootStrap {
 	    def userJohn = new UserLogin( person:personJohn, username: "john", password:new Sha1Hash("admin").toHex() ).save()
 	    def normalUserRalph = new UserLogin( person:personRalph, username:"ralph", password:new Sha1Hash("user").toHex() ).save()
 
+		// Create default Preference
+		def johnPref = new UserPreference( value: acmeProject.id )
+		johnPref.userLogin = userJohn
+		johnPref.preferenceCode = "CURR_PROJ"
+		johnPref.save( insert: true)
+		
 		// Notice that we are making the RoleType with code and description now
      	// create Roles.
 		// TODO : Should replace the dozen + inserts with a map and an iteratorg
