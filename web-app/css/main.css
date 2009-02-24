@@ -51,7 +51,7 @@ textarea {
 }
 
 input:focus, select:focus, textarea:focus {
-    border: 1px solid #C7E693;
+    border: 1px solid #5F9FCF;
 }
 
 .body {
@@ -129,7 +129,7 @@ td.errors input {
 /* TABLES */
 
 table {
-    border: 1px solid #B7DE74;
+    border: 1px solid #5F9FCF;
     width: 100%
 }
 tr {
@@ -184,7 +184,7 @@ th.desc a {
     border-left: 0px solid #ddd;
 }
 .list th:hover, .list tr:hover {
-    background: #C7E693;
+    background: #87CEEB;
 }
 
 /* PAGINATION */
@@ -259,6 +259,9 @@ th.desc a {
 .buttons input.edit {
     background: transparent url(../images/skin/database_edit.png) 5px 50% no-repeat;
     padding-left: 28px;
+}
+.buttons input.select {
+    background: transparent;
 }
 .buttons input.save {
     background: transparent url(../images/skin/database_save.png) 5px 50% no-repeat;

@@ -1,5 +1,7 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title><g:layoutTitle default="Grails" /></title>
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
@@ -8,34 +10,56 @@
 <g:layoutHead />
 <g:javascript library="application" />
 </head>
+
 <body>
-<div id="spinner" class="spinner" style="display: none;"><img
-	src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
-</div>
-<div class="logo">
-<table style="border: 0;">
-	<tr>
-		<td><a href="http://www.transitionaldata.com/" target="new"><img
-			src="${createLinkTo(dir:'images',file:'tds.jpg')}" border="0"
-			alt="tds" /></a></td>
-		<td style="padding-left: 20%"><jsec:isLoggedIn>
-			<strong>Welcome <jsec:principal />&nbsp;! </strong>
+<div class="main_body">
+
+<div class="header"><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;">
+<div class="header_right">
+<br />
+<div style="font-weight: bold; color: #0000FF">
+<jsec:isLoggedIn>
+			<strong>Welcome &nbsp;&nbsp;<jsec:principal />&nbsp;! </strong>
 			&nbsp;<g:link controller="auth" action="signOut"
 				style="color: #328714">sign out</g:link>
-		</jsec:isLoggedIn></td>
-	</tr>
-</table>
-	<div class="nav">
-		<span class="menuButton"><g:link class="home" controller="auth" action="home" params="[actionType:'party']">Party</g:link></span>
-		<span class="menuButton"><g:link class="home" controller="auth" action="home" params="[actionType:'asset']">Asset</g:link></span>
-		<jsec:hasRole name="ADMIN">
-		<span class="menuButton"><g:link class="home" controller="auth" action="home" params="[actionType:'masters']">Masters</g:link></span>
-		</jsec:hasRole>
-		
-	</div>
+</jsec:isLoggedIn>
 </div>
-<div class="logo"></div>
+</div>
+</div>
 
+<div class="top_menu_layout">
+<div class="menu1">
+<ul>
+	<li><g:link class="home" controller="projectUtil" >Project Manager</g:link></li>
+	<li><a href="#">Administration </a></li>
+</ul>
+</div>
+</div>
+<div class="title">&nbsp;Party Manager Application
+</div>
+<div class="menu1">
+<ul>
+	<li><a href="#">Main</a></li>
+	<li><g:link class="home" controller="projectUtil" action="searchList" >Search</g:link></li>
+	<li><g:link class="home" controller="project" action="create" >Add</g:link></li>
+	<li><a href="#">Import/Export</a></li>
+</ul>
+</div>
+<div class="menu2">
+<ul>
+	<li><g:link class="home" controller="auth" action="home" params="[actionType:'party']">Project </g:link></li>
+	<li><a href="#">Assets </a></li>
+	<li><a href="#">Team </a></li>
+	<li><a href="#">Contacts </a></li>
+	<li><a href="#">Applications </a></li>
+	<li><a href="#">Move Bundles </a></li>
+</ul>
+</div>
+<div class="main_bottom">
 <g:layoutBody />
+</div>
+
+
+</div>
 </body>
 </html>

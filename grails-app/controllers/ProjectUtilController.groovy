@@ -1,0 +1,42 @@
+import org.jsecurity.SecurityUtils
+class ProjectUtilController {
+	def userPreferenceService
+
+    def index = { 
+    		
+        def principal = SecurityUtils.subject.principal
+        def userLogin = UserLogin.findByUsername( principal )
+        def userPreference = UserPreference.findByUserLogin( userLogin )
+    		
+        if ( userPreference == null ) {
+            redirect( action:"searchList" )
+        } else {
+    			
+            def projectInstance = Project.findById( userPreference.value )
+            redirect( controller:"project", action:"show",id:projectInstance.id)
+        }
+    		
+    }
+    
+    /*
+     * Action to return a list of projects , sorted desc by dateCreated 
+     */
+        
+    def searchList = {
+   		def query = "from Project as p order by p.dateCreated desc"
+    	def projectList = Project.findAll( query )
+    	return [ projectList:projectList ]
+    }
+    /*
+     * Action to setPreferences
+     */
+    def addUserPreference = {
+    		
+        def projectInstance = Project.findByProjectCode(params.selectProject)
+    		
+        userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+
+        redirect(controller:'project', action:"show", id: projectInstance.id )
+    		
+    }
+}

@@ -4,6 +4,7 @@ import org.jsecurity.SecurityUtils
 
 class AuthController {
     def jsecSecurityManager
+    def userPreferenceService
 
     def index = { redirect(action: 'login', params: params) }
 
@@ -31,6 +32,10 @@ class AuthController {
 
             log.info "Redirecting to '${targetUri}'."
             //redirect(uri: targetUri)
+            /*
+             *  call loadPreferences() to load CURR_PROJ MAP into session
+             */
+            userPreferenceService.loadPreferences()
             redirect(action:'home')
         }
         catch (AuthenticationException ex){
