@@ -50,7 +50,7 @@
 <div class="menu2">
 <ul>
 	<li><a href="#">Project </a> </li>
-	<li><a href="#">Assets </a></li>
+	<li><g:link class="home" controller="asset">Assets </g:link></li>
 	<li><a href="#">Team </a></li>
 	<li><a href="#">Contacts </a></li>
 	<li><a href="#">Applications </a></li>
