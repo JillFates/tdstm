@@ -25,7 +25,7 @@
       })
 
     </script>
-    
+
     <g:javascript>
       function showAssetDialog( e ) {
 
@@ -221,7 +221,7 @@
                   <label for="assetName">Asset Name:</label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:assetInstance,field:'assetName','errors')}">
-                  <input type="text" id="assetName" name="assetName" value="${fieldValue(bean:assetInstance,field:'assetName')}"/>
+                  <input type="text" id="assetName" name="assetName" value=""/>
                   <g:hasErrors bean="${assetInstance}" field="assetName">
                     <div class="errors">
                       <g:renderErrors bean="${assetInstance}" as="list" field="assetName"/>
