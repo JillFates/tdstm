@@ -1,159 +1,246 @@
-
-
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="main" />
-        <title>Create Project</title>         
-    </head>
-    <body>
-        <div class="body">
-            <h1>Create Project</h1>
-             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-            <span class="menuButton"><g:link class="list" action="list">Project List</g:link></span>
-        	</div>
-        	<br>
-            <g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
-            </g:if>
-            <g:form action="save" method="post" >
-                <div class="dialog">
-                    <table>
-                        <tbody>
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="dateCreated">Date Created:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'dateCreated','errors')}">
-                                    <g:datePicker name="dateCreated" value="${projectInstance?.dateCreated}" ></g:datePicker>
-                                <g:hasErrors bean="${projectInstance}" field="dateCreated">
-					            <div class="errors">
-					                <g:renderErrors bean="${projectInstance}" as="list" field="dateCreated"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="lastUpdated">Last Updated:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'lastUpdated','errors')}">
-                                    <g:datePicker name="lastUpdated" value="${projectInstance?.lastUpdated}" noSelection="['':'']"></g:datePicker>
-                                <g:hasErrors bean="${projectInstance}" field="lastUpdated">
-					            <div class="errors">
-					                <g:renderErrors bean="${projectInstance}" as="list" field="lastUpdated"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="name">Name:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'name','errors')}">
-                                    <input type="text" id="name" name="name" value="${fieldValue(bean:projectInstance,field:'name')}"/>
-                                <g:hasErrors bean="${projectInstance}" field="name">
-					            <div class="errors">
-					                <g:renderErrors bean="${projectInstance}" as="list" field="name"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="comment">Comment:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'comment','errors')}">
-                                    <input type="text" id="comment" name="comment" value="${fieldValue(bean:projectInstance,field:'comment')}"/>
-                                <g:hasErrors bean="${projectInstance}" field="comment">
-					            <div class="errors">
-					                <g:renderErrors bean="${projectInstance}" as="list" field="comment"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="projectCode">Project Code:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'projectCode','errors')}">
-                                    <input type="text" id="projectCode" name="projectCode" value="${fieldValue(bean:projectInstance,field:'projectCode')}"/>
-                                <g:hasErrors bean="${projectInstance}" field="projectCode">
-					            <div class="errors">
-					                <g:renderErrors bean="${projectInstance}" as="list" field="projectCode"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="description">Description:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'description','errors')}">
-                                    <input type="text" id="description" name="description" value="${fieldValue(bean:projectInstance,field:'description')}"/>
-                                <g:hasErrors bean="${projectInstance}" field="description">
-					            <div class="errors">
-					                <g:renderErrors bean="${projectInstance}" as="list" field="description"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="trackChanges">Track Changes:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'trackChanges','errors')}">
-                                    <g:select id="trackChanges" name="trackChanges" from="${projectInstance.constraints.trackChanges.inList}" value="${projectInstance.trackChanges}" ></g:select>
-                                <g:hasErrors bean="${projectInstance}" field="trackChanges">
-					            <div class="errors">
-					                <g:renderErrors bean="${projectInstance}" as="list" field="trackChanges"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="startDate">Start Date:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'startDate','errors')}">
-                                    <g:datePicker name="startDate" value="${projectInstance?.startDate}" noSelection="['':'']"></g:datePicker>
-                                <g:hasErrors bean="${projectInstance}" field="startDate">
-					            <div class="errors">
-					                <g:renderErrors bean="${projectInstance}" as="list" field="startDate"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="completionDate">Completion Date:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'completionDate','errors')}">
-                                    <g:datePicker name="completionDate" value="${projectInstance?.completionDate}" noSelection="['':'']"></g:datePicker>
-                                <g:hasErrors bean="${projectInstance}" field="completionDate">
-					            <div class="errors">
-					                <g:renderErrors bean="${projectInstance}" as="list" field="completionDate"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                        
-                        </tbody>
-                    </table>
-                </div>
-                <div class="buttons">
-                    <span class="button"><input class="save" type="submit" value="Create" /></span>
-                </div>
-            </g:form>
-        </div>
-    </body>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="layout" content="main" />
+<title>Create Project</title>
+<g:javascript library="prototype" />
+<g:javascript>
+
+	function appendPartnerStaff(e) {
+		// The response comes back as a bunch-o-JSON 
+		
+		var managers = eval("(" + e.responseText + ")") 
+		// evaluate JSON
+		var rselect = document.getElementById('projectManagerId')
+		var mselect = document.getElementById('moveManagerId')
+		// Clear all previous options 
+		var l = rselect.length
+		var compSatff = document.getElementById('companyManagersId').value
+		while (l > compSatff) { 
+			l-- 
+			rselect.remove(l) 
+			mselect.remove(l) 
+		}
+			// Rebuild the select
+		if (managers) { 
+			var pmOptGroup = document.getElementById('pmOptGroupId')
+			var mmOptGroup = document.getElementById('mmOptGroupId')
+			var projectPartner = document.getElementById('projectPartnerId');
+			var projectPartnerVal = projectPartner[document.getElementById('projectPartnerId').selectedIndex].innerHTML;
+			pmOptGroup.style.visibility="visible";
+			mmOptGroup.style.visibility="visible";
+			pmOptGroup.label = projectPartnerVal;
+			mmOptGroup.label = projectPartnerVal;
+			var length = managers.items.length
+			for (var i=0; i < length; i++) {
+				var manager = managers.items[i]
+				var popt = document.createElement('option'); 
+				popt.text = manager.name
+				popt.value = manager.id
+				var mopt = document.createElement('option'); 
+				mopt.text = manager.name
+				mopt.value = manager.id
+				try { 
+					rselect.add(popt, null) // standards compliant; doesn't work in IE
+					mselect.add(mopt, null)
+				} catch(ex) { 
+					rselect.add(popt) // IE only
+					mselect.add(mopt)
+				} 
+			}
+		} 
+	}
+</g:javascript>
+</head>
+<body>
+<div class="body">
+<h1>Create Project</h1>
+<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
+<span class="menuButton"><g:link class="list" action="list">Project List</g:link></span>
+</div>
+<br>
+<g:if test="${flash.message}">
+	<div class="message">${flash.message}</div>
+</g:if> <g:form action="save" method="post">
+	<div class="dialog">
+	<table>
+		<tbody>
+
+			<tr class="prop">
+				<td valign="top" class="name"><label for="dateCreated">Date
+				Created:</label></td>
+				<td valign="top"
+					class="value ${hasErrors(bean:projectInstance,field:'dateCreated','errors')}">
+				<g:datePicker name="dateCreated"
+					value="${projectInstance?.dateCreated}"></g:datePicker> <g:hasErrors
+					bean="${projectInstance}" field="dateCreated">
+					<div class="errors"><g:renderErrors bean="${projectInstance}"
+						as="list" field="dateCreated" /></div>
+				</g:hasErrors></td>
+			</tr>
+
+			<tr class="prop">
+				<td valign="top" class="name"><label for="lastUpdated">Last
+				Updated:</label></td>
+				<td valign="top"
+					class="value ${hasErrors(bean:projectInstance,field:'lastUpdated','errors')}">
+				<g:datePicker name="lastUpdated"
+					value="${projectInstance?.lastUpdated}" noSelection="['':'']"></g:datePicker>
+				<g:hasErrors bean="${projectInstance}" field="lastUpdated">
+					<div class="errors"><g:renderErrors bean="${projectInstance}"
+						as="list" field="lastUpdated" /></div>
+				</g:hasErrors></td>
+			</tr>
+
+			<tr class="prop">
+				<td valign="top" class="name"><label for="name">Name:</label></td>
+				<td valign="top"
+					class="value ${hasErrors(bean:projectInstance,field:'name','errors')}">
+				<input type="text" id="name" name="name"
+					value="${fieldValue(bean:projectInstance,field:'name')}" /> <g:hasErrors
+					bean="${projectInstance}" field="name">
+					<div class="errors"><g:renderErrors bean="${projectInstance}"
+						as="list" field="name" /></div>
+				</g:hasErrors></td>
+			</tr>
+
+			<tr class="prop">
+				<td valign="top" class="name"><label for="comment">Comment:</label>
+				</td>
+				<td valign="top"
+					class="value ${hasErrors(bean:projectInstance,field:'comment','errors')}">
+				<input type="text" id="comment" name="comment"
+					value="${fieldValue(bean:projectInstance,field:'comment')}" /> <g:hasErrors
+					bean="${projectInstance}" field="comment">
+					<div class="errors"><g:renderErrors bean="${projectInstance}"
+						as="list" field="comment" /></div>
+				</g:hasErrors></td>
+			</tr>
+
+			<tr class="prop">
+				<td valign="top" class="name"><label for="projectCode">Project
+				Code:</label></td>
+				<td valign="top"
+					class="value ${hasErrors(bean:projectInstance,field:'projectCode','errors')}">
+				<input type="text" id="projectCode" name="projectCode"
+					value="${fieldValue(bean:projectInstance,field:'projectCode')}" />
+				<g:hasErrors bean="${projectInstance}" field="projectCode">
+					<div class="errors"><g:renderErrors bean="${projectInstance}"
+						as="list" field="projectCode" /></div>
+				</g:hasErrors></td>
+			</tr>
+
+			<tr class="prop">
+				<td valign="top" class="name"><label for="description">Description:</label>
+				</td>
+				<td valign="top"
+					class="value ${hasErrors(bean:projectInstance,field:'description','errors')}">
+				<input type="text" id="description" name="description"
+					value="${fieldValue(bean:projectInstance,field:'description')}" />
+				<g:hasErrors bean="${projectInstance}" field="description">
+					<div class="errors"><g:renderErrors bean="${projectInstance}"
+						as="list" field="description" /></div>
+				</g:hasErrors></td>
+			</tr>
+
+			<tr class="prop">
+				<td valign="top" class="name"><label for="trackChanges">Track
+				Changes:</label></td>
+				<td valign="top"
+					class="value ${hasErrors(bean:projectInstance,field:'trackChanges','errors')}">
+				<g:select id="trackChanges" name="trackChanges"
+					from="${projectInstance.constraints.trackChanges.inList}"
+					value="${projectInstance.trackChanges}"></g:select> <g:hasErrors
+					bean="${projectInstance}" field="trackChanges">
+					<div class="errors"><g:renderErrors bean="${projectInstance}"
+						as="list" field="trackChanges" /></div>
+				</g:hasErrors></td>
+			</tr>
+
+			<tr class="prop">
+				<td valign="top" class="name"><label for="startDate">Start
+				Date:</label></td>
+				<td valign="top"
+					class="value ${hasErrors(bean:projectInstance,field:'startDate','errors')}">
+				<g:datePicker name="startDate" value="${projectInstance?.startDate}"
+					noSelection="['':'']"></g:datePicker> <g:hasErrors
+					bean="${projectInstance}" field="startDate">
+					<div class="errors"><g:renderErrors bean="${projectInstance}"
+						as="list" field="startDate" /></div>
+				</g:hasErrors></td>
+			</tr>
+
+			<tr class="prop">
+				<td valign="top" class="name"><label for="completionDate">Completion
+				Date:</label></td>
+				<td valign="top"
+					class="value ${hasErrors(bean:projectInstance,field:'completionDate','errors')}">
+				<g:datePicker name="completionDate"
+					value="${projectInstance?.completionDate}" noSelection="['':'']"></g:datePicker>
+				<g:hasErrors bean="${projectInstance}" field="completionDate">
+					<div class="errors"><g:renderErrors bean="${projectInstance}"
+						as="list" field="completionDate" /></div>
+				</g:hasErrors></td>
+			</tr>
+			<tr class="prop">
+				<td valign="top" class="name"><label for="projectClient">Client:</label>
+				</td>
+				<td valign="top" class="value"><select id="projectClient"
+					name="projectClient">
+					<g:each status="i" in="${clients}" var="clients">
+						<option value="${clients.partyIdTo.id}">${clients.partyIdTo}</option>
+					</g:each>
+				</select></td>
+			</tr>
+			<tr class="prop">
+				<td valign="top" class="name"><label for="projectPartner">Partner:</label>
+				</td>
+				<td valign="top" class="value"><select id="projectPartnerId"
+					name="projectPartner"
+					onchange="${remoteFunction(action:'getPartnerStaffList', params:'\'partner=\' + this.value', onComplete:'appendPartnerStaff(e)' )}">
+					<option value="" selected="selected">-None-</option>
+					<g:each status="i" in="${partners}" var="partners">
+						<option value="${partners.partyIdTo.id}">${partners.partyIdTo}</option>
+					</g:each>
+				</select></td>
+			</tr>
+			<tr class="prop">
+				<td valign="top" class="name"><label for="projectManager">Project
+				Manager:</label></td>
+				<td valign="top" class="value"><select id="projectManagerId"
+					name="projectManager">
+					<optgroup label="TDS">
+					<g:each status="i" in="${managers}" var="managers">
+						<option value="${managers.partyIdTo.id}">${managers.partyIdTo.lastName},
+						${managers.partyIdTo.firstName} - ${managers.partyIdTo.title}</option>
+					</g:each>
+					</optgroup>
+					<optgroup id="pmOptGroupId" style="visibility: hidden;">
+					</optgroup>
+				</select></td>
+			</tr>
+			<tr class="prop">
+				<td valign="top" class="name"><label for="moveManager">Move
+				Manager:</label></td>
+				<td valign="top" class="value"><select id="moveManagerId"
+					name="moveManager">
+					<optgroup label="TDS">
+					<g:each status="i" in="${managers}" var="managers">
+						<option value="${managers.partyIdTo.id}">${managers.partyIdTo.lastName}, 
+						${managers.partyIdTo.firstName} - ${managers.partyIdTo.title}</option>
+					</g:each>
+					</optgroup>
+					<optgroup id="mmOptGroupId" style="visibility: hidden;">
+					</optgroup>
+				</select>
+				<input type="hidden" id="companyManagersId" value="${managers.size()}">
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	</div>
+	<div class="buttons"><span class="button"><input
+		class="save" type="submit" value="Create" /></span></div>
+</g:form></div>
+</body>
 </html>

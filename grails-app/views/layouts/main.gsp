@@ -14,40 +14,42 @@
 <body>
 <div class="main_body">
 
-<div class="header"><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;">
-<div class="header_right">
-<br />
-<div style="font-weight: bold; color: #0000FF">
-<jsec:isLoggedIn>
-			<strong>Welcome &nbsp;&nbsp;<jsec:principal />&nbsp;! </strong>
+<div class="header"><img
+	src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;">
+<div class="header_right"><br />
+<div style="font-weight: bold; color: #0000FF"><jsec:isLoggedIn>
+	<strong>Welcome &nbsp;&nbsp;<jsec:principal />&nbsp;! </strong>
 			&nbsp;<g:link controller="auth" action="signOut"
-				style="color: #328714">sign out</g:link>
-</jsec:isLoggedIn>
+		style="color: #328714">sign out</g:link>
+</jsec:isLoggedIn></div>
 </div>
 </div>
-</div>
-
+<jsec:hasRole name="ADMIN">
 <div class="top_menu_layout">
 <div class="menu1">
 <ul>
-	<li><g:link class="home" controller="projectUtil" >Project Manager</g:link></li>
+	<li><g:link class="home" controller="projectUtil">Project Manager</g:link></li>
 	<li><a href="#">Administration </a></li>
 </ul>
 </div>
 </div>
-<div class="title">&nbsp;Party Manager Application
-</div>
+</jsec:hasRole>
+<div class="title">&nbsp;Party Manager Application</div>
 <div class="menu1">
 <ul>
-	<li><a href="#">Main</a></li>
-	<li><g:link class="home" controller="projectUtil" action="searchList" >Search</g:link></li>
-	<li><g:link class="home" controller="project" action="create" >Add</g:link></li>
+	<li><g:link class="home" controller="projectUtil">Main</g:link></li>
+	<li><g:link class="home" controller="projectUtil"
+		action="searchList">Search</g:link></li>
+	<jsec:hasRole name="PROJECT_ADMIN">
+		<li><g:link class="home" controller="project" action="create">Add</g:link>
+		</li>
+	</jsec:hasRole>
 	<li><a href="#">Import/Export</a></li>
 </ul>
 </div>
 <div class="menu2">
 <ul>
-	<li><g:link class="home" controller="auth" action="home" params="[actionType:'party']">Project </g:link></li>
+	<li><g:link controller="debug" >Project </g:link></li>
 	<li><a href="#">Assets </a></li>
 	<li><a href="#">Team </a></li>
 	<li><a href="#">Contacts </a></li>
@@ -55,11 +57,7 @@
 	<li><a href="#">Move Bundles </a></li>
 </ul>
 </div>
-<div class="main_bottom">
-<g:layoutBody />
-</div>
-
-
+<div class="main_bottom"><g:layoutBody /></div>
 </div>
 </body>
 </html>

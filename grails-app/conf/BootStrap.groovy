@@ -12,10 +12,14 @@ class BootStrap {
 			groupPartyType.save( insert:true )
 	
 		// create Person Details
-		def personJohn = new Person( firstName:'John', lastName:'Doherty', dateCreated:new Date(), active:'Y', partyType:personPartyType ).save()
-		def personRalph = new Person( firstName:'Ralph', lastName:'King', dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
-		def personLisa = new Person( firstName:'Lisa', lastName:'Angel', dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
-		def personGeorge = new Person( firstName:'George', lastName:'Washington', dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
+		def personJohn = new Person( firstName:'John', lastName:'Doherty', title:'Project Manager', dateCreated:new Date(), active:'Y', partyType:personPartyType ).save()
+		def personRalph = new Person( firstName:'Ralph', lastName:'King', title:'Move Manager', dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
+		def personLisa = new Person( firstName:'Lisa', lastName:'Angel', title:'Move Manager', dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
+		def personGeorge = new Person( firstName:'George', lastName:'Washington', title:'Move Manager', dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
+		def personTim = new Person( firstName:'Tim', lastName:'Shutt', title:'Project Manager', dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
+		def personRobin = new Person( firstName:'Robin', lastName:'Banks', title:'Project Manager', dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
+		def personAnna = new Person( firstName:'Anna', lastName:'Graham',title:'Logistics Coordinator', dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
+		def personReddy = new Person( firstName:'Lokanath', lastName:'Reddy',title:'Tech Lead', dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
 
 		// Create Projects
 		// need to create parent(party,partyGroup) records also due to inheritence
@@ -27,6 +31,7 @@ class BootStrap {
 		// Create Party Group
 		def tds = new PartyGroup( dateCreated:new Date(), name:"TDS", partyType:groupPartyType ).save()
 		def emc = new PartyGroup( dateCreated:new Date(), name:"EMC", partyType:groupPartyType ).save()
+		def sigma = new PartyGroup( dateCreated:new Date(), name:"SIGMA", partyType:groupPartyType ).save()
 		def trucks = new PartyGroup( dateCreated:new Date(), name:"TrucksRUs", partyType:groupPartyType ).save()
 
 		// Create User Details.
@@ -46,6 +51,10 @@ class BootStrap {
 	    def adminRole = new RoleType( description:"Administrator" )
         adminRole.id = "ADMIN"
         adminRole.save( insert:true )
+        
+	    def projectAdminRole = new RoleType( description:"Project Administrator" )
+		projectAdminRole.id = "PROJECT_ADMIN"
+		projectAdminRole.save( insert:true )
 
 	    def userRole = new RoleType( description:"User" )
         userRole.id = "USER"
@@ -116,6 +125,7 @@ class BootStrap {
 	    def partyRoleForRalph = new PartyRole( party:personRalph, roleType:userRole ).save( insert:true )
 	    def partyRoleForLisa = new PartyRole( party:personLisa, roleType:adminRole ).save( insert:true )
 	    def partyRoleForJohn = new PartyRole( party:personJohn, roleType:adminRole ).save( insert:true )
+	    def projectAdminPartyRoleForJohn = new PartyRole( party:personJohn, roleType:projectAdminRole ).save( insert:true )
 
 	    // TODO : FIX INDENTATION!
 		// Create AssetType records
@@ -149,6 +159,14 @@ class BootStrap {
 		def empType = new PartyRelationshipType( description:"Employment" )
         empType.id = "EMPLOYMENT"
         empType.save( insert:true )
+		
+        def staffType = new PartyRelationshipType( description:"Project Staff" )
+		staffType.id = "PROJ_STAFF"
+		staffType.save( insert:true )
+
+		def companyType = new PartyRelationshipType( description:"Project Company" )
+		companyType.id = "PROJ_COMPANY"
+		companyType.save( insert:true )
 
 		def teamType = new PartyRelationshipType( description:"Project Team" )
         teamType.id = "PROJ_TEAM"
@@ -174,11 +192,16 @@ class BootStrap {
 	    // create Party Relationship
 
 	    def tdsEmc = new PartyRelationship( partyRelationshipType:partnerType, partyIdFrom:tds, roleTypeCodeFrom:companyRole, partyIdTo:emc, roleTypeCodeTo:partnerRole, statusCode:"ENABLED" ).save( insert:true )
+	    def tdsSigma = new PartyRelationship( partyRelationshipType:partnerType, partyIdFrom:tds, roleTypeCodeFrom:companyRole, partyIdTo:sigma, roleTypeCodeTo:partnerRole, statusCode:"ENABLED" ).save( insert:true )
 	    def tdsTrucks = new PartyRelationship( partyRelationshipType:vendorType, partyIdFrom:tds, roleTypeCodeFrom:companyRole, partyIdTo:trucks, roleTypeCodeTo:vendorRole, statusCode:"ENABLED" ).save( insert:true )
 	    def tdsAcme = new PartyRelationship( partyRelationshipType:clientType, partyIdFrom:tds, roleTypeCodeFrom:companyRole, partyIdTo:acmeProject, roleTypeCodeTo:clientRole, statusCode:"ENABLED" ).save( insert:true )
-	    def tdsJohn = new PartyRelationship( partyRelationshipType:empType, partyIdFrom:tds, roleTypeCodeFrom:employerRole, partyIdTo:personJohn, roleTypeCodeTo:pmRole, statusCode:"ENABLED" ).save( insert:true )
+	    def tdsJohn = new PartyRelationship( partyRelationshipType:staffType, partyIdFrom:tds, roleTypeCodeFrom:companyRole, partyIdTo:personJohn, roleTypeCodeTo:staffRole, statusCode:"ENABLED" ).save( insert:true )
+	    def tdsTim = new PartyRelationship( partyRelationshipType:staffType, partyIdFrom:tds, roleTypeCodeFrom:companyRole, partyIdTo:personTim, roleTypeCodeTo:staffRole, statusCode:"ENABLED" ).save( insert:true )
 	    def tdsRalph = new PartyRelationship( partyRelationshipType:empType, partyIdFrom:tds, roleTypeCodeFrom:employerRole, partyIdTo:personRalph, roleTypeCodeTo:techRole, statusCode:"ENABLED" ).save( insert:true )
-	    def emcLisa = new PartyRelationship( partyRelationshipType:empType, partyIdFrom:emc, roleTypeCodeFrom:employerRole, partyIdTo:personLisa, roleTypeCodeTo:pmRole, statusCode:"ENABLED" ).save( insert:true )
+	    def emcLisa = new PartyRelationship( partyRelationshipType:staffType, partyIdFrom:emc, roleTypeCodeFrom:companyRole, partyIdTo:personLisa, roleTypeCodeTo:staffRole, statusCode:"ENABLED" ).save( insert:true )
+	    def emcRobin = new PartyRelationship( partyRelationshipType:staffType, partyIdFrom:emc, roleTypeCodeFrom:companyRole, partyIdTo:personRobin, roleTypeCodeTo:staffRole, statusCode:"ENABLED" ).save( insert:true )
+	    def emcAnna = new PartyRelationship( partyRelationshipType:staffType, partyIdFrom:emc, roleTypeCodeFrom:companyRole, partyIdTo:personAnna, roleTypeCodeTo:staffRole, statusCode:"ENABLED" ).save( insert:true )
+	    def sigmaReddy = new PartyRelationship( partyRelationshipType:staffType, partyIdFrom:sigma, roleTypeCodeFrom:companyRole, partyIdTo:personReddy, roleTypeCodeTo:staffRole, statusCode:"ENABLED" ).save( insert:true )
 	    def acmeGeorge = new PartyRelationship( partyRelationshipType:empType, partyIdFrom:acmeProject, roleTypeCodeFrom:employerRole, partyIdTo:personGeorge, roleTypeCodeTo:networkAdminRole, statusCode:"ENABLED" ).save( insert:true )
 	    def marioAcme = new PartyRelationship( partyRelationshipType:projectType, partyIdFrom:marioProject, roleTypeCodeFrom:projectRole, partyIdTo:acmeProject, roleTypeCodeTo:clientRole, statusCode:"ENABLED" ).save( insert:true )
 	    def marioEmc = new PartyRelationship( partyRelationshipType:projectType, partyIdFrom:marioProject, roleTypeCodeFrom:projectRole, partyIdTo:emc, roleTypeCodeTo:pmRole, statusCode:"ENABLED" ).save( insert:true )

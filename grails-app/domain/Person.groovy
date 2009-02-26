@@ -4,6 +4,7 @@ class Person extends Party {
 	String lastName
 	String nickName
 	String active
+	String title
 
 	/*
 	 * Fields Validations
@@ -11,6 +12,7 @@ class Person extends Party {
 	 static constraints = {
 		 firstName( blank:false, nullable:false, maxLength:30 )
 		 lastName( blank:true, nullable:true, maxLength:30 )
+		 title( blank:true, nullable:true, maxLength:50 )
 		 nickName( blank:true, nullable:true, maxLength:30 )
 		 active( blank:false, nullable:false, inList:['Y','N'] )
 	 }
@@ -26,6 +28,7 @@ class Person extends Party {
 			firstName sqlType:'varchar(30)'
 			lastName sqlType:'varchar(30)'
 			nickName sqlType:'varchar(30)'
+			title sqlType:'varchar(50)'
 			active sqlType:'char(1)'
 		}
 	}
