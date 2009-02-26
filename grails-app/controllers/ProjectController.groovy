@@ -27,7 +27,7 @@ class ProjectController {
         	/*
         	def companyStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectCompany.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
         	def partnerStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectPartner.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' " )
-        	*/
+             */
         	return [ projectInstance : projectInstance, projectClient:projectClient, projectPartner:projectPartner, projectManager:projectManager, moveManager:moveManager ] //, companyStaff:companyStaff, partnerStaff:partnerStaff ]
         }
     }
@@ -201,7 +201,6 @@ class ProjectController {
 	             
             }
             def json=[ identifier:"id", items:items ]
-    		println"json------------------------>"+json
             render json as JSON
         }
     }
