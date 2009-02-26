@@ -4,6 +4,7 @@ import jxl.write.*
 import jxl.read.biff.*
 import org.springframework.web.multipart.*
 import org.springframework.web.multipart.commons.*
+import grails.converters.JSON
 class AssetController {
 
 	// TODO : Fix indentation
@@ -303,4 +304,30 @@ class AssetController {
             render( view:'create', model:[assetInstance:assetInstance] )
         }
     }
+    // remote link for asset dialog
+    def editShow = {
+        def items = []
+        def assetInstance = Asset.get( params.id )
+        items = [id:assetInstance.id, project:assetInstance.project.name, projectId:assetInstance.project.id, assetType:assetInstance.assetType, assetTypeId:assetInstance.assetType.id, assetTag:assetInstance.assetTag, assetName:assetInstance.assetName, serialNumber:assetInstance.serialNumber, deviceFunction:assetInstance.deviceFunction ]         
+        render items as JSON
+        
+    }
+    // update ajax overlay 
+    def updateAsset = {
+        def assetInstance = Asset.get( params.id )
+        if ( assetInstance ) {
+            assetInstance.properties = params
+            if( !assetInstance.hasErrors() && assetInstance.save() ) {
+                flash.message = "Asset ${params.id} updated"
+                redirect( action:list,id:assetInstance.id )
+            } else {
+                render( view:'list', model:[assetInstance:assetInstance] )
+            }
+        }
+        else {
+            flash.message = "Asset not found with id ${params.id}"
+            redirect( action:list, id:params.id )
+        }
+    }
+
 }
