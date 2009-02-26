@@ -10,15 +10,26 @@ class ProjectController {
         if(!params.max) params.max = 10
         [ projectInstanceList: Project.list( params ) ]
     }
-
+    /*
+     *  return the details of Project
+     */
     def show = {
         def projectInstance = Project.get( params.id )
-
         if(!projectInstance) {
             flash.message = "Project not found with id ${params.id}"
             redirect(action:list)
+        } else { 
+        	//def projectCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_COMPANY' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'COMPANY' ")
+        	def projectClient = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_CLIENT' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'CLIENT' ")
+        	def projectPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ")
+        	def projectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
+        	def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
+        	/*
+        	def companyStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectCompany.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
+        	def partnerStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectPartner.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' " )
+        	*/
+        	return [ projectInstance : projectInstance, projectClient:projectClient, projectPartner:projectPartner, projectManager:projectManager, moveManager:moveManager, companyStaff:companyStaff, partnerStaff:partnerStaff ]
         }
-        else { return [ projectInstance : projectInstance ] }
     }
 
     def delete = {
@@ -45,22 +56,24 @@ class ProjectController {
             return [ projectInstance : projectInstance ]
         }
     }
-
+    /*
+     * Update the Project details
+     */
     def update = {
         def projectInstance = Project.get( params.id )
-        if(projectInstance) {
+        if( projectInstance ) {
             projectInstance.properties = params
-            if(!projectInstance.hasErrors() && projectInstance.save()) {
+            if( !projectInstance.hasErrors() && projectInstance.save() ) {
                 flash.message = "Project ${params.id} updated"
                 redirect(action:show,id:projectInstance.id)
+                
             }
             else {
-                render(view:'edit',model:[projectInstance:projectInstance])
+                render( view:'edit',model:[projectInstance:projectInstance] )
             }
-        }
-        else {
+        } else {
             flash.message = "Project not found with id ${params.id}"
-            redirect(action:edit,id:params.id)
+            redirect( action:edit, id:params.id )
         }
     }
     /*
@@ -188,7 +201,7 @@ class ProjectController {
 	             
             }
             def json=[ identifier:"id", items:items ]
-    		
+    		println"json------------------------>"+json
             render json as JSON
         }
     }
