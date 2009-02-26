@@ -48,7 +48,12 @@
 					mselect.add(mopt)
 				} 
 			}
-		} 
+		}
+	}
+	function initialize(){
+		// This is called when the page loads to initialize Managers
+		var partnerselect = document.getElementById('projectPartnerId')
+		${remoteFunction(action:'getPartnerStaffList', params:'\'partner=\' + partnerselect.value', onComplete:'appendPartnerStaff(e)')}
 	}
 </g:javascript>
 </head>
@@ -242,5 +247,8 @@
 	<div class="buttons"><span class="button"><input
 		class="save" type="submit" value="Create" /></span></div>
 </g:form></div>
+<g:javascript>
+initialize();
+</g:javascript>
 </body>
 </html>
