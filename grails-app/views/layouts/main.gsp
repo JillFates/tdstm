@@ -49,7 +49,7 @@
 </div>
 <div class="menu2">
 <ul>
-	<li><g:link controller="debug" >Project </g:link></li>
+	<li><a href="#">Project </a> </li>
 	<li><a href="#">Assets </a></li>
 	<li><a href="#">Team </a></li>
 	<li><a href="#">Contacts </a></li>
