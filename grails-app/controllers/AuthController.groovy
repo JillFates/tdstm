@@ -36,7 +36,7 @@ class AuthController {
              *  call loadPreferences() to load CURR_PROJ MAP into session
              */
             userPreferenceService.loadPreferences()
-            redirect(action:'home')
+            redirect(controller:'projectUtil')
         }
         catch (AuthenticationException ex){
             // Authentication failed, so display the appropriate message
@@ -75,13 +75,6 @@ class AuthController {
     }
     // method for home page
     def home = {
-    	def actionType = params.actionType
-    	if ( actionType == "asset" ) {
-    		render( view:'asset' )
-    	} else if ( actionType == "masters" ) {
-    		render( view:'masters' )
-    	} else {
     		render( view:'home' )
-    	}
     }
 }

@@ -24,17 +24,19 @@
 </jsec:isLoggedIn></div>
 </div>
 </div>
-<jsec:hasRole name="ADMIN">
+
 <div class="top_menu_layout">
 <div class="menu1">
 <ul>
 	<li><g:link class="home" controller="projectUtil">Project Manager</g:link></li>
-	<li><a href="#">Administration </a></li>
+	<jsec:hasRole name="ADMIN">
+	<li><g:link class="home" controller="auth" action="home">Administration </g:link> </li>
+	</jsec:hasRole>
 </ul>
 </div>
 </div>
-</jsec:hasRole>
 <div class="title">&nbsp;Party Manager Application</div>
+<!--
 <div class="menu1">
 <ul>
 	<li><g:link class="home" controller="projectUtil">Main</g:link></li>
@@ -47,10 +49,12 @@
 	<li><a href="#">Import/Export</a></li>
 </ul>
 </div>
+-->
 <div class="menu2">
 <ul>
-	<li><a href="#">Project </a> </li>
+	<li><g:link class="home" controller="projectUtil">Project </g:link> </li>
 	<li><g:link class="home" controller="asset">Assets </g:link></li>
+	<li><g:link class="home" controller="asset" action="assetImport" >Import/Export</g:link> </li>
 	<li><a href="#">Team </a></li>
 	<li><a href="#">Contacts </a></li>
 	<li><a href="#">Applications </a></li>
