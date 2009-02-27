@@ -16,7 +16,7 @@ class Asset {
 		assetName( blank:true )
 		assetTag( blank:true )
 		serialNumber( blank:true )
-		deviceFunction( blank:true )
+		deviceFunction( blank:true, nullable:true )
 	}
 	
 	/*
