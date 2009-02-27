@@ -11,11 +11,12 @@
       <span class="menuButton"><g:link class="home" controller="auth" action="home">Home</g:link></span>
     </div>
     <div class="body">
-      <h1>File Import</h1>
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
       </g:if>
+      <h1>File Import</h1>
       <g:form action="upload" method="post" enctype="multipart/form-data">
+        <input type="hidden" value="<%= request.getAttribute("projectId") %>" name="projectIdImport" >
         <div class="dialog">
           <table>
             <thead>
@@ -30,19 +31,30 @@
                                                            name="file" id="file" /></td>
               </tr>
               <tr>
-                <td><label for="file">Project Name:</label> <g:select
-                    optionKey="id"
-                    from="${Project.findAll()}"
-                    name="projectName.id" id="projectNameId"
-                  value="${project?.project?.id}"></g:select></td>
-              </tr>
-              <tr>
                 <td class="buttonR"><input class="button" type="submit" value="Upload" /></td>
               </tr>
             </tbody>
           </table>
         </div>
       </g:form>
-    </div>
+
+      <h1>File Export</h1>
+
+      <g:form action="export" method="post">
+        <input type="hidden" value="<%= request.getAttribute("projectId") %>" name="projectIdExport" >
+        <div class="dialog">
+          <table>
+            <tbody>
+              <thead>
+                <th>Export</th>
+              </thead>
+
+              <tr>
+                <td class="buttonR"><input class="button" type="submit" value="Export" /></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+    </g:form></div>
   </body>
 </html>

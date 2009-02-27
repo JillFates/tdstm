@@ -29,6 +29,7 @@
 
       function showEdit() {
 
+      $("#dialog").dialog('option', 'width', 500)
       $("#dialog").dialog("open")
 
       }

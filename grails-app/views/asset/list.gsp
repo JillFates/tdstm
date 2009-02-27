@@ -37,8 +37,10 @@
       document.getElementById('id').value= asset.id
       document.getElementById('assetProject').value = asset.project
       document.getElementById('project.id').value = asset.projectId
+      if ( asset.assetType != null ) {
       document.getElementById('assetTypes').value = asset.assetTypeId
       document.getElementById('assetType.id').value = asset.assetTypeId
+      }
       document.getElementById('assetNames').value = asset.assetName
       document.getElementById('assetName').value = asset.assetName
       document.getElementById('assetTags').value = asset.assetTag
@@ -48,6 +50,7 @@
       document.getElementById('deviceFunctions').value = asset.deviceFunction
       document.getElementById('deviceFunction').value = asset.deviceFunction
 
+      $("#dialog").dialog('option', 'width', 400)
       $("#dialog").dialog("open")
 
       }
@@ -55,6 +58,7 @@
       function editAssetDialog() {
 
       $("#dialog").dialog("close")
+      $("#dialog1").dialog('option', 'width', 500)
       $("#dialog1").dialog("open")
 
       }
@@ -65,6 +69,7 @@
     <div class="nav">
       <span class="menuButton"><g:link class="home" controller="auth" action="home">Home</g:link></span>
       <span class="menuButton"><g:link class="create" action="create">New Asset</g:link></span>
+      <span class="menuButton"><g:link class="search" action="search">Search</g:link></span>
     </div>
     <div class="body">
       <h1>Asset List</h1>
@@ -77,8 +82,6 @@
             <tr>
 
               <g:sortableColumn property="id" title="Id" />
-
-              <th>Project Name</th>
 
               <th>Asset Type</th>
 
@@ -95,8 +98,6 @@
               <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
                 <td><g:remoteLink controller="asset" action="editShow" id="${assetInstance.id}"  onComplete ="showAssetDialog( e );">${fieldValue(bean:assetInstance, field:'id')}</g:remoteLink></td>
-
-                <td>${fieldValue(bean:assetInstance, field:'project')}</td>
 
                 <td>${fieldValue(bean:assetInstance, field:'assetType')}</td>
 

@@ -18,6 +18,18 @@ class AssetController {
      * render import form
      */
     def assetImport = {
+        //get id of selected project from project view
+        def idFromProjectView = params.projectId
+        
+        if( idFromProjectView == null ) {
+            //get project id from session
+            def currProj = getSession().getAttribute( "CURR_PROJ" )
+            idFromProjectView = currProj.CURR_PROJ 
+            
+        }
+    	//set project id
+    	request.setAttribute("projectId",idFromProjectView)
+       
         render( view:"assetImport" )
     }
     /*
@@ -31,21 +43,33 @@ class AssetController {
      */
     def upload = {
         //get project Name
-        def projectId = params["projectName.id"]
+        def projectId
+        def project
+        try {
+            projectId = params["projectIdImport"]
+       
+            if ( projectId == null || projectId == "" ) {
 
-        if ( projectId == null ) {
-            flash.message = "Project Name is required"
+                flash.message = "Project Name is required"
+                redirect( controller:"asset", action:"assetImport" )
+                
+            }
+
+            project = Project.findById( projectId )
+        
+            //delete previous records existed for Project
+        
+            def assetDelete = Asset.executeUpdate("delete from Asset a where a.project = $project.id " )
+
+        }catch ( Exception ex ) {
+            
+            flash.message = " Project Name is required. "
             redirect( controller:"asset", action:"assetImport" )
         }
 
-        def project = Project.findById( projectId )
-        //delete previous records existed for Project
-
-        def assetDelete = Asset.executeUpdate("delete from Asset a where a.project = $project.id " )
-
         // get File
-        MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request;
-        CommonsMultipartFile file = ( CommonsMultipartFile ) mpr.getFile("file");
+        MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
+        CommonsMultipartFile file = ( CommonsMultipartFile ) mpr.getFile("file")
 
         // create workbook
         def workbook
@@ -118,10 +142,11 @@ class AssetController {
      */
     def export = {
 
-        //get project Name
-        def projectId = params["projectName.id"]
+        //get project Id
+        def projectId = params["projectIdExport"]
+        
         def project = Project.findById( projectId )
-        if ( projectId == null ) {
+        if ( projectId == null || projectId == "") {
             flash.message = "Project Name is required"
             redirect( controller:"asset", action:"assetExport" )
         }
@@ -232,10 +257,14 @@ class AssetController {
 
     // the delete, save and update actions only accept POST requests
     def allowedMethods = [ delete:'POST', save:'POST', update:'POST' ]
-    // return the list of asset records
-    def list = {
+    // return the list of asset records for project present in current scope.
+    def list = {        
         if ( !params.max ) params.max = 25
-        [ assetInstanceList: Asset.list( params ) ]
+        def currProj = getSession().getAttribute( "CURR_PROJ" )
+        def projId = currProj.CURR_PROJ
+        def project = Project.findById( projId )
+        //get asset list for project present in current scope.
+        [ assetInstanceList: Asset.findAllByProject( project ) ]
     }
     // return asset details
     def show = {
@@ -247,7 +276,7 @@ class AssetController {
         }
         else { return [ assetInstance : assetInstance ] }
     }
-    // delate asset details
+    // delete asset details
     def delete = {
         def assetInstance = Asset.get( params.id )
         if( assetInstance ) {
@@ -306,9 +335,14 @@ class AssetController {
     }
     // remote link for asset dialog
     def editShow = {
+        
         def items = []
         def assetInstance = Asset.get( params.id )
-        items = [id:assetInstance.id, project:assetInstance.project.name, projectId:assetInstance.project.id, assetType:assetInstance.assetType, assetTypeId:assetInstance.assetType.id, assetTag:assetInstance.assetTag, assetName:assetInstance.assetName, serialNumber:assetInstance.serialNumber, deviceFunction:assetInstance.deviceFunction ]         
+        if( assetInstance.assetType == null ){
+            items = [id:assetInstance.id, project:assetInstance.project.name, projectId:assetInstance.project.id, assetTag:assetInstance.assetTag, assetName:assetInstance.assetName, serialNumber:assetInstance.serialNumber, deviceFunction:assetInstance.deviceFunction ]
+        } else {
+            items = [id:assetInstance.id, project:assetInstance.project.name, projectId:assetInstance.project.id, assetType:assetInstance.assetType, assetTypeId:assetInstance.assetType.id, assetTag:assetInstance.assetTag, assetName:assetInstance.assetName, serialNumber:assetInstance.serialNumber, deviceFunction:assetInstance.deviceFunction ]
+        }
         render items as JSON
         
     }
@@ -328,6 +362,6 @@ class AssetController {
             flash.message = "Asset not found with id ${params.id}"
             redirect( action:list, id:params.id )
         }
-    }
+    }    
 
 }
