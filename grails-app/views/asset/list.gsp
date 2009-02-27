@@ -54,7 +54,7 @@
       $("#dialog").dialog("open")
 
       }
-
+      
       function editAssetDialog() {
 
       $("#dialog").dialog("close")
@@ -69,7 +69,6 @@
     <div class="nav">
       <span class="menuButton"><g:link class="home" controller="auth" action="home">Home</g:link></span>
       <span class="menuButton"><g:link class="create" action="create">New Asset</g:link></span>
-      <span class="menuButton"><g:link class="search" action="search">Search</g:link></span>
     </div>
     <div class="body">
       <h1>Asset List</h1>
