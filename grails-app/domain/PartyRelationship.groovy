@@ -7,7 +7,7 @@ class PartyRelationship implements Serializable {
 	Party partyIdTo
 	RoleType roleTypeCodeFrom
 	RoleType roleTypeCodeTo
-	String statusCode
+	String statusCode="ENABLED"
 	String comment
 
 	static constraints = {

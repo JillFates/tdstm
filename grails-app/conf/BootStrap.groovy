@@ -2,61 +2,18 @@ import org.jsecurity.crypto.hash.Sha1Hash
 class BootStrap {
 
     def init = { servletContext ->
-		//  Create PartyType records
-		def personPartyType = new PartyType( description:"Person" )
-			personPartyType.id = "PERSON"
-			personPartyType.save( insert:true )
-	
-	    def groupPartyType = new PartyType( description:"PartyGroup" )
-			groupPartyType.id = "PARTY_GROUP"
-			groupPartyType.save( insert:true )
-	
-		// create Person Details
-		def personJohn = new Person( firstName:'John', lastName:'Doherty', title:'Project Manager', dateCreated:new Date(), active:'Y', partyType:personPartyType ).save()
-		def personRalph = new Person( firstName:'Ralph', lastName:'King', title:'Move Manager', dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
-		def personLisa = new Person( firstName:'Lisa', lastName:'Angel', title:'Move Manager', dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
-		def personGeorge = new Person( firstName:'George', lastName:'Washington', title:'Move Manager', dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
-		def personTim = new Person( firstName:'Tim', lastName:'Shutt', title:'Project Manager', dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
-		def personRobin = new Person( firstName:'Robin', lastName:'Banks', title:'Project Manager', dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
-		def personAnna = new Person( firstName:'Anna', lastName:'Graham',title:'Logistics Coordinator', dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
-		def personReddy = new Person( firstName:'Lokanath', lastName:'Reddy',title:'Tech Lead', dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
 
-		// Create Projects
-		// need to create parent(party,partyGroup) records also due to inheritence
-		def acmeProject = new Project( dateCreated:new Date(), name:"Acme, Inc", projectCode:'ACME', 
-			description:'100 servers', trackChanges:'N', partyType:groupPartyType ).save();
-		def marioProject = new Project( dateCreated:new Date(), name:"Mario Brothers Co.", projectCode:'MARIO', 
-			description:'500 servers', trackChanges:'N', partyType:groupPartyType ).save();
+println "\n\n ROLE TYPES \n\n" 		
 
-		// Create Party Group
-		def tds = new PartyGroup( dateCreated:new Date(), name:"TDS", partyType:groupPartyType ).save()
-		def emc = new PartyGroup( dateCreated:new Date(), name:"EMC", partyType:groupPartyType ).save()
-		def sigma = new PartyGroup( dateCreated:new Date(), name:"SIGMA", partyType:groupPartyType ).save()
-		def trucks = new PartyGroup( dateCreated:new Date(), name:"TrucksRUs", partyType:groupPartyType ).save()
-
-		// Create User Details.
-	    def adminUserLisa = new UserLogin( person:personLisa, username: "lisa", password:new Sha1Hash("admin").toHex()  ).save()
-	    def userJohn = new UserLogin( person:personJohn, username: "john", password:new Sha1Hash("admin").toHex() ).save()
-	    def normalUserRalph = new UserLogin( person:personRalph, username:"ralph", password:new Sha1Hash("user").toHex() ).save()
-
-		// Create default Preference
-		def johnPref = new UserPreference( value: acmeProject.id )
-		johnPref.userLogin = userJohn
-		johnPref.preferenceCode = "CURR_PROJ"
-		johnPref.save( insert: true)
-		
+		// -------------------------------
+		// Role Types
+		// -------------------------------
 		// Notice that we are making the RoleType with code and description now
-     	// create Roles.
-		// TODO : Should replace the dozen + inserts with a map and an iteratorg
 	    def adminRole = new RoleType( description:"Administrator" )
         adminRole.id = "ADMIN"
         adminRole.save( insert:true )
         
-	    def projectAdminRole = new RoleType( description:"Project Administrator" )
-		projectAdminRole.id = "PROJECT_ADMIN"
-		projectAdminRole.save( insert:true )
-
-	    def userRole = new RoleType( description:"User" )
+		def userRole = new RoleType( description:"User" )
         userRole.id = "USER"
         userRole.save( insert:true )
 
@@ -120,15 +77,150 @@ class BootStrap {
         appOwnerRole.id = "APP_OWNER "
         appOwnerRole.save( insert:true )
 
-		// Create PartyRole Details
+	    def projectAdminRole = new RoleType( description:"Project Administrator" )
+		projectAdminRole.id = "PROJECT_ADMIN"
+		projectAdminRole.save( insert:true )
 
+println "\n\n PARTY TYPES\n\n" 		
+
+		// -------------------------------
+		// Party Types
+		// -------------------------------
+		def personPartyType = new PartyType( description:"Person" )
+			personPartyType.id = "PERSON"
+			personPartyType.save( insert:true )
+	
+	    def groupPartyType = new PartyType( description:"PartyGroup" )
+			groupPartyType.id = "PARTY_GROUP"
+			groupPartyType.save( insert:true )
+	
+println "\n\n PARTY RELATIONSHIP TYPES\n\n" 		
+
+		// -----------------------------------------
+	    // Create PartyRelationshipType Details
+		// -----------------------------------------
+		def appType = new PartyRelationshipType( description:"Application" )
+        appType.id = "APPLICATION"
+        appType.save( insert:true )
+
+        def staffType = new PartyRelationshipType( description:"Staff" )
+		staffType.id = "STAFF"
+		staffType.save( insert:true )
+
+        def projStaffType = new PartyRelationshipType( description:"Project Staff" )
+		projStaffType.id = "PROJ_STAFF"
+		projStaffType.save( insert:true )
+
+		def projCompanyType = new PartyRelationshipType( description:"Project Company" )
+		projCompanyType.id = "PROJ_COMPANY"
+		projCompanyType.save( insert:true )
+
+		def teamType = new PartyRelationshipType( description:"Project Team" )
+        teamType.id = "PROJ_TEAM"
+        teamType.save( insert:true )
+
+		def projPartnerType = new PartyRelationshipType( description:"Project Partner" )
+        projPartnerType.id = "PROJ_PARTNER"
+        projPartnerType.save( insert:true )
+
+		def projClientType = new PartyRelationshipType( description:"Project Client" )
+        projClientType.id = "PROJ_CLIENT"
+        projClientType.save( insert:true )
+
+	    def clientType = new PartyRelationshipType( description:"Clients" )
+        clientType.id = "CLIENTS"
+        clientType.save( insert:true )
+
+	    def partnerType = new PartyRelationshipType( description:"Partners" )
+        partnerType.id = "PARTNERS"
+        partnerType.save( insert:true )
+
+	    def vendorType = new PartyRelationshipType( description:"Vendors" )
+        vendorType.id = "VENDORS"
+        vendorType.save( insert:true )
+
+	    def projectType = new PartyRelationshipType( description:"Project" )
+        projectType.id = "PROJECT"
+        projectType.save( insert:true )
+
+println "\n\nPERSONS\n\n" 		
+
+		// -------------------------------
+		// Persons
+		// -------------------------------
+		def personJohn = new Person( firstName:'John', lastName:'Doherty', title:'Project Manager', 
+			dateCreated:new Date(), active:'Y', partyType:personPartyType ).save()
+		def personRalph = new Person( firstName:'Ralph', lastName:'King', title:'Move Manager', 
+			dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
+		def personLisa = new Person( firstName:'Lisa', lastName:'Angel', title:'Move Manager', 
+			dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
+		def personGeorge = new Person( firstName:'George', lastName:'Washington', title:'Move Manager', 
+			dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
+		def personTim = new Person( firstName:'Tim', lastName:'Shutt', title:'Project Manager', 
+			dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
+		def personRobin = new Person( firstName:'Robin', lastName:'Banks', title:'Project Manager', 
+			dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
+		def personAnna = new Person( firstName:'Anna', lastName:'Graham',title:'Logistics Coordinator', 
+			dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
+		def personReddy = new Person( firstName:'Lokanath', lastName:'Reddy',title:'Tech Lead', 
+			dateCreated:new Date(), active:'Y', partyType:personPartyType  ).save()
+
+println "\n\n USER DETAILS\n\n" 		
+
+		// -------------------------------
+		// Create User Details.
+		// -------------------------------
+	    def adminUserLisa = new UserLogin( person:personLisa, username: "lisa", password:new Sha1Hash("admin").toHex()  ).save()
+	    def userJohn = new UserLogin( person:personJohn, username: "john", password:new Sha1Hash("admin").toHex() ).save()
+	    def normalUserRalph = new UserLogin( person:personRalph, username:"ralph", password:new Sha1Hash("user").toHex() ).save()
+
+println "\n\n PARTY GROUPS \n\n" 		
+
+		// -------------------------------
+		// Create Party Group (Companies)
+		// -------------------------------
+		def tds = new PartyGroup( dateCreated:new Date(), name:"TDS", partyType:groupPartyType ).save()
+		def emc = new PartyGroup( dateCreated:new Date(), name:"EMC", partyType:groupPartyType ).save()
+		def timeWarner = new PartyGroup( dateCreated:new Date(), name:"Time Warner", partyType:groupPartyType ).save()
+		def ceders = new PartyGroup( dateCreated:new Date(), name:"Ceders-Sinai", partyType:groupPartyType ).save()		
+		def sigma = new PartyGroup( dateCreated:new Date(), name:"SIGMA", partyType:groupPartyType ).save()
+		def trucks = new PartyGroup( dateCreated:new Date(), name:"TrucksRUs", partyType:groupPartyType ).save()
+		
+println "\n\n PROJECTS \n\n" 		
+
+		// -------------------------------
+		// Create Projects
+		// -------------------------------
+		def cedersProject = new Project( dateCreated:new Date(), name:"Ceders-Sinai Move 1", projectCode:'CS1', 
+			description:'100 servers', trackChanges:'Y', partyType:groupPartyType ).save();
+		def twProject = new Project( dateCreated:new Date(), name:"Time Warner VA Move", projectCode:'TM-VA-1', 
+			description:'500 servers', trackChanges:'N', partyType:groupPartyType ).save();
+
+println "\n\n USER PREFERENCES \n\n" 		
+
+		// -------------------------------
+		// Create default Preference
+		// -------------------------------
+		def johnPref = new UserPreference( value: cedersProject.id )
+		johnPref.userLogin = userJohn
+		johnPref.preferenceCode = "CURR_PROJ"
+		johnPref.save( insert: true)
+		
+println "\n\n PARTY ROLES \n\n" 		
+
+		// -------------------------------
+		// Create PartyRole Details
+		// -------------------------------
 	    def partyRoleForRalph = new PartyRole( party:personRalph, roleType:userRole ).save( insert:true )
 	    def partyRoleForLisa = new PartyRole( party:personLisa, roleType:adminRole ).save( insert:true )
 	    def partyRoleForJohn = new PartyRole( party:personJohn, roleType:adminRole ).save( insert:true )
 	    def projectAdminPartyRoleForJohn = new PartyRole( party:personJohn, roleType:projectAdminRole ).save( insert:true )
 
-	    // TODO : FIX INDENTATION!
+println "\n\n ASSET TYPES \n\n" 		
+
+		// -------------------------------
 		// Create AssetType records
+		// -------------------------------
 		def kvmAsset = new AssetType()
         kvmAsset.id = "KVM"
         kvmAsset.save( insert:true )
@@ -149,65 +241,84 @@ class BootStrap {
         arrayAsset.id = "Array"
         arrayAsset.save( insert:true )
 
-	    // TODO : Create PartyRelationship Types (Partners, Vendors, Staff, Project) Note: the code should be CAPS
-	    // Create PartyRelationshipType Details
+println "\n\n PARTY RELATIONSHIPS \n\n" 		
 
-		def appType = new PartyRelationshipType( description:"Application" )
-        appType.id = "APPLICATION"
-        appType.save( insert:true )
-
-		def empType = new PartyRelationshipType( description:"Employment" )
-        empType.id = "EMPLOYMENT"
-        empType.save( insert:true )
-		
-        def staffType = new PartyRelationshipType( description:"Project Staff" )
-		staffType.id = "PROJ_STAFF"
-		staffType.save( insert:true )
-
-		def companyType = new PartyRelationshipType( description:"Project Company" )
-		companyType.id = "PROJ_COMPANY"
-		companyType.save( insert:true )
-
-		def teamType = new PartyRelationshipType( description:"Project Team" )
-        teamType.id = "PROJ_TEAM"
-        teamType.save( insert:true )
-
-		def partnerType = new PartyRelationshipType( description:"Project Partner" )
-        partnerType.id = "PROJ_PARTNER"
-        partnerType.save( insert:true )
-
-		def clientType = new PartyRelationshipType( description:"Project Client" )
-        clientType.id = "PROJ_CLIENT"
-        clientType.save( insert:true )
-
-	    def vendorType = new PartyRelationshipType( description:"Vendors" )
-        vendorType.id = "VENDORS"
-        vendorType.save( insert:true )
-
-	    def projectType = new PartyRelationshipType( description:"Project" )
-        projectType.id = "PROJECT"
-        projectType.save( insert:true )
-
-		// TODO : Create some of the PartyRelationship associations as shown in Requiments Appedix A for PartyRelationship
+		// -------------------------------
 	    // create Party Relationship
+		// -------------------------------
+		def pr = [
+			// Partners, Clients and Vendors
+			[ partnerType, tds, companyRole, emc, partnerRole ],
+			[ partnerType, tds, companyRole, sigma, partnerRole ],
+			[ vendorType, tds, companyRole, trucks, vendorRole ],
+			[ clientType, tds, companyRole, ceders, clientRole ],
+			[ clientType, tds, companyRole, timeWarner, clientRole ],
+		   
+			// Staff
+			[ staffType, tds, companyRole, personJohn, staffRole ],
+			[ staffType, tds, companyRole, personTim, staffRole ],
+			[ staffType, tds, companyRole, personRalph, staffRole ],
+			[ staffType, emc, companyRole, personLisa, staffRole ],
+			[ staffType, emc, companyRole, personRobin, staffRole ],
+			[ staffType, emc, companyRole, personAnna, staffRole ],
+			[ staffType, sigma, companyRole, personReddy, staffRole ],
+			[ staffType, ceders, companyRole, personGeorge, staffRole ],
+			
 
-	    def tdsEmc = new PartyRelationship( partyRelationshipType:partnerType, partyIdFrom:tds, roleTypeCodeFrom:companyRole, partyIdTo:emc, roleTypeCodeTo:partnerRole, statusCode:"ENABLED" ).save( insert:true )
-	    def tdsSigma = new PartyRelationship( partyRelationshipType:partnerType, partyIdFrom:tds, roleTypeCodeFrom:companyRole, partyIdTo:sigma, roleTypeCodeTo:partnerRole, statusCode:"ENABLED" ).save( insert:true )
-	    def tdsTrucks = new PartyRelationship( partyRelationshipType:vendorType, partyIdFrom:tds, roleTypeCodeFrom:companyRole, partyIdTo:trucks, roleTypeCodeTo:vendorRole, statusCode:"ENABLED" ).save( insert:true )
-	    def tdsAcme = new PartyRelationship( partyRelationshipType:clientType, partyIdFrom:tds, roleTypeCodeFrom:companyRole, partyIdTo:acmeProject, roleTypeCodeTo:clientRole, statusCode:"ENABLED" ).save( insert:true )
-	    def tdsJohn = new PartyRelationship( partyRelationshipType:staffType, partyIdFrom:tds, roleTypeCodeFrom:companyRole, partyIdTo:personJohn, roleTypeCodeTo:staffRole, statusCode:"ENABLED" ).save( insert:true )
-	    def tdsTim = new PartyRelationship( partyRelationshipType:staffType, partyIdFrom:tds, roleTypeCodeFrom:companyRole, partyIdTo:personTim, roleTypeCodeTo:staffRole, statusCode:"ENABLED" ).save( insert:true )
-	    def tdsRalph = new PartyRelationship( partyRelationshipType:empType, partyIdFrom:tds, roleTypeCodeFrom:employerRole, partyIdTo:personRalph, roleTypeCodeTo:techRole, statusCode:"ENABLED" ).save( insert:true )
-	    def emcLisa = new PartyRelationship( partyRelationshipType:staffType, partyIdFrom:emc, roleTypeCodeFrom:companyRole, partyIdTo:personLisa, roleTypeCodeTo:staffRole, statusCode:"ENABLED" ).save( insert:true )
-	    def emcRobin = new PartyRelationship( partyRelationshipType:staffType, partyIdFrom:emc, roleTypeCodeFrom:companyRole, partyIdTo:personRobin, roleTypeCodeTo:staffRole, statusCode:"ENABLED" ).save( insert:true )
-	    def emcAnna = new PartyRelationship( partyRelationshipType:staffType, partyIdFrom:emc, roleTypeCodeFrom:companyRole, partyIdTo:personAnna, roleTypeCodeTo:staffRole, statusCode:"ENABLED" ).save( insert:true )
-	    def sigmaReddy = new PartyRelationship( partyRelationshipType:staffType, partyIdFrom:sigma, roleTypeCodeFrom:companyRole, partyIdTo:personReddy, roleTypeCodeTo:staffRole, statusCode:"ENABLED" ).save( insert:true )
-	    def acmeGeorge = new PartyRelationship( partyRelationshipType:empType, partyIdFrom:acmeProject, roleTypeCodeFrom:employerRole, partyIdTo:personGeorge, roleTypeCodeTo:networkAdminRole, statusCode:"ENABLED" ).save( insert:true )
-	    def marioAcme = new PartyRelationship( partyRelationshipType:projectType, partyIdFrom:marioProject, roleTypeCodeFrom:projectRole, partyIdTo:acmeProject, roleTypeCodeTo:clientRole, statusCode:"ENABLED" ).save( insert:true )
-	    def marioEmc = new PartyRelationship( partyRelationshipType:projectType, partyIdFrom:marioProject, roleTypeCodeFrom:projectRole, partyIdTo:emc, roleTypeCodeTo:pmRole, statusCode:"ENABLED" ).save( insert:true )
-	    def marioJohn = new PartyRelationship( partyRelationshipType:projectType, partyIdFrom:marioProject, roleTypeCodeFrom:projectRole, partyIdTo:personJohn, roleTypeCodeTo:moveMgrRole, statusCode:"ENABLED" ).save( insert:true )
-	    def marioRalph = new PartyRelationship( partyRelationshipType:projectType, partyIdFrom:marioProject, roleTypeCodeFrom:projectRole, partyIdTo:personRalph, roleTypeCodeTo:techRole, statusCode:"ENABLED" ).save( insert:true )
+			// Ceders-Sinai Relationships
+			[ projCompanyType, cedersProject, projectRole, tds, companyRole ],
+			[ projClientType, cedersProject, projectRole, ceders, clientRole ],
+			[ projPartnerType, cedersProject, projectRole, emc, partnerRole ],
+			[ projStaffType, cedersProject, projectRole, personRobin, pmRole ],
+			[ projStaffType, cedersProject, projectRole, personJohn, moveMgrRole ],
+			[ projStaffType, cedersProject, projectRole, personGeorge, networkAdminRole ],
+					
+			// TimeWarner Relationships
+			[ projCompanyType, twProject, projectRole, tds, companyRole ],
+			[ projClientType, twProject, projectRole, timeWarner, clientRole ],
+			[ projStaffType, twProject, projectRole, personTim, pmRole ],
+			[ projStaffType, twProject, projectRole, personJohn, moveMgrRole ]
+		]
+		// Save all the rows in list
+		def i = 0;
+		pr.each {
+		    println "row $i"
+			i++
+		    println "${it[0].id} : ${it[1].id} : ${it[2].id} : ${it[3].id} : ${it[4].id}" 
+			
+			new PartyRelationship( 
+				partyRelationshipType: it[0], 
+				partyIdFrom: it[1], 
+				roleTypeCodeFrom: it[2],
+				partyIdTo: it[3],
+				roleTypeCodeTo: it[4]
+				).save( insert:true )
+		}
 
+		def assets = [
+			// project, type, name, asset tag, s/n
+			[cedersProject, serverAsset, "CSHSACADAFF", "XX-232-YAB", "12345"],
+			[cedersProject, serverAsset, "CSHSACCESS2", "XX-138-YAB", "2343455"],
+			[cedersProject, serverAsset, "CSHSBDGT1", "MM-2232", "1893045"],
+			[cedersProject, kvmSwitchAsset, "Avocent", "", ""],
+			[cedersProject, arrayAsset, "CSMCARM Juke", "RR-32-YAB", "SU023423LLK"]
+		]
+		// Insert the list 
+		assets.each {
+			def a = new Asset(
+				project: it[0],
+				assetType: it[1],
+				assetName: it[2],
+				assetTag: it[3],
+				serialNumber: it[4]
+			)
+			def ok = a.validate()
+			if (ok) ok = a.save()
+			if ( ! ok ) {
+				println "Save failed : ${it[2]} " 
+				a.errors.allErrors.each { println it }
+			} 
+		}
 	}
 
 	def destroy = {
