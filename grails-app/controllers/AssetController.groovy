@@ -263,8 +263,8 @@ class AssetController {
         def currProj = getSession().getAttribute( "CURR_PROJ" )
         def projId = currProj.CURR_PROJ
         def project = Project.findById( projId )
-        //get asset list for project present in current scope.
-        [ assetInstanceList: Asset.findAllByProject( project ) ]
+        //get asset list for project present in current scope.        
+        [ assetInstanceList: Asset.findAllByProject( project, params ) ]
     }
     // return asset details
     def show = {
