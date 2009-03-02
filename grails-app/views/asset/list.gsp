@@ -68,7 +68,7 @@
   <body>
     <div class="nav">
       <span class="menuButton"><g:link class="home" controller="auth" action="home">Home</g:link></span>
-      <span class="menuButton"><g:link class="create" action="create">New Asset</g:link></span>
+      <span class="menuButton"></span>
     </div>
     <div class="body">
       <h1>Asset List</h1>
@@ -113,6 +113,11 @@
       </div>
       <div class="paginateButtons">
         <g:paginate total="${Asset.count()}" />
+      </div>
+      <div class="buttons">
+        <g:form>
+          <span class="button"><g:actionSubmit type="button" value="New Asset" class="create" action="create"/></span>
+        </g:form>
       </div>
     </div>
 

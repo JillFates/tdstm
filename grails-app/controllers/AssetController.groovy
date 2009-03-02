@@ -19,18 +19,22 @@ class AssetController {
      */
     def assetImport = {
         //get id of selected project from project view
-        def idFromProjectView = params.projectId
-        
-        if( idFromProjectView == null ) {
+        def projectId = params.projectId
+        def assetsByProject
+        if( projectId == null ) {
             //get project id from session
             def currProj = getSession().getAttribute( "CURR_PROJ" )
-            idFromProjectView = currProj.CURR_PROJ 
+            projectId = currProj.CURR_PROJ 
             
         }
     	//set project id
-    	request.setAttribute("projectId",idFromProjectView)
-       
-        render( view:"assetImport" )
+    	request.setAttribute("projectId",projectId)
+    	if ( projectId != null ) {
+    		def project = Project.findById(projectId)
+    		assetsByProject = Asset.findAllByProject(project)
+    	}
+    	
+        render( view:"assetImport", model : [ assetsByProject:assetsByProject ] )
     }
     /*
      * render export form
