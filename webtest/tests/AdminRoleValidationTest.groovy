@@ -14,9 +14,10 @@ class AdminRoleValidationTest extends grails.util.WebTest {
         
         // click on Project label
         clickLink(label: 'Project')
+        verifyText  'Show Project'
         // invoke the user to access the secure page
         invoke( url: 'project/create' , description:'Tyring to access secure Pages' )
-
+        verifyText  'You do not have permission to access this page'
     }
 	
 }
