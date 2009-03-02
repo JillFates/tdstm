@@ -3,78 +3,60 @@ class AuthControllerTest extends grails.util.WebTest {
     //Attempted login with no username or password.
     def testUserBlankAuth() {
 
-        invoke( url: 'auth/login' )
-        
-        selectForm( name: 'loginForm' )
-        setInputField( name: 'username', value:'' )
-        setInputField( name: 'password', value:'' )
-
-        clickButton( label: 'Sign in' )
+        tryLogin ( '', '' )
         
     }
 
     //Attempted login with invalid username and password.
     def testUserInvalidAuth() {
 
-        invoke( url: 'auth/login' )
-        
-        selectForm( name: 'loginForm' )
-        setInputField( name: 'username', value: 'john' )
-        setInputField( name: 'password', value: 'john' )
-
-        clickButton( label: 'Sign in' )
+        tryLogin ( 'john', 'john' )
         
     }
 
     //Attempted login with valid username and password.
     def testUserValidAuth() {
 
-        invoke( url: 'auth/login' )
-
-        selectForm( name: 'loginForm' )
-        setInputField( name: 'username', value:'john' )
-        setInputField( name: 'password', value:'admin' )
-
-        clickButton( label: 'Sign in' )
+        tryLogin ( 'john', 'admin' )
 
     }
 
     //Attempt accessing secure page without being logged in.  Should be redirected to login page.
     def testSecurePageWithoutLogin() {
 
-        invoke( url: 'auth/login/home', description:'Sign In to access secure Pages' )
+        invoke( url: 'auth/login/home', description:'Trying to access secure Pages with out login' )
 
     }
 
     //Attempt accessing secure page while being logged in.  Should be redirected to insufficient rights warning page.
     def testSecurePageWithValidLogin() {
 
-        invoke(url: 'auth/login')
+        tryLogin ( 'john', 'admin' )
 
-        selectForm( name: 'loginForm' )
-        setInputField( name: 'username', value:'john' )
-        setInputField( name: 'password', value:'admin' )
-
-        clickButton( label: 'Sign in' )
-        
-        clickLink( label:'Party' )
+        clickLink( label:'Assets' )
 
     }
 
     //Attempt logout after successful login, attempt to access secure page should redirect to login.
     def testLogOut() {
 
+        tryLogin ( 'ralph', 'admin' )
+
+        invoke( url: 'auth/signOut' , description:'Logout the Application' )
+        
+        invoke( url: 'auth/login/home' , description:'Tyring to access secure Pages after logout' )
+    }
+
+    //Common method to test login
+    def tryLogin ( def name, def password ) {
+
         invoke( url: 'auth/login' )
 
         selectForm( name: 'loginForm' )
-        setInputField( name: 'username', value: 'ralph' )
-        setInputField( name: 'password', value: 'user' )
-
+        setInputField( name: 'username', value: name )
+        setInputField( name: 'password', value: password )
         clickButton( label: 'Sign in' )
 
-        clickLink( label: 'sign out' )
-        
-        invoke( url: 'auth/login/home' , description:'Sign In to access secure Pages' )
     }
     
 }
