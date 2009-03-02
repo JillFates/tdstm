@@ -24,7 +24,13 @@ class AssetController {
         if( projectId == null ) {
             //get project id from session
             def currProj = getSession().getAttribute( "CURR_PROJ" )
-            projectId = currProj.CURR_PROJ 
+            projectId = currProj.CURR_PROJ
+            if( projectId == null ) {
+
+                flash.message = " No Projects are Associated, Please select Project. "
+                redirect( controller:"project",action:"list" )
+
+            }
             
         }
     	//set project id
@@ -152,7 +158,7 @@ class AssetController {
         def project = Project.findById( projectId )
         if ( projectId == null || projectId == "") {
             flash.message = "Project Name is required"
-            redirect( controller:"asset", action:"assetExport" )
+            redirect( controller:"asset", action:"assetImport" )
         }
         def asset = Asset.findAllByProject( project )
         //get template Excel
@@ -197,7 +203,7 @@ class AssetController {
             if ( checkCol == false ) {
 
                 flash.message = " Column Headers not found, Please check it. "
-                redirect( controller:"asset", action:"assetExport" )
+                redirect( controller:"asset", action:"assetImport" )
 
             } else {
 
@@ -230,12 +236,12 @@ class AssetController {
 
                 book.write()
                 book.close()
-                render( view: "assetExport" )
+                render( view: "assetImport" )
             }
         } catch( Exception fileEx ) {
 
             flash.message = "Excel template not found "
-            redirect( controller:"asset", action:"assetExport" )
+            redirect( controller:"asset", action:"assetImport" )
 
         }
     }
@@ -262,11 +268,22 @@ class AssetController {
     // the delete, save and update actions only accept POST requests
     def allowedMethods = [ delete:'POST', save:'POST', update:'POST' ]
     // return the list of asset records for project present in current scope.
-    def list = {        
-        if ( !params.max ) params.max = 25
-        def currProj = getSession().getAttribute( "CURR_PROJ" )
-        def projId = currProj.CURR_PROJ
-        def project = Project.findById( projId )
+    def list = {
+        def project
+        try {
+            if ( !params.max ) params.max = 25
+            def currProj = getSession().getAttribute( "CURR_PROJ" )
+            def projId = currProj.CURR_PROJ
+            if( projId == null ) {
+
+                flash.message = " No Projects are Associated, Please select Project. "
+                redirect( controller:"project",action:"list" )
+
+            }
+            project = Project.findById( projId )
+        } catch ( Exception ex ) {
+            println " No Projects are associated. "
+        }
         //get asset list for project present in current scope.        
         [ assetInstanceList: Asset.findAllByProject( project, params ) ]
     }
