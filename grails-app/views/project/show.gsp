@@ -61,8 +61,13 @@
 					var projectPartnerVal = projectPartnerObj[document.getElementById('projectPartnerId').selectedIndex].innerHTML;
 					pmOptGroup.style.visibility="visible";
 					mmOptGroup.style.visibility="visible";
-					pmOptGroup.label = projectPartnerVal;
-					mmOptGroup.label = projectPartnerVal;
+                    if(projectPartnerVal != "None" ){
+                      pmOptGroup.label = projectPartnerVal;
+                      mmOptGroup.label = projectPartnerVal;
+                    } else {
+                      pmOptGroup.label = "";
+                      mmOptGroup.label = "";
+                    }
 					var length = managers.items.length
 					for (var i=0; i < length; i++) {
 						var manager = managers.items[i]
@@ -280,7 +285,7 @@
 								<td valign="top" class="value"><select id="projectPartnerId"
 									name="projectPartner"
 									onchange="${remoteFunction(action:'getPartnerStaffList', params:'\'partner=\' + this.value', onComplete:'appendPartnerStaff(e)' )}">
-									<option value="" selected="selected">Please Select</option>
+									<option value="" selected="selected">None</option>
 									<g:each status="i" in="${companyPartners}" var="companyPartners">
 										<option value="${companyPartners?.partyIdTo.id}">${companyPartners?.partyIdTo}</option>
 									</g:each>

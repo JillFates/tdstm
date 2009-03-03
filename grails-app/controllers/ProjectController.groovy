@@ -1,4 +1,5 @@
 import grails.converters.JSON
+import java.text.SimpleDateFormat
 class ProjectController {
     def userPreferenceService
     def index = { redirect(action:list,params:params) }
@@ -8,9 +9,9 @@ class ProjectController {
 
     def list = {
         
-    		def query = "from Project as p order by p.dateCreated desc"
-        	def projectList = Project.findAll( query )
-        	return [ projectInstanceList:projectList ]
+        def query = "from Project as p order by p.dateCreated desc"
+        def projectList = Project.findAll( query )
+        return [ projectInstanceList:projectList ]
     }
     /*
      *  return the details of Project
@@ -68,6 +69,13 @@ class ProjectController {
         projectInstance.lastUpdated = new Date()
         if( projectInstance ) {
             projectInstance.properties = params
+            def startDate = params.startDate
+            def completionDate = params.completionDate
+            //  When the Start date is initially selected and Completion Date is blank, set completion date to the Start date
+            if ( startDate != "" && completionDate == "" ) {
+                def formatter = new SimpleDateFormat("MM/dd/yyyy");
+                projectInstance.completionDate = formatter.parse(startDate);
+            }
             if( !projectInstance.hasErrors() && projectInstance.save() ) {
             	
             	def partnerId = params.projectPartner
@@ -88,21 +96,21 @@ class ProjectController {
             		// condition to check whether partner has changed or not
             		if ( projectPartner == null ) {
 		        		def otherPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ")
-			        		if ( otherPartner != null && otherPartner != "" ) {
-			        			//	Delete existing partner and reinsert new partner For Project, if partner changed
-			        			otherPartner.delete()
-			        			def projectPartnerRel = new PartyRelationship( partyRelationshipType:partnerRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:partnerParty, roleTypeCodeTo:partnerRoleType, statusCode:"ENABLED" ).save( insert:true )
-			        		} else {
-			        			// Create Partner if there is no partner for this project 
-		            			def projectPartnerRel = new PartyRelationship( partyRelationshipType:partnerRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:partnerParty, roleTypeCodeTo:partnerRoleType, statusCode:"ENABLED" ).save( insert:true )
-		            		}
+                        if ( otherPartner != null && otherPartner != "" ) {
+                            //	Delete existing partner and reinsert new partner For Project, if partner changed
+                            otherPartner.delete()
+                            def projectPartnerRel = new PartyRelationship( partyRelationshipType:partnerRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:partnerParty, roleTypeCodeTo:partnerRoleType, statusCode:"ENABLED" ).save( insert:true )
+                        } else {
+                            // Create Partner if there is no partner for this project
+                            def projectPartnerRel = new PartyRelationship( partyRelationshipType:partnerRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:partnerParty, roleTypeCodeTo:partnerRoleType, statusCode:"ENABLED" ).save( insert:true )
+                        }
             		}
             	} else {
             		//	if user select a blank then remove Partner
             		def otherPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ")
-		        		if ( otherPartner != null && otherPartner != "" ) {
-		        			otherPartner.delete()
-		        		}
+                    if ( otherPartner != null && otherPartner != "" ) {
+                        otherPartner.delete()
+                    }
             	}
             	
             	//---------------------------------------
@@ -116,21 +124,21 @@ class ProjectController {
             		//	condition to check whether Project Manager has changed or not
             		if ( projectManager == null ) {
             			def otherprojectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
-            				if ( otherprojectManager != null && otherprojectManager != "" ) {
-            					//	Delete existing partner and reinsert new partner For Project, if partner changed
-            					otherprojectManager.delete()
-            					def projectManagerRel = new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:projectManagerParty, roleTypeCodeTo:projectManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
-            				} else {
-            					//	Create Project Manager if there is no Project Managet for this project
-            					def projectManagerRel = new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:projectManagerParty, roleTypeCodeTo:projectManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
-            				}
+                        if ( otherprojectManager != null && otherprojectManager != "" ) {
+                            //	Delete existing partner and reinsert new partner For Project, if partner changed
+                            otherprojectManager.delete()
+                            def projectManagerRel = new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:projectManagerParty, roleTypeCodeTo:projectManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
+                        } else {
+                            //	Create Project Manager if there is no Project Managet for this project
+                            def projectManagerRel = new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:projectManagerParty, roleTypeCodeTo:projectManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
+                        }
             		}
             	} else {
             		//	if user select a blank then remove Project Manager
             		def otherprojectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
-	            		if ( otherprojectManager != null && otherprojectManager != "" ) {
-	            			otherprojectManager.delete()
-	            		}
+                    if ( otherprojectManager != null && otherprojectManager != "" ) {
+                        otherprojectManager.delete()
+                    }
             	}
             	
             	//---------------------------------------
@@ -145,21 +153,21 @@ class ProjectController {
             		
             		if ( moveManager == null ) {
             			def othermoveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
-            				if ( othermoveManager != null && othermoveManager != "" ) {
-            					//	Delete existing partner and reinsert new partner For Move, if partner changed
-            					othermoveManager.delete()
-            					def moveManagerRel = new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:moveManagerParty, roleTypeCodeTo:moveManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
-            				} else {
-            					//	Create Move Manager if there is no Move Managet for this project
-            					def moveManagerRel = new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:moveManagerParty, roleTypeCodeTo:moveManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
-            				}
+                        if ( othermoveManager != null && othermoveManager != "" ) {
+                            //	Delete existing partner and reinsert new partner For Move, if partner changed
+                            othermoveManager.delete()
+                            def moveManagerRel = new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:moveManagerParty, roleTypeCodeTo:moveManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
+                        } else {
+                            //	Create Move Manager if there is no Move Managet for this project
+                            def moveManagerRel = new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:moveManagerParty, roleTypeCodeTo:moveManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
+                        }
             		}
             	} else {
             		// if user select a blank then remove Move Manager 
             		def othermoveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
-	            		if ( othermoveManager != null && othermoveManager != "" ) {
-	            			othermoveManager.delete()
-	            		}
+                    if ( othermoveManager != null && othermoveManager != "" ) {
+                        othermoveManager.delete()
+                    }
             	}
             	
             	
@@ -213,6 +221,13 @@ class ProjectController {
     def save = {
         def projectInstance = new Project(params)
         projectInstance.dateCreated = new Date()
+        def startDate = params.startDate
+        def completionDate = params.completionDate
+        //  When the Start date is initially selected and Completion Date is blank, set completion date to the Start date
+        if ( startDate != "" && completionDate == "" ) {
+            def formatter = new SimpleDateFormat("MM/dd/yyyy");
+            projectInstance.completionDate = formatter.parse(startDate);
+        }
         if ( !projectInstance.hasErrors() && projectInstance.save() ) {
         	
         	def client = params.projectClient
@@ -307,8 +322,8 @@ class ProjectController {
     }
     
     def cancel = {
-    		 redirect(controller:'projectUtil')
-     }
+        redirect(controller:'projectUtil')
+    }
     /*
      * Action to setPreferences
      */
