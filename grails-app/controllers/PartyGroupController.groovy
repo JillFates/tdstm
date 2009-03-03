@@ -47,6 +47,7 @@ class PartyGroupController {
 
     def update = {
         def partyGroupInstance = PartyGroup.get( params.id )
+        partyGroupInstance.lastUpdated = new Date()
         if(partyGroupInstance) {
             partyGroupInstance.properties = params
             if(!partyGroupInstance.hasErrors() && partyGroupInstance.save()) {
@@ -71,6 +72,7 @@ class PartyGroupController {
 
     def save = {
         def partyGroupInstance = new PartyGroup(params)
+        partyGroupInstance.dateCreated = new Date()
         if(!partyGroupInstance.hasErrors() && partyGroupInstance.save()) {
             flash.message = "PartyGroup ${partyGroupInstance.id} created"
             redirect(action:show,id:partyGroupInstance.id)

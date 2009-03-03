@@ -7,11 +7,7 @@
         <title>Show PartyGroup</title>
     </head>
     <body>
-        <div class="nav">
-            <span class="menuButton"><g:link class="home" controller="auth" action="home">Home</g:link></span>
-            <span class="menuButton"><g:link class="list" action="list">PartyGroup List</g:link></span>
-            <span class="menuButton"><g:link class="create" action="create">New PartyGroup</g:link></span>
-        </div>
+       
         <div class="body">
             <h1>Show PartyGroup</h1>
             <g:if test="${flash.message}">
@@ -26,20 +22,6 @@
                             <td valign="top" class="name">Id:</td>
                             
                             <td valign="top" class="value">${fieldValue(bean:partyGroupInstance, field:'id')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Date Created:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:partyGroupInstance, field:'dateCreated')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Last Updated:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:partyGroupInstance, field:'lastUpdated')}</td>
                             
                         </tr>
                     
@@ -62,6 +44,20 @@
                             
                             <td valign="top" class="value">${fieldValue(bean:partyGroupInstance, field:'comment')}</td>
                             
+                        </tr>
+                        
+                        <tr class="prop">
+                            <td valign="top" class="name">Date Created:</td>
+
+                            <td valign="top" class="value"><my:convertDateTime date="${partyGroupInstance?.dateCreated}"/> </td>
+
+                        </tr>
+
+                        <tr class="prop">
+                            <td valign="top" class="name">Last Updated:</td>
+
+                            <td valign="top" class="value"><my:convertDateTime date="${partyGroupInstance?.lastUpdated}" /> </td>
+
                         </tr>
                     
                     </tbody>

@@ -1,5 +1,3 @@
-
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -7,11 +5,6 @@
 <title>Edit RoleType</title>
 </head>
 <body>
-<div class="nav"><span class="menuButton"><g:link
-	class="home" controller="auth" action="home">Home</g:link></span> <span
-	class="menuButton"><g:link class="list" action="list">RoleType List</g:link></span>
-<span class="menuButton"><g:link class="create" action="create">New RoleType</g:link></span>
-</div>
 <div class="body">
 <h1>Edit RoleType</h1>
 <g:if test="${flash.message}">
@@ -24,13 +17,7 @@
 			<tr class="prop">
 				<td valign="top" class="name"><label for="id">Code:</label></td>
 				<td valign="top"
-					class="value ${hasErrors(bean:roleTypeInstance,field:'id','errors')}">
-				<input type="text" id="id" name="id"
-					value="${fieldValue(bean:roleTypeInstance,field:'id')}" /> <g:hasErrors
-					bean="${roleTypeInstance}" field="id">
-					<div class="errors"><g:renderErrors
-						bean="${roleTypeInstance}" as="list" field="id" /></div>
-				</g:hasErrors></td>
+					class="value">${fieldValue(bean:roleTypeInstance,field:'id')}</td>
 			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="description">Description:</label>

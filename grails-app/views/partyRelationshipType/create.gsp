@@ -7,10 +7,6 @@
 <title>Create PartyRelationshipType</title>
 </head>
 <body>
-<div class="nav"><span class="menuButton"><g:link
-	class="home" controller="auth" action="home">Home</g:link></span> <span
-	class="menuButton"><g:link class="list" action="list">PartyRelationshipType List</g:link></span>
-</div>
 <div class="body">
 <h1>Create PartyRelationshipType</h1>
 <g:if test="${flash.message}">

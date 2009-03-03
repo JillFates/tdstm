@@ -7,10 +7,7 @@
         <title>RoleType List</title>
     </head>
     <body>
-        <div class="nav">
-            <span class="menuButton"><g:link class="home" controller="auth" action="home">Home</g:link></span>
-            <span class="menuButton"><g:link class="create" action="create">New RoleType</g:link></span>
-        </div>
+       
         <div class="body">
             <h1>RoleType List</h1>
             <g:if test="${flash.message}">
@@ -42,6 +39,11 @@
             </div>
             <div class="paginateButtons">
                 <g:paginate total="${RoleType.count()}" />
+            </div>
+            <div class="buttons">
+                <g:form>
+                    <span class="button"><g:actionSubmit class="create" action="Create" value="New Role Type"/></span>
+                </g:form>
             </div>
         </div>
     </body>

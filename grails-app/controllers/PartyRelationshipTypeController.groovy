@@ -1,4 +1,6 @@
 class PartyRelationshipTypeController {
+
+    def idCheck = 0;
     
     def index = { redirect( action:list, params:params ) }
 
@@ -71,8 +73,15 @@ class PartyRelationshipTypeController {
     // save PartyRelationshipType details
     def save = {
         def partyRelationshipTypeInstance = new PartyRelationshipType(params)
-        	partyRelationshipTypeInstance.id = params.id
-        if(!partyRelationshipTypeInstance.hasErrors() && partyRelationshipTypeInstance.save( insert: true )) {
+        partyRelationshipTypeInstance.id = params.id
+        def partyRelationship = PartyRelationshipType.findById( params.id )
+       // condition to check the Primary Key
+        if( partyRelationship != null ){
+             
+            flash.message = "PartyRelationshipType ${partyRelationship.id} already exists"
+            idCheck = 1
+        }
+        if(!partyRelationshipTypeInstance.hasErrors() && idCheck != 1 && partyRelationshipTypeInstance.save( insert: true )) {
             flash.message = "PartyRelationshipType ${partyRelationshipTypeInstance.id} created"
             redirect( action:show, id:partyRelationshipTypeInstance.id )
         }

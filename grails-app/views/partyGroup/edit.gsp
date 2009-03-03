@@ -7,11 +7,6 @@
         <title>Edit PartyGroup</title>
     </head>
     <body>
-        <div class="nav">
-            <span class="menuButton"><g:link class="home" controller="auth" action="home">Home</g:link></span>
-            <span class="menuButton"><g:link class="list" action="list">PartyGroup List</g:link></span>
-            <span class="menuButton"><g:link class="create" action="create">New PartyGroup</g:link></span>
-        </div>
         <div class="body">
             <h1>Edit PartyGroup</h1>
             <g:if test="${flash.message}">
@@ -22,34 +17,6 @@
                 <div class="dialog">
                     <table>
                         <tbody>
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="dateCreated">Date Created:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:partyGroupInstance,field:'dateCreated','errors')}">
-                                    <g:datePicker name="dateCreated" value="${partyGroupInstance?.dateCreated}" ></g:datePicker>
-                                <g:hasErrors bean="${partyGroupInstance}" field="dateCreated">
-					            <div class="errors">
-					                <g:renderErrors bean="${partyGroupInstance}" as="list" field="dateCreated"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="lastUpdated">Last Updated:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:partyGroupInstance,field:'lastUpdated','errors')}">
-                                    <g:datePicker name="lastUpdated" value="${partyGroupInstance?.lastUpdated}" noSelection="['':'']"></g:datePicker>
-                                <g:hasErrors bean="${partyGroupInstance}" field="lastUpdated">
-					            <div class="errors">
-					                <g:renderErrors bean="${partyGroupInstance}" as="list" field="lastUpdated"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
                         
                             <tr class="prop">
                                 <td valign="top" class="name">

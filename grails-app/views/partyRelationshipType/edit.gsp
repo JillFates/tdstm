@@ -7,11 +7,6 @@
 <title>Edit PartyRelationshipType</title>
 </head>
 <body>
-<div class="nav"><span class="menuButton"><g:link
-	class="home" controller="auth" action="home">Home</g:link></span> <span
-	class="menuButton"><g:link class="list" action="list">PartyRelationshipType List</g:link></span>
-<span class="menuButton"><g:link class="create" action="create">New PartyRelationshipType</g:link></span>
-</div>
 <div class="body">
 <h1>Edit PartyRelationshipType</h1>
 <g:if test="${flash.message}">
@@ -24,14 +19,7 @@
 		<tbody>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="id">Code:</label></td>
-				<td valign="top"
-					class="value ${hasErrors(bean:partyRelationshipTypeInstance,field:'id','errors')}">
-				<input type="text" id="id" name="id"
-					value="${fieldValue(bean:partyRelationshipTypeInstance,field:'id')}" />
-				<g:hasErrors bean="${partyRelationshipTypeInstance}" field="id">
-					<div class="errors"><g:renderErrors
-						bean="${partyRelationshipTypeInstance}" as="list" field="id" /></div>
-				</g:hasErrors></td>
+				<td valign="top" class="value">${fieldValue(bean:partyRelationshipTypeInstance,field:'id')}</td>
 			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="description">Description:</label>

@@ -7,10 +7,6 @@
         <title>PartyRelationshipType List</title>
     </head>
     <body>
-        <div class="nav">
-            <span class="menuButton"><g:link class="home" controller="auth" action="home">Home</g:link></span>
-            <span class="menuButton"><g:link class="create" action="create">New PartyRelationshipType</g:link></span>
-        </div>
         <div class="body">
             <h1>PartyRelationshipType List</h1>
             <g:if test="${flash.message}">
@@ -42,6 +38,11 @@
             </div>
             <div class="paginateButtons">
                 <g:paginate total="${PartyRelationshipType.count()}" />
+            </div>
+             <div class="buttons">
+                <g:form>
+                    <span class="button"><g:actionSubmit class="create" value="New PartyRelationshipType" action="create" /></span>
+                </g:form>
             </div>
         </div>
     </body>

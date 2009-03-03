@@ -1,5 +1,5 @@
 class RoleTypeController {
-    
+    def idCheck = 0;
     def index = { redirect( action:list, params:params ) }
 
     // the delete, save and update actions only accept POST requests
@@ -72,7 +72,13 @@ class RoleTypeController {
     def save = {
         def roleTypeInstance = new RoleType(params)
         roleTypeInstance.id = params.id
-        if(!roleTypeInstance.hasErrors() && roleTypeInstance.save(insert:true)) {
+        def role = RoleType.findById(params.id)
+        // condition to check the id
+        if ( role != null ) {
+            flash.message = "Role Type ${role.id} already exist "
+            idCheck = 1;
+        }
+        if(!roleTypeInstance.hasErrors() && idCheck != 1 && roleTypeInstance.save(insert:true) ) {
             flash.message = "RoleType ${roleTypeInstance.id} created"
             redirect( action:show, id:roleTypeInstance.id )
         }
