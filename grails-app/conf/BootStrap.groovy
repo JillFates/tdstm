@@ -185,8 +185,17 @@ println "\n\n PARTY GROUPS \n\n"
 		def ceders = new PartyGroup( dateCreated:new Date(), name:"Ceders-Sinai", partyType:groupPartyType ).save()		
 		def sigma = new PartyGroup( dateCreated:new Date(), name:"SIGMA", partyType:groupPartyType ).save()
 		def trucks = new PartyGroup( dateCreated:new Date(), name:"TrucksRUs", partyType:groupPartyType ).save()
-		
-println "\n\n PROJECTS \n\n" 		
+
+
+		// -------------------------------
+		// Create PartyRole for Companies
+		// -------------------------------
+		def companies = [tds, emc, timeWarner, ceders, sigma, trucks]
+		companies.each {
+			new PartyRole( party: it, roleType: companyRole).save(insert: true)
+		}
+
+		println "\n\n PROJECTS \n\n"
 
 		// -------------------------------
 		// Create Projects
