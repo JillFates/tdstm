@@ -281,9 +281,8 @@ class AssetController {
 
             }
             project = Project.findById( projId )
-        } catch ( Exception ex ) {
-            println " No Projects are associated. "
-        }
+        } catch ( Exception ex ) { }
+        
         //get asset list for project present in current scope.        
         [ assetInstanceList: Asset.findAllByProject( project, params ) ]
     }
@@ -347,6 +346,13 @@ class AssetController {
     // save asset details
     def save = {
         def assetInstance = new Asset( params )
+        def currProj = getSession().getAttribute( "CURR_PROJ" )
+        def projectInstance
+        def projectId = currProj.CURR_PROJ
+        if( projectId != null ) {
+            projectInstance = Project.findById( projectId )
+            assetInstance.project = projectInstance
+        }
         if ( !assetInstance.hasErrors() && assetInstance.save() ) {
             flash.message = "Asset ${assetInstance.id} created"
             redirect( action:show, id:assetInstance.id )
