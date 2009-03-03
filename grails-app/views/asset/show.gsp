@@ -37,11 +37,7 @@
 
   </head>
   <body>
-    <div class="nav">
-      <span class="menuButton"><g:link class="home" controller="auth" action="home">Home</g:link></span>
-      <span class="menuButton"><g:link class="list" action="list">Asset List</g:link></span>
-      <span class="menuButton"><g:link class="create" action="create">New Asset</g:link></span>
-    </div>
+
     <div class="body">
       <h1>Show Asset</h1>
       <g:if test="${flash.message}">
@@ -50,21 +46,6 @@
       <div class="dialog">
         <table>
           <tbody>
-
-
-            <tr class="prop">
-              <td valign="top" class="name">Id:</td>
-
-              <td valign="top" class="value">${fieldValue(bean:assetInstance, field:'id')}</td>
-
-            </tr>
-
-            <tr class="prop">
-              <td valign="top" class="name">Project Name:</td>
-
-              <td valign="top" class="value"><g:link controller="project" action="show" id="${assetInstance?.project?.id}">${assetInstance?.project?.encodeAsHTML()}</g:link></td>
-
-            </tr>
 
             <tr class="prop">
               <td valign="top" class="name">Asset Type:</td>
@@ -120,20 +101,6 @@
         <div class="dialog">
           <table>
             <tbody>
-
-              <tr class="prop">
-                <td valign="top" class="name">
-                  <label for="project">Project :</label>
-                </td>
-                <td valign="top" class="value ${hasErrors(bean:assetInstance,field:'project','errors')}">
-                  <g:select optionKey="id" from="${Project.list()}" name="project.id" value="${assetInstance?.project?.id}" ></g:select>
-                  <g:hasErrors bean="${assetInstance}" field="project">
-                    <div class="errors">
-                      <g:renderErrors bean="${assetInstance}" as="list" field="project"/>
-                    </div>
-                  </g:hasErrors>
-                </td>
-              </tr>
 
               <tr class="prop">
                 <td valign="top" class="name">
