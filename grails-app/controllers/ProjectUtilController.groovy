@@ -3,19 +3,21 @@ class ProjectUtilController {
 	def userPreferenceService
 
     def index = { 
-    		
-        def principal = SecurityUtils.subject.principal
-        def userLogin = UserLogin.findByUsername( principal )
-        def userPreference = UserPreference.findByUserLogin( userLogin )
-    		
-        if ( userPreference == null ) {
-            redirect( action:"searchList" )
-        } else {
-    			
-            def projectInstance = Project.findById( userPreference.value )
-            redirect( controller:"project", action:"show",id:projectInstance.id)
+    		 
+        try{
+            def principal = SecurityUtils.subject.principal
+            def userLogin = UserLogin.findByUsername( principal )
+            def userPreference = UserPreference.findByUserLogin( userLogin )
+            if ( userPreference == null ) {
+                redirect( action:"searchList" )
+            } else {
+                def projectInstance = Project.findById( userPreference.value )
+                redirect( controller:"project", action:"show",id:projectInstance.id)
+            }
+        } catch (Exception e){
+            flash.message = "Your login has expired and must login again"
+            render( view:'/auth/login')
         }
-    		
     }
     
     /*
