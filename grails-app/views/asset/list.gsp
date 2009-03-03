@@ -33,10 +33,7 @@
 
       //set values to dialog from response
 
-      document.getElementById('assetId').value= asset.id
       document.getElementById('id').value= asset.id
-      document.getElementById('assetProject').value = asset.project
-      document.getElementById('project.id').value = asset.projectId
       if ( asset.assetType != null ) {
       document.getElementById('assetTypes').value = asset.assetTypeId
       document.getElementById('assetType.id').value = asset.assetTypeId
@@ -54,7 +51,7 @@
       $("#dialog").dialog("open")
 
       }
-      
+
       function editAssetDialog() {
 
       $("#dialog").dialog("close")
@@ -66,10 +63,7 @@
 
   </head>
   <body>
-    <div class="nav">
-      <span class="menuButton"><g:link class="home" controller="auth" action="home">Home</g:link></span>
-      <span class="menuButton"></span>
-    </div>
+
     <div class="body">
       <h1>Asset List</h1>
       <g:if test="${flash.message}">
@@ -126,21 +120,6 @@
         <table>
           <tbody>
 
-
-            <tr class="prop">
-              <td valign="top" class="name">Id:</td>
-
-              <td valign="top" class="value"><input type="text" id="assetId" name="assetId" value="" style="border: 0px" readonly></td>
-
-            </tr>
-
-            <tr class="prop">
-              <td valign="top" class="name">Project Name:</td>
-
-              <td valign="top" class="value"><input type="text" id="assetProject" name="assetProject" value="" style="border: 0px" readonly></td>
-
-            </tr>
-
             <tr class="prop">
               <td valign="top" class="name">Asset Type:</td>
 
@@ -192,20 +171,6 @@
         <div class="dialog">
           <table>
             <tbody>
-
-              <tr class="prop">
-                <td valign="top" class="name">
-                  <label for="project">Project :</label>
-                </td>
-                <td valign="top" class="value ${hasErrors(bean:assetInstance,field:'project','errors')}">
-                  <g:select optionKey="id" from="${Project.list()}" id="project.id" name="project.id" value="" ></g:select>
-                  <g:hasErrors bean="${assetInstance}" field="project">
-                    <div class="errors">
-                      <g:renderErrors bean="${assetInstance}" as="list" field="project"/>
-                    </div>
-                  </g:hasErrors>
-                </td>
-              </tr>
 
               <tr class="prop">
                 <td valign="top" class="name">
