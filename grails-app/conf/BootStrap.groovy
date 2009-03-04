@@ -93,6 +93,10 @@ println "\n\n PARTY TYPES\n\n"
 	    def groupPartyType = new PartyType( description:"PartyGroup" )
 			groupPartyType.id = "PARTY_GROUP"
 			groupPartyType.save( insert:true )
+			
+	    def companyType = new PartyType( description:"Company" )
+			companyType.id = "COMPANY"
+			companyType.save( insert:true )
 	
 println "\n\n PARTY RELATIONSHIP TYPES\n\n" 		
 
@@ -179,12 +183,12 @@ println "\n\n PARTY GROUPS \n\n"
 		// -------------------------------
 		// Create Party Group (Companies)
 		// -------------------------------
-		def tds = new PartyGroup( dateCreated:new Date(), name:"TDS", partyType:groupPartyType ).save()
-		def emc = new PartyGroup( dateCreated:new Date(), name:"EMC", partyType:groupPartyType ).save()
-		def timeWarner = new PartyGroup( dateCreated:new Date(), name:"Time Warner", partyType:groupPartyType ).save()
-		def ceders = new PartyGroup( dateCreated:new Date(), name:"Ceders-Sinai", partyType:groupPartyType ).save()		
-		def sigma = new PartyGroup( dateCreated:new Date(), name:"SIGMA", partyType:groupPartyType ).save()
-		def trucks = new PartyGroup( dateCreated:new Date(), name:"TrucksRUs", partyType:groupPartyType ).save()
+		def tds = new PartyGroup( dateCreated:new Date(), name:"TDS", partyType:companyType ).save()
+		def emc = new PartyGroup( dateCreated:new Date(), name:"EMC", partyType:companyType ).save()
+		def timeWarner = new PartyGroup( dateCreated:new Date(), name:"Time Warner", partyType:companyType ).save()
+		def ceders = new PartyGroup( dateCreated:new Date(), name:"Ceders-Sinai", partyType:companyType ).save()		
+		def sigma = new PartyGroup( dateCreated:new Date(), name:"SIGMA", partyType:companyType ).save()
+		def trucks = new PartyGroup( dateCreated:new Date(), name:"TrucksRUs", partyType:companyType ).save()
 
 
 		// -------------------------------
