@@ -7,10 +7,6 @@
         <title>PartyGroup List</title>
     </head>
     <body>
-        <div class="nav">
-            <span class="menuButton"><g:link class="home" controller="auth" action="home">Home</g:link></span>
-            <span class="menuButton"><g:link class="create" action="create">New PartyGroup</g:link></span>
-        </div>
         <div class="body">
             <h1>PartyGroup List</h1>
             <g:if test="${flash.message}">
@@ -23,15 +19,15 @@
                         
                    	        <g:sortableColumn property="id" title="Id" />
                         
-                   	        <g:sortableColumn property="dateCreated" title="Date Created" />
-                        
-                   	        <g:sortableColumn property="lastUpdated" title="Last Updated" />
-                        
                    	        <th>Party Type</th>
                    	    
                    	        <g:sortableColumn property="name" title="Name" />
                         
                    	        <g:sortableColumn property="comment" title="Comment" />
+                   	        
+                   	        <g:sortableColumn property="dateCreated" title="Date Created" />
+                        
+                   	        <g:sortableColumn property="lastUpdated" title="Last Updated" />
                         
                         </tr>
                     </thead>
@@ -41,15 +37,15 @@
                         
                             <td><g:link action="show" id="${partyGroupInstance.id}">${fieldValue(bean:partyGroupInstance, field:'id')}</g:link></td>
                         
-                            <td>${fieldValue(bean:partyGroupInstance, field:'dateCreated')}</td>
-                        
-                            <td>${fieldValue(bean:partyGroupInstance, field:'lastUpdated')}</td>
-                        
                             <td>${fieldValue(bean:partyGroupInstance, field:'partyType')}</td>
                         
                             <td>${fieldValue(bean:partyGroupInstance, field:'name')}</td>
                         
                             <td>${fieldValue(bean:partyGroupInstance, field:'comment')}</td>
+                            
+                            <td><my:convertDateTime date="${partyGroupInstance?.dateCreated}"/></td>
+                        
+                            <td><my:convertDateTime date="${partyGroupInstance?.lastUpdated}" /></td>
                         
                         </tr>
                     </g:each>
@@ -58,6 +54,11 @@
             </div>
             <div class="paginateButtons">
                 <g:paginate total="${PartyGroup.count()}" />
+            </div>
+            <div class="buttons">
+                <g:form>
+                    <span class="button"><g:actionSubmit class="create" value="New Party Group" action="create" /></span>
+                </g:form>
             </div>
         </div>
     </body>

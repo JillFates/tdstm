@@ -1,5 +1,7 @@
 class PersonController {
     
+	def partyRelationshipService
+	
     def index = { redirect(action:list,params:params) }
 
     // the delete, save and update actions only accept POST requests
@@ -17,7 +19,9 @@ class PersonController {
             flash.message = "Person not found with id ${params.id}"
             redirect(action:list)
         }
-        else { return [ personInstance : personInstance ] }
+        else { 
+        	def company = partyRelationshipService.getSatffCompany( personInstance )
+        	return [ personInstance : personInstance, company:company ] }
     }
 
     def delete = {
@@ -32,7 +36,7 @@ class PersonController {
             redirect(action:list)
         }
     }
-
+	// return person details to EDIT form
     def edit = {
         def personInstance = Person.get( params.id )
 
@@ -41,20 +45,27 @@ class PersonController {
             redirect(action:list)
         }
         else {
-            return [ personInstance : personInstance ]
+        	def companies = partyRelationshipService.getCompaniesList()
+        	def company = partyRelationshipService.getSatffCompany( personInstance )
+            return [ personInstance : personInstance, companies: companies, company:company  ]
         }
     }
 
     def update = {
         def personInstance = Person.get( params.id )
+        personInstance.lastUpdated = new Date()
         if(personInstance) {
             personInstance.properties = params
-            if(!personInstance.hasErrors() && personInstance.save()) {
+            if ( !personInstance.hasErrors() && personInstance.save() ) {
+            	def companyId = params.company 
+            	partyRelationshipService.updateStaffCompany( personInstance, companyId )
                 flash.message = "Person ${params.id} updated"
-                redirect(action:show,id:personInstance.id)
+                redirect( action:show, id:personInstance.id )
             }
             else {
-                render(view:'edit',model:[personInstance:personInstance])
+            	def companies = partyRelationshipService.getCompaniesList()
+            	def company = partyRelationshipService.getSatffCompany( personInstance )
+                render( view:'edit',model:[personInstance:personInstance, companies: companies, company:company ] )
             }
         }
         else {
@@ -62,21 +73,29 @@ class PersonController {
             redirect(action:edit,id:params.id)
         }
     }
-
+    // return person instance and companies 
     def create = {
         def personInstance = new Person()
         personInstance.properties = params
-        return ['personInstance':personInstance]
+        def companies = partyRelationshipService.getCompaniesList() 
+        return [ 'personInstance':personInstance, companies:companies ]
     }
-
+    //Save the Person Detais
     def save = {
-        def personInstance = new Person(params)
-        if(!personInstance.hasErrors() && personInstance.save()) {
+        def personInstance = new Person( params )
+        	personInstance.dateCreated = new Date()
+        if ( !personInstance.hasErrors() && personInstance.save() ) {
+        	def companyId = params.company
+        	if ( companyId != null ) {
+        		def companyParty = Party.findById( companyId )
+        		def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", personInstance, "STAFF" )
+        	}
             flash.message = "Person ${personInstance.id} created"
-            redirect(action:show,id:personInstance.id)
+            redirect( action:show, id:personInstance.id )
         }
         else {
-            render(view:'create',model:[personInstance:personInstance])
+        	def companies = partyRelationshipService.getCompaniesList()
+            render( view:'create', model:[ personInstance:personInstance, companies:companies ] )
         }
     }
 }

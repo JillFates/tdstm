@@ -4,6 +4,15 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="main" />
+		<g:javascript>
+			function initialize(){
+				var companyObj = document.getElementById("companyId")
+				<% if(company != null){ %>
+					companyObj.value = "${company?.partyIdFrom.id}"
+				<%} %>
+				
+			}
+		</g:javascript>
         <title>Edit Person</title>
     </head>
     <body>
@@ -26,34 +35,6 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="dateCreated">Date Created:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:personInstance,field:'dateCreated','errors')}">
-                                    <g:datePicker name="dateCreated" value="${personInstance?.dateCreated}" ></g:datePicker>
-                                <g:hasErrors bean="${personInstance}" field="dateCreated">
-					            <div class="errors">
-					                <g:renderErrors bean="${personInstance}" as="list" field="dateCreated"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="lastUpdated">Last Updated:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:personInstance,field:'lastUpdated','errors')}">
-                                    <g:datePicker name="lastUpdated" value="${personInstance?.lastUpdated}" noSelection="['':'']"></g:datePicker>
-                                <g:hasErrors bean="${personInstance}" field="lastUpdated">
-					            <div class="errors">
-					                <g:renderErrors bean="${personInstance}" as="list" field="lastUpdated"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
                                     <label for="partyType">Party Type:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:personInstance,field:'partyType','errors')}">
@@ -64,6 +45,18 @@
 					            </div>
 					            </g:hasErrors>
                                 </td>
+                            </tr> 
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="company">Company :</label>
+                                </td>
+                              	<td valign="top" class="value">
+	                              	<select name="company" id="companyId" >
+					                    <g:each status="i" in="${companies}" var="company">
+					                      <option value="${company.id}">${company}</option>
+					                    </g:each>
+	                				</select>
+                				</td>
                             </tr> 
                         
                             <tr class="prop">
@@ -131,5 +124,9 @@
                 </div>
             </g:form>
         </div>
+        <g:javascript>
+    initialize();
+	</g:javascript>
     </body>
+    
 </html>

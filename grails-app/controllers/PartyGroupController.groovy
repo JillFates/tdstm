@@ -1,5 +1,7 @@
 class PartyGroupController {
     
+	def partyRelationshipService
+    
     def index = { redirect(action:list,params:params) }
 
     // the delete, save and update actions only accept POST requests
@@ -74,6 +76,14 @@ class PartyGroupController {
         def partyGroupInstance = new PartyGroup(params)
         partyGroupInstance.dateCreated = new Date()
         if(!partyGroupInstance.hasErrors() && partyGroupInstance.save()) {
+        	def partyType = partyGroupInstance.partyType
+        	//	Statements to create CLIENT PartyRelationship with  TDS Company
+        	if( partyType.id == "COMPANY" ){
+        	
+	        	def companyParty = PartyGroup.findByName( "TDS" )
+	        	def partyRelationship = partyRelationshipService.savePartyRelationship( "CLIENTS", companyParty, "COMPANY", partyGroupInstance, "CLIENT" )
+
+        	}
             flash.message = "PartyGroup ${partyGroupInstance.id} created"
             redirect(action:show,id:partyGroupInstance.id)
         }

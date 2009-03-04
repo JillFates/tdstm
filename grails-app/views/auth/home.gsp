@@ -26,21 +26,17 @@ a:hover {
 	</thead>
 	<tbody>
 		<tr>
-			<td><g:link controller="party" style="color:black">Party </g:link></td>
-			<td><g:link controller="partyGroup" style="color:black">Party Group</g:link></td>
+			<td><g:link controller="partyGroup" style="color:black">Company</g:link></td>
+			<td><g:link controller="roleType" style="color:black">Role Type </g:link></td>
 		</tr>
 		<tr>
-			<td><g:link controller="project" style="color:black">Project</g:link></td>
-			<td><g:link controller="partyRole" style="color:black">Party Role</g:link></td>
-
-		</tr>
-		<tr>
-			<td><g:link controller="person" style="color:black">Person </g:link></td>
+			<td><g:link controller="person" style="color:black">Staff</g:link></td>
 			<td><g:link controller="userLogin" style="color:black">User Login</g:link></td>
 
 		</tr>
 		<tr>
 			<td><g:link controller="partyRelationship" style="color:black">Party Relationship</g:link></td>
+			<td><g:link controller="partyRelationshipType" style="color:black">Party RelationshipType</g:link></td>
 		</tr>
 
 	</tbody>

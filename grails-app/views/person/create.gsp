@@ -4,14 +4,11 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="main" />
-        <title>Create Person</title>         
+        <title>Create Staff</title>         
     </head>
     <body>
         <div class="body">
-            <h1>Create Person</h1>
-            <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-	            <span class="menuButton"><g:link class="list" action="list">Person List</g:link></span>
-	        </div>
+            <h1>Create Staff</h1>
 	        <br>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
@@ -20,34 +17,6 @@
                 <div class="dialog">
                     <table>
                         <tbody>
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="dateCreated">Date Created:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:personInstance,field:'dateCreated','errors')}">
-                                    <g:datePicker name="dateCreated" value="${personInstance?.dateCreated}" ></g:datePicker>
-                                <g:hasErrors bean="${personInstance}" field="dateCreated">
-					            <div class="errors">
-					                <g:renderErrors bean="${personInstance}" as="list" field="dateCreated"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="lastUpdated">Last Updated:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:personInstance,field:'lastUpdated','errors')}">
-                                    <g:datePicker name="lastUpdated" value="${personInstance?.lastUpdated}" noSelection="['':'']"></g:datePicker>
-                                <g:hasErrors bean="${personInstance}" field="lastUpdated">
-					            <div class="errors">
-					                <g:renderErrors bean="${personInstance}" as="list" field="lastUpdated"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
@@ -61,6 +30,19 @@
 					            </div>
 					            </g:hasErrors>
                                 </td>
+                            </tr> 
+                            
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="company">Company :</label>
+                                </td>
+                              	<td valign="top" class="value">
+	                              	<select id="company" name="company">
+					                    <g:each status="i" in="${companies}" var="company">
+					                      <option value="${company.id}">${company}</option>
+					                    </g:each>
+	                				</select>
+                				</td>
                             </tr> 
                         
                             <tr class="prop">
