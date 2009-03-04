@@ -207,7 +207,7 @@
                     </tbody>
                 </table>
             </div>
-            <div id="dialog" title="Edit Project" >
+            <div id="dialog" title="Edit Project" style="display:none;">
             	
 			      <g:form name="editForm" method="post" action="update">
 
@@ -385,16 +385,6 @@
                     </jsec:hasRole>
                 </g:form>
             </div>
-            <div class="buttons">
-		
-		        <g:form name="callImport" controller="asset">
-		          <input type="hidden" name="projectId" value="${projectInstance?.id}" />
-		          <span class="button">
-		            <g:actionSubmit class="edit" value="Import/Export" action="assetImport" />
-		          </span>
-		        </g:form>
-		
-		    </div>
     </body>
         </div>
     </body>
