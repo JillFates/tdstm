@@ -78,4 +78,38 @@ class UserPreferenceService  {
         return RequestContextHolder.currentRequestAttributes().getSession()
     }
     
+    /*
+     *	Set Roles to Persons in PartyRole  
+     */
+    def setUserRoles( def roleType, def person ){
+    	def personInstance = Party.findById(person)
+    	roleType.each{role ->
+    		def roleTypeInstance = RoleType.findById(role)
+    		// Create Role Preferences to User
+    		def dupPartyRole =  PartyRole.get( new PartyRole( party:personInstance, roleType:roleTypeInstance ) )
+    		if(dupPartyRole == null){
+    			def partyRole = new PartyRole( party:personInstance, roleType:roleTypeInstance ).save( insert:true )
+    		}
+    		
+    	}
+    }
+    
+    /*
+     *  Method to return List of Roles Available for User
+     */
+    def getAvailableRoles( def person ){
+        def availableRoles = RoleType.findAll("from RoleType r where r.id not in (select roleType.id from PartyRole where party = $person.id group by roleType.id )")
+    	 
+        return availableRoles
+    }
+    /*
+     *  Method to return List of Roles Assigned to User
+     */
+    def getAssignedRoles( def person ){
+
+        def assignedRoles = RoleType.findAll("from RoleType r where r.id in (select roleType.id from PartyRole where party = $person.id group by roleType.id )")
+    	 
+        return assignedRoles
+    }
+    
 }

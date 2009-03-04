@@ -5,6 +5,17 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="main" />
         <title>Edit UserLogin</title>
+        <g:javascript library="jquery" />
+			 <script type="text/javascript">  
+				   $().ready(function() {  
+				    $('#add').click(function() {  
+				     return !$('#availableRoleId option:selected').remove().appendTo('#assignedRoleId');  
+				    });  
+				    $('#remove').click(function() {  
+				     return !$('#assignedRoleId option:selected').remove().appendTo('#availableRoleId');  
+				    });  
+				   });  
+			  </script> 
     </head>
     <body>
         <div class="body">
@@ -66,32 +77,46 @@
                             </tr> 
                         
                             <tr class="prop">
+                                <td valign="top" class="value" colspan="2">
+                                <table style="border: none;">
+                                <tr>
+                               <td valign="top" class="name">
+                                    <label >Aavailable Roles:</label>
+                                </td>
                                 <td valign="top" class="name">
-                                    <label for="createdDate">Created Date:</label>
+                                    <label >&nbsp;</label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'createdDate','errors')}">
-                                    <g:datePicker name="createdDate" value="${userLoginInstance?.createdDate}" noSelection="['':'']"></g:datePicker>
-                                <g:hasErrors bean="${userLoginInstance}" field="createdDate">
-					            <div class="errors">
-					                <g:renderErrors bean="${userLoginInstance}" as="list" field="createdDate"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                        
-                            <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="lastLogin">Last Login:</label>
+                                    <label >Assigned Roles:</label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'lastLogin','errors')}">
-                                    <g:datePicker name="lastLogin" value="${userLoginInstance?.lastLogin}" noSelection="['':'']"></g:datePicker>
-                                <g:hasErrors bean="${userLoginInstance}" field="lastLogin">
-					            <div class="errors">
-					                <g:renderErrors bean="${userLoginInstance}" as="list" field="lastLogin"/>
-					            </div>
-					            </g:hasErrors>
+                                </tr>
+                                <tr>
+	                                <td valign="top" class="name">
+		                                <select name="availableRole" id="availableRoleId" multiple="multiple" size="10" style="width: 250px">
+			                                <g:each in="${availableRoles}" var="availableRoles">
+			                                	<option value="${availableRoles.id}">${availableRoles}</option>
+			                                </g:each>
+		                                </select>
+	                                </td>
+	                                <td valign="middle" style="vertical-align:middle" >
+		                                <span style="white-space: nowrap;height: 100px;" > <a href="#" id="add">Assign &gt;&gt;</a></span><br><br>
+		                                <span style="white-space: nowrap;"> <a href="#" id="remove">&lt;&lt; Remove</a></span>
+	                                </td>
+	                                <td valign="top" class="name">
+		                                <select name="assignedRole" id="assignedRoleId" multiple="multiple" size="10" style="width: 250px">
+				                                <g:each in="${assignedRoles}" var="assignedRole">
+				                                	<option value="${assignedRole?.id}" selected="selected">${assignedRole}</option>
+				                                </g:each>
+				                                <g:each in="${updatedRoles}" var="updatedRole">
+				                                	<option value="${updatedRole}" selected="selected">${RoleType.findById(updatedRole)}</option>
+				                                </g:each>
+		                                </select>
+	                                </td>
+                                </tr>
+                                </table>
                                 </td>
-                            </tr> 
+                                
+                            </tr>
                         
                         </tbody>
                     </table>
