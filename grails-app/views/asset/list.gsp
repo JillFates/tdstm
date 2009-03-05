@@ -37,6 +37,9 @@
       if ( asset.assetType != null ) {
       document.getElementById('assetTypes').value = asset.assetTypeId
       document.getElementById('assetType.id').value = asset.assetTypeId
+      }else{
+      document.getElementById('assetTypes').value = ""
+      document.getElementById('assetType.id').value = null
       }
       document.getElementById('assetNames').value = asset.assetName
       document.getElementById('assetName').value = asset.assetName
@@ -59,6 +62,50 @@
       $("#dialog1").dialog("open")
 
       }
+
+      function showEditAsset(e) {
+      var asset = eval('(' + e.responseText + ')')
+      if ( asset.assetType != null ) {
+      var type = document.getElementById('type_'+asset.id)
+      type.value = asset.assetTypeId
+      type.style.color = '#0366B0'
+      }else{
+      document.getElementById('type_'+asset.id).value = ""
+      }
+      var name = document.getElementById('name_'+asset.id)
+      name.value = asset.assetName
+      name.style.color = '#0366B0'
+      var tag = document.getElementById('tag_'+asset.id)
+      tag.value = asset.assetTag
+      tag.style.color = '#0366B0'
+      var sno = document.getElementById('sno_'+asset.id)
+      sno.value = asset.serialNumber
+      sno.style.color = '#0366B0'
+
+      }
+
+      function callUpdateDialog() {
+
+      var assetId = document.getElementById('id')
+      var assetType = document.getElementById('assetType.id')
+      var assetName = document.getElementById('assetName')
+      var assetTag = document.getElementById('assetTag')
+      var serialNumber = document.getElementById('serialNumber')
+      var deviceFunction = document.getElementById('deviceFunction')
+
+      var assetNameDialog = new Array()
+      assetNameDialog[0]=assetId.value
+      assetNameDialog[1]=assetType.value
+      assetNameDialog[2]=assetName.value
+      assetNameDialog[3]=assetTag.value
+      assetNameDialog[4]=serialNumber.value
+      assetNameDialog[5]=deviceFunction.value
+      assetNameDialog[6]="null"
+
+      ${remoteFunction(action:'updateAsset', params:'\'assetDialog=\' + assetNameDialog', onComplete:'showEditAsset(e)')}
+      return true
+      }
+
     </g:javascript>
 
   </head>
@@ -69,7 +116,7 @@
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
       </g:if>
-      <div class="list">
+      <div>
         <table>
           <thead>
             <tr>
@@ -88,19 +135,19 @@
           </thead>
           <tbody>
             <g:each in="${assetInstanceList}" status="i" var="assetInstance">
-              <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
+              <tr>
                 <td><g:remoteLink controller="asset" action="editShow" id="${assetInstance.id}"  onComplete ="showAssetDialog( e );">${fieldValue(bean:assetInstance, field:'id')}</g:remoteLink></td>
 
-                <td>${fieldValue(bean:assetInstance, field:'assetType')}</td>
+                <td><input type="text" id="type_${assetInstance.id}" value="${fieldValue(bean:assetInstance, field:'assetType')}" style="border: 0px" readonly/></td>
 
-                <td>${fieldValue(bean:assetInstance, field:'assetName')}</td>
+                <td><input type="text" id="name_${assetInstance.id}" value="${fieldValue(bean:assetInstance, field:'assetName')}" style="border: 0px" readonly/></td>
 
-                <td>${fieldValue(bean:assetInstance, field:'assetTag')}</td>
+                <td><input type="text" id="tag_${assetInstance.id}" value="${fieldValue(bean:assetInstance, field:'assetTag')}" style="border: 0px" readonly/></td>
 
-                <td>${fieldValue(bean:assetInstance, field:'serialNumber')}</td>
-
+                <td><input type="text" id="sno_${assetInstance.id}" value="${fieldValue(bean:assetInstance, field:'serialNumber')}" style="border: 0px" readonly/></td>
               </tr>
+
             </g:each>
           </tbody>
         </table>
@@ -166,7 +213,7 @@
     </div>
 
     <div id="dialog1" title="Edit Asset">
-      <g:form method="post" controller="asset" action="updateAsset">
+      <g:form method="post">
         <input type="hidden" id="id" name="id" value="" />
         <div class="dialog">
           <table>
@@ -246,7 +293,7 @@
           </table>
         </div>
         <div class="buttons">
-          <span class="button"><g:actionSubmit class="save" value="Update Asset" /></span>
+          <span class="button"><input type="button" class="save" value="Update Asset" onClick="return callUpdateDialog()"/></span>
           <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
         </div>
       </g:form>
