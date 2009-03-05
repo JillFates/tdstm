@@ -162,7 +162,7 @@
       </div>
     </div>
 
-    <div id="dialog" title="Show Asset">
+    <div id="dialog" title="Show Asset" style="display:none;">
       <div class="dialog">
         <table>
           <tbody>
@@ -212,7 +212,7 @@
       </div>
     </div>
 
-    <div id="dialog1" title="Edit Asset">
+    <div id="dialog1" title="Edit Asset" style="display:none;">
       <g:form method="post">
         <input type="hidden" id="id" name="id" value="" />
         <div class="dialog">
