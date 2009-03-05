@@ -375,20 +375,27 @@ class AssetController {
     }
     // update ajax overlay 
     def updateAsset = {
-        def assetInstance = Asset.get( params.id )
-        if ( assetInstance ) {
-            assetInstance.properties = params
-            if( !assetInstance.hasErrors() && assetInstance.save() ) {
-                flash.message = "Asset ${params.id} updated"
-                redirect( action:list,id:assetInstance.id )
-            } else {
-                render( view:'list', model:[assetInstance:assetInstance] )
-            }
+        def assetDialog= params.assetDialog.split(',')
+        
+        def assetItems = []
+        def assetInstance = Asset.get( assetDialog[0] )
+        def assetType=AssetType.findById( assetDialog[1] )
+        assetInstance.assetType = assetType
+        assetInstance.assetName = assetDialog[2]
+        assetInstance.assetTag = assetDialog[3]
+        assetInstance.serialNumber= assetDialog[4]
+        assetInstance.deviceFunction = assetDialog[5]
+
+        assetInstance.save()
+
+        if( assetInstance.assetType == null ) {
+            assetItems = [id:assetInstance.id, project:assetInstance.project.name, projectId:assetInstance.project.id, assetTag:assetInstance.assetTag, assetName:assetInstance.assetName, serialNumber:assetInstance.serialNumber, deviceFunction:assetInstance.deviceFunction ]
+        } else {
+            assetItems = [id:assetInstance.id, project:assetInstance.project.name, projectId:assetInstance.project.id, assetType:assetInstance.assetType, assetTypeId:assetInstance.assetType.id, assetTag:assetInstance.assetTag, assetName:assetInstance.assetName, serialNumber:assetInstance.serialNumber, deviceFunction:assetInstance.deviceFunction ]
         }
-        else {
-            flash.message = "Asset not found with id ${params.id}"
-            redirect( action:list, id:params.id )
-        }
-    }    
+
+        render assetItems as JSON
+
+    }
 
 }
