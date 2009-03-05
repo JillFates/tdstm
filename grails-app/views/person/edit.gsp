@@ -16,55 +16,33 @@
         <title>Edit Person</title>
     </head>
     <body>
-       
+       <div class="menu2">
+		<ul>
+			<li><g:link class="home" controller="person" id="${companyId}">Staff</g:link></li>
+			<li><a href="#">Applications </a></li>
+			<li><a href="#">Locations </a></li>
+			<li><a href="#">Rooms </a></li>
+		</ul>
+		</div>
         <div class="body">
             <h1>Edit Person</h1>
-             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-	            <span class="menuButton"><g:link class="list" action="list">Person List</g:link></span>
-	            <span class="menuButton"><g:link class="create" action="create">New Person</g:link></span>
-	        </div>
 	        <br>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
             <g:form method="post" >
                 <input type="hidden" name="id" value="${personInstance?.id}" />
+                <input type="hidden" name="companyId" value="${companyId}" />
                 <div class="dialog">
                     <table>
                         <tbody>
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="partyType">Party Type:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:personInstance,field:'partyType','errors')}">
-                                    <g:select optionKey="id" from="${PartyType.list()}" name="partyType.id" value="${personInstance?.partyType?.id}" noSelection="['null':'']"></g:select>
-                                <g:hasErrors bean="${personInstance}" field="partyType">
-					            <div class="errors">
-					                <g:renderErrors bean="${personInstance}" as="list" field="partyType"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="company">Company :</label>
-                                </td>
-                              	<td valign="top" class="value">
-	                              	<select name="company" id="companyId" >
-					                    <g:each status="i" in="${companies}" var="company">
-					                      <option value="${company.id}">${company}</option>
-					                    </g:each>
-	                				</select>
-                				</td>
-                            </tr> 
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
                                     <label for="firstName">First Name:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:personInstance,field:'firstName','errors')}">
-                                    <input type="text" id="firstName" name="firstName" value="${fieldValue(bean:personInstance,field:'firstName')}"/>
+                                    <input type="text" maxlength="64" id="firstName" name="firstName" value="${fieldValue(bean:personInstance,field:'firstName')}"/>
                                 <g:hasErrors bean="${personInstance}" field="firstName">
 					            <div class="errors">
 					                <g:renderErrors bean="${personInstance}" as="list" field="firstName"/>
@@ -78,7 +56,7 @@
                                     <label for="lastName">Last Name:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:personInstance,field:'lastName','errors')}">
-                                    <input type="text" id="lastName" name="lastName" value="${fieldValue(bean:personInstance,field:'lastName')}"/>
+                                    <input type="text" maxlength="64" id="lastName" name="lastName" value="${fieldValue(bean:personInstance,field:'lastName')}"/>
                                 <g:hasErrors bean="${personInstance}" field="lastName">
 					            <div class="errors">
 					                <g:renderErrors bean="${personInstance}" as="list" field="lastName"/>
@@ -92,7 +70,7 @@
                                     <label for="nickName">Nick Name:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:personInstance,field:'nickName','errors')}">
-                                    <input type="text" id="nickName" name="nickName" value="${fieldValue(bean:personInstance,field:'nickName')}"/>
+                                    <input type="text" maxlength="64" id="nickName" name="nickName" value="${fieldValue(bean:personInstance,field:'nickName')}"/>
                                 <g:hasErrors bean="${personInstance}" field="nickName">
 					            <div class="errors">
 					                <g:renderErrors bean="${personInstance}" as="list" field="nickName"/>
@@ -100,7 +78,19 @@
 					            </g:hasErrors>
                                 </td>
                             </tr> 
-                        
+                        	 <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="title">Title:</label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean:personInstance,field:'title','errors')}">
+                                    <input type="text" maxlength="34" id="title" name="title" value="${fieldValue(bean:personInstance,field:'title')}"/>
+                                <g:hasErrors bean="${personInstance}" field="title">
+					            <div class="errors">
+					                <g:renderErrors bean="${personInstance}" as="list" field="title"/>
+					            </div>
+					            </g:hasErrors>
+                                </td>
+                            </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="active">Active:</label>

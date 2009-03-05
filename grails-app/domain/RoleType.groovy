@@ -13,6 +13,6 @@ class RoleType {
 	}
 
 	String toString(){
-		"$id : $description"
+		description
 	}
 }

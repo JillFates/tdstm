@@ -58,9 +58,18 @@ class UserLoginController {
     def update = {
         def userLoginInstance = UserLogin.get( params.id )
         if(userLoginInstance) {
-            userLoginInstance.properties = params
-            //convert password onto Hash code
-            userLoginInstance.password = new Sha1Hash(params['password']).toHex()
+        	println"old password===========================>"+userLoginInstance.password
+        	println"updated password===========================>"+params.password
+        	def password = params.password
+        	def oldPassword = userLoginInstance.password
+        	userLoginInstance.properties = params
+        	if(password != ""){
+        		//	convert password onto Hash code
+                userLoginInstance.password = new Sha1Hash(params['password']).toHex()
+        	}else{
+        		userLoginInstance.password = oldPassword
+        	}
+            
             if(!userLoginInstance.hasErrors() && userLoginInstance.save()) {
             	def assignedRoles = request.getParameterValues("assignedRole");
             	def person = params.person.id
@@ -82,9 +91,14 @@ class UserLoginController {
     }
 	// return userlogin details to create form
     def create = {
+		def personId = params.id
+		def personInstance
+		if(personId != null ){
+			personInstance = Person.findById( personId )
+		}
         def userLoginInstance = new UserLogin()
         userLoginInstance.properties = params
-        return ['userLoginInstance':userLoginInstance ]
+        return ['userLoginInstance':userLoginInstance, personInstance:personInstance ]
     }
 	/*
 	 *  Save the User details and set the user roles for Person
@@ -104,7 +118,12 @@ class UserLoginController {
         }
         else {
         	def assignedRole = request.getParameterValues("assignedRole");
-            render(view:'create',model:[ userLoginInstance:userLoginInstance,assignedRole:assignedRole ])
+        	def personId = params.personId
+    		def personInstance
+    		if(personId != null ){
+    			personInstance = Person.findById( personId )
+    		}
+            render(view:'create',model:[ userLoginInstance:userLoginInstance,assignedRole:assignedRole,personInstance:personInstance ])
         }
     }
 }

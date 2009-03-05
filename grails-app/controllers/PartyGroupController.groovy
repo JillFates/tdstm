@@ -6,10 +6,11 @@ class PartyGroupController {
 
     // the delete, save and update actions only accept POST requests
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
-
-    def list = {
-        if(!params.max) params.max = 10
-        [ partyGroupInstanceList: PartyGroup.list( params ) ]
+	// Will Return PartyGroup list where PartyType = COMPANY
+	def list = {
+        def query = "from PartyGroup as p where partyType = 'COMPANY' "
+        def partyGroupList = PartyGroup.findAll( query )
+        [ partyGroupInstanceList: partyGroupList ]
     }
 
     def show = {

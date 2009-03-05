@@ -25,13 +25,12 @@
                     <tbody>
 
                     
-                        <tr class="prop">
-                            <td valign="top" class="name">Id:</td>
+						<tr class="prop">
+                            <td valign="top" class="name">Username:</td>
                             
-                            <td valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'id')}</td>
+                            <td valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'username')}</td>
                             
-                        </tr>
-                    
+                        </tr>                    
                         <tr class="prop">
                             <td valign="top" class="name">Person:</td>
                             
@@ -39,14 +38,13 @@
                             
                         </tr>
                     
-                        <tr class="prop">
-                            <td valign="top" class="name">Username:</td>
+                    	<tr class="prop">
+                            <td valign="top" class="name">Active:</td>
                             
-                            <td valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'username')}</td>
+                            <td valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'active')}</td>
                             
                         </tr>
-                    
-                    
+                        
                         <tr class="prop">
                             <td valign="top" class="name">Created Date:</td>
                             
@@ -60,6 +58,7 @@
                             <td valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'lastLogin')}</td>
                             
                         </tr>
+                        
                     
                     </tbody>
                 </table>

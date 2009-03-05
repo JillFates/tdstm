@@ -21,12 +21,10 @@
                     <thead>
                         <tr>
                         
-                   	        <g:sortableColumn property="id" title="Id" />
-                        
+                        	<g:sortableColumn property="username" title="Username" />
+                        	
                    	        <th>Person</th>
                    	    
-                   	        <g:sortableColumn property="username" title="Username" />
-                        
                    	        <g:sortableColumn property="createdDate" title="Created Date" />
                         
                    	        <g:sortableColumn property="lastLogin" title="Last Login" />
@@ -37,11 +35,9 @@
                     <g:each in="${userLoginInstanceList}" status="i" var="userLoginInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                         
-                            <td><g:link action="show" id="${userLoginInstance.id}">${fieldValue(bean:userLoginInstance, field:'id')}</g:link></td>
+                            <td><g:link action="show" id="${userLoginInstance.id}">${fieldValue(bean:userLoginInstance, field:'username')}</g:link></td>
                         
                             <td>${fieldValue(bean:userLoginInstance, field:'person')}</td>
-                        
-                            <td>${fieldValue(bean:userLoginInstance, field:'username')}</td>
                         
                             <td>${fieldValue(bean:userLoginInstance, field:'createdDate')}</td>
                         

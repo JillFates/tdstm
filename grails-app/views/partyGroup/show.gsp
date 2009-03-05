@@ -4,12 +4,19 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="main" />
-        <title>Show PartyGroup</title>
+        <title>Show Company</title>
     </head>
     <body>
-       
+       <div class="menu2">
+		<ul>
+			<li><g:link class="home" controller="person" id="${partyGroupInstance?.id}">Staff</g:link></li>
+			<li><a href="#">Applications </a></li>
+			<li><a href="#">Locations </a></li>
+			<li><a href="#">Rooms </a></li>
+		</ul>
+		</div>
         <div class="body">
-            <h1>Show PartyGroup</h1>
+                    <h1>Show Company</h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
@@ -17,21 +24,6 @@
                 <table>
                     <tbody>
 
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Id:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:partyGroupInstance, field:'id')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Party Type:</td>
-                            
-                            <td valign="top" class="value"><g:link controller="partyType" action="show" id="${partyGroupInstance?.partyType?.id}">${partyGroupInstance?.partyType?.encodeAsHTML()}</g:link></td>
-                            
-                        </tr>
-                    
                         <tr class="prop">
                             <td valign="top" class="name">Name:</td>
                             
@@ -42,7 +34,12 @@
                         <tr class="prop">
                             <td valign="top" class="name">Comment:</td>
                             
-                            <td valign="top" class="value">${fieldValue(bean:partyGroupInstance, field:'comment')}</td>
+                            <td valign="top" class="value">
+                            <textarea name="comment" cols="80" rows="3"	readonly="readonly" >
+							${fieldValue(bean:partyGroupInstance, field:'comment')}
+                  			</textarea>
+                            
+                            </td>
                             
                         </tr>
                         

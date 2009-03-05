@@ -37,7 +37,13 @@
                                     <label for="person">Person:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'person','errors')}">
+                                <g:if test="${personInstance}">
+	                                <g:select optionKey="id" from="${personInstance}" name="person.id" value="${personInstance?.id}" ></g:select>
+	                                <input type="hidden" name="personId" value="${personInstance?.id}" >
+                                </g:if>
+                                <g:else>
                                     <g:select optionKey="id" from="${Person.list()}" name="person.id" value="${userLoginInstance?.person?.id}" ></g:select>
+                                </g:else>
                                 <g:hasErrors bean="${userLoginInstance}" field="person">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="person"/>
@@ -51,7 +57,7 @@
                                     <label for="username">Username:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'username','errors')}">
-                                    <input type="text" id="username" name="username" value="${fieldValue(bean:userLoginInstance,field:'username')}"/>
+                                    <input type="text" maxlength="25" id="username" name="username" value="${fieldValue(bean:userLoginInstance,field:'username')}"/>
                                 <g:hasErrors bean="${userLoginInstance}" field="username">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="username"/>
@@ -65,10 +71,23 @@
                                     <label for="password">Password:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'password','errors')}">
-                                    <input type="password" id="password" name="password" value="${fieldValue(bean:userLoginInstance,field:'password')}"/>
+                                    <input type="password" maxlength="25" id="password" name="password" value="${fieldValue(bean:userLoginInstance,field:'password')}"/>
                                 <g:hasErrors bean="${userLoginInstance}" field="password">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="password"/>
+					            </div>
+					            </g:hasErrors>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="active">Active:</label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'active','errors')}">
+                                    <g:select id="active" name="active" from="${userLoginInstance.constraints.active.inList}" value="${userLoginInstance.active}" ></g:select>
+                                <g:hasErrors bean="${userLoginInstance}" field="active">
+					            <div class="errors">
+					                <g:renderErrors bean="${userLoginInstance}" as="list" field="active"/>
 					            </div>
 					            </g:hasErrors>
                                 </td>
@@ -78,7 +97,7 @@
                                 <table style="border: none;">
                                 <tr>
                                <td valign="top" class="name">
-                                    <label >Aavailable Roles:</label>
+                                    <label >Available Roles:</label>
                                 </td>
                                 <td valign="top" class="name">
                                     <label >&nbsp;</label>

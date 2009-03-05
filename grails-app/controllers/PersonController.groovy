@@ -1,3 +1,4 @@
+import grails.converters.JSON
 class PersonController {
     
 	def partyRelationshipService
@@ -6,96 +7,104 @@ class PersonController {
 
     // the delete, save and update actions only accept POST requests
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
-
+	// return Persons which are related to company
     def list = {
-        if(!params.max) params.max = 10
-        [ personInstanceList: Person.list( params ) ]
+        def companyId = params.id
+        def personInstanceList
+        if ( companyId!= null && companyId != "" ) {
+        	
+	        def query = "from Person s where s.id in (select p.partyIdTo from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $companyId and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ) "
+	        personInstanceList = Person.findAll( query )
+        }
+		return [ personInstanceList: personInstanceList, companyId:companyId ]
     }
 
     def show = {
+			
         def personInstance = Person.get( params.id )
-
+        def companyId = params.companyId
+        println"companyId---->"+companyId
         if(!personInstance) {
             flash.message = "Person not found with id ${params.id}"
-            redirect(action:list)
+            redirect( action:list, params:[ id:companyId ] )
         }
         else { 
-        	def company = partyRelationshipService.getSatffCompany( personInstance )
-        	return [ personInstance : personInstance, company:company ] }
+        	//def company = partyRelationshipService.getSatffCompany( personInstance )
+        	
+        	return [ personInstance : personInstance, companyId:companyId ] 
+        }
     }
 
     def delete = {
         def personInstance = Person.get( params.id )
+        def companyId = params.companyId
         if(personInstance) {
             personInstance.delete()
             flash.message = "Person ${params.id} deleted"
-            redirect(action:list)
+            redirect( action:list, params:[ id:companyId ] )
         }
         else {
             flash.message = "Person not found with id ${params.id}"
-            redirect(action:list)
+            redirect( action:list, params:[ id:companyId ] )
         }
     }
 	// return person details to EDIT form
     def edit = {
         def personInstance = Person.get( params.id )
-
+        def companyId = params.companyId
         if(!personInstance) {
             flash.message = "Person not found with id ${params.id}"
-            redirect(action:list)
+            redirect( action:list, params:[ id:companyId ] )
         }
         else {
-        	def companies = partyRelationshipService.getCompaniesList()
-        	def company = partyRelationshipService.getSatffCompany( personInstance )
-            return [ personInstance : personInstance, companies: companies, company:company  ]
+        	
+            return [ personInstance : personInstance, companyId:companyId ]
         }
     }
 
     def update = {
         def personInstance = Person.get( params.id )
         personInstance.lastUpdated = new Date()
+        def companyId = params.companyId
         if(personInstance) {
             personInstance.properties = params
             if ( !personInstance.hasErrors() && personInstance.save() ) {
-            	def companyId = params.company 
-            	partyRelationshipService.updateStaffCompany( personInstance, companyId )
                 flash.message = "Person ${params.id} updated"
-                redirect( action:show, id:personInstance.id )
+                redirect( action:show, id:personInstance.id, params:[ companyId:companyId ])
             }
             else {
-            	def companies = partyRelationshipService.getCompaniesList()
-            	def company = partyRelationshipService.getSatffCompany( personInstance )
-                render( view:'edit',model:[personInstance:personInstance, companies: companies, company:company ] )
+                render( view:'edit',model:[ personInstance:personInstance, companyId:companyId ] )
             }
         }
         else {
             flash.message = "Person not found with id ${params.id}"
-            redirect(action:edit,id:params.id)
+            redirect( action:edit, id:params.id, params:[ companyId:companyId ] )
         }
     }
     // return person instance and companies 
     def create = {
         def personInstance = new Person()
         personInstance.properties = params
-        def companies = partyRelationshipService.getCompaniesList() 
-        return [ 'personInstance':personInstance, companies:companies ]
+       // def companies = partyRelationshipService.getCompaniesList()
+       	def companyId = params.companyId 
+        return [ 'personInstance':personInstance, companyId:companyId ]
     }
     //Save the Person Detais
     def save = {
         def personInstance = new Person( params )
         	personInstance.dateCreated = new Date()
         if ( !personInstance.hasErrors() && personInstance.save() ) {
-        	def companyId = params.company
+        	def companyId = params.companyId
         	if ( companyId != null ) {
         		def companyParty = Party.findById( companyId )
         		def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", personInstance, "STAFF" )
         	}
             flash.message = "Person ${personInstance.id} created"
-            redirect( action:show, id:personInstance.id )
+            redirect( action:show, id:personInstance.id , params:[companyId:companyId] )
         }
         else {
-        	def companies = partyRelationshipService.getCompaniesList()
-            render( view:'create', model:[ personInstance:personInstance, companies:companies ] )
+        	def companyId = params.companyId
+            render( view:'create', model:[ personInstance:personInstance, companyId:companyId ] )
         }
     }
 }

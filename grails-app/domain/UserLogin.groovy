@@ -3,6 +3,7 @@ class UserLogin {
     String password
     Date createdDate
 	Date lastLogin
+	String active
 	Person person
 
 	/*
@@ -14,6 +15,7 @@ class UserLogin {
 		 password( blank: false, nullable: false, password: true )
 		 createdDate( blank: true, nullable: true )
 		 lastLogin( blank: true, nullable: true )
+		 active( nullable:false, inList:['Y', 'N'] )
 	 }
 
 	 /*
@@ -24,6 +26,7 @@ class UserLogin {
 		id column:'user_login_id'
 		username sqlType: 'varchar(25)'
 		password sqlType: 'varchar(100)'  // size must me more than 20 because it will store encripted code
+		active sqlType:'varchar(20)'
 	}
 
 	String toString(){

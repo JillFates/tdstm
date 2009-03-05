@@ -4,40 +4,35 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="main" />
-        <title>Edit PartyGroup</title>
+        <title>Edit Company</title>
     </head>
     <body>
+    <div class="menu2">
+		<ul>
+			<li><g:link class="home" controller="person" id="${partyGroupInstance?.id}">Staff</g:link></li>
+			<li><a href="#">Applications </a></li>
+			<li><a href="#">Locations </a></li>
+			<li><a href="#">Rooms </a></li>
+		</ul>
+		</div>
         <div class="body">
-            <h1>Edit PartyGroup</h1>
+            <h1>Edit Company</h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
-            <g:form method="post" >
+            <g:form method="post" name="editpartyGroup">
                 <input type="hidden" name="id" value="${partyGroupInstance?.id}" />
                 <div class="dialog">
                     <table>
                         <tbody>
                         
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="partyType">Party Type:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:partyGroupInstance,field:'partyType','errors')}">
-                                    <g:select optionKey="id" from="${PartyType.list()}" name="partyType.id" value="${partyGroupInstance?.partyType?.id}" noSelection="['null':'']"></g:select>
-                                <g:hasErrors bean="${partyGroupInstance}" field="partyType">
-					            <div class="errors">
-					                <g:renderErrors bean="${partyGroupInstance}" as="list" field="partyType"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                        
+                                                 
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="name">Name:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:partyGroupInstance,field:'name','errors')}">
-                                    <input type="text" id="name" name="name" value="${fieldValue(bean:partyGroupInstance,field:'name')}"/>
+                                    <input type="text" id="name" name="name" value="${fieldValue(bean:partyGroupInstance,field:'name')}" maxlength="64"/>
                                 <g:hasErrors bean="${partyGroupInstance}" field="name">
 					            <div class="errors">
 					                <g:renderErrors bean="${partyGroupInstance}" as="list" field="name"/>
@@ -51,7 +46,9 @@
                                     <label for="comment">Comment:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:partyGroupInstance,field:'comment','errors')}">
-                                    <input type="text" id="comment" name="comment" value="${fieldValue(bean:partyGroupInstance,field:'comment')}"/>
+                                    <textarea rows="3" cols="80" name="comment"	onkeydown="textCounter(document.editpartyGroup.comment,200);" onkeyup="textCounter(document.editpartyGroup.comment,200);">
+										${fieldValue(bean:partyGroupInstance,field:'comment')}
+              					    </textarea>
                                 <g:hasErrors bean="${partyGroupInstance}" field="comment">
 					            <div class="errors">
 					                <g:renderErrors bean="${partyGroupInstance}" as="list" field="comment"/>

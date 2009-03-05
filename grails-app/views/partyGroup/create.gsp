@@ -2,7 +2,17 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="main" />
-        <title>Create PartyGroup</title>         
+        <title>Create PartyGroup</title>
+        <g:javascript>
+        function textCounter(field, maxlimit){
+	      if (field.value.length > maxlimit){ // if too long...trim it!
+	      	  field.value = field.value.substring(0, maxlimit);
+		      return false;
+	      } else {
+	      	return true;
+	      }
+      	}
+        </g:javascript>
     </head>
     <body>
         <div class="body">
@@ -39,7 +49,7 @@
                                     <label for="name">Name:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:partyGroupInstance,field:'name','errors')}">
-                                    <input type="text" id="name" name="name" value="${fieldValue(bean:partyGroupInstance,field:'name')}"/>
+                                    <input type="text" id="name" name="name" value="${fieldValue(bean:partyGroupInstance,field:'name')}" maxlength="64"/>
                                 <g:hasErrors bean="${partyGroupInstance}" field="name">
 					            <div class="errors">
 					                <g:renderErrors bean="${partyGroupInstance}" as="list" field="name"/>
@@ -53,7 +63,9 @@
                                     <label for="comment">Comment:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:partyGroupInstance,field:'comment','errors')}">
-                                    <input type="text" id="comment" name="comment" value="${fieldValue(bean:partyGroupInstance,field:'comment')}"/>
+                                   <textarea rows="3" cols="80" name="comment"	onkeydown="textCounter(document.editpartyGroup.comment,200);" onkeyup="textCounter(document.editpartyGroup.comment,200);">
+										${fieldValue(bean:partyGroupInstance,field:'comment')}
+              					    </textarea>
                                 <g:hasErrors bean="${partyGroupInstance}" field="comment">
 					            <div class="errors">
 					                <g:renderErrors bean="${partyGroupInstance}" as="list" field="comment"/>

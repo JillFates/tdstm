@@ -67,10 +67,23 @@
                                     <label for="password">Password:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'password','errors')}">
-                                    <input type="password" id="password" name="password" value="${fieldValue(bean:userLoginInstance,field:'password')}"/>
+                                    <input type="password" id="password" name="password" value=""/>
                                 <g:hasErrors bean="${userLoginInstance}" field="password">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="password"/>
+					            </div>
+					            </g:hasErrors>
+                                </td>
+                            </tr> 
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="active">Active:</label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'active','errors')}">
+                                    <g:select id="active" name="active" from="${userLoginInstance.constraints.active.inList}" value="${userLoginInstance.active}" ></g:select>
+                                <g:hasErrors bean="${userLoginInstance}" field="active">
+					            <div class="errors">
+					                <g:renderErrors bean="${userLoginInstance}" as="list" field="active"/>
 					            </div>
 					            </g:hasErrors>
                                 </td>
@@ -81,7 +94,7 @@
                                 <table style="border: none;">
                                 <tr>
                                <td valign="top" class="name">
-                                    <label >Aavailable Roles:</label>
+                                    <label >Available Roles:</label>
                                 </td>
                                 <td valign="top" class="name">
                                     <label >&nbsp;</label>
