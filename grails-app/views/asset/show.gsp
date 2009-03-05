@@ -132,7 +132,7 @@
       </div>
     </div>
 
-    <div id="dialog" title="Edit Asset">
+    <div id="dialog" title="Edit Asset" style="display:none;">
 
       <g:form method="post" >
         <input type="hidden" id="id" name="id" value="${assetInstance?.id}" />
