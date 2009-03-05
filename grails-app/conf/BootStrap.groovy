@@ -174,9 +174,9 @@ println "\n\n USER DETAILS\n\n"
 		// -------------------------------
 		// Create User Details.
 		// -------------------------------
-	    def adminUserLisa = new UserLogin( person:personLisa, username: "lisa", password:new Sha1Hash("admin").toHex()  ).save()
-	    def userJohn = new UserLogin( person:personJohn, username: "john", password:new Sha1Hash("admin").toHex() ).save()
-	    def normalUserRalph = new UserLogin( person:personRalph, username:"ralph", password:new Sha1Hash("user").toHex() ).save()
+	    def adminUserLisa = new UserLogin( person:personLisa, username: "lisa", password:new Sha1Hash("admin").toHex(), active:'Y'  ).save()
+	    def userJohn = new UserLogin( person:personJohn, username: "john", password:new Sha1Hash("admin").toHex(), active:'Y' ).save()
+	    def normalUserRalph = new UserLogin( person:personRalph, username:"ralph", password:new Sha1Hash("user").toHex(), active:'Y' ).save()
 
 println "\n\n PARTY GROUPS \n\n" 		
 
