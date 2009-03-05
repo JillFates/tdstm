@@ -111,5 +111,18 @@ class UserPreferenceService  {
     	 
         return assignedRoles
     }
-    
+    /*
+     *  Check the User Authentication and return the boolean value 
+     */
+    def checkActiveStatus(){
+    	def activeStatus = true
+    	def principal = SecurityUtils.subject.principal
+    	def userLogin = UserLogin.findByUsername( principal )
+    	def userActive = userLogin.active
+    	def personActive = userLogin.person.active
+    	if(personActive != "Y" || userActive != "Y" ){
+    		activeStatus = false
+    	}
+    	return activeStatus
+    }
 }

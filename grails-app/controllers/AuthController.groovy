@@ -25,18 +25,25 @@ class AuthController {
             // will be thrown if the username is unrecognised or the
             // password is incorrect.
             this.jsecSecurityManager.login(authToken)
-
-            // If a controller redirected to this page, redirect back
-            // to it. Otherwise redirect to the root URI.
-            def targetUri = params.targetUri ?: "/"
-
-            log.info "Redirecting to '${targetUri}'."
-            //redirect(uri: targetUri)
-            /*
-             *  call loadPreferences() to load CURR_PROJ MAP into session
-             */
-            userPreferenceService.loadPreferences()
-            redirect(controller:'projectUtil')
+            // Check User and Person Activi status
+            
+            def activeStatus = userPreferenceService.checkActiveStatus()
+            if(!activeStatus){
+                flash.message = "User Authentication has been Disabled"
+                redirect(action: 'login')
+            } else {
+	            // If a controller redirected to this page, redirect back
+	            // to it. Otherwise redirect to the root URI.
+	            def targetUri = params.targetUri ?: "/"
+	            
+	            log.info "Redirecting to '${targetUri}'."
+	            //redirect(uri: targetUri)
+	            /*
+	             *  call loadPreferences() to load CURR_PROJ MAP into session
+	             */
+	            userPreferenceService.loadPreferences()
+	            redirect(controller:'projectUtil')
+            }
         }
         catch (AuthenticationException ex){
             // Authentication failed, so display the appropriate message
