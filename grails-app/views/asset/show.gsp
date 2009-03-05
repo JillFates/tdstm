@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="main" />
     <title>Show Asset</title>
-
+    <g:javascript library="prototype"/>
     <g:javascript library="jquery"/>
 
     <link type="text/css" rel="stylesheet" href="http://ui.jquery.com/testing/themes/base/ui.all.css" />
@@ -33,6 +33,44 @@
       $("#dialog").dialog("open")
 
       }
+
+      function showEditAsset(e) {
+
+      var asset = eval('(' + e.responseText + ')')
+      if ( asset.assetType != null ) {
+      document.getElementById('type').value = asset.assetTypeId
+      }else{
+      document.getElementById('type').value = ""
+      }
+      document.getElementById('name').value = asset.assetName
+      document.getElementById('tag').value = asset.assetTag
+      document.getElementById('sno').value = asset.serialNumber
+      document.getElementById('devFun').value = asset.deviceFunction
+
+
+      }
+
+      function callUpdateDialog() {
+
+      var assetId = document.getElementById('id')
+      var assetType = document.getElementById('assetType.id')
+      var assetName = document.getElementById('assetName')
+      var assetTag = document.getElementById('assetTag')
+      var serialNumber = document.getElementById('serialNumber')
+      var deviceFunction = document.getElementById('deviceFunction')
+
+      var assetNameDialog = new Array()
+      assetNameDialog[0]=assetId.value
+      assetNameDialog[1]=assetType.value
+      assetNameDialog[2]=assetName.value
+      assetNameDialog[3]=assetTag.value
+      assetNameDialog[4]=serialNumber.value
+      assetNameDialog[5]=deviceFunction.value
+      assetNameDialog[6]="null"
+
+      ${remoteFunction(action:'updateAsset', params:'\'assetDialog=\' + assetNameDialog', onComplete:'showEditAsset(e)')}
+      return true
+      }
     </g:javascript>
 
   </head>
@@ -50,35 +88,35 @@
             <tr class="prop">
               <td valign="top" class="name">Asset Type:</td>
 
-              <td valign="top" class="value"><g:link controller="assetType" action="show" id="${assetInstance?.assetType?.id}">${assetInstance?.assetType?.encodeAsHTML()}</g:link></td>
+              <td valign="top" class="value"><input type="text" id="type" value="${assetInstance?.assetType?.encodeAsHTML()}" style="border: 0px" readonly/></td>
 
             </tr>
 
             <tr class="prop">
               <td valign="top" class="name">Asset Name:</td>
 
-              <td valign="top" class="value">${fieldValue(bean:assetInstance, field:'assetName')}</td>
+              <td valign="top" class="value"><input type="text" id="name" value="${fieldValue(bean:assetInstance, field:'assetName')}" style="border: 0px" readonly/></td>
 
             </tr>
 
             <tr class="prop">
               <td valign="top" class="name">Asset Tag:</td>
 
-              <td valign="top" class="value">${fieldValue(bean:assetInstance, field:'assetTag')}</td>
+              <td valign="top" class="value"><input type="text" id="tag" value="${fieldValue(bean:assetInstance, field:'assetTag')}" style="border: 0px" readonly/></td>
 
             </tr>
 
             <tr class="prop">
               <td valign="top" class="name">Serial Number:</td>
 
-              <td valign="top" class="value">${fieldValue(bean:assetInstance, field:'serialNumber')}</td>
+              <td valign="top" class="value"><input type="text" id="sno" value="${fieldValue(bean:assetInstance, field:'serialNumber')}" style="border: 0px" readonly/></td>
 
             </tr>
 
             <tr class="prop">
               <td valign="top" class="name">Device Function:</td>
 
-              <td valign="top" class="value">${fieldValue(bean:assetInstance, field:'deviceFunction')}</td>
+              <td valign="top" class="value"><input type="text" id="devFun" value="${fieldValue(bean:assetInstance, field:'deviceFunction')}" style="border: 0px" readonly/></td>
 
             </tr>
 
@@ -97,7 +135,7 @@
     <div id="dialog" title="Edit Asset">
 
       <g:form method="post" >
-        <input type="hidden" name="id" value="${assetInstance?.id}" />
+        <input type="hidden" id="id" name="id" value="${assetInstance?.id}" />
         <div class="dialog">
           <table>
             <tbody>
@@ -176,7 +214,7 @@
           </table>
         </div>
         <div class="buttons">
-          <span class="button"><g:actionSubmit class="save" value="Update" /></span>
+          <span class="button"><input type="button" class="save" value="Update Asset" onClick="return callUpdateDialog()"/></span>
 
         </div>
       </g:form>
