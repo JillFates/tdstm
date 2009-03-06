@@ -18,10 +18,19 @@
 			  </script>          
     </head>
     <body>
+    <div class="menu2">
+		<ul>
+			<li><g:link class="home" controller="partyGroup" action="show" id="${companyId}">Company</g:link></li>
+			<li><g:link class="home" controller="person" id="${companyId}">Staff</g:link></li>
+			<li><a href="#">Applications </a></li>
+			<li><a href="#">Locations </a></li>
+			<li><a href="#">Rooms </a></li>
+		</ul>
+	</div>
         <div class="body">
             <h1>Create UserLogin</h1>
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-            <span class="menuButton"><g:link class="list" action="list">UserLogin List</g:link></span>
+            <span class="menuButton"><g:link class="list" action="list" id="${companyId}">UserLogin List</g:link></span>
         </div>
         <br>
             <g:if test="${flash.message}">
@@ -31,7 +40,7 @@
                 <div class="dialog">
                     <table>
                         <tbody>
-                        
+                        	<input name="companyId" type="hidden" value="${companyId}" >
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="person">Person:</label>
@@ -71,7 +80,7 @@
                                     <label for="password">Password:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'password','errors')}">
-                                    <input type="password" maxlength="25" id="password" name="password" value="${fieldValue(bean:userLoginInstance,field:'password')}"/>
+                                    <input type="password" maxlength="25" id="password" name="password" value=""/>
                                 <g:hasErrors bean="${userLoginInstance}" field="password">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="password"/>

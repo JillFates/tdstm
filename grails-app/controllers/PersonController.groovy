@@ -23,7 +23,6 @@ class PersonController {
 			
         def personInstance = Person.get( params.id )
         def companyId = params.companyId
-        println"companyId---->"+companyId
         if(!personInstance) {
             flash.message = "Person not found with id ${params.id}"
             redirect( action:list, params:[ id:companyId ] )
@@ -106,5 +105,31 @@ class PersonController {
         	def companyId = params.companyId
             render( view:'create', model:[ personInstance:personInstance, companyId:companyId ] )
         }
+    }
+	
+	 //ajax overlay for show
+    def editShow = {
+        
+        def personInstance = Person.get( params.id )
+        
+        render personInstance as JSON
+    }
+    //updatePerson dialog
+    def updatePerson = {
+    
+    def personData = params.personListDialog.split(',')
+
+       
+        def personInstance = Person.get( personData[0] )
+        personInstance.firstName = personData[1]
+        personInstance.lastName = personData[2]
+        personInstance.nickName = personData[3]
+        personInstance.title = personData[4]
+        //personInstance.active = personListDialog[5]
+
+        personInstance.save()
+
+        render personInstance as JSON
+        
     }
 }

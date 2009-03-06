@@ -8,6 +8,7 @@
 <body>
 <div class="menu2">
 <ul>
+	<li><g:link class="home" controller="partyGroup" action="show" id="${companyId}">Company</g:link></li>
 	<li><g:link class="home" controller="person" id="${companyId}">Staff</g:link></li>
 	<li><a href="#">Applications </a></li>
 	<li><a href="#">Locations </a></li>
@@ -43,17 +44,16 @@
 
 				<td><g:link action="show" id="${personInstance.id}" params="[companyId:companyId]">${fieldValue(bean:personInstance, field:'firstName')}</g:link></td>
 
-				<td>${fieldValue(bean:personInstance, field:'lastName')}</td>
+				<td><g:link action="show" id="${personInstance.id}" params="[companyId:companyId]">${fieldValue(bean:personInstance, field:'lastName')}</g:link> </td>
 
 				<td>
 				<%
 				def userLogin = UserLogin.findByPerson(personInstance);
-				%> <g:if
-					test="${userLogin}">
-					<g:link controller="userLogin" action="edit" id="${userLogin.id}">${userLogin}</g:link>
+				%> <g:if test="${userLogin}">
+					<g:link controller="userLogin" action="edit" id="${userLogin.id}" params="[companyId:companyId]">${userLogin}</g:link>
 				</g:if> <g:else>
 					<g:link controller="userLogin" action="create"
-						id="${personInstance.id}">CREATE</g:link>
+						id="${personInstance.id}" params="[companyId:companyId]">CREATE</g:link>
 				</g:else></td>
 
 				<td><my:convertDateTime date="${personInstance?.dateCreated}" /></td>

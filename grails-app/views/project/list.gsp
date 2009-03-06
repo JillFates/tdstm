@@ -5,8 +5,28 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="main" />
 <title>Project List</title>
+ <% def currProj = session.getAttribute("CURR_PROJ");
+    def projectId = currProj.CURR_PROJ ;
+    def currProjObj;
+    if( projectId != null){
+      currProjObj = Project.findById(projectId);
+    }
+    %>
 </head>
 <body>
+<g:if test="${currProjObj}">
+		 <div class="menu2">
+          <ul>
+            <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
+            <li><g:link class="home" controller="asset">Assets </g:link></li>
+            <li><g:link class="home" controller="asset" action="assetImport" >Import/Export</g:link> </li>
+            <li><a href="#">Team </a></li>
+            <li><a href="#">Contacts </a></li>
+            <li><a href="#">Applications </a></li>
+            <li><a href="#">Move Bundles </a></li>
+          </ul>
+        </div>
+        </g:if>
 <div class="body"><br>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
@@ -27,16 +47,20 @@
 
 				<g:sortableColumn property="comment" title="Comment" />
 
-
-
 			</tr>
 		</thead>
 		<tbody>
 			<g:each in="${projectInstanceList}" status="i" var="projectInstance">
 				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-					<td><input type="radio" name="selectProject"
-						value="${fieldValue(bean:projectInstance, field:'projectCode')}"></td>
+					<td>
+					<g:if test="${currProjObj?.id == projectInstance?.id}" >
+						<input type="radio" name="selectProject" id="selectProjectId" checked="checked" value="${fieldValue(bean:projectInstance, field:'projectCode')}">
+					</g:if>
+					<g:else>
+						<input type="radio" name="selectProject" id="selectProjectId" value="${fieldValue(bean:projectInstance, field:'projectCode')}">
+					</g:else>
+					</td>
 
 					<td><g:link controller="project" action="show" id="${projectInstance.id}">${fieldValue(bean:projectInstance, field:'projectCode')}</g:link></td>
 

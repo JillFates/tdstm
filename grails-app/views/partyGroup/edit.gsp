@@ -9,6 +9,7 @@
     <body>
     <div class="menu2">
 		<ul>
+			<li><g:link class="home" controller="partyGroup" action="show" id="${partyGroupInstance?.id}">Company</g:link></li>
 			<li><g:link class="home" controller="person" id="${partyGroupInstance?.id}">Staff</g:link></li>
 			<li><a href="#">Applications </a></li>
 			<li><a href="#">Locations </a></li>
@@ -32,7 +33,7 @@
                                     <label for="name">Name:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:partyGroupInstance,field:'name','errors')}">
-                                    <input type="text" id="name" name="name" value="${fieldValue(bean:partyGroupInstance,field:'name')}" maxlength="64"/>
+                                    <input type="text" id="name" name="name" value="${fieldValue(bean:partyGroupInstance,field:'name')}" maxlength="64" size="64"/>
                                 <g:hasErrors bean="${partyGroupInstance}" field="name">
 					            <div class="errors">
 					                <g:renderErrors bean="${partyGroupInstance}" as="list" field="name"/>
@@ -46,9 +47,7 @@
                                     <label for="comment">Comment:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:partyGroupInstance,field:'comment','errors')}">
-                                    <textarea rows="3" cols="80" name="comment"	onkeydown="textCounter(document.editpartyGroup.comment,200);" onkeyup="textCounter(document.editpartyGroup.comment,200);">
-										${fieldValue(bean:partyGroupInstance,field:'comment')}
-              					    </textarea>
+                                    <textarea rows="3" cols="80" name="comment"	onkeydown="textCounter(document.editpartyGroup.comment,200);" onkeyup="textCounter(document.editpartyGroup.comment,200);">${fieldValue(bean:partyGroupInstance,field:'comment')}</textarea>
                                 <g:hasErrors bean="${partyGroupInstance}" field="comment">
 					            <div class="errors">
 					                <g:renderErrors bean="${partyGroupInstance}" as="list" field="comment"/>

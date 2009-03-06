@@ -9,6 +9,7 @@
     <body>
     <div class="menu2">
 	<ul>
+		<li><g:link class="home" controller="partyGroup" action="show" id="${companyId}">Company</g:link></li>
 		<li><g:link class="home" controller="person" id="${companyId}">Staff</g:link></li>
 		<li><a href="#">Applications </a></li>
 		<li><a href="#">Locations </a></li>
@@ -26,26 +27,13 @@
                     <table>
                         <tbody>
                         	<input type="hidden" name="companyId" value="${companyId}">
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="partyType">Party Type:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:personInstance,field:'partyType','errors')}">
-                                    <g:select optionKey="id" from="${PartyType.list()}" name="partyType.id" value="${personInstance?.partyType?.id}" noSelection="['null':'']"></g:select>
-                                <g:hasErrors bean="${personInstance}" field="partyType">
-					            <div class="errors">
-					                <g:renderErrors bean="${personInstance}" as="list" field="partyType"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                            
+                                                       
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="firstName">First Name:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:personInstance,field:'firstName','errors')}">
-                                    <input type="text" maxlength="34" id="firstName" name="firstName" value="${fieldValue(bean:personInstance,field:'firstName')}"/>
+                                    <input type="text" maxlength="34" size="34" id="firstName" name="firstName" value="${fieldValue(bean:personInstance,field:'firstName')}"/>
                                 <g:hasErrors bean="${personInstance}" field="firstName">
 					            <div class="errors">
 					                <g:renderErrors bean="${personInstance}" as="list" field="firstName"/>
@@ -59,7 +47,7 @@
                                     <label for="lastName">Last Name:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:personInstance,field:'lastName','errors')}">
-                                    <input type="text" maxlength="34" id="lastName" name="lastName" value="${fieldValue(bean:personInstance,field:'lastName')}"/>
+                                    <input type="text" maxlength="34" size="34" id="lastName" name="lastName" value="${fieldValue(bean:personInstance,field:'lastName')}"/>
                                 <g:hasErrors bean="${personInstance}" field="lastName">
 					            <div class="errors">
 					                <g:renderErrors bean="${personInstance}" as="list" field="lastName"/>
@@ -73,7 +61,7 @@
                                     <label for="nickName">Nick Name:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:personInstance,field:'nickName','errors')}">
-                                    <input type="text" maxlength="34" id="nickName" name="nickName" value="${fieldValue(bean:personInstance,field:'nickName')}"/>
+                                    <input type="text" maxlength="34" size="34" id="nickName" name="nickName" value="${fieldValue(bean:personInstance,field:'nickName')}"/>
                                 <g:hasErrors bean="${personInstance}" field="nickName">
 					            <div class="errors">
 					                <g:renderErrors bean="${personInstance}" as="list" field="nickName"/>
@@ -86,7 +74,7 @@
                                     <label for="title">Title:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:personInstance,field:'title','errors')}">
-                                    <input type="text" maxlength="34" id="title" name="title" value="${fieldValue(bean:personInstance,field:'title')}"/>
+                                    <input type="text" maxlength="34" size="34" id="title" name="title" value="${fieldValue(bean:personInstance,field:'title')}"/>
                                 <g:hasErrors bean="${personInstance}" field="title">
 					            <div class="errors">
 					                <g:renderErrors bean="${personInstance}" as="list" field="title"/>

@@ -9,6 +9,12 @@
 <body>
 <div class="body">
 <h1>Edit PartyRelationshipType</h1>
+<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
+<span class="menuButton"><g:link class="list" action="list">PartyRelationshipType List</g:link></span>
+<jsec:hasRole name="ADMIN">
+	<span class="menuButton"><g:link class="create" action="create">New PartyRelationshipType</g:link></span>
+</jsec:hasRole></div>
+<br>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if> <g:form method="post">
@@ -39,7 +45,9 @@
 		</tbody>
 	</table>
 	</div>
-	<div class="buttons"><span class="button"><g:actionSubmit
+	<div class="buttons"><span class="button">
+	<input type="hidden" name="id" value="${partyRelationshipTypeInstance?.id}" />
+	<g:actionSubmit
 		class="save" value="Update" /></span> <span class="button"><g:actionSubmit
 		class="delete" onclick="return confirm('Are you sure?');"
 		value="Delete" /></span></div>

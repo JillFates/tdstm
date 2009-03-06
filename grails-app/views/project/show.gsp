@@ -54,38 +54,61 @@
 					mselect.remove(l) 
 				}
 					// Rebuild the select
-				if (managers) { 
-					var pmOptGroup = document.getElementById('pmOptGroupId')
-					var mmOptGroup = document.getElementById('mmOptGroupId')
-					var projectPartnerObj = document.getElementById('projectPartnerId');
-					var projectPartnerVal = projectPartnerObj[document.getElementById('projectPartnerId').selectedIndex].innerHTML;
-					pmOptGroup.style.visibility="visible";
-					mmOptGroup.style.visibility="visible";
-                    if(projectPartnerVal != "None" ){
-                      pmOptGroup.label = projectPartnerVal;
-                      mmOptGroup.label = projectPartnerVal;
-                    } else {
-                      pmOptGroup.label = "";
-                      mmOptGroup.label = "";
-                    }
-					var length = managers.items.length
-					for (var i=0; i < length; i++) {
-						var manager = managers.items[i]
-						var popt = document.createElement('option'); 
-						popt.text = manager.name
-						popt.value = manager.id
-						var mopt = document.createElement('option'); 
-						mopt.text = manager.name
-						mopt.value = manager.id
-						try { 
-							rselect.add(popt, null) // standards compliant; doesn't work in IE
-							mselect.add(mopt, null)
-						} catch(ex) { 
-							rselect.add(popt) // IE only
-							mselect.add(mopt)
-						} 
-					}
-				}
+				if (managers) {
+				      var projectPartner = document.getElementById('projectPartnerId');
+				      var projectPartnerVal = projectPartner[document.getElementById('projectPartnerId').selectedIndex].innerHTML;
+				      
+				      var pmExeOptgroup = document.getElementById('pmGroup')
+				      var mmExeOptgroup = document.getElementById('mmGroup')
+				      var pmOptgroup
+				      var mmOptgroup
+				      
+				      if(pmExeOptgroup == null){
+				      	pmOptgroup = document.createElement('optgroup');
+				      }else{
+				      	pmOptgroup = pmExeOptgroup
+				      }
+				      if(mmExeOptgroup == null){
+				      	mmOptgroup = document.createElement('optgroup');
+				      }else{
+				      	mmOptgroup = mmExeOptgroup
+				      }
+				      
+				      if(projectPartnerVal != "None" ){
+					      pmOptgroup.label = projectPartnerVal;
+					      pmOptgroup.id = "pmGroup";
+					      mmOptgroup.label = projectPartnerVal;
+					      mmOptgroup.id = "mmGroup";
+				      } else {
+				      	  pmOptgroup.label = "";
+					      mmOptgroup.label = "";
+				      }
+				      try {
+						rselect.appendChild(pmOptgroup, null) // standards compliant; doesn't work in IE
+						mselect.appendChild(mmOptgroup, null) 
+					  } catch(ex) {
+						rselect.appendChild(pmOptgroup) // IE only
+						mselect.appendChild(mmOptgroup) 
+					  }
+				
+				      var length = managers.items.length
+				      for (var i=0; i < length; i++) {
+					      var manager = managers.items[i]
+					      var popt = document.createElement('option');
+					      popt.text = manager.name
+					      popt.value = manager.id
+					      var mopt = document.createElement('option');
+					      mopt.text = manager.name
+					      mopt.value = manager.id
+					      try {
+						      pmOptgroup.appendChild(popt, null) // standards compliant; doesn't work in IE
+						      mmOptgroup.appendChild(mopt, null) 
+					      } catch(ex) {
+						      pmOptgroup.appendChild(popt) // IE only
+						      mmOptgroup.appendChild(mopt) 
+					      }
+				      }
+			      }
 				}else{
 					var partnerObj = document.getElementById("projectPartnerId")
 					<% if( projectPartner != null){ %>
@@ -93,10 +116,26 @@
 					<%} %>
 				}
 			}
-			
+			function setCompletionDate(startDate){
+		    	var completionDateObj = document.editProjectForm.completionDate;
+		    	if(completionDateObj.value == ""){
+		    		completionDateObj.value = startDate;
+		    	}
+	      	}
 		</g:javascript>
     </head>
     <body>
+        <div class="menu2">
+          <ul>
+            <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
+            <li><g:link class="home" controller="asset">Assets </g:link></li>
+            <li><g:link class="home" controller="asset" action="assetImport" >Import/Export</g:link> </li>
+            <li><a href="#">Team </a></li>
+            <li><a href="#">Contacts </a></li>
+            <li><a href="#">Applications </a></li>
+            <li><a href="#">Move Bundles </a></li>
+          </ul>
+        </div>
         <div class="body">
             <h1>Show Project</h1>
              <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
@@ -209,7 +248,7 @@
             </div>
             <div id="dialog" title="Edit Project" style="display:none;">
             	
-			      <g:form name="editForm" method="post" action="update">
+			      <g:form name="editForm" method="post" action="update" name="editProjectForm">
 
 			        <input type="hidden" name="id" value="${projectInstance?.id}" />
 			        <div class="dialog">
@@ -234,9 +273,7 @@
 								</td>
 								<td valign="top"
 									class="value ${hasErrors(bean:projectInstance,field:'comment','errors')}">
-									<textarea name="comment"	onkeydown="textCounter(document.createProjectForm.comment,200);" onkeyup="textCounter(document.createProjectForm.comment,200);">
-									${fieldValue(bean:projectInstance,field:'comment')}
-									</textarea>
+									<textarea cols="40"  rows="3" name="comment" onkeydown="textCounter(document.createProjectForm.comment,200);" onkeyup="textCounter(document.createProjectForm.comment,200);">${fieldValue(bean:projectInstance,field:'comment')}</textarea>
 									<g:hasErrors
 									bean="${projectInstance}" field="comment">
 									<div class="errors"><g:renderErrors bean="${projectInstance}"
@@ -254,7 +291,7 @@
 										<script type="text/javascript" charset="utf-8">
 											jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 										</script>
-										<input type="text" class="dateRange" size="15" style="width:112px;height:14px;" name="startDate" value="<my:convertDate date="${projectInstance?.startDate}"/>">	
+										<input type="text" class="dateRange" size="15" style="width:112px;height:14px;" name="startDate" value="<my:convertDate date="${projectInstance?.startDate}"/>" onchange="setCompletionDate(this.value)">	
 								<g:hasErrors
 									bean="${projectInstance}" field="startDate">
 									<div class="errors"><g:renderErrors bean="${projectInstance}"
@@ -271,7 +308,7 @@
 										<script type="text/javascript" charset="utf-8">
 											jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 										</script>
-										<input type="text" class="dateRange" size="15" style="width:112px;height:14px;" name="completionDate" value="<my:convertDate date="${projectInstance?.completionDate}"/>">
+										<input type="text" class="dateRange" size="15" style="width:112px;height:14px;" id="completionDateId" name="completionDate" value="<my:convertDate date="${projectInstance?.completionDate}"/>">
 								
 								<g:hasErrors bean="${projectInstance}" field="completionDate">
 									<div class="errors"><g:renderErrors bean="${projectInstance}"
@@ -300,13 +337,13 @@
 									<option value="" selected="selected">Please Select</option>
 									<optgroup label="TDS" >
 									<g:each status="i" in="${companyStaff}" var="companyStaff">
-										<option value="${companyStaff.partyIdTo.id}">${companyStaff.partyIdTo.lastName},
-										${companyStaff.partyIdTo.firstName} - ${companyStaff.partyIdTo.title}</option>
+										<option value="${companyStaff.partyIdTo.id}">${companyStaff?.partyIdTo?.lastName},
+										${companyStaff?.partyIdTo?.firstName} - ${companyStaff?.partyIdTo?.title}</option>
 									</g:each>
 									</optgroup>
-									<optgroup label="${projectPartner?.partyIdTo}" id="pmOptGroupId">
+									<optgroup label="${projectPartner?.partyIdTo}" id="pmGroup">
 										<g:each status="i" in="${partnerStaff}" var="partnerStaff">
-											<option value="${partnerStaff?.partyIdTo.id}">${partnerStaff.partyIdTo.lastName}, ${partnerStaff.partyIdTo.firstName} - ${partnerStaff.partyIdTo.title}</option>
+											<option value="${partnerStaff?.partyIdTo.id}">${partnerStaff?.partyIdTo?.lastName}, ${partnerStaff?.partyIdTo?.firstName} - ${partnerStaff?.partyIdTo?.title}</option>
 										</g:each>
 									</optgroup>
 								</select></td>
@@ -320,13 +357,13 @@
 									<option value="" selected="selected">Please Select</option>
 									<optgroup label="TDS">
 									<g:each status="i" in="${companyStaff}" var="companyStaff">
-										<option value="${companyStaff.partyIdTo.id}">${companyStaff.partyIdTo.lastName}, 
-										${companyStaff.partyIdTo.firstName} - ${companyStaff.partyIdTo.title}</option>
+										<option value="${companyStaff?.partyIdTo.id}">${companyStaff?.partyIdTo.lastName}, 
+										${companyStaff?.partyIdTo?.firstName} - ${companyStaff?.partyIdTo.title}</option>
 									</g:each>
 									</optgroup>
-									<optgroup label="${projectPartner?.partyIdTo}" id="mmOptGroupId">
+									<optgroup label="${projectPartner?.partyIdTo}" id="mmGroup">
 										<g:each status="i" in="${partnerStaff}" var="partnerStaff">
-											<option value="${partnerStaff.partyIdTo.id}">${partnerStaff.partyIdTo.lastName}, ${partnerStaff.partyIdTo.firstName} - ${partnerStaff.partyIdTo.title}</option>
+											<option value="${partnerStaff?.partyIdTo.id}">${partnerStaff?.partyIdTo?.lastName}, ${partnerStaff?.partyIdTo?.firstName} - ${partnerStaff?.partyIdTo?.title}</option>
 										</g:each>
 									</optgroup>
 								</select>

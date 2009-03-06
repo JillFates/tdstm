@@ -7,7 +7,17 @@
         <title>Edit Project</title>
     </head>
     <body>
-        
+        <div class="menu2">
+          <ul>
+            <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
+            <li><g:link class="home" controller="asset">Assets </g:link></li>
+            <li><g:link class="home" controller="asset" action="assetImport" >Import/Export</g:link> </li>
+            <li><a href="#">Team </a></li>
+            <li><a href="#">Contacts </a></li>
+            <li><a href="#">Applications </a></li>
+            <li><a href="#">Move Bundles </a></li>
+          </ul>
+        </div>
         <div class="body">
             <h1>Edit Project</h1>
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
@@ -24,34 +34,7 @@
                     <table>
                         <tbody>
                         
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="dateCreated">Date Created:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'dateCreated','errors')}">
-                                    <g:datePicker name="dateCreated" value="${projectInstance?.dateCreated}" ></g:datePicker>
-                                <g:hasErrors bean="${projectInstance}" field="dateCreated">
-					            <div class="errors">
-					                <g:renderErrors bean="${projectInstance}" as="list" field="dateCreated"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="lastUpdated">Last Updated:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'lastUpdated','errors')}">
-                                    <g:datePicker name="lastUpdated" value="${projectInstance?.lastUpdated}" noSelection="['':'']"></g:datePicker>
-                                <g:hasErrors bean="${projectInstance}" field="lastUpdated">
-					            <div class="errors">
-					                <g:renderErrors bean="${projectInstance}" as="list" field="lastUpdated"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                        
+                                                    
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="name">Name:</label>
@@ -71,7 +54,7 @@
                                     <label for="comment">Comment:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'comment','errors')}">
-                                    <input type="text" id="comment" name="comment" value="${fieldValue(bean:projectInstance,field:'comment')}"/>
+                                    <textarea cols="40"  rows="3" name="comment" onkeydown="textCounter(document.createProjectForm.comment,200);" onkeyup="textCounter(document.createProjectForm.comment,200);">${fieldValue(bean:projectInstance,field:'comment')}</textarea>
                                 <g:hasErrors bean="${projectInstance}" field="comment">
 					            <div class="errors">
 					                <g:renderErrors bean="${projectInstance}" as="list" field="comment"/>

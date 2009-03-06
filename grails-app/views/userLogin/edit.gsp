@@ -18,11 +18,20 @@
 			  </script> 
     </head>
     <body>
+    <div class="menu2">
+		<ul>
+			<li><g:link class="home" controller="partyGroup" action="show" id="${companyId}">Company</g:link></li>
+			<li><g:link class="home" controller="person" id="${companyId}">Staff</g:link></li>
+			<li><a href="#">Applications </a></li>
+			<li><a href="#">Locations </a></li>
+			<li><a href="#">Rooms </a></li>
+		</ul>
+	</div>
         <div class="body">
             <h1>Edit UserLogin</h1>
              <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-	            <span class="menuButton"><g:link class="list" action="list">UserLogin List</g:link></span>
-	            <span class="menuButton"><g:link class="create" action="create">New UserLogin</g:link></span>
+	            <span class="menuButton"><g:link class="list" action="list" id="${companyId}">UserLogin List</g:link></span>
+	            <span class="menuButton"><g:link class="create" action="create" params="[companyId:companyId]">New UserLogin</g:link></span>
         	</div>
         	<br>
             <g:if test="${flash.message}">
@@ -30,6 +39,7 @@
             </g:if>
             <g:form method="post" >
                 <input type="hidden" name="id" value="${userLoginInstance?.id}" />
+                <input type="hidden" name="companyId" value="${companyId}" />
                 <div class="dialog">
                     <table>
                         <tbody>

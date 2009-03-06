@@ -9,6 +9,13 @@
     <body>
         <div class="body">
             <h1>Show PartyRelationshipType</h1>
+           <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
+	            <span class="menuButton"><g:link class="list" action="list">PartyRelationshipType List</g:link></span>
+	            <jsec:hasRole name="ADMIN">
+	            <span class="menuButton"><g:link class="create" action="create">New PartyRelationshipType</g:link></span>
+	            </jsec:hasRole>
+        	</div>
+        	<br>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>

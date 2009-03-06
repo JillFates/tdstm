@@ -169,9 +169,6 @@ class ProjectController {
                         othermoveManager.delete()
                     }
             	}
-            	
-            	
-            	
             	flash.message = "Project ${params.id} updated"
                 redirect(action:show,id:projectInstance.id)
                 
@@ -195,25 +192,31 @@ class ProjectController {
         def relationshipTypePartner = PartyRelationshipType.findById( 'PROJ_PARTNER' )
         def relationshipTypeStaff = PartyRelationshipType.findById( 'PROJ_STAFF' )
          */
-        def tdsParty = PartyGroup.findByName( 'TDS' ).id
+        try {
+	        def tdsParty = PartyGroup.findByName( 'TDS' )
+	        
+	        /*def roleTypeCompany = RoleType.findById( 'COMPANY' )
+	        def roleTypeClient = RoleType.findById( 'CLIENT' )
+	        def roleTypePartner = RoleType.findById( 'PARTNER' )
+	        def roleTypeStaff = RoleType.findById( 'STAFF' )
+	         */
+	        // 	Populate a SELECT listbox with a list of all CLIENTS relationship to COMPANY (TDS)
+	        def clients = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'CLIENTS' and p.partyIdFrom = $tdsParty.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'CLIENT' order by p.partyIdTo" ) 
+	        
+	        //	Populate a SELECT listbox with a list of all PARTNERS relationship to COMPANY (TDS)
+	        //def partners = PartyRelationship.findAllWhere( partyRelationshipType: relationshipTypePartner, partyIdFrom: tdsParty, roleTypeCodeFrom: roleTypeCompany, roleTypeCodeTo: roleTypePartner )
+	        def partners = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'PARTNERS' and p.partyIdFrom = $tdsParty.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'PARTNER' order by p.partyIdTo" )
+	       
+	        //	Populate a SELECT listbox with a list of all STAFF relationship to COMPANY (TDS)
+	        //def managers = PartyRelationship.findAllWhere( partyRelationshipType: relationshipTypeStaff, partyIdFrom: tdsParty, roleTypeCodeFrom: roleTypeCompany, roleTypeCodeTo: roleTypeStaff )
+	        def managers = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $tdsParty.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
+	        
+	        return [ 'projectInstance':projectInstance, 'clients':clients , 'partners':partners , 'managers':managers ]
         
-        /*def roleTypeCompany = RoleType.findById( 'COMPANY' )
-        def roleTypeClient = RoleType.findById( 'CLIENT' )
-        def roleTypePartner = RoleType.findById( 'PARTNER' )
-        def roleTypeStaff = RoleType.findById( 'STAFF' )
-         */
-        // 	Populate a SELECT listbox with a list of all CLIENTS relationship to COMPANY (TDS)
-        def clients = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'CLIENTS' and p.partyIdFrom = $tdsParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'CLIENT' order by p.partyIdTo" ) 
-        
-        //	Populate a SELECT listbox with a list of all PARTNERS relationship to COMPANY (TDS)
-        //def partners = PartyRelationship.findAllWhere( partyRelationshipType: relationshipTypePartner, partyIdFrom: tdsParty, roleTypeCodeFrom: roleTypeCompany, roleTypeCodeTo: roleTypePartner )
-        def partners = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'PARTNERS' and p.partyIdFrom = $tdsParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'PARTNER' order by p.partyIdTo" )
-       
-        //	Populate a SELECT listbox with a list of all STAFF relationship to COMPANY (TDS)
-        //def managers = PartyRelationship.findAllWhere( partyRelationshipType: relationshipTypeStaff, partyIdFrom: tdsParty, roleTypeCodeFrom: roleTypeCompany, roleTypeCodeTo: roleTypeStaff )
-        def managers = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $tdsParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
-        
-        return [ 'projectInstance':projectInstance, 'clients':clients , 'partners':partners , 'managers':managers ]
+        } catch (Exception e) {
+        	flash.message = "Company not found"
+            redirect(action:list)
+        }
     }
     /*
      * create the project and PartyRelationships for the fields prompted

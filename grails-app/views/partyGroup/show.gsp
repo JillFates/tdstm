@@ -9,6 +9,7 @@
     <body>
        <div class="menu2">
 		<ul>
+			<li><g:link class="home" controller="partyGroup" action="show" id="${partyGroupInstance?.id}">Company</g:link></li>
 			<li><g:link class="home" controller="person" id="${partyGroupInstance?.id}">Staff</g:link></li>
 			<li><a href="#">Applications </a></li>
 			<li><a href="#">Locations </a></li>
@@ -35,9 +36,7 @@
                             <td valign="top" class="name">Comment:</td>
                             
                             <td valign="top" class="value">
-                            <textarea name="comment" cols="80" rows="3"	readonly="readonly" >
-							${fieldValue(bean:partyGroupInstance, field:'comment')}
-                  			</textarea>
+                            <textarea name="comment" cols="80" rows="3"	readonly="readonly" >${fieldValue(bean:partyGroupInstance, field:'comment')}</textarea>
                             
                             </td>
                             

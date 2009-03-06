@@ -9,6 +9,10 @@
 <body>
 <div class="body">
 <h1>Create PartyRelationshipType</h1>
+<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
+            	<span class="menuButton"><g:link class="list" action="list">PartyRelationshipType List</g:link></span>
+	  </div>
+	  <br>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if> <g:form action="save" method="post">

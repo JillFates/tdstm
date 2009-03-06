@@ -9,75 +9,114 @@
     <g:javascript>
 
       function appendPartnerStaff(e) {
-      // The response comes back as a bunch-o-JSON
-
-      var managers = eval("(" + e.responseText + ")")
-      // evaluate JSON
-      var rselect = document.getElementById('projectManagerId')
-      var mselect = document.getElementById('moveManagerId')
-      // Clear all previous options
-      var l = rselect.length
-      var compSatff = document.getElementById('companyManagersId').value
-      while (l > compSatff) {
-      l--
-      rselect.remove(l)
-      mselect.remove(l)
-      }
-      // Rebuild the select
-      if (managers) {
-      var pmOptGroup = document.getElementById('pmOptGroupId')
-      var mmOptGroup = document.getElementById('mmOptGroupId')
-      var projectPartner = document.getElementById('projectPartnerId');
-      var projectPartnerVal = projectPartner[document.getElementById('projectPartnerId').selectedIndex].innerHTML;
-      pmOptGroup.style.visibility="visible";
-      mmOptGroup.style.visibility="visible";
-      if(projectPartnerVal != "None" ){
-        pmOptGroup.label = projectPartnerVal;
-        mmOptGroup.label = projectPartnerVal;
-      } else {
-        pmOptGroup.label = "";
-        mmOptGroup.label = "";
-      }
-
-      var length = managers.items.length
-      for (var i=0; i < length; i++) {
-      var manager = managers.items[i]
-      var popt = document.createElement('option');
-      popt.text = manager.name
-      popt.value = manager.id
-      var mopt = document.createElement('option');
-      mopt.text = manager.name
-      mopt.value = manager.id
-      try {
-      rselect.add(popt, null) // standards compliant; doesn't work in IE
-      mselect.add(mopt, null)
-      } catch(ex) {
-      rselect.add(popt) // IE only
-      mselect.add(mopt)
-      }
-      }
-      }
+	      // The response comes back as a bunch-o-JSON
+	
+	      var managers = eval("(" + e.responseText + ")")
+	      // evaluate JSON
+	      var rselect = document.getElementById('projectManagerId')
+	      var mselect = document.getElementById('moveManagerId')
+		     //  Clear all previous options
+		  var l = rselect.length
+		  var compSatff = document.getElementById('companyManagersId').value
+		  while (l > compSatff) {
+			l--
+			rselect.remove(l) 
+			mselect.remove(l)
+		  }
+	      
+	      // Rebuild the select
+	      if (managers) {
+		      var projectPartner = document.getElementById('projectPartnerId');
+		      var projectPartnerVal = projectPartner[document.getElementById('projectPartnerId').selectedIndex].innerHTML;
+		      
+		      var pmExeOptgroup = document.getElementById('pmGroup')
+		      var mmExeOptgroup = document.getElementById('mmGroup')
+		      var pmOptgroup
+		      var mmOptgroup
+		      
+		      if(pmExeOptgroup == null){
+		      	pmOptgroup = document.createElement('optgroup');
+		      }else{
+		      	pmOptgroup = pmExeOptgroup
+		      }
+		      if(mmExeOptgroup == null){
+		      	mmOptgroup = document.createElement('optgroup');
+		      }else{
+		      	mmOptgroup = mmExeOptgroup
+		      }
+		      
+		      if(projectPartnerVal != "None" ){
+			      pmOptgroup.label = projectPartnerVal;
+			      pmOptgroup.id = "pmGroup";
+			      mmOptgroup.label = projectPartnerVal;
+			      mmOptgroup.id = "mmGroup";
+		      } else {
+		      	  pmOptgroup.label = "";
+			      mmOptgroup.label = "";
+		      }
+		      try {
+				rselect.appendChild(pmOptgroup, null) // standards compliant; doesn't work in IE
+				mselect.appendChild(mmOptgroup, null) 
+			  } catch(ex) {
+				rselect.appendChild(pmOptgroup) // IE only
+				mselect.appendChild(mmOptgroup) 
+			  }
+		
+		      var length = managers.items.length
+		      for (var i=0; i < length; i++) {
+			      var manager = managers.items[i]
+			      var popt = document.createElement('option');
+			      popt.text = manager.name
+			      popt.value = manager.id
+			      var mopt = document.createElement('option');
+			      mopt.text = manager.name
+			      mopt.value = manager.id
+			      try {
+				      pmOptgroup.appendChild(popt, null) // standards compliant; doesn't work in IE
+				      mmOptgroup.appendChild(mopt, null) 
+			      } catch(ex) {
+				      pmOptgroup.appendChild(popt) // IE only
+				      mmOptgroup.appendChild(mopt) 
+			      }
+		      }
+	      }
       }
       function initialize(){
-      // This is called when the page loads to initialize Managers
-      var partnerselect = document.getElementById('projectPartnerId')
-      ${remoteFunction(action:'getPartnerStaffList', params:'\'partner=\' + partnerselect.value', onComplete:'appendPartnerStaff(e)')}
+	      // This is called when the page loads to initialize Managers
+	      var partnerselect = document.getElementById('projectPartnerId')
+	      ${remoteFunction(action:'getPartnerStaffList', params:'\'partner=\' + partnerselect.value', onComplete:'appendPartnerStaff(e)')}
       }
-      function textCounter(field, maxlimit)
-      {
-      if (field.value.length > maxlimit) // if too long...trim it!
-      {
-      field.value = field.value.substring(0, maxlimit);
-      return false;
+      function textCounter(field, maxlimit) {
+	      if (field.value.length > maxlimit) // if too long...trim it!
+	      {
+	      field.value = field.value.substring(0, maxlimit);
+	      return false;
+	      }
+	      else
+	      {
+	      return true;
+	      }
       }
-      else
-      {
-      return true;
-      }
+      function setCompletionDate(startDate){
+    	var completionDateObj = document.createProjectForm.completionDate;
+    	if(completionDateObj.value == ""){
+    		completionDateObj.value = startDate;
+    	}
       }
     </g:javascript>
   </head>
   <body>
+  <div class="menu2">
+          <ul>
+            <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
+            <li><g:link class="home" controller="asset">Assets </g:link></li>
+            <li><g:link class="home" controller="asset" action="assetImport" >Import/Export</g:link> </li>
+            <li><a href="#">Team </a></li>
+            <li><a href="#">Contacts </a></li>
+            <li><a href="#">Applications </a></li>
+            <li><a href="#">Move Bundles </a></li>
+          </ul>
+        </div>
     <div class="body">
       <h1>Create Project</h1>
       <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
@@ -144,9 +183,7 @@
                 </td>
                 <td valign="top"
         class="value ${hasErrors(bean:projectInstance,field:'comment','errors')}">
-                  <textarea rows="5" cols="40" name="comment"	onkeydown="textCounter(document.createProjectForm.comment,200);" onkeyup="textCounter(document.createProjectForm.comment,200);">
-${fieldValue(bean:projectInstance,field:'comment')}
-                  </textarea>
+                  <textarea rows="3" cols="40" name="comment"	onkeydown="textCounter(document.createProjectForm.comment,200);" onkeyup="textCounter(document.createProjectForm.comment,200);">${fieldValue(bean:projectInstance,field:'comment')}</textarea>
                   <g:hasErrors
                     bean="${projectInstance}" field="comment">
                     <div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="comment" /></div>
@@ -162,7 +199,7 @@ ${fieldValue(bean:projectInstance,field:'comment')}
                   <script type="text/javascript" charset="utf-8">
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                   </script>
-                  <input type="text" class="dateRange" size="15" style="width:112px;height:14px;" name="startDate" value="<my:convertDate date="${projectInstance?.startDate}"/>">
+                  <input type="text" class="dateRange" size="15" style="width:112px;height:14px;" name="startDate" value="<my:convertDate date="${projectInstance?.startDate}"/>" onchange="setCompletionDate(this.value)">
        <!--  <g:datePicker name="startDate" value="${projectInstance?.startDate}"
        noSelection="['':'']"></g:datePicker> --><g:hasErrors
                     bean="${projectInstance}" field="startDate">
@@ -180,7 +217,7 @@ ${fieldValue(bean:projectInstance,field:'comment')}
                   <script type="text/javascript" charset="utf-8">
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                   </script>
-                  <input type="text" class="dateRange" size="15" style="width:112px;height:14px;" name="completionDate" value="<my:convertDate date="${projectInstance?.completionDate}"/>">
+                  <input type="text" class="dateRange" size="15" style="width:112px;height:14px;" id="completionDateId" name="completionDate" value="<my:convertDate date="${projectInstance?.completionDate}"/>">
        <!--  <g:datePicker name="completionDate"
                     value="${projectInstance?.completionDate}" noSelection="['':'']"></g:datePicker> -->
        <g:hasErrors bean="${projectInstance}" field="completionDate">
@@ -214,8 +251,6 @@ ${fieldValue(bean:projectInstance,field:'comment')}
                         ${managers.partyIdTo.firstName} - ${managers.partyIdTo.title}</option>
                       </g:each>
                     </optgroup>
-                    <optgroup id="pmOptGroupId" style="visibility: hidden;">
-                    </optgroup>
                 </select></td>
               </tr>
 
@@ -230,8 +265,6 @@ ${fieldValue(bean:projectInstance,field:'comment')}
                         <option value="${managers.partyIdTo.id}">${managers.partyIdTo.lastName},
                         ${managers.partyIdTo.firstName} - ${managers.partyIdTo.title}</option>
                       </g:each>
-                    </optgroup>
-                    <optgroup id="mmOptGroupId" style="visibility: hidden;">
                     </optgroup>
                   </select>
                   <input type="hidden" id="companyManagersId" value="${managers.size()}">
