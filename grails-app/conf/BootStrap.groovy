@@ -186,7 +186,7 @@ println "\n\n PARTY GROUPS \n\n"
 		def tds = new PartyGroup( dateCreated:new Date(), name:"TDS", partyType:companyType ).save()
 		def emc = new PartyGroup( dateCreated:new Date(), name:"EMC", partyType:companyType ).save()
 		def timeWarner = new PartyGroup( dateCreated:new Date(), name:"Time Warner", partyType:companyType ).save()
-		def ceders = new PartyGroup( dateCreated:new Date(), name:"Ceders-Sinai", partyType:companyType ).save()		
+		def cedars = new PartyGroup( dateCreated:new Date(), name:"Cedars-Sinai", partyType:companyType ).save()		
 		def sigma = new PartyGroup( dateCreated:new Date(), name:"SIGMA", partyType:companyType ).save()
 		def trucks = new PartyGroup( dateCreated:new Date(), name:"TrucksRUs", partyType:companyType ).save()
 
@@ -194,7 +194,7 @@ println "\n\n PARTY GROUPS \n\n"
 		// -------------------------------
 		// Create PartyRole for Companies
 		// -------------------------------
-		def companies = [tds, emc, timeWarner, ceders, sigma, trucks]
+		def companies = [tds, emc, timeWarner, cedars, sigma, trucks]
 		companies.each {
 			new PartyRole( party: it, roleType: companyRole).save(insert: true)
 		}
@@ -204,7 +204,7 @@ println "\n\n PARTY GROUPS \n\n"
 		// -------------------------------
 		// Create Projects
 		// -------------------------------
-		def cedersProject = new Project( dateCreated:new Date(), name:"Ceders-Sinai Move 1", projectCode:'CS1', 
+		def cedarsProject = new Project( dateCreated:new Date(), name:"Cedars-Sinai Move 1", projectCode:'CS1', 
 			description:'100 servers', trackChanges:'Y', partyType:groupPartyType ).save();
 		def twProject = new Project( dateCreated:new Date(), name:"Time Warner VA Move", projectCode:'TM-VA-1', 
 			description:'500 servers', trackChanges:'N', partyType:groupPartyType ).save();
@@ -214,7 +214,7 @@ println "\n\n USER PREFERENCES \n\n"
 		// -------------------------------
 		// Create default Preference
 		// -------------------------------
-		def johnPref = new UserPreference( value: cedersProject.id )
+		def johnPref = new UserPreference( value: cedarsProject.id )
 		johnPref.userLogin = userJohn
 		johnPref.preferenceCode = "CURR_PROJ"
 		johnPref.save( insert: true)
@@ -225,7 +225,7 @@ println "\n\n PARTY ROLES \n\n"
 		// Create PartyRole Details
 		// -------------------------------
 	    def partyRoleForRalph = new PartyRole( party:personRalph, roleType:userRole ).save( insert:true )
-	    def partyRoleForLisa = new PartyRole( party:personLisa, roleType:adminRole ).save( insert:true )
+	    def partyRoleForLisa = new PartyRole( party:personLisa, roleType:userRole ).save( insert:true )
 	    def partyRoleForJohn = new PartyRole( party:personJohn, roleType:adminRole ).save( insert:true )
 	    def projectAdminPartyRoleForJohn = new PartyRole( party:personJohn, roleType:projectAdminRole ).save( insert:true )
 
@@ -264,7 +264,7 @@ println "\n\n PARTY RELATIONSHIPS \n\n"
 			[ partnerType, tds, companyRole, emc, partnerRole ],
 			[ partnerType, tds, companyRole, sigma, partnerRole ],
 			[ vendorType, tds, companyRole, trucks, vendorRole ],
-			[ clientType, tds, companyRole, ceders, clientRole ],
+			[ clientType, tds, companyRole, cedars, clientRole ],
 			[ clientType, tds, companyRole, timeWarner, clientRole ],
 		   
 			// Staff
@@ -275,16 +275,16 @@ println "\n\n PARTY RELATIONSHIPS \n\n"
 			[ staffType, emc, companyRole, personRobin, staffRole ],
 			[ staffType, emc, companyRole, personAnna, staffRole ],
 			[ staffType, sigma, companyRole, personReddy, staffRole ],
-			[ staffType, ceders, companyRole, personGeorge, staffRole ],
+			[ staffType, cedars, companyRole, personGeorge, staffRole ],
 			
 
-			// Ceders-Sinai Relationships
-			[ projCompanyType, cedersProject, projectRole, tds, companyRole ],
-			[ projClientType, cedersProject, projectRole, ceders, clientRole ],
-			[ projPartnerType, cedersProject, projectRole, emc, partnerRole ],
-			[ projStaffType, cedersProject, projectRole, personRobin, pmRole ],
-			[ projStaffType, cedersProject, projectRole, personJohn, moveMgrRole ],
-			[ projStaffType, cedersProject, projectRole, personGeorge, networkAdminRole ],
+			// cedars-Sinai Relationships
+			[ projCompanyType, cedarsProject, projectRole, tds, companyRole ],
+			[ projClientType, cedarsProject, projectRole, cedars, clientRole ],
+			[ projPartnerType, cedarsProject, projectRole, emc, partnerRole ],
+			[ projStaffType, cedarsProject, projectRole, personRobin, pmRole ],
+			[ projStaffType, cedarsProject, projectRole, personJohn, moveMgrRole ],
+			[ projStaffType, cedarsProject, projectRole, personGeorge, networkAdminRole ],
 					
 			// TimeWarner Relationships
 			[ projCompanyType, twProject, projectRole, tds, companyRole ],
@@ -310,11 +310,11 @@ println "\n\n PARTY RELATIONSHIPS \n\n"
 
 		def assets = [
 			// project, type, name, asset tag, s/n
-			[cedersProject, serverAsset, "CSHSACADAFF", "XX-232-YAB", "12345"],
-			[cedersProject, serverAsset, "CSHSACCESS2", "XX-138-YAB", "2343455"],
-			[cedersProject, serverAsset, "CSHSBDGT1", "MM-2232", "1893045"],
-			[cedersProject, kvmSwitchAsset, "Avocent", "", ""],
-			[cedersProject, arrayAsset, "CSMCARM Juke", "RR-32-YAB", "SU023423LLK"]
+			[cedarsProject, serverAsset, "CSHSACADAFF", "XX-232-YAB", "12345"],
+			[cedarsProject, serverAsset, "CSHSACCESS2", "XX-138-YAB", "2343455"],
+			[cedarsProject, serverAsset, "CSHSBDGT1", "MM-2232", "1893045"],
+			[cedarsProject, kvmSwitchAsset, "Avocent", "", ""],
+			[cedarsProject, arrayAsset, "CSMCARM Juke", "RR-32-YAB", "SU023423LLK"]
 		]
 		// Insert the list 
 		assets.each {
