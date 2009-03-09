@@ -6,8 +6,8 @@
     <meta name="layout" content="main" />
     <title>Asset List</title>
 
-    <g:javascript library="prototype"/>    
-    
+    <g:javascript library="prototype"/>
+
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}"  />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
@@ -37,7 +37,7 @@
       var rowId
       function showAssetDialog( e ) {
 
-      var asset = eval('(' + e.responseText + ')')     
+      var asset = eval('(' + e.responseText + ')')
 
       document.getElementById('id').value = asset.id
       if ( asset.assetType != null ) {
@@ -130,6 +130,7 @@
     <div class="menu2">
       <ul>
         <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
+        <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:project?.id]" >Staff</g:link></li>
         <li><g:link class="home" controller="asset">Assets </g:link></li>
         <li><g:link class="home" controller="asset" action="assetImport" >Import/Export</g:link> </li>
         <li><a href="#">Team </a></li>
@@ -392,7 +393,7 @@
           </div>
         </g:form>
       </div>
-      </div>
+    </div>
 
   </body>
 </html>
