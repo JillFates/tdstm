@@ -66,5 +66,7 @@ log4j {
     }
     additivity.StackTrace=false
 }
+// For JSecurity
+jsecurity.legacy.filter.enabled = true
 
 
