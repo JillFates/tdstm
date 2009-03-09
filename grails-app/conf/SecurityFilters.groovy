@@ -25,5 +25,23 @@ class SecurityFilters {
                 }
             }
         }
+        
+        /*
+         *   Statements to Check the Session status
+         */
+        accessControlCheck(controller: '*', action: '*') {
+            before = {
+                if (grailsApplication.config.jsecurity.legacy.filter.enabled) {
+        
+                    def subject = SecurityUtils.subject
+                    def principal = subject.principal
+                    // condition to check the Session status 
+                    if(controllerName != 'auth' && principal == null){
+                    	flash.message = "Your login has expired and must login again."
+                    	redirect(controller:'auth', action:'login')
+                    }
+                }
+            }
+        }
     } 
 }
