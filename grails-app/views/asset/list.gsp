@@ -6,49 +6,55 @@
     <meta name="layout" content="main" />
     <title>Asset List</title>
 
-    <g:javascript library="prototype"/>
-    <g:javascript library="jquery"/>
+    <g:javascript library="prototype"/>    
+    
+    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}"  />
+    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
+    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
+    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}"  />
+    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}"  />
+    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}"  />
+    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
+    <script type="text/javascript" src="${createLinkTo(dir:'js',file:'jquery-1.3.1.js')}"></script>
+    <script type="text/javascript" src="${createLinkTo(dir:'js',file:'ui.core.js')}"></script>
+    <script type="text/javascript" src="${createLinkTo(dir:'js',file:'ui.draggable.js')}"></script>
+    <script type="text/javascript" src="${createLinkTo(dir:'js',file:'ui.resizable.js')}"></script>
+    <script type="text/javascript" src="${createLinkTo(dir:'js',file:'ui.dialog.js')}"></script>
 
-    <link type="text/css" rel="stylesheet" href="http://ui.jquery.com/testing/themes/base/ui.all.css" />
-    <script type="text/javascript" src="http://ui.jquery.com/testing/jquery-1.3.1.js"></script>
-    <script type="text/javascript" src="http://ui.jquery.com/testing/ui/ui.core.js"></script>
-    <script type="text/javascript" src="http://ui.jquery.com/testing/ui/ui.draggable.js"></script>
-    <script type="text/javascript" src="http://ui.jquery.com/testing/ui/ui.resizable.js"></script>
-    <script type="text/javascript" src="http://ui.jquery.com/testing/ui/ui.dialog.js"></script>
     <script>
 
       $(document).ready(function() {
 
         $("#dialog").dialog({ autoOpen: false })
         $("#dialog1").dialog({ autoOpen: false })
+        $("#dialog2").dialog({ autoOpen: false })
 
       })
 
     </script>
 
     <g:javascript>
+      var rowId
       function showAssetDialog( e ) {
 
-      var asset = eval('(' + e.responseText + ')')
+      var asset = eval('(' + e.responseText + ')')     
 
-      //set values to dialog from response
-
-      document.getElementById('id').value= asset.id
+      document.getElementById('id').value = asset.id
       if ( asset.assetType != null ) {
       document.getElementById('assetTypes').value = asset.assetTypeId
-      document.getElementById('assetType.id').value = asset.assetTypeId
+      document.getElementById('assetTypeD.id').value = asset.assetTypeId
       }else{
       document.getElementById('assetTypes').value = ""
-      document.getElementById('assetType.id').value = null
+      document.getElementById('assetTypeD.id').value = null
       }
       document.getElementById('assetNames').value = asset.assetName
-      document.getElementById('assetName').value = asset.assetName
+      document.getElementById('assetNameD').value = asset.assetName
       document.getElementById('assetTags').value = asset.assetTag
-      document.getElementById('assetTag').value = asset.assetTag
+      document.getElementById('assetTagD').value = asset.assetTag
       document.getElementById('serialNumbers').value = asset.serialNumber
-      document.getElementById('serialNumber').value = asset.serialNumber
+      document.getElementById('serialNumberD').value = asset.serialNumber
       document.getElementById('deviceFunctions').value = asset.deviceFunction
-      document.getElementById('deviceFunction').value = asset.deviceFunction
+      document.getElementById('deviceFunctionD').value = asset.deviceFunction
 
       $("#dialog").dialog('option', 'width', 400)
       $("#dialog").dialog("open")
@@ -64,52 +70,74 @@
       }
 
       function showEditAsset(e) {
+
+      $("#dialog1").dialog("close")
       var asset = eval('(' + e.responseText + ')')
-      if ( asset.assetType != null ) {
-      var type = document.getElementById('type_'+asset.id)
-      type.value = asset.assetTypeId
-      type.style.color = '#0366B0'
+
+      var x=document.getElementById('assetTable').rows
+      var y=x[rowId].cells
+      x[rowId].style.background = '#65a342'
+      if(asset.assetTypeId == null) {
+      y[1].innerHTML = ""
       }else{
-      document.getElementById('type_'+asset.id).value = ""
+      y[1].innerHTML = asset.assetTypeId
       }
-      var name = document.getElementById('name_'+asset.id)
-      name.value = asset.assetName
-      name.style.color = '#0366B0'
-      var tag = document.getElementById('tag_'+asset.id)
-      tag.value = asset.assetTag
-      tag.style.color = '#0366B0'
-      var sno = document.getElementById('sno_'+asset.id)
-      sno.value = asset.serialNumber
-      sno.style.color = '#0366B0'
+      y[2].innerHTML = asset.assetName
+      y[3].innerHTML = asset.assetTag
+      y[4].innerHTML = asset.serialNumber
 
       }
 
       function callUpdateDialog() {
 
       var assetId = document.getElementById('id')
-      var assetType = document.getElementById('assetType.id')
-      var assetName = document.getElementById('assetName')
-      var assetTag = document.getElementById('assetTag')
-      var serialNumber = document.getElementById('serialNumber')
-      var deviceFunction = document.getElementById('deviceFunction')
+      var assetType = document.getElementById('assetTypeD.id')
+      var assetName = document.getElementById('assetNameD')
+      var assetTag = document.getElementById('assetTagD')
+      var serialNumber = document.getElementById('serialNumberD')
+      var deviceFunction = document.getElementById('deviceFunctionD')
 
       var assetNameDialog = new Array()
-      assetNameDialog[0]=assetId.value
-      assetNameDialog[1]=assetType.value
-      assetNameDialog[2]=assetName.value
-      assetNameDialog[3]=assetTag.value
-      assetNameDialog[4]=serialNumber.value
-      assetNameDialog[5]=deviceFunction.value
-      assetNameDialog[6]="null"
+      assetNameDialog[0] = assetId.value
+      assetNameDialog[1] = assetType.value
+      assetNameDialog[2] = assetName.value
+      assetNameDialog[3] = assetTag.value
+      assetNameDialog[4] = serialNumber.value
+      assetNameDialog[5] = deviceFunction.value
+      assetNameDialog[6] = "null"
 
       ${remoteFunction(action:'updateAsset', params:'\'assetDialog=\' + assetNameDialog', onComplete:'showEditAsset(e)')}
       return true
+      }
+
+      function createDialog(){
+
+      $("#dialog2").dialog('option', 'width', 500)
+      $("#dialog2").dialog("open")
+
+      }
+
+      function setRowId(val){
+
+      rowId = val.id
+
       }
 
     </g:javascript>
 
   </head>
   <body>
+    <div class="menu2">
+      <ul>
+        <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
+        <li><g:link class="home" controller="asset">Assets </g:link></li>
+        <li><g:link class="home" controller="asset" action="assetImport" >Import/Export</g:link> </li>
+        <li><a href="#">Team </a></li>
+        <li><a href="#">Contacts </a></li>
+        <li><a href="#">Applications </a></li>
+        <li><a href="#">Move Bundles </a></li>
+      </ul>
+    </div>
 
     <div class="body">
       <h1>Asset List</h1>
@@ -117,7 +145,7 @@
         <div class="message">${flash.message}</div>
       </g:if>
       <div>
-        <table>
+        <table id="assetTable">
           <thead>
             <tr>
 
@@ -134,20 +162,21 @@
             </tr>
           </thead>
           <tbody>
+            <%  int k = 1 %>
             <g:each in="${assetInstanceList}" status="i" var="assetInstance">
 
-              <tr>
+              <tr id="${k}" onClick="setRowId(this)" onmouseover="style.backgroundColor='#87CEEE';" onmouseout="style.backgroundColor='white';">
                 <td><g:remoteLink controller="asset" action="editShow" id="${assetInstance.id}"  onComplete ="showAssetDialog( e );">${fieldValue(bean:assetInstance, field:'id')}</g:remoteLink></td>
 
-                <td><input type="text" id="type_${assetInstance.id}" value="${fieldValue(bean:assetInstance, field:'assetType')}" style="border: 0px" readonly/></td>
+                <td>${fieldValue(bean:assetInstance, field:'assetType')}</td>
 
-                <td><input type="text" id="name_${assetInstance.id}" value="${fieldValue(bean:assetInstance, field:'assetName')}" style="border: 0px" readonly/></td>
+                <td>${fieldValue(bean:assetInstance, field:'assetName')}</td>
 
-                <td><input type="text" id="tag_${assetInstance.id}" value="${fieldValue(bean:assetInstance, field:'assetTag')}" style="border: 0px" readonly/></td>
+                <td>${fieldValue(bean:assetInstance, field:'assetTag')}</td>
 
-                <td><input type="text" id="sno_${assetInstance.id}" value="${fieldValue(bean:assetInstance, field:'serialNumber')}" style="border: 0px" readonly/></td>
+                <td>${fieldValue(bean:assetInstance, field:'serialNumber')}</td>
               </tr>
-
+              <%  k = ++k %>
             </g:each>
           </tbody>
         </table>
@@ -157,7 +186,7 @@
       </div>
       <div class="buttons">
         <g:form>
-          <span class="button"><g:actionSubmit type="button" value="New Asset" class="create" action="create"/></span>
+          <span class="button"><input type="button" value="New Asset" class="create" onClick="createDialog()"/></span>
         </g:form>
       </div>
     </div>
@@ -223,13 +252,8 @@
                 <td valign="top" class="name">
                   <label for="assetType">Asset Type:</label>
                 </td>
-                <td valign="top" class="value ${hasErrors(bean:assetInstance,field:'assetType','errors')}">
-                  <g:select optionKey="id" from="${AssetType.list()}" id="assetType.id" name="assetType.id" value="" noSelection="['null':'']"></g:select>
-                  <g:hasErrors bean="${assetInstance}" field="assetType">
-                    <div class="errors">
-                      <g:renderErrors bean="${assetInstance}" as="list" field="assetType"/>
-                    </div>
-                  </g:hasErrors>
+                <td valign="top">
+                  <g:select optionKey="id" from="${AssetType.list()}" id="assetTypeD.id" name="assetTypeD.id" value="" noSelection="['null':'']"></g:select>
                 </td>
               </tr>
 
@@ -237,13 +261,8 @@
                 <td valign="top" class="name">
                   <label for="assetName">Asset Name:</label>
                 </td>
-                <td valign="top" class="value ${hasErrors(bean:assetInstance,field:'assetName','errors')}">
-                  <input type="text" id="assetName" name="assetName" value=""/>
-                  <g:hasErrors bean="${assetInstance}" field="assetName">
-                    <div class="errors">
-                      <g:renderErrors bean="${assetInstance}" as="list" field="assetName"/>
-                    </div>
-                  </g:hasErrors>
+                <td valign="top">
+                  <input type="text" id="assetNameD" name="assetNameD" value=""/>
                 </td>
               </tr>
 
@@ -251,13 +270,8 @@
                 <td valign="top" class="name">
                   <label for="assetTag">Asset Tag:</label>
                 </td>
-                <td valign="top" class="value ${hasErrors(bean:assetInstance,field:'assetTag','errors')}">
-                  <input type="text" id="assetTag" name="assetTag" value=""/>
-                  <g:hasErrors bean="${assetInstance}" field="assetTag">
-                    <div class="errors">
-                      <g:renderErrors bean="${assetInstance}" as="list" field="assetTag"/>
-                    </div>
-                  </g:hasErrors>
+                <td valign="top">
+                  <input type="text" id="assetTagD" name="assetTagD" value=""/>
                 </td>
               </tr>
 
@@ -265,13 +279,8 @@
                 <td valign="top" class="name">
                   <label for="serialNumber">Serial Number:</label>
                 </td>
-                <td valign="top" class="value ${hasErrors(bean:assetInstance,field:'serialNumber','errors')}">
-                  <input type="text" id="serialNumber" name="serialNumber" value=""/>
-                  <g:hasErrors bean="${assetInstance}" field="serialNumber">
-                    <div class="errors">
-                      <g:renderErrors bean="${assetInstance}" as="list" field="serialNumber"/>
-                    </div>
-                  </g:hasErrors>
+                <td valign="top">
+                  <input type="text" id="serialNumberD" name="serialNumberD" value=""/>
                 </td>
               </tr>
 
@@ -279,13 +288,8 @@
                 <td valign="top" class="name">
                   <label for="deviceFunction">Device Function:</label>
                 </td>
-                <td valign="top" class="value ${hasErrors(bean:assetInstance,field:'deviceFunction','errors')}">
-                  <input type="text" id="deviceFunction" name="deviceFunction" value=""/>
-                  <g:hasErrors bean="${assetInstance}" field="deviceFunction">
-                    <div class="errors">
-                      <g:renderErrors bean="${assetInstance}" as="list" field="deviceFunction"/>
-                    </div>
-                  </g:hasErrors>
+                <td valign="top">
+                  <input type="text" id="deviceFunctionD" name="deviceFunctionD" value=""/>
                 </td>
               </tr>
 
@@ -298,6 +302,97 @@
         </div>
       </g:form>
     </div>
+
+    <div id="dialog2" title="Create Asset" style="display:none;">
+      <div class="dialog">
+        <h1>Create Asset</h1>
+        <g:if test="${flash.message}">
+          <div class="message">${flash.message}</div>
+        </g:if>
+        <g:form action="save" method="post" >
+          <div class="dialog">
+            <table>
+              <tbody>
+
+                <tr class="prop">
+                  <td valign="top" class="name">
+                    <label for="assetType">Asset Type:</label>
+                  </td>
+                  <td valign="top" class="value ${hasErrors(bean:assetInstance,field:'assetType','errors')}">
+                    <g:select optionKey="id" from="${AssetType.list()}" name="assetType.id" value="${assetInstance?.assetType?.id}" noSelection="['null':'']"></g:select>
+                    <g:hasErrors bean="${assetInstance}" field="assetType">
+                      <div class="errors">
+                        <g:renderErrors bean="${assetInstance}" as="list" field="assetType"/>
+                      </div>
+                    </g:hasErrors>
+                  </td>
+                </tr>
+
+                <tr class="prop">
+                  <td valign="top" class="name">
+                    <label for="assetName">Asset Name:</label>
+                  </td>
+                  <td valign="top" class="value ${hasErrors(bean:assetInstance,field:'assetName','errors')}">
+                    <input type="text" id="assetName" name="assetName" value="${fieldValue(bean:assetInstance,field:'assetName')}"/>
+                    <g:hasErrors bean="${assetInstance}" field="assetName">
+                      <div class="errors">
+                        <g:renderErrors bean="${assetInstance}" as="list" field="assetName"/>
+                      </div>
+                    </g:hasErrors>
+                  </td>
+                </tr>
+
+                <tr class="prop">
+                  <td valign="top" class="name">
+                    <label for="assetTag">Asset Tag:</label>
+                  </td>
+                  <td valign="top" class="value ${hasErrors(bean:assetInstance,field:'assetTag','errors')}">
+                    <input type="text" id="assetTag" name="assetTag" value="${fieldValue(bean:assetInstance,field:'assetTag')}"/>
+                    <g:hasErrors bean="${assetInstance}" field="assetTag">
+                      <div class="errors">
+                        <g:renderErrors bean="${assetInstance}" as="list" field="assetTag"/>
+                      </div>
+                    </g:hasErrors>
+                  </td>
+                </tr>
+
+                <tr class="prop">
+                  <td valign="top" class="name">
+                    <label for="serialNumber">Serial Number:</label>
+                  </td>
+                  <td valign="top" class="value ${hasErrors(bean:assetInstance,field:'serialNumber','errors')}">
+                    <input type="text" id="serialNumber" name="serialNumber" value="${fieldValue(bean:assetInstance,field:'serialNumber')}"/>
+                    <g:hasErrors bean="${assetInstance}" field="serialNumber">
+                      <div class="errors">
+                        <g:renderErrors bean="${assetInstance}" as="list" field="serialNumber"/>
+                      </div>
+                    </g:hasErrors>
+                  </td>
+                </tr>
+
+                <tr class="prop">
+                  <td valign="top" class="name">
+                    <label for="deviceFunction">Device Function:</label>
+                  </td>
+                  <td valign="top" class="value ${hasErrors(bean:assetInstance,field:'deviceFunction','errors')}">
+                    <input type="text" id="deviceFunction" name="deviceFunction" value="${fieldValue(bean:assetInstance,field:'deviceFunction')}"/>
+                    <g:hasErrors bean="${assetInstance}" field="deviceFunction">
+                      <div class="errors">
+                        <g:renderErrors bean="${assetInstance}" as="list" field="deviceFunction"/>
+                      </div>
+                    </g:hasErrors>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+          <div class="buttons">
+            <span class="button"><input class="save" type="submit" value="Create" /></span>
+          </div>
+        </g:form>
+      </div>
+      </div>
 
   </body>
 </html>
