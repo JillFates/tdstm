@@ -355,7 +355,7 @@ class AssetController {
         }
         if ( !assetInstance.hasErrors() && assetInstance.save() ) {
             flash.message = "Asset ${assetInstance.id} created"
-            redirect( action:show, id:assetInstance.id )
+            redirect( action:list, id:assetInstance.id )
         } else {
             render( view:'create', model:[assetInstance:assetInstance] )
         }
