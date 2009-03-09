@@ -3,7 +3,7 @@ class Person extends Party {
 	String firstName
 	String lastName
 	String nickName
-	String active
+	String active = "Y"
 	String title
 
 	/*

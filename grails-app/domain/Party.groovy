@@ -1,5 +1,5 @@
 class Party {
-	Date dateCreated
+	Date dateCreated = new Date()
 	Date lastUpdated
 	PartyType partyType
 	
