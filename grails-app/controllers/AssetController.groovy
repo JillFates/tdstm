@@ -32,15 +32,14 @@ class AssetController {
 
             }
             
-        }
-    	//set project id
-    	request.setAttribute("projectId",projectId)
+        }   	
+    	
     	if ( projectId != null ) {
     		def project = Project.findById(projectId)
     		assetsByProject = Asset.findAllByProject(project)
     	}
     	
-        render( view:"assetImport", model : [ assetsByProject:assetsByProject ] )
+        render( view:"assetImport", model : [ assetsByProject:assetsByProject, projectId:projectId ] )
     }
     /*
      * render export form
@@ -284,7 +283,7 @@ class AssetController {
         } catch ( Exception ex ) { }
         
         //get asset list for project present in current scope.        
-        [ assetInstanceList: Asset.findAllByProject( project, params ) ]
+        return [ assetInstanceList: Asset.findAllByProject( project, params ), project:project ]
     }
     // return asset details
     def show = {
