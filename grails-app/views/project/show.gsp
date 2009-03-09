@@ -128,6 +128,7 @@
         <div class="menu2">
           <ul>
             <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
+            <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:projectInstance?.id]" >Staff</g:link></li>
             <li><g:link class="home" controller="asset">Assets </g:link></li>
             <li><g:link class="home" controller="asset" action="assetImport" >Import/Export</g:link> </li>
             <li><a href="#">Team </a></li>
@@ -241,7 +242,7 @@
                                     <label for="lastUpdated">Last Updated:</label>
                                 </td>
                                 <td valign="top" class="value"><my:convertDateTime date="${projectInstance?.lastUpdated}" /> </td>
-                        </tr> 
+                        </tr>
                         
                     </tbody>
                 </table>

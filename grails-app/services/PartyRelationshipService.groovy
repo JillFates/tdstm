@@ -66,5 +66,34 @@ class PartyRelationshipService {
     	}
     
     }
-        
+    
+    /*
+     *  Return the Project Staff
+     */
+    def getProjectStaff( def projectId ){
+    	def list = []
+    	def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' ")
+	    	projectStaff.each{staff ->
+	    		def map = new HashMap()
+	    		def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
+	    		map.put("company", company.partyIdFrom)
+	    		map.put("name", staff.partyIdTo.firstName+" "+ staff.partyIdTo.lastName)
+	    		map.put("role", staff.roleTypeCodeTo)
+	    		map.put("staff", staff.partyIdTo)
+	    		list<<map
+	    	}
+    	return list
+    }
+    /*
+     * 	Return the Companies Staff list, which are not associated with Project 
+     */
+    def getProjectCompaniesStaff( def projectId ) {
+    	
+    	def projectCompanyQuery = "select pr.partyIdTo from PartyRelationship pr where pr.partyRelationshipType in ('PROJ_CLIENT','PROJ_COMPANY','PROJ_PARTNER','PROJ_VENDOR ') and pr.partyIdFrom = $projectId and pr.roleTypeCodeFrom = 'PROJECT'  "
+    	def projectStaffQuery = "select ps.partyIdTo from PartyRelationship ps where ps.partyRelationshipType = 'PROJ_STAFF' and ps.partyIdFrom = $projectId and ps.roleTypeCodeFrom = 'PROJECT'"
+    	def query = " from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom in ( $projectCompanyQuery ) and p.partyIdTo not in ( $projectStaffQuery ) and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' "
+    	def projectCompaniesStaff = PartyRelationship.findAll(query)
+    	
+    	return projectCompaniesStaff
+    }
 }

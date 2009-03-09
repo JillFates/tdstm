@@ -18,6 +18,7 @@
 		 <div class="menu2">
           <ul>
             <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
+            <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
             <li><g:link class="home" controller="asset">Assets </g:link></li>
             <li><g:link class="home" controller="asset" action="assetImport" >Import/Export</g:link> </li>
             <li><a href="#">Team </a></li>

@@ -5,11 +5,19 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="main" />
         <title>Edit Project</title>
+         <% def currProj = session.getAttribute("CURR_PROJ");
+		    def projectId = currProj.CURR_PROJ ;
+		    def currProjObj;
+		    if( projectId != null){
+		      currProjObj = Project.findById(projectId);
+		    }
+    	%>
     </head>
     <body>
         <div class="menu2">
           <ul>
             <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
+            <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
             <li><g:link class="home" controller="asset">Assets </g:link></li>
             <li><g:link class="home" controller="asset" action="assetImport" >Import/Export</g:link> </li>
             <li><a href="#">Team </a></li>
