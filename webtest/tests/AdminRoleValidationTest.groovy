@@ -1,16 +1,22 @@
 class AdminRoleValidationTest extends grails.util.WebTest {
 	
+//	Common method to test login
+    def tryLogin ( def name, def password ) {
+
+        invoke( url: 'auth/login' )
+
+        verifyText  'Login'
+        selectForm( name: 'loginForm' )
+        setInputField( name: 'username', value: name )
+        setInputField( name: 'password', value: password )
+        clickButton( label: 'Sign in' )
+
+    }
+
 	//	Login without Administrator role,
 	def testLoginWithUserRole() {
 
-        invoke(url: 'auth/login')
-
-        selectForm(name:'loginForm')
-        setInputField(name: 'username', value: 'ralph')
-        setInputField(name: 'password', value: 'user')
-
-        clickButton(label: 'Sign in')
-        
+		tryLogin ( 'ralph', 'user' )
         
         // click on Project label
         clickLink(label: 'Project')
@@ -20,4 +26,17 @@ class AdminRoleValidationTest extends grails.util.WebTest {
         verifyText  'You do not have permission to access this page'
     }
 	
+	/*
+	 *  Test case for Session Expire
+	 */
+	 def testSessionExpire(){
+		 tryLogin ( 'ralph', 'user' )
+		 // logout the application to session expire
+		 invoke( url: 'auth/signOut' , description:'Logout the Application' )
+		 
+		 // Check the Session Expire
+		 invoke( url: 'person/index/9 ' , description:'Tyring to access secure Pages after Session Expire' )
+        
+		 invoke( url: 'project/show/15 ' , description:'Tyring to access secure Pages after Session Expire' )
+	 }
 }

@@ -165,7 +165,48 @@ class PersonController {
 	def projectStaff = {
 		def projectId = params.projectId
 		def projectStaff = partyRelationshipService.getProjectStaff( projectId )
-		def projectCompaniesStaff = partyRelationshipService.getProjectCompaniesStaff( projectId )
-		return [ projectStaff:projectStaff, projectId:projectId  ]
+		def companiesStaff = partyRelationshipService.getProjectCompaniesStaff( projectId )
+		def projectCompanies = partyRelationshipService.getProjectCompanies( projectId )
+		return [ projectStaff:projectStaff, companiesStaff:companiesStaff, projectCompanies:projectCompanies, projectId:projectId  ]
 	}
+	/*
+	 *	Method to add project Staff through Ajax Overlay 
+	 */
+	def saveProjectStaff = {
+    	def projectId = params.projectId
+    	def personId = params.person
+    	def roleType = params.roleType
+    	def projectParty = Project.findById( projectId )
+    	def personParty = Person.findById( personId )
+    	def projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
+    	redirect(action:'projectStaff', params:[projectId:projectId] )
+    	
+    }
+	/*
+	 * Method to save person detais and create party relation with Project as well 
+	 */
+	def savePerson = {
+		def personInstance = new Person( params )
+		personInstance.dateCreated = new Date()
+		def companyId = params.company
+		def projectId = params.projectId
+		def roleType = params.roleType
+		if ( !personInstance.hasErrors() && personInstance.save() ) {
+			
+			if ( companyId != null && companyId != "" ) {
+				def companyParty = Party.findById( companyId )
+				def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", personInstance, "STAFF" )
+			}
+			if ( projectId != null && projectId != "" && roleType != null) {
+				def projectParty = Party.findById( projectId )
+				def partyRelationship = partyRelationshipService.savePartyRelationship( "PROJ_STAFF", projectParty, "PROJECT", personInstance, roleType )
+			}
+			flash.message = "Person ${personInstance.id} created"
+			redirect( action:'projectStaff', params:[ projectId:projectId ] )
+		}
+		else {
+			flash.message = " Person FirstName cannot be blank. "
+			redirect( action:'projectStaff', params:[ projectId:projectId ] )
+		}
+    }	
 }

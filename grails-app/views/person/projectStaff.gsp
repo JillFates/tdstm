@@ -20,6 +20,17 @@
 	    $(document).ready(function(){
 		        $("#editPerson").dialog({ autoOpen: false });
 	      	});
+	    
+	    $(document).ready(function(){
+		        $("#addProjectStaff").dialog({ autoOpen: false });
+	      	});
+	    $(document).ready(function(){
+		        $("#createPerson").dialog({ autoOpen: false });
+	      	});
+	      	
+	    </script>
+	    <script type="text/javascript">
+	    
 	    </script>
 		<g:javascript>
 
@@ -37,6 +48,40 @@
 		      	$("#editPerson").dialog('option', 'width', 300)
 				$("#editPerson").dialog( "open" );
 		
+		 	}
+		 	
+		 	// function for add staff form dialog
+		 	function showAddProjectStaff(){
+		 		$("#addProjectStaff").dialog('option', 'width', 650)
+				$("#addProjectStaff").dialog( "open" );	
+		 	}
+		 	// function for create staff form dialog
+		 	function createProjectStaff(){
+		 		$("#createPerson").dialog('option', 'width', 350)
+				$("#createPerson").dialog( "open" );	
+		 	}
+		 	
+		 	// function to submit the Add staff form
+		 	function addProjectStaff(i){
+		 		
+		 		var roleType = document.getElementById("roleType_"+i).value;
+				if( roleType == "null" ){
+					alert("Please Select Role");
+					return false;
+				}else{
+					return true					
+				}
+		 	}
+		 	// function to validate CreateForm
+		 	function validateCreateForm(){
+		 		
+		 		var firstName = document.createForm.firstName.value;
+				if( firstName != "" ){
+					return true
+				}else{
+					alert("First Name can not be Blank");
+					return false;					
+				}
 		 	}
 	      	</g:javascript>
 </head>
@@ -87,9 +132,9 @@
 	</tbody>
 </table>
 </div>
-	<div class="buttons"><g:form>
-		<span class="button"><g:actionSubmit class="create"	value="Add" action="create" /></span>
-	</g:form></div>
+	<div class="buttons">
+		<span class="button"><input type="button" class="create" value="Add" onclick="showAddProjectStaff()"/></span>
+	</div>
 </div>
 <div id="editPerson" style="display: none;">
             <g:form method="post" action="updateStaff" name="editForm" >
@@ -153,6 +198,131 @@
                     <span class="button"><input type="submit" class="save" value="Update"  /></span>
                 </div>
             </g:form>
-        </div>
+</div>
+<div class="body" id="addProjectStaff" style="display: none;" title="Add staff to project" >
+<div >
+<table>
+	<thead>
+		<tr>
+
+			<th>Company</th>
+			<th>Name</th>
+			<th>Title</th>
+			<th>Role</th>
+			<th>Action</th>
+
+		</tr>
+	</thead>
+	<tbody>
+		<g:each in="${companiesStaff}" status="i" var="companiesStaff">
+		<g:formRemote method="post" before="return addProjectStaff($i)" name="addSatffForm_$i" url="${[action:'saveProjectStaff']}" onComplete="test(e);">
+			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+				<input type="hidden" name="projectId" value="${projectId}">
+				<td>${companiesStaff?.company[0]}</td>
+				
+				<td><input type="hidden" name="person" value="${companiesStaff?.staff.id}" >${companiesStaff?.name}</td>
+				
+				<td>${companiesStaff?.staff.title}</td>
+				
+				<td><tds:personRoleSelect name="roleType" id="roleType_$i" optionKey="id" from="${RoleType.list()}" value="${roleType?.id}" isNew="true" ></tds:personRoleSelect> </td>
+				
+				<td><input value="Add" type="submit" name="submit"> </td>
+				
+			</tr>
+			
+		</g:formRemote>
+		</g:each>
+	</tbody>
+</table>
+</div>
+	<div class="buttons" style="width: 99%">
+		<span class="button"><input class="create"	type="button" value="Create New Staff" onclick="createProjectStaff()"/></span>
+		<span class="button" style="padding-left:60%" ><input class="delete" type="button" value="Close" onclick="$('#addProjectStaff').dialog('close')"/></span>
+</div>
+</div>
+<div id="createPerson" style="display: none;" title="Create New Staff">
+<g:formRemote method="post" before="return validateCreateForm()" name="createForm" url="${[action:'savePerson']}" >
+                <input type="hidden" name="projectId" value="${projectId}" />
+                <div class="dialog">
+                    <table>
+                        <tbody>
+                        
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="firstName">Company:</label>
+                                </td>
+                                <td valign="top" class="value ">
+                                
+								<select name="company" id="companyId">
+								<option value="" selected="selected">Please Select</option>
+	                                <g:each in="${projectCompanies}" status="i" var="company">
+	                                	<option value="${company?.partyIdTo.id}">${company?.partyIdTo}</option>
+	                                </g:each>
+                                </select>
+                                </td>
+                            </tr> 
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="firstName">First Name:</label>
+                                </td>
+                                <td valign="top" class="value ">
+                                    <input type="text" maxlength="64" id="firstName" name="firstName" value=""/>
+                                </td>
+                            </tr> 
+                        
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="lastName">Last Name:</label>
+                                </td>
+                                <td valign="top" class="value">
+                                    <input type="text" maxlength="64" id="lastName" name="lastName" value=""/>
+                                </td>
+                            </tr> 
+                        
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="nickName">Nick Name:</label>
+                                </td>
+                                <td valign="top" class="value ">
+                                    <input type="text" maxlength="64" id="nickName" name="nickName" value=""/>
+                                </td>
+                            </tr> 
+                        	 <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="title">Title:</label>
+                                </td>
+                                <td valign="top" class="value">
+                                    <input type="text" maxlength="34" id="title" name="title" value=""/>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="active">Active:</label>
+                                </td>
+                                <td valign="top" class="value ">
+                                <select name="active" id="active" >
+                                <g:each in="${Person.constraints.active.inList}" status="i" var="active">
+                                	<option value="${active}">${active}</option>
+                                </g:each>
+                                </select>
+                                </td>
+                            </tr> 
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="active">Role:</label>
+                                </td>
+                                <td valign="top" class="value ">
+                               <tds:personRoleSelect name="roleType" id="roleType" optionKey="id" from="${RoleType.list()}" value="${roleType?.id}" isNew="true" ></tds:personRoleSelect>
+                                </td>
+                            </tr> 
+                        
+                        </tbody>
+                    </table>
+                </div>
+                <div class="buttons">
+                    <span class="button"><input type="submit" class="save" value="Create"  /></span>
+                </div>
+            </g:formRemote>
+</div>
 </body>
 </html>

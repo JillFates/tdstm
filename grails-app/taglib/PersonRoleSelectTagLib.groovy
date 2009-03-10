@@ -63,7 +63,7 @@ class PersonRoleSelectTagLib {
         if ( isNew && isNew == "true" )
         {
         	writer << '<option '
-        	writeValueAndCheckIfSelected( "Please Select", null, writer )
+        	writeValueAndCheckIfSelected( "null", null, writer )
         	writer << '>'
         	def message = "Please Select"
             if (message != null) {
