@@ -2,11 +2,10 @@ import org.springframework.beans.SimpleTypeConverter
 
 import org.springframework.web.servlet.support.RequestContextUtils as RCU
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
-
-/**
- * @author Mihai CAZACU (cazacugmihai [at] yahoo [dot] com)
+/*
+ *  Tag library for PersonRole select
  */
-class SelectTagLib {
+class PersonRoleSelectTagLib {
 
     static namespace = 'tds'
     def out // to facilitate testing 
