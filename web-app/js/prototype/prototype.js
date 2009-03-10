@@ -3933,9 +3933,9 @@ Object.extend(Event, (function() {
       event.memo = memo || { };
 
       if (document.createEvent) {
-        element.dispatchEvent(event);
+        //element.dispatchEvent(event);
       } else {
-        element.fireEvent(event.eventType, event);
+        //element.fireEvent(event.eventType, event);
       }
 
       return event;
