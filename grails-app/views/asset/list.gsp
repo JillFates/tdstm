@@ -53,8 +53,13 @@
       document.getElementById('assetTagD').value = asset.assetTag
       document.getElementById('serialNumbers').value = asset.serialNumber
       document.getElementById('serialNumberD').value = asset.serialNumber
+      if(asset.deviceFunction == null){
+      document.getElementById('deviceFunctions').value = ""
+      document.getElementById('deviceFunctionD').value = ""
+      }else{
       document.getElementById('deviceFunctions').value = asset.deviceFunction
       document.getElementById('deviceFunctionD').value = asset.deviceFunction
+      }
 
       $("#dialog").dialog('option', 'width', 400)
       $("#dialog").dialog("open")
