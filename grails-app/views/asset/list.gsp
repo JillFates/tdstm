@@ -173,7 +173,7 @@
 
               <tr id="${k}" onClick="setRowId(this)" onmouseover="style.backgroundColor='#87CEEE';" onmouseout="style.backgroundColor='white';">
 
-                <td><g:remoteLink controller="asset" action="editShow" id="${assetInstance.id}"  onComplete = "showAssetDialog( e );"><img src="../images/asset_view.png" border="0"> </g:remoteLink></td>
+                <td><g:remoteLink controller="asset" action="editShow" id="${assetInstance.id}"  onComplete = "showAssetDialog( e );"><img src="/tds/images/asset_view.png" border="0px"></g:remoteLink></td>
 
                 <td>${fieldValue(bean:assetInstance, field:'assetType')}</td>
 
@@ -311,11 +311,8 @@
     </div>
 
     <div id="dialog2" title="Create Asset" style="display:none;">
-      <div class="dialog">
-        <h1>Create Asset</h1>
-        <g:if test="${flash.message}">
-          <div class="message">${flash.message}</div>
-        </g:if>
+      <div class="dialog">        
+       
         <g:form action="save" method="post" >
           <div class="dialog">
             <table>
