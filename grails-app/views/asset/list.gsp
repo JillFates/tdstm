@@ -155,12 +155,12 @@
           <thead>
             <tr>
 
-              <g:sortableColumn property="id" title="Id" />
+              <th>Show</th>
 
               <th>Asset Type</th>
 
               <g:sortableColumn property="assetName" title="Asset Name" />
-
+              
               <g:sortableColumn property="assetTag" title="Asset Tag" />
 
               <g:sortableColumn property="serialNumber" title="Serial Number" />
@@ -172,7 +172,8 @@
             <g:each in="${assetInstanceList}" status="i" var="assetInstance">
 
               <tr id="${k}" onClick="setRowId(this)" onmouseover="style.backgroundColor='#87CEEE';" onmouseout="style.backgroundColor='white';">
-                <td><g:remoteLink controller="asset" action="editShow" id="${assetInstance.id}"  onComplete ="showAssetDialog( e );">${fieldValue(bean:assetInstance, field:'id')}</g:remoteLink></td>
+
+                <td><g:remoteLink controller="asset" action="editShow" id="${assetInstance.id}"  onComplete = "showAssetDialog( e );"><img src="../images/asset_view.png" border="0"> </g:remoteLink></td>
 
                 <td>${fieldValue(bean:assetInstance, field:'assetType')}</td>
 
