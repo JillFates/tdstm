@@ -46,6 +46,10 @@ println "\n\n ROLE TYPES \n\n"
         applicationRole.id ="APP_ROLE"
         applicationRole.save( insert:true )
 
+	    def teamRole = new RoleType( description:"Party : Team" )
+        teamRole.id ="APP_ROLE"
+        teamRole.save( insert:true )
+
 	    def techRole = new RoleType( description:"Staff : Technician" )
         techRole.id = "TECH"
         techRole.save( insert:true )
@@ -175,7 +179,7 @@ println "\n\nPERSONS\n\n"
 		// -------------------------------
 		def personJohn = new Person( firstName:'John', lastName:'Doherty', title:'Project Manager', 
 			partyType:personPartyType ).save()
-		def personRalph = new Person( firstName:'Ralph', lastName:'King', title:'Move Manager', 
+		def personJimL = new Person( firstName:'Jim', lastName:'Laucher', title:'Tech', 
 			partyType:personPartyType ).save()
 		def personLisa = new Person( firstName:'Lisa', lastName:'Angel', title:'Move Manager', 
 			partyType:personPartyType ).save()
@@ -185,7 +189,7 @@ println "\n\nPERSONS\n\n"
 			partyType:personPartyType ).save()
 		def personRobin = new Person( firstName:'Robin', lastName:'Banks', title:'Project Manager', 
 			partyType:personPartyType ).save()
-		def personAnna = new Person( firstName:'Anna', lastName:'Graham',title:'Logistics Coordinator', 
+		def personAnna = new Person( firstName:'Anna', lastName:'Graham',title:'Sys Opp', 
 			partyType:personPartyType ).save()
 		def personReddy = new Person( firstName:'Lokanath', lastName:'Reddy',title:'Tech Lead', 
 			partyType:personPartyType ).save()
@@ -207,7 +211,7 @@ println "\n\n USER DETAILS\n\n"
 		// -------------------------------
 	    def adminUserLisa = new UserLogin( person:personLisa, username: "lisa", password:new Sha1Hash("admin").toHex(), active:'Y'  ).save()
 	    def userJohn = new UserLogin( person:personJohn, username: "john", password:new Sha1Hash("admin").toHex(), active:'Y' ).save()
-	    def normalUserRalph = new UserLogin( person:personRalph, username:"ralph", password:new Sha1Hash("user").toHex(), active:'Y' ).save()
+	    def normalUserRalph = new UserLogin( person:personJimL, username:"ralph", password:new Sha1Hash("user").toHex(), active:'Y' ).save()
 
 println "\n\n PARTY GROUPS \n\n" 		
 
@@ -264,7 +268,7 @@ println "\n\n PARTY ROLES \n\n"
 		// -------------------------------
 		// Create PartyRole Details
 		// -------------------------------
-	    def partyRoleForRalph = new PartyRole( party:personRalph, roleType:userRole ).save( insert:true )
+	    def partyRoleForRalph = new PartyRole( party:personJimL, roleType:userRole ).save( insert:true )
 	    def partyRoleForLisa = new PartyRole( party:personLisa, roleType:userRole ).save( insert:true )
 	    def partyRoleForJohn = new PartyRole( party:personJohn, roleType:adminRole ).save( insert:true )
 	    def projectAdminPartyRoleForJohn = new PartyRole( party:personJohn, roleType:projectAdminRole ).save( insert:true )
@@ -310,10 +314,10 @@ println "\n\n PARTY RELATIONSHIPS \n\n"
 			// Staff
 			[ staffType, tds, companyRole, personJohn, staffRole ],
 			[ staffType, tds, companyRole, personTim, staffRole ],
-			[ staffType, tds, companyRole, personRalph, staffRole ],
+			[ staffType, tds, companyRole, personJimL, staffRole ],
+			[ staffType, tds, companyRole, personAnna, staffRole ],
 			[ staffType, emc, companyRole, personLisa, staffRole ],
 			[ staffType, emc, companyRole, personRobin, staffRole ],
-			[ staffType, emc, companyRole, personAnna, staffRole ],
 			[ staffType, sigma, companyRole, personReddy, staffRole ],
 			[ staffType, cedars, companyRole, personGeorge, staffRole ],
 			[ staffType, cedars, companyRole, personNBonner, staffRole ],
@@ -329,6 +333,9 @@ println "\n\n PARTY RELATIONSHIPS \n\n"
 			[ projStaffType, cedarsProject, projectRole, personRobin, pmRole ],
 			[ projStaffType, cedarsProject, projectRole, personJohn, moveMgrRole ],
 			[ projStaffType, cedarsProject, projectRole, personGeorge, networkAdminRole ],
+			[ projStaffType, cedarsProject, projectRole, personAnna, techRole ],
+			[ projStaffType, cedarsProject, projectRole, personAnna, personJimL ],
+
 			// Application / staff relationships
 			[ appRelaType, raiserApp, applicationRole, personNBonner, appOwnerRole ],
 			[ appRelaType, raiserApp, applicationRole, personAMaslac, appSMERole ],
