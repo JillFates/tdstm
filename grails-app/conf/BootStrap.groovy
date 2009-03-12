@@ -47,7 +47,7 @@ println "\n\n ROLE TYPES \n\n"
         applicationRole.save( insert:true )
 
 	    def teamRole = new RoleType( description:"Party : Team" )
-        teamRole.id ="APP_ROLE"
+        teamRole.id ="TEAM"
         teamRole.save( insert:true )
 
 	    def techRole = new RoleType( description:"Staff : Technician" )
@@ -334,7 +334,7 @@ println "\n\n PARTY RELATIONSHIPS \n\n"
 			[ projStaffType, cedarsProject, projectRole, personJohn, moveMgrRole ],
 			[ projStaffType, cedarsProject, projectRole, personGeorge, networkAdminRole ],
 			[ projStaffType, cedarsProject, projectRole, personAnna, techRole ],
-			[ projStaffType, cedarsProject, projectRole, personAnna, personJimL ],
+			[ projStaffType, cedarsProject, projectRole, personJimL, techRole ],
 
 			// Application / staff relationships
 			[ appRelaType, raiserApp, applicationRole, personNBonner, appOwnerRole ],
