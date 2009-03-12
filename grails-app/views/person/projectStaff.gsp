@@ -22,7 +22,12 @@
 	      	});
 	    
 	    $(document).ready(function(){
-		        $("#addProjectStaff").dialog({ autoOpen: false });
+	    		if('${submit}'){
+				    $("#addProjectStaff").dialog({ autoOpen: true });
+				    $("#addProjectStaff").dialog('option', 'width', 650)
+		        } else {
+		        	$("#addProjectStaff").dialog({ autoOpen: false });
+		        }
 	      	});
 	    $(document).ready(function(){
 		        $("#createPerson").dialog({ autoOpen: false });
@@ -44,8 +49,9 @@
 		      	document.editForm.nickName.value = person.nickName
 		      	document.editForm.title.value = person.title
 		      	document.editForm.active.value = person.active
+		      	document.editForm.roleType.value = person.role
 		      
-		      	$("#editPerson").dialog('option', 'width', 300)
+		      	$("#editPerson").dialog('option', 'width', 350)
 				$("#editPerson").dialog( "open" );
 		
 		 	}
@@ -69,15 +75,38 @@
 					alert("Please Select Role");
 					return false;
 				}else{
-					return true					
+					return true;					
 				}
 		 	}
 		 	// function to validate CreateForm
 		 	function validateCreateForm(){
 		 		
 		 		var firstName = document.createForm.firstName.value;
+		 		var roleType = document.createForm.roleType.value;
 				if( firstName != "" ){
-					return true
+					if(roleType != "null" && roleType != ""){
+						return true;
+					}else{
+						alert("please select Role ");
+						return false;
+					}
+				}else{
+					alert("First Name can not be Blank");
+					return false;					
+				}
+		 	}
+		 	// function to validate CreateForm
+		 	function validateEditForm(){
+		 		
+		 		var firstName = document.editForm.firstName.value;
+		 		var roleType = document.editForm.roleType.value;
+				if( firstName != "" ){
+					if(roleType != "null" && roleType != ""){
+						return true;
+					}else{
+						alert("please select Role ");
+						return false;
+					}
 				}else{
 					alert("First Name can not be Blank");
 					return false;					
@@ -121,7 +150,7 @@
 		<g:each in="${projectStaff}" status="i" var="projectStaff">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-				<td><g:remoteLink controller="person" action="editStaff" id="${projectStaff?.staff.id}" onComplete ="editPersonDialog( e );">${projectStaff?.name}</g:remoteLink></td>
+				<td><g:remoteLink controller="person" action="editStaff" id="${projectStaff?.staff.id}" params="[role:projectStaff?.role.id]" onComplete ="editPersonDialog( e );">${projectStaff?.name}</g:remoteLink></td>
 
 				<td>${projectStaff?.company[0]}</td>
 				
@@ -136,8 +165,8 @@
 		<span class="button"><input type="button" class="create" value="Add" onclick="showAddProjectStaff()"/></span>
 	</div>
 </div>
-<div id="editPerson" style="display: none;">
-            <g:form method="post" action="updateStaff" name="editForm" >
+<div id="editPerson" style="display: none;" title="Edit Staff">
+            <g:form method="post" action="updateStaff" name="editForm" onsubmit="return validateEditForm()">
                 <input type="hidden" name="id" value="" />
                 <input type="hidden" name="projectId" value="${projectId}" />
                 <div class="dialog">
@@ -189,6 +218,14 @@
                                 </g:each>
                                 </select>
                                 </td>
+                            </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="active">Role:</label>
+                                </td>
+                                <td valign="top" class="value ">
+                               <tds:personRoleSelect name="roleType" id="roleType" optionKey="id" from="${RoleType.list()}" value="${roleType?.id}" isNew="true" ></tds:personRoleSelect>
+                                </td>
                             </tr> 
                         
                         </tbody>
@@ -215,7 +252,7 @@
 	</thead>
 	<tbody>
 		<g:each in="${companiesStaff}" status="i" var="companiesStaff">
-		<g:formRemote method="post" before="return addProjectStaff($i)" name="addSatffForm_$i" url="${[action:'saveProjectStaff']}" onComplete="test(e);">
+		<g:formRemote method="post" before="return addProjectStaff($i)" name="addSatffForm_$i" url="${[action:'saveProjectStaff']}" >
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 				<input type="hidden" name="projectId" value="${projectId}">
 				<td>${companiesStaff?.company[0]}</td>
@@ -237,7 +274,7 @@
 </div>
 	<div class="buttons" style="width: 99%">
 		<span class="button"><input class="create"	type="button" value="Create New Staff" onclick="createProjectStaff()"/></span>
-		<span class="button" style="padding-left:60%" ><input class="delete" type="button" value="Close" onclick="$('#addProjectStaff').dialog('close')"/></span>
+		<span class="button" style="padding-left:55%" ><input class="delete" type="button" value="Close" onclick="$('#addProjectStaff').dialog('close')"/></span>
 </div>
 </div>
 <div id="createPerson" style="display: none;" title="Create New Staff">

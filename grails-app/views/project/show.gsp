@@ -48,20 +48,10 @@
       // The response comes back as a bunch-o-JSON
       //alert("make sure that the project isn't saved with a staff member from the previous partner");
       if(confirm(" Partner has been changed, Make sure that do you want to change the staff members ")){
-      var managers = eval("(" + e.responseText + ")")
+      
       // evaluate JSON
       var rselect = document.getElementById('projectManagerId')
       var mselect = document.getElementById('moveManagerId')
-      // Clear all previous options
-      var l = rselect.length
-      var compSatff = document.getElementById('companyManagersId').value
-      while (l > compSatff) {
-      l--
-      rselect.remove(l)
-      mselect.remove(l)
-      }
-      // Rebuild the select
-      if (managers) {
       var projectPartner = document.getElementById('projectPartnerId');
       var projectPartnerVal = projectPartner[document.getElementById('projectPartnerId').selectedIndex].innerHTML;
 
@@ -97,15 +87,27 @@
       rselect.appendChild(pmOptgroup) // IE only
       mselect.appendChild(mmOptgroup)
       }
+      // Clear all previous options
+      var l = rselect.length
+      var compSatff = document.getElementById('companyManagersId').value
+      while (l > compSatff) {
+      l--
+      rselect.remove(l)
+      mselect.remove(l)
+      }
+      
+      var managers = eval("(" + e.responseText + ")")
+      // Rebuild the select
+      if (managers) {
 
       var length = managers.items.length
       for (var i=0; i < length; i++) {
       var manager = managers.items[i]
       var popt = document.createElement('option');
-      popt.text = manager.name
+      popt.innerHTML = manager.name
       popt.value = manager.id
       var mopt = document.createElement('option');
-      mopt.text = manager.name
+      mopt.innerHTML = manager.name
       mopt.value = manager.id
       try {
       pmOptgroup.appendChild(popt, null) // standards compliant; doesn't work in IE

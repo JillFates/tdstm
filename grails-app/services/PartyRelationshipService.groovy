@@ -26,6 +26,16 @@ class PartyRelationshipService {
         return company
     }
     /*
+     *  Method will return Company Staff
+     */
+    def getCompanyStaff( def companyId ){
+    	
+    	def query = "from Person s where s.id in (select p.partyIdTo from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $companyId and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ) "
+    	def personInstanceList = Person.findAll( query )
+    	
+    	return personInstanceList
+    }
+    /*
      *  method to return list of companies
      */
     def getCompaniesList(){
@@ -36,38 +46,30 @@ class PartyRelationshipService {
     }
     
     /*
-     *  Method to Update Staff Company
+     *  Method to Update  the roleTypeTo 
      */
-    def updateStaffCompany( def staff, def companyId ){
-    	
-    	if ( companyId != "" && companyId != null ){
-    		
-    		def staffCompanyRel = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $companyId and p.partyIdTo = $staff.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-    		def companyParty = Party.findById( companyId )
-    		def relationshipType = PartyRelationshipType.findById( "STAFF" )
-    		def roleTypeTo = RoleType.findById( "STAFF" )
-    		def roleTypeFrom = RoleType.findById( "COMPANY" )
-    		// condition to check whether partner has changed or not
-    		if ( staffCompanyRel == null ) {
-        		def otherCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-                if ( otherCompany != null && otherCompany != "" ) {
-                    //	Delete existing partner and reinsert new partner For Project, if partner changed
-                    otherCompany.delete()
-                    def staffRel = new PartyRelationship( partyRelationshipType:relationshipType, partyIdFrom:companyParty, roleTypeCodeFrom:roleTypeFrom, partyIdTo:staff, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" ).save( insert:true )
+    def updatePartyRelationshipRoleTypeTo( def relationshipType, def partyFrom, def roleTypeIdFrom, def partyTo, def roleTypeIdTo ){
+    	if(roleTypeIdTo != null && roleTypeIdTo != ""){
+    		def partyRelationship = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$relationshipType' and p.partyIdFrom = $partyFrom.id and p.partyIdTo = $partyTo.id and p.roleTypeCodeFrom = '$roleTypeIdFrom' and p.roleTypeCodeTo = '$roleTypeIdTo' ")
+    		def partyRelationshipType = PartyRelationshipType.findById( relationshipType )
+    		def roleTypeTo = RoleType.findById( roleTypeIdTo )
+    		def roleTypeFrom = RoleType.findById( roleTypeIdFrom )
+    		if ( partyRelationship == null ) {
+    			def otherRole = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$relationshipType' and p.partyIdFrom = $partyFrom.id and p.partyIdTo = $partyTo.id and p.roleTypeCodeFrom = '$roleTypeIdFrom' ")
+                if ( otherRole != null && otherRole != "" ) {
+                    otherRole.delete()
+                    def newPartyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, partyIdFrom:partyFrom, roleTypeCodeFrom:roleTypeFrom, partyIdTo:partyTo, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" ).save( insert:true )
                 } else {
-                	
-                    // Create Partner if there is no partner for this project
-                    def staffRel = new PartyRelationship( partyRelationshipType:relationshipType, partyIdFrom:companyParty, roleTypeCodeFrom:roleTypeFrom, partyIdTo:staff, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" ).save( insert:true )
+                    def newPartyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, partyIdFrom:partyFrom, roleTypeCodeFrom:roleTypeFrom, partyIdTo:partyTo, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" ).save( insert:true )
                 }
     		}
-    	} else {
-    		//	if user select a blank then remove Partner
-    		def otherCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-            if ( otherCompany != null && otherCompany != "" ) {
-            	otherCompany.delete()
+    	} 
+    	/*else {
+    		def otherRole = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$relationshipType' and p.partyIdFrom = $partyFrom.id and p.partyIdTo = $partyTo.id and p.roleTypeCodeFrom = '$roleTypeIdFrom'")
+    		if ( otherRole != null && otherRole != "" ) {
+    			otherRole.delete()
             }
-    	}
-    
+		}*/
     }
     
     /*

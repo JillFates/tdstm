@@ -14,8 +14,7 @@ class PersonController {
         def personInstanceList
         if ( companyId!= null && companyId != "" ) {
         	
-	        def query = "from Person s where s.id in (select p.partyIdTo from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $companyId and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ) "
-	        personInstanceList = Person.findAll( query )
+        	personInstanceList = partyRelationshipService.getCompanyStaff( companyId )
         }
 		return [ personInstanceList: personInstanceList, companyId:companyId ]
     }
@@ -134,9 +133,17 @@ class PersonController {
     }
     //ajax overlay for Edit
     def editStaff = {
-        
+        def map = new HashMap()
         def personInstance = Person.get( params.id )
-        render personInstance as JSON
+        def role = params.role
+        	map.put("id", personInstance.id)
+        	map.put("firstName", personInstance.firstName)
+        	map.put("lastName", personInstance.lastName)
+        	map.put("nickName", personInstance.nickName)
+        	map.put("title", personInstance.title)
+        	map.put("active", personInstance.active)
+        	map.put("role", role)
+        render map as JSON
     }
 	/*
 	 *  Remote method to update Staff Details
@@ -144,10 +151,13 @@ class PersonController {
 	def updateStaff = {
     	def personInstance = Person.get( params.id )
     	def projectId = params.projectId
+    	def roleType = params.roleType
     	personInstance.lastUpdated = new Date()
     	if(personInstance) {
     		personInstance.properties = params
             if ( !personInstance.hasErrors() && personInstance.save() ) {
+	            def projectParty = Project.findById(projectId)
+	            def partyRelationship = partyRelationshipService.updatePartyRelationshipRoleTypeTo("PROJ_STAFF", projectParty, 'PROJECT', personInstance, roleType)
             	flash.message = "Person ${params.firstName} updated"
                 redirect( action:projectStaff, params:[ projectId:projectId ])
             } else {
@@ -164,23 +174,24 @@ class PersonController {
 	 */
 	def projectStaff = {
 		def projectId = params.projectId
+		def submit = params.submit
 		def projectStaff = partyRelationshipService.getProjectStaff( projectId )
 		def companiesStaff = partyRelationshipService.getProjectCompaniesStaff( projectId )
 		def projectCompanies = partyRelationshipService.getProjectCompanies( projectId )
-		return [ projectStaff:projectStaff, companiesStaff:companiesStaff, projectCompanies:projectCompanies, projectId:projectId  ]
+		return [ projectStaff:projectStaff, companiesStaff:companiesStaff, projectCompanies:projectCompanies, projectId:projectId, submit:submit ]
 	}
 	/*
-	 *	Method to add project Staff through Ajax Overlay 
+	 *	Method to add Staff to project through Ajax Overlay 
 	 */
 	def saveProjectStaff = {
     	def projectId = params.projectId
     	def personId = params.person
     	def roleType = params.roleType
+    	def submit = params.submit
     	def projectParty = Project.findById( projectId )
     	def personParty = Person.findById( personId )
     	def projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
-    	redirect(action:'projectStaff', params:[projectId:projectId] )
-    	
+    	redirect(action:'projectStaff', params:[projectId:projectId, submit:submit] )
     }
 	/*
 	 * Method to save person detais and create party relation with Project as well 
@@ -202,11 +213,11 @@ class PersonController {
 				def partyRelationship = partyRelationshipService.savePartyRelationship( "PROJ_STAFF", projectParty, "PROJECT", personInstance, roleType )
 			}
 			flash.message = "Person ${personInstance.id} created"
-			redirect( action:'projectStaff', params:[ projectId:projectId ] )
+			redirect( action:'projectStaff', params:[ projectId:projectId, submit:'Add' ] )
 		}
 		else {
 			flash.message = " Person FirstName cannot be blank. "
-			redirect( action:'projectStaff', params:[ projectId:projectId ] )
+			redirect( action:'projectStaff', params:[ projectId:projectId,submit:'Add' ] )
 		}
     }	
 }
