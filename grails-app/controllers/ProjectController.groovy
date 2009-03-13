@@ -309,6 +309,7 @@ class ProjectController {
         def partner = params.partner
         def partnerManagers
         def items = []
+        def json = []
         def partnersMap = new HashMap()
         if ( partner != "" && partner != null ) {
             def partnerParty = PartyGroup.findById( partner ).id
@@ -319,9 +320,10 @@ class ProjectController {
                 items <<[id:PartyRelationship.partyIdTo.id, name:PartyRelationship.partyIdTo.lastName +", "+PartyRelationship.partyIdTo.firstName+" - "+PartyRelationship.partyIdTo.title]
 	             
             }
-            def json=[ identifier:"id", items:items ]
-            render json as JSON
+            json = [ identifier:"id", items:items ]
+            
         }
+        render json as JSON
     }
     
     def cancel = {

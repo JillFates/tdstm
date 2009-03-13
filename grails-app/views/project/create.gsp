@@ -85,7 +85,10 @@
       function initialize(){
 	      // This is called when the page loads to initialize Managers
 	      var partnerselect = document.getElementById('projectPartnerId')
-	      ${remoteFunction(action:'getPartnerStaffList', params:'\'partner=\' + partnerselect.value', onComplete:'appendPartnerStaff(e)')}
+	      var partnerVal = partnerselect.value 
+	      if(partnerVal != ""){
+	      	${remoteFunction(action:'getPartnerStaffList', params:'\'partner=\' + partnerVal', onComplete:'appendPartnerStaff(e)')}
+	      }
       }
       function textCounter(field, maxlimit) {
 	      if (field.value.length > maxlimit) // if too long...trim it!
