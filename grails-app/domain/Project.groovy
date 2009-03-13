@@ -5,10 +5,12 @@ class Project extends PartyGroup {
 	String trackChanges
 	Date startDate	// Date that the project will start
 	Date completionDate	// Date that the project will finish
+	Party client
 
 	static constraints = {
 		name( ) // related party Group
-		projectCode( blank:false, nullable:false, unique:true )
+		projectCode( blank:false, nullable:false,unique:'client' )
+		client( blank:false, nullable:false)
 		description( blank:true, nullable:true )
 		trackChanges( blank:false, nullable:false, inList:['Y', 'N'] )
 		startDate( blank:true, nullable:true )

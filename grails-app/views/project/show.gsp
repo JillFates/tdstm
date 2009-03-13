@@ -165,7 +165,7 @@
           <tr class="prop">
             <td valign="top" class="name">Associated Client:</td>
 
-            <td valign="top" class="value">${projectClient?.partyIdTo}</td>
+            <td valign="top" class="value">${projectInstance?.client}</td>
 
           </tr>
 

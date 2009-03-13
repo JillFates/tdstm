@@ -147,10 +147,10 @@
 	<table>
 		<tbody>
 			<tr class="prop">
-				<td valign="top" class="name"><label for="projectClient">Client:</label>
+				<td valign="top" class="name"><label for="client">Client:</label>
 				</td>
-				<td valign="top" class="value"><select id="projectClient"
-					name="projectClient">
+				<td valign="top" class="value"><select id="client"
+					name="client.id">
 					<g:each status="i" in="${clients}" var="clients">
 						<option value="${clients.partyIdTo.id}">${clients.partyIdTo}</option>
 					</g:each>
