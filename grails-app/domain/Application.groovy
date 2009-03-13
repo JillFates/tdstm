@@ -11,10 +11,11 @@ class Application extends PartyGroup {
 	static constraints = {
 		owner(blank:false, nullable:false)	
 		name(blank:false, nullable:false) // related party Group
-		appCode(blank:false, nullable:false	)
+		appCode(blank:false, nullable:false,unique:'owner') // appCode is unique for each companyId (companyId + appCode) 
 		environment (
 			blank:false, nullable:false, 
 			inList:["Production", "Test", "Staging", "Development", "Other"]
+		
 		)
 		dateCreated( ) // related to party
 		lastUpdated( ) // related to party
@@ -25,13 +26,13 @@ class Application extends PartyGroup {
 		id column: 'app_id'
 		columns {
 			trackChanges sqlType: 'char(1)'
-			code sqlType: 'varchar(20)', index: 'project_projectcode_idx', unique: true
+            code sqlType: 'varchar(20)', index: 'project_projectcode_idx', unique: true
 		}
 	}
 	
 	// TODO : Add unique validation on CompanyId + appCode
 	
 	String toString() {
-		"$name ($projectCode)"
+		"$name ($appCode)"
 	}
 }
