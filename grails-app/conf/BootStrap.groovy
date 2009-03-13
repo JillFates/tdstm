@@ -239,9 +239,9 @@ println "\n\n PARTY GROUPS \n\n"
 		// -------------------------------
 		// Create Projects
 		// -------------------------------
-		def cedarsProject = new Project( name:"Cedars-Sinai Move 1", projectCode:'CS1', 
+		def cedarsProject = new Project( name:"Cedars-Sinai Move 1", projectCode:'CS1', client:cedars,
 			description:'100 servers', trackChanges:'Y', partyType:groupPartyType ).save();
-		def twProject = new Project( name:"Time Warner VA Move", projectCode:'TM-VA-1', 
+		def twProject = new Project( name:"Time Warner VA Move", projectCode:'TM-VA-1', client:timeWarner,
 			description:'500 servers', trackChanges:'N', partyType:groupPartyType ).save();
 
 			
