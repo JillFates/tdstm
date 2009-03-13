@@ -11,7 +11,7 @@
 		<ul>
 			<li><g:link class="home" controller="partyGroup" action="show" id="${partyGroupInstance?.id}">Company</g:link></li>
 			<li><g:link class="home" controller="person" id="${partyGroupInstance?.id}">Staff</g:link></li>
-			<li><a href="#">Applications </a></li>
+			<li><g:link class="home" controller="application" id="${partyGroupInstance?.id}">Applications </g:link></li>
 			<li><a href="#">Locations </a></li>
 			<li><a href="#">Rooms </a></li>
 		</ul>
