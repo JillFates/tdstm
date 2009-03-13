@@ -1,7 +1,7 @@
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 class CustomTagLib {
-	static namespace = 'my'
+	static namespace = 'tds'
 
 	def convertDate = { attrs ->
 	Date dt = attrs['date'];

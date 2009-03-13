@@ -38,9 +38,9 @@
                              </td>
                             <td><g:link action="edit" id="${partyGroupInstance.id}" title="Edit  '${fieldValue(bean:partyGroupInstance, field:'name')}'">${fieldValue(bean:partyGroupInstance, field:'name')}</g:link></td>
                         
-                            <td><my:convertDateTime date="${partyGroupInstance?.dateCreated}"/></td>
+                            <td><tds:convertDateTime date="${partyGroupInstance?.dateCreated}"/></td>
                         
-                            <td><my:convertDateTime date="${partyGroupInstance?.lastUpdated}" /></td>
+                            <td><tds:convertDateTime date="${partyGroupInstance?.lastUpdated}" /></td>
                         	
                         </tr>
                     </g:each>

@@ -140,7 +140,7 @@
         <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:projectInstance?.id]" >Staff</g:link></li>
         <li><g:link class="home" controller="asset">Assets </g:link></li>
         <li><g:link class="home" controller="asset" action="assetImport" >Import/Export</g:link> </li>
-        <li><a href="#">Team </a></li>
+        <li><g:link class="home" controller="projectTeam" action="list" params="[projectId:projectInstance?.id]" >Team </g:link></li>
         <li><a href="#">Contacts </a></li>
         <li><a href="#">Applications </a></li>
         <li><a href="#">Move Bundles </a></li>
@@ -200,14 +200,14 @@
           <tr class="prop">
             <td valign="top" class="name">Start Date:</td>
 
-            <td valign="top" class="value"><my:convertDate date="${projectInstance?.startDate}" /></td>
+            <td valign="top" class="value"><tds:convertDate date="${projectInstance?.startDate}" /></td>
 
           </tr>
 
           <tr class="prop">
             <td valign="top" class="name">Completion Date:</td>
 
-            <td valign="top" class="value"><my:convertDate date="${projectInstance?.completionDate}" /></td>
+            <td valign="top" class="value"><tds:convertDate date="${projectInstance?.completionDate}" /></td>
 
           </tr>
 
@@ -243,14 +243,14 @@
             <td valign="top" class="name">
               <label for="dateCreated">Date Created:</label>
             </td>
-            <td valign="top" class="value"><my:convertDateTime date="${projectInstance?.dateCreated}" /> </td>
+            <td valign="top" class="value"><tds:convertDateTime date="${projectInstance?.dateCreated}" /> </td>
           </tr>
 
           <tr class="prop">
             <td valign="top" class="name">
               <label for="lastUpdated">Last Updated:</label>
             </td>
-            <td valign="top" class="value"><my:convertDateTime date="${projectInstance?.lastUpdated}" /> </td>
+            <td valign="top" class="value"><tds:convertDateTime date="${projectInstance?.lastUpdated}" /> </td>
           </tr>
 
         </tbody>
@@ -301,7 +301,7 @@ class="value ${hasErrors(bean:projectInstance,field:'startDate','errors')}">
                   <script type="text/javascript" charset="utf-8">
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                   </script>
-                  <input type="text" class="dateRange" size="15" style="width:112px;height:14px;" name="startDate" value="<my:convertDate date="${projectInstance?.startDate}"/>" onchange="setCompletionDate(this.value)">
+                  <input type="text" class="dateRange" size="15" style="width:112px;height:14px;" name="startDate" value="<tds:convertDate date="${projectInstance?.startDate}"/>" onchange="setCompletionDate(this.value)">
 <g:hasErrors
                     bean="${projectInstance}" field="startDate">
                     <div class="errors"><g:renderErrors bean="${projectInstance}"
@@ -318,7 +318,7 @@ class="value ${hasErrors(bean:projectInstance,field:'completionDate','errors')}"
                   <script type="text/javascript" charset="utf-8">
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                   </script>
-                  <input type="text" class="dateRange" size="15" style="width:112px;height:14px;" id="completionDateId" name="completionDate" value="<my:convertDate date="${projectInstance?.completionDate}"/>">
+                  <input type="text" class="dateRange" size="15" style="width:112px;height:14px;" id="completionDateId" name="completionDate" value="<tds:convertDate date="${projectInstance?.completionDate}"/>">
 
 <g:hasErrors bean="${projectInstance}" field="completionDate">
                     <div class="errors"><g:renderErrors bean="${projectInstance}"
@@ -398,14 +398,14 @@ class="value ${hasErrors(bean:projectInstance,field:'completionDate','errors')}"
                 <td valign="top" class="name">
                   <label for="dateCreated">Date Created:</label>
                 </td>
-                <td valign="top" class="value"><my:convertDateTime date="${projectInstance?.dateCreated}" /> </td>
+                <td valign="top" class="value"><tds:convertDateTime date="${projectInstance?.dateCreated}" /> </td>
               </tr>
 
               <tr class="prop">
                 <td valign="top" class="name">
                   <label for="lastUpdated">Last Updated:</label>
                 </td>
-                <td valign="top" class="value"><my:convertDateTime date="${projectInstance?.lastUpdated}" /> </td>
+                <td valign="top" class="value"><tds:convertDateTime date="${projectInstance?.lastUpdated}" /> </td>
               </tr>
 
             </tbody>

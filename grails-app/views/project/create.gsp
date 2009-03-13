@@ -222,7 +222,7 @@
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                   </script> <input type="text" class="dateRange" size="15"
 					style="width: 112px; height: 14px;" name="startDate"
-					value="<my:convertDate date="${projectInstance?.startDate}"/>"
+					value="<tds:convertDate date="${projectInstance?.startDate}"/>"
 					onchange="setCompletionDate(this.value)"> <!--  <g:datePicker name="startDate" value="${projectInstance?.startDate}"
        noSelection="['':'']"></g:datePicker> --><g:hasErrors
 					bean="${projectInstance}" field="startDate">
@@ -243,7 +243,7 @@
                   </script> <input type="text" class="dateRange" size="15"
 					style="width: 112px; height: 14px;" id="completionDateId"
 					name="completionDate"
-					value="<my:convertDate date="${projectInstance?.completionDate}"/>">
+					value="<tds:convertDate date="${projectInstance?.completionDate}"/>">
 				<!--  <g:datePicker name="completionDate"
                     value="${projectInstance?.completionDate}" noSelection="['':'']"></g:datePicker> -->
 				<g:hasErrors bean="${projectInstance}" field="completionDate">

@@ -21,7 +21,7 @@
             <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
             <li><g:link class="home" controller="asset">Assets </g:link></li>
             <li><g:link class="home" controller="asset" action="assetImport" >Import/Export</g:link> </li>
-            <li><a href="#">Team </a></li>
+            <li><g:link class="home" controller="projectTeam" action="list" params="[projectId:currProjObj?.id]" >Team </g:link> </li>
             <li><a href="#">Contacts </a></li>
             <li><a href="#">Applications </a></li>
             <li><a href="#">Move Bundles </a></li>
@@ -67,9 +67,9 @@
 
 					<td>${fieldValue(bean:projectInstance, field:'name')}</td>
 
-					<td>${fieldValue(bean:projectInstance, field:'dateCreated')}</td>
+					<td><tds:convertDateTime date="${projectInstance?.dateCreated}"/> </td>
 
-					<td>${fieldValue(bean:projectInstance, field:'lastUpdated')}</td>
+					<td><tds:convertDateTime date="${projectInstance?.lastUpdated}"/></td>
 
 					<td>${fieldValue(bean:projectInstance, field:'comment')}</td>
 

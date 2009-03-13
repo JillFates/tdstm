@@ -49,14 +49,14 @@
                         <tr class="prop">
                             <td valign="top" class="name">Date Created:</td>
 
-                            <td valign="top" class="value"><my:convertDateTime date="${partyGroupInstance?.dateCreated}"/> </td>
+                            <td valign="top" class="value"><tds:convertDateTime date="${partyGroupInstance?.dateCreated}"/> </td>
 
                         </tr>
 
                         <tr class="prop">
                             <td valign="top" class="name">Last Updated:</td>
 
-                            <td valign="top" class="value"><my:convertDateTime date="${partyGroupInstance?.lastUpdated}" /> </td>
+                            <td valign="top" class="value"><tds:convertDateTime date="${partyGroupInstance?.lastUpdated}" /> </td>
 
                         </tr>
                     

@@ -140,7 +140,7 @@ class PartyRelationshipService {
     	return list
     }
     /*
-     * 
+     *  Will return the Companies list associated with the Project
      */
     def getProjectCompanies( def projectId ){
     	def projectCompanyQuery = "from PartyRelationship pr where pr.partyRelationshipType in ('PROJ_CLIENT','PROJ_COMPANY','PROJ_PARTNER','PROJ_VENDOR ') and pr.partyIdFrom = $projectId and pr.roleTypeCodeFrom = 'PROJECT'  "

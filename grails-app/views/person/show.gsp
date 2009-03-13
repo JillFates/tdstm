@@ -67,14 +67,14 @@
 		<tr class="prop">
 			<td valign="top" class="name">Date Created:</td>
 
-			<td valign="top" class="value"><my:convertDateTime date="${personInstance?.dateCreated}"/></td>
+			<td valign="top" class="value"><tds:convertDateTime date="${personInstance?.dateCreated}"/></td>
 
 		</tr>
 
 		<tr class="prop">
 			<td valign="top" class="name">Last Updated:</td>
 
-			<td valign="top" class="value"><my:convertDateTime date="${personInstance?.lastUpdated}" /></td>
+			<td valign="top" class="value"><tds:convertDateTime date="${personInstance?.lastUpdated}" /></td>
 
 		</tr>
 

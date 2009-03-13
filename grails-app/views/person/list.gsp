@@ -126,9 +126,9 @@ def userLogin = UserLogin.findByPerson(personInstance);
                             id="${personInstance.id}" params="[companyId:companyId]">CREATE</g:link>
                 </g:else></td>
 
-                <td><my:convertDateTime date="${personInstance?.dateCreated}" /></td>
+                <td><tds:convertDateTime date="${personInstance?.dateCreated}" /></td>
 
-                <td><my:convertDateTime date="${personInstance?.lastUpdated}" /></td>
+                <td><tds:convertDateTime date="${personInstance?.lastUpdated}" /></td>
 
               </tr>
             </g:each>

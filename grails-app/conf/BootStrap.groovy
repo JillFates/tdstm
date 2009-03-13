@@ -253,6 +253,16 @@ println "\n\n PARTY GROUPS \n\n"
 			appCode: "RE", environment:"Production", 
 			owner: cedars).save()
 		
+		println "\n\n PROJECT TEAM \n\n"
+		
+		// -------------------------------
+		// Create ProjectTeam
+		// -------------------------------
+		def cedarsGreenProjectTeam = new ProjectTeam( name: "Cedars's Green Team",	teamCode: "Green", project:cedarsProject, dateCreated: new Date()).save()
+		def cedarsRedProjectTeam = new ProjectTeam( name: "Cedars's Red Team",	teamCode: "Red", project:cedarsProject, dateCreated: new Date()).save()
+		def twGreenProjectTeam = new ProjectTeam( name: "TM's Green Team",	teamCode: "Green", project:twProject, dateCreated: new Date()).save()
+		def twRedProjectTeam = new ProjectTeam( name: "TM's Red Team",	teamCode: "Red", project:twProject, dateCreated: new Date()).save()
+		
 println "\n\n USER PREFERENCES \n\n" 		
 
 		// -------------------------------
@@ -346,7 +356,15 @@ println "\n\n PARTY RELATIONSHIPS \n\n"
 			[ projCompanyType, twProject, projectRole, tds, companyRole ],
 			[ projClientType, twProject, projectRole, timeWarner, clientRole ],
 			[ projStaffType, twProject, projectRole, personTim, pmRole ],
-			[ projStaffType, twProject, projectRole, personJohn, moveMgrRole ]
+			[ projStaffType, twProject, projectRole, personJohn, moveMgrRole ],
+
+			// Project Team Relationships with staff
+			[ teamType, cedarsGreenProjectTeam, teamRole, personJimL, techRole ],
+			[ teamType, cedarsGreenProjectTeam, teamRole, personAnna, moveMgrRole ],
+			[ teamType, cedarsRedProjectTeam, teamRole, personJimL, techRole ],
+			[ teamType, cedarsRedProjectTeam, teamRole, personJohn, moveMgrRole ],
+			[ teamType, twGreenProjectTeam, teamRole, personTim, pmRole ],
+			[ teamType, twGreenProjectTeam, teamRole, personJohn, moveMgrRole ]
 		]
 		// Save all the rows in list
 		def i = 0;
