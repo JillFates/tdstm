@@ -45,14 +45,7 @@ class PartyRelationshipService {
     	return applicationCompaniesStaff
     	
     }
-    //  Return the Persons List those are belongs to Company
-    def getCompanyStaff( def companyId ){
-        
-        def query = "from Person s where s.id in (select p.partyIdTo from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $companyId and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ) "
-        def personInstanceList = Person.findAll( query )
-        
-        return personInstanceList
-    }
+   
     /*
      *  method to return list of companies
      */
