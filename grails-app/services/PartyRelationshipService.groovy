@@ -39,7 +39,7 @@ class PartyRelationshipService {
      *  Return the Application staff
      */
     def getApplicationStaff( def companyId, def roleTypeTo ){
-    	def query = "from Person s where s.id in (select p.partyIdTo from PartyRelationship p where p.partyRelationshipType = 'APPLICATION'  and p.partyIdFrom = $companyId  )"
+    	def query = "from Person s where s.id in (select p.partyIdTo from PartyRelationship p where p.partyRelationshipType = 'APPLICATION'  and p.partyIdFrom = $companyId and p.roleTypeCodeTo = '$roleTypeTo' )"
     	def applicationCompaniesStaff = Person.findAll(query)
       
     	return applicationCompaniesStaff
