@@ -4,6 +4,7 @@
     <meta name="layout" content="main" />
     <title>Staff List</title>
     <g:javascript library="prototype" />
+    <g:javascript library="jquery"/>
 
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}"  />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
@@ -12,11 +13,11 @@
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}"  />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}"  />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
-    <script type="text/javascript" src="${createLinkTo(dir:'js',file:'jquery-1.3.1.js')}"></script>
-    <script type="text/javascript" src="${createLinkTo(dir:'js',file:'ui.core.js')}"></script>
-    <script type="text/javascript" src="${createLinkTo(dir:'js',file:'ui.draggable.js')}"></script>
-    <script type="text/javascript" src="${createLinkTo(dir:'js',file:'ui.resizable.js')}"></script>
-    <script type="text/javascript" src="${createLinkTo(dir:'js',file:'ui.dialog.js')}"></script>
+
+    <jq:plugin name="ui.core"/>
+    <jq:plugin name="ui.draggable"/>
+    <jq:plugin name="ui.resizable"/>
+    <jq:plugin name="ui.dialog"/>
 
     <script>
 
@@ -41,8 +42,13 @@
       document.editForm.firstName.value = person.firstName
       document.showForm.lastName.value = person.lastName
       document.editForm.lastName.value = person.lastName
+      if(person.nickName == null) {
+      document.showForm.nickName.value = ""
+      document.editForm.nickName.value = ""
+      } else {
       document.showForm.nickName.value = person.nickName
       document.editForm.nickName.value = person.nickName
+      }
       document.showForm.title.value = person.title
       document.editForm.title.value = person.title
       document.showForm.active.value = person.active

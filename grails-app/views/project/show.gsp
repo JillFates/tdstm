@@ -6,6 +6,7 @@
     <meta name="layout" content="main" />
     <title>Show Project</title>
     <g:javascript library="prototype" />
+    <g:javascript library="jquery"/>
 
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}"  />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
@@ -14,11 +15,11 @@
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}"  />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}"  />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
-    <script type="text/javascript" src="${createLinkTo(dir:'js',file:'jquery-1.3.1.js')}"></script>
-    <script type="text/javascript" src="${createLinkTo(dir:'js',file:'ui.core.js')}"></script>
-    <script type="text/javascript" src="${createLinkTo(dir:'js',file:'ui.draggable.js')}"></script>
-    <script type="text/javascript" src="${createLinkTo(dir:'js',file:'ui.resizable.js')}"></script>
-    <script type="text/javascript" src="${createLinkTo(dir:'js',file:'ui.dialog.js')}"></script>
+
+    <jq:plugin name="ui.core"/>
+    <jq:plugin name="ui.draggable"/>
+    <jq:plugin name="ui.resizable"/>
+    <jq:plugin name="ui.dialog"/>
     
     <script type="text/javascript">
       $(document).ready(function(){
