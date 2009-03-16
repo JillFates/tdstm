@@ -1,5 +1,3 @@
-
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -40,6 +38,7 @@
                     <table>
                         <tbody>
                         	<input type="hidden" name="projectId" value="${projectId}">
+                        	<input type="hidden" name="project.id" value="${projectId}">
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="teamCode">Team Code:</label>
@@ -102,8 +101,8 @@
                                 <tr >
 	                                <td valign="top" style="width: 10">
 		                                <select name="availableStaff" id="availableStaffId" multiple="multiple" size="10" style="width: 250px">
-			                                <g:each in="${projectStaff}" var="projectStaff">
-			                                	<option value="${projectStaff?.staff.id}">${projectStaff.company[0]}:${projectStaff.name}</option>
+			                                <g:each in="${availableStaff}" var="availableStaff">
+			                                	<option value="${availableStaff?.staff.id}">${availableStaff.company[0]}:${availableStaff.name}</option>
 			                                </g:each> 
 		                                </select>
 	                                </td>
@@ -113,6 +112,9 @@
 	                                </td>
 	                                <td valign="top" style="width: auto;">
 		                                <select name="teamMembers" id="teamMembersId" multiple="multiple" size="10" style="width: 250px">
+										<g:each in="${teamMembers}" var="teamMember">
+			                                	<option value="${teamMember?.staff.id}" selected="selected">${teamMember.company[0]}:${teamMember.name}</option>
+										</g:each>  
 		                                </select>
 	                                </td>
                                 </tr>

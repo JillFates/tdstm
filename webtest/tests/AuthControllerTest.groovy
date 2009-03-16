@@ -1,4 +1,4 @@
-class AuthControllerTest extends grails.util.WebTest { 
+class AuthControllerTest extends LoginTest { 
 
     //Attempted login with no username or password.
     def testUserBlankAuth() {
@@ -48,19 +48,6 @@ class AuthControllerTest extends grails.util.WebTest {
         invoke( url: 'auth/signOut' , description:'Logout the Application' )
         
         invoke( url: 'auth/login/home' , description:'Tyring to access secure Pages after logout' )
-    }
-
-    //Common method to test login
-    def tryLogin ( def name, def password ) {
-
-        invoke( url: 'auth/login' )
-
-        verifyText  'Login'
-        selectForm( name: 'loginForm' )
-        setInputField( name: 'username', value: name )
-        setInputField( name: 'password', value: password )
-        clickButton( label: 'Sign in' )
-
     }
     
 }

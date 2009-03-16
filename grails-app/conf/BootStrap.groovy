@@ -49,6 +49,10 @@ println "\n\n ROLE TYPES \n\n"
 	    def teamRole = new RoleType( description:"Party : Team" )
         teamRole.id ="TEAM"
         teamRole.save( insert:true )
+        
+	    def teamMemberRole = new RoleType( description:"Team : Team Member" )
+		teamMemberRole.id ="TEAM_MEMBER"
+		teamMemberRole.save( insert:true )
 
 	    def techRole = new RoleType( description:"Staff : Technician" )
         techRole.id = "TECH"
@@ -359,12 +363,12 @@ println "\n\n PARTY RELATIONSHIPS \n\n"
 			[ projStaffType, twProject, projectRole, personJohn, moveMgrRole ],
 
 			// Project Team Relationships with staff
-			[ teamType, cedarsGreenProjectTeam, teamRole, personJimL, techRole ],
-			[ teamType, cedarsGreenProjectTeam, teamRole, personAnna, moveMgrRole ],
-			[ teamType, cedarsRedProjectTeam, teamRole, personJimL, techRole ],
-			[ teamType, cedarsRedProjectTeam, teamRole, personJohn, moveMgrRole ],
-			[ teamType, twGreenProjectTeam, teamRole, personTim, pmRole ],
-			[ teamType, twGreenProjectTeam, teamRole, personJohn, moveMgrRole ]
+			[ teamType, cedarsGreenProjectTeam, teamRole, personJimL, teamMemberRole ],
+			[ teamType, cedarsGreenProjectTeam, teamRole, personAnna, teamMemberRole ],
+			[ teamType, cedarsRedProjectTeam, teamRole, personJimL, teamMemberRole ],
+			[ teamType, cedarsRedProjectTeam, teamRole, personJohn, teamMemberRole ],
+			[ teamType, twGreenProjectTeam, teamRole, personTim, teamMemberRole ],
+			[ teamType, twGreenProjectTeam, teamRole, personJohn, teamMemberRole ]
 		]
 		// Save all the rows in list
 		def i = 0;

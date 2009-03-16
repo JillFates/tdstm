@@ -1,18 +1,5 @@
-class AdminRoleValidationTest extends grails.util.WebTest {
+class AdminRoleValidationTest extends LoginTest {
 	
-//	Common method to test login
-    def tryLogin ( def name, def password ) {
-
-        invoke( url: 'auth/login' )
-
-        verifyText  'Login'
-        selectForm( name: 'loginForm' )
-        setInputField( name: 'username', value: name )
-        setInputField( name: 'password', value: password )
-        clickButton( label: 'Sign in' )
-
-    }
-
 	//	Login without Administrator role,
 	def testLoginWithUserRole() {
 

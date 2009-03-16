@@ -29,15 +29,17 @@
                     <thead>
                         <tr>
                         
-							<g:sortableColumn property="teamCode" title="Team Code" />
+							<th>Team Code</th>
 
-                   	        <g:sortableColumn property="name" title="Name" />
-                        
-                   	        <g:sortableColumn property="dateCreated" title="Date Created" />
+                   	        <th>Team Name</th>
+							
+							<th>Team Members</th>
+							                        
+                   	        <th>Date Created</th>
                         	
-                        	<g:sortableColumn property="lastUpdated" title="Last Updated" />
+                        	<th>Last Updated</th>
                         	
-                        	<g:sortableColumn property="comment" title="Comment" />
+                        	<th>Comment</th>
                         
                         </tr>
                     </thead>
@@ -45,16 +47,23 @@
                     <g:each in="${projectTeamInstanceList}" status="i" var="projectTeamInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                         
-                            <td><g:link action="show" id="${projectTeamInstance.id}">${fieldValue(bean:projectTeamInstance, field:'teamCode')}</g:link></td>
+                            <td><g:link action="show" id="${projectTeamInstance?.projectTeam.id}" params="[projectId:projectId]">${projectTeamInstance?.projectTeam?.teamCode}</g:link></td>
                         
-                            <td>${fieldValue(bean:projectTeamInstance, field:'name')}</td>
+                            <td>${projectTeamInstance?.projectTeam?.name}</td>
                             
-                            <td><tds:convertDateTime date="${projectTeamInstance?.dateCreated}"/></td>
+                             
+                            <td>
+                            	<g:each in="${projectTeamInstance?.teamMembers}" var="teamMember">
+			 					${teamMember.company[0]}:${teamMember.name}<br>
+								</g:each>
+							</td>
+                            
+                            <td><tds:convertDateTime date="${projectTeamInstance?.projectTeam?.dateCreated}"/></td>
 
-                            <td><tds:convertDateTime date="${projectTeamInstance?.lastUpdated}"/></td>
+                            <td><tds:convertDateTime date="${projectTeamInstance?.projectTeam?.lastUpdated}"/></td>
                             
-                            <td>${fieldValue(bean:projectTeamInstance, field:'comment')}</td>
-                        
+                            <td>${projectTeamInstance?.projectTeam?.comment}</td>
+                            
                         </tr>
                     </g:each>
                     </tbody>
