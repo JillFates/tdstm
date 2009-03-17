@@ -158,10 +158,10 @@ class PersonController {
             if ( !personInstance.hasErrors() && personInstance.save() ) {
 	            def projectParty = Project.findById(projectId)
 	            def partyRelationship = partyRelationshipService.updatePartyRelationshipRoleTypeTo("PROJ_STAFF", projectParty, 'PROJECT', personInstance, roleType)
-            	flash.message = "Person ${params.firstName} updated"
+            	flash.message = "Person ${personInstance} updated"
                 redirect( action:projectStaff, params:[ projectId:projectId ])
             } else {
-            	flash.message = "Person ${params.firstName} not updated"
+            	flash.message = "Person ${personInstance} not updated"
             	redirect( action:projectStaff, params:[ projectId:projectId ])
             }
     	} else {
@@ -212,7 +212,7 @@ class PersonController {
 				def projectParty = Party.findById( projectId )
 				def partyRelationship = partyRelationshipService.savePartyRelationship( "PROJ_STAFF", projectParty, "PROJECT", personInstance, roleType )
 			}
-			flash.message = "Person ${personInstance.id} created"
+			flash.message = "Person ${personInstance} created"
 			redirect( action:'projectStaff', params:[ projectId:projectId, submit:'Add' ] )
 		}
 		else {

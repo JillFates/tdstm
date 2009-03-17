@@ -42,7 +42,7 @@ class ProjectController {
         def projectInstance = Project.get( params.id )
         if(projectInstance) {
             projectInstance.delete()
-            flash.message = "Project ${params.id} deleted"
+            flash.message = "Project ${projectInstance} deleted"
             redirect(action:list)
         }
         else {
@@ -177,7 +177,7 @@ class ProjectController {
                     }
             	}
             	*/
-            	flash.message = "Project ${params.id} updated"
+            	flash.message = "Project ${projectInstance} updated"
                 redirect(action:show,id:projectInstance.id)
                 
             }
