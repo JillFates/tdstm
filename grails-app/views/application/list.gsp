@@ -239,7 +239,14 @@
       <div class="dialog">
         <table>
           <tbody>
-
+            <tr class="prop">
+             <td valign="top" class="name">
+              <label for="appCode">Company:</label>
+             </td>
+             <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'appCode','errors')}">
+                ${Party.findById(partyId)}
+             </td>
+            </tr> 
             <tr class="prop">
               <td valign="top" class="name">Application Code:</td>
 
@@ -313,7 +320,14 @@
           <table>
             <tbody>
 
-              
+              <tr class="prop">
+               <td valign="top" class="name">
+                <label for="appCode">Company:</label>
+               </td>
+               <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'appCode','errors')}">
+                ${Party.findById(partyId)}
+               </td>
+              </tr>
 
               <tr class="prop">
                 <td valign="top" class="name">

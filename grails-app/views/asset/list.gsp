@@ -42,11 +42,19 @@
 
       document.getElementById('id').value = asset.id
       if ( asset.assetType != null ) {
+      
       document.getElementById('assetTypes').value = asset.assetTypeId
       document.getElementById('assetTypeD.id').value = asset.assetTypeId
       }else{
       document.getElementById('assetTypes').value = ""
       document.getElementById('assetTypeD.id').value = null
+      }
+      if ( asset.assetOwner != null ) {
+      document.getElementById('assetOwners').value = asset.assetOwner
+      document.getElementById('assetOwnerD.id').value = asset.assetOwnerId
+      }else{
+      document.getElementById('assetOwners').value = ""
+      document.getElementById('assetOwnerD.id').value = null
       }
       document.getElementById('assetNames').value = asset.assetName
       document.getElementById('assetNameD').value = asset.assetName
@@ -102,6 +110,7 @@
       var assetTag = document.getElementById('assetTagD')
       var serialNumber = document.getElementById('serialNumberD')
       var deviceFunction = document.getElementById('deviceFunctionD')
+      var assetOwner = document.getElementById('assetOwnerD.id')
 
       var assetNameDialog = new Array()
       assetNameDialog[0] = assetId.value
@@ -110,8 +119,9 @@
       assetNameDialog[3] = assetTag.value
       assetNameDialog[4] = serialNumber.value
       assetNameDialog[5] = deviceFunction.value
-      assetNameDialog[6] = "null"
-
+      assetNameDialog[6] = assetOwner.value
+      assetNameDialog[7] = "null"
+      
       ${remoteFunction(action:'updateAsset', params:'\'assetDialog=\' + assetNameDialog', onComplete:'showEditAsset(e)')}
       return true
       }
@@ -210,6 +220,13 @@
               <td valign="top" class="value"><input type="text" id="assetTypes" name="assetTypes" value="" style="border: 0px" readonly></td>
 
             </tr>
+            
+             <tr class="prop">
+              <td valign="top" class="name">Asset Owner:</td>
+
+              <td valign="top" class="value"><input type="text" id="assetOwners" name="assetOwners" value="" style="border: 0px" readonly></td>
+
+            </tr>
 
             <tr class="prop">
               <td valign="top" class="name">Asset Name:</td>
@@ -264,6 +281,16 @@
                   <g:select optionKey="id" from="${AssetType.list()}" id="assetTypeD.id" name="assetTypeD.id" value="" noSelection="['null':'']"></g:select>
                 </td>
               </tr>
+              
+              <tr class="prop">
+                <td valign="top" class="name">
+                  <label for="assetType">Asset Owner:</label>
+                </td>
+                <td valign="top">
+                  <g:select optionKey="id" from="${partyGroupList}" id="assetOwnerD.id" name="assetOwnerD.id" value="" noSelection="['null':'Please Select']"></g:select>
+                </td>
+              </tr>
+              
 
               <tr class="prop">
                 <td valign="top" class="name">
@@ -332,6 +359,21 @@
                     </g:hasErrors>
                   </td>
                 </tr>
+                
+                <tr class="prop">
+                 <td valign="top" class="name">
+                   <label for="assetType">Asset Owner:</label>
+                 </td>
+                 <td valign="top" class="value ${hasErrors(bean:assetInstance,field:'owner','errors')}">
+                    <select id="owner" name="owner.id">
+					<option value="" selected="selected">Please Select</option>                    
+                    <g:each in="${partyGroupList}" var="partyGroup">
+                    <option value="partyGroup?.id">${partyGroup}</option>
+                    </g:each>
+                    
+                    </select>
+                 </td>
+               </tr> 
 
                 <tr class="prop">
                   <td valign="top" class="name">

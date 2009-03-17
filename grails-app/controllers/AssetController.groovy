@@ -281,9 +281,10 @@ class AssetController {
             }
             project = Project.findById( projId )
         } catch ( Exception ex ) { }
-        
+        def query = "from PartyGroup as p where p.partyType = 'COMPANY' "
+        def partyGroupList = PartyGroup.findAll( query )
         //get asset list for project present in current scope.        
-        return [ assetInstanceList: Asset.findAllByProject( project, params ), project:project ]
+        return [ assetInstanceList: Asset.findAllByProject( project, params ), project:project, partyGroupList:partyGroupList ]
     }
     // return asset details
     def show = {
@@ -364,16 +365,23 @@ class AssetController {
         
         def items = []
         def assetInstance = Asset.get( params.id )
-        if( assetInstance.assetType == null ){
-            items = [id:assetInstance.id, project:assetInstance.project.name, projectId:assetInstance.project.id, assetTag:assetInstance.assetTag, assetName:assetInstance.assetName, serialNumber:assetInstance.serialNumber, deviceFunction:assetInstance.deviceFunction ]
-        } else {
-            items = [id:assetInstance.id, project:assetInstance.project.name, projectId:assetInstance.project.id, assetType:assetInstance.assetType, assetTypeId:assetInstance.assetType.id, assetTag:assetInstance.assetTag, assetName:assetInstance.assetName, serialNumber:assetInstance.serialNumber, deviceFunction:assetInstance.deviceFunction ]
+       // def partyGroupInstance = PartyGroup.get(assetInstance.owner.id)
+        if( assetInstance.assetType != null && assetInstance.owner != null ){
+        	items = [id:assetInstance.id, project:assetInstance.project.name, projectId:assetInstance.project.id, assetType:assetInstance.assetType, assetTypeId:assetInstance.assetType.id, assetOwner:assetInstance.owner.name, assetOwnerId:assetInstance.owner.id, assetTag:assetInstance.assetTag, assetName:assetInstance.assetName, serialNumber:assetInstance.serialNumber, deviceFunction:assetInstance.deviceFunction ]
+        	
+        } else if( assetInstance.assetType != null && assetInstance.owner == null ) {
+        	items = [id:assetInstance.id, project:assetInstance.project.name, projectId:assetInstance.project.id, assetType:assetInstance.assetType, assetTypeId:assetInstance.assetType.id, assetTag:assetInstance.assetTag, assetName:assetInstance.assetName, serialNumber:assetInstance.serialNumber, deviceFunction:assetInstance.deviceFunction ]
+            
+        }else{
+        	items = [id:assetInstance.id, project:assetInstance.project.name, projectId:assetInstance.project.id, assetTag:assetInstance.assetTag, assetName:assetInstance.assetName, serialNumber:assetInstance.serialNumber, deviceFunction:assetInstance.deviceFunction ]
+        	
         }
         render items as JSON
         
     }
     // update ajax overlay 
     def updateAsset = {
+    		 
         def assetDialog= params.assetDialog.split(',')
         
         def assetItems = []
@@ -384,7 +392,12 @@ class AssetController {
         assetInstance.assetTag = assetDialog[3]
         assetInstance.serialNumber= assetDialog[4]
         assetInstance.deviceFunction = assetDialog[5]
-
+        if( assetDialog[6] != "" && assetDialog[6] != 'null' ){
+        	def PartyGroupInstance = PartyGroup.findById(assetDialog[6])
+    	    assetInstance.owner = PartyGroupInstance
+       }else{
+    	   assetInstance.owner = null
+       }
         assetInstance.save()
 
         if( assetInstance.assetType == null ) {

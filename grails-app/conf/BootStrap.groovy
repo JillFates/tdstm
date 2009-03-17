@@ -387,21 +387,23 @@ println "\n\n PARTY RELATIONSHIPS \n\n"
 		}
 
 		def assets = [
-			// project, type, name, asset tag, s/n
-			[cedarsProject, serverAsset, "CSHSACADAFF", "XX-232-YAB", "12345"],
-			[cedarsProject, serverAsset, "CSHSACCESS2", "XX-138-YAB", "2343455"],
-			[cedarsProject, serverAsset, "CSHSBDGT1", "MM-2232", "1893045"],
-			[cedarsProject, kvmSwitchAsset, "Avocent", "", ""],
-			[cedarsProject, arrayAsset, "CSMCARM Juke", "RR-32-YAB", "SU023423LLK"]
+			// project, type, name, asset tag, s/n, AssetOwner
+			[cedarsProject, serverAsset, "CSHSACADAFF", "XX-232-YAB", "12345",cedars],
+			[cedarsProject, serverAsset, "CSHSACCESS2", "XX-138-YAB", "2343455",cedars],
+			[cedarsProject, serverAsset, "CSHSBDGT1", "MM-2232", "1893045",cedars],
+			[cedarsProject, kvmSwitchAsset, "Avocent", "", "",cedars],
+			[cedarsProject, arrayAsset, "CSMCARM Juke", "RR-32-YAB", "SU023423LLK",cedars]
 		]
-		// Insert the list 
+		// Insert the list
+		println "cedars"+cedars
 		assets.each {
 			def asset = new Asset(
 				project: it[0],
 				assetType: it[1],
 				assetName: it[2],
 				assetTag: it[3],
-				serialNumber: it[4]
+				serialNumber: it[4],
+			    owner:it[5]
 			)
 			def ok = asset.validate()
 			if (ok) ok = asset.save()

@@ -30,14 +30,21 @@
                 <div class="dialog">
                     <table>
                         <tbody>
-                        
+                        <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="appCode">Company:</label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'appCode','errors')}">
+                                    ${Party.findById(partyId)}
+                                </td>
+                            </tr> 
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="appCode">App Code:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'appCode','errors')}">
                                    
-                                    <input type="hidden"  name="owner.id" value="${partyId}" />
+                                    <input type="hidden"   name="owner.id" value="${partyId}" />
                                     <input type="text" id="appCode" name="appCode" value="${fieldValue(bean:applicationInstance,field:'appCode')}"/>
                                 </td>
                             </tr> 

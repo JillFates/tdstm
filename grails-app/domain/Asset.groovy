@@ -6,6 +6,7 @@ class Asset {
 	String assetTag
 	String serialNumber
 	String deviceFunction
+	PartyGroup	owner
 
 	/*
 	 * Fields Validations
@@ -17,6 +18,8 @@ class Asset {
 		assetTag( blank:true )
 		serialNumber( blank:true )
 		deviceFunction( blank:true, nullable:true )
+		owner( blank:true, nullable:true )
+		
 	}
 	
 	/*
