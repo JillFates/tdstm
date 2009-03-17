@@ -44,7 +44,7 @@ class ApplicationController {
         }
         else {
             flash.message = "Application not found with id ${params.id}"
-            redirect(action:list, id:applicationInstance.owner.id)
+            redirect(action:list, id:params.id, partyId:params.id)
         }
     }
 
@@ -86,6 +86,7 @@ class ApplicationController {
     }
 
     def save = {
+		def partyId = params.owner.id
         def applicationInstance = new Application(params)
         if( !applicationInstance.hasErrors() && applicationInstance.save() ) {
         	//save ApplicationOwner in partyRelationship 
@@ -117,7 +118,7 @@ class ApplicationController {
             redirect(action:list,id:applicationInstance.owner.id)
         }
         else {
-            render(view:'create',model:[applicationInstance:applicationInstance])
+            render(view:'create',model:[applicationInstance:applicationInstance, partyId:partyId])
         }
     }
     //remote link for application dialog
