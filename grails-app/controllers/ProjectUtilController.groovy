@@ -16,7 +16,7 @@ class ProjectUtilController {
             }
         } catch (Exception e){
             flash.message = "Your login has expired and must login again"
-            render( view:'/auth/login')
+            redirect(controller:'auth', action:'login')
         }
     }
     
