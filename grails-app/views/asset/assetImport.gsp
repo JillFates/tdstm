@@ -19,9 +19,6 @@
         <li><a href="#">Move Bundles </a></li>
       </ul>
     </div>
-    <div class="nav">
-      <span class="menuButton"><g:link class="home" controller="auth" action="home">Home</g:link></span>
-    </div>
     <div class="body">
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
