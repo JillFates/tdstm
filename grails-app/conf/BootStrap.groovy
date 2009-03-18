@@ -418,6 +418,26 @@ println "\n\n PARTY RELATIONSHIPS \n\n"
 			
 			
 		}
+
+        println "\n\n MOVE BUNDLE \n\n"
+
+		// -------------------------------
+		// Create MoveBundle Details
+		// -------------------------------
+	    def moveBundle1ForAsset = new MoveBundle( project: cedarsProject, name: "bundle1", startTime: new Date(), finishTime: new Date(), bundleOrder:12244 ).save( insert:true )
+	    def moveBundle2ForAsset = new MoveBundle( project: cedarsProject, name: "bundle2", startTime: new Date(), finishTime: new Date(), bundleOrder:29922 ).save( insert:true )
+
+
+        println "\n\n MOVE BUNDLE ASSET \n\n"
+
+		// -------------------------------
+		// Create MoveBundleAsset Details
+		// -------------------------------
+
+	    def moveBundle1Asset = new MoveBundleAsset( moveBundle: moveBundle1ForAsset, asset: Asset.get(1),sourceTeam: cedarsGreenProjectTeam,targetTeam: cedarsRedProjectTeam ).save( insert:true )
+        def moveBundle2Asset = new MoveBundleAsset( moveBundle: moveBundle1ForAsset, asset: Asset.get(2),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam ).save( insert:true )
+        def moveBundle3Asset = new MoveBundleAsset( moveBundle: moveBundle2ForAsset, asset: Asset.get(3),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam ).save( insert:true )
+    
 	}
 
 	def destroy = {
