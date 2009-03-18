@@ -32,7 +32,7 @@
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                         
                             <td>
-                            <g:form>
+                            <g:form name="selectForm_$i">
                             <input type="hidden" name="id" value="${partyGroupInstance.id}">
                             <g:actionSubmit action="show" value="Select"  /></g:form>
                              </td>

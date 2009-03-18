@@ -27,7 +27,7 @@ class PartyGroupController {
         def partyGroupInstance = PartyGroup.get( params.id )
         if(partyGroupInstance) {
             partyGroupInstance.delete()
-            flash.message = "PartyGroup ${params.id} deleted"
+            flash.message = "PartyGroup ${partyGroupInstance} deleted"
             redirect(action:list)
         }
         else {
@@ -54,7 +54,7 @@ class PartyGroupController {
         if(partyGroupInstance) {
             partyGroupInstance.properties = params
             if(!partyGroupInstance.hasErrors() && partyGroupInstance.save()) {
-                flash.message = "PartyGroup ${params.id} updated"
+                flash.message = "PartyGroup ${partyGroupInstance} updated"
                 redirect(action:show,id:partyGroupInstance.id)
             }
             else {
@@ -79,13 +79,13 @@ class PartyGroupController {
         if(!partyGroupInstance.hasErrors() && partyGroupInstance.save()) {
         	def partyType = partyGroupInstance.partyType
         	//	Statements to create CLIENT PartyRelationship with  TDS Company
-        	if( partyType.id == "COMPANY" ){
+        	if( partyType != null && partyType.id == "COMPANY" ){
         	
 	        	def companyParty = PartyGroup.findByName( "TDS" )
 	        	def partyRelationship = partyRelationshipService.savePartyRelationship( "CLIENTS", companyParty, "COMPANY", partyGroupInstance, "CLIENT" )
 
         	}
-            flash.message = "PartyGroup ${partyGroupInstance.id} created"
+            flash.message = "PartyGroup ${partyGroupInstance} created"
             redirect(action:show,id:partyGroupInstance.id)
         }
         else {

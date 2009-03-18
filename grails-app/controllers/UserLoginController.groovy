@@ -31,7 +31,7 @@ class UserLoginController {
         def companyId = params.companyId
         if(userLoginInstance) {
             userLoginInstance.delete()
-            flash.message = "UserLogin ${params.id} deleted"
+            flash.message = "UserLogin ${userLoginInstance} deleted"
             redirect( action:list, params:[ id:companyId ] )
         }
         else {
@@ -77,7 +77,7 @@ class UserLoginController {
             	def assignedRoles = request.getParameterValues("assignedRole");
             	def person = params.person.id
             	userPreferenceService.setUserRoles(assignedRoles, person)
-                flash.message = "UserLogin ${params.id} updated"
+                flash.message = "UserLogin ${userLoginInstance} updated"
                 redirect( action:show, id:userLoginInstance.id, params:[ companyId:companyId ] )
             }
             else {
@@ -118,7 +118,7 @@ class UserLoginController {
         	def person = params.person.id
         	userPreferenceService.setUserRoles(assignedRoles, person)
         	
-            flash.message = "UserLogin ${userLoginInstance.id} created"
+            flash.message = "UserLogin ${userLoginInstance} created"
             redirect( action:show, id:userLoginInstance.id, params:[ companyId:companyId ] )
         }
         else {

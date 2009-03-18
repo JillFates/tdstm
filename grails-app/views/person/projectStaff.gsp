@@ -72,7 +72,7 @@
 		 	function addProjectStaff(i){
 		 		
 		 		var roleType = document.getElementById("roleType_"+i).value;
-				if( roleType == "null" ){
+				if( roleType == "" ){
 					alert("Please Select Role");
 					return false;
 				}else{
@@ -274,8 +274,10 @@
 </table>
 </div>
 	<div class="buttons" style="width: 99%">
+	<g:form>
 		<span class="button"><input class="create"	type="button" value="Create New Staff" onclick="createProjectStaff()"/></span>
 		<span class="button" style="padding-left:55%" ><input class="delete" type="button" value="Close" onclick="$('#addProjectStaff').dialog('close')"/></span>
+	</g:form>
 </div>
 </div>
 <div id="createPerson" style="display: none;" title="Create New Staff">

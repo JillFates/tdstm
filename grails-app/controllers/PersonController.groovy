@@ -39,7 +39,7 @@ class PersonController {
         def companyId = params.companyId
         if(personInstance) {
             personInstance.delete()
-            flash.message = "Person ${params.id} deleted"
+            flash.message = "Person ${personInstance} deleted"
             redirect( action:list, params:[ id:companyId ] )
         }
         else {
@@ -102,7 +102,7 @@ class PersonController {
                 def companyParty = Party.findById( companyId )
                 def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", personInstance, "STAFF" )
             }
-            flash.message = "Person ${personInstance.id} created"
+            flash.message = "Person ${personInstance} created"
             //redirect( action:list, id:personInstance.id , params:[companyId:companyId] )
             redirect( action:list, params:[ id:companyId ] )
         }
