@@ -1,11 +1,6 @@
 import org.springframework.beans.SimpleTypeConverter
-
 import org.springframework.web.servlet.support.RequestContextUtils as RCU
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
-
-/**
- * @author Mihai CAZACU (cazacugmihai [at] yahoo [dot] com)
- */
 class PersonRoleSelectTagLib {
 	def PartyRelationshipService
     static namespace = 'tds'
