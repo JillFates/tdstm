@@ -224,6 +224,11 @@ th.desc a {
     width: 85%;
 }
 
+.prop .bundle {
+    text-align: left;
+    width: 50%;
+}
+
 /* ACTION BUTTONS */
 
 .buttons {
