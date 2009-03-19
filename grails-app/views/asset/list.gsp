@@ -365,13 +365,8 @@
                    <label for="assetType">Asset Owner:</label>
                  </td>
                  <td valign="top" class="value ${hasErrors(bean:assetInstance,field:'owner','errors')}">
-                    <select id="owner" name="owner.id">
-					<option value="" selected="selected">Please Select</option>                    
-                    <g:each in="${partyGroupList}" var="partyGroup">
-                    <option value="partyGroup?.id">${partyGroup}</option>
-                    </g:each>
-                    
-                    </select>
+                    <g:select optionKey="id" from="${partyGroupList}" name="owner.id" id="owner" noSelection="['null':'']"></g:select>
+                   
                  </td>
                </tr> 
 

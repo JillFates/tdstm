@@ -372,7 +372,10 @@ class AssetController {
         } else if( assetInstance.assetType != null && assetInstance.owner == null ) {
         	items = [id:assetInstance.id, project:assetInstance.project.name, projectId:assetInstance.project.id, assetType:assetInstance.assetType, assetTypeId:assetInstance.assetType.id, assetTag:assetInstance.assetTag, assetName:assetInstance.assetName, serialNumber:assetInstance.serialNumber, deviceFunction:assetInstance.deviceFunction ]
             
-        }else{
+        }else if( assetInstance.assetType == null && assetInstance.owner != null ){
+        	items = [id:assetInstance.id, project:assetInstance.project.name, projectId:assetInstance.project.id, assetOwner:assetInstance.owner.name, assetOwnerId:assetInstance.owner.id, assetTag:assetInstance.assetTag, assetName:assetInstance.assetName, serialNumber:assetInstance.serialNumber, deviceFunction:assetInstance.deviceFunction ]
+        }
+        else{
         	items = [id:assetInstance.id, project:assetInstance.project.name, projectId:assetInstance.project.id, assetTag:assetInstance.assetTag, assetName:assetInstance.assetName, serialNumber:assetInstance.serialNumber, deviceFunction:assetInstance.deviceFunction ]
         	
         }
