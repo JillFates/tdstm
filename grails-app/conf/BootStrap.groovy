@@ -1,4 +1,5 @@
 import org.jsecurity.crypto.hash.Sha1Hash
+import com.tdssrc.eav.*
 class BootStrap {
 
     def init = { servletContext ->
@@ -437,7 +438,14 @@ println "\n\n PARTY RELATIONSHIPS \n\n"
 	    def moveBundle1Asset = new MoveBundleAsset( moveBundle: moveBundle1ForAsset, asset: Asset.get(1),sourceTeam: cedarsGreenProjectTeam,targetTeam: cedarsRedProjectTeam ).save( insert:true )
         def moveBundle2Asset = new MoveBundleAsset( moveBundle: moveBundle1ForAsset, asset: Asset.get(2),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam ).save( insert:true )
         def moveBundle3Asset = new MoveBundleAsset( moveBundle: moveBundle2ForAsset, asset: Asset.get(3),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam ).save( insert:true )
-    
+        
+        //--------------------------------
+        // Create EavEntityType and EavAttributeSet records 
+        //--------------------------------
+        println "\n\n ENTITY TYPE & ATTRIBUTE SET \n\n"
+        
+        def entityType = new EavEntityType( typeCode:'AssetEntity', domainName:'AssetEntity',isAudiable:1  ).save()
+        def attributeSet = new EavAttributeSet( attributeSetName:'TDS Master List', sortOrder:10 ).save()
 	}
 
 	def destroy = {
