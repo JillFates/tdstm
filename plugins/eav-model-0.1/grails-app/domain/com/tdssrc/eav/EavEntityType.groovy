@@ -11,8 +11,6 @@ class EavEntityType {
 	static hasMany = [ attributes : EavAttribute,
 	                   attributeSet : EavAttributeSet ]
 	
-	static belongsTo = [ attributeSet :EavAttributeSet  ]
-	
 	static mapping = {
 		version false
 		columns {

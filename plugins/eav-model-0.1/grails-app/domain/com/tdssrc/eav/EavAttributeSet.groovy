@@ -3,8 +3,11 @@ package com.tdssrc.eav
 class EavAttributeSet {
 	String	attributeSetName
 	Integer	sortOrder
+	EavEntityType	entityType
 
-	static hasMany = [ entities:EavEntity ]
+	static hasMany = [ entities : EavEntity ]
+
+	static belongsTo = [ EavEntityType ]
 
 	static mapping = {
 		version false
