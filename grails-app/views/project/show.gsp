@@ -144,7 +144,7 @@
         <li><g:link class="home" controller="projectTeam" action="list" params="[projectId:projectInstance?.id]" >Team </g:link></li>
         <li><a href="#">Contacts </a></li>
         <li><a href="#">Applications </a></li>
-        <li><a href="#">Move Bundles </a></li>
+        <li><g:link class="home" controller="moveBundle">Move Bundles</g:link> </li>
       </ul>
     </div>
     <div class="body">
