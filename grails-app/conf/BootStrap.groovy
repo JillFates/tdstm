@@ -1,8 +1,13 @@
 import org.jsecurity.crypto.hash.Sha1Hash
+import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes
+
 import com.tdssrc.eav.*
 class BootStrap {
 
     def init = { servletContext ->
+    def ctx = servletContext.getAttribute(
+    	      GrailsApplicationAttributes.APPLICATION_CONTEXT);
+    def ss = ctx.getBean("assetEntityAttributeLoaderService");
 
 		// -------------------------------
 		// Role Types
@@ -434,6 +439,16 @@ class BootStrap {
 
 		// This line was causing RTE because table is not created
 		def attributeSet = new EavAttributeSet( attributeSetName:'TDS Master List', entityType:entityType, sortOrder:10 ).save()
+		InputStream stream
+		try {
+			stream = servletContext.getResourceAsStream("/resource/AssetEntity_Attributes.xls")
+                
+            } catch (Exception ex) {
+                println "exception ----"+ex
+            }
+		ss.uploadEavAttribute(stream)
+
+
 	}
 
 	def destroy = {
