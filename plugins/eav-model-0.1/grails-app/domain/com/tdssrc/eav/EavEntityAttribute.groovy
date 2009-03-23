@@ -3,8 +3,8 @@ package com.tdssrc.eav
 class EavEntityAttribute {
 
 	Integer	sortOrder
-
-	static belongsTo = [ attribute : EavAttribute ]
+	
+	static belongsTo = [ attribute : EavAttribute, eavAttributeSet : EavAttributeSet, eavEntity : EavEntity ]
 
 	static mapping = {
 		version false
@@ -16,6 +16,7 @@ class EavEntityAttribute {
 
 	static constraints = {
 		sortOrder( size: 0..32767)
+		eavEntity( nullable: true )
 	}
 
 }

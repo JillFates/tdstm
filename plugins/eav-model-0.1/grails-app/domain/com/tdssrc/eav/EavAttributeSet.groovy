@@ -5,7 +5,7 @@ class EavAttributeSet {
 	Integer	sortOrder
 	EavEntityType	entityType
 
-	static hasMany = [ entities : EavEntity ]
+	static hasMany = [ entities : EavEntity, entityAttribute : EavEntityAttribute ]
 
 	static belongsTo = [ EavEntityType ]
 
