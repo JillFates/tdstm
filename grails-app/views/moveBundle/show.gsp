@@ -7,10 +7,21 @@
     <title>Show MoveBundle</title>
   </head>
   <body>
-    <div class="nav">
-      <span class="menuButton"><a class="home" href="${createLinkTo(dir:'')}">Home</a></span>
-      <span class="menuButton"><g:link class="list" action="list">MoveBundle List</g:link></span>
-      <span class="menuButton"><g:link class="create" action="create">New MoveBundle</g:link></span>
+    <div class="menu2">
+      <ul>
+        <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
+        <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:projectId]" >Staff</g:link></li>
+        <li><g:link class="home" controller="asset">Assets </g:link></li>
+        <li><g:link class="home" controller="asset" action="assetImport" >Import/Export</g:link> </li>
+        <li><a href="#">Contacts </a></li>
+        <li><a href="#">Applications </a></li>
+        <li><g:link class="home" controller="moveBundle" params="[projectId:projectId]">Move Bundles</g:link> </li>
+      </ul>
+    </div>
+    <div class="menu2" style="background-color:#003366;">
+      <ul>
+        <li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundleInstance?.id]" >Team </g:link> </li>
+      </ul>
     </div>
     <div class="body">
       <h1>Show MoveBundle</h1>
@@ -38,21 +49,43 @@
             <tr class="prop">
               <td valign="top" class="name">Start Time:</td>
 
-              <td valign="top" class="value">${fieldValue(bean:moveBundleInstance, field:'startTime')}</td>
+              <td valign="top" class="value"><tds:convertDateTime date="${moveBundleInstance?.startTime}" /></td>
 
             </tr>
 
             <tr class="prop">
-              <td valign="top" class="name">Finish Time:</td>
+              <td valign="top" class="name">Completion Time:</td>
 
-              <td valign="top" class="value">${fieldValue(bean:moveBundleInstance, field:'finishTime')}</td>
+              <td valign="top" class="value"><tds:convertDateTime date="${moveBundleInstance?.completionTime}" /></td>
 
             </tr>
 
             <tr class="prop">
-              <td valign="top" class="name">Bundle Order:</td>
+              <td valign="top" class="name">Project Manager:</td>
 
-              <td valign="top" class="value">${fieldValue(bean:moveBundleInstance, field:'bundleOrder')}</td>
+              <td valign="top" class="value">
+                <g:if test="${projectManager}">
+                  ${projectManager?.partyIdTo?.lastName}, ${projectManager?.partyIdTo?.firstName} - ${projectManager?.partyIdTo?.title}
+                </g:if>
+              </td>
+
+            </tr>
+
+            <tr class="prop">
+              <td valign="top" class="name">Move Manager:</td>
+
+              <td valign="top" class="value">
+                <g:if test="${moveManager}">
+                  ${moveManager?.partyIdTo?.lastName}, ${moveManager?.partyIdTo?.firstName} - ${moveManager?.partyIdTo?.title}
+                </g:if>
+              </td>
+
+            </tr>
+
+            <tr class="prop">
+              <td valign="top" class="name">Operational Order:</td>
+
+              <td valign="top" class="value">${fieldValue(bean:moveBundleInstance, field:'operationalOrder')}</td>
 
             </tr>
 
@@ -62,7 +95,8 @@
       <div class="buttons">
         <g:form>
           <input type="hidden" name="id" value="${moveBundleInstance?.id}" />
-          <span class="button"><g:actionSubmit class="edit" value="moveBundleEdit" /></span>
+          <input type="hidden" name="projectId" value="${projectId}" />
+          <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
           <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
         </g:form>
       </div>

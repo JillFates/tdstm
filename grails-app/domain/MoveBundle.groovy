@@ -1,23 +1,23 @@
-class MoveBundle {
-
+class MoveBundle extends PartyGroup {
+	
     Project project
     String name
     String description
     Date startTime
-    Date finishTime
-    Integer bundleOrder // Order that the bundles are performed in
+    Date completionTime
+    Integer operationalOrder  // Order that the bundles are performed in
 
     /*
 	 * Fields Validations
 	 */
-    static constraints = {
+    static constraints = {        
         
-        project( blank:false, nullable:false )
 		name( blank:false, nullable:false )
+		project( blank:false, nullable:false )
 		description( blank:true, nullable:true )		
 		startTime( blank:true, nullable:true )
-		finishTime( blank:true, nullable:true )
-        bundleOrder( blank:false, nullable:false )
+		completionTime( blank:true, nullable:true )
+        operationalOrder( blank:false, nullable:false )
         
 	}
 
@@ -28,7 +28,10 @@ class MoveBundle {
 	static mapping  = {
 		version true
 		id column:'move_bundle_id'
-        tablePerHierarchy false
+        columns {
+		 	startTime sqlType: 'DateTime'
+		 	completionTime sqlType: 'DateTime'
+		}        
 	}
 
     String toString(){

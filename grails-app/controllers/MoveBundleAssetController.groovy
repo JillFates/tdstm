@@ -5,22 +5,12 @@ class MoveBundleAssetController {
     // the delete, save and update actions only accept POST requests
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
-    def moveBundlelist = {
-        
-        if(!params.max) params.max = 10
-        [ moveBundleAssetInstanceList: MoveBundleAsset.findAll('from MoveBundleAsset m where m.moveBundle.id = '+params.id ) ]
-        
-    }
-
     def list = {
-
         if(!params.max) params.max = 10
         [ moveBundleAssetInstanceList: MoveBundleAsset.list( params ) ]
-
     }
 
-    def show = {        
-
+    def show = {
         def moveBundleAssetInstance = MoveBundleAsset.get( params.id )
 
         if(!moveBundleAssetInstance) {

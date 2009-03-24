@@ -5,29 +5,66 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="main" />
     <title>Edit MoveBundle</title>
+
+    <g:javascript library="jquery"/>
+
+    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}"  />
+    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
+    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
+    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}"  />
+    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}"  />
+    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}"  />
+    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
+    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" />
+
+    <jq:plugin name="ui.core"/>
+    <jq:plugin name="ui.draggable"/>
+    <jq:plugin name="ui.resizable"/>
+    <jq:plugin name="ui.dialog"/>
+    <jq:plugin name="ui.datetimepicker"/>
+    
+    <g:javascript>
+
+      function initialize(){
+      // This is called when the page loads to initialize Managers
+      var moveManagerSelect = document.getElementById('moveManagerId')
+      var projectManagerSelect = document.getElementById('projectManagerId')
+
+      moveManagerSelect.value = '${moveManager}'
+      projectManagerSelect.value= '${projectManager}'
+
+      }
+
+    </g:javascript>
   </head>
   <body>
-    <div class="nav">
-      <span class="menuButton"><a class="home" href="${createLinkTo(dir:'')}">Home</a></span>
-      <span class="menuButton"><g:link class="list" action="list">MoveBundle List</g:link></span>
-      <span class="menuButton"><g:link class="create" action="create">New MoveBundle</g:link></span>
+    <div class="menu2">
+      <ul>
+        <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
+        <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:projectId]" >Staff</g:link></li>
+        <li><g:link class="home" controller="asset">Assets </g:link></li>
+        <li><g:link class="home" controller="asset" action="assetImport" >Import/Export</g:link> </li>
+        <li><a href="#">Contacts </a></li>
+        <li><a href="#">Applications </a></li>
+        <li><g:link class="home" controller="moveBundle" params="[projectId:projectId]">Move Bundles</g:link> </li>
+      </ul>
+    </div>
+    <div class="menu2" style="background-color:#003366;">
+      <ul>
+        <li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundleInstance?.id]" >Team </g:link> </li>
+      </ul>
     </div>
     <div class="body">
       <h1>Edit MoveBundle</h1>
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
       </g:if>
-      <g:hasErrors bean="${moveBundleInstance}">
-        <div class="errors">
-          <g:renderErrors bean="${moveBundleInstance}" as="list" />
-        </div>
-      </g:hasErrors>
+
       <g:form method="post" >
         <input type="hidden" name="id" value="${moveBundleInstance?.id}" />
         <div class="dialog">
           <table>
             <tbody>
-
 
               <tr class="prop">
                 <td valign="top" class="name">
@@ -35,6 +72,11 @@
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'name','errors')}">
                   <input type="text" id="name" name="name" value="${fieldValue(bean:moveBundleInstance,field:'name')}"/>
+                  <g:hasErrors bean="${moveBundleInstance}" field="name">
+                    <div class="errors">
+                      <g:renderErrors bean="${moveBundleInstance}" as="list" field="name"/>
+                    </div>
+                  </g:hasErrors>
                 </td>
               </tr>
 
@@ -44,6 +86,11 @@
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'description','errors')}">
                   <input type="text" id="description" name="description" value="${fieldValue(bean:moveBundleInstance,field:'description')}"/>
+                  <g:hasErrors bean="${moveBundleInstance}" field="description">
+                    <div class="errors">
+                      <g:renderErrors bean="${moveBundleInstance}" as="list" field="description"/>
+                    </div>
+                  </g:hasErrors>
                 </td>
               </tr>
 
@@ -52,25 +99,86 @@
                   <label for="startTime">Start Time:</label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'startTime','errors')}">
-                  <g:datePicker name="startTime" value="${moveBundleInstance?.startTime}" noSelection="['':'']"></g:datePicker>
+                  <link rel="stylesheet"
+                        href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" />
+                  <script type="text/javascript">
+                    $(document).ready(function(){
+                      $("#startTime").datetimepicker();
+                    });
+                  </script> <input type="text" class="dateRange" size="15" readOnly
+        style="width: 112px; height: 14px;" id="startTime" name="startTime"
+        value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"/>">
+        <g:hasErrors bean="${moveBundleInstance}" field="startTime">
+                    <div class="errors">
+                      <g:renderErrors bean="${moveBundleInstance}" as="list" field="startTime"/>
+                    </div>
+                  </g:hasErrors>
                 </td>
               </tr>
 
               <tr class="prop">
                 <td valign="top" class="name">
-                  <label for="finishTime">Finish Time:</label>
+                  <label for="completionTime">Completion Time:</label>
                 </td>
-                <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'finishTime','errors')}">
-                  <g:datePicker name="finishTime" value="${moveBundleInstance?.finishTime}" noSelection="['':'']"></g:datePicker>
+                <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'completionTime','errors')}">
+                  <link rel="stylesheet"
+                        href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" />
+                  <script type="text/javascript">
+                    $(document).ready(function(){
+                      $("#completionTime").datetimepicker();
+                    });
+                  </script> <input type="text" class="dateRange" size="15" readOnly
+        style="width: 112px; height: 14px;" id="completionTime" name="completionTime"
+        value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}"/>">
+        <g:hasErrors bean="${moveBundleInstance}" field="completionTime">
+                    <div class="errors">
+                      <g:renderErrors bean="${moveBundleInstance}" as="list" field="completionTime"/>
+                    </div>
+                  </g:hasErrors>
                 </td>
               </tr>
 
               <tr class="prop">
+                <td valign="top" class="name"><label for="projectManager">Project
+                Manager:</label></td>
+                <td valign="top" class="value"><select id="projectManagerId"
+                                 name="projectManager">
+
+                    <option value="" selected="selected">Please Select</option>
+
+                    <g:each status="i" in="${managers}" var="managers">
+                      <option value="${managers?.staff?.id}">${managers?.staff?.lastName}, ${managers?.staff?.firstName} - ${managers?.staff?.title}</option>
+                    </g:each>
+
+                </select></td>
+              </tr>
+
+              <tr class="prop">
+                <td valign="top" class="name"><label for="moveManager">Move
+                Manager:</label></td>
+                <td valign="top" class="value"><select id="moveManagerId"
+                                    name="moveManager">
+
+                    <option value="" selected="selected">Please Select</option>
+
+                    <g:each status="i" in="${managers}" var="managers">
+                      <option value="${managers?.staff?.id}">${managers?.staff?.lastName}, ${managers?.staff?.firstName} - ${managers?.staff?.title}</option>
+                    </g:each>
+
+                </select></td>
+              </tr>
+
+              <tr class="prop">
                 <td valign="top" class="name">
-                  <label for="bundleOrder">Bundle Order:</label>
+                  <label for="operationalOrder">Operational Order:</label>
                 </td>
-                <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'bundleOrder','errors')}">
-                  <input type="text" id="bundleOrder" name="bundleOrder" value="${fieldValue(bean:moveBundleInstance,field:'bundleOrder')}" />
+                <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'operationalOrder','errors')}">
+                  <input type="text" id="operationalOrder" name="operationalOrder" value="${fieldValue(bean:moveBundleInstance,field:'operationalOrder')}" />
+                  <g:hasErrors bean="${moveBundleInstance}" field="operationalOrder">
+                    <div class="errors">
+                      <g:renderErrors bean="${moveBundleInstance}" as="list" field="operationalOrder"/>
+                    </div>
+                  </g:hasErrors>
                 </td>
               </tr>
 
@@ -78,10 +186,15 @@
           </table>
         </div>
         <div class="buttons">
+          <input type="hidden" name="project.id" value="${projectId }"/>
+          <input type="hidden" name="projectId" value="${projectId }"/>
           <span class="button"><g:actionSubmit class="save" value="Update" /></span>
           <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
         </div>
       </g:form>
+      <g:javascript>
+        initialize();
+      </g:javascript>
     </div>
   </body>
 </html>

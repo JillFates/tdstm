@@ -27,7 +27,7 @@ class MoveBundleAsset {
         tablePerHierarchy false
 	}
 
-     String toString(){
+    String toString(){
 		moveBundle
 	}
 
