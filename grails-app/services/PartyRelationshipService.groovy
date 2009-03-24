@@ -224,7 +224,7 @@ class PartyRelationshipService {
     /*
      *	Method to Create Project Team Members 
      */
-    def createProjectTeamMembers( def projectTeam, def teamMembers ){
+    def createBundleTeamMembers( def projectTeam, def teamMembers ){
     	teamMembers.each{teamMember->
     		def personParty = Party.findById( teamMember )
     		def projectTeamRel = savePartyRelationship( "PROJ_TEAM", projectTeam, "TEAM", personParty, "TEAM_MEMBER" )
@@ -234,9 +234,9 @@ class PartyRelationshipService {
     /*
      *  Method will return the Project Team Members
      */
-    def getProjectTeamMembers( def projectTeam ){
+    def getBundleTeamMembers( def bundleTeam ){
     	def list = []
-    	def query = "from PartyRelationship p where p.partyRelationshipType = 'PROJ_TEAM' and p.partyIdFrom = $projectTeam.id and p.roleTypeCodeFrom = 'TEAM'  "
+    	def query = "from PartyRelationship p where p.partyRelationshipType = 'PROJ_TEAM' and p.partyIdFrom = $bundleTeam.id and p.roleTypeCodeFrom = 'TEAM'  "
         def teamMembers = PartyRelationship.findAll(query)
         teamMembers.each{team ->
 	    		def map = new HashMap()
@@ -249,6 +249,9 @@ class PartyRelationshipService {
 	    	}
         return list 
     }
+    /*
+     *  Return the Staff which are not assign to projectTeam
+     */
     def getAvailableTeamMembers( def projectId, def projectTeam ){
     	def list = []
     	def query = "from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' and p.partyIdTo not in ( select pt.partyIdTo from PartyRelationship pt where pt.partyRelationshipType = 'PROJ_TEAM' and pt.partyIdFrom = $projectTeam.id and pt.roleTypeCodeFrom = 'TEAM' ) " 
@@ -264,15 +267,25 @@ class PartyRelationshipService {
 	    	}
     	return list
     }
-    def getProjectTeamInstanceList( def projectInstance ){
+    /*
+     *  Return the Staff which are assign to ProjectTeam
+     */
+    def getBundleTeamInstanceList( def bundleInstance ){
     	def list = []
-    	def projectTeamList = ProjectTeam.findAllByProject( projectInstance )
-    	projectTeamList.each{projectTeam->
+    	def bundleTeamList = ProjectTeam.findAllByMoveBundle( bundleInstance )
+    	bundleTeamList.each{bundleTeam->
     		def map = new HashMap()
-    		map.put("projectTeam",projectTeam)
-    		map.put("teamMembers",getProjectTeamMembers(projectTeam))
+    		map.put("projectTeam",bundleTeam)
+    		map.put("teamMembers",getBundleTeamMembers(bundleTeam))
     		list<<map
     	}
     	return list
+    }
+    /*
+     * 	Return the PartyIdTo Details from PartyRelationship
+     */
+    def getPartyToRelationship( def partyRelationshipType, def partyIdFrom, def roleTypeFrom, def roleTypeTo ){
+    	def partyToRelationship = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$partyRelationshipType' and p.partyIdFrom = $partyIdFrom and p.roleTypeCodeFrom = '$roleTypeFrom' and p.roleTypeCodeTo = '$roleTypeTo' ")
+    	return partyToRelationship
     }
 }

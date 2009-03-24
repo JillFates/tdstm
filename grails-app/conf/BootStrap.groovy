@@ -101,7 +101,11 @@ class BootStrap {
 		def appSCRole = new RoleType( description:"App : Secondary Contact" )
 		appSCRole.id = "APP_2ND_CONTACT"
 		appSCRole.save( insert:true )
-
+		
+		def bundleRole = new RoleType( description:"Proj: Move Bundle" )
+		bundleRole.id = "MOVE_BUNDLE"
+		bundleRole.save( insert:true )
+		
 		// -------------------------------
 		// Party Types
 		// -------------------------------
@@ -165,6 +169,10 @@ class BootStrap {
 		def vendorType = new PartyRelationshipType( description:"Vendors" )
 		vendorType.id = "VENDORS"
 		vendorType.save( insert:true )
+		
+		def projBundleStaffType = new PartyRelationshipType( description:"Bundle Staff" )
+		projBundleStaffType.id = "PROJ_BUNDLE_STAFF"
+		projBundleStaffType.save( insert:true )
 
         // Don't think we need this (John)
         //	    def projectRelaType = new PartyRelationshipType( description:"Project" )
@@ -253,13 +261,20 @@ class BootStrap {
 
 
 		// -------------------------------
+		// Create MoveBundle Details
+		// -------------------------------
+		println "\n\n MOVE BUNDLE\n\n"
+		def cedarsProjectMoveBundle = new MoveBundle( project: cedarsProject, name: "Cedars Bundle", startTime: new Date(), completionTime: new Date(), operationalOrder:12244 ).save( insert:true )
+		def twProjectMoveBundle = new MoveBundle( project: twProject, name: "TW Bundle", startTime: new Date(), completionTime: new Date(), operationalOrder:29922 ).save( insert:true )
+		
+		// -------------------------------
 		// Create ProjectTeam
 		// -------------------------------
 		println "\n\n PROJECT TEAM \n\n"
-		def cedarsGreenProjectTeam = new ProjectTeam( name: "Cedars's Green Team",	teamCode: "Green", project:cedarsProject, dateCreated: new Date()).save()
-		def cedarsRedProjectTeam = new ProjectTeam( name: "Cedars's Red Team",	teamCode: "Red", project:cedarsProject, dateCreated: new Date()).save()
-		def twGreenProjectTeam = new ProjectTeam( name: "TM's Green Team",	teamCode: "Green", project:twProject, dateCreated: new Date()).save()
-		def twRedProjectTeam = new ProjectTeam( name: "TM's Red Team",	teamCode: "Red", project:twProject, dateCreated: new Date()).save()
+		def cedarsGreenProjectTeam = new ProjectTeam( name: "Cedars's Green Team",	teamCode: "Green", moveBundle:cedarsProjectMoveBundle, dateCreated: new Date()).save()
+		def cedarsRedProjectTeam = new ProjectTeam( name: "Cedars's Red Team",	teamCode: "Red", moveBundle:cedarsProjectMoveBundle, dateCreated: new Date()).save()
+		def twGreenProjectTeam = new ProjectTeam( name: "TM's Green Team",	teamCode: "Green", moveBundle:twProjectMoveBundle, dateCreated: new Date()).save()
+		def twRedProjectTeam = new ProjectTeam( name: "TM's Red Team",	teamCode: "Red", moveBundle:twProjectMoveBundle, dateCreated: new Date()).save()
 
 
 		// -------------------------------
@@ -411,19 +426,12 @@ class BootStrap {
 		}
 
 		// -------------------------------
-		// Create MoveBundle Details
-		// -------------------------------
-        println "\n\n MOVE BUNDLE\n\n"
-		def moveBundle1ForAsset = new MoveBundle( project: cedarsProject, name: "bundle1", startTime: new Date(), finishTime: new Date(), bundleOrder:12244 ).save( insert:true )
-		def moveBundle2ForAsset = new MoveBundle( project: cedarsProject, name: "bundle2", startTime: new Date(), finishTime: new Date(), bundleOrder:29922 ).save( insert:true )
-
-		// -------------------------------
 		// Create MoveBundleAsset Details
 		// -------------------------------
         println "\n\n MOVE BUNDLE ASSET \n\n"
-		def moveBundle1Asset = new MoveBundleAsset( moveBundle: moveBundle1ForAsset, asset: Asset.get(1),sourceTeam: cedarsGreenProjectTeam,targetTeam: cedarsRedProjectTeam ).save( insert:true )
-		def moveBundle2Asset = new MoveBundleAsset( moveBundle: moveBundle1ForAsset, asset: Asset.get(2),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam ).save( insert:true )
-		def moveBundle3Asset = new MoveBundleAsset( moveBundle: moveBundle2ForAsset, asset: Asset.get(3),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam ).save( insert:true )
+		def moveBundle1Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle, asset: Asset.get(1),sourceTeam: cedarsGreenProjectTeam,targetTeam: cedarsRedProjectTeam ).save( insert:true )
+		def moveBundle2Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle, asset: Asset.get(2),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam ).save( insert:true )
+		def moveBundle3Asset = new MoveBundleAsset( moveBundle: twProjectMoveBundle, asset: Asset.get(3),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam ).save( insert:true )
 
 		//--------------------------------
 		// Create EavEntityType and EavAttributeSet records

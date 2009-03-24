@@ -4,23 +4,26 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="main" />
-        <title>Project Team List</title>
+        <title>Move Bundle Team List</title>
     </head>
     <body>
     	<div class="menu2">
           <ul>
             <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
-            <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:projectId]" >Staff</g:link></li>
+            <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:bundleInstance?.project?.id]" >Staff</g:link></li>
             <li><g:link class="home" controller="asset">Assets </g:link></li>
             <li><g:link class="home" controller="asset" action="assetImport" >Import/Export</g:link> </li>
-            <li><g:link class="home" controller="projectTeam" action="list" params="[projectId:projectId]" >Team </g:link> </li>
             <li><a href="#">Contacts </a></li>
             <li><a href="#">Applications </a></li>
-            <li><a href="#">Move Bundles </a></li>
+            <li><g:link class="home" controller="moveBundle" params="[projectId:bundleInstance?.project?.id]">Move Bundles</g:link></li>
           </ul>
 		</div>
+    	<div class="menu2" style="background-color:#003366;">
+          <ul>
+			<li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:bundleInstance?.id]" >Team </g:link> </li>          </ul>
+		</div>
         <div class="body">
-            <h1>Project Team List</h1>
+            <h1>Move Bundle Team List</h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
@@ -47,7 +50,7 @@
                     <g:each in="${projectTeamInstanceList}" status="i" var="projectTeamInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                         
-                            <td><g:link action="show" id="${projectTeamInstance?.projectTeam.id}" params="[projectId:projectId]">${projectTeamInstance?.projectTeam?.teamCode}</g:link></td>
+                            <td><g:link action="show" id="${projectTeamInstance?.projectTeam.id}" params="[bundleId:bundleInstance?.id]">${projectTeamInstance?.projectTeam?.teamCode}</g:link></td>
                         
                             <td>${projectTeamInstance?.projectTeam?.name}</td>
                             
@@ -71,7 +74,7 @@
             </div>
             <div class="buttons">
             		<g:form>
-            		<input type="hidden" name="projectId" value="${projectId}">
+            		<input type="hidden" name="bundleId" value="${bundleInstance?.id}">
 					<span class="button"><g:actionSubmit class="create" action="Create" value="New Project Team" /></span>
 					</g:form>
 				</div>

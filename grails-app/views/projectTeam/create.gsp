@@ -2,7 +2,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="main" />
-        <title>Create Project Team</title>
+        <title>Create Move Bundle Team</title>
         <g:javascript library="jquery" />
         <script type="text/javascript">  
 			   $().ready(function() {  
@@ -19,17 +19,21 @@
     	<div class="menu2">
           <ul>
             <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
-            <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:projectId]" >Staff</g:link></li>
+            <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:bundleInstance?.project?.id]" >Staff</g:link></li>
             <li><g:link class="home" controller="asset">Assets </g:link></li>
             <li><g:link class="home" controller="asset" action="assetImport" >Import/Export</g:link> </li>
-            <li><g:link class="home" controller="projectTeam" action="list" params="[projectId:projectId]" >Team </g:link> </li>
             <li><a href="#">Contacts </a></li>
             <li><a href="#">Applications </a></li>
-            <li><a href="#">Move Bundles </a></li>
+            <li><g:link class="home" controller="moveBundle" params="[projectId:bundleInstance?.project?.id]">Move Bundles</g:link></li>
+          </ul>
+		</div>
+    	<div class="menu2" style="background-color:#003366;">
+          <ul>
+            <li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:bundleInstance?.id]" >Team </g:link> </li>
           </ul>
 		</div>
         <div class="body">
-            <h1>Create Project Team</h1>
+            <h1>Create Move Bundle Team</h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
@@ -37,8 +41,8 @@
                 <div class="dialog">
                     <table>
                         <tbody>
-                        	<input type="hidden" name="projectId" value="${projectId}">
-                        	<input type="hidden" name="project.id" value="${projectId}">
+                        	<input type="hidden" name="bundleId" value="${bundleInstance?.id}">
+                        	<input type="hidden" name="moveBundle.id" value="${bundleInstance?.id}">
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="teamCode">Team Code:</label>

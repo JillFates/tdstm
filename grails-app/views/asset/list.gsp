@@ -149,10 +149,9 @@
         <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:project?.id]" >Staff</g:link></li>
         <li><g:link class="home" controller="asset">Assets </g:link></li>
         <li><g:link class="home" controller="asset" action="assetImport" >Import/Export</g:link> </li>
-        <li><g:link class="home" controller="projectTeam" action="list" params="[projectId:project?.id]" >Team </g:link></li>
         <li><a href="#">Contacts </a></li>
         <li><a href="#">Applications </a></li>
-        <li><a href="#">Move Bundles </a></li>
+        <li><g:link class="home" controller="moveBundle" params="[projectId:project?.id]">Move Bundles</g:link></li>
       </ul>
     </div>
 

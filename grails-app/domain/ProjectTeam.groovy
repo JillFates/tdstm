@@ -1,13 +1,13 @@
 class ProjectTeam extends PartyGroup{
 
-	Project project
+	MoveBundle moveBundle
 	String teamCode
 	String isDisbanded = "N"
 
 	static constraints = {
 		name( ) // related party Group
-		teamCode( blank:false, nullable:false,unique:'project' )
-		project( blank:false, nullable:false)
+		teamCode( blank:false, nullable:false,unique:'moveBundle' )
+		moveBundle( blank:false, nullable:false)
 		isDisbanded( blank:true, nullable:true, inList:['Y', 'N'] )
 		dateCreated( ) // related to party
 		lastUpdated( ) // related to party

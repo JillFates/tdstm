@@ -4,25 +4,29 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="main" />
-        <title>Show Project Team</title>
+        <title>Show Move Bundle Team</title>
     </head>
     <body>
         <div class="menu2">
           <ul>
             <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
-            <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:projectId]" >Staff</g:link></li>
+            <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:bundleInstance?.project?.id]" >Staff</g:link></li>
             <li><g:link class="home" controller="asset">Assets </g:link></li>
             <li><g:link class="home" controller="asset" action="assetImport" >Import/Export</g:link> </li>
-            <li><g:link class="home" controller="projectTeam" action="list" params="[projectId:projectId]" >Team </g:link> </li>
             <li><a href="#">Contacts </a></li>
             <li><a href="#">Applications </a></li>
-            <li><a href="#">Move Bundles </a></li>
+            <li><g:link class="home" controller="moveBundle" params="[projectId:bundleInstance?.project?.id]">Move Bundles</g:link></li>
+          </ul>
+		</div>
+        <div class="menu2" style="background-color:#003366;">
+          <ul>
+            <li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:bundleInstance?.id]" >Team </g:link> </li>
           </ul>
 		</div>
         <div class="body">
-            <h1>Show Project Team</h1>
+            <h1>Show Move Bundle Team</h1>
              <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-	            <span class="menuButton"><g:link class="list" action="list" params="[projectId:projectId]">Project Team List</g:link></span>
+	            <span class="menuButton"><g:link class="list" action="list" params="[bundleId:bundleInstance?.id]">Project Team List</g:link></span>
         	</div>
         	<br>
             <g:if test="${flash.message}">
@@ -92,7 +96,7 @@
             <div class="buttons">
                 <g:form>
                     <input type="hidden" name="id" value="${projectTeamInstance?.id}" />
-                    <input type="hidden" name="projectId" value="${projectId}" />
+                    <input type="hidden" name="bundleId" value="${bundleInstance?.id}" />
                     <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
                 </g:form>
