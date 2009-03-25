@@ -21,10 +21,21 @@ class AssetController {
         //get id of selected project from project view
         def projectId = params.projectId
         def assetsByProject
+        def projectInstance
+        def moveBundleInstanceList
+        if( projectId != null ) {
+	         projectInstance = Project.findById( projectId )
+	         moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
+        }
+        def dataTransferSetImport = DataTransferSet.findAll(" from DataTransferSet dts where dts.transferMode IN ('B','I') ")
+        def dataTransferSetExport = DataTransferSet.findAll(" from DataTransferSet dts where dts.transferMode IN ('B','E') ")
+        
         if( projectId == null ) {
             //get project id from session
             def currProj = getSession().getAttribute( "CURR_PROJ" )
             projectId = currProj.CURR_PROJ
+            projectInstance = Project.findById( projectId )
+            moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
             if( projectId == null ) {
 
                 flash.message = " No Projects are Associated, Please select Project. "
@@ -39,7 +50,7 @@ class AssetController {
     		assetsByProject = Asset.findAllByProject(project)
     	}
     	
-        render( view:"assetImport", model : [ assetsByProject:assetsByProject, projectId:projectId ] )
+        render( view:"assetImport", model : [ assetsByProject: assetsByProject, projectId: projectId, moveBundleInstanceList: moveBundleInstanceList, dataTransferSetImport: dataTransferSetImport, dataTransferSetExport: dataTransferSetExport ] )
     }
     /*
      * render export form
