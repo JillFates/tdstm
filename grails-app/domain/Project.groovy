@@ -6,7 +6,9 @@ class Project extends PartyGroup {
 	Date startDate	// Date that the project will start
 	Date completionDate	// Date that the project will finish
 	Party client
-
+    
+	static hasMany = [ dataTransferBatch : DataTransferBatch ]
+	
 	static constraints = {
 		name( ) // related party Group
 		projectCode( blank:false, nullable:false,unique:'client' )

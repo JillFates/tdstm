@@ -19,7 +19,7 @@ class AssetEntityAttributeLoaderService {
         def workbook
         def sheet
         def sheetNo = 0
-        def map = [ "Attribute Code":null, "Label":null, "Type":null, "sortOrder":null, "Note":null, "Input type":null, "Required":null, "Unique":null, "Business Rules (hard/soft errors)":null, "Options":null ]
+        def map = [ "Attribute Code":null, "Label":null, "Type":null, "sortOrder":null, "Note":null, "Input type":null, "Required":null, "Unique":null, "Business Rules (hard/soft errors)":null, "Spreadsheet Sheet Name":null, "Spreadsheet Column Name":null, "Options":null ]
         try{
         	workbook = Workbook.getWorkbook( stream )
         	sheet = workbook.getSheet( sheetNo )
@@ -43,6 +43,8 @@ class AssetEntityAttributeLoaderService {
             		def sortOrder = sheet.getCell( map["sortOrder"], r ).contents
             		def validation = sheet.getCell( map["Business Rules (hard/soft errors)"], r ).contents
             		def options = sheet.getCell( map["Options"], r ).contents
+            		def spreadSheetName = sheet.getCell( map["Spreadsheet Sheet Name"], r ).contents
+            		def columnName = sheet.getCell( map["Spreadsheet Column Name"], r ).contents
             		// save data in to db(eavAttribute) 
             		eavAttribute = new EavAttribute( attributeCode:applicationCode,
                         note: note,
@@ -55,8 +57,28 @@ class AssetEntityAttributeLoaderService {
                         isRequired: (isRequired.equalsIgnoreCase("X"))?1:0,
                         isUnique: (isUnique.equalsIgnoreCase("X"))?1:0,
                         sortOrder: sortOrder )
-            		if ( eavAttribute ) {
-            			eavAttribute.save()
+            		if ( eavAttribute && eavAttribute.save() ) {
+            			
+            			//create DataTransferAttributeMap records related to the DataTransferSet 
+            			def dataTransferSetId 
+		                def dataTransferSet
+		                try {
+		                	dataTransferSetId = 1
+		                	dataTransferSet = DataTransferSet.findById( dataTransferSetId )
+		                	def dataTransferAttributeMap = new DataTransferAttributeMap(
+		                		columnName:columnName,
+		                		sheetName:spreadSheetName,
+		                		dataTransferSet:dataTransferSet,
+		                		eavAttribute:eavAttribute,
+		                		validation:validation,
+		                		isRequired: (isRequired.equalsIgnoreCase("X"))?1:0
+                            )
+		                	if( dataTransferAttributeMap ){
+		                		dataTransferAttributeMap.save()
+		                	}
+		                }catch ( Exception ex ) {
+		        			ex.printStackTrace()
+		                }
             			//populate the EavEntityAttribute map associating each of the attributes to the set 
             			def eavAttributeSetId
 		                def eavAttributeSet
@@ -73,7 +95,7 @@ class AssetEntityAttributeLoaderService {
 		                		eavEntityAttribute.save()
 		                	}
 		                }catch ( Exception ex ) {
-		        			e.printStackTrace()
+		        			ex.printStackTrace()
 		                }
             			/*
             			 * After eavAttribute saved it will check for any options is there corresponding to current attribute
@@ -100,7 +122,7 @@ class AssetEntityAttributeLoaderService {
             }
         }
         catch( Exception ex ) {
-        	ex.printStacktrace()
+        	ex.printStackTrace()
         } 
 	}
     //  check the sheet headers and return boolean value

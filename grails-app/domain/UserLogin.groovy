@@ -5,7 +5,8 @@ class UserLogin {
 	Date lastLogin
 	String active
 	Person person
-
+    
+	static hasMany = [ dataTransferBatch : DataTransferBatch ]
 	/*
 	 * Fields Validations
 	 */
@@ -17,7 +18,7 @@ class UserLogin {
 		 lastLogin( blank: true, nullable: true )
 		 active( nullable:false, inList:['Y', 'N'] )
 	 }
-
+ 
 	 /*
 	 *  mapping for COLUMN Relation
 	 */

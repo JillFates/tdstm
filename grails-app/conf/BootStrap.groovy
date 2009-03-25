@@ -443,6 +443,10 @@ class BootStrap {
 		// This line was causing RTE because table is not created
 		def attributeSet = new EavAttributeSet( attributeSetName:'TDS Master List', entityType:entityType, sortOrder:10 ).save()
 		
+		//--------------------------------
+		// Create DataTransferSet 
+		//--------------------------------
+		def dataTransferSet = new DataTransferSet( title:'TDS Master Spreadsheet', transferMode:'B' ).save()
 		/*
 		 * Getting Stream of object on AssetEntity_Attributes.xls and storing Stream as records in database 
 		 * using assetEntityAttributeLoaderService
@@ -453,7 +457,7 @@ class BootStrap {
                 
         } catch (Exception ex) {
             println "exception while reading AssetEntity_Attributes file"
-            ex.printStacktrace()
+            
         }
         assetEntityAttributeLoaderService.uploadEavAttribute(stream)
 

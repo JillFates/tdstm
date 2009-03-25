@@ -16,11 +16,13 @@ class EavAttribute {
 	static hasMany = [ 
 		entityDatatypes  : EavEntityDatatype,
 		entityAttributes : EavEntityAttribute,
-		attributeOptions : EavAttributeOption
+		attributeOptions : EavAttributeOption,
+		dataTransferAttributeMap : DataTransferAttributeMap,
+		dateTransferValue : DateTransferValue
 	]
 
 	static belongsTo = [ entityType:EavEntityType ]
-
+	
 	static mapping = {
 		version false
 		columns {
