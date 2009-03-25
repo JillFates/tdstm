@@ -93,7 +93,8 @@ class MoveBundleController {
             	def updateMoveBundlePMRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", projectManagerId, "PROJ_MGR" )
             	def updateMoveBundleMMRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", moveManagerId, "MOVE_MGR" )
                 flash.message = "MoveBundle ${moveBundleInstance} updated"
-                redirect(action:list,id:moveBundleInstance.id, params:[projectId: projectId])
+                //redirect(action:show,params:[id:moveBundleInstance.id, projectId:projectId])
+                redirect(action:show,id:moveBundleInstance.id, params:[projectId: projectId])
             }
             else {
             	def managers = partyRelationshipService.getProjectStaff( projectId )

@@ -146,6 +146,18 @@
 	padding:2px 6px;
 	border-right:1px solid #CCCCCC;
 }
+.menu2 .title1
+{
+	width:auto;
+	float: left;
+	height:16px;
+	text-decoration: none;
+	text-align:center;
+	font: bold 12px Arial;
+	color:#F0F0F0;
+	padding:2px 6px;
+	border-right:1px solid #CCCCCC;
+}
 .menu2 li a:hover, .menu2 li.current a
 {
 	color:#ffffff;

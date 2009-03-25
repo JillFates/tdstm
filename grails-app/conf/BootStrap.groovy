@@ -264,8 +264,8 @@ class BootStrap {
 		// Create MoveBundle Details
 		// -------------------------------
 		println "\n\n MOVE BUNDLE\n\n"
-		def cedarsProjectMoveBundle = new MoveBundle( project: cedarsProject, name: "Cedars Bundle", startTime: new Date(), completionTime: new Date(), operationalOrder:12244 ).save( insert:true )
-		def twProjectMoveBundle = new MoveBundle( project: twProject, name: "TW Bundle", startTime: new Date(), completionTime: new Date(), operationalOrder:29922 ).save( insert:true )
+		def cedarsProjectMoveBundle = new MoveBundle( project: cedarsProject, name: "Cedars Bundle", startTime: new Date(), completionTime: new Date(), operationalOrder:1 ).save( insert:true )
+		def twProjectMoveBundle = new MoveBundle( project: twProject, name: "TW Bundle", startTime: new Date(), completionTime: new Date(), operationalOrder:2 ).save( insert:true )
 		
 		// -------------------------------
 		// Create ProjectTeam

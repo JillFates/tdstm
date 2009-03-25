@@ -20,7 +20,9 @@
 		</div>
     	<div class="menu2" style="background-color:#003366;">
           <ul>
-			<li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:bundleInstance?.id]" >Team </g:link> </li>          </ul>
+			<li class="title1">Move Bundle: ${bundleInstance?.name}</li>
+			<li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:bundleInstance?.id]" >Team </g:link> </li>
+			</ul>
 		</div>
         <div class="body">
             <h1>Move Bundle Team List</h1>
@@ -57,7 +59,7 @@
                              
                             <td>
                             	<g:each in="${projectTeamInstance?.teamMembers}" var="teamMember">
-			 					${teamMember.company[0]}:${teamMember.name}<br>
+			 					${teamMember.company[0]}:${teamMember?.staff?.lastName}, ${teamMember?.staff?.firstName} - ${teamMember?.staff?.title}<br>
 								</g:each>
 							</td>
                             

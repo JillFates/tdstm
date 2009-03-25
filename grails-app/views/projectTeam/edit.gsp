@@ -31,6 +31,7 @@
 		</div>
     	<div class="menu2" style="background-color:#003366;">
           <ul>
+          <li class="title1">Move Bundle: ${bundleInstance?.name}</li>
             <li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:bundleInstance?.id]" >Team </g:link> </li>
           </ul>
 		</div>
@@ -111,9 +112,9 @@
                                 </tr>
                                 <tr >
 	                                <td valign="top" style="width: 10">
-		                                <select name="availableStaff" id="availableStaffId" multiple="multiple" size="10" style="width: 250px">
+		                                <select name="availableStaff" id="availableStaffId" multiple="multiple" size="10" style="width: 313px;">
 			                                <g:each in="${availableStaff}" var="availableStaff">
-			                                	<option value="${availableStaff?.staff.id}">${availableStaff.company[0]}:${availableStaff.name}</option>
+			                                	<option value="${availableStaff?.staff.id}">${availableStaff.company[0]}:${availableStaff?.staff?.lastName}, ${availableStaff?.staff?.firstName} - ${availableStaff?.staff?.title}</option>
 			                                </g:each> 
 		                                </select>
 	                                </td>
@@ -122,9 +123,9 @@
 		                                <span style="white-space: nowrap;"> <a href="#" id="remove">&lt;&lt; Remove</a></span>
 	                                </td>
 	                                <td valign="top" style="width: auto;">
-		                                <select name="teamMembers" id="teamMembersId" multiple="multiple" size="10" style="width: 250px">
+		                                <select name="teamMembers" id="teamMembersId" multiple="multiple" size="10" style="width: 313px;">
 										<g:each in="${teamMembers}" var="teamMember">
-			                                	<option value="${teamMember?.staff.id}" selected="selected">${teamMember.company[0]}:${teamMember.name}</option>
+			                                	<option value="${teamMember?.staff.id}" selected="selected">${teamMember.company[0]}:${teamMember?.staff?.lastName}, ${teamMember?.staff?.firstName} - ${teamMember?.staff?.title}</option>
 										</g:each>  
 		                                </select>
 	                                </td>

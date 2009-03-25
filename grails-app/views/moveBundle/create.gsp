@@ -163,7 +163,7 @@
                   <label for="operationalOrder">Operational Order:</label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'operationalOrder','errors')}">
-                  <input type="text" id="operationalOrder" name="operationalOrder" value="${fieldValue(bean:moveBundleInstance,field:'operationalOrder')}" />
+                  <g:select from="${1..25}" id="operationalOrder" name="operationalOrder" value="${moveBundleInstance?.operationalOrder}" ></g:select>
                   <g:hasErrors bean="${moveBundleInstance}" field="operationalOrder">
                     <div class="errors">
                       <g:renderErrors bean="${moveBundleInstance}" as="list" field="operationalOrder"/>

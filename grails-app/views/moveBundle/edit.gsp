@@ -51,6 +51,7 @@
     </div>
     <div class="menu2" style="background-color:#003366;">
       <ul>
+      	<li class="title1">Move Bundle: ${moveBundleInstance?.name}</li>
         <li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundleInstance?.id]" >Team </g:link> </li>
       </ul>
     </div>
@@ -173,7 +174,7 @@
                   <label for="operationalOrder">Operational Order:</label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'operationalOrder','errors')}">
-                  <input type="text" id="operationalOrder" name="operationalOrder" value="${fieldValue(bean:moveBundleInstance,field:'operationalOrder')}" />
+                  <g:select from="${1..25}" id="operationalOrder" name="operationalOrder" value="${moveBundleInstance?.operationalOrder}" ></g:select>
                   <g:hasErrors bean="${moveBundleInstance}" field="operationalOrder">
                     <div class="errors">
                       <g:renderErrors bean="${moveBundleInstance}" as="list" field="operationalOrder"/>

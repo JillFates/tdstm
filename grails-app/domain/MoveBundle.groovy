@@ -17,7 +17,7 @@ class MoveBundle extends PartyGroup {
 		description( blank:true, nullable:true )		
 		startTime( blank:true, nullable:true )
 		completionTime( blank:true, nullable:true )
-        operationalOrder( blank:false, nullable:false )
+        operationalOrder( blank:false, nullable:false, range:1..25 )
         
 	}
 

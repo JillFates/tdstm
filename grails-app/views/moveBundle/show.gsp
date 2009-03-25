@@ -20,6 +20,7 @@
     </div>
     <div class="menu2" style="background-color:#003366;">
       <ul>
+      <li class="title1">Move Bundle: ${moveBundleInstance?.name}</li>
         <li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundleInstance?.id]" >Team </g:link> </li>
       </ul>
     </div>
