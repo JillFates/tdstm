@@ -5,10 +5,12 @@ import jxl.read.biff.*
 import org.springframework.web.multipart.*
 import org.springframework.web.multipart.commons.*
 import grails.converters.JSON
+import org.jsecurity.SecurityUtils
+import com.tdssrc.eav.*
 class AssetController {
 
 	// TODO : Fix indentation
-
+	
     def index = {
 		redirect( action:list, params:params )
 	}
@@ -24,8 +26,8 @@ class AssetController {
         def projectInstance
         def moveBundleInstanceList
         if( projectId != null ) {
-	         projectInstance = Project.findById( projectId )
-	         moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
+            projectInstance = Project.findById( projectId )
+            moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
         }
         def dataTransferSetImport = DataTransferSet.findAll(" from DataTransferSet dts where dts.transferMode IN ('B','I') ")
         def dataTransferSetExport = DataTransferSet.findAll(" from DataTransferSet dts where dts.transferMode IN ('B','E') ")
@@ -65,6 +67,11 @@ class AssetController {
         //get project Name
         def projectId
         def project
+        def dataTransferSet = params.dataTransferSet
+        def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
+        println "dataTransferSetInstance"+dataTransferSetInstance
+        def dataTransferAttributeMap = DataTransferAttributeMap.findAllByDataTransferSet( dataTransferSetInstance )
+       
         try {
             projectId = params["projectIdImport"]
        
@@ -94,68 +101,119 @@ class AssetController {
         // create workbook
         def workbook
         def sheet
-        def sheetNo = 1
-        def map = [ "Server":null, "Type":null, "S/N":null, "AssetTag":null ]
-        try{
+        //def sheetNo = 1
+        //def map = [ "Server":null, "Type":null, "S/N":null, "AssetTag":null ]
+        
+        def map = [:]
+        def serverMap = [:]
+        def dataTransferAttributeMapSheetName
+        dataTransferAttributeMap.eachWithIndex { item, pos ->
+    		map.put( item.columnName, null )
+    		serverMap.put( "sheetName", (item.sheetName).trim() )
+        }
+        try {
             workbook = Workbook.getWorkbook( file.inputStream )
-            sheet = workbook.getSheet( sheetNo )
-
-            // TODO : All columns should be done using maps as this will get unwieldly to manage with 20+ columns.  Both the import and
-            // export should use the same map.
-
-            //check for column
-            def col = sheet.getColumns()
-            def checkCol = checkHeader( col, map, sheet )
-
-            // Statement to check Headers if header are not found it will return Error message
-
-            // TODO : map here too.
-            if ( checkCol == false ) {
-                flash.message = " Column Headers not found, Please check it."
-                redirect( controller:"asset", action:"assetImport" )
-
-            } else {
-                def added = 0
-                def skipped = []
-                for ( int r = 1; r < sheet.rows; r++ ) {
-                    // get fields
-                    def assetName = sheet.getCell( map["Server"], r ).contents
-                    def assetType = sheet.getCell( map["Type"], r ).contents                    
-                    def assetTypeObj = AssetType.findById(assetType)                   
-                    def serialNumber = sheet.getCell( map["S/N"], r ).contents
-                    def assetTag = sheet.getCell( map["AssetTag"], r ).contents
-
-                    // save data in to db and check for added rows and skipped
-                    def asset = new Asset(
-
-                        project: project,
-                        assetType: assetTypeObj,
-                        assetName: assetName,
-                        assetTag: assetTag,
-                        serialNumber: serialNumber,
-                        deviceFunction: "")
-
-                    // TODO : This logic will ALWAY return true since the asset is created.  It should be testing asset.save() and not called above.
-                    if ( asset ) {
-                        asset.save()
-                        added++
-                    } else {
-                        skipped += ( r +1 )
-                    }
+            def sheetNames = workbook.getSheetNames()        
+            def flag = 0
+            for( int i=0;  i < sheetNames.length; i++ ) {           	
+            	
+                if ( serverMap.containsValue(sheetNames[i].trim()) ) {
+                    flag = 1
+                    sheet = workbook.getSheet( sheetNames[i] )
                 }
+            	
+      		}
+            
+            if( flag == 0 ) {
+            	
+            	flash.message = " Sheet not found, Please check it."
+                redirect( action:assetImport, params:[projectId:projectId] ) 
+                
+            } else {           
+           
+            
+                // TODO : All columns should be done using maps as this will get unwieldly to manage with 20+ columns.  Both the import and
+                // export should use the same map.
 
-                // generate error message
-                flash.message = " ${added} Asset added. "
-                if ( skipped.size() > 0 ) {
-                    flash.message += "  Rows ${skipped.join(', ')} were skipped because they were incomplete."
+                //check for column
+                def col = sheet.getColumns()
+                def checkCol = checkHeader( col, map, sheet )
+                // Statement to check Headers if header are not found it will return Error message
+
+                // TODO : map here too.
+                if ( checkCol == false ) {
+                    flash.message = " Column Headers not found, Please check it."
+                    redirect( action:assetImport, params:[projectId:projectId] )
+
+                } else {
+            	
+                    //get user name.
+                    def subject = SecurityUtils.subject
+                    def principal = subject.principal
+                    def userLogin = UserLogin.findByUsername( principal )
+                    //Add Data to dataTransferBatch.
+                    def dataTransferBatch = new DataTransferBatch()
+                	dataTransferBatch.statusCode = "PENDING"
+                	dataTransferBatch.transferMode = "I"
+                	dataTransferBatch.dataTransferSet = dataTransferSetInstance
+                	dataTransferBatch.project = project
+                	dataTransferBatch.userLogin = userLogin 
+                    if(dataTransferBatch.save()){
+                        def added = 0
+                        def skipped = []
+                        def dataTransferValue
+                        def eavAttributeInstance
+                        for( int cols = 0; cols < col; cols++ ) {
+                            def dataTransferAttributeMapInstance = DataTransferAttributeMap.findByColumnName(sheet.getCell( cols, 0 ).contents)
+                            if( dataTransferAttributeMapInstance != null ) {
+                                for ( int r = 1; r < sheet.rows; r++ ) {
+                                    dataTransferValue = new DataTransferValue()
+                                    eavAttributeInstance = dataTransferAttributeMapInstance.eavAttribute
+                                    dataTransferValue.importValue = sheet.getCell( cols, r ).contents
+                                    dataTransferValue.rowId = r
+                                    dataTransferValue.dataTransferBatch = dataTransferBatch
+                                    dataTransferValue.eavAttribute = eavAttributeInstance
+                                    dataTransferValue.save()
+                    		
+                                }
+                            }
+                	
+                            /*// get fields
+                            def assetName = sheet.getCell( map["Server"], r ).contents
+                            def assetType = sheet.getCell( map["Type"], r ).contents
+                            def assetTypeObj = AssetType.findById(assetType)
+                            def serialNumber = sheet.getCell( map["S/N"], r ).contents
+                            def assetTag = sheet.getCell( map["AssetTag"], r ).contents
+
+
+                            // save data in to db and check for added rows and skipped
+                            def asset = new Asset(
+
+                            project: project,
+                            assetType: assetTypeObj,
+                            assetName: assetName,
+                            assetTag: assetTag,
+                            serialNumber: serialNumber,
+                            deviceFunction: "")
+
+                            // TODO : This logic will ALWAY return true since the asset is created.  It should be testing asset.save() and not called above.
+                            if ( asset ) {
+                            asset.save()
+                            added++
+                            } else {
+                            skipped += ( r +1 )
+                            }*/
+                        }
+
+                    } // generate error message
+                    workbook.close()
+                    redirect( action:assetImport, params:[projectId:projectId] )
                 }
-                workbook.close()
-                redirect( controller:"asset", action:"list" )
             }
-        } catch( Exception ex ) {
+        }catch( Exception ex ) {
             flash.message = grailsApplication.metadata[ 'app.file.format' ]
-            redirect( controller:"asset", action:"assetImport" )
-        } 
+            redirect( action:assetImport, params:[projectId:projectId] )
+        }
     }
     /*
      * download data form Asset table into Excel file
@@ -261,7 +319,7 @@ class AssetController {
         for ( int c = 0; c < col; c++ ) {
             def cellContent = sheet.getCell( c, 0 ).contents
             if( map.containsKey( cellContent ) ) {
-                map.put( cellContent,c )
+                map.put( cellContent, c )
             }
         }
     	if( map.containsValue( null ) == true ) {
@@ -376,7 +434,7 @@ class AssetController {
         
         def items = []
         def assetInstance = Asset.get( params.id )
-       // def partyGroupInstance = PartyGroup.get(assetInstance.owner.id)
+        // def partyGroupInstance = PartyGroup.get(assetInstance.owner.id)
         if( assetInstance.assetType != null && assetInstance.owner != null ){
         	items = [id:assetInstance.id, project:assetInstance.project.name, projectId:assetInstance.project.id, assetType:assetInstance.assetType, assetTypeId:assetInstance.assetType.id, assetOwner:assetInstance.owner.name, assetOwnerId:assetInstance.owner.id, assetTag:assetInstance.assetTag, assetName:assetInstance.assetName, serialNumber:assetInstance.serialNumber, deviceFunction:assetInstance.deviceFunction ]
         	
@@ -409,9 +467,9 @@ class AssetController {
         if( assetDialog[6] != "" && assetDialog[6] != 'null' ){
         	def PartyGroupInstance = PartyGroup.findById(assetDialog[6])
     	    assetInstance.owner = PartyGroupInstance
-       }else{
-    	   assetInstance.owner = null
-       }
+        }else{
+            assetInstance.owner = null
+        }
         assetInstance.save()
 
         if( assetInstance.assetType == null ) {

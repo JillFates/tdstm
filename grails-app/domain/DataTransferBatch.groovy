@@ -5,7 +5,7 @@ class DataTransferBatch {
 	Integer versionNumber
 	String  transferMode 
 	
-	static hasMany = [ dateTransferValue:DateTransferValue ]
+	static hasMany = [ dataTransferValue:DataTransferValue ]
 	
 	static belongsTo = [ dataTransferSet : DataTransferSet, project : Project, userLogin : UserLogin ]
 	
@@ -17,10 +17,10 @@ class DataTransferBatch {
 	}
 	static constraints = {
 		statusCode(blank:false, size:0..20)
-		dateCreated(blank:false)
-		statusCode(blank:false)
+		dateCreated(blank:true, nullable:true)
+		lastModified(blank:true, nullable:true)
 		transferMode( blank:false, inList:['I', 'E', 'B'])
-		versionNumber(blank:true)
+		versionNumber(blank:true, nullable:true)
 	}
 
 }

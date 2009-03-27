@@ -18,7 +18,7 @@ class EavAttribute {
 		entityAttributes : EavEntityAttribute,
 		attributeOptions : EavAttributeOption,
 		dataTransferAttributeMap : DataTransferAttributeMap,
-		dateTransferValue : DateTransferValue
+		dataTransferValue : DataTransferValue
 	]
 
 	static belongsTo = [ entityType:EavEntityType ]
