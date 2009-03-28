@@ -16,9 +16,7 @@ class EavAttribute {
 	static hasMany = [ 
 		entityDatatypes  : EavEntityDatatype,
 		entityAttributes : EavEntityAttribute,
-		attributeOptions : EavAttributeOption,
-		dataTransferAttributeMap : DataTransferAttributeMap,
-		dataTransferValue : DataTransferValue
+		attributeOptions : EavAttributeOption
 	]
 
 	static belongsTo = [ entityType:EavEntityType ]

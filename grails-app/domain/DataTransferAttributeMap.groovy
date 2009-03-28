@@ -1,11 +1,19 @@
 import com.tdssrc.eav.*
+
+/*
+ * The DataTransferAttributeMap is used to map the spreadsheet sheet/columns
+ * to the entity attributes.  This mapping is used in conjuction for importing
+ * and exporting data of the referenced DataTransferSet.
+ */
 class DataTransferAttributeMap {
-	String columnName
-	String sheetName
-	String validation
-	Integer	isRequired
+	String sheetName			// Spreadsheet sheet name
+	String columnName			// Spreadsheet column name
+	String validation			// Validation rules
+	Integer	isRequired		// Flag if column is a required field
+	EavAttribute eavAttribute
+
+	static belongsTo = [ dataTransferSet : DataTransferSet ]
 	
-	static belongsTo = [ dataTransferSet : DataTransferSet, eavAttribute : EavAttribute ]
 	static mapping = {
 		version false
 		columns {
@@ -13,6 +21,7 @@ class DataTransferAttributeMap {
 			isRequired sqlType:'smallint'
 		}
 	}
+	
 	static constraints = {
 		columnName(blank:false, size:0..32)
 		sheetName(blank:false, size:0..64)

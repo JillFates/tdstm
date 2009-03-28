@@ -1,4 +1,5 @@
 import com.tdssrc.eav.EavAttribute
+
 class DataTransferValue {
 	String importValue
 	String correctedValue
@@ -6,8 +7,11 @@ class DataTransferValue {
 	Integer rowId
 	Integer assetEntityId
 	Integer hasError
+	EavAttribute eavAttribute
 	
-	static belongsTo = [ dataTransferBatch : DataTransferBatch, eavAttribute : EavAttribute ]
+	static belongsTo = [ 
+		dataTransferBatch : DataTransferBatch
+	]
 	
 	static mapping = {
 		version false
