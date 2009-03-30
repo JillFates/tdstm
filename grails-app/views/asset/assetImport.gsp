@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="main" />
-    <title>File Import</title>
+    <title>Asset Import/Export</title>
   </head>
   <body>
     <div class="menu2">
@@ -22,8 +22,8 @@
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
       </g:if>
-      <g:if test="${!assetsByProject}">
-        <h1>File Import</h1>
+      
+        <h1>Asset Import</h1>
         <g:form action="upload" method="post" name="importForm" enctype="multipart/form-data">
           <input type="hidden" value="${projectId}" name="projectIdImport" >
           <div class="dialog">
@@ -61,8 +61,8 @@
             </table>
           </div>
         </g:form>
-      </g:if>
-      <h1>File Export</h1>
+      
+      <h1>Asset Export</h1>
 
       <g:form action="export" method="post" name="exportForm">
         <input type="hidden" value="${projectId}" name="projectIdExport" >
@@ -74,7 +74,7 @@
             </thead>
             <tbody>
               <tr>
-                  <td valign="top" class="name">Import Type:</td>
+                  <td valign="top" class="name">Export Type:</td>
                   <td valign="top" class="value"><select id="dataTransferSet" name="dataTransferSet">                    
                     <g:each status="i" in="${dataTransferSetExport}" var="dataTransferSet">
                       <option value="${dataTransferSet?.id}">${dataTransferSet?.title}</option>

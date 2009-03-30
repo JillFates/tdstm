@@ -69,12 +69,10 @@ class AssetController {
         def project
         def dataTransferSet = params.dataTransferSet
         def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
-        println "dataTransferSetInstance"+dataTransferSetInstance
         def dataTransferAttributeMap = DataTransferAttributeMap.findAllByDataTransferSet( dataTransferSetInstance )
        
         try {
             projectId = params["projectIdImport"]
-       
             if ( projectId == null || projectId == "" ) {
 
                 flash.message = "Project Name is required"
@@ -83,10 +81,10 @@ class AssetController {
             }
 
             project = Project.findById( projectId )
-        
+            
             //delete previous records existed for Project
         
-            def assetDelete = Asset.executeUpdate("delete from Asset a where a.project = $project.id " )
+            //def assetDelete = Asset.executeUpdate("delete from Asset a where a.project = $project.id " )
 
         }catch ( Exception ex ) {
             
