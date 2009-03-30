@@ -139,5 +139,42 @@ class AssetEntityAttributeLoaderService {
 			return true
 		}
 	}
+	
+	/*
+	 * Method to assign Assets to Bundles 
+	 */
+	def saveAssetsToBundle( def bundleTo, def bundleFrom, def assets ){
+		def moveBundleAssets
+		def moveBundleTo = MoveBundle.findById( bundleTo )
+		// remove asstes from source bundle 
+		if(bundleFrom){
+			//def moveBundleFrom = MoveBundle.findById( bundleFrom )
+			def deleteAssets = MoveBundleAsset.executeUpdate("delete from MoveBundleAsset where moveBundle = $bundleFrom and asset in ($assets)")
+		}
+		if(bundleTo){
+			// get Assets into list
+			def assetsList = getStringArray( assets )
+			// assign assets to bundle
+			
+			assetsList.each{asset->
+				def assetEntity = AssetEntity.findById( asset )
+				def moveBundleAsset = new MoveBundleAsset( moveBundle:moveBundleTo, asset:assetEntity ).save()
+			}
+			moveBundleAssets = MoveBundleAsset.findAll("from MoveBundleAsset where moveBundle = $bundleTo and asset in ($assets)")
+		}
+		
+		return moveBundleAssets
+	}
+	
+	// get StringArray from StringList 
+	def getStringArray(def stringList){
+		def list = new ArrayList()
+		def token = new StringTokenizer(stringList, ",")
+		while (token.hasMoreTokens()) {
+			//println"list=============>"+token.nextToken()
+			list.add(token.nextToken())
+     	}
+		return list
+	}
 
 }

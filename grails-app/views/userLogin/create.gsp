@@ -124,8 +124,12 @@
 		                                </select>
 	                                </td>
 	                                <td valign="middle" style="vertical-align:middle" >
-		                                <span style="white-space: nowrap;height: 100px;" > <a href="#" id="add">Assign &gt;&gt;</a></span><br><br>
-		                                <span style="white-space: nowrap;"> <a href="#" id="remove">&lt;&lt; Remove</a></span>
+		                                <span style="white-space: nowrap;height: 100px;" > <a href="#" id="add">
+										<img  src="${createLinkTo(dir:'images',file:'right-arrow.png')}" style="float: left; border: none;">
+										</a></span><br><br><br><br>
+		                                <span style="white-space: nowrap;"> <a href="#" id="remove">
+		                                <img  src="${createLinkTo(dir:'images',file:'left-arrow.png')}" style="float: left; border: none;">
+		                                </a></span>
 	                                </td>
 	                                <td valign="top" class="name">
 		                                <select name="assignedRole" id="assignedRoleId" multiple="multiple" size="10" style="width: 250px">

@@ -264,15 +264,18 @@ class BootStrap {
 		// Create MoveBundle Details
 		// -------------------------------
 		println "\n\n MOVE BUNDLE\n\n"
-		def cedarsProjectMoveBundle = new MoveBundle( project: cedarsProject, name: "Cedars Bundle", startTime: new Date(), completionTime: new Date(), operationalOrder:1 ).save( insert:true )
+		def cedarsProjectMoveBundle1 = new MoveBundle( project: cedarsProject, name: "Cedars Bundle1", startTime: new Date(), completionTime: new Date(), operationalOrder:1 ).save( insert:true )
+		def cedarsProjectMoveBundle2 = new MoveBundle( project: cedarsProject, name: "Cedars Bundle2", startTime: new Date(), completionTime: new Date(), operationalOrder:1 ).save( insert:true )
+		def cedarsProjectMoveBundle3 = new MoveBundle( project: cedarsProject, name: "Cedars Bundle3", startTime: new Date(), completionTime: new Date(), operationalOrder:1 ).save( insert:true )
+		def cedarsProjectMoveBundle4 = new MoveBundle( project: cedarsProject, name: "Cedars Bundle4", startTime: new Date(), completionTime: new Date(), operationalOrder:1 ).save( insert:true )
 		def twProjectMoveBundle = new MoveBundle( project: twProject, name: "TW Bundle", startTime: new Date(), completionTime: new Date(), operationalOrder:2 ).save( insert:true )
 		
 		// -------------------------------
 		// Create ProjectTeam
 		// -------------------------------
 		println "\n\n PROJECT TEAM \n\n"
-		def cedarsGreenProjectTeam = new ProjectTeam( name: "Cedars's Green Team",	teamCode: "Green", moveBundle:cedarsProjectMoveBundle, dateCreated: new Date()).save()
-		def cedarsRedProjectTeam = new ProjectTeam( name: "Cedars's Red Team",	teamCode: "Red", moveBundle:cedarsProjectMoveBundle, dateCreated: new Date()).save()
+		def cedarsGreenProjectTeam = new ProjectTeam( name: "Cedars's Green Team",	teamCode: "Green", moveBundle:cedarsProjectMoveBundle1, dateCreated: new Date()).save()
+		def cedarsRedProjectTeam = new ProjectTeam( name: "Cedars's Red Team",	teamCode: "Red", moveBundle:cedarsProjectMoveBundle1, dateCreated: new Date()).save()
 		def twGreenProjectTeam = new ProjectTeam( name: "TM's Green Team",	teamCode: "Green", moveBundle:twProjectMoveBundle, dateCreated: new Date()).save()
 		def twRedProjectTeam = new ProjectTeam( name: "TM's Red Team",	teamCode: "Red", moveBundle:twProjectMoveBundle, dateCreated: new Date()).save()
 
@@ -424,15 +427,7 @@ class BootStrap {
 				asset.errors.allErrors.each { println it }
 			}
 		}
-
-		// -------------------------------
-		// Create MoveBundleAsset Details
-		// -------------------------------
-        println "\n\n MOVE BUNDLE ASSET \n\n"
-		def moveBundle1Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle, asset: Asset.get(1),sourceTeam: cedarsGreenProjectTeam,targetTeam: cedarsRedProjectTeam ).save( insert:true )
-		def moveBundle2Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle, asset: Asset.get(2),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam ).save( insert:true )
-		def moveBundle3Asset = new MoveBundleAsset( moveBundle: twProjectMoveBundle, asset: Asset.get(3),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam ).save( insert:true )
-
+		
 		//--------------------------------
 		// Create EavEntityType and EavAttributeSet records
 		//--------------------------------
@@ -442,6 +437,46 @@ class BootStrap {
 
 		// This line was causing RTE because table is not created
 		def attributeSet = new EavAttributeSet( attributeSetName:'TDS Master List', entityType:entityType, sortOrder:10 ).save()
+		//---------------------------------
+		//  Create Asset Entity
+		//---------------------------------
+		def assetEntityList = [
+		  			// project, type, name, asset tag, s/n, AssetOwner
+		  			["CSHMC3", "AutoView 3100", "XX-232-YAB", "rackad1", "1", "12",attributeSet],
+		  			["CSHSACCESS2","7028-6C4", "XX-138-YAB", "rackad1", "2", "12",attributeSet],
+		  			["CSHSBDGT1", "KVM", "MM-2232", "rackad1", "4", "1",attributeSet],
+		  			["Avocent", "AutoView 3100", "rackad1", "3", "1", attributeSet],
+		  			["CED14P", "Proliant 1600R", "RR-32-YAB", "rackad1", "6", "5",attributeSet],
+		  			["AIX Console HMC2", "V490", "RR-32-YAB", "rackad1", "7", "5",attributeSet],
+		  			["AXPNTSA", "Proliant DL380 G3", "RR-32-YAB", "rackad1", "5", "3",attributeSet],
+		  			["CEDCONSOLE1", "StorageWorks", "RR-32-YAB", "rackad1", "8", "6",attributeSet],
+		  			["CSEGP2 = CSENSD1 IO Drawer 1", "Ultrium Tape", "RR-32-YAB", "rackad1", "9", "7",attributeSet]
+		]
+		
+		// Insert the List of assetEntity
+		assetEntityList.each {
+			def assetEntity = new AssetEntity(
+				serverName: it[0],
+				model: it[1],
+				sourceLocation: it[2],
+				sourceRack: it[3],
+				position: it[4],
+				unitSize: it[5],
+				attributeSet: it[6]
+            ).save()
+		}
+		def assete = new AssetEntity(serverName:"CSHMC3", model:"AutoView 3100", room:"XX-232-YAB", rack:"rackad1", position:"1", uSize:"12", attributeSet:attributeSet)
+		// -------------------------------
+		// Create MoveBundleAsset Details
+		// -------------------------------
+        println "\n\n MOVE BUNDLE ASSET \n\n"
+		def moveBundle1Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle1, asset: AssetEntity.get(1),sourceTeam: cedarsGreenProjectTeam,targetTeam: cedarsRedProjectTeam ).save( insert:true )
+		def moveBundle2Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle1, asset: AssetEntity.get(2),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam ).save( insert:true )
+		def moveBundle3Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle2, asset: AssetEntity.get(3),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam ).save( insert:true )
+		def moveBundle4Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle3, asset: AssetEntity.get(4),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam ).save( insert:true )
+		def moveBundle5Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle2, asset: AssetEntity.get(5),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam ).save( insert:true )
+		def moveBundle6Asset = new MoveBundleAsset( moveBundle: twProjectMoveBundle, asset: AssetEntity.get(3),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam ).save( insert:true )
+
 		
 		//--------------------------------
 		// Create DataTransferSet 

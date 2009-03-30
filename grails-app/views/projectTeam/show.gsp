@@ -22,6 +22,7 @@
           <ul>
           <li class="title1">Move Bundle: ${bundleInstance?.name}</li>
             <li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:bundleInstance?.id]" >Team </g:link> </li>
+            <li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:bundleInstance?.id]" >Bundle Asset Assignment</g:link> </li>
           </ul>
 		</div>
         <div class="body">

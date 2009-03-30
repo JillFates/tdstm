@@ -1,7 +1,7 @@
 class MoveBundleAsset {
     
     MoveBundle moveBundle
-    Asset asset
+    AssetEntity asset
     ProjectTeam sourceTeam
     ProjectTeam targetTeam
 
@@ -12,8 +12,8 @@ class MoveBundleAsset {
 
         moveBundle( blank:false, nullable:false )
         asset( blank:false, nullable:false )
-        sourceTeam( blank:false, nullable:false )
-        targetTeam( blank:false, nullable:false )		
+        sourceTeam( blank:true, nullable:true )
+        targetTeam( blank:true, nullable:true )		
 
 	}
 

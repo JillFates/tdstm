@@ -31,6 +31,7 @@
           <ul>
           <li class="title1">Move Bundle: ${bundleInstance?.name}</li>
             <li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:bundleInstance?.id]" >Team </g:link> </li>
+            <li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:bundleInstance?.id]" >Bundle Asset Assignment</g:link> </li>
           </ul>
 		</div>
         <div class="body">
@@ -112,8 +113,12 @@
 		                                </select>
 	                                </td>
 	                                <td valign="middle" style="vertical-align:middle;" style="width: auto;"  >
-		                                <span style="white-space: nowrap;height: 100px;" > <a href="#" id="add">Assign &gt;&gt;</a></span><br><br>
-		                                <span style="white-space: nowrap;"> <a href="#" id="remove">&lt;&lt; Remove</a></span>
+		                                <span style="white-space: nowrap;height: 100px;" > <a href="#" id="add">
+										<img  src="${createLinkTo(dir:'images',file:'right-arrow.png')}" style="float: left; border: none;">
+										</a></span><br><br><br><br>
+		                                <span style="white-space: nowrap;"> <a href="#" id="remove">
+		                                <img  src="${createLinkTo(dir:'images',file:'left-arrow.png')}" style="float: left; border: none;">
+		                                </a></span>
 	                                </td>
 	                                <td valign="top" style="width: auto;">
 		                                <select name="teamMembers" id="teamMembersId" multiple="multiple" size="10" style="width: 313px;">
