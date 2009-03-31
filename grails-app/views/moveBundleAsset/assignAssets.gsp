@@ -154,13 +154,13 @@
 					</tr>
 					<tr>
 						<td valign="top" class="name">
-						<!-- <select name="assetsLeft" id="assetsLeftId" multiple="multiple" size="10" style="width: 400px" >
+						 <select name="assetsLeft" id="assetsLeftId" multiple="multiple" size="10" style="width: 400px" >
 							<option disabled="disabled" class="option"><ui><li> Asset</li> : <li>Desc </li>:<li> Rack</li> :<li> Rack</li> </option>
 							<g:each in="${AssetEntity.list()}" var="moveBundleAsset">
 								<option value="${moveBundleAsset?.id}">${moveBundleAsset?.id} : ${moveBundleAsset?.serverName} : ${moveBundleAsset?.sourceRack} : ${moveBundleAsset?.sourceLocation}</option>
 							</g:each>
-						</select> -->
-						
+						</select> 
+						<!-- 
 						<div class="scrollTable">  
 					       <table>  
 					         <thead>  
@@ -222,7 +222,7 @@
 					           </g:each>
 					         </tbody>  
 					       </table>  
-					     </div>  
+					     </div>  -->
 						</td>
 						
 						<td valign="middle" style="vertical-align: middle"><span
