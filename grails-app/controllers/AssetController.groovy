@@ -205,6 +205,7 @@ class AssetController {
 
                     } // generate error message
                     workbook.close()
+                    flash.message = " File Uploaded Successfully. "
                     redirect( action:assetImport, params:[projectId:projectId] )
                 }
             }
