@@ -160,7 +160,7 @@ class AssetEntityAttributeLoaderService {
 				def assetEntity = AssetEntity.findById( asset )
 				def moveBundleAsset = new MoveBundleAsset( moveBundle:moveBundleTo, asset:assetEntity ).save()
 			}
-			moveBundleAssets = MoveBundleAsset.findAll("from MoveBundleAsset where moveBundle = $bundleTo and asset in ($assets)")
+			moveBundleAssets = MoveBundleAsset.findAll("from MoveBundleAsset where moveBundle = $bundleTo ")
 		}
 		
 		return moveBundleAssets

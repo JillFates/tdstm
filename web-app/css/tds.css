@@ -190,3 +190,93 @@
 	float:left;
 }
 
+ /* TABLE WRAPPER */  
+  
+      div.scrollTable  
+      {  
+            
+        border: 1px solid black;  
+        width: 400px;  
+        overflow: hidden;  
+                    
+        *width : 516px;  
+        *height : 300px;  
+        *overflow : auto;  
+  
+      }  
+  
+    /* TABLE */  
+  
+      div.scrollTable table{  
+        width: 400px;  
+        border-collapse: collapse;  
+      }  
+  
+    /* TABLE HEADER */  
+  
+      div.scrollTable thead tr  
+      {  
+        display: block;  
+          
+        *display: inherit;  
+        *position: relative;  
+      }  
+  
+      div.scrollTable thead th{  
+        border: 1px solid #AAA;  
+        border-bottom: 1px solid #333;  
+        background-color: #CCC;  
+      }  
+  
+      div.scrollTable thead th a,  
+      div.scrollTable thead th a:link,  
+      div.scrollTable thead th a:visited{  
+        display: block;  
+        padding: 4px;  
+        color: #000;  
+      }  
+  
+      div.scrollTable thead a:hover{  
+        background-color: #EEE;  
+        color: #00A;  
+      }  
+        
+    /* TABLE TBODY */  
+      
+      
+      div.scrollTable tbody  
+      {  
+        display: block;  
+        overflow: auto;  
+        height: 290px;  
+        width: 100%;  
+  
+        *display: inherit;  
+        *overflow: visible;  
+        *height: auto;  
+                
+      }  
+  
+      div.scrollTable tbody td{  
+        padding: 3px;  
+        border-top: 1px solid #ccc;    
+        border-left: 1px solid #ccc;  
+        border-right: 1px solid #ccc;  
+        border-bottom: 1px solid #ccc;
+        border-left: 0px;  
+      }  
+  
+    /* TABLE HEADER AND BODY CELLS */  
+      
+      div.scrollTable thead th,  
+      div.scrollTable tbody td{  
+        width: 121px;  
+      }  
+  
+      div.scrollTable thead th + th + th + th{  
+        width: 138px;  
+      }  
+  
+      div.scrollTable tbody td + td + td + td{  
+        width: 120px;  
+      }  
