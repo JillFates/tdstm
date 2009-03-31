@@ -1,4 +1,4 @@
-<project name="trm" default="test">
+<project name="tds" default="test">
 
     <condition property="grails" value="grails.bat">
         <os family="windows"/>
