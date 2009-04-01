@@ -10,14 +10,16 @@ import com.tdssrc.eav.*
 class AssetController {
 
 	// TODO : Fix indentation
-	
+	def missingHeader = ""
+	def added = 0
+	def skipped = []
     def index = {
 		redirect( action:list, params:params )
 	}
 
     //upload , export
     /*
-     * render import form
+     * render import export form
      */
     def assetImport = {
         //get id of selected project from project view
@@ -51,8 +53,8 @@ class AssetController {
     		def project = Project.findById(projectId)
     		assetsByProject = Asset.findAllByProject(project)
     	}
-    	
-        render( view:"assetImport", model : [ assetsByProject: assetsByProject, projectId: projectId, moveBundleInstanceList: moveBundleInstanceList, dataTransferSetImport: dataTransferSetImport, dataTransferSetExport: dataTransferSetExport ] )
+    	def	dataTransferBatchs = DataTransferBatch.count()
+        render( view:"importExport", model : [ assetsByProject: assetsByProject, projectId: projectId, moveBundleInstanceList: moveBundleInstanceList, dataTransferSetImport: dataTransferSetImport, dataTransferSetExport: dataTransferSetExport, dataTransferBatchs: dataTransferBatchs ] )
     }
     /*
      * render export form
@@ -103,7 +105,7 @@ class AssetController {
         //def map = [ "Server":null, "Type":null, "S/N":null, "AssetTag":null ]
         
         def map = [:]
-        def serverMap = [:]
+        def serverMap = [:]        
         def dataTransferAttributeMapSheetName
         dataTransferAttributeMap.eachWithIndex { item, pos ->
     		map.put( item.columnName, null )
@@ -140,7 +142,9 @@ class AssetController {
 
                 // TODO : map here too.
                 if ( checkCol == false ) {
-                    flash.message = " Column Headers not found, Please check it."
+                	
+                	missingHeader = missingHeader.replaceFirst(",","")
+                    flash.message = " Column Headers : ${missingHeader} not found, Please check it."
                     redirect( action:assetImport, params:[projectId:projectId] )
 
                 } else {
@@ -156,9 +160,8 @@ class AssetController {
                 	dataTransferBatch.dataTransferSet = dataTransferSetInstance
                 	dataTransferBatch.project = project
                 	dataTransferBatch.userLogin = userLogin 
-                    if(dataTransferBatch.save()){
-                        def added = 0
-                        def skipped = []
+                    if(dataTransferBatch.save()){                       
+                        
                         def dataTransferValue
                         def eavAttributeInstance
                         for( int cols = 0; cols < col; cols++ ) {
@@ -171,8 +174,13 @@ class AssetController {
                                     dataTransferValue.rowId = r
                                     dataTransferValue.dataTransferBatch = dataTransferBatch
                                     dataTransferValue.eavAttribute = eavAttributeInstance
-                                    dataTransferValue.save()
-                    		
+                                    //dataTransferValue.save()
+                                    if ( dataTransferValue.save() ) {                                    	
+                                        added++
+                                    } else {
+                                        skipped += ( r +1 )
+                                    }
+                                    
                                 }
                             }
                 	
@@ -205,7 +213,11 @@ class AssetController {
 
                     } // generate error message
                     workbook.close()
-                    flash.message = " File Uploaded Successfully. "
+                    if (skipped.size() > 0) {
+                    	flash.message = " File Uploaded Successfully with ${added} Assets and Skipped are ${skipped}. "
+                    } else {
+                    	flash.message = " File Uploaded Successfully with ${added} Assets. "
+                    }
                     redirect( action:assetImport, params:[projectId:projectId] )
                 }
             }
@@ -303,7 +315,7 @@ class AssetController {
 
                 book.write()
                 book.close()
-                render( view: "assetImport" )
+                render( view: "importExport" )
             }
         } catch( Exception fileEx ) {
 
@@ -314,15 +326,17 @@ class AssetController {
     }
 	// check the sheet headers and return boolean value
     def checkHeader( def col, def map, def sheet ){
-
+    	
         for ( int c = 0; c < col; c++ ) {
             def cellContent = sheet.getCell( c, 0 ).contents
             if( map.containsKey( cellContent ) ) {
                 map.put( cellContent, c )
+            } else {
+            	 missingHeader = missingHeader + ", " + cellContent
             }
         }
     	if( map.containsValue( null ) == true ) {
-
+    		
     		return false
 
     	} else {
