@@ -8,7 +8,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String sourceRack
 	String targetRack
 	String position
-	String unitSize
+	String usize
 	
 	
 	static hasMany = [
@@ -23,7 +23,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		sourceRack( blank:true, nullable:true )
 		targetRack( blank:true, nullable:true )
 		position( blank:true, nullable:true )
-		unitSize( blank:true, nullable:true )
+		usize( blank:true, nullable:true )
 	}
 	// This is where we will/would define special details about the class
 	// TBD...

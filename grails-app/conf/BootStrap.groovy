@@ -461,7 +461,7 @@ class BootStrap {
 				sourceLocation: it[2],
 				sourceRack: it[3],
 				position: it[4],
-				unitSize: it[5],
+				usize: it[5],
 				attributeSet: it[6]
             ).save()
 		}
