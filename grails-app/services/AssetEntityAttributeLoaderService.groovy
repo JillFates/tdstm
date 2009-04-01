@@ -146,7 +146,6 @@ class AssetEntityAttributeLoaderService {
 	def saveAssetsToBundle( def bundleTo, def bundleFrom, def assets ){
 		def moveBundleAssets
 		// remove asstes from source bundle 
-		println"bundleTo---------->"+bundleTo
 		if ( bundleTo ) {
 			def moveBundleTo = MoveBundle.findById( bundleTo )
 			// get Assets into list
