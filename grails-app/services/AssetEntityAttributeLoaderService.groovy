@@ -145,26 +145,29 @@ class AssetEntityAttributeLoaderService {
 	 */
 	def saveAssetsToBundle( def bundleTo, def bundleFrom, def assets ){
 		def moveBundleAssets
-		def moveBundleTo = MoveBundle.findById( bundleTo )
 		// remove asstes from source bundle 
-		if(bundleFrom){
-			//def moveBundleFrom = MoveBundle.findById( bundleFrom )
-			def deleteAssets = MoveBundleAsset.executeUpdate("delete from MoveBundleAsset where moveBundle = $bundleFrom and asset in ($assets)")
-		}
-		if(bundleTo){
+		println"bundleTo---------->"+bundleTo
+		if ( bundleTo ) {
+			def moveBundleTo = MoveBundle.findById( bundleTo )
 			// get Assets into list
 			def assetsList = getStringArray( assets )
 			// assign assets to bundle
-			
 			assetsList.each{asset->
-			
-				def assetEntity = AssetEntity.findById( asset )
-				def assetsExist = MoveBundleAsset.findByMoveBundleAndAsset( moveBundleTo, assetEntity )
-				if(!assetsExist){
-					def moveBundleAsset = new MoveBundleAsset( moveBundle:moveBundleTo, asset:assetEntity ).save()
+				if ( bundleFrom ) {
+					
+					def updateAssets = MoveBundleAsset.executeUpdate("update MoveBundleAsset set moveBundle = $bundleTo where moveBundle = $bundleFrom and asset = $asset ")
+				
+				} else {
+					def assetEntity = AssetEntity.findById( asset )
+					def assetsExist = MoveBundleAsset.findByMoveBundleAndAsset( moveBundleTo, assetEntity )
+					if ( !assetsExist ) {
+						def moveBundleAsset = new MoveBundleAsset( moveBundle:moveBundleTo, asset:assetEntity ).save()
+					}
 				}
 			}
 			moveBundleAssets = MoveBundleAsset.findAll("from MoveBundleAsset where moveBundle = $bundleTo ")
+		} else{
+			def deleteAssets = MoveBundleAsset.executeUpdate("delete from MoveBundleAsset where moveBundle = $bundleFrom and asset in ($assets)")
 		}
 		
 		return moveBundleAssets

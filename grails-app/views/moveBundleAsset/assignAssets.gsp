@@ -90,8 +90,9 @@
 			      var checkbox = document.createElement('input');
 					checkbox.type = 'checkbox';
 					checkbox.name = 'leftasset_'+asset.id;
-					checkbox.id = 'leftasset_'+asset.id;
+					checkbox.id = 'leftassetId_'+asset.id;
 					checkbox.value = asset.id;
+					checkbox.onclick = function() { selectCheckBox( this.id, 'trleft_'+this.value); };
 			      var id = document.createTextNode(asset.id);
 			      td1.appendChild( checkbox )
 			      td1.appendChild( id )
@@ -108,7 +109,7 @@
 			      var room = document.createTextNode(asset.room);
 			      td4.appendChild( room )
 			      tr.appendChild( td4 )
-			      tr.onclick = function() { selectCheckBox('leftasset_'+this.name, this.id); };
+			      tr.onclick = function() { selectCheckBox('leftassetId_'+this.name, this.id); };
 			      tbody.appendChild( tr )
 		      	}
 	      }
@@ -138,8 +139,9 @@
 			      var checkbox = document.createElement('input');
 					checkbox.type = 'checkbox';
 					checkbox.name = 'rightasset_'+asset.id;
-					checkbox.id = 'rightasset_'+asset.id;
+					checkbox.id = 'rightassetId_'+asset.id;
 					checkbox.value = asset.id;
+					checkbox.onclick = function() { selectCheckBox(this.id, 'trright_'+this.value); };
 			      var id = document.createTextNode(asset.id);
 			      td1.appendChild( checkbox );
 			      td1.appendChild( id );
@@ -156,7 +158,7 @@
 			      var room = document.createTextNode(asset.room);
 			      td4.appendChild( room );
 			      tr.appendChild( td4 );
-			      tr.onclick = function() { selectCheckBox('rightasset_'+this.name, this.id); };
+			      tr.onclick = function() { selectCheckBox('rightassetId_'+this.name, this.id); };
 			      tbody.appendChild( tr );
 		      }
 	      }
@@ -245,8 +247,8 @@
 					         </thead>  
 					         <tbody id="assetsLeftTbodyId">
 					         <g:each in="${moveBundleAssets}" var="moveBundleAsset" status="i">
-					           <tr id="trleft_${moveBundleAsset?.id}" onclick="selectCheckBox('leftasset_${moveBundleAsset?.id}', this.id)">  
-					             <td> <input type="checkbox" name="leftasset_${moveBundleAsset?.id}" id="leftasset_${moveBundleAsset?.id}" value="${moveBundleAsset?.id}" onclick="selectCheckBox('leftasset_${moveBundleAsset?.id}', this.id)" />${moveBundleAsset?.id}</td>  
+					           <tr id="trleft_${moveBundleAsset?.id}" onclick="selectCheckBox('leftassetId_${moveBundleAsset?.id}', this.id)">  
+					             <td> <input type="checkbox" name="leftasset_${moveBundleAsset?.id}" id="leftassetId_${moveBundleAsset?.id}" value="${moveBundleAsset?.id}" onclick="selectCheckBox(this.id, 'trleft_${moveBundleAsset?.id}')" />${moveBundleAsset?.id}</td>  
 					             <td>${moveBundleAsset?.serverName}</td>  
 					             <td>${moveBundleAsset?.sourceRack}</td>  
 					             <td>${moveBundleAsset?.sourceLocation}</td>  
@@ -281,7 +283,7 @@
 					         <tbody id="assetsRightTbodyId" >
 					         	<g:each in="${currentBundleAssets}" var="currentBundleAsset" status="i">
 					           <tr id="trright_${currentBundleAsset?.asset?.id}" onclick="selectCheckBox('rightassetId_${currentBundleAsset?.asset?.id}', this.id )">  
-					             <td><input type="checkbox" name="rightasset_${currentBundleAsset?.asset?.id}" id="rightassetId_${currentBundleAsset?.asset?.id}" value="${currentBundleAsset?.asset?.id}" onclick="selectCheckBox('rightassetId_${currentBundleAsset?.asset?.id}', this.id )"/>${currentBundleAsset?.asset?.id}</td>  
+					             <td><input type="checkbox" name="rightasset_${currentBundleAsset?.asset?.id}" id="rightassetId_${currentBundleAsset?.asset?.id}" value="${currentBundleAsset?.asset?.id}" onclick="selectCheckBox( this.id, 'trright_${currentBundleAsset?.asset?.id}' )"/>${currentBundleAsset?.asset?.id}</td>  
 					             <td>${currentBundleAsset?.asset?.serverName}</td>  
 					             <td>${currentBundleAsset?.asset?.sourceRack}</td>  
 					             <td>${currentBundleAsset?.asset?.sourceLocation}</td>
