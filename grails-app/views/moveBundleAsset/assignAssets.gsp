@@ -5,7 +5,7 @@
 <title>Assign Assets</title>
 <g:javascript library="prototype"/>
     <g:javascript library="jquery" />
-	<script type="text/javascript">  
+	<script type="text/javascript">
 			   $().ready(function() {  
 			    $('#add').click(function() {
 			    	assignAssetsToRightBundle(); 
@@ -86,10 +86,6 @@
 			      var tr = document.createElement('tr');
 			      	tr.id = "trleft_"+asset.id;
 			      	tr.name = asset.id;
-			      	if( i % 2 != 0){
-			      	tr.style.backgroundColor = '#E0E0E0';
-			      	}
-			    //  	tr.onclick = selectCheckBox('leftasset_'+asset.id)
 			      var td1 = document.createElement('td');
 			      var checkbox = document.createElement('input');
 					checkbox.type = 'checkbox';
@@ -112,7 +108,7 @@
 			      var room = document.createTextNode(asset.room);
 			      td4.appendChild( room )
 			      tr.appendChild( td4 )
-			      tr.onclick = function() { selectCheckBox('leftasset_'+this.name); };
+			      tr.onclick = function() { selectCheckBox('leftasset_'+this.name, this.id); };
 			      tbody.appendChild( tr )
 		      	}
 	      }
@@ -138,9 +134,6 @@
 			      var tr = document.createElement('tr');
 			      	tr.id = "trright_"+asset.id;
 			      	tr.name = asset.id;
-			      	if( i % 2 != 0){
-			      		tr.style.backgroundColor = '#E0E0E0';
-			      	}
 			      var td1 = document.createElement('td');
 			      var checkbox = document.createElement('input');
 					checkbox.type = 'checkbox';
@@ -163,7 +156,7 @@
 			      var room = document.createTextNode(asset.room);
 			      td4.appendChild( room );
 			      tr.appendChild( td4 );
-			      tr.onclick = function() { selectCheckBox('rightasset_'+this.name); };
+			      tr.onclick = function() { selectCheckBox('rightasset_'+this.name, this.id); };
 			      tbody.appendChild( tr );
 		      }
 	      }
@@ -171,12 +164,16 @@
 	    rselect.appendChild( tbody );
 	}
 	
-	function selectCheckBox( name ){
+	function selectCheckBox( name, trId ){
 		var checkboxName = document.getElementById(name)
+		var trObj = document.getElementById(trId)
+		var bcolor = trObj.style.backgroundColor
 		if(checkboxName.checked){
 			checkboxName.checked = false
+			trObj.style.backgroundColor = '#FFFFFF'
 		} else {
 			checkboxName.checked = true
+			trObj.style.backgroundColor = '#5F9FCF'
 		}
 	}
 	function initialize(){
@@ -246,9 +243,9 @@
 					           </tr>  
 					         </thead>  
 					         <tbody id="assetsLeftTbodyId">
-					         <g:each in="${AssetEntity.list()}" var="moveBundleAsset" status="i">
-					           <tr style="background-color: ${(i % 2) == 0 ? '#FFFFFF' : '#E0E0E0'}" id="trleft_${moveBundleAsset?.id}" onclick="selectCheckBox('leftasset_${moveBundleAsset?.id}')">  
-					             <td> <input type="checkbox" name="leftasset_${moveBundleAsset?.id}" id="leftasset_${moveBundleAsset?.id}" value="${moveBundleAsset?.id}">${moveBundleAsset?.id}</td>  
+					         <g:each in="${moveBundleAssets}" var="moveBundleAsset" status="i">
+					           <tr id="trleft_${moveBundleAsset?.id}" onclick="selectCheckBox('leftasset_${moveBundleAsset?.id}', this.id)">  
+					             <td> <input type="checkbox" name="leftasset_${moveBundleAsset?.id}" id="leftasset_${moveBundleAsset?.id}" value="${moveBundleAsset?.id}" onclick="selectCheckBox('leftasset_${moveBundleAsset?.id}', this.id)" />${moveBundleAsset?.id}</td>  
 					             <td>${moveBundleAsset?.serverName}</td>  
 					             <td>${moveBundleAsset?.sourceRack}</td>  
 					             <td>${moveBundleAsset?.sourceLocation}</td>  
@@ -282,8 +279,8 @@
 					         </thead>  
 					         <tbody id="assetsRightTbodyId" >
 					         	<g:each in="${currentBundleAssets}" var="currentBundleAsset" status="i">
-					           <tr style="background-color: ${(i % 2) == 0 ? '#FFFFFF' : '#E0E0E0'}" id="trright_${currentBundleAsset?.asset?.id}" onclick="selectCheckBox('rightasset_${currentBundleAsset?.asset?.id}')">  
-					             <td><input type="checkbox" name="rightasset_${currentBundleAsset?.asset?.id}" id="rightasset_${currentBundleAsset?.asset?.id}" value="${currentBundleAsset?.asset?.id}">${currentBundleAsset?.asset?.id}</td>  
+					           <tr id="trright_${currentBundleAsset?.asset?.id}" onclick="selectCheckBox('rightassetId_${currentBundleAsset?.asset?.id}', this.id )">  
+					             <td><input type="checkbox" name="rightasset_${currentBundleAsset?.asset?.id}" id="rightassetId_${currentBundleAsset?.asset?.id}" value="${currentBundleAsset?.asset?.id}" onclick="selectCheckBox('rightassetId_${currentBundleAsset?.asset?.id}', this.id )"/>${currentBundleAsset?.asset?.id}</td>  
 					             <td>${currentBundleAsset?.asset?.serverName}</td>  
 					             <td>${currentBundleAsset?.asset?.sourceRack}</td>  
 					             <td>${currentBundleAsset?.asset?.sourceLocation}</td>

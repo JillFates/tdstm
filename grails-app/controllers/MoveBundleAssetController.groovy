@@ -90,8 +90,8 @@ class MoveBundleAssetController {
     	def moveBundleInstance = MoveBundle.findById( bundleId )
     	def moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $moveBundleInstance.project.id")
     	def currentBundleAssets = MoveBundleAsset.findAll("from MoveBundleAsset where moveBundle.id = $moveBundleInstance.id")
-    	//def moveBundleAssets = MoveBundleAsset.findAll("from MoveBundleAsset where asset.id not in (select asset.id from MoveBundleAsset where moveBundle.id = 22) group by asset.id")
-    	render( view:'assignAssets', model:[moveBundles:moveBundles, currentBundleAssets: currentBundleAssets, moveBundleInstance:moveBundleInstance ] )
+    	def moveBundleAssets = AssetEntity.findAll("from AssetEntity where id not in (select asset.id from MoveBundleAsset)")
+    	render( view:'assignAssets', model:[moveBundles:moveBundles, currentBundleAssets: currentBundleAssets, moveBundleInstance:moveBundleInstance, moveBundleAssets:moveBundleAssets ] )
     }
 	/*
 	 *  Save Assets for corresponding Bundle
@@ -107,7 +107,7 @@ class MoveBundleAssetController {
 				items <<[id:bundleAsset.asset.id, serverName:bundleAsset.asset.serverName, rack:bundleAsset.asset.sourceRack, room:bundleAsset.asset.sourceLocation ]
 	    	}
     	} else {
-    		def assetEntities = AssetEntity.list()
+    		def assetEntities = AssetEntity.findAll("from AssetEntity where id not in (select asset.id from MoveBundleAsset)")
 			assetEntities.each{assetEntity ->
 	        
 				items <<[id:assetEntity.id, serverName:assetEntity.serverName, rack:assetEntity.sourceRack, room:assetEntity.sourceLocation ]
@@ -130,7 +130,7 @@ class MoveBundleAssetController {
 	         
 			}
 		}else{
-			def assetEntities = AssetEntity.list()
+			def assetEntities = AssetEntity.findAll("from AssetEntity where id not in (select asset.id from MoveBundleAsset)")
 			assetEntities.each{assetEntity ->
 	        
 				items <<[id:assetEntity.id, serverName:assetEntity.serverName, rack:assetEntity.sourceRack, room:assetEntity.sourceLocation ]

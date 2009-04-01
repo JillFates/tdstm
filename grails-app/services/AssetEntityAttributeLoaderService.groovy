@@ -157,8 +157,12 @@ class AssetEntityAttributeLoaderService {
 			// assign assets to bundle
 			
 			assetsList.each{asset->
+			
 				def assetEntity = AssetEntity.findById( asset )
-				def moveBundleAsset = new MoveBundleAsset( moveBundle:moveBundleTo, asset:assetEntity ).save()
+				def assetsExist = MoveBundleAsset.findByMoveBundleAndAsset( moveBundleTo, assetEntity )
+				if(!assetsExist){
+					def moveBundleAsset = new MoveBundleAsset( moveBundle:moveBundleTo, asset:assetEntity ).save()
+				}
 			}
 			moveBundleAssets = MoveBundleAsset.findAll("from MoveBundleAsset where moveBundle = $bundleTo ")
 		}
