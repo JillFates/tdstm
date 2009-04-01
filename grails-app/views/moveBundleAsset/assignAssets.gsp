@@ -86,6 +86,9 @@
 			      var tr = document.createElement('tr');
 			      	tr.id = "trleft_"+asset.id;
 			      	tr.name = asset.id;
+			      	if( i % 2 != 0){
+			      	tr.style.backgroundColor = '#E0E0E0';
+			      	}
 			    //  	tr.onclick = selectCheckBox('leftasset_'+asset.id)
 			      var td1 = document.createElement('td');
 			      var checkbox = document.createElement('input');
@@ -135,6 +138,9 @@
 			      var tr = document.createElement('tr');
 			      	tr.id = "trright_"+asset.id;
 			      	tr.name = asset.id;
+			      	if( i % 2 != 0){
+			      		tr.style.backgroundColor = '#E0E0E0';
+			      	}
 			      var td1 = document.createElement('td');
 			      var checkbox = document.createElement('input');
 					checkbox.type = 'checkbox';
@@ -208,7 +214,7 @@
 				<table style="border: none;">
 				<g:form name="bundlesForm">
 					<tr>
-						<td valign="top" class="name">
+						<td valign="top" >
 						<select name="bundleLeft" id="bundleLeftId" onchange="${remoteFunction(action:'getBundleAssets', params:'\'bundleId=\'+ this.value', onComplete:'showAssetsLeft(e)')}" >
 							<option value="">Unassigned</option>
 							<g:each in="${moveBundles}" var="moveBundle">
@@ -216,8 +222,8 @@
 			                </g:each>
 						</select>
 						</td>
-						<td valign="top" class="name"><label>&nbsp;</label></td>
-						<td valign="top" class="name">
+						<td valign="top" ><label>&nbsp;</label></td>
+						<td valign="top" >
 						<select name="bundleRight" id="bundleRightId" onchange="${remoteFunction(action:'getBundleAssets', params:'\'bundleId=\'+ this.value', onComplete:'showAssetsRight(e)')}" >
 							<g:each in="${moveBundles}" var="moveBundle">
 			                	<option value="${moveBundle.id}">${moveBundle}</option>
@@ -227,7 +233,7 @@
 					</tr>
 					</g:form>
 					<tr>
-						<td valign="top" class="name">
+						<td valign="top" >
 						<g:form name="assignLeftAssetsForm">
 						<div class="scrollTable">  
 					       <table id="assetsLeftTableId">  
@@ -236,13 +242,13 @@
 					             <th>Asset</th>  
 					             <th>Desc</th>  
 					             <th>Rack</th>  
-					             <th>Rack</th>  
+					             <th>Room</th>  
 					           </tr>  
 					         </thead>  
 					         <tbody id="assetsLeftTbodyId">
 					         <g:each in="${AssetEntity.list()}" var="moveBundleAsset" status="i">
-					           <tr id="trleft_${moveBundleAsset?.id}" onclick="selectCheckBox('leftasset_${moveBundleAsset?.id}')">  
-					             <td><input type="checkbox" name="leftasset_${moveBundleAsset?.id}" id="leftasset_${moveBundleAsset?.id}" value="${moveBundleAsset?.id}">${moveBundleAsset?.id}</td>  
+					           <tr style="background-color: ${(i % 2) == 0 ? '#FFFFFF' : '#E0E0E0'}" id="trleft_${moveBundleAsset?.id}" onclick="selectCheckBox('leftasset_${moveBundleAsset?.id}')">  
+					             <td> <input type="checkbox" name="leftasset_${moveBundleAsset?.id}" id="leftasset_${moveBundleAsset?.id}" value="${moveBundleAsset?.id}">${moveBundleAsset?.id}</td>  
 					             <td>${moveBundleAsset?.serverName}</td>  
 					             <td>${moveBundleAsset?.sourceRack}</td>  
 					             <td>${moveBundleAsset?.sourceLocation}</td>  
@@ -259,10 +265,10 @@
 							<img  src="${createLinkTo(dir:'images',file:'right-arrow.png')}" style="float: left; border: none;">
 							</a></span><br><br><br>
 						<br>
-						<span style="white-space: nowrap;"> <a href="#" id="remove">
+						<span style="white-space: nowrap;"> <a href="#" id="remove" >
 						<img  src="${createLinkTo(dir:'images',file:'left-arrow.png')}" style="float: left; border: none;">
 						</a></span></td>
-						<td valign="top" class="name">
+						<td valign="top" >
 						<g:form name="assignRightAssetsForm">
 						<div class="scrollTable">  
 					       <table id="assetsRightTableId">  
@@ -271,12 +277,12 @@
 					             <th>Asset</th>  
 					             <th>Desc</th>  
 					             <th>Rack</th>
-					             <th>Rack</th>  
+					             <th>Room</th>  
 					           </tr>  
 					         </thead>  
 					         <tbody id="assetsRightTbodyId" >
 					         	<g:each in="${currentBundleAssets}" var="currentBundleAsset" status="i">
-					           <tr id="trright_${currentBundleAsset?.asset?.id}" onclick="selectCheckBox('rightasset_${currentBundleAsset?.asset?.id}')">  
+					           <tr style="background-color: ${(i % 2) == 0 ? '#FFFFFF' : '#E0E0E0'}" id="trright_${currentBundleAsset?.asset?.id}" onclick="selectCheckBox('rightasset_${currentBundleAsset?.asset?.id}')">  
 					             <td><input type="checkbox" name="rightasset_${currentBundleAsset?.asset?.id}" id="rightasset_${currentBundleAsset?.asset?.id}" value="${currentBundleAsset?.asset?.id}">${currentBundleAsset?.asset?.id}</td>  
 					             <td>${currentBundleAsset?.asset?.serverName}</td>  
 					             <td>${currentBundleAsset?.asset?.sourceRack}</td>  

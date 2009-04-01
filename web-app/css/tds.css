@@ -199,7 +199,7 @@
         width: 400px;  
         overflow: hidden;  
                     
-        *width : 516px;  
+        *width : 400px;  
         *height : 300px;  
         *overflow : auto;  
   
@@ -259,10 +259,6 @@
   
       div.scrollTable tbody td{  
         padding: 3px;  
-        border-top: 1px solid #ccc;    
-        border-left: 1px solid #ccc;  
-        border-right: 1px solid #ccc;  
-        border-bottom: 1px solid #ccc;
         border-left: 0px;  
       }  
   
@@ -270,7 +266,7 @@
       
       div.scrollTable thead th,  
       div.scrollTable tbody td{  
-        width: 121px;  
+        width: 92px;  
       }  
   
       div.scrollTable thead th + th + th + th{  
