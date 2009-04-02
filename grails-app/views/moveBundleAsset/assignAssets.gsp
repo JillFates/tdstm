@@ -102,12 +102,12 @@
 			      td2.appendChild( desc )
 			      tr.appendChild( td2 )
 			      var td3 = document.createElement('td');
-			      var rack = document.createTextNode(asset.rack);
-			      td3.appendChild( rack )
+			      var application = document.createTextNode(asset.application);
+			      td3.appendChild( application )
 			      tr.appendChild( td3 )
 			      var td4 = document.createElement('td');
-			      var room = document.createTextNode(asset.room);
-			      td4.appendChild( room )
+			      var srcLocation = document.createTextNode(asset.srcLocation);
+			      td4.appendChild( srcLocation )
 			      tr.appendChild( td4 )
 			      tr.onclick = function() { selectCheckBox('leftassetId_'+this.name, this.id); };
 			      tbody.appendChild( tr )
@@ -151,12 +151,12 @@
 			      td2.appendChild( desc );
 			      tr.appendChild( td2 );
 			      var td3 = document.createElement('td');
-			      var rack = document.createTextNode(asset.rack);
-			      td3.appendChild( rack );
+			      var application = document.createTextNode(asset.application);
+			      td3.appendChild( application );
 			      tr.appendChild( td3 );
 			      var td4 = document.createElement('td');
-			      var room = document.createTextNode(asset.room);
-			      td4.appendChild( room );
+			      var srcLocation = document.createTextNode(asset.srcLocation);
+			      td4.appendChild( srcLocation );
 			      tr.appendChild( td4 );
 			      tr.onclick = function() { selectCheckBox('rightassetId_'+this.name, this.id); };
 			      tbody.appendChild( tr );
@@ -239,19 +239,19 @@
 					       <table id="assetsLeftTableId">  
 					         <thead>  
 					           <tr>  
-					             <th>Asset</th>  
-					             <th>Desc</th>  
-					             <th>Rack</th>  
-					             <th>Room</th>  
+					             <th nowrap>Asset Tag</th>  
+					             <th nowrap>Server Name</th>  
+					             <th nowrap>Application</th>  
+					             <th nowrap>Src Loc/Rack</th>  
 					           </tr>  
 					         </thead>  
 					         <tbody id="assetsLeftTbodyId">
 					         <g:each in="${moveBundleAssets}" var="moveBundleAsset" status="i">
 					           <tr id="trleft_${moveBundleAsset?.id}" onclick="selectCheckBox('leftassetId_${moveBundleAsset?.id}', this.id)">  
-					             <td> <input type="checkbox" name="leftasset_${moveBundleAsset?.id}" id="leftassetId_${moveBundleAsset?.id}" value="${moveBundleAsset?.id}" onclick="selectCheckBox(this.id, 'trleft_${moveBundleAsset?.id}')" />${moveBundleAsset?.id}</td>  
+					             <td> <input type="checkbox" name="leftasset_${moveBundleAsset?.id}" id="leftassetId_${moveBundleAsset?.id}" value="${moveBundleAsset?.id}" onclick="selectCheckBox(this.id, 'trleft_${moveBundleAsset?.id}')" />${moveBundleAsset?.assetTag}</td>  
 					             <td>${moveBundleAsset?.serverName}</td>  
-					             <td>${moveBundleAsset?.sourceRack}</td>  
-					             <td>${moveBundleAsset?.sourceLocation}</td>  
+					             <td>${moveBundleAsset?.application}</td>  
+					             <td>${moveBundleAsset?.sourceLocation}/${moveBundleAsset?.sourceRack}</td>  
 					           </tr>  
 					           </g:each>
 					         </tbody>  
@@ -273,20 +273,20 @@
 						<div class="scrollTable">  
 					       <table id="assetsRightTableId">  
 					         <thead>  
-					           <tr>  
-					             <th>Asset</th>  
-					             <th>Desc</th>  
-					             <th>Rack</th>
-					             <th>Room</th>  
-					           </tr>  
+					          <tr>  
+					             <th nowrap>Asset Tag</th>  
+					             <th nowrap>Server Name</th>  
+					             <th nowrap>Application</th>  
+					             <th nowrap>Src Loc/Rack</th>  
+					           </tr>
 					         </thead>  
 					         <tbody id="assetsRightTbodyId" >
 					         	<g:each in="${currentBundleAssets}" var="currentBundleAsset" status="i">
 					           <tr id="trright_${currentBundleAsset?.asset?.id}" onclick="selectCheckBox('rightassetId_${currentBundleAsset?.asset?.id}', this.id )">  
-					             <td><input type="checkbox" name="rightasset_${currentBundleAsset?.asset?.id}" id="rightassetId_${currentBundleAsset?.asset?.id}" value="${currentBundleAsset?.asset?.id}" onclick="selectCheckBox( this.id, 'trright_${currentBundleAsset?.asset?.id}' )"/>${currentBundleAsset?.asset?.id}</td>  
+					             <td><input type="checkbox" name="rightasset_${currentBundleAsset?.asset?.id}" id="rightassetId_${currentBundleAsset?.asset?.id}" value="${currentBundleAsset?.asset?.id}" onclick="selectCheckBox( this.id, 'trright_${currentBundleAsset?.asset?.id}' )"/>${currentBundleAsset?.asset?.assetTag}</td>  
 					             <td>${currentBundleAsset?.asset?.serverName}</td>  
-					             <td>${currentBundleAsset?.asset?.sourceRack}</td>  
-					             <td>${currentBundleAsset?.asset?.sourceLocation}</td>
+					             <td>${currentBundleAsset?.asset?.application}</td>  
+					             <td>${currentBundleAsset?.asset?.sourceLocation}/${currentBundleAsset?.asset?.sourceRack}</td>
 					           </tr>  
 					           </g:each>
 					         </tbody>

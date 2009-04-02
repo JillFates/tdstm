@@ -396,7 +396,7 @@ class BootStrap {
 				roleTypeCodeTo: it[4]
             ).save( insert:true )
 		}
-
+/*
 		def assets = [
 			// project, type, name, asset tag, s/n, AssetOwner
 			[cedarsProject, serverAsset, "CSHSACADAFF", "XX-232-YAB", "12345",cedars],
@@ -427,7 +427,7 @@ class BootStrap {
 				asset.errors.allErrors.each { println it }
 			}
 		}
-		
+		*/
 		//--------------------------------
 		// Create EavEntityType and EavAttributeSet records
 		//--------------------------------
@@ -442,15 +442,15 @@ class BootStrap {
 		//---------------------------------
 		def assetEntityList = [
 		  			// project, type, name, asset tag, s/n, AssetOwner
-		  			["CSHMC3", "AutoView 3100", "XX-232-YAB", "rackad1", "1", "12",attributeSet],
-		  			["CSHSACCESS2","7028-6C4", "XX-138-YAB", "rackad1", "2", "12",attributeSet],
-		  			["CSHSBDGT1", "KVM", "MM-2232", "rackad1", "4", "1",attributeSet],
-		  			["Avocent", "AutoView 3100", "rackad1", "3", "1", attributeSet],
-		  			["CED14P", "Proliant 1600R", "RR-32-YAB", "rackad1", "6", "5",attributeSet],
-		  			["AIX Console HMC2", "V490", "RR-32-YAB", "rackad1", "7", "5",attributeSet],
-		  			["AXPNTSA", "Proliant DL380 G3", "RR-32-YAB", "rackad1", "5", "3",attributeSet],
-		  			["CEDCONSOLE1", "StorageWorks", "RR-32-YAB", "rackad1", "8", "6",attributeSet],
-		  			["CSEGP2 = CSENSD1 IO Drawer 1", "Ultrium Tape", "RR-32-YAB", "rackad1", "9", "7",attributeSet]
+		  			["105C31D", "Workstation B2600", "XX-232-YAB", "rackad1", "1", "12", attributeSet, cedarsProject, serverAsset, "CSHSACADAFF", "C2A133", "ASD12345", "Mail", cedarsProject.client],
+		  			["105D74C CSMEDI","7028-6C4", "XX-138-YAB", "rackad2", "2", "12", attributeSet, cedarsProject, serverAsset, "CSHSACCESS2", "C2A134", "ASD2343455", "SAP", cedarsProject.client],
+		  			["AIX Console HMC3", "KVM", "MM-2232", "rackad3", "4", "1", attributeSet, cedarsProject, serverAsset, "CSHSBDGT1", "C2A135", "ASD1893045", "SAP", cedarsProject.client],
+		  			["105D74C CSMEDI", "AutoView 3100", "RR-32-YAB", "rackad4", "3", "1", attributeSet, cedarsProject, kvmSwitchAsset, "Avocent", "C2A136", "ASD189234", "SAP", cedarsProject.client],
+		  			["CED14P", "Proliant 1600R", "RR-32-YAB", "rackad5", "6", "5", attributeSet, cedarsProject, arrayAsset, "CSMCARM Juke", "C2A137", "SU02325456", "SAP", cedarsProject.client],
+		  			["AIX Console HMC2", "V490", "RR-32-YAB", "rackad1", "7", "5", attributeSet, cedarsProject, kvmSwitchAsset, "Avocent", "C2A138", "ASD1765454", "Mail", cedarsProject.client],
+		  			["AXPNTSA", "Proliant DL380 G3", "RR-32-YAB", "rackad2", "5", "3", attributeSet, cedarsProject, serverAsset, "CSHSACADAFF", "C2A139", "ASD12345", "Mail", cedarsProject.client],
+		  			["CEDCONSOLE1", "StorageWorks", "RR-32-YAB", "rackad3", "8", "6", attributeSet, cedarsProject, serverAsset, "CSHSACCESS2", "C2A140", "ASD2343455", "Mail", cedarsProject.client],
+		  			["CSEGP2 = CSENSD1 IO Drawer 1", "Ultrium Tape", "RR-32-YAB", "rackad4", "9", "7", attributeSet, cedarsProject, arrayAsset, "CSMCARM Juke", "C2A141", "SU0234423", "Mail", cedarsProject.client]
 		]
 		
 		// Insert the List of assetEntity
@@ -462,7 +462,15 @@ class BootStrap {
 				sourceRack: it[3],
 				position: it[4],
 				usize: it[5],
-				attributeSet: it[6]
+				attributeSet: it[6],
+				project: it[7],
+				assetType: it[8],
+				assetName: it[9],
+				assetTag: it[10],
+				serialNumber: it[11],
+				application: it[12],
+				owner: it[13]
+		
             ).save()
 		}
 		def assete = new AssetEntity(serverName:"CSHMC3", model:"AutoView 3100", room:"XX-232-YAB", rack:"rackad1", position:"1", uSize:"12", attributeSet:attributeSet)

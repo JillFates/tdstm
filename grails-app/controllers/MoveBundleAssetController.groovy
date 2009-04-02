@@ -104,13 +104,13 @@ class MoveBundleAssetController {
     	def moveBundleAssets = assetEntityAttributeLoaderService.saveAssetsToBundle( bundleTo, bundleFrom, assets )
     	if(moveBundleAssets != null){
 	    	moveBundleAssets.each{bundleAsset ->
-				items <<[id:bundleAsset.asset.id, serverName:bundleAsset.asset.serverName, rack:bundleAsset.asset.sourceRack, room:bundleAsset.asset.sourceLocation ]
+				items <<[id:bundleAsset.asset.id, serverName:bundleAsset.asset.serverName, application:bundleAsset.asset.application, srcLocation:bundleAsset.asset.sourceLocation+"/"+bundleAsset.asset.sourceRack ]
 	    	}
     	} else {
     		def assetEntities = AssetEntity.findAll("from AssetEntity where id not in (select asset.id from MoveBundleAsset)")
 			assetEntities.each{assetEntity ->
 	        
-				items <<[id:assetEntity.id, serverName:assetEntity.serverName, rack:assetEntity.sourceRack, room:assetEntity.sourceLocation ]
+				items <<[id:assetEntity.id, serverName:assetEntity.serverName, application:assetEntity.application, srcLocation:assetEntity.sourceLocation+"/"+assetEntity.sourceRack ]
 	         
 			}
     	}
@@ -126,14 +126,14 @@ class MoveBundleAssetController {
 			def bundleAssets = MoveBundleAsset.findAll("from MoveBundleAsset where moveBundle.id = $bundleId ")
 			bundleAssets.each{bundleAsset ->
 	        
-				items <<[id:bundleAsset.asset.id, serverName:bundleAsset.asset.serverName, rack:bundleAsset.asset.sourceRack, room:bundleAsset.asset.sourceLocation ]
+				items <<[id:bundleAsset.asset.id, serverName:bundleAsset.asset.serverName, application:bundleAsset.asset.application, srcLocation:bundleAsset.asset.sourceLocation+"/"+bundleAsset.asset.sourceRack ]
 	         
 			}
 		}else{
 			def assetEntities = AssetEntity.findAll("from AssetEntity where id not in (select asset.id from MoveBundleAsset)")
 			assetEntities.each{assetEntity ->
 	        
-				items <<[id:assetEntity.id, serverName:assetEntity.serverName, rack:assetEntity.sourceRack, room:assetEntity.sourceLocation ]
+				items <<[id:assetEntity.id, serverName:assetEntity.serverName, application:assetEntity.application, srcLocation:assetEntity.sourceLocation+"/"+assetEntity.sourceRack  ]
 	         
 			}
 		}

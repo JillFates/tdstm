@@ -9,6 +9,14 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String targetRack
 	String position
 	String usize
+	Project project
+	AssetType assetType
+	String assetName	
+	String assetTag
+	String serialNumber
+	String deviceFunction
+	String application
+	PartyGroup owner
 	
 	
 	static hasMany = [
@@ -24,6 +32,23 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		targetRack( blank:true, nullable:true )
 		position( blank:true, nullable:true )
 		usize( blank:true, nullable:true )
+		project( blank:false, nullable:false )
+		assetType( blank:true, nullable:true )
+		assetName( blank:true )
+		assetTag( blank:true )
+		serialNumber( blank:true )
+		deviceFunction( blank:true, nullable:true )		
+		application( blank:true, nullable:true )
+		owner( blank:true, nullable:true )
+	}
+	
+	static mapping  = {	
+		version true
+		id column:'assetEntity_id'			
+	}
+	
+	String toString(){
+		"id:$id name:$assetName tag:$assetTag serial#:$serialNumber"
 	}
 	// This is where we will/would define special details about the class
 	// TBD...
