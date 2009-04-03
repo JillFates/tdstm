@@ -144,7 +144,11 @@
 	        	cell5.innerHTML = moveBundleAsset.targetRack		        	
 	        }
 	        var cell6 = row.insertCell(5);
-	        cell6.innerHTML = moveBundleAsset.position
+	        if(rackPlan == "RerackPlan") {
+	        	cell6.innerHTML = moveBundleAsset.targetPosition
+	        }else {
+				cell6.innerHTML = moveBundleAsset.sourcePosition	        	
+	        }
 	       
 	        var cell7 = row.insertCell(6);
 	        cell7.innerHTML = moveBundleAsset.uSize
@@ -412,14 +416,15 @@
                     	<td>${moveBundleAssetInstance?.asset?.sourceLocation}</td>
                     
                     	<td>${moveBundleAssetInstance?.asset?.sourceRack}</td>
+                    	<td>${moveBundleAssetInstance?.asset?.sourceRackPosition}</td>
                     </g:if>
                     <g:else>
                     	<td>${moveBundleAssetInstance?.asset?.targetLocation}</td>
                     
                     	<td>${moveBundleAssetInstance?.asset?.targetRack}</td>
-                    	
+                    	<td>${moveBundleAssetInstance?.asset?.sourceRackPosition}</td>
                     </g:else>
-                    <td>${moveBundleAssetInstance?.asset?.position}</td>
+                    
                     
                     <td>${moveBundleAssetInstance?.asset?.usize}</td>
 					<g:if test="${rack == 'UnrackPlan'}">
