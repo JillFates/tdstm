@@ -356,14 +356,15 @@ class AssetEntityController {
 
     def delete = {
         def assetEntityInstance = AssetEntity.get( params.id )
+        def projectId = params.projectId
         if(assetEntityInstance) {
             assetEntityInstance.delete()
             flash.message = "AssetEntity ${params.id} deleted"
-            redirect(action:list)
+            redirect(action:list, params:[projectId:projectId])
         }
         else {
             flash.message = "AssetEntity not found with id ${params.id}"
-            redirect(action:list)
+            redirect(action:list, params:[projectId:projectId])
         }
     }
     

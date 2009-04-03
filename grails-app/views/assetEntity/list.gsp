@@ -49,7 +49,9 @@
 		      var assetEntity = eval('(' + e.responseText + ')') 
 		      
 		      document.showForm.id.value = assetEntity.id
-			  document.editForm.id.value = assetEntity.id    
+			  document.editForm.id.value = assetEntity.id 
+			  document.showForm.projectId.value = assetEntity.projectId
+			  document.editForm.projectId.value = assetEntity.projectId  
 			  document.showForm.serverName.value = assetEntity.serverName
 			  document.editForm.serverName.value = assetEntity.serverName
 			  document.showForm.model.value = assetEntity.model
@@ -205,20 +207,17 @@
 		      x[rowId].style.background = '#65a342'
 		      y[1].innerHTML = asset.serverName
 		      y[2].innerHTML = asset.model
-		      y[3].innerHTML = asset.sourceLocation
-		      y[4].innerHTML = asset.targetLocation
-		      y[5].innerHTML = asset.sourceRack
-		      y[6].innerHTML = asset.targetRack
-		      y[7].innerHTML = asset.sourceRackPosition
-		      y[8].innerHTML = asset.usize
+		      y[3].innerHTML = asset.sourceLocation		      
+		      y[4].innerHTML = asset.sourceRack		      
+		      y[5].innerHTML = asset.sourceRackPosition
+		      y[6].innerHTML = asset.assetName
 		      if(asset.assetTypeId == null) {
-		      y[9].innerHTML = ""
+		      y[7].innerHTML = ""
 		      }else{
-		      y[9].innerHTML = asset.assetTypeId
-		      }
-		      y[10].innerHTML = asset.assetName
-		      y[11].innerHTML = asset.assetTag
-		      y[12].innerHTML = asset.serialNumber
+		      y[7].innerHTML = asset.assetTypeId
+		      }		      
+		      y[8].innerHTML = asset.assetTag
+		      y[9].innerHTML = asset.serialNumber
 
       		}
 		    
@@ -530,6 +529,7 @@
 <div id="dialog" title="Show Asset Entity" style="display: none;">
 <g:form action="save" method="post" name="showForm">
 	<div class="dialog">
+	<input type="hidden" name="projectId" value="" />
 	<table>
 		<tbody>
 
@@ -725,7 +725,7 @@
 	<div class="buttons"><input type="hidden" name="id"
 		value="${assetEntityInstance?.id}" /> <span class="button"><input
 		type="button" class="edit" value="Edit"
-		onClick="return editAssetDialog()" /></span> <span class="button"><g:actionSubmit
+		onClick="return editAssetDialog()" /></span> <span class="button"><g:actionSubmit 
 		class="delete" onclick="return confirm('Are you sure?');"
 		value="Delete" /></span></div>
 </g:form></div>
@@ -733,6 +733,7 @@
 <div id="dialog1" title="Edit Asset Entity" style="display: none;">
 <g:form method="post" name="editForm">
 	<input type="hidden" name="id" value="${assetEntityInstance?.id}" />
+	<input type="hidden" name="projectId" value="" />
 	<div class="dialog">
 	<table>
 		<tbody>
@@ -900,7 +901,7 @@
 	</div>
 	<div class="buttons"><span class="button"><input
 		type="button" class="save" value="Update Asset Entity"
-		onClick="return callUpdateDialog()" /></span> <span class="button"><g:actionSubmit
+		onClick="return callUpdateDialog()" /></span> <span class="button"><g:actionSubmit 
 		class="delete" onclick="return confirm('Are you sure?');"
 		value="Delete" /></span></div>
 </g:form></div>
