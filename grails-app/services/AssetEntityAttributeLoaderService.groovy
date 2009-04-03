@@ -182,5 +182,40 @@ class AssetEntityAttributeLoaderService {
      	}
 		return list
 	}
-
+	
+	//get Team - #Asset count corresponding to Bundle
+	def getTeamAssetCount ( def bundleId, def rackPlan ) {
+		def teamAssetCounts = []
+		def bundleInstance = MoveBundle.findById(bundleId)
+		def projectTeamInstanceList = ProjectTeam.findAllByMoveBundle( bundleInstance )
+    	if( rackPlan == 'RerackPlan') {
+    		projectTeamInstanceList.each{projectTeam ->
+    			def assetCount = MoveBundleAsset.countByMoveBundleAndTargetTeam( bundleInstance, projectTeam )
+    			teamAssetCounts << [ teamCode: projectTeam.teamCode , assetCount:assetCount ]
+    		}
+    	} else {
+    		projectTeamInstanceList.each{projectTeam ->
+				def assetCount = MoveBundleAsset.countByMoveBundleAndSourceTeam( bundleInstance, projectTeam )
+				teamAssetCounts << [ teamCode: projectTeam.teamCode , assetCount:assetCount ]
+    		}
+    	}
+		return teamAssetCounts
+	}
+	
+	//get assetsList  corresponding to selected bundle to update assetsList dynamically
+	
+	def getAssetList ( def moveBundleAssetList, rackPlan ) {
+		def moveBundleAsset = []
+		for( int assetRow = 0; assetRow < moveBundleAssetList.size(); assetRow++) {
+    		def displayTeam  
+    		if( rackPlan == "RerackPlan" ) {
+    			displayTeam = moveBundleAssetList[assetRow]?.targetTeam?.id
+    		}else {
+    			displayTeam = moveBundleAssetList[assetRow]?.sourceTeam?.id
+    		}
+    		def assetEntityInstance = AssetEntity.findById( moveBundleAssetList[assetRow].asset.id )
+    		moveBundleAsset <<[id:assetEntityInstance.id, serverName:assetEntityInstance.serverName, model:assetEntityInstance.model, sourceLocation:assetEntityInstance.sourceLocation, sourceRack:assetEntityInstance.sourceRack, targetLocation:assetEntityInstance.targetLocation, targetRack:assetEntityInstance.targetRack, position:assetEntityInstance.position, uSize:assetEntityInstance.usize, team:displayTeam ]
+    	}
+		return moveBundleAsset
+	}
 }

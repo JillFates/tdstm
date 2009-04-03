@@ -16,7 +16,7 @@
              try {  
              	var table = table;  
             	var rowCount = table.rows.length; 
-	            for(var i=0; i<rowCount; i++) {  
+	            for(var i=1; i<rowCount; i++) {  
     	             var row = table.rows[i];  
         	         table.deleteRow(i);  
                     	rowCount--;  
@@ -35,7 +35,7 @@
            	var asset = asset
            	var rackPlan = document.getElementById('rackPlan').value
            	var bundleId = document.getElementById('id').value
-         	${remoteFunction(action:'assetTeamAssign', params:'\'teamId=\' +teamNumber+\'&asset=\'+asset+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId', onComplete:"teamAssignComplete( e );")}
+         	${remoteFunction(action:'assetTeamAssign', params:'\'teamId=\' +teamNumber+\'&asset=\'+asset+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId', onComplete:"teamAssignComplete(e);")}
          }
          
          <!-- AutoFill assignment of assets to Selected Team -->
@@ -49,7 +49,10 @@
          	}
          	var bundleId = document.getElementById('id').value
          	var rackPlan = document.getElementById('rackPlan').value
-         	${remoteFunction(action:'autoFillTeamAssign', params:'\'teamCode=\' +teamCode+\'&assets=\'+assetList+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId', onComplete:"autoTeamAssignComplete( e );")}
+         	if(teamCode != 'null' && teamCode!= '')
+         	{
+	         	${remoteFunction(action:'autoFillTeamAssign', params:'\'teamCode=\' +teamCode+\'&assets=\'+assetList+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId', onComplete:"autoTeamAssignComplete( e );")}
+	        }
          }
          
          function filterAssetsOnTeam( teamCode ) {
@@ -86,10 +89,6 @@
          	 
          }
          
-         
-    </script>
-    <g:javascript>
-    
      function filterByTeam( e) {
    	 	var assetList = eval('(' + e.responseText + ')')
    	 	table = document.getElementById('assetTable')
@@ -108,6 +107,7 @@
      }
      function addAssetRow(assetList)
      {
+     
      	var rackPlan = document.getElementById('rackPlan').value
      	var length = assetList.length 
      	table = document.getElementById('assetTable')
@@ -119,15 +119,15 @@
                } else {
                     row.style.backgroundColor ='#E0E0E0';
                }
-
-	       	var cell1 = row.insertCell(0);
-	        var element1 = document.createElement("input");  
-            element1.type = "hidden";
-            element1.name = "asset"
-            element1.value = moveBundleAsset.id 
             
-            cell1.appendChild(element1); 
+	       	var cell1 = row.insertCell(0);
 	        cell1.innerHTML = moveBundleAsset.id
+	         var assetElement = document.createElement("input");  
+            assetElement.type = "hidden";
+            assetElement.name = "asset"
+            assetElement.id = "asset"
+            assetElement.value = moveBundleAsset.id 
+            cell1.appendChild(assetElement); 
 	        var cell2 = row.insertCell(1);
 	        cell2.innerHTML = moveBundleAsset.serverName
 	        var cell3 = row.insertCell(2);
@@ -149,53 +149,66 @@
 	        var cell7 = row.insertCell(6);
 	        cell7.innerHTML = moveBundleAsset.uSize
 	        var cell8 = row.insertCell(7);
-	        var element2 = document.createElement("input");  
-            element2.type = "text";
-            element2.name = "assetTeamAssign"
-            element2.id = "assetTeamAssign"
-            element2.value = "" 
-            element2.style.width="50px"
-            element2.onblur = function(){assetToTeamAssign(element2.value, moveBundleAsset.id );}
-            cell8.appendChild(element2); 
+	        var teamAssignElement = document.createElement("input");  
+            teamAssignElement.type = "text";
+            teamAssignElement.name = "assetTeamAssign_"+moveBundleAsset.id
+            teamAssignElement.id = moveBundleAsset.id
+            teamAssignElement.value = moveBundleAsset.team
+            teamAssignElement.style.width="50px"
+            //var assetID =moveBundleAsset.id 
+            teamAssignElement.onblur = function(){assetToTeamAssign(this.value, this.id );}
+            cell8.appendChild(teamAssignElement); 
 		 	if(rackPlan == "RerackPlan") {
 		 		var cell9 = row.insertCell(8);
-	        	var element3 = document.createElement("input");  
-            	element3.type = "text";
-            	element3.name = "assetCartAssign"
-           		element3.value = "" 
-            	element3.style.width="50px"
-            	cell9.appendChild(element3); 
+	        	var cartElement = document.createElement("input");  
+            	cartElement.type = "text";
+            	cartElement.name = "assetCartAssign"
+           		cartElement.value = "" 
+            	cartElement.style.width="50px"
+            	cell9.appendChild(cartElement); 
            		var cell10 = row.insertCell(9);
-	        	var element4 = document.createElement("input");  
-            	element4.type = "text";
-            	element4.name = "assetShelfAssign"
-            	element4.id = "assetShelfAssign"
-            	element4.value = "" 
-            	element4.style.width="50px"
-            	cell10.appendChild(element4); 
+	        	var shelfElement = document.createElement("input");  
+            	shelfElement.type = "text";
+            	shelfElement.name = "assetShelfAssign"
+            	shelfElement.id = "assetShelfAssign"
+            	shelfElement.value = "" 
+            	shelfElement.style.width="50px"
+            	cell10.appendChild(shelfElement); 
 	        		
 		 	}
      	}
      }
+     
+     
      function autoTeamAssignComplete( e ) {
+     	var teamAssetList = eval('(' + e.responseText + ')')
+     	assetList = teamAssetList[0].assetList
+		table = document.getElementById('assetTable')
+      	deleteRow( table )
+     	addAssetRow(assetList)
+     	showTeamAssetCount(teamAssetList[0].teamAssetCounts)
+     }
+     
+     
+     function teamAssignComplete( e ) {
+     	var teamAsset = eval('(' + e.responseText + ')')
+     	if (teamAsset && teamAsset.length > 0) {
+     		showTeamAssetCount(teamAsset)
+     	} else {
+     	document.getElementById('rackPlan').focus()
+     	alert("Team Not Found")
+     	}
      	
      }
-     function teamAssignComplete( e ) {
-     	var teamAssetAssigned = eval('(' + e.responseText + ')')
-     	 	if(teamAssetAssigned.assigned.equalsIgnoreCase("teamNotFound") ) {
-     		alert("Team Not Found With Entered value")
-     	}
-     }
-     function showUnrackPlanCount( e ){
-      	var teamAsset = eval('(' + e.responseText + ')')
+     function showTeamAssetCount( teamAsset ){
       	var table = document.getElementById('teamAssetCountTable');
       	deleteRow( table )
       	     	
       	if (teamAsset) {
- 			var length = teamAsset.items.length
+ 			var length = teamAsset.length
 			for (var i=0; i < length; i++) {
-				var team = teamAsset.items[i]
-				var row = table.insertRow( i ); 
+				var team = teamAsset[i]
+				var row = table.insertRow( i+1 ); 
 	            var cell1 = row.insertCell(0);
 	            cell1.innerHTML = team.teamCode
 				var cell2 = row.insertCell(1);  
@@ -204,7 +217,7 @@
 		}
 	 }
 
-    </g:javascript>
+    </script>
 
   </head>
   <body>
@@ -270,7 +283,7 @@
               	</table>
               </td>
               
-              <td>
+              <td style="padding-right:250px;">
               	<table id="teamAssetCountTable">
               		<thead>
               			<tr>
@@ -291,27 +304,15 @@
               	</table>
               </td>
               <tr>
-              	
-              	
-              	<td align=left><b>Filter By Racks</b></td>
-              	
-              	
-              	<td style="padding-left:50px;"><b>Filter By Team</b></td>
-              
-              	<td ><b>AutoFill with</b></td>
-              
-              	<td></td>
+              	<td  bordercolor="1px solid #000000;" align=left><b>Filter By Racks</b></td>
               </tr>
               <tr>
-              	
-              	
-              	
               	<td valign="middle">
               	<div>
-              	<div style="float:left;"><a href="#" onclick="moveRackUp()" id="add"><img src="${createLinkTo(dir:'images',file:'up-arrow.PNG')}" style="float: left; border: none;" /></a><br>
-              	&nbsp; Up<br>
-              	<a href="#" onclick="moveRackDown()" id="add"><img src="${createLinkTo(dir:'images',file:'down-arrow.PNG')}" style="float: left; border: none;" /></a><br>
-              	Down
+              	<div style="float:left;"><a href="#" onclick="moveRackUp()" id="add"><img src="${createLinkTo(dir:'images',file:'up-arrow.png')}" style="float: left; border: none;" /></a><br>
+              	
+              	<a href="#" onclick="moveRackDown()" id="add"><img src="${createLinkTo(dir:'images',file:'down-arrow.png')}" style="float: left; border: none;" /></a><br>
+              	
               	</div>
               	<div style="float:right;">
               		<select id="filterRack" multiple="multiple" onchange="filterAssetsOnRack(this.value)" style="width: 100px; height: 70px;">
@@ -325,38 +326,43 @@
     	          </td>
     	          
     	          <td style="padding-left:50px;">
-              		<select id="filterTeam" onchange="filterAssetsOnTeam(this.value)">
-	              		<option value="">All</option>
-              			<g:each in="${projectTeamInstance}" var="projectTeam">
-       	      				<option value="${projectTeam?.teamCode}">${projectTeam?.teamCode}</option>
-	           			</g:each>
-             		</select>
+    	          	<table style="border:0px;">
+    	          		<tr><td style="padding-left:50px;"><b>Filter By Team</b></td></tr>
+    	          		<tr>
+    	          			<td style="padding-left:50px;">
+    	          				<select id="filterTeam" onchange="filterAssetsOnTeam(this.value)">
+	              					<option value="">All Teams</option>
+              						<g:each in="${projectTeamInstance}" var="projectTeam">
+       	      							<option value="${projectTeam?.teamCode}">${projectTeam?.teamCode}</option>
+	           						</g:each>
+             					</select>
+    	          			</td>
+    	          		</tr>
+    	          	</table>
+              		
     	          </td>
     	          
-    	          <td valign="middle">
-              		<select id="team" onchange="autoFillTeam(this.value)">
-              			<g:each in="${projectTeamInstance}" var="projectTeam">
-       	      				<option value="${projectTeam?.teamCode}">${projectTeam?.teamCode}</option>
-	           			</g:each>
-	           			<option value="UnAssign">UnAssign</option>
-             		</select>
+    	          <td style="padding-left:50px; padding-top: 50px;">
+    	          	<table style="border:0px;">
+    	          		<tr></tr>
+    	          		<tr>
+    	          			<td style="padding-left:50px;">
+    	          				<select id="team" onchange="autoFillTeam(this.value)">
+              						<option value="null">Select Team to Assign All Assets To</option>
+              							<g:each in="${projectTeamInstance}" var="projectTeam">
+       	      								<option value="${projectTeam?.teamCode}">${projectTeam?.teamCode}</option>
+	           							</g:each>
+	           							<option value="UnAssign">UnAssign</option>
+             					</select>	
+    	          			</td>
+    	          		</tr>
+    	          	</table>
     	          </td>
     	          
               </tr>
-              <tr class="prop">
-              <td></td>
-              <td></td>
-
-              <tr>
-
-
             </tbody>
           </table>
-
-
-          <h1>Assets in Bundle</h1>
-
-           <div  style="overflow:scroll; width:1000px;">
+           <div  style="overflow:scroll; width:950px;">
             <table id="assetTable">
               <thead>
                 <tr>
@@ -387,7 +393,7 @@
                 </tr>
               </thead>
               <tbody>
-             
+             <%int row=0;%>
                 <g:each in="${moveBundleAssetInstanceList}" var="moveBundleAssetInstance" status="i">
                   <tr style="background-color: ${(i % 2) == 0 ? '#FFFFFF' : '#E0E0E0'}">
 
@@ -410,14 +416,17 @@
                     <td>${moveBundleAssetInstance?.asset?.position}</td>
                     
                     <td>${moveBundleAssetInstance?.asset?.usize}</td>
-
-					<td><input size=5px; type=text name="assetTeamAssign" id="assetTeamAssign" value="" onblur="assetToTeamAssign(this.value,'${moveBundleAssetInstance?.asset?.id}');" /></td>
-                    <g:if test="${rack == 'RerackPlan'}">
+					<g:if test="${rack == 'UnrackPlan'}">
+					<td><input size=5px; type=text name="assetTeamAssign_${moveBundleAssetInstance?.asset?.id}" id="${moveBundleAssetInstance?.asset?.id}" value="${moveBundleAssetInstance?.sourceTeam?.id}" onblur="assetToTeamAssign(this.value,'${moveBundleAssetInstance?.asset?.id}');" /></td>
+                    </g:if>
+                    <g:else >
+                    <td><input size=5px; type=text name="assetTeamAssign_${moveBundleAssetInstance?.asset?.id}" id="${moveBundleAssetInstance?.asset?.id}" value="${moveBundleAssetInstance?.targetTeam?.id}" onblur="assetToTeamAssign(this.value,'${moveBundleAssetInstance?.asset?.id}');" /></td>
 						<td><input size=5px; type=text name="assetCartAssign" value="" /></td>
 					
 						<td><input size=5px; type=text name="assetShelfAssign" value="" /></td>
-					</g:if>
+					</g:else>
                   </tr>
+                  <% row++;%>
                 </g:each>
               </tbody>
             </table>
