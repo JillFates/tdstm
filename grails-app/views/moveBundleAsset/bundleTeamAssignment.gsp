@@ -318,7 +318,13 @@
               		<select id="filterRack" multiple="multiple" onchange="filterAssetsOnRack(this.value)" style="width: 100px; height: 70px;">
               			<option value="">All Racks</option>
               			<g:each in="${moveBundleAssetsRacks}" var="moveBundleAssetsRacks">
-       	      				<option value="${moveBundleAssetsRacks?.asset?.sourceRack}">${moveBundleAssetsRacks?.asset?.sourceRack}</option>
+              				<g:if test="${rack == 'UnrackPlan'}">
+              					<option value="${moveBundleAssetsRacks?.asset?.sourceRack}">${moveBundleAssetsRacks?.asset?.sourceRack}</option>
+              				</g:if>
+              				<g:else>
+              					<option value="${moveBundleAssetsRacks?.asset?.targetRack}">${moveBundleAssetsRacks?.asset?.targetRack}</option>
+              				</g:else>
+       	      				
 	           			</g:each>
               		</select>
               		</div>

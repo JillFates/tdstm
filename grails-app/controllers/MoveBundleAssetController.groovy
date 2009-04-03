@@ -151,7 +151,7 @@ class MoveBundleAssetController {
     	def moveBundleAssetList = MoveBundleAsset.findAllByMoveBundle( bundleInstance )
     	if( params.rackPlan == 'RerackPlan') {
     		rackPlan = "RerackPlan"
-    		moveBundleAssetsRacks = MoveBundleAsset.findAll("from MoveBundleAsset ma  group by ma.asset.targetRack")
+    		moveBundleAssetsRacks = MoveBundleAsset.findAll("from MoveBundleAsset ma where ma.moveBundle = $bundleInstance.id  group by ma.asset.targetRack")
     		projectTeamInstanceList.each{projectTeam ->
     			def assetCount = MoveBundleAsset.countByMoveBundleAndTargetTeam( bundleInstance, projectTeam )
     			teamAssetCounts << [ teamCode: projectTeam.teamCode , assetCount:assetCount ]
@@ -159,12 +159,11 @@ class MoveBundleAssetController {
     	}else 
     	{
     		rackPlan = "UnrackPlan"
-    		moveBundleAssetsRacks = MoveBundleAsset.findAll("from MoveBundleAsset ma  group by ma.asset.sourceRack") 
+    		moveBundleAssetsRacks = MoveBundleAsset.findAll("from MoveBundleAsset ma  where ma.moveBundle = $bundleInstance.id group by ma.asset.sourceRack") 
     		projectTeamInstanceList.each{projectTeam ->
 				def assetCount = MoveBundleAsset.countByMoveBundleAndSourceTeam( bundleInstance, projectTeam )
 				teamAssetCounts << [ teamCode: projectTeam.teamCode , assetCount:assetCount ]
     		}
-    		
     	}
     	render(view:'bundleTeamAssignment',model:[moveBundleAssetInstanceList: moveBundleAssetList, moveBundleInstance:bundleInstance, projectTeamInstance:projectTeamInstanceList, teamAssetCount:teamAssetCounts, moveBundleAssetsRacks:moveBundleAssetsRacks, rack:rackPlan ])
     }
@@ -269,12 +268,12 @@ class MoveBundleAssetController {
     	for( int assetRow = 0; assetRow < moveBundleAssetList.size(); assetRow++) {
     		def displayTeam  
     		if( rackPlan == "RerackPlan" ) {
-    			displayTeam = moveBundleAssetList[assetRow].targetTeam.id
+    			displayTeam = moveBundleAssetList[assetRow]?.targetTeam?.id
     		}else {
-    			displayTeam = moveBundleAssetList[assetRow].sourceTeam.id
+    			displayTeam = moveBundleAssetList[assetRow]?.sourceTeam?.id
     		}
-    		def assetEntityInstance = AssetEntity.findById( moveBundleAssetList[assetRow].asset.id )
-    		moveBundleAsset <<[id:assetEntityInstance.id, serverName:assetEntityInstance.serverName, model:assetEntityInstance.model, sourceLocation:assetEntityInstance.sourceLocation, sourceRack:assetEntityInstance.sourceRack, targetLocation:assetEntityInstance.targetLocation, targetRack:assetEntityInstance.targetRack, position:assetEntityInstance.position, uSize:assetEntityInstance.usize,team:displayTeam ]
+    		def assetEntityInstance = AssetEntity.findById( moveBundleAssetList[assetRow]?.asset?.id )
+    		moveBundleAsset <<[id:assetEntityInstance?.id, serverName:assetEntityInstance?.serverName, model:assetEntityInstance?.model, sourceLocation:assetEntityInstance?.sourceLocation, sourceRack:assetEntityInstance?.sourceRack, targetLocation:assetEntityInstance?.targetLocation, targetRack:assetEntityInstance?.targetRack, position:assetEntityInstance?.position, uSize:assetEntityInstance?.usize,team:displayTeam ]
     	}
     	render moveBundleAsset as JSON
     }
@@ -282,29 +281,32 @@ class MoveBundleAssetController {
      * Filter Assets By Rack
      */
     def filterAssetByRack = {
-    		def rack = params.rack
-        	def bundleId = params.bundleId
-        	def rackPlan = params.rackPlan
-        	def bundleInstance = MoveBundle.findById(bundleId)
-        	def moveBundleAsset = []
-        	def moveBundleAssetList
-        	if(rack == "" || rack == null) {
-        		moveBundleAssetList = MoveBundleAsset.findAll( " from MoveBundleAsset ma where ma.moveBundle = $bundleInstance.id ")
-        	}else if(rackPlan == "UnrackPlan"){
-        		moveBundleAssetList = MoveBundleAsset.findAll( " from MoveBundleAsset ma where ma.moveBundle = $bundleInstance.id and ma.asset.sourceRack = '${rack}' ")
-        	}else {
-        		moveBundleAssetList = MoveBundleAsset.findAll( " from MoveBundleAsset ma where ma.moveBundle = $bundleInstance.id and ma.asset.targetRack = '${rack}' ")
-        	}
-        	for( int assetRow = 0; assetRow < moveBundleAssetList.size(); assetRow++) {
-        		def displayTeam  
-        		if( rackPlan == "RerackPlan" ) {
-        			displayTeam = moveBundleAssetList[assetRow].targetTeam.id
-        		}else {
-        			displayTeam = moveBundleAssetList[assetRow].sourceTeam.id
-        		}
-        		def assetEntityInstance = AssetEntity.findById( moveBundleAssetList[assetRow].asset.id )
-        		moveBundleAsset << [id:assetEntityInstance.id, serverName:assetEntityInstance.serverName, model:assetEntityInstance.model, sourceLocation:assetEntityInstance.sourceLocation, sourceRack:assetEntityInstance.sourceRack, targetLocation:assetEntityInstance.targetLocation, targetRack:assetEntityInstance.targetRack, position:assetEntityInstance.position, uSize:assetEntityInstance.usize, team:displayTeam ]
-        	}
-        	render moveBundleAsset as JSON
-        }
+    	def rack = params.rack
+       	def bundleId = params.bundleId
+       	def rackPlan = params.rackPlan
+       	def bundleInstance = MoveBundle.findById(bundleId)
+       	def moveBundleAsset = []
+       	def moveBundleAssetList
+       	if(rack == "" || rack == null) {
+       		moveBundleAssetList = MoveBundleAsset.findAll( " from MoveBundleAsset ma where ma.moveBundle = $bundleInstance.id ")
+       	}else if(rackPlan == "UnrackPlan"){
+       		moveBundleAssetList = MoveBundleAsset.findAll( " from MoveBundleAsset ma where ma.moveBundle = $bundleInstance.id and ma.asset.sourceRack = '${rack}' ")
+       	}else {
+       		moveBundleAssetList = MoveBundleAsset.findAll( " from MoveBundleAsset ma where ma.moveBundle = $bundleInstance.id and ma.asset.targetRack = '${rack}' ")
+       	}
+    	if(moveBundleAssetList != null) {
+    		for( int assetRow = 0; assetRow < moveBundleAssetList.size(); assetRow++) {
+    			def displayTeam  
+    			if( rackPlan == "RerackPlan" ) {
+    				displayTeam = moveBundleAssetList[assetRow]?.targetTeam?.id
+    			}else {
+    				displayTeam = moveBundleAssetList[assetRow]?.sourceTeam?.id
+    			}
+    			def assetEntityInstance = AssetEntity.findById( moveBundleAssetList[assetRow].asset.id )
+    			moveBundleAsset << [id:assetEntityInstance?.id, serverName:assetEntityInstance?.serverName, model:assetEntityInstance?.model, sourceLocation:assetEntityInstance?.sourceLocation, sourceRack:assetEntityInstance?.sourceRack, targetLocation:assetEntityInstance?.targetLocation, targetRack:assetEntityInstance?.targetRack, position:assetEntityInstance?.position, uSize:assetEntityInstance?.usize, team:displayTeam ]
+    		}
+    	}
+    		render moveBundleAsset as JSON
+    }
+     
 }
