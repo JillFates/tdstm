@@ -25,8 +25,7 @@
       $(document).ready(function(){
         $("#dialog").dialog({ autoOpen: false });
       });
-    </script>
-    <g:javascript>
+      
       function editProject(){
       $("#dialog").dialog('option', 'width', 500)
       $("#dialog").dialog( "open" );
@@ -45,94 +44,104 @@
       <% } %>
 
       }
+      
       function appendPartnerStaff(e) {
-      // The response comes back as a bunch-o-JSON
-      //alert("make sure that the project isn't saved with a staff member from the previous partner");
-      if(confirm(" Partner has been changed, Make sure that do you want to change the staff members ")){
-      
-      // evaluate JSON
-      var rselect = document.getElementById('projectManagerId')
-      var mselect = document.getElementById('moveManagerId')
-      var projectPartner = document.getElementById('projectPartnerId');
-      var projectPartnerVal = projectPartner[document.getElementById('projectPartnerId').selectedIndex].innerHTML;
-
-      var pmExeOptgroup = document.getElementById('pmGroup')
-      var mmExeOptgroup = document.getElementById('mmGroup')
-      var pmOptgroup
-      var mmOptgroup
-
-      if(pmExeOptgroup == null){
-      pmOptgroup = document.createElement('optgroup');
-      }else{
-      pmOptgroup = pmExeOptgroup
+	      // The response comes back as a bunch-o-JSON
+	      //alert("make sure that the project isn't saved with a staff member from the previous partner");
+	      if(confirm(" Partner has been changed, Make sure that do you want to change the staff members ")){
+	      
+	      // evaluate JSON
+	      var rselect = document.getElementById('projectManagerId')
+	      var mselect = document.getElementById('moveManagerId')
+	      var projectPartner = document.getElementById('projectPartnerId');
+	      var projectPartnerVal = projectPartner[document.getElementById('projectPartnerId').selectedIndex].innerHTML;
+	
+	      var pmExeOptgroup = document.getElementById('pmGroup')
+	      var mmExeOptgroup = document.getElementById('mmGroup')
+	      var pmOptgroup
+	      var mmOptgroup
+	
+	      if(pmExeOptgroup == null){
+	      pmOptgroup = document.createElement('optgroup');
+	      }else{
+	      pmOptgroup = pmExeOptgroup
+	      }
+	      if(mmExeOptgroup == null){
+	      mmOptgroup = document.createElement('optgroup');
+	      }else{
+	      mmOptgroup = mmExeOptgroup
+	      }
+	
+	      if(projectPartnerVal != "None" ){
+	      pmOptgroup.label = projectPartnerVal;
+	      pmOptgroup.id = "pmGroup";
+	      mmOptgroup.label = projectPartnerVal;
+	      mmOptgroup.id = "mmGroup";
+	      } else {
+	      pmOptgroup.label = "";
+	      mmOptgroup.label = "";
+	      }
+	      try {
+	      rselect.appendChild(pmOptgroup, null) // standards compliant; doesn't work in IE
+	      mselect.appendChild(mmOptgroup, null)
+	      } catch(ex) {
+	      rselect.appendChild(pmOptgroup) // IE only
+	      mselect.appendChild(mmOptgroup)
+	      }
+	      // Clear all previous options
+	      var l = rselect.length
+	      var compSatff = document.getElementById('companyManagersId').value
+	      while (l > compSatff) {
+	      l--
+	      rselect.remove(l)
+	      mselect.remove(l)
+	      }
+	      
+	      var managers = eval("(" + e.responseText + ")")
+	      // Rebuild the select
+	      if (managers) {
+	
+	      var length = managers.partnerStaff.length
+	      for (var i=0; i < length; i++) {
+	      var manager = managers.partnerStaff[i]
+	      var popt = document.createElement('option');
+	      popt.innerHTML = manager.name
+	      popt.value = manager.id
+	      var mopt = document.createElement('option');
+	      mopt.innerHTML = manager.name
+	      mopt.value = manager.id
+	      try {
+	      pmOptgroup.appendChild(popt, null) // standards compliant; doesn't work in IE
+	      mmOptgroup.appendChild(mopt, null)
+	      } catch(ex) {
+	      pmOptgroup.appendChild(popt) // IE only
+	      mmOptgroup.appendChild(mopt)
+	      }
+	      }
+	      }
+	      }else{
+	      var partnerObj = document.getElementById("projectPartnerId")
+	      <% if( projectPartner != null){ %>
+	      partnerObj.value = "${projectPartner?.partyIdTo.id}"
+	      <%} %>
+	      }
       }
-      if(mmExeOptgroup == null){
-      mmOptgroup = document.createElement('optgroup');
-      }else{
-      mmOptgroup = mmExeOptgroup
-      }
-
-      if(projectPartnerVal != "None" ){
-      pmOptgroup.label = projectPartnerVal;
-      pmOptgroup.id = "pmGroup";
-      mmOptgroup.label = projectPartnerVal;
-      mmOptgroup.id = "mmGroup";
-      } else {
-      pmOptgroup.label = "";
-      mmOptgroup.label = "";
-      }
-      try {
-      rselect.appendChild(pmOptgroup, null) // standards compliant; doesn't work in IE
-      mselect.appendChild(mmOptgroup, null)
-      } catch(ex) {
-      rselect.appendChild(pmOptgroup) // IE only
-      mselect.appendChild(mmOptgroup)
-      }
-      // Clear all previous options
-      var l = rselect.length
-      var compSatff = document.getElementById('companyManagersId').value
-      while (l > compSatff) {
-      l--
-      rselect.remove(l)
-      mselect.remove(l)
-      }
-      
-      var managers = eval("(" + e.responseText + ")")
-      // Rebuild the select
-      if (managers) {
-
-      var length = managers.items.length
-      for (var i=0; i < length; i++) {
-      var manager = managers.items[i]
-      var popt = document.createElement('option');
-      popt.innerHTML = manager.name
-      popt.value = manager.id
-      var mopt = document.createElement('option');
-      mopt.innerHTML = manager.name
-      mopt.value = manager.id
-      try {
-      pmOptgroup.appendChild(popt, null) // standards compliant; doesn't work in IE
-      mmOptgroup.appendChild(mopt, null)
-      } catch(ex) {
-      pmOptgroup.appendChild(popt) // IE only
-      mmOptgroup.appendChild(mopt)
-      }
-      }
-      }
-      }else{
-      var partnerObj = document.getElementById("projectPartnerId")
-      <% if( projectPartner != null){ %>
-      partnerObj.value = "${projectPartner?.partyIdTo.id}"
-      <%} %>
-      }
+      function validateEditForm(){
+      var completionDateObj = document.editProjectForm.name.value
+	      if(completionDateObj != ""){
+	      	return true;
+	      }else {
+	      	alert("Project Name cannot be blank")
+	      	return false;
+	      }
       }
       function setCompletionDate(startDate){
-      var completionDateObj = document.editProjectForm.completionDate;
-      if(completionDateObj.value == ""){
-      completionDateObj.value = startDate;
+	      var completionDateObj = document.editProjectForm.completionDate;
+	      if(completionDateObj.value == ""){
+	      completionDateObj.value = startDate;
+	      }
       }
-      }
-    </g:javascript>
+    </script>
   </head>
   <body>
     <div class="menu2">
@@ -351,6 +360,12 @@ class="value ${hasErrors(bean:projectInstance,field:'completionDate','errors')}"
                         ${companyStaff?.partyIdTo?.firstName} - ${companyStaff?.partyIdTo?.title}</option>
                       </g:each>
                     </optgroup>
+                    <optgroup label="${projectInstance?.client}">
+                      <g:each status="i" in="${clientStaff}" var="clientStaff">
+                        <option value="${clientStaff?.partyIdTo.id}">${clientStaff?.partyIdTo.lastName},
+                        ${clientStaff?.partyIdTo?.firstName} - ${clientStaff?.partyIdTo.title}</option>
+                      </g:each>
+                    </optgroup>
                     <optgroup label="${projectPartner?.partyIdTo}" id="pmGroup">
                       <g:each status="i" in="${partnerStaff}" var="partnerStaff">
                         <option value="${partnerStaff?.partyIdTo.id}">${partnerStaff?.partyIdTo?.lastName}, ${partnerStaff?.partyIdTo?.firstName} - ${partnerStaff?.partyIdTo?.title}</option>
@@ -371,13 +386,19 @@ class="value ${hasErrors(bean:projectInstance,field:'completionDate','errors')}"
                         ${companyStaff?.partyIdTo?.firstName} - ${companyStaff?.partyIdTo.title}</option>
                       </g:each>
                     </optgroup>
+                    <optgroup label="${projectInstance?.client}">
+                      <g:each status="i" in="${clientStaff}" var="clientStaff">
+                        <option value="${clientStaff?.partyIdTo.id}">${clientStaff?.partyIdTo.lastName},
+                        ${clientStaff?.partyIdTo?.firstName} - ${clientStaff?.partyIdTo.title}</option>
+                      </g:each>
+                    </optgroup>
                     <optgroup label="${projectPartner?.partyIdTo}" id="mmGroup">
                       <g:each status="i" in="${partnerStaff}" var="partnerStaff">
                         <option value="${partnerStaff?.partyIdTo.id}">${partnerStaff?.partyIdTo?.lastName}, ${partnerStaff?.partyIdTo?.firstName} - ${partnerStaff?.partyIdTo?.title}</option>
                       </g:each>
                     </optgroup>
                   </select>
-                  <input type="hidden" id="companyManagersId" value="${companyStaff.size()}">
+                  <input type="hidden" id="companyManagersId" value="${companyStaff.size()+clientStaff.size()+ 1}">
                 </td>
               </tr>
 
@@ -413,7 +434,7 @@ class="value ${hasErrors(bean:projectInstance,field:'completionDate','errors')}"
         </div>
         <div class="buttons">
           <span class="button">
-            <input class="save" type="submit" value="Update" />
+            <input class="save" type="submit" value="Update" onclick="return validateEditForm()"/>
           </span>
         </div>
       </g:form>

@@ -30,11 +30,14 @@ class ProjectController {
         	def projectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
         	def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
         	def companyStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectCompany.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
+        	def clientStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectInstance.client.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
         	def companyPartners = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'PARTNERS' and p.partyIdFrom = $projectCompany.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'PARTNER' order by p.partyIdTo" )
         	if(projectPartner != null){
         		partnerStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectPartner.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
         	}
-        	return [ projectInstance : projectInstance, projectPartner:projectPartner, projectManager:projectManager, moveManager:moveManager, companyStaff:companyStaff, partnerStaff:partnerStaff, companyPartners:companyPartners ]
+        	clientStaff.each{staff->
+        	}
+        	return [ projectInstance : projectInstance, projectPartner:projectPartner, projectManager:projectManager, moveManager:moveManager, companyStaff:companyStaff, clientStaff:clientStaff, partnerStaff:partnerStaff, companyPartners:companyPartners ]
         }
     }
 
@@ -182,11 +185,12 @@ class ProjectController {
                 
             }
             else {
-                render( view:'edit',model:[projectInstance:projectInstance] )
+            	flash.message = "Project ${projectInstance} not updated"
+                redirect(action:list )
             }
         } else {
             flash.message = "Project not found with id ${params.id}"
-            redirect( action:edit, id:params.id )
+            redirect( action:list, id:params.id )
         }
     }
     /*
@@ -317,23 +321,41 @@ class ProjectController {
      */
     def getPartnerStaffList = {
     		
+        def client = params.client
         def partner = params.partner
-        def partnerManagers
-        def items = []
         def json = []
-        def partnersMap = new HashMap()
-        if ( partner != "" && partner != null ) {
-            def partnerParty = PartyGroup.findById( partner ).id
-            // get list of all STAFF relationship to PARTNER
-            partnerManagers = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $partnerParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' " )
+        def pStaff = []
+        def cStaff = []
+        def compStaff = []
+        def tdsParty = PartyGroup.findByName( "TDS" ).id
+        // get list of all STAFF relationship to Client
+        def tdsStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $tdsParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' " )
+	    	
+        tdsStaff.each{partyRelationship ->
+        	compStaff <<[id:partyRelationship.partyIdTo.id, name:partyRelationship.partyIdTo.lastName +", "+partyRelationship.partyIdTo.firstName+" - "+partyRelationship.partyIdTo.title]
+        }
+        if ( client != "" && client != null ) {
+            def clientParty = PartyGroup.findById( client ).id
+            // get list of all STAFF relationship to Client
+            def clientStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $clientParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' " )
 	    		
-            partnerManagers.each{PartyRelationship ->
-                items <<[id:PartyRelationship.partyIdTo.id, name:PartyRelationship.partyIdTo.lastName +", "+PartyRelationship.partyIdTo.firstName+" - "+PartyRelationship.partyIdTo.title]
+            clientStaff.each{partyRelationship ->
+            	cStaff <<[id:partyRelationship.partyIdTo.id, name:partyRelationship.partyIdTo.lastName +", "+partyRelationship.partyIdTo.firstName+" - "+partyRelationship.partyIdTo.title]
 	             
             }
-            json = [ identifier:"id", items:items ]
-            
         }
+        if ( partner != "" && partner != null ) {
+            def partnerParty = PartyGroup.findById( partner ).id
+            // get list of all STAFF relationship to Client
+            def partnerStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $partnerParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' " )
+	    		
+            partnerStaff.each{partyRelationship ->
+            	pStaff <<[id:partyRelationship.partyIdTo.id, name:partyRelationship.partyIdTo.lastName +", "+partyRelationship.partyIdTo.firstName+" - "+partyRelationship.partyIdTo.title]
+	             
+            }
+        }
+        
+        json = [ identifier:"id", compStaff:compStaff, clientStaff:cStaff, partnerStaff:pStaff ]
         render json as JSON
     }
     

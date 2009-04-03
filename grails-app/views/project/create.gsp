@@ -6,55 +6,102 @@
 <g:javascript library="prototype" />
 <g:javascript library="jquery" />
 <g:javascript library="ui.datepicker" />
-<g:javascript>
+<script type="text/javascript">
 
-      function appendPartnerStaff(e) {
-	      // The response comes back as a bunch-o-JSON
+      function updateMastersList(e){
+      // The response comes back as a bunch-o-JSON
 	
 	      
 	      // evaluate JSON
 	      var rselect = document.getElementById('projectManagerId')
 	      var mselect = document.getElementById('moveManagerId')
-		  
 		      var projectPartner = document.getElementById('projectPartnerId');
-		      var projectPartnerVal = projectPartner[document.getElementById('projectPartnerId').selectedIndex].innerHTML;
+		      var projectClient = document.getElementById('clientId');
+		      var projectPartnerVal = projectPartner[projectPartner.selectedIndex].innerHTML;
+		      var projectClientVal = projectClient[projectClient.selectedIndex].innerHTML;
 		      
-		      var pmExeOptgroup = document.getElementById('pmGroup')
-		      var mmExeOptgroup = document.getElementById('mmGroup')
-		      var pmOptgroup
-		      var mmOptgroup
-		      
-		      if(pmExeOptgroup == null){
-		      	pmOptgroup = document.createElement('optgroup');
+		      var compPmExeOptgroup = document.getElementById('compPmGroup')
+		      var compMmExeOptgroup = document.getElementById('compMmGroup')
+		      var clientPmExeOptgroup = document.getElementById('clientPmGroup')
+		      var clientMmExeOptgroup = document.getElementById('clientMmGroup')
+		      var partnerPmExeOptgroup = document.getElementById('partnerPmGroup')
+		      var partnerMmExeOptgroup = document.getElementById('partnerMmGroup')
+		      var custPmOptgroup
+		      var custMmOptgroup
+		      var clientPmOptgroup
+		      var clientMmOptgroup
+		      var partnerPmOptgroup
+		      var partnerMmOptgroup
+		      // create Option group for Customer
+		      if(compPmExeOptgroup == null){
+		      	custPmOptgroup = document.createElement('optgroup');
 		      }else{
-		      	pmOptgroup = pmExeOptgroup
+		      	custPmOptgroup = compPmExeOptgroup
 		      }
-		      if(mmExeOptgroup == null){
-		      	mmOptgroup = document.createElement('optgroup');
+		      if(compMmExeOptgroup == null){
+		      	custMmOptgroup = document.createElement('optgroup');
 		      }else{
-		      	mmOptgroup = mmExeOptgroup
+		      	custMmOptgroup = compMmExeOptgroup
 		      }
-		      
+		      // create Option group for Client
+		      if(clientPmExeOptgroup == null){
+		      	clientPmOptgroup = document.createElement('optgroup');
+		      }else{
+		      	clientPmOptgroup = clientPmExeOptgroup
+		      }
+		      if(clientMmExeOptgroup == null){
+		      	clientMmOptgroup = document.createElement('optgroup');
+		      }else{
+		      	clientMmOptgroup = clientMmExeOptgroup
+		      }
+		      // create Option group for Partner
+		      if(partnerPmExeOptgroup == null){
+		      	partnerPmOptgroup = document.createElement('optgroup');
+		      }else{
+		      	partnerPmOptgroup = partnerPmExeOptgroup
+		      }
+		      if(partnerMmExeOptgroup == null){
+		      	partnerMmOptgroup = document.createElement('optgroup');
+		      }else{
+		      	partnerMmOptgroup = partnerMmExeOptgroup
+		      }
+		      // label assign for Customer
+		      custPmOptgroup.label = "TDS";
+			  custPmOptgroup.id = "compPmGroup";
+		      custMmOptgroup.label = "TDS";
+			  custMmOptgroup.id = "compMmGroup";
+		      clientPmOptgroup.label = projectClientVal;
+			  clientPmOptgroup.id = "clientPmGroup";
+		      clientMmOptgroup.label = projectClientVal;
+			  clientMmOptgroup.id = "clientMmGroup";
 		      if(projectPartnerVal != "None" ){
-			      pmOptgroup.label = projectPartnerVal;
-			      pmOptgroup.id = "pmGroup";
-			      mmOptgroup.label = projectPartnerVal;
-			      mmOptgroup.id = "mmGroup";
+			      partnerPmOptgroup.label = projectPartnerVal;
+			      partnerPmOptgroup.id = "partnerPmGroup";
+			      partnerMmOptgroup.label = projectPartnerVal;
+			      partnerMmOptgroup.id = "partnerMmGroup";
 		      } else {
-		      	  pmOptgroup.label = "";
-			      mmOptgroup.label = "";
+		      	  partnerPmOptgroup.label = "";
+			      partnerMmOptgroup.label = "";
 		      }
 		      try {
-				rselect.appendChild(pmOptgroup, null) // standards compliant; doesn't work in IE
-				mselect.appendChild(mmOptgroup, null) 
+				rselect.appendChild(custPmOptgroup, null) // standards compliant; doesn't work in IE
+				mselect.appendChild(custMmOptgroup, null) 
+				rselect.appendChild(clientPmOptgroup, null) 
+				mselect.appendChild(clientMmOptgroup, null) 
+				rselect.appendChild(partnerPmOptgroup, null) 
+				mselect.appendChild(partnerMmOptgroup, null) 
 			  } catch(ex) {
-				rselect.appendChild(pmOptgroup) // IE only
-				mselect.appendChild(mmOptgroup) 
+			  	rselect.appendChild(custPmOptgroup) // IE only
+				mselect.appendChild(custMmOptgroup) 
+				rselect.appendChild(clientPmOptgroup) 
+				mselect.appendChild(clientMmOptgroup) 
+				rselect.appendChild(partnerPmOptgroup) 
+				mselect.appendChild(partnerMmOptgroup)
 			  }
 	   		//  Clear all previous options
 			  var l = rselect.length
-			  var compSatff = document.getElementById('companyManagersId').value
-			  while (l > compSatff) {
+			 // var compSatff = document.getElementById('companyManagersId').value
+			  while (l > 1) {
 				l--
 				rselect.remove(l) 
 				mselect.remove(l)
@@ -62,10 +109,10 @@
 	      var managers = eval("(" + e.responseText + ")")
 	      // Rebuild the select
 	      if (managers) {
-		
-		      var length = managers.items.length
-		      for (var i=0; i < length; i++) {
-			      var manager = managers.items[i]
+		      // assign Company staff
+		      var compStaffLength = managers.compStaff.length
+		      for (var i=0; i < compStaffLength; i++) {
+			      var manager = managers.compStaff[i]
 			      var popt = document.createElement('option');
 			      popt.innerHTML = manager.name
 			      popt.value = manager.id
@@ -73,22 +120,59 @@
 			      mopt.innerHTML = manager.name
 			      mopt.value = manager.id
 			      try {
-				      pmOptgroup.appendChild(popt, null) // standards compliant; doesn't work in IE
-				      mmOptgroup.appendChild(mopt, null) 
+				      custPmOptgroup.appendChild(popt, null) // standards compliant; doesn't work in IE
+				      custMmOptgroup.appendChild(mopt, null) 
 			      } catch(ex) {
-				      pmOptgroup.appendChild(popt) // IE only
-				      mmOptgroup.appendChild(mopt) 
+				      custPmOptgroup.appendChild(popt) // IE only
+				      custMmOptgroup.appendChild(mopt) 
+			      }
+		      }
+		      // Assign Client Staff 
+		      var clientStaffLength = managers.clientStaff.length
+		     // if(clientStaffLength == ""){
+		      	//clientPmOptgroup.label = ""
+		      	//clientMmOptgroup.label = ""
+		      //}
+		      for (var i=0; i < clientStaffLength; i++) {
+			      var manager = managers.clientStaff[i]
+			      var cpopt = document.createElement('option');
+			      cpopt.innerHTML = manager.name
+			      cpopt.value = manager.id
+			      var cmopt = document.createElement('option');
+			      cmopt.innerHTML = manager.name
+			      cmopt.value = manager.id
+			      try {
+				      clientPmOptgroup.appendChild(cpopt, null) // standards compliant; doesn't work in IE
+				      clientMmOptgroup.appendChild(cmopt, null) 
+			      } catch(ex) {
+				      clientPmOptgroup.appendChild(cpopt) // IE only
+				      clientMmOptgroup.appendChild(cmopt) 
+			      }
+		      }
+		      var partnerStaffLength = managers.partnerStaff.length
+		      for (var i=0; i < partnerStaffLength; i++) {
+			      var manager = managers.partnerStaff[i]
+			      var ppopt = document.createElement('option');
+			      ppopt.innerHTML = manager.name
+			      ppopt.value = manager.id
+			      var pmopt = document.createElement('option');
+			      pmopt.innerHTML = manager.name
+			      pmopt.value = manager.id
+			      try {
+				      partnerPmOptgroup.appendChild(ppopt, null) // standards compliant; doesn't work in IE
+				      partnerMmOptgroup.appendChild(pmopt, null) 
+			      } catch(ex) {
+				      partnerPmOptgroup.appendChild(ppopt) // IE only
+				      partnerMmOptgroup.appendChild(pmopt) 
 			      }
 		      }
 	      }
       }
       function initialize(){
 	      // This is called when the page loads to initialize Managers
-	      var partnerselect = document.getElementById('projectPartnerId')
-	      var partnerVal = partnerselect.value 
-	      if(partnerVal != ""){
-	      	${remoteFunction(action:'getPartnerStaffList', params:'\'partner=\' + partnerVal', onComplete:'appendPartnerStaff(e)')}
-	      }
+	      var partnerVal = document.getElementById('projectPartnerId').value
+	      var clientObj = document.getElementById('clientId').value
+	      ${remoteFunction(action:'getPartnerStaffList', params:'\'client=\'+ clientObj +\'&partner=\'+partnerVal', onComplete:'updateMastersList(e)')}
       }
       function textCounter(field, maxlimit) {
 	      if (field.value.length > maxlimit) // if too long...trim it!
@@ -107,7 +191,7 @@
     		completionDateObj.value = startDate;
     	}
       }
-    </g:javascript>
+    </script>
 <%
 	def currProj = session.getAttribute("CURR_PROJ");
 	def projectId = currProj.CURR_PROJ;
@@ -146,8 +230,7 @@
 			<tr class="prop">
 				<td valign="top" class="name"><label for="client">Client:</label>
 				</td>
-				<td valign="top" class="value"><select id="client"
-					name="client.id">
+				<td valign="top" class="value"><select id="clientId" name="client.id" onchange="${remoteFunction(action:'getPartnerStaffList', params:'\'client=\'+ this.value +\'&partner=\'+document.getElementById(\'projectPartnerId\').value', onComplete:'updateMastersList(e)' )}">
 					<g:each status="i" in="${clients}" var="clients">
 						<option value="${clients.partyIdTo.id}">${clients.partyIdTo}</option>
 					</g:each>
@@ -254,7 +337,7 @@
 				</td>
 				<td valign="top" class="value"><select id="projectPartnerId"
 					name="projectPartner"
-					onchange="${remoteFunction(action:'getPartnerStaffList', params:'\'partner=\' + this.value', onComplete:'appendPartnerStaff(e)' )}">
+					onchange="${remoteFunction(action:'getPartnerStaffList', params:'\'client=\'+ document.getElementById(\'clientId\').value +\'&partner=\'+this.value', onComplete:'updateMastersList(e)' )}">
 					<option value="" selected="selected">None</option>
 					<g:each status="i" in="${partners}" var="partners">
 						<option value="${partners.partyIdTo.id}">${partners.partyIdTo}</option>
@@ -268,7 +351,7 @@
 				<td valign="top" class="value"><select id="projectManagerId"
 					name="projectManager">
 					<option value="" selected="selected">Please Select</option>
-					<optgroup label="TDS">
+					<optgroup label="TDS" id="compPmGroup">
 						<g:each status="i" in="${managers}" var="managers">
 							<option value="${managers.partyIdTo.id}">${managers.partyIdTo.lastName},
 							${managers.partyIdTo.firstName} - ${managers.partyIdTo.title}</option>
@@ -283,7 +366,7 @@
 				<td valign="top" class="value"><select id="moveManagerId"
 					name="moveManager">
 					<option value="" selected="selected">Please Select</option>
-					<optgroup label="TDS">
+					<optgroup label="TDS" id="compMmGroup">
 						<g:each status="i" in="${managers}" var="managers">
 							<option value="${managers.partyIdTo.id}">${managers.partyIdTo.lastName},
 							${managers.partyIdTo.firstName} - ${managers.partyIdTo.title}</option>
