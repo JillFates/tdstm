@@ -273,7 +273,7 @@ class MoveBundleAssetController {
     			displayTeam = moveBundleAssetList[assetRow]?.sourceTeam?.id
     		}
     		def assetEntityInstance = AssetEntity.findById( moveBundleAssetList[assetRow]?.asset?.id )
-    		moveBundleAsset <<[id:assetEntityInstance?.id, serverName:assetEntityInstance?.serverName, model:assetEntityInstance?.model, sourceLocation:assetEntityInstance?.sourceLocation, sourceRack:assetEntityInstance?.sourceRack, targetLocation:assetEntityInstance?.targetLocation, targetRack:assetEntityInstance?.targetRack, sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, uSize:assetEntityInstance?.usize,team:displayTeam ]
+    		moveBundleAsset <<[id:assetEntityInstance?.id, serverName:assetEntityInstance?.serverName, model:assetEntityInstance?.model, sourceLocation:assetEntityInstance?.sourceLocation, sourceRack:assetEntityInstance?.sourceRack, targetLocation:assetEntityInstance?.targetLocation, targetRack:assetEntityInstance?.targetRack, sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, uSize:assetEntityInstance?.usize,team:displayTeam,, cart:moveBundleAssetList[assetRow]?.cart, shelf:moveBundleAssetList[assetRow]?.shelf ]
     	}
     	render moveBundleAsset as JSON
     }
@@ -303,10 +303,40 @@ class MoveBundleAssetController {
     				displayTeam = moveBundleAssetList[assetRow]?.sourceTeam?.id
     			}
     			def assetEntityInstance = AssetEntity.findById( moveBundleAssetList[assetRow].asset.id )
-    			moveBundleAsset << [id:assetEntityInstance?.id, serverName:assetEntityInstance?.serverName, model:assetEntityInstance?.model, sourceLocation:assetEntityInstance?.sourceLocation, sourceRack:assetEntityInstance?.sourceRack, targetLocation:assetEntityInstance?.targetLocation, targetRack:assetEntityInstance?.targetRack, sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, uSize:assetEntityInstance?.usize, team:displayTeam ]
+    			moveBundleAsset << [id:assetEntityInstance?.id, serverName:assetEntityInstance?.serverName, model:assetEntityInstance?.model, sourceLocation:assetEntityInstance?.sourceLocation, sourceRack:assetEntityInstance?.sourceRack, targetLocation:assetEntityInstance?.targetLocation, targetRack:assetEntityInstance?.targetRack, sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, uSize:assetEntityInstance?.usize, team:displayTeam, cart:moveBundleAssetList[assetRow]?.cart, shelf:moveBundleAssetList[assetRow]?.shelf ]
     		}
     	}
     		render moveBundleAsset as JSON
     }
+	
+	//Updating #Cart for Selected Asset 
+	def assetCartAssign = {
+		def cart = params.cartNumber
+	    def asset = params.asset
+	    def bundleId = params.bundleId
+	    def teamAssetCounts = []
+	    def bundleInstance = MoveBundle.findById(bundleId)
+	    if( cart != null && cart != "")
+	    {
+	    	def assetEntityInstance = AssetEntity.findById(asset)
+	    	def moveBundleAsset = MoveBundleAsset.executeUpdate(" update MoveBundleAsset ma set ma.cart = $cart where ma.moveBundle = $bundleInstance.id and  ma.asset = $assetEntityInstance.id ")
+	    }
+	    render teamAssetCounts as JSON
+	}
+	
+	//Updating #Shelf for Selected Asset
+	def assetShelfAssign = {
+		def shelf = params.shelfNumber
+	    def asset = params.asset
+	    def bundleId = params.bundleId
+	    def teamAssetCounts = []
+	    def bundleInstance = MoveBundle.findById(bundleId)
+	    if( shelf != null && shelf != "")
+	    {
+	    	def assetEntityInstance = AssetEntity.findById(asset)
+	    	def moveBundleAsset = MoveBundleAsset.executeUpdate(" update MoveBundleAsset ma set ma.shelf = $shelf where ma.moveBundle = $bundleInstance.id and  ma.asset = $assetEntityInstance.id ")
+	    }
+	    render teamAssetCounts as JSON
+	}
      
 }

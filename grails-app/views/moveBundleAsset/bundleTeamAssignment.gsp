@@ -26,17 +26,71 @@
              }catch(e) {  
                  alert(e);  
              }  
-         }  
+         }
+         
+         function IsNumeric(sText)
+		{
+   			var ValidChars = "0123456789";
+   			var IsNumber=true;
+   			var Char;
+			for (i = 0; i < sText.length && IsNumber == true; i++) 
+      		{ 
+      			Char = sText.charAt(i); 
+      			if (ValidChars.indexOf(Char) == -1) 
+         		{
+         			IsNumber = false;
+         		}
+      		}
+   			return IsNumber;
+	   }
+           
          
          <!-- Assign asset to entered Team in text Box corresonding to Asset-->
          function assetToTeamAssign(team, asset)
          {
-         	var teamNumber = team
-           	var asset = asset
-           	var rackPlan = document.getElementById('rackPlan').value
-           	var bundleId = document.getElementById('id').value
-         	${remoteFunction(action:'assetTeamAssign', params:'\'teamId=\' +teamNumber+\'&asset=\'+asset+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId', onComplete:"teamAssignComplete(e);")}
+         if (!IsNumeric(team)) 
+   			{ 
+      			alert('Please enter only numbers in the Team field') 
+      			return false; 
+      		} else {
+         		var teamNumber = team
+           		var asset = asset
+           		var rackPlan = document.getElementById('rackPlan').value
+           		var bundleId = document.getElementById('id').value
+         		${remoteFunction(action:'assetTeamAssign', params:'\'teamId=\' +teamNumber+\'&asset=\'+asset+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId', onComplete:"teamAssignComplete(e);")}
+         	}
          }
+         
+         function assetCartAssign(cart, asset)
+         {
+         	if (!IsNumeric(cart.value)) 
+   			{ 
+      			alert('Please enter only numbers in the Cart field') 
+      			return false; 
+      		} else {
+         		var cartNumber = cart.value
+           		var asset = asset
+           		var bundleId = document.getElementById('id').value
+         		${remoteFunction(action:'assetCartAssign', params:'\'cartNumber=\' +cartNumber+\'&asset=\'+asset+\'&bundleId=\'+bundleId')}
+         	}	
+         	
+         }
+         function assetShelfAssign(shelf, asset)
+         {
+         	if (!IsNumeric(shelf.value) || shelf.value >= 10) 
+   			{ 
+      			alert('Please enter only numbers in the Shelf field and lessthan 10') 
+      			return false; 
+      		}else { 
+         		var shelfNumber = shelf.value
+           		var asset = asset
+           		var rackPlan = document.getElementById('rackPlan').value
+           		var bundleId = document.getElementById('id').value
+         		${remoteFunction(action:'assetShelfAssign', params:'\'shelfNumber=\' +shelfNumber+\'&asset=\'+asset+\'&bundleId=\'+bundleId')}
+         	}	
+         	
+         }
+         	
          
          <!-- AutoFill assignment of assets to Selected Team -->
          function autoFillTeam( teamCode) {
@@ -49,7 +103,7 @@
          	}
          	var bundleId = document.getElementById('id').value
          	var rackPlan = document.getElementById('rackPlan').value
-         	if(teamCode != 'null' && teamCode!= '')
+         	if(teamCode != 'null' && teamCode!= '' && assetList.length > 0 )
          	{
 	         	${remoteFunction(action:'autoFillTeamAssign', params:'\'teamCode=\' +teamCode+\'&assets=\'+assetList+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId', onComplete:"autoTeamAssignComplete( e );")}
 	        }
@@ -166,16 +220,19 @@
 		 		var cell9 = row.insertCell(8);
 	        	var cartElement = document.createElement("input");  
             	cartElement.type = "text";
-            	cartElement.name = "assetCartAssign"
-           		cartElement.value = "" 
+            	cartElement.name = "assetCartAssign_"+moveBundleAsset.id
+            	cartElement.id = moveBundleAsset.id
+           		cartElement.value = moveBundleAsset.cart 
+           		cartElement.onblur = function(){assetCartAssign(this, this.id );}
             	cartElement.style.width="50px"
             	cell9.appendChild(cartElement); 
            		var cell10 = row.insertCell(9);
 	        	var shelfElement = document.createElement("input");  
             	shelfElement.type = "text";
-            	shelfElement.name = "assetShelfAssign"
-            	shelfElement.id = "assetShelfAssign"
-            	shelfElement.value = "" 
+            	shelfElement.name = "assetShelfAssign_"+moveBundleAsset.id
+            	shelfElement.value = moveBundleAsset.shelf
+            	shelfElement.id = moveBundleAsset.id
+            	shelfElement.onblur = function(){assetShelfAssign(this, this.id );} 
             	shelfElement.style.width="50px"
             	cell10.appendChild(shelfElement); 
 	        		
@@ -432,9 +489,9 @@
                     </g:if>
                     <g:else >
                     <td><input size=5px; type=text name="assetTeamAssign_${moveBundleAssetInstance?.asset?.id}" id="${moveBundleAssetInstance?.asset?.id}" value="${moveBundleAssetInstance?.targetTeam?.id}" onblur="assetToTeamAssign(this.value,'${moveBundleAssetInstance?.asset?.id}');" /></td>
-						<td><input size=5px; type=text name="assetCartAssign" value="" /></td>
+						<td><input size=5px; type=text name="assetCartAssign_${moveBundleAssetInstance?.asset?.id}" id="${moveBundleAssetInstance?.asset?.id}" value="${moveBundleAssetInstance?.cart}" onblur="assetCartAssign(this,'${moveBundleAssetInstance?.asset?.id}');"/></td>
 					
-						<td><input size=5px; type=text name="assetShelfAssign" value="" /></td>
+						<td><input size=5px; type=text name="assetShelfAssign_${moveBundleAssetInstance?.asset?.id}" id="${moveBundleAssetInstance?.asset?.id}" value="${moveBundleAssetInstance?.shelf}" onblur="assetShelfAssign(this,'${moveBundleAssetInstance?.asset?.id}');"/></td>
 					</g:else>
                   </tr>
                   <% row++;%>

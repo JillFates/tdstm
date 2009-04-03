@@ -4,6 +4,8 @@ class MoveBundleAsset {
     AssetEntity asset
     ProjectTeam sourceTeam
     ProjectTeam targetTeam
+    Integer cart
+    Integer shelf
 
     /*
 	 * Fields Validations
@@ -13,7 +15,9 @@ class MoveBundleAsset {
         moveBundle( blank:false, nullable:false )
         asset( blank:false, nullable:false )
         sourceTeam( blank:true, nullable:true )
-        targetTeam( blank:true, nullable:true )		
+        targetTeam( blank:true, nullable:true )
+        cart( blank:true, nullable:true )
+        shelf( blank:true, nullable:true )
 
 	}
 

@@ -214,7 +214,7 @@ class AssetEntityAttributeLoaderService {
     			displayTeam = moveBundleAssetList[assetRow]?.sourceTeam?.id
     		}
     		def assetEntityInstance = AssetEntity.findById( moveBundleAssetList[assetRow].asset.id )
-    		moveBundleAsset <<[id:assetEntityInstance.id, serverName:assetEntityInstance.serverName, model:assetEntityInstance.model, sourceLocation:assetEntityInstance.sourceLocation, sourceRack:assetEntityInstance.sourceRack, targetLocation:assetEntityInstance.targetLocation, targetRack:assetEntityInstance.targetRack, sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, uSize:assetEntityInstance.usize, team:displayTeam ]
+    		moveBundleAsset <<[id:assetEntityInstance.id, serverName:assetEntityInstance.serverName, model:assetEntityInstance.model, sourceLocation:assetEntityInstance.sourceLocation, sourceRack:assetEntityInstance.sourceRack, targetLocation:assetEntityInstance.targetLocation, targetRack:assetEntityInstance.targetRack, sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, uSize:assetEntityInstance.usize, team:displayTeam, cart:moveBundleAssetList[assetRow]?.cart, shelf:moveBundleAssetList[assetRow]?.shelf ]
     	}
 		return moveBundleAsset
 	}

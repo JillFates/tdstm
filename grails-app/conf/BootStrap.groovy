@@ -472,8 +472,7 @@ class BootStrap {
 				assetTag: it[13],
 				serialNumber: it[14],
 				application: it[15],
-				owner: it[16]				
-		
+				owner: it[16]
             ).save()
 		}
 		def assete = new AssetEntity(serverName:"CSHMC3", model:"AutoView 3100", room:"XX-232-YAB", rack:"rackad1", position:"1", uSize:"12", attributeSet:attributeSet)
@@ -481,12 +480,12 @@ class BootStrap {
 		// Create MoveBundleAsset Details
 		// -------------------------------
         println "\n\n MOVE BUNDLE ASSET \n\n"
-		def moveBundle1Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle1, asset: AssetEntity.get(1),sourceTeam: cedarsGreenProjectTeam,targetTeam: cedarsRedProjectTeam ).save( insert:true )
-		def moveBundle2Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle1, asset: AssetEntity.get(2),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam ).save( insert:true )
-		def moveBundle3Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle2, asset: AssetEntity.get(3),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam ).save( insert:true )
-		def moveBundle4Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle3, asset: AssetEntity.get(4),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam ).save( insert:true )
-		def moveBundle5Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle2, asset: AssetEntity.get(5),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam ).save( insert:true )
-		def moveBundle6Asset = new MoveBundleAsset( moveBundle: twProjectMoveBundle, asset: AssetEntity.get(3),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam ).save( insert:true )
+		def moveBundle1Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle1, asset: AssetEntity.get(1),sourceTeam: cedarsGreenProjectTeam,targetTeam: cedarsRedProjectTeam,cart : 1,shelf: 2 ).save( insert:true )
+		def moveBundle2Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle1, asset: AssetEntity.get(2),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam,cart : 2,shelf: 3 ).save( insert:true )
+		def moveBundle3Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle2, asset: AssetEntity.get(3),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam,cart : 6,shelf: 4 ).save( insert:true )
+		def moveBundle4Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle3, asset: AssetEntity.get(4),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam,cart : 5,shelf: 8 ).save( insert:true )
+		def moveBundle5Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle2, asset: AssetEntity.get(5),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam,cart : 3,shelf: 9 ).save( insert:true )
+		def moveBundle6Asset = new MoveBundleAsset( moveBundle: twProjectMoveBundle, asset: AssetEntity.get(3),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam,cart : 1,shelf: 7 ).save( insert:true )
 
 		
 		//--------------------------------
