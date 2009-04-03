@@ -4,7 +4,7 @@
  **/
 class ProjectAssetMap {
     Project	project
-	Asset	asset
+    AssetEntity	asset
     Date createdDate
 
 	static mapping  = {

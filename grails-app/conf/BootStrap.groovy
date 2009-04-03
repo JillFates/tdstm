@@ -442,15 +442,15 @@ class BootStrap {
 		//---------------------------------
 		def assetEntityList = [
 		  			// project, type, name, asset tag, s/n, AssetOwner
-		  			["105C31D", "Workstation B2600", "XX-232-YAB", "rackad1", "1", "12", attributeSet, cedarsProject, serverAsset, "CSHSACADAFF", "C2A133", "ASD12345", "Mail", cedarsProject.client],
-		  			["105D74C CSMEDI","7028-6C4", "XX-138-YAB", "rackad2", "2", "12", attributeSet, cedarsProject, serverAsset, "CSHSACCESS2", "C2A134", "ASD2343455", "SAP", cedarsProject.client],
-		  			["AIX Console HMC3", "KVM", "MM-2232", "rackad3", "4", "1", attributeSet, cedarsProject, serverAsset, "CSHSBDGT1", "C2A135", "ASD1893045", "SAP", cedarsProject.client],
-		  			["105D74C CSMEDI", "AutoView 3100", "RR-32-YAB", "rackad4", "3", "1", attributeSet, cedarsProject, kvmSwitchAsset, "Avocent", "C2A136", "ASD189234", "SAP", cedarsProject.client],
-		  			["CED14P", "Proliant 1600R", "RR-32-YAB", "rackad5", "6", "5", attributeSet, cedarsProject, arrayAsset, "CSMCARM Juke", "C2A137", "SU02325456", "SAP", cedarsProject.client],
-		  			["AIX Console HMC2", "V490", "RR-32-YAB", "rackad1", "7", "5", attributeSet, cedarsProject, kvmSwitchAsset, "Avocent", "C2A138", "ASD1765454", "Mail", cedarsProject.client],
-		  			["AXPNTSA", "Proliant DL380 G3", "RR-32-YAB", "rackad2", "5", "3", attributeSet, cedarsProject, serverAsset, "CSHSACADAFF", "C2A139", "ASD12345", "Mail", cedarsProject.client],
-		  			["CEDCONSOLE1", "StorageWorks", "RR-32-YAB", "rackad3", "8", "6", attributeSet, cedarsProject, serverAsset, "CSHSACCESS2", "C2A140", "ASD2343455", "Mail", cedarsProject.client],
-		  			["CSEGP2 = CSENSD1 IO Drawer 1", "Ultrium Tape", "RR-32-YAB", "rackad4", "9", "7", attributeSet, cedarsProject, arrayAsset, "CSMCARM Juke", "C2A141", "SU0234423", "Mail", cedarsProject.client]
+		  			["105C31D", "Workstation B2600", "XX-232-YAB", "XX-232-YABB", "rackad1", "rackad11", "1", "11", "12", attributeSet, cedarsProject, serverAsset, "CSHSACADAFF", "C2A133", "ASD12345", "Mail", cedarsProject.client],
+		  			["105D74C CSMEDI","7028-6C4", "XX-138-YAB", "XX-138-YABB", "rackad2", "rackad22", "2", "22",  "12", attributeSet, cedarsProject, serverAsset, "CSHSACCESS2", "C2A134", "ASD2343455", "SAP", cedarsProject.client],
+		  			["AIX Console HMC3", "KVM", "MM-2232", "MM-22322", "rackad3", "rackad33", "4", "44", "1", attributeSet, cedarsProject, serverAsset, "CSHSBDGT1", "C2A135", "ASD1893045", "SAP", cedarsProject.client],
+		  			["105D74C CSMEDI", "AutoView 3100", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad44", "3", "33", "1", attributeSet, cedarsProject, kvmSwitchAsset, "Avocent", "C2A136", "ASD189234", "SAP", cedarsProject.client],
+		  			["CED14P", "Proliant 1600R", "RR-32-YAB", "RR-32-YABB", "rackad5", "rackad55", "6", "66", "5", attributeSet, cedarsProject, arrayAsset, "CSMCARM Juke", "C2A137", "SU02325456", "SAP", cedarsProject.client],
+		  			["AIX Console HMC2", "V490", "RR-32-YAB", "RR-32-YABB", "rackad1", "rackad66", "7", "77", "5", attributeSet, cedarsProject, kvmSwitchAsset, "Avocent", "C2A138", "ASD1765454", "Mail", cedarsProject.client],
+		  			["AXPNTSA", "Proliant DL380 G3", "RR-32-YAB", "RR-32-YABB", "rackad2", "rackad77", "5", "55", "3", attributeSet, cedarsProject, serverAsset, "CSHSACADAFF", "C2A139", "ASD12345", "Mail", cedarsProject.client],
+		  			["CEDCONSOLE1", "StorageWorks", "RR-32-YAB", "RR-32-YABB", "rackad3", "rackad88", "8", "88", "6", attributeSet, cedarsProject, serverAsset, "CSHSACCESS2", "C2A140", "ASD2343455", "Mail", cedarsProject.client],
+		  			["CSEGP2 = CSENSD1 IO Drawer 1", "Ultrium Tape", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad99", "9", "99", "7", attributeSet, cedarsProject, arrayAsset, "CSMCARM Juke", "C2A141", "SU0234423", "Mail", cedarsProject.client]
 		]
 		
 		// Insert the List of assetEntity
@@ -459,17 +459,20 @@ class BootStrap {
 				serverName: it[0],
 				model: it[1],
 				sourceLocation: it[2],
-				sourceRack: it[3],
-				position: it[4],
-				usize: it[5],
-				attributeSet: it[6],
-				project: it[7],
-				assetType: it[8],
-				assetName: it[9],
-				assetTag: it[10],
-				serialNumber: it[11],
-				application: it[12],
-				owner: it[13]
+				targetLocation: it[3],
+				sourceRack: it[4],
+				targetRack: it[5],
+				sourceRackposition: it[6],
+				targetRackposition: it[7],
+				usize: it[8],
+				attributeSet: it[9],
+				project: it[10],
+				assetType: it[11],
+				assetName: it[12],
+				assetTag: it[13],
+				serialNumber: it[14],
+				application: it[15],
+				owner: it[16]				
 		
             ).save()
 		}

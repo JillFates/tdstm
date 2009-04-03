@@ -19,8 +19,8 @@
           <ul>
             <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
             <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
-            <li><g:link class="home" controller="asset">Assets </g:link></li>
-            <li><g:link class="home" controller="asset" action="assetImport" >Import/Export</g:link> </li>
+            <li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">Assets </g:link></li>
+	<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link> </li>
             <li><a href="#">Contacts </a></li>
             <li><a href="#">Applications </a></li>
             <li><g:link class="home" controller="moveBundle" params="[projectId:currProjObj?.id]">Move Bundles</g:link></li>

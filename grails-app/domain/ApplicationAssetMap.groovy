@@ -7,7 +7,7 @@
 class ApplicationAssetMap {
 
 	Application	application
-	Asset		asset
+	AssetEntity	asset
 
 	// TODO : Create unique index on application_id + asset_id
 }

@@ -7,9 +7,9 @@ import org.springframework.web.multipart.commons.*
 import grails.converters.JSON
 import org.jsecurity.SecurityUtils
 import com.tdssrc.eav.*
-class AssetController {
-
-	// TODO : Fix indentation
+class AssetEntityController {
+    
+    //TODO : Fix indentation
 	def missingHeader = ""
 	def added = 0
 	def skipped = []
@@ -51,7 +51,7 @@ class AssetController {
     	
     	if ( projectId != null ) {
     		def project = Project.findById(projectId)
-    		assetsByProject = Asset.findAllByProject(project)
+    		assetsByProject = AssetEntity.findAllByProject(project)
     	}
     	def	dataTransferBatchs = DataTransferBatch.count()
         render( view:"importExport", model : [ assetsByProject: assetsByProject, projectId: projectId, moveBundleInstanceList: moveBundleInstanceList, dataTransferSetImport: dataTransferSetImport, dataTransferSetExport: dataTransferSetExport, dataTransferBatchs: dataTransferBatchs ] )
@@ -193,7 +193,7 @@ class AssetController {
 
 
                             // save data in to db and check for added rows and skipped
-                            def asset = new Asset(
+                            def asset = new 	(
 
                             project: project,
                             assetType: assetTypeObj,
@@ -239,7 +239,7 @@ class AssetController {
             flash.message = "Project Name is required"
             redirect( controller:"asset", action:"assetImport" )
         }
-        def asset = Asset.findAllByProject( project )
+        def asset = AssetEntity.findAllByProject( project )
         //get template Excel
         def workbook
         def book
@@ -332,7 +332,7 @@ class AssetController {
             if( map.containsKey( cellContent ) ) {
                 map.put( cellContent, c )
             } else {
-            	 missingHeader = missingHeader + ", " + cellContent
+                missingHeader = missingHeader + ", " + cellContent
             }
         }
     	if( map.containsValue( null ) == true ) {
@@ -345,154 +345,104 @@ class AssetController {
     	}
     }
 
-
     // the delete, save and update actions only accept POST requests
-    def allowedMethods = [ delete:'POST', save:'POST', update:'POST' ]
-    // return the list of asset records for project present in current scope.
+    def allowedMethods = [delete:'POST', save:'POST', update:'POST']
+
     def list = {
-        def project
-        try {
-            if ( !params.max ) params.max = 25
-            def currProj = getSession().getAttribute( "CURR_PROJ" )
-            def projId = currProj.CURR_PROJ
-            if( projId == null ) {
+        if(!params.max) params.max = 15
+        def projectId = params.projectId
+        [ assetEntityInstanceList: AssetEntity.list( params ), projectId: projectId ]
+    }   
 
-                flash.message = " No Projects are Associated, Please select Project. "
-                redirect( controller:"project",action:"list" )
-
-            }
-            project = Project.findById( projId )
-        } catch ( Exception ex ) { }
-        def query = "from PartyGroup as p where p.partyType = 'COMPANY' "
-        def partyGroupList = PartyGroup.findAll( query )
-        //get asset list for project present in current scope.        
-        return [ assetInstanceList: Asset.findAllByProject( project, params ), project:project, partyGroupList:partyGroupList ]
-    }
-    // return asset details
-    def show = {
-        def assetInstance = Asset.get( params.id )
-
-        if ( !assetInstance ) {
-            flash.message = "Asset not found with id ${params.id}"
-            redirect( action:list )
-        }
-        else { return [ assetInstance : assetInstance ] }
-    }
-    // delete asset details
     def delete = {
-        def assetInstance = Asset.get( params.id )
-        if( assetInstance ) {
-            assetInstance.delete()
-            flash.message = "Asset ${params.id} deleted"
-            redirect( action:list )
-        }
-        else {
-            flash.message = "Asset not found with id ${params.id}"
-            redirect( action:list )
-        }
-    }
-    // provide edit form with asset details
-    def edit = {
-        def assetInstance = Asset.get( params.id )
-
-        if ( !assetInstance ) {
-            flash.message = "Asset not found with id ${params.id}"
+        def assetEntityInstance = AssetEntity.get( params.id )
+        if(assetEntityInstance) {
+            assetEntityInstance.delete()
+            flash.message = "AssetEntity ${params.id} deleted"
             redirect(action:list)
-        } else {
-            return [ assetInstance : assetInstance ]
-        }
-    }
-    // update asset details
-    def update = {
-        def assetInstance = Asset.get( params.id )
-        if ( assetInstance ) {
-            assetInstance.properties = params
-            if( !assetInstance.hasErrors() && assetInstance.save() ) {
-                flash.message = "Asset ${params.id} updated"
-                redirect( action:show,id:assetInstance.id )
-            } else {
-                render( view:'edit', model:[assetInstance:assetInstance] )
-            }
         }
         else {
-            flash.message = "Asset not found with id ${params.id}"
-            redirect( action:edit, id:params.id )
+            flash.message = "AssetEntity not found with id ${params.id}"
+            redirect(action:list)
         }
     }
-    // provide asset create form
-    def create = {
-        def assetInstance = new Asset()
-        assetInstance.properties = params
-        return ['assetInstance':assetInstance]
-    }
-    // save asset details
+    
     def save = {
-        def assetInstance = new Asset( params )
-        def currProj = getSession().getAttribute( "CURR_PROJ" )
-        def projectInstance
-        def projectId = currProj.CURR_PROJ
-        if( projectId != null ) {
-            projectInstance = Project.findById( projectId )
-            assetInstance.project = projectInstance
+        def assetEntityInstance = new AssetEntity(params)
+        def projectId = params.projectId
+        def projectInstance = Project.findById( projectId )
+        assetEntityInstance.project = projectInstance
+        assetEntityInstance.owner = projectInstance.client
+        if(!assetEntityInstance.hasErrors() && assetEntityInstance.save()) {
+            flash.message = "AssetEntity ${assetEntityInstance.id} created"
+            redirect( action:list,id:assetEntityInstance.id,params:[projectId: projectId] )
         }
-        if ( !assetInstance.hasErrors() && assetInstance.save() ) {
-            flash.message = "Asset ${assetInstance.id} created"
-            redirect( action:list, id:assetInstance.id )
-        } else {
-            render( view:'create', model:[assetInstance:assetInstance] )
+        else {
+            render( view:'list',model:[assetEntityInstance:assetEntityInstance, projectId: projectId] )
         }
     }
-    // remote link for asset dialog
+    
+    //remote link for asset entity dialog.
     def editShow = {
         
         def items = []
-        def assetInstance = Asset.get( params.id )
-        // def partyGroupInstance = PartyGroup.get(assetInstance.owner.id)
-        if( assetInstance.assetType != null && assetInstance.owner != null ){
-        	items = [id:assetInstance.id, project:assetInstance.project.name, projectId:assetInstance.project.id, assetType:assetInstance.assetType, assetTypeId:assetInstance.assetType.id, assetOwner:assetInstance.owner.name, assetOwnerId:assetInstance.owner.id, assetTag:assetInstance.assetTag, assetName:assetInstance.assetName, serialNumber:assetInstance.serialNumber, deviceFunction:assetInstance.deviceFunction ]
-        	
-        } else if( assetInstance.assetType != null && assetInstance.owner == null ) {
-        	items = [id:assetInstance.id, project:assetInstance.project.name, projectId:assetInstance.project.id, assetType:assetInstance.assetType, assetTypeId:assetInstance.assetType.id, assetTag:assetInstance.assetTag, assetName:assetInstance.assetName, serialNumber:assetInstance.serialNumber, deviceFunction:assetInstance.deviceFunction ]
-            
-        }else if( assetInstance.assetType == null && assetInstance.owner != null ){
-        	items = [id:assetInstance.id, project:assetInstance.project.name, projectId:assetInstance.project.id, assetOwner:assetInstance.owner.name, assetOwnerId:assetInstance.owner.id, assetTag:assetInstance.assetTag, assetName:assetInstance.assetName, serialNumber:assetInstance.serialNumber, deviceFunction:assetInstance.deviceFunction ]
+        def assetEntityInstance = AssetEntity.get( params.id )
+        
+        if( assetEntityInstance.assetType != null ){
+        	items = [id:assetEntityInstance.id, serverName: assetEntityInstance.serverName, model: assetEntityInstance.model, sourceLocation: assetEntityInstance.sourceLocation, targetLocation: assetEntityInstance.targetLocation, sourceRack: assetEntityInstance.sourceRack, targetRack: assetEntityInstance.targetRack, sourceRackPosition: assetEntityInstance.sourceRackPosition, targetRackPosition: assetEntityInstance.targetRackPosition, usize: assetEntityInstance.usize, manufacturer: assetEntityInstance.manufacturer, fiberCabinet: assetEntityInstance.fiberCabinet, hbaPort: assetEntityInstance.hbaPort, hinfo: assetEntityInstance.hinfo, ipAddress: assetEntityInstance.ipAddress, kvmDevice: assetEntityInstance.kvmDevice, kvmPort: assetEntityInstance.kvmPort, newOrOld: assetEntityInstance.newOrOld, nicPort: assetEntityInstance.nicPort, powerPort: assetEntityInstance.powerPort, remoteMgmPort: assetEntityInstance.remoteMgmPort, truck: assetEntityInstance.truck, project:assetEntityInstance.project.name, projectId:assetEntityInstance.project.id, assetType:assetEntityInstance.assetType, assetTypeId:assetEntityInstance.assetType.id, assetTag:assetEntityInstance.assetTag, assetName:assetEntityInstance.assetName, serialNumber:assetEntityInstance.serialNumber, , application:assetEntityInstance.application ]
+       
+        } else {
+        	items = [id:assetEntityInstance.id, serverName: assetEntityInstance.serverName, model: assetEntityInstance.model, sourceLocation: assetEntityInstance.sourceLocation, targetLocation: assetEntityInstance.targetLocation, sourceRack: assetEntityInstance.sourceRack, targetRack: assetEntityInstance.targetRack, sourceRackPosition: assetEntityInstance.sourceRackPosition, targetRackPosition: assetEntityInstance.targetRackPosition, usize: assetEntityInstance.usize, manufacturer: assetEntityInstance.manufacturer, fiberCabinet: assetEntityInstance.fiberCabinet, hbaPort: assetEntityInstance.hbaPort, hinfo: assetEntityInstance.hinfo, ipAddress: assetEntityInstance.ipAddress, kvmDevice: assetEntityInstance.kvmDevice, kvmPort: assetEntityInstance.kvmPort, newOrOld: assetEntityInstance.newOrOld, nicPort: assetEntityInstance.nicPort, powerPort: assetEntityInstance.powerPort, remoteMgmPort: assetEntityInstance.remoteMgmPort, truck: assetEntityInstance.truck, project:assetEntityInstance.project.name, projectId:assetEntityInstance.project.id, assetTag:assetEntityInstance.assetTag, assetName:assetEntityInstance.assetName, serialNumber:assetEntityInstance.serialNumber, application:assetEntityInstance.application ]
         }
-        else{
-        	items = [id:assetInstance.id, project:assetInstance.project.name, projectId:assetInstance.project.id, assetTag:assetInstance.assetTag, assetName:assetInstance.assetName, serialNumber:assetInstance.serialNumber, deviceFunction:assetInstance.deviceFunction ]
-        	
-        }
+        
         render items as JSON
         
     }
-    // update ajax overlay 
-    def updateAsset = {
+    
+    //update ajax overlay
+    def updateAssetEntity = {
     		 
-        def assetDialog= params.assetDialog.split(',')
+        def assetDialog = params.assetDialog.split(',')
         
         def assetItems = []
-        def assetInstance = Asset.get( assetDialog[0] )
-        def assetType=AssetType.findById( assetDialog[1] )
-        assetInstance.assetType = assetType
-        assetInstance.assetName = assetDialog[2]
-        assetInstance.assetTag = assetDialog[3]
-        assetInstance.serialNumber= assetDialog[4]
-        assetInstance.deviceFunction = assetDialog[5]
-        if( assetDialog[6] != "" && assetDialog[6] != 'null' ){
-        	def PartyGroupInstance = PartyGroup.findById(assetDialog[6])
-    	    assetInstance.owner = PartyGroupInstance
-        }else{
-            assetInstance.owner = null
-        }
-        assetInstance.save()
+        def assetEntityInstance = AssetEntity.get( assetDialog[0] )
+        assetEntityInstance.serverName = assetDialog[1]
+        assetEntityInstance.model = assetDialog[2]
+        assetEntityInstance.sourceLocation = assetDialog[3]
+        assetEntityInstance.targetLocation = assetDialog[4]
+        assetEntityInstance.sourceRack = assetDialog[5]
+        assetEntityInstance.targetRack = assetDialog[6]
+        assetEntityInstance.sourceRackPosition = assetDialog[7]
+        assetEntityInstance.targetRackPosition = assetDialog[8]
+        assetEntityInstance.usize = assetDialog[9]
+        assetEntityInstance.manufacturer = assetDialog[10]
+        assetEntityInstance.fiberCabinet = assetDialog[11]
+        assetEntityInstance.hbaPort = assetDialog[12]
+        assetEntityInstance.hinfo = assetDialog[13]
+        assetEntityInstance.ipAddress = assetDialog[14]
+        assetEntityInstance.kvmDevice = assetDialog[15]
+        assetEntityInstance.kvmPort = assetDialog[16]
+        assetEntityInstance.newOrOld = assetDialog[17]
+        assetEntityInstance.nicPort = assetDialog[18]
+        assetEntityInstance.powerPort = assetDialog[19]
+        assetEntityInstance.remoteMgmPort = assetDialog[20]
+        assetEntityInstance.truck = assetDialog[21]
+        def assetType=AssetType.findById( assetDialog[22] )
+        assetEntityInstance.assetType = assetType        
+        assetEntityInstance.assetName = assetDialog[23]
+        assetEntityInstance.assetTag = assetDialog[24]
+        assetEntityInstance.serialNumber= assetDialog[25]
+        assetEntityInstance.application= assetDialog[26]
+        assetEntityInstance.save()
 
-        if( assetInstance.assetType == null ) {
-            assetItems = [id:assetInstance.id, project:assetInstance.project.name, projectId:assetInstance.project.id, assetTag:assetInstance.assetTag, assetName:assetInstance.assetName, serialNumber:assetInstance.serialNumber, deviceFunction:assetInstance.deviceFunction ]
+        if( assetEntityInstance.assetType != null ){
+        	assetItems = [id:assetEntityInstance.id, serverName: assetEntityInstance.serverName, model: assetEntityInstance.model, sourceLocation: assetEntityInstance.sourceLocation, targetLocation: assetEntityInstance.targetLocation, sourceRack: assetEntityInstance.sourceRack, targetRack: assetEntityInstance.targetRack, sourceRackPosition: assetEntityInstance.sourceRackPosition, targetRackPosition: assetEntityInstance.targetRackPosition, usize: assetEntityInstance.usize, manufacturer: assetEntityInstance.manufacturer, fiberCabinet: assetEntityInstance.fiberCabinet, hbaPort: assetEntityInstance.hbaPort, hinfo: assetEntityInstance.hinfo, ipAddress: assetEntityInstance.ipAddress, kvmDevice: assetEntityInstance.kvmDevice, kvmPort: assetEntityInstance.kvmPort, newOrOld: assetEntityInstance.newOrOld, nicPort: assetEntityInstance.nicPort, powerPort: assetEntityInstance.powerPort, remoteMgmPort: assetEntityInstance.remoteMgmPort, truck: assetEntityInstance.truck, project:assetEntityInstance.project.name, projectId:assetEntityInstance.project.id, assetType:assetEntityInstance.assetType, assetTypeId:assetEntityInstance.assetType.id, assetTag:assetEntityInstance.assetTag, assetName:assetEntityInstance.assetName, serialNumber:assetEntityInstance.serialNumber, application:assetEntityInstance.application ]
+       
         } else {
-            assetItems = [id:assetInstance.id, project:assetInstance.project.name, projectId:assetInstance.project.id, assetType:assetInstance.assetType, assetTypeId:assetInstance.assetType.id, assetTag:assetInstance.assetTag, assetName:assetInstance.assetName, serialNumber:assetInstance.serialNumber, deviceFunction:assetInstance.deviceFunction ]
+        	assetItems = [id:assetEntityInstance.id, serverName: assetEntityInstance.serverName, model: assetEntityInstance.model, sourceLocation: assetEntityInstance.sourceLocation, targetLocation: assetEntityInstance.targetLocation, sourceRack: assetEntityInstance.sourceRack, targetRack: assetEntityInstance.targetRack, sourceRackPosition: assetEntityInstance.sourceRackPosition, targetRackPosition: assetEntityInstance.targetRackPosition, usize: assetEntityInstance.usize, manufacturer: assetEntityInstance.manufacturer, fiberCabinet: assetEntityInstance.fiberCabinet, hbaPort: assetEntityInstance.hbaPort, hinfo: assetEntityInstance.hinfo, ipAddress: assetEntityInstance.ipAddress, kvmDevice: assetEntityInstance.kvmDevice, kvmPort: assetEntityInstance.kvmPort, newOrOld: assetEntityInstance.newOrOld, nicPort: assetEntityInstance.nicPort, powerPort: assetEntityInstance.powerPort, remoteMgmPort: assetEntityInstance.remoteMgmPort, truck: assetEntityInstance.truck, project:assetEntityInstance.project.name, projectId:assetEntityInstance.project.id, assetTag:assetEntityInstance.assetTag, assetName:assetEntityInstance.assetName, serialNumber:assetEntityInstance.serialNumber, application:assetEntityInstance.application ]
         }
 
         render assetItems as JSON
 
     }
-
 }

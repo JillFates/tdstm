@@ -22,8 +22,8 @@
           <ul>
             <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
             <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:bundleInstance?.project?.id]" >Staff</g:link></li>
-            <li><g:link class="home" controller="asset">Assets </g:link></li>
-            <li><g:link class="home" controller="asset" action="assetImport" >Import/Export</g:link> </li>
+            <li><g:link class="home" controller="assetEntity" params="[projectId:bundleInstance?.project?.id]">Assets </g:link></li>
+	<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:bundleInstance?.project?.id]">Import/Export</g:link> </li>
             <li><a href="#">Contacts </a></li>
             <li><a href="#">Applications </a></li>
 			<li><g:link class="home" controller="moveBundle" params="[projectId:bundleInstance?.project?.id]">Move Bundles</g:link></li>

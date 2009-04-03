@@ -5,7 +5,7 @@ class Project extends PartyGroup {
 	String trackChanges
 	Date startDate	// Date that the project will start
 	Date completionDate	// Date that the project will finish
-	Party client
+	PartyGroup client
     
 	static hasMany = [ dataTransferBatch : DataTransferBatch ]
 	
