@@ -86,8 +86,8 @@
 			  document.editForm.newOrOld.value = assetEntity.newOrOld
 			  document.showForm.nicPort.value = assetEntity.nicPort
 			  document.editForm.nicPort.value = assetEntity.nicPort
-			  document.showForm.remoteMgmPort.value = assetEntity.remoteMgmPort
-			  document.editForm.remoteMgmPort.value = assetEntity.remoteMgmPort
+			  document.showForm.remoteMgmtPort.value = assetEntity.remoteMgmtPort
+			  document.editForm.remoteMgmtPort.value = assetEntity.remoteMgmtPort
 			  document.showForm.truck.value = assetEntity.truck
 			  document.editForm.truck.value = assetEntity.truck
 			  if(assetEntity.assetTypeId == null) {
@@ -150,7 +150,7 @@
 			      var newOrOld = document.editForm.newOrOld.value
 			      var nicPort = document.editForm.nicPort.value
 			      var powerPort = document.editForm.powerPort.value
-			      var remoteMgmPort = document.editForm.remoteMgmPort.value
+			      var remoteMgmtPort = document.editForm.remoteMgmtPort.value
 			      var truck = document.editForm.truck.value
 			      var assetType = document.editForm.assetType.value		      
 			      var assetName = document.editForm.assetName.value
@@ -179,7 +179,7 @@
 			      assetNameDialog[16] = newOrOld
 			      assetNameDialog[17] = nicPort
 			      assetNameDialog[18] = powerPort
-			      assetNameDialog[19] = remoteMgmPort
+			      assetNameDialog[19] = remoteMgmtPort
 			      assetNameDialog[20] = truck
 			      assetNameDialog[21] = assetType
 			      assetNameDialog[22] = assetName
@@ -458,10 +458,10 @@
 					value="${assetEntityInstance?.assetType?.id}" noSelection="['':'']"></g:select>
 				</td>
 
-				<td valign="top" class="name"><label for="remoteMgmPort">Remote
+				<td valign="top" class="name"><label for="remoteMgmtPort">Remote
 				Mgm Port:</label></td>
 				<td valign="top"><input type="text" size="30"
-					id="remoteMgmPort" name="remoteMgmPort" value="" /></td>
+					id="remoteMgmtPort" name="remoteMgmtPort" value="" /></td>
 			</tr>
 
 			<tr class="prop">
@@ -656,7 +656,7 @@
 				<td valign="top" class="name">Remote Mgm Port:</td>
 
 				<td valign="top" class="value"><input type="text" size="35"
-					id="remoteMgmPort" name="remoteMgmPort" value=""
+					id="remoteMgmtPort" name="remoteMgmtPort" value=""
 					style="border: 0px" readonly></td>
 
 			</tr>
@@ -834,10 +834,10 @@
 				<td valign="top"><input type="text" size="35" id="assetName"
 					name="assetName" value="" /></td>
 
-				<td valign="top" class="name"><label for="remoteMgmPort">Remote
+				<td valign="top" class="name"><label for="remoteMgmtPort">Remote
 				Mgm Port:</label></td>
 				<td valign="top"><input type="text" size="35"
-					id="remoteMgmPort" name="remoteMgmPort" value="" /></td>
+					id="remoteMgmtPort" name="remoteMgmtPort" value="" /></td>
 			</tr>
 
 			<tr class="prop">

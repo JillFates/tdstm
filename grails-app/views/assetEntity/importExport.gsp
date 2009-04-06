@@ -11,8 +11,8 @@
       <ul>
         <li><g:link class="home" controller="projectUtil">Project </g:link></li>
         <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:projectId]" >Staff</g:link></li>
-        <li><g:link class="home" controller="assetEntity" params="[projectId:projectId]">Assets </g:link></li>
-        <li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:projectId]">Import/Export</g:link> </li>
+        <li><g:link class="home" controller="asset">Assets </g:link></li>
+        <li><g:link class="home" controller="asset" action="assetImport" params="[projectId:projectId]">Import/Export</g:link> </li>
         <li><a href="#">Contacts </a></li>
         <li><a href="#">Applications </a></li>
         <li><g:link class="home" controller="moveBundle" params="[projectId:projectId]">Move Bundles</g:link></li>
@@ -55,7 +55,7 @@
                 
                 <tr>
                 	<td valign="top" class="name">Manage Batches:</td>
-                	<td valign="top" class="name"><g:link action="assetImport">${dataTransferBatchs}</g:link></td>
+                	<td valign="top" class="name"><g:link controller="dataTransferBatch" params="[projectId:projectId]">${dataTransferBatchs}</g:link></td>
                 </tr>
               </tbody>
             </table>
