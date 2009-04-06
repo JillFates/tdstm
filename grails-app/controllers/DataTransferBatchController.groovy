@@ -23,7 +23,7 @@ class DataTransferBatchController {
     	for(int dataTransferValueRow =0; dataTransferValueRow < dataTransferValueRowList.size(); dataTransferValueRow ++) {
     		def rowId =dataTransferValueRowList[dataTransferValueRow].rowId
     		def dtvList = DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
-    		def  assetEntityId = dataTransferValueRows[dataTransferValueRow].assetEntityId
+    		def  assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
     		def assetEntity
     		if(assetEntityId == null) {
     			assetEntity = new AssetEntity()
