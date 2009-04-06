@@ -33,9 +33,9 @@
 	
 	      $(document).ready(function() {
 	
-	        $("#dialog").dialog({ autoOpen: false })
-	        $("#dialog1").dialog({ autoOpen: false })
-	        $("#dialog2").dialog({ autoOpen: false })
+	        $("#showDialog").dialog({ autoOpen: false })
+	        $("#editDialog").dialog({ autoOpen: false })
+	        $("#createDialog").dialog({ autoOpen: false })
 	
 	      })
 	
@@ -51,9 +51,7 @@
 		      document.showForm.id.value = assetEntity.id
 			  document.editForm.id.value = assetEntity.id 
 			  document.showForm.projectId.value = assetEntity.projectId
-			  document.editForm.projectId.value = assetEntity.projectId  
-			  document.showForm.serverName.value = assetEntity.serverName
-			  document.editForm.serverName.value = assetEntity.serverName
+			  document.editForm.projectId.value = assetEntity.projectId 			  
 			  document.showForm.model.value = assetEntity.model
 			  document.editForm.model.value = assetEntity.model
 			  document.showForm.sourceLocation.value = assetEntity.sourceLocation
@@ -108,33 +106,32 @@
 			  document.showForm.application.value = assetEntity.application
 			  document.editForm.application.value = assetEntity.application			  
 			  	
-		      $("#dialog").dialog('option', 'width', 800)
-		      $("#dialog").dialog("open")
+		      $("#showDialog").dialog('option', 'width', 800)
+		      $("#showDialog").dialog("open")
 		
 		    }
 	    	
 	    	function createDialog(){
 
-		      $("#dialog2").dialog('option', 'width', 800)
-		      $("#dialog2").dialog("open")
+		      $("#createDialog").dialog('option', 'width', 800)
+		      $("#createDialog").dialog("open")
 		
 		    }
 		    
 		    function editAssetDialog() {
 
-		      $("#dialog").dialog("close")
-		      $("#dialog1").dialog('option', 'width', 800)
-		      $("#dialog1").dialog("open")
+		      $("#showDialog").dialog("close")
+		      $("#editDialog").dialog('option', 'width', 800)
+		      $("#editDialog").dialog("open")
 		
 		    }
 		    
 		    function callUpdateDialog() {
-			  if( document.editForm.serverName.value == null || document.editForm.serverName.value == "" ) {
-      				alert(" Please Enter Server Name. ")
+			  if( document.editForm.assetName.value == null || document.editForm.assetName.value == "" ) {
+      				alert(" Please Enter Asset Name. ")
       				return false
 			  } else {
-			      var assetEntityId = document.editForm.id.value 
-			      var serverName = document.editForm.serverName.value
+			      var assetEntityId = document.editForm.id.value 			      
 			      var model = document.editForm.model.value
 			      var sourceLocation = document.editForm.sourceLocation.value
 			      var targetLocation = document.editForm.targetLocation.value
@@ -163,34 +160,33 @@
 			      	      
 			      
 			      var assetNameDialog = new Array()
-			      assetNameDialog[0] = assetEntityId
-			      assetNameDialog[1] = serverName
-			      assetNameDialog[2] = model
-			      assetNameDialog[3] = sourceLocation
-			      assetNameDialog[4] = targetLocation
-			      assetNameDialog[5] = sourceRack
-			      assetNameDialog[6] = targetRack
-			      assetNameDialog[7] = sourceRackPosition
-			      assetNameDialog[8] = targetRackPosition
-			      assetNameDialog[9] = usize
-			      assetNameDialog[10] = manufacturer
-			      assetNameDialog[11] = fiberCabinet
-			      assetNameDialog[12] = hbaPort
-			      assetNameDialog[13] = hinfo
-			      assetNameDialog[14] = ipAddress
-			      assetNameDialog[15] = kvmDevice
-			      assetNameDialog[16] = kvmPort
-			      assetNameDialog[17] = newOrOld
-			      assetNameDialog[18] = nicPort
-			      assetNameDialog[19] = powerPort
-			      assetNameDialog[20] = remoteMgmPort
-			      assetNameDialog[21] = truck
-			      assetNameDialog[22] = assetType
-			      assetNameDialog[23] = assetName
-			      assetNameDialog[24] = assetTag
-			      assetNameDialog[25] = serialNumber
-			      assetNameDialog[26] = application			      
-			      assetNameDialog[27] = "null"     
+			      assetNameDialog[0] = assetEntityId			      
+			      assetNameDialog[1] = model
+			      assetNameDialog[2] = sourceLocation
+			      assetNameDialog[3] = targetLocation
+			      assetNameDialog[4] = sourceRack
+			      assetNameDialog[5] = targetRack
+			      assetNameDialog[6] = sourceRackPosition
+			      assetNameDialog[7] = targetRackPosition
+			      assetNameDialog[8] = usize
+			      assetNameDialog[9] = manufacturer
+			      assetNameDialog[10] = fiberCabinet
+			      assetNameDialog[11] = hbaPort
+			      assetNameDialog[12] = hinfo
+			      assetNameDialog[13] = ipAddress
+			      assetNameDialog[14] = kvmDevice
+			      assetNameDialog[15] = kvmPort
+			      assetNameDialog[16] = newOrOld
+			      assetNameDialog[17] = nicPort
+			      assetNameDialog[18] = powerPort
+			      assetNameDialog[19] = remoteMgmPort
+			      assetNameDialog[20] = truck
+			      assetNameDialog[21] = assetType
+			      assetNameDialog[22] = assetName
+			      assetNameDialog[23] = assetTag
+			      assetNameDialog[24] = serialNumber
+			      assetNameDialog[25] = application			      
+			      assetNameDialog[26] = "null"      
 			
 			      ${remoteFunction(action:'updateAssetEntity', params:'\'assetDialog=\' + assetNameDialog', onComplete:'showEditAsset(e)')}
 			      return true
@@ -199,25 +195,24 @@
 		    
 		    function showEditAsset(e) {
 
-		      $("#dialog1").dialog("close")
+		      $("#editDialog").dialog("close")
 		      var asset = eval('(' + e.responseText + ')')
 		
 		      var x = document.getElementById('assetEntityTable').rows
 		      var y = x[rowId].cells
 		      x[rowId].style.background = '#65a342'
-		      y[1].innerHTML = asset.serverName
-		      y[2].innerHTML = asset.model
-		      y[3].innerHTML = asset.sourceLocation		      
-		      y[4].innerHTML = asset.sourceRack		      
-		      y[5].innerHTML = asset.sourceRackPosition
-		      y[6].innerHTML = asset.assetName
+		      y[1].innerHTML = asset.model
+		      y[2].innerHTML = asset.sourceLocation		      
+		      y[3].innerHTML = asset.sourceRack		      
+		      y[4].innerHTML = asset.sourceRackPosition
+		      y[5].innerHTML = asset.assetName
 		      if(asset.assetTypeId == null) {
-		      y[7].innerHTML = ""
+		      y[6].innerHTML = ""
 		      }else{
-		      y[7].innerHTML = asset.assetTypeId
+		      y[6].innerHTML = asset.assetTypeId
 		      }		      
-		      y[8].innerHTML = asset.assetTag
-		      y[9].innerHTML = asset.serialNumber
+		      y[7].innerHTML = asset.assetTag
+		      y[8].innerHTML = asset.serialNumber
 
       		}
 		    
@@ -229,8 +224,8 @@
       		}
       		
       		function validateAssetEntity() {
-      			if( document.createForm.serverName.value == null || document.createForm.serverName.value == "" ){
-      				alert(" Please Enter Server Name. ")
+      			if( document.createForm.assetName.value == null || document.createForm.assetName.value == "" ){
+      				alert(" Please Enter Asset Name. ")
       				return false
       			} else {
       				return true
@@ -268,9 +263,7 @@
 	<thead>
 		<tr>
 
-			<th>Show</th>
-
-			<g:sortableColumn property="serverName" title="Server Name" />
+			<th>Show</th>			
 
 			<g:sortableColumn property="model" title="Model" />
 
@@ -303,9 +296,7 @@
 				<td><g:remoteLink controller="assetEntity" action="editShow"
 					id="${assetEntityInstance.id}" onComplete="showAssetDialog( e );">
 					<img src="/tds/images/asset_view.png" border="0px">
-				</g:remoteLink></td>
-
-				<td>${fieldValue(bean:assetEntityInstance, field:'serverName')}</td>
+				</g:remoteLink></td>				
 
 				<td>${fieldValue(bean:assetEntityInstance, field:'model')}</td>
 
@@ -340,7 +331,7 @@
 </g:form></div>
 </div>
 
-<div id="dialog2" title="Create Asset Entity" style="display: none;">
+<div id="createDialog" title="Create Asset Entity" style="display: none;">
 <g:form action="save" method="post" name="createForm">
 	<div class="dialog">
 
@@ -360,18 +351,6 @@
 				<td valign="top"><input type="text" size="30" id="manufacturer"
 					name="manufacturer" value="" /></td>
 
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name"><label for="serverName">Server
-				Name:</label></td>
-				<td valign="top"><input type="text" size="30" id="serverName"
-					name="serverName" value="" /></td>
-
-				<td valign="top" class="name"><label for="fiberCabinet">Fiber
-				Cabinet:</label></td>
-				<td valign="top"><input type="text" size="30" id="fiberCabinet"
-					name="fiberCabinet" value="" /></td>
 			</tr>
 
 			<tr class="prop">
@@ -510,6 +489,12 @@
 			</tr>
 
 			<tr class="prop">
+			
+				<td valign="top" class="name"><label for="fiberCabinet">Fiber
+				Cabinet:</label></td>
+				<td valign="top"><input type="text" size="30" id="fiberCabinet"
+					name="fiberCabinet" value="" /></td>
+					
 				<td valign="top" class="name"><label for="serialNumber">Serial
 				Number:</label></td>
 				<td valign="top"><input type="text" size="30" id="serialNumber"
@@ -526,26 +511,12 @@
 </g:form></div>
 
 
-<div id="dialog" title="Show Asset Entity" style="display: none;">
+<div id="showDialog" title="Show Asset Entity" style="display: none;">
 <g:form action="save" method="post" name="showForm">
 	<div class="dialog">
 	<input type="hidden" name="projectId" value="" />
 	<table>
-		<tbody>
-
-			<tr class="prop">
-				<td valign="top" class="name">Server Name:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="serverName" name="serverName" value="" style="border: 0px"
-					readonly></td>
-
-				<td valign="top" class="name">Manufacturer:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="manufacturer" name="manufacturer" value="" style="border: 0px"
-					readonly></td>
-			</tr>
+		<tbody>			
 
 			<tr class="prop">
 				<td valign="top" class="name">Model:</td>
@@ -717,6 +688,15 @@
 					readonly></td>
 
 			</tr>
+			
+			<tr class="prop">				
+
+				<td valign="top" class="name">Manufacturer:</td>
+
+				<td valign="top" class="value"><input type="text" size="35"
+					id="manufacturer" name="manufacturer" value="" style="border: 0px"
+					readonly></td>
+			</tr>
 
 
 		</tbody>
@@ -730,25 +710,13 @@
 		value="Delete" /></span></div>
 </g:form></div>
 
-<div id="dialog1" title="Edit Asset Entity" style="display: none;">
+<div id="editDialog" title="Edit Asset Entity" style="display: none;">
 <g:form method="post" name="editForm">
 	<input type="hidden" name="id" value="${assetEntityInstance?.id}" />
 	<input type="hidden" name="projectId" value="" />
 	<div class="dialog">
 	<table>
-		<tbody>
-
-			<tr class="prop">
-				<td valign="top" class="name"><label for="serverName">Server
-				Name:</label></td>
-				<td valign="top"><input type="text" size="35" id="serverName"
-					name="serverName" value="" /></td>
-
-				<td valign="top" class="name"><label for="manufacturer">Manufacturer:</label>
-				</td>
-				<td valign="top"><input type="text" size="35" id="manufacturer"
-					name="manufacturer" value="" /></td>
-			</tr>
+		<tbody>			
 
 			<tr class="prop">
 				<td valign="top" class="name"><label for="model">Model:</label>
@@ -894,6 +862,14 @@
 				</td>
 				<td valign="top"><input type="text" size="35" id="application"
 					name="application" value="" /></td>
+			</tr>
+			
+			<tr class="prop">				
+
+				<td valign="top" class="name"><label for="manufacturer">Manufacturer:</label>
+				</td>
+				<td valign="top"><input type="text" size="35" id="manufacturer"
+					name="manufacturer" value="" /></td>
 			</tr>
 
 		</tbody>

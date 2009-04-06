@@ -183,7 +183,7 @@
             assetElement.value = moveBundleAsset.id 
             cell1.appendChild(assetElement); 
 	        var cell2 = row.insertCell(1);
-	        cell2.innerHTML = moveBundleAsset.serverName
+	        cell2.innerHTML = moveBundleAsset.assetName
 	        var cell3 = row.insertCell(2);
 	        cell3.innerHTML = moveBundleAsset.model
 	        if(rackPlan == "UnrackPlan") {
@@ -466,7 +466,7 @@
 
                     <td style="border:1px;"><input type="hidden" name="asset" id="asset" value="${moveBundleAssetInstance?.asset?.id}" />${moveBundleAssetInstance?.asset?.id}</td>
                     
-                    <td>${moveBundleAssetInstance?.asset?.serverName}</td>
+                    <td>${moveBundleAssetInstance?.asset?.assetName}</td>
                     
                     <td>${moveBundleAssetInstance?.asset?.model}</td>
                     <g:if test="${rack == 'UnrackPlan'}">

@@ -104,12 +104,12 @@ class MoveBundleAssetController {
     	def moveBundleAssets = assetEntityAttributeLoaderService.saveAssetsToBundle( bundleTo, bundleFrom, assets )
     	if(moveBundleAssets != null){
 	    	moveBundleAssets.each{bundleAsset ->
-				items <<[id:bundleAsset.asset.id, serverName:bundleAsset.asset.serverName, application:bundleAsset.asset.application, srcLocation:bundleAsset.asset.sourceLocation+"/"+bundleAsset.asset.sourceRack ]
+				items <<[id:bundleAsset.asset.id, assetName:bundleAsset.asset.assetName, application:bundleAsset.asset.application, srcLocation:bundleAsset.asset.sourceLocation+"/"+bundleAsset.asset.sourceRack ]
 	    	}
     	} else {
     		def assetEntities = AssetEntity.findAll("from AssetEntity where id not in (select asset.id from MoveBundleAsset)")
 			assetEntities.each{assetEntity ->
-				items <<[id:assetEntity.id, serverName:assetEntity.serverName, application:assetEntity.application, srcLocation:assetEntity.sourceLocation+"/"+assetEntity.sourceRack ]
+				items <<[id:assetEntity.id, assetName:assetEntity.assetName, application:assetEntity.application, srcLocation:assetEntity.sourceLocation+"/"+assetEntity.sourceRack ]
 			}
     	}
 		render items as JSON
@@ -124,13 +124,13 @@ class MoveBundleAssetController {
 			def bundleAssets = MoveBundleAsset.findAll("from MoveBundleAsset where moveBundle.id = $bundleId ")
 			bundleAssets.each{bundleAsset ->
 	        
-				items <<[id:bundleAsset.asset.id, serverName:bundleAsset.asset.serverName, application:bundleAsset.asset.application, srcLocation:bundleAsset.asset.sourceLocation+"/"+bundleAsset.asset.sourceRack ]
+				items <<[id:bundleAsset.asset.id, assetName:bundleAsset.asset.assetName, application:bundleAsset.asset.application, srcLocation:bundleAsset.asset.sourceLocation+"/"+bundleAsset.asset.sourceRack ]
 	         
 			}
 		}else{
 			def assetEntities = AssetEntity.findAll("from AssetEntity where id not in (select asset.id from MoveBundleAsset)")
 			assetEntities.each{assetEntity ->
-				items <<[id:assetEntity.id, serverName:assetEntity.serverName, application:assetEntity.application, srcLocation:assetEntity.sourceLocation+"/"+assetEntity.sourceRack  ]
+				items <<[id:assetEntity.id, assetName:assetEntity.assetName, application:assetEntity.application, srcLocation:assetEntity.sourceLocation+"/"+assetEntity.sourceRack  ]
 	         
 			}
 		}
@@ -273,7 +273,7 @@ class MoveBundleAssetController {
     			displayTeam = moveBundleAssetList[assetRow]?.sourceTeam?.id
     		}
     		def assetEntityInstance = AssetEntity.findById( moveBundleAssetList[assetRow]?.asset?.id )
-    		moveBundleAsset <<[id:assetEntityInstance?.id, serverName:assetEntityInstance?.serverName, model:assetEntityInstance?.model, sourceLocation:assetEntityInstance?.sourceLocation, sourceRack:assetEntityInstance?.sourceRack, targetLocation:assetEntityInstance?.targetLocation, targetRack:assetEntityInstance?.targetRack, sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, uSize:assetEntityInstance?.usize,team:displayTeam,, cart:moveBundleAssetList[assetRow]?.cart, shelf:moveBundleAssetList[assetRow]?.shelf ]
+    		moveBundleAsset <<[id:assetEntityInstance?.id, assetName:assetEntityInstance?.assetName, model:assetEntityInstance?.model, sourceLocation:assetEntityInstance?.sourceLocation, sourceRack:assetEntityInstance?.sourceRack, targetLocation:assetEntityInstance?.targetLocation, targetRack:assetEntityInstance?.targetRack, sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, uSize:assetEntityInstance?.usize,team:displayTeam,, cart:moveBundleAssetList[assetRow]?.cart, shelf:moveBundleAssetList[assetRow]?.shelf ]
     	}
     	render moveBundleAsset as JSON
     }
@@ -303,7 +303,7 @@ class MoveBundleAssetController {
     				displayTeam = moveBundleAssetList[assetRow]?.sourceTeam?.id
     			}
     			def assetEntityInstance = AssetEntity.findById( moveBundleAssetList[assetRow].asset.id )
-    			moveBundleAsset << [id:assetEntityInstance?.id, serverName:assetEntityInstance?.serverName, model:assetEntityInstance?.model, sourceLocation:assetEntityInstance?.sourceLocation, sourceRack:assetEntityInstance?.sourceRack, targetLocation:assetEntityInstance?.targetLocation, targetRack:assetEntityInstance?.targetRack, sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, uSize:assetEntityInstance?.usize, team:displayTeam, cart:moveBundleAssetList[assetRow]?.cart, shelf:moveBundleAssetList[assetRow]?.shelf ]
+    			moveBundleAsset << [id:assetEntityInstance?.id, assetName:assetEntityInstance?.assetName, model:assetEntityInstance?.model, sourceLocation:assetEntityInstance?.sourceLocation, sourceRack:assetEntityInstance?.sourceRack, targetLocation:assetEntityInstance?.targetLocation, targetRack:assetEntityInstance?.targetRack, sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, uSize:assetEntityInstance?.usize, team:displayTeam, cart:moveBundleAssetList[assetRow]?.cart, shelf:moveBundleAssetList[assetRow]?.shelf ]
     		}
     	}
     		render moveBundleAsset as JSON

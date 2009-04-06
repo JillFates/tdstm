@@ -98,7 +98,7 @@
 			      td1.appendChild( id )
 			      tr.appendChild( td1 )
 			      var td2 = document.createElement('td');
-			      var desc = document.createTextNode(asset.serverName);
+			      var desc = document.createTextNode(asset.assetName);
 			      td2.appendChild( desc )
 			      tr.appendChild( td2 )
 			      var td3 = document.createElement('td');
@@ -147,7 +147,7 @@
 			      td1.appendChild( id );
 			      tr.appendChild( td1 );
 			      var td2 = document.createElement('td');
-			      var desc = document.createTextNode(asset.serverName);
+			      var desc = document.createTextNode(asset.assetName);
 			      td2.appendChild( desc );
 			      tr.appendChild( td2 );
 			      var td3 = document.createElement('td');
@@ -249,7 +249,7 @@
 					         <g:each in="${moveBundleAssets}" var="moveBundleAsset" status="i">
 					           <tr id="trleft_${moveBundleAsset?.id}" onclick="selectCheckBox('leftassetId_${moveBundleAsset?.id}', this.id)">  
 					             <td> <input type="checkbox" name="leftasset_${moveBundleAsset?.id}" id="leftassetId_${moveBundleAsset?.id}" value="${moveBundleAsset?.id}" onclick="selectCheckBox(this.id, 'trleft_${moveBundleAsset?.id}')" />${moveBundleAsset?.assetTag}</td>  
-					             <td>${moveBundleAsset?.serverName}</td>  
+					             <td>${moveBundleAsset?.assetName}</td>  
 					             <td>${moveBundleAsset?.application}</td>  
 					             <td>${moveBundleAsset?.sourceLocation}/${moveBundleAsset?.sourceRack}</td>  
 					           </tr>  
@@ -284,7 +284,7 @@
 					         	<g:each in="${currentBundleAssets}" var="currentBundleAsset" status="i">
 					           <tr id="trright_${currentBundleAsset?.asset?.id}" onclick="selectCheckBox('rightassetId_${currentBundleAsset?.asset?.id}', this.id )">  
 					             <td><input type="checkbox" name="rightasset_${currentBundleAsset?.asset?.id}" id="rightassetId_${currentBundleAsset?.asset?.id}" value="${currentBundleAsset?.asset?.id}" onclick="selectCheckBox( this.id, 'trright_${currentBundleAsset?.asset?.id}' )"/>${currentBundleAsset?.asset?.assetTag}</td>  
-					             <td>${currentBundleAsset?.asset?.serverName}</td>  
+					             <td>${currentBundleAsset?.asset?.assetName}</td>  
 					             <td>${currentBundleAsset?.asset?.application}</td>  
 					             <td>${currentBundleAsset?.asset?.sourceLocation}/${currentBundleAsset?.asset?.sourceRack}</td>
 					           </tr>  

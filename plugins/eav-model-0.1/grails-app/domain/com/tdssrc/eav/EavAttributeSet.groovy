@@ -21,4 +21,8 @@ class EavAttributeSet {
 		attributeSetName( size: 1..64 )
 		sortOrder( size: 0..32767)
 	}
+	
+	String toString() {
+		attributeSetName
+	}
 }

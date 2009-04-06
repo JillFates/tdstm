@@ -1,7 +1,7 @@
 class AssetEntity extends com.tdssrc.eav.EavEntity {
 	
 	// Temp Attributes
-	String serverName
+	//String serverName
 	String model
 	String sourceLocation
 	String targetLocation
@@ -35,7 +35,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	]
 	
 	static constraints = {
-		serverName( blank:false, nullable:false)
+		//serverName( blank:false, nullable:false)
+		assetName( blank:false, nullable:false )
 		model( blank:true, nullable:true)
 		sourceLocation( blank:true, nullable:true )
 		targetLocation( blank:true, nullable:true )
@@ -58,7 +59,6 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		truck( blank:true, nullable:true )		
 		project( blank:false, nullable:false )
 		assetType( blank:true, nullable:true )
-		assetName( blank:true )
 		assetTag( blank:true )
 		serialNumber( blank:true )				
 		application( blank:true, nullable:true )

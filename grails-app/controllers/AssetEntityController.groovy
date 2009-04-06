@@ -233,11 +233,15 @@ class AssetEntityController {
 
         //get project Id
         def projectId = params["projectIdExport"]
+        def dataTransferSet = params.dataTransferSet
+        def bundle = params.bundle
+        def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
+        def dataTransferAttributeMap = DataTransferAttributeMap.findAllByDataTransferSet( dataTransferSetInstance )
         
         def project = Project.findById( projectId )
         if ( projectId == null || projectId == "") {
             flash.message = "Project Name is required"
-            redirect( controller:"asset", action:"assetImport" )
+            redirect( action:assetImport, params:[projectId:projectId] )
         }
         def asset = AssetEntity.findAllByProject( project )
         //get template Excel
@@ -252,7 +256,8 @@ class AssetEntityController {
         	// construct application URL
         	def appUrl = protocol + "://" + serverName + ":" + serverPort + "/" + grailsApplication.metadata['app.name']
         	// get connection
-        	def url = new URL( appUrl + "/templates/ServerListExample.xls" )
+        	def templateFilePath = appUrl + dataTransferSetInstance.templateFilename
+        	def url = new URL( templateFilePath )
         	HttpURLConnection con = url.openConnection(); 
             workbook = Workbook.getWorkbook( con.getInputStream() )
             
@@ -262,35 +267,57 @@ class AssetEntityController {
 
             //create workbook and sheet
             book = Workbook.createWorkbook( response.getOutputStream(), workbook )
-            def sheetNo = 1
-            def sheet = book.getSheet( sheetNo )
-
+            //def sheetNo = 1
+            //def sheet = book.getSheet( sheetNo )
+            def sheet
             // TODO : Use the column map that is shared between both import and export.
 
-            def map = [ "Server":null, "Type":null, "S/N":null, "AssetTag":null ]
+            //def map = [ "Server":null, "Type":null, "S/N":null, "AssetTag":null ]
             //check for column
-
+            def map = [:]
+            def serverMap = [:]        
+            def dataTransferAttributeMapSheetName
+            dataTransferAttributeMap.eachWithIndex { item, pos ->
+    		map.put( item.columnName, null )
+    		serverMap.put( "sheetName", (item.sheetName).trim() )
+            }
+            def sheetNames = book.getSheetNames()  
+            def flag = 0
+            for( int i=0;  i < sheetNames.length; i++ ) {           	
+            	
+                if ( serverMap.containsValue( sheetNames[i].trim()) ) {
+                    flag = 1
+                    sheet = book.getSheet( sheetNames[i] )
+                }
+            	
+      		}
+            if( flag == 0 ) {
+            	
+            	flash.message = " Sheet not found, Please check it."
+                redirect( action:assetImport, params:[projectId:projectId] ) 
+                
+            } else {
             def col = sheet.getColumns()
 
             //calling method to check for Header
 
             def checkCol = checkHeader( col, map, sheet )
-
             // TODO : The logic that reads the sheet should be able to be shared between import and export - refactor this out
 
             // Statement to check Headers if header are not found it will return Error message
             if ( checkCol == false ) {
+                	
+                	missingHeader = missingHeader.replaceFirst(",","")
+                    flash.message = " Column Headers : ${missingHeader} not found, Please check it."
+                    redirect( action:assetImport, params:[projectId:projectId] )
 
-                flash.message = " Column Headers not found, Please check it. "
-                redirect( controller:"asset", action:"assetImport" )
-
-            } else {
+             } else {
 
                 //update data from asset table to EXCEL
                 def k = 0
                 for ( int r = 1; r < asset.size(); r++ ) {
                     
-                    def assetName = new Label( map["Server"], r, asset.assetName[k] )                    
+                    /*def assetName = new Label( map["Server"], r, asset.assetName[k] )                    
                     sheet.addCell( assetName )
                     def assetType
                     
@@ -309,18 +336,19 @@ class AssetEntityController {
                     def assetTag = new Label( map["AssetTag"], r, asset.assetTag[k] )
                     sheet.addCell( assetTag )
 
-                    k++
+                    k++*/
                 }
 
 
                 book.write()
                 book.close()
                 render( view: "importExport" )
+             }
             }
         } catch( Exception fileEx ) {
 
             flash.message = "Excel template not found "
-            redirect( controller:"asset", action:"assetImport" )
+            redirect( action:assetImport, params:[projectId:projectId] )
 
         }
     }
@@ -351,7 +379,9 @@ class AssetEntityController {
     def list = {
         if(!params.max) params.max = 15
         def projectId = params.projectId
-        [ assetEntityInstanceList: AssetEntity.list( params ), projectId: projectId ]
+        def project = Project.findById( projectId )
+        def assetEntityInstanceList = AssetEntity.findAllByProject( project, params ) 
+        [ assetEntityInstanceList: assetEntityInstanceList, projectId: projectId ]
     }   
 
     def delete = {
@@ -390,10 +420,10 @@ class AssetEntityController {
         def assetEntityInstance = AssetEntity.get( params.id )
         
         if( assetEntityInstance.assetType != null ){
-        	items = [id:assetEntityInstance.id, serverName: assetEntityInstance.serverName, model: assetEntityInstance.model, sourceLocation: assetEntityInstance.sourceLocation, targetLocation: assetEntityInstance.targetLocation, sourceRack: assetEntityInstance.sourceRack, targetRack: assetEntityInstance.targetRack, sourceRackPosition: assetEntityInstance.sourceRackPosition, targetRackPosition: assetEntityInstance.targetRackPosition, usize: assetEntityInstance.usize, manufacturer: assetEntityInstance.manufacturer, fiberCabinet: assetEntityInstance.fiberCabinet, hbaPort: assetEntityInstance.hbaPort, hinfo: assetEntityInstance.hinfo, ipAddress: assetEntityInstance.ipAddress, kvmDevice: assetEntityInstance.kvmDevice, kvmPort: assetEntityInstance.kvmPort, newOrOld: assetEntityInstance.newOrOld, nicPort: assetEntityInstance.nicPort, powerPort: assetEntityInstance.powerPort, remoteMgmPort: assetEntityInstance.remoteMgmPort, truck: assetEntityInstance.truck, project:assetEntityInstance.project.name, projectId:assetEntityInstance.project.id, assetType:assetEntityInstance.assetType, assetTypeId:assetEntityInstance.assetType.id, assetTag:assetEntityInstance.assetTag, assetName:assetEntityInstance.assetName, serialNumber:assetEntityInstance.serialNumber, , application:assetEntityInstance.application ]
+        	items = [id:assetEntityInstance.id, model: assetEntityInstance.model, sourceLocation: assetEntityInstance.sourceLocation, targetLocation: assetEntityInstance.targetLocation, sourceRack: assetEntityInstance.sourceRack, targetRack: assetEntityInstance.targetRack, sourceRackPosition: assetEntityInstance.sourceRackPosition, targetRackPosition: assetEntityInstance.targetRackPosition, usize: assetEntityInstance.usize, manufacturer: assetEntityInstance.manufacturer, fiberCabinet: assetEntityInstance.fiberCabinet, hbaPort: assetEntityInstance.hbaPort, hinfo: assetEntityInstance.hinfo, ipAddress: assetEntityInstance.ipAddress, kvmDevice: assetEntityInstance.kvmDevice, kvmPort: assetEntityInstance.kvmPort, newOrOld: assetEntityInstance.newOrOld, nicPort: assetEntityInstance.nicPort, powerPort: assetEntityInstance.powerPort, remoteMgmPort: assetEntityInstance.remoteMgmPort, truck: assetEntityInstance.truck, project:assetEntityInstance.project.name, projectId:assetEntityInstance.project.id, assetType:assetEntityInstance.assetType, assetTypeId:assetEntityInstance.assetType.id, assetTag:assetEntityInstance.assetTag, assetName:assetEntityInstance.assetName, serialNumber:assetEntityInstance.serialNumber, , application:assetEntityInstance.application ]
        
         } else {
-        	items = [id:assetEntityInstance.id, serverName: assetEntityInstance.serverName, model: assetEntityInstance.model, sourceLocation: assetEntityInstance.sourceLocation, targetLocation: assetEntityInstance.targetLocation, sourceRack: assetEntityInstance.sourceRack, targetRack: assetEntityInstance.targetRack, sourceRackPosition: assetEntityInstance.sourceRackPosition, targetRackPosition: assetEntityInstance.targetRackPosition, usize: assetEntityInstance.usize, manufacturer: assetEntityInstance.manufacturer, fiberCabinet: assetEntityInstance.fiberCabinet, hbaPort: assetEntityInstance.hbaPort, hinfo: assetEntityInstance.hinfo, ipAddress: assetEntityInstance.ipAddress, kvmDevice: assetEntityInstance.kvmDevice, kvmPort: assetEntityInstance.kvmPort, newOrOld: assetEntityInstance.newOrOld, nicPort: assetEntityInstance.nicPort, powerPort: assetEntityInstance.powerPort, remoteMgmPort: assetEntityInstance.remoteMgmPort, truck: assetEntityInstance.truck, project:assetEntityInstance.project.name, projectId:assetEntityInstance.project.id, assetTag:assetEntityInstance.assetTag, assetName:assetEntityInstance.assetName, serialNumber:assetEntityInstance.serialNumber, application:assetEntityInstance.application ]
+        	items = [id:assetEntityInstance.id, model: assetEntityInstance.model, sourceLocation: assetEntityInstance.sourceLocation, targetLocation: assetEntityInstance.targetLocation, sourceRack: assetEntityInstance.sourceRack, targetRack: assetEntityInstance.targetRack, sourceRackPosition: assetEntityInstance.sourceRackPosition, targetRackPosition: assetEntityInstance.targetRackPosition, usize: assetEntityInstance.usize, manufacturer: assetEntityInstance.manufacturer, fiberCabinet: assetEntityInstance.fiberCabinet, hbaPort: assetEntityInstance.hbaPort, hinfo: assetEntityInstance.hinfo, ipAddress: assetEntityInstance.ipAddress, kvmDevice: assetEntityInstance.kvmDevice, kvmPort: assetEntityInstance.kvmPort, newOrOld: assetEntityInstance.newOrOld, nicPort: assetEntityInstance.nicPort, powerPort: assetEntityInstance.powerPort, remoteMgmPort: assetEntityInstance.remoteMgmPort, truck: assetEntityInstance.truck, project:assetEntityInstance.project.name, projectId:assetEntityInstance.project.id, assetTag:assetEntityInstance.assetTag, assetName:assetEntityInstance.assetName, serialNumber:assetEntityInstance.serialNumber, application:assetEntityInstance.application ]
         }
         
         render items as JSON
@@ -403,46 +433,45 @@ class AssetEntityController {
     //update ajax overlay
     def updateAssetEntity = {
     		 
-        def assetDialog = params.assetDialog.split(',')
+        
+    	def assetDialog = params.assetDialog.split(',')
         
         def assetItems = []
         def assetEntityInstance = AssetEntity.get( assetDialog[0] )
-        assetEntityInstance.serverName = assetDialog[1]
-        assetEntityInstance.model = assetDialog[2]
-        assetEntityInstance.sourceLocation = assetDialog[3]
-        assetEntityInstance.targetLocation = assetDialog[4]
-        assetEntityInstance.sourceRack = assetDialog[5]
-        assetEntityInstance.targetRack = assetDialog[6]
-        assetEntityInstance.sourceRackPosition = assetDialog[7]
-        assetEntityInstance.targetRackPosition = assetDialog[8]
-        assetEntityInstance.usize = assetDialog[9]
-        assetEntityInstance.manufacturer = assetDialog[10]
-        assetEntityInstance.fiberCabinet = assetDialog[11]
-        assetEntityInstance.hbaPort = assetDialog[12]
-        assetEntityInstance.hinfo = assetDialog[13]
-        assetEntityInstance.ipAddress = assetDialog[14]
-        assetEntityInstance.kvmDevice = assetDialog[15]
-        assetEntityInstance.kvmPort = assetDialog[16]
-        assetEntityInstance.newOrOld = assetDialog[17]
-        assetEntityInstance.nicPort = assetDialog[18]
-        assetEntityInstance.powerPort = assetDialog[19]
-        assetEntityInstance.remoteMgmPort = assetDialog[20]
-        assetEntityInstance.truck = assetDialog[21]
-        def assetType=AssetType.findById( assetDialog[22] )
+        assetEntityInstance.model = assetDialog[1]
+        assetEntityInstance.sourceLocation = assetDialog[2]
+        assetEntityInstance.targetLocation = assetDialog[3]
+        assetEntityInstance.sourceRack = assetDialog[4]
+        assetEntityInstance.targetRack = assetDialog[5]
+        assetEntityInstance.sourceRackPosition = assetDialog[6]
+        assetEntityInstance.targetRackPosition = assetDialog[7]
+        assetEntityInstance.usize = assetDialog[8]
+        assetEntityInstance.manufacturer = assetDialog[9]
+        assetEntityInstance.fiberCabinet = assetDialog[10]
+        assetEntityInstance.hbaPort = assetDialog[11]
+        assetEntityInstance.hinfo = assetDialog[12]
+        assetEntityInstance.ipAddress = assetDialog[13]
+        assetEntityInstance.kvmDevice = assetDialog[14]
+        assetEntityInstance.kvmPort = assetDialog[15]
+        assetEntityInstance.newOrOld = assetDialog[16]
+        assetEntityInstance.nicPort = assetDialog[17]
+        assetEntityInstance.powerPort = assetDialog[18]
+        assetEntityInstance.remoteMgmPort = assetDialog[19]
+        assetEntityInstance.truck = assetDialog[20]
+        def assetType=AssetType.findById( assetDialog[21] )
         assetEntityInstance.assetType = assetType        
-        assetEntityInstance.assetName = assetDialog[23]
-        assetEntityInstance.assetTag = assetDialog[24]
-        assetEntityInstance.serialNumber= assetDialog[25]
-        assetEntityInstance.application= assetDialog[26]
+        assetEntityInstance.assetName = assetDialog[22]
+        assetEntityInstance.assetTag = assetDialog[23]
+        assetEntityInstance.serialNumber= assetDialog[24]
+        assetEntityInstance.application= assetDialog[25]
         assetEntityInstance.save()
 
         if( assetEntityInstance.assetType != null ){
-        	assetItems = [id:assetEntityInstance.id, serverName: assetEntityInstance.serverName, model: assetEntityInstance.model, sourceLocation: assetEntityInstance.sourceLocation, targetLocation: assetEntityInstance.targetLocation, sourceRack: assetEntityInstance.sourceRack, targetRack: assetEntityInstance.targetRack, sourceRackPosition: assetEntityInstance.sourceRackPosition, targetRackPosition: assetEntityInstance.targetRackPosition, usize: assetEntityInstance.usize, manufacturer: assetEntityInstance.manufacturer, fiberCabinet: assetEntityInstance.fiberCabinet, hbaPort: assetEntityInstance.hbaPort, hinfo: assetEntityInstance.hinfo, ipAddress: assetEntityInstance.ipAddress, kvmDevice: assetEntityInstance.kvmDevice, kvmPort: assetEntityInstance.kvmPort, newOrOld: assetEntityInstance.newOrOld, nicPort: assetEntityInstance.nicPort, powerPort: assetEntityInstance.powerPort, remoteMgmPort: assetEntityInstance.remoteMgmPort, truck: assetEntityInstance.truck, project:assetEntityInstance.project.name, projectId:assetEntityInstance.project.id, assetType:assetEntityInstance.assetType, assetTypeId:assetEntityInstance.assetType.id, assetTag:assetEntityInstance.assetTag, assetName:assetEntityInstance.assetName, serialNumber:assetEntityInstance.serialNumber, application:assetEntityInstance.application ]
+        	assetItems = [id:assetEntityInstance.id, model: assetEntityInstance.model, sourceLocation: assetEntityInstance.sourceLocation, targetLocation: assetEntityInstance.targetLocation, sourceRack: assetEntityInstance.sourceRack, targetRack: assetEntityInstance.targetRack, sourceRackPosition: assetEntityInstance.sourceRackPosition, targetRackPosition: assetEntityInstance.targetRackPosition, usize: assetEntityInstance.usize, manufacturer: assetEntityInstance.manufacturer, fiberCabinet: assetEntityInstance.fiberCabinet, hbaPort: assetEntityInstance.hbaPort, hinfo: assetEntityInstance.hinfo, ipAddress: assetEntityInstance.ipAddress, kvmDevice: assetEntityInstance.kvmDevice, kvmPort: assetEntityInstance.kvmPort, newOrOld: assetEntityInstance.newOrOld, nicPort: assetEntityInstance.nicPort, powerPort: assetEntityInstance.powerPort, remoteMgmPort: assetEntityInstance.remoteMgmPort, truck: assetEntityInstance.truck, project:assetEntityInstance.project.name, projectId:assetEntityInstance.project.id, assetType:assetEntityInstance.assetType, assetTypeId:assetEntityInstance.assetType.id, assetTag:assetEntityInstance.assetTag, assetName:assetEntityInstance.assetName, serialNumber:assetEntityInstance.serialNumber, application:assetEntityInstance.application ]
        
         } else {
-        	assetItems = [id:assetEntityInstance.id, serverName: assetEntityInstance.serverName, model: assetEntityInstance.model, sourceLocation: assetEntityInstance.sourceLocation, targetLocation: assetEntityInstance.targetLocation, sourceRack: assetEntityInstance.sourceRack, targetRack: assetEntityInstance.targetRack, sourceRackPosition: assetEntityInstance.sourceRackPosition, targetRackPosition: assetEntityInstance.targetRackPosition, usize: assetEntityInstance.usize, manufacturer: assetEntityInstance.manufacturer, fiberCabinet: assetEntityInstance.fiberCabinet, hbaPort: assetEntityInstance.hbaPort, hinfo: assetEntityInstance.hinfo, ipAddress: assetEntityInstance.ipAddress, kvmDevice: assetEntityInstance.kvmDevice, kvmPort: assetEntityInstance.kvmPort, newOrOld: assetEntityInstance.newOrOld, nicPort: assetEntityInstance.nicPort, powerPort: assetEntityInstance.powerPort, remoteMgmPort: assetEntityInstance.remoteMgmPort, truck: assetEntityInstance.truck, project:assetEntityInstance.project.name, projectId:assetEntityInstance.project.id, assetTag:assetEntityInstance.assetTag, assetName:assetEntityInstance.assetName, serialNumber:assetEntityInstance.serialNumber, application:assetEntityInstance.application ]
-        }
-
+        	
+        } 
         render assetItems as JSON
 
     }

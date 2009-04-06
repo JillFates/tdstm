@@ -2,6 +2,7 @@ class DataTransferSet {
 	
 	String title
 	String transferMode
+	String templateFilename
 	static hasMany = [ dataTransferBatch :DataTransferBatch, dataTransferAttributeMap : DataTransferAttributeMap  ]
 	
 	static mapping = {
@@ -13,7 +14,7 @@ class DataTransferSet {
 	static constraints = {
 		title(blank:false, size:0..64)
 		transferMode( blank:false, inList:['I', 'E', 'B'])
-		
+		templateFilename(blank:true, nullable:true)
 	}
 	String toString(){
 		"$id : $title"

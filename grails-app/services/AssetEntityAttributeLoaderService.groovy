@@ -19,7 +19,7 @@ class AssetEntityAttributeLoaderService {
         def workbook
         def sheet
         def sheetNo = 0
-        def map = [ "Attribute Code":null, "Label":null, "Type":null, "sortOrder":null, "Note":null, "Input type":null, "Required":null, "Unique":null, "Business Rules (hard/soft errors)":null, "Spreadsheet Sheet Name":null, "Spreadsheet Column Name":null, "Options":null ]
+        def map = [ "Attribute Code":null, "Label":null, "Type":null, "sortOrder":null, "Note":null, "Input type":null, "Required":null, "Unique":null, "Business Rules (hard/soft errors)":null, "Spreadsheet Sheet Name":null, "Spreadsheet Column Name":null, "Options":null, "Walkthru Sheet Name":null, "Walkthru Column Name":null ]
         try{
         	workbook = Workbook.getWorkbook( stream )
         	sheet = workbook.getSheet( sheetNo )
@@ -44,7 +44,9 @@ class AssetEntityAttributeLoaderService {
             		def validation = sheet.getCell( map["Business Rules (hard/soft errors)"], r ).contents
             		def options = sheet.getCell( map["Options"], r ).contents
             		def spreadSheetName = sheet.getCell( map["Spreadsheet Sheet Name"], r ).contents
-            		def columnName = sheet.getCell( map["Spreadsheet Column Name"], r ).contents
+            		def spreadColumnName = sheet.getCell( map["Spreadsheet Column Name"], r ).contents
+            		def walkthruSheetName = sheet.getCell( map["Walkthru Sheet Name"], r ).contents
+            		def walkthruColumnName = sheet.getCell( map["Walkthru Column Name"], r ).contents
             		// save data in to db(eavAttribute) 
             		eavAttribute = new EavAttribute( attributeCode:applicationCode,
                         note: note,
@@ -60,14 +62,31 @@ class AssetEntityAttributeLoaderService {
             		if ( eavAttribute && eavAttribute.save() ) {
             			
             			//create DataTransferAttributeMap records related to the DataTransferSet 
-            			def dataTransferSetId 
+            			//def dataTransferSetId 
 		                def dataTransferSet
 		                try {
-		                	dataTransferSetId = 1
-		                	dataTransferSet = DataTransferSet.findById( dataTransferSetId )
+		                	dataTransferSet = DataTransferSet.findByTitle( "TDS Master Spreadsheet" )
 		                	def dataTransferAttributeMap = new DataTransferAttributeMap(
-		                		columnName:columnName,
+		                		columnName:spreadColumnName,
 		                		sheetName:spreadSheetName,
+		                		dataTransferSet:dataTransferSet,
+		                		eavAttribute:eavAttribute,
+		                		validation:validation,
+		                		isRequired: (isRequired.equalsIgnoreCase("X"))?1:0
+                            )
+		                	if( dataTransferAttributeMap ){
+		                		dataTransferAttributeMap.save()
+		                	}
+		                }catch ( Exception ex ) {
+		        			ex.printStackTrace()
+		                }
+		               // create DataTransferAttributeMap records (WalkThrough columns)related to the DataTransferSet 
+		               
+		               try {
+		                	dataTransferSet = DataTransferSet.findByTitle( "TDS Walkthru" )
+		                	def dataTransferAttributeMap = new DataTransferAttributeMap(
+		                		columnName:walkthruColumnName,
+		                		sheetName:walkthruSheetName,
 		                		dataTransferSet:dataTransferSet,
 		                		eavAttribute:eavAttribute,
 		                		validation:validation,
@@ -214,7 +233,7 @@ class AssetEntityAttributeLoaderService {
     			displayTeam = moveBundleAssetList[assetRow]?.sourceTeam?.id
     		}
     		def assetEntityInstance = AssetEntity.findById( moveBundleAssetList[assetRow].asset.id )
-    		moveBundleAsset <<[id:assetEntityInstance.id, serverName:assetEntityInstance.serverName, model:assetEntityInstance.model, sourceLocation:assetEntityInstance.sourceLocation, sourceRack:assetEntityInstance.sourceRack, targetLocation:assetEntityInstance.targetLocation, targetRack:assetEntityInstance.targetRack, sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, uSize:assetEntityInstance.usize, team:displayTeam, cart:moveBundleAssetList[assetRow]?.cart, shelf:moveBundleAssetList[assetRow]?.shelf ]
+    		moveBundleAsset <<[id:assetEntityInstance.id, assetName:assetEntityInstance.assetName, model:assetEntityInstance.model, sourceLocation:assetEntityInstance.sourceLocation, sourceRack:assetEntityInstance.sourceRack, targetLocation:assetEntityInstance.targetLocation, targetRack:assetEntityInstance.targetRack, sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, uSize:assetEntityInstance.usize, team:displayTeam, cart:moveBundleAssetList[assetRow]?.cart, shelf:moveBundleAssetList[assetRow]?.shelf ]
     	}
 		return moveBundleAsset
 	}
