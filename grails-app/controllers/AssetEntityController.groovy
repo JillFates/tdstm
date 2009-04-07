@@ -377,8 +377,11 @@ class AssetEntityController {
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
     def list = {
-        if(!params.max) params.max = 15
+	    if(!params.max) params.max = 15
         def projectId = params.projectId
+        if(projectId == null || projectId == ""){
+        	projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+        }
         def project = Project.findById( projectId )
         def assetEntityInstanceList = AssetEntity.findAllByProject( project, params ) 
         [ assetEntityInstanceList: assetEntityInstanceList, projectId: projectId ]
@@ -406,10 +409,11 @@ class AssetEntityController {
         assetEntityInstance.owner = projectInstance.client
         if(!assetEntityInstance.hasErrors() && assetEntityInstance.save()) {
             flash.message = "AssetEntity ${assetEntityInstance.id} created"
-            redirect( action:list,id:assetEntityInstance.id,params:[projectId: projectId] )
+            redirect( action:list, params:[projectId: projectId] )
         }
         else {
-            render( view:'list',model:[assetEntityInstance:assetEntityInstance, projectId: projectId] )
+        	flash.message = "AssetEntity ${assetEntityInstance.id} not created"
+            redirect( action:list, params:[projectId: projectId] )
         }
     }
     
@@ -419,13 +423,20 @@ class AssetEntityController {
         def items = []
         def assetEntityInstance = AssetEntity.get( params.id )
         
-        if( assetEntityInstance.assetType != null ){
+        /*if( assetEntityInstance.assetType != null ){
         	items = [id:assetEntityInstance.id, model: assetEntityInstance.model, sourceLocation: assetEntityInstance.sourceLocation, targetLocation: assetEntityInstance.targetLocation, sourceRack: assetEntityInstance.sourceRack, targetRack: assetEntityInstance.targetRack, sourceRackPosition: assetEntityInstance.sourceRackPosition, targetRackPosition: assetEntityInstance.targetRackPosition, usize: assetEntityInstance.usize, manufacturer: assetEntityInstance.manufacturer, fiberCabinet: assetEntityInstance.fiberCabinet, hbaPort: assetEntityInstance.hbaPort, hinfo: assetEntityInstance.hinfo, ipAddress: assetEntityInstance.ipAddress, kvmDevice: assetEntityInstance.kvmDevice, kvmPort: assetEntityInstance.kvmPort, newOrOld: assetEntityInstance.newOrOld, nicPort: assetEntityInstance.nicPort, powerPort: assetEntityInstance.powerPort, remoteMgmtPort: assetEntityInstance.remoteMgmtPort, truck: assetEntityInstance.truck, project:assetEntityInstance.project.name, projectId:assetEntityInstance.project.id, assetType:assetEntityInstance.assetType, assetTypeId:assetEntityInstance.assetType.id, assetTag:assetEntityInstance.assetTag, assetName:assetEntityInstance.assetName, serialNumber:assetEntityInstance.serialNumber, , application:assetEntityInstance.application ]
        
         } else {
         	items = [id:assetEntityInstance.id, model: assetEntityInstance.model, sourceLocation: assetEntityInstance.sourceLocation, targetLocation: assetEntityInstance.targetLocation, sourceRack: assetEntityInstance.sourceRack, targetRack: assetEntityInstance.targetRack, sourceRackPosition: assetEntityInstance.sourceRackPosition, targetRackPosition: assetEntityInstance.targetRackPosition, usize: assetEntityInstance.usize, manufacturer: assetEntityInstance.manufacturer, fiberCabinet: assetEntityInstance.fiberCabinet, hbaPort: assetEntityInstance.hbaPort, hinfo: assetEntityInstance.hinfo, ipAddress: assetEntityInstance.ipAddress, kvmDevice: assetEntityInstance.kvmDevice, kvmPort: assetEntityInstance.kvmPort, newOrOld: assetEntityInstance.newOrOld, nicPort: assetEntityInstance.nicPort, powerPort: assetEntityInstance.powerPort, remoteMgmtPort: assetEntityInstance.remoteMgmtPort, truck: assetEntityInstance.truck, project:assetEntityInstance.project.name, projectId:assetEntityInstance.project.id, assetTag:assetEntityInstance.assetTag, assetName:assetEntityInstance.assetName, serialNumber:assetEntityInstance.serialNumber, application:assetEntityInstance.application ]
-        }
+        }*/
+        def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
         
+        entityAttributeInstance.each{
+        
+        	if( it.attribute.attributeCode != "moveBundle"){
+        		items << [label:it.attribute.frontendLabel, attributeCode:it.attribute.attributeCode, value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode) : ""]
+        	}
+        }
         render items as JSON
         
     }
@@ -474,5 +485,21 @@ class AssetEntityController {
         } 
         render assetItems as JSON
 
+    }
+    
+    def getAttributes = {
+    	def attributeSetId = params.attribSet
+        def items = []
+    	def entityAttributeInstance = []
+    	
+        if(attributeSetId != null &&  attributeSetId != ""){
+    		def attributeSetInstance = EavAttributeSet.findById( attributeSetId )
+    		//entityAttributeInstance =  EavEntityAttribute.findAllByEavAttributeSetOrderBySortOrder( attributeSetInstance )
+    		entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $attributeSetId order by eav.sortOrder ")
+        }
+    	entityAttributeInstance.each{
+    		items<<[ label:it.attribute.frontendLabel, attributeCode:it.attribute.attributeCode ]
+    	}
+    	render items as JSON
     }
 }

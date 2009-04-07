@@ -38,89 +38,71 @@
 	        $("#createDialog").dialog({ autoOpen: false })
 	
 	      })
-	
-	    </script>
-
-<g:javascript>
-	    	
+</script>
+<script type="text/javascript">	
 	    	var rowId
 		    function showAssetDialog( e ) {
-				
-		      var assetEntity = eval('(' + e.responseText + ')') 
-		      
-		      document.showForm.id.value = assetEntity.id
-			  document.editForm.id.value = assetEntity.id 
-			  document.showForm.projectId.value = assetEntity.projectId
-			  document.editForm.projectId.value = assetEntity.projectId 			  
-			  document.showForm.model.value = assetEntity.model
-			  document.editForm.model.value = assetEntity.model
-			  document.showForm.sourceLocation.value = assetEntity.sourceLocation
-			  document.editForm.sourceLocation.value = assetEntity.sourceLocation
-			  document.showForm.targetLocation.value = assetEntity.targetLocation
-			  document.editForm.targetLocation.value = assetEntity.targetLocation
-			  document.showForm.sourceRack.value = assetEntity.sourceRack
-			  document.editForm.sourceRack.value = assetEntity.sourceRack
-			  document.showForm.targetRack.value = assetEntity.targetRack
-			  document.editForm.targetRack.value = assetEntity.targetRack
-			  document.showForm.sourceRackPosition.value = assetEntity.sourceRackPosition
-			  document.editForm.sourceRackPosition.value = assetEntity.sourceRackPosition
-			  document.showForm.targetRackPosition.value = assetEntity.targetRackPosition
-			  document.editForm.targetRackPosition.value = assetEntity.targetRackPosition
-			  document.showForm.usize.value = assetEntity.usize
-			  document.editForm.usize.value = assetEntity.usize
-			  document.showForm.manufacturer.value = assetEntity.manufacturer
-			  document.editForm.manufacturer.value = assetEntity.manufacturer
-			  document.showForm.fiberCabinet.value = assetEntity.fiberCabinet
-			  document.editForm.fiberCabinet.value = assetEntity.fiberCabinet
-			  document.showForm.hbaPort.value = assetEntity.hbaPort
-			  document.editForm.hbaPort.value = assetEntity.hbaPort
-			  document.showForm.hinfo.value = assetEntity.hinfo
-			  document.editForm.hinfo.value = assetEntity.hinfo
-			  document.showForm.ipAddress.value = assetEntity.ipAddress
-			  document.editForm.ipAddress.value = assetEntity.ipAddress
-			  document.showForm.kvmDevice.value = assetEntity.kvmDevice
-			  document.editForm.kvmDevice.value = assetEntity.kvmDevice
-			  document.showForm.kvmPort.value = assetEntity.kvmPort
-			  document.editForm.kvmPort.value = assetEntity.kvmPort
-			  document.showForm.newOrOld.value = assetEntity.newOrOld
-			  document.editForm.newOrOld.value = assetEntity.newOrOld
-			  document.showForm.nicPort.value = assetEntity.nicPort
-			  document.editForm.nicPort.value = assetEntity.nicPort
-			  document.showForm.remoteMgmtPort.value = assetEntity.remoteMgmtPort
-			  document.editForm.remoteMgmtPort.value = assetEntity.remoteMgmtPort
-			  document.showForm.truck.value = assetEntity.truck
-			  document.editForm.truck.value = assetEntity.truck
-			  if(assetEntity.assetTypeId == null) {
-			  document.showForm.assetType.value = ""
-			  document.editForm.assetType.value = ""
-			  } else {
-			  document.showForm.assetType.value = assetEntity.assetTypeId
-			  document.editForm.assetType.value = assetEntity.assetTypeId
-			  }
-			  document.showForm.assetName.value = assetEntity.assetName
-			  document.editForm.assetName.value = assetEntity.assetName
-			  document.showForm.assetTag.value = assetEntity.assetTag
-			  document.editForm.assetTag.value = assetEntity.assetTag
-			  document.showForm.serialNumber.value = assetEntity.serialNumber
-			  document.editForm.serialNumber.value = assetEntity.serialNumber
-			  document.showForm.application.value = assetEntity.application
-			  document.editForm.application.value = assetEntity.application			  
-			  	
-		      $("#showDialog").dialog('option', 'width', 800)
+      			var assetEntityAttributes = eval('(' + e.responseText + ')');
+      			var showTable = document.getElementById("showTable");
+      			var tb = document.getElementById('showTbodyId')
+			    if(tb != null){
+			      showTable.removeChild(tb)
+			    }
+      			// create tbody for CreateTable
+      			var tbody = document.createElement('tbody');
+				tbody.id = "showTbodyId"
+				// Rebuild the select
+			      if (assetEntityAttributes) {
+				      var length = assetEntityAttributes.length
+				      	for (var i=0; i < length; i += 2) {
+					      var attribute1 = assetEntityAttributes[i]
+					      var attribute2 = assetEntityAttributes[i + 1]
+					      var tr = document.createElement('tr');
+					      var inputTd1 = document.createElement('td');
+					      var labelTd1 = document.createElement('td');
+					      var label1 = document.createTextNode(attribute1.label);
+					      labelTd1.appendChild( label1 )
+					      var inputField1 = document.createTextNode(attribute1.value);
+					      inputTd1.appendChild( inputField1 )
+					      labelTd1.style.backgroundColor = '#f3f4f6 '
+					      labelTd1.style.width = '25%'
+					      inputTd1.style.width = '25%'
+					      tr.appendChild( labelTd1 )
+					      tr.appendChild( inputTd1 )
+					      if(attribute2){
+					      var inputTd2 = document.createElement('td');
+					      var labelTd2 = document.createElement('td');
+					      var label2 = document.createTextNode(attribute2.label);
+					      labelTd2.appendChild( label2 )
+					      var inputField2 = document.createTextNode(attribute2.value);
+					      inputTd2.appendChild( inputField2 )
+					      labelTd2.style.backgroundColor = '#f3f4f6'
+					      inputTd2.style.width = '25%'
+					      labelTd2.style.width = '25%'
+					      tr.appendChild( labelTd2 )
+					      tr.appendChild( inputTd2 )
+					     }
+					      tbody.appendChild( tr )
+				      	
+				      	}
+			      }
+			      showTable.appendChild( tbody ) 
+
+		      $("#showDialog").dialog('option', 'width', 700)
 		      $("#showDialog").dialog("open")
 		
 		    }
 	    	
 	    	function createDialog(){
 
-		      $("#createDialog").dialog('option', 'width', 800)
+		      $("#createDialog").dialog('option', 'width', 700)
 		      $("#createDialog").dialog("open")
 		
 		    }
 		    
 		    function editAssetDialog() {
 
-		      $("#showDialog").dialog("close")
+		      
 		      $("#editDialog").dialog('option', 'width', 800)
 		      $("#editDialog").dialog("open")
 		
@@ -231,8 +213,64 @@
       				return true
       			}
       		}
+      		
+      		// function to generate createForm
+      		
+      		function generateCreateForm( e ){
+      			var assetEntityAttributes = eval('(' + e.responseText + ')');
+      			var createTable = document.getElementById("createTable");
+      			var tb = document.getElementById('createFormTbodyId')
+			    if(tb != null){
+			      createTable.removeChild(tb)
+			    }
+      			// create tbody for CreateTable
+      			var tbody = document.createElement('tbody');
+				tbody.id = "createFormTbodyId"
+				// Rebuild the select
+			      if (assetEntityAttributes) {
+				      var length = assetEntityAttributes.length
+				      	for (var i=0; i < length; i += 2) {
+					      var attribute1 = assetEntityAttributes[i]
+					      var attribute2 = assetEntityAttributes[i + 1]
+					      var tr = document.createElement('tr');
+					      var inputTd1 = document.createElement('td');
+					      var labelTd1 = document.createElement('td');
+					      var label1 = document.createTextNode(attribute1.label);
+					      labelTd1.appendChild( label1 )
+					      var inputField1 = document.createElement('input');
+							inputField1.type = 'text';
+							inputField1.name = attribute1.attributeCode;
+							inputField1.id = attribute1.attributeCode+'Id';
+					      inputTd1.appendChild( inputField1 )
+					      labelTd1.style.backgroundColor = '#f3f4f6 '
+					      labelTd1.style.width = '25%'
+					      labelTd1.noWrap = 'nowrap'
+					      tr.appendChild( labelTd1 )
+					      tr.appendChild( inputTd1 )
+					      if(attribute2){
+					      var inputTd2 = document.createElement('td');
+					      var labelTd2 = document.createElement('td');
+					      var label2 = document.createTextNode(attribute2.label);
+					      labelTd2.appendChild( label2 )
+					      var inputField2 = document.createElement('input');
+							inputField2.type = 'text';
+							inputField2.name = attribute2.attributeCode;
+							inputField2.id = attribute2.attributeCode+'Id';
+					      inputTd2.appendChild( inputField2 )
+					      labelTd2.style.backgroundColor = '#f3f4f6 '
+					      labelTd2.style.width = '25%'
+					      labelTd2.noWrap = 'nowrap'
+					      tr.appendChild( labelTd2 )
+					      tr.appendChild( inputTd2 )
+					     }
+					      tbody.appendChild( tr )
+				      	
+				      	}
+			      }
+			      createTable.appendChild( tbody )
+      		}
 		      
-	    </g:javascript>
+	    </script>
 
 </head>
 <body>
@@ -332,175 +370,16 @@
 </div>
 
 <div id="createDialog" title="Create Asset Entity" style="display: none;">
-<g:form action="save" method="post" name="createForm">
+<g:form action="save" method="post" name="createForm" >
 	<div class="dialog">
-
-	<table>
+	<table id="createTable">
 		<tbody>
-
 			<tr class="prop">
-				<td valign="top" class="name"><label for="attributeSet">Attribute
-				Set:</label></td>
-				<td valign="top"><g:select optionKey="id"
-					from="${com.tdssrc.eav.EavAttributeSet.list()}"
-					name="attributeSet.id"
-					value="${assetEntityInstance?.attributeSet?.id}"></g:select></td>
-
-				<td valign="top" class="name"><label for="manufacturer">Manufacturer:</label>
-				</td>
-				<td valign="top"><input type="text" size="30" id="manufacturer"
-					name="manufacturer" value="" /></td>
+				<td valign="top" class="name"><label for="attributeSet">Attribute Set:</label></td>
+				<td valign="top"><g:select optionKey="id" from="${com.tdssrc.eav.EavAttributeSet.list()}" name="attributeSet.id" value="${assetEntityInstance?.attributeSet?.id}" noSelection="['':'select']" 
+				 onchange="${remoteFunction(action:'getAttributes', params:'\'attribSet=\' + this.value ', onComplete:'generateCreateForm(e)')}"></g:select></td>
 
 			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name"><label for="model">Model:</label>
-				</td>
-				<td valign="top"><input type="text" size="30" id="model"
-					name="model" value="" /></td>
-
-				<td valign="top" class="name"><label for="hbaPort">Hba
-				Port:</label></td>
-				<td valign="top"><input type="text" size="30" id="hbaPort"
-					name="hbaPort" value="" /></td>
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name"><label for="sourceLocation">Source
-				Location:</label></td>
-				<td valign="top"><input type="text" size="30"
-					id="sourceLocation" name="sourceLocation" value="" /></td>
-
-				<td valign="top" class="name"><label for="hinfo">Hinfo:</label>
-				</td>
-				<td valign="top"><input type="text" size="30" id="hinfo"
-					name="hinfo" value="" /></td>
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name"><label for="targetLocation">Target
-				Location:</label></td>
-				<td valign="top"><input type="text" size="30"
-					id="targetLocation" name="targetLocation" value="" /></td>
-
-				<td valign="top" class="name"><label for="ipAddress">Ip
-				Address:</label></td>
-				<td valign="top"><input type="text" size="30" id="ipAddress"
-					name="ipAddress" value="" /></td>
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name"><label for="sourceRack">Source
-				Rack:</label></td>
-				<td valign="top"><input type="text" size="30" id="sourceRack"
-					name="sourceRack" value="" /></td>
-
-				<td valign="top" class="name"><label for="kvmDevice">Kvm
-				Device:</label></td>
-				<td valign="top"><input type="text" size="30" id="kvmDevice"
-					name="kvmDevice" value="" /></td>
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name"><label for="targetRack">Target
-				Rack:</label></td>
-				<td valign="top"><input type="text" size="30" id="targetRack"
-					name="targetRack" value="" /></td>
-
-				<td valign="top" class="name"><label for="kvmPort">Kvm
-				Port:</label></td>
-				<td valign="top"><input type="text" size="30" id="kvmPort"
-					name="kvmPort" value="" /></td>
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name"><label for="sourceRackPosition">Source
-				Rack Position:</label></td>
-				<td valign="top"><input type="text" size="30"
-					id="sourceRackPosition" name="sourceRackPosition" value="" /></td>
-
-				<td valign="top" class="name"><label for="newOrOld">New
-				or Old:</label></td>
-				<td valign="top"><input type="text" size="30" id="newOrOld"
-					name="newOrOld" value="" /></td>
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name"><label for="targetRackPosition">Target
-				Rack Position:</label></td>
-				<td valign="top"><input type="text" size="30"
-					id="targetRackPosition" name="targetRackPosition" value="" /></td>
-
-				<td valign="top" class="name"><label for="nicPort">Nic
-				Port:</label></td>
-				<td valign="top"><input type="text" size="30" id="nicPort"
-					name="nicPort" value="" /></td>
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name"><label for="usize">Unit
-				Size:</label></td>
-				<td valign="top"><input type="text" size="30" id="usize"
-					name="usize" value="" /></td>
-
-				<td valign="top" class="name"><label for="powerPort">Power
-				Port:</label></td>
-				<td valign="top"><input type="text" size="30" id="powerPort"
-					name="powerPort" value="" /></td>
-			</tr>
-
-
-			<tr class="prop">
-				<td valign="top" class="name"><label for="assetType">Asset
-				Type:</label></td>
-				<td valign="top"><g:select optionKey="id"
-					from="${AssetType.list()}" name="assetType.id"
-					value="${assetEntityInstance?.assetType?.id}" noSelection="['':'']"></g:select>
-				</td>
-
-				<td valign="top" class="name"><label for="remoteMgmtPort">Remote
-				Mgm Port:</label></td>
-				<td valign="top"><input type="text" size="30"
-					id="remoteMgmtPort" name="remoteMgmtPort" value="" /></td>
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name"><label for="assetName">Asset
-				Name:</label></td>
-				<td valign="top"><input type="text" size="30" id="assetName"
-					name="assetName" value="" /></td>
-
-				<td valign="top" class="name"><label for="truck">Truck:</label>
-				</td>
-				<td valign="top"><input type="text" size="30" id="truck"
-					name="truck" value="" /></td>
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name"><label for="assetTag">Asset
-				Tag:</label></td>
-				<td valign="top"><input type="text" size="30" id="assetTag"
-					name="assetTag" value="" /></td>
-
-				<td valign="top" class="name"><label for="application">Application:</label>
-				</td>
-				<td valign="top"><input type="text" size="30" id="application"
-					name="application" value="" /></td>
-			</tr>
-
-			<tr class="prop">
-			
-				<td valign="top" class="name"><label for="fiberCabinet">Fiber
-				Cabinet:</label></td>
-				<td valign="top"><input type="text" size="30" id="fiberCabinet"
-					name="fiberCabinet" value="" /></td>
-					
-				<td valign="top" class="name"><label for="serialNumber">Serial
-				Number:</label></td>
-				<td valign="top"><input type="text" size="30" id="serialNumber"
-					name="serialNumber" value="" /></td>
-			</tr>
-
 		</tbody>
 	</table>
 	</div>
@@ -509,201 +388,17 @@
 		class="save" type="submit" value="Create"
 		onclick="return validateAssetEntity();" /></span></div>
 </g:form></div>
-
-
 <div id="showDialog" title="Show Asset Entity" style="display: none;">
 <g:form action="save" method="post" name="showForm">
 	<div class="dialog">
-	<input type="hidden" name="projectId" value="" />
-	<table>
-		<tbody>			
-
-			<tr class="prop">
-				<td valign="top" class="name">Model:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="model" name="model" value="" style="border: 0px" readonly></td>
-
-				<td valign="top" class="name">Fiber Cabinet:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="fiberCabinet" name="fiberCabinet" value="" style="border: 0px"
-					readonly></td>
-
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name">Source Location:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="sourceLocation" name="sourceLocation" value=""
-					style="border: 0px" readonly></td>
-
-				<td valign="top" class="name">Hba Port:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="hbaPort" name="hbaPort" value="" style="border: 0px" readonly></td>
-
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name">Target Location:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="targetLocation" name="targetLocation" value=""
-					style="border: 0px" readonly></td>
-
-				<td valign="top" class="name">Hinfo:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="hinfo" name="hinfo" value="" style="border: 0px" readonly></td>
-
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name">Source Rack:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="sourceRack" name="sourceRack" value="" style="border: 0px"
-					readonly></td>
-
-				<td valign="top" class="name">Ip Address:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="ipAddress" name="ipAddress" value="" style="border: 0px"
-					readonly></td>
-
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name">Target Rack:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="targetRack" name="targetRack" value="" style="border: 0px"
-					readonly></td>
-
-				<td valign="top" class="name">Kvm Device:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="kvmDevice" name="kvmDevice" value="" style="border: 0px"
-					readonly></td>
-
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name">Source Rack Position:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="sourceRackPosition" name="sourceRackPosition" value=""
-					style="border: 0px" readonly></td>
-
-				<td valign="top" class="name">Kvm Port:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="kvmPort" name="kvmPort" value="" style="border: 0px" readonly></td>
-
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name">target Rack Position:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="targetRackPosition" name="targetRackPosition" value=""
-					style="border: 0px" readonly></td>
-
-				<td valign="top" class="name">New or Old:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="newOrOld" name="newOrOld" value="" style="border: 0px" readonly></td>
-
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name">Unit Size:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="usize" name="usize" value="" style="border: 0px" readonly></td>
-
-				<td valign="top" class="name">Nic Port:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="nicPort" name="nicPort" value="" style="border: 0px" readonly></td>
-
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name">Asset Type:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="assetType" name="assetType" value="" style="border: 0px"
-					readonly></td>
-
-				<td valign="top" class="name">Power Port:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="powerPort" name="powerPort" value="" style="border: 0px"
-					readonly></td>
-
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name">Asset Name:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="assetName" name="assetName" value="" style="border: 0px"
-					readonly></td>
-
-				<td valign="top" class="name">Remote Mgm Port:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="remoteMgmtPort" name="remoteMgmtPort" value=""
-					style="border: 0px" readonly></td>
-
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name">Asset Tag:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="assetTag" name="assetTag" value="" style="border: 0px" readonly></td>
-
-				<td valign="top" class="name">Truck:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="truck" name="truck" value="" style="border: 0px" readonly></td>
-
-			</tr>
-
-			<tr class="prop">
-				<td valign="top" class="name">Serial Number:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="serialNumber" name="serialNumber" value="" style="border: 0px"
-					readonly></td>
-
-				<td valign="top" class="name">Application:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="application" name="application" value="" style="border: 0px"
-					readonly></td>
-
-			</tr>
-			
-			<tr class="prop">				
-
-				<td valign="top" class="name">Manufacturer:</td>
-
-				<td valign="top" class="value"><input type="text" size="35"
-					id="manufacturer" name="manufacturer" value="" style="border: 0px"
-					readonly></td>
-			</tr>
-
-
-		</tbody>
+	<table id="showTable">
+		
 	</table>
 	</div>
-	<div class="buttons"><input type="hidden" name="id"
-		value="${assetEntityInstance?.id}" /> <span class="button"><input
+	<div class="buttons">
+	<input type="hidden" name="id" value="${assetEntityInstance?.id}" />
+	<input type="hidden" name="projectId" value="${projectId}" />
+	 <span class="button"><input
 		type="button" class="edit" value="Edit"
 		onClick="return editAssetDialog()" /></span> <span class="button"><g:actionSubmit 
 		class="delete" onclick="return confirm('Are you sure?');"
