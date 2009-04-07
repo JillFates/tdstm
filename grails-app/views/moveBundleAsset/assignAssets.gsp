@@ -93,7 +93,7 @@
 					checkbox.id = 'leftassetId_'+asset.id;
 					checkbox.value = asset.id;
 					checkbox.onclick = function() { selectCheckBox( this.id, 'trleft_'+this.value); };
-			      var id = document.createTextNode(asset.id);
+			      var id = document.createTextNode(asset.assetTag);
 			      td1.appendChild( checkbox )
 			      td1.appendChild( id )
 			      tr.appendChild( td1 )
@@ -142,7 +142,7 @@
 					checkbox.id = 'rightassetId_'+asset.id;
 					checkbox.value = asset.id;
 					checkbox.onclick = function() { selectCheckBox(this.id, 'trright_'+this.value); };
-			      var id = document.createTextNode(asset.id);
+			      var id = document.createTextNode(asset.assetTag);
 			      td1.appendChild( checkbox );
 			      td1.appendChild( id );
 			      tr.appendChild( td1 );
