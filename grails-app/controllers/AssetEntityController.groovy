@@ -102,14 +102,16 @@ class AssetEntityController {
         def workbook
         def sheet
         //def sheetNo = 1
-        //def map = [ "Server":null, "Type":null, "S/N":null, "AssetTag":null ]
+        //def map = [ "Server":null, "Type":null, "S/N":null, "AssetTag":null ]        
         
-        def map = [:]
-        def serverMap = [:]        
+        def sheetColumnNames = [:]
+        def sheetNameMap = [:] 
+        def list = new ArrayList()
         def dataTransferAttributeMapSheetName
-        dataTransferAttributeMap.eachWithIndex { item, pos ->
-    		map.put( item.columnName, null )
-    		serverMap.put( "sheetName", (item.sheetName).trim() )
+        //get column name and sheets
+        dataTransferAttributeMap.eachWithIndex { item, pos ->    		
+    		list.add( item.columnName )
+    		sheetNameMap.put( "sheetName", (item.sheetName).trim() )
         }
         try {
             workbook = Workbook.getWorkbook( file.inputStream )
@@ -117,7 +119,7 @@ class AssetEntityController {
             def flag = 0
             for( int i=0;  i < sheetNames.length; i++ ) {           	
             	
-                if ( serverMap.containsValue(sheetNames[i].trim()) ) {
+                if ( sheetNameMap.containsValue(sheetNames[i].trim()) ) {
                     flag = 1
                     sheet = workbook.getSheet( sheetNames[i] )
                 }
@@ -137,7 +139,11 @@ class AssetEntityController {
 
                 //check for column
                 def col = sheet.getColumns()
-                def checkCol = checkHeader( col, map, sheet )
+                for ( int c = 0; c < col; c++ ) {
+                	def cellContent = sheet.getCell( c, 0 ).contents
+                	sheetColumnNames.put(cellContent, c)                	
+                }
+                def checkCol = checkHeader( list, sheetColumnNames )
                 // Statement to check Headers if header are not found it will return Error message
 
                 // TODO : map here too.
@@ -227,23 +233,46 @@ class AssetEntityController {
         }
     }
     /*
-     * download data form Asset table into Excel file
+     * download data form Asset Entity table into Excel file
      */
     def export = {
 
         //get project Id
-        def projectId = params["projectIdExport"]
+        def projectId = params[ "projectIdExport" ]
         def dataTransferSet = params.dataTransferSet
-        def bundle = params.bundle
+        def bundle = request.getParameterValues( "bundle" )
+        def bundleList = new StringBuffer()
+        def bundleSize = bundle.size()
+        for ( int i=0; i< bundleSize ; i++ ) {
+        	
+        	if( i != bundleSize - 1) {
+        		bundleList.append( bundle[i] + "," )
+        	} else {
+        		bundleList.append( bundle[i] )        		
+        	}
+        }        
         def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
         def dataTransferAttributeMap = DataTransferAttributeMap.findAllByDataTransferSet( dataTransferSetInstance )
-        
         def project = Project.findById( projectId )
-        if ( projectId == null || projectId == "") {
-            flash.message = "Project Name is required"
+        
+        if ( projectId == null || projectId == "" ) {
+            flash.message = " Project Name is required. "
             redirect( action:assetImport, params:[projectId:projectId] )
         }
-        def asset = AssetEntity.findAllByProject( project )
+        
+        def asset
+        def moveBundleAssetInstance 
+        if( bundleSize == 1 && bundle[0] == "" ) {
+        	asset = AssetEntity.findAllByProject( project )
+        } else {
+        	moveBundleAssetInstance = MoveBundleAsset.findAll( "from MoveBundleAsset m where  m.moveBundle in ( $bundleList )" )
+        	if( moveBundleAssetInstance.size()>0 ) {
+        		asset = AssetEntity.findAll( "from AssetEntity where project = project and id in (:asset)", [asset:moveBundleAssetInstance.asset.id] )
+        	} else {
+        		asset = []
+        	}
+        }
+        
         //get template Excel
         def workbook
         def book
@@ -256,36 +285,38 @@ class AssetEntityController {
         	// construct application URL
         	def appUrl = protocol + "://" + serverName + ":" + serverPort + "/" + grailsApplication.metadata['app.name']
         	// get connection
-        	def templateFilePath = appUrl + dataTransferSetInstance.templateFilename
+        	def filenametoSet = dataTransferSetInstance.templateFilename
+        	def templateFilePath = appUrl + filenametoSet
         	def url = new URL( templateFilePath )
-        	HttpURLConnection con = url.openConnection(); 
+        	HttpURLConnection con = url.openConnection() 
             workbook = Workbook.getWorkbook( con.getInputStream() )
             
-            //set MIME TYPE as Excel
+            //set MIME TYPE as Excel 
+            filenametoSet = filenametoSet.split("/")
             response.setContentType( "application/vnd.ms-excel" )
-            response.setHeader( "Content-Disposition", "attachment; filename=ServerListExample.xls" )
+            response.setHeader( "Content-Disposition", "attachment; filename= ${filenametoSet[2]}" )
 
             //create workbook and sheet
-            book = Workbook.createWorkbook( response.getOutputStream(), workbook )
-            //def sheetNo = 1
-            //def sheet = book.getSheet( sheetNo )
+            book = Workbook.createWorkbook( response.getOutputStream(), workbook )            
             def sheet
-            // TODO : Use the column map that is shared between both import and export.
-
-            //def map = [ "Server":null, "Type":null, "S/N":null, "AssetTag":null ]
+            
             //check for column
             def map = [:]
-            def serverMap = [:]        
+        	def sheetColumnNames = [:]
+            def columnNameList = new ArrayList()
+            def sheetNameMap = [:]        
             def dataTransferAttributeMapSheetName
+            //get columnNames in to map
             dataTransferAttributeMap.eachWithIndex { item, pos ->
-    		map.put( item.columnName, null )
-    		serverMap.put( "sheetName", (item.sheetName).trim() )
+	    		map.put( item.columnName, null )
+	    		columnNameList.add(item.columnName)
+	    		sheetNameMap.put( "sheetName", (item.sheetName).trim() )
             }
             def sheetNames = book.getSheetNames()  
             def flag = 0
             for( int i=0;  i < sheetNames.length; i++ ) {           	
             	
-                if ( serverMap.containsValue( sheetNames[i].trim()) ) {
+                if ( sheetNameMap.containsValue( sheetNames[i].trim()) ) {
                     flag = 1
                     sheet = book.getSheet( sheetNames[i] )
                 }
@@ -297,79 +328,82 @@ class AssetEntityController {
                 redirect( action:assetImport, params:[projectId:projectId] ) 
                 
             } else {
-            def col = sheet.getColumns()
-
-            //calling method to check for Header
-
-            def checkCol = checkHeader( col, map, sheet )
-            // TODO : The logic that reads the sheet should be able to be shared between import and export - refactor this out
-
-            // Statement to check Headers if header are not found it will return Error message
-            if ( checkCol == false ) {
+                def col = sheet.getColumns()
+                for ( int c = 0; c < col; c++ ) {
+                	def cellContent = sheet.getCell( c, 0 ).contents
+                	sheetColumnNames.put(cellContent, c)
+                	if( map.containsKey( cellContent ) ) {
+                        map.put( cellContent, c )
+                    } 
+                }
+                //calling method to check for Header
+                def checkCol = checkHeader( columnNameList, sheetColumnNames )
+                
+                // Statement to check Headers if header are not found it will return Error message
+                if ( checkCol == false ) {
                 	
                 	missingHeader = missingHeader.replaceFirst(",","")
                     flash.message = " Column Headers : ${missingHeader} not found, Please check it."
                     redirect( action:assetImport, params:[projectId:projectId] )
 
-             } else {
+                } else {
+                    //update data from Asset Entity table to EXCEL
+                    for ( int r = 1; r <= asset.size(); r++ ) {
+                    	//get Move Bundle
+                    	/*def assetEntityInstance = AssetEntity.findById( asset[r-1].id )
+                        def moveBundleName = MoveBundleAsset.findByAsset( assetEntityInstance )*/
+                        
+                        for ( int coll = 0; coll < columnNameList.size(); coll++ ) {
+                            def addContentToSheet
+                            if( dataTransferAttributeMap.eavAttribute.attributeCode[coll].equals("moveBundle") ) {
+                                //Add moveBundle for move into sheet.
+                               /* if(moveBundleName == null){
+                                	addContentToSheet = new Label( map[columnNameList.get(coll)], r, "" )
+                                }else{
+                                	addContentToSheet = new Label( map[columnNameList.get(coll)], r, String.valueOf(moveBundleName.moveBundle) )
+                                }*/
+                            } else {                            	
+                                if ( asset[r-1].(dataTransferAttributeMap.eavAttribute.attributeCode[coll]) == null ) {
+                                    addContentToSheet = new Label( map[columnNameList.get(coll)], r, "" )
+                                } else {
+                                    addContentToSheet = new Label( map[columnNameList.get(coll)], r, String.valueOf(asset[r-1].(dataTransferAttributeMap.eavAttribute.attributeCode[coll])) )
+                                }
+                                sheet.addCell( addContentToSheet )
+                            }
+                            
+                        }
+                    }
 
-                //update data from asset table to EXCEL
-                def k = 0
-                for ( int r = 1; r < asset.size(); r++ ) {
-                    
-                    /*def assetName = new Label( map["Server"], r, asset.assetName[k] )                    
-                    sheet.addCell( assetName )
-                    def assetType
-                    
-                    // Statement to check null values
-                   
-                    if( asset.assetType[k] != null ) {                       
-                        assetType = new Label( map["Type"], r, "${asset.assetType[k]}" )
-                    } else {                        
-                        assetType = new Label( map["Type"], r, "" )
-                    }                   
-                    sheet.addCell( assetType )
-
-                    def serialNumber = new Label( map["S/N"], r, asset.serialNumber[k] )
-                    sheet.addCell( serialNumber )
-
-                    def assetTag = new Label( map["AssetTag"], r, asset.assetTag[k] )
-                    sheet.addCell( assetTag )
-
-                    k++*/
+                    book.write()
+                    book.close()                    
+                    render( view: "importExport" )
                 }
-
-
-                book.write()
-                book.close()
-                render( view: "importExport" )
-             }
             }
         } catch( Exception fileEx ) {
 
-            flash.message = "Excel template not found "
+            flash.message = "Excel template not found. "
             redirect( action:assetImport, params:[projectId:projectId] )
 
         }
     }
 	// check the sheet headers and return boolean value
-    def checkHeader( def col, def map, def sheet ){
-    	
-        for ( int c = 0; c < col; c++ ) {
-            def cellContent = sheet.getCell( c, 0 ).contents
-            if( map.containsKey( cellContent ) ) {
-                map.put( cellContent, c )
+    def checkHeader( def list, def sheetColumnNames  ){       
+        
+        for ( int coll = 0; coll < list.size(); coll++ ) {
+            
+            if( sheetColumnNames.containsKey( list[coll] ) ) {
+            	//Nonthing to perform.
             } else {
-                missingHeader = missingHeader + ", " + cellContent
+                missingHeader = missingHeader + ", " + list[coll]
             }
         }
-    	if( map.containsValue( null ) == true ) {
+    	if( missingHeader == "" ) {
     		
-    		return false
+    		return true
 
     	} else {
 
-    		return true
+    		return false
     	}
     }
 
