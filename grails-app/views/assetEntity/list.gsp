@@ -333,7 +333,7 @@
 
 				<td><g:remoteLink controller="assetEntity" action="editShow"
 					id="${assetEntityInstance.id}" onComplete="showAssetDialog( e );">
-					<img src="/tds/images/asset_view.png" border="0px">
+					<img src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px">
 				</g:remoteLink></td>				
 
 				<td>${fieldValue(bean:assetEntityInstance, field:'model')}</td>
