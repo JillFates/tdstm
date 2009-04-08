@@ -181,6 +181,9 @@ class AssetEntityController {
 	                                    dataTransferValue.rowId = r
 	                                    dataTransferValue.dataTransferBatch = dataTransferBatch
 	                                    dataTransferValue.eavAttribute = eavAttributeInstance
+	                                    if( sheetColumnNames.containsKey("assetId") ) {
+	                                    	dataTransferValue.assetEntityId = Integer.parseInt(sheet.getCell( 0, r ).contents)            	                        
+	                                    } 
 	                                    //dataTransferValue.save()
 	                                    if ( dataTransferValue.save() ) {                                    	
 	                                        added++
