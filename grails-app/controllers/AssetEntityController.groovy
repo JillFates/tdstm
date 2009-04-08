@@ -66,330 +66,338 @@ class AssetEntityController {
      * upload excel file into Asset table
      */
     def upload = {
-        //get project Name
-        def projectId
-        def project
-        def dataTransferSet = params.dataTransferSet
-        def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
-        def dataTransferAttributeMap = DataTransferAttributeMap.findAllByDataTransferSet( dataTransferSetInstance )
-       
-        try {
-            projectId = params["projectIdImport"]
-            if ( projectId == null || projectId == "" ) {
+	        //get project Name
+	        def projectId
+	        def project
+	        def dataTransferSet = params.dataTransferSet
+	        def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
+	        def dataTransferAttributeMap = DataTransferAttributeMap.findAllByDataTransferSet( dataTransferSetInstance )
+	       
+	        try {
+	            projectId = params["projectIdImport"]
+	            if ( projectId == null || projectId == "" ) {
 
-                flash.message = "Project Name is required"
-                redirect( controller:"asset", action:"assetImport" )
-                
-            }
+	                flash.message = "Project Name is required"
+	                redirect( controller:"asset", action:"assetImport" )
+	                
+	            }
 
-            project = Project.findById( projectId )
-            
-            //delete previous records existed for Project
-        
-            //def assetDelete = Asset.executeUpdate("delete from Asset a where a.project = $project.id " )
+	            project = Project.findById( projectId )
+	            
+	            //delete previous records existed for Project
+	        
+	            //def assetDelete = Asset.executeUpdate("delete from Asset a where a.project = $project.id " )
 
-        }catch ( Exception ex ) {
-            
-            flash.message = " Project Name is required. "
-            redirect( controller:"asset", action:"assetImport" )
-        }
+	        }catch ( Exception ex ) {
+	            
+	            flash.message = " Project Name is required. "
+	            redirect( controller:"asset", action:"assetImport" )
+	        }
 
-        // get File
-        MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
-        CommonsMultipartFile file = ( CommonsMultipartFile ) mpr.getFile("file")
+	        // get File
+	        MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
+	        CommonsMultipartFile file = ( CommonsMultipartFile ) mpr.getFile("file")
 
-        // create workbook
-        def workbook
-        def sheet
-        //def sheetNo = 1
-        //def map = [ "Server":null, "Type":null, "S/N":null, "AssetTag":null ]        
-        
-        def sheetColumnNames = [:]
-        def sheetNameMap = [:] 
-        def list = new ArrayList()
-        def dataTransferAttributeMapSheetName
-        //get column name and sheets
-        dataTransferAttributeMap.eachWithIndex { item, pos ->    		
-    		list.add( item.columnName )
-    		sheetNameMap.put( "sheetName", (item.sheetName).trim() )
-        }
-        try {
-            workbook = Workbook.getWorkbook( file.inputStream )
-            def sheetNames = workbook.getSheetNames()        
-            def flag = 0
-            for( int i=0;  i < sheetNames.length; i++ ) {           	
-            	
-                if ( sheetNameMap.containsValue(sheetNames[i].trim()) ) {
-                    flag = 1
-                    sheet = workbook.getSheet( sheetNames[i] )
-                }
-            	
-      		}
-            
-            if( flag == 0 ) {
-            	
-            	flash.message = " Sheet not found, Please check it."
-                redirect( action:assetImport, params:[projectId:projectId] ) 
-                
-            } else {           
-           
-            
-                // TODO : All columns should be done using maps as this will get unwieldly to manage with 20+ columns.  Both the import and
-                // export should use the same map.
+	        // create workbook
+	        def workbook
+	        def sheet
+	        //def sheetNo = 1
+	        //def map = [ "Server":null, "Type":null, "S/N":null, "AssetTag":null ]        
+	        
+	        def sheetColumnNames = [:]
+	        def sheetNameMap = [:] 
+	        def list = new ArrayList()
+	        def dataTransferAttributeMapSheetName
+	        //get column name and sheets
+	        dataTransferAttributeMap.eachWithIndex { item, pos ->    		
+	    		list.add( item.columnName )
+	    		sheetNameMap.put( "sheetName", (item.sheetName).trim() )
+	        }
+	        try {
+	            workbook = Workbook.getWorkbook( file.inputStream )
+	            def sheetNames = workbook.getSheetNames()        
+	            def flag = 0
+	            def sheetNamesLength = sheetNames.length
+	            for( int i=0;  i < sheetNamesLength; i++ ) {           	
+	            	
+	                if ( sheetNameMap.containsValue(sheetNames[i].trim()) ) {
+	                    flag = 1
+	                    sheet = workbook.getSheet( sheetNames[i] )
+	                }
+	            	
+	      		}
+	            
+	            if( flag == 0 ) {
+	            	
+	            	flash.message = " Sheet not found, Please check it."
+	                redirect( action:assetImport, params:[projectId:projectId] ) 
+	                
+	            } else {           
+	           
+	            
+	                // TODO : All columns should be done using maps as this will get unwieldly to manage with 20+ columns.  Both the import and
+	                // export should use the same map.
 
-                //check for column
-                def col = sheet.getColumns()
-                for ( int c = 0; c < col; c++ ) {
-                	def cellContent = sheet.getCell( c, 0 ).contents
-                	sheetColumnNames.put(cellContent, c)                	
-                }
-                def checkCol = checkHeader( list, sheetColumnNames )
-                // Statement to check Headers if header are not found it will return Error message
+	                //check for column
+	                def col = sheet.getColumns()
+	                for ( int c = 0; c < col; c++ ) {
+	                	def cellContent = sheet.getCell( c, 0 ).contents
+	                	sheetColumnNames.put(cellContent, c)                	
+	                }
+	                def checkCol = checkHeader( list, sheetColumnNames )
+	                // Statement to check Headers if header are not found it will return Error message
 
-                // TODO : map here too.
-                if ( checkCol == false ) {
-                	
-                	missingHeader = missingHeader.replaceFirst(",","")
-                    flash.message = " Column Headers : ${missingHeader} not found, Please check it."
-                    redirect( action:assetImport, params:[projectId:projectId] )
+	                // TODO : map here too.
+	                if ( checkCol == false ) {
+	                	
+	                	missingHeader = missingHeader.replaceFirst(",","")
+	                    flash.message = " Column Headers : ${missingHeader} not found, Please check it."
+	                    redirect( action:assetImport, params:[projectId:projectId] )
 
-                } else {
-            	
-                    //get user name.
-                    def subject = SecurityUtils.subject
-                    def principal = subject.principal
-                    def userLogin = UserLogin.findByUsername( principal )
-                    //Add Data to dataTransferBatch.
-                    def dataTransferBatch = new DataTransferBatch()
-                	dataTransferBatch.statusCode = "PENDING"
-                	dataTransferBatch.transferMode = "I"
-                	dataTransferBatch.dataTransferSet = dataTransferSetInstance
-                	dataTransferBatch.project = project
-                	dataTransferBatch.userLogin = userLogin 
-                    if(dataTransferBatch.save()){                       
-                        
-                        def dataTransferValue
-                        def eavAttributeInstance
-                        for( int cols = 0; cols < col; cols++ ) {
-                            def dataTransferAttributeMapInstance = DataTransferAttributeMap.findByColumnName(sheet.getCell( cols, 0 ).contents)
-                            if( dataTransferAttributeMapInstance != null ) {
-                                for ( int r = 1; r < sheet.rows; r++ ) {
-                                    dataTransferValue = new DataTransferValue()
-                                    eavAttributeInstance = dataTransferAttributeMapInstance.eavAttribute
-                                    dataTransferValue.importValue = sheet.getCell( cols, r ).contents
-                                    dataTransferValue.rowId = r
-                                    dataTransferValue.dataTransferBatch = dataTransferBatch
-                                    dataTransferValue.eavAttribute = eavAttributeInstance
-                                    //dataTransferValue.save()
-                                    if ( dataTransferValue.save() ) {                                    	
-                                        added++
-                                    } else {
-                                        skipped += ( r +1 )
-                                    }
-                                    
-                                }
-                            }
-                	
-                            /*// get fields
-                            def assetName = sheet.getCell( map["Server"], r ).contents
-                            def assetType = sheet.getCell( map["Type"], r ).contents
-                            def assetTypeObj = AssetType.findById(assetType)
-                            def serialNumber = sheet.getCell( map["S/N"], r ).contents
-                            def assetTag = sheet.getCell( map["AssetTag"], r ).contents
+	                } else {
+	            	
+	                    //get user name.
+	                    def subject = SecurityUtils.subject
+	                    def principal = subject.principal
+	                    def userLogin = UserLogin.findByUsername( principal )
+	                    //Add Data to dataTransferBatch.
+	                    def dataTransferBatch = new DataTransferBatch()
+	                	dataTransferBatch.statusCode = "PENDING"
+	                	dataTransferBatch.transferMode = "I"
+	                	dataTransferBatch.dataTransferSet = dataTransferSetInstance
+	                	dataTransferBatch.project = project
+	                	dataTransferBatch.userLogin = userLogin 
+	                    if(dataTransferBatch.save()){                       
+	                        
+	                        def dataTransferValue
+	                        def eavAttributeInstance
+	                        for( int cols = 0; cols < col; cols++ ) {
+	                            def dataTransferAttributeMapInstance = DataTransferAttributeMap.findByColumnName(sheet.getCell( cols, 0 ).contents)
+	                            if( dataTransferAttributeMapInstance != null ) {
+	                                for ( int r = 1; r < sheet.rows; r++ ) {
+	                                    dataTransferValue = new DataTransferValue()
+	                                    eavAttributeInstance = dataTransferAttributeMapInstance.eavAttribute
+	                                    dataTransferValue.importValue = sheet.getCell( cols, r ).contents
+	                                    dataTransferValue.rowId = r
+	                                    dataTransferValue.dataTransferBatch = dataTransferBatch
+	                                    dataTransferValue.eavAttribute = eavAttributeInstance
+	                                    //dataTransferValue.save()
+	                                    if ( dataTransferValue.save() ) {                                    	
+	                                        added++
+	                                    } else {
+	                                        skipped += ( r +1 )
+	                                    }
+	                                    
+	                                }
+	                            }
+	                	
+	                            /*// get fields
+	                            def assetName = sheet.getCell( map["Server"], r ).contents
+	                            def assetType = sheet.getCell( map["Type"], r ).contents
+	                            def assetTypeObj = AssetType.findById(assetType)
+	                            def serialNumber = sheet.getCell( map["S/N"], r ).contents
+	                            def assetTag = sheet.getCell( map["AssetTag"], r ).contents
 
 
-                            // save data in to db and check for added rows and skipped
-                            def asset = new 	(
+	                            // save data in to db and check for added rows and skipped
+	                            def asset = new 	(
 
-                            project: project,
-                            assetType: assetTypeObj,
-                            assetName: assetName,
-                            assetTag: assetTag,
-                            serialNumber: serialNumber,
-                            deviceFunction: "")
+	                            project: project,
+	                            assetType: assetTypeObj,
+	                            assetName: assetName,
+	                            assetTag: assetTag,
+	                            serialNumber: serialNumber,
+	                            deviceFunction: "")
 
-                            // TODO : This logic will ALWAY return true since the asset is created.  It should be testing asset.save() and not called above.
-                            if ( asset ) {
-                            asset.save()
-                            added++
-                            } else {
-                            skipped += ( r +1 )
-                            }*/
-                        }
+	                            // TODO : This logic will ALWAY return true since the asset is created.  It should be testing asset.save() and not called above.
+	                            if ( asset ) {
+	                            asset.save()
+	                            added++
+	                            } else {
+	                            skipped += ( r +1 )
+	                            }*/
+	                        }
 
-                    } // generate error message
-                    workbook.close()
-                    if (skipped.size() > 0) {
-                    	flash.message = " File Uploaded Successfully with ${added} Assets and Skipped are ${skipped}. "
-                    } else {
-                    	flash.message = " File Uploaded Successfully with ${added} Assets. "
-                    }
-                    redirect( action:assetImport, params:[projectId:projectId] )
-                }
-            }
-        }catch( Exception ex ) {
-            flash.message = grailsApplication.metadata[ 'app.file.format' ]
-            redirect( action:assetImport, params:[projectId:projectId] )
-        }
-    }
+	                    } // generate error message
+	                    workbook.close()
+	                    if (skipped.size() > 0) {
+	                    	flash.message = " File Uploaded Successfully with ${added} Assets and Skipped are ${skipped}. "
+	                    } else {
+	                    	flash.message = " File Uploaded Successfully with ${added} Assets. "
+	                    }
+	                    redirect( action:assetImport, params:[projectId:projectId] )
+	                }
+	            }
+	        }catch( Exception ex ) {
+	            flash.message = grailsApplication.metadata[ 'app.file.format' ]
+	            redirect( action:assetImport, params:[projectId:projectId] )
+	        }
+	    }
     /*
      * download data form Asset Entity table into Excel file
      */
     def export = {
 
-        //get project Id
-        def projectId = params[ "projectIdExport" ]
-        def dataTransferSet = params.dataTransferSet
-        def bundle = request.getParameterValues( "bundle" )
-        def bundleList = new StringBuffer()
-        def bundleSize = bundle.size()
-        for ( int i=0; i< bundleSize ; i++ ) {
-        	
-        	if( i != bundleSize - 1) {
-        		bundleList.append( bundle[i] + "," )
-        	} else {
-        		bundleList.append( bundle[i] )        		
-        	}
-        }        
-        def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
-        def dataTransferAttributeMap = DataTransferAttributeMap.findAllByDataTransferSet( dataTransferSetInstance )
-        def project = Project.findById( projectId )
-        
-        if ( projectId == null || projectId == "" ) {
-            flash.message = " Project Name is required. "
-            redirect( action:assetImport, params:[projectId:projectId] )
-        }
-        
-        def asset
-        def moveBundleAssetInstance 
-        if( bundleSize == 1 && bundle[0] == "" ) {
-        	asset = AssetEntity.findAllByProject( project )
-        } else {
-        	moveBundleAssetInstance = MoveBundleAsset.findAll( "from MoveBundleAsset m where  m.moveBundle in ( $bundleList )" )
-        	if( moveBundleAssetInstance.size()>0 ) {
-        		asset = AssetEntity.findAll( "from AssetEntity where project = project and id in (:asset)", [asset:moveBundleAssetInstance.asset.id] )
-        	} else {
-        		asset = []
-        	}
-        }
-        
-        //get template Excel
-        def workbook
-        def book
-        try {
-        	// Statements to get context details
-        	def tempProtocol = request.getProtocol()
-        	def protocol = tempProtocol.substring(0,tempProtocol.indexOf("/"))
-        	def serverName = request.getServerName() 
-        	def serverPort = request.getServerPort()
-        	// construct application URL
-        	def appUrl = protocol + "://" + serverName + ":" + serverPort + "/" + grailsApplication.metadata['app.name']
-        	// get connection
-        	def filenametoSet = dataTransferSetInstance.templateFilename
-        	def templateFilePath = appUrl + filenametoSet
-        	def url = new URL( templateFilePath )
-        	HttpURLConnection con = url.openConnection() 
-            workbook = Workbook.getWorkbook( con.getInputStream() )
-            
-            //set MIME TYPE as Excel 
-            filenametoSet = filenametoSet.split("/")
-            response.setContentType( "application/vnd.ms-excel" )
-            response.setHeader( "Content-Disposition", "attachment; filename= ${filenametoSet[2]}" )
+	        //get project Id
+	        def projectId = params[ "projectIdExport" ]
+	        def dataTransferSet = params.dataTransferSet
+	        def bundle = request.getParameterValues( "bundle" )
+	        def bundleList = new StringBuffer()
+	        def bundleSize = bundle.size()
+	        for ( int i=0; i< bundleSize ; i++ ) {
+	        	
+	        	if( i != bundleSize - 1) {
+	        		bundleList.append( bundle[i] + "," )
+	        	} else {
+	        		bundleList.append( bundle[i] )        		
+	        	}
+	        }        
+	        def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
+	        def dataTransferAttributeMap = DataTransferAttributeMap.findAllByDataTransferSet( dataTransferSetInstance )
+	        def project = Project.findById( projectId )
+	        
+	        if ( projectId == null || projectId == "" ) {
+	            flash.message = " Project Name is required. "
+	            redirect( action:assetImport, params:[projectId:projectId] )
+	        }
+	        
+	        def asset
+	        def moveBundleAssetInstance 
+	        if( bundleSize == 1 && bundle[0] == "" ) {
+	        	asset = AssetEntity.findAllByProject( project )
+	        } else {
+	        	moveBundleAssetInstance = MoveBundleAsset.findAll( "from MoveBundleAsset m where  m.moveBundle in ( $bundleList )" )
+	        	if( moveBundleAssetInstance.size()>0 ) {
+	        		asset = AssetEntity.findAll( "from AssetEntity where project = project and id in (:asset)", [asset:moveBundleAssetInstance.asset.id] )
+	        	} else {
+	        		asset = []
+	        	}
+	        }
+	        
+	        //get template Excel
+	        def workbook
+	        def book
+	        try {
+	        	// Statements to get context details
+	        	def tempProtocol = request.getProtocol()
+	        	def protocol = tempProtocol.substring(0,tempProtocol.indexOf("/"))
+	        	def serverName = request.getServerName() 
+	        	def serverPort = request.getServerPort()
+	        	// construct application URL
+	        	def appUrl = protocol + "://" + serverName + ":" + serverPort + "/" + grailsApplication.metadata['app.name']
+	        	// get connection
+	        	def filenametoSet = dataTransferSetInstance.templateFilename
+	        	def templateFilePath = appUrl + filenametoSet
+	        	def url = new URL( templateFilePath )
+	        	HttpURLConnection con = url.openConnection() 
+	            workbook = Workbook.getWorkbook( con.getInputStream() )
+	            
+	            //set MIME TYPE as Excel 
+	            filenametoSet = filenametoSet.split("/")
+	            response.setContentType( "application/vnd.ms-excel" )
+	            response.setHeader( "Content-Disposition", "attachment; filename= ${filenametoSet[2]}" )
 
-            //create workbook and sheet
-            book = Workbook.createWorkbook( response.getOutputStream(), workbook )            
-            def sheet
-            
-            //check for column
-            def map = [:]
-        	def sheetColumnNames = [:]
-            def columnNameList = new ArrayList()
-            def sheetNameMap = [:]        
-            def dataTransferAttributeMapSheetName
-            //get columnNames in to map
-            dataTransferAttributeMap.eachWithIndex { item, pos ->
-	    		map.put( item.columnName, null )
-	    		columnNameList.add(item.columnName)
-	    		sheetNameMap.put( "sheetName", (item.sheetName).trim() )
-            }
-            def sheetNames = book.getSheetNames()  
-            def flag = 0
-            for( int i=0;  i < sheetNames.length; i++ ) {           	
-            	
-                if ( sheetNameMap.containsValue( sheetNames[i].trim()) ) {
-                    flag = 1
-                    sheet = book.getSheet( sheetNames[i] )
-                }
-            	
-      		}
-            if( flag == 0 ) {
-            	
-            	flash.message = " Sheet not found, Please check it."
-                redirect( action:assetImport, params:[projectId:projectId] ) 
-                
-            } else {
-                def col = sheet.getColumns()
-                for ( int c = 0; c < col; c++ ) {
-                	def cellContent = sheet.getCell( c, 0 ).contents
-                	sheetColumnNames.put(cellContent, c)
-                	if( map.containsKey( cellContent ) ) {
-                        map.put( cellContent, c )
-                    } 
-                }
-                //calling method to check for Header
-                def checkCol = checkHeader( columnNameList, sheetColumnNames )
-                
-                // Statement to check Headers if header are not found it will return Error message
-                if ( checkCol == false ) {
-                	
-                	missingHeader = missingHeader.replaceFirst(",","")
-                    flash.message = " Column Headers : ${missingHeader} not found, Please check it."
-                    redirect( action:assetImport, params:[projectId:projectId] )
+	            //create workbook and sheet
+	            book = Workbook.createWorkbook( response.getOutputStream(), workbook )            
+	            def sheet
+	            
+	            //check for column
+	            def map = [:]
+	        	def sheetColumnNames = [:]
+	            def columnNameList = new ArrayList()
+	            def sheetNameMap = [:]        
+	            def dataTransferAttributeMapSheetName
+	            //get columnNames in to map
+	            dataTransferAttributeMap.eachWithIndex { item, pos ->
+		    		map.put( item.columnName, null )
+		    		columnNameList.add(item.columnName)
+		    		sheetNameMap.put( "sheetName", (item.sheetName).trim() )
+	            }
+	            def sheetNames = book.getSheetNames()  
+	            def flag = 0
+	            def sheetNamesLength = sheetNames.length
+	            for( int i=0;  i < sheetNamesLength; i++ ) {           	
+	            	
+	                if ( sheetNameMap.containsValue( sheetNames[i].trim()) ) {
+	                    flag = 1
+	                    sheet = book.getSheet( sheetNames[i] )
+	                }
+	            	
+	      		}
+	            if( flag == 0 ) {
+	            	
+	            	flash.message = " Sheet not found, Please check it."
+	                redirect( action:assetImport, params:[projectId:projectId] ) 
+	                
+	            } else {
+	                def col = sheet.getColumns()
+	                for ( int c = 0; c < col; c++ ) {
+	                	def cellContent = sheet.getCell( c, 0 ).contents
+	                	sheetColumnNames.put(cellContent, c)
+	                	if( map.containsKey( cellContent ) ) {
+	                        map.put( cellContent, c )
+	                    } 
+	                }
+	                //calling method to check for Header
+	                def checkCol = checkHeader( columnNameList, sheetColumnNames )
+	                
+	                // Statement to check Headers if header are not found it will return Error message
+	                if ( checkCol == false ) {
+	                	
+	                	missingHeader = missingHeader.replaceFirst(",","")
+	                    flash.message = " Column Headers : ${missingHeader} not found, Please check it."
+	                    redirect( action:assetImport, params:[projectId:projectId] )
 
-                } else {
-                    //update data from Asset Entity table to EXCEL
-                    for ( int r = 1; r <= asset.size(); r++ ) {
-                    	//get Move Bundle
-                    	/*def assetEntityInstance = AssetEntity.findById( asset[r-1].id )
-                        def moveBundleName = MoveBundleAsset.findByAsset( assetEntityInstance )*/
-                        
-                        for ( int coll = 0; coll < columnNameList.size(); coll++ ) {
-                            def addContentToSheet
-                            if( dataTransferAttributeMap.eavAttribute.attributeCode[coll].equals("moveBundle") ) {
-                                //Add moveBundle for move into sheet.
-                               /* if(moveBundleName == null){
-                                	addContentToSheet = new Label( map[columnNameList.get(coll)], r, "" )
-                                }else{
-                                	addContentToSheet = new Label( map[columnNameList.get(coll)], r, String.valueOf(moveBundleName.moveBundle) )
-                                }*/
-                            } else {                            	
-                                if ( asset[r-1].(dataTransferAttributeMap.eavAttribute.attributeCode[coll]) == null ) {
-                                    addContentToSheet = new Label( map[columnNameList.get(coll)], r, "" )
-                                } else {
-                                    addContentToSheet = new Label( map[columnNameList.get(coll)], r, String.valueOf(asset[r-1].(dataTransferAttributeMap.eavAttribute.attributeCode[coll])) )
-                                }
-                                sheet.addCell( addContentToSheet )
-                            }
-                            
-                        }
-                    }
+	                } else {
+	                    //update data from Asset Entity table to EXCEL
+	                    def assetSize = asset.size()
+	                    def columnNameListSize = columnNameList.size()
+	                    for ( int r = 1; r <= assetSize; r++ ) {
+	                    	//get Move Bundle
+	                    	/*def assetEntityInstance = AssetEntity.findById( asset[r-1].id )
+	                        def moveBundleName = MoveBundleAsset.findByAsset( assetEntityInstance )*/
+//	                      Add assetId for walkthrough template only.
+	                        if( sheetColumnNames.containsKey("asset Id") ) {
+		                        def addAssetId = new Label( 0, r, String.valueOf(asset[r-1].id))
+		                        sheet.addCell( addAssetId )
+	                        }                        
+	                        for ( int coll = 0; coll < columnNameListSize; coll++ ) {
+	                            def addContentToSheet
+	                            if( dataTransferAttributeMap.eavAttribute.attributeCode[coll].equals("moveBundle") ) {
+	                                //Add moveBundle for move into sheet.
+	                               /* if(moveBundleName == null){
+	                                	addContentToSheet = new Label( map[columnNameList.get(coll)], r, "" )
+	                                }else{
+	                                	addContentToSheet = new Label( map[columnNameList.get(coll)], r, String.valueOf(moveBundleName.moveBundle) )
+	                                }*/
+	                            } else {                            	
+	                                if ( asset[r-1].(dataTransferAttributeMap.eavAttribute.attributeCode[coll]) == null ) {
+	                                    addContentToSheet = new Label( map[columnNameList.get(coll)], r, "" )
+	                                } else {
+	                                    addContentToSheet = new Label( map[columnNameList.get(coll)], r, String.valueOf(asset[r-1].(dataTransferAttributeMap.eavAttribute.attributeCode[coll])) )
+	                                }
+	                                sheet.addCell( addContentToSheet )
+	                            }
+	                            
+	                        }
+	                    }
 
-                    book.write()
-                    book.close()                    
-                    render( view: "importExport" )
-                }
-            }
-        } catch( Exception fileEx ) {
+	                    book.write()
+	                    book.close()                    
+	                    render( view: "importExport" )
+	                }
+	            }
+	        } catch( Exception fileEx ) {
 
-            flash.message = "Excel template not found. "
-            redirect( action:assetImport, params:[projectId:projectId] )
+	            flash.message = "Excel template not found. "
+	            redirect( action:assetImport, params:[projectId:projectId] )
 
-        }
-    }
+	        }
+	    }
 	// check the sheet headers and return boolean value
     def checkHeader( def list, def sheetColumnNames  ){       
-        
-        for ( int coll = 0; coll < list.size(); coll++ ) {
+        def listSize = list.size()
+        for ( int coll = 0; coll < listSize; coll++ ) {
             
             if( sheetColumnNames.containsKey( list[coll] ) ) {
             	//Nonthing to perform.
@@ -426,7 +434,7 @@ class AssetEntityController {
         def projectId = params.projectId
         if(assetEntityInstance) {
             assetEntityInstance.delete()
-            flash.message = "AssetEntity ${params.id} deleted"
+            flash.message = "AssetEntity ${assetEntityInstance.assetName} deleted"
             redirect(action:list, params:[projectId:projectId])
         }
         else {
@@ -442,11 +450,11 @@ class AssetEntityController {
         assetEntityInstance.project = projectInstance
         assetEntityInstance.owner = projectInstance.client
         if(!assetEntityInstance.hasErrors() && assetEntityInstance.save()) {
-            flash.message = "AssetEntity ${assetEntityInstance.id} created"
+            flash.message = "AssetEntity ${assetEntityInstance.assetName} created"
             redirect( action:list, params:[projectId: projectId] )
         }
         else {
-        	flash.message = "AssetEntity ${assetEntityInstance.id} not created"
+        	flash.message = "AssetEntity ${assetEntityInstance.assetName} not created"
             redirect( action:list, params:[projectId: projectId] )
         }
     }
@@ -478,45 +486,27 @@ class AssetEntityController {
     //update ajax overlay
     def updateAssetEntity = {
     		 
-        
-    	def assetDialog = params.assetDialog.split(',')
-        
-        def assetItems = []
-        def assetEntityInstance = AssetEntity.get( assetDialog[0] )
-        assetEntityInstance.model = assetDialog[1]
-        assetEntityInstance.sourceLocation = assetDialog[2]
-        assetEntityInstance.targetLocation = assetDialog[3]
-        assetEntityInstance.sourceRack = assetDialog[4]
-        assetEntityInstance.targetRack = assetDialog[5]
-        assetEntityInstance.sourceRackPosition = assetDialog[6]
-        assetEntityInstance.targetRackPosition = assetDialog[7]
-        assetEntityInstance.usize = assetDialog[8]
-        assetEntityInstance.manufacturer = assetDialog[9]
-        assetEntityInstance.fiberCabinet = assetDialog[10]
-        assetEntityInstance.hbaPort = assetDialog[11]
-        assetEntityInstance.hinfo = assetDialog[12]
-        assetEntityInstance.ipAddress = assetDialog[13]
-        assetEntityInstance.kvmDevice = assetDialog[14]
-        assetEntityInstance.kvmPort = assetDialog[15]
-        assetEntityInstance.newOrOld = assetDialog[16]
-        assetEntityInstance.nicPort = assetDialog[17]
-        assetEntityInstance.powerPort = assetDialog[18]
-        assetEntityInstance.remoteMgmtPort = assetDialog[19]
-        assetEntityInstance.truck = assetDialog[20]
-        def assetType=AssetType.findById( assetDialog[21] )
-        assetEntityInstance.assetType = assetType        
-        assetEntityInstance.assetName = assetDialog[22]
-        assetEntityInstance.assetTag = assetDialog[23]
-        assetEntityInstance.serialNumber= assetDialog[24]
-        assetEntityInstance.application= assetDialog[25]
-        assetEntityInstance.save()
-
-        if( assetEntityInstance.assetType != null ){
-        	assetItems = [id:assetEntityInstance.id, model: assetEntityInstance.model, sourceLocation: assetEntityInstance.sourceLocation, targetLocation: assetEntityInstance.targetLocation, sourceRack: assetEntityInstance.sourceRack, targetRack: assetEntityInstance.targetRack, sourceRackPosition: assetEntityInstance.sourceRackPosition, targetRackPosition: assetEntityInstance.targetRackPosition, usize: assetEntityInstance.usize, manufacturer: assetEntityInstance.manufacturer, fiberCabinet: assetEntityInstance.fiberCabinet, hbaPort: assetEntityInstance.hbaPort, hinfo: assetEntityInstance.hinfo, ipAddress: assetEntityInstance.ipAddress, kvmDevice: assetEntityInstance.kvmDevice, kvmPort: assetEntityInstance.kvmPort, newOrOld: assetEntityInstance.newOrOld, nicPort: assetEntityInstance.nicPort, powerPort: assetEntityInstance.powerPort, remoteMgmtPort: assetEntityInstance.remoteMgmtPort, truck: assetEntityInstance.truck, project:assetEntityInstance.project.name, projectId:assetEntityInstance.project.id, assetType:assetEntityInstance.assetType, assetTypeId:assetEntityInstance.assetType.id, assetTag:assetEntityInstance.assetTag, assetName:assetEntityInstance.assetName, serialNumber:assetEntityInstance.serialNumber, application:assetEntityInstance.application ]
-       
-        } else {
-        	
-        } 
+    	def assetItems = []
+    	def assetEntityParams = params.assetEntityParams.split(",")
+    	def map = new HashMap()
+    	assetEntityParams.each{
+    		def assetParam = it.split(":")
+    		if(assetParam.length > 1){
+    			map.put(assetParam[0],assetParam[1] )
+    		}
+    	}
+        def assetEntityInstance = AssetEntity.get( params.id )
+        if(assetEntityInstance) {
+        	assetEntityInstance.properties = map
+            if(!assetEntityInstance.hasErrors() && assetEntityInstance.save()) {
+            	def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
+            	entityAttributeInstance.each{
+                	if( it.attribute.attributeCode != "moveBundle"){
+                		assetItems << [id:assetEntityInstance.id, attributeCode:it.attribute.attributeCode, value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode) : ""]
+                	}
+                }
+            }
+        }
         render assetItems as JSON
 
     }
@@ -530,6 +520,21 @@ class AssetEntityController {
     		def attributeSetInstance = EavAttributeSet.findById( attributeSetId )
     		//entityAttributeInstance =  EavEntityAttribute.findAllByEavAttributeSetOrderBySortOrder( attributeSetInstance )
     		entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $attributeSetId order by eav.sortOrder ")
+        }
+    	entityAttributeInstance.each{
+    		items<<[ label:it.attribute.frontendLabel, attributeCode:it.attribute.attributeCode ]
+    	}
+    	render items as JSON
+    }
+    def getAssetAttributes = {
+    	def assetId = params.assetId
+        def items = []
+    	def entityAttributeInstance = []
+    	
+        if(assetId != null &&  assetId != ""){
+    		def assetEntity = AssetEntity.findById( assetId )
+    		//entityAttributeInstance =  EavEntityAttribute.findAllByEavAttributeSetOrderBySortOrder( attributeSetInstance )
+    		entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntity.attributeSet.id order by eav.sortOrder ")
         }
     	entityAttributeInstance.each{
     		items<<[ label:it.attribute.frontendLabel, attributeCode:it.attribute.attributeCode ]

@@ -436,7 +436,7 @@ class BootStrap {
 		def entityType = new EavEntityType( entityTypeCode:'AssetEntity', domainName:'AssetEntity', isAuditable:1  ).save()
 
 		// This line was causing RTE because table is not created
-		def attributeSet = new EavAttributeSet( attributeSetName:'TDS Master List', entityType:entityType, sortOrder:10 ).save()
+		def attributeSet = new EavAttributeSet( attributeSetName:'Server', entityType:entityType, sortOrder:10 ).save()
 		//---------------------------------
 		//  Create Asset Entity
 		//---------------------------------
