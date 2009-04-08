@@ -80,9 +80,9 @@ class AssetEntityAttributeLoaderService {
 		                }catch ( Exception ex ) {
 		        			ex.printStackTrace()
 		                }
-		               // create DataTransferAttributeMap records (WalkThrough columns)related to the DataTransferSet 
+                        // create DataTransferAttributeMap records (WalkThrough columns)related to the DataTransferSet
 		               
-		               try {
+                        try {
 		                	dataTransferSet = DataTransferSet.findByTitle( "TDS Walkthru" )
 		                	def dataTransferAttributeMap = new DataTransferAttributeMap(
 		                		columnName:walkthruColumnName,
@@ -223,17 +223,23 @@ class AssetEntityAttributeLoaderService {
 	
 	//get assetsList  corresponding to selected bundle to update assetsList dynamically
 	
-	def getAssetList ( def moveBundleAssetList, rackPlan ) {
+	def getAssetList ( def moveBundleAssetList, rackPlan, bundleInstance ) {
 		def moveBundleAsset = []
+		def projectTeam =[]
+		def projectTeamInstanceList = ProjectTeam.findAllByMoveBundle( bundleInstance )
+		projectTeamInstanceList.each{teams ->
+			
+            projectTeam << [ teamCode: teams.teamCode ]
+		}
 		for( int assetRow = 0; assetRow < moveBundleAssetList.size(); assetRow++) {
     		def displayTeam  
     		if( rackPlan == "RerackPlan" ) {
-    			displayTeam = moveBundleAssetList[assetRow]?.targetTeam?.id
+    			displayTeam = moveBundleAssetList[assetRow]?.targetTeam?.teamCode
     		}else {
-    			displayTeam = moveBundleAssetList[assetRow]?.sourceTeam?.id
+    			displayTeam = moveBundleAssetList[assetRow]?.sourceTeam?.teamCode
     		}
     		def assetEntityInstance = AssetEntity.findById( moveBundleAssetList[assetRow].asset.id )
-    		moveBundleAsset <<[id:assetEntityInstance.id, assetName:assetEntityInstance.assetName, model:assetEntityInstance.model, sourceLocation:assetEntityInstance.sourceLocation, sourceRack:assetEntityInstance.sourceRack, targetLocation:assetEntityInstance.targetLocation, targetRack:assetEntityInstance.targetRack, sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, uSize:assetEntityInstance.usize, team:displayTeam, cart:moveBundleAssetList[assetRow]?.cart, shelf:moveBundleAssetList[assetRow]?.shelf ]
+    		moveBundleAsset <<[id:assetEntityInstance.id, assetName:assetEntityInstance.assetName, model:assetEntityInstance.model, sourceLocation:assetEntityInstance.sourceLocation, sourceRack:assetEntityInstance.sourceRack, targetLocation:assetEntityInstance.targetLocation, targetRack:assetEntityInstance.targetRack, sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, uSize:assetEntityInstance.usize, team:displayTeam, cart:moveBundleAssetList[assetRow]?.cart, shelf:moveBundleAssetList[assetRow]?.shelf, projectTeam:projectTeam ]
     	}
 		return moveBundleAsset
 	}

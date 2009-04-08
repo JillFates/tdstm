@@ -5,7 +5,7 @@ class MoveBundleAsset {
     ProjectTeam sourceTeam
     ProjectTeam targetTeam
     Integer cart
-    Integer shelf
+    String shelf
 
     /*
 	 * Fields Validations
