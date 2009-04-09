@@ -194,31 +194,6 @@ class AssetEntityController {
 	                                }
 	                            }
 	                	
-	                            /*// get fields
-	                            def assetName = sheet.getCell( map["Server"], r ).contents
-	                            def assetType = sheet.getCell( map["Type"], r ).contents
-	                            def assetTypeObj = AssetType.findById(assetType)
-	                            def serialNumber = sheet.getCell( map["S/N"], r ).contents
-	                            def assetTag = sheet.getCell( map["AssetTag"], r ).contents
-
-
-	                            // save data in to db and check for added rows and skipped
-	                            def asset = new 	(
-
-	                            project: project,
-	                            assetType: assetTypeObj,
-	                            assetName: assetName,
-	                            assetTag: assetTag,
-	                            serialNumber: serialNumber,
-	                            deviceFunction: "")
-
-	                            // TODO : This logic will ALWAY return true since the asset is created.  It should be testing asset.save() and not called above.
-	                            if ( asset ) {
-	                            asset.save()
-	                            added++
-	                            } else {
-	                            skipped += ( r +1 )
-	                            }*/
 	                        }
 
 	                    } // generate error message
@@ -462,9 +437,13 @@ class AssetEntityController {
         def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
         
         entityAttributeInstance.each{
-        
+        	def attributeOptions = EavAttributeOption.findAllByAttribute( it.attribute )
+    		def options = []
+    		attributeOptions.each{option ->
+    			options<<[option:option.value]
+    		}
         	if( it.attribute.attributeCode != "moveBundle"){
-        		items << [label:it.attribute.frontendLabel, attributeCode:it.attribute.attributeCode, value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode) : ""]
+        		items << [label:it.attribute.frontendLabel, attributeCode:it.attribute.attributeCode, frontendInput:it.attribute.frontendInput, options : options, value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode) : ""]
         	}
         }
         render items as JSON
@@ -475,26 +454,33 @@ class AssetEntityController {
     def updateAssetEntity = {
     		 
     	def assetItems = []
-    	def assetEntityParams = params.assetEntityParams.split(",")
-    	def map = new HashMap()
-    	assetEntityParams.each{
-    		def assetParam = it.split(":")
-    		if(assetParam.length > 1){
-    			map.put(assetParam[0],assetParam[1] )
-    		}
+    	def assetEntityParams = params.assetEntityParams
+    	if(assetEntityParams){
+	    	def assetEntityParamsList = assetEntityParams.split(",")
+	    	def map = new HashMap()
+	    	assetEntityParamsList.each{
+	    		def assetParam = it.split(":")
+	    		if(assetParam.length > 1){
+	    			map.put(assetParam[0],assetParam[1] )
+	    		} else {
+	    			map.put(assetParam[0],"" )
+	    		}
+	    	}
+	        def assetEntityInstance = AssetEntity.get( params.id )
+	        if(assetEntityInstance) {
+	        	assetEntityInstance.properties = map
+	            if(!assetEntityInstance.hasErrors() && assetEntityInstance.save()) {
+	            	
+	            	def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
+	            	entityAttributeInstance.each{
+	            		
+	                	if( it.attribute.attributeCode != "moveBundle"){
+	                		assetItems << [id:assetEntityInstance.id, attributeCode:it.attribute.attributeCode, frontendInput:it.attribute.frontendInput, value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode) : ""]
+	                	}
+	                }
+	            }
+	        }
     	}
-        def assetEntityInstance = AssetEntity.get( params.id )
-        if(assetEntityInstance) {
-        	assetEntityInstance.properties = map
-            if(!assetEntityInstance.hasErrors() && assetEntityInstance.save()) {
-            	def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
-            	entityAttributeInstance.each{
-                	if( it.attribute.attributeCode != "moveBundle"){
-                		assetItems << [id:assetEntityInstance.id, attributeCode:it.attribute.attributeCode, value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode) : ""]
-                	}
-                }
-            }
-        }
         render assetItems as JSON
 
     }
@@ -510,7 +496,14 @@ class AssetEntityController {
     		entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $attributeSetId order by eav.sortOrder ")
         }
     	entityAttributeInstance.each{
-    		items<<[ label:it.attribute.frontendLabel, attributeCode:it.attribute.attributeCode ]
+    		def attributeOptions = EavAttributeOption.findAllByAttribute( it.attribute )
+    		def options = []
+    		attributeOptions.each{option ->
+    			options<<[option:option.value]
+    		}
+    		if( it.attribute.attributeCode != "moveBundle"){
+    			items<<[ label:it.attribute.frontendLabel, attributeCode:it.attribute.attributeCode, frontendInput:it.attribute.frontendInput, options : options ]
+    		}
     	}
     	render items as JSON
     }
@@ -525,8 +518,11 @@ class AssetEntityController {
     		entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntity.attributeSet.id order by eav.sortOrder ")
         }
     	entityAttributeInstance.each{
-    		items<<[ label:it.attribute.frontendLabel, attributeCode:it.attribute.attributeCode ]
+    		if( it.attribute.attributeCode != "moveBundle"){
+    			items<<[ attributeCode:it.attribute.attributeCode, frontendInput:it.attribute.frontendInput ]
+    		}
     	}
     	render items as JSON
     }
+     
 }

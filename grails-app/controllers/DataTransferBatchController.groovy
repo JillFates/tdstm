@@ -34,18 +34,12 @@ class DataTransferBatchController {
     		assetEntity.project = projectInstance 
     		dtvList.each {
     			def attribName = it.eavAttribute.attributeCode
-    			if( attribName == "assetType" ) {
-    				def correctedValue
-    				def importValue
-    				if(it.importValue != null ) {
-    					importValue = AssetType.findById( it.importValue )
+    			if ( attribName == "moveBundle" ) {
+    				if( it.importValue != null && it.correctedValue != null ) {
+    					def importMoveBundleInstance = MoveBundle.findByName(it.importValue)
+        				def exportMoveBundleInstance = MoveBundle.findByName(it.correctedValue)
+        				assetEntity."$attribName" = exportMoveBundleInstance ? exportMoveBundleInstance : importMoveBundleInstance
     				}
-    				if(it.correctedValue != null ) {
-    					correctedValue = AssetType.findById( it.correctedValue )
-    				}
-    				assetEntity."$attribName" = correctedValue ? correctedValue : importValue
-    			}else if ( attribName == "moveBundle" ) {
-    			
     			}else {
     				assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
     			}

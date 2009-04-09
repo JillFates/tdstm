@@ -30,17 +30,13 @@
 <jq:plugin name="ui.dialog" />
 
 <script>
-	
 	      $(document).ready(function() {
-	
 	        $("#showDialog").dialog({ autoOpen: false })
 	        $("#editDialog").dialog({ autoOpen: false })
 	        $("#createDialog").dialog({ autoOpen: false })
-	
 	      })
 </script>
 <script type="text/javascript">	
-	    	var rowId
 		    function showAssetDialog( e ) {
       			var assetEntityAttributes = eval('(' + e.responseText + ')');
       			var showTable = document.getElementById("showTable");
@@ -71,12 +67,7 @@
 					      var labelTd1 = document.createElement('td');
 					      var label1 = document.createTextNode(attribute1.label);
 					      labelTd1.appendChild( label1 )
-					      var inputField1
-					      if(attribute1.attributeCode != "assetType"){
-					      	inputField1 = document.createTextNode(attribute1.value);
-					      }else{
-					      	inputField1 = document.createTextNode("");
-					      }
+					      var inputField1 = document.createTextNode(attribute1.value);
 					      inputTd1.appendChild( inputField1 )
 					      labelTd1.style.backgroundColor = '#f3f4f6 '
 					      labelTd1.style.width = '25%'
@@ -89,14 +80,8 @@
 					      var labelTdE1 = document.createElement('td');
 					      var labelE1 = document.createTextNode(attribute1.label);
 					      labelTdE1.appendChild( labelE1 )
-					      var inputFieldE1 = document.createElement('input');
-						      inputFieldE1.type = 'text';
-							  inputFieldE1.name = attribute1.attributeCode;
-							  if(attribute1.attributeCode != "assetType"){
-							  inputFieldE1.value = attribute1.value;
-							  } else {
-							  	inputFieldE1.value = "";
-							  }
+					      var inputFieldE1 = getInputType(attribute1);
+					      	  inputFieldE1.value = attribute1.value;
 							  inputFieldE1.id = 'edit'+attribute1.attributeCode+'Id';
 					      inputTdE1.appendChild( inputFieldE1 )
 					      labelTdE1.style.backgroundColor = '#f3f4f6 '
@@ -110,12 +95,7 @@
 					      var labelTd2 = document.createElement('td');
 					      var label2 = document.createTextNode(attribute2.label);
 					      labelTd2.appendChild( label2 )
-					      var inputField2
-					      if(attribute2.attributeCode != "assetType"){
-					      	inputField2 = document.createTextNode(attribute2.value);
-					      } else {
-					      	inputField2 = document.createTextNode(attribute2.value);
-					      }
+					      var inputField2 = document.createTextNode(attribute2.value);
 					      inputTd2.appendChild( inputField2 )
 					      labelTd2.style.backgroundColor = '#f3f4f6'
 					      inputTd2.style.width = '25%'
@@ -127,14 +107,8 @@
 					      var labelTdE2 = document.createElement('td');
 					      var labelE2 = document.createTextNode(attribute2.label);
 					      labelTdE2.appendChild( labelE2 )
-					      var inputFieldE2 = document.createElement('input');
-						      inputFieldE2.type = 'text';
-							  inputFieldE2.name = attribute2.attributeCode;
-							  if(attribute2.attributeCode != "assetType"){
-							  	inputFieldE2.value = attribute2.value;
-							  } else {
-							  	inputFieldE2.value = "";
-							  }
+					      var inputFieldE2 = getInputType(attribute2);
+							  inputFieldE2.value = attribute2.value;
 							  inputFieldE2.id = 'edit'+attribute2.attributeCode+'Id';
 					      inputTdE2.appendChild( inputFieldE2 )
 					      labelTdE2.style.backgroundColor = '#f3f4f6'
@@ -154,6 +128,8 @@
 		      $("#showDialog").dialog('option', 'width', 700)
 		      $("#showDialog").dialog('option', 'position', ['right','top']);
 		      $("#showDialog").dialog("open")
+		      $("#createDialog").dialog("close")
+		      $("#editDialog").dialog("close")
 		
 		    }
 	    	
@@ -162,6 +138,8 @@
 		      $("#createDialog").dialog('option', 'width', 700)
 		      $("#createDialog").dialog('option', 'position', ['right','top']);
 		      $("#createDialog").dialog("open")
+		      $("#editDialog").dialog("close")
+		      $("#showDialog").dialog("close")
 		
 		    }
 		    
@@ -183,9 +161,11 @@
 		    		var length = assetEntityAttributes.length
 				      	for (var i=0; i < length; i ++) {
 				      		var attributeCode = assetEntityAttributes[i].attributeCode
-				      		if(attributeCode != 'moveBundle'){
-				      			var attributeValue = document.getElementById('edit'+attributeCode+'Id').value
+				      		var attributeValue = document.getElementById('edit'+attributeCode+'Id').value
+				      		if(assetEntityAttributes[i].frontendInput == 'select'){
 					      		assetEntityParams.push(attributeCode+':'+attributeValue)
+				      		} else {
+				      			assetEntityParams.push(attributeCode+':'+attributeValue)
 				      		}
 				      	}
 		    	}
@@ -201,24 +181,17 @@
 				      	for (var i=0; i < length; i ++) {
 				      		var attribute = assetEntityAttributes[i]
 				      		var tdId = document.getElementById(attribute.attributeCode+'_'+attribute.id)
-				      		if(tdId != null && attribute.attributeCode != 'assetType'){
-				      			tdId.innerHTML = attribute.value 
+				      		if(tdId != null ){
+				      				tdId.innerHTML = attribute.value
 				      		}
 				      	}
 				  $("#editDialog").dialog("close")
 				} else {
 					alert("Asset Entity is not updated")
 				}
-				      	
       		}
 		    
 		    
-		    function setRowId(val){
-
-      			rowId = val.id
-
-      		}
-      		
       		function validateAssetEntity() {
       			var attributeSet = document.getElementById("attributeSetId").value;
       			if(attributeSet){
@@ -258,22 +231,20 @@
 					      var labelTd1 = document.createElement('td');
 					      var label1 = document.createTextNode(attribute1.label);
 					      labelTd1.appendChild( label1 )
-					      var inputField1 = document.createElement('input');
-							inputField1.type = 'text';
-							inputField1.name = attribute1.attributeCode;
-							inputField1.id = attribute1.attributeCode+'Id';
+					      var inputField1 = getInputType(attribute1); 
+					      inputField1.id = attribute1.attributeCode+'Id';
 					      inputTd1.appendChild( inputField1 )
 					      labelTd1.style.backgroundColor = '#f3f4f6 '
 					      labelTd1.style.width = '25%'
 					      labelTd1.noWrap = 'nowrap'
 					      tr.appendChild( labelTd1 )
 					      tr.appendChild( inputTd1 )
-					      if(attribute2){
+					      if(attribute2 ){
 					      var inputTd2 = document.createElement('td');
 					      var labelTd2 = document.createElement('td');
 					      var label2 = document.createTextNode(attribute2.label);
 					      labelTd2.appendChild( label2 )
-					      var inputField2 = document.createElement('input');
+					      var inputField2 = getInputType(attribute2);//document.createElement('input');
 							inputField2.type = 'text';
 							inputField2.name = attribute2.attributeCode;
 							inputField2.id = attribute2.attributeCode+'Id';
@@ -289,6 +260,45 @@
 				      	}
 			      }
 			      createTable.appendChild( tbody )
+      		}
+      		
+      		// function to construct the frontendInput tag
+      		function getInputType( attribute ){
+      			var name = attribute.attributeCode
+      			var type = attribute.frontendInput
+      			var options = attribute.options
+      			
+      			var inputField
+      			if(type == 'select'){
+					inputField = document.createElement('select');
+					inputField.name = name ;
+						var inputOption = document.createElement('option');
+						inputOption.value = ''
+						inputOption.innerHTML = 'please select'
+						inputField.appendChild(inputOption)
+						if (options) {
+					      var length = options.length
+					      for (var i=0; i < length; i++) {
+						      var optionObj = options[i]
+						      var popt = document.createElement('option');
+						      popt.innerHTML = optionObj.option
+						      popt.value = optionObj.option
+						      if(attribute.value == optionObj.option){
+							      popt.selected = true
+						      }
+						      try {
+						      	inputField.appendChild(popt, null) // standards compliant; doesn't work in IE
+						      } catch(ex) {
+						      	inputField.appendChild(popt) // IE only
+						      }
+					      }
+					   }						
+				} else {
+      			 	inputField = document.createElement('input');
+					inputField.type = type;
+					inputField.name = name;
+				}
+				return inputField; 
       		}
 		      
 	    </script>
@@ -351,7 +361,7 @@
 	<tbody>
 		<g:each in="${assetEntityInstanceList}" status="i"
 			var="assetEntityInstance">
-			<tr id="assetRow_${assetEntityInstance.id}" onClick="setRowId(this)"
+			<tr id="assetRow_${assetEntityInstance.id}" 
 				onmouseover="style.backgroundColor='#87CEEE';"
 				onmouseout="style.backgroundColor='white';">
 

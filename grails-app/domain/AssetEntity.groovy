@@ -23,7 +23,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String remoteMgmtPort
 	String truck	
 	Project project
-	AssetType assetType
+	String assetType
 	String assetName	
 	String assetTag
 	String serialNumber	

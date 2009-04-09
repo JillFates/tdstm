@@ -114,7 +114,7 @@
                                     <label for="assetType">Asset Type:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:assetEntityInstance,field:'assetType','errors')}">
-                                    <g:select optionKey="id" from="${AssetType.list()}" name="assetType.id" value="${assetEntityInstance?.assetType?.id}" noSelection="['null':'']"></g:select>
+                                    
                                 </td>
                             </tr> 
                         
