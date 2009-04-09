@@ -265,16 +265,11 @@ class AssetEntityController {
 	        }
 	        
 	        def asset
-	        def moveBundleAssetInstance 
+	        def assetEntityInstance 
 	        if( bundleSize == 1 && bundle[0] == "" ) {
 	        	asset = AssetEntity.findAllByProject( project )
 	        } else {
-	        	moveBundleAssetInstance = MoveBundleAsset.findAll( "from MoveBundleAsset m where  m.moveBundle in ( $bundleList )" )
-	        	if( moveBundleAssetInstance.size()>0 ) {
-	        		asset = AssetEntity.findAll( "from AssetEntity where project = project and id in (:asset)", [asset:moveBundleAssetInstance.asset.id] )
-	        	} else {
-	        		asset = []
-	        	}
+	        	asset = AssetEntity.findAll( "from AssetEntity m where m.project = project and m.moveBundle in ( $bundleList )" )
 	        }
 	        
 	        //get template Excel
@@ -356,31 +351,21 @@ class AssetEntityController {
 	                    def assetSize = asset.size()
 	                    def columnNameListSize = columnNameList.size()
 	                    for ( int r = 1; r <= assetSize; r++ ) {
-	                    	//get Move Bundle
-	                    	/*def assetEntityInstance = AssetEntity.findById( asset[r-1].id )
-	                        def moveBundleName = MoveBundleAsset.findByAsset( assetEntityInstance )*/
-//	                      Add assetId for walkthrough template only.
-	                        if( sheetColumnNames.containsKey("asset Id") ) {
+	                    	//Add assetId for walkthrough template only.
+	                        if( sheetColumnNames.containsKey("assetId") ) {
 		                        def addAssetId = new Label( 0, r, String.valueOf(asset[r-1].id))
 		                        sheet.addCell( addAssetId )
 	                        }                        
 	                        for ( int coll = 0; coll < columnNameListSize; coll++ ) {
 	                            def addContentToSheet
-	                            if( dataTransferAttributeMap.eavAttribute.attributeCode[coll].equals("moveBundle") ) {
-	                                //Add moveBundle for move into sheet.
-	                               /* if(moveBundleName == null){
-	                                	addContentToSheet = new Label( map[columnNameList.get(coll)], r, "" )
-	                                }else{
-	                                	addContentToSheet = new Label( map[columnNameList.get(coll)], r, String.valueOf(moveBundleName.moveBundle) )
-	                                }*/
-	                            } else {                            	
+	                                                        	
 	                                if ( asset[r-1].(dataTransferAttributeMap.eavAttribute.attributeCode[coll]) == null ) {
 	                                    addContentToSheet = new Label( map[columnNameList.get(coll)], r, "" )
 	                                } else {
 	                                    addContentToSheet = new Label( map[columnNameList.get(coll)], r, String.valueOf(asset[r-1].(dataTransferAttributeMap.eavAttribute.attributeCode[coll])) )
 	                                }
 	                                sheet.addCell( addContentToSheet )
-	                            }
+	                            
 	                            
 	                        }
 	                    }
