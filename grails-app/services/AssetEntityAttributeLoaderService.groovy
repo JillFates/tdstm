@@ -164,6 +164,7 @@ class AssetEntityAttributeLoaderService {
 	 */
 	def saveAssetsToBundle( def bundleTo, def bundleFrom, def assets ){
 		def moveBundleAssets
+		
 		// remove asstes from source bundle 
 		if ( bundleTo ) {
 			def moveBundleTo = MoveBundle.findById( bundleTo )
@@ -172,22 +173,21 @@ class AssetEntityAttributeLoaderService {
 			// assign assets to bundle
 			assetsList.each{asset->
 				if ( bundleFrom ) {
-					
-					def updateAssets = MoveBundleAsset.executeUpdate("update MoveBundleAsset set moveBundle = $bundleTo where moveBundle = $bundleFrom and asset = $asset ")
+					def updateAssets = AssetEntity.executeUpdate("update AssetEntity set moveBundle = $bundleTo where moveBundle = $bundleFrom  and id = $asset")
 				
 				} else {
-					def assetEntity = AssetEntity.findById( asset )
-					def assetsExist = MoveBundleAsset.findByMoveBundleAndAsset( moveBundleTo, assetEntity )
+					/*def assetEntity = AssetEntity.findById( asset )
+					def assetsExist = AssetEntity.findByMoveBundle( moveBundleTo )
 					if ( !assetsExist ) {
-						def moveBundleAsset = new MoveBundleAsset( moveBundle:moveBundleTo, asset:assetEntity ).save()
-					}
+						def moveBundleAsset = new AssetEntity( moveBundle:moveBundleTo, asset:assetEntity ).save()
+					}*/
+					def updateAssets = AssetEntity.executeUpdate("update AssetEntity set moveBundle = $bundleTo where id = $asset")
 				}
 			}
-			moveBundleAssets = MoveBundleAsset.findAll("from MoveBundleAsset where moveBundle = $bundleTo ")
+			moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = $bundleTo ")
 		} else{
-			def deleteAssets = MoveBundleAsset.executeUpdate("delete from MoveBundleAsset where moveBundle = $bundleFrom and asset in ($assets)")
+			def deleteAssets = AssetEntity.executeUpdate("update AssetEntity set moveBundle = null where moveBundle = $bundleFrom and id in ($assets)")
 		}
-		
 		return moveBundleAssets
 	}
 	
@@ -209,38 +209,53 @@ class AssetEntityAttributeLoaderService {
 		def projectTeamInstanceList = ProjectTeam.findAllByMoveBundle( bundleInstance )
     	if( rackPlan == 'RerackPlan') {
     		projectTeamInstanceList.each{projectTeam ->
-    			def assetCount = MoveBundleAsset.countByMoveBundleAndTargetTeam( bundleInstance, projectTeam )
+    			def assetCount = AssetEntity.countByMoveBundleAndTargetTeam( bundleInstance, projectTeam )
     			teamAssetCounts << [ teamCode: projectTeam.teamCode , assetCount:assetCount ]
     		}
     	} else {
     		projectTeamInstanceList.each{projectTeam ->
-				def assetCount = MoveBundleAsset.countByMoveBundleAndSourceTeam( bundleInstance, projectTeam )
+				def assetCount = AssetEntity.countByMoveBundleAndSourceTeam( bundleInstance, projectTeam )
 				teamAssetCounts << [ teamCode: projectTeam.teamCode , assetCount:assetCount ]
     		}
     	}
 		return teamAssetCounts
 	}
+	//	get Cart - #Asset count corresponding to Bundle
+	def getCartAssetCounts ( def bundleId, def cartList ) {
+		def cartAssetCounts = []
+		def bundleInstance = MoveBundle.findById(bundleId)
+		cartList.each { assetCart ->
+			def cartAssetCount = AssetEntity.countByMoveBundleAndCart( bundleInstance, assetCart.cart )
+			def AssetEntityList = AssetEntity.findAllByMoveBundleAndCart(bundleInstance, assetCart.cart)
+			def usize = 0
+			for(int AssetEntityRow = 0; AssetEntityRow < AssetEntityList.size(); AssetEntityRow++ ) {
+				usize = usize + Integer.parseInt(AssetEntityList[AssetEntityRow].usize ? AssetEntityList[AssetEntityRow].usize : 0)
+			}
+			cartAssetCounts << [ cart:assetCart.cart, cartAssetCount:cartAssetCount,usizeUsed:usize ]
+		}
+		return cartAssetCounts
+	}
 	
 	//get assetsList  corresponding to selected bundle to update assetsList dynamically
 	
-	def getAssetList ( def moveBundleAssetList, rackPlan, bundleInstance ) {
-		def moveBundleAsset = []
+	def getAssetList ( def assetEntityList, rackPlan, bundleInstance ) {
+		def assetEntity = []
 		def projectTeam =[]
 		def projectTeamInstanceList = ProjectTeam.findAllByMoveBundle( bundleInstance )
 		projectTeamInstanceList.each{teams ->
 			
             projectTeam << [ teamCode: teams.teamCode ]
 		}
-		for( int assetRow = 0; assetRow < moveBundleAssetList.size(); assetRow++) {
+		for( int assetRow = 0; assetRow < assetEntityList.size(); assetRow++) {
     		def displayTeam  
     		if( rackPlan == "RerackPlan" ) {
-    			displayTeam = moveBundleAssetList[assetRow]?.targetTeam?.teamCode
+    			displayTeam = assetEntityList[assetRow]?.targetTeam?.teamCode
     		}else {
-    			displayTeam = moveBundleAssetList[assetRow]?.sourceTeam?.teamCode
+    			displayTeam = assetEntityList[assetRow]?.sourceTeam?.teamCode
     		}
-    		def assetEntityInstance = AssetEntity.findById( moveBundleAssetList[assetRow].asset.id )
-    		moveBundleAsset <<[id:assetEntityInstance.id, assetName:assetEntityInstance.assetName, model:assetEntityInstance.model, sourceLocation:assetEntityInstance.sourceLocation, sourceRack:assetEntityInstance.sourceRack, targetLocation:assetEntityInstance.targetLocation, targetRack:assetEntityInstance.targetRack, sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, uSize:assetEntityInstance.usize, team:displayTeam, cart:moveBundleAssetList[assetRow]?.cart, shelf:moveBundleAssetList[assetRow]?.shelf, projectTeam:projectTeam ]
+    		def assetEntityInstance = AssetEntity.findById( assetEntityList[assetRow].id )
+    		assetEntity <<[id:assetEntityInstance.id, assetName:assetEntityInstance.assetName, model:assetEntityInstance.model, sourceLocation:assetEntityInstance.sourceLocation, sourceRack:assetEntityInstance.sourceRack, targetLocation:assetEntityInstance.targetLocation, targetRack:assetEntityInstance.targetRack, sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, uSize:assetEntityInstance.usize, team:displayTeam, cart:assetEntityList[assetRow]?.cart, shelf:assetEntityList[assetRow]?.shelf, projectTeam:projectTeam ]
     	}
-		return moveBundleAsset
+		return assetEntity
 	}
 }

@@ -396,38 +396,7 @@ class BootStrap {
 				roleTypeCodeTo: it[4]
             ).save( insert:true )
 		}
-/*
-		def assets = [
-			// project, type, name, asset tag, s/n, AssetOwner
-			[cedarsProject, serverAsset, "CSHSACADAFF", "XX-232-YAB", "12345",cedars],
-			[cedarsProject, serverAsset, "CSHSACCESS2", "XX-138-YAB", "2343455",cedars],
-			[cedarsProject, serverAsset, "CSHSBDGT1", "MM-2232", "1893045",cedars],
-			[cedarsProject, kvmSwitchAsset, "Avocent", "", "",cedars],
-			[cedarsProject, arrayAsset, "CSMCARM Juke", "RR-32-YAB", "SU023423LLK",cedars]
-		]
-		// Insert the list
-		// println "cedars"+cedars
-		assets.each {
-			def asset = new Asset(
-				project: it[0],
-				assetType: it[1],
-				assetName: it[2],
-				assetTag: it[3],
-				serialNumber: it[4],
-			    owner:it[5]
-			)
-			def ok = asset.validate()
-			if (ok) ok = asset.save()
-			if ( ok ) {
-				// Create the association between these servers and the application
-				new ApplicationAssetMap(application:raiserApp, asset:asset).save()
 
-			} else {
-				println "Asset save failed : ${it[2]} "
-				asset.errors.allErrors.each { println it }
-			}
-		}
-		*/
 		//--------------------------------
 		// Create EavEntityType and EavAttributeSet records
 		//--------------------------------
@@ -442,15 +411,15 @@ class BootStrap {
 		//---------------------------------
 		def assetEntityList = [
 		  			// project, type, name, asset tag, s/n, AssetOwner
-		  			["105C31D", "Workstation B2600", "XX-232-YAB", "XX-232-YABB", "rackad1", "rackad11", "1", "11", "12", attributeSet, cedarsProject, serverAsset, "C2A133", "ASD12345", "Mail", cedarsProject.client],
-		  			["105D74C CSMEDI","7028-6C4", "XX-138-YAB", "XX-138-YABB", "rackad2", "rackad22", "2", "22",  "12", attributeSet, cedarsProject, serverAsset, "C2A134", "ASD2343455", "SAP", cedarsProject.client],
-		  			["AIX Console HMC3", "KVM", "MM-2232", "MM-22322", "rackad3", "rackad33", "4", "44", "1", attributeSet, cedarsProject, serverAsset, "C2A135", "ASD1893045", "SAP", cedarsProject.client],
-		  			["105D74C CSMEDI", "AutoView 3100", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad44", "3", "33", "1", attributeSet, cedarsProject, kvmSwitchAsset, "C2A136", "ASD189234", "SAP", cedarsProject.client],
-		  			["CED14P", "Proliant 1600R", "RR-32-YAB", "RR-32-YABB", "rackad5", "rackad55", "6", "66", "5", attributeSet, cedarsProject, arrayAsset, "C2A137", "SU02325456", "SAP", cedarsProject.client],
-		  			["AIX Console HMC2", "V490", "RR-32-YAB", "RR-32-YABB", "rackad1", "rackad66", "7", "77", "5", attributeSet, cedarsProject, kvmSwitchAsset, "C2A138", "ASD1765454", "Mail", cedarsProject.client],
-		  			["AXPNTSA", "Proliant DL380 G3", "RR-32-YAB", "RR-32-YABB", "rackad2", "rackad77", "5", "55", "3", attributeSet, cedarsProject, serverAsset, "ASD12345", "Mail", cedarsProject.client],
-		  			["CEDCONSOLE1", "StorageWorks", "RR-32-YAB", "RR-32-YABB", "rackad3", "rackad88", "8", "88", "6", attributeSet, cedarsProject, serverAsset, "C2A140", "ASD2343455", "Mail", cedarsProject.client],
-		  			["CSEGP2 = CSENSD1 IO Drawer 1", "Ultrium Tape", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad99", "9", "99", "7", attributeSet, cedarsProject, arrayAsset, "C2A141", "SU0234423", "Mail", cedarsProject.client]
+		  			["105C31D", "Workstation B2600", "XX-232-YAB", "XX-232-YABB", "rackad1", "rackad11", "1", "11", "12", attributeSet, cedarsProject, serverAsset, "C2A133", "ASD12345", "Mail", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1, "shelf1" ],
+		  			["105D74C CSMEDI","7028-6C4", "XX-138-YAB", "XX-138-YABB", "rackad2", "rackad22", "2", "22",  "12", attributeSet, cedarsProject, serverAsset, "C2A134", "ASD2343455", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 2, "shelf1" ],
+		  			["AIX Console HMC3", "KVM", "MM-2232", "MM-22322", "rackad3", "rackad33", "4", "44", "1", attributeSet, cedarsProject, serverAsset, "C2A135", "ASD1893045", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 6, "shelf1" ],
+		  			["105D74C CSMEDI", "AutoView 3100", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad44", "3", "33", "1", attributeSet, cedarsProject, kvmSwitchAsset, "C2A136", "ASD189234", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 5, "shelf1" ],
+		  			["CED14P", "Proliant 1600R", "RR-32-YAB", "RR-32-YABB", "rackad5", "rackad55", "6", "66", "5", attributeSet, cedarsProject, arrayAsset, "C2A137", "SU02325456", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"],
+		  			["AIX Console HMC2", "V490", "RR-32-YAB", "RR-32-YABB", "rackad1", "rackad66", "7", "77", "5", attributeSet, cedarsProject, kvmSwitchAsset, "C2A138", "ASD1765454", "Mail", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"],
+		  			["AXPNTSA", "Proliant DL380 G3", "RR-32-YAB", "RR-32-YABB", "rackad2", "rackad77", "5", "55", "3", attributeSet, cedarsProject, serverAsset, "ASD12345",  "ASD1765454", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"],
+		  			["CEDCONSOLE1", "StorageWorks", "RR-32-YAB", "RR-32-YABB", "rackad3", "rackad88", "8", "88", "6", attributeSet, cedarsProject, serverAsset, "C2A140", "ASD2343455", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"],
+		  			["CSEGP2 = CSENSD1 IO Drawer 1", "Ultrium Tape", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad99", "9", "99", "7", attributeSet, cedarsProject, arrayAsset, "C2A141", "SU0234423", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"]
 		]
 		
 		// Insert the List of assetEntity
@@ -471,20 +440,25 @@ class BootStrap {
 				assetTag: it[12],
 				serialNumber: it[13],
 				application: it[14],
-				owner: it[15]
+				owner: it[15],
+				moveBundle: it[16],
+				sourceTeam: it[17],
+				targetTeam: it[18],
+				cart:it[19],
+				shelf:it[20]
             ).save()
 		}
 		//def assete = new AssetEntity(serverName:"CSHMC3", model:"AutoView 3100", room:"XX-232-YAB", rack:"rackad1", position:"1", uSize:"12", attributeSet:attributeSet)
 		// -------------------------------
 		// Create MoveBundleAsset Details
 		// -------------------------------
-        println "\n\n MOVE BUNDLE ASSET \n\n"
+		/*println "\n\n MOVE BUNDLE ASSET \n\n"
 		def moveBundle1Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle1, asset: AssetEntity.get(1),sourceTeam: cedarsGreenProjectTeam,targetTeam: cedarsRedProjectTeam,cart : 1,shelf: 2 ).save( insert:true )
 		def moveBundle2Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle1, asset: AssetEntity.get(2),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam,cart : 2,shelf: 3 ).save( insert:true )
 		def moveBundle3Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle2, asset: AssetEntity.get(3),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam,cart : 6,shelf: 4 ).save( insert:true )
 		def moveBundle4Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle3, asset: AssetEntity.get(4),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam,cart : 5,shelf: 8 ).save( insert:true )
 		def moveBundle5Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle2, asset: AssetEntity.get(5),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam,cart : 3,shelf: 9 ).save( insert:true )
-		def moveBundle6Asset = new MoveBundleAsset( moveBundle: twProjectMoveBundle, asset: AssetEntity.get(3),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam,cart : 1,shelf: 7 ).save( insert:true )
+		def moveBundle6Asset = new MoveBundleAsset( moveBundle: twProjectMoveBundle, asset: AssetEntity.get(3),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam,cart : 1,shelf: 7 ).save( insert:true )*/
 
 		
 		//--------------------------------

@@ -282,11 +282,11 @@
 					         </thead>  
 					         <tbody id="assetsRightTbodyId" >
 					         	<g:each in="${currentBundleAssets}" var="currentBundleAsset" status="i">
-					           <tr id="trright_${currentBundleAsset?.asset?.id}" onclick="selectCheckBox('rightassetId_${currentBundleAsset?.asset?.id}', this.id )">  
-					             <td><input type="checkbox" name="rightasset_${currentBundleAsset?.asset?.id}" id="rightassetId_${currentBundleAsset?.asset?.id}" value="${currentBundleAsset?.asset?.id}" onclick="selectCheckBox( this.id, 'trright_${currentBundleAsset?.asset?.id}' )"/>${currentBundleAsset?.asset?.assetTag}</td>  
-					             <td>${currentBundleAsset?.asset?.assetName}</td>  
-					             <td>${currentBundleAsset?.asset?.application}</td>  
-					             <td>${currentBundleAsset?.asset?.sourceLocation}/${currentBundleAsset?.asset?.sourceRack}</td>
+					           <tr id="trright_${currentBundleAsset?.id}" onclick="selectCheckBox('rightassetId_${currentBundleAsset?.id}', this.id )">  
+					             <td><input type="checkbox" name="rightasset_${currentBundleAsset?.id}" id="rightassetId_${currentBundleAsset?.id}" value="${currentBundleAsset?.id}" onclick="selectCheckBox( this.id, 'trright_${currentBundleAsset?.id}' )"/>${currentBundleAsset?.assetTag}</td>  
+					             <td>${currentBundleAsset?.assetName}</td>  
+					             <td>${currentBundleAsset?.application}</td>  
+					             <td>${currentBundleAsset?.sourceLocation}/${currentBundleAsset?.sourceRack}</td>
 					           </tr>  
 					           </g:each>
 					         </tbody>

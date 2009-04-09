@@ -79,13 +79,12 @@
          }
          function assetShelfAssign(shelf, asset)
          {
-         	
+         		
          		var shelfNumber = shelf.value
            		var asset = asset
            		var rackPlan = document.getElementById('rackPlan').value
            		var bundleId = document.getElementById('id').value
          		${remoteFunction(action:'assetShelfAssign', params:'\'shelfNumber=\' +shelfNumber+\'&asset=\'+asset+\'&bundleId=\'+bundleId')}
-         		
          	
          }
          	
@@ -167,7 +166,7 @@
      	var length = assetList.length 
      	table = document.getElementById('assetTable')
 		for (var i=0; i < length; i++) {
-			var moveBundleAsset = assetList[i]
+			var assetEntity = assetList[i]
 			var row = table.insertRow( i+1 ); 
 			if (i % 2 == 0) {
                     row.style.backgroundColor ='#FFFFFF';
@@ -176,51 +175,51 @@
                }
             
 	       	var cell1 = row.insertCell(0);
-	        cell1.innerHTML = moveBundleAsset.id
+	        cell1.innerHTML = assetEntity.id
 	         var assetElement = document.createElement("input");  
             assetElement.type = "hidden";
             assetElement.name = "asset"
             assetElement.id = "asset"
-            assetElement.value = moveBundleAsset.id 
+            assetElement.value = assetEntity.id 
             cell1.appendChild(assetElement); 
 	        var cell2 = row.insertCell(1);
-	        cell2.innerHTML = moveBundleAsset.assetName
+	        cell2.innerHTML = assetEntity.assetName
 	        var cell3 = row.insertCell(2);
-	        cell3.innerHTML = moveBundleAsset.model
+	        cell3.innerHTML = assetEntity.model
 	        if(rackPlan == "UnrackPlan") {
 	        	var cell4 = row.insertCell(3);
-	        	cell4.innerHTML = moveBundleAsset.sourceLocation
+	        	cell4.innerHTML = assetEntity.sourceLocation
 	        	var cell5 = row.insertCell(4);
-	        	cell5.innerHTML = moveBundleAsset.sourceRack	
+	        	cell5.innerHTML = assetEntity.sourceRack	
 	        }else {
 				var cell4 = row.insertCell(3);
-	        	cell4.innerHTML = moveBundleAsset.targetLocation
+	        	cell4.innerHTML = assetEntity.targetLocation
 	        	var cell5 = row.insertCell(4);
-	        	cell5.innerHTML = moveBundleAsset.targetRack		        	
+	        	cell5.innerHTML = assetEntity.targetRack		        	
 	        }
 	        var cell6 = row.insertCell(5);
 	        if(rackPlan == "RerackPlan") {
-	        	cell6.innerHTML = moveBundleAsset.targetPosition
+	        	cell6.innerHTML = assetEntity.targetPosition
 	        }else {
-				cell6.innerHTML = moveBundleAsset.sourcePosition	        	
+				cell6.innerHTML = assetEntity.sourcePosition	        	
 	        }
 	       
 	        var cell7 = row.insertCell(6);
-	        cell7.innerHTML = moveBundleAsset.uSize
+	        cell7.innerHTML = assetEntity.uSize
 	        var cell8 = row.insertCell(7);
-	        cell8.id = moveBundleAsset.id
+	        cell8.id = assetEntity.id
 	        cell8.onclick = function(){makeSelect(this, this.id );}
 	        var teamAssignElement = document.createElement("span");  
             teamAssignElement.style.display = 'block'
-            teamAssignElement.id = "span_"+moveBundleAsset.id
-            teamAssignElement.innerHTML = moveBundleAsset.team
+            teamAssignElement.id = "span_"+assetEntity.id
+            teamAssignElement.innerHTML = assetEntity.team
             teamAssignElement.style.width="50px"
             cell8.appendChild(teamAssignElement);
             var teamAssignSelectElement = document.createElement("select");  
             teamAssignSelectElement.style.display = 'block'
-            teamAssignSelectElement.id = moveBundleAsset.id
-            teamAssignSelectElement.name = "assetTeamAssign_"+moveBundleAsset.id
-            var projectTeamList = moveBundleAsset.projectTeam
+            teamAssignSelectElement.id = assetEntity.id
+            teamAssignSelectElement.name = "assetTeamAssign_"+assetEntity.id
+            var projectTeamList = assetEntity.projectTeam
             var defaultOption = document.createElement('option');
     		defaultOption.text = "UnAssigned"
     		defaultOption.value = "null"
@@ -233,7 +232,7 @@
     			
     			try {
       				teamAssignSelectElement.add(teamOption,null);
-      				if( moveBundleAsset.team == teamOption.value ) {
+      				if( assetEntity.team == teamOption.value ) {
       					teamAssignSelectElement.selectedIndex = teamRow+1
       				} 
       				 // standards compliant; doesn't work in IE
@@ -247,24 +246,24 @@
             
             teamAssignSelectElement.onchange = function(){assetToTeamAssign(this.value, this.id );}
             teamAssignSelectElement.style.display = 'none'
-            //var assetID =moveBundleAsset.id 
+            //var assetID =assetEntity.id 
             cell8.appendChild(teamAssignSelectElement); 
 		 	if(rackPlan == "RerackPlan") {
 		 		var cell9 = row.insertCell(8);
 	        	var cartElement = document.createElement("input");  
             	cartElement.type = "text";
-            	cartElement.name = "assetCartAssign_"+moveBundleAsset.id
-            	cartElement.id = moveBundleAsset.id
-           		cartElement.value = moveBundleAsset.cart 
+            	cartElement.name = "assetCartAssign_"+assetEntity.id
+            	cartElement.id = assetEntity.id
+           		cartElement.value = assetEntity.cart 
            		cartElement.onblur = function(){assetCartAssign(this, this.id );}
             	cartElement.style.width="50px"
             	cell9.appendChild(cartElement); 
            		var cell10 = row.insertCell(9);
 	        	var shelfElement = document.createElement("input");  
             	shelfElement.type = "text";
-            	shelfElement.name = "assetShelfAssign_"+moveBundleAsset.id
-            	shelfElement.value = moveBundleAsset.shelf
-            	shelfElement.id = moveBundleAsset.id
+            	shelfElement.name = "assetShelfAssign_"+assetEntity.id
+            	shelfElement.value = assetEntity.shelf
+            	shelfElement.id = assetEntity.id
             	shelfElement.onblur = function(){assetShelfAssign(this, this.id );} 
             	shelfElement.style.width="50px"
             	cell10.appendChild(shelfElement); 
@@ -451,12 +450,12 @@
               	<div style="float:right;">
               		<select id="filterRack" multiple="multiple" onchange="filterAssetsOnRack(this.value)" style="width: 100px; height: 70px;">
               			<option value="" selected="selected">All Racks</option>
-              			<g:each in="${moveBundleAssetsRacks}" var="moveBundleAssetsRacks">
+              			<g:each in="${assetEntitysRacks}" var="assetEntitysRacks">
               				<g:if test="${rack == 'UnrackPlan'}">
-              					<option value="${moveBundleAssetsRacks?.asset?.sourceRack}">${moveBundleAssetsRacks?.asset?.sourceRack}</option>
+              					<option value="${assetEntitysRacks?.sourceRack}">${assetEntitysRacks?.sourceRack}</option>
               				</g:if>
               				<g:else>
-              					<option value="${moveBundleAssetsRacks?.asset?.targetRack}">${moveBundleAssetsRacks?.asset?.targetRack}</option>
+              					<option value="${assetEntitysRacks?.targetRack}">${assetEntitysRacks?.targetRack}</option>
               				</g:else>
        	      				
 	           			</g:each>
@@ -531,40 +530,40 @@
               </thead>
               <tbody>
              <%int row=0;%>
-                <g:each in="${moveBundleAssetInstanceList}" var="moveBundleAssetInstance" status="i">
+                <g:each in="${assetEntityInstanceList}" var="assetEntityInstance" status="i">
                   <tr style="background-color: ${(i % 2) == 0 ? '#FFFFFF' : '#E0E0E0'}">
 
-                    <td style="border:1px;"><input type="hidden" name="asset" id="asset" value="${moveBundleAssetInstance?.asset?.id}" />${moveBundleAssetInstance?.asset?.id}</td>
+                    <td style="border:1px;"><input type="hidden" name="asset" id="asset" value="${assetEntityInstance?.id}" />${assetEntityInstance?.id}</td>
                     
-                    <td>${moveBundleAssetInstance?.asset?.assetName}</td>
+                    <td>${assetEntityInstance?.assetName}</td>
                     
-                    <td>${moveBundleAssetInstance?.asset?.model}</td>
+                    <td>${assetEntityInstance?.model}</td>
                     <g:if test="${rack == 'UnrackPlan'}">
-                    	<td>${moveBundleAssetInstance?.asset?.sourceLocation}</td>
+                    	<td>${assetEntityInstance?.sourceLocation}</td>
                     
-                    	<td>${moveBundleAssetInstance?.asset?.sourceRack}</td>
-                    	<td>${moveBundleAssetInstance?.asset?.sourceRackPosition}</td>
+                    	<td>${assetEntityInstance?.sourceRack}</td>
+                    	<td>${assetEntityInstance?.sourceRackPosition}</td>
                     </g:if>
                     <g:else>
-                    	<td>${moveBundleAssetInstance?.asset?.targetLocation}</td>
+                    	<td>${assetEntityInstance?.targetLocation}</td>
                     
-                    	<td>${moveBundleAssetInstance?.asset?.targetRack}</td>
-                    	<td>${moveBundleAssetInstance?.asset?.sourceRackPosition}</td>
+                    	<td>${assetEntityInstance?.targetRack}</td>
+                    	<td>${assetEntityInstance?.sourceRackPosition}</td>
                     </g:else>
                     
                     
-                    <td>${moveBundleAssetInstance?.asset?.usize}</td>
+                    <td>${assetEntityInstance?.usize}</td>
 					<g:if test="${rack == 'UnrackPlan'}">
-					<td id="${moveBundleAssetInstance?.asset?.id}" onclick="makeSelect(this,${moveBundleAssetInstance?.asset?.id})" >
-							<g:select style="display:none;" from= "${projectTeamInstance?.teamCode}" name="assetTeamAssign_${moveBundleAssetInstance?.asset?.id}" value="${moveBundleAssetInstance?.sourceTeam?.teamCode}" id="${moveBundleAssetInstance?.asset?.id}" value="${moveBundleAssetInstance?.sourceTeam?.teamCode}" noSelection="['null':'Unassigned']" onChange="assetToTeamAssign(this.value,'${moveBundleAssetInstance?.asset?.id}');"/>
-							<span id="span_${moveBundleAssetInstance?.asset?.id}">${moveBundleAssetInstance?.sourceTeam?.teamCode} </span></td>
+					<td id="${assetEntityInstance?.id}" onclick="makeSelect(this,${assetEntityInstance?.id})" >
+							<g:select style="display:none;" from= "${projectTeamInstance?.teamCode}" name="assetTeamAssign_${assetEntityInstance?.id}" value="${assetEntityInstance?.sourceTeam?.teamCode}" id="${assetEntityInstance?.id}" value="${assetEntityInstance?.sourceTeam?.teamCode}" noSelection="['null':'Unassigned']" onChange="assetToTeamAssign(this.value,'${assetEntityInstance?.id}');"/>
+							<span id="span_${assetEntityInstance?.id}">${assetEntityInstance?.sourceTeam?.teamCode} </span></td>
                     </g:if>
                     <g:else >
-                    <td id="${moveBundleAssetInstance?.asset?.id}" onclick="makeSelect(this,${moveBundleAssetInstance?.asset?.id})" >
-							<g:select style="display:none;"  from= "${projectTeamInstance?.teamCode}" name="assetTeamAssign_${moveBundleAssetInstance?.asset?.id}" value="${moveBundleAssetInstance?.targetTeam?.teamCode}" id="${moveBundleAssetInstance?.asset?.id}" noSelection="['null':'Unassigned']" onChange="assetToTeamAssign(this.value,'${moveBundleAssetInstance?.asset?.id}');"/>
-							<span id="span_${moveBundleAssetInstance?.asset?.id}">${moveBundleAssetInstance?.targetTeam?.teamCode} </span></td>
-						<td><input size=5px; type=text name="assetCartAssign_${moveBundleAssetInstance?.asset?.id}" id="${moveBundleAssetInstance?.asset?.id}" value="${moveBundleAssetInstance?.cart}" onblur="assetCartAssign(this,'${moveBundleAssetInstance?.asset?.id}');"/></td>
-						<td><input size=5px; type=text name="assetShelfAssign_${moveBundleAssetInstance?.asset?.id}" id="${moveBundleAssetInstance?.asset?.id}" value="${moveBundleAssetInstance?.shelf}" onblur="assetShelfAssign(this,'${moveBundleAssetInstance?.asset?.id}');"/></td>
+                    <td id="${assetEntityInstance?.id}" onclick="makeSelect(this,${assetEntityInstance?.id})" >
+							<g:select style="display:none;"  from= "${projectTeamInstance?.teamCode}" name="assetTeamAssign_${assetEntityInstance?.id}" value="${assetEntityInstance?.targetTeam?.teamCode}" id="${assetEntityInstance?.id}" noSelection="['null':'Unassigned']" onChange="assetToTeamAssign(this.value,'${assetEntityInstance?.id}');"/>
+							<span id="span_${assetEntityInstance?.id}">${assetEntityInstance?.targetTeam?.teamCode} </span></td>
+						<td><input size=5px; type=text name="assetCartAssign_${assetEntityInstance?.id}" id="${assetEntityInstance?.id}" value="${assetEntityInstance?.cart}" onblur="assetCartAssign(this,'${assetEntityInstance?.id}');"/></td>
+						<td><input size=5px; type=text name="assetShelfAssign_${assetEntityInstance?.id}" id="${assetEntityInstance?.id}" value="${assetEntityInstance?.shelf}" onblur="assetShelfAssign(this,'${assetEntityInstance?.id}');"/></td>
 					</g:else>
                   </tr>
                   <% row++;%>

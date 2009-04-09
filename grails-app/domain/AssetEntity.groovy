@@ -29,6 +29,12 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String serialNumber	
 	String application
 	PartyGroup owner
+	//MoveBundleAsset fields
+	MoveBundle moveBundle
+    ProjectTeam sourceTeam
+    ProjectTeam targetTeam
+    Integer cart
+    String shelf
 	
 	static hasMany = [
 		assetEntityVarchars : AssetEntityVarchar
@@ -62,7 +68,13 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		assetTag( blank:true )
 		serialNumber( blank:true )				
 		application( blank:true, nullable:true )
-		owner( blank:true, nullable:true )		
+		owner( blank:true, nullable:true )
+		//MoveBundleAsset fields
+		moveBundle( blank:true, nullable:true )
+        sourceTeam( blank:true, nullable:true )
+        targetTeam( blank:true, nullable:true )
+        cart( blank:true, nullable:true )
+        shelf( blank:true, nullable:true )
 	}
 	
 	static mapping  = {	
