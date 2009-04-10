@@ -328,7 +328,8 @@ class AssetEntityController {
 	                    for ( int r = 1; r <= assetSize; r++ ) {
 	                    	//Add assetId for walkthrough template only.
 	                        if( sheetColumnNames.containsKey("assetId") ) {
-		                        def addAssetId = new Label( 0, r, String.valueOf(asset[r-1].id))
+	                        	def integerFormat = new WritableCellFormat (NumberFormats.INTEGER)
+	                        	def addAssetId = new Number(0, r, (asset[r-1].id))	                        	
 		                        sheet.addCell( addAssetId )
 	                        }                        
 	                        for ( int coll = 0; coll < columnNameListSize; coll++ ) {
