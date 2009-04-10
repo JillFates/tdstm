@@ -525,5 +525,22 @@ class AssetEntityController {
     	}
     	render items as JSON
     }
-     
+     /*
+      *   will return data for auto complete fields
+      */
+    def getAutoCompleteDate = {
+    	def autoCompAttribs = params.autoCompParams
+    	def data = []
+    	if(autoCompAttribs){
+    		def autoCompAttribsList = autoCompAttribs.split(",")
+    		def currProj = getSession().getAttribute( "CURR_PROJ" )
+            def projectId = currProj.CURR_PROJ
+    		def project = Project.findById( projectId )
+    		autoCompAttribsList.each{
+    			def assetEntity = AssetEntity.executeQuery( "select distinct $it from AssetEntity where owner = $project.client.id" ) 
+    			data<<[value:assetEntity , attributeCode : it]
+	    	}
+    	}
+    	render data as JSON
+    }
 }

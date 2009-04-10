@@ -1,5 +1,4 @@
 
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -8,7 +7,10 @@
 
 <g:javascript library="prototype" />
 <g:javascript library="jquery" />
-
+<jq:plugin name="jquery.bgiframe.min"/>
+<jq:plugin name="jquery.autocomplete"/>
+<link type="text/css" rel="stylesheet"
+	href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
 <link type="text/css" rel="stylesheet"
 	href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
 <link type="text/css" rel="stylesheet"
@@ -39,6 +41,7 @@
 <script type="text/javascript">	
 		    function showAssetDialog( e ) {
       			var assetEntityAttributes = eval('(' + e.responseText + ')');
+      			var autoComp = new Array()
       			var showTable = document.getElementById("showTable");
       			var editTable = document.getElementById("editTable");
       			var stb = document.getElementById('showTbodyId')
@@ -57,76 +60,125 @@
 				// Rebuild the select
 			      if (assetEntityAttributes) {
 				      var length = assetEntityAttributes.length
-				      	for (var i=0; i < length; i += 2) {
-					      var attribute1 = assetEntityAttributes[i]
-					      var attribute2 = assetEntityAttributes[i + 1]
-					      var str = document.createElement('tr');
-					      var etr = document.createElement('tr');
+				      var halfLength = getLength(length) 
+				      var str = document.createElement('tr');
+				      var etr = document.createElement('tr');
+					  var stdLeft = document.createElement('td');
+					  stdLeft.style.width = '50%'
+					  var etdLeft = document.createElement('td');
+					  var stdRight = document.createElement('td');
+					  stdRight.style.width = '50%'
+					  var etdRight = document.createElement('td');
+					  var stableLeft = document.createElement('table');
+					  var etableLeft = document.createElement('table');
+					  stableLeft.style.width = '50%'
+					  stableLeft.style.border = '0'
+					  etableLeft.style.width = '50%'
+					  etableLeft.style.border = '0'
+					  var stableRight = document.createElement('table');
+					  var etableRight = document.createElement('table');
+					  stableRight.style.width = '50%'
+					  stableRight.style.border = '0'
+					  etableRight.style.width = '50%'
+					  etableRight.style.border = '0'
+				      	for (var i=0; i < halfLength; i++ ) {
+					      var attributeLeft = assetEntityAttributes[i]
+					      var strLeft = document.createElement('tr');
+					      var etrLeft = document.createElement('tr');
 					      // td for Show page
-					      var inputTd1 = document.createElement('td');
-					      var labelTd1 = document.createElement('td');
-					      var label1 = document.createTextNode(attribute1.label);
-					      labelTd1.appendChild( label1 )
-					      var inputField1 = document.createTextNode(attribute1.value);
-					      inputTd1.appendChild( inputField1 )
-					      labelTd1.style.backgroundColor = '#f3f4f6 '
-					      labelTd1.style.width = '25%'
-					      inputTd1.style.width = '25%'
-					      str.appendChild( labelTd1 )
-					      str.appendChild( inputTd1 )
+					      var inputTdLeft = document.createElement('td');
+					      var labelTdLeft = document.createElement('td');
+					      labelTdLeft.noWrap = 'nowrap'
+					      var labelLeft = document.createTextNode(attributeLeft.label);
+					      labelTdLeft.appendChild( labelLeft )
+					      var inputFieldLeft = document.createTextNode(attributeLeft.value);
+					      inputTdLeft.appendChild( inputFieldLeft )
+					      labelTdLeft.style.backgroundColor = '#f3f4f6 '
+					      labelTdLeft.style.width = '25%'
+					      inputTdLeft.style.width = '25%'
+					      strLeft.appendChild( labelTdLeft )
+					      strLeft.appendChild( inputTdLeft )
 					      
 					      // td for Edit page
-					      var inputTdE1 = document.createElement('td');
-					      var labelTdE1 = document.createElement('td');
-					      var labelE1 = document.createTextNode(attribute1.label);
-					      labelTdE1.appendChild( labelE1 )
-					      var inputFieldE1 = getInputType(attribute1);
-					      	  inputFieldE1.value = attribute1.value;
-							  inputFieldE1.id = 'edit'+attribute1.attributeCode+'Id';
-					      inputTdE1.appendChild( inputFieldE1 )
-					      labelTdE1.style.backgroundColor = '#f3f4f6 '
-					      labelTdE1.style.width = '25%'
-					      inputTdE1.style.width = '25%'
-					      etr.appendChild( labelTdE1 )
-					      etr.appendChild( inputTdE1 )
-					      if(attribute2){
-					      // TD for Show page
-					      var inputTd2 = document.createElement('td');
-					      var labelTd2 = document.createElement('td');
-					      var label2 = document.createTextNode(attribute2.label);
-					      labelTd2.appendChild( label2 )
-					      var inputField2 = document.createTextNode(attribute2.value);
-					      inputTd2.appendChild( inputField2 )
-					      labelTd2.style.backgroundColor = '#f3f4f6'
-					      inputTd2.style.width = '25%'
-					      labelTd2.style.width = '25%'
-					      str.appendChild( labelTd2 )
-					      str.appendChild( inputTd2 )
-					      // TD for Edit page
-					      var inputTdE2 = document.createElement('td');
-					      var labelTdE2 = document.createElement('td');
-					      var labelE2 = document.createTextNode(attribute2.label);
-					      labelTdE2.appendChild( labelE2 )
-					      var inputFieldE2 = getInputType(attribute2);
-							  inputFieldE2.value = attribute2.value;
-							  inputFieldE2.id = 'edit'+attribute2.attributeCode+'Id';
-					      inputTdE2.appendChild( inputFieldE2 )
-					      labelTdE2.style.backgroundColor = '#f3f4f6'
-					      inputTdE2.style.width = '25%'
-					      labelTdE2.style.width = '25%'
-					      etr.appendChild( labelTdE2 )
-					      etr.appendChild( inputTdE2 )
-					     }
-					      stbody.appendChild( str )
-					     etbody.appendChild( etr )
+					      var inputTdELeft = document.createElement('td');
+					      var labelTdELeft = document.createElement('td');
+					      labelTdELeft.noWrap = 'nowrap'
+					      var labelELeft = document.createTextNode(attributeLeft.label);
+					      labelTdELeft.appendChild( labelELeft )
+					      var inputFieldELeft = getInputType(attributeLeft);
+					      	  inputFieldELeft.value = attributeLeft.value;
+							  inputFieldELeft.id = 'edit'+attributeLeft.attributeCode+'Id';
+					      inputTdELeft.appendChild( inputFieldELeft )
+					      labelTdELeft.style.backgroundColor = '#f3f4f6 '
+					      labelTdELeft.style.width = '25%'
+					      inputTdELeft.style.width = '25%'
+					      etrLeft.appendChild( labelTdELeft )
+					      etrLeft.appendChild( inputTdELeft )
+					      stableLeft.appendChild( strLeft )
+					     etableLeft.appendChild( etrLeft )
 				      	
 				      	}
+				      	for (var i=halfLength; i < length; i++ ) {
+					      var attributeRight = assetEntityAttributes[i]
+					      var strRight = document.createElement('tr');
+					      var etrRight = document.createElement('tr');
+					      // td for Show page
+					      var inputTdRight = document.createElement('td');
+					      var labelTdRight = document.createElement('td');
+					      labelTdRight.noWrap = 'nowrap'
+					      var labelRight = document.createTextNode(attributeRight.label);
+					      labelTdRight.appendChild( labelRight )
+					      var inputFieldRight = document.createTextNode(attributeRight.value);
+					      inputTdRight.appendChild( inputFieldRight )
+					      labelTdRight.style.backgroundColor = '#f3f4f6 '
+					      labelTdRight.style.width = '25%'
+					      inputTdRight.style.width = '25%'
+					      strRight.appendChild( labelTdRight )
+					      strRight.appendChild( inputTdRight )
+					      
+					      // td for Edit page
+					      var inputTdERight = document.createElement('td');
+					      var labelTdERight = document.createElement('td');
+					      labelTdERight.noWrap = 'nowrap'
+					      var labelERight = document.createTextNode(attributeRight.label);
+					      labelTdERight.appendChild( labelERight )
+					      var inputFieldERight = getInputType(attributeRight);
+					      	  inputFieldERight.value = attributeRight.value;
+							  inputFieldERight.id = 'edit'+attributeRight.attributeCode+'Id';
+					      inputTdERight.appendChild( inputFieldERight )
+					      labelTdERight.style.backgroundColor = '#f3f4f6 '
+					      labelTdERight.style.width = '25%'
+					      inputTdERight.style.width = '25%'
+					      etrRight.appendChild( labelTdERight )
+					      etrRight.appendChild( inputTdERight )
+					      stableRight.appendChild( strRight )
+					     etableRight.appendChild( etrRight )
+				      	
+				      	}
+				      	for (var i=0; i < length; i++ ) {
+					      	var attribute = assetEntityAttributes[i]
+					      	if(attribute.frontendInput == 'autocomplete'){
+					      		autoComp.push(attribute.attributeCode)
+					      	}
+				      	}
+				  stdLeft.appendChild( stableLeft )
+			      etdLeft.appendChild( etableLeft )
+				  stdRight.appendChild( stableRight )
+				  etdRight.appendChild( etableRight )
+				  str.appendChild( stdLeft )
+				  etr.appendChild( etdLeft )
+				  str.appendChild( stdRight )
+				  etr.appendChild( etdRight )
+				  stbody.appendChild( str )
+				  etbody.appendChild( etr )
 			      }
-			      showTable.appendChild( stbody ) 
-			     editTable.appendChild( etbody ) 
+			      
+			     showTable.appendChild( stbody ) 
+			     editTable.appendChild( etbody )
+			     ${remoteFunction(action:'getAutoCompleteDate', params:'\'autoCompParams=\' + autoComp ', onComplete:'updateAutoComplete(e)')} 
 
-		      $("#showDialog").dialog('option', 'width', 700)
-		      $("#showDialog").dialog('option', 'position', ['right','top']);
+		      $("#showDialog").dialog('option', 'width', 600)
+		      $("#showDialog").dialog('option', 'position', ['center','top']);
 		      $("#showDialog").dialog("open")
 		      $("#createDialog").dialog("close")
 		      $("#editDialog").dialog("close")
@@ -135,19 +187,19 @@
 	    	
 	    	function createDialog(){
 
-		      $("#createDialog").dialog('option', 'width', 700)
-		      $("#createDialog").dialog('option', 'position', ['right','top']);
+		      $("#createDialog").dialog('option', 'width', 600)
+		      $("#createDialog").dialog('option', 'position', ['center','top']);
 		      $("#createDialog").dialog("open")
 		      $("#editDialog").dialog("close")
 		      $("#showDialog").dialog("close")
-		
+		      
 		    }
 		    
 		    function editAssetDialog() {
 
 		      $("#showDialog").dialog("close")
-		      $("#editDialog").dialog('option', 'width', 700)
-		      $("#editDialog").dialog('option', 'position', ['right','top']);
+		      $("#editDialog").dialog('option', 'width', 600)
+		      $("#editDialog").dialog('option', 'position', ['center','top']);
 		      $("#editDialog").dialog("open")
 		
 		    }
@@ -211,9 +263,11 @@
       		// function to generate createForm
       		
       		function generateCreateForm( e ){
+						
       			var assetEntityAttributes = eval('(' + e.responseText + ')');
       			var createTable = document.getElementById("createTable");
       			var tb = document.getElementById('createFormTbodyId')
+      			var autoComp = new Array()
 			    if(tb != null){
 			      createTable.removeChild(tb)
 			    }
@@ -223,45 +277,102 @@
 				// Rebuild the select
 			      if (assetEntityAttributes) {
 				      var length = assetEntityAttributes.length
-				      	for (var i=0; i < length; i += 2) {
-					      var attribute1 = assetEntityAttributes[i]
-					      var attribute2 = assetEntityAttributes[i + 1]
-					      var tr = document.createElement('tr');
-					      var inputTd1 = document.createElement('td');
-					      var labelTd1 = document.createElement('td');
-					      var label1 = document.createTextNode(attribute1.label);
-					      labelTd1.appendChild( label1 )
-					      var inputField1 = getInputType(attribute1); 
-					      inputField1.id = attribute1.attributeCode+'Id';
-					      inputTd1.appendChild( inputField1 )
-					      labelTd1.style.backgroundColor = '#f3f4f6 '
-					      labelTd1.style.width = '25%'
-					      labelTd1.noWrap = 'nowrap'
-					      tr.appendChild( labelTd1 )
-					      tr.appendChild( inputTd1 )
-					      if(attribute2 ){
-					      var inputTd2 = document.createElement('td');
-					      var labelTd2 = document.createElement('td');
-					      var label2 = document.createTextNode(attribute2.label);
-					      labelTd2.appendChild( label2 )
-					      var inputField2 = getInputType(attribute2);//document.createElement('input');
-							inputField2.type = 'text';
-							inputField2.name = attribute2.attributeCode;
-							inputField2.id = attribute2.attributeCode+'Id';
-					      inputTd2.appendChild( inputField2 )
-					      labelTd2.style.backgroundColor = '#f3f4f6 '
-					      labelTd2.style.width = '25%'
-					      labelTd2.noWrap = 'nowrap'
-					      tr.appendChild( labelTd2 )
-					      tr.appendChild( inputTd2 )
-					     }
-					      tbody.appendChild( tr )
-				      	
+				      var halfLength = getLength(length) 
+				      var tr = document.createElement('tr');
+					  var tdLeft = document.createElement('td');
+					  var tdRight = document.createElement('td');
+					  var tableLeft = document.createElement('table');
+					  tableLeft.style.width = '50%'
+					  tableLeft.style.border = '0'
+					  var tableRight = document.createElement('table');
+					  tableRight.style.width = '50%'
+					  tableRight.style.border = '0'
+				      for (var i=0; i < halfLength; i ++ ) {
+					      var attributeLeft = assetEntityAttributes[i]
+					      var trLeft = document.createElement('tr');
+					      var inputTdLeft = document.createElement('td');
+					      var labelTdLeft = document.createElement('td');
+					      var labelLeft = document.createTextNode(attributeLeft.label);
+					      labelTdLeft.appendChild( labelLeft )
+					      var inputFieldLeft = getInputType(attributeLeft); 
+					      inputFieldLeft.id = attributeLeft.attributeCode+'Id';
+					      inputTdLeft.appendChild( inputFieldLeft )
+					      labelTdLeft.style.backgroundColor = '#f3f4f6 '
+					      labelTdLeft.style.width = '25%'
+					      labelTdLeft.noWrap = 'nowrap'
+					      trLeft.appendChild( labelTdLeft )
+					      trLeft.appendChild( inputTdLeft )
+					      tableLeft.appendChild( trLeft )
+				      }
+				      for (var i=halfLength; i < length; i ++ ) {
+					      var attributeRight = assetEntityAttributes[i]
+					      var trRight = document.createElement('tr');
+					      var inputTdRight = document.createElement('td');
+					      var labelTdRight = document.createElement('td');
+					      var labelRight = document.createTextNode(attributeRight.label);
+					      labelTdRight.appendChild( labelRight )
+					      var inputFieldRight = getInputType(attributeRight); 
+					      inputFieldRight.id = attributeRight.attributeCode+'Id';
+					      inputTdRight.appendChild( inputFieldRight )
+					      labelTdRight.style.backgroundColor = '#f3f4f6 '
+					      labelTdRight.style.width = '25%'
+					      labelTdRight.noWrap = 'nowrap'
+					      trRight.appendChild( labelTdRight )
+					      trRight.appendChild( inputTdRight )
+					      tableRight.appendChild( trRight )
+				      }
+				      for (var i=0; i < length; i++ ) {
+				      	var attribute = assetEntityAttributes[i]
+				      	if(attribute.frontendInput == 'autocomplete'){
+				      		autoComp.push(attribute.attributeCode)
 				      	}
+				      }
+				      tdLeft.appendChild( tableLeft )
+				      tdRight.appendChild( tableRight )
+				      tr.appendChild( tdLeft )
+				      tr.appendChild( tdRight )
+				      tbody.appendChild( tr )
 			      }
 			      createTable.appendChild( tbody )
+			      ${remoteFunction(action:'getAutoCompleteDate', params:'\'autoCompParams=\' + autoComp ', onComplete:'createAutoComplete(e)')}
       		}
-      		
+      		function createAutoComplete(e){
+      			var data = eval('(' + e.responseText + ')');
+      			if (data) {
+				      var length = data.length
+				      for (var i=0; i < length; i ++ ) {
+					      var attribData = data[i]
+					      var code = attribData.attributeCode+"Id"
+					      var codeValue = attribData.value;
+				  			$("#"+code).autocomplete(codeValue);
+					  }
+				}
+				      			
+      		}
+      		function updateAutoComplete(e){
+      			var data = eval('(' + e.responseText + ')');
+      			if (data) {
+				      var length = data.length
+				      for (var i=0; i < length; i ++ ) {
+					      var attribData = data[i]
+					      var code = "edit"+attribData.attributeCode+"Id"
+					      var codeValue = attribData.value;
+				  			$("#"+code).autocomplete(codeValue);
+					  }
+				}
+				      			
+      		}
+      		function getLength( length ){
+      			var isOdd = (length%2 != 0) ? true : false
+      			var halfLength
+      			if(isOdd){
+      				length += 1;
+      				halfLength = length / 2 
+      			} else {
+      				halfLength = length / 2 
+      			}
+      			return halfLength; 
+      		}
       		// function to construct the frontendInput tag
       		function getInputType( attribute ){
       			var name = attribute.attributeCode
@@ -298,6 +409,7 @@
 					inputField.type = type;
 					inputField.name = name;
 				}
+				
 				return inputField; 
       		}
 		      
@@ -335,7 +447,7 @@
 			<th>Show</th>			
 
 			<g:sortableColumn property="application" title="Application" />
-
+			
 			<g:sortableColumn property="assetName" title="Asset Name" />
 			
 			<g:sortableColumn property="model" title="Model" />
@@ -369,7 +481,7 @@
 					<img src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px">
 				</g:remoteLink></td>				
 				
-				<td id="application_${assetEntityInstance.id}" >${fieldValue(bean:assetEntityInstance, field:'application')}</td>
+				<td id="application_${assetEntityInstance.id}" > ${fieldValue(bean:assetEntityInstance, field:'application')} </td>
 
 				<td id="assetName_${assetEntityInstance.id}">${fieldValue(bean:assetEntityInstance, field:'assetName')}</td>
 
@@ -408,9 +520,8 @@
 	<table id="createTable">
 		<tbody>
 			<tr class="prop">
-				<td valign="top" class="name" style="width:25%"><label for="attributeSet">Attribute Set:</label></td>
-				<td valign="top"><g:select optionKey="id" from="${com.tdssrc.eav.EavAttributeSet.list()}" id="attributeSetId" name="attributeSet.id" value="${assetEntityInstance?.attributeSet?.id}" noSelection="['':'select']" 
-				 onchange="${remoteFunction(action:'getAttributes', params:'\'attribSet=\' + this.value ', onComplete:'generateCreateForm(e)')}"></g:select></td>
+				<td valign="top" class="name" ><label for="attributeSet">Attribute Set:</label><span style="padding-left: 46px;"><g:select optionKey="id" from="${com.tdssrc.eav.EavAttributeSet.list()}" id="attributeSetId" name="attributeSet.id" value="${assetEntityInstance?.attributeSet?.id}" noSelection="['':'select']" 
+				 onchange="${remoteFunction(action:'getAttributes', params:'\'attribSet=\' + this.value ', onComplete:'generateCreateForm(e)')}"></g:select></span> </td>
 
 			</tr>
 		</tbody>
@@ -451,5 +562,6 @@
 		class="delete" onclick="return confirm('Are you sure?');"
 		value="Delete" /></span></div>
 </g:form></div>
+
 </body>
 </html>

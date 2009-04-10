@@ -36,7 +36,7 @@ class EavAttribute {
 		note(size:0..255)
 		backendType( blank:false, inList:['datetime', 'decimal', 'int', 'text', 'varchar'])
 		frontendLabel(size:0..255)
-		frontendInput( inList:['text', 'checkbox', 'select', 'multiselect', 'radio'])
+		frontendInput( inList:['text', 'checkbox', 'select', 'multiselect', 'radio', 'autocomplete'])
 		defaultValue( )
 		validation( )
 		isRequired(range:0..1)
