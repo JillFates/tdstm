@@ -23,7 +23,23 @@ class AssetEntityAttributeLoaderService {
 		def workbook
 		def sheet
 		def sheetNo = 0
-		def map = [ "Attribute Code":null, "Label":null, "Type":null, "sortOrder":null, "Note":null, "Input type":null, "Required":null, "Unique":null, "Business Rules (hard/soft errors)":null, "Spreadsheet Sheet Name":null, "Spreadsheet Column Name":null, "Options":null, "Walkthru Sheet Name":null, "Walkthru Column Name":null ]
+		def map = [
+				"Attribute Code":null,
+				"Label":null,
+				"Type":null,
+				"sortOrder":null,
+				"Note":null,
+				"Mode":null,
+				"Input type":null,
+				"Required":null,
+				"Unique":null,
+				"Business Rules (hard/soft errors)":null,
+				"Spreadsheet Sheet Name":null,
+				"Spreadsheet Column Name":null,
+				"Options":null,
+				"Walkthru Sheet Name":null,
+				"Walkthru Column Name":null ]
+
 		try{
         	workbook = Workbook.getWorkbook( stream )
         	sheet = workbook.getSheet( sheetNo )
@@ -34,16 +50,19 @@ class AssetEntityAttributeLoaderService {
         	// Statement to check Headers if header are not found it will return Error message
 			if ( checkCol == false ) {
         		println "headers not matched "
-			}else{
+			} else {
+
+				// Iterate over the spreadsheet rows and populate the EavAttribute table appropriately
 				for ( int r = 1; r < sheet.rows; r++ ) {
 					// get fields
-					def applicationCode = sheet.getCell( map["Attribute Code"], r ).contents
+					def attributeCode = sheet.getCell( map["Attribute Code"], r ).contents
 					def backEndType = sheet.getCell( map["Type"], r ).contents
 					def frontEndInput = sheet.getCell( map["Input type"], r ).contents
 					def fronEndLabel = sheet.getCell( map["Label"], r ).contents
 					def isRequired = sheet.getCell( map["Required"], r ).contents
 					def isUnique = sheet.getCell( map["Unique"], r ).contents
 					def note = sheet.getCell( map["Note"], r ).contents
+					def mode = sheet.getCell( map["Mode"], r ).contents
 					def sortOrder = sheet.getCell( map["sortOrder"], r ).contents
 					def validation = sheet.getCell( map["Business Rules (hard/soft errors)"], r ).contents
 					def options = sheet.getCell( map["Options"], r ).contents
@@ -52,7 +71,12 @@ class AssetEntityAttributeLoaderService {
 					def walkthruSheetName = sheet.getCell( map["Walkthru Sheet Name"], r ).contents
 					def walkthruColumnName = sheet.getCell( map["Walkthru Column Name"], r ).contents
 					// save data in to db(eavAttribute)
-					eavAttribute = new EavAttribute( attributeCode:applicationCode,
+
+					// Only save "Actual" or "Reference" attributes for the time being
+					if ( ! "AR".contains(mode) ) continue
+
+					// Try saving
+					eavAttribute = new EavAttribute( attributeCode:attributeCode,
 						note: note,
 						backendType: "varchar",
 						frontendInput: frontEndInput,
@@ -62,81 +86,89 @@ class AssetEntityAttributeLoaderService {
 						validation: validation,
 						isRequired: (isRequired.equalsIgnoreCase("X"))?1:0,
 						isUnique: (isUnique.equalsIgnoreCase("X"))?1:0,
-						sortOrder: sortOrder )
-					if ( eavAttribute && eavAttribute.save() ) {
-            			
-						//create DataTransferAttributeMap records related to the DataTransferSet
-						//def dataTransferSetId
-						def dataTransferSet
-						try {
-							dataTransferSet = DataTransferSet.findByTitle( "TDS Master Spreadsheet" )
-							def dataTransferAttributeMap = new DataTransferAttributeMap(
-								columnName:spreadColumnName,
-								sheetName:spreadSheetName,
-								dataTransferSet:dataTransferSet,
-								eavAttribute:eavAttribute,
-								validation:validation,
-								isRequired: (isRequired.equalsIgnoreCase("X"))?1:0
-							)
-							if( dataTransferAttributeMap ){
-								dataTransferAttributeMap.save()
+						sortOrder: sortOrder 
+					)
+
+					// Make sure we can save the record
+					if ( ! eavAttribute.validate() || ! eavAttribute.save() ) {
+						log.error "Unable to load attribute " + com.tdssrc.grails.GormUtil.allErrorsString( eavAttribute )
+						continue
+					}
+
+					//create DataTransferAttributeMap records related to the DataTransferSet
+					//def dataTransferSetId
+					def dataTransferSet
+					try {
+						dataTransferSet = DataTransferSet.findByTitle( "TDS Master Spreadsheet" )
+						def dataTransferAttributeMap = new DataTransferAttributeMap(
+							columnName: spreadColumnName,
+							sheetName: spreadSheetName,
+							dataTransferSet: dataTransferSet,
+							eavAttribute: eavAttribute,
+							validation: validation,
+							isRequired: (isRequired.equalsIgnoreCase("X"))?1:0
+						)
+						if( dataTransferAttributeMap ){
+							if ( ! dataTransferAttributeMap.save() ) {
+								log.error "Failed to load DataTransferAttributeMap for TDS Master" +
+									com.tdssrc.grails.GormUtil.allErrorsString( eavAttribute )
 							}
-						}catch ( Exception ex ) {
-		        			ex.printStackTrace()
 						}
-						// create DataTransferAttributeMap records (WalkThrough columns)related to the DataTransferSet
+					} catch ( Exception ex ) {
+						ex.printStackTrace()
+					}
+					// create DataTransferAttributeMap records (WalkThrough columns)related to the DataTransferSet
 		               
-						try {
-							dataTransferSet = DataTransferSet.findByTitle( "TDS Walkthru" )
-							def dataTransferAttributeMap = new DataTransferAttributeMap(
-								columnName:walkthruColumnName,
-								sheetName:walkthruSheetName,
-								dataTransferSet:dataTransferSet,
-								eavAttribute:eavAttribute,
-								validation:validation,
-								isRequired: (isRequired.equalsIgnoreCase("X"))?1:0
-							)
-							if( dataTransferAttributeMap ){
-								dataTransferAttributeMap.save()
-							}
-						}catch ( Exception ex ) {
-		        			ex.printStackTrace()
+					try {
+						dataTransferSet = DataTransferSet.findByTitle( "TDS Walkthru" )
+						def dataTransferAttributeMap = new DataTransferAttributeMap(
+							columnName:walkthruColumnName,
+							sheetName:walkthruSheetName,
+							dataTransferSet:dataTransferSet,
+							eavAttribute:eavAttribute,
+							validation:validation,
+							isRequired: (isRequired.equalsIgnoreCase("X"))?1:0
+						)
+						if( dataTransferAttributeMap ){
+							dataTransferAttributeMap.save()
 						}
-						//populate the EavEntityAttribute map associating each of the attributes to the set
-						def eavAttributeSetId
-						def eavAttributeSet
-						try {
-							eavAttributeSetId = 1
-							eavAttributeSet = EavAttributeSet.findById( eavAttributeSetId )
+					}catch ( Exception ex ) {
+						ex.printStackTrace()
+					}
+					//populate the EavEntityAttribute map associating each of the attributes to the set
+					def eavAttributeSetId
+					def eavAttributeSet
+					try {
+						eavAttributeSetId = 1
+						eavAttributeSet = EavAttributeSet.findById( eavAttributeSetId )
 		        		
-							def eavEntityAttribute = new EavEntityAttribute(
-		        				attribute:eavAttribute,
-		        				eavAttributeSet:eavAttributeSet,
-		        				sortOrder:sortOrder
-							)
-							if( eavEntityAttribute ){
-								eavEntityAttribute.save()
-							}
-						}catch ( Exception ex ) {
-		        			ex.printStackTrace()
+						def eavEntityAttribute = new EavEntityAttribute(
+							attribute:eavAttribute,
+							eavAttributeSet:eavAttributeSet,
+							sortOrder:sortOrder
+						)
+						if( eavEntityAttribute ){
+							eavEntityAttribute.save()
 						}
-						/*
-						 * After eavAttribute saved it will check for any options is there corresponding to current attribute
-						 * If there then eavAttributeOptions.save() will be called corresponding to current attribute
-						 */
-						if(options != ""){
-							String attributeOptions = options;
-							String[] eavAttributeOptions = null
-							eavAttributeOptions = attributeOptions.split(",");
-							for( int attributeOption = 0; attributeOption < eavAttributeOptions.length; attributeOption++ ){
-								def eavAttributeOption = new EavAttributeOption(
-									attribute:eavAttribute,
-									sortOrder:sortOrder,
-									value:eavAttributeOptions[attributeOption].trim()
-								)
-								if( eavAttributeOption ){
-									eavAttributeOption.save()
-								}
+					}catch ( Exception ex ) {
+						ex.printStackTrace()
+					}
+					/*
+					 * After eavAttribute saved it will check for any options is there corresponding to current attribute
+					 * If there then eavAttributeOptions.save() will be called corresponding to current attribute
+					 */
+					if(options != ""){
+						String attributeOptions = options;
+						String[] eavAttributeOptions = null
+						eavAttributeOptions = attributeOptions.split(",");
+						for( int attributeOption = 0; attributeOption < eavAttributeOptions.length; attributeOption++ ){
+							def eavAttributeOption = new EavAttributeOption(
+								attribute:eavAttribute,
+								sortOrder:sortOrder,
+								value:eavAttributeOptions[attributeOption].trim()
+							)
+							if( eavAttributeOption ){
+								eavAttributeOption.save()
 							}
 						}
 					}
@@ -176,7 +208,9 @@ class AssetEntityAttributeLoaderService {
 		if ( bundleTo ) {
 			def moveBundleTo = MoveBundle.findById( bundleTo )
 			// get Assets into list
+			// def assetsList = assets.tokenize(',')
 			def assetsList = getStringArray( assets )
+
 			// assign assets to bundle
 			assetsList.each{asset->
 				if ( bundleFrom ) {

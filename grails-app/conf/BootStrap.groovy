@@ -1,5 +1,7 @@
 import org.jsecurity.crypto.hash.Sha1Hash
 import com.tdssrc.eav.*
+import com.tdssrc.grails.GormUtil
+
 class BootStrap {
 	def assetEntityAttributeLoaderService
     def init = { servletContext ->
@@ -9,7 +11,7 @@ class BootStrap {
 		// The description now classifies groups of roles.  Eventually this will be implemented
 		// like ofBiz where there is a parent id.
 		// -------------------------------
-		println "\n\n ROLE TYPES \n\n"
+		println " ROLE TYPES "
 		def adminRole = new RoleType( description:"System : Administrator" )
 		adminRole.id = "ADMIN"
 		adminRole.save( insert:true )
@@ -109,7 +111,7 @@ class BootStrap {
 		// -------------------------------
 		// Party Types
 		// -------------------------------
-		println "\n\n PARTY TYPES\n\n"
+		println " PARTY TYPES"
 		def personPartyType = new PartyType( description:"Person" )
 		personPartyType.id = "PERSON"
 		personPartyType.save( insert:true )
@@ -133,7 +135,7 @@ class BootStrap {
 		// -----------------------------------------
 		// Create PartyRelationshipType Details
 		// -----------------------------------------
-		println "\n\n PARTY RELATIONSHIP TYPES\n\n"
+		println " PARTY RELATIONSHIP TYPES"
 		def staffType = new PartyRelationshipType( description:"Staff" )
 		staffType.id = "STAFF"
 		staffType.save( insert:true )
@@ -186,7 +188,7 @@ class BootStrap {
 		// -------------------------------
 		// Persons
 		// -------------------------------
-		println "\n\nPERSONS\n\n"
+		println "PERSONS"
 		def personJohn = new Person( firstName:'John', lastName:'Doherty', title:'Project Manager',
 			partyType:personPartyType ).save()
 		def personJimL = new Person( firstName:'Jim', lastName:'Laucher', title:'Tech',
@@ -217,7 +219,7 @@ class BootStrap {
 		// -------------------------------
 		// Create User Details.
 		// -------------------------------
-		println "\n\n USER DETAILS\n\n"
+		println " USER DETAILS"
 		def adminUserLisa = new UserLogin( person:personLisa, username: "lisa", password:new Sha1Hash("admin").toHex(), active:'Y'  ).save()
 		def userJohn = new UserLogin( person:personJohn, username: "john", password:new Sha1Hash("admin").toHex(), active:'Y' ).save()
 		def normalUserRalph = new UserLogin( person:personJimL, username:"ralph", password:new Sha1Hash("user").toHex(), active:'Y' ).save()
@@ -225,7 +227,7 @@ class BootStrap {
 		// -------------------------------
 		// Create Party Group (Companies)
 		// -------------------------------
-		println "\n\n PARTY GROUPS \n\n"
+		println " PARTY GROUPS "
 		def tds = new PartyGroup( name:"TDS", partyType:companyType ).save()
 		def emc = new PartyGroup( name:"EMC", partyType:companyType ).save()
 		def timeWarner = new PartyGroup( name:"Time Warner", partyType:companyType ).save()
@@ -244,7 +246,7 @@ class BootStrap {
 		// -------------------------------
 		// Create Projects
 		// -------------------------------
-		println "\n\n PROJECTS \n\n"
+		println " PROJECTS "
 		def cedarsProject = new Project( name:"Cedars-Sinai Move 1", projectCode:'CS1', client:cedars,
 			description:'100 servers', trackChanges:'Y', partyType:groupPartyType ).save();
 		def twProject = new Project( name:"Time Warner VA Move", projectCode:'TM-VA-1', client:timeWarner,
@@ -263,7 +265,7 @@ class BootStrap {
 		// -------------------------------
 		// Create MoveBundle Details
 		// -------------------------------
-		println "\n\n MOVE BUNDLE\n\n"
+		println "MOVE BUNDLE"
 		def cedarsProjectMoveBundle1 = new MoveBundle( project: cedarsProject, name: "Cedars Bundle1", startTime: new Date(), completionTime: new Date(), operationalOrder:1 ).save( insert:true )
 		def cedarsProjectMoveBundle2 = new MoveBundle( project: cedarsProject, name: "Cedars Bundle2", startTime: new Date(), completionTime: new Date(), operationalOrder:1 ).save( insert:true )
 		def cedarsProjectMoveBundle3 = new MoveBundle( project: cedarsProject, name: "Cedars Bundle3", startTime: new Date(), completionTime: new Date(), operationalOrder:1 ).save( insert:true )
@@ -273,7 +275,7 @@ class BootStrap {
 		// -------------------------------
 		// Create ProjectTeam
 		// -------------------------------
-		println "\n\n PROJECT TEAM \n\n"
+		println "PROJECT TEAM"
 		def cedarsGreenProjectTeam = new ProjectTeam( name: "Cedars's Green Team",	teamCode: "Green", moveBundle:cedarsProjectMoveBundle1, dateCreated: new Date()).save()
 		def cedarsRedProjectTeam = new ProjectTeam( name: "Cedars's Red Team",	teamCode: "Red", moveBundle:cedarsProjectMoveBundle1, dateCreated: new Date()).save()
 		def twGreenProjectTeam = new ProjectTeam( name: "TM's Green Team",	teamCode: "Green", moveBundle:twProjectMoveBundle, dateCreated: new Date()).save()
@@ -283,7 +285,7 @@ class BootStrap {
 		// -------------------------------
 		// Create default Preference
 		// -------------------------------
-		println "\n\n USER PREFERENCES \n\n"
+		println "USER PREFERENCES"
 		def johnPref = new UserPreference( value: cedarsProject.id )
 		johnPref.userLogin = userJohn
 		johnPref.preferenceCode = "CURR_PROJ"
@@ -293,7 +295,7 @@ class BootStrap {
 		// -------------------------------
 		// Create PartyRole Details
 		// -------------------------------
-		println "\n\n PARTY ROLES \n\n"
+		println "PARTY ROLES"
 		def partyRoleForRalph = new PartyRole( party:personJimL, roleType:userRole ).save( insert:true )
 		def partyRoleForLisa = new PartyRole( party:personLisa, roleType:userRole ).save( insert:true )
 		def partyRoleForJohn = new PartyRole( party:personJohn, roleType:adminRole ).save( insert:true )
@@ -303,7 +305,7 @@ class BootStrap {
 		// -------------------------------
         // create Party Relationship
 		// -------------------------------
-		println "\n\n PARTY RELATIONSHIPS \n\n"
+		println "PARTY RELATIONSHIPS "
 		def pr = [
 			// Partners, Clients and Vendors
 			[ partnerType, tds, companyRole, emc, partnerRole ],
@@ -376,7 +378,7 @@ class BootStrap {
 		//--------------------------------
 		// Create EavEntityType and EavAttributeSet records
 		//--------------------------------
-		println "\n\n ENTITY TYPE & ATTRIBUTE SET \n\n"
+		println "ENTITY TYPE & ATTRIBUTE SET"
 
 		def entityType = new EavEntityType( entityTypeCode:'AssetEntity', domainName:'AssetEntity', isAuditable:1  ).save()
 
@@ -397,7 +399,7 @@ class BootStrap {
 		  			["CEDCONSOLE1", "StorageWorks", "RR-32-YAB", "RR-32-YABB", "rackad3", "rackad88", "8", "88", "6", attributeSet, cedarsProject, "KVM Switch", "C2A140", "ASD2343455", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"],
 		  			["CSEGP2 = CSENSD1 IO Drawer 1", "Ultrium Tape", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad99", "9", "99", "7", attributeSet, cedarsProject, "KVM Switch", "C2A141", "SU0234423", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"]
 		]
-		
+
 		// Insert the List of assetEntity
 		assetEntityList.each {
 			def assetEntity = new AssetEntity(
@@ -422,13 +424,19 @@ class BootStrap {
 				targetTeam: it[18],
 				cart:it[19],
 				shelf:it[20]
-            ).save()
+            )
+			if ( ! assetEntity.validate() || ! assetEntity.save() ) {
+				def etext = "Unable to create asset ${it[0]}" +
+					 GormUtil.allErrorsString( assetEntity )
+				println etext
+				log.error( etext )
+			}
 		}
 		//def assete = new AssetEntity(serverName:"CSHMC3", model:"AutoView 3100", room:"XX-232-YAB", rack:"rackad1", position:"1", uSize:"12", attributeSet:attributeSet)
 		// -------------------------------
 		// Create MoveBundleAsset Details
 		// -------------------------------
-		/*println "\n\n MOVE BUNDLE ASSET \n\n"
+		/*println " MOVE BUNDLE ASSET"
 		def moveBundle1Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle1, asset: AssetEntity.get(1),sourceTeam: cedarsGreenProjectTeam,targetTeam: cedarsRedProjectTeam,cart : 1,shelf: 2 ).save( insert:true )
 		def moveBundle2Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle1, asset: AssetEntity.get(2),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam,cart : 2,shelf: 3 ).save( insert:true )
 		def moveBundle3Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle2, asset: AssetEntity.get(3),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam,cart : 6,shelf: 4 ).save( insert:true )
