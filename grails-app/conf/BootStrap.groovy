@@ -449,18 +449,19 @@ class BootStrap {
 		// Create DataTransferSet 
 		//--------------------------------
 		def dataTransferSetList = [
-		  			// project, type, name, asset tag, s/n, AssetOwner
-		  			["TDS Master Spreadsheet", "B", "/templates/ServerListExample.xls" ],
-		  			["TDS Walkthru", "B", "/templates/walkthrough_template.xls" ]
-		]
-		
+	    // project, type, name, asset tag, s/n, AssetOwner
+		    ["TDS Master Spreadsheet", "B", "/templates/ServerListExample.xls", "MASTER" ],
+		    ["TDS Walkthru", "B", "/templates/walkthrough+template.xls", "WALKTHROUGH" ]
+		     ]
+		                      
 		// Insert the List of DataTransferSet
-		dataTransferSetList.each {
-			def dataTransferSet = new DataTransferSet(
-				title: it[0],
-				transferMode: it[1],
-				templateFilename: it[2]
-            ).save()
+		    dataTransferSetList.each {
+		    def dataTransferSet = new DataTransferSet(
+		    title: it[0],
+		    transferMode: it[1],
+		    templateFilename: it[2],
+		    setCode: it[3]
+		  ).save()
 		}
 		/*
 		 * Getting Stream of object on AssetEntity_Attributes.xls and storing Stream as records in database 
