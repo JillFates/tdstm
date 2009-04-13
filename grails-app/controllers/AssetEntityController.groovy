@@ -195,6 +195,25 @@ class AssetEntityController {
 	                            }
 	                	
 	                        }
+	                        for( int i=0;  i < sheetNamesLength; i++ ) {
+	    	        	      	
+	                            if(sheetNames[i] == "Comments"){
+			        
+	                                def sheet1 = workbook.getSheet(sheetNames[i])
+			                        for( int rows1 = 1; rows1 < sheet1.rows; rows1++ ) {                           
+			                                
+			                        	dataTransferComment = new DataTransferComment()	
+			                        	dataTransferComment.assetId = Integer.parseInt(sheet1.getCell(0,rows1).contents)   
+	                                    dataTransferComment.commentType = sheet1.getCell(2,rows1).contents
+			                        	dataTransferComment.comment = sheet1.getCell(3,rows1).contents
+	                                    dataTransferComment.rowId = rows1
+	                                    dataTransferComment.dataTransferBatch = dataTransferBatch
+	                                    dataTransferComment.save()
+			                	
+			                        }
+	                            }
+	                        }
+	                    }
 
 	                    } // generate error message
 	                    workbook.close()
@@ -204,8 +223,8 @@ class AssetEntityController {
 	                    	flash.message = " File Uploaded Successfully with ${added} Assets. "
 	                    }
 	                    redirect( action:assetImport, params:[projectId:projectId] )
-	                }
-	            }
+	              
+	        }
 	        }catch( Exception ex ) {
 	            flash.message = grailsApplication.metadata[ 'app.file.format' ]
 	            redirect( action:assetImport, params:[projectId:projectId] )
