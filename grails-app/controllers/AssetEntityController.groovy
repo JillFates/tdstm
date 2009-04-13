@@ -562,4 +562,64 @@ class AssetEntityController {
     	}
     	render data as JSON
     }
+    /* 
+     * get comments for selected asset entity
+     */
+    def listComments = {
+        def assetEntityInstance = AssetEntity.get( params.id )
+        def assetCommentsInstance = AssetComment.findAllByAssetEntity( assetEntityInstance )
+        def assetCommentsList = []
+    	assetCommentsInstance.each {
+    	assetCommentsList <<[ commentInstance : it, assetEntityId : it.assetEntity.id ]    		
+        }
+        render assetCommentsList as JSON
+    }
+    /*
+     *  To save the Comment record 
+     */
+    def saveComment = {
+    	def assetComments = []
+    	def assetCommentInstance = new AssetComment(params)
+    	if(!assetCommentInstance.hasErrors() && assetCommentInstance.save()) {
+    		render assetCommentInstance as JSON
+        } else {
+        	render assetComments as JSON
+        }
+     }
+    /*
+     *  return the commet record
+     */
+    def showComment = {
+    		 def assetComment = AssetComment.get(params.id)
+    		render assetComment as JSON
+    }
+    /*
+     *  update comments
+     */
+    def updateComment = {
+    	def assetCommentInstance = AssetComment.get(params.id)
+    	assetCommentInstance.properties = params
+    	if(!assetCommentInstance.hasErrors()) {
+    		assetCommentInstance.save()
+        }
+    	render assetCommentInstance as JSON
+    }
+    /*
+     * 	 delete the comment record 
+     */
+    def deleteComment = {
+    		 def assetCommentInstance = AssetComment.get(params.id)
+    		 if(assetCommentInstance){
+    			 assetCommentInstance.delete()
+    		 }
+    		 println"ass---"+params.assetEntity
+    		 def assetEntityInstance = AssetEntity.get( params.assetEntity )
+    	        def assetCommentsInstance = AssetComment.findAllByAssetEntity( assetEntityInstance )
+    	        def assetCommentsList = []
+    	    	assetCommentsInstance.each {
+    	    	assetCommentsList <<[ commentInstance : it, assetEntityId : it.assetEntity.id ]    		
+    	        }
+    		 println"assetCommentsList----->"+assetCommentsList
+    	        render assetCommentsList as JSON 
+    }
 }

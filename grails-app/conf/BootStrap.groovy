@@ -463,6 +463,24 @@ class BootStrap {
 		    setCode: it[3]
 		  ).save()
 		}
+		
+		//--------------------------------
+		// Create AssetComment 
+		//--------------------------------
+		def assetCommentList = [
+		  			
+		  			["Master Spreadsheet comments", "instruction", 0, AssetEntity.get(1)],
+		  			["Walkthru comments", "issue", 0, AssetEntity.get(2) ]
+		]
+		//Insert the List of AssetComment
+		assetCommentList.each {
+			def assetComment = new AssetComment(
+				comment: it[0],
+				commentType: it[1],
+				mustVerify: it[2],
+				assetEntity: it[3]
+            ).save()
+		}
 		/*
 		 * Getting Stream of object on AssetEntity_Attributes.xls and storing Stream as records in database 
 		 * using assetEntityAttributeLoaderService
