@@ -72,7 +72,6 @@ class AssetEntityController {
 	        def dataTransferSet = params.dataTransferSet
 	        def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
 	        def dataTransferAttributeMap = DataTransferAttributeMap.findAllByDataTransferSet( dataTransferSetInstance )
-	       
 	        try {
 	            projectId = params["projectIdImport"]
 	            if ( projectId == null || projectId == "" ) {
@@ -181,7 +180,8 @@ class AssetEntityController {
 	                                    dataTransferValue.rowId = r
 	                                    dataTransferValue.dataTransferBatch = dataTransferBatch
 	                                    dataTransferValue.eavAttribute = eavAttributeInstance
-	                                    if( sheetColumnNames.containsKey("assetId") ) {
+	                                    if( sheetColumnNames.containsKey("assetId" && sheet.getCell( 0, r ).contents != "") ) {
+	                                    	
 	                                    	dataTransferValue.assetEntityId = Integer.parseInt(sheet.getCell( 0, r ).contents)            	                        
 	                                    } 
 	                                    //dataTransferValue.save()
