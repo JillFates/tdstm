@@ -275,8 +275,9 @@ class AssetEntityController {
             def protocol = tempProtocol.substring(0,tempProtocol.indexOf("/"))
             def serverName = request.getServerName()
             def serverPort = request.getServerPort()
+            def contextPath = request.getContextPath()
             // construct application URL
-            def appUrl = protocol + "://" + serverName + ":" + serverPort + "/" + grailsApplication.metadata['app.name']
+            def appUrl = protocol + "://" + serverName + ":" + serverPort + contextPath
             // get connection
             def filenametoSet = dataTransferSetInstance.templateFilename
             def templateFilePath = appUrl + filenametoSet

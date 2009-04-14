@@ -451,7 +451,7 @@ class BootStrap {
 		def dataTransferSetList = [
 	    // project, type, name, asset tag, s/n, AssetOwner
 		    ["TDS Master Spreadsheet", "B", "/templates/ServerListExample.xls", "MASTER" ],
-		    ["TDS Walkthru", "B", "/templates/walkthrough+template.xls", "WALKTHROUGH" ]
+		    ["TDS Walkthru", "B", "/templates/walkthrough_template.xls", "WALKTHROUGH" ]
 		     ]
 		                      
 		// Insert the List of DataTransferSet
