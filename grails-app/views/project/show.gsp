@@ -1,5 +1,3 @@
-
-
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -24,6 +22,13 @@
     <script type="text/javascript">
       $(document).ready(function(){
         $("#dialog").dialog({ autoOpen: false });
+      });
+      
+      $(document).ready(function(){
+        $("#reportDialog").dialog({ autoOpen: false });
+      });
+      $(document).ready(function(){
+        $("#rackLayoutDialog").dialog({ autoOpen: false });
       });
       
       function editProject(){
@@ -141,9 +146,149 @@
 	      completionDateObj.value = startDate;
 	      }
       }
-    </script>
+      
+     function showReportDialog(e) {
+     	
+     	var moveBundles = eval('(' + e.responseText + ')')     	
+      	var report = document.getElementById('reportId').value
+      	    	var selectObj
+      	if (report == "Rack Layout") {
+      	selectObj = document.getElementById('bundleId')
+      	}else {
+      		selectObj = document.getElementById('moveBundleId')
+      	}
+      	
+      	//Clear all previous options
+	     var l = selectObj.length	    
+	     while (l > 2) {
+	     l--
+	     selectObj.remove(l)
+	     }
+      	if (moveBundles) {
+		      // assign move bundles
+		      var length = moveBundles.length
+		      for (var i=0; i < length; i++) {
+			      var bundle = moveBundles[i]
+			      var opt = document.createElement('option');
+			      opt.innerHTML = bundle.name
+			      opt.value = bundle.id
+			      try {
+				      selectObj.appendChild(opt, null) // standards compliant; doesn't work in IE
+			      } catch(ex) {
+				      selectObj.appendChild(opt) // IE only
+			      }
+		      }
+		          	
+      }
+       if (report == "Rack Layout") {
+      		$("#rackLayoutDialog").dialog('option', 'width', 500)
+      		$("#rackLayoutDialog").dialog( "open" )
+      	}else {
+      		$("#reportDialog").dialog('option', 'width', 500)
+      		$("#reportDialog").dialog( "open" )
+      	}
+       		
+            	
+      	
+     } 
+     
+     function assignTeams(e) {
+     
+     	var projectteams = eval('(' + e.responseText + ')')   	
+      	
+      	var selectObj = document.getElementById('projectTeamId')
+      	//Clear all previous options
+	     var l = selectObj.length	    
+	     while (l > 1) {
+	     l--
+	     selectObj.remove(l)
+	     }
+      	if (projectteams) {
+		      // assign project teams
+		      var length = projectteams.length
+		      for (var i=0; i < length; i++) {
+			      var team = projectteams[i]
+			      var opt = document.createElement('option');
+			      opt.innerHTML = team.name
+			      opt.value = team.id
+			      try {
+				      selectObj.appendChild(opt, null) // standards compliant; doesn't work in IE
+			      } catch(ex) {
+				      selectObj.appendChild(opt) // IE only
+			      }
+		      }		          	
+      }
+     	
+     }
+     
+     function assignRacks(e) {
+     
+     	var racks = eval('(' + e.responseText + ')')   	
+      	
+      	var selectObj = document.getElementById('rackId')
+      	//Clear all previous options
+	     var l = selectObj.length	    
+	     while (l > 1) {
+	     l--
+	     selectObj.remove(l)
+	     }
+      	if (racks) {
+		      // assign project teams
+		      var length = racks.length
+		      for (var i=0; i < length; i++) {
+			      var team = racks[i]
+			      var opt = document.createElement('option');
+			      opt.innerHTML = team.name
+			      opt.value = team.id
+			      try {
+				      selectObj.appendChild(opt, null) // standards compliant; doesn't work in IE
+			      } catch(ex) {
+				      selectObj.appendChild(opt) // IE only
+			      }
+		      }		          	
+      }
+     	
+     }
+     
+     
+     
+     function populateTeams(val) {
+     	var hiddenBundle = document.getElementById('moveBundle')
+     	hiddenBundle.value = val
+     	var projectId = ${projectInstance?.id}     	
+     	if( val == "null") {
+     	 var selectObj = document.getElementById('projectTeamId')
+      	 //Clear all previous options
+	     var l = selectObj.length	    
+	     while (l > 1) {
+	     l--
+	     selectObj.remove(l)
+	     }
+     	 return false
+     	} else {
+     	 ${remoteFunction(action:'getTeamsForBundles', params:'\'bundleId=\' + val +\'&projectId=\'+projectId', onComplete:'assignTeams(e)')}
+     	}
+     }   
+     
+     function populateRacks(val) {
+     	var projectId = ${projectInstance?.id}     	
+     	if( val == "null") {
+     	 var selectObj = document.getElementById('rackId')
+      	 //Clear all previous options
+	     var l = selectObj.length	    
+	     while (l > 1) {
+	     l--
+	     selectObj.remove(l)
+	     }
+     	 return false
+     	} else {
+     	 ${remoteFunction(action:'getRacksForBundles', params:'\'bundleId=\' + val +\'&projectId=\'+projectId', onComplete:'assignRacks(e)')}
+     	}
+     }  
+      </script>
   </head>
   <body>
+ 
     <div class="menu2">
       <ul>
         <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
@@ -153,6 +298,13 @@
         <li><a href="#">Contacts </a></li>
         <li><a href="#">Applications </a></li>
         <li><g:link class="home" controller="moveBundle" params="[projectId:projectInstance?.id]">Move Bundles</g:link></li>
+        <li><select id="reportId"
+                                 name="report"
+                                 onchange="${remoteFunction(action:'getBundleListForReportDialog', params:'\'reportId=\'+this.value ', onComplete:'showReportDialog(e)' )}">
+                    <option value="" selected="selected">Reports</option>
+                    <option value="Team Worksheets" >Team Worksheets</option> 
+                    <option value="Rack Layout" >Rack Layout</option>                   
+                </select></li>
       </ul>
     </div>
     <div class="body">
@@ -167,7 +319,103 @@
     <g:if test="${flash.message}">
       <div class="message">${flash.message}</div>
     </g:if>
-    <div class="dialog" id="updateShow">
+    <div id="reportDialog" title="Team Worksheets" style="display:none;">
+     <table id="reportTable">
+     	<tbody>
+     		<tr class="prop" id="bundleRow">
+                <td valign="top" class="name">
+                  <label>Bundles:</label>
+                </td>
+                <td valign="top" class="value"><select id="moveBundleId"
+                                 name="moveBundle" onchange="return populateTeams(this.value)">
+                    <option value="null" selected="selected">Please Select</option>
+                    <option value="" >All Bundles</option>
+                                      
+                  </select>
+               </td>   
+              </tr>
+              <tr class="prop" id="teamRow">
+                <td valign="top" class="name">
+                  <label>Teams:</label>
+                </td>
+                <td valign="top" class="value"><select id="projectTeamId"
+                                 name="projectTeam">
+                    <option value="null" selected="selected">All Teams</option>                   
+                                      
+                  </select>
+               </td> 
+              </tr>
+              <tr>
+              	<td valign="top" class="name">
+                  <label>Location:</label>
+                </td>
+                <td>
+                	<g:radio name="location" value="1" checked="true"/> Both
+                	<g:radio name="location" value="2" /> Source
+                	<g:radio name="location" value="3" /> Target               	
+                </td>                
+              </tr>
+              <tr>
+                <td class="buttonR"><g:jasperReport jasper="BundleAsset" format="PDF" name="Generate"  value = "Generate">
+                	<input type="hidden" name="moveBundle" id="moveBundle" value="" />
+                	</g:jasperReport>
+                	</td>
+              </tr>
+     	</tbody>
+     </table>
+  	</div>
+  	
+  	  <div id="rackLayoutDialog" title="Rack Layout" style="display:none;">
+     <table id="rackLayoutTable">
+     	<tbody>
+     		<tr class="prop" id="bundleRow">
+                <td valign="top" class="name">
+                  <label>Bundles:</label>
+                </td>
+                <td valign="top" class="value">
+                
+                <select id="bundleId"
+                                 name="moveBundle" onchange="return populateRacks(this.value)">
+                    <option value="null" selected="selected">Please Select</option>
+                    <option value="" >All Bundles</option>
+                                      
+                  </select>
+               </td>   
+              </tr>
+              <tr class="prop" id="teamRow">
+                <td valign="top" class="name">
+                  <label>Racks:</label>
+                </td>
+                <td valign="top" class="value">
+                <select id="rackId" multiple="multiple" name="rack"  style="width: 100px; height: 100px;">
+                
+                    <option value="null" selected="selected">All Racks</option>                   
+                                      
+                  </select>
+               </td> 
+              </tr>
+              <tr>
+              <td colspan="2"><div style="width:100%;height:10px;float:left;"> Hold [Ctrl] when clicking to choose multiple racks  </div></td>
+              </tr>
+              <tr>
+              	<td valign="top" class="name">
+                  <label>Racks/Page:</label>
+                </td>
+                <td>
+                	<g:select id="rackPerPage" from="${1..6}" value="3" />              	
+                </td>                
+              </tr>
+              <tr>
+                <td class="buttonR"><g:jasperReport  jasper="BundleAsset" format="PDF" name="Generate"  >
+                	<input type="hidden" name="moveBundle" value="23" />
+                	</g:jasperReport>
+                	</td>
+              </tr>
+     	</tbody>
+     </table>
+  	</div>
+    
+  	    <div class="dialog" id="updateShow">
       <table>
         <tbody>
 
@@ -264,7 +512,9 @@
 
         </tbody>
       </table>
-    </div>
+    </div>   
+    
+  	
     <div id="dialog" title="Edit Project" style="display:none;">
 
       <g:form name="editForm" method="post" action="update" name="editProjectForm">
@@ -454,6 +704,6 @@ class="value ${hasErrors(bean:projectInstance,field:'completionDate','errors')}"
       </g:form>
     </div>
   </body>
-  </div>
-  </body>
+  </div>  
+  </body>  
 </html>
