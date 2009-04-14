@@ -167,7 +167,7 @@ class AssetEntityController {
                     dataTransferBatch.project = project
                     dataTransferBatch.userLogin = userLogin
                     if(dataTransferBatch.save()){
-	                        
+                    	def dataTransferComment    
                         def dataTransferValue
                         def eavAttributeInstance
                         for( int cols = 0; cols < col; cols++ ) {
@@ -180,7 +180,7 @@ class AssetEntityController {
                                     dataTransferValue.rowId = r
                                     dataTransferValue.dataTransferBatch = dataTransferBatch
                                     dataTransferValue.eavAttribute = eavAttributeInstance
-                                    if( sheetColumnNames.containsKey("assetId" && sheet.getCell( 0, r ).contents != "") ) {
+                                    if( sheetColumnNames.containsKey("assetId") && (sheet.getCell( 0, r ).contents != "") ) {
 	                                    	
                                         dataTransferValue.assetEntityId = Integer.parseInt(sheet.getCell( 0, r ).contents)
                                     }
@@ -196,14 +196,14 @@ class AssetEntityController {
 	                	
                         }
                         for( int i=0;  i < sheetNamesLength; i++ ) {
-	    	        	      	
+	    	        	    	
                             if(sheetNames[i] == "Comments"){
-			        
+                            	
                                 def sheet1 = workbook.getSheet(sheetNames[i])
                                 for( int rows1 = 1; rows1 < sheet1.rows; rows1++ ) {
-			                                
+                                	
                                     dataTransferComment = new DataTransferComment()
-                                    dataTransferComment.assetId = Integer.parseInt(sheet1.getCell(0,rows1).contents)
+                                    dataTransferComment.assetId = Integer.parseInt(sheet1.getCell(0,rows1).contents)                                 
                                     dataTransferComment.commentType = sheet1.getCell(2,rows1).contents
                                     dataTransferComment.comment = sheet1.getCell(3,rows1).contents
                                     dataTransferComment.rowId = rows1
@@ -364,15 +364,31 @@ class AssetEntityController {
 	                            
 	                            
                         }
-                    }
-
+                    }                
+ 
+                   /* for( int sl=0;  sl < sheetNamesLength; sl++ ) {
+                    	println"sheetNames[sl] value-->"+sheetNames[sl]	
+                        if(sheetNames[sl] == "Comments"){
+                        	println"comg commentList val--------->"
+                        	def sheet1 = book.getSheet( sheetNames[sl] ) 
+                        	asset.each{
+                            	def commentList = AssetComment.findAllByAssetEntity(it.id)	
+                            	}
+                                if(commentList){
+                                	println"commentList val--------->"+commentList
+                               
+                            println"commentList val--------->"+sheet1
+                            def de = new Label(0,5, "bhuvana");
+                            sheet1.addCell(de)
+                                }
+                        }
+                    }*/
                     book.write()
                     book.close()
                     render( view: "importExport" )
                 }
             }
         } catch( Exception fileEx ) {
-
             flash.message = "Excel template not found. "
             redirect( action:assetImport, params:[projectId:projectId] )
 

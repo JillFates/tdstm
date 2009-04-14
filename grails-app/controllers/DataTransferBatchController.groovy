@@ -31,21 +31,38 @@ class DataTransferBatchController {
     		}else {
     			assetEntity = AssetEntity.findById(assetEntityId)
     		}
-    		assetEntity.project = projectInstance 
-    		dtvList.each {
-    			def attribName = it.eavAttribute.attributeCode
-    			if ( attribName == "moveBundle" ) {
-    				if( it.importValue != null && it.correctedValue != null ) {
-    					def importMoveBundleInstance = MoveBundle.findByName(it.importValue)
-        				def exportMoveBundleInstance = MoveBundle.findByName(it.correctedValue)
-        				assetEntity."$attribName" = exportMoveBundleInstance ? exportMoveBundleInstance : importMoveBundleInstance
-    				}
-    			}else {
-    				assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
-    			}
+    		if(assetEntity){
+	    		assetEntity.project = projectInstance 
+	    		dtvList.each {
+	    			def attribName = it.eavAttribute.attributeCode
+	    			if ( attribName == "moveBundle" ) {
+	    				if( it.importValue != null && it.correctedValue != null ) {
+	    					def importMoveBundleInstance = MoveBundle.findByName(it.importValue)
+	        				def exportMoveBundleInstance = MoveBundle.findByName(it.correctedValue)
+	        				assetEntity."$attribName" = exportMoveBundleInstance ? exportMoveBundleInstance : importMoveBundleInstance
+	    				}
+	    			}else {
+	    				assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
+	    			}
+	    		}
+	    		assetEntity.save()
     		}
-    		assetEntity.save()
-    	}     			   
+    	}  
+    	def dataTransferCommentRowList = DataTransferComment.findAll(" From DataTransferComment dtc where dtc.dataTransferBatch = $dataTransferBatch.id")
+    	def assetComment
+    	
+    	if(dataTransferCommentRowList){
+    		
+    		dataTransferCommentRowList.each{
+    			assetComment = new AssetComment() 
+    			assetComment.comment = it.comment        		
+        		assetComment.commentType = it.commentType
+        		assetComment.mustVerify = it.mustVerify
+        		assetComment.assetEntity =AssetEntity.findById(it.assetId)        		
+        		assetComment.save()
+    		}
+    		
+    	}
     	 redirect (action:list, params:[projectId:projectId])
      }
     /*
