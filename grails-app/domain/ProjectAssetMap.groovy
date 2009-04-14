@@ -1,17 +1,19 @@
 /**
  * This domain is used to manage the many-to-many relationship of assets that are owned 
  * by a company but can be associated to one or more projects.
- **/
+ * */
 class ProjectAssetMap {
-    Project	project
-    AssetEntity	asset
-    Date createdDate
+	Project project
+	AssetEntity asset
+	String currentState
+	Date createdDate = new Date()
+	Date lastModified
 
-	static mapping  = {
+	static mapping = {
 		version false
 	}
-	
-	String toString(){
-		"${project.name} : ${asset.assetName}" 
+
+	String toString() {
+		"${project.name} : ${asset.assetName}"
 	}
 }

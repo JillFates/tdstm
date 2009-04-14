@@ -2,6 +2,8 @@ class ProjectTeam extends PartyGroup{
 
 	MoveBundle moveBundle
 	String teamCode
+	String currentLocation = ""
+	Integer isIdle=1
 	String isDisbanded = "N"
 
 	static constraints = {
@@ -19,6 +21,7 @@ class ProjectTeam extends PartyGroup{
 		columns {
 			isDisbanded sqlType: 'char(1)'
 			teamCode sqlType: 'varchar(20)'
+			isIdle sqlType: 'tinyint(1)'
 		}
 	}
 	
