@@ -1,0 +1,65 @@
+#menubar {
+      border-top: 2px solid #0366b0;
+      border-right: 2px solid #0366b0;
+      border-bottom: 2px solid #0366b0;
+      border-left: 2px solid #0366b0;
+      background-color: #0366b0;
+      color: #9ACAEE;
+      height: 1.4em;
+      line-height: 1.2em;
+	  width:130px;
+	  font:12px Tahoma;
+	  font-weight:bold;
+	  float:left;
+	  widht:150px;
+	  height:auto;
+	}
+    
+    .menu_new {
+      width: auto;
+      height:auto;
+      float: left;
+      padding: 0.1em 3em 0.1em 0.5em;
+      cursor: default;
+    }
+    
+    .menu_new ul {
+      display: none;
+      position: absolute;
+      background-color: #0366b0;
+      color: black;
+      list-style: none;
+      margin: 0.1em 0 0 0;
+      padding: 0;
+      width:150px;
+      height:auto;
+      float:left;
+    }
+    
+    .menu_new ul li {
+      display: block;
+      padding: 0.2em;
+    }
+    
+    .menu_new ul li a {
+      background-color: #0366b0;
+      width:120px;
+      color: #9ACAEE;
+      font:11px Tahoma;
+	  font-weight:bold;
+	  border:0px;	
+	  text-align:left;
+	  padding-top:5px;  
+    }
+    
+    .menu_new ul li a:hover {
+      color: #ffffff;
+    }
+    
+    div.menu_new:hover ul {
+      display: block;
+      margin: 0;
+      padding: 0;
+    }
+
+

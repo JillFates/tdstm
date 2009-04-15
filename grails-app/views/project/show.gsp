@@ -13,13 +13,14 @@
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}"  />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}"  />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
-
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dropDown.css')}" />
     <jq:plugin name="ui.core"/>
     <jq:plugin name="ui.draggable"/>
     <jq:plugin name="ui.resizable"/>
     <jq:plugin name="ui.dialog"/>
     
     <script type="text/javascript">
+    var reportName="";
       $(document).ready(function(){
         $("#dialog").dialog({ autoOpen: false });
       });
@@ -148,10 +149,9 @@
       }
       
      function showReportDialog(e) {
-     	
      	var moveBundles = eval('(' + e.responseText + ')')     	
-      	var report = document.getElementById('reportId').value
-      	    	var selectObj
+      	var report = reportName
+      	var selectObj
       	if (report == "Rack Layout") {
       	selectObj = document.getElementById('bundleId')
       	}else {
@@ -271,6 +271,8 @@
      }   
      
      function populateRacks(val) {
+     var hiddenBundle = document.getElementById('rackMoveBundle')
+     	hiddenBundle.value = val
      	var projectId = ${projectInstance?.id}     	
      	if( val == "null") {
      	 var selectObj = document.getElementById('rackId')
@@ -284,7 +286,18 @@
      	} else {
      	 ${remoteFunction(action:'getRacksForBundles', params:'\'bundleId=\' + val +\'&projectId=\'+projectId', onComplete:'assignRacks(e)')}
      	}
-     }  
+     } 
+     
+      
+     function generateReportSelect(reportId){
+     reportName = reportId
+     ${remoteFunction(action:'getBundleListForReportDialog', params:'\'reportId=\'+reportId', onComplete:'showReportDialog(e)' )}""
+     }
+     
+     function selectTeamFilter(team){
+     var teamFilter = document.getElementById('teamFilter')
+     teamFilter.value = team
+     }
       </script>
   </head>
   <body>
@@ -298,14 +311,22 @@
         <li><a href="#">Contacts </a></li>
         <li><a href="#">Applications </a></li>
         <li><g:link class="home" controller="moveBundle" params="[projectId:projectInstance?.id]">Move Bundles</g:link></li>
-        <li><select id="reportId"
-                                 name="report"
-                                 onchange="${remoteFunction(action:'getBundleListForReportDialog', params:'\'reportId=\'+this.value ', onComplete:'showReportDialog(e)' )}">
-                    <option value="" selected="selected">Reports</option>
-                    <option value="Team Worksheets" >Team Worksheets</option> 
-                    <option value="Rack Layout" >Rack Layout</option>                   
-                </select></li>
+        <li>
+                	<div id="menubar">
+  <div id="menu1" class="menu_new">Rack Layout<ul>
+
+    	<li><a href="#" onclick="generateReportSelect('Reports')" value="Reports">Reports</a></li>
+    	<li><a href="#" onclick="generateReportSelect('Team Worksheets')">Team Worksheets</a></li>
+    	<li><a href="#" onclick="generateReportSelect('Rack Layout')">Rack Layout</a></li>
+    </ul>
+  </div>
+</div>
+                	
+                </li>
+        
+                   
       </ul>
+          
     </div>
     <div class="body">
     <h1>Show Project</h1>
@@ -339,7 +360,7 @@
                   <label>Teams:</label>
                 </td>
                 <td valign="top" class="value"><select id="projectTeamId"
-                                 name="projectTeam">
+                                 name="projectTeam" onchange="selectTeamFilter(this.value)">
                     <option value="null" selected="selected">All Teams</option>                   
                                       
                   </select>
@@ -356,8 +377,9 @@
                 </td>                
               </tr>
               <tr>
-                <td class="buttonR"><g:jasperReport jasper="BundleAsset" format="PDF" name="Generate"  value = "Generate">
+                <td class="buttonR"><g:jasperReport controller="project" action="teamSheetReport" jasper="sampleAssetReport" format="PDF" name="Generate"  >
                 	<input type="hidden" name="moveBundle" id="moveBundle" value="" />
+                	<input type="hidden" name="teamFilter" id="teamFilter" value="" />
                 	</g:jasperReport>
                 	</td>
               </tr>
@@ -406,8 +428,8 @@
                 </td>                
               </tr>
               <tr>
-                <td class="buttonR"><g:jasperReport  jasper="BundleAsset" format="PDF" name="Generate"  >
-                	<input type="hidden" name="moveBundle" value="23" />
+                <td class="buttonR"><g:jasperReport controller="project" action="teamSheetReport" jasper="sampleAssetReport" format="PDF" name="Generate"  >
+                	<input type="hidden" name="moveBundle" id="rackMoveBundle" value="" />
                 	</g:jasperReport>
                 	</td>
               </tr>

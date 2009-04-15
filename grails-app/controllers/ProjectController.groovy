@@ -374,4 +374,72 @@ class ProjectController {
         redirect(controller:'project', action:"show", id: projectInstance.id )
     		
     }
+    
+    //Generate Report Dialog
+    def getBundleListForReportDialog = {
+    	def reportId = params.reportId
+    	def currProj = getSession().getAttribute( "CURR_PROJ" )
+        def projectId = currProj.CURR_PROJ
+        def projectInstance = Project.findById( projectId )
+        def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
+        def moveBundleList = []
+        moveBundleInstanceList.each {
+    		moveBundleList <<[id:it.id, name:it.name]    		
+    	}
+    	render moveBundleList as JSON
+    	     
+     }
+    
+    //get teams for selected bundles.
+    def getTeamsForBundles = {
+    		def bundleId = params.bundleId
+    		def projectId = params.projectId
+    		def projectInstance = Project.findById( projectId )
+    		def TeamInstance 
+    		if( bundleId == "") {
+    			TeamInstance = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle in ( select m.id from MoveBundle m where m.project = $projectId ) " )
+    		} else {
+    			def moveBundleInstance = MoveBundle.findById( bundleId )
+    			TeamInstance = ProjectTeam.findAllByMoveBundle( moveBundleInstance )
+    		}
+    		def teams = []
+    		TeamInstance.each {
+        		teams <<[id:it.id, name:it.teamCode]    		
+        	}
+        	render teams as JSON
+    		
+    		
+    }
+    
+    def teamSheetReport = {
+   		 println "params.moveBundle"+params.moveBundle
+   		println "params.teamFilter"+params.teamFilter
+   		 def moveBundleInstance = MoveBundle.findById(params.moveBundle)
+   		 def projectteamInstance = ProjectTeam.findById( params.teamFilter )
+   		 def reportFields = []
+   		def assetEntityList
+   		 if( moveBundleInstance ) {
+   			 if( projectteamInstance ) {
+   				assetEntityList = AssetEntity.findAll("from AssetEntity asset where asset.moveBundle = $moveBundleInstance.id and asset.sourceTeam = $projectteamInstance.id order By asset.sourceTeam")
+   			 }else {
+   				 
+   				assetEntityList = AssetEntity.findAll("from AssetEntity asset where asset.moveBundle = $moveBundleInstance.id order By asset.sourceTeam")
+   			 }
+   			
+   		 }else {
+   			if( projectteamInstance ) {
+   				assetEntityList = AssetEntity.findAll("from AssetEntity asset  where asset.sourceTeam = $projectteamInstance.id order By asset.sourceTeam")
+   			 }else {
+   				assetEntityList = AssetEntity.findAll("from AssetEntity asset  order By asset.sourceTeam")
+   			 }
+   			
+   		 }
+   		 
+   		 
+   		 assetEntityList.each {
+   			 
+   			 reportFields <<['asset_name':it.assetName , 'asset_tag':it.assetTag, "asset_type":it.assetType, "manufacturer":it.manufacturer, "model":it.model, "source_rack":it.sourceRack, "source_rack_position":it.sourceRackPosition, "usize":it.usize, "cart":it.cart, "shelf":it.shelf,"source_team_id":it.sourceTeam.id, "move_bundle_id":it.moveBundle.id]
+   		 }
+   		 chain(controller:'jasper',action:'index',model:[data:reportFields],params:params)
+    }
 }
