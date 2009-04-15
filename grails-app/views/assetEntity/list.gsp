@@ -38,7 +38,6 @@
 	        $("#createDialog").dialog({ autoOpen: false })
 	        $("#commentsListDialog").dialog({ autoOpen: false })
 	        $("#createCommentDialog").dialog({ autoOpen: false })
-	        $("#showCommentDialog").dialog({ autoOpen: false })
 	        $("#editCommentDialog").dialog({ autoOpen: false })
 	      })
 </script>
@@ -181,11 +180,11 @@
 			     editTable.appendChild( etbody )
 			     ${remoteFunction(action:'getAutoCompleteDate', params:'\'autoCompParams=\' + autoComp ', onComplete:'updateAutoComplete(e)')} 
 
-		      $("#showDialog").dialog('option', 'width', 600)
-		      $("#showDialog").dialog('option', 'position', ['center','top']);
-		      $("#showDialog").dialog("open")
+		      $("#editDialog").dialog('option', 'width', 600)
+		      $("#editDialog").dialog('option', 'position', ['center','top']);
+		      $("#editDialog").dialog("open")
 		      $("#createDialog").dialog("close")
-		      $("#editDialog").dialog("close")
+		      $("#showDialog").dialog("close")
 		
 		    }
 	    	
@@ -420,7 +419,6 @@
 		    // function to list the comments list
       		function listCommentsDialog(e) {
       			$("#editCommentDialog").dialog("close")
-			    $("#showCommentDialog").dialog("close")
 				$("#createCommentDialog").dialog("close")
       			var assetComments = eval('(' + e.responseText + ')');
       			var listTable = document.getElementById("listCommentsTable");
@@ -431,9 +429,6 @@
 				    }
 				    var listTbody = document.createElement('tbody');
 				    listTbody.id = 'listCommentsTbodyId'
-      				//document.getElementById("createAssetCommentId").value = assetComments[0].assetEntityId
-      				//alert(document.getElementById("createAssetCommentId").value)
-      				//document.getElementById("showAssetCommentId").value = assetComments[0].assetEntityId
       				var length = assetComments.length
 				      	for (var i=0; i < length; i++) {
 				      	//generate dynamic rows	
@@ -441,11 +436,16 @@
 				      	  var tr = document.createElement('tr');
 				      	  tr.id = "commentTr_"+commentObj.commentInstance.id
 				      	  tr.setAttribute('onmouseover','this.style.backgroundColor="white";');
+					      var editTd = document.createElement('td');
 					      var commentTd = document.createElement('td');
+					      commentTd.id = 'comment_'+commentObj.commentInstance.id
 					      var typeTd = document.createElement('td');
 					      typeTd.id = 'type_'+commentObj.commentInstance.id
 					      var verifyTd = document.createElement('td');
 						  verifyTd.id = 'verify_'+commentObj.commentInstance.id					      
+					      var image = document.createElement('img');
+					      image.src = "../images/skin/database_edit.png"
+					      image.border = 0
 					      var link = document.createElement('a');
 					      link.href = '#'
 					      link.id = 'link_'+commentObj.commentInstance.id
@@ -453,11 +453,20 @@
 					      link.onclick = function(){new Ajax.Request('showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e );}})} //;return false
 					      var commentText = document.createTextNode(truncate(commentObj.commentInstance.comment));
 					      var typeText = document.createTextNode(commentObj.commentInstance.commentType);
-					      var verifyText = document.createTextNode(commentObj.commentInstance.mustVerify);
-					      link.appendChild( commentText )
-					      commentTd.appendChild( link )
+					      var verifyText = document.createElement('input')
+					      verifyText.id = 'verifyText_'+commentObj.commentInstance.id
+					      verifyText.type = 'checkbox'
+					      verifyText.disabled = 'disabled'
+					      if(commentObj.commentInstance.mustVerify != 0){
+					      	verifyText.checked = true
+					      }
+					      //createTextNode(commentObj.commentInstance.mustVerify);
+					      link.appendChild( image )
+						  editTd.appendChild( link  )					      
+					      commentTd.appendChild( commentText )
 					      typeTd.appendChild( typeText )
 					      verifyTd.appendChild( verifyText )
+					      tr.appendChild( editTd )
 					      tr.appendChild( commentTd )
 					      tr.appendChild( typeTd )
 					      tr.appendChild( verifyTd )
@@ -470,61 +479,72 @@
       			$("#commentsListDialog").dialog('option', 'position', ['center','top']);
 		      	$("#commentsListDialog").dialog("open")
       		}
-      		function createCommentDialog(){
-		      	$("#createCommentDialog").dialog("open")
-      		}
       		function showAssetCommentDialog( e ){
       		var assetComments = eval('(' + e.responseText + ')');
       			if (assetComments) {
-			      	 document.getElementById("commentId").value = assetComments.id
-			      	 document.getElementById("commentTdId").innerHTML = assetComments.comment
-			      	 document.getElementById("commentTypeTdId").innerHTML = assetComments.commentType
-			      	 document.getElementById("verifyTdId").innerHTML = assetComments.mustVerify
 			      	 document.editCommentForm.comment.value = assetComments.comment
 			      	 document.editCommentForm.commentType.value = assetComments.commentType
 			      	 document.editCommentForm.mustVerify.value = assetComments.mustVerify
 			      	 document.editCommentForm.id.value = assetComments.id
-			      	 $("#editCommentDialog").dialog("close")
+			      	 $("#editCommentDialog").dialog('option', 'width', 700)
+			      	 $("#editCommentDialog").dialog("open")
 			      	 $("#createCommentDialog").dialog("close")
-			      	 $("#showCommentDialog").dialog("open")
       			}
       		}
       		
       		function addCommentsToList( e ){
-      			$("#editCommentDialog").dialog("close")
-			    $("#showCommentDialog").dialog("close")
-		      	var assetComments = eval('(' + e.responseText + ')');
-	      		var tbody = document.getElementById('listCommentsTbodyId')
-      			if (assetComments != "") {
-      				$("#createCommentDialog").dialog("close")
-			      	//generate dynamic rows	
-			      	  var tr = document.createElement('tr');
-			      	  tr.style.background = '#65a342'
-			      	  tr.id = "commentTr_"+assetComments.id
-				      tr.setAttribute('onmouseover','this.style.backgroundColor="white";');
-					  var commentTd = document.createElement('td');
-					  var typeTd = document.createElement('td');
-					  typeTd.id = 'type_'+assetComments.id
-					  var verifyTd = document.createElement('td');
-					  verifyTd.id = 'verify_'+assetComments.id
-					  var link = document.createElement('a');
-					  link.href = '#'
-					  link.id = 'link_'+assetComments.id
-					  link.onclick = function(){new Ajax.Request('showComment?id='+assetComments.id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e );}})} //;return false
-				      var commentText = document.createTextNode(truncate(assetComments.comment));
-				      var typeText = document.createTextNode(assetComments.commentType);
-				      var verifyText = document.createTextNode(assetComments.mustVerify);
-				      link.appendChild( commentText )
-				      commentTd.appendChild( link )
-				      typeTd.appendChild( typeText )
-				      verifyTd.appendChild( verifyText )
-				      tr.appendChild( commentTd )
-				      tr.appendChild( typeTd )
-				      tr.appendChild( verifyTd )
-				      tbody.appendChild( tr )
-      			} else {
-      				alert("Comment not created")
-      			}
+      			var status = document.getElementById('statusId').value
+	      		$("#editCommentDialog").dialog("close")
+			    var assetComments = eval('(' + e.responseText + ')');
+		      	var tbody = document.getElementById('listCommentsTbodyId')
+				if (assetComments != "") {
+					if(status != 'new'){
+						$("#createCommentDialog").dialog("close")
+				      	//generate dynamic rows	
+				      	  var tr = document.createElement('tr');
+				      	  tr.style.background = '#65a342'
+				      	  tr.id = "commentTr_"+assetComments.id
+					      tr.setAttribute('onmouseover','this.style.backgroundColor="white";');
+					      var editTd = document.createElement('td');
+						  var commentTd = document.createElement('td');
+						  commentTd.id = 'comment_'+assetComments.id
+						  var typeTd = document.createElement('td');
+						  typeTd.id = 'type_'+assetComments.id
+						  var verifyTd = document.createElement('td');
+						  verifyTd.id = 'verify_'+assetComments.id
+						  var image = document.createElement('img');
+					      image.src = "../images/skin/database_edit.png"
+					      image.border = 0
+						  var link = document.createElement('a');
+						  link.href = '#'
+						  link.id = 'link_'+assetComments.id
+						  link.onclick = function(){new Ajax.Request('showComment?id='+assetComments.id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e );}})} //;return false
+					      var commentText = document.createTextNode(truncate(assetComments.comment));
+					      var typeText = document.createTextNode(assetComments.commentType);
+					      var verifyText = document.createElement('input')
+					      verifyText.id = 'verifyText_'+assetComments.id
+					      verifyText.type = 'checkbox'
+					      verifyText.disabled = 'disabled'
+					      if(assetComments.mustVerify != 0){
+					      	verifyText.checked = true
+					      }
+					      //createTextNode(assetComments.mustVerify);
+					      link.appendChild( image )
+						  editTd.appendChild( link  )					      
+					      commentTd.appendChild( commentText )
+					      typeTd.appendChild( typeText )
+					      verifyTd.appendChild( verifyText )
+					      tr.appendChild( editTd )
+					      tr.appendChild( commentTd )
+					      tr.appendChild( typeTd )
+					      tr.appendChild( verifyTd )
+					      tbody.appendChild( tr )
+				    } else {
+						window.location.reload()
+					}
+	      		} else {
+	      				alert("Comment not created")
+	      		}
       		}
       		
       		// update comments 
@@ -535,9 +555,13 @@
 			      	//generate dynamic rows	
 			      	  var tr = document.getElementById('commentTr_'+assetComments.id);
 			      	  tr.style.background = '#65a342'
-				      document.getElementById('verify_'+assetComments.id).innerHTML= assetComments.mustVerify ;
+			      	  if(assetComments.mustVerify != 0){
+				      document.getElementById('verifyText_'+assetComments.id).checked = true ;
+				      } else {
+				      document.getElementById('verifyText_'+assetComments.id).checked = false ;
+				      }
 				      document.getElementById('type_'+assetComments.id).innerHTML = assetComments.commentType;
-				      document.getElementById('link_'+assetComments.id).innerHTML = truncate(assetComments.comment);
+				      document.getElementById('comment_'+assetComments.id).innerHTML = truncate(assetComments.comment);
       			}
       		}
       		// Truncate the text 
@@ -550,7 +574,17 @@
       				}
       			}
       			return trunc;
-      		}  
+      		} 
+      		function setMustVerify(obj){
+      		alert(obj.checked)
+      		if(obj.checked){
+      			obj.value = 1
+      			alert('if')
+      		} else {
+      			obj.value = 0
+      		}
+      		alert(obj.value)
+      		}
 	    </script>
 
 </head>
@@ -582,9 +616,7 @@
 	<thead>
 		<tr>
 
-			<th>Show</th>			
-
-			<th>Comments</th>			
+			<th>Actions</th>			
 
 			<g:sortableColumn property="application" title="Application" />
 			
@@ -618,15 +650,18 @@
 				onmouseout="style.backgroundColor='white';">
 
 				<td><g:remoteLink controller="assetEntity" action="editShow" id="${assetEntityInstance.id}" before="document.showForm.id.value = ${assetEntityInstance.id};document.editForm.id.value = ${assetEntityInstance.id};" onComplete="showAssetDialog( e );">
-					<img src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px">
-				</g:remoteLink></td>				
-				
-				<td>
+					<img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px">
+				</g:remoteLink>
 				<g:if test="${AssetComment.findByAssetEntity(assetEntityInstance)}">
 				<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="document.getElementById('createAssetCommentId').value = ${assetEntityInstance.id};" onComplete="listCommentsDialog( e );">
-					<img src="${createLinkTo(dir:'images/skin',file:'database_table.png')}" border="0px">
+					<img src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}" border="0px">
 				</g:remoteLink>
 				</g:if>
+				<g:else>
+				<a href="#" onclick="document.getElementById('createAssetCommentId').value = ${assetEntityInstance.id};document.getElementById('statusId').value = 'new';$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('open');">
+					<img src="${createLinkTo(dir:'images/skin',file:'database_table_light.png')}" border="0px">
+				</a>
+				</g:else>
 				</td>
 				
 				<td id="application_${assetEntityInstance.id}" > ${fieldValue(bean:assetEntityInstance, field:'application')} </td>
@@ -713,7 +748,7 @@
 
 <div id="commentsListDialog" title="Show Asset Comments" style="display: none;">
 <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-	<span class="menuButton"><a class="create" href="#" onclick="createCommentDialog()" >New Comment</a></span>
+	<span class="menuButton"><a class="create" href="#" onclick="document.getElementById('statusId').value = '';$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('open')" >New Comment</a></span>
 </div>
 <br>
 	<div class="list">
@@ -721,6 +756,8 @@
 		<thead>
 	        <tr >
 	                        
+	          <th nowrap>Action</th>
+	          
 	          <th nowrap>Comment</th>
 	                        
 	          <th nowrap>Comment Type</th>
@@ -739,6 +776,7 @@
 <g:form action="saveComment" method="post" name="createCommentForm" >
 	<div class="dialog">
 	<input type="hidden" name="assetEntity.id" id="createAssetCommentId" value="">
+	<input type="hidden" name="status" id="statusId" value="">
 	<table id="createCommentTable">
 		<tbody>
 			<tr class="prop">
@@ -746,7 +784,7 @@
                 <label for="comment">Comment:</label>
                 </td>
 				<td valign="top" class="value">
-                <input type="text" id="comment" name="comment" value=""/>
+                <textarea cols="80" rows="5" id="comment" name="comment" ></textarea>
                 </td>
             </tr> 
 			<tr class="prop">
@@ -762,7 +800,7 @@
                 <label for="mustVerify">Must Verify:</label>
                 </td>
                 <td valign="top" class="value">
-                <input type="text" id="mustVerify" name="mustVerify" value="" />
+                <input type="checkbox" id="mustVerify" name="mustVerify" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
                 </td>
             </tr>
 		</tbody>
@@ -771,41 +809,6 @@
 	<div class="buttons"><span class="button">
 	<input class="save" type="button" value="Create" onclick="${remoteFunction(action:'saveComment', params:'\'assetEntity.id=\' + document.getElementById(\'createAssetCommentId\').value +\'&comment=\'+document.createCommentForm.comment.value +\'&commentType=\'+document.createCommentForm.commentType.value +\'&mustVerify=\'+document.createCommentForm.mustVerify.value', onComplete:'addCommentsToList(e)')}" /></span></div>
 </g:form ></div>
-<div id="showCommentDialog" title="Show Asset Comment" style="display: none;">
-	<div class="dialog">
-	<input name="id" value="" id="commentId" type="hidden">
-	<table id="showCommentTable">
-		<tbody>
-			<tr class="prop">
-				<td valign="top" class="name">
-                <label for="comment">Comment:</label>
-                </td>
-				<td valign="top" class="value" id="commentTdId"/>
-            </tr> 
-			<tr class="prop">
-            	<td valign="top" class="name">
-                <label for="commentType">Comment Type:</label>
-                </td>
-                <td valign="top" class="value" id="commentTypeTdId"/>
-            </tr> 
-			<tr class="prop">
-            	<td valign="top" class="name">
-                <label for="mustVerify">Must Verify:</label>
-                </td>
-                <td valign="top" class="value" id="verifyTdId"/>
-            </tr>
-		</tbody>
-	</table>
-	</div>
-	<div class="buttons">
-	<span class="button">
-	<input class="edit" type="button" value="Edit" onclick="$('#editCommentDialog').dialog('open');$('#showCommentDialog').dialog('close')" />
-	</span>
-	<span class="button">
-	<input class="delete" type="button" value="Delete" onclick="${remoteFunction(action:'deleteComment', params:'\'id=\' + document.getElementById(\'commentId\').value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e)')}" />
-	</span>
-	</div>
-</div>
 <div id="editCommentDialog" title="Edit Asset Comment" style="display: none;">
 <g:form action="updateComment" method="post" name="editCommentForm" >
 	<div class="dialog">
@@ -817,7 +820,7 @@
                 <label for="comment">Comment:</label>
                 </td>
 				<td valign="top" class="value">
-                <input type="text" id="comment" name="comment" value=""/>
+                <textarea cols="80" rows="5" id="comment" name="comment" ></textarea>
                 </td>
             </tr> 
 			<tr class="prop">
@@ -833,7 +836,7 @@
                 <label for="mustVerify">Must Verify:</label>
                 </td>
                 <td valign="top" class="value">
-                <input type="text" id="mustVerify" name="mustVerify" value="" />
+                <input type="checkbox" id="mustVerify" name="mustVerify" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
                 </td>
             </tr>
 		</tbody>
