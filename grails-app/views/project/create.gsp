@@ -1,7 +1,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
+<meta name="layout" content="projectHeader" />
 <title>Create Project</title>
 <g:javascript library="prototype" />
 <g:javascript library="jquery" />
@@ -202,18 +202,7 @@
 %>
 </head>
 <body>
-<div class="menu2">
-<ul>
-	<li><g:link class="home" controller="projectUtil">Project </g:link>
-	</li>
-	<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]">Staff</g:link></li>
-	<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">Assets </g:link></li>
-	<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link> </li>
-	<li><a href="#">Contacts </a></li>
-	<li><a href="#">Applications </a></li>
-	<li><g:link class="home" controller="moveBundle" params="[projectId:currProjObj?.id]">Move Bundles</g:link></li>
-</ul>
-</div>
+
 <div class="body">
 <h1>Create Project</h1>
 <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">

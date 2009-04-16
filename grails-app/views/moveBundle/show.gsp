@@ -3,29 +3,12 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="layout" content="main" />
+    <meta name="layout" content="moveBundleHeader" />
+   
     <title>Show MoveBundle</title>
   </head>
-  <body>
-    <div class="menu2">
-      <ul>
-        <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
-        <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:projectId]" >Staff</g:link></li>
-        <li><g:link class="home" controller="assetEntity" params="[projectId:projectId]">Assets </g:link></li>
-	<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:projectId]">Import/Export</g:link> </li>
-        <li><a href="#">Contacts </a></li>
-        <li><a href="#">Applications </a></li>
-        <li><g:link class="home" controller="moveBundle" params="[projectId:projectId]">Move Bundles</g:link> </li>
-      </ul>
-    </div>
-    <div class="menu2" style="background-color:#003366;">
-      <ul>
-      <li class="title1">Move Bundle: ${moveBundleInstance?.name}</li>
-        <li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundleInstance?.id]" >Team </g:link> </li>
-        <li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleInstance?.id]" >Bundle Asset Assignment</g:link> </li>
-        <li><g:link class="home" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleInstance?.id, rack:'UnrackPlan']" >Bundle Team Assignment </g:link> </li>
-      </ul>
-    </div>
+  <body>   
+    
     <div class="body">
       <h1>Show MoveBundle</h1>
       <g:if test="${flash.message}">

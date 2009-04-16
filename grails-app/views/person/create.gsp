@@ -3,19 +3,11 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="main" />
+        <meta name="layout" content="companyHeader" />
         <title>Create Staff</title>         
     </head>
     <body>
-    <div class="menu2">
-	<ul>
-		<li><g:link class="home" controller="partyGroup" action="show" id="${companyId}">Company</g:link></li>
-		<li><g:link class="home" controller="person" id="${companyId}">Staff</g:link></li>
-		<li><g:link class="home" controller="application" id="${companyId}">Applications </g:link></li>
-		<li><a href="#">Locations </a></li>
-		<li><a href="#">Rooms </a></li>
-	</ul>
-	</div>
+   
         <div class="body">
             <h1>Create Staff</h1>
 	        <br>

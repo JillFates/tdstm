@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="main" />
+        <meta name="layout" content="projectHeader" />
         <title>Create Move Bundle Team</title>
         <g:javascript library="jquery" />
         <script type="text/javascript">  
@@ -16,17 +16,7 @@
 		</script>
     </head>
     <body>
-    	<div class="menu2">
-          <ul>
-            <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
-            <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:bundleInstance?.project?.id]" >Staff</g:link></li>
-            <li><g:link class="home" controller="assetEntity" params="[projectId:bundleInstance?.project?.id]">Assets </g:link></li>
-	<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:bundleInstance?.project?.id]">Import/Export</g:link> </li>
-            <li><a href="#">Contacts </a></li>
-            <li><a href="#">Applications </a></li>
-            <li><g:link class="home" controller="moveBundle" params="[projectId:bundleInstance?.project?.id]">Move Bundles</g:link></li>
-          </ul>
-		</div>
+    	
     	<div class="menu2" style="background-color:#003366;">
           <ul>
           <li class="title1">Move Bundle: ${bundleInstance?.name}</li>

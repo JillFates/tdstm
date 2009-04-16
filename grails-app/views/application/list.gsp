@@ -4,7 +4,7 @@
 
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="main" />
+        <meta name="layout" content="companyHeader" />
         <title>Application List</title>
         <g:javascript library="prototype"/>
         <g:javascript library="jquery"/>
@@ -160,15 +160,7 @@
     </g:javascript>
     </head>
     <body>
-    <div class="menu2">
-		<ul>
-			<li><g:link class="home" controller="partyGroup" action="show" id="${partyGroupInstance?.id}">Company</g:link></li>
-			<li><g:link class="home" controller="person" id="${partyGroupInstance?.id}">Staff</g:link></li>
-			<li><g:link class="home" controller="application" id="${partyId}">Applications </g:link></li>
-			<li><a href="#">Locations </a></li>
-			<li><a href="#">Rooms </a></li>
-		</ul>
-	</div>
+    
         <div class="body">
             <h1>Application List</h1>
             <g:if test="${flash.message}">

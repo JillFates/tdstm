@@ -1,7 +1,7 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="layout" content="main" />
+    <meta name="layout" content="projectHeader" />
     <title>Show Project</title>
     <g:javascript library="prototype" />
     <g:javascript library="jquery"/>
@@ -13,24 +13,14 @@
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}"  />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}"  />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dropDown.css')}" />
+	
     <jq:plugin name="ui.core"/>
     <jq:plugin name="ui.draggable"/>
     <jq:plugin name="ui.resizable"/>
     <jq:plugin name="ui.dialog"/>
     
     <script type="text/javascript">
-    var reportName="";
-      $(document).ready(function(){
-        $("#dialog").dialog({ autoOpen: false });
-      });
-      
-      $(document).ready(function(){
-        $("#reportDialog").dialog({ autoOpen: false });
-      });
-      $(document).ready(function(){
-        $("#rackLayoutDialog").dialog({ autoOpen: false });
-      });
+   
       
       function editProject(){
       $("#dialog").dialog('option', 'width', 500)
@@ -148,186 +138,12 @@
 	      }
       }
       
-     function showReportDialog(e) {
-     	var moveBundles = eval('(' + e.responseText + ')')     	
-      	var report = reportName
-      	var selectObj
-      	if (report == "Rack Layout") {
-      	selectObj = document.getElementById('bundleId')
-      	}else {
-      		selectObj = document.getElementById('moveBundleId')
-      	}
-      	
-      	//Clear all previous options
-	     var l = selectObj.length	    
-	     while (l > 2) {
-	     l--
-	     selectObj.remove(l)
-	     }
-      	if (moveBundles) {
-		      // assign move bundles
-		      var length = moveBundles.length
-		      for (var i=0; i < length; i++) {
-			      var bundle = moveBundles[i]
-			      var opt = document.createElement('option');
-			      opt.innerHTML = bundle.name
-			      opt.value = bundle.id
-			      try {
-				      selectObj.appendChild(opt, null) // standards compliant; doesn't work in IE
-			      } catch(ex) {
-				      selectObj.appendChild(opt) // IE only
-			      }
-		      }
-		          	
-      }
-       if (report == "Rack Layout") {
-      		$("#rackLayoutDialog").dialog('option', 'width', 500)
-      		$("#rackLayoutDialog").dialog( "open" )
-      	}else {
-      		$("#reportDialog").dialog('option', 'width', 500)
-      		$("#reportDialog").dialog( "open" )
-      	}
-       		
-            	
-      	
-     } 
-     
-     function assignTeams(e) {
-     
-     	var projectteams = eval('(' + e.responseText + ')')   	
-      	
-      	var selectObj = document.getElementById('projectTeamId')
-      	//Clear all previous options
-	     var l = selectObj.length	    
-	     while (l > 1) {
-	     l--
-	     selectObj.remove(l)
-	     }
-      	if (projectteams) {
-		      // assign project teams
-		      var length = projectteams.length
-		      for (var i=0; i < length; i++) {
-			      var team = projectteams[i]
-			      var opt = document.createElement('option');
-			      opt.innerHTML = team.name
-			      opt.value = team.id
-			      try {
-				      selectObj.appendChild(opt, null) // standards compliant; doesn't work in IE
-			      } catch(ex) {
-				      selectObj.appendChild(opt) // IE only
-			      }
-		      }		          	
-      }
-     	
-     }
-     
-     function assignRacks(e) {
-     
-     	var racks = eval('(' + e.responseText + ')')   	
-      	
-      	var selectObj = document.getElementById('rackId')
-      	//Clear all previous options
-	     var l = selectObj.length	    
-	     while (l > 1) {
-	     l--
-	     selectObj.remove(l)
-	     }
-      	if (racks) {
-		      // assign project teams
-		      var length = racks.length
-		      for (var i=0; i < length; i++) {
-			      var team = racks[i]
-			      var opt = document.createElement('option');
-			      opt.innerHTML = team.name
-			      opt.value = team.id
-			      try {
-				      selectObj.appendChild(opt, null) // standards compliant; doesn't work in IE
-			      } catch(ex) {
-				      selectObj.appendChild(opt) // IE only
-			      }
-		      }		          	
-      }
-     	
-     }
-     
-     
-     
-     function populateTeams(val) {
-     	var hiddenBundle = document.getElementById('moveBundle')
-     	hiddenBundle.value = val
-     	var projectId = ${projectInstance?.id}     	
-     	if( val == "null") {
-     	 var selectObj = document.getElementById('projectTeamId')
-      	 //Clear all previous options
-	     var l = selectObj.length	    
-	     while (l > 1) {
-	     l--
-	     selectObj.remove(l)
-	     }
-     	 return false
-     	} else {
-     	 ${remoteFunction(action:'getTeamsForBundles', params:'\'bundleId=\' + val +\'&projectId=\'+projectId', onComplete:'assignTeams(e)')}
-     	}
-     }   
-     
-     function populateRacks(val) {
-     var hiddenBundle = document.getElementById('rackMoveBundle')
-     	hiddenBundle.value = val
-     	var projectId = ${projectInstance?.id}     	
-     	if( val == "null") {
-     	 var selectObj = document.getElementById('rackId')
-      	 //Clear all previous options
-	     var l = selectObj.length	    
-	     while (l > 1) {
-	     l--
-	     selectObj.remove(l)
-	     }
-     	 return false
-     	} else {
-     	 ${remoteFunction(action:'getRacksForBundles', params:'\'bundleId=\' + val +\'&projectId=\'+projectId', onComplete:'assignRacks(e)')}
-     	}
-     } 
-     
-      
-     function generateReportSelect(reportId){
-     reportName = reportId
-     ${remoteFunction(action:'getBundleListForReportDialog', params:'\'reportId=\'+reportId', onComplete:'showReportDialog(e)' )}""
-     }
-     
-     function selectTeamFilter(team){
-     var teamFilter = document.getElementById('teamFilter')
-     teamFilter.value = team
-     }
+    
       </script>
   </head>
   <body>
  
-    <div class="menu2">
-      <ul>
-        <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
-        <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:projectInstance?.id]" >Staff</g:link></li>
-        <li><g:link class="home" controller="assetEntity" params="[projectId:projectInstance?.id]">Assets </g:link></li>
-		<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:projectInstance?.id]">Import/Export</g:link> </li>
-        <li><a href="#">Contacts </a></li>
-        <li><a href="#">Applications </a></li>
-        <li><g:link class="home" controller="moveBundle" params="[projectId:projectInstance?.id]">Move Bundles</g:link></li>
-        <li>
-                	<div id="menubar">
-  <div id="menu1" class="menu_new">Rack Layout<ul>
-
-    	<li><a href="#" onclick="generateReportSelect('Reports')" value="Reports">Reports</a></li>
-    	<li><a href="#" onclick="generateReportSelect('Team Worksheets')">Team Worksheets</a></li>
-    	<li><a href="#" onclick="generateReportSelect('Rack Layout')">Rack Layout</a></li>
-    </ul>
-  </div>
-</div>
-                	
-                </li>
-        
-                   
-      </ul>
-          
-    </div>
+   
     <div class="body">
     <h1>Show Project</h1>
     <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
@@ -340,102 +156,7 @@
     <g:if test="${flash.message}">
       <div class="message">${flash.message}</div>
     </g:if>
-    <div id="reportDialog" title="Team Worksheets" style="display:none;">
-     <table id="reportTable">
-     	<tbody>
-     		<tr class="prop" id="bundleRow">
-                <td valign="top" class="name">
-                  <label>Bundles:</label>
-                </td>
-                <td valign="top" class="value"><select id="moveBundleId"
-                                 name="moveBundle" onchange="return populateTeams(this.value)">
-                    <option value="null" selected="selected">Please Select</option>
-                    <option value="" >All Bundles</option>
-                                      
-                  </select>
-               </td>   
-              </tr>
-              <tr class="prop" id="teamRow">
-                <td valign="top" class="name">
-                  <label>Teams:</label>
-                </td>
-                <td valign="top" class="value"><select id="projectTeamId"
-                                 name="projectTeam" onchange="selectTeamFilter(this.value)">
-                    <option value="null" selected="selected">All Teams</option>                   
-                                      
-                  </select>
-               </td> 
-              </tr>
-              <tr>
-              	<td valign="top" class="name">
-                  <label>Location:</label>
-                </td>
-                <td>
-                	<g:radio name="location" value="1" checked="true"/> Both
-                	<g:radio name="location" value="2" /> Source
-                	<g:radio name="location" value="3" /> Target               	
-                </td>                
-              </tr>
-              <tr>
-                <td class="buttonR"><g:jasperReport controller="project" action="teamSheetReport" jasper="sampleAssetReport" format="PDF" name="Generate"  >
-                	<input type="hidden" name="moveBundle" id="moveBundle" value="" />
-                	<input type="hidden" name="teamFilter" id="teamFilter" value="" />
-                	</g:jasperReport>
-                	</td>
-              </tr>
-     	</tbody>
-     </table>
-  	</div>
-  	
-  	  <div id="rackLayoutDialog" title="Rack Layout" style="display:none;">
-     <table id="rackLayoutTable">
-     	<tbody>
-     		<tr class="prop" id="bundleRow">
-                <td valign="top" class="name">
-                  <label>Bundles:</label>
-                </td>
-                <td valign="top" class="value">
-                
-                <select id="bundleId"
-                                 name="moveBundle" onchange="return populateRacks(this.value)">
-                    <option value="null" selected="selected">Please Select</option>
-                    <option value="" >All Bundles</option>
-                                      
-                  </select>
-               </td>   
-              </tr>
-              <tr class="prop" id="teamRow">
-                <td valign="top" class="name">
-                  <label>Racks:</label>
-                </td>
-                <td valign="top" class="value">
-                <select id="rackId" multiple="multiple" name="rack"  style="width: 100px; height: 100px;">
-                
-                    <option value="null" selected="selected">All Racks</option>                   
-                                      
-                  </select>
-               </td> 
-              </tr>
-              <tr>
-              <td colspan="2"><div style="width:100%;height:10px;float:left;"> Hold [Ctrl] when clicking to choose multiple racks  </div></td>
-              </tr>
-              <tr>
-              	<td valign="top" class="name">
-                  <label>Racks/Page:</label>
-                </td>
-                <td>
-                	<g:select id="rackPerPage" from="${1..6}" value="3" />              	
-                </td>                
-              </tr>
-              <tr>
-                <td class="buttonR"><g:jasperReport controller="project" action="teamSheetReport" jasper="sampleAssetReport" format="PDF" name="Generate"  >
-                	<input type="hidden" name="moveBundle" id="rackMoveBundle" value="" />
-                	</g:jasperReport>
-                	</td>
-              </tr>
-     	</tbody>
-     </table>
-  	</div>
+   
     
   	    <div class="dialog" id="updateShow">
       <table>

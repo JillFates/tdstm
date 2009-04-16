@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
+<meta name="layout" content="projectHeader" />
 <title>Asset Entity List</title>
 
 <g:javascript library="prototype" />
@@ -595,23 +595,7 @@
 
 </head>
 <body>
-<div class="menu2">
-<ul>
-	<li><g:link class="home" controller="projectUtil">Project </g:link>
-	</li>
-	<li><g:link class="home" controller="person" action="projectStaff"
-		params="[projectId:projectId]">Staff</g:link></li>
-	<li><g:link class="home" controller="assetEntity"
-		params="[projectId:projectId]">Assets</g:link></li>
-	<li><g:link class="home" controller="assetEntity"
-		action="assetImport" params="[projectId:projectId]">Import/Export</g:link>
-	</li>
-	<li><a href="#">Contacts </a></li>
-	<li><a href="#">Applications </a></li>
-	<li><g:link class="home" controller="moveBundle"
-		params="[projectId:projectId]">Move Bundles</g:link></li>
-</ul>
-</div>
+
 <div class="body">
 <h1>Asset Entity List</h1>
 <g:if test="${flash.message}">

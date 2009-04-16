@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
+<meta name="layout" content="projectHeader" />
 <title>Project List</title>
  <% def currProj = session.getAttribute("CURR_PROJ");
     def projectId = currProj.CURR_PROJ ;
@@ -14,19 +14,7 @@
     %>
 </head>
 <body>
-<g:if test="${currProjObj}">
-		 <div class="menu2">
-          <ul>
-            <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
-            <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
-            <li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">Assets </g:link></li>
-	<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link> </li>
-            <li><a href="#">Contacts </a></li>
-            <li><a href="#">Applications </a></li>
-            <li><g:link class="home" controller="moveBundle" params="[projectId:currProjObj?.id]">Move Bundles</g:link></li>
-          </ul>
-        </div>
-        </g:if>
+
 <div class="body"><br>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>

@@ -15,6 +15,7 @@ class PartyGroupController {
 
     def show = {
         def partyGroupInstance = PartyGroup.get( params.id )
+        request.getSession(false).setAttribute("PARTYGROUP",partyGroupInstance)
 
         if(!partyGroupInstance) {
             flash.message = "PartyGroup not found with id ${params.id}"
@@ -38,7 +39,7 @@ class PartyGroupController {
 
     def edit = {
         def partyGroupInstance = PartyGroup.get( params.id )
-
+        request.getSession(false).setAttribute("PARTYGROUP",partyGroupInstance)
         if(!partyGroupInstance) {
             flash.message = "PartyGroup not found with id ${params.id}"
             redirect(action:list)
