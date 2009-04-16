@@ -261,7 +261,7 @@
 
      	hiddenBundle.value = val
 
-     	var projectId = ${currProjObj?.id}     	
+     	var projectId = ${projectInstance?.id}     	
 
      	if( val == "null") {
 
@@ -297,7 +297,7 @@
 
      	hiddenBundle.value = val
 
-     	var projectId = ${currProjObj?.id}     	
+     	var projectId = ${projectInstance?.id}     	
 
      	if( val == "null") {
 
@@ -347,11 +347,35 @@
 
      }
 
+     
+
+     function changeLocation(val)
+
+     {
+
+     	var location = document.getElementById('location')
+
+     	location.value = val
+
+     
+
+     }
+
+     function selectRecordsPerPage(val)
+
+     {
+
+     var count = document.getElementById('recordsPerPage');
+
+     count.value = val;
+
+     }
+
     </script>
   </head>
 
   <body>
-     <div id="reportDialog" title="Team Worksheets" style="display:none;">
+      <div id="reportDialog" title="Team Worksheets" style="display:none;">
 
      <table id="reportTable">
 
@@ -413,11 +437,11 @@
 
                 <td>
 
-                	<g:radio name="location" value="1" checked="true"/> Both
+                	<input type="radio" name="location" value="both" onclick="changeLocation(this.value)" checked="true"/> Both
 
-                	<g:radio name="location" value="2" /> Source
+                	<input type="radio" name="location" value="source" onclick="changeLocation(this.value)"/> Source
 
-                	<g:radio name="location" value="3" /> Target               	
+                	<input type="radio" name="location" value="target" onclick="changeLocation(this.value)"/> Target               	
 
                 </td>                
 
@@ -425,11 +449,13 @@
 
               <tr>
 
-                <td class="buttonR"><g:jasperReport controller="project" action="teamSheetReport" jasper="sampleAssetReport" format="PDF" name="Generate"  >
+                <td class="buttonR"><g:jasperReport controller="project" action="teamSheetReport" jasper="teamWorksheetReport" format="PDF" name="Generate"  >
 
                 	<input type="hidden" name="moveBundle" id="moveBundle" value="" />
 
                 	<input type="hidden" name="teamFilter" id="teamFilter" value="" />
+
+                	<input type="hidden" name="location" id="location" value="both" />
 
                 	</g:jasperReport>
 
@@ -519,7 +545,7 @@
 
                 <td>
 
-                	<g:select id="rackPerPage" from="${1..6}" value="3" />              	
+                	<g:select id="rackPerPage" from="${1..6}" value="3" onChange="selectRecordsPerPage(this.value)" />              	
 
                 </td>                
 
@@ -527,11 +553,13 @@
 
               <tr>
 
-                <td class="buttonR"><g:jasperReport controller="project" action="teamSheetReport" jasper="sampleAssetReport" format="PDF" name="Generate"  >
+                <td class="buttonR"><g:jasperReport controller="project" action="rackLayoutReport" jasper="teamWorksheetReport" format="PDF" name="Generate"  >
 
                 	<input type="hidden" name="moveBundle" id="rackMoveBundle" value="" />
 
-                	<input type="hidden" name="teamFilter" id="rackFilter" value="" />
+                	<input type="hidden" name="rack" id="rack" value="" />
+
+                	<input type="hidden" name="recordsPerPage" id="recordsPerPage" value="3" />
 
                 	</g:jasperReport>
 
@@ -545,7 +573,6 @@
 
   	</div>
 
-    
 
   
     
