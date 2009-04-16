@@ -11,7 +11,7 @@ class JasperTagLib {
         String webAppPath = appPath + pluginContextPath
         String idAttr = attrs['id'] ?: ""
         String reportName = attrs['name'] ?: ""
-        String delimiter = attrs['delimiter'] ?: "|"
+        String delimiter = attrs['delimiter'] ?: ""
         String delimiterBefore = attrs['delimiterBefore'] ?: delimiter
         String delimiterAfter = attrs['delimiterAfter'] ?: delimiterBefore
         String description = attrs['description'] ?: (reportName ? "<strong>${reportName}</strong>" : "")
