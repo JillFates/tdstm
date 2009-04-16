@@ -364,25 +364,41 @@ class AssetEntityController {
 	                            
 	                            
                         }
-                    }                
- 
-                   /* for( int sl=0;  sl < sheetNamesLength; sl++ ) {
-                    	println"sheetNames[sl] value-->"+sheetNames[sl]	
+                    } 
+                    
+                    //update data from Asset Comment table to EXCEL
+                    
+                    for( int sl=0;  sl < sheetNamesLength; sl++ ) {
+                    	def commentIt = new ArrayList()
                         if(sheetNames[sl] == "Comments"){
-                        	println"comg commentList val--------->"
-                        	def sheet1 = book.getSheet( sheetNames[sl] ) 
+                        	def sheet1 = book.getSheet("Comments") 
                         	asset.each{
-                            	def commentList = AssetComment.findAllByAssetEntity(it.id)	
-                            	}
-                                if(commentList){
-                                	println"commentList val--------->"+commentList
-                               
-                            println"commentList val--------->"+sheet1
-                            def de = new Label(0,5, "bhuvana");
-                            sheet1.addCell(de)
-                                }
+                        		commentIt.add(it.id)                        		
+                            }
+                        	def commentList = new StringBuffer()
+                            def commentSize = commentIt.size()
+                            for ( int k=0; k< commentSize ; k++ ) {
+	                     	    if( k != commentSize - 1) {
+                                    commentList.append( commentIt[k] + "," )
+	                            } else {
+                                    commentList.append( commentIt[k] )
+	                            }
+                            }
+                            def assetcmt = AssetComment.findAll("from AssetComment cmt where cmt.assetEntity in ($commentList)")
+                            def commentEtyTotal
+                            def commentTypeTotal
+                            def commentCmtTotal
+                            for(int cr=1 ; cr<=assetcmt.size() ; cr++){
+                                commentEtyTotal = new Label(0,cr,String.valueOf(assetcmt[cr-1].assetEntity.id))
+                                sheet1.addCell(commentEtyTotal)
+                                commentTypeTotal = new Label(2,cr,String.valueOf(assetcmt[cr-1].commentType))
+                                sheet1.addCell(commentTypeTotal)
+                                commentCmtTotal = new Label(3,cr,String.valueOf(assetcmt[cr-1].comment))
+                                sheet1.addCell(commentCmtTotal)
+                            }
+                                                          
                         }
-                    }*/
+                    }
                     book.write()
                     book.close()
                     render( view: "importExport" )
