@@ -283,7 +283,11 @@ class AssetEntityController {
             def templateFilePath = appUrl + filenametoSet
             def url = new URL( templateFilePath )
             HttpURLConnection con = url.openConnection()
-            workbook = Workbook.getWorkbook( con.getInputStream() )
+
+            // Going to use temporary file because we were getting out of memory errors constantly on staging server
+            WorkbookSettings wbSetting = new WorkbookSettings()
+	    wbSetting.setUseTemporaryFileDuringWrite(true)
+            workbook = Workbook.getWorkbook( con.getInputStream(), wbSetting )
 	            
             //set MIME TYPE as Excel
             filenametoSet = filenametoSet.split("/")
