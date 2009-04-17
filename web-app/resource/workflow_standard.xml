@@ -48,7 +48,7 @@
 		<transition to="Terminated" name="Terminated"/>
 	</transitions>
 
-	<start-state name="Hold">
+	<startState name="Hold">
 		<task swimlane="ROLE_WF_SUPERVISOR">
 			<transition to="Ready" />
 			<transition to="PoweredDown" />
@@ -78,24 +78,24 @@
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
-	</start-state>
+	</startState>
 
-	<task-node name="Ready">
+	<taskNode name="Ready">
 		<task swimlane="ROLE_WF_MANAGER">
 			<transition to="Hold" flag="issue"/>
 			<transition to="PoweredDown" />
 			<transition to="Release" flag="skipped"/>
 		</task>
-	</task-node>
+	</taskNode>
 
-	<task-node name="PoweredDown">
+	<taskNode name="PoweredDown">
 		<task swimlane="ROLE_WF_MANAGER">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Release"/>
 		</task>
-	</task-node>
+	</taskNode>
 
-	<task-node name="Ready">
+	<taskNode name="Ready">
 		<task swimlane="ROLE_WF_SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="PoweredDown" />
@@ -115,9 +115,9 @@
 		<task swimlane="ROLE_WF_MOVER">
 			<transition to="Hold" flag="issue"/>
 		</task>
-	</task-node>
+	</taskNode>
 
-	<task-node name="PoweredDown">
+	<taskNode name="PoweredDown">
 		<task swimlane="ROLE_WF_SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Release"/>
@@ -137,9 +137,9 @@
 		<task swimlane="ROLE_WF_MOVER">
 			<transition to="Hold" flag="issue"/>
 		</task>
-	</task-node>
+	</taskNode>
 
-	<task-node name="Release">
+	<taskNode name="Release">
 		<task swimlane="ROLE_WF_SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Unracking"/>
@@ -161,9 +161,9 @@
 		<task swimlane="ROLE_WF_MOVER">
 			<transition to="Hold" flag="issue"/>
 		</task>
-	</task-node>
+	</taskNode>
 
-	<task-node name="Unracking">
+	<taskNode name="Unracking">
 		<task swimlane="ROLE_WF_SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready"/>
@@ -185,9 +185,9 @@
 		<task swimlane="ROLE_WF_MOVER">
 			<transition to="Hold" flag="issue"/>
 		</task>
-	</task-node>
+	</taskNode>
 
-	<task-node name="Unracked">
+	<taskNode name="Unracked">
 		<task swimlane="ROLE_WF_SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
@@ -226,9 +226,9 @@
 		<task swimlane="ROLE_WF_MOVER">
 			<transition to="Hold" flag="issue"/>
 		</task>
-	</task-node>
+	</taskNode>
 
-	<task-node name="Cleaned">
+	<taskNode name="Cleaned">
 		<task swimlane="ROLE_WF_SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
@@ -262,9 +262,9 @@
 			<transition to="OnCart"/>
 			<transition to="OnTruck" flag="skipped"/>
 		</task>
-	</task-node>
+	</taskNode>
 
-	<task-node name="OnCart">
+	<taskNode name="OnCart">
 		<task swimlane="ROLE_WF_SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
@@ -297,9 +297,9 @@
 			<transition to="Hold" flag="issue"/>
 			<transition to="OnTruck"/>
 		</task>
-	</task-node>
+	</taskNode>
 
-	<task-node name="OnTruck">
+	<taskNode name="OnTruck">
 		<task swimlane="ROLE_WF_SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
@@ -328,64 +328,9 @@
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
-	</task-node>
+	</taskNode>
 
-	<task-node name="InTransit">
-		<task swimlane="ROLE_WF_SUPERVISOR">
-			<transition to="Hold" flag="issue"/>
-			<transition to="Ready" />
-			<transition to="Release" />
-			<transition to="Unracking"/>
-			<transition to="Unracked"/>
-			<transition to="Cleaned"/>
-			<transition to="OnCart"/>
-			<transition to="OnTruck"/>
-			<transition to="EndTransit"/>
-			<transition to="OffTruck"/>
-			<transition to="Staged"/>
-			<transition to="Reracking"/>
-			<transition to="Racked"/>
-			<transition to="QAVerified"/>
-			<transition to="PoweredOn"/>
-			<transition to="NetVerify"/>
-			<transition to="NetVerified"/>
-			<transition to="SANVerify"/>
-			<transition to="SANVerified"/>
-			<transition to="DBStarted"/>
-			<transition to="DBFinished"/>
-			<transition to="AppStartup"/>
-			<transition to="AppFinished"/>
-			<transition to="AppVerify"/>
-			<transition to="AppVerified"/>
-			<transition to="Completed"/>
-		</task>
-	</task-node>
-
-	<task-node name="EndTransit">
-		<task swimlane="ROLE_WF_SUPERVISOR">
-			<transition to="Hold" flag="issue"/>
-			<transition to="InTransit"/>
-			<transition to="OffTruck"/>
-			<transition to="Staged"/>
-			<transition to="Reracking"/>
-			<transition to="Racked"/>
-			<transition to="QAVerified"/>
-			<transition to="PoweredOn"/>
-			<transition to="NetVerify"/>
-			<transition to="NetVerified"/>
-			<transition to="SANVerify"/>
-			<transition to="SANVerified"/>
-			<transition to="DBStarted"/>
-			<transition to="DBFinished"/>
-			<transition to="AppStartup"/>
-			<transition to="AppFinished"/>
-			<transition to="AppVerify"/>
-			<transition to="AppVerified"/>
-			<transition to="Completed"/>
-		</task>
-	</task-node>
-
-	<task-node name="OffTruck">
+	<taskNode name="InTransit">
 		<task swimlane="ROLE_WF_SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
@@ -395,7 +340,6 @@
 			<transition to="Cleaned"/>
 			<transition to="OnCart"/>
 			<transition to="OnTruck"/>
-			<transition to="InTransit"/>
 			<transition to="EndTransit"/>
 			<transition to="OffTruck"/>
 			<transition to="Staged"/>
@@ -415,9 +359,33 @@
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
-	</task-node>
+	</taskNode>
 
-	<task-node name="Staged">
+	<taskNode name="EndTransit">
+		<task swimlane="ROLE_WF_SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="InTransit"/>
+			<transition to="OffTruck"/>
+			<transition to="Staged"/>
+			<transition to="Reracking"/>
+			<transition to="Racked"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="NetVerify"/>
+			<transition to="NetVerified"/>
+			<transition to="SANVerify"/>
+			<transition to="SANVerified"/>
+			<transition to="DBStarted"/>
+			<transition to="DBFinished"/>
+			<transition to="AppStartup"/>
+			<transition to="AppFinished"/>
+			<transition to="AppVerify"/>
+			<transition to="AppVerified"/>
+			<transition to="Completed"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="OffTruck">
 		<task swimlane="ROLE_WF_SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
@@ -447,9 +415,9 @@
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
-	</task-node>
+	</taskNode>
 
-	<task-node name="Rerack/Cabling Started">
+	<taskNode name="Staged">
 		<task swimlane="ROLE_WF_SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
@@ -479,9 +447,9 @@
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
-	</task-node>
+	</taskNode>
 
-	<task-node name="Reracked/Cabled">
+	<taskNode name="Rerack/Cabling Started">
 		<task swimlane="ROLE_WF_SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
@@ -511,9 +479,9 @@
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
-	</task-node>
+	</taskNode>
 
-	<task-node name="QA Verification">
+	<taskNode name="Reracked/Cabled">
 		<task swimlane="ROLE_WF_SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
@@ -543,9 +511,9 @@
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
-	</task-node>
+	</taskNode>
 
-	<task-node name="Powered On">
+	<taskNode name="QA Verification">
 		<task swimlane="ROLE_WF_SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
@@ -575,9 +543,9 @@
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
-	</task-node>
+	</taskNode>
 
-	<task-node name="Verify Network Started">
+	<taskNode name="Powered On">
 		<task swimlane="ROLE_WF_SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
@@ -607,9 +575,9 @@
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
-	</task-node>
+	</taskNode>
 
-	<task-node name="Unracking Started">
+	<taskNode name="Verify Network Started">
 		<task swimlane="ROLE_WF_SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
@@ -639,7 +607,39 @@
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
-	</task-node>
+	</taskNode>
+
+	<taskNode name="Unracking Started">
+		<task swimlane="ROLE_WF_SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Ready" />
+			<transition to="Release" />
+			<transition to="Unracking"/>
+			<transition to="Unracked"/>
+			<transition to="Cleaned"/>
+			<transition to="OnCart"/>
+			<transition to="OnTruck"/>
+			<transition to="InTransit"/>
+			<transition to="EndTransit"/>
+			<transition to="OffTruck"/>
+			<transition to="Staged"/>
+			<transition to="Reracking"/>
+			<transition to="Racked"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="NetVerify"/>
+			<transition to="NetVerified"/>
+			<transition to="SANVerify"/>
+			<transition to="SANVerified"/>
+			<transition to="DBStarted"/>
+			<transition to="DBFinished"/>
+			<transition to="AppStartup"/>
+			<transition to="AppFinished"/>
+			<transition to="AppVerify"/>
+			<transition to="AppVerified"/>
+			<transition to="Completed"/>
+		</task>
+	</taskNode>
 
 	<end-state name="Completed"/>
 	<end-state name="Terminated"/>
