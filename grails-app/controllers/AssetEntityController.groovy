@@ -167,7 +167,6 @@ class AssetEntityController {
                     dataTransferBatch.project = project
                     dataTransferBatch.userLogin = userLogin
                     if(dataTransferBatch.save()){
-                    	def dataTransferComment    
                         def dataTransferValue
                         def eavAttributeInstance
                         for( int cols = 0; cols < col; cols++ ) {
@@ -201,8 +200,12 @@ class AssetEntityController {
                             	
                                 def sheet1 = workbook.getSheet(sheetNames[i])
                                 for( int rows1 = 1; rows1 < sheet1.rows; rows1++ ) {
-                                	
+                                	def commentAssetId = Integer.parseInt(sheet1.getCell(0,rows1).contents)
+                                	def dataTransferComment
+                                	dataTransferComment = DataTransferComment.find("from DataTransferComment dc where dc.assetId = $commentAssetId ")
+                                	if( dataTransferComment == null ) {
                                     dataTransferComment = new DataTransferComment()
+                                	}
                                     dataTransferComment.assetId = Integer.parseInt(sheet1.getCell(0,rows1).contents)                                 
                                     dataTransferComment.commentType = sheet1.getCell(2,rows1).contents
                                     dataTransferComment.comment = sheet1.getCell(3,rows1).contents
@@ -220,7 +223,7 @@ class AssetEntityController {
                 if (skipped.size() > 0) {
                     flash.message = " File Uploaded Successfully with ${added} Assets and Skipped are ${skipped}. "
                 } else {
-                    flash.message = " File Uploaded Successfully with ${added} Assets. "
+                    flash.message = " File Uploaded Successfully with ${added} DataTransferValue Records. "
                 }
                 redirect( action:assetImport, params:[projectId:projectId] )
 	              
@@ -286,7 +289,7 @@ class AssetEntityController {
 
             // Going to use temporary file because we were getting out of memory errors constantly on staging server
             WorkbookSettings wbSetting = new WorkbookSettings()
-	    wbSetting.setUseTemporaryFileDuringWrite(true)
+            wbSetting.setUseTemporaryFileDuringWrite(true)
             workbook = Workbook.getWorkbook( con.getInputStream(), wbSetting )
 	            
             //set MIME TYPE as Excel
@@ -306,15 +309,16 @@ class AssetEntityController {
             def dataTransferAttributeMapSheetName
             //get columnNames in to map
             dataTransferAttributeMap.eachWithIndex { item, pos ->
-                map.put( item.columnName, null )
-                columnNameList.add(item.columnName)
+               
+            	map.put( item.columnName, null )
+            	columnNameList.add(item.columnName)
                 sheetNameMap.put( "sheetName", (item.sheetName).trim() )
             }
             def sheetNames = book.getSheetNames()
             def flag = 0
             def sheetNamesLength = sheetNames.length
             for( int i=0;  i < sheetNamesLength; i++ ) {
-	            	
+	            
                 if ( sheetNameMap.containsValue( sheetNames[i].trim()) ) {
                     flag = 1
                     sheet = book.getSheet( sheetNames[i] )
@@ -398,6 +402,8 @@ class AssetEntityController {
                                 commentTypeTotal = new Label(2,cr,String.valueOf(assetcmt[cr-1].commentType))
                                 sheet1.addCell(commentTypeTotal)
                                 commentCmtTotal = new Label(3,cr,String.valueOf(assetcmt[cr-1].comment))
+                                sheet1.addCell(commentCmtTotal)
+                                 commentCmtTotal = new Label(4,cr,String.valueOf(assetcmt[cr-1].id))
                                 sheet1.addCell(commentCmtTotal)
                             }
                                                           

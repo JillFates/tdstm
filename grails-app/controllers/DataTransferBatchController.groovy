@@ -41,25 +41,40 @@ class DataTransferBatchController {
 	        				def exportMoveBundleInstance = MoveBundle.findByName(it.correctedValue)
 	        				assetEntity."$attribName" = exportMoveBundleInstance ? exportMoveBundleInstance : importMoveBundleInstance
 	    				}
-	    			}else {
-	    				assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
+	    			}else if( attribName == "sourceRackPosition" ){
+	    				def importPos
+	    				def correctedPos
+	    				if(it.importValue != null && it.importValue != "") {
+	    					importPos = Integer.parseInt(it.importValue)
+	    				}
+	    				if(it.correctedValue != null && it.correctedValue != "") {
+	    					correctedPos = Integer.parseInt(it.correctedValue)
+	    				}
+	    				
+	    				correctedPos = it.correctedValue
+	    				assetEntity."$attribName" = correctedPos ? correctedPos : importPos
 	    			}
 	    		}
 	    		assetEntity.save()
     		}
     	}  
     	def dataTransferCommentRowList = DataTransferComment.findAll(" From DataTransferComment dtc where dtc.dataTransferBatch = $dataTransferBatch.id")
-    	def assetComment
     	
     	if(dataTransferCommentRowList){
-    		
     		dataTransferCommentRowList.each{
-    			assetComment = new AssetComment() 
-    			assetComment.comment = it.comment        		
-        		assetComment.commentType = it.commentType
-        		assetComment.mustVerify = it.mustVerify
-        		assetComment.assetEntity =AssetEntity.findById(it.assetId)        		
-        		assetComment.save()
+    			def assetEntity = AssetEntity.findById(it.assetId)
+    			def assetCommentInstance = AssetComment.find("from AssetComment ac where ac.assetEntity = $assetEntity.id")
+    			if(assetCommentInstance == null ){
+    				assetCommentInstance = new AssetComment()
+    				assetCommentInstance.assetEntity = assetEntity
+    			}
+    			assetCommentInstance.comment = it.comment
+    			assetCommentInstance.commentType = it.commentType
+        		assetCommentInstance.mustVerify = it.mustVerify
+        		if(!assetCommentInstance.hasErrors()) {
+            		assetCommentInstance.save()
+                }
+        		
     		}
     		
     	}
