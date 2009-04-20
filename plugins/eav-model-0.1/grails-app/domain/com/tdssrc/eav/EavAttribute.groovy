@@ -34,7 +34,7 @@ class EavAttribute {
 	static constraints = {
 		attributeCode( unique:true, blank:false )
 		note(size:0..255)
-		backendType( blank:false, inList:['datetime', 'decimal', 'int', 'text', 'varchar'])
+		backendType( blank:false, inList:['datetime', 'decimal', 'int', 'text', 'varchar','String'])
 		frontendLabel(size:0..255)
 		frontendInput( inList:['text', 'textarea', 'autocomplete', 'checkbox', 'select', 'multiselect', 'radio'])
 		defaultValue( )

@@ -78,7 +78,7 @@ class AssetEntityAttributeLoaderService {
 					// Try saving
 					eavAttribute = new EavAttribute( attributeCode:attributeCode,
 						note: note,
-						backendType: "varchar",
+						backendType: backEndType,
 						frontendInput: frontEndInput,
 						entityType: entityType,
 						frontendLabel: fronEndLabel,

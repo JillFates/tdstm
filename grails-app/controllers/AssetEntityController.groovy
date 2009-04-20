@@ -200,11 +200,13 @@ class AssetEntityController {
                             	
                                 def sheet1 = workbook.getSheet(sheetNames[i])
                                 for( int rows1 = 1; rows1 < sheet1.rows; rows1++ ) {
-                                	def commentAssetId = Integer.parseInt(sheet1.getCell(0,rows1).contents)
                                 	def dataTransferComment
-                                	dataTransferComment = DataTransferComment.find("from DataTransferComment dc where dc.assetId = $commentAssetId ")
+                                	if(sheet1.getCell(4,rows1).contents != "" && sheet1.getCell(4,rows1).contents != null ) {
+                                		def commentId = Integer.parseInt(sheet1.getCell(4,rows1).contents)
+                                		dataTransferComment = DataTransferComment.findById(commentId)
+                                	}
                                 	if( dataTransferComment == null ) {
-                                    dataTransferComment = new DataTransferComment()
+                                		dataTransferComment = new DataTransferComment()
                                 	}
                                     dataTransferComment.assetId = Integer.parseInt(sheet1.getCell(0,rows1).contents)                                 
                                     dataTransferComment.commentType = sheet1.getCell(2,rows1).contents
@@ -221,9 +223,9 @@ class AssetEntityController {
                 } // generate error message
                 workbook.close()
                 if (skipped.size() > 0) {
-                    flash.message = " File Uploaded Successfully with ${added} Assets and Skipped are ${skipped}. "
+                    flash.message = " File Uploaded Successfully with ${added} records. and  ${skipped} Records skipped Please click the Manage Batches to review and post these changes."
                 } else {
-                    flash.message = " File Uploaded Successfully with ${added} DataTransferValue Records. "
+                    flash.message = " File uploaded successfully with ${added} records.  Please click the Manage Batches to review and post these changes."
                 }
                 redirect( action:assetImport, params:[projectId:projectId] )
 	              
