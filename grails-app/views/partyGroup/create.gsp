@@ -2,7 +2,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="main" />
-        <title>Create PartyGroup</title>
+        <title>Create Company</title>
         <g:javascript>
         function textCounter(field, maxlimit){
 	      if (field.value.length > maxlimit){ // if too long...trim it!
@@ -16,7 +16,7 @@
     </head>
     <body>
         <div class="body">
-            <h1>Create PartyGroup</h1>
+            <h1>Create Company</h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
@@ -30,7 +30,8 @@
 					                <g:renderErrors bean="${partyGroupInstance}" as="list" idCheck/>
 					            </div>
 					            </g:hasErrors>
-                            <tr class="prop">
+					            <input  type="hidden" name="partyType.id" value="COMPANY">
+                           <!--  <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="partyType">Party Type:</label>
                                 </td>
@@ -42,7 +43,7 @@
 					            </div>
 					            </g:hasErrors>
                                 </td>
-                            </tr> 
+                            </tr> -->
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
