@@ -685,7 +685,7 @@
 				</g:remoteLink>
 				</g:if>
 				<g:else>
-				<a href="#" onclick="document.getElementById('createAssetCommentId').value = ${assetEntityInstance.id};document.getElementById('statusId').value = 'new';$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('open');$('#commentsListDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')">
+				<a href="#" onclick="document.getElementById('createAssetCommentId').value = ${assetEntityInstance.id};document.getElementById('statusId').value = 'new';$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('open');$('#commentsListDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">
 					<img src="${createLinkTo(dir:'images/skin',file:'database_table_light.png')}" border="0px">
 				</a>
 				</g:else>
@@ -796,7 +796,7 @@
 		</table>
 	</div>
 	<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-		<span class="menuButton"><a class="create" href="#" onclick="document.getElementById('statusId').value = '';$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" >New Comment</a></span>
+		<span class="menuButton"><a class="create" href="#" onclick="document.getElementById('statusId').value = '';$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();" >New Comment</a></span>
 	</div>
 </div>
 <div id="createCommentDialog" title="Create Asset Comment" style="display: none;">
@@ -857,7 +857,7 @@
             	<td valign="top" class="name">
                 <label for="mustVerify">Must Verify:</label>
                 </td>
-                <td valign="top" class="value" id="verifyTdId"><input type="checkbox" id="mustVerifyShowId" name="mustVerify" value="0" /></td>
+                <td valign="top" class="value" id="verifyTdId"><input type="checkbox" id="mustVerifyShowId" name="mustVerify" value="0" disabled="disabled" /></td>
             </tr>
 		</tbody>
 	</table>
