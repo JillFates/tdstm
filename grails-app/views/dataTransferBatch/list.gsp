@@ -50,7 +50,7 @@
                         
                             <td>${dataTransferBatch?.dataTransferSet?.title}</td>
                         
-                            <td></td>
+                            <td>${DataTransferValue.executeQuery('select count(d.id) from DataTransferValue d where d.dataTransferBatch = '+ dataTransferBatch?.id +' group by rowId' ).size()}</td>
                             
                             <td></td>
                             

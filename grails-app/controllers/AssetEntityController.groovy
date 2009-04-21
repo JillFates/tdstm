@@ -7,6 +7,7 @@ import org.springframework.web.multipart.commons.*
 import grails.converters.JSON
 import org.jsecurity.SecurityUtils
 import com.tdssrc.eav.*
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 class AssetEntityController {
     
     //TODO : Fix indentation
@@ -169,27 +170,33 @@ class AssetEntityController {
                     if(dataTransferBatch.save()){
                         def dataTransferValue
                         def eavAttributeInstance
+                        def colNo = 0
                         for( int cols = 0; cols < col; cols++ ) {
                             def dataTransferAttributeMapInstance = DataTransferAttributeMap.findByColumnName(sheet.getCell( cols, 0 ).contents)
                             if( dataTransferAttributeMapInstance != null ) {
+                            	if(dataTransferAttributeMapInstance.columnName == "Server"){
+                            		colNo = cols
+                            	}
                                 for ( int r = 1; r < sheet.rows; r++ ) {
-                                    dataTransferValue = new DataTransferValue()
-                                    eavAttributeInstance = dataTransferAttributeMapInstance.eavAttribute
-                                    dataTransferValue.importValue = sheet.getCell( cols, r ).contents
-                                    dataTransferValue.rowId = r
-                                    dataTransferValue.dataTransferBatch = dataTransferBatch
-                                    dataTransferValue.eavAttribute = eavAttributeInstance
-                                    if( sheetColumnNames.containsKey("assetId") && (sheet.getCell( 0, r ).contents != "") ) {
-	                                    	
-                                        dataTransferValue.assetEntityId = Integer.parseInt(sheet.getCell( 0, r ).contents)
-                                    }
-                                    //dataTransferValue.save()
-                                    if ( dataTransferValue.save() ) {
-                                        added++
-                                    } else {
-                                        skipped += ( r +1 )
-                                    }
-	                                    
+                                	def server = sheet.getCell( colNo, r ).contents
+                                	if(server){
+	                                    dataTransferValue = new DataTransferValue()
+	                                    eavAttributeInstance = dataTransferAttributeMapInstance.eavAttribute
+	                                    dataTransferValue.importValue = sheet.getCell( cols, r ).contents
+	                                    dataTransferValue.rowId = r
+	                                    dataTransferValue.dataTransferBatch = dataTransferBatch
+	                                    dataTransferValue.eavAttribute = eavAttributeInstance
+	                                    if( sheetColumnNames.containsKey("assetId") && (sheet.getCell( 0, r ).contents != "") ) {
+		                                    	
+	                                        dataTransferValue.assetEntityId = Integer.parseInt(sheet.getCell( 0, r ).contents)
+	                                    }
+	                                    //dataTransferValue.save()
+	                                    if ( dataTransferValue.save() ) {
+	                                        added = r
+	                                    } else {
+	                                        skipped += ( r +1 )
+	                                    }
+                                	}
                                 }
                             }
 	                	
@@ -197,25 +204,26 @@ class AssetEntityController {
                         for( int i=0;  i < sheetNamesLength; i++ ) {
 	    	        	    	
                             if(sheetNames[i] == "Comments"){
-                            	
-                                def sheet1 = workbook.getSheet(sheetNames[i])
-                                for( int rows1 = 1; rows1 < sheet1.rows; rows1++ ) {
+                                def commentSheet = workbook.getSheet(sheetNames[i])
+                                for( int rowNo = 1; rowNo < commentSheet.rows; rowNo++ ) {
                                 	def dataTransferComment
-                                	if(sheet1.getCell(4,rows1).contents != "" && sheet1.getCell(4,rows1).contents != null ) {
-                                		def commentId = Integer.parseInt(sheet1.getCell(4,rows1).contents)
-                                		dataTransferComment = DataTransferComment.findById(commentId)
+                                	def commentId = commentSheet.getCell(1,rowNo).contents
+                                	def assetCommentId
+                                	if( commentId != "" && commentId != null ) {
+                                		assetCommentId = Integer.parseInt(commentId)
+                                		dataTransferComment = DataTransferComment.findByCommentId(commentId)
                                 	}
                                 	if( dataTransferComment == null ) {
                                 		dataTransferComment = new DataTransferComment()
                                 	}
-                                    dataTransferComment.assetId = Integer.parseInt(sheet1.getCell(0,rows1).contents)                                 
-                                    dataTransferComment.commentType = sheet1.getCell(2,rows1).contents
-                                    dataTransferComment.comment = sheet1.getCell(3,rows1).contents
-                                    dataTransferComment.rowId = rows1
+                                	dataTransferComment.commentId = assetCommentId
+                                    dataTransferComment.assetId = Integer.parseInt(commentSheet.getCell(0,rowNo).contents)                                 
+                                    dataTransferComment.commentType = commentSheet.getCell(3,rowNo).contents
+                                    dataTransferComment.comment = commentSheet.getCell(4,rowNo).contents
+                                    dataTransferComment.rowId = rowNo
                                     dataTransferComment.dataTransferBatch = dataTransferBatch
                                     dataTransferComment.save()
-			                	
-                                }
+                                	}
                             }
                         }
                     }
@@ -276,7 +284,7 @@ class AssetEntityController {
         def book
         try {
             // Statements to get context details
-            def tempProtocol = request.getProtocol()
+            /*def tempProtocol = request.getProtocol()
             def protocol = tempProtocol.substring(0,tempProtocol.indexOf("/"))
             def serverName = request.getServerName()
             def serverPort = request.getServerPort()
@@ -287,12 +295,14 @@ class AssetEntityController {
             def filenametoSet = dataTransferSetInstance.templateFilename
             def templateFilePath = appUrl + filenametoSet
             def url = new URL( templateFilePath )
-            HttpURLConnection con = url.openConnection()
-
+            HttpURLConnection con = url.openConnection()*/
+            
+            def filenametoSet = dataTransferSetInstance.templateFilename
+            File file =  ApplicationHolder.application.parentContext.getResource(filenametoSet).getFile()
             // Going to use temporary file because we were getting out of memory errors constantly on staging server
             WorkbookSettings wbSetting = new WorkbookSettings()
             wbSetting.setUseTemporaryFileDuringWrite(true)
-            workbook = Workbook.getWorkbook( con.getInputStream(), wbSetting )
+            workbook = Workbook.getWorkbook( file, wbSetting )
 	            
             //set MIME TYPE as Excel
             filenametoSet = filenametoSet.split("/")
@@ -381,7 +391,7 @@ class AssetEntityController {
                     for( int sl=0;  sl < sheetNamesLength; sl++ ) {
                     	def commentIt = new ArrayList()
                         if(sheetNames[sl] == "Comments"){
-                        	def sheet1 = book.getSheet("Comments") 
+                        	def commentSheet = book.getSheet("Comments") 
                         	asset.each{
                         		commentIt.add(it.id)                        		
                             }
@@ -394,21 +404,24 @@ class AssetEntityController {
                                     commentList.append( commentIt[k] )
 	                            }
                             }
-                            def assetcmt = AssetComment.findAll("from AssetComment cmt where cmt.assetEntity in ($commentList)")
-                            def commentEtyTotal
-                            def commentTypeTotal
-                            def commentCmtTotal
-                            for(int cr=1 ; cr<=assetcmt.size() ; cr++){
-                                commentEtyTotal = new Label(0,cr,String.valueOf(assetcmt[cr-1].assetEntity.id))
-                                sheet1.addCell(commentEtyTotal)
-                                commentTypeTotal = new Label(2,cr,String.valueOf(assetcmt[cr-1].commentType))
-                                sheet1.addCell(commentTypeTotal)
-                                commentCmtTotal = new Label(3,cr,String.valueOf(assetcmt[cr-1].comment))
-                                sheet1.addCell(commentCmtTotal)
-                                 commentCmtTotal = new Label(4,cr,String.valueOf(assetcmt[cr-1].id))
-                                sheet1.addCell(commentCmtTotal)
+                            def assetcomment = AssetComment.findAll("from AssetComment cmt where cmt.assetEntity in ($commentList)")
+                            def assetId
+                            def commentType
+                            def comment
+                            def commentId
+                            def assetName
+                            for(int cr=1 ; cr<=assetcomment.size() ; cr++){
+                            	assetId = new Label(0,cr,String.valueOf(assetcomment[cr-1].assetEntity.id))
+                                commentSheet.addCell(assetId)
+                                commentId = new Label(1,cr,String.valueOf(assetcomment[cr-1].id))
+                                commentSheet.addCell(commentId)
+                                assetName = new Label(2,cr,String.valueOf(assetcomment[cr-1].assetEntity.assetName))
+                                commentSheet.addCell(assetName)
+                                commentType = new Label(3,cr,String.valueOf(assetcomment[cr-1].commentType))
+                                commentSheet.addCell(commentType)
+                                comment = new Label(4,cr,String.valueOf(assetcomment[cr-1].comment))
+                                commentSheet.addCell(comment)
                             }
-                                                          
                         }
                     }
                     book.write()

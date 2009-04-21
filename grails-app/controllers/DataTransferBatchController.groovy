@@ -15,64 +15,80 @@ class DataTransferBatchController {
             return [ dataTransferBatchList:dataTransferBatchList, projectId:projectId ]
     }
     //Process DataTransfervalues Corresponding to DataTransferBatch
-    def process = {
+    def process = { 
     	def projectId = params.projectId
     	def projectInstance = Project.findById( projectId )
     	def dataTransferBatch = DataTransferBatch.get(params.batchId)
-    	def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = $dataTransferBatch.id group by rowId")
-    	for(int dataTransferValueRow =0; dataTransferValueRow < dataTransferValueRowList.size(); dataTransferValueRow ++) {
-    		def rowId =dataTransferValueRowList[dataTransferValueRow].rowId
-    		def dtvList = DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
-    		def  assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
-    		def assetEntity
-    		if(assetEntityId == null) {
-    			assetEntity = new AssetEntity()
-    			assetEntity.attributeSet = EavAttributeSet.findById(1)
-    		}else {
-    			assetEntity = AssetEntity.findById(assetEntityId)
-    		}
-    		if(assetEntity){
-	    		assetEntity.project = projectInstance 
-	    		dtvList.each {
-	    			def attribName = it.eavAttribute.attributeCode
-	    			if ( attribName == "moveBundle" ) {
-	    				if( it.importValue != null && it.correctedValue != null ) {
-	    					def importMoveBundleInstance = MoveBundle.findByName(it.importValue)
-	        				def exportMoveBundleInstance = MoveBundle.findByName(it.correctedValue)
-	        				assetEntity."$attribName" = exportMoveBundleInstance ? exportMoveBundleInstance : importMoveBundleInstance
-	    				}
-	    			}else if( it.eavAttribute.backendType == "int" ){
-	    				def importPos
-	    				def correctedPos
-	    				if(it.importValue != null && it.importValue != "") {
-	    					importPos = Integer.parseInt(it.importValue)
-	    				}
-	    				if(it.correctedValue != null && it.correctedValue != "") {
-	    					correctedPos = Integer.parseInt(it.correctedValue)
-	    				}
-	    				
-	    				correctedPos = it.correctedValue
-	    				assetEntity."$attribName" = correctedPos ? correctedPos : importPos
-	    			}else {
-	    				assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
-	    			}
-	    		}
-	    		assetEntity.save()
-    		}
-    	}  
-    	def dataTransferCommentRowList = DataTransferComment.findAll(" From DataTransferComment dtc where dtc.dataTransferBatch = $dataTransferBatch.id")
-    	def assetComment
-    	if(dataTransferCommentRowList){
-    		dataTransferCommentRowList.each{
-    			assetComment = new AssetComment() 
-    			assetComment.comment = it.comment        		
-        		assetComment.commentType = it.commentType
-        		assetComment.mustVerify = it.mustVerify
-        		assetComment.assetEntity =AssetEntity.findById(it.assetId)        		
-        		assetComment.save()
-    		}
-    		
-    	}
+    	try{
+	    	if(dataTransferBatch){
+		    	def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = $dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
+		    	for(int dataTransferValueRow =0; dataTransferValueRow < dataTransferValueRowList.size(); dataTransferValueRow ++) {
+		    		def rowId =dataTransferValueRowList[dataTransferValueRow].rowId
+		    		def dtvList = DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
+		    		def  assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
+		    		def assetEntity
+		    		if(assetEntityId == null) {
+		    			assetEntity = new AssetEntity()
+		    			assetEntity.attributeSet = EavAttributeSet.findById(1)
+		    		}else {
+		    			assetEntity = AssetEntity.findById(assetEntityId)
+		    		}
+		    		if(assetEntity){
+			    		assetEntity.project = projectInstance 
+			    		dtvList.each {
+			    			def attribName = it.eavAttribute.attributeCode
+			    			if ( attribName == "moveBundle" ) {
+			    				if( it.importValue != null && it.correctedValue != null ) {
+			    					def importMoveBundleInstance = MoveBundle.findByName(it.importValue)
+			        				def exportMoveBundleInstance = MoveBundle.findByName(it.correctedValue)
+			        				assetEntity."$attribName" = exportMoveBundleInstance ? exportMoveBundleInstance : importMoveBundleInstance
+			    				}
+			    			}else if( it.eavAttribute.backendType == "int" ){
+			    				def importPos
+			    				def correctedPos
+			    				if(it.importValue != null && it.importValue != "") {
+			    					importPos = Integer.parseInt(it.importValue)
+			    				}
+			    				if(it.correctedValue != null && it.correctedValue != "") {
+			    					correctedPos = Integer.parseInt(it.correctedValue)
+			    				}
+			    				
+			    				correctedPos = it.correctedValue
+			    				assetEntity."$attribName" = correctedPos ? correctedPos : importPos
+			    			}else {
+			    				assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
+			    			}
+			    		}
+			    		assetEntity.save(flush:true)
+		    		}
+		    	}  
+		    	def dataTransferCommentRowList = DataTransferComment.findAll(" From DataTransferComment dtc where dtc.dataTransferBatch = $dataTransferBatch.id and dtc.dataTransferBatch.statusCode = 'PENDING'")
+		    	if(dataTransferCommentRowList){
+		    		dataTransferCommentRowList.each{
+		    			def assetComment
+		    			def assetEntity = AssetEntity.findById(it.assetId)
+		    			if(assetEntity){
+		    			if(it.commentId){
+		    				assetComment = AssetComment.findById(it.commentId)
+		    			} 
+		    			if(!assetComment){
+			    			assetComment = new AssetComment()
+			    			assetComment.mustVerify = 0
+		    			}
+			    		assetComment.comment = it.comment  		
+			        	assetComment.commentType = it.commentType
+			        	assetComment.assetEntity = assetEntity        		
+			        	assetComment.save(flush:true)
+		    			}
+		    		}
+		    		
+		    	}
+		    dataTransferBatch.statusCode = 'COMPLETED'
+		    dataTransferBatch.save(flush:true)
+	    	}
+    	}catch (Exception e) {
+			flash.message = "Import Batch process failed"
+		}
     	redirect (action:list, params:[projectId:projectId])
      }
     /*

@@ -6,6 +6,7 @@ class DataTransferComment
 	DataTransferBatch dataTransferBatch
 	Integer rowId
 	Integer assetId
+	Integer commentId
 	static mapping = {
 	 	version false
 		columns {
@@ -15,7 +16,8 @@ class DataTransferComment
 	}
 	static constraints = {
 		 comment(blank:true, nullable:true)
-		 commentType(inList:['issue','instruction','comment'] )
+		 commentId(blank:true, nullable:true)
+		 commentType(inList:['issue','instruction','comment'])
 		 mustVerify( blank:true, nullable:true)
 		 rowId(blank:false)	
 		 assetId(blank:true, nullable:true)
