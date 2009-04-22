@@ -479,15 +479,31 @@ class MoveBundleAssetController {
         def projectId = currProj.CURR_PROJ
         def projectInstance = Project.findById( projectId )
         def partyGroupInstance = PartyGroup.get(projectInstance.id)
-   		assetEntityList.each {
+   		assetEntityList.each { asset ->
+   			 def bundleInstance = MoveBundle.findById(asset.moveBundle.id)
+   			 def bundlePartyGroup = PartyGroup.findById(bundleInstance?.id)
+   			 def teamPartyGroup = PartyGroup.findById(asset.sourceTeam?.id)
+   			 def assetCommentList = AssetComment.findByAssetEntity(asset)
+    		def assetCommentString =""
+    		assetCommentList.each { assetComment ->
+    		assetCommentString = assetCommentString + assetComment.comment +"\n"
+    		}
    			 
-   			 reportFields <<['asset_name':it.assetName , 'asset_tag':it.assetTag, "asset_type":it.assetType, "manufacturer":it.manufacturer, "model":it.model, "source_rack":it.sourceRack, "source_rack_position":it.sourceRackPosition, "usize":it.usize, "cart":it.cart, "shelf":it.shelf,"source_team_id":it.sourceTeam.id, "move_bundle_id":it.moveBundle.id, "clientName":projectInstance.client.name,
-   			                 'projectName':partyGroupInstance.name, 'bundleName':bundleName, 'teamName':teamName, 'teamMembers':teamMembers,'location':"Source Team", 'rack':"SourceRack",'rackPos':"SourceRackPosition"]
+   			 reportFields <<['assetName':asset.assetName , 'assetTag':asset.assetTag, "assetType":asset.assetType, "manufacturer":asset.manufacturer, "model":asset.model, "sourceTargetrack":asset.sourceRack, "position":asset.sourceRackPosition, "sourceTargetPos":asset.sourceLocation+ "(source/ unracking)", "usize":asset.usize, "cart":asset.cart, "shelf":asset.shelf,"source_team_id":asset.sourceTeam.id, "move_bundle_id":asset.moveBundle.id, "clientName":projectInstance.client.name,
+   			                 'projectName':partyGroupInstance.name,'startAt':projectInstance.startDate, 'completedAt':projectInstance.completionDate, 'bundleName':bundlePartyGroup.name, 'teamName':teamPartyGroup.name, 'teamMembers':teamMembers,'location':"Source Team", 'rack':"SourceRack",'rackPos':"SourceRackPosition",'truck':asset.truck, 'room':asset.sourceRoom, 'PDU':asset.powerPort,'NIC':asset.nicPort,'kvmPort':asset.kvmDevice ? asset.kvmDevice : '' + asset.kvmPort ? asset.kvmPort :'', 'hbaPort':asset.fiberCabinet + asset.hbaPort, 'instructions':assetCommentString, 'sourcetargetLoc':asset.sourceLocation]
    		}
-    	targetAssetEntitylist.each {
-  			 
-  			 reportFields <<['asset_name':it.assetName , 'asset_tag':it.assetTag, "asset_type":it.assetType, "manufacturer":it.manufacturer, "model":it.model, "source_rack":it.targetRack, "source_rack_position":it.targetRackPosition, "usize":it.usize, "cart":it.cart, "shelf":it.shelf,"source_team_id":it.sourceTeam.id, "move_bundle_id":it.moveBundle.id, "clientName":projectInstance.client.name,
-  			                 'projectName':partyGroupInstance.name, 'bundleName':bundleName, 'teamName':teamName, 'teamMembers':teamMembers,'location':"Target Team", 'rack':"TargetRack",'rackPos':"TargetRackPosition"]
+    	targetAssetEntitylist.each { asset ->
+    		
+    		def bundleInstance = MoveBundle.findById(asset.moveBundle.id)
+    		def bundlePartyGroup = PartyGroup.findById(bundleInstance?.id)
+    		def teamPartyGroup = PartyGroup.findById(asset.targetTeam?.id)
+    		def assetCommentList = AssetComment.findByAssetEntity(asset)
+    		def assetCommentString =""
+    		assetCommentList.each { assetComment ->
+    		assetCommentString = assetCommentString + assetComment.comment +"\n"
+    		}
+    		reportFields <<['assetName':asset.assetName , 'assetTag':asset.assetTag, "assetType":asset.assetType, "manufacturer":asset.manufacturer, "model":asset.model, "sourceTargetrack":asset.targetRack, "position":asset.targetRackPosition, "sourceTargetPos":asset.targetLocation+ "(target/ reracking)", "usize":asset.usize, "cart":asset.cart, "shelf":asset.shelf,"source_team_id":asset.targetTeam.id, "move_bundle_id":asset.moveBundle.id, "clientName":projectInstance.client.name,
+  			                 'projectName':partyGroupInstance.name,'startAt':projectInstance.startDate, 'completedAt':projectInstance.completionDate, 'bundleName':bundlePartyGroup.name, 'teamName':teamPartyGroup.name, 'teamMembers':teamMembers,'location':"Target Team", 'rack':"TargetRack",'rackPos':"TargetRackPosition",'truck':asset.truck,'room':asset.targetRoom,'PDU':asset.powerPort,'NIC':asset.nicPort, 'kvmPort':asset.kvmDevice ? asset.kvmDevice : '' + asset.kvmPort ? asset.kvmPort : '', 'hbaPort':asset.fiberCabinet ? asset.fiberCabinet : '' + asset.hbaPort ? asset.hbaPort : '','instructions':assetCommentString,'sourcetargetLoc':asset.targetLocation]
   		}
    		chain(controller:'jasper',action:'index',model:[data:reportFields],params:params)
     	}
@@ -525,7 +541,7 @@ class MoveBundleAssetController {
     	}else {	
     		assetEntityList = AssetEntity.findAll("from AssetEntity asset  order By asset.sourceTeam")
     	}
-    	assetEntityList.each {
+    	assetEntityList.each { 
       		 reportFields <<['asset_name':it.assetName , 'asset_tag':it.assetTag, "asset_type":it.assetType, "manufacturer":it.manufacturer, "model":it.model, "source_rack":it.sourceRack, "source_rack_position":it.sourceRackPosition, "usize":it.usize, "cart":it.cart, "shelf":it.shelf,"source_team_id":it.sourceTeam.id, "move_bundle_id":it.moveBundle.id, "clientName":projectInstance.client.name,
       		                 'projectName':partyGroupInstance.name, 'bundleName':bundleName, 'teamName':"", 'teamMembers':"",'location':"Source Team", 'rack':"SourceRack",'rackPos':"SourceRackPosition"]
       	}
