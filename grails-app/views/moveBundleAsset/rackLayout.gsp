@@ -180,7 +180,7 @@
 		<tr>
 
 			<td class="buttonR"><g:jasperReport controller="moveBundleAsset"
-				action="rackLayoutReport" jasper="teamWorksheetReport" format="PDF"
+				action="rackLayoutReport" jasper="workSheetsReport" format="PDF"
 				name="Generate">
 
 				<input type="hidden" name="moveBundle" id="rackMoveBundle"
