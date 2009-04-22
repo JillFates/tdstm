@@ -16,10 +16,11 @@ class DataTransferBatchController {
     }
     //Process DataTransfervalues Corresponding to DataTransferBatch
     def process = { 
+    	DataTransferBatch.withTransaction { status ->
     	def projectId = params.projectId
     	def projectInstance = Project.findById( projectId )
-    	def dataTransferBatch = DataTransferBatch.get(params.batchId)
     	try{
+    		def dataTransferBatch = DataTransferBatch.get(params.batchId)
 	    	if(dataTransferBatch){
 		    	def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = $dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
 		    	for(int dataTransferValueRow =0; dataTransferValueRow < dataTransferValueRowList.size(); dataTransferValueRow ++) {
@@ -59,7 +60,7 @@ class DataTransferBatchController {
 			    				assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
 			    			}
 			    		}
-			    		assetEntity.save(flush:true)
+			    		assetEntity.save()
 		    		}
 		    	}  
 		    	def dataTransferCommentRowList = DataTransferComment.findAll(" From DataTransferComment dtc where dtc.dataTransferBatch = $dataTransferBatch.id and dtc.dataTransferBatch.statusCode = 'PENDING'")
@@ -75,21 +76,23 @@ class DataTransferBatchController {
 			    			assetComment = new AssetComment()
 			    			assetComment.mustVerify = 0
 		    			}
-			    		assetComment.comment = it.comment  		
+			    		assetComment.comment = it.comment
 			        	assetComment.commentType = it.commentType
-			        	assetComment.assetEntity = assetEntity        		
-			        	assetComment.save(flush:true)
+			        	assetComment.assetEntity = assetEntity
+			        	assetComment.save()
 		    			}
 		    		}
 		    		
 		    	}
 		    dataTransferBatch.statusCode = 'COMPLETED'
-		    dataTransferBatch.save(flush:true)
+		    dataTransferBatch.save()
 	    	}
     	}catch (Exception e) {
+    		status.setRollbackOnly()
 			flash.message = "Import Batch process failed"
 		}
     	redirect (action:list, params:[projectId:projectId])
+    	}
      }
     /*
     def show = {
