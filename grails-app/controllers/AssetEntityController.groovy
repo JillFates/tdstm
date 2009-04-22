@@ -171,12 +171,14 @@ class AssetEntityController {
                         def dataTransferValue
                         def eavAttributeInstance
                         def colNo = 0
+                        for (int index = 0; index < col; index++) {
+                        	if(sheet.getCell( index, 0 ).contents == "Server"){
+                        		colNo = index
+                        	}
+                        }
                         for( int cols = 0; cols < col; cols++ ) {
                             def dataTransferAttributeMapInstance = DataTransferAttributeMap.findByColumnName(sheet.getCell( cols, 0 ).contents)
                             if( dataTransferAttributeMapInstance != null ) {
-                            	if(dataTransferAttributeMapInstance.columnName == "Server"){
-                            		colNo = cols
-                            	}
                                 for ( int r = 1; r < sheet.rows; r++ ) {
                                 	def server = sheet.getCell( colNo, r ).contents
                                 	if(server){
