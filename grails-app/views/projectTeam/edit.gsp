@@ -2,8 +2,8 @@
 
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="projectHeader" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>        
+        <meta name="layout" content="moveBundleHeader" />
         <title>Edit Move Bundle Team</title>
         <g:javascript library="jquery" />
         <script type="text/javascript">  
@@ -17,15 +17,8 @@
 			   });  
 		</script>
     </head>
-    <body>
+    <body>    	
     	
-    	<div class="menu2" style="background-color:#003366;">
-          <ul>
-          <li class="title1">Move Bundle: ${bundleInstance?.name}</li>
-            <li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:bundleInstance?.id]" >Team </g:link> </li>
-            <li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:bundleInstance?.id]" >Bundle Asset Assignment</g:link> </li>
-          </ul>
-		</div>
         <div class="body">
             <h1>Edit Move Bundle Team</h1>
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
