@@ -261,7 +261,7 @@
 
      	hiddenBundle.value = val
 
-     	var projectId = ${projectInstance?.id}     	
+     	var projectId = ${currProjObj?.id}     	
 
      	if( val == "null") {
 
@@ -297,7 +297,7 @@
 
      	hiddenBundle.value = val
 
-     	var projectId = ${projectInstance?.id}     	
+     	var projectId = ${currProjObj?.id}     	
 
      	if( val == "null") {
 
@@ -623,6 +623,7 @@
         <li><a href="#">Contacts </a></li>
         <li><a href="#">Applications </a></li>
         <li><g:link class="home" controller="moveBundle" params="[projectId:currProjObj?.id]">Move Bundles</g:link></li>
+        <li><g:link class="home" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id]">Dashboard</g:link></li>
         <li>  
           	<div id="menubar">
  			<div id="menu1" class="menu_new">Reports<ul>    

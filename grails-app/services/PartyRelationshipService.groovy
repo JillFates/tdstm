@@ -76,10 +76,10 @@ class PartyRelationshipService {
     		}
     	} 
     	/*else {
-    		def otherRole = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$relationshipType' and p.partyIdFrom = $partyFrom.id and p.partyIdTo = $partyTo.id and p.roleTypeCodeFrom = '$roleTypeIdFrom'")
-    		if ( otherRole != null && otherRole != "" ) {
-    			otherRole.delete()
-            }
+        def otherRole = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$relationshipType' and p.partyIdFrom = $partyFrom.id and p.partyIdTo = $partyTo.id and p.roleTypeCodeFrom = '$roleTypeIdFrom'")
+        if ( otherRole != null && otherRole != "" ) {
+        otherRole.delete()
+        }
 		}*/
     }
     /*
@@ -120,15 +120,15 @@ class PartyRelationshipService {
     def getProjectStaff( def projectId ){
     	def list = []
     	def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' ")
-	    	projectStaff.each{staff ->
-	    		def map = new HashMap()
-	    		def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-	    		map.put("company", company.partyIdFrom)
-	    		map.put("name", staff.partyIdTo.firstName+" "+ staff.partyIdTo.lastName)
-	    		map.put("role", staff.roleTypeCodeTo)
-	    		map.put("staff", staff.partyIdTo)
-	    		list<<map
-	    	}
+        projectStaff.each{staff ->
+            def map = new HashMap()
+            def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
+            map.put("company", company.partyIdFrom)
+            map.put("name", staff.partyIdTo.firstName+" "+ staff.partyIdTo.lastName)
+            map.put("role", staff.roleTypeCodeTo)
+            map.put("staff", staff.partyIdTo)
+            list<<map
+        }
     	return list
     }
     /*
@@ -155,21 +155,21 @@ class PartyRelationshipService {
     	def list = []
     	def query
     	if(teamMembers){
-    	def team = createString( teamMembers )
-    	query = "from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' and p.partyIdTo not in ( $team ) " 
+            def team = createString( teamMembers )
+            query = "from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' and p.partyIdTo not in ( $team ) "
     	} else {
-    	query = "from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' "    		
+            query = "from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' "
     	}
     	def projectStaff = PartyRelationship.findAll( query )
-	    	projectStaff.each{staff ->
-	    		def map = new HashMap()
-	    		def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-	    		map.put("company", company.partyIdFrom)
-	    		map.put("name", staff.partyIdTo.firstName+" "+ staff.partyIdTo.lastName)
-	    		map.put("role", staff.roleTypeCodeTo)
-	    		map.put("staff", staff.partyIdTo)
-	    		list<<map
-	    	}
+        projectStaff.each{staff ->
+            def map = new HashMap()
+            def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
+            map.put("company", company.partyIdFrom)
+            map.put("name", staff.partyIdTo.firstName+" "+ staff.partyIdTo.lastName)
+            map.put("role", staff.roleTypeCodeTo)
+            map.put("staff", staff.partyIdTo)
+            list<<map
+        }
     	return list
     }
     /*
@@ -179,9 +179,9 @@ class PartyRelationshipService {
     	def list = []
     	def query
     	if(teamMembers){
-    	def team = createString( teamMembers )
-    	query = "from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' and p.partyIdTo in ( $team ) " 
-    	def projectStaff = PartyRelationship.findAll( query )
+            def team = createString( teamMembers )
+            query = "from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' and p.partyIdTo in ( $team ) "
+            def projectStaff = PartyRelationship.findAll( query )
 	    	projectStaff.each{staff ->
 	    		def map = new HashMap()
 	    		def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
@@ -203,14 +203,14 @@ class PartyRelationshipService {
     	def projectStaffQuery = "select ps.partyIdTo from PartyRelationship ps where ps.partyRelationshipType = 'PROJ_STAFF' and ps.partyIdFrom = $projectId and ps.roleTypeCodeFrom = 'PROJECT'"
     	def query = " from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom in ( $projectCompanyQuery ) and p.partyIdTo not in ( $projectStaffQuery ) and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' "
     	def projectCompaniesStaff = PartyRelationship.findAll(query)
-    		projectCompaniesStaff.each{staff ->
-    			def map = new HashMap()
-    			def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-	    		map.put("company", company.partyIdFrom)
-	    		map.put("name", staff.partyIdTo.firstName+" "+ staff.partyIdTo.lastName)
-	    		map.put("staff", staff.partyIdTo)
-	    		list<<map
-    		}
+        projectCompaniesStaff.each{staff ->
+            def map = new HashMap()
+            def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
+            map.put("company", company.partyIdFrom)
+            map.put("name", staff.partyIdTo.firstName+" "+ staff.partyIdTo.lastName)
+            map.put("staff", staff.partyIdTo)
+            list<<map
+        }
     	return list
     }
     /*
@@ -239,16 +239,31 @@ class PartyRelationshipService {
     	def query = "from PartyRelationship p where p.partyRelationshipType = 'PROJ_TEAM' and p.partyIdFrom = $bundleTeam.id and p.roleTypeCodeFrom = 'TEAM'  "
         def teamMembers = PartyRelationship.findAll(query)
         teamMembers.each{team ->
-	    		def map = new HashMap()
-	    		def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $team.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-	    		map.put("company", company.partyIdFrom)
-	    		map.put("name", team.partyIdTo.firstName+" "+ team.partyIdTo.lastName)
-	    		map.put("role", team.roleTypeCodeTo)
-	    		map.put("staff", team.partyIdTo)
-	    		list<<map
-	    	}
+            def map = new HashMap()
+            def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $team.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
+            map.put("company", company.partyIdFrom)
+            map.put("name", team.partyIdTo.firstName+" "+ team.partyIdTo.lastName)
+            map.put("role", team.roleTypeCodeTo)
+            map.put("staff", team.partyIdTo)
+            list<<map
+        }
         return list 
     }
+    /*
+     *  Method will return the party last name of members
+     */
+    def getBundleTeamMembersDashboard( def bundleTeamId ){
+    	def query = "from PartyRelationship p where p.partyRelationshipType = 'PROJ_TEAM' and p.partyIdFrom = $bundleTeamId and p.roleTypeCodeFrom = 'TEAM'  "
+        def teamMembers = PartyRelationship.findAll(query)
+        def name = new StringBuffer()
+        teamMembers.each{team ->
+            name.append(team.partyIdTo.lastName)
+            name.append("/")
+        }
+        return name 
+    }
+    
+  
     /*
      *  Return the Staff which are not assign to projectTeam
      */
@@ -256,15 +271,15 @@ class PartyRelationshipService {
     	def list = []
     	def query = "from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' and p.partyIdTo not in ( select pt.partyIdTo from PartyRelationship pt where pt.partyRelationshipType = 'PROJ_TEAM' and pt.partyIdFrom = $projectTeam.id and pt.roleTypeCodeFrom = 'TEAM' ) " 
     	def projectStaff = PartyRelationship.findAll( query )
-	    	projectStaff.each{staff ->
-	    		def map = new HashMap()
-	    		def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-	    		map.put("company", company.partyIdFrom)
-	    		map.put("name", staff.partyIdTo.firstName+" "+ staff.partyIdTo.lastName)
-	    		map.put("role", staff.roleTypeCodeTo)
-	    		map.put("staff", staff.partyIdTo)
-	    		list<<map
-	    	}
+        projectStaff.each{staff ->
+            def map = new HashMap()
+            def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
+            map.put("company", company.partyIdFrom)
+            map.put("name", staff.partyIdTo.firstName+" "+ staff.partyIdTo.lastName)
+            map.put("role", staff.roleTypeCodeTo)
+            map.put("staff", staff.partyIdTo)
+            list<<map
+        }
     	return list
     }
     /*

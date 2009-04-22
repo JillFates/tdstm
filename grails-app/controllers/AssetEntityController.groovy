@@ -8,12 +8,12 @@ import grails.converters.JSON
 import org.jsecurity.SecurityUtils
 import com.tdssrc.eav.*
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-class AssetEntityController {
-    
+class AssetEntityController {	
     //TODO : Fix indentation
 	def missingHeader = ""
 	def added = 0
 	def skipped = []
+	def partyRelationshipService
     def index = {
 		redirect( action:list, params:params )
 	}
@@ -225,7 +225,7 @@ class AssetEntityController {
                                     dataTransferComment.rowId = rowNo
                                     dataTransferComment.dataTransferBatch = dataTransferBatch
                                     dataTransferComment.save()
-                                	}
+                                }
                             }
                         }
                     }
@@ -679,5 +679,58 @@ class AssetEntityController {
             assetCommentsList <<[ commentInstance : it, assetEntityId : it.assetEntity.id ]
         }
         render assetCommentsList as JSON
+    }
+    /*
+     * 	 To show the dashboard link page and processing
+     */
+    def dashboardView = {
+        def projectId = params.projectId
+        def bundleId = params.moveBundle
+        def assetList
+        def bundleTeams = []
+        def totalAsset
+        def projectInstance = Project.findById( projectId )
+        def moveBundleInstanceList = MoveBundle.findAll("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
+        def moveBundleInstance
+        if(bundleId){
+            moveBundleInstance = MoveBundle.findById(bundleId)
+        } else {
+            moveBundleInstance = MoveBundle.findByProject(projectInstance)
+        }
+        def orderDesc = params.order;
+        if(params.sort == "team"){
+            totalAsset = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = ${moveBundleInstance.id} order by ae.sourceTeam.name $orderDesc ")
+        }else if(params.sort == "statTimer"){
+            totalAsset = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = ${moveBundleInstance.id} order by ae.moveBundle.startTime $orderDesc ")	
+        }else if(params.sort == "loc"){
+            totalAsset = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = ${moveBundleInstance.id} order by ae.sourceTeam.currentLocation $orderDesc ")	
+        }else{
+            totalAsset = AssetEntity.findAllByMoveBundle(moveBundleInstance,params)
+        }
+        def projectTeamList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = ${moveBundleInstance.id} order by pt.name asc")
+        def arrAsset
+        projectTeamList.each{
+            def teamMembers = partyRelationshipService.getBundleTeamMembersDashboard(it.id)
+            def member = teamMembers.delete((teamMembers.length()-1),teamMembers.length())
+            bundleTeams <<[team:it,members:member]
+        		 	   
+        }
+        return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams, totalAsset:totalAsset,moveBundleInstance:moveBundleInstance]
+        		
+    }
+    /*
+     * 	 Get asset details part in dashboard page
+     */
+    def assetDetails = {
+        def assetId = params.assetId
+        def assetTeam = []
+        def assetDetail = AssetEntity.findById(assetId)
+        def teamName = assetDetail.sourceTeam.name
+        def map = new HashMap()
+        map.put("assetDetail",assetDetail)
+        map.put("teamName",teamName)
+        assetTeam<<map
+        render assetTeam as JSON
+        		
     }
 }
