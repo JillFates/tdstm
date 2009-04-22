@@ -11,7 +11,7 @@ class BootStrap {
 		// The description now classifies groups of roles.  Eventually this will be implemented
 		// like ofBiz where there is a parent id.
 		// -------------------------------
-		println " ROLE TYPES "
+		println "ROLE TYPES "
 		def adminRole = new RoleType( description:"System : Administrator" )
 		adminRole.id = "ADMIN"
 		adminRole.save( insert:true )
@@ -19,6 +19,10 @@ class BootStrap {
 		def userRole = new RoleType( description:"System : User" )
 		userRole.id = "USER"
 		userRole.save( insert:true )
+
+		def workStationRole = new RoleType( description:"System : Work Station" )
+		workStationRole.id = "WORKSTATION"
+		workStationRole.save( insert:true )
 
 		def clientRole = new RoleType( description:"Party : Client" )
 		clientRole.id = "CLIENT"
@@ -111,7 +115,7 @@ class BootStrap {
 		// -------------------------------
 		// Party Types
 		// -------------------------------
-		println " PARTY TYPES"
+		println "PARTY TYPES"
 		def personPartyType = new PartyType( description:"Person" )
 		personPartyType.id = "PERSON"
 		personPartyType.save( insert:true )
@@ -135,7 +139,7 @@ class BootStrap {
 		// -----------------------------------------
 		// Create PartyRelationshipType Details
 		// -----------------------------------------
-		println " PARTY RELATIONSHIP TYPES"
+		println "PARTY RELATIONSHIP TYPES"
 		def staffType = new PartyRelationshipType( description:"Staff" )
 		staffType.id = "STAFF"
 		staffType.save( insert:true )
@@ -205,7 +209,11 @@ class BootStrap {
 			partyType:personPartyType ).save()
 		def personReddy = new Person( firstName:'Lokanath', lastName:'Reddy',title:'Tech Lead',
 			partyType:personPartyType ).save()
-
+		
+		// This person account will actual share 3 logins (move tech, clean tech, and mover)
+		def personWorkStation = new Person( firstName:'Work', lastName:'Station', title:'Work Station User',
+			partyType:personPartyType ).save()	
+		
 		// Cedars staff for Raiser's Edge application
 		def personNBonner = new Person( firstName:'Nancy', lastName:'Bonner', title:'',
 			partyType:personPartyType  ).save()
@@ -217,17 +225,22 @@ class BootStrap {
 			partyType:personPartyType  ).save()
 
 		// -------------------------------
-		// Create User Details.
+		// Create User Login.
 		// -------------------------------
-		println " USER DETAILS"
+		println "USER LOGIN"
 		def adminUserLisa = new UserLogin( person:personLisa, username: "lisa", password:new Sha1Hash("admin").toHex(), active:'Y'  ).save()
 		def userJohn = new UserLogin( person:personJohn, username: "john", password:new Sha1Hash("admin").toHex(), active:'Y' ).save()
 		def normalUserRalph = new UserLogin( person:personJimL, username:"ralph", password:new Sha1Hash("user").toHex(), active:'Y' ).save()
 
+		// Create the Move Tech, Cleaning Tech and Mover (keep short for barcode)
+		def userMoveTech = new UserLogin( person:personWorkStation, username:"mt", password:new Sha1Hash("xyzzy").toHex(), active:'Y' ).save()
+		def userCleanTech = new UserLogin( person:personWorkStation, username:"ct", password:new Sha1Hash("xyzzy").toHex(), active:'Y' ).save()
+		def userMover = new UserLogin( person:personWorkStation, username:"mv", password:new Sha1Hash("xyzzy").toHex(), active:'Y' ).save()
+
 		// -------------------------------
 		// Create Party Group (Companies)
 		// -------------------------------
-		println " PARTY GROUPS "
+		println "PARTY GROUPS "
 		def tds = new PartyGroup( name:"TDS", partyType:companyType ).save()
 		def emc = new PartyGroup( name:"EMC", partyType:companyType ).save()
 		def timeWarner = new PartyGroup( name:"Time Warner", partyType:companyType ).save()
@@ -246,7 +259,7 @@ class BootStrap {
 		// -------------------------------
 		// Create Projects
 		// -------------------------------
-		println " PROJECTS "
+		println "PROJECTS "
 		def cedarsProject = new Project( name:"Cedars-Sinai Move 1", projectCode:'CS1', client:cedars,
 			description:'100 servers', trackChanges:'Y', partyType:groupPartyType ).save();
 		def twProject = new Project( name:"Time Warner VA Move", projectCode:'TM-VA-1', client:timeWarner,
@@ -296,10 +309,11 @@ class BootStrap {
 		// Create PartyRole Details
 		// -------------------------------
 		println "PARTY ROLES"
-		def partyRoleForRalph = new PartyRole( party:personJimL, roleType:userRole ).save( insert:true )
-		def partyRoleForLisa = new PartyRole( party:personLisa, roleType:userRole ).save( insert:true )
-		def partyRoleForJohn = new PartyRole( party:personJohn, roleType:adminRole ).save( insert:true )
-		def projectAdminPartyRoleForJohn = new PartyRole( party:personJohn, roleType:projectAdminRole ).save( insert:true )
+		new PartyRole( party:personJimL, roleType:userRole ).save( insert:true )
+		new PartyRole( party:personLisa, roleType:userRole ).save( insert:true )
+		new PartyRole( party:personJohn, roleType:adminRole ).save( insert:true )
+		new PartyRole( party:personJohn, roleType:projectAdminRole ).save( insert:true )
+		new PartyRole( party:personWorkStation, roleType:workStationRole).save( insert:true )
 
 
 		// -------------------------------
@@ -432,11 +446,11 @@ class BootStrap {
 				log.error( etext )
 			}
 		}
-		//def assete = new AssetEntity(serverName:"CSHMC3", model:"AutoView 3100", room:"XX-232-YAB", rack:"rackad1", position:"1", uSize:"12", attributeSet:attributeSet)
+		//def asset = new AssetEntity(serverName:"CSHMC3", model:"AutoView 3100", room:"XX-232-YAB", rack:"rackad1", position:"1", uSize:"12", attributeSet:attributeSet)
 		// -------------------------------
 		// Create MoveBundleAsset Details
 		// -------------------------------
-		/*println " MOVE BUNDLE ASSET"
+		/*println "MOVE BUNDLE ASSET"
 		def moveBundle1Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle1, asset: AssetEntity.get(1),sourceTeam: cedarsGreenProjectTeam,targetTeam: cedarsRedProjectTeam,cart : 1,shelf: 2 ).save( insert:true )
 		def moveBundle2Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle1, asset: AssetEntity.get(2),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam,cart : 2,shelf: 3 ).save( insert:true )
 		def moveBundle3Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle2, asset: AssetEntity.get(3),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam,cart : 6,shelf: 4 ).save( insert:true )
@@ -455,7 +469,7 @@ class BootStrap {
 		     ]
 		                      
 		// Insert the List of DataTransferSet
-		    dataTransferSetList.each {
+		dataTransferSetList.each {
 		    def dataTransferSet = new DataTransferSet(
 		    title: it[0],
 		    transferMode: it[1],
