@@ -7,23 +7,18 @@ class MoveBundle extends PartyGroup {
     Date completionTime
     Integer operationalOrder  // Order that the bundles are performed in
 
-    /*
-	 * Fields Validations
-	 */
     static constraints = {        
-        
 		name( blank:false, nullable:false )
 		project( blank:false, nullable:false )
 		description( blank:true, nullable:true )		
 		startTime( blank:true, nullable:true )
 		completionTime( blank:true, nullable:true )
-        operationalOrder( blank:false, nullable:false, range:1..25 )
-        
+		operationalOrder( blank:false, nullable:false, range:1..25 )
 	}
 
-    /*
-	 *  mapping for COLUMN Relation
-	 */
+	static hasMany = [
+		assetTransitions : AssetTransition
+	]
 
 	static mapping  = {
 		version true

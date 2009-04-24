@@ -1,6 +1,4 @@
 class ProjectTeam extends PartyGroup{
-
-	MoveBundle moveBundle
 	String teamCode
 	String currentLocation = ""
 	Integer isIdle=1
@@ -15,6 +13,12 @@ class ProjectTeam extends PartyGroup{
 		lastUpdated( ) // related to party
 	}
 
+	static belongsTo = [ moveBundle : MoveBundle  ]
+	
+	static hasMany = [
+		assetTransitions : AssetTransition
+	]
+	
 	static mapping  = {
 		version true
 		id column: 'project_team_id'
