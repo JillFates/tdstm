@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <process-definition xmlns="" name="Datacenter Move Operations - Standard Process" code="STD_PROCESS">
-	<swimlane name="ROLE_WF_MANAGER">
+	<swimlane name="MANAGER">
 		<assignment actor-id="Manager"/>
 	</swimlane>
-	<swimlane name="ROLE_WF_SUPERVISOR">
+	<swimlane name="SUPERVISOR">
 		<assignment actor-id="Supervisor"/>
 	</swimlane>
-	<swimlane name="ROLE_WF_TECH">
+	<swimlane name="MOVE_TECH">
 		<assignment actor-id="Technician"/>
 	</swimlane>
-	<swimlane name="ROLE_WF_CLEANER">
+	<swimlane name="CLEANER">
 		<assignment actor-id="Cleaner"/>
 	</swimlane>
-	<swimlane name="ROLE_WF_MOVER">
+	<swimlane name="MOVER">
 		<assignment actor-id="Mover"/>
 	</swimlane>
 
@@ -49,7 +49,7 @@
 	</transitions>
 
 	<startState name="Hold">
-		<task swimlane="ROLE_WF_SUPERVISOR">
+		<task swimlane="SUPERVISOR">
 			<transition to="Ready" />
 			<transition to="PoweredDown" />
 			<transition to="Release" />
@@ -81,7 +81,7 @@
 	</startState>
 
 	<taskNode name="Ready">
-		<task swimlane="ROLE_WF_MANAGER">
+		<task swimlane="MANAGER">
 			<transition to="Hold" flag="issue"/>
 			<transition to="PoweredDown" />
 			<transition to="Release" flag="skipped"/>
@@ -89,14 +89,14 @@
 	</taskNode>
 
 	<taskNode name="PoweredDown">
-		<task swimlane="ROLE_WF_MANAGER">
+		<task swimlane="MANAGER">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Release"/>
 		</task>
 	</taskNode>
 
 	<taskNode name="Ready">
-		<task swimlane="ROLE_WF_SUPERVISOR">
+		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="PoweredDown" />
 			<transition to="Unracking" flag="skipped"/>
@@ -106,19 +106,19 @@
 			<transition to="OnTruck" flag="skipped"/>
 			<transition to="InTransit" flag="skipped"/>
 		</task>
-		<task swimlane="ROLE_WF_TECH">
+		<task swimlane="MOVE_TECH">
 			<transition to="Hold" flag="issue"/>
 		</task>
-		<task swimlane="ROLE_WF_CLEANER">
+		<task swimlane="CLEANER">
 			<transition to="Hold" flag="issue"/>
 		</task>
-		<task swimlane="ROLE_WF_MOVER">
+		<task swimlane="MOVER">
 			<transition to="Hold" flag="issue"/>
 		</task>
 	</taskNode>
 
 	<taskNode name="PoweredDown">
-		<task swimlane="ROLE_WF_SUPERVISOR">
+		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Release"/>
 			<transition to="Unracking" flag="skipped"/>
@@ -128,19 +128,19 @@
 			<transition to="OnTruck" flag="skipped"/>
 			<transition to="InTransit" flag="skipped"/>
 		</task>
-		<task swimlane="ROLE_WF_TECH">
+		<task swimlane="MOVE_TECH">
 			<transition to="Hold" flag="issue"/>
 		</task>
-		<task swimlane="ROLE_WF_CLEANER">
+		<task swimlane="CLEANER">
 			<transition to="Hold" flag="issue"/>
 		</task>
-		<task swimlane="ROLE_WF_MOVER">
+		<task swimlane="MOVER">
 			<transition to="Hold" flag="issue"/>
 		</task>
 	</taskNode>
 
 	<taskNode name="Release">
-		<task swimlane="ROLE_WF_SUPERVISOR">
+		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Unracking"/>
 			<transition to="Unracked" flag="skipped"/>
@@ -149,22 +149,22 @@
 			<transition to="OnTruck" flag="skipped"/>
 			<transition to="InTransit" flag="skipped"/>
 		</task>
-		<task swimlane="ROLE_WF_TECH">
+		<task swimlane="MOVE_TECH">
 			<transition to="Hold" name="Hold" flag="issue,idle"/>
 			<transition to="Unracking" flag="busy" />
 			<transition to="Unracked" flag="skipped,idle"/>
 		</task>
-		<task swimlane="ROLE_WF_CLEANER">
+		<task swimlane="CLEANER">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Cleaned" flag="skipped"/>
 		</task>
-		<task swimlane="ROLE_WF_MOVER">
+		<task swimlane="MOVER">
 			<transition to="Hold" flag="issue"/>
 		</task>
 	</taskNode>
 
 	<taskNode name="Unracking">
-		<task swimlane="ROLE_WF_SUPERVISOR">
+		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready"/>
 			<transition to="Unracked"/>
@@ -173,22 +173,22 @@
 			<transition to="OnTruck" flag="skipped"/>
 			<transition to="InTransit" flag="skipped"/>
 		</task>
-		<task swimlane="ROLE_WF_TECH">
+		<task swimlane="MOVE_TECH">
 			<transition to="Hold" flag="issue,idle"/>
 			<transition to="Release" flag="comment,idle" />
 			<transition to="Unracked" flag="idle" />
 		</task>
-		<task swimlane="ROLE_WF_CLEANER">
+		<task swimlane="CLEANER">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Cleaned" flag="skipped"/>
 		</task>
-		<task swimlane="ROLE_WF_MOVER">
+		<task swimlane="MOVER">
 			<transition to="Hold" flag="issue"/>
 		</task>
 	</taskNode>
 
 	<taskNode name="Unracked">
-		<task swimlane="ROLE_WF_SUPERVISOR">
+		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
 			<transition to="Release" />
@@ -216,20 +216,20 @@
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
-		<task swimlane="ROLE_WF_TECH">
+		<task swimlane="MOVE_TECH">
 			<transition to="Hold" flag="issue,idle"/>
 		</task>
-		<task swimlane="ROLE_WF_CLEANER">
+		<task swimlane="CLEANER">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Cleaned" flag="skipped"/>
 		</task>
-		<task swimlane="ROLE_WF_MOVER">
+		<task swimlane="MOVER">
 			<transition to="Hold" flag="issue"/>
 		</task>
 	</taskNode>
 
 	<taskNode name="Cleaned">
-		<task swimlane="ROLE_WF_SUPERVISOR">
+		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
 			<transition to="Release" />
@@ -257,7 +257,7 @@
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
-		<task swimlane="ROLE_WF_MOVER">
+		<task swimlane="MOVER">
 			<transition to="Hold" flag="issue"/>
 			<transition to="OnCart"/>
 			<transition to="OnTruck" flag="skipped"/>
@@ -265,7 +265,7 @@
 	</taskNode>
 
 	<taskNode name="OnCart">
-		<task swimlane="ROLE_WF_SUPERVISOR">
+		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
 			<transition to="Release" />
@@ -293,14 +293,14 @@
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
-		<task swimlane="ROLE_WF_MOVER">
+		<task swimlane="MOVER">
 			<transition to="Hold" flag="issue"/>
 			<transition to="OnTruck"/>
 		</task>
 	</taskNode>
 
 	<taskNode name="OnTruck">
-		<task swimlane="ROLE_WF_SUPERVISOR">
+		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
 			<transition to="Release" />
@@ -331,7 +331,7 @@
 	</taskNode>
 
 	<taskNode name="InTransit">
-		<task swimlane="ROLE_WF_SUPERVISOR">
+		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
 			<transition to="Release" />
@@ -362,7 +362,7 @@
 	</taskNode>
 
 	<taskNode name="EndTransit">
-		<task swimlane="ROLE_WF_SUPERVISOR">
+		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="InTransit"/>
 			<transition to="OffTruck"/>
@@ -386,7 +386,7 @@
 	</taskNode>
 
 	<taskNode name="OffTruck">
-		<task swimlane="ROLE_WF_SUPERVISOR">
+		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
 			<transition to="Release" />
@@ -418,7 +418,7 @@
 	</taskNode>
 
 	<taskNode name="Staged">
-		<task swimlane="ROLE_WF_SUPERVISOR">
+		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
 			<transition to="Release" />
@@ -450,7 +450,7 @@
 	</taskNode>
 
 	<taskNode name="Rerack/Cabling Started">
-		<task swimlane="ROLE_WF_SUPERVISOR">
+		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
 			<transition to="Release" />
@@ -482,7 +482,7 @@
 	</taskNode>
 
 	<taskNode name="Reracked/Cabled">
-		<task swimlane="ROLE_WF_SUPERVISOR">
+		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
 			<transition to="Release" />
@@ -514,7 +514,7 @@
 	</taskNode>
 
 	<taskNode name="QA Verification">
-		<task swimlane="ROLE_WF_SUPERVISOR">
+		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
 			<transition to="Release" />
@@ -546,7 +546,7 @@
 	</taskNode>
 
 	<taskNode name="Powered On">
-		<task swimlane="ROLE_WF_SUPERVISOR">
+		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
 			<transition to="Release" />
@@ -578,7 +578,7 @@
 	</taskNode>
 
 	<taskNode name="Verify Network Started">
-		<task swimlane="ROLE_WF_SUPERVISOR">
+		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
 			<transition to="Release" />
@@ -610,7 +610,7 @@
 	</taskNode>
 
 	<taskNode name="Unracking Started">
-		<task swimlane="ROLE_WF_SUPERVISOR">
+		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
 			<transition to="Release" />
