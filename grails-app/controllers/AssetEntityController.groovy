@@ -84,9 +84,6 @@ class AssetEntityController {
 
             project = Project.findById( projectId )
 	            
-            //delete previous records existed for Project
-	        
-            //def assetDelete = Asset.executeUpdate("delete from Asset a where a.project = $project.id " )
 
         }catch ( Exception ex ) {
 	            
@@ -101,8 +98,6 @@ class AssetEntityController {
         // create workbook
         def workbook
         def sheet
-        //def sheetNo = 1
-        //def map = [ "Server":null, "Type":null, "S/N":null, "AssetTag":null ]
 	        
         def sheetColumnNames = [:]
         def sheetNameMap = [:]
@@ -119,25 +114,15 @@ class AssetEntityController {
             def flag = 0
             def sheetNamesLength = sheetNames.length
             for( int i=0;  i < sheetNamesLength; i++ ) {
-	            	
                 if ( sheetNameMap.containsValue(sheetNames[i].trim()) ) {
                     flag = 1
                     sheet = workbook.getSheet( sheetNames[i] )
                 }
-	            	
             }
-	            
             if( flag == 0 ) {
-	            	
                 flash.message = " Sheet not found, Please check it."
                 redirect( action:assetImport, params:[projectId:projectId] )
-	                
             } else {
-	           
-	            
-                // TODO : All columns should be done using maps as this will get unwieldly to manage with 20+ columns.  Both the import and
-                // export should use the same map.
-
                 //check for column
                 def col = sheet.getColumns()
                 for ( int c = 0; c < col; c++ ) {
@@ -146,16 +131,11 @@ class AssetEntityController {
                 }
                 def checkCol = checkHeader( list, sheetColumnNames )
                 // Statement to check Headers if header are not found it will return Error message
-
-                // TODO : map here too.
                 if ( checkCol == false ) {
-	                	
                     missingHeader = missingHeader.replaceFirst(",","")
                     flash.message = " Column Headers : ${missingHeader} not found, Please check it."
                     redirect( action:assetImport, params:[projectId:projectId] )
-
                 } else {
-	            	
                     //get user name.
                     def subject = SecurityUtils.subject
                     def principal = subject.principal
@@ -176,12 +156,12 @@ class AssetEntityController {
                         		colNo = index
                         	}
                         }
-                        for( int cols = 0; cols < col; cols++ ) {
-                            def dataTransferAttributeMapInstance = DataTransferAttributeMap.findByColumnName(sheet.getCell( cols, 0 ).contents)
-                            if( dataTransferAttributeMapInstance != null ) {
-                                for ( int r = 1; r < sheet.rows; r++ ) {
-                                	def server = sheet.getCell( colNo, r ).contents
-                                	if(server){
+                        for ( int r = 1; r < sheet.rows; r++ ) {
+                        	def server = sheet.getCell( colNo, r ).contents
+                        	if(server){
+	                        	for( int cols = 0; cols < col; cols++ ) {
+	                        		def dataTransferAttributeMapInstance = DataTransferAttributeMap.findByColumnName(sheet.getCell( cols, 0 ).contents)
+	                            	if( dataTransferAttributeMapInstance != null ) {
 	                                    dataTransferValue = new DataTransferValue()
 	                                    eavAttributeInstance = dataTransferAttributeMapInstance.eavAttribute
 	                                    dataTransferValue.importValue = sheet.getCell( cols, r ).contents
@@ -192,7 +172,6 @@ class AssetEntityController {
 		                                    	
 	                                        dataTransferValue.assetEntityId = Integer.parseInt(sheet.getCell( 0, r ).contents)
 	                                    }
-	                                    //dataTransferValue.save()
 	                                    if ( dataTransferValue.save() ) {
 	                                        added = r
 	                                    } else {
