@@ -17,35 +17,35 @@
 	</swimlane>
 
 	<transitions>
-		<transition to="Hold" name="Hold" color="red"/>
-		<transition to="Ready" name="Ready" color="yellow"/>
-		<transition to="PoweredDown" name="Powered Down" color="orange"/>
-		<transition to="Release" name="Release" color="green" />
-		<transition to="Unracking" name="Unracking Started" color="blue"/>
-		<transition to="Unracked" name="Unracked" color="blue"/>
-		<transition to="Cleaned" name="Cleaned/Tagged"/>
-		<transition to="OnCart" name="On Cart"/>
-		<transition to="OnTruck" name="On Truck"/>
-		<transition to="InTransit" name="In Transit"/>
-		<transition to="EndTransit" name="End Transit"/>
-		<transition to="OffTruck" name="Off Truck"/>
-		<transition to="Staged" name="Staged"/>
-		<transition to="Reracking" name="Rerack/Cabling Started"/>
-		<transition to="Racked" name="Racked/Cabled"/>
-		<transition to="QAVerified" name="QA Verification	"/>
-		<transition to="Powered On" name="Powered On"/>
-		<transition to="NetVerifying" name="Verify Network Started"/>
-		<transition to="NetVerified" name="Network Verified"/>
-		<transition to="SANVerifying" name="SAN Verify Started"/>
-		<transition to="SANVerified" name="SAN Verified"/>
-		<transition to="DBStarted" name="Database Tasks Started"/>
-		<transition to="DBFinished" name="Database Tasks Finished"/>
-		<transition to="AppStartup" name="Application Startup"/>
-		<transition to="AppFinished" name="Application Finished"/>
-		<transition to="AppVerifying" name="Application Verify Started"/>
-		<transition to="AppVerified" name="Application Verified"/>
-		<transition to="Completed" name="Completed"/>
-		<transition to="Terminated" name="Terminated"/>
+		<transition to="Hold" name="Hold" id="10" color="red"/>
+		<transition to="Ready" name="Ready" id="20" color="yellow"/>
+		<transition to="PoweredDown" name="Powered Down" id="30" color="orange"/>
+		<transition to="Release" name="Release" id="40" color="green" />
+		<transition to="Unracking" name="Unracking Started" id="50" color="blue"/>
+		<transition to="Unracked" name="Unracked" id="60" color="blue"/>
+		<transition to="Cleaned" name="Cleaned/Tagged" id="70" />
+		<transition to="OnCart" name="On Cart" id="80" />
+		<transition to="OnTruck" name="On Truck" id="90" />
+		<transition to="InTransit" name="In Transit" id="100" />
+		<transition to="EndTransit" name="End Transit" id="110" />
+		<transition to="OffTruck" name="Off Truck" id="120" />
+		<transition to="Staged" name="Staged" id="130" />
+		<transition to="Reracking" name="Reracking/Cabling Started" id="140" />
+		<transition to="Racked" name="Racked/Cabled" id="150" />
+		<transition to="QAVerified" name="QA Verification" id="160" />
+		<transition to="Powered On" name="Powered On" id="170" />
+		<transition to="NetVerifying" name="Verify Network Started" id="180" />
+		<transition to="NetVerified" name="Network Verified" id="190" />
+		<transition to="SANVerifying" name="SAN Verify Started" id="200" />
+		<transition to="SANVerified" name="SAN Verified" id="210" />
+		<transition to="DBStarted" name="Database Tasks Started" id="220" />
+		<transition to="DBFinished" name="Database Tasks Finished" id="230" />
+		<transition to="AppStartup" name="Application Startup" id="240" />
+		<transition to="AppFinished" name="Application Finished" id="250" />
+		<transition to="AppVerifying" name="Application Verify Started" id="260" />
+		<transition to="AppVerified" name="Application Verified" id="270" />
+		<transition to="Completed" name="Completed" id="280" />
+		<transition to="Terminated" name="Terminated" id="900" />
 	</transitions>
 
 	<startState name="Hold">
@@ -152,7 +152,6 @@
 		<task swimlane="MOVE_TECH">
 			<transition to="Hold" name="Hold" flag="issue,idle"/>
 			<transition to="Unracking" flag="busy" />
-			<transition to="Unracked" flag="skipped,idle"/>
 		</task>
 		<task swimlane="CLEANER">
 			<transition to="Hold" flag="issue"/>
@@ -175,7 +174,6 @@
 		</task>
 		<task swimlane="MOVE_TECH">
 			<transition to="Hold" flag="issue,idle"/>
-			<transition to="Release" flag="comment,idle" />
 			<transition to="Unracked" flag="idle" />
 		</task>
 		<task swimlane="CLEANER">
@@ -420,17 +418,6 @@
 	<taskNode name="Staged">
 		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
-			<transition to="Ready" />
-			<transition to="Release" />
-			<transition to="Unracking"/>
-			<transition to="Unracked"/>
-			<transition to="Cleaned"/>
-			<transition to="OnCart"/>
-			<transition to="OnTruck"/>
-			<transition to="InTransit"/>
-			<transition to="EndTransit"/>
-			<transition to="OffTruck"/>
-			<transition to="Staged"/>
 			<transition to="Reracking"/>
 			<transition to="Racked"/>
 			<transition to="QAVerified"/>
@@ -447,23 +434,16 @@
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
+		<task swimlane="MOVE_TECH">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracking" flag="busy"/>
+		</task>
+
 	</taskNode>
 
-	<taskNode name="Rerack/Cabling Started">
+	<taskNode name="Reracking">
 		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
-			<transition to="Ready" />
-			<transition to="Release" />
-			<transition to="Unracking"/>
-			<transition to="Unracked"/>
-			<transition to="Cleaned"/>
-			<transition to="OnCart"/>
-			<transition to="OnTruck"/>
-			<transition to="InTransit"/>
-			<transition to="EndTransit"/>
-			<transition to="OffTruck"/>
-			<transition to="Staged"/>
-			<transition to="Reracking"/>
 			<transition to="Racked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
@@ -479,9 +459,13 @@
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
+		<task swimlane="MOVE_TECH">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracked" />
+		</task>
 	</taskNode>
 
-	<taskNode name="Reracked/Cabled">
+	<taskNode name="Reracked">
 		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Ready" />
