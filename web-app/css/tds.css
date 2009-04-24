@@ -1,11 +1,17 @@
 
+.colum_techlogin{
+	width:292px;
+	height:auto;
+	margin:20px auto;
+	
+
+}
 .colum_login{
 	width:292px;
 	height:auto;
 	float:left;
 	margin-bottom: 10px;
 }
-
 .left_cornerlog{background-position:top left;}
 
 .right_cornerlog{background-position:top right;}
@@ -35,7 +41,14 @@
 	height:100%;
 	float:left;
 }
+.w_techlog{
+	width:270px;
+	height:100%;
+	float:left;
+	border:1px solid #5F9FCF;
+	padding:10px;
 
+}
 .buttonR input {
 	background-color:#5F9FCF;
 	border:1px solid #328714;

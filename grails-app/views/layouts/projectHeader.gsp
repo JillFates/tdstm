@@ -42,6 +42,7 @@
             <jsec:hasRole name="ADMIN">
               <li><g:link class="home" controller="auth" action="home">Administration </g:link> </li>
             </jsec:hasRole>
+            <li><g:link class="home" controller="moveTech" action="moveTechLogin">Move Tech</g:link></li>
           </ul>
         </div>
       </div>
