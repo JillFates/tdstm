@@ -4,12 +4,14 @@
 import org.jsecurity.authc.AuthenticationException
 import org.jsecurity.authc.UsernamePasswordToken
 import org.jsecurity.SecurityUtils
+import grails.converters.JSON
 class MoveTechController {
 	def jsecSecurityManager
     def userPreferenceService
     
-    def index = {
-        def partyGroupInstance = PartyGroup.findById(params.team)
+    def index = {	
+					
+        def partyGroupInstance = PartyGroup.findById(params.team)        
         def team = partyGroupInstance.name
         def location =""
         if( params.location == 's') {
@@ -18,7 +20,7 @@ class MoveTechController {
             location = "Reracking"
         }
 			
-        render(view:'home',model:[projectTeam:partyGroupInstance,project:params.project,location:location])
+        render(view:'home',model:[projectTeam:partyGroupInstance,project:params.project,loc:location, bundle:params.bundle,team:params.team,location:params.location])
 	}
     //moveTech login
     def moveTechLogin = {
@@ -149,6 +151,24 @@ class MoveTechController {
     }
     // method for home page
     def home = {
+    		
         render( view:'home' )
     }
+	// Method for my task link
+	def assetTask = {
+    		
+        def bundle = params.bundle
+        def bundleId = MoveBundle.find("from MoveBundle mb where mb.name = '${bundle}'")
+        def team = params.team
+        def taskList = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = ${bundleId.id} and ae.sourceTeam = ${team} and (ae.sourceLocation = 'XX-232-YAB' or ae.targetLocation = 'XX-232-YAB')")
+        return[taskList:taskList,bundle:bundle,team:team,project:params.project,location:params.location]
+	}
+	//To open div for my task
+	def getServerInfo = {
+			
+        def assetId = params.assetId
+        def assetItem = AssetEntity.findById(assetId)
+        render assetItem as JSON
+	}
+	
 }

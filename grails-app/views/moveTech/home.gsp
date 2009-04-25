@@ -7,6 +7,7 @@
 <link rel="shortcut icon"
 	href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 <g:javascript library="application" />
+
 </head>
 <body>
 	<div id="spinner" class="spinner" style="display: none;"><img
@@ -24,7 +25,7 @@
               									<div style="width:30%; float:left; background-color:#43ca56; border-left:1px solid #5585c7; ">
 		              										<a href="#">Home</a></div>
 							              				<div style="width:30%; float:left; border-left:1px solid #5585c7; ">
-              											<a href="#">My Tasks</a></div>
+              											<g:link action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project]'>My Tasks</g:link></div>
               											<div style="width:30%; float:left; border-left:1px solid #5585c7; ">
               											<a href="#">Search</a></div>
 								              	</div>
@@ -41,7 +42,7 @@
               					<div style="float:left; width:100%;"><div style="text-align:left; padding-left:10px; color:#990000;"><b>Currently Logged in as:</b></div>
               					<div style="float:left; width:100%;"><div style="text-align:left; padding-left:35px;"><b>${projectTeam}</b></div></div>
               					<div style="float:left; width:100%;"><div style="text-align:left; padding-left:35px;"><b>${project}</b></div></div>
-              					<div style="float:left; width:100%;"><div style="text-align:left; padding-left:35px;"><b>${location}</b></div></div>
+              					<div style="float:left; width:100%;"><div style="text-align:left; padding-left:35px;"><b>${loc}</b></div></div>
               					
            <div style="float:left; width:100%; margin:5px 0; "><b>My Issues:</b></div>
             <div id="assetTable"style="float:left;width:100%; ">
