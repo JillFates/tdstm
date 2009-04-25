@@ -6,6 +6,14 @@
 	
 
 }
+.div_head {
+	background:#CCCCCC none repeat scroll 0 0;
+	color:#000000;
+	font-size:11px;
+	font-weight:bold;
+	line-height:17px;
+ 
+	}
 .colum_login{
 	width:292px;
 	height:auto;
@@ -46,7 +54,7 @@
 	height:100%;
 	float:left;
 	border:1px solid #5F9FCF;
-	padding:10px;
+	padding:0px;
 
 }
 .buttonR input {
