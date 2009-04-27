@@ -18,6 +18,11 @@
     <jq:plugin name="ui.draggable"/>
     <jq:plugin name="ui.resizable"/>
     <jq:plugin name="ui.dialog"/>
+    <script>
+	      $(document).ready(function() {
+	        $("#dialog").dialog({ autoOpen: false })	        
+	      })
+   </script>
     
     <script type="text/javascript">
    
