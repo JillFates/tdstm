@@ -2,6 +2,8 @@ import org.jsecurity.crypto.hash.Sha1Hash
 import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
 
+import java.text.SimpleDateFormat
+
 class BootStrap {
 	def assetEntityAttributeLoaderService
     def init = { servletContext ->
@@ -197,9 +199,9 @@ class BootStrap {
 			partyType:personPartyType ).save()
 		def personJimL = new Person( firstName:'Jim', lastName:'Laucher', title:'Tech',
 			partyType:personPartyType ).save()
-		def personLisa = new Person( firstName:'Lisa', lastName:'Angel', title:'Move Manager',
+		def personLisa = new Person( firstName:'Lisa', lastName:'Carr', title:'Move Manager',
 			partyType:personPartyType ).save()
-		def personGeorge = new Person( firstName:'George', lastName:'Washington', title:'Move Manager',
+		def personGenePoole = new Person( firstName:'Gene', lastName:'Poole', title:'Move Manager',
 			active:'N', partyType:personPartyType ).save()
 		def personTim = new Person( firstName:'Tim', lastName:'Shutt', title:'Project Manager',
 			partyType:personPartyType ).save()
@@ -209,7 +211,11 @@ class BootStrap {
 			partyType:personPartyType ).save()
 		def personReddy = new Person( firstName:'Lokanath', lastName:'Reddy',title:'Tech Lead',
 			partyType:personPartyType ).save()
-		
+		def personBrock = new Person( firstName:'Brock', lastName:'Lee',title:'Tech',
+			partyType:personPartyType ).save()
+		def personTransport = new Person( firstName:'Tran', lastName:'Sport',title:'Transport',
+			partyType:personPartyType ).save()
+
 		// This person account will actual share 3 logins (move tech, clean tech, and mover)
 		def personWorkStation = new Person( firstName:'Work', lastName:'Station', title:'Work Station User',
 			partyType:personPartyType ).save()	
@@ -279,21 +285,27 @@ class BootStrap {
 		// Create MoveBundle Details
 		// -------------------------------
 		println "MOVE BUNDLE"
-		def cedarsProjectMoveBundle1 = new MoveBundle( project: cedarsProject, name: "Cedars Bundle1", startTime: new Date(), completionTime: new Date(), operationalOrder:1 ).save( insert:true )
-		def cedarsProjectMoveBundle2 = new MoveBundle( project: cedarsProject, name: "Cedars Bundle2", startTime: new Date(), completionTime: new Date(), operationalOrder:1 ).save( insert:true )
-		def cedarsProjectMoveBundle3 = new MoveBundle( project: cedarsProject, name: "Cedars Bundle3", startTime: new Date(), completionTime: new Date(), operationalOrder:1 ).save( insert:true )
-		def cedarsProjectMoveBundle4 = new MoveBundle( project: cedarsProject, name: "Cedars Bundle4", startTime: new Date(), completionTime: new Date(), operationalOrder:1 ).save( insert:true )
-		def twProjectMoveBundle = new MoveBundle( project: twProject, name: "TW Bundle", startTime: new Date(), completionTime: new Date(), operationalOrder:2 ).save( insert:true )
+		def cedarsProjectMoveBundle1 = new MoveBundle( project: cedarsProject, name: "Bundle 1",
+				startTime: new Date(), completionTime: new Date()+1, operationalOrder:1 ).save( insert:true )
+		def cedarsProjectMoveBundle2 = new MoveBundle( project: cedarsProject, name: "Bundle 2",
+				startTime: new Date()+1, completionTime: new Date()+2, operationalOrder:1 ).save( insert:true )
+		def cedarsProjectMoveBundle3 = new MoveBundle( project: cedarsProject, name: "Bundle 3",
+				startTime: new Date()+2, completionTime: new Date()+3, operationalOrder:1 ).save( insert:true )
+		def cedarsProjectMoveBundle4 = new MoveBundle( project: cedarsProject, name: "Bundle 4",
+				startTime: new Date()+3, completionTime: new Date()+4, operationalOrder:1 ).save( insert:true )
+		def twProjectMoveBundle = new MoveBundle( project: twProject, name: "TW Bundle",
+				startTime: new Date()+12, completionTime: new Date()+15, operationalOrder:2 ).save( insert:true )
 		
 		// -------------------------------
 		// Create ProjectTeam
 		// -------------------------------
 		println "PROJECT TEAM"
-		def cedarsGreenProjectTeam = new ProjectTeam( name: "Cedars's Green Team",	teamCode: "Green", moveBundle:cedarsProjectMoveBundle1, dateCreated: new Date()).save()
-		def cedarsRedProjectTeam = new ProjectTeam( name: "Cedars's Red Team",	teamCode: "Red", moveBundle:cedarsProjectMoveBundle1, dateCreated: new Date()).save()
-		def twGreenProjectTeam = new ProjectTeam( name: "TM's Green Team",	teamCode: "Green", moveBundle:twProjectMoveBundle, dateCreated: new Date()).save()
-		def twRedProjectTeam = new ProjectTeam( name: "TM's Red Team",	teamCode: "Red", moveBundle:twProjectMoveBundle, dateCreated: new Date()).save()
-
+		def cedarsGreenProjectTeam = new ProjectTeam( name: "MoveTeam 1",	teamCode: "1", moveBundle:cedarsProjectMoveBundle1 ).save()
+		def cedarsRedProjectTeam = new ProjectTeam( name: "MoveTeam 2",	teamCode: "2", moveBundle:cedarsProjectMoveBundle1 ).save()
+		def cedarsCleanProjectTeam = new ProjectTeam( name: "Cleaning",	teamCode: "Cleaning", moveBundle:cedarsProjectMoveBundle1 ).save()
+		def cedarsTransportProjectTeam = new ProjectTeam( name: "Transport",	teamCode: "Transport", moveBundle:cedarsProjectMoveBundle1 ).save()
+		def twGreenProjectTeam = new ProjectTeam( name: "MoveTeam 1",	teamCode: "1", moveBundle:twProjectMoveBundle ).save()
+		def twRedProjectTeam = new ProjectTeam( name: "MoveTeam 2",	teamCode: "2", moveBundle:twProjectMoveBundle ).save()
 
 		// -------------------------------
 		// Create default Preference
@@ -303,7 +315,6 @@ class BootStrap {
 		johnPref.userLogin = userJohn
 		johnPref.preferenceCode = "CURR_PROJ"
 		johnPref.save( insert: true)
-
 
 		// -------------------------------
 		// Create PartyRole Details
@@ -315,11 +326,12 @@ class BootStrap {
 		new PartyRole( party:personJohn, roleType:projectAdminRole ).save( insert:true )
 		new PartyRole( party:personWorkStation, roleType:workStationRole).save( insert:true )
 
-
 		// -------------------------------
         // create Party Relationship
 		// -------------------------------
 		println "PARTY RELATIONSHIPS "
+		// Save all the rows in list
+		def i = 0;
 		def pr = [
 			// Partners, Clients and Vendors
 			[ partnerType, tds, companyRole, emc, partnerRole ],
@@ -333,10 +345,12 @@ class BootStrap {
 			[ staffType, tds, companyRole, personTim, staffRole ],
 			[ staffType, tds, companyRole, personJimL, staffRole ],
 			[ staffType, tds, companyRole, personAnna, staffRole ],
+			[ staffType, tds, companyRole, personBrock, staffRole ],
+			[ staffType, tds, companyRole, personTransport, staffRole ],
 			[ staffType, emc, companyRole, personLisa, staffRole ],
 			[ staffType, emc, companyRole, personRobin, staffRole ],
 			[ staffType, sigma, companyRole, personReddy, staffRole ],
-			[ staffType, cedars, companyRole, personGeorge, staffRole ],
+			[ staffType, cedars, companyRole, personGenePoole, staffRole ],
 			[ staffType, cedars, companyRole, personNBonner, staffRole ],
 			[ staffType, cedars, companyRole, personAMaslac, staffRole ],
 			[ staffType, cedars, companyRole, personHKim, staffRole ],
@@ -349,9 +363,11 @@ class BootStrap {
 			// Project Staff roles
 			[ projStaffType, cedarsProject, projectRole, personRobin, pmRole ],
 			[ projStaffType, cedarsProject, projectRole, personJohn, moveMgrRole ],
-			[ projStaffType, cedarsProject, projectRole, personGeorge, networkAdminRole ],
+			[ projStaffType, cedarsProject, projectRole, personGenePoole, networkAdminRole ],
 			[ projStaffType, cedarsProject, projectRole, personAnna, techRole ],
 			[ projStaffType, cedarsProject, projectRole, personJimL, techRole ],
+			[ projStaffType, cedarsProject, projectRole, personBrock, techRole ],
+			[ projStaffType, cedarsProject, projectRole, personTransport, techRole ],
 
 			// Application / staff relationships
 			[ appRelaType, raiserApp, applicationRole, personNBonner, appOwnerRole ],
@@ -369,12 +385,12 @@ class BootStrap {
 			[ teamType, cedarsGreenProjectTeam, teamRole, personJimL, teamMemberRole ],
 			[ teamType, cedarsGreenProjectTeam, teamRole, personAnna, teamMemberRole ],
 			[ teamType, cedarsRedProjectTeam, teamRole, personJimL, teamMemberRole ],
+			[ teamType, cedarsCleanProjectTeam, teamRole, personBrock, teamMemberRole ],
+			[ teamType, cedarsTransportProjectTeam, teamRole, personTransport, teamMemberRole ],
 			[ teamType, cedarsRedProjectTeam, teamRole, personJohn, teamMemberRole ],
 			[ teamType, twGreenProjectTeam, teamRole, personTim, teamMemberRole ],
 			[ teamType, twGreenProjectTeam, teamRole, personJohn, teamMemberRole ]
 		]
-		// Save all the rows in list
-		def i = 0;
 		pr.each {
 			// println "row $i"
 			i++
