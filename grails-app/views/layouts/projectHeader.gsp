@@ -83,6 +83,7 @@
  			<div id="menu1" class="menu_new">Reports<ul>    	      
     	      <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Team Worksheets']">Team Worksheets</g:link> </li>
     	      <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Rack Layout']">Rack Layout</g:link></li>
+    	       <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'cart Asset']">Cart Asset List</g:link></li>
               </ul>
             </div>
             </div>

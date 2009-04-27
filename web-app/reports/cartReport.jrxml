@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TeamWorkSheetReport" pageWidth="1090" pageHeight="842" columnWidth="920" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isTitleNewPage="false">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="cartReport" language="groovy" pageWidth="900" pageHeight="842" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="860" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
 	<import value="net.sourceforge.barbecue.BarcodeFactory"/>
 	<style name="border" isDefault="false">
 		<box leftPadding="5">
@@ -16,55 +16,40 @@
 	<parameter name="source_team_id" class="java.lang.String">
 		<defaultValueExpression><![CDATA["27"]]></defaultValueExpression>
 	</parameter>
-	<queryString>
-		
-	</queryString>
+	
+	<field name="target_rack" class="java.lang.String">
+	</field>
+	<field name="dlocation" class="java.lang.String">
+	</field>
 	<field name="assetName" class="java.lang.String">
-	</field>
-	<field name="assetTag" class="java.lang.String">
-	</field>
-	<field name="assetType" class="java.lang.String">
-	</field>
-	<field name="model" class="java.lang.String">
 	</field>
 	<field name="room" class="java.lang.String">
 	</field>
-	<field name="rack" class="java.lang.String">
+	<field name="model" class="java.lang.String">
 	</field>
-	<field name="position" class="java.lang.Integer">
+	<field name="source_location" class="java.lang.String">
 	</field>
 	<field name="sourcetargetLoc" class="java.lang.String">
 	</field>
-	<field name="usize" class="java.lang.String">
+	<field name="source_room" class="java.lang.String">
+	</field>
+	<field name="source_team_id" class="java.lang.Long">
 	</field>
 	<field name="cart" class="java.lang.String">
 	</field>
 	<field name="shelf" class="java.lang.String">
 	</field>
-	<field name="PDU" class="java.lang.String">
-	</field>
-	<field name="NIC" class="java.lang.String">
-	</field>
-	<field name="kvmPort" class="java.lang.String">
-	</field>
-	<field name="hbaPort" class="java.lang.String">
-	</field>
 	<field name="truck" class="java.lang.String">
 	</field>
-	<field name="kvm_device" class="java.lang.String">
-	</field>
-	<field name="fiber_cabinet" class="java.lang.String">
-	</field>
-	<field name="source_team_id" class="java.lang.Long">
-	</field>
-	<field name="move_bundle_id" class="java.lang.Long">
+	<field name="target_location" class="java.lang.String">
 	</field>
 	<field name="startAt" class="java.util.Date">
 	</field>
 	<field name="completedAt" class="java.util.Date">
 	</field>
-		<field name="instructions" class="java.lang.String"/>
-	
+	<field name="instructions" class="java.lang.String"/>
+	<field name="move_bundle_id" class="java.lang.Long">
+	</field>
 	<field name="location" class="java.lang.String"/>
 	<field name="sourceTargetPos" class="java.lang.String"/>
 	<field name="sourceTargetrack" class="java.lang.String"/>
@@ -152,232 +137,185 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{sourceTargetPos}]]></textFieldExpression>
 			</textField>
 			<image>
-				<reportElement x="568" y="12" width="400" height="52"/>
+				<reportElement x="468" y="12" width="400" height="52"/>
 				<imageExpression class="net.sf.jasperreports.engine.JRRenderable"><![CDATA[new net.sf.jasperreports.renderers.BarbecueRenderer(BarcodeFactory.createCode128B("mt"+"-"+$F{move_bundle_id}+"-"+$F{source_team_id}+"-"+$F{sourcetargetLoc}))]]></imageExpression>
 			</image>
 			<staticText>
-				<reportElement x="724" y="71" width="100" height="22"/>
+				<reportElement x="524" y="71" width="100" height="22"/>
 				<textElement textAlignment="Right"><font size="13"/></textElement>
 				<text><![CDATA[Start At:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="724" y="93" width="100" height="22"/>
+				<reportElement x="524" y="93" width="100" height="22"/>
 				<textElement textAlignment="Right"><font size="13"/></textElement>
 				<text><![CDATA[Complete At:]]></text>
 			</staticText>
 			<textField pattern="dd/MM/yyyy h.mm a" isBlankWhenNull="true">
-				<reportElement x="832" y="71" width="100" height="22"/>
+				<reportElement x="632" y="71" width="100" height="22"/>
 				<textElement textAlignment="Right"><font size="13"/></textElement>
 				<textFieldExpression class="java.util.Date"><![CDATA[$F{startAt}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MM/yyyy h.mm a" isBlankWhenNull="true">
-				<reportElement x="832" y="93" width="100" height="22"/>
+				<reportElement x="632" y="93" width="100" height="22"/>
 				<textElement textAlignment="Right"><font size="13"/></textElement>
 				<textFieldExpression class="java.util.Date"><![CDATA[$F{completedAt}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>
 	<columnHeader>
-		<band height="18">
+		<band height="20">
 			<staticText>
-				<reportElement mode="Opaque" x="0" y="0" width="100" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<reportElement mode="Opaque" x="0" y="0" width="80" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
 				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
-				<text><![CDATA[assetName]]></text>
+				<text><![CDATA[Priority]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="101" y="0" width="70" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<reportElement mode="Opaque" x="81" y="0" width="79" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
 				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
-				<text><![CDATA[assetTag]]></text>
+				<text><![CDATA[AssetName]]></text>
 			</staticText>
-			
 			<staticText>
-				<reportElement mode="Opaque" x="171" y="0" width="70" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<reportElement mode="Opaque" x="161" y="0" width="79" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
 				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
-				<text><![CDATA[model]]></text>
+				<text><![CDATA[Model]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="241" y="0" width="70" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
-				<textElement textAlignment="Center">
-					<font size="12"/>
-				</textElement>
-				<text><![CDATA[room]]></text>
-			</staticText>
-			<staticText>
-				<reportElement mode="Opaque" x="311" y="0" width="70" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
-				<textElement textAlignment="Center">
-					<font size="12"/>
-				</textElement>
-				<text><![CDATA[rack]]></text>
-			</staticText>
-			<staticText>
-				<reportElement mode="Opaque" x="381" y="0" width="70" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
-				<textElement textAlignment="Center">
-					<font size="12"/>
-				</textElement>
-				<text><![CDATA[truck]]></text>
-			</staticText>
-			<staticText>
-				<reportElement mode="Opaque" x="451" y="0" width="250" height="18" forecolor="#FFFFFF" backcolor="#000000">
+				<reportElement mode="Opaque" x="241" y="0" width="79" height="18" forecolor="#FFFFFF" backcolor="#000000">
+				<printWhenExpression><![CDATA[new Boolean($F{location}.equals( "Source Team" ))]]></printWhenExpression>
 				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Old Location]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="321" y="0" width="79" height="18" forecolor="#FFFFFF" backcolor="#000000">
+				<printWhenExpression><![CDATA[new Boolean($F{location}.equals( "Source Team" ))]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Old Room]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="241" y="0" width="79" height="18" forecolor="#FFFFFF" backcolor="#000000">
+				<printWhenExpression><![CDATA[new Boolean($F{location}.equals( "Target Team" ))]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[New Location]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="321" y="0" width="79" height="18" forecolor="#FFFFFF" backcolor="#000000">
+				<printWhenExpression><![CDATA[new Boolean($F{location}.equals( "Target Team" ))]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[New Room]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="401" y="0" width="79" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Move Team]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="480" y="0" width="80" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Cart]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="641" y="0" width="225" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
 				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Instructions]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="701" y="0" width="70" height="18" forecolor="#FFFFFF" backcolor="#000000">
-				<printWhenExpression><![CDATA[new Boolean($F{location}.equals( "Target Team" ))]]></printWhenExpression>
-				</reportElement>
+				<reportElement mode="Opaque" x="561" y="0" width="79" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
 				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
-				<text><![CDATA[position]]></text>
+				<text><![CDATA[Truck]]></text>
 			</staticText>
-			<staticText>
-				<reportElement mode="Opaque" x="771" y="0" width="70" height="18" forecolor="#FFFFFF" backcolor="#000000">
-					<printWhenExpression><![CDATA[new Boolean($F{location}.equals( "Target Team" ))]]></printWhenExpression>
-				</reportElement>
-				<textElement textAlignment="Center">
-					<font size="12"/>
-				</textElement>
-				<text><![CDATA[PDU]]></text>
-			</staticText>
-			<staticText>
-				<reportElement mode="Opaque" x="841" y="0" width="70" height="18" forecolor="#FFFFFF" backcolor="#000000">
-					<printWhenExpression><![CDATA[new Boolean($F{location}.equals( "Target Team" ))]]></printWhenExpression>
-				</reportElement>
-				<textElement textAlignment="Center">
-					<font size="12"/>
-				</textElement>
-				<text><![CDATA[NIC]]></text>
-			</staticText>
-			<staticText>
-				<reportElement mode="Opaque" x="911" y="0" width="70" height="18" forecolor="#FFFFFF" backcolor="#000000">
-				<printWhenExpression><![CDATA[new Boolean($F{location}.equals( "Target Team" ))]]></printWhenExpression>
-				</reportElement>
-				<textElement textAlignment="Center">
-					<font size="12"/>
-				</textElement>
-				<text><![CDATA[KVM/Port]]></text>
-			</staticText>
-			<staticText>
-				<reportElement mode="Opaque" x="981" y="0" width="70" height="18" forecolor="#FFFFFF" backcolor="#000000">
-				<printWhenExpression><![CDATA[new Boolean($F{location}.equals( "Target Team" ))]]></printWhenExpression>
-				</reportElement>
-				<textElement textAlignment="Center">
-					<font size="12"/>
-				</textElement>
-				<text><![CDATA[HBA/Port]]></text>
-			</staticText>
-			
 		</band>
 	</columnHeader>
-	<detail >
+	<detail>
 		<band height="20">
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="0" y="0" width="100"  height="20" stretchType="RelativeToTallestObject" mode="Opaque"	style="border"/>
-				<textElement textAlignment="Center">
+				<reportElement style="border" stretchType="RelativeToTallestObject" x="0" y="0" width="80" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["High"]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="border" stretchType="RelativeToTallestObject" x="81" y="0" width="79" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement>
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{assetName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="101" y="0" width="70" height="20" stretchType="RelativeToTallestObject" mode="Opaque" style="border"/>
-				<textElement textAlignment="Center">
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{assetTag}]]></textFieldExpression>
-			</textField>
-		
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="171" y="0" width="70" height="20" stretchType="RelativeToTallestObject" mode="Opaque" style="border"/>
-				<textElement textAlignment="Center">
+				<reportElement style="border" stretchType="RelativeToTallestObject" x="161" y="0" width="79" height="20"/>
+				<textElement>
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{model}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="241" y="0" width="70" height="20" stretchType="RelativeToTallestObject" mode="Opaque" style="border"/>
-				<textElement textAlignment="Center">
+				<reportElement style="border" stretchType="RelativeToTallestObject" x="240" y="0" width="80" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{dlocation}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="border" stretchType="RelativeToTallestObject" x="321" y="0" width="79" height="20"/>
+				<textElement>
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{room}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="311" y="0" width="70" height="20" stretchType="RelativeToTallestObject" mode="Opaque" style="border"/>
-				<textElement textAlignment="Center">
+				<reportElement style="border" stretchType="RelativeToTallestObject" x="401" y="0" width="79" height="20"/>
+				<textElement>
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{sourceTargetrack}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{source_team_id}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="381" y="0" width="70" height="20" stretchType="RelativeToTallestObject" mode="Opaque" style="border"/>
-				<textElement textAlignment="Center">
+				<reportElement style="border" stretchType="RelativeToTallestObject" x="561" y="0" width="79" height="20"/>
+				<textElement>
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{truck}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="451" y="0" width="250" height="20" stretchType="RelativeToTallestObject" mode="Opaque" style="border">
-				</reportElement>
-				<textElement textAlignment="Center">
+				<reportElement style="border" stretchType="RelativeToTallestObject" x="641" y="0" width="225" height="20"/>
+				<textElement>
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{instructions}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="701" y="0" width="70" height="20" stretchType="RelativeToTallestObject" mode="Opaque" style="border">
-				<printWhenExpression><![CDATA[new Boolean($F{location}.equals( "Target Team" ))]]></printWhenExpression>
-				</reportElement>
-				<textElement textAlignment="Center">
+				<reportElement style="border" stretchType="RelativeToTallestObject" x="480" y="0" width="80" height="20"/>
+				<textElement>
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{position}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{cart}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="771" y="0" width="70" height="20" stretchType="RelativeToTallestObject" mode="Opaque" style="border">
-				<printWhenExpression><![CDATA[new Boolean($F{location}.equals( "Target Team" ))]]></printWhenExpression>
-				</reportElement>
-				<textElement textAlignment="Center">
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{PDU}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="841" y="0" width="70" height="20" stretchType="RelativeToTallestObject" mode="Opaque" style="border">
-				<printWhenExpression><![CDATA[new Boolean($F{location}.equals( "Target Team" ))]]></printWhenExpression>
-				</reportElement>
-				<textElement textAlignment="Center">
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{NIC}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="911" y="0" width="70" height="20" stretchType="RelativeToTallestObject" mode="Opaque" style="border">
-				<printWhenExpression><![CDATA[new Boolean($F{location}.equals( "Target Team" ))]]></printWhenExpression>
-				</reportElement>
-				<textElement textAlignment="Center">
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{kvmPort}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="981" y="0" width="70" height="20"  stretchType="RelativeToTallestObject" mode="Opaque" style="border">
-				<printWhenExpression><![CDATA[new Boolean($F{location}.equals( "Target Team" ))]]></printWhenExpression>
-				</reportElement>
-				<textElement textAlignment="Center">
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{hbaPort}]]></textFieldExpression>
-			</textField>
-			
-			
 		</band>
 	</detail>
 	<columnFooter>
