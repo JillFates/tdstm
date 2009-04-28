@@ -14,6 +14,7 @@ class AssetEntityController {
 	def added = 0
 	def skipped = []
 	def partyRelationshipService
+	def stateEngineService
     def index = {
 		redirect( action:list, params:params )
 	}
@@ -668,6 +669,7 @@ class AssetEntityController {
         def assetList
         def bundleTeams = []
         def totalAsset
+        def completed = new HashMap()
         def projectInstance = Project.findById( projectId )
         def moveBundleInstanceList = MoveBundle.findAll("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
         def moveBundleInstance
@@ -692,9 +694,22 @@ class AssetEntityController {
             def teamMembers = partyRelationshipService.getBundleTeamMembersDashboard(it.id)
             def member = teamMembers.delete((teamMembers.length()-1),teamMembers.length())
             bundleTeams <<[team:it,members:member]
-        		 	   
         }
-        return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams, totalAsset:totalAsset,moveBundleInstance:moveBundleInstance]
+        def cleanedId = stateEngineService.getStateId("STD_PROCESS","Cleaned")
+        def rerackedId = stateEngineService.getStateId("STD_PROCESS","Reracked")
+        def onTruckId = stateEngineService.getStateId("STD_PROCESS","OnTruck")
+        def stagedId = stateEngineService.getStateId("STD_PROCESS","Staged")
+        
+        def sourceCleaned = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $cleanedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
+        def targetCleaned = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $rerackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
+        def sourceMover = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $onTruckId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
+        def targetMover = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $stagedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
+        completed.put("totalAssets", totalAsset.size() )
+        completed.put("sourceCleaned", sourceCleaned )
+        completed.put("targetCleaned", targetCleaned )
+        completed.put("sourceMover", sourceMover )
+        completed.put("targetMover", targetMover )
+        return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams, totalAsset:totalAsset,moveBundleInstance:moveBundleInstance, completed:completed]
         		
     }
     /*

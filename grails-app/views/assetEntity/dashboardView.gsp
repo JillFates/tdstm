@@ -103,8 +103,9 @@
 			<tr><td>Names</td> </tr>
 			<tr><td class="odd">Location</td> </tr>
 			<tr><td>Asset</td> </tr>
-			<tr><td class="odd">Progress</td> </tr>
-			<tr><td>Queue</td> </tr>
+			<tr><td class="odd">Source</td> </tr>
+			<tr><td >Target</td> </tr>
+			<tr><td class="odd">Queue</td> </tr>
 			</table>
     </div>
     </td>
@@ -120,18 +121,31 @@
 			<tr><td class="odd">${bundleTeam?.team?.currentLocation }&nbsp;</td> </tr>
 			<tr><td nowrap>Sap1</td> </tr>
 			<tr><td class="odd">17 of 50</td> </tr>
-			<tr><td nowrap>2/22m</td> </tr>
+			<tr><td nowrap>17 of 50</td> </tr>
+			<tr><td nowrap class="odd">2/22m</td> </tr>
 			</table>
 			</td>
 			</g:each>
-			<td style="padding: 0px;">
+			<td style="padding: 0px;border-right: 1px solid #333333">
 			<table style="border: 0;" >
 			<th nowrap>Cleaner</th>
 			<tr><td nowrap>Gunderson</td></tr>
 			<tr><td class="odd">Dallas1</td> </tr>
 			<tr><td nowrap>Exchg3</td> </tr>
-			<tr><td class="odd">2 of 77</td> </tr>
-			<tr><td nowrap>1/10m</td> </tr>
+			<tr><td class="odd">${completed.sourceCleaned} of ${completed.totalAssets}</td> </tr>
+			<tr><td nowrap>${completed.targetCleaned} of ${completed.totalAssets}</td> </tr>
+			<tr><td nowrap class="odd">1/10m</td> </tr>
+			</table>
+			</td>
+			<td style="padding: 0px;">
+			<table style="border: 0;" >
+			<th nowrap>Mover</th>
+			<tr><td nowrap>Gunderson</td></tr>
+			<tr><td class="odd">Dallas1</td> </tr>
+			<tr><td nowrap>Exchg3</td> </tr>
+			<tr><td class="odd">${completed.sourceMover} of ${completed.totalAssets}</td> </tr>
+			<tr><td nowrap>${completed.targetMover} of ${completed.totalAssets}</td> </tr>
+			<tr><td nowrap class="odd">1/10m</td> </tr>
 			</table>
 			</td>
 	  </tr>
@@ -146,7 +160,8 @@
 			<tr><td class="odd">&nbsp;</td> </tr>
 			<tr><td>&nbsp;</td> </tr>
 			<tr><td class="odd">51 of 154</td> </tr>
-			<tr><td>11/92m</td> </tr>
+			<tr><td nowrap>17 of 50</td> </tr>
+			<tr><td class="odd">11/92m</td> </tr>
 			</table>
     </div>
     </td>
@@ -175,7 +190,7 @@
 					<g:sortableColumn property="issues" title="Issues" />
 				</tr>
 			</thead>
-			<tbody>
+			<tbody id="assetsTbody">
 
 				<g:each status="i" in="${totalAsset}" var="totalAsset">
 					<tr onclick="assetDetails('${totalAsset.id}')">

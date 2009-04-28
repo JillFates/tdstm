@@ -31,7 +31,7 @@
 		<transition to="OffTruck" name="Off Truck" id="120" />
 		<transition to="Staged" name="Staged" id="130" />
 		<transition to="Reracking" name="Reracking/Cabling Started" id="140" />
-		<transition to="Racked" name="Racked/Cabled" id="150" />
+		<transition to="Reracked" name="Reracked/Cabled" id="150" />
 		<transition to="QAVerified" name="QA Verification" id="160" />
 		<transition to="Powered On" name="Powered On" id="170" />
 		<transition to="NetVerifying" name="Verify Network Started" id="180" />
@@ -63,7 +63,7 @@
 			<transition to="OffTruck"/>
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
-			<transition to="Racked"/>
+			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="NetVerifying"/>
@@ -199,7 +199,7 @@
 			<transition to="OffTruck"/>
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
-			<transition to="Racked"/>
+			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="NetVerify"/>
@@ -240,7 +240,7 @@
 			<transition to="OffTruck"/>
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
-			<transition to="Racked"/>
+			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="NetVerify"/>
@@ -276,7 +276,7 @@
 			<transition to="OffTruck"/>
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
-			<transition to="Racked"/>
+			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="NetVerify"/>
@@ -311,7 +311,7 @@
 			<transition to="OffTruck"/>
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
-			<transition to="Racked"/>
+			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="NetVerify"/>
@@ -342,7 +342,7 @@
 			<transition to="OffTruck"/>
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
-			<transition to="Racked"/>
+			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="NetVerify"/>
@@ -366,7 +366,7 @@
 			<transition to="OffTruck"/>
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
-			<transition to="Racked"/>
+			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="NetVerify"/>
@@ -398,7 +398,7 @@
 			<transition to="OffTruck"/>
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
-			<transition to="Racked"/>
+			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="NetVerify"/>
@@ -419,7 +419,7 @@
 		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Reracking"/>
-			<transition to="Racked"/>
+			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="NetVerify"/>
@@ -444,7 +444,7 @@
 	<taskNode name="Reracking">
 		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
-			<transition to="Racked"/>
+			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="NetVerify"/>
@@ -480,7 +480,7 @@
 			<transition to="OffTruck"/>
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
-			<transition to="Racked"/>
+			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="NetVerify"/>
@@ -512,7 +512,7 @@
 			<transition to="OffTruck"/>
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
-			<transition to="Racked"/>
+			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="NetVerify"/>
@@ -544,7 +544,7 @@
 			<transition to="OffTruck"/>
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
-			<transition to="Racked"/>
+			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="NetVerify"/>
@@ -576,7 +576,7 @@
 			<transition to="OffTruck"/>
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
-			<transition to="Racked"/>
+			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="NetVerify"/>
@@ -608,7 +608,7 @@
 			<transition to="OffTruck"/>
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
-			<transition to="Racked"/>
+			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="NetVerify"/>
