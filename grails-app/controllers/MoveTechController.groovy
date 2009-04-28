@@ -8,9 +8,9 @@ import grails.converters.JSON
 class MoveTechController {
 	def jsecSecurityManager
     def userPreferenceService
-    
+    def stateEngineService
     def index = {	
-					
+			
         def partyGroupInstance = PartyGroup.findById(params.team)        
         def team = partyGroupInstance.name
         def location =""
@@ -37,7 +37,7 @@ class MoveTechController {
         def projectTeamInstance
         def token = new StringTokenizer(params.username, "-")
         //Getting current project instance
-        def currProj = getSession().getAttribute( "CURR_PROJ" )
+        def currProj = getSession().getAttribute( "CURR_PROJ" )       
         def projectId = currProj.CURR_PROJ
         def projectInstance = Project.findById( projectId )
         while (token.hasMoreTokens()) {
@@ -80,24 +80,7 @@ class MoveTechController {
                             // password is incorrect.
                             this.jsecSecurityManager.login(authToken)
                             // Check User and Person Activi status
-							            
-                            def activeStatus = userPreferenceService.checkActiveStatus()
-                            if(!activeStatus){
-                                flash.message = "User Authentication has been Disabled"
-                                redirect(action: 'login')
-                            } else {
-                                // If a controller redirected to this page, redirect back
-                                // to it. Otherwise redirect to the root URI.
-                                def targetUri = params.targetUri ?: "/"
-								            
-                                log.info "Redirecting to '${targetUri}'."
-                                //redirect(uri: targetUri)
-                                /*
-                                 *  call loadPreferences() to load CURR_PROJ MAP into session
-                                 */
-                                userPreferenceService.loadPreferences()
-                                redirect(controller:'moveTech',params:moveTech)
-                            }
+                            redirect(controller:'moveTech',params:moveTech)
                         }
                         catch (AuthenticationException ex){
                             // Authentication failed, so display the appropriate message
@@ -145,10 +128,6 @@ class MoveTechController {
         redirect(uri: '/')
     }
 
-    def unauthorized = {
-        flash.message = 'You do not have permission to access this page.'
-        render( view:'home' )
-    }
     // method for home page
     def home = {
     		
@@ -156,19 +135,82 @@ class MoveTechController {
     }
 	// Method for my task link
 	def assetTask = {
-    		
+			
         def bundle = params.bundle
+        def stateAssetList = []
         def bundleId = MoveBundle.find("from MoveBundle mb where mb.name = '${bundle}'")
-        def team = params.team
-        def taskList = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = ${bundleId.id} and ae.sourceTeam = ${team} and (ae.sourceLocation = 'XX-232-YAB' or ae.targetLocation = 'XX-232-YAB')")
-        return[taskList:taskList,bundle:bundle,team:team,project:params.project,location:params.location]
+        def team = params.team            
+        def projectId = bundleId.project.id        
+        def projectInstance = Project.findById(projectId)
+        def taskList
+        if(params.location == "s"){
+            taskList = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = ${bundleId.id} and ae.sourceTeam = ${team}")
+        }else{
+            taskList = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = ${bundleId.id} and ae.targetTeam = ${team}")
+        }
+        def taskBuffer = new StringBuffer()
+        def taskSize = taskList.size()
+        for ( int k=0; k< taskSize ; k++ ) {
+            if( k != taskSize - 1) {
+                taskBuffer.append( taskList[k].id + "," )
+            } else {
+                taskBuffer.append( taskList[k].id )
+            }
+        }
+        
+        def proAssetMap = ProjectAssetMap.findAll("from ProjectAssetMap pam where pam.asset in (${taskBuffer}) and pam.project = ${projectInstance.id}")
+   
+        proAssetMap.each{
+   
+            def stateVal = stateEngineService.getState("STD_PROCESS",it.currentStateId)
+            stateAssetList << [assetVal:it,stateVal:stateVal]
+      
+        }
+       
+        return[bundle:bundle,team:team,project:params.project,location:params.location,stateAssetList:stateAssetList]
 	}
 	//To open div for my task
 	def getServerInfo = {
 			
-        def assetId = params.assetId
+        def assetId = params.assetId        
         def assetItem = AssetEntity.findById(assetId)
         render assetItem as JSON
+	}
+	
+	def assetSearch = {
+			
+        def assetItem
+        def assetCommt
+        def projMap
+        def team = params.team
+        def assetId = params.assetId
+        def stateVal
+        if(assetId != null){
+			assetItem = AssetEntity.findByAssetTag(assetId)					
+			
+			
+			if(assetItem == null){			
+				flash.message = message(code :"Asset Tag number '${assetId}' was not located")
+			}else{
+				def bundleName = assetItem.moveBundle.name
+				def teamId = (assetItem.sourceTeam.id).toString()				
+				def teamName = assetItem.sourceTeam.name
+			
+                if(bundleName != params.bundle){
+                    flash.message = message(code :"The asset [${assetItem.assetName}] is not part of move bundle [${params.bundle}]")
+                }else if(teamId != params.team){
+                    flash.message = message(code :"The asset [${assetItem.assetName}] is assigned to team [${teamName}]")
+			    
+                }else{
+                    projMap = ProjectAssetMap.findByAsset(assetItem)
+                    stateVal = stateEngineService.getState("STD_PROCESS",projMap.currentStateId)
+                    assetCommt = AssetComment.findAllByAssetEntity(assetItem)
+				
+                }
+			}
+        }
+        return[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location]
+
 	}
 	
 }

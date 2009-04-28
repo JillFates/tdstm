@@ -29,6 +29,7 @@
 <jq:plugin name="ui.draggable" />
 <jq:plugin name="ui.resizable" />
 <jq:plugin name="ui.dialog" /> 
+
  <script>
 	      $(document).ready(function() {
 	        $("#serverInfoDialog").dialog({ autoOpen: false })
@@ -78,7 +79,7 @@
 							              				<div style="width:30%; float:left; background-color:#43ca56; border-left:1px solid #5585c7; ">
               											<g:link action="#" >My Tasks</g:link></div>
               											<div style="width:30%; float:left; border-left:1px solid #5585c7; ">
-              											<a href="#">Search</a></div>
+              											<g:link action="assetSearch" params='["bundle":bundle,"team":team,"location":location,"project":project]'>Asset</g:link></div>
 								              	</div>
 								              	</div>
 								              	<div style="float:left; width:100%; margin:5px 0; ">	
@@ -104,14 +105,28 @@
 				</tr>
                </thead>
                <tbody>
-                  <g:each status="i" in="${taskList}" var="taskList">
-					<tr ondblclick="${remoteFunction(action:'getServerInfo', params:'\'assetId=\'+'+ taskList.id,onComplete: 'serverInfo(e)')}">
+                  <g:each status="i" in="${stateAssetList}" var="stateAssetList">
+					<tr ondblclick="${remoteFunction(action:'getServerInfo', params:'\'assetId=\'+'+stateAssetList.assetVal.asset.id,onComplete: 'serverInfo(e)')}">
 						<td>High</td>
-						<td>${taskList.assetName}</td>
-						<td>${taskList.sourceRack}</td>
-						<td>${taskList.assetType}</td>
-						<td>HOLD!</td>
+						<td>${stateAssetList?.assetVal.asset.assetName}</td>
+						<td>${stateAssetList?.assetVal.asset.sourceRack}</td>
+						<td>${stateAssetList?.assetVal.asset.assetType}</td>
 						
+						<g:if test="${stateAssetList?.stateVal == 'Completed'}">
+						<td><g:checkBox name="myCheckbox" value="${true}" /></td>
+						</g:if>
+						<g:elseif test="${stateAssetList?.stateVal == 'Hold'}">
+						<td>Hold!</td>
+						</g:elseif>	
+						<g:elseif test="${stateAssetList?.stateVal == 'Unracking' && location == 's'}">
+						<td>IP</td>
+						</g:elseif>	
+						<g:elseif test="${stateAssetList?.stateVal == 'Reracking' && location == 't'}">
+						<td>IP</td>
+						</g:elseif>									
+						<g:else>
+						<td><g:checkBox name="myCheckbox" value="${false}" /></td>
+						</g:else>						
 					</tr>
 				</g:each>
                  </tbody>
