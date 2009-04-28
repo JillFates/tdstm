@@ -84,56 +84,65 @@
 		<band/>
 	</background>
 	<title>
-		
+		<band height="58">
+			
+			<staticText>
+				<reportElement x="225" y="13" width="424" height="35"/>
+				<textElement textAlignment="Center">
+					<font size="26" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cart Report]]></text>
+			</staticText>
+		</band>
 	</title>
 	<pageHeader>
 		<band height="151">
 			<staticText>
 				<reportElement x="1" y="0" width="100" height="26"/>
 				<textElement textAlignment="Right">
-					<font size="13"/>
+					<font size="15" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Project:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="26" width="100" height="26"/>
 				<textElement textAlignment="Right">
-					<font size="13"/>
+					<font size="15" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Move Bundle:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="55" width="100" height="26"/>
 				<textElement textAlignment="Right">
-					<font size="13"/>
+					<font size="15" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Team:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="85" width="100" height="26"/>
 				<textElement textAlignment="Right">
-					<font size="13"/>
+					<font size="15" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Location:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="105" y="2" width="100" height="26"/>
-				<textElement textAlignment="Left"><font size="13"/></textElement>
+				<reportElement x="105" y="0" width="250" height="26"/>
+				<textElement textAlignment="Left"><font size="15" isBold="true"/></textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{projectName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="105" y="29" width="100" height="26"/>
-				<textElement textAlignment="Left"><font size="13"/></textElement>
+				<reportElement x="105" y="26" width="250" height="26"/>
+				<textElement textAlignment="Left"><font size="15" isBold="true"/></textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{bundleName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="105" y="56" width="100" height="26"/>
-				<textElement textAlignment="Left"><font size="13"/></textElement>
+				<reportElement x="105" y="55" width="250" height="26"/>
+				<textElement textAlignment="Left"><font size="15" isBold="true"/></textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{teamName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="105" y="84" width="200" height="26"/>
-				<textElement textAlignment="Left"><font size="13"/></textElement>
+				<reportElement x="105" y="85" width="250" height="26"/>
+				<textElement textAlignment="Left"><font size="15" isBold="true"/></textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{sourceTargetPos}]]></textFieldExpression>
 			</textField>
 			<image>
@@ -142,22 +151,22 @@
 			</image>
 			<staticText>
 				<reportElement x="524" y="71" width="100" height="22"/>
-				<textElement textAlignment="Right"><font size="13"/></textElement>
+				<textElement textAlignment="Right"><font size="15" isBold="true"/></textElement>
 				<text><![CDATA[Start At:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="524" y="93" width="100" height="22"/>
-				<textElement textAlignment="Right"><font size="13"/></textElement>
+				<textElement textAlignment="Right"><font size="15" isBold="true"/></textElement>
 				<text><![CDATA[Complete At:]]></text>
 			</staticText>
 			<textField pattern="dd/MM/yyyy h.mm a" isBlankWhenNull="true">
-				<reportElement x="632" y="71" width="100" height="22"/>
-				<textElement textAlignment="Right"><font size="13"/></textElement>
+				<reportElement x="625" y="71" width="200" height="22"/>
+				<textElement textAlignment="Left"><font size="15" isBold="true"/></textElement>
 				<textFieldExpression class="java.util.Date"><![CDATA[$F{startAt}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MM/yyyy h.mm a" isBlankWhenNull="true">
-				<reportElement x="632" y="93" width="100" height="22"/>
-				<textElement textAlignment="Right"><font size="13"/></textElement>
+				<reportElement x="625" y="93" width="200" height="22"/>
+				<textElement textAlignment="Left"><font size="15" isBold="true"/></textElement>
 				<textFieldExpression class="java.util.Date"><![CDATA[$F{completedAt}]]></textFieldExpression>
 			</textField>
 		</band>

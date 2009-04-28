@@ -64,13 +64,14 @@
 	<field name="completedAt" class="java.util.Date">
 	</field>
 		<field name="instructions" class="java.lang.String"/>
-	
+	<field name="teamMembers" class="java.lang.String"/>
 	<field name="location" class="java.lang.String"/>
 	<field name="sourceTargetPos" class="java.lang.String"/>
 	<field name="sourceTargetrack" class="java.lang.String"/>
 	<field name="projectName" class="java.lang.String"/>
 	<field name="bundleName" class="java.lang.String"/>
 	<field name="teamName" class="java.lang.String"/>
+
 	<group name="source_team_id" isStartNewPage="true">
 		<groupExpression><![CDATA[$F{source_team_id}]]></groupExpression>
 		<groupFooter>
@@ -95,60 +96,70 @@
 			</band>
 		</groupFooter>
 	</group>
+	
 	<background>
 		<band/>
 	</background>
 	<title>
-		
+		<band height="58">
+			
+			<staticText>
+				<reportElement x="300" y="13" width="424" height="35"/>
+				<textElement textAlignment="Center">
+					<font size="26" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Move Team Worksheet]]></text>
+			</staticText>
+		</band>
 	</title>
 	<pageHeader>
 		<band height="151">
 			<staticText>
 				<reportElement x="1" y="0" width="100" height="26"/>
 				<textElement textAlignment="Right">
-					<font size="13"/>
+					<font size="15" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Project:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="26" width="100" height="26"/>
 				<textElement textAlignment="Right">
-					<font size="13"/>
+					<font size="15" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Move Bundle:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="55" width="100" height="26"/>
 				<textElement textAlignment="Right">
-					<font size="13"/>
+					<font size="15" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Team:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="85" width="100" height="26"/>
 				<textElement textAlignment="Right">
-					<font size="13"/>
+					<font size="15" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Location:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="105" y="2" width="100" height="26"/>
-				<textElement textAlignment="Left"><font size="13"/></textElement>
+				<reportElement x="105" y="0" width="200" height="26"/>
+				<textElement textAlignment="Left"><font size="15" isBold="true"/></textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{projectName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="105" y="29" width="100" height="26"/>
-				<textElement textAlignment="Left"><font size="13"/></textElement>
+				<reportElement x="105" y="26" width="100" height="26"/>
+				<textElement textAlignment="Left"><font size="15" isBold="true"/></textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{bundleName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="105" y="56" width="100" height="26"/>
-				<textElement textAlignment="Left"><font size="13"/></textElement>
+				<reportElement x="105" y="55" width="250" height="26"/>
+				<textElement textAlignment="Left"><font size="15" isBold="true"/></textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{teamName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="105" y="84" width="200" height="26"/>
-				<textElement textAlignment="Left"><font size="13"/></textElement>
+				<reportElement x="105" y="85" width="250" height="26"/>
+				<textElement textAlignment="Left"><font size="15" isBold="true"/></textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{sourceTargetPos}]]></textFieldExpression>
 			</textField>
 			<image>
@@ -156,23 +167,23 @@
 				<imageExpression class="net.sf.jasperreports.engine.JRRenderable"><![CDATA[new net.sf.jasperreports.renderers.BarbecueRenderer(BarcodeFactory.createCode128B("mt"+"-"+$F{move_bundle_id}+"-"+$F{source_team_id}+"-"+$F{sourcetargetLoc}))]]></imageExpression>
 			</image>
 			<staticText>
-				<reportElement x="724" y="71" width="100" height="22"/>
-				<textElement textAlignment="Right"><font size="13"/></textElement>
+				<reportElement x="624" y="71" width="100" height="22"/>
+				<textElement textAlignment="Right"><font size="15" isBold="true"/></textElement>
 				<text><![CDATA[Start At:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="724" y="93" width="100" height="22"/>
-				<textElement textAlignment="Right"><font size="13"/></textElement>
+				<reportElement x="624" y="93" width="100" height="22"/>
+				<textElement textAlignment="Right"><font size="15" isBold="true"/></textElement>
 				<text><![CDATA[Complete At:]]></text>
 			</staticText>
 			<textField pattern="dd/MM/yyyy h.mm a" isBlankWhenNull="true">
-				<reportElement x="832" y="71" width="100" height="22"/>
-				<textElement textAlignment="Right"><font size="13"/></textElement>
+				<reportElement x="726" y="71" width="200" height="22"/>
+				<textElement textAlignment="Left"><font size="15" isBold="true"/></textElement>
 				<textFieldExpression class="java.util.Date"><![CDATA[$F{startAt}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MM/yyyy h.mm a" isBlankWhenNull="true">
-				<reportElement x="832" y="93" width="100" height="22"/>
-				<textElement textAlignment="Right"><font size="13"/></textElement>
+				<reportElement x="726" y="93" width="200" height="22"/>
+				<textElement textAlignment="Left"><font size="15" isBold="true"/></textElement>
 				<textFieldExpression class="java.util.Date"><![CDATA[$F{completedAt}]]></textFieldExpression>
 			</textField>
 		</band>
@@ -184,14 +195,14 @@
 				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
-				<text><![CDATA[assetName]]></text>
+				<text><![CDATA[AssetName]]></text>
 			</staticText>
 			<staticText>
 				<reportElement mode="Opaque" x="101" y="0" width="70" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
 				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
-				<text><![CDATA[assetTag]]></text>
+				<text><![CDATA[AssetTag]]></text>
 			</staticText>
 			
 			<staticText>
@@ -199,28 +210,28 @@
 				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
-				<text><![CDATA[model]]></text>
+				<text><![CDATA[Model]]></text>
 			</staticText>
 			<staticText>
 				<reportElement mode="Opaque" x="241" y="0" width="70" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
 				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
-				<text><![CDATA[room]]></text>
+				<text><![CDATA[Room]]></text>
 			</staticText>
 			<staticText>
 				<reportElement mode="Opaque" x="311" y="0" width="70" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
 				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
-				<text><![CDATA[rack]]></text>
+				<text><![CDATA[Rack]]></text>
 			</staticText>
 			<staticText>
 				<reportElement mode="Opaque" x="381" y="0" width="70" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
 				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
-				<text><![CDATA[truck]]></text>
+				<text><![CDATA[Truck]]></text>
 			</staticText>
 			<staticText>
 				<reportElement mode="Opaque" x="451" y="0" width="250" height="18" forecolor="#FFFFFF" backcolor="#000000">
@@ -237,7 +248,7 @@
 				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
-				<text><![CDATA[position]]></text>
+				<text><![CDATA[Position]]></text>
 			</staticText>
 			<staticText>
 				<reportElement mode="Opaque" x="771" y="0" width="70" height="18" forecolor="#FFFFFF" backcolor="#000000">
@@ -281,7 +292,7 @@
 	<detail >
 		<band height="20">
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="0" y="0" width="100"  height="20" stretchType="RelativeToTallestObject" mode="Opaque"	style="border"/>
+				<reportElement x="0" y="0" width="101"  height="20" stretchType="RelativeToTallestObject" mode="Opaque"	style="border"/>
 				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>

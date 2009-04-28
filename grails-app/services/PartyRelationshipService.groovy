@@ -303,4 +303,20 @@ class PartyRelationshipService {
     	def partyToRelationship = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$partyRelationshipType' and p.partyIdFrom = $partyIdFrom and p.roleTypeCodeFrom = '$roleTypeFrom' and p.roleTypeCodeTo = '$roleTypeTo' ")
     	return partyToRelationship
     }
+    /*
+     * Return the List of TeamMembers corresponding to the Team
+     */
+    def getTeamMemberNames(def teamId )
+    {
+    	def roleTypeCodeTo ="TEAM_MEMBER"
+    	def roleTypeInstance = RoleType.findById('TEAM_MEMBER')
+    	def teamMembers = PartyRelationship.findAll(" from PartyRelationship pr where pr.partyIdFrom = $teamId and pr.roleTypeCodeTo = 'TEAM_MEMBER' ")
+    	 def memberNames = new StringBuffer()
+        teamMembers.each{team ->
+        	memberNames.append(team.partyIdTo.firstName)
+            memberNames.append("/")
+        }
+    	memberNames = memberNames.delete(memberNames.size()-1,memberNames.size())
+    	return memberNames
+    }
 }
