@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat
 
 class BootStrap {
 	def assetEntityAttributeLoaderService
+	def workflowService
     def init = { servletContext ->
     	
     	// -------------------------------
@@ -286,15 +287,15 @@ class BootStrap {
 		// -------------------------------
 		println "MOVE BUNDLE"
 		def cedarsProjectMoveBundle1 = new MoveBundle( project: cedarsProject, name: "Bundle 1",
-				startTime: new Date(), completionTime: new Date()+1, operationalOrder:1 ).save( insert:true )
+            startTime: new Date(), completionTime: new Date()+1, operationalOrder:1 ).save( insert:true )
 		def cedarsProjectMoveBundle2 = new MoveBundle( project: cedarsProject, name: "Bundle 2",
-				startTime: new Date()+1, completionTime: new Date()+2, operationalOrder:1 ).save( insert:true )
+            startTime: new Date()+1, completionTime: new Date()+2, operationalOrder:1 ).save( insert:true )
 		def cedarsProjectMoveBundle3 = new MoveBundle( project: cedarsProject, name: "Bundle 3",
-				startTime: new Date()+2, completionTime: new Date()+3, operationalOrder:1 ).save( insert:true )
+            startTime: new Date()+2, completionTime: new Date()+3, operationalOrder:1 ).save( insert:true )
 		def cedarsProjectMoveBundle4 = new MoveBundle( project: cedarsProject, name: "Bundle 4",
-				startTime: new Date()+3, completionTime: new Date()+4, operationalOrder:1 ).save( insert:true )
+            startTime: new Date()+3, completionTime: new Date()+4, operationalOrder:1 ).save( insert:true )
 		def twProjectMoveBundle = new MoveBundle( project: twProject, name: "TW Bundle",
-				startTime: new Date()+12, completionTime: new Date()+15, operationalOrder:2 ).save( insert:true )
+            startTime: new Date()+12, completionTime: new Date()+15, operationalOrder:2 ).save( insert:true )
 		
 		// -------------------------------
 		// Create ProjectTeam
@@ -417,17 +418,17 @@ class BootStrap {
 		//---------------------------------
 		//  Create Asset Entity
 		//---------------------------------
+		println "ASSET ENTITY"
 		def assetEntityList = [
-		  			// project, type, name, asset tag, s/n, AssetOwner
-		  			["105C31D", "Workstation B2600", "XX-232-YAB", "XX-232-YABB", "rackad1", "rackad11", "1", "11", "12", attributeSet, cedarsProject, "Server", "C2A133", "ASD12345", "Mail", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1, "shelf1" ],
-		  			["105D74C CSMEDI","7028-6C4", "XX-138-YAB", "XX-138-YABB", "rackad2", "rackad22", "2", "22",  "12", attributeSet, cedarsProject, "Server", "C2A134", "ASD2343455", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 2, "shelf1" ],
-		  			["AIX Console HMC3", "KVM", "MM-2232", "MM-22322", "rackad3", "rackad33", "4", "44", "1", attributeSet, cedarsProject, "Server", "C2A135", "ASD1893045", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 6, "shelf1" ],
-		  			["105D74C CSMEDI", "AutoView 3100", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad44", "3", "33", "1", attributeSet, cedarsProject, "KVM Switch", "C2A136", "ASD189234", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 5, "shelf1" ],
-		  			["CED14P", "Proliant 1600R", "RR-32-YAB", "RR-32-YABB", "rackad5", "rackad55", "6", "66", "5", attributeSet, cedarsProject, "KVM Switch", "C2A137", "SU02325456", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"],
-		  			["AIX Console HMC2", "V490", "RR-32-YAB", "RR-32-YABB", "rackad1", "rackad66", "7", "77", "5", attributeSet, cedarsProject, "KVM Switch", "C2A138", "ASD1765454", "Mail", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"],
-		  			["AXPNTSA", "Proliant DL380 G3", "RR-32-YAB", "RR-32-YABB", "rackad2", "rackad77", "5", "55", "3", attributeSet, cedarsProject, "KVM Switch", "ASD12345",  "ASD1765454", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"],
-		  			["CEDCONSOLE1", "StorageWorks", "RR-32-YAB", "RR-32-YABB", "rackad3", "rackad88", "8", "88", "6", attributeSet, cedarsProject, "KVM Switch", "C2A140", "ASD2343455", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"],
-		  			["CSEGP2 = CSENSD1 IO Drawer 1", "Ultrium Tape", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad99", "9", "99", "7", attributeSet, cedarsProject, "KVM Switch", "C2A141", "SU0234423", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"]
+            ["105C31D", "Workstation B2600", "XX-232-YAB", "XX-232-YABB", "rackad1", "rackad11", "1", "11", "12", attributeSet, cedarsProject, "Server", "C2A133", "ASD12345", "Mail", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1, "shelf1" ],
+            ["105D74C CSMEDI","7028-6C4", "XX-138-YAB", "XX-138-YABB", "rackad2", "rackad22", "2", "22",  "12", attributeSet, cedarsProject, "Server", "C2A134", "ASD2343455", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 2, "shelf1" ],
+            ["AIX Console HMC3", "KVM", "MM-2232", "MM-22322", "rackad3", "rackad33", "4", "44", "1", attributeSet, cedarsProject, "Server", "C2A135", "ASD1893045", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 6, "shelf1" ],
+            ["105D74C CSMEDI", "AutoView 3100", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad44", "3", "33", "1", attributeSet, cedarsProject, "KVM Switch", "C2A136", "ASD189234", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 5, "shelf1" ],
+            ["CED14P", "Proliant 1600R", "RR-32-YAB", "RR-32-YABB", "rackad5", "rackad55", "6", "66", "5", attributeSet, cedarsProject, "KVM Switch", "C2A137", "SU02325456", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"],
+            ["AIX Console HMC2", "V490", "RR-32-YAB", "RR-32-YABB", "rackad1", "rackad66", "7", "77", "5", attributeSet, cedarsProject, "KVM Switch", "C2A138", "ASD1765454", "Mail", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"],
+            ["AXPNTSA", "Proliant DL380 G3", "RR-32-YAB", "RR-32-YABB", "rackad2", "rackad77", "5", "55", "3", attributeSet, cedarsProject, "KVM Switch", "ASD12345",  "ASD1765454", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"],
+            ["CEDCONSOLE1", "StorageWorks", "RR-32-YAB", "RR-32-YABB", "rackad3", "rackad88", "8", "88", "6", attributeSet, cedarsProject, "KVM Switch", "C2A140", "ASD2343455", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"],
+            ["CSEGP2 = CSENSD1 IO Drawer 1", "Ultrium Tape", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad99", "9", "99", "7", attributeSet, cedarsProject, "KVM Switch", "C2A141", "SU0234423", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"]
 		]
 
 		// Insert the List of assetEntity
@@ -457,41 +458,60 @@ class BootStrap {
             )
 			if ( ! assetEntity.validate() || ! assetEntity.save() ) {
 				def etext = "Unable to create asset ${it[0]}" +
-					 GormUtil.allErrorsString( assetEntity )
+                GormUtil.allErrorsString( assetEntity )
 				println etext
 				log.error( etext )
 			}
 		}
-		//def asset = new AssetEntity(serverName:"CSHMC3", model:"AutoView 3100", room:"XX-232-YAB", rack:"rackad1", position:"1", uSize:"12", attributeSet:attributeSet)
-		// -------------------------------
-		// Create MoveBundleAsset Details
-		// -------------------------------
-		/*println "MOVE BUNDLE ASSET"
-		def moveBundle1Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle1, asset: AssetEntity.get(1),sourceTeam: cedarsGreenProjectTeam,targetTeam: cedarsRedProjectTeam,cart : 1,shelf: 2 ).save( insert:true )
-		def moveBundle2Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle1, asset: AssetEntity.get(2),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam,cart : 2,shelf: 3 ).save( insert:true )
-		def moveBundle3Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle2, asset: AssetEntity.get(3),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam,cart : 6,shelf: 4 ).save( insert:true )
-		def moveBundle4Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle3, asset: AssetEntity.get(4),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam,cart : 5,shelf: 8 ).save( insert:true )
-		def moveBundle5Asset = new MoveBundleAsset( moveBundle: cedarsProjectMoveBundle2, asset: AssetEntity.get(5),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam,cart : 3,shelf: 9 ).save( insert:true )
-		def moveBundle6Asset = new MoveBundleAsset( moveBundle: twProjectMoveBundle, asset: AssetEntity.get(3),sourceTeam: cedarsGreenProjectTeam,targetTeam: twGreenProjectTeam,cart : 1,shelf: 7 ).save( insert:true )*/
-
+		//--------------------------------
+		// Create ProjectAssetMap for Development Process
+		//--------------------------------
+		println "PROJECT_ASSET_MAP"
+		def projectAssetMapList = [
+            [ cedarsProject, AssetEntity.get(1), 30 ],
+            [ cedarsProject, AssetEntity.get(2), 280 ],
+            [ cedarsProject, AssetEntity.get(3), 30 ],
+            [ cedarsProject, AssetEntity.get(4), 280 ],
+            [ cedarsProject, AssetEntity.get(5), 20 ],
+            [ cedarsProject, AssetEntity.get(6), 30 ],
+            [ cedarsProject, AssetEntity.get(7), 30 ],
+            [ cedarsProject, AssetEntity.get(8), 20 ],
+            [ cedarsProject, AssetEntity.get(9), 280 ]
+		]
 		
+		//	Insert the List of assetEntity
+		projectAssetMapList.each {
+			def projectAssetMap = new ProjectAssetMap(
+				project: it[0],
+				asset: it[1],
+				currentStateId: it[2]
+			)
+			if ( !projectAssetMap.validate() || !projectAssetMap.save() ) {
+				def etext = "Unable to create ProjectAssetMap" +
+                GormUtil.allErrorsString( projectAssetMap )
+				println etext
+				log.error( etext )
+			}
+		}
+		//Call createTransaction method for testing
+		//workflowService.createTransition("STD_PROCESS","MOVE_TECH", 10, AssetEntity.get(1), cedarsProjectMoveBundle1, userJohn, cedarsGreenProjectTeam, "lokanath" )
 		//--------------------------------
 		// Create DataTransferSet 
 		//--------------------------------
 		def dataTransferSetList = [
-	    // project, type, name, asset tag, s/n, AssetOwner
+            // project, type, name, asset tag, s/n, AssetOwner
 		    ["TDS Master Spreadsheet", "B", "/templates/TDSMaster_template.xls", "MASTER" ],
 		    ["TDS Walkthru", "B", "/templates/walkthrough_template.xls", "WALKTHROUGH" ]
-		     ]
+        ]
 		                      
 		// Insert the List of DataTransferSet
 		dataTransferSetList.each {
 		    def dataTransferSet = new DataTransferSet(
-		    title: it[0],
-		    transferMode: it[1],
-		    templateFilename: it[2],
-		    setCode: it[3]
-		  ).save()
+                title: it[0],
+                transferMode: it[1],
+                templateFilename: it[2],
+                setCode: it[3]
+            ).save()
 		}
 		
 		//--------------------------------
@@ -499,8 +519,8 @@ class BootStrap {
 		//--------------------------------
 		def assetCommentList = [
 		  			
-		  			["Master Spreadsheet comments", "instruction", 0, AssetEntity.get(1)],
-		  			["Walkthru comments", "issue", 0, AssetEntity.get(2) ]
+            ["Master Spreadsheet comments", "instruction", 0, AssetEntity.get(1)],
+            ["Walkthru comments", "issue", 0, AssetEntity.get(2) ]
 		]
 		//Insert the List of AssetComment
 		assetCommentList.each {

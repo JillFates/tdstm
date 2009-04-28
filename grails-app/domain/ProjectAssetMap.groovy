@@ -5,10 +5,14 @@
 class ProjectAssetMap {
 	Project project
 	AssetEntity asset
-	String currentState
+	Integer currentStateId
 	Date createdDate = new Date()
 	Date lastModified
-
+	
+	static constraints = {
+		lastModified( blank:true, nullable:true )
+	}
+	
 	static mapping = {
 		version false
 	}
