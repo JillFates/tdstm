@@ -51,57 +51,58 @@ class MoveTechController {
         	//checkin for movebundle and team instances
         	if( moveBundleInstance != null && projectTeamInstance != null && projectInstance != null ){
         		//Validating is Logindate between startdate and completedate 
-        		if( new Date() < projectInstance.startDate && new Date() > projectInstance.completionDate ) {
+        		if( new Date() < projectInstance.startDate || new Date() > projectInstance.completionDate ) {
         			flash.message = message(code :"Login Disabled")
         			redirect(action: 'login')
-        		}
-        		def assetEntityInstance
-        		if ( barcodeText.get(3) == 's') {
-        			assetEntityInstance = AssetEntity.find("from AssetEntity ae where ae.moveBundle = $moveBundleInstance.id and ae.sourceTeam = $projectTeamInstance.id")
-        		}else if( barcodeText.get(3) == 't' ){
-        			assetEntityInstance = AssetEntity.find("from AssetEntity ae where ae.moveBundle = $moveBundleInstance.id and ae.targetTeam = $projectTeamInstance.id")
-        		}
-        		//checking for team corresponding to moveBundle exist or not
-        		if( assetEntityInstance != null) {
-        			def moveTech = [ user: barcodeText.get(0) ]
-        			moveTech['bundle'] = moveBundleInstance
-        			moveTech['team'] = Integer.parseInt(barcodeText.get(2))
-        			moveTech['location'] = barcodeText.get(3)
-        			moveTech['project'] = projectInstance
-        			def authToken = new UsernamePasswordToken(barcodeText.get(0), 'xyzzy')
-        			// Support for "remember me"
-        			if (params.rememberMe) {
-        				authToken.rememberMe = true
-        			}
-        			try{
-        				// Perform the actual login. An AuthenticationException
-        				// will be thrown if the username is unrecognised or the
-        				// password is incorrect.
-        				this.jsecSecurityManager.login(authToken)
-        				// Check User and Person Activi status
-        				redirect(controller:'moveTech',params:moveTech)
-        			}
-        			catch (AuthenticationException ex){
-        				// Authentication failed, so display the appropriate message
-        				// on the login page.
-        				log.info "Authentication failure for user '${params.username}'."
-        				flash.message = message(code: "login.failed")
-        				// Keep the username and "remember me" setting so that the
-        				// user doesn't have to enter them again.
-        				def m = [ username: params.username ]
-        				if (params.rememberMe) {
-        					m['rememberMe'] = true
-        				}
-        				// Remember the target URI too.
-        				if (params.targetUri) {
-        					m['targetUri'] = params.targetUri
-        				}
-        				// Now redirect back to the login page.
-        				redirect(action: 'login', params: m)
-        			}
         		}else {
-        			flash.message = message(code :"Login Failed")
-        			redirect(action: 'login')
+        			def assetEntityInstance
+        			if ( barcodeText.get(3) == 's') {
+        				assetEntityInstance = AssetEntity.find("from AssetEntity ae where ae.moveBundle = $moveBundleInstance.id and ae.sourceTeam = $projectTeamInstance.id")
+        			}else if( barcodeText.get(3) == 't' ){
+        				assetEntityInstance = AssetEntity.find("from AssetEntity ae where ae.moveBundle = $moveBundleInstance.id and ae.targetTeam = $projectTeamInstance.id")
+        			}
+        			//checking for team corresponding to moveBundle exist or not
+        			if( assetEntityInstance != null) {
+        				def moveTech = [ user: barcodeText.get(0) ]
+        				moveTech['bundle'] = moveBundleInstance
+        				moveTech['team'] = Integer.parseInt(barcodeText.get(2))
+        				moveTech['location'] = barcodeText.get(3)
+        				moveTech['project'] = projectInstance
+        				def authToken = new UsernamePasswordToken(barcodeText.get(0), 'xyzzy')
+        				// Support for "remember me"
+        				if (params.rememberMe) {
+        					authToken.rememberMe = true
+        				}
+        				try{
+        					// Perform the actual login. An AuthenticationException
+        					// will be thrown if the username is unrecognised or the
+        					// password is incorrect.
+        					this.jsecSecurityManager.login(authToken)
+        					// Check User and Person Activi status
+        					redirect(controller:'moveTech',params:moveTech)
+        				}
+        				catch (AuthenticationException ex){
+        					// Authentication failed, so display the appropriate message
+        					// on the login page.
+        					log.info "Authentication failure for user '${params.username}'."
+        					flash.message = message(code: "login.failed")
+        					// Keep the username and "remember me" setting so that the
+        					// user doesn't have to enter them again.
+        					def m = [ username: params.username ]
+        					if (params.rememberMe) {
+        						m['rememberMe'] = true
+        					}
+        					// Remember the target URI too.
+        					if (params.targetUri) {
+        						m['targetUri'] = params.targetUri
+        					}
+        					// Now redirect back to the login page.
+        					redirect(action: 'login', params: m)
+        				}
+        			}else {
+        				flash.message = message(code :"Login Failed")
+        				redirect(action: 'login')
+        			}
         		}
         	}else {
         		flash.message = message(code :"Login Failed")
@@ -112,6 +113,7 @@ class MoveTechController {
         	redirect(action: 'login')
         }
     }
+	//SignOut
     def signOut = {
         // Log the user out of the application.
         SecurityUtils.subject?.logout()
