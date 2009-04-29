@@ -101,7 +101,7 @@
 			<li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundle?.id]" >Bundle Asset Assignment</g:link> </li>
 			<li><g:link class="home" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundle?.id, rack:'UnrackPlan']" >Bundle Team Assignment </g:link> </li>
 			 <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Issue Report']">Issue Report</g:link></li>
-			
+			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Transportation Asset List']">Transportation Asset List</g:link></li>
 			</ul>
 		</div>
       

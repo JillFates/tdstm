@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<title>Cart Report</title>
+<title>Transportation Asset List</title>
 <g:javascript library="prototype" />
 <script type="text/javascript">
     
@@ -109,7 +109,7 @@
 <body>
 
 <div class="body">
-<h1>Cart Asset List</h1>
+<h1>Transportation Asset List</h1>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
@@ -162,9 +162,9 @@
 		<tr>
 
 			<td class="buttonR"><g:jasperReport controller="moveBundleAsset"
-				action="cartAssetReport" jasper="cartReport" format="PDF"
+				action="cartAssetReport" jasper="transportationAssetReport" format="PDF"
 				name="Generate">
-				<input type="hidden" name="reportName" id="reportName" value="cartAsset" />
+				<input type="hidden" name="reportName" id="reportName" value="transportationAsset" />
 				<input type="hidden" name="moveBundle" id="moveBundle" value="null" />
 
 				<input type="hidden" name="teamFilter" id="teamFilter" value="" />

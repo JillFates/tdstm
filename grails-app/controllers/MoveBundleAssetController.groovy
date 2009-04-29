@@ -383,6 +383,8 @@ class MoveBundleAssetController {
         	render(view:'cartAssetReport',model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
         }else if( reportId == 'Issue Report' ){
         	render(view:'issueReport',model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
+        }else if(reportId == 'Transportation Asset List') {
+        	render(view:'transportationAssetReport',model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
         }else {
         	render(view:'teamWorkSheets',model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
         }
@@ -541,6 +543,7 @@ class MoveBundleAssetController {
 	
 	//cart Asset report
 	def cartAssetReport = {
+    	def reportName = params.reportName
     	def currProj = getSession().getAttribute( "CURR_PROJ" )
     	def projectId = currProj.CURR_PROJ
     	def projectInstance = Project.findById( projectId )
@@ -548,7 +551,11 @@ class MoveBundleAssetController {
     	// if no moveBundle was selected
     	if(params.moveBundle == "null") {
             flash.message = " Please Select Bundles. "
-            redirect( action:'getBundleListForReportDialog', params:[reportId: 'cart Asset'] )
+            if(reportName == 'cartAsset') {
+            	redirect( action:'getBundleListForReportDialog', params:[reportId: 'cart Asset'] )
+            }else {
+            	redirect( action:'getBundleListForReportDialog', params:[reportId: 'Transportation Asset List'] )
+            }
         } else {
             def moveBundleInstance = MoveBundle.findById(params.moveBundle)
             def projectTeamInstance
@@ -598,40 +605,57 @@ class MoveBundleAssetController {
        			}
        		}
        		//Source AssetList 
-            assetEntityList.each { asset ->
-                def bundleInstance = MoveBundle.findById(asset.moveBundle.id)
-                def bundlePartyGroup = PartyGroup.findById(bundleInstance?.id)
-                def teamPartyGroup =  ProjectTeam.findBymoveBundleAndTeamCode(bundleInstance, 'Cleaning')
-                def projectTeamLocationInstance = ProjectTeam.findById(asset.sourceTeam?.id)
-                def assetCommentList = AssetComment.findAllByAssetEntity(asset)
-        		def assetCommentString =""
-        		assetCommentList.each { assetComment ->
-                    assetCommentString = assetCommentString + assetComment.comment +"\n"
-        		}
-                def teamMembers = partyRelationshipService.getTeamMemberNames(teamPartyGroup?.id) 
-                reportFields <<['assetName':asset.assetName , "model":asset.model, "sourceTargetrack":asset.sourceRack, "position":asset.sourceRackPosition, "sourceTargetPos":projectTeamLocationInstance?.currentLocation+"(source/ unracking)", "cart":asset.cart +"/"+asset.shelf, "shelf":asset.shelf,"source_team_id":asset.sourceTeam.id, "move_bundle_id":asset.moveBundle.id,dlocation:asset.sourceLocation,
-       			                 'projectName':partyGroupInstance.name,'startAt':projectInstance.startDate, 'completedAt':projectInstance.completionDate, 'bundleName':bundlePartyGroup.name, 'teamName':teamPartyGroup?.teamCode ? teamPartyGroup?.name+" - "+teamMembers : "", 'teamMembers':teamMembers,'location':"Source Team", 'rack':"SourceRack",'rackPos':"SourceRackPosition",'truck':asset.truck, 'room':asset.sourceRoom, 'instructions':assetCommentString, 'sourcetargetLoc':"s"]
+       		if( assetEntityList != null) {
+       			assetEntityList.each { asset ->
+       				def bundleInstance = MoveBundle.findById(asset?.moveBundle?.id)
+       				def bundlePartyGroup = PartyGroup.findById(bundleInstance.id)
+       				def teamPartyGroup =  ProjectTeam.findBymoveBundleAndTeamCode(bundleInstance, 'Cleaning')
+       				def projectTeamLocationInstance = ProjectTeam.findById(asset.sourceTeam?.id)
+       				def assetCommentList = AssetComment.findAllByAssetEntity(asset)
+       				def moveTeamName
+       				if(teamPartyGroup != null ){
+       					def moveteamInstance = PartyGroup.findById(teamPartyGroup.id)
+       					moveTeamName = moveteamInstance?.name
+       				}
+       				def assetCommentString =""
+       				assetCommentList.each { assetComment ->
+       					assetCommentString = assetCommentString + assetComment.comment +"\n"
+       				}
+       				def teamMembers = partyRelationshipService.getTeamMemberNames(teamPartyGroup?.id) 
+       				reportFields <<['assetName':asset.assetName , "model":asset.model, "sourceTargetPos":projectTeamLocationInstance?.currentLocation+"(source/ unracking)", "cart":asset.cart +"/"+asset.shelf, "shelf":asset.shelf,"source_team_id":teamPartyGroup?.id, "move_bundle_id":asset?.moveBundle?.id,dlocation:asset.sourceLocation,
+       			                 'projectName':partyGroupInstance.name,'startAt':projectInstance.startDate, 'completedAt':projectInstance?.completionDate, 'bundleName':bundlePartyGroup?.name, 'teamName':teamPartyGroup?.teamCode ? teamPartyGroup?.name+" - "+teamMembers : "", 'teamMembers':teamMembers,'location':"Source Team", 'truck':asset.truck, 'room':asset.sourceRoom,'moveTeam':moveTeamName, 'instructions':assetCommentString, 'sourcetargetLoc':"s"]
+       			}
        		}
        		//TargetAsset List
-        	targetAssetEntitylist.each { asset ->
-        		
-        		def bundleInstance = MoveBundle.findById(asset.moveBundle.id)
-        		def bundlePartyGroup = PartyGroup.findById(bundleInstance?.id)
-        		def teamPartyGroup =  ProjectTeam.findBymoveBundleAndTeamCode(bundleInstance, 'Cleaning')
-        		def projectTeamLocationInstance = ProjectTeam.findById(asset.targetTeam?.id)
-        		def assetCommentList = AssetComment.findAllByAssetEntity(asset)
-        		def assetCommentString =""
-        		assetCommentList.each { assetComment ->
-                    assetCommentString = assetCommentString + assetComment.comment +"\n"
-        		}
-        		def teamMembers = partyRelationshipService.getTeamMemberNames(teamPartyGroup?.id) 
-        		reportFields <<['assetName':asset.assetName , "model":asset.model, "sourceTargetrack":asset.targetRack, "position":asset.targetRackPosition, "sourceTargetPos":projectTeamLocationInstance?.currentLocation+"(target/ reracking)", "cart":asset.cart+"/"+asset.shelf, "shelf":asset.shelf,"source_team_id":asset.targetTeam.id, "move_bundle_id":asset.moveBundle.id, "clientName":projectInstance.client.name,dlocation:asset.targetLocation,
-      			                 'projectName':partyGroupInstance.name,'startAt':projectInstance.startDate, 'completedAt':projectInstance.completionDate, 'bundleName':bundlePartyGroup.name, 'teamName':teamPartyGroup?.teamCode ? teamPartyGroup?.teamCode+" - "+teamMembers : "", 'teamMembers':teamMembers,'location':"Target Team", 'rack':"TargetRack",'rackPos':"TargetRackPosition",'truck':asset.truck,'room':asset.targetRoom,'instructions':assetCommentString,'sourcetargetLoc':"t"]
-      		}
+       		if( targetAssetEntitylist != null) {
+       			targetAssetEntitylist.each { asset ->
+       				def bundleInstance = MoveBundle.findById(asset?.moveBundle?.id)
+       				def bundlePartyGroup = PartyGroup.findById(bundleInstance?.id)
+       				def teamPartyGroup =  ProjectTeam.findBymoveBundleAndTeamCode(bundleInstance, 'Cleaning')
+        			def projectTeamLocationInstance = ProjectTeam.findById(asset.targetTeam?.id)
+        			def assetCommentList = AssetComment.findAllByAssetEntity(asset)
+        			def moveTeamName
+           			if(teamPartyGroup != null ){
+           				def moveteamInstance = PartyGroup.findById(teamPartyGroup.id)
+           				moveTeamName = moveteamInstance?.name
+           			}
+        			def assetCommentString =""
+        			assetCommentList.each { assetComment ->
+                    	assetCommentString = assetCommentString + assetComment.comment +"\n"
+       				}
+       				def teamMembers = partyRelationshipService.getTeamMemberNames(teamPartyGroup?.id) 
+       				reportFields <<['assetName':asset.assetName , "model":asset.model, "sourceTargetPos":projectTeamLocationInstance?.currentLocation+"(target/ reracking)", "cart":asset.cart+"/"+asset.shelf, "shelf":asset.shelf,"source_team_id":teamPartyGroup?.id, "move_bundle_id":asset?.moveBundle?.id, "clientName":projectInstance?.client.name,dlocation:asset.targetLocation,
+      			                 'projectName':partyGroupInstance?.name,'startAt':projectInstance?.startDate, 'completedAt':projectInstance?.completionDate, 'bundleName':bundlePartyGroup?.name, 'teamName':teamPartyGroup?.teamCode ? teamPartyGroup?.teamCode+" - "+teamMembers : "", 'teamMembers':teamMembers,'location':"Target Team", 'moveTeam':moveTeamName,'truck':asset.truck,'room':asset.targetRoom,'instructions':assetCommentString,'sourcetargetLoc':"t"]
+       			}
+       		}
        		//No Assets were found for selected moveBundle,team and Location
-        	if(reportFields.size() <= 0) {    		
-        		flash.message = " No Assets Were found for  selected values  "
-        		redirect( action:'getBundleListForReportDialog', params:[reportId: 'cart Asset'] )
+       		if(reportFields.size() <= 0) {    		
+       			flash.message = " No Assets Were found for  selected values  "
+       			if(reportName == 'cartAsset') {
+       				redirect( action:'getBundleListForReportDialog', params:[reportId: 'cart Asset'] )
+        		}else {
+        			redirect( action:'getBundleListForReportDialog', params:[reportId: 'Transportation Asset List'] )
+        		}
         	}else {
         		chain(controller:'jasper',action:'index',model:[data:reportFields],params:params)
         	}
