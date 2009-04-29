@@ -4,6 +4,7 @@ class AssetComment {
 	String commentType
 	Integer mustVerify
 	AssetEntity assetEntity
+	Date dateCreated = new Date()
 	
 	static constraints = {
 		
