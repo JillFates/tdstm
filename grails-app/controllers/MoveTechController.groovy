@@ -125,39 +125,70 @@ class MoveTechController {
     def home = {
         render( view:'home' )
     }
-	// Method for my task link
+    // Method for my task link
 	def assetTask = {
-        def bundle = params.bundle
-        def stateAssetList = []
+        def bundle = params.bundle  
+        def tab = params.tab
+        def proAssetMap
         def bundleId = MoveBundle.find("from MoveBundle mb where mb.name = '${bundle}'")
         def team = params.team            
         def projectId = bundleId.project.id        
-        def projectInstance = Project.findById(projectId)
-        def taskList
+        def projectInstance = Project.findById(projectId)      
+        def stateVal
+        def todoSize
+        def allSize
+        def assetList = []
+        def colorCss  
+        def rdyState
+        def ipState
+        def holdState
+        def query = new StringBuffer()
+        query.append("from ProjectAssetMap pam where pam.project = ${projectInstance.id} ")
+			
         if(params.location == "s"){
-            taskList = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = ${bundleId.id} and ae.sourceTeam = ${team}")
-        }else{
-            taskList = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = ${bundleId.id} and ae.targetTeam = ${team}")
+            stateVal = stateEngineService.getStateId("STD_PROCESS","Unracked")
+            query.append("and pam.asset in (select id from AssetEntity ae where ae.moveBundle = ${bundleId.id} and ae.sourceTeam = ${team}) ")
+        }else {
+            stateVal = stateEngineService.getStateId("STD_PROCESS","Reracked")
+            query.append("and pam.asset in (select id from AssetEntity ae where ae.moveBundle = ${bundleId.id} and ae.targetTeam = ${team}) ")
         }
-        def taskBuffer = new StringBuffer()
-        def taskSize = taskList.size()
-        for ( int k=0; k< taskSize ; k++ ) {
-            if( k != taskSize - 1) {
-                taskBuffer.append( taskList[k].id + "," )
-            } else {
-                taskBuffer.append( taskList[k].id )
-            }
+        allSize = ProjectAssetMap.findAll(query.toString()).size()
+        if(tab == "Todo"){
+            query.append("and pam.currentStateId < ${stateVal}")
         }
-        def proAssetMap = ProjectAssetMap.findAll("from ProjectAssetMap pam where pam.asset in (${taskBuffer}) and pam.project = ${projectInstance.id}")
-   
+        proAssetMap = ProjectAssetMap.findAll(query.toString())
+        todoSize = proAssetMap.size()
         proAssetMap.each{
-   
-            def stateVal = stateEngineService.getState("STD_PROCESS",it.currentStateId)
-            stateAssetList << [assetVal:it,stateVal:stateVal]
-      
+            holdState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Hold"))
+				
+            if(params.location == "s"){
+                rdyState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Release"))
+                ipState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Unracking"))
+				
+            }else{
+                rdyState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Cleaned"))
+                ipState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Reracking"))
+					
+            }
+            if(it.currentStateId == holdState){
+                colorCss = "assetHold"
+            }else if(it.currentStateId == rdyState){
+                colorCss = "assetReady"
+            }else if(it.currentStateId == ipState){
+                colorCss = "assetInProcess"
+            }else if((it.currentStateId > holdState) && (it.currentStateId < rdyState) ){
+                colorCss = "assetPending"
+            }else if((it.currentStateId >= rdyState)){
+                colorCss = "assetDone"
+            }
+            assetList<<[item:it,cssVal:colorCss]
         }
-       
-        return[bundle:bundle,team:team,project:params.project,location:params.location,stateAssetList:stateAssetList]
+        if(tab == "All"){
+            query.append("and pam.currentStateId < ${stateVal}")
+            todoSize = ProjectAssetMap.findAll(query.toString()).size()
+        }
+      
+        return[bundle:bundle,team:team,project:params.project,location:params.location,assetList:assetList,allSize:allSize,todoSize:todoSize]
 	}
 	//To open div for my task
 	def getServerInfo = {

@@ -21,7 +21,7 @@
 <link rel="shortcut icon"
 	href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 <g:javascript library="application" />
- <g:javascript library="prototype" />
+<g:javascript library="prototype" />
 <g:javascript library="jquery" />
 <jq:plugin name="jquery.bgiframe.min"/>
 <jq:plugin name="jquery.autocomplete"/>
@@ -58,7 +58,7 @@
         
 </head>
 <body>
-<div id="serverInfoDialog" title ="Server Info" >
+<div id="serverInfoDialog" title ="Server Info" onclick="$('#serverInfoDialog').dialog('close')">
   
 			
     </div>
@@ -66,30 +66,30 @@
 		src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 	</div>
 	<div class="mainbody" style="width: 100%;" >
-				<div class="colum_techlogin">			
-				<div class="w_techlog">
-				<div style="float:center; width:100%;float:left;text-align:left; height:20px; border-bottom:1px solid #5F9FCF;">
-								<span style="text-align:left;font-size:10"><b>Task</b></span>
-								</div>
+				<div class="colum_techlogin">
+				<div style="float:left; width:100%; margin-left:20px;">
+              									
+		              									<g:link params='["bundle":bundle,"team":team,"location":location,"project":project]' style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'home.png')}" border="0"/></g:link>
+							              				
+              											<a href="#" style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'my_task_h.png')}" border="0" /><a>
+              											
+              											<g:link action="assetSearch" params='["bundle":bundle,"team":team,"location":location,"project":project]' style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'asset.png')}" border="0"/></g:link>
+								           
+								              	</div>			
+				<div class="w_techlog" style="overflow-y: scroll; overflow-x: none;">
+				
       					<g:form method="post" name="bundleTeamAssetForm">
-					        <div class="border_bundle_team">
-          						<div style="float:left; margin:5px 0; width:100%; border:1px solid #5F9FCF;">
-              									<div style="width:30%; float:left; border-left:1px solid #5585c7; ">
-		              										<g:link params='["bundle":bundle,"team":team,"location":location,"project":project]'>Home</g:link></div>
-							              				<div style="width:30%; float:left; background-color:#43ca56; border-left:1px solid #5585c7; ">
-              											<g:link action="#" >My Tasks</g:link></div>
-              											<div style="width:30%; float:left; border-left:1px solid #5585c7; ">
-              											<g:link action="assetSearch" params='["bundle":bundle,"team":team,"location":location,"project":project]'>Asset</g:link></div>
-								              	</div>
-								              	</div>
-								              	<div style="float:left; width:100%; margin:5px 0; ">	
-              								<div style="float:left; margin:5px; width:20%; border:1px solid #5F9FCF;">
-								            	<g:link controller="moveTech" action="signOut" style="color: #328714">Log out</g:link>
-								            </div>
-								            <div style="float:right; margin:5px; width:20%; border:1px solid #5F9FCF;">
-								            	<a href="#" style="color: #328714">Search</a>
-								            </div>
-								            </div>
+					       
+								              	
+								            <div style="float:left; width:100%; margin:5px 0; ">              								
+              								   <table style="border:0px;">
+								            		<tr>
+								            		<td ><g:link style="color: #328714; border:1px solid #328714; margin:5px; background:#ffffff;" action="assetTask" style="color: #328714" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo(${todoSize})</g:link></td>
+								            		<td><g:link  style="color: #328714; border:1px solid #328714; margin:5px; background:#ffffff;" action="assetTask" style="color: #328714" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All(${allSize})</g:link></td>
+								            		<td style="text-align:right;"><a href="#" style="color: #328714;"><input type="text" size="8" value="" name="search" style="background:url(${createLinkTo(dir:'images',file:'search.png')}) no-repeat center right;"/></a></td></tr>
+								               </table>
+								            </div>  
+								            
               				
            <div style="float:left; width:100%; margin:5px 0; "><b>My Tasks:</b></div>
             <div id="assetTable"style="float:left;width:100%; ">
@@ -97,36 +97,25 @@
              <table id="assetTable" style="overflow:scroll;height:80px;">
               <thead>
                 <tr>
-                <th>Prty</th>
-                  <th>Server</th>
-                  <th>Rack</th>
-                  <th>Type</th>					
-				<th>Task</th>		
+                  <th>AssetTag</th>
+                  <th>Rack/Pos</th>
+                  <th>Model</th>
+                 	
 				</tr>
                </thead>
                <tbody>
-                  <g:each status="i" in="${stateAssetList}" var="stateAssetList">
-					<tr ondblclick="${remoteFunction(action:'getServerInfo', params:'\'assetId=\'+'+stateAssetList.assetVal.asset.id,onComplete: 'serverInfo(e)')}">
-						<td>High</td>
-						<td>${stateAssetList?.assetVal.asset.assetName}</td>
-						<td>${stateAssetList?.assetVal.asset.sourceRack}</td>
-						<td>${stateAssetList?.assetVal.asset.assetType}</td>
+                  <g:each status="i" in="${assetList}" var="assetList">
+					<tr class="${assetList.cssVal}" ondblclick="${remoteFunction(action:'getServerInfo', params:'\'assetId=\'+'+assetList.item.asset.id,onComplete: 'serverInfo(e)')}">
 						
-						<g:if test="${stateAssetList?.stateVal == 'Completed'}">
-						<td><g:checkBox name="myCheckbox" value="${true}" /></td>
+						<td>${assetList?.item?.asset.assetTag}</td>
+						<g:if test="${location == 's'}">
+						<td>${assetList?.item?.asset.sourceRack}/${assetList?.item?.asset.sourceRackPosition}</td>
 						</g:if>
-						<g:elseif test="${stateAssetList?.stateVal == 'Hold'}">
-						<td>Hold!</td>
-						</g:elseif>	
-						<g:elseif test="${stateAssetList?.stateVal == 'Unracking' && location == 's'}">
-						<td>IP</td>
-						</g:elseif>	
-						<g:elseif test="${stateAssetList?.stateVal == 'Reracking' && location == 't'}">
-						<td>IP</td>
-						</g:elseif>									
 						<g:else>
-						<td><g:checkBox name="myCheckbox" value="${false}" /></td>
-						</g:else>						
+						<td>${assetList?.item?.asset.targetRack}/${assetList?.item?.asset.targetRackPosition}</td>
+						</g:else>
+						<td>${assetList?.item?.asset.model}</td>						
+											
 					</tr>
 				</g:each>
                  </tbody>
@@ -136,7 +125,7 @@
   </div>
   </div>
   
-  </div>
+
   
     
   </body>
