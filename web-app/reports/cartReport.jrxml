@@ -56,14 +56,6 @@
 	<field name="projectName" class="java.lang.String"/>
 	<field name="bundleName" class="java.lang.String"/>
 	<field name="teamName" class="java.lang.String"/>
-	<group name="source_team_id" isStartNewPage="true">
-		<groupExpression><![CDATA[$F{source_team_id}]]></groupExpression>
-		<groupFooter>
-			<band height="8">
-				
-			</band>
-		</groupFooter>
-	</group>
 	<group name="move_bundle_id" isStartNewPage="true">
 		<groupExpression><![CDATA[$F{move_bundle_id}]]></groupExpression>
 		<groupFooter>
@@ -72,14 +64,7 @@
 			</band>
 		</groupFooter>
 	</group>
-	<group name="location" isStartNewPage="true">
-		<groupExpression><![CDATA[$F{location}]]></groupExpression>
-		<groupFooter>
-			<band height="8">
-				
-			</band>
-		</groupFooter>
-	</group>
+
 	<background>
 		<band/>
 	</background>
@@ -135,18 +120,20 @@
 				<textElement textAlignment="Left"><font size="15" isBold="true"/></textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{bundleName}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement x="105" y="55" width="250" height="26"/>
 				<textElement textAlignment="Left"><font size="15" isBold="true"/></textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{teamName}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement x="105" y="85" width="250" height="26"/>
 				<textElement textAlignment="Left"><font size="15" isBold="true"/></textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{sourceTargetPos}]]></textFieldExpression>
 			</textField>
 			<image>
-				<reportElement x="468" y="12" width="400" height="52"/>
+				<reportElement x="468" y="12" width="400" height="52">
+				<printWhenExpression><![CDATA[new Boolean(!($F{teamName}.equals( "" )))]]></printWhenExpression>
+				</reportElement>
 				<imageExpression class="net.sf.jasperreports.engine.JRRenderable"><![CDATA[new net.sf.jasperreports.renderers.BarbecueRenderer(BarcodeFactory.createCode128B("mt"+"-"+$F{move_bundle_id}+"-"+$F{source_team_id}+"-"+$F{sourcetargetLoc}))]]></imageExpression>
 			</image>
 			<staticText>

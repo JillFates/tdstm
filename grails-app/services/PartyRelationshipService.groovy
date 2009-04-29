@@ -316,7 +316,9 @@ class PartyRelationshipService {
         	memberNames.append(team.partyIdTo.firstName)
             memberNames.append("/")
         }
-    	memberNames = memberNames.delete(memberNames.size()-1,memberNames.size())
+    	if(memberNames.size() > 0) {
+    		memberNames = memberNames.delete(memberNames.size()-1,memberNames.size())
+    	}
     	return memberNames
     }
 }
