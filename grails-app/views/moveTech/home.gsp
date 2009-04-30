@@ -3,7 +3,7 @@
 	<head>
 		<title>Home</title>
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
+<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 <link rel="shortcut icon"
 	href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 <g:javascript library="application" />
@@ -14,7 +14,7 @@
 		src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 	</div>
 	<div class="mainbody" style="width: 100%;" >
-				<div class="colum_techlogin">
+				<div class="colum_techlogin" style="float:left;">
 				<div class="border_bundle_team">
           										<div style="float:left; width:100%; margin-left:20px;">
               									
@@ -22,7 +22,7 @@
 							              				
               											<g:link action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'my_task.png')}" border="0" /></g:link>
               											
-              											<a href="#" style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'asset.png')}" border="0"/></a>
+              											<img src="${createLinkTo(dir:'images',file:'asset.png')}" border="0"/>
 								           
 								              	</div>			
 				<div class="w_techlog" style="overflow-y: scroll; overflow-x: none;">

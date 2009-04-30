@@ -127,6 +127,7 @@ class MoveTechController {
     }
     // Method for my task link
 	def assetTask = {
+    		
         def bundle = params.bundle  
         def tab = params.tab
         def proAssetMap
@@ -171,15 +172,15 @@ class MoveTechController {
 					
             }
             if(it.currentStateId == holdState){
-                colorCss = "assetHold"
+                colorCss = "asset_hold"
             }else if(it.currentStateId == rdyState){
-                colorCss = "assetReady"
+                colorCss = "asset_ready"
             }else if(it.currentStateId == ipState){
-                colorCss = "assetInProcess"
+                colorCss = "asset_process"
             }else if((it.currentStateId > holdState) && (it.currentStateId < rdyState) ){
-                colorCss = "assetPending"
+                colorCss = "asset_pending"
             }else if((it.currentStateId >= rdyState)){
-                colorCss = "assetDone"
+                colorCss = "asset_done"
             }
             assetList<<[item:it,cssVal:colorCss]
         }
@@ -204,14 +205,16 @@ class MoveTechController {
         def assetCommt
         def projMap
         def team = params.team
-        def assetId = params.assetId
+        def assetId = params.search
         def stateVal
+        def taskList
         if(assetId != null){
 			assetItem = AssetEntity.findByAssetTag(assetId)					
 			
 			
 			if(assetItem == null){			
 				flash.message = message(code :"Asset Tag number '${assetId}' was not located")
+				redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
 			}else{
 				def bundleName = assetItem.moveBundle.name
 				def teamId = (assetItem.sourceTeam.id).toString()				
@@ -219,18 +222,28 @@ class MoveTechController {
 			
                 if(bundleName != params.bundle){
                     flash.message = message(code :"The asset [${assetItem.assetName}] is not part of move bundle [${params.bundle}]")
+             redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
                 }else if(teamId != params.team){
                     flash.message = message(code :"The asset [${assetItem.assetName}] is assigned to team [${teamName}]")
-			    
+			    redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
                 }else{
                     projMap = ProjectAssetMap.findByAsset(assetItem)
-                    stateVal = stateEngineService.getState("STD_PROCESS",projMap.currentStateId)
+                    stateVal = stateEngineService.getState("STD_PROCESS",projMap.currentStateId)                     
+                    taskList = stateEngineService.getTasks("STD_PROCESS","MOVE_TECH",stateVal)                  
+                   
+                    if(taskList.size() == 1){
+                    	if(taskList.contains("Hold")){
+                    		flash.message = message(code :"There is a problem with this asset. Place the asset on hold to alert the move coordinator")	
+                    		
+                    	}
+                    	
+                    }
                     assetCommt = AssetComment.findAllByAssetEntity(assetItem)
-				
+				 render(view:'assetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location])
                 }
 			}
         }
-        return[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location]
+       
 
 	}
 	

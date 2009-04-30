@@ -3,7 +3,7 @@
 <head>
 <title>Login</title>
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
+<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 <link rel="shortcut icon"
 	href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 <g:javascript library="application" />
@@ -14,7 +14,8 @@
 	src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 </div>
 <div class="mainbody" style="width: auto;">
-<div class="colum_techlogin"><g:if test="${flash.message}">
+<div class="colum_techlogin" style="float:left;">
+<g:if test="${flash.message}">
 	<div style="width: 204px;" class="message">${flash.message}</div>
 </g:if>
 <div class="w_techlog"><g:form action="signIn" name="loginForm">

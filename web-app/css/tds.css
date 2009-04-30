@@ -1,11 +1,5 @@
 
-.colum_techlogin{
-	width:292px;
-	height:auto;
-	margin:20px auto;
-	
 
-}
 .div_head {
 	background:#CCCCCC none repeat scroll 0 0;
 	color:#000000;
@@ -49,14 +43,7 @@
 	height:100%;
 	float:left;
 }
-.w_techlog{
-	width:240px;
-	height:380px;
-	float:left;
-	border:1px solid #5F9FCF;
-	padding:0px;
 
-}
 .buttonR input {
 	background-color:#5F9FCF;
 	border:1px solid #328714;

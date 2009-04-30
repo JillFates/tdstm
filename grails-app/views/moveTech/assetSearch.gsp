@@ -3,7 +3,7 @@
 <head>
 <title>Home</title>
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
+<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 <link rel="shortcut icon"
 	href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 <g:javascript library="application" />
@@ -16,58 +16,38 @@
 	src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 </div>
 <div class="mainbody" style="width: 100%;">
-<div class="colum_techlogin">
+<div class="colum_techlogin" style="float:left;">
 <div style="float: left; width: 100%; margin-left: 20px;"><g:link
 	params='["bundle":bundle,"team":team,"location":location,"project":project]'
 	style="height:26px; width:64px; float:left; margin:auto 0px;">
 	<img src="${createLinkTo(dir:'images',file:'home.png')}" border="0" />
 </g:link> <g:link action="assetTask"
-	params='["bundle":bundle,"team":team,"location":location,"project":project]'
+	params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'
 	style="height:26px; width:64px; float:left; margin:auto 0px;">
-	<img src="${createLinkTo(dir:'images',file:'my_task.png')}" border="0" />
-</g:link> <a href="#"
-	style="height: 26px; width: 64px; float: left; margin: auto 0px;"><img
-	src="${createLinkTo(dir:'images',file:'asset_h.png')}" border="0" /></a></div>
+	<img style="background-color: #FFFF00;" src="${createLinkTo(dir:'images',file:'my_task.png')}" border="0" /></g:link>
+<img
+	src="${createLinkTo(dir:'images',file:'asset_h.png')}" border="0" /></div>
 <div class="w_techlog" style="overflow-y: scroll; overflow-x: none;">
-
-<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">
-	<input name="bundle" type="hidden" value="${bundle}" />
-	<input name="team" type="hidden" value="${team}" />
-	<input name="location" type="hidden" value="${location}" />
-	<input name="project" type="hidden" value="${project}" />
-
-
-
-	<div
-		style="float: left; margin: 5px; width: 30%; border: 1px solid #5F9FCF;">
-	<g:link controller="moveTech" action="signOut" style="color: #328714">Log out</g:link>
-	</div>
-
-	<div style="float: left;"><input type="text" name="assetId"
-		id="assetId" size="18" /> <input type="submit" name="search"
-		value="Search" /></div>
-</g:form>
 
 
 <div>&nbsp;</div>
 
-<div>
-<div>
+<div style="float:left; width:100%; margin:5px 0; ">
+<table style="border:0px;" >
 
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p><strong>Device Description</strong></p>
-<g:if test="${flash.message}">
-	<div class="message">${flash.message}</div>
-</g:if> <g:if test="${projMap}">
-	<p>
-	${projMap?.asset?.assetName}-${projMap?.asset?.model}-${projMap?.asset?.serialNumber}-${stateVal}</p>
-</g:if></div>
-<div>
-<table>
-	<p>&nbsp;</p>
+
+ <g:if test="${flash.message}">
+	<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
+</g:if> 		
+<g:if test="${projMap}">
+<tr><td>Asset:</td><td> ${projMap?.asset?.assetName}</td></tr>
+<tr><td>Model:</td><td> ${projMap?.asset?.model}</td></tr>
+<tr><td>Rack/Pos:</td><td> <g:if test="${location == 's'}">${projMap?.asset?.sourceRack}/${projMap?.asset?.sourceRackPosition}</g:if><g:else test="${location == 't'}">${projMap?.asset?.targetRack}/${projMap?.asset?.targetRackPosition}</g:else> </td></tr>
+	
+</g:if>
+	
 	<tr>
-		<td><strong>Instructions</strong></td>
+		<td><strong>Instructions:</strong></td>
 	</tr>
 	<g:each status="i" in="${assetCommt}" var="comments">
 		<tr>
@@ -76,14 +56,26 @@
 		</tr>
 	</g:each>
 	<tr>
+		<td>&nbsp;</td>
+		<td><g:actionSubmit value="Start Unracking"
+			onclick="#" /></td>
+	</tr>
+	
+
+	<table>	
+		
+		<tr><td><g:actionSubmit  value="Enter Note..."
+			onclick="#" /></td> </tr>
+			<tr>
+		<td width="60%">&nbsp;</td>		
 		<td><g:actionSubmit value="Place on HOLD"
 			onclick="return confirm('Are you sure???')" /></td>
-		<td><g:actionSubmit value="Start Unracking"
-			onclick="return confirm('Are you sure???')" /></td>
 	</tr>
-</table>
-</div>
+	</table>
 
+
+
+</table>
 </div>
 </div>
 
