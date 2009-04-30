@@ -152,8 +152,8 @@
 				<textElement textAlignment="Left"><font size="15" isBold="true"/></textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{bundleName}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="105" y="55" width="250" height="26"/>
+			<textField isStretchWithOverflow="true">
+				<reportElement  x="105" y="55" width="250" height="26"/>
 				<textElement textAlignment="Left"><font size="15" isBold="true"/></textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{teamName}]]></textFieldExpression>
 			</textField>
@@ -176,12 +176,12 @@
 				<textElement textAlignment="Right"><font size="15" isBold="true"/></textElement>
 				<text><![CDATA[Complete At:]]></text>
 			</staticText>
-			<textField pattern="dd/MM/yyyy h.mm a" isBlankWhenNull="true">
+			<textField pattern="MM/dd/yyyy h.mm a" isBlankWhenNull="true">
 				<reportElement x="726" y="71" width="200" height="22"/>
 				<textElement textAlignment="Left"><font size="15" isBold="true"/></textElement>
 				<textFieldExpression class="java.util.Date"><![CDATA[$F{startAt}]]></textFieldExpression>
 			</textField>
-			<textField pattern="dd/MM/yyyy h.mm a" isBlankWhenNull="true">
+			<textField pattern="MM/dd/yyyy h.mm a" isBlankWhenNull="true">
 				<reportElement x="726" y="93" width="200" height="22"/>
 				<textElement textAlignment="Left"><font size="15" isBold="true"/></textElement>
 				<textFieldExpression class="java.util.Date"><![CDATA[$F{completedAt}]]></textFieldExpression>

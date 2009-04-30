@@ -7,104 +7,13 @@
 <g:javascript library="prototype" />
 <script type="text/javascript">
     
-    	function populateTeams(val) {    	
+    	function populateBundle(val) {    	
     			
      	var hiddenBundle = document.getElementById('moveBundle')
 		
      	hiddenBundle.value = val
-
-     	var projectId = ${projectInstance?.id}     	
-
-     	if( val == "null") {
-
-     	 var selectObj = document.getElementById('projectTeamId')
-
-      	 //Clear all previous options
-
-	     var l = selectObj.length	    
-
-	     while (l > 1) {
-
-	     l--
-
-	     selectObj.remove(l)
-
-	     }
-
-     	 return false
-
-     	} else {
-
-     	 ${remoteFunction(action:'getTeamsForBundles', params:'\'bundleId=\' + val +\'&projectId=\'+projectId', onComplete:'assignTeams(e)')}
-
-     	}     	
      }
-     
-     function assignTeams(e) {    
-
-     	var projectteams = eval('(' + e.responseText + ')') 
-     	  	
-      	var selectObj = document.getElementById('projectTeamId')
-
-      	//Clear all previous options
-
-	     var l = selectObj.length	    
-
-	     while (l > 1) {
-
-	     l--
-
-	     selectObj.remove(l)
-
-	     }
-
-      	if (projectteams) {
-
-		      // assign project teams
-
-		      var length = projectteams.length
-
-		      for (var i=0; i < length; i++) {
-
-			      var team = projectteams[i]
-
-			      var opt = document.createElement('option')
-
-			      opt.innerHTML = team.name
-
-			      opt.value = team.id
-
-			      try {
-
-				      selectObj.appendChild(opt, null) // standards compliant; doesn't work in IE
-
-			      } catch(ex) {
-
-				      selectObj.appendChild(opt) // IE only
-
-			      }
-
-		      }		          	
-
-      }
-
-     	
-
-     }
-     
-     function selectTeamFilter(team){
-     	document.getElementById('teamFilter').value = team
-     }
-
-     
-
-     function changeLocation(val) {		 
-     	 document.getElementById('location').value = val
-     }
-
-	
-     
-    </script>
+</script>
 </head>
 <body>
 
@@ -121,7 +30,7 @@
 			<td valign="top" class="name"><label>Bundles:</label></td>
 
 			<td valign="top" class="value"><select id="moveBundleId"
-				name="moveBundle" onchange="return populateTeams(this.value);">
+				name="moveBundle" onchange="return populateBundle(this.value);">
 
 				<option value="null" selected="selected">Please Select</option>
 
@@ -134,30 +43,7 @@
 
 		</tr>
 
-		<tr class="prop" id="teamRow">
-
-			<td valign="top" class="name"><label>Teams:</label></td>
-
-			<td valign="top" class="value"><select id="projectTeamId"
-				name="projectTeam" onchange="selectTeamFilter(this.value)">
-
-				<option value="null" selected="selected">All Teams</option>
-
-			</select></td>
-
-		</tr>
-
-		<tr>
-
-			<td valign="top" class="name"><label>Location:</label></td>
-
-			<td><input
-				type="radio" name="location" value="source"
-				onclick="changeLocation(this.value)" checked="true" /> Source <input type="radio"
-				name="location" value="target" onclick="changeLocation(this.value)" />
-			Target</td>
-
-		</tr>
+		
 
 		<tr>
 
@@ -166,10 +52,6 @@
 				name="Generate">
 				<input type="hidden" name="reportName" id="reportName" value="transportationAsset" />
 				<input type="hidden" name="moveBundle" id="moveBundle" value="null" />
-
-				<input type="hidden" name="teamFilter" id="teamFilter" value="" />
-
-				<input type="hidden" name="location" id="location" value="source" />
 
 			</g:jasperReport></td>
 

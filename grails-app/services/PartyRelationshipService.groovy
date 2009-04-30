@@ -313,7 +313,7 @@ class PartyRelationshipService {
     	def teamMembers = PartyRelationship.findAll(" from PartyRelationship pr where pr.partyIdFrom = $teamId and pr.roleTypeCodeTo = 'TEAM_MEMBER' ")
     	 def memberNames = new StringBuffer()
         teamMembers.each{team ->
-        	memberNames.append(team.partyIdTo.firstName)
+        	memberNames.append(team.partyIdTo.firstName +" "+ team.partyIdTo.lastName)
             memberNames.append("/")
         }
     	if(memberNames.size() > 0) {

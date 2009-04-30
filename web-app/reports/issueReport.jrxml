@@ -14,6 +14,7 @@
 		<defaultValueExpression><![CDATA["23"]]></defaultValueExpression>
 	</parameter>
 	<queryString>
+		<![CDATA[]]>
 	</queryString>
 	<field name="assetName" class="java.lang.String"/>
 	<field name="assetTag" class="java.lang.String"/>
@@ -24,6 +25,7 @@
 	<field name="issue" class="java.lang.String"/>
 	<field name="bundleNames" class="java.lang.String"/>
 	<field name="projectName" class="java.lang.String"/>
+	<field name="clientName" class="java.lang.String"/>
 	<background>
 		<band/>
 	</background>
@@ -36,38 +38,52 @@
 				</textElement>
 				<text><![CDATA[Issues Report]]></text>
 			</staticText>
-			<textField pattern="dd/MM/yyyy h.mm a">
-				<reportElement x="770" y="13" width="161" height="30"/>
+			<textField pattern="MM/dd/yyyy h.mm a">
+				<reportElement x="740" y="5" width="250" height="30"/>
 				<textElement>
-					<font size="15" isBold="true"/>
+					<font size="14" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="52" width="100" height="26"/>
+				<reportElement x="0" y="64" width="100" height="20"/>
 				<textElement textAlignment="Right">
-					<font size="15" isBold="true"/>
+					<font size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Move Bundle:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1" y="24" width="100" height="26"/>
+				<reportElement x="1" y="24" width="100" height="20"/>
 				<textElement textAlignment="Right" markup="none">
-					<font size="15" isBold="true"/>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Client:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="44" width="100" height="20"/>
+				<textElement textAlignment="Right" markup="none">
+					<font size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Project:]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true">
-				<reportElement x="105" y="52" width="180" height="26"/>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="105" y="24" width="180" height="20"/>
 				<textElement>
-					<font size="15" isBold="true"/>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{clientName}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="105" y="64" width="180" height="20"/>
+				<textElement>
+					<font size="14" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{bundleNames}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="105" y="24" width="180" height="26"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="105" y="44" width="180" height="20"/>
 				<textElement>
-					<font size="15" isBold="true"/>
+					<font size="14" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{projectName}]]></textFieldExpression>
 			</textField>
@@ -131,49 +147,49 @@
 	</columnHeader>
 	<detail>
 		<band height="20">
-			<textField isStretchWithOverflow="true">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="border" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{assetName}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="border" stretchType="RelativeToTallestObject" x="100" y="0" width="100" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{assetTag}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="border" stretchType="RelativeToTallestObject" x="200" y="0" width="100" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{serialNumber}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="border" stretchType="RelativeToTallestObject" x="300" y="0" width="100" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{model}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="border" stretchType="RelativeToTallestObject" x="400" y="0" width="100" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression class="java.util.Date"><![CDATA[$F{occuredAt}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="border" stretchType="RelativeToTallestObject" x="500" y="0" width="100" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{createdBy}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="border" stretchType="RelativeToTallestObject" x="600" y="0" width="350" height="20"/>
 				<textElement>
 					<font size="12"/>
