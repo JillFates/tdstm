@@ -31,11 +31,10 @@ class WorkflowService {
     	if ( projectAssetMap ) {
     		currentState = projectAssetMap.currentStateId
 	    	def fromState = stateEngineService.getState( process, currentState )
-			def state = stateEngineService.getState( process, toState )
-	    	def roleCheck = stateEngineService.canDoTask( process, role, fromState, state )
+	    	def roleCheck = stateEngineService.canDoTask( process, role, fromState, toState )
 	    	// Check whether role has permission to change the State
 	    	if ( roleCheck ) {
-	    		flag = stateEngineService.getFlags(process, role, fromState, state)
+	    		flag = stateEngineService.getFlags(process, role, fromState, toState)
 	    		if ( flag.contains("comment") || flag.contains("issue") ) {
 	        		if ( ! comment ) {
 	        			verifyFlag = false
@@ -44,7 +43,8 @@ class WorkflowService {
 	        	}
 	    		//	If verification is successful then create AssetTransition and Update ProjectTeam
 	        	if ( verifyFlag ) {
-	        		def assetTransition = new AssetTransition( stateFrom:currentState, stateTo:toState, comment:comment, assetEntity:assetEntity, moveBundle:moveBundle, projectTeam:projectTeam, userLogin:userLogin )
+	        		def state = stateEngineService.getState( process, currentState )
+	        		def assetTransition = new AssetTransition( stateFrom:state, stateTo:toState, comment:comment, assetEntity:assetEntity, moveBundle:moveBundle, projectTeam:projectTeam, userLogin:userLogin )
 	        		if ( !assetTransition.validate() || !assetTransition.save() ) {
 	    				message = "Unable to create AssetTransition: " + GormUtil.allErrorsString( assetTransition )
 	    			} else {
@@ -53,7 +53,7 @@ class WorkflowService {
     	        		projectTeam.isIdle = flag.contains('busy') ? 1 : 0
     	        		projectTeam.save()
 
-	    				projectAssetMap.currentStateId = toState
+	    				projectAssetMap.currentStateId = Integer.parseInt(stateEngineService.getStateId( process, toState ))
 	    				projectAssetMap.save()
 
 						success = true

@@ -15,6 +15,7 @@ class AssetEntityController {
 	def skipped = []
 	def partyRelationshipService
 	def stateEngineService
+	def workflowService
     def index = {
 		redirect( action:list, params:params )
 	}
@@ -668,6 +669,7 @@ class AssetEntityController {
         def bundleId = params.moveBundle
         def assetList
         def bundleTeams = []
+        def assetsList = []
         def totalAsset
         def completed = new HashMap()
         def projectInstance = Project.findById( projectId )
@@ -709,7 +711,12 @@ class AssetEntityController {
         completed.put("targetCleaned", targetCleaned )
         completed.put("sourceMover", sourceMover )
         completed.put("targetMover", targetMover )
-        return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams, totalAsset:totalAsset,moveBundleInstance:moveBundleInstance, completed:completed]
+        totalAsset.each{
+        	def projectAssetMap = ProjectAssetMap.findByAsset(it)
+        	assetsList<<[asset: it, status: stateEngineService.getStateLabel("STD_PROCESS",projectAssetMap.currentStateId)]
+        	
+        }
+        return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams, assetsList:assetsList, moveBundleInstance:moveBundleInstance, completed:completed]
         		
     }
     /*
@@ -717,14 +724,59 @@ class AssetEntityController {
      */
     def assetDetails = {
         def assetId = params.assetId
-        def assetTeam = []
+        def assetStatusDetails = []
+        def statesList = []
+        def recentChanges = []
         def assetDetail = AssetEntity.findById(assetId)
         def teamName = assetDetail.sourceTeam.name
+        def assetTransition = AssetTransition.findAllByAssetEntity( assetDetail, [max:3, sort:"dateCreated", order:"desc"] )
+        assetTransition.each{
+        	recentChanges<<[it.stateTo+'('+it.projectTeam.name+')']
+        }
+        def currentState = ProjectAssetMap.findByAsset(assetDetail).currentStateId
+        def state = stateEngineService.getState("STD_PROCESS",currentState)
+        def validStates = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR", state)
+        validStates.each{
+        	def id = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
+        	statesList<<[id:it,label:stateEngineService.getStateLabel("STD_PROCESS",id)]
+        }
         def map = new HashMap()
         map.put("assetDetail",assetDetail)
         map.put("teamName",teamName)
-        assetTeam<<map
-        render assetTeam as JSON
+        map.put("currentState",state)
+        def sourceTeams = ProjectTeam.findAll("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and id not in ($assetDetail.targetTeam.id)")
+        def targetTeams = ProjectTeam.findAll("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and id not in ($assetDetail.sourceTeam.id)")
+        assetStatusDetails<<[ 'assetDetails':map, 'statesList':statesList, 'recentChanges':recentChanges, 'sourceTeams':sourceTeams,'targetTeams':targetTeams ]
+        render assetStatusDetails as JSON
         		
+    }
+    def getFlag = {
+    	def toState = params.toState
+    	def fromState = params.fromState
+    	def status = []
+    	def flag = stateEngineService.getFlags("STD_PROCESS","SUPERVISOR", fromState, toState)
+    	if(flag.contains("comment") || flag.contains("issue")){
+    		status<< ['status':'true']
+    	}
+    	render status as JSON
+    }
+    /*
+     *  Used to create Transaction for Supervisor 
+     */
+    def createTransition = {
+    	def status = params.state
+    	def assetId = params.asset
+    	def assetEntity = AssetEntity.get(assetId)
+    	def assignTo = params.assignTo
+    	def projectTeam = ProjectTeam.get(assignTo)
+    	def comment = params.comment
+    	def principal = SecurityUtils.subject.principal
+    	def loginUser = UserLogin.findByUsername(principal)
+    	def transactionStatus = workflowService.createTransition("STD_PROCESS","SUPERVISOR", status, assetEntity, assetEntity.moveBundle, loginUser, projectTeam, comment )
+    	if ( transactionStatus.success ) {
+    		assetEntity.priority = params.priority
+    		assetEntity.save()
+        }
+    	//render params as JSON
     }
 }

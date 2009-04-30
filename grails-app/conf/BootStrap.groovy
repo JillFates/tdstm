@@ -420,15 +420,15 @@ class BootStrap {
 		//---------------------------------
 		println "ASSET ENTITY"
 		def assetEntityList = [
-            ["105C31D", "Workstation B2600", "XX-232-YAB", "XX-232-YABB", "rackad1", "rackad11", "1", "11", "12", attributeSet, cedarsProject, "Server", "C2A133", "ASD12345", "Mail", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1, "shelf1" ],
-            ["105D74C CSMEDI","7028-6C4", "XX-138-YAB", "XX-138-YABB", "rackad2", "rackad22", "2", "22",  "12", attributeSet, cedarsProject, "Server", "C2A134", "ASD2343455", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 2, "shelf1" ],
-            ["AIX Console HMC3", "KVM", "MM-2232", "MM-22322", "rackad3", "rackad33", "4", "44", "1", attributeSet, cedarsProject, "Server", "C2A135", "ASD1893045", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 6, "shelf1" ],
-            ["105D74C CSMEDI", "AutoView 3100", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad44", "3", "33", "1", attributeSet, cedarsProject, "KVM Switch", "C2A136", "ASD189234", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 5, "shelf1" ],
-            ["CED14P", "Proliant 1600R", "RR-32-YAB", "RR-32-YABB", "rackad5", "rackad55", "6", "66", "5", attributeSet, cedarsProject, "KVM Switch", "C2A137", "SU02325456", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"],
-            ["AIX Console HMC2", "V490", "RR-32-YAB", "RR-32-YABB", "rackad1", "rackad66", "7", "77", "5", attributeSet, cedarsProject, "KVM Switch", "C2A138", "ASD1765454", "Mail", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"],
-            ["AXPNTSA", "Proliant DL380 G3", "RR-32-YAB", "RR-32-YABB", "rackad2", "rackad77", "5", "55", "3", attributeSet, cedarsProject, "KVM Switch", "ASD12345",  "ASD1765454", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"],
-            ["CEDCONSOLE1", "StorageWorks", "RR-32-YAB", "RR-32-YABB", "rackad3", "rackad88", "8", "88", "6", attributeSet, cedarsProject, "KVM Switch", "C2A140", "ASD2343455", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"],
-            ["CSEGP2 = CSENSD1 IO Drawer 1", "Ultrium Tape", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad99", "9", "99", "7", attributeSet, cedarsProject, "KVM Switch", "C2A141", "SU0234423", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1"]
+            ["105C31D", "Workstation B2600", "XX-232-YAB", "XX-232-YABB", "rackad1", "rackad11", "1", "11", "12", attributeSet, cedarsProject, "Server", "C2A133", "ASD12345", "Mail", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1, "shelf1", 1 ],
+            ["105D74C CSMEDI","7028-6C4", "XX-138-YAB", "XX-138-YABB", "rackad2", "rackad22", "2", "22",  "12", attributeSet, cedarsProject, "Server", "C2A134", "ASD2343455", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 2, "shelf1", 2 ],
+            ["AIX Console HMC3", "KVM", "MM-2232", "MM-22322", "rackad3", "rackad33", "4", "44", "1", attributeSet, cedarsProject, "Server", "C2A135", "ASD1893045", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 6, "shelf1", 3 ],
+            ["105D74C CSMEDI", "AutoView 3100", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad44", "3", "33", "1", attributeSet, cedarsProject, "KVM Switch", "C2A136", "ASD189234", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 5, "shelf1", 1 ],
+            ["CED14P", "Proliant 1600R", "RR-32-YAB", "RR-32-YABB", "rackad5", "rackad55", "6", "66", "5", attributeSet, cedarsProject, "KVM Switch", "C2A137", "SU02325456", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1", 1],
+            ["AIX Console HMC2", "V490", "RR-32-YAB", "RR-32-YABB", "rackad1", "rackad66", "7", "77", "5", attributeSet, cedarsProject, "KVM Switch", "C2A138", "ASD1765454", "Mail", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1", 1],
+            ["AXPNTSA", "Proliant DL380 G3", "RR-32-YAB", "RR-32-YABB", "rackad2", "rackad77", "5", "55", "3", attributeSet, cedarsProject, "KVM Switch", "ASD12345",  "ASD1765454", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1", 1],
+            ["CEDCONSOLE1", "StorageWorks", "RR-32-YAB", "RR-32-YABB", "rackad3", "rackad88", "8", "88", "6", attributeSet, cedarsProject, "KVM Switch", "C2A140", "ASD2343455", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1", 1],
+            ["CSEGP2 = CSENSD1 IO Drawer 1", "Ultrium Tape", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad99", "9", "99", "7", attributeSet, cedarsProject, "KVM Switch", "C2A141", "SU0234423", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1", 1]
 		]
 
 		// Insert the List of assetEntity
@@ -454,7 +454,8 @@ class BootStrap {
 				sourceTeam: it[17],
 				targetTeam: it[18],
 				cart:it[19],
-				shelf:it[20]
+				shelf:it[20],
+				priority:it[21]
             )
 			if ( ! assetEntity.validate() || ! assetEntity.save() ) {
 				def etext = "Unable to create asset ${it[0]}" +
@@ -468,8 +469,8 @@ class BootStrap {
 		//--------------------------------
 		println "PROJECT_ASSET_MAP"
 		def projectAssetMapList = [
-            [ cedarsProject, AssetEntity.get(1), 30 ],
-            [ cedarsProject, AssetEntity.get(2), 280 ],
+            [ cedarsProject, AssetEntity.get(1), 20 ],
+            [ cedarsProject, AssetEntity.get(2), 60 ],
             [ cedarsProject, AssetEntity.get(3), 30 ],
             [ cedarsProject, AssetEntity.get(4), 280 ],
             [ cedarsProject, AssetEntity.get(5), 20 ],

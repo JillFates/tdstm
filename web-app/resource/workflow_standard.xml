@@ -33,7 +33,7 @@
 		<transition to="Reracking" name="Reracking/Cabling Started" id="140" />
 		<transition to="Reracked" name="Reracked/Cabled" id="150" />
 		<transition to="QAVerified" name="QA Verification" id="160" />
-		<transition to="Powered On" name="Powered On" id="170" />
+		<transition to="PoweredOn" name="Powered On" id="170" />
 		<transition to="NetVerifying" name="Verify Network Started" id="180" />
 		<transition to="NetVerified" name="Network Verified" id="190" />
 		<transition to="SANVerifying" name="SAN Verify Started" id="200" />
@@ -68,13 +68,13 @@
 			<transition to="PoweredOn"/>
 			<transition to="NetVerifying"/>
 			<transition to="NetVerified"/>
-			<transition to="SANVerify"/>
+			<transition to="SANVerifying"/>
 			<transition to="SANVerified"/>
 			<transition to="DBStarted"/>
 			<transition to="DBFinished"/>
 			<transition to="AppStartup"/>
 			<transition to="AppFinished"/>
-			<transition to="AppVerify"/>
+			<transition to="AppVerifying"/>
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
@@ -202,15 +202,15 @@
 			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
-			<transition to="NetVerify"/>
+			<transition to="NetVerifying"/>
 			<transition to="NetVerified"/>
-			<transition to="SANVerify"/>
+			<transition to="SANVerifying"/>
 			<transition to="SANVerified"/>
 			<transition to="DBStarted"/>
 			<transition to="DBFinished"/>
 			<transition to="AppStartup"/>
 			<transition to="AppFinished"/>
-			<transition to="AppVerify"/>
+			<transition to="AppVerifying"/>
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
@@ -243,15 +243,15 @@
 			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
-			<transition to="NetVerify"/>
+			<transition to="NetVerifying"/>
 			<transition to="NetVerified"/>
-			<transition to="SANVerify"/>
+			<transition to="SANVerifying"/>
 			<transition to="SANVerified"/>
 			<transition to="DBStarted"/>
 			<transition to="DBFinished"/>
 			<transition to="AppStartup"/>
 			<transition to="AppFinished"/>
-			<transition to="AppVerify"/>
+			<transition to="AppVerifying"/>
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
@@ -279,15 +279,15 @@
 			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
-			<transition to="NetVerify"/>
+			<transition to="NetVerifying"/>
 			<transition to="NetVerified"/>
-			<transition to="SANVerify"/>
+			<transition to="SANVerifying"/>
 			<transition to="SANVerified"/>
 			<transition to="DBStarted"/>
 			<transition to="DBFinished"/>
 			<transition to="AppStartup"/>
 			<transition to="AppFinished"/>
-			<transition to="AppVerify"/>
+			<transition to="AppVerifying"/>
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
@@ -314,15 +314,15 @@
 			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
-			<transition to="NetVerify"/>
+			<transition to="NetVerifying"/>
 			<transition to="NetVerified"/>
-			<transition to="SANVerify"/>
+			<transition to="SANVerifying"/>
 			<transition to="SANVerified"/>
 			<transition to="DBStarted"/>
 			<transition to="DBFinished"/>
 			<transition to="AppStartup"/>
 			<transition to="AppFinished"/>
-			<transition to="AppVerify"/>
+			<transition to="AppVerifying"/>
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
@@ -345,15 +345,15 @@
 			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
-			<transition to="NetVerify"/>
+			<transition to="NetVerifying"/>
 			<transition to="NetVerified"/>
-			<transition to="SANVerify"/>
+			<transition to="SANVerifying"/>
 			<transition to="SANVerified"/>
 			<transition to="DBStarted"/>
 			<transition to="DBFinished"/>
 			<transition to="AppStartup"/>
 			<transition to="AppFinished"/>
-			<transition to="AppVerify"/>
+			<transition to="AppVerifying"/>
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
@@ -369,15 +369,15 @@
 			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
-			<transition to="NetVerify"/>
+			<transition to="NetVerifying"/>
 			<transition to="NetVerified"/>
-			<transition to="SANVerify"/>
+			<transition to="SANVerifying"/>
 			<transition to="SANVerified"/>
 			<transition to="DBStarted"/>
 			<transition to="DBFinished"/>
 			<transition to="AppStartup"/>
 			<transition to="AppFinished"/>
-			<transition to="AppVerify"/>
+			<transition to="AppVerifying"/>
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
@@ -401,15 +401,15 @@
 			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
-			<transition to="NetVerify"/>
+			<transition to="NetVerifying"/>
 			<transition to="NetVerified"/>
-			<transition to="SANVerify"/>
+			<transition to="SANVerifying"/>
 			<transition to="SANVerified"/>
 			<transition to="DBStarted"/>
 			<transition to="DBFinished"/>
 			<transition to="AppStartup"/>
 			<transition to="AppFinished"/>
-			<transition to="AppVerify"/>
+			<transition to="AppVerifying"/>
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
@@ -422,15 +422,15 @@
 			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
-			<transition to="NetVerify"/>
+			<transition to="NetVerifying"/>
 			<transition to="NetVerified"/>
-			<transition to="SANVerify"/>
+			<transition to="SANVerifying"/>
 			<transition to="SANVerified"/>
 			<transition to="DBStarted"/>
 			<transition to="DBFinished"/>
 			<transition to="AppStartup"/>
 			<transition to="AppFinished"/>
-			<transition to="AppVerify"/>
+			<transition to="AppVerifying"/>
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
@@ -447,15 +447,15 @@
 			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
-			<transition to="NetVerify"/>
+			<transition to="NetVerifying"/>
 			<transition to="NetVerified"/>
-			<transition to="SANVerify"/>
+			<transition to="SANVerifying"/>
 			<transition to="SANVerified"/>
 			<transition to="DBStarted"/>
 			<transition to="DBFinished"/>
 			<transition to="AppStartup"/>
 			<transition to="AppFinished"/>
-			<transition to="AppVerify"/>
+			<transition to="AppVerifying"/>
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
@@ -483,15 +483,15 @@
 			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
-			<transition to="NetVerify"/>
+			<transition to="NetVerifying"/>
 			<transition to="NetVerified"/>
-			<transition to="SANVerify"/>
+			<transition to="SANVerifying"/>
 			<transition to="SANVerified"/>
 			<transition to="DBStarted"/>
 			<transition to="DBFinished"/>
 			<transition to="AppStartup"/>
 			<transition to="AppFinished"/>
-			<transition to="AppVerify"/>
+			<transition to="AppVerifying"/>
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
@@ -515,15 +515,15 @@
 			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
-			<transition to="NetVerify"/>
+			<transition to="NetVerifying"/>
 			<transition to="NetVerified"/>
-			<transition to="SANVerify"/>
+			<transition to="SANVerifying"/>
 			<transition to="SANVerified"/>
 			<transition to="DBStarted"/>
 			<transition to="DBFinished"/>
 			<transition to="AppStartup"/>
 			<transition to="AppFinished"/>
-			<transition to="AppVerify"/>
+			<transition to="AppVerifying"/>
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
@@ -547,15 +547,15 @@
 			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
-			<transition to="NetVerify"/>
+			<transition to="NetVerifying"/>
 			<transition to="NetVerified"/>
-			<transition to="SANVerify"/>
+			<transition to="SANVerifying"/>
 			<transition to="SANVerified"/>
 			<transition to="DBStarted"/>
 			<transition to="DBFinished"/>
 			<transition to="AppStartup"/>
 			<transition to="AppFinished"/>
-			<transition to="AppVerify"/>
+			<transition to="AppVerifying"/>
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
@@ -579,15 +579,15 @@
 			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
-			<transition to="NetVerify"/>
+			<transition to="NetVerifying"/>
 			<transition to="NetVerified"/>
-			<transition to="SANVerify"/>
+			<transition to="SANVerifying"/>
 			<transition to="SANVerified"/>
 			<transition to="DBStarted"/>
 			<transition to="DBFinished"/>
 			<transition to="AppStartup"/>
 			<transition to="AppFinished"/>
-			<transition to="AppVerify"/>
+			<transition to="AppVerifying"/>
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
@@ -611,15 +611,15 @@
 			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
-			<transition to="NetVerify"/>
+			<transition to="NetVerifying"/>
 			<transition to="NetVerified"/>
-			<transition to="SANVerify"/>
+			<transition to="SANVerifying"/>
 			<transition to="SANVerified"/>
 			<transition to="DBStarted"/>
 			<transition to="DBFinished"/>
 			<transition to="AppStartup"/>
 			<transition to="AppFinished"/>
-			<transition to="AppVerify"/>
+			<transition to="AppVerifying"/>
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>

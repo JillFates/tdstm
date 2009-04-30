@@ -27,7 +27,10 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String nicPort
 	String powerPort
 	String remoteMgmtPort
-	String truck	
+	String truck
+	String appOwner
+	String appSme
+	Integer priority 
 	Project project
 
 	// MoveBundleAsset fields
@@ -38,8 +41,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String shelf
 	
 	static hasMany = [
-		assetEntityVarchars : AssetEntityVarchar,
-		assetTransitions : AssetTransition
+		assetEntityVarchars : AssetEntityVarchar
 	]
 	
 	static constraints = {
@@ -73,6 +75,10 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		project( blank:false, nullable:false )
 		application( blank:true, nullable:true )
 		owner( blank:true, nullable:true )
+		appOwner( blank:true,nullable:true)
+		appSme(nullable:true)
+		priority(nullable:true, inList:[1,2,3])
+		
 
 		// The following were the MoveBundleAsset fields
 		moveBundle( blank:true, nullable:true )

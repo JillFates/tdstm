@@ -39,15 +39,72 @@
    
    }
    function getAssetDetail(e){
-   var asset = eval("(" + e.responseText + ")")	
-    var tableBody = '<table ><thead><tr><th>Asset Details </th></tr></thead><tbody>'+
-'<tr><td>'+asset[0].assetDetail.assetName+'</td></tr>'+
-'<tr><td>'+asset[0].assetDetail.model+'</td></tr>'+
-'<tr><td>'+asset[0].assetDetail.sourceRack+'</td></tr>'+
-'<tr><td>'+asset[0].teamName+'</td></tr>'+
-'</tbody></table>'
-    	var selectObj = document.getElementById('asset')
+   var asset = eval("(" + e.responseText + ")")
+   	document.assetdetailsForm.asset.value = asset[0].assetDetails.assetDetail.id 
+   	document.assetdetailsForm.currentState.value = asset[0].assetDetails.currentState
+    var tableBody = '<table style=\'border:0\' ><thead><tr><th>Asset Details </th></tr></thead><tbody>'+
+	'<tr><td><b>Asset Name : </b>'+asset[0].assetDetails.assetDetail.assetName+'</td></tr>'+
+	'<tr><td><b>Model : </b>'+asset[0].assetDetails.assetDetail.model+'</td></tr>'+
+	'<tr><td><b>Rack: </b>'+asset[0].assetDetails.assetDetail.sourceRack+'</td></tr>'+
+	'<tr><td><b>Assigned : </b>'+asset[0].assetDetails.teamName+'</td></tr>'+
+	'<tr><td><b>Recent Changes: </b></td></tr>'
+	for(i=0;i<asset[0].recentChanges.length; i++){
+		tableBody += '<tr><td>'+asset[0].recentChanges[i]+'</td></tr>'
+	}
+	tableBody += '</tbody></table>'
+    var selectObj = document.getElementById('asset')
    	selectObj.innerHTML = tableBody
+   	document.getElementById('assetDetails').style.display = 'block'
+   	var statusObj = document.getElementById("stateSelectId")
+   		var l = statusObj.length
+	   	while (l > 0) {
+			l--
+		    statusObj.remove(l)
+		}
+		var length = asset[0].statesList.length
+	    for (var i=0; i < length; i++) {
+	      var state = asset[0].statesList[i]
+	      var popt = document.createElement('option');
+		  popt.innerHTML = state.label
+	      popt.value = state.id
+	      try {
+	      statusObj.appendChild(popt, null) // standards compliant; doesn't work in IE
+	      } catch(ex) {
+	      statusObj.appendChild(popt) // IE only
+	      }
+		}
+   	var teamObj = document.getElementById("assignToId")
+   	var sourceObj = document.getElementById("sourceAssignTo")
+   	var targetObj = document.getElementById("targetAssignTo")
+   		var l = teamObj.length
+	   	while (l > 0) {
+			l--
+		    teamObj.remove(l)
+		}
+		var sourceLength = asset[0].sourceTeams.length
+	    for (var i=0; i < sourceLength; i++) {
+	      var team = asset[0].sourceTeams[i]
+	      var popt = document.createElement('option');
+		  popt.innerHTML = team.name
+	      popt.value = team.id
+	      try {
+	      sourceObj.appendChild(popt, null) // standards compliant; doesn't work in IE
+	      } catch(ex) {
+	      sourceObj.appendChild(popt) // IE only
+	      }
+		}
+		var targetLength = asset[0].targetTeams.length
+	    for (var i=0; i < targetLength; i++) {
+	      var team = asset[0].targetTeams[i]
+	      var popt = document.createElement('option');
+		  popt.innerHTML = team.name
+	      popt.value = team.id
+	      try {
+	      targetObj.appendChild(popt, null) // standards compliant; doesn't work in IE
+	      } catch(ex) {
+	      targetObj.appendChild(popt) // IE only
+	      }
+		}
    }
    
    function bundleChange(){  
@@ -55,10 +112,22 @@
    document.getElementById("moveBundleId").value =  bundleID; 
  
    }
-   
+   function setComment(e){
+   	var commentStatus = eval("(" + e.responseText + ")")
+   	if(commentStatus[0]){
+   		document.assetdetailsForm.validateComment.value = commentStatus[0].status
+   	}else {
+   		document.assetdetailsForm.validateComment.value = ""
+   	}
+   }
+   function setCommentValidation(){
+   	if(document.assetdetailsForm.validateComment.value == 'true'){
+   		if(document.assetdetailsForm.comment.value == ''){
+   			alert("A comment is required")
+   		}
+   	}
+   }
     </script>
-
-
 </head>
 
 <body>
@@ -176,52 +245,88 @@
 <table style="border: 0px;">
 	<tr>
 		<td valign="top" style="padding: 0px;">
-		<div class="list">
+		<div class="list" >
 		<g:form name="assetListForm">		
 		
 		<table>
 			<thead>
 				<tr>
-					<g:sortableColumn property="assetName" title="Asset Name" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
+					<!-- <g:sortableColumn property="assetName" title="Asset Name" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
 					<g:sortableColumn property="status" title="Status" />
 					<g:sortableColumn property="team" title="Team" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
 					<g:sortableColumn property="statTimer" title="Stat Timer" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
 					<g:sortableColumn property="loc" title="Loc" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
-					<g:sortableColumn property="issues" title="Issues" />
+					<g:sortableColumn property="issues" title="Issues" /> -->
+					<th>Priority</th>
+					<th>Asset Name</th>
+					<th>Status</th>
+					<th>Team</th>
+					<th>Stat</th>
+					<th>Loc</th>
+					<th>Issues</th>
 				</tr>
 			</thead>
 			<tbody id="assetsTbody">
-
-				<g:each status="i" in="${totalAsset}" var="totalAsset">
-					<tr onclick="assetDetails('${totalAsset.id}')">
-						<td>${totalAsset.assetName}</td>
-						<td>HOLD!</td>
-						<td>${totalAsset.sourceTeam.name}</td>
-						<td>${totalAsset.moveBundle.startTime}</td>
-						<td>${totalAsset.sourceTeam.currentLocation}</td>
+				<g:each status="i" in="${assetsList}" var="assetsList">
+					<tr onclick="assetDetails('${assetsList?.asset.id}')">
+						<td>${assetsList?.asset.priority}</td>
+						<td>${assetsList?.asset.assetName}</td>
+						<td>${assetsList?.status}</td>
+						<td>${assetsList?.asset.sourceTeam.name}</td>
+						<td>${assetsList.asset.moveBundle.startTime}</td>
+						<td>${assetsList.asset.sourceTeam.currentLocation}</td>
 						<td>not required</td>
 					</tr>
+					
 				</g:each>
-
 			</tbody>
 		</table>
 		
 		</g:form>
 		</div>
-		
 		</td>
-		
 		<td valign="top" style="padding: 0px;">
-		<div id="asset">
-		<table>
-			<thead>
-				<tr>
-					<th>Asset Details</th>
-				</tr>
-			</thead>
-			<tbody>				
+		<div id="assetDetails" style="display: none;border: 1px solid #5F9FCF;width: 200px;">
+		<div id="asset" >
+		</div>
+		<div>
+		<g:form name="assetdetailsForm" >
+		<table style="border: 0">
+		
+			<tbody>
+			<tr><td> <b>Change :</b></td>
+			<td> <select id="stateSelectId" name="state" style="width: 100px" onchange="${remoteFunction(action:'getFlag', params:'\'toState=\'+ this.value +\'&fromState=\'+document.getElementById(\'currentStateId\').value', onComplete:'setComment(e)')}"></select> </td>
+			</tr>
+			<tr><td><input type="hidden" name="asset" id="assetId" value=""> &nbsp;</td>
+			<td>
+			<!-- <select id="priorityId" name="priority" style="width: 100px">
+			<option value="1">High</option>
+			<option value="2">Normal</option>
+			<option value="3">Low</option>
+			</select> -->
+			<g:select id="priorityId" name="priority" from="${AssetEntity.constraints.priority.inList}" style="width: 100px"></g:select>
+			 </td>
+			</tr>
+			<tr><td><input type="hidden" name="currentState" id="currentStateId" value="">&nbsp;</td>
+			<td> <select id="assignToId" name="assignTo" style="width: 100px">
+			<optgroup label="Source" id="sourceAssignTo"></optgroup>
+			<optgroup label="Target" id="targetAssignTo"></optgroup>
+			</select> </td>
+			</tr>
+			<tr>
+			<td colspan="2" style="text-align: center;" >
+			<input type="hidden" value="" id="validateCommentId" name="validateComment">
+			<textarea name="comment" name="comment" cols="25" rows="2" ></textarea> </td>
+			</tr>
+			<tr>
+			<td colspan="2" style="text-align: center;" class="buttonR">
+			<input type="button" value="Cancle"> 
+			<g:submitToRemote  action="createTransition" value="Submit" before="setCommentValidation();"/></td>
+			</tr>
 			</tbody>
 		</table>
+		</g:form>
+		</div>
 		</div>
 		</td>
 	</tr>
