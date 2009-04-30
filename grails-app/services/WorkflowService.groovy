@@ -2,7 +2,6 @@
  *  This Service is responsible for managing the workflow and status of assets in the system.
  */
 class WorkflowService {
-	
     boolean transactional = true
     def stateEngineService
     /*
@@ -22,7 +21,8 @@ class WorkflowService {
                 b. Need to change ProjectAssetMap domain currentState to currentStateId (Integer)
             3. Update ProjectTeam
                 a. set isIdle based on "busy" flag for the task. isIdle = ! "busy"
-         */
+      */
+		boolean success = false
     	def currentState
     	def flag
     	def verifyFlag = true
@@ -36,27 +36,28 @@ class WorkflowService {
 	    	// Check whether role has permission to change the State
 	    	if ( roleCheck ) {
 	    		flag = stateEngineService.getFlags(process, role, fromState, state)
-	    		if(flag.contains("comment") || flag.contains("issue")){
-	        		if(comment == "" || comment == null){
+	    		if ( flag.contains("comment") || flag.contains("issue") ) {
+	        		if ( ! comment ) {
 	        			verifyFlag = false
-	        			message = "Comment should not be balnk"
+	        			message = "A comment is required"
 	        		}
 	        	}
 	    		//	If verification is successful then create AssetTransition and Update ProjectTeam
 	        	if ( verifyFlag ) {
 	        		def assetTransition = new AssetTransition( stateFrom:currentState, stateTo:toState, comment:comment, assetEntity:assetEntity, moveBundle:moveBundle, projectTeam:projectTeam, userLogin:userLogin )
 	        		if ( !assetTransition.validate() || !assetTransition.save() ) {
-	    				def etext = "Unable to create AssetTransition" + GormUtil.allErrorsString( assetTransition )
-	    				message = etext
+	    				message = "Unable to create AssetTransition: " + GormUtil.allErrorsString( assetTransition )
 	    			} else {
 	    				message = "Transaction created successfully"
-	    				if(flag != 'busy'){
-	    	        		projectTeam.isIdle = 0
-	    	        		projectTeam.save()
-	    	        	}
+	    				
+    	        		projectTeam.isIdle = flag.contains('busy') ? 1 : 0
+    	        		projectTeam.save()
+
 	    				projectAssetMap.currentStateId = toState
 	    				projectAssetMap.save()
-	    			}
+
+						success = true
+					}
 	        	}
 	    	} else {
 	    		message = "$role does not have permission to change the State"
@@ -64,6 +65,7 @@ class WorkflowService {
     	} else {
     		message = "Transaction failed"
     	}
-    	return message
+		
+    	return [success:success, message:message]
     }
 }
