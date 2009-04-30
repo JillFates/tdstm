@@ -38,7 +38,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String shelf
 	
 	static hasMany = [
-		assetEntityVarchars : AssetEntityVarchar
+		assetEntityVarchars : AssetEntityVarchar,
+		assetTransitions : AssetTransition
 	]
 	
 	static constraints = {
