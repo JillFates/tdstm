@@ -33,49 +33,43 @@
 	</style>
 	
 <script type="text/javascript">
-   function assetDetails(assetId) {   
-   var assetId = assetId; 
-   ${remoteFunction(action:'assetDetails', params:'\'assetId=\'+ assetId ' , onComplete:'getAssetDetail(e)') }
+   function assetDetails(assetId) {
+	   var browser=navigator.appName;
+	   var 	assetId = assetId;
+	   var	rows = new Array();
+	   if(browser != 'Microsoft Internet Explorer') {
+			rows = document.getElementsByName('assetDetailRow')	
+		} else {
+		    rows = document.getElementById('assetsTbody').childNodes
+		}
+	   for(i = 0 ; i<rows.length ; i++){
+	   		rows[i].style.backgroundColor = '#FFFFFF'
+	   }
+	   document.getElementById('assetDetailRow_'+assetId).style.backgroundColor = '#65a342';
+	   ${remoteFunction(action:'assetDetails', params:'\'assetId=\'+ assetId ' , onComplete:'getAssetDetail(e)') }
    
    }
    function getAssetDetail(e){
-   var asset = eval("(" + e.responseText + ")")
-   	document.assetdetailsForm.asset.value = asset[0].assetDetails.assetDetail.id 
-   	document.assetdetailsForm.currentState.value = asset[0].assetDetails.currentState
-    var tableBody = '<table style=\'border:0\' ><thead><tr><th>Asset Details </th></tr></thead><tbody>'+
-	'<tr><td><b>Asset Name : </b>'+asset[0].assetDetails.assetDetail.assetName+'</td></tr>'+
-	'<tr><td><b>Model : </b>'+asset[0].assetDetails.assetDetail.model+'</td></tr>'+
-	'<tr><td><b>Rack: </b>'+asset[0].assetDetails.assetDetail.sourceRack+'</td></tr>'+
-	'<tr><td><b>Assigned : </b>'+asset[0].assetDetails.teamName+'</td></tr>'+
-	'<tr><td><b>Recent Changes: </b></td></tr>'
-	for(i=0;i<asset[0].recentChanges.length; i++){
-		tableBody += '<tr><td>'+asset[0].recentChanges[i]+'</td></tr>'
-	}
-	tableBody += '</tbody></table>'
-    var selectObj = document.getElementById('asset')
-   	selectObj.innerHTML = tableBody
-   	document.getElementById('assetDetails').style.display = 'block'
-   	var statusObj = document.getElementById("stateSelectId")
-   		var l = statusObj.length
-	   	while (l > 0) {
-			l--
-		    statusObj.remove(l)
+	   	var asset = eval("(" + e.responseText + ")")
+	   	document.assetdetailsForm.asset.value = asset[0].assetDetails.assetDetail.id
+	   	document.assetdetailsForm.currentState.value = asset[0].assetDetails.currentState
+	    var tableBody = '<table style=\'border:0\' ><thead><tr><th>Asset Details </th></tr></thead><tbody>'+
+		'<tr><td><b>Asset Name : </b>'+asset[0].assetDetails.assetDetail.assetName+'</td></tr>'+
+		'<tr><td><b>Model : </b>'+asset[0].assetDetails.assetDetail.model+'</td></tr>'+
+		'<tr><td><b>Rack: </b>'+asset[0].assetDetails.assetDetail.sourceRack+'</td></tr>'+
+		'<tr><td><b>Status : </b>'+asset[0].assetDetails.currentState+'</td></tr>'+
+		'<tr><td><b>Assigned : </b>'+asset[0].assetDetails.teamName+'</td></tr>'+
+		'<tr><td><b>Recent Changes: </b></td></tr>'
+		for(i=0;i<asset[0].recentChanges.length; i++){
+			tableBody += '<tr><td>'+asset[0].recentChanges[i]+'</td></tr>'
 		}
-		var length = asset[0].statesList.length
-	    for (var i=0; i < length; i++) {
-	      var state = asset[0].statesList[i]
-	      var popt = document.createElement('option');
-		  popt.innerHTML = state.label
-	      popt.value = state.id
-	      try {
-	      statusObj.appendChild(popt, null) // standards compliant; doesn't work in IE
-	      } catch(ex) {
-	      statusObj.appendChild(popt) // IE only
-	      }
-		}
-   	var teamObj = document.getElementById("assignToId")
-   	var sourceObj = document.getElementById("sourceAssignTo")
-   	var targetObj = document.getElementById("targetAssignTo")
+		tableBody += '</tbody></table>'
+	    var selectObj = document.getElementById('asset')
+	   	selectObj.innerHTML = tableBody
+	   	createOptions(asset[0].statesList)
+	   	var teamObj = document.getElementById("assignToId")
+	   	var sourceObj = document.getElementById("sourceAssignTo")
+	   	var targetObj = document.getElementById("targetAssignTo")
    		var l = teamObj.length
 	   	while (l > 0) {
 			l--
@@ -105,33 +99,65 @@
 	      targetObj.appendChild(popt) // IE only
 	      }
 		}
-   }
+   	}
    
-   function bundleChange(){  
-   var bundleID = ${moveBundleInstance.id}; 
-   document.getElementById("moveBundleId").value =  bundleID; 
- 
-   }
-   function setComment(e){
-   	var commentStatus = eval("(" + e.responseText + ")")
-   	if(commentStatus[0]){
-   		document.assetdetailsForm.validateComment.value = commentStatus[0].status
-   	}else {
-   		document.assetdetailsForm.validateComment.value = ""
+   	function bundleChange(){  
+	   var bundleID = ${moveBundleInstance.id}; 
+	   document.getElementById("moveBundleId").value =  bundleID; 
    	}
-   }
-   function setCommentValidation(){
-   	if(document.assetdetailsForm.validateComment.value == 'true'){
-   		if(document.assetdetailsForm.comment.value == ''){
-   			alert("A comment is required")
-   		}
+   	function setComment(e){
+	   	var commentStatus = eval("(" + e.responseText + ")")
+	   	if(commentStatus[0]){
+	   		document.assetdetailsForm.validateComment.value = commentStatus[0].status
+	   	}else {
+	   		document.assetdetailsForm.validateComment.value = ""
+	   	}
    	}
-   }
+   	function setCommentValidation(){
+	   	if(document.assetdetailsForm.validateComment.value == 'true'){
+	   		if(document.assetdetailsForm.comment.value == ''){
+	   			alert("A comment is required")
+	   		}
+	   	}
+   	}
+   	function timedRefresh(timeoutPeriod) {
+   	alert(timeoutPeriod)
+		setTimeout("location.reload(false);",timeoutPeriod);
+		document.getElementById("selectTimedId").value = timeoutPeriod; 
+	}
+	function updateAsset(e){
+		var asset = eval("(" + e.responseText + ")")
+		if(asset[0]){
+		createOptions(asset[0].statesList)
+		document.getElementById('priorityCol_'+asset[0].assetEntity.id).innerHTML = asset[0].assetEntity.priority 
+		document.getElementById('statusCol_'+asset[0].assetEntity.id).innerHTML = asset[0].status
+		}
+	}
+	function createOptions(statesList){
+		var statusObj = document.getElementById("stateSelectId")
+   		var l = statusObj.length
+	   	while (l > 0) {
+			l--
+		    statusObj.remove(l)
+		}
+		var length = statesList.length
+	    for (var i=0; i < length; i++) {
+	      var state = statesList[i]
+	      var popt = document.createElement('option');
+		  popt.innerHTML = state.label
+	      popt.value = state.id
+	      try {
+	      statusObj.appendChild(popt, null) // standards compliant; doesn't work in IE
+	      } catch(ex) {
+	      statusObj.appendChild(popt) // IE only
+	      }
+		}
+	}
     </script>
 </head>
 
-<body>
-<div class="body">
+<body >
+<div class="body" >
 
 <h1>Supervisor Dashboard</h1>
 <g:if test="${flash.message}">
@@ -144,8 +170,7 @@
 <table style="border: 0px;">
 	<tr class="prop">
 		<td valign="top" class="name"><label for="moveBundle">Move
-		Bundle:</label></td>
-		<td valign="top" class="value"><select id="moveBundleId"
+		Bundle:</label>&nbsp;<select id="moveBundleId"
 			name="moveBundle" onchange="document.dashboardForm.submit()" >	
 
 			<g:each status="i" in="${moveBundleInstanceList}"
@@ -154,6 +179,15 @@
 			</g:each>
 
 		</select></td>
+	<td style="text-align: right;"><input type="button" value="Refresh" onclick="location.reload(true);">
+	<select id="selectTimedId" onchange="timedRefresh(this.value)">
+	<option value="60000">1 min</option> 
+	<option value="120000">2 min</option> 
+	<option value="180000">3 min</option> 
+	<option value="240000">4 min</option> 
+	<option value="300000">5 min</option> 
+	<option value="0">Never</option> 
+	</select> </td>
 	</tr>
 	</table>
 	</div>
@@ -165,7 +199,7 @@
 <div style="width:100%; float:left; border-left:1px solid #333333;">
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
   <tr>
-    <td valign="top" style="border-right: 1px solid #333333;padding: 0px;">
+    <td valign="top" style="border-right: 1px solid #333333;padding: 0px;width: 100px;">
      <div style="width:100px; float:left;">  
      <table style="border: 0">
 			<th>TEAMS:</th>
@@ -179,7 +213,7 @@
     </div>
     </td>
     <td valign="top" style="border-right: 1px solid #333333;padding: 0px;">
-    <div style="width:720px; float:left; overflow:auto;">
+    <div style="width:750px; float:left; overflow:auto;">
 	<table width="100%" style="border: 0;" cellspacing="0" cellpadding="0">
 	  <tr>
 	    <g:each in="${bundleTeams}" var="bundleTeam">
@@ -187,33 +221,33 @@
 			<table style="border: 0;" >
 			<th nowrap>${bundleTeam?.team?.name }</th>
 			<tr><td nowrap>${bundleTeam?.members}</td></tr>
-			<tr><td class="odd">${bundleTeam?.team?.currentLocation }&nbsp;</td> </tr>
+			<tr><td class="odd">${bundleTeam?.team?.currentLocation}&nbsp;</td> </tr>
 			<tr><td nowrap>Sap1</td> </tr>
-			<tr><td class="odd">17 of 50</td> </tr>
-			<tr><td nowrap>17 of 50</td> </tr>
+			<tr><td class="odd">${bundleTeam?.unrackedAssets} of ${bundleTeam?.sourceAssets}</td> </tr>
+			<tr><td nowrap>${bundleTeam?.rerackedAssets} of ${bundleTeam?.targetAssets}</td> </tr>
 			<tr><td nowrap class="odd">2/22m</td> </tr>
 			</table>
 			</td>
 			</g:each>
 			<td style="padding: 0px;border-right: 1px solid #333333">
 			<table style="border: 0;" >
-			<th nowrap>Cleaner</th>
-			<tr><td nowrap>Gunderson</td></tr>
-			<tr><td class="odd">Dallas1</td> </tr>
+			<th nowrap>${supportTeam?.cleaning.name}</th>
+			<tr><td nowrap>${supportTeam?.cleaningMembers}</td></tr>
+			<tr><td class="odd">${supportTeam?.cleaning.currentLocation}&nbsp;</td> </tr>
 			<tr><td nowrap>Exchg3</td> </tr>
-			<tr><td class="odd">${completed.sourceCleaned} of ${completed.totalAssets}</td> </tr>
-			<tr><td nowrap>${completed.targetCleaned} of ${completed.totalAssets}</td> </tr>
+			<tr><td class="odd">${supportTeam.sourceCleaned} of ${supportTeam.totalAssets}</td> </tr>
+			<tr><td nowrap>N/A</td> </tr>
 			<tr><td nowrap class="odd">1/10m</td> </tr>
 			</table>
 			</td>
 			<td style="padding: 0px;">
 			<table style="border: 0;" >
-			<th nowrap>Mover</th>
-			<tr><td nowrap>Gunderson</td></tr>
-			<tr><td class="odd">Dallas1</td> </tr>
+			<th nowrap>${supportTeam?.transport.name}</th>
+			<tr><td nowrap>${supportTeam?.transportMembers}</td></tr>
+			<tr><td class="odd">${supportTeam?.transport.currentLocation}&nbsp;</td> </tr>
 			<tr><td nowrap>Exchg3</td> </tr>
-			<tr><td class="odd">${completed.sourceMover} of ${completed.totalAssets}</td> </tr>
-			<tr><td nowrap>${completed.targetMover} of ${completed.totalAssets}</td> </tr>
+			<tr><td class="odd">${supportTeam.sourceMover} of ${supportTeam.totalAssets}</td> </tr>
+			<tr><td nowrap>${supportTeam.targetMover} of ${supportTeam.totalAssets}</td> </tr>
 			<tr><td nowrap class="odd">1/10m</td> </tr>
 			</table>
 			</td>
@@ -221,15 +255,15 @@
 	</table>
     </div>
     </td> 
-    <td valign="top" style="border-right: 1px solid #333333;padding: 0px;">
+    <td valign="top" style="border-right: 1px solid #333333;padding: 0px;width: 100px;">
      <div style=" float:left;">  
      <table style="width:100px; border: 0">
 			<th nowrap>TOTALS:</th>
 			<tr><td>&nbsp;</td> </tr>
 			<tr><td class="odd">&nbsp;</td> </tr>
 			<tr><td>&nbsp;</td> </tr>
-			<tr><td class="odd">51 of 154</td> </tr>
-			<tr><td nowrap>17 of 50</td> </tr>
+			<tr><td class="odd">${totalUnracked} of ${totalAsset}</td> </tr>
+			<tr><td nowrap>${totalReracked} of ${totalAsset}</td> </tr>
 			<tr><td class="odd">11/92m</td> </tr>
 			</table>
     </div>
@@ -268,12 +302,12 @@
 			</thead>
 			<tbody id="assetsTbody">
 				<g:each status="i" in="${assetsList}" var="assetsList">
-					<tr onclick="assetDetails('${assetsList?.asset.id}')">
-						<td>${assetsList?.asset.priority}</td>
+					<tr onclick="assetDetails('${assetsList?.asset.id}')" name="assetDetailRow" id="assetDetailRow_${assetsList?.asset.id}">
+						<td id="priorityCol_${assetsList?.asset.id}">${assetsList?.asset.priority}</td>
 						<td>${assetsList?.asset.assetName}</td>
-						<td>${assetsList?.status}</td>
+						<td id="statusCol_${assetsList?.asset.id}">${assetsList?.status}</td>
 						<td>${assetsList?.asset.sourceTeam.name}</td>
-						<td>${assetsList.asset.moveBundle.startTime}</td>
+						<td><tds:convertDateTime date="${assetsList.asset.moveBundle.startTime}" /></td>
 						<td>${assetsList.asset.sourceTeam.currentLocation}</td>
 						<td>not required</td>
 					</tr>
@@ -286,13 +320,20 @@
 		</div>
 		</td>
 		<td valign="top" style="padding: 0px;">
-		<div id="assetDetails" style="display: none;border: 1px solid #5F9FCF;width: 200px;">
+		<div id="assetDetails" style="border: 1px solid #5F9FCF;width: 200px;">
 		<div id="asset" >
+		<table style='border:0' ><thead><tr><th>Asset Details </th></tr></thead><tbody>
+		<tr><td><b>Asset Name : </b></td></tr>
+		<tr><td><b>Model :</b></td></tr>
+		<tr><td><b>Rack: </b></td></tr>
+		<tr><td><b>Status : </b></td></tr>
+		<tr><td><b>Assigned : </b></td></tr>
+		<tr><td><b>Recent Changes: </b></td></tr>
+		</tbody></table>
 		</div>
 		<div>
 		<g:form name="assetdetailsForm" >
 		<table style="border: 0">
-		
 			<tbody>
 			<tr><td> <b>Change :</b></td>
 			<td> <select id="stateSelectId" name="state" style="width: 100px" onchange="${remoteFunction(action:'getFlag', params:'\'toState=\'+ this.value +\'&fromState=\'+document.getElementById(\'currentStateId\').value', onComplete:'setComment(e)')}"></select> </td>
@@ -320,8 +361,8 @@
 			</tr>
 			<tr>
 			<td colspan="2" style="text-align: center;" class="buttonR">
-			<input type="button" value="Cancle"> 
-			<g:submitToRemote  action="createTransition" value="Submit" before="setCommentValidation();"/></td>
+			<!-- <input type="button" value="Cancle"> --> 
+			<g:submitToRemote  action="createTransition" value="Submit" before="setCommentValidation();" onComplete="updateAsset(e)"/></td>
 			</tr>
 			</tbody>
 		</table>
@@ -334,9 +375,9 @@
 </td></tr></table>
 </div>
 <script type="text/javascript">
-bundleChange()
+bundleChange();
+timedRefresh(document.getElementById("selectTimedId").value)
 </script>
-
 </div>
 </body>
 </html>

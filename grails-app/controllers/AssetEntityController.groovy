@@ -8,6 +8,7 @@ import grails.converters.JSON
 import org.jsecurity.SecurityUtils
 import com.tdssrc.eav.*
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import com.tdssrc.grails.GormUtil
 class AssetEntityController {	
     //TODO : Fix indentation
 	def missingHeader = ""
@@ -662,7 +663,7 @@ class AssetEntityController {
         render assetCommentsList as JSON
     }
     /*
-     * 	 To show the dashboard link page and processing
+     * 	 User to get the deatails for Supervisor Console
      */
     def dashboardView = {
         def projectId = params.projectId
@@ -671,7 +672,7 @@ class AssetEntityController {
         def bundleTeams = []
         def assetsList = []
         def totalAsset
-        def completed = new HashMap()
+        def supportTeam = new HashMap()
         def projectInstance = Project.findById( projectId )
         def moveBundleInstanceList = MoveBundle.findAll("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
         def moveBundleInstance
@@ -690,33 +691,47 @@ class AssetEntityController {
         }else{
             totalAsset = AssetEntity.findAllByMoveBundle(moveBundleInstance,params)
         }
-        def projectTeamList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = ${moveBundleInstance.id} order by pt.name asc")
-        def arrAsset
-        projectTeamList.each{
-            def teamMembers = partyRelationshipService.getBundleTeamMembersDashboard(it.id)
-            def member = teamMembers.delete((teamMembers.length()-1),teamMembers.length())
-            bundleTeams <<[team:it,members:member]
-        }
+        def projectTeamList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = ${moveBundleInstance.id} and pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport'  order by pt.name asc")
+        // Get Id for respective States
         def cleanedId = stateEngineService.getStateId("STD_PROCESS","Cleaned")
         def rerackedId = stateEngineService.getStateId("STD_PROCESS","Reracked")
         def onTruckId = stateEngineService.getStateId("STD_PROCESS","OnTruck")
         def stagedId = stateEngineService.getStateId("STD_PROCESS","Staged")
-        
+        def unrackedId = stateEngineService.getStateId("STD_PROCESS","Unracked")
+        projectTeamList.each{
+            def teamMembers = partyRelationshipService.getBundleTeamMembersDashboard(it.id)
+            def member = teamMembers.delete((teamMembers.length()-1),teamMembers.length())
+            def sourceAssets = ProjectAssetMap.findAll("from ProjectAssetMap where asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and sourceTeam = ${it.id} )" ).size()
+            def unrackedAssets = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $unrackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and sourceTeam = ${it.id} )" ).size()
+            def targetAssets = ProjectAssetMap.findAll("from ProjectAssetMap where asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and targetTeam = ${it.id} )" ).size()
+            def rerackedAssets = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $rerackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and targetTeam = ${it.id} )" ).size()
+            bundleTeams <<[team:it,members:member, sourceAssets:sourceAssets, unrackedAssets:unrackedAssets, targetAssets:targetAssets, rerackedAssets:rerackedAssets ]
+        }
         def sourceCleaned = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $cleanedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
-        def targetCleaned = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $rerackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
         def sourceMover = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $onTruckId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
         def targetMover = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $stagedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
-        completed.put("totalAssets", totalAsset.size() )
-        completed.put("sourceCleaned", sourceCleaned )
-        completed.put("targetCleaned", targetCleaned )
-        completed.put("sourceMover", sourceMover )
-        completed.put("targetMover", targetMover )
+        def cleaningTeam = ProjectTeam.findByTeamCode("Cleaning")
+        def transportTeam = ProjectTeam.findByTeamCode("Transport")
+        def cleaningMembers = partyRelationshipService.getBundleTeamMembersDashboard(cleaningTeam.id)
+        def transportMembers = partyRelationshipService.getBundleTeamMembersDashboard(transportTeam.id)
+        
+        supportTeam.put("totalAssets", totalAsset.size() )
+        supportTeam.put("sourceCleaned", sourceCleaned )
+        supportTeam.put("sourceMover", sourceMover )
+        supportTeam.put("targetMover", targetMover )
+        supportTeam.put("cleaning", cleaningTeam )
+        supportTeam.put("cleaningMembers", cleaningMembers.delete((cleaningMembers.length()-1),cleaningMembers.length()) )
+        supportTeam.put("transport", transportTeam )
+        supportTeam.put("transportMembers", transportMembers.delete((transportMembers.length()-1),transportMembers.length()) )
         totalAsset.each{
         	def projectAssetMap = ProjectAssetMap.findByAsset(it)
         	assetsList<<[asset: it, status: stateEngineService.getStateLabel("STD_PROCESS",projectAssetMap.currentStateId)]
         	
         }
-        return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams, assetsList:assetsList, moveBundleInstance:moveBundleInstance, completed:completed]
+        def totalUnracked = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $unrackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
+        def totalReracked = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $rerackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
+
+        return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams, assetsList:assetsList, moveBundleInstance:moveBundleInstance, supportTeam:supportTeam,totalUnracked:totalUnracked ? totalUnracked : 0, totalReracked:totalReracked ? totalReracked : 0, totalAsset:totalAsset.size()]
         		
     }
     /*
@@ -743,9 +758,9 @@ class AssetEntityController {
         def map = new HashMap()
         map.put("assetDetail",assetDetail)
         map.put("teamName",teamName)
-        map.put("currentState",state)
-        def sourceTeams = ProjectTeam.findAll("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and id not in ($assetDetail.targetTeam.id)")
-        def targetTeams = ProjectTeam.findAll("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and id not in ($assetDetail.sourceTeam.id)")
+        map.put("currentState",stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",state))))
+        def sourceTeams = ProjectTeam.findAll("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and id not in ($assetDetail.sourceTeam.id)")
+        def targetTeams = ProjectTeam.findAll("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and id not in ($assetDetail.targetTeam.id)")
         assetStatusDetails<<[ 'assetDetails':map, 'statesList':statesList, 'recentChanges':recentChanges, 'sourceTeams':sourceTeams,'targetTeams':targetTeams ]
         render assetStatusDetails as JSON
         		
@@ -764,19 +779,32 @@ class AssetEntityController {
      *  Used to create Transaction for Supervisor 
      */
     def createTransition = {
-    	def status = params.state
     	def assetId = params.asset
     	def assetEntity = AssetEntity.get(assetId)
-    	def assignTo = params.assignTo
-    	def projectTeam = ProjectTeam.get(assignTo)
-    	def comment = params.comment
-    	def principal = SecurityUtils.subject.principal
-    	def loginUser = UserLogin.findByUsername(principal)
-    	def transactionStatus = workflowService.createTransition("STD_PROCESS","SUPERVISOR", status, assetEntity, assetEntity.moveBundle, loginUser, projectTeam, comment )
-    	if ( transactionStatus.success ) {
-    		assetEntity.priority = params.priority
-    		assetEntity.save()
-        }
-    	//render params as JSON
+    	def assetList = []
+    	def statesList = []
+    	if(assetEntity){
+	    	def status = params.state
+	    	def assignTo = params.assignTo
+	    	def projectTeam = ProjectTeam.get(assignTo)
+	    	def comment = params.comment
+	    	def principal = SecurityUtils.subject.principal
+	    	def loginUser = UserLogin.findByUsername(principal)
+	    	def transactionStatus = workflowService.createTransition("STD_PROCESS","SUPERVISOR", status, assetEntity, assetEntity.moveBundle, loginUser, projectTeam, comment )
+	    	if ( transactionStatus.success ) {
+	    		def priority = params.priority
+	    		if(priority){
+                    assetEntity.priority = Integer.parseInt( priority )
+                    assetEntity.save()
+                    def validStates = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR", status)
+                    validStates.each{
+                        def id = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
+                        statesList<<[id:it,label:stateEngineService.getStateLabel("STD_PROCESS",id)]
+                    }
+                    assetList <<['assetEntity':assetEntity,'statesList':statesList,'status':stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",status))) ]
+	    		}
+	        }
+    	}
+    	render assetList as JSON
     }
 }
