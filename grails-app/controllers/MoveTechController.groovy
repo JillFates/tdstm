@@ -1,12 +1,13 @@
-s/*
+/*
  * MoveTech Login 
- */
+*/
 import org.jsecurity.authc.AuthenticationException
 import org.jsecurity.authc.UsernamePasswordToken
 import org.jsecurity.SecurityUtils
 import grails.converters.JSON
+
 class MoveTechController {
-	def jsecSecurityManager
+    def jsecSecurityManager
     def userPreferenceService
     def stateEngineService
     def workflowService
