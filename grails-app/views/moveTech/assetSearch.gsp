@@ -3,7 +3,7 @@
 <head>
 <title>Asset</title>
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}" />
 <link rel="shortcut icon"
 	href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 	<link type="text/css" rel="stylesheet"
@@ -129,7 +129,7 @@
 <div class="mainbody" style="width: 100%;">
 <div class="colum_techlogin" style="float:left;">
 <div style="float: left; width: 100%; margin-left: 20px;"><g:link
-	params='["bundle":bundle,"team":team,"location":location,"project":project]'
+	params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt"]'
 	style="height:26px; width:64px; float:left; margin:auto 0px;">
 	<img src="${createLinkTo(dir:'images',file:'home.png')}" border="0" />
 </g:link> <g:link action="assetTask"
@@ -152,6 +152,7 @@
 							<input name="search" type="hidden" value="${search}"  />
 							<input name="assetCommt" type="hidden" value="${assetCommt}"  />
 							<input name="label" type="hidden" value="${label}"  />
+							<input name="user" type="hidden" value="${mt}"  />
 <table style="border:0px;" >
 
 <div id="mydiv" onclick="document.getElementById('mydiv').style.display = 'none';">

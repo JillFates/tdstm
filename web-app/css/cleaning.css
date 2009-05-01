@@ -1,0 +1,43 @@
+
+.colum_techlogin{
+	width:292px;
+	height:auto;
+	margin:20px auto;
+	
+
+}
+
+.w_techlog{
+	width:240px;
+	height:380px;
+	float:left;
+	border:1px solid #5F9FCF;
+	padding:0px;
+
+}
+
+.asset_hold{
+	background-color:#FFFF00;
+	color:black;
+}
+
+.asset_ready{
+	background-color:#008000;
+	color:black;
+}
+
+.asset_process{
+	background-color:#00FFFF;
+	color:black;
+}
+
+.asset_pending{
+	background-color:#FFFFFF;
+	color:black;
+}
+
+.asset_done{
+	background-color:#FFFFFF;
+	text-decoration: line-through;
+	color:black;
+}

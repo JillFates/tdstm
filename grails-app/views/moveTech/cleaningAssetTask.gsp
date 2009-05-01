@@ -4,7 +4,7 @@
 		<title>My Tasks</title>
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}" />
 <link type="text/css" rel="stylesheet"
 	href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
 <link type="text/css" rel="stylesheet"
@@ -94,7 +94,7 @@
 				<div class="colum_techlogin" style="float:left;">
 				<div style="float:left; width:100%; margin-left:20px;">
               									
-		              									<g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt"]' style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'home.png')}" border="0"/></g:link>
+		              									<g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"ct"]' style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'home.png')}" border="0"/></g:link>
 							              				
               											<a href="#" style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'my_task_h.png')}" border="0" /><a>
               											
@@ -103,7 +103,7 @@
 								              	</div>			
 				<div class="w_techlog" style="overflow-y: scroll; overflow-x: none;">
 				
-      					<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">
+      					<g:form method="post" name="bundleTeamAssetForm" action="cleaningAssetSearch">
       					
 					        <input name="bundle" type="hidden" value="${bundle}" />
 							<input name="team" type="hidden" value="${team}" />
@@ -115,8 +115,8 @@
 								            <div style="float:left; width:100%; margin:5px 0; ">              								
               								   <table style="border:0px;">
 								            		<tr>
-								            		<td ><g:link style="color: #328714; border:1px solid #328714; margin:5px; background:#ffffff;" action="assetTask" style="color: #328714" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo(${todoSize})</g:link></td>
-								            		<td><g:link  style="color: #328714; border:1px solid #328714; margin:5px; background:#ffffff;" action="assetTask" style="color: #328714" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All(${allSize})</g:link></td>
+								            		<td ><g:link style="color: #328714; border:1px solid #328714; margin:5px; background:#ffffff;" action="cleaningAssetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo(${todoSize})</g:link></td>
+								            		<td><g:link  style="color: #328714; border:1px solid #328714; margin:5px; background:#ffffff;" action="cleaningAssetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All(${allSize})</g:link></td>
 								            		<td style="text-align:right;"><input  type="text" size="8" value="" name="search" style="background:url(${createLinkTo(dir:'images',file:'search.png')}) no-repeat center right;"/></td></tr>
 								               </table>
 								            </div>  
@@ -160,9 +160,6 @@
   </div>
   </div>
   
-
-  
-    
   </body>
 
 </html>
