@@ -22,6 +22,8 @@
 	href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
 <link type="text/css" rel="stylesheet"
 	href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" />
+<link type="text/css" rel="stylesheet"
+	href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 
 <jq:plugin name="ui.core" />
 <jq:plugin name="ui.draggable" />
@@ -46,6 +48,7 @@
 	   		rows[i].style.backgroundColor = '#FFFFFF'
 	   }
 	   document.getElementById('assetDetailRow_'+assetId).style.backgroundColor = '#65a342';
+	   timedRefresh('never')
 	   ${remoteFunction(action:'assetDetails', params:'\'assetId=\'+ assetId ' , onComplete:'getAssetDetail(e)') }
    
    }
@@ -71,7 +74,7 @@
 	   	var sourceObj = document.getElementById("sourceAssignTo")
 	   	var targetObj = document.getElementById("targetAssignTo")
    		var l = teamObj.length
-	   	while (l > 0) {
+	   	while (l > 1) {
 			l--
 		    teamObj.remove(l)
 		}
@@ -80,7 +83,7 @@
 	      var team = asset[0].sourceTeams[i]
 	      var popt = document.createElement('option');
 		  popt.innerHTML = team.name
-	      popt.value = team.id
+	      popt.value = "s/"+team.id
 	      try {
 	      sourceObj.appendChild(popt, null) // standards compliant; doesn't work in IE
 	      } catch(ex) {
@@ -92,7 +95,7 @@
 	      var team = asset[0].targetTeams[i]
 	      var popt = document.createElement('option');
 		  popt.innerHTML = team.name
-	      popt.value = team.id
+	      popt.value = "t/"+team.id
 	      try {
 	      targetObj.appendChild(popt, null) // standards compliant; doesn't work in IE
 	      } catch(ex) {
@@ -121,8 +124,10 @@
 	   	}
    	}
    	function timedRefresh(timeoutPeriod) {
-   	alert(timeoutPeriod)
+   		if(timeoutPeriod != 'never'){
 		setTimeout("location.reload(false);",timeoutPeriod);
+		document.getElementById("timeToRefresh").value = timeoutPeriod;
+		}
 		document.getElementById("selectTimedId").value = timeoutPeriod; 
 	}
 	function updateAsset(e){
@@ -132,11 +137,12 @@
 		document.getElementById('priorityCol_'+asset[0].assetEntity.id).innerHTML = asset[0].assetEntity.priority 
 		document.getElementById('statusCol_'+asset[0].assetEntity.id).innerHTML = asset[0].status
 		}
+		timedRefresh(document.getElementById('timeToRefresh').value)
 	}
 	function createOptions(statesList){
 		var statusObj = document.getElementById("stateSelectId")
    		var l = statusObj.length
-	   	while (l > 0) {
+	   	while (l > 1) {
 			l--
 		    statusObj.remove(l)
 		}
@@ -186,8 +192,10 @@
 	<option value="180000">3 min</option> 
 	<option value="240000">4 min</option> 
 	<option value="300000">5 min</option> 
-	<option value="0">Never</option> 
-	</select> </td>
+	<option value="never">Never</option> 
+	</select> 
+	<input type="hidden" id="timeToRefresh">
+	</td>
 	</tr>
 	</table>
 	</div>
@@ -292,18 +300,20 @@
 					<g:sortableColumn property="loc" title="Loc" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
 					<g:sortableColumn property="issues" title="Issues" /> -->
 					<th>Priority</th>
+					<th>Asset Tag</th>
 					<th>Asset Name</th>
 					<th>Status</th>
 					<th>Team</th>
-					<th>Stat</th>
+					<th>Start</th>
 					<th>Loc</th>
 					<th>Issues</th>
 				</tr>
 			</thead>
 			<tbody id="assetsTbody">
 				<g:each status="i" in="${assetsList}" var="assetsList">
-					<tr onclick="assetDetails('${assetsList?.asset.id}')" name="assetDetailRow" id="assetDetailRow_${assetsList?.asset.id}">
+					<tr onclick="assetDetails('${assetsList?.asset.id}')" name="assetDetailRow" id="assetDetailRow_${assetsList?.asset.id}" class="asset_${assetsList?.status}">
 						<td id="priorityCol_${assetsList?.asset.id}">${assetsList?.asset.priority}</td>
+						<td>${assetsList?.asset.assetTag}</td>
 						<td>${assetsList?.asset.assetName}</td>
 						<td id="statusCol_${assetsList?.asset.id}">${assetsList?.status}</td>
 						<td>${assetsList?.asset.sourceTeam.name}</td>
@@ -336,7 +346,9 @@
 		<table style="border: 0">
 			<tbody>
 			<tr><td> <b>Change :</b></td>
-			<td> <select id="stateSelectId" name="state" style="width: 100px" onchange="${remoteFunction(action:'getFlag', params:'\'toState=\'+ this.value +\'&fromState=\'+document.getElementById(\'currentStateId\').value', onComplete:'setComment(e)')}"></select> </td>
+			<td> <select id="stateSelectId" name="state" style="width: 100px" onchange="${remoteFunction(action:'getFlag', params:'\'toState=\'+ this.value +\'&fromState=\'+document.getElementById(\'currentStateId\').value', onComplete:'setComment(e)')}">
+			<option value="">Status</option>
+			</select> </td>
 			</tr>
 			<tr><td><input type="hidden" name="asset" id="assetId" value=""> &nbsp;</td>
 			<td>
@@ -345,11 +357,12 @@
 			<option value="2">Normal</option>
 			<option value="3">Low</option>
 			</select> -->
-			<g:select id="priorityId" name="priority" from="${AssetEntity.constraints.priority.inList}" style="width: 100px"></g:select>
+			<g:select id="priorityId" name="priority" from="${AssetEntity.constraints.priority.inList}" style="width: 100px" noSelection="['':'Priority ']"></g:select>
 			 </td>
 			</tr>
 			<tr><td><input type="hidden" name="currentState" id="currentStateId" value="">&nbsp;</td>
 			<td> <select id="assignToId" name="assignTo" style="width: 100px">
+			<option value="">Move Team</option>
 			<optgroup label="Source" id="sourceAssignTo"></optgroup>
 			<optgroup label="Target" id="targetAssignTo"></optgroup>
 			</select> </td>
@@ -361,7 +374,7 @@
 			</tr>
 			<tr>
 			<td colspan="2" style="text-align: center;" class="buttonR">
-			<!-- <input type="button" value="Cancle"> --> 
+			 <input type="button" value="Cancle" onclick="timedRefresh(document.getElementById('timeToRefresh').value)">
 			<g:submitToRemote  action="createTransition" value="Submit" before="setCommentValidation();" onComplete="updateAsset(e)"/></td>
 			</tr>
 			</tbody>

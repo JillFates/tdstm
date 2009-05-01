@@ -49,10 +49,10 @@ class WorkflowService {
 	    				message = "Unable to create AssetTransition: " + GormUtil.allErrorsString( assetTransition )
 	    			} else {
 	    				message = "Transaction created successfully"
-	    				
+	    				if(projectTeam){
     	        		projectTeam.isIdle = flag.contains('busy') ? 1 : 0
     	        		projectTeam.save()
-
+	    				}
 	    				projectAssetMap.currentStateId = Integer.parseInt(stateEngineService.getStateId( process, toState ))
 	    				projectAssetMap.save()
 
