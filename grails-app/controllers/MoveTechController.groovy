@@ -174,22 +174,17 @@ class MoveTechController {
 					
             }
             if(it.currentStateId == holdState){
-                colorCss = "casset_hold"
+                colorCss = "asset_hold"
             }else if(it.currentStateId == rdyState){
-                colorCss = "basset_ready"
+                colorCss = "asset_ready"
             }else if(it.currentStateId == ipState){
-                colorCss = "easset_process"
+                colorCss = "asset_process"
             }else if((it.currentStateId > holdState) && (it.currentStateId < rdyState) ){
                 colorCss = "asset_pending"
             }else if((it.currentStateId >= rdyState)){
-                colorCss = "dasset_done"
+                colorCss = "asset_done"
             }
             assetList<<[item:it,cssVal:colorCss]
-           
-            
-        }
-        assetList.sort{
-        	it.cssVal
         }
         if(tab == "All"){
             query.append("and pam.currentStateId < ${stateVal}")
