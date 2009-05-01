@@ -40,13 +40,32 @@
 
   <script type="text/javascript">
         function serverInfo(e){
-        
-        var asset = eval('(' + e.responseText + ')');       
+        var loc = document.bundleTeamAssetForm.location.value;
+        var location;
+        var room;
+        var rack;
+        var pos;  
+       
+        var asset = eval('(' + e.responseText + ')'); 
+         if(loc == 's'){
+        location = asset.sourceLocation
+        room = asset.sourceRoom
+         rack = asset.sourceRack
+         pos = asset.sourceRackPosition
+          }else{
+          location = asset.targetLocation
+        room = asset.targetRoom
+         rack = asset.targetRack
+         pos = asset.targetRackPosition
+          }           
         var htmlBody = '<table ><thead></thead><tbody>'+
 '<tr><td>Name:  '+asset.assetName+'</td></tr>'+
 '<tr><td>Asset Tag:  '+asset.assetTag+'</td></tr>'+
 '<tr><td>Serial Number:  '+asset.serialNumber+'</td></tr>'+
 '<tr><td>Model:  '+asset.model+'</td></tr>'+
+'<tr><td>Location:  '+location+'</td></tr>'+
+'<tr><td>Room:  '+room+'</td></tr>'+
+'<tr><td>Rack/Position:  '+rack+'/'+pos+'</td></tr>'+
 '<tr><td>PDU:  '+asset.powerPort+'</td></tr>'+
 '<tr><td>NIC:  '+asset.nicPort+'</td></tr>'+
 '<tr><td>HBA:  '+asset.hbaPort+'</td></tr>'+
@@ -57,11 +76,14 @@
 		 $("#serverInfoDialog").dialog('option', 'position', ['left','center']);
         $('#serverInfoDialog').dialog('open');
         }
+        function setFocus(){
+        document.bundleTeamAssetForm.search.focus();
+        }
         </script>      
         
 </head>
-<body>
-<div id="serverInfoDialog" title ="Server Info" onclick="$('#serverInfoDialog').dialog('close')">
+<body onload="setFocus()">
+<div id="serverInfoDialog" title ="Server Info" onclick="$('#serverInfoDialog').dialog('close');setFocus()">
   
 			
     </div>
@@ -88,9 +110,7 @@
 							<input name="location" type="hidden" value="${location}" />
 							<input name="project" type="hidden" value="${project}" />
 							<input name="tab" type="hidden" value="Todo" />
-							<input name="assetList" type="hidden" value="${assetList}" />
-							<input name="allSize" type="hidden" value="${allSize}" />
-							<input name="todoSize" type="hidden" value="${todoSize}" />
+							
 								              	
 								            <div style="float:left; width:100%; margin:5px 0; ">              								
               								   <table style="border:0px;">
@@ -100,9 +120,11 @@
 								            		<td style="text-align:right;"><input  type="text" size="8" value="" name="search" style="background:url(${createLinkTo(dir:'images',file:'search.png')}) no-repeat center right;"/></td></tr>
 								               </table>
 								            </div>  
+		<div id="mydiv" onclick="document.getElementById('mydiv').style.display = 'none';setFocus()">						            
 			   <g:if test="${flash.message}">
 	<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
-</g:if> 		
+</g:if> 
+</div>		
            <div style="float:left; width:100%; margin:5px 0; "><b>My Tasks:</b></div>
             <div id="assetTable"style="float:left;width:100%; ">
             <div  style=" width:100%; ">

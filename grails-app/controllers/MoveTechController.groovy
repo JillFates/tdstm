@@ -1,4 +1,4 @@
-/*
+s/*
  * MoveTech Login 
  */
 import org.jsecurity.authc.AuthenticationException
@@ -9,6 +9,7 @@ class MoveTechController {
 	def jsecSecurityManager
     def userPreferenceService
     def stateEngineService
+    def workflowService
     def index = {	
 			
         def partyGroupInstance = PartyGroup.findById(params.team)        
@@ -172,17 +173,22 @@ class MoveTechController {
 					
             }
             if(it.currentStateId == holdState){
-                colorCss = "asset_hold"
+                colorCss = "casset_hold"
             }else if(it.currentStateId == rdyState){
-                colorCss = "asset_ready"
+                colorCss = "basset_ready"
             }else if(it.currentStateId == ipState){
-                colorCss = "asset_process"
+                colorCss = "easset_process"
             }else if((it.currentStateId > holdState) && (it.currentStateId < rdyState) ){
                 colorCss = "asset_pending"
             }else if((it.currentStateId >= rdyState)){
-                colorCss = "asset_done"
+                colorCss = "dasset_done"
             }
             assetList<<[item:it,cssVal:colorCss]
+           
+            
+        }
+        assetList.sort{
+        	it.cssVal
         }
         if(tab == "All"){
             query.append("and pam.currentStateId < ${stateVal}")
@@ -196,24 +202,57 @@ class MoveTechController {
 			
         def assetId = params.assetId        
         def assetItem = AssetEntity.findById(assetId)
+        if(assetItem.sourceLocation == null)
+        assetItem.sourceLocation = ""
+        if(assetItem.sourceRoom == null)
+        assetItem.sourceRoom = ""
+        if(assetItem.sourceRack == null)
+        assetItem.sourceRack = ""
+        if(assetItem.sourceRackPosition == null)
+        assetItem.sourceRackPosition = ""
+        if(assetItem.targetLocation == null)
+        assetItem.targetLocation = ""
+        if(assetItem.targetRoom == null)
+        assetItem.targetRoom = ""
+        if(assetItem.targetRack == null)
+        assetItem.targetRack = ""
+        if(assetItem.targetRackPosition == null)
+        assetItem.targetRackPosition = ""        
+        if(assetItem.assetName == null)
+        assetItem.assetName = ""
+        if(assetItem.assetTag == null)
+        assetItem.assetTag = ""
+        if(assetItem.serialNumber == null)
+        assetItem.serialNumber = ""
+        if(assetItem.model == null)
+        assetItem.model = ""
+        if(assetItem.powerPort == null)
+        assetItem.powerPort = ""
+        if(assetItem.nicPort == null)
+        assetItem.nicPort = ""
+        if(assetItem.hbaPort == null)
+        assetItem.hbaPort = ""
+        
         render assetItem as JSON
 	}
 	
 	def assetSearch = {
-			
         def assetItem
         def assetCommt
         def projMap
         def team = params.team
-        def assetId = params.search
+        def search = params.search
         def stateVal
         def taskList
-        if(assetId != null){
-			assetItem = AssetEntity.findByAssetTag(assetId)					
+        def holdTask
+        def taskSize
+        def label
+        if(search != null){
+			assetItem = AssetEntity.findByAssetTag(search)					
 			
 			
 			if(assetItem == null){			
-				flash.message = message(code :"Asset Tag number '${assetId}' was not located")
+				flash.message = message(code :"Asset Tag number '${search}' was not located")
 				redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
 			}else{
 				def bundleName = assetItem.moveBundle.name
@@ -222,29 +261,78 @@ class MoveTechController {
 			
                 if(bundleName != params.bundle){
                     flash.message = message(code :"The asset [${assetItem.assetName}] is not part of move bundle [${params.bundle}]")
-             redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                    redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
                 }else if(teamId != params.team){
                     flash.message = message(code :"The asset [${assetItem.assetName}] is assigned to team [${teamName}]")
-			    redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                    redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
                 }else{
                     projMap = ProjectAssetMap.findByAsset(assetItem)
-                    stateVal = stateEngineService.getState("STD_PROCESS",projMap.currentStateId)                     
+                    stateVal = stateEngineService.getState("STD_PROCESS",projMap.currentStateId)
+                    if(stateVal == "Hold"){
+                    	flash.message = message(code :"The asset is on Hold. Please contact manager to resolve issue.")
+                    	redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                    }
                     taskList = stateEngineService.getTasks("STD_PROCESS","MOVE_TECH",stateVal)                  
-                   
-                    if(taskList.size() == 1){
+                    taskSize = taskList.size()
+                    if(taskSize == 1){
                     	if(taskList.contains("Hold")){
                     		flash.message = message(code :"There is a problem with this asset. Place the asset on hold to alert the move coordinator")	
-                    		
+                    		holdTask = 1
                     	}
                     	
+                    }else if(taskSize > 1) {
+                    	taskList.each{
+                    		if(it != "Hold"){
+                                label =	stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it)))
+                    		}
+                    			
+                    	}
                     }
                     assetCommt = AssetComment.findAllByAssetEntity(assetItem)
-				 render(view:'assetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location])
+                    render(view:'assetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,holdTask:holdTask,search:params.search,label:label])
                 }
 			}
         }
        
 
+	}
+	
+	def placeHold = {
+        def asset = AssetEntity.findByAssetTag(params.search)
+        def bundle = asset.moveBundle
+        def principal = SecurityUtils.subject.principal
+        def loginUser = UserLogin.findByUsername(principal)
+        def team
+        if(params.location == 's'){
+            team = asset.sourceTeam
+        }else{
+            team = asset.targetTeam
+        }
+			
+        def workflow = workflowService.createTransition("STD_PROCESS","MOVE_TECH","Hold",asset,bundle,loginUser,team,params.assetCommt)
+        if(workflow.success){
+			redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+        }
+	}
+	
+	def unRack = {
+        def asset = AssetEntity.findByAssetTag(params.search)
+        def bundle = asset.moveBundle
+        def label = params.label
+        def principal = SecurityUtils.subject.principal
+        def loginUser = UserLogin.findByUsername(principal)
+        def team
+        if(params.location == 's'){
+            team = asset.sourceTeam
+        }else{
+            team = asset.targetTeam
+        }
+			
+        def workflow = workflowService.createTransition("STD_PROCESS","MOVE_TECH",label,asset,bundle,loginUser,team,params.assetCommt)
+        if(workflow.success){
+			redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+        }
+			
 	}
 	
 }
