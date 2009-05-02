@@ -45,9 +45,13 @@
 		    rows = document.getElementById('assetsTbody').childNodes
 		}
 	   for(i = 0 ; i<rows.length ; i++){
-	   		rows[i].style.backgroundColor = '#FFFFFF'
+	   	var cls = rows[i].getAttribute("class")
+	   	if(cls != 'asset_Hold'){
+	   		rows[i].setAttribute("class",'asset_pending')
+	   	}
 	   }
-	   document.getElementById('assetDetailRow_'+assetId).style.backgroundColor = '#65a342';
+	   var rowColor =  document.getElementById('assetDetailRow_'+assetId)
+	   rowColor.setAttribute("class",'asset_select');
 	   timedRefresh('never')
 	   ${remoteFunction(action:'assetDetails', params:'\'assetId=\'+ assetId ' , onComplete:'getAssetDetail(e)') }
    
@@ -55,7 +59,7 @@
    function getAssetDetail(e){
 	   	var asset = eval("(" + e.responseText + ")")
 	   	document.assetdetailsForm.asset.value = asset[0].assetDetails.assetDetail.id
-	   	document.assetdetailsForm.currentState.value = asset[0].assetDetails.currentState
+	   	document.assetdetailsForm.currentState.value = asset[0].assetDetails.state
 	    var tableBody = '<table style=\'border:0\' ><thead><tr><th>Asset Details </th></tr></thead><tbody>'+
 		'<tr><td><b>Asset Name : </b>'+asset[0].assetDetails.assetDetail.assetName+'</td></tr>'+
 		'<tr><td><b>Model : </b>'+asset[0].assetDetails.assetDetail.model+'</td></tr>'+
@@ -69,8 +73,31 @@
 		tableBody += '</tbody></table>'
 	    var selectObj = document.getElementById('asset')
 	   	selectObj.innerHTML = tableBody
-	   	createOptions(asset[0].statesList)
-	   	var teamObj = document.getElementById("assignToId")
+	   	createStateOptions(asset[0].statesList)
+	   	createAssighToOptions(asset[0].sourceTeams,asset[0].targetTeams)
+   	}
+   	function createStateOptions(statesList){
+		var statusObj = document.getElementById("stateSelectId")
+   		var l = statusObj.length
+	   	while (l > 1) {
+			l--
+		    statusObj.remove(l)
+		}
+		var length = statesList.length
+	    for (var i=0; i < length; i++) {
+	      var state = statesList[i]
+	      var popt = document.createElement('option');
+		  popt.innerHTML = state.label
+	      popt.value = state.id
+	      try {
+	      statusObj.appendChild(popt, null) // standards compliant; doesn't work in IE
+	      } catch(ex) {
+	      statusObj.appendChild(popt) // IE only
+	      }
+		}
+	}
+   	function createAssighToOptions(sourceTeams,targetTeams){
+   		var teamObj = document.getElementById("assignToId")
 	   	var sourceObj = document.getElementById("sourceAssignTo")
 	   	var targetObj = document.getElementById("targetAssignTo")
    		var l = teamObj.length
@@ -78,9 +105,9 @@
 			l--
 		    teamObj.remove(l)
 		}
-		var sourceLength = asset[0].sourceTeams.length
+		var sourceLength = sourceTeams.length
 	    for (var i=0; i < sourceLength; i++) {
-	      var team = asset[0].sourceTeams[i]
+	      var team = sourceTeams[i]
 	      var popt = document.createElement('option');
 		  popt.innerHTML = team.name
 	      popt.value = "s/"+team.id
@@ -90,9 +117,9 @@
 	      sourceObj.appendChild(popt) // IE only
 	      }
 		}
-		var targetLength = asset[0].targetTeams.length
+		var targetLength = targetTeams.length
 	    for (var i=0; i < targetLength; i++) {
-	      var team = asset[0].targetTeams[i]
+	      var team = targetTeams[i]
 	      var popt = document.createElement('option');
 		  popt.innerHTML = team.name
 	      popt.value = "t/"+team.id
@@ -103,7 +130,6 @@
 	      }
 		}
    	}
-   
    	function bundleChange(){  
 	   var bundleID = ${moveBundleInstance.id}; 
 	   document.getElementById("moveBundleId").value =  bundleID; 
@@ -133,31 +159,16 @@
 	function updateAsset(e){
 		var asset = eval("(" + e.responseText + ")")
 		if(asset[0]){
-		createOptions(asset[0].statesList)
+		createStateOptions(asset[0].statesList)
+		createAssighToOptions(asset[0].sourceTeams,asset[0].targetTeams)
 		document.getElementById('priorityCol_'+asset[0].assetEntity.id).innerHTML = asset[0].assetEntity.priority 
 		document.getElementById('statusCol_'+asset[0].assetEntity.id).innerHTML = asset[0].status
+		document.getElementById('source_'+asset[0].assetEntity.id).innerHTML = asset[0].sourceTeam
+		document.getElementById('target_'+asset[0].assetEntity.id).innerHTML = asset[0].targetTeam
+		if(asset[0].status == 'Hold')
+		document.getElementById('assetDetailRow_'+asset[0].assetEntity.id).setAttribute('class','asset_Hold')
 		}
 		timedRefresh(document.getElementById('timeToRefresh').value)
-	}
-	function createOptions(statesList){
-		var statusObj = document.getElementById("stateSelectId")
-   		var l = statusObj.length
-	   	while (l > 1) {
-			l--
-		    statusObj.remove(l)
-		}
-		var length = statesList.length
-	    for (var i=0; i < length; i++) {
-	      var state = statesList[i]
-	      var popt = document.createElement('option');
-		  popt.innerHTML = state.label
-	      popt.value = state.id
-	      try {
-	      statusObj.appendChild(popt, null) // standards compliant; doesn't work in IE
-	      } catch(ex) {
-	      statusObj.appendChild(popt) // IE only
-	      }
-		}
 	}
     </script>
 </head>
@@ -207,9 +218,9 @@
 <div style="width:100%; float:left; border-left:1px solid #333333;">
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
   <tr>
-    <td valign="top" style="border-right: 1px solid #333333;padding: 0px;width: 100px;">
-     <div style="width:100px; float:left;">  
-     <table style="border: 0">
+    <td valign="top" style="border-right: 1px solid #333333;padding: 0px;width: 15%;">
+     <div style="width:100%;; float:left;">  
+     <table style="border: 0;width:100%;">
 			<th>TEAMS:</th>
 			<tr><td>Names</td> </tr>
 			<tr><td class="odd">Location</td> </tr>
@@ -220,7 +231,7 @@
 			</table>
     </div>
     </td>
-    <td valign="top" style="border-right: 1px solid #333333;padding: 0px;">
+    <td valign="top" style="border-right: 1px solid #333333;padding: 0px; width:70%;">
     <div style="width:750px; float:left; overflow:auto;">
 	<table width="100%" style="border: 0;" cellspacing="0" cellpadding="0">
 	  <tr>
@@ -263,9 +274,9 @@
 	</table>
     </div>
     </td> 
-    <td valign="top" style="border-right: 1px solid #333333;padding: 0px;width: 100px;">
-     <div style=" float:left;">  
-     <table style="width:100px; border: 0">
+    <td valign="top" style="border-right: 1px solid #333333;padding: 0px;width: 15%;">
+     <div style=" float:left;width:100%;">  
+     <table style="width:100%; border: 0">
 			<th nowrap>TOTALS:</th>
 			<tr><td>&nbsp;</td> </tr>
 			<tr><td class="odd">&nbsp;</td> </tr>
@@ -289,7 +300,6 @@
 		<td valign="top" style="padding: 0px;">
 		<div class="list" >
 		<g:form name="assetListForm">		
-		
 		<table>
 			<thead>
 				<tr>
@@ -303,20 +313,23 @@
 					<th>Asset Tag</th>
 					<th>Asset Name</th>
 					<th>Status</th>
-					<th>Team</th>
+					<th>Source Team</th>
+					<th>Target Team</th>
 					<th>Start</th>
 					<th>Loc</th>
 					<th>Issues</th>
 				</tr>
 			</thead>
 			<tbody id="assetsTbody">
+			
 				<g:each status="i" in="${assetsList}" var="assetsList">
 					<tr onclick="assetDetails('${assetsList?.asset.id}')" name="assetDetailRow" id="assetDetailRow_${assetsList?.asset.id}" class="asset_${assetsList?.status}">
 						<td id="priorityCol_${assetsList?.asset.id}">${assetsList?.asset.priority}</td>
 						<td>${assetsList?.asset.assetTag}</td>
 						<td>${assetsList?.asset.assetName}</td>
 						<td id="statusCol_${assetsList?.asset.id}">${assetsList?.status}</td>
-						<td>${assetsList?.asset.sourceTeam.name}</td>
+						<td id="source_${assetsList?.asset.id}">${assetsList?.asset.sourceTeam?.name}</td>
+						<td id="target_${assetsList?.asset.id}">${assetsList?.asset.targetTeam?.name}</td>
 						<td><tds:convertDateTime date="${assetsList.asset.moveBundle.startTime}" /></td>
 						<td>${assetsList.asset.sourceTeam.currentLocation}</td>
 						<td>not required</td>

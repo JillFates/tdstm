@@ -751,7 +751,7 @@ class AssetEntityController {
         def currentState = ProjectAssetMap.findByAsset(assetDetail).currentStateId
         def state = stateEngineService.getState("STD_PROCESS",currentState)
         def validStates = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR", state)
-        validStates.each{
+        validStates.sort().each{
         	def id = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
         	statesList<<[id:it,label:stateEngineService.getStateLabel("STD_PROCESS",id)]
         }
@@ -759,6 +759,7 @@ class AssetEntityController {
         map.put("assetDetail",assetDetail)
         map.put("teamName",teamName)
         map.put("currentState",stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",state))))
+        map.put("state",state)
         def sourceTeams = ProjectTeam.findAll("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and id != $assetDetail.sourceTeam.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
         def targetTeams = ProjectTeam.findAll("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and id != $assetDetail.targetTeam.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
         assetStatusDetails<<[ 'assetDetails':map, 'statesList':statesList, 'recentChanges':recentChanges, 'sourceTeams':sourceTeams,'targetTeams':targetTeams ]
@@ -807,11 +808,15 @@ class AssetEntityController {
 		    		}
 		    		assetEntity.save()
                     def validStates = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR", status)
-                    validStates.each{
+                    validStates.sort().each{
                         def id = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
                         statesList<<[id:it,label:stateEngineService.getStateLabel("STD_PROCESS",id)]
                     }
-		    		assetList <<['assetEntity':assetEntity,'statesList':statesList,'status':stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",status))) ]
+		    		def sourceTeam = assetEntity.sourceTeam.name
+		    		def targetTeam = assetEntity.targetTeam.name
+		    		def sourceTeams = ProjectTeam.findAll("from ProjectTeam where moveBundle = $assetEntity.moveBundle.id and id != $assetEntity.sourceTeam.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
+		            def targetTeams = ProjectTeam.findAll("from ProjectTeam where moveBundle = $assetEntity.moveBundle.id and id != $assetEntity.targetTeam.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
+		    		assetList <<['assetEntity':assetEntity, 'sourceTeam':sourceTeam, 'targetTeam':targetTeam, 'sourceTeams':sourceTeams,'targetTeams':targetTeams, 'statesList':statesList,'status':stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",status))) ]
 		        }
 	    	}
     	}
