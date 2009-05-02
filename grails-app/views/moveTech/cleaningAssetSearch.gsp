@@ -65,21 +65,21 @@
         pos = asset.targetRackPosition
         }     
         var htmlBody = '<table ><thead></thead><tbody>'+
-		'<tr><td>Name:  '+asset.assetName+'</td></tr>'+
-		'<tr><td>Asset Tag:  '+asset.assetTag+'</td></tr>'+
-		'<tr><td>Serial Number:  '+asset.serialNumber+'</td></tr>'+
-		'<tr><td>Model:  '+asset.model+'</td></tr>'+
-		'<tr><td>Location:  '+location+'</td></tr>'+
-		'<tr><td>Room:  '+room+'</td></tr>'+
-		'<tr><td>Rack/Position:  '+rack+'/'+pos+'</td></tr>'+
-		'<tr><td>PDU:  '+asset.powerPort+'</td></tr>'+
-		'<tr><td>NIC:  '+asset.nicPort+'</td></tr>'+
-		'<tr><td>HBA:  '+asset.hbaPort+'</td></tr>'+
+        '<tr><td style="font-size:9px">Asset Tag:  '+asset.assetTag+'</td></tr>'+
+		'<tr><td style="font-size:9px">Asset Name:  '+asset.assetName+'</td></tr>'+		
+		'<tr><td style="font-size:9px">Serial Number:  '+asset.serialNumber+'</td></tr>'+
+		'<tr><td style="font-size:9px">Model:  '+asset.model+'</td></tr>'+
+		'<tr><td style="font-size:9px">Location:  '+location+'</td></tr>'+
+		'<tr><td style="font-size:9px">Room:  '+room+'</td></tr>'+
+		'<tr><td style="font-size:9px">Rack/Position:  '+rack+'/'+pos+'</td></tr>'+
+		'<tr><td style="font-size:9px">PDU:  '+asset.powerPort+'</td></tr>'+
+		'<tr><td style="font-size:9px">NIC:  '+asset.nicPort+'</td></tr>'+
+		'<tr><td style="font-size:9px">HBA:  '+asset.hbaPort+'</td></tr>'+
 		'</tbody></table>' 
         var getDialogId = document.getElementById('serverInfoDialog')
         getDialogId.innerHTML = htmlBody
         $("#serverInfoDialog").dialog('option', 'width', 200)                     
-		$("#serverInfoDialog").dialog('option', 'position', ['left','center']);
+		$("#serverInfoDialog").dialog('option', 'position', ['left','top']);
         $('#serverInfoDialog').dialog('open');
         }
         
@@ -105,7 +105,7 @@
       }
       }
       function clean(){   
-      
+      if(document.assetSearchForm.myCheckbox != undefined) {
       if(document.assetSearchForm.myCheckbox.checked){
       document.assetSearchForm.action = "cleaning";
       
@@ -113,6 +113,11 @@
       }else{
       alert('Please select all instructions');
       return false;
+      }
+      }else{
+      document.assetSearchForm.action = "cleaning";      
+      document.assetSearchForm.submit();
+      
       }
       }
      
@@ -141,7 +146,7 @@
 		<div class="w_techlog" style="overflow-y: scroll; overflow-x: none;">
 		
 		
-		<div>&nbsp;</div>
+		
 
 	<div style="float: left; width: 100%; margin: 5px 0;"><g:form
 	name="assetSearchForm" action="placeHold">
@@ -152,7 +157,8 @@
 	<input name="search" type="hidden" value="${search}" />
 	<input name="assetCommt" type="hidden" value="${assetCommt}" />
 	<input name="label" type="hidden" value="${label}" />
-	<input name="user" type="hidden" value="${ct}" />
+	<input name="actionLabel" type="hidden" value="${actionLabel}"  />
+	<input name="user" type="hidden" value="ct" />
 	<table style="border: 0px;">
 
 		<div id="mydiv"
@@ -175,33 +181,31 @@
 			</p>
 
 		</g:if></div>
-		<div
-			style="float: left; width: 230Px; margin-left: 5px; margin-right: 5px;">
-		<table style="border: 0px;">
-			<tr>
+		
+		<tr>
 				<td>Labels: <select name="labels">
 					<option value="1">1</option>
 					<option value="2" selected="selected">2</option>
 					<option value="3">3</option>
 				</select></td>
 				<td class="buttonR"><input type="button" value="Print" /></td>
-			</tr>
-		</table>
-		</div>
+		</tr>
+		
 		<tr>
-			<td><strong>Instructions:</strong></td>
+			<td><strong>Instructions</strong></td>
+			<td><strong>Confirm</strong></td>
 		</tr>
 		<g:each status="i" in="${assetCommt}" var="comments">
-			<tr>
+			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 				<td>${comments.comment}</td>
 				<td><g:checkBox name="myCheckbox" value="${false}" /></td>
 			</tr>
 		</g:each>
-		<g:if test="${holdTask != 1}">
+		<g:if test="${holdTask}">
 
 			<tr>
 				<td>&nbsp;</td>
-				<td><input type="button" value="${label}" onclick="clean()" /></td>
+				<td class="buttonR"><input type="button" value="${label}" onclick="clean()" /></td>
 			</tr>
 		</g:if>
 
@@ -214,7 +218,7 @@
 			</tr>
 
 			<tr>
-				<td style="text-align: right;"><input type="button"
+				<td class="buttonR" style="text-align: right;"><input type="button"
 					value="Place on HOLD" onclick="doTransition()" /></td>
 			<tr>
 		</table>

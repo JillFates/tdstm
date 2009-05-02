@@ -9,6 +9,7 @@ import grails.converters.JSON
 class MoveTechController {
     def jsecSecurityManager
     def userPreferenceService
+    def partyRelationshipService
     def stateEngineService
     def workflowService
     def index = {	
@@ -39,7 +40,7 @@ class MoveTechController {
     }
     //moveTech login
     def moveTechLogin = {
-        render(view:'login')
+        redirect(action:'login')
     }
     def login = {
         return [ username: params.username, rememberMe: (params.rememberMe != null), targetUri: params.targetUri ]
@@ -76,7 +77,7 @@ class MoveTechController {
 	        				assetEntityInstance = AssetEntity.find("from AssetEntity ae where ae.moveBundle = $moveBundleInstance.id and ae.sourceTeam = $projectTeamInstance.id")
 	        			}else if( barcodeText.get(3) == 't' ){
 	        				assetEntityInstance = AssetEntity.find("from AssetEntity ae where ae.moveBundle = $moveBundleInstance.id and ae.targetTeam = $projectTeamInstance.id")
-	        			}
+	        			}	        			
 	        			//checking for team corresponding to moveBundle exist or not
 	        			if( assetEntityInstance != null) {
 	        				def moveTech = [ user: barcodeText.get(0) ]
@@ -113,10 +114,10 @@ class MoveTechController {
 	        		}else {
 	        			def assetEntityInstance
 	        			if ( barcodeText.get(3) == 's' ) {
-	        				assetEntityInstance = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = $moveBundleInstance.id and ae.sourceTeam != $projectTeamInstance.id ")
+	        				assetEntityInstance = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = $moveBundleInstance.id ")
 	        			}else if( barcodeText.get(3) == 't' ){
-	        				assetEntityInstance = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = $moveBundleInstance.id and ae.targetTeam != $projectTeamInstance.id ")
-	        			}
+	        				assetEntityInstance = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = $moveBundleInstance.id ")
+	        			}	        			
 	        			//checking for team corresponding to moveBundle exist or not
 	        			if( assetEntityInstance != null) {
 	        				def moveTech = [ user: barcodeText.get(0) ]
@@ -148,19 +149,15 @@ class MoveTechController {
     }
 		
     //check authentication
-    def checkAuth(def barcodeText, def moveTech){
+    def checkAuth(def barcodeText, def actionScreen){
         def authToken = new UsernamePasswordToken(barcodeText, 'xyzzy')
-        // Support for "remember me"
-        if (params.rememberMe) {
-            authToken.rememberMe = true
-        }
         try{
             // Perform the actual login. An AuthenticationException
             // will be thrown if the username is unrecognised or the
             // password is incorrect.
             this.jsecSecurityManager.login(authToken)
             // Check User and Person Activi status
-            redirect(controller:'moveTech',params:moveTech)
+            redirect(controller:'moveTech',params:actionScreen)
         }
         catch (AuthenticationException ex){
             // Authentication failed, so display the appropriate message
@@ -178,16 +175,16 @@ class MoveTechController {
                 m['targetUri'] = params.targetUri
             }
             // Now redirect back to the login page.
-            redirect(action: 'login', params: m)
+            redirect(action: 'moveTechLogin', params: m)
         }
     }
 	//SignOut
     def signOut = {
         // Log the user out of the application.
-        SecurityUtils.subject?.logout()
+      //  SecurityUtils.subject?.logout()
 
         // For now, redirect back to the login page.
-        redirect(uri: '/')
+        redirect(action: 'moveTechLogin')
     }
     // method for home page
     def home = {
@@ -257,7 +254,7 @@ class MoveTechController {
             todoSize = ProjectAssetMap.findAll(query.toString()).size()
         }
       
-        return[bundle:bundle,team:team,project:params.project,location:params.location,assetList:assetList,allSize:allSize,todoSize:todoSize]
+        return[bundle:bundle,team:team,project:params.project,location:params.location,assetList:assetList,allSize:allSize,todoSize:todoSize,'tab':tab]
 	}
 	//To open div for my task
 	def getServerInfo = {
@@ -309,6 +306,7 @@ class MoveTechController {
         def holdTask
         def taskSize
         def label
+        def actionLabel
         if(search != null){
 			assetItem = AssetEntity.findByAssetTag(search)					
 			
@@ -345,13 +343,14 @@ class MoveTechController {
                     }else if(taskSize > 1) {
                     	taskList.each{
                     		if(it != "Hold"){
+                    			actionLabel = it
                                 label =	stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it)))
                     		}
                     			
                     	}
                     }
                     assetCommt = AssetComment.findAllByAssetEntity(assetItem)
-                    render(view:'assetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,holdTask:holdTask,search:params.search,label:label])
+                    render(view:'assetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,holdTask:holdTask,search:params.search,label:label,actionLabel:actionLabel])
                 }
 			}
         }
@@ -360,6 +359,7 @@ class MoveTechController {
 	}
 	
 	def placeHold = {
+		def enterNote = params.enterNote
         def asset = AssetEntity.findByAssetTag(params.search)
         def bundle = asset.moveBundle
         def principal = SecurityUtils.subject.principal
@@ -370,10 +370,18 @@ class MoveTechController {
         }else{
             team = asset.targetTeam
         }
-			
-        def workflow = workflowService.createTransition("STD_PROCESS","MOVE_TECH","Hold",asset,bundle,loginUser,team,params.assetCommt)
+        def workflow
+        if(params.user == "mt"){	
+          workflow = workflowService.createTransition("STD_PROCESS","MOVE_TECH","Hold",asset,bundle,loginUser,team,params.assetCommt)
+        }else{
+          workflow = workflowService.createTransition("STD_PROCESS","CLEANER","Hold",asset,bundle,loginUser,team,params.assetCommt)
+        }
         if(workflow.success){
         	if(params.user == "mt"){
+	        	def assetComment = new AssetComment()
+        		assetComment.comment = enterNote
+        		assetComment.assetEntity = asset
+        		assetComment.save()
         		redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
         	}else{
         		redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
@@ -384,7 +392,7 @@ class MoveTechController {
 	def unRack = {
         def asset = AssetEntity.findByAssetTag(params.search)
         def bundle = asset.moveBundle
-        def label = params.label
+        def actionLabel = params.actionLabel
         def principal = SecurityUtils.subject.principal
         def loginUser = UserLogin.findByUsername(principal)
         def team
@@ -394,9 +402,12 @@ class MoveTechController {
             team = asset.targetTeam
         }
 			
-        def workflow = workflowService.createTransition("STD_PROCESS","MOVE_TECH",label,asset,bundle,loginUser,team,params.assetCommt)
+        def workflow = workflowService.createTransition("STD_PROCESS","MOVE_TECH",actionLabel,asset,bundle,loginUser,team,params.assetCommt)
         if(workflow.success){
 			redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+		}else{
+        	flash.message = message(code :workflow.message)	
+        	redirect(action:'assetSearch',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"search":params.search,"assetCommt":params.assetCommt,"label":params.label,"actionLabel":actionLabel])
         }
 			
 	}
@@ -423,10 +434,10 @@ class MoveTechController {
     			
         if(params.location == "s"){
             stateVal = stateEngineService.getStateId("STD_PROCESS","Cleaned")
-            query.append("and pam.asset in (select id from AssetEntity ae where ae.moveBundle = ${bundleId.id} and ae.sourceTeam != ${team}) ")
+            query.append("and pam.asset in (select id from AssetEntity ae where ae.moveBundle = ${bundleId.id} ) ")
         }else {
             stateVal = stateEngineService.getStateId("STD_PROCESS","Cleaned")
-            query.append("and pam.asset in (select id from AssetEntity ae where ae.moveBundle = ${bundleId.id} and ae.targetTeam != ${team}) ")
+            query.append("and pam.asset in (select id from AssetEntity ae where ae.moveBundle = ${bundleId.id} ) ")
         }
         allSize = ProjectAssetMap.findAll(query.toString()).size()
         if(tab == "Todo"){
@@ -444,7 +455,6 @@ class MoveTechController {
             }else{
                 rdyState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Cleaned"))
                 ipState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Reracking"))
-    					
             }
             if(it.currentStateId == holdState){
                 colorCss = "asset_hold"
@@ -469,11 +479,12 @@ class MoveTechController {
             todoSize = ProjectAssetMap.findAll(query.toString()).size()
         }
           
-        return[bundle:bundle,team:team,project:params.project,location:params.location,assetList:assetList,allSize:allSize,todoSize:todoSize]
+        return[bundle:bundle,team:team,project:params.project,location:params.location,assetList:assetList,allSize:allSize,todoSize:todoSize,'tab':tab]
 	
 	}
 	
     def cleaningAssetSearch = {
+	try {
         def assetItem
         def assetCommt
         def projMap
@@ -484,6 +495,7 @@ class MoveTechController {
         def holdTask
         def taskSize
         def label
+        def actionLabel
         if(search != null){
             assetItem = AssetEntity.findByAssetTag(search)
     			
@@ -499,17 +511,14 @@ class MoveTechController {
                 if(bundleName != params.bundle){
                     flash.message = message(code :"The asset [${assetItem.assetName}] is not part of move bundle [${params.bundle}]")
                     redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
-                }else if(teamId != params.team){
-                    flash.message = message(code :"The asset [${assetItem.assetName}] is assigned to team [${teamName}]")
-                    redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
-                }else{
+                } else {
                     projMap = ProjectAssetMap.findByAsset(assetItem)
                     stateVal = stateEngineService.getState("STD_PROCESS",projMap.currentStateId)
                     if(stateVal == "Hold"){
                         flash.message = message(code :"The asset is on Hold. Please contact manager to resolve issue.")
                         redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
                     }
-                    taskList = stateEngineService.getTasks("STD_PROCESS","MOVE_TECH",stateVal)
+                    taskList = stateEngineService.getTasks("STD_PROCESS","CLEANER",stateVal)
                     taskSize = taskList.size()
                     if(taskSize == 1){
                         if(taskList.contains("Hold")){
@@ -520,23 +529,29 @@ class MoveTechController {
                     }else if(taskSize > 1) {
                         taskList.each{
                             if(it != "Hold"){
+                            	actionLabel = it
                                 label =	stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it)))
                             }
                         			
                         }
                     }
                     assetCommt = AssetComment.findAllByAssetEntity(assetItem)
-                    render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,holdTask:holdTask,search:params.search,label:label])
+                    render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,holdTask:holdTask,search:params.search,label:label,actionLabel:actionLabel])
                 }
             }
         }
+	} catch (Exception ex){
+		flash.message = message(code :"The asset is not associated with bundle and team, please check it")
+		redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+		
+	}
 
 	}
 	
 	def cleaning = {
         def asset = AssetEntity.findByAssetTag(params.search)
         def bundle = asset.moveBundle
-        def label = params.label
+        def actionLabel = params.actionLabel
         def principal = SecurityUtils.subject.principal
         def loginUser = UserLogin.findByUsername(principal)
         def team
@@ -546,9 +561,12 @@ class MoveTechController {
             team = asset.targetTeam
         }
     			
-        def workflow = workflowService.createTransition("STD_PROCESS","MOVE_TECH",label,asset,bundle,loginUser,team,params.assetCommt)
+        def workflow = workflowService.createTransition("STD_PROCESS","CLEANER",actionLabel,asset,bundle,loginUser,team,params.assetCommt)
         if(workflow.success){
             redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+        }else{
+        	flash.message = message(code :workflow.message)	
+        	redirect(action:'cleaningAssetSearch',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"search":params.search,"assetCommt":params.assetCommt,"label":params.label,"actionLabel":actionLabel])
         }
 			
 	}

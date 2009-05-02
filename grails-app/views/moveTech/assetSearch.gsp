@@ -3,7 +3,8 @@
 <head>
 <title>Asset</title>
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}" />
+<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
+<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 <link rel="shortcut icon"
 	href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 	<link type="text/css" rel="stylesheet"
@@ -63,28 +64,30 @@
          pos = asset.targetRackPosition
           }     
         var htmlBody = '<table ><thead></thead><tbody>'+
-'<tr><td>Name:  '+asset.assetName+'</td></tr>'+
-'<tr><td>Asset Tag:  '+asset.assetTag+'</td></tr>'+
-'<tr><td>Serial Number:  '+asset.serialNumber+'</td></tr>'+
-'<tr><td>Model:  '+asset.model+'</td></tr>'+
-'<tr><td>Location:  '+location+'</td></tr>'+
-'<tr><td>Room:  '+room+'</td></tr>'+
-'<tr><td>Rack/Position:  '+rack+'/'+pos+'</td></tr>'+
-'<tr><td>PDU:  '+asset.powerPort+'</td></tr>'+
-'<tr><td>NIC:  '+asset.nicPort+'</td></tr>'+
-'<tr><td>HBA:  '+asset.hbaPort+'</td></tr>'+
+'<tr><td style="font-size:9px">Asset Tag:  '+asset.assetTag+'</td></tr>'+
+'<tr><td style="font-size:9px">Asset Name:  '+asset.assetName+'</td></tr>'+
+'<tr><td style="font-size:9px">Serial Number:  '+asset.serialNumber+'</td></tr>'+
+'<tr><td style="font-size:9px">Model:  '+asset.model+'</td></tr>'+
+'<tr><td style="font-size:9px">Location:  '+location+'</td></tr>'+
+'<tr><td style="font-size:9px">Room:  '+room+'</td></tr>'+
+'<tr><td style="font-size:9px">Rack/Position:  '+rack+'/'+pos+'</td></tr>'+
+'<tr><td style="font-size:9px">PDU:  '+asset.powerPort+'</td></tr>'+
+'<tr><td style="font-size:9px">NIC:  '+asset.nicPort+'</td></tr>'+
+'<tr><td style="font-size:9px">HBA:  '+asset.hbaPort+'</td></tr>'+
 '</tbody></table>' 
         var getDialogId = document.getElementById('serverInfoDialog')
         getDialogId.innerHTML = htmlBody
          $("#serverInfoDialog").dialog('option', 'width', 200)                     
-		 $("#serverInfoDialog").dialog('option', 'position', ['left','center']);
+		 $("#serverInfoDialog").dialog('option', 'position', ['left','top']);
         $('#serverInfoDialog').dialog('open');
         }
         
-      function validation(){      
-      var enterNote = document.assetSearchForm.enterNote.value;
+      function validation(){     
       
+      var enterNote = document.assetSearchForm.enterNote.value;   
+           
       if(enterNote == ""){
+     
       alert('Please enter note');
          document.assetSearchForm.enterNote.focus();   
      return false;
@@ -102,16 +105,22 @@
       return false;
       }
       }
-      function unRack(){   
+      function unRack(){  
       
+     if(document.assetSearchForm.myCheckbox != undefined) {      
        if(document.assetSearchForm.myCheckbox.checked){
-      document.assetSearchForm.action = "unRack";
-      
+      document.assetSearchForm.action = "unRack";      
       document.assetSearchForm.submit();
       }else{
       alert('Please select all instructions');
       return false;
       }
+      }else{
+      document.assetSearchForm.action = "unRack";      
+      document.assetSearchForm.submit();
+      
+      }
+      
       }
      
       
@@ -141,18 +150,19 @@
 <div class="w_techlog" style="overflow-y: scroll; overflow-x: none;">
 
 
-<div>&nbsp;</div>
+
 
 <div style="float:left; width:100%; margin:5px 0; ">
 <g:form name="assetSearchForm" action="placeHold">
-<input name="bundle" type="hidden" value="${bundle}" />
+							<input name="bundle" type="hidden" value="${bundle}" />
 							<input name="team" type="hidden" value="${team}" />
 							<input name="location" type="hidden" value="${location}" />
 							<input name="project" type="hidden" value="${project}" />
 							<input name="search" type="hidden" value="${search}"  />
 							<input name="assetCommt" type="hidden" value="${assetCommt}"  />
 							<input name="label" type="hidden" value="${label}"  />
-							<input name="user" type="hidden" value="${mt}"  />
+							<input name="actionLabel" type="hidden" value="${actionLabel}"  />
+							<input name="user" type="hidden" value="mt"  />
 <table style="border:0px;" >
 
 <div id="mydiv" onclick="document.getElementById('mydiv').style.display = 'none';">
@@ -160,7 +170,7 @@
 	<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
 </g:if> 
 </div>
-<div onclick="${remoteFunction(action:'getServerInfo', params:'\'assetId=\'+'+projMap.asset.id,onComplete: 'serverInfo(e)')}">
+<div style="background:url(${createLinkTo(dir:'images',file:'search.png')}) no-repeat top right;" onclick="${remoteFunction(action:'getServerInfo', params:'\'assetId=\'+'+projMap.asset.id,onComplete: 'serverInfo(e)')}">
 
 <g:if test="${projMap}">
 <p>Asset: ${projMap?.asset?.assetName}</p>
@@ -171,10 +181,11 @@
 
 </div>	
 	<tr>
-		<td><strong>Instructions:</strong></td>
+		<td><strong>Instructions</strong></td>
+		<td><strong>Confirm</strong></td>
 	</tr>
 	<g:each status="i" in="${assetCommt}" var="comments">
-		<tr>
+		<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 			<td>${comments.comment}</td>
 			<td><g:checkBox name="myCheckbox" value="${false}" /></td>
 		</tr>
@@ -183,7 +194,7 @@
 	
 	<tr>
 		<td>&nbsp;</td>
-		<td><input type="button" value="${label}"
+		<td class="buttonR"><input type="button" value="${label}"
 			onclick="unRack()" /></td>
 	</tr>
 	</g:if>		
@@ -195,7 +206,7 @@
 		</td> </tr>
 		
 		<tr>
-		<td style="text-align: right;"><input type="button" value="Place on HOLD" onclick="doTransition()" /></td>
+		<td class="buttonR" style="text-align: right;"><input type="button" value="Place on HOLD" onclick="doTransition()" /></td>
 		<tr>
 	
 	</table>

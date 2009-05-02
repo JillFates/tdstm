@@ -32,7 +32,7 @@
       										        
 								              <div style="float:left; width:100%; margin:5px 0; ">              								
               								   <table style="border:0px;">
-								            		<tr><td><g:link controller="moveTech" action="signOut" style="color: #328714; border:1px solid #328714; margin:5px; background:#ffffff;">Log out</g:link></td>
+								            		<tr><td><g:link controller="moveTech" action="signOut" style="color: #5b5e5c; border:1px solid #5b5e5c; margin:5px;background:#aaefb8;">Log out</g:link></td>
 								            		
 								               </table>
 								            </div>  
