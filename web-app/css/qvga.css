@@ -20,10 +20,6 @@
 	background-color:#FFFF00;
 	color:black;
 }
-.asset_Hold{
-	background-color:#FFFF00;
-	color:black;
-}
 
 .asset_ready{
 	background-color:#008000;
@@ -31,12 +27,12 @@
 }
 
 .asset_process{
-	background-color:#00FFFF;
+	background-color:#3399FF;
 	color:black;
 }
 
 .asset_pending{
-	background-color:#FFFFFF;
+	background-color:#999;
 	color:black;
 }
 .asset_select{
