@@ -268,9 +268,11 @@ class BootStrap {
 		// -------------------------------
 		println "PROJECTS "
 		def cedarsProject = new Project( name:"Cedars-Sinai Move 1", projectCode:'CS1', client:cedars,
-			description:'100 servers', trackChanges:'Y', partyType:groupPartyType ).save();
+			description:'100 servers', trackChanges:'Y', partyType:groupPartyType,
+			startDate:new Date(), completionDate: new Date()+10 ).save();
 		def twProject = new Project( name:"Time Warner VA Move", projectCode:'TM-VA-1', client:timeWarner,
-			description:'500 servers', trackChanges:'N', partyType:groupPartyType ).save();
+			description:'500 servers', trackChanges:'N', partyType:groupPartyType,
+			startDate:new Date(), completionDate: new Date()+10 ).save();
 
 
 		// -------------------------------
@@ -469,11 +471,11 @@ class BootStrap {
 		//--------------------------------
 		println "PROJECT_ASSET_MAP"
 		def projectAssetMapList = [
-            [ cedarsProject, AssetEntity.get(1), 20 ],
+            [ cedarsProject, AssetEntity.get(1), 10 ],
             [ cedarsProject, AssetEntity.get(2), 60 ],
-            [ cedarsProject, AssetEntity.get(3), 30 ],
+            [ cedarsProject, AssetEntity.get(3), 40 ],
             [ cedarsProject, AssetEntity.get(4), 280 ],
-            [ cedarsProject, AssetEntity.get(5), 20 ],
+            [ cedarsProject, AssetEntity.get(5), 40 ],
             [ cedarsProject, AssetEntity.get(6), 30 ],
             [ cedarsProject, AssetEntity.get(7), 30 ],
             [ cedarsProject, AssetEntity.get(8), 20 ],
