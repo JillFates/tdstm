@@ -16,6 +16,7 @@ class MoveTechController {
         if(params.user == "mt"){
             def partyGroupInstance = PartyGroup.findById(params.team)
             def team = partyGroupInstance.name
+            def teamMembers = partyRelationshipService.getTeamMemberNames(params.team)
             def location =""
             if( params.location == 's') {
                 location = "Unracking"
@@ -23,18 +24,19 @@ class MoveTechController {
                 location = "Reracking"
             }
 					
-            render(view:'home',model:[projectTeam:partyGroupInstance,project:params.project,loc:location, bundle:params.bundle,team:params.team,location:params.location])
+            render(view:'home',model:[projectTeam:team,members:teamMembers,project:params.project,loc:location, bundle:params.bundle,team:params.team,location:params.location])
         } else {
-            def partyGroupInstance = PartyGroup.findById(params.team)
+            def partyGroupInstance = PartyGroup.findById(params.team)            
             def team = partyGroupInstance.name
-            def location =""
+            def teamMembers = partyRelationshipService.getTeamMemberNames(params.team)
+            def teamLocation =ProjectTeam.findById(params.team)
             if( params.location == 's') {
-                location = "Source"
+            	teamLocation = teamLocation.currentLocation +" "+ "(Source)"                
             }else if( params.location == 't'){
-                location = "Target"
+            	teamLocation = teamLocation.currentLocation +" "+ "(Target)"
             }
 					
-            render(view:'cleaningTechHome',model:[projectTeam:partyGroupInstance,project:params.project,loc:location, bundle:params.bundle,team:params.team,location:params.location])
+            render(view:'cleaningTechHome',model:[projectTeam:team,members:teamMembers,project:params.project,loc:teamLocation, bundle:params.bundle,team:params.team,location:params.location])
 				
         }
     }
@@ -81,7 +83,7 @@ class MoveTechController {
 	        			//checking for team corresponding to moveBundle exist or not
 	        			if( assetEntityInstance != null) {
 	        				def moveTech = [ user: barcodeText.get(0) ]
-	        				moveTech['bundle'] = moveBundleInstance
+	        				moveTech['bundle'] = moveBundleInstance.name
 	        				moveTech['team'] = Integer.parseInt(barcodeText.get(2))
 	        				moveTech['location'] = barcodeText.get(3)
 	        				moveTech['project'] = projectInstance.name
@@ -121,10 +123,10 @@ class MoveTechController {
 	        			//checking for team corresponding to moveBundle exist or not
 	        			if( assetEntityInstance != null) {
 	        				def moveTech = [ user: barcodeText.get(0) ]
-	        				moveTech['bundle'] = moveBundleInstance
+	        				moveTech['bundle'] = moveBundleInstance.name
 	        				moveTech['team'] = Integer.parseInt(barcodeText.get(2))
 	        				moveTech['location'] = barcodeText.get(3)
-	        				moveTech['project'] = projectInstance
+	        				moveTech['project'] = projectInstance.name
 	        				checkAuth(barcodeText.get(0), moveTech)
 	        			}else {
 	        				flash.message = message(code :"Login Failed")
@@ -373,20 +375,30 @@ class MoveTechController {
         def workflow
         if(params.user == "mt"){	
           workflow = workflowService.createTransition("STD_PROCESS","MOVE_TECH","Hold",asset,bundle,loginUser,team,params.assetCommt)
+          if(workflow.success){          	
+  	        	def assetComment = new AssetComment()
+          		assetComment.comment = enterNote
+          		assetComment.assetEntity = asset
+          		assetComment.save()
+          		redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])          	
+          } else {          	
+          		flash.message = message(code :workflow.message)
+          		redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])          	
+          }
+          
         }else{
           workflow = workflowService.createTransition("STD_PROCESS","CLEANER","Hold",asset,bundle,loginUser,team,params.assetCommt)
-        }
-        if(workflow.success){
-        	if(params.user == "mt"){
-	        	def assetComment = new AssetComment()
-        		assetComment.comment = enterNote
-        		assetComment.assetEntity = asset
-        		assetComment.save()
-        		redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
-        	}else{
-        		redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
-        	}
-        }
+          if(workflow.success){          	
+  	        	def assetComment = new AssetComment()
+          		assetComment.comment = enterNote
+          		assetComment.assetEntity = asset
+          		assetComment.save()          		
+          		redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])          	
+          } else {          	
+          		flash.message = message(code :workflow.message)
+          		redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])          	
+          }
+        }        
 	}
 	
 	def unRack = {

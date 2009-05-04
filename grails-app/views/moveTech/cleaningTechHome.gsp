@@ -17,13 +17,13 @@
 	<div class="mainbody" style="width: 100%;" >
 				<div class="colum_techlogin" style="float:left;">
 				<div class="border_bundle_team">
-          										<div style="float:left; width:100%; margin-left:20px;">
+          										<div style="float:left; width:97.5%; margin-left:20px;">
               									
 		              									<a href="#" style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'home_h.png')}" border="0"/></a>
 							              				
               											<g:link action="cleaningAssetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'my_task.png')}" border="0" /></g:link>
               											
-              											<a href="#" style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'asset.png')}" border="0"/></a>
+              											<img src="${createLinkTo(dir:'images',file:'asset.png')}" style="height:26px; width:64px; float:left; margin:auto 0px;"/>
 								           
 								              	</div>			
 				<div class="w_techlog" style="overflow-y: scroll; overflow-x: none;">
@@ -40,10 +40,11 @@
               					<div style="float:left; width:100%; margin:5px 0; ">
               					  <table style="border:0px;">
               					     <tr><td colspan="2">Currently Logged in as:</td></tr>              					     
-              					     <tr><td>Project:</td><td>${project}</td></tr>
-              					     <tr><td>Bundle:</td><td>${bundle}</td></tr>
-              					     <tr><td>Team:</td><td>${projectTeam}</td></tr>              					     
-              					     <tr><td>Location:</td><td>${loc}</td></tr>
+              					     <tr><td style="width:20px;">Project:</td><td>${project}</td></tr>
+              					     <tr><td style="width:20px;">Bundle:</td><td>${bundle}</td></tr>
+              					     <tr><td style="width:20px;">Team:</td><td>${projectTeam}</td></tr> 
+              					     <tr><td style="width:20px;">Members:</td><td>${members}</td></tr>              					     
+              					     <tr><td style="width:20px;">Location:</td><td>${loc}</td></tr>
               					  </table>
               					</div>
               					

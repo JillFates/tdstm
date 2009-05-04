@@ -97,7 +97,7 @@
 	</div>
 	<div class="mainbody" style="width: 100%;" >
 				<div class="colum_techlogin" style="float:left;">
-				<div style="float:left; width:100%; margin-left:20px;">
+				<div style="float:left; width:97.5%; margin-left:20px;">
               									
 		              									<g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"ct"]' style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'home.png')}" border="0"/></g:link>
 							              				
@@ -122,7 +122,7 @@
 								            		<tr>
 								            		<td id="todoId"><g:link style="color: #5b5e5c; border:1px solid #5b5e5c; margin:5px;background:#aaefb8;padding:2px;" action="cleaningAssetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo(${todoSize})</g:link></td>
 								            		<td id="allId"><g:link  style="color: #5b5e5c; border:1px solid #5b5e5c; margin:5px;padding:2px;" action="cleaningAssetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All(${allSize})</g:link></td>
-								            		<td style="text-align:right;"><input  type="text" size="8" value="" name="search" style="background:url(${createLinkTo(dir:'images',file:'search.png')}) no-repeat center right;"/></td></tr>
+								            		<td style="text-align:right;"><input  type="text" size="25" value="" name="search" style="background:url(${createLinkTo(dir:'images',file:'search.png')}) no-repeat center right;"/></td></tr>
 								               </table>
 								            </div>  
 		<div id="mydiv" onclick="document.getElementById('mydiv').style.display = 'none';setFocus()">						            

@@ -134,7 +134,7 @@
 		</div>
 		<div class="mainbody" style="width: 100%;">
 		<div class="colum_techlogin" style="float: left;">
-		<div style="float: left; width: 100%; margin-left: 20px;"><g:link
+		<div style="float: left; width: 97.5%; margin-left: 20px;"><g:link
 			params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"ct"]'
 			style="height:26px; width:64px; float:left; margin:auto 0px;">
 			<img src="${createLinkTo(dir:'images',file:'home.png')}" border="0" />
@@ -213,7 +213,7 @@
 		<table>
 
 			<tr>
-				<td><textarea rows="2" cols="10" style="width: 200px"
+				<td><textarea rows="2" cols="10" style="width: 750px"
 					title="Enter Note..." name="enterNote"></textarea></td>
 			</tr>
 

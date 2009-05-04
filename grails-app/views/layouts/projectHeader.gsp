@@ -43,6 +43,7 @@
               <li><g:link class="home" controller="auth" action="home">Administration </g:link> </li>
             </jsec:hasRole>
             <li><g:link class="home" controller="moveTech" action="moveTechLogin">Move Tech</g:link></li>
+            <li><g:link class="home" controller="moveTech" action="moveTechLogin">Cleaning</g:link></li>
           </ul>
         </div>
       </div>

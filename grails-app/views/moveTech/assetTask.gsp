@@ -97,7 +97,7 @@
 	</div>
 	<div class="mainbody" style="width: 100%;" >
 				<div class="colum_techlogin" style="float:left;">
-				<div style="float:left; width:100%; margin-left:20px;">
+				<div style="float:left; width:92%; margin-left:20px;">
 		        	<g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt"]' style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'home.png')}" border="0"/></g:link>
 					<a href="#" style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'my_task_h.png')}" border="0" /><a>
 					<img  src="${createLinkTo(dir:'images',file:'asset.png')}" style="height:26px; width:64px; float:left; margin:auto 0px;"/>
