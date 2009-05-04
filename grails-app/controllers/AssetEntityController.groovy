@@ -700,7 +700,10 @@ class AssetEntityController {
         def unrackedId = stateEngineService.getStateId("STD_PROCESS","Unracked")
         projectTeamList.each{
             def teamMembers = partyRelationshipService.getBundleTeamMembersDashboard(it.id)
-            def member = teamMembers.delete((teamMembers.length()-1),teamMembers.length())
+            def member
+            if(teamMembers.length() > 0){
+            	member = teamMembers.delete((teamMembers.length()-1),teamMembers.length())
+            }
             def sourceAssets = ProjectAssetMap.findAll("from ProjectAssetMap where asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and sourceTeam = ${it.id} )" ).size()
             def unrackedAssets = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $unrackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and sourceTeam = ${it.id} )" ).size()
             def targetAssets = ProjectAssetMap.findAll("from ProjectAssetMap where asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and targetTeam = ${it.id} )" ).size()
@@ -714,7 +717,6 @@ class AssetEntityController {
         def transportTeam = ProjectTeam.findByTeamCode("Transport")
         def cleaningMembers = partyRelationshipService.getBundleTeamMembersDashboard(cleaningTeam.id)
         def transportMembers = partyRelationshipService.getBundleTeamMembersDashboard(transportTeam.id)
-        
         supportTeam.put("totalAssets", totalAsset.size() )
         supportTeam.put("sourceCleaned", sourceCleaned )
         supportTeam.put("sourceMover", sourceMover )

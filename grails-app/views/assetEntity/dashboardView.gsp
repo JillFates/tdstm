@@ -130,7 +130,7 @@
 	      }
 		}
    	}
-   	function bundleChange(){  
+   	function bundleChange(){
 	   var bundleID = ${moveBundleInstance.id}; 
 	   document.getElementById("moveBundleId").value =  bundleID; 
    	}
@@ -149,12 +149,15 @@
 	   		}
 	   	}
    	}
+   	var timer
    	function timedRefresh(timeoutPeriod) {
    		if(timeoutPeriod != 'never'){
-		setTimeout("location.reload(false);",timeoutPeriod);
+		timer = setTimeout("location.reload(false);",timeoutPeriod);
 		document.getElementById("timeToRefresh").value = timeoutPeriod;
+		} else {
+		clearTimeout(timer)
 		}
-		document.getElementById("selectTimedId").value = timeoutPeriod; 
+		//document.getElementById("selectTimedId").value = timeoutPeriod; 
 	}
 	function updateAsset(e){
 		var asset = eval("(" + e.responseText + ")")
@@ -238,8 +241,8 @@
 	    <g:each in="${bundleTeams}" var="bundleTeam">
 			<td style="padding: 0px;border-right: 1px solid #333333">
 			<table style="border: 0;" >
-			<th nowrap>${bundleTeam?.team?.name }</th>
-			<tr><td nowrap>${bundleTeam?.members}</td></tr>
+			<th nowrap>${bundleTeam?.team?.name }&nbsp;</th>
+			<tr><td nowrap>${bundleTeam?.members}&nbsp;</td></tr>
 			<tr><td class="odd">${bundleTeam?.team?.currentLocation}&nbsp;</td> </tr>
 			<tr><td nowrap>Sap1</td> </tr>
 			<tr><td class="odd">${bundleTeam?.unrackedAssets} of ${bundleTeam?.sourceAssets}</td> </tr>
@@ -250,8 +253,8 @@
 			</g:each>
 			<td style="padding: 0px;border-right: 1px solid #333333">
 			<table style="border: 0;" >
-			<th nowrap>${supportTeam?.cleaning.name}</th>
-			<tr><td nowrap>${supportTeam?.cleaningMembers}</td></tr>
+			<th nowrap>${supportTeam?.cleaning.name}&nbsp;</th>
+			<tr><td nowrap>${supportTeam?.cleaningMembers}&nbsp;</td></tr>
 			<tr><td class="odd">${supportTeam?.cleaning.currentLocation}&nbsp;</td> </tr>
 			<tr><td nowrap>Exchg3</td> </tr>
 			<tr><td class="odd">${supportTeam.sourceCleaned} of ${supportTeam.totalAssets}</td> </tr>
@@ -261,8 +264,8 @@
 			</td>
 			<td style="padding: 0px;">
 			<table style="border: 0;" >
-			<th nowrap>${supportTeam?.transport.name}</th>
-			<tr><td nowrap>${supportTeam?.transportMembers}</td></tr>
+			<th nowrap>${supportTeam?.transport.name}&nbsp;</th>
+			<tr><td nowrap>${supportTeam?.transportMembers}&nbsp;</td></tr>
 			<tr><td class="odd">${supportTeam?.transport.currentLocation}&nbsp;</td> </tr>
 			<tr><td nowrap>Exchg3</td> </tr>
 			<tr><td class="odd">${supportTeam.sourceMover} of ${supportTeam.totalAssets}</td> </tr>

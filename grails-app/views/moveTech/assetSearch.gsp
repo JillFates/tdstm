@@ -173,20 +173,21 @@
 <div style="background:url(${createLinkTo(dir:'images',file:'search.png')}) no-repeat top right;" onclick="${remoteFunction(action:'getServerInfo', params:'\'assetId=\'+'+projMap.asset.id,onComplete: 'serverInfo(e)')}">
 
 <g:if test="${projMap}">
-<p>Asset: ${projMap?.asset?.assetName}</p>
-<p>Model: ${projMap?.asset?.model}</p>
-<p>Rack/Pos: <g:if test="${location == 's'}">${projMap?.asset?.sourceRack}/${projMap?.asset?.sourceRackPosition}</g:if><g:else test="${location == 't'}">${projMap?.asset?.targetRack}/${projMap?.asset?.targetRackPosition}</g:else> </p>
+<p><b>Asset Tag:</b> ${projMap?.asset?.assetTag}</p>
+<p><b>Asset Name:</b> ${projMap?.asset?.assetName}</p>
+<p><b>Model:</b> ${projMap?.asset?.model}</p>
+<p><b>Rack/Pos:</b> <g:if test="${location == 's'}">${projMap?.asset?.sourceRack}/${projMap?.asset?.sourceRackPosition}</g:if><g:else test="${location == 't'}">${projMap?.asset?.targetRack}/${projMap?.asset?.targetRackPosition}</g:else> </p>
 	
 </g:if>
 
 </div>	
 	<tr>
-		<td><strong>Instructions</strong></td>
+		<td width="200px"><strong>Instructions</strong></td>
 		<td><strong>Confirm</strong></td>
 	</tr>
 	<g:each status="i" in="${assetCommt}" var="comments">
 		<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-			<td>${comments.comment}</td>
+			<td >${comments.comment}</td>
 			<td><g:checkBox name="myCheckbox" value="${false}" /></td>
 		</tr>
 	</g:each>

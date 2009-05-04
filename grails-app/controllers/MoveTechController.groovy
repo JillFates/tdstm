@@ -379,6 +379,7 @@ class MoveTechController {
   	        	def assetComment = new AssetComment()
           		assetComment.comment = enterNote
           		assetComment.assetEntity = asset
+          		assetComment.commentType = 'issue'
           		assetComment.save()
           		redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])          	
           } else {          	
@@ -392,6 +393,7 @@ class MoveTechController {
   	        	def assetComment = new AssetComment()
           		assetComment.comment = enterNote
           		assetComment.assetEntity = asset
+          		assetComment.commentType = 'issue'
           		assetComment.save()          		
           		redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])          	
           } else {          	
