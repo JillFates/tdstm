@@ -17,6 +17,7 @@ class AssetEntityController {
 	def partyRelationshipService
 	def stateEngineService
 	def workflowService
+	def userPreferenceService
     def index = {
 		redirect( action:list, params:params )
 	}
@@ -732,8 +733,9 @@ class AssetEntityController {
         }
         def totalUnracked = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $unrackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
         def totalReracked = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $rerackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
-
-        return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams, assetsList:assetsList, moveBundleInstance:moveBundleInstance, supportTeam:supportTeam,totalUnracked:totalUnracked ? totalUnracked : 0, totalReracked:totalReracked ? totalReracked : 0, totalAsset:totalAsset.size()]
+        userPreferenceService.loadPreferences("SUPER_CONSOLE_REFRESH")
+        def timeToRefresh = getSession().getAttribute("SUPER_CONSOLE_REFRESH")
+        return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams, assetsList:assetsList, moveBundleInstance:moveBundleInstance, supportTeam:supportTeam,totalUnracked:totalUnracked ? totalUnracked : 0, totalReracked:totalReracked ? totalReracked : 0, totalAsset:totalAsset.size(), timeToRefresh : timeToRefresh ? timeToRefresh.SUPER_CONSOLE_REFRESH : "never"]
         		
     }
     /*
@@ -823,5 +825,15 @@ class AssetEntityController {
 	    	}
     	}
     	render assetList as JSON
+    }
+    def setTimePreference = {
+    	def timer = params.timer
+    	def refreshTime =[]
+    	if(timer){
+    		userPreferenceService.setPreference( "SUPER_CONSOLE_REFRESH", "${timer}" )
+    	}
+    	def timeToRefresh = getSession().getAttribute("SUPER_CONSOLE_REFRESH")
+    	refreshTime <<[refreshTime:timeToRefresh] 
+    	render refreshTime as JSON
     }
 }

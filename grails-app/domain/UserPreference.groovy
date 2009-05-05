@@ -9,7 +9,7 @@ class UserPreference implements Serializable {
 	static mapping  = {
 		version false
 		id composite:['userLogin', 'preferenceCode'], generator:'assigned'
-		preferenceCode sqlType:'varchar(20)'
+		preferenceCode sqlType:'varchar(50)'
 	}
 
 	String toString(){

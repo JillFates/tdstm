@@ -32,8 +32,12 @@
 <jq:plugin name="ui.datetimepicker" />
 <style>
 	td .odd{ background:#DDDDDD;nowrap }
-	</style>
-	
+	.asset_Hold{
+		background-color:#FFFF00;
+		color:black;
+	}
+</style>
+
 <script type="text/javascript">
    function assetDetails(assetId) {
 	   var browser=navigator.appName;
@@ -46,8 +50,12 @@
 		}
 	   for(i = 0 ; i<rows.length ; i++){
 	   	var cls = rows[i].getAttribute("class")
-	   	if(cls != 'asset_Hold'){
-	   		rows[i].setAttribute("class",'asset_pending')
+	   	var holdId = rows[i].getAttribute("value")
+	   	var holdRow = document.getElementById("statusCol_"+holdId).innerHTML
+	   	if(holdRow != 'Hold'){
+	   		rows[i].setAttribute("class",'asset_done')
+	   	} else {
+	   		rows[i].setAttribute("class",'asset_Hold')
 	   	}
 	   }
 	   var rowColor =  document.getElementById('assetDetailRow_'+assetId)
@@ -132,7 +140,11 @@
    	}
    	function bundleChange(){
 	   var bundleID = ${moveBundleInstance.id}; 
-	   document.getElementById("moveBundleId").value =  bundleID; 
+	   document.getElementById("moveBundleId").value =  bundleID;
+	   var time = '${timeToRefresh}';
+	   if(time != 'never'){
+	   document.getElementById("selectTimedId").value = time;
+	   } 
    	}
    	function setComment(e){
 	   	var commentStatus = eval("(" + e.responseText + ")")
@@ -153,11 +165,16 @@
    	function timedRefresh(timeoutPeriod) {
    		if(timeoutPeriod != 'never'){
 		timer = setTimeout("location.reload(false);",timeoutPeriod);
-		document.getElementById("timeToRefresh").value = timeoutPeriod;
+		document.getElementById("selectTimedId").value = timeoutPeriod;
 		} else {
 		clearTimeout(timer)
 		}
-		//document.getElementById("selectTimedId").value = timeoutPeriod; 
+	}
+	function setRefreshTime(e) {
+		var timeRefresh = eval("(" + e.responseText + ")")
+		if(timeRefresh){
+			timedRefresh(timedRefresh[0].refreshTime.SUPER_CONSOLE_REFRESH)
+		}
 	}
 	function updateAsset(e){
 		var asset = eval("(" + e.responseText + ")")
@@ -171,7 +188,7 @@
 		if(asset[0].status == 'Hold')
 		document.getElementById('assetDetailRow_'+asset[0].assetEntity.id).setAttribute('class','asset_Hold')
 		}
-		timedRefresh(document.getElementById('timeToRefresh').value)
+		timedRefresh(document.getElementById('selectTimedId').value)
 	}
     </script>
 </head>
@@ -200,7 +217,7 @@
 
 		</select></td>
 	<td style="text-align: right;"><input type="button" value="Refresh" onclick="location.reload(true);">
-	<select id="selectTimedId" onchange="timedRefresh(this.value)">
+	<select id="selectTimedId" onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(e)') }">
 	<option value="60000">1 min</option> 
 	<option value="120000">2 min</option> 
 	<option value="180000">3 min</option> 
@@ -208,7 +225,6 @@
 	<option value="300000">5 min</option> 
 	<option value="never">Never</option> 
 	</select> 
-	<input type="hidden" id="timeToRefresh">
 	</td>
 	</tr>
 	</table>
@@ -324,9 +340,8 @@
 				</tr>
 			</thead>
 			<tbody id="assetsTbody">
-			
 				<g:each status="i" in="${assetsList}" var="assetsList">
-					<tr onclick="assetDetails('${assetsList?.asset.id}')" name="assetDetailRow" id="assetDetailRow_${assetsList?.asset.id}" class="asset_${assetsList?.status}">
+					<tr onclick="assetDetails('${assetsList?.asset.id}')" name="assetDetailRow" id="assetDetailRow_${assetsList?.asset.id}" class="asset_${assetsList?.status}" value="${assetsList?.asset.id}">
 						<td id="priorityCol_${assetsList?.asset.id}">${assetsList?.asset.priority}</td>
 						<td>${assetsList?.asset.assetTag}</td>
 						<td>${assetsList?.asset.assetName}</td>
@@ -390,7 +405,7 @@
 			</tr>
 			<tr>
 			<td colspan="2" style="text-align: center;" class="buttonR">
-			 <input type="button" value="Cancle" onclick="timedRefresh(document.getElementById('timeToRefresh').value)">
+			 <input type="button" value="Cancle" onclick="timedRefresh(document.getElementById('selectTimedId').value)">
 			<g:submitToRemote  action="createTransition" value="Submit" before="setCommentValidation();" onComplete="updateAsset(e)"/></td>
 			</tr>
 			</tbody>

@@ -41,7 +41,7 @@ class AuthController {
 	            /*
 	             *  call loadPreferences() to load CURR_PROJ MAP into session
 	             */
-	            userPreferenceService.loadPreferences()
+	            userPreferenceService.loadPreferences("CURR_PROJ")
 	            redirect(controller:'projectUtil')
             }
         }

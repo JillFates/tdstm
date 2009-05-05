@@ -10,7 +10,7 @@ class UserPreferenceService  {
      * saved into the user's session
      */
     
-    def loadPreferences() {
+    def loadPreferences(def preferenceCode) {
     	
     	def principal = SecurityUtils.subject.principal
     	def userLogin = UserLogin.findByUsername( principal )
@@ -24,7 +24,7 @@ class UserPreferenceService  {
     			currProj.put( userPreference[i].preferenceCode, userPreference[i].value )
     		}
     		// Set CURR_PROJ into User session
-    		getSession().setAttribute( "CURR_PROJ", currProj )
+    		getSession().setAttribute( preferenceCode, currProj )
     	}
     }
 	
@@ -35,8 +35,7 @@ class UserPreferenceService  {
    
     def String getPreference( String preferenceCode ) {
 
-    	def currProj = getSession().getAttribute( "CURR_PROJ" )
-    	
+    	def currProj = getSession().getAttribute( preferenceCode )
     	def prefValue
     	if ( currProj != null ) {
     		prefValue = currProj[preferenceCode]
@@ -69,7 +68,7 @@ class UserPreferenceService  {
     		userPreference.save();
     	}
     	// call loadPreferences() to load CURR_PROJ MAP into session
-    	loadPreferences()
+    	loadPreferences(preferenceCode)
     }
     /*
      * Return current session object
