@@ -464,18 +464,16 @@ class MoveTechController {
     				
             if(params.location == "s"){
                 rdyState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Cleaned"))
-                ipState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Unracking"))
+                ipState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Unracked"))
     				
             }else{
                 rdyState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Cleaned"))
-                ipState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Reracking"))
+                ipState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Unracked"))
             }
             if(it.currentStateId == holdState){
                 colorCss = "asset_hold"
-            }else if(it.currentStateId == rdyState){
-                colorCss = "asset_ready"
             }else if(it.currentStateId == ipState){
-                colorCss = "asset_process"
+                colorCss = "asset_ready"
             }else if((it.currentStateId > holdState) && (it.currentStateId < ipState) ){
                 colorCss = "sset_pending"
             }else if((it.currentStateId >= rdyState)){

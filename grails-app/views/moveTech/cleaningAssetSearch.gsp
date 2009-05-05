@@ -104,7 +104,7 @@
       return false;
       }
       }
-      function clean(){   
+      function clean(){
       if(document.assetSearchForm.myCheckbox != undefined) {
       if(document.assetSearchForm.myCheckbox.checked){
       document.assetSearchForm.action = "cleaning";
@@ -143,7 +143,7 @@
 			style="height:26px; width:64px; float:left; margin:auto 0px;">
 			<img src="${createLinkTo(dir:'images',file:'my_task.png')}" border="0" />
 		</g:link> <img src="${createLinkTo(dir:'images',file:'asset_h.png')}" border="0" /></div>
-		<div class="w_techlog" style="overflow-y: scroll; overflow-x: none;">
+		<div class="w_techlog">
 		
 		
 		
@@ -200,11 +200,11 @@
 				<td><g:checkBox name="myCheckbox" value="${false}" /></td>
 			</tr>
 		</g:each>
-		<g:if test="${holdTask}">
+		
+		<g:if test="${actionLabel}">
 
 			<tr>
-				<td>&nbsp;</td>
-				<td class="buttonR"><input type="button" value="${label}" onclick="clean()" /></td>
+				<td class="buttonR" style="text-align: right;" colspan="2"><input type="button" value="${actionLabel}" onclick="clean()" /></td>
 			</tr>
 		</g:if>
 
@@ -212,8 +212,7 @@
 		<table>
 
 			<tr>
-				<td><textarea rows="2" cols="10" style="width: 750px"
-					title="Enter Note..." name="enterNote"></textarea></td>
+				<td><textarea rows="2" cols="110" title="Enter Note..." name="enterNote"></textarea></td>
 			</tr>
 
 			<tr>
