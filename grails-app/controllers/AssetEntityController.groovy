@@ -746,18 +746,23 @@ class AssetEntityController {
         def assetStatusDetails = []
         def statesList = []
         def recentChanges = []
+        def stateIdList = []
         def assetDetail = AssetEntity.findById(assetId)
         def teamName = assetDetail.sourceTeam.name
         def assetTransition = AssetTransition.findAllByAssetEntity( assetDetail, [max:3, sort:"dateCreated", order:"desc"] )
         assetTransition.each{
-        	recentChanges<<[it.stateTo+'('+ it.userLogin.person.lastName +')']
+        	def taskLabel = stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(it.stateTo))
+        	def time = it.dateCreated.toString().substring(11,19)
+        	recentChanges<<[time+" "+taskLabel+'('+ it.userLogin.person.lastName +')']
         }
         def currentState = ProjectAssetMap.findByAsset(assetDetail).currentStateId
         def state = stateEngineService.getState("STD_PROCESS",currentState)
         def validStates = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR", state)
-        validStates.sort().each{
-        	def id = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
-        	statesList<<[id:it,label:stateEngineService.getStateLabel("STD_PROCESS",id)]
+        validStates.each{
+        	stateIdList<<Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
+        }
+        stateIdList.sort().each{
+        	statesList<<[id:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
         }
         def map = new HashMap()
         map.put("assetDetail",assetDetail)
@@ -788,6 +793,7 @@ class AssetEntityController {
     	def assetEntity = AssetEntity.get(assetId)
     	def assetList = []
     	def statesList = []
+    	def stateIdList = []
     	if(assetEntity){
 	    	def status = params.state
 	    	def assignTo = params.assignTo
@@ -812,10 +818,12 @@ class AssetEntityController {
 		    		}
 		    		assetEntity.save()
                     def validStates = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR", status)
-                    validStates.sort().each{
-                        def id = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
-                        statesList<<[id:it,label:stateEngineService.getStateLabel("STD_PROCESS",id)]
-                    }
+                    validStates.each{
+			        	stateIdList<<Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
+			        }
+			        stateIdList.sort().each{
+			        	statesList<<[id:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
+			        }
 		    		def sourceTeam = assetEntity.sourceTeam.name
 		    		def targetTeam = assetEntity.targetTeam.name
 		    		def sourceTeams = ProjectTeam.findAll("from ProjectTeam where moveBundle = $assetEntity.moveBundle.id and id != $assetEntity.sourceTeam.id and teamCode != 'Cleaning' and teamCode != 'Transport'")

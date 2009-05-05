@@ -69,11 +69,13 @@
 	   	document.assetdetailsForm.asset.value = asset[0].assetDetails.assetDetail.id
 	   	document.assetdetailsForm.currentState.value = asset[0].assetDetails.state
 	    var tableBody = '<table style=\'border:0\' ><thead><tr><th>Asset Details </th></tr></thead><tbody>'+
-		'<tr><td><b>Asset Name : </b>'+asset[0].assetDetails.assetDetail.assetName+'</td></tr>'+
-		'<tr><td><b>Model : </b>'+asset[0].assetDetails.assetDetail.model+'</td></tr>'+
+		'<tr><td><b>Name: </b>'+asset[0].assetDetails.assetDetail.assetName+'</td></tr>'+
+		'<tr><td><b>Model: </b>'+asset[0].assetDetails.assetDetail.model+'</td></tr>'+
 		'<tr><td><b>Rack: </b>'+asset[0].assetDetails.assetDetail.sourceRack+'</td></tr>'+
-		'<tr><td><b>Status : </b>'+asset[0].assetDetails.currentState+'</td></tr>'+
-		'<tr><td><b>Assigned : </b>'+asset[0].assetDetails.teamName+'</td></tr>'+
+		'<tr><td><b>Status: </b>'+asset[0].assetDetails.currentState+'</td></tr>'+
+		'<tr><td><b>Issue: </b></td></tr>'+
+		'<tr><td><b>Time: </b></td></tr>'+
+		'<tr><td><b>Assigned: </b>'+asset[0].assetDetails.teamName+'</td></tr>'+
 		'<tr><td><b>Recent Changes: </b></td></tr>'
 		for(i=0;i<asset[0].recentChanges.length; i++){
 			tableBody += '<tr><td>'+asset[0].recentChanges[i]+'</td></tr>'
@@ -364,11 +366,13 @@
 		<div id="assetDetails" style="border: 1px solid #5F9FCF;width: 200px;">
 		<div id="asset" >
 		<table style='border:0' ><thead><tr><th>Asset Details </th></tr></thead><tbody>
-		<tr><td><b>Asset Name : </b></td></tr>
-		<tr><td><b>Model :</b></td></tr>
+		<tr><td><b>Name: </b></td></tr>
+		<tr><td><b>Model:</b></td></tr>
 		<tr><td><b>Rack: </b></td></tr>
-		<tr><td><b>Status : </b></td></tr>
-		<tr><td><b>Assigned : </b></td></tr>
+		<tr><td><b>Status: </b></td></tr>
+		<tr><td><b>Issue: </b></td></tr>
+		<tr><td><b>Time: </b></td></tr>
+		<tr><td><b>Assigned: </b></td></tr>
 		<tr><td><b>Recent Changes: </b></td></tr>
 		</tbody></table>
 		</div>
@@ -376,7 +380,7 @@
 		<g:form name="assetdetailsForm" >
 		<table style="border: 0">
 			<tbody>
-			<tr><td> <b>Change :</b></td>
+			<tr><td> <b>Change:</b></td>
 			<td> <select id="stateSelectId" name="state" style="width: 100px" onchange="${remoteFunction(action:'getFlag', params:'\'toState=\'+ this.value +\'&fromState=\'+document.getElementById(\'currentStateId\').value', onComplete:'setComment(e)')}">
 			<option value="">Status</option>
 			</select> </td>
@@ -405,7 +409,7 @@
 			</tr>
 			<tr>
 			<td colspan="2" style="text-align: center;" class="buttonR">
-			 <input type="button" value="Cancle" onclick="timedRefresh(document.getElementById('selectTimedId').value)">
+			 <input type="reset" value="Cancel" onclick="timedRefresh(document.getElementById('selectTimedId').value)">
 			<g:submitToRemote  action="createTransition" value="Submit" before="setCommentValidation();" onComplete="updateAsset(e)"/></td>
 			</tr>
 			</tbody>
