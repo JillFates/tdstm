@@ -43,8 +43,8 @@ class WorkflowService {
 	        	}
 	    		//	If verification is successful then create AssetTransition and Update ProjectTeam
 	        	if ( verifyFlag ) {
-	        		def state = stateEngineService.getState( process, currentState )
-	        		def assetTransition = new AssetTransition( stateFrom:state, stateTo:toState, comment:comment, assetEntity:assetEntity, moveBundle:moveBundle, projectTeam:projectTeam, userLogin:userLogin )
+	        		def state = stateEngineService.getStateId( process, toState )
+	        		def assetTransition = new AssetTransition( stateFrom:currentState, stateTo:state, comment:comment, assetEntity:assetEntity, moveBundle:moveBundle, projectTeam:projectTeam, userLogin:userLogin )
 	        		if ( !assetTransition.validate() || !assetTransition.save() ) {
 	    				message = "Unable to create AssetTransition: " + GormUtil.allErrorsString( assetTransition )
 	    			} else {

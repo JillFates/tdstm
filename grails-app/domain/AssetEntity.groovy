@@ -90,7 +90,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	
 	static mapping  = {	
 		version true
-		id column:'assetEntity_id'			
+		id column:'asset_entity_id'			
 	}
 	
 	String toString(){
