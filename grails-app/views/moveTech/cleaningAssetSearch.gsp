@@ -181,7 +181,7 @@
 			</ul>
 			</div>
 		</g:if></div>
-		<div
+		<div style="background:url(${createLinkTo(dir:'images',file:'search.png')}) no-repeat top right;margin-right:500px"
 			onclick="${remoteFunction(action:'getServerInfo', params:'\'assetId=\'+'+projMap.asset.id,onComplete: 'serverInfo(e)')}">
 
 		<g:if test="${projMap}">
