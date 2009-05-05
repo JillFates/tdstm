@@ -1,36 +1,42 @@
 
 .colum_techlogin{
-	width:225px;
+	width:220px;
 	height:auto;
 	margin:0px;
-	
-
-}
-
-.colum_techlogin_login{
-	width:240px;
-	height:auto;
-	margin:0px;
-	
-
-}
-
-.w_techlog_login{
-	width:240px;
-	height:380px;
-	float:left;
-	border:1px solid #5F9FCF;
-	padding:0px;
 
 }
 
 .w_techlog{
-	width:225px;
+	width:220px;
 	height:380px;
 	float:left;
 	border:1px solid #5F9FCF;
 	padding:0px;
 
+}
+
+.colum_techlogin_login{
+	width:235px;
+	height:auto;
+	margin:0px;
+}
+
+.w_techlog_login{
+	width:235px;
+	height:380px;
+	float:left;
+	border:1px solid #5F9FCF;
+	padding:0px;
+}
+
+dt {
+   font-weight: bold;
+   float: left;
+   margin-right: 2px;
+ }  
+
+.set_font{
+	font-size:9px;
 }
 
 .asset_hold{

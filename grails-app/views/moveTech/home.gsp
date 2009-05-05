@@ -16,7 +16,7 @@
 	<div class="mainbody" style="width: 100%;" >
 				<div class="colum_techlogin" style="float:left;">
 				<div class="border_bundle_team">
-          										<div style="float:left; width:92%; margin-left:20px;">
+          										<div style="float:left; width:92%; margin-left:15px;">
               									
 		              									<a href="#" style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'home_h.png')}" border="0"/></a>
 							              				

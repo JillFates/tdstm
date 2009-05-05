@@ -64,21 +64,21 @@
          pos = asset[0].item.targetRackPosition
           }     
         var htmlBody = '<table ><thead></thead><tbody>'+
-'<tr><td style="font-size:9px"><b>Asset Tag:</b>  '+asset[0].item.assetTag+'</td></tr>'+
-'<tr><td style="font-size:9px"><b>Asset Name:</b>  '+asset[0].item.assetName+'</td></tr>'+
-'<tr><td style="font-size:9px"><b>Current State:</b>  '+asset[0].state+'</td></tr>'+
-'<tr><td style="font-size:9px"><b>Serial Number:</b>  '+asset[0].item.serialNumber+'</td></tr>'+
-'<tr><td style="font-size:9px"><b>Model:</b>  '+asset[0].item.model+'</td></tr>'+
-'<tr><td style="font-size:9px"><b>Location:</b>  '+location+'</td></tr>'+
-'<tr><td style="font-size:9px"><b>Room:</b>  '+room+'</td></tr>'+
-'<tr><td style="font-size:9px"><b>Rack/Position:</b>  '+rack+'/'+pos+'</td></tr>'+
-'<tr><td style="font-size:9px"><b>PDU:</b>  '+asset[0].item.powerPort+'</td></tr>'+
-'<tr><td style="font-size:9px"><b>NIC:</b>  '+asset[0].item.nicPort+'</td></tr>'+
-'<tr><td style="font-size:9px"><b>HBA:</b>  '+asset[0].item.hbaPort+'</td></tr>'+
+'<tr><td class="set_font"><b>Asset Tag:</b>  '+asset[0].item.assetTag+'</td></tr>'+
+'<tr><td class="set_font"><b>Asset Name:</b>  '+asset[0].item.assetName+'</td></tr>'+
+'<tr><td class="set_font"><b>Current State:</b>  '+asset[0].state+'</td></tr>'+
+'<tr><td class="set_font"><b>Serial Number:</b>  '+asset[0].item.serialNumber+'</td></tr>'+
+'<tr><td class="set_font"><b>Model:</b>  '+asset[0].item.model+'</td></tr>'+
+'<tr><td class="set_font"><b>Location:</b>  '+location+'</td></tr>'+
+'<tr><td class="set_font"><b>Room:</b>  '+room+'</td></tr>'+
+'<tr><td class="set_font"><b>Rack/Position:</b>  '+rack+'/'+pos+'</td></tr>'+
+'<tr><td class="set_font"><b>PDU:</b>  '+asset[0].item.powerPort+'</td></tr>'+
+'<tr><td class="set_font"><b>NIC:</b>  '+asset[0].item.nicPort+'</td></tr>'+
+'<tr><td class="set_font"><b>HBA:</b>  '+asset[0].item.hbaPort+'</td></tr>'+
 '</tbody></table>' 
         var getDialogId = document.getElementById('serverInfoDialog')
         getDialogId.innerHTML = htmlBody
-         $("#serverInfoDialog").dialog('option', 'width', 200)                     
+         $("#serverInfoDialog").dialog('option', 'width', 215)                     
 		 $("#serverInfoDialog").dialog('option', 'position', ['left','top']);
         $('#serverInfoDialog').dialog('open');
         }
@@ -144,7 +144,7 @@
 </div>
 <div class="mainbody" style="width: 100%;">
 <div class="colum_techlogin" style="float:left;">
-<div style="float: left; width: 200px; margin-left: 20px;"><g:link
+<div style="float: left; width: 200px; margin-left: 15px;"><g:link
 	params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt"]'
 	style="height:26px; width:64px; float:left; margin:auto 0px;">
 	<img src="${createLinkTo(dir:'images',file:'home.png')}" border="0" />
@@ -159,7 +159,7 @@
 
 
 
-<div style="float:left; width:225px; margin:5px 0; ">
+<div style="float:left; width:220px; margin:5px 0; ">
 <g:form name="assetSearchForm" action="placeHold">
 							<input name="bundle" type="hidden" value="${bundle}" />
 							<input name="team" type="hidden" value="${team}" />
@@ -177,13 +177,13 @@
 	<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
 </g:if> 
 </div>
-<div style="background:url(${createLinkTo(dir:'images',file:'search.png')}) no-repeat top right;" onclick="${remoteFunction(action:'getServerInfo', params:'\'assetId=\'+'+projMap.asset.id,onComplete: 'serverInfo(e)')}">
+<div style="background:url(${createLinkTo(dir:'images',file:'search.png')}) no-repeat top right;margin-right:10px" onclick="${remoteFunction(action:'getServerInfo', params:'\'assetId=\'+'+projMap.asset.id,onComplete: 'serverInfo(e)')}">
 
 <g:if test="${projMap}">
-<p><b>Asset Tag:</b> ${projMap?.asset?.assetTag}</p>
-<p><b>Asset Name:</b> ${projMap?.asset?.assetName}</p>
-<p><b>Model:</b> ${projMap?.asset?.model}</p>
-<p><b>Rack/Pos:</b> <g:if test="${location == 's'}">${projMap?.asset?.sourceRack}/${projMap?.asset?.sourceRackPosition}</g:if><g:else test="${location == 't'}">${projMap?.asset?.targetRack}/${projMap?.asset?.targetRackPosition}</g:else> </p>
+<dl><dt>Asset Tag:</dt><dd> ${projMap?.asset?.assetTag}</dd>
+<dt>Asset Name:</dt><dd> mallikarjun haranal bijapur bangalore</dd>
+<dt>Model:</dt><dd> ${projMap?.asset?.model}</dd>
+<dt>Rack/Pos:</dt><dd><g:if test="${location == 's'}">${projMap?.asset?.sourceRack}/${projMap?.asset?.sourceRackPosition}</g:if><g:else test="${location == 't'}">${projMap?.asset?.targetRack}/${projMap?.asset?.targetRackPosition}</g:else></dd></dl>
 	
 </g:if>
 
