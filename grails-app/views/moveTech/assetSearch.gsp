@@ -198,7 +198,7 @@
 			<td><g:checkBox name="myCheckbox" value="${false}" /></td>
 		</tr>
 	</g:each>
-	<g:if test ="${holdTask != 1}">
+	<g:if test ="${actionLabel}">
 	
 	<tr>
 		<td class="buttonR" colspan="2" style="text-align:right;"><input type="button" value="${label}"

@@ -307,7 +307,6 @@ class MoveTechController {
         def search = params.search
         def stateVal
         def taskList
-        def holdTask
         def taskSize
         def label
         def actionLabel
@@ -336,15 +335,15 @@ class MoveTechController {
                     	flash.message = message(code :"The asset is on Hold. Please contact manager to resolve issue.")
                     	redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
                     }
-                    taskList = stateEngineService.getTasks("STD_PROCESS","MOVE_TECH",stateVal)                  
+                    taskList = stateEngineService.getTasks("STD_PROCESS","MOVE_TECH",stateVal)
                     taskSize = taskList.size()
                     if(taskSize == 1){
                     	if(taskList.contains("Hold")){
                     		flash.message = message(code :"There is a problem with this asset. Place the asset on hold to alert the move coordinator")	
-                    		holdTask = 1
                     	}
                     	
                     }else if(taskSize > 1) {
+
                     	taskList.each{
                     		if(it != "Hold"){
                     			actionLabel = it
@@ -354,7 +353,7 @@ class MoveTechController {
                     	}
                     }
                     assetCommt = AssetComment.findAllByAssetEntity(assetItem)
-                    render(view:'assetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,holdTask:holdTask,search:params.search,label:label,actionLabel:actionLabel])
+                    render(view:'assetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:params.search,label:label,actionLabel:actionLabel])
                 }
 			}
         }
@@ -509,7 +508,6 @@ class MoveTechController {
         def search = params.search
         def stateVal
         def taskList
-        def holdTask
         def taskSize
         def label
         def actionLabel
@@ -540,7 +538,6 @@ class MoveTechController {
                     if(taskSize == 1){
                         if(taskList.contains("Hold")){
                             flash.message = message(code :"There is a problem with this asset. Place the asset on hold to alert the move coordinator")
-                            holdTask = 1
                         }
                         	
                     }else if(taskSize > 1) {
@@ -553,7 +550,7 @@ class MoveTechController {
                         }
                     }
                     assetCommt = AssetComment.findAllByAssetEntity(assetItem)
-                    render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,holdTask:holdTask,search:params.search,label:label,actionLabel:actionLabel])
+                    render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:params.search,label:label,actionLabel:actionLabel])
                 }
             }
         }
