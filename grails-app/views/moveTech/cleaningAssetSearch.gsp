@@ -208,7 +208,12 @@
 		<g:each status="i" in="${assetCommt}" var="comments">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 				<td >${comments.comment}</td>
+				<g:if test="${comments.mustVerify == 1}">
 				<td><g:checkBox name="myCheckbox" value="${false}" /></td>
+				</g:if>
+				<g:else>
+			<td></td>
+			</g:else>
 			</tr>
 		</g:each>
 		

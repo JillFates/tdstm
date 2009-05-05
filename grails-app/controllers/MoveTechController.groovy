@@ -376,7 +376,7 @@ class MoveTechController {
         }
         def workflow
         if(params.user == "mt"){	
-          workflow = workflowService.createTransition("STD_PROCESS","MOVE_TECH","Hold",asset,bundle,loginUser,team,params.assetCommt)
+          workflow = workflowService.createTransition("STD_PROCESS","MOVE_TECH","Hold",asset,bundle,loginUser,team,params.enterNote)
           if(workflow.success){          	
   	        	def assetComment = new AssetComment()
           		assetComment.comment = enterNote
@@ -390,7 +390,7 @@ class MoveTechController {
           }
           
         }else{
-          workflow = workflowService.createTransition("STD_PROCESS","CLEANER","Hold",asset,bundle,loginUser,team,params.assetCommt)
+          workflow = workflowService.createTransition("STD_PROCESS","CLEANER","Hold",asset,bundle,loginUser,team,params.enterNote)
           if(workflow.success){          	
   	        	def assetComment = new AssetComment()
           		assetComment.comment = enterNote
@@ -413,15 +413,20 @@ class MoveTechController {
         def principal = SecurityUtils.subject.principal
         def loginUser = UserLogin.findByUsername(principal)               
         def team
+        def assetCommt = params.assetCommt
+       
+        if(assetCommt == '[]'){
+        	assetCommt = "";
+        }
+        
         if(params.location == 's'){
             team = asset.sourceTeam
         }else{
             team = asset.targetTeam
         }
 			
-        def workflow = workflowService.createTransition("STD_PROCESS","MOVE_TECH",actionLabel,asset,bundle,loginUser,team,params.assetCommt)
+        def workflow = workflowService.createTransition("STD_PROCESS","MOVE_TECH",actionLabel,asset,bundle,loginUser,team,assetCommt)
         if(workflow.success){
-        	AssetComment.executeUpdate("update AssetComment ac set ac.mustVerify = 1 where ac.assetEntity = $asset.id");
 			redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
 		}else{
         	flash.message = message(code :workflow.message)	
@@ -569,15 +574,19 @@ class MoveTechController {
         def principal = SecurityUtils.subject.principal
         def loginUser = UserLogin.findByUsername(principal)
         def team
+        def assetCommt = params.assetCommt
+        
+        if(assetCommt == '[]'){
+        	assetCommt = "";
+        }
         if(params.location == 's'){
             team = asset.sourceTeam
         }else{
             team = asset.targetTeam
         }
     			
-        def workflow = workflowService.createTransition("STD_PROCESS","CLEANER",actionLabel,asset,bundle,loginUser,team,params.assetCommt)
+        def workflow = workflowService.createTransition("STD_PROCESS","CLEANER",actionLabel,asset,bundle,loginUser,team,assetCommt)
         if(workflow.success){
-        	AssetComment.executeUpdate("update AssetComment ac set ac.mustVerify = 1 where ac.assetEntity = $asset.id");
             redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
         }else{
         	flash.message = message(code :workflow.message)	
@@ -586,4 +595,5 @@ class MoveTechController {
 			
 	}
 	
+    
 }
