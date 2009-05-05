@@ -26,7 +26,7 @@
               											<img src="${createLinkTo(dir:'images',file:'asset.png')}" style="height:26px; width:64px; float:left; margin:auto 0px;"/>
 								           
 								              	</div>			
-				<div class="w_techlog" style="overflow-y: scroll; overflow-x: none;">
+				<div class="w_techlog">
 				
       					<g:form method="post" name="bundleTeamAssetForm">
       										        
