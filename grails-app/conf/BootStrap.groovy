@@ -522,8 +522,10 @@ class BootStrap {
 		//--------------------------------
 		def assetCommentList = [
 		  			
-            ["Master Spreadsheet comments", "instruction", 0, AssetEntity.get(1)],
-            ["Walkthru comments", "issue", 0, AssetEntity.get(2) ]
+            ["Switch powersupply to 220V", "instruction", 1, AssetEntity.get(1)],
+            ["Tape the SCSI cable to the server", "instruction", 1, AssetEntity.get(1)],
+            ["After move we should upgrade this", "comment", 0, AssetEntity.get(1)],
+            ["The server is going to moved right after the move so don't bother dressing the cabling.", "issue", 0, AssetEntity.get(2) ]
 		]
 		//Insert the List of AssetComment
 		assetCommentList.each {
