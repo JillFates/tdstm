@@ -54,27 +54,28 @@
        
         var asset = eval('(' + e.responseText + ')');
         if(loc == 's'){
-        location = asset.sourceLocation
-        room = asset.sourceRoom
-        rack = asset.sourceRack
-        pos = asset.sourceRackPosition
+        location = asset[0].item.sourceLocation
+        room = asset[0].item.sourceRoom
+        rack = asset[0].item.sourceRack
+        pos = asset[0].item.sourceRackPosition
         }else{
-        location = asset.targetLocation
-        room = asset.targetRoom
-        rack = asset.targetRack
-        pos = asset.targetRackPosition
+        location = asset[0].item.targetLocation
+        room = asset[0].item.targetRoom
+        rack = asset[0].item.targetRack
+        pos = asset[0].item.targetRackPosition
         }     
         var htmlBody = '<table ><thead></thead><tbody>'+
-        '<tr><td style="font-size:9px"><b>Asset Tag:</b> '+asset.assetTag+'</td></tr>'+
-		'<tr><td style="font-size:9px"><b>Asset Name:</b>  '+asset.assetName+'</td></tr>'+		
-		'<tr><td style="font-size:9px"><b>Serial Number:</b>  '+asset.serialNumber+'</td></tr>'+
-		'<tr><td style="font-size:9px"><b>Model:</b>  '+asset.model+'</td></tr>'+
+        '<tr><td style="font-size:9px"><b>Asset Tag:</b>  '+asset[0].item.assetTag+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>Asset Name:</b>  '+asset[0].item.assetName+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>Current State:</b>  '+asset[0].state+'</td></tr>'+		
+		'<tr><td style="font-size:9px"><b>Serial Number:</b>  '+asset[0].item.serialNumber+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>Model:</b>  '+asset[0].item.model+'</td></tr>'+
 		'<tr><td style="font-size:9px"><b>Location:</b>  '+location+'</td></tr>'+
 		'<tr><td style="font-size:9px"><b>Room:</b>  '+room+'</td></tr>'+
 		'<tr><td style="font-size:9px"><b>Rack/Position:</b>  '+rack+'/'+pos+'</td></tr>'+
-		'<tr><td style="font-size:9px"><b>PDU:</b>  '+asset.powerPort+'</td></tr>'+
-		'<tr><td style="font-size:9px"><b>NIC:</b>  '+asset.nicPort+'</td></tr>'+
-		'<tr><td style="font-size:9px"><b>HBA:</b>  '+asset.hbaPort+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>PDU:</b>  '+asset[0].item.powerPort+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>NIC:</b>  '+asset[0].item.nicPort+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>HBA:</b>  '+asset[0].item.hbaPort+'</td></tr>'+
 		'</tbody></table>' 
         var getDialogId = document.getElementById('serverInfoDialog')
         getDialogId.innerHTML = htmlBody
@@ -104,23 +105,33 @@
       return false;
       }
       }
+      
       function clean(){
-      if(document.assetSearchForm.myCheckbox != undefined) {
-      if(document.assetSearchForm.myCheckbox.checked){
-      document.assetSearchForm.action = "cleaning";
+      if(doCheckValidation()){  
+   document.assetSearchForm.action = "cleaning";      
+   document.assetSearchForm.submit();
+   }else{
+   return false;
+   }
+      }
       
-      document.assetSearchForm.submit();
+     function doCheckValidation(){
+	 var trArray = new Array()
+	 var j = 0;
+     trArray = document.getElementsByName('myCheckbox');        
+     for(i=0; i < trArray.length; i++){         
+     if(trArray[i].checked == false){
+     j=1;
+     }
+    }
+     if(j == 0){     
+      return true;
       }else{
-      alert('Please select all instructions');
+      alert('Please select all instructions');                                   
       return false;
-      }
-      }else{
-      document.assetSearchForm.action = "cleaning";      
-      document.assetSearchForm.submit();
-      
-      }
-      }
+      }     
      
+      }
       
         </script>
 </head>

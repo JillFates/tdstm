@@ -260,9 +260,11 @@ class MoveTechController {
 	}
 	//To open div for my task
 	def getServerInfo = {
-			
+		def assetList = []	
         def assetId = params.assetId        
         def assetItem = AssetEntity.findById(assetId)
+        def proMap = ProjectAssetMap.findByAsset(assetItem)
+        def currState = stateEngineService.getState("STD_PROCESS",proMap.currentStateId)       
         if(assetItem.sourceLocation == null)
         assetItem.sourceLocation = ""
         if(assetItem.sourceRoom == null)
@@ -293,10 +295,10 @@ class MoveTechController {
         assetItem.nicPort = ""
         if(assetItem.hbaPort == null)
         assetItem.hbaPort = ""
-        
-        render assetItem as JSON
+       	assetList<<[item:assetItem,state:currState]
+        render assetList as JSON
 	}
-	
+    //  Method for my task asset tag search
 	def assetSearch = {
         def assetItem
         def assetCommt
@@ -360,6 +362,7 @@ class MoveTechController {
 
 	}
 	
+    //  Method for place on hold action
 	def placeHold = {
 		def enterNote = params.enterNote
         def asset = AssetEntity.findByAssetTag(params.search)
@@ -403,12 +406,13 @@ class MoveTechController {
         }        
 	}
 	
+    //  Method for start unracking action
 	def unRack = {
         def asset = AssetEntity.findByAssetTag(params.search)
         def bundle = asset.moveBundle
         def actionLabel = params.actionLabel
         def principal = SecurityUtils.subject.principal
-        def loginUser = UserLogin.findByUsername(principal)
+        def loginUser = UserLogin.findByUsername(principal)               
         def team
         if(params.location == 's'){
             team = asset.sourceTeam
@@ -418,6 +422,7 @@ class MoveTechController {
 			
         def workflow = workflowService.createTransition("STD_PROCESS","MOVE_TECH",actionLabel,asset,bundle,loginUser,team,params.assetCommt)
         if(workflow.success){
+        	AssetComment.executeUpdate("update AssetComment ac set ac.mustVerify = 1 where ac.assetEntity = $asset.id");
 			redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
 		}else{
         	flash.message = message(code :workflow.message)	
@@ -575,6 +580,7 @@ class MoveTechController {
     			
         def workflow = workflowService.createTransition("STD_PROCESS","CLEANER",actionLabel,asset,bundle,loginUser,team,params.assetCommt)
         if(workflow.success){
+        	AssetComment.executeUpdate("update AssetComment ac set ac.mustVerify = 1 where ac.assetEntity = $asset.id");
             redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
         }else{
         	flash.message = message(code :workflow.message)	
