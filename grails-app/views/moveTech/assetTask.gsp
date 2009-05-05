@@ -12,7 +12,7 @@
 <link type="text/css" rel="stylesheet"
 	href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
 <link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
+	href="${createLinkTo(dir:'css',file:'ui.move_tech_dialog.css')}" />
 <link type="text/css" rel="stylesheet"
 	href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
 <link type="text/css" rel="stylesheet"
@@ -59,16 +59,16 @@
          pos = asset.targetRackPosition
           }           
         var htmlBody = '<table ><thead></thead><tbody>'+
-'<tr><td style="font-size:9px">Asset Tag:  '+asset.assetTag+'</td></tr>'+
-'<tr><td style="font-size:9px">Asset Name:  '+asset.assetName+'</td></tr>'+
-'<tr><td style="font-size:9px">Serial Number:  '+asset.serialNumber+'</td></tr>'+
-'<tr><td style="font-size:9px">Model:  '+asset.model+'</td></tr>'+
-'<tr><td style="font-size:9px">Location:  '+location+'</td></tr>'+
-'<tr><td style="font-size:9px">Room:  '+room+'</td></tr>'+
-'<tr><td style="font-size:9px">Rack/Position:  '+rack+'/'+pos+'</td></tr>'+
-'<tr><td style="font-size:9px">PDU:  '+asset.powerPort+'</td></tr>'+
-'<tr><td style="font-size:9px">NIC:  '+asset.nicPort+'</td></tr>'+
-'<tr><td style="font-size:9px">HBA:  '+asset.hbaPort+'</td></tr>'+
+'<tr><td style="font-size:9px;padding:2px 2px;"><b>Asset Tag:</b> '+asset.assetTag+'</td></tr>'+
+'<tr><td style="font-size:9px;padding:2px 2px;"><b>Asset Name:</b> '+asset.assetName+'</td></tr>'+
+'<tr><td style="font-size:9px;padding:2px 2px;"><b>Serial Number:</b> '+asset.serialNumber+'</td></tr>'+
+'<tr><td style="font-size:9px;padding:2px 2px;"><b>Model:</b> '+asset.model+'</td></tr>'+
+'<tr><td style="font-size:9px;padding:2px 2px;"><b>Location:</b> '+location+'</td></tr>'+
+'<tr><td style="font-size:9px;padding:2px 2px;"><b>Room:</b> '+room+'</td></tr>'+
+'<tr><td style="font-size:9px;padding:2px 2px;"><b>Rack/Position:</b> '+rack+'/'+pos+'</td></tr>'+
+'<tr><td style="font-size:9px;padding:2px 2px;"><b>PDU:</b> '+asset.powerPort+'</td></tr>'+
+'<tr><td style="font-size:9px;padding:2px 2px;"><b>NIC:</b> '+asset.nicPort+'</td></tr>'+
+'<tr><td style="font-size:9px;padding:2px 2px;"><b>HBA:</b> '+asset.hbaPort+'</td></tr>'+
 '</tbody></table>' 
         var getDialogId = document.getElementById('serverInfoDialog')
         getDialogId.innerHTML = htmlBody
@@ -97,12 +97,12 @@
 	</div>
 	<div class="mainbody" style="width: 100%;" >
 				<div class="colum_techlogin" style="float:left;">
-				<div style="float:left; width:92%; margin-left:20px;">
+				<div style="float:left; width:200px; margin-left:20px;">
 		        	<g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt"]' style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'home.png')}" border="0"/></g:link>
 					<a href="#" style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'my_task_h.png')}" border="0" /><a>
 					<img  src="${createLinkTo(dir:'images',file:'asset.png')}" style="height:26px; width:64px; float:left; margin:auto 0px;"/>
 				</div>			
-				<div class="w_techlog" style="overflow-y: scroll; overflow-x: none;">
+				<div class="w_techlog">
 				
       					<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">
       					
@@ -113,13 +113,13 @@
 							<input name="tab" type="hidden" value="Todo" />
 							
 								              	
-								            <div style="float:left; width:100%; margin:5px 0; ">              								
-              								   <table style="border:0px;">
+								            <div style="float:left; width:225px; margin:2px 0; ">              								
+              								   <table style="border:0px;width:225px">
 								            		<tr>
 								            										            		
-								            		<td id="todoId" ><g:link  style="color: #5b5e5c; border:1px solid #5b5e5c; margin:5px;background:#aaefb8;padding:2px;" action="assetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo(${todoSize})</g:link></td>
-								            		<td id="allId"><g:link   style="color: #5b5e5c; border:1px solid #5b5e5c; margin:5px; padding:2px;" action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All(${allSize})</g:link></td>
-								            		<td style="text-align:right;"><input  type="text" size="8" value="" name="search" style="background:url(${createLinkTo(dir:'images',file:'search.png')}) no-repeat center right;"/></td></tr>
+								            		<td id="todoId" ><g:link  style="color: #5b5e5c; border:1px solid #5b5e5c; margin:2px;background:#aaefb8;padding:2px;" action="assetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo(${todoSize})</g:link></td>
+								            		<td id="allId"><g:link   style="color: #5b5e5c; border:1px solid #5b5e5c; margin:2px; padding:2px;" action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All(${allSize})</g:link></td>
+								            		<td style="text-align:right; margin:2px; padding:2px;"><input  type="text" size="10" value="" name="search" style="background:url(${createLinkTo(dir:'images',file:'search.png')}) no-repeat center right;margin:2px; padding:2px;"/></td></tr>
 								               </table>
 								            </div>  
 		<div id="mydiv" onclick="document.getElementById('mydiv').style.display = 'none';setFocus()">						            
@@ -127,11 +127,11 @@
 	<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
 </g:if> 
 </div>		
-           <div style="float:left; width:100%; margin:5px 0; "><b>My Tasks:</b></div>
-            <div id="assetTable"style="float:left;width:100%; ">
-            <div  style=" width:100%; ">
+           <div style="float:left; width:225px; margin:5px 0; "><b>My Tasks:</b></div>
+            <div id="assetTable"style="float:left;width:225px; ">
+            <div  style=" width:225px; ">
           
-             <table id="assetTable" style="overflow:scroll;height:80px;">
+             <table id="assetTable" style="height:80px;">
               <thead>
                 <tr>
                   <th style="font-size:9px">AssetTag</th>

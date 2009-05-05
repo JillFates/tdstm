@@ -15,11 +15,11 @@
 	src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 </div>
 <div class="mainbody" style="width: auto;">
-<div class="colum_techlogin" style="float:left;">
+<div class="colum_techlogin_login" style="float:left;">
 <g:if test="${flash.message}">
 	<div style="width: 204px;" class="message">${flash.message}</div>
 </g:if>
-<div class="w_techlog"><g:form action="signIn" name="loginForm">
+<div class="w_techlog_login"><g:form action="signIn" name="loginForm">
 	<input type="hidden" name="targetUri" value="${targetUri}" />
 
 	<div

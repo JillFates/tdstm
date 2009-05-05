@@ -65,16 +65,16 @@
         pos = asset.targetRackPosition
         }     
         var htmlBody = '<table ><thead></thead><tbody>'+
-        '<tr><td style="font-size:9px">Asset Tag:  '+asset.assetTag+'</td></tr>'+
-		'<tr><td style="font-size:9px">Asset Name:  '+asset.assetName+'</td></tr>'+		
-		'<tr><td style="font-size:9px">Serial Number:  '+asset.serialNumber+'</td></tr>'+
-		'<tr><td style="font-size:9px">Model:  '+asset.model+'</td></tr>'+
-		'<tr><td style="font-size:9px">Location:  '+location+'</td></tr>'+
-		'<tr><td style="font-size:9px">Room:  '+room+'</td></tr>'+
-		'<tr><td style="font-size:9px">Rack/Position:  '+rack+'/'+pos+'</td></tr>'+
-		'<tr><td style="font-size:9px">PDU:  '+asset.powerPort+'</td></tr>'+
-		'<tr><td style="font-size:9px">NIC:  '+asset.nicPort+'</td></tr>'+
-		'<tr><td style="font-size:9px">HBA:  '+asset.hbaPort+'</td></tr>'+
+        '<tr><td style="font-size:9px"><b>Asset Tag:</b> '+asset.assetTag+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>Asset Name:</b>  '+asset.assetName+'</td></tr>'+		
+		'<tr><td style="font-size:9px"><b>Serial Number:</b>  '+asset.serialNumber+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>Model:</b>  '+asset.model+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>Location:</b>  '+location+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>Room:</b>  '+room+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>Rack/Position:</b>  '+rack+'/'+pos+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>PDU:</b>  '+asset.powerPort+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>NIC:</b>  '+asset.nicPort+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>HBA:</b>  '+asset.hbaPort+'</td></tr>'+
 		'</tbody></table>' 
         var getDialogId = document.getElementById('serverInfoDialog')
         getDialogId.innerHTML = htmlBody
@@ -174,12 +174,11 @@
 			onclick="${remoteFunction(action:'getServerInfo', params:'\'assetId=\'+'+projMap.asset.id,onComplete: 'serverInfo(e)')}">
 
 		<g:if test="${projMap}">
-			<p>Asset: ${projMap?.asset?.assetName}</p>
-			<p>Model: ${projMap?.asset?.model}</p>
-			<p>Rack/Pos: <g:if test="${location == 's'}">${projMap?.asset?.sourceRack}/${projMap?.asset?.sourceRackPosition}</g:if><g:else
-				test="${location == 't'}">${projMap?.asset?.targetRack}/${projMap?.asset?.targetRackPosition}</g:else>
-			</p>
-
+		<p><b>Asset Tag:</b> ${projMap?.asset?.assetTag}</p>
+		<p><b>Asset Name:</b> ${projMap?.asset?.assetName}</p>
+		<p><b>Model:</b> ${projMap?.asset?.model}</p>
+		<p><b>Rack/Pos:</b> <g:if test="${location == 's'}">${projMap?.asset?.sourceRack}/${projMap?.asset?.sourceRackPosition}</g:if><g:else test="${location == 't'}">${projMap?.asset?.targetRack}/${projMap?.asset?.targetRackPosition}</g:else> </p>
+	
 		</g:if></div>
 		
 		<tr>
@@ -197,7 +196,7 @@
 		</tr>
 		<g:each status="i" in="${assetCommt}" var="comments">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-				<td>${comments.comment}</td>
+				<td >${comments.comment}</td>
 				<td><g:checkBox name="myCheckbox" value="${false}" /></td>
 			</tr>
 		</g:each>

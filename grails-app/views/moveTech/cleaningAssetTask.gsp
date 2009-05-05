@@ -59,16 +59,16 @@
          pos = asset.targetRackPosition
           }           
         var htmlBody = '<table ><thead></thead><tbody>'+
-        '<tr><td style="font-size:9px">Asset Tag:  '+asset.assetTag+'</td></tr>'+
-		'<tr><td style="font-size:9px">Asset Name:  '+asset.assetName+'</td></tr>'+		
-		'<tr><td style="font-size:9px">Serial Number:  '+asset.serialNumber+'</td></tr>'+
-		'<tr><td style="font-size:9px">Model:  '+asset.model+'</td></tr>'+
-		'<tr><td style="font-size:9px">Location:  '+location+'</td></tr>'+
-		'<tr><td style="font-size:9px">Room:  '+room+'</td></tr>'+
-		'<tr><td style="font-size:9px">Rack/Position:  '+rack+'/'+pos+'</td></tr>'+
-		'<tr><td style="font-size:9px">PDU:  '+asset.powerPort+'</td></tr>'+
-		'<tr><td style="font-size:9px">NIC:  '+asset.nicPort+'</td></tr>'+
-		'<tr><td style="font-size:9px">HBA:  '+asset.hbaPort+'</td></tr>'+
+        '<tr><td style="font-size:9px"><b>Asset Tag:</b>  '+asset.assetTag+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>Asset Name:</b>  '+asset.assetName+'</td></tr>'+		
+		'<tr><td style="font-size:9px"><b>Serial Number:</b>  '+asset.serialNumber+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>Model:</b>  '+asset.model+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>Location:</b>  '+location+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>Room:</b>  '+room+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>Rack/Position:</b>  '+rack+'/'+pos+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>PDU:</b>  '+asset.powerPort+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>NIC:</b>  '+asset.nicPort+'</td></tr>'+
+		'<tr><td style="font-size:9px"><b>HBA:</b>  '+asset.hbaPort+'</td></tr>'+
 		'</tbody></table>' 
         var getDialogId = document.getElementById('serverInfoDialog')
         getDialogId.innerHTML = htmlBody

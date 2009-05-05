@@ -39,12 +39,12 @@
 								
               					<div style="float:left; width:100%; margin:5px 0; ">
               					  <table style="border:0px;">
-              					     <tr><td colspan="2">Currently Logged in as:</td></tr>              					     
-              					     <tr><td style="width:20px;">Project:</td><td>${project}</td></tr>
-              					     <tr><td style="width:20px;">Bundle:</td><td>${bundle}</td></tr>
-              					     <tr><td style="width:20px;">Team:</td><td>${projectTeam}</td></tr> 
-              					     <tr><td style="width:20px;">Members:</td><td>${members}</td></tr>              					     
-              					     <tr><td style="width:20px;">Location:</td><td>${loc}</td></tr>
+              					     <tr><td colspan="2"><b>Currently Logged in as:</b></td></tr>              					     
+              					     <tr><td style="width:20px;"><b>Project:</b></td><td>${project}</td></tr>
+              					     <tr><td style="width:20px;"><b>Bundle:</b></td><td>${bundle}</td></tr>
+              					     <tr><td style="width:20px;"><b>Team:</b></td><td>${projectTeam}</td></tr> 
+              					     <tr><td style="width:20px;"><b>Members:</b></td><td>${members}</td></tr>              					     
+              					     <tr><td style="width:20px;"><b>Location:</b></td><td>${loc}</td></tr>
               					  </table>
               					</div>
               					

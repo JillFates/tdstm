@@ -14,7 +14,7 @@
 <link type="text/css" rel="stylesheet"
 	href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
 <link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
+	href="${createLinkTo(dir:'css',file:'ui.move_tech_dialog.css')}" />
 <link type="text/css" rel="stylesheet"
 	href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
 <link type="text/css" rel="stylesheet"
@@ -64,16 +64,16 @@
          pos = asset.targetRackPosition
           }     
         var htmlBody = '<table ><thead></thead><tbody>'+
-'<tr><td style="font-size:9px">Asset Tag:  '+asset.assetTag+'</td></tr>'+
-'<tr><td style="font-size:9px">Asset Name:  '+asset.assetName+'</td></tr>'+
-'<tr><td style="font-size:9px">Serial Number:  '+asset.serialNumber+'</td></tr>'+
-'<tr><td style="font-size:9px">Model:  '+asset.model+'</td></tr>'+
-'<tr><td style="font-size:9px">Location:  '+location+'</td></tr>'+
-'<tr><td style="font-size:9px">Room:  '+room+'</td></tr>'+
-'<tr><td style="font-size:9px">Rack/Position:  '+rack+'/'+pos+'</td></tr>'+
-'<tr><td style="font-size:9px">PDU:  '+asset.powerPort+'</td></tr>'+
-'<tr><td style="font-size:9px">NIC:  '+asset.nicPort+'</td></tr>'+
-'<tr><td style="font-size:9px">HBA:  '+asset.hbaPort+'</td></tr>'+
+'<tr><td style="font-size:9px;padding:2px 2px;"><b>Asset Tag:</b> '+asset.assetTag+'</td></tr>'+
+'<tr><td style="font-size:9px;padding:2px 2px;"><b>Asset Name:</b> '+asset.assetName+'</td></tr>'+
+'<tr><td style="font-size:9px;padding:2px 2px;"><b>Serial Number:</b> '+asset.serialNumber+'</td></tr>'+
+'<tr><td style="font-size:9px;padding:2px 2px;"><b>Model:</b> '+asset.model+'</td></tr>'+
+'<tr><td style="font-size:9px;padding:2px 2px;"><b>Location:</b> '+location+'</td></tr>'+
+'<tr><td style="font-size:9px;padding:2px 2px;"><b>Room:</b> '+room+'</td></tr>'+
+'<tr><td style="font-size:9px;padding:2px 2px;">Rack/Position:</b> '+rack+'/'+pos+'</td></tr>'+
+'<tr><td style="font-size:9px;padding:2px 2px;"><b>PDU:</b> '+asset.powerPort+'</td></tr>'+
+'<tr><td style="font-size:9px;padding:2px 2px;"><b>NIC:</b> '+asset.nicPort+'</td></tr>'+
+'<tr><td style="font-size:9px;padding:2px 2px;"><b>HBA:</b> '+asset.hbaPort+'</td></tr>'+
 '</tbody></table>' 
         var getDialogId = document.getElementById('serverInfoDialog')
         getDialogId.innerHTML = htmlBody
@@ -127,17 +127,15 @@
         </script>    
 </head>
 <body>
-<div id="serverInfoDialog" title ="Server Info" onclick="$('#serverInfoDialog').dialog('close')">
-  
-			
-    </div>
+<div id="serverInfoDialog" title ="Server Info" onclick="$('#serverInfoDialog').dialog('close')">			
+</div>
 
 <div id="spinner" class="spinner" style="display: none;"><img
 	src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 </div>
 <div class="mainbody" style="width: 100%;">
 <div class="colum_techlogin" style="float:left;">
-<div style="float: left; width: 92%; margin-left: 20px;"><g:link
+<div style="float: left; width: 200px; margin-left: 20px;"><g:link
 	params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt"]'
 	style="height:26px; width:64px; float:left; margin:auto 0px;">
 	<img src="${createLinkTo(dir:'images',file:'home.png')}" border="0" />
@@ -147,12 +145,12 @@
 	<img  src="${createLinkTo(dir:'images',file:'my_task.png')}" border="0" /></g:link>
 <img
 	src="${createLinkTo(dir:'images',file:'asset_h.png')}" border="0" /></div>
-<div class="w_techlog" style="overflow-y: scroll; overflow-x: none;">
+<div class="w_techlog">
 
 
 
 
-<div style="float:left; width:100%; margin:5px 0; ">
+<div style="float:left; width:225px; margin:5px 0; ">
 <g:form name="assetSearchForm" action="placeHold">
 							<input name="bundle" type="hidden" value="${bundle}" />
 							<input name="team" type="hidden" value="${team}" />
@@ -194,16 +192,15 @@
 	<g:if test ="${holdTask != 1}">
 	
 	<tr>
-		<td>&nbsp;</td>
-		<td class="buttonR"><input type="button" value="${label}"
+		<td class="buttonR" colspan="2" style="text-align:right;"><input type="button" value="${label}"
 			onclick="unRack()" /></td>
 	</tr>
 	</g:if>		
 
-	<table >	
+	<table>	
 		
 		<tr><td>
-		<textarea rows="2" cols="10" style="width: 200px" title="Enter Note..." name="enterNote" ></textarea>
+		<textarea rows="2" cols="10" style="width: 200px;padding:0px;" title="Enter Note..." name="enterNote" ></textarea>
 		</td> </tr>
 		
 		<tr>
