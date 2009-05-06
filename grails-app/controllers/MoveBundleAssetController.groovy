@@ -672,7 +672,7 @@ class MoveBundleAssetController {
     		assetCommentList.each { assetComment ->
     			def createdBy
     			def assetTransitionInstance = AssetTransition.findByAssetEntity(assetComment.assetEntity)
-    			if ( assetTransitionInstance?.projectteam != null ){
+    			if ( assetTransitionInstance?.projectTeam != null ){
     				def createdParty = PartyGroup.findById(assetTransitionInstance.projectTeam.id)
     				createdBy = createdParty?.name
     			}else if ( assetTransitionInstance?.userLogin != null ){
