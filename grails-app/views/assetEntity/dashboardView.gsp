@@ -333,7 +333,7 @@
 					<g:sortableColumn property="statTimer" title="Stat Timer" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
 					<g:sortableColumn property="loc" title="Loc" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
 					<g:sortableColumn property="issues" title="Issues" /> -->
-					<th>Actions</th>
+					<th></th>
 					<th>Priority</th>
 					<th>Asset Tag</th>
 					<th>Asset Name</th>
@@ -348,8 +348,18 @@
 			<tbody id="assetsTbody">
 				<g:each status="i" in="${assetsList}" var="assetsList">
 					<tr name="assetDetailRow" id="assetDetailRow_${assetsList?.asset.id}" class="${assetsList?.cssClass}" value="${assetsList?.asset.id}">
-						<td id="action_${assetsList?.asset.id}">
+						<td onclick="assetDetails('${assetsList?.asset.id}')">
 						<span style="visibility: hidden;" id="image_${assetsList?.asset.id}"><img src="${createLinkTo(dir:'images',file:'arrow.png')}" border="0px" ></span> 
+						</td>
+						<td id="priorityCol_${assetsList?.asset.id}" onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.priority}</td>
+						<td onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.assetTag}</td>
+						<td onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.assetName}</td>
+						<td onclick="assetDetails('${assetsList?.asset.id}')" id="statusCol_${assetsList?.asset.id}">${assetsList?.status}</td>
+						<td onclick="assetDetails('${assetsList?.asset.id}')" id="source_${assetsList?.asset.id}">${assetsList?.asset.sourceTeam?.name}</td>
+						<td onclick="assetDetails('${assetsList?.asset.id}')" id="target_${assetsList?.asset.id}">${assetsList?.asset.targetTeam?.name}</td>
+						<td onclick="assetDetails('${assetsList?.asset.id}')"><tds:convertDateTime date="${assetsList.asset.moveBundle.startTime}" /></td>
+						<td onclick="assetDetails('${assetsList?.asset.id}')">${assetsList.asset.sourceTeam.currentLocation}</td>
+						<td >
 						<g:if test="${AssetComment.findByAssetEntityAndCommentType(assetsList?.asset,'issue')}">
 						<g:remoteLink controller="assetEntity" action="listComments" id="${assetsList?.asset.id}" before="document.getElementById('createAssetCommentId').value = ${assetsList?.asset.id};" onComplete="listCommentsDialog( e );">
 							<img src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}" border="0px">
@@ -363,15 +373,6 @@
 						</g:if>
 						</g:else>
 						</td>
-						<td id="priorityCol_${assetsList?.asset.id}" onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.priority}</td>
-						<td onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.assetTag}</td>
-						<td onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.assetName}</td>
-						<td onclick="assetDetails('${assetsList?.asset.id}')" id="statusCol_${assetsList?.asset.id}">${assetsList?.status}</td>
-						<td onclick="assetDetails('${assetsList?.asset.id}')" id="source_${assetsList?.asset.id}">${assetsList?.asset.sourceTeam?.name}</td>
-						<td onclick="assetDetails('${assetsList?.asset.id}')" id="target_${assetsList?.asset.id}">${assetsList?.asset.targetTeam?.name}</td>
-						<td onclick="assetDetails('${assetsList?.asset.id}')"><tds:convertDateTime date="${assetsList.asset.moveBundle.startTime}" /></td>
-						<td onclick="assetDetails('${assetsList?.asset.id}')">${assetsList.asset.sourceTeam.currentLocation}</td>
-						<td onclick="assetDetails('${assetsList?.asset.id}')">not required</td>
 					</tr>
 					
 				</g:each>

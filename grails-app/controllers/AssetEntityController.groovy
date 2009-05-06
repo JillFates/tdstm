@@ -700,6 +700,7 @@ class AssetEntityController {
         def stagedId = stateEngineService.getStateId("STD_PROCESS","Staged")
         def unrackedId = stateEngineService.getStateId("STD_PROCESS","Unracked")
         def holdId = stateEngineService.getStateId("STD_PROCESS","Hold")
+        def releasedId = stateEngineService.getStateId("STD_PROCESS","Release")
         projectTeamList.each{
             def teamMembers = partyRelationshipService.getBundleTeamMembersDashboard(it.id)
             def member
@@ -733,7 +734,7 @@ class AssetEntityController {
         	def cssClass
         	if(curId == Integer.parseInt(holdId) ){
         		cssClass = 'asset_hold'
-        	} else if(curId < Integer.parseInt(rerackedId) && curId != Integer.parseInt(holdId) ){
+        	} else if(curId < Integer.parseInt(releasedId) && curId != Integer.parseInt(holdId) ){
         		cssClass = 'asset_pending'
         	} else if(curId > Integer.parseInt(rerackedId)){
         		cssClass = 'asset_done'
@@ -813,6 +814,7 @@ class AssetEntityController {
 	    	def projectAssetMap = ProjectAssetMap.findByAsset(assetEntity)
 	    	def rerackedId = stateEngineService.getStateId("STD_PROCESS","Reracked")
 	        def holdId = stateEngineService.getStateId("STD_PROCESS","Hold")
+	        def releasedId = stateEngineService.getStateId("STD_PROCESS","Release")
 	    	if(status != "" ){
 		    	def principal = SecurityUtils.subject.principal
 		    	def loginUser = UserLogin.findByUsername(principal)
@@ -853,7 +855,7 @@ class AssetEntityController {
     		def cssClass
     		if(currentStatus == Integer.parseInt(holdId) ){
         		cssClass = 'asset_hold'
-        	} else if(currentStatus < Integer.parseInt(rerackedId) && currentStatus != Integer.parseInt(holdId) ){
+        	} else if(currentStatus < Integer.parseInt(releasedId) && currentStatus != Integer.parseInt(holdId) ){
         		cssClass = 'asset_pending'
         	} else if(currentStatus > Integer.parseInt(rerackedId)){
         		cssClass = 'asset_done'
