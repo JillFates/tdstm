@@ -1,328 +1,213 @@
+
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <title>Report List</title>
-<g:javascript library="prototype"/>
-<g:javascript library="jquery"/>
+<g:javascript library="prototype" />
+<g:javascript library="jquery" />
+<jq:plugin name="jquery.bgiframe.min" />
+<jq:plugin name="jquery.autocomplete" />
+<link type="text/css" rel="stylesheet"
+	href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
+<link type="text/css" rel="stylesheet"
+	href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
+<link type="text/css" rel="stylesheet"
+	href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
+<link type="text/css" rel="stylesheet"
+	href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
+<link type="text/css" rel="stylesheet"
+	href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
+<link type="text/css" rel="stylesheet"
+	href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
+<link type="text/css" rel="stylesheet"
+	href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
+<link type="text/css" rel="stylesheet"
+	href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
+
+<jq:plugin name="ui.core" />
+<jq:plugin name="ui.draggable" />
+<jq:plugin name="ui.resizable" />
+<jq:plugin name="ui.dialog" />
+
 <g:javascript>
 function initialize(){
 document.getElementById('appSmeId').value="${appSmeValue}"
 document.getElementById('appOwnerId').value="${appOwnerValue}"
 document.getElementById('applicationId').value="${appValue}"
-}
-function callRelatedRec(){
-var projectId=document.getElementById('projectId').value
-var appValue=document.getElementById('applicationId').value
-var appOwnerValue=document.getElementById('appOwnerId').value
-var appSmeValue=document.getElementById('appSmeId').value
-document.listForm.method="post"
-document.listForm.action="searchFilters?applicationVal="+appValue+"&appOwnerVal="+appOwnerValue+"&appSmeVal="+appSmeValue+"&projectId="+projectId;
-document.listForm.submit();
+var time = '${timeToRefresh}';
+	if(time != "never" && time != "" ){
+	document.getElementById("selectTimedId").value = time;
+	} else if(time == "" ){
+	document.getElementById("selectTimedId").value = 120000;	
+	}
 }
 </g:javascript>
+<script>
+	      $(document).ready(function() {
+	        $("#showDialog").dialog({ autoOpen: false })
+	       
+	      })
+</script>
+<script type="text/javascript">
+
+function showChangeStatusDialog(e){
+var task = eval('(' + e.responseText + ')');
+
+var options = '';
+      for (var i = 0; i < task[0].item.length; i++) {
+        options += '<option value="' + task[0].item[i] + '">' + task[0].item[i] + '</option>';
+      }
+      $("select#taskList").html(options);
+       var getDialogId = document.getElementById('asset')     
+      getDialogId.value=task[0].asset;
+ 
+ 
+$("#showDialog").dialog('option', 'width', 400)
+$("#showDialog").dialog('option', 'position', ['center','top']);
+$('#showDialog').dialog('open');
+}
+function submitAction(){
+document.changeStatusForm.action = "changeStatus";
+document.changeStatusForm.submit();
+}
+function setRefreshTime(e) {
+	var timeRefresh = eval("(" + e.responseText + ")")
+	if(timeRefresh){
+		timedRefresh(timedRefresh[0].refreshTime.CLIENT_CONSOLE_REFRESH)
+	}
+}
+var timer
+function timedRefresh(timeoutPeriod) {
+	if(timeoutPeriod != 'never'){
+		timer = setTimeout("location.reload(false);",timeoutPeriod);
+		document.getElementById("selectTimedId").value = timeoutPeriod;
+	} else {
+		clearTimeout(timer)
+	}
+}
+</script>
 </head>
 <body>
-<g:form name="listForm" />
+<div title="Change Status" id="showDialog"
+	style="background-color: #808080;display: none;">
+<form name="changeStatusForm"><input type="hidden" name="asset"
+	id="asset" /> <input type="hidden" name="projectId" id="projectId"
+	value="${projectId}" />
+<table style="border: 0px; width: 100%">
+	<tr>
+		<td width="40%"><strong>Change status for selected
+		devices to:</strong></td>
+		<td width="60%"></td>
+	</tr>
+	<tr>
+		<td><select id="taskList" name="taskList" style="width: 250%">
+
+		</select></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td style="text-align: right;"><input type="button" value="Save"
+			onclick="submitAction()" /></td>
+	</tr>
+</table>
+</form>
+</div>
 <div class="body"><br>
-<g:if test="${flash.message}">
-	<div class="message">${flash.message}</div>
-</g:if>
-<div style="width:900px;overflow-x:scroll">
-<input type="hidden" id="projectId" name="projectId"
-		value="${projectId }" />
-	<table cellpadding="1" cellspacing="1">
-<select id="applicationId" onchange="callRelatedRec();">
-<option value="All">All</option>	
-<g:each in="${applicationList}" var="application">
-<option value="${application}" >${application}</option>
-</g:each> 	
-</select>	
-	
-<select id="appOwnerId" onchange="callRelatedRec();">
-<option value="All">All</option>	
-<g:each in="${appOwnerList}" var="appOwner">
-<option value="${appOwner}">${appOwner}</option>
-</g:each> 	
-</select>	
-	
-<select id="appSmeId" onchange="callRelatedRec();">	
-<option value="All">All</option>
-<g:each in="${appSmeList}" var="appSme">
-<option value="${appSme}">${appSme}</option>
-</g:each> 	
-</select>	
-
-
-		<thead>
-			<tr>
-				<g:sortableColumn property="application" title="Application" />
-
-				<g:sortableColumn property="appOwner" title="App Owner" />
-
-				<g:sortableColumn property="appSme" title="App Sme" />
-
-				<g:sortableColumn property="assetName" title="Asset Name" />
-				
-				<th>AppStartup</th>
-				<th>AppFinished</th>
-				<th>AppVerifying</th>
-				<th>AppVerified</th>
-                <th>Cleaned</th>
-                <th>Completed</th>
-                <th>DBFinished</th>
-                <th>DBStarted</th>
-				
-				<th>EndTransit</th>
-				<th>Hold</th>
-				<th>InTransit</th>
-				<th>NetVerifying</th>
-				<th>NetVerified</th>
-				<th>OffTruck</th>
-				<th>OnCart</th>
-				<th>OnTruck</th>
-				<th>PoweredDown</th>
-				<th>PoweredOn</th>
-				
-				<th>QAVerified</th>
-				<th>Ready</th>
-				<th>Release</th>
-				<th>Reracked</th>
-				<th>Reracking</th>
-				<th>SANVerifying</th>
-				<th>SANVerified</th>
-				<th>Staged</th>
-				<th>Terminated</th>
-				<th>Unracking</th>
-				<th>Unracked</th>
-
-			</tr>
-		</thead>
-		<tbody>
-		
-		
-		
-		
-			<g:each in="${assetEntityList}" status="i" var="assetEntity">
-				<tr>
-
-					<td>${assetEntity.application}</td>
-					<td>${assetEntity.appOwner}</td>
-					<td>${assetEntity.appSme}</td>
-					<td>${assetEntity.assetName}</td> 
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'AppStartup')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'AppFinished')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'AppVerifying')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'AppVerified')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'Cleaned')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'Completed')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'DBFinished')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'DBStarted')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'EndTransit')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'Hold')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'InTransit')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'NetVerifying')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'NetVerified')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'OffTruck')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'OnCart')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'OnTruck')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'PoweredDown')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'PoweredOn')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'QAVerified')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'Ready')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'Release')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'Reracked')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'Reracking')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'SANVerifying')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'SANVerified')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'Staged')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'Terminated')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'Unracking')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					
-					<g:if test="${AssetTransition.findByAssetEntityAndStateTo(assetEntity,'Unracked')==null}">
-					<td bgcolor="white"></td>
-					</g:if>
-					<g:else>
-					<td bgcolor="green"></td>
-					</g:else>
-					</tr>
-			</g:each>
-		</tbody>
+<h1>PMO Dashboard</h1>
+<div style="width: 900px; overflow-x: scroll"><g:form
+	name="listForm" action="list" method="post">
+	<table style="border: 0px;">
+		<tr>
+			<td><select id="applicationId" name="application"
+				onchange="document.listForm.submit();">
+				<option value="">All</option>
+				<g:each in="${applicationList}" var="application">
+					<option value="${application}">${application}</option>
+				</g:each>
+			</select> <select id="appOwnerId" name="appOwner"
+				onchange="document.listForm.submit();">
+				<option value="">All</option>
+				<g:each in="${appOwnerList}" var="appOwner">
+					<option value="${appOwner}">${appOwner}</option>
+				</g:each>
+			</select><input type="hidden" id="projectId" name="projectId"
+				value="${projectId }" /> <select id="appSmeId" name="appSme"
+				onchange="document.listForm.submit();">
+				<option value="">All</option>
+				<g:each in="${appSmeList}" var="appSme">
+					<option value="${appSme}">${appSme}</option>
+				</g:each>
+			</select></td>
+			<td style="text-align: right;"><input type="button"
+				value="Refresh" onclick="location.reload(true);"> <select
+				id="selectTimedId"
+				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(e)') }">
+				<option value="30000">30 sec</option>
+				<option value="60000">1 min</option>
+				<option value="120000">2 min</option>
+				<option value="300000">5 min</option>
+				<option value="never">no refresh</option>
+			</select></td>
+		</tr>
 	</table>
+</g:form>
+
+<table cellpadding="1" cellspacing="1">
+	<thead>
+		<tr>
+			<th>Actions</th>
+			<g:sortableColumn property="application" title="Application" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
+
+			<g:sortableColumn property="app_owner" title="App Owner" params="['projectId':projectId]" />
+
+			<g:sortableColumn property="app_sme" title="App Sme" params="['projectId':projectId]" />
+
+			<g:sortableColumn property="asset_name" title="Asset Name" params="['projectId':projectId]"/>
+
+			<g:each in="${processTransitionList}" var="task">
+
+				<th>${task?.header}</th>
+
+			</g:each>
+
+		</tr>
+	</thead>
+	<tbody>
+
+		<g:each in="${assetEntityList}" var="assetEntity">
+			<tr>
+				<td><jsec:hasRole name="ADMIN">
+					<g:if test="${assetEntity.checkVal == true}">
+						<g:remoteLink action="getTask"
+							params="['assetEntity':assetEntity.id]"
+							onComplete="showChangeStatusDialog(e);">
+							<img
+								src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}"
+								border="0px">
+						</g:remoteLink>
+					</g:if>
+				</jsec:hasRole>
+				<td>${assetEntity?.application}</td>
+				<td>${assetEntity?.appOwner}</td>
+				<td>${assetEntity?.appSme}</td>
+				<td>${assetEntity?.assetName}</td>
+				<g:each in="${processTransitionList}" var="process">
+					<td bgcolor="white"><g:each in="${assetEntity?.transitions}"
+						var="transitions">
+						<g:if test="${transitions == process.transId}">
+							<div style="background-color: green;">&nbsp;</div>
+						</g:if>
+					</g:each></td>
+				</g:each>
+			</tr>
+		</g:each>
+	</tbody>
+</table>
 </div>
 <g:javascript>
 initialize();
+timedRefresh(document.getElementById("selectTimedId").value)
 </g:javascript>
 </body>
 
