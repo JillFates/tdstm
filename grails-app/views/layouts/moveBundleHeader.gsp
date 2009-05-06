@@ -90,6 +90,9 @@
     	      <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Team Worksheets']">Team Worksheets</g:link> </li>
     	      <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Rack Layout']">Rack Layout</g:link></li>
     	      <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'cart Asset']">cart Asset List</g:link></li>
+               <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Issue Report']">Issue Report</g:link></li>
+			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Transportation Asset List']">Transportation Asset List</g:link></li>
+			
               </ul>
             </div>
             </div>
@@ -103,8 +106,6 @@
 			<li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundle?.id]" >Team </g:link> </li>
 			<li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundle?.id]" >Bundle Asset Assignment</g:link> </li>
 			<li><g:link class="home" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundle?.id, rack:'UnrackPlan']" >Bundle Team Assignment </g:link> </li>
-			 <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Issue Report']">Issue Report</g:link></li>
-			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Transportation Asset List']">Transportation Asset List</g:link></li>
 			</ul>
 		</div>
       
