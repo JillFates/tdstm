@@ -61,10 +61,14 @@ class ClientConsoleController {
         	}
         	assetEntityList << [id: it.id, application:it.application,appOwner:it.appOwner,appSme:it.appSme,assetName:it.assetName,transitions:transitions,checkVal:check]
         }
-        def processTransitions=stateEngineService.getTasks("STD_PROCESS")
         def processTransitionList=[]
-        processTransitions.sort().each{
-        	def processTransition = stateEngineService.getState("STD_PROCESS",Integer.parseInt(it))
+        def tempTransitions = []
+        def processTransitions= stateEngineService.getTasks("STD_PROCESS")
+        processTransitions.each{
+        	tempTransitions <<Integer.parseInt(it)
+        }
+        tempTransitions.sort().each{
+        	def processTransition = stateEngineService.getState("STD_PROCESS",it)
             if(processTransition.length() > 5){
                 processTransitionList<<[header:processTransition.substring(0,5), transId:stateEngineService.getStateId("STD_PROCESS",processTransition)]
             } else {
