@@ -33,7 +33,7 @@ class ClientConsoleController {
         if(appSmeValue!="" && appSmeValue!= null){
         	query.append(" and ae.app_sme='$appSmeValue'")
         }
-        query.append(" GROUP BY at.asset_entity_id")
+        query.append(" GROUP BY ae.asset_entity_id")
         
         if(sortby != "" && sortby != null){
         	query.append(" order by $sortby")
