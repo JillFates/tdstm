@@ -4,9 +4,6 @@
 <title>MoveTech Home</title>
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-<link rel="shortcut icon"
-	href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-<g:javascript library="application" />
 
 <style type="text/css">
 dt {
@@ -22,22 +19,22 @@ dt {
 	</div>
 	<div class="mainbody" style="width: 100%;" >
 		<div class="colum_techlogin" style="float:left;">
-			<div class="border_bundle_team">
-				<table border=0 cellpadding=0 cellmargin=0 align="center"><tr>
-					<td><a href="#"><img src="${createLinkTo(dir:'images',file:'home_h.png')}" border="0"/></a></td>
-					<td><g:link action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'><img src="${createLinkTo(dir:'images',file:'my_task.png')}" border="0" /></g:link></td>
-					<td><img src="${createLinkTo(dir:'images',file:'asset.png')}" border="0"/></td>
-				</table>
-			</div>			
+				<div class="border_bundle_team">
+          			<div style="float:left; width:92%; margin-left:15px;">              									
+		              	<a href="#" style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'home_h.png')}" border="0"/></a>							              				
+              			<g:link action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'my_task.png')}" border="0" /></g:link>              											
+              			<img src="${createLinkTo(dir:'images',file:'asset.png')}" style="height:26px; width:64px; float:left; margin:auto 0px;"/>								           
+		       </div>			
 			<div class="w_techlog">
 				<g:form method="post" name="bundleTeamAssetForm">
 				<div style="float:left; width:100%; margin:5px 0; ">              								
 					<table style="border:0px;">
-						<tr><td><g:link controller="moveTech" action="signOut" style="color: #5b5e5c; border:1px solid #5b5e5c; margin:5px;background:#aaefb8;">Log out</g:link></td>
-							<td style="text-align:right;"><a href="#" style="color: #328714;"><input type="text" size="15" value="" name="search" style="background:url(${createLinkTo(dir:'images',file:'search.png')}) no-repeat center right;"/></a></td></tr>
+						<tr><td><g:link controller="moveTech" action="signOut" style="color: #5b5e5c; border:1px solid #5b5e5c; margin:2px 5px 5px 5px; height:15px; padding:1px 2px 1px 3px; width:50px; background:#aaefb8; float:left;">Log out</g:link></td>
+							<td style="text-align:right;"><a href="#" style="color: #328714;"><input type="text" size="12" value="" name="search"/></a>&nbsp;<img	src="${createLinkTo(dir:'images',file:'search.png')}"/></td>
+						</tr>
 					  </table>
 				</div>  
-				<div style="float:left; width:100%; margin:4px; ">
+				<div style="float:left; width:200px; margin:4px;">
 					<b>Currently Logged in as:</b>
 					<dl compact>
 						<dt>Project:&nbsp;</dt><dd>${project}</dd>

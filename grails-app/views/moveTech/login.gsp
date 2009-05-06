@@ -16,14 +16,14 @@
 </div>
 <div class="mainbody" style="width: auto;">
 <div class="colum_techlogin_login" style="float:left;">
-<g:if test="${flash.message}">
-	<div style="width: 204px;" class="message">${flash.message}</div>
-</g:if>
+
 <div class="w_techlog_login"><g:form action="signIn" name="loginForm">
 	<input type="hidden" name="targetUri" value="${targetUri}" />
-
+	<g:if test="${flash.message}">
+	<div style="width: 200px;" class="message">${flash.message}</div>
+	</g:if>
 	<div
-		style="float: left; padding-left: 5px; width: 100%; margin-top: 25px;"><a
+		style="float: left; padding-left: 2px; width: 98%; margin-top: 25px;"><a
 		href="http://www.transitionaldata.com/" target="new"><img
 		src="${createLinkTo(dir:'images',file:'tds.jpg')}" border="0"
 		alt="tds" /></a></div>
@@ -45,7 +45,7 @@
 			</tr>
 			<tr>
 				<td><label>Username:</label></td>
-				<td><input type="text" name="username" value="${username}" /></td>
+				<td><input type="text" size="15" name="username" value="${username}" /></td>
 			</tr>
 			<tr>
 				<td height="25px;"></td>

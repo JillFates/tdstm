@@ -1,6 +1,6 @@
 
 .colum_techlogin{
-	width:775px;
+	width:777px;
 	height:auto;
 	margin:0px;
 	
@@ -8,12 +8,22 @@
 }
 
 .w_techlog{
-	width:775px;
+	width:777px;
 	height:600px;
 	float:left;
 	border:1px solid #5F9FCF;
 	padding:0px;
 
+}
+
+dt {
+   font-weight: bold;
+   float: left;
+   margin-right: 2px;
+ }  
+
+.set_font{
+	font-size:9px;
 }
 
 .asset_hold{
