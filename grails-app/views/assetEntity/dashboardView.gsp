@@ -5,7 +5,6 @@
 <title>Supervisor Dashboard</title>
 <g:javascript library="prototype" />
 <g:javascript library="jquery" />
-
 <link type="text/css" rel="stylesheet"
 	href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
 <link type="text/css" rel="stylesheet"
@@ -430,7 +429,7 @@
 			<tr>
 			<td colspan="2" style="text-align: center;" class="buttonR">
 			 <input type="reset" value="Cancel" onclick="timedRefresh(document.getElementById('selectTimedId').value)" >
-			<g:submitToRemote  action="createTransition" value="Submit" before="setCommentValidation();" onComplete="updateAsset(e)"/></td>
+			<input  type="button" value="Submit" onclick="setCommentValidation();${remoteFunction(action:'createTransition', params:'\'asset=\' + document.assetdetailsForm.asset.value +\'&state=\'+document.assetdetailsForm.state.value +\'&priority=\'+document.assetdetailsForm.priority.value +\'&assignTo=\'+document.assetdetailsForm.assignTo.value +\'&comment=\'+document.assetdetailsForm.comment.value ', onComplete:'updateAsset(e)')}"/></td>
 			</tr>
 			</tbody>
 		</table>
