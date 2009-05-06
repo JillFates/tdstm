@@ -181,7 +181,7 @@
 
 <g:if test="${projMap}">
 <dl><dt>Asset Tag:</dt><dd> ${projMap?.asset?.assetTag}</dd>
-<dt>Asset Name:</dt><dd> mallikarjun haranal bijapur bangalore</dd>
+<dt>Asset Name:</dt><dd> ${projMap?.asset?.assetName}</dd>
 <dt>Model:</dt><dd> ${projMap?.asset?.model}</dd>
 <dt>Rack/Pos:</dt><dd><g:if test="${location == 's'}">${projMap?.asset?.sourceRack}/${projMap?.asset?.sourceRackPosition}</g:if><g:else test="${location == 't'}">${projMap?.asset?.targetRack}/${projMap?.asset?.targetRackPosition}</g:else></dd></dl>
 	
