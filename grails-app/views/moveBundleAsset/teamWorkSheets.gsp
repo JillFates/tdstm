@@ -151,11 +151,11 @@
 
 			<td valign="top" class="name"><label>Location:</label></td>
 
-			<td><input type="radio" name="location" value="both"
+			<td><input type="radio" name="locations" value="both"
 				onclick="changeLocation(this.value)" checked="true" /> Both <input
-				type="radio" name="location" value="source"
+				type="radio" name="locations" value="source"
 				onclick="changeLocation(this.value)" /> Source <input type="radio"
-				name="location" value="target" onclick="changeLocation(this.value)" />
+				name="locations" value="target" onclick="changeLocation(this.value)" />
 			Target</td>
 
 		</tr>

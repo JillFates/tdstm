@@ -36,7 +36,7 @@
 			<td valign="top" class="name"><label>Bundles:</label></td>
 
 			<td valign="top" class="value"><select id="moveBundleId"
-				name="moveBundle" onchange="return populateBundle(this.value);">
+				name="moveBundles" onchange="return populateBundle(this.value);">
 
 				<option value="null" selected="selected">Please Select</option>
 
