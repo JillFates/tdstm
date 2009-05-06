@@ -3,8 +3,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <title>Supervisor Dashboard</title>
-<g:javascript library="jquery" />
 <g:javascript library="prototype" />
+<g:javascript library="jquery" />
 
 <link type="text/css" rel="stylesheet"
 	href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
@@ -24,12 +24,13 @@
 	href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" />
 <link type="text/css" rel="stylesheet"
 	href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-
+<g:javascript src="assetcommnet.js"/>
 <jq:plugin name="ui.core" />
 <jq:plugin name="ui.draggable" />
 <jq:plugin name="ui.resizable" />
 <jq:plugin name="ui.dialog" />
 <jq:plugin name="ui.datetimepicker" />
+
 <style>
 	td .odd{ background:#DDDDDD;nowrap }
 	.asset_Hold{
@@ -37,7 +38,14 @@
 		color:black;
 	}
 </style>
-
+<script>
+	$(document).ready(function() {
+		$("#commentsListDialog").dialog({ autoOpen: false })
+	    $("#createCommentDialog").dialog({ autoOpen: false })
+	    $("#showCommentDialog").dialog({ autoOpen: false })
+	    $("#editCommentDialog").dialog({ autoOpen: false })	        
+	})
+</script>
 <script type="text/javascript">
    function assetDetails(assetId) {
 	   var browser=navigator.appName;
@@ -51,15 +59,11 @@
 	   for(i = 0 ; i<rows.length ; i++){
 	   	var cls = rows[i].getAttribute("class")
 	   	var holdId = rows[i].getAttribute("value")
-	   	var holdRow = document.getElementById("statusCol_"+holdId).innerHTML
-	   	if(holdRow != 'Hold'){
-	   		rows[i].setAttribute("class",'asset_done')
-	   	} else {
-	   		rows[i].setAttribute("class",'asset_Hold')
-	   	}
+	   	var showImg = document.getElementById("image_"+holdId)
+	   	 showImg.style.visibility = 'hidden';
 	   }
-	   var rowColor =  document.getElementById('assetDetailRow_'+assetId)
-	   rowColor.setAttribute("class",'asset_select');
+	   var rowColor =  document.getElementById('image_'+assetId)
+	   rowColor.style.visibility = 'visible';
 	   timedRefresh('never')
 	   ${remoteFunction(action:'assetDetails', params:'\'assetId=\'+ assetId ' , onComplete:'getAssetDetail(e)') }
    
@@ -68,7 +72,7 @@
 	   	var asset = eval("(" + e.responseText + ")")
 	   	document.assetdetailsForm.asset.value = asset[0].assetDetails.assetDetail.id
 	   	document.assetdetailsForm.currentState.value = asset[0].assetDetails.state
-	    var tableBody = '<table style=\'border:0\' ><thead><tr><th>Asset Details </th></tr></thead><tbody>'+
+	    var tableBody = '<table style=\'border:0\' cellpadding=\'0\' cellspacing=\'0\' ><thead><tr><th>Asset Details </th></tr></thead><tbody>'+
 		'<tr><td><b>Name: </b>'+asset[0].assetDetails.assetDetail.assetName+'</td></tr>'+
 		'<tr><td><b>Model: </b>'+asset[0].assetDetails.assetDetail.model+'</td></tr>'+
 		'<tr><td><b>Rack: </b>'+asset[0].assetDetails.assetDetail.sourceRack+'</td></tr>'+
@@ -144,7 +148,7 @@
 	   var bundleID = ${moveBundleInstance.id}; 
 	   document.getElementById("moveBundleId").value =  bundleID;
 	   var time = '${timeToRefresh}';
-	   if(time != 'never'){
+	   if(time != 'never' && time != '' ){
 	   document.getElementById("selectTimedId").value = time;
 	   } 
    	}
@@ -187,11 +191,11 @@
 		document.getElementById('statusCol_'+asset[0].assetEntity.id).innerHTML = asset[0].status
 		document.getElementById('source_'+asset[0].assetEntity.id).innerHTML = asset[0].sourceTeam
 		document.getElementById('target_'+asset[0].assetEntity.id).innerHTML = asset[0].targetTeam
-		if(asset[0].status == 'Hold')
-		document.getElementById('assetDetailRow_'+asset[0].assetEntity.id).setAttribute('class','asset_Hold')
+		document.getElementById('assetDetailRow_'+asset[0].assetEntity.id).setAttribute('class',asset[0].cssClass)
 		}
 		timedRefresh(document.getElementById('selectTimedId').value)
 	}
+	
     </script>
 </head>
 
@@ -330,6 +334,7 @@
 					<g:sortableColumn property="statTimer" title="Stat Timer" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
 					<g:sortableColumn property="loc" title="Loc" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
 					<g:sortableColumn property="issues" title="Issues" /> -->
+					<th>Actions</th>
 					<th>Priority</th>
 					<th>Asset Tag</th>
 					<th>Asset Name</th>
@@ -343,16 +348,31 @@
 			</thead>
 			<tbody id="assetsTbody">
 				<g:each status="i" in="${assetsList}" var="assetsList">
-					<tr onclick="assetDetails('${assetsList?.asset.id}')" name="assetDetailRow" id="assetDetailRow_${assetsList?.asset.id}" class="asset_${assetsList?.status}" value="${assetsList?.asset.id}">
-						<td id="priorityCol_${assetsList?.asset.id}">${assetsList?.asset.priority}</td>
-						<td>${assetsList?.asset.assetTag}</td>
-						<td>${assetsList?.asset.assetName}</td>
-						<td id="statusCol_${assetsList?.asset.id}">${assetsList?.status}</td>
-						<td id="source_${assetsList?.asset.id}">${assetsList?.asset.sourceTeam?.name}</td>
-						<td id="target_${assetsList?.asset.id}">${assetsList?.asset.targetTeam?.name}</td>
-						<td><tds:convertDateTime date="${assetsList.asset.moveBundle.startTime}" /></td>
-						<td>${assetsList.asset.sourceTeam.currentLocation}</td>
-						<td>not required</td>
+					<tr name="assetDetailRow" id="assetDetailRow_${assetsList?.asset.id}" class="${assetsList?.cssClass}" value="${assetsList?.asset.id}">
+						<td id="action_${assetsList?.asset.id}">
+						<span style="visibility: hidden;" id="image_${assetsList?.asset.id}"><img src="${createLinkTo(dir:'images',file:'arrow.png')}" border="0px" ></span> 
+						<g:if test="${AssetComment.findByAssetEntityAndCommentType(assetsList?.asset,'issue')}">
+						<g:remoteLink controller="assetEntity" action="listComments" id="${assetsList?.asset.id}" before="document.getElementById('createAssetCommentId').value = ${assetsList?.asset.id};" onComplete="listCommentsDialog( e );">
+							<img src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}" border="0px">
+						</g:remoteLink>
+						</g:if>
+						<g:else>
+						<g:if test="${AssetComment.findByAssetEntity(assetsList?.asset)}">
+						<g:remoteLink controller="assetEntity" action="listComments" id="${assetsList?.asset.id}" before="document.getElementById('createAssetCommentId').value = ${assetsList?.asset.id};" onComplete="listCommentsDialog( e );">
+							<img src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}" border="0px">
+						</g:remoteLink>
+						</g:if>
+						</g:else>
+						</td>
+						<td id="priorityCol_${assetsList?.asset.id}" onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.priority}</td>
+						<td onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.assetTag}</td>
+						<td onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.assetName}</td>
+						<td onclick="assetDetails('${assetsList?.asset.id}')" id="statusCol_${assetsList?.asset.id}">${assetsList?.status}</td>
+						<td onclick="assetDetails('${assetsList?.asset.id}')" id="source_${assetsList?.asset.id}">${assetsList?.asset.sourceTeam?.name}</td>
+						<td onclick="assetDetails('${assetsList?.asset.id}')" id="target_${assetsList?.asset.id}">${assetsList?.asset.targetTeam?.name}</td>
+						<td onclick="assetDetails('${assetsList?.asset.id}')"><tds:convertDateTime date="${assetsList.asset.moveBundle.startTime}" /></td>
+						<td onclick="assetDetails('${assetsList?.asset.id}')">${assetsList.asset.sourceTeam.currentLocation}</td>
+						<td onclick="assetDetails('${assetsList?.asset.id}')">not required</td>
 					</tr>
 					
 				</g:each>
@@ -365,7 +385,7 @@
 		<td valign="top" style="padding: 0px;">
 		<div id="assetDetails" style="border: 1px solid #5F9FCF;width: 200px;">
 		<div id="asset" >
-		<table style='border:0' ><thead><tr><th>Asset Details </th></tr></thead><tbody>
+		<table style="border: 0px" cellpadding="0" cellspacing="0"><thead><tr><th>Asset Details </th></tr></thead><tbody>
 		<tr><td><b>Name: </b></td></tr>
 		<tr><td><b>Model:</b></td></tr>
 		<tr><td><b>Rack: </b></td></tr>
@@ -409,7 +429,7 @@
 			</tr>
 			<tr>
 			<td colspan="2" style="text-align: center;" class="buttonR">
-			 <input type="reset" value="Cancel" onclick="timedRefresh(document.getElementById('selectTimedId').value)">
+			 <input type="reset" value="Cancel" onclick="timedRefresh(document.getElementById('selectTimedId').value)" >
 			<g:submitToRemote  action="createTransition" value="Submit" before="setCommentValidation();" onComplete="updateAsset(e)"/></td>
 			</tr>
 			</tbody>
@@ -420,7 +440,148 @@
 		</td>
 	</tr>
 </table>
-</td></tr></table>
+</td></tr>
+</table>
+</div>
+<div id="commentsListDialog" title="Show Asset Comments" style="display: none;">
+<br>
+	<div class="list">
+		<table id="listCommentsTable">
+		<thead>
+	        <tr >
+	                        
+	          <th nowrap>Action</th>
+	          
+	          <th nowrap>Comment</th>
+	                        
+	          <th nowrap>Comment Type</th>
+	                        
+	          <th nowrap>Must Verify</th>                      
+	                   	    
+	        </tr>
+	    </thead>
+		<tbody id="listCommentsTbodyId">
+		
+		</tbody>
+		</table>
+	</div>
+	<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
+		<span class="menuButton"><a class="create" href="#" onclick="document.getElementById('statusId').value = '';$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();" >New Comment</a></span>
+	</div>
+</div>
+<div id="createCommentDialog" title="Create Asset Comment" style="display: none;">
+<g:form action="saveComment" method="post" name="createCommentForm" >
+	<div class="dialog">
+	<input type="hidden" name="assetEntity.id" id="createAssetCommentId" value="">
+	<input type="hidden" name="status" id="statusId" value="">
+	<table id="createCommentTable">
+		<tbody>
+			<tr class="prop">
+				<td valign="top" class="name">
+                <label for="comment">Comment:</label>
+                </td>
+				<td valign="top" class="value">
+                <textarea cols="80" rows="5" id="comment" name="comment" ></textarea>
+                </td>
+            </tr> 
+			<tr class="prop">
+            	<td valign="top" class="name">
+                <label for="commentType">Comment Type:</label>
+                </td>
+                <td valign="top" class="value">
+                <g:select id="commentType" name="commentType" from="${AssetComment.constraints.commentType.inList}" value="" noSelection="['':'please select']"></g:select>
+                </td>
+            </tr> 
+			<tr class="prop">
+            	<td valign="top" class="name">
+                <label for="mustVerify">Must Verify:</label>
+                </td>
+                <td valign="top" class="value">
+                <input type="checkbox" id="mustVerify" name="mustVerify" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
+                </td>
+            </tr>
+		</tbody>
+	</table>
+	</div>
+	<div class="buttons"><span class="button">
+	<input class="save" type="button" value="Create" onclick="${remoteFunction(action:'saveComment', params:'\'assetEntity.id=\' + document.getElementById(\'createAssetCommentId\').value +\'&comment=\'+document.createCommentForm.comment.value +\'&commentType=\'+document.createCommentForm.commentType.value +\'&mustVerify=\'+document.createCommentForm.mustVerify.value', onComplete:'addCommentsToList(e)')}" /></span></div>
+</g:form ></div>
+<div id="showCommentDialog" title="Show Asset Comment" style="display: none;">
+	<div class="dialog">
+	<input name="id" value="" id="commentId" type="hidden">
+	<table id="showCommentTable">
+		<tbody>
+			<tr class="prop">
+				<td valign="top" class="name">
+                <label for="comment">Comment:</label>
+                </td>
+				<td valign="top" class="value" id="commentTdId"/>
+            </tr> 
+			<tr class="prop">
+            	<td valign="top" class="name">
+                <label for="commentType">Comment Type:</label>
+                </td>
+                <td valign="top" class="value" id="commentTypeTdId"/>
+            </tr> 
+			<tr class="prop">
+            	<td valign="top" class="name">
+                <label for="mustVerify">Must Verify:</label>
+                </td>
+                <td valign="top" class="value" id="verifyTdId"><input type="checkbox" id="mustVerifyShowId" name="mustVerify" value="0" disabled="disabled" /></td>
+            </tr>
+		</tbody>
+	</table>
+	</div>
+	<div class="buttons">
+	<span class="button">
+	<input class="edit" type="button" value="Edit" onclick="$('#editCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
+	</span>
+	<span class="button">
+	<input class="delete" type="button" value="Delete" onclick="${remoteFunction(action:'deleteComment', params:'\'id=\' + document.getElementById(\'commentId\').value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e)')}" />
+	</span>
+	</div>
+</div>
+<div id="editCommentDialog" title="Edit Asset Comment" style="display: none;">
+<g:form action="updateComment" method="post" name="editCommentForm" >
+	<div class="dialog">
+	<input type="hidden" name="id" value="">
+	<table id="updateCommentTable">
+		<tbody>
+			<tr class="prop">
+				<td valign="top" class="name">
+                <label for="comment">Comment:</label>
+                </td>
+				<td valign="top" class="value">
+                <textarea cols="80" rows="5" id="comment" name="comment" ></textarea>
+                </td>
+            </tr> 
+			<tr class="prop">
+            	<td valign="top" class="name">
+                <label for="commentType">Comment Type:</label>
+                </td>
+                <td valign="top" class="value">
+                <g:select id="commentType" name="commentType" from="${AssetComment.constraints.commentType.inList}" value="" noSelection="['':'please select']"></g:select>
+                </td>
+            </tr> 
+			<tr class="prop">
+            	<td valign="top" class="name">
+                <label for="mustVerify">Must Verify:</label>
+                </td>
+                <td valign="top" class="value">
+                <input type="checkbox" id="mustVerify" name="mustVerify" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
+                </td>
+            </tr>
+		</tbody>
+	</table>
+	</div>
+	<div class="buttons"><span class="button">
+	<input class="save" type="button" value="Update" onclick="${remoteFunction(action:'updateComment', params:'\'id=\' + document.editCommentForm.id.value +\'&comment=\'+document.editCommentForm.comment.value +\'&commentType=\'+document.editCommentForm.commentType.value +\'&mustVerify=\'+document.editCommentForm.mustVerify.value', onComplete:'updateCommentsOnList(e)')}" />
+	</span>
+	<span class="button">
+	<input class="delete" type="button" value="Delete" onclick="${remoteFunction(action:'deleteComment', params:'\'id=\' + document.editCommentForm.id.value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e)')}" />
+	</span>
+	</div>
+</g:form >
 </div>
 <script type="text/javascript">
 bundleChange();

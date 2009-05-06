@@ -699,6 +699,7 @@ class AssetEntityController {
         def onCartId = stateEngineService.getStateId("STD_PROCESS","OnCart")
         def stagedId = stateEngineService.getStateId("STD_PROCESS","Staged")
         def unrackedId = stateEngineService.getStateId("STD_PROCESS","Unracked")
+        def holdId = stateEngineService.getStateId("STD_PROCESS","Hold")
         projectTeamList.each{
             def teamMembers = partyRelationshipService.getBundleTeamMembersDashboard(it.id)
             def member
@@ -728,7 +729,16 @@ class AssetEntityController {
         supportTeam.put("transportMembers", transportMembers.delete((transportMembers.length()-1),transportMembers.length()) )
         totalAsset.each{
         	def projectAssetMap = ProjectAssetMap.findByAsset(it)
-        	assetsList<<[asset: it, status: stateEngineService.getStateLabel("STD_PROCESS",projectAssetMap.currentStateId)]
+        	def curId = projectAssetMap.currentStateId
+        	def cssClass
+        	if(curId == Integer.parseInt(holdId) ){
+        		cssClass = 'asset_hold'
+        	} else if(curId < Integer.parseInt(rerackedId) && curId != Integer.parseInt(holdId) ){
+        		cssClass = 'asset_pending'
+        	} else if(curId > Integer.parseInt(rerackedId)){
+        		cssClass = 'asset_done'
+        	}
+        	assetsList<<[asset: it, status: stateEngineService.getStateLabel("STD_PROCESS",projectAssetMap.currentStateId), cssClass : cssClass]
         	
         }
         def totalUnracked = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $unrackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
@@ -794,45 +804,76 @@ class AssetEntityController {
     	def assetList = []
     	def statesList = []
     	def stateIdList = []
+    	def statusLabel
     	if(assetEntity){
 	    	def status = params.state
 	    	def assignTo = params.assignTo
+	    	def priority = params.priority
+	    	def comment = params.comment
+	    	def projectAssetMap = ProjectAssetMap.findByAsset(assetEntity)
+	    	def rerackedId = stateEngineService.getStateId("STD_PROCESS","Reracked")
+	        def holdId = stateEngineService.getStateId("STD_PROCESS","Hold")
 	    	if(status != "" ){
-		    	def comment = params.comment
 		    	def principal = SecurityUtils.subject.principal
 		    	def loginUser = UserLogin.findByUsername(principal)
 		    	def transactionStatus = workflowService.createTransition("STD_PROCESS","SUPERVISOR", status, assetEntity, assetEntity.moveBundle, loginUser, null, comment )
 		    	if ( transactionStatus.success ) {
-		    		def priority = params.priority
-		    		if(priority){
-	                    assetEntity.priority = Integer.parseInt( priority )
-		    		}
-		    		if(assignTo){
-	    	    		def assignToList = assignTo.split('/')
-	    	    		def projectTeam = ProjectTeam.get(assignToList[1])
-	    	    		if(assignToList[0] == 's'){
-	    	    			assetEntity.sourceTeam = projectTeam
-	    	    		} else if(assignToList[0] == 't'){
-	    	    			assetEntity.targetTeam = projectTeam
-	    	    		}
-		    		}
-		    		assetEntity.save()
-                    def validStates = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR", status)
-                    validStates.each{
-			        	stateIdList<<Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
-			        }
-			        stateIdList.sort().each{
-			        	statesList<<[id:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
-			        }
-		    		def sourceTeam = assetEntity.sourceTeam.name
-		    		def targetTeam = assetEntity.targetTeam.name
-		    		def sourceTeams = ProjectTeam.findAll("from ProjectTeam where moveBundle = $assetEntity.moveBundle.id and id != $assetEntity.sourceTeam.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
-		            def targetTeams = ProjectTeam.findAll("from ProjectTeam where moveBundle = $assetEntity.moveBundle.id and id != $assetEntity.targetTeam.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
-		    		assetList <<['assetEntity':assetEntity, 'sourceTeam':sourceTeam, 'targetTeam':targetTeam, 'sourceTeams':sourceTeams,'targetTeams':targetTeams, 'statesList':statesList,'status':stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",status))) ]
-		        }
+		    		stateIdList = getStates(status)
+				    stateIdList.sort().each{
+				    	statesList<<[id:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
+				    }
+				    statusLabel = stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",status)))
+		    	} else {
+		        	statusLabel = stateEngineService.getStateLabel("STD_PROCESS",projectAssetMap.currentStateId)
+		        	stateIdList = getStates(stateEngineService.getState("STD_PROCESS",projectAssetMap.currentStateId))
+		        	stateIdList.sort().each{
+				    	statesList<<[id:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
+				    }
+		    	}
+	    	} else {
+	        	statusLabel = stateEngineService.getStateLabel("STD_PROCESS",projectAssetMap.currentStateId)
+	        	stateIdList = getStates(stateEngineService.getState("STD_PROCESS",projectAssetMap.currentStateId))
+	        	stateIdList.sort().each{
+			    	statesList<<[id:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
+			    }
 	    	}
+    		if(priority){
+                assetEntity.priority = Integer.parseInt( priority )
+    		}
+    		if(assignTo){
+	    		def assignToList = assignTo.split('/')
+	    		def projectTeam = ProjectTeam.get(assignToList[1])
+	    		if(assignToList[0] == 's'){
+	    			assetEntity.sourceTeam = projectTeam
+	    		} else if(assignToList[0] == 't'){
+	    			assetEntity.targetTeam = projectTeam
+	    		}
+    		}
+    		def currentStatus = ProjectAssetMap.findByAsset(assetEntity).currentStateId
+    		def cssClass
+    		if(currentStatus == Integer.parseInt(holdId) ){
+        		cssClass = 'asset_hold'
+        	} else if(currentStatus < Integer.parseInt(rerackedId) && currentStatus != Integer.parseInt(holdId) ){
+        		cssClass = 'asset_pending'
+        	} else if(currentStatus > Integer.parseInt(rerackedId)){
+        		cssClass = 'asset_done'
+        	}
+    		assetEntity.save()
+    		def sourceTeam = assetEntity.sourceTeam.name
+		    def targetTeam = assetEntity.targetTeam.name
+		    def sourceTeams = ProjectTeam.findAll("from ProjectTeam where moveBundle = $assetEntity.moveBundle.id and id != $assetEntity.sourceTeam.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
+		    def targetTeams = ProjectTeam.findAll("from ProjectTeam where moveBundle = $assetEntity.moveBundle.id and id != $assetEntity.targetTeam.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
+		    assetList <<['assetEntity':assetEntity, 'sourceTeam':sourceTeam, 'targetTeam':targetTeam, 'sourceTeams':sourceTeams,'targetTeams':targetTeams, 'statesList':statesList,'status':statusLabel,'cssClass':cssClass ]
     	}
     	render assetList as JSON
+    }
+    def getStates(def state){
+    	 def stateIdList = []
+    	 def validStates = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR", state)
+         validStates.each{
+		 	stateIdList<<Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
+		 }
+		 return stateIdList
     }
     def setTimePreference = {
     	def timer = params.timer
