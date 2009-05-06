@@ -11,7 +11,7 @@
 	  font:12px Tahoma;
 	  font-weight:bold;
 	  float:left;
-	  widht:150px;
+	  width:150px;
 	  height:auto;
 	}
     
@@ -26,16 +26,18 @@
     .menu_new ul {
       display: none;
       position: absolute;
+      top: 125px;
+      left:450px;
       background-color: #0366b0;
       color: black;
       list-style: none;
       margin: 0.1em 0 0 0;
       padding: 0;
-      width:auto;
+      width:165px;
       height:auto;
       float:left;
     }
-    
+       
     .menu_new ul li {
       display: block;
       padding: 0.2em;
@@ -43,7 +45,7 @@
     
     .menu_new ul li a {
       background-color: #0366b0;
-      width:auto;
+      width:150px;
       color: #9ACAEE;
       font:11px Tahoma;
 	  font-weight:bold;
@@ -62,4 +64,52 @@
       padding: 0;
     }
 
-
+/*Asset menu*/
+    .menu_new_asset {
+      width: auto;
+      height:auto;
+      float: left;
+      padding: 0.1em 3em 0.1em 0.5em;
+      cursor: default;
+    }
+    
+    .menu_new_asset ul {
+      display: none;
+      position: absolute;
+      top: 125px;
+      left:105px;
+      background-color: #0366b0;
+      color: black;
+      list-style: none;
+      margin: 0.1em 0 0 0;
+      padding: 0;
+      width:165px;
+      height:auto;
+      float:left;
+    }
+       
+    .menu_new_asset ul li {
+      display: block;
+      padding: 0.2em;
+    }
+    
+    .menu_new_asset ul li a {
+      background-color: #0366b0;
+      width:150px;
+      color: #9ACAEE;
+      font:11px Tahoma;
+	  font-weight:bold;
+	  border:0px;	
+	  text-align:left;
+	  padding-top:5px;  
+    }
+    
+    .menu_new_asset ul li a:hover {
+      color: #ffffff;
+    }
+    
+    div.menu_new_asset:hover ul {
+      display: block;
+      margin: 0;
+      padding: 0;
+    }

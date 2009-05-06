@@ -73,7 +73,7 @@
         <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
         <li>  
           	<div id="menubar" style="border-right:1px solid #ffffff; width:65px;">
- 			<div id="menu1" class="menu_new">Assets<ul>    	      
+ 			<div id="menu1" class="menu_new_asset">Assets<ul>    	      
     	      <li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Assets</g:link></li>
     	      <li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link> </li>
               </ul>
