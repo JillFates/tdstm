@@ -70,9 +70,9 @@ class ClientConsoleController {
         tempTransitions.sort().each{
         	def processTransition = stateEngineService.getState("STD_PROCESS",it)
             if(processTransition.length() > 5){
-                processTransitionList<<[header:processTransition.substring(0,5), transId:stateEngineService.getStateId("STD_PROCESS",processTransition)]
+                processTransitionList<<[header:processTransition.substring(0,5), title:stateEngineService.getStateLabel("STD_PROCESS",it),transId:stateEngineService.getStateId("STD_PROCESS",processTransition)]
             } else {
-                processTransitionList<<[header:processTransition, transId:stateEngineService.getStateId("STD_PROCESS",processTransition)]
+                processTransitionList<<[header:processTransition,title:stateEngineService.getStateLabel("STD_PROCESS",it),transId:stateEngineService.getStateId("STD_PROCESS",processTransition)]
             }
         }
         userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")

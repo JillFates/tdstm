@@ -113,32 +113,13 @@ function timedRefresh(timeoutPeriod) {
 </table>
 </form>
 </div>
-<div class="body"><br>
-<h1>PMO Dashboard</h1>
-<div style="width: 900px; overflow-x: scroll"><g:form
-	name="listForm" action="list" method="post">
+<div style="width:100%"><br>
+<div style="width: 100%;">
+
+	<h1 align="center">PMO Dashboard</h1>
 	<table style="border: 0px;">
 		<tr>
-			<td><select id="applicationId" name="application"
-				onchange="document.listForm.submit();">
-				<option value="">All</option>
-				<g:each in="${applicationList}" var="application">
-					<option value="${application}">${application}</option>
-				</g:each>
-			</select> <select id="appOwnerId" name="appOwner"
-				onchange="document.listForm.submit();">
-				<option value="">All</option>
-				<g:each in="${appOwnerList}" var="appOwner">
-					<option value="${appOwner}">${appOwner}</option>
-				</g:each>
-			</select><input type="hidden" id="projectId" name="projectId"
-				value="${projectId }" /> <select id="appSmeId" name="appSme"
-				onchange="document.listForm.submit();">
-				<option value="">All</option>
-				<g:each in="${appSmeList}" var="appSme">
-					<option value="${appSme}">${appSme}</option>
-				</g:each>
-			</select></td>
+			
 			<td style="text-align: right;"><input type="button"
 				value="Refresh" onclick="location.reload(true);"> <select
 				id="selectTimedId"
@@ -151,23 +132,47 @@ function timedRefresh(timeoutPeriod) {
 			</select></td>
 		</tr>
 	</table>
-</g:form>
-
-<table cellpadding="1" cellspacing="1">
+</div>
+<div style="width: 99%; overflow-x: scroll;border:1px solid #5F9FCF;">
+<table cellpadding="1" cellspacing="1"  style="border:0px;">
 	<thead>
+	<tr>
+		<g:form	name="listForm" action="list" method="post">
+			<td>&nbsp;</td>
+			<td style="padding-left: 0px;"><select id="applicationId" name="application" onchange="document.listForm.submit();" style="width: 100px;">
+				<option value="">All</option>
+				<g:each in="${applicationList}" var="application">
+					<option value="${application}">${application}</option>
+				</g:each>
+			</select></td>
+			<td style="padding-left: 0px;"><select id="appOwnerId" name="appOwner"	onchange="document.listForm.submit();" style="width: 100px;">
+				<option value="">All</option>
+				<g:each in="${appOwnerList}" var="appOwner">
+					<option value="${appOwner}">${appOwner}</option>
+				</g:each>
+			</select></td>
+			<td style="padding-left: 0px;"><input type="hidden" id="projectId" name="projectId" value="${projectId }" />
+			 <select id="appSmeId" name="appSme" onchange="document.listForm.submit();" style="width: 100px;">
+				<option value="">All</option>
+				<g:each in="${appSmeList}" var="appSme">
+					<option value="${appSme}">${appSme}</option>
+				</g:each>
+			</select></td>
+		</g:form>
+		</tr>
 		<tr>
 			<th>Actions</th>
-			<g:sortableColumn property="application" title="Application" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
+			<g:sortableColumn property="application"  title="Application" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
+			
+			<g:sortableColumn property="app_owner" title="App Owner"  params="['projectId':projectId]" />
 
-			<g:sortableColumn property="app_owner" title="App Owner" params="['projectId':projectId]" />
-
-			<g:sortableColumn property="app_sme" title="App Sme" params="['projectId':projectId]" />
+			<g:sortableColumn property="app_sme" title="App Sme" params="['projectId':projectId]"/>
 
 			<g:sortableColumn property="asset_name" title="Asset Name" params="['projectId':projectId]"/>
 
-			<g:each in="${processTransitionList}" var="task">
+			<g:each in="${processTransitionList}"  var="task">
 
-				<th>${task?.header}</th>
+				<th title="${task.title}">${task?.header}</th>
 
 			</g:each>
 
