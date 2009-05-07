@@ -179,7 +179,7 @@
 	function setRefreshTime(e) {
 		var timeRefresh = eval("(" + e.responseText + ")")
 		if(timeRefresh){
-			timedRefresh(timedRefresh[0].refreshTime.SUPER_CONSOLE_REFRESH)
+			timedRefresh(timeRefresh[0].refreshTime.SUPER_CONSOLE_REFRESH)
 		}
 	}
 	function updateAsset(e){

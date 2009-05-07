@@ -827,7 +827,6 @@ class AssetEntityController {
 		          		assetComment.comment = comment
 		          		assetComment.assetEntity = assetEntity
 		          		assetComment.commentType = 'issue'
-		          		assetComment.mustVerify = 1
 		          		assetComment.save()
 		    		}
 		    		stateIdList = getStates(status)

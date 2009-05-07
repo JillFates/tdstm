@@ -2,7 +2,7 @@ class AssetComment {
 	
 	String comment
 	String commentType
-	Integer mustVerify
+	Integer mustVerify = 0
 	AssetEntity assetEntity
 	Date dateCreated = new Date()
 	
