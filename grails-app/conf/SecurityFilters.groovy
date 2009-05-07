@@ -33,7 +33,9 @@ class SecurityFilters {
             before = {
             	def subject = SecurityUtils.subject
                 def principal = subject.principal
-                if( controllerName != 'auth' && principal == null ) {
+                if(controllerName == 'moveTech' && principal == null){
+                	return true
+                } else if( controllerName != 'auth' && principal == null ) {
                 	flash.message = "Your login has expired and must login again."
                 	redirect(controller:'auth', action:'login')
                 	return false					

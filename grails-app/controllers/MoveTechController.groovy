@@ -25,7 +25,7 @@ class MoveTechController {
             }
 					
             render(view:'home',model:[projectTeam:team,members:teamMembers,project:params.project,loc:location, bundle:params.bundle,team:params.team,location:params.location])
-        } else {
+        } else if(params.user == "ct") {
             def partyGroupInstance = PartyGroup.findById(params.team)            
             def team = partyGroupInstance.name
             def teamMembers = partyRelationshipService.getTeamMemberNames(params.team)
@@ -38,6 +38,8 @@ class MoveTechController {
 					
             render(view:'cleaningTechHome',model:[projectTeam:team,members:teamMembers,project:params.project,loc:teamLocation, bundle:params.bundle,team:params.team,location:params.location])
 				
+        } else {
+        	redirect(action:'login')
         }
     }
     //moveTech login
