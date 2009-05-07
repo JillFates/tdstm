@@ -24,6 +24,8 @@
 	href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
 <link type="text/css" rel="stylesheet"
 	href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
+<link type="text/css" rel="stylesheet"
+	href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 
 <jq:plugin name="ui.core" />
 <jq:plugin name="ui.draggable" />
@@ -54,6 +56,7 @@ var time = '${timeToRefresh}';
 <script type="text/javascript">
 
 function showChangeStatusDialog(e){
+timedRefresh('never')
 var task = eval('(' + e.responseText + ')');
 
 var options = '';
@@ -73,6 +76,7 @@ function submitAction(){
 if(doCheck()){
 document.changeStatusForm.action = "changeStatus";
 document.changeStatusForm.submit();
+timedRefresh(document.getElementById("selectTimedId").value)
 }else{
 return false;
 }
@@ -131,14 +135,12 @@ function timedRefresh(timeoutPeriod) {
 		<td style="text-align: right;"><input type="button" value="Save"
 			onclick="submitAction()" /></td>
 	</tr>
-	
 </table>
 </form>
 </div>
-<div style="width:100%"><br>
+<div style="width:100%">
 <div style="width: 100%;">
 	<g:form	name="listForm" action="list" method="post">
-	<h1 align="center">PMO Dashboard</h1>
 	<table style="border: 0px;">
 		<tr>
 			<td valign="top" class="name"><label for="moveBundle">Move
@@ -151,7 +153,10 @@ function timedRefresh(timeoutPeriod) {
 			</g:each>
 
 		</select></td>
-			<td style="text-align: right;"><input type="button"
+			<td><h1 align="center">PMO Dashboard</h1></td>
+			<td style="text-align: right;">
+			<input type="hidden" name="last_refresh" value="${new Date()}">
+			<input type="button"
 				value="Refresh" onclick="location.reload(true);"> <select
 				id="selectTimedId"
 				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(e)') }">
@@ -164,7 +169,7 @@ function timedRefresh(timeoutPeriod) {
 		</tr>
 	</table>
 </div>
-<div style="width: 99%; overflow-x: scroll;border:1px solid #5F9FCF;margin-left: 3px;">
+<div style="width: 99%; overflow-x: scroll;border:1px solid #5F9FCF;margin-left: 5px;">
 <table cellpadding="1" cellspacing="1"  style="border:0px;">
 	<thead>
 	<tr>
@@ -215,12 +220,8 @@ function timedRefresh(timeoutPeriod) {
 			<tr>
 				<td><jsec:hasRole name="ADMIN">
 					<g:if test="${assetEntity.checkVal == true}">
-						<g:remoteLink action="getTask"
-							params="['assetEntity':assetEntity.id]"
-							onComplete="showChangeStatusDialog(e);">
-							<img
-								src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}"
-								border="0px">
+						<g:remoteLink action="getTask" params="['assetEntity':assetEntity.id]"	onComplete="showChangeStatusDialog(e);">
+							<img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}"	border="0px">
 						</g:remoteLink>
 					</g:if>
 				</jsec:hasRole>
@@ -228,18 +229,8 @@ function timedRefresh(timeoutPeriod) {
 				<td>${assetEntity?.appOwner}</td>
 				<td>${assetEntity?.appSme}</td>
 				<td>${assetEntity?.assetName}</td>
-				<g:each in="${processTransitionList}" var="process">
-					<td bgcolor="white"><g:each in="${assetEntity?.transitions}"
-						var="transitions">
-						<g:if test="${transitions == process.transId}">
-							<g:if test="${Integer.parseInt(transitions) == ProjectAssetMap.find('from ProjectAssetMap where asset.id ='+assetEntity.id).currentStateId && Integer.parseInt(transitions) == 10}">
-							<div style="background-color: yellow;">&nbsp;</div>
-							</g:if>
-							<g:else>
-							<div style="background-color: green;">&nbsp;</div>
-							</g:else>
-						</g:if>
-					</g:each></td>
+				<g:each in="${assetEntity.transitions}" var="transition">
+					${transition}
 				</g:each>
 			</tr>
 		</g:each>

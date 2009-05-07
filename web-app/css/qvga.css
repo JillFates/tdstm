@@ -68,3 +68,9 @@ dt {
 	text-decoration: line-through;
 	color:black;
 }
+.task_pending {
+	background-color: #FFFFFF;
+}
+.task_done{
+	background-color: green;
+}

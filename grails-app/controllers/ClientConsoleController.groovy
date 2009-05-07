@@ -54,7 +54,23 @@ class ClientConsoleController {
         }
         def resultList=jdbcTemplate.queryForList(query.toString())
         def assetEntityList=[]
+        def processTransitionList=[]
+        def tempTransitions = []
+        def processTransitions= stateEngineService.getTasks("STD_PROCESS")
+        processTransitions.each{
+        	tempTransitions <<Integer.parseInt(it)
+        }
+        tempTransitions.sort().each{
+        	def processTransition = stateEngineService.getState("STD_PROCESS",it)
+            if(processTransition.length() > 5){
+                processTransitionList<<[header:processTransition.substring(0,5), title:stateEngineService.getStateLabel("STD_PROCESS",it),transId:stateEngineService.getStateId("STD_PROCESS",processTransition)]
+            } else {
+                processTransitionList<<[header:processTransition,title:stateEngineService.getStateLabel("STD_PROCESS",it),transId:stateEngineService.getStateId("STD_PROCESS",processTransition)]
+            }
+        }
+        
         resultList.each{
+        	def htmlTd = []
         	def transitions
         	if(it.transitions){
         		transitions =it.transitions.tokenize(',')
@@ -70,21 +86,20 @@ class ClientConsoleController {
         	}else{
         		check = false
         	}
-        	assetEntityList << [id: it.id, application:it.application,appOwner:it.appOwner,appSme:it.appSme,assetName:it.assetName,transitions:transitions,checkVal:check]
-        }
-        def processTransitionList=[]
-        def tempTransitions = []
-        def processTransitions= stateEngineService.getTasks("STD_PROCESS")
-        processTransitions.each{
-        	tempTransitions <<Integer.parseInt(it)
-        }
-        tempTransitions.sort().each{
-        	def processTransition = stateEngineService.getState("STD_PROCESS",it)
-            if(processTransition.length() > 5){
-                processTransitionList<<[header:processTransition.substring(0,5), title:stateEngineService.getStateLabel("STD_PROCESS",it),transId:stateEngineService.getStateId("STD_PROCESS",processTransition)]
-            } else {
-                processTransitionList<<[header:processTransition,title:stateEngineService.getStateLabel("STD_PROCESS",it),transId:stateEngineService.getStateId("STD_PROCESS",processTransition)]
-            }
+        	processTransitionList.each() { trans ->
+	        	def cssClass='task_pending'
+	        		transitions.each() { task ->
+	        		if(task == trans.transId){
+	        			if(stateId == 10 && trans.transId == "10"){
+	        				cssClass = "asset_hold"
+	        			} else {
+	        				cssClass = "task_done"
+	        			}
+	        		}
+	        	}
+	        	htmlTd << "<td class=\"$cssClass\">&nbsp;</td>"	
+        	}
+        	assetEntityList << [id: it.id, application:it.application,appOwner:it.appOwner,appSme:it.appSme,assetName:it.assetName,transitions:htmlTd,checkVal:check]
         }
         userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")
         def timeToRefresh = getSession().getAttribute("CLIENT_CONSOLE_REFRESH")
