@@ -32,6 +32,8 @@
 
 <g:javascript>
 function initialize(){
+var bundleID = ${moveBundleInstance.id}; 
+document.getElementById("moveBundleId").value =  bundleID;
 document.getElementById('appSmeId').value="${appSmeValue}"
 document.getElementById('appOwnerId').value="${appOwnerValue}"
 document.getElementById('applicationId').value="${appValue}"
@@ -68,13 +70,27 @@ $("#showDialog").dialog('option', 'position', ['center','top']);
 $('#showDialog').dialog('open');
 }
 function submitAction(){
+if(doCheck()){
 document.changeStatusForm.action = "changeStatus";
 document.changeStatusForm.submit();
+}else{
+return false;
+}
+}
+function doCheck(){
+var taskVal = document.getElementById('taskList').value;
+var noteVal = document.getElementById('enterNote').value;
+if((taskVal == "Hold")&&(noteVal == "")){
+alert('Please Enter Note');
+return false;
+}else{
+return true;
+}
 }
 function setRefreshTime(e) {
 	var timeRefresh = eval("(" + e.responseText + ")")
 	if(timeRefresh){
-		timedRefresh(timedRefresh[0].refreshTime.CLIENT_CONSOLE_REFRESH)
+		timedRefresh(timeRefresh[0].refreshTime.CLIENT_CONSOLE_REFRESH)
 	}
 }
 var timer
@@ -106,20 +122,35 @@ function timedRefresh(timeoutPeriod) {
 		</select></td>
 	</tr>
 	<tr>
+		<td>
+		<textarea rows="2" cols="1"  title="Enter Note..." name="enterNote" id="enterNote" style="width: 200%"></textarea>
+		</td>
+	</tr>
+	<tr>
 		<td></td>
 		<td style="text-align: right;"><input type="button" value="Save"
 			onclick="submitAction()" /></td>
 	</tr>
+	
 </table>
 </form>
 </div>
 <div style="width:100%"><br>
 <div style="width: 100%;">
-
+	<g:form	name="listForm" action="list" method="post">
 	<h1 align="center">PMO Dashboard</h1>
 	<table style="border: 0px;">
 		<tr>
-			
+			<td valign="top" class="name"><label for="moveBundle">Move
+		Bundle:</label>&nbsp;<select id="moveBundleId"
+			name="moveBundle" onchange="document.listForm.submit()" >	
+
+			<g:each status="i" in="${moveBundleInstanceList}"
+				var="moveBundleInstance">
+				<option value="${moveBundleInstance?.id}">${moveBundleInstance?.name}</option>
+			</g:each>
+
+		</select></td>
 			<td style="text-align: right;"><input type="button"
 				value="Refresh" onclick="location.reload(true);"> <select
 				id="selectTimedId"
@@ -133,11 +164,11 @@ function timedRefresh(timeoutPeriod) {
 		</tr>
 	</table>
 </div>
-<div style="width: 99%; overflow-x: scroll;border:1px solid #5F9FCF;">
+<div style="width: 99%; overflow-x: scroll;border:1px solid #5F9FCF;margin-left: 3px;">
 <table cellpadding="1" cellspacing="1"  style="border:0px;">
 	<thead>
 	<tr>
-		<g:form	name="listForm" action="list" method="post">
+	
 			<td>&nbsp;</td>
 			<td style="padding-left: 0px;"><select id="applicationId" name="application" onchange="document.listForm.submit();" style="width: 100px;">
 				<option value="">All</option>
@@ -201,7 +232,12 @@ function timedRefresh(timeoutPeriod) {
 					<td bgcolor="white"><g:each in="${assetEntity?.transitions}"
 						var="transitions">
 						<g:if test="${transitions == process.transId}">
+							<g:if test="${Integer.parseInt(transitions) == ProjectAssetMap.find('from ProjectAssetMap where asset.id ='+assetEntity.id).currentStateId && Integer.parseInt(transitions) == 10}">
+							<div style="background-color: yellow;">&nbsp;</div>
+							</g:if>
+							<g:else>
 							<div style="background-color: green;">&nbsp;</div>
+							</g:else>
 						</g:if>
 					</g:each></td>
 				</g:each>
