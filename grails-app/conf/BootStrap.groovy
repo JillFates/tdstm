@@ -473,13 +473,13 @@ class BootStrap {
 		def projectAssetMapList = [
             [ cedarsProject, AssetEntity.get(1), 10 ],
             [ cedarsProject, AssetEntity.get(2), 60 ],
-            [ cedarsProject, AssetEntity.get(3), 40 ],
-            [ cedarsProject, AssetEntity.get(4), 280 ],
-            [ cedarsProject, AssetEntity.get(5), 40 ],
-            [ cedarsProject, AssetEntity.get(6), 30 ],
-            [ cedarsProject, AssetEntity.get(7), 30 ],
-            [ cedarsProject, AssetEntity.get(8), 20 ],
-            [ cedarsProject, AssetEntity.get(9), 280 ]
+            [ cedarsProject, AssetEntity.get(3), 60 ],
+            [ cedarsProject, AssetEntity.get(4), 10 ],
+            [ cedarsProject, AssetEntity.get(5), 150 ],
+            [ cedarsProject, AssetEntity.get(6), 60 ],
+            [ cedarsProject, AssetEntity.get(7), 150 ],
+            [ cedarsProject, AssetEntity.get(8), 60 ],
+            [ cedarsProject, AssetEntity.get(9), 10 ]
 		]
 		
 		//	Insert the List of assetEntity
@@ -496,8 +496,53 @@ class BootStrap {
 				log.error( etext )
 			}
 		}
-		//Call createTransaction method for testing
-		//workflowService.createTransition("STD_PROCESS","MOVE_TECH", 10, AssetEntity.get(1), cedarsProjectMoveBundle1, userJohn, cedarsGreenProjectTeam, "lokanath" )
+		
+		//--------------------------------
+		// Create AssetTransition 
+		//--------------------------------
+		println "TRANSITIONS"
+		// Adding ‘Ready’ transition for all assets
+		def readyTarasitionList = [
+            [ "Ready", AssetEntity.get(1),cedarsProjectMoveBundle1],
+            [ "Ready", AssetEntity.get(2),cedarsProjectMoveBundle1],
+            [ "Ready", AssetEntity.get(3),cedarsProjectMoveBundle1],
+            [ "Ready", AssetEntity.get(4),cedarsProjectMoveBundle1],
+            [ "Ready", AssetEntity.get(5),cedarsProjectMoveBundle1],
+            [ "Ready", AssetEntity.get(6),cedarsProjectMoveBundle1],
+            [ "Ready", AssetEntity.get(7),cedarsProjectMoveBundle1],
+            [ "Ready", AssetEntity.get(8),cedarsProjectMoveBundle1],
+            [ "Ready", AssetEntity.get(9),cedarsProjectMoveBundle1]
+		]
+		//Insert the "Ready" list into Transitions
+		readyTarasitionList.each {
+			def readyTarasition = workflowService.createTransition("STD_PROCESS", "SUPERVISOR", it[0], it[1], it[2], userJohn, null, "" )
+		}
+		// Adding "PoweredDown" and "Release" to 4 of the assets
+		def powerTarasitionList = [
+            [ "PoweredDown", AssetEntity.get(1),cedarsProjectMoveBundle1],
+            [ "PoweredDown", AssetEntity.get(2),cedarsProjectMoveBundle1],
+            [ "PoweredDown", AssetEntity.get(3),cedarsProjectMoveBundle1],
+            [ "PoweredDown", AssetEntity.get(4),cedarsProjectMoveBundle1],
+            [ "Release", AssetEntity.get(1),cedarsProjectMoveBundle1],
+            [ "Release", AssetEntity.get(2),cedarsProjectMoveBundle1],
+            [ "Release", AssetEntity.get(3),cedarsProjectMoveBundle1],
+            [ "Release", AssetEntity.get(4),cedarsProjectMoveBundle1]
+		]
+		//	Insert the "PoweredDown" and "Release" list into Transitions
+		powerTarasitionList.each {
+			def powerTarasition = workflowService.createTransition("STD_PROCESS", "MANAGER", it[0], it[1], it[2], userJohn, null, "" )
+		}
+		//	Adding "Unracking" to 2 of the assets and "Unracked" to 1 of the asset
+		def unrackTarasitionList = [
+            [ "Unracking", AssetEntity.get(1),cedarsProjectMoveBundle1],
+            [ "Unracking", AssetEntity.get(2),cedarsProjectMoveBundle1],
+            [ "Unracked", AssetEntity.get(1),cedarsProjectMoveBundle1]
+		]
+		//	Insert the "Unracking" and "Unracked" list into Transitions		
+		unrackTarasitionList.each {
+			def unrackTarasition = workflowService.createTransition("STD_PROCESS", "SUPERVISOR", it[0], it[1], it[2], userJohn, null, "" )
+		}
+		
 		//--------------------------------
 		// Create DataTransferSet 
 		//--------------------------------

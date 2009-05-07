@@ -88,6 +88,7 @@
 	   	selectObj.innerHTML = tableBody
 	   	createStateOptions(asset[0].statesList)
 	   	createAssighToOptions(asset[0].sourceTeams,asset[0].targetTeams)
+	   	document.assetdetailsForm.reset();
    	}
    	function createStateOptions(statesList){
 		var statusObj = document.getElementById("stateSelectId")
@@ -192,7 +193,8 @@
 		document.getElementById('target_'+asset[0].assetEntity.id).innerHTML = asset[0].targetTeam
 		document.getElementById('assetDetailRow_'+asset[0].assetEntity.id).setAttribute('class',asset[0].cssClass)
 		}
-		timedRefresh(document.getElementById('selectTimedId').value)
+		timedRefresh(document.getElementById('selectTimedId').value);
+		document.assetdetailsForm.reset();
 	}
 	
     </script>
