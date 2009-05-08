@@ -15,6 +15,8 @@ class ClientConsoleController {
         def moveBundleInstance
         def projectMap
         def stateId
+        def stateVal
+        def taskVal
         def holdId
         def releaseId
         def reRackId
@@ -82,7 +84,13 @@ class ClientConsoleController {
         	releaseId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Release"))
         	reRackId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Reracked"))
         	if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
+        		stateVal = stateEngineService.getState("STD_PROCESS",stateId)
+    			taskVal = stateEngineService.getTasks("STD_PROCESS","MANAGER",stateVal)
+    			if(taskVal.size() == 0){
+    				check = false    				
+    			}else{
         		check = true
+    			}
         	}else{
         		check = false
         	}

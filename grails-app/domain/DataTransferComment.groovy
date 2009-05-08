@@ -2,7 +2,7 @@ class DataTransferComment
 {
 	String comment
 	String commentType
-	Integer mustVerify
+	Integer mustVerify = 0
 	DataTransferBatch dataTransferBatch
 	Integer rowId
 	Integer assetId
@@ -11,7 +11,7 @@ class DataTransferComment
 	 	version false
 		columns {
 			comment sqlType:'TEXT'
-			mustVerify sqlType:'TINYINT(2) default 0'
+			mustVerify sqlType:'TINYINT'
 		}
 	}
 	static constraints = {

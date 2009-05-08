@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<title>Report List</title>
+<title>PMO Dashboard</title>
 <g:javascript library="prototype" />
 <g:javascript library="jquery" />
 <jq:plugin name="jquery.bgiframe.min" />
@@ -64,6 +64,9 @@ var options = '';
         options += '<option value="' + task[0].item[i] + '">' + task[0].item[i] + '</option>';
       }
       $("select#taskList").html(options);
+      if(task[0].item.length > 1 && task[0].item[0] == "Hold"){
+      document.getElementById('taskList').options[1].selected = true;
+      }
        var getDialogId = document.getElementById('asset')     
       getDialogId.value=task[0].asset;
  
