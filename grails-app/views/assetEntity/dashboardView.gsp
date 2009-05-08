@@ -69,8 +69,6 @@
    }
    function getAssetDetail(e){
 	   	var asset = eval("(" + e.responseText + ")")
-	   	document.assetdetailsForm.asset.value = asset[0].assetDetails.assetDetail.id
-	   	document.assetdetailsForm.currentState.value = asset[0].assetDetails.state
 	    var tableBody = '<table style=\'border:0\' cellpadding=\'0\' cellspacing=\'0\' ><thead><tr><th>Asset Details </th></tr></thead><tbody>'+
 		'<tr><td><b>Name: </b>'+asset[0].assetDetails.assetDetail.assetName+'</td></tr>'+
 		'<tr><td><b>Model: </b>'+asset[0].assetDetails.assetDetail.model+'</td></tr>'+
@@ -89,6 +87,8 @@
 	   	createStateOptions(asset[0].statesList)
 	   	createAssighToOptions(asset[0].sourceTeams,asset[0].targetTeams)
 	   	document.assetdetailsForm.reset();
+	   	document.assetdetailsForm.asset.value = asset[0].assetDetails.assetDetail.id
+	   	document.assetdetailsForm.currentState.value = asset[0].assetDetails.state
    	}
    	function createStateOptions(statesList){
 		var statusObj = document.getElementById("stateSelectId")
@@ -161,7 +161,7 @@
 	   	}
    	}
    	function setCommentValidation(){
-	   	if(document.assetdetailsForm.validateComment.value == 'true'){
+	   	if(document.assetdetailsForm.validateComment.value == 'true' && document.assetdetailsForm.state.value == 'Hold'){
 	   		if(document.assetdetailsForm.comment.value == ''){
 	   			alert("A comment is required")
 	   		}
@@ -191,10 +191,10 @@
 		document.getElementById('statusCol_'+asset[0].assetEntity.id).innerHTML = asset[0].status
 		document.getElementById('source_'+asset[0].assetEntity.id).innerHTML = asset[0].sourceTeam
 		document.getElementById('target_'+asset[0].assetEntity.id).innerHTML = asset[0].targetTeam
-		document.getElementById('assetDetailRow_'+asset[0].assetEntity.id).setAttribute('class',asset[0].cssClass)
+		document.getElementById('assetDetailRow_'+asset[0].assetEntity.id).setAttribute("class",asset[0].cssClass);
+		document.assetdetailsForm.priority.value = "";
 		}
 		timedRefresh(document.getElementById('selectTimedId').value);
-		document.assetdetailsForm.reset();
 	}
 	
     </script>
@@ -202,11 +202,7 @@
 
 <body >
 <div class="body" >
-
-<h1>Supervisor Dashboard</h1>
-<g:if test="${flash.message}">
-	<div class="message">${flash.message}</div>
-</g:if> <g:form method="get" name="dashboardForm" controller="assetEntity"
+<g:form method="get" name="dashboardForm" controller="assetEntity"
 	action="dashboardView">
 	<input type="hidden" name="projectId" value="${projectId}">	
 
@@ -222,7 +218,7 @@
 				<option value="${moveBundleInstance?.id}">${moveBundleInstance?.name}</option>
 			</g:each>
 
-		</select></td>
+		</select></td><td><h1 align="right">Supervisor Dashboard</h1></td>
 	<td style="text-align: right;"><input type="button" value="Refresh" onclick="location.reload(true);">
 	<select id="selectTimedId" onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(e)') }">
 	<option value="60000">1 min</option> 
@@ -257,7 +253,7 @@
 			</table>
     </div>
     </td>
-    <td valign="top" style="border-right: 1px solid #333333;padding: 0px; width:70%;">
+    <td valign="top" style="border-right: 1px solid #333333;padding: 0px; width:45%;">
     <div style="width:750px; float:left; overflow:auto;">
 	<table width="100%" style="border: 0;" cellspacing="0" cellpadding="0">
 	  <tr>
@@ -409,11 +405,6 @@
 			</tr>
 			<tr><td><input type="hidden" name="asset" id="assetId" value=""> &nbsp;</td>
 			<td>
-			<!-- <select id="priorityId" name="priority" style="width: 100px">
-			<option value="1">High</option>
-			<option value="2">Normal</option>
-			<option value="3">Low</option>
-			</select> -->
 			<g:select id="priorityId" name="priority" from="${AssetEntity.constraints.priority.inList}" style="width: 100px" noSelection="['':'Priority ']"></g:select>
 			 </td>
 			</tr>

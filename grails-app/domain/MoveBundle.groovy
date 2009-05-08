@@ -1,4 +1,4 @@
-class MoveBundle extends PartyGroup {
+class MoveBundle extends Party {
 	
     Project project
     String name

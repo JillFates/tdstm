@@ -90,7 +90,7 @@ class ClientConsoleController {
 	        	def cssClass='task_pending'
 	        		transitions.each() { task ->
 	        		if(task == trans.transId){
-	        			if(stateId == 10 && trans.transId == "10"){
+	        			if(stateId == 10 ){
 	        				cssClass = "asset_hold"
 	        			} else {
 	        				cssClass = "task_done"
