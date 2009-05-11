@@ -40,7 +40,7 @@ document.getElementById('appSmeId').value="${appSmeValue}"
 document.getElementById('appOwnerId').value="${appOwnerValue}"
 document.getElementById('applicationId').value="${appValue}"
 var time = '${timeToRefresh}';
-	if(time != "never" && time != "" ){
+	if(time != "" ){
 	document.getElementById("selectTimedId").value = time;
 	} else if(time == "" ){
 	document.getElementById("selectTimedId").value = 120000;	
@@ -109,6 +109,31 @@ function timedRefresh(timeoutPeriod) {
 		clearTimeout(timer)
 	}
 }
+function changeState(){
+
+var assetArr = new Array();
+var totalAsset = ${assetEntityList.id};
+var j=0;
+for(i=0; i< totalAsset.size() ; i++){
+if(document.getElementById('checkId_'+totalAsset[i]) != null){
+var booCheck = document.getElementById('checkId_'+totalAsset[i]).checked;
+if(booCheck == true){
+assetArr[j] = totalAsset[i];
+j++;
+}
+}
+}
+${remoteFunction(action:'getList', params:'\'assetArray=\' + assetArr', onComplete:'showChangeStatusDialog(e);' )}
+
+}
+function selectAll(){
+var totalCheck = document.getElementsByName('checkChange');
+for(i=0;i<totalCheck.length;i++){
+totalCheck[i].checked = true;
+}
+
+}
+
 </script>
 </head>
 <body>
@@ -117,6 +142,8 @@ function timedRefresh(timeoutPeriod) {
 <form name="changeStatusForm"><input type="hidden" name="asset"
 	id="asset" /> <input type="hidden" name="projectId" id="projectId"
 	value="${projectId}" />
+	<input type="hidden" name="moveBundle" id="moveBundle"
+	value="${moveBundleInstance.id}" />
 <table style="border: 0px; width: 100%">
 	<tr>
 		<td width="40%"><strong>Change status for selected
@@ -136,7 +163,7 @@ function timedRefresh(timeoutPeriod) {
 	<tr>
 		<td></td>
 		<td style="text-align: right;"><input type="button" value="Save"
-			onclick="submitAction()" /></td>
+			onclick="confirm('Are you sure???');submitAction()" /></td>
 	</tr>
 </table>
 </form>
@@ -144,6 +171,7 @@ function timedRefresh(timeoutPeriod) {
 <div style="width:100%">
 <div style="width: 100%;">
 	<g:form	name="listForm" action="list" method="post">
+	
 	<table style="border: 0px;">
 		<tr>
 			<td valign="top" class="name"><label for="moveBundle">Move
@@ -171,41 +199,46 @@ function timedRefresh(timeoutPeriod) {
 			</select></td>
 		</tr>
 	</table>
+
 </div>
 <div style="width: 99%; overflow-x: scroll;border:1px solid #5F9FCF;margin-left: 5px;">
+
 <table cellpadding="1" cellspacing="1"  style="border:0px;">
 	<thead>
 	<tr>
-	
-			<td>&nbsp;</td>
-			<td style="padding-left: 0px;"><select id="applicationId" name="application" onchange="document.listForm.submit();" style="width: 100px;">
+	<td>
+	<input type="button" value="Change State" onclick="changeState()" />
+	</td>
+			
+			<td style="padding-left: 0px;"><select id="applicationId" name="application" onchange="document.listForm.submit();" style="width: 120px;">
 				<option value="">All</option>
 				<g:each in="${applicationList}" var="application">
 					<option value="${application}">${application}</option>
 				</g:each>
 			</select></td>
-			<td style="padding-left: 0px;"><select id="appOwnerId" name="appOwner"	onchange="document.listForm.submit();" style="width: 100px;">
+			<td style="padding-left: 0px;"><select id="appOwnerId" name="appOwner"	onchange="document.listForm.submit();" style="width: 120px;">
 				<option value="">All</option>
 				<g:each in="${appOwnerList}" var="appOwner">
 					<option value="${appOwner}">${appOwner}</option>
 				</g:each>
 			</select></td>
 			<td style="padding-left: 0px;"><input type="hidden" id="projectId" name="projectId" value="${projectId }" />
-			 <select id="appSmeId" name="appSme" onchange="document.listForm.submit();" style="width: 100px;">
+			 <select id="appSmeId" name="appSme" onchange="document.listForm.submit();" style="width: 120px;">
 				<option value="">All</option>
 				<g:each in="${appSmeList}" var="appSme">
 					<option value="${appSme}">${appSme}</option>
 				</g:each>
 			</select></td>
-		</g:form>
+	<td style="padding-left: 0px;"><select style="width: 120px;visibility: hidden;"/></td>
 		</tr>
 		<tr>
-			<th>Actions</th>
+		 <th>Actions <a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a></th>
+			
 			<g:sortableColumn property="application"  title="Application" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
 			
 			<g:sortableColumn property="app_owner" title="App Owner"  params="['projectId':projectId]" />
 
-			<g:sortableColumn property="app_sme" title="App Sme" params="['projectId':projectId]"/>
+			<g:sortableColumn property="app_sme" title="App SME" params="['projectId':projectId]"/>
 
 			<g:sortableColumn property="asset_name" title="Asset Name" params="['projectId':projectId]"/>
 
@@ -221,13 +254,18 @@ function timedRefresh(timeoutPeriod) {
 
 		<g:each in="${assetEntityList}" var="assetEntity">
 			<tr>
+			
+			
 				<td><jsec:hasRole name="ADMIN">
 					<g:if test="${assetEntity.checkVal == true}">
+					<g:checkBox name="checkChange" id="checkId_${assetEntity.id}"></g:checkBox> 
 						<g:remoteLink action="getTask" params="['assetEntity':assetEntity.id]"	onComplete="showChangeStatusDialog(e);">
 							<img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}"	border="0px">
 						</g:remoteLink>
+						
 					</g:if>
 				</jsec:hasRole>
+				</td>
 				<td>${assetEntity?.application}</td>
 				<td>${assetEntity?.appOwner}</td>
 				<td>${assetEntity?.appSme}</td>
@@ -237,8 +275,10 @@ function timedRefresh(timeoutPeriod) {
 				</g:each>
 			</tr>
 		</g:each>
+		
 	</tbody>
 </table>
+</g:form>
 </div>
 <g:javascript>
 initialize();

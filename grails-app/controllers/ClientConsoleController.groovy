@@ -89,14 +89,14 @@ class ClientConsoleController {
     			if(taskVal.size() == 0){
     				check = false    				
     			}else{
-        		check = true
+                    check = true
     			}
         	}else{
         		check = false
         	}
         	processTransitionList.each() { trans ->
 	        	def cssClass='task_pending'
-	        		transitions.each() { task ->
+                transitions.each() { task ->
 	        		if(task == trans.transId){
 	        			if(stateId == 10 ){
 	        				cssClass = "asset_hold"
@@ -125,42 +125,18 @@ class ClientConsoleController {
         if(projectMap != null){
 			stateVal = stateEngineService.getState("STD_PROCESS",projectMap.currentStateId)
 			temp = stateEngineService.getTasks("STD_PROCESS","MANAGER",stateVal)
-        }
-        temp.each{
-        	tempTaskList << Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
-        }
-        tempTaskList.sort().each{
-        	taskList << stateEngineService.getState("STD_PROCESS",it)
+       
+            temp.each{
+                tempTaskList << Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
+            }
+            tempTaskList.sort().each{
+                taskList << stateEngineService.getState("STD_PROCESS",it)
+            }
         }
         totalList<<[item:taskList,asset:assetId]
         render totalList as JSON
 	}
-    // To change the status for an asset
-	def changeStatus = {
-        def assetId = params.asset
-			 
-        def assetEnt = AssetEntity.findById(assetId)
-        def bundle = assetEnt.moveBundle
-        def principal = SecurityUtils.subject.principal
-        def loginUser = UserLogin.findByUsername(principal)
-        def team = assetEnt.sourceTeam
-		     
-        def workflow = workflowService.createTransition("STD_PROCESS","MANAGER",params.taskList,assetEnt,bundle,loginUser,team,params.enterNote)
-        if(workflow.success){
-        	if(params.enterNote != ""){
-                def assetComment = new AssetComment()
-                assetComment.comment = params.enterNote
-                assetComment.commentType = 'issue'
-                assetComment.assetEntity = assetEnt
-                assetComment.save()
-            }
-            redirect(action:'list',params:["projectId":params.projectId])
-		}else{
-        	flash.message = message(code :workflow.message)	
-            redirect(action:'list',params:["projectId":params.projectId])
-        }
-       
-	}
+    
 	// Refresh time selection 
 	def setTimePreference = {
         def timer = params.timer
@@ -172,4 +148,65 @@ class ClientConsoleController {
         refreshTime <<[refreshTime:timeToRefresh]
         render refreshTime as JSON
 	}
+	
+	//To get unique list of task for list of assets through ajax
+	def getList = {
+    		
+    	
+        def assetArray = params.assetArray
+        Set common = new HashSet()
+        def taskList = []
+        def temp
+        def totalList = []
+        def projectMap = ProjectAssetMap.findAll("from ProjectAssetMap pam where pam.asset in ($assetArray)")
+        def stateVal
+        if(projectMap != null){
+    		projectMap.each{
+    			
+    	        	
+                stateVal = stateEngineService.getState("STD_PROCESS",it.currentStateId)
+                temp = stateEngineService.getTasks("STD_PROCESS","MANAGER",stateVal)
+    				
+                taskList << [task:temp]
+            }
+    			
+    		
+    		common = (HashSet)(taskList[0].task);
+    		for(int i=1; i< taskList.size();i++){
+                common.retainAll((HashSet)(taskList[i].task))
+    		}
+        }
+        totalList << [item:common,asset:assetArray]
+        render totalList as JSON
+    }
+	
+    // To change the status for an asset
+	def changeStatus = {
+        def assetId = params.asset
+				 
+        def assetEnt = AssetEntity.findAll("from AssetEntity ae where ae.id in ($assetId)")
+        assetEnt.each{
+	        def bundle = it.moveBundle
+	        def principal = SecurityUtils.subject.principal
+	        def loginUser = UserLogin.findByUsername(principal)
+	        def team = it.sourceTeam
+			     
+	        def workflow = workflowService.createTransition("STD_PROCESS","MANAGER",params.taskList,it,bundle,loginUser,team,params.enterNote)
+	        if(workflow.success){
+	        	if(params.enterNote != ""){
+	                def assetComment = new AssetComment()
+	                assetComment.comment = params.enterNote
+	                assetComment.commentType = 'issue'
+	                assetComment.assetEntity = it
+	                assetComment.save()
+	            }
+	        }else{
+	        	flash.message = message(code :workflow.message)		            
+	        }
+        }
+    
+        redirect(action:'list',params:["projectId":params.projectId,"moveBundle":params.moveBundle])
+			
+	       
+    }
 }
