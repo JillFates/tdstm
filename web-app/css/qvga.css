@@ -40,12 +40,12 @@ dt {
 }
 
 .asset_hold{
-	background-color:#FFFF00;
+	background-color:#FFFF33;
 	color:black;
 }
 
 .asset_ready{
-	background-color:#008000;
+	background-color:#33ff00;
 	color:black;
 }
 
@@ -55,7 +55,7 @@ dt {
 }
 
 .asset_pending{
-	background-color:#999;
+	background-color:#ccc;
 	color:black;
 }
 .asset_select{
@@ -65,7 +65,6 @@ dt {
 
 .asset_done{
 	background-color:#FFFFFF;
-	text-decoration: line-through;
 	color:black;
 }
 .task_pending {
