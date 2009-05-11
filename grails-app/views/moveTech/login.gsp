@@ -29,11 +29,11 @@
 		alt="tds" /></a></div>
 
 	<div
-		style="float: left; width: 100%; margin: 50px 0; text-align: center;">
+		style="float: left; width: 100%; margin: 12px 0; text-align: center;">
 	<table style="border: 0px;">
 		<tbody>
 			<tr>
-				<td height="15px;"></td>
+				<td height="5px;"></td>
 			</tr>
 			<tr>
 				<td colspan="2" style="text-align: center;"><span
@@ -44,8 +44,8 @@
 				<td height="25px;"></td>
 			</tr>
 			<tr>
-				<td><label>Username:</label></td>
-				<td><input type="text" size="15" name="username" value="${username}" /></td>
+				<td style="text-align:center;"><label>Username:</label>
+				<input type="text" size="10" name="username" value="${username}" /></td>
 			</tr>
 			<tr>
 				<td height="25px;"></td>

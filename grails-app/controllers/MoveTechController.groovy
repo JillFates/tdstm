@@ -369,6 +369,7 @@ class MoveTechController {
         def asset = AssetEntity.findByAssetTag(params.search)
         def bundle = asset.moveBundle
         def principal = SecurityUtils.subject.principal
+        if(principal){
         def loginUser = UserLogin.findByUsername(principal)
         def team
         if(params.location == 's'){
@@ -404,7 +405,10 @@ class MoveTechController {
           		flash.message = message(code :workflow.message)
           		redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])          	
           }
-        }        
+        }
+        } else {
+        	redirect(action:'login')
+        }
 	}
 	
     //  Method for start unracking action
@@ -413,6 +417,7 @@ class MoveTechController {
         def bundle = asset.moveBundle
         def actionLabel = params.actionLabel
         def principal = SecurityUtils.subject.principal
+        if(principal){
         def loginUser = UserLogin.findByUsername(principal)               
         def team
         def assetCommt = params.assetCommt
@@ -433,6 +438,9 @@ class MoveTechController {
 		}else{
         	flash.message = message(code :workflow.message)	
         	redirect(action:'assetSearch',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"search":params.search,"assetCommt":params.assetCommt,"label":params.label,"actionLabel":actionLabel])
+        }
+        } else {
+        	redirect(action:'login')
         }
 			
 	}
@@ -574,6 +582,7 @@ class MoveTechController {
         def bundle = asset.moveBundle
         def actionLabel = params.actionLabel
         def principal = SecurityUtils.subject.principal
+        if(principal){
         def loginUser = UserLogin.findByUsername(principal)
         def team
         def assetCommt = params.assetCommt
@@ -593,6 +602,9 @@ class MoveTechController {
         }else{
         	flash.message = message(code :workflow.message)	
         	redirect(action:'cleaningAssetSearch',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"search":params.search,"assetCommt":params.assetCommt,"label":params.label,"actionLabel":actionLabel])
+        }
+        } else {
+        	redirect(action:'login')
         }
 			
 	}

@@ -116,14 +116,13 @@
 <div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody" style="width: 100%;">
 		<div class="colum_techlogin" style="float:left;">
-			<div style="float: left; width: 200px; margin-left: 15px;"><g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt"]'	style="height:26px; width:64px; float:left; margin:auto 0px;">
-			<img src="${createLinkTo(dir:'images',file:'home.png')}" border="0" />
-			</g:link> <g:link action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' style="height:26px; width:64px; float:left; margin:auto 0px;">
-			<img  src="${createLinkTo(dir:'images',file:'my_task.png')}" border="0" /></g:link>
-			<img src="${createLinkTo(dir:'images',file:'asset_h.png')}" style="height:26px; width:64px; float:left; margin:auto 0px;" />
-		</div>
+			<div style="float:left; width:200px; margin-left:13px;background-color:none;">
+		        	<g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt"]' style="height:21px; width:45px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Home</g:link>
+					<g:link action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' style="height:21px; width:60px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">My Task</g:link>
+					<a href="#" style="height:21px; width:63px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;background:#aaefb8;padding:auto 0px;text-align:center;">Asset</a>
+				</div>
 		<div class="w_techlog">
-		<div style="float:left; width:220px; margin:5px 0; ">
+		<div style="float:left; width:219px; margin:5px 0; ">
 		<g:form name="assetSearchForm" action="placeHold">
 			<input name="bundle" type="hidden" value="${bundle}" />
 			<input name="team" type="hidden" value="${team}" />
@@ -150,7 +149,7 @@
 			</g:if>
  	</div>	
 			<tr>
-			<td width="200px"><strong>Instructions</strong></td>
+			<td width="219px"><strong>Instructions</strong></td>
 			<td><strong>Confirm</strong></td>
 			</tr>
 			<g:each status="i" in="${assetCommt}" var="comments">
@@ -166,7 +165,7 @@
 			</g:each>
 			<g:if test ="${actionLabel}">	
 			<tr>
-			<td class="buttonR" colspan="2" style="text-align:right;"><input type="button" value="${label}" onclick="unRack()" /></td>
+			<td colspan="2" style="text-align:right;"><input type="button" value="${label}" onclick="unRack()" style="background-color:#aaefb8;width: 120px;"/></td>
 			</tr>
 			</g:if>
 			<table>			
@@ -174,7 +173,7 @@
 			<textarea rows="2" cols="10" style="width: 200px;padding:0px;" title="Enter Note..." name="enterNote" ></textarea>
 			</td></tr>		
 			<tr>
-			<td class="buttonR" style="text-align: right;"><input type="button" value="Place on HOLD" onclick="doTransition()" /></td>
+			<td style="text-align: right;"><input type="button" value="Place on HOLD" onclick="doTransition()" style="background-color:#aaefb8;width: 100px;"/></td>
 			<tr>	
 			</table>
 			</table>

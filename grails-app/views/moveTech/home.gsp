@@ -20,11 +20,11 @@ dt {
 	<div class="mainbody" style="width: 100%;" >
 		<div class="colum_techlogin" style="float:left;">
 				<div class="border_bundle_team">
-          			<div style="float:left; width:92%; margin-left:15px;">              									
-		              	<a href="#" style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'home_h.png')}" border="0"/></a>							              				
-              			<g:link action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'my_task.png')}" border="0" /></g:link>              											
-              			<img src="${createLinkTo(dir:'images',file:'asset.png')}" style="height:26px; width:64px; float:left; margin:auto 0px;"/>								           
-		       </div>			
+          			<div style="float:left; width:200px; margin-left:13px;background-color:none;">
+		        	<a href="#" style="height:21px; width:45px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;background:#aaefb8;padding:auto 0px;text-align:center;">Home</a>
+					<g:link action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' style="height:21px; width:60px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">My Task</g:link>
+					<a href="#" style="height:21px; width:63px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Asset</a>
+				</div>		
 			<div class="w_techlog">
 				<g:form method="post" name="bundleTeamAssetForm">
 				<div style="float:left; width:100%; margin:5px 0; ">              								
