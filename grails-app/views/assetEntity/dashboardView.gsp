@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<title>Supervisor Dashboard</title>
+<title>Supervisor Console</title>
 <g:javascript library="prototype" />
 <g:javascript library="jquery" />
 <link type="text/css" rel="stylesheet"
@@ -32,10 +32,6 @@
 
 <style>
 	td .odd{ background:#DDDDDD;nowrap }
-	.asset_Hold{
-		background-color:#FFFF00;
-		color:black;
-	}
 </style>
 <script>
 	$(document).ready(function() {
@@ -217,7 +213,7 @@
 	<div class="dialog">
 <table style="border: 0px;">
 	<tr class="prop">
-		<td valign="top" class="name"><label for="moveBundle">Move
+		<td style="vertical-align:bottom;" class="name"><label for="moveBundle">Move
 		Bundle:</label>&nbsp;<select id="moveBundleId"
 			name="moveBundle" onchange="document.dashboardForm.submit()" >	
 
@@ -226,8 +222,8 @@
 				<option value="${moveBundleInstance?.id}">${moveBundleInstance?.name}</option>
 			</g:each>
 
-		</select></td><td><h1 align="right">Supervisor Dashboard</h1></td>
-	<td style="text-align: right;"><input type="button" value="Refresh" onclick="location.reload(true);">
+		</select></td><td><h1 align="right">Supervisor Console</h1></td>
+	<td style="text-align: right;vertical-align:bottom;"><input type="button" value="Refresh" onclick="location.reload(true);">
 	<select id="selectTimedId" onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(e)') }">
 	<option value="60000">1 min</option> 
 	<option value="120000">2 min</option> 
@@ -255,9 +251,8 @@
 			<tr><td>Names</td> </tr>
 			<tr><td class="odd">Location</td> </tr>
 			<tr><td>Asset</td> </tr>
-			<tr><td class="odd">Source<span style="font: 9px bold verdana, arial, helvetica, sans-serif;">(Avail/Done/Total)</span> </td> </tr>
-			<tr><td >Target<span style="font: 9px bold verdana, arial, helvetica, sans-serif;">(Avail/Done/Total)</span> </td> </tr>
-			<tr><td class="odd">Queue</td> </tr>
+			<tr><td class="odd" nowrap>Source <span style="font: 9px bold verdana, arial, helvetica, sans-serif;">(Avail/Done/Total)</span> </td> </tr>
+			<tr><td nowrap>Target <span style="font: 9px bold verdana, arial, helvetica, sans-serif;">(Avail/Done/Total)</span> </td> </tr>
 			</table>
     </div>
     </td>
@@ -274,7 +269,6 @@
 			<tr><td nowrap>Sap1</td> </tr>
 			<tr><td class="odd">${bundleTeam?.sourceAvailassets} / ${bundleTeam?.unrackedAssets} / ${bundleTeam?.sourceAssets}</td> </tr>
 			<tr><td nowrap>${bundleTeam?.targetAvailAssets} / ${bundleTeam?.rerackedAssets} / ${bundleTeam?.targetAssets}</td> </tr>
-			<tr><td nowrap class="odd">2/22m</td> </tr>
 			</table>
 			</td>
 			</g:each>
@@ -286,7 +280,6 @@
 			<tr><td nowrap>Exchg3</td> </tr>
 			<tr><td class="odd">${supportTeam.sourceCleaned} / ${supportTeam.totalAssets}</td> </tr>
 			<tr><td nowrap>N/A</td> </tr>
-			<tr><td nowrap class="odd">1/10m</td> </tr>
 			</table>
 			</td>
 			<td style="padding: 0px;">
@@ -297,7 +290,6 @@
 			<tr><td nowrap>Exchg3</td> </tr>
 			<tr><td class="odd">${supportTeam.sourceMover} / ${supportTeam.totalAssets}</td> </tr>
 			<tr><td nowrap>${supportTeam.targetMover} / ${supportTeam.totalAssets}</td> </tr>
-			<tr><td nowrap class="odd">1/10m</td> </tr>
 			</table>
 			</td>
 	  </tr>
@@ -313,7 +305,6 @@
 			<tr><td>&nbsp;</td> </tr>
 			<tr><td class="odd">${totalSourceAvail} / ${totalUnracked} / ${totalAsset}</td> </tr>
 			<tr><td nowrap>${totalTargetAvail} / ${totalReracked} / ${totalAsset}</td> </tr>
-			<tr><td class="odd">11/92m</td> </tr>
 			</table>
     </div>
     </td>
@@ -346,7 +337,6 @@
 					<th>Status</th>
 					<th>Source Team</th>
 					<th>Target Team</th>
-					<th>Start</th>
 					<th>Loc</th>
 					<th>Issues</th>
 				</tr>
@@ -355,7 +345,7 @@
 				<g:each status="i" in="${assetsList}" var="assetsList">
 					<tr name="assetDetailRow" id="assetDetailRow_${assetsList?.asset.id}" class="${assetsList?.cssClass}" value="${assetsList?.asset.id}">
 						<td onclick="assetDetails('${assetsList?.asset.id}')">
-						<span style="visibility: hidden;" id="image_${assetsList?.asset.id}"><img src="${createLinkTo(dir:'images',file:'arrow.png')}" border="0px" ></span> 
+						<span style="visibility: hidden;" id="image_${assetsList?.asset.id}"><img src="${createLinkTo(dir:'images',file:'row_arrow.gif')}" border="0px" ></span> 
 						</td>
 						<td id="priorityCol_${assetsList?.asset.id}" onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.priority}</td>
 						<td onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.assetTag}</td>
@@ -363,7 +353,6 @@
 						<td onclick="assetDetails('${assetsList?.asset.id}')" id="statusCol_${assetsList?.asset.id}">${assetsList?.status}</td>
 						<td onclick="assetDetails('${assetsList?.asset.id}')" id="source_${assetsList?.asset.id}">${assetsList?.asset.sourceTeam?.name}</td>
 						<td onclick="assetDetails('${assetsList?.asset.id}')" id="target_${assetsList?.asset.id}">${assetsList?.asset.targetTeam?.name}</td>
-						<td onclick="assetDetails('${assetsList?.asset.id}')"><tds:convertDateTime date="${assetsList.asset.moveBundle.startTime}" /></td>
 						<td onclick="assetDetails('${assetsList?.asset.id}')">${assetsList.asset.sourceTeam.currentLocation}</td>
 						<td id="icon_${assetsList?.asset.id}">
 						<g:if test="${AssetComment.findByAssetEntityAndCommentType(assetsList?.asset,'issue')}">
