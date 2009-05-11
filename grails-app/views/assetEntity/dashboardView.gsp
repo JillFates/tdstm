@@ -255,8 +255,8 @@
 			<tr><td>Names</td> </tr>
 			<tr><td class="odd">Location</td> </tr>
 			<tr><td>Asset</td> </tr>
-			<tr><td class="odd">Source</td> </tr>
-			<tr><td >Target</td> </tr>
+			<tr><td class="odd">Source<span style="font: 9px bold verdana, arial, helvetica, sans-serif;">(Avail/Done/Total)</span> </td> </tr>
+			<tr><td >Target<span style="font: 9px bold verdana, arial, helvetica, sans-serif;">(Avail/Done/Total)</span> </td> </tr>
 			<tr><td class="odd">Queue</td> </tr>
 			</table>
     </div>
@@ -272,8 +272,8 @@
 			<tr><td nowrap>${bundleTeam?.members}&nbsp;</td></tr>
 			<tr><td class="odd">${bundleTeam?.team?.currentLocation}&nbsp;</td> </tr>
 			<tr><td nowrap>Sap1</td> </tr>
-			<tr><td class="odd">${bundleTeam?.unrackedAssets} of ${bundleTeam?.sourceAssets}</td> </tr>
-			<tr><td nowrap>${bundleTeam?.rerackedAssets} of ${bundleTeam?.targetAssets}</td> </tr>
+			<tr><td class="odd">${bundleTeam?.sourceAvailassets} / ${bundleTeam?.unrackedAssets} / ${bundleTeam?.sourceAssets}</td> </tr>
+			<tr><td nowrap>${bundleTeam?.targetAvailAssets} / ${bundleTeam?.rerackedAssets} / ${bundleTeam?.targetAssets}</td> </tr>
 			<tr><td nowrap class="odd">2/22m</td> </tr>
 			</table>
 			</td>
@@ -284,7 +284,7 @@
 			<tr><td nowrap>${supportTeam?.cleaningMembers}&nbsp;</td></tr>
 			<tr><td class="odd">${supportTeam?.cleaning.currentLocation}&nbsp;</td> </tr>
 			<tr><td nowrap>Exchg3</td> </tr>
-			<tr><td class="odd">${supportTeam.sourceCleaned} of ${supportTeam.totalAssets}</td> </tr>
+			<tr><td class="odd">${supportTeam.sourceCleaned} / ${supportTeam.totalAssets}</td> </tr>
 			<tr><td nowrap>N/A</td> </tr>
 			<tr><td nowrap class="odd">1/10m</td> </tr>
 			</table>
@@ -295,8 +295,8 @@
 			<tr><td nowrap>${supportTeam?.transportMembers}&nbsp;</td></tr>
 			<tr><td class="odd">${supportTeam?.transport.currentLocation}&nbsp;</td> </tr>
 			<tr><td nowrap>Exchg3</td> </tr>
-			<tr><td class="odd">${supportTeam.sourceMover} of ${supportTeam.totalAssets}</td> </tr>
-			<tr><td nowrap>${supportTeam.targetMover} of ${supportTeam.totalAssets}</td> </tr>
+			<tr><td class="odd">${supportTeam.sourceMover} / ${supportTeam.totalAssets}</td> </tr>
+			<tr><td nowrap>${supportTeam.targetMover} / ${supportTeam.totalAssets}</td> </tr>
 			<tr><td nowrap class="odd">1/10m</td> </tr>
 			</table>
 			</td>
@@ -311,8 +311,8 @@
 			<tr><td>&nbsp;</td> </tr>
 			<tr><td class="odd">&nbsp;</td> </tr>
 			<tr><td>&nbsp;</td> </tr>
-			<tr><td class="odd">${totalUnracked} of ${totalAsset}</td> </tr>
-			<tr><td nowrap>${totalReracked} of ${totalAsset}</td> </tr>
+			<tr><td class="odd">${totalSourceAvail} / ${totalUnracked} / ${totalAsset}</td> </tr>
+			<tr><td nowrap>${totalTargetAvail} / ${totalReracked} / ${totalAsset}</td> </tr>
 			<tr><td class="odd">11/92m</td> </tr>
 			</table>
     </div>

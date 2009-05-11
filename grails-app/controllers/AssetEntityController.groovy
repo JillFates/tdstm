@@ -709,9 +709,11 @@ class AssetEntityController {
             }
             def sourceAssets = ProjectAssetMap.findAll("from ProjectAssetMap where asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and sourceTeam = ${it.id} )" ).size()
             def unrackedAssets = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $unrackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and sourceTeam = ${it.id} )" ).size()
+            def sourceAvailassets = AssetTransition.findAll("from AssetTransition where (select max(stateTo) from AssetTransition where assetEntity in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and sourceTeam = ${it.id} ) ) <= $unrackedId and stateTo >= $releasedId and assetEntity in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and sourceTeam = ${it.id} ) group by assetEntity" ).size()
             def targetAssets = ProjectAssetMap.findAll("from ProjectAssetMap where asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and targetTeam = ${it.id} )" ).size()
             def rerackedAssets = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $rerackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and targetTeam = ${it.id} )" ).size()
-            bundleTeams <<[team:it,members:member, sourceAssets:sourceAssets, unrackedAssets:unrackedAssets, targetAssets:targetAssets, rerackedAssets:rerackedAssets ]
+            def targetAvailAssets = AssetTransition.findAll("from AssetTransition where (select max(stateTo) from AssetTransition where assetEntity in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and targetTeam = ${it.id} )) < $rerackedId and stateTo >= $stagedId and assetEntity in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and targetTeam = ${it.id} ) group by assetEntity" ).size()
+            bundleTeams <<[team:it,members:member, sourceAssets:sourceAssets, unrackedAssets:unrackedAssets, sourceAvailassets:sourceAvailassets , targetAvailAssets:targetAvailAssets , targetAssets:targetAssets, rerackedAssets:rerackedAssets ]
         }
         def sourceCleaned = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $cleanedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
         def sourceMover = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $onCartId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
@@ -743,10 +745,12 @@ class AssetEntityController {
         	
         }
         def totalUnracked = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $unrackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
+        def totalSourceAvail = AssetTransition.findAll("from AssetTransition where (select max(stateTo) from AssetTransition  where assetEntity in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} ) ) <= $unrackedId and stateTo >= $releasedId and assetEntity in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} ) group by assetEntity" ).size()
         def totalReracked = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $rerackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
+        def totalTargetAvail = AssetTransition.findAll("from AssetTransition where (select max(stateTo) from AssetTransition where assetEntity in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} ) ) < $rerackedId and stateTo >= $stagedId and assetEntity in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} ) group by assetEntity" ).size()
         userPreferenceService.loadPreferences("SUPER_CONSOLE_REFRESH")
         def timeToRefresh = getSession().getAttribute("SUPER_CONSOLE_REFRESH")
-        return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams, assetsList:assetsList, moveBundleInstance:moveBundleInstance, supportTeam:supportTeam,totalUnracked:totalUnracked ? totalUnracked : 0, totalReracked:totalReracked ? totalReracked : 0, totalAsset:totalAsset.size(), timeToRefresh : timeToRefresh ? timeToRefresh.SUPER_CONSOLE_REFRESH : "never"]
+        return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams, assetsList:assetsList, moveBundleInstance:moveBundleInstance, supportTeam:supportTeam,totalUnracked:totalUnracked , totalSourceAvail:totalSourceAvail, totalTargetAvail:totalTargetAvail, totalReracked:totalReracked , totalAsset:totalAsset.size(), timeToRefresh : timeToRefresh ? timeToRefresh.SUPER_CONSOLE_REFRESH : "never"]
         		
     }
     /*

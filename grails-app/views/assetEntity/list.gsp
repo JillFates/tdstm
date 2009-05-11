@@ -513,7 +513,7 @@
       				 document.getElementById("commentId").value = assetComments.id
 			      	 document.getElementById("commentTdId").innerHTML = assetComments.comment
 			      	 document.getElementById("commentTypeTdId").innerHTML = assetComments.commentType
-			      	 document.getElementById("mustVerify").innerHTML = assetComments.mustVerify
+			      	 document.getElementById("mustVerifyEdit").value = assetComments.mustVerify
 			      	 if(assetComments.mustVerify != 0){
 			      	 document.getElementById("mustVerifyShowId").checked = true
 			      	 document.editCommentForm.mustVerify.checked = true
@@ -800,10 +800,10 @@
 	</div>
 </div>
 <div id="createCommentDialog" title="Create Asset Comment" style="display: none;">
+<input type="hidden" name="assetEntity.id" id="createAssetCommentId" value="">
+<input type="hidden" name="status" id="statusId" value="">
 <g:form action="saveComment" method="post" name="createCommentForm" >
 	<div class="dialog">
-	<input type="hidden" name="assetEntity.id" id="createAssetCommentId" value="">
-	<input type="hidden" name="status" id="statusId" value="">
 	<table id="createCommentTable">
 		<tbody>
 			<tr class="prop">
@@ -898,7 +898,7 @@
                 <label for="mustVerify">Must Verify:</label>
                 </td>
                 <td valign="top" class="value">
-                <input type="checkbox" id="mustVerify" name="mustVerify" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
+                <input type="checkbox" id="mustVerifyEdit" name="mustVerify" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
                 </td>
             </tr>
 		</tbody>
