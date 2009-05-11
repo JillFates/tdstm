@@ -7,11 +7,11 @@ class ProjectUtilController {
         try{
             def principal = SecurityUtils.subject.principal
             def userLogin = UserLogin.findByUsername( principal )
-            def userPreference = UserPreference.findByUserLogin( userLogin )
+            def userPreference = UserPreference.findAllByUserLoginAndPreferenceCode( userLogin, "CURR_PROJ" )
             if ( userPreference == null ) {
                 redirect( action:"searchList" )
             } else {
-                def projectInstance = Project.findById( userPreference.value )
+                def projectInstance = Project.findById( userPreference.value[0] )
                 redirect( controller:"project", action:"show",id:projectInstance.id)
             }
         } catch (Exception e){

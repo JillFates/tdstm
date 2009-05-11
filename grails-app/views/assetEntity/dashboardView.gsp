@@ -148,7 +148,7 @@
 	   var bundleID = ${moveBundleInstance.id}; 
 	   document.getElementById("moveBundleId").value =  bundleID;
 	   var time = '${timeToRefresh}';
-	   if(time != 'never' && time != '' ){
+	   if(time != '' ){
 	   document.getElementById("selectTimedId").value = time;
 	   } 
    	}
@@ -191,8 +191,16 @@
 		document.getElementById('statusCol_'+asset[0].assetEntity.id).innerHTML = asset[0].status
 		document.getElementById('source_'+asset[0].assetEntity.id).innerHTML = asset[0].sourceTeam
 		document.getElementById('target_'+asset[0].assetEntity.id).innerHTML = asset[0].targetTeam
-		document.getElementById('assetDetailRow_'+asset[0].assetEntity.id).setAttribute("class",asset[0].cssClass);
+		document.getElementById('assetDetailRow_'+asset[0].assetEntity.id).className = asset[0].cssClass ;
+		if(asset[0].status == "Hold"){
+		var link = document.createElement('a');
+		link.href = '#'
+		link.onclick = function(){document.getElementById('createAssetCommentId').value = asset[0].assetEntity.id ;new Ajax.Request('listComments?id='+asset[0].assetEntity.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e);}})} //;return false
+		link.innerHTML = "<img src=\"/tds/images/skin/database_table_red.png\" border=\"0px\">"
+		document.getElementById('icon_'+asset[0].assetEntity.id).appendChild(link);
+		}
 		document.assetdetailsForm.priority.value = "";
+		document.assetdetailsForm.comment.value = "";
 		}
 		timedRefresh(document.getElementById('selectTimedId').value);
 	}
@@ -357,7 +365,7 @@
 						<td onclick="assetDetails('${assetsList?.asset.id}')" id="target_${assetsList?.asset.id}">${assetsList?.asset.targetTeam?.name}</td>
 						<td onclick="assetDetails('${assetsList?.asset.id}')"><tds:convertDateTime date="${assetsList.asset.moveBundle.startTime}" /></td>
 						<td onclick="assetDetails('${assetsList?.asset.id}')">${assetsList.asset.sourceTeam.currentLocation}</td>
-						<td >
+						<td id="icon_${assetsList?.asset.id}">
 						<g:if test="${AssetComment.findByAssetEntityAndCommentType(assetsList?.asset,'issue')}">
 						<g:remoteLink controller="assetEntity" action="listComments" id="${assetsList?.asset.id}" before="document.getElementById('createAssetCommentId').value = ${assetsList?.asset.id};" onComplete="listCommentsDialog( e );">
 							<img src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}" border="0px">
@@ -463,10 +471,10 @@
 	</div>
 </div>
 <div id="createCommentDialog" title="Create Asset Comment" style="display: none;">
+<input type="hidden" name="assetEntity.id" id="createAssetCommentId" value="">
+<input type="hidden" name="status" id="statusId" value="">
 <g:form action="saveComment" method="post" name="createCommentForm" >
 	<div class="dialog">
-	<input type="hidden" name="assetEntity.id" id="createAssetCommentId" value="">
-	<input type="hidden" name="status" id="statusId" value="">
 	<table id="createCommentTable">
 		<tbody>
 			<tr class="prop">
@@ -561,7 +569,7 @@
                 <label for="mustVerify">Must Verify:</label>
                 </td>
                 <td valign="top" class="value">
-                <input type="checkbox" id="mustVerify" name="mustVerify" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
+                <input type="checkbox" id="mustVerifyEdit" name="mustVerify" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
                 </td>
             </tr>
 		</tbody>

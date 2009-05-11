@@ -49,8 +49,8 @@
 					      verifyText.id = 'verifyText_'+commentObj.commentInstance.id
 					      verifyText.type = 'checkbox'
 					      verifyText.disabled = 'disabled'
-					      if(commentObj.commentInstance.mustVerify != 0){
-					      	verifyText.checked = true
+					      if(commentObj.commentInstance.mustVerify == 1){
+					      	verifyText.checked = true ;
 					      }
 					      //createTextNode(commentObj.commentInstance.mustVerify);
 					      link.appendChild( image )
@@ -79,7 +79,7 @@
       				 document.getElementById("commentId").value = assetComments.id
 			      	 document.getElementById("commentTdId").innerHTML = assetComments.comment
 			      	 document.getElementById("commentTypeTdId").innerHTML = assetComments.commentType
-			      	 document.getElementById("mustVerify").innerHTML = assetComments.mustVerify
+			      	 document.getElementById("mustVerifyEdit").value = assetComments.mustVerify
 			      	 if(assetComments.mustVerify != 0){
 			      	 document.getElementById("mustVerifyShowId").checked = true
 			      	 document.editCommentForm.mustVerify.checked = true
