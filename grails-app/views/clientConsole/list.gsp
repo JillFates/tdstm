@@ -56,9 +56,13 @@ var time = '${timeToRefresh}';
 function showChangeStatusDialog(e){
 timedRefresh('never')
 var task = eval('(' + e.responseText + ')');
-
+var taskLen = task[0].item.length;
 var options = '';
-      for (var i = 0; i < task[0].item.length; i++) {
+if(taskLen == 0){
+alert('Sorry but there were no common states for the assets selected');
+return false;
+}else{
+      for (var i = 0; i < taskLen; i++) {
         options += '<option value="' + task[0].item[i] + '">' + task[0].item[i] + '</option>';
       }
       $("select#taskList").html(options);
@@ -72,6 +76,7 @@ var options = '';
 $("#showDialog").dialog('option', 'width', 400)
 $("#showDialog").dialog('option', 'position', ['center','top']);
 $('#showDialog').dialog('open');
+}
 }
 function submitAction(){
 if(doCheck()){
@@ -108,7 +113,7 @@ function timedRefresh(timeoutPeriod) {
 	}
 }
 function changeState(){
-
+timedRefresh('never')
 var assetArr = new Array();
 var totalAsset = ${assetEntityList.id};
 var j=0;
@@ -124,13 +129,23 @@ j++;
 ${remoteFunction(action:'getList', params:'\'assetArray=\' + assetArr', onComplete:'showChangeStatusDialog(e);' )}
 
 }
+var isFirst = true;
 function selectAll(){
+timedRefresh('never')
 var totalCheck = document.getElementsByName('checkChange');
+if(isFirst){
 for(i=0;i<totalCheck.length;i++){
 totalCheck[i].checked = true;
 }
-
+isFirst = false;
+}else{
+for(i=0;i<totalCheck.length;i++){
+totalCheck[i].checked = false;
 }
+isFirst = true;
+}
+}
+
 
 </script>
 </head>
@@ -205,7 +220,7 @@ totalCheck[i].checked = true;
 	<thead>
 	<tr>
 	<td>
-	<input type="button" value="Change State" onclick="changeState()" />
+	<input type="button" value="State..." onclick="changeState()" title="Change State"/>
 	</td>
 			
 			<td style="padding-left: 0px;"><select id="applicationId" name="application" onchange="document.listForm.submit();" style="width: 120px;">
@@ -256,7 +271,8 @@ totalCheck[i].checked = true;
 			
 				<td><jsec:hasRole name="ADMIN">
 					<g:if test="${assetEntity.checkVal == true}">
-					<g:checkBox name="checkChange" id="checkId_${assetEntity.id}"></g:checkBox> 
+					
+					<g:checkBox name="checkChange" id="checkId_${assetEntity.id}" onclick="timedRefresh('never')"></g:checkBox> 
 						<g:remoteLink action="getTask" params="['assetEntity':assetEntity.id]"	onComplete="showChangeStatusDialog(e);">
 							<img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}"	border="0px">
 						</g:remoteLink>

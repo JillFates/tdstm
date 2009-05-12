@@ -151,32 +151,38 @@ class ClientConsoleController {
 	
 	//To get unique list of task for list of assets through ajax
 	def getList = {
-    		
     	
         def assetArray = params.assetArray
         Set common = new HashSet()
         def taskList = []
+        def checkList = []
+        def sortList = []
+        def tempTaskList = []
         def temp
         def totalList = []
         def projectMap = ProjectAssetMap.findAll("from ProjectAssetMap pam where pam.asset in ($assetArray)")
         def stateVal
         if(projectMap != null){
-    		projectMap.each{
+        	projectMap.each{
     			
-    	        	
                 stateVal = stateEngineService.getState("STD_PROCESS",it.currentStateId)
                 temp = stateEngineService.getTasks("STD_PROCESS","MANAGER",stateVal)
     				
                 taskList << [task:temp]
-            }
-    			
-    		
+            } 	
+    	
     		common = (HashSet)(taskList[0].task);
     		for(int i=1; i< taskList.size();i++){
                 common.retainAll((HashSet)(taskList[i].task))
     		}
+    		 common.each{
+                tempTaskList << Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
+            }
+            tempTaskList.sort().each{
+            	sortList << stateEngineService.getState("STD_PROCESS",it)
+            }
         }
-        totalList << [item:common,asset:assetArray]
+        totalList << [item:sortList,asset:assetArray]
         render totalList as JSON
     }
 	
