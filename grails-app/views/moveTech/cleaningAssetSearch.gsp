@@ -23,13 +23,13 @@
 	</script>
 
 	<script type="text/javascript">    
-        function serverInfo(e){             
+        function serverInfo(e){        
         var loc = document.assetSearchForm.location.value;
       	var location;
         var room;
         var rack;
         var pos;       
-        var asset = eval('(' + e.responseText + ')');
+        var asset = eval('(' + e.responseText + ')');    
         if(loc == 's'){
         location = asset[0].item.sourceLocation
         room = asset[0].item.sourceRoom
@@ -75,6 +75,7 @@
       	}  
       	function doTransition(){
       	if(validation()){
+      	document.assetSearchForm.action="placeHold";
       	document.assetSearchForm.submit();
       	}else {
       	return false;
@@ -105,7 +106,11 @@
       	alert('Please select all instructions');                                   
       	return false;
       	}     
-      	}      
+      	}
+      	function setFocus(){ 
+        document.assetSearchForm.textSearch.focus();
+        }
+           
     </script>
 </head>
 <body>
@@ -116,15 +121,13 @@
 			<div class="mainbody" style="width: 100%;">
 			<div class="colum_techlogin" style="float: left;">
 			<div style="float: left; width: 97.5%; margin-left: 20px;">
-				<g:link	params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"ct"]' style="height:26px; width:64px; float:left; margin:auto 0px;">
-				<img src="${createLinkTo(dir:'images',file:'home.png')}" border="0" />
-				</g:link> <g:link action="cleaningAssetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' style="height:26px; width:64px; float:left; margin:auto 0px;">
-				<img src="${createLinkTo(dir:'images',file:'my_task.png')}" border="0" />
-				</g:link> <img src="${createLinkTo(dir:'images',file:'asset_h.png')}" border="0" />
+		        	<g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"ct"]' style="height:21px; width:45px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Home</g:link>
+					<g:link action="cleaningAssetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' style="height:21px; width:60px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">My Task</g:link>
+					<a href="#" style="height:21px; width:63px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;background:#aaefb8;padding:auto 0px;text-align:center;">Asset</a>
 			</div>
 			<div class="w_techlog">
 			<div style="float: left; width: 100%; margin: 5px 0;">
-				<g:form	name="assetSearchForm" action="placeHold">
+				<g:form	name="assetSearchForm" action="cleaningAssetSearch">
 					<input name="bundle" type="hidden" value="${bundle}" />
 					<input name="team" type="hidden" value="${team}" />
 					<input name="location" type="hidden" value="${location}" />
@@ -134,6 +137,7 @@
 					<input name="label" type="hidden" value="${label}" />
 					<input name="actionLabel" type="hidden" value="${actionLabel}"  />
 					<input name="user" type="hidden" value="ct" />
+					<input name="assetPage" type="hidden" value="assetPage" />
 					<table style="border: 0px;">
 			<div id="mydiv" onclick="document.getElementById('mydiv').style.display = 'none';">
 					<g:if test="${flash.message}">
@@ -143,7 +147,11 @@
 					</ul>
 					</div>
 					</g:if></div>
-			<div style="background:url(${createLinkTo(dir:'images',file:'search.png')}) no-repeat top right;margin-right:500px" onclick="${remoteFunction(action:'getServerInfo', params:'\'assetId=\'+'+projMap.asset.id,onComplete: 'serverInfo(e)')}">
+			<div style="float:right;margin-right:10px;">
+				<input type="text" name="textSearch" size="10"/>&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/>
+			</div>
+			<div onclick="${remoteFunction(action:'getServerInfo', params:'\'assetId=\'+'+projMap.asset.id,onComplete: 'serverInfo(e)')}">
+					
 					<g:if test="${projMap}">
 					<dl><dt>Asset Tag:</dt><dd>${projMap?.asset?.assetTag}</dd>
 					<dt>Asset Name:</dt><dd> ${projMap?.asset?.assetName}</dd>
@@ -151,7 +159,15 @@
 					<dt>Rack/Pos:</dt><dd> <g:if test="${location == 's'}">${projMap?.asset?.sourceRack}/${projMap?.asset?.sourceRackPosition}</g:if><g:else test="${location == 't'}">${projMap?.asset?.targetRack}/${projMap?.asset?.targetRackPosition}</g:else> </dd>
 					</dl>	
 					</g:if>
-			</div>		
+					<g:else>
+					<dl><dt>Asset Tag:</dt><dd>&nbsp;</dd>
+					<dt>Asset Name:</dt><dd>&nbsp;</dd>
+					<dt>Model:</dt><dd>&nbsp;</dd>
+					<dt>Rack/Pos:</dt><dd>&nbsp;</dd>
+					</dl>
+					</g:else>
+			</div>	
+					<g:if test="${projMap}">	
 					<tr>
 					<td>Labels: <select name="labels">
 					<option value="1">1</option>
@@ -159,7 +175,8 @@
 					<option value="3">3</option>
 					</select></td>
 					<td class="buttonR"><input type="button" value="Print" onclick="alert('Labels were printed')"/></td>
-					</tr>		
+					</tr>
+					</g:if>		
 					<tr>
 					<td><strong>Instructions</strong></td>
 					<td><strong>Confirm</strong></td>
@@ -184,10 +201,12 @@
 					<tr>
 					<td><textarea rows="2" cols="110" title="Enter Note..." name="enterNote"></textarea></td>
 					</tr>
+					<g:if test="${projMap}">
 					<tr>
 					<td class="buttonR" style="text-align: right;"><input type="button"
 					value="Place on HOLD" onclick="doTransition()" /></td>
 					<tr>
+					</g:if>
 					</table>
 					</table>
 				</g:form>
@@ -195,5 +214,6 @@
 		</div>
 		</div>
 		</div>
+<script>setFocus();</script>		
 </body>
 </html>

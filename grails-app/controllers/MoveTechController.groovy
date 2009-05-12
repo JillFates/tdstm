@@ -50,7 +50,8 @@ class MoveTechController {
         return [ username: params.username, rememberMe: (params.rememberMe != null), targetUri: params.targetUri ]
     }
     //sign in for moveTech by reading the barcode as userName
-    def signIn = {
+    def signIn = {  	
+    	
         def moveBundleInstance
         def projectTeamInstance
         def token = new StringTokenizer(params.username, "-")
@@ -150,7 +151,7 @@ class MoveTechController {
             flash.message = message(code :"Login Failed")
             redirect(action: 'login')
         }
-    }
+      } 
 		
     //check authentication
     def checkAuth(def barcodeText, def actionScreen){
@@ -192,11 +193,18 @@ class MoveTechController {
     }
     // method for home page
     def home = {
-        render( view:'home' )
+    	def principal = SecurityUtils.subject.principal
+    	if(principal){	
+    		render( view:'home' )
+    	} else {
+    		flash.message = "Your login has expired and must login again."
+    		redirect(action:'login')
+    	}
     }
     // Method for my task link
 	def assetTask = {
-    		
+		def principal = SecurityUtils.subject.principal
+		if(principal){
         def bundle = params.bundle  
         def tab = params.tab
         def proAssetMap
@@ -259,11 +267,18 @@ class MoveTechController {
         }
       
         return[bundle:bundle,team:team,project:params.project,location:params.location,assetList:assetList,allSize:allSize,todoSize:todoSize,'tab':tab]
+		} else {
+			flash.message = "Your login has expired and must login again."
+			redirect(action:'login')
+		}
 	}
 	//To open div for my task
 	def getServerInfo = {
+		def principal = SecurityUtils.subject.principal
+		if(principal){
 		def assetList = []	
-        def assetId = params.assetId        
+        def assetId = params.assetId 
+        if(assetId){
         def assetItem = AssetEntity.findById(assetId)
         def proMap = ProjectAssetMap.findByAsset(assetItem)
         def currState = stateEngineService.getState("STD_PROCESS",proMap.currentStateId)       
@@ -298,10 +313,17 @@ class MoveTechController {
         if(assetItem.hbaPort == null)
         assetItem.hbaPort = ""
        	assetList<<[item:assetItem,state:currState]
+        }
         render assetList as JSON
+		} else {
+			flash.message = "Your login has expired and must login again."
+			redirect(action:'login')
+		}
 	}
     //  Method for my task asset tag search
 	def assetSearch = {
+		def principal = SecurityUtils.subject.principal
+		if(principal){
         def assetItem
         def assetCommt
         def projMap
@@ -313,9 +335,8 @@ class MoveTechController {
         def label
         def actionLabel
         if(search != null){
-			assetItem = AssetEntity.findByAssetTag(search)					
-			
-			
+			assetItem = AssetEntity.findByAssetTag(search)		
+		
 			if(assetItem == null){			
 				flash.message = message(code :"Asset Tag number '${search}' was not located")
 				redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
@@ -359,7 +380,10 @@ class MoveTechController {
                 }
 			}
         }
-       
+	 } else {
+		 flash.message = "Your login has expired and must login again."
+	     redirect(action:'login')
+	 }
 
 	}
 	
@@ -394,19 +418,25 @@ class MoveTechController {
           
         }else{
           workflow = workflowService.createTransition("STD_PROCESS","CLEANER","Hold",asset,bundle,loginUser,team,params.enterNote)
+          def projMap = []
+          def assetCommt = []
+          def stateVal = null
+          def label = null
+          def actionLabel = null
           if(workflow.success){          	
   	        	def assetComment = new AssetComment()
           		assetComment.comment = enterNote
           		assetComment.assetEntity = asset
           		assetComment.commentType = 'issue'
           		assetComment.save()          		
-          		redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])          	
+          		render(view: 'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,"bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo",label:label,actionLabel:actionLabel])       	       	
           } else {          	
           		flash.message = message(code :workflow.message)
-          		redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])          	
+          		render(view: 'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,"bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo",label:label,actionLabel:actionLabel])          	          	
           }
         }
         } else {
+        	flash.message = "Your login has expired and must login again."
         	redirect(action:'login')
         }
 	}
@@ -440,6 +470,7 @@ class MoveTechController {
         	redirect(action:'assetSearch',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"search":params.search,"assetCommt":params.assetCommt,"label":params.label,"actionLabel":actionLabel])
         }
         } else {
+        	flash.message = "Your login has expired and must login again."
         	redirect(action:'login')
         }
 			
@@ -447,6 +478,8 @@ class MoveTechController {
 	
 	//MyTasks for Cleaning
 	def cleaningAssetTask = {
+		def principal = SecurityUtils.subject.principal
+		if(principal){
         def bundle = params.bundle
         def tab = params.tab
         def proAssetMap
@@ -511,28 +544,40 @@ class MoveTechController {
         }
           
         return[bundle:bundle,team:team,project:params.project,location:params.location,assetList:assetList,allSize:allSize,todoSize:todoSize,'tab':tab]
+		} else {
+			flash.message = "Your login has expired and must login again."
+		    redirect(action:'login')
+		}
 	
 	}
 	
     def cleaningAssetSearch = {
-	try {
+	def principal = SecurityUtils.subject.principal	
+	if(principal){
+		def textSearch = params.textSearch	
         def assetItem
-        def assetCommt
-        def projMap
+        def assetCommt = []
+        def projMap = []
         def team = params.team
-        def search = params.search
+        def search = params.search        
+        if(textSearch){
+        	search = textSearch
+        }
         def stateVal
         def taskList
         def taskSize
         def label
         def actionLabel
+        try {
         if(search != null){
             assetItem = AssetEntity.findByAssetTag(search)
-    			
-    			
-            if(assetItem == null){
+             if(assetItem == null){
                 flash.message = message(code :"Asset Tag number '${search}' was not located")
-                redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                 if(textSearch){                	 
+                	 render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel])
+                } else {
+                	 redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                }
             }else{
                 def bundleName = assetItem.moveBundle.name
                 def teamId = (assetItem.sourceTeam.id).toString()
@@ -540,13 +585,21 @@ class MoveTechController {
     			
                 if(bundleName != params.bundle){
                     flash.message = message(code :"The asset [${assetItem.assetName}] is not part of move bundle [${params.bundle}]")
-                    redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                     if(textSearch){
+                    	render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel])
+                    } else {
+                    	redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                    }
                 } else {
                     projMap = ProjectAssetMap.findByAsset(assetItem)
                     stateVal = stateEngineService.getState("STD_PROCESS",projMap.currentStateId)
                     if(stateVal == "Hold"){
                         flash.message = message(code :"The asset is on Hold. Please contact manager to resolve issue.")
-                        redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                         if(textSearch){
+                        	render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel])
+                        } else {
+                        	redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                        }
                     }
                     taskList = stateEngineService.getTasks("STD_PROCESS","CLEANER",stateVal)
                     taskSize = taskList.size()
@@ -565,14 +618,22 @@ class MoveTechController {
                         }
                     }
                     assetCommt = AssetComment.findAllByAssetEntity(assetItem)
-                    render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:params.search,label:label,actionLabel:actionLabel])
+                    render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel])
                 }
             }
         }
 	} catch (Exception ex){
 		flash.message = message(code :"The asset is not associated with bundle and team, please check it")
-		redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+		 if(textSearch){
+			render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel])
+		} else {
+			redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+		}
 		
+	}
+	} else {
+		flash.message = "Your login has expired and must login again."
+        redirect(action:'login')
 	}
 
 	}
@@ -598,16 +659,21 @@ class MoveTechController {
     			
         def workflow = workflowService.createTransition("STD_PROCESS","CLEANER",actionLabel,asset,bundle,loginUser,team,assetCommt)
         if(workflow.success){
-            redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+        	def projMap = []
+            assetCommt = []
+            def stateVal = null
+            def label = null
+            actionLabel = null
+            render(view: 'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,"search":params.search,"bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo",label:label,actionLabel:actionLabel])
         }else{
         	flash.message = message(code :workflow.message)	
         	redirect(action:'cleaningAssetSearch',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"search":params.search,"assetCommt":params.assetCommt,"label":params.label,"actionLabel":actionLabel])
         }
         } else {
+        	flash.message = "Your login has expired and must login again."
         	redirect(action:'login')
         }
 			
 	}
-	
     
 }

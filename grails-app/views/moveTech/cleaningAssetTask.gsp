@@ -78,9 +78,9 @@
 		<div class="mainbody" style="width: 100%;">
 			<div class="colum_techlogin" style="float:left;">
 			<div style="float:left; width:97.5%; margin-left:20px;">              									
-		         <g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"ct"]' style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'home.png')}" border="0"/></g:link>							              				
-              	 <a href="#" style="height:26px; width:64px; float:left; margin:auto 0px;"><img src="${createLinkTo(dir:'images',file:'my_task_h.png')}" border="0" /><a>              											
-              	 <img  src="${createLinkTo(dir:'images',file:'asset.png')}" style="height:26px; width:64px; float:left; margin:auto 0px;"/>								           
+		         <g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"ct"]' style="height:21px; width:45px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Home</g:link>
+				 <a href="#" style="height:21px; width:60px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;background:#aaefb8;padding:auto 0px;text-align:center;">My Task</a>
+				 <a href="#" style="height:21px; width:63px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Asset</a>								           
 			</div>			
 			<div class="w_techlog">				
       			<g:form method="post" name="bundleTeamAssetForm" action="cleaningAssetSearch">      					
@@ -93,8 +93,8 @@
               		<table style="border:0px;">
 					<tr>
 					<td id="todoId"><g:link style="color: #5b5e5c; border:1px solid #5b5e5c; margin:5px;background:#aaefb8;padding:2px;" action="cleaningAssetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link></td>
-					<td id="allId"><g:link  style="color: #5b5e5c; border:1px solid #5b5e5c; margin:5px;padding:2px;" action="cleaningAssetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All&nbsp;(${allSize})</g:link></td>
-					<td style="text-align:right;"><input  type="text" size="25" value="" name="search" />&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/></td></tr>
+					<td id="allId"><g:link  style="color: #5b5e5c; border:1px solid #5b5e5c; margin:5px;padding:2px;margin-right:300px;" action="cleaningAssetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All&nbsp;(${allSize})</g:link></td>
+					<td style="text-align:right;"><input  type="text" size="10" value="" name="search" />&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/></td></tr>
 					</table>
 					</div>  
 		    <div id="mydiv" onclick="document.getElementById('mydiv').style.display = 'none';setFocus()">						            
