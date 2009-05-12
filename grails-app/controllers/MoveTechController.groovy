@@ -13,27 +13,34 @@ class MoveTechController {
     def stateEngineService
     def workflowService
     def index = {	
+    	def projectTeamInstance = ProjectTeam.findById(params.team)
         if(params.user == "mt"){
-            def partyGroupInstance = PartyGroup.findById(params.team)
-            def team = partyGroupInstance.name
+            def team = projectTeamInstance.name
             def teamMembers = partyRelationshipService.getTeamMemberNames(params.team)
             def location =""
             if( params.location == 's') {
                 location = "Unracking"
+                projectTeamInstance.currentLocation = "Source"
+                projectTeamInstance.save()
             }else if( params.location == 't'){
                 location = "Reracking"
+                projectTeamInstance.currentLocation = "Target"
+                projectTeamInstance.save()
             }
 					
             render(view:'home',model:[projectTeam:team,members:teamMembers,project:params.project,loc:location, bundle:params.bundle,team:params.team,location:params.location])
         } else if(params.user == "ct") {
-            def partyGroupInstance = PartyGroup.findById(params.team)            
-            def team = partyGroupInstance.name
+            def team = projectTeamInstance.name
             def teamMembers = partyRelationshipService.getTeamMemberNames(params.team)
-            def teamLocation =ProjectTeam.findById(params.team)
+            def teamLocation =""
             if( params.location == 's') {
-            	teamLocation = teamLocation.currentLocation +" "+ "(Source)"                
+            	projectTeamInstance.currentLocation = "Source"
+            	projectTeamInstance.save()
+            	teamLocation = projectTeamInstance.currentLocation
             }else if( params.location == 't'){
-            	teamLocation = teamLocation.currentLocation +" "+ "(Target)"
+            	projectTeamInstance.currentLocation = "Target"
+            	projectTeamInstance.save()
+            	teamLocation = projectTeamInstance.currentLocation
             }
 					
             render(view:'cleaningTechHome',model:[projectTeam:team,members:teamMembers,project:params.project,loc:teamLocation, bundle:params.bundle,team:params.team,location:params.location])
