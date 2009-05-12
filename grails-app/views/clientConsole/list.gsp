@@ -24,8 +24,6 @@
 	href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
 <link type="text/css" rel="stylesheet"
 	href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 
 <jq:plugin name="ui.core" />
 <jq:plugin name="ui.draggable" />

@@ -42,17 +42,17 @@
         pos = asset[0].item.targetRackPosition
         }           
         var htmlBody = '<table ><thead></thead><tbody>'+
-        '<tr><td class="set_font"><b>Asset Tag:</b>  '+asset[0].item.assetTag+'</td></tr>'+
-		'<tr><td class="set_font"><b>Asset Name:</b>  '+asset[0].item.assetName+'</td></tr>'+
-		'<tr><td class="set_font"><b>Current State:</b>  '+asset[0].state+'</td></tr>'+		
-		'<tr><td class="set_font"><b>Serial Number:</b>  '+asset[0].item.serialNumber+'</td></tr>'+
-		'<tr><td class="set_font"><b>Model:</b>  '+asset[0].item.model+'</td></tr>'+
-		'<tr><td class="set_font"><b>Location:</b>  '+location+'</td></tr>'+
-		'<tr><td class="set_font"><b>Room:</b>  '+room+'</td></tr>'+
-		'<tr><td class="set_font"><b>Rack/Position:</b>  '+rack+'/'+pos+'</td></tr>'+
-		'<tr><td class="set_font"><b>PDU:</b>  '+asset[0].item.powerPort+'</td></tr>'+
-		'<tr><td class="set_font"><b>NIC:</b>  '+asset[0].item.nicPort+'</td></tr>'+
-		'<tr><td class="set_font"><b>HBA:</b>  '+asset[0].item.hbaPort+'</td></tr>'+
+        '<tr><td class="asset_details_block"><b>Asset Tag:</b>  '+asset[0].item.assetTag+'</td></tr>'+
+		'<tr><td class="asset_details_block"><b>Asset Name:</b>  '+asset[0].item.assetName+'</td></tr>'+
+		'<tr><td class="asset_details_block"><b>Current State:</b>  '+asset[0].state+'</td></tr>'+		
+		'<tr><td class="asset_details_block"><b>Serial Number:</b>  '+asset[0].item.serialNumber+'</td></tr>'+
+		'<tr><td class="asset_details_block"><b>Model:</b>  '+asset[0].item.model+'</td></tr>'+
+		'<tr><td class="asset_details_block"><b>Location:</b>  '+location+'</td></tr>'+
+		'<tr><td class="asset_details_block"><b>Room:</b>  '+room+'</td></tr>'+
+		'<tr><td class="asset_details_block"><b>Rack/Position:</b>  '+rack+'/'+pos+'</td></tr>'+
+		'<tr><td class="asset_details_block"><b>PDU:</b>  '+asset[0].item.powerPort+'</td></tr>'+
+		'<tr><td class="asset_details_block"><b>NIC:</b>  '+asset[0].item.nicPort+'</td></tr>'+
+		'<tr><td class="asset_details_block"><b>HBA:</b>  '+asset[0].item.hbaPort+'</td></tr>'+
 		'</tbody></table>' 
         var getDialogId = document.getElementById('serverInfoDialog')
         getDialogId.innerHTML = htmlBody
@@ -108,22 +108,22 @@
              	   <table id="assetTable" style="overflow:scroll;height:80px;">
               	   <thead>
                    <tr>
-                   <th class="set_font">AssetTag</th>
-                   <th class="set_font">Rack/Pos</th>
-                   <th class="set_font">Model</th>                 	
+                   <th class="asset_details_block">AssetTag</th>
+                   <th class="asset_details_block">Rack/Pos</th>
+                   <th class="asset_details_block">Model</th>                 	
 				   </tr>
                    </thead>
                    <tbody>
                    <g:each status="i" in="${assetList}" var="assetList">
 					<tr class="${assetList.cssVal}" onclick="${remoteFunction(action:'getServerInfo', params:'\'assetId=\'+'+assetList.item.asset.id,onComplete: 'serverInfo(e)')}">						
-						<td class="set_font">${assetList?.item?.asset.assetTag}</td>
+						<td class="asset_details_block">${assetList?.item?.asset.assetTag}</td>
 						<g:if test="${location == 's'}">
-						<td class="set_font">${assetList?.item?.asset.sourceRack}/${assetList?.item?.asset.sourceRackPosition}</td>
+						<td class="asset_details_block">${assetList?.item?.asset.sourceRack}/${assetList?.item?.asset.sourceRackPosition}</td>
 						</g:if>
 						<g:else>
-						<td class="set_font">${assetList?.item?.asset.targetRack}/${assetList?.item?.asset.targetRackPosition}</td>
+						<td class="asset_details_block">${assetList?.item?.asset.targetRack}/${assetList?.item?.asset.targetRackPosition}</td>
 						</g:else>
-						<td sclass="set_font">${assetList?.item?.asset.model}</td>											
+						<td sclass="asset_details_block">${assetList?.item?.asset.model}</td>											
 					    </tr>
 				        </g:each>
                         </tbody>

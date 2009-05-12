@@ -44,17 +44,17 @@
         pos = asset[0].item.targetRackPosition
         }     
         var htmlBody = '<table ><thead></thead><tbody>'+
-		'<tr><td class="set_font"><b>Asset Tag:</b>  '+asset[0].item.assetTag+'</td></tr>'+
-		'<tr><td class="set_font"><b>Asset Name:</b>  '+asset[0].item.assetName+'</td></tr>'+
-		'<tr><td class="set_font"><b>Current State:</b>  '+asset[0].state+'</td></tr>'+
-		'<tr><td class="set_font"><b>Serial Number:</b>  '+asset[0].item.serialNumber+'</td></tr>'+
-		'<tr><td class="set_font"><b>Model:</b>  '+asset[0].item.model+'</td></tr>'+
-		'<tr><td class="set_font"><b>Location:</b>  '+location+'</td></tr>'+
-		'<tr><td class="set_font"><b>Room:</b>  '+room+'</td></tr>'+
-		'<tr><td class="set_font"><b>Rack/Position:</b>  '+rack+'/'+pos+'</td></tr>'+
-		'<tr><td class="set_font"><b>PDU:</b>  '+asset[0].item.powerPort+'</td></tr>'+
-		'<tr><td class="set_font"><b>NIC:</b>  '+asset[0].item.nicPort+'</td></tr>'+
-		'<tr><td class="set_font"><b>HBA:</b>  '+asset[0].item.hbaPort+'</td></tr>'+
+		'<tr><td class="asset_details_block"><b>Asset Tag:</b>  '+asset[0].item.assetTag+'</td></tr>'+
+		'<tr><td class="asset_details_block"><b>Asset Name:</b>  '+asset[0].item.assetName+'</td></tr>'+
+		'<tr><td class="asset_details_block"><b>Current State:</b>  '+asset[0].state+'</td></tr>'+
+		'<tr><td class="asset_details_block"><b>Serial Number:</b>  '+asset[0].item.serialNumber+'</td></tr>'+
+		'<tr><td class="asset_details_block"><b>Model:</b>  '+asset[0].item.model+'</td></tr>'+
+		'<tr><td class="asset_details_block"><b>Location:</b>  '+location+'</td></tr>'+
+		'<tr><td class="asset_details_block"><b>Room:</b>  '+room+'</td></tr>'+
+		'<tr><td class="asset_details_block"><b>Rack/Position:</b>  '+rack+'/'+pos+'</td></tr>'+
+		'<tr><td class="asset_details_block"><b>PDU:</b>  '+asset[0].item.powerPort+'</td></tr>'+
+		'<tr><td class="asset_details_block"><b>NIC:</b>  '+asset[0].item.nicPort+'</td></tr>'+
+		'<tr><td class="asset_details_block"><b>HBA:</b>  '+asset[0].item.hbaPort+'</td></tr>'+
 		'</tbody></table>' 
         var getDialogId = document.getElementById('serverInfoDialog')
         getDialogId.innerHTML = htmlBody

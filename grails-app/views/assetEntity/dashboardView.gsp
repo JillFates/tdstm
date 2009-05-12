@@ -21,8 +21,6 @@
 	href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
 <link type="text/css" rel="stylesheet"
 	href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 <g:javascript src="assetcommnet.js"/>
 <jq:plugin name="ui.core" />
 <jq:plugin name="ui.draggable" />
@@ -166,7 +164,7 @@
    	var timer
    	function timedRefresh(timeoutPeriod) {
    		if(timeoutPeriod != 'never'){
-		timer = setTimeout("location.reload(false);",timeoutPeriod);
+		timer = setTimeout("location.reload(true);",timeoutPeriod);
 		document.getElementById("selectTimedId").value = timeoutPeriod;
 		} else {
 		clearTimeout(timer)
@@ -419,7 +417,7 @@
 			</tr>
 			<tr>
 			<td colspan="2" style="text-align: center;" class="buttonR">
-			 <input type="reset" value="Cancel" onclick="timedRefresh(document.getElementById('selectTimedId').value)" >
+			 <input type="reset" value="Cancel" onclick="location.reload(true);timedRefresh(document.getElementById('selectTimedId').value)" >
 			<input  type="button" value="Submit" onclick="setCommentValidation();${remoteFunction(action:'createTransition', params:'\'asset=\' + document.assetdetailsForm.asset.value +\'&state=\'+document.assetdetailsForm.state.value +\'&priority=\'+document.assetdetailsForm.priority.value +\'&assignTo=\'+document.assetdetailsForm.assignTo.value +\'&comment=\'+document.assetdetailsForm.comment.value ', onComplete:'updateAsset(e)')}"/></td>
 			</tr>
 			</tbody>

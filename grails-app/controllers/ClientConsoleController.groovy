@@ -100,7 +100,7 @@ class ClientConsoleController {
 	        		if(task == trans.transId){
 	        			if(stateId == 10 ){
 	        				cssClass = "asset_hold"
-	        			} else {
+	        			} else if(stateId != 10 && Integer.parseInt(task) != 10){
 	        				cssClass = "task_done"
 	        			}
 	        		}
