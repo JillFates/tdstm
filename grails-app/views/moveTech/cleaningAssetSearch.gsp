@@ -91,22 +91,23 @@
    		}
       	}
       
-     	function doCheckValidation(){
-	 	var trArray = new Array()
-	 	var j = 0;
-     	trArray = document.getElementsByName('myCheckbox');        
-     	for(i=0; i < trArray.length; i++){         
-     	if(trArray[i].checked == false){
-     	j=1;
-     	}
-    	}
-     	if(j == 0){     
-      	return true;
-      	}else{
-      	alert('Please select all instructions');                                   
-      	return false;
-      	}     
-      	}
+        function doCheckValidation(){
+	    var j = 0;
+        var boxes = document.getElementsByTagName('input'); 
+		for (i = 0; i < boxes.length; i++) {
+          if (boxes[i].type == 'checkbox'){
+               if(boxes[i].checked == false){
+       			j=1;
+       		 }
+           }
+     	}      
+        if(j == 0){     
+        return true;
+        }else{
+        alert("Please select all instructions");                                   
+        return false;
+        }     
+        }
       	function setFocus(){ 
         document.assetSearchForm.textSearch.focus();
         }
@@ -176,7 +177,17 @@
 					</select></td>
 					<td class="buttonR"><input type="button" value="Print" onclick="alert('Labels were printed')"/></td>
 					</tr>
-					</g:if>		
+					</g:if>
+					<g:else>
+					<tr>
+					<td>Labels: <select name="labels">
+					<option value="1">1</option>
+					<option value="2" selected="selected">2</option>
+					<option value="3">3</option>
+					</select></td>
+					<td class="buttonR"><input type="button" value="Print" disabled="disabled"/></td>
+					</tr>
+					</g:else>		
 					<tr>
 					<td><strong>Instructions</strong></td>
 					<td><strong>Confirm</strong></td>
@@ -194,7 +205,7 @@
 					</g:each>		
 					<g:if test="${actionLabel}">
 					<tr>
-					<td class="buttonR" style="text-align: right;" colspan="2"><input type="button" value="${actionLabel}" onclick="clean()" /></td>
+					<td class="buttonR" style="text-align: right;" colspan="2"><input type="button" value="${actionLabel}" onclick="return clean()" /></td>
 					</tr>
 					</g:if>
 					<table>
@@ -204,7 +215,7 @@
 					<g:if test="${projMap}">
 					<tr>
 					<td class="buttonR" style="text-align: right;"><input type="button"
-					value="Place on HOLD" onclick="doTransition()" /></td>
+					value="Place on HOLD" onclick="return doTransition()" /></td>
 					<tr>
 					</g:if>
 					</table>
