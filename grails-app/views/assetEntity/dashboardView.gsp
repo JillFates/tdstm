@@ -207,7 +207,7 @@ return true;
 	   	}
    	}
    	function setCommentValidation(){
-	   	if(document.assetdetailsForm.validateComment.value == 'true' && document.assetdetailsForm.state.value == 'Hold'){
+	   	if(document.assetdetailsForm.validateComment.value == 'true' || document.assetdetailsForm.state.value == 'Hold'){
 	   		if(document.assetdetailsForm.comment.value == ''){
 	   			alert("A comment is required")
 	   		}
@@ -573,7 +573,7 @@ ${remoteFunction(action:'getList', params:'\'assetArray=\' + assetArr ', onCompl
 										id="source_${assetsList?.asset.id}">${assetsList?.asset.sourceTeam?.name}</td>
 									<td onclick="assetDetails('${assetsList?.asset.id}')"
 										id="target_${assetsList?.asset.id}">${assetsList?.asset.targetTeam?.name}</td>
-									<td onclick="assetDetails('${assetsList?.asset.id}')">${assetsList.asset.sourceTeam.currentLocation}</td>
+									<td onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset?.sourceTeam?.currentLocation}</td>
 									<td id="icon_${assetsList?.asset.id}"><g:if
 										test="${AssetComment.findByAssetEntityAndCommentType(assetsList?.asset,'issue')}">
 										<g:remoteLink controller="assetEntity" action="listComments"

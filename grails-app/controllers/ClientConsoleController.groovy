@@ -14,7 +14,6 @@ class ClientConsoleController {
         def bundleId = params.moveBundle
         def moveBundleInstance
         def projectMap
-        def stateId
         def stateVal
         def taskVal
         def holdId
@@ -58,7 +57,7 @@ class ClientConsoleController {
         def assetEntityList=[]
         def processTransitionList=[]
         def tempTransitions = []
-        def processTransitions= stateEngineService.getTasks("STD_PROCESS")
+        def processTransitions= stateEngineService.getTasks("STD_PROCESS", "TASK_ID")
         processTransitions.each{
         	tempTransitions <<Integer.parseInt(it)
         }
@@ -72,6 +71,7 @@ class ClientConsoleController {
         }
         
         resultList.each{
+        	def stateId = 0
         	def htmlTd = []
         	def transitions
         	if(it.transitions){
@@ -79,7 +79,9 @@ class ClientConsoleController {
         	}
         	def assetEntity = AssetEntity.get(it.id)
         	projectMap = ProjectAssetMap.findByAsset(assetEntity)
-        	stateId = projectMap.currentStateId
+        	if(projectMap){
+        		stateId = projectMap.currentStateId
+        	}
         	holdId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Hold"))
         	releaseId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Release"))
         	reRackId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Reracked"))

@@ -735,7 +735,10 @@ class AssetEntityController {
         supportTeam.put("transportMembers", transportMembers.delete((transportMembers.length()-1),transportMembers.length()) )
         totalAsset.each{
         	def projectAssetMap = ProjectAssetMap.findByAsset(it)
-        	def curId = projectAssetMap.currentStateId
+        	def curId = 0
+        	if(projectAssetMap){
+        		curId = projectAssetMap.currentStateId
+        	}
         	stateVal = stateEngineService.getState("STD_PROCESS",curId)
 			taskVal = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR",stateVal)
 			if(taskVal.size() == 0){
@@ -751,8 +754,7 @@ class AssetEntityController {
         	} else if(curId > Integer.parseInt(rerackedId)){
         		cssClass = 'asset_done'
         	}
-        	assetsList<<[asset: it, status: stateEngineService.getStateLabel("STD_PROCESS",projectAssetMap.currentStateId), cssClass : cssClass,checkVal:check]
-        	
+        	assetsList<<[asset: it, status: stateEngineService.getStateLabel("STD_PROCESS",curId), cssClass : cssClass,checkVal:check]
         }
         def totalUnracked = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $unrackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
         def totalSourceAvail = AssetTransition.findAll("from AssetTransition where (select max(stateTo) from AssetTransition  where assetEntity in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} ) ) < $unrackedId and stateTo >= $releasedId and assetEntity in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} ) group by assetEntity" ).size()
@@ -774,16 +776,25 @@ class AssetEntityController {
         def stateIdList = []
         if(assetId){
 	        def assetDetail = AssetEntity.findById(assetId)
-	        def teamName = assetDetail.sourceTeam.name
+	        def teamName = assetDetail.sourceTeam
 	        def assetTransition = AssetTransition.findAllByAssetEntity( assetDetail, [max:3, sort:"dateCreated", order:"desc"] )
 	        assetTransition.each{
 	        	def taskLabel = stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(it.stateTo))
 	        	def time = it.dateCreated.toString().substring(11,19)
 	        	recentChanges<<[time+" "+taskLabel+'('+ it.userLogin.person.lastName +')']
 	        }
-	        def currentState = ProjectAssetMap.findByAsset(assetDetail).currentStateId
+	        def currentState = 0
+	        def projectAssetMap = ProjectAssetMap.findByAsset(assetDetail)
+	        if(projectAssetMap){
+	        	currentState = projectAssetMap.currentStateId
+	        }
 	        def state = stateEngineService.getState("STD_PROCESS",currentState)
-	        def validStates = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR", state)
+	        def validStates
+	        if(state){
+	        	validStates= stateEngineService.getTasks("STD_PROCESS","SUPERVISOR", state)
+	        } else {
+	        	validStates = stateEngineService.getTasks("STD_PROCESS","TASK_NAME")
+	        }
 	        validStates.each{
 	        	stateIdList<<Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
 	        }
@@ -792,11 +803,23 @@ class AssetEntityController {
 	        }
 	        def map = new HashMap()
 	        map.put("assetDetail",assetDetail)
-	        map.put("teamName",teamName)
-	        map.put("currentState",stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",state))))
+	        if(teamName){
+	        map.put("teamName",teamName.name)
+	        }else{
+	        map.put("teamName","")
+	        }
+	        map.put("currentState",stateEngineService.getStateLabel("STD_PROCESS",currentState))
 	        map.put("state",state)
-	        def sourceTeams = ProjectTeam.findAll("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and id != $assetDetail.sourceTeam.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
-	        def targetTeams = ProjectTeam.findAll("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and id != $assetDetail.targetTeam.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
+	        def sourceQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
+	        def targetQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
+	        if(assetDetail.sourceTeam){
+	        	sourceQuery.append(" and id != $assetDetail.sourceTeam.id ")
+	        }
+	        if(assetDetail.targetTeam){
+	        	targetQuery.append(" and id != $assetDetail.targetTeam.id ")
+	        }
+	        def sourceTeams = ProjectTeam.findAll(sourceQuery.toString())
+	        def targetTeams = ProjectTeam.findAll(targetQuery.toString())
 	        assetStatusDetails<<[ 'assetDetails':map, 'statesList':statesList, 'recentChanges':recentChanges, 'sourceTeams':sourceTeams,'targetTeams':targetTeams ]
         }
         render assetStatusDetails as JSON
@@ -828,10 +851,14 @@ class AssetEntityController {
 	    	def assignTo = params.assignTo
 	    	def priority = params.priority
 	    	def comment = params.comment
-	    	def projectAssetMap = ProjectAssetMap.findByAsset(assetEntity)
 	    	def rerackedId = stateEngineService.getStateId("STD_PROCESS","Reracked")
 	        def holdId = stateEngineService.getStateId("STD_PROCESS","Hold")
 	        def releasedId = stateEngineService.getStateId("STD_PROCESS","Release")
+	        def projectAssetMap = ProjectAssetMap.findByAsset(assetEntity)
+	        def currentStateId 
+	        if(projectAssetMap){
+	        	currentStateId = projectAssetMap.currentStateId
+	        }
 	    	if(status != "" ){
 		    	def principal = SecurityUtils.subject.principal
 		    	def loginUser = UserLogin.findByUsername(principal)
@@ -850,15 +877,15 @@ class AssetEntityController {
 				    }
 				    statusLabel = stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",status)))
 		    	} else {
-		        	statusLabel = stateEngineService.getStateLabel("STD_PROCESS",projectAssetMap.currentStateId)
-		        	stateIdList = getStates(stateEngineService.getState("STD_PROCESS",projectAssetMap.currentStateId))
+		        	statusLabel = stateEngineService.getStateLabel("STD_PROCESS",currentStateId)
+		        	stateIdList = getStates(stateEngineService.getState("STD_PROCESS",currentStateId))
 		        	stateIdList.sort().each{
 				    	statesList<<[id:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
 				    }
 		    	}
 	    	} else {
-	        	statusLabel = stateEngineService.getStateLabel("STD_PROCESS",projectAssetMap.currentStateId)
-	        	stateIdList = getStates(stateEngineService.getState("STD_PROCESS",projectAssetMap.currentStateId))
+	        	statusLabel = stateEngineService.getStateLabel("STD_PROCESS",currentStateId)
+	        	stateIdList = getStates(stateEngineService.getState("STD_PROCESS",currentStateId))
 	        	stateIdList.sort().each{
 			    	statesList<<[id:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
 			    }
@@ -875,10 +902,13 @@ class AssetEntityController {
 	    			assetEntity.targetTeam = projectTeam
 	    		}
     		}
-    		def currentStatus = ProjectAssetMap.findByAsset(assetEntity).currentStateId
-    		def stateVal = stateEngineService.getState("STD_PROCESS",currentStatus)
-			def taskVal = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR",stateVal)
-			if(taskVal.size() == 0){
+    		def currentStatus = 0
+    		def projectAsset = ProjectAssetMap.findByAsset(assetEntity)
+    		if(projectAsset){
+    			currentStatus = projectAsset.currentStateId
+    		}
+    		
+			if(statesList.size() == 0){
 				check = false    				
 			}else{
                 check = true
@@ -892,17 +922,36 @@ class AssetEntityController {
         		cssClass = 'asset_done'
         	}
     		assetEntity.save()
-    		def sourceTeam = assetEntity.sourceTeam.name
-		    def targetTeam = assetEntity.targetTeam.name
-		    def sourceTeams = ProjectTeam.findAll("from ProjectTeam where moveBundle = $assetEntity.moveBundle.id and id != $assetEntity.sourceTeam.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
-		    def targetTeams = ProjectTeam.findAll("from ProjectTeam where moveBundle = $assetEntity.moveBundle.id and id != $assetEntity.targetTeam.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
+    		def sourceTeam
+    		def targetTeam
+    		if(assetEntity.sourceTeam){
+    			sourceTeam = assetEntity.sourceTeam.name
+    		}
+		    if(assetEntity.targetTeam){
+		    	targetTeam = assetEntity.targetTeam.name
+		    }
+		    def sourceQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetEntity.moveBundle.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
+	        def targetQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetEntity.moveBundle.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
+	        if(assetEntity.sourceTeam){
+	        	sourceQuery.append(" and id != $assetEntity.sourceTeam.id ")
+	        }
+	        if(assetEntity.targetTeam){
+	        	targetQuery.append(" and id != $assetEntity.targetTeam.id ")
+	        }
+	        def sourceTeams = ProjectTeam.findAll(sourceQuery.toString())
+	        def targetTeams = ProjectTeam.findAll(targetQuery.toString())
 		    assetList <<['assetEntity':assetEntity, 'sourceTeam':sourceTeam, 'targetTeam':targetTeam, 'sourceTeams':sourceTeams,'targetTeams':targetTeams, 'statesList':statesList,'status':statusLabel,'cssClass':cssClass,'checkVal':check ]
     	}
     	render assetList as JSON
     }
     def getStates(def state){
     	 def stateIdList = []
-    	 def validStates = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR", state)
+    	 def validStates 
+    	 if(state){
+    		 validStates = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR", state)
+    	 } else {
+    		 validStates = stateEngineService.getTasks("STD_PROCESS","TASK_NAME")
+    	 }
          validStates.each{
 		 	stateIdList<<Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
 		 }
@@ -944,12 +993,12 @@ class AssetEntityController {
                 common.retainAll((HashSet)(taskList[i].task))
     		}
        
-   		 common.each{
+   		 	common.each{
                tempTaskList << Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
-           }
-           tempTaskList.sort().each{
+   		 	}
+   		 	tempTaskList.sort().each{
         	   sortList << stateEngineService.getState("STD_PROCESS",it)
-           }
+   		 	}
         }
         totalList << [item:sortList,asset:assetArray]
         render totalList as JSON

@@ -63,7 +63,25 @@ class WorkflowService {
 	    		message = "$role does not have permission to change the State"
 	    	}
     	} else {
-    		message = "Transaction failed"
+    		def state = stateEngineService.getStateId( process, toState )
+    		if ( toState == "Hold" ) {
+	        	if ( ! comment ) {
+	        		verifyFlag = false
+	        		message = "A comment is required"
+	        	}
+	        }
+    		if ( verifyFlag ) {
+		        def assetTransition = new AssetTransition( stateFrom:state, stateTo:state, comment:comment, assetEntity:assetEntity, moveBundle:moveBundle, projectTeam:projectTeam, userLogin:userLogin )
+		        if ( !assetTransition.validate() || !assetTransition.save() ) {
+		    		message = "Unable to create AssetTransition: " + GormUtil.allErrorsString( assetTransition )
+		    	} else {
+		    		def projectAssetMapInstance = new ProjectAssetMap(project:moveBundle.project, asset:assetEntity)
+		    		projectAssetMapInstance.currentStateId = Integer.parseInt(stateEngineService.getStateId( process, toState ))
+		    		projectAssetMapInstance.save()
+		    		message = "Transaction created successfully"
+					success = true
+				}
+    		}
     	}
 		
     	return [success:success, message:message]
