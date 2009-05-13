@@ -132,7 +132,7 @@ class ClientConsoleController {
                 tempTaskList << Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
             }
             tempTaskList.sort().each{
-                taskList << stateEngineService.getState("STD_PROCESS",it)
+                taskList << [state:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
             }
         }
         totalList<<[item:taskList,asset:assetId]
@@ -181,7 +181,7 @@ class ClientConsoleController {
                 tempTaskList << Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
             }
             tempTaskList.sort().each{
-            	sortList << stateEngineService.getState("STD_PROCESS",it)
+            	sortList << [state:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
             }
         }
         totalList << [item:sortList,asset:assetArray]

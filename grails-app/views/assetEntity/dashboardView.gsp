@@ -57,10 +57,10 @@ return false;
 }else{
 
       for (var i = 0; i < taskLen; i++) {
-        options += '<option value="' + task[0].item[i] + '">' + task[0].item[i] + '</option>';
+        options += '<option value="' + task[0].item[i].state + '">' + task[0].item[i].label + '</option>';
       }
       $("select#taskList").html(options);
-      if(task[0].item.length > 1 && task[0].item[0] == "Hold"){
+      if(taskLen > 1 && task[0].item[0].state == "Hold"){
       document.getElementById('taskList').options[1].selected = true;
       }
        var getDialogId = document.getElementById('assetVal')     
@@ -285,8 +285,11 @@ j++;
 }
 }
 }
+if(j == 0){
+alert('Please select the Asset');
+}else{
 ${remoteFunction(action:'getList', params:'\'assetArray=\' + assetArr ', onComplete:'showChangeStatusDialog(e);' )}
-
+}
 }	
     </script>
 </head>

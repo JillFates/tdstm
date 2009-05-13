@@ -997,7 +997,7 @@ class AssetEntityController {
                tempTaskList << Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
    		 	}
    		 	tempTaskList.sort().each{
-        	   sortList << stateEngineService.getState("STD_PROCESS",it)
+   		 	sortList << [state:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
    		 	}
         }
         totalList << [item:sortList,asset:assetArray]
