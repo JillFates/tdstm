@@ -75,35 +75,36 @@
         }
         }   
        }  
-       function doTransition(){
+       function doTransition(){     
        if(validation()){
        document.assetSearchForm.submit();
        }else {
        return false;
        }
        }
-       function unRack(){      
+       function unRack(){ 
        if(doCheckValidation()){  
        document.assetSearchForm.action = "unRack";      
-       document.assetSearchForm.submit();
+       document.assetSearchForm.submit();       
        }else{
        return false;
        }
        }
       
        function doCheckValidation(){
-	   var trArray = new Array()
 	   var j = 0;
-       trArray = document.getElementsByName('myCheckbox');        
-       for(i=0; i < trArray.length; i++){         
-       if(trArray[i].checked == false){
-       j=1;
-       }
-       }
+       var boxes = document.getElementsByTagName('input'); 
+		for (i = 0; i < boxes.length; i++) {
+          if (boxes[i].type == 'checkbox'){
+               if(boxes[i].checked == false){
+       			j=1;
+       		 }
+           }
+     	}      
        if(j == 0){     
        return true;
        }else{
-       alert('Please select all instructions');                                   
+       alert("Please select all instructions");                                   
        return false;
        }     
       }      
@@ -154,7 +155,7 @@
 			</tr>
 			<g:each status="i" in="${assetCommt}" var="comments">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-			<td >${comments.comment}</td>
+			<td>${comments.comment}</td>
 			<g:if test="${comments.mustVerify == 1}">
 			<td><g:checkBox name="myCheckbox" value="${false}" /></td>
 			</g:if>
@@ -165,7 +166,7 @@
 			</g:each>
 			<g:if test ="${actionLabel}">	
 			<tr>
-			<td colspan="2" style="text-align:right;"><input type="button" value="${label}" onclick="unRack()" style="background-color:#aaefb8;width: 120px;"/></td>
+			<td colspan="2" style="text-align:right;"><input type="button" value="${label}" onclick="return unRack();" style="background-color:#aaefb8;width: 120px;"/></td>
 			</tr>
 			</g:if>
 			<table>			
@@ -173,7 +174,7 @@
 			<textarea rows="2" cols="10" style="width: 200px;padding:0px;" title="Enter Note..." name="enterNote" ></textarea>
 			</td></tr>		
 			<tr>
-			<td style="text-align: right;"><input type="button" value="Place on HOLD" onclick="doTransition()" style="background-color:#aaefb8;width: 100px;"/></td>
+			<td style="text-align: right;"><input type="button" value="Place on HOLD" onclick="return doTransition();" style="background-color:#aaefb8;width: 100px;"/></td>
 			<tr>	
 			</table>
 			</table>
