@@ -13,8 +13,9 @@ class MoveTechController {
     def stateEngineService
     def workflowService
     def index = {	
-    	def projectTeamInstance = ProjectTeam.findById(params.team)
+    	
         if(params.user == "mt"){
+        	def projectTeamInstance = ProjectTeam.findById(params.team)
             def team = projectTeamInstance.name
             def teamMembers = partyRelationshipService.getTeamMemberNames(params.team)
             def location =""
@@ -30,6 +31,7 @@ class MoveTechController {
 					
             render(view:'home',model:[projectTeam:team,members:teamMembers,project:params.project,loc:location, bundle:params.bundle,team:params.team,location:params.location])
         } else if(params.user == "ct") {
+        	def projectTeamInstance = ProjectTeam.findById(params.team)
             def team = projectTeamInstance.name
             def teamMembers = partyRelationshipService.getTeamMemberNames(params.team)
             def teamLocation =""
