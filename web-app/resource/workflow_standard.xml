@@ -23,7 +23,7 @@
 		<transition to="Release" name="Release" id="40" color="green" />
 		<transition to="Unracking" name="Unracking Started" id="50" color="blue"/>
 		<transition to="Unracked" name="Unracked" id="60" color="blue"/>
-		<transition to="Cleaned" name="Cleaned/Tagged" id="70" />
+		<transition to="Cleaned" name="Cleaned / Tagged" id="70" />
 		<transition to="OnCart" name="On Cart" id="80" />
 		<transition to="OnTruck" name="On Truck" id="90" />
 		<transition to="InTransit" name="In Transit" id="100" />
@@ -77,12 +77,31 @@
 			<transition to="AppVerifying"/>
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
+			<transition to="Terminated" flag="comment"/>
 		</task>
 	</startState>
 
+	<taskNode name="Hold">
+		<task swimlane="MANAGER">
+			<transition to="Reracked"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="NetVerifying"/>
+			<transition to="NetVerified"/>
+			<transition to="SANVerifying"/>
+			<transition to="SANVerified"/>
+			<transition to="DBStarted"/>
+			<transition to="DBFinished"/>
+			<transition to="AppStartup"/>
+			<transition to="AppFinished"/>
+			<transition to="AppVerifying"/>
+			<transition to="AppVerified"/>
+			<transition to="Completed"/>
+		</task>
+	</taskNode>
+
 	<taskNode name="Ready">
 		<task swimlane="MANAGER">
-			<transition to="Hold" flag="issue"/>
 			<transition to="PoweredDown" />
 			<transition to="Release" flag="skipped"/>
 		</task>
@@ -90,7 +109,6 @@
 
 	<taskNode name="PoweredDown">
 		<task swimlane="MANAGER">
-			<transition to="Hold" flag="issue"/>
 			<transition to="Release"/>
 		</task>
 	</taskNode>
@@ -438,7 +456,6 @@
 			<transition to="Hold" flag="issue"/>
 			<transition to="Reracking" flag="busy"/>
 		</task>
-
 	</taskNode>
 
 	<taskNode name="Reracking">
@@ -468,19 +485,12 @@
 	<taskNode name="Reracked">
 		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
-			<transition to="Ready" />
-			<transition to="Release" />
-			<transition to="Unracking"/>
-			<transition to="Unracked"/>
-			<transition to="Cleaned"/>
-			<transition to="OnCart"/>
-			<transition to="OnTruck"/>
-			<transition to="InTransit"/>
-			<transition to="EndTransit"/>
-			<transition to="OffTruck"/>
-			<transition to="Staged"/>
-			<transition to="Reracking"/>
-			<transition to="Reracked"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="Reracked">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="NetVerifying"/>
@@ -500,18 +510,6 @@
 	<taskNode name="QA Verification">
 		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
-			<transition to="Ready" />
-			<transition to="Release" />
-			<transition to="Unracking"/>
-			<transition to="Unracked"/>
-			<transition to="Cleaned"/>
-			<transition to="OnCart"/>
-			<transition to="OnTruck"/>
-			<transition to="InTransit"/>
-			<transition to="EndTransit"/>
-			<transition to="OffTruck"/>
-			<transition to="Staged"/>
-			<transition to="Reracking"/>
 			<transition to="Reracked"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
@@ -530,23 +528,8 @@
 	</taskNode>
 
 	<taskNode name="Powered On">
-		<task swimlane="SUPERVISOR">
+		<task swimlane="MANAGER">
 			<transition to="Hold" flag="issue"/>
-			<transition to="Ready" />
-			<transition to="Release" />
-			<transition to="Unracking"/>
-			<transition to="Unracked"/>
-			<transition to="Cleaned"/>
-			<transition to="OnCart"/>
-			<transition to="OnTruck"/>
-			<transition to="InTransit"/>
-			<transition to="EndTransit"/>
-			<transition to="OffTruck"/>
-			<transition to="Staged"/>
-			<transition to="Reracking"/>
-			<transition to="Reracked"/>
-			<transition to="QAVerified"/>
-			<transition to="PoweredOn"/>
 			<transition to="NetVerifying"/>
 			<transition to="NetVerified"/>
 			<transition to="SANVerifying"/>
@@ -561,25 +544,9 @@
 		</task>
 	</taskNode>
 
-	<taskNode name="Verify Network Started">
-		<task swimlane="SUPERVISOR">
+	<taskNode name="NetVerifying">
+		<task swimlane="MANAGER">
 			<transition to="Hold" flag="issue"/>
-			<transition to="Ready" />
-			<transition to="Release" />
-			<transition to="Unracking"/>
-			<transition to="Unracked"/>
-			<transition to="Cleaned"/>
-			<transition to="OnCart"/>
-			<transition to="OnTruck"/>
-			<transition to="InTransit"/>
-			<transition to="EndTransit"/>
-			<transition to="OffTruck"/>
-			<transition to="Staged"/>
-			<transition to="Reracking"/>
-			<transition to="Reracked"/>
-			<transition to="QAVerified"/>
-			<transition to="PoweredOn"/>
-			<transition to="NetVerifying"/>
 			<transition to="NetVerified"/>
 			<transition to="SANVerifying"/>
 			<transition to="SANVerified"/>
@@ -593,26 +560,9 @@
 		</task>
 	</taskNode>
 
-	<taskNode name="Unracking Started">
-		<task swimlane="SUPERVISOR">
+	<taskNode name="NetVerified">
+		<task swimlane="MANAGER">
 			<transition to="Hold" flag="issue"/>
-			<transition to="Ready" />
-			<transition to="Release" />
-			<transition to="Unracking"/>
-			<transition to="Unracked"/>
-			<transition to="Cleaned"/>
-			<transition to="OnCart"/>
-			<transition to="OnTruck"/>
-			<transition to="InTransit"/>
-			<transition to="EndTransit"/>
-			<transition to="OffTruck"/>
-			<transition to="Staged"/>
-			<transition to="Reracking"/>
-			<transition to="Reracked"/>
-			<transition to="QAVerified"/>
-			<transition to="PoweredOn"/>
-			<transition to="NetVerifying"/>
-			<transition to="NetVerified"/>
 			<transition to="SANVerifying"/>
 			<transition to="SANVerified"/>
 			<transition to="DBStarted"/>
@@ -621,6 +571,92 @@
 			<transition to="AppFinished"/>
 			<transition to="AppVerifying"/>
 			<transition to="AppVerified"/>
+			<transition to="Completed"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="SANVerifying">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="SANVerified"/>
+			<transition to="DBStarted"/>
+			<transition to="DBFinished"/>
+			<transition to="AppStartup"/>
+			<transition to="AppFinished"/>
+			<transition to="AppVerifying"/>
+			<transition to="AppVerified"/>
+			<transition to="Completed"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="SANVerified">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="DBStarted"/>
+			<transition to="DBFinished"/>
+			<transition to="AppStartup"/>
+			<transition to="AppFinished"/>
+			<transition to="AppVerifying"/>
+			<transition to="AppVerified"/>
+			<transition to="Completed"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="DBStarted">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="DBFinished"/>
+			<transition to="AppStartup"/>
+			<transition to="AppFinished"/>
+			<transition to="AppVerifying"/>
+			<transition to="AppVerified"/>
+			<transition to="Completed"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="DBFinished">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="DBFinished"/>
+			<transition to="AppStartup"/>
+			<transition to="AppFinished"/>
+			<transition to="AppVerifying"/>
+			<transition to="AppVerified"/>
+			<transition to="Completed"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="AppStartup">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="AppFinished"/>
+			<transition to="AppVerifying"/>
+			<transition to="AppVerified"/>
+			<transition to="Completed"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="AppFinished">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="AppVerifying"/>
+			<transition to="AppVerified"/>
+			<transition to="Completed"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="AppVerifying">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="AppVerifying"/>
+			<transition to="AppVerified"/>
+			<transition to="Completed"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="AppVerified">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
 			<transition to="Completed"/>
 		</task>
 	</taskNode>
