@@ -17,6 +17,7 @@
 	</swimlane>
 
 	<transitions>
+		<transition to="" name="Initial" id="1" color="white"/>
 		<transition to="Hold" name="Hold" id="10" color="red"/>
 		<transition to="Ready" name="Ready" id="20" color="yellow"/>
 		<transition to="PoweredDown" name="Powered Down" id="30" color="orange"/>
@@ -48,6 +49,12 @@
 		<transition to="Terminated" name="Terminated" id="900" />
 	</transitions>
 
+	<startState name="">
+		<task swimlane="SUPERVISOR">
+			<transition to="Ready" />
+		</task>
+	</startState>
+	
 	<startState name="Hold">
 		<task swimlane="SUPERVISOR">
 			<transition to="Ready" />
