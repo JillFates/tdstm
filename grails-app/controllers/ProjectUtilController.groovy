@@ -8,11 +8,11 @@ class ProjectUtilController {
             def principal = SecurityUtils.subject.principal
             def userLogin = UserLogin.findByUsername( principal )
             def userPreference = UserPreference.findAllByUserLoginAndPreferenceCode( userLogin, "CURR_PROJ" )
-            if ( userPreference == null ) {
-                redirect( action:"searchList" )
-            } else {
-                def projectInstance = Project.findById( userPreference.value[0] )
+            if ( userPreference != null && userPreference != [] ) {
+            	def projectInstance = Project.findById( userPreference.value[0] )
                 redirect( controller:"project", action:"show",id:projectInstance.id)
+            } else {
+            	redirect( action:"searchList" )
             }
         } catch (Exception e){
             flash.message = "Your login has expired and must login again"
