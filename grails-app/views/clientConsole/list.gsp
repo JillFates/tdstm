@@ -250,7 +250,7 @@ isFirst = true;
 	<td style="padding-left: 0px;"><select style="width: 120px;visibility: hidden;"/></td>
 		</tr>
 		<tr>
-		 <th>Actions <a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a></th>
+		 <jsec:hasRole in="['ADMIN','MANAGER']">	<th>Actions <a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a></th></jsec:hasRole>
 			
 			<g:sortableColumn property="application"  title="Application" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
 			
@@ -274,7 +274,7 @@ isFirst = true;
 			<tr>
 			
 			
-				<td><jsec:hasRole name="ADMIN">
+			<jsec:hasRole in="['ADMIN','MANAGER']">	<td>
 					<g:if test="${assetEntity.checkVal == true}">
 					
 					<g:checkBox name="checkChange" id="checkId_${assetEntity.id}" onclick="timedRefresh('never')"></g:checkBox> 
@@ -283,8 +283,9 @@ isFirst = true;
 						</g:remoteLink>
 						
 					</g:if>
-				</jsec:hasRole>
+				
 				</td>
+				</jsec:hasRole>
 				<td>${assetEntity?.application}</td>
 				<td>${assetEntity?.appOwner}</td>
 				<td>${assetEntity?.appSme}</td>

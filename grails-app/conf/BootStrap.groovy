@@ -22,6 +22,14 @@ class BootStrap {
 		def userRole = new RoleType( description:"System : User" )
 		userRole.id = "USER"
 		userRole.save( insert:true )
+		
+		def managerRole = new RoleType( description:"System : Manager" )
+		managerRole.id = "MANAGER"
+		managerRole.save( insert:true )
+		
+		def observerRole = new RoleType( description:"System : Observer" )
+		observerRole.id = "OBSERVER"
+		observerRole.save( insert:true )
 
 		def workStationRole = new RoleType( description:"System : Work Station" )
 		workStationRole.id = "WORKSTATION"
@@ -216,6 +224,11 @@ class BootStrap {
 			partyType:personPartyType ).save()
 		def personTransport = new Person( firstName:'Tran', lastName:'Sport',title:'Transport',
 			partyType:personPartyType ).save()
+		def personRita = new Person( firstName:'Rita', lastName:'Booke', title:'MANAGER',
+			partyType:personPartyType ).save()
+		def personWarren = new Person( firstName:'Warren', lastName:'Peace', title:'OBSERVER ',
+			partyType:personPartyType ).save()	
+		
 
 		// This person account will actual share 3 logins (move tech, clean tech, and mover)
 		def personWorkStation = new Person( firstName:'Work', lastName:'Station', title:'Work Station User',
@@ -238,7 +251,8 @@ class BootStrap {
 		def adminUserLisa = new UserLogin( person:personLisa, username: "lisa", password:new Sha1Hash("admin").toHex(), active:'Y'  ).save()
 		def userJohn = new UserLogin( person:personJohn, username: "john", password:new Sha1Hash("admin").toHex(), active:'Y' ).save()
 		def normalUserRalph = new UserLogin( person:personJimL, username:"ralph", password:new Sha1Hash("user").toHex(), active:'Y' ).save()
-
+		def userRita = new UserLogin( person:personRita, username: "rbooke", password:new Sha1Hash("manager").toHex(), active:'Y' ).save()
+		def userWarren = new UserLogin( person:personWarren, username: "wpeace", password:new Sha1Hash("observer").toHex(), active:'Y' ).save()
 		// Create the Move Tech, Cleaning Tech and Mover (keep short for barcode)
 		def userMoveTech = new UserLogin( person:personWorkStation, username:"mt", password:new Sha1Hash("xyzzy").toHex(), active:'Y' ).save()
 		def userCleanTech = new UserLogin( person:personWorkStation, username:"ct", password:new Sha1Hash("xyzzy").toHex(), active:'Y' ).save()
@@ -318,7 +332,7 @@ class BootStrap {
 		johnPref.userLogin = userJohn
 		johnPref.preferenceCode = "CURR_PROJ"
 		johnPref.save( insert: true)
-
+		
 		// -------------------------------
 		// Create PartyRole Details
 		// -------------------------------
@@ -328,6 +342,8 @@ class BootStrap {
 		new PartyRole( party:personJohn, roleType:adminRole ).save( insert:true )
 		new PartyRole( party:personJohn, roleType:projectAdminRole ).save( insert:true )
 		new PartyRole( party:personWorkStation, roleType:workStationRole).save( insert:true )
+		new PartyRole( party:personRita, roleType:managerRole ).save( insert:true )
+		new PartyRole( party:personWarren, roleType:observerRole ).save( insert:true )
 
 		// -------------------------------
         // create Party Relationship
@@ -371,6 +387,8 @@ class BootStrap {
 			[ projStaffType, cedarsProject, projectRole, personJimL, techRole ],
 			[ projStaffType, cedarsProject, projectRole, personBrock, techRole ],
 			[ projStaffType, cedarsProject, projectRole, personTransport, techRole ],
+			[ projStaffType, cedarsProject, projectRole, personRita, managerRole ],
+			[ projStaffType, cedarsProject, projectRole, personWarren, observerRole ],
 
 			// Application / staff relationships
 			[ appRelaType, raiserApp, applicationRole, personNBonner, appOwnerRole ],

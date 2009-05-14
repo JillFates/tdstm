@@ -531,8 +531,8 @@ ${remoteFunction(action:'getList', params:'\'assetArray=\' + assetArr ', onCompl
 					<g:sortableColumn property="statTimer" title="Stat Timer" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
 					<g:sortableColumn property="loc" title="Loc" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
 					<g:sortableColumn property="issues" title="Issues" /> -->
-								<th>Actions <a href="#" onclick="selectAll()"><u
-									style="color: blue;">All</u></a></th>
+								<jsec:hasRole in="['ADMIN','MANAGER']"><th>Actions <a href="#" onclick="selectAll()"><u
+									style="color: blue;">All</u></a></th></jsec:hasRole>
 								<th>Priority</th>
 								<th>Asset Tag</th>
 								<th>Asset Name</th>
@@ -550,7 +550,7 @@ ${remoteFunction(action:'getList', params:'\'assetArray=\' + assetArr ', onCompl
 									id="assetDetailRow_${assetsList?.asset.id}"
 									class="${assetsList?.cssClass}" value="${assetsList?.asset.id}">
 
-
+									<jsec:hasRole in="['ADMIN','MANAGER']">
 									<td><jsec:hasRole name="ADMIN">
 										<g:if test="${assetsList.checkVal == true}">
 <span id="spanId_${assetsList?.asset.id}">
@@ -560,12 +560,13 @@ ${remoteFunction(action:'getList', params:'\'assetArray=\' + assetArr ', onCompl
 </span>
 
 										</g:if>
-									</jsec:hasRole> <span style="visibility: hidden;"
+									</jsec:hasRole>
+									 <span style="visibility: hidden;"
 										id="image_${assetsList?.asset.id}"><img
 										src="${createLinkTo(dir:'images',file:'row_arrow.gif')}"
 										border="0px"></span>
 										
-										</td>
+										</td></jsec:hasRole>
 									<td id="priorityCol_${assetsList?.asset.id}"
 										onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.priority}</td>
 									<td onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.assetTag}</td>

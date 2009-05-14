@@ -43,12 +43,14 @@
       <div class="top_menu_layout">
         <div class="menu1">
           <ul>
+          <jsec:lacksRole in="['MANAGER','OBSERVER']"> 
             <li><g:link class="home" controller="projectUtil">Project Manager</g:link></li>
             <jsec:hasRole name="ADMIN">
               <li><g:link class="home" controller="auth" action="home">Administration </g:link> </li>
             </jsec:hasRole>
             <li><g:link class="home" controller="moveTech" action="moveTechLogin">Move Tech</g:link></li>
             <li><g:link class="home" controller="moveTech" action="moveTechLogin">Cleaning</g:link></li>
+            </jsec:lacksRole>
           </ul>
         </div>
       </div>
@@ -69,7 +71,9 @@
       -->
       <div class="menu2">
       <ul>
+      
         <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
+        <jsec:lacksRole in="['MANAGER','OBSERVER']"> 
         <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
         <li>  
           	<div id="menubar" style="border-right:1px solid #ffffff; width:65px;">
@@ -83,7 +87,9 @@
         </li>  
         <li><g:link class="home" controller="moveBundle" params="[projectId:currProjObj?.id]">Move Bundles</g:link></li>
         <li><g:link class="home" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id]">Dashboard</g:link></li>
+        </jsec:lacksRole>
         <li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">PMO Dashboard</g:link> </li>
+         <jsec:lacksRole in="['MANAGER','OBSERVER']">
         <li>  
           	<div id="menubar">
  			<div id="menu1" class="menu_new">Reports<ul>    
@@ -92,7 +98,7 @@
     	      <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'cart Asset']">cart Asset List</g:link></li>
                <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Issue Report']">Issue Report</g:link></li>
 			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Transportation Asset List']">Transportation Asset List</g:link></li>
-			
+			</jsec:lacksRolee>
               </ul>
             </div>
             </div>
