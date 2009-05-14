@@ -18,6 +18,7 @@ class AssetEntityController {
 	def stateEngineService
 	def workflowService
 	def userPreferenceService
+	def jdbcTemplate
     def index = {
 		redirect( action:list, params:params )
 	}
@@ -712,10 +713,10 @@ class AssetEntityController {
             }
             def sourceAssets = ProjectAssetMap.findAll("from ProjectAssetMap where asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and sourceTeam = ${it.id} )" ).size()
             def unrackedAssets = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $unrackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and sourceTeam = ${it.id} )" ).size()
-            def sourceAvailassets = AssetTransition.findAll("from AssetTransition where (select max(stateTo) from AssetTransition where assetEntity in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and sourceTeam = ${it.id} ) ) < $unrackedId and stateTo >= $releasedId and assetEntity in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and sourceTeam = ${it.id} ) group by assetEntity" ).size()
+            def sourceAvailassets = jdbcTemplate.queryForList("SELECT max(t.state_to) as maxstate FROM asset_transition t left join asset_entity e on (t.asset_entity_id = e.asset_entity_id) where t.state_to >= $releasedId and e.move_bundle_id = ${moveBundleInstance.id} and e.source_team_id = ${it.id} group by e.asset_entity_id HAVING maxstate < $unrackedId ").size()
             def targetAssets = ProjectAssetMap.findAll("from ProjectAssetMap where asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and targetTeam = ${it.id} )" ).size()
             def rerackedAssets = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $rerackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and targetTeam = ${it.id} )" ).size()
-            def targetAvailAssets = AssetTransition.findAll("from AssetTransition where (select max(stateTo) from AssetTransition where assetEntity in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and targetTeam = ${it.id} )) < $rerackedId and stateTo >= $stagedId and assetEntity in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and targetTeam = ${it.id} ) group by assetEntity" ).size()
+            def targetAvailAssets = jdbcTemplate.queryForList("SELECT max(t.state_to) as maxstate FROM asset_transition t left join asset_entity e on (t.asset_entity_id = e.asset_entity_id) where t.state_to >= $stagedId and e.move_bundle_id = ${moveBundleInstance.id} and e.target_team_id = ${it.id} group by e.asset_entity_id HAVING maxstate < $rerackedId ").size()
             bundleTeams <<[team:it,members:member, sourceAssets:sourceAssets, unrackedAssets:unrackedAssets, sourceAvailassets:sourceAvailassets , targetAvailAssets:targetAvailAssets , targetAssets:targetAssets, rerackedAssets:rerackedAssets ]
         }
         def sourceCleaned = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $cleanedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
@@ -757,9 +758,9 @@ class AssetEntityController {
         	assetsList<<[asset: it, status: stateEngineService.getStateLabel("STD_PROCESS",curId), cssClass : cssClass,checkVal:check]
         }
         def totalUnracked = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $unrackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
-        def totalSourceAvail = AssetTransition.findAll("from AssetTransition where (select max(stateTo) from AssetTransition  where assetEntity in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} ) ) < $unrackedId and stateTo >= $releasedId and assetEntity in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} ) group by assetEntity" ).size()
+        def totalSourceAvail = jdbcTemplate.queryForList("SELECT max(t.state_to) as maxstate FROM asset_transition t left join asset_entity e on (t.asset_entity_id = e.asset_entity_id) where t.state_to >= $releasedId and e.move_bundle_id = ${moveBundleInstance.id} group by e.asset_entity_id HAVING maxstate < $unrackedId ").size() 
         def totalReracked = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $rerackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
-        def totalTargetAvail = AssetTransition.findAll("from AssetTransition where (select max(stateTo) from AssetTransition where assetEntity in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} ) ) < $rerackedId and stateTo >= $stagedId and assetEntity in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} ) group by assetEntity" ).size()
+        def totalTargetAvail = jdbcTemplate.queryForList("SELECT max(t.state_to) as maxstate FROM asset_transition t left join asset_entity e on (t.asset_entity_id = e.asset_entity_id) where t.state_to >= $stagedId and e.move_bundle_id = ${moveBundleInstance.id} group by e.asset_entity_id HAVING maxstate < $rerackedId ").size() 
         userPreferenceService.loadPreferences("SUPER_CONSOLE_REFRESH")
         def timeToRefresh = getSession().getAttribute("SUPER_CONSOLE_REFRESH")
         return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams, assetsList:assetsList, moveBundleInstance:moveBundleInstance, supportTeam:supportTeam,totalUnracked:totalUnracked , totalSourceAvail:totalSourceAvail, totalTargetAvail:totalTargetAvail, totalReracked:totalReracked , totalAsset:totalAsset.size(), timeToRefresh : timeToRefresh ? timeToRefresh.SUPER_CONSOLE_REFRESH : "never"]
