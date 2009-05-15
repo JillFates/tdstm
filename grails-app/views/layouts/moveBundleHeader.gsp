@@ -35,7 +35,7 @@
     	  <img src="${createLink(controller:'project', action:'showImage', id:setImage)} "/> 
       </g:if>
       <g:else>
-     	 <img src="${createLinkTo(dir:'images',file:'tds_logo_new.jpg')}" style="float: left;">
+     	 <img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;">
      </g:else>
         <div class="header_right"><br />
           <div style="font-weight: bold; color: #0000FF"><jsec:isLoggedIn>
