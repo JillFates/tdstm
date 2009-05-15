@@ -54,9 +54,11 @@
       </tbody>
     </table>
   </div>
+  <g:if test="${MoveBundle.findAll('from MoveBundle where project = '+projectId).size() > 10}">
   <div class="paginateButtons">
-    <g:paginate total="${MoveBundle.count()}" />
+    <g:paginate total="${MoveBundle.findAll('from MoveBundle where project = '+projectId).size()}" />
   </div>
+  </g:if>
   <input type="hidden" id="projectId" name="projectId" value="${projectId}"/>
   <div class="buttons"> <span class="button"><g:actionSubmit	class="save" action="Create" value="Create" /></span></div>
   </g:form>

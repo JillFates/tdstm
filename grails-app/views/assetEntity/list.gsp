@@ -716,8 +716,10 @@
 	</tbody>
 </table>
 </div>
-<div class="paginateButtons"><g:paginate
-	total="${AssetEntity.count()}" /></div>
+<g:if test="${AssetEntity.findAll('from AssetEntity where project = '+projectId).size() > 15}">
+<div class="paginateButtons"><g:paginate total="${AssetEntity.findAll('from AssetEntity where project = '+projectId).size()}" /></div>
+</g:if>
+
 <div class="buttons"><g:form>
 	<span class="button"><input type="button"
 		value="New Asset Entity" class="create" onClick="createDialog()" /></span>

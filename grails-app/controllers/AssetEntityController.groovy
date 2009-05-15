@@ -680,7 +680,7 @@ class AssetEntityController {
         def moveBundleInstance
         def stateVal
         def taskVal
-        def check
+        def check = true
         if(bundleId){
             moveBundleInstance = MoveBundle.findById(bundleId)
         } else {
@@ -741,11 +741,11 @@ class AssetEntityController {
         		curId = projectAssetMap.currentStateId
         	}
         	stateVal = stateEngineService.getState("STD_PROCESS",curId)
-			taskVal = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR",stateVal)
-			if(taskVal.size() == 0){
-				check = false    				
-			}else{
-                check = true
+			if(stateVal){
+	        	taskVal = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR",stateVal)
+				if(taskVal.size() == 0){
+					check = false    				
+				}
 			}
         	def cssClass
         	if(curId == Integer.parseInt(holdId) ){
@@ -794,7 +794,8 @@ class AssetEntityController {
 	        if(state){
 	        	validStates= stateEngineService.getTasks("STD_PROCESS","SUPERVISOR", state)
 	        } else {
-	        	validStates = stateEngineService.getTasks("STD_PROCESS","TASK_NAME")
+	        	validStates = ["Ready"] 
+	        	//stateEngineService.getTasks("STD_PROCESS","TASK_NAME")
 	        }
 	        validStates.each{
 	        	stateIdList<<Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
@@ -951,7 +952,8 @@ class AssetEntityController {
     	 if(state){
     		 validStates = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR", state)
     	 } else {
-    		 validStates = stateEngineService.getTasks("STD_PROCESS","TASK_NAME")
+    		 validStates = ["Ready"]
+    		 //stateEngineService.getTasks("STD_PROCESS","TASK_NAME")
     	 }
          validStates.each{
 		 	stateIdList<<Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
@@ -979,29 +981,31 @@ class AssetEntityController {
         def totalList = []
         def tempTaskList = []
         def sortList = []
-        def projectMap = ProjectAssetMap.findAll("from ProjectAssetMap pam where pam.asset in ($assetArray)")
         def stateVal
-        if(projectMap != null){
-    		projectMap.each{
-    			
-                stateVal = stateEngineService.getState("STD_PROCESS",it.currentStateId)
-                temp = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR",stateVal)    				
-                taskList << [task:temp]
-            }
-    		
-    		common = (HashSet)(taskList[0].task);
-    		for(int i=1; i< taskList.size();i++){
-                common.retainAll((HashSet)(taskList[i].task))
-    		}
-       
-   		 	common.each{
-               tempTaskList << Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
-   		 	}
-   		 	tempTaskList.sort().each{
-   		 	sortList << [state:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
-   		 	}
+        if(assetArray){
+        	def assetList = assetArray.split(",") 
+        	assetList.each{ asset->
+        		def projectAssetMap = ProjectAssetMap.find("from ProjectAssetMap pam where pam.asset = $asset")
+        		if(projectAssetMap){
+        			stateVal = stateEngineService.getState("STD_PROCESS",projectAssetMap.currentStateId)
+                    temp = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR",stateVal)
+                    taskList << [task:temp]
+        		} else {
+        			taskList << [task:["Ready"] ]
+        		}
+        	}
+        	common = (HashSet)(taskList[0].task);
+        	for(int i=1; i< taskList.size();i++){
+        		common.retainAll((HashSet)(taskList[i].task))
+        	}
+           	common.each{
+           		tempTaskList << Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
+       		}
+       		tempTaskList.sort().each{
+       			sortList << [state:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
+       		}
+        	totalList << [item:sortList,asset:assetArray]
         }
-        totalList << [item:sortList,asset:assetArray]
         render totalList as JSON
     		
     }
@@ -1029,10 +1033,7 @@ class AssetEntityController {
 	        	flash.message = message(code :workflow.message)		            
 	        }
         }
-    
         redirect(action:'dashboardView',params:["projectId":params.projectId,"moveBundle":params.moveBundle])
-			
-	       
     }
     
 }

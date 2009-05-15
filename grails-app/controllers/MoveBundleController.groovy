@@ -7,10 +7,13 @@ class MoveBundleController {
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
     def list = {
+    	if(!params.max) params.max = 10
     	def projectId = params.projectId
+    	if(projectId == null || projectId == ""){
+        	projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+        }
     	def projectInstance = Project.findById( projectId )
-    	def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
-        if(!params.max) params.max = 10
+    	def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance, params )
         [ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId ]
     }
 

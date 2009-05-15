@@ -85,7 +85,9 @@ class ClientConsoleController {
         	holdId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Hold"))
         	releaseId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Release"))
         	reRackId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Reracked"))
-        	if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
+        	if(stateId == 0){
+        		check = true
+        	} else if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
         		stateVal = stateEngineService.getState("STD_PROCESS",stateId)
     			taskVal = stateEngineService.getTasks("STD_PROCESS","MANAGER",stateVal)
     			if(taskVal.size() == 0){
@@ -126,15 +128,18 @@ class ClientConsoleController {
         def projectMap = ProjectAssetMap.find("from ProjectAssetMap pam where pam.asset = ${params.assetEntity}")
         if(projectMap != null){
 			stateVal = stateEngineService.getState("STD_PROCESS",projectMap.currentStateId)
-			temp = stateEngineService.getTasks("STD_PROCESS","MANAGER",stateVal)
-       
-            temp.each{
-                tempTaskList << Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
-            }
-            tempTaskList.sort().each{
-                taskList << [state:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
-            }
         }
+		if(stateVal){
+			temp = stateEngineService.getTasks("STD_PROCESS","MANAGER",stateVal)
+		} else {
+			temp =  ["Ready"]
+		}
+        temp.each{
+			tempTaskList << Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
+		}
+        tempTaskList.sort().each{
+			taskList << [state:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
+		}
         totalList<<[item:taskList,asset:assetId]
         render totalList as JSON
 	}
@@ -164,27 +169,30 @@ class ClientConsoleController {
         def totalList = []
         def projectMap = ProjectAssetMap.findAll("from ProjectAssetMap pam where pam.asset in ($assetArray)")
         def stateVal
-        if(projectMap != null){
-        	projectMap.each{
-    			
-                stateVal = stateEngineService.getState("STD_PROCESS",it.currentStateId)
-                temp = stateEngineService.getTasks("STD_PROCESS","MANAGER",stateVal)
-    				
-                taskList << [task:temp]
-            } 	
-    	
-    		common = (HashSet)(taskList[0].task);
-    		for(int i=1; i< taskList.size();i++){
-                common.retainAll((HashSet)(taskList[i].task))
-    		}
-    		 common.each{
-                tempTaskList << Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
-            }
-            tempTaskList.sort().each{
-            	sortList << [state:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
-            }
+        if(assetArray){
+        	def assetList = assetArray.split(",") 
+        	assetList.each{ asset->
+        		def projectAssetMap = ProjectAssetMap.find("from ProjectAssetMap pam where pam.asset = $asset")
+        		if(projectAssetMap){
+        			stateVal = stateEngineService.getState("STD_PROCESS",projectAssetMap.currentStateId)
+                    temp = stateEngineService.getTasks("STD_PROCESS","MANAGER",stateVal)
+                    taskList << [task:temp]
+        		} else {
+        			taskList << [task:["Ready"] ]
+        		}
+        	}
+        	common = (HashSet)(taskList[0].task);
+        	for(int i=1; i< taskList.size();i++){
+        		common.retainAll((HashSet)(taskList[i].task))
+        	}
+           	common.each{
+           		tempTaskList << Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
+       		}
+       		tempTaskList.sort().each{
+       			sortList << [state:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
+       		}
+        	totalList << [item:sortList,asset:assetArray]
         }
-        totalList << [item:sortList,asset:assetArray]
         render totalList as JSON
     }
 	
