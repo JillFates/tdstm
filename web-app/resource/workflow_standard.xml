@@ -49,12 +49,6 @@
 		<transition to="Terminated" name="Terminated" id="900" />
 	</transitions>
 
-	<startState name="">
-		<task swimlane="SUPERVISOR">
-			<transition to="Ready" />
-		</task>
-	</startState>
-	
 	<startState name="Hold">
 		<task swimlane="SUPERVISOR">
 			<transition to="Ready" />
