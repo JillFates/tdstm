@@ -25,7 +25,6 @@
    </script>
     
     <script type="text/javascript">
-   
       
       function editProject(){
       $("#dialog").dialog('option', 'width', 500)
@@ -151,6 +150,11 @@
    
     <div class="body">
     <h1>Show Project</h1>
+        <div>   	
+    	<jsec:hasRole name="ADMIN">
+          <span><g:link  action="deleteImage" params='["id":projectInstance?.id]'>Delete Image&nbsp;<img src="${createLinkTo(dir:'images',file:'database_delete.png' )}" style="border:0px;"/></g:link></span>
+        </jsec:hasRole>    	
+    </div>
     <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
       <span class="menuButton"><g:link class="list" action="list">Project List</g:link></span>
       <jsec:hasRole name="ADMIN">
@@ -265,12 +269,20 @@
   	
     <div id="dialog" title="Edit Project" style="display:none;">
 
-      <g:form name="editForm" method="post" action="update" name="editProjectForm">
+      <g:form name="editForm" method="post" action="update" name="editProjectForm" enctype="multipart/form-data">
 
         <input type="hidden" name="id" value="${projectInstance?.id}" />
         <div class="dialog">
           <table>
             <tbody>
+               <tr class="prop">
+				<td valign="top" class="name"><label for="client">Partner Image:</label>
+				</td>
+				<td valign="top" class="value">
+				<input type="file" name="partnerImage" id="partnerImage"/>
+				</td>
+			  </tr>
+			
               <tr class="prop">
                 <td valign="top" class="name">
                   <label for="name">Project Name:</label>

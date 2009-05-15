@@ -212,10 +212,18 @@
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 
-</g:if> <g:form action="save" method="post" name="createProjectForm">
+</g:if> <g:form action="save" method="post" name="createProjectForm" enctype="multipart/form-data">
 	<div class="dialog">
 	<table>
 		<tbody>
+			<tr class="prop">
+				<td valign="top" class="name"><label for="client">Partner Image:</label>
+				</td>
+				<td valign="top" class="value">
+				<input type="file" name="partnerImage" id="partnerImage" />
+				</td>
+			</tr>
+		
 			<tr class="prop">
 				<td valign="top" class="name"><label for="client">Client:</label>
 				</td>

@@ -22,7 +22,13 @@ class ProjectController {
         if(!projectInstance) {
             flash.message = "Project not found with id ${params.id}"
             redirect( action:list )
-        } else {
+        } else { 
+        	def projectLogo = ProjectLogo.findByProject(projectInstance)
+        	def imageId
+        	if(projectLogo){
+        		imageId = projectLogo.id
+        	}
+        	session.setAttribute("setImage",imageId)        	
         	def partnerStaff
         	def projectCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_COMPANY' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'COMPANY' ")
         	//def projectClient = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_CLIENT' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'CLIENT' ")
@@ -80,7 +86,34 @@ class ProjectController {
                 def formatter = new SimpleDateFormat("MM/dd/yyyy");
                 projectInstance.completionDate = formatter.parse(startDate);
             }
-            if( !projectInstance.hasErrors() && projectInstance.save() ) {
+           //Get the Partner Image file from the multi-part request
+            def file = request.getFile('partnerImage')
+            // List of OK mime-types
+            def okcontents = ['image/png', 'image/jpeg', 'image/gif']
+			if(file.getContentType() != "application/octet-stream"){
+	        	if (! okcontents.contains(file.getContentType())) {
+	        		flash.message = "Image must be one of: ${okcontents}"
+	        		redirect(action:list)
+	        		return;
+	        	}
+        	}
+            
+          //save image
+            def imageInstance = ProjectLogo.findByProject(projectInstance)
+            if(file){
+            if(imageInstance){
+            	imageInstance.delete()
+            }
+            }
+            def image = ProjectLogo.fromUpload(file)           
+            image.project = projectInstance
+            def party
+            def partnerImage = params.projectPartner
+            if ( partnerImage != null && partnerImage != "" ) {
+                party = Party.findById(partnerImage)
+            }
+            image.party = party
+            if( !projectInstance.hasErrors() && projectInstance.save() && image.save() ) {
             	
             	def partnerId = params.projectPartner
             	def projectManagerId = params.projectManager
@@ -237,18 +270,42 @@ class ProjectController {
         def projectInstance = new Project(params)
         projectInstance.dateCreated = new Date()
         def startDate = params.startDate
-        def completionDate = params.completionDate
+        def completionDate = params.completionDate   
+
         //  When the Start date is initially selected and Completion Date is blank, set completion date to the Start date
         if ( startDate != "" && completionDate == "" ) {
             def formatter = new SimpleDateFormat("MM/dd/yyyy");
             projectInstance.completionDate = formatter.parse(startDate);
         }
-        if ( !projectInstance.hasErrors() && projectInstance.save() ) {
+        
+        //Get the Partner Image file from the multi-part request
+        def file = request.getFile('partnerImage')
+        
+        // List of OK mime-types
+        def okcontents = ['image/png', 'image/jpeg', 'image/gif']
+        if(file.getContentType() != "application/octet-stream"){
+	    	if (! okcontents.contains(file.getContentType())) {
+	    		flash.message = "Image must be one of: ${okcontents}"
+	    		redirect(action:'create')
+	    		return;
+	    	}        
+        }
+      //save image
+        def image = ProjectLogo.fromUpload(file)           
+        image.project = projectInstance
+        def party
+        def partnerImage = params.projectPartner
+        if ( partnerImage != null && partnerImage != "" ) {
+            party = Party.findById(partnerImage)
+        }
+        image.party = party        
+
+        if ( !projectInstance.hasErrors() && projectInstance.save() && image.save()) {
         	
         	//def client = params.projectClient
         	def partner = params.projectPartner
         	def projectManager = params.projectManager
-        	def moveManager = params.moveManager
+        	def moveManager = params.moveManager      	
         	
         	def companyParty = PartyGroup.findByName( "TDS" )
         	//def companyRelationshipType = PartyRelationshipType.findById( "PROJ_COMPANY" ) 
@@ -296,10 +353,10 @@ class ProjectController {
         			//new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:moveManagerParty, roleTypeCodeTo:moveManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
         	}
         	// set the projectInstance as CURR_PROJ
-        	userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+        	userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )       	
         	
         	flash.message = "Project ${projectInstance.id} created"
-            redirect( action:show, id:projectInstance.id )
+            redirect( action:show, id:projectInstance.id, imageId:image.id )
         } else {
             def tdsParty = PartyGroup.findByName( 'TDS' ).id
              
@@ -374,5 +431,26 @@ class ProjectController {
         redirect(controller:'project', action:"show", id: projectInstance.id )
     		
     }
+    
+    def showImage = {
+    		 
+    		def projectLogo = ProjectLogo.findById( params.id )
+     		def image = projectLogo.partnerImage?.binaryStream
+     		response.outputStream << image
+     }
+    
+    def deleteImage = {
+    		 def projectInstance = Project.get( params.id )
+    		 def imageInstance = ProjectLogo.findByProject(projectInstance)
+    		 if(imageInstance){
+    			 flash.message = "Image deleted"
+    			 imageInstance.delete()
+    			 redirect(action:'show',id:projectInstance.id )
+    		 } else {
+    			 flash.message = "No Image to delete"
+    			 redirect(action:'show',id:projectInstance.id )
+    		 }
+    		 
+     }
 
 }

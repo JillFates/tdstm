@@ -14,6 +14,7 @@
    
   </head>
 	<% def currProj = session.getAttribute("CURR_PROJ");
+	   def setImage = session.getAttribute("setImage");
     def projectId = currProj.CURR_PROJ ;
     def currProjObj;
     if( projectId != null){
@@ -24,8 +25,16 @@
    
     <div class="main_body">
 
-      <div class="header"><img
-          src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;">
+      <div class="header">
+      <g:if test="${setImage}">
+    	  <img src="${createLink(controller:'project', action:'showImage', id:setImage)} "/> 
+      </g:if>
+      <g:else>
+     	 <img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;">
+     	 <td>&nbsp;</td>
+     	 <td>&nbsp;</td>
+     	 <td>&nbsp;</td>
+     </g:else>
         <div class="header_right"><br />
           <div style="font-weight: bold; color: #0000FF"><jsec:isLoggedIn>
               <strong>Welcome &nbsp;&nbsp;<jsec:principal />&nbsp;! </strong>
