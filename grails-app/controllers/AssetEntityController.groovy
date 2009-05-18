@@ -33,6 +33,7 @@ class AssetEntityController {
         def assetsByProject
         def projectInstance
         def moveBundleInstanceList
+        def project
         if( projectId != null ) {
             projectInstance = Project.findById( projectId )
             moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
@@ -56,10 +57,10 @@ class AssetEntityController {
         }   	
     	
     	if ( projectId != null ) {
-    		def project = Project.findById(projectId)
+    		 project = Project.findById(projectId)
     		assetsByProject = AssetEntity.findAllByProject(project)
     	}
-    	def	dataTransferBatchs = DataTransferBatch.count()
+    	def	dataTransferBatchs = DataTransferBatch.findAllByProject(project).size()
         render( view:"importExport", model : [ assetsByProject: assetsByProject, projectId: projectId, moveBundleInstanceList: moveBundleInstanceList, dataTransferSetImport: dataTransferSetImport, dataTransferSetExport: dataTransferSetExport, dataTransferBatchs: dataTransferBatchs ] )
     }
     /*

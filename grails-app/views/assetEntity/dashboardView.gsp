@@ -37,6 +37,8 @@ td .odd {
 
 <script>
 	$(document).ready(function() {
+	    $("#showDialog").dialog({ autoOpen: false })
+	    $("#editDialog").dialog({ autoOpen: false })
 		$("#commentsListDialog").dialog({ autoOpen: false })
 	    $("#createCommentDialog").dialog({ autoOpen: false })
 	    $("#showCommentDialog").dialog({ autoOpen: false })
@@ -46,6 +48,288 @@ td .odd {
 </script>
 <script type="text/javascript">
 
+function showAssetDialog( e , action ) {
+				timedRefresh('never')
+		    	$('#createCommentDialog').dialog('close');
+		    	$('#commentsListDialog').dialog('close');
+		    	$('#editCommentDialog').dialog('close');
+		    	$('#showCommentDialog').dialog('close');
+		    	$("#showChangeStatusDialog").dialog('close');
+		    	var browser=navigator.appName;
+      			var assetEntityAttributes = eval('(' + e.responseText + ')');
+      			var autoComp = new Array()      			
+      			
+      			var showDiv = document.getElementById("showDiv");      			
+      			var editDiv = document.getElementById("editDiv");
+      			var stb = document.getElementById('showTbodyId')
+			    if(stb != null){
+			      showDiv.removeChild(stb)
+			    }
+      			var etb = document.getElementById('editTbodyId')
+			    if(etb != null){
+			      editDiv.removeChild(etb)
+			    }
+      			// create tbody for CreateTable
+      			var stbody = document.createElement('table');
+				stbody.id = "showTbodyId"
+      			
+      			var etbody = document.createElement('table');
+				etbody.id = "editTbodyId"
+				// Rebuild the select
+			      if (assetEntityAttributes) {
+				      var length = assetEntityAttributes.length
+				      var halfLength = getLength(length) 
+				      var str = document.createElement('tr');
+				      var etr = document.createElement('tr');
+					  var stdLeft = document.createElement('td');
+					  stdLeft.style.width = '50%'
+					  var etdLeft = document.createElement('td');
+					  var stdRight = document.createElement('td');
+					  stdRight.style.width = '50%'
+					  var etdRight = document.createElement('td');
+					  var stableLeft = document.createElement('table');
+					  var etableLeft = document.createElement('table');
+					  stableLeft.style.width = '50%'
+					  stableLeft.style.border = '0'
+					  etableLeft.style.width = '50%'
+					  etableLeft.style.border = '0'
+					  var stableRight = document.createElement('table');
+					  var etableRight = document.createElement('table');
+					  stableRight.style.width = '50%'
+					  stableRight.style.border = '0'
+					  etableRight.style.width = '50%'
+					  etableRight.style.border = '0'
+				      	for (var i=0; i < halfLength; i++ ) {
+					     var attributeLeft = assetEntityAttributes[i]
+					      var strLeft = document.createElement('tr');
+					      var etrLeft = document.createElement('tr');
+					      // td for Show page
+					     var inputTdLeft = document.createElement('td');
+					      var labelTdLeft = document.createElement('td');
+					      labelTdLeft.noWrap = 'nowrap'
+					      var labelLeft = document.createTextNode(attributeLeft.label);
+					      labelTdLeft.appendChild( labelLeft )
+					      var inputFieldLeft = document.createTextNode(attributeLeft.value);
+					      inputTdLeft.appendChild( inputFieldLeft )
+					      labelTdLeft.style.background = '#f3f4f6 '
+					      labelTdLeft.style.width = '25%'
+					      inputTdLeft.style.width = '25%'
+					      strLeft.appendChild( labelTdLeft )
+					      strLeft.appendChild( inputTdLeft )
+					      // td for Edit page
+					      var inputTdELeft = document.createElement('td');
+					      var labelTdELeft = document.createElement('td');
+					      labelTdELeft.noWrap = 'nowrap'
+					      var labelELeft = document.createTextNode(attributeLeft.label);
+					      labelTdELeft.appendChild( labelELeft )
+					      var inputFieldELeft = getInputType(attributeLeft);
+					      	  inputFieldELeft.value = attributeLeft.value;
+							  inputFieldELeft.id = 'edit'+attributeLeft.attributeCode+'Id';
+					      inputTdELeft.appendChild( inputFieldELeft )
+					      labelTdELeft.style.background = '#f3f4f6 '
+					      	
+					      labelTdELeft.style.width = '25%'
+					      inputTdELeft.style.width = '25%'
+					      etrLeft.appendChild( labelTdELeft )
+					      etrLeft.appendChild( inputTdELeft )
+					      stableLeft.appendChild( strLeft )
+					     etableLeft.appendChild( etrLeft )
+				      	}
+				      	
+				      	for (var i=halfLength; i < length; i++ ) {
+					      var attributeRight = assetEntityAttributes[i]
+					      var strRight = document.createElement('tr');
+					      var etrRight = document.createElement('tr');
+					      // td for Show page
+					      var inputTdRight = document.createElement('td');
+					      var labelTdRight = document.createElement('td');
+					      labelTdRight.noWrap = 'nowrap'
+					      var labelRight = document.createTextNode(attributeRight.label);
+					      labelTdRight.appendChild( labelRight )
+					      var inputFieldRight = document.createTextNode(attributeRight.value);
+					      inputTdRight.appendChild( inputFieldRight )
+					      labelTdRight.style.background = '#f3f4f6 '
+					      labelTdRight.style.width = '25%'
+					      inputTdRight.style.width = '25%'
+					      strRight.appendChild( labelTdRight )
+					      strRight.appendChild( inputTdRight )
+					      
+					      // td for Edit page
+					      var inputTdERight = document.createElement('td');
+					      var labelTdERight = document.createElement('td');
+					      labelTdERight.noWrap = 'nowrap'
+					      var labelERight = document.createTextNode(attributeRight.label);
+					      labelTdERight.appendChild( labelERight )
+					      
+					      var inputFieldERight = getInputType(attributeRight);
+					      	  inputFieldERight.value = attributeRight.value;
+							  inputFieldERight.id = 'edit'+attributeRight.attributeCode+'Id';
+					      inputTdERight.appendChild( inputFieldERight )
+					      labelTdERight.style.background = '#f3f4f6 '
+					      labelTdERight.style.width = '25%'
+					      inputTdERight.style.width = '25%'
+					      etrRight.appendChild( labelTdERight )
+					      etrRight.appendChild( inputTdERight )
+					      stableRight.appendChild( strRight )
+					     etableRight.appendChild( etrRight )
+				      	
+				      	}
+				      	for (var i=0; i < length; i++ ) {
+					      	var attribute = assetEntityAttributes[i]
+					      	if(attribute.frontendInput == 'autocomplete'){
+					      		autoComp.push(attribute.attributeCode)
+					      	}
+				      	}
+				  stdLeft.appendChild( stableLeft )
+			      etdLeft.appendChild( etableLeft )
+				  stdRight.appendChild( stableRight )
+				  etdRight.appendChild( etableRight )
+				  str.appendChild( stdLeft )
+				  etr.appendChild( etdLeft )
+				  str.appendChild( stdRight )
+				  etr.appendChild( etdRight )
+				  stbody.appendChild( str )
+				  etbody.appendChild( etr )
+			      }
+			      showDiv.appendChild(stbody)
+			     showDiv.innerHTML += "";
+			     
+			     editDiv.appendChild( etbody )
+			       if(browser == 'Microsoft Internet Explorer') {
+			editDiv.innerHTML += "";
+		} 
+			    
+			     ${remoteFunction(action:'getAutoCompleteDate', params:'\'autoCompParams=\' + autoComp ', onComplete:'updateAutoComplete(e)')} 
+			  if(action == 'edit'){
+			      $("#editDialog").dialog('option', 'width', 600)
+			      $("#editDialog").dialog('option', 'position', ['center','top']);
+			      $("#editDialog").dialog("open")
+			      $("#showDialog").dialog("close")
+		      } else if(action == 'show'){
+		          $("#showDialog").dialog('option', 'width', 600)
+			      $("#showDialog").dialog('option', 'position', ['center','top']);
+			      $("#showDialog").dialog("open")
+			      $("#editDialog").dialog("close")
+		      }
+		
+		    }
+		    function getLength( length ){
+      			var isOdd = (length%2 != 0) ? true : false
+      			var halfLength
+      			if(isOdd){
+      				length += 1;
+      				halfLength = length / 2 
+      			} else {
+      				halfLength = length / 2 
+      			}
+      			return halfLength; 
+      		}
+      		
+      		// function to construct the frontendInput tag
+      		function getInputType( attribute ){
+      			var name = attribute.attributeCode
+      			var type = attribute.frontendInput
+      			var options = attribute.options
+      			var inputField
+      			if(type == 'select'){
+					inputField = document.createElement('select');
+					inputField.name = name ;
+						var inputOption = document.createElement('option');
+						inputOption.value = ''
+						inputOption.innerHTML = 'please select'
+						inputField.appendChild(inputOption)
+						if (options) {
+					      var length = options.length
+					      for (var i=0; i < length; i++) {
+						      var optionObj = options[i]
+						      var popt = document.createElement('option');
+						      popt.innerHTML = optionObj.option
+						      popt.value = optionObj.option
+						      if(attribute.value == optionObj.option){
+							      popt.selected = true
+						      }
+						      try {
+						      	inputField.appendChild(popt, null) // standards compliant; doesn't work in IE
+						      } catch(ex) {
+						      	inputField.appendChild(popt) // IE only
+						      }
+					      }
+					   }						
+				} else {
+      			 	inputField = document.createElement('input');      			 	
+					inputField.type = "text";										
+					inputField.name = name;
+				}
+				return inputField; 
+      		}
+      		
+      		function editAssetDialog() {
+timedRefresh('never')
+		      $("#showDialog").dialog("close")
+		      $("#editDialog").dialog('option', 'width', 600)
+		      $("#editDialog").dialog('option', 'position', ['center','top']);
+		      $("#editDialog").dialog("open")
+		
+		    }
+
+function updateAutoComplete(e){
+
+      			var data = eval('(' + e.responseText + ')');
+      		
+      			if (data) {
+      			
+				      var length = data.length
+				     
+				      for (var i=0; i < length; i ++ ) {
+					      var attribData = data[i]
+					    
+					      var code = "edit"+attribData.attributeCode+"Id"
+					      var codeValue = attribData.value;
+				  			$("#"+code).autocomplete(codeValue);
+					  }
+					 
+				}
+				      			
+      		}
+      		
+      function callUpdateDialog( e ) {
+		    timedRefresh('never')
+		    	var assetEntityAttributes = eval('(' + e.responseText + ')');
+				var assetId = document.editForm.id.value
+		    	var assetEntityParams = new Array()
+		    	if (assetEntityAttributes) {
+		    		var length = assetEntityAttributes.length
+				      	for (var i=0; i < length; i ++) {
+				      		var attributeCode = assetEntityAttributes[i].attributeCode
+				      		var attributeValue = document.getElementById('edit'+attributeCode+'Id').value
+				      		if(assetEntityAttributes[i].frontendInput == 'select'){
+					      		assetEntityParams.push(attributeCode+':'+attributeValue)
+				      		} else {
+				      			assetEntityParams.push(attributeCode+':'+attributeValue)
+				      		}
+				      	}
+		    	}
+		    ${remoteFunction(action:'updateAssetEntity', params:'\'assetEntityParams=\' + assetEntityParams +\'&id=\'+assetId', onComplete:'showEditAsset(e)')}
+		    }
+		    
+		    function showEditAsset(e) {
+		      var assetEntityAttributes = eval('(' + e.responseText + ')')
+			  if (assetEntityAttributes != "") {
+			  		var trObj = document.getElementById("assetDetailRow_"+assetEntityAttributes[0].id)
+			  		//trObj.style.background = '#65a342'
+		    		var length = assetEntityAttributes.length
+				      	for (var i=0; i < length; i ++) {
+				      		var attribute = assetEntityAttributes[i]
+				      		var tdId = document.getElementById(attribute.attributeCode+'_'+attribute.id)
+				      		if(tdId != null ){
+				      				tdId.innerHTML = attribute.value
+				      		}
+				      	}
+				  $("#editDialog").dialog("close")
+				} else {
+					alert("Asset Entity is not updated")
+				}
+      		} 		
 function showChangeStatusDialog(e){
 timedRefresh('never')
 var task = eval('(' + e.responseText + ')');
@@ -561,6 +845,9 @@ ${remoteFunction(action:'getList', params:'\'assetArray=\' + assetArr ', onCompl
 
 										</g:if>
 									</jsec:hasRole>
+									<g:remoteLink controller="assetEntity" action="editShow" id="${assetsList?.asset.id}" before="document.showForm.id.value = ${assetsList?.asset.id};document.editForm.id.value = ${assetsList?.asset.id};" onComplete="showAssetDialog( e , 'show');">
+					<img src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px">
+				</g:remoteLink>
 									 <span style="visibility: hidden;"
 										id="image_${assetsList?.asset.id}"><img
 										src="${createLinkTo(dir:'images',file:'row_arrow.gif')}"
@@ -798,6 +1085,34 @@ Comment</a></span></div>
 	onclick="${remoteFunction(action:'deleteComment', params:'\'id=\' + document.getElementById(\'commentId\').value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e)')}" />
 </span></div>
 </div>
+<div id="showDialog" title="Show Asset Entity" style="display: none;">
+<g:form action="save" method="post" name="showForm">
+	<div class="dialog" id="showDiv">
+	
+	</div>
+	<div class="buttons">
+	<input type="hidden" name="id" value="" />
+	<input type="hidden" name="projectId" value="${projectId}" />
+	 <span class="button"><input
+		type="button" class="edit" value="Edit"
+		onClick="return editAssetDialog()" /></span> <span class="button"><g:actionSubmit 
+		class="delete" onclick="return confirm('Are you sure?');"
+		value="Delete" /></span></div>
+</g:form></div>
+
+<div id="editDialog" title="Edit Asset Entity" style="display: none;">
+<g:form method="post" name="editForm">
+	<input type="hidden" name="id" value="" />
+	<input type="hidden" name="projectId" value="${projectId}" />
+	<div class="dialog" id="editDiv">
+	
+	</div>
+	<div class="buttons"><span class="button">
+	<input type="button" class="save" value="Update Asset Entity" onClick="${remoteFunction(action:'getAssetAttributes', params:'\'assetId=\' + document.editForm.id.value ', onComplete:'callUpdateDialog(e)')}" />
+	</span> <span class="button"><g:actionSubmit 
+		class="delete" onclick="return confirm('Are you sure?');"
+		value="Delete" /></span></div>
+</g:form></div>
 <div id="editCommentDialog" title="Edit Asset Comment"
 	style="display: none;"><g:form action="updateComment"
 	method="post" name="editCommentForm">

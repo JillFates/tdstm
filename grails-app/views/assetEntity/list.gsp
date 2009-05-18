@@ -48,22 +48,23 @@
 		    	$('#commentsListDialog').dialog('close');
 		    	$('#editCommentDialog').dialog('close');
 		    	$('#showCommentDialog').dialog('close');
+		    	 var browser=navigator.appName;
       			var assetEntityAttributes = eval('(' + e.responseText + ')');
       			var autoComp = new Array()
-      			var showTable = document.getElementById("showTable");
-      			var editTable = document.getElementById("editTable");
+      			var showDiv = document.getElementById("showDiv");
+      			var editDiv = document.getElementById("editDiv");
       			var stb = document.getElementById('showTbodyId')
 			    if(stb != null){
-			      showTable.removeChild(stb)
+			      showDiv.removeChild(stb)
 			    }
       			var etb = document.getElementById('editTbodyId')
 			    if(etb != null){
-			      editTable.removeChild(etb)
+			      editDiv.removeChild(etb)
 			    }
       			// create tbody for CreateTable
-      			var stbody = document.createElement('tbody');
+      			var stbody = document.createElement('table');
 				stbody.id = "showTbodyId"
-      			var etbody = document.createElement('tbody');
+      			var etbody = document.createElement('table');
 				etbody.id = "editTbodyId"
 				// Rebuild the select
 			      if (assetEntityAttributes) {
@@ -101,7 +102,7 @@
 					      labelTdLeft.appendChild( labelLeft )
 					      var inputFieldLeft = document.createTextNode(attributeLeft.value);
 					      inputTdLeft.appendChild( inputFieldLeft )
-					      labelTdLeft.style.backgroundColor = '#f3f4f6 '
+					      labelTdLeft.style.background = '#f3f4f6 '
 					      labelTdLeft.style.width = '25%'
 					      inputTdLeft.style.width = '25%'
 					      strLeft.appendChild( labelTdLeft )
@@ -114,10 +115,12 @@
 					      var labelELeft = document.createTextNode(attributeLeft.label);
 					      labelTdELeft.appendChild( labelELeft )
 					      var inputFieldELeft = getInputType(attributeLeft);
-					      	  inputFieldELeft.value = attributeLeft.value;
-							  inputFieldELeft.id = 'edit'+attributeLeft.attributeCode+'Id';
+					      	 inputFieldELeft.value = attributeLeft.value;
+							  inputFieldELeft.id = 'edit'+attributeLeft.attributeCode+'Id';							 
+							 
 					      inputTdELeft.appendChild( inputFieldELeft )
-					      labelTdELeft.style.backgroundColor = '#f3f4f6 '
+					  
+					      labelTdELeft.style.background = '#f3f4f6 '
 					      labelTdELeft.style.width = '25%'
 					      inputTdELeft.style.width = '25%'
 					      etrLeft.appendChild( labelTdELeft )
@@ -138,7 +141,7 @@
 					      labelTdRight.appendChild( labelRight )
 					      var inputFieldRight = document.createTextNode(attributeRight.value);
 					      inputTdRight.appendChild( inputFieldRight )
-					      labelTdRight.style.backgroundColor = '#f3f4f6 '
+					      labelTdRight.style.background = '#f3f4f6 '
 					      labelTdRight.style.width = '25%'
 					      inputTdRight.style.width = '25%'
 					      strRight.appendChild( labelTdRight )
@@ -154,7 +157,7 @@
 					      	  inputFieldERight.value = attributeRight.value;
 							  inputFieldERight.id = 'edit'+attributeRight.attributeCode+'Id';
 					      inputTdERight.appendChild( inputFieldERight )
-					      labelTdERight.style.backgroundColor = '#f3f4f6 '
+					      labelTdERight.style.background = '#f3f4f6 '
 					      labelTdERight.style.width = '25%'
 					      inputTdERight.style.width = '25%'
 					      etrRight.appendChild( labelTdERight )
@@ -181,8 +184,14 @@
 				  etbody.appendChild( etr )
 			      }
 			      
-			     showTable.appendChild( stbody ) 
-			     editTable.appendChild( etbody )
+			     showDiv.appendChild( stbody )
+			      showDiv.innerHTML += "";
+			     editDiv.appendChild( etbody )
+			      if(browser == 'Microsoft Internet Explorer') {
+			editDiv.innerHTML += "";
+		} 
+			      
+			      
 			     ${remoteFunction(action:'getAutoCompleteDate', params:'\'autoCompParams=\' + autoComp ', onComplete:'updateAutoComplete(e)')} 
 			  $("#createDialog").dialog("close")
 			  if(action == 'edit'){
@@ -214,7 +223,6 @@
 		    }
 		    
 		    function editAssetDialog() {
-
 		      $("#showDialog").dialog("close")
 		      $("#editDialog").dialog('option', 'width', 600)
 		      $("#editDialog").dialog('option', 'position', ['center','top']);
@@ -424,7 +432,7 @@
 					   }						
 				} else {
       			 	inputField = document.createElement('input');
-					inputField.type = type;
+					inputField.type = "text";
 					inputField.name = name;
 				}
 				
@@ -746,9 +754,8 @@
 </g:form></div>
 <div id="showDialog" title="Show Asset Entity" style="display: none;">
 <g:form action="save" method="post" name="showForm">
-	<div class="dialog">
-	<table id="showTable">
-	</table>
+	<div class="dialog" id="showDiv">
+	
 	</div>
 	<div class="buttons">
 	<input type="hidden" name="id" value="" />
@@ -764,9 +771,8 @@
 <g:form method="post" name="editForm">
 	<input type="hidden" name="id" value="" />
 	<input type="hidden" name="projectId" value="${projectId}" />
-	<div class="dialog">
-	<table id="editTable">
-	</table>
+	<div class="dialog" id="editDiv">
+	
 	</div>
 	<div class="buttons"><span class="button">
 	<input type="button" class="save" value="Update Asset Entity" onClick="${remoteFunction(action:'getAssetAttributes', params:'\'assetId=\' + document.editForm.id.value ', onComplete:'callUpdateDialog(e)')}" />
