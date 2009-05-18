@@ -23,13 +23,13 @@ class ProjectLogo {
         return partnerImage?.binaryStream
     }*/
    
-   /* static transients = [ 'size', 'data' ]
+    static transients = [ 'size', 'data' ]
 
     Long getSize() {
         return partnerImage?.length() ?: 0
     }
    
-    def render(def response) {
+    /*def render(def response) {
         response.contentType = "application/octet-stream"
         response.outputStream << data
     }*/

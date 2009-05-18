@@ -32,10 +32,12 @@
 
       <div class="header">
       <g:if test="${setImage}">
-    	  <img src="${createLink(controller:'project', action:'showImage', id:setImage)} "/> 
+      	<div class="header_left">
+    	  <img src="${createLink(controller:'project', action:'showImage', id:setImage)} "/>
+        </div> 
       </g:if>
       <g:else>
-     	 <img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;">
+     	 <img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;"/>
      </g:else>
         <div class="header_right"><br />
           <div style="font-weight: bold; color: #0000FF"><jsec:isLoggedIn>

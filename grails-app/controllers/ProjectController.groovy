@@ -89,7 +89,7 @@ class ProjectController {
            //Get the Partner Image file from the multi-part request
             def file = request.getFile('partnerImage')
             // List of OK mime-types
-            def okcontents = ['image/png', 'image/jpeg', 'image/gif']
+            def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
 			if(file.getContentType() != "application/octet-stream"){
 	        	if (! okcontents.contains(file.getContentType())) {
 	        		flash.message = "Image must be one of: ${okcontents}"
@@ -113,6 +113,14 @@ class ProjectController {
                 party = Party.findById(partnerImage)
             }
             image.party = party
+            
+            def imageSize = image.getSize()
+            if( imageSize > 25000 ) {
+            	flash.message = " Image size is too large. Please select proper Image"
+    	    	redirect(action:list)
+    	    	return;
+            }
+            
             if( !projectInstance.hasErrors() && projectInstance.save() && image.save() ) {
             	
             	def partnerId = params.projectPartner
@@ -282,7 +290,7 @@ class ProjectController {
         def file = request.getFile('partnerImage')
         
         // List of OK mime-types
-        def okcontents = ['image/png', 'image/jpeg', 'image/gif']
+        def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
         if(file.getContentType() != "application/octet-stream"){
 	    	if (! okcontents.contains(file.getContentType())) {
 	    		flash.message = "Image must be one of: ${okcontents}"
@@ -298,9 +306,15 @@ class ProjectController {
         if ( partnerImage != null && partnerImage != "" ) {
             party = Party.findById(partnerImage)
         }
-        image.party = party        
+        image.party = party 
+        def imageSize = image.getSize()
+        if( imageSize > 25000 ) {
+        	flash.message = " Image size is too large. Please select proper Image"
+	    	redirect(action:'create')
+	    	return;
+        }
 
-        if ( !projectInstance.hasErrors() && projectInstance.save() && image.save()) {
+        if ( !projectInstance.hasErrors() && projectInstance.save() && image.save() ) {
         	
         	//def client = params.projectClient
         	def partner = params.projectPartner
