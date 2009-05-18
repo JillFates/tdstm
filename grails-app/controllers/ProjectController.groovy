@@ -93,7 +93,7 @@ class ProjectController {
 			if(file.getContentType() != "application/octet-stream"){
 	        	if (! okcontents.contains(file.getContentType())) {
 	        		flash.message = "Image must be one of: ${okcontents}"
-	        		redirect(action:list)
+	        		redirect(action:'show',id:projectInstance.id )
 	        		return;
 	        	}
         	}
@@ -115,9 +115,9 @@ class ProjectController {
             image.party = party
             
             def imageSize = image.getSize()
-            if( imageSize > 25000 ) {
+            if( imageSize > 50000 ) {
             	flash.message = " Image size is too large. Please select proper Image"
-    	    	redirect(action:list)
+            	redirect(action:'show',id:projectInstance.id )
     	    	return;
             }
             
@@ -308,7 +308,7 @@ class ProjectController {
         }
         image.party = party 
         def imageSize = image.getSize()
-        if( imageSize > 25000 ) {
+        if( imageSize > 50000 ) {
         	flash.message = " Image size is too large. Please select proper Image"
 	    	redirect(action:'create')
 	    	return;

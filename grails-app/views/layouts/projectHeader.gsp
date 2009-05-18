@@ -28,11 +28,11 @@
       <div class="header">
       <g:if test="${setImage}">
       	<div class="header_left">
-    	  <img src="${createLink(controller:'project', action:'showImage', id:setImage)} "/>
+    	  <img src="${createLink(controller:'project', action:'showImage', id:setImage)}" style="height: 30px;"/>
     	 </div> 
       </g:if>
       <g:else>      	
-     	 <img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;"/>      	    	 
+     	 <a href="http://www.transitionaldata.com/" target="new"><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;border: 0px"/></a>      	    	 
      </g:else>
         <div class="header_right"><br />
           <div style="font-weight: bold; color: #0000FF"><jsec:isLoggedIn>
