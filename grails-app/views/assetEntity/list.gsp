@@ -31,6 +31,7 @@
 <jq:plugin name="ui.resizable" />
 <jq:plugin name="ui.dialog" />
 
+
 <script>
 	      $(document).ready(function() {
 	        $("#showDialog").dialog({ autoOpen: false })
@@ -40,7 +41,8 @@
 	        $("#createCommentDialog").dialog({ autoOpen: false })
 	        $("#showCommentDialog").dialog({ autoOpen: false })
 	        $("#editCommentDialog").dialog({ autoOpen: false })
-	      })
+	        $("#filterPane").draggable()
+})
 </script>
 <script type="text/javascript">	
 		    function showAssetDialog( e , action ) {
@@ -637,7 +639,7 @@
       		} 
       		
 	    </script>
-
+<filterpane:includes />
 </head>
 <body>
 
@@ -653,26 +655,26 @@
 
 			<th>Actions</th>			
 
-			<g:sortableColumn property="application" title="Application" />
+			<g:sortableColumn property="application" title="Application" params="${filterParams}"/>
 			
-			<g:sortableColumn property="assetName" title="Asset Name" />
+			<g:sortableColumn property="assetName" title="Asset Name" params="${filterParams}"/>
 			
-			<g:sortableColumn property="model" title="Model" />
+			<g:sortableColumn property="model" title="Model" params="${filterParams}"/>
 
-			<g:sortableColumn property="sourceLocation" title="Source Location" />
+			<g:sortableColumn property="sourceLocation" title="Source Location" params="${filterParams}"/>
 
-			<g:sortableColumn property="sourceRack" title="Source Rack/Cab" />
+			<g:sortableColumn property="sourceRack" title="Source Rack/Cab" params="${filterParams}"/>
 
-			<g:sortableColumn property="targetLocation"	title="Target Location" />
+			<g:sortableColumn property="targetLocation"	title="Target Location" params="${filterParams}"/>
 			
-			<g:sortableColumn property="targetRack"	title="Target Rack/Cab" />
+			<g:sortableColumn property="targetRack"	title="Target Rack/Cab" params="${filterParams}"/>
 			
 
-			<g:sortableColumn property="assetType" title="Asset Type" />
+			<g:sortableColumn property="assetType" title="Asset Type" params="${filterParams}"/>
 
-			<g:sortableColumn property="assetTag" title="Asset Tag" />
+			<g:sortableColumn property="assetTag" title="Asset Tag" params="${filterParams}"/>
 
-			<g:sortableColumn property="serialNumber" title="Serial #" />
+			<g:sortableColumn property="serialNumber" title="Serial #" params="${filterParams}"/>
 
 
 		</tr>
@@ -723,11 +725,15 @@
 		</g:each>
 	</tbody>
 </table>
-</div>
-<g:if test="${AssetEntity.findAll('from AssetEntity where project = '+projectId).size() > 15}">
-<div class="paginateButtons"><g:paginate total="${AssetEntity.findAll('from AssetEntity where project = '+projectId).size()}" /></div>
-</g:if>
 
+</div>
+
+<div class="paginateButtons"><g:paginate total="${AssetEntity.findAll('from AssetEntity where project = '+projectId).size()}" />
+<filterpane:filterButton textKey="fp.tag.filterButton.text" appliedTextKey="fp.tag.filterButton.appliedText" text="Filter Me" appliedText="Change Filter" />
+<filterpane:isNotFiltered>Pure and Unfiltered!</filterpane:isNotFiltered>
+<filterpane:isFiltered>Filter Applied!</filterpane:isFiltered>
+</div>
+<filterpane:filterPane domainBean="AssetEntity"  excludeProperties="sourceRackPosition,targetRackPosition,usize,railType,fiberCabinet,hbaPort,ipAddress,hinfo,kvmDevice,kvmPort,newOrOld,nicPort,powerPort,remoteMgmtPort,truck,priority,cart,shelf,dateCreated,project.name" />
 <div class="buttons"><g:form>
 	<span class="button"><input type="button"
 		value="New Asset Entity" class="create" onClick="createDialog()" /></span>

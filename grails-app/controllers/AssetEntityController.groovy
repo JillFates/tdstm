@@ -18,11 +18,30 @@ class AssetEntityController {
 	def stateEngineService
 	def workflowService
 	def userPreferenceService
+	def assetEntityInstanceList = []
 	def jdbcTemplate
+	 def filterService
     def index = {
 		redirect( action:list, params:params )
 	}
-
+	def filter = {
+		     
+	if(!params.max) params.max = 10
+	def project = Project.findById(getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ)
+	def assetEntityList = filterService.filter(params, AssetEntity)
+	assetEntityList.each{
+		if(it.project.id == project.id){
+			assetEntityInstanceList<<it
+		}
+		
+	}
+	try{
+		render( view:'list', model:[ assetEntityInstanceList:assetEntityInstanceList, filterParams: com.zeddware.grails.plugins.filterpane.FilterUtils.extractFilterParams(params), params:params ] )
+	} catch(Exception ex){
+		redirect( controller:"assetEntity", action:"list" )
+	}
+	
+	          }
     //upload , export
     /*
      * render import export form
@@ -69,6 +88,9 @@ class AssetEntityController {
     def assetExport = {
         render( view:"assetExport" )
     }
+
+
+
     /*
      * upload excel file into Asset table
      */
