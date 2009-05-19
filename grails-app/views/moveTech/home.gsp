@@ -40,7 +40,7 @@ dt {
 						</tr>
 					  </table>
 				</div>
-				<div id="mydiv" onclick="document.getElementById('mydiv').style.display = 'none';">						            
+				<div style="float:left; width:100%;" id="mydiv" onclick="document.getElementById('mydiv').style.display = 'none'">						            
 			   					<g:if test="${flash.message}">
 								<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
 								</g:if> 
