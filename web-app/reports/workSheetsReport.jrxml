@@ -157,7 +157,7 @@
 				<textElement textAlignment="Left"><font size="15" isBold="true"/></textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{teamName}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isStretchWithOverflow="true">
 				<reportElement x="105" y="85" width="250" height="26"/>
 				<textElement textAlignment="Left"><font size="15" isBold="true"/></textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{sourceTargetPos}]]></textFieldExpression>

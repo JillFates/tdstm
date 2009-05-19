@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<title>Transportation Asset List</title>
+<title>Transport Worksheets </title>
 <g:javascript library="prototype" />
 <script type="text/javascript">
     
@@ -18,7 +18,7 @@
 <body>
 
 <div class="body">
-<h1>Transportation Asset List</h1>
+<h1>Transport Worksheets </h1>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>

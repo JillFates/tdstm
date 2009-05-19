@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<title>Team Worksheets</title>
+<title>Move Team Worksheets </title>
 <g:javascript library="prototype" />
 <script type="text/javascript">
     
@@ -109,7 +109,7 @@
 <body>
 
 <div class="body">
-<h1>Team Worksheets</h1>
+<h1>Move Team Worksheets </h1>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
