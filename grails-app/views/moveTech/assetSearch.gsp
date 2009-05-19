@@ -6,62 +6,8 @@
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.move_tech_dialog.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
 	
-	<g:javascript library="prototype" />
-	<g:javascript library="jquery" />
-	
-	<jq:plugin name="ui.core" />
-	<jq:plugin name="ui.dialog" />
-
-	<script>
-	$(document).ready(function() {
-	$("#serverInfoDialog").dialog({ autoOpen: false })	       
-	})
-	</script>
-
     <script type="text/javascript">
-    
-        function serverInfo(e){             
-        var loc = document.assetSearchForm.location.value;
-        var location;
-        var room;
-        var rack;
-        var pos;     
-       
-        var asset = eval('(' + e.responseText + ')');
-        if(loc == 's'){
-        location = asset[0].item.sourceLocation
-        room = asset[0].item.sourceRoom
-        rack = asset[0].item.sourceRack
-        pos = asset[0].item.sourceRackPosition
-        }else{
-        location = asset[0].item.targetLocation
-        room = asset[0].item.targetRoom
-        rack = asset[0].item.targetRack
-        pos = asset[0].item.targetRackPosition
-        }     
-        var htmlBody = '<table ><thead></thead><tbody>'+
-		'<tr><td class="asset_details_block"><b>Asset Tag:</b>  '+asset[0].item.assetTag+'</td></tr>'+
-		'<tr><td class="asset_details_block"><b>Asset Name:</b>  '+asset[0].item.assetName+'</td></tr>'+
-		'<tr><td class="asset_details_block"><b>Current State:</b>  '+asset[0].state+'</td></tr>'+
-		'<tr><td class="asset_details_block"><b>Serial Number:</b>  '+asset[0].item.serialNumber+'</td></tr>'+
-		'<tr><td class="asset_details_block"><b>Model:</b>  '+asset[0].item.model+'</td></tr>'+
-		'<tr><td class="asset_details_block"><b>Location:</b>  '+location+'</td></tr>'+
-		'<tr><td class="asset_details_block"><b>Room:</b>  '+room+'</td></tr>'+
-		'<tr><td class="asset_details_block"><b>Rack/Position:</b>  '+rack+'/'+pos+'</td></tr>'+
-		'<tr><td class="asset_details_block"><b>PDU:</b>  '+asset[0].item.powerPort+'</td></tr>'+
-		'<tr><td class="asset_details_block"><b>NIC:</b>  '+asset[0].item.nicPort+'</td></tr>'+
-		'<tr><td class="asset_details_block"><b>HBA:</b>  '+asset[0].item.hbaPort+'</td></tr>'+
-		'</tbody></table>' 
-        var getDialogId = document.getElementById('serverInfoDialog')
-        getDialogId.innerHTML = htmlBody
-         $("#serverInfoDialog").dialog('option', 'width', 215)                     
-		 $("#serverInfoDialog").dialog('option', 'position', ['left','top']);
-         $('#serverInfoDialog').dialog('open');
-        }
         
         function validation(){      
         var enterNote = document.assetSearchForm.enterNote.value;           
@@ -111,8 +57,6 @@
     </script>    
 </head>
 <body>
-<div id="serverInfoDialog" title ="Server Info" onclick="$('#serverInfoDialog').dialog('close')">			
-</div>
 
 <div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody" style="width: 100%;">
@@ -140,14 +84,33 @@
 			<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
 			</g:if> 
 			</div>
-	<div style="background:url(${createLinkTo(dir:'images',file:'search.png')}) no-repeat top right;margin-right:10px" onclick="${remoteFunction(action:'getServerInfo', params:'\'assetId=\'+'+projMap.asset.id,onComplete: 'serverInfo(e)')}">
+	<div style="background:url(${createLinkTo(dir:'images',file:'search.png')}) no-repeat top right;margin-right:10px">
 			<g:if test="${projMap}">
-			<dl><dt>Asset Tag:</dt><dd> ${projMap?.asset?.assetTag}</dd>
-			<dt>Asset Name:</dt><dd> ${projMap?.asset?.assetName}</dd>
-			<dt>Model:</dt><dd> ${projMap?.asset?.model}</dd>
-			<dt>Rack/Pos:</dt><dd><g:if test="${location == 's'}">${projMap?.asset?.sourceRack}/${projMap?.asset?.sourceRackPosition}</g:if><g:else test="${location == 't'}">${projMap?.asset?.targetRack}/${projMap?.asset?.targetRackPosition}</g:else></dd>
-			</dl>	
+			<dl>
+			<dt>Asset Tag:</dt><dd>&nbsp;${projMap?.asset?.assetTag}</dd>
+			<dt>Asset Name:</dt><dd>&nbsp;${projMap?.asset?.assetName}</dd>
+			<dt>Model:</dt><dd>&nbsp;${projMap?.asset?.model}</dd>
+			<dt>Rack/Pos:</dt><dd>&nbsp;<g:if test="${location == 's'}">${projMap?.asset?.sourceRack}/${projMap?.asset?.sourceRackPosition}</g:if><g:else test="${location == 't'}">${projMap?.asset?.targetRack}/${projMap?.asset?.targetRackPosition}</g:else></dd>
+			<dt>New or Old:</dt><dd>&nbsp;${projMap?.asset?.newOrOld}</dd>
+			<dt>Rail Type:</dt><dd>&nbsp;${projMap?.asset?.railType}</dd>	
 			</g:if>
+			<g:if test="${location == 's'}">			   	
+			   	<dt>Location:</dt><dd>&nbsp;${projMap?.asset?.sourceLocation}</dd>
+			   	<dt>Room:</dt><dd>&nbsp;${projMap?.asset?.sourceRoom}</dd>  			   	
+			   	</dl>			   	
+			</g:if>
+			<g:else>				
+			   	<dt>Location:</dt><dd>&nbsp;${projMap?.asset?.targetLocation}</dd>
+			   	<dt>Room:</dt><dd>&nbsp;${projMap?.asset?.targetRoom}</dd> 			   	
+			   	<dt>Power Port:</dt><dd>&nbsp;${projMap?.asset?.powerPort}</dd>
+			   	<dt>NIC Port:</dt><dd>&nbsp;${projMap?.asset?.nicPort}</dd>
+			   	<dt>Remote Mgmt Port:</dt><dd>&nbsp;${projMap?.asset?.remoteMgmtPort}</dd>
+			   	<dt>Fiber Cabinet:</dt><dd>&nbsp;${projMap?.asset?.fiberCabinet}</dd>
+			   	<dt>HBA Port:</dt><dd>&nbsp;${projMap?.asset?.hbaPort}</dd>
+			   	<dt>KVM Device:</dt><dd>&nbsp;${projMap?.asset?.kvmDevice}</dd>
+			   	<dt>KVM Port:</dt><dd>&nbsp;${projMap?.asset?.kvmPort}</dd>			   	
+			   	</dl>
+			</g:else>
  	</div>	
 			<tr>
 			<td width="219px"><strong>Instructions</strong></td>

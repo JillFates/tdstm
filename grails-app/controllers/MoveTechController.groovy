@@ -63,6 +63,7 @@ class MoveTechController {
     	
         def moveBundleInstance
         def projectTeamInstance
+        if( params.username ) {
         def token = new StringTokenizer(params.username, "-")
         //Getting current project instance
         def projectInstance
@@ -78,6 +79,7 @@ class MoveTechController {
 	        	catch (Exception ex) {
 	        		flash.message = message(code :"Login Failed")
 	        		redirect(action: 'login')
+	        		return;
 	        	}
 	        	//checkin for movebundle and team instances
 	        	if( moveBundleInstance != null && projectTeamInstance != null && projectInstance != null ){
@@ -85,6 +87,7 @@ class MoveTechController {
 	        		if( new Date() < projectInstance.startDate || new Date() > projectInstance.completionDate ) {
 	        			flash.message = message(code :"Login Disabled")
 	        			redirect(action: 'login')
+	        			return;
 	        		}else {
 	        			def assetEntityInstance
 	        			if ( barcodeText.get(3) == 's') {
@@ -103,11 +106,13 @@ class MoveTechController {
 	        			}else {
 	        				flash.message = message(code :"Login Failed")
 	        				redirect(action: 'login')
+	        				return;
 	        			}
 	        		}
 	        	}else {
 	        		flash.message = message(code :"Login Failed")
 	        		redirect(action: 'login')
+	        		return;
 	        	}
             } else if( barcodeText.get(0) == "ct" ) {
 	         	try {         		
@@ -118,6 +123,7 @@ class MoveTechController {
 	        	catch (Exception ex) {
 	        		flash.message = message(code :"Login Failed")
 	        		redirect(action: 'login')
+	        		return;
 	        	}
 	        	//checkin for movebundle and team instances
 	        	if( moveBundleInstance != null && projectTeamInstance != null && projectInstance != null && projectTeamInstance.teamCode == "Cleaning"){
@@ -125,6 +131,7 @@ class MoveTechController {
 	        		if( new Date() < projectInstance.startDate || new Date() > projectInstance.completionDate ) {
 	        			flash.message = message(code :"Login Disabled")
 	        			redirect(action: 'login')
+	        			return;
 	        		}else {
 	        			def assetEntityInstance
 	        			if ( barcodeText.get(3) == 's' ) {
@@ -143,11 +150,13 @@ class MoveTechController {
 	        			}else {
 	        				flash.message = message(code :"Login Failed")
 	        				redirect(action: 'login', moveTech)
+	        				return;
 	        			}
 	        		}
 	        	}else {
 	        		flash.message = message(code :"Login Failed")
 	        		redirect(action: 'login')
+	        		return;
 	        	}      	 
 	        	 
 	        	 
@@ -155,10 +164,17 @@ class MoveTechController {
             } else {
                 flash.message = message(code :"Login Failed")
                 redirect(action: 'login')
+                return;
             }
         }else {
             flash.message = message(code :"Login Failed")
             redirect(action: 'login')
+            return;
+        }
+        } else {
+        	flash.message = message(code :"Login Failed")
+            redirect(action: 'login')
+            return;
         }
       } 
 		
@@ -172,6 +188,7 @@ class MoveTechController {
             this.jsecSecurityManager.login(authToken)
             // Check User and Person Activi status
             redirect(controller:'moveTech',params:actionScreen)
+            return;
         }
         catch (AuthenticationException ex){
             // Authentication failed, so display the appropriate message
@@ -190,6 +207,7 @@ class MoveTechController {
             }
             // Now redirect back to the login page.
             redirect(action: 'moveTechLogin', params: m)
+            return;
         }
     }
 	//SignOut
@@ -343,12 +361,19 @@ class MoveTechController {
         def taskSize
         def label
         def actionLabel
+        def checkHome = params.home
         if(search != null){
 			assetItem = AssetEntity.findByAssetTag(search)		
 		
 			if(assetItem == null){			
 				flash.message = message(code :"Asset Tag number '${search}' was not located")
-				redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+				if(checkHome){
+					redirect(action: 'index',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"user":"mt"])
+					return;
+				} else {
+					redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+					return;
+				}
 			}else{
 				def bundleName = assetItem.moveBundle.name
 				def teamId = (assetItem.sourceTeam.id).toString()				
@@ -356,16 +381,34 @@ class MoveTechController {
 			
                 if(bundleName != params.bundle){
                     flash.message = message(code :"The asset [${assetItem.assetName}] is not part of move bundle [${params.bundle}]")
-                    redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                    if(checkHome){
+    					redirect(action: 'index',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"user":"mt"])
+    					return;
+    				} else {
+    					redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+    					return;
+    				}
                 }else if(teamId != params.team){
                     flash.message = message(code :"The asset [${assetItem.assetName}] is assigned to team [${teamName}]")
-                    redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                    if(checkHome){
+    					redirect(action: 'index',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"user":"mt"])
+    					return;
+    				} else {
+    					redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+    					return;
+    				}
                 }else{
                     projMap = ProjectAssetMap.findByAsset(assetItem)
                     stateVal = stateEngineService.getState("STD_PROCESS",projMap.currentStateId)
                     if(stateVal == "Hold"){
                     	flash.message = message(code :"The asset is on Hold. Please contact manager to resolve issue.")
-                    	redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                    	if(checkHome){
+        					redirect(action: 'index',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"user":"mt"])
+        					return;
+        				} else {
+        					redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+        					return;
+        				}
                     }
                     taskList = stateEngineService.getTasks("STD_PROCESS","MOVE_TECH",stateVal)
                     taskSize = taskList.size()
@@ -392,8 +435,8 @@ class MoveTechController {
 	 } else {
 		 flash.message = "Your login has expired and must login again."
 	     redirect(action:'login')
+	     return;
 	 }
-
 	}
 	
     //  Method for place on hold action
@@ -536,7 +579,7 @@ class MoveTechController {
             }else if(it.currentStateId == ipState){
                 colorCss = "asset_ready"
             }else if((it.currentStateId > holdState) && (it.currentStateId < ipState) ){
-                colorCss = "sset_pending"
+                colorCss = "asset_pending"
             }else if((it.currentStateId >= rdyState)){
                 colorCss = "asset_done"
             }

@@ -25,7 +25,7 @@
 	<div
 		style="float: left; padding-left: 2px; width: 98%; margin-top: 25px;"><a
 		href="http://www.transitionaldata.com/" target="new"><img
-		src="${createLinkTo(dir:'images',file:'tds.jpg')}" border="0"
+		src="${createLinkTo(dir:'images',file:'tds_movetech.jpg')}" border="0"
 		alt="tds" /></a></div>
 
 	<div

@@ -26,13 +26,24 @@ dt {
 					<a href="#" style="height:21px; width:63px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Asset</a>
 				</div>		
 			<div class="w_techlog">
-				<g:form method="post" name="bundleTeamAssetForm">
+				<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">      					
+					        <input name="bundle" type="hidden" value="${bundle}" />
+							<input name="team" type="hidden" value="${team}" />
+							<input name="location" type="hidden" value="${location}" />
+							<input name="project" type="hidden" value="${project}" />
+							<input name="tab" type="hidden" value="Todo" />	
+							<input name="home" type="hidden" value="home" />									
 				<div style="float:left; width:100%; margin:5px 0; ">              								
 					<table style="border:0px;">
 						<tr><td><g:link controller="moveTech" action="signOut" style="color: #5b5e5c; border:1px solid #5b5e5c; margin:2px 5px 5px 5px; height:15px; padding:1px 2px 1px 3px; width:50px; background:#aaefb8; float:left;">Log out</g:link></td>
 							<td style="text-align:right;"><a href="#" style="color: #328714;"><input type="text" size="12" value="" name="search"/></a>&nbsp;<img	src="${createLinkTo(dir:'images',file:'search.png')}"/></td>
 						</tr>
 					  </table>
+				</div>
+				<div id="mydiv" onclick="document.getElementById('mydiv').style.display = 'none';">						            
+			   					<g:if test="${flash.message}">
+								<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
+								</g:if> 
 				</div>  
 				<div style="float:left; width:200px; margin:4px;">
 					<b>Currently Logged in as:</b>
