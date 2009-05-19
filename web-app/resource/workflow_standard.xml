@@ -487,9 +487,6 @@
 		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 		</task>
-	</taskNode>
-
-	<taskNode name="Reracked">
 		<task swimlane="MANAGER">
 			<transition to="Hold" flag="issue"/>
 			<transition to="QAVerified"/>
