@@ -375,9 +375,16 @@ class MoveTechController {
 					return;
 				}
 			}else{
+				def teamName
+				def teamId
 				def bundleName = assetItem.moveBundle.name
-				def teamId = (assetItem.sourceTeam.id).toString()				
-				def teamName = assetItem.sourceTeam.name
+				 if(params.location == "s"){
+					 teamId = (assetItem.sourceTeam.id).toString()				
+					 teamName = assetItem.sourceTeam.name
+					 }else{
+					 teamId = (assetItem.targetTeam.id).toString()				
+					 teamName = assetItem.targetTeam.name
+					 }
 			
                 if(bundleName != params.bundle){
                     flash.message = message(code :"The asset [${assetItem.assetName}] is not part of move bundle [${params.bundle}]")
@@ -572,7 +579,7 @@ class MoveTechController {
     				
             }else{
                 rdyState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Cleaned"))
-                ipState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Unracked"))
+                ipState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Staged"))
             }
             if(it.currentStateId == holdState){
                 colorCss = "asset_hold"
