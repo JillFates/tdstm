@@ -57,7 +57,7 @@ class AssetEntityController {
         }   	
     	
     	if ( projectId != null ) {
-    		 project = Project.findById(projectId)
+            project = Project.findById(projectId)
     		assetsByProject = AssetEntity.findAllByProject(project)
     	}
     	def	dataTransferBatchs = DataTransferBatch.findAllByProject(project).size()
@@ -464,14 +464,45 @@ class AssetEntityController {
 
     def delete = {
         def assetEntityInstance = AssetEntity.get( params.id )
+       
         def projectId = params.projectId
         if(assetEntityInstance) {
-            assetEntityInstance.delete()
-            flash.message = "AssetEntity ${assetEntityInstance.assetName} deleted"
+            ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${params.id}")
+            AssetTransition.executeUpdate("delete from AssetTransition ast where ast.assetEntity = ${params.id}")
+            AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity = ${params.id}")
+            ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset = ${params.id}")
+            AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar aev where aev.assetEntity = ${params.id}")
+            AssetEntity.executeUpdate("delete from AssetEntity ae where ae.id = ${params.id}")
+          
+            flash.message = "AssetEntity ${assetEntityInstance.assetName} deleted"         
+        }
+        else {
+            flash.message = "AssetEntity not found with id ${params.id}"          
+        }
+        if(params.moveBundle){
+         	redirect(action:dashboardView, params:[projectId:projectId,moveBundle : params.moveBundle])
+        }else{
             redirect(action:list, params:[projectId:projectId])
+        }
+    }
+    
+    // method for assets to remove from project
+    def remove = {
+        def assetEntityInstance = AssetEntity.get( params.id )
+        def projectId = params.projectId
+        if(assetEntityInstance) {
+            ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${params.id}")
+            	
+            AssetEntity.executeUpdate("update AssetEntity ae set ae.moveBundle = null , ae.project = null , ae.sourceTeam = null , ae.targetTeam = null where ae.id = ${params.id}")
+            flash.message = "AssetEntity ${assetEntityInstance.assetName} Removed from Project"
+                           
         }
         else {
             flash.message = "AssetEntity not found with id ${params.id}"
+        }
+        if(params.moveBundle){
+            redirect(action:dashboardView, params:[projectId:projectId,moveBundle : params.moveBundle])
+        }else{
             redirect(action:list, params:[projectId:projectId])
         }
     }
@@ -812,9 +843,9 @@ class AssetEntityController {
 	        def map = new HashMap()
 	        map.put("assetDetail",assetDetail)
 	        if(teamName){
-	        map.put("teamName",teamName.name)
+                map.put("teamName",teamName.name)
 	        }else{
-	        map.put("teamName","")
+                map.put("teamName","")
 	        }
 	        map.put("currentState",stateEngineService.getStateLabel("STD_PROCESS",currentState))
 	        map.put("state",state)
@@ -953,18 +984,18 @@ class AssetEntityController {
     	render assetList as JSON
     }
     def getStates(def state){
-    	 def stateIdList = []
-    	 def validStates 
-    	 if(state){
-    		 validStates = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR", state)
-    	 } else {
-    		 validStates = ["Ready"]
-    		 //stateEngineService.getTasks("STD_PROCESS","TASK_NAME")
-    	 }
-         validStates.each{
+        def stateIdList = []
+        def validStates
+        if(state){
+            validStates = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR", state)
+        } else {
+            validStates = ["Ready"]
+            //stateEngineService.getTasks("STD_PROCESS","TASK_NAME")
+        }
+        validStates.each{
 		 	stateIdList<<Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
-		 }
-		 return stateIdList
+        }
+        return stateIdList
     }
     def setTimePreference = {
     	def timer = params.timer
@@ -977,7 +1008,7 @@ class AssetEntityController {
     	render refreshTime as JSON
     }
     
-//  To get unique list of task for list of assets through ajax
+    //  To get unique list of task for list of assets through ajax
 	def getList = {
     		
         def assetArray = params.assetArray

@@ -764,7 +764,11 @@
 		type="button" class="edit" value="Edit"
 		onClick="return editAssetDialog()" /></span> <span class="button"><g:actionSubmit 
 		class="delete" onclick="return confirm('Are you sure?');"
-		value="Delete" /></span></div>
+		value="Delete" /></span>
+		<span class="button"><g:actionSubmit action="remove"
+		class="delete"  onclick="return confirm('Are you sure?');"
+		value="Remove From Project" /></span>
+		</div>
 </g:form></div>
 
 <div id="editDialog" title="Edit Asset Entity" style="display: none;">
@@ -778,7 +782,11 @@
 	<input type="button" class="save" value="Update Asset Entity" onClick="${remoteFunction(action:'getAssetAttributes', params:'\'assetId=\' + document.editForm.id.value ', onComplete:'callUpdateDialog(e)')}" />
 	</span> <span class="button"><g:actionSubmit 
 		class="delete" onclick="return confirm('Are you sure?');"
-		value="Delete" /></span></div>
+		value="Delete" /></span>
+		<span class="button"><g:actionSubmit action="remove"
+		class="delete"  onclick="return confirm('Are you sure?');"
+		value="Remove From Project" /></span>
+		</div>
 </g:form></div>
 
 <div id="commentsListDialog" title="Show Asset Comments" style="display: none;">

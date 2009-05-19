@@ -609,7 +609,11 @@ ${remoteFunction(action:'getList', params:'\'assetArray=\' + assetArr ', onCompl
 </table>
 </form>
 </div>
-<div class="body"><g:form method="get" name="dashboardForm"
+<div class="body">
+<g:if test="${flash.message}">
+	<div class="message">${flash.message}</div>
+</g:if>
+<g:form method="get" name="dashboardForm"
 	controller="assetEntity" action="dashboardView">
 	<input type="hidden" name="projectId" value="${projectId}">
 
@@ -1093,17 +1097,23 @@ Comment</a></span></div>
 	<div class="buttons">
 	<input type="hidden" name="id" value="" />
 	<input type="hidden" name="projectId" value="${projectId}" />
+	<input type="hidden" name="moveBundle" value="${moveBundleInstance.id}" />
 	 <span class="button"><input
 		type="button" class="edit" value="Edit"
 		onClick="return editAssetDialog()" /></span> <span class="button"><g:actionSubmit 
 		class="delete" onclick="return confirm('Are you sure?');"
-		value="Delete" /></span></div>
+		value="Delete" /></span>
+		<span class="button"><g:actionSubmit action="remove"
+		class="delete"  onclick="return confirm('Are you sure?');"
+		value="Remove From Project" /></span>
+		</div>
 </g:form></div>
 
 <div id="editDialog" title="Edit Asset Entity" style="display: none;">
 <g:form method="post" name="editForm">
 	<input type="hidden" name="id" value="" />
 	<input type="hidden" name="projectId" value="${projectId}" />
+	<input type="hidden" name="moveBundle" value="${moveBundleInstance.id}" />
 	<div class="dialog" id="editDiv">
 	
 	</div>
@@ -1111,7 +1121,11 @@ Comment</a></span></div>
 	<input type="button" class="save" value="Update Asset Entity" onClick="${remoteFunction(action:'getAssetAttributes', params:'\'assetId=\' + document.editForm.id.value ', onComplete:'callUpdateDialog(e)')}" />
 	</span> <span class="button"><g:actionSubmit 
 		class="delete" onclick="return confirm('Are you sure?');"
-		value="Delete" /></span></div>
+		value="Delete" /></span>
+		<span class="button"><g:actionSubmit action="remove"
+		class="delete"  onclick="return confirm('Are you sure?');"
+		value="Remove From Project" /></span>
+		</div>
 </g:form></div>
 <div id="editCommentDialog" title="Edit Asset Comment"
 	style="display: none;"><g:form action="updateComment"
