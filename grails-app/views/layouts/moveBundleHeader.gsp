@@ -94,18 +94,18 @@
                 	
         </li>  
         <li><g:link class="home" controller="moveBundle" params="[projectId:currProjObj?.id]">Move Bundles</g:link></li>
-        <li><g:link class="home" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id]">Dashboard</g:link></li>
+        <li><g:link class="home" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id]">Console</g:link></li>
         </jsec:lacksRole>
         <li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">PMO Dashboard</g:link> </li>
          <jsec:lacksRole in="['MANAGER','OBSERVER']">
         <li>  
           	<div id="menubar">
  			<div id="menu1" class="menu_new">Reports<ul>    
-    	      <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Team Worksheets']">Team Worksheets</g:link> </li>
-    	      <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Rack Layout']">Rack Layout</g:link></li>
-    	      <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'cart Asset']">cart Asset List</g:link></li>
-               <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Issue Report']">Issue Report</g:link></li>
-			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Transportation Asset List']">Transportation Asset List</g:link></li>
+    	      	<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Team Worksheets']">Move Team Worksheets</g:link> </li>
+			  	<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'cart Asset']">Cleaning Team Worksheets</g:link></li>
+    			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Transportation Asset List']">Transport Worksheets</g:link></li>
+               	<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Issue Report']">Issue Report</g:link></li>
+    	      	<!-- <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Rack Layout']">Rack Layout</g:link></li> -->
 			</jsec:lacksRole>
               </ul>
             </div>

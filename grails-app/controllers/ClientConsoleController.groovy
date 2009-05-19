@@ -28,9 +28,19 @@ class ClientConsoleController {
         def projectInstance = Project.findById( projectId )
         def moveBundleInstanceList = MoveBundle.findAll("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
         if(bundleId){
+        	userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
             moveBundleInstance = MoveBundle.findById(bundleId)
         } else {
-            moveBundleInstance = MoveBundle.findByProject(projectInstance)
+            userPreferenceService.loadPreferences("CURR_BUNDLE")
+            def defaultBundle = getSession().getAttribute("CURR_BUNDLE")
+            if(defaultBundle.CURR_BUNDLE){
+            	moveBundleInstance = MoveBundle.findById(defaultBundle.CURR_BUNDLE)
+            	if( moveBundleInstance.project.id != Integer.parseInt(projectId) ){
+            	moveBundleInstance = MoveBundle.findByProject(projectInstance)
+            	}
+            } else {
+            	moveBundleInstance = MoveBundle.findByProject(projectInstance)
+            }
         }
         def applicationList=AssetEntity.executeQuery("select distinct ae.application from AssetEntity ae where ae.application is not null and ae.project.id="+projectId)
         def appOwnerList=AssetEntity.executeQuery("select distinct ae.appOwner from AssetEntity ae where ae.appOwner is not null and ae.project.id="+projectId)

@@ -216,8 +216,8 @@
 					<tr>
 						<td valign="top" >
 						<g:form name="assignLeftAssetsForm">
-						<div class="scrollTable">  
-					       <table id="assetsLeftTableId">  
+						<div class="scrollTable" style="width: 100%;float: left;">  
+					       <table id="assetsLeftTableId" style="width: 100%;float: left; border: 0px">  
 					         <thead>  
 					           <tr>  
 					             <th nowrap>Asset Tag</th>  
@@ -251,8 +251,8 @@
 						</a></span></td>
 						<td valign="top" >
 						<g:form name="assignRightAssetsForm">
-						<div class="scrollTable">  
-					       <table id="assetsRightTableId">  
+						<div class="scrollTable" style="width: 100%;float: left;">  
+					       <table id="assetsRightTableId" style="width: 100%;float: left;border: 0px">  
 					         <thead>  
 					          <tr>  
 					             <th nowrap>Asset Tag</th>  

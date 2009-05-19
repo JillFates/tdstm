@@ -406,7 +406,6 @@ return true;
 		'<tr><td><b>Status: </b>'+asset[0].assetDetails.currentState+'</td></tr>'+
 		'<tr><td><b>Issue: </b></td></tr>'+
 		'<tr><td><b>Time: </b></td></tr>'+
-		'<tr><td><b>Assigned: </b>'+asset[0].assetDetails.teamName+'</td></tr>'+
 		'<tr><td><b>Recent Changes: </b></td></tr>'
 		for(i=0;i<asset[0].recentChanges.length; i++){
 			tableBody += '<tr><td>'+asset[0].recentChanges[i]+'</td></tr>'
@@ -928,9 +927,6 @@ ${remoteFunction(action:'getList', params:'\'assetArray=\' + assetArr ', onCompl
 						</tr>
 						<tr>
 							<td><b>Time: </b></td>
-						</tr>
-						<tr>
-							<td><b>Assigned: </b></td>
 						</tr>
 						<tr>
 							<td><b>Recent Changes: </b></td>

@@ -719,9 +719,19 @@ class AssetEntityController {
         def taskVal
         def check = true
         if(bundleId){
+        	userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
             moveBundleInstance = MoveBundle.findById(bundleId)
         } else {
-            moveBundleInstance = MoveBundle.findByProject(projectInstance)
+            userPreferenceService.loadPreferences("CURR_BUNDLE")
+            def defaultBundle = getSession().getAttribute("CURR_BUNDLE")
+            if(defaultBundle.CURR_BUNDLE){
+            	moveBundleInstance = MoveBundle.findById(defaultBundle.CURR_BUNDLE)
+            	if( moveBundleInstance.project.id != Integer.parseInt(projectId) ){
+            	moveBundleInstance = MoveBundle.findByProject(projectInstance)
+            	}
+            } else {
+            	moveBundleInstance = MoveBundle.findByProject(projectInstance)
+            }
         }
         def orderDesc = params.order;
         if(params.sort == "team"){
