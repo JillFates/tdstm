@@ -23,7 +23,7 @@
 	        $("#dialog").dialog({ autoOpen: false })	        
 	      })
    </script>
-    
+   
     <script type="text/javascript">
       
       function editProject(){
@@ -150,11 +150,7 @@
    
     <div class="body">
     <h1>Show Project</h1>
-        <div>   	
-    	<jsec:hasRole name="ADMIN">
-          <span><g:link  action="deleteImage" params='["id":projectInstance?.id]'>Delete Image&nbsp;<img src="${createLinkTo(dir:'images',file:'database_delete.png' )}" style="border:0px;"/></g:link></span>
-        </jsec:hasRole>    	
-    </div>
+        
     <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
       <span class="menuButton"><g:link class="list" action="list">Project List</g:link></span>
       <jsec:hasRole name="ADMIN">
@@ -226,6 +222,13 @@
             <td valign="top" class="value">${projectPartner?.partyIdTo}</td>
 
           </tr>
+          
+          <tr class="prop">
+            <td valign="top" class="name">Partner Image:</td>
+			<g:if test="${projectLogoForProject}">
+            <td valign="top" class="value"><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;"/></td>
+			</g:if>
+          </tr>
 
           <tr class="prop">
             <td valign="top" class="name">Project Manager:</td>
@@ -274,14 +277,7 @@
         <input type="hidden" name="id" value="${projectInstance?.id}" />
         <div class="dialog">
           <table>
-            <tbody>
-               <tr class="prop">
-				<td valign="top" class="name"><label for="client">Partner Image:</label>
-				</td>
-				<td valign="top" class="value">
-				<input type="file" name="partnerImage" id="partnerImage"/>
-				</td>
-			  </tr>
+            <tbody>               
 			
               <tr class="prop">
                 <td valign="top" class="name">
@@ -357,6 +353,19 @@ class="value ${hasErrors(bean:projectInstance,field:'completionDate','errors')}"
                     </g:each>
                 </select></td>
               </tr>
+              
+              <tr class="prop">
+				<td valign="top" class="name"><label for="client">Partner Image:</label>
+				</td>
+				<g:if test="${projectLogoForProject}">
+				<td valign="top" class="value"><g:link  action="deleteImage" params='["id":projectInstance?.id]'><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;border:0px;"/><img src="${createLinkTo(dir:'images',file:'delete.png' )}" style="border:0px;padding:6px;"/></g:link></td>
+				</g:if>
+				<g:else>				
+				<td valign="top" class="value">
+				<input type="file" name="partnerImage" id="partnerImage"/>
+				</td>				
+				</g:else>
+			  </tr>
 
               <tr class="prop">
                 <td valign="top" class="name"><label for="projectManager">Project

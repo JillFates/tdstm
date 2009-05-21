@@ -23,12 +23,15 @@ class ProjectController {
             flash.message = "Project not found with id ${params.id}"
             redirect( action:list )
         } else { 
-        	def projectLogo = ProjectLogo.findByProject(projectInstance)
+        	def currProj = session.getAttribute("CURR_PROJ");
+        	def currProjectInstance = Project.get( currProj.CURR_PROJ )
+        	def projectLogo = ProjectLogo.findByProject(currProjectInstance)
         	def imageId
         	if(projectLogo){
         		imageId = projectLogo.id
         	}
-        	session.setAttribute("setImage",imageId)        	
+        	session.setAttribute("setImage",imageId) 
+        	def projectLogoForProject = ProjectLogo.findByProject(projectInstance)
         	def partnerStaff
         	def projectCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_COMPANY' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'COMPANY' ")
         	//def projectClient = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_CLIENT' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'CLIENT' ")
@@ -43,7 +46,7 @@ class ProjectController {
         	}
         	clientStaff.each{staff->
         	}
-        	return [ projectInstance : projectInstance, projectPartner:projectPartner, projectManager:projectManager, moveManager:moveManager, companyStaff:companyStaff, clientStaff:clientStaff, partnerStaff:partnerStaff, companyPartners:companyPartners ]
+        	return [ projectInstance : projectInstance, projectPartner:projectPartner, projectManager:projectManager, moveManager:moveManager, companyStaff:companyStaff, clientStaff:clientStaff, partnerStaff:partnerStaff, companyPartners:companyPartners,projectLogoForProject:projectLogoForProject ]
         }
     }
 
@@ -77,6 +80,7 @@ class ProjectController {
     def update = {
         def projectInstance = Project.get( params.id )
         projectInstance.lastUpdated = new Date()
+        
         if( projectInstance ) {
             projectInstance.properties = params
             def startDate = params.startDate
@@ -88,40 +92,62 @@ class ProjectController {
             }
            //Get the Partner Image file from the multi-part request
             def file = request.getFile('partnerImage')
+            def image            
             // List of OK mime-types
-            def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
-			if(file.getContentType() != "application/octet-stream"){
-	        	if (! okcontents.contains(file.getContentType())) {
-	        		flash.message = "Image must be one of: ${okcontents}"
-	        		redirect(action:'show',id:projectInstance.id )
-	        		return;
+            if( file ) {
+	            def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
+				if(file.getContentType() != "application/octet-stream"){
+					if(params.projectPartner == ""){
+		           		flash.message = " Please select Associated Partner to upload Image. "
+				        redirect(action:'show',id:projectInstance.id )
+				        return;
+		           	} else if (! okcontents.contains(file.getContentType())) {
+		        		flash.message = "Image must be one of: ${okcontents}"
+		        		redirect(action:'show',id:projectInstance.id )
+		        		return;
+		        	}
 	        	}
-        	}
+	            
+	          //save image
+	            /*def imageInstance = ProjectLogo.findByProject(projectInstance)
+	            
+	            if(imageInstance){
+	            	imageInstance.delete()
+	            }*/
+	            
+	            image = ProjectLogo.fromUpload(file)           
+	            image.project = projectInstance
+	            def party
+	            def partnerImage = params.projectPartner
+	            if ( partnerImage != null && partnerImage != "" ) {
+	                party = Party.findById(partnerImage)
+	            }
+	            image.party = party
+	            
+	            def imageSize = image.getSize()
+	            if( imageSize > 50000 ) {
+	            	flash.message = " Image size is too large. Please select proper Image"
+	            	redirect(action:'show',id:projectInstance.id )
+	    	    	return;
+	            }
+	            if(file.getContentType() == "application/octet-stream"){
+	            	//Nonthing to perform.
+	            } else if(params.projectPartner){
+               		if(!image.save()){
+               			flash.message = " Image Upload Error."
+               			redirect(action:'show',id:projectInstance.id )
+               			return;
+               		}
+	            }
+            }else {
+            	image = ProjectLogo.findByProject(projectInstance)
+            	if(!params.projectPartner){
+               	 image.delete()
+            	}
+            }
+           
             
-          //save image
-            def imageInstance = ProjectLogo.findByProject(projectInstance)
-            if(file){
-            if(imageInstance){
-            	imageInstance.delete()
-            }
-            }
-            def image = ProjectLogo.fromUpload(file)           
-            image.project = projectInstance
-            def party
-            def partnerImage = params.projectPartner
-            if ( partnerImage != null && partnerImage != "" ) {
-                party = Party.findById(partnerImage)
-            }
-            image.party = party
-            
-            def imageSize = image.getSize()
-            if( imageSize > 50000 ) {
-            	flash.message = " Image size is too large. Please select proper Image"
-            	redirect(action:'show',id:projectInstance.id )
-    	    	return;
-            }
-            
-            if( !projectInstance.hasErrors() && projectInstance.save() && image.save() ) {
+            if( !projectInstance.hasErrors() && projectInstance.save() ) {
             	
             	def partnerId = params.projectPartner
             	def projectManagerId = params.projectManager
@@ -288,18 +314,22 @@ class ProjectController {
         
         //Get the Partner Image file from the multi-part request
         def file = request.getFile('partnerImage')
-        
+        def image      
         // List of OK mime-types
         def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
         if(file.getContentType() != "application/octet-stream"){
-	    	if (! okcontents.contains(file.getContentType())) {
+        	if(params.projectPartner == ""){
+           		flash.message = " Please select Associated Partner to upload Image. "
+		        redirect(action:'create' )
+		        return;
+        	} else if (! okcontents.contains(file.getContentType())) {
 	    		flash.message = "Image must be one of: ${okcontents}"
 	    		redirect(action:'create')
 	    		return;
 	    	}        
         }
       //save image
-        def image = ProjectLogo.fromUpload(file)           
+        image = ProjectLogo.fromUpload(file)           
         image.project = projectInstance
         def party
         def partnerImage = params.projectPartner
@@ -312,10 +342,14 @@ class ProjectController {
         	flash.message = " Image size is too large. Please select proper Image"
 	    	redirect(action:'create')
 	    	return;
-        }
+        }       
 
-        if ( !projectInstance.hasErrors() && projectInstance.save() && image.save() ) {
-        	
+        if ( !projectInstance.hasErrors() && projectInstance.save() ) {
+        	if(file.getContentType() == "application/octet-stream"){
+        		//Nonthing to perform.
+        	} else if(params.projectPartner){
+        		image.save()
+        	}
         	//def client = params.projectClient
         	def partner = params.projectPartner
         	def projectManager = params.projectManager
@@ -447,14 +481,17 @@ class ProjectController {
     }
     
     def showImage = {
-    		 
-    		def projectLogo = ProjectLogo.findById( params.id )
-     		def image = projectLogo.partnerImage?.binaryStream
-     		response.outputStream << image
+    		if( params.id ) {
+	    		def projectLogo = ProjectLogo.findById( params.id )
+	     		def image = projectLogo.partnerImage?.binaryStream
+	     		response.outputStream << image
+    		} else {
+    			return;
+    		}
      }
     
-    def deleteImage = {
-    		 def projectInstance = Project.get( params.id )
+    def deleteImage = {    		 
+         	 def projectInstance = Project.get( params.id )
     		 def imageInstance = ProjectLogo.findByProject(projectInstance)
     		 if(imageInstance){
     			 flash.message = "Image deleted"

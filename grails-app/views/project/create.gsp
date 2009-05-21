@@ -215,14 +215,7 @@
 </g:if> <g:form action="save" method="post" name="createProjectForm" enctype="multipart/form-data">
 	<div class="dialog">
 	<table>
-		<tbody>
-			<tr class="prop">
-				<td valign="top" class="name"><label for="client">Partner Image:</label>
-				</td>
-				<td valign="top" class="value">
-				<input type="file" name="partnerImage" id="partnerImage" />
-				</td>
-			</tr>
+		<tbody>		
 		
 			<tr class="prop">
 				<td valign="top" class="name"><label for="client">Client:</label>
@@ -340,6 +333,14 @@
 						<option value="${partners.partyIdTo.id}">${partners.partyIdTo}</option>
 					</g:each>
 				</select></td>
+			</tr>
+			
+			<tr class="prop">
+				<td valign="top" class="name"><label for="client">Partner Image:</label>
+				</td>
+				<td valign="top" class="value">
+				<input type="file" name="partnerImage" id="partnerImage" />
+				</td>
 			</tr>
 
 			<tr class="prop">
