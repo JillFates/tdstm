@@ -20,28 +20,27 @@ class AssetEntityController {
 	def userPreferenceService
 	def assetEntityInstanceList = []
 	def jdbcTemplate
-	 def filterService
+    def filterService
     def index = {
 		redirect( action:list, params:params )
 	}
+	// Will return filters data to AssetEntity list page
 	def filter = {
-		     
-	if(!params.max) params.max = 10
-	def project = Project.findById(getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ)
-	def assetEntityList = filterService.filter(params, AssetEntity)
-	assetEntityList.each{
-		if(it.project.id == project.id){
-			assetEntityInstanceList<<it
-		}
-		
-	}
-	try{
-		render( view:'list', model:[ assetEntityInstanceList:assetEntityInstanceList, filterParams: com.zeddware.grails.plugins.filterpane.FilterUtils.extractFilterParams(params), params:params ] )
-	} catch(Exception ex){
-		redirect( controller:"assetEntity", action:"list" )
-	}
-	
-	          }
+        if(!params.max) params.max = 15
+        def project = Project.findById(getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ)
+        def assetEntityList = filterService.filter(params, AssetEntity)
+        assetEntityList.each{
+            if(it.project.id == project.id){
+                assetEntityInstanceList<<it
+            }
+        }
+        try{
+            render( view:'list', model:[ assetEntityInstanceList:assetEntityInstanceList,assetEntityCount:filterService.count( params, AssetEntity ), filterParams: com.zeddware.grails.plugins.filterpane.FilterUtils.extractFilterParams(params), params:params, projectId:project.id ] )
+        } catch(Exception ex){
+            redirect( controller:"assetEntity", action:"list" )
+        }
+			
+    }
     //upload , export
     /*
      * render import export form
@@ -749,7 +748,7 @@ class AssetEntityController {
             if(defaultBundle.CURR_BUNDLE){
             	moveBundleInstance = MoveBundle.findById(defaultBundle.CURR_BUNDLE)
             	if( moveBundleInstance.project.id != Integer.parseInt(projectId) ){
-            	moveBundleInstance = MoveBundle.findByProject(projectInstance)
+                    moveBundleInstance = MoveBundle.findByProject(projectInstance)
             	}
             } else {
             	moveBundleInstance = MoveBundle.findByProject(projectInstance)

@@ -728,7 +728,7 @@
 
 </div>
 
-<div class="paginateButtons"><g:paginate total="${AssetEntity.findAll('from AssetEntity where project = '+projectId).size()}" />
+<div class="paginateButtons"><g:paginate total="${assetEntityCount == null ? AssetEntity.findAll('from AssetEntity where project = '+projectId).size() :  assetEntityCount }" params="${filterParams}"/>
 <filterpane:filterButton textKey="fp.tag.filterButton.text" appliedTextKey="fp.tag.filterButton.appliedText" text="Filter Me" appliedText="Change Filter" />
 <filterpane:isNotFiltered>Pure and Unfiltered!</filterpane:isNotFiltered>
 <filterpane:isFiltered>Filter Applied!</filterpane:isFiltered>

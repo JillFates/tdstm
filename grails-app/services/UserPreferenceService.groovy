@@ -34,7 +34,7 @@ class UserPreferenceService  {
      */
    
     def String getPreference( String preferenceCode ) {
-
+    	loadPreferences(preferenceCode)
     	def currProj = getSession().getAttribute( preferenceCode )
     	def prefValue
     	if ( currProj != null ) {

@@ -3,6 +3,7 @@ import org.jsecurity.SecurityUtils
 class MoveBundleAssetController {
 	def partyRelationshipService
 	def assetEntityAttributeLoaderService
+	def userPreferenceService
     
     def index = { redirect(action:list,params:params) }
 
@@ -139,8 +140,16 @@ class MoveBundleAssetController {
      */
     def bundleTeamAssignment = {
     	if(!params.max) params.max = 10
-    	def bundleId = params.bundleId
+    	
+    	def bundleId = params.moveBundle
+    	if( bundleId ){
+    		userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
+    	} else {
+    		bundleId = getSession().getAttribute("CURR_BUNDLE").CURR_BUNDLE
+    	}
     	def bundleInstance = MoveBundle.findById(bundleId)
+    	/*def moveBundleList = MoveBundle.findAllByProject(bundleInstance.project)
+    	println"http://jira.tdsops.com:8080/browse/TM-138------------------------------>"+moveBundleList.name*/
     	def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.teamCode != 'Cleaning' " )
     	def teamAssetCounts = []
     	def cartAssetCounts

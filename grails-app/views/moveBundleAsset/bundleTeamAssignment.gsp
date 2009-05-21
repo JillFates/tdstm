@@ -334,6 +334,10 @@
 			 }     
 		}
 	 }
+	 function submitForm(){	
+	 	document.bundleTeamAssetForm.action = "bundleTeamAssignment";
+	 	document.bundleTeamAssetForm.submit();
+	 }
 
     </script>
 
@@ -355,7 +359,9 @@
             <tbody>
               <tr>
               &nbsp;<td valign="top" class="name">
-                <label for="Name"><b> ${moveBundleInstance?.name}</b></label>
+                <label for="Name">
+                <g:select optionKey="id" from="${MoveBundle.findAll('from MoveBundle where project = '+moveBundleInstance.project.id)}" name="moveBundle" value="${moveBundleInstance.id}" onChange="submitForm()" />
+                </label>
               </td>
               <td style="width:250px; float:left;">
               	<table style="width:250px; float:left;">

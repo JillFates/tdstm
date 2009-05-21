@@ -1,6 +1,7 @@
 import java.text.SimpleDateFormat 
 class MoveBundleController {
     def partyRelationshipService
+    def userPreferenceService
     def index = { redirect(action:list,params:params) }
 
     // the delete, save and update actions only accept POST requests
@@ -26,7 +27,8 @@ class MoveBundleController {
             flash.message = "MoveBundle not found with id ${params.id}"
             redirect(action:list)
         }
-        else { 
+        else {
+        	userPreferenceService.setPreference( "CURR_BUNDLE", "${moveBundleInstance.id}" )
             def projectManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "PROJ_MGR" ) 
             //PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'PROJ_MGR' ")
         	def moveManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "MOVE_MGR" ) 

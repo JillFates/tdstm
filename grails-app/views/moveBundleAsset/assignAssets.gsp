@@ -195,7 +195,7 @@
 				<table style="border: none;">
 				<g:form name="bundlesForm">
 					<tr>
-						<td valign="top" >
+						<td valign="top" >Move Bundle:
 						<select name="bundleLeft" id="bundleLeftId" onchange="${remoteFunction(action:'getBundleAssets', params:'\'bundleId=\'+ this.value', onComplete:'showAssetsLeft(e)')}" >
 							<option value="">Unassigned</option>
 							<g:each in="${moveBundles}" var="moveBundle">
@@ -204,7 +204,7 @@
 						</select>
 						</td>
 						<td valign="top" ><label>&nbsp;</label></td>
-						<td valign="top" >
+						<td valign="top" >Move Bundle:
 						<select name="bundleRight" id="bundleRightId" onchange="${remoteFunction(action:'getBundleAssets', params:'\'bundleId=\'+ this.value', onComplete:'showAssetsRight(e)')}" >
 							<g:each in="${moveBundles}" var="moveBundle">
 			                	<option value="${moveBundle.id}">${moveBundle}</option>
