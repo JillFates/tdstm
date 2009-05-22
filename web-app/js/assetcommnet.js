@@ -42,7 +42,7 @@
 					      link.href = '#'
 					      link.id = 'link_'+commentObj.commentInstance.id
 					      link.name = commentObj.commentInstance.id
-					      link.onclick = function(){new Ajax.Request('showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );}})} //;return false
+					      link.onclick = function(){new Ajax.Request('showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );commentChange('editResolveDiv','editCommentForm');}})} //;return false
 					      var commentText = document.createTextNode(truncate(commentObj.commentInstance.comment));
 					      var typeText = document.createTextNode(commentObj.commentInstance.commentType);
 					      var verifyText = document.createElement('input')
@@ -76,21 +76,45 @@
       			$("#createCommentDialog").dialog("close")
       		var assetComments = eval('(' + e.responseText + ')');
       			if (assetComments) {
-      				 document.getElementById("commentId").value = assetComments.id
-			      	 document.getElementById("commentTdId").innerHTML = assetComments.comment
-			      	 document.getElementById("commentTypeTdId").innerHTML = assetComments.commentType
-			      	 document.getElementById("mustVerifyEdit").value = assetComments.mustVerify
-			      	 if(assetComments.mustVerify != 0){
+      				 document.getElementById("commentId").value = assetComments[0].assetComment.id
+			      	 document.getElementById("commentTdId").value = assetComments[0].assetComment.comment
+			      	 document.getElementById("commentTypeTdId").innerHTML = assetComments[0].assetComment.commentType
+			      	 document.getElementById("mustVerifyEdit").value = assetComments[0].assetComment.mustVerify
+			      	 document.getElementById("isResolved").value = assetComments[0].assetComment.isResolved
+			      	 if(assetComments[0].assetComment.mustVerify != 0){
 			      	 document.getElementById("mustVerifyShowId").checked = true
 			      	 document.editCommentForm.mustVerify.checked = true
 			      	 } else {
 			      	 document.getElementById("mustVerifyShowId").checked = false
 			      	 document.editCommentForm.mustVerify.checked = false
 			      	 }
-			      	 document.editCommentForm.comment.value = assetComments.comment
-			      	 document.editCommentForm.commentType.value = assetComments.commentType
-			      	 document.editCommentForm.mustVerify.value = assetComments.mustVerify
-			      	 document.editCommentForm.id.value = assetComments.id
+			      	 if(assetComments[0].assetComment.isResolved != 0){
+			      	 document.getElementById("isResolvedId").checked = true
+			      	 document.editCommentForm.isResolved.checked = true
+			      	 } else {
+			      	 document.getElementById("isResolvedId").checked = false
+			      	 document.editCommentForm.isResolved.checked = false
+			      	 }
+			      	 document.getElementById("dateResolvedId").innerHTML = assetComments[0].assetComment.dateResolved
+			      	 document.getElementById("dateResolvedEditId").innerHTML = assetComments[0].assetComment.dateResolved
+			      	 document.getElementById("dateCreatedId").innerHTML = assetComments[0].assetComment.dateCreated
+			      	 document.getElementById("dateCreatedEditId").innerHTML = assetComments[0].assetComment.dateCreated
+			      	 if(assetComments[0].personResolvedObj != null){
+			      	 document.getElementById("resolvedById").innerHTML = assetComments[0].personResolvedObj.firstName+" "+assetComments[0].personResolvedObj.lastName
+			      	 document.getElementById("resolvedByEditId").innerHTML = assetComments[0].personResolvedObj.firstName+" "+assetComments[0].personResolvedObj.lastName
+			      	 
+			      	 }
+			      	 if(assetComments[0].personCreateObj != null){
+			      	 document.getElementById("createdById").innerHTML = assetComments[0].personCreateObj.firstName+" "+assetComments[0].personCreateObj.lastName
+			      	 document.getElementById("createdByEditId").innerHTML = assetComments[0].personCreateObj.firstName+" "+assetComments[0].personCreateObj.lastName
+			      	 }
+			      	 document.getElementById("resolutionId").value = assetComments[0].assetComment.resolution
+			      	 document.editCommentForm.resolution.value = assetComments[0].assetComment.resolution
+			      	 document.editCommentForm.comment.value = assetComments[0].assetComment.comment
+			      	 document.editCommentForm.commentType.value = assetComments[0].assetComment.commentType
+			      	 document.editCommentForm.mustVerify.value = assetComments[0].assetComment.mustVerify
+			      	 document.editCommentForm.isResolved.value = assetComments[0].assetComment.isResolved
+			      	 document.editCommentForm.id.value = assetComments[0].assetComment.id
 			      	 if(action == 'edit'){
 				      	$("#editCommentDialog").dialog('option', 'width', 700)
 				      	$("#editCommentDialog").dialog("open")
@@ -135,7 +159,7 @@
 						  var link = document.createElement('a');
 						  link.href = '#'
 						  link.id = 'link_'+assetComments.id
-						  link.onclick = function(){new Ajax.Request('showComment?id='+assetComments.id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );}})} //;return false
+						  link.onclick = function(){new Ajax.Request('showComment?id='+assetComments.id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );commentChange('editResolveDiv','editCommentForm');}})} //;return false
 					      var commentText = document.createTextNode(truncate(assetComments.comment));
 					      var typeText = document.createTextNode(assetComments.commentType);
 					      var verifyText = document.createElement('input')
@@ -192,3 +216,19 @@
       			return trunc;
       		}
       		
+  	function commentChange(resolveDiv,formName) {
+		var type = 	document.forms[formName].commentType.value;
+		if(type == "issue"){
+			document.getElementById(resolveDiv).style.display = 'block' ;
+			document.forms[formName].mustVerify.checked = false;
+		}else if(type == "instruction"){
+			document.forms[formName].mustVerify.checked = true;
+			document.getElementById(resolveDiv).style.display = 'none' ;
+		}else{
+			document.forms[formName].mustVerify.checked = false;
+			document.getElementById(resolveDiv).style.display = 'none' ;
+		}
+	}
+
+
+		

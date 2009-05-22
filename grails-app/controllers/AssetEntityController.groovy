@@ -682,6 +682,14 @@ class AssetEntityController {
     def saveComment = {
     	def assetComments = []
     	def assetCommentInstance = new AssetComment(params)
+	    def principal = SecurityUtils.subject.principal	 
+	    def loginUser = UserLogin.findByUsername(principal)  
+        assetCommentInstance.createdBy = loginUser.person
+        if(params.isResolved == '1'){
+            assetCommentInstance.resolvedBy = loginUser.person
+            assetCommentInstance.dateResolved = new Date()
+        }
+    		 
     	if(!assetCommentInstance.hasErrors() && assetCommentInstance.save()) {
     		render assetCommentInstance as JSON
         } else {
@@ -692,8 +700,18 @@ class AssetEntityController {
      *  return the commet record
      */
     def showComment = {
+        def commentList = []
+        def personResolvedObj
+        def personCreateObj
         def assetComment = AssetComment.get(params.id)
-        render assetComment as JSON
+        if(assetComment.createdBy){
+            personCreateObj = Person.find("from Person p where p.id = $assetComment.createdBy.id")
+        }
+        if(assetComment.resolvedBy){
+            personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")
+        }
+        commentList<<[assetComment:assetComment,personCreateObj:personCreateObj,personResolvedObj:personResolvedObj]
+        render commentList as JSON
     }
     /*
      *  update comments
@@ -701,6 +719,13 @@ class AssetEntityController {
     def updateComment = {
     	def assetCommentInstance = AssetComment.get(params.id)
     	assetCommentInstance.properties = params
+        def principal = SecurityUtils.subject.principal
+  	    def loginUser = UserLogin.findByUsername(principal)  
+  	 
+        if(params.isResolved == '1'){
+            assetCommentInstance.resolvedBy = loginUser.person
+            assetCommentInstance.dateResolved = new Date()
+        }
     	if(!assetCommentInstance.hasErrors()) {
     		assetCommentInstance.save()
         }

@@ -540,40 +540,59 @@ return true;
 	
 var isFirst = true;
 function selectAll(){
-timedRefresh('never')
-var totalCheck = document.getElementsByName('checkChange');
-if(isFirst){
-for(i=0;i<totalCheck.length;i++){
-totalCheck[i].checked = true;
-}
-isFirst = false;
-}else{
-for(i=0;i<totalCheck.length;i++){
-totalCheck[i].checked = false;
-}
-isFirst = true;
-}
+	timedRefresh('never')
+	var totalCheck = document.getElementsByName('checkChange');
+	if(isFirst){
+	for(i=0;i<totalCheck.length;i++){
+	totalCheck[i].checked = true;
+	}
+	isFirst = false;
+	}else{
+	for(i=0;i<totalCheck.length;i++){
+	totalCheck[i].checked = false;
+	}
+	isFirst = true;
+	}
 }
 function changeState(){
-timedRefresh('never')
-var assetArr = new Array();
-var totalAsset = ${assetsList?.asset.id};
-var j=0;
-for(i=0; i< totalAsset.size() ; i++){
-if(document.getElementById('checkId_'+totalAsset[i]) != null){
-var booCheck = document.getElementById('checkId_'+totalAsset[i]).checked;
-if(booCheck == true){
-assetArr[j] = totalAsset[i];
-j++;
-}
-}
-}
-if(j == 0){
-alert('Please select the Asset');
-}else{
-${remoteFunction(action:'getList', params:'\'assetArray=\' + assetArr ', onComplete:'showChangeStatusDialog(e);' )}
-}
+	timedRefresh('never')
+	var assetArr = new Array();
+	var totalAsset = ${assetsList?.asset.id};
+	var j=0;
+	for(i=0; i< totalAsset.size() ; i++){
+	if(document.getElementById('checkId_'+totalAsset[i]) != null){
+	var booCheck = document.getElementById('checkId_'+totalAsset[i]).checked;
+	if(booCheck == true){
+	assetArr[j] = totalAsset[i];
+	j++;
+	}
+	}
+	}
+	if(j == 0){
+	alert('Please select the Asset');
+	}else{
+	${remoteFunction(action:'getList', params:'\'assetArray=\' + assetArr ', onComplete:'showChangeStatusDialog(e);' )}
+	}
 }	
+function resolveValidate(formName,idVal){
+	var type = 	document.forms[formName].commentType.value;
+	if(type != "issue"){
+		document.forms[formName].isResolved.value = 0;
+	}
+	var resolveBoo = document.forms[formName].isResolved.checked;
+	var resolveVal = document.forms[formName].resolution.value;
+	if(resolveBoo){
+		if(resolveVal != ""){
+			${remoteFunction(action:'saveComment', params:'\'assetEntity.id=\' + document.getElementById(idVal).value +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'addCommentsToList(e)')}
+		}else{
+			alert('Please enter resolution');
+			return false;
+		}
+	}else{
+		${remoteFunction(action:'saveComment', params:'\'assetEntity.id=\' + document.getElementById(idVal).value +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'addCommentsToList(e)')}
+	}
+}
+
     </script>
 </head>
 
@@ -1019,37 +1038,62 @@ Comment</a></span></div>
 	id="createAssetCommentId" value=""> <input type="hidden"
 	name="status" id="statusId" value=""> <g:form
 	action="saveComment" method="post" name="createCommentForm">
-	<div class="dialog">
-	<table id="createCommentTable">
-		<tbody>
+	
+	<div class="dialog" style="border: 1px solid #5F9FCF">
+	<div>
+	<table id="createCommentTable" style="border: 0px">
+		
+			<tr class="prop" >
+				<td valign="top" class="name"><label for="commentType">Comment
+				Type:</label></td>
+				<td valign="top" style="width: 20px;" ><g:select id="commentType"
+					name="commentType"
+					from="${AssetComment.constraints.commentType.inList}" value=""
+					noSelection="['':'please select']" onChange="commentChange('createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
+				
+				<input type="checkbox"
+					id="mustVerifyEdit" name="mustVerify" value="0"
+					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
+					<label for="mustVerify">Must
+				Verify</label>
+				</td>
+			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="comment">Comment:</label>
 				</td>
 				<td valign="top" class="value"><textarea cols="80" rows="5"
 					id="comment" name="comment"></textarea></td>
 			</tr>
-			<tr class="prop">
-				<td valign="top" class="name"><label for="commentType">Comment
-				Type:</label></td>
-				<td valign="top" class="value"><g:select id="commentType"
-					name="commentType"
-					from="${AssetComment.constraints.commentType.inList}" value=""
-					noSelection="['':'please select']"></g:select></td>
-			</tr>
-			<tr class="prop">
-				<td valign="top" class="name"><label for="mustVerify">Must
-				Verify:</label></td>
-				<td valign="top" class="value"><input type="checkbox"
-					id="mustVerify" name="mustVerify" value="0"
-					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
-				</td>
-			</tr>
-		</tbody>
+		
 	</table>
+	</div>
+	<div id="createResolveDiv" style="display: none;">
+		<table id="createResolveTable" style="border: 0px" >
+            <tr class="prop">
+            	<td valign="top" class="name">
+                <label for="isResolved">Resolved:</label>
+                </td>
+                <td valign="top" class="value">
+                <input type="checkbox" id="isResolved" name="isResolved" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
+                </td>
+            </tr>
+          
+            <tr class="prop">
+				<td valign="top" class="name">
+                <label for="resolution">Resolution:</label>
+                </td>
+				<td valign="top" class="value">
+                <textarea cols="80" rows="5" id="resolution" name="resolution" ></textarea>
+                </td>
+            </tr> 
+                
+            </table>
+            </div>
+		
 	</div>
 	<div class="buttons"><span class="button"> <input
 		class="save" type="button" value="Create"
-		onclick="${remoteFunction(action:'saveComment', params:'\'assetEntity.id=\' + document.getElementById(\'createAssetCommentId\').value +\'&comment=\'+document.createCommentForm.comment.value +\'&commentType=\'+document.createCommentForm.commentType.value +\'&mustVerify=\'+document.createCommentForm.mustVerify.value', onComplete:'addCommentsToList(e)')}" /></span></div>
+		onclick="resolveValidate('createCommentForm','createAssetCommentId');" /></span></div>
 </g:form></div>
 <div id="showCommentDialog" title="Show Asset Comment"
 	style="display: none;">
@@ -1057,11 +1101,17 @@ Comment</a></span></div>
 	type="hidden">
 <table id="showCommentTable">
 	<tbody>
-		<tr class="prop">
-			<td valign="top" class="name"><label for="comment">Comment:</label>
-			</td>
-			<td valign="top" class="value" id="commentTdId" />
-		</tr>
+	<tr>
+	<td valign="top" class="name"><label for="dateCreated">Created
+			At:</label></td>
+			<td valign="top" class="value" id="dateCreatedId" />
+	</tr>
+		<tr>
+	<td valign="top" class="name"><label for="createdBy">Created
+			By:</label></td>
+			<td valign="top" class="value" id="createdById" />
+	</tr>
+		
 		<tr class="prop">
 			<td valign="top" class="name"><label for="commentType">Comment
 			Type:</label></td>
@@ -1074,6 +1124,36 @@ Comment</a></span></div>
 				type="checkbox" id="mustVerifyShowId" name="mustVerify" value="0"
 				disabled="disabled" /></td>
 		</tr>
+		<tr class="prop">
+			<td valign="top" class="name"><label for="comment">Comment:</label>
+			</td>
+			<td valign="top" class="value" ><textarea cols="80" rows="5"
+					id="commentTdId" readonly="readonly"></textarea> </td>
+		</tr>
+		<tr class="prop">
+			<td valign="top" class="name"><label for="isResolved">Is
+			Resolved:</label></td>
+			<td valign="top" class="value" id="resolveTdId"><input
+				type="checkbox" id="isResolvedId" name="isResolved" value="0"
+				disabled="disabled" /></td>
+		</tr>
+		<tr class="prop">
+			<td valign="top" class="name"><label for="resolution">Resolution:</label>
+			</td>
+			<td valign="top" class="value" ><textarea cols="80" rows="5"
+					id="resolutionId" readonly="readonly"></textarea> </td>
+		</tr>
+			<tr>
+	<td valign="top" class="name"><label for="dateResolved">Resolved
+			At:</label></td>
+			<td valign="top" class="value" id="dateResolvedId" />
+	</tr>
+		<tr>
+	<td valign="top" class="name"><label for="resolvedBy">Resolved
+			By:</label></td>
+			<td valign="top" class="value" id="resolvedById" />
+	</tr>
+		
 	</tbody>
 </table>
 </div>
@@ -1126,37 +1206,83 @@ Comment</a></span></div>
 <div id="editCommentDialog" title="Edit Asset Comment"
 	style="display: none;"><g:form action="updateComment"
 	method="post" name="editCommentForm">
-	<div class="dialog"><input type="hidden" name="id" value="">
-	<table id="updateCommentTable">
-		<tbody>
+	<div class="dialog" style="border: 1px solid #5F9FCF">
+	<input type="hidden" name="id" value="">
+	<div>
+	<table id="updateCommentTable" style="border: 0px">
+		
+		
+			<tr>
+	<td valign="top" class="name"><label for="dateCreated">Created
+			At:</label></td>
+			<td valign="top" class="value" id="dateCreatedEditId"  />
+	</tr>
+		<tr>
+	<td valign="top" class="name"><label for="createdBy">Created
+			By:</label></td>
+			<td valign="top" class="value" id="createdByEditId" />
+	</tr>
+			<tr class="prop" >
+				<td valign="top" class="name"><label for="commentType">Comment
+				Type:</label></td>
+				<td valign="top" style="width: 20px;" >
+				<input type="text" id="commentType" name="commentType" readonly="readonly">&nbsp;&nbsp;&nbsp;&nbsp;			
+				
+				<input type="checkbox"
+					id="mustVerifyEdit" name="mustVerify" value="0"
+					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
+					<label for="mustVerify">Must
+				Verify</label>
+				</td>
+			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="comment">Comment:</label>
 				</td>
 				<td valign="top" class="value"><textarea cols="80" rows="5"
 					id="comment" name="comment"></textarea></td>
 			</tr>
-			<tr class="prop">
-				<td valign="top" class="name"><label for="commentType">Comment
-				Type:</label></td>
-				<td valign="top" class="value"><g:select id="commentType"
-					name="commentType"
-					from="${AssetComment.constraints.commentType.inList}" value=""
-					noSelection="['':'please select']"></g:select></td>
-			</tr>
-			<tr class="prop">
-				<td valign="top" class="name"><label for="mustVerify">Must
-				Verify:</label></td>
-				<td valign="top" class="value"><input type="checkbox"
-					id="mustVerifyEdit" name="mustVerify" value="0"
-					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
-				</td>
-			</tr>
-		</tbody>
-	</table>
+			</table>
+			
+			</div>
+			<div id="editResolveDiv" style="display: none;">
+		<table id="updateResolveTable" style="border: 0px">
+            <tr class="prop">
+            	<td valign="top" class="name">
+                <label for="isResolved">Resolved:</label>
+                </td>
+                <td valign="top" class="value">
+                <input type="checkbox" id="isResolved" name="isResolved" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
+                </td>
+            </tr>
+          
+            <tr class="prop">
+				<td valign="top" class="name">
+                <label for="resolution">Resolution:</label>
+                </td>
+				<td valign="top" class="value">
+                <textarea cols="80" rows="5" id="resolution" name="resolution" ></textarea>
+                </td>
+            </tr> 
+               <tr>
+	<td valign="top" class="name"><label for="dateResolved">Resolved
+			At:</label></td>
+			<td valign="top" class="value" id="dateResolvedEditId" />
+	</tr>
+		<tr>
+	<td valign="top" class="name"><label for="resolvedBy">Resolved
+			By:</label></td>
+			<td valign="top" class="value" id="resolvedByEditId"  />
+	</tr>
+            </table>
+            </div>
+		
+		
+
 	</div>
+
 	<div class="buttons"><span class="button"> <input
 		class="save" type="button" value="Update"
-		onclick="${remoteFunction(action:'updateComment', params:'\'id=\' + document.editCommentForm.id.value +\'&comment=\'+document.editCommentForm.comment.value +\'&commentType=\'+document.editCommentForm.commentType.value +\'&mustVerify=\'+document.editCommentForm.mustVerify.value', onComplete:'updateCommentsOnList(e)')}" />
+		onclick="${remoteFunction(action:'updateComment', params:'\'id=\' + document.editCommentForm.id.value +\'&comment=\'+document.editCommentForm.comment.value +\'&isResolved=\'+document.editCommentForm.isResolved.value +\'&resolution=\'+document.editCommentForm.resolution.value +\'&commentType=\'+document.editCommentForm.commentType.value +\'&mustVerify=\'+document.editCommentForm.mustVerify.value', onComplete:'updateCommentsOnList(e)')}" />
 	</span> <span class="button"> <input class="delete" type="button"
 		value="Delete"
 		onclick="${remoteFunction(action:'deleteComment', params:'\'id=\' + document.editCommentForm.id.value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e)')}" />
@@ -1164,6 +1290,7 @@ Comment</a></span></div>
 </g:form></div>
 <script type="text/javascript">
 bundleChange();
+
 timedRefresh(document.getElementById("selectTimedId").value)
 </script></div>
 </body>
