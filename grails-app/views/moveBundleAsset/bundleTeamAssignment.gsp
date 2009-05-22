@@ -91,7 +91,6 @@
          
          <!-- AutoFill assignment of assets to Selected Team -->
          function autoFillTeam( teamCode) {
-         	document.getElementById('filterRack').selectedIndex =0
          	var teamCode = teamCode
          	var assets=document.getElementsByName('asset')
          	var assetList = new Array()

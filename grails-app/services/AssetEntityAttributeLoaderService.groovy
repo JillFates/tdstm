@@ -111,7 +111,7 @@ class AssetEntityAttributeLoaderService {
 						if( dataTransferAttributeMap ){
 							if ( ! dataTransferAttributeMap.save() ) {
 								log.error "Failed to load DataTransferAttributeMap for TDS Master" +
-									com.tdssrc.grails.GormUtil.allErrorsString( eavAttribute )
+                                com.tdssrc.grails.GormUtil.allErrorsString( eavAttribute )
 							}
 						}
 					} catch ( Exception ex ) {
@@ -250,7 +250,7 @@ class AssetEntityAttributeLoaderService {
 	def getTeamAssetCount ( def bundleId, def rackPlan ) {
 		def teamAssetCounts = []
 		def bundleInstance = MoveBundle.findById(bundleId)
-		def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.teamCode != 'Cleaning' " )
+		def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport' " )
     	if( rackPlan == 'RerackPlan') {
     		projectTeamInstanceList.each{projectTeam ->
     			def assetCount = AssetEntity.countByMoveBundleAndTargetTeam( bundleInstance, projectTeam )
@@ -272,17 +272,18 @@ class AssetEntityAttributeLoaderService {
 
 
 	//	get Cart - #Asset count corresponding to Bundle
-	def getCartAssetCounts ( def bundleId, def cartList ) {
+	def getCartAssetCounts ( def bundleId ) {
 		def cartAssetCounts = []
 		def bundleInstance = MoveBundle.findById(bundleId)
+		def cartList = AssetEntity.executeQuery(" select ma.cart from AssetEntity ma where ma.moveBundle = $bundleInstance.id  group by ma.cart")
 		cartList.each { assetCart ->
-			def cartAssetCount = AssetEntity.countByMoveBundleAndCart( bundleInstance, assetCart.cart )
-			def AssetEntityList = AssetEntity.findAllByMoveBundleAndCart(bundleInstance, assetCart.cart)
+			def cartAssetCount = AssetEntity.countByMoveBundleAndCart( bundleInstance, assetCart )
+			def AssetEntityList = AssetEntity.findAllByMoveBundleAndCart(bundleInstance, assetCart)
 			def usize = 0
 			for(int AssetEntityRow = 0; AssetEntityRow < AssetEntityList.size(); AssetEntityRow++ ) {
 				usize = usize + Integer.parseInt(AssetEntityList[AssetEntityRow].usize ? AssetEntityList[AssetEntityRow].usize : "0")
 			}
-			cartAssetCounts << [ cart:assetCart.cart, cartAssetCount:cartAssetCount,usizeUsed:usize ]
+			cartAssetCounts << [ cart:assetCart, cartAssetCount:cartAssetCount,usizeUsed:usize ]
 		}
 		return cartAssetCounts
 	}

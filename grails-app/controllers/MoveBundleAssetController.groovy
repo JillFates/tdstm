@@ -150,7 +150,7 @@ class MoveBundleAssetController {
     	def bundleInstance = MoveBundle.findById(bundleId)
     	/*def moveBundleList = MoveBundle.findAllByProject(bundleInstance.project)
     	println"http://jira.tdsops.com:8080/browse/TM-138------------------------------>"+moveBundleList.name*/
-    	def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.teamCode != 'Cleaning' " )
+    	def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport' " )
     	def teamAssetCounts = []
     	def cartAssetCounts
     	def assetEntitysRacks
@@ -166,7 +166,7 @@ class MoveBundleAssetController {
     		def unAssignCount = AssetEntity.countByMoveBundleAndTargetTeam( bundleInstance, null )
 			teamAssetCounts << [ teamCode: "UnAssigned" , assetCount:unAssignCount ]
     		def cartList = AssetEntity.findAll("from AssetEntity ma where ma.moveBundle = $bundleInstance.id  group by ma.cart")
-			cartAssetCounts = assetEntityAttributeLoaderService.getCartAssetCounts(bundleId, cartList)
+			cartAssetCounts = assetEntityAttributeLoaderService.getCartAssetCounts(bundleId)
     		render(view:'bundleTeamAssignment',model:[assetEntityInstanceList: assetEntityList, moveBundleInstance:bundleInstance, projectTeamInstance:projectTeamInstanceList, teamAssetCount:teamAssetCounts, assetEntitysRacks:assetEntitysRacks, rack:rackPlan, cartAssetCountList:cartAssetCounts ])
     	}else 
     	{
@@ -282,7 +282,7 @@ class MoveBundleAssetController {
     	def assetEntity = []
     	def projectTeam = []
     	def assetEntityList
-    	def projectTeamInstanceList = ProjectTeam.findAllByMoveBundle( bundleInstance )
+    	def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport' " )
        	projectTeamInstanceList.each{teams ->
             projectTeam << [ teamCode: teams.teamCode ]
         }
@@ -318,7 +318,7 @@ class MoveBundleAssetController {
        	def moveBundleAsset = []
        	def moveBundleAssetList
        	def projectTeam = []
-       	def projectTeamInstanceList = ProjectTeam.findAllByMoveBundle( bundleInstance )
+       	def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport' " )
        	projectTeamInstanceList.each{team ->
             projectTeam << [ teamCode: team.teamCode ]
         }
@@ -356,7 +356,7 @@ class MoveBundleAssetController {
 	    	def moveBundleAsset = AssetEntity.executeUpdate(" update AssetEntity ma set ma.cart = $cart where ma.moveBundle = $bundleInstance.id and  ma.id = $assetEntityInstance.id ")
 	    }
 		def cartList = AssetEntity.findAll("from AssetEntity ma where ma.moveBundle = $bundleInstance.id  group by ma.cart")
-		cartAssetCounts = assetEntityAttributeLoaderService.getCartAssetCounts(bundleId, cartList)
+		cartAssetCounts = assetEntityAttributeLoaderService.getCartAssetCounts(bundleId)
 	    render cartAssetCounts as JSON
 	}
 	//Updating #Shelf for Selected Asset
