@@ -8,6 +8,9 @@ class BootStrap {
 	def assetEntityAttributeLoaderService
 	def workflowService
     def init = { servletContext ->
+
+	// Don't load bootstrap if production environment
+	if ( grails.util.GrailsUtil.environment.equals("production") ) return
     	
     	// -------------------------------
 		// Role Types

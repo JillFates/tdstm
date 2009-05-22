@@ -38,7 +38,7 @@ environments {
 	production {
 		dataSource {
 		// TDS Transitional Manager
-			dbCreate = "create-drop" // one of 'create', 'create-drop','update'
+			dbCreate = "update" // one of 'create', 'create-drop','update'
 			url = "jdbc:mysql://localhost/tdstm"
 			driverClassName = "com.mysql.jdbc.Driver"
 			username = "tdstm"
