@@ -31,7 +31,7 @@ class AssetComment {
 			comment sqltype: 'text'
 			mustVerify sqltype: 'tinyint'
 			isResolved sqltype: 'tinyint'
-				resolution sqltype: 'text'
+			resolution sqltype: 'text'
 		}
 	}
 	

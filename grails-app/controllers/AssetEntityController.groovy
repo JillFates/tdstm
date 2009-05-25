@@ -9,6 +9,8 @@ import org.jsecurity.SecurityUtils
 import com.tdssrc.eav.*
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import com.tdssrc.grails.GormUtil
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 class AssetEntityController {	
     //TODO : Fix indentation
 	def missingHeader = ""
@@ -703,29 +705,41 @@ class AssetEntityController {
         def commentList = []
         def personResolvedObj
         def personCreateObj
+        def dtCreated 
+        def dtResolved 
+        DateFormat formatter ; 
+        formatter = new SimpleDateFormat("MM/dd/yyyy");
+ 	   
         def assetComment = AssetComment.get(params.id)
         if(assetComment.createdBy){
             personCreateObj = Person.find("from Person p where p.id = $assetComment.createdBy.id")
+            dtCreated = formatter.format(assetComment.dateCreated);
         }
         if(assetComment.resolvedBy){
             personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")
-        }
-        commentList<<[assetComment:assetComment,personCreateObj:personCreateObj,personResolvedObj:personResolvedObj]
+            dtResolved = formatter.format(assetComment.dateResolved);
+        }     
+    	
+        commentList<<[assetComment:assetComment,personCreateObj:personCreateObj,personResolvedObj:personResolvedObj,dtCreated:dtCreated,dtResolved:dtResolved]
         render commentList as JSON
     }
     /*
      *  update comments
      */
     def updateComment = {
-    	def assetCommentInstance = AssetComment.get(params.id)
-    	assetCommentInstance.properties = params
         def principal = SecurityUtils.subject.principal
-  	    def loginUser = UserLogin.findByUsername(principal)  
-  	 
-        if(params.isResolved == '1'){
+        def loginUser = UserLogin.findByUsername(principal)
+    	def assetCommentInstance = AssetComment.get(params.id)
+    	if(params.isResolved == '1' && assetCommentInstance.isResolved == 0 ){
             assetCommentInstance.resolvedBy = loginUser.person
             assetCommentInstance.dateResolved = new Date()
+        }else if(params.isResolved == '1' && assetCommentInstance.isResolved == 1){
+        }else{
+        	assetCommentInstance.resolvedBy = null
+            assetCommentInstance.dateResolved = null
         }
+    	assetCommentInstance.properties = params      
+    	
     	if(!assetCommentInstance.hasErrors()) {
     		assetCommentInstance.save()
         }
