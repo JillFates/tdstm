@@ -588,10 +588,10 @@ class BootStrap {
 		//--------------------------------
 		def assetCommentList = [
 		  			
-            ["Switch powersupply to 220V", "instruction", 1, AssetEntity.get(1)],
-            ["Tape the SCSI cable to the server", "instruction", 1, AssetEntity.get(1)],
-            ["After move we should upgrade this", "comment", 0, AssetEntity.get(1)],
-            ["The server is going to moved right after the move so don't bother dressing the cabling.", "issue", 0, AssetEntity.get(2) ]
+            ["Switch powersupply to 220V", "instruction", 1, AssetEntity.get(1), personJohn],
+            ["Tape the SCSI cable to the server", "instruction", 1, AssetEntity.get(1), personJohn],
+            ["After move we should upgrade this", "comment", 0, AssetEntity.get(1), personJohn],
+            ["The server is going to moved right after the move so don't bother dressing the cabling.", "issue", 0, AssetEntity.get(2), personJohn]
 		]
 		//Insert the List of AssetComment
 		assetCommentList.each {
@@ -599,7 +599,8 @@ class BootStrap {
 				comment: it[0],
 				commentType: it[1],
 				mustVerify: it[2],
-				assetEntity: it[3]
+				assetEntity: it[3],
+				createdBy: it[4]
             ).save()
 		}
 		/*
