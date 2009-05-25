@@ -475,14 +475,26 @@ class AssetEntityController {
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
     def list = {
-	    if(!params.max) params.max = 15
+    	
+        if(params.rowVal){
+    		if(!params.max) params.max = params.rowVal
+    		userPreferenceService.setPreference( "MAX_ASSET_LIST", "${params.rowVal}" )
+        }else{
+            userPreferenceService.loadPreferences("MAX_ASSET_LIST")
+            def userMax = getSession().getAttribute("MAX_ASSET_LIST")
+            if(userMax.MAX_ASSET_LIST){
+                if(!params.max) params.max = userMax.MAX_ASSET_LIST
+            }else{
+                if(!params.max) params.max = 50
+            }
+        }
         def projectId = params.projectId
         if(projectId == null || projectId == ""){
         	projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
         }
         def project = Project.findById( projectId )
         def assetEntityInstanceList = AssetEntity.findAllByProject( project, params ) 
-        [ assetEntityInstanceList: assetEntityInstanceList, projectId: projectId ]
+        [ assetEntityInstanceList: assetEntityInstanceList, projectId: projectId,maxVal : params.max ]
     }   
 
     def delete = {

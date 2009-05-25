@@ -470,7 +470,10 @@
 		}
 	}
 }
-		    
+function rowsPerPage(){
+alert('cumg to row s per fn--->');
+document.paginateRows.submit();
+}		    
 		    
       		
 	    </script>
@@ -563,10 +566,20 @@
 
 </div>
 
-<div class="paginateButtons"><g:paginate total="${assetEntityCount == null ? AssetEntity.findAll('from AssetEntity where project = '+projectId).size() :  assetEntityCount }" params="${filterParams}"/>
+<div class="paginateButtons">
+<g:form name="paginateRows" action="list">
+<table>
+<tr>
+<td style="width: 770px;">
+<g:paginate total="${assetEntityCount == null ? AssetEntity.findAll('from AssetEntity where project = '+projectId).size() :  assetEntityCount }" params="${filterParams}"/>
 <filterpane:filterButton textKey="fp.tag.filterButton.text" appliedTextKey="fp.tag.filterButton.appliedText" text="Filter Me" appliedText="Change Filter" />
 <filterpane:isNotFiltered>Pure and Unfiltered!</filterpane:isNotFiltered>
 <filterpane:isFiltered>Filter Applied!</filterpane:isFiltered>
+</td>
+<td >
+Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" value="${maxVal}" onchange="document.paginateRows.submit();"></g:select></td>
+</table>
+</g:form>
 </div>
 <filterpane:filterPane domainBean="AssetEntity"  excludeProperties="sourceRackPosition,targetRackPosition,usize,railType,fiberCabinet,hbaPort,ipAddress,hinfo,kvmDevice,kvmPort,newOrOld,nicPort,powerPort,remoteMgmtPort,truck,priority,cart,shelf,dateCreated,project.name" />
 <div class="buttons"><g:form>
