@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="issueReport" pageWidth="1000" pageHeight="842" orientation="Landscape" columnWidth="960" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="issueReport" pageWidth="1050" pageHeight="842" orientation="Landscape" columnWidth="1000" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
 	<style name="border" isDefault="false">
 		<pen lineWidth="0.0"/>
 		<box leftPadding="5">
@@ -123,25 +123,25 @@
 				<text><![CDATA[Model]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="500" y="0" width="100" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<reportElement mode="Opaque" x="520" y="0" width="120" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
-				<text><![CDATA[Created By]]></text>
+				<text><![CDATA[Created/Resolved By ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="400" y="0" width="100" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<reportElement mode="Opaque" x="400" y="0" width="120" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
-				<text><![CDATA[Occured At]]></text>
+				<text><![CDATA[Created/Resolved At ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="600" y="0" width="350" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<reportElement mode="Opaque" x="640" y="0" width="350" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
-				<text><![CDATA[Issue]]></text>
+				<text><![CDATA[Issue/Resolution ]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -176,21 +176,21 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{model}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="border" stretchType="RelativeToTallestObject" x="400" y="0" width="100" height="20"/>
+				<reportElement style="border" stretchType="RelativeToTallestObject" x="400" y="0" width="120" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression class="java.util.Date"><![CDATA[$F{occuredAt}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="border" stretchType="RelativeToTallestObject" x="500" y="0" width="100" height="20"/>
+				<reportElement style="border" stretchType="RelativeToTallestObject" x="520" y="0" width="120" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{createdBy}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="border" stretchType="RelativeToTallestObject" x="600" y="0" width="350" height="20"/>
+				<reportElement style="border" stretchType="RelativeToTallestObject" x="640" y="0" width="350" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>

@@ -366,7 +366,7 @@ class MoveBundleAssetController {
 	    def bundleId = params.bundleId
 	    def teamAssetCounts = []
 	    def bundleInstance = MoveBundle.findById(bundleId)
-	    if( shelf != null && shelf != "")
+	    if( shelf != null )
 	    {
 	    	def assetEntityInstance = AssetEntity.findById(asset)
 	    	def moveBundleAsset = AssetEntity.executeUpdate(" update AssetEntity ma set ma.shelf = '$shelf' where ma.moveBundle = $bundleInstance.id and  ma.id = $assetEntityInstance.id ")
@@ -696,6 +696,9 @@ class MoveBundleAssetController {
     				createdBy = createdParty?.firstName ? createdParty?.firstName : ""+" "+createdParty?.lastName ? createdParty?.lastName : ""
     			}
     			reportFields <<['assetName':assetComment?.assetEntity?.assetName, 'assetTag':assetComment?.assetEntity?.assetTag, 'serialNumber':assetComment?.assetEntity?.serialNumber,'model':assetComment?.assetEntity?.model, 'occuredAt':assetComment?.dateCreated, 'createdBy':createdBy, 'issue':assetComment?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 'clientName':projectInstance?.client?.name]
+    			if(	assetComment.isResolved == 1 ) {
+    				reportFields <<['assetName':null, 'assetTag':null, 'serialNumber':null,'model':null, 'occuredAt':assetComment?.dateResolved, 'createdBy':assetComment?.resolvedBy?.firstName+" "+assetComment?.resolvedBy?.lastName, 'issue':assetComment?.resolution, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 'clientName':projectInstance?.client?.name]
+    			}
     		}
     		if(reportFields.size() <= 0) {    		
         		flash.message = " No Issues Were found for  selected values  "
