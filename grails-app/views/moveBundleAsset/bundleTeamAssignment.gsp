@@ -88,6 +88,33 @@
          	
          }
          	
+        
+     
+    
+     
+     var loaded = false;
+        function showProcessing()
+        {
+               loaded =false;
+                showLoadingImage()
+         }
+
+         function showLoadingImage()
+         {
+                var box = document.getElementById("assetTable");
+                if(box && !loaded)
+                {
+                  box.innerHTML ='<img src="../images/processing.gif">';
+                  }
+           }
+
+          function hideProcessing()
+          {
+              var box = document.getElementById("assetTable");
+              box.innerHTML='';
+           }
+  
+      
          
          <!-- AutoFill assignment of assets to Selected Team -->
          function autoFillTeam( teamCode) {
@@ -102,7 +129,7 @@
          	var rackPlan = document.getElementById('rackPlan').value
          	if(teamCode != 'null' && teamCode!= '' && assetList.length > 0 )
          	{
-	         	${remoteFunction(action:'autoFillTeamAssign', params:'\'teamCode=\' +teamCode+\'&assets=\'+assetList+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId', onComplete:"autoTeamAssignComplete( e );")}
+	         	${remoteFunction(action:'autoFillTeamAssign', params:'\'teamCode=\' +teamCode+\'&assets=\'+assetList+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId', onLoading:"showProcessing();" ,onComplete:"autoTeamAssignComplete( e );")}
 	        }
          }
          
@@ -143,6 +170,7 @@
          }
          
      function filterByTeam( e) {
+        hideProcessing()
    	 	var assetList = eval('(' + e.responseText + ')')
    	 	table = document.getElementById('assetTable')
    	 	var rowCount = table.rows.length; 
@@ -160,13 +188,74 @@
      }
      function addAssetRow(assetList)
      {
-     
+    
      	var rackPlan = document.getElementById('rackPlan').value
      	var length = assetList.length 
+     	
      	table = document.getElementById('assetTable')
+     	
+     	var oTHead = document.createElement("THEAD");
+        table.appendChild(oTHead);
+
+      var oRow = document.createElement("TR");
+      oTHead.appendChild(oRow);
+
+
+      var oTH = document.createElement("TH");
+      oTH.textContent= 'Asset';
+      oRow.appendChild(oTH);
+
+      var oTH = document.createElement("TH");
+      oTH.textContent = 'Server';
+      oRow.appendChild(oTH);
+
+      var oTH = document.createElement("TH");
+      oTH.textContent = 'Model';
+     oRow.appendChild(oTH);
+
+      var oTH = document.createElement("TH");
+      oTH.textContent = 'Room';
+      oRow.appendChild(oTH);
+
+      var oTH = document.createElement("TH");
+      oTH.textContent = 'Rack';
+      oRow.appendChild(oTH);
+      
+      var oTH = document.createElement("TH");
+      oTH.textContent = 'Pos';
+      oRow.appendChild(oTH);
+      
+      var oTH = document.createElement("TH");
+      oTH.textContent = 'Size';
+      oRow.appendChild(oTH);
+      
+      var oTH = document.createElement("TH");
+      oTH.textContent = 'Team';
+      oRow.appendChild(oTH);
+      
+      
+      if(rackPlan == "RerackPlan"){
+      
+      var oTH = document.createElement("TH");
+      oTH.textContent = 'Cart';
+      oRow.appendChild(oTH);
+      
+      var oTH = document.createElement("TH");
+      oTH.textContent = 'Shelf';
+      oRow.appendChild(oTH);
+      
+      }
+      
+     var oTBody = document.createElement("TBODY");
+
+      table.appendChild(oTBody);
+
+     	
 		for (var i=0; i < length; i++) {
+			
 			var assetEntity = assetList[i]
-			var row = table.insertRow( i+1 ); 
+			var row = table.insertRow(i+1); 
+			
 			if (i % 2 == 0) {
                     row.style.backgroundColor ='#FFFFFF';
                } else {
@@ -273,10 +362,11 @@
      
      
      function autoTeamAssignComplete( e ) {
+        hideProcessing()
      	var teamAssetList = eval('(' + e.responseText + ')')
      	assetList = teamAssetList[0].assetList
 		table = document.getElementById('assetTable')
-      	deleteRow( table )
+		deleteRow( table )
      	addAssetRow(assetList)
      	showTeamAssetCount(teamAssetList[0].teamAssetCounts)
      }
@@ -319,6 +409,7 @@
 	 }
      function showTeamAssetCount( teamAsset ){
       	var table = document.getElementById('teamAssetCountTable');
+      	
       	deleteRow( table )
       	     	
       	if (teamAsset) {
@@ -484,7 +575,9 @@
     	          
               </tr>
           </table>
-           <div  style="overflow:scroll; width:950px;">
+         
+          
+           <div  id="assetTab" style="overflow:scroll; width:950px;">
             <table id="assetTable">
               <thead>
                 <tr>
