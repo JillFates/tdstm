@@ -180,6 +180,14 @@
 	}
 	function initialize(){
 	document.bundlesForm.bundleRight.value = "${moveBundleInstance?.id}"
+	document.bundlesForm.bundleLeft.value = "${leftBundleInstance?.id}"
+	}
+	
+	function sortTag(header, side) {
+		var leftBundle = document.bundlesForm.bundleLeft.value;
+		var rightBundle = document.bundlesForm.bundleRight.value;
+		document.bundlesForm.action = "sortAssetList?column="+header+"&&side="+side+"&&leftBundle="+leftBundle+"&&rightBundle="+rightBundle;
+		document.bundlesForm.submit();
 	}
 	</script> 
 </head>
@@ -210,6 +218,7 @@
 			                	<option value="${moveBundle.id}">${moveBundle}</option>
 			                </g:each>
 						</select>
+						
 						</td>
 					</tr>
 					</g:form>
@@ -220,10 +229,10 @@
 					       <table id="assetsLeftTableId" style="width: 100%;float: left; border: 0px">  
 					         <thead>  
 					           <tr>  
-					             <th nowrap>Asset Tag</th>  
-					             <th nowrap>Server Name</th>  
-					             <th nowrap>Application</th>  
-					             <th nowrap>Src Loc/Rack</th>  
+					           <g:sortableColumn action="sortAssetList"  property="assetTag" title="Asset Tag" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id,'side':'left']" />
+					           <g:sortableColumn action="sortAssetList"  property="assetName" title="Server Name" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'left']"/>
+					           <g:sortableColumn action="sortAssetList" property="lapplication" title="Application" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'left']"/>
+					           <g:sortableColumn action="sortAssetList" property="sourceLocation" title="Src Loc/Rack" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'left']"/>
 					           </tr>  
 					         </thead>  
 					         <tbody id="assetsLeftTbodyId">
@@ -255,19 +264,19 @@
 					       <table id="assetsRightTableId" style="width: 100%;float: left;border: 0px">  
 					         <thead>  
 					          <tr>  
-					             <th nowrap>Asset Tag</th>  
-					             <th nowrap>Server Name</th>  
-					             <th nowrap>Application</th>  
-					             <th nowrap>Src Loc/Rack</th>  
+					             <g:sortableColumn action="sortAssetList" property="asset_tag" title="Asset Tag" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'right']"/>
+					             <g:sortableColumn action="sortAssetList" property="asset_name" title="Server Name" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'right']"/>
+					             <g:sortableColumn action="sortAssetList" property="application" title="Application" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'right']"/>
+					             <g:sortableColumn action="sortAssetList" property="source_location" title="Src Loc/Rack" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'right']"/>
 					           </tr>
 					         </thead>  
 					         <tbody id="assetsRightTbodyId" >
 					         	<g:each in="${currentBundleAssets}" var="currentBundleAsset" status="i">
 					           <tr id="trright_${currentBundleAsset?.id}" onclick="selectCheckBox('rightassetId_${currentBundleAsset?.id}', this.id )">  
 					             <td><input type="checkbox" name="rightasset_${currentBundleAsset?.id}" id="rightassetId_${currentBundleAsset?.id}" value="${currentBundleAsset?.id}" onclick="selectCheckBox( this.id, 'trright_${currentBundleAsset?.id}' )"/>${currentBundleAsset?.assetTag}</td>  
-					             <td>${currentBundleAsset?.assetName}</td>  
-					             <td>${currentBundleAsset?.application}</td>  
-					             <td>${currentBundleAsset?.sourceLocation}/${currentBundleAsset?.sourceRack}</td>
+					             <td style="vertical-align:middle;">${currentBundleAsset?.assetName}</td>  
+					             <td style="vertical-align:middle;">${currentBundleAsset?.application}</td>  
+					             <td style="vertical-align:middle;">${currentBundleAsset?.sourceLocation}/${currentBundleAsset?.sourceRack}</td>
 					           </tr>  
 					           </g:each>
 					         </tbody>

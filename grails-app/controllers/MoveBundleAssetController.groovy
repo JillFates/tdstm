@@ -96,6 +96,50 @@ class MoveBundleAssetController {
     	render( view:'assignAssets', model:[moveBundles:moveBundles, currentBundleAssets: currentBundleAssets, moveBundleInstance:moveBundleInstance, moveBundleAssets:moveBundleAssets ] )
     }
 	/*
+	 *  Sort Assets By Selected Row Column 
+	 */
+	def sortAssetList = {
+		def rightBundleId = params.rightBundle
+		def leftBundleId = params.leftBundle
+		def sortField
+		if( params.sort == "lapplication" ) {
+			sortField = "application"
+		}else {
+			sortField = params.sort
+		}
+		def sideList = params.side
+		def rightMoveBundleInstance
+		def leftMoveBundleInstance
+		def moveBundles
+		def currentBundleAssets
+		def moveBundleAssets
+		//Right Side AssetTable Sort
+		if( sideList == "right" ) {
+			rightMoveBundleInstance = MoveBundle.findById( rightBundleId )
+			moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $rightMoveBundleInstance.project.id")
+			currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $rightMoveBundleInstance.id order by  $sortField $params.order")
+			if( leftBundleId != null && leftBundleId != "" ) {
+				leftMoveBundleInstance = MoveBundle.findById( leftBundleId )
+				moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $leftMoveBundleInstance.id ")
+			}else {
+				moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null ")
+		    }
+		}
+		//Left Side AssetTable Sort
+		else {
+			if( leftBundleId != null && leftBundleId != "" ) {
+				leftMoveBundleInstance = MoveBundle.findById( leftBundleId )
+				moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $leftMoveBundleInstance.id order by  $sortField $params.order ")
+		    }else {
+		    	moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null order by  $sortField $params.order")
+		    }
+			rightMoveBundleInstance = MoveBundle.findById( rightBundleId )
+			moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $rightMoveBundleInstance.project.id")
+			currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $rightMoveBundleInstance.id ")
+		}
+		render( view:'assignAssets', model:[moveBundles:moveBundles, currentBundleAssets: currentBundleAssets, moveBundleInstance:rightMoveBundleInstance, leftBundleInstance:leftMoveBundleInstance, moveBundleAssets:moveBundleAssets ] )
+	}
+	/*
 	 *  Save Assets for corresponding Bundle
 	 */
     def saveAssetsToBundle = {
@@ -108,7 +152,7 @@ class MoveBundleAssetController {
 	    	moveBundleAssets.each{bundleAsset ->
 				items <<[id:bundleAsset.id, assetName:bundleAsset.assetName, assetTag:bundleAsset.assetTag, application:bundleAsset.application, srcLocation:bundleAsset.sourceLocation  +"/"+bundleAsset.sourceRack  ]
 	    	}
-    	} else {
+    	}else {
     		def assetEntities = AssetEntity.findAll("from AssetEntity where moveBundle = null ")
 			assetEntities.each{assetEntity ->
 				items <<[id:assetEntity.id, assetName:assetEntity.assetName, assetTag:assetEntity.assetTag, application:assetEntity.application, srcLocation:assetEntity.sourceLocation +"/"+assetEntity.sourceRack  ]

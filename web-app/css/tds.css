@@ -247,7 +247,7 @@
       div.scrollTable thead th a:visited{  
         display: block;  
         padding: 4px;  
-        color: #FFF;  
+        color: #000000;  
       }  
   
       div.scrollTable thead a:hover{  
@@ -280,7 +280,7 @@
       
       div.scrollTable thead th,  
       div.scrollTable tbody td{  
-        width: 92px;  
+        width: 102px;  
       }  
   
       div.scrollTable thead th + th + th + th{  
