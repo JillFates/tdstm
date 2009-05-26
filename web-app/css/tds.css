@@ -289,7 +289,8 @@
   
       div.scrollTable tbody td + td + td + td{  
         width: 120px;  
-      }  
+      }
+        
 /* class for dashboards */
 .asset_done{
 	background-color:#FFFFFF;
@@ -308,4 +309,35 @@
 .asset_hold{
 	background-color:#FFFF33;
 	color:black;
+}
+
+/* dashboards label display for IE only */
+	.verticaltext {
+	writing-mode: tb-rl;
+	filter: flipv fliph;
+	font-family: verdana,arial,helvetica,sans-serif;
+	font-size: 12px; 
+	line-height: 8px;
+	color: #333333;
+}
+
+div.tableContainer {
+  width: 98%;       /* table width will be 99% of this*/
+  overflow: auto;
+  height:600px;
+  margin: 0 auto;
+  border: 1px solid gray;
+}
+div.tableContainer table {
+  width: 97%;  /*100% of container produces horiz. scroll in Mozilla*/
+  background-color: transparent;
+}
+div.tableContainer table>tbody {
+  overflow: auto;
+  height: 370px;
+  overflow-x: hidden;
+}
+
+div.tableContainer table>tbody tr {
+  height: auto;
 }

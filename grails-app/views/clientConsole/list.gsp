@@ -254,7 +254,7 @@ function selectAll(){
 				value="Refresh" onclick="location.reload(true);"> <select
 				id="selectTimedId"
 				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(e)') }">
-				<option value="20000">30 sec</option>
+				<option value="30000">30 sec</option>
 				<option value="60000">1 min</option>
 				<option value="120000">2 min</option>
 				<option value="300000">5 min</option>
@@ -264,7 +264,7 @@ function selectAll(){
 	</table>
 
 </div>
-<div style="width: 99%; overflow-x: scroll;border:1px solid #5F9FCF;margin-left: 5px;">
+<div class="tableContainer">
 
 <table cellpadding="1" cellspacing="1"  style="border:0px;">
 	<thead>
@@ -295,27 +295,30 @@ function selectAll(){
 	<td style="padding-left: 0px;"><select style="width: 120px;visibility: hidden;"/></td>
 		</tr>
 		<tr>
-		 <jsec:hasRole in="['ADMIN','MANAGER']">	<th>Actions <a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a></th></jsec:hasRole>
+		 <jsec:hasRole in="['ADMIN','MANAGER']">	<th style="padding-top:85px;">Actions <a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a></th></jsec:hasRole>
 			
-			<g:sortableColumn property="application"  title="Application" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
+			<g:sortableColumn style="padding-top:85px;" property="application"  title="Application" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
 			
-			<g:sortableColumn property="app_owner" title="App Owner"  params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]" />
+			<g:sortableColumn style="padding-top:85px;" property="app_owner" title="App Owner"  params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]" />
 
-			<g:sortableColumn property="app_sme" title="App SME" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
+			<g:sortableColumn style="padding-top:85px;" property="app_sme" title="App SME" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
 
-			<g:sortableColumn property="asset_name" title="Asset Name" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
-
+			<g:sortableColumn style="padding-top:85px;" property="asset_name" title="Asset Name" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
+			
+			<g:if test="${browserTest}">
 			<g:each in="${processTransitionList}"  var="task">
-
-				<th title="${task.title}">${task?.header}</th>
-
+				<th class="verticaltext" title="${task.header}">${task?.header}</th>
 			</g:each>
+			</g:if>
+			<g:else>
+			<th style="padding-left: 0px" colspan="${headerCount}"><embed src="${createLinkTo(dir:'templates',file:'headerSvg.svg')}" type="image/svg+xml" width="${headerCount*22}" height="180"/></th>
+			</g:else>
 
 		</tr>
 	</thead>
-	<tbody td="transitionBody">
+	<tbody>
 		<g:each in="${assetEntityList}" var="assetEntity">
-			<tr >
+			<tr>
 			<td id="action_${assetEntity.id}">
 				<jsec:hasRole in="['ADMIN','MANAGER']">	
 					<g:if test="${assetEntity.checkVal == true}">

@@ -1,5 +1,6 @@
 import grails.converters.JSON
 import org.jsecurity.SecurityUtils
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 class ClientConsoleController {
 	def stateEngineService
 	def userPreferenceService
@@ -10,6 +11,8 @@ class ClientConsoleController {
     }
 	// List of asset for client console
     def list={
+    	def headerCount = getHeaderNames()
+    	def browserTest = request.getHeader("User-Agent").contains("MSIE")
         def projectId=params.projectId
         def bundleId = params.moveBundle
         def moveBundleInstance
@@ -73,11 +76,7 @@ class ClientConsoleController {
         }
         tempTransitions.sort().each{
         	def processTransition = stateEngineService.getState("STD_PROCESS",it)
-            if(processTransition.length() > 5){
-                processTransitionList<<[header:processTransition.substring(0,5), title:stateEngineService.getStateLabel("STD_PROCESS",it),transId:stateEngineService.getStateId("STD_PROCESS",processTransition)]
-            } else {
-                processTransitionList<<[header:processTransition,title:stateEngineService.getStateLabel("STD_PROCESS",it),transId:stateEngineService.getStateId("STD_PROCESS",processTransition)]
-            }
+            processTransitionList<<[header:stateEngineService.getStateLabel("STD_PROCESS",it),transId:stateEngineService.getStateId("STD_PROCESS",processTransition)]
         }
         
         resultList.each{
@@ -126,7 +125,7 @@ class ClientConsoleController {
         }
         userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")
         def timeToRefresh = getSession().getAttribute("CLIENT_CONSOLE_REFRESH")
-        return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,appOwnerList:appOwnerList,applicationList:applicationList,appSmeList:appSmeList,projectId:projectId,processTransitionList:processTransitionList,projectId:projectId,appOwnerValue:appOwnerValue,appValue:appValue,appSmeValue:appSmeValue,timeToRefresh:timeToRefresh ? timeToRefresh.CLIENT_CONSOLE_REFRESH : "never"]
+        return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,appOwnerList:appOwnerList,applicationList:applicationList,appSmeList:appSmeList,projectId:projectId,processTransitionList:processTransitionList,projectId:projectId,appOwnerValue:appOwnerValue,appValue:appValue,appSmeValue:appSmeValue,timeToRefresh:timeToRefresh ? timeToRefresh.CLIENT_CONSOLE_REFRESH : "never",headerCount:headerCount,browserTest:browserTest]
     }
     // To get list of task for an asset through ajax
 	def getTask = {
@@ -307,4 +306,59 @@ class ClientConsoleController {
 	        }
     	render assetEntityList as JSON
     }
+	
+	//get header name details for svg.
+	def getHeaderNames = {
+	        def tempTransitions = []
+	        def processTransitions= stateEngineService.getTasks("STD_PROCESS", "TASK_ID")
+	        processTransitions.each{
+	        	tempTransitions <<Integer.parseInt(it)
+	        }
+	       
+	        def svgHeaderFile = new StringBuffer()
+	        svgHeaderFile.append("<?xml version='1.0' encoding='UTF-8' standalone='no'?>")
+	        svgHeaderFile.append("<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>")
+	        svgHeaderFile.append("<svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>")
+	        svgHeaderFile.append("<script type='text/javascript'>")
+	        svgHeaderFile.append("<![CDATA[")
+	        svgHeaderFile.append("//this will create htmljavascriptfunctionname in html document and link it to changeText")
+	        svgHeaderFile.append("top.htmljavascriptfunctionname = changeText;")
+	        svgHeaderFile.append("function changeText(txt){")
+	        svgHeaderFile.append("targetText=document.getElementById('thetext');")
+	        svgHeaderFile.append("var newText = document.createTextNode(txt);")
+	        svgHeaderFile.append("targetText.replaceChild(newText,targetText.childNodes[0]);")
+	        svgHeaderFile.append("}")
+	        svgHeaderFile.append("// ]]>")
+	        svgHeaderFile.append("</script>")	       
+	        svgHeaderFile.append("<text id='thetext' text-rendering='optimizeLegibility' transform='rotate(270, 90, 0)' font-weight='bold' font-size='12' fill='#333333' x='-90' y='-76' font-family='verdana,arial,helvetica,sans-serif'>")
+	        def count = 0
+	        tempTransitions.sort().each{
+	        	def processTransition = stateEngineService.getStateLabel("STD_PROCESS",it)
+	        	if(count == 0){
+	        		svgHeaderFile.append("${processTransition}")
+	        	} else {
+	        		svgHeaderFile.append("<tspan x='-90' dy='22'>${processTransition}</tspan>")	
+	        	}
+	        	count++
+	        }
+	        svgHeaderFile.append("</text>")
+	        svgHeaderFile.append("<path d='M 22 0 l 0 185")
+	        def value = 22
+	        for(int i=0;i<count;i++){
+	        	value = value+22
+	        	svgHeaderFile.append(" M ${value} 0 l 0 185")
+	        }
+	        svgHeaderFile.append("' stroke = 'white' stroke-width = '1'/>")
+	        svgHeaderFile.append("</svg>")
+	        def f = ApplicationHolder.application.parentContext.getResource("templates/headerSvg.svg").getFile()
+	        def fop=new FileOutputStream(f)
+	        if(f.exists()){            
+	          fop.write(svgHeaderFile.toString().getBytes())
+	          fop.flush()
+	          fop.close()          
+	        } else {
+	          println("This file is not exist")
+	        }
+	        return count
+	}
 }
