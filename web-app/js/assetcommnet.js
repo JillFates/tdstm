@@ -138,10 +138,12 @@
 			      	 document.editCommentForm.id.value = assetComments[0].assetComment.id
 			      	 if(action == 'edit'){
 				      	$("#editCommentDialog").dialog('option', 'width', 700)
+				      	$("#editCommentDialog").dialog('option', 'position', ['center','top']);
 				      	$("#editCommentDialog").dialog("open")
 				      	$("#showCommentDialog").dialog("close")
 			      	 } else if(action == 'show'){
 			      	 	$("#showCommentDialog").dialog('option', 'width', 700)
+			      	 	$("#showCommentDialog").dialog('option', 'position', ['center','top']);
 			      	 	$("#showCommentDialog").dialog("open")
 			      	 	$("#editCommentDialog").dialog("close")
 			      	 }
