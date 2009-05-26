@@ -720,7 +720,7 @@ class AssetEntityController {
         def dtCreated 
         def dtResolved 
         DateFormat formatter ; 
-        formatter = new SimpleDateFormat("MM/dd/yyyy");
+        formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
  	   
         def assetComment = AssetComment.get(params.id)
         if(assetComment.createdBy){
@@ -732,7 +732,7 @@ class AssetEntityController {
             dtResolved = formatter.format(assetComment.dateResolved);
         }     
     	
-        commentList<<[assetComment:assetComment,personCreateObj:personCreateObj,personResolvedObj:personResolvedObj,dtCreated:dtCreated,dtResolved:dtResolved]
+        commentList<<[assetComment:assetComment,personCreateObj:personCreateObj,personResolvedObj:personResolvedObj,dtCreated:dtCreated?dtCreated:"",dtResolved:dtResolved?dtResolved:""]
         render commentList as JSON
     }
     /*

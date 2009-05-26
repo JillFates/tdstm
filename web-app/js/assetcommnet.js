@@ -58,17 +58,13 @@
 					      resolveVal.id = 'verifyResolved_'+commentObj.commentInstance.id
 					      resolveVal.type = 'checkbox'
 					      resolveVal.disabled = 'disabled'
-					      if(commentObj.commentInstance.isResolved == 1){
-					      	resolveVal.checked = true ;
-					      }
+					     
 					      }
 					      var verifyText = document.createElement('input')
 					      verifyText.id = 'verifyText_'+commentObj.commentInstance.id
 					      verifyText.type = 'checkbox'
 					      verifyText.disabled = 'disabled'
-					      if(commentObj.commentInstance.mustVerify == 1){
-					      	verifyText.checked = true ;
-					      }
+					     
 					      //createTextNode(commentObj.commentInstance.mustVerify);
 					      link.appendChild( image )
 						  editTd.appendChild( link  )					      
@@ -82,8 +78,15 @@
 					      tr.appendChild( resolveTd )	     					      
 					      tr.appendChild( verifyTd )
 					      listTbody.appendChild( tr )
+					      if(commentObj.commentInstance.isResolved == 1){
+					      	resolveVal.checked = true ;
+					      }
+				       if(commentObj.commentInstance.mustVerify == 1){
+					      	verifyText.checked = true ;
+					      }
 				      	}
 				      listTable.appendChild( listTbody )
+				       
       			}
       			
       			$("#commentsListDialog").dialog('option', 'width', 600)	      	
@@ -95,6 +98,12 @@
       			$("#createCommentDialog").dialog("close")
       		var assetComments = eval('(' + e.responseText + ')');
       			if (assetComments) {
+      			if(assetComments[0].assetComment.comment == null){
+      			assetComments[0].assetComment.comment = "";
+      			}
+      			if(assetComments[0].assetComment.resolution == null){
+      			assetComments[0].assetComment.resolution = "";
+      			}
       				 document.getElementById("commentId").value = assetComments[0].assetComment.id
 			      	 document.getElementById("commentTdId").value = assetComments[0].assetComment.comment
 			      	 document.getElementById("commentTypeTdId").innerHTML = assetComments[0].assetComment.commentType
@@ -195,19 +204,15 @@
 					      }else{
 					      resolveVal = document.createElement('input')
 					      resolveVal.id = 'verifyResolved_'+assetComments.id
-					      resolveVal.type = 'checkbox'
+					      resolveVal.type = 'checkbox'					     
 					      resolveVal.disabled = 'disabled'
-					      if(assetComments.isResolved == 1){
-					      	resolveVal.checked = true ;
-					      }
+					     
 					      }
 					      var verifyText = document.createElement('input')
 					      verifyText.id = 'verifyText_'+assetComments.id
 					      verifyText.type = 'checkbox'
 					      verifyText.disabled = 'disabled'
-					      if(assetComments.mustVerify != 0){
-					      	verifyText.checked = true
-					      }
+					     
 					      //createTextNode(assetComments.mustVerify);
 					      link.appendChild( image )
 						  editTd.appendChild( link  )					      
@@ -221,6 +226,13 @@
 					      tr.appendChild( resolveTd )
 					      tr.appendChild( verifyTd )
 					      tbody.appendChild( tr )
+					      if(assetComments.isResolved == 1){
+					      	resolveVal.checked = true;
+					      }
+					       if(assetComments.mustVerify != 0){
+					      	verifyText.checked = true
+					      }
+					  
 				    } else {
 						window.location.reload()
 					}
@@ -272,6 +284,8 @@
 			document.getElementById(resolveDiv).style.display = 'block' ;
 			document.forms[formName].mustVerify.checked = false;
 			document.forms[formName].mustVerify.value = 0;
+			document.forms[formName].isResolved.checked = false;
+			document.forms[formName].isResolved.value = 0;
 		}else if(type == "instruction"){
 			document.forms[formName].mustVerify.checked = true;
 			document.forms[formName].mustVerify.value = 1;
