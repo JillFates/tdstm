@@ -54,48 +54,48 @@ var time = '${timeToRefresh}';
 <script type="text/javascript">
 
 function showChangeStatusDialog(e){
-timedRefresh('never')
-var task = eval('(' + e.responseText + ')');
-var taskLen = task[0].item.length;
-var options = '';
-if(taskLen == 0){
-alert('Sorry but there were no common states for the assets selected');
-return false;
-}else{
-      for (var i = 0; i < taskLen; i++) {
-        options += '<option value="' + task[0].item[i].state + '">' + task[0].item[i].label + '</option>';
-      }
-      $("select#taskList").html(options);
-      if(taskLen > 1 && task[0].item[0].state == "Hold"){
-      document.getElementById('taskList').options[1].selected = true;
-      }
-       var getDialogId = document.getElementById('asset')     
-      getDialogId.value=task[0].asset;
- 
- 
-$("#showDialog").dialog('option', 'width', 400)
-$("#showDialog").dialog('option', 'position', ['center','top']);
-$('#showDialog').dialog('open');
-}
+	timedRefresh('never')
+	var task = eval('(' + e.responseText + ')');
+	var taskLen = task[0].item.length;
+	var options = '';
+	if(taskLen == 0){
+	alert('Sorry but there were no common states for the assets selected');
+	return false;
+	}else{
+	      for (var i = 0; i < taskLen; i++) {
+	        options += '<option value="' + task[0].item[i].state + '">' + task[0].item[i].label + '</option>';
+	      }
+	      $("select#taskList").html(options);
+	      if(taskLen > 1 && task[0].item[0].state == "Hold"){
+	      document.getElementById('taskList').options[1].selected = true;
+	      }
+	       var getDialogId = document.getElementById('asset')     
+	      getDialogId.value=task[0].asset;
+	 
+	 
+	$("#showDialog").dialog('option', 'width', 400)
+	$("#showDialog").dialog('option', 'position', ['center','top']);
+	$('#showDialog').dialog('open');
+	}
 }
 function submitAction(){
-if(doCheck()){
-document.changeStatusForm.action = "changeStatus";
-document.changeStatusForm.submit();
-timedRefresh(document.getElementById("selectTimedId").value)
-}else{
-return false;
-}
+	if(doCheck()){
+	document.changeStatusForm.action = "changeStatus";
+	document.changeStatusForm.submit();
+	timedRefresh(document.getElementById("selectTimedId").value)
+	}else{
+	return false;
+	}
 }
 function doCheck(){
-var taskVal = document.getElementById('taskList').value;
-var noteVal = document.getElementById('enterNote').value;
-if((taskVal == "Hold")&&(noteVal == "")){
-alert('Please Enter Note');
-return false;
-}else{
-return true;
-}
+	var taskVal = document.getElementById('taskList').value;
+	var noteVal = document.getElementById('enterNote').value;
+	if((taskVal == "Hold")&&(noteVal == "")){
+	alert('Please Enter Note');
+	return false;
+	}else{
+	return true;
+	}
 }
 function setRefreshTime(e) {
 	var timeRefresh = eval("(" + e.responseText + ")")
@@ -106,49 +106,94 @@ function setRefreshTime(e) {
 var timer
 function timedRefresh(timeoutPeriod) {
 	if(timeoutPeriod != 'never'){
-		timer = setTimeout("location.reload(false);",timeoutPeriod);
+		timer = setTimeout("doAjaxCall()",timeoutPeriod);
 		document.getElementById("selectTimedId").value = timeoutPeriod;
 	} else {
 		clearTimeout(timer)
 	}
 }
 
-function changeState(){
-timedRefresh('never')
-var assetArr = new Array();
-var totalAsset = ${assetEntityList.id};
-var j=0;
-for(i=0; i< totalAsset.size() ; i++){
-if(document.getElementById('checkId_'+totalAsset[i]) != null){
-var booCheck = document.getElementById('checkId_'+totalAsset[i]).checked;
-if(booCheck == true){
-assetArr[j] = totalAsset[i];
-j++;
+function doAjaxCall(){
+	var moveBundle = document.getElementById("moveBundleId").value;
+	var application = document.getElementById("applicationId").value;
+	var appOwner = document.getElementById("appOwnerId").value;
+	var appSme = document.getElementById("appSmeId").value;
+	${remoteFunction(action:'getTransitions', params:'\'moveBundle=\' + moveBundle +\'&application=\'+application +\'&appOwner=\'+appOwner+\'&appSme=\'+appSme', onComplete:'updateTransitions(e);' )}
+	timedRefresh(document.getElementById("selectTimedId").value)
 }
+function updateTransitions(e){
+	var assetTransitions = eval('(' + e.responseText + ')');
+	if(assetTransitions){
+		var assetslength = assetTransitions.length;
+		for( i = 0; i <assetslength ; i++){
+			var assetTransition = assetTransitions[i]
+			var action = document.getElementById("action_"+assetTransition.id)
+			if(action){
+				if(!assetTransition.check){
+					action.visibility='hidden';
+				} 
+			}
+			var application = document.getElementById("application_"+assetTransition.id)
+			if(application){
+				application.innerHTML = assetTransition.application
+			}
+			var owner = document.getElementById("owner_"+assetTransition.id)
+			if(owner){
+				owner.innerHTML = assetTransition.appOwner
+			}
+			var sme = document.getElementById("sme_"+assetTransition.id)
+			if(sme){
+				sme.innerHTML = assetTransition.appSme
+			}
+			var assetName = document.getElementById("assetName_"+assetTransition.id)
+			if(assetName){
+				assetName.innerHTML = assetTransition.assetName
+			}
+			var tdIdslength = assetTransition.tdId.length
+			for(j = 0; j< tdIdslength ; j++){
+				var transition = assetTransition.tdId[j]
+				var transTd = document.getElementById(transition.id)
+				transTd.setAttribute("class",transition.cssClass)
+			}
+		}
+	}
 }
-}
-if(j == 0){
-alert('Please select the Asset');
-}else{
 
-${remoteFunction(action:'getList', params:'\'assetArray=\' + assetArr', onComplete:'showChangeStatusDialog(e);' )}
-}
+function changeState(){
+	timedRefresh('never')
+	var assetArr = new Array();
+	var totalAsset = ${assetEntityList.id};
+	var j=0;
+	for(i=0; i< totalAsset.size() ; i++){
+	if(document.getElementById('checkId_'+totalAsset[i]) != null){
+	var booCheck = document.getElementById('checkId_'+totalAsset[i]).checked;
+	if(booCheck == true){
+	assetArr[j] = totalAsset[i];
+	j++;
+	}
+	}
+	}
+	if(j == 0){
+		alert('Please select the Asset');
+	}else{
+		${remoteFunction(action:'getList', params:'\'assetArray=\' + assetArr', onComplete:'showChangeStatusDialog(e);' )}
+	}
 }
 var isFirst = true;
 function selectAll(){
-timedRefresh('never')
-var totalCheck = document.getElementsByName('checkChange');
-if(isFirst){
-for(i=0;i<totalCheck.length;i++){
-totalCheck[i].checked = true;
-}
-isFirst = false;
-}else{
-for(i=0;i<totalCheck.length;i++){
-totalCheck[i].checked = false;
-}
-isFirst = true;
-}
+	timedRefresh('never')
+	var totalCheck = document.getElementsByName('checkChange');
+	if(isFirst){
+	for(i=0;i<totalCheck.length;i++){
+	totalCheck[i].checked = true;
+	}
+	isFirst = false;
+	}else{
+	for(i=0;i<totalCheck.length;i++){
+	totalCheck[i].checked = false;
+	}
+	isFirst = true;
+	}
 }
 
 
@@ -209,7 +254,7 @@ isFirst = true;
 				value="Refresh" onclick="location.reload(true);"> <select
 				id="selectTimedId"
 				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(e)') }">
-				<option value="30000">30 sec</option>
+				<option value="20000">30 sec</option>
 				<option value="60000">1 min</option>
 				<option value="120000">2 min</option>
 				<option value="300000">5 min</option>
@@ -254,11 +299,11 @@ isFirst = true;
 			
 			<g:sortableColumn property="application"  title="Application" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
 			
-			<g:sortableColumn property="app_owner" title="App Owner"  params="['projectId':projectId]" />
+			<g:sortableColumn property="app_owner" title="App Owner"  params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]" />
 
-			<g:sortableColumn property="app_sme" title="App SME" params="['projectId':projectId]"/>
+			<g:sortableColumn property="app_sme" title="App SME" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
 
-			<g:sortableColumn property="asset_name" title="Asset Name" params="['projectId':projectId]"/>
+			<g:sortableColumn property="asset_name" title="Asset Name" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
 
 			<g:each in="${processTransitionList}"  var="task">
 
@@ -268,31 +313,24 @@ isFirst = true;
 
 		</tr>
 	</thead>
-	<tbody>
-
+	<tbody td="transitionBody">
 		<g:each in="${assetEntityList}" var="assetEntity">
-			<tr>
-			
-			
-			<jsec:hasRole in="['ADMIN','MANAGER']">	<td>
+			<tr >
+			<td id="action_${assetEntity.id}">
+				<jsec:hasRole in="['ADMIN','MANAGER']">	
 					<g:if test="${assetEntity.checkVal == true}">
-					
-					<g:checkBox name="checkChange" id="checkId_${assetEntity.id}" onclick="timedRefresh('never')"></g:checkBox> 
+						<g:checkBox name="checkChange" id="checkId_${assetEntity.id}" onclick="timedRefresh('never')"></g:checkBox> 
 						<g:remoteLink action="getTask" params="['assetEntity':assetEntity.id]"	onComplete="showChangeStatusDialog(e);">
 							<img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}"	border="0px">
 						</g:remoteLink>
-						
 					</g:if>
-				
-				</td>
 				</jsec:hasRole>
-				<td>${assetEntity?.application}</td>
-				<td>${assetEntity?.appOwner}</td>
-				<td>${assetEntity?.appSme}</td>
-				<td>${assetEntity?.assetName}</td>
-				<g:each in="${assetEntity.transitions}" var="transition">
-					${transition}
-				</g:each>
+			</td>
+			<td id="application_${assetEntity.id}">${assetEntity?.application}</td>
+			<td id="owner_${assetEntity.id}">${assetEntity?.appOwner}</td>
+			<td id="sme_${assetEntity.id}">${assetEntity?.appSme}</td>
+			<td id="assetName_${assetEntity.id}">${assetEntity?.assetName}</td>
+			<g:each in="${assetEntity.transitions}" var="transition">${transition}</g:each>
 			</tr>
 		</g:each>
 		

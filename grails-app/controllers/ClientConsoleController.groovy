@@ -82,12 +82,13 @@ class ClientConsoleController {
         
         resultList.each{
         	def stateId = 0
+        	def assetId = it.id
         	def htmlTd = []
         	def transitions
         	if(it.transitions){
         		transitions =it.transitions.tokenize(',')
         	}
-        	def assetEntity = AssetEntity.get(it.id)
+        	def assetEntity = AssetEntity.get(assetId)
         	projectMap = ProjectAssetMap.findByAsset(assetEntity)
         	if(projectMap){
         		stateId = projectMap.currentStateId
@@ -119,9 +120,9 @@ class ClientConsoleController {
 	        			}
 	        		}
 	        	}
-	        	htmlTd << "<td class=\"$cssClass\">&nbsp;</td>"	
+	        	htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass\">&nbsp;</td>"	
         	}
-        	assetEntityList << [id: it.id, application:it.application,appOwner:it.appOwner,appSme:it.appSme,assetName:it.assetName,transitions:htmlTd,checkVal:check]
+        	assetEntityList << [id: assetId, application:it.application,appOwner:it.appOwner,appSme:it.appSme,assetName:it.assetName,transitions:htmlTd,checkVal:check]
         }
         userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")
         def timeToRefresh = getSession().getAttribute("CLIENT_CONSOLE_REFRESH")
@@ -234,5 +235,76 @@ class ClientConsoleController {
         redirect(action:'list',params:["projectId":params.projectId,"moveBundle":params.moveBundle])
 			
 	       
+    }
+	
+	// Will return updated transitional data
+	def getTransitions = {
+			def bundleId = params.moveBundle
+	        def appValue=params.application
+	        def appOwnerValue=params.appOwner
+	        def appSmeValue=params.appSme
+	        def assetEntityList = []
+	        if(bundleId){
+		        def moveBundleInstance = MoveBundle.findById( bundleId )
+				def query = new StringBuffer("select ae.asset_entity_id as id,ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,ae.asset_name as assetName,GROUP_CONCAT(state_to ORDER BY state_to SEPARATOR ',') as transitions FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id) where ae.project_id = $moveBundleInstance.project.id and ae.move_bundle_id = ${moveBundleInstance.id}")
+		        if(appValue!="" && appValue!= null){
+		        	query.append(" and ae.application ='$appValue'")
+		        }
+		        if(appOwnerValue!="" && appOwnerValue!= null){
+		        	query.append(" and ae.app_owner='$appOwnerValue'")
+		        }
+		        if(appSmeValue!="" && appSmeValue!= null){
+		        	query.append(" and ae.app_sme='$appSmeValue'")
+		        }
+		        query.append(" GROUP BY ae.asset_entity_id")
+		        def resultList=jdbcTemplate.queryForList(query.toString())
+	            def processTransitions= stateEngineService.getTasks("STD_PROCESS", "TASK_ID")
+	            resultList.each{
+	            	def stateId = 0
+	            	def assetId = it.id
+	            	def tdId = []
+	            	def transitions
+	            	def check
+	            	if(it.transitions){
+	            		transitions =it.transitions.tokenize(',')
+	            	}
+	            	def assetEntity = AssetEntity.get(assetId)
+	            	def projectMap = ProjectAssetMap.findByAsset(assetEntity)
+	            	if(projectMap){
+	            		stateId = projectMap.currentStateId
+	            	}
+	            	def holdId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Hold"))
+	            	def releaseId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Release"))
+	            	def reRackId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Reracked"))
+	            	if(stateId == 0){
+	            		check = true
+	            	} else if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
+	            		def stateVal = stateEngineService.getState("STD_PROCESS",stateId)
+	        			def taskVal = stateEngineService.getTasks("STD_PROCESS","MANAGER",stateVal)
+	        			if(taskVal.size() == 0){
+	        				check = false    				
+	        			}else{
+	                        check = true
+	        			}
+	            	}else{
+	            		check = false
+	            	}
+	            	processTransitions.each() { trans ->
+	    	        	def cssClass='task_pending'
+	                    transitions.each() { task ->
+	    	        		if(task == trans){
+	    	        			if(stateId == 10 ){
+	    	        				cssClass = "asset_hold"
+	    	        			} else if(stateId != 10 && Integer.parseInt(task) != 10){
+	    	        				cssClass = "task_done"
+	    	        			}
+	    	        		}
+	    	        	}
+	    	        	tdId << [id:"${assetId+"_"+trans}", cssClass:cssClass]
+	            	}
+	            	assetEntityList << [id: assetId, application:it.application ? it.application : "",appOwner:it.appOwner ? it.appOwner : "",appSme:it.appSme ? it.appSme : "",assetName:it.assetName ? it.assetName :"",tdId:tdId, check:check]
+	            }
+	        }
+    	render assetEntityList as JSON
     }
 }
