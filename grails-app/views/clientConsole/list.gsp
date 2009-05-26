@@ -251,7 +251,7 @@ function selectAll(){
 			<td style="text-align: right;">
 			<input type="hidden" name="last_refresh" value="${new Date()}">
 			<input type="button"
-				value="Refresh" onclick="doAjaxCall();"> <select
+				value="Refresh" onclick="location.reload(true);"> <select
 				id="selectTimedId"
 				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(e)') }">
 				<option value="30000">30 sec</option>
