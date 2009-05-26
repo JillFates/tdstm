@@ -1029,7 +1029,7 @@ function resolveValidate(formName,idVal){
 </div>
 <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 <span class="menuButton"><a class="create" href="#"
-	onclick="document.getElementById('statusId').value = '';$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">New
+	onclick="document.getElementById('statusId').value = '';document.getElementById('createResolveDiv').style.display = 'none' ;$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">New
 Comment</a></span></div>
 </div>
 <div id="createCommentDialog" title="Create Asset Comment"
@@ -1045,7 +1045,7 @@ Comment</a></span></div>
 			<tr class="prop" >
 				<td valign="top" class="name"><label for="commentType">Comment
 				Type:</label></td>
-				<td valign="top" style="width: 20px;" ><g:select id="commentType"
+				<td valign="top" style="width: 20%;" ><g:select id="commentType"
 					name="commentType"
 					from="${AssetComment.constraints.commentType.inList}" value=""
 					noSelection="['':'please select']" onChange="commentChange('createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
@@ -1053,8 +1053,7 @@ Comment</a></span></div>
 				<input type="checkbox"
 					id="mustVerifyEdit" name="mustVerify" value="0"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
-					<label for="mustVerify">Must
-				Verify</label>
+					<label for="mustVerify">Must Verify</label>
 				</td>
 			</tr>
 			<tr class="prop">
@@ -1163,7 +1162,7 @@ Comment</a></span></div>
 </div>
 <div class="buttons"><span class="button"> <input
 	class="edit" type="button" value="Edit"
-	onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
+	onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
 </span> <span class="button"> <input class="delete" type="button"
 	value="Delete"
 	onclick="${remoteFunction(action:'deleteComment', params:'\'id=\' + document.getElementById(\'commentId\').value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e)')}" />
@@ -1191,7 +1190,7 @@ Comment</a></span></div>
 			<tr class="prop" >
 				<td valign="top" class="name"><label for="commentType">Comment
 				Type:</label></td>
-				<td valign="top" style="width: 20px;" >
+				<td valign="top" style="width: 20%;" >
 				<input type="text" id="commentType" name="commentType" readonly="readonly">&nbsp;&nbsp;&nbsp;&nbsp;			
 				
 				<input type="checkbox"
