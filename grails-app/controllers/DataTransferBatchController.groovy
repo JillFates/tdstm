@@ -1,4 +1,5 @@
 import com.tdssrc.eav.EavAttributeSet
+import org.jsecurity.SecurityUtils
 class DataTransferBatchController {
     
     def index = { redirect(action:list,params:params) }
@@ -67,8 +68,11 @@ class DataTransferBatchController {
 		    	if(dataTransferCommentRowList){
 		    		dataTransferCommentRowList.each{
 		    			def assetComment
+		    			
 		    			def assetEntity = AssetEntity.findById(it.assetId)
 		    			if(assetEntity){
+		    				def principal = SecurityUtils.subject.principal
+					    	def loginUser = UserLogin.findByUsername(principal)
 		    			if(it.commentId){
 		    				assetComment = AssetComment.findById(it.commentId)
 		    			} 
@@ -78,6 +82,7 @@ class DataTransferBatchController {
 		    			}
 			    		assetComment.comment = it.comment
 			        	assetComment.commentType = it.commentType
+			        	assetComment.createdBy = loginUser.person
 			        	assetComment.assetEntity = assetEntity
 			        	assetComment.save()
 		    			}

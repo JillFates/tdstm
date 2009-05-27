@@ -989,7 +989,8 @@ class AssetEntityController {
 			    		def assetComment = new AssetComment()
 		          		assetComment.comment = comment
 		          		assetComment.assetEntity = assetEntity
-		          		assetComment.commentType = 'issue'
+		          		assetComment.commentType = 'issue'		          			
+		          		assetComment.createdBy = loginUser.person
 		          		assetComment.save()
 		    		}
 		    		stateIdList = getStates(status)
@@ -1145,6 +1146,7 @@ class AssetEntityController {
 	                def assetComment = new AssetComment()
 	                assetComment.comment = params.enterNote
 	                assetComment.commentType = 'issue'
+	               	assetComment.createdBy = loginUser.person
 	                assetComment.assetEntity = it
 	                assetComment.save()
 	            }

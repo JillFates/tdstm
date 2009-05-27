@@ -475,6 +475,7 @@ class MoveTechController {
                     assetComment.comment = enterNote
                     assetComment.assetEntity = asset
                     assetComment.commentType = 'issue'
+                  	assetComment.createdBy = loginUser.person
                     assetComment.save()
                     redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
                 } else {
@@ -494,6 +495,7 @@ class MoveTechController {
                     assetComment.comment = enterNote
                     assetComment.assetEntity = asset
                     assetComment.commentType = 'issue'
+                 	assetComment.createdBy = loginUser.person
                     assetComment.save()
                     render(view: 'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,"bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo",label:label,actionLabel:actionLabel])
                 } else {

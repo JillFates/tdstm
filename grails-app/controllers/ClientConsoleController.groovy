@@ -223,6 +223,7 @@ class ClientConsoleController {
 	                def assetComment = new AssetComment()
 	                assetComment.comment = params.enterNote
 	                assetComment.commentType = 'issue'
+	             	assetComment.createdBy = loginUser.person
 	                assetComment.assetEntity = it
 	                assetComment.save()
 	            }
