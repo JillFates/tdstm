@@ -1,13 +1,26 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<head>
-<style type="text/css">
-P, td  {MARGIN-TOP: 0px; MARGIN-BOTTOM: 0px; FONT-FAMILY: Arial; FONT-SIZE:10pt; }
-h4, h2 {COLOR: #c21428; }
-h3     {MARGIN-TOP: 0px; MARGIN-BOTTOM: 0px; COLOR: #ffffff; FONT-SIZE: 18pt;}
-
-</style>
+<title>Asset</title>
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}"/>
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}"/>
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}"/>
+	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
+	
+	<g:javascript library="prototype" />
+	<g:javascript library="jquery" />
+	
+	<jq:plugin name="ui.core" />
+	<jq:plugin name="ui.dialog" />
+	
+	<script>
+	$(document).ready(function() {
+	$("#serverInfoDialog").dialog({ autoOpen: false })	       
+	})
+	</script>
 <script type="text/javascript" language="Javascript1.2">
 var sHint = "C:\\temp\\output";
 //=============================================================================
@@ -56,7 +69,7 @@ var jobdata = job.NewJobDataRecordSet();
     jobdata.SetDataField('ArticlePrice','400');
 
     jobdata.AddNewRecord();				  										// add sixth data record
-    jobdata.SetDataField('ArticleName', '20" LCD model');
+    jobdata.SetDataField('ArticleName', 'AIX Console HMC2');
     jobdata.SetDataField('ArticleNo',   '445866');
     jobdata.SetDataField('ArticlePrice','600');
 
@@ -163,11 +176,12 @@ function mySelect(x)
 
 </script>
 
-
-
-	<script type="text/javascript">	
-	
-	   
+	<script type="text/javascript">    
+		var timeInterval;
+		function submittheform() {
+			document.assetSearchForm.submit();
+		}
+		
         function serverInfo(e){        
         var loc = document.assetSearchForm.location.value;
       	var location;
@@ -260,7 +274,6 @@ function mySelect(x)
     </script>
 </head>
 <body onload="InitData()">
-
 <div id="serverInfoDialog" title="Server Info" onclick="$('#serverInfoDialog').dialog('close')">
 </div>
 		<object id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C" viewastext></object>
@@ -295,7 +308,7 @@ function mySelect(x)
 					</div>
 					</g:if></div>
 			<div style="float:right;margin-right:10px;">
-				<input type="text" name="textSearch" size="10"/>&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/>
+				<input type="text" name="textSearch" size="10" onchange="submittheform()" onkeyup="timeInterval = setTimeout('submittheform()',2000)" onkeydown="if(timeInterval){clearTimeout(timeInterval)}"/>&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/>
 			</div>
 			<div onclick="${remoteFunction(action:'getServerInfo', params:'\'assetId=\'+'+projMap.asset.id,onComplete: 'serverInfo(e)')}">
 					
@@ -321,13 +334,13 @@ function mySelect(x)
 					<option value="2" selected="selected">2</option>
 					<option value="3">3</option>
 					</select>
-						<input type= "hidden" id="RepPath" name="RepPath">
+					<input type= "hidden" id="RepPath" name="RepPath">
       	  				<input type= "hidden" name="PrjName" id="PrjName">
           				<input type= "hidden" name="FormName" id="FormName">
-	      				<select type= "hidden" id="Printers" name="Printers" onChange="javascript:mySelect(this);"/>
+	      				Printers: <select type= "hidden" id="Printers" name="Printers" onChange="javascript:mySelect(this);"/>
           				<input type= "hidden" name="PrinterName" id="PrinterName">
-		  				<input id="button1" onclick="startprintjob()" type="button" value="Start Printing" name="button1" >
-		  			</td>
+		  				</td>
+					<td class="buttonR"><input type="button" value="Print" onclick="startprintjob()"/></td>
 					</tr>
 					</g:if>
 					<g:else>
@@ -336,7 +349,9 @@ function mySelect(x)
 					<option value="1">1</option>
 					<option value="2" selected="selected">2</option>
 					<option value="3">3</option>
-					</select></td>
+					</select>
+					
+						</td>
 					<td class="buttonR"><input type="button" value="Print" disabled="disabled"/></td>
 					</tr>
 					</g:else>		

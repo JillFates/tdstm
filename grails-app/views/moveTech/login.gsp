@@ -1,6 +1,12 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<script type="text/javascript">
+var timeInterval;
+function submittheform() {
+document.loginForm.submit();
+}
+</script> 
 <title>Login</title>
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
@@ -45,7 +51,7 @@
 			</tr>
 			<tr>
 				<td style="text-align:center;"><label>Username:</label>
-				<input type="text" size="10" name="username" value="${username}" /></td>
+				<input type="text" size="10" name="username" value="${username}" onchange="submittheform()" onkeyup="timeInterval = setTimeout('submittheform()',2000)" onkeydown="if(timeInterval){clearTimeout(timeInterval)}" /></td>
 			</tr>
 			<tr>
 				<td height="25px;"></td>
