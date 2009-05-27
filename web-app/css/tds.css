@@ -321,23 +321,17 @@
 	color: #333333;
 }
 
-div.tableContainer {
-  width: 98%;       /* table width will be 99% of this*/
-  overflow: auto;
-  height:600px;
-  margin: 0 auto;
-  border: 1px solid gray;
-}
-div.tableContainer table {
-  width: 97%;  /*100% of container produces horiz. scroll in Mozilla*/
-  background-color: transparent;
-}
-div.tableContainer table>tbody {
-  overflow: auto;
-  height: 370px;
-  overflow-x: hidden;
+/* dash board vertical scroll for fire fox only */
+div.tableContainer table {     
+   width: 99%;
+   height: 600px;
 }
 
-div.tableContainer table>tbody tr {
-  height: auto;
+div.tableContainer tbody {
+   width: 99%;
+   height: 400px;
+   overflow-y: scroll;
+   overflow-x: hidden;
+   border: 1px solid gray;
 }
+

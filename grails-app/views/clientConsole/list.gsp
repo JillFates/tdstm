@@ -24,6 +24,8 @@
 	href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
 <link type="text/css" rel="stylesheet"
 	href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
+<link type="text/css" rel="stylesheet"
+	href="${createLinkTo(dir:'css',file:'dashboard.css')}" />
 
 <jq:plugin name="ui.core" />
 <jq:plugin name="ui.draggable" />
@@ -264,7 +266,12 @@ function selectAll(){
 	</table>
 
 </div>
+<g:if test="${browserTest}">
+<div class="tableContainerIE">
+</g:if>
+<g:else>
 <div class="tableContainer">
+</g:else>
 
 <table cellpadding="1" cellspacing="1"  style="border:0px;">
 	<thead>
