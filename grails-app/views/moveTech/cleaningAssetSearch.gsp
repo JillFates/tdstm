@@ -1,28 +1,173 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Asset</title>
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}"/>
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}"/>
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}"/>
-	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
-	
-	<g:javascript library="prototype" />
-	<g:javascript library="jquery" />
-	
-	<jq:plugin name="ui.core" />
-	<jq:plugin name="ui.dialog" />
-	
-	<script>
-	$(document).ready(function() {
-	$("#serverInfoDialog").dialog({ autoOpen: false })	       
-	})
-	</script>
+<head>
+<style type="text/css">
+P, td  {MARGIN-TOP: 0px; MARGIN-BOTTOM: 0px; FONT-FAMILY: Arial; FONT-SIZE:10pt; }
+h4, h2 {COLOR: #c21428; }
+h3     {MARGIN-TOP: 0px; MARGIN-BOTTOM: 0px; COLOR: #ffffff; FONT-SIZE: 18pt;}
 
-	<script type="text/javascript">    
+</style>
+<script type="text/javascript" language="Javascript1.2">
+var sHint = "C:\\temp\\output";
+//=============================================================================
+// PRINT HERE
+//=============================================================================
+function startprintjob()
+{
+
+var job = window.TF.CreateJob();
+
+var form = window.document.assetSearchForm;
+var jobdata = job.NewJobDataRecordSet();
+
+    job.RepositoryName = "C:\\Documents and Settings\\All Users\\Application Data\\TEC-IT\\TFORMer\\6.0\\Examples\\Demo Repository\\Demos.tfr";       			 
+    job.ProjectName 		= form.PrjName.value;     
+    job.FormName 		    = form.FormName.value;                   
+    job.PrinterName 		= form.PrinterName.value; 
+
+    // THIS IS THE PLACE TO ADD YOUR DATA
+
+    jobdata.ClearRecords();               								// delete all previous assigned data - start with empty record set
+
+    jobdata.AddNewRecord();                							// add a new record. Each record prints the Detail Band of the form
+    jobdata.SetDataField('ArticleName', '105C31D');  // set the value of the data-field ArticleName
+    jobdata.SetDataField('ArticleNo',   '1235');       // set the value of the data-field ArticleNo
+    jobdata.SetDataField('ArticlePrice','39');    	   		// set the value of the data-field ArticlePrice
+
+    jobdata.AddNewRecord();                							// add second data record
+    jobdata.SetDataField('ArticleName', '105D74C CSMEDI');
+    jobdata.SetDataField('ArticleNo',   '778920');
+    jobdata.SetDataField('ArticlePrice','39');
+
+    jobdata.AddNewRecord();				   										// add second data record
+    jobdata.SetDataField('ArticleName', 'AIX Console HMC3');
+    jobdata.SetDataField('ArticleNo',   '775116');
+    jobdata.SetDataField('ArticlePrice','75');
+	
+    jobdata.AddNewRecord();				   										// add fourth data record
+    jobdata.SetDataField('ArticleName', '105D74C CSMEDI');
+    jobdata.SetDataField('ArticleNo',   '549896');
+    jobdata.SetDataField('ArticlePrice','200');
+
+    jobdata.AddNewRecord();				   										// add fifth data record
+    jobdata.SetDataField('ArticleName', 'CED14P');
+    jobdata.SetDataField('ArticleNo',   '458862');
+    jobdata.SetDataField('ArticlePrice','400');
+
+    jobdata.AddNewRecord();				  										// add sixth data record
+    jobdata.SetDataField('ArticleName', '20" LCD model');
+    jobdata.SetDataField('ArticleNo',   '445866');
+    jobdata.SetDataField('ArticlePrice','600');
+
+
+		
+
+    // now we print one copy of the label with default settings
+    try 
+    {
+    	job.PrintForm();
+	    alert ("Print Job finished!");
+    }
+    catch (e)
+    {
+	    alert ("TFORMer returned an error!" + 
+	           "\nError description: " + e.description + 
+	           "\nError name: " + e.name + 
+	           "\nError number: " + e.number + 
+	           "\nError message: " + e.message);
+    }
+
+}
+
+//=============================================================================
+// Add a new option to select element
+//=============================================================================
+function AddOption (selElement, text, value)
+{
+  opt = new Option(text, value, false, true);
+  selElement.options[selElement.length] = opt;
+}
+
+//=============================================================================
+// Set default data for TFORMer Runtime Properties
+//=============================================================================
+function InitData()
+{
+var form = window.document.assetSearchForm;
+var path = window.location.href;
+var i = -1;
+
+		// the following code evaluates the path to the demo repository
+		for (n=1; n<=3; n++)
+		{
+			i = path.lastIndexOf('/');
+			if (i != -1)
+			{
+				path = path.substring(0,i)                              // one directory level up
+			}
+		}
+		if (path.substr (0, 8) == "file:///")			                  // do not use URL-style for Repository file name - remove file:///
+		    path = path.substr (8);
+
+    path= unescape(path);	                        					// unescape!
+    form.RepPath.value 	= path + '/Demo Repository/Demos.tfr';  // repository name
+    form.PrjName.value 	= 'TFORMer_Runtime_Examples';						// project name
+    form.FormName.value = 'BarcodeLabels';											// form name
+    form.PrinterName.value = ''																	// use default printer
+
+		// get list of installed printers
+		var dropdown = document.getElementById("Printers");
+		window.TF.RefreshOSPrinters();
+		var def = 0;
+		for (i = 0; i < window.TF.GetOSPrintersCount(); i++) 
+		{
+		  AddOption (dropdown, window.TF.GetOSPrinter(i), window.TF.GetOSPrinter(i));
+		  if (window.TF.GetOSPrinter(i) == window.TF.GetOSDefaultPrinter())
+		    def = i;
+		}
+		// add TFORMer standard output formats
+	  AddOption (dropdown, "PDF-File", "PDF:" + sHint + ".PDF");
+	  AddOption (dropdown, "PostScript-File", "PS:" + sHint + ".PS");
+	  AddOption (dropdown, "HTML-File", "HTML:" + sHint + ".HTML");
+	  AddOption (dropdown, "Zebra (ZPL-II)", "ZPL:" + sHint + ".ZPL");
+	  AddOption (dropdown, "Image (BMP)", "IMGBMP:" + sHint + ".BMP");
+	  AddOption (dropdown, "Image (GIF)", "IMGGIF:" + sHint + ".GIF");
+	  AddOption (dropdown, "Image (JPG)", "IMGJPG:" + sHint + ".JPG");
+	  AddOption (dropdown, "Image (PCX)", "IMGPCX:" + sHint + ".PCX");
+	  AddOption (dropdown, "Image (PNG)", "IMGPNG:" + sHint + ".PNG");
+	  AddOption (dropdown, "Image (TGA)", "IMGTGA:" + sHint + ".TGA");
+	  AddOption (dropdown, "Image (TIF)", "IMGTIF:" + sHint + ".TIF");
+	  AddOption (dropdown, "Image (TIF Multipage)", "IMGMULTITIF:" + sHint + ".TIF");
+	  dropdown.options[def].selected = true;
+	  mySelect(dropdown);
+}
+
+//=============================================================================
+// Handle Browse Button
+//=============================================================================
+function FileFind_onchange()
+{
+var form = window.document.assetSearchForm;
+
+  form.RepPath.value = form.FileFind.value;
+}
+
+//=============================================================================
+// The selected dprinter has changed
+//=============================================================================
+function mySelect(x)
+{
+	document.getElementById("PrinterName").value = x.options[x.selectedIndex].value;
+}
+
+</script>
+
+
+
+	<script type="text/javascript">	
+	
+	   
         function serverInfo(e){        
         var loc = document.assetSearchForm.location.value;
       	var location;
@@ -114,10 +259,11 @@
            
     </script>
 </head>
-<body>
+<body onload="InitData()">
+
 <div id="serverInfoDialog" title="Server Info" onclick="$('#serverInfoDialog').dialog('close')">
 </div>
-		
+		<object id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C" viewastext></object>
 		<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 			<div class="mainbody" style="width: 100%;">
 			<div class="colum_techlogin" style="float: left;">
@@ -174,8 +320,14 @@
 					<option value="1">1</option>
 					<option value="2" selected="selected">2</option>
 					<option value="3">3</option>
-					</select></td>
-					<td class="buttonR"><input type="button" value="Print" onclick="alert('Labels were printed')"/></td>
+					</select>
+						<input type= "hidden" id="RepPath" name="RepPath">
+      	  				<input type= "hidden" name="PrjName" id="PrjName">
+          				<input type= "hidden" name="FormName" id="FormName">
+	      				<select type= "hidden" id="Printers" name="Printers" onChange="javascript:mySelect(this);"/>
+          				<input type= "hidden" name="PrinterName" id="PrinterName">
+		  				<input id="button1" onclick="startprintjob()" type="button" value="Start Printing" name="button1" >
+		  			</td>
 					</tr>
 					</g:if>
 					<g:else>
