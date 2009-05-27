@@ -364,6 +364,8 @@
      function autoTeamAssignComplete( e ) {
         hideProcessing()
      	var teamAssetList = eval('(' + e.responseText + ')')
+     	var team = document.getElementById('team')
+     	team.selectedIndex = 0
      	assetList = teamAssetList[0].assetList
 		table = document.getElementById('assetTable')
 		deleteRow( table )
@@ -550,6 +552,7 @@
               						<g:each in="${projectTeamInstance}" var="projectTeam">
        	      							<option value="${projectTeam?.teamCode}">${projectTeam?.teamCode}</option>
 	           						</g:each>
+	           						<option value="unAssign">UnAssigned</option>
              					</select>
     	          			</div>
     	          	</div>

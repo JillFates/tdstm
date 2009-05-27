@@ -308,7 +308,7 @@ function mySelect(x)
 					</div>
 					</g:if></div>
 			<div style="float:right;margin-right:10px;">
-				<input type="text" name="textSearch" size="10" onchange="submittheform()" onkeyup="timeInterval = setTimeout('submittheform()',2000)" onkeydown="if(timeInterval){clearTimeout(timeInterval)}"/>&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/>
+				<input type="text" name="textSearch" size="10" onchange="submittheform()" onkeyup="timeInterval = setTimeout('submittheform()',1500)" onkeydown="if(timeInterval){clearTimeout(timeInterval)}"/>&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/>
 			</div>
 			<div onclick="${remoteFunction(action:'getServerInfo', params:'\'assetId=\'+'+projMap.asset.id,onComplete: 'serverInfo(e)')}">
 					
@@ -350,7 +350,11 @@ function mySelect(x)
 					<option value="2" selected="selected">2</option>
 					<option value="3">3</option>
 					</select>
-					
+					<input type= "hidden" id="RepPath" name="RepPath">
+      	  				<input type= "hidden" name="PrjName" id="PrjName">
+          				<input type= "hidden" name="FormName" id="FormName">
+          				<select type= "hidden" id="Printers" name="Printers" onChange="javascript:mySelect(this);"/>
+          				<input type= "hidden" name="PrinterName" id="PrinterName">
 						</td>
 					<td class="buttonR"><input type="button" value="Print" disabled="disabled"/></td>
 					</tr>

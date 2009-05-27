@@ -51,7 +51,7 @@ document.loginForm.submit();
 			</tr>
 			<tr>
 				<td style="text-align:center;"><label>Username:</label>
-				<input type="text" size="10" name="username" value="${username}" onchange="submittheform()" onkeyup="timeInterval = setTimeout('submittheform()',2000)" onkeydown="if(timeInterval){clearTimeout(timeInterval)}" /></td>
+				<input type="text" size="10" name="username" value="${username}" onchange="submittheform()" onkeyup="timeInterval = setTimeout('submittheform()',1500)" onkeydown="if(timeInterval){clearTimeout(timeInterval)}" /></td>
 			</tr>
 			<tr>
 				<td height="25px;"></td>
