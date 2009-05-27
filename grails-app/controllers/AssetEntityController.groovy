@@ -789,7 +789,6 @@ class AssetEntityController {
         def moveBundleInstance
         def stateVal
         def taskVal
-        def check = true
         if(bundleId){
         	userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
             moveBundleInstance = MoveBundle.findById(bundleId)
@@ -854,6 +853,7 @@ class AssetEntityController {
         supportTeam.put("transport", transportTeam )
         supportTeam.put("transportMembers", transportMembers.delete((transportMembers.length()-1),transportMembers.length()) )
         totalAsset.each{
+        	def check = true
         	def projectAssetMap = ProjectAssetMap.findByAsset(it)
         	def curId = 0
         	if(projectAssetMap){

@@ -527,7 +527,7 @@ td .odd {
 		var link = document.createElement('a');
 		link.href = '#'
 		link.onclick = function(){document.getElementById('createAssetCommentId').value = asset[0].assetEntity.id ;new Ajax.Request('listComments?id='+asset[0].assetEntity.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e);}})} //;return false
-		link.innerHTML = "<img src=\"/tds/images/skin/database_table_red.png\" border=\"0px\">"
+		link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
 		document.getElementById('icon_'+asset[0].assetEntity.id).appendChild(link);
 		}
 		document.assetdetailsForm.priority.value = "";

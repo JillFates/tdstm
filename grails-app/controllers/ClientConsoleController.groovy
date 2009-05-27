@@ -302,7 +302,12 @@ class ClientConsoleController {
 	    	        	}
 	    	        	tdId << [id:"${assetId+"_"+trans}", cssClass:cssClass]
 	            	}
-	            	assetEntityList << [id: assetId, application:it.application ? it.application : "",appOwner:it.appOwner ? it.appOwner : "",appSme:it.appSme ? it.appSme : "",assetName:it.assetName ? it.assetName :"",tdId:tdId, check:check]
+	            	def showCommentIcon = false
+	            	def assetComment = AssetComment.find('from AssetComment where assetEntity = '+assetId+' and commentType = ? and isResolved = ?',['issue',0])
+	            	if(assetComment){
+	            		showCommentIcon = true
+	            	}
+	            	assetEntityList << [id: assetId, application:it.application ? it.application : "",appOwner:it.appOwner ? it.appOwner : "",appSme:it.appSme ? it.appSme : "",assetName:it.assetName ? it.assetName :"",tdId:tdId, check:check, showCommentIcon:showCommentIcon]
 	            }
 	        }
     	render assetEntityList as JSON
