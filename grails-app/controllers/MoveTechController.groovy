@@ -4,6 +4,7 @@
 import org.jsecurity.authc.AuthenticationException
 import org.jsecurity.authc.UsernamePasswordToken
 import org.jsecurity.SecurityUtils
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import grails.converters.JSON
 
 class MoveTechController {
@@ -442,7 +443,7 @@ class MoveTechController {
                             }
                         }
                         assetCommt = AssetComment.findAllByAssetEntity(assetItem)
-                        render(view:'assetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:params.search,label:label,actionLabel:actionLabel])
+                        render(view:'assetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:params.search,label:label,actionLabel:actionLabel,filePath:ApplicationHolder.application.parentContext.getResource("resource/racking_label.tff").getFile()])
                     }
                 }
             }
@@ -497,10 +498,10 @@ class MoveTechController {
                     assetComment.commentType = 'issue'
                  	assetComment.createdBy = loginUser.person
                     assetComment.save()
-                    render(view: 'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,"bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo",label:label,actionLabel:actionLabel])
+                    render(view: 'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,"bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo",label:label,actionLabel:actionLabel,filePath:ApplicationHolder.application.parentContext.getResource("resource/racking_label.tff").getFile()])
                 } else {
                     flash.message = message(code :workflow.message)
-                    render(view: 'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,"bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo",label:label,actionLabel:actionLabel])
+                    render(view: 'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,"bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo",label:label,actionLabel:actionLabel,filePath:ApplicationHolder.application.parentContext.getResource("resource/racking_label.tff").getFile()])
                 }
             }
         } else {
@@ -686,14 +687,15 @@ class MoveTechController {
                                 }
                             }
                             assetCommt = AssetComment.findAllByAssetEntity(assetItem)
-                            render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel])
+                            
+                            render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:ApplicationHolder.application.parentContext.getResource("resource/racking_label.tff").getFile()])
                         }
                     }
                 }
             } catch (Exception ex){
                 flash.message = message(code :"The asset is not associated with bundle and team, please check it")
                 if(textSearch){
-                    render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel])
+                    render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:ApplicationHolder.application.parentContext.getResource("resource/racking_label.tff").getFile()])
                 } else {
                     redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
                 }

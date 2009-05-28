@@ -21,7 +21,7 @@
 	$("#serverInfoDialog").dialog({ autoOpen: false })	       
 	})
 	</script>
-<script type="text/javascript" language="Javascript1.2">
+<script type="text/javascript" language="Javascript1.2"><!--
 var sHint = "C:\\temp\\output";
 //=============================================================================
 // PRINT HERE
@@ -34,7 +34,7 @@ var job = window.TF.CreateJob();
 var form = window.document.assetSearchForm;
 var jobdata = job.NewJobDataRecordSet();
 
-    job.RepositoryName = "C:\\Documents and Settings\\All Users\\Application Data\\TEC-IT\\TFORMer\\6.0\\Examples\\Demo Repository\\Demos.tfr";       			 
+    job.RepositoryName = document.getElementById('urlPath').value;       			 
     job.ProjectName 		= form.PrjName.value;     
     job.FormName 		    = form.FormName.value;                   
     job.PrinterName 		= form.PrinterName.value; 
@@ -44,35 +44,16 @@ var jobdata = job.NewJobDataRecordSet();
     jobdata.ClearRecords();               								// delete all previous assigned data - start with empty record set
 
     jobdata.AddNewRecord();                							// add a new record. Each record prints the Detail Band of the form
-    jobdata.SetDataField('ArticleName', '105C31D');  // set the value of the data-field ArticleName
-    jobdata.SetDataField('ArticleNo',   '1235');       // set the value of the data-field ArticleNo
-    jobdata.SetDataField('ArticlePrice','39');    	   		// set the value of the data-field ArticlePrice
+    jobdata.SetDataField('serverName', '105C31D');  // set the value of the data-field ArticleName
+    jobdata.SetDataField('model',   'KVM');       // set the value of the data-field ArticleNo
+    jobdata.SetDataField('assetTag','c2a134'); 
+    jobdata.SetDataField('cart','12');    	   		
+    jobdata.SetDataField('shelf','shelf1');
+    jobdata.SetDataField('room','11');
+    jobdata.SetDataField('rack','rackad1');
+    jobdata.SetDataField('upos','123');
 
-    jobdata.AddNewRecord();                							// add second data record
-    jobdata.SetDataField('ArticleName', '105D74C CSMEDI');
-    jobdata.SetDataField('ArticleNo',   '778920');
-    jobdata.SetDataField('ArticlePrice','39');
-
-    jobdata.AddNewRecord();				   										// add second data record
-    jobdata.SetDataField('ArticleName', 'AIX Console HMC3');
-    jobdata.SetDataField('ArticleNo',   '775116');
-    jobdata.SetDataField('ArticlePrice','75');
-	
-    jobdata.AddNewRecord();				   										// add fourth data record
-    jobdata.SetDataField('ArticleName', '105D74C CSMEDI');
-    jobdata.SetDataField('ArticleNo',   '549896');
-    jobdata.SetDataField('ArticlePrice','200');
-
-    jobdata.AddNewRecord();				   										// add fifth data record
-    jobdata.SetDataField('ArticleName', 'CED14P');
-    jobdata.SetDataField('ArticleNo',   '458862');
-    jobdata.SetDataField('ArticlePrice','400');
-
-    jobdata.AddNewRecord();				  										// add sixth data record
-    jobdata.SetDataField('ArticleName', 'AIX Console HMC2');
-    jobdata.SetDataField('ArticleNo',   '445866');
-    jobdata.SetDataField('ArticlePrice','600');
-
+    
 
 		
 
@@ -80,7 +61,7 @@ var jobdata = job.NewJobDataRecordSet();
     try 
     {
     	job.PrintForm();
-	    alert ("Print Job finished!");
+	    document.getElementById('printCheck').value = "printed"
     }
     catch (e)
     {
@@ -231,7 +212,10 @@ function mySelect(x)
       	return true;
       	}
       	}   
-      	}  
+      	}
+      	
+      	
+      	  
       	function doTransition(){
       	if(validation()){
       	document.assetSearchForm.action="placeHold";
@@ -242,12 +226,23 @@ function mySelect(x)
       	}
       
       	function clean(){
-      	if(doCheckValidation()){  
-   		document.assetSearchForm.action = "cleaning";      
-   		document.assetSearchForm.submit();
-   		}else{
-   		return false;
-   		}
+      		if(doCheckValidation()){ 
+      			var printCheck = document.getElementById('printCheck');
+      			if(printCheck.value != "printed" )
+      			{
+      				if(confirm('You have not printed labels for this asset. Are you sure that you want to continue?')){
+      					document.assetSearchForm.action = "cleaning";      
+   						document.assetSearchForm.submit();
+      				}else {
+      					return false;
+      				}
+   				}else {
+   						document.assetSearchForm.action = "cleaning";      
+   						document.assetSearchForm.submit();
+   				}
+   			}else{
+   				return false;
+   			}
       	}
       
         function doCheckValidation(){
@@ -289,6 +284,8 @@ function mySelect(x)
 			<div style="float: left; width: 100%; margin: 5px 0;">
 				<g:form	name="assetSearchForm" action="cleaningAssetSearch">
 					<input name="bundle" type="hidden" value="${bundle}" />
+					<input type="hidden" name="printCheck" id="printCheck" value="notprinted"/>
+					<input type="hidden" name="urlPath" id="urlPath" value="${filePath}"/>
 					<input name="team" type="hidden" value="${team}" />
 					<input name="location" type="hidden" value="${location}" />
 					<input name="project" type="hidden" value="${project}" />

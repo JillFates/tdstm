@@ -739,15 +739,7 @@ class MoveBundleAssetController {
         	}
     		assetCommentList.each { assetComment ->
     			def createdBy
-    			def assetTransitionInstance = AssetTransition.findByAssetEntity(assetComment.assetEntity)
-    			if ( assetTransitionInstance?.projectTeam != null ){
-    				def createdParty = PartyGroup.findById(assetTransitionInstance.projectTeam.id)
-    				createdBy = createdParty?.name
-    			}else if ( assetTransitionInstance?.userLogin != null ){
-    				def createdParty = Person.findById(assetTransitionInstance.userLogin.id)
-    				createdBy = createdParty?.firstName ? createdParty?.firstName : ""+" "+createdParty?.lastName ? createdParty?.lastName : ""
-    			}
-    			reportFields <<['assetName':assetComment?.assetEntity?.assetName, 'assetTag':assetComment?.assetEntity?.assetTag, 'serialNumber':assetComment?.assetEntity?.serialNumber,'model':assetComment?.assetEntity?.model, 'occuredAt':assetComment?.dateCreated, 'createdBy':createdBy, 'issue':assetComment?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 'clientName':projectInstance?.client?.name]
+    			reportFields <<['assetName':assetComment?.assetEntity?.assetName, 'assetTag':assetComment?.assetEntity?.assetTag, 'serialNumber':assetComment?.assetEntity?.serialNumber,'model':assetComment?.assetEntity?.model, 'occuredAt':assetComment?.dateCreated, 'createdBy':assetComment?.createdBy?.firstName+" "+assetComment?.createdBy?.lastName, 'issue':assetComment?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 'clientName':projectInstance?.client?.name]
     			if(	assetComment.isResolved == 1 ) {
     				reportFields <<['assetName':null, 'assetTag':null, 'serialNumber':null,'model':null, 'occuredAt':assetComment?.dateResolved, 'createdBy':assetComment?.resolvedBy?.firstName+" "+assetComment?.resolvedBy?.lastName, 'issue':assetComment?.resolution, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 'clientName':projectInstance?.client?.name]
     			}
