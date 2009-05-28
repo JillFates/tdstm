@@ -150,7 +150,7 @@ function updateTransitions(e){
 					link.href = '#'
 					link.id = assetTransition.id
 					link.onclick = function(){document.getElementById('createAssetCommentId').value = assetTransition.id ;new Ajax.Request('../assetEntity/listComments?id='+this.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e);}})} //;return false
-					link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">xx"
+					link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
 					commentIcon.appendChild(link);
 					commentIcon.style.visibility='visible';
 				} 

@@ -180,7 +180,6 @@ class AssetEntityController {
                     dataTransferBatch.project = project
                     dataTransferBatch.userLogin = userLogin
                     if(dataTransferBatch.save()){
-                        def dataTransferValue
                         def eavAttributeInstance
                         def colNo = 0
                         for (int index = 0; index < col; index++) {
@@ -188,20 +187,28 @@ class AssetEntityController {
                         		colNo = index
                         	}
                         }
-                        for ( int r = 1; r < sheet.rows; r++ ) {
+                        def sheetrows = sheet.rows
+                        for ( int r = 1; r < sheetrows ; r++ ) {
                         	def server = sheet.getCell( colNo, r ).contents
                         	if(server){
+                        		def dataTransferValueList = new StringBuffer()
 	                        	for( int cols = 0; cols < col; cols++ ) {
 	                        		def dataTransferAttributeMapInstance = DataTransferAttributeMap.findByColumnName(sheet.getCell( cols, 0 ).contents)
 	                            	if( dataTransferAttributeMapInstance != null ) {
-	                                    dataTransferValue = new DataTransferValue()
+	                            		def assetId
+	                            		if( sheetColumnNames.containsKey("assetId") && (sheet.getCell( 0, r ).contents != "") ) {
+	                            			assetId = Integer.parseInt(sheet.getCell( 0, r ).contents)
+	                                    }
+	                            		def dataTransferValues = "("+assetId+",'"+sheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+dataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
+	                            		dataTransferValueList.append(dataTransferValues)
+	                            		dataTransferValueList.append(",")
+	                                    /*dataTransferValue = new DataTransferValue()
 	                                    eavAttributeInstance = dataTransferAttributeMapInstance.eavAttribute
 	                                    dataTransferValue.importValue = sheet.getCell( cols, r ).contents
 	                                    dataTransferValue.rowId = r
 	                                    dataTransferValue.dataTransferBatch = dataTransferBatch
 	                                    dataTransferValue.eavAttribute = eavAttributeInstance
 	                                    if( sheetColumnNames.containsKey("assetId") && (sheet.getCell( 0, r ).contents != "") ) {
-		                                    	
 	                                        dataTransferValue.assetEntityId = Integer.parseInt(sheet.getCell( 0, r ).contents)
 	                                    }
 	                                    if ( dataTransferValue.save() ) {
@@ -209,13 +216,19 @@ class AssetEntityController {
 	                                    } else {
 	                                        skipped += ( r +1 )
 	                                    }
+	                                    */
                                 	}
                                 }
+                        		try{
+                        			jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
+                        			added = r
+                        		} catch (Exception e) {
+                        			skipped += ( r +1 )
+                        		}
                             }
 	                	
                         }
                         for( int i=0;  i < sheetNamesLength; i++ ) {
-	    	        	    	
                             if(sheetNames[i] == "Comments"){
                                 def commentSheet = workbook.getSheet(sheetNames[i])
                                 for( int rowNo = 1; rowNo < commentSheet.rows; rowNo++ ) {
