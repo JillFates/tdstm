@@ -811,10 +811,10 @@ class AssetEntityController {
             if(defaultBundle.CURR_BUNDLE){
             	moveBundleInstance = MoveBundle.findById(defaultBundle.CURR_BUNDLE)
             	if( moveBundleInstance.project.id != Integer.parseInt(projectId) ){
-                    moveBundleInstance = MoveBundle.findByProject(projectInstance)
+            		moveBundleInstance = MoveBundle.find("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
             	}
             } else {
-            	moveBundleInstance = MoveBundle.findByProject(projectInstance)
+            	moveBundleInstance = MoveBundle.find("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
             }
         }
         def orderDesc = params.order;
