@@ -93,7 +93,7 @@
         </jsec:lacksRole>
         <jsec:hasRole in="['ADMIN','SUPERVISOR']">
         <li><g:link class="home" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id]">Console</g:link></li>
-        </jsec:lacksRole>
+        </jsec:hasRole>
         <jsec:hasRole in="['ADMIN','MANAGER','OBSERVER']">
         <li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">PMO Dashboard</g:link> </li>
         </jsec:hasRole>
