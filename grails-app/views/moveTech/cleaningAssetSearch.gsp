@@ -271,10 +271,7 @@ function mySelect(x)
 <body onload="InitData()">
 <div id="serverInfoDialog" title="Server Info" onclick="$('#serverInfoDialog').dialog('close')">
 </div>
-		<object id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C" viewastext></object>
-		<OBJECT ID="tformer" CLASSID="CLSID:06889605-B8D0-101A-91F1-00608CEAD5B3"
-   CODEBASE="${filePath}/resource/TFORMer60.cab">
-   </OBJECT>
+<OBJECT id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C" CODEBASE="${createLinkTo(dir:'resource',file:'TFORMer60.cab')}"></OBJECT>
 		
 		<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 			<div class="mainbody" style="width: 100%;">
