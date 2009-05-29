@@ -832,7 +832,7 @@ function resolveValidate(formName,idVal){
 					
 					<table>
 						<thead>
-
+<jsec:hasRole name="ADMIN">
 							<tr
 								onmouseover="document.getElementById('tdId').style.background = 'white';">
 								<td id="tdId"><input id="state" type="button"
@@ -840,14 +840,15 @@ function resolveValidate(formName,idVal){
 								</td>
 							</tr>
 							<tr>
+							</jsec:hasRole>
 								<!-- <g:sortableColumn property="assetName" title="Asset Name" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
 					<g:sortableColumn property="status" title="Status" />
 					<g:sortableColumn property="team" title="Team" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
 					<g:sortableColumn property="statTimer" title="Stat Timer" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
 					<g:sortableColumn property="loc" title="Loc" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
 					<g:sortableColumn property="issues" title="Issues" /> -->
-								<jsec:hasRole in="['ADMIN','SUPERVISOR']"><th>Actions <a href="#" onclick="selectAll()"><u
-									style="color: blue;">All</u></a></th></jsec:hasRole>
+								<jsec:hasRole in="['ADMIN','SUPERVISOR']"><th>Actions <jsec:hasRole name="ADMIN"><a href="#" onclick="selectAll()"><u
+									style="color: blue;">All</u></a></jsec:hasRole></th></jsec:hasRole>
 								<th>Priority</th>
 								<th>Asset Tag</th>
 								<th>Asset Name</th>
