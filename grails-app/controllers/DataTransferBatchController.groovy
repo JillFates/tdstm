@@ -1,7 +1,7 @@
 import com.tdssrc.eav.EavAttributeSet
 import org.jsecurity.SecurityUtils
 class DataTransferBatchController {
-    
+    def sessionFactory
     def index = { redirect(action:list,params:params) }
 
     // the delete, save and update actions only accept POST requests
@@ -24,16 +24,17 @@ class DataTransferBatchController {
     		def dataTransferBatch = DataTransferBatch.get(params.batchId)
 	    	if(dataTransferBatch){
 		    	def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = $dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
-		    	for(int dataTransferValueRow =0; dataTransferValueRow < dataTransferValueRowList.size(); dataTransferValueRow ++) {
+		    	def assetsSize = dataTransferValueRowList.size()
+		    	for(int dataTransferValueRow =0; dataTransferValueRow < assetsSize; dataTransferValueRow ++) {
 		    		def rowId =dataTransferValueRowList[dataTransferValueRow].rowId
 		    		def dtvList = DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
 		    		def  assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
 		    		def assetEntity
-		    		if(assetEntityId == null) {
+		    		if( assetEntityId ) {
+		    			assetEntity = AssetEntity.findById(assetEntityId)
+		    		}else {
 		    			assetEntity = new AssetEntity()
 		    			assetEntity.attributeSet = EavAttributeSet.findById(1)
-		    		}else {
-		    			assetEntity = AssetEntity.findById(assetEntityId)
 		    		}
 		    		if(assetEntity){
 			    		assetEntity.project = projectInstance 
@@ -46,17 +47,15 @@ class DataTransferBatchController {
 			        				assetEntity."$attribName" = exportMoveBundleInstance ? exportMoveBundleInstance : importMoveBundleInstance
 			    				}
 			    			}else if( it.eavAttribute.backendType == "int" ){
-			    				def importPos
 			    				def correctedPos
-			    				if(it.importValue != null && it.importValue != "") {
-			    					importPos = Integer.parseInt(it.importValue)
-			    				}
-			    				if(it.correctedValue != null && it.correctedValue != "") {
+			    				if( it.correctedValue ) {
 			    					correctedPos = Integer.parseInt(it.correctedValue)
+			    				} else if( it.importValue ) {
+			    					correctedPos = Integer.parseInt(it.importValue)
 			    				}
 			    				
-			    				correctedPos = it.correctedValue
-			    				assetEntity."$attribName" = correctedPos ? correctedPos : importPos
+			    				//correctedPos = it.correctedValue
+			    				assetEntity."$attribName" = correctedPos 
 			    			}else {
 			    				assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
 			    			}
