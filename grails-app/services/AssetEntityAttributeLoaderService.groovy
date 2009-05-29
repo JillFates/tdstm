@@ -214,7 +214,7 @@ class AssetEntityAttributeLoaderService {
 			// assign assets to bundle
 			assetsList.each{asset->
 				if ( bundleFrom ) {
-					def updateAssets = AssetEntity.executeUpdate("update AssetEntity set moveBundle = $bundleTo where moveBundle = $bundleFrom  and id = $asset")
+					def updateAssets = AssetEntity.executeUpdate("update AssetEntity set moveBundle = $bundleTo,project = $moveBundleTo.project.id where moveBundle = $bundleFrom  and id = $asset")
 				
 				} else {
 					/*def assetEntity = AssetEntity.findById( asset )
@@ -238,7 +238,6 @@ class AssetEntityAttributeLoaderService {
 		def list = new ArrayList()
 		def token = new StringTokenizer(stringList, ",")
 		while (token.hasMoreTokens()) {
-			//println"list=============>"+token.nextToken()
 			list.add(token.nextToken())
      	}
 		return list
