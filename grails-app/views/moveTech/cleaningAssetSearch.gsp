@@ -272,6 +272,10 @@ function mySelect(x)
 <div id="serverInfoDialog" title="Server Info" onclick="$('#serverInfoDialog').dialog('close')">
 </div>
 		<object id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C" viewastext></object>
+		<OBJECT ID="tformer" CLASSID="CLSID:06889605-B8D0-101A-91F1-00608CEAD5B3"
+   CODEBASE="${filePath}/resource/TFORMer60.cab">
+   </OBJECT>
+		
 		<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 			<div class="mainbody" style="width: 100%;">
 			<div class="colum_techlogin" style="float: left;">
@@ -285,7 +289,7 @@ function mySelect(x)
 				<g:form	name="assetSearchForm" action="cleaningAssetSearch">
 					<input name="bundle" type="hidden" value="${bundle}" />
 					<input type="hidden" name="printCheck" id="printCheck" value="notprinted"/>
-					<input type="hidden" name="urlPath" id="urlPath" value="${filePath}"/>
+					<input type="hidden" name="urlPath" id="urlPath" value="${filePath}/resource/racking_label.tff"/>
 					<input name="team" type="hidden" value="${team}" />
 					<input name="location" type="hidden" value="${location}" />
 					<input name="project" type="hidden" value="${project}" />

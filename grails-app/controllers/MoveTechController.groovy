@@ -733,8 +733,7 @@ class MoveTechController {
         // construct application URL
         def appUrl = protocol + "://" + serverName + ":" + serverPort + contextPath
         // get connection
-        def templateFilePath = appUrl + "/resource/racking_label.tff"
-        def fileUrl = new URL( templateFilePath )
+        def fileUrl = new URL( appUrl )
 		return fileUrl
 	}
 }
