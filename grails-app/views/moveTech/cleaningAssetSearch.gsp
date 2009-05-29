@@ -30,28 +30,28 @@ function startprintjob()
 {
 
 var job = window.TF.CreateJob();
-
 var form = window.document.assetSearchForm;
 var jobdata = job.NewJobDataRecordSet();
-
     job.RepositoryName = document.getElementById('urlPath').value;       			 
-    job.ProjectName 		= form.PrjName.value;     
-    job.FormName 		    = form.FormName.value;                   
-    job.PrinterName 		= form.PrinterName.value; 
+    job.ProjectName = form.PrjName.value;     
+    job.FormName = form.FormName.value;                   
+    job.PrinterName = form.PrinterName.value;
+    var labelsCount = document.assetSearchForm.labels.value;  
 
     // THIS IS THE PLACE TO ADD YOUR DATA
 
-    jobdata.ClearRecords();               								// delete all previous assigned data - start with empty record set
-
-    jobdata.AddNewRecord();                							// add a new record. Each record prints the Detail Band of the form
-    jobdata.SetDataField('serverName', '105C31D');  // set the value of the data-field ArticleName
-    jobdata.SetDataField('model',   'KVM');       // set the value of the data-field ArticleNo
-    jobdata.SetDataField('assetTag','c2a134'); 
-    jobdata.SetDataField('cart','12');    	   		
-    jobdata.SetDataField('shelf','shelf1');
-    jobdata.SetDataField('room','11');
-    jobdata.SetDataField('rack','rackad1');
-    jobdata.SetDataField('upos','123');
+    jobdata.ClearRecords();               					
+    for(var label = 0; label < labelsCount; label++) {
+    	jobdata.AddNewRecord();                					
+    	jobdata.SetDataField('serverName', document.assetSearchForm.serverName.value); 
+    	jobdata.SetDataField('model',   document.assetSearchForm.model.value);       
+    	jobdata.SetDataField('assetTag',document.assetSearchForm.assetTag.value); 
+    	jobdata.SetDataField('cart',document.assetSearchForm.cart.value);    	   		
+    	jobdata.SetDataField('shelf',document.assetSearchForm.shelf.value);
+    	jobdata.SetDataField('room',document.assetSearchForm.room.value);
+    	jobdata.SetDataField('rack',document.assetSearchForm.rack.value);
+    	jobdata.SetDataField('upos',document.assetSearchForm.upos.value);
+    }
 
     
 
@@ -295,6 +295,14 @@ function mySelect(x)
 					<input name="actionLabel" type="hidden" value="${actionLabel}"  />
 					<input name="user" type="hidden" value="ct" />
 					<input name="assetPage" type="hidden" value="assetPage" />
+					<input name="serverName" type="hidden" value="${projMap?.asset?.assetName}" />
+					<input name="model" type="hidden" value="${projMap?.asset?.model}" />
+					<input name="cart" type="hidden" value="${projMap?.asset?.cart}" />
+					<input name="shelf" type="hidden" value="${projMap?.asset?.shelf}" />
+					<input name="room" type="hidden" value="${projMap?.asset?.targetRoom}" />
+					<input name="rack" type="hidden" value="${projMap?.asset?.targetRack}" />
+					<input name="upos" type="hidden" value="${projMap?.asset?.targetRackPosition}" />
+					<input name="assetTag" type="hidden" value="${projMap?.asset?.assetTag}" />
 					<table style="border: 0px;">
 			<div id="mydiv" onclick="document.getElementById('mydiv').style.display = 'none';">
 					<g:if test="${flash.message}">
