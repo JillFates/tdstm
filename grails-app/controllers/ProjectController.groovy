@@ -25,7 +25,10 @@ class ProjectController {
         } else { 
         	def currProj = session.getAttribute("CURR_PROJ");
         	def currProjectInstance = Project.get( currProj.CURR_PROJ )
-        	def projectLogo = ProjectLogo.findByProject(currProjectInstance)
+        	def projectLogo
+        	if(currProjectInstance){
+        		projectLogo = ProjectLogo.findByProject(currProjectInstance)
+        	}
         	def imageId
         	if(projectLogo){
         		imageId = projectLogo.id
@@ -51,14 +54,21 @@ class ProjectController {
     }
 
     def delete = {
-        def projectInstance = Project.get( params.id )
-        if(projectInstance) {
-            projectInstance.delete()
-            flash.message = "Project ${projectInstance} deleted"
-            redirect(action:list)
-        }
-        else {
-            flash.message = "Project not found with id ${params.id}"
+    	
+    	def currProj = session.getAttribute("CURR_PROJ").CURR_PROJ;
+        if(currProj != params.id){
+        	def projectInstance = Project.get( params.id )
+	        if(projectInstance) {
+	            projectInstance.delete()
+	            flash.message = "Project ${projectInstance} deleted"
+	            redirect(action:list)
+	        }
+	        else {
+	            flash.message = "Project not found with id ${params.id}"
+	            redirect(action:list)
+	        }
+        } else {
+            flash.message = "Unable to Delete the Current Project"
             redirect(action:list)
         }
     }

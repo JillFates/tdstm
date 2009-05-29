@@ -23,6 +23,7 @@ class AssetEntityController {
 	def assetEntityInstanceList = []
 	def jdbcTemplate
     def filterService
+    def sessionFactory 
     def index = {
 		redirect( action:list, params:params )
 	}
@@ -226,7 +227,10 @@ class AssetEntityController {
                         			skipped += ( r +1 )
                         		}
                             }
-	                	
+                        	if (r%50 == 0){
+                        		 sessionFactory.currentSession.flush() ;
+                        		 sessionFactory.currentSession.clear();
+                        	}
                         }
                         for( int i=0;  i < sheetNamesLength; i++ ) {
                             if(sheetNames[i] == "Comments"){

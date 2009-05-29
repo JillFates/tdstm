@@ -38,7 +38,7 @@
 					<td><input type="radio" name="selectProject"
 						value="${fieldValue(bean:projectInstance, field:'projectCode')}"></td>
 
-					<td><g:link action="show" id="${projectInstance.id}">${fieldValue(bean:projectInstance, field:'projectCode')}</g:link></td>
+					<td><g:link controller="project" action="show" id="${projectInstance.id}">${fieldValue(bean:projectInstance, field:'projectCode')}</g:link></td>
 
 					<td>${fieldValue(bean:projectInstance, field:'name')}</td>
 

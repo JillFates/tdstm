@@ -846,7 +846,7 @@ function resolveValidate(formName,idVal){
 					<g:sortableColumn property="statTimer" title="Stat Timer" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
 					<g:sortableColumn property="loc" title="Loc" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
 					<g:sortableColumn property="issues" title="Issues" /> -->
-								<jsec:hasRole in="['ADMIN','MANAGER']"><th>Actions <a href="#" onclick="selectAll()"><u
+								<jsec:hasRole in="['ADMIN','SUPERVISOR']"><th>Actions <a href="#" onclick="selectAll()"><u
 									style="color: blue;">All</u></a></th></jsec:hasRole>
 								<th>Priority</th>
 								<th>Asset Tag</th>
@@ -865,7 +865,7 @@ function resolveValidate(formName,idVal){
 									id="assetDetailRow_${assetsList?.asset.id}"
 									class="${assetsList?.cssClass}" value="${assetsList?.asset.id}">
 
-									<jsec:hasRole in="['ADMIN','MANAGER']">
+									<jsec:hasRole in="['ADMIN','SUPERVISOR']">
 									<td><jsec:hasRole name="ADMIN">
 										<g:if test="${assetsList.checkVal == true}">
 <span id="spanId_${assetsList?.asset.id}">

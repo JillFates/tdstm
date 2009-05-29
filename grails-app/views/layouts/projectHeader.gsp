@@ -72,6 +72,7 @@
 </ul>
 </div>
       -->
+      <g:if test="${currProj}">
       <div class="menu2">
       <ul>
         <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
@@ -89,9 +90,13 @@
         </li>  
 		
         <li><g:link class="home" controller="moveBundle" params="[projectId:currProjObj?.id]">Move Bundles</g:link></li>
+        </jsec:lacksRole>
+        <jsec:hasRole in="['ADMIN','SUPERVISOR']">
         <li><g:link class="home" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id]">Console</g:link></li>
         </jsec:lacksRole>
-         <li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">PMO Dashboard</g:link> </li>
+        <jsec:hasRole in="['ADMIN','MANAGER','OBSERVER']">
+        <li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">PMO Dashboard</g:link> </li>
+        </jsec:hasRole>
         <jsec:lacksRole in="['MANAGER','OBSERVER']"><li>  
           	<div id="menubar">
  			<div id="menu1" class="menu_new">Reports<ul>    	      
@@ -109,7 +114,7 @@
         </jsec:lacksRole>
       </ul>
     </div>
-      
+    </g:if>
       <div class="main_bottom"><g:layoutBody /></div>
     </div>
   </body>
