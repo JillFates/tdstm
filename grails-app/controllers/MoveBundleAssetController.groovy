@@ -154,7 +154,7 @@ class MoveBundleAssetController {
 	    	}
     	}else {
     		def projectId = getSession().getAttribute("CURR_BUNDLE").CURR_BUNDLE
-    		def assetEntities = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = projectId ")
+    		def assetEntities = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId ")
 			assetEntities.each{assetEntity ->
 				items <<[id:assetEntity.id, assetName:assetEntity.assetName, assetTag:assetEntity.assetTag, application:assetEntity.application, srcLocation:assetEntity.sourceLocation +"/"+assetEntity.sourceRack  ]
 			}
@@ -174,7 +174,7 @@ class MoveBundleAssetController {
 			}
 		}else{
 			def projectId = getSession().getAttribute("CURR_BUNDLE").CURR_BUNDLE
-			def assetEntities = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = projectId")
+			def assetEntities = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId")
 			assetEntities.each{assetEntity ->
 				items <<[id:assetEntity.id, assetName:assetEntity.assetName, assetTag:assetEntity.assetTag, application:assetEntity.application, srcLocation:assetEntity.sourceLocation +"/"+assetEntity.sourceRack ]
 			}
