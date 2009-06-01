@@ -91,8 +91,6 @@ class AssetEntityController {
         render( view:"assetExport" )
     }
 
-
-
     /*
      * upload excel file into Asset table
      */
@@ -228,8 +226,8 @@ class AssetEntityController {
                         		}
                             }
                         	if (r%50 == 0){
-                        		 sessionFactory.currentSession.flush() ;
-                        		 sessionFactory.currentSession.clear();
+                        		sessionFactory.getCurrentSession().flush();
+    			    			sessionFactory.getCurrentSession().clear();
                         	}
                         }
                         for( int i=0;  i < sheetNamesLength; i++ ) {
@@ -799,7 +797,7 @@ class AssetEntityController {
         def assetList
         def bundleTeams = []
         def assetsList = []
-        def totalAsset
+        def totalAsset = []
         def supportTeam = new HashMap()
         def projectInstance = Project.findById( projectId )
         def moveBundleInstanceList = MoveBundle.findAll("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
@@ -821,16 +819,16 @@ class AssetEntityController {
             	moveBundleInstance = MoveBundle.find("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
             }
         }
-        def orderDesc = params.order;
-        if(params.sort == "team"){
-            totalAsset = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = ${moveBundleInstance.id} order by ae.sourceTeam.name $orderDesc ")
-        }else if(params.sort == "statTimer"){
-            totalAsset = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = ${moveBundleInstance.id} order by ae.moveBundle.startTime $orderDesc ")	
-        }else if(params.sort == "loc"){
-            totalAsset = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = ${moveBundleInstance.id} order by ae.sourceTeam.currentLocation $orderDesc ")	
-        }else{
-            totalAsset = AssetEntity.findAllByMoveBundle(moveBundleInstance,params)
+        // get the list of assets order by Hold and recent asset Transition
+        def holdTotalAsset = jdbcTemplate.queryForList("select max(at.date_created) as dateCreated, ae.asset_entity_id as id,ae.priority, ae.asset_tag as assetTag, ae.asset_name as assetName, ae.source_team_id as sourceTeam, ae.target_team_id as targetTeam, pm.current_state_id as currentState  FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id) LEFT JOIN project_asset_map pm ON (pm.asset_id = ae.asset_entity_id) where ae.project_id = ${moveBundleInstance.project.id} and ae.move_bundle_id = ${moveBundleInstance.id} and pm.current_state_id = 10 group by ae.asset_entity_id order by dateCreated desc")
+        def otherTotalAsset = jdbcTemplate.queryForList("select max(at.date_created) as dateCreated, ae.asset_entity_id as id,ae.priority, ae.asset_tag as assetTag, ae.asset_name as assetName, ae.source_team_id as sourceTeam, ae.target_team_id as targetTeam, pm.current_state_id as currentState  FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id) LEFT JOIN project_asset_map pm ON (pm.asset_id = ae.asset_entity_id) where ae.project_id = ${moveBundleInstance.project.id} and ae.move_bundle_id = ${moveBundleInstance.id} and pm.current_state_id != 10 group by ae.asset_entity_id order by dateCreated desc")
+        holdTotalAsset.each{
+        	totalAsset<<it
         }
+        otherTotalAsset.each{
+        	totalAsset<<it
+        }
+        	//AssetEntity.findAllByMoveBundle(moveBundleInstance,params)
         def projectTeamList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = ${moveBundleInstance.id} and pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport'  order by pt.name asc")
         // Get Id for respective States
         def cleanedId = stateEngineService.getStateId("STD_PROCESS","Cleaned")
@@ -871,10 +869,10 @@ class AssetEntityController {
         supportTeam.put("transportMembers", transportMembers.delete((transportMembers.length()-1),transportMembers.length()) )
         totalAsset.each{
         	def check = true
-        	def projectAssetMap = ProjectAssetMap.findByAsset(it)
+        	def projectAssetMap = it.currentState
         	def curId = 0
         	if(projectAssetMap){
-        		curId = projectAssetMap.currentStateId
+        		curId = it.currentState
         	}
         	stateVal = stateEngineService.getState("STD_PROCESS",curId)
 			if(stateVal){

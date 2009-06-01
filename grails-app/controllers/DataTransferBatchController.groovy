@@ -37,7 +37,7 @@ class DataTransferBatchController {
 		    			assetEntity.attributeSet = EavAttributeSet.findById(1)
 		    		}
 		    		if(assetEntity){
-			    		assetEntity.project = projectInstance 
+			    		assetEntity.project = projectInstance
 			    		dtvList.each {
 			    			def attribName = it.eavAttribute.attributeCode
 			    			if ( attribName == "moveBundle" ) {
@@ -61,6 +61,10 @@ class DataTransferBatchController {
 			    			}
 			    		}
 			    		assetEntity.save()
+			    		if(dataTransferValueRow % 50 == 0) {
+			    			sessionFactory.getCurrentSession().flush();
+			    			sessionFactory.getCurrentSession().clear();
+			    		}
 		    		}
 		    	}  
 		    	def dataTransferCommentRowList = DataTransferComment.findAll(" From DataTransferComment dtc where dtc.dataTransferBatch = $dataTransferBatch.id and dtc.dataTransferBatch.statusCode = 'PENDING'")

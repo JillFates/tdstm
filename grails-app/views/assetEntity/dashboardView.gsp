@@ -855,7 +855,6 @@ function resolveValidate(formName,idVal){
 								<th>Status</th>
 								<th>Source Team</th>
 								<th>Target Team</th>
-								<th>Loc</th>
 								<th>Issues</th>
 							</tr>
 						</thead>
@@ -893,12 +892,11 @@ function resolveValidate(formName,idVal){
 									<td onclick="assetDetails('${assetsList?.asset.id}')"
 										id="statusCol_${assetsList?.asset.id}">${assetsList?.status}</td>
 									<td onclick="assetDetails('${assetsList?.asset.id}')"
-										id="source_${assetsList?.asset.id}">${assetsList?.asset.sourceTeam?.name}</td>
+										id="source_${assetsList?.asset.id}"><g:if test="${assetsList?.asset.targetTeam}">${ProjectTeam.findById(assetsList?.asset.sourceTeam)?.name}</g:if></td>
 									<td onclick="assetDetails('${assetsList?.asset.id}')"
-										id="target_${assetsList?.asset.id}">${assetsList?.asset.targetTeam?.name}</td>
-									<td onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset?.sourceTeam?.currentLocation}</td>
+										id="target_${assetsList?.asset.id}"><g:if test="${assetsList?.asset.targetTeam}"> ${ProjectTeam.findById(assetsList?.asset.targetTeam)?.name}</g:if></td>
 									<td id="icon_${assetsList?.asset.id}"><g:if
-										test="${AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetsList?.asset,'issue',0])}">
+										test="${AssetComment.find('from AssetComment where assetEntity = '+ assetsList?.asset?.id +' and commentType = ? and isResolved = ?',['issue',0])}">
 										<g:remoteLink controller="assetEntity" action="listComments"
 											id="${assetsList?.asset.id}"
 											before="document.getElementById('createAssetCommentId').value = ${assetsList?.asset.id};"
