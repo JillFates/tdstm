@@ -15,7 +15,95 @@
 	
 	<jq:plugin name="ui.core" />
 	<jq:plugin name="ui.dialog" />
+	<script language="JavaScript" >
+	// Function to save a field.
+	var domain		= '';
+	var path		= '/';
+	var secure		= 0;
 	
+function save_field(obj) {
+	var cookie_value = '';
+	var objType = new String(obj.type);
+	switch(objType.toLowerCase()) {
+		case "checkbox" :
+			if (obj.checked) cookie_value = obj.name + '=[1]'
+			else cookie_value = obj.name + '=[0]'
+			break;
+		case "undefined" :
+			// a.k.a. radio field.
+			for (var i = 0; i < obj.length; i++) {
+				if (obj[i].checked) cookie_value = obj[i].name + '=[' + i + ']'
+			}
+			break;
+		case "select-one" :
+			cookie_value = obj.name + '=[' + obj.selectedIndex + ']';
+			break;
+		case "select-multiple" :
+			cookie_value = obj.name + '=[';
+			for (var i = 0; i < obj.options.length; i++) {
+				if (obj.options[i].selected) cookie_value += '+' + i
+			}
+			cookie_value += ']';
+			break;
+		default :
+			// We assume all other fields will have
+			// a valid obj.name and obj.value
+			cookie_value = obj.name + '=[' + obj.value + ']';
+	}
+	if (cookie_value) {
+		var expires = new Date();
+		expires.setYear(expires.getYear() + 1);
+		document.cookie = cookie_value +
+		((domain.length > 0) ? ';domain=' + domain : '') +
+		((path) ? ';path=' + path : '') +
+		((secure) ? ';secure' : '') +
+		';expires=' + expires.toGMTString();
+	}
+	return 1;
+}
+
+// Function to retrieve a field.
+function retrieve_field(obj) {
+	var cookie = '', real_value = '';
+	cookie = document.cookie;
+	var objType = new String(obj.type);
+	if (obj.name)
+		var objName = new String(obj.name);
+	else
+		var objName = new String(obj[0].name);
+	var offset_start = cookie.indexOf(objName + '=[');
+	if (offset_start == -1) return 1;
+	var offset_start_length = objName.length + 2;
+	offset_start = offset_start + offset_start_length;
+	var offset_end = cookie.indexOf(']', offset_start);
+	real_value = cookie.substring(offset_start, offset_end);
+	switch(objType.toLowerCase()) {
+		case "checkbox" :
+			if (real_value == '1') obj.checked = 1
+			else obj.checked = 0
+			break;
+		case "undefined" :
+			obj[real_value].checked = 1;
+			break;
+		case "select-one" :
+			obj.selectedIndex = real_value;
+			break;
+		case "select-multiple" :
+			for (var i = 0; i < obj.options.length; i++) {
+				if ((real_value.indexOf('+' + i)) > -1)
+					obj.options[i].selected = 1;
+				else
+					obj.options[i].selected = 0;
+			}
+			break;
+		default :
+			obj.value = real_value;
+			break;
+	}
+	return 1;
+}
+	
+	</script>
 	<script>
 	$(document).ready(function() {
 	$("#serverInfoDialog").dialog({ autoOpen: false })	       
@@ -62,6 +150,12 @@ var jobdata = job.NewJobDataRecordSet();
     {
     	job.PrintForm();
 	    document.getElementById('printCheck').value = "printed"
+	    var cleanButton = document.getElementById('cleanButton')
+	    if(cleanButton != null && !cleanButton.disabled) {
+	    	cleanButton.focus();
+	    }
+	    save_field(document.assetSearchForm.Printers)
+	    
     }
     catch (e)
     {
@@ -88,6 +182,10 @@ function AddOption (selElement, text, value)
 //=============================================================================
 function InitData()
 {
+var printButton = document.getElementById('printButton');
+if(!printButton.disabled){ 
+	printButton.focus();
+}
 var form = window.document.assetSearchForm;
 var path = window.location.href;
 var i = -1;
@@ -133,7 +231,7 @@ var i = -1;
 	  AddOption (dropdown, "Image (TGA)", "IMGTGA:" + sHint + ".TGA");
 	  AddOption (dropdown, "Image (TIF)", "IMGTIF:" + sHint + ".TIF");
 	  AddOption (dropdown, "Image (TIF Multipage)", "IMGMULTITIF:" + sHint + ".TIF");
-	  dropdown.options[def].selected = true;
+	  retrieve_field(document.assetSearchForm.Printers)
 	  mySelect(dropdown);
 }
 
@@ -153,6 +251,7 @@ var form = window.document.assetSearchForm;
 function mySelect(x)
 {
 	document.getElementById("PrinterName").value = x.options[x.selectedIndex].value;
+	
 }
 
 </script>
@@ -346,7 +445,7 @@ function mySelect(x)
 	      				Printers: <select type= "hidden" id="Printers" name="Printers" onChange="javascript:mySelect(this);"/>
           				<input type= "hidden" name="PrinterName" id="PrinterName">
 		  				</td>
-					<td class="buttonR"><input type="button" value="Print" onclick="startprintjob()"/></td>
+					<td class="buttonR"><input id="printButton" type="button" value="Print" onclick="startprintjob()"/></td>
 					</tr>
 					</g:if>
 					<g:else>
@@ -362,7 +461,7 @@ function mySelect(x)
           				<select type= "hidden" id="Printers" name="Printers" onChange="javascript:mySelect(this);"/>
           				<input type= "hidden" name="PrinterName" id="PrinterName">
 						</td>
-					<td class="buttonR"><input type="button" value="Print" disabled="disabled"/></td>
+					<td class="buttonR"><input id="printButton" type="button" value="Print" disabled="disabled"/></td>
 					</tr>
 					</g:else>		
 					<tr>
@@ -382,7 +481,7 @@ function mySelect(x)
 					</g:each>		
 					<g:if test="${actionLabel}">
 					<tr>
-					<td class="buttonR" style="text-align: right;" colspan="2"><input type="button" value="${actionLabel}" onclick="return clean()" /></td>
+					<td class="buttonR" style="text-align: right;" colspan="2"><input id="cleanButton" type="button" value="${actionLabel}" onclick="return clean()" /></td>
 					</tr>
 					</g:if>
 					<table>
@@ -402,6 +501,6 @@ function mySelect(x)
 		</div>
 		</div>
 		</div>
-<script>setFocus();</script>		
+		<script>setFocus();</script>
 </body>
 </html>

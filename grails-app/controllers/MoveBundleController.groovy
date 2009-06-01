@@ -42,9 +42,14 @@ class MoveBundleController {
         def moveBundleInstance = MoveBundle.get( params.id )
         def projectId = params.projectId
         if(moveBundleInstance) {
-            moveBundleInstance.delete()
-            flash.message = "MoveBundle ${moveBundleInstance} deleted"
-            redirect(action:list, params:[projectId: projectId])
+            try{
+            	moveBundleInstance.delete()
+                flash.message = "MoveBundle ${moveBundleInstance} deleted"
+                redirect(action:list, params:[projectId: projectId])
+            }catch(Exception ex){
+            	flash.message = "Unable to Delete MoveBundle Assosiated with Teams "
+            	redirect(action:list)
+            }
         }
         else {
             flash.message = "MoveBundle not found with id ${params.id}"
@@ -93,7 +98,7 @@ class MoveBundleController {
             if(completionTime != null && completionTime != ""){
             	moveBundleInstance.completionTime =  formatter.parse( completionTime )
             }
-            if(!moveBundleInstance.hasErrors() && moveBundleInstance.save()) {
+            if(!moveBundleInstance.hasErrors() && moveBundleInstance.save() ) {
             	           	
             	//def projectManegerInstance = Party.findById( projectManagerId )
             	def updateMoveBundlePMRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", projectManagerId, "PROJ_MGR" )
@@ -103,6 +108,7 @@ class MoveBundleController {
                 redirect(action:show,id:moveBundleInstance.id, params:[projectId: projectId])
             }
             else {
+            	moveBundleInstance.discard()
             	def managers = partyRelationshipService.getProjectStaff( projectId )
             	def projectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'PROJ_MGR' ")
             	def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'MOVE_MGR' ")

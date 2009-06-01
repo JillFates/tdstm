@@ -77,7 +77,7 @@
         
 </head>
 <body>
-<div id="serverInfoDialog" title ="Server Info" onclick="$('#serverInfoDialog').dialog('close');setFocus()">			
+<div id="serverInfoDialog" title ="Server Info" >			
 </div>
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 		<div class="mainbody" style="width: 100%;">
@@ -107,10 +107,9 @@
 					<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
 					</g:if> 
 					</div>		
-           <div style="float:left; width:100%; margin:5px 0;font-size:10px "><b>My Tasks:</b></div>
-           <div id="assetTable"style="float:left;width:100%; ">
-           <div  style=" width:100%; ">          
-             	   <table id="assetTable" style="overflow:scroll;height:80px;">
+           <div style="float:left; width:100%; height:auto; margin:5px 0;font-size:10px "><b>My Tasks:</b></div>
+           <div id="assetTable"style="float:left;width:100%;height:auto;">
+                   <table id="assetTable" style="overflow:scroll;height:80px;">
               	   <thead>
                    <tr>
                    <th class="asset_details_block">AssetTag</th>
@@ -133,7 +132,7 @@
 				        </g:each>
                         </tbody>
                         </table>
-        	 </div>
+        	 
       			</g:form>
   			</div>
   			</div>
