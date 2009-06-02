@@ -198,7 +198,7 @@
           <tr class="prop">
             <td valign="top" class="name">Comment:</td>
 
-            <td valign="top" class="value">${fieldValue(bean:projectInstance, field:'comment')}</td>
+            <td valign="top" class="value"><textarea cols="40"  rows="3" readOnly="true" value="${projectInstance?.comment}"></textarea></td>
 
           </tr>
 
@@ -232,16 +232,41 @@
 
           <tr class="prop">
             <td valign="top" class="name">Project Manager:</td>
-
-            <td valign="top" class="value">${projectManager?.partyIdTo?.lastName}, ${projectManager?.partyIdTo?.firstName} - ${projectManager?.partyIdTo?.title}</td>
-
+            <g:if test="${projectManager?.partyIdTo?.lastName!=null&&projectManager?.partyIdTo?.firstName!=null&&projectManager?.partyIdTo?.title!=null}">
+                <td valign="top" class="value">${projectManager?.partyIdTo?.lastName}, ${projectManager?.partyIdTo?.firstName} - ${projectManager?.partyIdTo?.title}</td>
+            </g:if>
+            <g:if test="${projectManager?.partyIdTo?.lastName!=null&&projectManager?.partyIdTo?.title!=null}">
+                <td valign="top" class="value">${projectManager?.partyIdTo?.lastName} - ${projectManager?.partyIdTo?.title}</td>
+            </g:if>
+            <g:if test="${projectManager?.partyIdTo?.lastName!=null&&projectManager?.partyIdTo?.firstName!=null}">
+                <td valign="top" class="value">${projectManager?.partyIdTo?.lastName}, ${projectManager?.partyIdTo?.firstName}</td>
+            </g:if>
+            <g:if test="${projectManager?.partyIdTo?.firstName!=null&&projectManager?.partyIdTo?.title!=null}">
+                <td valign="top" class="value">${projectManager?.partyIdTo?.firstName} - ${projectManager?.partyIdTo?.title}</td>
+            </g:if>
+            <g:else>
+           <td valign="top" class="value"></td>
+            </g:else>
           </tr>
 
           <tr class="prop">
             <td valign="top" class="name">Move Manager:</td>
-
+             <g:if test="${moveManager?.partyIdTo?.lastName!=null&&moveManager?.partyIdTo?.firstName!=null&&projectManager?.partyIdTo?.title!=null}">
             <td valign="top" class="value">${moveManager?.partyIdTo?.lastName}, ${moveManager?.partyIdTo?.firstName} - ${moveManager?.partyIdTo?.title}</td>
-
+             </g:if>
+             <g:if test="${moveManager?.partyIdTo?.lastName!=null&&moveManager?.partyIdTo?.title!=null}">
+                <td valign="top" class="value">${projectManager?.partyIdTo?.lastName} - ${projectManager?.partyIdTo?.title}</td>
+            </g:if>
+            <g:if test="${moveManager?.partyIdTo?.lastName!=null&&moveManager?.partyIdTo?.firstName!=null}">
+                <td valign="top" class="value">${projectManager?.partyIdTo?.lastName}, ${projectManager?.partyIdTo?.firstName}</td>
+            </g:if>
+            <g:if test="${moveManager?.partyIdTo?.firstName!=null&&moveManager?.partyIdTo?.title!=null}">
+                <td valign="top" class="value">${projectManager?.partyIdTo?.firstName} - ${projectManager?.partyIdTo?.title}</td>
+            </g:if>
+            
+            <g:else>
+            <td valign="top" class="value"></td>
+            </g:else> 
           </tr>
 
           <tr class="prop">
