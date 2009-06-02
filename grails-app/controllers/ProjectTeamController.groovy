@@ -85,6 +85,7 @@ class ProjectTeamController {
                 redirect( action:show, id:projectTeamInstance.id, params:[bundleId:bundleId] )
             }
             else {
+            	projectTeamInstance.discard()
             	def availableStaff = partyRelationshipService.getAvailableProjectStaff( bundleInstance.project.id, teamMembers )
             	def projectTeamStaff = partyRelationshipService.getProjectTeamStaff( bundleInstance.project.id, teamMembers )
                 render( view:'edit', model:[projectTeamInstance:projectTeamInstance, bundleInstance:bundleInstance, availableStaff:availableStaff, teamMembers:projectTeamStaff  ] )
