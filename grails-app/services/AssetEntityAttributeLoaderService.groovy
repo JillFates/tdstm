@@ -214,7 +214,7 @@ class AssetEntityAttributeLoaderService {
 			// assign assets to bundle
 			assetsList.each{asset->
 				if ( bundleFrom ) {
-					def updateAssets = AssetEntity.executeUpdate("update AssetEntity set moveBundle = $bundleTo,project = $moveBundleTo.project.id where moveBundle = $bundleFrom  and id = $asset")
+					def updateAssets = AssetEntity.executeUpdate("update AssetEntity set moveBundle = $bundleTo,project = $moveBundleTo.project.id, sourceTeam = null, targetTeam = null where moveBundle = $bundleFrom  and id = $asset")
 				
 				} else {
 					/*def assetEntity = AssetEntity.findById( asset )
@@ -222,12 +222,12 @@ class AssetEntityAttributeLoaderService {
 					if ( !assetsExist ) {
 					def moveBundleAsset = new AssetEntity( moveBundle:moveBundleTo, asset:assetEntity ).save()
 					}*/
-					def updateAssets = AssetEntity.executeUpdate("update AssetEntity set moveBundle = $bundleTo where id = $asset")
+					def updateAssets = AssetEntity.executeUpdate("update AssetEntity set moveBundle = $bundleTo, sourceTeam = null, targetTeam = null where id = $asset")
 				}
 			}
 			moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = $bundleTo ")
 		} else{
-			def deleteAssets = AssetEntity.executeUpdate("update AssetEntity set moveBundle = null where moveBundle = $bundleFrom and id in ($assets)")
+			def deleteAssets = AssetEntity.executeUpdate("update AssetEntity set moveBundle = null, sourceTeam = null, targetTeam = null where moveBundle = $bundleFrom and id in ($assets)")
 		}
 		return moveBundleAssets
 	}
