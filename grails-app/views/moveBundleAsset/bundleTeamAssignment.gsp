@@ -121,16 +121,21 @@
          	var teamCode = teamCode
          	var assets=document.getElementsByName('asset')
          	var assetList = new Array()
-         	
-         	for(var assetRow = 0; assetRow < assets.length; assetRow++) {
-         		assetList[assetRow] = assets[assetRow].value
-         	}
-         	var bundleId = document.getElementById('id').value
-         	var rackPlan = document.getElementById('rackPlan').value
-         	if(teamCode != 'null' && teamCode!= '' && assetList.length > 0 )
-         	{
-	         	${remoteFunction(action:'autoFillTeamAssign', params:'\'teamCode=\' +teamCode+\'&assets=\'+assetList+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId', onLoading:"showProcessing();" ,onComplete:"autoTeamAssignComplete( e );")}
-	        }
+         	if(assets.length <= 0) {
+         		alert("No Assets to To Assign The Team");
+         		var team = document.getElementById('team')
+     			team.selectedIndex = 0
+         	}else {
+         		for(var assetRow = 0; assetRow < assets.length; assetRow++) {
+         			assetList[assetRow] = assets[assetRow].value
+         		}
+         		var bundleId = document.getElementById('id').value
+         		var rackPlan = document.getElementById('rackPlan').value
+         		if(teamCode != 'null' && teamCode!= '' && assetList.length > 0 )
+         		{
+	         		${remoteFunction(action:'autoFillTeamAssign', params:'\'teamCode=\' +teamCode+\'&assets=\'+assetList+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId', onLoading:"showProcessing();" ,onComplete:"autoTeamAssignComplete( e );")}
+	       	 	}
+       	    }
          }
          
          function filterAssetsOnTeam( teamCode ) {

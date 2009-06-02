@@ -59,3 +59,8 @@ dt {
 	background-color:#FFFFFF;
 	color:black;
 }
+th {
+   background-color: #000000;
+   color: #ffffff;
+	font-weight:bold;
+}
