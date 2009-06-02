@@ -27,27 +27,35 @@ dt {
 }
 
 .asset_hold{
-	background-color:#FFFF00;
+	background-color:#FFFF33;
 	color:black;
+	font-weight:bold;
 }
 
 .asset_ready{
-	background-color:#008000;
+	background-color:#33ff00;
 	color:black;
+	font-weight:bold;
 }
 
 .asset_process{
-	background-color:#00FFFF;
+	background-color:#66ffff;
 	color:black;
+	font-weight:bold;
 }
 
 .asset_pending{
-	background-color:#FFFFFF;
+	background-color:#ccc;
 	color:black;
+	font-weight:bold;
+}
+.asset_select{
+	background-color:#65a342;
+	color:black;
+	font-weight:bold;
 }
 
 .asset_done{
 	background-color:#FFFFFF;
-	text-decoration: line-through;
 	color:black;
 }

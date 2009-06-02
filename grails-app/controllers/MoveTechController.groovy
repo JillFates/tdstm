@@ -620,6 +620,7 @@ class MoveTechController {
             def taskSize
             def label
             def actionLabel
+            def teamMembers
             try {
                 if(search != null){
                     assetItem = AssetEntity.findByAssetTag(search)
@@ -631,6 +632,9 @@ class MoveTechController {
                             redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
                         }
                     }else{
+                    	teamMembers = partyRelationshipService.getTeamMemberNames(assetItem.sourceTeam?.id)
+                    	def membersCount = ((teamMembers.toString()).tokenize("/")).size()
+                    	teamMembers = membersCount + "(" + teamMembers.toString() + ")"
                         def bundleName = assetItem.moveBundle.name
                         def teamId = (assetItem.sourceTeam.id).toString()
                         def teamName = assetItem.sourceTeam.name
@@ -638,7 +642,7 @@ class MoveTechController {
                         if(bundleName != params.bundle){
                             flash.message = message(code :"The asset [${assetItem.assetName}] is not part of move bundle [${params.bundle}]")
                             if(textSearch){
-                                render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+                                render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers,projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
                             } else {
                                 redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
                             }
@@ -648,7 +652,8 @@ class MoveTechController {
                             if(stateVal == "Hold"){
                                 flash.message = message(code :"The asset is on Hold. Please contact manager to resolve issue.")
                                 if(textSearch){
-                                    render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+                                	
+                                    render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers, projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
                                 } else {
                                     redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
                                 }
@@ -670,8 +675,7 @@ class MoveTechController {
                                 }
                             }
                             assetCommt = AssetComment.findAllByAssetEntity(assetItem)
-                            
-                            render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+                            render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers, projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
                         }
                     }
                 }
@@ -735,5 +739,35 @@ class MoveTechController {
         // get connection
         def fileUrl = new URL( appUrl )
 		return fileUrl
+	}
+	
+	//cancel the Asset Search
+	def cancelAssetSearch = {
+		def asset = AssetEntity.findByAssetTag(params.search)
+		def bundle = asset.moveBundle
+		def actionLabel = params.actionLabel
+		def principal = SecurityUtils.subject.principal
+		if(principal){
+			def loginUser = UserLogin.findByUsername(principal)
+			def team
+			def assetCommt = params.assetCommt
+			if(assetCommt == '[]'){
+				assetCommt = "";
+			}
+			if(params.location == 's'){
+				team = asset.sourceTeam
+			}else{
+				team = asset.targetTeam
+			}
+			def projMap = []
+			assetCommt = []
+			def stateVal = null
+			def label = null
+			actionLabel = null
+			render(view: 'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,"search":params.search,"bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo",label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+		}else {
+			flash.message = "Your login has expired and must login again."
+			redirect(action:'login')
+		}
 	}
 }
