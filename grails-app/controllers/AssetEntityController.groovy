@@ -208,14 +208,14 @@ class AssetEntityController {
 	                                    dataTransferValue.dataTransferBatch = dataTransferBatch
 	                                    dataTransferValue.eavAttribute = eavAttributeInstance
 	                                    if( sheetColumnNames.containsKey("assetId") && (sheet.getCell( 0, r ).contents != "") ) {
-	                                        dataTransferValue.assetEntityId = Integer.parseInt(sheet.getCell( 0, r ).contents)
+                                        dataTransferValue.assetEntityId = Integer.parseInt(sheet.getCell( 0, r ).contents)
 	                                    }
 	                                    if ( dataTransferValue.save() ) {
-	                                        added = r
+                                        added = r
 	                                    } else {
-	                                        skipped += ( r +1 )
+                                        skipped += ( r +1 )
 	                                    }
-	                                    */
+                                         */
                                 	}
                                 }
                         		try{
@@ -284,8 +284,9 @@ class AssetEntityController {
         def bundleList = new StringBuffer()
         def bundleSize = bundle.size()
         for ( int i=0; i< bundleSize ; i++ ) {
+	        if(bundle[i] == ""){
 	        	
-            if( i != bundleSize - 1) {
+	        }else if( i != bundleSize - 1) {
                 bundleList.append( bundle[i] + "," )
             } else {
                 bundleList.append( bundle[i] )
@@ -303,7 +304,7 @@ class AssetEntityController {
 	        
         def asset
         def assetEntityInstance
-        if( bundleSize == 1 && bundle[0] == "" ) {
+        if(bundle[0] == "" ) {
             asset = AssetEntity.findAllByProject( project )
         } else {
             asset = AssetEntity.findAll( "from AssetEntity m where m.project = project and m.moveBundle in ( $bundleList )" )
@@ -828,7 +829,7 @@ class AssetEntityController {
         otherTotalAsset.each{
         	totalAsset<<it
         }
-        	//AssetEntity.findAllByMoveBundle(moveBundleInstance,params)
+        //AssetEntity.findAllByMoveBundle(moveBundleInstance,params)
         def projectTeamList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = ${moveBundleInstance.id} and pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport'  order by pt.name asc")
         // Get Id for respective States
         def cleanedId = stateEngineService.getStateId("STD_PROCESS","Cleaned")

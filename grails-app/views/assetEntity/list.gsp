@@ -214,6 +214,10 @@
 
 		      $("#createDialog").dialog('option', 'width', 600)
 		      $("#createDialog").dialog('option', 'position', ['center','top']);
+		      if(document.getElementById('createFormTbodyId')){
+		      document.getElementById('createFormTbodyId').style.display = 'none';
+		      document.getElementById('attributeSetId').value = '';
+		      }
 		      $("#createDialog").dialog("open")
 		      $("#editDialog").dialog("close")
 		      $("#showDialog").dialog("close")
@@ -275,7 +279,7 @@
       		function validateAssetEntity() {
       			var attributeSet = document.getElementById("attributeSetId").value;
       			if(attributeSet){
-      				var assetName = document.createForm.assetName.value;
+      				var assetName = document.createForm.assetNameId.value;
 	      			if( assetName == null || assetName == "" ){
 	      				alert(" Please Enter Asset Name. ");
 	      				return false;
@@ -291,19 +295,20 @@
       		// function to generate createForm
       		
       		function generateCreateForm( e ){
-						
+				var browser=navigator.appName;		
       			var assetEntityAttributes = eval('(' + e.responseText + ')');
-      			var createTable = document.getElementById("createTable");
-      			var tb = document.getElementById('createFormTbodyId')
-      			var autoComp = new Array()
+      			var createDiv = document.getElementById("createDiv");
+      			//var createTable = document.getElementById("createTable");
+      			var tb = document.getElementById('createFormTbodyId');
+      			var autoComp = new Array();
 			    if(tb != null){
-			      createTable.removeChild(tb)
+			      createDiv.removeChild(tb);
 			    }
       			// create tbody for CreateTable
-      			var tbody = document.createElement('tbody');
-				tbody.id = "createFormTbodyId"
+      			var tbody = document.createElement('table');
+				tbody.id = "createFormTbodyId";
 				// Rebuild the select
-			      if (assetEntityAttributes) {
+			      if (assetEntityAttributes != "") {
 				      var length = assetEntityAttributes.length
 				      var halfLength = getLength(length) 
 				      var tr = document.createElement('tr');
@@ -324,8 +329,9 @@
 					      labelTdLeft.appendChild( labelLeft )
 					      var inputFieldLeft = getInputType(attributeLeft); 
 					      inputFieldLeft.id = attributeLeft.attributeCode+'Id';
+					      inputFieldLeft.setAttribute('name',attributeLeft.attributeCode); 
 					      inputTdLeft.appendChild( inputFieldLeft )
-					      labelTdLeft.style.backgroundColor = '#f3f4f6 '
+					      labelTdLeft.style.background = '#f3f4f6 '
 					      labelTdLeft.style.width = '25%'
 					      labelTdLeft.noWrap = 'nowrap'
 					      trLeft.appendChild( labelTdLeft )
@@ -341,8 +347,9 @@
 					      labelTdRight.appendChild( labelRight )
 					      var inputFieldRight = getInputType(attributeRight); 
 					      inputFieldRight.id = attributeRight.attributeCode+'Id';
+					      inputFieldRight.setAttribute('name',attributeRight.attributeCode);
 					      inputTdRight.appendChild( inputFieldRight )
-					      labelTdRight.style.backgroundColor = '#f3f4f6 '
+					      labelTdRight.style.background = '#f3f4f6 '
 					      labelTdRight.style.width = '25%'
 					      labelTdRight.noWrap = 'nowrap'
 					      trRight.appendChild( labelTdRight )
@@ -361,7 +368,10 @@
 				      tr.appendChild( tdRight )
 				      tbody.appendChild( tr )
 			      }
-			      createTable.appendChild( tbody )
+			      createDiv.appendChild( tbody )			     
+			      if(browser == 'Microsoft Internet Explorer') {
+			      createDiv.innerHTML += "";
+			      }
 			      ${remoteFunction(action:'getAutoCompleteDate', params:'\'autoCompParams=\' + autoComp ', onComplete:'createAutoComplete(e)')}
       		}
       		function createAutoComplete(e){
@@ -406,11 +416,15 @@
       			var name = attribute.attributeCode
       			var type = attribute.frontendInput
       			var options = attribute.options
-      			
+      			var browser=navigator.appName;
       			var inputField
       			if(type == 'select'){
+      			if(browser == 'Microsoft Internet Explorer') {
+					inputField = document.createElement('<select name='+name +' />');
+					}else{
 					inputField = document.createElement('select');
 					inputField.name = name ;
+					}
 						var inputOption = document.createElement('option');
 						inputOption.value = ''
 						inputOption.innerHTML = 'please select'
@@ -433,9 +447,13 @@
 					      }
 					   }						
 				} else {
+				if(browser == 'Microsoft Internet Explorer') {
+      			 	inputField = document.createElement('<input type="text" name='+name +' />');
+      			 	}else{
       			 	inputField = document.createElement('input');
 					inputField.type = "text";
 					inputField.name = name;
+					}
 				}
 				
 				return inputField; 
@@ -586,17 +604,20 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 
 <div id="createDialog" title="Create Asset Entity" style="display: none;">
 <g:form action="save" method="post" name="createForm" >
-	<div class="dialog">
-	<table id="createTable">
-		<tbody>
+
+	<div class="dialog" id="createDiv" >
+
+		<table >
 			<tr class="prop">
 				<td valign="top" class="name" ><label for="attributeSet">Attribute Set:</label><span style="padding-left: 46px;"><g:select optionKey="id" from="${com.tdssrc.eav.EavAttributeSet.list()}" id="attributeSetId" name="attributeSet.id" value="${assetEntityInstance?.attributeSet?.id}" noSelection="['':'select']" 
 				 onchange="${remoteFunction(action:'getAttributes', params:'\'attribSet=\' + this.value ', onComplete:'generateCreateForm(e)')}"></g:select></span> </td>
 
 			</tr>
-		</tbody>
-	</table>
+			</table>
+		
+
 	</div>
+	
 	<div class="buttons"><input type="hidden" name="projectId"
 		value="${projectId }" /> <span class="button"><input
 		class="save" type="submit" value="Create"
@@ -801,7 +822,7 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 	onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
 </span> <span class="button"> <input class="delete" type="button"
 	value="Delete"
-	onclick="${remoteFunction(action:'deleteComment', params:'\'id=\' + document.getElementById(\'commentId\').value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e)')}" />
+	onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + document.getElementById(\'commentId\').value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e)')}" />
 </span></div>
 </div>
 <div id="editCommentDialog" title="Edit Asset Comment"
@@ -886,7 +907,7 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 		onclick="resolveValidate('editCommentForm','updateCommentId');" />
 	</span> <span class="button"> <input class="delete" type="button"
 		value="Delete"
-		onclick="${remoteFunction(action:'deleteComment', params:'\'id=\' + document.editCommentForm.id.value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e)')}" />
+		onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + document.editCommentForm.id.value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e)')}" />
 	</span></div>
 </g:form></div>
 </body>
