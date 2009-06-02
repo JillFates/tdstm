@@ -41,11 +41,24 @@ class DataTransferBatchController {
 			    		dtvList.each {
 			    			def attribName = it.eavAttribute.attributeCode
 			    			if ( attribName == "moveBundle" ) {
-			    				if( it.importValue != null && it.correctedValue != null ) {
-			    					def importMoveBundleInstance = MoveBundle.findByName(it.importValue)
-			        				def exportMoveBundleInstance = MoveBundle.findByName(it.correctedValue)
+			    				def moveBundleInstance
+			    				/*if( it.importValue != null && it.correctedValue != null ) {
+			    					importMoveBundleInstance = MoveBundle.findByName(it.importValue)
+			        				exportMoveBundleInstance = MoveBundle.findByName(it.correctedValue)
 			        				assetEntity."$attribName" = exportMoveBundleInstance ? exportMoveBundleInstance : importMoveBundleInstance
+			    				}*/
+			    				if(it.correctedValue){
+			    					moveBundleInstance = MoveBundle.findByName(it.correctedValue)
+			    					if(!moveBundleInstance){
+			    						moveBundleInstance = new MoveBundle(name:it.correctedValue,project:projectInstance,operationalOrder:1).save()
+			    					}
+			    				} else if(it.importValue){
+			    					moveBundleInstance = MoveBundle.findByName(it.importValue)
+			    					if(!moveBundleInstance){
+			    						moveBundleInstance = new MoveBundle(name:it.importValue,project:projectInstance,operationalOrder:1).save()
+			    					}
 			    				}
+			    				assetEntity."$attribName" = moveBundleInstance 
 			    			}else if( it.eavAttribute.backendType == "int" ){
 			    				def correctedPos
 			    				if( it.correctedValue ) {
