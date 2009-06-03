@@ -70,8 +70,7 @@ class MoveTechController {
         return [ username: params.username, rememberMe: (params.rememberMe != null), targetUri: params.targetUri ]
     }
     //sign in for moveTech by reading the barcode as userName
-    def signIn = { 	
-    	
+    def signIn = {    	
         def moveBundleInstance
         def projectTeamInstance
         if( params.username ) {
@@ -198,8 +197,13 @@ class MoveTechController {
             // password is incorrect.
             this.jsecSecurityManager.login(authToken)
             // Check User and Person Activi status
-            redirect(controller:'moveTech',params:actionScreen)
-            return;
+            if(barcodeText == "ct") {
+	            redirect(controller:'moveTech',params:actionScreen)
+	            return;
+            } else {
+            	redirect(controller:'moveTech',action:'moveTechSuccessLogin',params:actionScreen)
+            	return;
+            }
         }
         catch (AuthenticationException ex){
             // Authentication failed, so display the appropriate message
@@ -371,6 +375,7 @@ class MoveTechController {
             def label
             def actionLabel
             def checkHome = params.home
+            def loginTeam = ProjectTeam.findById(params.team) 
             if(search != null){
                 assetItem = AssetEntity.findByAssetTag(search)
                 if(assetItem == null){
@@ -385,16 +390,9 @@ class MoveTechController {
                 }else{
                     def teamName
                     def teamId
-                    def bundleName = assetItem.moveBundle.name
-                    if(params.location == "s"){
-                        teamId = (assetItem.sourceTeam.id).toString()
-                        teamName = assetItem.sourceTeam.name
-                    }else{
-                        teamId = (assetItem.targetTeam.id).toString()
-                        teamName = assetItem.targetTeam.name
-                    }
-			
-                    if(bundleName != params.bundle){
+                    def bundleName = assetItem.moveBundle.name        
+	                
+                    if (bundleName != params.bundle) {
                         flash.message = message(code :"The asset [${assetItem.assetName}] is not part of move bundle [${params.bundle}]")
                         if(checkHome){
                             redirect(action: 'index',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"user":"mt"])
@@ -403,20 +401,39 @@ class MoveTechController {
                             redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
                             return;
                         }
-                    }else if(teamId != params.team){
-                        flash.message = message(code :"The asset [${assetItem.assetName}] is assigned to team [${teamName}]")
-                        if(checkHome){
-                            redirect(action: 'index',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"user":"mt"])
-                            return;
+                    } else {
+                        if(params.location == "s"){
+                            if(assetItem.sourceTeam){
+                                teamId = (assetItem.sourceTeam.id).toString()
+                                teamName = assetItem.sourceTeam.name
+                            } else {
+                                flash.message = message(code :"The asset [${assetItem.assetName}] is not assigned to team [${loginTeam}]")
+                                if(checkHome){
+                                    redirect(action: 'index',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"user":"mt"])
+                                    return;
+                                } else {
+                                    redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                                    return;
+                                }
+                            }
                         } else {
-                            redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
-                            return;
+                            if(assetItem.targetTeam){
+                                teamId = (assetItem.targetTeam.id).toString()
+                                teamName = assetItem.targetTeam.name
+                            } else {
+                                flash.message = message(code :"The asset [${assetItem.assetName}] is not assigned to team [${loginTeam}]")
+                                if(checkHome){
+                                    redirect(action: 'index',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"user":"mt"])
+                                    return;
+                                } else {
+                                    redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                                    return;
+                                }
+                            }
                         }
-                    }else{
-                        projMap = ProjectAssetMap.findByAsset(assetItem)
-                        stateVal = stateEngineService.getState("STD_PROCESS",projMap.currentStateId)
-                        if(stateVal == "Hold"){
-                            flash.message = message(code :"The asset is on Hold. Please contact manager to resolve issue.")
+                        if(teamId != params.team){
+    	                    	
+                            flash.message = message(code :"The asset [${assetItem.assetName}] is assigned to team [${teamName}]")
                             if(checkHome){
                                 redirect(action: 'index',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"user":"mt"])
                                 return;
@@ -424,29 +441,54 @@ class MoveTechController {
                                 redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
                                 return;
                             }
-                        }
-                        taskList = stateEngineService.getTasks("STD_PROCESS","MOVE_TECH",stateVal)
-                        taskSize = taskList.size()
-                        if(taskSize == 1){
-                            if(taskList.contains("Hold")){
-                                flash.message = message(code :"There is a problem with this asset. Place the asset on hold to alert the move coordinator")
-                            }
-                    	
-                        }else if(taskSize > 1) {
-
-                            taskList.each{
-                                if(it != "Hold"){
-                                    actionLabel = it
-                                    label =	stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it)))
-                                }
-                    			
-                            }
-                        }
-                        assetCommt = AssetComment.findAllByAssetEntity(assetItem)
-                        render(view:'assetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:params.search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+                        } else {
+	                        projMap = ProjectAssetMap.findByAsset(assetItem)
+	                        if( !projMap ) {
+	                            flash.message = message(code :" The asset has not yet been released ")
+	                            if(checkHome){
+	                                redirect(action: 'index',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"user":"mt"])
+	                                return;
+	                            } else {
+	                                redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+	                                return;
+	                            }
+	                        } else {
+		                        stateVal = stateEngineService.getState("STD_PROCESS",projMap.currentStateId)
+	                            if(stateVal == "Hold"){
+	                                flash.message = message(code :"The asset is on Hold. Please contact manager to resolve issue.")
+	                                if(checkHome){
+	                                    redirect(action: 'index',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"user":"mt"])
+	                                    return;
+	                                } else {
+	                                    redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+	                                    return;
+	                                }
+	                            }
+	                            taskList = stateEngineService.getTasks("STD_PROCESS","MOVE_TECH",stateVal)
+	                            taskSize = taskList.size()
+	                            if(taskSize == 1){
+	                                if(taskList.contains("Hold")){
+	                                    flash.message = message(code :"There is a problem with this asset. Place the asset on hold to alert the move coordinator")
+	                                }
+	                    	
+	                            }else if(taskSize > 1) {
+	
+	                                taskList.each{
+	                                    if(it != "Hold"){
+	                                        actionLabel = it
+	                                        label =	stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it)))
+	                                    }
+	                    			
+	                                }
+	                            }
+	                            assetCommt = AssetComment.findAllByAssetEntity(assetItem)
+	                            render(view:'assetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:params.search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+	                        }
+	                    }
                     }
                 }
             }
+		 
         } else {
             flash.message = "Your login has expired and must login again."
             redirect(action:'login')
@@ -627,73 +669,94 @@ class MoveTechController {
             def label
             def actionLabel
             def teamMembers
-            try {
+            def loginTeam = ProjectTeam.findById(params.team)
                 if(search != null){
                     assetItem = AssetEntity.findByAssetTag(search)
                     if(assetItem == null){
                         flash.message = message(code :"Asset Tag number '${search}' was not located")
                         if(textSearch){
                             render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+                            return;
                         } else {
                             redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                            return;
                         }
                     }else{
                     	teamMembers = partyRelationshipService.getTeamMemberNames(assetItem.sourceTeam?.id)
                     	def membersCount = ((teamMembers.toString()).tokenize("/")).size()
                     	teamMembers = membersCount + "(" + teamMembers.toString() + ")"
                         def bundleName = assetItem.moveBundle.name
-                        def teamId = (assetItem.sourceTeam.id).toString()
-                        def teamName = assetItem.sourceTeam.name
+                        def teamId 
+                        def teamName
+                        if(assetItem.sourceTeam){
+                            teamId = (assetItem.sourceTeam.id).toString()
+                            teamName = assetItem.sourceTeam.name
+                        } else {
+                            flash.message = message(code :"The asset [${assetItem.assetName}] is not assigned to team [${loginTeam}]")
+                            if(textSearch){
+                                render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers,projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+                                return;
+                            } else {
+                                redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                                return;
+                            }
+                        }                        
     			
                         if(bundleName != params.bundle){
                             flash.message = message(code :"The asset [${assetItem.assetName}] is not part of move bundle [${params.bundle}]")
                             if(textSearch){
                                 render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers,projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+                                return;
                             } else {
                                 redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                                return;
                             }
                         } else {
                             projMap = ProjectAssetMap.findByAsset(assetItem)
-                            stateVal = stateEngineService.getState("STD_PROCESS",projMap.currentStateId)
-                            if(stateVal == "Hold"){
-                                flash.message = message(code :"The asset is on Hold. Please contact manager to resolve issue.")
-                                if(textSearch){
-                                	
-                                    render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers, projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
-                                } else {
-                                    redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
-                                }
-                            }
-                            taskList = stateEngineService.getTasks("STD_PROCESS","CLEANER",stateVal)
-                            taskSize = taskList.size()
-                            if(taskSize == 1){
-                                if(taskList.contains("Hold")){
-                                    flash.message = message(code :"There is a problem with this asset. Place the asset on hold to alert the move coordinator")
-                                }
-                        	
-                            }else if(taskSize > 1) {
-                                taskList.each{
-                                    if(it != "Hold"){
-                                        actionLabel = it
-                                        label =	stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it)))
-                                    }
-                        			
-                                }
-                            }
-                            assetCommt = AssetComment.findAllByAssetEntity(assetItem)
-                            render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers, projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+                            if( !projMap ) {
+	                            flash.message = message(code :" The asset has not yet been released ")
+	                            if(textSearch){
+	                                render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers,projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+	                                return;
+	                            } else {
+	                                redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+	                                return;
+	                            }
+	                        } else {
+	                            stateVal = stateEngineService.getState("STD_PROCESS",projMap.currentStateId)
+	                            if(stateVal == "Hold"){
+	                                flash.message = message(code :"The asset is on Hold. Please contact manager to resolve issue.")
+	                                if(textSearch){	                                	
+	                                    render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers, projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+	                                    return;
+	                                } else {
+	                                    redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+	                                    return;
+	                                }
+	                            }
+	                            taskList = stateEngineService.getTasks("STD_PROCESS","CLEANER",stateVal)
+	                            taskSize = taskList.size()
+	                            if(taskSize == 1){
+	                                if(taskList.contains("Hold")){
+	                                    flash.message = message(code :"There is a problem with this asset. Place the asset on hold to alert the move coordinator")
+	                                }
+	                        	
+	                            }else if(taskSize > 1) {
+	                                taskList.each{
+	                                    if(it != "Hold"){
+	                                        actionLabel = it
+	                                        label =	stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it)))
+	                                    }
+	                        			
+	                                }
+	                            }
+	                            assetCommt = AssetComment.findAllByAssetEntity(assetItem)
+	                            render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers, projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+	                        }
                         }
                     }
                 }
-            } catch (Exception ex){
-                flash.message = message(code :"The asset is not associated with bundle and team, please check it")
-                if(textSearch){
-                    render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
-                } else {
-                    redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
-                }
-		
-            }
+            
         } else {
             flash.message = "Your login has expired and must login again."
             redirect(action:'login')
@@ -774,6 +837,35 @@ class MoveTechController {
 		}else {
 			flash.message = "Your login has expired and must login again."
 			redirect(action:'login')
+		}
+	}
+
+    /* --------------------------------------
+     * 	Author : Mallikarjun Haranal
+     *	Redirect to MyTask after logged in.
+     * -------------------------------------- */
+
+	def moveTechSuccessLogin = {
+    	def principal = SecurityUtils.subject.principal
+    	// Checking user existence
+    	if(principal){	        
+            def projectTeamInstance = ProjectTeam.findById(params.team)
+            def team = projectTeamInstance.name
+            def teamMembers = partyRelationshipService.getTeamMemberNames(params.team)
+            def location =""
+            if( params.location == 's') {
+                location = "Unracking"
+                projectTeamInstance.currentLocation = "Source"
+                projectTeamInstance.save()
+            }else if( params.location == 't'){
+                location = "Reracking"
+                projectTeamInstance.currentLocation = "Target"
+                projectTeamInstance.save()
+            }
+            redirect(action:'assetTask',params:[projectTeam:team,members:teamMembers,project:params.project,loc:location, bundle:params.bundle,team:params.team,location:params.location,"tab":"Todo"])
+    	} else {
+			flash.message = "Your login has expired and must login again."
+            redirect(action:'login')
 		}
 	}
 }
