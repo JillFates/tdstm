@@ -366,7 +366,21 @@ class MoveBundleAssetController {
      * Filter Assets By Rack
      */
     def filterAssetByRack = {
-    	def rack = params.rack
+    	def rackList = []
+    	rackList = (params.rack).tokenize(",")
+    	def rackString = "("
+    	if(rackList.size()<=0 || rackList[0] == null || rackList[0] == "all"){
+    		rackString = null
+    	}else {
+    		for(int rack = 0; rack<rackList.size(); rack++) {
+    			rackString = rackString +"'"+ rackList[rack]+"'"
+    			if(rack+1 >= rackList.size){
+    				rackString = rackString+')'
+    			}else{
+    				rackString = rackString+','
+    			}
+    		}
+    	}
        	def bundleId = params.bundleId
        	def rackPlan = params.rackPlan
        	def bundleInstance = MoveBundle.findById(bundleId)
@@ -377,12 +391,12 @@ class MoveBundleAssetController {
        	projectTeamInstanceList.each{team ->
             projectTeam << [ teamCode: team.teamCode ]
         }
-       	if(rack == "" || rack == null) {
+       	if(rackString == "" || rackString == null) {
        		moveBundleAssetList = AssetEntity.findAll( " from AssetEntity ma where ma.moveBundle = $bundleInstance.id ")
        	}else if(rackPlan == "UnrackPlan"){
-       		moveBundleAssetList = AssetEntity.findAll( " from AssetEntity ma where ma.moveBundle = $bundleInstance.id and ma.sourceRack = '${rack}' ")
+       		moveBundleAssetList = AssetEntity.findAll( " from AssetEntity ma where ma.moveBundle = $bundleInstance.id and ma.sourceRack in $rackString ")
        	}else {
-       		moveBundleAssetList = AssetEntity.findAll( " from AssetEntity ma where ma.moveBundle = $bundleInstance.id and ma.targetRack = '${rack}' ")
+       		moveBundleAssetList = AssetEntity.findAll( " from AssetEntity ma where ma.moveBundle = $bundleInstance.id and ma.targetRack in $rackString ")
        	}
     	if(moveBundleAssetList != null) {
     		for( int assetRow = 0; assetRow < moveBundleAssetList.size(); assetRow++) {
@@ -560,8 +574,12 @@ class MoveBundleAssetController {
     			assetCommentList.each { assetComment ->
     				assetCommentString = assetCommentString + assetComment.comment +"\n"
    			 	}
-    			def teamMembers = partyRelationshipService.getTeamMemberNames(asset.sourceTeam?.id) 
-   			 	reportFields <<['assetName':asset.assetName , 'assetTag':asset.assetTag, "assetType":asset.assetType, "manufacturer":asset.manufacturer, "model":asset.model, "sourceTargetrack":asset.sourceRack, "position":asset.sourceRackPosition, "sourceTargetPos":(projectTeamLocationInstance?.currentLocation ? projectTeamLocationInstance?.currentLocation : "") +"(source/ unracking)", "usize":asset.usize, "cart":asset.cart, "shelf":asset.shelf,"source_team_id":asset?.sourceTeam?.id, "move_bundle_id":asset?.moveBundle?.id, "clientName":projectInstance?.client?.name,
+    			def teamMembers = partyRelationshipService.getTeamMemberNames(asset.sourceTeam?.id)
+    			def rackPos = (asset.sourceRack ? asset.sourceRack : "")+"/"+ (asset.sourceRackPosition ? asset.sourceRackPosition : "")
+   				if (rackPos == "/"){
+   					rackPos = ""
+   				}
+   			 	reportFields <<['assetName':asset.assetName , 'assetTag':asset.assetTag, "assetType":asset.assetType, "manufacturer":asset.manufacturer, "model":asset.model, "sourceTargetrack":rackPos, "position":asset.sourceRackPosition, "sourceTargetPos":(projectTeamLocationInstance?.currentLocation ? projectTeamLocationInstance?.currentLocation : "") +"(source/ unracking)", "usize":asset.usize, "cart":asset.cart, "shelf":asset.shelf,"source_team_id":asset?.sourceTeam?.id, "move_bundle_id":asset?.moveBundle?.id, "clientName":projectInstance?.client?.name,
    			                 'projectName':partyGroupInstance?.name,'startAt':projectInstance?.startDate, 'completedAt':projectInstance?.completionDate, 'bundleName':bundleInstance?.name, 'teamName':teamPartyGroup?.name +"-"+teamMembers, 'teamMembers':teamMembers,'location':"Source Team", 'rack':"SourceRack",'rackPos':"SourceRackPosition",'truck':asset.truck, 'room':asset.sourceRoom, 'PDU':asset.powerPort,'NIC':asset.nicPort,'kvmPort':asset.kvmDevice ? asset.kvmDevice : '' + asset.kvmPort ? asset.kvmPort :'', 'hbaPort':asset.fiberCabinet + asset.hbaPort, 'instructions':assetCommentString, 'sourcetargetLoc':"s"]
     		}
     		//Target List of Assets
@@ -585,8 +603,11 @@ class MoveBundleAssetController {
    				}
    				def kvmPort = (asset.kvmDevice ? asset.kvmDevice : '')+" "+ (asset.kvmPort ? asset.kvmPort : '')
    				def hbaPort = (asset.fiberCabinet ? asset.fiberCabinet : '')+" "+ (asset.hbaPort ? asset.hbaPort : '')
-   				
-   				reportFields <<['assetName':asset.assetName , 'assetTag':asset.assetTag, "assetType":asset.assetType, "manufacturer":asset.manufacturer, "model":asset.model, "sourceTargetrack":asset.targetRack, "position":asset.targetRackPosition, "sourceTargetPos":(projectTeamLocationInstance?.currentLocation ? projectTeamLocationInstance?.currentLocation : "") +"(target/ reracking)", "usize":asset.usize, "cart":asset.cart, "shelf":asset.shelf,"source_team_id":asset?.targetTeam?.id, "move_bundle_id":asset?.moveBundle?.id, "clientName":projectInstance?.client?.name,
+   				def rackPos = (asset.targetRack ? asset.targetRack : "")+"/"+ (asset.targetRackPosition ? asset.targetRackPosition : "")
+   				if (rackPos == "/"){
+   					rackPos = ""
+   				}
+   				reportFields <<['assetName':asset.assetName , 'assetTag':asset.assetTag, "assetType":asset.assetType, "manufacturer":asset.manufacturer, "model":asset.model, "sourceTargetrack":rackPos, "position":asset.targetRackPosition, "sourceTargetPos":(projectTeamLocationInstance?.currentLocation ? projectTeamLocationInstance?.currentLocation : "") +"(target/ reracking)", "usize":asset.usize, "cart":asset.cart, "shelf":asset.shelf,"source_team_id":asset?.targetTeam?.id, "move_bundle_id":asset?.moveBundle?.id, "clientName":projectInstance?.client?.name,
   			                 'projectName':partyGroupInstance?.name,'startAt':projectInstance?.startDate, 'completedAt':projectInstance?.completionDate, 'bundleName':bundleInstance?.name, 'teamName':teamPartyGroup?.name +"-"+teamMembers, 'teamMembers':teamMembers,'location':"Target Team", 'rack':"TargetRack",'rackPos':"TargetRackPosition",'truck':asset.truck,'room':asset.targetRoom,'PDU':asset.powerPort,'NIC':asset.nicPort, 'kvmPort':kvmPort, 'hbaPort':hbaPort,'instructions':assetCommentString,'sourcetargetLoc':"t"]
     		}
     		//No assets were found for selected MoveBundle,Team and Location
