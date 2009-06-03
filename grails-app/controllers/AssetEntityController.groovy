@@ -29,7 +29,12 @@ class AssetEntityController {
 	}
 	// Will return filters data to AssetEntity list page
 	def filter = {
-        if(!params.max) params.max = 15
+		def userMax = getSession().getAttribute("MAX_ASSET_LIST")
+        	if(userMax.MAX_ASSET_LIST){
+                if(!params.max) params.max = userMax.MAX_ASSET_LIST
+            }else{
+                if(!params.max) params.max = 50
+            }
         def project = Project.findById(getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ)
         def assetEntityList = filterService.filter(params, AssetEntity)
         assetEntityList.each{
@@ -38,7 +43,7 @@ class AssetEntityController {
             }
         }
         try{
-            render( view:'list', model:[ assetEntityInstanceList:assetEntityInstanceList,assetEntityCount:filterService.count( params, AssetEntity ), filterParams: com.zeddware.grails.plugins.filterpane.FilterUtils.extractFilterParams(params), params:params, projectId:project.id ] )
+            render( view:'list', model:[ assetEntityInstanceList:assetEntityInstanceList,assetEntityCount:filterService.count( params, AssetEntity ), filterParams: com.zeddware.grails.plugins.filterpane.FilterUtils.extractFilterParams(params), params:params, projectId:project.id,,maxVal : params.max ] )
         } catch(Exception ex){
             redirect( controller:"assetEntity", action:"list" )
         }
