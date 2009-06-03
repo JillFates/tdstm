@@ -215,7 +215,7 @@ class BootStrap {
 			partyType:personPartyType ).save()
 		def personGenePoole = new Person( firstName:'Gene', lastName:'Poole', title:'Move Manager',
 			active:'N', partyType:personPartyType ).save()
-		def personTim = new Person( firstName:'Tim', lastName:'Shutt', title:'Project Manager',
+		def personTim = new Person( firstName:'Tim', lastName:'Schutt', title:'Project Manager',
 			partyType:personPartyType ).save()
 		def personRobin = new Person( firstName:'Robin', lastName:'Banks', title:'Project Manager',
 			partyType:personPartyType ).save()
