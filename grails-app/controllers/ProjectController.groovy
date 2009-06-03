@@ -50,7 +50,7 @@ class ProjectController {
         	companyPartners.sort{it.partyIdTo.name}
         	if(projectPartner != null){
         		partnerStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectPartner.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
-        	    partnerStaff.sort{it.partyIdTo.name}
+        	    partnerStaff.sort{it.partyIdTo.lastName}
         	}
         	clientStaff.each{staff->
         	}
