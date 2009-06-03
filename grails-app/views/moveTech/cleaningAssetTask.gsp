@@ -22,10 +22,10 @@
 	</script>
 	
   	<script type="text/javascript">
-  		var timeInterval;
+  		/*var timeInterval;
 		function submittheform() {
 			document.bundleTeamAssetForm.submit();
-		}
+		}*/
 		
         function serverInfo(e){
         var loc = document.bundleTeamAssetForm.location.value;
@@ -99,7 +99,7 @@
 					<tr>
 					<td id="todoId"><g:link style="color: #5b5e5c; border:1px solid #5b5e5c; margin:5px;background:#aaefb8;padding:2px;" action="cleaningAssetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link></td>
 					<td id="allId"><g:link  style="color: #5b5e5c; border:1px solid #5b5e5c; margin:5px;padding:2px;margin-right:300px;" action="cleaningAssetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All&nbsp;(${allSize})</g:link></td>
-					<td style="text-align:right;"><input  type="text" size="10" value="" name="search" onchange="submittheform()" onkeyup="timeInterval = setTimeout('submittheform()',1500)" onkeydown="if(timeInterval){clearTimeout(timeInterval)}"/>&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/></td></tr>
+					<td style="text-align:right;"><input  type="text" size="10" value="" name="search" />&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/></td></tr>
 					</table>
 					</div>  
 		    <div id="mydiv" onclick="document.getElementById('mydiv').style.display = 'none';setFocus()">						            

@@ -11,12 +11,7 @@ dt {
 	float: left;
 }
 </style>
-<script type="text/javascript">    
-		var timeInterval;
-		function submittheform() {
-			document.bundleTeamAssetForm.submit();
-		}
-</script>
+
 </head>
 <body>
 	<div id="spinner" class="spinner" style="display: none;"><img
@@ -41,7 +36,7 @@ dt {
 				<div style="float:left; width:100%; margin:5px 0; ">              								
 					<table style="border:0px;">
 						<tr><td><g:link controller="moveTech" action="signOut" style="color: #5b5e5c; border:1px solid #5b5e5c; margin:2px 5px 5px 5px; height:15px; padding:1px 2px 1px 3px; width:50px; background:#aaefb8; float:left;">Log out</g:link></td>
-							<td style="text-align:right;"><a href="#" style="color: #328714;"><input type="text" size="12" value="" name="search" onchange="submittheform()" onkeyup="timeInterval = setTimeout('submittheform()',1500)" onkeydown="if(timeInterval){clearTimeout(timeInterval)}"/></a>&nbsp;<img	src="${createLinkTo(dir:'images',file:'search.png')}"/></td>
+							<td style="text-align:right;"><a href="#" style="color: #328714;"><input type="text" size="12" value="" name="search" /></a>&nbsp;<img	src="${createLinkTo(dir:'images',file:'search.png')}"/></td>
 						</tr>
 					  </table>
 				</div>

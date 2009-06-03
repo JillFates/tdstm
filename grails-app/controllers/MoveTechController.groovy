@@ -14,6 +14,9 @@ class MoveTechController {
     def stateEngineService
     def workflowService
     def index = {
+    	if(params.fMess){
+    		flash.clear()
+    	}
     	def principal = SecurityUtils.subject.principal
     	// Checking user existence
     	if(principal){
@@ -238,6 +241,9 @@ class MoveTechController {
     }
     // Method for my task link
 	def assetTask = {
+		if(params.fMess){
+			flash.clear()
+		}
 		def principal = SecurityUtils.subject.principal
 		if(principal){
             def bundle = params.bundle

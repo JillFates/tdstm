@@ -3,31 +3,27 @@
 <head>
 <title>My Tasks</title>
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.move_tech_dialog.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
+	 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+	 <!--<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
+	 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.move_tech_dialog.css')}" /> 
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />-->
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 	
-	<g:javascript library="prototype" />
+	<!-- <g:javascript library="prototype" />
 	<g:javascript library="jquery" />
 	
 	<jq:plugin name="ui.core" />
-	<jq:plugin name="ui.dialog" /> 
+	<jq:plugin name="ui.dialog" /> -->
 
 	<script>
-	$(document).ready(function() {
+	/*$(document).ready(function() {
 	$("#serverInfoDialog").dialog({ autoOpen: false })	       
-	})
+	})*/
 	</script>
 
-    <script type="text/javascript">
-    	var timeInterval;
-		function submittheform() {
-			document.bundleTeamAssetForm.submit();
-		}
+    <script type="text/javascript">    	
 		
-        function serverInfo(e){
+      /*  function serverInfo(e){
         var loc = document.bundleTeamAssetForm.location.value;
         var location;
         var room;
@@ -64,7 +60,7 @@
          $("#serverInfoDialog").dialog('option', 'width', 215)                     
 		 $("#serverInfoDialog").dialog('option', 'position', ['left','top']);
          $('#serverInfoDialog').dialog('open');
-        }
+        }*/
         function setFocus(){
         var tab = '${tab}' ;
         if(tab != 'Todo'){
@@ -77,8 +73,9 @@
         
 </head>
 <body>
-<div id="serverInfoDialog" title ="Server Info" onclick="$('#serverInfoDialog').dialog('close');setFocus()">			
-</div>
+<!-- <div id="serverInfoDialog" title ="Server Info" onclick="$('#serverInfoDialog').dialog('close');setFocus()">			
+</div> 
+-->
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody" style="width: 100%;" >
 				<div class="colum_techlogin" style="float:left;">
@@ -100,7 +97,7 @@
 								    <tr>								            										            		
 								    <td id="todoId" style="padding-top:4px;padding-left:1px;padding-right:0px;padding-bottom:0px;width:50px;"><g:link  style="color: #5b5e5c; border:1px solid #5b5e5c; margin:2px;background:#aaefb8;padding:2px;" action="assetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link></td>
 								    <td id="allId" style="padding-top:4px;padding-left:1px;padding-right:0px;padding-bottom:0px;"><g:link   style="color: #5b5e5c; border:1px solid #5b5e5c; margin:2px; padding:2px;" action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All&nbsp;(${allSize})</g:link></td>
-								    <td style="padding-top:0px;padding-left:1px;padding-right:0px;padding-bottom:0px; height:10px;"><input  type="text" size="08" value="" name="search" style="color: #5b5e5c; border:1px solid #5b5e5c; margin:0px; padding:1px;" onchange="submittheform()" onkeyup="timeInterval = setTimeout('submittheform()',1500)" onkeydown="if(timeInterval){clearTimeout(timeInterval)}"/>&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/></td>
+								    <td style="padding-top:0px;padding-left:1px;padding-right:0px;padding-bottom:0px; height:10px;"><input  type="text" size="08" value="" name="search" style="color: #5b5e5c; border:1px solid #5b5e5c; margin:0px; padding:1px;" />&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/></td>
 								    </tr>
 								    </table>
 						    </div>  
@@ -122,7 +119,8 @@
                					</thead>
                					<tbody>
                   				<g:each status="i" in="${assetList}" var="assetList">
-								<tr class="${assetList.cssVal}" onclick="${remoteFunction(action:'getServerInfo', params:'\'assetId=\'+'+assetList.item.asset.id,onComplete: 'serverInfo(e)')}">						
+                  				
+								<tr class="${assetList.cssVal}"  ondblclick="document.bundleTeamAssetForm.search.value='${assetList?.item?.asset.assetTag}';document.bundleTeamAssetForm.submit();">						
 								<td class="asset_details_block">${assetList?.item?.asset.assetTag}</td>
 								<g:if test="${location == 's'}">
 								<td class="asset_details_block">${assetList?.item?.asset.sourceRack}/${assetList?.item?.asset.sourceRackPosition}</td>
@@ -142,3 +140,4 @@
 <script>setFocus();</script>
 </body>
 </html>
+                  				

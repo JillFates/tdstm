@@ -257,10 +257,10 @@ function mySelect(x)
 </script>
 
 	<script type="text/javascript">    
-		var timeInterval;
+		/*var timeInterval;
 		function submittheform() {
 			document.assetSearchForm.submit();
-		}
+		}*/
 		
         function serverInfo(e){        
         var loc = document.assetSearchForm.location.value;
@@ -407,7 +407,7 @@ function mySelect(x)
 					<input name="assetTag" type="hidden" value="${projMap?.asset?.assetTag}" />
 					
 			<div style="float:right;margin-right:10px;margin-top:-20px;">
-				<input type="text" name="textSearch" size="10" onchange="submittheform()" onkeyup="timeInterval = setTimeout('submittheform()',1500)" onkeydown="if(timeInterval){clearTimeout(timeInterval)}"/>&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/>
+				<input type="text" name="textSearch" size="10" />&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/>
 			</div>		
 			<div id="mydiv" onclick="document.getElementById('mydiv').style.display = 'none';">
 					<g:if test="${flash.message}">

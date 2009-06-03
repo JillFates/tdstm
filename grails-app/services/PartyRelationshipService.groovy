@@ -257,6 +257,8 @@ class PartyRelationshipService {
         def teamMembers = PartyRelationship.findAll(query)
         def name = new StringBuffer()
         teamMembers.each{team ->
+        name.append(team.partyIdTo.firstName.charAt(0))
+        name.append(".")
             name.append(team.partyIdTo.lastName)
             name.append("/")
         }
