@@ -87,6 +87,12 @@ class AssetEntityController {
     		assetsByProject = AssetEntity.findAllByProject(project)
     	}
     	def	dataTransferBatchs = DataTransferBatch.findAllByProject(project).size()
+    	session.setAttribute("BATCH_ID",0) 
+		session.setAttribute("TOTAL_ASSETS",0)
+		if(params.message){
+			flash.message = params.message
+		}
+    	
         render( view:"importExport", model : [ assetsByProject: assetsByProject, projectId: projectId, moveBundleInstanceList: moveBundleInstanceList, dataTransferSetImport: dataTransferSetImport, dataTransferSetExport: dataTransferSetExport, dataTransferBatchs: dataTransferBatchs ] )
     }
     /*
@@ -184,6 +190,7 @@ class AssetEntityController {
                     dataTransferBatch.project = project
                     dataTransferBatch.userLogin = userLogin
                     if(dataTransferBatch.save()){
+                    	session.setAttribute("BATCH_ID",dataTransferBatch.id)
                         def eavAttributeInstance
                         def colNo = 0
                         for (int index = 0; index < col; index++) {
@@ -192,6 +199,14 @@ class AssetEntityController {
                         	}
                         }
                         def sheetrows = sheet.rows
+                        def assetsCount = 0
+                        for (int row = 1; row < sheetrows; row++) {
+                        	def server = sheet.getCell( colNo, row ).contents
+                        	if(server){
+                        		assetsCount = row
+                        	}
+                        }
+                        session.setAttribute("TOTAL_ASSETS",assetsCount)
                         for ( int r = 1; r < sheetrows ; r++ ) {
                         	def server = sheet.getCell( colNo, r ).contents
                         	if(server){
@@ -268,7 +283,7 @@ class AssetEntityController {
                 } else {
                     flash.message = " File uploaded successfully with ${added} records.  Please click the Manage Batches to review and post these changes."
                 }
-                redirect( action:assetImport, params:[projectId:projectId] )
+                redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
 	            return;  
 	        }
         }catch( Exception ex ) {
@@ -1176,6 +1191,22 @@ class AssetEntityController {
 	        }
         }
         redirect(action:'dashboardView',params:["projectId":params.projectId,"moveBundle":params.moveBundle])
+    }
+    
+    /* --------------------------------------
+     * 	Author : Lokanada Reddy
+     *	Action will return imported data for progress bar
+     * -------------------------------------- */
+    def getProgress = {
+		def importedData
+		def progressData = []
+    	def batchId = session.getAttribute("BATCH_ID") 
+    	def total = session.getAttribute("TOTAL_ASSETS")
+    	if ( batchId ){
+    		importedData = jdbcTemplate.queryForList("select count(distinct row_id) as rows from data_transfer_value where data_transfer_batch_id="+batchId).rows
+    	}
+		progressData<<[imported:importedData,total:total]
+    	render progressData as JSON
     }
     
 }

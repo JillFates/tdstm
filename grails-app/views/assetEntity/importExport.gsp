@@ -1,10 +1,39 @@
-
-
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="projectHeader" />
     <title>Asset Import/Export</title>
+    <g:javascript library="prototype" />
+	<g:javascript library="jquery" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'progressbar.css')}" />
+	<jq:plugin name="ui.progressbar"/>
+	<script>
+		/* ---------------------------------
+		 * 	Author : Lokanada Reddy		
+		 *	function to show the Progress bar
+		 * ------------------------------- */
+		var handle=0;
+		function showProcessBar(e){
+			var progress = eval('(' + e.responseText + ')');
+			if(progress){
+				$("#progressbar").reportprogress(progress[0].imported,progress[0].total);
+		        if(progress[0].imported==progress[0].total){
+		                clearInterval(handle);
+		        }
+			}
+		}
+		/* ---------------------------------
+		 * 	Author : Lokanada Reddy
+		 *	JQuary function to set the interval to display Progress
+		 * ------------------------------- */
+		jQuery(function($){
+	        $("#run").click(function(){
+	        	document.getElementById("progressbar").style.display = "block"
+	        	clearInterval(handle);
+				handle=setInterval("${remoteFunction(action:'getProgress', onComplete:'showProcessBar(e)')}",500);
+	        });
+		});
+	</script>
   </head>
   <body>
    
@@ -14,7 +43,7 @@
       </g:if>
       
         <h1>Asset Import</h1>
-        <g:form action="upload" method="post" name="importForm" enctype="multipart/form-data">
+        <g:form action="upload" method="post" name="importForm" enctype="multipart/form-data" >
           <input type="hidden" value="${projectId}" name="projectIdImport" >
           <div class="dialog">
             <table>
@@ -36,11 +65,16 @@
 
                 <tr>
                   <td><label for="file">File:</label></td>
-                  <td><input size="40" type="file" name="file" id="file" /></td>
+                  <td><input size="40" type="file" name="file" id="file" />
+                  </td>
                 </tr>              
                 
                 <tr>
-                  <td class="buttonR"><input class="button" type="submit" value="Import Batch" /></td>
+                  <td >&nbsp;</td>
+                  <td ><div id="progressbar" style="display: none;" ></div></td>
+                </tr>
+                <tr>
+                  <td class="buttonR"><input class="button" id="run" type="submit" value="Import Batch" /></td>
                 </tr>
                 
                 <tr>
