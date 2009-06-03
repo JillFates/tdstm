@@ -102,7 +102,7 @@
         <jsec:hasRole in="['ADMIN','MANAGER','OBSERVER']">
         <li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">PMO Dashboard</g:link> </li>
         </jsec:hasRole>
-         <jsec:lacksRole in="['MANAGER','OBSERVER']">
+         <jsec:lacksRole in="['MANAGER','OBSERVER','USER']">
         <li>  
           	<div id="menubar">
  			<div id="menu1" class="menu_new">Reports<ul>    
@@ -112,6 +112,20 @@
                	<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Issue Report']">Issue Report</g:link></li>
     	      	<!-- <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Rack Layout']">Rack Layout</g:link></li> -->
 			</jsec:lacksRole>
+			<jsec:hasRole in="['USER']">
+        <div id="menubar">
+ 			<div id="menu1" class="menu_normal">Reports<ul>    	      
+    	      	<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Team Worksheets']">Move Team Worksheets</g:link> </li>
+				<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'cart Asset']">Cleaning Team Worksheets</g:link></li>
+    	       	<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Transportation Asset List']">Transport Worksheets</g:link></li>
+    	       	<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Issue Report']">Issue Report</g:link></li>
+    	       	<!-- <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Rack Layout']">Rack Layout</g:link></li> -->
+              </ul>
+            </div>
+            </div>
+                	
+        </li>
+        </jsec:hasRole>
               </ul>
             </div>
             </div>

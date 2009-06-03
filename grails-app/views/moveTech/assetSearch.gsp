@@ -16,7 +16,7 @@
         document.assetSearchForm.enterNote.focus();   
         return false;
         }else{
-        if(confirm('Are you sure???')){
+        if(confirm('Are you sure?')){
         return true;
         }
         }   
