@@ -128,7 +128,7 @@
                     <option value="" selected="selected">Please Select</option>
 
                     <g:each status="i" in="${managers}" var="managers">
-                      <option value="${managers?.staff?.id}">${managers?.staff?.lastName}, ${managers?.staff?.firstName} - ${managers?.staff?.title}</option>
+                      <option value="${managers?.staff?.id}">${managers?.staff?.lastName}, ${managers?.staff?.firstName}<g:if test="${managers?.staff?.title}"> - ${managers?.staff?.title}</g:if></option>
                     </g:each>
 
                 </select></td>
@@ -142,7 +142,7 @@
                     <option value="" selected="selected">Please Select</option>
 
                     <g:each status="i" in="${managers}" var="managers">
-                      <option value="${managers?.staff?.id}">${managers?.staff?.lastName}, ${managers?.staff?.firstName} - ${managers?.staff?.title}</option>
+                      <option value="${managers?.staff?.id}">${managers?.staff?.lastName}, ${managers?.staff?.firstName}<g:if test="${managers?.staff?.title}"> - ${managers?.staff?.title}</g:if></option>
                     </g:each>
 
                 </select></td>

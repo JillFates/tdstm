@@ -380,19 +380,20 @@ class="value ${hasErrors(bean:projectInstance,field:'completionDate','errors')}"
                     <option value="" selected="selected">Please Select</option>
                     <optgroup label="TDS" >
                       <g:each status="i" in="${companyStaff}" var="companyStaff">
-                        <option value="${companyStaff.partyIdTo.id}">${companyStaff?.partyIdTo?.lastName},
-                        ${companyStaff?.partyIdTo?.firstName} - ${companyStaff?.partyIdTo?.title}</option>
+                        <option value="${companyStaff.partyIdTo.id}">${companyStaff?.partyIdTo?.lastName}
+                        <g:if test="${companyStaff?.partyIdTo?.firstName}">,${companyStaff?.partyIdTo?.firstName}</g:if><g:if test="${companyStaff?.partyIdTo?.title}"> - ${companyStaff?.partyIdTo?.title}</g:if></option>
                       </g:each>
                     </optgroup>
                     <optgroup label="${projectInstance?.client}">
                       <g:each status="i" in="${clientStaff}" var="clientStaff">
-                        <option value="${clientStaff?.partyIdTo.id}">${clientStaff?.partyIdTo.lastName},
-                        ${clientStaff?.partyIdTo?.firstName} - ${clientStaff?.partyIdTo.title}</option>
+                        <option value="${clientStaff?.partyIdTo.id}">${clientStaff?.partyIdTo.lastName}
+                        <g:if test="${clientStaff?.partyIdTo?.firstName}">,${clientStaff?.partyIdTo?.firstName}</g:if> <g:if test="${clientStaff?.partyIdTo.title}"> - ${clientStaff?.partyIdTo.title}</g:if></option>
                       </g:each>
                     </optgroup>
                     <optgroup label="${projectPartner?.partyIdTo}" id="pmGroup">
                       <g:each status="i" in="${partnerStaff}" var="partnerStaff">
-                        <option value="${partnerStaff?.partyIdTo.id}">${partnerStaff?.partyIdTo?.lastName}, ${partnerStaff?.partyIdTo?.firstName} - ${partnerStaff?.partyIdTo?.title}</option>
+                        <option value="${partnerStaff?.partyIdTo.id}">${partnerStaff?.partyIdTo?.lastName}
+                        <g:if test="${partnerStaff?.partyIdTo?.firstName}">, ${partnerStaff?.partyIdTo?.firstName}</g:if> <g:if test="${partnerStaff?.partyIdTo?.title}"> - ${partnerStaff?.partyIdTo?.title}</g:if></option>
                       </g:each>
                     </optgroup>
                 </select></td>
@@ -406,19 +407,21 @@ class="value ${hasErrors(bean:projectInstance,field:'completionDate','errors')}"
                     <option value="" selected="selected">Please Select</option>
                     <optgroup label="TDS">
                       <g:each status="i" in="${companyStaff}" var="companyStaff">
-                        <option value="${companyStaff?.partyIdTo.id}">${companyStaff?.partyIdTo.lastName},
-                        ${companyStaff?.partyIdTo?.firstName} - ${companyStaff?.partyIdTo.title}</option>
+                        <option value="${companyStaff?.partyIdTo.id}">
+                        ${companyStaff?.partyIdTo.lastName}
+                        <g:if test="${companyStaff?.partyIdTo?.firstName}">, ${companyStaff?.partyIdTo?.firstName}</g:if> <g:if test="${companyStaff?.partyIdTo.title}"> - ${companyStaff?.partyIdTo.title}</g:if></option>
                       </g:each>
                     </optgroup>
                     <optgroup label="${projectInstance?.client}">
                       <g:each status="i" in="${clientStaff}" var="clientStaff">
-                        <option value="${clientStaff?.partyIdTo.id}">${clientStaff?.partyIdTo.lastName},
-                        ${clientStaff?.partyIdTo?.firstName} - ${clientStaff?.partyIdTo.title}</option>
+                        <option value="${clientStaff?.partyIdTo.id}">${clientStaff?.partyIdTo.lastName}
+                        <g:if test="${clientStaff?.partyIdTo?.firstName}">,${clientStaff?.partyIdTo?.firstName}</g:if><g:if test="${clientStaff?.partyIdTo.title}"> - ${clientStaff?.partyIdTo.title}</g:if></option>
                       </g:each>
                     </optgroup>
                     <optgroup label="${projectPartner?.partyIdTo}" id="mmGroup">
                       <g:each status="i" in="${partnerStaff}" var="partnerStaff">
-                        <option value="${partnerStaff?.partyIdTo.id}">${partnerStaff?.partyIdTo?.lastName}, ${partnerStaff?.partyIdTo?.firstName} - ${partnerStaff?.partyIdTo?.title}</option>
+                        <option value="${partnerStaff?.partyIdTo.id}">${partnerStaff?.partyIdTo?.lastName}
+                        <g:if test="${partnerStaff?.partyIdTo?.firstName}">, ${partnerStaff?.partyIdTo?.firstName}</g:if> <g:if test="${partnerStaff?.partyIdTo?.title}"> - ${partnerStaff?.partyIdTo?.title}</g:if></option>
                       </g:each>
                     </optgroup>
                   </select>

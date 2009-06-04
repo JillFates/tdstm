@@ -451,7 +451,8 @@ class ProjectController {
         def tdsStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $tdsParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' " )
         tdsStaff.sort{it.partyIdTo.lastName}
         tdsStaff.each{partyRelationship ->
-        	compStaff <<[id:partyRelationship.partyIdTo.id, name:partyRelationship.partyIdTo.lastName +", "+partyRelationship.partyIdTo.firstName+" - "+partyRelationship.partyIdTo.title]
+        	def title = partyRelationship.partyIdTo.title ? " - "+partyRelationship.partyIdTo.title : ""
+        	compStaff <<[id:partyRelationship.partyIdTo.id, name:partyRelationship.partyIdTo.lastName +", "+partyRelationship.partyIdTo.firstName+title]
         }
         if ( client != "" && client != null ) {
             def clientParty = PartyGroup.findById( client ).id
@@ -459,7 +460,8 @@ class ProjectController {
             def clientStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $clientParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' " )
 	    	clientStaff.sort{it.partyIdTo.lastName}
             clientStaff.each{partyRelationship ->
-            	cStaff <<[id:partyRelationship.partyIdTo.id, name:partyRelationship.partyIdTo.lastName +", "+partyRelationship.partyIdTo.firstName+" - "+partyRelationship.partyIdTo.title]
+            	def title = partyRelationship.partyIdTo.title ? " - "+partyRelationship.partyIdTo.title : "" 
+            	cStaff <<[id:partyRelationship.partyIdTo.id, name:partyRelationship.partyIdTo.lastName +", "+partyRelationship.partyIdTo.firstName+title]
 	             
             }
         }
@@ -469,7 +471,8 @@ class ProjectController {
             def partnerStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $partnerParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' " )
 	    	partnerStaff.sort{it.partyIdTo.lastName}
             partnerStaff.each{partyRelationship ->
-            	pStaff <<[id:partyRelationship.partyIdTo.id, name:partyRelationship.partyIdTo.lastName +", "+partyRelationship.partyIdTo.firstName+" - "+partyRelationship.partyIdTo.title]
+            	def title = partyRelationship.partyIdTo.title ? " - "+partyRelationship.partyIdTo.title : ""
+            	pStaff <<[id:partyRelationship.partyIdTo.id, name:partyRelationship.partyIdTo.lastName +", "+partyRelationship.partyIdTo.firstName+title]
 	             
             }
         }
