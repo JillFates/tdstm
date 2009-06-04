@@ -43,7 +43,7 @@ class AssetEntityController {
             }
         }
         try{
-            render( view:'list', model:[ assetEntityInstanceList:assetEntityInstanceList,assetEntityCount:filterService.count( params, AssetEntity ), filterParams: com.zeddware.grails.plugins.filterpane.FilterUtils.extractFilterParams(params), params:params, projectId:project.id,,maxVal : params.max ] )
+            render( view:'list', model:[ assetEntityInstanceList:assetEntityInstanceList,assetEntityCount:filterService.count( params, AssetEntity ), filterParams: com.zeddware.grails.plugins.filterpane.FilterUtils.extractFilterParams(params), params:params, projectId:project.id,maxVal : params.max ] )
         } catch(Exception ex){
             redirect( controller:"assetEntity", action:"list" )
         }
