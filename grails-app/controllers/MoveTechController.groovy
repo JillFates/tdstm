@@ -159,7 +159,7 @@ class MoveTechController {
                                 checkAuth(barcodeText.get(0), moveTech)
                             }else {
                                 flash.message = message(code :"Login Failed")
-                                redirect(action: 'login', moveTech)
+                                redirect(action: 'login')
                                 return;
                             }
                         }
