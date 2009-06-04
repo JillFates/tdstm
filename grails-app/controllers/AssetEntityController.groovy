@@ -175,7 +175,6 @@ class AssetEntityController {
                 if ( checkCol == false ) {
                     missingHeader = missingHeader.replaceFirst(",","")
                     flash.message = " Column Headers : ${missingHeader} not found, Please check it."
-                    println"flask..---------->"+flash.message
                     redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
                     return;
                 } else {

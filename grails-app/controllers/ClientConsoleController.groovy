@@ -365,7 +365,6 @@ class ClientConsoleController {
 	        } else {
 	          println("This file is not exist")
 	        }
-	        println"headerCount----------->"+count
 	        return count
 	       
 	}
