@@ -9,12 +9,16 @@ class AuthController {
     def index = { redirect(action: 'login', params: params) }
 
     def login = {
-        return [ username: params.username, rememberMe: (params.rememberMe != null), targetUri: params.targetUri ]
+        def browserTest = request.getHeader("User-Agent").contains("IEMobile")
+        if(browserTest) {
+            redirect(controller:'moveTech', action:'moveTechLogin')
+        } else {
+            return [ username: params.username, rememberMe: (params.rememberMe != null), targetUri: params.targetUri ]
+        }
     }
 
     def signIn = {
         def authToken = new UsernamePasswordToken(params.username, params.password)
-
         // Support for "remember me"
         if (params.rememberMe) {
             authToken.rememberMe = true
@@ -41,7 +45,7 @@ class AuthController {
 	            /*
 	             *  call loadPreferences() to load CURR_PROJ MAP into session
 	             */
-	            userPreferenceService.loadPreferences("CURR_PROJ")
+	            userPreferenceService.loadPreferences("CURR_PROJ")	            
 	            redirect(controller:'projectUtil')
             }
         }
@@ -78,10 +82,10 @@ class AuthController {
 
     def unauthorized = {
         flash.message = 'You do not have permission to access this page.'
-        	render( view:'home' )
+        render( view:'home' )
     }
     // method for home page
     def home = {
-    		render( view:'home' )
+        render( view:'home' )
     }
 }

@@ -63,17 +63,27 @@ class MoveTechController {
         }
     }
     //moveTech login
-    def moveTechLogin = {
+    def moveTechLogin = {    	
         redirect(action:'login')
     }
     def login = {
-        return [ username: params.username, rememberMe: (params.rememberMe != null), targetUri: params.targetUri ]
+        if(flash.message != "Login Failed"){
+            def username = session.getAttribute("USERNAME")
+            if(username){
+                redirect(action:'signIn',params:["username":username])
+            } else {
+                return [ username: params.username, rememberMe: (params.rememberMe != null), targetUri: params.targetUri ]
+            }
+        } else {
+            return [ username: params.username, rememberMe: (params.rememberMe != null), targetUri: params.targetUri ]
+        }
     }
     //sign in for moveTech by reading the barcode as userName
-    def signIn = {    	
+    def signIn = {
         def moveBundleInstance
         def projectTeamInstance
         if( params.username ) {
+        	session.setAttribute("USERNAME",params.username)
             def token = new StringTokenizer(params.username, "-")
             //Getting current project instance
             def projectInstance
@@ -228,7 +238,7 @@ class MoveTechController {
 	//SignOut
     def signOut = {
         // Log the user out of the application.
-        //  SecurityUtils.subject?.logout()
+        SecurityUtils.subject.logout()
 
         // For now, redirect back to the login page.
         redirect(action: 'moveTechLogin')
@@ -236,7 +246,7 @@ class MoveTechController {
     // method for home page
     def home = {
     	def principal = SecurityUtils.subject.principal
-    	if(principal){	
+    	if(principal){
     		render( view:'home' )
     	} else {
     		flash.message = "Your login has expired and must login again."
@@ -670,40 +680,51 @@ class MoveTechController {
             def actionLabel
             def teamMembers
             def loginTeam = ProjectTeam.findById(params.team)
-                if(search != null){
-                    assetItem = AssetEntity.findByAssetTag(search)
-                    if(assetItem == null){
-                        flash.message = message(code :"Asset Tag number '${search}' was not located")
+            if(search != null){
+                assetItem = AssetEntity.findByAssetTag(search)
+                if(assetItem == null){
+                    flash.message = message(code :"Asset Tag number '${search}' was not located")
+                    if(textSearch){
+                        render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+                        return;
+                    } else {
+                        redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                        return;
+                    }
+                }else{
+                    teamMembers = partyRelationshipService.getTeamMemberNames(assetItem.sourceTeam?.id)
+                    def membersCount = ((teamMembers.toString()).tokenize("/")).size()
+                    teamMembers = membersCount + "(" + teamMembers.toString() + ")"
+                    def bundleName = assetItem.moveBundle.name
+                    def teamId
+                    def teamName
+                    if(assetItem.sourceTeam){
+                        teamId = (assetItem.sourceTeam.id).toString()
+                        teamName = assetItem.sourceTeam.name
+                    } else {
+                        flash.message = message(code :"The asset [${assetItem.assetName}] is not assigned to team [${loginTeam}]")
                         if(textSearch){
-                            render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+                            render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers,projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
                             return;
                         } else {
                             redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
                             return;
                         }
-                    }else{
-                    	teamMembers = partyRelationshipService.getTeamMemberNames(assetItem.sourceTeam?.id)
-                    	def membersCount = ((teamMembers.toString()).tokenize("/")).size()
-                    	teamMembers = membersCount + "(" + teamMembers.toString() + ")"
-                        def bundleName = assetItem.moveBundle.name
-                        def teamId 
-                        def teamName
-                        if(assetItem.sourceTeam){
-                            teamId = (assetItem.sourceTeam.id).toString()
-                            teamName = assetItem.sourceTeam.name
-                        } else {
-                            flash.message = message(code :"The asset [${assetItem.assetName}] is not assigned to team [${loginTeam}]")
-                            if(textSearch){
-                                render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers,projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
-                                return;
-                            } else {
-                                redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
-                                return;
-                            }
-                        }                        
+                    }
     			
-                        if(bundleName != params.bundle){
-                            flash.message = message(code :"The asset [${assetItem.assetName}] is not part of move bundle [${params.bundle}]")
+                    if(bundleName != params.bundle){
+                        flash.message = message(code :"The asset [${assetItem.assetName}] is not part of move bundle [${params.bundle}]")
+                        if(textSearch){
+                            render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers,projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+                            return;
+                        } else {
+                            redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                            return;
+                        }
+                    } else {
+                        projMap = ProjectAssetMap.findByAsset(assetItem)
+                        if( !projMap ) {
+                            flash.message = message(code :" The asset has not yet been released ")
                             if(textSearch){
                                 render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers,projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
                                 return;
@@ -712,50 +733,39 @@ class MoveTechController {
                                 return;
                             }
                         } else {
-                            projMap = ProjectAssetMap.findByAsset(assetItem)
-                            if( !projMap ) {
-	                            flash.message = message(code :" The asset has not yet been released ")
-	                            if(textSearch){
-	                                render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers,projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
-	                                return;
-	                            } else {
-	                                redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
-	                                return;
-	                            }
-	                        } else {
-	                            stateVal = stateEngineService.getState("STD_PROCESS",projMap.currentStateId)
-	                            if(stateVal == "Hold"){
-	                                flash.message = message(code :"The asset is on Hold. Please contact manager to resolve issue.")
-	                                if(textSearch){	                                	
-	                                    render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers, projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
-	                                    return;
-	                                } else {
-	                                    redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
-	                                    return;
-	                                }
-	                            }
-	                            taskList = stateEngineService.getTasks("STD_PROCESS","CLEANER",stateVal)
-	                            taskSize = taskList.size()
-	                            if(taskSize == 1){
-	                                if(taskList.contains("Hold")){
-	                                    flash.message = message(code :"There is a problem with this asset. Place the asset on hold to alert the move coordinator")
-	                                }
+                            stateVal = stateEngineService.getState("STD_PROCESS",projMap.currentStateId)
+                            if(stateVal == "Hold"){
+                                flash.message = message(code :"The asset is on Hold. Please contact manager to resolve issue.")
+                                if(textSearch){
+                                    render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers, projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+                                    return;
+                                } else {
+                                    redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                                    return;
+                                }
+                            }
+                            taskList = stateEngineService.getTasks("STD_PROCESS","CLEANER",stateVal)
+                            taskSize = taskList.size()
+                            if(taskSize == 1){
+                                if(taskList.contains("Hold")){
+                                    flash.message = message(code :"There is a problem with this asset. Place the asset on hold to alert the move coordinator")
+                                }
 	                        	
-	                            }else if(taskSize > 1) {
-	                                taskList.each{
-	                                    if(it != "Hold"){
-	                                        actionLabel = it
-	                                        label =	stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it)))
-	                                    }
+                            }else if(taskSize > 1) {
+                                taskList.each{
+                                    if(it != "Hold"){
+                                        actionLabel = it
+                                        label =	stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it)))
+                                    }
 	                        			
-	                                }
-	                            }
-	                            assetCommt = AssetComment.findAllByAssetEntity(assetItem)
-	                            render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers, projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
-	                        }
+                                }
+                            }
+                            assetCommt = AssetComment.findAllByAssetEntity(assetItem)
+                            render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers, projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
                         }
                     }
                 }
+            }
             
         } else {
             flash.message = "Your login has expired and must login again."
