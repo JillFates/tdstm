@@ -518,7 +518,7 @@ td .odd {
 		var spanEle = document.getElementById('spanId_'+asset[0].assetEntity.id);
 		spanEle.innerHTML = "&nbsp;&nbsp;&nbsp;";
 		}		
-		document.getElementById('priorityCol_'+asset[0].assetEntity.id).innerHTML = asset[0].assetEntity.priority 
+		document.getElementById('priority_'+asset[0].assetEntity.id).innerHTML = asset[0].assetEntity.priority 
 		document.getElementById('statusCol_'+asset[0].assetEntity.id).innerHTML = asset[0].status
 		document.getElementById('source_'+asset[0].assetEntity.id).innerHTML = asset[0].sourceTeam
 		document.getElementById('target_'+asset[0].assetEntity.id).innerHTML = asset[0].targetTeam
@@ -885,14 +885,14 @@ function resolveValidate(formName,idVal){
 										border="0px"></span>
 										
 										</td></jsec:hasRole>
-									<td id="priorityCol_${assetsList?.asset.id}"
+									<td id="priority_${assetsList?.asset.id}"
 										onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.priority}</td>
-									<td onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.assetTag}</td>
-									<td onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.assetName}</td>
+									<td id="assetTag_${assetsList?.asset.id}" onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.assetTag}</td>
+									<td  id="assetName_${assetsList?.asset.id}" onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.assetName}</td>
 									<td onclick="assetDetails('${assetsList?.asset.id}')"
 										id="statusCol_${assetsList?.asset.id}">${assetsList?.status}</td>
 									<td onclick="assetDetails('${assetsList?.asset.id}')"
-										id="source_${assetsList?.asset.id}"><g:if test="${assetsList?.asset.targetTeam}">${ProjectTeam.findById(assetsList?.asset.sourceTeam)?.name}</g:if></td>
+										id="source_${assetsList?.asset.id}"><g:if test="${assetsList?.asset.sourceTeam}">${ProjectTeam.findById(assetsList?.asset.sourceTeam)?.name}</g:if></td>
 									<td onclick="assetDetails('${assetsList?.asset.id}')"
 										id="target_${assetsList?.asset.id}"><g:if test="${assetsList?.asset.targetTeam}"> ${ProjectTeam.findById(assetsList?.asset.targetTeam)?.name}</g:if></td>
 									<td id="icon_${assetsList?.asset.id}"><g:if
