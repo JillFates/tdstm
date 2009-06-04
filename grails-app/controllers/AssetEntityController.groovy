@@ -161,7 +161,7 @@ class AssetEntityController {
             }
             if( flag == 0 ) {
                 flash.message = " Sheet not found, Please check it."
-                redirect( action:assetImport, params:[projectId:projectId] )
+                redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
                 return;
             } else {
                 //check for column
@@ -175,7 +175,8 @@ class AssetEntityController {
                 if ( checkCol == false ) {
                     missingHeader = missingHeader.replaceFirst(",","")
                     flash.message = " Column Headers : ${missingHeader} not found, Please check it."
-                    redirect( action:assetImport, params:[projectId:projectId] )
+                    println"flask..---------->"+flash.message
+                    redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
                     return;
                 } else {
                     //get user name.
@@ -288,7 +289,7 @@ class AssetEntityController {
 	        }
         }catch( Exception ex ) {
             flash.message = grailsApplication.metadata[ 'app.file.format' ]
-            redirect( action:assetImport, params:[projectId:projectId] )
+            redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
             return;
         }
     }
@@ -318,7 +319,7 @@ class AssetEntityController {
 	        
         if ( projectId == null || projectId == "" ) {
             flash.message = " Project Name is required. "
-            redirect( action:assetImport, params:[projectId:projectId] )
+            redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
             return;
         }
 	        
@@ -391,7 +392,7 @@ class AssetEntityController {
             if( flag == 0 ) {
 	            	
                 flash.message = " Sheet not found, Please check it."
-                redirect( action:assetImport, params:[projectId:projectId] )
+                redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
 	            return;    
             } else {
                 def col = sheet.getColumns()
@@ -410,7 +411,7 @@ class AssetEntityController {
 	                	
                     missingHeader = missingHeader.replaceFirst(",","")
                     flash.message = " Column Headers : ${missingHeader} not found, Please check it."
-                    redirect( action:assetImport, params:[projectId:projectId] )
+                    redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
                     return;
                 } else {
                     //update data from Asset Entity table to EXCEL
@@ -482,7 +483,7 @@ class AssetEntityController {
             }
         } catch( Exception fileEx ) {
             flash.message = "Excel template not found. "
-            redirect( action:assetImport, params:[projectId:projectId] )
+            redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
             return;
         }
     }

@@ -354,7 +354,7 @@ function resolveValidate(formName,idVal){
 			
 			<th style="padding-top:85px;">Issue</th>
 			
-			<g:sortableColumn style="padding-top:85px;" property="application"  title="Application" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
+			 <g:sortableColumn style="padding-top:85px;" property="application"  title="Application" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
 			
 			<g:sortableColumn style="padding-top:85px;" property="app_owner" title="App Owner"  params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]" />
 
@@ -368,7 +368,7 @@ function resolveValidate(formName,idVal){
 			</g:each>
 			</g:if>
 			<g:else>
-			<th style="padding-left: 0px" colspan="${headerCount}"><embed src="${createLinkTo(dir:'templates',file:'headerSvg.svg')}" type="image/svg+xml" width="${headerCount*22}" height="180"/></th>
+			<th style="padding-left: 0px" colspan="${headerCount}"><embed src="${createLinkTo(dir:'templates',file:'headerSvg.svg')}" type="image/svg+xml" width="${headerCount*22}" height="129"/></th>
 			</g:else>
 
 		</tr>
