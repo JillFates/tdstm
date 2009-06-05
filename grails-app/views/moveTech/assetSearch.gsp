@@ -54,6 +54,11 @@
        return false;
        }     
       }      
+      function commentSelect(cmtVal) {
+      document.assetSearchForm.enterNote.value = cmtVal;
+      document.assetSearchForm.selectCmt.value = 'Select a common reason:';
+      }
+      
     </script>    
 </head>
 <body>
@@ -132,7 +137,12 @@
 			<td colspan="2" style="text-align:right;"><input type="button" value="${label}" onclick="return unRack();" style="background-color:#aaefb8;width: 120px;"/></td>
 			</tr>
 			</g:if>
-			<table>			
+			<table>	
+			<tr>
+			<td >
+			<g:select style="width: 170px;padding:0px;" from="['Select a common reason:','Device not powered down','Device is not in expected rack','Device will not power up']" id="selectCmt" name="selectCmt" value="Select a common reason:" onchange="commentSelect(this.value);"></g:select>
+			</td>
+			</tr>		
 			<tr><td>
 			<textarea rows="2" cols="10" style="width: 200px;padding:0px;" title="Enter Note..." name="enterNote" ></textarea>
 			</td></tr>		

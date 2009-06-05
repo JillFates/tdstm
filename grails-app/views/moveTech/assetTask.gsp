@@ -4,26 +4,29 @@
 <title>My Tasks</title>
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 	 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-	 <!--<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
+	<%--<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
 	 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.move_tech_dialog.css')}" /> 
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />-->
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />--%>
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 	
-	<!-- <g:javascript library="prototype" />
+	<%--<g:javascript library="prototype" />
 	<g:javascript library="jquery" />
 	
 	<jq:plugin name="ui.core" />
-	<jq:plugin name="ui.dialog" /> -->
+	<jq:plugin name="ui.dialog" /> --%>
+	
 
+	
 	<script>
-	/*$(document).ready(function() {
+	<%--
+	$(document).ready(function() {
 	$("#serverInfoDialog").dialog({ autoOpen: false })	       
-	})*/
+	})--%>
 	</script>
+	
 
     <script type="text/javascript">    	
-		
-      /*  function serverInfo(e){
+	<%--  function serverInfo(e){
         var loc = document.bundleTeamAssetForm.location.value;
         var location;
         var room;
@@ -61,6 +64,7 @@
 		 $("#serverInfoDialog").dialog('option', 'position', ['left','top']);
          $('#serverInfoDialog').dialog('open');
         }*/
+       --%>
         function setFocus(){
         var tab = '${tab}' ;
         if(tab != 'Todo'){
@@ -69,13 +73,19 @@
         }
         document.bundleTeamAssetForm.search.focus();
         }
+        function assetSubmit(searchVal){
+        
+        document.bundleTeamAssetForm.search.value = searchVal; 
+        document.bundleTeamAssetForm.submit();
+        
+        }
      </script>      
         
 </head>
 <body>
-<!-- <div id="serverInfoDialog" title ="Server Info" onclick="$('#serverInfoDialog').dialog('close');setFocus()">			
+<%--  <div id="serverInfoDialog" title ="Server Info" onclick="$('#serverInfoDialog').dialog('close');setFocus()">			
 </div> 
--->
+--%>
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody" style="width: 100%;" >
 				<div class="colum_techlogin" style="float:left;">
@@ -120,7 +130,7 @@
                					<tbody>
                   				<g:each status="i" in="${assetList}" var="assetList">
                   				
-								<tr class="${assetList.cssVal}"  ondblclick="document.bundleTeamAssetForm.search.value='${assetList?.item?.asset.assetTag}';document.bundleTeamAssetForm.submit();">						
+								<tr class="${assetList.cssVal}"  ondblclick="assetSubmit('${assetList?.item?.asset.assetTag}');">						
 								<td class="asset_details_block">${assetList?.item?.asset.assetTag}</td>
 								<g:if test="${location == 's'}">
 								<td class="asset_details_block">${assetList?.item?.asset.sourceRack}/${assetList?.item?.asset.sourceRackPosition}</td>
