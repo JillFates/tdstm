@@ -5,17 +5,35 @@
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}" />
 </head>
-<body>
+<body >
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 		<div class="mainbody" style="width: 100%;" >
 				<div class="colum_techlogin" style="float:left;">
+				
 				<div class="border_bundle_team">
-          		<div style="float:left; width:97.5%; margin-left:20px;">              									
-		        	<a href="#" style="height:21px; width:45px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;background:#aaefb8;padding:auto 0px;text-align:center;">Home</a>
-					<g:link action="cleaningAssetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' style="height:21px; width:60px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">My Task</g:link>
-					<a href="#" style="height:21px; width:63px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Asset</a>								           
-			  	</div>			
-				<div class="w_techlog">				
+          		<div style="float:left; width:97.5%; margin-left:20px;margin-top:17px;">              									
+		        	<a href="#" style="height:18px; width:45px; float:left;padding-top:3px; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;background:#aaefb8;padding:auto 0px;text-align:center;vertical-align:center ">Home</a>
+					<g:link action="cleaningAssetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' style="height:18px; padding-top:3px;width:60px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">My Task</g:link>
+					<g:link action="cleaningAssetSearch" params='["bundle":bundle,"menu":"true","team":team,"location":location,"project":project,"user":"ct"]' style="height:18px; padding-top:3px; width:63px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Asset</g:link>								           
+			  	</div>		
+				<div id="mydiv" onclick="document.getElementById('mydiv').style.display = 'none';">
+					<g:if test="${flash.message}">
+					<div style="color: red;">
+					<ul>
+					<li>${flash.message}</li>
+					</ul>
+					</div>
+					</g:if>
+				</div>
+				<g:if test="${browserTest == true}" >
+					<div style="color: red;">
+					<ul>
+					<li>Please note that in order to print barcode labels you will need to use the Internet Explorer browser</li>
+					</ul>
+					</div>
+				</g:if>
+				<div class="w_techlog" style="margin-top:15px;">
+										
       					<g:form method="post" name="bundleTeamAssetForm">      										        
 							<div style="float:left; width:100%; margin:5px 0; ">              								
               					<table style="border:0px;">

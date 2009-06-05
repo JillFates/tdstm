@@ -73,6 +73,12 @@
         }
         document.bundleTeamAssetForm.search.focus();
         }
+        function assetSearch(assetTag) {
+        document.bundleTeamAssetForm.search.value = assetTag
+        	document.bundleTeamAssetForm.action = "cleaningAssetSearch";
+       		document.bundleTeamAssetForm.submit() 
+        }
+    
    </script>      
         
 </head>
@@ -82,12 +88,12 @@
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 		<div class="mainbody" style="width: 100%;">
 			<div class="colum_techlogin" style="float:left;">
-			<div style="float:left; width:97.5%; margin-left:20px;">              									
-		         <g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"ct"]' style="height:21px; width:45px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Home</g:link>
-				 <a href="#" style="height:21px; width:60px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;background:#aaefb8;padding:auto 0px;text-align:center;">My Task</a>
-				 <a href="#" style="height:21px; width:63px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Asset</a>								           
+			<div style="float:left; width:97.5%; margin-left:20px; margin-top:17px;">              									
+		         <g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"ct"]' style="height:18px; padding-top:3px; width:45px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Home</g:link>
+				 <a href="#" style="height:18px; width:60px; float:left; padding-top:3px; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;background:#aaefb8;padding:auto 0px;text-align:center;">My Task</a>
+				 <g:link action="cleaningAssetSearch" params='["bundle":bundle,"menu":"true","team":team,"location":location,"project":project,"user":"ct"]' style="height:18px; padding-top:3px; width:63px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Asset</g:link>								           
 			</div>			
-			<div class="w_techlog">				
+			<div class="w_techlog" style="margin-top:15px;">				
       			<g:form method="post" name="bundleTeamAssetForm" action="cleaningAssetSearch">      					
 					<input name="bundle" type="hidden" value="${bundle}" />
 					<input name="team" type="hidden" value="${team}" />
@@ -119,7 +125,7 @@
                    </thead>
                    <tbody>
                    <g:each status="i" in="${assetList}" var="assetList">
-					<tr class="${assetList.cssVal}" onclick="${remoteFunction(action:'getServerInfo', params:'\'assetId=\'+'+assetList.item.asset.id,onComplete: 'serverInfo(e)')}">						
+					<tr class="${assetList.cssVal}" onclick="assetSearch('${assetList?.item?.asset.assetTag}')">						
 						<td class="asset_details_block">${assetList?.item?.asset.assetTag}</td>
 						<g:if test="${location == 's'}">
 						<td class="asset_details_block">${assetList?.item?.asset.sourceRack}/${assetList?.item?.asset.sourceRackPosition}</td>

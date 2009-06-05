@@ -302,7 +302,7 @@ function mySelect(x)
         
         function validation(){      
         var enterNote = document.assetSearchForm.enterNote.value;      
-        if(enterNote == ""){
+        if(enterNote == "" || enterNote == "Enter Comment"){
       	alert('Please enter note');
         document.assetSearchForm.enterNote.focus();   
       	return false;
@@ -367,7 +367,10 @@ function mySelect(x)
       	function setFocus(){ 
         document.assetSearchForm.textSearch.focus();
         }
-           
+       function commentSelect(cmtVal) {
+      document.assetSearchForm.enterNote.value = cmtVal;
+      document.assetSearchForm.selectCmt.value = 'Select a common reason:';
+      }
     </script>
 </head>
 <body onload="InitData()">
@@ -378,10 +381,10 @@ function mySelect(x)
 		<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 			<div class="mainbody" style="width: 100%;">
 			<div class="colum_techlogin" style="float: left;">
-			<div style="float: left; width: 97.5%; margin-left: 20px; margin-top: 0px;">
-		        	<g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"ct"]' style="height:21px; width:45px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Home</g:link>
-					<g:link action="cleaningAssetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' style="height:21px; width:60px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">My Task</g:link>
-					<a href="#" style="height:21px; width:63px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;background:#aaefb8;padding:auto 0px;text-align:center;">Asset</a>
+			<div style="float: left; width: 97.5%; margin-left: 20px; margin-top:;">
+		        	<g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"ct"]' style="height:18px; padding-top:3px; width:45px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Home</g:link>
+					<g:link action="cleaningAssetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' style="height:18px; padding-top:3px; width:60px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">My Task</g:link>
+					<a href="#" style="height:18px; padding-top:3px; width:63px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;background:#aaefb8;padding:auto 0px;text-align:center;">Asset</a>
 			</div>
 			<div style="float: left; width: 100%; margin: 5px 0;">
 				<g:form	name="assetSearchForm" action="cleaningAssetSearch">
@@ -421,28 +424,39 @@ function mySelect(x)
 			<span style="position:absolute;text-align:center;width:auto;margin:-17px 0 0 10px;padding:0px 8px; background:#ffffff;"><b>Asset Details</b></span>
 					
 					<g:if test="${projMap}">
-					<dl><dt>Asset Tag:</dt><dd>${projMap?.asset?.assetTag}</dd>
-					<dt style="margin-top:5px;">Asset Name:</dt><dd style="margin-top:5px;"> ${projMap?.asset?.assetName}</dd>
-					<dt style="margin-top:5px;">Manufacturer:</dt><dd style="margin-top:5px; min-width:25px;"> ${projMap?.asset?.manufacturer}</dd>
-					<dt style="margin-top:5px;">Model:</dt><dd style="margin-top:5px;"> ${projMap?.asset?.model}</dd>
-					<dt style="margin-top:5px;">Unrack Team:</dt><dd style="margin-top:5px;"> ${teamMembers} </dd>
+					<dl><dt style="margin-left:10px;">Asset Tag:</dt><dd>${projMap?.asset?.assetTag}</dd>
+					<dt style="margin-top:8px;margin-left:10px;">Asset Name:</dt><dd style="margin-top:8px;"> ${projMap?.asset?.assetName}</dd>
+					<dt style="margin-top:8px; margin-left:10px;">Manufacturer:</dt><dd style="margin-top:8px;  min-width:25px;"> ${projMap?.asset?.manufacturer}</dd>
+					<dt style="margin-top:8px; margin-left:10px;">Model:</dt><dd style="margin-top:8px;"> ${projMap?.asset?.model}</dd>
+					<dt style="margin-top:8px;margin-left:10px;">Unrack Team:</dt><dd style="margin-top:8px;"> ${teamMembers}</dd>
+					<dt style="margin-top:8px;margin-left:10px;">Cart/Shelf:</dt><dd style="margin-top:8px;"> ${projMap?.asset?.cart}/${projMap?.asset?.shelf}</dd>
+					<dt style="margin-top:8px;margin-left:10px;">Current State:</dt><dd style="margin-top:8px;"> ${stateVal}</dd>
 					</dl>	
 					</g:if>
 					<g:else>
-					<dl><dt>Asset Tag:</dt><dd>&nbsp;</dd>
-					<dt>Asset Name:</dt><dd>&nbsp;</dd>
-					<dt>Manufacturer:</dt><dd>&nbsp;</dd>
-					<dt>Model:</dt><dd>&nbsp;</dd>
-					<dt>Unrack Team:</dt><dd>&nbsp;</dd>
+					<dl ><dt style="margin-left:10px;">Asset Tag:</dt><dd>&nbsp;</dd>
+					<dt style="margin-left:10px; ">Asset Name:</dt><dd>&nbsp;</dd>
+					<dt style="margin-left:10px;">Manufacturer:</dt><dd>&nbsp;</dd>
+					<dt style="margin-left:10px;">Model:</dt><dd>&nbsp;</dd>
+					<dt style="margin-left:10px;">Unrack Team:</dt><dd>&nbsp;</dd>
+					<dt style="margin-left:10px;">Cart/Shelf:</dt><dd>&nbsp;</dd>
+					<dt style="margin-left:10px;">Current State:</dt><dd>&nbsp;</dd>
 					</dl>
 					</g:else>
 			</div>	
+			<g:if test="${browserTest == true}" >
+			<div style="color: red;">
+					<ul>
+					<li>Please note that in order to print barcode labels you will need to use the Internet Explorer browser</li>
+					</ul>
+					</div>
+			</g:if>
 			<div  style="width:100%; height:auto; border:1px solid #5F9FCF; margin-top:10px;padding:10px 0;">
 					<span style="position:absolute;text-align:center;width:auto;margin:-17px 0 0 10px;padding:0px 8px; background:#ffffff;"><b>Label Printing</b></span>
 			<table style="margin-top:10px; border:0px;">
-					<g:if test="${projMap}">	
+					<g:if test="${projMap && browserTest != true}">	
 					<tr>
-					<td><b>Quantity: </b><select name="labels">
+					<td><b>Quantity: </b><select name="labels" >
 					<option value="1">1</option>
 					<option value="2" selected="selected">2</option>
 					<option value="3">3</option>
@@ -450,15 +464,22 @@ function mySelect(x)
 					<input type= "hidden" id="RepPath" name="RepPath">
       	  				<input type= "hidden" name="PrjName" id="PrjName">
           				<input type= "hidden" name="FormName" id="FormName">
-	      				Printer: <select type= "hidden" id="Printers" name="Printers" onChange="javascript:mySelect(this);"/>
+	      				<b>Printer: </b><select type= "hidden" id="Printers" name="Printers" onChange="javascript:mySelect(this);"/>
           				<input type= "hidden" name="PrinterName" id="PrinterName">
 		  				</td>
-					<td class="buttonR"><input id="printButton" type="button" value="Print" onclick="startprintjob()"/></td>
+					</tr>
+					<tr>
+					<g:if test="${browserTest == true}" >
+						<td class="buttonR"><input id="printButton" type="button" value="Print" disabled="disabled" onclick="startprintjob()"/></td></tr>
+					</g:if>
+					<g:else>
+					<td class="buttonR"><input id="printButton" type="button" value="Print"  onclick="startprintjob()"/></td>
+					</g:else>
 					</tr>
 					</g:if>
 					<g:else>
 					<tr>
-					<td><b>Quantity: </b> <select name="labels">
+					<td><b>Quantity: </b> <select name="labels" disabled="disabled">
 					<option value="1">1</option>
 					<option value="2" selected="selected">2</option>
 					<option value="3">3</option>
@@ -466,11 +487,11 @@ function mySelect(x)
 					<input type= "hidden" id="RepPath" name="RepPath">
       	  				<input type= "hidden" name="PrjName" id="PrjName">
           				<input type= "hidden" name="FormName" id="FormName">
-          				<select type= "hidden" id="Printers" name="Printers" onChange="javascript:mySelect(this);"/>
+          				<b>Printer: </b><select type= "hidden" id="Printers" name="Printers" disabled="disabled" onChange="javascript:mySelect(this);"/>
           				<input type= "hidden" name="PrinterName" id="PrinterName">
 						</td>
-					<td class="buttonR"><input id="printButton" type="button" value="Print" disabled="disabled"/></td>
 					</tr>
+					<tr><td class="buttonR"><input id="printButton" type="button" value="Print" disabled="disabled"/></td></tr>
 					</g:else>		
 					<tr>
 					</table>
@@ -486,17 +507,23 @@ function mySelect(x)
 					<td class="buttonR" style="text-align: center;" colspan="2"><input id="cleanButton" type="button" value="${actionLabel}" onclick="return clean()" /></td>
 					</tr>
 					</g:if>
+					<g:if test="${projMap}">
 					<tr>
 					<td class="buttonR" style="text-align:center; padding-left:10px;" colspan="2"><input id="cancelButton" type="button" value="Cancel" onclick="return cancel()" /></td>
 					</tr>
+					</g:if>
 					</table>
 					</div>
 					</td>
-					<td style="text-align: right;"><textarea rows="5" cols="95" title="Enter Note..." name="enterNote"></textarea></td>
+					<td >
+						
+			<g:select style="width: 170px;padding:0px;text-align:left;" from="['Select a common reason:','Device not powered down','Device is not in expected rack','Device will not power up']" id="selectCmt" name="selectCmt" value="Select a common reason:" onchange="commentSelect(this.value);"></g:select>
+			<br/>
+					<textarea rows="5" cols="95" title="Enter Note..." name="enterNote" >Enter Comment</textarea></td>
 					</tr>
 					<g:if test="${projMap}">
 					<tr>
-					<td class="buttonR" style="text-align:center;"><input type="button"
+					<td class="buttonR" style="padding-left:30px;"><input type="button"
 					value="Place on HOLD" onclick="return doTransition()" /></td>
 					<tr>
 					</g:if>					

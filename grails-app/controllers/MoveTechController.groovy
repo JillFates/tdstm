@@ -14,6 +14,10 @@ class MoveTechController {
     def stateEngineService
     def workflowService
     def index = {
+    	def browserTest=false
+    	if(!request.getHeader("User-Agent").contains("MSIE")) {
+    		browserTest = true
+    	}	
     	if(params.fMess){
     		flash.clear()
     	}
@@ -50,8 +54,7 @@ class MoveTechController {
 	            	projectTeamInstance.save()
 	            	teamLocation = projectTeamInstance.currentLocation
 	            }
-						
-	            render(view:'cleaningTechHome',model:[projectTeam:team,members:teamMembers,project:params.project,loc:teamLocation, bundle:params.bundle,team:params.team,location:params.location])
+	            render(view:'cleaningTechHome',model:[projectTeam:team,members:teamMembers,project:params.project,loc:teamLocation, bundle:params.bundle,team:params.team,location:params.location,browserTest:browserTest])
 					
 	        } else {
 	        	redirect(action:'login')
@@ -118,7 +121,7 @@ class MoveTechController {
                             //checking for team corresponding to moveBundle exist or not
                             if( assetEntityInstance != null) {
                                 def moveTech = [ user: barcodeText.get(0) ]
-                                moveTech['bundle'] = moveBundleInstance.name
+                                moveTech['bundle'] = moveBundleInstance.id
                                 moveTech['team'] = Integer.parseInt(barcodeText.get(2))
                                 moveTech['location'] = barcodeText.get(3)
                                 moveTech['project'] = projectInstance.name
@@ -162,7 +165,7 @@ class MoveTechController {
                             //checking for team corresponding to moveBundle exist or not
                             if( assetEntityInstance != null) {
                                 def moveTech = [ user: barcodeText.get(0) ]
-                                moveTech['bundle'] = moveBundleInstance.name
+                                moveTech['bundle'] = moveBundleInstance.id
                                 moveTech['team'] = Integer.parseInt(barcodeText.get(2))
                                 moveTech['location'] = barcodeText.get(3)
                                 moveTech['project'] = projectInstance.name
@@ -263,7 +266,7 @@ class MoveTechController {
             def bundle = params.bundle
             def tab = params.tab
             def proAssetMap
-            def bundleId = MoveBundle.find("from MoveBundle mb where mb.name = '${bundle}'")
+            def bundleId = MoveBundle.find("from MoveBundle mb where mb.id = '${bundle}'")
             def team = params.team
             def projectId = bundleId.project.id
             def projectInstance = Project.findById(projectId)
@@ -400,9 +403,8 @@ class MoveTechController {
                 }else{
                     def teamName
                     def teamId
-                    def bundleName = assetItem.moveBundle.name        
-	                
-                    if (bundleName != params.bundle) {
+                    def bundleName = assetItem.moveBundle.id        
+                    if (bundleName != Integer.parseInt(params.bundle)) {
                         flash.message = message(code :"The asset [${assetItem.assetName}] is not part of move bundle [${params.bundle}]")
                         if(checkHome){
                             redirect(action: 'index',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"user":"mt"])
@@ -599,7 +601,7 @@ class MoveTechController {
             def bundle = params.bundle
             def tab = params.tab
             def proAssetMap
-            def bundleId = MoveBundle.find("from MoveBundle mb where mb.name = '${bundle}'")
+            def bundleId = MoveBundle.find("from MoveBundle mb where mb.id = '${bundle}'")
             def team = params.team
             def projectId = bundleId.project.id
             def projectInstance = Project.findById(projectId)
@@ -662,6 +664,10 @@ class MoveTechController {
 		}
 	}
     def cleaningAssetSearch = {
+		def browserTest=false
+		if(!request.getHeader("User-Agent").contains("MSIE")) {
+			browserTest = true
+		}	
         def principal = SecurityUtils.subject.principal
         if(principal){
             def textSearch = params.textSearch
@@ -680,12 +686,17 @@ class MoveTechController {
             def actionLabel
             def teamMembers
             def loginTeam = ProjectTeam.findById(params.team)
-            if(search != null){
+            if(params.menu == "true") {
+            	render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl(), browserTest:browserTest])
+            	return;
+            }
+            else if(search != null){
                 assetItem = AssetEntity.findByAssetTag(search)
+                
                 if(assetItem == null){
                     flash.message = message(code :"Asset Tag number '${search}' was not located")
                     if(textSearch){
-                        render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+                        render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl(), browserTest:browserTest])
                         return;
                     } else {
                         redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
@@ -695,7 +706,7 @@ class MoveTechController {
                     teamMembers = partyRelationshipService.getTeamMemberNames(assetItem.sourceTeam?.id)
                     def membersCount = ((teamMembers.toString()).tokenize("/")).size()
                     teamMembers = membersCount + "(" + teamMembers.toString() + ")"
-                    def bundleName = assetItem.moveBundle.name
+                    def bundleName = assetItem.moveBundle.id
                     def teamId
                     def teamName
                     if(assetItem.sourceTeam){
@@ -704,18 +715,17 @@ class MoveTechController {
                     } else {
                         flash.message = message(code :"The asset [${assetItem.assetName}] is not assigned to team [${loginTeam}]")
                         if(textSearch){
-                            render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers,projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+                            render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers,projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl(), browserTest:browserTest])
                             return;
                         } else {
                             redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
                             return;
                         }
                     }
-    			
-                    if(bundleName != params.bundle){
+                    if(bundleName != Integer.parseInt(params.bundle)){
                         flash.message = message(code :"The asset [${assetItem.assetName}] is not part of move bundle [${params.bundle}]")
                         if(textSearch){
-                            render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers,projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+                            render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers,projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl(), browserTest:browserTest])
                             return;
                         } else {
                             redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
@@ -726,7 +736,7 @@ class MoveTechController {
                         if( !projMap ) {
                             flash.message = message(code :" The asset has not yet been released ")
                             if(textSearch){
-                                render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers,projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+                                render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers,projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl(), browserTest:browserTest])
                                 return;
                             } else {
                                 redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
@@ -737,7 +747,7 @@ class MoveTechController {
                             if(stateVal == "Hold"){
                                 flash.message = message(code :"The asset is on Hold. Please contact manager to resolve issue.")
                                 if(textSearch){
-                                    render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers, projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+                                    render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers, projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl(), browserTest:browserTest])
                                     return;
                                 } else {
                                     redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
@@ -761,7 +771,7 @@ class MoveTechController {
                                 }
                             }
                             assetCommt = AssetComment.findAllByAssetEntity(assetItem)
-                            render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers, projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl()])
+                            render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers, projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl(),browserTest:browserTest])
                         }
                     }
                 }

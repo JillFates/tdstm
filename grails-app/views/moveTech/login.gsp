@@ -20,6 +20,7 @@
 
 <div class="w_techlog_login"><g:form action="signIn" name="loginForm">
 	<input type="hidden" name="targetUri" value="${targetUri}" />
+	<input type="hidden" name="browserName" id="browserName" value="" />
 	<g:if test="${flash.message}">
 	<div style="width: 200px;" class="message">${flash.message}</div>
 	</g:if>
