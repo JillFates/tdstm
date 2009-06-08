@@ -93,7 +93,7 @@
 				 <a href="#" style="height:18px; width:60px; float:left; padding-top:3px; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;background:#aaefb8;padding:auto 0px;text-align:center;">My Task</a>
 				 <g:link action="cleaningAssetSearch" params='["bundle":bundle,"menu":"true","team":team,"location":location,"project":project,"user":"ct"]' style="height:18px; padding-top:3px; width:63px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Asset</g:link>								           
 			</div>			
-			<div class="w_techlog" style="margin-top:15px;">				
+			<div class="w_techlog" style="margin-top:15px; height:auto;">				
       			<g:form method="post" name="bundleTeamAssetForm" action="cleaningAssetSearch">      					
 					<input name="bundle" type="hidden" value="${bundle}" />
 					<input name="team" type="hidden" value="${team}" />
@@ -113,7 +113,7 @@
 					<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
 					</g:if> 
 					</div>		
-           <div style="float:left; width:100%; height:auto; margin:5px 0;font-size:10px "><b>My Tasks:</b></div>
+           <div style="float:left;border:0px; width:100%; height:auto; margin:5px 0;font-size:10px "><b>My Tasks:</b></div>
            <div id="assetTable"style="float:left;width:100%;height:auto;">
                    <table id="assetTable" style="overflow:scroll;height:80px;">
               	   <thead>
