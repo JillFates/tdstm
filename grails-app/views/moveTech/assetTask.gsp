@@ -130,7 +130,7 @@
                					<tbody>
                   				<g:each status="i" in="${assetList}" var="assetList">
                   				
-								<tr class="${assetList.cssVal}"  ondblclick="assetSubmit('${assetList?.item?.asset.assetTag}');">						
+								<tr class="${assetList.cssVal}"  onclick="assetSubmit('${assetList?.item?.asset.assetTag}');">						
 								<td class="asset_details_block">${assetList?.item?.asset.assetTag}</td>
 								<g:if test="${location == 's'}">
 								<td class="asset_details_block">${assetList?.item?.asset.sourceRack}/${assetList?.item?.asset.sourceRackPosition}</td>
