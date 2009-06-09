@@ -120,13 +120,18 @@
          }
          
          function filterAssetsOnRack( rack ) {
-         document.getElementById('filterTeam').selectedIndex =0
+         	var arSelected = new Array();
+         	document.getElementById('filterTeam').selectedIndex =0
+         	var filterRacks = document.getElementById('filterRack')
          	var rackPlan = document.getElementById('rackPlan').value
-         	var selectedRack = rack
+         	for(var rack=0;rack<filterRacks.length;rack++)
+         	{ 
+         		if (filterRacks[rack].selected) {
+         			arSelected.push(filterRacks[rack].value);
+         		}
+         	} 
          	var bundleId = document.getElementById('id').value
-         	if(bundleId != null && bundleId != "" && selectedRack != null) {
-         		${remoteFunction(action:'filterAssetByRack', params:'\'rack=\'+selectedRack+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId',onLoad="showProcessing()", onComplete:"filterByTeam( e );")}
-         	}
+         	${remoteFunction(action:'filterAssetByRack', params:'\'rack=\'+arSelected+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId', onComplete:"filterByTeam( e );")}
          }
          
          function moveRackUp() {
@@ -475,8 +480,8 @@
               	
               	</div>
               	<div style="float:left;">
-              		<select id="filterRack" multiple="multiple" onchange="filterAssetsOnRack(this.value)" style="width: 100px; height: 70px;">
-              			<option value="" selected="selected">All Racks</option>
+              		<select id="filterRack" multiple="multiple" onMouseUp="filterAssetsOnRack(this.value)"  style="width: 100px; height: 70px;">
+              			<option value="all" selected="selected">All Racks</option>
               			<g:each in="${assetEntitysRacks}" var="assetEntitysRacks">
               				<g:if test="${rack == 'UnrackPlan'}">
               					<option value="${assetEntitysRacks?.sourceRack}">${assetEntitysRacks?.sourceRack}</option>
