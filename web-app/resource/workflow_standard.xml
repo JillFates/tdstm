@@ -21,28 +21,28 @@
 		<transition to="Ready" name="Ready" id="20" color="yellow"/>
 		<transition to="PoweredDown" name="Powered Down" id="30" color="orange"/>
 		<transition to="Release" name="Release" id="40" color="green" />
-		<transition to="Unracking" name="Unracking Started" id="50" color="blue"/>
+		<transition to="Unracking" name="Unracking" id="50" color="blue"/>
 		<transition to="Unracked" name="Unracked" id="60" color="blue"/>
-		<transition to="Cleaned" name="Cleaned/Tagged" id="70" />
+		<transition to="Cleaned" name="Cleaned" id="70" />
 		<transition to="OnCart" name="On Cart" id="80" />
 		<transition to="OnTruck" name="On Truck" id="90" />
 		<transition to="InTransit" name="In Transit" id="100" />
 		<transition to="EndTransit" name="End Transit" id="110" />
 		<transition to="OffTruck" name="Off Truck" id="120" />
 		<transition to="Staged" name="Staged" id="130" />
-		<transition to="Reracking" name="Reracking Started" id="140" />
+		<transition to="Reracking" name="Reracking" id="140" />
 		<transition to="Reracked" name="Reracked" id="150" />
-		<transition to="QAVerified" name="QA Verification" id="160" />
+		<transition to="QAVerified" name="QA Verified" id="160" />
 		<transition to="PoweredOn" name="Powered On" id="170" />
-		<transition to="NetVerifying" name="Verify Network" id="180" />
-		<transition to="NetVerified" name="Network Verified" id="190" />
-		<transition to="SANVerifying" name="Verifying SAN" id="200" />
+		<transition to="NetVerifying" name="Net Verifying" id="180" />
+		<transition to="NetVerified" name="Net Verified" id="190" />
+		<transition to="SANVerifying" name="SAN Verifying" id="200" />
 		<transition to="SANVerified" name="SAN Verified" id="210" />
-		<transition to="DBStarted" name="DB Tasks Started" id="220" />
+		<transition to="DBStarted" name="DB Tasks Start" id="220" />
 		<transition to="DBFinished" name="DB Tasks Done" id="230" />
-		<transition to="AppStartup" name="Application Startup" id="240" />
-		<transition to="AppFinished" name="Application Done" id="250" />
-		<transition to="AppVerifying" name="Verifying App" id="260" />
+		<transition to="AppStartup" name="App Startup" id="240" />
+		<transition to="AppFinished" name="App Done" id="250" />
+		<transition to="AppVerifying" name="App Verifying" id="260" />
 		<transition to="AppVerified" name="App Verified" id="270" />
 		<transition to="Completed" name="Completed" id="280" />
 		<transition to="Terminated" name="Terminated" id="900" />
