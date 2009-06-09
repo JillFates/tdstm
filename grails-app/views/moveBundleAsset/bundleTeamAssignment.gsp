@@ -250,6 +250,9 @@
     			}
    				catch(ex) {
       				teamAssignSelectElement.add(teamOption); // IE only
+      				if( assetEntity.team == teamOption.value ) {
+      					teamAssignSelectElement.selectedIndex = teamRow+1
+      				}
     			}
             
             } 
@@ -286,6 +289,8 @@
      
      function autoTeamAssignComplete( e ) {
      	hideProcessing()
+     	var team = document.getElementById('team')
+     	team.selectedIndex = 0
      	var teamAssetList = eval('(' + e.responseText + ')')
      	assetList = teamAssetList[0].assetList
 		table = document.getElementById('assetTable')
@@ -520,7 +525,7 @@
     	          
               </tr>
           </table>
-          <div  id="processDiv" style="overflow:scroll; width:950px; display:none;">
+          <div  id="processDiv" style="overflow:scroll; width:100%; display:none;">
           <img src="../images/processing.gif"/>
           </div>
            <div  id="assetDiv" style="overflow:scroll; width:100%;">
