@@ -292,7 +292,7 @@ class AssetEntityAttributeLoaderService {
 	def getAssetList ( def assetEntityList, rackPlan, bundleInstance ) {
 		def assetEntity = []
 		def projectTeam =[]
-		def projectTeamInstanceList = ProjectTeam.findAllByMoveBundle( bundleInstance )
+		def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport' " )
 		projectTeamInstanceList.each{teams ->
 			
 			projectTeam << [ teamCode: teams.teamCode ]

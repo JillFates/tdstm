@@ -271,7 +271,7 @@ class MoveBundleAssetController {
     def autoFillTeamAssign = {
     	def team = params.teamCode
     	def assetString = params.assets
-    	def  assets= assetString.split(",")
+    	def  assets= assetString.tokenize(",")
     	def bundleId = params.bundleId
     	def rackPlan = params.rackPlan
     	def teamAssetCounts
