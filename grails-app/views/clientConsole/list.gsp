@@ -350,17 +350,17 @@ function resolveValidate(formName,idVal){
 	<td style="padding-left: 0px;"><select style="width: 120px;visibility: hidden;"/></td>
 		</tr>
 		<tr>
-		 <jsec:hasRole in="['ADMIN','MANAGER']">	<th style="padding-top:85px;">Actions <a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a></th></jsec:hasRole>
+		 <jsec:hasRole in="['ADMIN','MANAGER']">	<th style="padding-top:50px;">Actions <a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a></th></jsec:hasRole>
 			
-			<th style="padding-top:85px;">Issue</th>
+			<th style="padding-top:50px;">Issue</th>
 			
-			 <g:sortableColumn style="padding-top:85px;" property="application"  title="Application" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
+			 <g:sortableColumn style="padding-top:50px;" property="application"  title="Application" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
 			
-			<g:sortableColumn style="padding-top:85px;" property="app_owner" title="App Owner"  params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]" />
+			<g:sortableColumn style="padding-top:50px;" property="app_owner" title="App Owner"  params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]" />
 
-			<g:sortableColumn style="padding-top:85px;" property="app_sme" title="App SME" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
+			<g:sortableColumn style="padding-top:50px;" property="app_sme" title="App SME" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
 
-			<g:sortableColumn style="padding-top:85px;" property="asset_name" title="Asset Name" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
+			<g:sortableColumn style="padding-top:50px;" property="asset_name" title="Asset Name" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
 			
 			<g:if test="${browserTest}">
 			<g:each in="${processTransitionList}"  var="task">
@@ -368,7 +368,7 @@ function resolveValidate(formName,idVal){
 			</g:each>
 			</g:if>
 			<g:else>
-			<th style="padding-left: 0px" colspan="${headerCount}"><embed src="${createLinkTo(dir:'templates',file:'headerSvg.svg')}" type="image/svg+xml" width="${headerCount*22}" height="129"/></th>
+			<th style="padding-left: 0px" colspan="${headerCount}"><embed src="${createLinkTo(dir:'templates',file:'headerSvg.svg')}" type="image/svg+xml" width="${headerCount*22}" height="102"/></th>
 			</g:else>
 
 		</tr>

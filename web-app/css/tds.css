@@ -329,7 +329,7 @@ div.tableContainer table {
 
 div.tableContainer tbody {
    width: 99%;
-   height: 425px;
+   height: 451px;
    overflow-y: scroll;
    overflow-x: hidden;
    border: 1px solid gray;

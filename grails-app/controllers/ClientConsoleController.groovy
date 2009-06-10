@@ -336,23 +336,23 @@ class ClientConsoleController {
 	        svgHeaderFile.append("}")
 	        svgHeaderFile.append("// ]]>")
 	        svgHeaderFile.append("</script>")	       
-	        svgHeaderFile.append("<text id='thetext' text-rendering='optimizeLegibility' transform='rotate(270, 90, 0)' font-weight='bold' font-size='12' fill='#333333' x='-40' y='-76' font-family='verdana,arial,helvetica,sans-serif'>")
+	        svgHeaderFile.append("<text id='thetext' text-rendering='optimizeLegibility' transform='rotate(270, 90, 0)' font-weight='bold' font-size='12' fill='#333333' x='-11' y='-76' font-family='verdana,arial,helvetica,sans-serif'>")
 	        def count = 0
 	        tempTransitions.sort().each{
 	        	def processTransition = stateEngineService.getStateLabel("STD_PROCESS",it)
 	        	if(count == 0){
 	        		svgHeaderFile.append("${processTransition}")
 	        	} else {
-	        		svgHeaderFile.append("<tspan x='-40' dy='22'>${processTransition}</tspan>")	
+	        		svgHeaderFile.append("<tspan x='-11' dy='22'>${processTransition}</tspan>")	
 	        	}
 	        	count++
 	        }
 	        svgHeaderFile.append("</text>")
-	        svgHeaderFile.append("<path d='M 22 0 l 0 130")
+	        svgHeaderFile.append("<path d='M 22 0 l 0 110")
 	        def value = 22
 	        for(int i=0;i<count;i++){
 	        	value = value+22
-	        	svgHeaderFile.append(" M ${value} 0 l 0 130")
+	        	svgHeaderFile.append(" M ${value} 0 l 0 110")
 	        }
 	        svgHeaderFile.append("' stroke = 'white' stroke-width = '1'/>")
 	        svgHeaderFile.append("</svg>")
