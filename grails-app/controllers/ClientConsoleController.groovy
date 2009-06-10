@@ -67,6 +67,8 @@ class ClientConsoleController {
         	query.append(" $order ")
         }
         def resultList=jdbcTemplate.queryForList(query.toString())
+        def today = new java.util.Date();
+        getSession().setAttribute("LAST_POOL_TIME",new java.sql.Timestamp(today.getTime()))
         def assetEntityList=[]
         def processTransitionList=[]
         def tempTransitions = []
@@ -246,7 +248,11 @@ class ClientConsoleController {
 	        def assetEntityList = []
 	        if(bundleId){
 		        def moveBundleInstance = MoveBundle.findById( bundleId )
-				def query = new StringBuffer("select ae.asset_entity_id as id,ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,ae.asset_name as assetName,GROUP_CONCAT(state_to ORDER BY state_to SEPARATOR ',') as transitions FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id) where ae.project_id = $moveBundleInstance.project.id and ae.move_bundle_id = ${moveBundleInstance.id}")
+		        def lastPoolTime = getSession().getAttribute("LAST_POOL_TIME")
+		        def today = new java.util.Date();
+		        def currentPoolTime = new java.sql.Timestamp(today.getTime())
+		        getSession().setAttribute("LAST_POOL_TIME",currentPoolTime)
+				def query = new StringBuffer("select ae.asset_entity_id as id,ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,ae.asset_name as assetName,GROUP_CONCAT(state_to ORDER BY state_to SEPARATOR ',') as transitions FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id) where ae.asset_entity_id in ( select t.asset_entity_id from asset_transition t where t.date_created between '$lastPoolTime' and '$currentPoolTime' ) and ae.project_id = $moveBundleInstance.project.id and ae.move_bundle_id = ${moveBundleInstance.id}")
 		        if(appValue!="" && appValue!= null){
 		        	query.append(" and ae.application ='$appValue'")
 		        }

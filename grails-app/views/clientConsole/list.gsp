@@ -113,6 +113,7 @@ function setRefreshTime(e) {
 var timer
 function timedRefresh(timeoutPeriod) {
 	if(timeoutPeriod != 'never'){
+		clearTimeout(timer)
 		timer = setTimeout("doAjaxCall()",timeoutPeriod);
 		document.getElementById("selectTimedId").value = timeoutPeriod;
 	} else {
