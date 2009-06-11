@@ -70,7 +70,7 @@ class MoveTechController {
         redirect(action:'login')
     }
     def login = {
-        if(flash.message != "Login Failed"){
+        if(flash.message != "Login Failed" && flash.message != "Login Disabled"){
             def username = session.getAttribute("USERNAME")
             if(username){
                 redirect(action:'signIn',params:["username":username])
@@ -118,7 +118,7 @@ class MoveTechController {
                             }else if( barcodeText.get(3) == 't' ){
                                 assetEntityInstance = AssetEntity.find("from AssetEntity ae where ae.moveBundle = $moveBundleInstance.id and ae.targetTeam = $projectTeamInstance.id")
                             }
-                            //checking for team corresponding to moveBundle exist or not
+                            //checking for Assets corresponding to moveBundle exist or not
                             if( assetEntityInstance != null) {
                                 def moveTech = [ user: barcodeText.get(0) ]
                                 moveTech['bundle'] = moveBundleInstance.id
@@ -162,7 +162,7 @@ class MoveTechController {
                             }else if( barcodeText.get(3) == 't' ){
                                 assetEntityInstance = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = $moveBundleInstance.id ")
                             }
-                            //checking for team corresponding to moveBundle exist or not
+                            //checking for Assets corresponding to moveBundle exist or not
                             if( assetEntityInstance != null) {
                                 def moveTech = [ user: barcodeText.get(0) ]
                                 moveTech['bundle'] = moveBundleInstance.id
