@@ -5,7 +5,7 @@ class MoveBundleAssetController {
 	def assetEntityAttributeLoaderService
 	def userPreferenceService
     
-    def index = { redirect(action:list,params:params) }
+    def index = { redirect( action:list, params:params ) }
 
     // the delete, save and update actions only accept POST requests
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
@@ -30,11 +30,11 @@ class MoveBundleAssetController {
         if(moveBundleAssetInstance) {
             moveBundleAssetInstance.delete()
             flash.message = "MoveBundleAsset ${params.id} deleted"
-            redirect(action:list)
+            redirect( action:list )
         }
         else {
             flash.message = "MoveBundleAsset not found with id ${params.id}"
-            redirect(action:list)
+            redirect( action:list )
         }
     }
 
@@ -43,7 +43,7 @@ class MoveBundleAssetController {
 
         if(!moveBundleAssetInstance) {
             flash.message = "MoveBundleAsset not found with id ${params.id}"
-            redirect(action:list)
+            redirect( action:list )
         }
         else {
             return [ moveBundleAssetInstance : moveBundleAssetInstance ]
@@ -56,15 +56,15 @@ class MoveBundleAssetController {
             moveBundleAssetInstance.properties = params
             if(!moveBundleAssetInstance.hasErrors() && moveBundleAssetInstance.save()) {
                 flash.message = "MoveBundleAsset ${params.id} updated"
-                redirect(action:show,id:moveBundleAssetInstance.id)
+                redirect( action:show, id:moveBundleAssetInstance.id )
             }
             else {
-                render(view:'edit',model:[moveBundleAssetInstance:moveBundleAssetInstance])
+                render( view:'edit', model:[ moveBundleAssetInstance:moveBundleAssetInstance ] )
             }
         }
         else {
             flash.message = "MoveBundleAsset not found with id ${params.id}"
-            redirect(action:edit,id:params.id)
+            redirect( action:edit, id:params.id )
         }
     }
 
@@ -75,13 +75,12 @@ class MoveBundleAssetController {
     }
 
     def save = {
-        def moveBundleAssetInstance = new AssetEntity(params)
+        def moveBundleAssetInstance = new AssetEntity( params )
         if(!moveBundleAssetInstance.hasErrors() && moveBundleAssetInstance.save()) {
             flash.message = "MoveBundleAsset ${moveBundleAssetInstance.id} created"
-            redirect(action:show,id:moveBundleAssetInstance.id)
-        }
-        else {
-            render(view:'create',model:[moveBundleAssetInstance:moveBundleAssetInstance])
+            redirect( action:show, id:moveBundleAssetInstance.id )
+        } else {
+            render( view:'create', model:[ moveBundleAssetInstance:moveBundleAssetInstance ] )
         }
     }
 	/*
@@ -95,6 +94,63 @@ class MoveBundleAssetController {
     	def moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $moveBundleInstance.project.id ")
     	render( view:'assignAssets', model:[moveBundles:moveBundles, currentBundleAssets: currentBundleAssets, moveBundleInstance:moveBundleInstance, moveBundleAssets:moveBundleAssets ] )
     }
+    def assignAssetsToBundleChange = {
+        def bundleRight = params.bundleRight
+        def bundleLeft = params.bundleLeft
+        def sortField
+        if( params.sortField == "lapplication" ) {
+            sortField = "application"
+        } else {
+            sortField = params.sortField
+        }
+        def sideField = params.sideField
+        def currentBundleAssets
+        def moveBundleAssets
+        def moveBundleInstanceRight = MoveBundle.findById( bundleRight )
+        def moveBundleInstanceLeft = MoveBundle.findById( bundleLeft )
+        def moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $moveBundleInstanceRight.project.id")
+	    def sessionSort = request.getSession(true).getAttribute("sessionSort")
+        def sessionSide = request.getSession(true).getAttribute("sessionSide")
+        def sessionOrder = request.getSession(true).getAttribute("sessionOrder")
+        if( bundleRight ){
+            if ( sideField == "right" ) {
+                currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $moveBundleInstanceRight.id order by  $sortField $params.orderField")
+	    			
+            } else {
+                if ( sessionSide == "right" ) {
+                    currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $moveBundleInstanceRight.id order by  $sessionSort $sessionOrder")
+                } else {
+                    currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $moveBundleInstanceRight.id")
+                }
+            }
+        }
+        if( bundleLeft ){
+            if( sideField == "left" ){
+                moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $moveBundleInstanceLeft.id order by  $sortField $params.orderField")
+	    			
+            } else {
+                if( sessionSide == "left" ){
+                    moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $moveBundleInstanceLeft.id order by  $sessionSort $sessionOrder")
+                } else {
+                    moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $moveBundleInstanceLeft.id")
+                }
+            }
+        } else {
+            def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
+            if( sideField == "left" ){
+                moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId order by  $sortField $params.orderField")
+            } else {
+                if( sessionSide == "left" ){
+	    			moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId order by  $sessionSort $sessionOrder")	
+                } else {
+	    		    moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId")
+                }
+            }
+        }
+        render( view:'assignAssets', model:[moveBundles:moveBundles, currentBundleAssets: currentBundleAssets, moveBundleInstance:moveBundleInstanceRight,moveBundleAssets:moveBundleAssets,leftBundleInstance:moveBundleInstanceLeft,sortField:params.sortField,orderField:params.orderField,sideField:params.sideField] )
+    }
+	
+	 
 	/*
 	 *  Sort Assets By Selected Row Column 
 	 */
@@ -107,13 +163,29 @@ class MoveBundleAssetController {
 		}else {
 			sortField = params.sort
 		}
+		if( params.sortField == "lapplication" ) {
+			params.sortField = "application"
+		}
 		def sideList = params.side
 		def rightMoveBundleInstance
 		def leftMoveBundleInstance
 		def moveBundles
 		def currentBundleAssets
 		def moveBundleAssets
+		def sessionSort
+		def sessionSide
+		def sessionOrder
 		def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
+		if( ( sideList == "right" && params.sideField == "left" )||( sideList == "left" && params.sideField == "right" ) ){
+			request.getSession(true).setAttribute( "sessionSort", params.sortField )
+			request.getSession(true).setAttribute( "sessionSide", params.sideField )
+			request.getSession(true).setAttribute( "sessionOrder", params.orderField )	
+		}
+		if( ( sideList == "right" && params.sideField == "right" )||( sideList == "left" && params.sideField == "left" ) ){
+            sessionSort = request.getSession(true).getAttribute( "sessionSort" )
+            sessionSide = request.getSession(true).getAttribute( "sessionSide" )
+            sessionOrder = request.getSession(true).getAttribute( "sessionOrder" )
+		}
 		//Right Side AssetTable Sort
 		if( sideList == "right" ) {
 			rightMoveBundleInstance = MoveBundle.findById( rightBundleId )
@@ -121,24 +193,57 @@ class MoveBundleAssetController {
 			currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $rightMoveBundleInstance.id order by  $sortField $params.order")
 			if( leftBundleId != null && leftBundleId != "" ) {
 				leftMoveBundleInstance = MoveBundle.findById( leftBundleId )
-				moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $leftMoveBundleInstance.id ")
-			}else {
-				moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId")
-		    }
+				if( params.sideField == "left" ){
+                    moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $leftMoveBundleInstance.id order by  $params.sortField $params.orderField")
+				
+				} else if( params.sideField == "right" ) {
+					if( sessionSort != null ){
+						moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $leftMoveBundleInstance.id order by  $sessionSort $sessionOrder")
+						
+					} else {
+                        moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $leftMoveBundleInstance.id ")
+					}
+					
+				} else {
+                    moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $leftMoveBundleInstance.id ")
+				}
+			} else {
+				if( params.sideField == "left" ){
+                    moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId order by  $params.sortField $params.orderField")
+				} else if ( params.sideField == "right" ) {
+					if( sessionSort != null ){
+						moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId order by  $sessionSort $sessionOrder")	
+					} else {
+						moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId")		
+					}
+				} else {
+                    moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId")
+				}
+			}
 		}
 		//Left Side AssetTable Sort
 		else {
 			if( leftBundleId != null && leftBundleId != "" ) {
 				leftMoveBundleInstance = MoveBundle.findById( leftBundleId )
 				moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $leftMoveBundleInstance.id order by  $sortField $params.order ")
-		    }else {
+		    } else {
 		    	moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId order by  $sortField $params.order")
 		    }
 			rightMoveBundleInstance = MoveBundle.findById( rightBundleId )
 			moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $rightMoveBundleInstance.project.id")
-			currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $rightMoveBundleInstance.id ")
+			if( params.sideField == "right" ){
+                currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $rightMoveBundleInstance.id order by  $params.sortField $params.orderField")
+			} else if ( params.sideField == "left" ) {
+				if( sessionSort != null ){
+					currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $rightMoveBundleInstance.id order by  $sessionSort $sessionOrder")	
+				} else {
+					currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $rightMoveBundleInstance.id ")	
+				}
+			} else {
+                currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $rightMoveBundleInstance.id ")
+			}
 		}
-		render( view:'assignAssets', model:[moveBundles:moveBundles, currentBundleAssets: currentBundleAssets, moveBundleInstance:rightMoveBundleInstance, leftBundleInstance:leftMoveBundleInstance, moveBundleAssets:moveBundleAssets ] )
+		render( view:'assignAssets', model:[moveBundles:moveBundles, currentBundleAssets: currentBundleAssets, moveBundleInstance:rightMoveBundleInstance, leftBundleInstance:leftMoveBundleInstance, moveBundleAssets:moveBundleAssets, sortField:params.sort, orderField:params.order, sideField:params.side ] )
 	}
 	/*
 	 *  Save Assets for corresponding Bundle
@@ -149,11 +254,11 @@ class MoveBundleAssetController {
     	def bundleTo = params.bundleTo
     	def assets = params.assets
     	def moveBundleAssets = assetEntityAttributeLoaderService.saveAssetsToBundle( bundleTo, bundleFrom, assets )
-    	if(moveBundleAssets != null){
+    	if( moveBundleAssets != null ){
 	    	moveBundleAssets.each{bundleAsset ->
 				items <<[id:bundleAsset.id, assetName:bundleAsset.assetName, assetTag:bundleAsset.assetTag, application:bundleAsset.application, srcLocation:bundleAsset.sourceLocation  +"/"+bundleAsset.sourceRack  ]
 	    	}
-    	}else {
+    	 } else {
     		def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
     		def assetEntities = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId ")
 			assetEntities.each{assetEntity ->
@@ -165,23 +270,24 @@ class MoveBundleAssetController {
 	/*
 	 *   Return the list of assets for a selected bundle
 	 */
-	def getBundleAssets = {
-		def bundleId = params.bundleId
-		def items = []
-		if(bundleId){
-			def bundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $bundleId ")
-			bundleAssets.each{bundleAsset ->
-				items <<[id:bundleAsset.id, assetName:bundleAsset.assetName, assetTag:bundleAsset.assetTag, application:bundleAsset.application, srcLocation:bundleAsset.sourceLocation +"/"+bundleAsset.sourceRack ]
-			}
-		}else{
-			def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
-			def assetEntities = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId")
-			assetEntities.each{assetEntity ->
-				items <<[id:assetEntity.id, assetName:assetEntity.assetName, assetTag:assetEntity.assetTag, application:assetEntity.application, srcLocation:assetEntity.sourceLocation +"/"+assetEntity.sourceRack ]
-			}
-		}
-		render items as JSON
-	}
+	/*def getBundleAssets = {
+    def bundleId = params.bundleId
+    println"null bundle val--->"+bundleId
+    def items = []
+    if(bundleId){
+    def bundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $bundleId ")
+    bundleAssets.each{bundleAsset ->
+    items <<[id:bundleAsset.id, assetName:bundleAsset.assetName, assetTag:bundleAsset.assetTag, application:bundleAsset.application, srcLocation:bundleAsset.sourceLocation +"/"+bundleAsset.sourceRack ]
+    }
+    }else{
+    def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
+    def assetEntities = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId")
+    assetEntities.each{assetEntity ->
+    items <<[id:assetEntity.id, assetName:assetEntity.assetName, assetTag:assetEntity.assetTag, application:assetEntity.application, srcLocation:assetEntity.sourceLocation +"/"+assetEntity.sourceRack ]
+    }
+    }
+    render items as JSON
+	}*/
     /*
      * Get the Assets and Teams those belongs to Selected  MoveBundle
      */
@@ -203,7 +309,7 @@ class MoveBundleAssetController {
     	def assetEntitysRacks
     	def rackPlan
     	def assetEntityList = AssetEntity.findAllByMoveBundle( bundleInstance )
-    	if( params.rackPlan == 'RerackPlan') {
+    	if( params.rackPlan == 'RerackPlan' ) {
     		rackPlan = "RerackPlan"
     		assetEntitysRacks = AssetEntity.findAll("from AssetEntity ma where ma.moveBundle = $bundleInstance.id  group by ma.targetRack")
     		projectTeamInstanceList.each{projectTeam ->
@@ -240,24 +346,24 @@ class MoveBundleAssetController {
     	def teamAssetCounts = []
     	def bundleInstance = MoveBundle.findById(bundleId)
     	def assetAssigned = []
-    	if( team != null && team != "" && team != "null")
+    	if( team != null && team != "" && team != "null" )
     	{
     		def projectTeamInstance = ProjectTeam.find( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and  pt.teamCode = '${team}' " )
     		if( projectTeamInstance ) {
     			def assetEntityInstance = AssetEntity.findById(asset)
-    			if(rackPlan == "UnrackPlan" ) {
+    			if( rackPlan == "UnrackPlan" ) {
     				assetEntityInstance.sourceTeam = projectTeamInstance
-    			}else {
+    			} else {
     				assetEntityInstance.targetTeam = projectTeamInstance
     			}
     			assetEntityInstance.save()
     			teamAssetCounts = assetEntityAttributeLoaderService.getTeamAssetCount( bundleId, rackPlan )
     		}
-    	}else {
+    	} else {
     		def assetEntityInstance = AssetEntity.findById(asset)
 			if( rackPlan == "UnrackPlan" ) {
 				assetEntityInstance.sourceTeam = null
-			}else {
+			} else {
 				assetEntityInstance.targetTeam = null
 			}
     		assetEntityInstance.save()
@@ -281,13 +387,13 @@ class MoveBundleAssetController {
     	def teamId= null
     	def teamName = ""
     	def bundleInstance = MoveBundle.findById(bundleId)
-    	if( team == "UnAssign") {
+    	if( team == "UnAssign" ) {
     		def modifiedAssetList = []
     		for( int assetRow = 0; assetRow < assets.size(); assetRow ++ ) {
 				def assetEntityInstance = AssetEntity.findById(assets[ assetRow ] )
 				if( rackPlan == "UnrackPlan" ) {
 					assetEntityInstance.sourceTeam = null
-				}else {
+				} else {
 					assetEntityInstance.targetTeam = null
 				}
 				assetEntityInstance.save()
@@ -296,7 +402,7 @@ class MoveBundleAssetController {
 				assetList = assetEntityAttributeLoaderService.getAssetList( assetEntityList, rackPlan, bundleInstance)
 				teamAssetCounts = assetEntityAttributeLoaderService.getTeamAssetCount( bundleId, rackPlan )
 			}
-    	}else {
+    	} else {
     		def modifiedAssetList = []
     		def projectTeamInstance = ProjectTeam.find( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and  pt.teamCode = '${team}' " )
     		if( projectTeamInstance ) {
@@ -304,7 +410,7 @@ class MoveBundleAssetController {
     				def assetEntityInstance = AssetEntity.findById(assets[assetRow] )
     				if( rackPlan == "UnrackPlan" || team == "UnAssign" ) {
     					assetEntityInstance.sourceTeam = projectTeamInstance
-    				}else {
+    				} else {
     					assetEntityInstance.targetTeam = projectTeamInstance
     				}
     				assetEntityInstance.save()
@@ -333,19 +439,19 @@ class MoveBundleAssetController {
        	projectTeamInstanceList.each{teams ->
             projectTeam << [ teamCode: teams.teamCode ]
         }
-    	if(team == "" || team == null) {
+    	if( team == "" || team == null ) {
     		assetEntityList = AssetEntity.findAll( " from AssetEntity ma where ma.moveBundle = $bundleInstance.id ")
-    	}else if(rackPlan == "UnrackPlan"){
-    		if(team == "unAssign") {
+    	} else if ( rackPlan == "UnrackPlan" ) {
+    		if( team == "unAssign" ) {
     			assetEntityList = AssetEntity.findAll( " from AssetEntity ma where ma.moveBundle = $bundleInstance.id and ma.sourceTeam = null ")
-        	}else {
+        	} else {
         		def projectTeamInstance = ProjectTeam.find( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and  pt.teamCode = '${team}' " )
         		assetEntityList = AssetEntity.findAll( " from AssetEntity ma where ma.moveBundle = $bundleInstance.id and ma.sourceTeam = $projectTeamInstance.id ")
         	}
-    	}else {
-    		if(team == "unAssign") {
+    	} else {
+    		if( team == "unAssign" ) {
     			assetEntityList = AssetEntity.findAll( " from AssetEntity ma where ma.moveBundle = $bundleInstance.id and ma.targetTeam = null ")
-        	}else {
+        	} else {
         		def projectTeamInstance = ProjectTeam.find( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and  pt.teamCode = '${team}' " )
         		assetEntityList = AssetEntity.findAll( " from AssetEntity ma where ma.moveBundle = $bundleInstance.id and ma.targetTeam = $projectTeamInstance.id ")
         	}
@@ -354,7 +460,7 @@ class MoveBundleAssetController {
     		def displayTeam  
     		if( rackPlan == "RerackPlan" ) {
     			displayTeam = assetEntityList[assetRow]?.targetTeam?.teamCode
-    		}else {
+    		} else {
     			displayTeam = assetEntityList[assetRow]?.sourceTeam?.teamCode
     		}
     		def assetEntityInstance = AssetEntity.findById( assetEntityList[assetRow]?.id )
@@ -369,14 +475,14 @@ class MoveBundleAssetController {
     	def rackList = []
     	rackList = (params.rack).tokenize(",")
     	def rackString = "("
-    	if(rackList.size()<=0 || rackList[0] == null || rackList[0] == "all"){
+    	if( rackList.size()<=0 || rackList[0] == null || rackList[0] == "all" ){
     		rackString = null
-    	}else {
-    		for(int rack = 0; rack<rackList.size(); rack++) {
+    	} else {
+    		for( int rack = 0; rack<rackList.size(); rack++ ) {
     			rackString = rackString +"'"+ rackList[rack]+"'"
-    			if(rack+1 >= rackList.size){
+    			if( rack+1 >= rackList.size ){
     				rackString = rackString+')'
-    			}else{
+    			} else {
     				rackString = rackString+','
     			}
     		}
@@ -391,14 +497,14 @@ class MoveBundleAssetController {
        	projectTeamInstanceList.each{team ->
             projectTeam << [ teamCode: team.teamCode ]
         }
-       	if(rackString == "" || rackString == null) {
+       	if( rackString == "" || rackString == null ) {
        		moveBundleAssetList = AssetEntity.findAll( " from AssetEntity ma where ma.moveBundle = $bundleInstance.id ")
-       	}else if(rackPlan == "UnrackPlan"){
+       	} else if ( rackPlan == "UnrackPlan" ) {
        		moveBundleAssetList = AssetEntity.findAll( " from AssetEntity ma where ma.moveBundle = $bundleInstance.id and ma.sourceRack in $rackString ")
-       	}else {
+       	} else {
        		moveBundleAssetList = AssetEntity.findAll( " from AssetEntity ma where ma.moveBundle = $bundleInstance.id and ma.targetRack in $rackString ")
        	}
-    	if(moveBundleAssetList != null) {
+    	if( moveBundleAssetList != null ) {
     		for( int assetRow = 0; assetRow < moveBundleAssetList.size(); assetRow++) {
     			def displayTeam  
     			if( rackPlan == "RerackPlan" ) {
@@ -421,7 +527,7 @@ class MoveBundleAssetController {
 	    def bundleInstance = MoveBundle.findById(bundleId)
 	    if( cart != null && cart != "")
 	    {
-	    	def assetEntityInstance = AssetEntity.findById(asset)
+	    	def assetEntityInstance = AssetEntity.findById( asset )
 	    	def moveBundleAsset = AssetEntity.executeUpdate(" update AssetEntity ma set ma.cart = $cart where ma.moveBundle = $bundleInstance.id and  ma.id = $assetEntityInstance.id ")
 	    }
 		def cartList = AssetEntity.findAll("from AssetEntity ma where ma.moveBundle = $bundleInstance.id  group by ma.cart")
@@ -437,7 +543,7 @@ class MoveBundleAssetController {
 	    def bundleInstance = MoveBundle.findById(bundleId)
 	    if( shelf != null )
 	    {
-	    	def assetEntityInstance = AssetEntity.findById(asset)
+	    	def assetEntityInstance = AssetEntity.findById( asset )
 	    	def moveBundleAsset = AssetEntity.executeUpdate(" update AssetEntity ma set ma.shelf = '$shelf' where ma.moveBundle = $bundleInstance.id and  ma.id = $assetEntityInstance.id ")
 	    }
 	    render teamAssetCounts as JSON

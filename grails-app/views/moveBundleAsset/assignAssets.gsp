@@ -189,6 +189,10 @@
 		document.bundlesForm.action = "sortAssetList?column="+header+"&&side="+side+"&&leftBundle="+leftBundle+"&&rightBundle="+rightBundle;
 		document.bundlesForm.submit();
 	}
+	function bundleChange(){
+	document.bundlesForm.action = "assignAssetsToBundleChange";
+	document.bundlesForm.submit();
+	}
 	</script> 
 </head>
 <body>
@@ -202,9 +206,12 @@
 				<td valign="top" class="value" colspan="2">
 				<table style="border: none;">
 				<g:form name="bundlesForm">
+				<input type="hidden" name="sortField" value="${sortField}"/>
+				<input type="hidden" name="orderField" value="${orderField}"/>
+				<input type="hidden" name="sideField" value="${sideField}"/>
 					<tr>
 						<td valign="top" >Move Bundle:
-						<select name="bundleLeft" id="bundleLeftId" onchange="${remoteFunction(action:'getBundleAssets', params:'\'bundleId=\'+ this.value', onComplete:'showAssetsLeft(e)')}" >
+						<select name="bundleLeft" id="bundleLeftId" onchange="bundleChange();" >
 							<option value="">Unassigned</option>
 							<g:each in="${moveBundles}" var="moveBundle">
 			                	<option value="${moveBundle.id}">${moveBundle}</option>
@@ -213,7 +220,7 @@
 						</td>
 						<td valign="top" ><label>&nbsp;</label></td>
 						<td valign="top" >Move Bundle:
-						<select name="bundleRight" id="bundleRightId" onchange="${remoteFunction(action:'getBundleAssets', params:'\'bundleId=\'+ this.value', onComplete:'showAssetsRight(e)')}" >
+						<select name="bundleRight" id="bundleRightId" onchange="bundleChange();" >
 							<g:each in="${moveBundles}" var="moveBundle">
 			                	<option value="${moveBundle.id}">${moveBundle}</option>
 			                </g:each>
@@ -225,14 +232,15 @@
 					<tr>
 						<td valign="top" >
 						<g:form name="assignLeftAssetsForm">
+						
 						<div class="scrollTable" style="width: 100%;float: left;">  
 					       <table id="assetsLeftTableId" style="width: 100%;float: left; border: 0px">  
 					         <thead>  
 					           <tr>  
-					           <g:sortableColumn action="sortAssetList"  property="assetTag" title="Asset Tag" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id,'side':'left']" />
-					           <g:sortableColumn action="sortAssetList"  property="assetName" title="Server Name" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'left']"/>
-					           <g:sortableColumn action="sortAssetList" property="lapplication" title="Application" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'left']"/>
-					           <g:sortableColumn action="sortAssetList" property="sourceLocation" title="Src Loc/Rack" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'left']"/>
+					           <g:sortableColumn action="sortAssetList"  property="assetTag" title="Asset Tag" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id,'side':'left','sortField':sortField,'sideField':sideField,'orderField':orderField]" />
+					           <g:sortableColumn action="sortAssetList"  property="assetName" title="Server Name" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'left','sortField':sortField,'sideField':sideField,'orderField':orderField]"/>
+					           <g:sortableColumn action="sortAssetList" property="lapplication" title="Application" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'left','sortField':sortField,'sideField':sideField,'orderField':orderField]"/>
+					           <g:sortableColumn action="sortAssetList" property="sourceLocation" title="Src Loc/Rack" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'left','sortField':sortField,'sideField':sideField,'orderField':orderField]"/>
 					           </tr>  
 					         </thead>  
 					         <tbody id="assetsLeftTbodyId">
@@ -260,14 +268,15 @@
 						</a></span></td>
 						<td valign="top" >
 						<g:form name="assignRightAssetsForm">
+						<input type="hidden" name="sample" value="abcd"/>
 						<div class="scrollTable" style="width: 100%;float: left;">  
 					       <table id="assetsRightTableId" style="width: 100%;float: left;border: 0px">  
 					         <thead>  
 					          <tr>  
-					             <g:sortableColumn action="sortAssetList" property="asset_tag" title="Asset Tag" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'right']"/>
-					             <g:sortableColumn action="sortAssetList" property="asset_name" title="Server Name" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'right']"/>
-					             <g:sortableColumn action="sortAssetList" property="application" title="Application" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'right']"/>
-					             <g:sortableColumn action="sortAssetList" property="source_location" title="Src Loc/Rack" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'right']"/>
+					             <g:sortableColumn action="sortAssetList" property="asset_tag" title="Asset Tag" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'right','sortField':sortField,'sideField':sideField,'orderField':orderField]"/>
+					             <g:sortableColumn action="sortAssetList" property="asset_name" title="Server Name" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'right','sortField':sortField,'sideField':sideField,'orderField':orderField]"/>
+					             <g:sortableColumn action="sortAssetList" property="application" title="Application" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'right','sortField':sortField,'sideField':sideField,'orderField':orderField]"/>
+					             <g:sortableColumn action="sortAssetList" property="source_location" title="Src Loc/Rack" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'right','sortField':sortField,'sideField':sideField,'orderField':orderField]"/>
 					           </tr>
 					         </thead>  
 					         <tbody id="assetsRightTbodyId" >
