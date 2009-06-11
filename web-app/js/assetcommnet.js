@@ -1,5 +1,5 @@
 // function to list the comments list
-      		function listCommentsDialog(e) {
+      		function listCommentsDialog(e,action) {
       		
       			$("#editCommentDialog").dialog("close")
       			$("#showCommentDialog").dialog("close")
@@ -92,7 +92,9 @@
       			$("#commentsListDialog").dialog('option', 'width', 600)	      	
       			$("#commentsListDialog").dialog('option', 'position', ['center','top']);
 		      	$("#commentsListDialog").dialog("open")
-		      	timedRefresh('never')
+		      	if(action == 'never'){
+		      		timedRefresh('never')
+		      	}
       		}
       		function showAssetCommentDialog( e , action){
       			$("#createCommentDialog").dialog("close")

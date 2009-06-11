@@ -526,7 +526,7 @@ td .odd {
 		if(asset[0].status == "Hold"){
 		var link = document.createElement('a');
 		link.href = '#'
-		link.onclick = function(){document.getElementById('createAssetCommentId').value = asset[0].assetEntity.id ;new Ajax.Request('listComments?id='+asset[0].assetEntity.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e);}})} //;return false
+		link.onclick = function(){document.getElementById('createAssetCommentId').value = asset[0].assetEntity.id ;new Ajax.Request('listComments?id='+asset[0].assetEntity.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never');}})} //;return false
 		link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
 		document.getElementById('icon_'+asset[0].assetEntity.id).appendChild(link);
 		}
@@ -900,12 +900,12 @@ function resolveValidate(formName,idVal){
 										<g:remoteLink controller="assetEntity" action="listComments"
 											id="${assetsList?.asset.id}"
 											before="document.getElementById('createAssetCommentId').value = ${assetsList?.asset.id};"
-											onComplete="listCommentsDialog( e );">
+											onComplete="listCommentsDialog( e ,'never' );">
 											<img
 												src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}"
 												border="0px">
 										</g:remoteLink>
-									</g:if> </td>
+									</g:if></td>
 								</tr>
 
 							</g:each>
@@ -1164,7 +1164,7 @@ Comment</a></span></div>
 	onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
 </span> <span class="button"> <input class="delete" type="button"
 	value="Delete"
-	onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + document.getElementById(\'commentId\').value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e)')}" />
+	onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + document.getElementById(\'commentId\').value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e ,\'never\')')}" />
 </span></div>
 </div>
 <div id="editCommentDialog" title="Edit Asset Comment"
@@ -1249,7 +1249,7 @@ Comment</a></span></div>
 		onclick="resolveValidate('editCommentForm','updateCommentId');" />
 	</span> <span class="button"> <input class="delete" type="button"
 		value="Delete"
-		onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + document.editCommentForm.id.value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e)')}" />
+		onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + document.editCommentForm.id.value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e,\'never\')')}" />
 	</span></div>
 </g:form></div>
 <div id="showDialog" title="Show Asset Entity" style="display: none;">

@@ -542,7 +542,7 @@
 					<img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px">
 				</g:remoteLink>
 				<g:if test="${AssetComment.findByAssetEntity(assetEntityInstance)}">
-				<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="document.getElementById('createAssetCommentId').value = ${assetEntityInstance.id};" onComplete="listCommentsDialog( e );">
+				<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="document.getElementById('createAssetCommentId').value = ${assetEntityInstance.id};" onComplete="listCommentsDialog(e,'never');">
 					<img src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}" border="0px">
 				</g:remoteLink>
 				</g:if>
@@ -822,7 +822,7 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 	onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
 </span> <span class="button"> <input class="delete" type="button"
 	value="Delete"
-	onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + document.getElementById(\'commentId\').value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e)')}" />
+	onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + document.getElementById(\'commentId\').value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e,\'never\')')}" />
 </span></div>
 </div>
 <div id="editCommentDialog" title="Edit Asset Comment"
@@ -907,7 +907,7 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 		onclick="resolveValidate('editCommentForm','updateCommentId');" />
 	</span> <span class="button"> <input class="delete" type="button"
 		value="Delete"
-		onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + document.editCommentForm.id.value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e)')}" />
+		onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + document.editCommentForm.id.value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e,\'never\')')}" />
 	</span></div>
 </g:form></div>
 </body>
