@@ -43,7 +43,7 @@
 	      	function editPersonDialog( e ) {
 
 		      var person = eval('(' + e.responseText + ')')
-		
+		        document.editForm.company.value = person.companyId
 		      	document.editForm.id.value = person.id
 		      	document.editForm.firstName.value = person.firstName
 		      	document.editForm.lastName.value = person.lastName
@@ -162,6 +162,20 @@
                 <div class="dialog">
                     <table>
                         <tbody>
+                     <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label>Company:</label>
+                                </td>
+                                <td valign="top" class="value ">
+                               
+								<select name="company" id="companyId">
+								 <option value="" selected="selected">Please Select</option>
+	                                <g:each in="${projectCompanies}" status="i" var="company">
+	                                	<option value="${company?.partyIdTo.id}">${company?.partyIdTo}</option>
+	                                </g:each>
+                                </select>
+                                </td>
+                            </tr> 
                         
                             <tr class="prop">
                                 <td valign="top" class="name">

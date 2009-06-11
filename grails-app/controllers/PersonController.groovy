@@ -10,13 +10,18 @@ class PersonController {
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 	// return Persons which are related to company
     def list = {
+		//def	projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
         def companyId = params.id
         def personInstanceList
+        def companiesList
         if ( companyId!= null && companyId != "" ) {
         	
         	personInstanceList = partyRelationshipService.getCompanyStaff( companyId )
+        	def query = "from PartyGroup as p where partyType = 'COMPANY' "
+            companiesList = PartyGroup.findAll( query )
+        	//projectCompanies = partyRelationshipService.getProjectCompanies( projectId )        	
         }
-		return [ personInstanceList: personInstanceList, companyId:companyId ]
+		return [ personInstanceList: personInstanceList, companyId:companyId,totalCompanies:companiesList ]
     }
 
     def show = {
@@ -67,10 +72,14 @@ class PersonController {
 	        
         personInstance.lastUpdated = new Date()
 	        
-        def companyId = params.companyId
+        def companyId = params.company
         if(personInstance) {
             personInstance.properties = params
             if ( !personInstance.hasErrors() && personInstance.save() ) {
+            	if(companyId != ""){
+    	            def companyParty = Party.findById(companyId)
+    	            partyRelationshipService.updatePartyRelationshipPartyIdFrom("STAFF", companyParty, 'COMPANY', personInstance, "STAFF")
+                }
                 flash.message = "Person ${params.firstName} ${params.lastName} updated"
                 redirect( action:list, params:[ id:companyId ])
             }
@@ -97,8 +106,8 @@ class PersonController {
         def personInstance = new Person( params )
         personInstance.dateCreated = new Date()
         if ( !personInstance.hasErrors() && personInstance.save() ) {
-            def companyId = params.companyId
-            if ( companyId != null ) {
+            def companyId = params.company
+            if ( companyId != "" ) {
                 def companyParty = Party.findById( companyId )
                 def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", personInstance, "STAFF" )
             }
@@ -117,6 +126,7 @@ class PersonController {
         
         def personInstance = Person.get( params.id )        
         def companyId = params.companyId
+        def companyParty = Party.findById(companyId)
         SimpleDateFormat outputDateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm")
 		SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm")
         def dateCreatedByFormat = outputDateFormat.format(inputDateFormat.parse(String.valueOf(personInstance.dateCreated)))
@@ -127,7 +137,7 @@ class PersonController {
         }
         else {       	
 
-        	def items = [id: personInstance.id, firstName: personInstance.firstName, lastName: personInstance.lastName, nickName: personInstance.nickName, title: personInstance.title, active: personInstance.active, dateCreated: dateCreatedByFormat, lastUpdated: lastUpdatedFormat, companyId: companyId ]
+        	def items = [id: personInstance.id, firstName: personInstance.firstName, lastName: personInstance.lastName, nickName: personInstance.nickName, title: personInstance.title, active: personInstance.active, dateCreated: dateCreatedByFormat, lastUpdated: lastUpdatedFormat, companyId: companyId,companyParty:companyParty ]
             render items as JSON
         }
     }
@@ -136,13 +146,19 @@ class PersonController {
         def map = new HashMap()
         def personInstance = Person.get( params.id )
         def role = params.role
-        	map.put("id", personInstance.id)
-        	map.put("firstName", personInstance.firstName)
-        	map.put("lastName", personInstance.lastName)
-        	map.put("nickName", personInstance.nickName)
-        	map.put("title", personInstance.title)
-        	map.put("active", personInstance.active)
-        	map.put("role", role)
+        def company = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $personInstance.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'")
+        if(company == null){
+        	map.put("companyId","")
+        }else{
+            map.put("companyId",company.partyIdFrom.id)
+        }
+        map.put("id", personInstance.id)
+        map.put("firstName", personInstance.firstName)
+        map.put("lastName", personInstance.lastName)
+        map.put("nickName", personInstance.nickName)
+        map.put("title", personInstance.title)
+        map.put("active", personInstance.active)
+        map.put("role", role)
         render map as JSON
     }
 	/*
@@ -152,13 +168,19 @@ class PersonController {
     	def personInstance = Person.get( params.id )
     	def projectId = params.projectId
     	def roleType = params.roleType
+    	def companyId = params.company
     	personInstance.lastUpdated = new Date()
     	if(personInstance) {
     		personInstance.properties = params
             if ( !personInstance.hasErrors() && personInstance.save() ) {
 	            def projectParty = Project.findById(projectId)
+	            if(companyId != ""){
+                    def companyParty = Party.findById(companyId)
+                    partyRelationshipService.updatePartyRelationshipPartyIdFrom("STAFF", companyParty, 'COMPANY', personInstance, "STAFF")
+	            }
 	            def partyRelationship = partyRelationshipService.updatePartyRelationshipRoleTypeTo("PROJ_STAFF", projectParty, 'PROJECT', personInstance, roleType)
-            	flash.message = "Person ${personInstance} updated"
+            	 
+	            flash.message = "Person ${personInstance} updated"
                 redirect( action:projectStaff, params:[ projectId:projectId ])
             } else {
             	flash.message = "Person ${personInstance} not updated"

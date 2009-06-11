@@ -113,6 +113,24 @@ class PartyRelationshipService {
             }
     	}
     }
+    /*
+     *  Method to update PartyIdFrom
+     */
+    def updatePartyRelationshipPartyIdFrom( def relationshipType, def partyIdFrom, def roleTypeIdFrom, def partyIdTo, def roleTypeIdTo ){
+    	def partyRelationship = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$relationshipType' and p.partyIdTo = $partyIdTo.id and p.roleTypeCodeFrom = '$roleTypeIdFrom' and p.roleTypeCodeTo = '$roleTypeIdTo' ")
+    	def newPartyRelationship
+		def partyRelationshipType = PartyRelationshipType.findById( relationshipType )
+		def roleTypeFrom = RoleType.findById( roleTypeIdFrom )
+		def roleTypeTo = RoleType.findById( roleTypeIdTo )
+    	if(partyRelationship == null){
+            newPartyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, partyIdFrom:partyIdFrom, roleTypeCodeFrom:roleTypeFrom, partyIdTo:partyIdTo, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" ).save( insert:true )
+    	}else{
+    		partyRelationship.delete()
+            newPartyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, partyIdFrom:partyIdFrom, roleTypeCodeFrom:roleTypeFrom, partyIdTo:partyIdTo, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" ).save( insert:true )
+    		
+    	}
+    	
+    }
     
     /*
      *  Return the Project Staff
@@ -257,8 +275,8 @@ class PartyRelationshipService {
         def teamMembers = PartyRelationship.findAll(query)
         def name = new StringBuffer()
         teamMembers.each{team ->
-        name.append(team.partyIdTo.firstName.charAt(0))
-        name.append(".")
+            name.append(team.partyIdTo.firstName.charAt(0))
+            name.append(".")
             name.append(team.partyIdTo.lastName)
             name.append("/")
         }
@@ -313,7 +331,7 @@ class PartyRelationshipService {
     	def roleTypeCodeTo ="TEAM_MEMBER"
     	def roleTypeInstance = RoleType.findById('TEAM_MEMBER')
     	def teamMembers = PartyRelationship.findAll(" from PartyRelationship pr where pr.partyIdFrom = $teamId and pr.roleTypeCodeTo = 'TEAM_MEMBER' ")
-    	 def memberNames = new StringBuffer()
+        def memberNames = new StringBuffer()
         teamMembers.each{team ->
         	memberNames.append(team.partyIdTo.firstName +" "+ team.partyIdTo.lastName)
             memberNames.append("/")

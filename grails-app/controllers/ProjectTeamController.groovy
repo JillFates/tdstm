@@ -10,12 +10,12 @@ class ProjectTeamController {
      * 	Return all of the teams associated to the project
      */
     def list = {
-    	 def bundleId = params.bundleId
-    	 def bundleInstance = MoveBundle.findById(bundleId)
-    	 def projectTeamInstanceList = partyRelationshipService.getBundleTeamInstanceList( bundleInstance  )
-    		 //ProjectTeam.findAllByProject(projectInstance)
+        def bundleId = params.bundleId
+        def bundleInstance = MoveBundle.findById(bundleId)
+        def projectTeamInstanceList = partyRelationshipService.getBundleTeamInstanceList( bundleInstance  )
+        //ProjectTeam.findAllByProject(projectInstance)
     	 
-         return [ projectTeamInstanceList: projectTeamInstanceList, bundleInstance:bundleInstance ]
+        return [ projectTeamInstanceList: projectTeamInstanceList, bundleInstance:bundleInstance ]
     }
 	/*
 	 *  Return the Project Team Details
@@ -38,10 +38,13 @@ class ProjectTeamController {
 	 */
     def delete = {
         def projectTeamInstance = ProjectTeam.get( params.id )
+        
         def bundleId = params.bundleId
         if(projectTeamInstance) {
         	PartyRelationship.executeUpdate("delete from PartyRelationship p where p.partyRelationshipType = 'PROJ_TEAM' and p.partyIdFrom = $projectTeamInstance.id and p.roleTypeCodeFrom = 'TEAM' ")
-            projectTeamInstance.delete()
+            AssetEntity.executeUpdate("update AssetEntity ae set ae.sourceTeam = null where ae.sourceTeam = $projectTeamInstance.id")
+            AssetEntity.executeUpdate("update AssetEntity ae set ae.targetTeam = null where ae.targetTeam = $projectTeamInstance.id")
+        	projectTeamInstance.delete()
             flash.message = "ProjectTeam ${projectTeamInstance} deleted"
             redirect( action:list, params:[bundleId:bundleId] )
         }

@@ -56,6 +56,8 @@
       document.showForm.companyId.value = person.companyId
       document.showForm.dateCreated.value = person.dateCreated
       document.showForm.lastUpdated.value = person.lastUpdated
+      document.showForm.company.value = person.companyParty.name
+      document.editForm.company.value = person.companyParty.id
 
       $("#dialog").dialog('option', 'width', 400)
       $("#dialog").dialog("open")
@@ -71,7 +73,8 @@
       }
 
       function createDialog(){
-
+      
+document.createDialogForm.company.value = ${companyId}
       $("#dialog2").dialog('option', 'width', 500)
       $("#dialog2").dialog("open")
 
@@ -147,6 +150,12 @@ def userLogin = UserLogin.findByPerson(personInstance);
           <div>
             <table>
               <tbody>
+              <tr class="prop">
+                  <td valign="top" class="name">Company:</td>
+
+                  <td valign="top" class="value"><input type="text" id="company" name="company" value="" style="border: 0px"/></td>
+
+                </tr>
 
                 <tr class="prop">
                   <td valign="top" class="name">First Name:</td>
@@ -219,6 +228,19 @@ def userLogin = UserLogin.findByPerson(personInstance);
           <div class="dialog">
             <table>
               <tbody>
+              <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label>Company:</label>
+                                </td>
+                                <td valign="top" class="value ">
+                               
+								<select name="company" id="companyId">
+	                                <g:each in="${totalCompanies}" status="i" var="company">
+	                                	<option value="${company?.id}">${company?.name}</option>
+	                                </g:each>
+                                </select>
+                                </td>
+                            </tr>
 
                 <tr class="prop">
                   <td valign="top" class="name">
@@ -314,12 +336,25 @@ def userLogin = UserLogin.findByPerson(personInstance);
     <div id="dialog2" title="Create Staff" style="display:none;">
       <div class="dialog">
 
-        <g:form action="save" method="post" >
+        <g:form action="save" method="post" name="createDialogForm">
           <div class="dialog">
             <table>
               <tbody>
-                <input type="hidden" name="companyId" value="${companyId}">
-
+               <%-- <input type="hidden" name="companyId" value="${companyId}"> --%>
+                
+ 					<tr class="prop">
+                                <td valign="top" class="name">
+                                    <label>Company:</label>
+                                </td>
+                                <td valign="top" class="value ">
+                               
+								<select name="company" id="companyId">
+	                                <g:each in="${totalCompanies}" status="i" var="company">
+	                                	<option value="${company?.id}">${company?.name}</option>
+	                                </g:each>
+                                </select>
+                                </td>
+                            </tr> 
                 <tr class="prop">
                   <td valign="top" class="name">
                     <label for="firstName">First Name:</label>
@@ -405,3 +440,4 @@ def userLogin = UserLogin.findByPerson(personInstance);
     </div>
   </body>
 </html>
+               
