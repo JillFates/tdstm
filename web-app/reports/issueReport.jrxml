@@ -18,7 +18,7 @@
 	</queryString>
 	<field name="assetName" class="java.lang.String"/>
 	<field name="assetTag" class="java.lang.String"/>
-	<field name="serialNumber" class="java.lang.String"/>
+	<field name="sourceTargetRoom" class="java.lang.String"/>
 	<field name="model" class="java.lang.String"/>
 	<field name="occuredAt" class="java.util.Date"/>
 	<field name="createdBy" class="java.lang.String"/>
@@ -26,6 +26,7 @@
 	<field name="bundleNames" class="java.lang.String"/>
 	<field name="projectName" class="java.lang.String"/>
 	<field name="clientName" class="java.lang.String"/>
+	<field name="resolvedInfoInclude" class="java.lang.String"/>
 	<background>
 		<band/>
 	</background>
@@ -93,63 +94,70 @@
 		<band/>
 	</pageHeader>
 	<columnHeader>
-		<band height="18">
+		<band height="30">
 			<staticText>
-				<reportElement mode="Opaque" x="0" y="0" width="100" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
-				<textElement>
+				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="100" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<textElement textAlignment="Center">
 					<font size="12"/>
-				</textElement>
+				</textElement >
 				<text><![CDATA[Asset Name]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="100" y="0" width="100" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
-				<textElement>
+				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="100" y="0" width="100" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<textElement textAlignment="Center">
 					<font size="12"/>
-				</textElement>
+				</textElement >
 				<text><![CDATA[Asset Tag]]></text>
 			</staticText>
-			<staticText>
-				<reportElement mode="Opaque" x="200" y="0" width="100" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
-				<textElement>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement  stretchType="RelativeToTallestObject" mode="Opaque" x="200" y="0" width="130" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
-				<text><![CDATA[Serial Number]]></text>
-			</staticText>
+				<textFieldExpression class="java.lang.String"><![CDATA["Source / Target\n Room / Rack / UPos"]]></textFieldExpression>
+			</textField>
 			<staticText>
-				<reportElement mode="Opaque" x="300" y="0" width="100" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
-				<textElement>
+				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="330" y="0" width="70" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Model]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="520" y="0" width="120" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
-				<textElement>
+				<reportElement stretchType="RelativeToTallestObject"  mode="Opaque" x="520" y="0" width="120" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Created/Resolved By ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="400" y="0" width="120" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
-				<textElement>
+				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="400" y="0" width="120" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Created/Resolved At ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="640" y="0" width="350" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
-				<textElement>
+				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="640" y="0" width="350" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Issue/Resolution ]]></text>
 			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="5" y="-20" width="500" height="20"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{resolvedInfoInclude}]]></textFieldExpression>
+			</textField>
 		</band>
 	</columnHeader>
 	<detail>
 		<band height="20">
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="border" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="20"/>
-				<textElement>
+				<textElement >
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{assetName}]]></textFieldExpression>
@@ -162,14 +170,14 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{assetTag}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="border" stretchType="RelativeToTallestObject" x="200" y="0" width="100" height="20"/>
+				<reportElement style="border" stretchType="RelativeToTallestObject" x="200" y="0" width="130" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{serialNumber}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{sourceTargetRoom}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="border" stretchType="RelativeToTallestObject" x="300" y="0" width="100" height="20"/>
+				<reportElement style="border" stretchType="RelativeToTallestObject" x="330" y="0" width="70" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
