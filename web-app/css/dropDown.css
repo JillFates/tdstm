@@ -36,6 +36,7 @@
       width:200px;
       height:auto;
       float:left;
+      z-index: 100;
     }
        
     .menu_new ul li {
@@ -86,6 +87,7 @@
       width:165px;
       height:auto;
       float:left;
+      z-index:100;
     }
        
     .menu_new_asset ul li {
