@@ -354,13 +354,13 @@ class ClientConsoleController {
 	        	count++
 	        }
 	        svgHeaderFile.append("</text>")
-	        svgHeaderFile.append("<path d='M 22 0 l 0 110")
+	        svgHeaderFile.append("<path d='M 22 0 l 0 120")
 	        def value = 22
 	        for(int i=0;i<count;i++){
 	        	value = value+22
-	        	svgHeaderFile.append(" M ${value} 0 l 0 110")
+	        	svgHeaderFile.append(" M ${value} 0 l 0 120")
 	        }
-	        svgHeaderFile.append("' stroke = 'white' stroke-width = '1'/>")
+	        svgHeaderFile.append("' stroke = '#FFFFFF' stroke-width = '1'/>")
 	        svgHeaderFile.append("</svg>")
 	        def f = ApplicationHolder.application.parentContext.getResource("templates/headerSvg.svg").getFile()
 	        def fop=new FileOutputStream(f)

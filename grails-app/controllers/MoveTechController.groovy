@@ -70,7 +70,14 @@ class MoveTechController {
         redirect(action:'login')
     }
     def login = {
-        if(flash.message != "Login Failed" && flash.message != "Login Disabled"){
+    	def validate = true
+    	def message = flash.message
+    	if(message){
+    		if(message.contains("Unknown") || message.contains("Invalid") || message.contains("No assets assigned") ||message.contains("presently inactive")){
+    			validate = false
+    		}
+    	}
+    	if(validate){
             def username = session.getAttribute("USERNAME")
             if(username){
                 redirect(action:'signIn',params:["username":username])
@@ -93,109 +100,121 @@ class MoveTechController {
             def barcodeText  = params.username.tokenize("-")
             //checking for valid barcode format or not size is 4 (mt-moveid- teamid- s/t)
             if ( barcodeText.size() == 4) {
-                if(barcodeText.get(0) == "mt"){
-                    try {
-                        moveBundleInstance = MoveBundle.findById(Integer.parseInt(barcodeText.get(1)))
-                        projectTeamInstance = ProjectTeam.findById(Integer.parseInt(barcodeText.get(2)))
-                        projectInstance = Project.findById( moveBundleInstance.project.id )
-                    }
-                    catch (Exception ex) {
-                        flash.message = message(code :"Login Failed")
-                        redirect(action: 'login')
-                        return;
-                    }
-                    //checkin for movebundle and team instances
-                    if( moveBundleInstance != null && projectTeamInstance != null && projectInstance != null ){
-                        //Validating is Logindate between startdate and completedate
-                        if( new Date() < projectInstance.startDate || new Date() > projectInstance.completionDate ) {
-                            flash.message = message(code :"Login Disabled")
-                            redirect(action: 'login')
-                            return;
-                        }else {
-                            def assetEntityInstance
-                            if ( barcodeText.get(3) == 's') {
-                                assetEntityInstance = AssetEntity.find("from AssetEntity ae where ae.moveBundle = $moveBundleInstance.id and ae.sourceTeam = $projectTeamInstance.id")
-                            }else if( barcodeText.get(3) == 't' ){
-                                assetEntityInstance = AssetEntity.find("from AssetEntity ae where ae.moveBundle = $moveBundleInstance.id and ae.targetTeam = $projectTeamInstance.id")
-                            }
-                            //checking for Assets corresponding to moveBundle exist or not
-                            if( assetEntityInstance != null) {
-                                def moveTech = [ user: barcodeText.get(0) ]
-                                moveTech['bundle'] = moveBundleInstance.id
-                                moveTech['team'] = Integer.parseInt(barcodeText.get(2))
-                                moveTech['location'] = barcodeText.get(3)
-                                moveTech['project'] = projectInstance.name
-                                checkAuth(barcodeText.get(0), moveTech)
-                            }else {
-                                flash.message = message(code :"Login Failed")
-                                redirect(action: 'login')
-                                return;
-                            }
-                        }
-                    }else {
-                        flash.message = message(code :"Login Failed")
-                        redirect(action: 'login')
-                        return;
-                    }
-                } else if( barcodeText.get(0) == "ct" ) {
-                    try {
-                        moveBundleInstance = MoveBundle.findById(Integer.parseInt(barcodeText.get(1)))
-                        projectTeamInstance = ProjectTeam.findById(Integer.parseInt(barcodeText.get(2)))
-                        projectInstance = Project.findById( moveBundleInstance.project.id )
-                    }
-                    catch (Exception ex) {
-                        flash.message = message(code :"Login Failed")
-                        redirect(action: 'login')
-                        return;
-                    }
-                    //checkin for movebundle and team instances
-                    if( moveBundleInstance != null && projectTeamInstance != null && projectInstance != null && projectTeamInstance.teamCode == "Cleaning"){
-                        //Validating is Logindate between startdate and completedate
-                        if( new Date() < projectInstance.startDate || new Date() > projectInstance.completionDate ) {
-                            flash.message = message(code :"Login Disabled")
-                            redirect(action: 'login')
-                            return;
-                        }else {
-                            def assetEntityInstance
-                            if ( barcodeText.get(3) == 's' ) {
-                                assetEntityInstance = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = $moveBundleInstance.id ")
-                            }else if( barcodeText.get(3) == 't' ){
-                                assetEntityInstance = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = $moveBundleInstance.id ")
-                            }
-                            //checking for Assets corresponding to moveBundle exist or not
-                            if( assetEntityInstance != null) {
-                                def moveTech = [ user: barcodeText.get(0) ]
-                                moveTech['bundle'] = moveBundleInstance.id
-                                moveTech['team'] = Integer.parseInt(barcodeText.get(2))
-                                moveTech['location'] = barcodeText.get(3)
-                                moveTech['project'] = projectInstance.name
-                                checkAuth(barcodeText.get(0), moveTech)
-                            }else {
-                                flash.message = message(code :"Login Failed")
-                                redirect(action: 'login')
-                                return;
-                            }
-                        }
-                    }else {
-                        flash.message = message(code :"Login Failed")
-                        redirect(action: 'login')
-                        return;
-                    }
-	        	 
-	        	 
-	        	 
-                } else {
-                    flash.message = message(code :"Login Failed")
-                    redirect(action: 'login')
-                    return;
-                }
+            	try{
+	                if(barcodeText.get(0) == "mt"){
+	                	moveBundleInstance = MoveBundle.findById(barcodeText.get(1))
+	                    //checkin for movebundle and team instances
+	                    if(moveBundleInstance){
+	                    	projectInstance = Project.findById( moveBundleInstance.project.id )
+	                    	if(projectInstance){
+	                    		projectTeamInstance = ProjectTeam.findById(barcodeText.get(2))
+	                    		if(projectTeamInstance){
+	                                //Validating is Logindate between startdate and completedate
+	                                if( new Date() < projectInstance.startDate || new Date() > projectInstance.completionDate ) {
+	                                    flash.message = message(code :"Move bundle presently inactive")
+	                                    redirect(action: 'login')
+	                                    return;
+	                                }else {
+	                                    def assetEntityInstance
+	                                    if ( barcodeText.get(3) == 's') {
+	                                        assetEntityInstance = AssetEntity.find("from AssetEntity ae where ae.moveBundle = $moveBundleInstance.id and ae.sourceTeam = $projectTeamInstance.id")
+	                                    }else if( barcodeText.get(3) == 't' ){
+	                                        assetEntityInstance = AssetEntity.find("from AssetEntity ae where ae.moveBundle = $moveBundleInstance.id and ae.targetTeam = $projectTeamInstance.id")
+	                                    }
+	                                    //checking for Assets corresponding to moveBundle exist or not
+	                                    if( assetEntityInstance != null) {
+	                                        def moveTech = [ user: barcodeText.get(0) ]
+	                                        moveTech['bundle'] = moveBundleInstance.id
+	                                        moveTech['team'] = Integer.parseInt(barcodeText.get(2))
+	                                        moveTech['location'] = barcodeText.get(3)
+	                                        moveTech['project'] = projectInstance.name
+	                                        checkAuth(barcodeText.get(0), moveTech)
+	                                    }else {
+	                                        flash.message = message(code :"No assets assigned to team for move bundle")
+	                                        redirect(action: 'login')
+	                                        return;
+	                                    }
+	                                }
+	                            } else {
+	                            	flash.message = message(code :"Unknown move bundle team")
+	                                redirect(action: 'login')
+	                                return;
+	                            }
+	                    	}else{
+	                    		flash.message = message(code :"Unknown project")
+	                            redirect(action: 'login')
+	                            return;
+	                    	}
+	                    } else {
+	                    	flash.message = message(code :"Unknown move bundle")
+	                        redirect(action: 'login')
+	                        return;
+	                    }
+	                } else if( barcodeText.get(0) == "ct" ) {
+	                    moveBundleInstance = MoveBundle.findById(barcodeText.get(1))
+	                    if(moveBundleInstance){
+	                    	projectInstance = Project.findById( moveBundleInstance.project.id )
+	                    	if(projectInstance){
+	                    		projectTeamInstance = ProjectTeam.findById(barcodeText.get(2))
+	                    		if(projectTeamInstance != null && projectTeamInstance.teamCode == "Cleaning"){
+	                                //Validating is Logindate between startdate and completedate
+	                                if( new Date() < projectInstance.startDate || new Date() > projectInstance.completionDate ) {
+	                                    flash.message = message(code :"Move bundle presently inactive")
+	                                    redirect(action: 'login')
+	                                    return;
+	                                }else {
+	                                    def assetEntityInstance
+	                                    if ( barcodeText.get(3) == 's' ) {
+	                                        assetEntityInstance = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = $moveBundleInstance.id ")
+	                                    }else if( barcodeText.get(3) == 't' ){
+	                                        assetEntityInstance = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = $moveBundleInstance.id ")
+	                                    }
+	                                    //checking for Assets corresponding to moveBundle exist or not
+	                                    if( assetEntityInstance != null) {
+	                                        def moveTech = [ user: barcodeText.get(0) ]
+	                                        moveTech['bundle'] = moveBundleInstance.id
+	                                        moveTech['team'] = Integer.parseInt(barcodeText.get(2))
+	                                        moveTech['location'] = barcodeText.get(3)
+	                                        moveTech['project'] = projectInstance.name
+	                                        checkAuth(barcodeText.get(0), moveTech)
+	                                    }else {
+	                                        flash.message = message(code :"No assets assigned to team for move bundle")
+	                                        redirect(action: 'login')
+	                                        return;
+	                                    }
+	                                }
+	                            }else{
+	                            	flash.message = message(code :"Unknown Cleaning team")
+	                                redirect(action: 'login')
+	                                return;
+	                            }
+	                    	}else{
+	                    		flash.message = message(code :"Unknown project")
+	                            redirect(action: 'login')
+	                            return;
+	                    	}
+	                    } else {
+	                    	flash.message = message(code :"Unknown move bundle")
+	                        redirect(action: 'login')
+	                        return;
+	                    }
+	                } else {
+	                    flash.message = message(code :"Invalid username")
+	                    redirect(action: 'login')
+	                    return;
+	                }
+            	} catch (Exception e) {
+            		 flash.message = message(code :"Invalid Login")
+	                 redirect(action: 'login')
+	                 return;
+				}
             }else {
-                flash.message = message(code :"Login Failed")
+                flash.message = message(code :"Invalid username format")
                 redirect(action: 'login')
                 return;
             }
         } else {
-        	flash.message = message(code :"Login Failed")
+        	flash.message = message(code :"Invalid username format")
             redirect(action: 'login')
             return;
         }

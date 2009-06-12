@@ -25,6 +25,3 @@ div.tableContainerIE tbody td{
 div.tableContainerIE thead th{
    border-right: 1px solid #F8F8F8;
 }
-tr.highLightRow:hover td { 
-	border-bottom: 1px solid green; border-top: 1px solid green; 
-}

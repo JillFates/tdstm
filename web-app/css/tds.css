@@ -329,7 +329,7 @@ div.tableContainer table {
 
 div.tableContainer tbody {
    width: 99%;
-   height: 458px;
+   height: 460px;
    overflow-y: scroll;
    overflow-x: hidden;
    border: 1px solid gray;
@@ -338,9 +338,10 @@ div.tableContainer tbody td{
    border-bottom: 1px solid #E8E8E8;
    border-right: 1px solid #E8E8E8;
 }
-tr.highLightRow:hover td { 
+div.tableContainer tbody tr:hover td { 
 	border-bottom: 1px solid green; border-top: 1px solid green; 
 }
 div.tableContainer thead th{
    border-right: 1px solid #F8F8F8;
+   padding: 0px 6px;
 }

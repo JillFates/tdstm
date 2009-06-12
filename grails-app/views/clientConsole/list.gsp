@@ -377,7 +377,7 @@ function resolveValidate(formName,idVal){
 	</thead>
 	<tbody>
 		<g:each in="${assetEntityList}" var="assetEntity">
-			<tr class="highLightRow">
+			<tr>
 			<jsec:hasRole in="['ADMIN','MANAGER']">	
 			<td id="action_${assetEntity.id}">
 				
