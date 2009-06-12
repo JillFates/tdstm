@@ -375,7 +375,7 @@ function resolveValidate(formName,idVal){
 	</thead>
 	<tbody>
 		<g:each in="${assetEntityList}" var="assetEntity">
-			<tr>
+			<tr class="highLightRow">
 			<td id="action_${assetEntity.id}">
 				<jsec:hasRole in="['ADMIN','MANAGER']">	
 					<g:if test="${assetEntity.checkVal == true}">

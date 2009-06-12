@@ -25,15 +25,6 @@ div.tableContainerIE tbody td{
 div.tableContainerIE thead th{
    border-right: 1px solid #F8F8F8;
 }
-div.tableContainerIE tbody tr:hover{
-   background-color: #65A342;
-}
-div.tableContainerIE tbody tr td.task_pending:hover{
-   background-color: #65A342;
-}
-div.tableContainerIE tbody tr td.task_done:hover{
-   background-color: #65A342;
-}
-div.tableContainerIE tbody tr td.asset_hold:hover{
-   background-color: #65A342;
+tr.highLightRow:hover td { 
+	border-bottom: 1px solid green; border-top: 1px solid green; 
 }
