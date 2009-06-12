@@ -43,7 +43,8 @@ td .odd {
 	    $("#createCommentDialog").dialog({ autoOpen: false })
 	    $("#showCommentDialog").dialog({ autoOpen: false })
 	    $("#editCommentDialog").dialog({ autoOpen: false })
-	    $("#showChangeStatusDialog").dialog({ autoOpen: false })	        
+	    $("#showChangeStatusDialog").dialog({ autoOpen: false })
+	    
 	})
 </script>
 <script type="text/javascript">
@@ -523,13 +524,11 @@ td .odd {
 		document.getElementById('source_'+asset[0].assetEntity.id).innerHTML = asset[0].sourceTeam
 		document.getElementById('target_'+asset[0].assetEntity.id).innerHTML = asset[0].targetTeam
 		document.getElementById('assetDetailRow_'+asset[0].assetEntity.id).className = asset[0].cssClass ;
-		if(asset[0].status == "Hold"){
 		var link = document.createElement('a');
 		link.href = '#'
 		link.onclick = function(){document.getElementById('createAssetCommentId').value = asset[0].assetEntity.id ;new Ajax.Request('listComments?id='+asset[0].assetEntity.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never');}})} //;return false
 		link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
 		document.getElementById('icon_'+asset[0].assetEntity.id).appendChild(link);
-		}
 		document.assetdetailsForm.priority.value = "";
 		document.assetdetailsForm.comment.value = "";
 		}
@@ -829,7 +828,6 @@ function resolveValidate(formName,idVal){
 			<tr>
 				<td valign="top" style="padding: 0px;">
 				<div class="list"><g:form name="assetListForm">
-					
 					<table>
 						<thead>
 <jsec:hasRole name="ADMIN">
@@ -905,7 +903,16 @@ function resolveValidate(formName,idVal){
 												src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}"
 												border="0px">
 										</g:remoteLink>
-									</g:if></td>
+									</g:if>
+									<g:else>
+						<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+ assetsList?.asset?.id)}">
+						<g:remoteLink controller="assetEntity" action="listComments" id="${assetsList?.asset.id}" before="document.getElementById('createAssetCommentId').value = ${assetsList?.asset.id};" onComplete="listCommentsDialog( e ,'never' ); ">
+							<img src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}" border="0px">
+						</g:remoteLink>
+						</g:if>
+						</g:else>
+												
+									</td>
 								</tr>
 
 							</g:each>
@@ -1003,7 +1010,7 @@ function resolveValidate(formName,idVal){
 </table>
 </div>
 <div id="commentsListDialog" title="Show Asset Comments"
-	style="display: none;"><br>
+	style="display: none;" ><br>
 <div class="list">
 <table id="listCommentsTable">
 	<thead>
@@ -1159,14 +1166,16 @@ Comment</a></span></div>
 	
 </table>
 </div>
-<div class="buttons"><span class="button"> <input
+ <div class="buttons"><span class="button"> <input
 	class="edit" type="button" value="Edit"
 	onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
 </span> <span class="button"> <input class="delete" type="button"
 	value="Delete"
 	onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + document.getElementById(\'commentId\').value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e ,\'never\')')}" />
-</span></div>
+</span> </div>
 </div>
+</div>
+
 <div id="editCommentDialog" title="Edit Asset Comment"
 	style="display: none;"><g:form action="updateComment"
 	method="post" name="editCommentForm">
@@ -1295,6 +1304,7 @@ Comment</a></span></div>
 bundleChange();
 
 timedRefresh(document.getElementById("selectTimedId").value)
-</script></div>
+</script>
+</div>
 </body>
 </html>

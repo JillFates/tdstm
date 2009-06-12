@@ -37,7 +37,6 @@ $.widget("ui.dialog", {
 
 	_init: function() {
 		this.originalTitle = this.element.attr('title');
-
 		var self = this,
 			options = this.options,
 
@@ -109,6 +108,10 @@ $.widget("ui.dialog", {
 				})
 				.click(function(event) {
 					self.close(event);
+					if(title == "Show Asset Comments"){
+					timedRefresh('0');
+					}
+					
 					return false;
 				})
 				.appendTo(uiDialogTitlebar),
@@ -125,6 +128,7 @@ $.widget("ui.dialog", {
 				.addClass('ui-dialog-title')
 				.attr('id', titleId)
 				.html(title)
+				
 				.prependTo(uiDialogTitlebar);
 
 		uiDialogTitlebar.find("*").add(uiDialogTitlebar).disableSelection();

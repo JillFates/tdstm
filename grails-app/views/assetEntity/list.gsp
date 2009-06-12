@@ -45,6 +45,9 @@
 })
 </script>
 <script type="text/javascript">	
+function timedRefresh(timeoutPeriod) {
+
+}
 		    function showAssetDialog( e , action ) {
 		    	$('#createCommentDialog').dialog('close');
 		    	$('#commentsListDialog').dialog('close');
