@@ -845,7 +845,6 @@ class MoveBundleAssetController {
 	 * Generate Issue Report
 	 */
 	def issueReport = {
-    	def sortBy = params.reportSort
     	def subject = SecurityUtils.subject
         def principal = subject.principal
     	def personInstance = Person.findByFirstName( principal )
@@ -856,6 +855,12 @@ class MoveBundleAssetController {
     	def bundleNames = ""
     	def reportFields = []
     	def resolvedInfoInclude
+    	def sortBy = params.reportSort
+    	if( params.reportSort == "sourceLocation" ) {
+    		sortBy = params.reportSort+",source_room,source_rack,source_rack_position"
+    	}else if( params.reportSort == "targetLocation" ){
+    		sortBy = params.reportSort+",target_room,target_rack,target_rack_position"
+    	}
     	if( params.reportResolveInfo == "false" ){
     		resolvedInfoInclude = "Resolved issues were not included"
     	}
@@ -881,7 +886,7 @@ class MoveBundleAssetController {
     			sourceTargetRoom = (assetComment?.assetEntity?.sourceRoom ? assetComment?.assetEntity?.sourceRoom : "--")+"/"+(assetComment?.assetEntity?.sourceRack ? assetComment?.assetEntity?.sourceRack : "--")+"/"+(assetComment?.assetEntity?.sourceRackPosition ? assetComment?.assetEntity?.sourceRackPosition : "--")+"\n"+
     								(assetComment?.assetEntity?.targetRoom ? assetComment?.assetEntity?.targetRoom : "--")+"/"+(assetComment?.assetEntity?.targetRack ? assetComment?.assetEntity?.targetRack : "--")+"/"+(assetComment?.assetEntity?.targetRackPosition ? assetComment?.assetEntity?.targetRackPosition : "--")
     			if( params.reportResolveInfo == "true" || assetComment.isResolved != 1 ) {
-    				reportFields <<['assetName':assetComment?.assetEntity?.assetName, 'assetTag':assetComment?.assetEntity?.assetTag, 'sourceTargetRoom':sourceTargetRoom,'model':assetComment?.assetEntity?.model, 'occuredAt':assetComment?.dateCreated, 'createdBy':assetComment?.createdBy?.firstName+"--"+assetComment?.createdBy?.lastName, 'issue':assetComment?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 'clientName':projectInstance?.client?.name,"resolvedInfoInclude":resolvedInfoInclude]
+    				reportFields <<['assetName':assetComment?.assetEntity?.assetName, 'assetTag':assetComment?.assetEntity?.assetTag, 'sourceTargetRoom':sourceTargetRoom,'model':(assetComment?.assetEntity?.manufacturer ? assetComment?.assetEntity?.manufacturer : "")+" "+(assetComment?.assetEntity?.model ? assetComment?.assetEntity?.model : "" ), 'occuredAt':assetComment?.dateCreated, 'createdBy':assetComment?.createdBy?.firstName+" "+assetComment?.createdBy?.lastName, 'issue':assetComment?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 'clientName':projectInstance?.client?.name,"resolvedInfoInclude":resolvedInfoInclude]
     			}
     			if( params.reportResolveInfo == "true" && assetComment.isResolved == 1 ) {
     				reportFields <<['assetName':null, 'assetTag':null, 'sourceTargetRoom':null,'model':null, 'occuredAt':assetComment?.dateResolved, 'createdBy':assetComment?.resolvedBy?.firstName+" "+assetComment?.resolvedBy?.lastName, 'issue':assetComment?.resolution, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 'clientName':projectInstance?.client?.name]
