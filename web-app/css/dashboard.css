@@ -7,7 +7,7 @@ div.tableContainerIE {
    border: 1px solid gray;
 }
 div.tableContainerIE table {
-   width: 97%;
+   width: 99%;
 }
 div.tableContainerIE thead tr {
   position: relative;
@@ -17,6 +17,23 @@ div.tableContainerIE thead tr {
 div.tableContainerIE tbody {
   height: auto;
 }
-div.tableContainerIE table tbody tr:first-child td {
-  padding: 29px 4px 4px 4px;
+
+div.tableContainerIE tbody td{
+   border-bottom: 1px solid #E8E8E8;
+   border-right: 1px solid #E8E8E8;
+}
+div.tableContainerIE thead th{
+   border-right: 1px solid #F8F8F8;
+}
+div.tableContainerIE tbody tr:hover{
+   background-color: #65A342;
+}
+div.tableContainerIE tbody tr td.task_pending:hover{
+   background-color: #65A342;
+}
+div.tableContainerIE tbody tr td.task_done:hover{
+   background-color: #65A342;
+}
+div.tableContainerIE tbody tr td.asset_hold:hover{
+   background-color: #65A342;
 }

@@ -313,7 +313,7 @@ class ClientConsoleController {
 	            	if(assetComment){
 	            		showCommentIcon = true
 	            	}
-	            	assetEntityList << [id: assetId, application:it.application ? it.application : "",appOwner:it.appOwner ? it.appOwner : "",appSme:it.appSme ? it.appSme : "",assetName:it.assetName ? it.assetName :"",tdId:tdId, check:check, showCommentIcon:showCommentIcon]
+	            	assetEntityList << [id: assetId, application:it.application ? it.application : "&nbsp;",appOwner:it.appOwner ? it.appOwner : "&nbsp;", appSme:it.appSme ? it.appSme : "&nbsp;",assetName:it.assetName ? it.assetName :"&nbsp;",tdId:tdId, check:check, showCommentIcon:showCommentIcon]
 	            }
 	        }
     	render assetEntityList as JSON

@@ -138,13 +138,13 @@ function updateTransitions(e){
 			var action = document.getElementById("action_"+assetTransition.id)
 			if(action){
 				if(!assetTransition.check){
-					action.style.visibility='hidden';
+					action.innerHTML='&nbsp;';
 				} 
 			}
 			var commentIcon = document.getElementById("icon_"+assetTransition.id)
 			if(commentIcon){
 				if(!assetTransition.showCommentIcon){
-					commentIcon.style.visibility='hidden';
+					commentIcon.innerHTML='&nbsp;';
 				}else{
 					commentIcon.innerHTML=""
 					var link = document.createElement('a');
@@ -153,7 +153,6 @@ function updateTransitions(e){
 					link.onclick = function(){document.getElementById('createAssetCommentId').value = assetTransition.id ;new Ajax.Request('../assetEntity/listComments?id='+this.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'action');}})} //;return false
 					link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
 					commentIcon.appendChild(link);
-					commentIcon.style.visibility='visible';
 				} 
 			}
 			var application = document.getElementById("application_"+assetTransition.id)
@@ -321,7 +320,7 @@ function resolveValidate(formName,idVal){
 <div class="tableContainer">
 </g:else>
 
-<table cellpadding="1" cellspacing="1"  style="border:0px;">
+<table cellpadding="0" cellspacing="0"  style="border:0px;">
 	<thead>
 	<tr>
 	<td>
@@ -369,7 +368,7 @@ function resolveValidate(formName,idVal){
 			</g:each>
 			</g:if>
 			<g:else>
-			<th style="padding-left: 0px" colspan="${headerCount}"><embed src="${createLinkTo(dir:'templates',file:'headerSvg.svg')}" type="image/svg+xml" width="${headerCount*22}" height="102"/></th>
+			<th style="padding-left: 0px" colspan="${headerCount}"><embed src="${createLinkTo(dir:'templates',file:'headerSvg.svg')}" type="image/svg+xml" width="${headerCount*21.73}" height="102"/></th>
 			</g:else>
 
 		</tr>
@@ -385,6 +384,7 @@ function resolveValidate(formName,idVal){
 							<img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}"	border="0px">
 						</g:remoteLink>
 					</g:if>
+					<g:else>&nbsp;</g:else>
 				</jsec:hasRole>
 			</td>
 			<td id="icon_${assetEntity.id}">
@@ -393,11 +393,12 @@ function resolveValidate(formName,idVal){
 						<img src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}"	border="0px">
 					</g:remoteLink>
 				</g:if>
+				<g:else>&nbsp;</g:else>
 			</td>
-			<td id="application_${assetEntity.id}">${assetEntity?.application}</td>
-			<td id="owner_${assetEntity.id}">${assetEntity?.appOwner}</td>
-			<td id="sme_${assetEntity.id}">${assetEntity?.appSme}</td>
-			<td id="assetName_${assetEntity.id}">${assetEntity?.assetName}</td>
+			<td id="application_${assetEntity.id}">${assetEntity?.application}&nbsp;</td>
+			<td id="owner_${assetEntity.id}">${assetEntity?.appOwner}&nbsp;</td>
+			<td id="sme_${assetEntity.id}">${assetEntity?.appSme}&nbsp;</td>
+			<td id="assetName_${assetEntity.id}">${assetEntity?.assetName}&nbsp;</td>
 			<g:each in="${assetEntity.transitions}" var="transition">${transition}</g:each>
 			</tr>
 		</g:each>

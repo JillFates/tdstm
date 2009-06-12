@@ -329,9 +329,27 @@ div.tableContainer table {
 
 div.tableContainer tbody {
    width: 99%;
-   height: 451px;
+   height: 458px;
    overflow-y: scroll;
    overflow-x: hidden;
    border: 1px solid gray;
 }
-
+div.tableContainer tbody td{
+   border-bottom: 1px solid #E8E8E8;
+   border-right: 1px solid #E8E8E8;
+}
+div.tableContainer tbody tr:hover{
+   background-color: #65A342;
+}
+div.tableContainer tbody tr td.task_pending:hover{
+   background-color: #65A342;
+}
+div.tableContainer tbody tr td.task_done:hover{
+   background-color: #65A342;
+}
+div.tableContainer tbody tr td.asset_hold:hover{
+   background-color: #65A342;
+}
+div.tableContainer thead th{
+   border-right: 1px solid #F8F8F8;
+}
