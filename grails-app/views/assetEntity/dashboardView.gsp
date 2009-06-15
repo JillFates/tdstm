@@ -511,7 +511,9 @@ td .odd {
 		}
 	}
 	function updateAsset(e){
-		var asset = eval("(" + e.responseText + ")")		
+		var asset = eval("(" + e.responseText + ")")
+		var commentVal = document.assetdetailsForm.comment.value;
+			
 		if(asset[0]){
 		createStateOptions(asset[0].statesList)
 		createAssighToOptions(asset[0].sourceTeams,asset[0].targetTeams)
@@ -524,11 +526,13 @@ td .odd {
 		document.getElementById('source_'+asset[0].assetEntity.id).innerHTML = asset[0].sourceTeam
 		document.getElementById('target_'+asset[0].assetEntity.id).innerHTML = asset[0].targetTeam
 		document.getElementById('assetDetailRow_'+asset[0].assetEntity.id).className = asset[0].cssClass ;
+		if(commentVal != ""){
 		var link = document.createElement('a');
 		link.href = '#'
 		link.onclick = function(){document.getElementById('createAssetCommentId').value = asset[0].assetEntity.id ;new Ajax.Request('listComments?id='+asset[0].assetEntity.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never');}})} //;return false
 		link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
 		document.getElementById('icon_'+asset[0].assetEntity.id).appendChild(link);
+		}
 		document.assetdetailsForm.priority.value = "";
 		document.assetdetailsForm.comment.value = "";
 		}

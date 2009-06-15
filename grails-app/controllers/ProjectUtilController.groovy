@@ -25,8 +25,17 @@ class ProjectUtilController {
      */
         
     def searchList = {
-   		def query = "from Project as p order by p.dateCreated desc"
-    	def projectList = Project.findAll( query )
+			def projectList
+    		def partyProjectList
+    		def isAdmin = SecurityUtils.getSubject().hasRole("ADMIN")
+    		def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
+    	if(isAdmin){	
+        	  projectList = Project.findAll( "from Project as p order by p.dateCreated desc" )
+    	}else{
+    		
+    		def query = "from Project p where p.id in (select pr.partyIdFrom from PartyRelationship pr where pr.partyRelationshipType = 'PROJ_STAFF' and pr.partyIdTo = ${loginUser.person.id} and pr.roleTypeCodeFrom = 'PROJECT' )"
+    			projectList = Project.findAll(query)
+    	}
     	return [ projectList:projectList ]
     }
     /*

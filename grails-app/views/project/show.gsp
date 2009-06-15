@@ -146,7 +146,10 @@
       </script>
   </head>
   <body>
- 
+  
+  <g:if test="${flash.message}">
+      <div class="message">${flash.message}</div>
+    </g:if>
    
     <div class="body">
     <h1>Show Project</h1>
@@ -158,9 +161,7 @@
       </jsec:hasRole>
     </div>
     <br>
-    <g:if test="${flash.message}">
-      <div class="message">${flash.message}</div>
-    </g:if>
+   
    
     
   	    <div class="dialog" id="updateShow">

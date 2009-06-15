@@ -841,6 +841,7 @@ class AssetEntityController {
             }
         }
         // get the list of assets order by Hold and recent asset Transition
+        if( moveBundleInstance != null ){
         def holdTotalAsset = jdbcTemplate.queryForList("select max(at.date_created) as dateCreated, ae.asset_entity_id as id,ae.priority, ae.asset_tag as assetTag, ae.asset_name as assetName, ae.source_team_id as sourceTeam, ae.target_team_id as targetTeam, pm.current_state_id as currentState  FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id) LEFT JOIN project_asset_map pm ON (pm.asset_id = ae.asset_entity_id) where ae.project_id = ${moveBundleInstance.project.id} and ae.move_bundle_id = ${moveBundleInstance.id} and pm.current_state_id = 10 group by ae.asset_entity_id order by dateCreated desc")
         def otherTotalAsset = jdbcTemplate.queryForList("select max(at.date_created) as dateCreated, ae.asset_entity_id as id,ae.priority, ae.asset_tag as assetTag, ae.asset_name as assetName, ae.source_team_id as sourceTeam, ae.target_team_id as targetTeam, pm.current_state_id as currentState  FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id) LEFT JOIN project_asset_map pm ON (pm.asset_id = ae.asset_entity_id) where ae.project_id = ${moveBundleInstance.project.id} and ae.move_bundle_id = ${moveBundleInstance.id} and ( pm.current_state_id != 10 or pm.current_state_id is null ) group by ae.asset_entity_id order by dateCreated desc")
         holdTotalAsset.each{
@@ -919,7 +920,10 @@ class AssetEntityController {
         userPreferenceService.loadPreferences("SUPER_CONSOLE_REFRESH")
         def timeToRefresh = getSession().getAttribute("SUPER_CONSOLE_REFRESH")
         return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams, assetsList:assetsList, moveBundleInstance:moveBundleInstance, supportTeam:supportTeam,totalUnracked:totalUnracked , totalSourceAvail:totalSourceAvail, totalTargetAvail:totalTargetAvail, totalReracked:totalReracked , totalAsset:totalAsset.size(), timeToRefresh : timeToRefresh ? timeToRefresh.SUPER_CONSOLE_REFRESH : "never"]
-        		
+        } else {
+        flash.message = "Please create bundle to view Console"	
+        redirect(controller:'project',action:'show',params:["id":params.projectId])
+        }
     }
     /*
      * 	 Get asset details part in dashboard page

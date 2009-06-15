@@ -45,6 +45,7 @@ class ClientConsoleController {
             	moveBundleInstance = MoveBundle.find("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
             }
         }
+    	if(moveBundleInstance != null){
         def applicationList=AssetEntity.executeQuery("select distinct ae.application from AssetEntity ae where ae.application is not null and ae.project.id="+projectId)
         def appOwnerList=AssetEntity.executeQuery("select distinct ae.appOwner from AssetEntity ae where ae.appOwner is not null and ae.project.id="+projectId)
         def appSmeList=AssetEntity.executeQuery("select distinct ae.appSme from AssetEntity ae where ae.appSme is not null  and ae.project.id="+projectId)
@@ -128,7 +129,11 @@ class ClientConsoleController {
         userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")
         def timeToRefresh = getSession().getAttribute("CLIENT_CONSOLE_REFRESH")
         return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,appOwnerList:appOwnerList,applicationList:applicationList,appSmeList:appSmeList,projectId:projectId,processTransitionList:processTransitionList,projectId:projectId,appOwnerValue:appOwnerValue,appValue:appValue,appSmeValue:appSmeValue,timeToRefresh:timeToRefresh ? timeToRefresh.CLIENT_CONSOLE_REFRESH : "never",headerCount:headerCount,browserTest:browserTest]
-    }
+    	} else {
+    		flash.message = "Please create bundle to view PMO Dashboard"
+    		redirect(controller:'project',action:'show',params:["id":params.projectId])
+    	}
+	}
     // To get list of task for an asset through ajax
 	def getTask = {
         def stateVal
