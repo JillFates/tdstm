@@ -94,7 +94,6 @@ class MoveTechController {
         def projectTeamInstance
         if( params.username ) {
         	session.setAttribute("USERNAME",params.username)
-            def token = new StringTokenizer(params.username, "-")
             //Getting current project instance
             def projectInstance
             def barcodeText  = params.username.tokenize("-")
@@ -407,9 +406,15 @@ class MoveTechController {
             def label
             def actionLabel
             def checkHome = params.home
-            def loginTeam = ProjectTeam.findById(params.team) 
+            def loginTeam = ProjectTeam.findById(params.team)
             if(search != null){
-                assetItem = AssetEntity.findByAssetTag(search)
+            	def query = new StringBuffer("from AssetEntity where assetTag = '$search' and moveBundle = $params.bundle")
+            	if(params.location == "s"){
+            		query.append(" and sourceTeam = $team ")
+            	} else {
+            		query.append(" and targetTeam = $team ")
+            	}
+                assetItem = AssetEntity.find(query.toString())
                 if(assetItem == null){
                     flash.message = message(code :"Asset Tag number '${search}' was not located")
                     if(checkHome){
@@ -530,7 +535,8 @@ class MoveTechController {
     //  Method for place on hold action
 	def placeHold = {
 		def enterNote = params.enterNote
-        def asset = AssetEntity.findByAssetTag(params.search)
+		def asset = getAssetEntity(params.search)
+        //def asset = AssetEntity.findByAssetTag(params.search)
         def bundle = asset.moveBundle
         def principal = SecurityUtils.subject.principal
         if(principal){
@@ -585,7 +591,7 @@ class MoveTechController {
 	
     //  Method for start unracking action
 	def unRack = {
-        def asset = AssetEntity.findByAssetTag(params.search)
+        def asset = getAssetEntity(params.search)//AssetEntity.findByAssetTag(params.search)
         def bundle = asset.moveBundle
         def actionLabel = params.actionLabel
         def principal = SecurityUtils.subject.principal
@@ -710,8 +716,13 @@ class MoveTechController {
             	return;
             }
             else if(search != null){
-                assetItem = AssetEntity.findByAssetTag(search)
-                
+            	def query = new StringBuffer("from AssetEntity where assetTag = '$search' and moveBundle = $params.bundle")
+            	if(params.location == "s"){
+            		query.append(" and sourceTeam = $team ")
+            	} else {
+            		query.append(" and targetTeam = $team ")
+            	}
+                assetItem = AssetEntity.find(query.toString())
                 if(assetItem == null){
                     flash.message = message(code :"Asset Tag number '${search}' was not located")
                     if(textSearch){
@@ -802,7 +813,7 @@ class MoveTechController {
         }
 	}
 	def cleaning = {
-        def asset = AssetEntity.findByAssetTag(params.search)
+        def asset = getAssetEntity(params.search)//AssetEntity.findByAssetTag(params.search)
         def bundle = asset.moveBundle
         def actionLabel = params.actionLabel
         def principal = SecurityUtils.subject.principal
@@ -851,7 +862,7 @@ class MoveTechController {
 	
 	//cancel the Asset Search
 	def cancelAssetSearch = {
-		def asset = AssetEntity.findByAssetTag(params.search)
+		def asset = getAssetEntity(params.search)//AssetEntity.findByAssetTag(params.search)
 		def bundle = asset.moveBundle
 		def actionLabel = params.actionLabel
 		def principal = SecurityUtils.subject.principal
@@ -906,5 +917,24 @@ class MoveTechController {
 			flash.message = "Your login has expired and must login again."
             redirect(action:'login')
 		}
+	}
+	/* 	-----------------------------------------------
+	 * 	Lokanath Reddy
+	 *  Will return the AssetEntity object for assetTag  
+	 *-------------------------------------------------*/
+	def getAssetEntity(assetTag){
+		def loginCode = session.getAttribute("USERNAME")
+		def loginDetails = loginCode.split("-")
+		def movebundle = loginDetails[1]
+		def bundleteam = loginDetails[2]
+		def location = loginDetails[3]
+		def query = new StringBuffer("from AssetEntity where assetTag = '$assetTag' and moveBundle = $movebundle")
+    	if(location == "s"){
+    		query.append(" and sourceTeam = $bundleteam ")
+    	} else {
+    		query.append(" and targetTeam = $bundleteam ")
+    	}
+		def asset = AssetEntity.find(query.toString())
+		return asset 
 	}
 }

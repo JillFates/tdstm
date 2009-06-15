@@ -48,12 +48,12 @@ class DataTransferBatchController {
 			        				assetEntity."$attribName" = exportMoveBundleInstance ? exportMoveBundleInstance : importMoveBundleInstance
 			    				}*/
 			    				if(it.correctedValue){
-			    					moveBundleInstance = MoveBundle.findByName(it.correctedValue)
+			    					moveBundleInstance = MoveBundle.findByNameAndProject(it.correctedValue,projectInstance)
 			    					if(!moveBundleInstance){
 			    						moveBundleInstance = new MoveBundle(name:it.correctedValue,project:projectInstance,operationalOrder:1).save()
 			    					}
 			    				} else if(it.importValue){
-			    					moveBundleInstance = MoveBundle.findByName(it.importValue)
+			    					moveBundleInstance = MoveBundle.findByNameAndProject(it.importValue,projectInstance)
 			    					if(!moveBundleInstance){
 			    						moveBundleInstance = new MoveBundle(name:it.importValue,project:projectInstance,operationalOrder:1).save()
 			    					}
