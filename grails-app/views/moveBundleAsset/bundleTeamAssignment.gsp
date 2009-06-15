@@ -505,6 +505,7 @@
               						<g:each in="${projectTeamInstance}" var="projectTeam">
        	      							<option value="${projectTeam?.teamCode}">${projectTeam?.teamCode}</option>
 	           						</g:each>
+	           						<option value="unAssign">UnAssigned</option>
              					</select>
     	          			</div>
     	          	</div>
