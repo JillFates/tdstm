@@ -535,7 +535,7 @@ class MoveTechController {
     //  Method for place on hold action
 	def placeHold = {
 		def enterNote = params.enterNote
-		def asset = getAssetEntity(params.search)
+		def asset = getAssetEntity(params.search, params.user)
         //def asset = AssetEntity.findByAssetTag(params.search)
         def bundle = asset.moveBundle
         def principal = SecurityUtils.subject.principal
@@ -591,7 +591,7 @@ class MoveTechController {
 	
     //  Method for start unracking action
 	def unRack = {
-        def asset = getAssetEntity(params.search)//AssetEntity.findByAssetTag(params.search)
+        def asset = getAssetEntity(params.search,params.user)//AssetEntity.findByAssetTag(params.search)
         def bundle = asset.moveBundle
         def actionLabel = params.actionLabel
         def principal = SecurityUtils.subject.principal
@@ -716,12 +716,7 @@ class MoveTechController {
             	return;
             }
             else if(search != null){
-            	def query = new StringBuffer("from AssetEntity where assetTag = '$search' and moveBundle = $params.bundle")
-            	if(params.location == "s"){
-            		query.append(" and sourceTeam = $team ")
-            	} else {
-            		query.append(" and targetTeam = $team ")
-            	}
+            	def query = "from AssetEntity where assetTag = '$search' and moveBundle = $params.bundle"
                 assetItem = AssetEntity.find(query.toString())
                 if(assetItem == null){
                     flash.message = message(code :"Asset Tag number '${search}' was not located")
@@ -813,7 +808,7 @@ class MoveTechController {
         }
 	}
 	def cleaning = {
-        def asset = getAssetEntity(params.search)//AssetEntity.findByAssetTag(params.search)
+        def asset = getAssetEntity(params.search,params.user)//AssetEntity.findByAssetTag(params.search)
         def bundle = asset.moveBundle
         def actionLabel = params.actionLabel
         def principal = SecurityUtils.subject.principal
@@ -862,7 +857,7 @@ class MoveTechController {
 	
 	//cancel the Asset Search
 	def cancelAssetSearch = {
-		def asset = getAssetEntity(params.search)//AssetEntity.findByAssetTag(params.search)
+		def asset = getAssetEntity(params.search,params.user)//AssetEntity.findByAssetTag(params.search)
 		def bundle = asset.moveBundle
 		def actionLabel = params.actionLabel
 		def principal = SecurityUtils.subject.principal
@@ -922,18 +917,20 @@ class MoveTechController {
 	 * 	Lokanath Reddy
 	 *  Will return the AssetEntity object for assetTag  
 	 *-------------------------------------------------*/
-	def getAssetEntity(assetTag){
+	def getAssetEntity(assetTag,user){
 		def loginCode = session.getAttribute("USERNAME")
 		def loginDetails = loginCode.split("-")
 		def movebundle = loginDetails[1]
 		def bundleteam = loginDetails[2]
 		def location = loginDetails[3]
 		def query = new StringBuffer("from AssetEntity where assetTag = '$assetTag' and moveBundle = $movebundle")
-    	if(location == "s"){
-    		query.append(" and sourceTeam = $bundleteam ")
-    	} else {
-    		query.append(" and targetTeam = $bundleteam ")
-    	}
+		if(user != "ct"){
+	    	if(location == "s"){
+	    		query.append(" and sourceTeam = $bundleteam ")
+	    	} else {
+	    		query.append(" and targetTeam = $bundleteam ")
+	    	}
+		}
 		def asset = AssetEntity.find(query.toString())
 		return asset 
 	}
