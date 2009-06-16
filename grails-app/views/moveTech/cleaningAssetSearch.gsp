@@ -116,7 +116,6 @@ var sHint = "C:\\temp\\output";
 //=============================================================================
 function startprintjob()
 {
-
 var job = window.TF.CreateJob();
 var form = window.document.assetSearchForm;
 var jobdata = job.NewJobDataRecordSet();
@@ -231,6 +230,7 @@ var i = -1;
 	  AddOption (dropdown, "Image (TGA)", "IMGTGA:" + sHint + ".TGA");
 	  AddOption (dropdown, "Image (TIF)", "IMGTIF:" + sHint + ".TIF");
 	  AddOption (dropdown, "Image (TIF Multipage)", "IMGMULTITIF:" + sHint + ".TIF");
+	  dropdown.options[def].selected = true;
 	  retrieve_field(document.assetSearchForm.Printers)
 	  mySelect(dropdown);
 }
@@ -326,6 +326,7 @@ function mySelect(x)
       
       	function clean(){
       		if(doCheckValidation()){ 
+      			var obj = document.getElementsByName('checkChange')
       			var printCheck = document.getElementById('printCheck');
       			if(printCheck.value != "printed" )
       			{
@@ -456,7 +457,7 @@ function mySelect(x)
 			<table style="margin-top:10px; border:0px;">
 					<g:if test="${projMap && browserTest != true}">	
 					<tr>
-					<td><b>Quantity: </b><select name="labels" >
+					<td style="width:85%;"><b>Quantity: </b><select name="labels" >
 					<option value="1">1</option>
 					<option value="2" selected="selected">2</option>
 					<option value="3">3</option>
@@ -467,19 +468,18 @@ function mySelect(x)
 	      				<b>Printer: </b><select type= "hidden" id="Printers" name="Printers" onChange="javascript:mySelect(this);"/>
           				<input type= "hidden" name="PrinterName" id="PrinterName">
 		  				</td>
-					</tr>
-					<tr>
+					
 					<g:if test="${browserTest == true}" >
-						<td class="buttonR"><input id="printButton" type="button" value="Print" disabled="disabled" onclick="startprintjob()"/></td></tr>
+						<td style="width:15%;"class="buttonR"><input id="printButton" type="button" value="Print" disabled="disabled" onclick="startprintjob()"/></td></tr>
 					</g:if>
 					<g:else>
-					<td class="buttonR"><input id="printButton" type="button" value="Print"  onclick="startprintjob()"/></td>
+					<td style="width:15%;"class="buttonR"><input id="printButton" type="button" value="Print"  onclick="startprintjob()"/></td>
 					</g:else>
 					</tr>
 					</g:if>
 					<g:else>
 					<tr>
-					<td><b>Quantity: </b> <select name="labels" disabled="disabled">
+					<td style="width:85%;"><b>Quantity: </b> <select name="labels" disabled="disabled">
 					<option value="1">1</option>
 					<option value="2" selected="selected">2</option>
 					<option value="3">3</option>
@@ -490,43 +490,64 @@ function mySelect(x)
           				<b>Printer: </b><select type= "hidden" id="Printers" name="Printers" disabled="disabled" onChange="javascript:mySelect(this);"/>
           				<input type= "hidden" name="PrinterName" id="PrinterName">
 						</td>
-					</tr>
-					<tr><td class="buttonR"><input id="printButton" type="button" value="Print" disabled="disabled"/></td></tr>
+					<td style="width:15%;" class="buttonR" style=" align:center;padding-right:40px;"><input id="printButton" type="button" value="Print" disabled="disabled"/></td></tr>
 					</g:else>		
 					<tr>
 					</table>
 					</div>
 					<div  style="width:100%; height:auto; border:1px solid #5F9FCF; margin-top:10px;padding:10px 0;">
 					<span style="position:absolute;text-align:center;width:auto;margin:-17px 0 0 10px;padding:0px 8px; background:#ffffff;"><b>Task</b></span>
-					<table style="margin-top:10px;border:0px;">
-					<tr>
-					<td rowspan="2" align="center"><div style="border-right:1px solid #5F9FCF; width:120px; height:auto; min-height:120px; float:left;">
+					<table style="margin-top:10px;border:0px; ">
+					<tr style="min-height:300px; width:95%;height:auto; ">
+					
+					<td style="width:90%;border-bottom:1px solid #5F9FCF;">
+					<div  style="height:auto;min-height:100px;border:1px solid #5F9FCF;">
+					<table style="min-height:200px;border:0px;">
+					<thead >
+					<th style="background-color:#cccccc;width:90%;">Instruction/Comments</th>
+					<th style="background-color:#cccccc;width:10%;">Confirmed</th></thead>
+					<tbody style="min-height:200px;">
+					<g:each in="${assetCommt}" status="i" var="assetComment">
+					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+					<td style="border-right:1px;">${fieldValue(bean:assetComment, field:'comment')}</td>
+					<td style="text-align:center;">
+					<g:if test="${assetComment?.mustVerify == 1}" >
+					<input type="checkbox" id="confirmCheck"  name="checkChange"/>
+					</g:if>
+					</td>
+					
+					</tr>
+					</g:each></tbody>
+					</table>
+					</div>	
+			        </td>
+					<td  style="width:14%;border-bottom:1px solid #5F9FCF;" align="center"><div style="border-right:0px solid #5F9FCF; width:110px; height:auto; min-height:120px; float:left;">
 					<table style="border:0px;">
 					<g:if test="${actionLabel}">
 					<tr>
-					<td class="buttonR" style="text-align: center;" colspan="2"><input id="cleanButton" type="button" value="${actionLabel}" onclick="return clean()" /></td>
+					<td  style="width:15%;" class="buttonR" style="align:left; padding-right:20px;float:left" colspan="2"><input id="cleanButton" type="button" value="${actionLabel}" onclick="return clean()" /></td>
 					</tr>
 					</g:if>
 					<g:if test="${projMap}">
 					<tr>
-					<td class="buttonR" style="text-align:center; padding-left:10px;" colspan="2"><input id="cancelButton" type="button" value="Cancel" onclick="return cancel()" /></td>
+					<td class="buttonR" style="align:left; padding-right:20px;float:left" colspan="2"><input id="cancelButton" type="button" value="Cancel" onclick="return cancel()" /></td>
 					</tr>
 					</g:if>
 					</table>
 					</div>
 					</td>
-					<td >
+					</tr>
+					<tr>
+					<td style="width:85%">
 						
 			<g:select style="width: 170px;padding:0px;text-align:left;" from="['Select a common reason:','Device not powered down','Device is not in expected rack','Device will not power up']" id="selectCmt" name="selectCmt" value="Select a common reason:" onchange="commentSelect(this.value);"></g:select>
 			<br/>
-					<textarea rows="5" cols="95" title="Enter Note..." name="enterNote" >Enter Comment</textarea></td>
-					</tr>
+					<textarea rows="5" cols="98" title="Enter Note..." name="enterNote" >Enter Comment</textarea></td>
+					
 					<g:if test="${projMap}">
-					<tr>
-					<td class="buttonR" style="padding-left:30px;"><input type="button"
-					value="Place on HOLD" onclick="return doTransition()" /></td>
-					<tr>
-					</g:if>					
+					<td class="buttonClean" style="text-align:center;vertical-align:bottom;align:left; " colspan="2"><input  type="button"	value="Place on HOLD" onclick="return doTransition()" /></td>
+					</g:if>	
+					</tr>				
 					</table>
 					</div>
 				</g:form>

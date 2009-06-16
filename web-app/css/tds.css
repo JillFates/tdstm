@@ -345,3 +345,18 @@ div.tableContainer thead th{
    border-right: 1px solid #F8F8F8;
    padding: 0px 6px;
 }
+.buttonClean input {
+	background-color:#5F9FCF;
+	border:1px solid #328714;
+	background-image:url(../images/button_highlight.png);
+	background-repeat:repeat-x; 
+	font-family:"bold Arial",Helvetica,sans-serif;
+	font-size:12px;
+	padding: 2px 8px;
+	font-weight:bold;
+	margin:2px;
+	text-align:center;
+	text-decoration:none;
+	letter-spacing:1px;
+	width:120px;
+		}

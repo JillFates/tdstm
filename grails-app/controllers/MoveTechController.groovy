@@ -800,7 +800,7 @@ class MoveTechController {
                                     }
                                 }
                             }
-                            assetCommt = AssetComment.findAllByAssetEntity(assetItem)
+                            assetCommt = AssetComment.findAll("from AssetComment ac where ac.assetEntity = $assetItem.id and ac.commentType != 'issue' ")
                             render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers, projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl(),browserTest:browserTest])
                         }
                     }
