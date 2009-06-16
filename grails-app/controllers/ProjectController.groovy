@@ -51,14 +51,29 @@ class ProjectController {
         	def projectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
         	def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
         	def companyStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectCompany.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
+        	companyStaff.each {
+        		if( it.partyIdTo.lastName == null ){
+        			it.partyIdTo.lastName = ""
+        		}
+        	}
         	companyStaff.sort{it.partyIdTo.lastName}
         	def clientStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectInstance.client.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
+        		clientStaff.each {
+        		if( it.partyIdTo.lastName == null ){
+        			it.partyIdTo.lastName = ""
+        		}
+        	}
         	clientStaff.sort{it.partyIdTo.lastName}
         	def companyPartners = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'PARTNERS' and p.partyIdFrom = $projectCompany.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'PARTNER' order by p.partyIdTo" )
         	companyPartners.sort{it.partyIdTo.name}
         	if(projectPartner != null){
         		partnerStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectPartner.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
-        	    partnerStaff.sort{it.partyIdTo.lastName}
+        	    partnerStaff.each {
+        		if( it.partyIdTo.lastName == null ){
+        			it.partyIdTo.lastName = ""
+        		}
+        	}
+        		partnerStaff.sort{it.partyIdTo.lastName}
         	}
         	clientStaff.each{staff->
         	}
@@ -460,8 +475,9 @@ class ProjectController {
         def tdsStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $tdsParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' " )
         tdsStaff.sort{it.partyIdTo.lastName}
         tdsStaff.each{partyRelationship ->
+        def fullName = partyRelationship.partyIdTo.lastName ? partyRelationship.partyIdTo.lastName+", "+partyRelationship.partyIdTo.firstName : partyRelationship.partyIdTo.firstName
         	def title = partyRelationship.partyIdTo.title ? " - "+partyRelationship.partyIdTo.title : ""
-        	compStaff <<[id:partyRelationship.partyIdTo.id, name:partyRelationship.partyIdTo.lastName +", "+partyRelationship.partyIdTo.firstName+title]
+        	compStaff <<[id:partyRelationship.partyIdTo.id, name:fullName+title]
         }
         if ( client != "" && client != null ) {
             def clientParty = PartyGroup.findById( client ).id
@@ -469,8 +485,9 @@ class ProjectController {
             def clientStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $clientParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' " )
 	    	clientStaff.sort{it.partyIdTo.lastName}
             clientStaff.each{partyRelationship ->
+            def fullName = partyRelationship.partyIdTo.lastName ? partyRelationship.partyIdTo.lastName+", "+partyRelationship.partyIdTo.firstName : partyRelationship.partyIdTo.firstName
             	def title = partyRelationship.partyIdTo.title ? " - "+partyRelationship.partyIdTo.title : "" 
-            	cStaff <<[id:partyRelationship.partyIdTo.id, name:partyRelationship.partyIdTo.lastName +", "+partyRelationship.partyIdTo.firstName+title]
+            	cStaff <<[id:partyRelationship.partyIdTo.id, name:fullName+title]
 	             
             }
         }
@@ -480,8 +497,9 @@ class ProjectController {
             def partnerStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $partnerParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' " )
 	    	partnerStaff.sort{it.partyIdTo.lastName}
             partnerStaff.each{partyRelationship ->
+            def fullName = partyRelationship.partyIdTo.lastName ? partyRelationship.partyIdTo.lastName+", "+partyRelationship.partyIdTo.firstName : partyRelationship.partyIdTo.firstName
             	def title = partyRelationship.partyIdTo.title ? " - "+partyRelationship.partyIdTo.title : ""
-            	pStaff <<[id:partyRelationship.partyIdTo.id, name:partyRelationship.partyIdTo.lastName +", "+partyRelationship.partyIdTo.firstName+title]
+            	pStaff <<[id:partyRelationship.partyIdTo.id, name:fullName+title]
 	             
             }
         }

@@ -103,20 +103,28 @@ class PersonController {
     }
     //Save the Person Detais
     def save = {
+		
         def personInstance = new Person( params )
+        
         personInstance.dateCreated = new Date()
         if ( !personInstance.hasErrors() && personInstance.save() ) {
+        	def fullName 
+			if(params.lastName == ""){
+				fullName = params.firstName
+			}else{
+				fullName = params.firstName+" "+params.lastName
+			}
             def companyId = params.company
             if ( companyId != "" ) {
                 def companyParty = Party.findById( companyId )
                 def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", personInstance, "STAFF" )
             }
-            flash.message = "Person ${personInstance} created"
+            flash.message = "Person ${fullName} created"
             //redirect( action:list, id:personInstance.id , params:[companyId:companyId] )
             redirect( action:list, params:[ id:companyId ] )
         }
         else {
-            def companyId = params.companyId
+            def companyId = params.company
             flash.message = " Person FirstName cannot be blank. "
             redirect( action:list, params:[ id:companyId ] )
         }

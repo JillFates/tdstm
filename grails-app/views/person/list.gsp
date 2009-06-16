@@ -65,7 +65,7 @@
       }
 
       function editPersonDialog() {
-
+      document.editForm.active.value = document.showForm.active.value;
       $("#dialog").dialog("close")
       $("#dialog1").dialog('option', 'width', 500)
       $("#dialog1").dialog("open")
