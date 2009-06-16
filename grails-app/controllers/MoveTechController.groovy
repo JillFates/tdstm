@@ -13,6 +13,7 @@ class MoveTechController {
     def partyRelationshipService
     def stateEngineService
     def workflowService
+    def jdbcTemplate
     def index = {
     	def browserTest=false
     	if(!request.getHeader("User-Agent").contains("MSIE")) {
@@ -296,46 +297,51 @@ class MoveTechController {
             def rdyState
             def ipState
             def holdState
-            def query = new StringBuffer()
-            query.append("from ProjectAssetMap pam where pam.project = ${projectInstance.id} ")
+            def query = new StringBuffer("select a.asset_entity_id as id, a.asset_tag as assetTag, a.source_rack as sourceRack, a.source_rack_position as sourceRackPosition, a.target_rack as targetRack, a.target_rack_position as targetRackPosition, a.model as model, p.current_state_id as currentStateId from asset_entity a left join project_asset_map p on (a.asset_entity_id = p.asset_id) where a.move_bundle_id = $bundle  ")
             if(params.location == "s"){
                 stateVal = stateEngineService.getStateId("STD_PROCESS","Unracked")
-                query.append("and pam.asset in (select id from AssetEntity ae where ae.moveBundle = ${bundleId.id} and ae.sourceTeam = ${team}) ")
+                query.append(" and a.source_team_id = $team ")
             }else {
                 stateVal = stateEngineService.getStateId("STD_PROCESS","Reracked")
-                query.append("and pam.asset in (select id from AssetEntity ae where ae.moveBundle = ${bundleId.id} and ae.targetTeam = ${team}) ")
+                query.append(" and a.target_team_id = $team ")
             }
-            allSize = ProjectAssetMap.findAll(query.toString()).size()
+            allSize = jdbcTemplate.queryForList(query.toString()).size()
             if(tab == "Todo"){
-                query.append("and pam.currentStateId < ${stateVal}")
+                query.append(" and p.current_state_id < $stateVal ")
             }
-            proAssetMap = ProjectAssetMap.findAll(query.toString())
+            proAssetMap = jdbcTemplate.queryForList(query.toString())
             todoSize = proAssetMap.size()
+            
+            holdState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Hold"))
+            if(params.location == "s"){
+                rdyState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Release"))
+                ipState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Unracking"))
+            }else{
+                rdyState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Cleaned"))
+                ipState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Reracking"))
+            }
+            
             proAssetMap.each{
-                holdState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Hold"))
-                if(params.location == "s"){
-                    rdyState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Release"))
-                    ipState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Unracking"))
-                }else{
-                    rdyState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Cleaned"))
-                    ipState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Reracking"))
-                }
-                if(it.currentStateId == holdState){
-                    colorCss = "asset_hold"
-                }else if(it.currentStateId == rdyState){
-                    colorCss = "asset_ready"
-                }else if(it.currentStateId == ipState){
-                    colorCss = "asset_process"
-                }else if((it.currentStateId > holdState) && (it.currentStateId < rdyState) ){
-                    colorCss = "asset_pending"
-                }else if((it.currentStateId >= rdyState)){
-                    colorCss = "asset_done"
+                if(it.currentStateId){
+	                if(it.currentStateId == holdState){
+	                    colorCss = "asset_hold"
+	                }else if(it.currentStateId == rdyState){
+	                    colorCss = "asset_ready"
+	                }else if(it.currentStateId == ipState){
+	                    colorCss = "asset_process"
+	                }else if((it.currentStateId > holdState) && (it.currentStateId < rdyState) ){
+	                    colorCss = "asset_pending"
+	                }else if((it.currentStateId >= rdyState)){
+	                    colorCss = "asset_done"
+	                }
+                } else{
+                	colorCss = "asset_pending"
                 }
                 assetList<<[item:it,cssVal:colorCss]
             }
             if(tab == "All"){
-                query.append("and pam.currentStateId < ${stateVal}")
-                todoSize = ProjectAssetMap.findAll(query.toString()).size()
+                query.append(" and p.current_state_id < $stateVal ")
+                todoSize = jdbcTemplate.queryForList(query.toString()).size()
             }
             return[bundle:bundle,team:team,project:params.project,location:params.location,assetList:assetList,allSize:allSize,todoSize:todoSize,'tab':tab]
 		} else {
@@ -344,6 +350,7 @@ class MoveTechController {
 		}
 	}
 	//To open div for my task
+	/*
 	def getServerInfo = {
 		def principal = SecurityUtils.subject.principal
 		if(principal){
@@ -391,6 +398,7 @@ class MoveTechController {
 			redirect(action:'login')
 		}
 	}
+	*/
     //  Method for my task asset tag search
 	def assetSearch = {
 		def principal = SecurityUtils.subject.principal
@@ -421,7 +429,7 @@ class MoveTechController {
                         redirect(action: 'index',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"user":"mt"])
                         return;
                     } else {
-                        redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                        redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":params.tab])
                         return;
                     }
                 }else{
@@ -434,7 +442,7 @@ class MoveTechController {
                             redirect(action: 'index',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"user":"mt"])
                             return;
                         } else {
-                            redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                            redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":params.tab])
                             return;
                         }
                     } else {
@@ -448,7 +456,7 @@ class MoveTechController {
                                     redirect(action: 'index',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"user":"mt"])
                                     return;
                                 } else {
-                                    redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                                    redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":params.tab])
                                     return;
                                 }
                             }
@@ -462,7 +470,7 @@ class MoveTechController {
                                     redirect(action: 'index',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"user":"mt"])
                                     return;
                                 } else {
-                                    redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                                    redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":params.tab])
                                     return;
                                 }
                             }
@@ -474,7 +482,7 @@ class MoveTechController {
                                 redirect(action: 'index',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"user":"mt"])
                                 return;
                             } else {
-                                redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                                redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":params.tab])
                                 return;
                             }
                         } else {
@@ -485,7 +493,7 @@ class MoveTechController {
 	                                redirect(action: 'index',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"user":"mt"])
 	                                return;
 	                            } else {
-	                                redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+	                                redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":params.tab])
 	                                return;
 	                            }
 	                        } else {
@@ -496,7 +504,7 @@ class MoveTechController {
 	                                    redirect(action: 'index',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"user":"mt"])
 	                                    return;
 	                                } else {
-	                                    redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+	                                    redirect(action: 'assetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":params.tab])
 	                                    return;
 	                                }
 	                            }
@@ -638,40 +646,39 @@ class MoveTechController {
             def rdyState
             def ipState
             def holdState
-            def query = new StringBuffer()
-            query.append("from ProjectAssetMap pam where pam.project = ${projectInstance.id} ")
+            def query = new StringBuffer("select a.asset_entity_id as id, a.asset_tag as assetTag, a.source_rack as sourceRack, a.source_rack_position as sourceRackPosition, a.target_rack as targetRack, a.target_rack_position as targetRackPosition, a.model as model, p.current_state_id as currentStateId from asset_entity a left join project_asset_map p on (a.asset_entity_id = p.asset_id) where a.move_bundle_id = $bundle  ")
             if(params.location == "s"){
                 stateVal = stateEngineService.getStateId("STD_PROCESS","Cleaned")
-                query.append("and pam.asset in (select id from AssetEntity ae where ae.moveBundle = ${bundleId.id} ) ")
             }else {
                 stateVal = stateEngineService.getStateId("STD_PROCESS","Cleaned")
-                query.append("and pam.asset in (select id from AssetEntity ae where ae.moveBundle = ${bundleId.id} ) ")
             }
-            allSize = ProjectAssetMap.findAll(query.toString()).size()
+            allSize = jdbcTemplate.queryForList(query.toString()).size()
             if(tab == "Todo"){
-                query.append("and pam.currentStateId < ${stateVal}")
+                query.append(" and p.current_state_id < $stateVal ")
             }
-            proAssetMap = ProjectAssetMap.findAll(query.toString())
+            proAssetMap = jdbcTemplate.queryForList(query.toString())
             todoSize = proAssetMap.size()
+            holdState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Hold"))
+            if(params.location == "s"){
+                rdyState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Cleaned"))
+                ipState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Unracked"))
+            }else{
+                rdyState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Cleaned"))
+                ipState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Staged"))
+            }
             proAssetMap.each{
-                holdState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Hold"))
-    				
-                if(params.location == "s"){
-                    rdyState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Cleaned"))
-                    ipState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Unracked"))
-    				
+                if(it.currentStateId){
+	                if(it.currentStateId == holdState){
+	                    colorCss = "asset_hold"
+	                }else if(it.currentStateId == ipState){
+	                    colorCss = "asset_ready"
+	                }else if((it.currentStateId > holdState) && (it.currentStateId < ipState) ){
+	                    colorCss = "asset_pending"
+	                }else if((it.currentStateId >= rdyState)){
+	                    colorCss = "asset_done"
+	                }
                 }else{
-                    rdyState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Cleaned"))
-                    ipState = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Staged"))
-                }
-                if(it.currentStateId == holdState){
-                    colorCss = "asset_hold"
-                }else if(it.currentStateId == ipState){
-                    colorCss = "asset_ready"
-                }else if((it.currentStateId > holdState) && (it.currentStateId < ipState) ){
-                    colorCss = "asset_pending"
-                }else if((it.currentStateId >= rdyState)){
-                    colorCss = "asset_done"
+                	colorCss = "asset_pending"
                 }
                 assetList<<[item:it,cssVal:colorCss]
             }
@@ -679,8 +686,8 @@ class MoveTechController {
                 it.cssVal
             }
             if(tab == "All"){
-                query.append("and pam.currentStateId < ${stateVal}")
-                todoSize = ProjectAssetMap.findAll(query.toString()).size()
+                query.append(" and p.current_state_id < $stateVal ")
+                todoSize = jdbcTemplate.queryForList(query.toString()).size()
             }
             return[bundle:bundle,team:team,project:params.project,location:params.location,assetList:assetList,allSize:allSize,todoSize:todoSize,'tab':tab]
 		} else {
@@ -714,8 +721,7 @@ class MoveTechController {
             if(params.menu == "true") {
             	render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl(), browserTest:browserTest])
             	return;
-            }
-            else if(search != null){
+            } else if(search != null){
             	def query = "from AssetEntity where assetTag = '$search' and moveBundle = $params.bundle"
                 assetItem = AssetEntity.find(query.toString())
                 if(assetItem == null){
@@ -724,7 +730,7 @@ class MoveTechController {
                         render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl(), browserTest:browserTest])
                         return;
                     } else {
-                        redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                        redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":params.tab])
                         return;
                     }
                 }else{
@@ -743,7 +749,7 @@ class MoveTechController {
                             render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers,projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl(), browserTest:browserTest])
                             return;
                         } else {
-                            redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                            redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":params.tab])
                             return;
                         }
                     }
@@ -753,7 +759,7 @@ class MoveTechController {
                             render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers,projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl(), browserTest:browserTest])
                             return;
                         } else {
-                            redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                            redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":params.tab])
                             return;
                         }
                     } else {
@@ -764,7 +770,7 @@ class MoveTechController {
                                 render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers,projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl(), browserTest:browserTest])
                                 return;
                             } else {
-                                redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                                redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":params.tab])
                                 return;
                             }
                         } else {
@@ -775,7 +781,7 @@ class MoveTechController {
                                     render(view:'cleaningAssetSearch',model:[teamMembers:teamMembers, projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl(), browserTest:browserTest])
                                     return;
                                 } else {
-                                    redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":"Todo"])
+                                    redirect(action: 'cleaningAssetTask',params:["bundle":params.bundle,"team":params.team,"project":params.project,"location":params.location,"tab":params.tab])
                                     return;
                                 }
                             }
@@ -792,7 +798,6 @@ class MoveTechController {
                                         actionLabel = it
                                         label =	stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it)))
                                     }
-	                        			
                                 }
                             }
                             assetCommt = AssetComment.findAllByAssetEntity(assetItem)

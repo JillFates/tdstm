@@ -51,13 +51,16 @@ class ClientConsoleController {
         def appSmeList=AssetEntity.executeQuery("select distinct ae.appSme from AssetEntity ae where ae.appSme is not null  and ae.project.id="+projectId)
         def query = new StringBuffer("select ae.asset_entity_id as id,ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,ae.asset_name as assetName,GROUP_CONCAT(state_to ORDER BY state_to SEPARATOR ',') as transitions FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id) where ae.project_id = $projectId and ae.move_bundle_id = ${moveBundleInstance.id}")
         if(appValue!="" && appValue!= null){
-        	query.append(" and ae.application ='$appValue'")
+        	def app = appValue.replace("'","\\'")
+        	query.append(" and ae.application ='$app'")
         }
         if(appOwnerValue!="" && appOwnerValue!= null){
-        	query.append(" and ae.app_owner='$appOwnerValue'")
+        	def owner = appOwnerValue.replace("'","\\'")
+        	query.append(" and ae.app_owner='$owner'")
         }
         if(appSmeValue!="" && appSmeValue!= null){
-        	query.append(" and ae.app_sme='$appSmeValue'")
+        	def sme = appSmeValue.toString().replace("'","\\'")
+        	query.append(" and ae.app_sme='$sme'")
         }
         query.append(" GROUP BY ae.asset_entity_id")
         

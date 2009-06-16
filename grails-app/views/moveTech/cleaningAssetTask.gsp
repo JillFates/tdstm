@@ -99,7 +99,7 @@
 					<input name="team" type="hidden" value="${team}" />
 					<input name="location" type="hidden" value="${location}" />
 					<input name="project" type="hidden" value="${project}" />
-					<input name="tab" type="hidden" value="Todo" />								              	
+					<input name="tab" type="hidden" value="${tab}" />								              	
 			<div style="float:left; width:100%; margin:5px 0; ">              								
               		<table style="border:0px;">
 					<tr>
@@ -125,15 +125,15 @@
                    </thead>
                    <tbody>
                    <g:each status="i" in="${assetList}" var="assetList">
-					<tr class="${assetList.cssVal}" onclick="assetSearch('${assetList?.item?.asset.assetTag}')">						
-						<td class="asset_details_block">${assetList?.item?.asset.assetTag}</td>
+					<tr class="${assetList.cssVal}" onclick="assetSearch('${assetList?.item?.assetTag}')">						
+						<td class="asset_details_block">${assetList?.item?.assetTag}</td>
 						<g:if test="${location == 's'}">
-						<td class="asset_details_block">${assetList?.item?.asset.sourceRack}/${assetList?.item?.asset.sourceRackPosition}</td>
+						<td class="asset_details_block">${assetList?.item?.sourceRack}/${assetList?.item?.sourceRackPosition}</td>
 						</g:if>
 						<g:else>
-						<td class="asset_details_block">${assetList?.item?.asset.targetRack}/${assetList?.item?.asset.targetRackPosition}</td>
+						<td class="asset_details_block">${assetList?.item?.targetRack}/${assetList?.item?.targetRackPosition}</td>
 						</g:else>
-						<td sclass="asset_details_block">${assetList?.item?.asset.model}</td>											
+						<td sclass="asset_details_block">${assetList?.item?.model}</td>											
 					    </tr>
 				        </g:each>
                         </tbody>
