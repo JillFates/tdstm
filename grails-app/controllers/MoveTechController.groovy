@@ -846,24 +846,18 @@ class MoveTechController {
         	redirect(action:'login')
         }
 	}
-	// get context details to get label format path
-    def labelFormatUrl() {
-        def tempProtocol = request.getProtocol()
-        def protocol = tempProtocol.substring(0,tempProtocol.indexOf("/"))
-        def serverName = request.getServerName()
-        def serverPort = request.getServerPort()
-        def contextPath = request.getContextPath()
-        // construct application URL
-        def appUrl
-        //checking for http or https protocol to construct URL
-        if( request.isSecure()) {
-        	appUrl = "https" + "://" + serverName +contextPath
-        }else {
-        	appUrl = protocol + "://" + serverName +":"+serverPort+contextPath
-        }
-        // get connection
-        def fileUrl = new URL( appUrl )
-		return fileUrl
+	
+	/**
+	 * Used to construct the URL for the current context
+	 * @return String - the URL
+	 */
+	def labelFormatUrl() {
+		def protocol = request.getProtocol()
+		def serverName = request.getServerName()
+		def serverPort = request.getServerPort()
+		def contextPath = request.getContextPath()
+
+		return protocol + serverName + ':' + serverPort + contextPath
 	}
 	
 	//cancel the Asset Search
