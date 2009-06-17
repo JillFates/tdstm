@@ -854,7 +854,13 @@ class MoveTechController {
         def serverPort = request.getServerPort()
         def contextPath = request.getContextPath()
         // construct application URL
-        def appUrl = protocol + "://" + serverName + ":" + serverPort + contextPath
+        def appUrl
+        //checking for http or https protocol to construct URL
+        if( serverPort == 443 ) {
+        	appUrl = "https" + "://" + serverName +contextPath
+        }else {
+        	appUrl = protocol + "://" + serverName +":"+serverPort+contextPath
+        }
         // get connection
         def fileUrl = new URL( appUrl )
 		return fileUrl
