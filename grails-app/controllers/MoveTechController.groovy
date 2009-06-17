@@ -856,7 +856,7 @@ class MoveTechController {
         // construct application URL
         def appUrl
         //checking for http or https protocol to construct URL
-        if( serverPort == 443 ) {
+        if( request.isSecure()) {
         	appUrl = "https" + "://" + serverName +contextPath
         }else {
         	appUrl = protocol + "://" + serverName +":"+serverPort+contextPath
