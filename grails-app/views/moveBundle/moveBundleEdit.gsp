@@ -6,7 +6,6 @@
     <meta name="layout" content="main" />
     <title>Edit MoveBundle</title>
     <g:javascript library="jquery" />
-    <g:javascript library="ui.datetimepicker" />
     <g:javascript library="ui.datepicker" />
 
     <g:javascript>

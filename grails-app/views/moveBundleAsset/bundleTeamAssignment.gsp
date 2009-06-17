@@ -5,7 +5,6 @@
     <meta name="layout" content="moveBundleHeader" />
     <title>Bundle Team Assignment</title>
  	<g:javascript library="jquery" />
-    <g:javascript library="ui.datetimepicker" />
     <g:javascript library="ui.datepicker" />
 	<g:javascript library="prototype"/>
 	

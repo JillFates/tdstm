@@ -19,14 +19,11 @@
 	href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
 <link type="text/css" rel="stylesheet"
 	href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" />
 <g:javascript src="assetcommnet.js" />
 <jq:plugin name="ui.core" />
 <jq:plugin name="ui.draggable" />
 <jq:plugin name="ui.resizable" />
 <jq:plugin name="ui.dialog" />
-<jq:plugin name="ui.datetimepicker" />
 
 <style>
 td .odd {
