@@ -16,12 +16,12 @@ environments {
 		dataSource {
 			// TDS Transitional Manager
 			dbCreate = "create-drop" // one of 'create', 'create-drop','update'
-			url = "jdbc:mysql://localhost/tdstm"
+			url = "jdbc:mysql://192.168.1.110/tdstm"
 			driverClassName = "com.mysql.jdbc.Driver"
-			username = "tdstm"
-			password = "tdstm"
+			username = "root"
+			password = "admin"
 			
-			logSql = true 
+			//logSql = true 
 			
 			/*
 			dbCreate = "create-drop" // one of 'create', 'create-drop','update'
@@ -39,10 +39,10 @@ environments {
 		dataSource {
 		// TDS Transitional Manager
 			dbCreate = "update" // one of 'create', 'create-drop','update'
-			url = "jdbc:mysql://localhost/tdstm"
+			url = "jdbc:mysql://192.168.1.110/tdstm"
 			driverClassName = "com.mysql.jdbc.Driver"
-			username = "tdstm"
-			password = "tdstm"
+			username = "root"
+			password = "admin"
 			
 			// logSql = true 
 		}

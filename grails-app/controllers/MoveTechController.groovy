@@ -414,7 +414,10 @@ class MoveTechController {
             def label
             def actionLabel
             def checkHome = params.home
-            def loginTeam = ProjectTeam.findById(params.team)
+            def loginTeam
+            if(team){
+            	loginTeam = ProjectTeam.findById(params.team)
+            }
             if(search != null){
             	def query = new StringBuffer("from AssetEntity where assetTag = '$search' and moveBundle = $params.bundle")
             	if(params.location == "s"){
@@ -599,11 +602,11 @@ class MoveTechController {
 	
     //  Method for start unracking action
 	def unRack = {
-        def asset = getAssetEntity(params.search,params.user)//AssetEntity.findByAssetTag(params.search)
-        def bundle = asset.moveBundle
-        def actionLabel = params.actionLabel
         def principal = SecurityUtils.subject.principal
         if(principal){
+        	def asset = getAssetEntity(params.search,params.user)//AssetEntity.findByAssetTag(params.search)
+            def bundle = asset.moveBundle
+            def actionLabel = params.actionLabel
             def loginUser = UserLogin.findByUsername(principal)
             def team
             def assetCommt = params.assetCommt
@@ -717,7 +720,10 @@ class MoveTechController {
             def label
             def actionLabel
             def teamMembers
-            def loginTeam = ProjectTeam.findById(params.team)
+            def loginTeam
+            if(team){
+            	loginTeam = ProjectTeam.findById(params.team)
+            }
             if(params.menu == "true") {
             	render(view:'cleaningAssetSearch',model:[projMap:projMap,assetCommt:assetCommt,stateVal:stateVal,bundle:params.bundle,team:params.team,project:params.project,location:params.location,search:search,label:label,actionLabel:actionLabel,filePath:labelFormatUrl(), browserTest:browserTest])
             	return;
@@ -813,11 +819,11 @@ class MoveTechController {
         }
 	}
 	def cleaning = {
-        def asset = getAssetEntity(params.search,params.user)//AssetEntity.findByAssetTag(params.search)
-        def bundle = asset.moveBundle
-        def actionLabel = params.actionLabel
         def principal = SecurityUtils.subject.principal
         if(principal){
+        	def asset = getAssetEntity(params.search,params.user)//AssetEntity.findByAssetTag(params.search)
+            def bundle = asset.moveBundle
+            def actionLabel = params.actionLabel
             def loginUser = UserLogin.findByUsername(principal)
             def team
             def assetCommt = params.assetCommt
@@ -862,11 +868,11 @@ class MoveTechController {
 	
 	//cancel the Asset Search
 	def cancelAssetSearch = {
-		def asset = getAssetEntity(params.search,params.user)//AssetEntity.findByAssetTag(params.search)
-		def bundle = asset.moveBundle
-		def actionLabel = params.actionLabel
 		def principal = SecurityUtils.subject.principal
 		if(principal){
+			def bundle = asset.moveBundle
+			def actionLabel = params.actionLabel
+			def asset = getAssetEntity(params.search,params.user)//AssetEntity.findByAssetTag(params.search)
 			def loginUser = UserLogin.findByUsername(principal)
 			def team
 			def assetCommt = params.assetCommt
