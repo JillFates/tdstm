@@ -666,7 +666,7 @@ class MoveTechController {
 					"a.source_rack as sourceRack, a.source_rack_position as sourceRackPosition, " +
 					"a.target_rack as targetRack, a.target_rack_position as targetRackPosition, " +
 					"a.model as model, p.current_state_id as currentStateId from asset_entity a " +
-					left join project_asset_map p on (a.asset_entity_id = p.asset_id) where a.move_bundle_id = $bundle ")
+					"left join project_asset_map p on (a.asset_entity_id = p.asset_id) where a.move_bundle_id = $bundle ")
 // TODO WHY THE IF/ELSE since the logic is the same
             if(params.location == "s"){
                 stateVal = stateEngineService.getStateId("STD_PROCESS","Cleaned")

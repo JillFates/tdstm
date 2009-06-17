@@ -33,9 +33,26 @@ grails.enable.native2ascii = true
 
 // set per-environment serverURL stem for creating absolute links
 environments {
-    production {
-        grails.serverURL = "http://www.changeme.com"
-    }
+   development {
+      grails.serverURL = "http://localhost/tds"
+   }
+   production {
+      grails.serverURL = "http://tm.tdsops.com/tds-0.1"
+      log4j {
+         appender.'errors.File'="/var/log/tomcat/stacktrace.log"
+         appender.logfile = "org.apache.log4j.DailyRollingFileAppender "
+         appender.'logfile.File' = "/var/log/tomcat/tdstm.log"
+         appender.'logfile.layout' = "org.apache.log4j.PatternLayout"
+         appender.'logfile.layout.ConversionPattern' = '%d{[ dd.MM.yy HH:mm:ss.SSS]} [%t] %-5p %c %x - %m%n'
+
+         logger {
+            grails="debug,stdout,logfile"
+            org {
+               codehaus.groovy.grails.web.servlet="info,stdout,logfile"
+            }
+         }
+      }
+   }
 }
 
 // log4j configuration
