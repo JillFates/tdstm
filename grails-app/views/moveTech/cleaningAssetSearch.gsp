@@ -391,7 +391,7 @@ function mySelect(x)
 				<g:form	name="assetSearchForm" action="cleaningAssetSearch">
 					<input name="bundle" type="hidden" value="${bundle}" />
 					<input type="hidden" name="printCheck" id="printCheck" value="notprinted"/>
-					<input type="hidden" name="urlPath" id="urlPath" value="${filePath}/resource/racking_label.tff"/>
+					<input type="hidden" name="urlPath" id="urlPath" value="<g:createLinkTo dir="resource" file="racking_label.tff" absolute="true"/>"/>
 					<input name="team" type="hidden" value="${team}" />
 					<input name="location" type="hidden" value="${location}" />
 					<input name="project" type="hidden" value="${project}" />
