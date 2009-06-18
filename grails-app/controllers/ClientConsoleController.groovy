@@ -46,92 +46,92 @@ class ClientConsoleController {
             }
         }
     	if(moveBundleInstance != null){
-        def applicationList=AssetEntity.executeQuery("select distinct ae.application from AssetEntity ae where ae.application is not null and ae.project.id="+projectId)
-        def appOwnerList=AssetEntity.executeQuery("select distinct ae.appOwner from AssetEntity ae where ae.appOwner is not null and ae.project.id="+projectId)
-        def appSmeList=AssetEntity.executeQuery("select distinct ae.appSme from AssetEntity ae where ae.appSme is not null  and ae.project.id="+projectId)
-        def query = new StringBuffer("select ae.asset_entity_id as id,ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,ae.asset_name as assetName,GROUP_CONCAT(state_to ORDER BY state_to SEPARATOR ',') as transitions FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id) where ae.project_id = $projectId and ae.move_bundle_id = ${moveBundleInstance.id}")
-        if(appValue!="" && appValue!= null){
-        	def app = appValue.replace("'","\\'")
-        	query.append(" and ae.application ='$app'")
-        }
-        if(appOwnerValue!="" && appOwnerValue!= null){
-        	def owner = appOwnerValue.replace("'","\\'")
-        	query.append(" and ae.app_owner='$owner'")
-        }
-        if(appSmeValue!="" && appSmeValue!= null){
-        	def sme = appSmeValue.toString().replace("'","\\'")
-        	query.append(" and ae.app_sme='$sme'")
-        }
-        query.append(" GROUP BY ae.asset_entity_id")
+			def applicationList=AssetEntity.executeQuery("select distinct ae.application from AssetEntity ae where ae.application is not null and ae.project.id="+projectId)
+			def appOwnerList=AssetEntity.executeQuery("select distinct ae.appOwner from AssetEntity ae where ae.appOwner is not null and ae.project.id="+projectId)
+			def appSmeList=AssetEntity.executeQuery("select distinct ae.appSme from AssetEntity ae where ae.appSme is not null  and ae.project.id="+projectId)
+			def query = new StringBuffer("select ae.asset_entity_id as id,ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,ae.asset_name as assetName,GROUP_CONCAT(state_to ORDER BY state_to SEPARATOR ',') as transitions FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id) where ae.project_id = $projectId and ae.move_bundle_id = ${moveBundleInstance.id}")
+			if(appValue!="" && appValue!= null){
+				def app = appValue.replace("'","\\'")
+				query.append(" and ae.application ='$app'")
+			}
+			if(appOwnerValue!="" && appOwnerValue!= null){
+				def owner = appOwnerValue.replace("'","\\'")
+				query.append(" and ae.app_owner='$owner'")
+			}
+			if(appSmeValue!="" && appSmeValue!= null){
+				def sme = appSmeValue.toString().replace("'","\\'")
+				query.append(" and ae.app_sme='$sme'")
+			}
+			query.append(" GROUP BY ae.asset_entity_id")
         
-        if(sortby != "" && sortby != null){
-        	query.append(" order by $sortby")
-        }
-        if(order != "" && order != null){
-        	query.append(" $order ")
-        }
-        def resultList=jdbcTemplate.queryForList(query.toString())
-        def today = new java.util.Date();
-        getSession().setAttribute("LAST_POOL_TIME",new java.sql.Timestamp(today.getTime()))
-        def assetEntityList=[]
-        def processTransitionList=[]
-        def tempTransitions = []
-        def processTransitions= stateEngineService.getTasks("STD_PROCESS", "TASK_ID")
-        processTransitions.each{
-        	tempTransitions <<Integer.parseInt(it)
-        }
-        tempTransitions.sort().each{
-        	def processTransition = stateEngineService.getState("STD_PROCESS",it)
-            processTransitionList<<[header:stateEngineService.getStateLabel("STD_PROCESS",it),transId:stateEngineService.getStateId("STD_PROCESS",processTransition)]
-        }
+			if(sortby != "" && sortby != null){
+				query.append(" order by $sortby")
+			}
+			if(order != "" && order != null){
+				query.append(" $order ")
+			}
+			def resultList=jdbcTemplate.queryForList(query.toString())
+			def today = new java.util.Date();
+			getSession().setAttribute("LAST_POOL_TIME",new java.sql.Timestamp(today.getTime()))
+			def assetEntityList=[]
+			def processTransitionList=[]
+			def tempTransitions = []
+			def processTransitions= stateEngineService.getTasks("STD_PROCESS", "TASK_ID")
+			processTransitions.each{
+				tempTransitions <<Integer.parseInt(it)
+			}
+			tempTransitions.sort().each{
+				def processTransition = stateEngineService.getState("STD_PROCESS",it)
+				processTransitionList<<[header:stateEngineService.getStateLabel("STD_PROCESS",it),transId:stateEngineService.getStateId("STD_PROCESS",processTransition)]
+			}
         
-        resultList.each{
-        	def stateId = 0
-        	def assetId = it.id
-        	def htmlTd = []
-        	def transitions
-        	if(it.transitions){
-        		transitions =it.transitions.tokenize(',')
-        	}
-        	def assetEntity = AssetEntity.get(assetId)
-        	projectMap = ProjectAssetMap.findByAsset(assetEntity)
-        	if(projectMap){
-        		stateId = projectMap.currentStateId
-        	}
-        	holdId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Hold"))
-        	releaseId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Release"))
-        	reRackId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Reracked"))
-        	if(stateId == 0){
-        		check = true
-        	} else if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
-        		stateVal = stateEngineService.getState("STD_PROCESS",stateId)
-    			taskVal = stateEngineService.getTasks("STD_PROCESS","MANAGER",stateVal)
-    			if(taskVal.size() == 0){
-    				check = false    				
-    			}else{
-                    check = true
-    			}
-        	}else{
-        		check = false
-        	}
-        	processTransitionList.each() { trans ->
-	        	def cssClass='task_pending'
-                transitions.each() { task ->
-	        		if(task == trans.transId){
-	        			if(stateId == 10 ){
-	        				cssClass = "asset_hold"
-	        			} else if(stateId != 10 && Integer.parseInt(task) != 10){
-	        				cssClass = "task_done"
-	        			}
-	        		}
-	        	}
-	        	htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass\">&nbsp;</td>"	
-        	}
-        	assetEntityList << [id: assetId, application:it.application,appOwner:it.appOwner,appSme:it.appSme,assetName:it.assetName,transitions:htmlTd,checkVal:check]
-        }
-        userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")
-        def timeToRefresh = getSession().getAttribute("CLIENT_CONSOLE_REFRESH")
-        return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,appOwnerList:appOwnerList,applicationList:applicationList,appSmeList:appSmeList,projectId:projectId,processTransitionList:processTransitionList,projectId:projectId,appOwnerValue:appOwnerValue,appValue:appValue,appSmeValue:appSmeValue,timeToRefresh:timeToRefresh ? timeToRefresh.CLIENT_CONSOLE_REFRESH : "never",headerCount:headerCount,browserTest:browserTest]
+			resultList.each{
+				def stateId = 0
+				def assetId = it.id
+				def htmlTd = []
+				def transitions
+				if(it.transitions){
+					transitions =it.transitions.tokenize(',')
+				}
+				def assetEntity = AssetEntity.get(assetId)
+				projectMap = ProjectAssetMap.findByAsset(assetEntity)
+				if(projectMap){
+					stateId = projectMap.currentStateId
+				}
+				holdId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Hold"))
+				releaseId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Release"))
+				reRackId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Reracked"))
+				if(stateId == 0){
+					check = true
+				} else if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
+					stateVal = stateEngineService.getState("STD_PROCESS",stateId)
+					taskVal = stateEngineService.getTasks("STD_PROCESS","MANAGER",stateVal)
+					if(taskVal.size() == 0){
+						check = false
+					}else{
+						check = true
+					}
+				}else{
+					check = false
+				}
+				processTransitionList.each() { trans ->
+					def cssClass='task_pending'
+					transitions.each() { task ->
+						if(task == trans.transId){
+							if(stateId == 10 ){
+								cssClass = "asset_hold"
+							} else if(stateId != 10 && Integer.parseInt(task) != 10){
+								cssClass = "task_done"
+							}
+						}
+					}
+					htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass\">&nbsp;</td>"
+				}
+				assetEntityList << [id: assetId, application:it.application,appOwner:it.appOwner,appSme:it.appSme,assetName:it.assetName,transitions:htmlTd,checkVal:check]
+			}
+			userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")
+			def timeToRefresh = getSession().getAttribute("CLIENT_CONSOLE_REFRESH")
+			return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,appOwnerList:appOwnerList,applicationList:applicationList,appSmeList:appSmeList,projectId:projectId,processTransitionList:processTransitionList,projectId:projectId,appOwnerValue:appOwnerValue,appValue:appValue,appSmeValue:appSmeValue,timeToRefresh:timeToRefresh ? timeToRefresh.CLIENT_CONSOLE_REFRESH : "never",headerCount:headerCount,browserTest:browserTest]
     	} else {
     		flash.message = "Please create bundle to view PMO Dashboard"
     		redirect(controller:'project',action:'show',params:["id":params.projectId])
@@ -247,139 +247,143 @@ class ClientConsoleController {
 	       
     }
 	
-	// Will return updated transitional data
+	/* -----------------------------------------------------
+	 * @author: Lokanada Reddy
+	 * @param : MoveBundle, application,appSme,appOwner
+	 * @return: AssetEntity object with recent transactions
+	 *----------------------------------------------------*/
 	def getTransitions = {
-			def bundleId = params.moveBundle
-	        def appValue=params.application
-	        def appOwnerValue=params.appOwner
-	        def appSmeValue=params.appSme
-	        def assetEntityList = []
-	        if(bundleId){
-		        def moveBundleInstance = MoveBundle.findById( bundleId )
-		        def lastPoolTime = getSession().getAttribute("LAST_POOL_TIME")
-		        def today = new java.util.Date();
-		        def currentPoolTime = new java.sql.Timestamp(today.getTime())
-		        getSession().setAttribute("LAST_POOL_TIME",currentPoolTime)
-				def query = new StringBuffer("select ae.asset_entity_id as id,ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,ae.asset_name as assetName,GROUP_CONCAT(state_to ORDER BY state_to SEPARATOR ',') as transitions FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id) where ae.asset_entity_id in ( select t.asset_entity_id from asset_transition t where t.date_created between '$lastPoolTime' and '$currentPoolTime' ) and ae.project_id = $moveBundleInstance.project.id and ae.move_bundle_id = ${moveBundleInstance.id}")
-		        if(appValue!="" && appValue!= null){
-		        	query.append(" and ae.application ='$appValue'")
-		        }
-		        if(appOwnerValue!="" && appOwnerValue!= null){
-		        	query.append(" and ae.app_owner='$appOwnerValue'")
-		        }
-		        if(appSmeValue!="" && appSmeValue!= null){
-		        	query.append(" and ae.app_sme='$appSmeValue'")
-		        }
-		        query.append(" GROUP BY ae.asset_entity_id")
-		        def resultList=jdbcTemplate.queryForList(query.toString())
-	            def processTransitions= stateEngineService.getTasks("STD_PROCESS", "TASK_ID")
-	            resultList.each{
-	            	def stateId = 0
-	            	def assetId = it.id
-	            	def tdId = []
-	            	def transitions
-	            	def check
-	            	if(it.transitions){
-	            		transitions =it.transitions.tokenize(',')
-	            	}
-	            	def assetEntity = AssetEntity.get(assetId)
-	            	def projectMap = ProjectAssetMap.findByAsset(assetEntity)
-	            	if(projectMap){
-	            		stateId = projectMap.currentStateId
-	            	}
-	            	def holdId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Hold"))
-	            	def releaseId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Release"))
-	            	def reRackId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Reracked"))
-	            	if(stateId == 0){
-	            		check = true
-	            	} else if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
-	            		def stateVal = stateEngineService.getState("STD_PROCESS",stateId)
-	        			def taskVal = stateEngineService.getTasks("STD_PROCESS","MANAGER",stateVal)
-	        			if(taskVal.size() == 0){
-	        				check = false    				
-	        			}else{
-	                        check = true
-	        			}
-	            	}else{
-	            		check = false
-	            	}
-	            	processTransitions.each() { trans ->
-	    	        	def cssClass='task_pending'
-	                    transitions.each() { task ->
-	    	        		if(task == trans){
-	    	        			if(stateId == 10 ){
-	    	        				cssClass = "asset_hold"
-	    	        			} else if(stateId != 10 && Integer.parseInt(task) != 10){
-	    	        				cssClass = "task_done"
-	    	        			}
-	    	        		}
-	    	        	}
-	    	        	tdId << [id:"${assetId+"_"+trans}", cssClass:cssClass]
-	            	}
-	            	def showCommentIcon = false
-	            	def assetComment = AssetComment.find('from AssetComment where assetEntity = '+assetId+' and commentType = ? and isResolved = ?',['issue',0])
-	            	if(assetComment){
-	            		showCommentIcon = true
-	            	}
-	            	assetEntityList << [id: assetId, application:it.application ? it.application : "&nbsp;",appOwner:it.appOwner ? it.appOwner : "&nbsp;", appSme:it.appSme ? it.appSme : "&nbsp;",assetName:it.assetName ? it.assetName :"&nbsp;",tdId:tdId, check:check, showCommentIcon:showCommentIcon]
-	            }
-	        }
+		def bundleId = params.moveBundle
+		def appValue=params.application
+		def appOwnerValue=params.appOwner
+		def appSmeValue=params.appSme
+		def assetEntityList = []
+		if(bundleId){
+			def moveBundleInstance = MoveBundle.findById( bundleId )
+			def lastPoolTime = getSession().getAttribute("LAST_POOL_TIME")
+			def today = new java.util.Date();
+			def currentPoolTime = new java.sql.Timestamp(today.getTime())
+			getSession().setAttribute("LAST_POOL_TIME",currentPoolTime)
+			def query = new StringBuffer("select ae.asset_entity_id as id,ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,ae.asset_name as assetName,GROUP_CONCAT(state_to ORDER BY state_to SEPARATOR ',') as transitions FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id) where ae.asset_entity_id in ( select t.asset_entity_id from asset_transition t where t.date_created between '$lastPoolTime' and '$currentPoolTime' ) and ae.project_id = $moveBundleInstance.project.id and ae.move_bundle_id = ${moveBundleInstance.id}")
+			if(appValue!="" && appValue!= null){
+				query.append(" and ae.application ='$appValue'")
+			}
+			if(appOwnerValue!="" && appOwnerValue!= null){
+				query.append(" and ae.app_owner='$appOwnerValue'")
+			}
+			if(appSmeValue!="" && appSmeValue!= null){
+				query.append(" and ae.app_sme='$appSmeValue'")
+			}
+			query.append(" GROUP BY ae.asset_entity_id")
+			def resultList=jdbcTemplate.queryForList(query.toString())
+			def processTransitions= stateEngineService.getTasks("STD_PROCESS", "TASK_ID")
+			resultList.each{
+				def stateId = 0
+				def assetId = it.id
+				def tdId = []
+				def transitions
+				def check
+				if(it.transitions){
+					transitions =it.transitions.tokenize(',')
+				}
+				def assetEntity = AssetEntity.get(assetId)
+				def projectMap = ProjectAssetMap.findByAsset(assetEntity)
+				if(projectMap){
+					stateId = projectMap.currentStateId
+				}
+				def holdId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Hold"))
+				def releaseId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Release"))
+				def reRackId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Reracked"))
+				if(stateId == 0){
+					check = true
+				} else if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
+					def stateVal = stateEngineService.getState("STD_PROCESS",stateId)
+					def taskVal = stateEngineService.getTasks("STD_PROCESS","MANAGER",stateVal)
+					if(taskVal.size() == 0){
+						check = false
+					}else{
+						check = true
+					}
+				}else{
+					check = false
+				}
+				processTransitions.each() { trans ->
+					def cssClass='task_pending'
+					transitions.each() { task ->
+						if(task == trans){
+							if(stateId == 10 ){
+								cssClass = "asset_hold"
+							} else if(stateId != 10 && Integer.parseInt(task) != 10){
+								cssClass = "task_done"
+							}
+						}
+					}
+					tdId << [id:"${assetId+"_"+trans}", cssClass:cssClass]
+				}
+				def showCommentIcon = false
+				def assetComment = AssetComment.find('from AssetComment where assetEntity = '+assetId+' and commentType = ? and isResolved = ?',['issue',0])
+				if(assetComment){
+					showCommentIcon = true
+				}
+				assetEntityList << [id: assetId, application:it.application ? it.application : "&nbsp;",appOwner:it.appOwner ? it.appOwner : "&nbsp;", appSme:it.appSme ? it.appSme : "&nbsp;",assetName:it.assetName ? it.assetName :"&nbsp;",tdId:tdId, check:check, showCommentIcon:showCommentIcon]
+			}
+		}
     	render assetEntityList as JSON
     }
 	
 	//get header name details for svg.
 	def getHeaderNames = {
-	        def tempTransitions = []
-	        def processTransitions= stateEngineService.getTasks("STD_PROCESS", "TASK_ID")
-	        processTransitions.each{
-	        	tempTransitions <<Integer.parseInt(it)
-	        }
+		def tempTransitions = []
+		def processTransitions= stateEngineService.getTasks("STD_PROCESS", "TASK_ID")
+		processTransitions.each{
+			tempTransitions <<Integer.parseInt(it)
+		}
 	       
-	        def svgHeaderFile = new StringBuffer()
-	        svgHeaderFile.append("<?xml version='1.0' encoding='UTF-8' standalone='no'?>")
-	        svgHeaderFile.append("<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>")
-	        svgHeaderFile.append("<svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>")
-	        svgHeaderFile.append("<script type='text/javascript'>")
-	        svgHeaderFile.append("<![CDATA[")
-	        svgHeaderFile.append("//this will create htmljavascriptfunctionname in html document and link it to changeText")
-	        svgHeaderFile.append("top.htmljavascriptfunctionname = changeText;")
-	        svgHeaderFile.append("function changeText(txt){")
-	        svgHeaderFile.append("targetText=document.getElementById('thetext');")
-	        svgHeaderFile.append("var newText = document.createTextNode(txt);")
-	        svgHeaderFile.append("targetText.replaceChild(newText,targetText.childNodes[0]);")
-	        svgHeaderFile.append("}")
-	        svgHeaderFile.append("// ]]>")
-	        svgHeaderFile.append("</script>")	       
-	        svgHeaderFile.append("<text id='thetext' text-rendering='optimizeLegibility' transform='rotate(270, 90, 0)' font-weight='bold' font-size='12' fill='#333333' x='-11' y='-76' font-family='verdana,arial,helvetica,sans-serif'>")
-	        def count = 0
-	        tempTransitions.sort().each{
-	        	def processTransition = stateEngineService.getStateLabel("STD_PROCESS",it)
-	        	if(count == 0){
-	        		svgHeaderFile.append("${processTransition}")
-	        	} else {
-	        		svgHeaderFile.append("<tspan x='-11' dy='22'>${processTransition}</tspan>")	
-	        	}
-	        	count++
-	        }
-	        svgHeaderFile.append("</text>")
-	        svgHeaderFile.append("<path d='M 22 0 l 0 120")
-	        def value = 22
-	        for(int i=0;i<count;i++){
-	        	value = value+22
-	        	svgHeaderFile.append(" M ${value} 0 l 0 120")
-	        }
-	        svgHeaderFile.append("' stroke = '#FFFFFF' stroke-width = '1'/>")
-	        svgHeaderFile.append("</svg>")
-	        def f = ApplicationHolder.application.parentContext.getResource("templates/headerSvg.svg").getFile()
-	        def fop=new FileOutputStream(f)
-	        if(f.exists()){            
-	          fop.write(svgHeaderFile.toString().getBytes())
-	          fop.flush()
-	          fop.close()          
-	        } else {
-	          println("This file is not exist")
-	        }
-	        return count
+		def svgHeaderFile = new StringBuffer()
+		svgHeaderFile.append("<?xml version='1.0' encoding='UTF-8' standalone='no'?>")
+		svgHeaderFile.append("<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>")
+		svgHeaderFile.append("<svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>")
+		svgHeaderFile.append("<script type='text/javascript'>")
+		svgHeaderFile.append("<![CDATA[")
+		svgHeaderFile.append("//this will create htmljavascriptfunctionname in html document and link it to changeText")
+		svgHeaderFile.append("top.htmljavascriptfunctionname = changeText;")
+		svgHeaderFile.append("function changeText(txt){")
+		svgHeaderFile.append("targetText=document.getElementById('thetext');")
+		svgHeaderFile.append("var newText = document.createTextNode(txt);")
+		svgHeaderFile.append("targetText.replaceChild(newText,targetText.childNodes[0]);")
+		svgHeaderFile.append("}")
+		svgHeaderFile.append("// ]]>")
+		svgHeaderFile.append("</script>")
+		svgHeaderFile.append("<text id='thetext' text-rendering='optimizeLegibility' transform='rotate(270, 90, 0)' font-weight='bold' font-size='12' fill='#333333' x='-11' y='-76' font-family='verdana,arial,helvetica,sans-serif'>")
+		def count = 0
+		tempTransitions.sort().each{
+			def processTransition = stateEngineService.getStateLabel("STD_PROCESS",it)
+			if(count == 0){
+				svgHeaderFile.append("${processTransition}")
+			} else {
+				svgHeaderFile.append("<tspan x='-11' dy='22'>${processTransition}</tspan>")
+			}
+			count++
+		}
+		svgHeaderFile.append("</text>")
+		svgHeaderFile.append("<path d='M 22 0 l 0 120")
+		def value = 22
+		for(int i=0;i<count;i++){
+			value = value+22
+			svgHeaderFile.append(" M ${value} 0 l 0 120")
+		}
+		svgHeaderFile.append("' stroke = '#FFFFFF' stroke-width = '1'/>")
+		svgHeaderFile.append("</svg>")
+		def f = ApplicationHolder.application.parentContext.getResource("templates/headerSvg.svg").getFile()
+		def fop=new FileOutputStream(f)
+		if(f.exists()){
+			fop.write(svgHeaderFile.toString().getBytes())
+			fop.flush()
+			fop.close()
+		} else {
+			println("This file is not exist")
+		}
+		return count
 	       
 	}
 }

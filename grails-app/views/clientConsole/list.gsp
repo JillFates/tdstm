@@ -130,54 +130,64 @@ function doAjaxCall(){
 	timedRefresh(document.getElementById("selectTimedId").value)
 }
 function updateTransitions(e){
-	var assetTransitions = eval('(' + e.responseText + ')');
-	if(assetTransitions){
+	try{
+		var assetTransitions = eval('(' + e.responseText + ')');
 		var assetslength = assetTransitions.length;
-		for( i = 0; i <assetslength ; i++){
-			var assetTransition = assetTransitions[i]
-			var action = document.getElementById("action_"+assetTransition.id)
-			if(action){
-				if(!assetTransition.check){
-					action.innerHTML='&nbsp;';
-				} 
+		var sessionStatus = isNaN(parseInt(assetslength));
+		if( !sessionStatus ){
+			if(assetTransitions){
+				for( i = 0; i <assetslength ; i++){
+					var assetTransition = assetTransitions[i]
+					var action = document.getElementById("action_"+assetTransition.id)
+					if(action){
+						if(!assetTransition.check){
+							action.innerHTML='&nbsp;';
+						} 
+					}
+					var commentIcon = document.getElementById("icon_"+assetTransition.id)
+					if(commentIcon){
+						if(!assetTransition.showCommentIcon){
+							commentIcon.innerHTML='&nbsp;';
+						}else{
+							commentIcon.innerHTML=""
+							var link = document.createElement('a');
+							link.href = '#'
+							link.id = assetTransition.id
+							link.onclick = function(){document.getElementById('createAssetCommentId').value = assetTransition.id ;new Ajax.Request('../assetEntity/listComments?id='+this.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'action');}})} //;return false
+							link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
+							commentIcon.appendChild(link);
+						} 
+					}
+					var application = document.getElementById("application_"+assetTransition.id)
+					if(application){
+						application.innerHTML = assetTransition.application
+					}
+					var owner = document.getElementById("owner_"+assetTransition.id)
+					if(owner){
+						owner.innerHTML = assetTransition.appOwner
+					}
+					var sme = document.getElementById("sme_"+assetTransition.id)
+					if(sme){
+						sme.innerHTML = assetTransition.appSme
+					}
+					var assetName = document.getElementById("assetName_"+assetTransition.id)
+					if(assetName){
+						assetName.innerHTML = assetTransition.assetName
+					}
+					var tdIdslength = assetTransition.tdId.length
+					for(j = 0; j< tdIdslength ; j++){
+						var transition = assetTransition.tdId[j]
+						var transTd = document.getElementById(transition.id)
+						transTd.className = transition.cssClass
+					}
+				}
 			}
-			var commentIcon = document.getElementById("icon_"+assetTransition.id)
-			if(commentIcon){
-				if(!assetTransition.showCommentIcon){
-					commentIcon.innerHTML='&nbsp;';
-				}else{
-					commentIcon.innerHTML=""
-					var link = document.createElement('a');
-					link.href = '#'
-					link.id = assetTransition.id
-					link.onclick = function(){document.getElementById('createAssetCommentId').value = assetTransition.id ;new Ajax.Request('../assetEntity/listComments?id='+this.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'action');}})} //;return false
-					link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
-					commentIcon.appendChild(link);
-				} 
-			}
-			var application = document.getElementById("application_"+assetTransition.id)
-			if(application){
-				application.innerHTML = assetTransition.application
-			}
-			var owner = document.getElementById("owner_"+assetTransition.id)
-			if(owner){
-				owner.innerHTML = assetTransition.appOwner
-			}
-			var sme = document.getElementById("sme_"+assetTransition.id)
-			if(sme){
-				sme.innerHTML = assetTransition.appSme
-			}
-			var assetName = document.getElementById("assetName_"+assetTransition.id)
-			if(assetName){
-				assetName.innerHTML = assetTransition.assetName
-			}
-			var tdIdslength = assetTransition.tdId.length
-			for(j = 0; j< tdIdslength ; j++){
-				var transition = assetTransition.tdId[j]
-				var transTd = document.getElementById(transition.id)
-				transTd.className = transition.cssClass
-			}
+		} else {
+			location.reload(false);
+			//timedRefresh('never')
 		}
+	} catch(ex){
+		location.reload(false);
 	}
 }
 
