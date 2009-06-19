@@ -809,9 +809,12 @@ class AssetEntityController {
         }
         render assetCommentsList as JSON
     }
-    /*
-     * 	 User to get the deatails for Supervisor Console
-     */
+    /*---------------------------------------------------------------------------------------
+     *	User to get the deatails for Supervisor Console
+     * 	@author:	Lokanath Reddy
+     * 	@param :	CURR_PROJ and movebundle
+     * 	@return:	AssetEntity details and Transition details for all MoveBundle Teams
+     *--------------------------------------------------------------------------------------*/
     def dashboardView = {
         def projectId = params.projectId
         def bundleId = params.moveBundle
@@ -842,53 +845,81 @@ class AssetEntityController {
         }
         // get the list of assets order by Hold and recent asset Transition
         if( moveBundleInstance != null ){
-        def holdTotalAsset = jdbcTemplate.queryForList("select max(at.date_created) as dateCreated, ae.asset_entity_id as id,ae.priority, ae.asset_tag as assetTag, ae.asset_name as assetName, ae.source_team_id as sourceTeam, ae.target_team_id as targetTeam, pm.current_state_id as currentState  FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id) LEFT JOIN project_asset_map pm ON (pm.asset_id = ae.asset_entity_id) where ae.project_id = ${moveBundleInstance.project.id} and ae.move_bundle_id = ${moveBundleInstance.id} and pm.current_state_id = 10 group by ae.asset_entity_id order by dateCreated desc")
-        def otherTotalAsset = jdbcTemplate.queryForList("select max(at.date_created) as dateCreated, ae.asset_entity_id as id,ae.priority, ae.asset_tag as assetTag, ae.asset_name as assetName, ae.source_team_id as sourceTeam, ae.target_team_id as targetTeam, pm.current_state_id as currentState  FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id) LEFT JOIN project_asset_map pm ON (pm.asset_id = ae.asset_entity_id) where ae.project_id = ${moveBundleInstance.project.id} and ae.move_bundle_id = ${moveBundleInstance.id} and ( pm.current_state_id != 10 or pm.current_state_id is null ) group by ae.asset_entity_id order by dateCreated desc")
+        def holdTotalAsset = jdbcTemplate.queryForList("select max(at.date_created) as dateCreated, ae.asset_entity_id as id,ae.priority,"+
+        												" ae.asset_tag as assetTag, ae.asset_name as assetName, ae.source_team_id as sourceTeam,"+
+        												" ae.target_team_id as targetTeam, pm.current_state_id as currentState  FROM asset_entity ae "+
+        												"LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id) "+
+        												"LEFT JOIN project_asset_map pm ON (pm.asset_id = ae.asset_entity_id) where ae.project_id = ${moveBundleInstance.project.id}"+
+        												" and ae.move_bundle_id = ${moveBundleInstance.id} and pm.current_state_id = 10 group by ae.asset_entity_id order by dateCreated desc")
+        												
+        def otherTotalAsset = jdbcTemplate.queryForList("select max(at.date_created) as dateCreated, ae.asset_entity_id as id,ae.priority, ae.asset_tag as assetTag, ae.asset_name as assetName,"+
+        												" ae.source_team_id as sourceTeam, ae.target_team_id as targetTeam, pm.current_state_id as currentState  FROM asset_entity ae "+
+        												"LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id) LEFT JOIN project_asset_map pm ON (pm.asset_id = ae.asset_entity_id) "+
+        												"where ae.project_id = ${moveBundleInstance.project.id} and ae.move_bundle_id = ${moveBundleInstance.id} and "+
+        												"( pm.current_state_id != 10 or pm.current_state_id is null ) group by ae.asset_entity_id order by dateCreated desc")
         holdTotalAsset.each{
         	totalAsset<<it
         }
         otherTotalAsset.each{
         	totalAsset<<it
         }
-        //AssetEntity.findAllByMoveBundle(moveBundleInstance,params)
-        def projectTeamList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = ${moveBundleInstance.id} and pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport'  order by pt.name asc")
+        def projectTeamList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = ${moveBundleInstance.id} and "+
+        											"pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport'  order by pt.name asc")
         // Get Id for respective States
-        def cleanedId = stateEngineService.getStateId("STD_PROCESS","Cleaned")
-        def rerackedId = stateEngineService.getStateId("STD_PROCESS","Reracked")
-        def onCartId = stateEngineService.getStateId("STD_PROCESS","OnCart")
-        def stagedId = stateEngineService.getStateId("STD_PROCESS","Staged")
-        def unrackedId = stateEngineService.getStateId("STD_PROCESS","Unracked")
-        def holdId = stateEngineService.getStateId("STD_PROCESS","Hold")
-        def releasedId = stateEngineService.getStateId("STD_PROCESS","Release")
+        def cleanedId = stateEngineService.getStateId( "STD_PROCESS", "Cleaned" )
+        def rerackedId = stateEngineService.getStateId( "STD_PROCESS", "Reracked" )
+        def onCartId = stateEngineService.getStateId( "STD_PROCESS", "OnCart" )
+        def stagedId = stateEngineService.getStateId( "STD_PROCESS", "Staged" )
+        def unrackedId = stateEngineService.getStateId( "STD_PROCESS", "Unracked" )
+        def holdId = stateEngineService.getStateId( "STD_PROCESS", "Hold" )
+        def releasedId = stateEngineService.getStateId( "STD_PROCESS", "Release" )
         projectTeamList.each{
             def teamMembers = partyRelationshipService.getBundleTeamMembersDashboard(it.id)
             def member
             if(teamMembers.length() > 0){
-            	member = teamMembers.delete((teamMembers.length()-1),teamMembers.length())
+            	member = teamMembers.delete((teamMembers.length()-1), teamMembers.length())
             }
-            def sourceAssets = ProjectAssetMap.findAll("from ProjectAssetMap where asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and sourceTeam = ${it.id} )" ).size()
-            def unrackedAssets = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $unrackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and sourceTeam = ${it.id} )" ).size()
-            def sourceAvailassets = jdbcTemplate.queryForList("SELECT max(t.state_to) as maxstate FROM asset_transition t left join asset_entity e on (t.asset_entity_id = e.asset_entity_id) where t.state_to >= $releasedId and e.move_bundle_id = ${moveBundleInstance.id} and e.source_team_id = ${it.id} group by e.asset_entity_id HAVING maxstate < $unrackedId ").size()
-            def targetAssets = ProjectAssetMap.findAll("from ProjectAssetMap where asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and targetTeam = ${it.id} )" ).size()
-            def rerackedAssets = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $rerackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} and targetTeam = ${it.id} )" ).size()
-            def targetAvailAssets = jdbcTemplate.queryForList("SELECT max(t.state_to) as maxstate FROM asset_transition t left join asset_entity e on (t.asset_entity_id = e.asset_entity_id) where t.state_to >= $stagedId and e.move_bundle_id = ${moveBundleInstance.id} and e.target_team_id = ${it.id} group by e.asset_entity_id HAVING maxstate < $rerackedId ").size()
-            bundleTeams <<[team:it,members:member, sourceAssets:sourceAssets, unrackedAssets:unrackedAssets, sourceAvailassets:sourceAvailassets , targetAvailAssets:targetAvailAssets , targetAssets:targetAssets, rerackedAssets:rerackedAssets ]
+            def sourceAssets = AssetEntity.findAll("from AssetEntity where moveBundle = ${moveBundleInstance.id} and sourceTeam = ${it.id} " ).size()
+            
+            def unrackedAssets = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
+        														"(t.asset_entity_id = e.asset_entity_id) where e.move_bundle_id = ${moveBundleInstance.id} "+
+        														"and e.source_team_id = ${it.id} group by e.asset_entity_id having maxstate >= $unrackedId").size() 
+            
+            def sourceAvailassets = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
+        														"(t.asset_entity_id = e.asset_entity_id) where t.state_to >= $releasedId and e.move_bundle_id = ${moveBundleInstance.id}"+
+        														" and e.source_team_id = ${it.id} group by e.asset_entity_id HAVING maxstate < $unrackedId ").size()
+            def targetAssets = AssetEntity.findAll("from AssetEntity  where moveBundle = ${moveBundleInstance.id} and targetTeam = ${it.id} " ).size()
+
+            def rerackedAssets = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
+															"(t.asset_entity_id = e.asset_entity_id) where e.move_bundle_id = ${moveBundleInstance.id} "+
+															"and e.target_team_id = ${it.id} group by e.asset_entity_id HAVING maxstate >= $rerackedId ").size()
+			
+            def targetAvailAssets = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
+        														"(t.asset_entity_id = e.asset_entity_id) where t.state_to >= $stagedId and e.move_bundle_id = ${moveBundleInstance.id} "+
+        														"and e.target_team_id = ${it.id} group by e.asset_entity_id HAVING maxstate < $rerackedId ").size()
+            bundleTeams <<[team:it,members:member, sourceAssets:sourceAssets, 
+                           unrackedAssets:unrackedAssets, sourceAvailassets:sourceAvailassets , 
+                           targetAvailAssets:targetAvailAssets , targetAssets:targetAssets, 
+                           rerackedAssets:rerackedAssets ]
         }
-        def sourceCleaned = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $cleanedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
-        def sourceMover = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $onCartId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
-        def targetMover = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $stagedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
+        def sourceCleaned = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $cleanedId and asset in (select id from AssetEntity  "+
+        												"where moveBundle = ${moveBundleInstance.id} )" ).size()
+        def sourceMover = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $onCartId and asset in (select id from AssetEntity  "+
+        											"where moveBundle = ${moveBundleInstance.id} )" ).size()
+        def targetMover = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $stagedId and asset in (select id from AssetEntity  "+
+        											"where moveBundle = ${moveBundleInstance.id} )" ).size()
         def cleaningTeam = ProjectTeam.findByTeamCode("Cleaning")
         def transportTeam = ProjectTeam.findByTeamCode("Transport")
         def cleaningMembers = partyRelationshipService.getBundleTeamMembersDashboard(cleaningTeam.id)
         def transportMembers = partyRelationshipService.getBundleTeamMembersDashboard(transportTeam.id)
-        supportTeam.put("totalAssets", totalAsset.size() )
-        supportTeam.put("sourceCleaned", sourceCleaned )
-        supportTeam.put("sourceMover", sourceMover )
-        supportTeam.put("targetMover", targetMover )
-        supportTeam.put("cleaning", cleaningTeam )
-        supportTeam.put("cleaningMembers", cleaningMembers.delete((cleaningMembers.length()-1),cleaningMembers.length()) )
-        supportTeam.put("transport", transportTeam )
-        supportTeam.put("transportMembers", transportMembers.delete((transportMembers.length()-1),transportMembers.length()) )
+	        supportTeam.put("totalAssets", totalAsset.size() )
+	        supportTeam.put("sourceCleaned", sourceCleaned )
+	        supportTeam.put("sourceMover", sourceMover )
+	        supportTeam.put("targetMover", targetMover )
+	        supportTeam.put("cleaning", cleaningTeam )
+	        supportTeam.put("cleaningMembers", cleaningMembers.delete((cleaningMembers.length()-1), cleaningMembers.length()) )
+	        supportTeam.put("transport", transportTeam )
+	        supportTeam.put("transportMembers", transportMembers.delete((transportMembers.length()-1), transportMembers.length()) )
         totalAsset.each{
         	def check = true
         	def projectAssetMap = it.currentState
@@ -896,9 +927,9 @@ class AssetEntityController {
         	if(projectAssetMap){
         		curId = it.currentState
         	}
-        	stateVal = stateEngineService.getState("STD_PROCESS",curId)
+        	stateVal = stateEngineService.getState( "STD_PROCESS", curId )
 			if(stateVal){
-	        	taskVal = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR",stateVal)
+	        	taskVal = stateEngineService.getTasks( "STD_PROCESS", "SUPERVISOR", stateVal )
 				if(taskVal.size() == 0){
 					check = false    				
 				}
@@ -911,23 +942,41 @@ class AssetEntityController {
         	} else if(curId > Integer.parseInt(rerackedId)){
         		cssClass = 'asset_done'
         	}
-        	assetsList<<[asset: it, status: stateEngineService.getStateLabel("STD_PROCESS",curId), cssClass : cssClass,checkVal:check]
+        	assetsList<<[asset: it, status: stateEngineService.getStateLabel( "STD_PROCESS", curId ), cssClass : cssClass, checkVal:check]
         }
-        def totalUnracked = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $unrackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
-        def totalSourceAvail = jdbcTemplate.queryForList("SELECT max(t.state_to) as maxstate FROM asset_transition t left join asset_entity e on (t.asset_entity_id = e.asset_entity_id) where t.state_to >= $releasedId and e.move_bundle_id = ${moveBundleInstance.id} group by e.asset_entity_id HAVING maxstate < $unrackedId ").size() 
-        def totalReracked = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $rerackedId and asset in (select id from AssetEntity  where moveBundle = ${moveBundleInstance.id} )" ).size()
-        def totalTargetAvail = jdbcTemplate.queryForList("SELECT max(t.state_to) as maxstate FROM asset_transition t left join asset_entity e on (t.asset_entity_id = e.asset_entity_id) where t.state_to >= $stagedId and e.move_bundle_id = ${moveBundleInstance.id} group by e.asset_entity_id HAVING maxstate < $rerackedId ").size() 
-        userPreferenceService.loadPreferences("SUPER_CONSOLE_REFRESH")
+        def totalUnracked = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
+														"(t.asset_entity_id = e.asset_entity_id) where e.move_bundle_id = ${moveBundleInstance.id} "+
+														"group by e.asset_entity_id having maxstate >= $unrackedId").size()
+        
+        def totalSourceAvail = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on"+
+        												" (t.asset_entity_id = e.asset_entity_id) where t.state_to >= $releasedId and e.move_bundle_id = ${moveBundleInstance.id}"+
+        												" group by e.asset_entity_id HAVING maxstate < $unrackedId ").size() 
+        
+        def totalReracked = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
+														"(t.asset_entity_id = e.asset_entity_id) where e.move_bundle_id = ${moveBundleInstance.id} "+
+														"group by e.asset_entity_id HAVING maxstate >= $rerackedId ").size()
+        
+        def totalTargetAvail = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
+        											" (t.asset_entity_id = e.asset_entity_id) where t.state_to >= $stagedId and e.move_bundle_id = ${moveBundleInstance.id} "+
+        											" group by e.asset_entity_id HAVING maxstate < $rerackedId ").size() 
+        	userPreferenceService.loadPreferences("SUPER_CONSOLE_REFRESH")
         def timeToRefresh = getSession().getAttribute("SUPER_CONSOLE_REFRESH")
-        return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams, assetsList:assetsList, moveBundleInstance:moveBundleInstance, supportTeam:supportTeam,totalUnracked:totalUnracked , totalSourceAvail:totalSourceAvail, totalTargetAvail:totalTargetAvail, totalReracked:totalReracked , totalAsset:totalAsset.size(), timeToRefresh : timeToRefresh ? timeToRefresh.SUPER_CONSOLE_REFRESH : "never"]
+        return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams, 
+                assetsList:assetsList, moveBundleInstance:moveBundleInstance, 
+                supportTeam:supportTeam, totalUnracked:totalUnracked, totalSourceAvail:totalSourceAvail, 
+                totalTargetAvail:totalTargetAvail, totalReracked:totalReracked, totalAsset:totalAsset.size(), 
+                timeToRefresh : timeToRefresh ? timeToRefresh.SUPER_CONSOLE_REFRESH : "never"]
         } else {
-        flash.message = "Please create bundle to view Console"	
-        redirect(controller:'project',action:'show',params:["id":params.projectId])
+	        flash.message = "Please create bundle to view Console"	
+	        redirect(controller:'project',action:'show',params:["id":params.projectId])
         }
     }
-    /*
-     * 	 Get asset details part in dashboard page
-     */
+    /*--------------------------------------------
+     * 	Get asset details part in dashboard page
+     * 	@author: 	Lokanath Reddy
+     * 	@param :	AssetEntity
+     * 	@return:	AssetEntity Details , Recent Transitions and MoveBundle Teams
+     *-------------------------------------------*/
     def assetDetails = {
         def assetId = params.assetId
         def assetStatusDetails = []
@@ -948,16 +997,16 @@ class AssetEntityController {
 	        if(projectAssetMap){
 	        	currentState = projectAssetMap.currentStateId
 	        }
-	        def state = stateEngineService.getState("STD_PROCESS",currentState)
+	        def state = stateEngineService.getState( "STD_PROCESS", currentState )
 	        def validStates
 	        if(state){
-	        	validStates= stateEngineService.getTasks("STD_PROCESS","SUPERVISOR", state)
+	        	validStates= stateEngineService.getTasks( "STD_PROCESS", "SUPERVISOR", state )
 	        } else {
 	        	validStates = ["Ready"] 
 	        	//stateEngineService.getTasks("STD_PROCESS","TASK_NAME")
 	        }
 	        validStates.each{
-	        	stateIdList<<Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
+	        	stateIdList<<stateEngineService.getStateIdAsInt( "STD_PROCESS", it )
 	        }
 	        stateIdList.sort().each{
 	        	statesList<<[id:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
@@ -981,11 +1030,18 @@ class AssetEntityController {
 	        }
 	        def sourceTeams = ProjectTeam.findAll(sourceQuery.toString())
 	        def targetTeams = ProjectTeam.findAll(targetQuery.toString())
-	        assetStatusDetails<<[ 'assetDetails':map, 'statesList':statesList, 'recentChanges':recentChanges, 'sourceTeams':sourceTeams,'targetTeams':targetTeams ]
+	        assetStatusDetails<<[ 'assetDetails':map, 'statesList':statesList, 
+	                              'recentChanges':recentChanges, 'sourceTeams':sourceTeams,
+	                              'targetTeams':targetTeams ]
         }
         render assetStatusDetails as JSON
         		
     }
+    /*----------------------------------
+     * @author: Lokanath Redy
+     * @param : fromState and toState
+     * @return: boolean value to validate comment field
+     *---------------------------------*/
     def getFlag = {
     	def toState = params.toState
     	def fromState = params.fromState
@@ -996,9 +1052,12 @@ class AssetEntityController {
     	}
     	render status as JSON
     }
-    /*
+    /*-------------------------------------------------------------------
      *  Used to create Transaction for Supervisor 
-     */
+     * @author: Lokanath Reddy
+     * @param : AssetEntity id, priority,assigned to value and from and to States
+     * @return: AssetEntity details and AssetTransition details
+     *------------------------------------------------------------------*/
     def createTransition = {
     	def assetId = params.asset
     	def assetEntity = AssetEntity.get(assetId)
@@ -1037,7 +1096,7 @@ class AssetEntityController {
 				    stateIdList.sort().each{
 				    	statesList<<[id:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
 				    }
-				    statusLabel = stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",status)))
+				    statusLabel = stateEngineService.getStateLabel("STD_PROCESS",stateEngineService.getStateIdAsInt("STD_PROCESS",status))
 		    	} else {
 		        	statusLabel = stateEngineService.getStateLabel("STD_PROCESS",currentStateId)
 		        	stateIdList = getStates(stateEngineService.getState("STD_PROCESS",currentStateId))
@@ -1102,10 +1161,16 @@ class AssetEntityController {
 	        }
 	        def sourceTeams = ProjectTeam.findAll(sourceQuery.toString())
 	        def targetTeams = ProjectTeam.findAll(targetQuery.toString())
-		    assetList <<['assetEntity':assetEntity, 'sourceTeam':sourceTeam, 'targetTeam':targetTeam, 'sourceTeams':sourceTeams,'targetTeams':targetTeams, 'statesList':statesList,'status':statusLabel,'cssClass':cssClass,'checkVal':check ]
+		    assetList <<['assetEntity':assetEntity, 'sourceTeam':sourceTeam, 'targetTeam':targetTeam, 
+		                 'sourceTeams':sourceTeams,'targetTeams':targetTeams, 'statesList':statesList,
+		                 'status':statusLabel,'cssClass':cssClass,'checkVal':check ]
     	}
     	render assetList as JSON
     }
+    /*-----------------------------------------
+     *@param : state value
+     *@return: List of valid stated for param state
+     *----------------------------------------*/
     def getStates(def state){
         def stateIdList = []
         def validStates
@@ -1116,10 +1181,16 @@ class AssetEntityController {
             //stateEngineService.getTasks("STD_PROCESS","TASK_NAME")
         }
         validStates.each{
-		 	stateIdList<<Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
+		 	stateIdList<<stateEngineService.getStateIdAsInt("STD_PROCESS",it)
         }
         return stateIdList
     }
+    /*---------------------------------------------
+     * Set browser refresh time interval as user preference
+     * @author : Lokanath Reddy
+     * @param : time interval
+     * @return : time interval
+     *-------------------------------------------*/
     def setTimePreference = {
     	def timer = params.timer
     	def refreshTime =[]
@@ -1130,7 +1201,11 @@ class AssetEntityController {
     	refreshTime <<[refreshTime:timeToRefresh] 
     	render refreshTime as JSON
     }
-    
+    /*-------------------------------------------
+     * @author : Bhuvaneshwari
+     * @param  : List of assets selected for transition
+     * @return : Common tasks for selected assets
+     *-------------------------------------------*/
     //  To get unique list of task for list of assets through ajax
 	def getList = {
     		
@@ -1159,7 +1234,7 @@ class AssetEntityController {
         		common.retainAll((HashSet)(taskList[i].task))
         	}
            	common.each{
-           		tempTaskList << Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
+           		tempTaskList << stateEngineService.getStateIdAsInt("STD_PROCESS",it)
        		}
        		tempTaskList.sort().each{
        			sortList << [state:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
@@ -1170,7 +1245,12 @@ class AssetEntityController {
     		
     }
 	
-    // To change the status for an asset
+    /*-------------------------------------------
+     *To change the status for an asset
+     *	@author : Bhuvaneshwari
+     * 	@param  : List of assets selected for transition and tostate to change the state
+     * 	@return : Once transition is completed it will redirect to dashboardView method
+     * -------------------------------------------*/
 	def changeStatus = {
         def assetId = params.assetVal
         def assetEnt = AssetEntity.findAll("from AssetEntity ae where ae.id in ($assetId)")
@@ -1198,8 +1278,9 @@ class AssetEntityController {
     }
     
     /* --------------------------------------
-     * 	Author : Lokanada Reddy
-     *	Action will return imported data for progress bar
+     * 	@author : Lokanada Reddy
+     * 	@param : batch id and total assts from session 
+     *	@return imported data for progress bar
      * -------------------------------------- */
     def getProgress = {
 		def importedData
