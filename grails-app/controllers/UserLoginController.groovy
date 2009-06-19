@@ -99,7 +99,11 @@ class UserLoginController {
 		def personInstance
 		if(personId != null ){
 			personInstance = Person.findById( personId )
+			if(personInstance.lastName == null){
+				personInstance.lastName = ""
+			}
 		}
+		
         def userLoginInstance = new UserLogin()
         userLoginInstance.properties = params
         return ['userLoginInstance':userLoginInstance, personInstance:personInstance, companyId:companyId ]

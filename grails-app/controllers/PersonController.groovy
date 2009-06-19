@@ -40,10 +40,32 @@ class PersonController {
     }
 
     def delete = {
-        def personInstance = Person.get( params.id )
+			
+		def personInstance = Person.get( params.id )
         def companyId = params.companyId
-        if(personInstance) {
+        if ( personInstance ) {
+	        def partyInstance = Party.findById( personInstance.id )      
+	        def partyRelnInst = PartyRelationship.findAll("from PartyRelationship pr where pr.partyIdTo = ${personInstance.id}")         
+	        def partyRole = PartyRole.findAll("from PartyRole p where p.party =${partyInstance.id}")      
+	        def loginInst = UserLogin.find("from UserLogin ul where ul.person = ${personInstance.id}")
+	        if ( loginInst ) {
+		        def preferenceInst = UserPreference.findAll("from UserPreference up where up.userLogin = ${loginInst.id}")
+		        preferenceInst.each{
+		          it.delete()
+		          }
+		        loginInst.delete()
+	        }       
+		    partyRelnInst.each{
+		   	it.delete()
+		    }
+		    partyRole.each{
+		    it.delete()
+		    }      
+	      	partyInstance.delete()      
             personInstance.delete()
+        	if( personInstance.lastName == null ) {
+        		personInstance.lastName = ""
+        	}
             flash.message = "Person ${personInstance} deleted"
             redirect( action:list, params:[ id:companyId ] )
         }
@@ -180,6 +202,9 @@ class PersonController {
     	personInstance.lastUpdated = new Date()
     	if(personInstance) {
     		personInstance.properties = params
+    		if(personInstance.lastName == null){
+				personInstance.lastName = ""	
+			}
             if ( !personInstance.hasErrors() && personInstance.save() ) {
 	            def projectParty = Project.findById(projectId)
 	            if(companyId != ""){
@@ -205,7 +230,7 @@ class PersonController {
 	def projectStaff = {
 		def projectId = params.projectId
 		def submit = params.submit
-		def projectStaff = partyRelationshipService.getProjectStaff( projectId )
+		def projectStaff = partyRelationshipService.getProjectStaff( projectId )	
 		def companiesStaff = partyRelationshipService.getProjectCompaniesStaff( projectId )
 		def projectCompanies = partyRelationshipService.getProjectCompanies( projectId )
 		return [ projectStaff:projectStaff, companiesStaff:companiesStaff, projectCompanies:projectCompanies, projectId:projectId, submit:submit ]
@@ -228,6 +253,7 @@ class PersonController {
 	 */
 	def savePerson = {
 		def personInstance = new Person( params )
+		
 		personInstance.dateCreated = new Date()
 		def companyId = params.company
 		def projectId = params.projectId
@@ -241,6 +267,9 @@ class PersonController {
 			if ( projectId != null && projectId != "" && roleType != null) {
 				def projectParty = Party.findById( projectId )
 				def partyRelationship = partyRelationshipService.savePartyRelationship( "PROJ_STAFF", projectParty, "PROJECT", personInstance, roleType )
+			}
+			if(personInstance.lastName == null){
+				personInstance.lastName = ""	
 			}
 			flash.message = "Person ${personInstance} created"
 			redirect( action:'projectStaff', params:[ projectId:projectId, submit:'Add' ] )
