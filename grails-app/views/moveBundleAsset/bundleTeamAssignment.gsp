@@ -68,16 +68,11 @@
          
          function assetCartAssign(cart, asset)
          {
-         	if (!IsNumeric(cart.value)) 
-   			{ 
-      			alert('Please enter only numbers in the Cart field') 
-      			return false; 
-      		} else {
+         	
          		var cartNumber = cart.value
            		var asset = asset
            		var bundleId = document.getElementById('id').value
          		${remoteFunction(action:'assetCartAssign', params:'\'cartNumber=\' +cartNumber+\'&asset=\'+asset+\'&bundleId=\'+bundleId', onComplete:"cartAssignComplete(e);")}
-         	}	
          	
          }
          function assetShelfAssign(shelf, asset)

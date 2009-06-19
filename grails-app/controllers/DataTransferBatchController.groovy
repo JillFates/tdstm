@@ -6,16 +6,24 @@ class DataTransferBatchController {
 
     // the delete, save and update actions only accept POST requests
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
-    /*
-     *   Return list of dataTransferBatchs for associated Project and Mode = Import
-     */
+    /* --------------------------------------------------------------------------
+     * Return list of dataTransferBatchs for associated Project and Mode = Import
+     * @param projectId
+     * @author Lokanath
+     * @return dataTransferBatchList
+     * -------------------------------------------------------------------------- */
     def list = {
     		def projectId = params.projectId
     		def projectInstance = Project.findById( projectId )
     		def dataTransferBatchList =  DataTransferBatch.findAllByProjectAndTransferMode( projectInstance, "I" );
             return [ dataTransferBatchList:dataTransferBatchList, projectId:projectId ]
     }
-    //Process DataTransfervalues Corresponding to DataTransferBatch
+    /* -----------------------------------------------------------------------
+     * Process DataTransfervalues Corresponding to DataTransferBatch
+     * @param dataTransferBach
+     * @author Lokanath
+     * @return process the dataTransferBatch and return to datatransferBatchList
+     * -------------------------------------------------------------------------    */
     def process = { 
     	DataTransferBatch.withTransaction { status ->
     	def projectId = params.projectId
@@ -40,7 +48,24 @@ class DataTransferBatchController {
 			    		assetEntity.project = projectInstance
 			    		dtvList.each {
 			    			def attribName = it.eavAttribute.attributeCode
-			    			if ( attribName == "moveBundle" ) {
+			    			//sourceteam and targetTeam assignment to assetEntity
+			    			if( attribName == "sourceTeam" || attribName == "targetTeam" ) {
+			    				def bundleInstance = assetEntity.moveBundle 
+			    				def teamInstance
+			    				if( it.correctedValue && bundleInstance ) {
+			    					teamInstance = projectTeam.findByTeamCodeAndMoveBundle(it.correctedValue,bundleInstance)
+			    					if(!teamInstance){
+			    						teamInstance = new ProjectTeam(teamCode:it.correctedValue,moveBundle:bundleInstance).save()
+			    					}
+			    				} else if( it.importValue && bundleInstance ) {
+			    					teamInstance = ProjectTeam.findByTeamCodeAndMoveBundle(it.importValue,bundleInstance)
+			    					if(!teamInstance){
+			    						teamInstance = new ProjectTeam( name:it.importValue, teamCode:it.importValue, 
+			    														moveBundle:bundleInstance ).save()
+			    					}
+			    				}
+			    				assetEntity."$attribName" = teamInstance
+			    			} else if ( attribName == "moveBundle" ) {
 			    				def moveBundleInstance
 			    				/*if( it.importValue != null && it.correctedValue != null ) {
 			    					importMoveBundleInstance = MoveBundle.findByName(it.importValue)
@@ -104,7 +129,7 @@ class DataTransferBatchController {
 		    			}
 		    		}
 		    		
-		    	}
+		    }
 		    dataTransferBatch.statusCode = 'COMPLETED'
 		    dataTransferBatch.save()
 	    	}

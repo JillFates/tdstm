@@ -597,12 +597,11 @@ class MoveTechController {
      * @return boolean for indication of transitions   
      *------------------------------------------------------------------------------*/
 	def placeHold = {
-		def enterNote = params.enterNote
-		def asset = getAssetEntity ( params.search, params.user )
-        //def asset = AssetEntity.findByAssetTag(params.search)
-        def bundle = asset.moveBundle
         def principal = SecurityUtils.subject.principal
         if ( principal ) {
+        	def enterNote = params.enterNote
+    		def asset = getAssetEntity ( params.search, params.user )
+            def bundle = asset.moveBundle
             def loginUser = UserLogin.findByUsername ( principal )
             def team
             if ( params.location == 's' ) {

@@ -528,7 +528,7 @@ class MoveBundleAssetController {
 	    if( cart != null && cart != "")
 	    {
 	    	def assetEntityInstance = AssetEntity.findById( asset )
-	    	def moveBundleAsset = AssetEntity.executeUpdate(" update AssetEntity ma set ma.cart = $cart where ma.moveBundle = $bundleInstance.id and  ma.id = $assetEntityInstance.id ")
+	    	def moveBundleAsset = AssetEntity.executeUpdate(" update AssetEntity ma set ma.cart = :cart where ma.moveBundle = $bundleInstance.id and  ma.id = $assetEntityInstance.id ",[cart:cart])
 	    }
 		def cartList = AssetEntity.findAll("from AssetEntity ma where ma.moveBundle = $bundleInstance.id  group by ma.cart")
 		cartAssetCounts = assetEntityAttributeLoaderService.getCartAssetCounts(bundleId)

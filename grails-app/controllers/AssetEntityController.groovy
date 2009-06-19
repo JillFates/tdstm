@@ -27,32 +27,40 @@ class AssetEntityController {
     def index = {
 		redirect( action:list, params:params )
 	}
-	// Will return filters data to AssetEntity list page
+	/* -----------------------------------------------------
+	 * To Filter the Data on AssetEntityList Page 
+     * @author Bhuvana
+     * @param  Selected Filter Values
+     * @return Will return filters data to AssetEntity  
+     * ------------------------------------------------------ */
 	def filter = {
 		def userMax = getSession().getAttribute("MAX_ASSET_LIST")
-        	if(userMax.MAX_ASSET_LIST){
-                if(!params.max) params.max = userMax.MAX_ASSET_LIST
-            }else{
-                if(!params.max) params.max = 50
+        	if( userMax.MAX_ASSET_LIST ) {
+                if( !params.max ) params.max = userMax.MAX_ASSET_LIST
+            } else {
+                if( !params.max ) params.max = 50
             }
-        def project = Project.findById(getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ)
-        def assetEntityList = filterService.filter(params, AssetEntity)
+        def project = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
+        def assetEntityList = filterService.filter( params, AssetEntity )
         assetEntityList.each{
-            if(it.project.id == project.id){
+            if( it.project.id == project.id ) {
                 assetEntityInstanceList<<it
             }
         }
         try{
-            render( view:'list', model:[ assetEntityInstanceList:assetEntityInstanceList,assetEntityCount:filterService.count( params, AssetEntity ), filterParams: com.zeddware.grails.plugins.filterpane.FilterUtils.extractFilterParams(params), params:params, projectId:project.id,maxVal : params.max ] )
+            render( view:'list', model:[ assetEntityInstanceList: assetEntityInstanceList, 
+                                         assetEntityCount: filterService.count( params, AssetEntity ), 
+                                         filterParams: com.zeddware.grails.plugins.filterpane.FilterUtils.extractFilterParams(params), 
+                                         params:params, projectId:project.id,maxVal : params.max ] )
         } catch(Exception ex){
             redirect( controller:"assetEntity", action:"list" )
         }
-			
     }
-    //upload , export
-    /*
-     * render import export form
-     */
+    /* -------------------------------------------------------
+     * To import the asset form data
+     * @param project
+     * @ render import export form
+     * --------------------------------------------------------*/
     def assetImport = {
         //get id of selected project from project view
         def projectId = params.projectId
@@ -66,7 +74,6 @@ class AssetEntityController {
         }
         def dataTransferSetImport = DataTransferSet.findAll(" from DataTransferSet dts where dts.transferMode IN ('B','I') ")
         def dataTransferSetExport = DataTransferSet.findAll(" from DataTransferSet dts where dts.transferMode IN ('B','E') ")
-        
         if( projectId == null ) {
             //get project id from session
             def currProj = getSession().getAttribute( "CURR_PROJ" )
@@ -74,14 +81,10 @@ class AssetEntityController {
             projectInstance = Project.findById( projectId )
             moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
             if( projectId == null ) {
-
                 flash.message = " No Projects are Associated, Please select Project. "
                 redirect( controller:"project",action:"list" )
-
             }
-            
         }   	
-    	
     	if ( projectId != null ) {
             project = Project.findById(projectId)
     		assetsByProject = AssetEntity.findAllByProject(project)
@@ -89,22 +92,31 @@ class AssetEntityController {
     	def	dataTransferBatchs = DataTransferBatch.findAllByProject(project).size()
     	session.setAttribute("BATCH_ID",0) 
 		session.setAttribute("TOTAL_ASSETS",0)
-		if(params.message){
+		if( params.message ) {
 			flash.message = params.message
 		}
-    	
-        render( view:"importExport", model : [ assetsByProject: assetsByProject, projectId: projectId, moveBundleInstanceList: moveBundleInstanceList, dataTransferSetImport: dataTransferSetImport, dataTransferSetExport: dataTransferSetExport, dataTransferBatchs: dataTransferBatchs ] )
+        render( view:"importExport", model : [ assetsByProject: assetsByProject, 
+                                               projectId: projectId, 
+                                               moveBundleInstanceList: moveBundleInstanceList, 
+                                               dataTransferSetImport: dataTransferSetImport, 
+                                               dataTransferSetExport: dataTransferSetExport, 
+                                               dataTransferBatchs: dataTransferBatchs ] )
     }
-    /*
+    /* -----------------------------------------------------
+     * To Export the assets
+     * @author Mallikarjun 
      * render export form
-     */
+     *------------------------------------------------------*/
     def assetExport = {
         render( view:"assetExport" )
     }
 
-    /*
-     * upload excel file into Asset table
-     */
+    /* ---------------------------------------------------
+     * To upload the Data from the ExcelSheet
+     * @author Mallikarjun
+     * @param DataTransferSet,Project,Excel Sheet 
+     * @return currentPage( assetImport Page)
+     * --------------------------------------------------- */
     def upload = {
         //get project Name
         def projectId
@@ -115,30 +127,22 @@ class AssetEntityController {
         try {
             projectId = params["projectIdImport"]
             if ( projectId == null || projectId == "" ) {
-
                 flash.message = "Project Name is required"
                 redirect( controller:"asset", action:"assetImport" )
 	            return;    
             }
-
             project = Project.findById( projectId )
-	            
-
         }catch ( Exception ex ) {
-	            
             flash.message = " Project Name is required. "
             redirect( controller:"asset", action:"assetImport" )
             return;
         }
-
         // get File
         MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
         CommonsMultipartFile file = ( CommonsMultipartFile ) mpr.getFile("file")
-
         // create workbook
         def workbook
         def sheet
-	        
         def sheetColumnNames = [:]
         def sheetNameMap = [:]
         def list = new ArrayList()
@@ -292,11 +296,12 @@ class AssetEntityController {
             return;
         }
     }
-    /*
+    /*------------------------------------------------------------
      * download data form Asset Entity table into Excel file
-     */
+     * @author Mallikarjun
+     * @param Datatransferset,Project,Movebundle
+     *------------------------------------------------------------*/
     def export = {
-
         //get project Id
         def projectId = params[ "projectIdExport" ]
         def dataTransferSet = params.dataTransferSet
@@ -304,9 +309,8 @@ class AssetEntityController {
         def bundleList = new StringBuffer()
         def bundleSize = bundle.size()
         for ( int i=0; i< bundleSize ; i++ ) {
-	        if(bundle[i] == ""){
-	        	
-	        }else if( i != bundleSize - 1) {
+	        if( bundle[i] == "" ) {
+	        } else if( i != bundleSize - 1) {
                 bundleList.append( bundle[i] + "," )
             } else {
                 bundleList.append( bundle[i] )
@@ -315,13 +319,11 @@ class AssetEntityController {
         def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
         def dataTransferAttributeMap = DataTransferAttributeMap.findAllByDataTransferSet( dataTransferSetInstance )
         def project = Project.findById( projectId )
-	        
         if ( projectId == null || projectId == "" ) {
             flash.message = " Project Name is required. "
             redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
             return;
         }
-	        
         def asset
         def assetEntityInstance
         if(bundle[0] == "" ) {
@@ -329,7 +331,6 @@ class AssetEntityController {
         } else {
             asset = AssetEntity.findAll( "from AssetEntity m where m.project = project and m.moveBundle in ( $bundleList )" )
         }
-	        
         //get template Excel
         def workbook
         def book
@@ -347,23 +348,19 @@ class AssetEntityController {
             def templateFilePath = appUrl + filenametoSet
             def url = new URL( templateFilePath )
             HttpURLConnection con = url.openConnection()*/
-            
             def filenametoSet = dataTransferSetInstance.templateFilename
             File file =  ApplicationHolder.application.parentContext.getResource(filenametoSet).getFile()
             // Going to use temporary file because we were getting out of memory errors constantly on staging server
             WorkbookSettings wbSetting = new WorkbookSettings()
             wbSetting.setUseTemporaryFileDuringWrite(true)
             workbook = Workbook.getWorkbook( file, wbSetting )
-	            
             //set MIME TYPE as Excel
             filenametoSet = filenametoSet.split("/")
             response.setContentType( "application/vnd.ms-excel" )
             response.setHeader( "Content-Disposition", "attachment; filename= ${filenametoSet[2]}" )
-
             //create workbook and sheet
             book = Workbook.createWorkbook( response.getOutputStream(), workbook )
             def sheet
-	            
             //check for column
             def map = [:]
             def sheetColumnNames = [:]
@@ -372,7 +369,6 @@ class AssetEntityController {
             def dataTransferAttributeMapSheetName
             //get columnNames in to map
             dataTransferAttributeMap.eachWithIndex { item, pos ->
-               
             	map.put( item.columnName, null )
             	columnNameList.add(item.columnName)
                 sheetNameMap.put( "sheetName", (item.sheetName).trim() )
@@ -381,15 +377,12 @@ class AssetEntityController {
             def flag = 0
             def sheetNamesLength = sheetNames.length
             for( int i=0;  i < sheetNamesLength; i++ ) {
-	            
                 if ( sheetNameMap.containsValue( sheetNames[i].trim()) ) {
                     flag = 1
                     sheet = book.getSheet( sheetNames[i] )
                 }
-	            	
             }
             if( flag == 0 ) {
-	            	
                 flash.message = " Sheet not found, Please check it."
                 redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
 	            return;    
@@ -404,10 +397,8 @@ class AssetEntityController {
                 }
                 //calling method to check for Header
                 def checkCol = checkHeader( columnNameList, sheetColumnNames )
-	                
                 // Statement to check Headers if header are not found it will return Error message
                 if ( checkCol == false ) {
-	                	
                     missingHeader = missingHeader.replaceFirst(",","")
                     flash.message = " Column Headers : ${missingHeader} not found, Please check it."
                     redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
@@ -428,17 +419,19 @@ class AssetEntityController {
 	                                                        	
                             if ( asset[r-1].(dataTransferAttributeMap.eavAttribute.attributeCode[coll]) == null ) {
                                 addContentToSheet = new Label( map[columnNameList.get(coll)], r, "" )
-                            } else {
-                                addContentToSheet = new Label( map[columnNameList.get(coll)], r, String.valueOf(asset[r-1].(dataTransferAttributeMap.eavAttribute.attributeCode[coll])) )
+                            } 
+                            else {
+                            	//if attributeCode is sourceTeam or TargetTeam export the teamCode 
+                            	if( dataTransferAttributeMap.eavAttribute.attributeCode[coll] == "sourceTeam" || dataTransferAttributeMap.eavAttribute.attributeCode[coll] == "targetTeam" ) {
+                            		addContentToSheet = new Label( map[columnNameList.get(coll)], r, String.valueOf(asset[r-1].(dataTransferAttributeMap.eavAttribute.attributeCode[coll]).teamCode) )
+                            	}else {
+                            		addContentToSheet = new Label( map[columnNameList.get(coll)], r, String.valueOf(asset[r-1].(dataTransferAttributeMap.eavAttribute.attributeCode[coll])) )
+                            	}
                             }
                             sheet.addCell( addContentToSheet )
-	                            
-	                            
                         }
                     } 
-                    
                     //update data from Asset Comment table to EXCEL
-                    
                     for( int sl=0;  sl < sheetNamesLength; sl++ ) {
                     	def commentIt = new ArrayList()
                         if(sheetNames[sl] == "Comments"){
@@ -486,11 +479,15 @@ class AssetEntityController {
             return;
         }
     }
-	// check the sheet headers and return boolean value
-    def checkHeader( def list, def sheetColumnNames  ){       
+	/* -------------------------------------------------------
+	 * To check the sheet headers
+	 * @param attributeList, SheetColumnNames
+	 * @author Mallikarjun
+	 * @return bollenValue 
+	 *------------------------------------------------------- */  
+    def checkHeader( def list, def sheetColumnNames  ) {       
         def listSize = list.size()
         for ( int coll = 0; coll < listSize; coll++ ) {
-            
             if( sheetColumnNames.containsKey( list[coll] ) ) {
             	//Nonthing to perform.
             } else {
@@ -498,18 +495,18 @@ class AssetEntityController {
             }
         }
     	if( missingHeader == "" ) {
-    		
     		return true
-
     	} else {
-
     		return false
     	}
     }
-
     // the delete, save and update actions only accept POST requests
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
-
+    /*------------------------------------------
+     * To get the assetEntity List 
+     * @param project
+     * @return assetList
+     *-------------------------------------------*/
     def list = {
     	
         if(params.rowVal){
@@ -532,10 +529,13 @@ class AssetEntityController {
         def assetEntityInstanceList = AssetEntity.findAllByProject( project, params ) 
         [ assetEntityInstanceList: assetEntityInstanceList, projectId: projectId,maxVal : params.max ]
     }   
-
+    /* ----------------------------------------
+     * delete assetEntity
+     * @param assetEntityId
+     * @return assetEntityList
+     * --------------------------------------- */
     def delete = {
         def assetEntityInstance = AssetEntity.get( params.id )
-       
         def projectId = params.projectId
         if(assetEntityInstance) {
             ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${params.id}")
@@ -557,7 +557,12 @@ class AssetEntityController {
         }
     }
     
-    // method for assets to remove from project
+   /*--------------------------------------------------
+    * To remove the asseet from project
+    * @param assetEntityId
+    * @author Mallikarjun
+    * @return assetList page
+    *-------------------------------------------------*/
     def remove = {
         def assetEntityInstance = AssetEntity.get( params.id )
         def projectId = params.projectId
@@ -577,7 +582,12 @@ class AssetEntityController {
             redirect(action:list, params:[projectId:projectId])
         }
     }
-    
+    /* -------------------------------------------
+     * To create New assetEntity
+     * @param assetEntity Attribute
+     * @author Mallikarjun
+     * @return assetList Page
+     * ------------------------------------------ */
     def save = {
         def assetEntityInstance = new AssetEntity(params)
         def projectId = params.projectId
@@ -593,44 +603,49 @@ class AssetEntityController {
             redirect( action:list, params:[projectId: projectId] )
         }
     }
-    
-    //remote link for asset entity dialog.
+    /*--------------------------------------------------------
+     * remote link for asset entity dialog.
+     *@param assetEntityId
+     *@author Mallikarjun
+     *@return retun to assetEntity to assetEntity Dialog
+     *--------------------------------------------------------- */
     def editShow = {
-        
         def items = []
         def assetEntityInstance = AssetEntity.get( params.id )
-        
         /*if( assetEntityInstance.assetType != null ){
         items = [id:assetEntityInstance.id, model: assetEntityInstance.model, sourceLocation: assetEntityInstance.sourceLocation, targetLocation: assetEntityInstance.targetLocation, sourceRack: assetEntityInstance.sourceRack, targetRack: assetEntityInstance.targetRack, sourceRackPosition: assetEntityInstance.sourceRackPosition, targetRackPosition: assetEntityInstance.targetRackPosition, usize: assetEntityInstance.usize, manufacturer: assetEntityInstance.manufacturer, fiberCabinet: assetEntityInstance.fiberCabinet, hbaPort: assetEntityInstance.hbaPort, hinfo: assetEntityInstance.hinfo, ipAddress: assetEntityInstance.ipAddress, kvmDevice: assetEntityInstance.kvmDevice, kvmPort: assetEntityInstance.kvmPort, newOrOld: assetEntityInstance.newOrOld, nicPort: assetEntityInstance.nicPort, powerPort: assetEntityInstance.powerPort, remoteMgmtPort: assetEntityInstance.remoteMgmtPort, truck: assetEntityInstance.truck, project:assetEntityInstance.project.name, projectId:assetEntityInstance.project.id, assetType:assetEntityInstance.assetType, assetTypeId:assetEntityInstance.assetType.id, assetTag:assetEntityInstance.assetTag, assetName:assetEntityInstance.assetName, serialNumber:assetEntityInstance.serialNumber, , application:assetEntityInstance.application ]
-       
         } else {
         items = [id:assetEntityInstance.id, model: assetEntityInstance.model, sourceLocation: assetEntityInstance.sourceLocation, targetLocation: assetEntityInstance.targetLocation, sourceRack: assetEntityInstance.sourceRack, targetRack: assetEntityInstance.targetRack, sourceRackPosition: assetEntityInstance.sourceRackPosition, targetRackPosition: assetEntityInstance.targetRackPosition, usize: assetEntityInstance.usize, manufacturer: assetEntityInstance.manufacturer, fiberCabinet: assetEntityInstance.fiberCabinet, hbaPort: assetEntityInstance.hbaPort, hinfo: assetEntityInstance.hinfo, ipAddress: assetEntityInstance.ipAddress, kvmDevice: assetEntityInstance.kvmDevice, kvmPort: assetEntityInstance.kvmPort, newOrOld: assetEntityInstance.newOrOld, nicPort: assetEntityInstance.nicPort, powerPort: assetEntityInstance.powerPort, remoteMgmtPort: assetEntityInstance.remoteMgmtPort, truck: assetEntityInstance.truck, project:assetEntityInstance.project.name, projectId:assetEntityInstance.project.id, assetTag:assetEntityInstance.assetTag, assetName:assetEntityInstance.assetName, serialNumber:assetEntityInstance.serialNumber, application:assetEntityInstance.application ]
         }*/
         def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
-        
         entityAttributeInstance.each{
         	def attributeOptions = EavAttributeOption.findAllByAttribute( it.attribute )
     		def options = []
     		attributeOptions.each{option ->
     			options<<[option:option.value]
     		}
-        	if( it.attribute.attributeCode != "moveBundle"){
-        		items << [label:it.attribute.frontendLabel, attributeCode:it.attribute.attributeCode, frontendInput:it.attribute.frontendInput, options : options, value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode) : ""]
+        	if( it.attribute.attributeCode != "moveBundle" && it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam" ){
+        		items << [label:it.attribute.frontendLabel, attributeCode:it.attribute.attributeCode, 
+        		          frontendInput:it.attribute.frontendInput, 
+        		          options : options, 
+        		          value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode) : ""]
         	}
         }
         render items as JSON
-        
     }
-    
-    //update ajax overlay
+    /*--------------------------------------------------------
+     * To update assetEntity ajax overlay
+     * @param assetEntity Attributes
+     * @author Mallikarjun
+     * @return assetEnntiAttribute JSON oObject 
+     * ----------------------------------------------------------*/
     def updateAssetEntity = {
-    		 
     	def assetItems = []
     	def assetEntityParams = params.assetEntityParams
-    	if(assetEntityParams){
+    	if(assetEntityParams) {
 	    	def assetEntityParamsList = assetEntityParams.split(",")
 	    	def map = new HashMap()
-	    	assetEntityParamsList.each{
+	    	assetEntityParamsList.each {
 	    		def assetParam = it.split(":")
 	    		if(assetParam.length > 1){
 	    			map.put(assetParam[0],assetParam[1] )
@@ -642,26 +657,28 @@ class AssetEntityController {
 	        if(assetEntityInstance) {
 	        	assetEntityInstance.properties = map
 	            if(!assetEntityInstance.hasErrors() && assetEntityInstance.save()) {
-	            	
 	            	def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
 	            	entityAttributeInstance.each{
-	            		
-	                	if( it.attribute.attributeCode != "moveBundle"){
-	                		assetItems << [id:assetEntityInstance.id, attributeCode:it.attribute.attributeCode, frontendInput:it.attribute.frontendInput, value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode) : ""]
+	                	if( it.attribute.attributeCode != "moveBundle" && it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam" ){
+	                		assetItems << [id:assetEntityInstance.id, attributeCode:it.attribute.attributeCode, 
+	                		               frontendInput:it.attribute.frontendInput, 
+	                		               value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode) : ""]
 	                	}
 	                }
 	            }
 	        }
     	}
         render assetItems as JSON
-
     }
-    
+    /*To get the  Attributes
+     *@param attributeSet
+     *@author Lokanath
+     *@return attributes as a JSON Object 
+     */
     def getAttributes = {
     	def attributeSetId = params.attribSet
         def items = []
     	def entityAttributeInstance = []
-    	
         if(attributeSetId != null &&  attributeSetId != ""){
     		def attributeSetInstance = EavAttributeSet.findById( attributeSetId )
     		//entityAttributeInstance =  EavEntityAttribute.findAllByEavAttributeSetOrderBySortOrder( attributeSetInstance )
@@ -673,32 +690,41 @@ class AssetEntityController {
     		attributeOptions.each{option ->
     			options<<[option:option.value]
     		}
-    		if( it.attribute.attributeCode != "moveBundle"){
-    			items<<[ label:it.attribute.frontendLabel, attributeCode:it.attribute.attributeCode, frontendInput:it.attribute.frontendInput, options : options ]
+    		if( it.attribute.attributeCode != "moveBundle" && it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam"){
+    			items<<[ label:it.attribute.frontendLabel, attributeCode:it.attribute.attributeCode, 
+    			         frontendInput:it.attribute.frontendInput, options : options ]
     		}
     	}
     	render items as JSON
     }
+    /* --------------------------------------------------
+     * To get the  asset Attributes
+     * @param attributeSet
+     * @author Lokanath
+     * @return attributes as a JSON Object
+     * -----------------------------------------------------*/
     def getAssetAttributes = {
     	def assetId = params.assetId
         def items = []
     	def entityAttributeInstance = []
-    	
         if(assetId != null &&  assetId != ""){
     		def assetEntity = AssetEntity.findById( assetId )
     		//entityAttributeInstance =  EavEntityAttribute.findAllByEavAttributeSetOrderBySortOrder( attributeSetInstance )
     		entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntity.attributeSet.id order by eav.sortOrder ")
         }
     	entityAttributeInstance.each{
-    		if( it.attribute.attributeCode != "moveBundle"){
+    		if( it.attribute.attributeCode != "moveBundle" && it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam"){
     			items<<[ attributeCode:it.attribute.attributeCode, frontendInput:it.attribute.frontendInput ]
     		}
     	}
     	render items as JSON
     }
-    /*
-     *   will return data for auto complete fields
-     */
+    /* ----------------------------------------------------------
+     * will return data for auto complete fields
+     * @param autocomplete param
+     * @author Lokanath
+     * @return autoCompletefield data as JSON
+     *-----------------------------------------------------------*/
     def getAutoCompleteDate = {
     	def autoCompAttribs = params.autoCompParams
     	def data = []
@@ -714,9 +740,12 @@ class AssetEntityController {
     	}
     	render data as JSON
     }
-    /* 
+    /* ------------------------------------------------------------
      * get comments for selected asset entity
-     */
+     * @param assetEntity
+     * @author Lokanath
+     * @return commentList as JSON
+     *-------------------------------------------------------------*/
     def listComments = {
         def assetEntityInstance = AssetEntity.get( params.id )
         def assetCommentsInstance = AssetComment.findAllByAssetEntity( assetEntityInstance )
@@ -726,9 +755,12 @@ class AssetEntityController {
         }
         render assetCommentsList as JSON
     }
-    /*
-     *  To save the Comment record 
-     */
+    /* ----------------------------------------------------------------
+     * To save the Comment record
+     * @param assetComment
+     * @author Lokanath
+     * @return assetComments
+     * -----------------------------------------------------------------*/
     def saveComment = {
     	def assetComments = []
     	def assetCommentInstance = new AssetComment(params)
@@ -739,16 +771,18 @@ class AssetEntityController {
             assetCommentInstance.resolvedBy = loginUser.person
             assetCommentInstance.dateResolved = new Date()
         }
-    		 
     	if(!assetCommentInstance.hasErrors() && assetCommentInstance.save()) {
     		render assetCommentInstance as JSON
         } else {
         	render assetComments as JSON
         }
     }
-    /*
-     *  return the commet record
-     */
+    /* ------------------------------------------------------------------------
+     * return the commet record
+     * @param assetCommentId
+     * @author Lokanath
+     * @return assetCommentList
+     * ---------------------------------------------------------------------- */
     def showComment = {
         def commentList = []
         def personResolvedObj
@@ -768,12 +802,17 @@ class AssetEntityController {
             dtResolved = formatter.format(assetComment.dateResolved);
         }     
     	
-        commentList<<[assetComment:assetComment,personCreateObj:personCreateObj,personResolvedObj:personResolvedObj,dtCreated:dtCreated?dtCreated:"",dtResolved:dtResolved?dtResolved:""]
+        commentList<<[ assetComment:assetComment,personCreateObj:personCreateObj,
+                      personResolvedObj:personResolvedObj,dtCreated:dtCreated?dtCreated:"",
+                      dtResolved:dtResolved?dtResolved:"" ]
         render commentList as JSON
     }
-    /*
-     *  update comments
-     */
+    /* ------------------------------------------------------------
+     * update comments
+     * @param assetCommentId
+     * @author Lokanath
+     * @return assetComment
+     * ------------------------------------------------------------ */
     def updateComment = {
         def principal = SecurityUtils.subject.principal
         def loginUser = UserLogin.findByUsername(principal)
@@ -793,8 +832,10 @@ class AssetEntityController {
         }
     	render assetCommentInstance as JSON
     }
-    /*
-     * 	 delete the comment record 
+    /* delete the comment record
+     * @param assetComment
+     * @author Lokanath
+     * @return assetCommentList 
      */
     def deleteComment = {
         def assetCommentInstance = AssetComment.get(params.id)
@@ -890,20 +931,20 @@ class AssetEntityController {
 	            }
 	            def sourceAssets = AssetEntity.findAll("from AssetEntity where moveBundle = ${moveBundleInstance.id} and sourceTeam = ${it.id} " ).size()
 	            
-	            def unrackedAssets = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
+	            def unrackedAssets = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
 	        														"(t.asset_entity_id = e.asset_entity_id) where e.move_bundle_id = ${moveBundleInstance.id} "+
 	        														"and e.source_team_id = ${it.id} group by e.asset_entity_id having maxstate >= $unrackedId").size() 
 	            
-	            def sourceAvailassets = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
+	            def sourceAvailassets = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
 	        														"(t.asset_entity_id = e.asset_entity_id) where t.state_to >= $releasedId and e.move_bundle_id = ${moveBundleInstance.id}"+
 	        														" and e.source_team_id = ${it.id} group by e.asset_entity_id HAVING maxstate < $unrackedId ").size()
 	            def targetAssets = AssetEntity.findAll("from AssetEntity  where moveBundle = ${moveBundleInstance.id} and targetTeam = ${it.id} " ).size()
 	
-	            def rerackedAssets = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
+	            def rerackedAssets = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
 																"(t.asset_entity_id = e.asset_entity_id) where e.move_bundle_id = ${moveBundleInstance.id} "+
 																"and e.target_team_id = ${it.id} group by e.asset_entity_id HAVING maxstate >= $rerackedId ").size()
 				
-	            def targetAvailAssets = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
+	            def targetAvailAssets = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
 	        														"(t.asset_entity_id = e.asset_entity_id) where t.state_to >= $stagedId and e.move_bundle_id = ${moveBundleInstance.id} "+
 	        														"and e.target_team_id = ${it.id} group by e.asset_entity_id HAVING maxstate < $rerackedId ").size()
 	            bundleTeams <<[team:it,members:member, sourceAssets:sourceAssets, 
@@ -953,19 +994,19 @@ class AssetEntityController {
 	        	}
 	        	assetsList<<[asset: it, status: stateEngineService.getStateLabel( "STD_PROCESS", curId ), cssClass : cssClass, checkVal:check]
 	        }
-	        def totalUnracked = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
+	        def totalUnracked = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
 															"(t.asset_entity_id = e.asset_entity_id) where e.move_bundle_id = ${moveBundleInstance.id} "+
 															"group by e.asset_entity_id having maxstate >= $unrackedId").size()
 	        
-	        def totalSourceAvail = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on"+
+	        def totalSourceAvail = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on"+
 	        												" (t.asset_entity_id = e.asset_entity_id) where t.state_to >= $releasedId and e.move_bundle_id = ${moveBundleInstance.id}"+
 	        												" group by e.asset_entity_id HAVING maxstate < $unrackedId ").size() 
 	        
-	        def totalReracked = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
+	        def totalReracked = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
 															"(t.asset_entity_id = e.asset_entity_id) where e.move_bundle_id = ${moveBundleInstance.id} "+
 															"group by e.asset_entity_id HAVING maxstate >= $rerackedId ").size()
 	        
-	        def totalTargetAvail = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
+	        def totalTargetAvail = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
 	        											" (t.asset_entity_id = e.asset_entity_id) where t.state_to >= $stagedId and e.move_bundle_id = ${moveBundleInstance.id} "+
 	        											" group by e.asset_entity_id HAVING maxstate < $rerackedId ").size() 
 	        	userPreferenceService.loadPreferences("SUPER_CONSOLE_REFRESH")
