@@ -377,7 +377,7 @@ class MoveTechController {
                 rdyState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Release" )
                 ipState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Unracking" )
             } else {
-                rdyState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Cleaned" )
+                rdyState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Staged" )
                 ipState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Reracking" )
             }
             

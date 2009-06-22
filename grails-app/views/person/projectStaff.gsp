@@ -84,14 +84,18 @@
 		 		
 		 		var firstName = document.createForm.firstName.value;
 		 		var roleType = document.createForm.roleType.value;
-				if( firstName != "" ){
+		 		var companyVal = document.createForm.company.value;
+		 		if( companyVal == "" ){
+		 		    alert("please select Company ");
+		 			return false;
+		 		} else if( firstName != "" ){
 					if(roleType != "null" && roleType != ""){
 						return true;
 					}else{
 						alert("please select Role ");
 						return false;
 					}
-				}else{
+				} else {
 					alert("First Name can not be Blank");
 					return false;					
 				}
@@ -101,7 +105,11 @@
 		 		
 		 		var firstName = document.editForm.firstName.value;
 		 		var roleType = document.editForm.roleType.value;
-				if( firstName != "" ){
+		 		var companyVal = document.createForm.company.value;
+		 		if( companyVal == "" ){
+		 		    alert("please select Company ");
+		 			return false;
+		 		}else if( firstName != "" ){
 					if(roleType != "null" && roleType != ""){
 						return true;
 					}else{
@@ -169,7 +177,6 @@
                                 <td valign="top" class="value ">
                                
 								<select name="company" id="companyId">
-								 <option value="" selected="selected">Please Select</option>
 	                                <g:each in="${projectCompanies}" status="i" var="company">
 	                                	<option value="${company?.partyIdTo.id}">${company?.partyIdTo}</option>
 	                                </g:each>
@@ -297,7 +304,6 @@
                                 <td valign="top" class="value ">
                                 
 								<select name="company" id="companyId">
-								<option value="" selected="selected">Please Select</option>
 	                                <g:each in="${projectCompanies}" status="i" var="company">
 	                                	<option value="${company?.partyIdTo.id}">${company?.partyIdTo}</option>
 	                                </g:each>

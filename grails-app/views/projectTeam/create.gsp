@@ -91,7 +91,7 @@
 	                                <td valign="top" style="width: 10">
 		                                <select name="availableStaff" id="availableStaffId" multiple="multiple" size="10" style="width: 313px;">
 			                                <g:each in="${availableStaff}" var="availableStaff">
-			                                	<option value="${availableStaff?.staff.id}">${availableStaff.company[0]}:${availableStaff?.staff?.lastName}, ${availableStaff?.staff?.firstName} - ${availableStaff?.staff?.title}</option>
+			                                	<option value="${availableStaff?.staff.id}"><g:if test="${availableStaff.company[0]}">${availableStaff.company[0]}:</g:if><g:if test="${availableStaff?.staff?.lastName}">${availableStaff?.staff?.lastName},</g:if> ${availableStaff?.staff?.firstName} <g:if test="${availableStaff?.staff?.title}">- ${availableStaff?.staff?.title}</g:if></option>
 			                                </g:each> 
 		                                </select>
 	                                </td>
@@ -106,7 +106,7 @@
 	                                <td valign="top" style="width: auto;">
 		                                <select name="teamMembers" id="teamMembersId" multiple="multiple" size="10" style="width: 313px;">
 										<g:each in="${teamMembers}" var="teamMember">
-			                                	<option value="${teamMember?.staff.id}" selected="selected">${teamMember.company[0]}:${teamMember?.staff?.lastName}, ${teamMember?.staff?.firstName} - ${teamMember?.staff?.title}</option>
+			                                	<option value="${teamMember?.staff.id}" selected="selected"><g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName},</g:if> ${teamMember?.staff?.firstName} <g:if test="${teamMember?.staff?.title}">- ${teamMember?.staff?.title}</g:if></option>
 										</g:each>  
 		                                </select>
 	                                </td>

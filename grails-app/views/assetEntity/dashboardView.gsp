@@ -631,7 +631,7 @@ function resolveValidate(formName,idVal){
 	<tr>
 		<td></td>
 		<td style="text-align: right;"><input type="button" value="Save"
-			onclick="confirm('Are you sure?');submitAction()" /></td>
+			onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)submitAction()" /></td>
 	</tr>
 </table>
 </form>
