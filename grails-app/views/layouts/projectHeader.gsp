@@ -47,14 +47,14 @@
       <div class="top_menu_layout">
         <div class="menu1">
           <ul>
-          <jsec:lacksAnyRole in="['MANAGER','OBSERVER']"> 
+          <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
             <li><g:link class="home" controller="projectUtil">Project Manager</g:link></li>
             <jsec:hasRole name="ADMIN">
               <li><g:link class="home" controller="auth" action="home">Administration </g:link> </li>
             </jsec:hasRole>
             <li><g:link class="home" controller="moveTech" action="moveTechLogin">Move Tech</g:link></li>
             <li><g:link class="home" controller="moveTech" action="moveTechLogin">Cleaning</g:link></li>
-            </jsec:lacksAnyRole>
+            </jsec:lacksAllRoles>
           </ul>
         </div>
       </div>
@@ -77,7 +77,7 @@
       <div class="menu2">
       <ul>
         <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
-        <jsec:lacksAnyRole in="['MANAGER','OBSERVER']"> 
+        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
         <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
         <li>  
           	<div id="menubar" style="border-right:1px solid #ffffff; width:65px;">
@@ -91,14 +91,14 @@
         </li>  
 		
         <li><g:link class="home" controller="moveBundle" params="[projectId:currProjObj?.id]">Move Bundles</g:link></li>
-        </jsec:lacksAnyRole>
+        </jsec:lacksAllRoles>
         <jsec:hasAnyRole in="['ADMIN','SUPERVISOR']">
         <li><g:link class="home" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id]">Console</g:link></li>
         </jsec:hasAnyRole>
         <jsec:hasAnyRole in="['ADMIN','MANAGER','OBSERVER']">
         <li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">PMO Dashboard</g:link> </li>
         </jsec:hasAnyRole>
-        <jsec:lacksAnyRole in="['MANAGER','OBSERVER','USER']"><li>  
+        <jsec:lacksAllRoles in="['MANAGER','OBSERVER','USER']"><li>  
           	<div id="menubar">
  			<div id="menu1" class="menu_new">Reports<ul>    	      
     	      	<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Team Worksheets']">Move Team Worksheets</g:link> </li>
@@ -111,11 +111,11 @@
             </div>
                 	
         </li>
-        </jsec:lacksAnyRole>
+        </jsec:lacksAllRoles>
         <jsec:hasAnyRole in="['USER']">
         <div id="menubar">
  			<div id="menu1" class="menu_normal">Reports<ul>    	      
-    	      	<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Team Worksheets']">Move Team Worksheets</g:link> </li>
+    	      	<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Team Worksheets']">Move Team Worksheetsssss</g:link> </li>
 				<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'cart Asset']">Cleaning Team Worksheets</g:link></li>
     	       	<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Transportation Asset List']">Transport Worksheets</g:link></li>
     	       	<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Issue Report']">Issue Report</g:link></li>
