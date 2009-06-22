@@ -849,7 +849,7 @@ function resolveValidate(formName,idVal){
 								<g:sortableColumn property="currentState" title="Status" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
 								<g:sortableColumn property="sourceTeam" title="Source Team" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
 								<g:sortableColumn property="targetTeam" title="Target Team" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
-								<g:sortableColumn property="isResolved" title="Issues" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
+								<th>Issues</th>
 							</tr>
 						</thead>
 						<tbody id="assetsTbody">
