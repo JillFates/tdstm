@@ -333,11 +333,11 @@ function resolveValidate(formName,idVal){
 <table cellpadding="0" cellspacing="0"  style="border:0px;">
 	<thead>
 	<tr>
-	<jsec:hasRole in="['ADMIN','MANAGER']">
+	<jsec:hasAnyRole in="['ADMIN','MANAGER']">
 	<td>
 	<input type="button" value="State..." onclick="changeState()" title="Change State"/>
 	</td>
-	</jsec:hasRole>
+	</jsec:hasAnyRole>
 	<td>&nbsp;</td>
 			
 			<td style="padding-left: 0px;"><select id="applicationId" name="application" onchange="document.listForm.submit();" style="width: 120px;">
@@ -362,7 +362,7 @@ function resolveValidate(formName,idVal){
 	<td style="padding-left: 0px;"><select style="width: 120px;visibility: hidden;"/></td>
 		</tr>
 		<tr>
-		 <jsec:hasRole in="['ADMIN','MANAGER']">	<th style="padding-top:50px;">Actions <a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a></th></jsec:hasRole>
+		 <jsec:hasAnyRole in="['ADMIN','MANAGER']">	<th style="padding-top:50px;">Actions <a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a></th></jsec:hasAnyRole>
 			
 			<th style="padding-top:50px;">Issue</th>
 			
@@ -388,7 +388,7 @@ function resolveValidate(formName,idVal){
 	<tbody>
 		<g:each in="${assetEntityList}" var="assetEntity">
 			<tr>
-			<jsec:hasRole in="['ADMIN','MANAGER']">	
+			<jsec:hasAnyRole in="['ADMIN','MANAGER']">	
 			<td id="action_${assetEntity.id}">
 				
 					<g:if test="${assetEntity.checkVal == true}">
@@ -400,7 +400,7 @@ function resolveValidate(formName,idVal){
 					<g:else>&nbsp;</g:else>
 				
 			</td>
-			</jsec:hasRole>
+			</jsec:hasAnyRole>
 			<td id="icon_${assetEntity.id}">
 				<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+assetEntity.id+' and commentType = ? and isResolved = ?',['issue',0])}">
 					<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntity.id}" before="document.getElementById('createAssetCommentId').value = ${assetEntity.id};"	onComplete="listCommentsDialog( e ,'action');">
@@ -445,12 +445,12 @@ function resolveValidate(formName,idVal){
 	</tbody>
 </table>
 </div>
-<jsec:hasRole in="['ADMIN','MANAGER']">
+<jsec:hasAnyRole in="['ADMIN','MANAGER']">
 <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 <span class="menuButton"><a class="create" href="#"
 	onclick="document.getElementById('statusId').value = '';document.getElementById('createResolveDiv').style.display = 'none' ;$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">New
 Comment</a></span></div>
-</jsec:hasRole>
+</jsec:hasAnyRole>
 </div>
 <div id="createCommentDialog" title="Create Asset Comment"
 	style="display: none;"><input type="hidden" name="assetEntity.id"
@@ -580,7 +580,7 @@ Comment</a></span></div>
 	
 </table>
 </div>
-<jsec:hasRole in="['ADMIN','MANAGER']">
+<jsec:hasAnyRole in="['ADMIN','MANAGER']">
 <div class="buttons"><span class="button"> <input
 	class="edit" type="button" value="Edit"
 	onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
@@ -588,7 +588,7 @@ Comment</a></span></div>
 	value="Delete"
 	onclick="${remoteFunction(controller:'assetEntity', action:'deleteComment', params:'\'id=\' + document.getElementById(\'commentId\').value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e,\'action\')')}" />
 </span></div>
-</jsec:hasRole>
+</jsec:hasAnyRole>
 </div>
 <div id="editCommentDialog" title="Edit Asset Comment"
 	style="display: none;"><g:form action="updateComment"

@@ -49,7 +49,7 @@ dt {
 					<b>Currently Logged in as:</b>
 					<dl compact>
 						<dt>Project:&nbsp;</dt><dd>${project}</dd>
-						<dt>Bundle:&nbsp;</dt><dd>${bundle}</dd> 
+						<dt>Bundle:&nbsp;</dt><dd>${bundleName}</dd> 
 						<dt>Team:&nbsp;</dt><dd>${projectTeam}</dd>
 						<dt>Members:&nbsp;</dt><dd>${members}</dd>              					     
 						<dt>Location:&nbsp;</dt><dd>${loc}</dd>

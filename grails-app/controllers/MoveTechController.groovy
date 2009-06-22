@@ -35,6 +35,7 @@ class MoveTechController {
 	        	def projectTeamInstance = ProjectTeam.findById( params.team )
 	            def team = projectTeamInstance.name
 	            def teamMembers = partyRelationshipService.getTeamMemberNames( params.team )
+	            def bundleInstance = MoveBundle.findById(params.bundle)
 	            def location = ""
 	            if ( params.location == 's' ) {
 	            	location = "Unracking"
@@ -48,13 +49,15 @@ class MoveTechController {
 						
 	            render ( view:'home',
 	            		 model:[
-	            		        projectTeam:team, members:teamMembers, project:params.project, 
-	                            loc:location, bundle:params.bundle, team:params.team, location:params.location 
-	                     ])
+	            		        projectTeam:team, members:teamMembers, project:params.project,
+	            		        loc:location, bundle:params.bundle,bundleName:bundleInstance.name,
+	            		        team:params.team, location:params.location 
+	            		        ])
 	        } else if ( params.user == "ct" ) {
 	        	def projectTeamInstance = ProjectTeam.findById( params.team )
 	            def team = projectTeamInstance.name
 	            def teamMembers = partyRelationshipService.getTeamMemberNames( params.team )
+	            def bundleInstance = MoveBundle.findById(params.bundle)
 	            def teamLocation = ""
 	            if ( params.location == 's' ) {
 	            	projectTeamInstance.currentLocation = "Source"
@@ -67,8 +70,8 @@ class MoveTechController {
 	            }
 	            render ( view:'cleaningTechHome', 
 	            		model:[
-	            		       projectTeam:team, members:teamMembers, project:params.project, 
-	            		       loc:teamLocation, bundle:params.bundle, team:params.team, 
+	            		       projectTeam:team, members:teamMembers, project:params.project,
+	            		       loc:teamLocation, bundle:params.bundle,bundleName:bundleInstance.name, team:params.team, 
 	            		       location:params.location, browserTest:browserTest 
 	            		       ])
 					

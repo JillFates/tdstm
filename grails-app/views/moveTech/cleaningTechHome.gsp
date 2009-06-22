@@ -44,7 +44,7 @@
               					<table style="border:0px;">
               					<tr><td colspan="2"><b>Currently Logged in as:</b></td></tr>              					     
               					<tr><td style="width:20px;"><b>Project:</b></td><td>${project}</td></tr>
-              					<tr><td style="width:20px;"><b>Bundle:</b></td><td>${bundle}</td></tr>
+              					<tr><td style="width:20px;"><b>Bundle:</b></td><td>${bundleName}</td></tr>
               					<tr><td style="width:20px;"><b>Team:</b></td><td>${projectTeam}</td></tr> 
               					<tr><td style="width:20px;"><b>Members:</b></td><td>${members}</td></tr>              					     
               					<tr><td style="width:20px;"><b>Location:</b></td><td>${loc}</td></tr>

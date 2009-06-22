@@ -841,8 +841,8 @@ function resolveValidate(formName,idVal){
 							<tr>
 							</jsec:hasRole>
 								
-								<jsec:hasRole in="['ADMIN','SUPERVISOR']"><th>Actions <jsec:hasRole name="ADMIN"><a href="#" onclick="selectAll()"><u
-									style="color: blue;">All</u></a></jsec:hasRole></th></jsec:hasRole>
+								<jsec:hasAnyRole in="['ADMIN','SUPERVISOR']"><th>Actions <jsec:hasRole name="ADMIN"><a href="#" onclick="selectAll()"><u
+									style="color: blue;">All</u></a></jsec:hasRole></th></jsec:hasAnyRole>
 								<g:sortableColumn property="priority" title="Priority" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
 								<g:sortableColumn property="assetTag" title="Asset Tag" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
 								<g:sortableColumn property="assetName" title="Asset Name" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
@@ -859,7 +859,7 @@ function resolveValidate(formName,idVal){
 									id="assetDetailRow_${assetsList?.asset.id}"
 									class="${assetsList?.cssClass}" value="${assetsList?.asset.id}">
 
-									<jsec:hasRole in="['ADMIN','SUPERVISOR']">
+									<jsec:hasAnyRole in="['ADMIN','SUPERVISOR']">
 									<td><jsec:hasRole name="ADMIN">
 										<g:if test="${assetsList.checkVal == true}">
 <span id="spanId_${assetsList?.asset.id}">
@@ -878,7 +878,7 @@ function resolveValidate(formName,idVal){
 										src="${createLinkTo(dir:'images',file:'row_arrow.gif')}"
 										border="0px"></span>
 										
-										</td></jsec:hasRole>
+										</td></jsec:hasAnyRole>
 									<td id="priority_${assetsList?.asset.id}"
 										onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.priority}</td>
 									<td id="assetTag_${assetsList?.asset.id}" onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.assetTag}</td>

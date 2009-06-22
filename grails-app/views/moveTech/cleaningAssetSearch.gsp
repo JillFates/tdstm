@@ -181,58 +181,44 @@ function AddOption (selElement, text, value)
 //=============================================================================
 function InitData()
 {
-var printButton = document.getElementById('printButton');
-if(!printButton.disabled){ 
-	printButton.focus();
-}
-var form = window.document.assetSearchForm;
-var path = window.location.href;
-var i = -1;
-
-		// the following code evaluates the path to the demo repository
-		for (n=1; n<=3; n++)
+	//To check the Instructions for enable the Clean Button
+	checkInstuction();
+	var printButton = document.getElementById('printButton');
+	if(!printButton.disabled){ 
+		printButton.focus();
+	}
+	var form = window.document.assetSearchForm;
+	var path = window.location.href;
+	var i = -1;
+	// the following code evaluates the path to the demo repository
+	for (n=1; n<=3; n++)
+	{
+		i = path.lastIndexOf('/');
+		if (i != -1)
 		{
-			i = path.lastIndexOf('/');
-			if (i != -1)
-			{
-				path = path.substring(0,i)                              // one directory level up
-			}
+			path = path.substring(0,i)                              // one directory level up
 		}
-		if (path.substr (0, 8) == "file:///")			                  // do not use URL-style for Repository file name - remove file:///
-		    path = path.substr (8);
-
+	}
+	if (path.substr (0, 8) == "file:///")			                  // do not use URL-style for Repository file name - remove file:///
+	    path = path.substr (8);
     path= unescape(path);	                        					// unescape!
     form.RepPath.value 	= path + '/Demo Repository/Demos.tfr';  // repository name
     form.PrjName.value 	= 'TFORMer_Runtime_Examples';						// project name
     form.FormName.value = 'BarcodeLabels';											// form name
     form.PrinterName.value = ''																	// use default printer
-
-		// get list of installed printers
-		var dropdown = document.getElementById("Printers");
-		window.TF.RefreshOSPrinters();
-		var def = 0;
-		for (i = 0; i < window.TF.GetOSPrintersCount(); i++) 
-		{
-		  AddOption (dropdown, window.TF.GetOSPrinter(i), window.TF.GetOSPrinter(i));
-		  if (window.TF.GetOSPrinter(i) == window.TF.GetOSDefaultPrinter())
-		    def = i;
-		}
-		// add TFORMer standard output formats
-	  AddOption (dropdown, "PDF-File", "PDF:" + sHint + ".PDF");
-	  AddOption (dropdown, "PostScript-File", "PS:" + sHint + ".PS");
-	  AddOption (dropdown, "HTML-File", "HTML:" + sHint + ".HTML");
-	  AddOption (dropdown, "Zebra (ZPL-II)", "ZPL:" + sHint + ".ZPL");
-	  AddOption (dropdown, "Image (BMP)", "IMGBMP:" + sHint + ".BMP");
-	  AddOption (dropdown, "Image (GIF)", "IMGGIF:" + sHint + ".GIF");
-	  AddOption (dropdown, "Image (JPG)", "IMGJPG:" + sHint + ".JPG");
-	  AddOption (dropdown, "Image (PCX)", "IMGPCX:" + sHint + ".PCX");
-	  AddOption (dropdown, "Image (PNG)", "IMGPNG:" + sHint + ".PNG");
-	  AddOption (dropdown, "Image (TGA)", "IMGTGA:" + sHint + ".TGA");
-	  AddOption (dropdown, "Image (TIF)", "IMGTIF:" + sHint + ".TIF");
-	  AddOption (dropdown, "Image (TIF Multipage)", "IMGMULTITIF:" + sHint + ".TIF");
-	  dropdown.options[def].selected = true;
-	  retrieve_field(document.assetSearchForm.Printers)
-	  mySelect(dropdown);
+	// get list of installed printers
+	var dropdown = document.getElementById("Printers");
+	window.TF.RefreshOSPrinters();
+	var def = 0;
+	for (i = 0; i < window.TF.GetOSPrintersCount(); i++) 
+	{
+	  AddOption (dropdown, window.TF.GetOSPrinter(i), window.TF.GetOSPrinter(i));
+	  if (window.TF.GetOSPrinter(i) == window.TF.GetOSDefaultPrinter())
+	    def = i;
+	}
+	dropdown.options[def].selected = true;
+	retrieve_field(document.assetSearchForm.Printers)
+	mySelect(dropdown);
 }
 
 //=============================================================================
@@ -341,6 +327,7 @@ function mySelect(x)
    						document.assetSearchForm.submit();
    				}
    			}else{
+   				 alert("Please select all instructions");
    				return false;
    			}
       	}
@@ -361,7 +348,6 @@ function mySelect(x)
         if(j == 0){     
         return true;
         }else{
-        alert("Please select all instructions");                                   
         return false;
         }     
         }
@@ -371,6 +357,35 @@ function mySelect(x)
        function commentSelect(cmtVal) {
       document.assetSearchForm.enterNote.value = cmtVal;
       document.assetSearchForm.selectCmt.value = 'Select a common reason:';
+      }
+      /*-----------------------------------------------------------------------
+      *To check all instructions checked or not to enable cleaned button
+      *@author: Srinivas
+      *@return: disable cleanbutton if all checkboxes not checked. enable if all checked
+      *-------------------------------------------------------------------------*/
+      function checkInstuction()
+      {
+      	var cleanButton = document.getElementById('cleanButton')
+      	if(doCheckValidation()) {
+	    	if(cleanButton != null ) {
+	    		cleanButton.disabled = false;
+	    		cleanButton.focus()
+	    	}
+	    }else {
+	    	if(cleanButton != null ) {
+	    		cleanButton.disabled = true;
+	    	}	
+	    }
+      }
+      /*-----------------------------------------------------------------------
+      *To clear out the default Comment text("Enter Comment") in Hold Text area
+      *@author: Srinivas
+      *@return: Clear default Text in TextArea.
+      *-------------------------------------------------------------------------*/
+      function clearComment(holdText) {
+      	if(holdText.value == "Enter Comment") {
+      		holdText.value = ""
+      	}	
       }
     </script>
 </head>
@@ -470,7 +485,7 @@ function mySelect(x)
 		  				</td>
 					
 					<g:if test="${browserTest == true}" >
-						<td style="width:15%;"class="buttonR"><input id="printButton" type="button" value="Print" disabled="disabled" onclick="startprintjob()"/></td></tr>
+						<td style="width:15%;"class="buttonR"><input id="printButton" type="button" value="Print"  onclick="startprintjob()"/></td></tr>
 					</g:if>
 					<g:else>
 					<td style="width:15%;"class="buttonR"><input id="printButton" type="button" value="Print"  onclick="startprintjob()"/></td>
@@ -512,7 +527,7 @@ function mySelect(x)
 					<td style="border-right:1px;">${fieldValue(bean:assetComment, field:'comment')}</td>
 					<td style="text-align:center;">
 					<g:if test="${assetComment?.mustVerify == 1}" >
-					<input type="checkbox" id="confirmCheck"  name="checkChange"/>
+					<input type="checkbox" id="confirmCheck"  name="checkChange" onclick="checkInstuction()"/>
 					</g:if>
 					</td>
 					
@@ -525,12 +540,12 @@ function mySelect(x)
 					<table style="border:0px;">
 					<g:if test="${actionLabel}">
 					<tr>
-					<td  style="width:15%;" class="buttonR" style="align:left; padding-right:20px;float:left" colspan="2"><input id="cleanButton" type="button" value="${actionLabel}" onclick="return clean()" /></td>
+					<td  style="width:15%;" class="buttonR" style="align:left; padding-right:20px;float:left" colspan="2"><input id="cleanButton" type="button" disabled="disabled" value="${actionLabel}" onclick="return clean()" /></td>
 					</tr>
 					</g:if>
 					<g:if test="${projMap}">
 					<tr>
-					<td class="buttonR" style="align:left; padding-right:20px;float:left" colspan="2"><input id="cancelButton" type="button" value="Cancel" onclick="return cancel()" /></td>
+					<td class="buttonR" style="align:left; padding-right:20px;float:left"  colspan="2"><input id="cancelButton" type="button" value="Cancel"  onclick="return cancel()" /></td>
 					</tr>
 					</g:if>
 					</table>
@@ -542,7 +557,7 @@ function mySelect(x)
 						
 			<g:select style="width: 170px;padding:0px;text-align:left;" from="['Select a common reason:','Device not powered down','Device is not in expected rack','Device will not power up']" id="selectCmt" name="selectCmt" value="Select a common reason:" onchange="commentSelect(this.value);"></g:select>
 			<br/>
-					<textarea rows="5" cols="98" title="Enter Note..." name="enterNote" >Enter Comment</textarea></td>
+					<textarea rows="5" cols="98" title="Enter Note..." name="enterNote" onclick="clearComment(this)" onkeypress="clearComment(this)">Enter Comment</textarea></td>
 					
 					<g:if test="${projMap}">
 					<td class="buttonClean" style="text-align:center;vertical-align:bottom;align:left; " colspan="2"><input  type="button"	value="Place on HOLD" onclick="return doTransition()" /></td>
