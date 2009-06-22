@@ -594,7 +594,7 @@ function timedRefresh(timeoutPeriod) {
 <filterpane:isFiltered>Filter Applied!</filterpane:isFiltered>
 </td>
 <td >
-Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" value="${maxVal}" onchange="document.paginateRows.submit();"></g:select></td>
+Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" value="${maxVal}" onchange="document.getElementById('maxRow').value = this.value;document.filterForm.submit();"></g:select></td>
 </table>
 </g:form>
 </div>

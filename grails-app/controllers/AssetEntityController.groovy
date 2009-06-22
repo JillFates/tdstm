@@ -34,12 +34,17 @@ class AssetEntityController {
      * @return Will return filters data to AssetEntity  
      * ------------------------------------------------------ */
 	def filter = {
-		def userMax = getSession().getAttribute("MAX_ASSET_LIST")
+		if(params.rowVal){
+			if(!params.max) params.max = params.rowVal
+	    	userPreferenceService.setPreference( "MAX_ASSET_LIST", "${params.rowVal}" )
+		}else{
+			def userMax = getSession().getAttribute("MAX_ASSET_LIST")
         	if( userMax.MAX_ASSET_LIST ) {
                 if( !params.max ) params.max = userMax.MAX_ASSET_LIST
             } else {
                 if( !params.max ) params.max = 50
             }
+		}
         def project = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
         def assetEntityList = filterService.filter( params, AssetEntity )
         assetEntityList.each{
@@ -509,17 +514,12 @@ class AssetEntityController {
      *-------------------------------------------*/
     def list = {
     	
-        if(params.rowVal){
-    		if(!params.max) params.max = params.rowVal
-    		userPreferenceService.setPreference( "MAX_ASSET_LIST", "${params.rowVal}" )
+        userPreferenceService.loadPreferences("MAX_ASSET_LIST")
+        def userMax = getSession().getAttribute("MAX_ASSET_LIST")
+        if(userMax.MAX_ASSET_LIST){
+        	if(!params.max) params.max = userMax.MAX_ASSET_LIST
         }else{
-            userPreferenceService.loadPreferences("MAX_ASSET_LIST")
-            def userMax = getSession().getAttribute("MAX_ASSET_LIST")
-            if(userMax.MAX_ASSET_LIST){
-                if(!params.max) params.max = userMax.MAX_ASSET_LIST
-            }else{
-                if(!params.max) params.max = 50
-            }
+        	if(!params.max) params.max = 50
         }
         def projectId = params.projectId
         if(projectId == null || projectId == ""){

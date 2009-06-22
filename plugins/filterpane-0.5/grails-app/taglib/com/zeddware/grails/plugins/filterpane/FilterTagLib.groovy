@@ -274,6 +274,7 @@ class FilterTagLib {
       &nbsp;${g.message(code:'fp.tag.filterPane.sort.ascending', default:'Ascending')}&nbsp;
       ${this.radio(name: "order", value: "desc", checked: params.order == 'desc')}
       &nbsp;${g.message(code:'fp.tag.filterPane.sort.descending', default:'Descending')}
+      <input type="hidden" id='maxRow' name='rowVal' value="${params.max}">
   </div>
   <div class="buttons">
       <span class="button">
