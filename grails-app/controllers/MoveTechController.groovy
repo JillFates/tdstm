@@ -448,12 +448,7 @@ class MoveTechController {
             	loginTeam = ProjectTeam.findById( params.team )
             }
             if ( search != null ) {
-            	def query = new StringBuffer ("from AssetEntity ae where ae.assetTag = :search and ae.moveBundle = ${params.bundle}")
-            	if ( params.location == "s" ) {
-            		query.append (" and ae.sourceTeam = ${team}")
-            	} else {
-            		query.append (" and ae.targetTeam = ${team}")
-            	}
+            	def query = new StringBuffer ("from AssetEntity ae where ae.assetTag = :search ")
                 assetItem = AssetEntity.find( query.toString(), [ search : search ] )
                 if ( assetItem == null ) {
                     flash.message = message ( code : "Asset Tag number '${search}' was not located" )
@@ -526,7 +521,8 @@ class MoveTechController {
                         if ( teamId != params.team ) {
     	                    	
                             flash.message = message ( code : "The asset [${assetItem.assetName}] is assigned to team [${teamName}] " )
-                            if ( checkHome ) {
+                            // commented as per JIRA:TM-199 
+                           /* if ( checkHome ) {
                                 redirect ( action: 'index',
                                 		   params:["bundle":params.bundle, "team":params.team, "project":params.project,
                                 		           "location":params.location,"user":"mt" ])
@@ -536,63 +532,61 @@ class MoveTechController {
                                 		   params:["bundle":params.bundle, "team":params.team, "project":params.project,
                                 		           "location":params.location,"tab":params.tab ])
                                 return;
-                            }
+                            }*/
+                        }
+                        projMap = ProjectAssetMap.findByAsset( assetItem )
+                        if( !projMap ) {
+                        	flash.message = message ( code :" The asset has not yet been released " )
+                        	if ( checkHome ) {
+                        		redirect ( action: 'index',
+                        				params:["bundle":params.bundle, "team":params.team, "project":params.project,
+                        				        "location":params.location, "user":"mt" ])
+                        	return;
+                        	} else {
+                        		redirect ( action: 'assetTask', 
+                        				params:["bundle":params.bundle, "team":params.team, "project":params.project,
+                        				        "location":params.location, "tab":params.tab ])
+                        		return;
+                        	}
                         } else {
-	                        projMap = ProjectAssetMap.findByAsset( assetItem )
-	                        if( !projMap ) {
-	                            flash.message = message ( code :" The asset has not yet been released " )
-	                            if ( checkHome ) {
-	                                redirect ( action: 'index',
-	                                		   params:["bundle":params.bundle, "team":params.team, "project":params.project,
-	                                		           "location":params.location, "user":"mt" ])
-	                                return;
-	                            } else {
-	                                redirect ( action: 'assetTask', 
-	                                		   params:["bundle":params.bundle, "team":params.team, "project":params.project,
-	                                		           "location":params.location, "tab":params.tab ])
-	                                return;
-	                            }
-	                        } else {
-		                        stateVal = stateEngineService.getState( "STD_PROCESS", projMap.currentStateId )
-	                            if ( stateVal == "Hold" ) {
-	                                flash.message = message ( code : "The asset is on Hold. Please contact manager to resolve issue." )
-	                                if( checkHome ) {
-	                                    redirect ( action: 'index',
-	                                    		   params:["bundle":params.bundle, "team":params.team, "project":params.project,
-	                                    		           "location":params.location, "user":"mt" ])
-	                                    return;
-	                                } else {
-	                                    redirect ( action: 'assetTask', 
-	                                    		   params:["bundle":params.bundle, "team":params.team, "project":params.project,
-	                                    		           "location":params.location, "tab":params.tab ])
-	                                    return;
-	                                }
-	                            }
-	                            taskList = stateEngineService.getTasks ( "STD_PROCESS", "MOVE_TECH", stateVal )
-	                            taskSize = taskList.size()
-	                            if ( taskSize == 1 ) {
-	                                if ( taskList.contains ( "Hold" ) ) {
-	                                    flash.message = message ( code : "There is a problem with this asset. Place the asset on hold to alert the move coordinator " )
-	                                }
-	                    	
-	                            } else if ( taskSize > 1 ) {
-	
-	                                taskList.each {
-	                                    if ( it != "Hold" ) {
-	                                        actionLabel = it
-	                                        label =	stateEngineService.getStateLabel ( "STD_PROCESS", stateEngineService.getStateIdAsInt("STD_PROCESS",it) )
-	                                    }
+                        	stateVal = stateEngineService.getState( "STD_PROCESS", projMap.currentStateId )
+                        	if ( stateVal == "Hold" ) {
+                        		flash.message = message ( code : "The asset is on Hold. Please contact manager to resolve issue." )
+                        		if( checkHome ) {
+                        			redirect ( action: 'index',
+                        					params:["bundle":params.bundle, "team":params.team, "project":params.project,
+                        					        "location":params.location, "user":"mt" ])
+                        			return;
+                        		} else {
+                        			redirect ( action: 'assetTask', 
+                        					params:["bundle":params.bundle, "team":params.team, "project":params.project,
+                        					        "location":params.location, "tab":params.tab ])
+                        			return;
+                        		}
+                        	}
+                        	taskList = stateEngineService.getTasks ( "STD_PROCESS", "MOVE_TECH", stateVal )
+                        	taskSize = taskList.size()
+                        	if ( taskSize == 1 ) {
+                        		if ( taskList.contains ( "Hold" ) ) {
+                        			flash.message = message ( code : "There is a problem with this asset. Place the asset on hold to alert the move coordinator " )
+                        		}
+                        	} else if ( taskSize > 1 ) {
+                        		
+                        		taskList.each {
+                        			if ( it != "Hold" ) {
+                        				actionLabel = it
+                        				label =	stateEngineService.getStateLabel ( "STD_PROCESS", stateEngineService.getStateIdAsInt("STD_PROCESS",it) )
+                        			}
 	                    			
-	                                }
-	                            }
-	                            assetCommt = AssetComment.findAllByAssetEntity( assetItem )
-	                            render ( view:'assetSearch',
-											model:[projMap:projMap,
-												assetCommt:assetCommt, stateVal:stateVal, bundle:params.bundle, team:params.team, 
-												project:params.project, location:params.location, search:params.search, label:label,
-												actionLabel:actionLabel	])
-	                        }
-	                    }
+                        		}
+                        	}
+                        	assetCommt = AssetComment.findAllByAssetEntity( assetItem )
+                        	render ( view:'assetSearch',
+                        			model:[projMap:projMap,
+                        			       assetCommt:assetCommt, stateVal:stateVal, bundle:params.bundle, team:params.team, 
+                        			       project:params.project, location:params.location, search:params.search, label:label,
+                        			       actionLabel:actionLabel	])
+                        }
                     }
                 }
             }
@@ -837,7 +831,7 @@ class MoveTechController {
 							])
             	return;
             } else if ( search != null ) {
-            	def query = "from AssetEntity where assetTag = :search and moveBundle = $params.bundle"
+            	def query = "from AssetEntity where assetTag = :search "
                assetItem = AssetEntity.find ( query.toString(), [ search : search ] )
                if ( assetItem == null ) {
                     flash.message = message ( code : "Asset Tag number '${search}' was not located" )
@@ -1113,13 +1107,14 @@ class MoveTechController {
 		def bundleteam = loginDetails[2]
 		def location = loginDetails[3]
 		def query = new StringBuffer("from AssetEntity where assetTag = :assetTag and moveBundle = $movebundle")
-		if ( user != "ct" ) {
+		// commented as per JIRA:TM-199  
+		/*if ( user != "ct" ) {
 	    	if ( location == "s" ) {
 	    		query.append(" and sourceTeam = $bundleteam")
 	    	} else {
 	    		query.append(" and targetTeam = $bundleteam")
 	    	}
-		}
+		}*/
 		def asset = AssetEntity.find( query.toString(), [ assetTag : assetTag ] )
 		return asset 
 	}
