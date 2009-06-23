@@ -433,7 +433,7 @@ class MoveTechController {
 		def principal = SecurityUtils.subject.principal
 		if ( principal ) {
             def assetItem
-            def assetCommt
+            def assetComment
             def projMap
             def team = params.team
             def search = params.search
@@ -580,10 +580,10 @@ class MoveTechController {
 	                    			
                         		}
                         	}
-                        	assetCommt = AssetComment.findAllByAssetEntity( assetItem )
+                        	assetComment = AssetComment.findAllByAssetEntity( assetItem )
                         	render ( view:'assetSearch',
                         			model:[projMap:projMap,
-                        			       assetCommt:assetCommt, stateVal:stateVal, bundle:params.bundle, team:params.team, 
+                        			       assetComment:assetComment?assetComment :"", stateVal:stateVal, bundle:params.bundle, team:params.team, 
                         			       project:params.project, location:params.location, search:params.search, label:label,
                         			       actionLabel:actionLabel	])
                         }
@@ -642,12 +642,12 @@ class MoveTechController {
             } else {
                 workflow = workflowService.createTransition ( "STD_PROCESS", "CLEANER", "Hold", asset, bundle, loginUser, team, params.enterNote )
                 def projMap = []
-                def assetCommt = []
+                def assetComment
                 def stateVal = null
                 def label = null
                 def actionLabel = null
                 if ( workflow.success ) {
-                    def assetComment = new AssetComment()
+                    assetComment = new AssetComment()
                     assetComment.comment = enterNote
                     assetComment.assetEntity = asset
                     assetComment.commentType = 'issue'
@@ -655,14 +655,14 @@ class MoveTechController {
                     assetComment.save()
                     render(view: 'cleaningAssetSearch',
 							model:[
-								projMap:projMap, assetCommt:assetCommt, stateVal:stateVal, "bundle":params.bundle, "team":params.team,
+								projMap:projMap, assetComment:assetComment, stateVal:stateVal, "bundle":params.bundle, "team":params.team,
 								"project":params.project, "location":params.location, "tab":"Todo", label:label, actionLabel:actionLabel
 							])
                 } else {
                     flash.message = message( code : workflow.message )
                     render( view: 'cleaningAssetSearch',
 							model:[
-								projMap:projMap, assetCommt:assetCommt, stateVal:stateVal, "bundle":params.bundle, "team":params.team,
+								projMap:projMap, assetComment:assetComment, stateVal:stateVal, "bundle":params.bundle, "team":params.team,
 								"project":params.project, "location":params.location, "tab":"Todo", label:label, actionLabel:actionLabel
 							])
                 }
@@ -676,7 +676,7 @@ class MoveTechController {
      /*------------------------------------------------------------------------------------------------------
      * To unrack the state of an asset 
      * @author Bhuvana
-     * @param  String assetCommt, String team, String location, String actionLabel, String search, String user
+     * @param  String assetComment, String team, String location, String actionLabel, String search, String user
      * @return boolean for indication of transitions   
      *--------------------------------------------------------------------------------------------------------*/
 	def unRack = {
@@ -687,16 +687,13 @@ class MoveTechController {
             def actionLabel = params.actionLabel
             def loginUser = UserLogin.findByUsername( principal )
             def team
-            def assetCommt = params.assetCommt
-            if ( assetCommt == '[]' ) {
-                assetCommt = "";
-            }
+            def assetComment = params.assetComment
             if ( params.location == 's' ) {
                 team = asset.sourceTeam
             } else {
                 team = asset.targetTeam
             }
-            def workflow = workflowService.createTransition( "STD_PROCESS", "MOVE_TECH", actionLabel, asset, bundle, loginUser, team, assetCommt )
+            def workflow = workflowService.createTransition( "STD_PROCESS", "MOVE_TECH", actionLabel, asset, bundle, loginUser, team, assetComment )
             if ( workflow.success ) {
                 redirect ( action: 'assetTask', 
                 		   params:["bundle":params.bundle, "team":params.team, "project":params.project, 
@@ -706,7 +703,7 @@ class MoveTechController {
                 flash.message = message ( code : workflow.message )
                 redirect ( action:'assetSearch', 
                 		   params:["bundle":params.bundle, "team":params.team, "project":params.project, "location":params.location,
-                		           "search":params.search, "assetCommt":params.assetCommt, "label":params.label, "actionLabel":actionLabel
+                		           "search":params.search, "assetComment":params.assetComment, "label":params.label, "actionLabel":actionLabel
                 		           ])
             }
         } else {
@@ -805,7 +802,7 @@ class MoveTechController {
         if ( principal ) {
             def textSearch = params.textSearch
             def assetItem
-            def assetCommt = []
+            def assetComment
             def projMap = []
             def team = params.team
             def search = params.search
@@ -825,7 +822,7 @@ class MoveTechController {
             if ( params.menu == "true" ) {
             	render(view:'cleaningAssetSearch', 
 						model:[
-							projMap:projMap, assetCommt:assetCommt, stateVal:stateVal, bundle:params.bundle,
+							projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundle:params.bundle,
 							team:params.team, project:params.project, location:params.location, search:search,
 							label:label, actionLabel:actionLabel, browserTest:browserTest
 							])
@@ -838,7 +835,7 @@ class MoveTechController {
                     if ( textSearch ) {
                         render ( view:'cleaningAssetSearch',
 									model:[ 
-										projMap:projMap, assetCommt:assetCommt, stateVal:stateVal, bundle:params.bundle,
+										projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundle:params.bundle,
 										team:params.team, project:params.project, location:params.location,
 										search:search, label:label, actionLabel:actionLabel, browserTest:browserTest
 									])
@@ -865,7 +862,7 @@ class MoveTechController {
                         if ( textSearch ) {
                             render ( view : 'cleaningAssetSearch',
 										model:[
-											teamMembers:teamMembers, projMap:projMap, assetCommt:assetCommt, stateVal:stateVal, bundle:params.bundle,
+											teamMembers:teamMembers, projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundle:params.bundle,
 											team:params.team, project:params.project, location:params.location, search:search, label:label,
 											actionLabel:actionLabel, browserTest:browserTest
 										])
@@ -884,7 +881,7 @@ class MoveTechController {
                         if ( textSearch ) {
                             render ( view:'cleaningAssetSearch',
 										model:[
-											teamMembers:teamMembers, projMap:projMap, assetCommt:assetCommt, stateVal:stateVal, 
+											teamMembers:teamMembers, projMap:projMap, assetComment:assetComment, stateVal:stateVal, 
 											bundle:params.bundle, team:params.team, project:params.project, location:params.location,
 											search:search, label:label, actionLabel:actionLabel, browserTest:browserTest
 										])
@@ -904,7 +901,7 @@ class MoveTechController {
                             if ( textSearch ) {
                                 render(view:'cleaningAssetSearch',
 											model:[
-												teamMembers:teamMembers, projMap:projMap, assetCommt:assetCommt, stateVal:stateVal,
+												teamMembers:teamMembers, projMap:projMap, assetComment:assetComment, stateVal:stateVal,
 												bundle:params.bundle, team:params.team, project:params.project, location:params.location,
 												search:search, label:label, actionLabel:actionLabel, browserTest:browserTest
 											])
@@ -924,7 +921,7 @@ class MoveTechController {
                                 if ( textSearch ) {
                                     render ( view:'cleaningAssetSearch',
 													model:[
-														teamMembers:teamMembers, projMap:projMap,assetCommt:assetCommt, stateVal:stateVal,
+														teamMembers:teamMembers, projMap:projMap,assetComment:assetComment, stateVal:stateVal,
 														bundle:params.bundle, team:params.team, project:params.project, location:params.location, 
 														search:search, label:label, actionLabel:actionLabel, browserTest:browserTest
 													])
@@ -953,9 +950,9 @@ class MoveTechController {
                                     }
                                 }
                             }
-                            assetCommt = AssetComment.findAll( "from AssetComment ac where ac.assetEntity = $assetItem.id and ac.commentType != 'issue' " )
+                            assetComment = AssetComment.findAll( "from AssetComment ac where ac.assetEntity = $assetItem.id and ac.commentType != 'issue' " )
                             render ( view:'cleaningAssetSearch',
-										model:[teamMembers:teamMembers, projMap:projMap, assetCommt:assetCommt, stateVal:stateVal, bundle:params.bundle,
+										model:[teamMembers:teamMembers, projMap:projMap, assetComment:assetComment ? assetComment :"", stateVal:stateVal, bundle:params.bundle,
 											team:params.team, project:params.project, location:params.location, search:search, label:label, 
 											actionLabel:actionLabel, browserTest:browserTest
 										])
@@ -973,7 +970,7 @@ class MoveTechController {
     /*--------------------------------------------------------------------------------------------------------
      * To change the state of an asset to CLEANING 
      * @author Mallikarjun
-     * @param  String assetCommt, String team, String location, String actionLabel, String search, String user
+     * @param  String assetComment, String team, String location, String actionLabel, String search, String user
      * @return Message with boolean for indication of transitions   
      *-------------------------------------------------------------------------------------------------------*/ 
 	def cleaning = {
@@ -984,25 +981,21 @@ class MoveTechController {
             def actionLabel = params.actionLabel
             def loginUser = UserLogin.findByUsername ( principal )
             def team
-            def assetCommt = params.assetCommt
-            if ( assetCommt == '[]' ){
-                assetCommt = "";
-            }
+            def assetComment = params.assetComment
             if(params.location == 's'){
                 team = asset.sourceTeam
             }else{
                 team = asset.targetTeam
             }
-            def workflow = workflowService.createTransition ( "STD_PROCESS", "CLEANER", actionLabel, asset, bundle, loginUser, team, assetCommt )
+            def workflow = workflowService.createTransition ( "STD_PROCESS", "CLEANER", actionLabel, asset, bundle, loginUser, team, assetComment )
             if ( workflow.success ) {
                 def projMap = []
-                assetCommt = []
                 def stateVal = null
                 def label = null
                 actionLabel = null
                 render(view: 'cleaningAssetSearch',
 						model:[
-							projMap:projMap, assetCommt:assetCommt, stateVal:stateVal, "search":params.search, "bundle":params.bundle, 
+							projMap:projMap, assetComment:assetComment, stateVal:stateVal, "search":params.search, "bundle":params.bundle, 
 							"team":params.team, "project":params.project, "location":params.location, "tab":"Todo", label:label,
 							actionLabel:actionLabel
 						])
@@ -1011,7 +1004,7 @@ class MoveTechController {
                 redirect ( action:'cleaningAssetSearch', 
                 		   params:[
                 		           "bundle":params.bundle, "team":params.team, "project":params.project, "location":params.location,
-                		           "search":params.search, "assetCommt":params.assetCommt, "label":params.label, "actionLabel":actionLabel
+                		           "search":params.search, "assetComment":assetComment, "label":params.label, "actionLabel":actionLabel
                 		           ])
             }
         } else {
@@ -1034,23 +1027,20 @@ class MoveTechController {
 			def actionLabel = params.actionLabel
 			def loginUser = UserLogin.findByUsername ( principal )
 			def team
-			def assetCommt = params.assetCommt
-			if ( assetCommt == '[]' ) {
-				assetCommt = "";
-			}
+			def assetComment = params.assetComment
 			if ( params.location == 's' ) {
 				team = asset.sourceTeam
 			} else if ( params.location == 't' ) {
 				team = asset.targetTeam
 			}
 			def projMap = []
-			assetCommt = []
+			assetComment = []
 			def stateVal = null
 			def label = null
 			actionLabel = null
 			render(view: 'cleaningAssetSearch',
 					model:[
-						projMap:projMap, assetCommt:assetCommt, stateVal:stateVal, "search":params.search, "bundle":params.bundle, 
+						projMap:projMap, assetComment:assetComment, stateVal:stateVal, "search":params.search, "bundle":params.bundle, 
 						"team":params.team, "project":params.project, "location":params.location, "tab":"Todo", label:label,
 						actionLabel:actionLabel
 					])

@@ -84,3 +84,11 @@ th {
    color: #ffffff;
 	font-weight:bold;
 }
+.action_button {
+	background-color:#aaefb8;
+	width: 200px;
+}
+.confirm_checkbox {
+	width: 30px;
+	height: 30px;
+}

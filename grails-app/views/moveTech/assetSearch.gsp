@@ -79,7 +79,7 @@
 			<input name="location" type="hidden" value="${location}" />
 			<input name="project" type="hidden" value="${project}" />
 			<input name="search" type="hidden" value="${search}"  />
-			<input name="assetCommt" type="hidden" value="${assetCommt}"  />
+			<input name="assetComment" type="hidden" value="${assetComment}"  />
 			<input name="label" type="hidden" value="${label}"  />
 			<input name="actionLabel" type="hidden" value="${actionLabel}"  />
 			<input name="user" type="hidden" value="mt"  />
@@ -121,11 +121,11 @@
 			<td width="219px"><strong>Instructions</strong></td>
 			<td><strong>Confirm</strong></td>
 			</tr>
-			<g:each status="i" in="${assetCommt}" var="comments">
+			<g:each status="i" in="${assetComment}" var="comments">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 			<td>${comments.comment}</td>
 			<g:if test="${comments.mustVerify == 1}">
-			<td><g:checkBox name="myCheckbox" value="${false}" /></td>
+			<td><g:checkBox name="myCheckbox" value="${false}" class="confirm_checkbox" /></td>
 			</g:if>
 			<g:else>
 			<td></td>
@@ -134,7 +134,7 @@
 			</g:each>
 			<g:if test ="${actionLabel}">	
 			<tr>
-			<td colspan="2" style="text-align:right;"><input type="button" value="${label}" onclick="return unRack();" style="background-color:#aaefb8;width: 120px;"/></td>
+			<td colspan="2" style="text-align:right;"><input type="button" value="${label}" onclick="return unRack();" class="action_button"/></td>
 			</tr>
 			</g:if>
 			<table>	

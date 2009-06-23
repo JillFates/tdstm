@@ -411,7 +411,7 @@ function mySelect(x)
 					<input name="location" type="hidden" value="${location}" />
 					<input name="project" type="hidden" value="${project}" />
 					<input name="search" type="hidden" value="${search}" />
-					<input name="assetCommt" type="hidden" value="${assetCommt}" />
+					<input name="assetComment" type="hidden" value="${assetComment}" />
 					<input name="label" type="hidden" value="${label}" />
 					<input name="actionLabel" type="hidden" value="${actionLabel}"  />
 					<input name="user" type="hidden" value="ct" />
@@ -522,9 +522,9 @@ function mySelect(x)
 					<th style="background-color:#cccccc;width:90%;">Instruction/Comments</th>
 					<th style="background-color:#cccccc;width:10%;">Confirmed</th></thead>
 					<tbody style="min-height:200px;">
-					<g:each in="${assetCommt}" status="i" var="assetComment">
+					<g:each in="${assetComment}" status="i" var="assetComment">
 					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-					<td style="border-right:1px;">${fieldValue(bean:assetComment, field:'comment')}</td>
+					<td style="border-right:1px;">${assetComment?.comment}</td>
 					<td style="text-align:center;">
 					<g:if test="${assetComment?.mustVerify == 1}" >
 					<input type="checkbox" id="confirmCheck"  name="checkChange" onclick="checkInstuction()"/>
