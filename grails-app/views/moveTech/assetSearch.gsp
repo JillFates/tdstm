@@ -89,7 +89,7 @@
 			<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
 			</g:if> 
 			</div>
-	<div style="background:url(${createLinkTo(dir:'images',file:'search.png')}) no-repeat top right;margin-right:10px">
+	<div>
 			<g:if test="${projMap}">
 			<dl>
 			<dt>Asset Tag:</dt><dd>&nbsp;${projMap?.asset?.assetTag}</dd>

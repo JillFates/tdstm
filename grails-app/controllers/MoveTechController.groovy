@@ -353,25 +353,36 @@ class MoveTechController {
             def rdyState
             def ipState
             def holdState
-            def query = new StringBuffer ("select a.asset_entity_id as id, a.asset_tag as assetTag, a.source_rack as sourceRack, " + 
-                                           "a.source_rack_position as sourceRackPosition, a.target_rack as targetRack, " +
-                                           "a.target_rack_position as targetRackPosition, a.model as model, p.current_state_id as currentStateId " +
-                                           "from asset_entity a left join project_asset_map p on (a.asset_entity_id = p.asset_id) " +
-                                           "where a.move_bundle_id = $bundle")
+            def countQuery = "select a.asset_entity_id as id, a.asset_tag as assetTag, a.source_rack as sourceRack, " + 
+				            "a.source_rack_position as sourceRackPosition, a.target_rack as targetRack, " +
+				            "a.target_rack_position as targetRackPosition, a.model as model, p.current_state_id as currentStateId " +
+				            "from asset_entity a left join project_asset_map p on (a.asset_entity_id = p.asset_id) " +
+				            "where a.move_bundle_id = $bundle"
+            def query = new StringBuffer (countQuery)
             if ( params.location == "s" ) {
                 stateVal = stateEngineService.getStateId ( "STD_PROCESS", "Unracked" )
                 query.append (" and a.source_team_id = $team" )
+                countQuery +=" and a.source_team_id = $team"
             } else {
                 stateVal = stateEngineService.getStateId ( "STD_PROCESS", "Reracked" )
                 query.append (" and a.target_team_id = $team" )
+                countQuery += " and a.target_team_id = $team" 
             }
             allSize = jdbcTemplate.queryForList ( query.toString() ).size()
             if ( tab == "Todo" ) {
                 query.append (" and p.current_state_id < $stateVal")
             }
+            if( params.sort != null ){
+            	if( params.sort == "source_rack" ) {
+            		query.append(" order by p.current_state_id, a.$params.sort $params.order, a.source_rack_position $params.order" )
+            	}else {
+            		query.append(" order by p.current_state_id, a.$params.sort $params.order" )
+            	}
+            }else {
+            	query.append(" order by p.current_state_id, a.source_rack, a.source_rack_position" )
+            }
             proAssetMap = jdbcTemplate.queryForList ( query.toString() )
             todoSize = proAssetMap.size()
-            
             holdState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Hold" ) 
             if ( params.location == "s" ) {
                 rdyState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Release" )
@@ -380,7 +391,6 @@ class MoveTechController {
                 rdyState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Staged" )
                 ipState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Reracking" )
             }
-            
             proAssetMap.each {
                 if ( it.currentStateId ) {
 	                if ( it.currentStateId == holdState ) {
@@ -400,12 +410,13 @@ class MoveTechController {
                 assetList << [ item:it, cssVal:colorCss ]
             }
             if ( tab == "All" ) {
-                query.append ( " and p.current_state_id < $stateVal" )
-                todoSize = jdbcTemplate.queryForList ( query.toString() ).size()
+            	countQuery += " and p.current_state_id < $stateVal" 
+                todoSize = jdbcTemplate.queryForList ( countQuery ).size()
+                
             }
             return[ bundle:bundle, team:team, project:params.project, location:params.location, 
                     assetList:assetList, allSize:allSize, todoSize:todoSize, 'tab':tab
-                    ]
+                  ]
 		} else {
 			flash.message = "Your login has expired and must login again."
 			redirect ( action:'login' )

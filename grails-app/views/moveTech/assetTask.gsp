@@ -122,9 +122,9 @@
              					<table id="assetTable" style="height:80px;">
               					<thead>
                 				<tr>
-                  				<th class="asset_details_block">AssetTag</th>
-                  				<th class="asset_details_block">Rack/Pos</th>
-                  				<th class="asset_details_block">Model</th>                 	
+                  				<g:sortableColumn style="color: #5b5e5c; width:60px; border:1px  solid #5b5e5c; margin:2px;background:#aaefb8;padding:2px;" action="assetTask" property="asset_tag" title="AssetTag" params="['bundle':bundle, 'team':team, 'tab':tab,'location':location,'project':project ]"></g:sortableColumn>
+                  				<g:sortableColumn style="color: #5b5e5c; width:65px; border:1px  solid #5b5e5c; margin:2px;background:#aaefb8;padding:2px;" action="assetTask" property="source_rack" title="Rack/Pos" params="['bundle':bundle, 'team':team, 'tab':tab,'location':location,'project':project ]"></g:sortableColumn>
+                  				<g:sortableColumn style="color: #5b5e5c; border:1px solid #5b5e5c; margin:2px;background:#aaefb8;padding:2px;" action="assetTask" property="model" title="Model" params="['bundle':bundle, 'team':team, 'tab':tab,'location':location,'project':project ]"></g:sortableColumn>
 								</tr>
                					</thead>
                					<tbody>
