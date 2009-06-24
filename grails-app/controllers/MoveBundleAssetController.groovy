@@ -258,7 +258,7 @@ class MoveBundleAssetController {
 	    	moveBundleAssets.each{bundleAsset ->
 				items <<[id:bundleAsset.id, assetName:bundleAsset.assetName, assetTag:bundleAsset.assetTag, application:bundleAsset.application, srcLocation:bundleAsset.sourceLocation  +"/"+bundleAsset.sourceRack  ]
 	    	}
-    	 } else {
+        } else {
     		def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
     		def assetEntities = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId ")
 			assetEntities.each{assetEntity ->
@@ -891,7 +891,7 @@ class MoveBundleAssetController {
     			def createdBy
     			def sourceTargetRoom
     			sourceTargetRoom = (assetComment?.assetEntity?.sourceRoom ? assetComment?.assetEntity?.sourceRoom : "--")+"/"+(assetComment?.assetEntity?.sourceRack ? assetComment?.assetEntity?.sourceRack : "--")+"/"+(assetComment?.assetEntity?.sourceRackPosition ? assetComment?.assetEntity?.sourceRackPosition : "--")+"\n"+
-    								(assetComment?.assetEntity?.targetRoom ? assetComment?.assetEntity?.targetRoom : "--")+"/"+(assetComment?.assetEntity?.targetRack ? assetComment?.assetEntity?.targetRack : "--")+"/"+(assetComment?.assetEntity?.targetRackPosition ? assetComment?.assetEntity?.targetRackPosition : "--")
+                (assetComment?.assetEntity?.targetRoom ? assetComment?.assetEntity?.targetRoom : "--")+"/"+(assetComment?.assetEntity?.targetRack ? assetComment?.assetEntity?.targetRack : "--")+"/"+(assetComment?.assetEntity?.targetRackPosition ? assetComment?.assetEntity?.targetRackPosition : "--")
     			if( params.reportResolveInfo == "true" || assetComment.isResolved != 1 ) {
     				reportFields <<['assetName':assetComment?.assetEntity?.assetName, 'assetTag':assetComment?.assetEntity?.assetTag, 'sourceTargetRoom':sourceTargetRoom,'model':(assetComment?.assetEntity?.manufacturer ? assetComment?.assetEntity?.manufacturer : "")+" "+(assetComment?.assetEntity?.model ? assetComment?.assetEntity?.model : "" ), 'occuredAt':assetComment?.dateCreated, 'createdBy':assetComment?.createdBy?.firstName+" "+assetComment?.createdBy?.lastName, 'issue':assetComment?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 'clientName':projectInstance?.client?.name,"resolvedInfoInclude":resolvedInfoInclude]
     			}
@@ -921,10 +921,10 @@ class MoveBundleAssetController {
     	def client = projectInstance.client.name
     	def startDate = projectInstance.startDate
     	def reportFields = []
-    	def teamMembers = [] 
+    	def teamMembers = []
     	if(params.moveBundle == "null") {    		
-    		flash.message = " Please Select Bundles. "
-    		redirect( action:'getBundleListForReportDialog', params:[reportId: 'Login Badges'] )
+    		reportFields <<[ 'flashMessage': "Please Select Bundles."]
+    		render reportFields as JSON
     	} else {
     		def moveBundleInstance = MoveBundle.findById(params.moveBundle)
     		def projectTeamInstance
@@ -939,7 +939,6 @@ class MoveBundleAssetController {
     		//if moveBundleinstance is selected (single moveBundle)
     		if( moveBundleInstance ) {
     			bundleName = moveBundleInstance?.name
-    			//if Projectteam and moveBundle both selected
     			if( projectTeamInstance ) {
     				teamName = projectTeamInstance?.name
     				def members = partyRelationshipService.getTeamMembers(projectTeamInstance.id)
@@ -961,46 +960,46 @@ class MoveBundleAssetController {
     				moveBundleInstanceList.each { bundle ->
     					def teamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle in ( select m.id from MoveBundle m where m.project = $projectId ) " )
     					teamInstanceList.each { team ->
-    					def members = partyRelationshipService.getTeamMembers(team.id)
-    					teamMembers.add(members)
+                            def members = partyRelationshipService.getTeamMembers(team.id)
+                            teamMembers.add(members)
     					}
     				}
     			}
     		}
-    	}
-    	if ( params.location == "source" || params.location == "both" ) {
-    		teamMembers.each { members ->
-    			members.each { member ->
-    			def teamCode = "mt"
-    			if(member.partyIdFrom.teamCode == "Cleaning") {
-    				teamCode = "ct"
-    			}
-    			reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
-    			                 'teamName': member.partyIdFrom.name, 
-    			                 'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? partyRelationshipService.convertDate(member.partyIdFrom.moveBundle.startTime) : " "),
-    			                 'barCode': teamCode+'-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-s' 
-    			                 ]
+    		if ( params.location == "source" || params.location == "both" ) {
+        		teamMembers.each { members ->
+        			members.each { member ->
+                        def teamCode = "mt"
+                        if(member.partyIdFrom.teamCode == "Cleaning") {
+                            teamCode = "ct"
+                        }
+                        reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
+        			                 'teamName': member.partyIdFrom.name, 
+        			                 'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? partyRelationshipService.convertDate(member.partyIdFrom.moveBundle.startTime) : " "),
+        			                 'barCode': teamCode+'-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-s' 
+                        ]
+        			}
+        		}
+        	}
+    		if ( params.location == "target" || params.location == "both" ) {
+    			teamMembers.each { members ->
+    				members.each { member ->
+                        if(member.partyIdFrom.teamCode != "Cleaning") {
+                            reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
+    					                 'teamName': member.partyIdFrom.name, 
+    					                 'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? partyRelationshipService.convertDate(member.partyIdFrom.moveBundle.startTime) : " "),
+    					                 'barCode': 'mt-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-t' 
+                            ]
+    					}
+    				}
     			}
     		}
-    	}
-		if ( params.location == "target" || params.location == "both" ) {
-			teamMembers.each { members ->
-				members.each { member ->
-				if(member.partyIdFrom.teamCode != "Cleaning") {
-					reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
-					                 'teamName': member.partyIdFrom.name, 
-					                 'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? partyRelationshipService.convertDate(member.partyIdFrom.moveBundle.startTime) : " "),
-					                 'barCode': 'mt-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-t' 
-					                 ]
-					}
-				}
-			}
-		}
-    	if(reportFields.size <= 0) {    		
-    		flash.message = " No Assets Were found for  selected values  "
-    		redirect( action:'getBundleListForReportDialog', params:[reportId: 'Login Badges'] )
-    	}else {
-    		render reportFields as JSON
+        	if(reportFields.size <= 0) { 
+        		reportFields <<[ 'flashMessage': "Team Members not Found for selected Teams"]
+        		render reportFields as JSON
+        	}else {
+        		render reportFields as JSON
+        	}
     	}
     }
 }    

@@ -23,7 +23,13 @@ var jobdata = job.NewJobDataRecordSet();
     job.PrinterName = form.PrinterName.value;
     // THIS IS THE PLACE TO ADD YOUR DATA
     jobdata.ClearRecords();  
-    var teamMembers = eval("(" + e.responseText + ")")	    
+    var teamMembers = eval("(" + e.responseText + ")")
+    if(	teamMembers.length == 1 && teamMembers[0].flashMessage != null) {
+    	document.getElementById('teamNotFound').style.display = "block"
+    	document.getElementById('warnMessage').innerHTML = teamMembers[0].flashMessage
+    	return flase;
+    }
+    document.getElementById('teamNotFound').style.display = "none"   
     for(var label = 0; label < teamMembers.length; label++) {
     	jobdata.AddNewRecord();                					
     	jobdata.SetDataField('userName', teamMembers[label].name); 
@@ -219,6 +225,7 @@ var sHint = "C:\\temp\\output";
 	/*----------------------------------------------
 	 * To get the labels print for selected Bundles and team
 	 * @author Srinivas
+	 * @return call startPrintJob() method by passing the list of teamMembers
 	 * -----------------------------------------------*/ 
 	 function generateLabels() {
 	 var projectId = ${projectInstance?.id}
@@ -227,13 +234,10 @@ var sHint = "C:\\temp\\output";
 	 var location = document.getElementById( 'location' ).value
 	${remoteFunction(action:'getLabelBadges', params:'\'moveBundle=\' + moveBundle +\'&project=\'+projectId +\'&teamFilter=\'+team+\'&location=\'+location', onComplete:'startprintjob(e)')}
 	 }
-     function sample(){
-     alert("ok");
-     }
      
     </script>
 </head>
-<body onload="InitData()">
+<body >
 <div class="body">
 <h1>Login Badges </h1>
 <g:if test="${flash.message}">
@@ -244,11 +248,16 @@ var sHint = "C:\\temp\\output";
 					<ul>
 					<li>This report must be done using Internet Explorer</li>
 					</ul>
-					</div>
+			</div>
 			</g:if>
 <div class="dialog">
 <object id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C" codebase="${createLinkTo(dir:'resource',file:'TFORMer60.cab')}"></object>
 <g:form	name="loginLabelForm" >
+<div id="teamNotFound" class="message" style="display:none">
+					<ul>
+					<span id="warnMessage" name="warnMessage"></span>
+					</ul>
+			</div>
 <table>
 	<tbody>
 		<tr class="prop" id="bundleRow">
