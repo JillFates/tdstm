@@ -9,7 +9,12 @@ class ClientConsoleController {
     def index = { 
     	redirect(action:list,params:params)
     }
-	// List of asset for client console
+	/*-----------------------------------------------------
+	 *  List of asset for client console
+	 *  @author : Lokanath Reddy
+	 *  @param  : asset filters and movebundle and project
+	 *  @return : AssetEntity Details and AssetTransition details
+	 */
     def list={
     	def headerCount = getHeaderNames()
     	def browserTest = request.getHeader("User-Agent").contains("MSIE")
@@ -46,10 +51,16 @@ class ClientConsoleController {
             }
         }
     	if(moveBundleInstance != null){
-			def applicationList=AssetEntity.executeQuery("select distinct ae.application from AssetEntity ae where ae.application is not null and ae.project.id="+projectId)
-			def appOwnerList=AssetEntity.executeQuery("select distinct ae.appOwner from AssetEntity ae where ae.appOwner is not null and ae.project.id="+projectId)
-			def appSmeList=AssetEntity.executeQuery("select distinct ae.appSme from AssetEntity ae where ae.appSme is not null  and ae.project.id="+projectId)
-			def query = new StringBuffer("select ae.asset_entity_id as id,ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,ae.asset_name as assetName,GROUP_CONCAT(state_to ORDER BY state_to SEPARATOR ',') as transitions FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id) where ae.project_id = $projectId and ae.move_bundle_id = ${moveBundleInstance.id}")
+			def applicationList=AssetEntity.executeQuery("select distinct ae.application from AssetEntity "+
+															"ae where ae.application is not null and ae.project.id="+projectId)
+			def appOwnerList=AssetEntity.executeQuery("select distinct ae.appOwner from AssetEntity ae where "+
+														"ae.appOwner is not null and ae.project.id="+projectId)
+			def appSmeList=AssetEntity.executeQuery("select distinct ae.appSme from AssetEntity ae where ae.appSme is not null  "+
+														"and ae.project.id="+projectId)
+			def query = new StringBuffer("select ae.asset_entity_id as id,ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,"+
+															"ae.asset_name as assetName,max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate "+
+															" FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id) "+
+															"where ae.project_id = $projectId and ae.move_bundle_id = ${moveBundleInstance.id}")
 			if(appValue!="" && appValue!= null){
 				def app = appValue.replace("'","\\'")
 				query.append(" and ae.application ='$app'")
@@ -89,10 +100,7 @@ class ClientConsoleController {
 				def stateId = 0
 				def assetId = it.id
 				def htmlTd = []
-				def transitions
-				if(it.transitions){
-					transitions =it.transitions.tokenize(',')
-				}
+				def maxstate = it.maxstate
 				def assetEntity = AssetEntity.get(assetId)
 				projectMap = ProjectAssetMap.findByAsset(assetEntity)
 				if(projectMap){
@@ -116,13 +124,13 @@ class ClientConsoleController {
 				}
 				processTransitionList.each() { trans ->
 					def cssClass='task_pending'
-					transitions.each() { task ->
-						if(task == trans.transId){
-							if(stateId == 10 ){
-								cssClass = "asset_hold"
-							} else if(stateId != 10 && Integer.parseInt(task) != 10){
-								cssClass = "task_done"
-							}
+					def transitionId = Integer.parseInt(trans.transId)
+					if( transitionId <= maxstate  ){
+						cssClass = "task_done"
+						if(stateId == 10 ){
+							cssClass = "asset_hold"
+						} else if( transitionId == 10 ){
+							cssClass='task_pending'
 						}
 					}
 					htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass\">&nbsp;</td>"
@@ -131,13 +139,22 @@ class ClientConsoleController {
 			}
 			userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")
 			def timeToRefresh = getSession().getAttribute("CLIENT_CONSOLE_REFRESH")
-			return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,appOwnerList:appOwnerList,applicationList:applicationList,appSmeList:appSmeList,projectId:projectId,processTransitionList:processTransitionList,projectId:projectId,appOwnerValue:appOwnerValue,appValue:appValue,appSmeValue:appSmeValue,timeToRefresh:timeToRefresh ? timeToRefresh.CLIENT_CONSOLE_REFRESH : "never",headerCount:headerCount,browserTest:browserTest]
+			return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,
+				appOwnerList:appOwnerList,applicationList:applicationList,appSmeList:appSmeList,projectId:projectId,
+				processTransitionList:processTransitionList,projectId:projectId,appOwnerValue:appOwnerValue,appValue:appValue,
+				appSmeValue:appSmeValue,timeToRefresh:timeToRefresh ? timeToRefresh.CLIENT_CONSOLE_REFRESH : "never",
+				headerCount:headerCount,browserTest:browserTest]
     	} else {
     		flash.message = "Please create bundle to view PMO Dashboard"
     		redirect(controller:'project',action:'show',params:["id":params.projectId])
     	}
 	}
-    // To get list of task for an asset through ajax
+	/*---------------------------------------------------------
+	 * To get list of task for an asset through ajax
+	 * @author : Bhuvaneshwari
+	 * @param  : AssetEntitys  
+	 * @return : Tasks list for params asset
+	 *---------------------------------------------------------*/
 	def getTask = {
         def stateVal
         def taskList = []
@@ -163,8 +180,12 @@ class ClientConsoleController {
         totalList<<[item:taskList,asset:assetId]
         render totalList as JSON
 	}
-    
-	// Refresh time selection 
+	/*---------------------------------------------------------
+	 * Will set user preference for CLIENT_CONSOLE_REFRESH time
+	 * @author : Lokanath Reddy
+	 * @param  : refresh time 
+	 * @return : refresh time 
+	 *---------------------------------------------------------*/
 	def setTimePreference = {
         def timer = params.timer
         def refreshTime =[]
@@ -175,8 +196,12 @@ class ClientConsoleController {
         refreshTime <<[refreshTime:timeToRefresh]
         render refreshTime as JSON
 	}
-	
-	//To get unique list of task for list of assets through ajax
+	/*---------------------------------------------------------
+	 * To get unique list of task for list of assets through ajax
+	 * @author : Bhuvaneshwari
+	 * @param  : AssetEntitys array 
+	 * @return : Tasks list for params asset array 
+	 *---------------------------------------------------------*/
 	def getList = {
     	
         def assetArray = params.assetArray
@@ -215,8 +240,13 @@ class ClientConsoleController {
         }
         render totalList as JSON
     }
-	
-    // To change the status for an asset
+	/*---------------------------------------------------------
+	 * To change the status for an asset
+	 * @author : Bhuvaneshwari
+	 * @param  : AssetEntitys array , tostate 
+	 * @return : Change the status for params asset array 
+	 *---------------------------------------------------------*/
+    
 	def changeStatus = {
         def assetId = params.asset
 				 
@@ -264,7 +294,11 @@ class ClientConsoleController {
 			def today = new java.util.Date();
 			def currentPoolTime = new java.sql.Timestamp(today.getTime())
 			getSession().setAttribute("LAST_POOL_TIME",currentPoolTime)
-			def query = new StringBuffer("select ae.asset_entity_id as id,ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,ae.asset_name as assetName,GROUP_CONCAT(state_to ORDER BY state_to SEPARATOR ',') as transitions FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id) where ae.asset_entity_id in ( select t.asset_entity_id from asset_transition t where t.date_created between '$lastPoolTime' and '$currentPoolTime' ) and ae.project_id = $moveBundleInstance.project.id and ae.move_bundle_id = ${moveBundleInstance.id}")
+			def query = new StringBuffer("select ae.asset_entity_id as id,ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,ae.asset_name "+
+											" as assetName,max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_entity ae "+
+											" LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id) where ae.asset_entity_id in "+
+											" ( select t.asset_entity_id from asset_transition t where t.date_created between '$lastPoolTime' and '$currentPoolTime' )"+
+											" and ae.project_id = $moveBundleInstance.project.id and ae.move_bundle_id = ${moveBundleInstance.id}")
 			if(appValue!="" && appValue!= null){
 				query.append(" and ae.application ='$appValue'")
 			}
@@ -281,11 +315,8 @@ class ClientConsoleController {
 				def stateId = 0
 				def assetId = it.id
 				def tdId = []
-				def transitions
 				def check
-				if(it.transitions){
-					transitions =it.transitions.tokenize(',')
-				}
+				def maxstate = it.maxstate
 				def assetEntity = AssetEntity.get(assetId)
 				def projectMap = ProjectAssetMap.findByAsset(assetEntity)
 				if(projectMap){
@@ -309,13 +340,13 @@ class ClientConsoleController {
 				}
 				processTransitions.each() { trans ->
 					def cssClass='task_pending'
-					transitions.each() { task ->
-						if(task == trans){
-							if(stateId == 10 ){
-								cssClass = "asset_hold"
-							} else if(stateId != 10 && Integer.parseInt(task) != 10){
-								cssClass = "task_done"
-							}
+					def transitionId = Integer.parseInt(trans.transId)
+					if( transitionId <= maxstate  ){
+						cssClass = "task_done"
+						if(stateId == 10 ){
+							cssClass = "asset_hold"
+						} else if( transitionId == 10 ){
+							cssClass='task_pending'
 						}
 					}
 					tdId << [id:"${assetId+"_"+trans}", cssClass:cssClass]
@@ -325,13 +356,20 @@ class ClientConsoleController {
 				if(assetComment){
 					showCommentIcon = true
 				}
-				assetEntityList << [id: assetId, application:it.application ? it.application : "&nbsp;",appOwner:it.appOwner ? it.appOwner : "&nbsp;", appSme:it.appSme ? it.appSme : "&nbsp;",assetName:it.assetName ? it.assetName :"&nbsp;",tdId:tdId, check:check, showCommentIcon:showCommentIcon]
+				assetEntityList << [id: assetId, application:it.application ? it.application : "&nbsp;",appOwner:it.appOwner ? it.appOwner : "&nbsp;", 
+									appSme:it.appSme ? it.appSme : "&nbsp;",assetName:it.assetName ? it.assetName :"&nbsp;",tdId:tdId,
+									check:check, showCommentIcon:showCommentIcon]
 			}
 		}
     	render assetEntityList as JSON
     }
 	
-	//get header name details for svg.
+	
+	/* -----------------------------------------------------
+	 * get header name details for svg.
+	 * @author: Mallikarjun
+	 * @return: count of tasks
+	 *----------------------------------------------------*/
 	def getHeaderNames = {
 		def tempTransitions = []
 		def processTransitions= stateEngineService.getTasks("STD_PROCESS", "TASK_ID")
@@ -354,7 +392,8 @@ class ClientConsoleController {
 		svgHeaderFile.append("}")
 		svgHeaderFile.append("// ]]>")
 		svgHeaderFile.append("</script>")
-		svgHeaderFile.append("<text id='thetext' text-rendering='optimizeLegibility' transform='rotate(270, 90, 0)' font-weight='bold' font-size='12' fill='#333333' x='-11' y='-76' font-family='verdana,arial,helvetica,sans-serif'>")
+		svgHeaderFile.append("<text id='thetext' text-rendering='optimizeLegibility' transform='rotate(270, 90, 0)' font-weight='bold' "+
+							"font-size='12' fill='#333333' x='-11' y='-76' font-family='verdana,arial,helvetica,sans-serif'>")
 		def count = 0
 		tempTransitions.sort().each{
 			def processTransition = stateEngineService.getStateLabel("STD_PROCESS",it)
