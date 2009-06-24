@@ -258,9 +258,10 @@
 				</td>
 				<td valign="top"
 					class="value ${hasErrors(bean:projectInstance,field:'description','errors')}">
-				<input type="text" id="description" name="description"
-					maxlength="64"
-					value="${fieldValue(bean:projectInstance,field:'description')}" />
+				<textarea rows="3" cols="40" id="description" name="description"
+					onkeydown="textCounter(document.createProjectForm.description,200);"
+					onkeyup="textCounter(document.createProjectForm.description,200);">
+					${fieldValue(bean:projectInstance,field:'description')}</textarea>
 				<g:hasErrors bean="${projectInstance}" field="description">
 					<div class="errors"><g:renderErrors bean="${projectInstance}"
 						as="list" field="description" /></div>
@@ -272,7 +273,7 @@
 				</td>
 				<td valign="top"
 					class="value ${hasErrors(bean:projectInstance,field:'comment','errors')}">
-				<textarea rows="3" cols="40" name="comment"
+				<textarea  rows="3" cols="40" name="comment"
 					onkeydown="textCounter(document.createProjectForm.comment,200);"
 					onkeyup="textCounter(document.createProjectForm.comment,200);">${fieldValue(bean:projectInstance,field:'comment')}</textarea>
 				<g:hasErrors bean="${projectInstance}" field="comment">

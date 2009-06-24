@@ -538,22 +538,24 @@ class AssetEntityController {
         def assetEntityInstance = AssetEntity.get( params.id )
         def projectId = params.projectId
         if(assetEntityInstance) {
-            ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${params.id}")
-            AssetTransition.executeUpdate("delete from AssetTransition ast where ast.assetEntity = ${params.id}")
-            AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity = ${params.id}")
-            ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset = ${params.id}")
-            AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar aev where aev.assetEntity = ${params.id}")
-            AssetEntity.executeUpdate("delete from AssetEntity ae where ae.id = ${params.id}")
+            ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${assetEntityInstance.id}")
+            AssetTransition.executeUpdate("delete from AssetTransition ast where ast.assetEntity = ${assetEntityInstance.id}")
+            AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity = ${assetEntityInstance.id}")
+            ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset = ${assetEntityInstance.id}")
+            AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar aev where aev.assetEntity = ${assetEntityInstance.id}")
+            AssetEntity.executeUpdate("delete from AssetEntity ae where ae.id = ${assetEntityInstance.id}")
           
             flash.message = "AssetEntity ${assetEntityInstance.assetName} deleted"         
         }
         else {
             flash.message = "AssetEntity not found with id ${params.id}"          
         }
-        if(params.moveBundle){
-         	redirect(action:dashboardView, params:[projectId:projectId,moveBundle : params.moveBundle])
-        }else{
-            redirect(action:list, params:[projectId:projectId])
+    	if ( params.clientList ){
+    		redirect( controller:"clientConsole", action:"list", params:[projectId:projectId, moveBundle:params.moveBundle] )
+    	} else if ( params.moveBundle ) {
+         	redirect( action:dashboardView, params:[projectId:projectId, moveBundle:params.moveBundle] )
+        } else {
+            redirect( action:list, params:[projectId:projectId] )
         }
     }
     
@@ -576,10 +578,12 @@ class AssetEntityController {
         else {
             flash.message = "AssetEntity not found with id ${params.id}"
         }
-        if(params.moveBundle){
-            redirect(action:dashboardView, params:[projectId:projectId,moveBundle : params.moveBundle])
+        if ( params.clientList ){
+    		redirect( controller:"clientConsole", action:"list", params:[projectId:projectId, moveBundle:params.moveBundle] )
+    	} else if ( params.moveBundle ){
+            redirect( action:dashboardView, params:[projectId:projectId, moveBundle : params.moveBundle] )
         }else{
-            redirect(action:list, params:[projectId:projectId])
+            redirect( action:list, params:[projectId:projectId] )
         }
     }
     /* -------------------------------------------

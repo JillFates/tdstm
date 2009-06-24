@@ -192,14 +192,14 @@
           <tr class="prop">
             <td valign="top" class="name">Description:</td>
 
-            <td valign="top" class="value">${fieldValue(bean:projectInstance, field:'description')}</td>
+            <td valign="top" class="value"><textarea cols="40"  rows="3" readOnly="true" >${fieldValue(bean:projectInstance, field:'description')}</textarea></td>
 
           </tr>
 
           <tr class="prop">
             <td valign="top" class="name">Comment:</td>
 
-            <td valign="top" class="value"><textarea cols="40"  rows="3" readOnly="true" value="${projectInstance?.comment}"></textarea></td>
+            <td valign="top" class="value"><textarea cols="40"  rows="3" readOnly="true" >${fieldValue(bean:projectInstance, field:'comment')}</textarea></td>
 
           </tr>
 
@@ -298,6 +298,20 @@
                   </g:hasErrors>
                 </td>
               </tr>
+              
+              <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="description">Description:</label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'description','errors')}">
+                                    <textarea cols="40"  rows="3" id="description" name="description" onkeydown="textCounter(document.createProjectForm.description,200);" onkeyup="textCounter(document.createProjectForm.description,200);">${fieldValue(bean:projectInstance,field:'description')}</textarea>
+                                <g:hasErrors bean="${projectInstance}" field="description">
+					            <div class="errors">
+					                <g:renderErrors bean="${projectInstance}" as="list" field="description"/>
+					            </div>
+					            </g:hasErrors>
+                                </td>
+                            </tr> 
 
               <tr class="prop">
                 <td valign="top" class="name"><label for="comment">Comment:</label>

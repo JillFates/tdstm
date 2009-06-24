@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
 <link rel="shortcut icon"
 	href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+	
 <g:javascript library="application" />
 </head>
 <body>
@@ -14,9 +15,12 @@
 <div class="logo">
 <table style="border: 0;">
 	<tr>
-		<td><a href="http://www.transitionaldata.com/" target="new"><img
+		<td>
+		<%--<a href="http://www.transitionaldata.com/" target="new"><img
 			src="${createLinkTo(dir:'images',file:'tds.jpg')}" border="0"
-			alt="tds" /></a></td>
+			alt="tds" /></a>--%>
+			<h1>Transition Manager</h1>
+			</td>
 		
 	</tr>
 </table>
@@ -64,3 +68,4 @@
 <div class="logo"></div>
 </body>
 </html>
+		

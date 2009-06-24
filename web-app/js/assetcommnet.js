@@ -258,6 +258,14 @@
 				      if(assetComments.commentType != "issue"){
 				      document.getElementById('resolve_'+assetComments.id).innerHTML = "";
 				      }else{
+				      var checkResolveTd = document.getElementById('verifyResolved_'+assetComments.id)
+				      if (checkResolveTd == null){
+				      	  var resolveVal = document.createElement('input')
+					      resolveVal.id = 'verifyResolved_'+assetComments.id
+					      resolveVal.type = 'checkbox'
+					      resolveVal.disabled = 'disabled'
+					      document.getElementById('resolve_'+assetComments.id).appendChild( resolveVal )
+					      }
 				       if(assetComments.isResolved != 0){
 				      document.getElementById('verifyResolved_'+assetComments.id).checked = true ;
 				      } else {

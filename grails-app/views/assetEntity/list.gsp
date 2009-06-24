@@ -851,8 +851,16 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 				<td valign="top" class="name"><label for="commentType">Comment
 				Type:</label></td>
 				<td valign="top" style="width: 20%;" >
-				<input type="text" id="commentType" name="commentType" readonly="readonly">&nbsp;&nbsp;&nbsp;&nbsp;			
+				<jsec:hasAnyRole in="['ADMIN','PROJ_MGR']">
+				<g:select id="commentType"
+					name="commentType"
+					from="${AssetComment.constraints.commentType.inList}" value=""
+					 onChange="commentChange('editResolveDiv','editCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
+				</jsec:hasAnyRole>
+				<jsec:lacksAllRoles in="['ADMIN','PROJ_MGR']">
 				
+				<input type="text" id="commentType" name="commentType" readonly style="border: 0;">&nbsp;&nbsp;&nbsp;&nbsp;
+				</jsec:lacksAllRoles>				
 				<input type="checkbox"
 					id="mustVerifyEdit" name="mustVerify" value="0"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
