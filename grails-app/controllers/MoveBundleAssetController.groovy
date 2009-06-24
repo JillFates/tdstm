@@ -559,11 +559,18 @@ class MoveBundleAssetController {
         	render(view:'rackLayout',model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
         } else if( reportId == "cart Asset" ){
         	render(view:'cartAssetReport',model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
-        }else if( reportId == 'Issue Report' ){
+        } else if( reportId == 'Issue Report' ){
         	render(view:'issueReport',model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
-        }else if(reportId == 'Transportation Asset List') {
+        } else if(reportId == 'Transportation Asset List') {
         	render(view:'transportationAssetReport',model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
-        }else {
+        }
+        else if ( reportId == 'Login Badges' ) {
+        	def browserTest = false
+        	if ( !request.getHeader ( "User-Agent" ).contains ( "MSIE" ) ) {
+        		browserTest = true
+        	}
+        	render(view:'loginBadgeLabelReport',model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, browserTest: browserTest])
+        } else {
         	render(view:'teamWorkSheets',model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
         }
     }
@@ -900,4 +907,100 @@ class MoveBundleAssetController {
         	}
         }
     }
-}
+	/*-------------------------------------------------------------------
+	 * To Get the Team Login Badge labes Data
+	 * @author Srinivas
+	 * @param Project,MoveBundle,Team,Location
+	 * @return logn badge labels data
+	 *--------------------------------------------------------------------*/
+	def getLabelBadges = {
+    	def moveBundle = params.bundle
+    	def location = params.location
+    	def projectInstance = Project.findById(params.project)
+    	def projectId = params.project
+    	def client = projectInstance.client.name
+    	def startDate = projectInstance.startDate
+    	def reportFields = []
+    	def teamMembers = [] 
+    	if(params.moveBundle == "null") {    		
+    		flash.message = " Please Select Bundles. "
+    		redirect( action:'getBundleListForReportDialog', params:[reportId: 'Login Badges'] )
+    	} else {
+    		def moveBundleInstance = MoveBundle.findById(params.moveBundle)
+    		def projectTeamInstance
+    		def loginBadges = []
+    		def bundleName = "All Bundles"
+    		def teamName = "All Teams"
+    		def assetEntityList
+    		def targetAssetEntitylist
+    		if(params.teamFilter != "null"){
+   	   			projectTeamInstance = ProjectTeam.findById( params.teamFilter )
+   	   		}
+    		//if moveBundleinstance is selected (single moveBundle)
+    		if( moveBundleInstance ) {
+    			bundleName = moveBundleInstance?.name
+    			//if Projectteam and moveBundle both selected
+    			if( projectTeamInstance ) {
+    				teamName = projectTeamInstance?.name
+    				def members = partyRelationshipService.getTeamMembers(projectTeamInstance.id)
+    				teamMembers.add(members)
+    			}else {
+    				def teamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $moveBundleInstance.id " )
+    				teamInstanceList.each { team ->
+    					def members = partyRelationshipService.getTeamMembers(team.id)
+    					teamMembers.add(members)
+    				}
+    			}
+    		} else {
+    			if( projectTeamInstance ) {
+    				teamName = projectTeamInstance?.name
+    				def members = partyRelationshipService.getTeamMembers(projectTeamInstance.id)
+    				teamMembers.add(members)
+    			} else {
+    				def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
+    				moveBundleInstanceList.each { bundle ->
+    					def teamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle in ( select m.id from MoveBundle m where m.project = $projectId ) " )
+    					teamInstanceList.each { team ->
+    					def members = partyRelationshipService.getTeamMembers(team.id)
+    					teamMembers.add(members)
+    					}
+    				}
+    			}
+    		}
+    	}
+    	if ( params.location == "source" || params.location == "both" ) {
+    		teamMembers.each { members ->
+    			members.each { member ->
+    			def teamCode = "mt"
+    			if(member.partyIdFrom.teamCode == "Cleaning") {
+    				teamCode = "ct"
+    			}
+    			reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
+    			                 'teamName': member.partyIdFrom.name, 
+    			                 'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? partyRelationshipService.convertDate(member.partyIdFrom.moveBundle.startTime) : " "),
+    			                 'barCode': teamCode+'-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-s' 
+    			                 ]
+    			}
+    		}
+    	}
+		if ( params.location == "target" || params.location == "both" ) {
+			teamMembers.each { members ->
+				members.each { member ->
+				if(member.partyIdFrom.teamCode != "Cleaning") {
+					reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
+					                 'teamName': member.partyIdFrom.name, 
+					                 'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? partyRelationshipService.convertDate(member.partyIdFrom.moveBundle.startTime) : " "),
+					                 'barCode': 'mt-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-t' 
+					                 ]
+					}
+				}
+			}
+		}
+    	if(reportFields.size <= 0) {    		
+    		flash.message = " No Assets Were found for  selected values  "
+    		redirect( action:'getBundleListForReportDialog', params:[reportId: 'Login Badges'] )
+    	}else {
+    		render reportFields as JSON
+    	}
+    }
+}    

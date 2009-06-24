@@ -1,3 +1,5 @@
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 class PartyRelationshipService {
 
     boolean transactional = true
@@ -323,9 +325,12 @@ class PartyRelationshipService {
     	def partyToRelationship = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$partyRelationshipType' and p.partyIdFrom = $partyIdFrom and p.roleTypeCodeFrom = '$roleTypeFrom' and p.roleTypeCodeTo = '$roleTypeTo' ")
     	return partyToRelationship
     }
-    /*
-     * Return the List of TeamMembers corresponding to the Team
-     */
+    /*-----------------------------------------------------------------
+     * To Return the List of TeamMembersNames as a complete String to display in Reports
+     * @author Srinivas
+     * @param teamId
+     * @return concat of  all teammemberNames 
+     *---------------------------------------------------------------*/
     def getTeamMemberNames(def teamId )
     {
     	def roleTypeCodeTo ="TEAM_MEMBER"
@@ -341,4 +346,35 @@ class PartyRelationshipService {
     	}
     	return memberNames
     }
+    /*------------------------------------------
+     * @To get the TeamMembers List for a Team
+     * @author Srinivas
+     * @param teamId
+     * @return list of TeamMembers 
+     *-------------------------------------------*/
+    def getTeamMembers(def teamId )
+    {
+    	def roleTypeCodeTo ="TEAM_MEMBER"
+    	def roleTypeInstance = RoleType.findById('TEAM_MEMBER')
+    	def teamMembers = PartyRelationship.findAll(" from PartyRelationship pr where pr.partyIdFrom = $teamId and pr.roleTypeCodeTo = 'TEAM_MEMBER' ")
+    	return teamMembers
+    }
+    /*--------------------------------------------------
+     * To convert Date time into mm/dd/yy format
+     * @author srinivas
+     * @param 
+     */
+     def convertDate(def date) {
+    	 Date dt = date
+    		String dtStr = dt.getClass().getName().toString();
+    		String dtParam = dt.toString();	
+    		DateFormat formatter ; 
+    		formatter = new SimpleDateFormat("MM/dd/yy");
+    		dtParam = formatter.format(dt);		
+    		/* if null or any plain string */
+    		if (dtParam != "null") {
+    			dtParam = dtParam.trim();
+    		}
+    		return dtParam
+ 	}
 }
