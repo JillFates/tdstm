@@ -340,7 +340,7 @@ class ClientConsoleController {
 				}
 				processTransitions.each() { trans ->
 					def cssClass='task_pending'
-					def transitionId = Integer.parseInt(trans.transId)
+					def transitionId = Integer.parseInt(trans)
 					if( transitionId <= maxstate  ){
 						cssClass = "task_done"
 						if(stateId == 10 ){
