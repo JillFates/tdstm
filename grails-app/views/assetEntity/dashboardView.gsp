@@ -400,10 +400,8 @@ td .odd {
 		'<tr><td><b>Model: </b>'+asset[0].assetDetails.assetDetail.model+'</td></tr>'+
 		'<tr><td><b>Rack: </b>'+asset[0].assetDetails.assetDetail.sourceRack+'</td></tr>'+
 		'<tr><td><b>Status: </b>'+asset[0].assetDetails.currentState+'</td></tr>'+
-		'<tr><td><b>Issue: </b></td></tr>'+
-		'<tr><td><b>Time: </b></td></tr>'+
-		'<tr><td><b>Recent Changes: </b></td><td><a href="#" id="moreLinkId" onclick="displayMore()"><b>More</b></a>'+
-		'<a href="#" id="lessLinkId" style="display:none" onclick="displayLess()"><b>Less</b></a></td></tr>' +
+		'<tr><td><b>Recent Changes: </b></td><td><a href="#" id="moreLinkId" onclick="displayMore();return false;"><b>More</b></a>'+
+		'<a href="#" id="lessLinkId" style="display:none" onclick="displayLess(); return false;"><b>Less</b></a></td></tr>' +
 		'<tr><td>' +
 		'<div id=\'recentChangesLess\'><table style=\'border: 0px\' cellpadding=\'0\' cellspacing=\'0\'><tbody>'
 		for(i=0;i<asset[0].recentChanges.length && i<3; i++){
@@ -749,7 +747,7 @@ function resolveValidate(formName,idVal){
 									<td class="odd">${bundleTeam?.team?.currentLocation}&nbsp;</td>
 								</tr>
 								<tr>
-									<td nowrap>Sap1</td>
+									<td nowrap>&nbsp;</td>
 								</tr>
 								<tr>
 									<td class="odd">${bundleTeam?.sourceAvailassets} /
@@ -772,7 +770,7 @@ function resolveValidate(formName,idVal){
 								<td class="odd">${supportTeam?.cleaning.currentLocation}&nbsp;</td>
 							</tr>
 							<tr>
-								<td nowrap>Exchg3</td>
+								<td nowrap>&nbsp;</td>
 							</tr>
 							<tr>
 								<td class="odd">${supportTeam.sourceCleaned} /
@@ -793,7 +791,7 @@ function resolveValidate(formName,idVal){
 								<td class="odd">${supportTeam?.transport.currentLocation}&nbsp;</td>
 							</tr>
 							<tr>
-								<td nowrap>Exchg3</td>
+								<td nowrap>&nbsp;</td>
 							</tr>
 							<tr>
 								<td class="odd">${supportTeam.sourceMover} /
@@ -961,12 +959,6 @@ function resolveValidate(formName,idVal){
 						</tr>
 						<tr>
 							<td><b>Status: </b></td>
-						</tr>
-						<tr>
-							<td><b>Issue: </b></td>
-						</tr>
-						<tr>
-							<td><b>Time: </b></td>
 						</tr>
 						<tr>
 							<td><b>Recent Changes: </b></td>
