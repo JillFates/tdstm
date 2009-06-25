@@ -147,7 +147,7 @@
 			<textarea rows="2" cols="10" style="width: 200px;padding:0px;" title="Enter Note..." name="enterNote" ></textarea>
 			</td></tr>		
 			<tr>
-			<td style="text-align: right;"><input type="button" value="Place on HOLD" onclick="return doTransition();" style="background-color:#aaefb8;width: 100px;"/></td>
+			<td style="text-align: right;"><input type="button" value="Place on HOLD" onclick="return doTransition();" class="action_button"/></td>
 			<tr>	
 			</table>
 			</table>

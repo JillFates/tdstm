@@ -87,6 +87,8 @@ th {
 .action_button {
 	background-color:#aaefb8;
 	width: 200px;
+	font-size: 12px;
+	font-weight:bold;
 }
 .confirm_checkbox {
 	width: 30px;
