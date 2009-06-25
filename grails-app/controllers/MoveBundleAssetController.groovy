@@ -974,10 +974,10 @@ class MoveBundleAssetController {
                             teamCode = "ct"
                         }
                         reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
-        			                 'teamName': member.partyIdFrom.name, 
-        			                 'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? partyRelationshipService.convertDate(member.partyIdFrom.moveBundle.startTime) : " "),
-        			                 'barCode': teamCode+'-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-s' 
-                        ]
+                                         'teamName': member.partyIdFrom.name, 
+                                         'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? partyRelationshipService.convertDate(member.partyIdFrom.moveBundle.startTime) : " "),
+                                         'barCode': teamCode+'-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-s' 
+                                         ]
         			}
         		}
         	}
@@ -986,10 +986,10 @@ class MoveBundleAssetController {
     				members.each { member ->
                         if(member.partyIdFrom.teamCode != "Cleaning") {
                             reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
-    					                 'teamName': member.partyIdFrom.name, 
-    					                 'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? partyRelationshipService.convertDate(member.partyIdFrom.moveBundle.startTime) : " "),
-    					                 'barCode': 'mt-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-t' 
-                            ]
+                                             'teamName': member.partyIdFrom.name, 
+                                             'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? partyRelationshipService.convertDate(member.partyIdFrom.moveBundle.startTime) : " "),
+                                             'barCode': 'mt-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-t' 
+                                             ]
     					}
     				}
     			}

@@ -48,11 +48,10 @@ class MoveTechController {
 	            }
 						
 	            render ( view:'home',
-                    model:[
-                        projectTeam:team, members:teamMembers, project:params.project,
-                        loc:location, bundle:params.bundle,bundleName:bundleInstance.name,
-                        team:params.team, location:params.location
-                    ])
+                    model:[ projectTeam:team, members:teamMembers, project:params.project,
+                            loc:location, bundle:params.bundle,bundleName:bundleInstance.name,
+                            team:params.team, location:params.location
+                            ])
 	        } else if ( params.user == "ct" ) {
 	        	def projectTeamInstance = ProjectTeam.findById( params.team )
 	            def team = projectTeamInstance.name
@@ -68,10 +67,10 @@ class MoveTechController {
 	            	projectTeamInstance.save()
 	            	teamLocation = projectTeamInstance.currentLocation
 	            }
-	            render ( view:'cleaningTechHome', 
-	                    model:[ projectTeam:team, members:teamMembers, project:params.project,
-	                        loc:teamLocation, bundle:params.bundle,bundleName:bundleInstance.name, team:params.team,
-	                        location:params.location, browserTest:browserTest ])
+	            render ( view:'cleaningTechHome', model:[ projectTeam:team, members:teamMembers, project:params.project,
+	                                                      loc:teamLocation, bundle:params.bundle,bundleName:bundleInstance.name, team:params.team,
+	                                                      location:params.location, browserTest:browserTest 
+	                                                      ])
 					
 	        } else {
 	        	redirect( action:'login' )
@@ -413,8 +412,8 @@ class MoveTechController {
                 
             }
             return[ bundle:bundle, team:team, project:params.project, location:params.location, 
-                assetList:assetList, allSize:allSize, todoSize:todoSize, 'tab':tab
-            ]
+                    assetList:assetList, allSize:allSize, todoSize:todoSize, 'tab':tab
+                    ]
 		} else {
 			flash.message = "Your login has expired and must login again."
 			redirect ( action:'login' )
@@ -453,12 +452,14 @@ class MoveTechController {
                     if ( checkHome ) {
                         redirect ( action : 'index', 
                             params:["bundle":params.bundle, "team":params.team, "project":params.project,
-                        		           "location":params.location, "user":"mt" ])
+                                    "location":params.location, "user":"mt" 
+                                    ])
                         return;
                     } else {
                         redirect ( action : 'assetTask', 
                             params:["bundle":params.bundle, "team":params.team, "project":params.project,
-                        		           "location":params.location,"tab":params.tab ])
+                                    "location":params.location,"tab":params.tab 
+                                    ])
                         return;
                     }
                 } else {
@@ -470,12 +471,14 @@ class MoveTechController {
                         if ( checkHome ) {
                             redirect ( action: 'index',
                                 params:["bundle":params.bundle, "team":params.team, "project":params.project,
-                            		           "location":params.location, "user":"mt" ])
+                                        "location":params.location, "user":"mt" 
+                                        ])
                             return;
                         } else {
                             redirect ( action: 'assetTask',
                                 params:["bundle":params.bundle, "team":params.team, "project":params.project,
-                            		           "location":params.location,"tab":params.tab ])
+                                        "location":params.location,"tab":params.tab 
+                                        ])
                             return;
                         }
                     } else {
@@ -488,12 +491,14 @@ class MoveTechController {
                                 if ( checkHome ) {
                                     redirect ( action: 'index',
                                         params:["bundle":params.bundle, "team":params.team, "project":params.project,
-                                    		           "location":params.location, "user":"mt" ])
+                                                "location":params.location, "user":"mt" 
+                                                ])
                                     return;
                                 } else {
                                     redirect ( action: 'assetTask',
                                         params:["bundle":params.bundle, "team":params.team, "project":params.project,
-                                    		           "location":params.location, "tab":params.tab ])
+                                                "location":params.location, "tab":params.tab 
+                                                ])
                                     return;
                                 }
                             }
@@ -506,12 +511,14 @@ class MoveTechController {
                                 if ( checkHome ) {
                                     redirect ( action: 'index',
                                         params:["bundle":params.bundle, "team":params.team, "project":params.project,
-                                    		           "location":params.location, "user":"mt" ])
+                                                "location":params.location, "user":"mt" 
+                                                ])
                                     return;
                                 } else {
                                     redirect ( action: 'assetTask',
                                         params:["bundle":params.bundle, "team":params.team, "project":params.project,
-                                    		           "location":params.location, "tab":params.tab ])
+                                                "location":params.location, "tab":params.tab 
+                                                ])
                                     return;
                                 }
                             }
@@ -538,12 +545,14 @@ class MoveTechController {
                         	if ( checkHome ) {
                         		redirect ( action: 'index',
                                     params:["bundle":params.bundle, "team":params.team, "project":params.project,
-                        				        "location":params.location, "user":"mt" ])
+                                            "location":params.location, "user":"mt" 
+                                            ])
                                 return;
                         	} else {
                         		redirect ( action: 'assetTask', 
                                     params:["bundle":params.bundle, "team":params.team, "project":params.project,
-                        				        "location":params.location, "tab":params.tab ])
+                                            "location":params.location, "tab":params.tab 
+                                            ])
                         		return;
                         	}
                         } else {
@@ -553,12 +562,14 @@ class MoveTechController {
                         		if( checkHome ) {
                         			redirect ( action: 'index',
                                         params:["bundle":params.bundle, "team":params.team, "project":params.project,
-                        					        "location":params.location, "user":"mt" ])
+                                                "location":params.location, "user":"mt" 
+                                                ])
                         			return;
                         		} else {
                         			redirect ( action: 'assetTask', 
                                         params:["bundle":params.bundle, "team":params.team, "project":params.project,
-                        					        "location":params.location, "tab":params.tab ])
+                                                "location":params.location, "tab":params.tab 
+                                                ])
                         			return;
                         		}
                         	}
@@ -580,10 +591,10 @@ class MoveTechController {
                         	}
                         	assetComment = AssetComment.findAllByAssetEntity( assetItem )
                         	render ( view:'assetSearch',
-                                model:[projMap:projMap,
-                                    assetComment:assetComment?assetComment :"", stateVal:stateVal, bundle:params.bundle, team:params.team,
-                                    project:params.project, location:params.location, search:params.search, label:label,
-                                    actionLabel:actionLabel	])
+                                model:[ projMap:projMap, assetComment:assetComment?assetComment :"", stateVal:stateVal, bundle:params.bundle, 
+                                		team:params.team, project:params.project, location:params.location, search:params.search, label:label,
+                                		actionLabel:actionLabel	
+                                		])
                         }
                     }
                 }
@@ -622,14 +633,14 @@ class MoveTechController {
                     assetComment.save()
                     redirect ( action: 'assetTask', 
                         params:["bundle":params.bundle, "team":params.team, "project":params.project,
-                    		           "location":params.location, "tab":"Todo"
-                        ])
+                                "location":params.location, "tab":"Todo"
+                                ])
                 } else {
                     flash.message = message ( code : workflow.message )
                     redirect ( action : 'assetTask', 
                         params:["bundle":params.bundle, "team":params.team, "project":params.project,
-                    		           "location":params.location, "tab":"Todo"
-                        ])
+                                "location":params.location, "tab":"Todo"
+                                ])
                 }
           
             } else {
@@ -647,17 +658,15 @@ class MoveTechController {
                  	assetComment.createdBy = loginUser.person
                     assetComment.save()
                     render(view: 'cleaningAssetSearch',
-                        model:[
-                            projMap:projMap, assetComment:assetComment, stateVal:stateVal, "bundle":params.bundle, "team":params.team,
+                        model:[ projMap:projMap, assetComment:assetComment, stateVal:stateVal, "bundle":params.bundle, "team":params.team,
 								"project":params.project, "location":params.location, "tab":"Todo", label:label, actionLabel:actionLabel
-                        ])
+								])
                 } else {
                     flash.message = message( code : workflow.message )
                     render( view: 'cleaningAssetSearch',
-                        model:[
-                            projMap:projMap, assetComment:assetComment, stateVal:stateVal, "bundle":params.bundle, "team":params.team,
-								"project":params.project, "location":params.location, "tab":"Todo", label:label, actionLabel:actionLabel
-                        ])
+                        model:[ projMap:projMap, assetComment:assetComment, stateVal:stateVal, "bundle":params.bundle, "team":params.team,
+                                "project":params.project, "location":params.location, "tab":"Todo", label:label, actionLabel:actionLabel
+                                ])
                 }
             }
         } else {
@@ -684,15 +693,15 @@ class MoveTechController {
             def workflow = workflowService.createTransition( "STD_PROCESS", "MOVE_TECH", actionLabel, asset, bundle, loginUser, loginTeam, assetComment )
             if ( workflow.success ) {
                 redirect ( action: 'assetTask', 
-                    params:["bundle":params.bundle, "team":params.team, "project":params.project,
-                		           "location":params.location, "tab":"Todo" 
-                    ])
+                    params:[ "bundle":params.bundle, "team":params.team, "project":params.project,
+                		     "location":params.location, "tab":"Todo" 
+                		     ])
             } else {
                 flash.message = message ( code : workflow.message )
                 redirect ( action:'assetSearch', 
-                    params:["bundle":params.bundle, "team":params.team, "project":params.project, "location":params.location,
-                		           "search":params.search, "assetComment":params.assetComment, "label":params.label, "actionLabel":actionLabel
-                    ])
+                    params:[ "bundle":params.bundle, "team":params.team, "project":params.project, "location":params.location,
+                             "search":params.search, "assetComment":params.assetComment, "label":params.label, "actionLabel":actionLabel
+                             ])
             }
         } else {
         	flash.message = "Your login has expired and must login again."
@@ -768,7 +777,8 @@ class MoveTechController {
                 todoSize = jdbcTemplate.queryForList ( query.toString() ).size()
             }
             return[ bundle:bundle, team:team, project:params.project, location:params.location, 
-                assetList:assetList, allSize:allSize, todoSize:todoSize, 'tab':tab ]
+                    assetList:assetList, allSize:allSize, todoSize:todoSize, 'tab':tab 
+                    ]
 		} else {
 			flash.message = "Your login has expired and must login again."
             redirect( action:'login' )
@@ -809,11 +819,10 @@ class MoveTechController {
             }
             if ( params.menu == "true" ) {
             	render(view:'cleaningAssetSearch', 
-                    model:[
-                        projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundle:params.bundle,
-                        team:params.team, project:params.project, location:params.location, search:search,
-                        label:label, actionLabel:actionLabel, browserTest:browserTest
-                    ])
+                    model:[ projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundle:params.bundle,
+                            team:params.team, project:params.project, location:params.location, search:search,
+                            label:label, actionLabel:actionLabel, browserTest:browserTest
+                            ])
             	return;
             } else if ( search != null ) {
             	def query = "from AssetEntity where assetTag = :search "
@@ -822,17 +831,16 @@ class MoveTechController {
                     flash.message = message ( code : "Asset Tag number '${search}' was not located" )
                     if ( textSearch ) {
                         render ( view:'cleaningAssetSearch',
-                            model:[
-                                projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundle:params.bundle,
-                                team:params.team, project:params.project, location:params.location,
-                                search:search, label:label, actionLabel:actionLabel, browserTest:browserTest
-                            ])
+                            model:[ projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundle:params.bundle,
+                                    team:params.team, project:params.project, location:params.location,
+                                    search:search, label:label, actionLabel:actionLabel, browserTest:browserTest
+                                    ])
                         return;
                     } else {
                         redirect( action:'cleaningAssetTask',
                             params:[ "bundle":params.bundle, "team":params.team, "project":params.project,
-										"location":params.location, "tab":params.tab
-                            ])
+                                     "location":params.location, "tab":params.tab
+                                     ])
                         return;
                     }
                 } else {
@@ -849,18 +857,16 @@ class MoveTechController {
                         flash.message = message ( code : "The asset [${assetItem.assetName}] is not assigned to team [${loginTeam}]" )
                         if ( textSearch ) {
                             render ( view : 'cleaningAssetSearch',
-                                model:[
-                                    teamMembers:teamMembers, projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundle:params.bundle,
-                                    team:params.team, project:params.project, location:params.location, search:search, label:label,
-                                    actionLabel:actionLabel, browserTest:browserTest
-                                ])
+                                model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundle:params.bundle,
+                                        team:params.team, project:params.project, location:params.location, search:search, label:label,
+                                        actionLabel:actionLabel, browserTest:browserTest
+                                        ])
                             return;
                         } else {
                             redirect ( action: 'cleaningAssetTask', 
-                                params:[
-                            		           "bundle":params.bundle, "team":params.team, "project":params.project,
-                            		           "location":params.location, "tab":params.tab
-                                ])
+                                params:[ "bundle":params.bundle, "team":params.team, "project":params.project,
+                                         "location":params.location, "tab":params.tab
+                                         ])
                             return;
                         }
                     }
@@ -868,18 +874,16 @@ class MoveTechController {
                         flash.message = message ( code : "The asset [${assetItem.assetName}] is not part of move bundle [${params.bundle}]" )
                         if ( textSearch ) {
                             render ( view:'cleaningAssetSearch',
-                                model:[
-                                    teamMembers:teamMembers, projMap:projMap, assetComment:assetComment, stateVal:stateVal,
-                                    bundle:params.bundle, team:params.team, project:params.project, location:params.location,
-                                    search:search, label:label, actionLabel:actionLabel, browserTest:browserTest
-                                ])
+                                model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment, stateVal:stateVal,
+                                        bundle:params.bundle, team:params.team, project:params.project, location:params.location,
+                                        search:search, label:label, actionLabel:actionLabel, browserTest:browserTest
+                                        ])
                             return;
                         } else {
                             redirect ( action: 'cleaningAssetTask', 
-                                params:[
-                            		           "bundle":params.bundle, "team":params.team, "project":params.project,
-                            		           "location":params.location, "tab":params.tab
-                                ])
+                                params:[ "bundle":params.bundle, "team":params.team, "project":params.project,
+                                         "location":params.location, "tab":params.tab
+                                         ])
                             return;
                         }
                     } else {
@@ -888,18 +892,16 @@ class MoveTechController {
                             flash.message = message ( code : " The asset has not yet been released " )
                             if ( textSearch ) {
                                 render(view:'cleaningAssetSearch',
-                                    model:[
-                                        teamMembers:teamMembers, projMap:projMap, assetComment:assetComment, stateVal:stateVal,
-                                        bundle:params.bundle, team:params.team, project:params.project, location:params.location,
-                                        search:search, label:label, actionLabel:actionLabel, browserTest:browserTest
-                                    ])
+                                    model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment, stateVal:stateVal,
+                                            bundle:params.bundle, team:params.team, project:params.project, location:params.location,
+                                            search:search, label:label, actionLabel:actionLabel, browserTest:browserTest
+                                            ])
                                 return;
                             } else {
                                 redirect ( action: 'cleaningAssetTask',
-                                    params:[
-												"bundle":params.bundle, "team":params.team, "project":params.project, 
-												"location":params.location,"tab":params.tab
-                                    ])
+                                    params:[ "bundle":params.bundle, "team":params.team, "project":params.project, 
+                                             "location":params.location,"tab":params.tab
+                                             ])
                                 return;
                             }
                         } else {
@@ -908,18 +910,16 @@ class MoveTechController {
                                 flash.message = message ( code :"The asset is on Hold. Please contact manager to resolve issue." )
                                 if ( textSearch ) {
                                     render ( view:'cleaningAssetSearch',
-                                        model:[
-                                            teamMembers:teamMembers, projMap:projMap,assetComment:assetComment, stateVal:stateVal,
-                                            bundle:params.bundle, team:params.team, project:params.project, location:params.location,
-                                            search:search, label:label, actionLabel:actionLabel, browserTest:browserTest
-                                        ])
+                                        model:[	teamMembers:teamMembers, projMap:projMap,assetComment:assetComment, stateVal:stateVal,
+                                               	bundle:params.bundle, team:params.team, project:params.project, location:params.location,
+                                               	search:search, label:label, actionLabel:actionLabel, browserTest:browserTest
+                                               	])
                                     return;
                                 } else {
                                     redirect ( action: 'cleaningAssetTask',
-                                        params:[
-														"bundle":params.bundle, "team":params.team, "project":params.project, 
-														"location":params.location,"tab":params.tab
-                                        ])
+                                        params:[ "bundle":params.bundle, "team":params.team, "project":params.project, 
+                                                 "location":params.location,"tab":params.tab
+                                                 ])
                                     return;
                                 }
                             }
@@ -940,10 +940,10 @@ class MoveTechController {
                             }
                             assetComment = AssetComment.findAll( "from AssetComment ac where ac.assetEntity = $assetItem.id and ac.commentType != 'issue' " )
                             render ( view:'cleaningAssetSearch',
-                                model:[teamMembers:teamMembers, projMap:projMap, assetComment:assetComment ? assetComment :"", stateVal:stateVal, bundle:params.bundle,
-                                    team:params.team, project:params.project, location:params.location, search:search, label:label,
-                                    actionLabel:actionLabel, browserTest:browserTest
-                                ])
+                                model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment ? assetComment :"", stateVal:stateVal, bundle:params.bundle,
+                                		team:params.team, project:params.project, location:params.location, search:search, label:label,
+                                		actionLabel:actionLabel, browserTest:browserTest
+                                		])
                         }
                     }
                 }
@@ -977,18 +977,16 @@ class MoveTechController {
                 def label = null
                 actionLabel = null
                 render(view: 'cleaningAssetSearch',
-                    model:[
-                        projMap:projMap, assetComment:assetComment, stateVal:stateVal, "search":params.search, "bundle":params.bundle,
+                    model:[ projMap:projMap, assetComment:assetComment, stateVal:stateVal, "search":params.search, "bundle":params.bundle,
 							"team":params.team, "project":params.project, "location":params.location, "tab":"Todo", label:label,
-                        actionLabel:actionLabel
-                    ])
+							actionLabel:actionLabel
+							])
             } else {
                 flash.message = message ( code : workflow.message )
                 redirect ( action:'cleaningAssetSearch', 
-                    params:[
-                		           "bundle":params.bundle, "team":params.team, "project":params.project, "location":params.location,
-                		           "search":params.search, "assetComment":assetComment, "label":params.label, "actionLabel":actionLabel
-                    ])
+                    params:[ "bundle":params.bundle, "team":params.team, "project":params.project, "location":params.location,
+                             "search":params.search, "assetComment":assetComment, "label":params.label, "actionLabel":actionLabel
+                             ])
             }
         } else {
         	flash.message = "Your login has expired and must login again."
@@ -1017,11 +1015,10 @@ class MoveTechController {
 			def label = null
 			actionLabel = null
 			render(view: 'cleaningAssetSearch',
-                model:[
-                    projMap:projMap, assetComment:assetComment, stateVal:stateVal, "search":params.search, "bundle":params.bundle,
+                model:[	projMap:projMap, assetComment:assetComment, stateVal:stateVal, "search":params.search, "bundle":params.bundle,
 						"team":params.team, "project":params.project, "location":params.location, "tab":"Todo", label:label,
-                    actionLabel:actionLabel
-                ])
+						actionLabel:actionLabel
+						])
 		} else {
 			flash.message = "Your login has expired and must login again."
 			redirect ( action:'login' )
@@ -1052,10 +1049,9 @@ class MoveTechController {
                 projectTeamInstance.save()
             }
             redirect ( action:'assetTask', 
-                params:[
-                    projectTeam:team, members:teamMembers, project:params.project, loc:location,
-                    bundle:params.bundle, team:params.team, location:params.location, "tab":"Todo"
-                ])
+                params:[ projectTeam:team, members:teamMembers, project:params.project, loc:location,
+                         bundle:params.bundle, team:params.team, location:params.location, "tab":"Todo"
+                         ])
     	} else {
 			flash.message = "Your login has expired and must login again."
             redirect ( action:'login' )
