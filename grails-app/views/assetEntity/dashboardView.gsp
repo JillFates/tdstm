@@ -395,17 +395,26 @@ td .odd {
    }
    function getAssetDetail(e){
 	   	var asset = eval("(" + e.responseText + ")")
-	    var tableBody = '<table style=\'border:0\' cellpadding=\'0\' cellspacing=\'0\' ><thead><tr><th>Asset Details </th></tr></thead><tbody>'+
+	    var tableBody = '<table style=\'border:0\' cellpadding=\'0\' cellspacing=\'0\' ><thead><tr><th colspan="2">Asset Details </th></tr></thead><tbody>'+
 		'<tr><td><b>Name: </b>'+asset[0].assetDetails.assetDetail.assetName+'</td></tr>'+
 		'<tr><td><b>Model: </b>'+asset[0].assetDetails.assetDetail.model+'</td></tr>'+
 		'<tr><td><b>Rack: </b>'+asset[0].assetDetails.assetDetail.sourceRack+'</td></tr>'+
 		'<tr><td><b>Status: </b>'+asset[0].assetDetails.currentState+'</td></tr>'+
 		'<tr><td><b>Issue: </b></td></tr>'+
 		'<tr><td><b>Time: </b></td></tr>'+
-		'<tr><td><b>Recent Changes: </b></td></tr>'
-		for(i=0;i<asset[0].recentChanges.length; i++){
+		'<tr><td><b>Recent Changes: </b></td><td><a href="#" id="moreLinkId" onclick="displayMore()"><b>More</b></a>'+
+		'<a href="#" id="lessLinkId" style="display:none" onclick="displayLess()"><b>Less</b></a></td></tr>' +
+		'<tr><td>' +
+		'<div id=\'recentChangesLess\'><table style=\'border: 0px\' cellpadding=\'0\' cellspacing=\'0\'><tbody>'
+		for(i=0;i<asset[0].recentChanges.length && i<3; i++){
 			tableBody += '<tr><td>'+asset[0].recentChanges[i]+'</td></tr>'
 		}
+		tableBody += '<tbody></table></div>'
+		tableBody += '<div id=\'recentChangesMore\' style=\"display: none;\"><table style=\'border: 0px\'  cellpadding=\'0\' cellspacing=\'0\' ><tbody>'
+		for(i=0;i<asset[0].recentChanges.length ; i++){
+			tableBody += '<tr><td>'+asset[0].recentChanges[i]+'</td></tr>'
+		}
+		tableBody += '<tbody></table></div></td></tr>'
 		tableBody += '</tbody></table>'
 	    var selectObj = document.getElementById('asset')
 	   	selectObj.innerHTML = tableBody
@@ -414,6 +423,18 @@ td .odd {
 	   	document.assetdetailsForm.reset();
 	   	document.assetdetailsForm.asset.value = asset[0].assetDetails.assetDetail.id
 	   	document.assetdetailsForm.currentState.value = asset[0].assetDetails.state
+   	}
+   	function displayLess(){
+   		document.getElementById("recentChangesMore").style.display = "none"
+   		document.getElementById("recentChangesLess").style.display = "block"
+   		document.getElementById("moreLinkId").style.display = "block"
+   		document.getElementById("lessLinkId").style.display = "none"
+   	}
+   	function displayMore(){
+   		document.getElementById("recentChangesMore").style.display = "block"
+   		document.getElementById("recentChangesLess").style.display = "none"
+   		document.getElementById("moreLinkId").style.display = "none"
+   		document.getElementById("lessLinkId").style.display = "block"
    	}
    	function createStateOptions(statesList){
 		var statusObj = document.getElementById("stateSelectId")
@@ -924,7 +945,7 @@ function resolveValidate(formName,idVal){
 				<table style="border: 0px" cellpadding="0" cellspacing="0">
 					<thead>
 						<tr>
-							<th>Asset Details</th>
+							<th colspan="2">Asset Details</th>
 						</tr>
 					</thead>
 					<tbody>

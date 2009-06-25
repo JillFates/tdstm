@@ -1040,11 +1040,20 @@ class AssetEntityController {
         if(assetId){
 	        def assetDetail = AssetEntity.findById(assetId)
 	        def teamName = assetDetail.sourceTeam
-	        def assetTransition = AssetTransition.findAllByAssetEntity( assetDetail, [max:3, sort:"dateCreated", order:"desc"] )
+	        def assetTransition = AssetTransition.findAllByAssetEntity( assetDetail, [ sort:"dateCreated", order:"desc"] )
 	        assetTransition.each{
 	        	def taskLabel = stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(it.stateTo))
 	        	def time = it.dateCreated.toString().substring(11,19)
-	        	recentChanges<<[time+" "+taskLabel+'('+ it.userLogin.person.lastName +')']
+	    	    def timeElapsed 
+	    	    if(it.timeElapsed != 0){
+		    	    def hours = (it.timeElapsed / (1000*60*60)).toString()
+		    	    def minutes = ((it.timeElapsed % (1000*60*60)) / (1000*60)).toString()
+		    	    def seconds = (((it.timeElapsed % (1000*60*60)) % (1000*60)) / 1000).toString()
+		    	    timeElapsed = hours.substring(0,hours.indexOf("."))+":"+minutes.substring(0,minutes.indexOf("."))+":"+seconds.substring(0,seconds.indexOf("."))
+	    	    } else {
+	    	    	timeElapsed = "0:0:0"
+	    	    }
+	        	recentChanges<<[time+"/"+timeElapsed+" "+taskLabel+' ('+ it.userLogin.person.lastName +')']
 	        }
 	        def currentState = 0
 	        def projectAssetMap = ProjectAssetMap.findByAsset(assetDetail)
