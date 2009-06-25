@@ -133,7 +133,7 @@ class ClientConsoleController {
 							cssClass='task_pending'
 						}
 					}
-					htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass\">&nbsp;</td>"
+					htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass\" onclick=\"${remoteFunction(controller:'assetEntity', action:'editShow', params:'\'id=\'+'+ assetId, before:'document.showForm.id.value ='+ assetId+';document.editForm.id.value = '+ assetId+';', onComplete:'showAssetDialog(e , \'show\')')}\">&nbsp;</td>"
 				}
 				assetEntityList << [id: assetId, application:it.application,appOwner:it.appOwner,appSme:it.appSme,assetName:it.assetName,transitions:htmlTd,checkVal:check]
 			}
