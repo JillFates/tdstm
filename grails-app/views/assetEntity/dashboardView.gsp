@@ -416,8 +416,8 @@ td .odd {
 		}
 		tableBody += '<tbody></table></div></td></tr>'
 		tableBody += '</tbody></table>'
-	    var selectObj = document.getElementById('asset')
-	   	selectObj.innerHTML = tableBody
+	    var selectObj = $("#asset")
+	   	selectObj.html(tableBody)
 	   	createStateOptions(asset[0].statesList)
 	   	createAssighToOptions(asset[0].sourceTeams,asset[0].targetTeams)
 	   	document.assetdetailsForm.reset();
@@ -425,17 +425,18 @@ td .odd {
 	   	document.assetdetailsForm.currentState.value = asset[0].assetDetails.state
    	}
    	function displayLess(){
-   		document.getElementById("recentChangesMore").style.display = "none"
-   		document.getElementById("recentChangesLess").style.display = "block"
-   		document.getElementById("moreLinkId").style.display = "block"
-   		document.getElementById("lessLinkId").style.display = "none"
+   		$("#recentChangesMore").hide()
+   		$("#recentChangesLess").show()
+   		$("#moreLinkId").show()
+   		$("#lessLinkId").hide()
    	}
    	function displayMore(){
-   		document.getElementById("recentChangesMore").style.display = "block"
-   		document.getElementById("recentChangesLess").style.display = "none"
-   		document.getElementById("moreLinkId").style.display = "none"
-   		document.getElementById("lessLinkId").style.display = "block"
+   		$("#recentChangesMore").show()
+   		$("#recentChangesLess").hide()
+   		$("#moreLinkId").hide()
+   		$("#lessLinkId").show()
    	}
+   	
    	function createStateOptions(statesList){
 		var statusObj = document.getElementById("stateSelectId")
    		var l = statusObj.length
