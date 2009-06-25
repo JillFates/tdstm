@@ -958,7 +958,7 @@ class MoveBundleAssetController {
     			} else {
     				def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
     				moveBundleInstanceList.each { bundle ->
-    					def teamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle in ( select m.id from MoveBundle m where m.project = $projectId ) " )
+    					def teamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle in ( select m.id from MoveBundle m where m.project = $projectId ) order by pt.moveBundle.name " )
     					teamInstanceList.each { team ->
                             def members = partyRelationshipService.getTeamMembers(team.id)
                             teamMembers.add(members)
@@ -966,31 +966,25 @@ class MoveBundleAssetController {
     				}
     			}
     		}
-    		if ( params.location == "source" || params.location == "both" ) {
-        		teamMembers.each { members ->
-        			members.each { member ->
-                        def teamCode = "mt"
-                        if(member.partyIdFrom.teamCode == "Cleaning") {
-                            teamCode = "ct"
-                        }
-                        reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
-                                         'teamName': member.partyIdFrom.name, 
+    		teamMembers.each { members ->
+    			members.each { member ->
+    				def teamCode = "mt"
+    				if(member.partyIdFrom.teamCode == "Cleaning") {
+    					teamCode = "ct"
+    				}
+    				if ( params.location == "source" || params.location == "both" ) {
+    					reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
+                                         'teamName': member.partyIdFrom.name+" - Source", 
                                          'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? partyRelationshipService.convertDate(member.partyIdFrom.moveBundle.startTime) : " "),
                                          'barCode': teamCode+'-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-s' 
                                          ]
-        			}
-        		}
-        	}
-    		if ( params.location == "target" || params.location == "both" ) {
-    			teamMembers.each { members ->
-    				members.each { member ->
-                        if(member.partyIdFrom.teamCode != "Cleaning") {
-                            reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
-                                             'teamName': member.partyIdFrom.name, 
-                                             'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? partyRelationshipService.convertDate(member.partyIdFrom.moveBundle.startTime) : " "),
-                                             'barCode': 'mt-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-t' 
-                                             ]
-    					}
+    				}
+    				if ( member.partyIdFrom.teamCode != "Cleaning" && (params.location == "target" || params.location == "both") ) {
+    					reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
+    					                 'teamName': member.partyIdFrom.name+" - Target", 
+    					                 'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? partyRelationshipService.convertDate(member.partyIdFrom.moveBundle.startTime) : " "),
+    					                 'barCode': 'mt-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-t' 
+    					                 ]
     				}
     			}
     		}

@@ -356,7 +356,10 @@ class PartyRelationshipService {
     {
     	def roleTypeCodeTo ="TEAM_MEMBER"
     	def roleTypeInstance = RoleType.findById('TEAM_MEMBER')
-    	def teamMembers = PartyRelationship.findAll(" from PartyRelationship pr where pr.partyIdFrom = $teamId and pr.roleTypeCodeTo = 'TEAM_MEMBER' ")
+    	def teamMembers = PartyRelationship.findAll(" from PartyRelationship pr where pr.partyRelationshipType = 'PROJ_TEAM' and pr.roleTypeCodeFrom ='TEAM' and pr.partyIdFrom = $teamId and pr.roleTypeCodeTo = 'TEAM_MEMBER' ")
+    	teamMembers.sort{
+    		it.partyIdTo.firstName+it.partyIdTo.lastName
+    	}
     	return teamMembers
     }
     /*--------------------------------------------------
