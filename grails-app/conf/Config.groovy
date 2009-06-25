@@ -38,6 +38,7 @@ environments {
    }
    production {
       grails.serverURL = "http://tm.tdsops.com/tds-0.1"
+      // grails.serverURL = "http://dev01.tdsops.net:8080/tds"
       log4j {
          appender.'errors.File'="/var/log/tomcat/stacktrace.log"
          appender.logfile = "org.apache.log4j.DailyRollingFileAppender "
