@@ -288,16 +288,16 @@ td .odd {
 				      			
       		}
       		
-      function callUpdateDialog( e ) {
+      		function callUpdateDialog( e ) {
 		    timedRefresh('never')
 		    	var assetEntityAttributes = eval('(' + e.responseText + ')');
-				var assetId = document.editForm.id.value
+				var assetId = $("#editFormId").val()
 		    	var assetEntityParams = new Array()
 		    	if (assetEntityAttributes) {
 		    		var length = assetEntityAttributes.length
 				      	for (var i=0; i < length; i ++) {
 				      		var attributeCode = assetEntityAttributes[i].attributeCode
-				      		var attributeValue = document.getElementById('edit'+attributeCode+'Id').value
+				      		var attributeValue = $('#edit'+attributeCode+'Id').val()
 				      		if(assetEntityAttributes[i].frontendInput == 'select'){
 					      		assetEntityParams.push(attributeCode+':'+attributeValue)
 				      		} else {
@@ -311,14 +311,14 @@ td .odd {
 		    function showEditAsset(e) {
 		      var assetEntityAttributes = eval('(' + e.responseText + ')')
 			  if (assetEntityAttributes != "") {
-			  		var trObj = document.getElementById("assetDetailRow_"+assetEntityAttributes[0].id)
+			  		var trObj = $("#assetDetailRow_"+assetEntityAttributes[0].id)
 			  		//trObj.style.background = '#65a342'
 		    		var length = assetEntityAttributes.length
 				      	for (var i=0; i < length; i ++) {
 				      		var attribute = assetEntityAttributes[i]
-				      		var tdId = document.getElementById(attribute.attributeCode+'_'+attribute.id)
+				      		var tdId = $("#"+attribute.attributeCode+'_'+attribute.id)
 				      		if(tdId != null ){
-				      				tdId.innerHTML = attribute.value
+				      			tdId.html(attribute.value)
 				      		}
 				      	}
 				  $("#editDialog").dialog("close")
@@ -343,9 +343,7 @@ td .odd {
 		      if(taskLen > 1 && task[0].item[0].state == "Hold"){
 		      document.getElementById('taskList').options[1].selected = true;
 		      }
-		       var getDialogId = document.getElementById('assetVal')     
-		      getDialogId.value=task[0].asset;
-		 
+		      $('#assetVal').val(task[0].asset);
 		 
 			$("#showChangeStatusDialog").dialog('option', 'width', 400)
 			$("#showChangeStatusDialog").dialog('option', 'position', ['center','top']);
@@ -357,14 +355,14 @@ td .odd {
 			if(doCheck()){
 			document.changeStatusForm.action = "changeStatus";
 			document.changeStatusForm.submit();
-			timedRefresh(document.getElementById("selectTimedId").value)
+			timedRefresh($("#selectTimedId").val())
 			}else{
 			return false;
 			}
 		}
 		function doCheck(){
-			var taskVal = document.getElementById('taskList').value;
-			var noteVal = document.getElementById('enterNote').value;
+			var taskVal = $('#taskList').val();
+			var noteVal = $('#enterNote').val();
 			if((taskVal == "Hold")&&(noteVal == "")){
 			alert('Please Enter Note');
 			return false;
@@ -419,8 +417,8 @@ td .odd {
 	   	createStateOptions(asset[0].statesList)
 	   	createAssighToOptions(asset[0].sourceTeams,asset[0].targetTeams)
 	   	document.assetdetailsForm.reset();
-	   	document.assetdetailsForm.asset.value = asset[0].assetDetails.assetDetail.id
-	   	document.assetdetailsForm.currentState.value = asset[0].assetDetails.state
+	   	$("#assetId").val( asset[0].assetDetails.assetDetail.id )
+	   	$("#currentStateId").val( asset[0].assetDetails.state )
    	}
    	function displayLess(){
    		$("#recentChangesMore").hide()
@@ -436,12 +434,8 @@ td .odd {
    	}
    	
    	function createStateOptions(statesList){
-		var statusObj = document.getElementById("stateSelectId")
-   		var l = statusObj.length
-	   	while (l > 1) {
-			l--
-		    statusObj.remove(l)
-		}
+		var statusObj = $("#stateSelectId")
+		statusObj.html("<option value=''>Status</option>")
 		var length = statesList.length
 	    for (var i=0; i < length; i++) {
 	      var state = statesList[i]
@@ -449,21 +443,18 @@ td .odd {
 		  popt.innerHTML = state.label
 	      popt.value = state.id
 	      try {
-	      statusObj.appendChild(popt, null) // standards compliant; doesn't work in IE
+	      statusObj.append(popt, null) // standards compliant; doesn't work in IE
 	      } catch(ex) {
-	      statusObj.appendChild(popt) // IE only
+	      statusObj.append(popt) // IE only
 	      }
 		}
 	}
    	function createAssighToOptions(sourceTeams,targetTeams){
-   		var teamObj = document.getElementById("assignToId")
-	   	var sourceObj = document.getElementById("sourceAssignTo")
-	   	var targetObj = document.getElementById("targetAssignTo")
-   		var l = teamObj.length
-	   	while (l > 1) {
-			l--
-		    teamObj.remove(l)
-		}
+   		var teamObj = $("#assignToId")
+	   	var sourceObj = $("#sourceAssignTo")
+	   	var targetObj = $("#targetAssignTo")
+	   	sourceObj.html("")
+	   	targetObj.html("")
 		var sourceLength = sourceTeams.length
 	    for (var i=0; i < sourceLength; i++) {
 	      var team = sourceTeams[i]
@@ -471,9 +462,9 @@ td .odd {
 		  popt.innerHTML = team.name
 	      popt.value = "s/"+team.id
 	      try {
-	      sourceObj.appendChild(popt, null) // standards compliant; doesn't work in IE
+	      sourceObj.append(popt, null) // standards compliant; doesn't work in IE
 	      } catch(ex) {
-	      sourceObj.appendChild(popt) // IE only
+	      sourceObj.append(popt) // IE only
 	      }
 		}
 		var targetLength = targetTeams.length
@@ -483,31 +474,31 @@ td .odd {
 		  popt.innerHTML = team.name
 	      popt.value = "t/"+team.id
 	      try {
-	      targetObj.appendChild(popt, null) // standards compliant; doesn't work in IE
+	      targetObj.append(popt, null) // standards compliant; doesn't work in IE
 	      } catch(ex) {
-	      targetObj.appendChild(popt) // IE only
+	      targetObj.append(popt) // IE only
 	      }
 		}
    	}
    	function bundleChange(){
-	   var bundleID = ${moveBundleInstance.id}; 
-	   document.getElementById("moveBundleId").value =  bundleID;
+	   var bundleId = ${moveBundleInstance.id}; 
+	   $("#moveBundleId").val( bundleId );
 	   var time = '${timeToRefresh}';
 	   if(time != '' ){
-	   document.getElementById("selectTimedId").value = time;
+	   		$("#selectTimedId").val( time );
 	   } 
    	}
    	function setComment(e){
 	   	var commentStatus = eval("(" + e.responseText + ")")
 	   	if(commentStatus[0]){
-	   		document.assetdetailsForm.validateComment.value = commentStatus[0].status
+	   		$("#validateCommentId").val( commentStatus[0].status )
 	   	}else {
-	   		document.assetdetailsForm.validateComment.value = ""
+	   		$("#validateCommentId").val("")
 	   	}
    	}
    	function setCommentValidation(){
-	   	if(document.assetdetailsForm.validateComment.value == 'true' || document.assetdetailsForm.state.value == 'Hold'){
-	   		if(document.assetdetailsForm.comment.value == ''){
+	   	if($("#validateCommentId").val() == 'true' || $("#stateSelectId").val() == 'Hold'){
+	   		if($("#commentId").val() == ''){
 	   			alert("A comment is required")
 	   		}
 	   	}
@@ -529,99 +520,103 @@ td .odd {
 	}
 	function updateAsset(e){
 		var asset = eval("(" + e.responseText + ")")
-		var commentVal = document.assetdetailsForm.comment.value;
-			
 		if(asset[0]){
-		createStateOptions(asset[0].statesList)
-		createAssighToOptions(asset[0].sourceTeams,asset[0].targetTeams)
-		if(asset[0].checkVal == false){
-		var spanEle = document.getElementById('spanId_'+asset[0].assetEntity.id);
-		spanEle.innerHTML = "&nbsp;&nbsp;&nbsp;";
-		}		
-		document.getElementById('priority_'+asset[0].assetEntity.id).innerHTML = asset[0].assetEntity.priority 
-		document.getElementById('statusCol_'+asset[0].assetEntity.id).innerHTML = asset[0].status
-		document.getElementById('source_'+asset[0].assetEntity.id).innerHTML = asset[0].sourceTeam
-		document.getElementById('target_'+asset[0].assetEntity.id).innerHTML = asset[0].targetTeam
-		document.getElementById('assetDetailRow_'+asset[0].assetEntity.id).className = asset[0].cssClass ;
-		if(commentVal != ""){
-		var link = document.createElement('a');
-		link.href = '#'
-		link.onclick = function(){document.getElementById('createAssetCommentId').value = asset[0].assetEntity.id ;new Ajax.Request('listComments?id='+asset[0].assetEntity.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never');}})} //;return false
-		link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
-		document.getElementById('icon_'+asset[0].assetEntity.id).appendChild(link);
+			createStateOptions(asset[0].statesList)
+			createAssighToOptions(asset[0].sourceTeams,asset[0].targetTeams)
+			if(asset[0].checkVal == false){
+				var spanEle = $('#spanId_'+asset[0].assetEntity.id);
+				spanEle.html("&nbsp;&nbsp;&nbsp;");
+			}		
+	
+			$('#priority_'+asset[0].assetEntity.id).html( asset[0].assetEntity.priority )
+			$('#statusCol_'+asset[0].assetEntity.id).html( asset[0].status )
+			$('#source_'+asset[0].assetEntity.id).html( asset[0].sourceTeam )
+			$('#target_'+asset[0].assetEntity.id).html( asset[0].targetTeam )
+			$('#assetDetailRow_'+asset[0].assetEntity.id).removeAttr( "class" ) ;
+			$('#assetDetailRow_'+asset[0].assetEntity.id).addClass(asset[0].cssClass)
+	
+			var link = document.createElement('a');
+			link.href = '#'
+			link.onclick = function(){$('#createAssetCommentId').val( asset[0].assetEntity.id ) ;new Ajax.Request('listComments?id='+asset[0].assetEntity.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never');}})} //;return false
+			link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
+			var iconObj = $('#icon_'+asset[0].assetEntity.id);
+			iconObj.html(link)
+			$("#currentStateId").val( asset[0].statusName )
+			$("#priorityId").val("");
+			$("#commentId").val("")
 		}
-		document.assetdetailsForm.priority.value = "";
-		document.assetdetailsForm.comment.value = "";
-		}
-		timedRefresh(document.getElementById('selectTimedId').value);
+		timedRefresh($('#selectTimedId').val());
 	}
 	
-var isFirst = true;
-function selectAll(){
-	timedRefresh('never')
-	var totalCheck = document.getElementsByName('checkChange');
-	if(isFirst){
-	for(i=0;i<totalCheck.length;i++){
-	totalCheck[i].checked = true;
-	}
-	isFirst = false;
-	}else{
-	for(i=0;i<totalCheck.length;i++){
-	totalCheck[i].checked = false;
-	}
-	isFirst = true;
-	}
-}
-function changeState(){
-	timedRefresh('never')
-	var assetArr = new Array();
-	var totalAsset = ${assetsList?.asset.id};
-	var j=0;
-	for(i=0; i< totalAsset.size() ; i++){
-	if(document.getElementById('checkId_'+totalAsset[i]) != null){
-	var booCheck = document.getElementById('checkId_'+totalAsset[i]).checked;
-	if(booCheck == true){
-	assetArr[j] = totalAsset[i];
-	j++;
-	}
-	}
-	}
-	if(j == 0){
-	alert('Please select the Asset');
-	}else{
-	${remoteFunction(action:'getList', params:'\'assetArray=\' + assetArr ', onComplete:'showChangeStatusDialog(e);' )}
-	}
-}	
-function resolveValidate(formName,idVal){
-	var type = 	document.forms[formName].commentType.value;
-	if(type != "issue"){
-		document.forms[formName].isResolved.value = 0;
-	}
-	var resolveBoo = document.forms[formName].isResolved.checked;
-	var resolveVal = document.forms[formName].resolution.value;
-	if(type == ""){
-		alert('Please select comment type');
-		return false;
-	}else if(resolveBoo){
-		if(resolveVal != ""){
-		if(formName == "createCommentForm"){
-			${remoteFunction(action:'saveComment', params:'\'assetEntity.id=\' + document.getElementById(idVal).value +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'addCommentsToList(e)')}
-		}else{
-			${remoteFunction(action:'updateComment', params:'\'id=\' + document.getElementById(idVal).value +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'updateCommentsOnList(e)')}
+	var isFirst = true;
+	function selectAll(){
+		timedRefresh('never')
+		var totalCheck = document.getElementsByName('checkChange');
+		if(isFirst){
+		for(i=0;i<totalCheck.length;i++){
+		totalCheck[i].checked = true;
 		}
+		isFirst = false;
 		}else{
-			alert('Please enter resolution');
+		for(i=0;i<totalCheck.length;i++){
+		totalCheck[i].checked = false;
+		}
+		isFirst = true;
+		}
+	}
+	function changeState(){
+		timedRefresh('never')
+		var assetArr = new Array();
+		var totalAsset = ${assetsList?.asset.id};
+		var j=0;
+		for(i=0; i< totalAsset.size() ; i++){
+			if($('#checkId_'+totalAsset[i]) != null){
+				var booCheck = $('#checkId_'+totalAsset[i]).is(':checked');
+				if(booCheck){
+					assetArr[j] = totalAsset[i];
+					j++;
+				}
+			}
+		}
+		if(j == 0){
+			alert('Please select the Asset');
+		}else{
+			${remoteFunction(action:'getList', params:'\'assetArray=\' + assetArr ', onComplete:'showChangeStatusDialog(e);' )}
+		}
+	}	
+	function resolveValidate(formName,idVal){
+		var type = 	document.forms[formName].commentType.value;
+		if(type != "issue"){
+			document.forms[formName].isResolved.value = 0;
+		}
+		var resolveBoo = document.forms[formName].isResolved.checked;
+		var resolveVal = document.forms[formName].resolution.value;
+		var assetId = $("#"+idVal).val()
+		if(type == ""){
+			alert('Please select comment type');
 			return false;
-		}
-	}else{
-		if(formName == "createCommentForm"){
-			${remoteFunction(action:'saveComment', params:'\'assetEntity.id=\' + document.getElementById(idVal).value +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'addCommentsToList(e)')}
+		}else if(resolveBoo){
+			if(resolveVal != ""){
+			if(formName == "createCommentForm"){
+				${remoteFunction(action:'saveComment', params:'\'assetEntity.id=\' + assetId +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'addCommentsToList(e)')}
+			}else{
+				${remoteFunction(action:'updateComment', params:'\'id=\' + assetId +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'updateCommentsOnList(e)')}
+			}
+			}else{
+				alert('Please enter resolution');
+				return false;
+			}
 		}else{
-			${remoteFunction(action:'updateComment', params:'\'id=\' + document.getElementById(idVal).value +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'updateCommentsOnList(e)')}
+			if(formName == "createCommentForm"){
+				${remoteFunction(action:'saveComment', params:'\'assetEntity.id=\' + assetId +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'addCommentsToList(e)')}
+			}else{
+				${remoteFunction(action:'updateComment', params:'\'id=\' + assetId +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'updateCommentsOnList(e)')}
+			}
 		}
 	}
-}
-
+	function setAssetId(assetId){
+		$("#createAssetCommentId").val(assetId)
+	}
     </script>
 </head>
 
@@ -851,9 +846,9 @@ function resolveValidate(formName,idVal){
 				<div class="list"><g:form name="assetListForm">
 					<table>
 						<thead>
-<jsec:hasRole name="ADMIN">
+							<jsec:hasRole name="ADMIN">
 							<tr
-								onmouseover="document.getElementById('tdId').style.background = 'white';">
+								onmouseover="$('#tdId').css('background','white');">
 								<td id="tdId"><input id="state" type="button"
 									value="State..." onclick="changeState()" title="Change State" />
 								</td>
@@ -882,17 +877,17 @@ function resolveValidate(formName,idVal){
 									<jsec:hasAnyRole in="['ADMIN','SUPERVISOR']">
 									<td><jsec:hasRole name="ADMIN">
 										<g:if test="${assetsList.checkVal == true}">
-<span id="spanId_${assetsList?.asset.id}">
+										<span id="spanId_${assetsList?.asset.id}">
 											<g:checkBox name="checkChange"
 												id="checkId_${assetsList?.asset.id}"
 												onclick="timedRefresh('never')"></g:checkBox>
-</span>
+										</span>
 
 										</g:if>
 									</jsec:hasRole>
 									<g:remoteLink controller="assetEntity" action="editShow" id="${assetsList?.asset.id}" before="document.showForm.id.value = ${assetsList?.asset.id};document.editForm.id.value = ${assetsList?.asset.id};" onComplete="showAssetDialog( e , 'show');">
-					<img src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px">
-				</g:remoteLink>
+										<img src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px">
+									</g:remoteLink>
 									 <span style="visibility: hidden;"
 										id="image_${assetsList?.asset.id}"><img
 										src="${createLinkTo(dir:'images',file:'row_arrow.gif')}"
@@ -913,7 +908,7 @@ function resolveValidate(formName,idVal){
 										test="${AssetComment.find('from AssetComment where assetEntity = '+ assetsList?.asset?.id +' and commentType = ? and isResolved = ?',['issue',0])}">
 										<g:remoteLink controller="assetEntity" action="listComments"
 											id="${assetsList?.asset.id}"
-											before="document.getElementById('createAssetCommentId').value = ${assetsList?.asset.id};"
+											before='setAssetId(${assetsList?.asset.id});'
 											onComplete="listCommentsDialog( e ,'never' );">
 											<img
 												src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}"
@@ -922,7 +917,7 @@ function resolveValidate(formName,idVal){
 									</g:if>
 									<g:else>
 						<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+ assetsList?.asset?.id)}">
-						<g:remoteLink controller="assetEntity" action="listComments" id="${assetsList?.asset.id}" before="document.getElementById('createAssetCommentId').value = ${assetsList?.asset.id};" onComplete="listCommentsDialog( e ,'never' ); ">
+						<g:remoteLink controller="assetEntity" action="listComments" id="${assetsList?.asset.id}" before="setAssetId(${assetsList?.asset.id});" onComplete="listCommentsDialog( e ,'never' ); ">
 							<img src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}" border="0px">
 						</g:remoteLink>
 						</g:if>
@@ -973,7 +968,7 @@ function resolveValidate(formName,idVal){
 								<td><b>Change:</b></td>
 								<td><select id="stateSelectId" name="state"
 									style="width: 100px"
-									onchange="${remoteFunction(action:'getFlag', params:'\'toState=\'+ this.value +\'&fromState=\'+document.getElementById(\'currentStateId\').value', onComplete:'setComment(e)')}">
+									onchange="${remoteFunction(action:'getFlag', params:'\'toState=\'+ this.value +\'&fromState=\'+$(\'#currentStateId\').val()', onComplete:'setComment(e)')}">
 									<option value="">Status</option>
 								</select></td>
 							</tr>
@@ -996,17 +991,16 @@ function resolveValidate(formName,idVal){
 								</select></td>
 							</tr>
 							<tr>
-								<td colspan="2" style="text-align: center;"><input
-									type="hidden" value="" id="validateCommentId"
-									name="validateComment"> <textarea name="comment"
-									name="comment" cols="25" rows="2"></textarea></td>
+								<td colspan="2" style="text-align: center;">
+									<input type="hidden" value="" id="validateCommentId" name="validateComment">
+									<textarea name="comment" id="commentId" cols="25" rows="2"></textarea></td>
 							</tr>
 							<tr>
 								<td colspan="2" style="text-align: center;" class="buttonR">
 								<input type="reset" value="Cancel"
-									onclick="location.reload(true);timedRefresh(document.getElementById('selectTimedId').value)">
+									onclick="location.reload(true);timedRefresh($('#selectTimedId').val())">
 								<input type="button" value="Submit"
-									onclick="setCommentValidation();${remoteFunction(action:'createTransition', params:'\'asset=\' + document.assetdetailsForm.asset.value +\'&state=\'+document.assetdetailsForm.state.value +\'&priority=\'+document.assetdetailsForm.priority.value +\'&assignTo=\'+document.assetdetailsForm.assignTo.value +\'&comment=\'+document.assetdetailsForm.comment.value ', onComplete:'updateAsset(e)')}" /></td>
+									onclick="setCommentValidation();${remoteFunction(action:'createTransition', params:'\'asset=\' + $(\'#assetId\').val() +\'&state=\'+ $(\'#stateSelectId\').val() +\'&priority=\'+ $(\'#priorityId\').val() +\'&assignTo=\'+$(\'#assignToId\').val() +\'&comment=\'+$(\'#commentId\').val() ', onComplete:'updateAsset(e)')}" /></td>
 							</tr>
 						</tbody>
 					</table>
@@ -1045,7 +1039,7 @@ function resolveValidate(formName,idVal){
 </div>
 <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 <span class="menuButton"><a class="create" href="#"
-	onclick="document.getElementById('statusId').value = '';document.getElementById('createResolveDiv').style.display = 'none' ;$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">New
+	onclick="$('#statusId').val('');$('#createResolveDiv').hide();$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">New
 Comment</a></span></div>
 </div>
 <div id="createCommentDialog" title="Create Asset Comment"
@@ -1181,7 +1175,7 @@ Comment</a></span></div>
 	onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
 </span> <span class="button"> <input class="delete" type="button"
 	value="Delete"
-	onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + document.getElementById(\'commentId\').value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e ,\'never\')')}" />
+	onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + $(\'#commentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e ,\'never\')')}" />
 </span> </div>
 </div>
 </div>
@@ -1277,7 +1271,7 @@ Comment</a></span></div>
 		onclick="resolveValidate('editCommentForm','updateCommentId');" />
 	</span> <span class="button"> <input class="delete" type="button"
 		value="Delete"
-		onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + document.editCommentForm.id.value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e,\'never\')')}" />
+		onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + $(\'#updateCommentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'never\')')}" />
 	</span></div>
 </g:form></div>
 <div id="showDialog" title="Show Asset Entity" style="display: none;">
@@ -1302,14 +1296,14 @@ Comment</a></span></div>
 
 <div id="editDialog" title="Edit Asset Entity" style="display: none;">
 <g:form method="post" name="editForm">
-	<input type="hidden" name="id" value="" />
+	<input type="hidden" name="id" id="editFormId" value="" />
 	<input type="hidden" name="projectId" value="${projectId}" />
 	<input type="hidden" name="moveBundle" value="${moveBundleInstance.id}" />
 	<div class="dialog" id="editDiv">
 	
 	</div>
 	<div class="buttons"><span class="button">
-	<input type="button" class="save" value="Update Asset Entity" onClick="${remoteFunction(action:'getAssetAttributes', params:'\'assetId=\' + document.editForm.id.value ', onComplete:'callUpdateDialog(e)')}" />
+	<input type="button" class="save" value="Update Asset Entity" onClick="${remoteFunction(action:'getAssetAttributes', params:'\'assetId=\' + $(\'#editFormId\').val() ', onComplete:'callUpdateDialog(e)')}" />
 	</span> <span class="button"><g:actionSubmit 
 		class="delete" onclick="return confirm('Are you sure?');"
 		value="Delete" /></span>
@@ -1322,7 +1316,7 @@ Comment</a></span></div>
 <script type="text/javascript">
 bundleChange();
 
-timedRefresh(document.getElementById("selectTimedId").value)
+timedRefresh($("#selectTimedId").val())
 </script>
 </div>
 </body>

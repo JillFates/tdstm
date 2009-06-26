@@ -1128,6 +1128,7 @@ class AssetEntityController {
     	def statesList = []
     	def stateIdList = []
     	def statusLabel
+    	def statusName
     	def check
     	if(assetEntity){
 	    	def status = params.state
@@ -1160,8 +1161,10 @@ class AssetEntityController {
 				    	statesList<<[id:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
 				    }
 				    statusLabel = stateEngineService.getStateLabel("STD_PROCESS",stateEngineService.getStateIdAsInt("STD_PROCESS",status))
+				    statusName = stateEngineService.getState("STD_PROCESS",stateEngineService.getStateIdAsInt("STD_PROCESS",status))
 		    	} else {
 		        	statusLabel = stateEngineService.getStateLabel("STD_PROCESS",currentStateId)
+		        	statusName = stateEngineService.getState("STD_PROCESS",currentStateId)
 		        	stateIdList = getStates(stateEngineService.getState("STD_PROCESS",currentStateId))
 		        	stateIdList.sort().each{
 				    	statesList<<[id:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
@@ -1169,6 +1172,7 @@ class AssetEntityController {
 		    	}
 	    	} else {
 	        	statusLabel = stateEngineService.getStateLabel("STD_PROCESS",currentStateId)
+	        	statusName = stateEngineService.getState("STD_PROCESS",currentStateId)
 	        	stateIdList = getStates(stateEngineService.getState("STD_PROCESS",currentStateId))
 	        	stateIdList.sort().each{
 			    	statesList<<[id:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
@@ -1226,7 +1230,7 @@ class AssetEntityController {
 	        def targetTeams = ProjectTeam.findAll(targetQuery.toString())
 		    assetList <<['assetEntity':assetEntity, 'sourceTeam':sourceTeam, 'targetTeam':targetTeam, 
 		                 'sourceTeams':sourceTeams,'targetTeams':targetTeams, 'statesList':statesList,
-		                 'status':statusLabel,'cssClass':cssClass,'checkVal':check ]
+		                 'status':statusLabel,'cssClass':cssClass,'checkVal':check, 'statusName':statusName]
     	}
     	render assetList as JSON
     }
