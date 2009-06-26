@@ -1046,10 +1046,10 @@ class AssetEntityController {
 	        	def time = it.dateCreated.toString().substring(11,19)
 	    	    def timeElapsed 
 	    	    if(it.timeElapsed != 0){
-		    	    def hours = (it.timeElapsed / (1000*60*60)).toString()
-		    	    def minutes = ((it.timeElapsed % (1000*60*60)) / (1000*60)).toString()
-		    	    def seconds = (((it.timeElapsed % (1000*60*60)) % (1000*60)) / 1000).toString()
-		    	    timeElapsed = hours.substring(0,hours.indexOf("."))+":"+minutes.substring(0,minutes.indexOf("."))+":"+seconds.substring(0,seconds.indexOf("."))
+		    	    def hours = (Integer)(it.timeElapsed / (1000*60*60))
+		    	    def minutes = (Integer)((it.timeElapsed % (1000*60*60)) / (1000*60))
+		    	    def seconds = (Integer)(((it.timeElapsed % (1000*60*60)) % (1000*60)) / 1000)
+		    	    timeElapsed = hours+":"+minutes+":"+seconds
 	    	    } else {
 	    	    	timeElapsed = "0:0:0"
 	    	    }
