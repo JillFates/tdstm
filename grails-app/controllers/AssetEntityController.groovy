@@ -1130,6 +1130,7 @@ class AssetEntityController {
     	def statusLabel
     	def statusName
     	def check
+    	def assetComment
     	if(assetEntity){
 	    	def status = params.state
 	    	def assignTo = params.assignTo
@@ -1149,7 +1150,7 @@ class AssetEntityController {
 		    	def transactionStatus = workflowService.createTransition("STD_PROCESS","SUPERVISOR", status, assetEntity, assetEntity.moveBundle, loginUser, null, comment )
 		    	if ( transactionStatus.success ) {
 		    		if(comment){
-			    		def assetComment = new AssetComment()
+			    		assetComment = new AssetComment()
 		          		assetComment.comment = comment
 		          		assetComment.assetEntity = assetEntity
 		          		assetComment.commentType = 'issue'		          			
@@ -1230,7 +1231,8 @@ class AssetEntityController {
 	        def targetTeams = ProjectTeam.findAll(targetQuery.toString())
 		    assetList <<['assetEntity':assetEntity, 'sourceTeam':sourceTeam, 'targetTeam':targetTeam, 
 		                 'sourceTeams':sourceTeams,'targetTeams':targetTeams, 'statesList':statesList,
-		                 'status':statusLabel,'cssClass':cssClass,'checkVal':check, 'statusName':statusName]
+		                 'status':statusLabel,'cssClass':cssClass,'checkVal':check, 
+		                 'statusName':statusName, assetComment:assetComment]
     	}
     	render assetList as JSON
     }

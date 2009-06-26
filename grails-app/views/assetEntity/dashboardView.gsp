@@ -534,13 +534,14 @@ td .odd {
 			$('#target_'+asset[0].assetEntity.id).html( asset[0].targetTeam )
 			$('#assetDetailRow_'+asset[0].assetEntity.id).removeAttr( "class" ) ;
 			$('#assetDetailRow_'+asset[0].assetEntity.id).addClass(asset[0].cssClass)
-	
-			var link = document.createElement('a');
-			link.href = '#'
-			link.onclick = function(){$('#createAssetCommentId').val( asset[0].assetEntity.id ) ;new Ajax.Request('listComments?id='+asset[0].assetEntity.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never');}})} //;return false
-			link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
-			var iconObj = $('#icon_'+asset[0].assetEntity.id);
-			iconObj.html(link)
+			if(asset[0].assetComment != null){
+				var link = document.createElement('a');
+				link.href = '#'
+				link.onclick = function(){$('#createAssetCommentId').val( asset[0].assetEntity.id ) ;new Ajax.Request('listComments?id='+asset[0].assetEntity.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never');}})} //;return false
+				link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
+				var iconObj = $('#icon_'+asset[0].assetEntity.id);
+				iconObj.html(link)
+			}
 			$("#currentStateId").val( asset[0].statusName )
 			$("#priorityId").val("");
 			$("#commentId").val("")
