@@ -956,13 +956,10 @@ class MoveBundleAssetController {
     				def members = partyRelationshipService.getTeamMembers(projectTeamInstance.id)
     				teamMembers.add(members)
     			} else {
-    				def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
-    				moveBundleInstanceList.each { bundle ->
-    					def teamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle in ( select m.id from MoveBundle m where m.project = $projectId ) order by pt.moveBundle.name " )
+    					def teamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle in ( select m.id from MoveBundle m where m.project = $projectId ) " )
     					teamInstanceList.each { team ->
                             def members = partyRelationshipService.getTeamMembers(team.id)
                             teamMembers.add(members)
-    					}
     				}
     			}
     		}
@@ -974,14 +971,14 @@ class MoveBundleAssetController {
     				}
     				if ( params.location == "source" || params.location == "both" ) {
     					reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
-                                         'teamName': member.partyIdFrom.name+" - Source", 
+                                         'teamName': member.partyIdFrom.name+" - Source","sortField":member.partyIdFrom.moveBundle.name+member.partyIdTo.firstName+member.partyIdTo.lastName,
                                          'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? partyRelationshipService.convertDate(member.partyIdFrom.moveBundle.startTime) : " "),
                                          'barCode': teamCode+'-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-s' 
                                          ]
     				}
     				if ( member.partyIdFrom.teamCode != "Cleaning" && (params.location == "target" || params.location == "both") ) {
     					reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
-    					                 'teamName': member.partyIdFrom.name+" - Target", 
+    					                 'teamName': member.partyIdFrom.name+" - Target","sortField": member.partyIdFrom.moveBundle.name+member.partyIdTo.firstName+member.partyIdTo.lastName, 
     					                 'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? partyRelationshipService.convertDate(member.partyIdFrom.moveBundle.startTime) : " "),
     					                 'barCode': 'mt-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-t' 
     					                 ]
@@ -992,6 +989,7 @@ class MoveBundleAssetController {
         		reportFields <<[ 'flashMessage': "Team Members not Found for selected Teams"]
         		render reportFields as JSON
         	}else {
+        		reportFields.sort{it.sortField }
         		render reportFields as JSON
         	}
     	}
