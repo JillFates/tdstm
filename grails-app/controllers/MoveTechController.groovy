@@ -977,7 +977,7 @@ class MoveTechController {
                 def label = null
                 actionLabel = null
                 render(view: 'cleaningAssetSearch',
-                    model:[ projMap:projMap, assetComment:assetComment, stateVal:stateVal, "search":params.search, "bundle":params.bundle,
+                    model:[ projMap:projMap, stateVal:stateVal, "search":params.search, "bundle":params.bundle,
 							"team":params.team, "project":params.project, "location":params.location, "tab":"Todo", label:label,
 							actionLabel:actionLabel
 							])
