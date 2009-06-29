@@ -1,16 +1,15 @@
 // function to list the comments list
       		function listCommentsDialog(e,action) {
-      		
       			$("#editCommentDialog").dialog("close")
       			$("#showCommentDialog").dialog("close")
 				$("#createCommentDialog").dialog("close")
       			var assetComments = eval('(' + e.responseText + ')');
       			
-      			var listTable = document.getElementById("listCommentsTable");
-	      		var tbody = document.getElementById('listCommentsTbodyId')
+      			var listTable = $('#listCommentsTable');
+	      		var tbody = $('#listCommentsTbodyId');
       			if (assetComments) {
       				if(tbody != null){				
-				   		listTable.removeChild(tbody)
+				   		tbody.remove();
 				    }
 				    var listTbody = document.createElement('tbody');
 				    listTbody.id = 'listCommentsTbodyId'
@@ -47,7 +46,7 @@
 					      link.href = '#'
 					      link.id = 'link_'+commentObj.commentInstance.id
 					      link.name = commentObj.commentInstance.id
-					      link.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );commentChangeEdit('editResolveDiv','editCommentForm');}})} //;return false
+					      link.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );commentChangeEdit('#editResolveDiv','editCommentForm');}})} //;return false
 					      var commentText = document.createTextNode(truncate(commentObj.commentInstance.comment));
 					      var typeText = document.createTextNode(commentObj.commentInstance.commentType);
 					      var resolveVal
@@ -85,8 +84,7 @@
 					      	verifyText.checked = true ;
 					      }
 				      	}
-				      listTable.appendChild( listTbody )
-				       
+				      listTable.append( listTbody )
       			}
       			
       			$("#commentsListDialog").dialog('option', 'width', 600)	      	
@@ -98,7 +96,7 @@
       		}
       		function showAssetCommentDialog( e , action){
       			$("#createCommentDialog").dialog("close")
-      		var assetComments = eval('(' + e.responseText + ')');
+      			var assetComments = eval('(' + e.responseText + ')');
       			if (assetComments) {
       			if(assetComments[0].assetComment.comment == null){
       			assetComments[0].assetComment.comment = "";
@@ -106,47 +104,46 @@
       			if(assetComments[0].assetComment.resolution == null){
       			assetComments[0].assetComment.resolution = "";
       			}
-      				 document.getElementById("commentId").value = assetComments[0].assetComment.id
-			      	 document.getElementById("commentTdId").value = assetComments[0].assetComment.comment
-			      	 document.getElementById("commentTypeTdId").innerHTML = assetComments[0].assetComment.commentType
-			      	 document.getElementById("mustVerifyEdit").value = assetComments[0].assetComment.mustVerify
-			      	 document.getElementById("isResolved").value = assetComments[0].assetComment.isResolved
+      				 $('#commentId').val(assetComments[0].assetComment.id)
+      				 $('#updateCommentId').val(assetComments[0].assetComment.id)
+			      	 $('#commentTdId').val(assetComments[0].assetComment.comment)
+			      	 $('#commentTypeTdId').html(assetComments[0].assetComment.commentType)
+			      	 $('#mustVerifyShowId').val(assetComments[0].assetComment.mustVerify)
+			      	 $('#isResolvedId').val(assetComments[0].assetComment.isResolved)
 			      	 if(assetComments[0].assetComment.mustVerify != 0){
-			      	 document.getElementById("mustVerifyShowId").checked = true
-			      	 document.editCommentForm.mustVerify.checked = true
+			      	 $('#mustVerifyShowId').attr('checked', true);
+			      	 $('#mustVerifyEditId').attr('checked', true);
 			      	 } else {
-			      	 document.getElementById("mustVerifyShowId").checked = false
-			      	 document.editCommentForm.mustVerify.checked = false
+			      	 $('#mustVerifyShowId').attr('checked', false);
+			      	 $('#mustVerifyEditId').attr('checked', false);
 			      	 }
 			      	 if(assetComments[0].assetComment.isResolved != 0){
-			      	 document.getElementById("isResolvedId").checked = true
-			      	 document.editCommentForm.isResolved.checked = true
+			      	 $('#isResolvedId').attr('checked', true);
+			      	 $('#isResolvedEditId').attr('checked', true);
 			      	 } else {
-			      	 document.getElementById("isResolvedId").checked = false
-			      	 document.editCommentForm.isResolved.checked = false
+			      	 $('#isResolvedId').attr('checked', false);
+			      	 $('#isResolvedEditId').attr('checked', false);
 			      	 }
-			      	 document.getElementById("dateResolvedId").innerHTML = assetComments[0].dtResolved
-			      	 document.getElementById("dateResolvedEditId").innerHTML = assetComments[0].dtResolved
-			      	 document.getElementById("dateCreatedId").innerHTML = assetComments[0].dtCreated
-			      	 document.getElementById("dateCreatedEditId").innerHTML = assetComments[0].dtCreated
+			      	 $('#dateResolvedId').html(assetComments[0].dtResolved)
+			      	 $('#dateResolvedEditId').html(assetComments[0].dtResolved)
+			      	 $('#dateCreatedId').html(assetComments[0].dtCreated)
+			      	 $('#dateCreatedEditId').html(assetComments[0].dtCreated)
 			      	 if(assetComments[0].personResolvedObj != null){
-			      	 document.getElementById("resolvedById").innerHTML = assetComments[0].personResolvedObj.firstName+" "+assetComments[0].personResolvedObj.lastName
-			      	 document.getElementById("resolvedByEditId").innerHTML = assetComments[0].personResolvedObj.firstName+" "+assetComments[0].personResolvedObj.lastName			      	 
+				      	 $('#resolvedById').html(assetComments[0].personResolvedObj.firstName+" "+assetComments[0].personResolvedObj.lastName)
+				      	 $('#resolvedByEditId').html(assetComments[0].personResolvedObj.firstName+" "+assetComments[0].personResolvedObj.lastName)
 			      	 }else{
-			      	 document.getElementById("resolvedById").innerHTML = "";
-			      	 document.getElementById("resolvedByEditId").innerHTML = "";
+				      	 $('#resolvedById').html("")
+				      	 $('#resolvedByEditId').html("")
 			      	 }
 			      	
-			      	 document.getElementById("createdById").innerHTML = assetComments[0].personCreateObj.firstName+" "+assetComments[0].personCreateObj.lastName
-			      	 document.getElementById("createdByEditId").innerHTML = assetComments[0].personCreateObj.firstName+" "+assetComments[0].personCreateObj.lastName
-			      	
-			      	 document.getElementById("resolutionId").value = assetComments[0].assetComment.resolution
-			      	 document.editCommentForm.resolution.value = assetComments[0].assetComment.resolution
-			      	 document.editCommentForm.comment.value = assetComments[0].assetComment.comment
-			      	 document.editCommentForm.commentType.value = assetComments[0].assetComment.commentType
-			      	 document.editCommentForm.mustVerify.value = assetComments[0].assetComment.mustVerify
-			      	 document.editCommentForm.isResolved.value = assetComments[0].assetComment.isResolved
-			      	 document.editCommentForm.id.value = assetComments[0].assetComment.id
+			      	 $('#createdById').html(assetComments[0].personCreateObj.firstName+" "+assetComments[0].personCreateObj.lastName)
+			      	 $('#createdByEditId').html(assetComments[0].personCreateObj.firstName+" "+assetComments[0].personCreateObj.lastName)
+			      	 $('#resolutionId').val(assetComments[0].assetComment.resolution)
+			      	 $('#resolutionEditId').val(assetComments[0].assetComment.resolution)
+			      	 $('#commentEditId').val(assetComments[0].assetComment.comment)
+			      	 $('#commentTypeEditId').val(assetComments[0].assetComment.commentType)
+			      	 $('#mustVerifyEditId').val(assetComments[0].assetComment.mustVerify)
+			      	 $('#isResolvedEditId').val(assetComments[0].assetComment.isResolved)
 			      	 if(action == 'edit'){
 				      	$("#editCommentDialog").dialog('option', 'width', 700)
 				      	$("#editCommentDialog").dialog('option', 'position', ['center','top']);
@@ -162,10 +159,11 @@
       			}
       		}
       		function addCommentsToList( e ){
-      			var status = document.getElementById('statusId').value
+      			var status = $('#statusId').val();
+      			
 	      		$("#editCommentDialog").dialog("close")
 			    var assetComments = eval('(' + e.responseText + ')');
-		      	var tbody = document.getElementById('listCommentsTbodyId')
+		      	var tbody = $('#listCommentsTbodyId')
 				if (assetComments != "") {
 					if(status != 'new'){
 						$("#createCommentDialog").dialog("close")
@@ -197,7 +195,7 @@
 						  var link = document.createElement('a');
 						  link.href = '#'
 						  link.id = 'link_'+assetComments.id
-						  link.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+assetComments.id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );commentChangeEdit('editResolveDiv','editCommentForm');}})} //;return false
+						  link.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+assetComments.id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );commentChangeEdit('#editResolveDiv','editCommentForm');}})} //;return false
 					      var commentText = document.createTextNode(truncate(assetComments.comment));
 					      var typeText = document.createTextNode(assetComments.commentType);
 					      var resolveVal
@@ -227,7 +225,7 @@
 					      tr.appendChild( typeTd )
 					      tr.appendChild( resolveTd )
 					      tr.appendChild( verifyTd )
-					      tbody.appendChild( tr )
+					      tbody.append( tr )
 					      if(assetComments.isResolved == 1){
 					      	resolveVal.checked = true;
 					      }
@@ -248,32 +246,34 @@
       			if (assetComments) {
       				$("#editCommentDialog").dialog("close")
 			      	//generate dynamic rows	
-			      	  var tr = document.getElementById('commentTr_'+assetComments.id);
-			      	  tr.style.background = '#65a342'
+			      	  var tr = $('#commentTr_'+assetComments.id);
+			      	  tr.css( 'background', '#65a342' );
 			      	  if(assetComments.mustVerify != 0){
-				      document.getElementById('verifyText_'+assetComments.id).checked = true ;
+				      $('#verifyText_'+assetComments.id).attr('checked', true);
 				      } else {
-				      document.getElementById('verifyText_'+assetComments.id).checked = false ;
+				      $('#verifyText_'+assetComments.id).attr('checked', false);
 				      }
 				      if(assetComments.commentType != "issue"){
-				      document.getElementById('resolve_'+assetComments.id).innerHTML = "";
+				      	  $('#resolve_'+assetComments.id).html("");
 				      }else{
-				      var checkResolveTd = document.getElementById('verifyResolved_'+assetComments.id)
-				      if (checkResolveTd == null){
+					      var checkResolveTd = $('#verifyResolved_'+assetComments.id);
+					      if(checkResolveTd){
+					      	checkResolveTd.remove();
+					      }
 				      	  var resolveVal = document.createElement('input')
 					      resolveVal.id = 'verifyResolved_'+assetComments.id
 					      resolveVal.type = 'checkbox'
 					      resolveVal.disabled = 'disabled'
-					      document.getElementById('resolve_'+assetComments.id).appendChild( resolveVal )
+					      $('#resolve_'+assetComments.id).append( resolveVal )
+					     
+					      if(assetComments.isResolved != 0){
+					      	$('#verifyResolved_'+assetComments.id).attr('checked', true);
+					      } else {
+					      	$('#verifyResolved_'+assetComments.id).attr('checked', false);
 					      }
-				       if(assetComments.isResolved != 0){
-				      document.getElementById('verifyResolved_'+assetComments.id).checked = true ;
-				      } else {
-				      document.getElementById('verifyResolved_'+assetComments.id).checked = false ;
 				      }
-				      }
-				      document.getElementById('type_'+assetComments.id).innerHTML = assetComments.commentType;
-				      document.getElementById('comment_'+assetComments.id).innerHTML = truncate(assetComments.comment);
+				      $('#type_'+assetComments.id).html(assetComments.commentType);
+				      $('#comment_'+assetComments.id).html(truncate(assetComments.comment));
       			}
       		}
       		// Truncate the text 
@@ -291,7 +291,7 @@
   	function commentChange(resolveDiv,formName) {
 		var type = 	document.forms[formName].commentType.value;
 		if(type == "issue"){
-			document.getElementById(resolveDiv).style.display = 'block' ;
+			$(resolveDiv).css('display', 'block');
 			document.forms[formName].mustVerify.checked = false;
 			document.forms[formName].mustVerify.value = 0;
 			document.forms[formName].isResolved.checked = false;
@@ -299,28 +299,28 @@
 		}else if(type == "instruction"){
 			document.forms[formName].mustVerify.checked = true;
 			document.forms[formName].mustVerify.value = 1;
-			document.getElementById(resolveDiv).style.display = 'none' ;
+			$(resolveDiv).css('display', 'none');
 		}else{
 			document.forms[formName].mustVerify.checked = false;
 			document.forms[formName].mustVerify.value = 0;
-			document.getElementById(resolveDiv).style.display = 'none' ;
+			$(resolveDiv).css('display', 'none');
 		}
 	}
 	
 	  	function commentChangeEdit(resolveDiv,formName) {
 		var type = 	document.forms[formName].commentType.value;
 		if(type == "issue"){
-			document.getElementById(resolveDiv).style.display = 'block' ;
+			$(resolveDiv).css('display', 'block');
 		}else{
-			document.getElementById(resolveDiv).style.display = 'none' ;
+			$(resolveDiv).css('display', 'none');
 		}
 	}
 function commentChangeShow() {
-		var type = 	document.getElementById('commentTypeTdId').innerHTML;
+		var type = 	$('#commentTypeTdId').html();
 		if(type == "issue"){
-			document.getElementById('showResolveDiv').style.display = 'block' ;
+			$('#showResolveDiv').css('display', 'block');
 		}else{
-			document.getElementById('showResolveDiv').style.display = 'none' ;
+			$('#showResolveDiv').css('display', 'none');
 		}
 	}
 

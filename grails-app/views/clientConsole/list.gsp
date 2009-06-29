@@ -33,16 +33,16 @@
 
 <g:javascript>
 function initialize(){
-var bundleID = ${moveBundleInstance.id}; 
-document.getElementById("moveBundleId").value =  bundleID;
-document.getElementById('appSmeId').value="${appSmeValue}"
-document.getElementById('appOwnerId').value="${appOwnerValue}"
-document.getElementById('applicationId').value="${appValue}"
+var bundleId = ${moveBundleInstance.id}; 
+$("#moveBundleId").val(bundleId);
+$("#appSmeId").val("${appSmeValue}");
+$("#appOwnerId").val("${appOwnerValue}");
+$("#applicationId").val("${appValue}");
 var time = '${timeToRefresh}';
 	if(time != "" ){
-	document.getElementById("selectTimedId").value = time;
+		$("#selectTimedId").val( time ) ;
 	} else if(time == "" ){
-	document.getElementById("selectTimedId").value = 120000;	
+		$("selectTimedId").val( 120000 );	
 	}
 }
 </g:javascript>
@@ -70,7 +70,7 @@ var time = '${timeToRefresh}';
 		var browser=navigator.appName;
       	var assetEntityAttributes = eval('(' + e.responseText + ')');
       	var autoComp = new Array()      			
-      	var showDiv = document.getElementById("showDiv");      			
+       	var showDiv = document.getElementById("showDiv");      			
       	var editDiv = document.getElementById("editDiv");
       	var stb = document.getElementById('showTbodyId')
 		if(stb != null){
@@ -303,21 +303,21 @@ var time = '${timeToRefresh}';
       		}
       		
       function callUpdateDialog( e ) {
-		    timedRefresh('never')
-		    	var assetEntityAttributes = eval('(' + e.responseText + ')');
-				var assetId = document.editForm.id.value
-		    	var assetEntityParams = new Array()
-		    	if (assetEntityAttributes) {
-		    		var length = assetEntityAttributes.length
-				      	for (var i=0; i < length; i ++) {
-				      		var attributeCode = assetEntityAttributes[i].attributeCode
-				      		var attributeValue = document.getElementById('edit'+attributeCode+'Id').value
-				      		if(assetEntityAttributes[i].frontendInput == 'select'){
-					      		assetEntityParams.push(attributeCode+':'+attributeValue)
-				      		} else {
-				      			assetEntityParams.push(attributeCode+':'+attributeValue)
-				      		}
-				      	}
+      	timedRefresh('never')
+			var assetEntityAttributes = eval('(' + e.responseText + ')');
+			var assetId = document.editForm.id.value
+			var assetEntityParams = new Array()
+			if (assetEntityAttributes) {
+		   		var length = assetEntityAttributes.length
+			      	for (var i=0; i < length; i ++) {
+			      		var attributeCode = assetEntityAttributes[i].attributeCode
+			      		var attributeValue = $('#edit'+attributeCode+'Id').val();
+			      		if(assetEntityAttributes[i].frontendInput == 'select'){
+				      		assetEntityParams.push(attributeCode+':'+attributeValue)
+			      		} else {
+			      			assetEntityParams.push(attributeCode+':'+attributeValue)
+			      		}
+					}
 		    	}
 		    ${remoteFunction(controller:'assetEntity', action:'updateAssetEntity', params:'\'assetEntityParams=\' + assetEntityParams +\'&id=\'+assetId', onComplete:'showEditAsset(e)')}
 		    }
@@ -325,14 +325,12 @@ var time = '${timeToRefresh}';
 		    function showEditAsset(e) {
 		      var assetEntityAttributes = eval('(' + e.responseText + ')')
 			  if (assetEntityAttributes != "") {
-			  		var trObj = document.getElementById("assetDetailRow_"+assetEntityAttributes[0].id)
-			  		//trObj.style.background = '#65a342'
 		    		var length = assetEntityAttributes.length
 				      	for (var i=0; i < length; i ++) {
 				      		var attribute = assetEntityAttributes[i]
-				      		var tdId = document.getElementById(attribute.attributeCode+'_'+attribute.id)
+				      		var tdId = $("#"+attribute.attributeCode+'_'+attribute.id)
 				      		if(tdId != null ){
-				      				tdId.innerHTML = attribute.value
+				      				tdId.html( attribute.value )
 				      		}
 				      	}
 				  $("#editDialog").dialog("close")
@@ -355,10 +353,9 @@ function showChangeStatusDialog(e){
 	      }
 	      $("select#taskList").html(options);
 	      if(taskLen > 1 && task[0].item[0].state == "Hold"){
-	      document.getElementById('taskList').options[1].selected = true;
+	      	$('#taskList').children().eq(1).attr('selected',true);
 	      }
-	       var getDialogId = document.getElementById('asset')     
-	      getDialogId.value=task[0].asset;
+	       	$('#asset').val(task[0].asset);
 	 
 	 
 	$("#changeStatusDialog").dialog('option', 'width', 400)
@@ -370,19 +367,19 @@ function submitAction(){
 	if(doCheck()){
 	document.changeStatusForm.action = "changeStatus";
 	document.changeStatusForm.submit();
-	timedRefresh(document.getElementById("selectTimedId").value)
+	timedRefresh($("#selectTimedId").val())
 	}else{
 	return false;
 	}
 }
 function doCheck(){
-	var taskVal = document.getElementById('taskList').value;
-	var noteVal = document.getElementById('enterNote').value;
+	var taskVal = $('#taskList').val();
+	var noteVal = $('#enterNote').val();
 	if((taskVal == "Hold")&&(noteVal == "")){
-	alert('Please Enter Note');
-	return false;
+		alert('Please Enter Note');
+		return false;
 	}else{
-	return true;
+		return true;
 	}
 }
 function setRefreshTime(e) {
@@ -396,19 +393,19 @@ function timedRefresh(timeoutPeriod) {
 	if(timeoutPeriod != 'never'){
 		clearTimeout(timer)
 		timer = setTimeout("doAjaxCall()",timeoutPeriod);
-		document.getElementById("selectTimedId").value = timeoutPeriod;
+		$("#selectTimedId").val( timeoutPeriod );
 	} else {
 		clearTimeout(timer)
 	}
 }
 
 function doAjaxCall(){
-	var moveBundle = document.getElementById("moveBundleId").value;
-	var application = document.getElementById("applicationId").value;
-	var appOwner = document.getElementById("appOwnerId").value;
-	var appSme = document.getElementById("appSmeId").value;
+	var moveBundle = $("#moveBundleId").val();
+	var application = $("#applicationId").val();
+	var appOwner = $("#appOwnerId").val();
+	var appSme = $("#appSmeId").val();
 	${remoteFunction(action:'getTransitions', params:'\'moveBundle=\' + moveBundle +\'&application=\'+application +\'&appOwner=\'+appOwner+\'&appSme=\'+appSme', onComplete:'updateTransitions(e);' )}
-	timedRefresh(document.getElementById("selectTimedId").value)
+	timedRefresh($("#selectTimedId").val())
 }
 function updateTransitions(e){
 	try{
@@ -419,47 +416,46 @@ function updateTransitions(e){
 			if(assetTransitions){
 				for( i = 0; i <assetslength ; i++){
 					var assetTransition = assetTransitions[i]
-					var action = document.getElementById("action_"+assetTransition.id)
+					var action = $("#action_"+assetTransition.id)
 					if(action){
 						if(!assetTransition.check){
-							action.innerHTML='&nbsp;';
+							action.html('&nbsp;');
 						} 
 					}
-					var commentIcon = document.getElementById("icon_"+assetTransition.id)
+					var commentIcon = $("#icon_"+assetTransition.id)
 					if(commentIcon){
 						if(!assetTransition.showCommentIcon){
-							commentIcon.innerHTML='&nbsp;';
+							commentIcon.html('&nbsp;');
 						}else{
-							commentIcon.innerHTML=""
 							var link = document.createElement('a');
 							link.href = '#'
 							link.id = assetTransition.id
-							link.onclick = function(){document.getElementById('createAssetCommentId').value = assetTransition.id ;new Ajax.Request('../assetEntity/listComments?id='+this.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'action');}})} //;return false
+							link.onclick = function(){$('#createAssetCommentId').val( assetTransition.id );new Ajax.Request('../assetEntity/listComments?id='+this.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'action');}})} //;return false
 							link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
-							commentIcon.appendChild(link);
+							commentIcon.html(link);
 						} 
 					}
-					var application = document.getElementById("application_"+assetTransition.id)
+					var application = $("#application_"+assetTransition.id)
 					if(application){
-						application.innerHTML = assetTransition.application
+						application.html( assetTransition.application );
 					}
-					var owner = document.getElementById("appOwner_"+assetTransition.id)
+					var owner = $("#appOwner_"+assetTransition.id)
 					if(owner){
-						owner.innerHTML = assetTransition.appOwner
+						owner.html( assetTransition.appOwner );
 					}
-					var sme = document.getElementById("appSme_"+assetTransition.id)
+					var sme = $("#appSme_"+assetTransition.id)
 					if(sme){
-						sme.innerHTML = assetTransition.appSme
+						sme.html( assetTransition.appSme );
 					}
-					var assetName = document.getElementById("assetName_"+assetTransition.id)
+					var assetName = $("#assetName_"+assetTransition.id)
 					if(assetName){
-						assetName.innerHTML = assetTransition.assetName
+						assetName.html( assetTransition.assetName );
 					}
 					var tdIdslength = assetTransition.tdId.length
 					for(j = 0; j< tdIdslength ; j++){
 						var transition = assetTransition.tdId[j]
-						var transTd = document.getElementById(transition.id)
-						transTd.className = transition.cssClass
+						var transTd = $("#"+transition.id)
+						transTd.attr("class",transition.cssClass )
 					}
 				}
 			}
@@ -478,13 +474,13 @@ function changeState(){
 	var totalAsset = ${assetEntityList.id};
 	var j=0;
 	for(i=0; i< totalAsset.size() ; i++){
-	if(document.getElementById('checkId_'+totalAsset[i]) != null){
-	var booCheck = document.getElementById('checkId_'+totalAsset[i]).checked;
-	if(booCheck == true){
-	assetArr[j] = totalAsset[i];
-	j++;
-	}
-	}
+		if($('#checkId_'+totalAsset[i]) != null){
+			var booCheck = $('#checkId_'+totalAsset[i]).is(':checked');
+			if(booCheck == true){
+				assetArr[j] = totalAsset[i];
+				j++;
+			}
+		}
 	}
 	if(j == 0){
 		alert('Please select the Asset');
@@ -515,15 +511,16 @@ function resolveValidate(formName,idVal){
 	}
 	var resolveBoo = document.forms[formName].isResolved.checked;
 	var resolveVal = document.forms[formName].resolution.value;
+	var assetId = $("#"+idVal).val()
 	if(type == ""){
 		alert('Please select comment type');
 		return false;
 	}else if(resolveBoo){
 		if(resolveVal != ""){
 		if(formName == "createCommentForm"){
-			${remoteFunction(controller:'assetEntity',action:'saveComment', params:'\'assetEntity.id=\' + document.getElementById(idVal).value +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'addCommentsToList(e)')}
+			${remoteFunction(controller:'assetEntity',action:'saveComment', params:'\'assetEntity.id=\' + assetId +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'addCommentsToList(e)')}
 		}else{
-			${remoteFunction(controller:'assetEntity',action:'updateComment', params:'\'id=\' + document.getElementById(idVal).value +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'updateCommentsOnList(e)')}
+			${remoteFunction(controller:'assetEntity',action:'updateComment', params:'\'id=\' + assetId +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'updateCommentsOnList(e)')}
 		}
 		}else{
 			alert('Please enter resolution');
@@ -531,12 +528,15 @@ function resolveValidate(formName,idVal){
 		}
 	}else{
 		if(formName == "createCommentForm"){
-			${remoteFunction(controller:'assetEntity',action:'saveComment', params:'\'assetEntity.id=\' + document.getElementById(idVal).value +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'addCommentsToList(e)')}
+			${remoteFunction(controller:'assetEntity',action:'saveComment', params:'\'assetEntity.id=\' + assetId +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'addCommentsToList(e)')}
 		}else{
-			${remoteFunction(controller:'assetEntity',action:'updateComment', params:'\'id=\' + document.getElementById(idVal).value +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'updateCommentsOnList(e)')}
+			${remoteFunction(controller:'assetEntity',action:'updateComment', params:'\'id=\' + assetId +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'updateCommentsOnList(e)')}
 		}
 	}
 }
+	function setAssetId(assetId){
+		$("#createAssetCommentId").val(assetId)
+	}
 </script>
 </head>
 <body>
@@ -684,7 +684,7 @@ function resolveValidate(formName,idVal){
 			</jsec:hasAnyRole>
 			<td id="icon_${assetEntity.id}">
 				<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+assetEntity.id+' and commentType = ? and isResolved = ?',['issue',0])}">
-					<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntity.id}" before="document.getElementById('createAssetCommentId').value = ${assetEntity.id};"	onComplete="listCommentsDialog( e ,'action');">
+					<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntity.id}" before="setAssetId('${assetEntity.id}');"	onComplete="listCommentsDialog( e ,'action');">
 						<img src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}"	border="0px">
 					</g:remoteLink>
 				</g:if>
@@ -729,7 +729,7 @@ function resolveValidate(formName,idVal){
 <jsec:hasAnyRole in="['ADMIN','MANAGER']">
 <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 <span class="menuButton"><a class="create" href="#"
-	onclick="document.getElementById('statusId').value = '';document.getElementById('createResolveDiv').style.display = 'none' ;$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">New
+	onclick="$('#statusId').val('');$('#createResolveDiv').css('display', 'none') ;$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">New
 Comment</a></span></div>
 </jsec:hasAnyRole>
 </div>
@@ -749,7 +749,7 @@ Comment</a></span></div>
 				<td valign="top" style="width: 20%;" ><g:select id="commentType"
 					name="commentType"
 					from="${AssetComment.constraints.commentType.inList}" value=""
-					noSelection="['':'please select']" onChange="commentChange('createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
+					noSelection="['':'please select']" onChange="commentChange('#createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
 				
 				<input type="checkbox"
 					id="mustVerifyEdit" name="mustVerify" value="0"
@@ -867,7 +867,7 @@ Comment</a></span></div>
 	onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
 </span> <span class="button"> <input class="delete" type="button"
 	value="Delete"
-	onclick="${remoteFunction(controller:'assetEntity', action:'deleteComment', params:'\'id=\' + document.getElementById(\'commentId\').value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e,\'action\')')}" />
+	onclick="${remoteFunction(controller:'assetEntity', action:'deleteComment', params:'\'id=\' + $(\'#commentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'action\')')}" />
 </span></div>
 </jsec:hasAnyRole>
 </div></div>
@@ -895,18 +895,17 @@ Comment</a></span></div>
 				Type:</label></td>
 				<td valign="top" style="width: 20%;" >
 				<jsec:hasAnyRole in="['ADMIN','PROJ_MGR']">
-				<g:select id="commentType"
+				<g:select id="commentTypeEditId"
 					name="commentType"
 					from="${AssetComment.constraints.commentType.inList}" value=""
-					 onChange="commentChange('editResolveDiv','editCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
+					 onChange="commentChange('#editResolveDiv','editCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
 				</jsec:hasAnyRole>
 				<jsec:lacksAllRoles in="['ADMIN','PROJ_MGR']">
 				
-				<input type="text" id="commentType" name="commentType" readonly style="border: 0;">&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="text" id="commentTypeEditId" name="commentType" readonly style="border: 0;">&nbsp;&nbsp;&nbsp;&nbsp;
 				</jsec:lacksAllRoles>						
 				
-				<input type="checkbox"
-					id="mustVerifyEdit" name="mustVerify" value="0"
+				<input type="checkbox" id="mustVerifyEditId" name="mustVerify" value="0"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
 					<label for="mustVerify">Must
 				Verify</label>
@@ -916,7 +915,7 @@ Comment</a></span></div>
 				<td valign="top" class="name"><label for="comment">Comment:</label>
 				</td>
 				<td valign="top" class="value"><textarea cols="80" rows="5"
-					id="comment" name="comment"></textarea></td>
+					id="commentEditId" name="comment"></textarea></td>
 			</tr>
 			</table>
 			
@@ -928,7 +927,7 @@ Comment</a></span></div>
                 <label for="isResolved">Resolved:</label>
                 </td>
                 <td valign="top" class="value">
-                <input type="checkbox" id="isResolved" name="isResolved" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
+                <input type="checkbox" id="isResolvedEditId" name="isResolved" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
                 </td>
             </tr>
           
@@ -937,7 +936,7 @@ Comment</a></span></div>
                 <label for="resolution">Resolution:</label>
                 </td>
 				<td valign="top" class="value">
-                <textarea cols="80" rows="5" id="resolution" name="resolution" ></textarea>
+                <textarea cols="80" rows="5" id="resolutionEditId" name="resolution" ></textarea>
                 </td>
             </tr> 
                <tr>
@@ -962,13 +961,14 @@ Comment</a></span></div>
 		onclick="resolveValidate('editCommentForm','updateCommentId');" />
 	</span> <span class="button"> <input class="delete" type="button"
 		value="Delete"
-		onclick="${remoteFunction(controller:'assetEntity', action:'deleteComment', params:'\'id=\' + document.editCommentForm.id.value +\'&assetEntity=\'+document.getElementById(\'createAssetCommentId\').value ', onComplete:'listCommentsDialog(e,\'action\')')}" />
+		onclick="${remoteFunction(controller:'assetEntity', action:'deleteComment', params:'\'id=\' + $(\'#updateCommentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'action\')')}" />
 	</span></div>
 </g:form></div>
 <div id="showDialog" title="Show Asset Entity" style="display: none;">
 <g:form controller="assetEntity" action="save" method="post" name="showForm">
 	<div class="dialog" id="showDiv">
-	
+	<table id="showTable">
+	</table>
 	</div>
 	<jsec:hasAnyRole in="['ADMIN','MANAGER']">
 	<div class="buttons">
@@ -1011,7 +1011,7 @@ Comment</a></span></div>
 </g:form></div>
 <g:javascript>
 initialize();
-timedRefresh(document.getElementById("selectTimedId").value)
+timedRefresh($("#selectTimedId").val())
 </g:javascript>
 </body>
 

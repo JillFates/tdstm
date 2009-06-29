@@ -332,22 +332,21 @@ td .odd {
 			var taskLen = task[0].item.length;
 			var options = '';
 			if(taskLen == 0){
-			alert('Sorry but there were no common states for the assets selected');
-			return false;
+				alert('Sorry but there were no common states for the assets selected');
+				return false;
 			}else{
-	
-		      for (var i = 0; i < taskLen; i++) {
-		        options += '<option value="' + task[0].item[i].state + '">' + task[0].item[i].label + '</option>';
-		      }
-		      $("select#taskList").html(options);
-		      if(taskLen > 1 && task[0].item[0].state == "Hold"){
-		      document.getElementById('taskList').options[1].selected = true;
-		      }
-		      $('#assetVal').val(task[0].asset);
-		 
-			$("#showChangeStatusDialog").dialog('option', 'width', 400)
-			$("#showChangeStatusDialog").dialog('option', 'position', ['center','top']);
-			$('#showChangeStatusDialog').dialog('open');
+				for (var i = 0; i < taskLen; i++) {
+			    	options += '<option value="' + task[0].item[i].state + '">' + task[0].item[i].label + '</option>';
+				}
+			    $("select#taskList").html(options);
+			    if(taskLen > 1 && task[0].item[0].state == "Hold"){
+			      	$('#taskList').children().eq(1).attr('selected',true);
+			    }
+			    $('#assetVal').val(task[0].asset);
+			 
+				$("#showChangeStatusDialog").dialog('option', 'width', 400)
+				$("#showChangeStatusDialog").dialog('option', 'position', ['center','top']);
+				$('#showChangeStatusDialog').dialog('open');
 			}
 		}
 
@@ -371,22 +370,13 @@ td .odd {
 			}
 		}
    function assetDetails(assetId) {
-	   var browser=navigator.appName;
-	   var 	assetId = assetId;
-	   var	rows = new Array();
-	   if(browser != 'Microsoft Internet Explorer') {
-			rows = document.getElementsByName('assetDetailRow')	
-		} else {
-		    rows = document.getElementById('assetsTbody').childNodes
-		}
+	   var assetId = assetId;
+	   var rows = $('#assetsTbody').children('tr')
 	   for(i = 0 ; i<rows.length ; i++){
-	   	var cls = rows[i].getAttribute("class")
-	   	var holdId = rows[i].getAttribute("value")
-	   	var showImg = document.getElementById("image_"+holdId)
-	   	 showImg.style.visibility = 'hidden';
+		var rowVal = rows[i].getAttribute("value")
+		   	$("#image_"+rowVal).css('visibility','hidden');
 	   }
-	   var rowColor =  document.getElementById('image_'+assetId)
-	   rowColor.style.visibility = 'visible';
+	   $('#image_'+assetId).css('visibility','visible');
 	   timedRefresh('never')
 	   ${remoteFunction(action:'assetDetails', params:'\'assetId=\'+ assetId ' , onComplete:'getAssetDetail(e)') }
    
@@ -1059,7 +1049,7 @@ Comment</a></span></div>
 				<td valign="top" style="width: 20%;" ><g:select id="commentType"
 					name="commentType"
 					from="${AssetComment.constraints.commentType.inList}" value=""
-					noSelection="['':'please select']" onChange="commentChange('createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
+					noSelection="['':'please select']" onChange="commentChange('#createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
 				
 				<input type="checkbox"
 					id="mustVerifyEdit" name="mustVerify" value="0"
@@ -1205,18 +1195,18 @@ Comment</a></span></div>
 				Type:</label></td>
 				<td valign="top" style="width: 20%;" >
 				<jsec:hasAnyRole in="['ADMIN','PROJ_MGR']">
-				<g:select id="commentType"
+				<g:select id="commentTypeEditId"
 					name="commentType"
 					from="${AssetComment.constraints.commentType.inList}" value=""
-					 onChange="commentChange('editResolveDiv','editCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
+					 onChange="commentChange('#editResolveDiv','editCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
 				</jsec:hasAnyRole>
 				<jsec:lacksAllRoles in="['ADMIN','PROJ_MGR']">
 				
-				<input type="text" id="commentType" name="commentType" readonly style="border: 0;">&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="text" id="commentTypeEditId" name="commentType" readonly style="border: 0;">&nbsp;&nbsp;&nbsp;&nbsp;
 				</jsec:lacksAllRoles>					
 				
 				<input type="checkbox"
-					id="mustVerifyEdit" name="mustVerify" value="0"
+					id="mustVerifyEditId" name="mustVerify" value="0"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
 					<label for="mustVerify">Must
 				Verify</label>
@@ -1226,7 +1216,7 @@ Comment</a></span></div>
 				<td valign="top" class="name"><label for="comment">Comment:</label>
 				</td>
 				<td valign="top" class="value"><textarea cols="80" rows="5"
-					id="comment" name="comment"></textarea></td>
+					id="commentEditId" name="comment"></textarea></td>
 			</tr>
 			</table>
 			
@@ -1238,7 +1228,7 @@ Comment</a></span></div>
                 <label for="isResolved">Resolved:</label>
                 </td>
                 <td valign="top" class="value">
-                <input type="checkbox" id="isResolved" name="isResolved" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
+                <input type="checkbox" id="isResolvedEditId" name="isResolved" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
                 </td>
             </tr>
           
@@ -1247,7 +1237,7 @@ Comment</a></span></div>
                 <label for="resolution">Resolution:</label>
                 </td>
 				<td valign="top" class="value">
-                <textarea cols="80" rows="5" id="resolution" name="resolution" ></textarea>
+                <textarea cols="80" rows="5" id="resolutionEditId" name="resolution" ></textarea>
                 </td>
             </tr> 
                <tr>
