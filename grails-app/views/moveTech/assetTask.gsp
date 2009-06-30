@@ -68,8 +68,8 @@
         function setFocus(){
         var tab = '${tab}' ;
         if(tab != 'Todo'){
-        document.getElementById('todoId').firstChild.style.backgroundColor="#FFFFFF"
-        document.getElementById('allId').firstChild.style.backgroundColor="#aaefb8"
+        $('#todoId').children().eq(0).css("backgroundColor","#FFFFFF");
+        $('#allId').children().eq(0).css("backgroundColor","#aaefb8");
         }
         $('#search').focus();
         }

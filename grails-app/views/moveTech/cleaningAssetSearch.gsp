@@ -119,7 +119,7 @@ function startprintjob()
 var job = window.TF.CreateJob();
 var form = window.document.assetSearchForm;
 var jobdata = job.NewJobDataRecordSet();
-    job.RepositoryName = document.getElementById('urlPath').value;       			 
+    job.RepositoryName = $('#urlPath').val();       			 
     job.ProjectName = form.PrjName.value;     
     job.FormName = form.FormName.value;                   
     job.PrinterName = form.PrinterName.value;
@@ -148,8 +148,8 @@ var jobdata = job.NewJobDataRecordSet();
     try 
     {
     	job.PrintForm();
-	    document.getElementById('printCheck').value = "printed"
-	    var cleanButton = document.getElementById('cleanButton')
+	    $('#printCheck').val('printed');
+	    var cleanButton = $('#cleanButton');
 	    if(cleanButton != null && !cleanButton.disabled) {
 	    	cleanButton.focus();
 	    }
@@ -183,7 +183,7 @@ function InitData()
 {
 	//To check the Instructions for enable the Clean Button
 	checkInstuction();
-	var printButton = document.getElementById('printButton');
+	var printButton = $('#printButton');
 	if(!printButton.disabled){ 
 		printButton.focus();
 	}
@@ -207,7 +207,7 @@ function InitData()
     form.FormName.value = 'BarcodeLabels';											// form name
     form.PrinterName.value = ''																	// use default printer
 	// get list of installed printers
-	var dropdown = document.getElementById("Printers");
+	var dropdown = document.assetSearchForm.Printers;
 	window.TF.RefreshOSPrinters();
 	var def = 0;
 	for (i = 0; i < window.TF.GetOSPrintersCount(); i++) 
@@ -236,7 +236,7 @@ var form = window.document.assetSearchForm;
 //=============================================================================
 function mySelect(x)
 {
-	document.getElementById("PrinterName").value = x.options[x.selectedIndex].value;
+	$('#PrinterName').val( x.options[x.selectedIndex].value );
 	
 }
 
@@ -248,7 +248,7 @@ function mySelect(x)
 			document.assetSearchForm.submit();
 		}*/
 		
-        function serverInfo(e){        
+       <%-- function serverInfo(e){        
         var loc = document.assetSearchForm.location.value;
       	var location;
         var room;
@@ -284,13 +284,13 @@ function mySelect(x)
         $("#serverInfoDialog").dialog('option', 'width', 200)                     
 		$("#serverInfoDialog").dialog('option', 'position', ['left','top']);
         $('#serverInfoDialog').dialog('open');
-        }
+        } --%>
         
         function validation(){      
         var enterNote = $('#enterNote').val();  
         if(enterNote == "" || enterNote == "Enter Comment"){
       	alert('Please enter note');
-        document.assetSearchForm.enterNote.focus();   
+        $('#enterNote').focus();   
       	return false;
       	}else{
       	if(confirm('Are you sure?')){
@@ -312,9 +312,9 @@ function mySelect(x)
       
       	function clean(){
       		if(doCheckValidation()){ 
-      			var obj = document.getElementsByName('checkChange')
-      			var printCheck = document.getElementById('printCheck');
-      			if(printCheck.value != "printed" )
+      			var obj = $('#confirmCheck');
+      			var printCheck = $('#printCheck');
+      			if(printCheck.val() != "printed" )
       			{
       				if(confirm('You have not printed labels for this asset. Are you sure that you want to continue?')){
       					$('form#assetSearchForm').attr({action: "cleaning"});     
@@ -327,7 +327,7 @@ function mySelect(x)
    						$('form#assetSearchForm').submit();
    				}
    			}else{
-   				 alert("Please select all instructions");
+   				alert("Please select all instructions");
    				return false;
    			}
       	}
@@ -365,15 +365,15 @@ function mySelect(x)
       *-------------------------------------------------------------------------*/
       function checkInstuction()
       {
-      	var cleanButton = document.getElementById('cleanButton')
+      	var cleanButton = $('#cleanButton');
       	if(doCheckValidation()) {
 	    	if(cleanButton != null ) {
-	    		cleanButton.disabled = false;
+	    		cleanButton.attr('disabled',false);
 	    		cleanButton.focus()
 	    	}
 	    }else {
 	    	if(cleanButton != null ) {
-	    		cleanButton.disabled = true;
+	    		cleanButton.attr('disabled',true);
 	    	}	
 	    }
       }
@@ -428,7 +428,7 @@ function mySelect(x)
 			<div style="float:right;margin-right:10px;margin-top:-20px;">
 				<input type="text" name="textSearch" size="10" />&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/>
 			</div>		
-			<div id="mydiv" onclick="document.getElementById('mydiv').style.display = 'none';">
+			<div id="mydiv" onclick='$("#mydiv").hide()'>
 					<g:if test="${flash.message}">
 					<div style="color: red;">
 					<ul>
