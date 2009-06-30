@@ -15,12 +15,12 @@ class DataTransferComment
 		}
 	}
 	static constraints = {
-		 comment(blank:true, nullable:true)
-		 commentId(blank:true, nullable:true)
-		 commentType(inList:['issue','instruction','comment'])
-		 mustVerify( blank:true, nullable:true)
-		 rowId(blank:false)	
-		 assetId(blank:true, nullable:true)
+		 comment( blank:true, nullable:true )
+		 commentId( nullable:true )
+		 commentType( inList:['issue','instruction','comment'] )
+		 mustVerify( nullable:true )
+		 rowId()	
+		 assetId( nullable:true )
 	}	
 	
 }

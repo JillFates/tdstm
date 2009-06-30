@@ -164,8 +164,7 @@
 		}   
    	 	
      }
-     function addAssetRow(assetList)
-     {
+     function addAssetRow(assetList){
      
      	var rackPlan = document.getElementById('rackPlan').value
      	var length = assetList.length 
@@ -181,7 +180,7 @@
                }
             
 	       	var cell1 = row.insertCell(0);
-	        cell1.innerHTML = assetEntity.id
+	        cell1.innerHTML = assetEntity.assetTag
 	         var assetElement = document.createElement("input");  
             assetElement.type = "hidden";
             assetElement.name = "asset"
@@ -563,7 +562,7 @@
                 <g:each in="${assetEntityInstanceList}" var="assetEntityInstance" status="i">
                   <tr style="background-color: ${(i % 2) == 0 ? '#FFFFFF' : '#E0E0E0'}" id="row_${assetEntityInstance?.id}">
 
-                    <td style="border:1px;"><input type="hidden" name="asset" id="asset" value="${assetEntityInstance?.id}" />${assetEntityInstance?.id}</td>
+                    <td style="border:1px;"><input type="hidden" name="asset" id="asset" value="${assetEntityInstance?.id}" />${assetEntityInstance?.assetTag}</td>
                     
                     <td>${assetEntityInstance?.assetName}</td>
                     

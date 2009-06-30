@@ -7,7 +7,7 @@ class ProjectTeam extends PartyGroup{
 	static constraints = {
 		name( ) // related party Group
 		teamCode( blank:false, nullable:false,unique:'moveBundle' )
-		moveBundle( blank:false, nullable:false)
+		moveBundle( nullable:false)
 		isDisbanded( blank:true, nullable:true, inList:['Y', 'N'] )
 		dateCreated( ) // related to party
 		lastUpdated( ) // related to party

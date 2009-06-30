@@ -7,7 +7,7 @@ class ContactMech {
 	 * Fields Validations
 	 */
 	static constraints = {
-    	party( blank: true, nullable: true )
+    	party( nullable: true )
     	mechType( blank: false, unique:true, maxLength: 10 )
     	value( blank: false, nullable: false )
     }

@@ -12,11 +12,11 @@ class UserLogin {
 	]
 	
 	static constraints = {
-		person( blank: false, nullable: false )
+		person( nullable: false )
 		username( blank: false, unique:true, size:2..25 )
 		password( blank: false, nullable: false, password: true )
-		createdDate( blank: true, nullable: true )
-		lastLogin( blank: true, nullable: true )
+		createdDate( nullable: true )
+		lastLogin( nullable: true )
 		active( nullable:false, inList:['Y', 'N'] )
 	}
 

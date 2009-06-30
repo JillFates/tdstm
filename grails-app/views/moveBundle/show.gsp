@@ -69,7 +69,7 @@
             </tr>
 
             <tr class="prop">
-              <td valign="top" class="name">Operational Order:</td>
+              <td valign="top" class="name">Order:</td>
 
               <td valign="top" class="value">${fieldValue(bean:moveBundleInstance, field:'operationalOrder')}</td>
 

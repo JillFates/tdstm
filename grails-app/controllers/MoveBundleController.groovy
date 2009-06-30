@@ -13,9 +13,13 @@ class MoveBundleController {
     	if(projectId == null || projectId == ""){
         	projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
         }
+    	def moveBundleList = []
     	def projectInstance = Project.findById( projectId )
     	def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance, params )
-        [ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId ]
+    	moveBundleInstanceList.each{
+    		moveBundleList <<[ bundle:it, assetCount:AssetEntity.countByMoveBundle(it) ]
+    	}
+        [ moveBundleList: moveBundleList, projectId:projectId ]
     }
 
     def show = {
@@ -165,13 +169,4 @@ class MoveBundleController {
             render(view:'create',model:[moveBundleInstance:moveBundleInstance, managers: managers, projectId:projectId, projectManager: projectManager, moveManager: moveManager])
         }
     }
-   /* def dashboardView = {
-    		println"comg into dash view---->"
-    		def projectId = params.projectId
-        	def projectInstance = Project.findById( projectId )
-        	def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
-            if(!params.max) params.max = 10
-            return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId ]
-    		
-    }*/
 }

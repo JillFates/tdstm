@@ -10,7 +10,7 @@ class ProjectAssetMap {
 	Date lastModified
 	
 	static constraints = {
-		lastModified( blank:true, nullable:true )
+		lastModified( nullable:true )
 	}
 	
 	static mapping = {

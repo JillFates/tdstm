@@ -15,7 +15,7 @@ class EavEntityAttribute {
 	}
 
 	static constraints = {
-		sortOrder( size: 0..32767)
+		sortOrder( range: 0..32767)
 		eavEntity( nullable: true )
 	}
 

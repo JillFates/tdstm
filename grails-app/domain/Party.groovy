@@ -7,9 +7,9 @@ class Party {
 	 * Fields Validations
 	 */
 	static constraints = {
-		dateCreated( blank:false, nullable:false )
-		lastUpdated( blank:true, nullable:true )
-		partyType( blank:true, nullable:true )
+		dateCreated( nullable:false )
+		lastUpdated( nullable:true )
+		partyType( nullable:true )
 	}
 
 	/*

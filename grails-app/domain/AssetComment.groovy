@@ -14,12 +14,12 @@ class AssetComment {
 		
 		comment( blank:true, nullable:true  )
 		commentType( blank:true, nullable:true, inList: ['issue','instruction','comment'] )
-		mustVerify( blank:true, nullable:true )
-		isResolved( blank:true, nullable:true )
+		mustVerify( nullable:true )
+		isResolved( nullable:true )
 		resolution( blank:true, nullable:true  )
-		resolvedBy( blank:true, nullable:true  )
-		createdBy( blank:true, nullable:true  )
-		dateResolved( blank:true, nullable:true  )
+		resolvedBy( nullable:true  )
+		createdBy( nullable:true  )
+		dateResolved( nullable:true  )
 	}
 
 	static mapping  = {	

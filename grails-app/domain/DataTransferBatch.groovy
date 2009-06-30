@@ -16,11 +16,11 @@ class DataTransferBatch {
 		}
 	}
 	static constraints = {
-		statusCode(blank:false, size:0..20)
-		dateCreated(blank:true, nullable:true)
-		lastModified(blank:true, nullable:true)
-		transferMode( blank:false, inList:['I', 'E', 'B'])
-		versionNumber(blank:true, nullable:true)
+		statusCode( blank:false, size:0..20 )
+		dateCreated( nullable:true )
+		lastModified( nullable:true )
+		transferMode( blank:false, inList:['I', 'E', 'B'] )
+		versionNumber( nullable:true)
 	}
 
 }

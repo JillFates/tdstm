@@ -22,6 +22,6 @@ class EavAttributeOption {
 
 	static constraints = {
 		value( size:0..255 )
-		sortOrder( size:0..32767 )
+		sortOrder( range:0..32767 )
 	}
 }

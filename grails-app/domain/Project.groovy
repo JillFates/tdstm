@@ -12,11 +12,11 @@ class Project extends PartyGroup {
 	static constraints = {
 		name( ) // related party Group
 		projectCode( blank:false, nullable:false,unique:'client' )
-		client( blank:false, nullable:false)
+		client( nullable:false)
 		description( blank:true, nullable:true )
 		trackChanges( blank:false, nullable:false, inList:['Y', 'N'] )
-		startDate( blank:true, nullable:true )
-		completionDate( blank:true, nullable:true )
+		startDate( nullable:true )
+		completionDate( nullable:true )
 		dateCreated( ) // related to party
 		lastUpdated( ) // related to party
 	}

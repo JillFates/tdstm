@@ -9,11 +9,11 @@ class MoveBundle extends Party {
 
     static constraints = {        
 		name( blank:false, nullable:false )
-		project( blank:false, nullable:false )
+		project( nullable:false )
 		description( blank:true, nullable:true )		
-		startTime( blank:true, nullable:true )
-		completionTime( blank:true, nullable:true )
-		operationalOrder( blank:false, nullable:false, range:1..25 )
+		startTime( nullable:true )
+		completionTime( nullable:true )
+		operationalOrder( nullable:false, range:1..25 )
 	}
 
 	static hasMany = [

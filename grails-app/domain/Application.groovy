@@ -9,9 +9,9 @@ class Application extends PartyGroup {
 	String 		environment	// Indicates what environment that the application runs in (potential Attribute)
 
 	static constraints = {
-		owner(blank:false, nullable:false)	
-		name(blank:false, nullable:false) // related party Group
-		appCode(blank:false, nullable:false,unique:'owner') // appCode is unique for each companyId (companyId + appCode) 
+		owner( nullable:false )	
+		name( blank:false, nullable:false ) // related party Group
+		appCode( blank:false, nullable:false, unique:'owner' ) // appCode is unique for each companyId (companyId + appCode) 
 		environment (
 			blank:false, nullable:false, 
 			inList:["Production", "Test", "Staging", "Development", "Other"]

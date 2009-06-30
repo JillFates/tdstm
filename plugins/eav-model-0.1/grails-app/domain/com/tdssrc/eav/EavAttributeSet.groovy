@@ -19,7 +19,7 @@ class EavAttributeSet {
 
 	static constraints = {
 		attributeSetName( size: 1..64 )
-		sortOrder( size: 0..32767)
+		sortOrder( range: 0..32767)
 	}
 	
 	String toString() {

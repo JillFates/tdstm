@@ -24,7 +24,9 @@
 
           <g:sortableColumn property="description" title="Description" />
 
-          <g:sortableColumn property="operationalOrder" title="Operational Order" />
+          <g:sortableColumn property="operationalOrder" title="Order" />
+          
+          <th class="sortable"><a href="#">Asset Qty</a></th>
 
           <g:sortableColumn property="startTime" title="Start Time" />
 
@@ -34,19 +36,21 @@
         </tr>
       </thead>
       <tbody>
-        <g:each in="${moveBundleInstanceList}" status="i" var="moveBundleInstance">
+        <g:each in="${moveBundleList}" status="i" var="moveBundle">
           <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
 
-            <td><g:link params="[projectId:projectId]" action="show" id="${moveBundleInstance.id}">${fieldValue(bean:moveBundleInstance, field:'name')}</g:link></td>
+            <td><g:link params="[projectId:projectId]" action="show" id="${moveBundle?.bundle?.id}">${moveBundle?.bundle?.name}</g:link></td>
 
-            <td>${fieldValue(bean:moveBundleInstance, field:'description')}</td>
+            <td>${moveBundle?.bundle?.description}</td>
 
-            <td>${fieldValue(bean:moveBundleInstance, field:'operationalOrder')}</td>
+            <td>${moveBundle?.bundle?.operationalOrder}</td>
+            
+            <td>${moveBundle?.assetCount}</td>
 
-            <td><tds:convertDateTime date="${moveBundleInstance?.startTime}" /></td>
+            <td><tds:convertDateTime date="${moveBundle?.bundle?.startTime}" /></td>
 
-            <td><tds:convertDateTime date="${moveBundleInstance?.completionTime}" /></td>
+            <td><tds:convertDateTime date="${moveBundle?.bundle?.completionTime}" /></td>
 
 
           </tr>

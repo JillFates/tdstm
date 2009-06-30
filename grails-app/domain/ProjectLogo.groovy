@@ -10,8 +10,8 @@ class ProjectLogo {
 	static constraints = {
         name()
         partnerImage(nullable: true)       
-        project( blank:false, nullable:false)
-        party( blank:true, nullable:true)
+        project( nullable:false)
+        party( nullable:true)
     }
 
    

@@ -305,7 +305,12 @@ class AssetEntityAttributeLoaderService {
     			displayTeam = assetEntityList[assetRow]?.sourceTeam?.teamCode
     		}
     		def assetEntityInstance = AssetEntity.findById( assetEntityList[assetRow].id )
-    		assetEntity <<[id:assetEntityInstance.id, assetName:assetEntityInstance.assetName, model:assetEntityInstance.model, sourceLocation:assetEntityInstance.sourceLocation, sourceRack:assetEntityInstance.sourceRack, targetLocation:assetEntityInstance.targetLocation, targetRack:assetEntityInstance.targetRack, sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, uSize:assetEntityInstance.usize, team:displayTeam, cart:assetEntityList[assetRow]?.cart, shelf:assetEntityList[assetRow]?.shelf, projectTeam:projectTeam ]
+    		assetEntity <<[id:assetEntityInstance.id, assetName:assetEntityInstance.assetName, model:assetEntityInstance.model, 
+    		               	sourceLocation:assetEntityInstance.sourceLocation, sourceRack:assetEntityInstance.sourceRack, 
+    		               	targetLocation:assetEntityInstance.targetLocation, targetRack:assetEntityInstance.targetRack, 
+    		               	sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, 
+    		            	uSize:assetEntityInstance.usize, team:displayTeam, cart:assetEntityList[assetRow]?.cart, 
+    		            	shelf:assetEntityList[assetRow]?.shelf, projectTeam:projectTeam, assetTag:assetEntityInstance?.assetTag]
     	}
 		return assetEntity
 	}

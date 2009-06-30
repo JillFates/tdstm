@@ -26,6 +26,6 @@ class DataTransferAttributeMap {
 		columnName(blank:false, size:0..32)
 		sheetName(blank:false, size:0..64)
 		validation(blank:true, size:0..255)
-		isRequired(blank:false)
+		isRequired()
 	}
 }

@@ -22,13 +22,13 @@ class DataTransferValue {
 	}
 	
 	static constraints = {
-		importValue(blank:true, nullable:true, size:0..255)
-		correctedValue(blank:true, nullable:true, size:0..255)
-		correctedValue(blank:true, nullable:true, size:0..255)
-		errorText(blank:true, nullable:true, size:0..255)
-		rowId(blank:false)
-		hasError(blank:true, nullable:true)
-		assetEntityId(blank:true, nullable:true)
+		importValue( blank:true, nullable:true, size:0..255 )
+		correctedValue( blank:true, nullable:true, size:0..255 )
+		correctedValue( blank:true, nullable:true, size:0..255 )
+		errorText( blank:true, nullable:true, size:0..255 )
+		rowId()
+		hasError( nullable:true )
+		assetEntityId( nullable:true )
 	}
 
 }

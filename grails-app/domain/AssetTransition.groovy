@@ -20,13 +20,13 @@ class AssetTransition {
 	]
 
 	static constraints = {
-		assetEntity( blank:false, nullable:false )
+		assetEntity( nullable:false )
 		stateFrom( blank:false, nullable:false )
 		stateTo( blank:false, nullable:false )
 		comment( blank:true, nullable:true, size:0..255 )
-		moveBundle( blank:false, nullable:false )
-		projectTeam( blank:true, nullable:true )		// Not all transitions are performed by teams
-		userLogin( blank:false, nullable:false )		// Transitions are all by users
+		moveBundle( nullable:false )
+		projectTeam( nullable:true )		// Not all transitions are performed by teams
+		userLogin( nullable:false )		// Transitions are all by users
 		timeElapsed( nullable:false )
 		wasOverridden( range:0..1 )
 		wasSkippedTo( range:0..1 )

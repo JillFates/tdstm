@@ -162,7 +162,7 @@
 
               <tr class="prop">
                 <td valign="top" class="name">
-                  <label for="operationalOrder">Operational Order:</label>
+                  <label for="operationalOrder">Order:</label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'operationalOrder','errors')}">
                   <g:select from="${1..25}" id="operationalOrder" name="operationalOrder" value="${moveBundleInstance?.operationalOrder}" ></g:select>
