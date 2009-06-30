@@ -21,7 +21,24 @@
 	})
 	</script>
 	
+   <script type="text/javascript">
+  		
+        function setFocus(){
+	        var tab = '${tab}' ;
+	        if(tab != 'Todo'){
+		        document.getElementById('todoId').firstChild.style.backgroundColor="#FFFFFF"
+		        document.getElementById('allId').firstChild.style.backgroundColor="#aaefb8"
+	        }
+	        document.bundleTeamAssetForm.search.focus();
+        }
         
+        function assetSearch(assetTag) {
+        	document.bundleTeamAssetForm.search.value = assetTag
+        	document.bundleTeamAssetForm.action = "cleaningAssetSearch";
+       		document.bundleTeamAssetForm.submit() 
+        }
+    
+   </script>           
 </head>
 <body>
 <div id="serverInfoDialog" title ="Server Info" >			
