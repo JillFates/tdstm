@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>My Tasks</title>
+<g:javascript library="jquery" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 	 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 	<%--<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
@@ -10,7 +11,6 @@
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 	
 	<%--<g:javascript library="prototype" />
-	<g:javascript library="jquery" />
 	
 	<jq:plugin name="ui.core" />
 	<jq:plugin name="ui.dialog" /> --%>
@@ -71,12 +71,12 @@
         document.getElementById('todoId').firstChild.style.backgroundColor="#FFFFFF"
         document.getElementById('allId').firstChild.style.backgroundColor="#aaefb8"
         }
-        document.bundleTeamAssetForm.search.focus();
+        $('#search').focus();
         }
         function assetSubmit(searchVal){
         
-        document.bundleTeamAssetForm.search.value = searchVal; 
-        document.bundleTeamAssetForm.submit();
+        $('#search').val(searchVal); 
+        $('form#bundleTeamAssetForm').submit();
         
         }
      </script>      
@@ -102,16 +102,16 @@
 							<input name="location" type="hidden" value="${location}" />
 							<input name="project" type="hidden" value="${project}" />
 							<input name="tab" type="hidden" value="${tab}" />								              	
-							<div style="float:left; width:220px; margin:2px 0; ">              								
-              					<table style="border:0px;width:220px">
+							<div style="float:left; width:210px; margin:2px 0; ">              								
+              					<table style="border:0px;width:210px;">
 								    <tr>								            										            		
 								    <td id="todoId" style="padding-top:4px;padding-left:1px;padding-right:0px;padding-bottom:0px;width:50px;"><g:link  style="color: #5b5e5c; border:1px solid #5b5e5c; margin:2px;background:#aaefb8;padding:2px;" action="assetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link></td>
 								    <td id="allId" style="padding-top:4px;padding-left:1px;padding-right:0px;padding-bottom:0px;"><g:link   style="color: #5b5e5c; border:1px solid #5b5e5c; margin:2px; padding:2px;" action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All&nbsp;(${allSize})</g:link></td>
-								    <td style="padding-top:0px;padding-left:1px;padding-right:0px;padding-bottom:0px; height:10px;"><input  type="text" size="08" value="" name="search" style="color: #5b5e5c; border:1px solid #5b5e5c; margin:0px; padding:1px;" /></td>
+								    <td style="padding-top:0px;padding-left:1px;padding-right:0px;padding-bottom:0px; height:10px;"><input  type="text" size="08" value="" id="search" name="search" style="color: #5b5e5c; border:1px solid #5b5e5c; margin:0px; padding:1px;" /></td>
 								    </tr>
 								    </table>
 						    </div>  
-							<div id="mydiv" onclick="document.getElementById('mydiv').style.display = 'none';setFocus()">						            
+							<div id="mydiv" onclick="$('#mydiv').hide();setFocus()">						            
 			   					<g:if test="${flash.message}">
 								<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
 								</g:if> 

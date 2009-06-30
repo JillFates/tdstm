@@ -287,7 +287,7 @@ function mySelect(x)
         }
         
         function validation(){      
-        var enterNote = document.assetSearchForm.enterNote.value;      
+        var enterNote = $('#enterNote').val();  
         if(enterNote == "" || enterNote == "Enter Comment"){
       	alert('Please enter note');
         document.assetSearchForm.enterNote.focus();   
@@ -303,8 +303,8 @@ function mySelect(x)
       	  
       	function doTransition(){
       	if(validation()){
-      	document.assetSearchForm.action="placeHold";
-      	document.assetSearchForm.submit();
+      	$('form#assetSearchForm').attr({action: "placeHold"});
+      	$('form#assetSearchForm').submit(); 
       	}else {
       	return false;
       	}
@@ -317,14 +317,14 @@ function mySelect(x)
       			if(printCheck.value != "printed" )
       			{
       				if(confirm('You have not printed labels for this asset. Are you sure that you want to continue?')){
-      					document.assetSearchForm.action = "cleaning";      
-   						document.assetSearchForm.submit();
+      					$('form#assetSearchForm').attr({action: "cleaning"});     
+   						$('form#assetSearchForm').submit();
       				}else {
       					return false;
       				}
    				}else {
-   						document.assetSearchForm.action = "cleaning";      
-   						document.assetSearchForm.submit();
+   						$('form#assetSearchForm').attr({action: "cleaning"});      
+   						$('form#assetSearchForm').submit();
    				}
    			}else{
    				 alert("Please select all instructions");
@@ -332,8 +332,8 @@ function mySelect(x)
    			}
       	}
       	function cancel(){
-      		document.assetSearchForm.action = "cancelAssetSearch";      
-   			document.assetSearchForm.submit();
+      		$('form#assetSearchForm').attr({action: "cancelAssetSearch"});      
+   			$('form#assetSearchForm').submit();
       	}
         function doCheckValidation(){
 	    var j = 0;
@@ -352,11 +352,11 @@ function mySelect(x)
         }     
         }
       	function setFocus(){ 
-        document.assetSearchForm.textSearch.focus();
+        $('#textSearch').focus();
         }
        function commentSelect(cmtVal) {
-      document.assetSearchForm.enterNote.value = cmtVal;
-      document.assetSearchForm.selectCmt.value = 'Select a common reason:';
+      $('#enterNote').val(cmtVal);
+      $('#selectCmt').val('Select a common reason:');
       }
       /*-----------------------------------------------------------------------
       *To check all instructions checked or not to enable cleaned button
@@ -557,7 +557,7 @@ function mySelect(x)
 						
 			<g:select style="width: 170px;padding:0px;text-align:left;" from="['Select a common reason:','Device not powered down','Device is not in expected rack','Device will not power up']" id="selectCmt" name="selectCmt" value="Select a common reason:" onchange="commentSelect(this.value);"></g:select>
 			<br/>
-					<textarea rows="5" cols="98" title="Enter Note..." name="enterNote" onclick="clearComment(this)" onkeypress="clearComment(this)">Enter Comment</textarea></td>
+					<textarea rows="5" cols="98" title="Enter Note..." id="enterNote" name="enterNote" onclick="clearComment(this)" onkeypress="clearComment(this)">Enter Comment</textarea></td>
 					
 					<g:if test="${projMap}">
 					<td class="buttonClean" style="text-align:center;vertical-align:bottom;align:left; " colspan="2"><input  type="button"	value="Place on HOLD" onclick="return doTransition()" /></td>

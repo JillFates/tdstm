@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Home</title>
+<g:javascript library="jquery" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}" />
 </head>
@@ -16,7 +17,7 @@
 					<g:link action="cleaningAssetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' style="height:18px; padding-top:3px;width:60px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">My Task</g:link>
 					<g:link action="cleaningAssetSearch" params='["bundle":bundle,"menu":"true","team":team,"location":location,"project":project,"user":"ct"]' style="height:18px; padding-top:3px; width:63px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Asset</g:link>								           
 			  	</div>		
-				<div id="mydiv" onclick="document.getElementById('mydiv').style.display = 'none';">
+				<div id="mydiv" onclick='$("#mydiv").hide()'>
 					<g:if test="${flash.message}">
 					<div style="color: red;">
 					<ul>

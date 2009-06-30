@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Asset</title>
+<g:javascript library="jquery" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
@@ -10,10 +11,10 @@
     <script type="text/javascript">
         
         function validation(){      
-        var enterNote = document.assetSearchForm.enterNote.value;           
+        var enterNote = $('#enterNote').val(); 
         if(enterNote == ""){     
         alert('Please enter note');
-        document.assetSearchForm.enterNote.focus();   
+        $('#enterNote').focus();   
         return false;
         }else{
         if(confirm('Are you sure?')){
@@ -23,15 +24,15 @@
        }  
        function doTransition(){     
        if(validation()){
-       document.assetSearchForm.submit();
+       $('form#assetSearchForm').submit();
        }else {
        return false;
        }
        }
        function unRack(){ 
        if(doCheckValidation()){  
-       document.assetSearchForm.action = "unRack";      
-       document.assetSearchForm.submit();       
+       $('form#assetSearchForm').attr({action: "unRack"});     
+       $('form#assetSearchForm').submit();       
        }else{
        return false;
        }
@@ -55,8 +56,8 @@
        }     
       }      
       function commentSelect(cmtVal) {
-      document.assetSearchForm.enterNote.value = cmtVal;
-      document.assetSearchForm.selectCmt.value = 'Select a common reason:';
+      $('#enterNote').val(cmtVal);
+      $('#selectCmt').val('Select a common reason:');
       }
       
     </script>    
@@ -84,7 +85,7 @@
 			<input name="actionLabel" type="hidden" value="${actionLabel}"  />
 			<input name="user" type="hidden" value="mt"  />
 			<table style="border:0px;">
-	  <div id="mydiv" onclick="document.getElementById('mydiv').style.display = 'none';">
+	  <div id="mydiv" onclick="$('#mydiv').hide();">
  			<g:if test="${flash.message}">
 			<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
 			</g:if> 
@@ -144,7 +145,7 @@
 			</td>
 			</tr>		
 			<tr><td>
-			<textarea rows="2" cols="10" style="width: 200px;padding:0px;" title="Enter Note..." name="enterNote" ></textarea>
+			<textarea rows="2" cols="10" style="width: 200px;padding:0px;" title="Enter Note..." id="enterNote" name="enterNote" ></textarea>
 			</td></tr>		
 			<tr>
 			<td style="text-align: right;"><input type="button" value="Place on HOLD" onclick="return doTransition();" class="action_button"/></td>

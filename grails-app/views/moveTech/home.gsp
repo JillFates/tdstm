@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>MoveTech Home</title>
+<g:javascript library="jquery" />
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 
@@ -40,7 +41,7 @@ dt {
 						</tr>
 					  </table>
 				</div>
-				<div style="float:left; width:100%;" id="mydiv" onclick="document.getElementById('mydiv').style.display = 'none'">						            
+				<div style="float:left; width:100%;" id="mydiv" onclick='$("#mydiv").hide()'>						            
 			   					<g:if test="${flash.message}">
 								<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
 								</g:if> 

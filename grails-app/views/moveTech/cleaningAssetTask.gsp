@@ -21,65 +21,6 @@
 	})
 	</script>
 	
-  	<script type="text/javascript">
-  		/*var timeInterval;
-		function submittheform() {
-			document.bundleTeamAssetForm.submit();
-		}*/
-		
-        function serverInfo(e){
-        var loc = document.bundleTeamAssetForm.location.value;
-        var location;
-        var room;
-        var rack;
-        var pos;  
-       
-        var asset = eval('(' + e.responseText + ')'); 
-        if(loc == 's'){
-        location = asset[0].item.sourceLocation
-        room = asset[0].item.sourceRoom
-        rack = asset[0].item.sourceRack
-        pos = asset[0].item.sourceRackPosition
-        }else{
-        location = asset[0].item.targetLocation
-        room = asset[0].item.targetRoom
-        rack = asset[0].item.targetRack
-        pos = asset[0].item.targetRackPosition
-        }           
-        var htmlBody = '<table ><thead></thead><tbody>'+
-        '<tr><td class="asset_details_block"><b>Asset Tag:</b>  '+asset[0].item.assetTag+'</td></tr>'+
-		'<tr><td class="asset_details_block"><b>Asset Name:</b>  '+asset[0].item.assetName+'</td></tr>'+
-		'<tr><td class="asset_details_block"><b>Current State:</b>  '+asset[0].state+'</td></tr>'+		
-		'<tr><td class="asset_details_block"><b>Serial Number:</b>  '+asset[0].item.serialNumber+'</td></tr>'+
-		'<tr><td class="asset_details_block"><b>Model:</b>  '+asset[0].item.model+'</td></tr>'+
-		'<tr><td class="asset_details_block"><b>Location:</b>  '+location+'</td></tr>'+
-		'<tr><td class="asset_details_block"><b>Room:</b>  '+room+'</td></tr>'+
-		'<tr><td class="asset_details_block"><b>Rack/Position:</b>  '+rack+'/'+pos+'</td></tr>'+
-		'<tr><td class="asset_details_block"><b>PDU:</b>  '+asset[0].item.powerPort+'</td></tr>'+
-		'<tr><td class="asset_details_block"><b>NIC:</b>  '+asset[0].item.nicPort+'</td></tr>'+
-		'<tr><td class="asset_details_block"><b>HBA:</b>  '+asset[0].item.hbaPort+'</td></tr>'+
-		'</tbody></table>' 
-        var getDialogId = document.getElementById('serverInfoDialog')
-        getDialogId.innerHTML = htmlBody
-         $("#serverInfoDialog").dialog('option', 'width', 200)                     
-		 $("#serverInfoDialog").dialog('option', 'position', ['left','top']);
-         $('#serverInfoDialog').dialog('open');
-        }
-        function setFocus(){
-        var tab = '${tab}' ;
-        if(tab != 'Todo'){
-        document.getElementById('todoId').firstChild.style.backgroundColor="#FFFFFF"
-        document.getElementById('allId').firstChild.style.backgroundColor="#aaefb8"
-        }
-        document.bundleTeamAssetForm.search.focus();
-        }
-        function assetSearch(assetTag) {
-        document.bundleTeamAssetForm.search.value = assetTag
-        	document.bundleTeamAssetForm.action = "cleaningAssetSearch";
-       		document.bundleTeamAssetForm.submit() 
-        }
-    
-   </script>      
         
 </head>
 <body>
@@ -105,10 +46,10 @@
 					<tr>
 					<td id="todoId"><g:link style="color: #5b5e5c; border:1px solid #5b5e5c; margin:5px;background:#aaefb8;padding:2px;" action="cleaningAssetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link></td>
 					<td id="allId"><g:link  style="color: #5b5e5c; border:1px solid #5b5e5c; margin:5px;padding:2px;margin-right:300px;" action="cleaningAssetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All&nbsp;(${allSize})</g:link></td>
-					<td style="text-align:right;"><input  type="text" size="10" value="" name="search" />&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/></td></tr>
+					<td style="text-align:right;"><input  type="text" size="10" value="" id="search" name="search" />&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/></td></tr>
 					</table>
 					</div>  
-		    <div id="mydiv" onclick="document.getElementById('mydiv').style.display = 'none';setFocus()">						            
+		    <div id="mydiv" onclick="$('#mydiv').hide();setFocus()">						            
 			   		<g:if test="${flash.message}">
 					<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
 					</g:if> 
