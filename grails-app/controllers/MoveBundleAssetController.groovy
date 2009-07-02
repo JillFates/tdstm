@@ -88,6 +88,10 @@ class MoveBundleAssetController {
 	 */
     def assignAssetsToBundle = {
     	def bundleId = params.bundleId
+    	if(!bundleId){
+        	userPreferenceService.loadPreferences("CURR_BUNDLE")
+            bundleId = getSession().getAttribute("CURR_BUNDLE").CURR_BUNDLE
+        }
     	def moveBundleInstance = MoveBundle.findById( bundleId )
     	def moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $moveBundleInstance.project.id")
     	def currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $moveBundleInstance.id")
@@ -301,6 +305,7 @@ class MoveBundleAssetController {
     	if( bundleId ){
     		userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
     	} else {
+            userPreferenceService.loadPreferences("CURR_BUNDLE")
     		bundleId = getSession().getAttribute("CURR_BUNDLE").CURR_BUNDLE
     	}
     	def bundleInstance = MoveBundle.findById(bundleId)

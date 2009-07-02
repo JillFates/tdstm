@@ -48,6 +48,9 @@ class WorkflowService {
 	        		if ( !assetTransition.validate() || !assetTransition.save() ) {
 	    				message = "Unable to create AssetTransition: " + GormUtil.allErrorsString( assetTransition )
 	    			} else {
+	    				/* Set preexisting AssetTransitions as voided where stateTo >= new state */
+	    				setPreExistTransitionsAsVoided( assetEntity, state )
+	    				/* Set time elapsed for each transition */
 	    				message = setTransitionTimeElapsed(assetTransition)
 	    				message = "Transaction created successfully"
 	    				if(projectTeam){
@@ -109,5 +112,18 @@ class WorkflowService {
     	}
     	return message
     }
-    
+    /*--------------------------------------------------------------------------------
+     * @author : Lokanath Reddy
+     * @param  : AssetEntity , stateTo
+     * @return : Set preexisting AssetTransitions as voided where stateTo >= new state
+     * -----------------------------------------------------------------------------*/
+    def setPreExistTransitionsAsVoided( def assetEntity, def state ) {
+    	if(state != "10"){
+	    	def preExistTransitions = AssetTransition.findAll("from AssetTransition where assetEntity = $assetEntity.id and stateTo > $state ")
+	    	preExistTransitions.each{
+	    		it.voided = 1
+	    		it.save()
+	    	}
+    	}
+    }
 }

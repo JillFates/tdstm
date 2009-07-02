@@ -27,11 +27,8 @@
 
       function initialize(){
       // This is called when the page loads to initialize Managers
-      var moveManagerSelect = document.getElementById('moveManagerId')
-      var projectManagerSelect = document.getElementById('projectManagerId')
-
-      moveManagerSelect.value = '${moveManager}'
-      projectManagerSelect.value= '${projectManager}'
+      $('#moveManagerId').val('${moveManager}');
+      $('#projectManagerId').val('${projectManager}');
 
       }
 

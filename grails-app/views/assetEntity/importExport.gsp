@@ -28,7 +28,7 @@
 		 * ------------------------------- */
 		jQuery(function($){
 	        $("#run").click(function(){
-	        	document.getElementById("progressbar").style.display = "block"
+	        	$("#progressbar").css("display","block")
 	        	clearInterval(handle);
 				handle=setInterval("${remoteFunction(action:'getProgress', onComplete:'showProcessBar(e)')}",500);
 	        });

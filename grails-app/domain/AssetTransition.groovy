@@ -11,6 +11,9 @@ class AssetTransition {
 	Integer wasSkippedTo = 0	// Indicates that a state was skipped prior to this transtion stateTo
 	String comment
 	Date dateCreated = new Date()
+	Date lastUpdated
+	Integer voided = 0		// to place transition as voided when statusTo < new status
+	
 
 	static belongsTo = [ 
 		assetEntity : AssetEntity,
@@ -30,6 +33,9 @@ class AssetTransition {
 		timeElapsed( nullable:false )
 		wasOverridden( range:0..1 )
 		wasSkippedTo( range:0..1 )
+		lastUpdated( nullable:true )
+		voided( range:0..1 )
+		
 	}	
 	
 	static mapping  = {

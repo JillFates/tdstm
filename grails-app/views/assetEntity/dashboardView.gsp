@@ -393,12 +393,12 @@ td .odd {
 		'<tr><td>' +
 		'<div id=\'recentChangesLess\'><table style=\'border: 0px\' cellpadding=\'0\' cellspacing=\'0\'><tbody>'
 		for(i=0;i<asset[0].recentChanges.length && i<3; i++){
-			tableBody += '<tr><td>'+asset[0].recentChanges[i]+'</td></tr>'
+			tableBody += '<tr><td class='+asset[0].recentChanges[i].cssClass+'>'+asset[0].recentChanges[i].transition+'</td></tr>'
 		}
 		tableBody += '<tbody></table></div>'
 		tableBody += '<div id=\'recentChangesMore\' style=\"display: none;\"><table style=\'border: 0px\'  cellpadding=\'0\' cellspacing=\'0\' ><tbody>'
 		for(i=0;i<asset[0].recentChanges.length ; i++){
-			tableBody += '<tr><td>'+asset[0].recentChanges[i]+'</td></tr>'
+			tableBody += '<tr><td class='+asset[0].recentChanges[i].cssClass+'>'+asset[0].recentChanges[i].transition+'</td></tr>'
 		}
 		tableBody += '<tbody></table></div></td></tr>'
 		tableBody += '</tbody></table>'

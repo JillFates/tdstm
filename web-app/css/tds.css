@@ -359,4 +359,7 @@ div.tableContainer thead th{
 	text-decoration:none;
 	letter-spacing:1px;
 	width:120px;
-		}
+}
+.void_transition {
+text-decoration: line-through;	
+}

@@ -1,6 +1,7 @@
 class ProjectTeamController {
     
 	def partyRelationshipService
+	def userPreferenceService
 	
     def index = { redirect(action:list,params:params) }
 
@@ -11,6 +12,10 @@ class ProjectTeamController {
      */
     def list = {
         def bundleId = params.bundleId
+        if(!bundleId){
+        	userPreferenceService.loadPreferences("CURR_BUNDLE")
+            bundleId = getSession().getAttribute("CURR_BUNDLE").CURR_BUNDLE
+        }
         def bundleInstance = MoveBundle.findById(bundleId)
         def projectTeamInstanceList = partyRelationshipService.getBundleTeamInstanceList( bundleInstance  )
         //ProjectTeam.findAllByProject(projectInstance)
