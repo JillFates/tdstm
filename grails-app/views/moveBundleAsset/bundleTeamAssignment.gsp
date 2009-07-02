@@ -8,9 +8,9 @@
     <g:javascript library="ui.datepicker" />
 	<g:javascript library="prototype"/>
 	
-    <script>
+    <script type="text/javascript">
     
-         <!-- Delete Rows from a Table-->
+       <%--   Delete Rows from a Table --%>
     	 function deleteRow(table) {  
              try {  
              	var table = table;  
@@ -21,14 +21,14 @@
                     	rowCount--;  
                      	i--;  
                  	  
-	             }  
+	             }
              }catch(e) {  
                  alert(e);  
              }  
          }
          function  makeSelect(field,asset ) {
-        	var spanText = document.getElementById('span_'+asset)
-        	spanText.style.display = 'none'
+        	var spanText = jQuery('#span_'+asset);
+        	spanText.attr("style", "display:none"); 
         	var TeamSelect
         	try{
         		TeamSelect = document.getElementsByName('assetTeamAssign_'+asset)
@@ -56,13 +56,13 @@
 	   }
            
          
-         <!-- Assign asset to entered Team in text Box corresonding to Asset-->
+         <%--  Assign asset to entered Team in text Box corresonding to Asset --%>
          function assetToTeamAssign(team, asset)
          {
          		var teamNumber = team
            		var asset = asset
-           		var rackPlan = document.getElementById('rackPlan').value
-           		var bundleId = document.getElementById('id').value
+           		var rackPlan = jQuery('#rackPlan').val();
+           		var bundleId = jQuery('#id').val();
          		${remoteFunction(action:'assetTeamAssign', params:'\'teamId=\' +teamNumber+\'&asset=\'+asset+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId', onComplete:"teamAssignComplete(e);")}
          }
          
@@ -71,7 +71,7 @@
          	
          		var cartNumber = cart.value
            		var asset = asset
-           		var bundleId = document.getElementById('id').value
+           		var bundleId = jQuery('#id').val();
          		${remoteFunction(action:'assetCartAssign', params:'\'cartNumber=\' +cartNumber+\'&asset=\'+asset+\'&bundleId=\'+bundleId', onComplete:"cartAssignComplete(e);")}
          	
          }
@@ -80,14 +80,14 @@
          		
          		var shelfNumber = shelf.value
            		var asset = asset
-           		var rackPlan = document.getElementById('rackPlan').value
-           		var bundleId = document.getElementById('id').value
+           		var rackPlan = jQuery('#rackPlan').val();
+           		var bundleId = jQuery('#id').val();
          		${remoteFunction(action:'assetShelfAssign', params:'\'shelfNumber=\' +shelfNumber+\'&asset=\'+asset+\'&bundleId=\'+bundleId')}
          	
          }
          	
          
-         <!-- AutoFill assignment of assets to Selected Team -->
+        <%--   AutoFill assignment of assets to Selected Team --%>
          function autoFillTeam( teamCode) {
          	var teamCode = teamCode
          	var assets=document.getElementsByName('asset')
@@ -95,8 +95,8 @@
          	for(var assetRow = 0; assetRow < assets.length; assetRow++) {
          		assetList[assetRow] = assets[assetRow].value
          	}
-         	var bundleId = document.getElementById('id').value
-         	var rackPlan = document.getElementById('rackPlan').value
+         	var bundleId = jQuery('#id').val();
+         	var rackPlan = jQuery('#rackPlan').val();
          	if(teamCode != 'null' && teamCode!= '' && assetList.length > 0 && bundleId != null)
          	{
 	         	${remoteFunction(action:'autoFillTeamAssign', params:'\'teamCode=\' +teamCode+\'&assets=\'+assetList+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId',onLoading:"showProcessing();", onComplete:"autoTeamAssignComplete( e );")}
@@ -104,10 +104,10 @@
          }
          
          function filterAssetsOnTeam( teamCode ) {
-         	document.getElementById('filterRack').selectedIndex =0
+         	jQuery('#filterRack').attr("selectedIndex","0");
          	var teamCode = teamCode
-         	var rackPlan = document.getElementById('rackPlan').value
-         	var bundleId = document.getElementById('id').value
+         	var rackPlan = jQuery('#rackPlan').val();
+         	var bundleId = jQuery('#id').val();
          	if(bundleId != null && bundleId != "") {
 	         	${remoteFunction(action:'filterAssetByTeam', params:'\'teamCode=\' +teamCode+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId',onLoad="showProcessing()", onComplete:"filterByTeam( e );")}
     		}     	
@@ -115,39 +115,39 @@
          
          function filterAssetsOnRack( rack ) {
          	var arSelected = new Array();
-         	document.getElementById('filterTeam').selectedIndex =0
+         	jQuery('#filterTeam').attr("selectedIndex","0");
          	var filterRacks = document.getElementById('filterRack')
-         	var rackPlan = document.getElementById('rackPlan').value
+         	var rackPlan = jQuery('#rackPlan').val();
          	for(var rack=0;rack<filterRacks.length;rack++)
          	{ 
          		if (filterRacks[rack].selected) {
          			arSelected.push(filterRacks[rack].value);
          		}
          	} 
-         	var bundleId = document.getElementById('id').value
+         	var bundleId = jQuery('#id').val();
          	${remoteFunction(action:'filterAssetByRack', params:'\'rack=\'+arSelected+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId', onComplete:"filterByTeam( e );")}
          }
          
          function moveRackUp() {
-         	var optionList = document.getElementById('filterRack').options
-         	var selectedIndex = document.getElementById('filterRack').selectedIndex
+         	var optionList = jQuery('#filterRack').attr("options");
+         	var selectedIndex = jQuery('#filterRack').attr("selectedIndex");
          	if ( selectedIndex > 0) {
-         		document.getElementById('filterRack').selectedIndex = selectedIndex -1
-         		filterAssetsOnRack(document.getElementById('filterRack').value)
+         		jQuery('#filterRack').attr("selectedIndex", selectedIndex-1);
+         		filterAssetsOnRack(jQuery('#filterRack').val())
          	}
          	 
          }
          function moveRackDown() {
-         	var optionList = document.getElementById('filterRack').options
-         	var selectedIndex = document.getElementById('filterRack').selectedIndex
+         	var optionList = jQuery('#filterRack').attr("options");
+         	var selectedIndex = jQuery('#filterRack').attr("selectedIndex");
          	if ( selectedIndex < (optionList.length - 1) ) {
-         		document.getElementById('filterRack').selectedIndex = selectedIndex +1
-         		filterAssetsOnRack(document.getElementById('filterRack').value)
+         		jQuery('#filterRack').attr("selectedIndex",selectedIndex+1);
+         		filterAssetsOnRack(jQuery('#filterRack').val())
          	}
          	 
          }
          
-     function filterByTeam( e) {
+     function filterByTeam(e) {
      	hideProcessing();
    	 	var assetList = eval('(' + e.responseText + ')')
    	 	table = document.getElementById('assetTable')
@@ -159,6 +159,7 @@
             rowCount--;  
             i--;  
         } 
+        
         if (assetList) {
  			addAssetRow( assetList )    
 		}   
@@ -166,7 +167,7 @@
      }
      function addAssetRow(assetList){
      
-     	var rackPlan = document.getElementById('rackPlan').value
+     	var rackPlan = jQuery('#rackPlan').val()
      	var length = assetList.length 
      	table = document.getElementById('assetTable')
 		for (var i=0; i < length; i++) {
@@ -287,10 +288,9 @@
      
      function autoTeamAssignComplete( e ) {
      	hideProcessing()
-     	var team = document.getElementById('team')
-     	team.selectedIndex = 0
+     	jQuery('#team').attr("selectedIndex","0");
      	var teamAssetList = eval('(' + e.responseText + ')')
-     	assetList = teamAssetList[0].assetList
+     	var assetList = teamAssetList[0].assetList
 		table = document.getElementById('assetTable')
       	deleteRow( table )
      	addAssetRow(assetList)
@@ -303,7 +303,7 @@
      	if (teamAsset && teamAsset.length > 0) {
      		showTeamAssetCount(teamAsset)
      	} else {
-     	document.getElementById('rackPlan').focus()
+     	jQuery('#rackPlan').focus();
      	alert("Team Not Found")
      	}
      }
@@ -350,32 +350,32 @@
 		}
 	 }
 	 function submitForm(){	
-	 	document.bundleTeamAssetForm.action = "bundleTeamAssignment";
-	 	document.bundleTeamAssetForm.submit();
+	 	jQuery('form#bundleTeamAssetForm').attr({action: "bundleTeamAssignment"}); 
+	 	jQuery('form#bundleTeamAssetForm').submit();
 	 }
  var loaded = false;
         function showProcessing()
         {		
                loaded =false;
-                showLoadingImage()
+               showLoadingImage()
          }
 
          function showLoadingImage()
          {
-                var processTab = document.getElementById('processDiv')
-                processTab.style.display="block";
-                var assetTab = document.getElementById('assetDiv')
-                assetTab.style.display="none";
+                var processTab = jQuery('#processDiv');
+                processTab.attr("style", "display:block");
+                var assetTab = jQuery('#assetDiv');
+                assetTab.attr("style", "display:none");
                 
                 
            }
 
           function hideProcessing()
           {
-              var processTab = document.getElementById('processDiv')
-                processTab.style.display="none";
-                var assetTab = document.getElementById('assetDiv')
-                assetTab.style.display="block";
+              var processTab = jQuery('#processDiv');
+                processTab.attr("style", "display:none");
+                var assetTab = jQuery('#assetDiv');
+                assetTab.attr("style", "display:block");
           }
     </script>
 
