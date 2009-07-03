@@ -1,4 +1,5 @@
 import com.tdssrc.eav.EavAttributeSet
+import grails.converters.JSON
 import org.jsecurity.SecurityUtils
 class DataTransferBatchController {
     def sessionFactory
@@ -25,6 +26,10 @@ class DataTransferBatchController {
      * @return process the dataTransferBatch and return to datatransferBatchList
      * -------------------------------------------------------------------------    */
     def process = { 
+    	sessionFactory.getCurrentSession().flush();
+    	sessionFactory.getCurrentSession().clear();
+    	session.setAttribute("TOTAL_BATCH_ASSETS",0)
+    	session.setAttribute("TOTAL_PROCESSES_ASSETS",0)
     	DataTransferBatch.withTransaction { status ->
     	def projectId = params.projectId
     	def projectInstance = Project.findById( projectId )
@@ -33,6 +38,7 @@ class DataTransferBatchController {
 	    	if(dataTransferBatch){
 		    	def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = $dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
 		    	def assetsSize = dataTransferValueRowList.size()
+		    	session.setAttribute("TOTAL_BATCH_ASSETS",assetsSize)
 		    	for(int dataTransferValueRow =0; dataTransferValueRow < assetsSize; dataTransferValueRow ++) {
 		    		def rowId =dataTransferValueRowList[dataTransferValueRow].rowId
 		    		def dtvList = DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
@@ -103,6 +109,7 @@ class DataTransferBatchController {
 			    			sessionFactory.getCurrentSession().flush();
 			    			sessionFactory.getCurrentSession().clear();
 			    		}
+			    		session.setAttribute("TOTAL_PROCESSES_ASSETS",dataTransferValueRow)
 		    		}
 		    	}  
 		    	def dataTransferCommentRowList = DataTransferComment.findAll(" From DataTransferComment dtc where dtc.dataTransferBatch = $dataTransferBatch.id and dtc.dataTransferBatch.statusCode = 'PENDING'")
@@ -139,6 +146,18 @@ class DataTransferBatchController {
 		}
     	redirect (action:list, params:[projectId:projectId])
     	}
+     }
+    /* --------------------------------------
+     * 	@author : Lokanada Reddy
+     * 	@param  : processed and total assts from session 
+     *	@return : processed data for Batch progress bar
+     * -------------------------------------- */
+    def getProgress = {
+    	def progressData = []
+        def total = session.getAttribute("TOTAL_BATCH_ASSETS") 
+        def processed = session.getAttribute("TOTAL_PROCESSES_ASSETS")
+    	progressData<<[processed:processed,total:total]
+        render progressData as JSON
      }
     /*
     def show = {

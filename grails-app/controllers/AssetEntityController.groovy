@@ -95,6 +95,8 @@ class AssetEntityController {
     		assetsByProject = AssetEntity.findAllByProject(project)
     	}
     	def	dataTransferBatchs = DataTransferBatch.findAllByProject(project).size()
+    	session.setAttribute("BATCH_ID",0) 
+		session.setAttribute("TOTAL_ASSETS",0)
 		if( params.message ) {
 			flash.message = params.message
 		}

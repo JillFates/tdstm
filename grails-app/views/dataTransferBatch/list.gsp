@@ -5,13 +5,50 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="projectHeader" />
         <title>Data Transfer Batch List</title>
+        <g:javascript library="prototype" />
+	<g:javascript library="jquery" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'progressbar.css')}" />
+	<jq:plugin name="ui.progressbar"/>
+	<script>
+		/* ---------------------------------
+		 * 	Author : Lokanada Reddy		
+		 *	function to show the Progress bar
+		 * ------------------------------- */
+		var handle=0;
+		function showProcessBar(e){
+			var progress = eval('(' + e.responseText + ')');
+			if(progress){
+				$("#progressbar").reportprogress(progress[0].processed,progress[0].total);
+		        if(progress[0].imported==progress[0].total){
+		                clearInterval(handle);
+		                location.reload(true);
+		        }
+			}
+		}
+		/* ---------------------------------
+		 * 	Author : Lokanada Reddy
+		 *	JQuary function to set the interval to display Progress
+		 * ------------------------------- */
+		function getProgress() {
+			var returnStatus =  confirm('Do you really want to process Batch ?');
+			if(returnStatus){
+				$("#progressbar").css("display","block")
+			    clearInterval(handle);
+				handle=setInterval("${remoteFunction(action:'getProgress', onComplete:'showProcessBar(e)')}",500);
+				return true
+			} else {
+				return false
+			}
+		}
+	</script>
     </head>
     <body>
     
 	    <br>
         
         <div class="body">
-            <h1>Data Transfer Batch List</h1>
+        	<table style="border: 0"><tr><td><h1>Data Transfer Batch List</h1></td>
+        	<td style="vertical-align: bottom;" align="right"><div id="progressbar" style="display: none;" /></td></tr> </table>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
@@ -58,11 +95,12 @@
                             
                             <td>
 	                            <g:if test="${dataTransferBatch?.statusCode == 'PENDING'}">
-	                            	<g:link action="show" >View</g:link>|<g:link action="process" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return confirm('Do you really want to process Batch ?');" >Process</g:link>|<g:link action="void" >Void</g:link>
+	                            	<a href="#" >View</a>|<g:link action="process" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<a href="#">Void</a>
 	                            </g:if>
 	                            <g:else>
-	                            	<g:link action="show" >View</g:link>|<g:link action="delete" >Remove</g:link>
+	                            	<a href="#">View</a>|<a href="#">Remove</a>
 	                            </g:else>
+	                            
                             </td>
                         
                         </tr>
