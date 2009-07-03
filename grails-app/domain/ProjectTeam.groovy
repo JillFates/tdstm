@@ -4,20 +4,24 @@ class ProjectTeam extends PartyGroup{
 	Integer isIdle=1
 	String isDisbanded = "N"
 
-	static constraints = {
-		name( ) // related party Group
-		teamCode( blank:false, nullable:false,unique:'moveBundle' )
-		moveBundle( nullable:false)
-		isDisbanded( blank:true, nullable:true, inList:['Y', 'N'] )
-		dateCreated( ) // related to party
-		lastUpdated( ) // related to party
-	}
-
-	static belongsTo = [ moveBundle : MoveBundle  ]
+	static belongsTo = [ 
+	                    moveBundle : MoveBundle,
+	                    latestAsset : AssetEntity
+	                    ]
 	
 	static hasMany = [
 		assetTransitions : AssetTransition
 	]
+	
+	static constraints = {
+		name( ) // related party Group
+		teamCode( blank:false, nullable:false,unique:'moveBundle' )
+		moveBundle( nullable:false )
+		latestAsset( nullable:true )
+		isDisbanded( blank:true, nullable:true, inList:['Y', 'N'] )
+		dateCreated( ) // related to party
+		lastUpdated( ) // related to party
+	}
 	
 	static mapping  = {
 		version true

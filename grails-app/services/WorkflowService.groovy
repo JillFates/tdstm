@@ -55,6 +55,7 @@ class WorkflowService {
 	    				message = "Transaction created successfully"
 	    				if(projectTeam){
 							projectTeam.isIdle = flag.contains('busy') ? 1 : 0
+							projectTeam.latestAsset = assetEntity
 							projectTeam.save()
 	    				}
 	    				projectAssetMap.currentStateId = Integer.parseInt(stateEngineService.getStateId( process, toState ))

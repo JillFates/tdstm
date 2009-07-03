@@ -701,7 +701,7 @@ td .odd {
 						<td class="odd">Location</td>
 					</tr>
 					<tr>
-						<td>Asset</td>
+						<td>Latest Asset</td>
 					</tr>
 					<tr>
 						<td class="odd" nowrap>Source <span
@@ -733,7 +733,11 @@ td .odd {
 									<td class="odd">${bundleTeam?.team?.currentLocation}&nbsp;</td>
 								</tr>
 								<tr>
-									<td nowrap>&nbsp;</td>
+									<td nowrap>
+									<g:if test="${bundleTeam?.team?.latestAsset}">
+									<a href="#" onclick="assetDetails('${bundleTeam?.team?.latestAsset?.id}')"> ${bundleTeam?.team?.latestAsset?.assetTag}</a>
+									</g:if>&nbsp;
+									</td>
 								</tr>
 								<tr>
 									<td class="odd">${bundleTeam?.sourceAvailassets} /
@@ -756,7 +760,11 @@ td .odd {
 								<td class="odd">${supportTeam?.cleaning.currentLocation}&nbsp;</td>
 							</tr>
 							<tr>
-								<td nowrap>&nbsp;</td>
+								<td nowrap>
+									<g:if test="${supportTeam?.cleaning?.latestAsset}">
+									<a href="#" onclick="assetDetails('${supportTeam?.cleaning?.latestAsset?.id}')"> ${supportTeam?.cleaning?.latestAsset?.assetTag}</a>
+									</g:if>&nbsp;
+								</td>
 							</tr>
 							<tr>
 								<td class="odd">${supportTeam.sourceCleaned} /
