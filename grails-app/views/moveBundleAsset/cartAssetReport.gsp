@@ -5,21 +5,20 @@
 <meta name="layout" content="projectHeader" />
 <title>Cleaning Team Worksheets </title>
 <g:javascript library="prototype" />
+<g:javascript library="jquery" />
+
 <script type="text/javascript">
     
-    	function populateBundle(val) {    	
-    			
-     	var hiddenBundle = document.getElementById('moveBundle')
-		
-     	hiddenBundle.value = val
+    	function populateBundle( moveBundleVal ) {  	
+	     	jQuery('#moveBundle').val( moveBundleVal );
+        }
 
-     }
+     	function setSortOrder( sortVal ) {
+     		jQuery('#sortType').val( sortVal );
+     	}
 
-     
+</script>
 
-	
-     
-    </script>
 </head>
 <body>
 
@@ -48,7 +47,20 @@
 			</select></td>
 
 		</tr>
+		<tr class="prop">
+			<td valign="top" class="name"><label>Sort By:</label></td>
+			<td valign="top" class="value"><select id="sortOrderId"
+				name="sortOrder" onchange="setSortOrder(this.value);">
 
+				<option value="null" selected="selected">Please Select</option>
+
+				<option value="TEAM_ASSET">Team/Asset Tag</option>
+				<option value="ROOM_RACK_USIZE">Room/Rack/UPos</option>
+				<option value="TRUCK_CART_SHELF">Truck/Cart/Shelf</option>
+				<option value="ASSET_TAG">Asset Tag</option>				
+
+			</select></td>
+		</tr>
 		
 		<tr>
 
@@ -57,6 +69,7 @@
 				name="Generate">
 				<input type="hidden" name="reportName" id="reportName" value="cartAsset" />
 				<input type="hidden" name="moveBundle" id="moveBundle" value="null" />
+				<input type="hidden" name="sortType" id="sortType" value="null" />
 
 			</g:jasperReport></td>
 

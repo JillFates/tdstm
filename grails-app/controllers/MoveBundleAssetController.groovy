@@ -789,6 +789,10 @@ class MoveBundleAssetController {
    				if (rackPos == "/"){
    					rackPos = ""
    				}
+   				def cartShelf = (asset.cart ? asset.cart : "")+"/"+ (asset.shelf ? asset.shelf : "")
+   				if (cartShelf == "/"){
+   					cartShelf = ""
+   				}
    				reportFields <<['assetName':asset.assetName , 'assetTag':asset.assetTag, "assetType":asset.assetType, 
    				                "manufacturer":asset.manufacturer, "model":asset.model, "sourceTargetrack":rackPos, 
    				                "position":asset.targetRackPosition, 
@@ -799,7 +803,7 @@ class MoveBundleAssetController {
    				                'completedAt':projectInstance?.completionDate, 'bundleName':bundleInstance?.name, 
    				                'teamName':teamPartyGroup?.name +"-"+teamMembers, 'teamMembers':teamMembers,
    				                'location':"Target Team", 'rack':"TargetRack",'rackPos':"TargetRackPosition",
-   				                'truck':asset.truck,'room':asset.targetRoom,'PDU':asset.powerPort,'NIC':asset.nicPort, 
+   				                'truck':(asset.truck ? asset.truck : "")+"\n"+cartShelf,'room':asset.targetRoom,'PDU':asset.powerPort,'NIC':asset.nicPort, 
    				                'kvmPort':kvmPort, 'hbaPort':hbaPort,'instructions':assetCommentString,'sourcetargetLoc':"t"]
     		}
     		//No assets were found for selected MoveBundle,Team and Location
@@ -831,6 +835,7 @@ class MoveBundleAssetController {
     	def projectId = currProj.CURR_PROJ
     	def projectInstance = Project.findById( projectId )
     	def partyGroupInstance = PartyGroup.get(projectInstance.id)
+    	def sortOrder = params.sortType
     	def teamPartyGroup
     	// if no moveBundle was selected
     	if(params.moveBundle == "null") {
@@ -858,6 +863,8 @@ class MoveBundleAssetController {
        			assetEntityList = AssetEntity.findAll("from AssetEntity asset  where asset.project.id = $projectInstance.id and "+
                     									"asset.moveBundle != null order By asset.moveBundle,asset.cart,asset.shelf")
        		}
+            
+            
        		//Source AssetList 
        		if( assetEntityList != null) {
        			assetEntityList.each { asset ->
@@ -884,6 +891,14 @@ class MoveBundleAssetController {
        				if (cartShelf == "/"){
        					cartShelf = ""
        				}
+       				
+       				// sort options for reportFields
+       				def teamTagSort = (asset.sourceTeam.name ? asset.sourceTeam.name : "") +" "+ (asset.assetTag ? asset.assetTag : "")
+       				
+       				def roomTagSort = (asset.sourceRoom ? asset.sourceRoom : "") +" "+ (asset.sourceRack ? asset.sourceRack : "") +" "+ (asset.usize ? asset.usize : "")
+       				
+       				def truckTagSort = (asset.truck ? asset.truck : "") +" "+ (asset.cart ? asset.cart : "") +" "+ (asset.shelf ? asset.shelf : "")
+       				
        				def teamMembers = partyRelationshipService.getTeamMemberNames(teamPartyGroup?.id) 
        				reportFields <<['assetName':asset.assetName , "model":asset.model, 
        				                "sourceTargetPos":(teamPartyGroup?.currentLocation ? teamPartyGroup?.currentLocation : "") +"(source/ unracking)", 
@@ -894,7 +909,8 @@ class MoveBundleAssetController {
        				                'teamName':teamPartyGroup?.teamCode ? teamPartyGroup?.name+" - "+teamMembers : "", 
        				                'teamMembers':teamMembers,'location':"Source Team", 'truck':asset.truck, 
        				                'room':asset.sourceRoom,'moveTeam':asset?.sourceTeam?.name, 'instructions':assetCommentString,
-       				                'sourcetargetLoc':"s", 'usize':asset.usize]
+       				                'teamTagSort':teamTagSort, 'roomTagSort':roomTagSort,'truckTagSort':truckTagSort,
+       				                'assetTagSort': (asset.assetTag ? asset.assetTag : ""),'sourcetargetLoc':"s", 'usize':asset.usize]
        			}
        		}
        		//No Assets were found for selected moveBundle,team and Location
@@ -906,6 +922,18 @@ class MoveBundleAssetController {
         			redirect( action:'getBundleListForReportDialog', params:[reportId: 'Transportation Asset List'] )
         		}
         	}else {
+        		//sort reportFields by selected sort options
+                if ( sortOrder ) {
+                	if ( sortOrder == "TEAM_ASSET" ) {
+                		reportFields.sort{ it.teamTagSort }
+                	} else if ( sortOrder == "ROOM_RACK_USIZE" ) {
+                		reportFields.sort{ it.roomTagSort }
+                	} else if ( sortOrder == "TRUCK_CART_SHELF" ) {
+                		reportFields.sort{ it.truckTagSort }
+                	} else if ( sortOrder == "ASSET_TAG" ) {
+                		reportFields.sort{ it.assetTagSort }
+                	}
+                }
         		chain(controller:'jasper',action:'index',model:[data:reportFields],params:params)
         	}
         }
