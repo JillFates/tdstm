@@ -14,12 +14,15 @@
 		 * 	Author : Lokanada Reddy		
 		 *	function to show the Progress bar
 		 * ------------------------------- */
+		var checkProgressBar;
 		var handle=0;
 		function showProcessBar(e){
-			var progress = eval('(' + e.responseText + ')');
+			var progress = eval('(' + e.responseText + ')');			
 			if(progress){
+				checkProgressBar = true;
 				$("#progressbar").reportprogress(progress[0].processed,progress[0].total);
 		        if(progress[0].imported==progress[0].total){
+		        		checkProgressBar = false;
 		                clearInterval(handle);
 		                location.reload(true);
 		        }
@@ -29,17 +32,23 @@
 		 * 	Author : Lokanada Reddy
 		 *	JQuary function to set the interval to display Progress
 		 * ------------------------------- */
-		function getProgress() {
-			var returnStatus =  confirm('Do you really want to process Batch ?');
-			if(returnStatus){
-				$("#progressbar").css("display","block")
-			    clearInterval(handle);
-				handle=setInterval("${remoteFunction(action:'getProgress', onComplete:'showProcessBar(e)')}",500);
-				return true
+		function getProgress() {		
+			if ( !checkProgressBar ) {
+				var returnStatus =  confirm('Do you really want to process Batch ?');
+				if(returnStatus){
+					$("#progressbar").css("display","block")
+				    clearInterval(handle);
+					handle=setInterval("${remoteFunction(action:'getProgress', onComplete:'showProcessBar(e)')}",500);
+					return true;
+				} else {
+					return false;
+				}
 			} else {
-				return false
+				alert("Please wait, process is in progress.");
+				return false;
 			}
-		}
+		}		
+		
 	</script>
     </head>
     <body>
