@@ -867,6 +867,7 @@ td .odd {
 							</tr>
 						</thead>
 						<tbody id="assetsTbody">
+						<g:if test="${assetsList}">
 							<g:each status="i" in="${assetsList}" var="assetsList">
 
 								<tr name="assetDetailRow"
@@ -915,17 +916,19 @@ td .odd {
 										</g:remoteLink>
 									</g:if>
 									<g:else>
-						<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+ assetsList?.asset?.id)}">
-						<g:remoteLink controller="assetEntity" action="listComments" id="${assetsList?.asset.id}" before="setAssetId(${assetsList?.asset.id});" onComplete="listCommentsDialog( e ,'never' ); ">
-							<img src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}" border="0px">
-						</g:remoteLink>
-						</g:if>
-						</g:else>
-												
+										<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+ assetsList?.asset?.id)}">
+										<g:remoteLink controller="assetEntity" action="listComments" id="${assetsList?.asset.id}" before="setAssetId(${assetsList?.asset.id});" onComplete="listCommentsDialog( e ,'never' ); ">
+											<img src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}" border="0px">
+										</g:remoteLink>
+										</g:if>
+									</g:else>
 									</td>
 								</tr>
-
 							</g:each>
+							</g:if>
+						<g:else>
+							<tr><td colspan="8" class="no_records">No records found</td></tr>
+						</g:else>
 						</tbody>
 					</table>
 

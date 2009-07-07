@@ -363,3 +363,13 @@ div.tableContainer thead th{
 .void_transition {
 text-decoration: line-through;	
 }
+.cart_style span{
+	font-size: 16px;
+	font-weight: bold;
+}
+.no_records{
+	font-size: 12px;
+	font-weight: bold;
+	color: maroon;
+	text-align: center;
+}

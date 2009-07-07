@@ -667,6 +667,7 @@ function resolveValidate(formName,idVal){
 		</tr>
 	</thead>
 	<tbody>
+		<g:if test="${assetEntityList}">
 		<g:each in="${assetEntityList}" var="assetEntity">
 			<tr id="assetRow_${assetEntity.id}" >
 			<jsec:hasAnyRole in="['ADMIN','MANAGER']">	
@@ -697,7 +698,10 @@ function resolveValidate(formName,idVal){
 			<g:each in="${assetEntity.transitions}" var="transition" >${transition}</g:each>
 			</tr>
 		</g:each>
-		
+		</g:if>
+		<g:else>
+			<tr><td colspan="40" class="no_records">No records found</td></tr>
+		</g:else>
 	</tbody>
 </table>
 </g:form>

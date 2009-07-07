@@ -9,11 +9,11 @@ class CartTrackingController {
     def index = { 
     	redirect(action:cartTracking,params:params)
     }
-	/*--------------------------------------------------
+	/*---------------------------------------------------------
 	 * @author : Lokanath Reddy
-	 * @param  : 
-	 * @return : 
-	 *-------------------------------------------------*/
+	 * @param  : bundle and projectId
+	 * @return : Asset Details  On Cart and Truck 
+	 *---------------------------------------------------------*/
 	def cartTracking = {
 		def cartAction = params.cartAction
     	def moveBundleInstance
@@ -55,7 +55,7 @@ class CartTrackingController {
 			completed = true
 			pendingAssets = 0
     		def assetQuery = "select max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate from asset_entity ae left join "+
-							"asset_transition at on (at.asset_entity_id = ae.asset_entity_id ) where ae.project_id = ${projectInstance.id} "+
+							"asset_transition at on (at.asset_entity_id = ae.asset_entity_id and at.voided = 0 ) where ae.project_id = ${projectInstance.id} "+
 							"and ae.move_bundle_id = ${moveBundleInstance.id} and ae.cart = '$it.cart' and ae.truck = '$it.truck' group by ae.asset_entity_id"
     		def assetTransition = jdbcTemplate.queryForList(assetQuery)
     		assetTransition.each{
@@ -80,12 +80,12 @@ class CartTrackingController {
 				pendingAssets = 0
 			}
 			allCartTrackingDetails  << [ cartDetails:it, completed:completed, pendingAssets:pendingAssets ]
-    		if(cartAction == "allId" ){
-    			cartTrackingDetails = allCartTrackingDetails
-    		} else {
-    			cartTrackingDetails = pendingCartTrackingDetails
-    		}
     	}
+		if(cartAction == "allId" ){
+			cartTrackingDetails = allCartTrackingDetails
+		} else {
+			cartTrackingDetails = pendingCartTrackingDetails
+		}
     	userPreferenceService.loadPreferences("CART_TRACKING_REFRESH")
 		def timeToRefresh = getSession().getAttribute("CART_TRACKING_REFRESH")
 		// select distinct trucks 
@@ -119,10 +119,93 @@ class CartTrackingController {
 	 * @return : updated truck
 	 *---------------------------------------------------------*/
 	def changeTruck = {
-		println"pramas"+params
 		def updateQuery = "update asset_entity set truck = '$params.truck' where project_id = $params.projectId "+
-							"and move_bundle_id = $params.bundleId and cart = '$params.cart' "
+						"and move_bundle_id = $params.bundleId and cart = '$params.cart' "
 		jdbcTemplate.update(updateQuery)
 		render params.truck
+	}
+	/*---------------------------------------------------------
+	 * @author : Lokanath Reddy
+	 * @param  : cart, truck, bundle and projectId
+	 * @return : return all the assets which are on Cart
+	 *---------------------------------------------------------*/
+	def getAssetsOnCart = {
+		def projectId = params.projectId
+		def bundleId = params.moveBundle
+		def cart = params.cart
+		def truck = params.truck
+		def assetAction = params.assetAction
+		def pendingAssetsOnCart = []
+		def allAssetsOnCart = []
+		def assetsOnCart = []
+		def query = "select ae.asset_entity_id as id,ae.asset_tag as assetTag, ae.asset_name as assetName, "+
+					"ae.manufacturer as manufacturer,ae.model as model, ae.source_team_id as source, "+
+					" max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate "+
+					"from asset_entity ae left join asset_transition at on (at.asset_entity_id = ae.asset_entity_id "+
+					"and at.voided = 0) where ae.project_id = $projectId and ae.move_bundle_id = $bundleId "+
+					"and ae.cart = '$cart' and ae.truck = '$truck' group by ae.asset_entity_id"
+		def resultList = jdbcTemplate.queryForList( query )
+		def cleanedId = stateEngineService.getStateIdAsInt("STD_PROCESS","Cleaned")
+		def stagedId = stateEngineService.getStateIdAsInt("STD_PROCESS","Staged")
+		resultList.each{
+			def completed = true
+			def checked = false
+			def currentState = stateEngineService.getStateLabel("STD_PROCESS",it.maxstate)
+			def team = ""
+			if(it.source){
+				team = ProjectTeam.findById( it.source ).toString()
+			}
+			if(it.maxstate < cleanedId){
+				completed = false
+			}
+			if(it.maxstate >= cleanedId && it.maxstate < stagedId){
+				checked = true
+			}
+			if(!completed){
+				pendingAssetsOnCart << [ assetDetails:it, currentState:currentState, checked:checked,
+				                         completed:completed, team:team, assetAction:assetAction ]
+			}
+			allAssetsOnCart << [ assetDetails:it, currentState:currentState, checked:checked,
+			                     completed:completed, team:team, assetAction:assetAction ]
+		}
+		
+		if(assetAction == "allAssetsId" ){
+			assetsOnCart = allAssetsOnCart
+		} else {
+			assetsOnCart = pendingAssetsOnCart
+		}
+		render assetsOnCart as JSON
+	}
+	/*---------------------------------------------------------
+	 * @author : Lokanath Reddy
+	 * @param  : asset entity
+	 * @return : return asset Details
+	 *---------------------------------------------------------*/
+	def getAssetDetails ={
+		def assetDetails = []
+		def assetId = params.assetId
+		def assetEntity = AssetEntity.findById( assetId )
+		def transition = jdbcTemplate.queryForList(" select max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate "+
+													"from asset_transition at where at.asset_entity_id = $assetEntity.id and at.voided = 0 group by at.asset_entity_id")
+		def onTruckId = stateEngineService.getStateIdAsInt("STD_PROCESS","OnTruck")
+		assetDetails<<[assetEntity:assetEntity,team:assetEntity.sourceTeam.toString(), 
+		               state: transition[0] ? transition[0].maxstate : "", onTruck :onTruckId ]
+		render assetDetails as JSON
+	}
+	/*---------------------------------------------------------
+	 * @author : Lokanath Reddy
+	 * @param  : cart, truck, bundle and projectId
+	 * @return : update the asset details
+	 *---------------------------------------------------------*/
+	def reassignAssetOnCart = {
+		def assetEntity = AssetEntity.get( params.assetId )
+		assetEntity.properties = params
+		if ( ! assetEntity.validate() || ! assetEntity.save() ) {
+			def etext = "Unable to create asset $assetEntity" +
+            GormUtil.allErrorsString( assetEntity )
+			println etext
+			log.error( etext )
+		}
+		render assetEntity as JSON
 	}
 }
