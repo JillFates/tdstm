@@ -105,7 +105,7 @@ class WorkflowService {
     		def previousTransition = AssetTransition.findById(lastTransition)
     		def timeDiff = assetTransition.dateCreated.getTime() - previousTransition.dateCreated.getTime()
     		if(timeDiff != 0){
-    			assetTransition.timeElapsed = Integer.parseInt(timeDiff.toString())
+    			assetTransition.timeElapsed = timeDiff
         		if ( !assetTransition.validate() || !assetTransition.save() ) {
 					message = "Unable to create AssetTransition: " + GormUtil.allErrorsString( assetTransition )
     		    } 

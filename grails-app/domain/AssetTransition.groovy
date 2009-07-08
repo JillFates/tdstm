@@ -6,7 +6,7 @@ class AssetTransition {
 
 	String stateFrom
 	String stateTo
-	Integer timeElapsed = 0		// Time it took from the last transition until this transtion (seconds)
+	BigInteger timeElapsed = 0		// Time it took from the last transition until this transtion (seconds)
 	Integer wasOverridden = 0	// Indicates that the admin reset the state
 	Integer wasSkippedTo = 0	// Indicates that a state was skipped prior to this transtion stateTo
 	String comment
@@ -46,6 +46,7 @@ class AssetTransition {
 		 	stateTo sqlType: 'varchar(20)'
 			wasOverridden sqlType: 'tinyint(1)'
 			wasSkippedTo sqlType: 'tinyint(1)'
+			timeElapsed sqlType: 'bigint(20)'
 		}        
 	}
 }
