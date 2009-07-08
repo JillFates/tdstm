@@ -194,6 +194,14 @@
 			alert("Asset is not Ready");
 		}
 	}
+	/*-----------------------------------------
+	* function to change all assets state to OnTruck
+	*-----------------------------------------*/
+	function moveToOnTruck(cart, truck){
+		var projectId = $("#projectId").val();
+		var moveBundle = $("#moveBundleId").val();
+		${remoteFunction(action:'moveToOnTruck', params:'\'cart=\' + cart +\'&truck=\'+truck +\'&projectId=\'+projectId+\'&moveBundle=\'+moveBundle ', onComplete:'location.reload(true)')}
+	}
 </script>
 </head>
 <body>
@@ -257,7 +265,7 @@
 				<input type="checkbox" checked="checked" disabled="disabled">
 			</g:if>
 			<g:elseif test="${cartTrackingDetails?.pendingAssets == 0 }" >
-				<a href="#" >Move to Truck</a>
+				<a href="#" onclick="moveToOnTruck('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}')">Move to Truck</a>
 			</g:elseif>
 			</td>
 			</tr>

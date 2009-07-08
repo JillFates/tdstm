@@ -1,8 +1,10 @@
 import grails.converters.JSON
+import org.jsecurity.SecurityUtils
 class CartTrackingController {
 	def userPreferenceService
 	def jdbcTemplate
 	def stateEngineService
+	def workflowService
 	/*---------------------------------
 	 * default Index method
 	 *---------------------------------*/
@@ -44,6 +46,7 @@ class CartTrackingController {
 		// get id's for Cleaned and OnTrucks
 		def cleanedId = stateEngineService.getStateIdAsInt("STD_PROCESS","Cleaned")
 		def onTruckId = stateEngineService.getStateIdAsInt("STD_PROCESS","OnTruck")
+		def holdId = stateEngineService.getStateIdAsInt("STD_PROCESS","Hold")
 		// query for list of carts and trucks
     	def query = new StringBuffer("select ae.truck as truck , ae.cart as cart, count(ae.asset_entity_id) as totalAssets, "+
     								"sum(ae.usize) as usize from asset_entity ae left join project_asset_map pm on "+
@@ -54,27 +57,29 @@ class CartTrackingController {
     	resultList.each{
 			completed = true
 			pendingAssets = 0
-    		def assetQuery = "select max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate from asset_entity ae left join "+
+    		def assetQuery = "select ae.asset_entity_id as id, max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate from asset_entity ae left join "+
 							"asset_transition at on (at.asset_entity_id = ae.asset_entity_id and at.voided = 0 ) where ae.project_id = ${projectInstance.id} "+
 							"and ae.move_bundle_id = ${moveBundleInstance.id} and ae.cart = '$it.cart' and ae.truck = '$it.truck' group by ae.asset_entity_id"
     		def assetTransition = jdbcTemplate.queryForList(assetQuery)
     		assetTransition.each{
-				if(it.maxstate < onTruckId){
-					completed = false
-					if(it.maxstate >= cleanedId){
+								
+    			def currentState = 0
+    			def projectAssetMap = ProjectAssetMap.find( "from ProjectAssetMap where asset = $it.id" )
+    			if(projectAssetMap){
+    				currentState = projectAssetMap.currentStateId
+    			}
+				if(it.maxstate < onTruckId ){
+					if( currentState != holdId ){
+						completed = false
+					}
+					if(it.maxstate >= cleanedId || currentState == holdId){
 						pendingAssets +=1
 					}
 				}
 			}
 							
-			if(pendingAssets != 0){
-				if(it.totalAssets == pendingAssets){
-					pendingAssets = 0
-				}
-			} else {
-				pendingAssets = null
-			}
 			if(!completed){
+				pendingAssets = it.totalAssets - pendingAssets
 				pendingCartTrackingDetails << [ cartDetails:it, completed:completed, pendingAssets:pendingAssets ]
 			} else {
 				pendingAssets = 0
@@ -150,16 +155,22 @@ class CartTrackingController {
 		resultList.each{
 			def completed = true
 			def checked = false
-			def currentState = stateEngineService.getStateLabel("STD_PROCESS",it.maxstate)
+			def currentState
+			def projectAssetMap = ProjectAssetMap.find( "from ProjectAssetMap where asset = $it.id" )
+			if(projectAssetMap){
+				currentState = stateEngineService.getStateLabel("STD_PROCESS",projectAssetMap.currentStateId)
+			}
 			def team = ""
 			if(it.source){
 				team = ProjectTeam.findById( it.source ).toString()
 			}
-			if(it.maxstate < cleanedId){
-				completed = false
-			}
+			
 			if(it.maxstate >= cleanedId && it.maxstate < stagedId){
 				checked = true
+			} else if(it.maxstate < cleanedId ){
+				if(currentState != "Hold"){
+					completed = false
+				}
 			}
 			if(!completed){
 				pendingAssetsOnCart << [ assetDetails:it, currentState:currentState, checked:checked,
@@ -207,5 +218,32 @@ class CartTrackingController {
 			log.error( etext )
 		}
 		render assetEntity as JSON
+	}
+	/*---------------------------------------------------------
+	 * @author : Lokanath Reddy
+	 * @param  : cart, truck, bundle and projectId
+	 * @return : update the all the assets state to OnTruck
+	 *---------------------------------------------------------*/
+	def moveToOnTruck = {
+		def projectId = params.projectId
+		def bundleId = params.moveBundle
+		def cart = params.cart
+		def truck = params.truck
+		def assetEntityList = AssetEntity.findAll(" from AssetEntity a where a.project = $projectId and "+
+												"a.moveBundle = $bundleId and a.cart = '$cart' and a.truck = '$truck'")
+		assetEntityList.each{
+			def transactionStatus
+			def projectAssetMap = ProjectAssetMap.findByAsset( it )
+			if(projectAssetMap){
+				def currentStateId = projectAssetMap.currentStateId
+				def principal = SecurityUtils.subject.principal
+		    	def loginUser = UserLogin.findByUsername(principal)
+		    	def currentState = stateEngineService.getState("STD_PROCESS",currentStateId)
+		    	if(currentState != "Hold"){
+		    		transactionStatus = workflowService.createTransition("STD_PROCESS","SUPERVISOR", "OnTruck", it, it.moveBundle, loginUser, null, null )
+		    	}
+			}
+		}
+		render assetEntityList as JSON
 	}
 }
