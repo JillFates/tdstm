@@ -25,8 +25,6 @@ class CartTrackingController {
     	def allCartTrackingDetails = []
     	def pendingCartTrackingDetails = []
 		def cartTrackingDetails = []
-    	def completed 
-    	def pendingAssets
         def moveBundleInstanceList = MoveBundle.findAll("from MoveBundle b where b.project = $projectId order by b.name asc")
         if(bundleId){
         	userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
@@ -55,8 +53,9 @@ class CartTrackingController {
     	def resultList = jdbcTemplate.queryForList( query.toString() )
     	// iterate the carts details for completed and pending assets
     	resultList.each{
-			completed = true
-			pendingAssets = 0
+			def completed = true
+			def pendingAssets = 0
+			def completedAssets = 0
     		def assetQuery = "select ae.asset_entity_id as id, max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate from asset_entity ae left join "+
 							"asset_transition at on (at.asset_entity_id = ae.asset_entity_id and at.voided = 0 ) where ae.project_id = ${projectInstance.id} "+
 							"and ae.move_bundle_id = ${moveBundleInstance.id} and ae.cart = '$it.cart' and ae.truck = '$it.truck' group by ae.asset_entity_id"
@@ -69,20 +68,15 @@ class CartTrackingController {
     				currentState = projectAssetMap.currentStateId
     			}
 				if(it.maxstate < onTruckId ){
-					if( currentState != holdId ){
 						completed = false
-					}
-					if(it.maxstate >= cleanedId || currentState == holdId){
-						pendingAssets +=1
-					}
+				}
+				if(it.maxstate >= cleanedId && currentState != holdId){
+					completedAssets +=1
 				}
 			}
-							
+    		pendingAssets = it.totalAssets - completedAssets			
 			if(!completed){
-				pendingAssets = it.totalAssets - pendingAssets
 				pendingCartTrackingDetails << [ cartDetails:it, completed:completed, pendingAssets:pendingAssets ]
-			} else {
-				pendingAssets = 0
 			}
 			allCartTrackingDetails  << [ cartDetails:it, completed:completed, pendingAssets:pendingAssets ]
     	}
@@ -168,9 +162,7 @@ class CartTrackingController {
 			if(it.maxstate >= cleanedId && it.maxstate < stagedId){
 				checked = true
 			} else if(it.maxstate < cleanedId ){
-				if(currentState != "Hold"){
 					completed = false
-				}
 			}
 			if(!completed){
 				pendingAssetsOnCart << [ assetDetails:it, currentState:currentState, checked:checked,
