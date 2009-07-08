@@ -61,7 +61,6 @@ class CartTrackingController {
 							"and ae.move_bundle_id = ${moveBundleInstance.id} and ae.cart = '$it.cart' and ae.truck = '$it.truck' group by ae.asset_entity_id"
     		def assetTransition = jdbcTemplate.queryForList(assetQuery)
     		assetTransition.each{
-								
     			def currentState = 0
     			def projectAssetMap = ProjectAssetMap.find( "from ProjectAssetMap where asset = $it.id" )
     			if(projectAssetMap){
@@ -149,20 +148,20 @@ class CartTrackingController {
 		resultList.each{
 			def completed = true
 			def checked = false
-			def currentState
+			def currentState = ""
 			def projectAssetMap = ProjectAssetMap.find( "from ProjectAssetMap where asset = $it.id" )
 			if(projectAssetMap){
 				currentState = stateEngineService.getStateLabel("STD_PROCESS",projectAssetMap.currentStateId)
 			}
 			def team = ""
 			if(it.source){
-				team = ProjectTeam.findById( it.source ).toString()
+				team = ProjectTeam.findById( it.source ).teamCode
 			}
 			
 			if(it.maxstate >= cleanedId && it.maxstate < stagedId){
 				checked = true
 			} else if(it.maxstate < cleanedId ){
-					completed = false
+				completed = false
 			}
 			if(!completed){
 				pendingAssetsOnCart << [ assetDetails:it, currentState:currentState, checked:checked,
@@ -189,9 +188,10 @@ class CartTrackingController {
 		def assetId = params.assetId
 		def assetEntity = AssetEntity.findById( assetId )
 		def transition = jdbcTemplate.queryForList(" select max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate "+
-													"from asset_transition at where at.asset_entity_id = $assetEntity.id and at.voided = 0 group by at.asset_entity_id")
+													"from asset_transition at where at.asset_entity_id = $assetEntity.id "+
+													"and at.voided = 0 group by at.asset_entity_id")
 		def onTruckId = stateEngineService.getStateIdAsInt("STD_PROCESS","OnTruck")
-		assetDetails<<[assetEntity:assetEntity,team:assetEntity.sourceTeam.toString(), 
+		assetDetails<<[assetEntity:assetEntity,team:assetEntity.sourceTeam? assetEntity.sourceTeam.teamCode : "", 
 		               state: transition[0] ? transition[0].maxstate : "", onTruck :onTruckId ]
 		render assetDetails as JSON
 	}

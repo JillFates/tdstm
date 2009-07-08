@@ -373,3 +373,6 @@ text-decoration: line-through;
 	color: maroon;
 	text-align: center;
 }
+.selectedRow {  
+	background-color: #aaefb8;  
+}

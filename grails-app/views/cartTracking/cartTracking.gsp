@@ -80,7 +80,15 @@
 	/*-----------------------------------------
 	* function to get assets to Display on Asset Div
 	*-----------------------------------------*/
-	function getAssetsOnCart(cart, truck){
+	function getAssetsOnCart(cart, truck, rowId){
+		var cartTable = $("#cartTableHighlightId > tr");
+		cartTable.each(function(n, row){
+			if(n == rowId) {		
+		    	$(row).addClass('selectedRow'); 
+		    } else {
+		    	$(row).removeClass('selectedRow');
+		    }		          		
+     	});
 		$("#assetsOnCartId").val(cart);
 		$("#assetsOnTruckId").val(truck);
 		var projectId = $("#projectId").val();
@@ -105,6 +113,8 @@
 	* function to show assets div
 	*-----------------------------------------*/
 	function showAssetDiv( e ) {
+		$("#reassignAssetDiv").dialog('close');
+		$('#chnageTruckDiv').dialog('close');
 		var assetsOnCart = eval('(' + e.responseText + ')');
 		var assetslength = assetsOnCart.length;
 		var assetsTbody = $("#assetsOnCartTbodyId")
@@ -113,12 +123,17 @@
 		if(assetslength != 0){
 			for( i = 0; i < assetslength ; i++){
 				var check = ""
+				var cssClass = 'odd'
+				if(i % 2 == 0){
+					cssClass = 'even'
+				}
 				var assetOnCart = assetsOnCart[i]
-				tbody +="<tr onclick='getReassignDetails("+assetOnCart.assetDetails.id+")'><td>"+assetOnCart.assetDetails.assetTag+"</td><td>"+assetOnCart.assetDetails.assetName+"</td>"+
+				tbody +="<tr id='assetRow_"+assetOnCart.assetDetails.id+"' onclick='getReassignDetails("+assetOnCart.assetDetails.id+")' class='"+cssClass+"'>"+
+						"<td>"+assetOnCart.assetDetails.assetTag+"</td><td>"+assetOnCart.assetDetails.assetName+"</td>"+
 						"<td>"+assetOnCart.assetDetails.manufacturer +" "+ assetOnCart.assetDetails.model +"</td>"+
 						"<td>"+assetOnCart.currentState+"</td><td>"+assetOnCart.team+"</td>"
 						if(assetOnCart.checked){
-							check +="<td><input type='checkbox' disabled checked='checked'></td></tr>"
+							check +="<td><input type='checkbox' disabled='disabled' checked='checked'></td></tr>"
 						} else {
 							check += "<td>&nbsp;</td></tr>"
 						}
@@ -147,6 +162,11 @@
 	* function to get asset details for Reassign div
 	*-----------------------------------------*/
 	function getReassignDetails(asset){
+		var assetTable = $("#assetsOnCartTbodyId > tr");
+		assetTable.each(function(n, row){
+		    $(row).removeClass('selectedRow');       		
+     	});     
+	    $("#assetRow_"+asset).addClass('selectedRow');
 		$("#assetEntityId").val(asset);
 		${remoteFunction(action:'getAssetDetails', params:'\'assetId=\' + asset ', onComplete:'showReassignAssetDiv(e)')}
 	}
@@ -198,9 +218,15 @@
 	* function to change all assets state to OnTruck
 	*-----------------------------------------*/
 	function moveToOnTruck(cart, truck){
-		var projectId = $("#projectId").val();
-		var moveBundle = $("#moveBundleId").val();
-		${remoteFunction(action:'moveToOnTruck', params:'\'cart=\' + cart +\'&truck=\'+truck +\'&projectId=\'+projectId+\'&moveBundle=\'+moveBundle ', onComplete:'location.reload(true)')}
+		var confirmMove = confirm( "This action will update all assets on cart to On Truck.  Are you sure you want to continue?")
+		if( confirmMove ){
+			var projectId = $("#projectId").val();
+			var moveBundle = $("#moveBundleId").val();
+			${remoteFunction(action:'moveToOnTruck', params:'\'cart=\' + cart +\'&truck=\'+truck +\'&projectId=\'+projectId+\'&moveBundle=\'+moveBundle ', onComplete:'location.reload(true)')}
+			return true;
+		} else {
+			return false
+		}
 	}
 </script>
 </head>
@@ -251,21 +277,21 @@
 		<th>U's Used</th>
 		<th>Completed</th>
 	</thead>
-	<tbody>
+	<tbody id="cartTableHighlightId">
 		<g:if test="${cartTrackingDetails}">
-		<g:each in="${cartTrackingDetails}" var="cartTrackingDetails" >
-			<tr>
+		<g:each in="${cartTrackingDetails}" status="i" var="cartTrackingDetails" >
+			<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 			<td><a href="#" onclick="openChangeTruckDiv('${cartTrackingDetails?.cartDetails?.cart}')">${cartTrackingDetails?.cartDetails?.truck}</a></td>
-			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}')">${cartTrackingDetails?.cartDetails?.cart}</td>
-			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}')">${cartTrackingDetails?.cartDetails?.totalAssets}</td>
-			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}')">${cartTrackingDetails?.pendingAssets}</td>
-			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}')">${(Integer)cartTrackingDetails?.cartDetails?.usize}</td>
+			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}',${i})">${cartTrackingDetails?.cartDetails?.cart}</td>
+			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}',${i})">${cartTrackingDetails?.cartDetails?.totalAssets}</td>
+			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}',${i})">${cartTrackingDetails?.pendingAssets}</td>
+			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}',${i})">${(Integer)cartTrackingDetails?.cartDetails?.usize}</td>
 			<td>
 			<g:if test="${cartTrackingDetails?.completed}">
 				<input type="checkbox" checked="checked" disabled="disabled">
 			</g:if>
 			<g:elseif test="${cartTrackingDetails?.pendingAssets == 0 }" >
-				<a href="#" onclick="moveToOnTruck('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}')">Move to Truck</a>
+				<a href="#" onclick="return moveToOnTruck('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}')">Move to Truck</a>
 			</g:elseif>
 			</td>
 			</tr>
@@ -278,6 +304,7 @@
 </table>
 </g:form>
 </div>
+<br>
 <div id="chnageTruckDiv" title="Change Trucks" style="display: none;">
 	<table style="border: 0px;">
 		<tr>
@@ -312,7 +339,7 @@
 		<th>Name</th>
 		<th>Mfg/Model</th>
 		<th>Status</th>
-		<th>Team(S/T)</th>
+		<th>Team</th>
 		<th>On Cart</th>
 	</thead>
 	<tbody id="assetsOnCartTbodyId"> 
