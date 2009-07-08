@@ -13,7 +13,6 @@ class AssetTransition {
 	Date dateCreated = new Date()
 	Date lastUpdated
 	Integer voided = 0		// to place transition as voided when statusTo < new status
-	
 
 	static belongsTo = [ 
 		assetEntity : AssetEntity,
@@ -35,7 +34,6 @@ class AssetTransition {
 		wasSkippedTo( range:0..1 )
 		lastUpdated( nullable:true )
 		voided( range:0..1 )
-		
 	}	
 	
 	static mapping  = {
@@ -46,6 +44,7 @@ class AssetTransition {
 		 	stateTo sqlType: 'varchar(20)'
 			wasOverridden sqlType: 'tinyint(1)'
 			wasSkippedTo sqlType: 'tinyint(1)'
+			voided sqlType: 'tinyint(1)'
 			timeElapsed sqlType: 'bigint(20)'
 		}        
 	}
