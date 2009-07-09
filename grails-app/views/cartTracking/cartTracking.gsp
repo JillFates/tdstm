@@ -372,6 +372,16 @@
 <g:javascript>
 initialize();
 timedRefresh($("#selectTimedId").val())
+
+/*------------------------------------------------------------------
+* function to Unhighlight the Asset row when the edit DIV is closed
+*-------------------------------------------------------------------*/
+$("#reassignAssetDiv").bind('dialogclose', function(){   		
+	var assetTable = $("#assetsOnCartTbodyId > tr");
+	assetTable.each(function(n, row){
+		$(row).removeClass('selectedRow');       		
+    });   		
+});	
 </g:javascript>
 </body>
 
