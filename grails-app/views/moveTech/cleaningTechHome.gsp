@@ -3,10 +3,27 @@
 <head>
 <title>Home</title>
 <g:javascript library="jquery" />
+<g:javascript library="prototype" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}" />
+	<script type="text/javascript">
+	/*----------------------------------------------------------
+	* To load the installed printers into session by initializing TFORMer 
+	*---------------------------------------------------------*/
+	function initializeTF(){
+		window.TF.RefreshOSPrinters();
+		var def = "";
+		var dropdown = new Array();
+		for (i = 0; i < window.TF.GetOSPrintersCount(); i++){
+			dropdown.push(window.TF.GetOSPrinter(i))
+		}
+		${remoteFunction(action:'setPrintersIntoSession', params:'\'dropdown=\' + dropdown')}
+	}
+	
+	</script>
 </head>
 <body >
+<OBJECT id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C" CODEBASE="${createLinkTo(dir:'resource',file:'TFORMer60.cab')}"></OBJECT>
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 		<div class="mainbody" style="width: 100%;" >
 				<div class="colum_techlogin" style="float:left;">
@@ -55,5 +72,8 @@
   				</div>
   				</div>  
 		</div>
+		<script type="text/javascript">
+		initializeTF();
+		</script>
 </body>
 </html>

@@ -1082,4 +1082,12 @@ class MoveTechController {
 		def asset = AssetEntity.find( query.toString(), [ assetTag : assetTag ] )
 		return asset 
 	}
+    
+    /*----------------------------------------------------------
+	* To load the installed printers into session
+	* @author : Lokanath Reddy
+	*---------------------------------------------------------*/
+    def setPrintersIntoSession = {
+    	session.setAttribute( "PRINTERS", params.dropdown)
+    }
 }

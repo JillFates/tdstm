@@ -208,7 +208,7 @@ function InitData()
     form.PrinterName.value = ''																	// use default printer
 	// get list of installed printers
 	var dropdown = document.assetSearchForm.Printers;
-	window.TF.RefreshOSPrinters();
+	/* window.TF.RefreshOSPrinters();
 	var def = 0;
 	for (i = 0; i < window.TF.GetOSPrintersCount(); i++) 
 	{
@@ -217,6 +217,20 @@ function InitData()
 	    def = i;
 	}
 	dropdown.options[def].selected = true;
+	*/
+	/*-----------------------------------------------------------------------
+	   TFORMer initialization has been moved to Home page to get list of installed printers.
+	   Printers are added by getting form session, which are setted at HomePage
+	   Modified by Lokanath Reddy 
+	*-------------------------------------------------------------------------*/
+	var printersString = '${session.getAttribute( "PRINTERS" )}'
+	var dropdownOptions = printersString.split(",");
+	for(opt=0; opt< dropdownOptions.length; opt++){
+		var doption = document.createElement("option");
+		doption.value = dropdownOptions[opt];
+		doption.innerHTML = dropdownOptions[opt];
+		dropdown.appendChild( doption );
+	}
 	retrieve_field(document.assetSearchForm.Printers)
 	mySelect(dropdown);
 }
