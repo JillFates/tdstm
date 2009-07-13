@@ -335,13 +335,10 @@ class MoveTechController {
 		}
 		def principal = SecurityUtils.subject.principal
 		if( principal ) {
-            def bundle = params.bundle
+            def bundleId = params.bundle
             def tab = params.tab
             def proAssetMap
-            def bundleId = MoveBundle.find ("from MoveBundle mb where mb.id = ${bundle}")
             def team = params.team
-            def projectId = bundleId.project.id
-            def projectInstance = Project.findById(projectId)
             def stateVal
             def todoSize
             def allSize
@@ -354,7 +351,7 @@ class MoveTechController {
 				            "a.source_rack_position as sourceRackPosition, a.target_rack as targetRack, " +
 				            "a.target_rack_position as targetRackPosition, a.model as model, p.current_state_id as currentStateId " +
 				            "from asset_entity a left join project_asset_map p on (a.asset_entity_id = p.asset_id) " +
-				            "where a.move_bundle_id = $bundle"
+				            "where a.move_bundle_id = $bundleId"
             def query = new StringBuffer (countQuery)
             if ( params.location == "s" ) {
                 stateVal = stateEngineService.getStateId ( "STD_PROCESS", "Unracked" )
@@ -411,7 +408,7 @@ class MoveTechController {
                 todoSize = jdbcTemplate.queryForList ( countQuery ).size()
                 
             }
-            return[ bundle:bundle, team:team, project:params.project, location:params.location, 
+            return[ bundle:bundleId, team:team, project:params.project, location:params.location, 
                     assetList:assetList, allSize:allSize, todoSize:todoSize, 'tab':tab
                     ]
 		} else {
@@ -718,13 +715,10 @@ class MoveTechController {
 	def cleaningAssetTask = {
 		def principal = SecurityUtils.subject.principal
 		if( principal ) {
-            def bundle = params.bundle
+            def bundleId = params.bundle
             def tab = params.tab
             def proAssetMap
-            def bundleId = MoveBundle.find("from MoveBundle mb where mb.id = ${bundle}")
             def team = params.team
-            def projectId = bundleId.project.id
-            def projectInstance = Project.findById( projectId )
             def stateVal
             def todoSize
             def allSize
@@ -737,7 +731,7 @@ class MoveTechController {
 					"a.source_rack as sourceRack, a.source_rack_position as sourceRackPosition, " +
 					"a.target_rack as targetRack, a.target_rack_position as targetRackPosition, " +
 					"a.model as model, p.current_state_id as currentStateId from asset_entity a " +
-					"left join project_asset_map p on (a.asset_entity_id = p.asset_id) where a.move_bundle_id = $bundle ")
+					"left join project_asset_map p on (a.asset_entity_id = p.asset_id) where a.move_bundle_id = $bundleId ")
             stateVal = stateEngineService.getStateId ( "STD_PROCESS", "Cleaned" )
             allSize = jdbcTemplate.queryForList( query.toString() ).size()
             if ( tab == "Todo" ) {
@@ -776,7 +770,7 @@ class MoveTechController {
                 query.append (" and p.current_state_id < $stateVal")
                 todoSize = jdbcTemplate.queryForList ( query.toString() ).size()
             }
-            return[ bundle:bundle, team:team, project:params.project, location:params.location, 
+            return[ bundle:bundleId, team:team, project:params.project, location:params.location, 
                     assetList:assetList, allSize:allSize, todoSize:todoSize, 'tab':tab 
                     ]
 		} else {
@@ -847,7 +841,7 @@ class MoveTechController {
                     teamMembers = partyRelationshipService.getTeamMemberNames( assetItem.sourceTeam?.id )
                     def membersCount = ( ( teamMembers.toString() ).tokenize("/") ).size()
                     teamMembers = membersCount + "(" + teamMembers.toString() + ")"
-                    def bundleId = assetItem.moveBundle.moveBundleId
+                    def bundleId = assetItem.moveBundle.id
                     def teamId
                     def teamName
                     if ( assetItem.sourceTeam ) {
