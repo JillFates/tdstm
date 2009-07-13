@@ -17,7 +17,7 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
 <script>
 	$(document).ready(function() {
-		$("#chnageTruckDiv").dialog({ autoOpen: false })
+		$("#changeTruckDiv").dialog({ autoOpen: false })
 		$("#reassignAssetDiv").dialog({ autoOpen: false })
 	})
 </script>
@@ -74,7 +74,7 @@
 	function openChangeTruckDiv( cart ) {
 		$("#changeTruckCartTdId").html("Cart : "+cart);
 		$("#changeTruckCartId").val(cart);
-		$('#chnageTruckDiv').dialog('open');
+		$('#changeTruckDiv').dialog('open');
 		$("#reassignAssetDiv").dialog('close');
 	}
 	/*-----------------------------------------
@@ -114,7 +114,7 @@
 	*-----------------------------------------*/
 	function showAssetDiv( e ) {
 		$("#reassignAssetDiv").dialog('close');
-		$('#chnageTruckDiv').dialog('close');
+		$('#changeTruckDiv').dialog('close');
 		var assetsOnCart = eval('(' + e.responseText + ')');
 		var assetslength = assetsOnCart.length;
 		var assetsTbody = $("#assetsOnCartTbodyId")
@@ -190,7 +190,7 @@
 		$("#reassignAssetTbodyId").html(tbody);
 		$("#reassignAssetDiv").dialog('option', 'width', 550)
 		$("#reassignAssetDiv").dialog('open');
-		$('#chnageTruckDiv').dialog('close');
+		$('#changeTruckDiv').dialog('close');
 	}
 	/*-----------------------------------------
 	* function to submit the form when user click on update button
@@ -305,25 +305,27 @@
 </g:form>
 </div>
 <br>
-<div id="chnageTruckDiv" title="Change Trucks" style="display: none;">
-	<table style="border: 0px;">
-		<tr>
-			<input type="hidden" name="cart" id="changeTruckCartId">
-			<td id="changeTruckCartTdId">Cart : </td>
-		</tr>
-		<tr>
-			<td style="vertical-align: middle;">Truck : <select name="truck" id="changeTruckSelectId" >
-			<g:each in="${trucks}" var="truck">
-				<option value="${truck?.truck}">${truck?.truck}</option>
-			</g:each>
-			</select>
-			 </td>
-		</tr>
-		<tr><td>
-			<input type="button" value="Update" onclick="${remoteFunction(action:'changeTruck', params:'\'cart=\' + $(\'#changeTruckCartId\').val() +\'&truck=\'+$(\'#changeTruckSelectId\').val() +\'&projectId=\'+$(\'#projectId\').val() +\'&bundleId=\'+$(\'#moveBundleId\').val()', onComplete:'location.reload(true)')}">
-			<input type="button" value="Cancel" onclick="$('#chnageTruckDiv').dialog('close');"> 
-		</td></tr>
-	</table>
+<div id="changeTruckDiv" title="Change Trucks" style="display: none;">
+	<g:form action="changeTruckForm">
+		<table style="border: 0px;">
+			<tr>
+				<input type="hidden" name="cart" id="changeTruckCartId">
+				<td id="changeTruckCartTdId">Cart : </td>
+			</tr>
+			<tr>
+				<td style="vertical-align: middle;">Truck : <select name="truck" id="changeTruckSelectId" >
+				<g:each in="${trucks}" var="truck">
+					<option value="${truck?.truck}">${truck?.truck}</option>
+				</g:each>
+				</select>
+				 </td>
+			</tr>
+			<tr><td>
+				<input type="button" value="Update" onclick="${remoteFunction(action:'changeTruck', params:'\'cart=\' + $(\'#changeTruckCartId\').val() +\'&truck=\'+$(\'#changeTruckSelectId\').val() +\'&projectId=\'+$(\'#projectId\').val() +\'&bundleId=\'+$(\'#moveBundleId\').val()', onComplete:'location.reload(true)')}">
+				<input type="button" value="Cancel" onclick="$('#changeTruckDiv').dialog('close');"> 
+			</td></tr>
+		</table>
+	</g:form>
 </div>
 <div id="assetsOnCartDiv" style="display: none;">
 <div class="cart_style">

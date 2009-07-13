@@ -310,9 +310,9 @@
 	  	function commentChangeEdit(resolveDiv,formName) {
 		var type = 	document.forms[formName].commentType.value;
 		if(type == "issue"){
-			$(resolveDiv).css('display', 'block');
+			$("#"+resolveDiv).css('display', 'block');
 		}else{
-			$(resolveDiv).css('display', 'none');
+			$("#"+resolveDiv).css('display', 'none');
 		}
 	}
 function commentChangeShow() {

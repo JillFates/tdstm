@@ -52,11 +52,11 @@ class ClientConsoleController {
         }
     	if(moveBundleInstance != null){
 			def applicationList=AssetEntity.executeQuery("select distinct ae.application from AssetEntity "+
-															"ae where ae.application is not null and ae.project.id="+projectId)
+															"ae where ae.application is not null and ae.moveBundle=${moveBundleInstance.id}")
 			def appOwnerList=AssetEntity.executeQuery("select distinct ae.appOwner from AssetEntity ae where "+
-														"ae.appOwner is not null and ae.project.id="+projectId)
+														"ae.appOwner is not null and ae.moveBundle=${moveBundleInstance.id}")
 			def appSmeList=AssetEntity.executeQuery("select distinct ae.appSme from AssetEntity ae where ae.appSme is not null  "+
-														"and ae.project.id="+projectId)
+														"and ae.moveBundle=${moveBundleInstance.id}")
 			def query = new StringBuffer("select ae.asset_entity_id as id,ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,"+
 															"ae.asset_name as assetName,max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate "+
 															" FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id and at.voided = 0 ) "+

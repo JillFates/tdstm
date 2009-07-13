@@ -210,7 +210,7 @@ var time = '${timeToRefresh}';
 			editDiv.innerHTML += "";
 		} 
 			    
-		${remoteFunction(action:'getAutoCompleteDate', params:'\'autoCompParams=\' + autoComp ', onComplete:'updateAutoComplete(e)')} 
+		${remoteFunction(controller:'assetEntity', action:'getAutoCompleteDate', params:'\'autoCompParams=\' + autoComp ', onComplete:'updateAutoComplete(e)')} 
 		if(action == 'edit'){
 			$("#editDialog").dialog('option', 'width', 600)
 			$("#editDialog").dialog('option', 'position', ['center','top']);
@@ -292,7 +292,6 @@ var time = '${timeToRefresh}';
 				     
 				      for (var i=0; i < length; i ++ ) {
 					      var attribData = data[i]
-					    
 					      var code = "edit"+attribData.attributeCode+"Id"
 					      var codeValue = attribData.value;
 				  			$("#"+code).autocomplete(codeValue);

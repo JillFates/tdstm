@@ -45,9 +45,15 @@
 })
 </script>
 <script type="text/javascript">	
-function timedRefresh(timeoutPeriod) {
-
-}
+		var timer
+	   	function timedRefresh(timeoutPeriod) {
+	   		if(timeoutPeriod != 'never'){
+				clearTimeout(timer);
+				timer = setTimeout("location.reload(true);",timeoutPeriod);
+			} else {
+				clearTimeout(timer)
+			}
+		}
 		    function showAssetDialog( e , action ) {
 		    	$('#createCommentDialog').dialog('close');
 		    	$('#commentsListDialog').dialog('close');
@@ -494,7 +500,7 @@ function timedRefresh(timeoutPeriod) {
 	    function setAssetId(assetId){
 			$("#createAssetCommentId").val(assetId)
 		}
-      		
+      	
 	    </script>
 <filterpane:includes />
 </head>
@@ -546,11 +552,16 @@ function timedRefresh(timeoutPeriod) {
 				<td><g:remoteLink controller="assetEntity" action="editShow" id="${assetEntityInstance.id}" before="document.showForm.id.value = ${assetEntityInstance.id};document.editForm.id.value = ${assetEntityInstance.id};" onComplete="showAssetDialog( e , 'edit');">
 					<img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px">
 				</g:remoteLink>
-				<g:if test="${AssetComment.findByAssetEntity(assetEntityInstance)}">
+				<g:if test="${AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetEntityInstance,'issue',0])}">
+					<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
+						<img src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}" border="0px">
+					</g:remoteLink>
+				</g:if>
+				<g:elseif test="${AssetComment.findByAssetEntity(assetEntityInstance)}">
 				<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
 					<img src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}" border="0px">
 				</g:remoteLink>
-				</g:if>
+				</g:elseif>
 				<g:else>
 				<a href="#" onclick="$('#createAssetCommentId').val(${assetEntityInstance.id});$('#statusId').val('new');$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('open');$('#commentsListDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">
 					<img src="${createLinkTo(dir:'images/skin',file:'database_table_light.png')}" border="0px">
@@ -921,6 +932,10 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 		value="Delete"
 		onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + $(\'#updateCommentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'never\')')}" />
 	</span></div>
-</g:form></div>
+</g:form>
+</div>
+<script type="text/javascript">
+timedRefresh('never');
+</script>
 </body>
 </html>

@@ -399,7 +399,13 @@ $.Autocompleter.defaults = {
 	mustMatch: false,
 	extraParams: {},
 	selectFirst: true,
-	formatItem: function(row) { return row[0]; },
+	formatItem: function(row) { 
+		if(row != "" && row != null){
+			return row[0];
+		} else {
+			return ""
+		}
+	 },
 	formatMatch: null,
 	autoFill: false,
 	width: 0,
