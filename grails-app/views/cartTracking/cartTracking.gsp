@@ -306,7 +306,7 @@
 </div>
 <br>
 <div id="changeTruckDiv" title="Change Trucks" style="display: none;">
-	<g:form action="changeTruckForm">
+	<g:form name="changeTruckForm">
 		<table style="border: 0px;">
 			<tr>
 				<input type="hidden" name="cart" id="changeTruckCartId">
