@@ -1046,18 +1046,11 @@ class AssetEntityController {
 	        def assetDetail = AssetEntity.findById(assetId)
 	        def teamName = assetDetail.sourceTeam
 	        def assetTransition = AssetTransition.findAllByAssetEntity( assetDetail, [ sort:"dateCreated", order:"desc"] )
+	        def sinceTimeElapsed = convertIntegerIntoTime( new Date().getTime() - assetTransition[0].dateCreated.getTime() )
 	        assetTransition.each{
 	        	def taskLabel = stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(it.stateTo))
 	        	def time = it.dateCreated.toString().substring(11,19)
-	    	    def timeElapsed 
-	    	    if(it.timeElapsed != 0){
-		    	    def hours = (Integer)(it.timeElapsed / (1000*60*60))
-		    	    def minutes = (Integer)((it.timeElapsed % (1000*60*60)) / (1000*60))
-		    	    def seconds = (Integer)(((it.timeElapsed % (1000*60*60)) % (1000*60)) / 1000)
-		    	    timeElapsed = hours+":"+minutes+":"+seconds
-	    	    } else {
-	    	    	timeElapsed = "0:0:0"
-	    	    }
+	    	    def timeElapsed = convertIntegerIntoTime( it.timeElapsed )
 	        	if(it.voided == 1){
 	        		cssClass = "void_transition"
 	        	}
@@ -1103,7 +1096,7 @@ class AssetEntityController {
 	        def targetTeams = ProjectTeam.findAll(targetQuery.toString())
 	        assetStatusDetails<<[ 'assetDetails':map, 'statesList':statesList, 
 	                              'recentChanges':recentChanges, 'sourceTeams':sourceTeams,
-	                              'targetTeams':targetTeams ]
+	                              'targetTeams':targetTeams, 'sinceTimeElapsed':sinceTimeElapsed ]
         }
         render assetStatusDetails as JSON
         		
@@ -1369,6 +1362,25 @@ class AssetEntityController {
     	}
 		progressData<<[imported:importedData,total:total]
     	render progressData as JSON
+    }
+    /* --------------------------------------
+     * 	@author : Lokanada Reddy
+     * 	@param : time as ms 
+     *	@return time as HH:MM:SS formate
+     * -------------------------------------- */
+    def convertIntegerIntoTime(def time) {
+    	def timeFormate 
+ 	    if(time != 0){
+	    	    def hours = (Integer)(time / (1000*60*60))
+	    	    timeFormate = hours > 10 ? hours : '0'+hours
+	    	    def minutes = (Integer)((time % (1000*60*60)) / (1000*60))
+	    	    timeFormate += ":"+(minutes > 10 ? minutes : '0'+minutes)
+	    	    def seconds = (Integer)(((time % (1000*60*60)) % (1000*60)) / 1000)
+	    	    timeFormate += ":"+(seconds > 10 ? seconds : '0'+seconds)
+ 	    } else {
+ 	    	timeFormate = "00:00:00"
+ 	    }
+    	return timeFormate
     }
     
 }

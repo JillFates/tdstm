@@ -390,7 +390,8 @@ td .odd {
 		'<tr><td><b>Status: </b>'+asset[0].assetDetails.currentState+'</td></tr>'+
 		'<tr><td><b>Recent Changes: </b></td><td><a href="#" id="moreLinkId" onclick="displayMore();return false;"><b>More</b></a>'+
 		'<a href="#" id="lessLinkId" style="display:none" onclick="displayLess(); return false;"><b>Less</b></a></td></tr>' +
-		'<tr><td>' +
+		'<tr><td colspan="2">&nbsp;'+asset[0].sinceTimeElapsed+' Since last action </td></tr>'+
+		'<tr><td colspan="2">' +
 		'<div id=\'recentChangesLess\'><table style=\'border: 0px\' cellpadding=\'0\' cellspacing=\'0\'><tbody>'
 		for(i=0;i<asset[0].recentChanges.length && i<3; i++){
 			tableBody += '<tr><td class='+asset[0].recentChanges[i].cssClass+'>'+asset[0].recentChanges[i].transition+'</td></tr>'

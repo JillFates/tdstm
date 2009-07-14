@@ -1084,4 +1084,26 @@ class MoveTechController {
     def setPrintersIntoSession = {
     	session.setAttribute( "PRINTERS", params.dropdown)
     }
+    /*----------------------------------------------------------------------------------
+     * @author Lokanath Reddy
+     * @param  String assetTag, project,bundle
+     * @return Create a Comment for AssetEntity
+     *----------------------------------------------------------------------------------*/
+	def addComment = {
+		def principal = SecurityUtils.subject.principal
+		if( principal ){
+			def loginUser = UserLogin.findByUsername ( principal )
+			def asset = getAssetEntity ( params.search, params.user )
+			def assetComment = new AssetComment()
+				assetComment.comment = params.enterNote
+                assetComment.assetEntity = asset
+                assetComment.commentType = 'comment'
+                assetComment.createdBy = loginUser.person
+                assetComment.save()
+			redirect(action:assetSearch,params:params)
+		} else {
+        	flash.message = "Your login has expired and must login again."
+        	redirect( action:'login' )
+		}
+	}
 }

@@ -114,57 +114,50 @@ var sHint = "C:\\temp\\output";
 //=============================================================================
 // PRINT HERE
 //=============================================================================
-function startprintjob()
-{
-var job = window.TF.CreateJob();
-var form = window.document.assetSearchForm;
-var jobdata = job.NewJobDataRecordSet();
-    job.RepositoryName = $('#urlPath').val();       			 
-    job.ProjectName = form.PrjName.value;     
-    job.FormName = form.FormName.value;                   
-    job.PrinterName = form.PrinterName.value;
-    var labelsCount = document.assetSearchForm.labels.value;  
-
-    // THIS IS THE PLACE TO ADD YOUR DATA
-
-    jobdata.ClearRecords();               					
-    for(var label = 0; label < labelsCount; label++) {
-    	jobdata.AddNewRecord();                					
-    	jobdata.SetDataField('serverName', document.assetSearchForm.serverName.value); 
-    	jobdata.SetDataField('model',   document.assetSearchForm.model.value);       
-    	jobdata.SetDataField('assetTag',document.assetSearchForm.assetTag.value); 
-    	jobdata.SetDataField('cart',document.assetSearchForm.cart.value);    	   		
-    	jobdata.SetDataField('shelf',document.assetSearchForm.shelf.value);
-    	jobdata.SetDataField('room',document.assetSearchForm.room.value);
-    	jobdata.SetDataField('rack',document.assetSearchForm.rack.value);
-    	jobdata.SetDataField('upos',document.assetSearchForm.upos.value);
-    }
-
-    
-
-		
-
-    // now we print one copy of the label with default settings
-    try 
-    {
-    	job.PrintForm();
-	    $('#printCheck').val('printed');
-	    var cleanButton = $('#cleanButton');
-	    if(cleanButton != null && !cleanButton.disabled) {
-	    	cleanButton.focus();
+function startprintjob(){
+	try{	
+		var job = window.TF.CreateJob();
+		var form = window.document.assetSearchForm;
+		var jobdata = job.NewJobDataRecordSet();
+		    job.RepositoryName = $('#urlPath').val();       			 
+		    job.ProjectName = form.PrjName.value;     
+		    job.FormName = form.FormName.value;                   
+		    job.PrinterName = form.PrinterName.value;
+		    var labelsCount = document.assetSearchForm.labels.value;  
+	
+	    // THIS IS THE PLACE TO ADD YOUR DATA
+	
+	    jobdata.ClearRecords();               					
+	    for(var label = 0; label < labelsCount; label++) {
+	    	jobdata.AddNewRecord();                					
+	    	jobdata.SetDataField('serverName', document.assetSearchForm.serverName.value); 
+	    	jobdata.SetDataField('model',   document.assetSearchForm.model.value);       
+	    	jobdata.SetDataField('assetTag',document.assetSearchForm.assetTag.value); 
+	    	jobdata.SetDataField('cart',document.assetSearchForm.cart.value);    	   		
+	    	jobdata.SetDataField('shelf',document.assetSearchForm.shelf.value);
+	    	jobdata.SetDataField('room',document.assetSearchForm.room.value);
+	    	jobdata.SetDataField('rack',document.assetSearchForm.rack.value);
+	    	jobdata.SetDataField('upos',document.assetSearchForm.upos.value);
 	    }
-	    save_field(document.assetSearchForm.Printers)
-	    
-    }
-    catch (e)
-    {
-	    alert ("TFORMer returned an error!" + 
-	           "\nError description: " + e.description + 
-	           "\nError name: " + e.name + 
-	           "\nError number: " + e.number + 
-	           "\nError message: " + e.message);
-    }
-
+	    // now we print one copy of the label with default settings
+	    try {
+	    	job.PrintForm();
+		    $('#printCheck').val('printed');
+		    var cleanButton = $('#cleanButton');
+		    if(cleanButton != null && !cleanButton.disabled) {
+		    	cleanButton.focus();
+		    }
+		    save_field(document.assetSearchForm.Printers)
+	    } catch (e) {
+		    alert ("TFORMer returned an error!" + 
+		           "\nError description: " + e.description + 
+		           "\nError name: " + e.name + 
+		           "\nError number: " + e.number + 
+		           "\nError message: " + e.message);
+	    }
+	} catch(ex){
+		alert("It appears that your security settings are preventing printing. Please add this site to your Trusted Sites in setup.")
+	}
 }
 
 //=============================================================================

@@ -10,32 +10,37 @@
 	
     <script type="text/javascript">
         
-        function validation(){      
-        var enterNote = $('#enterNote').val(); 
-        if(enterNote == ""){     
-        alert('Please enter note');
-        $('#enterNote').focus();   
-        return false;
-        }else{
-        if(confirm('Are you sure?')){
-        return true;
-        }
-        }   
+        function validation(){   
+	        var enterNote = $('#enterNote').val(); 
+	        if(enterNote == ""){     
+	        	alert('Please enter note');
+	        	$('#enterNote').focus();   
+	        	return false;
+	        }else{
+	        	if(confirm('Are you sure?')){
+	        	return true;
+	        	}
+	        }   
        }  
-       function doTransition(){     
-       if(validation()){
-       $('form#assetSearchForm').submit();
-       }else {
-       return false;
-       }
+       function doTransition( actionType ){
+	       if(validation()){
+	       		if(actionType != 'hold'){
+	       			$('form#assetSearchForm').attr({action: "addComment"});
+	       			$('form#assetSearchForm').submit();
+	       		}else {
+	       			$('form#assetSearchForm').submit();
+	       		}
+	       }else {
+	       		return false;
+	       }
        }
        function unRack(){ 
-       if(doCheckValidation()){  
-       $('form#assetSearchForm').attr({action: "unRack"});     
-       $('form#assetSearchForm').submit();       
-       }else{
-       return false;
-       }
+	       if(doCheckValidation()){  
+		       $('form#assetSearchForm').attr({action: "unRack"});     
+		       $('form#assetSearchForm').submit();       
+	       }else{
+	       		return false;
+	       }
        }
       
        function doCheckValidation(){
@@ -49,15 +54,15 @@
            }
      	}      
        if(j == 0){     
-       return true;
+       		return true;
        }else{
-       alert("Please select all instructions");                                   
-       return false;
+       		alert("Please select all instructions");                                   
+      	 	return false;
        }     
       }      
       function commentSelect(cmtVal) {
-      $('#enterNote').val(cmtVal);
-      $('#selectCmt').val('Select a common reason:');
+	      $('#enterNote').val(cmtVal);
+	      $('#selectCmt').val('Select a common reason:');
       }
       
     </script>    
@@ -145,10 +150,13 @@
 			</td>
 			</tr>		
 			<tr><td>
-			<textarea rows="2" cols="10" style="width: 200px;padding:0px;" title="Enter Note..." id="enterNote" name="enterNote" ></textarea>
+			<textarea rows="3" cols="10" style="width: 200px;padding:0px;" title="Enter Note..." id="enterNote" name="enterNote" ></textarea>
 			</td></tr>		
 			<tr>
-			<td style="text-align: right;"><input type="button" value="Place on HOLD" onclick="return doTransition();" class="action_button"/></td>
+			<td class="button_style"><input type="button" value="Add Comment" onclick="return doTransition('comment');" class="action_button"/></td>
+			<tr>
+			<tr>
+			<td class="button_style"><input type="button" value="Place on HOLD" onclick="return doTransition('hold');" class="action_button"/></td>
 			<tr>	
 			</table>
 			</table>

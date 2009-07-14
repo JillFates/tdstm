@@ -94,3 +94,8 @@ th {
 	width: 30px;
 	height: 30px;
 }
+.button_style {
+	padding-bottom: 0px;
+	padding-top:0px;
+	text-align: right;
+}
