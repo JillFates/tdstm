@@ -676,29 +676,34 @@ class MoveTechController {
      * To unrack the state of an asset 
      * @author Bhuvana
      * @param  String assetComment, String team, String location, String actionLabel, String search, String user
-     * @return boolean for indication of transitions   
+     * @return redirect to Asset details page if transition flag is busy otherwise redirect to asset task page   
      *--------------------------------------------------------------------------------------------------------*/
 	def unRack = {
         def principal = SecurityUtils.subject.principal
         if( principal ) {
-        	def asset = getAssetEntity ( params.search, params.user )//AssetEntity.findByAssetTag(params.search)
+        	def asset = getAssetEntity ( params.search, params.user )
             def bundle = asset.moveBundle
             def loginTeam = ProjectTeam.findById(params.team)
             def actionLabel = params.actionLabel
+            def projectAssetMap = ProjectAssetMap.findByAsset( asset ) 
+            def currentState = stateEngineService.getState( "STD_PROCESS", projectAssetMap.currentStateId )
+            def flags = stateEngineService.getFlags( "STD_PROCESS", "MOVE_TECH", currentState, actionLabel )
             def loginUser = UserLogin.findByUsername( principal )
             def assetComment = params.assetComment
             def workflow = workflowService.createTransition( "STD_PROCESS", "MOVE_TECH", actionLabel, asset, bundle, loginUser, loginTeam, assetComment )
             if ( workflow.success ) {
-                redirect ( action: 'assetTask', 
-                    params:[ "bundle":params.bundle, "team":params.team, "project":params.project,
-                		     "location":params.location, "tab":"Todo" 
-                		     ])
+            	if(flags.contains("busy")){
+            		flash.message = message ( code : workflow.message )
+                    redirect ( action:'assetSearch', params:params)
+            	} else {
+            		redirect ( action: 'assetTask', 
+            			params:[ "bundle":params.bundle, "team":params.team, "project":params.project,
+            			         "location":params.location, "tab":"Todo" 
+            			         ])
+            	}
             } else {
                 flash.message = message ( code : workflow.message )
-                redirect ( action:'assetSearch', 
-                    params:[ "bundle":params.bundle, "team":params.team, "project":params.project, "location":params.location,
-                             "search":params.search, "assetComment":params.assetComment, "label":params.label, "actionLabel":actionLabel
-                             ])
+                redirect ( action:'assetSearch',params:params)
             }
         } else {
         	flash.message = "Your login has expired and must login again."
