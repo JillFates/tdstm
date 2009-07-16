@@ -980,7 +980,11 @@ td .odd {
 					</tbody>
 				</table>
 				</div>
-				<div><g:form name="assetdetailsForm">
+				<div>
+				<input type="hidden" name="asset" id="assetId" value="">
+				<input type="hidden" name="currentState" id="currentStateId" value="">
+				<input type="hidden" value="" id="validateCommentId" name="validateComment">
+				<g:form name="assetdetailsForm">
 					<table style="border: 0">
 						<tbody>
 							<tr>
@@ -992,7 +996,7 @@ td .odd {
 								</select></td>
 							</tr>
 							<tr>
-								<td><input type="hidden" name="asset" id="assetId" value="">
+								<td>
 								&nbsp;</td>
 								<td><g:select id="priorityId" name="priority"
 									from="${AssetEntity.constraints.priority.inList}"
@@ -1000,8 +1004,7 @@ td .odd {
 								</td>
 							</tr>
 							<tr>
-								<td><input type="hidden" name="currentState"
-									id="currentStateId" value="">&nbsp;</td>
+								<td>&nbsp;</td>
 								<td><select id="assignToId" name="assignTo"
 									style="width: 100px">
 									<option value="">Move Team</option>
@@ -1011,13 +1014,12 @@ td .odd {
 							</tr>
 							<tr>
 								<td colspan="2" style="text-align: center;">
-									<input type="hidden" value="" id="validateCommentId" name="validateComment">
 									<textarea name="comment" id="commentId" cols="25" rows="2"></textarea></td>
 							</tr>
 							<tr>
 								<td colspan="2" style="text-align: center;" class="buttonR">
 								<input type="reset" value="Cancel"
-									onclick="location.reload(true);timedRefresh($('#selectTimedId').val())">
+									onclick="timedRefresh($('#selectTimedId').val())">
 								<input type="button" value="Submit"
 									onclick="setCommentValidation();${remoteFunction(action:'createTransition', params:'\'asset=\' + $(\'#assetId\').val() +\'&state=\'+ $(\'#stateSelectId\').val() +\'&priority=\'+ $(\'#priorityId\').val() +\'&assignTo=\'+$(\'#assignToId\').val() +\'&comment=\'+$(\'#commentId\').val() ', onComplete:'updateAsset(e)')}" /></td>
 							</tr>
