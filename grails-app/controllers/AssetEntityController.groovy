@@ -1043,7 +1043,6 @@ class AssetEntityController {
         def statesList = []
         def recentChanges = []
         def stateIdList = []
-        def cssClass
         if(assetId){
 	        def assetDetail = AssetEntity.findById(assetId)
 	        def teamName = assetDetail.sourceTeam
@@ -1053,6 +1052,7 @@ class AssetEntityController {
 	        	sinceTimeElapsed = convertIntegerIntoTime( new Date().getTime() - assetTransition[0]?.dateCreated?.getTime() )
 	        }
 	        assetTransition.each{
+	        	def cssClass
 	        	def taskLabel = stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(it.stateTo))
 	        	def time = it.dateCreated.toString().substring(11,19)
 	    	    def timeElapsed = convertIntegerIntoTime( it.timeElapsed )
