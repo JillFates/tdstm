@@ -867,6 +867,7 @@ class AssetEntityController {
      * 	@return:	AssetEntity details and Transition details for all MoveBundle Teams
      *--------------------------------------------------------------------------------------*/
     def dashboardView = {
+    	def showAll = params.showAll
         def projectId = params.projectId
         def bundleId = params.moveBundle
         def sortField = params.sort
@@ -920,9 +921,11 @@ class AssetEntityController {
         	holdTotalAsset.each{
         	totalAsset<<it
         	}
-	        otherTotalAsset.each{
-	        	totalAsset<<it
-	        }
+        	if( showAll ){
+		        otherTotalAsset.each{
+		        	totalAsset<<it
+		        }
+        	}
 	        def projectTeamList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = ${moveBundleInstance.id} and "+
 	        											"pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport'  order by pt.name asc")
 	        // Get Id for respective States
@@ -1025,7 +1028,7 @@ class AssetEntityController {
 	                assetsList:assetsList, moveBundleInstance:moveBundleInstance, 
 	                supportTeam:supportTeam, totalUnracked:totalUnracked, totalSourceAvail:totalSourceAvail, 
 	                totalTargetAvail:totalTargetAvail, totalReracked:totalReracked, totalAsset:totalAsset.size(), 
-	                timeToRefresh : timeToRefresh ? timeToRefresh.SUPER_CONSOLE_REFRESH : "never"]
+	                timeToRefresh : timeToRefresh ? timeToRefresh.SUPER_CONSOLE_REFRESH : "never", showAll : showAll ]
         } else {
 	        flash.message = "Please create bundle to view Console"	
 	        redirect(controller:'project',action:'show',params:["id":params.projectId])
@@ -1349,7 +1352,7 @@ class AssetEntityController {
 	        	flash.message = message(code :workflow.message)		            
 	        }
         }
-        redirect(action:'dashboardView',params:["projectId":params.projectId,"moveBundle":params.moveBundle])
+        redirect(action:'dashboardView',params:params)
     }
     
     /* --------------------------------------

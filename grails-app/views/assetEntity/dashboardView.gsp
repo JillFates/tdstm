@@ -343,7 +343,10 @@ td .odd {
 			      	$('#taskList').children().eq(1).attr('selected',true);
 			    }
 			    $('#assetVal').val(task[0].asset);
-			 
+			    var showAll = $("#showAllCheckbox").is(':checked');
+				if(showAll){
+					$('#showAllInChangeStatus').val('show');
+				}
 				$("#showChangeStatusDialog").dialog('option', 'width', 400)
 				$("#showChangeStatusDialog").dialog('option', 'position', ['center','top']);
 				$('#showChangeStatusDialog').dialog('open');
@@ -478,6 +481,10 @@ td .odd {
 	   if(time != '' ){
 	   		$("#selectTimedId").val( time );
 	   } 
+	   var showAll = '${showAll}'
+	   if(showAll == 'show'){
+	   		$("#showAllCheckbox").attr('checked',true)
+	   }
    	}
    	function setComment(e){
 	   	var commentStatus = eval("(" + e.responseText + ")")
@@ -609,6 +616,13 @@ td .odd {
 	function setAssetId(assetId){
 		$("#createAssetCommentId").val(assetId)
 	}
+	function showAll(){
+		var showAll = $("#showAllCheckbox").is(':checked');
+		if(showAll){
+			$("#showAllId").val('show');
+		}
+		$("form#dashboardForm").submit();
+	}
     </script>
 </head>
 
@@ -620,6 +634,7 @@ td .odd {
 	name="assetVal" id="assetVal" /> <input type="hidden" name="projectId"
 	id="projectId" value="${projectId}" /> <input type="hidden"
 	name="moveBundle" id="moveBundle" value="${moveBundleInstance.id}" />
+	<input type="hidden" name="showAll" id="showAllInChangeStatus">
 <table style="border: 0px; width: 100%">
 	<tr>
 		<td width="40%"><strong>Change status for selected
@@ -650,7 +665,7 @@ td .odd {
 <g:form method="get" name="dashboardForm"
 	controller="assetEntity" action="dashboardView">
 	<input type="hidden" name="projectId" value="${projectId}">
-
+	<input type="hidden" name="showAll" id="showAllId">
 	<div class="dialog">
 	<table style="border: 0px;">
 		<tr class="prop">
@@ -846,16 +861,17 @@ td .odd {
 				<div class="list"><g:form name="assetListForm">
 					<table>
 						<thead>
-							<jsec:hasRole name="ADMIN">
-							<tr
-								onmouseover="$('#tdId').css('background','white');">
+							<tr	id="rowId" onmouseover="$('#rowId').css('background','white');">
+								<jsec:hasRole name="ADMIN">
 								<td id="tdId"><input id="state" type="button"
 									value="State..." onclick="changeState()" title="Change State" />
 								</td>
+								</jsec:hasRole>
+								<td style="vertical-align: middle;" colspan="2">
+									<input type="checkbox" onclick="showAll()" id="showAllCheckbox"/>&nbsp;Show All
+								</td>
 							</tr>
 							<tr>
-							</jsec:hasRole>
-								
 								<jsec:hasAnyRole in="['ADMIN','SUPERVISOR']"><th>Actions <jsec:hasRole name="ADMIN"><a href="#" onclick="selectAll()"><u
 									style="color: blue;">All</u></a></jsec:hasRole></th></jsec:hasAnyRole>
 								<g:sortableColumn property="priority" title="Priority" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>

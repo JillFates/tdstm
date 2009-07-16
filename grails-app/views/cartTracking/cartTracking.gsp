@@ -285,7 +285,7 @@
 			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}',${i})">${cartTrackingDetails?.cartDetails?.cart}</td>
 			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}',${i})">${cartTrackingDetails?.cartDetails?.totalAssets}</td>
 			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}',${i})">${cartTrackingDetails?.pendingAssets}</td>
-			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}',${i})">${(Integer)cartTrackingDetails?.cartDetails?.usize}</td>
+			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}',${i})">${cartTrackingDetails?.cartDetails?.usize ? (Integer)cartTrackingDetails?.cartDetails?.usize : ''}</td>
 			<td>
 			<g:if test="${cartTrackingDetails?.completed}">
 				<input type="checkbox" checked="checked" disabled="disabled">
