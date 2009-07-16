@@ -9,7 +9,7 @@
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 	
     <script type="text/javascript">
-        
+   
         function validation(){   
 	        var enterNote = $('#enterNote').val(); 
 	        if(enterNote == ""){     
@@ -65,7 +65,7 @@
 	      $('#selectCmt').val('Select a common reason:');
       }
       
-    </script>    
+    </script>
 </head>
 <body>
 
@@ -95,10 +95,54 @@
 			<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
 			</g:if> 
 			</div>
-	<div>
+		<div>
+			<g:if test="${projMap}">			
+			<dt>Asset Tag:</dt><dd><a name="#AssetTag" href="#Top">&nbsp;${projMap?.asset?.assetTag}</a></dd>
+			</g:if>
+ 		</div>
+ 			<g:if test="${assetComment}">
+			<tr>
+			<td width="219px"><strong>Instructions</strong></td>
+			<td><strong>Confirm</strong></td>
+			</tr>
+			<g:each status="i" in="${assetComment}" var="comments">
+			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+			<td>${comments.comment}</td>
+			<g:if test="${comments.mustVerify == 1}">
+			<td><g:checkBox name="myCheckbox" value="${false}" class="confirm_checkbox" /></td>
+			</g:if>
+			<g:else>
+			<td></td>
+			</g:else>
+			</tr>
+			</g:each>
+			</g:if>
+			<g:if test ="${actionLabel}">	
+			<tr>
+			<td colspan="2" style="text-align:right;"><input type="button" value="${label}" onclick="return unRack();" class="action_button"/></td>
+			</tr>
+			</g:if>
+			<table>	
+			<tr>
+			<td >
+			<g:select style="width: 170px;padding:0px;" from="['Select a common reason:','Device not powered down','Device is not in expected rack','Device will not power up']" id="selectCmt" name="selectCmt" value="Select a common reason:" onchange="commentSelect(this.value);"></g:select>
+			</td>
+			</tr>		
+			<tr><td>
+			<textarea rows="3" cols="10" style="width: 200px;padding:0px;" title="Enter Note..." id="enterNote" name="enterNote" ></textarea>
+			</td></tr>		
+			<tr>
+			<td class="button_style"><input type="button" value="Add Comment" onclick="return doTransition('comment');" class="action_button"/></td>
+			<tr>
+			<tr>
+			<td class="button_style"><input type="button" value="Place on HOLD" onclick="return doTransition('hold');" class="action_button"/></td>
+			<tr>	
+			</table>
+			</table>
+	 	<div>
 			<g:if test="${projMap}">
 			<dl>
-			<dt>Asset Tag:</dt><dd>&nbsp;${projMap?.asset?.assetTag}</dd>
+			<dt onclick="window.scrollTo(0,0)" style="float: right;color: red;"><a name="#Top" href="#AssetTag">Top</a></dt><dd>&nbsp;</dd>
 			<dt>Asset Name:</dt><dd>&nbsp;${projMap?.asset?.assetName}</dd>
 			<dt>Model:</dt><dd>&nbsp;${projMap?.asset?.model}</dd>
 			<dt>Rack/Pos:</dt><dd>&nbsp;<g:if test="${location == 's'}">${projMap?.asset?.sourceRack}/${projMap?.asset?.sourceRackPosition}</g:if><g:else test="${location == 't'}">${projMap?.asset?.targetRack}/${projMap?.asset?.targetRackPosition}</g:else></dd>
@@ -122,44 +166,7 @@
 			   	<dt>KVM Port:</dt><dd>&nbsp;${projMap?.asset?.kvmPort}</dd>			   	
 			   	</dl>
 			</g:else>
- 	</div>	
-			<tr>
-			<td width="219px"><strong>Instructions</strong></td>
-			<td><strong>Confirm</strong></td>
-			</tr>
-			<g:each status="i" in="${assetComment}" var="comments">
-			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-			<td>${comments.comment}</td>
-			<g:if test="${comments.mustVerify == 1}">
-			<td><g:checkBox name="myCheckbox" value="${false}" class="confirm_checkbox" /></td>
-			</g:if>
-			<g:else>
-			<td></td>
-			</g:else>
-			</tr>
-			</g:each>
-			<g:if test ="${actionLabel}">	
-			<tr>
-			<td colspan="2" style="text-align:right;"><input type="button" value="${label}" onclick="return unRack();" class="action_button"/></td>
-			</tr>
-			</g:if>
-			<table>	
-			<tr>
-			<td >
-			<g:select style="width: 170px;padding:0px;" from="['Select a common reason:','Device not powered down','Device is not in expected rack','Device will not power up']" id="selectCmt" name="selectCmt" value="Select a common reason:" onchange="commentSelect(this.value);"></g:select>
-			</td>
-			</tr>		
-			<tr><td>
-			<textarea rows="3" cols="10" style="width: 200px;padding:0px;" title="Enter Note..." id="enterNote" name="enterNote" ></textarea>
-			</td></tr>		
-			<tr>
-			<td class="button_style"><input type="button" value="Add Comment" onclick="return doTransition('comment');" class="action_button"/></td>
-			<tr>
-			<tr>
-			<td class="button_style"><input type="button" value="Place on HOLD" onclick="return doTransition('hold');" class="action_button"/></td>
-			<tr>	
-			</table>
-			</table>
+ 		</div>	
 	</g:form>
 	</div>
 	</div>
