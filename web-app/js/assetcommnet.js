@@ -165,51 +165,50 @@
 			    var assetComments = eval('(' + e.responseText + ')');
 		      	var tbody = $('#listCommentsTbodyId')
 				if (assetComments != "") {
-					if(status != 'new'){
 						$("#createCommentDialog").dialog("close")
 				      	//generate dynamic rows	
 				      	  var tr = document.createElement('tr');
 				      	  tr.style.background = '#65a342'
-				      	  tr.id = "commentTr_"+assetComments.id
+				      	  tr.id = "commentTr_"+assetComments[0].assetComment.id
 					      tr.setAttribute('onmouseover','this.style.backgroundColor="white";');
 					      var editTd = document.createElement('td');
 						  var commentTd = document.createElement('td');
-						  commentTd.id = 'comment_'+assetComments.id
-						  commentTd.name = assetComments.id
+						  commentTd.id = 'comment_'+assetComments[0].assetComment.id
+						  commentTd.name = assetComments[0].assetComment.id
 						  commentTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
 						  var typeTd = document.createElement('td');
-						  typeTd.id = 'type_'+assetComments.id
-						  typeTd.name = assetComments.id
+						  typeTd.id = 'type_'+assetComments[0].assetComment.id
+						  typeTd.name = assetComments[0].assetComment.id
 						  typeTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
 						  var resolveTd = document.createElement('td');
-						  resolveTd.id = 'resolve_'+assetComments.id
-						  resolveTd.name = assetComments.id
+						  resolveTd.id = 'resolve_'+assetComments[0].assetComment.id
+						  resolveTd.name = assetComments[0].assetComment.id
 					      resolveTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'show' );commentChangeShow();}})}					      
 					   	  var verifyTd = document.createElement('td');
-						  verifyTd.id = 'verify_'+assetComments.id
-						  verifyTd.name = assetComments.id
+						  verifyTd.id = 'verify_'+assetComments[0].assetComment.id
+						  verifyTd.name = assetComments[0].assetComment.id
 						  verifyTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
 						  var image = document.createElement('img');
 					      image.src = "../images/skin/database_edit.png"
 					      image.border = 0
 						  var link = document.createElement('a');
 						  link.href = '#'
-						  link.id = 'link_'+assetComments.id
-						  link.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+assetComments.id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );commentChangeEdit('#editResolveDiv','editCommentForm');}})} //;return false
-					      var commentText = document.createTextNode(truncate(assetComments.comment));
-					      var typeText = document.createTextNode(assetComments.commentType);
+						  link.id = 'link_'+assetComments[0].assetComment.id
+						  link.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+assetComments[0].assetComment.id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );commentChangeEdit('#editResolveDiv','editCommentForm');}})} //;return false
+					      var commentText = document.createTextNode(truncate(assetComments[0].assetComment.comment));
+					      var typeText = document.createTextNode(assetComments[0].assetComment.commentType);
 					      var resolveVal
-					      if(assetComments.commentType != "issue"){
+					      if(assetComments[0].assetComment.commentType != "issue"){
 					      resolveVal = document.createTextNode('');
 					      }else{
 					      resolveVal = document.createElement('input')
-					      resolveVal.id = 'verifyResolved_'+assetComments.id
+					      resolveVal.id = 'verifyResolved_'+assetComments[0].assetComment.id
 					      resolveVal.type = 'checkbox'					     
 					      resolveVal.disabled = 'disabled'
 					     
 					      }
 					      var verifyText = document.createElement('input')
-					      verifyText.id = 'verifyText_'+assetComments.id
+					      verifyText.id = 'verifyText_'+assetComments[0].assetComment.id
 					      verifyText.type = 'checkbox'
 					      verifyText.disabled = 'disabled'
 					     
@@ -226,16 +225,13 @@
 					      tr.appendChild( resolveTd )
 					      tr.appendChild( verifyTd )
 					      tbody.append( tr )
-					      if(assetComments.isResolved == 1){
+					      if(assetComments[0].assetComment.isResolved == 1){
 					      	resolveVal.checked = true;
 					      }
-					       if(assetComments.mustVerify != 0){
+					       if(assetComments[0].assetComment.mustVerify != 0){
 					      	verifyText.checked = true
 					      }
-					  
-				    } else {
-						window.location.reload()
-					}
+					  	updateAssetCommentIcon( assetComments[0] );
 	      		} else {
 	      				alert("Comment not created")
 	      		}
@@ -243,37 +239,38 @@
       		// update comments 
       		function updateCommentsOnList( e ){
       		var assetComments = eval('(' + e.responseText + ')');
-      			if (assetComments) {
+      			if (assetComments != "") {
       				$("#editCommentDialog").dialog("close")
 			      	//generate dynamic rows	
-			      	  var tr = $('#commentTr_'+assetComments.id);
+			      	  var tr = $('#commentTr_'+assetComments[0].assetComment.id);
 			      	  tr.css( 'background', '#65a342' );
-			      	  if(assetComments.mustVerify != 0){
-				      $('#verifyText_'+assetComments.id).attr('checked', true);
+			      	  if(assetComments[0].assetComment.mustVerify != 0){
+				      $('#verifyText_'+assetComments[0].assetComment.id).attr('checked', true);
 				      } else {
-				      $('#verifyText_'+assetComments.id).attr('checked', false);
+				      $('#verifyText_'+assetComments[0].assetComment.id).attr('checked', false);
 				      }
-				      if(assetComments.commentType != "issue"){
-				      	  $('#resolve_'+assetComments.id).html("");
+				      if(assetComments[0].assetComment.commentType != "issue"){
+				      	  $('#resolve_'+assetComments[0].assetComment.id).html("");
 				      }else{
-					      var checkResolveTd = $('#verifyResolved_'+assetComments.id);
+					      var checkResolveTd = $('#verifyResolved_'+assetComments[0].assetComment.id);
 					      if(checkResolveTd){
 					      	checkResolveTd.remove();
 					      }
 				      	  var resolveVal = document.createElement('input')
-					      resolveVal.id = 'verifyResolved_'+assetComments.id
+					      resolveVal.id = 'verifyResolved_'+assetComments[0].assetComment.id
 					      resolveVal.type = 'checkbox'
 					      resolveVal.disabled = 'disabled'
-					      $('#resolve_'+assetComments.id).append( resolveVal )
+					      $('#resolve_'+assetComments[0].assetComment.id).append( resolveVal )
 					     
-					      if(assetComments.isResolved != 0){
-					      	$('#verifyResolved_'+assetComments.id).attr('checked', true);
+					      if(assetComments[0].assetComment.isResolved != 0){
+					      	$('#verifyResolved_'+assetComments[0].assetComment.id).attr('checked', true);
 					      } else {
-					      	$('#verifyResolved_'+assetComments.id).attr('checked', false);
+					      	$('#verifyResolved_'+assetComments[0].assetComment.id).attr('checked', false);
 					      }
 				      }
-				      $('#type_'+assetComments.id).html(assetComments.commentType);
-				      $('#comment_'+assetComments.id).html(truncate(assetComments.comment));
+				      $('#type_'+assetComments[0].assetComment.id).html(assetComments[0].assetComment.commentType);
+				      $('#comment_'+assetComments[0].assetComment.id).html(truncate(assetComments[0].assetComment.comment));
+				      updateAssetCommentIcon( assetComments[0] )
       			}
       		}
       		// Truncate the text 
@@ -323,5 +320,17 @@ function commentChangeShow() {
 			$('#showResolveDiv').css('display', 'none');
 		}
 	}
-
+/*UPDATE THE ASSET COMMENT ICON*/
+function updateAssetCommentIcon( assetComments ){
+	var link = document.createElement('a');
+	link.href = '#'
+	link.onclick = function(){setAssetId(assetComments.assetComment.assetEntity);new Ajax.Request('../assetEntity/listComments?id='+assetComments.assetComment.assetEntity,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never');}})} //;return false
+	if( assetComments.status ){
+		link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
+	}else{
+		link.innerHTML = "<img src=\"../images/skin/database_table_bold.png\" border=\"0px\">"
+	}
+	var iconObj = $('#icon_'+assetComments.assetComment.assetEntity);
+	iconObj.html(link)
+}
 		

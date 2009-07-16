@@ -780,10 +780,10 @@ class AssetEntityController {
             assetCommentInstance.dateResolved = new Date()
         }
     	if(!assetCommentInstance.hasErrors() && assetCommentInstance.save()) {
-    		render assetCommentInstance as JSON
-        } else {
-        	render assetComments as JSON
-        }
+    		def status = AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetCommentInstance.assetEntity,'issue',0])
+    		assetComments << [assetComment : assetCommentInstance, status : status ? true : false]
+        } 
+    	render assetComments as JSON
     }
     /* ------------------------------------------------------------------------
      * return the commet record
@@ -822,6 +822,7 @@ class AssetEntityController {
      * @return assetComment
      * ------------------------------------------------------------ */
     def updateComment = {
+    	def assetComments = []
         def principal = SecurityUtils.subject.principal
         def loginUser = UserLogin.findByUsername(principal)
     	def assetCommentInstance = AssetComment.get(params.id)
@@ -835,10 +836,11 @@ class AssetEntityController {
         }
     	assetCommentInstance.properties = params      
     	
-    	if(!assetCommentInstance.hasErrors()) {
-    		assetCommentInstance.save()
+    	if(!assetCommentInstance.hasErrors() && assetCommentInstance.save(flush:true) ) {
+    		def status = AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetCommentInstance.assetEntity,'issue',0])
+    		assetComments << [assetComment : assetCommentInstance, status : status ? true : false]
         }
-    	render assetCommentInstance as JSON
+    	render assetComments as JSON
     }
     /* delete the comment record
      * @param assetComment
@@ -1046,7 +1048,10 @@ class AssetEntityController {
 	        def assetDetail = AssetEntity.findById(assetId)
 	        def teamName = assetDetail.sourceTeam
 	        def assetTransition = AssetTransition.findAllByAssetEntity( assetDetail, [ sort:"dateCreated", order:"desc"] )
-	        def sinceTimeElapsed = convertIntegerIntoTime( new Date().getTime() - assetTransition[0].dateCreated.getTime() )
+	        def sinceTimeElapsed = "00:00:00" 
+	        if( assetTransition ){
+	        	sinceTimeElapsed = convertIntegerIntoTime( new Date().getTime() - assetTransition[0]?.dateCreated?.getTime() )
+	        }
 	        assetTransition.each{
 	        	def taskLabel = stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(it.stateTo))
 	        	def time = it.dateCreated.toString().substring(11,19)
@@ -1372,11 +1377,11 @@ class AssetEntityController {
     	def timeFormate 
  	    if(time != 0){
 	    	    def hours = (Integer)(time / (1000*60*60))
-	    	    timeFormate = hours > 10 ? hours : '0'+hours
+	    	    timeFormate = hours >= 10 ? hours : '0'+hours
 	    	    def minutes = (Integer)((time % (1000*60*60)) / (1000*60))
-	    	    timeFormate += ":"+(minutes > 10 ? minutes : '0'+minutes)
+	    	    timeFormate += ":"+(minutes >= 10 ? minutes : '0'+minutes)
 	    	    def seconds = (Integer)(((time % (1000*60*60)) % (1000*60)) / 1000)
-	    	    timeFormate += ":"+(seconds > 10 ? seconds : '0'+seconds)
+	    	    timeFormate += ":"+(seconds >= 10 ? seconds : '0'+seconds)
  	    } else {
  	    	timeFormate = "00:00:00"
  	    }

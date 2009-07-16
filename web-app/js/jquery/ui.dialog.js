@@ -108,10 +108,6 @@ $.widget("ui.dialog", {
 				})
 				.click(function(event) {
 					self.close(event);
-					if(title == "Show Asset Comments"){
-					timedRefresh('0');
-					}
-					
 					return false;
 				})
 				.appendTo(uiDialogTitlebar),

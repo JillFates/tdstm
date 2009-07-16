@@ -45,16 +45,7 @@
 })
 </script>
 <script type="text/javascript">	
-		var timer
-	   	function timedRefresh(timeoutPeriod) {
-	   		if(timeoutPeriod != 'never'){
-				clearTimeout(timer);
-				timer = setTimeout("location.reload(true);",timeoutPeriod);
-			} else {
-				clearTimeout(timer)
-			}
-		}
-		    function showAssetDialog( e , action ) {
+	   		function showAssetDialog( e , action ) {
 		    	$('#createCommentDialog').dialog('close');
 		    	$('#commentsListDialog').dialog('close');
 		    	$('#editCommentDialog').dialog('close');
@@ -500,7 +491,7 @@
 	    function setAssetId(assetId){
 			$("#createAssetCommentId").val(assetId)
 		}
-      	
+		
 	    </script>
 <filterpane:includes />
 </head>
@@ -552,6 +543,7 @@
 				<td><g:remoteLink controller="assetEntity" action="editShow" id="${assetEntityInstance.id}" before="document.showForm.id.value = ${assetEntityInstance.id};document.editForm.id.value = ${assetEntityInstance.id};" onComplete="showAssetDialog( e , 'edit');">
 					<img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px">
 				</g:remoteLink>
+				<span id="icon_${assetEntityInstance.id}">
 				<g:if test="${AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetEntityInstance,'issue',0])}">
 					<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
 						<img src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}" border="0px">
@@ -566,7 +558,7 @@
 				<a href="#" onclick="$('#createAssetCommentId').val(${assetEntityInstance.id});$('#statusId').val('new');$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('open');$('#commentsListDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">
 					<img src="${createLinkTo(dir:'images/skin',file:'database_table_light.png')}" border="0px">
 				</a>
-				</g:else>
+				</g:else></span>
 				</td>
 				
 				<td id="application_${assetEntityInstance.id}" onclick="${remoteFunction(action:'editShow', params:'\'id=\'+'+assetEntityInstance.id, before:'document.showForm.id.value ='+ assetEntityInstance.id+';document.editForm.id.value = '+ assetEntityInstance.id+';', onComplete:'showAssetDialog(e , \'show\')')}"> ${fieldValue(bean:assetEntityInstance, field:'application')} </td>
@@ -934,8 +926,5 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 	</span></div>
 </g:form>
 </div>
-<script type="text/javascript">
-timedRefresh('never');
-</script>
 </body>
 </html>
