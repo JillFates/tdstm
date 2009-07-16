@@ -24,7 +24,7 @@
 					      var commentTd = document.createElement('td');
 					      commentTd.id = 'comment_'+commentObj.commentInstance.id
 					      commentTd.name = commentObj.commentInstance.id
-					   
+					      
 					      commentTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
 					      // = 'comment_'+commentObj.commentInstance.id
 					      var typeTd = document.createElement('td');
@@ -307,9 +307,9 @@
 	  	function commentChangeEdit(resolveDiv,formName) {
 		var type = 	document.forms[formName].commentType.value;
 		if(type == "issue"){
-			$("#"+resolveDiv).css('display', 'block');
+			$(resolveDiv).css('display', 'block');
 		}else{
-			$("#"+resolveDiv).css('display', 'none');
+			$(resolveDiv).css('display', 'none');
 		}
 	}
 function commentChangeShow() {
