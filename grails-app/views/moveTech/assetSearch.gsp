@@ -73,6 +73,7 @@
 	<div class="mainbody" style="width: 100%;">
 		<div class="colum_techlogin" style="float:left;">
 			<div style="float:left; width:200px; margin-left:13px;background-color:none;">
+					<a name="#assetTag"/>
 		        	<g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt","fMess":"fMess"]' style="height:21px; width:45px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Home</g:link>
 					<g:link action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo","fMess":"fMess"]' style="height:21px; width:60px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">My Task</g:link>
 					<a href="#" style="height:21px; width:63px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;background:#aaefb8;padding:auto 0px;text-align:center;">Asset</a>
@@ -97,7 +98,7 @@
 			</div>
 		<div>
 			<g:if test="${projMap}">			
-			<dt>Asset Tag:</dt><dd><a name="#AssetTag" href="#Top">&nbsp;${projMap?.asset?.assetTag}</a></dd>
+			<dt>Asset Tag:</dt><dd><a href="#Top">&nbsp;${projMap?.asset?.assetTag}</a></dd>
 			</g:if>
  		</div>
  			<g:if test="${assetComment}">

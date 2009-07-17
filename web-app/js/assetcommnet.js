@@ -24,7 +24,7 @@
 					      var commentTd = document.createElement('td');
 					      commentTd.id = 'comment_'+commentObj.commentInstance.id
 					      commentTd.name = commentObj.commentInstance.id
-					      
+					   	  
 					      commentTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
 					      // = 'comment_'+commentObj.commentInstance.id
 					      var typeTd = document.createElement('td');
@@ -46,7 +46,7 @@
 					      link.href = '#'
 					      link.id = 'link_'+commentObj.commentInstance.id
 					      link.name = commentObj.commentInstance.id
-					      link.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );commentChangeEdit('#editResolveDiv','editCommentForm');}})} //;return false
+					      link.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );commentChangeEdit('editResolveDiv','editCommentForm');}})} //;return false
 					      var commentText = document.createTextNode(truncate(commentObj.commentInstance.comment));
 					      var typeText = document.createTextNode(commentObj.commentInstance.commentType);
 					      var resolveVal
@@ -194,7 +194,7 @@
 						  var link = document.createElement('a');
 						  link.href = '#'
 						  link.id = 'link_'+assetComments[0].assetComment.id
-						  link.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+assetComments[0].assetComment.id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );commentChangeEdit('#editResolveDiv','editCommentForm');}})} //;return false
+						  link.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+assetComments[0].assetComment.id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );commentChangeEdit('editResolveDiv','editCommentForm');}})} //;return false
 					      var commentText = document.createTextNode(truncate(assetComments[0].assetComment.comment));
 					      var typeText = document.createTextNode(assetComments[0].assetComment.commentType);
 					      var resolveVal
@@ -307,9 +307,9 @@
 	  	function commentChangeEdit(resolveDiv,formName) {
 		var type = 	document.forms[formName].commentType.value;
 		if(type == "issue"){
-			$(resolveDiv).css('display', 'block');
+			$("#"+resolveDiv).css('display', 'block');
 		}else{
-			$(resolveDiv).css('display', 'none');
+			$("#"+resolveDiv).css('display', 'none');
 		}
 	}
 function commentChangeShow() {
