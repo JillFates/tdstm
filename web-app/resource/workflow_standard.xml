@@ -139,7 +139,6 @@
 	<taskNode name="Ready">
 		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
-			<transition to="Ready" />
 			<transition to="PoweredDown" />
 			<transition to="Release" />
 			<transition to="Unracking" flag="skipped"/>
