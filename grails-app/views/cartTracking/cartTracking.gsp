@@ -140,6 +140,7 @@
 				tbody += check
 						
 			}
+			
 			var assetAction = assetsOnCart[0].assetAction
 			if(assetAction){
 				$("#assetActionId").val(assetAction)
@@ -151,6 +152,9 @@
 			        $('#allAssetsId').css("backgroundColor","#FFFFFF");
 		        }
 			}
+		} else {
+			$('#remainingAssetsId').css("backgroundColor","#aaefb8");
+			$('#allAssetsId').css("backgroundColor","#FFFFFF");
 		}
 		if(tbody == ""){
 			tbody = "<tr><td colspan='6' class='no_records'>No records found</td></tr>"

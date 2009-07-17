@@ -49,7 +49,7 @@ class CartTrackingController {
     	def query = new StringBuffer("select ae.truck as truck , ae.cart as cart, count(ae.asset_entity_id) as totalAssets, "+
     								"sum(ae.usize) as usize from asset_entity ae left join project_asset_map pm on "+
     								"(pm.asset_id = ae.asset_entity_id ) where ae.project_id = ${projectInstance.id} "+
-    								"and ae.move_bundle_id = ${moveBundleInstance.id} group by ae.cart, ae.truck ")
+    								"and ae.move_bundle_id = ${moveBundleInstance.id} group by ae.cart ")
     	def resultList = jdbcTemplate.queryForList( query.toString() )
     	// iterate the carts details for completed and pending assets
     	resultList.each{
@@ -58,7 +58,7 @@ class CartTrackingController {
 			def completedAssets = 0
     		def assetQuery = "select ae.asset_entity_id as id, max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate from asset_entity ae left join "+
 							"asset_transition at on (at.asset_entity_id = ae.asset_entity_id and at.voided = 0 ) where ae.project_id = ${projectInstance.id} "+
-							"and ae.move_bundle_id = ${moveBundleInstance.id} and ae.cart = '$it.cart' and ae.truck = '$it.truck' group by ae.asset_entity_id"
+							"and ae.move_bundle_id = ${moveBundleInstance.id} and ae.cart = '$it.cart' group by ae.asset_entity_id"
     		def assetTransition = jdbcTemplate.queryForList(assetQuery)
     		assetTransition.each{
     			def currentState = 0
@@ -141,7 +141,7 @@ class CartTrackingController {
 					" max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate "+
 					"from asset_entity ae left join asset_transition at on (at.asset_entity_id = ae.asset_entity_id "+
 					"and at.voided = 0) where ae.project_id = $projectId and ae.move_bundle_id = $bundleId "+
-					"and ae.cart = '$cart' and ae.truck = '$truck' group by ae.asset_entity_id"
+					"and ae.cart = '$cart' group by ae.asset_entity_id"
 		def resultList = jdbcTemplate.queryForList( query )
 		def cleanedId = stateEngineService.getStateIdAsInt("STD_PROCESS","Cleaned")
 		def stagedId = stateEngineService.getStateIdAsInt("STD_PROCESS","Staged")
@@ -222,7 +222,7 @@ class CartTrackingController {
 		def cart = params.cart
 		def truck = params.truck
 		def assetEntityList = AssetEntity.findAll(" from AssetEntity a where a.project = $projectId and "+
-												"a.moveBundle = $bundleId and a.cart = '$cart' and a.truck = '$truck'")
+												"a.moveBundle = $bundleId and a.cart = '$cart' ")
 		assetEntityList.each{
 			def transactionStatus
 			def projectAssetMap = ProjectAssetMap.findByAsset( it )
