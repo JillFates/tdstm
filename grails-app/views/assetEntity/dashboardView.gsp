@@ -623,6 +623,20 @@ td .odd {
 		}
 		$("form#dashboardForm").submit();
 	}
+	function createNewAssetComment( asset ){
+		setAssetId( asset );
+		$('#statusId').val('new');
+		$('#createCommentDialog').dialog('option', 'width', 700);
+		$('#createCommentDialog').dialog('open');
+		$('#commentsListDialog').dialog('close');
+		$('#editCommentDialog').dialog('close');
+		$('#showCommentDialog').dialog('close');
+		$('#showDialog').dialog('close');
+		$('#editDialog').dialog('close');
+		$('#createDialog').dialog('close');
+		document.createCommentForm.mustVerify.value=0;
+		document.createCommentForm.reset();
+	}
     </script>
 </head>
 
@@ -932,12 +946,15 @@ td .odd {
 												border="0px">
 										</g:remoteLink>
 									</g:if>
-									<g:else>
-										<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+ assetsList?.asset?.id)}">
+									<g:elseif test="${AssetComment.find('from AssetComment where assetEntity = '+ assetsList?.asset?.id)}">
 										<g:remoteLink controller="assetEntity" action="listComments" id="${assetsList?.asset.id}" before="setAssetId(${assetsList?.asset.id});" onComplete="listCommentsDialog( e ,'never' ); ">
 											<img src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}" border="0px">
 										</g:remoteLink>
-										</g:if>
+									</g:elseif>
+									<g:else>
+									<a onclick="createNewAssetComment(${assetsList?.asset.id});">
+										<img src="${createLinkTo(dir:'images/skin',file:'database_table_light.png')}" border="0px">
+									</a>
 									</g:else>
 									</td>
 								</tr>
