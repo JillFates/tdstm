@@ -201,6 +201,7 @@ function InitData()
     form.PrinterName.value = ''																	// use default printer
 	// get list of installed printers
 	var dropdown = document.assetSearchForm.Printers;
+	AddOption (dropdown, "Zebra (ZPL-II)", "ZPL:" + sHint + ".ZPL");
 	/* window.TF.RefreshOSPrinters();
 	var def = 0;
 	for (i = 0; i < window.TF.GetOSPrintersCount(); i++) 
@@ -223,7 +224,7 @@ function InitData()
 		doption.value = dropdownOptions[opt];
 		doption.innerHTML = dropdownOptions[opt];
 		dropdown.appendChild( doption );
-	}
+	}	
 	retrieve_field(document.assetSearchForm.Printers)
 	mySelect(dropdown);
 }
