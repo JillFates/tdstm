@@ -938,6 +938,15 @@ class MoveTechController {
                                 }
                             }
                             assetComment = AssetComment.findAll( "from AssetComment ac where ac.assetEntity = $assetItem.id and ac.commentType != 'issue' " )
+                            def cleanedId = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Cleaned" )
+                            def cartAssetCountQuery = new StringBuffer(" select count(a.asset_entity_id) as assetCount from asset_entity a "+
+                            											"left join project_asset_map p on ( a.asset_entity_id = p.asset_id  ) " +
+                            											"where a.cart = '$assetItem.cart' and a.move_bundle_id = $bundleId "+
+                            											"and p.project_id = $assetItem.project.id and p.current_state_id < $cleanedId ")
+                			def cartAssetCount = jdbcTemplate.queryForInt( cartAssetCountQuery.toString() )
+                			if(cartAssetCount == 1){
+                				flash.message = "This is the last asset for cart "+assetItem.cart
+                			}
                             render ( view:'cleaningAssetSearch',
                                 model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment ? assetComment :"", stateVal:stateVal, bundle:params.bundle,
                                 		team:params.team, project:params.project, location:params.location, search:search, label:label,
