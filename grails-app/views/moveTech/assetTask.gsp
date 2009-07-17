@@ -71,12 +71,12 @@
         $('#todoId').children().eq(0).css("backgroundColor","#FFFFFF");
         $('#allId').children().eq(0).css("backgroundColor","#aaefb8");
         }
-        $('#search').focus();
+        document.bundleTeamAssetForm.search.focus();
         }
         function assetSubmit(searchVal){
         
-        $('#search').val(searchVal); 
-        $('form#bundleTeamAssetForm').submit();
+        document.bundleTeamAssetForm.search.value = searchVal; 
+        document.bundleTeamAssetForm.submit();
         
         }
      </script>      
