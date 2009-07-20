@@ -21,10 +21,10 @@ dt {
 	<div class="mainbody" style="width: 100%;" >
 		<div class="colum_techlogin" style="float:left;">
 				<div class="border_bundle_team">
-          			<div style="float:left; width:200px; margin-left:13px;background-color:none;">
-		        	<a href="#" style="height:21px; width:45px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;background:#aaefb8;padding:auto 0px;text-align:center;">Home</a>
-					<g:link action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' style="height:21px; width:60px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">My Task</g:link>
-					<a href="#" style="height:21px; width:63px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Asset</a>
+          			<div class="tech_head">
+		        	<a href="#" class="home_select">Home</a>
+					<g:link action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' class="my_task">My Task</g:link>
+					<a href="#" class="asset_search">Asset</a>
 				</div>		
 			<div class="w_techlog">
 				<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">      					
@@ -36,12 +36,12 @@ dt {
 							<input name="home" type="hidden" value="home" />									
 				<div style="float:left; width:100%; margin:5px 0; ">              								
 					<table style="border:0px;">
-						<tr><td><g:link controller="moveTech" action="signOut" style="color: #5b5e5c; border:1px solid #5b5e5c; margin:2px 5px 5px 5px; height:15px; padding:1px 2px 1px 3px; width:50px; background:#aaefb8; float:left;">Log out</g:link></td>
+						<tr><td><g:link controller="moveTech" action="signOut" class="sign_out">Log out</g:link></td>
 							<td style="text-align:right;"><a href="#" style="color: #328714;"><input type="text" size="12" value="" name="search" /></a></td>
 						</tr>
 					  </table>
 				</div>
-				<div style="float:left; width:100%;" id="mydiv" onclick='$("#mydiv").hide()'>						            
+				<div style="float:left; width:100%;" id="mydiv" onclick="this.style.display = 'none'">						            
 			   					<g:if test="${flash.message}">
 								<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
 								</g:if> 

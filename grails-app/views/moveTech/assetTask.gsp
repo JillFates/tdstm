@@ -2,7 +2,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>My Tasks</title>
-<g:javascript library="jquery" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 	 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 	<%--<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
@@ -10,10 +9,13 @@
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />--%>
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 	
-	<%--<g:javascript library="prototype" />
+	<%--
+	<g:javascript library="jquery" />
+	<g:javascript library="prototype" />
 	
 	<jq:plugin name="ui.core" />
-	<jq:plugin name="ui.dialog" /> --%>
+	<jq:plugin name="ui.dialog" /> 
+	--%>
 	
 
 	
@@ -66,12 +68,7 @@
         }*/
        --%>
         function setFocus(){
-        var tab = '${tab}' ;
-        if(tab != 'Todo'){
-        $('#todoId').children().eq(0).css("backgroundColor","#FFFFFF");
-        $('#allId').children().eq(0).css("backgroundColor","#aaefb8");
-        }
-        document.bundleTeamAssetForm.search.focus();
+	        document.bundleTeamAssetForm.search.focus();
         }
         function assetSubmit(searchVal){
         
@@ -89,10 +86,10 @@
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody" style="width: 100%;" >
 				<div class="colum_techlogin" style="float:left;">
-				<div style="float:left; width:200px; margin-left:13px;background-color:none;">
-		        	<g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt"]' style="height:21px; width:45px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Home</g:link>
-					<a href="#" style="height:21px; width:60px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;background:#aaefb8;padding:auto 0px;text-align:center;">My Task</a>
-					<a href="#" style="height:21px; width:63px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Asset</a>
+				<div class="tech_head">
+		        	<g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt"]' class="home">Home</g:link>
+					<a href="#" class="my_task_select">My Task</a>
+					<a href="#" class="asset_search">Asset</a>
 				</div>			
 				<div class="w_techlog">				
       					<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">
@@ -105,26 +102,40 @@
 							<div style="float:left; width:210px; margin:2px 0; ">              								
               					<table style="border:0px;width:210px;">
 								    <tr>								            										            		
-								    <td id="todoId" style="padding-top:4px;padding-left:1px;padding-right:0px;padding-bottom:0px;width:50px;"><g:link  style="color: #5b5e5c; border:1px solid #5b5e5c; margin:2px;background:#aaefb8;padding:2px;" action="assetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link></td>
-								    <td id="allId" style="padding-top:4px;padding-left:1px;padding-right:0px;padding-bottom:0px;"><g:link   style="color: #5b5e5c; border:1px solid #5b5e5c; margin:2px; padding:2px;" action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All&nbsp;(${allSize})</g:link></td>
-								    <td style="padding-top:0px;padding-left:1px;padding-right:0px;padding-bottom:0px; height:10px;"><input  type="text" size="08" value="" id="search" name="search" style="color: #5b5e5c; border:1px solid #5b5e5c; margin:0px; padding:1px;" /></td>
+								    <td id="todoId" class="tab">
+								    	<g:if test="${tab && tab == 'Todo'}">
+								    		<g:link class="tab_select" action="assetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link>
+								    	</g:if>
+								    	<g:else>
+								    		<g:link class="tab_deselect" action="assetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link>
+								    	</g:else>
+								    </td>
+								    <td id="allId" class="tab">
+								    	<g:if test="${tab == 'All'}">
+								    		<g:link class="tab_select" action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All&nbsp;(${allSize})</g:link>
+								    	</g:if>
+								    	<g:else>
+								    		<g:link class="tab_deselect" action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All&nbsp;(${allSize})</g:link>
+								    	</g:else>
+								    </td>
+								    <td class="tab_search"><input  type="text" size="08" value="" id="search" name="search" /></td>
 								    </tr>
 								    </table>
-						    </div>  
-							<div id="mydiv" onclick="$('#mydiv').hide();setFocus()">						            
+						    </div> 
+							<div id="mydiv" onclick="this.style.display = 'none';setFocus()">						            
 			   					<g:if test="${flash.message}">
 								<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
 								</g:if> 
 							</div>		
            					<div style="float:left; width:220px; margin:5px 0;"><b>My Tasks:</b></div>
-            				<div id="assetTable"style="float:left;width:220px; ">
+            				<div id="assetTable" style="float:left;width:220px; ">
            					<div style=" width:220px; ">          
              					<table id="assetTable" style="height:80px;">
               					<thead>
                 				<tr>
-                  				<g:sortableColumn style="color: #5b5e5c; width:60px; border:1px  solid #5b5e5c; margin:2px;background:#aaefb8;padding:2px;" action="assetTask" property="asset_tag" title="AssetTag" params="['bundle':bundle, 'team':team, 'tab':tab,'location':location,'project':project ]"></g:sortableColumn>
-                  				<g:sortableColumn style="color: #5b5e5c; width:65px; border:1px  solid #5b5e5c; margin:2px;background:#aaefb8;padding:2px;" action="assetTask" property="source_rack" title="Rack/Pos" params="['bundle':bundle, 'team':team, 'tab':tab,'location':location,'project':project ]"></g:sortableColumn>
-                  				<g:sortableColumn style="color: #5b5e5c; border:1px solid #5b5e5c; margin:2px;background:#aaefb8;padding:2px;" action="assetTask" property="model" title="Model" params="['bundle':bundle, 'team':team, 'tab':tab,'location':location,'project':project ]"></g:sortableColumn>
+                  				<g:sortableColumn class="sort_column" style="width:60px;" action="assetTask" property="asset_tag" title="AssetTag" params="['bundle':bundle, 'team':team, 'tab':tab,'location':location,'project':project ]"></g:sortableColumn>
+                  				<g:sortableColumn class="sort_column" style="width:65px;" action="assetTask" property="source_rack" title="Rack/Pos" params="['bundle':bundle, 'team':team, 'tab':tab,'location':location,'project':project ]"></g:sortableColumn>
+                  				<g:sortableColumn class="sort_column" action="assetTask" property="model" title="Model" params="['bundle':bundle, 'team':team, 'tab':tab,'location':location,'project':project ]"></g:sortableColumn>
 								</tr>
                					</thead>
                					<tbody>

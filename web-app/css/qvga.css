@@ -99,3 +99,128 @@ th {
 	padding-top:0px;
 	text-align: right;
 }
+.tech_head {
+	float:left; 
+	width:200px; 
+	margin-left:13px;
+	background-color:none;
+}
+.home {
+	height:21px; 
+	width:45px; 
+	float:left; 
+	margin:auto 0px;
+	color: #5b5e5c; 
+	border:1px solid #5b5e5c; 
+	margin:0px;
+	padding:auto 0px;
+	text-align:center;
+}
+.home_select {
+	height:21px; 
+	width:45px; 
+	float:left; 
+	margin:auto 0px;
+	color: #5b5e5c; 
+	border:1px solid #5b5e5c; 
+	margin:0px;
+	background:#aaefb8;
+	padding:auto 0px;
+	text-align:center;
+}
+.my_task {
+	height:21px; 
+	width:60px; 
+	float:left; 
+	margin:auto 0px;
+	color: #5b5e5c; 
+	border:1px solid #5b5e5c; 
+	margin:0px;
+	padding:auto 0px;
+	text-align:center;
+}
+.my_task_select{
+	height:21px; 
+	width:60px; 
+	float:left; 
+	margin:auto 0px;
+	color: #5b5e5c; 
+	border:1px solid #5b5e5c; 
+	margin:0px;
+	background:#aaefb8;
+	padding:auto 0px;
+	text-align:center;
+}
+.asset_search {
+	height:21px; 
+	width:63px; 
+	float:left; 
+	margin:auto 0px;
+	color: #5b5e5c; 
+	border:1px solid #5b5e5c; 
+	margin:0px;
+	padding:auto 0px;
+	text-align:center;
+}
+.asset_search_select {
+	height:21px; 
+	width:63px; 
+	float:left; 
+	margin:auto 0px;
+	color: #5b5e5c; 
+	border:1px solid #5b5e5c;
+	margin:0px;
+	background:#aaefb8;
+	padding:auto 0px;
+	text-align:center;
+}
+.tab {
+	padding-top:4px;
+	padding-left:1px;
+	padding-right:0px;
+	padding-bottom:0px;
+	width:50px;
+}
+.tab_search {
+	padding-top:0px;
+	padding-left:1px;
+	padding-right:0px;
+	padding-bottom:0px; 
+	height:10px;
+}
+.tab_search input {
+	color: #5b5e5c; 
+	border:1px solid #5b5e5c; 
+	margin:0px; 
+	padding:1px;
+}
+.tab_select {
+	color: #5b5e5c; 
+	border:1px solid #5b5e5c;
+	margin:2px;
+	background:#aaefb8;
+	padding:2px;
+}
+.tab_deselect {
+	color: #5b5e5c; 
+	border:1px solid #5b5e5c;
+	margin:2px;
+	padding:2px;
+}
+.sort_column {
+	color: #5b5e5c; 
+	border:1px  solid #5b5e5c; 
+	margin:2px;
+	background:#aaefb8;
+	padding:2px;
+}
+.sign_out {
+	color: #5b5e5c; 
+	border:1px solid #5b5e5c; 
+	margin:2px 5px 5px 5px; 
+	height:15px; 
+	padding:1px 2px 1px 3px; 
+	width:50px; 
+	background:#aaefb8; 
+	float:left;
+}

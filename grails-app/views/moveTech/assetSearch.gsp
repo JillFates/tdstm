@@ -11,10 +11,10 @@
     <script type="text/javascript">
    
         function validation(){   
-	        var enterNote = $('#enterNote').val(); 
+	        var enterNote = document.assetSearchForm.enterNote.value;
 	        if(enterNote == ""){     
 	        	alert('Please enter note');
-	        	$('#enterNote').focus();   
+	        	document.assetSearchForm.enterNote.focus();   
 	        	return false;
 	        }else{
 	        	if(confirm('Are you sure?')){
@@ -25,10 +25,10 @@
        function doTransition( actionType ){
 	       if(validation()){
 	       		if(actionType != 'hold'){
-	       			$('form#assetSearchForm').attr({action: "addComment"});
-	       			$('form#assetSearchForm').submit();
+	       			document.assetSearchForm.action = "addComment";
+	       			document.assetSearchForm.submit();
 	       		}else {
-	       			$('form#assetSearchForm').submit();
+	       			document.assetSearchForm.submit();
 	       		}
 	       }else {
 	       		return false;
@@ -36,8 +36,8 @@
        }
        function unRack(){ 
 	       if(doCheckValidation()){  
-		       $('form#assetSearchForm').attr({action: "unRack"});     
-		       $('form#assetSearchForm').submit();       
+		      	document.assetSearchForm.action = "unRack";      
+       			document.assetSearchForm.submit();       
 	       }else{
 	       		return false;
 	       }
@@ -61,8 +61,8 @@
        }     
       }      
       function commentSelect(cmtVal) {
-	      $('#enterNote').val(cmtVal);
-	      $('#selectCmt').val('Select a common reason:');
+	      	document.assetSearchForm.enterNote.value = cmtVal;
+      		document.assetSearchForm.selectCmt.value = 'Select a common reason:';
       }
       
     </script>
@@ -72,11 +72,11 @@
 <div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody" style="width: 100%;">
 		<div class="colum_techlogin" style="float:left;">
-			<div style="float:left; width:200px; margin-left:13px;background-color:none;">
+			<div class="tech_head">
 					<a name="#assetTag"/>
-		        	<g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt","fMess":"fMess"]' style="height:21px; width:45px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Home</g:link>
-					<g:link action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo","fMess":"fMess"]' style="height:21px; width:60px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">My Task</g:link>
-					<a href="#" style="height:21px; width:63px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;background:#aaefb8;padding:auto 0px;text-align:center;">Asset</a>
+		        	<g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt","fMess":"fMess"]' class="home" >Home</g:link>
+					<g:link action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo","fMess":"fMess"]' class="my_task">My Task</g:link>
+					<a href="#" class="asset_search_select">Asset</a>
 				</div>
 		<div class="w_techlog">
 		<div style="float:left; width:219px; margin:5px 0; ">
@@ -91,7 +91,7 @@
 			<input name="actionLabel" type="hidden" value="${actionLabel}"  />
 			<input name="user" type="hidden" value="mt"  />
 			<table style="border:0px;">
-	  <div id="mydiv" onclick="$('#mydiv').hide();">
+	  <div id="mydiv" onclick="this.style.display = 'none';">
  			<g:if test="${flash.message}">
 			<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
 			</g:if> 
