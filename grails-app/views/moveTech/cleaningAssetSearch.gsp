@@ -449,9 +449,20 @@ function mySelect(x)
 			<div id="mydiv" onclick='$("#mydiv").hide()'>
 					<g:if test="${flash.message}">
 					<div style="color: red;">
-					<ul>
-					<li>${flash.message}</li>
-					</ul>
+					<ul><li>${flash.message}</li>					
+					<g:each status="i" in="${issuecomments}" var="comments">
+						<g:if test="${assetIssueCommentListSize == 1}">
+							<dl>
+						  		<dt></dt><dd>${comments}</dd>
+							</dl>
+						</g:if>
+						<g:else>
+					    	<dl>
+							  <dt></dt><dd>${comments}&nbsp;( reason ${i+1} )</dd>
+							</dl>
+						</g:else>
+				  	</g:each>
+				  	</ul>
 					</div>
 					</g:if></div>
 			<div  style="width:100%; height:auto; border:1px solid #5F9FCF; margin-top:10px;padding:10px 0;">

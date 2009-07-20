@@ -732,6 +732,8 @@ class MoveTechController {
             def rdyState
             def ipState
             def holdState
+            def issuecomments
+            def assetIssueCommentListSize
             def query = new StringBuffer("select a.asset_entity_id as id, a.asset_tag as assetTag, " +
 					"a.source_rack as sourceRack, a.source_rack_position as sourceRackPosition, " +
 					"a.target_rack as targetRack, a.target_rack_position as targetRackPosition, " +
@@ -775,8 +777,15 @@ class MoveTechController {
                 query.append (" and p.current_state_id < $stateVal")
                 todoSize = jdbcTemplate.queryForList ( query.toString() ).size()
             }
+            def assetIssueCommentList
+            if ( params.issueAssetId ) {
+            	def assetItem = AssetEntity.findById( params.issueAssetId )
+            	assetIssueCommentList = AssetComment.findAll("from AssetComment ac where ac.assetEntity = ${assetItem.id} and ac.commentType = 'issue' and ac.isResolved = 0 ")
+            	assetIssueCommentListSize = assetIssueCommentList.size()
+            }
             return[ bundle:bundleId, team:team, project:params.project, location:params.location, 
-                    assetList:assetList, allSize:allSize, todoSize:todoSize, 'tab':tab 
+                    assetList:assetList, allSize:allSize, todoSize:todoSize, 'tab':tab, issuecomments: assetIssueCommentList,
+                    assetIssueCommentListSize: assetIssueCommentListSize
                     ]
 		} else {
 			flash.message = "Your login has expired and must login again."
@@ -813,6 +822,8 @@ class MoveTechController {
             def actionLabel
             def teamMembers
             def loginTeam
+            def issuecomments
+            def assetIssueCommentListSize
             if ( team ) {
             	loginTeam = ProjectTeam.findById ( params.team )
             }
@@ -906,18 +917,21 @@ class MoveTechController {
                         } else {
                             stateVal = stateEngineService.getState ( "STD_PROCESS", projMap.currentStateId )
                             if ( stateVal == "Hold" ) {
-                                flash.message = message ( code :"The asset is on Hold. Please contact manager to resolve issue." )
+                            	def assetIssueCommentList = AssetComment.findAll("from AssetComment ac where ac.assetEntity = ${assetItem.id} and ac.commentType = 'issue' and ac.isResolved = 0")
+                            	assetIssueCommentListSize = assetIssueCommentList.size()
+                                flash.message = message ( code :"The asset is currently on HOLD because: " )
                                 if ( textSearch ) {
                                     render ( view:'cleaningAssetSearch',
                                         model:[	teamMembers:teamMembers, projMap:projMap,assetComment:assetComment, stateVal:stateVal,
                                                	bundle:params.bundle, team:params.team, project:params.project, location:params.location,
-                                               	search:search, label:label, actionLabel:actionLabel, browserTest:browserTest
+                                               	search:search, label:label, actionLabel:actionLabel, browserTest:browserTest, 
+                                               	issuecomments: assetIssueCommentList, assetIssueCommentListSize: assetIssueCommentListSize
                                                	])
                                     return;
                                 } else {
                                     redirect ( action: 'cleaningAssetTask',
                                         params:[ "bundle":params.bundle, "team":params.team, "project":params.project, 
-                                                 "location":params.location,"tab":params.tab
+                                                 "location":params.location,"tab":params.tab, "issueAssetId" : String.valueOf( assetItem.id )
                                                  ])
                                     return;
                                 }

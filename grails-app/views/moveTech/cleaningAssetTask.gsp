@@ -66,11 +66,25 @@
 					<td style="text-align:right;"><input  type="text" size="10" value="" id="search" name="search" />&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/></td></tr>
 					</table>
 					</div>  
-		    <div id="mydiv" onclick="$('#mydiv').hide();setFocus()">						            
+		    <div id="mydiv" onclick="$('#mydiv').hide();setFocus();">						            
 			   		<g:if test="${flash.message}">
-					<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
-					</g:if> 
-					</div>		
+					<div style="color: red;float: left;">
+					<ul><li>${flash.message}</li>					
+					<g:each status="i" in="${issuecomments}" var="comments">
+						<g:if test="${assetIssueCommentListSize == 1}">
+							<dl>
+						  		<dt></dt><dd>${comments}</dd>
+							</dl>
+						</g:if>
+						<g:else>
+					    	<dl>
+							  <dt></dt><dd>${comments}&nbsp;( reason ${i+1} )</dd>
+							</dl>
+						</g:else>
+				  	</g:each>
+				  	</ul>
+					</div>
+					</g:if></div>	
            <div style="float:left;border:0px; width:100%; height:auto; margin:5px 0;font-size:10px "><b>My Tasks:</b></div>
            <div id="assetTable"style="float:left;width:100%;height:auto;">
                    <table id="assetTable" style="overflow:scroll;height:80px;">
