@@ -414,6 +414,21 @@ td .odd {
 	   	$("#assetId").val( asset[0].assetDetails.assetDetail.id )
 	   	$("#currentStateId").val( asset[0].assetDetails.state )
    	}
+   	function resetAssetDetails(){
+   		var tableBody = '<table style=\'border:0\' cellpadding=\'0\' cellspacing=\'0\' ><thead><tr><th colspan="2">Asset Details </th></tr></thead><tbody>'+
+		'<tr><td><b>Name: </b></td></tr><tr><td><b>Model: </b></td></tr><tr><td><b>Rack: </b></td></tr><tr><td><b>Status: </b></td></tr>'+
+		'<tr><td><b>Recent Changes: </b></td></tr><tbody></table>'
+	   	$("#asset").html(tableBody);
+	   	$("#stateSelectId").html("<option value=''>Status</option>");
+	   	$("#assignToId").html("<option value=''>Move Team</option><optgroup label='Source' id='sourceAssignTo'></optgroup><optgroup label='Target' id='targetAssignTo'></optgroup>")
+	   	var rows = $('#assetsTbody').children('tr')
+	   	for(i = 0 ; i<rows.length ; i++){
+		var rowVal = rows[i].getAttribute("value")
+		   	$("#image_"+rowVal).css('visibility','hidden');
+	   	}
+	   	var seconds = new Date().getTime() - $("#lastRefreshId").val();
+	   	timedRefresh($('#selectTimedId').val() - seconds )
+   	}
    	function displayLess(){
    		$("#recentChangesMore").hide()
    		$("#recentChangesLess").show()
@@ -696,8 +711,9 @@ td .odd {
 			<td>
 			<h1 align="right">Supervisor Console</h1>
 			</td>
-			<td style="text-align: right; vertical-align: bottom;"><input
-				type="button" value="Refresh" onclick="location.reload(true);">
+			<td style="text-align: right; vertical-align: bottom;">
+			<input type="hidden" id="lastRefreshId" name="lastRefresh" value="${new Date().getTime()}">
+			<input type="button" value="Refresh" onclick="location.reload(true);">
 			<select id="selectTimedId"
 				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(e)') }">
 				<option value="60000">1 min</option>
@@ -1035,8 +1051,8 @@ td .odd {
 							</tr>
 							<tr>
 								<td colspan="2" style="text-align: center;" class="buttonR">
-								<input type="reset" value="Cancel"
-									onclick="timedRefresh($('#selectTimedId').val())">
+								<input type="button" value="Cancel"
+									onclick="resetAssetDetails()">
 								<input type="button" value="Submit"
 									onclick="setCommentValidation();${remoteFunction(action:'createTransition', params:'\'asset=\' + $(\'#assetId\').val() +\'&state=\'+ $(\'#stateSelectId\').val() +\'&priority=\'+ $(\'#priorityId\').val() +\'&assignTo=\'+$(\'#assignToId\').val() +\'&comment=\'+$(\'#commentId\').val() ', onComplete:'updateAsset(e)')}" /></td>
 							</tr>
