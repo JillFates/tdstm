@@ -150,20 +150,27 @@
 			<g:if test="${projMap}">
 			<dl>
 			<dt onclick="window.scrollTo(0,0)" style="float: right;color: red;"><a name="#Top" href="#AssetTag">Top</a></dt><dd>&nbsp;</dd>
+			<dt>Asset Tag:</dt><dd>&nbsp;${projMap?.asset?.assetTag}</dd>
 			<dt>Asset Name:</dt><dd>&nbsp;${projMap?.asset?.assetName}</dd>
 			<dt>Model:</dt><dd>&nbsp;${projMap?.asset?.model}</dd>
-			<dt>Rack/Pos:</dt><dd>&nbsp;<g:if test="${location == 's'}">${projMap?.asset?.sourceRack}/${projMap?.asset?.sourceRackPosition}</g:if><g:else test="${location == 't'}">${projMap?.asset?.targetRack}/${projMap?.asset?.targetRackPosition}</g:else></dd>
-			<dt>New or Old:</dt><dd>&nbsp;${projMap?.asset?.newOrOld}</dd>
-			<dt>Rail Type:</dt><dd>&nbsp;${projMap?.asset?.railType}</dd>	
+			<dt>Serial #:</dt><dd>&nbsp;${projMap?.asset?.serialNumber}</dd>
 			</g:if>
 			<g:if test="${location == 's'}">			   	
 			   	<dt>Location:</dt><dd>&nbsp;${projMap?.asset?.sourceLocation}</dd>
-			   	<dt>Room:</dt><dd>&nbsp;${projMap?.asset?.sourceRoom}</dd>  			   	
+			   	<dt>Room:</dt><dd>&nbsp;${projMap?.asset?.sourceRoom}</dd>
+			   	<dt>Rack/Pos:</dt><dd>&nbsp;${projMap?.asset?.sourceRack}/${projMap?.asset?.sourceRackPosition}</dd>
+			   	<dt>New or Old:</dt><dd>&nbsp;${projMap?.asset?.newOrOld}</dd>
+				<dt>Rail Type:</dt><dd>&nbsp;${projMap?.asset?.railType}</dd>  			   	
 			   	</dl>			   	
 			</g:if>
 			<g:else>				
 			   	<dt>Location:</dt><dd>&nbsp;${projMap?.asset?.targetLocation}</dd>
-			   	<dt>Room:</dt><dd>&nbsp;${projMap?.asset?.targetRoom}</dd> 			   	
+			   	<dt>Room:</dt><dd>&nbsp;${projMap?.asset?.targetRoom}</dd>
+			   	<dt>Rack/Pos:</dt><dd>&nbsp;${projMap?.asset?.targetRack}/${projMap?.asset?.targetRackPosition}</dd>
+			   	<dt>Truck:</dt><dd>&nbsp;${projMap?.asset?.truck}</dd>
+			   	<dt>Cart/Shelf:</dt><dd>&nbsp;${projMap?.asset?.cart}/${projMap?.asset?.shelf}</dd>
+			   	<dt>New or Old:</dt><dd>&nbsp;${projMap?.asset?.newOrOld}</dd>
+				<dt>Rail Type:</dt><dd>&nbsp;${projMap?.asset?.railType}</dd>  			   	
 			   	<dt>Power Port:</dt><dd>&nbsp;${projMap?.asset?.powerPort}</dd>
 			   	<dt>NIC Port:</dt><dd>&nbsp;${projMap?.asset?.nicPort}</dd>
 			   	<dt>Remote Mgmt Port:</dt><dd>&nbsp;${projMap?.asset?.remoteMgmtPort}</dd>
