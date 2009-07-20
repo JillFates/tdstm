@@ -1114,7 +1114,11 @@ class MoveTechController {
                 assetComment.commentType = 'comment'
                 assetComment.createdBy = loginUser.person
                 assetComment.save()
-			redirect(action:assetSearch,params:params)
+            if( params.user != "ct" ) {
+            	redirect( action:assetSearch, params:params )
+            } else {
+            	redirect( action:cleaningAssetSearch, params:params )
+            }
 		} else {
         	flash.message = "Your login has expired and must login again."
         	redirect( action:'login' )

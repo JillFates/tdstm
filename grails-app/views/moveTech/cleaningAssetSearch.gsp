@@ -294,28 +294,38 @@ function mySelect(x)
         $('#serverInfoDialog').dialog('open');
         } --%>
         
-        function validation(){      
-        var enterNote = $('#enterNote').val();  
-        if(enterNote == "" || enterNote == "Enter Comment"){
-      	alert('Please enter note');
-        $('#enterNote').focus();   
-      	return false;
-      	}else{
-      	if(confirm('Are you sure?')){
-      	return true;
-      	}
-      	}   
+        function validation( actionType ){      
+	        var enterNote = $('#enterNote').val();  
+	        if(enterNote == "" || enterNote == "Enter Comment"){
+		      	alert('Please enter note');
+		        $('#enterNote').focus();   
+	      		return false;
+	      	}else{
+	      		var alertText = ""
+	      		if(actionType != 'hold'){
+	      			alertText = "Add comment, are you sure?"
+	      		} else {
+	      			alertText = "Place on HOLD, are you sure?"
+	      		}
+		      	if(confirm( alertText )){
+		      		return true;
+	      		}
+	      	}   
       	}
       	
       	
       	  
-      	function doTransition(){
-      	if(validation()){
-      	$('form#assetSearchForm').attr({action: "placeHold"});
-      	$('form#assetSearchForm').submit(); 
-      	}else {
-      	return false;
-      	}
+      	function doTransition( actionType ) {
+	      	if(validation( actionType )){
+	      		if( actionType != 'hold'){
+	      			$('form#assetSearchForm').attr({action: "addComment"});
+	      		} else {
+		      		$('form#assetSearchForm').attr({action: "placeHold"});
+		      	}
+		      	$('form#assetSearchForm').submit(); 
+	      	}else {
+	      		return false;
+	      	}
       	}
       
       	function clean(){
@@ -562,13 +572,14 @@ function mySelect(x)
 					</tr>
 					<tr>
 					<td style="width:85%">
-						
-			<g:select style="width: 170px;padding:0px;text-align:left;" from="['Select a common reason:','Device not powered down','Device is not in expected rack','Device will not power up']" id="selectCmt" name="selectCmt" value="Select a common reason:" onchange="commentSelect(this.value);"></g:select>
-			<br/>
+						<g:select style="width: 170px;padding:0px;text-align:left;" from="['Select a common reason:','Device not powered down','Device is not in expected rack','Device will not power up']" id="selectCmt" name="selectCmt" value="Select a common reason:" onchange="commentSelect(this.value);"></g:select>
+					<br/>
 					<textarea rows="5" cols="98" title="Enter Note..." id="enterNote" name="enterNote" onclick="clearComment(this)" onkeypress="clearComment(this)">Enter Comment</textarea></td>
-					
 					<g:if test="${projMap}">
-					<td class="buttonClean" style="text-align:center;vertical-align:bottom;align:left; " colspan="2"><input  type="button"	value="Place on HOLD" onclick="return doTransition()" /></td>
+					<td class="buttonClean" style="text-align:center;vertical-align:bottom;align:left; " colspan="2">
+					<input  type="button"	value="Add Comment" onclick="return doTransition('comment')" /><br/><br/>
+					<input  type="button"	value="Place on HOLD" class="placehold" onclick="return doTransition('hold')" />
+					</td>
 					</g:if>	
 					</tr>				
 					</table>

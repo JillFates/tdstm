@@ -360,6 +360,9 @@ div.tableContainer thead th{
 	letter-spacing:1px;
 	width:120px;
 }
+.buttonClean .placehold{
+	background-color:yellow;
+}
 .void_transition {
 text-decoration: line-through;	
 }

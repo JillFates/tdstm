@@ -1333,7 +1333,7 @@ class AssetEntityController {
         def assetId = params.assetVal
         def assetEnt = AssetEntity.findAll("from AssetEntity ae where ae.id in ($assetId)")
         assetEnt.each{
-	        def bundle = it.moveBundle
+        	def bundle = it.moveBundle
 	        def principal = SecurityUtils.subject.principal
 	        def loginUser = UserLogin.findByUsername(principal)
 	        def team = it.sourceTeam
@@ -1352,7 +1352,9 @@ class AssetEntityController {
 	        	flash.message = message(code :workflow.message)		            
 	        }
         }
-        redirect(action:'dashboardView',params:params)
+        
+        redirect(action:'dashboardView',params:[moveBundle:params.moveBundle, showAll:params.showAll,
+                                                projectId:params.projectId] )
     }
     
     /* --------------------------------------

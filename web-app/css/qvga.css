@@ -90,6 +90,12 @@ th {
 	font-size: 12px;
 	font-weight:bold;
 }
+.action_button_hold {
+	background-color:yellow;
+	width: 200px;
+	font-size: 12px;
+	font-weight:bold;
+}
 .confirm_checkbox {
 	width: 30px;
 	height: 30px;

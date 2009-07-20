@@ -10,20 +10,26 @@
 	
     <script type="text/javascript">
    
-        function validation(){   
+        function validation( actionType ){   
 	        var enterNote = document.assetSearchForm.enterNote.value;
 	        if(enterNote == ""){     
 	        	alert('Please enter note');
 	        	document.assetSearchForm.enterNote.focus();   
 	        	return false;
 	        }else{
-	        	if(confirm('Are you sure?')){
+	        	var alertText = ""
+	      		if(actionType != 'hold'){
+	      			alertText = "Add comment, are you sure?"
+	      		} else {
+	      			alertText = "Place on HOLD, are you sure?"
+	      		}
+	        	if(confirm( alertText )){
 	        	return true;
 	        	}
 	        }   
        }  
        function doTransition( actionType ){
-	       if(validation()){
+	       if(validation( actionType )){
 	       		if(actionType != 'hold'){
 	       			document.assetSearchForm.action = "addComment";
 	       			document.assetSearchForm.submit();
@@ -136,7 +142,7 @@
 			<td class="button_style"><input type="button" value="Add Comment" onclick="return doTransition('comment');" class="action_button"/></td>
 			<tr>
 			<tr>
-			<td class="button_style"><input type="button" value="Place on HOLD" onclick="return doTransition('hold');" class="action_button"/></td>
+			<td class="button_style"><input type="button" value="Place on HOLD" onclick="return doTransition('hold');" class="action_button_hold" /></td>
 			<tr>	
 			</table>
 			</table>
