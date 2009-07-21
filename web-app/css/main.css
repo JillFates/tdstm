@@ -30,6 +30,13 @@ h1 {
     margin: .8em 0 .3em 0;
 }
 
+.heading {
+    color: #63a242;
+    font-weight: bold;
+    font-size: 13px;
+    margin: .0em 0 .0em 0;
+}
+
 ul {
     padding-left: 15px;	
 }
@@ -124,7 +131,7 @@ td.errors input {
 /* TABLES */
 
 table {
-    border: 1px solid #5F9FCF;
+    border: 1px solid #63a242;
     width: 100%
 }
 tr {
@@ -270,4 +277,9 @@ th.desc a {
 .buttons input.save {
     background: transparent url(../images/skin/database_save.png) 5px 50% no-repeat;
     padding-left: 28px;
+}
+
+.clear {
+	float:left;
+	clear:both;
 }

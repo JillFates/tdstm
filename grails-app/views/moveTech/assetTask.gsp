@@ -85,13 +85,11 @@
 --%>
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody" style="width: 100%;" >
-				<div class="colum_techlogin" style="float:left;">
-				<div class="tech_head">
-		        	<g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt"]' class="home">Home</g:link>
-					<a href="#" class="my_task_select">My Task</a>
-					<a href="#" class="asset_search">Asset</a>
-				</div>			
-				<div class="w_techlog">				
+		<table border=0 cellpadding=0 cellspacing=0><tr>
+		<td><g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt"]' class="home">Home</g:link></td>
+		<td><a href="#" class="my_task_select">My Task</a></td>
+		<td><a href="#" class="asset_search">Asset</a></td>
+		</tr></table>
       					<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">
       					
 					        <input name="bundle" type="hidden" value="${bundle}" />
