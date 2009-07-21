@@ -227,6 +227,7 @@ function InitData()
 	}	
 	retrieve_field(document.assetSearchForm.Printers)
 	mySelect(dropdown);
+	$('#textSearchId').focus();
 }
 
 //=============================================================================
@@ -354,27 +355,24 @@ function mySelect(x)
    			$('form#assetSearchForm').submit();
       	}
         function doCheckValidation(){
-	    var j = 0;
-        var boxes = document.getElementsByTagName('input'); 
-		for (i = 0; i < boxes.length; i++) {
-          if (boxes[i].type == 'checkbox'){
-               if(boxes[i].checked == false){
-       			j=1;
-       		 }
-           }
-     	}      
-        if(j == 0){     
-        return true;
-        }else{
-        return false;
-        }     
+		    var j = 0;
+	        var boxes = document.getElementsByTagName('input'); 
+			for (i = 0; i < boxes.length; i++) {
+	          if (boxes[i].type == 'checkbox'){
+	               if(boxes[i].checked == false){
+	       			j=1;
+	       		 }
+	           }
+	     	}      
+	        if(j == 0){     
+	        	return true;
+	        }else{
+	        	return false;
+	        }     
         }
-      	function setFocus(){ 
-        $('#textSearch').focus();
-        }
-       function commentSelect(cmtVal) {
-      $('#enterNote').val(cmtVal);
-      $('#selectCmt').val('Select a common reason:');
+      function commentSelect(cmtVal) {
+	      $('#enterNote').val(cmtVal);
+	      $('#selectCmt').val('Select a common reason:');
       }
       /*-----------------------------------------------------------------------
       *To check all instructions checked or not to enable cleaned button
@@ -444,7 +442,7 @@ function mySelect(x)
 					<input name="assetTag" type="hidden" value="${projMap?.asset?.assetTag}" />
 					
 			<div style="float:right;margin-right:10px;margin-top:-20px;">
-				<input type="text" name="textSearch" size="10" />&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/>
+				<input type="text" name="textSearch" id="textSearchId" size="10" />&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/>
 			</div>		
 			<div id="mydiv" onclick='$("#mydiv").hide()'>
 					<g:if test="${flash.message}">
@@ -599,6 +597,5 @@ function mySelect(x)
 		</div>
 		</div>
 		</div>
-		<script>setFocus();</script>
 </body>
 </html>

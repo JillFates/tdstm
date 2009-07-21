@@ -876,6 +876,7 @@ class AssetEntityController {
         def bundleTeams = []
         def assetsList = []
         def totalAsset = []
+    	def totalAssetsSize = 0
         def supportTeam = new HashMap()
         def projectInstance = Project.findById( projectId )
         def moveBundleInstanceList = MoveBundle.findAll("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
@@ -919,13 +920,14 @@ class AssetEntityController {
 	        	otherTotalAsset = jdbcTemplate.queryForList( queryNotHold.append(" order by dateCreated desc").toString() )
 	        }
         	holdTotalAsset.each{
-        	totalAsset<<it
+        		totalAsset<<it
         	}
         	if( showAll ){
 		        otherTotalAsset.each{
 		        	totalAsset<<it
 		        }
         	}
+        	totalAssetsSize = holdTotalAsset.size() + otherTotalAsset.size()
 	        def projectTeamList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = ${moveBundleInstance.id} and "+
 	        											"pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport'  order by pt.name asc")
 	        // Get Id for respective States
@@ -975,7 +977,7 @@ class AssetEntityController {
 	        def transportTeam = ProjectTeam.findByTeamCode("Transport")
 	        def cleaningMembers = partyRelationshipService.getBundleTeamMembersDashboard(cleaningTeam.id)
 	        def transportMembers = partyRelationshipService.getBundleTeamMembersDashboard(transportTeam.id)
-		        supportTeam.put("totalAssets", totalAsset.size() )
+		        supportTeam.put("totalAssets", totalAssetsSize )
 		        supportTeam.put("sourceCleaned", sourceCleaned )
 		        supportTeam.put("sourceMover", sourceMover )
 		        supportTeam.put("targetMover", targetMover )
@@ -1027,7 +1029,7 @@ class AssetEntityController {
 	        return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams, 
 	                assetsList:assetsList, moveBundleInstance:moveBundleInstance, 
 	                supportTeam:supportTeam, totalUnracked:totalUnracked, totalSourceAvail:totalSourceAvail, 
-	                totalTargetAvail:totalTargetAvail, totalReracked:totalReracked, totalAsset:totalAsset.size(), 
+	                totalTargetAvail:totalTargetAvail, totalReracked:totalReracked, totalAsset:totalAssetsSize, 
 	                timeToRefresh : timeToRefresh ? timeToRefresh.SUPER_CONSOLE_REFRESH : "never", showAll : showAll ]
         } else {
 	        flash.message = "Please create bundle to view Console"	

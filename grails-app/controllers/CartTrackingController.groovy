@@ -20,6 +20,9 @@ class CartTrackingController {
 		def cartAction = params.cartAction
     	def moveBundleInstance
     	def projectId = params.projectId
+    	if( !projectId ){
+    		projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+    	}
     	def bundleId = params.moveBundle
     	def projectInstance = Project.findById( projectId )
     	def allCartTrackingDetails = []
