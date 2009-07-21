@@ -904,12 +904,12 @@ td .odd {
 							<tr>
 								<jsec:hasAnyRole in="['ADMIN','SUPERVISOR']"><th>Actions <jsec:hasRole name="ADMIN"><a href="#" onclick="selectAll()"><u
 									style="color: blue;">All</u></a></jsec:hasRole></th></jsec:hasAnyRole>
-								<g:sortableColumn property="priority" title="Priority" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
-								<g:sortableColumn property="assetTag" title="Asset Tag" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
-								<g:sortableColumn property="assetName" title="Asset Name" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
-								<g:sortableColumn property="currentState" title="Status" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
-								<g:sortableColumn property="sourceTeam" title="Source Team" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
-								<g:sortableColumn property="targetTeam" title="Target Team" params='["projectId":projectId,"moveBundle":moveBundleInstance.id]'/>
+								<g:sortableColumn property="priority" title="Priority" params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll]'/>
+								<g:sortableColumn property="assetTag" title="Asset Tag" params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll]'/>
+								<g:sortableColumn property="assetName" title="Asset Name" params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll]'/>
+								<g:sortableColumn property="currentState" title="Status" params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll]'/>
+								<g:sortableColumn property="sourceTeam" title="Source Team" params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll]'/>
+								<g:sortableColumn property="targetTeam" title="Target Team" params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll]'/>
 								<th>Issues</th>
 							</tr>
 						</thead>

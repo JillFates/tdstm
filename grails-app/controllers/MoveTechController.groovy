@@ -346,7 +346,14 @@ class MoveTechController {
             def colorCss
             def rdyState
             def ipState
-            def holdState
+            def holdState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Hold" ) 
+            if ( params.location == "s" ) {
+                rdyState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Release" )
+                ipState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Unracking" )
+            } else {
+                rdyState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Staged" )
+                ipState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Reracking" )
+            }
             def countQuery = "select a.asset_entity_id as id, a.asset_tag as assetTag, a.source_rack as sourceRack, " + 
 				            "a.source_rack_position as sourceRackPosition, a.target_rack as targetRack, " +
 				            "a.target_rack_position as targetRackPosition, a.model as model, p.current_state_id as currentStateId " +
@@ -368,23 +375,18 @@ class MoveTechController {
             }
             if( params.sort != null ){
             	if( params.sort == "source_rack" ) {
-            		query.append(" order by p.current_state_id, a.$params.sort $params.order, a.source_rack_position $params.order" )
+            		query.append(" order by p.current_state_id = $holdState desc ,p.current_state_id = $ipState desc, p.current_state_id = $rdyState desc, "+
+            					"p.current_state_id < $rdyState desc , a.$params.sort $params.order, a.source_rack_position $params.order" )
             	}else {
-            		query.append(" order by p.current_state_id, a.$params.sort $params.order" )
+            		query.append(" order by p.current_state_id = $holdState desc ,p.current_state_id = $ipState desc, p.current_state_id = $rdyState desc, "+
+            					"p.current_state_id < $rdyState desc , a.$params.sort $params.order" )
             	}
             }else {
-            	query.append(" order by p.current_state_id, a.source_rack, a.source_rack_position" )
+            	query.append(" order by p.current_state_id = $holdState desc ,p.current_state_id = $ipState desc, p.current_state_id = $rdyState desc, "+
+            				"p.current_state_id < $rdyState desc , a.source_rack, a.source_rack_position" )
             }
             proAssetMap = jdbcTemplate.queryForList ( query.toString() )
             todoSize = proAssetMap.size()
-            holdState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Hold" ) 
-            if ( params.location == "s" ) {
-                rdyState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Release" )
-                ipState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Unracking" )
-            } else {
-                rdyState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Staged" )
-                ipState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Reracking" )
-            }
             proAssetMap.each {
                 if ( it.currentStateId ) {
 	                if ( it.currentStateId == holdState ) {
