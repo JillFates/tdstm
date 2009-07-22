@@ -33,6 +33,8 @@
       padding: 0;
       width:200px;
       height:auto;
+      left:492px;
+      top:93px;
       float:left;
       z-index: 100;
     }
@@ -80,6 +82,8 @@
       padding: 0;
       width:165px;
       height:auto;
+      left:109px;
+      top:93px;
       float:left;
       z-index:100;
     }
@@ -127,6 +131,8 @@
       padding: 0;
       width:200px;
       height:auto;
+      left:275px;
+      top:93px;
       float:left;
     }
        

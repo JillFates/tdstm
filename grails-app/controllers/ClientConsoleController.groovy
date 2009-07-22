@@ -51,16 +51,18 @@ class ClientConsoleController {
             }
         }
     	if(moveBundleInstance != null){
-			def applicationList=AssetEntity.executeQuery("select distinct ae.application from AssetEntity "+
-															"ae where ae.application is not null and ae.moveBundle=${moveBundleInstance.id}")
-			def appOwnerList=AssetEntity.executeQuery("select distinct ae.appOwner from AssetEntity ae where "+
-														"ae.appOwner is not null and ae.moveBundle=${moveBundleInstance.id}")
-			def appSmeList=AssetEntity.executeQuery("select distinct ae.appSme from AssetEntity ae where ae.appSme is not null  "+
-														"and ae.moveBundle=${moveBundleInstance.id}")
+			def applicationList=AssetEntity.executeQuery("select distinct ae.application , count(ae.id) from AssetEntity "+
+															"ae where ae.application is not null and ae.moveBundle=${moveBundleInstance.id} "+
+															"group by ae.application order by ae.application")
+			def appOwnerList=AssetEntity.executeQuery("select distinct ae.appOwner, count(ae.id) from AssetEntity ae where "+
+														"ae.appOwner is not null and ae.moveBundle=${moveBundleInstance.id}"+
+														"group by ae.appOwner order by ae.appOwner")
+			def appSmeList=AssetEntity.executeQuery("select distinct ae.appSme, count(ae.id) from AssetEntity ae where ae.appSme is not null  "+
+														"and ae.moveBundle=${moveBundleInstance.id} group by ae.appSme order by ae.appSme")
 			def query = new StringBuffer("select ae.asset_entity_id as id,ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,"+
-															"ae.asset_name as assetName,max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate "+
-															" FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id and at.voided = 0 ) "+
-															"where ae.project_id = $projectId and ae.move_bundle_id = ${moveBundleInstance.id}")
+											"ae.asset_name as assetName,max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate "+
+											" FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id and at.voided = 0 ) "+
+											"where ae.project_id = $projectId and ae.move_bundle_id = ${moveBundleInstance.id}")
 			if(appValue!="" && appValue!= null){
 				def app = appValue.replace("'","\\'")
 				query.append(" and ae.application ='$app'")
