@@ -558,6 +558,7 @@ td .odd {
 			$("#currentStateId").val( asset[0].statusName )
 			$("#priorityId").val("");
 			$("#commentId").val("")
+			$('#statusCol_'+asset[0].assetEntity.id).click();
 		}
 		timedRefresh($('#selectTimedId').val());
 	}

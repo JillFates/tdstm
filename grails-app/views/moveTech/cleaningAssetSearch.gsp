@@ -16,12 +16,25 @@
 	<jq:plugin name="ui.core" />
 	<jq:plugin name="ui.dialog" />
 	<script language="JavaScript" >
+	/*--------------------------------------------------------
+	* function to call printjob when user press on 1,2,3 or 4
+	*--------------------------------------------------------*/
+	document.onkeyup = keyCheck;       
+	function keyCheck(){
+	  var keyID = event.keyCode;
+	  var labelQty = keyID - 48 
+	  if(labelQty < 5 && labelQty > 0){
+	  	$('#labelQuantity').val(labelQty);
+	  	startprintjob();
+	  }
+	}
+	
 	// Function to save a field.
 	var domain		= '';
 	var path		= '/';
 	var secure		= 0;
 	
-function save_field(obj) {
+	function save_field(obj) {
 	var cookie_value = '';
 	var objType = new String(obj.type);
 	switch(objType.toLowerCase()) {
@@ -126,7 +139,7 @@ function startprintjob(){
 		    var labelsCount = document.assetSearchForm.labels.value;  
 	
 	    // THIS IS THE PLACE TO ADD YOUR DATA
-	
+	    
 	    jobdata.ClearRecords();               					
 	    for(var label = 0; label < labelsCount; label++) {
 	    	jobdata.AddNewRecord();                					
@@ -155,6 +168,7 @@ function startprintjob(){
 		           "\nError number: " + e.number + 
 		           "\nError message: " + e.message);
 	    }
+	    $("#cleanButton").focus()
 	} catch(ex){
 		alert("It appears that your security settings are preventing printing. Please add this site to your Trusted Sites in setup.")
 	}
@@ -227,7 +241,13 @@ function InitData()
 	}	
 	retrieve_field(document.assetSearchForm.Printers)
 	mySelect(dropdown);
-	$('#textSearchId').focus();
+	
+	if(${ projMap ? true : false}){
+		$('#labelQuantity').focus();
+	} else {
+		$('#textSearchId').focus();
+	}
+		
 }
 
 //=============================================================================
@@ -499,10 +519,11 @@ function mySelect(x)
 			<table style="margin-top:10px; border:0px;">
 					<g:if test="${projMap && browserTest != true}">	
 					<tr>
-					<td style="width:85%;"><b>Quantity: </b><select name="labels" >
+					<td style="width:85%;"><b>Quantity: </b><select name="labels" id="labelQuantity" onkeypress="startprintjob()">
 					<option value="1">1</option>
 					<option value="2" selected="selected">2</option>
 					<option value="3">3</option>
+					<option value="4">4</option>
 					</select>
 					<input type= "hidden" id="RepPath" name="RepPath">
       	  				<input type= "hidden" name="PrjName" id="PrjName">
