@@ -151,6 +151,7 @@ function startprintjob(){
 	    	jobdata.SetDataField('room',document.assetSearchForm.room.value);
 	    	jobdata.SetDataField('rack',document.assetSearchForm.rack.value);
 	    	jobdata.SetDataField('upos',document.assetSearchForm.upos.value);
+	    	jobdata.SetDataField('cartQty',document.assetSearchForm.cartQty.value);
 	    }
 	    // now we print one copy of the label with default settings
 	    try {
@@ -488,6 +489,7 @@ function mySelect(x)
 					<input name="rack" type="hidden" value="${projMap?.asset?.targetRack}" />
 					<input name="upos" type="hidden" value="${projMap?.asset?.targetRackPosition}" />
 					<input name="assetTag" type="hidden" value="${projMap?.asset?.assetTag}" />
+					<input name="cartQty" type="hidden" value="${cartQty}" />
 					<input name="similarComment" id="similarComment" type="hidden" value="nosimilar"/>
 					
 			<div style="float:right;margin-right:10px;margin-top:-20px;">

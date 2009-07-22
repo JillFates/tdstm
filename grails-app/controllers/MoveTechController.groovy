@@ -599,10 +599,11 @@ class MoveTechController {
                         		}
                         	}
                         	assetComment = AssetComment.findAllByAssetEntity( assetItem )
+                        	def stateLabel = stateEngineService.getStateLabel( "STD_PROCESS", projMap.currentStateId )
                         	render ( view:'assetSearch',
                                 model:[ projMap:projMap, assetComment:assetComment?assetComment :"", stateVal:stateVal, bundle:params.bundle, 
                                 		team:params.team, project:params.project, location:params.location, search:params.search, label:label,
-                                		actionLabel:actionLabel, commentsList: commentsList	
+                                		actionLabel:actionLabel, commentsList: commentsList, stateLabel: stateLabel
                                 		])
                         }
                     }
@@ -996,13 +997,18 @@ class MoveTechController {
                             											"where a.cart = '$assetItem.cart' and a.move_bundle_id = $bundleId "+
                             											"and p.project_id = $assetItem.project.id and p.current_state_id < $cleanedId ")
                 			def cartAssetCount = jdbcTemplate.queryForInt( cartAssetCountQuery.toString() )
-                			if(cartAssetCount == 1){
-                				flash.message = "This is the last asset for cart "+assetItem.cart
+                			def cartQty
+                			if ( cartAssetCount == 1 ) {
+                				def totalCartAssetCountQuery = new StringBuffer(" select count(a.asset_entity_id) as assetCount from asset_entity a "+    									
+    																			"where a.cart = '$assetItem.cart' and a.move_bundle_id = $bundleId "+
+    																			"and a.project_id = $assetItem.project.id ")
+                				cartQty = jdbcTemplate.queryForInt( totalCartAssetCountQuery.toString() )
+                				flash.message = "This is the last asset for cart "+assetItem.cart+" which should contain "+cartQty+" assest(s)"
                 			}
                             render ( view:'cleaningAssetSearch',
                                 model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment ? assetComment :"", stateVal:stateVal, bundle:params.bundle,
                                 		team:params.team, project:params.project, location:params.location, search:search, label:label,
-                                		actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList
+                                		actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList, cartQty: cartQty
                                 		])
                         }
                     }

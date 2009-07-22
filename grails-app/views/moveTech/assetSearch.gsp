@@ -229,6 +229,7 @@
 			   		<dt>KVM Device:</dt><dd>&nbsp;${projMap?.asset?.kvmDevice}</dd>
 			   		<dt>KVM Port:</dt><dd>&nbsp;${projMap?.asset?.kvmPort}</dd>			   	
 				</g:else>
+				<dt>Current State:</dt><dd>&nbsp;${stateLabel}</dd>
 				</dl>
 				</g:if>
  			</div>	
