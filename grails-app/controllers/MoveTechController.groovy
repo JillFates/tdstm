@@ -443,6 +443,16 @@ class MoveTechController {
             if ( team ) {
             	loginTeam = ProjectTeam.findById( params.team )
             }
+            def commentListFromSession = session.getAttribute ( "COMMENT_LIST" )
+            def commentsList
+            if ( commentListFromSession ) {
+            	def commentList = commentListFromSession.split('~')
+            	commentsList = [ commentList[0], commentList[1], commentList[2] ]
+            } else {
+            	commentsList = ["Device not powered down", "Device is not in expected rack", "Device will not power up" ]
+            	session.setAttribute ( "COMMENT_LIST", "Device not powered down~Device is not in expected rack~Device will not power up" )
+            	session.setAttribute ( "COMMENT_COMPLETE", "Device not powered down~Device is not in expected rack~Device will not power up" )
+            }
             if ( search != null ) {
             	def query = new StringBuffer ("from AssetEntity ae where ae.assetTag = :search ")
                 assetItem = AssetEntity.find( query.toString(), [ search : search ] )
@@ -592,7 +602,7 @@ class MoveTechController {
                         	render ( view:'assetSearch',
                                 model:[ projMap:projMap, assetComment:assetComment?assetComment :"", stateVal:stateVal, bundle:params.bundle, 
                                 		team:params.team, project:params.project, location:params.location, search:params.search, label:label,
-                                		actionLabel:actionLabel	
+                                		actionLabel:actionLabel, commentsList: commentsList	
                                 		])
                         }
                     }
@@ -616,6 +626,21 @@ class MoveTechController {
         def principal = SecurityUtils.subject.principal
         if ( principal ) {
         	def enterNote = params.enterNote
+        	if ( params.similarComment == 'nosimilar' ) {
+	        	def truncatedComment
+				if( enterNote.length() > 25 ) {
+					truncatedComment = enterNote.substring( 0, 25 )
+				} else {
+					truncatedComment = enterNote
+				}
+				def commentListFromSession = session.getAttribute ( "COMMENT_LIST" )
+				if ( commentListFromSession ) {
+					def commentList = commentListFromSession.split('~')
+					def completeComment = session.getAttribute ( "COMMENT_COMPLETE" ).split('~')
+					session.setAttribute( "COMMENT_LIST", "${truncatedComment}~${commentList[0]}~${commentList[1]}" )
+					session.setAttribute( "COMMENT_COMPLETE", "${params.enterNote}~${completeComment[0]}~${completeComment[1]}" )
+				}
+        	}
         	def loginTeam = ProjectTeam.findById(params.team)
     		def asset = getAssetEntity ( params.search, params.user )
             def bundle = asset.moveBundle
@@ -829,11 +854,21 @@ class MoveTechController {
             if ( team ) {
             	loginTeam = ProjectTeam.findById ( params.team )
             }
+            def commentListFromSession = session.getAttribute ( "COMMENT_LIST" )
+            def commentsList
+            if ( commentListFromSession ) {
+            	def commentList = commentListFromSession.split('~')
+            	commentsList = [ commentList[0], commentList[1], commentList[2] ]
+            } else {
+            	commentsList = ["Device not powered down", "Device is not in expected rack", "Device will not power up" ]
+            	session.setAttribute ( "COMMENT_LIST", "Device not powered down~Device is not in expected rack~Device will not power up" )
+            	session.setAttribute ( "COMMENT_COMPLETE", "Device not powered down~Device is not in expected rack~Device will not power up" )
+            }
             if ( params.menu == "true" ) {
             	render(view:'cleaningAssetSearch', 
                     model:[ projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundle:params.bundle,
                             team:params.team, project:params.project, location:params.location, search:search,
-                            label:label, actionLabel:actionLabel, browserTest:browserTest
+                            label:label, actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList
                             ])
             	return;
             } else if ( search != null ) {
@@ -845,7 +880,7 @@ class MoveTechController {
                         render ( view:'cleaningAssetSearch',
                             model:[ projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundle:params.bundle,
                                     team:params.team, project:params.project, location:params.location,
-                                    search:search, label:label, actionLabel:actionLabel, browserTest:browserTest
+                                    search:search, label:label, actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList
                                     ])
                         return;
                     } else {
@@ -871,7 +906,7 @@ class MoveTechController {
                             render ( view : 'cleaningAssetSearch',
                                 model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundle:params.bundle,
                                         team:params.team, project:params.project, location:params.location, search:search, label:label,
-                                        actionLabel:actionLabel, browserTest:browserTest
+                                        actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList
                                         ])
                             return;
                         } else {
@@ -888,7 +923,7 @@ class MoveTechController {
                             render ( view:'cleaningAssetSearch',
                                 model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment, stateVal:stateVal,
                                         bundle:params.bundle, team:params.team, project:params.project, location:params.location,
-                                        search:search, label:label, actionLabel:actionLabel, browserTest:browserTest
+                                        search:search, label:label, actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList
                                         ])
                             return;
                         } else {
@@ -906,7 +941,7 @@ class MoveTechController {
                                 render(view:'cleaningAssetSearch',
                                     model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment, stateVal:stateVal,
                                             bundle:params.bundle, team:params.team, project:params.project, location:params.location,
-                                            search:search, label:label, actionLabel:actionLabel, browserTest:browserTest
+                                            search:search, label:label, actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList
                                             ])
                                 return;
                             } else {
@@ -927,7 +962,8 @@ class MoveTechController {
                                         model:[	teamMembers:teamMembers, projMap:projMap,assetComment:assetComment, stateVal:stateVal,
                                                	bundle:params.bundle, team:params.team, project:params.project, location:params.location,
                                                	search:search, label:label, actionLabel:actionLabel, browserTest:browserTest, 
-                                               	issuecomments: assetIssueCommentList, assetIssueCommentListSize: assetIssueCommentListSize
+                                               	issuecomments: assetIssueCommentList, assetIssueCommentListSize: assetIssueCommentListSize,
+                                               	commentsList: commentsList
                                                	])
                                     return;
                                 } else {
@@ -966,7 +1002,7 @@ class MoveTechController {
                             render ( view:'cleaningAssetSearch',
                                 model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment ? assetComment :"", stateVal:stateVal, bundle:params.bundle,
                                 		team:params.team, project:params.project, location:params.location, search:search, label:label,
-                                		actionLabel:actionLabel, browserTest:browserTest
+                                		actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList
                                 		])
                         }
                     }
@@ -1126,6 +1162,21 @@ class MoveTechController {
 			def asset = getAssetEntity ( params.search, params.user )
 			def assetComment = new AssetComment()
 				assetComment.comment = params.enterNote
+				if ( params.similarComment == "nosimilar" ) {
+					def truncatedComment
+					if( ( params.enterNote ).length() > 25 ) {
+						truncatedComment = params.enterNote.substring( 0, 25 )
+					} else {
+						truncatedComment = params.enterNote
+					}
+					def commentListFromSession = session.getAttribute ( "COMMENT_LIST" )
+					if ( commentListFromSession ) {
+						def commentList = commentListFromSession.split('~')
+						def completeComment = session.getAttribute ( "COMMENT_COMPLETE" ).split('~')
+						session.setAttribute( "COMMENT_LIST", "${truncatedComment}~${commentList[0]}~${commentList[1]}" )
+						session.setAttribute( "COMMENT_COMPLETE", "${params.enterNote}~${completeComment[0]}~${completeComment[1]}" )
+					}
+				}
                 assetComment.assetEntity = asset
                 assetComment.commentType = 'comment'
                 assetComment.createdBy = loginUser.person

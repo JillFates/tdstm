@@ -30,6 +30,15 @@
        }  
        function doTransition( actionType ){
 	       if(validation( actionType )){
+	       		  var splittedComment
+			      var enterNote = document.assetSearchForm.enterNote.value;
+				  var completeComment = '${session.getAttribute( "COMMENT_COMPLETE" )}'
+				  completeComment = completeComment.split('~');
+				  for ( var i=0; i<3; i++ ) {
+				  	if ( enterNote == completeComment[i] ) {
+				  		document.assetSearchForm.similarComment.value = 'null';
+				  	} 
+				  }
 	       		if(actionType != 'hold'){
 	       			document.assetSearchForm.action = "addComment";
 	       			document.assetSearchForm.submit();
@@ -67,8 +76,27 @@
        }     
       }      
       function commentSelect(cmtVal) {
-	      	document.assetSearchForm.enterNote.value = cmtVal;
-      		document.assetSearchForm.selectCmt.value = 'Select a common reason:';
+      	  var splittedComment
+		  var completeComment = '${session.getAttribute( "COMMENT_COMPLETE" )}'
+		  completeComment = completeComment.split('~');
+		  for ( var i=0; i<3; i++ ) {
+		  	if ( completeComment[i].length > 25 ) {
+		  	    if ( cmtVal != completeComment[i] ) {
+		  			splittedComment = completeComment[i].substring(0,25);
+		  		} else {
+		  			splittedComment = completeComment[i];
+		  		}
+		  	} else {
+		  		splittedComment = completeComment[i];
+		  	}
+		  	if ( cmtVal == splittedComment ) {
+		  		document.assetSearchForm.enterNote.value = completeComment[i];
+		  	}		  	
+		 }
+		 if ( cmtVal == 'Select a common reason:' ) {
+		  	document.assetSearchForm.enterNote.value = '';
+		 }
+      	 document.assetSearchForm.selectCmt.value = cmtVal;
       }
       
     </script>
@@ -95,6 +123,7 @@
 			<input name="label" type="hidden" value="${label}"  />
 			<input name="actionLabel" type="hidden" value="${actionLabel}"  />
 			<input name="user" type="hidden" value="mt"  />
+			<input name="similarComment" id="similarComment" type="hidden" value="nosimilar"/>
 
 	 	<div id="mydiv" onclick="this.style.display = 'none';">
  			<g:if test="${flash.message}">
@@ -143,7 +172,7 @@
 				<td><span style="float:right;"><a href="#top">Top</a></span></td>
 			</tr>
 			<td colspan=2>
-				<g:select style="width: 188px;padding:0px;" from="['Select a common reason:','Device not powered down','Device is not in expected rack','Device will not power up']" id="selectCmt" name="selectCmt" value="Select a common reason:" onchange="commentSelect(this.value);"></g:select>
+				<g:select style="width: 188px;padding:0px;" from="${commentsList}" id="selectCmt" name="selectCmt" value="Select a common reason:" noSelection="['Select a common reason:':'Select a common reason:']" onchange="commentSelect(this.value);"></g:select>
 			</td>
 			</tr>		
 			<tr><td colspan=2>

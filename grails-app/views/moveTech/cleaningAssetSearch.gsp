@@ -343,6 +343,15 @@ function mySelect(x)
 	      		} else {
 		      		$('form#assetSearchForm').attr({action: "placeHold"});
 		      	}
+		      	var splittedComment
+			      var enterNote = $('#enterNote').val();
+				  var completeComment = '${session.getAttribute( "COMMENT_COMPLETE" )}'
+				  completeComment = completeComment.split('~');
+				  for ( var i=0; i<3; i++ ) {
+				  	if ( enterNote == completeComment[i] ) {
+				  		$('#similarComment').val('null');
+				  	} 
+				  }
 		      	$('form#assetSearchForm').submit(); 
 	      	}else {
 	      		return false;
@@ -391,8 +400,27 @@ function mySelect(x)
 	        }     
         }
       function commentSelect(cmtVal) {
-	      $('#enterNote').val(cmtVal);
-	      $('#selectCmt').val('Select a common reason:');
+	      var splittedComment
+		  var completeComment = '${session.getAttribute( "COMMENT_COMPLETE" )}'
+		  completeComment = completeComment.split('~');
+		  for ( var i=0; i<3; i++ ) {
+		  	if ( completeComment[i].length > 25 ) {
+		  	    if ( cmtVal != completeComment[i] ) {
+		  			splittedComment = completeComment[i].substring(0,25);
+		  		} else {
+		  			splittedComment = completeComment[i];
+		  		}
+		  	} else {
+		  		splittedComment = completeComment[i];
+		  	}
+		  	if ( cmtVal == splittedComment ) {
+		  		$('#enterNote').val(completeComment[i]);
+		  	}
+		 }
+		 if ( cmtVal == 'Select a common reason:' ) {
+		  		$('#enterNote').val('Enter Comment');
+		 }
+	      $('#selectCmt').val(cmtVal);
       }
       /*-----------------------------------------------------------------------
       *To check all instructions checked or not to enable cleaned button
@@ -460,6 +488,7 @@ function mySelect(x)
 					<input name="rack" type="hidden" value="${projMap?.asset?.targetRack}" />
 					<input name="upos" type="hidden" value="${projMap?.asset?.targetRackPosition}" />
 					<input name="assetTag" type="hidden" value="${projMap?.asset?.assetTag}" />
+					<input name="similarComment" id="similarComment" type="hidden" value="nosimilar"/>
 					
 			<div style="float:right;margin-right:10px;margin-top:-20px;">
 				<input type="text" name="textSearch" id="textSearchId" size="10" />&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/>
@@ -602,7 +631,7 @@ function mySelect(x)
 					</tr>
 					<tr>
 					<td style="width:85%">
-						<g:select style="width: 170px;padding:0px;text-align:left;" from="['Select a common reason:','Device not powered down','Device is not in expected rack','Device will not power up']" id="selectCmt" name="selectCmt" value="Select a common reason:" onchange="commentSelect(this.value);"></g:select>
+						<g:select style="width: 170px;padding:0px;text-align:left;" from="${commentsList}" id="selectCmt" name="selectCmt" value="Select a common reason:" noSelection="['Select a common reason:':'Select a common reason:']" onchange="commentSelect(this.value);"></g:select>
 					<br/>
 					<textarea rows="5" cols="98" title="Enter Note..." id="enterNote" name="enterNote" onclick="clearComment(this)" onkeypress="clearComment(this)">Enter Comment</textarea></td>
 					<g:if test="${projMap}">
