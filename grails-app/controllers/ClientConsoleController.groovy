@@ -52,28 +52,40 @@ class ClientConsoleController {
         }
     	if(moveBundleInstance != null){
 			def applicationList=AssetEntity.executeQuery("select distinct ae.application , count(ae.id) from AssetEntity "+
-															"ae where ae.application is not null and ae.moveBundle=${moveBundleInstance.id} "+
+															"ae where  ae.moveBundle=${moveBundleInstance.id} "+
 															"group by ae.application order by ae.application")
 			def appOwnerList=AssetEntity.executeQuery("select distinct ae.appOwner, count(ae.id) from AssetEntity ae where "+
-														"ae.appOwner is not null and ae.moveBundle=${moveBundleInstance.id}"+
-														"group by ae.appOwner order by ae.appOwner")
-			def appSmeList=AssetEntity.executeQuery("select distinct ae.appSme, count(ae.id) from AssetEntity ae where ae.appSme is not null  "+
-														"and ae.moveBundle=${moveBundleInstance.id} group by ae.appSme order by ae.appSme")
+														"ae.moveBundle=${moveBundleInstance.id} group by ae.appOwner order by ae.appOwner")
+			def appSmeList=AssetEntity.executeQuery("select distinct ae.appSme, count(ae.id) from AssetEntity ae where "+
+														" ae.moveBundle=${moveBundleInstance.id} group by ae.appSme order by ae.appSme")
 			def query = new StringBuffer("select ae.asset_entity_id as id,ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,"+
 											"ae.asset_name as assetName,max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate "+
 											" FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id and at.voided = 0 ) "+
 											"where ae.project_id = $projectId and ae.move_bundle_id = ${moveBundleInstance.id}")
 			if(appValue!="" && appValue!= null){
-				def app = appValue.replace("'","\\'")
-				query.append(" and ae.application ='$app'")
+				if(appValue == 'blank'){
+					query.append(" and ae.application is null")
+				} else {
+					def app = appValue.replace("'","\\'")
+					query.append(" and ae.application ='$app'")
+				}
 			}
 			if(appOwnerValue!="" && appOwnerValue!= null){
-				def owner = appOwnerValue.replace("'","\\'")
-				query.append(" and ae.app_owner='$owner'")
+				if(appOwnerValue == 'blank'){
+					query.append(" and ae.app_owner is null")
+				} else {
+					def owner = appOwnerValue.replace("'","\\'")
+					query.append(" and ae.app_owner='$owner'")
+				}
+				
 			}
 			if(appSmeValue!="" && appSmeValue!= null){
-				def sme = appSmeValue.toString().replace("'","\\'")
-				query.append(" and ae.app_sme='$sme'")
+				if(appSmeValue == 'blank'){
+					query.append(" and ae.app_sme is null")
+				} else {
+					def sme = appSmeValue.toString().replace("'","\\'")
+					query.append(" and ae.app_sme='$sme'")
+				}
 			}
 			query.append(" GROUP BY ae.asset_entity_id")
         

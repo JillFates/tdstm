@@ -621,22 +621,22 @@ function resolveValidate(formName,idVal){
 	<td>&nbsp;</td>
 			
 			<td style="padding-left: 0px;"><select id="applicationId" name="application" onchange="document.listForm.submit();" style="width: 120px;">
-				<option value="">All</option>
+				<option value="" selected="selected">All</option>
 				<g:each in="${applicationList}" var="application">
-					<option value="${application[0]}">${application[0]}&nbsp;(${application[1]})</option>
+					<option value="${application[0]}">${application[0] ? application[0] : 'blank'}&nbsp;(${application[1]})</option>
 				</g:each>
 			</select></td>
 			<td style="padding-left: 0px;"><select id="appOwnerId" name="appOwner"	onchange="document.listForm.submit();" style="width: 120px;">
-				<option value="">All</option>
+				<option value="" selected="selected">All</option>
 				<g:each in="${appOwnerList}" var="appOwner">
-					<option value="${appOwner[0]}">${appOwner[0]}&nbsp;(${appOwner[1]})</option>
+					<option value="${appOwner[0] ? appOwner[0] : 'blank'}">${appOwner[0] ? appOwner[0] : 'blank'}&nbsp;(${appOwner[1]})</option>
 				</g:each>
 			</select></td>
 			<td style="padding-left: 0px;"><input type="hidden" id="projectId" name="projectId" value="${projectId }" />
 			 <select id="appSmeId" name="appSme" onchange="document.listForm.submit();" style="width: 120px;">
-				<option value="">All</option>
+				<option value="" selected="selected">All</option>
 				<g:each in="${appSmeList}" var="appSme">
-					<option value="${appSme[0]}">${appSme[0]}&nbsp;(${appSme[1]})</option>
+					<option value="${appSme[0] ? appSme[0] : 'blank'}">${appSme[0] ? appSme[0] : 'blank'}&nbsp;(${appSme[1]})</option>
 				</g:each>
 			</select></td>
 	<td style="padding-left: 0px;"><select style="width: 120px;visibility: hidden;"/></td>
