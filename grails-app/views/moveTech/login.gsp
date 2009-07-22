@@ -25,35 +25,30 @@
 	<div style="width: 200px;" class="message">${flash.message}</div>
 	</g:if>
 	<div
-		style="float: left; padding-left: 2px; width: 98%; margin-top: 25px;"><a
-		href="http://www.transitionaldata.com/" target="new"><img
+		style="float: left; padding-left: 2px; width: 98%; margin-top: 2px;">
+		<img
 		src="${createLinkTo(dir:'images',file:'tds_movetech.jpg')}" border="0"
-		alt="tds" /></a></div>
+		alt="tds" />
+	</div>
 
 	<div
-		style="float: left; width: 100%; margin: 12px 0; text-align: center;">
+		style="float: left; width: 100%; margin: 4px 0; text-align: center;">
 	<table style="border: 0px;">
 		<tbody>
 			<tr>
-				<td height="5px;"></td>
+				<td height="2px;"></td>
 			</tr>
 			<tr>
-				<td colspan="2" style="text-align: center;"><span
+				<td style="text-align: center;"><span
 					style="color: #328714; font: bold 15px arial;">Transition
 				Manager</span></td>
-			</tr>
-			<tr>
-				<td height="25px;"></td>
 			</tr>
 			<tr>
 				<td style="text-align:center;"><label>Username:</label>
 				<input type="text" size="10" name="username" value="${username}" /></td>
 			</tr>
 			<tr>
-				<td height="25px;"></td>
-			</tr>
-			<tr>
-				<td class="buttonR" style="text-align: center;" COLSPAN="2"><input
+				<td class="buttonR" style="text-align: center;"><input
 					type="submit" value="Login" /></td>
 			</tr>
 		</tbody>
