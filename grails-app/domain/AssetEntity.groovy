@@ -5,7 +5,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String serialNumber	
 	String manufacturer
 	String model
-	String application
+	String application = ""
 	PartyGroup owner
 	String sourceLocation
 	String sourceRoom
@@ -28,8 +28,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String powerPort
 	String remoteMgmtPort
 	String truck
-	String appOwner
-	String appSme
+	String appOwner = ""
+	String appSme = ""
 	Integer priority 
 	Project project
 
@@ -73,11 +73,11 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		remoteMgmtPort( blank:true, nullable:true )
 		truck( blank:true, nullable:true )		
 		project( nullable:false )
-		application( blank:true, nullable:true )
+		application( blank:true, nullable:false )
 		owner( nullable:true )
-		appOwner( blank:true,nullable:true)
-		appSme(nullable:true)
-		priority(nullable:true, inList:[1,2,3])
+		appOwner( blank:true,nullable:false )
+		appSme( blank:true, nullable:false )
+		priority( nullable:true, inList:[1,2,3] )
 		
 
 		// The following were the MoveBundleAsset fields
@@ -90,7 +90,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	
 	static mapping  = {	
 		version true
-		id column:'asset_entity_id'			
+		id column:'asset_entity_id'
 	}
 	
 	String toString(){

@@ -623,7 +623,7 @@ function resolveValidate(formName,idVal){
 			<td style="padding-left: 0px;"><select id="applicationId" name="application" onchange="document.listForm.submit();" style="width: 120px;">
 				<option value="" selected="selected">All</option>
 				<g:each in="${applicationList}" var="application">
-					<option value="${application[0]}">${application[0] ? application[0] : 'blank'}&nbsp;(${application[1]})</option>
+					<option value="${application[0] ? application[0] : 'blank'}">${application[0] ? application[0] : 'blank'}&nbsp;(${application[1]})</option>
 				</g:each>
 			</select></td>
 			<td style="padding-left: 0px;"><select id="appOwnerId" name="appOwner"	onchange="document.listForm.submit();" style="width: 120px;">

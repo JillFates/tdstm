@@ -64,7 +64,7 @@ class ClientConsoleController {
 											"where ae.project_id = $projectId and ae.move_bundle_id = ${moveBundleInstance.id}")
 			if(appValue!="" && appValue!= null){
 				if(appValue == 'blank'){
-					query.append(" and ae.application is null")
+					query.append(" and ae.application = '' ")
 				} else {
 					def app = appValue.replace("'","\\'")
 					query.append(" and ae.application ='$app'")
@@ -72,7 +72,7 @@ class ClientConsoleController {
 			}
 			if(appOwnerValue!="" && appOwnerValue!= null){
 				if(appOwnerValue == 'blank'){
-					query.append(" and ae.app_owner is null")
+					query.append(" and ae.app_owner = '' ")
 				} else {
 					def owner = appOwnerValue.replace("'","\\'")
 					query.append(" and ae.app_owner='$owner'")
@@ -81,7 +81,7 @@ class ClientConsoleController {
 			}
 			if(appSmeValue!="" && appSmeValue!= null){
 				if(appSmeValue == 'blank'){
-					query.append(" and ae.app_sme is null")
+					query.append(" and ae.app_sme = '' ")
 				} else {
 					def sme = appSmeValue.toString().replace("'","\\'")
 					query.append(" and ae.app_sme='$sme'")
