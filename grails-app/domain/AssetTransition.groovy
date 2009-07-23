@@ -30,10 +30,10 @@ class AssetTransition {
 		projectTeam( nullable:true )		// Not all transitions are performed by teams
 		userLogin( nullable:false )		// Transitions are all by users
 		timeElapsed( nullable:false )
-		wasOverridden( range:0..1 )
-		wasSkippedTo( range:0..1 )
+		wasOverridden( range:0..1, nullable:false )
+		wasSkippedTo( range:0..1, nullable:false )
 		lastUpdated( nullable:true )
-		voided( range:0..1 )
+		voided( range:0..1, nullable:false )
 	}	
 	
 	static mapping  = {
