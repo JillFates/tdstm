@@ -41,6 +41,7 @@ td .odd {
 	    $("#showCommentDialog").dialog({ autoOpen: false })
 	    $("#editCommentDialog").dialog({ autoOpen: false })
 	    $("#showChangeStatusDialog").dialog({ autoOpen: false })
+	    $('#filterDialog').dialog({ autoOpen: false })
 	    
 	})
 </script>
@@ -53,6 +54,7 @@ td .odd {
 		$('#editCommentDialog').dialog('close');
 		$('#showCommentDialog').dialog('close');
 		$("#showChangeStatusDialog").dialog('close');
+		$('#filterDialog').dialog('close');
 		var browser=navigator.appName;
       	var assetEntityAttributes = eval('(' + e.responseText + ')');
       	var autoComp = new Array()      			
@@ -500,6 +502,11 @@ td .odd {
 	   if(showAll == 'show'){
 	   		$("#showAllCheckbox").attr('checked',true)
 	   }
+	   $("#filterStateId").val('${params.currentState}');
+	   $("#filterApplicationId").val('${params.application}');
+	   $("#filterAppSmeId").val('${params.appSme}');
+	   $("#filterAppOwnerId").val('${params.appOwner}');
+	   
    	}
    	function setComment(e){
 	   	var commentStatus = eval("(" + e.responseText + ")")
@@ -650,8 +657,38 @@ td .odd {
 		$('#showDialog').dialog('close');
 		$('#editDialog').dialog('close');
 		$('#createDialog').dialog('close');
+		$('#filterDialog').dialog('close');
 		document.createCommentForm.mustVerify.value=0;
 		document.createCommentForm.reset();
+	}
+	function showfilterDialog(){
+		timedRefresh('never')
+		$('#createCommentDialog').dialog('close');
+		$('#commentsListDialog').dialog('close');
+		$('#editCommentDialog').dialog('close');
+		$('#showCommentDialog').dialog('close');
+		$('#showDialog').dialog('close');
+		$('#editDialog').dialog('close');
+		$('#createDialog').dialog('close');
+		$('#filterDialog').dialog('open');
+	}
+	<%--/* --------------------------------------------
+	*	Function to get assets by Team
+	*---------------------------------------------*/
+	function filterByTeam( team ){
+		$("#showAllId").val('show');
+		$("#teamId").val( team );
+		$("form#dashboardForm").submit();
+	}--%>
+	/* --------------------------------------------
+	*	Function to get assets by Team
+	*---------------------------------------------*/
+	function filterByDataPoints(assetLocation, team, assetStatus){
+		$("#showAllId").val('show');
+		$("#teamId").val( team );
+		$("#assetLocationId").val( assetLocation );
+		$("#assetStatusId").val( assetStatus );
+		$("form#dashboardForm").submit();
 	}
     </script>
 </head>
@@ -665,7 +702,7 @@ td .odd {
 	id="projectId" value="${projectId}" /> <input type="hidden"
 	name="moveBundle" id="moveBundle" value="${moveBundleInstance.id}" />
 	<input type="hidden" name="showAll" id="showAllInChangeStatus">
-<table style="border: 0px; width: 100%">
+		<table style="border: 0px; width: 100%">
 	<tr>
 		<td width="40%"><strong>Change status for selected
 		devices to:</strong></td>
@@ -696,6 +733,9 @@ td .odd {
 	controller="assetEntity" action="dashboardView">
 	<input type="hidden" name="projectId" value="${projectId}">
 	<input type="hidden" name="showAll" id="showAllId">
+	<input type="hidden" name="team" id="teamId">
+	<input type="hidden" name="assetLocation" id="assetLocationId">
+	<input type="hidden" name="assetStatus" id="assetStatusId">
 	<div class="dialog">
 	<table style="border: 0px;">
 		<tr class="prop">
@@ -727,7 +767,6 @@ td .odd {
 		</tr>
 	</table>
 	</div>
-
 </g:form>
 <div style="width: 100%; float: left; border: 1px solid #cccccc;">
 <table style="border: 0px">
@@ -787,12 +826,18 @@ td .odd {
 									</td>
 								</tr>
 								<tr>
-									<td class="odd">${bundleTeam?.sourceAvailassets} /
-									${bundleTeam?.unrackedAssets} / ${bundleTeam?.sourceAssets}</td>
+									<td class="odd">
+										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_avail')">${bundleTeam?.sourceAvailassets}</a> /
+										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_done')"> ${bundleTeam?.unrackedAssets}</a> / 
+										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','')"> ${bundleTeam?.sourceAssets}</a>
+									</td>
 								</tr>
 								<tr>
-									<td nowrap>${bundleTeam?.targetAvailAssets} /
-									${bundleTeam?.rerackedAssets} / ${bundleTeam?.targetAssets}</td>
+									<td nowrap>
+										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_avail')">${bundleTeam?.targetAvailAssets}</a> /
+										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_done')"> ${bundleTeam?.rerackedAssets}</a> / 
+										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','')">${bundleTeam?.targetAssets}</a>
+									</td>
 								</tr>
 							</table>
 							</td>
@@ -863,12 +908,18 @@ td .odd {
 						<td>&nbsp;</td>
 					</tr>
 					<tr>
-						<td class="odd">${totalSourceAvail} / ${totalUnracked} /
-						${totalAsset}</td>
+						<td class="odd">
+							<a href="#" onclick="filterByDataPoints('source','','source_avail')">${totalSourceAvail}</a> /
+							<a href="#" onclick="filterByDataPoints('source','','source_done')"> ${totalUnracked}</a> / 
+							<a href="#" onclick="filterByDataPoints('source','','')"> ${totalAsset}</a>
+						</td>
 					</tr>
 					<tr>
-						<td nowrap>${totalTargetAvail} / ${totalReracked} /
-						${totalAsset}</td>
+						<td nowrap>
+							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_avail')">${totalTargetAvail}</a> /
+							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_done')">${totalReracked}</a> / 
+							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','')">${totalAsset}</a>
+						</td>
 					</tr>
 				</table>
 				</div>
@@ -898,19 +949,48 @@ td .odd {
 									value="State..." onclick="changeState()" title="Change State" />
 								</td>
 								</jsec:hasRole>
-								<td style="vertical-align: middle;" colspan="2">
-									<input type="checkbox" onclick="showAll()" id="showAllCheckbox"/>&nbsp;Show All
+								<td style="vertical-align: middle;" colspan="3">
+									<label for="showAllCheckbox"><input type="checkbox" onclick="showAll()" id="showAllCheckbox"/>&nbsp;Show All&nbsp;</label>
+									<input type="button" onclick="showfilterDialog()" id="filterButtonId" value="Filter"/>&nbsp;
+									<g:if test="${params.application || params.appOwner || params.appSme || params.currentState || params.assetLocation || params.assetStatus }">
+									<a href="#" style="font-size: 14px;font-weight: bolder;color: #B80000 ;vertical-align: baseline;"
+										onclick="document.filterForm.reset();$('#filterShowAllId').val('');document.filterForm.submit();">X</a>
+									</g:if>
 								</td>
 							</tr>
 							<tr>
 								<jsec:hasAnyRole in="['ADMIN','SUPERVISOR']"><th>Actions <jsec:hasRole name="ADMIN"><a href="#" onclick="selectAll()"><u
 									style="color: blue;">All</u></a></jsec:hasRole></th></jsec:hasAnyRole>
-								<g:sortableColumn property="priority" title="Priority" params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll]'/>
-								<g:sortableColumn property="assetTag" title="Asset Tag" params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll]'/>
-								<g:sortableColumn property="assetName" title="Asset Name" params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll]'/>
-								<g:sortableColumn property="currentState" title="Status" params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll]'/>
-								<g:sortableColumn property="sourceTeam" title="Source Team" params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll]'/>
-								<g:sortableColumn property="targetTeam" title="Target Team" params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll]'/>
+								<g:sortableColumn property="priority" title="Priority" 
+									params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll,
+											application:params.application,appOwner:params.appOwner,appSme:params.appSme,
+											currentState:params.currentState,team:params.team,assetLocation:params.assetLocation,
+											assetStatus:params.assetStatus]'/>
+								<g:sortableColumn property="assetTag" title="Asset Tag" 
+									params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll,
+											application:params.application,appOwner:params.appOwner,appSme:params.appSme,
+											currentState:params.currentState,team:params.team,assetLocation:params.assetLocation,
+											assetStatus:params.assetStatus]'/>
+								<g:sortableColumn property="assetName" title="Asset Name" 
+									params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll,
+											application:params.application,appOwner:params.appOwner,appSme:params.appSme,
+											currentState:params.currentState,team:params.team,assetLocation:params.assetLocation,
+											assetStatus:params.assetStatus]'/>
+								<g:sortableColumn property="currentState" title="Status" 
+									params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll,
+											application:params.application,appOwner:params.appOwner,appSme:params.appSme,
+											currentState:params.currentState,team:params.team,assetLocation:params.assetLocation,
+											assetStatus:params.assetStatus]'/>
+								<g:sortableColumn property="sourceTeam" title="Source Team" 
+									params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll,
+											application:params.application,appOwner:params.appOwner,appSme:params.appSme,
+											currentState:params.currentState,team:params.team,assetLocation:params.assetLocation,
+											assetStatus:params.assetStatus]'/>
+								<g:sortableColumn property="targetTeam" title="Target Team" 
+									params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll,
+											application:params.application,appOwner:params.appOwner,appSme:params.appSme,
+											currentState:params.currentState,team:params.team,assetLocation:params.assetLocation,
+											assetStatus:params.assetStatus]'/>
 								<th>Issues</th>
 							</tr>
 						</thead>
@@ -1368,9 +1448,68 @@ Comment</a></span></div>
 		</div>
 </g:form></div>
 
+<div id="filterDialog" title="Filter" style="display: none;">
+	<g:form name="filterForm" action="dashboardView">
+		<input type="hidden" name="projectId" value="${projectId}" />
+		<input type="hidden" name="moveBundle" value="${moveBundleInstance.id}" />
+		<input type="hidden" name="showAll" id="filterShowAllId" value="${showAll}">
+		<table>
+			<tr>
+				<td>Application : </td>
+				<td >
+					<select name="application" id="filterApplicationId" style="width: 120px;">
+						<option value="" selected="selected">All</option>
+						<g:each in="${applicationList}" var="application">
+							<option value="${application[0]}">${application[0] ? application[0] : 'blank'}&nbsp;(${application[1]})</option>
+						</g:each>
+					</select>	
+				</td>
+			</tr>
+			<tr>
+				<td>App Owner : </td>
+				<td >
+					<select name="appOwner" id="filterAppOwnerId" style="width: 120px;">
+						<option value="" selected="selected">All</option>
+						<g:each in="${appOwnerList}" var="appOwner">
+							<option value="${appOwner[0] ? appOwner[0] : 'blank'}">${appOwner[0] ? appOwner[0] : 'blank'}&nbsp;(${appOwner[1]})</option>
+						</g:each>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>App SME : </td>
+				<td >
+					<select name="appSme" id="filterAppSmeId" style="width: 120px;">
+						<option value="" selected="selected">All</option>
+						<g:each in="${appSmeList}" var="appSme">
+							<option value="${appSme[0] ? appSme[0] : 'blank'}">${appSme[0] ? appSme[0] : 'blank'}&nbsp;(${appSme[1]})</option>
+						</g:each>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>Current State : </td>
+				<td >
+					<select name="currentState" id="filterStateId" style="width: 120px;" >
+						<option value="" selected="selected">All</option>
+						<g:each in="${transitionStates}" var="transitionState">
+							<option value="${transitionState.state}">${transitionState.stateLabel}</option>
+						</g:each>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" style="text-align: center;"><input type="reset" value="Cancel" onclick="$('#filterDialog').dialog('close');">
+				<input type="reset" value="Clear">
+				<input type="submit" value="Apply" onclick="$('#filterShowAllId').val('show')">				
+				</td>
+			</tr>
+		</table>
+	</g:form>
+</div>
+
 <script type="text/javascript">
 bundleChange();
-
 timedRefresh($("#selectTimedId").val())
 </script>
 </div>

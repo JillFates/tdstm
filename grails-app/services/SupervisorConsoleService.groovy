@@ -1,0 +1,100 @@
+/*---------------------------------------
+ * @author : Lokanath Reddy
+ *--------------------------------------*/
+class SupervisorConsoleService {
+	def stateEngineService
+    boolean transactional = true
+    /*----------------------------------------
+     * @author : Lokanath Reddy
+     * @param  : move bundle and request params
+     * @return : Query for Supervisor console  
+     *----------------------------------------*/
+    def getQueryForConsole( def moveBundleInstance, def params, def type ) {
+    	// filter params
+        def application = params.application
+        def currentState = params.currentState
+        def appOwner = params.appOwner
+        def appSme = params.appSme
+        def filterTeam = params.team
+        def assetLocation = params.assetLocation
+        def assetStatus = params.assetStatus
+        def sortField = params.sort
+        def orderField = params.order
+        def holdCheck = true
+        def rerackedId = stateEngineService.getStateId( "STD_PROCESS", "Reracked" )
+        def stagedId = stateEngineService.getStateId( "STD_PROCESS", "Staged" )
+        def unrackedId = stateEngineService.getStateId( "STD_PROCESS", "Unracked" )
+        def releasedId = stateEngineService.getStateId( "STD_PROCESS", "Release" )
+        def queryForConsole = new StringBuffer("select max(at.date_created) as dateCreated, ae.asset_entity_id as id, ae.priority, "+
+						"ae.asset_tag as assetTag, ae.asset_name as assetName, ae.source_team_id as sourceTeam, " + 
+						"ae.target_team_id as targetTeam, pm.current_state_id as currentState FROM asset_entity ae " +
+						"LEFT JOIN asset_transition at ON ( at.asset_entity_id = ae.asset_entity_id and at.voided = 0 ) " + 
+						"LEFT JOIN project_asset_map pm ON (pm.asset_id = ae.asset_entity_id) " + 
+						"where ae.project_id = ${moveBundleInstance.project.id} and ae.move_bundle_id = ${moveBundleInstance.id} ")
+		if(application){
+			if(application == "blank"){
+				queryForConsole.append(" and ae.application = '' ")
+			} else {
+				queryForConsole.append(" and ae.application = '$application' ")
+			}
+		}
+		if(appOwner){
+			if(appOwner == "blank"){
+				queryForConsole.append(" and ae.app_owner = '' ")
+			} else {
+				queryForConsole.append(" and ae.app_owner = '$appOwner' ")
+			}
+		}
+		if(appSme){
+			if(appOwner == "blank"){
+				queryForConsole.append(" and ae.app_sme = '' ")
+			} else {
+				queryForConsole.append(" and ae.app_sme = '$appSme' ")
+			}
+		}
+		if(filterTeam){
+			if(assetLocation){
+				if(assetLocation == "source"){
+					queryForConsole.append(" and ae.source_team_id = $filterTeam ")
+				} else if(assetLocation == "target"){
+					queryForConsole.append(" and ae.target_team_id = $filterTeam ")
+				}
+			} else {
+				queryForConsole.append(" and ( ae.source_team_id = $filterTeam or ae.target_team_id = $filterTeam ) ")
+			}
+		}
+		
+		if(assetStatus){
+			if(type != 'hold'){
+				if(assetStatus == 'source_avail'){
+					queryForConsole.append(" and pm.current_state_id >= $releasedId and pm.current_state_id < $unrackedId ")
+				} else if(assetStatus == 'source_done'){
+					queryForConsole.append(" and pm.current_state_id >= $unrackedId ")
+				} else if(assetStatus == 'target_avail'){
+					queryForConsole.append(" and pm.current_state_id >= $stagedId and pm.current_state_id < $rerackedId")
+				} else if(assetStatus == 'target_done'){
+					queryForConsole.append(" and pm.current_state_id >= $rerackedId ")
+				}
+			} else {
+				queryForConsole.append(" and pm.current_state_id != 10 ")
+			}
+		}
+		if(currentState){
+			def stateId = stateEngineService.getStateIdAsInt( "STD_PROCESS", currentState )
+			queryForConsole.append(" and pm.current_state_id = $stateId ")
+		} else {
+			if(type != 'hold'){
+				queryForConsole.append(" and ( pm.current_state_id != 10 or pm.current_state_id is null ) ")
+			} else {
+				queryForConsole.append(" and pm.current_state_id = 10 ")
+			}
+		}
+		queryForConsole.append(" group by ae.asset_entity_id " )
+		if( sortField ) {
+			queryForConsole.append(" order by ${sortField} ${orderField}" )
+		} else {
+			queryForConsole.append(" order by date_created desc ")
+		}
+		return queryForConsole.toString()
+    }
+}

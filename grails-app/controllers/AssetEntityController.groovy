@@ -20,6 +20,7 @@ class AssetEntityController {
 	def stateEngineService
 	def workflowService
 	def userPreferenceService
+	def supervisorConsoleService
 	def assetEntityInstanceList = []
 	def jdbcTemplate
     def filterService
@@ -870,8 +871,7 @@ class AssetEntityController {
     	def showAll = params.showAll
         def projectId = params.projectId
         def bundleId = params.moveBundle
-        def sortField = params.sort
-        def orderField = params.order
+        def currentState = params.currentState
         def assetList
         def bundleTeams = []
         def assetsList = []
@@ -900,37 +900,7 @@ class AssetEntityController {
         }
         // get the list of assets order by Hold and recent asset Transition
         if( moveBundleInstance != null ){
-        	def holdTotalAsset
-        	def otherTotalAsset
-        	def queryHold = new StringBuffer("select max(at.date_created) as dateCreated, ae.asset_entity_id as id, ae.priority, ae.asset_tag as assetTag, ae.asset_name as assetName, " + 
-        								     "ae.source_team_id as sourceTeam, ae.target_team_id as targetTeam, pm.current_state_id as currentState FROM asset_entity ae " +
-        								     "LEFT JOIN asset_transition at ON ( at.asset_entity_id = ae.asset_entity_id and at.voided = 0 ) LEFT JOIN project_asset_map pm ON (pm.asset_id = ae.asset_entity_id) " + 
-        	                                 "where ae.project_id = ${moveBundleInstance.project.id} and ae.move_bundle_id = ${moveBundleInstance.id} and pm.current_state_id = 10 group by ae.asset_entity_id")
-        	
-        	def queryNotHold = new StringBuffer("select max(at.date_created) as dateCreated, ae.asset_entity_id as id, ae.priority, ae.asset_tag as assetTag, ae.asset_name as assetName, " + 
-					                            "ae.source_team_id as sourceTeam, ae.target_team_id as targetTeam, pm.current_state_id as currentState FROM asset_entity ae " +
-					                            "LEFT JOIN asset_transition at ON ( at.asset_entity_id = ae.asset_entity_id and at.voided = 0 ) LEFT JOIN project_asset_map pm ON (pm.asset_id = ae.asset_entity_id) " + 
-                                                "where ae.project_id = ${moveBundleInstance.project.id} and ae.move_bundle_id = ${moveBundleInstance.id} and ( pm.current_state_id != 10 or pm.current_state_id is null ) group by ae.asset_entity_id")
-        	
-	        if( sortField ) {
-		        holdTotalAsset = jdbcTemplate.queryForList( queryHold.append(" order by ${sortField} ${orderField}").toString() )
-		        otherTotalAsset = jdbcTemplate.queryForList( queryNotHold.append(" order by ${sortField} ${orderField}").toString() )
-	        } else {
-	        	holdTotalAsset = jdbcTemplate.queryForList( queryHold.append(" order by dateCreated desc").toString() )
-	        	otherTotalAsset = jdbcTemplate.queryForList( queryNotHold.append(" order by dateCreated desc").toString() )
-	        }
-        	holdTotalAsset.each{
-        		totalAsset<<it
-        	}
-        	if( showAll ){
-		        otherTotalAsset.each{
-		        	totalAsset<<it
-		        }
-        	}
-        	totalAssetsSize = holdTotalAsset.size() + otherTotalAsset.size()
-	        def projectTeamList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = ${moveBundleInstance.id} and "+
-	        											"pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport'  order by pt.name asc")
-	        // Get Id for respective States
+        	//  Get Id for respective States
 	        def cleanedId = stateEngineService.getStateId( "STD_PROCESS", "Cleaned" )
 	        def rerackedId = stateEngineService.getStateId( "STD_PROCESS", "Reracked" )
 	        def onCartId = stateEngineService.getStateId( "STD_PROCESS", "OnCart" )
@@ -938,6 +908,24 @@ class AssetEntityController {
 	        def unrackedId = stateEngineService.getStateId( "STD_PROCESS", "Unracked" )
 	        def holdId = stateEngineService.getStateId( "STD_PROCESS", "Hold" )
 	        def releasedId = stateEngineService.getStateId( "STD_PROCESS", "Release" )
+	        def queryHold = supervisorConsoleService.getQueryForConsole( moveBundleInstance, params, 'hold')
+        	def queryNotHold = supervisorConsoleService.getQueryForConsole(moveBundleInstance,params, 'notHold')
+        	def holdTotalAsset = jdbcTemplate.queryForList( queryHold )
+        	def otherTotalAsset = jdbcTemplate.queryForList( queryNotHold )
+        	
+        	if(!currentState){
+	        	holdTotalAsset.each{
+	        		totalAsset<<it
+	        	}
+        	}
+        	if( showAll ){
+		        otherTotalAsset.each{
+		        	totalAsset<<it
+		        }
+        	}
+        	totalAssetsSize = jdbcTemplate.queryForInt("select count(a.asset_entity_id) from asset_entity a where a.move_bundle_id = ${moveBundleInstance.id}" )
+	        def projectTeamList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = ${moveBundleInstance.id} and "+
+	        											"pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport'  order by pt.name asc")
 	        projectTeamList.each{
 	            def teamMembers = partyRelationshipService.getBundleTeamMembersDashboard(it.id)
 	            def member
@@ -1026,11 +1014,30 @@ class AssetEntityController {
 	        											" group by e.asset_entity_id HAVING maxstate < $rerackedId ").size() 
 	        	userPreferenceService.loadPreferences("SUPER_CONSOLE_REFRESH")
 	        def timeToRefresh = getSession().getAttribute("SUPER_CONSOLE_REFRESH")
+	        /*Get data for filter dropdowns*/
+	        def applicationList=AssetEntity.executeQuery("select distinct ae.application , count(ae.id) from AssetEntity "+
+															"ae where  ae.moveBundle=${moveBundleInstance.id} "+
+															"group by ae.application order by ae.application")
+			def appOwnerList=AssetEntity.executeQuery("select distinct ae.appOwner, count(ae.id) from AssetEntity ae where "+
+														"ae.moveBundle=${moveBundleInstance.id} group by ae.appOwner order by ae.appOwner")
+			def appSmeList=AssetEntity.executeQuery("select distinct ae.appSme, count(ae.id) from AssetEntity ae where "+
+														" ae.moveBundle=${moveBundleInstance.id} group by ae.appSme order by ae.appSme")
+            /* Get list of Transitions states*/
+            def transitionStates = []
+			def processTransitions = stateEngineService.getTasks("STD_PROCESS", "TASK_ID")
+			processTransitions.each{
+	        	def stateId = Integer.parseInt( it ) 
+	        	transitionStates << [state:stateEngineService.getState( "STD_PROCESS", stateId ),
+	        	                     stateLabel:stateEngineService.getStateLabel( "STD_PROCESS", stateId )] 
+	        }
+			
 	        return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams, 
 	                assetsList:assetsList, moveBundleInstance:moveBundleInstance, 
 	                supportTeam:supportTeam, totalUnracked:totalUnracked, totalSourceAvail:totalSourceAvail, 
 	                totalTargetAvail:totalTargetAvail, totalReracked:totalReracked, totalAsset:totalAssetsSize, 
-	                timeToRefresh : timeToRefresh ? timeToRefresh.SUPER_CONSOLE_REFRESH : "never", showAll : showAll ]
+	                timeToRefresh : timeToRefresh ? timeToRefresh.SUPER_CONSOLE_REFRESH : "never", showAll : showAll,
+	                applicationList : applicationList, appOwnerList : appOwnerList, appSmeList : appSmeList, 
+	                transitionStates : transitionStates, params:params]
         } else {
 	        flash.message = "Please create bundle to view Console"	
 	        redirect(controller:'project',action:'show',params:["id":params.projectId])
