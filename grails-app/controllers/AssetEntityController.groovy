@@ -912,7 +912,6 @@ class AssetEntityController {
         	def queryNotHold = supervisorConsoleService.getQueryForConsole(moveBundleInstance,params, 'notHold')
         	def holdTotalAsset = jdbcTemplate.queryForList( queryHold )
         	def otherTotalAsset = jdbcTemplate.queryForList( queryNotHold )
-        	
         	if(!currentState){
 	        	holdTotalAsset.each{
 	        		totalAsset<<it
@@ -1011,7 +1010,9 @@ class AssetEntityController {
 	        
 	        def totalTargetAvail = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
 	        											" (t.asset_entity_id = e.asset_entity_id and t.voided = 0) where t.state_to >= $stagedId and e.move_bundle_id = ${moveBundleInstance.id} "+
-	        											" group by e.asset_entity_id HAVING maxstate < $rerackedId ").size() 
+	        											" group by e.asset_entity_id HAVING maxstate < $rerackedId ").size()
+	        def totalAssetsOnHold = jdbcTemplate.queryForInt("select count(asset_entity_id) from asset_entity a left join project_asset_map p on "+
+	        												"(a.asset_entity_id = p.asset_id) where a.move_bundle_id = ${moveBundleInstance.id} and p.current_state_id = $holdId")
 	        	userPreferenceService.loadPreferences("SUPER_CONSOLE_REFRESH")
 	        def timeToRefresh = getSession().getAttribute("SUPER_CONSOLE_REFRESH")
 	        /*Get data for filter dropdowns*/
@@ -1037,7 +1038,7 @@ class AssetEntityController {
 	                totalTargetAvail:totalTargetAvail, totalReracked:totalReracked, totalAsset:totalAssetsSize, 
 	                timeToRefresh : timeToRefresh ? timeToRefresh.SUPER_CONSOLE_REFRESH : "never", showAll : showAll,
 	                applicationList : applicationList, appOwnerList : appOwnerList, appSmeList : appSmeList, 
-	                transitionStates : transitionStates, params:params]
+	                transitionStates : transitionStates, params:params, totalAssetsOnHold:totalAssetsOnHold]
         } else {
 	        flash.message = "Please create bundle to view Console"	
 	        redirect(controller:'project',action:'show',params:["id":params.projectId])

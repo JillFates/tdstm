@@ -821,22 +821,22 @@ td .odd {
 								<tr>
 									<td nowrap>
 									<g:if test="${bundleTeam?.team?.latestAsset}">
-									<a href="#" onclick="assetDetails('${bundleTeam?.team?.latestAsset?.id}')"> ${bundleTeam?.team?.latestAsset?.assetTag}</a>
+									<a href="#" onclick="assetDetails('${bundleTeam?.team?.latestAsset?.id}')"><u> ${bundleTeam?.team?.latestAsset?.assetTag}</u> </a>
 									</g:if>&nbsp;
 									</td>
 								</tr>
 								<tr>
 									<td class="odd">
-										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_avail')">${bundleTeam?.sourceAvailassets}</a> /
-										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_done')"> ${bundleTeam?.unrackedAssets}</a> / 
-										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','')"> ${bundleTeam?.sourceAssets}</a>
+										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_avail')"><u>${bundleTeam?.sourceAvailassets}</u></a> /
+										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_done')"><u>${bundleTeam?.unrackedAssets}</u></a> / 
+										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','')"><u>${bundleTeam?.sourceAssets}</u></a>
 									</td>
 								</tr>
 								<tr>
 									<td nowrap>
-										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_avail')">${bundleTeam?.targetAvailAssets}</a> /
-										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_done')"> ${bundleTeam?.rerackedAssets}</a> / 
-										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','')">${bundleTeam?.targetAssets}</a>
+										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_avail')"><u>${bundleTeam?.targetAvailAssets}</u> </a> /
+										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_done')"><u> ${bundleTeam?.rerackedAssets}</u> </a> / 
+										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','')"><u>${bundleTeam?.targetAssets}</u></a>
 									</td>
 								</tr>
 							</table>
@@ -909,16 +909,16 @@ td .odd {
 					</tr>
 					<tr>
 						<td class="odd">
-							<a href="#" onclick="filterByDataPoints('source','','source_avail')">${totalSourceAvail}</a> /
-							<a href="#" onclick="filterByDataPoints('source','','source_done')"> ${totalUnracked}</a> / 
-							<a href="#" onclick="filterByDataPoints('source','','')"> ${totalAsset}</a>
+							<a href="#" onclick="filterByDataPoints('source','','source_avail')"><u> ${totalSourceAvail}</u> </a> /
+							<a href="#" onclick="filterByDataPoints('source','','source_done')"><u> ${totalUnracked}</u> </a> / 
+							<a href="#" onclick="filterByDataPoints('source','','')"><u>${totalAsset}</u> </a>
 						</td>
 					</tr>
 					<tr>
 						<td nowrap>
-							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_avail')">${totalTargetAvail}</a> /
-							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_done')">${totalReracked}</a> / 
-							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','')">${totalAsset}</a>
+							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_avail')"><u>${totalTargetAvail}</u></a> /
+							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_done')"><u>${totalReracked}</u></a> / 
+							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','')"><u>${totalAsset}</u> </a>
 						</td>
 					</tr>
 				</table>
@@ -930,14 +930,9 @@ td .odd {
 		</div>
 		</td>
 	</tr>
-
-
-
 	<tr>
 		<td>
-
 		<table style="border: 0px;">
-
 			<tr>
 				<td valign="top" style="padding: 0px;">
 				<div class="list"><g:form name="assetListForm">
@@ -954,8 +949,9 @@ td .odd {
 									<input type="button" onclick="showfilterDialog()" id="filterButtonId" value="Filter"/>&nbsp;
 									<g:if test="${params.application || params.appOwner || params.appSme || params.currentState || params.assetLocation || params.assetStatus }">
 									<a href="#" style="font-size: 14px;font-weight: bolder;color: #B80000 ;vertical-align: baseline;"
-										onclick="document.filterForm.reset();$('#filterShowAllId').val('');document.filterForm.submit();">X</a>
+										onclick="document.filterForm.reset();$('#filterShowAllId').val('');document.filterForm.submit();"><u>X</u></a>
 									</g:if>
+									&nbsp;<input type="button" onclick="$('#showAllId').val('');$('form#dashboardForm').submit()" id="onHoldButtonId" value="On Hold (${totalAssetsOnHold})"/>
 								</td>
 							</tr>
 							<tr>
