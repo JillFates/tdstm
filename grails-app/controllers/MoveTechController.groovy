@@ -443,16 +443,7 @@ class MoveTechController {
             if ( team ) {
             	loginTeam = ProjectTeam.findById( params.team )
             }
-            def commentListFromSession = session.getAttribute ( "COMMENT_LIST" )
-            def commentsList
-            if ( commentListFromSession ) {
-            	def commentList = commentListFromSession.split('~')
-            	commentsList = [ commentList[0], commentList[1], commentList[2] ]
-            } else {
-            	commentsList = ["Device not powered down", "Device is not in expected rack", "Device will not power up" ]
-            	session.setAttribute ( "COMMENT_LIST", "Device not powered down~Device is not in expected rack~Device will not power up" )
-            	session.setAttribute ( "COMMENT_COMPLETE", "Device not powered down~Device is not in expected rack~Device will not power up" )
-            }
+            def commentsList = getCommentsFromRemainderList( session )
             if ( search != null ) {
             	def query = new StringBuffer ("from AssetEntity ae where ae.assetTag = :search ")
                 assetItem = AssetEntity.find( query.toString(), [ search : search ] )
@@ -628,19 +619,7 @@ class MoveTechController {
         if ( principal ) {
         	def enterNote = params.enterNote
         	if ( params.similarComment == 'nosimilar' ) {
-	        	def truncatedComment
-				if( enterNote.length() > 25 ) {
-					truncatedComment = enterNote.substring( 0, 25 )
-				} else {
-					truncatedComment = enterNote
-				}
-				def commentListFromSession = session.getAttribute ( "COMMENT_LIST" )
-				if ( commentListFromSession ) {
-					def commentList = commentListFromSession.split('~')
-					def completeComment = session.getAttribute ( "COMMENT_COMPLETE" ).split('~')
-					session.setAttribute( "COMMENT_LIST", "${truncatedComment}~${commentList[0]}~${commentList[1]}" )
-					session.setAttribute( "COMMENT_COMPLETE", "${params.enterNote}~${completeComment[0]}~${completeComment[1]}" )
-				}
+        		appendCommentsToRemainderList( params, session )
         	}
         	def loginTeam = ProjectTeam.findById(params.team)
     		def asset = getAssetEntity ( params.search, params.user )
@@ -855,16 +834,7 @@ class MoveTechController {
             if ( team ) {
             	loginTeam = ProjectTeam.findById ( params.team )
             }
-            def commentListFromSession = session.getAttribute ( "COMMENT_LIST" )
-            def commentsList
-            if ( commentListFromSession ) {
-            	def commentList = commentListFromSession.split('~')
-            	commentsList = [ commentList[0], commentList[1], commentList[2] ]
-            } else {
-            	commentsList = ["Device not powered down", "Device is not in expected rack", "Device will not power up" ]
-            	session.setAttribute ( "COMMENT_LIST", "Device not powered down~Device is not in expected rack~Device will not power up" )
-            	session.setAttribute ( "COMMENT_COMPLETE", "Device not powered down~Device is not in expected rack~Device will not power up" )
-            }
+            def commentsList = getCommentsFromRemainderList( session )
             if ( params.menu == "true" ) {
             	render(view:'cleaningAssetSearch', 
                     model:[ projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundle:params.bundle,
@@ -1169,19 +1139,7 @@ class MoveTechController {
 			def assetComment = new AssetComment()
 				assetComment.comment = params.enterNote
 				if ( params.similarComment == "nosimilar" ) {
-					def truncatedComment
-					if( ( params.enterNote ).length() > 25 ) {
-						truncatedComment = params.enterNote.substring( 0, 25 )
-					} else {
-						truncatedComment = params.enterNote
-					}
-					def commentListFromSession = session.getAttribute ( "COMMENT_LIST" )
-					if ( commentListFromSession ) {
-						def commentList = commentListFromSession.split('~')
-						def completeComment = session.getAttribute ( "COMMENT_COMPLETE" ).split('~')
-						session.setAttribute( "COMMENT_LIST", "${truncatedComment}~${commentList[0]}~${commentList[1]}" )
-						session.setAttribute( "COMMENT_COMPLETE", "${params.enterNote}~${completeComment[0]}~${completeComment[1]}" )
-					}
+					appendCommentsToRemainderList( params, session )
 				}
                 assetComment.assetEntity = asset
                 assetComment.commentType = 'comment'
@@ -1196,5 +1154,56 @@ class MoveTechController {
         	flash.message = "Your login has expired and must login again."
         	redirect( action:'login' )
 		}
+	}
+	def appendCommentsToRemainderList( def params, def session ) {
+
+		def truncatedComment
+		if( ( params.enterNote ).length() > 25 ) {
+			truncatedComment = params.enterNote.substring( 0, 25 )
+		} else {
+			truncatedComment = params.enterNote
+		}
+		def commentListFromSession = session.getAttribute ( "COMMENT_LIST" )
+		if ( commentListFromSession ) {
+			def commentList = commentListFromSession.split('~')
+			def completeComment = session.getAttribute ( "COMMENT_COMPLETE" ).split('~')
+			if ( commentList.length == 3 ) {
+				session.setAttribute( "COMMENT_LIST", "${truncatedComment}~${commentList[0]}~${commentList[1]}~${commentList[2]}" )
+				session.setAttribute( "COMMENT_COMPLETE", "${params.enterNote}~${completeComment[0]}~${completeComment[1]}~${completeComment[2]}" )
+			} else if ( commentList.length == 4 ) {
+				session.setAttribute( "COMMENT_LIST", "${truncatedComment}~${commentList[0]}~${commentList[1]}~${commentList[2]}~${commentList[3]}" )
+				session.setAttribute( "COMMENT_COMPLETE", "${params.enterNote}~${commentList[0]}~${completeComment[1]}~${completeComment[2]}~${completeComment[3]}" )
+			} else if ( commentList.length == 5 ) {
+				session.setAttribute( "COMMENT_LIST", "${truncatedComment}~${commentList[0]}~${commentList[1]}~${commentList[2]}~${commentList[3]}~${commentList[4]}" )
+				session.setAttribute( "COMMENT_COMPLETE", "${params.enterNote}~${commentList[0]}~${commentList[1]}~${completeComment[2]}~${completeComment[3]}~${completeComment[4]}" )
+			} else if ( commentList.length == 6 ) {
+				session.setAttribute( "COMMENT_LIST", "${truncatedComment}~${commentList[0]}~${commentList[1]}~${commentList[3]}~${commentList[4]}~${commentList[5]}" )
+				session.setAttribute( "COMMENT_COMPLETE", "${params.enterNote}~${commentList[0]}~${commentList[1]}~${completeComment[3]}~${completeComment[4]}~${completeComment[5]}" )
+			}
+		}
+	
+    }
+	def getCommentsFromRemainderList( def session ) {
+		def commentsList
+		def commentListFromSession = session.getAttribute ( "COMMENT_LIST" )
+        if ( commentListFromSession ) {
+        	commentsList = commentListFromSession.split('~')
+			if ( commentsList.length == 3 ) {
+				commentsList = [ commentsList[0], commentsList[1], commentsList[2] ]
+			} else if ( commentsList.length == 4 ) {
+				commentsList = [ commentsList[0], commentsList[1], commentsList[2], commentsList[3] ]
+			} else if ( commentsList.length == 5 ) {
+				commentsList = [ commentsList[0], commentsList[1], commentsList[2], commentsList[3], commentsList[4] ]
+			} else if ( commentsList.length == 6 ) {
+				commentsList = [ commentsList[0], commentsList[1], commentsList[2], commentsList[3], commentsList[4], commentsList[5] ]
+			} else if ( commentsList.length == 7 ) {
+				commentsList = [ commentsList[0], commentsList[1], commentsList[2], commentsList[3], commentsList[4], commentsList[5] ]
+			}			
+        } else {
+        	commentsList = ["Device not powered down", "Device is not in expected rack", "Device will not power up" ]
+        	session.setAttribute ( "COMMENT_LIST", "Device not powered down~Device is not in expected rack~Device will not power up" )
+        	session.setAttribute ( "COMMENT_COMPLETE", "Device not powered down~Device is not in expected rack~Device will not power up" )
+        }
+		return commentsList
 	}
 }

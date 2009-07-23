@@ -34,7 +34,8 @@
 			      var enterNote = document.assetSearchForm.enterNote.value;
 				  var completeComment = '${session.getAttribute( "COMMENT_COMPLETE" )}'
 				  completeComment = completeComment.split('~');
-				  for ( var i=0; i<3; i++ ) {
+				  var checkLength = completeComment.length
+				  for ( var i=0; i<checkLength; i++ ) {
 				  	if ( enterNote == completeComment[i] ) {
 				  		document.assetSearchForm.similarComment.value = 'null';
 				  	} 
@@ -79,7 +80,8 @@
       	  var splittedComment
 		  var completeComment = '${session.getAttribute( "COMMENT_COMPLETE" )}'
 		  completeComment = completeComment.split('~');
-		  for ( var i=0; i<3; i++ ) {
+		  var checkLength = completeComment.length
+		  for ( var i=0; i<checkLength; i++ ) {
 		  	if ( completeComment[i].length > 25 ) {
 		  	    if ( cmtVal != completeComment[i] ) {
 		  			splittedComment = completeComment[i].substring(0,25);
