@@ -946,12 +946,14 @@ td .odd {
 								</jsec:hasRole>
 								<td style="vertical-align: middle;" colspan="3">
 									<label for="showAllCheckbox"><input type="checkbox" onclick="showAll()" id="showAllCheckbox"/>&nbsp;Show All&nbsp;</label>
-									<input type="button" onclick="showfilterDialog()" id="filterButtonId" value="Filter"/>&nbsp;
+									&nbsp;&nbsp;<input type="button" onclick="showfilterDialog()" id="filterButtonId" value="Filter"/>
 									<g:if test="${params.application || params.appOwner || params.appSme || params.currentState || params.assetLocation || params.assetStatus }">
-									<a href="#" style="font-size: 14px;font-weight: bolder;color: #B80000 ;vertical-align: baseline;"
+									&nbsp;<a href="#" style="font-size: 14px;font-weight: bolder;color: #B80000 ;vertical-align: baseline;"
 										onclick="document.filterForm.reset();$('#filterShowAllId').val('');document.filterForm.submit();"><u>X</u></a>
 									</g:if>
-									&nbsp;<input type="button" onclick="$('#showAllId').val('');$('form#dashboardForm').submit()" id="onHoldButtonId" value="On Hold (${totalAssetsOnHold})"/>
+									<g:if test="${totalAssetsOnHold > 0}">
+									&nbsp;&nbsp;<input type="button" class="onhold-button" style="background-color:yellow;" onclick="$('#showAllId').val('');$('form#dashboardForm').submit()" id="onHoldButtonId" value="On Hold (${totalAssetsOnHold})"/>
+									</g:if>
 								</td>
 							</tr>
 							<tr>
