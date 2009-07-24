@@ -1458,7 +1458,7 @@ Comment</a></span></div>
 					<select name="application" id="filterApplicationId" style="width: 120px;">
 						<option value="" selected="selected">All</option>
 						<g:each in="${applicationList}" var="application">
-							<option value="${application[0]}">${application[0] ? application[0] : 'blank'}&nbsp;(${application[1]})</option>
+							<option value="${application[0] ? application[0] : 'blank'}">${application[0] ? application[0] : 'blank'}&nbsp;(${application[1]})</option>
 						</g:each>
 					</select>	
 				</td>
