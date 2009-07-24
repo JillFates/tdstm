@@ -19,16 +19,17 @@
 	/*--------------------------------------------------------
 	* function to call printjob when user press on 1,2,3 or 4
 	*--------------------------------------------------------*/
-	document.onkeyup = keyCheck;       
-	function keyCheck(){
-	  var keyID = event.keyCode;
-	  var labelQty = keyID - 48 
-	  if(labelQty < 5 && labelQty > 0){
-	  	$('#labelQuantity').val(labelQty);
-	  	startprintjob();
-	  }
+	if(${ projMap ? true : false}){
+		document.onkeyup = keyCheck;   
+		function keyCheck(){
+		  var keyID = event.keyCode;
+		  var labelQty = keyID - 48 
+		  if(labelQty < 5 && labelQty > 0){
+		  	$('#labelQuantity').val(labelQty);
+		  	startprintjob();
+		  }
+		}
 	}
-	
 	// Function to save a field.
 	var domain		= '';
 	var path		= '/';
@@ -139,8 +140,7 @@ function startprintjob(){
 		    var labelsCount = document.assetSearchForm.labels.value;  
 	
 	    // THIS IS THE PLACE TO ADD YOUR DATA
-	    
-	    jobdata.ClearRecords();               					
+	    jobdata.ClearRecords();
 	    for(var label = 0; label < labelsCount; label++) {
 	    	jobdata.AddNewRecord();                					
 	    	jobdata.SetDataField('serverName', document.assetSearchForm.serverName.value); 
@@ -552,7 +552,7 @@ function mySelect(x)
 			<table style="margin-top:10px; border:0px;">
 					<g:if test="${projMap && browserTest != true}">	
 					<tr>
-					<td style="width:85%;"><b>Quantity: </b><select name="labels" id="labelQuantity" onkeypress="startprintjob()">
+					<td style="width:85%;"><b>Quantity: </b><select name="labels" id="labelQuantity" onkeyup="if(event.keyCode == 13 ){startprintjob();}">
 					<option value="1">1</option>
 					<option value="2" selected="selected">2</option>
 					<option value="3">3</option>
