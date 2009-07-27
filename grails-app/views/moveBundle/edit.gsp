@@ -3,7 +3,7 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="layout" content="projectHeader" />
+    <meta name="layout" content="moveBundleHeader" />
     <title>Edit MoveBundle</title>
 
     <g:javascript library="jquery"/>
@@ -35,14 +35,6 @@
     </g:javascript>
   </head>
   <body>
-    
-    <div class="menu2" style="background-color:#003366;">
-      <ul>
-      	<li class="title1">Move Bundle: ${moveBundleInstance?.name}</li>
-        <li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundleInstance?.id]" >Team </g:link> </li>
-        <li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleInstance?.id]" >Bundle Asset Assignment</g:link> </li>
-      </ul>
-    </div>
     <div class="body">
       <h1>Edit MoveBundle</h1>
       <g:if test="${flash.message}">

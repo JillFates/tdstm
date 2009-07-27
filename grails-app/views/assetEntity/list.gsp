@@ -926,5 +926,9 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 	</span></div>
 </g:form>
 </div>
+<script type="text/javascript">
+$('#assetMenu').show();
+$('#reportsMenu').hide();
+</script>
 </body>
 </html>

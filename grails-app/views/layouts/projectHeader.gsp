@@ -12,7 +12,7 @@
     <g:layoutHead />
    
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dropDown.css')}" />    
-   
+   <g:javascript library="jquery" />
   </head>
 	<% def currProj = session.getAttribute("CURR_PROJ");
 	   def setImage = session.getAttribute("setImage");
@@ -79,17 +79,7 @@
         <li><g:link class="home" controller="projectUtil">Project </g:link> </li>
         <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
         <li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
-        <li>  
-          	<div id="menubar" style="border-right:1px solid #ffffff; width:65px;">
- 			<div id="menu1" class="menu_new_asset">Assets<ul>    	      
-    	      <li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Assets</g:link></li>
-    	      <li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link> </li>
-              </ul>
-            </div>
-            </div>
-                	
-        </li>  
-		
+        <li><a href="#" onclick="$('#assetMenu').show();$('#reportsMenu').hide();">Assets</a></li>  
         <li><g:link class="home" controller="moveBundle" params="[projectId:currProjObj?.id]">Move Bundles</g:link></li>
         </jsec:lacksAllRoles>
         <jsec:hasAnyRole in="['ADMIN','SUPERVISOR']">
@@ -101,38 +91,24 @@
         <jsec:hasAnyRole in="['ADMIN','MANAGER','OBSERVER']">
         	<li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">PMO Dashboard</g:link> </li>
         </jsec:hasAnyRole>
-        <jsec:lacksAllRoles in="['MANAGER','OBSERVER','USER']"><li>  
-          	<div id="menubar">
- 			<div id="menu1" class="menu_new">Reports<ul> 
- 				<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Login Badges']">Login Badges</g:link> </li>   	      
-    	      	<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Team Worksheets']">Move Team Worksheets</g:link> </li>
-				<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'cart Asset']">Cleaning Team Worksheets</g:link></li>
-    	       	<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Transportation Asset List']">Transport Worksheets</g:link></li>
-    	       	<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Issue Report']">Issue Report</g:link></li>
-    	       	<!-- <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Rack Layout']">Rack Layout</g:link></li> -->
-              </ul>
-            </div>
-            </div>
-                	
-        </li>
-        </jsec:lacksAllRoles>
-        <jsec:hasAnyRole in="['USER']">
-        <div id="menubar">
- 			<div id="menu1" class="menu_normal">Reports<ul>
- 				<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Login Badges']">Login Badges</g:link> </li>    	      
-    	      	<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Team Worksheets']">Move Team Worksheets</g:link> </li>
-				<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'cart Asset']">Cleaning Team Worksheets</g:link></li>
-    	       	<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Transportation Asset List']">Transport Worksheets</g:link></li>
-    	       	<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Issue Report']">Issue Report</g:link></li>
-    	       	<!-- <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Rack Layout']">Rack Layout</g:link></li> -->
-              </ul>
-            </div>
-            </div>
-                	
-        </li>
-        </jsec:hasAnyRole>
+        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"><li><a href="#" onclick="$('#reportsMenu').show();$('#assetMenu').hide();">Reports</a></li></jsec:lacksAllRoles>
       </ul>
     </div>
+    <div class="menu2" id="assetMenu" style="background-color:#003366;display: none;">
+        <ul>
+			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Assets</g:link></li>
+    		<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link> </li>
+		</ul>
+	</div>
+	<div class="menu2" id="reportsMenu" style="background-color:#003366;display: none;">
+		<ul>
+			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Login Badges']">Login Badges</g:link> </li>   	      
+    	    <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Team Worksheets']">Move Team Worksheets</g:link> </li>
+			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'cart Asset']">Cleaning Team Worksheets</g:link></li>
+    	    <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Transportation Asset List']">Transport Worksheets</g:link></li>
+    	    <li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Issue Report']">Issue Report</g:link></li>
+		</ul>
+	</div>
     </g:if>
       <div class="main_bottom"><g:layoutBody /></div>
     </div>

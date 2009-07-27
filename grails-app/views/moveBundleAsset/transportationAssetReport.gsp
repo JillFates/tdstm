@@ -42,26 +42,22 @@
 			</select></td>
 
 		</tr>
-
-		
-
 		<tr>
-
 			<td class="buttonR"><g:jasperReport controller="moveBundleAsset"
 				action="cartAssetReport" jasper="transportationAssetReport" format="PDF"
 				name="Generate">
 				<input type="hidden" name="reportName" id="reportName" value="transportationAsset" />
 				<input type="hidden" name="moveBundle" id="moveBundle" value="null" />
-
 			</g:jasperReport></td>
 
 		</tr>
-
-
 	</tbody>
 </table>
 </div>
-
 </div>
+<script type="text/javascript">
+$('#reportsMenu').show();
+$('#assetMenu').hide();
+</script>
 </body>
 </html>

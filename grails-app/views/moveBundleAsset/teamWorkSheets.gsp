@@ -6,7 +6,7 @@
 <title>Move Team Worksheets </title>
 <g:javascript library="prototype" />
 <script type="text/javascript">
-    
+    	
     	function populateTeams(val) {    	
     			
      	var hiddenBundle = document.getElementById('moveBundle')
@@ -175,12 +175,13 @@
 			</g:jasperReport></td>
 
 		</tr>
-
-
 	</tbody>
 </table>
 </div>
-
 </div>
+<script type="text/javascript">
+$('#reportsMenu').show();
+$('#assetMenu').hide();
+</script>
 </body>
 </html>

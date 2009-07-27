@@ -321,16 +321,16 @@ var sHint = "C:\\temp\\output";
 				value="Print" onclick="generateLabels();"></td>
 
 		</tr>
-
-
 	</tbody>
 </table>
 </g:form>
 </div>
-
 </div>
 <script type="text/javascript">
-InitData()</script>
+$('#reportsMenu').show();
+$('#assetMenu').hide();
+InitData()
+</script>
 </body>
 
 </html>
