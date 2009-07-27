@@ -1155,6 +1155,7 @@ class MoveTechController {
         	redirect( action:'login' )
 		}
 	}
+		
 	def appendCommentsToRemainderList( def params, def session ) {
 
 		def truncatedComment
@@ -1167,38 +1168,38 @@ class MoveTechController {
 		if ( commentListFromSession ) {
 			def commentList = commentListFromSession.split('~')
 			def completeComment = session.getAttribute ( "COMMENT_COMPLETE" ).split('~')
-			if ( commentList.length == 3 ) {
-				session.setAttribute( "COMMENT_LIST", "${truncatedComment}~${commentList[0]}~${commentList[1]}~${commentList[2]}" )
-				session.setAttribute( "COMMENT_COMPLETE", "${params.enterNote}~${completeComment[0]}~${completeComment[1]}~${completeComment[2]}" )
-			} else if ( commentList.length == 4 ) {
-				session.setAttribute( "COMMENT_LIST", "${truncatedComment}~${commentList[0]}~${commentList[1]}~${commentList[2]}~${commentList[3]}" )
-				session.setAttribute( "COMMENT_COMPLETE", "${params.enterNote}~${commentList[0]}~${completeComment[1]}~${completeComment[2]}~${completeComment[3]}" )
-			} else if ( commentList.length == 5 ) {
-				session.setAttribute( "COMMENT_LIST", "${truncatedComment}~${commentList[0]}~${commentList[1]}~${commentList[2]}~${commentList[3]}~${commentList[4]}" )
-				session.setAttribute( "COMMENT_COMPLETE", "${params.enterNote}~${commentList[0]}~${commentList[1]}~${completeComment[2]}~${completeComment[3]}~${completeComment[4]}" )
-			} else if ( commentList.length == 6 ) {
-				session.setAttribute( "COMMENT_LIST", "${truncatedComment}~${commentList[0]}~${commentList[1]}~${commentList[3]}~${commentList[4]}~${commentList[5]}" )
-				session.setAttribute( "COMMENT_COMPLETE", "${params.enterNote}~${commentList[0]}~${commentList[1]}~${completeComment[3]}~${completeComment[4]}~${completeComment[5]}" )
-			}
+			 switch ( commentList.length ) {
+			 	case 3:  session.setAttribute( "COMMENT_LIST", "${truncatedComment}~${commentList[0]}~${commentList[1]}~${commentList[2]}" )
+			 			 session.setAttribute( "COMMENT_COMPLETE", "${params.enterNote}~${completeComment[0]}~${completeComment[1]}~${completeComment[2]}" )
+			 			 break;
+	            case 4:  session.setAttribute( "COMMENT_LIST", "${truncatedComment}~${commentList[0]}~${commentList[1]}~${commentList[2]}~${commentList[3]}" )
+						 session.setAttribute( "COMMENT_COMPLETE", "${params.enterNote}~${commentList[0]}~${completeComment[1]}~${completeComment[2]}~${completeComment[3]}" )
+						 break;
+	            case 5:  session.setAttribute( "COMMENT_LIST", "${truncatedComment}~${commentList[0]}~${commentList[1]}~${commentList[2]}~${commentList[3]}~${commentList[4]}" )
+						 session.setAttribute( "COMMENT_COMPLETE", "${params.enterNote}~${commentList[0]}~${commentList[1]}~${completeComment[2]}~${completeComment[3]}~${completeComment[4]}" )
+						 break;
+	            case 6:  session.setAttribute( "COMMENT_LIST", "${truncatedComment}~${commentList[0]}~${commentList[1]}~${commentList[3]}~${commentList[4]}~${commentList[5]}" )
+						 session.setAttribute( "COMMENT_COMPLETE", "${params.enterNote}~${commentList[0]}~${commentList[1]}~${completeComment[3]}~${completeComment[4]}~${completeComment[5]}" )
+						 break;
+			 }
 		}
-	
     }
+		
 	def getCommentsFromRemainderList( def session ) {
 		def commentsList
 		def commentListFromSession = session.getAttribute ( "COMMENT_LIST" )
         if ( commentListFromSession ) {
         	commentsList = commentListFromSession.split('~')
-			if ( commentsList.length == 3 ) {
-				commentsList = [ commentsList[0], commentsList[1], commentsList[2] ]
-			} else if ( commentsList.length == 4 ) {
-				commentsList = [ commentsList[0], commentsList[1], commentsList[2], commentsList[3] ]
-			} else if ( commentsList.length == 5 ) {
-				commentsList = [ commentsList[0], commentsList[1], commentsList[2], commentsList[3], commentsList[4] ]
-			} else if ( commentsList.length == 6 ) {
-				commentsList = [ commentsList[0], commentsList[1], commentsList[2], commentsList[3], commentsList[4], commentsList[5] ]
-			} else if ( commentsList.length == 7 ) {
-				commentsList = [ commentsList[0], commentsList[1], commentsList[2], commentsList[3], commentsList[4], commentsList[5] ]
-			}			
+			switch ( commentsList.length ) {
+				case 3:  commentsList = [ commentsList[0], commentsList[1], commentsList[2] ]
+						 break;
+	            case 4:  commentsList = [ commentsList[0], commentsList[1], commentsList[2], commentsList[3] ]
+	            		 break;
+	            case 5:  commentsList = [ commentsList[0], commentsList[1], commentsList[2], commentsList[3], commentsList[4] ]
+	            		 break;
+	            case 6:  commentsList = [ commentsList[0], commentsList[1], commentsList[2], commentsList[3], commentsList[4], commentsList[5] ]
+	            		 break;
+			}
         } else {
         	commentsList = ["Device not powered down", "Device is not in expected rack", "Device will not power up" ]
         	session.setAttribute ( "COMMENT_LIST", "Device not powered down~Device is not in expected rack~Device will not power up" )
@@ -1206,4 +1207,5 @@ class MoveTechController {
         }
 		return commentsList
 	}
+	
 }

@@ -948,11 +948,11 @@ td .odd {
 									<label for="showAllCheckbox"><input type="checkbox" onclick="showAll()" id="showAllCheckbox"/>&nbsp;Show All&nbsp;</label>
 									&nbsp;&nbsp;<input type="button" onclick="showfilterDialog()" id="filterButtonId" value="Filter"/>
 									<g:if test="${params.application || params.appOwner || params.appSme || params.currentState || params.assetLocation || params.assetStatus }">
-									&nbsp;<a href="#" style="font-size: 14px;font-weight: bolder;color: #B80000 ;vertical-align: baseline;"
-										onclick="document.filterForm.reset();$('#filterShowAllId').val('');document.filterForm.submit();"><u>X</u></a>
+									&nbsp;<a href="#"
+											 onclick="document.filterForm.reset();$('#filterShowAllId').val('');document.filterForm.submit();"><span class="clear_filter"><u>X</u></span></a>
 									</g:if>
 									<g:if test="${totalAssetsOnHold > 0}">
-									&nbsp;&nbsp;<input type="button" class="onhold-button" style="background-color:yellow;" onclick="$('#showAllId').val('');$('form#dashboardForm').submit()" id="onHoldButtonId" value="On Hold (${totalAssetsOnHold})"/>
+									&nbsp;&nbsp;<input type="button" class="onhold_button" onclick="$('#showAllId').val('');$('form#dashboardForm').submit()" id="onHoldButtonId" value="On Hold (${totalAssetsOnHold})"/>
 									</g:if>
 								</td>
 							</tr>
