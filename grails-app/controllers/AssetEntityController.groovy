@@ -925,6 +925,9 @@ class AssetEntityController {
         	totalAssetsSize = jdbcTemplate.queryForInt("select count(a.asset_entity_id) from asset_entity a where a.move_bundle_id = ${moveBundleInstance.id}" )
 	        def projectTeamList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = ${moveBundleInstance.id} and "+
 	        											"pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport'  order by pt.name asc")
+	        def countQuery = "SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
+							"(t.asset_entity_id = e.asset_entity_id and t.voided = 0) left join project_asset_map pm on (pm.asset_id = e.asset_entity_id ) "+
+							"where pm.current_state_id != $holdId and e.move_bundle_id = ${moveBundleInstance.id} "
 	        projectTeamList.each{
 	            def teamMembers = partyRelationshipService.getBundleTeamMembersDashboard(it.id)
 	            def member
@@ -933,22 +936,16 @@ class AssetEntityController {
 	            }
 	            def sourceAssets = AssetEntity.findAll("from AssetEntity where moveBundle = ${moveBundleInstance.id} and sourceTeam = ${it.id} " ).size()
 	            
-	            def unrackedAssets = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
-	        														"(t.asset_entity_id = e.asset_entity_id and t.voided = 0) where e.move_bundle_id = ${moveBundleInstance.id} "+
-	        														"and e.source_team_id = ${it.id} group by e.asset_entity_id having maxstate >= $unrackedId").size() 
+	            def unrackedAssets = jdbcTemplate.queryForList( countQuery + "and e.source_team_id = ${it.id} group by e.asset_entity_id having maxstate >= $unrackedId").size() 
 	            
-	            def sourceAvailassets = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
-	        														"(t.asset_entity_id = e.asset_entity_id and t.voided = 0 ) where t.state_to >= $releasedId and e.move_bundle_id = ${moveBundleInstance.id}"+
-	        														" and e.source_team_id = ${it.id} group by e.asset_entity_id HAVING maxstate < $unrackedId ").size()
+	            def sourceAvailassets = jdbcTemplate.queryForList( countQuery + " and t.state_to >= $releasedId and e.source_team_id = ${it.id} "+
+	            													"group by e.asset_entity_id HAVING maxstate < $unrackedId ").size()
 	            def targetAssets = AssetEntity.findAll("from AssetEntity  where moveBundle = ${moveBundleInstance.id} and targetTeam = ${it.id} " ).size()
 	
-	            def rerackedAssets = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
-																"(t.asset_entity_id = e.asset_entity_id and t.voided = 0) where e.move_bundle_id = ${moveBundleInstance.id} "+
-																"and e.target_team_id = ${it.id} group by e.asset_entity_id HAVING maxstate >= $rerackedId ").size()
+	            def rerackedAssets = jdbcTemplate.queryForList(countQuery +	"and e.target_team_id = ${it.id} group by e.asset_entity_id HAVING maxstate >= $rerackedId ").size()
 				
-	            def targetAvailAssets = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
-	        														"(t.asset_entity_id = e.asset_entity_id and t.voided = 0) where t.state_to >= $stagedId and e.move_bundle_id = ${moveBundleInstance.id} "+
-	        														"and e.target_team_id = ${it.id} group by e.asset_entity_id HAVING maxstate < $rerackedId ").size()
+	            def targetAvailAssets = jdbcTemplate.queryForList( countQuery + " and t.state_to >= $stagedId and e.target_team_id = ${it.id} "+
+	            													"group by e.asset_entity_id HAVING maxstate < $rerackedId ").size()
 	            bundleTeams <<[team:it,members:member, sourceAssets:sourceAssets, 
 	                           unrackedAssets:unrackedAssets, sourceAvailassets:sourceAvailassets , 
 	                           targetAvailAssets:targetAvailAssets , targetAssets:targetAssets, 
@@ -996,21 +993,14 @@ class AssetEntityController {
 	        	}
 	        	assetsList<<[asset: it, status: stateEngineService.getStateLabel( "STD_PROCESS", curId ), cssClass : cssClass, checkVal:check]
 	        }
-	        def totalUnracked = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
-															"(t.asset_entity_id = e.asset_entity_id and t.voided = 0) where e.move_bundle_id = ${moveBundleInstance.id} "+
-															"group by e.asset_entity_id having maxstate >= $unrackedId").size()
+	        def totalUnracked = jdbcTemplate.queryForList(countQuery +	"group by e.asset_entity_id having maxstate >= $unrackedId").size()
 	        
-	        def totalSourceAvail = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on"+
-	        												" (t.asset_entity_id = e.asset_entity_id and t.voided = 0) where t.state_to >= $releasedId and e.move_bundle_id = ${moveBundleInstance.id}"+
-	        												" group by e.asset_entity_id HAVING maxstate < $unrackedId ").size() 
+	        def totalSourceAvail = jdbcTemplate.queryForList(countQuery + " and t.state_to >= $releasedId group by e.asset_entity_id HAVING maxstate < $unrackedId ").size() 
 	        
-	        def totalReracked = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
-															"(t.asset_entity_id = e.asset_entity_id and t.voided = 0) where e.move_bundle_id = ${moveBundleInstance.id} "+
-															"group by e.asset_entity_id HAVING maxstate >= $rerackedId ").size()
+	        def totalReracked = jdbcTemplate.queryForList(countQuery + "group by e.asset_entity_id HAVING maxstate >= $rerackedId ").size()
 	        
-	        def totalTargetAvail = jdbcTemplate.queryForList("SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_transition t left join asset_entity e on "+
-	        											" (t.asset_entity_id = e.asset_entity_id and t.voided = 0) where t.state_to >= $stagedId and e.move_bundle_id = ${moveBundleInstance.id} "+
-	        											" group by e.asset_entity_id HAVING maxstate < $rerackedId ").size()
+	        def totalTargetAvail = jdbcTemplate.queryForList( countQuery + " and t.state_to >= $stagedId group by e.asset_entity_id HAVING maxstate < $rerackedId ").size()
+	     
 	        def totalAssetsOnHold = jdbcTemplate.queryForInt("select count(asset_entity_id) from asset_entity a left join project_asset_map p on "+
 	        												"(a.asset_entity_id = p.asset_id) where a.move_bundle_id = ${moveBundleInstance.id} and p.current_state_id = $holdId")
 	        	userPreferenceService.loadPreferences("SUPER_CONSOLE_REFRESH")

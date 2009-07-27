@@ -82,6 +82,7 @@ class UserPreferenceService  {
      */
     def setUserRoles( def roleType, def person ){
     	def personInstance = Party.findById(person)
+    	PartyRole.executeUpdate("delete from PartyRole where party = $person")
     	roleType.each{role ->
     		def roleTypeInstance = RoleType.findById(role)
     		// Create Role Preferences to User
