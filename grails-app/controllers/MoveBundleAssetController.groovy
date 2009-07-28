@@ -4,7 +4,8 @@ class MoveBundleAssetController {
 	def partyRelationshipService
 	def assetEntityAttributeLoaderService
 	def userPreferenceService
-    
+	def jdbcTemplate
+	
     def index = { redirect( action:list, params:params ) }
 
     // the delete, save and update actions only accept POST requests
@@ -1133,4 +1134,29 @@ class MoveBundleAssetController {
         	}
     	}
     }
-}    
+	/*----------------------------------------
+	 * @author : Lokanath Reddy
+	 * @param  : move bundle id
+	 * @return : list of racks and rooms
+	 *---------------------------------------*/
+	 def getRackDetails = {
+    	def bundleId = params.bundleId
+    	def rackDetails = []
+    	def sourceRackList
+    	def targetRackList
+    	def queryForSourceRacks = "select source_location as location, source_rack as rack, source_room as room from asset_entity "
+    	def queryForTargetRacks = "select target_location as location, target_rack as rack, target_room as room from asset_entity "
+    	def sourceGroup = "group by source_location, source_rack, source_room"
+    	def targetGroup = "group by target_location, target_rack, target_room"
+    	if(bundleId){
+        		sourceRackList = jdbcTemplate.queryForList(queryForSourceRacks + "where move_bundle_id = $bundleId " + sourceGroup )
+        		targetRackList = jdbcTemplate.queryForList(queryForTargetRacks + "where move_bundle_id = $bundleId " + targetGroup)
+    	} else if(bundleId == ""){
+    		def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
+     		sourceRackList = jdbcTemplate.queryForList(queryForSourceRacks + "where project_id = $projectId " + sourceGroup)
+			targetRackList = jdbcTemplate.queryForList(queryForTargetRacks + "where project_id = $projectId " + targetGroup)
+    	}
+    	rackDetails << [sourceRackList:sourceRackList, targetRackList:targetRackList]
+    	render rackDetails as JSON
+	 }
+}   

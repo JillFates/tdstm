@@ -3,202 +3,114 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<title>Rack Layout</title>
+<title>Rack Elevations</title>
 <g:javascript library="prototype" />
 <script type="text/javascript">
-        function populateRacks(val) {
-
-        var hiddenBundle = document.getElementById('rackMoveBundle')
-
-     	hiddenBundle.value = val
-
-     	var projectId = ${projectInstance?.id}     	
-
-     	if( val == "null") {
-
-     	 var selectObj = document.getElementById('rackId')
-
-      	 //Clear all previous options
-
-	     var l = selectObj.length	    
-
-	     while (l > 1) {
-
-	     l--
-
-	     selectObj.remove(l)
-
-	     }
-
-     	 return false
-
-     	} else {
-
-     	 ${remoteFunction(action:'getRacksForBundles', params:'\'bundleId=\' + val +\'&projectId=\'+projectId', onComplete:'assignRacks(e)')}
-
-     	}
-
-     } 
-     
-          function assignRacks(e) {
-
-     
-
-     	var racks = eval('(' + e.responseText + ')')   	
-
-      	
-
-      	var selectObj = document.getElementById('rackId')
-
-      	//Clear all previous options
-
-	     var l = selectObj.length	    
-
-	     while (l > 1) {
-
-	     l--
-
-	     selectObj.remove(l)
-
-	     }
-
-      	if (racks) {
-
-		      // assign project teams
-
-		      var length = racks.length
-
-		      for (var i=0; i < length; i++) {
-
-			      var team = racks[i]
-
-			      var opt = document.createElement('option');
-
-			      opt.innerHTML = team.name
-
-			      opt.value = team.id
-
-			      try {
-
-				      selectObj.appendChild(opt, null) // standards compliant; doesn't work in IE
-
-			      } catch(ex) {
-
-				      selectObj.appendChild(opt) // IE only
-
-			      }
-
-		      }		          	
-
-      }
-
-     	
-
+	function updateRackDetails(e) {
+     	var rackDetails = eval('(' + e.responseText + ')')   	
+      	var sourceSelectObj = $('#sourceRackId');
+      	var targetSelectObj = $('#targetRackId');
+      	var sourceRacks = rackDetails[0].sourceRackList;
+      	var targetRacks = rackDetails[0].targetRackList;
+      	generateOptions(sourceSelectObj,sourceRacks);
+      	generateOptions(targetSelectObj,targetRacks);
      }
-     
-     function selectRecordsPerPage(val)
-
-     {
-
-     var count = document.getElementById('recordsPerPage');
-
-     count.value = val;
-
+     function generateOptions(selectObj,racks){
+     	if (racks) {
+			var length = racks.length
+			var options = "<option value='' selected='selected'>All</option>"
+			for (var i=0; i < length; i++) {
+				var rack = racks[i]
+				var locvalue = rack.location ? rack.location : '';
+				var rmvalue = rack.room ? rack.room : '';
+				var ravalue = rack.rack ? rack.rack : '';
+				var value = locvalue +"|"+rmvalue +"|"+ ravalue
+				var text =  locvalue +"/"+rmvalue +"/"+ ravalue
+				options += "<option value='"+value+"'>"+text+"</option>"
+			}
+			selectObj.html(options)	          	
+      	}
      }
-     
     </script>
-
 </head>
 <body>
-
 <div class="body">
-<h1>Rack Layout</h1>
+<h1>Rack Elevations</h1>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
 <div class="dialog">
 <table>
+	<g:form action="rackLayoutReport" method="post">
 	<tbody>
-
 		<tr class="prop" id="bundleRow">
-
-			<td valign="top" class="name"><label>Bundles:</label></td>
-
-			<td valign="top" class="value"><select id="bundleId"
-				name="moveBundle" onchange="return populateRacks(this.value)">
-
-				<option value="null" selected="selected">Please Select</option>
-
-				<option value="">All Bundles</option>
-
-				<g:each in="${moveBundleInstanceList}" var="moveBundleList">
-					<option value="${moveBundleList?.id}">${moveBundleList?.name}</option>
-				</g:each>
-
-
-
-
-			</select></td>
-
-		</tr>
-
-		<tr class="prop" id="teamRow">
-
-			<td valign="top" class="name"><label>Racks:</label></td>
-
-			<td valign="top" class="value"><select id="rackId"
-				multiple="multiple" name="rack" style="width: 100px; height: 100px;">
-
-
-
-				<option value="null" selected="selected">All Racks</option>
-
-
-
-			</select></td>
-
-		</tr>
-
-		<tr>
-
-			<td colspan="2">
-			<div style="width: 100%; height: 10px; float: left;">Hold
-			[Ctrl] when clicking to choose multiple racks</div>
+			<td valign="top" class="name"><label>Current Move Bundle :</label></td>
+			<td valign="top" class="value" colspan="2">
+				<select id="bundleId" name="moveBundle" onchange="${remoteFunction(action:'getRackDetails', params:'\'bundleId=\' + this.value', onComplete:'updateRackDetails(e)')}">
+					<option value="null" selected="selected">Please Select</option>
+					<option value="">All Bundles</option>
+					<g:each in="${moveBundleInstanceList}" var="moveBundleList">
+						<option value="${moveBundleList?.id}">${moveBundleList?.name}</option>
+					</g:each>
+				</select>
 			</td>
-
 		</tr>
-
+		<tr class="prop">
+			<td valign="top" class="name"><label>Location :</label></td>
+			<td valign="top">
+				<label for="source"><input type="radio" name="location" id="source" checked="checked" onclick="$('#targetRackId').hide();$('#sourceRackId').show();" /> Source </label> 
+			</td>
+			<td valign="top">
+				<label for="target"><input type="radio" name="location" id="target" onclick="$('#targetRackId').show();$('#sourceRackId').hide();"/> Target </label> 
+			</td>
+		</tr>
+		<tr class="prop">
+			<td valign="top" class="name"><label>Room/Rack :</label></td>
+			<td valign="top" class="value" colspan="2">
+				<select id="sourceRackId"	multiple="multiple" name="rack" style="width: 100%;" size="10">
+					<option value="null" selected="selected">All</option>
+				</select>
+				<select id="targetRackId"	multiple="multiple" name="rack" style="width: 100%;display: none;" size="10">
+					<option value="null" selected="selected">All</option>
+				</select>
+			</td>
+		</tr>
 		<tr>
-
-			<td valign="top" class="name"><label>Racks/Page:</label></td>
-
-			<td><g:select id="rackPerPage" from="${1..6}" value="3"
-				onChange="selectRecordsPerPage(this.value)" /></td>
-
+			<td>&nbsp;</td>
+			<td colspan="2" >
+				<div style="width: 100%; height: 10px; float: left;"><i>Hold ctrl/shift to select multiple</i></div>
+			</td>
 		</tr>
-
+		<tr class="prop">
+			<td valign="top" class="name"><label>Include other bundles :</label></td>
+			<td valign="top" colspan="2"><input type="checkbox" name="otherBundle" ></td>
+		</tr>
+		<tr class="prop">
+			<td valign="top" class="name"><label>Include bundle names :</label></td>
+			<td valign="top" colspan="2"><input type="checkbox" name="bundleName" ></td>
+		</tr>
 		<tr>
-
-			<td class="buttonR"><g:jasperReport controller="moveBundleAsset"
-				action="rackLayoutReport" jasper="workSheetsReport" format="PDF"
-				name="Generate">
-
-				<input type="hidden" name="moveBundle" id="rackMoveBundle"
-					value="null" />
-
-				<input type="hidden" name="rack" id="rack" value="" />
-
-				<input type="hidden" name="recordsPerPage" id="recordsPerPage"
-					value="3" />
-
-			</g:jasperReport></td>
-
+			<td valign="top" class="name"><label>Print Quantity:</label></td>
+			<td colspan="2"><g:select id="rackPerPage" from="${1..6}" name="printQuantity"/></td>
 		</tr>
-
+		<tr>
+			<td colspan="3" class="buttonR" style="text-align: center;">
+				<input type="hidden" name="_format" value="PDF"/>
+				<input type="hidden" name="_name" value="Generate" />
+				<input type="hidden" name="_file" value="workSheetsReport" />
+				<input type="submit" value="Generate"/>
+			</td>
+		</tr>
 	</tbody>
+	</g:form>
 </table>
 </div>
-
 </div>
+<script type="text/javascript">
+$('#reportsMenu').show();
+$('#assetMenu').hide();
+var bundleId = $("#bundleId").val()
+${remoteFunction(action:'getRackDetails', params:'\'bundleId=\' + bundleId', onComplete:'updateRackDetails(e)')}
+</script>
 </body>
 </html>
