@@ -280,7 +280,11 @@ class AssetEntityAttributeLoaderService {
 			def AssetEntityList = AssetEntity.findAllByMoveBundleAndCart(bundleInstance, assetCart)
 			def usize = 0
 			for(int AssetEntityRow = 0; AssetEntityRow < AssetEntityList.size(); AssetEntityRow++ ) {
-				usize = usize + Integer.parseInt(AssetEntityList[AssetEntityRow].usize ? AssetEntityList[AssetEntityRow].usize : "0")
+				try {
+					usize = usize + Integer.parseInt(AssetEntityList[AssetEntityRow].usize? (AssetEntityList[AssetEntityRow].usize).trim() : "0")
+				} catch ( Exception e ) {
+					println "uSize containing blank value."
+				}
 			}
 			cartAssetCounts << [ cart:assetCart, cartAssetCount:cartAssetCount,usizeUsed:usize ]
 		}
