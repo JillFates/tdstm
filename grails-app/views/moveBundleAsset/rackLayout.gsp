@@ -24,7 +24,7 @@
 				var locvalue = rack.location ? rack.location : '';
 				var rmvalue = rack.room ? rack.room : '';
 				var ravalue = rack.rack ? rack.rack : '';
-				var value = locvalue +"|"+rmvalue +"|"+ ravalue
+				var value = locvalue +"~"+rmvalue +"~"+ ravalue
 				var text =  locvalue +"/"+rmvalue +"/"+ ravalue
 				options += "<option value='"+value+"'>"+text+"</option>"
 			}
@@ -58,19 +58,19 @@
 		<tr class="prop">
 			<td valign="top" class="name"><label>Location :</label></td>
 			<td valign="top">
-				<label for="source"><input type="radio" name="location" id="source" checked="checked" onclick="$('#targetRackId').hide();$('#sourceRackId').show();" /> Source </label> 
+				<label for="source"><input type="radio" name="location" id="source" checked="checked" onclick="$('#targetRackId').hide();$('#sourceRackId').show();$('#locationNameId').val('source');" /> Source </label> 
 			</td>
 			<td valign="top">
-				<label for="target"><input type="radio" name="location" id="target" onclick="$('#targetRackId').show();$('#sourceRackId').hide();"/> Target </label> 
+				<label for="target"><input type="radio" name="location" id="target" onclick="$('#targetRackId').show();$('#sourceRackId').hide();$('#locationNameId').val('target');"/> Target </label> 
 			</td>
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label>Room/Rack :</label></td>
 			<td valign="top" class="value" colspan="2">
-				<select id="sourceRackId"	multiple="multiple" name="rack" style="width: 100%;" size="10">
+				<select id="sourceRackId"	multiple="multiple" name="sourcerack" style="width: 100%;" size="10">
 					<option value="null" selected="selected">All</option>
 				</select>
-				<select id="targetRackId"	multiple="multiple" name="rack" style="width: 100%;display: none;" size="10">
+				<select id="targetRackId"	multiple="multiple" name="targetrack" style="width: 100%;display: none;" size="10">
 					<option value="null" selected="selected">All</option>
 				</select>
 			</td>
@@ -90,15 +90,13 @@
 			<td valign="top" colspan="2"><input type="checkbox" name="bundleName" ></td>
 		</tr>
 		<tr>
-			<td valign="top" class="name"><label>Print Quantity:</label></td>
+			<td valign="top" class="name"><label>Print Quantity :</label></td>
 			<td colspan="2"><g:select id="rackPerPage" from="${1..6}" name="printQuantity"/></td>
 		</tr>
 		<tr>
 			<td colspan="3" class="buttonR" style="text-align: center;">
-				<input type="hidden" name="_format" value="PDF"/>
-				<input type="hidden" name="_name" value="Generate" />
-				<input type="hidden" name="_file" value="workSheetsReport" />
-				<input type="submit" value="Generate"/>
+				<input type="hidden" name="locationName" id="locationNameId" value="source"/>
+				<input type="submit" value="Generate" onclick="this.form.target='_blank';return true;"/>
 			</td>
 		</tr>
 	</tbody>

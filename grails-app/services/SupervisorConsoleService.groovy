@@ -97,4 +97,25 @@ class SupervisorConsoleService {
 		}
 		return queryForConsole.toString()
     }
+	 /*----------------------------------------
+     * @author : Lokanath Reddy
+     * @param  : move bundle and request params
+     * @return : Query for Rack Elevation  
+     *----------------------------------------*/
+    def getQueryForRackElevation( def bundle, def rackRooms, def type ) {
+    	def assetsDetailsQuery = new StringBuffer("select a."+type+"_rack_position as rackPosition, max(a.usize) as usize, "+
+													"count(a.asset_entity_id) as racksize, a.move_bundle_id as bundleId, "+
+													"GROUP_CONCAT(CONCAT_WS(' - ',a.asset_tag,a.asset_name ) SEPARATOR '<br>') "+
+													"as assetTag from asset_entity a where a.move_bundle_id = $bundle.id ")
+		if(rackRooms[0]){
+		assetsDetailsQuery.append(" and a."+type+"_location = '${rackRooms[0]}' ")
+		}
+		if(rackRooms[1]){
+		assetsDetailsQuery.append(" and a."+type+"_room = '${rackRooms[1]}' ")
+		}
+		if(rackRooms[2]){
+		assetsDetailsQuery.append(" and a."+type+"_rack = '${rackRooms[2]}' ")
+		}
+		assetsDetailsQuery.append(" group by "+type+"_Rack_Position")
+    }
 }

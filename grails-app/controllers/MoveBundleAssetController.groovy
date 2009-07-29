@@ -5,6 +5,7 @@ class MoveBundleAssetController {
 	def assetEntityAttributeLoaderService
 	def userPreferenceService
 	def jdbcTemplate
+	def supervisorConsoleService
 	
     def index = { redirect( action:list, params:params ) }
 
@@ -939,36 +940,96 @@ class MoveBundleAssetController {
         	}
         }
     }
-    //RackLayout Report
+	/*----------------------------------------------------------
+     * @author : Lokanath Reddy
+     * @param  : move bundle and params from rack elevation form
+     * @return : Data for Rack Elevation report  
+     *---------------------------------------------------------*/
     def rackLayoutReport = {
-        if(params.moveBundle == "null") {
+    	def bundleId = params.moveBundle
+        if(bundleId == "null") {
             flash.message = " Please Select Bundles. "
             redirect( action:'getBundleListForReportDialog', params:[reportId: 'Rack Layout'] )
         } else {
-            def moveBundleInstance = MoveBundle.findById(params.moveBundle)
-            def reportFields = []
-            def assetEntityList
-            def currProj = getSession().getAttribute( "CURR_PROJ" )
-            def projectId = currProj.CURR_PROJ
-            def projectInstance = Project.findById( projectId )
-            def bundleName = "All Bundles"
-            def partyGroupInstance = PartyGroup.get(projectInstance.id)
-            if( moveBundleInstance ) {
-                bundleName = moveBundleInstance?.name
-                assetEntityList = AssetEntity.findAll("from AssetEntity asset where asset.moveBundle = $moveBundleInstance.id order By asset.sourceTeam")
-            }else {
-                assetEntityList = AssetEntity.findAll("from AssetEntity asset  order By asset.sourceTeam")
-            }
-            assetEntityList.each {
-                reportFields <<['asset_name':it.assetName , 'asset_tag':it.assetTag, "asset_type":it.assetType, 
-                                "manufacturer":it.manufacturer, "model":it.model, "source_rack":it.sourceRack, 
-                                "source_rack_position":it.sourceRackPosition, "usize":it.usize, "cart":it.cart, 
-                                "shelf":it.shelf,"source_team_id":it.sourceTeam?.id, "move_bundle_id":it.moveBundle?.id, 
-                                "clientName":projectInstance?.client?.name, 'projectName':partyGroupInstance?.name, 
-                                'bundleName':bundleName, 'teamName':"", 'teamMembers':"",'location':"Source Team", 
-                                'rack':"SourceRack",'rackPos':"SourceRackPosition",'usize':it.usize]
-            }
-            chain(controller:'jasper',action:'index',model:[data:reportFields],params:params)
+        	def includeOtherBundle = params.otherBundle
+        	def includeBundleName = params.bundleName
+        	def printQuantity = params.printQuantity
+        	def location = params.locationName
+        	def racks = []
+        	def rack
+        	def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
+        	def moveBundleList
+        	if(bundleId){
+        		moveBundleList = MoveBundle.findAllById(bundleId)
+        	} else {
+        		def project = Project.findById(projectId)
+        		moveBundleList = MoveBundle.findAllByProject(project)
+        	}
+        	def rackLayout = []
+        	moveBundleList.each{ bundle ->
+        		if(location == "source"){
+            		rack = request.getParameterValues("sourcerack")
+            		rack.each{
+            			racks<<[rack:it]
+            		}
+            		if(rack[0] == ""){
+            			racks = jdbcTemplate.queryForList(" select CONCAT_WS('~',IFNULL(source_location ,''),IFNULL(source_room,''),"+
+            												"IFNULL(source_rack,'')) as rack from asset_entity where move_bundle_id = $bundle.id "+
+            												"group by source_location, source_rack, source_room")
+            		}
+            	} else {
+            		rack = request.getParameterValues("targetrack")
+            		rack.each{
+            			racks<<[rack:it]
+            		}
+            		if(rack[0] == ""){
+            			racks = jdbcTemplate.queryForList( "select CONCAT_WS('~',IFNULL(target_location ,''),IFNULL(target_room,''), "+
+															"IFNULL(target_rack,'')) as rack from asset_entity where move_bundle_id = $bundle.id "+
+															"group by source_location, source_rack, source_room")
+            		}
+            	}
+        		racks.each{
+                	def rackRooms = it.rack.split("~")
+    	            def assetDetails = []
+                	def assetsDetailsQuery = supervisorConsoleService.getQueryForRackElevation(bundle,rackRooms,location)
+    	            def assetEntityList = jdbcTemplate.queryForList(assetsDetailsQuery.toString())
+    	            assetEntityList.sort{
+    	            	it.sourceRackPosition
+    	            }
+    	            for (int i = 42; i > 0; i--) {
+    	            	def assetEnity
+    		            assetEntityList.each {
+    	            		def position 
+    	            		if(it.usize && it.usize != '0'){
+    	            			position =  it.rackPosition + Integer.parseInt(it.usize) - 1
+    	            		} else {
+    	            			position =  it.rackPosition
+    	            		}
+    		            	if(position == i ){
+    		            		assetEnity = it;
+    		            	}
+    		            }
+    	            	def cssClass = "empty"
+    	            	def rackStyle = "rack_past"
+    	            	if(assetEnity){
+    	            		if(assetEnity.racksize > 1 ){
+    	            			cssClass = 'rack_error'
+    	            		} else {
+    	            			cssClass = 'rack_current'
+    	            		}
+    	            		if(assetEnity.usize == '0'){
+    	            			rackStyle = 'rack_error'
+    	            		}
+    	            		assetDetails<<[asset:assetEnity, rack:i, cssClass:cssClass, rackStyle:rackStyle]
+    	            	}else {
+    	            		assetDetails<<[asset:null, rack:i, cssClass:cssClass, rackStyle:rackStyle]
+    	            	}
+    	            }
+    	            def rows = getRackLayout( assetDetails )
+    	            rackLayout << [ assetDetails : assetDetails, rack : rackRooms[2], location: rackRooms[0]+"("+location+")" , bundle:bundle, rows:rows ]  
+            	}
+        	}
+           render(view:'rackLayoutReport',model:[rackLayout:rackLayout])
         }
     }
 	/*
@@ -1159,4 +1220,28 @@ class MoveBundleAssetController {
     	rackDetails << [sourceRackList:sourceRackList, targetRackList:targetRackList]
     	render rackDetails as JSON
 	 }
+	/*----------------------------------------
+	 * @author : Lokanath Reddy
+	 * @param  : asset details
+	 * @return : rack rows
+	 *---------------------------------------*/
+	def getRackLayout(asset){
+    	def rows= new StringBuffer()
+    	def rowspan = 1
+    	asset.each{
+    		 def row = new StringBuffer("<tr><td class='${it.rackStyle}'>${it.rack}</td>")
+    		 	if(it.asset){
+    		 		rowspan = Integer.parseInt(it.asset?.usize != '0' ? it.asset?.usize : '1')
+    		 		row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${it.asset?.assetTag}</td><td>kajsd faklsdjh</td>")
+    		 	} else if(rowspan <= 1){
+    		 		rowspan = 1
+    		 		row.append("<td rowspan=1 class=${it.cssClass}></td>")
+    		 	} else {
+    		 		rowspan--
+    		 	}
+    		 row.append("</tr>")
+    		 rows.append(row.toString())
+    	}
+    	return rows
+     }
 }   
