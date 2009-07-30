@@ -438,7 +438,10 @@ td .odd {
 		   	$("#image_"+rowVal).css('visibility','hidden');
 	   	}
 	   	var seconds = new Date().getTime() - $("#lastRefreshId").val();
-	   	timedRefresh($('#selectTimedId').val() - seconds )
+	   	var refreshTime = $('#selectTimedId').val() - seconds
+	   	if( !isNaN(refreshTime) ){
+	   		timedRefresh( refreshTime )
+	   	}
    	}
    	function displayLess(){
    		$("#recentChangesMore").hide()
