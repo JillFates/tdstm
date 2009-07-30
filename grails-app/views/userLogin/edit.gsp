@@ -6,15 +6,41 @@
         <meta name="layout" content="companyHeader" />
         <title>Edit UserLogin</title>
         <g:javascript library="jquery" />
-			 <script type="text/javascript">  
+			 <script type="text/javascript"> 
+			 	   var flag 
 				   $().ready(function() {  
-				    $('#add').click(function() {  
-				     return !$('#availableRoleId option:selected').remove().appendTo('#assignedRoleId');  
+				    $('#add').click(function() {
+				     flag = !$('#availableRoleId option:selected').remove().appendTo('#assignedRoleId');
+				     updateRole( 'add' );
+				     return flag;  
 				    });  
-				    $('#remove').click(function() {  
-				     return !$('#assignedRoleId option:selected').remove().appendTo('#availableRoleId');  
+				    $('#remove').click(function() {
+				     flag = !$('#assignedRoleId option:selected').remove().appendTo('#availableRoleId');
+				     updateRole( 'remove' );  
+				     return flag;  
 				    });  
-				   });  
+				   }); 
+				   
+				   function updateRole( val ) {
+				   	 var personId = $('#person').val();
+				     var assignedRoleId  = new Array(); 
+				     var obj = document.editUserForm.assignedRole;
+				     switch( val ) {
+						case "add" :
+							for ( var i = 0; i < obj.options.length; i++ ) {
+				     			if ( obj.options[ i ].selected ) 
+				     				assignedRoleId.push( obj.options[ i ].value ); 
+				     		}
+							break;
+						case "remove" :
+							for ( var i = 0; i < obj.options.length; i++ ) {
+				     			if ( !obj.options[ i ].selected ) 
+				     				assignedRoleId.push( obj.options[ i ].value ); 
+				     		}
+							break;
+					 }				      				 
+				     ${remoteFunction(controller:'userLogin', action:'addRoles', params:'\'assignedRoleId=\' + assignedRoleId +\'&person=\'+personId')}
+				   } 
 			  </script> 
     </head>
     <body>
@@ -29,7 +55,7 @@
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
-            <g:form method="post" >
+            <g:form method="post" name="editUserForm">
                 <input type="hidden" name="id" value="${userLoginInstance?.id}" />
                 <input type="hidden" name="companyId" value="${companyId}" />
                 <div class="dialog">
@@ -41,7 +67,7 @@
                                     <label for="person">Person:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'person','errors')}">
-                                    <g:select optionKey="id" from="${Person.list()}" name="person.id" value="${userLoginInstance?.person?.id}" ></g:select>
+                                    <g:select optionKey="id" from="${Person.list()}" id="person" name="person.id" value="${userLoginInstance?.person?.id}" ></g:select>
                                 <g:hasErrors bean="${userLoginInstance}" field="person">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="person"/>

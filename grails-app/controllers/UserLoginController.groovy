@@ -92,6 +92,14 @@ class UserLoginController {
             redirect( action:edit, id:params.id, params:[ companyId:companyId ])
         }
     }
+	
+	// set the User Roles to the Person
+	def addRoles = {
+			def assignedRoles = params.assignedRoleId.split(',')
+        	def person = params.person
+        	userPreferenceService.setUserRoles(assignedRoles, person)
+	}
+	
 	// return userlogin details to create form
     def create = {
 		def personId = params.id
