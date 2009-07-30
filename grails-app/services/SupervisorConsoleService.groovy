@@ -102,19 +102,33 @@ class SupervisorConsoleService {
      * @param  : move bundle and request params
      * @return : Query for Rack Elevation  
      *----------------------------------------*/
-    def getQueryForRackElevation( def bundle, def rackRooms, def type ) {
+    def getQueryForRackElevation( def bundleId, def projectId, def includeOtherBundle, def rackRooms, def type ) {
     	def assetsDetailsQuery = new StringBuffer("select a."+type+"_rack_position as rackPosition, max(a.usize) as usize, "+
+    												"a.power_port as powerPort, nic_port as nicPort,remote_mgmt_port as remoteMgmtPort, "+
+    												"CONCAT_WS(' / ',a.fiber_cabinet,a.hba_port ) as fiberCabinet,"+
+    												"CONCAT_WS(' / ',a.kvm_device,a.kvm_port ) as kvmDevice,"+
 													"count(a.asset_entity_id) as racksize, a.move_bundle_id as bundleId, "+
 													"GROUP_CONCAT(CONCAT_WS(' - ',a.asset_tag,a.asset_name ) SEPARATOR '<br>') "+
-													"as assetTag from asset_entity a where a.move_bundle_id = $bundle.id ")
+													"as assetTag from asset_entity a where ")
+    	if( bundleId && !includeOtherBundle){
+    		assetsDetailsQuery.append(" a.move_bundle_id = $bundleId ")
+    	} else {
+    		assetsDetailsQuery.append(" a.project_id = $projectId ")
+    	}
 		if(rackRooms[0]){
-		assetsDetailsQuery.append(" and a."+type+"_location = '${rackRooms[0]}' ")
+			def location = rackRooms[0].replace("'","\\'")
+			location = location.replace('"','\\"')
+			assetsDetailsQuery.append(" and a."+type+"_location = '${location}' ")
 		}
 		if(rackRooms[1]){
-		assetsDetailsQuery.append(" and a."+type+"_room = '${rackRooms[1]}' ")
+			def room = rackRooms[1].replace("'","\\'")
+			room =room.replace("'","\\'")
+			assetsDetailsQuery.append(" and a."+type+"_room = '${room}' ")
 		}
 		if(rackRooms[2]){
-		assetsDetailsQuery.append(" and a."+type+"_rack = '${rackRooms[2]}' ")
+			def rack = rackRooms[2].replace("'","\\'")
+			rack = rack.replace("'","\\'")
+			assetsDetailsQuery.append(" and a."+type+"_rack = '${rack}' ")
 		}
 		assetsDetailsQuery.append(" group by "+type+"_Rack_Position")
     }

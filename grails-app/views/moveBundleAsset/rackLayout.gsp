@@ -26,10 +26,21 @@
 				var ravalue = rack.rack ? rack.rack : '';
 				var value = locvalue +"~"+rmvalue +"~"+ ravalue
 				var text =  locvalue +"/"+rmvalue +"/"+ ravalue
-				options += "<option value='"+value+"'>"+text+"</option>"
+				options += "<option value="+value+">"+text+"</option>"
 			}
 			selectObj.html(options)	          	
       	}
+     }
+     function validateForm(){
+     	if($("#bundleId").val() == 'null') {
+     		alert("Please select bundle")
+     		return false;
+     	} else if( !$("#frontView").is(":checked") && !$("#backView").is(":checked") ) {
+     		alert("Please select print view")
+     		return false;
+     	} else {
+     		return true;
+     	}
      }
     </script>
 </head>
@@ -41,7 +52,7 @@
 </g:if>
 <div class="dialog">
 <table>
-	<g:form action="rackLayoutReport" method="post">
+	<g:form action="rackLayoutReport" method="post" target="new" onsubmit="return validateForm()">
 	<tbody>
 		<tr class="prop" id="bundleRow">
 			<td valign="top" class="name"><label>Current Move Bundle :</label></td>
@@ -90,13 +101,14 @@
 			<td valign="top" colspan="2"><input type="checkbox" name="bundleName" ></td>
 		</tr>
 		<tr>
-			<td valign="top" class="name"><label>Print Quantity :</label></td>
-			<td colspan="2"><g:select id="rackPerPage" from="${1..6}" name="printQuantity"/></td>
+			<td valign="top" class="name"><label>Print Views :</label></td>
+			<td valign="top"><label for="frontView" ><input type="checkbox" name="frontView" id="frontView" />&nbsp;Front</label></td>
+			<td valign="top"><label for="backView" ><input type="checkbox" name="backView" id="backView" >&nbsp;Back</label></td>
 		</tr>
 		<tr>
 			<td colspan="3" class="buttonR" style="text-align: center;">
 				<input type="hidden" name="locationName" id="locationNameId" value="source"/>
-				<input type="submit" value="Generate" onclick="this.form.target='_blank';return true;"/>
+				<input type="submit" value="Generate" />
 			</td>
 		</tr>
 	</tbody>
