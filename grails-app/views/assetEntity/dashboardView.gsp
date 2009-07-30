@@ -24,7 +24,6 @@
 <jq:plugin name="ui.draggable" />
 <jq:plugin name="ui.resizable" />
 <jq:plugin name="ui.dialog" />
-<jq:plugin name="jquery.dimensions" />
 
 <style>
 td .odd {
@@ -34,8 +33,6 @@ td .odd {
 </style>
 
 <script>
- var name = "#floatMenu";  
- var menuYloc = null; 
 	$(document).ready(function() {
 	    $("#showDialog").dialog({ autoOpen: false })
 	    $("#editDialog").dialog({ autoOpen: false })
@@ -45,12 +42,6 @@ td .odd {
 	    $("#editCommentDialog").dialog({ autoOpen: false })
 	    $("#showChangeStatusDialog").dialog({ autoOpen: false })
 	    $('#filterDialog').dialog({ autoOpen: false })
-	    
-	   menuYloc = parseInt($(name).css("top").substring(0,$(name).css("top").indexOf("px")))  
-       $(window).scroll(function () {   
-         var offset = menuYloc+$(document).scrollTop()+"px"; 
-         $(name).animate({top:offset},{duration:500,queue:false});   
-       });  
 	    
 	})
 </script>
@@ -947,7 +938,7 @@ td .odd {
 		<table style="border: 0px;">
 			<tr>
 				<td valign="top" style="padding: 0px;">
-				<div class="list" style="width: 750px;"><g:form name="assetListForm">
+				<div class="list"><g:form name="assetListForm">
 					<table>
 						<thead>
 							<tr	id="rowId" onmouseover="$('#rowId').css('background','white');">
@@ -1074,7 +1065,84 @@ td .odd {
 					</table>
 
 				</g:form></div>
-				</td>				
+				</td>
+				<td valign="top" style="padding: 0px;">
+				<div id="assetDetails"
+					style="border: 1px solid #5F9FCF; width: 200px;">
+				<div id="asset">
+				<table style="border: 0px" cellpadding="0" cellspacing="0">
+					<thead>
+						<tr>
+							<th colspan="2">Asset Details</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><b>Name: </b></td>
+						</tr>
+						<tr>
+							<td><b>Model:</b></td>
+						</tr>
+						<tr>
+							<td><b>Rack: </b></td>
+						</tr>
+						<tr>
+							<td><b>Status: </b></td>
+						</tr>
+						<tr>
+							<td><b>Recent Changes: </b></td>
+						</tr>
+					</tbody>
+				</table>
+				</div>
+				<div>
+				<input type="hidden" name="asset" id="assetId" value="">
+				<input type="hidden" name="currentState" id="currentStateId" value="">
+				<input type="hidden" value="" id="validateCommentId" name="validateComment">
+				<g:form name="assetdetailsForm">
+					<table style="border: 0">
+						<tbody>
+							<tr>
+								<td><b>Change:</b></td>
+								<td><select id="stateSelectId" name="state"
+									style="width: 100px"
+									onchange="${remoteFunction(action:'getFlag', params:'\'toState=\'+ this.value +\'&fromState=\'+$(\'#currentStateId\').val()', onComplete:'setComment(e)')}">
+									<option value="">Status</option>
+								</select></td>
+							</tr>
+							<tr>
+								<td>
+								&nbsp;</td>
+								<td><g:select id="priorityId" name="priority"
+									from="${AssetEntity.constraints.priority.inList}"
+									style="width: 100px" noSelection="['':'Priority ']"></g:select>
+								</td>
+							</tr>
+							<tr>
+								<td>&nbsp;</td>
+								<td><select id="assignToId" name="assignTo"
+									style="width: 100px">
+									<option value="">Move Team</option>
+									<optgroup label="Source" id="sourceAssignTo"></optgroup>
+									<optgroup label="Target" id="targetAssignTo"></optgroup>
+								</select></td>
+							</tr>
+							<tr>
+								<td colspan="2" style="text-align: center;">
+									<textarea name="comment" id="commentId" cols="25" rows="2"></textarea></td>
+							</tr>
+							<tr>
+								<td colspan="2" style="text-align: center;" class="buttonR">
+								<input type="button" value="Cancel"
+									onclick="resetAssetDetails()">
+								<input type="button" value="Submit"
+									onclick="setCommentValidation();${remoteFunction(action:'createTransition', params:'\'asset=\' + $(\'#assetId\').val() +\'&state=\'+ $(\'#stateSelectId\').val() +\'&priority=\'+ $(\'#priorityId\').val() +\'&assignTo=\'+$(\'#assignToId\').val() +\'&comment=\'+$(\'#commentId\').val() ', onComplete:'updateAsset(e)')}" /></td>
+							</tr>
+						</tbody>
+					</table>
+				</g:form></div>
+				</div>
+				</td>
 			</tr>
 		</table>
 		</td>
@@ -1446,83 +1514,5 @@ bundleChange();
 timedRefresh($("#selectTimedId").val())
 </script>
 </div>
-<div id="floatMenu" style="position:absolute;top:320px;left:50%;margin-left:216px;width:200px;">  
-       <div id="assetDetails"
-					style="border: 1px solid #5F9FCF; width: 200px;">
-				<div id="asset">
-				<table style="border: 0px" cellpadding="0" cellspacing="0">
-					<thead>
-						<tr>
-							<th colspan="2">Asset Details</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td><b>Name: </b></td>
-						</tr>
-						<tr>
-							<td><b>Model:</b></td>
-						</tr>
-						<tr>
-							<td><b>Rack: </b></td>
-						</tr>
-						<tr>
-							<td><b>Status: </b></td>
-						</tr>
-						<tr>
-							<td><b>Recent Changes: </b></td>
-						</tr>
-					</tbody>
-				</table>
-				</div>
-				<div>
-				<input type="hidden" name="asset" id="assetId" value="">
-				<input type="hidden" name="currentState" id="currentStateId" value="">
-				<input type="hidden" value="" id="validateCommentId" name="validateComment">
-				<g:form name="assetdetailsForm">
-					<table style="border: 0">
-						<tbody>
-							<tr>
-								<td><b>Change:</b></td>
-								<td><select id="stateSelectId" name="state"
-									style="width: 100px"
-									onchange="${remoteFunction(action:'getFlag', params:'\'toState=\'+ this.value +\'&fromState=\'+$(\'#currentStateId\').val()', onComplete:'setComment(e)')}">
-									<option value="">Status</option>
-								</select></td>
-							</tr>
-							<tr>
-								<td>
-								&nbsp;</td>
-								<td><g:select id="priorityId" name="priority"
-									from="${AssetEntity.constraints.priority.inList}"
-									style="width: 100px" noSelection="['':'Priority ']"></g:select>
-								</td>
-							</tr>
-							<tr>
-								<td>&nbsp;</td>
-								<td><select id="assignToId" name="assignTo"
-									style="width: 100px">
-									<option value="">Move Team</option>
-									<optgroup label="Source" id="sourceAssignTo"></optgroup>
-									<optgroup label="Target" id="targetAssignTo"></optgroup>
-								</select></td>
-							</tr>
-							<tr>
-								<td colspan="2" style="text-align: center;">
-									<textarea name="comment" id="commentId" cols="25" rows="2"></textarea></td>
-							</tr>
-							<tr>
-								<td colspan="2" style="text-align: center;" class="buttonR">
-								<input type="button" value="Cancel"
-									onclick="resetAssetDetails()">
-								<input type="button" value="Submit"
-									onclick="setCommentValidation();${remoteFunction(action:'createTransition', params:'\'asset=\' + $(\'#assetId\').val() +\'&state=\'+ $(\'#stateSelectId\').val() +\'&priority=\'+ $(\'#priorityId\').val() +\'&assignTo=\'+$(\'#assignToId\').val() +\'&comment=\'+$(\'#commentId\').val() ', onComplete:'updateAsset(e)')}" /></td>
-							</tr>
-						</tbody>
-					</table>
-				</g:form></div>
-			</div>
-</div>  
 </body>
-    
 </html>
