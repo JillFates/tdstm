@@ -1005,13 +1005,13 @@ class MoveBundleAssetController {
     	            	def cssClass = "empty"
         	            def rackStyle = "rack_past"
     		            assetEntityList.each {
-    	            		def position
+    	            		/*def position
     	            		if(it.usize && !it.usize.equals("0")){
     	            			position =  (it.rackPosition ? it.rackPosition : 1 ) + Integer.parseInt(it.usize) - 1
     	            		} else {
     	            			position =  it.rackPosition
-    	            		}
-    	            		if(position == i ){
+    	            		}*/
+    	            		if(it.rackPosition == i ){
     		            		assetEnity = it
     		            	}
     		            }
