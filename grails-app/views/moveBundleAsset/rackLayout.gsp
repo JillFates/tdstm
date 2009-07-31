@@ -52,7 +52,7 @@
 </g:if>
 <div class="dialog">
 <table>
-	<g:form action="rackLayoutReport" method="post" target="new" onsubmit="return validateForm()">
+	<g:form action="rackLayoutReport" method="post" onsubmit="this.target='_blank';return validateForm()">
 	<tbody>
 		<tr class="prop" id="bundleRow">
 			<td valign="top" class="name"><label>Current Move Bundle :</label></td>
