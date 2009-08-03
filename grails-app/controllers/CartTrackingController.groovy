@@ -224,6 +224,7 @@ class CartTrackingController {
 		def bundleId = params.moveBundle
 		def cart = params.cart
 		def truck = params.truck
+		def status = ""
 		def assetEntityList = AssetEntity.findAll(" from AssetEntity a where a.project = $projectId and "+
 												"a.moveBundle = $bundleId and a.cart = '$cart' ")
 		assetEntityList.each{
@@ -237,8 +238,9 @@ class CartTrackingController {
 		    	if(currentState != "Hold"){
 		    		transactionStatus = workflowService.createTransition("STD_PROCESS","SUPERVISOR", "OnTruck", it, it.moveBundle, loginUser, null, null )
 		    	}
+				status += ""+transactionStatus.success+":"+it.assetName +"~"
 			}
 		}
-		render assetEntityList as JSON
+		render status
 	}
 }

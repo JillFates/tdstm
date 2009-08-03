@@ -8,7 +8,7 @@
 	
 <g:javascript library="application" />
 </head>
-<body>
+<body onload="document.loginForm.username.focus()">
 <div id="spinner" class="spinner" style="display: none;"><img
 	src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 </div>
@@ -43,7 +43,7 @@
 				<tbody>
 					<tr>
 						<td>Username:</td>
-						<td><input type="text" name="username" value="${username}" /></td>
+						<td><input type="text" name="username" id="usernameId" value="${username}" /></td>
 					</tr>
 					<tr>
 						<td>Password:</td>

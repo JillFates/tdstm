@@ -221,15 +221,39 @@
 	/*-----------------------------------------
 	* function to change all assets state to OnTruck
 	*-----------------------------------------*/
-	function moveToOnTruck(cart, truck){
+	function moveToOnTruck(cart, truck, rowId){
 		var confirmMove = confirm( "This action will update all assets on cart to On Truck.  Are you sure you want to continue?")
 		if( confirmMove ){
 			var projectId = $("#projectId").val();
 			var moveBundle = $("#moveBundleId").val();
-			${remoteFunction(action:'moveToOnTruck', params:'\'cart=\' + cart +\'&truck=\'+truck +\'&projectId=\'+projectId+\'&moveBundle=\'+moveBundle ', onComplete:'location.reload(true)')}
+			${remoteFunction(action:'moveToOnTruck', params:'\'cart=\' + cart +\'&truck=\'+truck +\'&projectId=\'+projectId+\'&moveBundle=\'+moveBundle ', onComplete:'removeMoveToTruckLink(e,rowId)')}
 			return true;
 		} else {
 			return false
+		}
+	}
+	function removeMoveToTruckLink(e, rowId){
+		var statusObj = e.responseText ;
+		var statusList = statusObj.split("~");
+		var message = "";
+		if(statusList){
+			var length = statusList.length;
+			for(i = 0; i<length -1; i++){
+				var status = statusList[i].split(':');
+				if(status[0] != 'true'){
+					message += status[1]  ;
+					if(i != length-2){
+					 	message += ", "
+					} 
+				}
+			}
+		} 
+		if(message){
+			alert(message +" transitions are failed")
+		} else if('${cartAction}' == 'allId'){ 
+			$("#completedTd_"+rowId).html('<input type="checkbox" checked="checked" disabled="disabled">')			
+		} else {
+			$("#cartRow_"+rowId).hide()
 		}
 	}
 </script>
@@ -284,18 +308,18 @@
 	<tbody id="cartTableHighlightId">
 		<g:if test="${cartTrackingDetails}">
 		<g:each in="${cartTrackingDetails}" status="i" var="cartTrackingDetails" >
-			<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+			<tr class="${(i % 2) == 0 ? 'even' : 'odd'}" id="cartRow_${i}">
 			<td><a href="#" onclick="openChangeTruckDiv('${cartTrackingDetails?.cartDetails?.cart}')">${cartTrackingDetails?.cartDetails?.truck}</a></td>
 			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}',${i})">${cartTrackingDetails?.cartDetails?.cart}</td>
 			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}',${i})">${cartTrackingDetails?.cartDetails?.totalAssets}</td>
 			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}',${i})">${cartTrackingDetails?.pendingAssets}</td>
 			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}',${i})">${cartTrackingDetails?.cartDetails?.usize ? (Integer)cartTrackingDetails?.cartDetails?.usize : ''}</td>
-			<td>
+			<td id="completedTd_${i}">
 			<g:if test="${cartTrackingDetails?.completed}">
 				<input type="checkbox" checked="checked" disabled="disabled">
 			</g:if>
 			<g:elseif test="${cartTrackingDetails?.pendingAssets == 0 }" >
-				<a href="#" onclick="return moveToOnTruck('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}')">Move to Truck</a>
+				<a href="#" onclick="return moveToOnTruck('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}','${i}')">Move to Truck</a>
 			</g:elseif>
 			</td>
 			</tr>
