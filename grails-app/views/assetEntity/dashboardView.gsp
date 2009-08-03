@@ -24,6 +24,7 @@
 <jq:plugin name="ui.draggable" />
 <jq:plugin name="ui.resizable" />
 <jq:plugin name="ui.dialog" />
+<jq:plugin name="jquery.scrollfollow" />
 
 <style>
 td .odd {
@@ -42,7 +43,7 @@ td .odd {
 	    $("#editCommentDialog").dialog({ autoOpen: false })
 	    $("#showChangeStatusDialog").dialog({ autoOpen: false })
 	    $('#filterDialog').dialog({ autoOpen: false })
-	    
+	    $( '#floatMenu' ).scrollFollow();
 	})
 </script>
 <script type="text/javascript">
@@ -772,7 +773,7 @@ td .odd {
 	</div>
 </g:form>
 <div style="width: 100%; float: left; border: 1px solid #cccccc;">
-<table style="border: 0px">
+<table style="border: 0px;">
 	<tr>
 		<td>
 		<div style="width: 100%; float: left; border-left: 1px solid #333333;">
@@ -1067,6 +1068,7 @@ td .odd {
 				</g:form></div>
 				</td>
 				<td valign="top" style="padding: 0px;">
+				<div id="floatMenu" style="position:relative;">
 				<div id="assetDetails"
 					style="border: 1px solid #5F9FCF; width: 200px;">
 				<div id="asset">
@@ -1141,7 +1143,7 @@ td .odd {
 						</tbody>
 					</table>
 				</g:form></div>
-				</div>
+				</div></div>
 				</td>
 			</tr>
 		</table>
