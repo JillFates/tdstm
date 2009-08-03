@@ -60,44 +60,50 @@ class UserLoginController {
 	 * update user details and set the User Roles to the Person
 	 */
     def update = {
-        def userLoginInstance = UserLogin.get( params.id )
-        def companyId = params.companyId
-        if(userLoginInstance) {
-        	def password = params.password
-        	def oldPassword = userLoginInstance.password
-        	userLoginInstance.properties = params
-        	if(password != ""){
-        		//	convert password onto Hash code
-                userLoginInstance.password = new Sha1Hash(params['password']).toHex()
-        	}else{
-        		userLoginInstance.password = oldPassword
-        	}
-            
-            if(!userLoginInstance.hasErrors() && userLoginInstance.save()) {
-            	def assignedRoles = request.getParameterValues("assignedRole");
-            	def person = params.person.id
-            	userPreferenceService.setUserRoles(assignedRoles, person)
-                flash.message = "UserLogin ${userLoginInstance} updated"
-                redirect( action:show, id:userLoginInstance.id, params:[ companyId:companyId ] )
-            }
-            else {
-            	def person = userLoginInstance.person
-            	def availableRoles = userPreferenceService.getAvailableRoles( person )
-                def assignedRoles = request.getParameterValues( "assignedRole" )
-                render(view:'edit',model:[userLoginInstance:userLoginInstance, availableRoles:availableRoles, updatedRoles:assignedRoles, companyId:companyId ])
-            }
-        }
-        else {
-            flash.message = "UserLogin not found with id ${params.id}"
-            redirect( action:edit, id:params.id, params:[ companyId:companyId ])
-        }
+		UserLogin.withTransaction { status ->
+	        def userLoginInstance = UserLogin.get( params.id )
+	        def companyId = params.companyId
+	        if(userLoginInstance) {
+	        	def password = params.password
+	        	def oldPassword = userLoginInstance.password
+	        	userLoginInstance.properties = params
+	        	if(password != ""){
+	        		//	convert password onto Hash code
+	                userLoginInstance.password = new Sha1Hash(params['password']).toHex()
+	        	}else{
+	        		userLoginInstance.password = oldPassword
+	        	}
+	            if( !userLoginInstance.hasErrors() && userLoginInstance.save(flush:true) ) {
+	            	/*def assignedRoles = request.getParameterValues("assignedRole");
+	            	def person = params.person.id
+	            	userPreferenceService.setUserRoles(assignedRoles, person)*/
+	                flash.message = "UserLogin ${userLoginInstance} updated"
+	                redirect( action:show, id:userLoginInstance.id, params:[ companyId:companyId ] )
+	            } else {
+	            	def person = userLoginInstance.person
+	            	def availableRoles = userPreferenceService.getAvailableRoles( person )
+	                def assignedRoles = userPreferenceService.getAssignedRoles( person )
+	                status.setRollbackOnly()
+	                render(view:'edit',model:[userLoginInstance:userLoginInstance, availableRoles:availableRoles, assignedRoles:assignedRoles, companyId:companyId ])
+	            }
+	        }
+	        else {
+	            flash.message = "UserLogin not found with id ${params.id}"
+	            redirect( action:edit, id:params.id, params:[ companyId:companyId ])
+	        }
+		}
     }
 	
 	// set the User Roles to the Person
 	def addRoles = {
 			def assignedRoles = params.assignedRoleId.split(',')
         	def person = params.person
-        	userPreferenceService.setUserRoles(assignedRoles, person)
+        	def actionType = params.actionType
+        	if(actionType != "remove"){
+        		userPreferenceService.setUserRoles(assignedRoles, person)
+        	} else {
+        		userPreferenceService.removeUserRoles(assignedRoles, person)
+        	}
 	}
 	
 	// return userlogin details to create form

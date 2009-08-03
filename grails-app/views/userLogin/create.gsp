@@ -14,7 +14,12 @@
 			    $('#remove').click(function() {  
 			     return !$('#assignedRoleId option:selected').remove().appendTo('#availableRoleId');  
 			    });  
-			   });  
+			   });
+			   function selectAllAssigned(){
+			   	$('#assignedRoleId').each(function(){  
+					$("#assignedRoleId option").attr("selected","selected");  
+   				});
+			   }
 			  </script>          
     </head>
     <body>
@@ -145,7 +150,7 @@
                     </table>
                 </div>
                 <div class="buttons">
-                    <span class="button"><input class="save" type="submit" value="Create" /></span>
+                    <span class="button"><input class="save" type="submit" value="Create" onclick="selectAllAssigned()"/></span>
                 </div>
             </g:form>
         </div>

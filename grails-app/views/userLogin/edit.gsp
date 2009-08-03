@@ -10,36 +10,22 @@
 			 	   var flag 
 				   $().ready(function() {  
 				    $('#add').click(function() {
+				     updateRole( 'add',$('#availableRoleId').val() );
 				     flag = !$('#availableRoleId option:selected').remove().appendTo('#assignedRoleId');
-				     updateRole( 'add' );
 				     return flag;  
 				    });  
 				    $('#remove').click(function() {
+				     updateRole( 'remove',$('#assignedRoleId').val() );
 				     flag = !$('#assignedRoleId option:selected').remove().appendTo('#availableRoleId');
-				     updateRole( 'remove' );  
 				     return flag;  
 				    });  
 				   }); 
 				   
-				   function updateRole( val ) {
+				   function updateRole( action, values ) {
 				   	 var personId = $('#person').val();
-				     var assignedRoleId  = new Array(); 
-				     var obj = document.editUserForm.assignedRole;
-				     switch( val ) {
-						case "add" :
-							for ( var i = 0; i < obj.options.length; i++ ) {
-				     			if ( obj.options[ i ].selected ) 
-				     				assignedRoleId.push( obj.options[ i ].value ); 
-				     		}
-							break;
-						case "remove" :
-							for ( var i = 0; i < obj.options.length; i++ ) {
-				     			if ( !obj.options[ i ].selected ) 
-				     				assignedRoleId.push( obj.options[ i ].value ); 
-				     		}
-							break;
-					 }				      				 
-				     ${remoteFunction(controller:'userLogin', action:'addRoles', params:'\'assignedRoleId=\' + assignedRoleId +\'&person=\'+personId')}
+				   	 if(values){
+				     	${remoteFunction(controller:'userLogin', action:'addRoles', params:'\'assignedRoleId=\' + values +\'&person=\'+personId +\'&actionType=\'+action')}
+				     }
 				   } 
 			  </script> 
     </head>
@@ -150,9 +136,6 @@
 		                                <select name="assignedRole" id="assignedRoleId" multiple="multiple" size="10" style="width: 250px">
 				                                <g:each in="${assignedRoles}" var="assignedRole">
 				                                	<option value="${assignedRole?.id}" selected="selected">${assignedRole}</option>
-				                                </g:each>
-				                                <g:each in="${updatedRoles}" var="updatedRole">
-				                                	<option value="${updatedRole}" selected="selected">${RoleType.findById(updatedRole)}</option>
 				                                </g:each>
 		                                </select>
 	                                </td>

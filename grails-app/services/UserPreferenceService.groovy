@@ -82,7 +82,6 @@ class UserPreferenceService  {
      */
     def setUserRoles( def roleType, def person ){
     	def personInstance = Party.findById(person)
-    	PartyRole.executeUpdate("delete from PartyRole where party = $person")
     	roleType.each{role ->
     		def roleTypeInstance = RoleType.findById(role)
     		// Create Role Preferences to User
@@ -90,7 +89,16 @@ class UserPreferenceService  {
     		if(dupPartyRole == null){
     			def partyRole = new PartyRole( party:personInstance, roleType:roleTypeInstance ).save( insert:true )
     		}
-    		
+    	}
+    }
+    /*----------------------------------------------------------
+     * @author : Lokanath Reddy
+     * @param  : person and rols
+     * @return : Remove Roles to Persons in PartyRole  
+     *----------------------------------------------------------*/
+    def removeUserRoles( def roleType, def person ){
+    	roleType.each{role ->
+    		PartyRole.executeUpdate("delete from PartyRole where party = '$person' and roleType = '$role' ")
     	}
     }
     
