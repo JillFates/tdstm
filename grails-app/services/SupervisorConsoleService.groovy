@@ -103,7 +103,7 @@ class SupervisorConsoleService {
      * @return : Query for Rack Elevation  
      *----------------------------------------*/
     def getQueryForRackElevation( def bundleId, def projectId, def includeOtherBundle, def rackRooms, def type ) {
-    	def assetsDetailsQuery = new StringBuffer("select a."+type+"_rack_position as rackPosition, max(cast(if(a.usize != '0' and a.usize,a.usize,'1') as UNSIGNED INTEGER)) as usize, "+
+    	def assetsDetailsQuery = new StringBuffer("select if(a."+type+"_rack_position,a."+type+"_rack_position,1) as rackPosition, max(cast(if(a.usize != '0' and a.usize,a.usize,'1') as UNSIGNED INTEGER)) as usize, "+
     												"a.power_port as powerPort, nic_port as nicPort,remote_mgmt_port as remoteMgmtPort, "+
     												"CONCAT_WS(' / ',a.fiber_cabinet,a.hba_port ) as fiberCabinet,"+
     												"CONCAT_WS(' / ',a.kvm_device,a.kvm_port ) as kvmDevice,"+
@@ -115,20 +115,22 @@ class SupervisorConsoleService {
     	} else {
     		assetsDetailsQuery.append(" a.project_id = $projectId ")
     	}
-		if(rackRooms[0]){
-			def location = rackRooms[0].replace("'","\\'")
-			location = location.replace('"','\\"')
-			assetsDetailsQuery.append(" and a."+type+"_location = '${location}' ")
-		}
-		if(rackRooms[1]){
-			def room = rackRooms[1].replace("'","\\'")
-			room =room.replace("'","\\'")
-			assetsDetailsQuery.append(" and a."+type+"_room = '${room}' ")
-		}
-		if(rackRooms[2]){
-			def rack = rackRooms[2].replace("'","\\'")
-			rack = rack.replace("'","\\'")
-			assetsDetailsQuery.append(" and a."+type+"_rack = '${rack}' ")
+		if(rackRooms.size() == 3){
+	    	if(rackRooms[0]){
+				def location = rackRooms[0].replace("'","\\'")
+				location = location.replace('"','\\"')
+				assetsDetailsQuery.append(" and a."+type+"_location = '${location}' ")
+			}
+			if(rackRooms[1]){
+				def room = rackRooms[1].replace("'","\\'")
+				room =room.replace('"','\\"')
+				assetsDetailsQuery.append(" and a."+type+"_room = '${room}' ")
+			}
+			if(rackRooms[2]){
+				def rack = rackRooms[2].replace("'","\\'")
+				rack = rack.replace('"','\\"')
+				assetsDetailsQuery.append(" and a."+type+"_rack = '${rack}' ")
+			}
 		}
 		assetsDetailsQuery.append(" group by a."+type+"_Rack_Position order by (rackPosition + usize - 1) desc")
 		return assetsDetailsQuery 

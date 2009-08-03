@@ -1089,8 +1089,13 @@ class MoveBundleAssetController {
     	            	}
     	            }
     	            def rows = getRackLayout( assetDetails, includeBundleName, backView )
-    	            rackLayout << [ assetDetails : assetDetails, rack : rackRooms[2], room : rackRooms[1], 
-    	                            location : rackRooms[0]+"("+location+")" , rows:rows, backView:backView ]  
+    	            if(rackRooms.size() == 3){
+    	            	rackLayout << [ assetDetails : assetDetails, rack : rackRooms[2] , room : rackRooms[1] , 
+    	                            location : rackRooms[0] +"("+location+")" , rows:rows, backView:backView ]
+    	            } else {
+    	            	rackLayout << [ assetDetails : assetDetails, rack : "", room : "", 
+	                            location : "("+location+")" , rows:rows, backView:backView ]
+    	            }
             	}
            render(view:'rackLayoutReport',model:[rackLayout:rackLayout])
         }
