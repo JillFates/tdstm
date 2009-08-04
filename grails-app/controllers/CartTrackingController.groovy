@@ -249,7 +249,7 @@ class CartTrackingController {
 		def dateFormat = new SimpleDateFormat("HH:mm:ss.SSS")
 			dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"))
 		def elapsedTime = dateFormat.format(new Date(endTime - startTime));
-		log.info("\n MoveToTruck took $elapsedTime ")
+		log.debug("moveToOnTruck took $elapsedTime ")
 		
 		render status
 	}
