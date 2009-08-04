@@ -96,9 +96,8 @@ th {
 		</tr>
 		${rackLayout?.rows}
 	</table>
-
-</g:each>
 	<br class="page-break-after"/>
+</g:each>
 </div>
 </body>
 </html>
