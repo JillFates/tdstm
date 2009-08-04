@@ -1,5 +1,6 @@
 import grails.converters.JSON
 import org.jsecurity.SecurityUtils
+import java.text.SimpleDateFormat
 class CartTrackingController {
 	def userPreferenceService
 	def jdbcTemplate
@@ -220,6 +221,7 @@ class CartTrackingController {
 	 * @return : update the all the assets state to OnTruck
 	 *---------------------------------------------------------*/
 	def moveToOnTruck = {
+		def startTime = System.currentTimeMillis()
 		def projectId = params.projectId
 		def bundleId = params.moveBundle
 		def cart = params.cart
@@ -241,6 +243,14 @@ class CartTrackingController {
 				status += ""+transactionStatus.success+":"+it.assetName +"~"
 			}
 		}
+		
+		/* Logging statement, which shows the elapsed time of the call */
+		def endTime = System.currentTimeMillis()
+		def dateFormat = new SimpleDateFormat("HH:mm:ss.SSS")
+			dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"))
+		def elapsedTime = dateFormat.format(new Date(endTime - startTime));
+		log.info("\n MoveToTruck took $elapsedTime ")
+		
 		render status
 	}
 }

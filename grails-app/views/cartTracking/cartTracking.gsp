@@ -226,13 +226,13 @@
 		if( confirmMove ){
 			var projectId = $("#projectId").val();
 			var moveBundle = $("#moveBundleId").val();
-			${remoteFunction(action:'moveToOnTruck', params:'\'cart=\' + cart +\'&truck=\'+truck +\'&projectId=\'+projectId+\'&moveBundle=\'+moveBundle ', onComplete:'removeMoveToTruckLink(e,rowId)')}
+			${remoteFunction(action:'moveToOnTruck', params:'\'cart=\' + cart +\'&truck=\'+truck +\'&projectId=\'+projectId+\'&moveBundle=\'+moveBundle ', onComplete:'removeMoveToTruckLink(e,cart, truck,rowId)')}
 			return true;
 		} else {
 			return false
 		}
 	}
-	function removeMoveToTruckLink(e, rowId){
+	function removeMoveToTruckLink( e, cart, truck, rowId){
 		var statusObj = e.responseText ;
 		var statusList = statusObj.split("~");
 		var message = "";
@@ -250,11 +250,12 @@
 		} 
 		if(message){
 			alert(message +" transitions are failed")
-		} else if('${cartAction}' == 'allId'){ 
+		} else if('${cartAction}' == 'allId'){
 			$("#completedTd_"+rowId).html('<input type="checkbox" checked="checked" disabled="disabled">')			
 		} else {
 			$("#cartRow_"+rowId).hide()
 		}
+		getAssetsOnCart(cart, truck,rowId)		
 	}
 </script>
 </head>

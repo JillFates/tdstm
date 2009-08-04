@@ -1004,6 +1004,7 @@ class MoveBundleAssetController {
                 	def assetsDetailsQuery = supervisorConsoleService.getQueryForRackElevation( bundleId, projectId, includeOtherBundle, rackRooms, location )
     	            def assetEntityList = jdbcTemplate.queryForList( assetsDetailsQuery.toString() )
     	            assetEntityList.each{assetEntity ->
+    	            	def overlapError = false
     	            	def rackPosition = assetEntity.rackPosition != 0 ? assetEntity.rackPosition : 1
     	            	def rackSize = assetEntity.usize != 0 ? assetEntity.usize : 1
 		            	def position = rackPosition + rackSize - 1
@@ -1019,7 +1020,14 @@ class MoveBundleAssetController {
 		            			def changeBoth = (currentLow >= newLow && currentHigh <= newHigh )
 		            			def changeLow = (currentLow >= newLow && currentHigh >= newHigh && currentLow <= newHigh)
 		            			def changeHigh = (currentLow <= newLow && currentHigh <= newHigh && currentHigh <= newLow)
-		            			if(ignoreLow){
+		            			if(position > 42){
+		            				asset.position = 42
+	    	            			asset.rowspan = 1 
+	    	            			asset.assetTag = asset.assetTag +"<br>"+assetEntity.assetTag
+	    	            			asset.overlapError = true
+	    	            			asset.cssClass = "rack_error"
+	    	            			flag = false
+		            			} else if(ignoreLow){
 		            				asset.position = currentHigh
 	    	            			asset.rowspan = currentHigh - currentLow + 1 
 	    	            			asset.assetTag = asset.assetTag +"<br>"+assetEntity.assetTag
@@ -1055,11 +1063,23 @@ class MoveBundleAssetController {
 	    	            	}
 		            		
 		            		if(flag){
-		            			assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag, position:position, overlapError:false, 
+		            			if(position > 42) {
+			            			position = 42
+			            			newLow = 42
+			            			assetEntity.usize = 1
+			            			overlapError = true
+			            		}
+		            			assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag, position:position, overlapError:overlapError, 
 		            			              rowspan:assetEntity.usize, currentHigh : position, currentLow : newLow]
 		            		}
 		            	}else{
-		            		assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag, position:position, overlapError:false, 
+		            		if(position > 42) {
+		            			position = 42
+		            			newLow = 42
+		            			assetEntity.usize = 1
+		            			overlapError = true
+		            		}
+		            		assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag, position:position, overlapError:overlapError, 
 		            		              rowspan:assetEntity.usize, currentHigh : position, currentLow : newLow ]
 		            	}
 		            }
@@ -1348,9 +1368,7 @@ class MoveBundleAssetController {
     		 		row.append("<td class='${rackStyle}'>${it.rack}</td>")
     		 		rowspan--
     		 	}
-    		 if(backView){
-    			 row.append("<td class='${rackStyle}'>${it.rack}</td>")
-    		 }
+    		 row.append("<td class='${rackStyle}'>${it.rack}</td>")
     		 if(it.cssClass == "rack_current" && backView){
     			 row.append("<td class='${it.cssClass}'>&nbsp;</td><td class='${it.cssClass}'>&nbsp;</td><td class='${it.cssClass}'>&nbsp;</td>"+
     			 			"<td class='${it.cssClass}'>&nbsp;</td><td class='${it.cssClass}'>&nbsp;</td><td class='${it.cssClass}'>&nbsp;</td>"+

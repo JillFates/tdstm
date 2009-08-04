@@ -84,7 +84,9 @@ td {
 			<th>Bundle</th>
 			<g:if test="${rackLayout?.backView}">
 				<th>Cabling</th>
-				<th>U</th>
+			</g:if>
+			<th>U</th>
+			<g:if test="${rackLayout?.backView}">
 				<th>Pos</th>
 				<th>PDU</th>
 				<th>NIC</th>
