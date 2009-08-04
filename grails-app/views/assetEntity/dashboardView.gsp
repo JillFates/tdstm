@@ -43,7 +43,9 @@ td .odd {
 	    $("#editCommentDialog").dialog({ autoOpen: false })
 	    $("#showChangeStatusDialog").dialog({ autoOpen: false })
 	    $('#filterDialog').dialog({ autoOpen: false })
-	    $( '#floatMenu' ).scrollFollow();
+	    $( '#floatMenu' ).scrollFollow({
+		    speed: 50
+		});
 	})
 </script>
 <script type="text/javascript">
@@ -729,7 +731,7 @@ td .odd {
 </table>
 </form>
 </div>
-<div class="body">
+<div class="body" style="width: 98%;">
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
@@ -743,7 +745,7 @@ td .odd {
 	<div class="dialog">
 	<table style="border: 0px;">
 		<tr class="prop">
-			<td style="vertical-align: bottom;" class="name"><label
+			<td style="vertical-align: bottom;width:30%" class="name"><label
 				for="moveBundle">Move Bundle:</label>&nbsp;<select id="moveBundleId"
 				name="moveBundle" onchange="document.dashboardForm.submit()">
 
@@ -753,10 +755,10 @@ td .odd {
 				</g:each>
 
 			</select></td>
-			<td>
-			<h1 align="right">Supervisor Console</h1>
+			<td style="width:40%">
+			<h1 align="center">Supervisor Console</h1>
 			</td>
-			<td style="text-align: right; vertical-align: bottom;">
+			<td style="text-align: right; vertical-align: bottom;width:30%">
 			<input type="hidden" id="lastRefreshId" name="lastRefresh" value="${new Date().getTime()}">
 			<input type="button" value="Refresh" onclick="location.reload(true);">
 			<select id="selectTimedId"
@@ -807,7 +809,7 @@ td .odd {
 				</div>
 				</td>
 				<td valign="top"
-					style="border-right: 1px solid #333333; padding: 0px; width: 45%;">
+					style="border-right: 1px solid #333333; padding: 0px; width: 1%;">
 				<div style="width: 750px; float: left; overflow: auto;">
 				<table width="100%" style="border: 0;" cellspacing="0"
 					cellpadding="0">
@@ -1067,12 +1069,12 @@ td .odd {
 
 				</g:form></div>
 				</td>
-				<td valign="top" style="padding: 0px;">
+				<td valign="top" style="padding: 0px;width:250px;">
 				<div id="floatMenu" style="position:relative;">
 				<div id="assetDetails"
-					style="border: 1px solid #5F9FCF; width: 200px;">
+					style="border: 1px solid #5F9FCF; width: 250px;">
 				<div id="asset">
-				<table style="border: 0px" cellpadding="0" cellspacing="0">
+				<table style="border: 0px;width: 250px;" cellpadding="0" cellspacing="0">
 					<thead>
 						<tr>
 							<th colspan="2">Asset Details</th>
