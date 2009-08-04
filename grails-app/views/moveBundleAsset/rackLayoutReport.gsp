@@ -4,9 +4,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>Rack Elevation Report</title>
 <style type="text/css">
-.page-break {
-	display: block;
-	page-break-before: always;
+
+br.page-break-after {
+	page-break-after: always;
 }
 
 .empty {
@@ -16,7 +16,7 @@
 .rack_current {
 	background: #7CFE80;
 	font-weight: bold;
-	font-size: 1.1em;
+	font-size: 1.0em;
 	border: 2px solid black;
 }
 
@@ -31,8 +31,14 @@
 .rack_error {
 	background: #D80B01 !important;
 	color: white !important;
-	font-size: 1.1em;
+	font-size: 1.0em;
 	border: 2px dashed black !important;
+}
+
+h2 {
+	text-size:1.1em;
+	font-weight:bold;
+	margin:1px;
 }
 
 table {
@@ -41,8 +47,9 @@ table {
 
 td {
 	text-align: center;
-	font-size: .9em;
+	font-size: .8em;
 	border: 1px solid #999999;
+	padding:0px 2px 0px 2px;
 }
 
 th {
@@ -50,33 +57,23 @@ th {
 	font-size: 1.0em;
 	font-weight: bold;
 	text-decoration: underline;
-}
+	padding:0px 2px 0px 2px;
 
-.footer {
-	font-family: arial, helivetica, san-serif;
-	font-size: 1.4em;
-	font-weight: bold;
-}
-
-}
-td {
-	border: 1px solid #95999A;
 }
 
 .rack_elevation {
 	font-family: arial, helivetica, san-serif;
 	font-size: 10px;
 }
+
 </style>
 </head>
 <body>
-<div class="body"><g:each in="${rackLayout}" var="rackLayout">
-	<div class="page-break">
+<div class="body">
+<g:each in="${rackLayout}" var="rackLayout">
 	<table cellpadding=2 class="rack_elevation">
 		<tr>
-			<td colspan="13">
-			<h2>Room: ${rackLayout?.room} - Rack: ${rackLayout?.rack}</h2>
-			</td>
+			<td colspan="13" style="border:0px;"><h2>Room: ${rackLayout?.room} - Rack: ${rackLayout?.rack}</h2></td>
 		</tr>
 		<tr>
 			<th>U</th>
@@ -99,8 +96,9 @@ td {
 		</tr>
 		${rackLayout?.rows}
 	</table>
-	</div>
+
 </g:each>
+	<br class="page-break-after"/>
 </div>
 </body>
 </html>
