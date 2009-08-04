@@ -103,7 +103,7 @@ class SupervisorConsoleService {
      * @return : Query for Rack Elevation  
      *----------------------------------------*/
     def getQueryForRackElevation( def bundleId, def projectId, def includeOtherBundle, def rackRooms, def type ) {
-    	def assetsDetailsQuery = new StringBuffer("select if(a."+type+"_rack_position,a."+type+"_rack_position,1) as rackPosition, max(cast(if(a.usize != '0' and a.usize,a.usize,'1') as UNSIGNED INTEGER)) as usize, "+
+    	def assetsDetailsQuery = new StringBuffer("select if(a."+type+"_rack_position,a."+type+"_rack_position,0) as rackPosition, max(cast(if(a.usize,a.usize,'0') as UNSIGNED INTEGER)) as usize, "+
     												"a.power_port as powerPort, nic_port as nicPort,remote_mgmt_port as remoteMgmtPort, "+
     												"CONCAT_WS(' / ',a.fiber_cabinet,a.hba_port ) as fiberCabinet,"+
     												"CONCAT_WS(' / ',a.kvm_device,a.kvm_port ) as kvmDevice,"+
@@ -132,7 +132,7 @@ class SupervisorConsoleService {
 				assetsDetailsQuery.append(" and a."+type+"_rack = '${rack}' ")
 			}
 		}
-		assetsDetailsQuery.append(" group by a."+type+"_Rack_Position order by (rackPosition + usize - 1) desc")
+		assetsDetailsQuery.append(" group by a."+type+"_Rack_Position order by ( rackPosition + max(usize) ) desc, rackPosition desc")
 		return assetsDetailsQuery 
     }
 }

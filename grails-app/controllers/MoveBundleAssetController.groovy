@@ -585,7 +585,9 @@ class MoveBundleAssetController {
         def projectInstance = Project.findById( projectId )
         def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
         if (reportId == "Rack Layout") {
-        	render(view:'rackLayout',model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
+        	userPreferenceService.loadPreferences("CURR_BUNDLE")
+            def currentBundle = getSession().getAttribute("CURR_BUNDLE")
+        	render(view:'rackLayout',model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, currentBundle:currentBundle])
         } else if( reportId == "cart Asset" ){
         	render(view:'cartAssetReport',model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
         } else if( reportId == 'Issue Report' ){
@@ -969,7 +971,7 @@ class MoveBundleAssetController {
         		if( rack[0] == "" ){
         			def sourceRackQuery = "select CONCAT_WS('~',IFNULL(source_location ,''),IFNULL(source_room,''),"+
             								"IFNULL(source_rack,'')) as rack from asset_entity where"
-            		if( bundleId && !includeOtherBundle ){
+            		if( bundleId ){
             			sourceRackQuery += " move_bundle_id = $bundleId "
             		} else {
             			sourceRackQuery += " project_id = $projectId "
@@ -989,8 +991,10 @@ class MoveBundleAssetController {
 					} else {
 						targetRackQuery += " project_id = $projectId "
 					}
-            		racks = jdbcTemplate.queryForList( targetRackQuery  + "group by source_location, source_rack, source_room")
+            		racks = jdbcTemplate.queryForList( targetRackQuery  + "group by target_location, target_rack, target_room")
+            		
             		}
+            	
             	}
         		racks.each{
                 	def rackRooms = it.rack.split("~")
@@ -1000,9 +1004,11 @@ class MoveBundleAssetController {
                 	def assetsDetailsQuery = supervisorConsoleService.getQueryForRackElevation( bundleId, projectId, includeOtherBundle, rackRooms, location )
     	            def assetEntityList = jdbcTemplate.queryForList( assetsDetailsQuery.toString() )
     	            assetEntityList.each{assetEntity ->
-		            	def position = assetEntity.rackPosition + assetEntity.usize - 1
+    	            	def rackPosition = assetEntity.rackPosition != 0 ? assetEntity.rackPosition : 1
+    	            	def rackSize = assetEntity.usize != 0 ? assetEntity.usize : 1
+		            	def position = rackPosition + rackSize - 1
 		            	def newHigh = position
-            			def newLow = assetEntity.rackPosition
+            			def newLow = rackPosition
 		            	if(assetDetail.size() > 0){
 		            		def flag = true
 		            		assetDetail.each{asset->
@@ -1015,7 +1021,7 @@ class MoveBundleAssetController {
 		            			def changeHigh = (currentLow <= newLow && currentHigh <= newHigh && currentHigh <= newLow)
 		            			if(ignoreLow){
 		            				asset.position = currentHigh
-	    	            			asset.colspan = currentHigh - currentLow + 1 
+	    	            			asset.rowspan = currentHigh - currentLow + 1 
 	    	            			asset.assetTag = asset.assetTag +"<br>"+assetEntity.assetTag
 	    	            			asset.overlapError = true
 	    	            			asset.cssClass = "rack_error"
@@ -1024,7 +1030,7 @@ class MoveBundleAssetController {
 		            				asset.currentHigh = newHigh
 		            				asset.currentLow = newLow
 		            				asset.position = newHigh
-	    	            			asset.colspan = newHigh - newLow + 1
+	    	            			asset.rowspan = newHigh - newLow + 1
 	    	            			asset.assetTag = asset.assetTag +"<br>"+assetEntity.assetTag
 	    	            			asset.overlapError = true
 	    	            			asset.cssClass = "rack_error"
@@ -1032,7 +1038,7 @@ class MoveBundleAssetController {
 		            			} else if(changeHigh){
 		            				asset.currentHigh = newHigh
 		            				asset.position = newHigh
-	    	            			asset.colspan = newHigh - currentLow  + 1
+	    	            			asset.rowspan = newHigh - currentLow  + 1
 	    	            			asset.assetTag = asset.assetTag +"<br>"+assetEntity.assetTag
 	    	            			asset.overlapError = true
 	    	            			asset.cssClass = "rack_error"
@@ -1040,23 +1046,23 @@ class MoveBundleAssetController {
 		            			} else if(changeLow){
 			            			asset.currentLow = newLow
 		            				asset.position = currentHigh
-	    	            			asset.colspan = currentHigh - newLow +1
+	    	            			asset.rowspan = currentHigh - newLow +1
 	    	            			asset.assetTag = asset.assetTag +"<br>"+assetEntity.assetTag
 	    	            			asset.overlapError = true
 	    	            			asset.cssClass = "rack_error"
 	    	            			flag = false
 		            			}
 	    	            	}
+		            		
 		            		if(flag){
 		            			assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag, position:position, overlapError:false, 
-		            			              colspan:assetEntity.usize, currentHigh : position, currentLow : newLow]
+		            			              rowspan:assetEntity.usize, currentHigh : position, currentLow : newLow]
 		            		}
 		            	}else{
 		            		assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag, position:position, overlapError:false, 
-		            		              colspan:assetEntity.usize, currentHigh : position, currentLow : newLow ]
+		            		              rowspan:assetEntity.usize, currentHigh : position, currentLow : newLow ]
 		            	}
 		            }
-                	
     	            for (int i = 42; i > 0; i--) {
     	            	def assetEnity
     	            	def cssClass = "empty"
@@ -1069,8 +1075,10 @@ class MoveBundleAssetController {
     	            	if(assetEnity){
     	            		if(assetEnity.assetEntity?.racksize > 1 ){
     	            			cssClass = 'rack_error'
+    	            			rackStyle = 'rack_error'
     	            		} else if(assetEnity.overlapError){
     	            			cssClass = 'rack_error'
+    	            			rackStyle = 'rack_error'
     	            		} else if(bundleId && assetEnity.assetEntity?.bundleId != Integer.parseInt(bundleId)){
     	            			def currentTime = new Date().getTime()
     	            			def moveBundle = MoveBundle.findById(bundleId)
@@ -1082,6 +1090,10 @@ class MoveBundleAssetController {
     	            			}
     	            		} else{
     	            			cssClass = 'rack_current'
+    	            			rackStyle = 'rack_current'
+    	            		}
+    	            		if(assetEnity.assetEntity?.rackPosition == 0 || assetEnity.assetEntity?.usize == 0 ){
+    	            			rackStyle = 'rack_error'
     	            		}
     	            		assetDetails<<[asset:assetEnity, rack:i, cssClass:cssClass, rackStyle:rackStyle]
     	            	}else {
@@ -1278,8 +1290,9 @@ class MoveBundleAssetController {
     	def sourceGroup = "group by source_location, source_rack, source_room"
     	def targetGroup = "group by target_location, target_rack, target_room"
     	if(bundleId){
-        		sourceRackList = jdbcTemplate.queryForList(queryForSourceRacks + "where move_bundle_id = $bundleId " + sourceGroup )
-        		targetRackList = jdbcTemplate.queryForList(queryForTargetRacks + "where move_bundle_id = $bundleId " + targetGroup)
+    		userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
+    		sourceRackList = jdbcTemplate.queryForList(queryForSourceRacks + "where move_bundle_id = $bundleId " + sourceGroup )
+    		targetRackList = jdbcTemplate.queryForList(queryForTargetRacks + "where move_bundle_id = $bundleId " + targetGroup)
     	} else if(bundleId == ""){
     		def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
      		sourceRackList = jdbcTemplate.queryForList(queryForSourceRacks + "where project_id = $projectId " + sourceGroup)
@@ -1297,42 +1310,46 @@ class MoveBundleAssetController {
     	def rows= new StringBuffer()
     	def rowspan = 1
     	def cssClass = "empty"
+    	def rackStyle = ""
     	asset.each{
-    		 def row = new StringBuffer("<tr><td class='${it.rackStyle}'>${it.rack}</td>")
+    		 def row = new StringBuffer("<tr>")
     		 	if(it.asset){
-    		 		rowspan = it.asset?.colspan
-    		 		row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${it.asset?.assetTag}</td>")
+    		 		rowspan = it.asset?.rowspan != 0 ? it.asset?.rowspan : 1
+    		 		rackStyle = it.rackStyle
+    		 		row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${it.asset?.assetTag}</td>")
     		 		if(includeBundleName){
     		 			def moveBundle 
     		 			if(it.asset?.assetEntity?.bundleId){
     		 				moveBundle = MoveBundle.findById(it.asset?.assetEntity?.bundleId)
     		 			}
-    		 			row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${moveBundle}</td>")
+    		 			row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${moveBundle ? moveBundle : ''}</td>")
     		 		}else{
     		 			row.append("<td rowspan='${rowspan}' class='${it.cssClass}'></td>")
     		 		}
     		 		if(backView){
     		 			if(it.cssClass != "rack_error"){
-    		 				row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>PDU: ${it.asset?.assetEntity?.powerPort ? it.asset?.assetEntity?.powerPort : '' };"+
-    		 							"NIC: ${it.asset?.assetEntity?.nicPort ? it.asset?.assetEntity?.nicPort : ''}; "+
-    		 							"Fiber: ${it.asset?.assetEntity?.fiberCabinet ? it.asset?.assetEntity?.fiberCabinet : ''};"+
-    		 							"KVM: ${it.asset?.assetEntity?.kvmDevice ? it.asset?.assetEntity?.kvmDevice : ''}; "+
-    		 							"Mgmt: ${it.asset?.assetEntity?.remoteMgmtPort ? it.asset?.assetEntity?.remoteMgmtPort : ''}</td>")
+    		 				row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${it.asset?.assetEntity?.powerPort ? 'PDU:'+ it.asset?.assetEntity?.powerPort +'; ' : '' }"+
+    		 							"${it.asset?.assetEntity?.nicPort ? 'NIC:'+ it.asset?.assetEntity?.nicPort +'; ' : ''} "+
+    		 							"${it.asset?.assetEntity?.fiberCabinet && it.asset?.assetEntity?.fiberCabinet != ' / ' ? 'Fiber:'+ it.asset?.assetEntity?.fiberCabinet +'; ' : ''}"+
+    		 							"${it.asset?.assetEntity?.kvmDevice && it.asset?.assetEntity?.kvmDevice != ' / '? 'KVM:'+ it.asset?.assetEntity?.kvmDevice +'; ' : ''} "+
+    		 							"${it.asset?.assetEntity?.remoteMgmtPort ? 'Mgmt:'+ it.asset?.assetEntity?.remoteMgmtPort : ''}</td>")
     		 			} else {
     		 				row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>Devices Overlap</td>")
     		 			}
     		 		}
     		 	} else if(rowspan <= 1){
     		 		rowspan = 1
-    		 		row.append("<td rowspan=1 class=${it.cssClass}></td><td>&nbsp;</td>")
+    		 		rackStyle = it.rackStyle
+    		 		row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan=1 class=${it.cssClass}></td><td>&nbsp;</td>")
     		 		if(backView){
     		 			row.append("<td>&nbsp;</td>")
     		 		}
     		 	} else {
+    		 		row.append("<td class='${rackStyle}'>${it.rack}</td>")
     		 		rowspan--
     		 	}
     		 if(backView){
-    			 row.append("<td class='${it.rackStyle}'>${it.rack}</td>")
+    			 row.append("<td class='${rackStyle}'>${it.rack}</td>")
     		 }
     		 if(it.cssClass == "rack_current" && backView){
     			 row.append("<td class='${it.cssClass}'>&nbsp;</td><td class='${it.cssClass}'>&nbsp;</td><td class='${it.cssClass}'>&nbsp;</td>"+

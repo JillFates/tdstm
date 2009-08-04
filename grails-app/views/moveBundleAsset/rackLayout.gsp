@@ -18,7 +18,7 @@
      function generateOptions(selectObj,racks){
      	if (racks) {
 			var length = racks.length
-			var options = "<option value='' selected='selected'>All</option>"
+			selectObj.html("<option value='' selected='selected'>All</option>")
 			for (var i=0; i < length; i++) {
 				var rack = racks[i]
 				var locvalue = rack.location ? rack.location : '';
@@ -26,9 +26,12 @@
 				var ravalue = rack.rack ? rack.rack : '';
 				var value = locvalue +"~"+rmvalue +"~"+ ravalue
 				var text =  locvalue +"/"+rmvalue +"/"+ ravalue
-				options += "<option value="+value+">"+text+"</option>"
+				var option = document.createElement("option")
+				option.value = value;
+				option.innerHTML = text
+				selectObj.append(option)
 			}
-			selectObj.html(options)	          	
+				          	
       	}
      }
      function validateForm(){
@@ -59,7 +62,6 @@
 			<td valign="top" class="value" colspan="2">
 				<select id="bundleId" name="moveBundle" onchange="${remoteFunction(action:'getRackDetails', params:'\'bundleId=\' + this.value', onComplete:'updateRackDetails(e)')}">
 					<option value="null" selected="selected">Please Select</option>
-					<option value="">All Bundles</option>
 					<g:each in="${moveBundleInstanceList}" var="moveBundleList">
 						<option value="${moveBundleList?.id}">${moveBundleList?.name}</option>
 					</g:each>
@@ -69,19 +71,19 @@
 		<tr class="prop">
 			<td valign="top" class="name"><label>Location :</label></td>
 			<td valign="top">
-				<label for="source"><input type="radio" name="location" id="source" checked="checked" onclick="$('#targetRackId').hide();$('#sourceRackId').show();$('#locationNameId').val('source');" /> Source </label> 
+				<label for="source"><input type="radio" name="location" id="source" onclick="$('#targetRackId').hide();$('#sourceRackId').show();$('#locationNameId').val('source');" /> Source </label> 
 			</td>
 			<td valign="top">
-				<label for="target"><input type="radio" name="location" id="target" onclick="$('#targetRackId').show();$('#sourceRackId').hide();$('#locationNameId').val('target');"/> Target </label> 
+				<label for="target"><input type="radio" name="location" id="target" checked="checked" onclick="$('#targetRackId').show();$('#sourceRackId').hide();$('#locationNameId').val('target');"/> Target </label> 
 			</td>
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label>Room/Rack :</label></td>
 			<td valign="top" class="value" colspan="2">
-				<select id="sourceRackId"	multiple="multiple" name="sourcerack" style="width: 100%;" size="10">
+				<select id="sourceRackId"	multiple="multiple" name="sourcerack" style="width: 100%;display: none;" size="10">
 					<option value="null" selected="selected">All</option>
 				</select>
-				<select id="targetRackId"	multiple="multiple" name="targetrack" style="width: 100%;display: none;" size="10">
+				<select id="targetRackId"	multiple="multiple" name="targetrack" style="width: 100%;" size="10">
 					<option value="null" selected="selected">All</option>
 				</select>
 			</td>
@@ -94,20 +96,20 @@
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label>Include other bundles :</label></td>
-			<td valign="top" colspan="2"><input type="checkbox" name="otherBundle" ></td>
+			<td valign="top" colspan="2"><input type="checkbox" name="otherBundle" checked="checked"></td>
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label>Include bundle names :</label></td>
-			<td valign="top" colspan="2"><input type="checkbox" name="bundleName" ></td>
+			<td valign="top" colspan="2"><input type="checkbox" name="bundleName" checked="checked"></td>
 		</tr>
 		<tr>
 			<td valign="top" class="name"><label>Print Views :</label></td>
-			<td valign="top"><label for="frontView" ><input type="checkbox" name="frontView" id="frontView" />&nbsp;Front</label></td>
-			<td valign="top"><label for="backView" ><input type="checkbox" name="backView" id="backView" >&nbsp;Back</label></td>
+			<td valign="top"><label for="frontView" ><input type="checkbox" name="frontView" id="frontView" checked="checked" />&nbsp;Front</label></td>
+			<td valign="top"><label for="backView" ><input type="checkbox" name="backView" id="backView" checked="checked">&nbsp;Back</label></td>
 		</tr>
 		<tr>
 			<td colspan="3" class="buttonR" style="text-align: center;">
-				<input type="hidden" name="locationName" id="locationNameId" value="source"/>
+				<input type="hidden" name="locationName" id="locationNameId" value="target"/>
 				<input type="submit" value="Generate" />
 			</td>
 		</tr>
@@ -119,7 +121,9 @@
 <script type="text/javascript">
 $('#reportsMenu').show();
 $('#assetMenu').hide();
-var bundleId = $("#bundleId").val()
+var bundleObj = $("#bundleId")
+bundleObj.val('${currentBundle?.CURR_BUNDLE}')
+var bundleId = bundleObj.val() 
 ${remoteFunction(action:'getRackDetails', params:'\'bundleId=\' + bundleId', onComplete:'updateRackDetails(e)')}
 </script>
 </body>
