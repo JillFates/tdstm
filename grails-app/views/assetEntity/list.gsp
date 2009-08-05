@@ -642,10 +642,10 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 	 <span class="button"><input
 		type="button" class="edit" value="Edit"
 		onClick="return editAssetDialog()" /></span> <span class="button"><g:actionSubmit 
-		class="delete" onclick="return confirm('Are you sure?');"
+		class="delete" onclick="return confirm('Delete Asset, are you sure?');"
 		value="Delete" /></span>
 		<span class="button"><g:actionSubmit action="remove"
-		class="delete"  onclick="return confirm('Are you sure?');"
+		class="delete"  onclick="return confirm('Remove Asset from project, are you sure?');"
 		value="Remove From Project" /></span>
 		</div>
 </g:form></div>
@@ -659,11 +659,11 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 	</div>
 	<div class="buttons"><span class="button">
 	<input type="button" class="save" value="Update Asset Entity" onClick="${remoteFunction(action:'getAssetAttributes', params:'\'assetId=\' + document.editForm.id.value ', onComplete:'callUpdateDialog(e)')}" />
-	</span> <span class="button"><g:actionSubmit 
-		class="delete" onclick="return confirm('Are you sure?');"
+	</span> <span class="button"><input type="button"
+		class="delete" onclick="return editDialogDeleteRemove('delete')"
 		value="Delete" /></span>
-		<span class="button"><g:actionSubmit action="remove"
-		class="delete"  onclick="return confirm('Are you sure?');"
+		<span class="button"><input type="button"
+		class="delete"  onclick="return editDialogDeleteRemove('remove');"
 		value="Remove From Project" /></span>
 		</div>
 </g:form></div>

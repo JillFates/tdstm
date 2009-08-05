@@ -333,4 +333,20 @@ function updateAssetCommentIcon( assetComments ){
 	var iconObj = $('#icon_'+assetComments.assetComment.assetEntity);
 	iconObj.html(link)
 }
+
+/*Actions to perform Delete Assest and Remove Assest from project*/
+function editDialogDeleteRemove( actionType ) {
+	var confirmMessage = 'Remove Asset from project, are you sure?';
+	var submitAction = 'remove';
+	if ( actionType != 'remove' ) {
+	 	confirmMessage = 'Delete Asset, are you sure?';
+	 	submitAction = 'delete';
+	}
+	if ( confirm(confirmMessage) ) {
+		$('form#editForm').attr({action: '../assetEntity/'+submitAction}).submit();
+		return true;
+	} else {
+		return false;
+	}
+}
 		
