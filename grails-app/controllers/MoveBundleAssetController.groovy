@@ -1120,16 +1120,23 @@ class MoveBundleAssetController {
     	            		assetDetails<<[asset:null, rack:i, cssClass:cssClass, rackStyle:rackStyle]
     	            	}
     	            }
-    	            def rows = getRackLayout( assetDetails, includeBundleName, backView )
+    	            def backViewRows
+    	            def frontViewRows
+    	            if(backView){
+    	            	backViewRows = getRackLayout( assetDetails, includeBundleName, backView )
+    	            }
+    	            if(frontView){
+    	            	frontViewRows = getRackLayout( assetDetails, includeBundleName, null )
+    	            }
     	            if(rackRooms.size() == 3){
     	            	rackLayout << [ assetDetails : assetDetails, rack : rackRooms[2] , room : rackRooms[1] , 
-    	                            location : rackRooms[0] +"("+location+")" , rows:rows, backView:backView ]
+    	            	                location : rackRooms[0] +"("+location+")" , frontViewRows : frontViewRows, backViewRows : backViewRows ]
     	            } else {
-    	            	rackLayout << [ assetDetails : assetDetails, rack : "", room : "", 
-	                            location : "("+location+")" , rows:rows, backView:backView ]
+    	            	rackLayout << [ assetDetails : assetDetails, rack : "", room : "", location : "("+location+")" , 
+    	            	                frontViewRows : frontViewRows, backViewRows : backViewRows ]
     	            }
             	}
-           render(view:'rackLayoutReport',model:[rackLayout:rackLayout])
+           render(view:'rackLayoutReport',model:[rackLayout : rackLayout, frontView : frontView, backView : backView])
         }
     }
 	/*
@@ -1369,10 +1376,10 @@ class MoveBundleAssetController {
     		 		rowspan--
     		 	}
     		 row.append("<td class='${rackStyle}'>${it.rack}</td>")
-    		 if(it.cssClass == "rack_current" && backView){
-    			 row.append("<td class='${it.cssClass}'>&nbsp;</td><td class='${it.cssClass}'>&nbsp;</td><td class='${it.cssClass}'>&nbsp;</td>"+
-    			 			"<td class='${it.cssClass}'>&nbsp;</td><td class='${it.cssClass}'>&nbsp;</td><td class='${it.cssClass}'>&nbsp;</td>"+
-    			 			"<td class='${it.cssClass}'>&nbsp;</td><td class='${it.cssClass}'>&nbsp;</td>")
+    		 if(rackStyle == "rack_current" && backView && rowspan == 1){
+    			 row.append("<td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td>"+
+    			 			"<td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td>"+
+    			 			"<td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td>")
     		 }
     		 
     		 row.append("</tr>")

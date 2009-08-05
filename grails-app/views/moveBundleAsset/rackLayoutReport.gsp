@@ -70,6 +70,7 @@ th {
 </head>
 <body>
 <div class="body">
+<g:if test="${frontView}">
 <g:each in="${rackLayout}" var="rackLayout">
 	<table cellpadding=2 class="rack_elevation">
 		<tr>
@@ -79,25 +80,39 @@ th {
 			<th>U</th>
 			<th>Device</th>
 			<th>Bundle</th>
-			<g:if test="${rackLayout?.backView}">
-				<th>Cabling</th>
-			</g:if>
 			<th>U</th>
-			<g:if test="${rackLayout?.backView}">
-				<th>Pos</th>
-				<th>PDU</th>
-				<th>NIC</th>
-				<th>Mgmt</th>
-				<th>KVM</th>
-				<th>Fiber</th>
-				<th>Amber</th>
-				<th>OK</th>
-			</g:if>
 		</tr>
-		${rackLayout?.rows}
+		${rackLayout?.frontViewRows}
 	</table>
 	<br class="page-break-after"/>
 </g:each>
+</g:if>
+<g:if test="${backView}">
+<g:each in="${rackLayout}" var="rackLayout">
+	<table cellpadding=2 class="rack_elevation">
+		<tr>
+			<td colspan="13" style="border:0px;"><h2>Room: ${rackLayout?.room} - Rack: ${rackLayout?.rack}</h2></td>
+		</tr>
+		<tr>
+			<th>U</th>
+			<th>Device</th>
+			<th>Bundle</th>
+			<th>Cabling</th>
+			<th>U</th>
+			<th>Pos</th>
+			<th>PDU</th>
+			<th>NIC</th>
+			<th>Mgmt</th>
+			<th>KVM</th>
+			<th>Fiber</th>
+			<th>Amber</th>
+			<th>OK</th>
+		</tr>
+		${rackLayout?.backViewRows}
+	</table>
+	<br class="page-break-after"/>
+</g:each>
+</g:if>
 </div>
 </body>
 </html>
