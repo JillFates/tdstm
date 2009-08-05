@@ -263,7 +263,6 @@ var sHint = "C:\\temp\\output";
 		<tr class="prop" id="bundleRow">
 
 			<td valign="top" class="name"><label>Bundles:</label><input type="hidden" name="urlPath" id="urlPath" value="<g:createLinkTo dir="resource" file="login_badge.tff" absolute="true"/>"/>
-          				<input type= "hidden" name="PrinterName" id="PrinterName"></td>
 
 			<td valign="top" class="value"><select id="moveBundleId"
 				name="moveBundles" onchange="return populateTeams(this.value);">
