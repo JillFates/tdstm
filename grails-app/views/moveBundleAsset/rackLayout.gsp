@@ -48,14 +48,14 @@
     </script>
 </head>
 <body>
-<div class="body">
+<div class="body" style="width: 30%;">
 <h1>Rack Elevations</h1>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
 <div class="dialog">
 <table>
-	<g:form action="rackLayoutReport" method="post" onsubmit="this.target='_blank';return validateForm()">
+	<g:form action="rackLayoutReport" method="post" target="_blank" onsubmit="return validateForm()">
 	<tbody>
 		<tr class="prop" id="bundleRow">
 			<td valign="top" class="name"><label>Current Move Bundle :</label></td>

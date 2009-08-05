@@ -897,7 +897,7 @@ class MoveBundleAssetController {
        				}
        				
        				// sort options for reportFields
-       				def teamTagSort = (asset.sourceTeam.name ? asset.sourceTeam.name : "") +" "+ (asset.assetTag ? asset.assetTag : "")
+       				def teamTagSort = (asset.sourceTeam ? asset.sourceTeam?.name : "") +" "+ (asset.assetTag ? asset.assetTag : "")
        				
        				def roomTagSort = (asset.sourceRoom ? asset.sourceRoom : "") +" "+ (asset.sourceRack ? asset.sourceRack : "") +" "+ (asset.usize ? asset.usize : "")
        				
@@ -1343,13 +1343,15 @@ class MoveBundleAssetController {
     		 	if(it.asset){
     		 		rowspan = it.asset?.rowspan != 0 ? it.asset?.rowspan : 1
     		 		rackStyle = it.rackStyle
+    		 		def assetTagsList = (it.asset?.assetTag).split("<br>")
+    		 		def moveBundle = "" 
+    		 		assetTagsList.each{
+    		 			def bundleInstance = AssetEntity.findByAssetTag(it.substring(0,it.indexOf('-')))?.moveBundle
+    		 			moveBundle += (bundleInstance ? bundleInstance.name : "") + "<br>"
+    		 		}
     		 		row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${it.asset?.assetTag}</td>")
     		 		if(includeBundleName){
-    		 			def moveBundle 
-    		 			if(it.asset?.assetEntity?.bundleId){
-    		 				moveBundle = MoveBundle.findById(it.asset?.assetEntity?.bundleId)
-    		 			}
-    		 			row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${moveBundle ? moveBundle : ''}</td>")
+    		 			row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${moveBundle}</td>")
     		 		}else{
     		 			row.append("<td rowspan='${rowspan}' class='${it.cssClass}'></td>")
     		 		}

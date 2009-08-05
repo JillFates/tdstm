@@ -71,8 +71,8 @@ th {
 </head>
 <body>
 <div class="body">
-<g:if test="${frontView}">
 <g:each in="${rackLayout}" var="rackLayout">
+	<g:if test="${frontView}">
 	<table cellpadding=2 class="rack_elevation">
 		<tr>
 			<td colspan="13" style="border:0px;"><h2>Room: ${rackLayout?.room} - Rack: ${rackLayout?.rack}</h2></td>
@@ -86,10 +86,8 @@ th {
 		${rackLayout?.frontViewRows}
 	</table>
 	<br class="page-break-after"/>
-</g:each>
-</g:if>
-<g:if test="${backView}">
-<g:each in="${rackLayout}" var="rackLayout">
+	</g:if>
+	<g:if test="${backView}">
 	<table cellpadding=2 class="rack_elevation">
 		<tr>
 			<td colspan="13" style="border:0px;"><h2>Room: ${rackLayout?.room} - Rack: ${rackLayout?.rack}</h2></td>
@@ -112,8 +110,8 @@ th {
 		${rackLayout?.backViewRows}
 	</table>
 	<br class="page-break-after"/>
+	</g:if>
 </g:each>
-</g:if>
 </div>
 </body>
 </html>
