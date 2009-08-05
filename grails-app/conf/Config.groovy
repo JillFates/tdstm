@@ -97,6 +97,7 @@ log4j {
             springframework="off"
             hibernate="off"
         }
+
     }
     additivity.StackTrace=false
 }

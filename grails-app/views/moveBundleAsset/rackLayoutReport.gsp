@@ -43,6 +43,7 @@ h2 {
 
 table {
 	border: 1px solid #000000;
+	empty-cells: show;
 }
 
 td {
