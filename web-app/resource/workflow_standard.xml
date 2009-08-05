@@ -551,7 +551,7 @@
 		</task>
 	</taskNode>
 
-	<taskNode name="QA Verification">
+	<taskNode name="QA Verified">
 		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Reracking"/>
@@ -587,11 +587,45 @@
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="QAVerified"/>
+			<transition to="NetVerifying"/>
+			<transition to="NetVerified"/>
+			<transition to="SANVerifying"/>
+			<transition to="SANVerified"/>
+			<transition to="DBStarted"/>
+			<transition to="DBFinished"/>
+			<transition to="AppStartup"/>
+			<transition to="AppFinished"/>
+			<transition to="AppVerifying"/>
+			<transition to="AppVerified"/>
+			<transition to="Completed"/>
+		</task>
 	</taskNode>
 
 	<taskNode name="NetVerifying">
 		<task swimlane="MANAGER">
 			<transition to="Hold" flag="issue"/>
+			<transition to="NetVerified"/>
+			<transition to="SANVerifying"/>
+			<transition to="SANVerified"/>
+			<transition to="DBStarted"/>
+			<transition to="DBFinished"/>
+			<transition to="AppStartup"/>
+			<transition to="AppFinished"/>
+			<transition to="AppVerifying"/>
+			<transition to="AppVerified"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
 			<transition to="NetVerified"/>
 			<transition to="SANVerifying"/>
 			<transition to="SANVerified"/>
@@ -618,11 +652,45 @@
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="NetVerifying"/>
+			<transition to="SANVerifying"/>
+			<transition to="SANVerified"/>
+			<transition to="DBStarted"/>
+			<transition to="DBFinished"/>
+			<transition to="AppStartup"/>
+			<transition to="AppFinished"/>
+			<transition to="AppVerifying"/>
+			<transition to="AppVerified"/>
+			<transition to="Completed"/>
+		</task>
 	</taskNode>
 
 	<taskNode name="SANVerifying">
 		<task swimlane="MANAGER">
 			<transition to="Hold" flag="issue"/>
+			<transition to="SANVerified"/>
+			<transition to="DBStarted"/>
+			<transition to="DBFinished"/>
+			<transition to="AppStartup"/>
+			<transition to="AppFinished"/>
+			<transition to="AppVerifying"/>
+			<transition to="AppVerified"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="NetVerifying"/>
+			<transition to="NetVerified"/>
 			<transition to="SANVerified"/>
 			<transition to="DBStarted"/>
 			<transition to="DBFinished"/>
@@ -645,11 +713,45 @@
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="NetVerifying"/>
+			<transition to="NetVerified"/>
+			<transition to="SANVerifying"/>
+			<transition to="DBStarted"/>
+			<transition to="DBFinished"/>
+			<transition to="AppStartup"/>
+			<transition to="AppFinished"/>
+			<transition to="AppVerifying"/>
+			<transition to="AppVerified"/>
+			<transition to="Completed"/>
+		</task>
 	</taskNode>
 
 	<taskNode name="DBStarted">
 		<task swimlane="MANAGER">
 			<transition to="Hold" flag="issue"/>
+			<transition to="DBFinished"/>
+			<transition to="AppStartup"/>
+			<transition to="AppFinished"/>
+			<transition to="AppVerifying"/>
+			<transition to="AppVerified"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="NetVerifying"/>
+			<transition to="NetVerified"/>
+			<transition to="SANVerifying"/>
+			<transition to="SANVerified"/>
 			<transition to="DBFinished"/>
 			<transition to="AppStartup"/>
 			<transition to="AppFinished"/>
@@ -669,11 +771,45 @@
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="NetVerifying"/>
+			<transition to="NetVerified"/>
+			<transition to="SANVerifying"/>
+			<transition to="SANVerified"/>
+			<transition to="DBStarted"/>
+			<transition to="AppStartup"/>
+			<transition to="AppFinished"/>
+			<transition to="AppVerifying"/>
+			<transition to="AppVerified"/>
+			<transition to="Completed"/>
+		</task>
 	</taskNode>
 
 	<taskNode name="AppStartup">
 		<task swimlane="MANAGER">
 			<transition to="Hold" flag="issue"/>
+			<transition to="AppFinished"/>
+			<transition to="AppVerifying"/>
+			<transition to="AppVerified"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="NetVerifying"/>
+			<transition to="NetVerified"/>
+			<transition to="SANVerifying"/>
+			<transition to="SANVerified"/>
+			<transition to="DBStarted"/>
+			<transition to="DBFinished"/>
 			<transition to="AppFinished"/>
 			<transition to="AppVerifying"/>
 			<transition to="AppVerified"/>
@@ -688,6 +824,23 @@
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="NetVerifying"/>
+			<transition to="NetVerified"/>
+			<transition to="SANVerifying"/>
+			<transition to="SANVerified"/>
+			<transition to="DBStarted"/>
+			<transition to="DBFinished"/>
+			<transition to="AppStartup"/>
+			<transition to="AppVerifying"/>
+			<transition to="AppVerified"/>
+			<transition to="Completed"/>
+		</task>
 	</taskNode>
 
 	<taskNode name="AppVerifying">
@@ -697,12 +850,28 @@
 			<transition to="AppVerified"/>
 			<transition to="Completed"/>
 		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="NetVerifying"/>
+			<transition to="NetVerified"/>
+			<transition to="SANVerifying"/>
+			<transition to="SANVerified"/>
+			<transition to="DBStarted"/>
+			<transition to="DBFinished"/>
+			<transition to="AppStartup"/>
+			<transition to="AppFinished"/>
+			<transition to="AppVerified"/>
+			<transition to="Completed"/>
+		</task>
 	</taskNode>
 
-	<taskNode name="AppVerified">
-		<task swimlane="MANAGER">
+	<taskNode name="Completed">
+		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
-			<transition to="Completed"/>
 		</task>
 	</taskNode>
 
