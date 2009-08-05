@@ -10,7 +10,6 @@ class BootStrap {
     def init = { servletContext ->
 
 	// Don't load bootstrap if production environment
-return;
 	if ( grails.util.GrailsUtil.environment.equals("production") ) return
     	
     	// -------------------------------
