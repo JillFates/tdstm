@@ -551,7 +551,7 @@
 		</task>
 	</taskNode>
 
-	<taskNode name="QA Verified">
+	<taskNode name="QAVerified">
 		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Reracking"/>
@@ -572,7 +572,7 @@
 		</task>
 	</taskNode>
 
-	<taskNode name="Powered On">
+	<taskNode name="PoweredOn">
 		<task swimlane="MANAGER">
 			<transition to="Hold" flag="issue"/>
 			<transition to="NetVerifying"/>
