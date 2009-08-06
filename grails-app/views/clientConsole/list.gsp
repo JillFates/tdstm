@@ -312,13 +312,14 @@ var time = '${timeToRefresh}';
 			      		var attributeCode = assetEntityAttributes[i].attributeCode
 			      		var attributeValue = $('#edit'+attributeCode+'Id').val();
 			      		if(assetEntityAttributes[i].frontendInput == 'select'){
-				      		assetEntityParams.push(attributeCode+':'+attributeValue)
+				      		assetEntityParams.push(attributeCode+':'+attributeValue+'~')
 			      		} else {
-			      			assetEntityParams.push(attributeCode+':'+attributeValue)
+			      			assetEntityParams.push(attributeCode+':'+attributeValue+'~')
 			      		}
 					}
 		    	}
-		    ${remoteFunction(controller:'assetEntity', action:'updateAssetEntity', params:'\'assetEntityParams=\' + assetEntityParams +\'&id=\'+assetId', onComplete:'showEditAsset(e)')}
+		    var safeQueryString = escape( assetEntityParams );
+		    ${remoteFunction(controller:'assetEntity', action:'updateAssetEntity', params:'\'assetEntityParams=\' + safeQueryString +\'&id=\'+assetId', onComplete:'showEditAsset(e)')}
 		    }
 		    
 		    function showEditAsset(e) {

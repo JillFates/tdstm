@@ -652,7 +652,7 @@ class AssetEntityController {
     	def assetItems = []
     	def assetEntityParams = params.assetEntityParams
     	if(assetEntityParams) {
-	    	def assetEntityParamsList = assetEntityParams.split(",")
+    		def assetEntityParamsList = ( assetEntityParams.substring( 0, assetEntityParams.lastIndexOf('~') ) ).split("~,")
 	    	def map = new HashMap()
 	    	assetEntityParamsList.each {
 	    		def assetParam = it.split(":")
