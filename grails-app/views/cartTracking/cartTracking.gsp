@@ -216,7 +216,7 @@
 				var shelf = $("#reassignShelfId").val();
 				var truck = $("#reassignAssetSelectId").val()
 				var assetId = $("#assetEntityId").val()
-				${remoteFunction(action:'reassignAssetOnCart', params:'\'cart=\' + cart +\'&truck=\'+truck +\'&shelf=\'+shelf+\'&assetId=\'+assetId ', onComplete:'location.reload(true)')}
+				${remoteFunction(action:'reassignAssetOnCart', params:'\'cart=\' + cart +\'&truck=\'+truck +\'&shelf=\'+shelf+\'&assetId=\'+assetId ', onComplete:'pageReload()')}
 				return true;
 			} else {
 				alert("That cart is already On Truck");
@@ -359,7 +359,7 @@
 				 </td>
 			</tr>
 			<tr><td>
-				<input type="button" value="Update" onclick="${remoteFunction(action:'changeTruck', params:'\'cart=\' + $(\'#changeTruckCartId\').val() +\'&truck=\'+$(\'#changeTruckSelectId\').val() +\'&projectId=\'+$(\'#projectId\').val() +\'&bundleId=\'+$(\'#moveBundleId\').val()', onComplete:'location.reload(true)')}">
+				<input type="button" value="Update" onclick="${remoteFunction(action:'changeTruck', params:'\'cart=\' + $(\'#changeTruckCartId\').val() +\'&truck=\'+$(\'#changeTruckSelectId\').val() +\'&projectId=\'+$(\'#projectId\').val() +\'&bundleId=\'+$(\'#moveBundleId\').val()', onComplete:'pageReload()')}">
 				<input type="button" value="Cancel" onclick="$('#changeTruckDiv').dialog('close');"> 
 			</td></tr>
 		</table>
