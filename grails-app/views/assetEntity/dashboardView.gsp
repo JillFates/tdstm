@@ -533,7 +533,7 @@ td .odd {
    	function timedRefresh(timeoutPeriod) {
    		if(timeoutPeriod != 'never'){
 			clearTimeout(timer);
-			timer = setTimeout("location.reload(true);",timeoutPeriod);
+			timer = setTimeout("window.location.reload(true);",timeoutPeriod);
 		} else {
 			clearTimeout(timer)
 		}
@@ -760,7 +760,7 @@ td .odd {
 			</td>
 			<td style="text-align: right; vertical-align: bottom;width:30%">
 			<input type="hidden" id="lastRefreshId" name="lastRefresh" value="${new Date().getTime()}">
-			<input type="button" value="Refresh" onclick="location.reload(true);">
+			<input type="button" value="Refresh" onclick="window.location.reload(true);">
 			<select id="selectTimedId"
 				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(e)') }">
 				<option value="60000">1 min</option>
@@ -797,12 +797,12 @@ td .odd {
 					</tr>
 					<tr>
 						<td class="odd" nowrap>Source <span
-							style="font: 9px bold verdana, arial, helvetica, sans-serif;">(Avail/Done/Total)</span>
+							style="font: 9px bold verdana, arial, helvetica, sans-serif;">(Pending/Avail/Done/Total)</span>
 						</td>
 					</tr>
 					<tr>
 						<td nowrap>Target <span
-							style="font: 9px bold verdana, arial, helvetica, sans-serif;">(Avail/Done/Total)</span>
+							style="font: 9px bold verdana, arial, helvetica, sans-serif;">(Pending/Avail/Done/Total)</span>
 						</td>
 					</tr>
 				</table>
@@ -822,7 +822,7 @@ td .odd {
 									<td nowrap>${bundleTeam?.members}&nbsp;</td>
 								</tr>
 								<tr>
-									<td class="odd">${bundleTeam?.team?.currentLocation}&nbsp;</td>
+									<td nowrap class="odd">${bundleTeam?.team?.currentLocation}&nbsp;</td>
 								</tr>
 								<tr>
 									<td nowrap>
@@ -832,7 +832,8 @@ td .odd {
 									</td>
 								</tr>
 								<tr>
-									<td class="odd">
+									<td nowrap class="odd">
+										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_pend')"><u>${bundleTeam?.sourcePendAssets}</u></a> /
 										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_avail')"><u>${bundleTeam?.sourceAvailassets}</u></a> /
 										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_done')"><u>${bundleTeam?.unrackedAssets}</u></a> / 
 										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','')"><u>${bundleTeam?.sourceAssets}</u></a>
@@ -840,6 +841,7 @@ td .odd {
 								</tr>
 								<tr>
 									<td nowrap>
+										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_pend')"><u>${bundleTeam?.targetPendAssets}</u> </a> /
 										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_avail')"><u>${bundleTeam?.targetAvailAssets}</u> </a> /
 										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_done')"><u> ${bundleTeam?.rerackedAssets}</u> </a> / 
 										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','')"><u>${bundleTeam?.targetAssets}</u></a>
@@ -855,7 +857,7 @@ td .odd {
 								<td nowrap>${supportTeam?.cleaningMembers}&nbsp;</td>
 							</tr>
 							<tr>
-								<td class="odd">${supportTeam?.cleaning.currentLocation}&nbsp;</td>
+								<td nowrap class="odd">${supportTeam?.cleaning.currentLocation}&nbsp;</td>
 							</tr>
 							<tr>
 								<td nowrap>
@@ -865,7 +867,7 @@ td .odd {
 								</td>
 							</tr>
 							<tr>
-								<td class="odd">${supportTeam.sourceCleaned} /
+								<td nowrap class="odd">${supportTeam.sourcePendCleaned} / ${supportTeam.sourceAvailCleaned} / ${supportTeam.sourceCleaned} /
 								${supportTeam.totalAssets}</td>
 							</tr>
 							<tr>
@@ -880,17 +882,17 @@ td .odd {
 								<td nowrap>${supportTeam?.transportMembers}&nbsp;</td>
 							</tr>
 							<tr>
-								<td class="odd">${supportTeam?.transport.currentLocation}&nbsp;</td>
+								<td nowrap class="odd">${supportTeam?.transport.currentLocation}&nbsp;</td>
 							</tr>
 							<tr>
 								<td nowrap>&nbsp;</td>
 							</tr>
 							<tr>
-								<td class="odd">${supportTeam.sourceMover} /
+								<td nowrap class="odd">${supportTeam.sourceTransportPend} / ${supportTeam.sourceTransportAvail} / ${supportTeam.sourceMover} /
 								${supportTeam.totalAssets}</td>
 							</tr>
 							<tr>
-								<td nowrap>${supportTeam.targetMover} /
+								<td nowrap>${supportTeam.targetTransportPend} / ${supportTeam.targetTransportAvail} / ${supportTeam.targetMover} /
 								${supportTeam.totalAssets}</td>
 							</tr>
 						</table>
@@ -914,7 +916,8 @@ td .odd {
 						<td>&nbsp;</td>
 					</tr>
 					<tr>
-						<td class="odd">
+						<td nowrap class="odd">
+							<a href="#" onclick="filterByDataPoints('source','','source_pend')"><u> ${totalSourcePending}</u> </a> /
 							<a href="#" onclick="filterByDataPoints('source','','source_avail')"><u> ${totalSourceAvail}</u> </a> /
 							<a href="#" onclick="filterByDataPoints('source','','source_done')"><u> ${totalUnracked}</u> </a> / 
 							<a href="#" onclick="filterByDataPoints('source','','')"><u>${totalAsset}</u> </a>
@@ -922,6 +925,7 @@ td .odd {
 					</tr>
 					<tr>
 						<td nowrap>
+							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_pend')"><u>${totalTargetPending}</u></a> /
 							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_avail')"><u>${totalTargetAvail}</u></a> /
 							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_done')"><u>${totalReracked}</u></a> / 
 							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','')"><u>${totalAsset}</u> </a>

@@ -908,6 +908,8 @@ class AssetEntityController {
 	        def unrackedId = stateEngineService.getStateId( "STD_PROCESS", "Unracked" )
 	        def holdId = stateEngineService.getStateId( "STD_PROCESS", "Hold" )
 	        def releasedId = stateEngineService.getStateId( "STD_PROCESS", "Release" )
+	        def onTruckId = stateEngineService.getStateId( "STD_PROCESS", "OnTruck" )
+	        def offTruckId = stateEngineService.getStateId( "STD_PROCESS", "OffTruck" )
 	        def queryHold = supervisorConsoleService.getQueryForConsole( moveBundleInstance, params, 'hold')
         	def queryNotHold = supervisorConsoleService.getQueryForConsole(moveBundleInstance,params, 'notHold')
         	def holdTotalAsset = jdbcTemplate.queryForList( queryHold )
@@ -934,33 +936,59 @@ class AssetEntityController {
 	            if(teamMembers.length() > 0){
 	            	member = teamMembers.delete((teamMembers.length()-1), teamMembers.length())
 	            }
+	            
+	            def sourcePendAssets = jdbcTemplate.queryForList( countQuery + "and e.source_team_id = ${it.id} group by e.asset_entity_id having maxstate < $releasedId").size()
+	            
 	            def sourceAssets = AssetEntity.findAll("from AssetEntity where moveBundle = ${moveBundleInstance.id} and sourceTeam = ${it.id} " ).size()
 	            
-	            def unrackedAssets = jdbcTemplate.queryForList( countQuery + "and e.source_team_id = ${it.id} group by e.asset_entity_id having maxstate >= $unrackedId").size() 
+	            def unrackedAssets = jdbcTemplate.queryForList( countQuery + "and e.source_team_id = ${it.id} group by e.asset_entity_id having maxstate >= $unrackedId").size()
 	            
 	            def sourceAvailassets = jdbcTemplate.queryForList( countQuery + " and t.state_to >= $releasedId and e.source_team_id = ${it.id} "+
 	            													"group by e.asset_entity_id HAVING maxstate < $unrackedId ").size()
+	            													
 	            def targetAssets = AssetEntity.findAll("from AssetEntity  where moveBundle = ${moveBundleInstance.id} and targetTeam = ${it.id} " ).size()
+	            
+	            def targetPendAssets = jdbcTemplate.queryForList(countQuery +	"and e.target_team_id = ${it.id} group by e.asset_entity_id HAVING maxstate < $stagedId ").size()
 	
 	            def rerackedAssets = jdbcTemplate.queryForList(countQuery +	"and e.target_team_id = ${it.id} group by e.asset_entity_id HAVING maxstate >= $rerackedId ").size()
 				
 	            def targetAvailAssets = jdbcTemplate.queryForList( countQuery + " and t.state_to >= $stagedId and e.target_team_id = ${it.id} "+
 	            													"group by e.asset_entity_id HAVING maxstate < $rerackedId ").size()
+			
 	            bundleTeams <<[team:it,members:member, sourceAssets:sourceAssets, 
 	                           unrackedAssets:unrackedAssets, sourceAvailassets:sourceAvailassets , 
 	                           targetAvailAssets:targetAvailAssets , targetAssets:targetAssets, 
-	                           rerackedAssets:rerackedAssets ]
+	                           rerackedAssets:rerackedAssets, sourcePendAssets:sourcePendAssets, 
+	                           targetPendAssets:targetPendAssets ]
 	        }
-	        def sourceCleaned = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $cleanedId and asset in (select id from AssetEntity  "+
-	        												"where moveBundle = ${moveBundleInstance.id} )" ).size()
-	        def sourceMover = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $onCartId and asset in (select id from AssetEntity  "+
-	        											"where moveBundle = ${moveBundleInstance.id} )" ).size()
-	        def targetMover = ProjectAssetMap.findAll("from ProjectAssetMap where currentStateId >= $stagedId and asset in (select id from AssetEntity  "+
-	        											"where moveBundle = ${moveBundleInstance.id} )" ).size()
+							
+			def sourcePendCleaned = jdbcTemplate.queryForList(countQuery +	" group by e.asset_entity_id having maxstate < $unrackedId").size()
+			
+			def sourceAvailCleaned = jdbcTemplate.queryForList(countQuery +	" group by e.asset_entity_id having maxstate = $unrackedId").size()
+			
+	        def sourceCleaned = jdbcTemplate.queryForList(countQuery +" group by e.asset_entity_id having maxstate >= $cleanedId").size()
+	        												
+	        def sourceMover = jdbcTemplate.queryForList(countQuery + " group by e.asset_entity_id having maxstate >= $onCartId").size()
+	        											
+	        def sourceTransportAvail = jdbcTemplate.queryForList(countQuery + " group by e.asset_entity_id having maxstate = $cleanedId").size()
+	        								
+	        def sourceTransportPend = jdbcTemplate.queryForList(countQuery + " group by e.asset_entity_id having maxstate < $cleanedId").size()
+			
+	        def targetMover = jdbcTemplate.queryForList(countQuery + " group by e.asset_entity_id having maxstate >= $stagedId").size()
+	        
+	        def targetTransportAvail = jdbcTemplate.queryForList(countQuery + " group by e.asset_entity_id having maxstate >= $onTruckId and maxstate < $offTruckId").size()
+	        def targetTransportPend = jdbcTemplate.queryForList(countQuery + " group by e.asset_entity_id having maxstate < $onTruckId").size()
+	        											
 	        def cleaningTeam = ProjectTeam.findByTeamCode("Cleaning")
 	        def transportTeam = ProjectTeam.findByTeamCode("Transport")
 	        def cleaningMembers = partyRelationshipService.getBundleTeamMembersDashboard(cleaningTeam.id)
 	        def transportMembers = partyRelationshipService.getBundleTeamMembersDashboard(transportTeam.id)
+	            supportTeam.put("sourcePendCleaned", sourcePendCleaned )
+	            supportTeam.put("sourceAvailCleaned", sourceAvailCleaned )
+	            supportTeam.put("sourceTransportAvail", sourceTransportAvail )
+	            supportTeam.put("sourceTransportPend", sourceTransportPend )
+	            supportTeam.put("targetTransportAvail", targetTransportAvail )
+	            supportTeam.put("targetTransportPend", targetTransportPend )
 		        supportTeam.put("totalAssets", totalAssetsSize )
 		        supportTeam.put("sourceCleaned", sourceCleaned )
 		        supportTeam.put("sourceMover", sourceMover )
@@ -993,9 +1021,13 @@ class AssetEntityController {
 	        	}
 	        	assetsList<<[asset: it, status: stateEngineService.getStateLabel( "STD_PROCESS", curId ), cssClass : cssClass, checkVal:check]
 	        }
+	        def totalSourcePending = jdbcTemplate.queryForList(countQuery +	"group by e.asset_entity_id having maxstate < $releasedId").size()
+	        
 	        def totalUnracked = jdbcTemplate.queryForList(countQuery +	"group by e.asset_entity_id having maxstate >= $unrackedId").size()
 	        
-	        def totalSourceAvail = jdbcTemplate.queryForList(countQuery + " and t.state_to >= $releasedId group by e.asset_entity_id HAVING maxstate < $unrackedId ").size() 
+	        def totalSourceAvail = jdbcTemplate.queryForList(countQuery + " and t.state_to >= $releasedId group by e.asset_entity_id HAVING maxstate < $unrackedId ").size()
+	        
+	        def totalTargetPending = jdbcTemplate.queryForList(countQuery +	"group by e.asset_entity_id having maxstate < $stagedId").size()
 	        
 	        def totalReracked = jdbcTemplate.queryForList(countQuery + "group by e.asset_entity_id HAVING maxstate >= $rerackedId ").size()
 	        
@@ -1028,7 +1060,8 @@ class AssetEntityController {
 	                totalTargetAvail:totalTargetAvail, totalReracked:totalReracked, totalAsset:totalAssetsSize, 
 	                timeToRefresh : timeToRefresh ? timeToRefresh.SUPER_CONSOLE_REFRESH : "never", showAll : showAll,
 	                applicationList : applicationList, appOwnerList : appOwnerList, appSmeList : appSmeList, 
-	                transitionStates : transitionStates, params:params, totalAssetsOnHold:totalAssetsOnHold]
+	                transitionStates : transitionStates, params:params, totalAssetsOnHold:totalAssetsOnHold,
+	                totalSourcePending: totalSourcePending, totalTargetPending: totalTargetPending ]
         } else {
 	        flash.message = "Please create bundle to view Console"	
 	        redirect(controller:'project',action:'show',params:["id":params.projectId])

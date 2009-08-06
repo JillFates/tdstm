@@ -74,6 +74,10 @@ class SupervisorConsoleService {
 					queryForConsole.append(" and pm.current_state_id >= $stagedId and pm.current_state_id < $rerackedId")
 				} else if(assetStatus == 'target_done'){
 					queryForConsole.append(" and pm.current_state_id >= $rerackedId ")
+				} else if(assetStatus == 'source_pend'){
+					queryForConsole.append(" and pm.current_state_id < $releasedId")
+				} else if(assetStatus == 'target_pend'){
+					queryForConsole.append(" and pm.current_state_id < $stagedId")
 				}
 			} else {
 				queryForConsole.append(" and pm.current_state_id != 10 ")
