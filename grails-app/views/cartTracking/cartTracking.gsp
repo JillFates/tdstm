@@ -47,11 +47,19 @@
    	function timedRefresh(timeoutPeriod) {
    		if(timeoutPeriod != 'never'){
 			clearTimeout(timer);
-			timer = setTimeout("location.reload(true);",timeoutPeriod);
+			timer = setTimeout("pageReload()",timeoutPeriod);
 		} else {
 			clearTimeout(timer)
 		}
 	}
+	function pageReload(){
+		if('${myForm}'){
+			document.forms['${myForm}'].submit() ;
+		} else {
+			window.location = document.URL;
+		}
+	}
+	
 	/*-----------------------------------------
 	* Function to initialize time refresh when user selects the time refresh 
 	*-----------------------------------------*/
@@ -268,6 +276,7 @@
 				<td valign="top" class="name">
 					<input type="hidden" id="projectId" name="projectId" value="${projectId }" />
 					<input type="hidden" id="cartActionId" name="cartAction" value="${cartAction}" />
+					<input type="hidden" name="myForm" value="cartTrackingForm">
 					<label for="moveBundle">Move Bundle:</label>&nbsp;
 					<select id="moveBundleId" name="moveBundle"	onchange="document.cartTrackingForm.submit()">
 						<g:each status="i" in="${moveBundleInstanceList}" var="moveBundleInstance">
@@ -280,7 +289,7 @@
 				</td>
 				<td style="text-align: right;">
 					<input type="hidden" name="last_refresh_2342131123" value="${new Date()}">
-					<input type="button" value="Refresh" onclick="location.reload(true);">
+					<input type="button" value="Refresh" onclick="pageReload();">
 					<select id="selectTimedId" onchange="${remoteFunction( action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(e)') }">
 						<option value="60000">1 min</option>
 						<option value="120000">2 min</option>

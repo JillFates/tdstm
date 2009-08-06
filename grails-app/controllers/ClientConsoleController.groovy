@@ -157,7 +157,7 @@ class ClientConsoleController {
 				appOwnerList:appOwnerList,applicationList:applicationList,appSmeList:appSmeList,projectId:projectId,
 				processTransitionList:processTransitionList,projectId:projectId,appOwnerValue:appOwnerValue,appValue:appValue,
 				appSmeValue:appSmeValue,timeToRefresh:timeToRefresh ? timeToRefresh.CLIENT_CONSOLE_REFRESH : "never",
-				headerCount:headerCount,browserTest:browserTest]
+				headerCount:headerCount,browserTest:browserTest, myForm : params.myForm]
     	} else {
     		flash.message = "Please create bundle to view PMO Dashboard"
     		redirect(controller:'project',action:'show',params:["id":params.projectId])

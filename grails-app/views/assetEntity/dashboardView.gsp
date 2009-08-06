@@ -534,9 +534,20 @@ td .odd {
    	function timedRefresh(timeoutPeriod) {
    		if(timeoutPeriod != 'never'){
 			clearTimeout(timer);
-			timer = setTimeout("window.location.reload(true);",timeoutPeriod);
+			timer = setTimeout("pageReload()",timeoutPeriod);
 		} else {
 			clearTimeout(timer)
+		}
+	}
+	function pageReload(){
+		var showAll = $("#showAllCheckbox").is(':checked');
+		if(showAll){
+			$("#showAllId").val('show');
+		}
+		if('${params.myForm}'){
+			document.forms['${params.myForm}'].submit() ;
+		} else {
+			window.location = document.URL;
 		}
 	}
 	function setRefreshTime(e) {
@@ -651,6 +662,9 @@ td .odd {
 		if(showAll){
 			$("#showAllId").val('show');
 		}
+		$("#teamId").val('');
+		$("#assetLocationId").val('');
+		$("#assetStatusId").val('');
 		$("form#dashboardForm").submit();
 	}
 	function createNewAssetComment( asset ){
@@ -697,6 +711,13 @@ td .odd {
 		$("#assetStatusId").val( assetStatus );
 		$("form#dashboardForm").submit();
 	}
+	function submitFormWithBundle(){
+		$("#showAllId").val('');
+		$("#teamId").val('');
+		$("#assetLocationId").val('');
+		$("#assetStatusId").val('');
+		$("form#dashboardForm").submit();
+	}
     </script>
 </head>
 
@@ -704,7 +725,8 @@ td .odd {
 
 <div title="Change Status" id="showChangeStatusDialog"
 	style="background-color: #808080; display: none;">
-<form name="changeStatusForm"><input type="hidden"
+<form name="changeStatusForm" method="post">
+	<input type="hidden"
 	name="assetVal" id="assetVal" /> <input type="hidden" name="projectId"
 	id="projectId" value="${projectId}" /> <input type="hidden"
 	name="moveBundle" id="moveBundle" value="${moveBundleInstance.id}" />
@@ -736,19 +758,19 @@ td .odd {
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
-<g:form method="get" name="dashboardForm"
-	controller="assetEntity" action="dashboardView">
+<g:form method="post" name="dashboardForm" controller="assetEntity" action="dashboardView">
 	<input type="hidden" name="projectId" value="${projectId}">
 	<input type="hidden" name="showAll" id="showAllId">
-	<input type="hidden" name="team" id="teamId">
-	<input type="hidden" name="assetLocation" id="assetLocationId">
-	<input type="hidden" name="assetStatus" id="assetStatusId">
+	<input type="hidden" name="team" id="teamId" value="${params.team}">
+	<input type="hidden" name="assetLocation" id="assetLocationId" value="${params.assetLocation}">
+	<input type="hidden" name="assetStatus" id="assetStatusId" value="${params.assetStatus}">
+	<input type="hidden" name="myForm" value="dashboardForm">
 	<div class="dialog">
 	<table style="border: 0px;">
 		<tr class="prop">
 			<td style="vertical-align: bottom;width:30%" class="name"><label
 				for="moveBundle">Move Bundle:</label>&nbsp;<select id="moveBundleId"
-				name="moveBundle" onchange="document.dashboardForm.submit()">
+				name="moveBundle" onchange="submitFormWithBundle()">
 
 				<g:each status="i" in="${moveBundleInstanceList}"
 					var="moveBundleInstance">
@@ -761,7 +783,7 @@ td .odd {
 			</td>
 			<td style="text-align: right; vertical-align: bottom;width:30%">
 			<input type="hidden" id="lastRefreshId" name="lastRefresh" value="${new Date().getTime()}">
-			<input type="button" value="Refresh" onclick="window.location.reload(true);">
+			<input type="button" value="Refresh" onclick="pageReload();">
 			<select id="selectTimedId"
 				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(e)') }">
 				<option value="60000">1 min</option>
@@ -963,7 +985,7 @@ td .odd {
 											 onclick="document.filterForm.reset();$('#filterShowAllId').val('');document.filterForm.submit();"><span class="clear_filter"><u>X</u></span></a>
 									</g:if>
 									<g:if test="${totalAssetsOnHold > 0}">
-									&nbsp;&nbsp;<input type="button" class="onhold_button" onclick="$('#showAllId').val('');$('form#dashboardForm').submit()" id="onHoldButtonId" value="On Hold (${totalAssetsOnHold})"/>
+									&nbsp;&nbsp;<input type="button" class="onhold_button" onclick="submitFormWithBundle()" id="onHoldButtonId" value="On Hold (${totalAssetsOnHold})"/>
 									</g:if>
 								</td>
 							</tr>
@@ -1463,6 +1485,7 @@ Comment</a></span></div>
 		<input type="hidden" name="projectId" value="${projectId}" />
 		<input type="hidden" name="moveBundle" value="${moveBundleInstance.id}" />
 		<input type="hidden" name="showAll" id="filterShowAllId" value="${showAll}">
+		<input type="hidden" name="myForm" value="filterForm">
 		<table>
 			<tr>
 				<td>Application : </td>

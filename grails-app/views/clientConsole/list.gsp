@@ -398,7 +398,13 @@ function timedRefresh(timeoutPeriod) {
 		clearTimeout(timer)
 	}
 }
-
+function pageReload(){
+	if('${myForm}'){
+		document.forms['${myForm}'].submit() ;
+	} else {
+		window.location = document.URL;
+	}
+}
 function doAjaxCall(){
 	var moveBundle = $("#moveBundleId").val();
 	var application = $("#applicationId").val();
@@ -590,8 +596,9 @@ function resolveValidate(formName,idVal){
 			<td><h1 align="center">PMO Dashboard</h1></td>
 			<td style="text-align: right;">
 			<input type="hidden" name="last_refresh" value="${new Date()}">
+			<input type="hidden" name="myForm" value="listForm">
 			<input type="button"
-				value="Refresh" onclick="location.reload(true);"> <select
+				value="Refresh" onclick="pageReload();"> <select
 				id="selectTimedId"
 				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(e)') }">
 				<option value="30000">30 sec</option>

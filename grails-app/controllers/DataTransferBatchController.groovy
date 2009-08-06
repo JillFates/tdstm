@@ -52,6 +52,7 @@ class DataTransferBatchController {
 		    		}
 		    		if(assetEntity){
 			    		assetEntity.project = projectInstance
+			    		assetEntity.owner = projectInstance.client
 			    		dtvList.each {
 			    			def attribName = it.eavAttribute.attributeCode
 			    			//sourceteam and targetTeam assignment to assetEntity
