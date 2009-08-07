@@ -395,7 +395,8 @@ td .odd {
 	    var tableBody = '<table style=\'border:0\' cellpadding=\'0\' cellspacing=\'0\' ><thead><tr><th colspan="2">Asset Details </th></tr></thead><tbody>'+
 		'<tr><td><b>Name: </b>'+asset[0].assetDetails.assetDetail.assetName+'</td></tr>'+
 		'<tr><td><b>Model: </b>'+asset[0].assetDetails.assetDetail.model+'</td></tr>'+
-		'<tr><td><b>Rack: </b>'+asset[0].assetDetails.assetDetail.sourceRack+'</td></tr>'+
+		'<tr><td><b>Src Rack: </b>'+asset[0].assetDetails.srcRack+'</td></tr>'+
+		'<tr><td><b>Tgt Rack: </b>'+asset[0].assetDetails.tgtRack+'</td></tr>'+
 		'<tr><td><b>Status: </b>'+asset[0].assetDetails.currentState+'</td></tr>'+
 		'<tr><td><b>Recent Changes: </b></td><td><a href="#" id="moreLinkId" onclick="displayMore();return false;"><b>More</b></a>'+
 		'<a href="#" id="lessLinkId" style="display:none" onclick="displayLess(); return false;"><b>Less</b></a></td></tr>' +
@@ -506,7 +507,10 @@ td .odd {
 	   		$("#selectTimedId").val( time );
 	   } 
 	   var showAll = '${showAll}'
-	   if(showAll == 'show'){
+	   var team = '${params.team}'
+	   var status = '${params.assetStatus}'
+	   var filter = '${params.myForm}'
+	   if(showAll == 'show' && !team && !status && filter != 'filterForm'){
 	   		$("#showAllCheckbox").attr('checked',true)
 	   }
 	   $("#filterStateId").val('${params.currentState}');
@@ -718,6 +722,9 @@ td .odd {
 		$("#assetStatusId").val('');
 		$("form#dashboardForm").submit();
 	}
+	function vpWidth() {
+		return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+	}
     </script>
 </head>
 
@@ -806,8 +813,8 @@ td .odd {
 			<tr>
 				<td valign="top"
 					style="border-right: 1px solid #333333; padding: 0px; width: 15%;">
-				<div style="width: 100%;; float: left;">
-				<table style="border: 0; width: 100%;">
+				<div style="width: 175px; float: left;">
+				<table style="border: 0; width: 175px;">
 					<th>TEAMS:</th>
 					<tr>
 						<td>Names</td>
@@ -833,7 +840,7 @@ td .odd {
 				</td>
 				<td valign="top"
 					style="border-right: 1px solid #333333; padding: 0px; width: 1%;">
-				<div style="width: 750px; float: left; overflow: auto;">
+				<div style="float: left; overflow: auto;" id="midDiv">
 				<table width="100%" style="border: 0;" cellspacing="0"
 					cellpadding="0">
 					<tr>
@@ -1115,7 +1122,10 @@ td .odd {
 							<td><b>Model:</b></td>
 						</tr>
 						<tr>
-							<td><b>Rack: </b></td>
+							<td><b>Src Rack: </b></td>
+						</tr>
+						<tr>
+							<td><b>Tgt Rack: </b></td>
 						</tr>
 						<tr>
 							<td><b>Status: </b></td>
@@ -1543,6 +1553,7 @@ Comment</a></span></div>
 
 <script type="text/javascript">
 bundleChange();
+$("#midDiv").css('width',vpWidth() - 340)
 timedRefresh($("#selectTimedId").val())
 </script>
 </div>

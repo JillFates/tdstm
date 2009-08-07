@@ -1118,6 +1118,12 @@ class AssetEntityController {
 	        }
 	        def map = new HashMap()
 	        map.put("assetDetail",assetDetail)
+	        map.put("srcRack",(assetDetail.sourceRoom ? assetDetail.sourceRoom : '') +" / "+ 
+	        					(assetDetail.sourceRack ? assetDetail.sourceRack : '') +" / "+
+	        					(assetDetail.sourceRackPosition ? assetDetail.sourceRackPosition : ''))
+	        map.put("tgtRack",(assetDetail.targetRoom ? assetDetail.targetRoom : '') +" / "+ 
+	        					(assetDetail.targetRack ? assetDetail.targetRack : '') +" / "+
+	        					(assetDetail.targetRackPosition ? assetDetail.targetRackPosition : ''))
 	        if(teamName){
                 map.put("teamName",teamName.name)
 	        }else{
