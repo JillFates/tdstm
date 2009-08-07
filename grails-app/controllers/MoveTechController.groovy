@@ -623,6 +623,8 @@ class MoveTechController {
         	}
         	def loginTeam = ProjectTeam.findById(params.team)
     		def asset = getAssetEntity ( params.search, params.user )
+    		def redirectAction = "assetTask"
+    		if(asset){
             def bundle = asset.moveBundle
             def loginUser = UserLogin.findByUsername ( principal )
             def workflow
@@ -673,6 +675,12 @@ class MoveTechController {
                                 ])
                 }
             }
+    		} else {
+    			if ( params.user != "mt" ){
+    				redirectAction = "cleaningAssetSearch"
+    			}
+    			redirect ( action : redirectAction, params:params)
+    		}
         } else {
         	flash.message = "Your login has expired and must login again."
         	redirect( action:'login' )
@@ -689,29 +697,34 @@ class MoveTechController {
         def principal = SecurityUtils.subject.principal
         if( principal ) {
         	def asset = getAssetEntity ( params.search, params.user )
-            def bundle = asset.moveBundle
-            def loginTeam = ProjectTeam.findById(params.team)
-            def actionLabel = params.actionLabel
-            def projectAssetMap = ProjectAssetMap.findByAsset( asset ) 
-            def currentState = stateEngineService.getState( "STD_PROCESS", projectAssetMap.currentStateId )
-            def flags = stateEngineService.getFlags( "STD_PROCESS", "MOVE_TECH", currentState, actionLabel )
-            def loginUser = UserLogin.findByUsername( principal )
-            def assetComment = params.assetComment
-            def workflow = workflowService.createTransition( "STD_PROCESS", "MOVE_TECH", actionLabel, asset, bundle, loginUser, loginTeam, assetComment )
-            if ( workflow.success ) {
-            	if(flags.contains("busy")){
-            		flash.message = message ( code : workflow.message )
-                    redirect ( action:'assetSearch', params:params)
-            	} else {
-            		redirect ( action: 'assetTask', 
-            			params:[ "bundle":params.bundle, "team":params.team, "project":params.project,
-            			         "location":params.location, "tab":"Todo" 
-            			         ])
-            	}
-            } else {
-                flash.message = message ( code : workflow.message )
+        	if(asset){
+	            def bundle = asset.moveBundle
+	            def loginTeam = ProjectTeam.findById(params.team)
+	            def actionLabel = params.actionLabel
+	            def projectAssetMap = ProjectAssetMap.findByAsset( asset ) 
+	            def currentState = stateEngineService.getState( "STD_PROCESS", projectAssetMap.currentStateId )
+	            def flags = stateEngineService.getFlags( "STD_PROCESS", "MOVE_TECH", currentState, actionLabel )
+	            def loginUser = UserLogin.findByUsername( principal )
+	            def assetComment = params.assetComment
+	            def workflow = workflowService.createTransition( "STD_PROCESS", "MOVE_TECH", actionLabel, asset, bundle, loginUser, loginTeam, assetComment )
+	            if ( workflow.success ) {
+	            	if(flags.contains("busy")){
+	            		flash.message = message ( code : workflow.message )
+	                    redirect ( action:'assetSearch', params:params)
+	            	} else {
+	            		redirect ( action: 'assetTask', 
+	            			params:[ "bundle":params.bundle, "team":params.team, "project":params.project,
+	            			         "location":params.location, "tab":"Todo" 
+	            			         ])
+	            	}
+	            } else {
+	                flash.message = message ( code : workflow.message )
+	                redirect ( action:'assetSearch',params:params)
+	            }
+        	} else {
+        		flash.message = 'Asset not found'
                 redirect ( action:'assetSearch',params:params)
-            }
+        	}
         } else {
         	flash.message = "Your login has expired and must login again."
         	redirect( action:'login' )
@@ -1001,29 +1014,34 @@ class MoveTechController {
         def principal = SecurityUtils.subject.principal
         if ( principal ) {
         	def asset = getAssetEntity ( params.search, params.user )//AssetEntity.findByAssetTag(params.search)
-            def bundle = asset.moveBundle
-            def actionLabel = params.actionLabel
-            def loginUser = UserLogin.findByUsername ( principal )
-            def loginTeam = ProjectTeam.findById(params.team)
-            def assetComment = params.assetComment
-            def workflow = workflowService.createTransition ( "STD_PROCESS", "CLEANER", actionLabel, asset, bundle, loginUser, loginTeam, assetComment )
-            if ( workflow.success ) {
-                def projMap = []
-                def stateVal = null
-                def label = null
-                actionLabel = null
-                render(view: 'cleaningAssetSearch',
-                    model:[ projMap:projMap, stateVal:stateVal, "search":params.search, "bundle":params.bundle,
-							"team":params.team, "project":params.project, "location":params.location, "tab":"Todo", label:label,
-							actionLabel:actionLabel
-							])
-            } else {
-                flash.message = message ( code : workflow.message )
-                redirect ( action:'cleaningAssetSearch', 
-                    params:[ "bundle":params.bundle, "team":params.team, "project":params.project, "location":params.location,
-                             "search":params.search, "assetComment":assetComment, "label":params.label, "actionLabel":actionLabel
-                             ])
-            }
+        	if(asset){
+	            def bundle = asset.moveBundle
+	            def actionLabel = params.actionLabel
+	            def loginUser = UserLogin.findByUsername ( principal )
+	            def loginTeam = ProjectTeam.findById(params.team)
+	            def assetComment = params.assetComment
+	            def workflow = workflowService.createTransition ( "STD_PROCESS", "CLEANER", actionLabel, asset, bundle, loginUser, loginTeam, assetComment )
+	            if ( workflow.success ) {
+	                def projMap = []
+	                def stateVal = null
+	                def label = null
+	                actionLabel = null
+	                render(view: 'cleaningAssetSearch',
+	                    model:[ projMap:projMap, stateVal:stateVal, "search":params.search, "bundle":params.bundle,
+								"team":params.team, "project":params.project, "location":params.location, "tab":"Todo", label:label,
+								actionLabel:actionLabel
+								])
+	            } else {
+	                flash.message = message ( code : workflow.message )
+	                redirect ( action:'cleaningAssetSearch', 
+	                    params:[ "bundle":params.bundle, "team":params.team, "project":params.project, "location":params.location,
+	                             "search":params.search, "assetComment":assetComment, "label":params.label, "actionLabel":actionLabel
+	                             ])
+	            }
+        	} else {
+                flash.message = "Asset not found"
+                redirect ( action:'cleaningAssetSearch', params:params)
+        	}
         } else {
         	flash.message = "Your login has expired and must login again."
         	redirect( action:'login' )
@@ -1040,21 +1058,26 @@ class MoveTechController {
 		def principal = SecurityUtils.subject.principal
 		if ( principal ) {
 			def asset = getAssetEntity ( params.search, params.user )
-			def bundle = asset.moveBundle
-			def actionLabel = params.actionLabel
-			def loginUser = UserLogin.findByUsername ( principal )
-			def team
-			def assetComment = params.assetComment
-			def projMap = []
-			assetComment = []
-			def stateVal = null
-			def label = null
-			actionLabel = null
-			render(view: 'cleaningAssetSearch',
-                model:[	projMap:projMap, assetComment:assetComment, stateVal:stateVal, "search":params.search, "bundle":params.bundle,
-						"team":params.team, "project":params.project, "location":params.location, "tab":"Todo", label:label,
-						actionLabel:actionLabel
-						])
+			if(asset){
+				def bundle = asset.moveBundle
+				def actionLabel = params.actionLabel
+				def loginUser = UserLogin.findByUsername ( principal )
+				def team
+				def assetComment = params.assetComment
+				def projMap = []
+				assetComment = []
+				def stateVal = null
+				def label = null
+				actionLabel = null
+				render(view: 'cleaningAssetSearch',
+	                model:[	projMap:projMap, assetComment:assetComment, stateVal:stateVal, "search":params.search, "bundle":params.bundle,
+							"team":params.team, "project":params.project, "location":params.location, "tab":"Todo", label:label,
+							actionLabel:actionLabel
+							])
+			} else {
+				flash.message = "Asset not found"
+				redirect ( action:'cleaningAssetSearch', params:params)
+            }
 		} else {
 			flash.message = "Your login has expired and must login again."
 			redirect ( action:'login' )
@@ -1115,7 +1138,10 @@ class MoveTechController {
         query.append(" and targetTeam = $bundleteam")
         }
 		}*/
-		def asset = AssetEntity.find( query.toString(), [ assetTag : assetTag ] )
+		def asset 
+		if(loginCode && assetTag){
+			asset = AssetEntity.find( query.toString(), [ assetTag : assetTag ] )
+		}
 		return asset 
 	}
     
@@ -1136,20 +1162,24 @@ class MoveTechController {
 		if( principal ){
 			def loginUser = UserLogin.findByUsername ( principal )
 			def asset = getAssetEntity ( params.search, params.user )
-			def assetComment = new AssetComment()
-				assetComment.comment = params.enterNote
-				if ( params.similarComment == "nosimilar" ) {
-					appendCommentsToRemainderList( params, session )
-				}
-                assetComment.assetEntity = asset
-                assetComment.commentType = 'comment'
-                assetComment.createdBy = loginUser.person
-                assetComment.save()
-            if( params.user != "ct" ) {
-            	redirect( action:assetSearch, params:params )
-            } else {
-            	redirect( action:cleaningAssetSearch, params:params )
-            }
+			if(asset){
+				def assetComment = new AssetComment()
+					assetComment.comment = params.enterNote
+					if ( params.similarComment == "nosimilar" ) {
+						appendCommentsToRemainderList( params, session )
+					}
+	                assetComment.assetEntity = asset
+	                assetComment.commentType = 'comment'
+	                assetComment.createdBy = loginUser.person
+	                assetComment.save()
+			} else {
+				flash.message = "Asset not found"
+			}
+	        if( params.user != "ct" ) {
+	        	redirect( action:assetSearch, params:params )
+	        } else {
+	        	redirect( action:cleaningAssetSearch, params:params )
+	        }
 		} else {
         	flash.message = "Your login has expired and must login again."
         	redirect( action:'login' )
