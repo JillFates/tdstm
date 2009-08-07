@@ -21,6 +21,10 @@ class SupervisorConsoleService {
         def sortField = params.sort
         def orderField = params.order
         def holdCheck = true
+        def cleanedId = stateEngineService.getStateId( "STD_PROCESS", "Cleaned" )
+        def onCartId = stateEngineService.getStateId( "STD_PROCESS", "OnCart" )
+        def onTruckId = stateEngineService.getStateId( "STD_PROCESS", "OnTruck" )
+	    def offTruckId = stateEngineService.getStateId( "STD_PROCESS", "OffTruck" )
         def rerackedId = stateEngineService.getStateId( "STD_PROCESS", "Reracked" )
         def stagedId = stateEngineService.getStateId( "STD_PROCESS", "Staged" )
         def unrackedId = stateEngineService.getStateId( "STD_PROCESS", "Unracked" )
@@ -66,19 +70,41 @@ class SupervisorConsoleService {
 		
 		if(assetStatus){
 			if(type != 'hold'){
-				if(assetStatus == 'source_avail'){
-					queryForConsole.append(" and pm.current_state_id >= $releasedId and pm.current_state_id < $unrackedId ")
-				} else if(assetStatus == 'source_done'){
-					queryForConsole.append(" and pm.current_state_id >= $unrackedId ")
-				} else if(assetStatus == 'target_avail'){
-					queryForConsole.append(" and pm.current_state_id >= $stagedId and pm.current_state_id < $rerackedId")
-				} else if(assetStatus == 'target_done'){
-					queryForConsole.append(" and pm.current_state_id >= $rerackedId ")
-				} else if(assetStatus == 'source_pend'){
-					queryForConsole.append(" and pm.current_state_id < $releasedId")
-				} else if(assetStatus == 'target_pend'){
-					queryForConsole.append(" and pm.current_state_id < $stagedId")
+				
+				switch( assetStatus ) {
+				
+					case "source_avail" 		: queryForConsole.append(" and pm.current_state_id >= $releasedId and pm.current_state_id < $unrackedId ")
+										  		  break;
+					case "source_done"  		: queryForConsole.append(" and pm.current_state_id >= $unrackedId ")
+										  		  break;
+					case "target_avail" 		: queryForConsole.append(" and pm.current_state_id >= $stagedId and pm.current_state_id < $rerackedId")
+										          break;
+					case "target_done"  		: queryForConsole.append(" and pm.current_state_id >= $rerackedId ")
+										          break;
+					case "source_pend"  		: queryForConsole.append(" and pm.current_state_id < $releasedId")
+					  					          break;
+					case "target_pend"  		: queryForConsole.append(" and pm.current_state_id < $stagedId")
+					  					          break;
+					case "source_pend_clean"  	: queryForConsole.append(" and pm.current_state_id < $unrackedId")
+					  							  break;
+					case "source_avail_clean"  	: queryForConsole.append(" and pm.current_state_id = $unrackedId")
+					  							  break;
+					case "source_done_clean"  	: queryForConsole.append(" and pm.current_state_id >= $cleanedId")
+					  							  break;
+					case "source_pend_trans"  	: queryForConsole.append(" and pm.current_state_id < $cleanedId")
+					  							  break;
+					case "source_avail_trans"   : queryForConsole.append(" and pm.current_state_id = $cleanedId")
+					  							  break;
+					case "source_done_trans"    : queryForConsole.append(" and pm.current_state_id >= $onCartId")
+					  							  break;
+					case "target_pend_trans"    : queryForConsole.append(" and pm.current_state_id < $onTruckId")
+					  							  break;
+					case "target_avail_trans"   : queryForConsole.append(" and pm.current_state_id >= $onTruckId and pm.current_state_id < $offTruckId")
+												  break;
+					case "target_done_trans"    : queryForConsole.append(" and pm.current_state_id >= $stagedId")
+											  break;
 				}
+				
 			} else {
 				queryForConsole.append(" and pm.current_state_id != 10 ")
 			}

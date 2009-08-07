@@ -897,8 +897,12 @@ td .odd {
 								</td>
 							</tr>
 							<tr>
-								<td nowrap class="odd">${supportTeam.sourcePendCleaned} / ${supportTeam.sourceAvailCleaned} / ${supportTeam.sourceCleaned} /
-								${supportTeam.totalAssets}</td>
+								<td nowrap class="odd">
+								<a href="#" onclick="filterByDataPoints('source','','source_pend_clean')"><u> ${supportTeam.sourcePendCleaned}</u> </a> /
+								<a href="#" onclick="filterByDataPoints('source','','source_avail_clean')"><u> ${supportTeam.sourceAvailCleaned}</u> </a> /
+								<a href="#" onclick="filterByDataPoints('source','','source_done_clean')"><u> ${supportTeam.sourceCleaned}</u> </a>/
+								<a href="#" onclick="filterByDataPoints('source','','')"><u> ${supportTeam.totalAssets}</u> </a>  
+								</td>
 							</tr>
 							<tr>
 								<td nowrap>N/A</td>
@@ -918,12 +922,20 @@ td .odd {
 								<td nowrap>&nbsp;</td>
 							</tr>
 							<tr>
-								<td nowrap class="odd">${supportTeam.sourceTransportPend} / ${supportTeam.sourceTransportAvail} / ${supportTeam.sourceMover} /
-								${supportTeam.totalAssets}</td>
+								<td nowrap class="odd">
+								<a href="#" onclick="filterByDataPoints('source','','source_pend_trans')"><u> ${supportTeam.sourceTransportPend}</u> </a> /
+								<a href="#" onclick="filterByDataPoints('source','','source_avail_trans')"><u> ${supportTeam.sourceTransportAvail}</u> </a> /
+								<a href="#" onclick="filterByDataPoints('source','','source_done_trans')"><u> ${supportTeam.sourceMover}</u> </a> /
+								<a href="#" onclick="filterByDataPoints('source','','')"><u> ${supportTeam.totalAssets}</u> </a> 
+								</td>
 							</tr>
 							<tr>
-								<td nowrap>${supportTeam.targetTransportPend} / ${supportTeam.targetTransportAvail} / ${supportTeam.targetMover} /
-								${supportTeam.totalAssets}</td>
+								<td nowrap>
+								<a href="#" onclick="filterByDataPoints('target','','target_pend_trans')"><u> ${supportTeam.targetTransportPend}</u> </a> /
+								<a href="#" onclick="filterByDataPoints('target','','target_avail_trans')"><u> ${supportTeam.targetTransportAvail}</u> </a> /
+								<a href="#" onclick="filterByDataPoints('target','','target_done_trans')"><u> ${supportTeam.targetMover}</u> </a> /
+								<a href="#" onclick="filterByDataPoints('target','','')"><u> ${supportTeam.totalAssets}</u> </a> 
+								</td>
 							</tr>
 						</table>
 						</td>
