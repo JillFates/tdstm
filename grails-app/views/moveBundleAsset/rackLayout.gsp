@@ -58,7 +58,7 @@
 	<g:form action="rackLayoutReport" method="post" target="_blank" onsubmit="return validateForm()">
 	<tbody>
 		<tr class="prop" id="bundleRow">
-			<td valign="top" class="name"><label>Current Move Bundle :</label></td>
+			<td valign="top" class="name"><label>Current Move Bundle:</label></td>
 			<td valign="top" class="value" colspan="2">
 				<select id="bundleId" name="moveBundle" onchange="${remoteFunction(action:'getRackDetails', params:'\'bundleId=\' + this.value', onComplete:'updateRackDetails(e)')}">
 					<option value="null" selected="selected">Please Select</option>
@@ -69,7 +69,7 @@
 			</td>
 		</tr>
 		<tr class="prop">
-			<td valign="top" class="name"><label>Location :</label></td>
+			<td valign="top" class="name"><label>Location:</label></td>
 			<td valign="top">
 				<label for="source"><input type="radio" name="location" id="source" onclick="$('#targetRackId').hide();$('#sourceRackId').show();$('#locationNameId').val('source');" /> Source </label> 
 			</td>
@@ -78,7 +78,7 @@
 			</td>
 		</tr>
 		<tr class="prop">
-			<td valign="top" class="name"><label>Room/Rack :</label></td>
+			<td valign="top" class="name"><label>Room/Rack:</label></td>
 			<td valign="top" class="value" colspan="2">
 				<select id="sourceRackId"	multiple="multiple" name="sourcerack" style="width: 100%;display: none;" size="10">
 					<option value="null" selected="selected">All</option>
@@ -95,15 +95,15 @@
 			</td>
 		</tr>
 		<tr class="prop">
-			<td valign="top" class="name"><label>Include other bundles :</label></td>
+			<td valign="top" class="name"><label>Include other bundles:</label></td>
 			<td valign="top" colspan="2"><input type="checkbox" name="otherBundle" checked="checked"></td>
 		</tr>
 		<tr class="prop">
-			<td valign="top" class="name"><label>Include bundle names :</label></td>
+			<td valign="top" class="name"><label>Include bundle names:</label></td>
 			<td valign="top" colspan="2"><input type="checkbox" name="bundleName" checked="checked"></td>
 		</tr>
 		<tr>
-			<td valign="top" class="name"><label>Print Views :</label></td>
+			<td valign="top" class="name"><label>Print Views:</label></td>
 			<td valign="top"><label for="frontView" ><input type="checkbox" name="frontView" id="frontView" checked="checked" />&nbsp;Front</label></td>
 			<td valign="top"><label for="backView" ><input type="checkbox" name="backView" id="backView" checked="checked">&nbsp;Back</label></td>
 		</tr>
