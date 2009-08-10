@@ -25,6 +25,7 @@
 	href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
 <link type="text/css" rel="stylesheet"
 	href="${createLinkTo(dir:'css',file:'dashboard.css')}" />
+<g:javascript src="assetcrud.js" />
 <g:javascript src="assetcommnet.js" />
 <jq:plugin name="ui.core" />
 <jq:plugin name="ui.draggable" />
@@ -60,489 +61,210 @@ var time = '${timeToRefresh}';
 </script>
 <script type="text/javascript">
 
-	function showAssetDialog( e , action ) {
+	function editAssetDialog() {
 		timedRefresh('never')
-		$('#createCommentDialog').dialog('close');
-		$('#commentsListDialog').dialog('close');
-		$('#editCommentDialog').dialog('close');
-		$('#showCommentDialog').dialog('close');
-		$("#showChangeStatusDialog").dialog('close');
-		var browser=navigator.appName;
-      	var assetEntityAttributes = eval('(' + e.responseText + ')');
-      	var autoComp = new Array()      			
-       	var showDiv = document.getElementById("showDiv");      			
-      	var editDiv = document.getElementById("editDiv");
-      	var stb = document.getElementById('showTbodyId')
-		if(stb != null){
-			showDiv.removeChild(stb)
-		}
-      	var etb = document.getElementById('editTbodyId')
-		if(etb != null){
-			editDiv.removeChild(etb)
-		}
-      	// create tbody for CreateTable
-      	var stbody = document.createElement('table');
-		stbody.id = "showTbodyId"
-      			
-      	var etbody = document.createElement('table');
-		etbody.id = "editTbodyId"
-		// Rebuild the select
-		if (assetEntityAttributes) {
-			var length = assetEntityAttributes.length
-			var halfLength = getLength(length) 
-			var str = document.createElement('tr');
-			var etr = document.createElement('tr');
-			var stdLeft = document.createElement('td');
-			stdLeft.style.width = '50%'
-			var etdLeft = document.createElement('td');
-			var stdRight = document.createElement('td');
-			stdRight.style.width = '50%'
-			var etdRight = document.createElement('td');
-			var stableLeft = document.createElement('table');
-			var etableLeft = document.createElement('table');
-			stableLeft.style.width = '50%'
-			stableLeft.style.border = '0'
-			etableLeft.style.width = '50%'
-			etableLeft.style.border = '0'
-			var stableRight = document.createElement('table');
-			var etableRight = document.createElement('table');
-			stableRight.style.width = '50%'
-			stableRight.style.border = '0'
-			etableRight.style.width = '50%'
-			etableRight.style.border = '0'
-			for (var i=0; i < halfLength; i++ ) {
-				var attributeLeft = assetEntityAttributes[i]
-				var strLeft = document.createElement('tr');
-				var etrLeft = document.createElement('tr');
-				// td for Show page
-				var inputTdLeft = document.createElement('td');
-				var labelTdLeft = document.createElement('td');
-				labelTdLeft.noWrap = 'nowrap'
-				var labelLeft = document.createTextNode(attributeLeft.label);
-				labelTdLeft.appendChild( labelLeft )
-				var inputFieldLeft = document.createTextNode(attributeLeft.value);
-				inputTdLeft.appendChild( inputFieldLeft )
-				labelTdLeft.style.background = '#f3f4f6 '
-				labelTdLeft.style.width = '25%'
-				inputTdLeft.style.width = '25%'
-				strLeft.appendChild( labelTdLeft )
-				strLeft.appendChild( inputTdLeft )
-				// td for Edit page
-				var inputTdELeft = document.createElement('td');
-				var labelTdELeft = document.createElement('td');
-				labelTdELeft.noWrap = 'nowrap'
-				var labelELeft = document.createTextNode(attributeLeft.label);
-				labelTdELeft.appendChild( labelELeft )
-				var inputFieldELeft = getInputType(attributeLeft);
-				inputFieldELeft.value = attributeLeft.value;
-				inputFieldELeft.id = 'edit'+attributeLeft.attributeCode+'Id';
-				inputTdELeft.appendChild( inputFieldELeft )
-				labelTdELeft.style.background = '#f3f4f6 '
-					
-				labelTdELeft.style.width = '25%'
-				inputTdELeft.style.width = '25%'
-				etrLeft.appendChild( labelTdELeft )
-				etrLeft.appendChild( inputTdELeft )
-				stableLeft.appendChild( strLeft )
-				etableLeft.appendChild( etrLeft )
-			}
-				      	
-			for (var i=halfLength; i < length; i++ ) {
-				var attributeRight = assetEntityAttributes[i]
-				var strRight = document.createElement('tr');
-				var etrRight = document.createElement('tr');
-				// td for Show page
-				var inputTdRight = document.createElement('td');
-				var labelTdRight = document.createElement('td');
-				labelTdRight.noWrap = 'nowrap'
-				var labelRight = document.createTextNode(attributeRight.label);
-				labelTdRight.appendChild( labelRight )
-				var inputFieldRight = document.createTextNode(attributeRight.value);
-				inputTdRight.appendChild( inputFieldRight )
-				labelTdRight.style.background = '#f3f4f6 '
-				labelTdRight.style.width = '25%'
-				inputTdRight.style.width = '25%'
-				strRight.appendChild( labelTdRight )
-				strRight.appendChild( inputTdRight )
-					      
-				// td for Edit page
-				var inputTdERight = document.createElement('td');
-				var labelTdERight = document.createElement('td');
-				labelTdERight.noWrap = 'nowrap'
-				var labelERight = document.createTextNode(attributeRight.label);
-				labelTdERight.appendChild( labelERight )
-					      
-				var inputFieldERight = getInputType(attributeRight);
-				inputFieldERight.value = attributeRight.value;
-				inputFieldERight.id = 'edit'+attributeRight.attributeCode+'Id';
-				inputTdERight.appendChild( inputFieldERight )
-				labelTdERight.style.background = '#f3f4f6 '
-				labelTdERight.style.width = '25%'
-				inputTdERight.style.width = '25%'
-				etrRight.appendChild( labelTdERight )
-				etrRight.appendChild( inputTdERight )
-				stableRight.appendChild( strRight )
-				etableRight.appendChild( etrRight )
-				      	
-			}
-			for (var i=0; i < length; i++ ) {
-				var attribute = assetEntityAttributes[i]
-				if(attribute.frontendInput == 'autocomplete'){
-					autoComp.push(attribute.attributeCode)
-				}
-			}
-			stdLeft.appendChild( stableLeft )
-			etdLeft.appendChild( etableLeft )
-			stdRight.appendChild( stableRight )
-			etdRight.appendChild( etableRight )
-			str.appendChild( stdLeft )
-			etr.appendChild( etdLeft )
-			str.appendChild( stdRight )
-			etr.appendChild( etdRight )
-			stbody.appendChild( str )
-			etbody.appendChild( etr )
-		}
-		showDiv.appendChild(stbody)
-		showDiv.innerHTML += "";
+		$("#showDialog").dialog("close")
+		$("#editDialog").dialog('option', 'width', 600)
+		$("#editDialog").dialog('option', 'position', ['center','top']);
+		$("#editDialog").dialog("open")
 		
-		editDiv.appendChild( etbody )
-		if(browser == 'Microsoft Internet Explorer') {
-			editDiv.innerHTML += "";
-		} 
-			    
-		${remoteFunction(controller:'assetEntity', action:'getAutoCompleteDate', params:'\'autoCompParams=\' + autoComp ', onComplete:'updateAutoComplete(e)')} 
-		if(action == 'edit'){
-			$("#editDialog").dialog('option', 'width', 600)
-			$("#editDialog").dialog('option', 'position', ['center','top']);
-			$("#editDialog").dialog("open")
-			$("#showDialog").dialog("close")
-		} else if(action == 'show'){
-			$("#showDialog").dialog('option', 'width', 600)
-			$("#showDialog").dialog('option', 'position', ['center','top']);
-			$("#showDialog").dialog("open")
-			$("#editDialog").dialog("close")
-		}
 	}
-		    function getLength( length ){
-      			var isOdd = (length%2 != 0) ? true : false
-      			var halfLength
-      			if(isOdd){
-      				length += 1;
-      				halfLength = length / 2 
-      			} else {
-      				halfLength = length / 2 
-      			}
-      			return halfLength; 
-      		}
-      		
-      		// function to construct the frontendInput tag
-      		function getInputType( attribute ){
-      			var name = attribute.attributeCode
-      			var type = attribute.frontendInput
-      			var options = attribute.options
-      			var inputField
-      			if(type == 'select'){
-					inputField = document.createElement('select');
-					inputField.name = name ;
-						var inputOption = document.createElement('option');
-						inputOption.value = ''
-						inputOption.innerHTML = 'please select'
-						inputField.appendChild(inputOption)
-						if (options) {
-					      var length = options.length
-					      for (var i=0; i < length; i++) {
-						      var optionObj = options[i]
-						      var popt = document.createElement('option');
-						      popt.innerHTML = optionObj.option
-						      popt.value = optionObj.option
-						      if(attribute.value == optionObj.option){
-							      popt.selected = true
-						      }
-						      try {
-						      	inputField.appendChild(popt, null) // standards compliant; doesn't work in IE
-						      } catch(ex) {
-						      	inputField.appendChild(popt) // IE only
-						      }
-					      }
-					   }						
-				} else {
-      			 	inputField = document.createElement('input');      			 	
-					inputField.type = "text";										
-					inputField.name = name;
-				}
-				return inputField; 
-      		}
-      		
-      		function editAssetDialog() {
-			timedRefresh('never')
-		      $("#showDialog").dialog("close")
-		      $("#editDialog").dialog('option', 'width', 600)
-		      $("#editDialog").dialog('option', 'position', ['center','top']);
-		      $("#editDialog").dialog("open")
-		
-		    }
-
-	function updateAutoComplete(e){
-
-      			var data = eval('(' + e.responseText + ')');
-      		
-      			if (data) {
-      			
-				      var length = data.length
-				     
-				      for (var i=0; i < length; i ++ ) {
-					      var attribData = data[i]
-					      var code = "edit"+attribData.attributeCode+"Id"
-					      var codeValue = attribData.value;
-				  			$("#"+code).autocomplete(codeValue);
-					  }
-					 
-				}
-				      			
-      		}
-      		
-      function callUpdateDialog( e ) {
-      	timedRefresh('never')
-			var assetEntityAttributes = eval('(' + e.responseText + ')');
-			var assetId = document.editForm.id.value
-			var assetEntityParams = new Array()
-			if (assetEntityAttributes) {
-		   		var length = assetEntityAttributes.length
-			      	for (var i=0; i < length; i ++) {
-			      		var attributeCode = assetEntityAttributes[i].attributeCode
-			      		var attributeValue = $('#edit'+attributeCode+'Id').val();
-			      		if(assetEntityAttributes[i].frontendInput == 'select'){
-				      		assetEntityParams.push(attributeCode+':'+attributeValue+'~')
-			      		} else {
-			      			assetEntityParams.push(attributeCode+':'+attributeValue+'~')
-			      		}
-					}
-		    	}
-		    var safeQueryString = escape( assetEntityParams );
-		    ${remoteFunction(controller:'assetEntity', action:'updateAssetEntity', params:'\'assetEntityParams=\' + safeQueryString +\'&id=\'+assetId', onComplete:'showEditAsset(e)')}
-		    }
 		    
-		    function showEditAsset(e) {
-		      var assetEntityAttributes = eval('(' + e.responseText + ')')
-			  if (assetEntityAttributes != "") {
-		    		var length = assetEntityAttributes.length
-				      	for (var i=0; i < length; i ++) {
-				      		var attribute = assetEntityAttributes[i]
-				      		var tdId = $("#"+attribute.attributeCode+'_'+attribute.id)
-				      		if(tdId != null ){
-				      				tdId.html( attribute.value )
-				      		}
-				      	}
+	function showEditAsset(e) {
+   		var assetEntityAttributes = eval('(' + e.responseText + ')')
+			if (assetEntityAttributes != "") {
+		    	var length = assetEntityAttributes.length
+				for (var i=0; i < length; i ++) {
+					var attribute = assetEntityAttributes[i]
+				    var tdId = $("#"+attribute.attributeCode+'_'+attribute.id)
+				    if(tdId != null ){
+				    	tdId.html( attribute.value )
+				    }
+				}
 				  $("#editDialog").dialog("close")
-				} else {
-					alert("Asset Entity is not updated")
-				}
-      		}
+			} else {
+		   		alert("Asset Entity is not updated")
+			}
+	}
 
-function showChangeStatusDialog(e){
-	timedRefresh('never')
-	var task = eval('(' + e.responseText + ')');
-	var taskLen = task[0].item.length;
-	var options = '';
-	if(taskLen == 0){
-	alert('Sorry but there were no common states for the assets selected');
-	return false;
-	}else{
-	      for (var i = 0; i < taskLen; i++) {
-	        options += '<option value="' + task[0].item[i].state + '">' + task[0].item[i].label + '</option>';
-	      }
-	      $("select#taskList").html(options);
-	      if(taskLen > 1 && task[0].item[0].state == "Hold"){
-	      	$('#taskList').children().eq(1).attr('selected',true);
-	      }
+	function showChangeStatusDialog(e){
+		timedRefresh('never')
+		var task = eval('(' + e.responseText + ')');
+		var taskLen = task[0].item.length;
+		var options = '';
+		if(taskLen == 0){
+			alert('Sorry but there were no common states for the assets selected');
+			return false;
+		}else{
+	      	for (var i = 0; i < taskLen; i++) {
+	        	options += '<option value="' + task[0].item[i].state + '">' + task[0].item[i].label + '</option>';
+	      	}
+	      	$("select#taskList").html(options);
+	      	if(taskLen > 1 && task[0].item[0].state == "Hold"){
+	      		$('#taskList').children().eq(1).attr('selected',true);
+	      	}
 	       	$('#asset').val(task[0].asset);
-	 
-	 
-	$("#changeStatusDialog").dialog('option', 'width', 400)
-	$("#changeStatusDialog").dialog('option', 'position', ['center','top']);
-	$('#changeStatusDialog').dialog('open');
-	}
-}
-function submitAction(){
-	if(doCheck()){
-	document.changeStatusForm.action = "changeStatus";
-	document.changeStatusForm.submit();
-	timedRefresh($("#selectTimedId").val())
-	}else{
-	return false;
-	}
-}
-function doCheck(){
-	var taskVal = $('#taskList').val();
-	var noteVal = $('#enterNote').val();
-	if((taskVal == "Hold")&&(noteVal == "")){
-		alert('Please Enter Note');
-		return false;
-	}else{
-		return true;
-	}
-}
-function setRefreshTime(e) {
-	var timeRefresh = eval("(" + e.responseText + ")")
-	if(timeRefresh){
-		timedRefresh(timeRefresh[0].refreshTime.CLIENT_CONSOLE_REFRESH)
-	}
-}
-var timer
-function timedRefresh(timeoutPeriod) {
-	if(timeoutPeriod != 'never'){
-		clearTimeout(timer)
-		timer = setTimeout("doAjaxCall()",timeoutPeriod);
-		$("#selectTimedId").val( timeoutPeriod );
-	} else {
-		clearTimeout(timer)
-	}
-}
-function pageReload(){
-	if('${myForm}'){
-		document.forms['${myForm}'].submit() ;
-	} else {
-		window.location = document.URL;
-	}
-}
-function doAjaxCall(){
-	var moveBundle = $("#moveBundleId").val();
-	var application = $("#applicationId").val();
-	var appOwner = $("#appOwnerId").val();
-	var appSme = $("#appSmeId").val();
-	${remoteFunction(action:'getTransitions', params:'\'moveBundle=\' + moveBundle +\'&application=\'+application +\'&appOwner=\'+appOwner+\'&appSme=\'+appSme', onComplete:'updateTransitions(e);' )}
-	timedRefresh($("#selectTimedId").val())
-}
-function updateTransitions(e){
-	try{
-		var assetTransitions = eval('(' + e.responseText + ')');
-		var assetslength = assetTransitions.length;
-		var sessionStatus = isNaN(parseInt(assetslength));
-		if( !sessionStatus ){
-			if(assetTransitions){
-				for( i = 0; i <assetslength ; i++){
-					var assetTransition = assetTransitions[i]
-					var action = $("#action_"+assetTransition.id)
-					if(action){
-						if(!assetTransition.check){
-							action.html('&nbsp;');
-						} 
-					}
-					var commentIcon = $("#icon_"+assetTransition.id)
-					if(commentIcon){
-						if(!assetTransition.showCommentIcon){
-							commentIcon.html('&nbsp;');
-						}else{
-							var link = document.createElement('a');
-							link.href = '#'
-							link.id = assetTransition.id
-							link.onclick = function(){$('#createAssetCommentId').val( assetTransition.id );new Ajax.Request('../assetEntity/listComments?id='+this.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'action');}})} //;return false
-							link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
-							commentIcon.html(link);
-						} 
-					}
-					var application = $("#application_"+assetTransition.id)
-					if(application){
-						application.html( assetTransition.application );
-					}
-					var owner = $("#appOwner_"+assetTransition.id)
-					if(owner){
-						owner.html( assetTransition.appOwner );
-					}
-					var sme = $("#appSme_"+assetTransition.id)
-					if(sme){
-						sme.html( assetTransition.appSme );
-					}
-					var assetName = $("#assetName_"+assetTransition.id)
-					if(assetName){
-						assetName.html( assetTransition.assetName );
-					}
-					var tdIdslength = assetTransition.tdId.length
-					for(j = 0; j< tdIdslength ; j++){
-						var transition = assetTransition.tdId[j]
-						var transTd = $("#"+transition.id)
-						transTd.attr("class",transition.cssClass )
-					}
-				}
-			}
-		} else {
-			location.reload(false);
-			//timedRefresh('never')
-		}
-	} catch(ex){
-		location.reload(false);
-	}
-}
-
-function changeState(){
-	timedRefresh('never')
-	var assetArr = new Array();
-	var totalAsset = ${assetEntityList.id};
-	var j=0;
-	for(i=0; i< totalAsset.size() ; i++){
-		if($('#checkId_'+totalAsset[i]) != null){
-			var booCheck = $('#checkId_'+totalAsset[i]).is(':checked');
-			if(booCheck == true){
-				assetArr[j] = totalAsset[i];
-				j++;
-			}
+			$("#changeStatusDialog").dialog('option', 'width', 400)
+			$("#changeStatusDialog").dialog('option', 'position', ['center','top']);
+			$('#changeStatusDialog').dialog('open');
 		}
 	}
-	if(j == 0){
-		alert('Please select the Asset');
-	}else{
-		${remoteFunction(action:'getList', params:'\'assetArray=\' + assetArr', onComplete:'showChangeStatusDialog(e);' )}
-	}
-}
-var isFirst = true;
-function selectAll(){
-	timedRefresh('never')
-	var totalCheck = document.getElementsByName('checkChange');
-	if(isFirst){
-	for(i=0;i<totalCheck.length;i++){
-	totalCheck[i].checked = true;
-	}
-	isFirst = false;
-	}else{
-	for(i=0;i<totalCheck.length;i++){
-	totalCheck[i].checked = false;
-	}
-	isFirst = true;
-	}
-}
-function resolveValidate(formName,idVal){
-	var type = 	document.forms[formName].commentType.value;
-	if(type != "issue"){
-		document.forms[formName].isResolved.value = 0;
-	}
-	var resolveBoo = document.forms[formName].isResolved.checked;
-	var resolveVal = document.forms[formName].resolution.value;
-	var assetId = $("#"+idVal).val()
-	if(type == ""){
-		alert('Please select comment type');
-		return false;
-	}else if(resolveBoo){
-		if(resolveVal != ""){
-		if(formName == "createCommentForm"){
-			${remoteFunction(controller:'assetEntity',action:'saveComment', params:'\'assetEntity.id=\' + assetId +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'addCommentsToList(e)')}
+	
+	function submitAction(){
+		if(doCheck()){
+			document.changeStatusForm.action = "changeStatus";
+			document.changeStatusForm.submit();
+			timedRefresh($("#selectTimedId").val())
 		}else{
-			${remoteFunction(controller:'assetEntity',action:'updateComment', params:'\'id=\' + assetId +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'updateCommentsOnList(e)')}
-		}
-		}else{
-			alert('Please enter resolution');
 			return false;
 		}
-	}else{
-		if(formName == "createCommentForm"){
-			${remoteFunction(controller:'assetEntity',action:'saveComment', params:'\'assetEntity.id=\' + assetId +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'addCommentsToList(e)')}
+	}
+	
+	function doCheck(){
+		var taskVal = $('#taskList').val();
+		var noteVal = $('#enterNote').val();
+		if((taskVal == "Hold")&&(noteVal == "")){
+			alert('Please Enter Note');
+			return false;
 		}else{
-			${remoteFunction(controller:'assetEntity',action:'updateComment', params:'\'id=\' + assetId +\'&comment=\'+document.forms[formName].comment.value +\'&isResolved=\'+document.forms[formName].isResolved.value +\'&resolution=\'+document.forms[formName].resolution.value +\'&commentType=\'+document.forms[formName].commentType.value +\'&mustVerify=\'+document.forms[formName].mustVerify.value', onComplete:'updateCommentsOnList(e)')}
+			return true;
 		}
 	}
-}
-	function setAssetId(assetId){
-		$("#createAssetCommentId").val(assetId)
+	
+	function setRefreshTime(e) {
+		var timeRefresh = eval("(" + e.responseText + ")")
+		if(timeRefresh){
+			timedRefresh(timeRefresh[0].refreshTime.CLIENT_CONSOLE_REFRESH)
+		}
 	}
+	
+	var timer
+	function timedRefresh(timeoutPeriod) {
+		if(timeoutPeriod != 'never'){
+			clearTimeout(timer)
+			timer = setTimeout("doAjaxCall()",timeoutPeriod);
+			$("#selectTimedId").val( timeoutPeriod );
+		} else {
+			clearTimeout(timer)
+		}
+	}
+	
+	function pageReload(){
+		if('${myForm}'){
+		document.forms['${myForm}'].submit() ;
+		} else {
+			window.location = document.URL;
+		}
+	}
+	
+	function doAjaxCall(){
+		var moveBundle = $("#moveBundleId").val();
+		var application = $("#applicationId").val();
+		var appOwner = $("#appOwnerId").val();
+		var appSme = $("#appSmeId").val();
+		${remoteFunction(action:'getTransitions', params:'\'moveBundle=\' + moveBundle +\'&application=\'+application +\'&appOwner=\'+appOwner+\'&appSme=\'+appSme', onComplete:'updateTransitions(e);' )}
+		timedRefresh($("#selectTimedId").val())
+	}
+	
+	function updateTransitions(e){
+		try{
+			var assetTransitions = eval('(' + e.responseText + ')');
+			var assetslength = assetTransitions.length;
+			var sessionStatus = isNaN(parseInt(assetslength));
+			if( !sessionStatus ){
+				if(assetTransitions){
+					for( i = 0; i <assetslength ; i++){
+						var assetTransition = assetTransitions[i]
+						var action = $("#action_"+assetTransition.id)
+						if(action){
+							if(!assetTransition.check){
+								action.html('&nbsp;');
+							} 
+						}
+						var commentIcon = $("#icon_"+assetTransition.id)
+						if(commentIcon){
+							if(!assetTransition.showCommentIcon){
+								commentIcon.html('&nbsp;');
+							}else{
+								var link = document.createElement('a');
+								link.href = '#'
+								link.id = assetTransition.id
+								link.onclick = function(){$('#createAssetCommentId').val( assetTransition.id );new Ajax.Request('../assetEntity/listComments?id='+this.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'action');}})} //;return false
+								link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
+								commentIcon.html(link);
+							} 
+						}
+						var application = $("#application_"+assetTransition.id)
+						if(application){
+							application.html( assetTransition.application );
+						}
+						var owner = $("#appOwner_"+assetTransition.id)
+						if(owner){
+							owner.html( assetTransition.appOwner );
+						}
+						var sme = $("#appSme_"+assetTransition.id)
+						if(sme){
+							sme.html( assetTransition.appSme );
+						}
+						var assetName = $("#assetName_"+assetTransition.id)
+						if(assetName){
+							assetName.html( assetTransition.assetName );
+						}
+						var tdIdslength = assetTransition.tdId.length
+						for(j = 0; j< tdIdslength ; j++){
+							var transition = assetTransition.tdId[j]
+							var transTd = $("#"+transition.id)
+							transTd.attr("class",transition.cssClass )
+						}
+					}
+				}
+			} else {
+			location.reload(false);
+			//timedRefresh('never')
+			}
+		} catch(ex){
+		location.reload(false);
+		}
+	}
+
+	function changeState(){
+		timedRefresh('never')
+		var assetArr = new Array();
+		var totalAsset = ${assetEntityList.id};
+		var j=0;
+		for(i=0; i< totalAsset.size() ; i++){
+			if($('#checkId_'+totalAsset[i]) != null){
+				var booCheck = $('#checkId_'+totalAsset[i]).is(':checked');
+				if(booCheck == true){
+					assetArr[j] = totalAsset[i];
+					j++;
+				}
+			}
+		}	
+		if(j == 0){
+			alert('Please select the Asset');
+		}else{
+			${remoteFunction(action:'getList', params:'\'assetArray=\' + assetArr', onComplete:'showChangeStatusDialog(e);' )}
+		}
+	}
+	
+	var isFirst = true;
+	function selectAll(){
+		timedRefresh('never')
+		var totalCheck = document.getElementsByName('checkChange');
+		if(isFirst){
+			for(i=0;i<totalCheck.length;i++){
+				totalCheck[i].checked = true;
+			}
+			isFirst = false;
+		}else{
+			for(i=0;i<totalCheck.length;i++){
+				totalCheck[i].checked = false;
+			}
+			isFirst = true;
+		}
+	}
+
 </script>
 </head>
 <body>

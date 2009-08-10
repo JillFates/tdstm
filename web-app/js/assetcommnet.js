@@ -304,7 +304,7 @@
 		}
 	}
 	
-	  	function commentChangeEdit(resolveDiv,formName) {
+  function commentChangeEdit(resolveDiv,formName) {
 		var type = 	document.forms[formName].commentType.value;
 		if(type == "issue"){
 			$("#"+resolveDiv).css('display', 'block');
@@ -312,41 +312,60 @@
 			$("#"+resolveDiv).css('display', 'none');
 		}
 	}
-function commentChangeShow() {
-		var type = 	$('#commentTypeTdId').html();
-		if(type == "issue"){
-			$('#showResolveDiv').css('display', 'block');
+	
+	function commentChangeShow() {
+			var type = 	$('#commentTypeTdId').html();
+			if(type == "issue"){
+				$('#showResolveDiv').css('display', 'block');
+			}else{
+				$('#showResolveDiv').css('display', 'none');
+			}
+	}
+		
+	/*UPDATE THE ASSET COMMENT ICON*/
+	function updateAssetCommentIcon( assetComments ){
+		var link = document.createElement('a');
+		link.href = '#'
+		link.onclick = function(){setAssetId(assetComments.assetComment.assetEntity);new Ajax.Request('../assetEntity/listComments?id='+assetComments.assetComment.assetEntity,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never');}})} //;return false
+		if( assetComments.status ){
+			link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
 		}else{
-			$('#showResolveDiv').css('display', 'none');
+			link.innerHTML = "<img src=\"../images/skin/database_table_bold.png\" border=\"0px\">"
+		}
+		var iconObj = $('#icon_'+assetComments.assetComment.assetEntity);
+		iconObj.html(link)
+	}
+	
+	function resolveValidate(formName,idVal){
+		var type = 	document.forms[formName].commentType.value;
+		if(type != "issue"){
+			document.forms[formName].isResolved.value = 0;
+		}
+		var resolveBoo = document.forms[formName].isResolved.checked;
+		var resolveVal = document.forms[formName].resolution.value;
+		var assetId = $("#"+idVal).val()
+		if(type == ""){
+			alert('Please select comment type');
+			return false;
+		}else if(resolveBoo){
+			if(resolveVal != ""){
+			if(formName == "createCommentForm"){
+				new Ajax.Request('../assetEntity/saveComment?assetEntity.id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value,{asynchronous:true,evalScripts:true,onComplete:function(e){addCommentsToList(e);}})
+			}else{
+				new Ajax.Request('../assetEntity/updateComment?id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value,{asynchronous:true,evalScripts:true,onComplete:function(e){updateCommentsOnList(e);}})
+			}
+			}else{
+				alert('Please enter resolution');
+				return false;
+			}
+		}else{
+			if(formName == "createCommentForm"){
+				new Ajax.Request('../assetEntity/saveComment?assetEntity.id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value,{asynchronous:true,evalScripts:true,onComplete:function(e){addCommentsToList(e);}})
+			}else{
+				new Ajax.Request('../assetEntity/updateComment?id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value,{asynchronous:true,evalScripts:true,onComplete:function(e){updateCommentsOnList(e);}})
+			}
 		}
 	}
-/*UPDATE THE ASSET COMMENT ICON*/
-function updateAssetCommentIcon( assetComments ){
-	var link = document.createElement('a');
-	link.href = '#'
-	link.onclick = function(){setAssetId(assetComments.assetComment.assetEntity);new Ajax.Request('../assetEntity/listComments?id='+assetComments.assetComment.assetEntity,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never');}})} //;return false
-	if( assetComments.status ){
-		link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
-	}else{
-		link.innerHTML = "<img src=\"../images/skin/database_table_bold.png\" border=\"0px\">"
-	}
-	var iconObj = $('#icon_'+assetComments.assetComment.assetEntity);
-	iconObj.html(link)
-}
 
-/*Actions to perform Delete Assest and Remove Assest from project*/
-function editDialogDeleteRemove( actionType ) {
-	var confirmMessage = 'Remove Asset from project, are you sure?';
-	var submitAction = 'remove';
-	if ( actionType != 'remove' ) {
-	 	confirmMessage = 'Delete Asset, are you sure?';
-	 	submitAction = 'delete';
-	}
-	if ( confirm(confirmMessage) ) {
-		$('form#editForm').attr({action: '../assetEntity/'+submitAction}).submit();
-		return true;
-	} else {
-		return false;
-	}
-}
+
 		
