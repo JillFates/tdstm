@@ -126,6 +126,10 @@ class BootStrap {
 		bundleRole.id = "MOVE_BUNDLE"
 		bundleRole.save( insert:true )
 		
+		def companyAdmin = new RoleType( description:"Staff: Company Administrator" )
+		companyAdmin.id = "COMPANY_ADMIN"
+		companyAdmin.save( insert:true )
+		
 		// -------------------------------
 		// Party Types
 		// -------------------------------
@@ -344,6 +348,7 @@ class BootStrap {
 		new PartyRole( party:personLisa, roleType:userRole ).save( insert:true )
 		new PartyRole( party:personJohn, roleType:adminRole ).save( insert:true )
 		new PartyRole( party:personJohn, roleType:projectAdminRole ).save( insert:true )
+		new PartyRole( party:personJohn, roleType:companyAdmin ).save( insert:true )
 		new PartyRole( party:personWorkStation, roleType:workStationRole).save( insert:true )
 		new PartyRole( party:personRita, roleType:managerRole ).save( insert:true )
 		new PartyRole( party:personWarren, roleType:observerRole ).save( insert:true )

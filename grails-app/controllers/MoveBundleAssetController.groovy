@@ -1345,11 +1345,18 @@ class MoveBundleAssetController {
     		 		rackStyle = it.rackStyle
     		 		def assetTagsList = (it.asset?.assetTag).split("<br>")
     		 		def moveBundle = "" 
+    		 		def assetTag = ""
+    		 		def isAdmin = SecurityUtils.getSubject().hasRole("PROJ_MGR")
     		 		assetTagsList.each{
-    		 			def bundleInstance = AssetEntity.findByAssetTag(it.substring(0,it.indexOf('-')))?.moveBundle
-    		 			moveBundle += (bundleInstance ? bundleInstance.name : "") + "<br>"
+    		 			def tag = it.substring(0,it.indexOf('-'))
+    		 			def assetInstance = AssetEntity.findByAssetTag( tag )
+    		 			moveBundle += (assetInstance?.moveBundle ? assetInstance?.moveBundle.name : "") + "<br>"
+    		 			assetTag += "<a href='javascript:openAssetEditDialig(${assetInstance?.id})' >$it</a> <br>"
     		 		}
-    		 		row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${it.asset?.assetTag}</td>")
+    		 		if( !isAdmin ){
+    		 			assetTag = it.asset?.assetTag
+    		 		}
+    		 		row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
     		 		if(includeBundleName){
     		 			row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${moveBundle}</td>")
     		 		}else{

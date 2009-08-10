@@ -2,72 +2,135 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<g:javascript library="prototype" />
+<g:javascript library="jquery" />
+<jq:plugin name="ui.core" />
+<jq:plugin name="ui.draggable" />
+<jq:plugin name="ui.resizable" />
+<jq:plugin name="ui.dialog" />
+<jq:plugin name="jquery.scrollfollow" />
+<g:javascript src="assetcrud.js" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
+<script type="text/javascript">
+	$(document).ready(function() {
+	    $("#editDialog").dialog({ autoOpen: false })
+	})
+	function openAssetEditDialig( id ){
+		$("#editFormId").val(id)
+		${remoteFunction(controller:"assetEntity", action:"editShow", params:'\'id=\' + id ', onComplete:'showAssetEditDialog( e )')}
+	}
+	function showAssetEditDialog( e ) {
+		var browser=navigator.appName;
+      	var assetEntityAttributes = eval('(' + e.responseText + ')');
+      	var autoComp = new Array()      			
+      	var editDiv = document.getElementById("editDiv");
+      	var etb = document.getElementById('editTbodyId')
+		if(etb != null){
+			editDiv.removeChild(etb)
+		}
+      	var etbody = document.createElement('table');
+		etbody.id = "editTbodyId"
+		// Rebuild the select
+		if (assetEntityAttributes) {
+			var length = assetEntityAttributes.length
+			var halfLength = getLength(length) 
+			var etr = document.createElement('tr');
+			var etdLeft = document.createElement('td');
+			etdLeft.style.border = '0'
+			var etdRight = document.createElement('td');
+			etdRight.style.border = '0'
+			etdRight.style.verticalAlign = 'top'
+			var etableLeft = document.createElement('table');
+			etableLeft.style.width = '50%'
+			etableLeft.style.border = '0'
+			var etableRight = document.createElement('table');
+			etableRight.style.width = '50%'
+			etableRight.style.border = '0'
+			for (var i=0; i < halfLength; i++ ) {
+				var attributeLeft = assetEntityAttributes[i]
+				var etrLeft = document.createElement('tr');
+				// td for Edit page
+				var inputTdELeft = document.createElement('td');
+				var labelTdELeft = document.createElement('td');
+				labelTdELeft.noWrap = 'nowrap'
+				inputTdELeft.style.border = '0'
+				labelTdELeft.style.border = '0'
+				var labelELeft = document.createTextNode(attributeLeft.label);
+				labelTdELeft.appendChild( labelELeft )
+				var inputFieldELeft = getInputType(attributeLeft);
+				inputFieldELeft.value = attributeLeft.value;
+				inputFieldELeft.id = 'edit'+attributeLeft.attributeCode+'Id';
+				inputTdELeft.appendChild( inputFieldELeft )
+				labelTdELeft.style.background = '#f3f4f6 '
+				labelTdELeft.style.width = '25%'
+				inputTdELeft.style.width = '25%'
+				etrLeft.appendChild( labelTdELeft )
+				etrLeft.appendChild( inputTdELeft )
+				etableLeft.appendChild( etrLeft )
+			}
+				      	
+			for (var i=halfLength; i < length; i++ ) {
+				var attributeRight = assetEntityAttributes[i]
+				var etrRight = document.createElement('tr');
+				// td for Edit page
+				var inputTdERight = document.createElement('td');
+				var labelTdERight = document.createElement('td');
+				labelTdERight.noWrap = 'nowrap'
+				inputTdERight.style.border = '0'
+				labelTdERight.style.border = '0'
+				var labelERight = document.createTextNode(attributeRight.label);
+				labelTdERight.appendChild( labelERight )
+				var inputFieldERight = getInputType(attributeRight);
+				inputFieldERight.value = attributeRight.value;
+				inputFieldERight.id = 'edit'+attributeRight.attributeCode+'Id';
+				inputTdERight.appendChild( inputFieldERight )
+				labelTdERight.style.background = '#f3f4f6 '
+				labelTdERight.style.width = '25%'
+				inputTdERight.style.width = '25%'
+				etrRight.appendChild( labelTdERight )
+				etrRight.appendChild( inputTdERight )
+				etableRight.appendChild( etrRight )
+			}
+			for (var i=0; i < length; i++ ) {
+				var attribute = assetEntityAttributes[i]
+				if(attribute.frontendInput == 'autocomplete'){
+					autoComp.push(attribute.attributeCode)
+				}
+			}
+			etdLeft.appendChild( etableLeft )
+			etdRight.appendChild( etableRight )
+			etr.appendChild( etdLeft )
+			etr.appendChild( etdRight )
+			etbody.appendChild( etr )
+		}
+		
+		editDiv.appendChild( etbody )
+		if(browser == 'Microsoft Internet Explorer') {
+			editDiv.innerHTML += "";
+		} 
+			    
+		${remoteFunction(action:'getAutoCompleteDate', params:'\'autoCompParams=\' + autoComp ', onComplete:'updateAutoComplete(e)')} 
+		$("#editDialog").dialog('option', 'width', 'auto')
+		$("#editDialog").dialog('option', 'position', ['center','top']);
+		$("#editDialog").dialog("open")
+		$("#showDialog").dialog("close")
+	}
+	function showEditAsset(e) {
+		var assetEntityAttributes = eval('(' + e.responseText + ')')
+		if (assetEntityAttributes != "") {
+			$("#editDialog").dialog("close")
+		} else {
+			alert("Asset Entity is not updated")
+		}
+	}
+</script>
 <title>Rack Elevation Report</title>
-<style type="text/css">
-
-br.page-break-after {
-	page-break-after: always;
-}
-
-.empty {
-	background: #e7e7e7;
-}
-
-.rack_current {
-	background: #7CFE80;
-	font-weight: bold;
-	font-size: 1.0em;
-	border: 2px solid black;
-}
-
-.rack_past {
-	background: #ffffff;
-}
-
-.rack_future {
-	background: #F7D375;
-}
-
-.rack_error {
-	background: #D80B01 !important;
-	color: white !important;
-	font-size: 1.0em;
-	border: 2px dashed black !important;
-}
-
-h2 {
-	text-size:1.1em;
-	font-weight:bold;
-	margin:1px;
-}
-
-table {
-	border: 1px solid #000000;
-	empty-cells: show;
-}
-
-td {
-	text-align: center;
-	font-size: .8em;
-	border: 1px solid #999999;
-	padding:0px 2px 0px 2px;
-}
-
-th {
-	font-family: arial, helivetica, san-serif;
-	font-size: 1.0em;
-	font-weight: bold;
-	text-decoration: underline;
-	padding:0px 2px 0px 2px;
-
-}
-
-.rack_elevation {
-	font-family: arial, helivetica, san-serif;
-	font-size: 10px;
-}
-
-</style>
 </head>
 <body>
 <div class="body">
@@ -112,6 +175,18 @@ th {
 	<br class="page-break-after"/>
 	</g:if>
 </g:each>
+</div>
+<div id="editDialog" title="Edit Asset Entity" style="display: none;">
+	<g:form method="post" name="editForm">
+		<input type="hidden" name="id" id="editFormId" value="" />
+		<div class="dialog" id="editDiv">
+		</div>
+		<div class="buttons">
+			<span class="button">
+				<input class="save" type="button" style="font-size: 12px;" value="Update Asset Entity" onClick="${remoteFunction(controller:'assetEntity', action:'getAssetAttributes', params:'\'assetId=\' + $(\'#editFormId\').val() ', onComplete:'callUpdateDialog(e)')}" />
+			</span>
+		</div>
+	</g:form>
 </div>
 </body>
 </html>
