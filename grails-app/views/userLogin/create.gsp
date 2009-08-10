@@ -48,7 +48,7 @@
 	                                <input type="hidden" name="personId" value="${personInstance?.id}" >
                                 </g:if>
                                 <g:else>
-                                    <g:select optionKey="id" from="${Person.list()}" name="person.id" value="${userLoginInstance?.person?.id}" ></g:select>
+                                    <g:select optionKey="id" from="${Person.executeQuery('from Person p where p.id not in (select person.id from UserLogin u) order by p.firstName')}" name="person.id" value="${userLoginInstance?.person?.id}" ></g:select>
                                 </g:else>
                                 <g:hasErrors bean="${userLoginInstance}" field="person">
 					            <div class="errors">

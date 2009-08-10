@@ -34,6 +34,9 @@ class ProjectController {
         } else { 
         	def currProj = session.getAttribute("CURR_PROJ");
         	def currProjectInstance = Project.get( currProj.CURR_PROJ )
+        	def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
+    		def userCompany = partyRelationshipService.getSatffCompany( loginUser.person )
+    		request.getSession(false).setAttribute("PARTYGROUP",userCompany?.partyIdFrom)
         	def projectLogo
         	if(currProjectInstance){
         		projectLogo = ProjectLogo.findByProject(currProjectInstance)

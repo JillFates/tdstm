@@ -1,4 +1,5 @@
 import org.jsecurity.crypto.hash.Sha1Hash;
+import org.jsecurity.SecurityUtils;
 class UserLoginController {
     
 	def partyRelationshipService
@@ -10,9 +11,24 @@ class UserLoginController {
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
     def list = {
+		def userLoginInstanceList = UserLogin.list( params )
 		def companyId = params.id
         if(!params.max) params.max = 10
-        return [ userLoginInstanceList: UserLogin.list( params ), companyId:companyId ]
+        if( !companyId ){
+        	companyId = request.getSession().getAttribute("PARTYGROUP")?.id
+        }
+		def isCompanyAdmin = SecurityUtils.getSubject().hasRole("COMPANY_ADMIN")
+		if( !isCompanyAdmin ){
+			def personsList = partyRelationshipService.getCompanyStaff( companyId )
+			def personIds = ""
+			personsList.each{
+				personIds += "$it.id,"
+			}
+			personIds = personIds.substring(0,personIds.lastIndexOf(','))
+			userLoginInstanceList = UserLogin.findAll("from UserLogin u where u.person in ($personIds)")
+		}
+		
+        return [ userLoginInstanceList : userLoginInstanceList, companyId:companyId ]
     }
 
     def show = {

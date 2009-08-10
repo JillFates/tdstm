@@ -33,7 +33,10 @@ a:hover {
 			<td><g:link controller="partyRelationship" style="color:black">Party Relationship</g:link></td>
 			<td><g:link controller="partyRelationshipType" style="color:black">Party RelationshipType</g:link></td>
 		</tr>
-
+		<tr>
+			<td><g:link controller="userLogin" style="color:black">Manage Users</g:link></td>
+			<td>&nbsp;</td>
+		</tr>
 	</tbody>
 </table>
 </div>
