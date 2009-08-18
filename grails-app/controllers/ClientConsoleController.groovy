@@ -101,13 +101,13 @@ class ClientConsoleController {
 			def assetEntityList=[]
 			def processTransitionList=[]
 			def tempTransitions = []
-			def processTransitions= stateEngineService.getTasks("STD_PROCESS", "TASK_ID")
+			def processTransitions= stateEngineService.getTasks(projectInstance.workflowCode, "TASK_ID")
 			processTransitions.each{
 				tempTransitions <<Integer.parseInt(it)
 			}
 			tempTransitions.sort().each{
-				def processTransition = stateEngineService.getState("STD_PROCESS",it)
-				processTransitionList<<[header:stateEngineService.getStateLabel("STD_PROCESS",it),transId:stateEngineService.getStateId("STD_PROCESS",processTransition)]
+				def processTransition = stateEngineService.getState(projectInstance.workflowCode,it)
+				processTransitionList<<[header:stateEngineService.getStateLabel(projectInstance.workflowCode,it),transId:stateEngineService.getStateId(projectInstance.workflowCode,processTransition)]
 			}
         
 			resultList.each{
@@ -125,14 +125,14 @@ class ClientConsoleController {
 				if(transitionStates.size()){
 					stateId = transitionStates[0].stateTo
 				}
-				holdId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Hold"))
-				releaseId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Release"))
-				reRackId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Reracked"))
+				holdId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Hold"))
+				releaseId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Release"))
+				reRackId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Reracked"))
 				if(stateId == 0){
 					check = true
 				} else if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
-					stateVal = stateEngineService.getState("STD_PROCESS",stateId)
-					taskVal = stateEngineService.getTasks("STD_PROCESS","MANAGER",stateVal)
+					stateVal = stateEngineService.getState(projectInstance.workflowCode,stateId)
+					taskVal = stateEngineService.getTasks(projectInstance.workflowCode,"MANAGER",stateVal)
 					if(taskVal.size() == 0){
 						check = false
 					}else{
@@ -181,25 +181,26 @@ class ClientConsoleController {
         def totalList = []
         def tempTaskList = []
         def assetId = params.assetEntity
+        def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
         /*def projectMap = ProjectAssetMap.find("from ProjectAssetMap pam where pam.asset = ${params.assetEntity}")
         if(projectMap != null){
-			stateVal = stateEngineService.getState("STD_PROCESS",projectMap.currentStateId)
+			stateVal = stateEngineService.getState(projectInstance.workflowCode,projectMap.currentStateId)
         }*/
         def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
         												"where t.asset_entity_id = $assetId and voided = 0 order by date_created desc limit 1 ")
 		if(transitionStates.size()){
-			stateVal = stateEngineService.getState("STD_PROCESS",transitionStates[0].stateTo)
+			stateVal = stateEngineService.getState(projectInstance.workflowCode,transitionStates[0].stateTo)
 		}
 		if(stateVal){
-			temp = stateEngineService.getTasks("STD_PROCESS","MANAGER",stateVal)
+			temp = stateEngineService.getTasks(projectInstance.workflowCode,"MANAGER",stateVal)
 		} else {
 			temp =  ["Ready"]
 		}
         temp.each{
-			tempTaskList << Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
+			tempTaskList << Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,it))
 		}
         tempTaskList.sort().each{
-			taskList << [state:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
+			taskList << [state:stateEngineService.getState(projectInstance.workflowCode,it),label:stateEngineService.getStateLabel(projectInstance.workflowCode,it)]
 		}
         totalList<<[item:taskList,asset:assetId]
         render totalList as JSON
@@ -227,7 +228,7 @@ class ClientConsoleController {
 	 * @return : Tasks list for params asset array 
 	 *---------------------------------------------------------*/
 	def getList = {
-    	
+    	def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
         def assetArray = params.assetArray
         Set common = new HashSet()
         def taskList = []
@@ -245,8 +246,8 @@ class ClientConsoleController {
         		def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
     															"where t.asset_entity_id = $asset and voided = 0 order by date_created desc limit 1 ")
         		if(transitionStates.size()){
-        			stateVal = stateEngineService.getState("STD_PROCESS",transitionStates[0].stateTo)
-                    temp = stateEngineService.getTasks("STD_PROCESS","MANAGER",stateVal)
+        			stateVal = stateEngineService.getState(projectInstance.workflowCode,transitionStates[0].stateTo)
+                    temp = stateEngineService.getTasks(projectInstance.workflowCode,"MANAGER",stateVal)
                     taskList << [task:temp]
         		} else {
         			taskList << [task:["Ready"] ]
@@ -257,10 +258,10 @@ class ClientConsoleController {
         		common.retainAll((HashSet)(taskList[i].task))
         	}
            	common.each{
-           		tempTaskList << Integer.parseInt(stateEngineService.getStateId("STD_PROCESS",it))
+           		tempTaskList << Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,it))
        		}
        		tempTaskList.sort().each{
-       			sortList << [state:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
+       			sortList << [state:stateEngineService.getState(projectInstance.workflowCode,it),label:stateEngineService.getStateLabel(projectInstance.workflowCode,it)]
        		}
         	totalList << [item:sortList,asset:assetArray]
         }
@@ -275,7 +276,7 @@ class ClientConsoleController {
     
 	def changeStatus = {
         def assetId = params.asset
-				 
+		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )		 		 
         def assetEnt = AssetEntity.findAll("from AssetEntity ae where ae.id in ($assetId)")
         assetEnt.each{
 	        def bundle = it.moveBundle
@@ -283,7 +284,7 @@ class ClientConsoleController {
 	        def loginUser = UserLogin.findByUsername(principal)
 	        def team = it.sourceTeam
 			     
-	        def workflow = workflowService.createTransition("STD_PROCESS","MANAGER",params.taskList,it,bundle,loginUser,team,params.enterNote)
+	        def workflow = workflowService.createTransition(projectInstance.workflowCode,"MANAGER",params.taskList,it,bundle,loginUser,team,params.enterNote)
 	        if(workflow.success){
 	        	if(params.enterNote != ""){
 	                def assetComment = new AssetComment()
@@ -314,6 +315,7 @@ class ClientConsoleController {
 		def appOwnerValue=params.appOwner
 		def appSmeValue=params.appSme
 		def assetEntityList = []
+		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
 		if(bundleId){
 			def moveBundleInstance = MoveBundle.findById( bundleId )
 			def lastPoolTime = getSession().getAttribute("LAST_POOL_TIME")
@@ -336,7 +338,7 @@ class ClientConsoleController {
 			}
 			query.append(" GROUP BY ae.asset_entity_id")
 			def resultList=jdbcTemplate.queryForList(query.toString())
-			def processTransitions= stateEngineService.getTasks("STD_PROCESS", "TASK_ID")
+			def processTransitions= stateEngineService.getTasks(projectInstance.workflowCode, "TASK_ID")
 			resultList.each{
 				def stateId = 0
 				def assetId = it.id
@@ -353,14 +355,14 @@ class ClientConsoleController {
 				if(transitionStates.size()){
 					stateId = transitionStates[0].stateTo
 				}
-				def holdId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Hold"))
-				def releaseId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Release"))
-				def reRackId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Reracked"))
+				def holdId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Hold"))
+				def releaseId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Release"))
+				def reRackId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Reracked"))
 				if(stateId == 0){
 					check = true
 				} else if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
-					def stateVal = stateEngineService.getState("STD_PROCESS",stateId)
-					def taskVal = stateEngineService.getTasks("STD_PROCESS","MANAGER",stateVal)
+					def stateVal = stateEngineService.getState(projectInstance.workflowCode,stateId)
+					def taskVal = stateEngineService.getTasks(projectInstance.workflowCode,"MANAGER",stateVal)
 					if(taskVal.size() == 0){
 						check = false
 					}else{
@@ -403,7 +405,8 @@ class ClientConsoleController {
 	 *----------------------------------------------------*/
 	def getHeaderNames = {
 		def tempTransitions = []
-		def processTransitions= stateEngineService.getTasks("STD_PROCESS", "TASK_ID")
+		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
+		def processTransitions= stateEngineService.getTasks(projectInstance.workflowCode, "TASK_ID")
 		processTransitions.each{
 			tempTransitions <<Integer.parseInt(it)
 		}
@@ -427,7 +430,7 @@ class ClientConsoleController {
 							"font-size='12' fill='#333333' x='-11' y='-76' font-family='verdana,arial,helvetica,sans-serif'>")
 		def count = 0
 		tempTransitions.sort().each{
-			def processTransition = stateEngineService.getStateLabel("STD_PROCESS",it)
+			def processTransition = stateEngineService.getStateLabel(projectInstance.workflowCode,it)
 			if(count == 0){
 				svgHeaderFile.append("${processTransition}")
 			} else {

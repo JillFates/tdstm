@@ -388,6 +388,20 @@
 						as="list" field="trackChanges" /></div>
 				</g:hasErrors></td>
 			</tr>
+			
+			<tr class="prop">
+				<td valign="top" class="name"><label for="workflowCode">Workflow
+				Code:</label></td>
+				<td valign="top"
+					class="value ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">
+				<g:select id="workflowCode" name="workflowCode"
+					from="${workflowCodes}"
+					value="Please Select" noSelection="['':'Please Select']"></g:select><g:hasErrors
+					bean="${projectInstance}" field="workflowCode">
+					<div class="errors"><g:renderErrors bean="${projectInstance}"
+						as="list" field="workflowCode" /></div>
+				</g:hasErrors></td>
+			</tr>
 
 
 		</tbody>

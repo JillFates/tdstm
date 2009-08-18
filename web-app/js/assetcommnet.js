@@ -38,7 +38,18 @@
 					      var verifyTd = document.createElement('td');
 						  verifyTd.id = 'verify_'+commentObj.commentInstance.id
 						  verifyTd.name = commentObj.commentInstance.id
-					      verifyTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'show' );commentChangeShow();}})}					      
+					      verifyTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'show' );commentChangeShow();}})}
+					      
+					      var categoryTd = document.createElement('td');
+					      categoryTd.id = 'category_'+commentObj.commentInstance.id
+					      categoryTd.name = commentObj.commentInstance.id					   	  
+					      categoryTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
+					      
+					      var commentCodeTd = document.createElement('td');
+					      commentCodeTd.id = 'commentCode_'+commentObj.commentInstance.id
+					      commentCodeTd.name = commentObj.commentInstance.id					   	  
+					      commentCodeTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
+					      					      
 					      var image = document.createElement('img');
 					      image.src = "../images/skin/database_edit.png"
 					      image.border = 0
@@ -59,6 +70,9 @@
 					      resolveVal.disabled = 'disabled'
 					     
 					      }
+					      var categoryText = document.createTextNode(truncate(commentObj.commentInstance.category));
+					      var commentCodeText = document.createTextNode(truncate(commentObj.commentInstance.commentCode));
+					      
 					      var verifyText = document.createElement('input')
 					      verifyText.id = 'verifyText_'+commentObj.commentInstance.id
 					      verifyText.type = 'checkbox'
@@ -71,11 +85,15 @@
 					      typeTd.appendChild( typeText )
 					      resolveTd.appendChild( resolveVal )
 					      verifyTd.appendChild( verifyText )
+					      categoryTd.appendChild( categoryText )
+					      commentCodeTd.appendChild( commentCodeText )
 					      tr.appendChild( editTd )
 					      tr.appendChild( commentTd )
 					      tr.appendChild( typeTd )	     					      
 					      tr.appendChild( resolveTd )	     					      
 					      tr.appendChild( verifyTd )
+					      tr.appendChild( categoryTd )
+					      tr.appendChild( commentCodeTd )
 					      listTbody.appendChild( tr )
 					      if(commentObj.commentInstance.isResolved == 1){
 					      	resolveVal.checked = true ;
@@ -87,7 +105,7 @@
 				      listTable.append( listTbody )
       			}
       			
-      			$("#commentsListDialog").dialog('option', 'width', 600)	      	
+      			$("#commentsListDialog").dialog('option', 'width', 800)	      	
       			$("#commentsListDialog").dialog('option', 'position', ['center','top']);
 		      	$("#commentsListDialog").dialog("open")
 		      	if(action == 'never'){
@@ -110,6 +128,8 @@
 			      	 $('#commentTypeTdId').html(assetComments[0].assetComment.commentType)
 			      	 $('#mustVerifyShowId').val(assetComments[0].assetComment.mustVerify)
 			      	 $('#isResolvedId').val(assetComments[0].assetComment.isResolved)
+			      	 $('#categoryTdId').html(assetComments[0].assetComment.category)
+			      	 $('#commentCodeTdId').html(assetComments[0].assetComment.commentCode)
 			      	 if(assetComments[0].assetComment.mustVerify != 0){
 			      	 $('#mustVerifyShowId').attr('checked', true);
 			      	 $('#mustVerifyEditId').attr('checked', true);
@@ -142,6 +162,8 @@
 			      	 $('#resolutionEditId').val(assetComments[0].assetComment.resolution)
 			      	 $('#commentEditId').val(assetComments[0].assetComment.comment)
 			      	 $('#commentTypeEditId').val(assetComments[0].assetComment.commentType)
+			      	 $('#categoryEditId').html(assetComments[0].assetComment.category)
+			      	 $('#commentCodeEditId').html(assetComments[0].assetComment.commentCode)
 			      	 $('#mustVerifyEditId').val(assetComments[0].assetComment.mustVerify)
 			      	 $('#isResolvedEditId').val(assetComments[0].assetComment.isResolved)
 			      	 if(action == 'edit'){
@@ -180,6 +202,17 @@
 						  typeTd.id = 'type_'+assetComments[0].assetComment.id
 						  typeTd.name = assetComments[0].assetComment.id
 						  typeTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
+						  
+						  var categoryTd = document.createElement('td');
+						  categoryTd.id = 'category_'+assetComments[0].assetComment.id
+						  categoryTd.name = assetComments[0].assetComment.id
+						  categoryTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
+						  
+						  var commentCodeTd = document.createElement('td');
+						  commentCodeTd.id = 'commentCode_'+assetComments[0].assetComment.id
+						  commentCodeTd.name = assetComments[0].assetComment.id
+						  commentCodeTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
+						  
 						  var resolveTd = document.createElement('td');
 						  resolveTd.id = 'resolve_'+assetComments[0].assetComment.id
 						  resolveTd.name = assetComments[0].assetComment.id
@@ -197,6 +230,10 @@
 						  link.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+assetComments[0].assetComment.id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );commentChangeEdit('editResolveDiv','editCommentForm');}})} //;return false
 					      var commentText = document.createTextNode(truncate(assetComments[0].assetComment.comment));
 					      var typeText = document.createTextNode(assetComments[0].assetComment.commentType);
+					      
+					      var categoryText = document.createTextNode(assetComments[0].assetComment.category);
+					      var commentCodeText = document.createTextNode(assetComments[0].assetComment.commentCode);
+					      
 					      var resolveVal
 					      if(assetComments[0].assetComment.commentType != "issue"){
 					      resolveVal = document.createTextNode('');
@@ -219,11 +256,15 @@
 					      typeTd.appendChild( typeText )
 					      resolveTd.appendChild( resolveVal )
 					      verifyTd.appendChild( verifyText )
+					      categoryTd.appendChild( categoryText )
+					      commentCodeTd.appendChild( commentCodeText )
 					      tr.appendChild( editTd )
 					      tr.appendChild( commentTd )
 					      tr.appendChild( typeTd )
 					      tr.appendChild( resolveTd )
 					      tr.appendChild( verifyTd )
+					      tr.appendChild( categoryTd )
+					      tr.appendChild( commentCodeTd )
 					      tbody.append( tr )
 					      if(assetComments[0].assetComment.isResolved == 1){
 					      	resolveVal.checked = true;
@@ -350,7 +391,7 @@
 		}else if(resolveBoo){
 			if(resolveVal != ""){
 			if(formName == "createCommentForm"){
-				new Ajax.Request('../assetEntity/saveComment?assetEntity.id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value,{asynchronous:true,evalScripts:true,onComplete:function(e){addCommentsToList(e);}})
+				new Ajax.Request('../assetEntity/saveComment?assetEntity.id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value+'&category='+document.forms[formName].category.value,{asynchronous:true,evalScripts:true,onComplete:function(e){addCommentsToList(e);}})
 			}else{
 				new Ajax.Request('../assetEntity/updateComment?id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value,{asynchronous:true,evalScripts:true,onComplete:function(e){updateCommentsOnList(e);}})
 			}
@@ -360,7 +401,7 @@
 			}
 		}else{
 			if(formName == "createCommentForm"){
-				new Ajax.Request('../assetEntity/saveComment?assetEntity.id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value,{asynchronous:true,evalScripts:true,onComplete:function(e){addCommentsToList(e);}})
+				new Ajax.Request('../assetEntity/saveComment?assetEntity.id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value+'&category='+document.forms[formName].category.value,{asynchronous:true,evalScripts:true,onComplete:function(e){addCommentsToList(e);}})
 			}else{
 				new Ajax.Request('../assetEntity/updateComment?id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value,{asynchronous:true,evalScripts:true,onComplete:function(e){updateCommentsOnList(e);}})
 			}

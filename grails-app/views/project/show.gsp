@@ -256,6 +256,13 @@
             <td valign="top" class="value">${fieldValue(bean:projectInstance, field:'trackChanges')}</td>
 
           </tr>
+          
+          <tr class="prop">
+            <td valign="top" class="name">Workflow Code:</td>
+
+            <td valign="top" class="value">${fieldValue(bean:projectInstance, field:'workflowCode')}</td>
+
+          </tr>
 
           <tr class="prop">
             <td valign="top" class="name">

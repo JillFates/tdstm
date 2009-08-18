@@ -290,10 +290,10 @@ class BootStrap {
 		println "PROJECTS "
 		def cedarsProject = new Project( name:"Cedars-Sinai Move 1", projectCode:'CS1', client:cedars,
 			description:'100 servers', trackChanges:'Y', partyType:groupPartyType,
-			startDate:new Date(), completionDate: new Date()+10 ).save();
+			startDate:new Date(), completionDate: new Date()+10, workflowCode: 'STD_PROCESS' ).save();
 		def twProject = new Project( name:"Time Warner VA Move", projectCode:'TM-VA-1', client:timeWarner,
 			description:'500 servers', trackChanges:'N', partyType:groupPartyType,
-			startDate:new Date(), completionDate: new Date()+10 ).save();
+			startDate:new Date(), completionDate: new Date()+10, workflowCode: 'STD_PROCESS' ).save();
 
 
 		// -------------------------------

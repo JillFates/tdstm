@@ -901,15 +901,15 @@ class AssetEntityController {
         // get the list of assets order by Hold and recent asset Transition
         if( moveBundleInstance != null ){
         	//  Get Id for respective States
-	        def cleanedId = stateEngineService.getStateId( "STD_PROCESS", "Cleaned" )
-	        def rerackedId = stateEngineService.getStateId( "STD_PROCESS", "Reracked" )
-	        def onCartId = stateEngineService.getStateId( "STD_PROCESS", "OnCart" )
-	        def stagedId = stateEngineService.getStateId( "STD_PROCESS", "Staged" )
-	        def unrackedId = stateEngineService.getStateId( "STD_PROCESS", "Unracked" )
-	        def holdId = stateEngineService.getStateId( "STD_PROCESS", "Hold" )
-	        def releasedId = stateEngineService.getStateId( "STD_PROCESS", "Release" )
-	        def onTruckId = stateEngineService.getStateId( "STD_PROCESS", "OnTruck" )
-	        def offTruckId = stateEngineService.getStateId( "STD_PROCESS", "OffTruck" )
+	        def cleanedId = stateEngineService.getStateId( projectInstance.workflowCode, "Cleaned" )
+	        def rerackedId = stateEngineService.getStateId( projectInstance.workflowCode, "Reracked" )
+	        def onCartId = stateEngineService.getStateId( projectInstance.workflowCode, "OnCart" )
+	        def stagedId = stateEngineService.getStateId( projectInstance.workflowCode, "Staged" )
+	        def unrackedId = stateEngineService.getStateId( projectInstance.workflowCode, "Unracked" )
+	        def holdId = stateEngineService.getStateId( projectInstance.workflowCode, "Hold" )
+	        def releasedId = stateEngineService.getStateId( projectInstance.workflowCode, "Release" )
+	        def onTruckId = stateEngineService.getStateId( projectInstance.workflowCode, "OnTruck" )
+	        def offTruckId = stateEngineService.getStateId( projectInstance.workflowCode, "OffTruck" )
 	        def queryHold = supervisorConsoleService.getQueryForConsole( moveBundleInstance, params, 'hold')
         	def queryNotHold = supervisorConsoleService.getQueryForConsole(moveBundleInstance,params, 'notHold')
         	def holdTotalAsset = jdbcTemplate.queryForList( queryHold )
@@ -1009,9 +1009,9 @@ class AssetEntityController {
 	        	if(transitionStates.size()){
 	        		curId = transitionStates[0].stateTo
 	        	}
-	        	stateVal = stateEngineService.getState( "STD_PROCESS", curId )
+	        	stateVal = stateEngineService.getState( projectInstance.workflowCode, curId )
 				if(stateVal){
-		        	taskVal = stateEngineService.getTasks( "STD_PROCESS", "SUPERVISOR", stateVal )
+		        	taskVal = stateEngineService.getTasks( projectInstance.workflowCode, "SUPERVISOR", stateVal )
 					if(taskVal.size() == 0){
 						check = false    				
 					}
@@ -1024,7 +1024,7 @@ class AssetEntityController {
 	        	} else if(curId > Integer.parseInt(rerackedId)){
 	        		cssClass = 'asset_done'
 	        	}
-	        	assetsList<<[asset: it, status: stateEngineService.getStateLabel( "STD_PROCESS", curId ), cssClass : cssClass, checkVal:check]
+	        	assetsList<<[asset: it, status: stateEngineService.getStateLabel( projectInstance.workflowCode, curId ), cssClass : cssClass, checkVal:check]
 	        }
 	        def totalSourcePending = jdbcTemplate.queryForList(countQuery +	"and pm.current_state_id < $releasedId group by e.asset_entity_id having ( minstate != $holdId or minstate  is null )").size()
 	        
@@ -1053,11 +1053,11 @@ class AssetEntityController {
 														" ae.moveBundle=${moveBundleInstance.id} group by ae.appSme order by ae.appSme")
             /* Get list of Transitions states*/
             def transitionStates = []
-			def processTransitions = stateEngineService.getTasks("STD_PROCESS", "TASK_ID")
+			def processTransitions = stateEngineService.getTasks(projectInstance.workflowCode, "TASK_ID")
 			processTransitions.each{
 	        	def stateId = Integer.parseInt( it ) 
-	        	transitionStates << [state:stateEngineService.getState( "STD_PROCESS", stateId ),
-	        	                     stateLabel:stateEngineService.getStateLabel( "STD_PROCESS", stateId )] 
+	        	transitionStates << [state:stateEngineService.getState( projectInstance.workflowCode, stateId ),
+	        	                     stateLabel:stateEngineService.getStateLabel( projectInstance.workflowCode, stateId )] 
 	        }
 			
 	        return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams, 
@@ -1095,7 +1095,7 @@ class AssetEntityController {
 	        }
 	        assetTransition.each{
 	        	def cssClass
-	        	def taskLabel = stateEngineService.getStateLabel("STD_PROCESS",Integer.parseInt(it.stateTo))
+	        	def taskLabel = stateEngineService.getStateLabel(assetDetail.project.workflowCode,Integer.parseInt(it.stateTo))
 	        	def time = it.dateCreated.toString().substring(11,19)
 	    	    def timeElapsed = convertIntegerIntoTime( it.timeElapsed )
 	        	if(it.voided == 1){
@@ -1114,19 +1114,19 @@ class AssetEntityController {
 	        	currentState = projectAssetMap.currentStateId
 	        }*/
 	        
-	        def state = stateEngineService.getState( "STD_PROCESS", currentState )
+	        def state = stateEngineService.getState( assetDetail.project.workflowCode, currentState )
 	        def validStates
 	        if(state){
-	        	validStates= stateEngineService.getTasks( "STD_PROCESS", "SUPERVISOR", state )
+	        	validStates= stateEngineService.getTasks( assetDetail.project.workflowCode, "SUPERVISOR", state )
 	        } else {
 	        	validStates = ["Ready"] 
 	        	//stateEngineService.getTasks("STD_PROCESS","TASK_NAME")
 	        }
 	        validStates.each{
-	        	stateIdList<<stateEngineService.getStateIdAsInt( "STD_PROCESS", it )
+	        	stateIdList<<stateEngineService.getStateIdAsInt( assetDetail.project.workflowCode, it )
 	        }
 	        stateIdList.sort().each{
-	        	statesList<<[id:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
+	        	statesList<<[id:stateEngineService.getState(assetDetail.project.workflowCode,it),label:stateEngineService.getStateLabel(assetDetail.project.workflowCode,it)]
 	        }
 	        def map = new HashMap()
 	        map.put("assetDetail",assetDetail)
@@ -1141,7 +1141,7 @@ class AssetEntityController {
 	        }else{
                 map.put("teamName","")
 	        }
-	        map.put("currentState",stateEngineService.getStateLabel("STD_PROCESS",currentState))
+	        map.put("currentState",stateEngineService.getStateLabel(assetDetail.project.workflowCode,currentState))
 	        map.put("state",state)
 	        def sourceQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
 	        def targetQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
@@ -1166,10 +1166,11 @@ class AssetEntityController {
      * @return: boolean value to validate comment field
      *---------------------------------*/
     def getFlag = {
+    	def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
     	def toState = params.toState
     	def fromState = params.fromState
     	def status = []
-    	def flag = stateEngineService.getFlags("STD_PROCESS","SUPERVISOR", fromState, toState)
+    	def flag = stateEngineService.getFlags(projectInstance.workflowCode,"SUPERVISOR", fromState, toState)
     	if(flag.contains("comment") || flag.contains("issue")){
     		status<< ['status':'true']
     	}
@@ -1196,9 +1197,9 @@ class AssetEntityController {
 	    	def assignTo = params.assignTo
 	    	def priority = params.priority
 	    	def comment = params.comment
-	    	def rerackedId = stateEngineService.getStateId("STD_PROCESS","Reracked")
-	        def holdId = stateEngineService.getStateId("STD_PROCESS","Hold")
-	        def releasedId = stateEngineService.getStateId("STD_PROCESS","Release")
+	    	def rerackedId = stateEngineService.getStateId(assetEntity.project.workflowCode,"Reracked")
+	        def holdId = stateEngineService.getStateId(assetEntity.project.workflowCode,"Hold")
+	        def releasedId = stateEngineService.getStateId(assetEntity.project.workflowCode,"Release")
 	        def projectAssetMap = ProjectAssetMap.findByAsset(assetEntity)
 	        def currentStateId 
 	        if(projectAssetMap){
@@ -1207,36 +1208,37 @@ class AssetEntityController {
 	    	if(status != "" ){
 		    	def principal = SecurityUtils.subject.principal
 		    	def loginUser = UserLogin.findByUsername(principal)
-		    	def transactionStatus = workflowService.createTransition("STD_PROCESS","SUPERVISOR", status, assetEntity, assetEntity.moveBundle, loginUser, null, comment )
+		    	def transactionStatus = workflowService.createTransition(assetEntity.project.workflowCode,"SUPERVISOR", status, assetEntity, assetEntity.moveBundle, loginUser, null, comment )
 		    	if ( transactionStatus.success ) {
 		    		if(comment){
 			    		assetComment = new AssetComment()
 		          		assetComment.comment = comment
 		          		assetComment.assetEntity = assetEntity
-		          		assetComment.commentType = 'issue'		          			
+		          		assetComment.commentType = 'issue'
+		          		assetComment.category = 'moveday'		          			
 		          		assetComment.createdBy = loginUser.person
 		          		assetComment.save()
 		    		}
 		    		stateIdList = getStates(status)
 				    stateIdList.sort().each{
-				    	statesList<<[id:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
+				    	statesList<<[id:stateEngineService.getState(assetEntity.project.workflowCode,it),label:stateEngineService.getStateLabel(assetEntity.project.workflowCode,it)]
 				    }
-				    statusLabel = stateEngineService.getStateLabel("STD_PROCESS",stateEngineService.getStateIdAsInt("STD_PROCESS",status))
-				    statusName = stateEngineService.getState("STD_PROCESS",stateEngineService.getStateIdAsInt("STD_PROCESS",status))
+				    statusLabel = stateEngineService.getStateLabel(assetEntity.project.workflowCode,stateEngineService.getStateIdAsInt(assetEntity.project.workflowCode,status))
+				    statusName = stateEngineService.getState(assetEntity.project.workflowCode,stateEngineService.getStateIdAsInt(assetEntity.project.workflowCode,status))
 		    	} else {
-		        	statusLabel = stateEngineService.getStateLabel("STD_PROCESS",currentStateId)
-		        	statusName = stateEngineService.getState("STD_PROCESS",currentStateId)
-		        	stateIdList = getStates(stateEngineService.getState("STD_PROCESS",currentStateId))
+		        	statusLabel = stateEngineService.getStateLabel(assetEntity.project.workflowCode,currentStateId)
+		        	statusName = stateEngineService.getState(assetEntity.project.workflowCode,currentStateId)
+		        	stateIdList = getStates(stateEngineService.getState(assetEntity.project.workflowCode,currentStateId))
 		        	stateIdList.sort().each{
-				    	statesList<<[id:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
+				    	statesList<<[id:stateEngineService.getState(assetEntity.project.workflowCode,it),label:stateEngineService.getStateLabel(assetEntity.project.workflowCode,it)]
 				    }
 		    	}
 	    	} else {
-	        	statusLabel = stateEngineService.getStateLabel("STD_PROCESS",currentStateId)
-	        	statusName = stateEngineService.getState("STD_PROCESS",currentStateId)
-	        	stateIdList = getStates(stateEngineService.getState("STD_PROCESS",currentStateId))
+	        	statusLabel = stateEngineService.getStateLabel(assetEntity.project.workflowCode,currentStateId)
+	        	statusName = stateEngineService.getState(assetEntity.project.workflowCode,currentStateId)
+	        	stateIdList = getStates(stateEngineService.getState(assetEntity.project.workflowCode,currentStateId))
 	        	stateIdList.sort().each{
-			    	statesList<<[id:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
+			    	statesList<<[id:stateEngineService.getState(assetEntity.project.workflowCode,it),label:stateEngineService.getStateLabel(assetEntity.project.workflowCode,it)]
 			    }
 	    	}
     		if(priority){
@@ -1302,16 +1304,17 @@ class AssetEntityController {
      *@return: List of valid stated for param state
      *----------------------------------------*/
     def getStates(def state){
+    	def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
         def stateIdList = []
         def validStates
         if(state){
-            validStates = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR", state)
+            validStates = stateEngineService.getTasks(projectInstance.workflowCode,"SUPERVISOR", state)
         } else {
             validStates = ["Ready"]
             //stateEngineService.getTasks("STD_PROCESS","TASK_NAME")
         }
         validStates.each{
-		 	stateIdList<<stateEngineService.getStateIdAsInt("STD_PROCESS",it)
+		 	stateIdList<<stateEngineService.getStateIdAsInt(projectInstance.workflowCode,it)
         }
         return stateIdList
     }
@@ -1338,7 +1341,7 @@ class AssetEntityController {
      *-------------------------------------------*/
     //  To get unique list of task for list of assets through ajax
 	def getList = {
-    		
+    	def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )		
         def assetArray = params.assetArray
         Set common = new HashSet()
         def taskList = []
@@ -1354,8 +1357,8 @@ class AssetEntityController {
         		def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
     															"where t.asset_entity_id = $asset and voided = 0 order by date_created desc limit 1 ")
         		if(transitionStates.size()){
-        			stateVal = stateEngineService.getState("STD_PROCESS",transitionStates[0].stateTo)
-                    temp = stateEngineService.getTasks("STD_PROCESS","SUPERVISOR",stateVal)
+        			stateVal = stateEngineService.getState(projectInstance.workflowCode,transitionStates[0].stateTo)
+                    temp = stateEngineService.getTasks(projectInstance.workflowCode,"SUPERVISOR",stateVal)
                     taskList << [task:temp]
         		} else {
         			taskList << [task:["Ready"] ]
@@ -1366,10 +1369,10 @@ class AssetEntityController {
         		common.retainAll((HashSet)(taskList[i].task))
         	}
            	common.each{
-           		tempTaskList << stateEngineService.getStateIdAsInt("STD_PROCESS",it)
+           		tempTaskList << stateEngineService.getStateIdAsInt(projectInstance.workflowCode,it)
        		}
        		tempTaskList.sort().each{
-       			sortList << [state:stateEngineService.getState("STD_PROCESS",it),label:stateEngineService.getStateLabel("STD_PROCESS",it)]
+       			sortList << [state:stateEngineService.getState(projectInstance.workflowCode,it),label:stateEngineService.getStateLabel(projectInstance.workflowCode,it)]
        		}
         	totalList << [item:sortList,asset:assetArray]
         }
@@ -1384,6 +1387,7 @@ class AssetEntityController {
      * 	@return : Once transition is completed it will redirect to dashboardView method
      * -------------------------------------------*/
 	def changeStatus = {
+		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
         def assetId = params.assetVal
         def assetEnt = AssetEntity.findAll("from AssetEntity ae where ae.id in ($assetId)")
         assetEnt.each{
@@ -1392,7 +1396,7 @@ class AssetEntityController {
 	        def loginUser = UserLogin.findByUsername(principal)
 	        def team = it.sourceTeam
 			     
-	        def workflow = workflowService.createTransition("STD_PROCESS","SUPERVISOR",params.taskList,it,bundle,loginUser,team,params.enterNote)
+	        def workflow = workflowService.createTransition(projectInstance.workflowCode,"SUPERVISOR",params.taskList,it,bundle,loginUser,team,params.enterNote)
 	        if(workflow.success){
 	        	if(params.enterNote != ""){
 	                def assetComment = new AssetComment()

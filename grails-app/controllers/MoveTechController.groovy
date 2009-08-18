@@ -346,13 +346,14 @@ class MoveTechController {
             def colorCss
             def rdyState
             def ipState
-            def holdState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Hold" ) 
+            def moveBundleInstance = MoveBundle.findById( bundleId )
+            def holdState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Hold" ) 
             if ( params.location == "s" ) {
-                rdyState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Release" )
-                ipState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Unracking" )
+                rdyState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Release" )
+                ipState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Unracking" )
             } else {
-                rdyState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Staged" )
-                ipState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Reracking" )
+                rdyState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Staged" )
+                ipState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Reracking" )
             }
             def countQuery = "select a.asset_entity_id as id, a.asset_tag as assetTag, a.source_rack as sourceRack, " + 
 				            "a.source_rack_position as sourceRackPosition, a.target_rack as targetRack, " +
@@ -363,17 +364,17 @@ class MoveTechController {
 				            "where a.move_bundle_id = $bundleId"
             def query = new StringBuffer (countQuery)
             if ( params.location == "s" ) {
-                stateVal = stateEngineService.getStateId ( "STD_PROCESS", "Unracked" )
+                stateVal = stateEngineService.getStateId ( moveBundleInstance.project.workflowCode, "Unracked" )
                 query.append (" and a.source_team_id = $team" )
                 countQuery +=" and a.source_team_id = $team"
             } else {
-                stateVal = stateEngineService.getStateId ( "STD_PROCESS", "Reracked" )
+                stateVal = stateEngineService.getStateId ( moveBundleInstance.project.workflowCode, "Reracked" )
                 query.append (" and a.target_team_id = $team" )
                 countQuery += " and a.target_team_id = $team" 
             }
             allSize = jdbcTemplate.queryForList ( query.toString() + " group by a.asset_entity_id ").size()
             if ( tab == "Todo" ) {
-                query.append (" and p.current_state_id < $stateVal")
+                query.append (" and ( p.current_state_id < $stateVal or t.state_to = $holdState )")
             }
             query.append(" group by a.asset_entity_id ")
             if( params.sort != null ){
@@ -409,7 +410,7 @@ class MoveTechController {
                 assetList << [ item:it, cssVal:colorCss ]
             }
             if ( tab == "All" ) {
-            	countQuery += " and p.current_state_id < $stateVal group by a.asset_entity_id" 
+            	countQuery += " and (p.current_state_id < $stateVal or t.state_to = $holdState) group by a.asset_entity_id" 
                 todoSize = jdbcTemplate.queryForList ( countQuery ).size()
                 
             }
@@ -442,6 +443,7 @@ class MoveTechController {
             def label
             def actionLabel
             def checkHome = params.home
+            def moveBundleInstance = MoveBundle.findById( params.bundle )
             def loginTeam
             if ( team ) {
             	loginTeam = ProjectTeam.findById( params.team )
@@ -561,7 +563,7 @@ class MoveTechController {
                         		return;
                         	}
                         } else {
-                        	stateVal = stateEngineService.getState( "STD_PROCESS", transitionStates[0].stateTo )
+                        	stateVal = stateEngineService.getState( moveBundleInstance.project.workflowCode, transitionStates[0].stateTo )
                         	if ( stateVal == "Hold" ) {
                         		flash.message = message ( code : "The asset is on Hold. Please contact manager to resolve issue." )
                         		if( checkHome ) {
@@ -578,7 +580,7 @@ class MoveTechController {
                         			return;
                         		}
                         	}
-                        	taskList = stateEngineService.getTasks ( "STD_PROCESS", "MOVE_TECH", stateVal )
+                        	taskList = stateEngineService.getTasks ( moveBundleInstance.project.workflowCode, "MOVE_TECH", stateVal )
                         	taskSize = taskList.size()
                         	if ( taskSize == 1 ) {
                         		if ( taskList.contains ( "Hold" ) ) {
@@ -589,13 +591,13 @@ class MoveTechController {
                         		taskList.each {
                         			if ( it != "Hold" ) {
                         				actionLabel = it
-                        				label =	stateEngineService.getStateLabel ( "STD_PROCESS", stateEngineService.getStateIdAsInt("STD_PROCESS",it) )
+                        				label =	stateEngineService.getStateLabel ( moveBundleInstance.project.workflowCode, stateEngineService.getStateIdAsInt(moveBundleInstance.project.workflowCode,it) )
                         			}
 	                    			
                         		}
                         	}
                         	assetComment = AssetComment.findAllByAssetEntity( assetItem )
-                        	def stateLabel = stateEngineService.getStateLabel( "STD_PROCESS", transitionStates[0].stateTo )
+                        	def stateLabel = stateEngineService.getStateLabel( moveBundleInstance.project.workflowCode, transitionStates[0].stateTo )
                         	render ( view:'assetSearch',
                                 model:[ projMap:projMap, assetComment:assetComment?assetComment :"", stateVal:stateVal, bundle:params.bundle, 
                                 		team:params.team, project:params.project, location:params.location, search:params.search, label:label,
@@ -623,6 +625,7 @@ class MoveTechController {
         def principal = SecurityUtils.subject.principal
         if ( principal ) {
         	def enterNote = params.enterNote
+        	def moveBundleInstance = MoveBundle.findById( params.bundle )
         	if ( params.similarComment == 'nosimilar' ) {
         		appendCommentsToRemainderList( params, session )
         	}
@@ -634,12 +637,13 @@ class MoveTechController {
             def loginUser = UserLogin.findByUsername ( principal )
             def workflow
             if ( params.user == "mt" ) {
-                workflow = workflowService.createTransition ( "STD_PROCESS", "MOVE_TECH", "Hold", asset,bundle, loginUser, loginTeam, params.enterNote )
+                workflow = workflowService.createTransition ( moveBundleInstance.project.workflowCode, "MOVE_TECH", "Hold", asset,bundle, loginUser, loginTeam, params.enterNote )
                 if ( workflow.success ) {
                     def assetComment = new AssetComment()
                     assetComment.comment = enterNote
                     assetComment.assetEntity = asset
                     assetComment.commentType = 'issue'
+                    assetComment.category = 'moveday'
                   	assetComment.createdBy = loginUser.person
                     assetComment.save()
                     redirect ( action: 'assetTask', 
@@ -655,7 +659,7 @@ class MoveTechController {
                 }
           
             } else {
-                workflow = workflowService.createTransition ( "STD_PROCESS", "CLEANER", "Hold", asset, bundle, loginUser, loginTeam, params.enterNote )
+                workflow = workflowService.createTransition ( moveBundleInstance.project.workflowCode, "CLEANER", "Hold", asset, bundle, loginUser, loginTeam, params.enterNote )
                 def projMap = []
                 def assetComment
                 def stateVal = null
@@ -666,6 +670,7 @@ class MoveTechController {
                     assetComment.comment = enterNote
                     assetComment.assetEntity = asset
                     assetComment.commentType = 'issue'
+                    assetComment.category = 'moveday'
                  	assetComment.createdBy = loginUser.person
                     assetComment.save()
                     render(view: 'cleaningAssetSearch',
@@ -684,7 +689,7 @@ class MoveTechController {
     			if ( params.user != "mt" ){
     				redirectAction = "cleaningAssetSearch"
     			}
-    			redirect ( action : redirectAction, params:params)
+    			redirect ( action : redirectAction, params:params )
     		}
         } else {
         	flash.message = "Your login has expired and must login again."
@@ -704,6 +709,7 @@ class MoveTechController {
         	def asset = getAssetEntity ( params.search, params.user )
         	if(asset){
 	            def bundle = asset.moveBundle
+	            def moveBundleInstance = MoveBundle.findById( params.bundle )
 	            def loginTeam = ProjectTeam.findById(params.team)
 	            def actionLabel = params.actionLabel
 	            //def projectAssetMap = ProjectAssetMap.findByAsset( asset )
@@ -711,12 +717,12 @@ class MoveTechController {
                         										"where t.asset_entity_id = ${asset.id} and voided = 0 order by date_created desc limit 1 ")
 	            def currentState = ""
 	            if(transitionStates.size()){
-	            	currentState = stateEngineService.getState( "STD_PROCESS", transitionStates[0].stateTo )
+	            	currentState = stateEngineService.getState( moveBundleInstance.project.workflowCode, transitionStates[0].stateTo )
 	            }
-	            def flags = stateEngineService.getFlags( "STD_PROCESS", "MOVE_TECH", currentState, actionLabel )
+	            def flags = stateEngineService.getFlags( moveBundleInstance.project.workflowCode, "MOVE_TECH", currentState, actionLabel )
 	            def loginUser = UserLogin.findByUsername( principal )
 	            def assetComment = params.assetComment
-	            def workflow = workflowService.createTransition( "STD_PROCESS", "MOVE_TECH", actionLabel, asset, bundle, loginUser, loginTeam, assetComment )
+	            def workflow = workflowService.createTransition( moveBundleInstance.project.workflowCode, "MOVE_TECH", actionLabel, asset, bundle, loginUser, loginTeam, assetComment )
 	            if ( workflow.success ) {
 	            	if(flags.contains("busy")){
 	            		flash.message = message ( code : workflow.message )
@@ -764,6 +770,7 @@ class MoveTechController {
             def holdState
             def issuecomments
             def assetIssueCommentListSize
+            def moveBundleInstance = MoveBundle.findById( bundleId )
             def query = new StringBuffer("select a.asset_entity_id as id, a.asset_tag as assetTag, " +
 					"a.source_rack as sourceRack, a.source_rack_position as sourceRackPosition, " +
 					"a.target_rack as targetRack, a.target_rack_position as targetRackPosition, " +
@@ -772,20 +779,20 @@ class MoveTechController {
 					"left join asset_transition t on(a.asset_entity_id = t.asset_entity_id and t.voided = 0) "+
 					"left join project_asset_map p on (a.asset_entity_id = p.asset_id) where a.move_bundle_id = $bundleId ")
             
-            stateVal = stateEngineService.getStateId ( "STD_PROCESS", "Cleaned" )
+            stateVal = stateEngineService.getStateId ( moveBundleInstance.project.workflowCode, "Cleaned" )
             allSize = jdbcTemplate.queryForList( query.toString() +" group by a.asset_entity_id" ).size()
+            holdState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Hold" )
             if ( tab == "Todo" ) {
-                query.append ( " and p.current_state_id < $stateVal " )
+                query.append ( " and ( p.current_state_id < $stateVal or t.state_to = $holdState )" )
             }
             proAssetMap = jdbcTemplate.queryForList ( query.toString() +" group by a.asset_entity_id" )
             todoSize = proAssetMap.size()
-            holdState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Hold" )
             if ( params.location == "s" ) {
-                rdyState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Cleaned" )
-                ipState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Unracked" )
+                rdyState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Cleaned" )
+                ipState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Unracked" )
             } else {
-                rdyState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Cleaned" )
-                ipState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Staged" )
+                rdyState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Cleaned" )
+                ipState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Staged" )
             }
             proAssetMap.each {
                 if ( it.currentStateId ) {
@@ -807,7 +814,7 @@ class MoveTechController {
                 it.cssVal
             }
             if ( tab == "All" ) {
-                query.append (" and p.current_state_id < $stateVal group by a.asset_entity_id")
+                query.append (" and (p.current_state_id < $stateVal or t.state_to = $holdState ) group by a.asset_entity_id")
                 todoSize = jdbcTemplate.queryForList ( query.toString() ).size()
             }
             def assetIssueCommentList
@@ -857,6 +864,7 @@ class MoveTechController {
             def loginTeam
             def issuecomments
             def assetIssueCommentListSize
+            def moveBundleInstance = MoveBundle.findById( params.bundle )
             if ( team ) {
             	loginTeam = ProjectTeam.findById ( params.team )
             }
@@ -951,7 +959,7 @@ class MoveTechController {
                                 return;
                             }
                         } else {
-                            stateVal = stateEngineService.getState ( "STD_PROCESS", transitionStates[0].stateTo )
+                            stateVal = stateEngineService.getState ( moveBundleInstance.project.workflowCode, transitionStates[0].stateTo )
                             if ( stateVal == "Hold" ) {
                             	def assetIssueCommentList = AssetComment.findAll("from AssetComment ac where ac.assetEntity = ${assetItem.id} and ac.commentType = 'issue' and ac.isResolved = 0")
                             	assetIssueCommentListSize = assetIssueCommentList.size()
@@ -973,7 +981,7 @@ class MoveTechController {
                                     return;
                                 }
                             }
-                            taskList = stateEngineService.getTasks ( "STD_PROCESS", "CLEANER", stateVal )
+                            taskList = stateEngineService.getTasks ( moveBundleInstance.project.workflowCode, "CLEANER", stateVal )
                             taskSize = taskList.size()
                             if ( taskSize == 1 ) {
                                 if ( taskList.contains ( "Hold" ) ) {
@@ -984,12 +992,12 @@ class MoveTechController {
                                 taskList.each {
                                     if ( it != "Hold" ) {
                                         actionLabel = it
-                                        label =	stateEngineService.getStateLabel ( "STD_PROCESS", stateEngineService.getStateIdAsInt("STD_PROCESS",it) )
+                                        label =	stateEngineService.getStateLabel ( moveBundleInstance.project.workflowCode, stateEngineService.getStateIdAsInt(moveBundleInstance.project.workflowCode,it) )
                                     }
                                 }
                             }
                             assetComment = AssetComment.findAll( "from AssetComment ac where ac.assetEntity = $assetItem.id and ac.commentType != 'issue' " )
-                            def cleanedId = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Cleaned" )
+                            def cleanedId = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Cleaned" )
                             def cartAssetCountQuery = new StringBuffer(" select count(a.asset_entity_id) as assetCount from asset_entity a "+
                             											"left join project_asset_map p on ( a.asset_entity_id = p.asset_id  ) " +
                             											"where a.cart = '$assetItem.cart' and a.move_bundle_id = $bundleId "+
@@ -1031,11 +1039,12 @@ class MoveTechController {
         	def asset = getAssetEntity ( params.search, params.user )//AssetEntity.findByAssetTag(params.search)
         	if(asset){
 	            def bundle = asset.moveBundle
+	            def moveBundleInstance = MoveBundle.findById( params.bundle )
 	            def actionLabel = params.actionLabel
 	            def loginUser = UserLogin.findByUsername ( principal )
 	            def loginTeam = ProjectTeam.findById(params.team)
 	            def assetComment = params.assetComment
-	            def workflow = workflowService.createTransition ( "STD_PROCESS", "CLEANER", actionLabel, asset, bundle, loginUser, loginTeam, assetComment )
+	            def workflow = workflowService.createTransition ( moveBundleInstance.project.workflowCode, "CLEANER", actionLabel, asset, bundle, loginUser, loginTeam, assetComment )
 	            if ( workflow.success ) {
 	                def projMap = []
 	                def stateVal = null
@@ -1185,6 +1194,7 @@ class MoveTechController {
 					}
 	                assetComment.assetEntity = asset
 	                assetComment.commentType = 'comment'
+	                assetComment.category = 'moveday'
 	                assetComment.createdBy = loginUser.person
 	                assetComment.save()
 			} else {

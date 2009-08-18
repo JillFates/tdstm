@@ -4,6 +4,7 @@ import org.jsecurity.SecurityUtils
 class ProjectController {
     def userPreferenceService
     def partyRelationshipService
+    def stateEngineService
     def index = { redirect(action:list,params:params) }
 
     // the delete, save and update actions only accept POST requests
@@ -305,6 +306,7 @@ class ProjectController {
      * Populate create view
      */
     def create = {
+    	def workflowCodes = []
         def projectInstance = new Project()
         projectInstance.properties = params
         /*
@@ -331,7 +333,8 @@ class ProjectController {
 	        //def managers = PartyRelationship.findAllWhere( partyRelationshipType: relationshipTypeStaff, partyIdFrom: tdsParty, roleTypeCodeFrom: roleTypeCompany, roleTypeCodeTo: roleTypeStaff )
 	        def managers = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $tdsParty.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
 	        managers.sort{it.partyIdTo.lastName}
-	        return [ 'projectInstance':projectInstance, 'clients':clients , 'partners':partners , 'managers':managers]
+	        workflowCodes = stateEngineService.getWorkflowCode()
+	        return [ 'projectInstance':projectInstance, 'clients':clients , 'partners':partners , 'managers':managers, 'workflowCodes': workflowCodes ]
         
         } catch (Exception e) {
         	flash.message = "Company not found"
@@ -342,6 +345,7 @@ class ProjectController {
      * create the project and PartyRelationships for the fields prompted
      */
     def save = {
+    	def workflowCodes = []
         def projectInstance = new Project(params)
         projectInstance.dateCreated = new Date()
         def startDate = params.startDate
@@ -457,8 +461,10 @@ class ProjectController {
             
             //	Populate a SELECT listbox with a list of all STAFF relationship to COMPANY (TDS)
             def managers = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $tdsParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
+            
+            workflowCodes = stateEngineService.getWorkflowCode()
              
-            render( view:'create', model:[ projectInstance:projectInstance, clients:clients, partners:partners, managers:managers ] )
+            render( view:'create', model:[ projectInstance:projectInstance, clients:clients, partners:partners, managers:managers, workflowCodes: workflowCodes ] )
         }
     }
     

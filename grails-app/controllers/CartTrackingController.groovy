@@ -46,9 +46,9 @@ class CartTrackingController {
             }
         }
 		// get id's for Cleaned and OnTrucks
-		def cleanedId = stateEngineService.getStateIdAsInt("STD_PROCESS","Cleaned")
-		def onTruckId = stateEngineService.getStateIdAsInt("STD_PROCESS","OnTruck")
-		def holdId = stateEngineService.getStateIdAsInt("STD_PROCESS","Hold")
+		def cleanedId = stateEngineService.getStateIdAsInt(projectInstance.workflowCode,"Cleaned")
+		def onTruckId = stateEngineService.getStateIdAsInt(projectInstance.workflowCode,"OnTruck")
+		def holdId = stateEngineService.getStateIdAsInt(projectInstance.workflowCode,"Hold")
 		// query for list of carts and trucks
     	def query = new StringBuffer("select ae.truck as truck , ae.cart as cart, count(ae.asset_entity_id) as totalAssets, "+
     								"sum(ae.usize) as usize from asset_entity ae left join project_asset_map pm on "+
@@ -133,6 +133,7 @@ class CartTrackingController {
 	 *---------------------------------------------------------*/
 	def getAssetsOnCart = {
 		def projectId = params.projectId
+		def projectInstance = Project.findById( projectId )
 		def bundleId = params.moveBundle
 		def cart = params.cart
 		def truck = params.truck
@@ -147,15 +148,15 @@ class CartTrackingController {
 					"and at.voided = 0) where ae.project_id = $projectId and ae.move_bundle_id = $bundleId "+
 					"and ae.cart = '$cart' group by ae.asset_entity_id"
 		def resultList = jdbcTemplate.queryForList( query )
-		def cleanedId = stateEngineService.getStateIdAsInt("STD_PROCESS","Cleaned")
-		def stagedId = stateEngineService.getStateIdAsInt("STD_PROCESS","Staged")
+		def cleanedId = stateEngineService.getStateIdAsInt(projectInstance.workflowCode,"Cleaned")
+		def stagedId = stateEngineService.getStateIdAsInt(projectInstance.workflowCode,"Staged")
 		resultList.each{
 			def completed = true
 			def checked = false
 			def currentState = ""
 			def projectAssetMap = ProjectAssetMap.find( "from ProjectAssetMap where asset = $it.id" )
 			if(projectAssetMap){
-				currentState = stateEngineService.getStateLabel("STD_PROCESS",projectAssetMap.currentStateId)
+				currentState = stateEngineService.getStateLabel(projectInstance.workflowCode,projectAssetMap.currentStateId)
 			}
 			def team = ""
 			if(it.source){
@@ -194,7 +195,7 @@ class CartTrackingController {
 		def transition = jdbcTemplate.queryForList(" select max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate "+
 													"from asset_transition at where at.asset_entity_id = $assetEntity.id "+
 													"and at.voided = 0 group by at.asset_entity_id")
-		def onTruckId = stateEngineService.getStateIdAsInt("STD_PROCESS","OnTruck")
+		def onTruckId = stateEngineService.getStateIdAsInt(assetEntity.project.workflowCode,"OnTruck")
 		assetDetails<<[assetEntity:assetEntity,team:assetEntity.sourceTeam? assetEntity.sourceTeam.teamCode : "", 
 		               state: transition[0] ? transition[0].maxstate : "", onTruck :onTruckId ]
 		render assetDetails as JSON
@@ -223,6 +224,7 @@ class CartTrackingController {
 	def moveToOnTruck = {
 		def startTime = System.currentTimeMillis()
 		def projectId = params.projectId
+		def projectInstance = Project.findById( projectId )
 		def bundleId = params.moveBundle
 		def cart = params.cart
 		def truck = params.truck
@@ -236,9 +238,9 @@ class CartTrackingController {
 				def currentStateId = projectAssetMap.currentStateId
 				def principal = SecurityUtils.subject.principal
 		    	def loginUser = UserLogin.findByUsername(principal)
-		    	def currentState = stateEngineService.getState("STD_PROCESS",currentStateId)
+		    	def currentState = stateEngineService.getState(projectInstance.workflowCode,currentStateId)
 		    	if(currentState != "Hold"){
-		    		transactionStatus = workflowService.createTransition("STD_PROCESS","SUPERVISOR", "OnTruck", it, it.moveBundle, loginUser, null, null )
+		    		transactionStatus = workflowService.createTransition(projectInstance.workflowCode,"SUPERVISOR", "OnTruck", it, it.moveBundle, loginUser, null, null )
 		    	}
 				status += ""+transactionStatus.success+":"+it.assetName +"~"
 			}

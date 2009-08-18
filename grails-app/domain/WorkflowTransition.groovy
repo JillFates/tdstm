@@ -3,14 +3,18 @@
  */
 class WorkflowTransition {
 	
+	String process
 	String code
 	String name
+	Integer transId
 	String type
 	String color
 	
 	static constraints = {
+		process( blank:false, nullable:false )
 		code( blank:false, nullable:false )
 		name( blank:false, nullable:false )
+		transId( nullable:false )
 		type( blank:false, nullable:false )
 		color( blank:true, nullable:true)
 	}	

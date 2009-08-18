@@ -21,15 +21,16 @@ class SupervisorConsoleService {
         def sortField = params.sort
         def orderField = params.order
         def holdCheck = true
-        def cleanedId = stateEngineService.getStateId( "STD_PROCESS", "Cleaned" )
-        def onCartId = stateEngineService.getStateId( "STD_PROCESS", "OnCart" )
-        def onTruckId = stateEngineService.getStateId( "STD_PROCESS", "OnTruck" )
-	    def offTruckId = stateEngineService.getStateId( "STD_PROCESS", "OffTruck" )
-        def rerackedId = stateEngineService.getStateId( "STD_PROCESS", "Reracked" )
-        def stagedId = stateEngineService.getStateId( "STD_PROCESS", "Staged" )
-        def unrackedId = stateEngineService.getStateId( "STD_PROCESS", "Unracked" )
-        def releasedId = stateEngineService.getStateId( "STD_PROCESS", "Release" )
-        def holdId = stateEngineService.getStateId( "STD_PROCESS", "Hold" )
+        def projectInstance = Project.findById( params.projectId )
+        def cleanedId = stateEngineService.getStateId( projectInstance.workflowCode, "Cleaned" )
+        def onCartId = stateEngineService.getStateId( projectInstance.workflowCode, "OnCart" )
+        def onTruckId = stateEngineService.getStateId( projectInstance.workflowCode, "OnTruck" )
+	    def offTruckId = stateEngineService.getStateId( projectInstance.workflowCode, "OffTruck" )
+        def rerackedId = stateEngineService.getStateId( projectInstance.workflowCode, "Reracked" )
+        def stagedId = stateEngineService.getStateId( projectInstance.workflowCode, "Staged" )
+        def unrackedId = stateEngineService.getStateId( projectInstance.workflowCode, "Unracked" )
+        def releasedId = stateEngineService.getStateId( projectInstance.workflowCode, "Release" )
+        def holdId = stateEngineService.getStateId( projectInstance.workflowCode, "Hold" )
         def queryForConsole = new StringBuffer("select max(at.date_created) as dateCreated, ae.asset_entity_id as id, ae.priority, "+
 						"ae.asset_tag as assetTag, ae.asset_name as assetName, ae.source_team_id as sourceTeam, ae.target_team_id as " + 
 						"targetTeam, pm.current_state_id as currentState, min(cast(at.state_to as UNSIGNED INTEGER)) as minstate FROM asset_entity ae " +
@@ -108,7 +109,7 @@ class SupervisorConsoleService {
 			}
 		}
 		if(currentState){
-			def stateId = stateEngineService.getStateIdAsInt( "STD_PROCESS", currentState )
+			def stateId = stateEngineService.getStateIdAsInt( projectInstance.workflowCode, currentState )
 			if(currentState != 'Hold'){
 				queryForConsole.append(" and pm.current_state_id = $stateId group by ae.asset_entity_id having minstate != $holdId" )
 			} else {

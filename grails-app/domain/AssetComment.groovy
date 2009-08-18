@@ -10,6 +10,9 @@ class AssetComment {
 	String resolution
 	Person resolvedBy
 	Person createdBy
+	String commentCode 
+	String category = "general"
+	
 	static constraints = {
 		
 		comment( blank:true, nullable:true  )
@@ -20,6 +23,8 @@ class AssetComment {
 		resolvedBy( nullable:true  )
 		createdBy( nullable:true  )
 		dateResolved( nullable:true  )
+		commentCode( blank:true, nullable:true  )
+		category( blank:false, nullable:false )
 	}
 
 	static mapping  = {	

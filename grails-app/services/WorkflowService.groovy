@@ -58,7 +58,7 @@ class WorkflowService {
 	    				def stateType = stateEngineService.getStateType( process, toState )
 	    				def holdState = stateEngineService.getStateId( process, 'Hold' )
 	    				/* Set preexisting AssetTransitions as voided where stateTo >= new state */
-	    				setPreExistTransitionsAsVoided( assetEntity, state, assetTransition, stateType, holdState)
+	    				setPreExistTransitionsAsVoided( process, assetEntity, state, assetTransition, stateType, holdState)
 	    				/* Set time elapsed for each transition */
 	    				message = setTransitionTimeElapsed(assetTransition)
 	    				message = "Transaction created successfully"
@@ -128,11 +128,11 @@ class WorkflowService {
      * @param  : AssetEntity , stateTo
      * @return : Set preexisting AssetTransitions as voided where stateTo >= new state
      * -----------------------------------------------------------------------------*/
-    def setPreExistTransitionsAsVoided( def assetEntity, def state, def assetTransition, def stateType, def holdState ) {
+    def setPreExistTransitionsAsVoided( def process, def assetEntity, def state, def assetTransition, def stateType, def holdState ) {
     	if(stateType != "boolean"){
 	    	def preExistTransitions = AssetTransition.findAll("from AssetTransition where assetEntity = $assetEntity.id and ( stateTo >= $state or stateTo = $holdState ) "+
-	    														"and id != $assetTransition.id and stateTo not in(select w.id from WorkflowTransition w "+
-	    														"where id != $holdState and w.type != 'process') ")
+	    														"and id != $assetTransition.id and stateTo not in(select w.transId from WorkflowTransition w "+
+	    														"where w.process = '$process' and w.transId != $holdState and w.type != 'process' ) ")
 	    	preExistTransitions.each{
 	    		it.voided = 1
 	    		it.save()

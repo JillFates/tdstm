@@ -298,7 +298,11 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 	          
 	          <th nowrap>Resolved</th>
 	                        
-	          <th nowrap>Must Verify</th>                      
+	          <th nowrap>Must Verify</th>
+	          
+	          <th nowrap>Category</th>  
+	          
+	          <th nowrap>Comment Code</th>                     
 	                   	    
 	        </tr>
 	    </thead>
@@ -316,7 +320,7 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 	id="createAssetCommentId" value=""> <input type="hidden"
 	name="status" id="statusId" value=""> <g:form
 	action="saveComment" method="post" name="createCommentForm">
-	
+	<input type="hidden" name="category" value="general"/>
 	<div class="dialog" style="border: 1px solid #5F9FCF">
 	<div>
 	<table id="createCommentTable" style="border: 0px">
@@ -334,7 +338,7 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
 					<label for="mustVerify">Must
 				Verify</label>
-				</td>
+				</td>				
 			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="comment">Comment:</label>
@@ -396,6 +400,18 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 			Type:</label></td>
 			<td valign="top" class="value" id="commentTypeTdId" />
 		</tr>
+		
+		<tr>
+	<td valign="top" class="name"><label for="category">Category:
+			</label></td>
+			<td valign="top" class="value" id="categoryTdId" />
+	</tr>
+	
+	<td valign="top" class="name"><label for="commentCode">comment
+			Code:</label></td>
+			<td valign="top" class="value" id="commentCodeTdId" />
+	</tr>
+	
 		<tr class="prop">
 			<td valign="top" class="name"><label for="mustVerify">Must
 			Verify:</label></td>
@@ -436,7 +452,6 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 			By:</label></td>
 			<td valign="top" class="value" id="resolvedById" />
 	</tr>
-		
 	
 </table>
 </div>
@@ -486,6 +501,16 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 					<label for="mustVerify">Must
 				Verify</label>
 				</td>
+			</tr>
+			<tr class="prop">
+				<td valign="top" class="name"><label for="category">Category:</label>
+				</td>
+				<td valign="top" class="value" id="categoryEditId" />
+			</tr>
+			<tr class="prop">
+				<td valign="top" class="name"><label for="commentCode">Comment Code:</label>
+				</td>
+				<td valign="top" class="value" id="commentCodeEditId" />
 			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="comment">Comment:</label>
