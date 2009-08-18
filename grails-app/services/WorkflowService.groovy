@@ -5,6 +5,7 @@ import com.tdssrc.grails.GormUtil
 class WorkflowService {
     boolean transactional = true
     def stateEngineService
+    def jdbcTemplate
     /*
      *  Used to create the Asset Transaction 
      */
@@ -31,6 +32,11 @@ class WorkflowService {
     	def projectAssetMap = ProjectAssetMap.findByAsset( assetEntity )
     	if ( projectAssetMap ) {
     		currentState = projectAssetMap.currentStateId
+    		def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+    														"where t.asset_entity_id = ${assetEntity.id} and voided = 0 order by date_created desc limit 1 ")
+			if(transitionStates.size()){
+				currentState = transitionStates[0].stateTo
+			}
 	    	def fromState = stateEngineService.getState( process, currentState )
 	    	def roleCheck = stateEngineService.canDoTask( process, role, fromState, toState )
 	    	// Check whether role has permission to change the State
@@ -45,12 +51,14 @@ class WorkflowService {
 	    		//	If verification is successful then create AssetTransition and Update ProjectTeam
 	        	if ( verifyFlag ) {
 	        		def state = stateEngineService.getStateId( process, toState )
-	        		def assetTransition = new AssetTransition( stateFrom:currentState, stateTo:state, comment:comment, assetEntity:assetEntity, moveBundle:moveBundle, projectTeam:projectTeam, userLogin:userLogin )
+	        		def assetTransition = new AssetTransition( stateFrom:currentState.toString(), stateTo:state, comment:comment, assetEntity:assetEntity, moveBundle:moveBundle, projectTeam:projectTeam, userLogin:userLogin )
 	        		if ( !assetTransition.validate() || !assetTransition.save() ) {
 	    				message = "Unable to create AssetTransition: " + GormUtil.allErrorsString( assetTransition )
 	    			} else {
+	    				def stateType = stateEngineService.getStateType( process, toState )
+	    				def holdState = stateEngineService.getStateId( process, 'Hold' )
 	    				/* Set preexisting AssetTransitions as voided where stateTo >= new state */
-	    				setPreExistTransitionsAsVoided( assetEntity, state, assetTransition )
+	    				setPreExistTransitionsAsVoided( assetEntity, state, assetTransition, stateType, holdState)
 	    				/* Set time elapsed for each transition */
 	    				message = setTransitionTimeElapsed(assetTransition)
 	    				message = "Transaction created successfully"
@@ -59,7 +67,9 @@ class WorkflowService {
 							projectTeam.latestAsset = assetEntity
 							projectTeam.save()
 	    				}
-	    				projectAssetMap.currentStateId = Integer.parseInt(stateEngineService.getStateId( process, toState ))
+	    				if(stateType != "boolean"){
+	    					projectAssetMap.currentStateId = Integer.parseInt(stateEngineService.getStateId( process, toState ))
+	    				}
 	    				projectAssetMap.save()
 
 						success = true
@@ -90,7 +100,6 @@ class WorkflowService {
 				}
     		}
     	}
-		
     	return [success:success, message:message]
     }
     /*----------------------------------------------------
@@ -119,9 +128,11 @@ class WorkflowService {
      * @param  : AssetEntity , stateTo
      * @return : Set preexisting AssetTransitions as voided where stateTo >= new state
      * -----------------------------------------------------------------------------*/
-    def setPreExistTransitionsAsVoided( def assetEntity, def state, def assetTransition ) {
-    	if(state != "10"){
-	    	def preExistTransitions = AssetTransition.findAll("from AssetTransition where assetEntity = $assetEntity.id and stateTo >= $state and id != $assetTransition.id ")
+    def setPreExistTransitionsAsVoided( def assetEntity, def state, def assetTransition, def stateType, def holdState ) {
+    	if(stateType != "boolean"){
+	    	def preExistTransitions = AssetTransition.findAll("from AssetTransition where assetEntity = $assetEntity.id and ( stateTo >= $state or stateTo = $holdState ) "+
+	    														"and id != $assetTransition.id and stateTo not in(select w.id from WorkflowTransition w "+
+	    														"where id != $holdState and w.type != 'process') ")
 	    	preExistTransitions.each{
 	    		it.voided = 1
 	    		it.save()

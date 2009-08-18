@@ -29,9 +29,10 @@ class SupervisorConsoleService {
         def stagedId = stateEngineService.getStateId( "STD_PROCESS", "Staged" )
         def unrackedId = stateEngineService.getStateId( "STD_PROCESS", "Unracked" )
         def releasedId = stateEngineService.getStateId( "STD_PROCESS", "Release" )
+        def holdId = stateEngineService.getStateId( "STD_PROCESS", "Hold" )
         def queryForConsole = new StringBuffer("select max(at.date_created) as dateCreated, ae.asset_entity_id as id, ae.priority, "+
-						"ae.asset_tag as assetTag, ae.asset_name as assetName, ae.source_team_id as sourceTeam, " + 
-						"ae.target_team_id as targetTeam, pm.current_state_id as currentState FROM asset_entity ae " +
+						"ae.asset_tag as assetTag, ae.asset_name as assetName, ae.source_team_id as sourceTeam, ae.target_team_id as " + 
+						"targetTeam, pm.current_state_id as currentState, min(cast(at.state_to as UNSIGNED INTEGER)) as minstate FROM asset_entity ae " +
 						"LEFT JOIN asset_transition at ON ( at.asset_entity_id = ae.asset_entity_id and at.voided = 0 ) " + 
 						"LEFT JOIN project_asset_map pm ON (pm.asset_id = ae.asset_entity_id) " + 
 						"where ae.project_id = ${moveBundleInstance.project.id} and ae.move_bundle_id = ${moveBundleInstance.id} ")
@@ -50,7 +51,7 @@ class SupervisorConsoleService {
 			}
 		}
 		if(appSme){
-			if(appOwner == "blank"){
+			if(appSme == "blank"){
 				queryForConsole.append(" and ae.app_sme = '' ")
 			} else {
 				queryForConsole.append(" and ae.app_sme = '$appSme' ")
@@ -102,24 +103,25 @@ class SupervisorConsoleService {
 					case "target_avail_trans"   : queryForConsole.append(" and pm.current_state_id >= $onTruckId and pm.current_state_id < $offTruckId")
 												  break;
 					case "target_done_trans"    : queryForConsole.append(" and pm.current_state_id >= $stagedId")
-											  break;
+												  break;
 				}
-				
-			} else {
-				queryForConsole.append(" and pm.current_state_id != 10 ")
 			}
 		}
 		if(currentState){
 			def stateId = stateEngineService.getStateIdAsInt( "STD_PROCESS", currentState )
-			queryForConsole.append(" and pm.current_state_id = $stateId ")
+			if(currentState != 'Hold'){
+				queryForConsole.append(" and pm.current_state_id = $stateId group by ae.asset_entity_id having minstate != $holdId" )
+			} else {
+				queryForConsole.append(" group by ae.asset_entity_id having minstate = $stateId")
+			}
 		} else {
 			if(type != 'hold'){
-				queryForConsole.append(" and ( pm.current_state_id != 10 or pm.current_state_id is null ) ")
+				queryForConsole.append(" group by ae.asset_entity_id having (minstate != $holdId or minstate is null) ")
 			} else {
-				queryForConsole.append(" and pm.current_state_id = 10 ")
+				queryForConsole.append(" group by ae.asset_entity_id having minstate = $holdId")
 			}
 		}
-		queryForConsole.append(" group by ae.asset_entity_id " )
+		//queryForConsole.append(" group by ae.asset_entity_id " )
 		if( sortField ) {
 			queryForConsole.append(" order by ${sortField} ${orderField}" )
 		} else {

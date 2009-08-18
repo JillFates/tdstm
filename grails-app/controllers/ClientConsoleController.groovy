@@ -21,7 +21,7 @@ class ClientConsoleController {
         def projectId=params.projectId
         def bundleId = params.moveBundle
         def moveBundleInstance
-        def projectMap
+		//def projectMap
         def stateVal
         def taskVal
         def holdId
@@ -116,9 +116,14 @@ class ClientConsoleController {
 				def htmlTd = []
 				def maxstate = it.maxstate
 				def assetEntity = AssetEntity.get(assetId)
-				projectMap = ProjectAssetMap.findByAsset(assetEntity)
+				/*projectMap = ProjectAssetMap.findByAsset(assetEntity)
 				if(projectMap){
 					stateId = projectMap.currentStateId
+				}*/
+				def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+																"where t.asset_entity_id = $assetId and voided = 0 order by date_created desc limit 1 ")
+				if(transitionStates.size()){
+					stateId = transitionStates[0].stateTo
 				}
 				holdId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Hold"))
 				releaseId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Release"))
@@ -176,10 +181,15 @@ class ClientConsoleController {
         def totalList = []
         def tempTaskList = []
         def assetId = params.assetEntity
-        def projectMap = ProjectAssetMap.find("from ProjectAssetMap pam where pam.asset = ${params.assetEntity}")
+        /*def projectMap = ProjectAssetMap.find("from ProjectAssetMap pam where pam.asset = ${params.assetEntity}")
         if(projectMap != null){
 			stateVal = stateEngineService.getState("STD_PROCESS",projectMap.currentStateId)
-        }
+        }*/
+        def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+        												"where t.asset_entity_id = $assetId and voided = 0 order by date_created desc limit 1 ")
+		if(transitionStates.size()){
+			stateVal = stateEngineService.getState("STD_PROCESS",transitionStates[0].stateTo)
+		}
 		if(stateVal){
 			temp = stateEngineService.getTasks("STD_PROCESS","MANAGER",stateVal)
 		} else {
@@ -226,14 +236,16 @@ class ClientConsoleController {
         def tempTaskList = []
         def temp
         def totalList = []
-        def projectMap = ProjectAssetMap.findAll("from ProjectAssetMap pam where pam.asset in ($assetArray)")
+        //def projectMap = ProjectAssetMap.findAll("from ProjectAssetMap pam where pam.asset in ($assetArray)")
         def stateVal
         if(assetArray){
         	def assetList = assetArray.split(",") 
         	assetList.each{ asset->
-        		def projectAssetMap = ProjectAssetMap.find("from ProjectAssetMap pam where pam.asset = $asset")
-        		if(projectAssetMap){
-        			stateVal = stateEngineService.getState("STD_PROCESS",projectAssetMap.currentStateId)
+        		//def projectAssetMap = ProjectAssetMap.find("from ProjectAssetMap pam where pam.asset = $asset")
+        		def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+    															"where t.asset_entity_id = $asset and voided = 0 order by date_created desc limit 1 ")
+        		if(transitionStates.size()){
+        			stateVal = stateEngineService.getState("STD_PROCESS",transitionStates[0].stateTo)
                     temp = stateEngineService.getTasks("STD_PROCESS","MANAGER",stateVal)
                     taskList << [task:temp]
         		} else {
@@ -332,9 +344,14 @@ class ClientConsoleController {
 				def check
 				def maxstate = it.maxstate
 				def assetEntity = AssetEntity.get(assetId)
-				def projectMap = ProjectAssetMap.findByAsset(assetEntity)
+				/*def projectMap = ProjectAssetMap.findByAsset(assetEntity)
 				if(projectMap){
 					stateId = projectMap.currentStateId
+				}*/
+				def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+																"where t.asset_entity_id = $assetId and voided = 0 order by date_created desc limit 1 ")
+				if(transitionStates.size()){
+					stateId = transitionStates[0].stateTo
 				}
 				def holdId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Hold"))
 				def releaseId = Integer.parseInt(stateEngineService.getStateId("STD_PROCESS","Release"))

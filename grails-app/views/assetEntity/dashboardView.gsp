@@ -289,10 +289,7 @@ td .odd {
 		}
 	}
 	function pageReload(){
-		var showAll = $("#showAllCheckbox").is(':checked');
-		if(showAll){
-			$("#showAllId").val('show');
-		}
+		$("#showAllId").val('${showAll}');
 		if('${params.myForm}'){
 			document.forms['${params.myForm}'].submit() ;
 		} else {

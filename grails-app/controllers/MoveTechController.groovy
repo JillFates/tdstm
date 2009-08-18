@@ -356,8 +356,10 @@ class MoveTechController {
             }
             def countQuery = "select a.asset_entity_id as id, a.asset_tag as assetTag, a.source_rack as sourceRack, " + 
 				            "a.source_rack_position as sourceRackPosition, a.target_rack as targetRack, " +
+				            "min(cast(t.state_to as UNSIGNED INTEGER)) as minstate, "+
 				            "a.target_rack_position as targetRackPosition, a.model as model, p.current_state_id as currentStateId " +
 				            "from asset_entity a left join project_asset_map p on (a.asset_entity_id = p.asset_id) " +
+				            "left join asset_transition t on(a.asset_entity_id = t.asset_entity_id and t.voided = 0)"+
 				            "where a.move_bundle_id = $bundleId"
             def query = new StringBuffer (countQuery)
             if ( params.location == "s" ) {
@@ -369,27 +371,28 @@ class MoveTechController {
                 query.append (" and a.target_team_id = $team" )
                 countQuery += " and a.target_team_id = $team" 
             }
-            allSize = jdbcTemplate.queryForList ( query.toString() ).size()
+            allSize = jdbcTemplate.queryForList ( query.toString() + " group by a.asset_entity_id ").size()
             if ( tab == "Todo" ) {
                 query.append (" and p.current_state_id < $stateVal")
             }
+            query.append(" group by a.asset_entity_id ")
             if( params.sort != null ){
             	if( params.sort == "source_rack" ) {
-            		query.append(" order by p.current_state_id = $holdState desc ,p.current_state_id = $ipState desc, p.current_state_id = $rdyState desc, "+
+            		query.append(" order by min(cast(t.state_to as UNSIGNED INTEGER)) = $holdState desc ,p.current_state_id = $ipState desc, p.current_state_id = $rdyState desc, "+
             					"p.current_state_id < $rdyState desc , a.$params.sort $params.order, a.source_rack_position $params.order" )
             	}else {
-            		query.append(" order by p.current_state_id = $holdState desc ,p.current_state_id = $ipState desc, p.current_state_id = $rdyState desc, "+
+            		query.append(" order by min(cast(t.state_to as UNSIGNED INTEGER)) = $holdState desc ,p.current_state_id = $ipState desc, p.current_state_id = $rdyState desc, "+
             					"p.current_state_id < $rdyState desc , a.$params.sort $params.order" )
             	}
             }else {
-            	query.append(" order by p.current_state_id = $holdState desc ,p.current_state_id = $ipState desc, p.current_state_id = $rdyState desc, "+
+            	query.append(" order by min(cast(t.state_to as UNSIGNED INTEGER)) = $holdState desc ,p.current_state_id = $ipState desc, p.current_state_id = $rdyState desc, "+
             				"p.current_state_id < $rdyState desc , a.source_rack, a.source_rack_position" )
             }
             proAssetMap = jdbcTemplate.queryForList ( query.toString() )
             todoSize = proAssetMap.size()
             proAssetMap.each {
                 if ( it.currentStateId ) {
-	                if ( it.currentStateId == holdState ) {
+	                if ( it.minstate == holdState ) {
 	                    colorCss = "asset_hold"
 	                } else if ( it.currentStateId == rdyState ) {
 	                    colorCss = "asset_ready"
@@ -406,7 +409,7 @@ class MoveTechController {
                 assetList << [ item:it, cssVal:colorCss ]
             }
             if ( tab == "All" ) {
-            	countQuery += " and p.current_state_id < $stateVal" 
+            	countQuery += " and p.current_state_id < $stateVal group by a.asset_entity_id" 
                 todoSize = jdbcTemplate.queryForList ( countQuery ).size()
                 
             }
@@ -539,8 +542,10 @@ class MoveTechController {
                             return;
                             }*/
                         }
+                        def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+                        												"where t.asset_entity_id = ${assetItem.id} and voided = 0 order by date_created desc limit 1 ")
                         projMap = ProjectAssetMap.findByAsset( assetItem )
-                        if( !projMap ) {
+                        if( !transitionStates.size() ) {
                         	flash.message = message ( code :" The asset has not yet been released " )
                         	if ( checkHome ) {
                         		redirect ( action: 'index',
@@ -556,7 +561,7 @@ class MoveTechController {
                         		return;
                         	}
                         } else {
-                        	stateVal = stateEngineService.getState( "STD_PROCESS", projMap.currentStateId )
+                        	stateVal = stateEngineService.getState( "STD_PROCESS", transitionStates[0].stateTo )
                         	if ( stateVal == "Hold" ) {
                         		flash.message = message ( code : "The asset is on Hold. Please contact manager to resolve issue." )
                         		if( checkHome ) {
@@ -590,7 +595,7 @@ class MoveTechController {
                         		}
                         	}
                         	assetComment = AssetComment.findAllByAssetEntity( assetItem )
-                        	def stateLabel = stateEngineService.getStateLabel( "STD_PROCESS", projMap.currentStateId )
+                        	def stateLabel = stateEngineService.getStateLabel( "STD_PROCESS", transitionStates[0].stateTo )
                         	render ( view:'assetSearch',
                                 model:[ projMap:projMap, assetComment:assetComment?assetComment :"", stateVal:stateVal, bundle:params.bundle, 
                                 		team:params.team, project:params.project, location:params.location, search:params.search, label:label,
@@ -701,8 +706,13 @@ class MoveTechController {
 	            def bundle = asset.moveBundle
 	            def loginTeam = ProjectTeam.findById(params.team)
 	            def actionLabel = params.actionLabel
-	            def projectAssetMap = ProjectAssetMap.findByAsset( asset ) 
-	            def currentState = stateEngineService.getState( "STD_PROCESS", projectAssetMap.currentStateId )
+	            //def projectAssetMap = ProjectAssetMap.findByAsset( asset )
+	            def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+                        										"where t.asset_entity_id = ${asset.id} and voided = 0 order by date_created desc limit 1 ")
+	            def currentState = ""
+	            if(transitionStates.size()){
+	            	currentState = stateEngineService.getState( "STD_PROCESS", transitionStates[0].stateTo )
+	            }
 	            def flags = stateEngineService.getFlags( "STD_PROCESS", "MOVE_TECH", currentState, actionLabel )
 	            def loginUser = UserLogin.findByUsername( principal )
 	            def assetComment = params.assetComment
@@ -757,14 +767,17 @@ class MoveTechController {
             def query = new StringBuffer("select a.asset_entity_id as id, a.asset_tag as assetTag, " +
 					"a.source_rack as sourceRack, a.source_rack_position as sourceRackPosition, " +
 					"a.target_rack as targetRack, a.target_rack_position as targetRackPosition, " +
+					"min(cast(t.state_to as UNSIGNED INTEGER)) as minstate, "+
 					"a.model as model, p.current_state_id as currentStateId from asset_entity a " +
+					"left join asset_transition t on(a.asset_entity_id = t.asset_entity_id and t.voided = 0) "+
 					"left join project_asset_map p on (a.asset_entity_id = p.asset_id) where a.move_bundle_id = $bundleId ")
+            
             stateVal = stateEngineService.getStateId ( "STD_PROCESS", "Cleaned" )
-            allSize = jdbcTemplate.queryForList( query.toString() ).size()
+            allSize = jdbcTemplate.queryForList( query.toString() +" group by a.asset_entity_id" ).size()
             if ( tab == "Todo" ) {
                 query.append ( " and p.current_state_id < $stateVal " )
             }
-            proAssetMap = jdbcTemplate.queryForList ( query.toString() )
+            proAssetMap = jdbcTemplate.queryForList ( query.toString() +" group by a.asset_entity_id" )
             todoSize = proAssetMap.size()
             holdState = stateEngineService.getStateIdAsInt( "STD_PROCESS", "Hold" )
             if ( params.location == "s" ) {
@@ -776,7 +789,7 @@ class MoveTechController {
             }
             proAssetMap.each {
                 if ( it.currentStateId ) {
-	                if ( it.currentStateId == holdState ) {
+	                if ( it.minstate == holdState ) {
 	                    colorCss = "asset_hold"
 	                } else if ( it.currentStateId == ipState ) {
 	                    colorCss = "asset_ready"
@@ -794,7 +807,7 @@ class MoveTechController {
                 it.cssVal
             }
             if ( tab == "All" ) {
-                query.append (" and p.current_state_id < $stateVal")
+                query.append (" and p.current_state_id < $stateVal group by a.asset_entity_id")
                 todoSize = jdbcTemplate.queryForList ( query.toString() ).size()
             }
             def assetIssueCommentList
@@ -918,8 +931,10 @@ class MoveTechController {
                             return;
                         }
                     } else {
+                    	def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+                    													"where t.asset_entity_id = ${assetItem.id} and voided = 0 order by date_created desc limit 1 ")
                         projMap = ProjectAssetMap.findByAsset( assetItem )
-                        if( !projMap ) {
+                        if( !transitionStates.size()) {
                             flash.message = message ( code : " The asset has not yet been released " )
                             if ( textSearch ) {
                                 render(view:'cleaningAssetSearch',
@@ -936,7 +951,7 @@ class MoveTechController {
                                 return;
                             }
                         } else {
-                            stateVal = stateEngineService.getState ( "STD_PROCESS", projMap.currentStateId )
+                            stateVal = stateEngineService.getState ( "STD_PROCESS", transitionStates[0].stateTo )
                             if ( stateVal == "Hold" ) {
                             	def assetIssueCommentList = AssetComment.findAll("from AssetComment ac where ac.assetEntity = ${assetItem.id} and ac.commentType = 'issue' and ac.isResolved = 0")
                             	assetIssueCommentListSize = assetIssueCommentList.size()
