@@ -30,6 +30,7 @@ class WorkflowService {
     	def verifyFlag = true
     	def message
     	def projectAssetMap = ProjectAssetMap.findByAsset( assetEntity )
+    	def stateType = stateEngineService.getStateType( process, toState )
     	if ( projectAssetMap ) {
     		currentState = projectAssetMap.currentStateId
     		def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
@@ -51,11 +52,10 @@ class WorkflowService {
 	    		//	If verification is successful then create AssetTransition and Update ProjectTeam
 	        	if ( verifyFlag ) {
 	        		def state = stateEngineService.getStateId( process, toState )
-	        		def assetTransition = new AssetTransition( stateFrom:currentState.toString(), stateTo:state, comment:comment, assetEntity:assetEntity, moveBundle:moveBundle, projectTeam:projectTeam, userLogin:userLogin )
+	        		def assetTransition = new AssetTransition( stateFrom:currentState.toString(), stateTo:state, comment:comment, assetEntity:assetEntity, moveBundle:moveBundle, projectTeam:projectTeam, userLogin:userLogin, type:stateType )
 	        		if ( !assetTransition.validate() || !assetTransition.save() ) {
 	    				message = "Unable to create AssetTransition: " + GormUtil.allErrorsString( assetTransition )
 	    			} else {
-	    				def stateType = stateEngineService.getStateType( process, toState )
 	    				def holdState = stateEngineService.getStateId( process, 'Hold' )
 	    				/* Set preexisting AssetTransitions as voided where stateTo >= new state */
 	    				setPreExistTransitionsAsVoided( process, assetEntity, state, assetTransition, stateType, holdState)
@@ -87,7 +87,7 @@ class WorkflowService {
 	        	}
 	        }
     		if ( verifyFlag ) {
-		        def assetTransition = new AssetTransition( stateFrom:state, stateTo:state, comment:comment, assetEntity:assetEntity, moveBundle:moveBundle, projectTeam:projectTeam, userLogin:userLogin )
+		        def assetTransition = new AssetTransition( stateFrom:state, stateTo:state, comment:comment, assetEntity:assetEntity, moveBundle:moveBundle, projectTeam:projectTeam, userLogin:userLogin, type:stateType )
 		        if ( !assetTransition.validate() || !assetTransition.save() ) {
 		    		message = "Unable to create AssetTransition: " + GormUtil.allErrorsString( assetTransition )
 		    	} else {

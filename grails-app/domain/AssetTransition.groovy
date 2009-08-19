@@ -13,6 +13,7 @@ class AssetTransition {
 	Date dateCreated = new Date()
 	Date lastUpdated
 	Integer voided = 0		// to place transition as voided when statusTo < new status
+	String type
 
 	static belongsTo = [ 
 		assetEntity : AssetEntity,
@@ -34,6 +35,7 @@ class AssetTransition {
 		wasSkippedTo( range:0..1, nullable:false )
 		lastUpdated( nullable:true )
 		voided( range:0..1, nullable:false )
+		type( blank:false, nullable:false )
 	}	
 	
 	static mapping  = {
