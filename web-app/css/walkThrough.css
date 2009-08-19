@@ -1,0 +1,130 @@
+body {
+   font-size:10px;
+   font-family: arial,helvetica,sans-serif;
+}
+ 
+div.title {
+   border: 1px solid #e7e7e7;
+   background: green;
+   color: white;
+   font-size:12px;
+   font-weight:bold;
+   padding-left:3px;
+   padding-bottom:2px;
+   margin: 1px 0px 2px 0px;
+}
+ 
+select, submit, input, textarea{
+   font-size:10px;
+}
+ 
+textarea {
+	width:220px;
+	height:40px;
+}
+ 
+.qvga_border {
+   border:0px solid #5276FB;
+   width:100%;
+   height:380px;
+}
+ 
+div.input_area {
+   padding: 2px;
+}
+   
+.clear {
+   clear:both;
+}
+ 
+div.gap {
+   margin-top:500px;
+}
+ 
+table {
+   border: 0px;
+   border-spacing: 0px;
+   padding:0px;
+   width:100%;
+}
+td {
+   padding: 0px;
+   margin: 0px;
+}
+th {
+   border: 1px solid #bcbcbc;
+   font-size:10px;
+}
+table.grid td {
+   border: 1px solid #bcbcbc;
+   font-size:10px;
+}
+tr.jump {
+}
+ 
+td.center {
+   text-align:center;
+}
+td.label {
+   font-size:9;
+   font-weight:bold;
+   text-align:right;
+   white-space:nowrap;
+}
+label {
+   font-size:9;
+   font-weight:bold;
+   text-align:right;
+}
+a.button {
+   border:1px outset black;
+   font-size:10px;
+   font-weight:bold;
+   background: #FCBF31;
+   color:black;
+   text-decoration: none;
+   padding-left: 3px;
+   padding-right: 3px;
+}
+ 
+a.big {
+   font-size:12px;
+   margin:6px;
+   width: 150px;
+}
+ 
+a.unselected {
+   background: #999999;
+}
+ 
+a.nav_button {
+   border:1px outset black;
+   font-weight:bold;
+   background: #FCBF31;
+   color:black;
+   text-decoration: none;
+   padding-left: 3px;
+   padding-right: 3px;
+}
+ 
+input.select {
+	font-size:10px;
+	width:120px;
+	margin:1px;
+	padding:1px;
+}
+ 
+input.text {
+	font-size:10px;
+	width:120px;
+	margin:1px;
+	padding:1px;
+}
+ 
+input.search {
+	width:60px;
+}
+.sortable a {
+	color:white;
+	text-decoration: none;
+}
