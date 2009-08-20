@@ -7,6 +7,7 @@ class WalkThroughController {
 	
 	def userPreferenceService
 	def jdbcTemplate
+	def walkThroughService
 	
     def index = { redirect(action: 'mainMenu', params: params) }
 	/*------------------------------------------------------------
@@ -41,6 +42,8 @@ class WalkThroughController {
 		def moveBundleId = params.moveBundle
 		def auditType = params.auditType
 		def sortOrder = params.sort
+		def location = params.location
+		def viewType = params.viewType
 		def locationQuery = "as location from asset_entity where move_bundle_id = $moveBundleId"
 		def locationsList
 		if(auditType == 'source'){
@@ -48,10 +51,18 @@ class WalkThroughController {
 		} else {
 			locationsList = jdbcTemplate.queryForList("select distinct target_location "+locationQuery )
 		}
-		def auditLocation = params.location
-		if( !auditLocation ){
-			auditLocation = locationsList ? locationsList[0].location : ""
-			if(auditLocation){
+		def auditLocation = ""
+		def auditBundle = getSession().getAttribute("AUDIT_BUNDLE")
+		if( location ){
+			auditLocation = location
+			getSession().setAttribute("AUDIT_LOCATION",auditLocation)
+		} else if(auditBundle != moveBundleId){
+				auditLocation = locationsList ? locationsList[0].location : ""
+				getSession().setAttribute("AUDIT_LOCATION",auditLocation)
+		}else{
+			auditLocation = getSession().getAttribute("AUDIT_LOCATION")
+			if( !auditLocation ){
+				auditLocation = locationsList ? locationsList[0].location : ""
 				getSession().setAttribute("AUDIT_LOCATION",auditLocation)
 			}
 		}
@@ -75,10 +86,9 @@ class WalkThroughController {
 			}
 			racksList = AssetEntity.executeQuery(sourceRacksListQuery,[auditLocation])
 		}
-		getSession().setAttribute("AUDIT_RACKS",racksList)
-		def sortParams = ['moveBundle':moveBundleId,'location':auditLocation,'auditType':auditType]
-    	render( view : 'rackList', model:[ locationsList : locationsList, racksList : racksList, sortParams : sortParams,
-    	                                   auditLocation : auditLocation, moveBundle : moveBundleId ] )	
+		def rackListView = walkThroughService.generateRackListView( racksList, moveBundleId, auditLocation, auditType, viewType )
+    	render( view : 'rackList', model:[ locationsList : locationsList, rackListView : rackListView, auditType:auditType,
+    	                                   auditLocation : auditLocation, moveBundle : moveBundleId, viewType : viewType ] )	
     }
     /*------------------------------------------------------------
 	 * @author : Lokanath Reddy
@@ -116,17 +126,27 @@ class WalkThroughController {
 	 *----------------------------------------------------------*/
 	def getRacksByLocation = {
 		def auditLocation = params.location
+		def viewType = params.viewType
+		def searchKey = params.searchKey
 		getSession().setAttribute("AUDIT_LOCATION",auditLocation)
 		def auditBundle = getSession().getAttribute("AUDIT_BUNDLE")
+		def auditType = getSession().getAttribute("AUDIT_TYPE")
+		def args = [auditLocation]
 		def racksList
+		
 		if(auditLocation){
-			def sourceRacksListQuery = "select a.sourceRoom, a.sourceRack, count(a.id) from AssetEntity a where a.sourceLocation = ? "+
-										"and a.moveBundle = $auditBundle group by a.sourceRoom, a.sourceRack"
-			racksList = AssetEntity.executeQuery(sourceRacksListQuery,[auditLocation])
+			def sourceRacksListQuery = new StringBuffer("select a.sourceRoom, a.sourceRack, count(a.id) from AssetEntity a "+
+					"where a.sourceLocation = ? and a.moveBundle = $auditBundle ")
+			if(searchKey){
+				searchKey = searchKey+"%"
+				sourceRacksListQuery .append(" and ( a.sourceRoom like ? or a.sourceRack like ? ) ")
+				args = [auditLocation,searchKey,searchKey]
+			}
+			sourceRacksListQuery .append("group by a.sourceRoom, a.sourceRack order by a.sourceRoom, a.sourceRack")
+			racksList = AssetEntity.executeQuery(sourceRacksListQuery.toString(),args)
 		}
-		getSession().setAttribute("AUDIT_RACKS",racksList)
-		def sortParams = ['moveBundle':auditBundle,'location':auditLocation,'auditType':getSession().getAttribute("AUDIT_TYPE")]
-		def racksDetails = [racksList:racksList, sortParams:sortParams]
-		render racksDetails as JSON
+		def rackListView = walkThroughService.generateRackListView( racksList, auditBundle, auditLocation, auditType, viewType)
+		//def racksDetails = [racksList:racksList, sortParams:sortParams]
+		render rackListView
 	}
 }
