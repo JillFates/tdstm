@@ -4,26 +4,27 @@
 <g:javascript library="prototype" />
 <g:javascript library="jquery" />
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-<link rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
+<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
 </head>
 <body>
 <DIV class=qvga_border>
 <DIV class=title>Walkthru&gt; Asset Menu</DIV>
 <DIV class=input_area>
-<DIV style="FLOAT: left"><A class=button
-	href="startMenu">Start Over</A></DIV>
-<DIV style="FLOAT: right"><A class=button
-	href="selectAsset">Asset List</A></DIV>
+<DIV style="FLOAT: left">
+	<A class=button href="startMenu">Start Over</A>
+</DIV>
+<DIV style="FLOAT: right">
+	<A class=button	href="selectAsset?moveBundle=${moveBundle}&location=${location}&room=${room}&rack=${rack}">Asset List</A>
+</DIV>
 <TABLE>
 	<TBODY>
 		<TR>
 			<TD class=label>Asset Tag:</TD>
-			<TD class=field>TW00223322</TD>
+			<TD class=field>${assetEntity?.assetTag}</TD>
 		</TR>
 		<TR>
 			<TD class=label>Asset Name:</TD>
-			<TD class=field>SAP DB SRV1</TD>
+			<TD class=field>${assetEntity?.assetName}</TD>
 		</TR>
 	</TBODY>
 </TABLE>

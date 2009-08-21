@@ -36,6 +36,21 @@ class WalkThroughController {
     }
     /*------------------------------------------------------------
 	 * @author : Lokanath Reddy
+	 * @param  : project
+	 * @return : Move Bundles list as JSON via AJAX
+	 *----------------------------------------------------------*/
+    def getBundles = {
+    	def moveBundleList
+    	def projectId = params.id
+    	if(projectId){
+    		getSession().setAttribute("AUDIT_PROJ",projectId)
+	    	def projectInstance = Project.findById( projectId )
+	    	moveBundleList = MoveBundle.findAllByProject( projectInstance )
+    	}
+    	render moveBundleList as JSON
+    }
+    /*------------------------------------------------------------
+	 * @author : Lokanath Reddy
 	 * @return : Racks list for selected Move Bundle
 	 *----------------------------------------------------------*/
     def selectRack = {
@@ -90,35 +105,6 @@ class WalkThroughController {
     	render( view : 'rackList', model:[ locationsList : locationsList, rackListView : rackListView, auditType:auditType,
     	                                   auditLocation : auditLocation, moveBundle : moveBundleId, viewType : viewType ] )	
     }
-    /*------------------------------------------------------------
-	 * @author : Lokanath Reddy
-	 * @param  : project
-	 * @return : Move Bundles list as JSON via AJAX
-	 *----------------------------------------------------------*/
-    def getBundles = {
-    	def moveBundleList
-    	def projectId = params.id
-    	if(projectId){
-    		getSession().setAttribute("AUDIT_PROJ",projectId)
-	    	def projectInstance = Project.findById( projectId )
-	    	moveBundleList = MoveBundle.findAllByProject( projectInstance )
-    	}
-    	render moveBundleList as JSON
-    }
-    /*------------------------------------------------------------
-	 * @author : Lokanath Reddy
-	 * @return : Assets list for selected Rack
-	 *----------------------------------------------------------*/
-	def selectAsset = {
-		render( view : 'assetList' )
-	}
-	/*------------------------------------------------------------
-	 * @author : Lokanath Reddy
-	 * @return : Will render Asset Menu for selected Asset
-	 *----------------------------------------------------------*/
-	def assetMenu = {
-		render( view : 'assetMenu' )	
-	}
 	/*------------------------------------------------------------
 	 * @author : Lokanath Reddy
 	 * @param  : location
@@ -148,5 +134,143 @@ class WalkThroughController {
 		def rackListView = walkThroughService.generateRackListView( racksList, auditBundle, auditLocation, auditType, viewType)
 		//def racksDetails = [racksList:racksList, sortParams:sortParams]
 		render rackListView
+	}
+    /*------------------------------------------------------------
+	 * @author : Lokanath Reddy
+	 * @param  : Bundle, location, room, rack
+	 * @return : Assets list for selected Rack
+	 *----------------------------------------------------------*/
+	def selectAsset = {
+		def moveBundle = params.moveBundle
+		def auditLocation = params.location
+		def auditRoom = params.room
+		def auditRack = params.rack
+		def sortOrder = params.sort
+		def auditType = getSession().getAttribute("AUDIT_TYPE")
+		def viewType = params.viewType
+		def assetsList
+		if(auditRoom == 'null' || auditRoom == ''){
+			auditRoom = null
+		}
+		if(auditRack == 'null' || auditRack == ''){
+			auditRack = null
+		}
+		if(auditLocation){
+			def asstesListQuery = new StringBuffer("from AssetEntity a where a.moveBundle = $moveBundle and a.sourceLocation = ? ")
+			def args = [auditLocation]
+			if(auditRoom && auditRack ){
+				asstesListQuery.append(" and a.sourceRoom = ? and a.sourceRack = ? ")
+				args = [auditLocation,auditRoom,auditRack]
+			} else if(!auditRoom && auditRack){
+				asstesListQuery.append(" and a.sourceRoom is null and a.sourceRack = ? ")
+				args = [auditLocation,auditRack]
+			} else if(auditRoom && !auditRack){
+				asstesListQuery.append(" and a.sourceRoom = ? and a.sourceRack is null")
+				args = [auditLocation,auditRoom]
+			} else {
+				asstesListQuery.append(" and a.sourceRoom is null and a.sourceRack is null")
+				args = [auditLocation]
+			}
+			if(sortOrder){
+				if(sortOrder == "assetTag"){
+					asstesListQuery.append(" order by a.assetTag $params.order")
+				} else if(sortOrder == "usize"){
+					asstesListQuery.append(" order by a.usize $params.order")
+				} else {
+					asstesListQuery.append(" order by a.sourceRackPosition $params.order")
+				}
+			} else {
+				asstesListQuery.append(" order by a.sourceRackPosition ")
+			}
+			assetsList = AssetEntity.executeQuery(asstesListQuery.toString(),args)
+		}
+		def assetsListView = walkThroughService.generateAssetListView( assetsList, auditLocation, auditType, viewType )
+    	render( view : 'assetList', model:[ assetsListView : assetsListView, params:params, auditType:auditType] )
+	}
+	/*------------------------------------------------------------
+	 * @author : Lokanath Reddy
+	 * @param  : searck Key, room , rack
+	 * @return : Will return list of assets for a search key
+	 *----------------------------------------------------------*/
+	def searchAssets = {
+		def auditLocation = getSession().getAttribute("AUDIT_LOCATION")
+		def moveBundle = getSession().getAttribute("AUDIT_BUNDLE")
+		def auditRoom = params.room
+		def auditRack = params.rack
+		def auditType = getSession().getAttribute("AUDIT_TYPE")
+		def searchKey = params.searchKey
+		def viewType = params.viewType
+		def assetsList
+		if(auditRoom == 'null' || auditRoom == ''){
+			auditRoom = null
+		}
+		if(auditRack == 'null' || auditRack == ''){
+			auditRack = null
+		}
+		if(auditLocation){
+			def asstesListQuery = new StringBuffer("from AssetEntity a where a.sourceLocation = ? ")
+			def args = [auditLocation]
+			if(searchKey){
+				searchKey = searchKey+"%"
+				asstesListQuery.append(" and ( a.assetTag like ? or a.assetName like ? ) ")
+				if(auditRoom && auditRack ){
+					asstesListQuery.append(" and a.sourceRoom = ? and a.sourceRack = ? ")
+					args = [auditLocation,searchKey,searchKey,auditRoom,auditRack]
+				} else if(!auditRoom && auditRack){
+					asstesListQuery.append(" and a.sourceRoom is null and a.sourceRack = ? ")
+					args = [auditLocation,searchKey,searchKey,auditRack]
+				} else if(auditRoom && !auditRack){
+					asstesListQuery.append(" and a.sourceRoom = ? and a.sourceRack is null")
+					args = [auditLocation,searchKey,searchKey,auditRoom]
+				} else {
+					asstesListQuery.append(" and a.sourceRoom is null and a.sourceRack is null")
+					args = [auditLocation,searchKey,searchKey]
+				}
+			} else {
+				asstesListQuery.append(" and a.moveBundle = ${moveBundle} ")
+				if(auditRoom && auditRack ){
+					asstesListQuery.append(" and a.sourceRoom = ? and a.sourceRack = ? ")
+					args = [auditLocation,auditRoom,auditRack]
+				} else if(!auditRoom && auditRack){
+					asstesListQuery.append(" and a.sourceRoom is null and a.sourceRack = ? ")
+					args = [auditLocation,auditRack]
+				} else if(auditRoom && !auditRack){
+					asstesListQuery.append(" and a.sourceRoom = ? and a.sourceRack is null")
+					args = [auditLocation,auditRoom]
+				} else {
+					asstesListQuery.append(" and a.sourceRoom is null and a.sourceRack is null")
+					args = [auditLocation]
+				}
+			}
+			asstesListQuery.append(" order by a.sourceRackPosition ")
+			assetsList = AssetEntity.executeQuery(asstesListQuery.toString(),args)
+		}
+		def assetsListView = walkThroughService.generateAssetListView( assetsList, auditLocation, auditType, viewType )
+		render assetsListView
+	}
+	/*------------------------------------------------------------
+	 * @author : Lokanath Reddy
+	 * @param  : Asset Id
+	 * @return : Will return boolean flag if asset bundle does not match with Audit bundle
+	 *----------------------------------------------------------*/
+	def confirmAssetBundle = {
+		def assetEntity = AssetEntity.findById(params.id)
+		def assetBundle = assetEntity?.moveBundle?.id
+		def auditBundle = Integer.parseInt(getSession().getAttribute("AUDIT_BUNDLE"))
+		def message = ""
+		if(assetBundle != auditBundle){
+			message = "The asset ${assetEntity?.assetName} is not part of the bundle ${assetEntity?.moveBundle}. Do you want to proceed?"
+		}
+		render message
+	}
+	/*------------------------------------------------------------
+	 * @author : Lokanath Reddy
+	 * @param  : Asset Id, Audit bundle, location, room, rack
+	 * @return : Will render Asset Menu for selected Asset
+	 *----------------------------------------------------------*/
+	def assetMenu = {
+		def assetEntity = AssetEntity.findById(params.id)
+		render(view:'assetMenu', model:[ moveBundle:params.moveBundle, location:params.location, room:params.room,
+		                                rack:params.rack, assetEntity:assetEntity ] )
 	}
 }

@@ -11,14 +11,20 @@
 	@author : Lokanath Reddy
 	@params : Racks list object as JSON
 *------------------------------------------------------------------*/
-function updateRacks( e ) {
+function updateRacks( e , type ) {
 	var racksDetails = e.responseText;
+	var result = racksDetails.indexOf("No records found")
+	if(result != -1 && type == 'search'){
+		$('#searchId').css("border","1px solid red")
+	} else {
+			$('#searchId').css("border","1px solid #ccc")
+	}
 	var racksListBody = $("#racksListBody");
 	racksListBody.html( racksDetails );
 }
 var timeInterval;
 function searchRacks(){
-	${remoteFunction(action:'getRacksByLocation', params:'\'location=\' + $(\'#locationId\').val() +\'&viewType=\'+$(\'#viewTypeId\').val() +\'&searchKey=\'+$(\'#searchId\').val()', onComplete:'updateRacks(e)')}
+	${remoteFunction(action:'getRacksByLocation', params:'\'location=\' + $(\'#locationId\').val() +\'&viewType=\'+$(\'#viewTypeId\').val() +\'&searchKey=\'+$(\'#searchId\').val()', onComplete:'updateRacks(e, \'search\')')}
 }
 </script>
 </head>
@@ -34,7 +40,7 @@ function searchRacks(){
    <td class="label">Location:</td>
    <td class="field">
       <select name="location" id="locationId" class="select"
-      	onchange="${remoteFunction(action:'getRacksByLocation', params:'\'location=\' + this.value +\'&viewType=\'+$(\'#viewTypeId\').val() ', onComplete:'updateRacks(e)')}">
+      	onchange="${remoteFunction(action:'getRacksByLocation', params:'\'location=\' + this.value +\'&viewType=\'+$(\'#viewTypeId\').val() ', onComplete:'updateRacks(e,\'location\')')}">
 	      <g:each in="${locationsList}" var="locationsList">
 	         <option value="${locationsList.location}">${locationsList.location}</option>
 	      </g:each>
@@ -44,15 +50,16 @@ function searchRacks(){
 
 <tr>
 	<td align="center" style="margin-top:8px; margin-bottom:8px;">
-		<label>View:</label> 
 		<input type="hidden" name="viewType" id="viewTypeId" value="${viewType}">
 		<input type="hidden" name="moveBundle" value="${moveBundle}">
 		<input type="hidden" name="auditType" value="${auditType}">
+		<label>View:</label>
 		<a class="button unselected" href="#" onclick="$('#viewTypeId').val('todo');$('form#selectRackForm').submit();" id="todoId">ToDo</a>
 		<a class="button" href="#" onclick="$('#viewTypeId').val('all');$('form#selectRackForm').submit();" id="allId">All</a>
 	</td>
 	<td align="right">
-		<label for="search">Search:</label><input type="text" class="text search" size=8 name="search" id="searchId"  
+		<label for="search">Search:</label>
+		<input type="text" class="text search" size=8 name="search" id="searchId"
 		onkeyup="timeInterval = setTimeout('searchRacks()',500)" onkeydown="if(timeInterval){clearTimeout(timeInterval)}"> 
 	</td>
 </tr>
