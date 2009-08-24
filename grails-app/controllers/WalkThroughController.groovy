@@ -273,4 +273,71 @@ class WalkThroughController {
 		render(view:'assetMenu', model:[ moveBundle:params.moveBundle, location:params.location, room:params.room,
 		                                rack:params.rack, assetEntity:assetEntity ] )
 	}
+    /*------------------------------------------------------------
+	 * @author : Lokanath Reddy
+	 * @param  : Asset Id
+	 * @return : Mark asset as missing Asset
+	 *----------------------------------------------------------*/
+    def missingAsset = {
+		def type = params.type
+		def assetComment
+		def assetEntity = AssetEntity.findById( params.id )
+		if(assetEntity){
+			if(type != 'create'){
+				assetComment = AssetComment.find("from AssetComment where assetEntity = ${assetEntity.id} and commentType = ? and isResolved = ? and commentCode = ?" ,['issue',0,'ASSET_MISSING'])
+				assetComment.isResolved = 1
+				assetComment.save()
+			} else {
+				assetComment = new AssetComment(commentType:'issue', assetEntity:assetEntity, isResolved:0, commentCode:'ASSET_MISSING', category:'walkthru' ).save()
+			}
+		}
+		def message = "success"
+		if(!assetComment){
+			message = "failure"
+		}
+		render message
+	}
+    /*------------------------------------------------------------
+	 * @author : Mallikarjun 
+	 * @param  : 
+	 * @return : 
+	 *----------------------------------------------------------*/
+    def validateComments = {
+		def asset = AssetEntity.findById( params.id )
+        def comment = params.comment
+        def commentType = params.commentType
+        def checkCommentQuery = new StringBuffer()
+        checkCommentQuery.append("from AssetComment where assetEntity=${asset.id} and comment='${comment}' and commentType='${commentType}'") 
+        def assetComment
+        	switch ( commentType ) {
+        		case "comment"     : assetComment = AssetComment.findAll( checkCommentQuery.toString() )
+        							 break;
+        		case "instruction" : assetComment = AssetComment.findAll( checkCommentQuery.toString() )
+        							 break;
+        		case "issue"       : assetComment = AssetComment.findAll( ( checkCommentQuery.append(" and isResolved=0 ") ).toString() )
+        							 break;
+        	}
+        def flag = []
+        	if ( assetComment.size()>0 ) {
+        		flag << false
+        	} else {
+        		flag << true
+        	}
+        render flag as JSON
+	}
+    /*------------------------------------------------------------
+	 * @author : Mallikarjun 
+	 * @param  : 
+	 * @return : 
+	 *----------------------------------------------------------*/
+    def saveComment = {
+		def asset = AssetEntity.findById( params.assetId )
+    	def assetComment = new AssetComment()
+    	assetComment.comment = params.comments
+    	assetComment.assetEntity = asset
+    	assetComment.commentType = params.saveCommentType
+    	assetComment.category = 'walkthru'
+    	assetComment.save()
+    	render( view : 'assetMenu' )
+	 }
 }

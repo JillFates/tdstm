@@ -9,12 +9,12 @@ class AuthController {
     def index = { redirect(action: 'login', params: params) }
 
     def login = {
-        def browserTest = request.getHeader("User-Agent").contains("IEMobile")
+        /*def browserTest = request.getHeader("User-Agent").contains("IEMobile")
         if(browserTest) {
             redirect(controller:'moveTech', action:'moveTechLogin')
-        } else {
+        } else {*/
             return [ username: params.username, rememberMe: (params.rememberMe != null), targetUri: params.targetUri ]
-        }
+        /*}*/
     }
 
     def signIn = {
@@ -45,8 +45,13 @@ class AuthController {
 	            /*
 	             *  call loadPreferences() to load CURR_PROJ MAP into session
 	             */
-	            userPreferenceService.loadPreferences("CURR_PROJ")	            
-	            redirect(controller:'projectUtil')
+	            userPreferenceService.loadPreferences("CURR_PROJ")
+	            def browserTest = request.getHeader("User-Agent").contains("IEMobile")
+	            if(browserTest) {
+	            	redirect(controller:'walkThrough')
+	            } else {
+	            	redirect(controller:'projectUtil')
+	            }
             }
         }
         catch (AuthenticationException ex){
