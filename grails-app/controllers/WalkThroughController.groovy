@@ -351,6 +351,12 @@ class WalkThroughController {
 						new AssetComment(assetEntity : assetEntity, isResolved : 0, commentType : 'issue', category : 'walkthru', commentCode : 'NEED_CABLES_MOVED' ).save()
 					}
 				}
+				def generalComment = params.generalComment
+				def commentDescription = generalComment.substring(0,generalComment.lastIndexOf(",") > 255 ? 255 : generalComment.lastIndexOf(","))
+				if(generalComment.lastIndexOf(",") != -1){
+					new AssetComment(assetEntity : assetEntity, commentType : 'comment', category : 'walkthru', 
+									comment : commentDescription ).save()
+				}
 				redirect(action:selectAsset,params:[moveBundle: getSession().getAttribute("AUDIT_BUNDLE"),
 				                                    location : getSession().getAttribute("AUDIT_LOCATION"),
 				                                    room : assetEntity.sourceRoom, rack : assetEntity.sourceRack ])

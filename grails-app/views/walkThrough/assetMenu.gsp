@@ -73,26 +73,27 @@ function validateCommentSelect() {
 	}
 }
 var mustSave = false;
-function setMustSave( changed, actual, type ){
+function setMustSave( changed, actual, type, attribute ){
 	if( changed != actual ) {
 		mustSave = true;
 		$("#"+type+"CompleteId").css({'background-color' : 'green', 'color' : '#FFF'});
 		$("#"+type+"SaveId").css({'background-color' : 'green', 'color' : '#FFF'});
+		$("#generalCommentId").val($("#generalCommentId").val() + attribute+" form "+actual+" to "+ changed +", " )
 	}
 }
 function moveOption( objectId, actual, type, actionType ){
-	var optionList = $('#'+objectId).attr("options");
-    var selectedIndex = $('#'+objectId).attr("selectedIndex");
+	var optionList = $('#'+objectId+'Id').attr("options");
+    var selectedIndex = $('#'+objectId+'Id').attr("selectedIndex");
     if( actionType != 'down'){
 	    if ( selectedIndex > 0) {
-	    	$('#'+objectId).attr("selectedIndex", selectedIndex-1);
+	    	$('#'+objectId+'Id').attr("selectedIndex", selectedIndex-1);
 	    }
     } else {
     	if ( selectedIndex < (optionList.length - 1) ) {
-        	$('#'+objectId).attr("selectedIndex",selectedIndex+1);
+        	$('#'+objectId+'Id').attr("selectedIndex",selectedIndex+1);
         }
     }
-    setMustSave( $('#'+objectId).val(), actual, type )
+    setMustSave( $('#'+objectId+'Id').val(), actual, type ,objectId )
 }
 </script>
 </head>
@@ -104,6 +105,7 @@ function moveOption( objectId, actual, type, actionType ){
 		<div class=input_area>
 		<input type="hidden" name="id" value="${assetEntity.id}" />
 		<input type="hidden" name="submitType" id="submitTypeId">
+		<input type="hidden" name="generalComment" id="generalCommentId" value="Asset changed: ">
 		<div style="FLOAT: left"><a class=button href="startMenu">Start Over</a></div>
 		<div style="FLOAT: right"><a class=button href="selectAsset?moveBundle=${moveBundle}&location=${location}&room=${room}&rack=${rack}">Asset List</a></div>
 		<table>
@@ -156,7 +158,7 @@ function moveOption( objectId, actual, type, actionType ){
 				<td class="label">Asset Name:</td>
 				<td class="field">
 					<input type="text" class="text" name="assetName" value="${assetEntity?.assetName}" size=20 maxsize=50 
-							onchange="setMustSave(this.value,'${assetEntity?.assetName}','front1')">
+							onchange="setMustSave(this.value,'${assetEntity?.assetName}','front1', this.name)">
 				</td>
 			</tr>
 			
@@ -164,42 +166,50 @@ function moveOption( objectId, actual, type, actionType ){
 				<td class="label">Serial #:</td>
 				<td class="field">
 					<input type="text" class="text" name="serialNumber" value="${assetEntity?.serialNumber}" size=20 maxsize=50 
-							onchange="setMustSave(this.value,'${assetEntity?.serialNumber}','front1')">
+							onchange="setMustSave(this.value,'${assetEntity?.serialNumber}','front1', this.name)">
 				</td>
 			</tr>
 			
 			<tr>
 				<td class="label">Device Type:</td>
 				<td class="field">
-				<select id="deviceTypeId" name="kvmDevice" onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1')">
+				<select id="deviceTypeId" name="kvmDevice" onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name)">
 			            <option value="${assetEntity?.kvmDevice}">${assetEntity?.kvmDevice}</option>
 			    </select>
+				<!-- <refcode:select domain="KvmDevice" noSelection=['':''] id="deviceTypeId" name="kvmDevice" value="${assetEntity?.kvmDevice}" 
+						onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name)"/> -->
 			</tr>
 			
 			<tr>
 				<td class="label">Manufacturer:</td>
 				<td class="field">
-				<select id="manufacturerId" name="manufacturer" onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1')">
+				<select id="manufacturerId" name="manufacturer" onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name)">
 			            <option value="${assetEntity?.manufacturer}">${assetEntity?.manufacturer}</option>
 				</select>
+			<!-- 	<refcode:select domain="Manufacturer" noSelection=['':''] id="manufacturerId" name="manufacturer" value="${assetEntity?.manufacturer}"
+						onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name)"/> -->
 				</td>
 			</tr>
 			
 			<tr>
 				<td class="label">Model:</td>
 				<td class="field">
-				<select id="modelId" name="model" onchange="setMustSave(this.value,'${assetEntity?.model}','front1')">
+				<select id="modelId" name="model" onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)">
 			            <option value="${assetEntity?.model}">${assetEntity?.model}</option>
 				</select>
+				<!-- <refcode:select domain="Model" noSelection=['':''] id="modelId" name="model" value="${assetEntity?.model}" 
+						onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)"/> -->
 				</td>
 			</tr>
 			
 			<tr>
 				<td class="label">Rails:</td>
 				<td class="field">
-				<select id="railTypeId" name="railType" onchange="setMustSave(this.value,'${assetEntity?.railType}','front1')">
+				<select id="railTypeId" name="railType" onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)">
 			            <option value="${assetEntity?.railType}">${assetEntity?.railType}</option>
 				</select>
+				<!-- <refcode:select domain="RailType" noSelection=['':''] id="railTypeId" name="railType" value="${assetEntity?.railType}" 
+				onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)"/> -->
 				</td>
 			</tr>
 			</table>
@@ -236,9 +246,9 @@ function moveOption( objectId, actual, type, actionType ){
 				<td class="label">U-Position:</td>
 				<td class="field" nowrap>
 				<g:select name="sourceRackPosition" from="${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,'Undefined']}" 
-							id="sourceRackPositionId" value="${assetEntity?.sourceRackPosition}" onchange="setMustSave(this.value,'${assetEntity?.sourceRackPosition}','front2')"/>
-				<img src="${createLinkTo(dir:'images',file:'arrow_blue_up.png')}" height="18" onclick="moveOption('sourceRackPositionId','${assetEntity?.sourceRackPosition}','front2','up')"/>
-				<img src="${createLinkTo(dir:'images',file:'arrow_blue_down.png')}" height="18" onclick="moveOption('sourceRackPositionId','${assetEntity?.sourceRackPosition}','front2','down')"/>
+							id="sourceRackPositionId" value="${assetEntity?.sourceRackPosition}" onchange="setMustSave(this.value,'${assetEntity?.sourceRackPosition}','front2', this.namevv)"/>
+				<img src="${createLinkTo(dir:'images',file:'arrow_blue_up.png')}" height="18" onclick="moveOption('sourceRackPosition','${assetEntity?.sourceRackPosition}','front2','up')"/>
+				<img src="${createLinkTo(dir:'images',file:'arrow_blue_down.png')}" height="18" onclick="moveOption('sourceRackPosition','${assetEntity?.sourceRackPosition}','front2','down')"/>
 				</td>
 			</tr>
 			
@@ -246,9 +256,9 @@ function moveOption( objectId, actual, type, actionType ){
 				<td class="label">U-Size:</td>
 				<td class="field">
 				<g:select name="usize" from="${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,'Undefined']}"   
-							id="usizeId" value="${assetEntity?.usize}" onchange="setMustSave(this.value,'${assetEntity?.usize}','front2')"/>
-				<img src="${createLinkTo(dir:'images',file:'arrow_blue_up.png')}" height="18" onclick="moveOption('usizeId','${assetEntity?.usize}','front2','up')"/>
-				<img src="${createLinkTo(dir:'images',file:'arrow_blue_down.png')}" height="18" onclick="moveOption('usizeId','${assetEntity?.usize}','front2','down')"/>
+							id="usizeId" value="${assetEntity?.usize}" onchange="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)"/>
+				<img src="${createLinkTo(dir:'images',file:'arrow_blue_up.png')}" height="18" onclick="moveOption('usize','${assetEntity?.usize}','front2','up')"/>
+				<img src="${createLinkTo(dir:'images',file:'arrow_blue_down.png')}" height="18" onclick="moveOption('usize','${assetEntity?.usize}','front2','down')"/>
 				</td>
 			</tr>
 			
@@ -321,7 +331,7 @@ function moveOption( objectId, actual, type, actionType ){
 			<td class="label">PDU Qty/Type:</td>
 			<td class="field">
 			<g:select name="powerPort" from="${[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,24,32,40,48,56,64,72,80,88,96]}" value="${assetEntity?.powerPort}"
-				onchange="setMustSave(this.value,'${assetEntity?.powerPort}','rear')"/>
+				onchange="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)"/>
 			&nbsp;&nbsp;
 		        <select>
 		            <option>C13
@@ -336,9 +346,9 @@ function moveOption( objectId, actual, type, actionType ){
 			<td class="label">NIC Qty:</td>
 			<td class="field">
 			<g:select name="nicPort" from="${[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,24,32,40,48,56,64,72,80,88,96]}" value="${assetEntity?.nicPort}"
-						id="nicPortId" onchange="setMustSave(this.value,'${assetEntity?.nicPort}','rear')"/>
-		     	<img src="${createLinkTo(dir:'images',file:'arrow_blue_up.png')}" height="18" onclick="moveOption('nicPortId','${assetEntity?.nicPort}','rear','up')"/>
-			 	<img src="${createLinkTo(dir:'images',file:'arrow_blue_down.png')}" height="18" onclick="moveOption('nicPortId','${assetEntity?.nicPort}','rear','down')"/>
+						id="nicPortId" onchange="setMustSave(this.value,'${assetEntity?.nicPort}','rear', this.name)"/>
+		     	<img src="${createLinkTo(dir:'images',file:'arrow_blue_up.png')}" height="18" onclick="moveOption('nicPort','${assetEntity?.nicPort}','rear','up')"/>
+			 	<img src="${createLinkTo(dir:'images',file:'arrow_blue_down.png')}" height="18" onclick="moveOption('nicPort','${assetEntity?.nicPort}','rear','down')"/>
 			</td>
 		</tr>
 		
@@ -346,7 +356,7 @@ function moveOption( objectId, actual, type, actionType ){
 			<td class="label">Fiber Qty/Type:</td>
 			<td class="field">
 				<g:select name="hbaPort" from="${[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,24,32,40,48,56,64,72,80,88,96]}" value="${assetEntity?.hbaPort}"
-						onchange="setMustSave(this.value,'${assetEntity?.hbaPort}','rear')"/>
+						onchange="setMustSave(this.value,'${assetEntity?.hbaPort}','rear', this.name)"/>
 		        &nbsp;&nbsp;
 			<select>
 		            <option>LC
