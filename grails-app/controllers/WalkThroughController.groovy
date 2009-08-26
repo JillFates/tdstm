@@ -1,4 +1,5 @@
 import grails.converters.JSON
+import org.jsecurity.SecurityUtils
 /*------------------------------------------------------------
  * Controller for Walk Through Process
  * @author : Lokanath Reddy
@@ -8,6 +9,7 @@ class WalkThroughController {
 	def userPreferenceService
 	def jdbcTemplate
 	def walkThroughService
+	def workflowService
 	
     def index = { redirect(action: 'mainMenu', params: params) }
 	/*------------------------------------------------------------
@@ -270,8 +272,14 @@ class WalkThroughController {
 	 *----------------------------------------------------------*/
 	def assetMenu = {
 		def assetEntity = AssetEntity.findById(params.id)
+		def query = "from AssetComment where assetEntity = ${assetEntity.id} and commentType = ? and isResolved = ? and commentCode = ?"
+		def commentCodes = [needAssetTag : AssetComment.find(query,["issue", 0, "NEED_ASSET_TAG"])?.commentCode,
+		                    amberLights : AssetComment.find(query,["issue", 0, "AMBER_LIGHTS"])?.commentCode,
+		                    stackedOnTop : AssetComment.find(query,["issue", 0, "STACKED_ON_TOP"])?.commentCode,
+		                    poweredOff : AssetComment.find(query,["issue", 0, "POWERED_OFF"])?.commentCode,
+		                    cablesMoved : AssetComment.find(query,["issue", 0, "NEED_CABLES_MOVED"])?.commentCode]
 		render(view:'assetMenu', model:[ moveBundle:params.moveBundle, location:params.location, room:params.room,
-		                                rack:params.rack, assetEntity:assetEntity ] )
+		                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes ] )
 	}
     /*------------------------------------------------------------
 	 * @author : Lokanath Reddy
@@ -296,6 +304,64 @@ class WalkThroughController {
 			message = "failure"
 		}
 		render message
+	}
+    /*------------------------------------------------------------
+	 * @author : Lokanath Reddy
+	 * @param  : Asset properties
+	 * @return : Will do the Save and Complete for Front/Rear audit
+	 *----------------------------------------------------------*/
+    def saveAndCompleteAudit = {
+		def assetEntity = AssetEntity.get( params.id )
+		if( assetEntity ){
+			assetEntity.properties = params
+			if(!assetEntity.hasErrors() && assetEntity.save() ) {
+				if(params.submitType != "save"){
+					def principal = SecurityUtils.subject.principal
+			    	def loginUser = UserLogin.findByUsername(principal)
+					def transactionStatus = workflowService.createTransition(assetEntity.project.workflowCode,"SUPERVISOR", "SourceWalkthru", assetEntity, assetEntity.moveBundle, loginUser, null, "" )
+				}
+				def query = "from AssetComment where assetEntity = ${assetEntity.id} and commentType = ? and isResolved = ? and commentCode = ?"
+				if(params.needAssetTag == "Y"){
+					def needAssetTagComment = AssetComment.find(query, ["issue", 0, "NEED_ASSET_TAG"])
+					if(!needAssetTagComment){
+						new AssetComment(assetEntity : assetEntity, isResolved : 0, commentType : 'issue', category : 'walkthru', commentCode : 'NEED_ASSET_TAG').save()
+					}
+				}
+				if(params.hasAmber == "Y"){
+					def hasAmberComment = AssetComment.find(query, ["issue", 0, "AMBER_LIGHTS"])
+					if(!hasAmberComment){
+						new AssetComment(assetEntity : assetEntity, isResolved : 0, commentType : 'issue', category : 'walkthru', commentCode : 'AMBER_LIGHTS' ).save()
+					}
+				}
+				if(params.stuffOnTop == "Y"){
+					def stuffOnTopComment = AssetComment.find(query, ["issue", 0, "STACKED_ON_TOP"])
+					if(!stuffOnTopComment){
+						new AssetComment(assetEntity : assetEntity, isResolved : 0, commentType : 'issue', category : 'walkthru', commentCode : 'STACKED_ON_TOP' ).save()
+					}
+				}
+				if(params.poweredOff == "Y"){
+					def poweredOffComment = AssetComment.find(query, ["issue", 0, "POWERED_OFF"])
+					if(!poweredOffComment){
+						new AssetComment(assetEntity : assetEntity, isResolved : 0, commentType : 'issue', category : 'walkthru', commentCode : 'POWERED_OFF' ).save()
+					}
+				}
+				if(params.moveCables == "Y"){
+					def moveCablesComment = AssetComment.find(query, ["issue", 0, "NEED_CABLES_MOVED"])
+					if(!moveCablesComment){
+						new AssetComment(assetEntity : assetEntity, isResolved : 0, commentType : 'issue', category : 'walkthru', commentCode : 'NEED_CABLES_MOVED' ).save()
+					}
+				}
+				redirect(action:selectAsset,params:[moveBundle: getSession().getAttribute("AUDIT_BUNDLE"),
+				                                    location : getSession().getAttribute("AUDIT_LOCATION"),
+				                                    room : assetEntity.sourceRoom, rack : assetEntity.sourceRack ])
+			} else {
+				redirect(action:selectAsset,params:[id : assetEntity.id ])
+			}
+		} else {
+			redirect(action:selectAsset,params:[moveBundle: getSession().getAttribute("AUDIT_BUNDLE"),
+			                                    location : getSession().getAttribute("AUDIT_LOCATION"),
+			                                    room : assetEntity.sourceRoom, rack : assetEntity.sourceRack ])
+		}
 	}
     /*------------------------------------------------------------
 	 * @author : Mallikarjun 
