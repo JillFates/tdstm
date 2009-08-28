@@ -34,7 +34,7 @@ class WalkThroughController {
     		userPreferenceService.loadPreferences("CURR_PROJ")
     		currProj = session.getAttribute("CURR_PROJ")?.CURR_PROJ
     	}
-    	render( view : 'startMenu', model:[ currProj : currProj, currBundle : currBundle ])	
+    	render( view : 'startMenu', model:[ currProj : currProj, currBundle : currBundle ] )	
     }
     /*------------------------------------------------------------
 	 * @author : Lokanath Reddy
@@ -272,6 +272,11 @@ class WalkThroughController {
 	 *----------------------------------------------------------*/
 	def assetMenu = {
 		def assetEntity = AssetEntity.findById(params.id)
+		def walkthruComments = []
+		def walkthruCommentsCount = Integer.parseInt(message ( code: "walkthru.defComment.count" ))
+		for ( int i=1; i<=walkthruCommentsCount; i++ ) {
+			walkthruComments << message ( code: "walkthru.defComment.${i}" )
+		}
 		def query = "from AssetComment where assetEntity = ${assetEntity.id} and commentType = ? and isResolved = ? and commentCode = ?"
 		def commentCodes = [needAssetTag : AssetComment.find(query,["issue", 0, "NEED_ASSET_TAG"])?.commentCode,
 		                    amberLights : AssetComment.find(query,["issue", 0, "AMBER_LIGHTS"])?.commentCode,
@@ -279,7 +284,7 @@ class WalkThroughController {
 		                    poweredOff : AssetComment.find(query,["issue", 0, "POWERED_OFF"])?.commentCode,
 		                    cablesMoved : AssetComment.find(query,["issue", 0, "NEED_CABLES_MOVED"])?.commentCode]
 		render(view:'assetMenu', model:[ moveBundle:params.moveBundle, location:params.location, room:params.room,
-		                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes ] )
+		                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
 	}
     /*------------------------------------------------------------
 	 * @author : Lokanath Reddy
@@ -371,45 +376,80 @@ class WalkThroughController {
 	}
     /*------------------------------------------------------------
 	 * @author : Mallikarjun 
-	 * @param  : 
-	 * @return : 
+	 * @return : comments validation 
 	 *----------------------------------------------------------*/
     def validateComments = {
 		def asset = AssetEntity.findById( params.id )
         def comment = params.comment
         def commentType = params.commentType
-        def checkCommentQuery = new StringBuffer()
-        checkCommentQuery.append("from AssetComment where assetEntity=${asset.id} and comment='${comment}' and commentType='${commentType}'") 
-        def assetComment
-        	switch ( commentType ) {
-        		case "comment"     : assetComment = AssetComment.findAll( checkCommentQuery.toString() )
-        							 break;
-        		case "instruction" : assetComment = AssetComment.findAll( checkCommentQuery.toString() )
-        							 break;
-        		case "issue"       : assetComment = AssetComment.findAll( ( checkCommentQuery.append(" and isResolved=0 ") ).toString() )
-        							 break;
-        	}
-        def flag = []
-        	if ( assetComment.size()>0 ) {
-        		flag << false
-        	} else {
-        		flag << true
-        	}
-        render flag as JSON
+        def checkCommentQuery = new StringBuffer("from AssetComment where assetEntity=${asset.id} and "+
+        						"comment='${comment}' and commentType='${commentType}'")
+        if(commentType == "issue"){
+        	checkCommentQuery.append(" and isResolved=0 ")
+        }
+		def assetComment = AssetComment.findAll( checkCommentQuery.toString() )
+        def flag = true
+        if ( assetComment ) {
+        	flag = false
+        }
+        render flag
 	}
     /*------------------------------------------------------------
 	 * @author : Mallikarjun 
-	 * @param  : 
-	 * @return : 
+	 * @return : save new comment
 	 *----------------------------------------------------------*/
     def saveComment = {
-		def asset = AssetEntity.findById( params.assetId )
+    	def principal = SecurityUtils.subject.principal
+    	def loginUser = UserLogin.findByUsername ( principal )
+		def asset = AssetEntity.findById( params.id )
     	def assetComment = new AssetComment()
-    	assetComment.comment = params.comments
+    	assetComment.comment = params.comment
     	assetComment.assetEntity = asset
-    	assetComment.commentType = params.saveCommentType
+    	assetComment.commentType = params.commentType
     	assetComment.category = 'walkthru'
+    	assetComment.createdBy = loginUser.person
     	assetComment.save()
-    	render( view : 'assetMenu' )
 	 }
+	
+ /*------------------------------------------------------------
+  * @author : Mallikarjun 
+  * @param  : commentsList
+  * @return : Will return comment list view as string
+  *----------------------------------------------------------*/
+  def getComments = {
+      def assetEntity = AssetEntity.findById( params.id )
+	  def assetCommentsList
+	  if ( params.commentType != 'all' ) {
+		  assetCommentsList = AssetComment.findAll(" from AssetComment where assetEntity=${assetEntity.id} and commentType='${params.commentType}' order by ${params.orderType} ${params.sort}")
+	  } else {
+		  assetCommentsList = AssetComment.findAll(" from AssetComment where assetEntity=${assetEntity.id} order by ${params.orderType} ${params.sort}")
+	  }
+		
+	 def commentListSize = assetCommentsList.size()
+	 def commentListView = new StringBuffer()
+	 if ( assetCommentsList ) {
+		 for ( int i=0; i<commentListSize; i++ ) {
+			 switch ( assetCommentsList[i].commentType ) {
+			 	case "comment" 		: commentListView.append("<TR><TD>Cmnt</TD>")
+										  commentListView.append("<TD>${assetCommentsList[i].comment}</TD><TD>&nbsp;</TD></TR>")
+									 	  break;
+				case "instruction" 	: commentListView.append("<TR><TD>Inst</TD>")
+										  commentListView.append("<TD>${assetCommentsList[i].comment}</TD><TD>&nbsp;</TD></TR>")
+										  break;
+				case "issue" 		: commentListView.append("<TR><TD>Iss</TD>")
+										  if ( assetCommentsList[i].isResolved == 1 ) {
+											  commentListView.append("<TD>${assetCommentsList[i].comment}</TD><TD><input type='checkbox' checked disabled></TD></TR>")
+										  } else {
+											  commentListView.append("<TD>${assetCommentsList[i].comment}</TD><TD><input type='checkbox' disabled></TD></TR>")
+										  }
+								   		  break;
+						
+			}
+				
+		}
+	} else {
+		commentListView.append("<TR><TD colSpan=3 align=middle style='color: red;font-weight: bold;'>No records found</TD></TR>")
+	}
+	render commentListView.toString()
+  }
 }

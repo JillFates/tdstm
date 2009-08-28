@@ -3,8 +3,10 @@
 <title>Walkthru&gt; Select Asset</title>
 <g:javascript library="prototype" />
 <g:javascript library="jquery" />
+<jq:plugin name="jquery.contextMenu"/>
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.contextMenu.css')}" />
 <script type="text/javascript">
 $(document).ready( function() {
 	// Show menu when #myDiv is clicked
@@ -13,7 +15,8 @@ $(document).ready( function() {
 	},
 	function(action) {
 		$('#selectCmt').val(action);
-		$('form#commentsViewForm').attr({action: 'issuesandcommentsview'}).submit();
+		$('#sort').val('desc');
+		${remoteFunction(action:'getComments', params:'\'id=\' + $(\'#assetId\').val() +\'&commentType=\'+$(\'#selectCmt\').val() +\'&sort=\'+$(\'#sort\').val() +\'&orderType=\'+$(\'#orderType\').val()', onComplete:'updateViewComment( e )')};
 	});
 });
 function missingAsset( type, id, message ){
@@ -42,21 +45,9 @@ function commentSelect( cmtVal ) {
     
 function callUpdateComment( e, type ) {
 	var data = eval('(' + e.responseText + ')');
-	if ( data == "true" ) {
-		switch ( type ) {
-			case 'comment'  	: $('#saveCommentType').val(type);
-							 	  $('form#commentForm').attr({action: "saveComment"}).submit();
-								  break;
-    								  
-			case 'instruction' 	: $('#saveCommentType').val(type);
-								  $('form#commentForm').attr({action: "saveComment"}).submit();
-   								  break;
-								  
-			case 'issue' 		: $('#saveCommentType').val(type);
-							      $('form#commentForm').attr({action: "saveComment"}).submit();
-							      break;
-		}
-	return true;
+	if ( data ) {
+		${remoteFunction(action:'saveComment', params:'\'id=\' + $(\'#assetId\').val() +\'&comment=\'+$(\'#comments\').val() +\'&commentType=\'+type', onComplete:'callAssetMenu()')};
+		return true;
 	} else {
 		alert( type +" already exists. " );
 		return false;
@@ -94,6 +85,38 @@ function moveOption( objectId, actual, type, actionType ){
         }
     }
     setMustSave( $('#'+objectId+'Id').val(), actual, type ,objectId )
+}
+
+function callAssetMenu() {
+	$('#selectCmts').val('');
+	$('#comments').val('');
+	location.href = "#asset_menu";
+}
+
+function populateComments() {
+	$('#selectCmt').val('all');
+	$('#sort').val('desc');
+	$('#orderType').val('commentType');
+	${remoteFunction(action:'getComments', params:'\'id=\' + $(\'#assetId\').val() +\'&commentType=\'+$(\'#selectCmt\').val() +\'&sort=\'+$(\'#sort\').val() +\'&orderType=\'+$(\'#orderType\').val()', onComplete:'updateViewComment( e )')};
+}
+
+function updateViewComment( e ) {
+	var assetComments = e.responseText;
+	var commentTbody = $('#listCommentsTbodyId');
+	$('#selectCmts').val('');
+	$('#comments').val('');
+	commentTbody.html( assetComments );
+}
+
+function sortCommentList(orderType) {
+	var sortOrder = $('#sort').val();
+	$('#orderType').val(orderType);
+	if ( sortOrder == 'desc') {
+		$('#sort').val('asc');
+	} else {
+		$('#sort').val('desc');
+	}
+	${remoteFunction(action:'getComments', params:'\'id=\' + $(\'#assetId\').val() +\'&commentType=\'+$(\'#selectCmt\').val() +\'&sort=\'+$(\'#sort\').val() +\'&orderType=\'+$(\'#orderType\').val()', onComplete:'updateViewComment( e )')};
 }
 </script>
 </head>
@@ -427,22 +450,21 @@ function moveOption( objectId, actual, type, actionType ){
 		<g:form name="commentForm">	
 			<table>
 			<tr>
-				<input type="hidden" name="id" id="assetId" value="${assetEntity.id}" />
+				<input type="hidden" name="assetId" id="assetId" value="${assetEntity.id}" />
 				<input type="hidden" name="commentType" id="commentType" value="comment" />
 				<input type="hidden" name="instructionType" id="instructionType" value="instruction" />
 				<input type="hidden" name="issueType" id="issueType" value="issue" />
-				<input type="hidden" name="saveCommentType" id="saveCommentType" value="issue" />
 				<td class="label">Asset Tag:</td>
 				<td class="field">${assetEntity.assetTag}</td>
 			</tr>
 			</table>
-			<select name="selectCmt" style="width: 200px;" onChange="return commentSelect(this.value);">
-				<option value="Select Common Comment">Select Common Comment</option>
-				<option value="No Cables">No Cables</option>
-				<option value="Screwed into rack">Screwed into rack</option>
-				<option value="Take screws and rack clips">Take screws and rack clips</option>
+			<select id="selectCmts" name="selectCmts" style="width: 200px;" onChange="return commentSelect(this.value);">
+					<option value="">Select Common Comment</option>
+				<g:each in="${walkthruComments}" status="i" var="messages">
+    				<option value="${messages}">${messages}</option>
+				</g:each>
 			</select>
-			<br />
+			<br/>
 			
 			<textarea name="comments" id="comments" rows="6" cols="8" value=""></textarea>
 			</textarea>
@@ -452,15 +474,15 @@ function moveOption( objectId, actual, type, actionType ){
 			<label>Save As:</label>
 			<br />
 			<div style="float:center;">
-			   	<a class="button" href="#" onclick="var booConfirm = validateCommentSelect();if(booConfirm)${remoteFunction(action:'validateComments', params:'\'id=\' + $(\'#assetId\').val() +\'&comment=\'+$(\'#comments\').val() +\'&commentType=\'+$(\'#commentType\').val()', onComplete:'callUpdateComment( e, \'comment\' )')}">COMMENT</a>&nbsp;&nbsp;
-				<a class="button" href="#" onclick="var booConfirm = validateCommentSelect();if(booConfirm)${remoteFunction(action:'validateComments', params:'\'id=\' + $(\'#assetId\').val() +\'&comment=\'+$(\'#comments\').val() +\'&commentType=\'+$(\'#instructionType\').val()', onComplete:'callUpdateComment( e, \'instruction\' )')}">INSTRUCTION</a>&nbsp;&nbsp;
-				<a class="button" href="#" onclick="var booConfirm = validateCommentSelect();if(booConfirm)${remoteFunction(action:'validateComments', params:'\'id=\' + $(\'#assetId\').val() +\'&comment=\'+$(\'#comments\').val() +\'&commentType=\'+$(\'#issueType\').val()', onComplete:'callUpdateComment( e, \'issue\' )')}">ISSUE</a>
+			   	<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm)${remoteFunction(action:'validateComments', params:'\'id=\' + $(\'#assetId\').val() +\'&comment=\'+$(\'#comments\').val() +\'&commentType=\'+$(\'#commentType\').val()', onComplete:'callUpdateComment( e, \'comment\' )')}">COMMENT</a>&nbsp;&nbsp;
+				<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm)${remoteFunction(action:'validateComments', params:'\'id=\' + $(\'#assetId\').val() +\'&comment=\'+$(\'#comments\').val() +\'&commentType=\'+$(\'#instructionType\').val()', onComplete:'callUpdateComment( e, \'instruction\' )')}">INSTRUCTION</a>&nbsp;&nbsp;
+				<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm)${remoteFunction(action:'validateComments', params:'\'id=\' + $(\'#assetId\').val() +\'&comment=\'+$(\'#comments\').val() +\'&commentType=\'+$(\'#issueType\').val()', onComplete:'callUpdateComment( e, \'issue\' )')}">ISSUE</a>
 			</div>
 			<br class="clear"/>
 			
 			<br />
 			
-			<a class="button" href="#view_comments">View Issues &amp; Comments</a>
+			<a class="button" href="#view_comments" onclick="populateComments();">View Issues &amp; Comments</a>
 		</g:form>
 		</div>
 		</div>
@@ -477,14 +499,17 @@ function moveOption( objectId, actual, type, actionType ){
 		<div style="float:right;"><a class="button" href="#comments">Issues&amp;Comments</a></div>
 		<br class="clear"/>
 		<g:form action="issuesandcommentsview" name="commentsViewForm">
-		<input type="hidden" name="selectCmt" id="selectCmt" value=""/>
+		<input type="hidden" name="selectCmt" id="selectCmt" value="all"/>
+		<input type="hidden" name="sort" id="sort" value"desc"/>
+		<input type="hidden" name="orderType" id="orderType" value"commentType"/>
 		<table>
-		<tbody>
+		
 			<tr>
-				<g:sortableColumn id="selector" property="commentType" title="Type" params="['selectCmt':cmt,'assetId':assetId]"/>
-				<g:sortableColumn  property="comment" title="Text" params="['selectCmt':cmt,'assetId':assetId]"/>
+			    <th id="selector" onclick="sortCommentList('commentType');">Type</th>
+				<th onclick="sortCommentList('comment');">Text</th>
 				<th>Rsvld</th>
 			</tr>
+		<tbody id="listCommentsTbodyId">
 			<g:each in="${AssetComment.findAll('from AssetComment where assetEntity = '+ assetEntity?.id +' order by commentType')}" status="i" var="assetCommentsInstance">
 				<g:if test="${assetCommentsInstance.commentType == 'issue'}">
 				<tr><td>Iss</td><td>${assetCommentsInstance.comment}</td><td>
@@ -502,12 +527,19 @@ function moveOption( objectId, actual, type, actionType ){
 				<g:else>
 					<tr><td>Inst</td><td>${assetCommentsInstance.comment}</td><td>&nbsp;</td></tr>
 				</g:else>
-			</g:each>
-		
+			</g:each>		
 		</tbody>
 		</table>
 		</g:form>
 		<div class="gap"></div>
+				<div>
+		<ul id="myMenu" class="contextMenu">
+			<li><a href="#all">All</a></li>
+			<li><a href="#comment">Comment</a></li>
+			<li><a href="#instruction">Instruction</a></li>
+			<li><a href="#issue">Issue</a></li>
+		</ul>	
+		</div>
 	<script type="text/javascript">
 	if('${commentCodes.needAssetTag}'){
 		$("#needAssetTagYes").attr("checked",true)
