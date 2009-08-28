@@ -444,6 +444,34 @@ class BootStrap {
 		// This line was causing RTE because table is not created
 		def attributeSet = new EavAttributeSet( attributeSetName:'Server', entityType:entityType, sortOrder:10 ).save()
 		//---------------------------------
+		//  Create Models
+		//---------------------------------
+		println "MODEL"
+		def refCodeList = [
+            [ "model", "Workstation B2600", 0 ],
+            [ "model", "7028-6C4", 0 ],
+            [ "model", "KVM", 0 ],
+            [ "manufacturer", "AutoView 3100", 0 ],
+            [ "manufacturer", "Proliant 1600R", 0 ],
+            [ "kvmDevice", "V490", 0 ],
+            [ "kvmDevice", "Proliant DL380 G3", 0 ],
+            [ "railType", "StorageWorks", 0 ],
+            [ "railType", "Ultrium Tape", 0 ]
+		]
+		refCodeList.each {
+			def refCode = new RefCode(
+				domain: it[0],
+				value: it[1],
+				sortOrder : it[2]
+			)
+			if ( !refCode.validate() || !refCode.save() ) {
+				def etext = "Unable to create refCode" +
+                GormUtil.allErrorsString( refCode )
+				println etext
+				log.error( etext )
+			}
+		}
+		//---------------------------------
 		//  Create Asset Entity
 		//---------------------------------
 		println "ASSET ENTITY"

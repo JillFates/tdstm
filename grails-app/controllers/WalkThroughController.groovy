@@ -357,8 +357,8 @@ class WalkThroughController {
 					}
 				}
 				def generalComment = params.generalComment
-				def commentDescription = generalComment.substring(0,generalComment.lastIndexOf(",") > 255 ? 255 : generalComment.lastIndexOf(","))
 				if(generalComment.lastIndexOf(",") != -1){
+					def commentDescription = generalComment.substring(0,generalComment.lastIndexOf(",") > 255 ? 255 : generalComment.lastIndexOf(","))
 					new AssetComment(assetEntity : assetEntity, commentType : 'comment', category : 'walkthru', 
 									comment : commentDescription ).save()
 				}
@@ -383,12 +383,12 @@ class WalkThroughController {
         def comment = params.comment
         def commentType = params.commentType
         def checkCommentQuery = new StringBuffer("from AssetComment where assetEntity=${asset.id} and "+
-        						"comment='${comment}' and commentType='${commentType}'")
+        						"comment= ? and commentType='${commentType}'")
         if(commentType == "issue"){
         	checkCommentQuery.append(" and isResolved=0 ")
         }
-		def assetComment = AssetComment.findAll( checkCommentQuery.toString() )
-        def flag = true
+		def assetComment = AssetComment.findAll( checkCommentQuery.toString(), [ comment ] )
+		def flag = true
         if ( assetComment ) {
         	flag = false
         }

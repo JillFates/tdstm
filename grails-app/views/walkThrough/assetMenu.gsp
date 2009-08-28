@@ -46,7 +46,7 @@ function commentSelect( cmtVal ) {
 function callUpdateComment( e, type ) {
 	var data = eval('(' + e.responseText + ')');
 	if ( data ) {
-		${remoteFunction(action:'saveComment', params:'\'id=\' + $(\'#assetId\').val() +\'&comment=\'+$(\'#comments\').val() +\'&commentType=\'+type', onComplete:'callAssetMenu()')};
+		${remoteFunction(action:'saveComment', params:'\'id=\' + $(\'#assetId\').val() +\'&comment=\'+escape($(\'#comments\').val()) +\'&commentType=\'+type', onComplete:'callAssetMenu()')};
 		return true;
 	} else {
 		alert( type +" already exists. " );
@@ -196,43 +196,43 @@ function sortCommentList(orderType) {
 			<tr>
 				<td class="label">Device Type:</td>
 				<td class="field">
-				<select id="deviceTypeId" name="kvmDevice" onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name)">
+				<!--<select id="deviceTypeId" name="kvmDevice" onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name)">
 			            <option value="${assetEntity?.kvmDevice}">${assetEntity?.kvmDevice}</option>
-			    </select>
-				<!-- <refcode:select domain="KvmDevice" noSelection=['':''] id="deviceTypeId" name="kvmDevice" value="${assetEntity?.kvmDevice}" 
-						onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name)"/> -->
+			    </select>-->
+				 <refcode:select domain="kvmDevice" noSelection=['':''] id="deviceTypeId" name="kvmDevice" value="${assetEntity?.kvmDevice}" 
+						onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name)"/> 
 			</tr>
 			
 			<tr>
 				<td class="label">Manufacturer:</td>
 				<td class="field">
-				<select id="manufacturerId" name="manufacturer" onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name)">
+				<!-- <select id="manufacturerId" name="manufacturer" onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name)">
 			            <option value="${assetEntity?.manufacturer}">${assetEntity?.manufacturer}</option>
-				</select>
-			<!-- 	<refcode:select domain="Manufacturer" noSelection=['':''] id="manufacturerId" name="manufacturer" value="${assetEntity?.manufacturer}"
-						onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name)"/> -->
+				</select>-->
+				<refcode:select domain="manufacturer" noSelection=['':''] id="manufacturerId" name="manufacturer" value="${assetEntity?.manufacturer}"
+						onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name)"/> 
 				</td>
 			</tr>
 			
 			<tr>
 				<td class="label">Model:</td>
 				<td class="field">
-				<select id="modelId" name="model" onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)">
+				<!-- <select id="modelId" name="model" onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)">
 			            <option value="${assetEntity?.model}">${assetEntity?.model}</option>
-				</select>
-				<!-- <refcode:select domain="Model" noSelection=['':''] id="modelId" name="model" value="${assetEntity?.model}" 
-						onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)"/> -->
+				</select>-->
+				<refcode:select domain="model" noSelection=['':''] id="modelId" name="model" value="${assetEntity?.model}" 
+						onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)"/> 
 				</td>
 			</tr>
 			
 			<tr>
 				<td class="label">Rails:</td>
 				<td class="field">
-				<select id="railTypeId" name="railType" onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)">
+				<!--<select id="railTypeId" name="railType" onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)">
 			            <option value="${assetEntity?.railType}">${assetEntity?.railType}</option>
-				</select>
-				<!-- <refcode:select domain="RailType" noSelection=['':''] id="railTypeId" name="railType" value="${assetEntity?.railType}" 
-				onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)"/> -->
+				</select> -->
+				 <refcode:select domain="railType" noSelection=['':''] id="railTypeId" name="railType" value="${assetEntity?.railType}" 
+				onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)"/>
 				</td>
 			</tr>
 			</table>
@@ -474,9 +474,9 @@ function sortCommentList(orderType) {
 			<label>Save As:</label>
 			<br />
 			<div style="float:center;">
-			   	<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm)${remoteFunction(action:'validateComments', params:'\'id=\' + $(\'#assetId\').val() +\'&comment=\'+$(\'#comments\').val() +\'&commentType=\'+$(\'#commentType\').val()', onComplete:'callUpdateComment( e, \'comment\' )')}">COMMENT</a>&nbsp;&nbsp;
-				<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm)${remoteFunction(action:'validateComments', params:'\'id=\' + $(\'#assetId\').val() +\'&comment=\'+$(\'#comments\').val() +\'&commentType=\'+$(\'#instructionType\').val()', onComplete:'callUpdateComment( e, \'instruction\' )')}">INSTRUCTION</a>&nbsp;&nbsp;
-				<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm)${remoteFunction(action:'validateComments', params:'\'id=\' + $(\'#assetId\').val() +\'&comment=\'+$(\'#comments\').val() +\'&commentType=\'+$(\'#issueType\').val()', onComplete:'callUpdateComment( e, \'issue\' )')}">ISSUE</a>
+			   	<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm)${remoteFunction(action:'validateComments', params:'\'id=\' + $(\'#assetId\').val() +\'&comment=\'+escape($(\'#comments\').val()) +\'&commentType=\'+$(\'#commentType\').val()', onComplete:'callUpdateComment( e, \'comment\' )')}">COMMENT</a>&nbsp;&nbsp;
+				<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm)${remoteFunction(action:'validateComments', params:'\'id=\' + $(\'#assetId\').val() +\'&comment=\'+escape($(\'#comments\').val()) +\'&commentType=\'+$(\'#instructionType\').val()', onComplete:'callUpdateComment( e, \'instruction\' )')}">INSTRUCTION</a>&nbsp;&nbsp;
+				<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm)${remoteFunction(action:'validateComments', params:'\'id=\' + $(\'#assetId\').val() +\'&comment=\'+escape($(\'#comments\').val()) +\'&commentType=\'+$(\'#issueType\').val()', onComplete:'callUpdateComment( e, \'issue\' )')}">ISSUE</a>
 			</div>
 			<br class="clear"/>
 			
