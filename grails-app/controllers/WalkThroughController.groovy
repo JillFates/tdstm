@@ -312,6 +312,29 @@ class WalkThroughController {
 	}
     /*------------------------------------------------------------
 	 * @author : Lokanath Reddy
+	 * @param  : Manufacturer and device type
+	 * @return : list of Models for selected Manufacturer and Device
+	 *----------------------------------------------------------*/
+    def getModels = {
+		def manufacturer = params.manufacturer
+		def deviceType = params.device
+		def modelQuery = "from Model m "
+		if(deviceType  && manufacturer ){
+			def device = RefCode.findByDomainAndValue('kvmDevice',deviceType)
+			def manu = Manufacturer.findByName(manufacturer)
+			modelQuery += " where deviceType = $device.id and manufacturer = $manu.id "
+		} else if( !deviceType  && manufacturer ){
+			def manu = Manufacturer.findByName(manufacturer)
+			modelQuery += " where manufacturer = $manu.id "
+		} else if( deviceType  && !manufacturer ){
+			def device = RefCode.findByDomainAndValue('kvmDevice',deviceType)
+			modelQuery += " where deviceType = $device.id "
+		}
+		def model = Model.findAll(modelQuery)
+		render model as JSON
+	}
+    /*------------------------------------------------------------
+	 * @author : Lokanath Reddy
 	 * @param  : Asset properties
 	 * @return : Will do the Save and Complete for Front/Rear audit
 	 *----------------------------------------------------------*/

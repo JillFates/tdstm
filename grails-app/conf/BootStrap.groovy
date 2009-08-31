@@ -448,13 +448,14 @@ class BootStrap {
 		//---------------------------------
 		println "MODEL"
 		def refCodeList = [
-            [ "model", "Workstation B2600", 0 ],
-            [ "model", "7028-6C4", 0 ],
-            [ "model", "KVM", 0 ],
-            [ "manufacturer", "AutoView 3100", 0 ],
-            [ "manufacturer", "Proliant 1600R", 0 ],
+            [ "fiberCabinet", "LC", 0 ],
+            [ "fiberCabinet", "SC", 0 ],
+            [ "fiberCabinet", "ST", 0 ],
+            [ "powerType", "A1", 0 ],
+            [ "powerType", "C13", 0 ],
+            [ "powerType", "C14", 0 ],
             [ "kvmDevice", "V490", 0 ],
-            [ "kvmDevice", "Proliant DL380 G3", 0 ],
+            [ "kvmDevice", "Proliant", 0 ],
             [ "railType", "StorageWorks", 0 ],
             [ "railType", "Ultrium Tape", 0 ]
 		]
@@ -471,6 +472,32 @@ class BootStrap {
 				log.error( etext )
 			}
 		}
+		
+		def dellManu = new Manufacturer(name:"DELL").save()
+		def hclManu = new Manufacturer(name:"HCL").save()
+		def modelList = [
+		    [ "server", RefCode.findByDomainAndValue('kvmDevice','Proliant'), dellManu ],
+		    [ "leaptop", RefCode.findByDomainAndValue('kvmDevice','V490'), dellManu ],
+		   	[ "mouse", RefCode.findByDomainAndValue('kvmDevice','Proliant'), dellManu ],
+		    [ "hardisk", RefCode.findByDomainAndValue('kvmDevice','V490'), dellManu ],
+		    [ "monitor", RefCode.findByDomainAndValue('kvmDevice','Proliant'), hclManu ],
+		    [ "keyboard", RefCode.findByDomainAndValue('kvmDevice','V490'), hclManu ],
+		    [ "cpu", RefCode.findByDomainAndValue('kvmDevice','Proliant'), hclManu ],
+		    [ "charger", RefCode.findByDomainAndValue('kvmDevice','V490'), hclManu ]
+		    ]
+		modelList.each {
+			def model = new Model(
+				name: it[0],
+				deviceType: it[1],
+				manufacturer : it[2]
+			)
+			if ( !model.validate() || !model.save() ) {
+				def etext = "Unable to create model" +
+				GormUtil.allErrorsString( model )
+		       	println etext
+		       	log.error( etext )
+			}
+   		}
 		//---------------------------------
 		//  Create Asset Entity
 		//---------------------------------

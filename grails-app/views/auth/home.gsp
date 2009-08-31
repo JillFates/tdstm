@@ -35,7 +35,11 @@ a:hover {
 		</tr>
 		<tr>
 			<td><g:link controller="userLogin" style="color:black">Manage Users</g:link></td>
-			<td>&nbsp;</td>
+			<td><g:link controller="refCode" style="color:black">Manage RefCode</g:link></td>
+		</tr>
+		<tr>
+			<td><g:link controller="manufacturer" style="color:black">Manufacturer</g:link></td>
+			<td><g:link controller="model" style="color:black">Model</g:link></td>
 		</tr>
 	</tbody>
 </table>

@@ -118,6 +118,28 @@ function sortCommentList(orderType) {
 	}
 	${remoteFunction(action:'getComments', params:'\'id=\' + $(\'#assetId\').val() +\'&commentType=\'+$(\'#selectCmt\').val() +\'&sort=\'+$(\'#sort\').val() +\'&orderType=\'+$(\'#orderType\').val()', onComplete:'updateViewComment( e )')};
 }
+function getModels(){
+	var manufacturer = $("#manufacturerId").val()
+	var device = $("#kvmDeviceId").val()
+	${remoteFunction(action:'getModels', params:'\'manufacturer=\' + manufacturer +\'&device=\'+device ', onComplete:'updateModels( e )')};
+}
+function updateModels( e ){
+	var models = eval('(' + e.responseText + ')');
+	var length = models.length
+	if(length > 0){
+		$("#modelTdId").html("<select type=\"text\" name=\"model\" id=\"modelId\" />")
+		var modelObj = $("#modelId")
+		for(i = 0; i < length; i++){
+			var model = models[i]
+			var option = document.createElement("option")
+			option.value = model.name
+			option.innerHTML = model.name
+			modelObj.append(option)
+		} 
+	} else {
+		$("#modelTdId").html("<input type=\"text\" name=\"model\" id=\"modelId\" >")
+	}
+}
 </script>
 </head>
 <body>
@@ -196,42 +218,40 @@ function sortCommentList(orderType) {
 			<tr>
 				<td class="label">Device Type:</td>
 				<td class="field">
-				<!--<select id="deviceTypeId" name="kvmDevice" onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name)">
-			            <option value="${assetEntity?.kvmDevice}">${assetEntity?.kvmDevice}</option>
-			    </select>-->
-				 <refcode:select domain="kvmDevice" noSelection=['':''] id="deviceTypeId" name="kvmDevice" value="${assetEntity?.kvmDevice}" 
-						onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name)"/> 
+				<refcode:select domain="kvmDevice" noSelection="['':'']" id="kvmDeviceId" name="kvmDevice" value="${assetEntity?.kvmDevice}" 
+						onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name);getModels()"/> 
 			</tr>
 			
 			<tr>
 				<td class="label">Manufacturer:</td>
 				<td class="field">
-				<!-- <select id="manufacturerId" name="manufacturer" onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name)">
-			            <option value="${assetEntity?.manufacturer}">${assetEntity?.manufacturer}</option>
-				</select>-->
-				<refcode:select domain="manufacturer" noSelection=['':''] id="manufacturerId" name="manufacturer" value="${assetEntity?.manufacturer}"
-						onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name)"/> 
+				<g:if test="${Manufacturer.list()}">
+				<g:select name="manufacturer" from="${Manufacturer.list()}" value="${assetEntity?.manufacturer}" id="manufacturerId" 
+					noSelection="['':'']"  onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name);getModels();"/>
+				</g:if>
+				<g:else>
+				<input type="text" name="manufacturer" id="manufacturerId" >
+				</g:else>
 				</td>
 			</tr>
 			
 			<tr>
 				<td class="label">Model:</td>
-				<td class="field">
-				<!-- <select id="modelId" name="model" onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)">
-			            <option value="${assetEntity?.model}">${assetEntity?.model}</option>
-				</select>-->
-				<refcode:select domain="model" noSelection=['':''] id="modelId" name="model" value="${assetEntity?.model}" 
-						onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)"/> 
+				<td class="field" id="modelTdId">
+				<g:if test="${Model.list()}">
+				<g:select name="model" from="${Model.list()}" id="modelId" noSelection="['':'']" 
+					value="${assetEntity?.model}" onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)"/>
+				</g:if>
+				 <g:else>
+				<input type="text" name="model" id="modelId" >
+				</g:else>
 				</td>
 			</tr>
 			
 			<tr>
 				<td class="label">Rails:</td>
 				<td class="field">
-				<!--<select id="railTypeId" name="railType" onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)">
-			            <option value="${assetEntity?.railType}">${assetEntity?.railType}</option>
-				</select> -->
-				 <refcode:select domain="railType" noSelection=['':''] id="railTypeId" name="railType" value="${assetEntity?.railType}" 
+				 <refcode:select domain="railType" noSelection="['':'']" id="railTypeId" name="railType" value="${assetEntity?.railType}" 
 				onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)"/>
 				</td>
 			</tr>
@@ -269,7 +289,7 @@ function sortCommentList(orderType) {
 				<td class="label">U-Position:</td>
 				<td class="field" nowrap>
 				<g:select name="sourceRackPosition" from="${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,'Undefined']}" 
-							id="sourceRackPositionId" value="${assetEntity?.sourceRackPosition}" onchange="setMustSave(this.value,'${assetEntity?.sourceRackPosition}','front2', this.namevv)"/>
+							id="sourceRackPositionId" value="${assetEntity?.sourceRackPosition}" onchange="setMustSave(this.value,'${assetEntity?.sourceRackPosition}','front2', this.name)"/>
 				<img src="${createLinkTo(dir:'images',file:'arrow_blue_up.png')}" height="18" onclick="moveOption('sourceRackPosition','${assetEntity?.sourceRackPosition}','front2','up')"/>
 				<img src="${createLinkTo(dir:'images',file:'arrow_blue_down.png')}" height="18" onclick="moveOption('sourceRackPosition','${assetEntity?.sourceRackPosition}','front2','down')"/>
 				</td>
@@ -356,12 +376,8 @@ function sortCommentList(orderType) {
 			<g:select name="powerPort" from="${[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,24,32,40,48,56,64,72,80,88,96]}" value="${assetEntity?.powerPort}"
 				onchange="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)"/>
 			&nbsp;&nbsp;
-		        <select>
-		            <option>C13
-		            <option selected>C14
-		            <option>5-15R
-		            <option>Unknown
-		        </select>
+				<refcode:select domain="powerType" noSelection="['':'Unknown']" id="powerType" name="powerType" value="${assetEntity?.powerType}" 
+				onchange="setMustSave(this.value,'${assetEntity?.powerType}','rear', this.name)"/>
 			</td>
 		</tr>
 		
@@ -381,12 +397,8 @@ function sortCommentList(orderType) {
 				<g:select name="hbaPort" from="${[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,24,32,40,48,56,64,72,80,88,96]}" value="${assetEntity?.hbaPort}"
 						onchange="setMustSave(this.value,'${assetEntity?.hbaPort}','rear', this.name)"/>
 		        &nbsp;&nbsp;
-			<select>
-		            <option>LC
-		            <option selected>SC
-		            <option>ST
-		            <option>MT-
-		        </select>
+			<refcode:select domain="fiberCabinet" noSelection="['':'']" id="fiberCabinet" name="fiberCabinet" value="${assetEntity?.fiberCabinet}" 
+				onchange="setMustSave(this.value,'${assetEntity?.fiberCabinet}','rear', this.name)"/>
 			</td>
 		</tr>
 		</table>
@@ -556,7 +568,8 @@ function sortCommentList(orderType) {
 	if('${commentCodes.cablesMoved}'){
 		$("#moveCablesYes").attr("checked",true)
 	}
-	
+	$("#manufacturerId").val("${assetEntity?.manufacturer}")
+	$("#modelId").val("${assetEntity?.model}") 
 	</script>
 </body>
 </html>
