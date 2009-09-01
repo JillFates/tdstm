@@ -317,13 +317,20 @@ class AssetEntityController {
         def dataTransferSet = params.dataTransferSet
         def bundle = request.getParameterValues( "bundle" )
         def bundleList = new StringBuffer()
+        def bundleNameList = new StringBuffer()
+        def principal = SecurityUtils.subject.principal	 
+	    def loginUser = UserLogin.findByUsername(principal) 
         def bundleSize = bundle.size()
         for ( int i=0; i< bundleSize ; i++ ) {
 	        if( bundle[i] == "" ) {
+	        	bundleNameList.append("ALL")
 	        } else if( i != bundleSize - 1) {
+	        	bundleNameList.append( MoveBundle.findById( bundle[i] ) )
+	        	bundleNameList.append( "," )
                 bundleList.append( bundle[i] + "," )
             } else {
                 bundleList.append( bundle[i] )
+                bundleNameList.append( MoveBundle.findById( bundle[i] ) )
             }
         }
         def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
@@ -345,19 +352,6 @@ class AssetEntityController {
         def workbook
         def book
         try {
-            // Statements to get context details
-            /*def tempProtocol = request.getProtocol()
-            def protocol = tempProtocol.substring(0,tempProtocol.indexOf("/"))
-            def serverName = request.getServerName()
-            def serverPort = request.getServerPort()
-            def contextPath = request.getContextPath()
-            // construct application URL
-            def appUrl = protocol + "://" + serverName + ":" + serverPort + contextPath
-            // get connection
-            def filenametoSet = dataTransferSetInstance.templateFilename
-            def templateFilePath = appUrl + filenametoSet
-            def url = new URL( templateFilePath )
-            HttpURLConnection con = url.openConnection()*/
             def filenametoSet = dataTransferSetInstance.templateFilename
             File file =  ApplicationHolder.application.parentContext.getResource(filenametoSet).getFile()
             // Going to use temporary file because we were getting out of memory errors constantly on staging server
@@ -371,6 +365,7 @@ class AssetEntityController {
             //create workbook and sheet
             book = Workbook.createWorkbook( response.getOutputStream(), workbook )
             def sheet
+            def titleSheet
             //check for column
             def map = [:]
             def sheetColumnNames = [:]
@@ -414,6 +409,20 @@ class AssetEntityController {
                     redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
                     return;
                 } else {
+                	//Add Title Information to master SpreadSheet
+                	titleSheet = book.getSheet("Title")
+                	if(titleSheet != null) {
+                		def titleInfoMap = new HashMap()
+                		SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy hh:mm a");  
+                		titleInfoMap.put("MoveBundleName :",bundleNameList)
+                		titleInfoMap.put("ExportUser :",loginUser.person)
+                		titleInfoMap.put("ExportDatetime :",format.format(new Date()))
+                		titleInfoMap.put("ProjectManager :",partyRelationshipService.getProjectManagers(projectId))
+                		titleInfoMap.put("ProjectName :",project.name)
+                		titleInfoMap.put("ProjectId :",projectId)
+                		titleInfoMap.put("CustomerName :",project.client)
+                		partyRelationshipService.exportTitleInfo(titleInfoMap,titleSheet)
+                	}
                     //update data from Asset Entity table to EXCEL
                     def assetSize = asset.size()
                     def columnNameListSize = columnNameList.size()

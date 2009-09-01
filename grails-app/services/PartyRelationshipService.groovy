@@ -1,5 +1,8 @@
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import jxl.*
+import jxl.write.*
+import jxl.read.biff.*
 class PartyRelationshipService {
 
     boolean transactional = true
@@ -363,7 +366,7 @@ class PartyRelationshipService {
      * To convert Date time into mm/dd/yy format
      * @author srinivas
      * @param 
-     */
+     *---------------------------------------------------*/
      def convertDate(def date) {
     	 Date dt = date
     		String dtStr = dt.getClass().getName().toString();
@@ -377,4 +380,39 @@ class PartyRelationshipService {
     		}
     		return dtParam
  	}
+     /*-------------------------------------------------------
+      *  Return the Projectmanagers 
+      *  @author srinivas
+      *  @param projectId
+      *-------------------------------------------------------*/
+     def getProjectManagers( def projectId ){
+    	 def list = []
+    	 def projectManagers = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeTo = 'PROJ_MGR' ")
+    	 def managerNames = new StringBuffer()
+    	 projectManagers.each{staff ->
+    	 	managerNames.append(staff.partyIdTo.firstName+" "+ staff.partyIdTo.lastName)
+    	 	managerNames.append(",")
+    	 }
+    	 if(managerNames.size() > 0) {
+    		 managerNames = managerNames.delete(managerNames.size()-1,managerNames.size())
+    	 }   
+    	 return managerNames
+     }
+     /*-------------------------------------------------------
+      *  TO Add the Title Info to MasterSpreadSheet
+      *  @author srinivas
+      *  @param Title Information as a Map and Workbook Sheet Object
+      *-------------------------------------------------------*/
+     def exportTitleInfo(def titleInfoMap,def titleSheet){
+    	 def sheetContent
+    	 def row=1;
+    	 for (Object key: titleInfoMap.keySet()) {
+    		 sheetContent = new Label(0,row,key)
+    		 titleSheet.addCell(sheetContent)
+    		 sheetContent = new Label(1,row,titleInfoMap.get(key).toString())
+    		 titleSheet.addCell(sheetContent)
+    		 row+=1;
+    	 }
+     }
 }
+
