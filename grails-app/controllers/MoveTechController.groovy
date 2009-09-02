@@ -450,7 +450,7 @@ class MoveTechController {
             }
             def commentsList = getCommentsFromRemainderList( session )
             if ( search != null ) {
-            	def query = new StringBuffer ("from AssetEntity ae where ae.assetTag = :search ")
+            	def query = new StringBuffer ("from AssetEntity ae where ae.moveBundle=${moveBundleInstance.id} and ae.assetTag = :search ")
                 assetItem = AssetEntity.find( query.toString(), [ search : search ] )
                 if ( assetItem == null ) {
                     flash.message = message ( code : "Asset Tag number '${search}' was not located" )
@@ -470,7 +470,7 @@ class MoveTechController {
                 } else {
                     def teamName
                     def teamId
-                    def bundleName = assetItem.moveBundle?.id        
+                    /*def bundleName = assetItem.moveBundle?.id        
                     if ( bundleName != Integer.parseInt ( params.bundle ) ) {
                         flash.message = message( code : "The asset [${assetItem.assetName}] is not part of move bundle [${params.bundle}] " )
                         if ( checkHome ) {
@@ -486,7 +486,7 @@ class MoveTechController {
                                         ])
                             return;
                         }
-                    } else {
+                    } else {*/
                         if ( params.location == "s" ) {
                             if ( assetItem.sourceTeam ) {
                                 teamId = ( assetItem.sourceTeam.id ).toString()
@@ -604,7 +604,7 @@ class MoveTechController {
                                 		actionLabel:actionLabel, commentsList: commentsList, stateLabel: stateLabel
                                 		])
                         }
-                    }
+                    //}
                 }
             }
 		 
@@ -877,7 +877,7 @@ class MoveTechController {
                             ])
             	return;
             } else if ( search != null ) {
-            	def query = "from AssetEntity where assetTag = :search "
+            	def query = "from AssetEntity where moveBundle=${moveBundleInstance.id} and assetTag = :search "
                 assetItem = AssetEntity.find ( query.toString(), [ search : search ] )
                 if ( assetItem == null ) {
                     flash.message = message ( code : "Asset Tag number '${search}' was not located" )
@@ -922,7 +922,7 @@ class MoveTechController {
                             return;
                         }
                     }
-                    if ( bundleId != Integer.parseInt ( params.bundle ) ) {
+                    /*if ( bundleId != Integer.parseInt ( params.bundle ) ) {
                         flash.message = message ( code : "The asset [${assetItem.assetName}] is not part of move bundle [${params.bundle}]" )
                         if ( textSearch ) {
                             render ( view:'cleaningAssetSearch',
@@ -938,7 +938,7 @@ class MoveTechController {
                                          ])
                             return;
                         }
-                    } else {
+                    } else {*/
                     	def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
                     													"where t.asset_entity_id = ${assetItem.id} and voided = 0 order by date_created desc limit 1 ")
                         projMap = ProjectAssetMap.findByAsset( assetItem )
@@ -1017,7 +1017,7 @@ class MoveTechController {
                                 		actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList, cartQty: cartQty
                                 		])
                         }
-                    }
+                    //}
                 }
             }
             

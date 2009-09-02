@@ -55,7 +55,7 @@
 </g:if>
 <div class="dialog">
 <table>
-	<g:form action="rackLayoutReport" method="post" target="_blank" onsubmit="return validateForm()">
+	<g:form action="rackLayoutReport" name="rackLayoutForm" method="post" target="_blank" onsubmit="return validateForm()">
 	<tbody>
 		<tr class="prop" id="bundleRow">
 			<td valign="top" class="name"><label>Current Move Bundle:</label></td>
@@ -122,6 +122,7 @@
 $('#reportsMenu').show();
 $('#assetMenu').hide();
 var bundleObj = $("#bundleId")
+$('#target').attr('checked','true');
 bundleObj.val('${currentBundle?.CURR_BUNDLE}')
 var bundleId = bundleObj.val() 
 ${remoteFunction(action:'getRackDetails', params:'\'bundleId=\' + bundleId', onComplete:'updateRackDetails(e)')}

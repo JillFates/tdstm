@@ -148,6 +148,7 @@ class SupervisorConsoleService {
     	} else {
     		assetsDetailsQuery.append(" a.project_id = $projectId ")
     	}
+    	assetsDetailsQuery.append(" and a.asset_type NOT IN ('VM', 'Blade Card')  ")
 		if(rackRooms.size() == 3){
 	    	if(rackRooms[0]){
 				def location = rackRooms[0].replace("'","\\'")

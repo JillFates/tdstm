@@ -976,6 +976,7 @@ class MoveBundleAssetController {
             		} else {
             			sourceRackQuery += " project_id = $projectId "
             		}
+        			sourceRackQuery += " and asset_type NOT IN ('VM', 'Blade Card') "
         			racks = jdbcTemplate.queryForList(sourceRackQuery + "group by source_location, source_rack, source_room")
             	}
             } else {
@@ -991,13 +992,14 @@ class MoveBundleAssetController {
 					} else {
 						targetRackQuery += " project_id = $projectId "
 					}
+            		targetRackQuery += " and asset_type NOT IN ('VM', 'Blade Card') "
             		racks = jdbcTemplate.queryForList( targetRackQuery  + "group by target_location, target_rack, target_room")
             		
             		}
             	
             	}
         		racks.each{
-                	def rackRooms = it.rack.split("~")
+                	def rackRooms = it?.rack.split("~")
     	            def assetDetails = []
                 	def assetDetail = []
                 	def finalAssetList = []
@@ -1312,18 +1314,18 @@ class MoveBundleAssetController {
     	def rackDetails = []
     	def sourceRackList
     	def targetRackList
-    	def queryForSourceRacks = "select source_location as location, source_rack as rack, source_room as room from asset_entity "
-    	def queryForTargetRacks = "select target_location as location, target_rack as rack, target_room as room from asset_entity "
+    	def queryForSourceRacks = "select source_location as location, source_rack as rack, source_room as room from asset_entity where asset_type NOT IN ('VM', 'Blade Card')"
+    	def queryForTargetRacks = "select target_location as location, target_rack as rack, target_room as room from asset_entity where asset_type NOT IN ('VM', 'Blade Card')"
     	def sourceGroup = "group by source_location, source_rack, source_room"
     	def targetGroup = "group by target_location, target_rack, target_room"
     	if(bundleId){
     		userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
-    		sourceRackList = jdbcTemplate.queryForList(queryForSourceRacks + "where move_bundle_id = $bundleId " + sourceGroup )
-    		targetRackList = jdbcTemplate.queryForList(queryForTargetRacks + "where move_bundle_id = $bundleId " + targetGroup)
+    		sourceRackList = jdbcTemplate.queryForList(queryForSourceRacks + "and move_bundle_id = $bundleId " + sourceGroup )
+    		targetRackList = jdbcTemplate.queryForList(queryForTargetRacks + "and move_bundle_id = $bundleId " + targetGroup)
     	} else if(bundleId == ""){
     		def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
-     		sourceRackList = jdbcTemplate.queryForList(queryForSourceRacks + "where project_id = $projectId " + sourceGroup)
-			targetRackList = jdbcTemplate.queryForList(queryForTargetRacks + "where project_id = $projectId " + targetGroup)
+     		sourceRackList = jdbcTemplate.queryForList(queryForSourceRacks + "and project_id = $projectId " + sourceGroup)
+			targetRackList = jdbcTemplate.queryForList(queryForTargetRacks + "and project_id = $projectId " + targetGroup)
     	}
     	rackDetails << [sourceRackList:sourceRackList, targetRackList:targetRackList]
     	render rackDetails as JSON
@@ -1348,7 +1350,13 @@ class MoveBundleAssetController {
     		 		def assetTag = ""
     		 		def isAdmin = SecurityUtils.getSubject().hasRole("PROJ_MGR")
     		 		assetTagsList.each{
-    		 			def tag = it.substring(0,it.indexOf('-'))
+    		 			def index = it.indexOf('-')
+    		 			def tag
+    		 			if (index != -1) {
+    		 				tag = it?.substring(0,index)
+    		 			} else {
+    		 				tag = it
+    		 			}
     		 			def assetInstance = AssetEntity.findByAssetTag( tag )
     		 			moveBundle += (assetInstance?.moveBundle ? assetInstance?.moveBundle.name : "") + "<br>"
     		 			assetTag += "<a href='javascript:openAssetEditDialig(${assetInstance?.id})' >$it</a> <br>"
