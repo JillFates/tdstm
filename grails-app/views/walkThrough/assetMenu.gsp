@@ -6,17 +6,32 @@
 <jq:plugin name="jquery.contextMenu"/>
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.contextMenu.css')}" />
 <script type="text/javascript">
 $(document).ready( function() {
 	// Show menu when #myDiv is clicked
-	$("#selector").contextMenu({
-		menu: 'myMenu'
-	},
-	function(action) {
-		$('#selectCmt').val(action);
-		$('#sort').val('desc');
-		${remoteFunction(action:'getComments', params:'\'id=\' + $(\'#assetId\').val() +\'&commentType=\'+$(\'#selectCmt\').val() +\'&sort=\'+$(\'#sort\').val() +\'&orderType=\'+$(\'#orderType\').val()', onComplete:'updateViewComment( e )')};
+	$("#selector").contextMenu('myMenu',{
+		bindings: {
+			'all': function(t) {
+				$('#selectCmt').val('all');
+				$('#sort').val('desc');
+				${remoteFunction(action:'getComments', params:'\'id=\' + $(\'#assetId\').val() +\'&commentType=\'+$(\'#selectCmt\').val() +\'&sort=\'+$(\'#sort\').val() +\'&orderType=\'+$(\'#orderType\').val()', onComplete:'updateViewComment( e )')};
+			},
+			'comment': function(t) {
+				 $('#selectCmt').val('comment');
+				$('#sort').val('desc');
+				${remoteFunction(action:'getComments', params:'\'id=\' + $(\'#assetId\').val() +\'&commentType=\'+$(\'#selectCmt\').val() +\'&sort=\'+$(\'#sort\').val() +\'&orderType=\'+$(\'#orderType\').val()', onComplete:'updateViewComment( e )')};
+		    },
+			'instruction': function(t) {
+				$('#selectCmt').val('instruction');
+				$('#sort').val('desc');
+				${remoteFunction(action:'getComments', params:'\'id=\' + $(\'#assetId\').val() +\'&commentType=\'+$(\'#selectCmt\').val() +\'&sort=\'+$(\'#sort\').val() +\'&orderType=\'+$(\'#orderType\').val()', onComplete:'updateViewComment( e )')};
+			},
+			'issue': function(t) {
+				$('#selectCmt').val('issue');
+				$('#sort').val('desc');
+				${remoteFunction(action:'getComments', params:'\'id=\' + $(\'#assetId\').val() +\'&commentType=\'+$(\'#selectCmt\').val() +\'&sort=\'+$(\'#sort\').val() +\'&orderType=\'+$(\'#orderType\').val()', onComplete:'updateViewComment( e )')};
+			}
+		}
 	});
 });
 function missingAsset( type, id, message ){
@@ -544,13 +559,13 @@ function updateModels( e ){
 		</table>
 		</g:form>
 		<div class="gap"></div>
-				<div>
-		<ul id="myMenu" class="contextMenu">
-			<li><a href="#all">All</a></li>
-			<li><a href="#comment">Comment</a></li>
-			<li><a href="#instruction">Instruction</a></li>
-			<li><a href="#issue">Issue</a></li>
-		</ul>	
+		<div id="myMenu" class="contextMenu">
+			<ul>
+				<li id="all">All</li>
+				<li id="comment">Comment</li>
+				<li id="instruction">Instruction</li>
+				<li id="issue">Issue</li>
+			</ul>	
 		</div>
 	<script type="text/javascript">
 	if('${commentCodes.needAssetTag}'){

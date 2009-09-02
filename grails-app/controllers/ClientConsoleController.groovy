@@ -109,7 +109,7 @@ class ClientConsoleController {
 				def processTransition = stateEngineService.getState(projectInstance.workflowCode,it)
 				processTransitionList<<[header:stateEngineService.getStateLabel(projectInstance.workflowCode,it),transId:stateEngineService.getStateId(projectInstance.workflowCode,processTransition)]
 			}
-        
+			def htmlTdId = new StringBuffer()
 			resultList.each{
 				def stateId = 0
 				def assetId = it.id
@@ -153,6 +153,7 @@ class ClientConsoleController {
 						}
 					}
 					htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass\" onclick=\"${remoteFunction(controller:'assetEntity', action:'editShow', params:'\'id=\'+'+ assetId, before:'document.showForm.id.value ='+ assetId+';document.editForm.id.value = '+ assetId+';', onComplete:'showAssetDialog(e , \'show\')')}\">&nbsp;</td>"
+					htmlTdId.append("${assetId+"_"+trans.transId},")
 				}
 				assetEntityList << [id: assetId, application:it.application,appOwner:it.appOwner,appSme:it.appSme,assetName:it.assetName,transitions:htmlTd,checkVal:check]
 			}
@@ -162,7 +163,7 @@ class ClientConsoleController {
 				appOwnerList:appOwnerList,applicationList:applicationList,appSmeList:appSmeList,projectId:projectId,
 				processTransitionList:processTransitionList,projectId:projectId,appOwnerValue:appOwnerValue,appValue:appValue,
 				appSmeValue:appSmeValue,timeToRefresh:timeToRefresh ? timeToRefresh.CLIENT_CONSOLE_REFRESH : "never",
-				headerCount:headerCount,browserTest:browserTest, myForm : params.myForm]
+				headerCount:headerCount,browserTest:browserTest, myForm : params.myForm, htmlTdId:htmlTdId]
     	} else {
     		flash.message = "Please create bundle to view PMO Dashboard"
     		redirect(controller:'project',action:'show',params:["id":params.projectId])
@@ -458,5 +459,164 @@ class ClientConsoleController {
 		}
 		return count
 	       
+	}
+	def getMenuList = {
+		def id = params.id
+		def ids = id.split("_")
+		def transId = ids[1]
+		def assetEntity = AssetEntity.findById( ids[0] ) 
+		def state = stateEngineService.getState( assetEntity.project.workflowCode, Integer.parseInt( ids[1] ) )
+		def stateType = stateEngineService.getStateType( assetEntity.project.workflowCode, state )
+		def situation = ""
+		def assetTransition
+		def menuOptions = ""
+		assetTransition = AssetTransition.find("from AssetTransition t where t.assetEntity = $assetEntity.id and t.stateTo = $transId and t.type ='boolean' and t.voided = 0 ")
+		if(assetTransition){
+			if(assetTransition.isNonApplicable != 0){
+				situation = "NA"
+			} else {
+				situation = "done"
+			}
+		}
+		menuOptions = constructManuOptions( state, assetEntity, situation, stateType )
+		
+		render menuOptions
+	}
+	
+	def constructManuOptions( def state, def assetEntity, def situation, def stateType ){
+		 def menuOptions = ""
+		 if(stateType != "process"){
+			 if(situation == "NA"){
+				 menuOptions = "naMenu"
+			 } else if(situation == "done"){
+				 menuOptions = "doneMenu"
+			 } else {
+				 menuOptions = "noTransMenu"
+			 }
+		 } else {
+			 def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+					 "where t.asset_entity_id = ${assetEntity.id} and voided = 0 order by date_created desc limit 1 ")
+			 def taskList
+			 def role = ""
+			 def supervisor = SecurityUtils.subject.hasRole("ADMIN")
+			 def manager = SecurityUtils.subject.hasRole("MANAGER")
+			 if(supervisor){
+				 role = "SUPERVISOR"
+			 } else if(manager){
+				 role = "MANAGER"
+			 }
+			 if(transitionStates.size()){
+				 def transitionSelected = stateEngineService.getStateIdAsInt( assetEntity.project.workflowCode, state )
+				 def currentState = transitionStates[0].stateTo
+				 def stateVal = stateEngineService.getState(assetEntity.project.workflowCode,currentState)
+				 if(currentState < transitionSelected ){
+					 taskList = stateEngineService.getTasks(assetEntity.project.workflowCode,role,stateVal)
+					 taskList.each{
+						 if(it == state){
+							 menuOptions = "doMenu"
+						 }
+					 }
+				 } else {
+					 menuOptions = "voidMenu"
+				 }
+			 } else {
+				 menuOptions = "readyMenu"
+			 }
+		 }
+		 if(!menuOptions){
+			 
+			 menuOptions = "noOption"
+		 }
+		 return menuOptions.toString()
+	}
+	
+	def createTransitionForNA = {
+		def actionId = params.actionId
+		def type = params.type
+		def currentState = 0
+		def transitionStatus
+		def principal = SecurityUtils.subject.principal
+        def loginUser = UserLogin.findByUsername(principal)
+		def actions = actionId.split("_")
+		def assetEntity = AssetEntity.findById(actions[0])
+		def stateToId = Integer.parseInt(actions[1])
+		def stateTo = stateEngineService.getState( assetEntity.project.workflowCode, stateToId )
+		def currStateQuery = "select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+		 					"where t.asset_entity_id = ${assetEntity.id} and voided = 0 order by date_created desc limit 1 "
+		def transitionStates = jdbcTemplate.queryForList(currStateQuery)
+		if(transitionStates.size()){
+			currentState = transitionStates[0].stateTo
+		}
+		def role = ""
+		def supervisor = SecurityUtils.subject.hasRole("ADMIN")
+		def manager = SecurityUtils.subject.hasRole("MANAGER")
+		if(supervisor){
+			role = "SUPERVISOR"
+		} else if(manager){
+			role = "MANAGER"
+		}
+		def assetTransitionQuery = "from AssetTransition t where t.assetEntity = ${assetEntity.id} and t.voided = 0"
+		def comment = ""
+		if(stateTo == "Hold"){
+				comment = "Transition created for Boolean transition"
+		}
+		switch (type) {
+			case "done" :
+						transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,stateTo, assetEntity, 
+																			assetEntity.moveBundle, loginUser, null, comment )
+						break;
+				
+			case "void" : 
+						def assetTeansitions = AssetTransition.findAll(assetTransitionQuery + " and t.stateTo >= $stateToId")
+						assetTeansitions.each{
+							it.voided = 1
+							it.save(flush:true)
+						}
+						changeCurrentStatus(currStateQuery,assetEntity)
+						break;
+				
+			case "ready" :
+						transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,"Ready", assetEntity, 
+																	assetEntity.moveBundle, loginUser, null, comment )
+						break;
+			case "NA" :
+						/*def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
+						if(assetTeansition){
+							assetTeansition.isNonApplicable = 1
+							assetTeansition.save()
+						} else {*/
+						transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,stateTo, assetEntity, 
+																			assetEntity.moveBundle, loginUser, null, comment )
+						def currentTransition = AssetTransition.find("from AssetTransition t where t.assetEntity = ${assetEntity.id} "+
+																	"and voided = 0 order by dateCreated desc")
+						currentTransition.isNonApplicable = 1
+						currentTransition.save()
+						
+						/*}*/
+						break;
+			case "pending" :
+						def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
+						if(assetTeansition){
+							assetTeansition.voided = 1
+							assetTeansition.save()
+						}
+						changeCurrentStatus(currStateQuery,assetEntity)
+					break;
+		}
+		render params as JSON
+	}
+	def changeCurrentStatus( def currStateQuery, def assetEntity ){
+		def currTransition = jdbcTemplate.queryForList(currStateQuery)
+		def currState
+		if(currTransition.size()){
+			currState = currTransition[0].stateTo
+		}
+		def projectAssetMap = ProjectAssetMap.findByAsset( assetEntity )
+		if(currState){
+			projectAssetMap.currentStateId = currState
+			projectAssetMap.save()
+		} else {
+			projectAssetMap.delete()
+		}
 	}
 }

@@ -14,6 +14,7 @@ class AssetTransition {
 	Date lastUpdated
 	Integer voided = 0		// to place transition as voided when statusTo < new status
 	String type
+	Integer isNonApplicable = 0
 
 	static belongsTo = [ 
 		assetEntity : AssetEntity,
@@ -36,6 +37,7 @@ class AssetTransition {
 		lastUpdated( nullable:true )
 		voided( range:0..1, nullable:false )
 		type( blank:false, nullable:false )
+		isNonApplicable( range:0..1, nullable:false )
 	}	
 	
 	static mapping  = {

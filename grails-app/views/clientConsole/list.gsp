@@ -7,24 +7,16 @@
 <g:javascript library="jquery" />
 <jq:plugin name="jquery.bgiframe.min" />
 <jq:plugin name="jquery.autocomplete" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'dashboard.css')}" />
+<jq:plugin name="jquery.contextMenu"/>
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dashboard.css')}" />
 <g:javascript src="assetcrud.js" />
 <g:javascript src="assetcommnet.js" />
 <jq:plugin name="ui.core" />
@@ -57,10 +49,64 @@ var time = '${timeToRefresh}';
 	    $("#showCommentDialog").dialog({ autoOpen: false })
 	    $("#editCommentDialog").dialog({ autoOpen: false })
 	    $("#showChangeStatusDialog").dialog({ autoOpen: false })	        
-	})
+	
+		var cells = "${htmlTdId}"
+		if(cells){
+			var cellIds = "${htmlTdId}".split(",")
+			var cellsCount = cellIds.length - 1
+			for(i = 0; i < cellsCount; i++){
+				var cellId = cellIds[i] 
+				// Show menu when #myDiv is clicked
+				$("#"+cellId).contextMenu('transitionMenu', {
+					bindings: {
+		        		'done': function(t) {
+				       		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=done\'', onComplete:'location.reload()' )};
+				        },
+				        'ready': function(t) {
+				          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=ready\'', onComplete:'location.reload()' )};
+				        },
+				        'NA': function(t) {
+				          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=NA\'', onComplete:'location.reload()' )};
+				        },
+				        'pending': function(t) {
+				          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=pending\'', onComplete:'location.reload()' )};
+				        },
+				        'void': function(t) {
+				          	if(confirm("Void this and any successive transitions. Are you sure?")){
+				          		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=void\'', onComplete:'location.reload()' )};
+							} else {
+				          		return false
+				         	}
+				        }
+			      	},
+			      	onShowMenu: function(e, menu) {
+			      		${remoteFunction(action:'getMenuList', params:'\'id=\' + $(e.target).attr("id") ', onComplete:'updateMenu(e,menu)')};
+			        	return menu;
+			      	}
+		    	});
+			}
+		}
+	});
 </script>
 <script type="text/javascript">
-
+	function updateMenu(e,menu){
+		var actionType = e.responseText
+		if( actionType == "noTransMenu"){
+			$('#pending, #void, #ready, #noOptions', menu ).remove()
+		} else if( actionType == "naMenu") {
+			$('#NA, #void, #ready, #noOptions', menu ).remove()
+		} else if( actionType == "doneMenu") {
+			$('#done, #void, #ready, #noOptions', menu ).remove()
+		} else if( actionType == "readyMenu") {
+			$('#NA, #done, #void, #pending, #noOptions', menu ).remove()
+		} else if( actionType == "voidMenu") {
+			$('#NA, #done, #ready, #pending, #noOptions', menu ).remove()
+		} else if( actionType == "doMenu") {
+			$('#NA, #ready, #pending, #void, #noOptions', menu ).remove()
+		} else {
+			$('#NA, #done, #ready, #pending, #void', menu ).remove()
+		}
+	}
 	function editAssetDialog() {
 		timedRefresh('never')
 		$("#showDialog").dialog("close")
@@ -264,7 +310,6 @@ var time = '${timeToRefresh}';
 			isFirst = true;
 		}
 	}
-
 </script>
 </head>
 <body>
@@ -768,6 +813,17 @@ Comment</a></span></div>
 		</div>
 		</jsec:hasAnyRole>
 </g:form></div>
+<div class="contextMenu" id="myMenu"/>
+<div class="contextMenu" id="transitionMenu"/>
+		<ul>
+        <li id="done">Done</li>
+        <li id="NA">N/A</li>
+        <li id="pending">Pending</li>
+        <li id="void">Void</li>
+        <li id="ready">Ready</li>
+        <li id="noOptions">No Options</li>
+      </ul>
+</div>
 <g:javascript>
 initialize();
 timedRefresh($("#selectTimedId").val())
