@@ -41,9 +41,6 @@
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
       </g:if>
-      <g:if test="${assetEntityErrorList}">
-		 <div>${assetEntityErrorList}</div>
-      </g:if>
       
         <h1>Asset Import</h1>
         <g:form action="upload" method="post" name="importForm" enctype="multipart/form-data" >

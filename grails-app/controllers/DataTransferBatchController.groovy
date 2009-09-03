@@ -176,7 +176,7 @@ class DataTransferBatchController {
     	if ( assetEntityErrorList ) {
     		flash.message = flash.message + " and ${assetEntityErrorList} is invalid format not updated "
     	}
-    	redirect (action:list, params:[projectId:projectId, assetEntityErrorList:assetEntityErrorList])
+    	redirect (action:list, params:[projectId:projectId])
     	}
      }
     /* --------------------------------------
