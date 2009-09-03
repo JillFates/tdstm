@@ -3,7 +3,9 @@ class DataTransferBatch {
 	String statusCode
 	Date lastModified
 	Integer versionNumber
-	String  transferMode 
+	String  transferMode
+	Date exportDatetime
+	Integer hasErrors = 0
 	
 	static hasMany = [ dataTransferValue:DataTransferValue ]
 	
@@ -18,9 +20,11 @@ class DataTransferBatch {
 	static constraints = {
 		statusCode( blank:false, size:0..20 )
 		dateCreated( nullable:true )
+		exportDatetime( nullable:true )
 		lastModified( nullable:true )
 		transferMode( blank:false, inList:['I', 'E', 'B'] )
-		versionNumber( nullable:true)
+		versionNumber( nullable:true )
+		hasErrors( nullable:false )
 	}
 
 }

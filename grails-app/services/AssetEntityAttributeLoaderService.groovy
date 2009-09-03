@@ -318,4 +318,28 @@ class AssetEntityAttributeLoaderService {
     	}
 		return assetEntity
 	}
+	/*----------------------------------------------------
+	 * To Validate the Import Process If any Errors update DataTransferBatch and DataTransferValue
+	 * @author Srinivas
+	 * @param DataTransferBatch, AssetEntity
+	 * @return flag
+	 *----------------------------------------------------*/
+    def importValidation( def dataTransferBatch, def assetEntity, def  dtvList, def flag) {
+		//Export Date Validation
+		if( assetEntity.lastUpdated < dataTransferBatch.exportDatetime ) {
+			flag = 0
+			dtvList.each {
+				def attribName = it.eavAttribute.attributeCode
+				if(assetEntity."$attribName" != it.correctedValue && assetEntity."$attribName" != it.importValue ){
+					if( dataTransferBatch.hasErrors == 0 ) {
+						dataTransferBatch.hasErrors = 1
+					}
+					it.hasError = 1
+					it.errorText = "change conflict"
+					it.save()
+				}
+			}
+		}
+		return flag
+	}
 }

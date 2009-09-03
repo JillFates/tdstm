@@ -153,9 +153,11 @@ class AssetEntityController {
         // create workbook
         def workbook
         def sheet
+        def titleSheet
         def sheetColumnNames = [:]
         def sheetNameMap = [:]
         def list = new ArrayList()
+        Date exportTime
         def dataTransferAttributeMapSheetName
         //get column name and sheets
         dataTransferAttributeMap.eachWithIndex { item, pos ->
@@ -172,6 +174,20 @@ class AssetEntityController {
                     flag = 1
                     sheet = workbook.getSheet( sheetNames[i] )
                 }
+            }
+            titleSheet = workbook.getSheet( "Title" )
+            if( titleSheet != null) {
+            		SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss k");
+            		try {
+            			exportTime = format.parse( (titleSheet.getCell( 1,5 ).contents).toString() )
+            		}catch ( Exception e) {
+            			flash.message = " Export Date Time Not Found, Please check it."
+                            redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+                            return;
+            		}
+                	
+            }else {
+            		flag = 1
             }
             if( flag == 0 ) {
                 flash.message = " Sheet not found, Please check it."
@@ -203,6 +219,7 @@ class AssetEntityController {
                     dataTransferBatch.dataTransferSet = dataTransferSetInstance
                     dataTransferBatch.project = project
                     dataTransferBatch.userLogin = userLogin
+                    dataTransferBatch.exportDatetime = exportTime
                     if(dataTransferBatch.save()){
                     	session.setAttribute("BATCH_ID",dataTransferBatch.id)
                         def eavAttributeInstance
@@ -411,16 +428,15 @@ class AssetEntityController {
                 } else {
                 	//Add Title Information to master SpreadSheet
                 	titleSheet = book.getSheet("Title")
+            		SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss k");  
                 	if(titleSheet != null) {
-                		def titleInfoMap = new HashMap()
-                		SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy hh:mm a");  
-                		titleInfoMap.put("MoveBundleName :",bundleNameList)
-                		titleInfoMap.put("ExportUser :",loginUser.person)
-                		titleInfoMap.put("ExportDatetime :",format.format(new Date()))
-                		titleInfoMap.put("ProjectManager :",partyRelationshipService.getProjectManagers(projectId))
-                		titleInfoMap.put("ProjectName :",project.name)
-                		titleInfoMap.put("ProjectId :",projectId)
-                		titleInfoMap.put("CustomerName :",project.client)
+                		def titleInfoMap = new ArrayList();
+                		titleInfoMap.add (project.client )
+                		titleInfoMap.add( projectId+"/"+project.name )
+                		titleInfoMap.add( partyRelationshipService.getProjectManagers(projectId) )
+                		titleInfoMap.add( format.format(new Date()) )
+                		titleInfoMap.add( loginUser.person )
+                		titleInfoMap.add( bundleNameList )
                 		partyRelationshipService.exportTitleInfo(titleInfoMap,titleSheet)
                 	}
                     //update data from Asset Entity table to EXCEL

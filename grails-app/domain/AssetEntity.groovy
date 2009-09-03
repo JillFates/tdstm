@@ -80,7 +80,6 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		appOwner( blank:true,nullable:false )
 		appSme( blank:true, nullable:false )
 		priority( nullable:true, inList:[1,2,3] )
-		
 
 		// The following were the MoveBundleAsset fields
 		moveBundle( nullable:true )

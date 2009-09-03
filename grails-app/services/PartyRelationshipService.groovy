@@ -401,17 +401,13 @@ class PartyRelationshipService {
      /*-------------------------------------------------------
       *  TO Add the Title Info to MasterSpreadSheet
       *  @author srinivas
-      *  @param Title Information as a Map and Workbook Sheet Object
+      *  @param Title Information as a List and Workbook Sheet Object
       *-------------------------------------------------------*/
-     def exportTitleInfo(def titleInfoMap,def titleSheet){
+     def exportTitleInfo(def titleFieldList,def titleSheet){
     	 def sheetContent
-    	 def row=1;
-    	 for (Object key: titleInfoMap.keySet()) {
-    		 sheetContent = new Label(0,row,key)
+    	 for (int titleField = 0; titleField < titleFieldList.size(); titleField++ ) {
+    		 sheetContent = new Label(1,(titleField+2),titleFieldList.get(titleField).toString())
     		 titleSheet.addCell(sheetContent)
-    		 sheetContent = new Label(1,row,titleInfoMap.get(key).toString())
-    		 titleSheet.addCell(sheetContent)
-    		 row+=1;
     	 }
      }
 }

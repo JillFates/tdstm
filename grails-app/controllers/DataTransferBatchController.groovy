@@ -3,6 +3,7 @@ import grails.converters.JSON
 import org.jsecurity.SecurityUtils
 class DataTransferBatchController {
     def sessionFactory
+    def assetEntityAttributeLoaderService
     def index = { redirect(action:list,params:params) }
 
     // the delete, save and update actions only accept POST requests
@@ -16,7 +17,7 @@ class DataTransferBatchController {
     def list = {
     		def projectId = params.projectId
     		def projectInstance = Project.findById( projectId )
-    		def dataTransferBatchList =  DataTransferBatch.findAllByProjectAndTransferMode( projectInstance, "I" );
+    		def dataTransferBatchList =  DataTransferBatch.findAllByProjectAndTransferMode( projectInstance, "I", [sort:"dateCreated", order:"desc"] )
             return [ dataTransferBatchList:dataTransferBatchList, projectId:projectId ]
     }
     /* -----------------------------------------------------------------------
@@ -30,11 +31,17 @@ class DataTransferBatchController {
     	sessionFactory.getCurrentSession().clear();
     	session.setAttribute("TOTAL_BATCH_ASSETS",0)
     	session.setAttribute("TOTAL_PROCESSES_ASSETS",0)
+    	def assetEntityErrorList = []
     	DataTransferBatch.withTransaction { status ->
     	def projectId = params.projectId
     	def projectInstance = Project.findById( projectId )
+    	def dataTransferBatch
+    	def insertCount = 0
+    	def updateCount = 0
+    	def errorCount = 0
+    	
     	try{
-    		def dataTransferBatch = DataTransferBatch.get(params.batchId)
+    		dataTransferBatch = DataTransferBatch.get(params.batchId)
 	    	if(dataTransferBatch){
 		    	def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = $dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
 		    	def assetsSize = dataTransferValueRowList.size()
@@ -43,14 +50,27 @@ class DataTransferBatchController {
 		    		def rowId =dataTransferValueRowList[dataTransferValueRow].rowId
 		    		def dtvList = DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
 		    		def  assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
+		    		def flag = 1
 		    		def assetEntity
 		    		if( assetEntityId ) {
 		    			assetEntity = AssetEntity.findById(assetEntityId)
+		    			if ( dataTransferBatch.dataTransferSet.id == 1 ) {
+		    				flag = assetEntityAttributeLoaderService.importValidation(dataTransferBatch,assetEntity,dtvList,flag)
+		    				if( flag == 0 ) {
+		    					updateCount+=1
+		    				}else {
+		    					errorCount+=1
+		    				}
+		    			} else {
+		    				flag = 0;
+		    			}
 		    		}else {
 		    			assetEntity = new AssetEntity()
 		    			assetEntity.attributeSet = EavAttributeSet.findById(1)
+		    			insertCount+=1
 		    		}
-		    		if(assetEntity){
+		    		
+		    		if( assetEntity && flag == 0 ){
 			    		assetEntity.project = projectInstance
 			    		assetEntity.owner = projectInstance.client
 			    		dtvList.each {
@@ -93,14 +113,18 @@ class DataTransferBatchController {
 			    				assetEntity."$attribName" = moveBundleInstance 
 			    			}else if( it.eavAttribute.backendType == "int" ){
 			    				def correctedPos
-			    				if( it.correctedValue ) {
-			    					correctedPos = Integer.parseInt(it.correctedValue)
-			    				} else if( it.importValue ) {
-			    					correctedPos = Integer.parseInt(it.importValue)
+			    				try {
+				    				if( it.correctedValue ) {
+				    					correctedPos = Integer.parseInt(it.correctedValue)
+				    				} else if( it.importValue ) {
+				    					correctedPos = Integer.parseInt(it.importValue)
+				    				}
+				    				
+				    				//correctedPos = it.correctedValue
+				    				assetEntity."$attribName" = correctedPos 
+			    				} catch ( Exception ex ) {
+			    					assetEntityErrorList << " ${attribName} at row ${dataTransferValueRow+1}"
 			    				}
-			    				
-			    				//correctedPos = it.correctedValue
-			    				assetEntity."$attribName" = correctedPos 
 			    			}else {
 			    				assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
 			    			}
@@ -145,7 +169,14 @@ class DataTransferBatchController {
     		status.setRollbackOnly()
 			flash.message = "Import Batch process failed"
 		}
-    	redirect (action:list, params:[projectId:projectId])
+    	//def errorCount = DataTransferValue.countByDataTransferBatchAndHasError(dataTransferBatch, 1)
+    	if ( dataTransferBatch.dataTransferSet.id == 1 ) {
+    		flash.message = " ${insertCount} Records Inserted ${updateCount} Records Updated ${errorCount} Number Of Errors Occured " 
+    	}
+    	if ( assetEntityErrorList ) {
+    		flash.message = flash.message + " and ${assetEntityErrorList} is invalid format not updated "
+    	}
+    	redirect (action:list, params:[projectId:projectId, assetEntityErrorList:assetEntityErrorList])
     	}
      }
     /* --------------------------------------
