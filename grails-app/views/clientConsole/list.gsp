@@ -60,20 +60,20 @@ var time = '${timeToRefresh}';
 				$("#"+cellId).contextMenu('transitionMenu', {
 					bindings: {
 		        		'done': function(t) {
-				       		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=done\'', onComplete:'location.reload()' )};
+				       		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=done\'', onComplete:'alert(e.responseText);location.reload()' )};
 				        },
 				        'ready': function(t) {
-				          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=ready\'', onComplete:'location.reload()' )};
+				          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=ready\'', onComplete:'alert(e.responseText);location.reload()' )};
 				        },
 				        'NA': function(t) {
-				          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=NA\'', onComplete:'location.reload()' )};
+				          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=NA\'', onComplete:'alert(e.responseText);location.reload()' )};
 				        },
 				        'pending': function(t) {
-				          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=pending\'', onComplete:'location.reload()' )};
+				          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=pending\'', onComplete:'alert(e.responseText);location.reload()' )};
 				        },
 				        'void': function(t) {
 				          	if(confirm("Void this and any successive transitions. Are you sure?")){
-				          		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=void\'', onComplete:'location.reload()' )};
+				          		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=void\'', onComplete:'alert(e.responseText);location.reload()' )};
 							} else {
 				          		return false
 				         	}

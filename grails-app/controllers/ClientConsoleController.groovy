@@ -141,6 +141,7 @@ class ClientConsoleController {
 				}else{
 					check = false
 				}
+				def naTransQuery = "from AssetTransition where assetEntity = $assetId and voided = 0 and type = 'boolean' and isNonApplicable = 1"
 				processTransitionList.each() { trans ->
 					def cssClass='task_pending'
 					def transitionId = Integer.parseInt(trans.transId)
@@ -150,6 +151,8 @@ class ClientConsoleController {
 							cssClass = "asset_hold"
 						} else if( transitionId == 10 ){
 							cssClass='task_pending'
+						} else if(AssetTransition.find(naTransQuery+" and stateTo = "+transitionId)){
+							cssClass='asset_pending'
 						}
 					}
 					htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass\" onclick=\"${remoteFunction(controller:'assetEntity', action:'editShow', params:'\'id=\'+'+ assetId, before:'document.showForm.id.value ='+ assetId+';document.editForm.id.value = '+ assetId+';', onComplete:'showAssetDialog(e , \'show\')')}\">&nbsp;</td>"
@@ -560,10 +563,17 @@ class ClientConsoleController {
 		if(stateTo == "Hold"){
 				comment = "Transition created for Boolean transition"
 		}
+		def message = "Transaction created successfully"
 		switch (type) {
 			case "done" :
+						def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
+						if(assetTeansition){
+							assetTeansition.voided = 1
+							assetTeansition.save()
+						}
 						transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,stateTo, assetEntity, 
 																			assetEntity.moveBundle, loginUser, null, comment )
+						message = transitionStatus.message
 						break;
 				
 			case "void" : 
@@ -578,21 +588,21 @@ class ClientConsoleController {
 			case "ready" :
 						transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,"Ready", assetEntity, 
 																	assetEntity.moveBundle, loginUser, null, comment )
+						message = transitionStatus.message
 						break;
 			case "NA" :
-						/*def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
+						def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
 						if(assetTeansition){
-							assetTeansition.isNonApplicable = 1
+							assetTeansition.voided = 1
 							assetTeansition.save()
-						} else {*/
+						}
 						transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,stateTo, assetEntity, 
 																			assetEntity.moveBundle, loginUser, null, comment )
+						message = transitionStatus.message
 						def currentTransition = AssetTransition.find("from AssetTransition t where t.assetEntity = ${assetEntity.id} "+
 																	"and voided = 0 order by dateCreated desc")
 						currentTransition.isNonApplicable = 1
 						currentTransition.save()
-						
-						/*}*/
 						break;
 			case "pending" :
 						def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
@@ -603,7 +613,7 @@ class ClientConsoleController {
 						changeCurrentStatus(currStateQuery,assetEntity)
 					break;
 		}
-		render params as JSON
+		render message
 	}
 	def changeCurrentStatus( def currStateQuery, def assetEntity ){
 		def currTransition = jdbcTemplate.queryForList(currStateQuery)
