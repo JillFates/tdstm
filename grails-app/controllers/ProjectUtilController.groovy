@@ -32,8 +32,10 @@ class ProjectUtilController {
     	if(isAdmin){	
         	  projectList = Project.findAll( "from Project as p order by p.dateCreated desc" )
     	}else{
-    		
-    		def query = "from Project p where p.id in (select pr.partyIdFrom from PartyRelationship pr where pr.partyRelationshipType = 'PROJ_STAFF' and pr.partyIdTo = ${loginUser.person.id} and pr.roleTypeCodeFrom = 'PROJECT' )"
+    		def userCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' "+
+    							"and partyIdTo = ${loginUser.person.id} and roleTypeCodeFrom = 'COMPANY' and roleTypeCodeTo = 'STAFF' ")
+    		def query = "from Project p where p.id in (select pr.partyIdFrom from PartyRelationship pr where "+
+    					"pr.partyIdTo = ${userCompany?.partyIdFrom?.id} and roleTypeCodeFrom = 'PROJECT')"
     			projectList = Project.findAll(query)
     	}
     	return [ projectList:projectList ]

@@ -563,55 +563,60 @@ class ClientConsoleController {
 		if(stateTo == "Hold"){
 				comment = "Transition created for Boolean transition"
 		}
-		def message = "Transaction created successfully"
-		switch (type) {
-			case "done" :
-						def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
-						if(assetTeansition){
-							assetTeansition.voided = 1
-							assetTeansition.save()
-						}
-						transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,stateTo, assetEntity, 
-																			assetEntity.moveBundle, loginUser, null, comment )
-						message = transitionStatus.message
+		def message = ""
+		if(role){
+			message = "Transaction created successfully"
+			switch (type) {
+				case "done" :
+							def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
+							if(assetTeansition){
+								assetTeansition.voided = 1
+								assetTeansition.save()
+							}
+							transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,stateTo, assetEntity, 
+																				assetEntity.moveBundle, loginUser, null, comment )
+							message = transitionStatus.message
+							break;
+					
+				case "void" : 
+							def assetTeansitions = AssetTransition.findAll(assetTransitionQuery + " and t.stateTo >= $stateToId")
+							assetTeansitions.each{
+								it.voided = 1
+								it.save(flush:true)
+							}
+							changeCurrentStatus(currStateQuery,assetEntity)
+							break;
+					
+				case "ready" :
+							transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,"Ready", assetEntity, 
+																		assetEntity.moveBundle, loginUser, null, comment )
+							message = transitionStatus.message
+							break;
+				case "NA" :
+							def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
+							if(assetTeansition){
+								assetTeansition.voided = 1
+								assetTeansition.save()
+							}
+							transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,stateTo, assetEntity, 
+																				assetEntity.moveBundle, loginUser, null, comment )
+							message = transitionStatus.message
+							def currentTransition = AssetTransition.find("from AssetTransition t where t.assetEntity = ${assetEntity.id} "+
+																		"and voided = 0 order by dateCreated desc")
+							currentTransition.isNonApplicable = 1
+							currentTransition.save()
+							break;
+				case "pending" :
+							def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
+							if(assetTeansition){
+								assetTeansition.voided = 1
+								assetTeansition.save()
+							}
+							changeCurrentStatus(currStateQuery,assetEntity)
 						break;
-				
-			case "void" : 
-						def assetTeansitions = AssetTransition.findAll(assetTransitionQuery + " and t.stateTo >= $stateToId")
-						assetTeansitions.each{
-							it.voided = 1
-							it.save(flush:true)
-						}
-						changeCurrentStatus(currStateQuery,assetEntity)
-						break;
-				
-			case "ready" :
-						transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,"Ready", assetEntity, 
-																	assetEntity.moveBundle, loginUser, null, comment )
-						message = transitionStatus.message
-						break;
-			case "NA" :
-						def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
-						if(assetTeansition){
-							assetTeansition.voided = 1
-							assetTeansition.save()
-						}
-						transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,stateTo, assetEntity, 
-																			assetEntity.moveBundle, loginUser, null, comment )
-						message = transitionStatus.message
-						def currentTransition = AssetTransition.find("from AssetTransition t where t.assetEntity = ${assetEntity.id} "+
-																	"and voided = 0 order by dateCreated desc")
-						currentTransition.isNonApplicable = 1
-						currentTransition.save()
-						break;
-			case "pending" :
-						def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
-						if(assetTeansition){
-							assetTeansition.voided = 1
-							assetTeansition.save()
-						}
-						changeCurrentStatus(currStateQuery,assetEntity)
-					break;
+			}
+		} else {
+			message = " You don't have permission to create transition"
 		}
 		render message
 	}

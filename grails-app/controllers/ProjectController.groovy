@@ -18,8 +18,10 @@ class ProjectController {
     	if(isAdmin){	
         	  projectList = Project.findAll( "from Project as p order by p.dateCreated desc" )
     	}else{
-    		
-    		def query = "from Project p where p.id in (select pr.partyIdFrom from PartyRelationship pr where pr.partyRelationshipType = 'PROJ_STAFF' and pr.partyIdTo = ${loginUser.person.id} and pr.roleTypeCodeFrom = 'PROJECT' )"
+    		def userCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' "+
+								"and partyIdTo = ${loginUser.person.id} and roleTypeCodeFrom = 'COMPANY' and roleTypeCodeTo = 'STAFF' ")
+			def query = "from Project p where p.id in (select pr.partyIdFrom from PartyRelationship pr where "+
+						"pr.partyIdTo = ${userCompany?.partyIdFrom?.id} and roleTypeCodeFrom = 'PROJECT')"
     			projectList = Project.findAll(query)
     	}
         return [ projectInstanceList:projectList ]
@@ -524,12 +526,15 @@ class ProjectController {
      * Action to setPreferences
      */
     def addUserPreference = {
-    		
-        def projectInstance = Project.findByProjectCode(params.selectProject)
-    		
-        userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
-
-        redirect(controller:'project', action:"show", id: projectInstance.id )
+    	def selectProject = params.selectProject
+    	if(selectProject){
+    		def projectInstance = Project.findByProjectCode(params.selectProject)
+	        userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+	        redirect(controller:'project', action:"show", id: projectInstance.id )
+    	} else {
+    		flash.message = "Please select Project"
+    		redirect( action:"list" )
+    	}
     		
     }
     
