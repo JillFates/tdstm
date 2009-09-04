@@ -432,7 +432,8 @@ class AssetEntityController {
                 	if(titleSheet != null) {
                 		def titleInfoMap = new ArrayList();
                 		titleInfoMap.add (project.client )
-                		titleInfoMap.add( projectId+"/"+project.name )
+                		titleInfoMap.add( projectId )
+                		titleInfoMap.add( project.name )
                 		titleInfoMap.add( partyRelationshipService.getProjectManagers(projectId) )
                 		titleInfoMap.add( format.format(new Date()) )
                 		titleInfoMap.add( loginUser.person )

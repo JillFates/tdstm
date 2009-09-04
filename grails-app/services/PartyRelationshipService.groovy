@@ -405,9 +405,15 @@ class PartyRelationshipService {
       *-------------------------------------------------------*/
      def exportTitleInfo(def titleFieldList,def titleSheet){
     	 def sheetContent
+    	 def column = 2
     	 for (int titleField = 0; titleField < titleFieldList.size(); titleField++ ) {
-    		 sheetContent = new Label(1,(titleField+2),titleFieldList.get(titleField).toString())
+    		 if( titleField == 2){
+    			 sheetContent = new Label(2,(column-=1),titleFieldList.get(titleField).toString())
+    		 }else {
+    			 sheetContent = new Label(1,column,titleFieldList.get(titleField).toString())
+    		 }
     		 titleSheet.addCell(sheetContent)
+    		 column+=1
     	 }
      }
 }

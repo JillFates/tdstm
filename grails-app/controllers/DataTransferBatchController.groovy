@@ -37,6 +37,7 @@ class DataTransferBatchController {
     	def projectInstance = Project.findById( projectId )
     	def dataTransferBatch
     	def insertCount = 0
+    	def errorConfictCount = 0
     	def updateCount = 0
     	def errorCount = 0
     	
@@ -50,12 +51,14 @@ class DataTransferBatchController {
 		    		def rowId =dataTransferValueRowList[dataTransferValueRow].rowId
 		    		def dtvList = DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
 		    		def  assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
-		    		def flag = 1
+		    		def flag = 0
 		    		def assetEntity
 		    		if( assetEntityId ) {
 		    			assetEntity = AssetEntity.findById(assetEntityId)
 		    			if ( dataTransferBatch.dataTransferSet.id == 1 ) {
-		    				flag = assetEntityAttributeLoaderService.importValidation(dataTransferBatch,assetEntity,dtvList,flag)
+		    				def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, assetEntity, dtvList, projectInstance )
+		    				flag = validateResultList[0]?.flag
+		    				errorConfictCount = errorConfictCount+validateResultList[0]?.errorConfictCount 
 		    				if( flag == 0 ) {
 		    					updateCount+=1
 		    				}else {
@@ -124,6 +127,9 @@ class DataTransferBatchController {
 				    				assetEntity."$attribName" = correctedPos 
 			    				} catch ( Exception ex ) {
 			    					assetEntityErrorList << " ${attribName} at row ${dataTransferValueRow+1}"
+			    					it.hasError = 1
+			    					it.errorText = "format error"
+			    					it.save()
 			    				}
 			    			}else {
 			    				assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
@@ -171,10 +177,14 @@ class DataTransferBatchController {
 		}
     	//def errorCount = DataTransferValue.countByDataTransferBatchAndHasError(dataTransferBatch, 1)
     	if ( dataTransferBatch.dataTransferSet.id == 1 ) {
-    		flash.message = " ${insertCount} Records Inserted ${updateCount} Records Updated ${errorCount} Number Of Errors Occured " 
+    		flash.message = " ${insertCount} Records Inserted; ${updateCount} Records Updated; ${errorCount} Asset Errors;  ${errorConfictCount} Attribute Erros " 
     	}
     	if ( assetEntityErrorList ) {
-    		flash.message = flash.message + " and ${assetEntityErrorList} is invalid format not updated "
+    		if ( flash.message ) {
+    			flash.message = flash.message + " and ${assetEntityErrorList} is invalid format not updated "
+    		} else {
+    			flash.message = " ${assetEntityErrorList} is invalid format not updated "
+    		}
     	}
     	redirect (action:list, params:[projectId:projectId])
     	}

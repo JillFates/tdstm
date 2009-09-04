@@ -324,22 +324,66 @@ class AssetEntityAttributeLoaderService {
 	 * @param DataTransferBatch, AssetEntity
 	 * @return flag
 	 *----------------------------------------------------*/
-    def importValidation( def dataTransferBatch, def assetEntity, def  dtvList, def flag) {
+    def importValidation( def dataTransferBatch, def assetEntity, def  dtvList,def projectInstance) {
 		//Export Date Validation
-		if( assetEntity.lastUpdated < dataTransferBatch.exportDatetime ) {
-			flag = 0
-			dtvList.each {
-				def attribName = it.eavAttribute.attributeCode
-				if(assetEntity."$attribName" != it.correctedValue && assetEntity."$attribName" != it.importValue ){
-					if( dataTransferBatch.hasErrors == 0 ) {
-						dataTransferBatch.hasErrors = 1
+		def errorConfictCount = 0
+		def flag = 0
+		def validateResultList = []
+		if( assetEntity.lastUpdated >= dataTransferBatch.exportDatetime ) {
+			flag = 1
+			dtvList.each { dtValue->
+				def attribName = dtValue.eavAttribute.attributeCode
+				//validation for sourceTeam and targetTeam and MoveBundle and Backendtype int field
+				if( attribName == "sourceTeam" || attribName == "targetTeam" ) {
+					def bundleInstance = assetEntity.moveBundle 
+    				def teamInstance
+					if(assetEntity?."$attribName"?.teamCode != dtValue.correctedValue && assetEntity?."$attribName"?.teamCode != dtValue.importValue ){
+						updateChangeConflicts( dataTransferBatch, dtValue )
+						errorConfictCount+=1
 					}
-					it.hasError = 1
-					it.errorText = "change conflict"
-					it.save()
+				}else if ( attribName == "moveBundle" ) {
+					if(assetEntity?.moveBundle?.name != dtValue.correctedValue && assetEntity?.moveBundle?.name != dtValue.importValue ){
+						updateChangeConflicts( dataTransferBatch, dtValue )
+						errorConfictCount+=1
+					}
+				}else if( dtValue.eavAttribute.backendType == "int" ){
+					def correctedPos
+					try {
+						if( dtValue.correctedValue ) {
+							correctedPos = Integer.parseInt(dtValue.correctedValue.trim())
+						} else if( dtValue.importValue ) {
+							correctedPos = Integer.parseInt(dtValue.importValue.trim())
+						}
+						if( assetEntity."$attribName" != correctedPos ){
+							updateChangeConflicts( dataTransferBatch, dtValue )
+							errorConfictCount+=1
+						}
+					} catch ( Exception ex ) {
+					}
+				} else {
+					if(assetEntity."$attribName" != dtValue.correctedValue && assetEntity."$attribName" != dtValue.importValue ){
+						updateChangeConflicts( dataTransferBatch, dtValue )
+						errorConfictCount+=1
+					}
+					
 				}
 			}
 		}
-		return flag
+		validateResultList << [flag : flag, errorConfictCount : errorConfictCount]
+		return validateResultList
+	}
+	
+	/*
+	 * Update ChangeConficts if value is changed in spreadsheet
+	 * @param dataTransferBatch, datatransfervalue
+	 * @author srinivas
+	 */
+	def updateChangeConflicts( def dataTransferBatch, def dtValue) {
+		if( dataTransferBatch.hasErrors == 0 ) {
+			dataTransferBatch.hasErrors = 1
+		}
+		dtValue.hasError = 1
+		dtValue.errorText = "change conflict"
+		dtValue.save()
 	}
 }

@@ -15,6 +15,7 @@ class DataTransferBatch {
 		version false
 		columns {
 			id column:'batch_id'
+			hasErrors sqlType: 'TINYINT(1)'
 		}
 	}
 	static constraints = {
