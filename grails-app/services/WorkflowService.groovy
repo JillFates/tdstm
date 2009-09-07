@@ -32,12 +32,14 @@ class WorkflowService {
     	def projectAssetMap = ProjectAssetMap.findByAsset( assetEntity )
     	def stateType = stateEngineService.getStateType( process, toState )
     	if ( projectAssetMap ) {
-    		currentState = projectAssetMap.currentStateId
     		def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
     														"where t.asset_entity_id = ${assetEntity.id} and voided = 0 order by date_created desc limit 1 ")
 			if(transitionStates.size()){
 				currentState = transitionStates[0].stateTo
 			}
+    		if(stateEngineService.getState( process, currentState ) != "Hold"){
+    			currentState = projectAssetMap.currentStateId
+    		}
 	    	def fromState = stateEngineService.getState( process, currentState )
 	    	def roleCheck = stateEngineService.canDoTask( process, role, fromState, toState )
 	    	// Check whether role has permission to change the State
@@ -92,9 +94,11 @@ class WorkflowService {
 		    		message = "Unable to create AssetTransition: " + GormUtil.allErrorsString( assetTransition )
 		    	} else {
 		    		message = setTransitionTimeElapsed(assetTransition)
-		    		def projectAssetMapInstance = new ProjectAssetMap(project:moveBundle.project, asset:assetEntity)
-		    		projectAssetMapInstance.currentStateId = Integer.parseInt(stateEngineService.getStateId( process, toState ))
-		    		projectAssetMapInstance.save()
+		    		if(stateType != "boolean"){
+			    		def projectAssetMapInstance = new ProjectAssetMap(project:moveBundle.project, asset:assetEntity)
+			    		projectAssetMapInstance.currentStateId = Integer.parseInt(stateEngineService.getStateId( process, toState ))
+			    		projectAssetMapInstance.save()
+		    		}
 		    		message = "Transaction created successfully"
 					success = true
 				}

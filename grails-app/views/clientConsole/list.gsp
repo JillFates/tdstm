@@ -51,37 +51,38 @@ var time = '${timeToRefresh}';
 	    $("#showChangeStatusDialog").dialog({ autoOpen: false })	        
 	
 		var cells = "${htmlTdId}"
-		if(cells){
+		var role = "${role}"
+		if(role && cells){
 			var cellIds = "${htmlTdId}".split(",")
 			var cellsCount = cellIds.length - 1
 			for(i = 0; i < cellsCount; i++){
 				var cellId = cellIds[i] 
 				// Show menu when #myDiv is clicked
 				$("#"+cellId).contextMenu('transitionMenu', {
+					onShowMenu: function(e, menu) {
+			      		${remoteFunction(action:'getMenuList', params:'\'id=\' + $(e.target).attr("id") ', onComplete:'updateMenu(e,menu)')};
+			        	return menu;
+			      	},
 					bindings: {
 		        		'done': function(t) {
-				       		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=done\'', onComplete:'alert(e.responseText);location.reload()' )};
+				       		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=done\'', onComplete:'updateTransitionRow(e)' )};
 				        },
 				        'ready': function(t) {
-				          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=ready\'', onComplete:'alert(e.responseText);location.reload()' )};
+				          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=ready\'', onComplete:'updateTransitionRow(e)' )};
 				        },
 				        'NA': function(t) {
-				          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=NA\'', onComplete:'alert(e.responseText);location.reload()' )};
+				          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=NA\'', onComplete:'updateTransitionRow(e)' )};
 				        },
 				        'pending': function(t) {
-				          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=pending\'', onComplete:'alert(e.responseText);location.reload()' )};
+				          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=pending\'', onComplete:'updateTransitionRow(e)' )};
 				        },
 				        'void': function(t) {
 				          	if(confirm("Void this and any successive transitions. Are you sure?")){
-				          		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=void\'', onComplete:'alert(e.responseText);location.reload()' )};
+				          		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=void\'', onComplete:'updateTransitionRow(e)' )};
 							} else {
 				          		return false
 				         	}
 				        }
-			      	},
-			      	onShowMenu: function(e, menu) {
-			      		${remoteFunction(action:'getMenuList', params:'\'id=\' + $(e.target).attr("id") ', onComplete:'updateMenu(e,menu)')};
-			        	return menu;
 			      	}
 		    	});
 			}
@@ -89,6 +90,9 @@ var time = '${timeToRefresh}';
 	});
 </script>
 <script type="text/javascript">
+	/*------------------------------------------------------------
+	 * update the menu for transition 
+	 *------------------------------------------------------------*/
 	function updateMenu(e,menu){
 		var actionType = e.responseText
 		if( actionType == "noTransMenu"){
@@ -105,6 +109,20 @@ var time = '${timeToRefresh}';
 			$('#NA, #ready, #pending, #void, #noOptions', menu ).remove()
 		} else {
 			$('#NA, #done, #ready, #pending, #void', menu ).remove()
+		}
+		menu.show()
+	}
+	/*-------------------------------------------------------------
+	 * update the row as per user transition transition 
+	 *------------------------------------------------------------*/
+	function updateTransitionRow( e ){
+		var assetTransitions = eval('(' + e.responseText + ')')
+		var length = assetTransitions.length
+		if(length > 0){
+			for( i=0; i<length; i++ ) {
+				var transition = assetTransitions[i]
+				$("#"+transition.id).attr("class",transition.cssClass )
+			}
 		}
 	}
 	function editAssetDialog() {
@@ -814,15 +832,15 @@ Comment</a></span></div>
 		</jsec:hasAnyRole>
 </g:form></div>
 <div class="contextMenu" id="myMenu"/>
-<div class="contextMenu" id="transitionMenu"/>
-		<ul>
+<div class="contextMenu" id="transitionMenu" style="visibility: hidden;">
+	<ul>
         <li id="done">Done</li>
         <li id="NA">N/A</li>
         <li id="pending">Pending</li>
         <li id="void">Void</li>
         <li id="ready">Ready</li>
         <li id="noOptions">No Options</li>
-      </ul>
+    </ul>
 </div>
 <g:javascript>
 initialize();

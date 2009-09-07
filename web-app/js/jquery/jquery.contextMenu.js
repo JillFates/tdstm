@@ -24,8 +24,8 @@
       listStyle: 'none',
       padding: '1px',
       margin: '0px',
-      backgroundColor: '#fff',
-      border: '1px solid #999',
+      backgroundColor: '#FFAF09',
+      border: '1px solid #000',
       width: '100px'
     },
     itemStyle: {
@@ -115,7 +115,7 @@
       });
     });
 
-    menu.css({'left':e[cur.eventPosX],'top':e[cur.eventPosY]}).show();
+    menu.css({'left':e[cur.eventPosX],'top':e[cur.eventPosY]});
     if (cur.shadow) shadow.css({width:menu.width(),height:menu.height(),left:e.pageX+2,top:e.pageY+2}).show();
     $(document).one('click', hide);
   }
