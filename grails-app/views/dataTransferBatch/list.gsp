@@ -106,7 +106,10 @@
 	                            <g:if test="${dataTransferBatch?.statusCode == 'PENDING'}">
 	                            	<a href="#" >View</a>|<g:link action="process" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<a href="#">Void</a>
 	                            </g:if>
-	                            <g:else>
+	                            <g:elseif test="${dataTransferBatch?.hasErrors == 1}">
+	                            	<a href="errorsListView?id=${dataTransferBatch?.id}">Errors</a>
+	                            </g:elseif>
+	                             <g:else>
 	                            	<a href="#">View</a>|<a href="#">Remove</a>
 	                            </g:else>
 	                            

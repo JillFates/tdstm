@@ -326,7 +326,7 @@ class AssetEntityAttributeLoaderService {
 	 *----------------------------------------------------*/
     def importValidation( def dataTransferBatch, def assetEntity, def  dtvList,def projectInstance) {
 		//Export Date Validation
-		def errorConfictCount = 0
+		def errorConflictCount = 0
 		def flag = 0
 		def validateResultList = []
 		if( assetEntity.lastUpdated >= dataTransferBatch.exportDatetime ) {
@@ -339,12 +339,12 @@ class AssetEntityAttributeLoaderService {
     				def teamInstance
 					if(assetEntity?."$attribName"?.teamCode != dtValue.correctedValue && assetEntity?."$attribName"?.teamCode != dtValue.importValue ){
 						updateChangeConflicts( dataTransferBatch, dtValue )
-						errorConfictCount+=1
+						errorConflictCount+=1
 					}
 				}else if ( attribName == "moveBundle" ) {
 					if(assetEntity?.moveBundle?.name != dtValue.correctedValue && assetEntity?.moveBundle?.name != dtValue.importValue ){
 						updateChangeConflicts( dataTransferBatch, dtValue )
-						errorConfictCount+=1
+						errorConflictCount+=1
 					}
 				}else if( dtValue.eavAttribute.backendType == "int" ){
 					def correctedPos
@@ -356,20 +356,20 @@ class AssetEntityAttributeLoaderService {
 						}
 						if( assetEntity."$attribName" != correctedPos ){
 							updateChangeConflicts( dataTransferBatch, dtValue )
-							errorConfictCount+=1
+							errorConflictCount+=1
 						}
 					} catch ( Exception ex ) {
 					}
 				} else {
 					if(assetEntity."$attribName" != dtValue.correctedValue && assetEntity."$attribName" != dtValue.importValue ){
 						updateChangeConflicts( dataTransferBatch, dtValue )
-						errorConfictCount+=1
+						errorConflictCount+=1
 					}
 					
 				}
 			}
 		}
-		validateResultList << [flag : flag, errorConfictCount : errorConfictCount]
+		validateResultList << [flag : flag, errorConflictCount : errorConflictCount]
 		return validateResultList
 	}
 	
