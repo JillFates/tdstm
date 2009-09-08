@@ -35,7 +35,7 @@ class ProjectUtilController {
     		def userCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' "+
     							"and partyIdTo = ${loginUser.person.id} and roleTypeCodeFrom = 'COMPANY' and roleTypeCodeTo = 'STAFF' ")
     		def query = "from Project p where p.id in (select pr.partyIdFrom from PartyRelationship pr where "+
-    					"pr.partyIdTo = ${userCompany?.partyIdFrom?.id} and roleTypeCodeFrom = 'PROJECT')"
+    					"pr.partyIdTo = ${userCompany?.partyIdFrom?.id} and roleTypeCodeFrom = 'PROJECT') or p.client = ${userCompany?.partyIdFrom?.id}"
     			projectList = Project.findAll(query)
     	}
     	return [ projectList:projectList ]
