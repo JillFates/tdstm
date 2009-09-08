@@ -324,7 +324,6 @@
 /* dash board vertical scroll for fire fox only */
 div.tableContainer table {     
    width: 99%;
-   height: 600px;
 }
 
 div.tableContainer tbody {
