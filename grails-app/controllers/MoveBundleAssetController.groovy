@@ -1349,6 +1349,9 @@ class MoveBundleAssetController {
     		 		def moveBundle = "" 
     		 		def assetTag = ""
     		 		def isAdmin = SecurityUtils.getSubject().hasRole("PROJ_MGR")
+    		 		if( !isAdmin ) {
+    		 			isAdmin = SecurityUtils.getSubject().hasRole("PROJECT_ADMIN")
+    		 		}
     		 		assetTagsList.each{
     		 			def index = it.indexOf('-')
     		 			def tag
