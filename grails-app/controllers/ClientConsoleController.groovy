@@ -668,10 +668,10 @@ class ClientConsoleController {
 			currState = currTransition[0].stateTo
 		}
 		def projectAssetMap = ProjectAssetMap.findByAsset( assetEntity )
-		if(currState){
+		if(currState && projectAssetMap){
 			projectAssetMap.currentStateId = currState
 			projectAssetMap.save()
-		} else {
+		} else if( projectAssetMap ) {
 			projectAssetMap.delete()
 		}
 	}
