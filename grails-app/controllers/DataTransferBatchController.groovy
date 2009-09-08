@@ -43,9 +43,11 @@ class DataTransferBatchController {
     		def errorConflictCount = 0
     		def updateCount = 0
     		def errorCount = 0
+    		def batchRecords = 0
     		try{
     			dataTransferBatch = DataTransferBatch.get(params.batchId)
     			if(dataTransferBatch){
+    				batchRecords = DataTransferValue.executeQuery("select count( distinct rowId  ) from DataTransferValue where dataTransferBatch = $dataTransferBatch.id ")[0]
     				def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = $dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
     				def assetsSize = dataTransferValueRowList.size()
     				session.setAttribute("TOTAL_BATCH_ASSETS",assetsSize)
@@ -54,6 +56,7 @@ class DataTransferBatchController {
     					def dtvList = DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
     					def  assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
     					def flag = 0
+    					def isModified = "false"
     					def isNewValidate
     					def isFormatError = 0
 		    			def assetEntity
@@ -98,7 +101,10 @@ class DataTransferBatchController {
 			    														moveBundle:bundleInstance ).save()
     									}
     								}
-    								assetEntity."$attribName" = teamInstance
+    								if( assetEntity."$attribName" != teamInstance ) {
+    									isModified = "true"
+    									assetEntity."$attribName" = teamInstance
+    								}
     							} else if ( attribName == "moveBundle" ) {
     								def moveBundleInstance
 				    				/*if( it.importValue != null && it.correctedValue != null ) {
@@ -117,7 +123,11 @@ class DataTransferBatchController {
 				    						moveBundleInstance = new MoveBundle(name:it.importValue,project:projectInstance,operationalOrder:1).save()
 				    					}
 				    				}
-				    				assetEntity."$attribName" = moveBundleInstance 
+				    				
+				    				if( assetEntity."$attribName" != moveBundleInstance ) {
+    									isModified = "true"
+    									assetEntity."$attribName" = moveBundleInstance 
+    								}
     							} else if( it.eavAttribute.backendType == "int" ){
     								def correctedPos
     								try {
@@ -127,7 +137,10 @@ class DataTransferBatchController {
     										correctedPos = Integer.parseInt(it.importValue)
     									}
     									//correctedPos = it.correctedValue
-    									assetEntity."$attribName" = correctedPos 
+    									if( assetEntity."$attribName" != correctedPos ) {
+        									isModified = "true"
+        									assetEntity."$attribName" = correctedPos 
+        								}
     								} catch ( Exception ex ) {
     									assetEntityErrorList << " ${attribName} at row ${dataTransferValueRow+1}"
     									it.hasError = 1
@@ -137,15 +150,20 @@ class DataTransferBatchController {
     									isFormatError = 1
     								}
     							} else {
-    								assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
+    								if( assetEntity."$attribName" != it.correctedValue && assetEntity."$attribName" != it.importValue  ) {
+    									isModified = "true"
+    									assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
+    								}
     							}
     						}
     						if ( isFormatError != 1 ) {
-    							assetEntity.save()
-    							if ( isNewValidate == "true" ) {
-    								insertCount+=1
-    							} else {
-    								updateCount+=1
+    							if( isModified == "true" ) {
+    								assetEntity.save()
+        							if ( isNewValidate == "true" ) {
+        								insertCount+=1
+        							} else {
+        								updateCount+=1
+        							}
     							}
     						} else {
     							errorCount+=1
@@ -191,7 +209,7 @@ class DataTransferBatchController {
     		}
     		//def errorCount = DataTransferValue.countByDataTransferBatchAndHasError(dataTransferBatch, 1)
     		if ( dataTransferBatch.dataTransferSet.id == 1 ) {
-    			flash.message = " ${insertCount} Records Inserted; ${updateCount} Records Updated; ${errorCount} Asset Errors;  ${errorConflictCount} Attribute Erros " 
+    			flash.message = " Assets in Batch: ${batchRecords}; ${insertCount} Records Inserted; ${updateCount} Records Updated; ${errorCount} Asset Errors;  ${errorConflictCount} Attribute Erros " 
     		}
     		if ( assetEntityErrorList ) {
     			if ( flash.message ) {
@@ -201,7 +219,7 @@ class DataTransferBatchController {
     			}
     		}
     	}
-    	redirect ( action:list, params:[projectId:projectId] )
+    	redirect ( action:list, params:[projectId:projectId, 'flash.message':flash.message ] )
      }
     /* --------------------------------------
      * 	@author : Lokanada Reddy

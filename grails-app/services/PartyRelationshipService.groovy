@@ -391,10 +391,10 @@ class PartyRelationshipService {
     	 def managerNames = new StringBuffer()
     	 projectManagers.each{staff ->
     	 	managerNames.append(staff.partyIdTo.firstName+" "+ staff.partyIdTo.lastName)
-    	 	managerNames.append(",")
+    	 	managerNames.append(", ")
     	 }
     	 if(managerNames.size() > 0) {
-    		 managerNames = managerNames.delete(managerNames.size()-1,managerNames.size())
+    		 managerNames = managerNames.delete(managerNames.size()-2,managerNames.size())
     	 }   
     	 return managerNames
      }

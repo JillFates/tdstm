@@ -343,7 +343,7 @@ class AssetEntityController {
 	        	bundleNameList.append("ALL")
 	        } else if( i != bundleSize - 1) {
 	        	bundleNameList.append( MoveBundle.findById( bundle[i] ) )
-	        	bundleNameList.append( "," )
+	        	bundleNameList.append( ", " )
                 bundleList.append( bundle[i] + "," )
             } else {
                 bundleList.append( bundle[i] )
