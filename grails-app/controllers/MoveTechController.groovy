@@ -544,8 +544,10 @@ class MoveTechController {
                             return;
                             }*/
                         }
+                        def holdId = stateEngineService.getStateId( moveBundleInstance.project.workflowCode, "Hold" )
                         def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-                        												"where t.asset_entity_id = ${assetItem.id} and voided = 0 order by date_created desc limit 1 ")
+                        												"where t.asset_entity_id = ${assetItem.id} and voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
+                        												"order by date_created desc limit 1 ")
                         projMap = ProjectAssetMap.findByAsset( assetItem )
                         if( !transitionStates.size() ) {
                         	flash.message = message ( code :" The asset has not yet been released " )
@@ -713,8 +715,10 @@ class MoveTechController {
 	            def loginTeam = ProjectTeam.findById(params.team)
 	            def actionLabel = params.actionLabel
 	            //def projectAssetMap = ProjectAssetMap.findByAsset( asset )
+	            def holdId = stateEngineService.getStateId( moveBundleInstance.project.workflowCode, "Hold" )
 	            def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-                        										"where t.asset_entity_id = ${asset.id} and voided = 0 order by date_created desc limit 1 ")
+                        										"where t.asset_entity_id = ${asset.id} and voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
+                    											"order by date_created desc limit 1 ")
 	            def currentState = ""
 	            if(transitionStates.size()){
 	            	currentState = stateEngineService.getState( moveBundleInstance.project.workflowCode, transitionStates[0].stateTo )
@@ -939,8 +943,10 @@ class MoveTechController {
                             return;
                         }
                     } else {*/
+                    	def holdId = stateEngineService.getStateId( moveBundleInstance.project.workflowCode, "Hold" )
                     	def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-                    													"where t.asset_entity_id = ${assetItem.id} and voided = 0 order by date_created desc limit 1 ")
+                    													"where t.asset_entity_id = ${assetItem.id} and voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
+                    													"order by date_created desc limit 1 ")
                         projMap = ProjectAssetMap.findByAsset( assetItem )
                         if( !transitionStates.size()) {
                             flash.message = message ( code : " The asset has not yet been released " )
