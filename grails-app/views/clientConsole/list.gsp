@@ -60,6 +60,10 @@ var time = '${timeToRefresh}';
 				// Show menu when #myDiv is clicked
 				$("#"+cellId).contextMenu('transitionMenu', {
 					onShowMenu: function(e, menu) {
+						$(".cell-selected").attr('class',$("#cssClassId").val());
+						var cssname = $("#"+$(e.target).attr("id")).attr('class')
+						$("#cssClassId").val(cssname)
+						$("#"+$(e.target).attr("id")).attr("class","cell-selected")
 			      		${remoteFunction(action:'getMenuList', params:'\'id=\' + $(e.target).attr("id") ', onComplete:'updateMenu(e,menu)')};
 			        	return menu;
 			      	},
@@ -337,6 +341,7 @@ var time = '${timeToRefresh}';
 <body>
 <div title="Change Status" id="changeStatusDialog"
 	style="background-color: #808080;display: none;">
+	<input type="hidden" id="cssClassId">
 <form name="changeStatusForm"><input type="hidden" name="asset"
 	id="asset" /> <input type="hidden" name="projectId" id="projectId"
 	value="${projectId}" />

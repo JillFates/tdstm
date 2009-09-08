@@ -379,3 +379,6 @@ text-decoration: line-through;
 .selectedRow {  
 	background-color: #aaefb8;  
 }
+.cell-selected{
+	background-color: #FFAF09;
+}
