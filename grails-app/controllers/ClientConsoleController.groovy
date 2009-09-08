@@ -117,6 +117,9 @@ class ClientConsoleController {
 			} else if(SecurityUtils.subject.hasRole("MANAGER")){
 				 role = "MANAGER"
 			}
+			holdId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Hold"))
+			releaseId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Release"))
+			reRackId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Reracked"))
 			resultList.each{
 				def stateId = 0
 				def assetId = it.id
@@ -128,14 +131,11 @@ class ClientConsoleController {
 					stateId = projectMap.currentStateId
 				}*/
 				def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-																"where t.asset_entity_id = $assetId and voided = 0 and ( type = 'process' or state_To = 10 ) "+
+																"where t.asset_entity_id = $assetId and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
 																"order by date_created desc limit 1 ")
 				if(transitionStates.size()){
 					stateId = transitionStates[0].stateTo
 				}
-				holdId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Hold"))
-				releaseId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Release"))
-				reRackId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Reracked"))
 				if(stateId == 0){
 					check = true
 				} else if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
@@ -220,8 +220,10 @@ class ClientConsoleController {
         if(projectMap != null){
 			stateVal = stateEngineService.getState(projectInstance.workflowCode,projectMap.currentStateId)
         }*/
+        def holdId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Hold"))
         def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-        												"where t.asset_entity_id = $assetId and voided = 0 and ( type = 'process' or state_To = 10 ) order by date_created desc limit 1 ")
+        												"where t.asset_entity_id = $assetId and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
+        												" order by date_created desc limit 1 ")
 		if(transitionStates.size()){
 			stateVal = stateEngineService.getState(projectInstance.workflowCode,transitionStates[0].stateTo)
 		}
@@ -281,11 +283,12 @@ class ClientConsoleController {
 			} else if(SecurityUtils.subject.hasRole("MANAGER")){
 				 role = "MANAGER"
 			}
+			def holdId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Hold"))
         	def assetList = assetArray.split(",") 
         	assetList.each{ asset->
         		//def projectAssetMap = ProjectAssetMap.find("from ProjectAssetMap pam where pam.asset = $asset")
         		def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-    															"where t.asset_entity_id = $asset and voided = 0 and ( type = 'process' or state_To = 10 )  "+
+    															"where t.asset_entity_id = $asset and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId )  "+
     															"order by date_created desc limit 1 ")
         		if(transitionStates.size()){
         			stateVal = stateEngineService.getState(projectInstance.workflowCode,transitionStates[0].stateTo)
@@ -395,6 +398,9 @@ class ClientConsoleController {
 			} else if(SecurityUtils.subject.hasRole("MANAGER")){
 				 role = "MANAGER"
 			}
+			def holdId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Hold"))
+			def releaseId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Release"))
+			def reRackId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Reracked"))
 			resultList.each{
 				def stateId = 0
 				def assetId = it.id
@@ -407,14 +413,11 @@ class ClientConsoleController {
 					stateId = projectMap.currentStateId
 				}*/
 				def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-																"where t.asset_entity_id = $assetId and voided = 0 and ( type = 'process' or state_To = 10 ) "+
+																"where t.asset_entity_id = $assetId and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
 																"order by date_created desc limit 1 ")
 				if(transitionStates.size()){
 					stateId = transitionStates[0].stateTo
 				}
-				def holdId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Hold"))
-				def releaseId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Release"))
-				def reRackId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Reracked"))
 				if(stateId == 0){
 					check = true
 				} else if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
@@ -725,8 +728,10 @@ class ClientConsoleController {
 		def maxstate = 0
 		def currentstate = 0
 		def tdId = []
+		def holdId = Integer.parseInt(stateEngineService.getStateId(assetEntity.project.workflowCode,"Hold"))
 		def currentTransition = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-														"where t.asset_entity_id = ${assetEntity?.id} and voided = 0 order by date_created desc limit 1 ")
+														"where t.asset_entity_id = ${assetEntity?.id} and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
+														"order by date_created desc limit 1 ")
 		if(currentTransition.size()){
 			currentstate = currentTransition[0].stateTo
 		}
@@ -735,7 +740,6 @@ class ClientConsoleController {
 		if(maxTransition){
 			maxstate = maxTransition[0].maxState
 		}
-		def holdId = Integer.parseInt(stateEngineService.getStateId(assetEntity.project.workflowCode,"Hold"))
 		def processTransitions= stateEngineService.getTasks(assetEntity.project.workflowCode, "TASK_ID")
 		def naTransQuery = "from AssetTransition where assetEntity = ${assetEntity?.id} and voided = 0 and type = 'boolean' "
 		processTransitions.each() { trans ->
