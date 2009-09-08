@@ -232,21 +232,18 @@ class DataTransferBatchController {
         dataTransferErrorList.each {
         	def assetNameId = EavAttribute.findByAttributeCode("assetName")?.id
         	def assetTagId = EavAttribute.findByAttributeCode("assetTag")?.id
-        	def queryForAssetName = jdbcTemplate.queryForList("select import_value as assetName from data_transfer_value "+
-								        						"where row_id=${it.row_id} and eav_attribute_id= $assetNameId "+
-								        						"and data_transfer_batch_id = ${dataTransferBatchInstance.id}")
-        	def queryForAssetTag = jdbcTemplate.queryForList("select import_value as assetTag from data_transfer_value "+
-								        						"where row_id=${it.row_id} and eav_attribute_id= $assetTagId "+
-								        						"and data_transfer_batch_id = ${dataTransferBatchInstance.id}")
-        	def assetEntity = AssetEntity.findAll("from AssetEntity where id=${it.asset_entity_id}")
+        	def assetName = DataTransferValue.find("from DataTransferValue where rowId=$it.row_id and eavAttribute=$assetNameId "+
+        										    "and dataTransferBatch=$dataTransferBatchInstance.id")?.importValue
+        	def assetTag = DataTransferValue.find("from DataTransferValue where rowId=$it.row_id and eavAttribute=$assetTagId "+
+                									"and dataTransferBatch=$dataTransferBatchInstance.id")?.importValue
+        	def assetEntity = AssetEntity.find("from AssetEntity where id=${it.asset_entity_id}")
         	if( it.attribute_code == "sourceTeam" || it.attribute_code == "targetTeam") {
-        		currentValues = assetEntity.(it.attribute_code).name[0]
+        		currentValues = assetEntity.(it.attribute_code).name
         	} else {
-        		currentValues = assetEntity.(it.attribute_code)[0]
+        		currentValues = assetEntity.(it.attribute_code)
         	}
-        	completeDataTransferErrorList << ["assetName":queryForAssetName[0].assetName, "assetTag":queryForAssetTag[0].assetTag,
-        	                                  "attribute":it.attribute_code, "error":it.error_text, "currentValue":currentValues,
-        	                                  "importValue":it.import_value]
+        	completeDataTransferErrorList << ["assetName":assetName, "assetTag":assetTag, "attribute":it.attribute_code, "error":it.error_text,  
+        	                                  "currentValue":currentValues, "importValue":it.import_value]
         }
         completeDataTransferErrorList.sort{it.assetTag + it.attribute}
         return [ completeDataTransferErrorList : completeDataTransferErrorList ]
