@@ -328,6 +328,10 @@ var time = '${timeToRefresh}';
 			isFirst = true;
 		}
 	}
+	
+	function showAssetDetails( assetId ){
+		${remoteFunction(controller:'assetEntity', action:'editShow', params:'\'id=\'+ assetId', before:'document.showForm.id.value ='+ assetId+';document.editForm.id.value = '+ assetId+';', onComplete:'showAssetDialog(e , \'show\')')}
+	}
 </script>
 </head>
 <body>
@@ -483,10 +487,10 @@ var time = '${timeToRefresh}';
 				</g:if>
 				<g:else>&nbsp;</g:else>
 			</td>
-			<td id="application_${assetEntity.id}" onclick="${remoteFunction(controller:'assetEntity', action:'editShow', params:'\'id=\'+'+assetEntity.id, before:'document.showForm.id.value ='+ assetEntity.id+';document.editForm.id.value = '+ assetEntity.id+';', onComplete:'showAssetDialog(e , \'show\')')}">${assetEntity?.application}&nbsp;</td>
-			<td id="appOwner_${assetEntity.id}" onclick="${remoteFunction(controller:'assetEntity', action:'editShow', params:'\'id=\'+'+assetEntity.id, before:'document.showForm.id.value ='+ assetEntity.id+';document.editForm.id.value = '+ assetEntity.id+';', onComplete:'showAssetDialog(e , \'show\')')}">${assetEntity?.appOwner}&nbsp;</td>
-			<td id="appSme_${assetEntity.id}" onclick="${remoteFunction(controller:'assetEntity', action:'editShow', params:'\'id=\'+'+assetEntity.id, before:'document.showForm.id.value ='+ assetEntity.id+';document.editForm.id.value = '+ assetEntity.id+';', onComplete:'showAssetDialog(e , \'show\')')}">${assetEntity?.appSme}&nbsp;</td>
-			<td id="assetName_${assetEntity.id}" onclick="${remoteFunction(controller:'assetEntity', action:'editShow', params:'\'id=\'+'+assetEntity.id, before:'document.showForm.id.value ='+ assetEntity.id+';document.editForm.id.value = '+ assetEntity.id+';', onComplete:'showAssetDialog(e , \'show\')')}">${assetEntity?.assetName}&nbsp;</td>
+			<td id="application_${assetEntity.id}" onclick="showAssetDetails(${assetEntity.id})">${assetEntity?.application}&nbsp;</td>
+			<td id="appOwner_${assetEntity.id}" onclick="showAssetDetails(${assetEntity.id})">${assetEntity?.appOwner}&nbsp;</td>
+			<td id="appSme_${assetEntity.id}" onclick="showAssetDetails(${assetEntity.id})">${assetEntity?.appSme}&nbsp;</td>
+			<td id="assetName_${assetEntity.id}" onclick="showAssetDetails(${assetEntity.id})">${assetEntity?.assetName}&nbsp;</td>
 			<g:each in="${assetEntity.transitions}" var="transition" >${transition}</g:each>
 			</tr>
 		</g:each>

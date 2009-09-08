@@ -110,6 +110,13 @@ class ClientConsoleController {
 				processTransitionList<<[header:stateEngineService.getStateLabel(projectInstance.workflowCode,it),transId:stateEngineService.getStateId(projectInstance.workflowCode,processTransition)]
 			}
 			def htmlTdId = new StringBuffer()
+			/* user role check*/
+			def role = ""
+			if(SecurityUtils.subject.hasRole("ADMIN")){
+				 role = "SUPERVISOR"
+			} else if(SecurityUtils.subject.hasRole("MANAGER")){
+				 role = "MANAGER"
+			}
 			resultList.each{
 				def stateId = 0
 				def assetId = it.id
@@ -121,7 +128,8 @@ class ClientConsoleController {
 					stateId = projectMap.currentStateId
 				}*/
 				def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-																"where t.asset_entity_id = $assetId and voided = 0 order by date_created desc limit 1 ")
+																"where t.asset_entity_id = $assetId and voided = 0 and ( type = 'process' or state_To = 10 ) "+
+																"order by date_created desc limit 1 ")
 				if(transitionStates.size()){
 					stateId = transitionStates[0].stateTo
 				}
@@ -132,7 +140,7 @@ class ClientConsoleController {
 					check = true
 				} else if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
 					stateVal = stateEngineService.getState(projectInstance.workflowCode,stateId)
-					taskVal = stateEngineService.getTasks(projectInstance.workflowCode,"MANAGER",stateVal)
+					taskVal = stateEngineService.getTasks(projectInstance.workflowCode, role ,stateVal)
 					if(taskVal.size() == 0){
 						check = false
 					}else{
@@ -145,6 +153,8 @@ class ClientConsoleController {
 				processTransitionList.each() { trans ->
 					def cssClass='task_pending'
 					def transitionId = Integer.parseInt(trans.transId)
+					def stateType = stateEngineService.getStateType( projectInstance.workflowCode, 
+									stateEngineService.getState(projectInstance.workflowCode, transitionId))
 					if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId)){
 						cssClass='asset_pending'
 					} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 0 and stateTo = "+transitionId)) {
@@ -154,30 +164,27 @@ class ClientConsoleController {
 							cssClass='asset_hold'
 						}
 					}
-					if( transitionId <= maxstate  ){
-						cssClass = "task_done"
-						if(stateId == holdId ){
-							cssClass = "asset_hold"
-						} else if( transitionId == holdId ){
-							cssClass='task_pending'
-						} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId)){
-							cssClass='asset_pending'
+					if(stateType != 'boolean' || transitionId == holdId){
+						if( transitionId <= maxstate  ){
+							cssClass = "task_done"
+							if(stateId == holdId ){
+								cssClass = "asset_hold"
+							} else if( transitionId == holdId ){
+								cssClass='task_pending'
+							} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId)){
+								cssClass='asset_pending'
+							}
 						}
 					}
-					htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass\" onclick=\"${remoteFunction(controller:'assetEntity', action:'editShow', params:'\'id=\'+'+ assetId, before:'document.showForm.id.value ='+ assetId+';document.editForm.id.value = '+ assetId+';', onComplete:'showAssetDialog(e , \'show\')')}\">&nbsp;</td>"
+					
+					htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass\" onclick=\"showAssetDetails($assetId)\">&nbsp;</td>"
 					htmlTdId.append("${assetId+"_"+trans.transId},")
 				}
 				assetEntityList << [id: assetId, application:it.application,appOwner:it.appOwner,appSme:it.appSme,assetName:it.assetName,transitions:htmlTd,checkVal:check]
 			}
 			userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")
 			def timeToRefresh = getSession().getAttribute("CLIENT_CONSOLE_REFRESH")
-			/* user role check*/
-			def role = ""
-			if(SecurityUtils.subject.hasRole("ADMIN")){
-				 role = "SUPERVISOR"
-			} else if(SecurityUtils.subject.hasRole("MANAGER")){
-				 role = "MANAGER"
-			}
+			
 			return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,
 				appOwnerList:appOwnerList,applicationList:applicationList,appSmeList:appSmeList,projectId:projectId,
 				processTransitionList:processTransitionList,projectId:projectId,appOwnerValue:appOwnerValue,appValue:appValue,
@@ -202,17 +209,24 @@ class ClientConsoleController {
         def tempTaskList = []
         def assetId = params.assetEntity
         def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
+        /* user role check*/
+		def role = ""
+		if(SecurityUtils.subject.hasRole("ADMIN")){
+			 role = "SUPERVISOR"
+		} else if(SecurityUtils.subject.hasRole("MANAGER")){
+			 role = "MANAGER"
+		}
         /*def projectMap = ProjectAssetMap.find("from ProjectAssetMap pam where pam.asset = ${params.assetEntity}")
         if(projectMap != null){
 			stateVal = stateEngineService.getState(projectInstance.workflowCode,projectMap.currentStateId)
         }*/
         def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-        												"where t.asset_entity_id = $assetId and voided = 0 order by date_created desc limit 1 ")
+        												"where t.asset_entity_id = $assetId and voided = 0 and ( type = 'process' or state_To = 10 ) order by date_created desc limit 1 ")
 		if(transitionStates.size()){
 			stateVal = stateEngineService.getState(projectInstance.workflowCode,transitionStates[0].stateTo)
 		}
 		if(stateVal){
-			temp = stateEngineService.getTasks(projectInstance.workflowCode,"MANAGER",stateVal)
+			temp = stateEngineService.getTasks(projectInstance.workflowCode, role, stateVal)
 		} else {
 			temp =  ["Ready"]
 		}
@@ -260,14 +274,22 @@ class ClientConsoleController {
         //def projectMap = ProjectAssetMap.findAll("from ProjectAssetMap pam where pam.asset in ($assetArray)")
         def stateVal
         if(assetArray){
+        	/* user role check*/
+			def role = ""
+			if(SecurityUtils.subject.hasRole("ADMIN")){
+				 role = "SUPERVISOR"
+			} else if(SecurityUtils.subject.hasRole("MANAGER")){
+				 role = "MANAGER"
+			}
         	def assetList = assetArray.split(",") 
         	assetList.each{ asset->
         		//def projectAssetMap = ProjectAssetMap.find("from ProjectAssetMap pam where pam.asset = $asset")
         		def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-    															"where t.asset_entity_id = $asset and voided = 0 order by date_created desc limit 1 ")
+    															"where t.asset_entity_id = $asset and voided = 0 and ( type = 'process' or state_To = 10 )  "+
+    															"order by date_created desc limit 1 ")
         		if(transitionStates.size()){
         			stateVal = stateEngineService.getState(projectInstance.workflowCode,transitionStates[0].stateTo)
-                    temp = stateEngineService.getTasks(projectInstance.workflowCode,"MANAGER",stateVal)
+                    temp = stateEngineService.getTasks(projectInstance.workflowCode, role ,stateVal)
                     taskList << [task:temp]
         		} else {
         			taskList << [task:["Ready"] ]
@@ -298,13 +320,20 @@ class ClientConsoleController {
         def assetId = params.asset
 		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )		 		 
         def assetEnt = AssetEntity.findAll("from AssetEntity ae where ae.id in ($assetId)")
+        /* user role check*/
+		def role = ""
+		if(SecurityUtils.subject.hasRole("ADMIN")){
+			 role = "SUPERVISOR"
+		} else if(SecurityUtils.subject.hasRole("MANAGER")){
+			 role = "MANAGER"
+		}
         assetEnt.each{
 	        def bundle = it.moveBundle
 	        def principal = SecurityUtils.subject.principal
 	        def loginUser = UserLogin.findByUsername(principal)
 	        def team = it.sourceTeam
 			     
-	        def workflow = workflowService.createTransition(projectInstance.workflowCode,"MANAGER",params.taskList,it,bundle,loginUser,team,params.enterNote)
+	        def workflow = workflowService.createTransition(projectInstance.workflowCode, role ,params.taskList,it,bundle,loginUser,team,params.enterNote)
 	        if(workflow.success){
 	        	if(params.enterNote != ""){
 	                def assetComment = new AssetComment()
@@ -359,6 +388,13 @@ class ClientConsoleController {
 			query.append(" GROUP BY ae.asset_entity_id")
 			def resultList=jdbcTemplate.queryForList(query.toString())
 			def processTransitions= stateEngineService.getTasks(projectInstance.workflowCode, "TASK_ID")
+			/* user role check*/
+			def role = ""
+			if(SecurityUtils.subject.hasRole("ADMIN")){
+				 role = "SUPERVISOR"
+			} else if(SecurityUtils.subject.hasRole("MANAGER")){
+				 role = "MANAGER"
+			}
 			resultList.each{
 				def stateId = 0
 				def assetId = it.id
@@ -371,7 +407,8 @@ class ClientConsoleController {
 					stateId = projectMap.currentStateId
 				}*/
 				def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-																"where t.asset_entity_id = $assetId and voided = 0 order by date_created desc limit 1 ")
+																"where t.asset_entity_id = $assetId and voided = 0 and ( type = 'process' or state_To = 10 ) "+
+																"order by date_created desc limit 1 ")
 				if(transitionStates.size()){
 					stateId = transitionStates[0].stateTo
 				}
@@ -382,7 +419,7 @@ class ClientConsoleController {
 					check = true
 				} else if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
 					def stateVal = stateEngineService.getState(projectInstance.workflowCode,stateId)
-					def taskVal = stateEngineService.getTasks(projectInstance.workflowCode,"MANAGER",stateVal)
+					def taskVal = stateEngineService.getTasks(projectInstance.workflowCode,role,stateVal)
 					if(taskVal.size() == 0){
 						check = false
 					}else{
@@ -395,6 +432,8 @@ class ClientConsoleController {
 				processTransitions.each() { trans ->
 					def cssClass='task_pending'
 					def transitionId = Integer.parseInt(trans)
+					def stateType = stateEngineService.getStateType( projectInstance.workflowCode, 
+									stateEngineService.getState(projectInstance.workflowCode, transitionId))
 					if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId)){
 						cssClass='asset_pending'
 					} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 0 and stateTo = "+transitionId)) {
@@ -404,14 +443,16 @@ class ClientConsoleController {
 							cssClass='asset_hold'
 						}
 					}
-					if( transitionId <= maxstate  ){
-						cssClass = "task_done"
-						if(stateId == holdId ){
-							cssClass = "asset_hold"
-						} else if( transitionId == holdId ){
-							cssClass='task_pending'
-						} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId)){
-							cssClass='asset_pending'
+					if(stateType != 'boolean' || transitionId == holdId){
+						if( transitionId <= maxstate  ){
+							cssClass = "task_done"
+							if(stateId == holdId ){
+								cssClass = "asset_hold"
+							} else if( transitionId == holdId ){
+								cssClass='task_pending'
+							} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId)){
+								cssClass='asset_pending'
+							}
 						}
 					}
 					tdId << [id:"${assetId+"_"+trans}", cssClass:cssClass]
@@ -697,10 +738,11 @@ class ClientConsoleController {
 		def holdId = Integer.parseInt(stateEngineService.getStateId(assetEntity.project.workflowCode,"Hold"))
 		def processTransitions= stateEngineService.getTasks(assetEntity.project.workflowCode, "TASK_ID")
 		def naTransQuery = "from AssetTransition where assetEntity = ${assetEntity?.id} and voided = 0 and type = 'boolean' "
-		def stateType = stateEngineService.getStateType( assetEntity.project.workflowCode, state )
 		processTransitions.each() { trans ->
 			def cssClass='task_pending'
 			def transitionId = Integer.parseInt(trans)
+			def stateType = stateEngineService.getStateType( assetEntity.project.workflowCode, 
+									stateEngineService.getState(assetEntity.project.workflowCode, transitionId))
 			if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId)){
 				cssClass='asset_pending'
 			} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 0 and stateTo = "+transitionId)) {
@@ -710,14 +752,16 @@ class ClientConsoleController {
 					cssClass='asset_hold'
 				}
 			}
-			if( transitionId <= maxstate  ){
-				cssClass = "task_done"
-				if(currentstate == holdId ){
-					cssClass = "asset_hold"
-				} else if( transitionId == holdId ){
-					cssClass='task_pending'
-				} else if(AssetTransition.find(naTransQuery+"  and isNonApplicable = 1 and stateTo = "+transitionId)){
-					cssClass='asset_pending'
+			if(stateType != 'boolean' || transitionId == holdId){
+				if( transitionId <= maxstate  ){
+					cssClass = "task_done"
+					if(currentstate == holdId ){
+						cssClass = "asset_hold"
+					} else if( transitionId == holdId ){
+						cssClass='task_pending'
+					} else if(AssetTransition.find(naTransQuery+"  and isNonApplicable = 1 and stateTo = "+transitionId)){
+						cssClass='asset_pending'
+					}
 				}
 			}
 			tdId << [id:"${assetEntity?.id+"_"+trans}", cssClass:cssClass]
