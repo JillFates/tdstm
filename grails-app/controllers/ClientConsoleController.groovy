@@ -113,7 +113,7 @@ class ClientConsoleController {
 			/* user role check*/
 			def role = ""
 			def subject = SecurityUtils.subject
-			if(subject.hasRole("ADMIN") || subject.hasRole("PROJ_MGR")){
+			if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
 				role = "SUPERVISOR"
 			} else if(subject.hasRole("MANAGER")){
 				role = "MANAGER"
@@ -213,7 +213,7 @@ class ClientConsoleController {
         /* user role check*/
 		def role = ""
 		def subject = SecurityUtils.subject
-		if(subject.hasRole("ADMIN") || subject.hasRole("PROJ_MGR")){
+		if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
 			role = "SUPERVISOR"
 		} else if(subject.hasRole("MANAGER")){
 			role = "MANAGER"
@@ -281,7 +281,7 @@ class ClientConsoleController {
         	/* user role check*/
 			def role = ""
 			def subject = SecurityUtils.subject
-			if(subject.hasRole("ADMIN") || subject.hasRole("PROJ_MGR")){
+			if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
 				role = "SUPERVISOR"
 			} else if(subject.hasRole("MANAGER")){
 				role = "MANAGER"
@@ -329,7 +329,7 @@ class ClientConsoleController {
         /* user role check*/
 		def role = ""
 		def subject = SecurityUtils.subject
-		if(subject.hasRole("ADMIN") || subject.hasRole("PROJ_MGR")){
+		if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
 			role = "SUPERVISOR"
 		} else if(subject.hasRole("MANAGER")){
 			role = "MANAGER"
@@ -398,7 +398,7 @@ class ClientConsoleController {
 			/* user role check*/
 			def role = ""
 			def subject = SecurityUtils.subject 
-			if(subject.hasRole("ADMIN") || subject.hasRole("PROJ_MGR")){
+			if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
 				 role = "SUPERVISOR"
 			} else if(subject.hasRole("MANAGER")){
 				 role = "MANAGER"
@@ -587,7 +587,7 @@ class ClientConsoleController {
 			 def taskList
 			 def role = ""
 			 def subject = SecurityUtils.subject
-			 if(subject.hasRole("ADMIN") || subject.hasRole("PROJ_MGR")){
+			 if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
 				 role = "SUPERVISOR"
 			 } else if(subject.hasRole("MANAGER")){
 				 role = "MANAGER"
@@ -635,7 +635,7 @@ class ClientConsoleController {
 		 					"where t.asset_entity_id = ${assetEntity.id} and t.voided = 0 and t.type = 'process' order by date_created desc limit 1 "
 		def role = ""
 		def subject = SecurityUtils.subject
-		if(subject.hasRole("ADMIN") || subject.hasRole("PROJ_MGR")){
+		if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
 			role = "SUPERVISOR"
 		} else if(subject.hasRole("MANAGER")){
 			role = "MANAGER"
