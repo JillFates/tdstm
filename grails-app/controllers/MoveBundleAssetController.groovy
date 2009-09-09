@@ -976,7 +976,7 @@ class MoveBundleAssetController {
             		} else {
             			sourceRackQuery += " project_id = $projectId "
             		}
-        			sourceRackQuery += " and asset_type NOT IN ('VM', 'Blade Card') "
+        			sourceRackQuery += " and asset_type NOT IN ('VM', 'Blade') "
         			racks = jdbcTemplate.queryForList(sourceRackQuery + "group by source_location, source_rack, source_room")
             	}
             } else {
@@ -992,7 +992,7 @@ class MoveBundleAssetController {
 					} else {
 						targetRackQuery += " project_id = $projectId "
 					}
-            		targetRackQuery += " and asset_type NOT IN ('VM', 'Blade Card') "
+            		targetRackQuery += " and asset_type NOT IN ('VM', 'Blade') "
             		racks = jdbcTemplate.queryForList( targetRackQuery  + "group by target_location, target_rack, target_room")
             		
             		}
@@ -1314,8 +1314,8 @@ class MoveBundleAssetController {
     	def rackDetails = []
     	def sourceRackList
     	def targetRackList
-    	def queryForSourceRacks = "select source_location as location, source_rack as rack, source_room as room from asset_entity where asset_type NOT IN ('VM', 'Blade Card')"
-    	def queryForTargetRacks = "select target_location as location, target_rack as rack, target_room as room from asset_entity where asset_type NOT IN ('VM', 'Blade Card')"
+    	def queryForSourceRacks = "select source_location as location, source_rack as rack, source_room as room from asset_entity where asset_type NOT IN ('VM', 'Blade')"
+    	def queryForTargetRacks = "select target_location as location, target_rack as rack, target_room as room from asset_entity where asset_type NOT IN ('VM', 'Blade')"
     	def sourceGroup = "group by source_location, source_rack, source_room"
     	def targetGroup = "group by target_location, target_rack, target_room"
     	if(bundleId){
