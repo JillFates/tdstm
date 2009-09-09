@@ -701,11 +701,11 @@ td .odd {
 					<table>
 						<thead>
 							<tr	id="rowId" onmouseover="$('#rowId').css('background','white');">
-								<jsec:hasRole name="ADMIN">
+								<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJ_MGR']">
 								<td id="tdId"><input id="state" type="button"
 									value="State..." onclick="changeState()" title="Change State" />
 								</td>
-								</jsec:hasRole>
+								</jsec:hasAnyRole>
 								<td style="vertical-align: middle;" colspan="3">
 									<label for="showAllCheckbox"><input type="checkbox" onclick="showAll()" id="showAllCheckbox"/>&nbsp;Show All&nbsp;</label>
 									&nbsp;&nbsp;<input type="button" onclick="showfilterDialog()" id="filterButtonId" value="Filter"/>
@@ -719,8 +719,9 @@ td .odd {
 								</td>
 							</tr>
 							<tr>
-								<jsec:hasAnyRole in="['ADMIN','SUPERVISOR']"><th>Actions <jsec:hasRole name="ADMIN"><a href="#" onclick="selectAll()"><u
-									style="color: blue;">All</u></a></jsec:hasRole></th></jsec:hasAnyRole>
+								<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJ_MGR']">
+									<th>Actions <jsec:hasAnyRole in="['ADMIN','PROJ_MGR']"><a href="#" onclick="selectAll()"><u
+									style="color: blue;">All</u></a></jsec:hasAnyRole></th></jsec:hasAnyRole>
 								<g:sortableColumn property="priority" title="Priority" 
 									params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll,
 											application:params.application,appOwner:params.appOwner,appSme:params.appSme,
@@ -762,8 +763,8 @@ td .odd {
 									id="assetDetailRow_${assetsList?.asset.id}"
 									class="${assetsList?.cssClass}" value="${assetsList?.asset.id}">
 
-									<jsec:hasAnyRole in="['ADMIN','SUPERVISOR']">
-									<td><jsec:hasRole name="ADMIN">
+									<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJ_MGR']">
+									<td><jsec:hasAnyRole in="['ADMIN','PROJ_MGR']">
 										<g:if test="${assetsList.checkVal == true}">
 										<span id="spanId_${assetsList?.asset.id}">
 											<g:checkBox name="checkChange"
@@ -772,7 +773,7 @@ td .odd {
 										</span>
 
 										</g:if>
-									</jsec:hasRole>
+									</jsec:hasAnyRole>
 									<g:remoteLink controller="assetEntity" action="editShow" id="${assetsList?.asset.id}" before="document.showForm.id.value = ${assetsList?.asset.id};document.editForm.id.value = ${assetsList?.asset.id};" onComplete="showAssetDialog( e , 'show');">
 										<img src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px">
 									</g:remoteLink>

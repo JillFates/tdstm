@@ -112,10 +112,11 @@ class ClientConsoleController {
 			def htmlTdId = new StringBuffer()
 			/* user role check*/
 			def role = ""
-			if(SecurityUtils.subject.hasRole("ADMIN")){
-				 role = "SUPERVISOR"
-			} else if(SecurityUtils.subject.hasRole("MANAGER")){
-				 role = "MANAGER"
+			def subject = SecurityUtils.subject
+			if(subject.hasRole("ADMIN") || subject.hasRole("PROJ_MGR")){
+				role = "SUPERVISOR"
+			} else if(subject.hasRole("MANAGER")){
+				role = "MANAGER"
 			}
 			holdId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Hold"))
 			releaseId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Release"))
@@ -211,10 +212,11 @@ class ClientConsoleController {
         def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
         /* user role check*/
 		def role = ""
-		if(SecurityUtils.subject.hasRole("ADMIN")){
-			 role = "SUPERVISOR"
-		} else if(SecurityUtils.subject.hasRole("MANAGER")){
-			 role = "MANAGER"
+		def subject = SecurityUtils.subject
+		if(subject.hasRole("ADMIN") || subject.hasRole("PROJ_MGR")){
+			role = "SUPERVISOR"
+		} else if(subject.hasRole("MANAGER")){
+			role = "MANAGER"
 		}
         /*def projectMap = ProjectAssetMap.find("from ProjectAssetMap pam where pam.asset = ${params.assetEntity}")
         if(projectMap != null){
@@ -278,10 +280,11 @@ class ClientConsoleController {
         if(assetArray){
         	/* user role check*/
 			def role = ""
-			if(SecurityUtils.subject.hasRole("ADMIN")){
-				 role = "SUPERVISOR"
-			} else if(SecurityUtils.subject.hasRole("MANAGER")){
-				 role = "MANAGER"
+			def subject = SecurityUtils.subject
+			if(subject.hasRole("ADMIN") || subject.hasRole("PROJ_MGR")){
+				role = "SUPERVISOR"
+			} else if(subject.hasRole("MANAGER")){
+				role = "MANAGER"
 			}
 			def holdId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Hold"))
         	def assetList = assetArray.split(",") 
@@ -325,10 +328,11 @@ class ClientConsoleController {
         def assetEnt = AssetEntity.findAll("from AssetEntity ae where ae.id in ($assetId)")
         /* user role check*/
 		def role = ""
-		if(SecurityUtils.subject.hasRole("ADMIN")){
-			 role = "SUPERVISOR"
-		} else if(SecurityUtils.subject.hasRole("MANAGER")){
-			 role = "MANAGER"
+		def subject = SecurityUtils.subject
+		if(subject.hasRole("ADMIN") || subject.hasRole("PROJ_MGR")){
+			role = "SUPERVISOR"
+		} else if(subject.hasRole("MANAGER")){
+			role = "MANAGER"
 		}
         assetEnt.each{
 	        def bundle = it.moveBundle
@@ -393,9 +397,10 @@ class ClientConsoleController {
 			def processTransitions= stateEngineService.getTasks(projectInstance.workflowCode, "TASK_ID")
 			/* user role check*/
 			def role = ""
-			if(SecurityUtils.subject.hasRole("ADMIN")){
+			def subject = SecurityUtils.subject 
+			if(subject.hasRole("ADMIN") || subject.hasRole("PROJ_MGR")){
 				 role = "SUPERVISOR"
-			} else if(SecurityUtils.subject.hasRole("MANAGER")){
+			} else if(subject.hasRole("MANAGER")){
 				 role = "MANAGER"
 			}
 			def holdId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Hold"))
@@ -581,11 +586,10 @@ class ClientConsoleController {
 			 def projectAssetMap = ProjectAssetMap.findByAsset(assetEntity)
 			 def taskList
 			 def role = ""
-			 def supervisor = SecurityUtils.subject.hasRole("ADMIN")
-			 def manager = SecurityUtils.subject.hasRole("MANAGER")
-			 if(supervisor){
+			 def subject = SecurityUtils.subject
+			 if(subject.hasRole("ADMIN") || subject.hasRole("PROJ_MGR")){
 				 role = "SUPERVISOR"
-			 } else if(manager){
+			 } else if(subject.hasRole("MANAGER")){
 				 role = "MANAGER"
 			 }
 			 if(projectAssetMap){
@@ -630,11 +634,10 @@ class ClientConsoleController {
 		def currStateQuery = "select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
 		 					"where t.asset_entity_id = ${assetEntity.id} and t.voided = 0 and t.type = 'process' order by date_created desc limit 1 "
 		def role = ""
-		def supervisor = SecurityUtils.subject.hasRole("ADMIN")
-		def manager = SecurityUtils.subject.hasRole("MANAGER")
-		if(supervisor){
+		def subject = SecurityUtils.subject
+		if(subject.hasRole("ADMIN") || subject.hasRole("PROJ_MGR")){
 			role = "SUPERVISOR"
-		} else if(manager){
+		} else if(subject.hasRole("MANAGER")){
 			role = "MANAGER"
 		}
 		def assetTransitionQuery = "from AssetTransition t where t.assetEntity = ${assetEntity.id} and t.voided = 0"

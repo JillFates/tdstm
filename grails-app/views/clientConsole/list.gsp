@@ -415,7 +415,7 @@ var time = '${timeToRefresh}';
 <table cellpadding="0" cellspacing="0"  style="border:0px;">
 	<thead>
 	<tr>
-	<jsec:hasAnyRole in="['ADMIN','MANAGER']">
+	<jsec:hasAnyRole in="['ADMIN','MANAGER', 'PROJ_MGR']">
 	<td>
 	<input type="button" value="State..." onclick="changeState()" title="Change State"/>
 	</td>
@@ -444,7 +444,7 @@ var time = '${timeToRefresh}';
 	<td style="padding-left: 0px;"><select style="width: 120px;visibility: hidden;"/></td>
 		</tr>
 		<tr>
-		 <jsec:hasAnyRole in="['ADMIN','MANAGER']">	<th style="padding-top:50px;">Actions <a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a></th></jsec:hasAnyRole>
+		 <jsec:hasAnyRole in="['ADMIN','MANAGER', 'PROJ_MGR']">	<th style="padding-top:50px;">Actions <a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a></th></jsec:hasAnyRole>
 			
 			<th style="padding-top:50px;">Issue</th>
 			
@@ -471,7 +471,7 @@ var time = '${timeToRefresh}';
 		<g:if test="${assetEntityList}">
 		<g:each in="${assetEntityList}" var="assetEntity">
 			<tr id="assetRow_${assetEntity.id}" >
-			<jsec:hasAnyRole in="['ADMIN','MANAGER']">	
+			<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">	
 			<td id="action_${assetEntity.id}">
 				
 					<g:if test="${assetEntity.checkVal == true}">
@@ -535,7 +535,7 @@ var time = '${timeToRefresh}';
 	</tbody>
 </table>
 </div>
-<jsec:hasAnyRole in="['ADMIN','MANAGER']">
+<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
 <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 <span class="menuButton"><a class="create" href="#"
 	onclick="$('#statusId').val('');$('#createResolveDiv').css('display', 'none') ;$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">New
@@ -682,7 +682,7 @@ Comment</a></span></div>
 	
 </table>
 </div>
-<jsec:hasAnyRole in="['ADMIN','MANAGER']">
+<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
 <div class="buttons"><span class="button"> <input
 	class="edit" type="button" value="Edit"
 	onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
@@ -801,7 +801,7 @@ Comment</a></span></div>
 	<table id="showTable">
 	</table>
 	</div>
-	<jsec:hasAnyRole in="['ADMIN','MANAGER']">
+	<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
 	<div class="buttons">
 	<input type="hidden" name="id" value="" />
 	<input type="hidden" name="projectId" value="${projectId}" />
@@ -828,7 +828,7 @@ Comment</a></span></div>
 	<div class="dialog" id="editDiv">
 	
 	</div>
-	<jsec:hasAnyRole in="['ADMIN','MANAGER']">
+	<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
 	<div class="buttons"><span class="button">
 	<input type="button" class="save" value="Update Asset Entity" onClick="${remoteFunction(controller:'assetEntity', action:'getAssetAttributes', params:'\'assetId=\' + document.editForm.id.value ', onComplete:'callUpdateDialog(e)')}" />
 	</span> <span class="button"><input type="button"  
