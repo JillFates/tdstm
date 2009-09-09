@@ -940,7 +940,7 @@ class AssetEntityController {
         	def queryNotHold = supervisorConsoleService.getQueryForConsole(moveBundleInstance,params, 'notHold')
         	def holdTotalAsset = jdbcTemplate.queryForList( queryHold )
         	def otherTotalAsset = jdbcTemplate.queryForList( queryNotHold )
-        	if(!currentState && !params.assetStatus){
+        	if(!currentState && !params.assetStatus || params.assetStatus?.contains("pend")){
 	        	holdTotalAsset.each{
 	        		totalAsset<<it
 	        	}
@@ -964,7 +964,7 @@ class AssetEntityController {
 	            }
 	            
 	            def sourcePendAssets = jdbcTemplate.queryForList( countQuery + "and e.source_team_id = ${it.id} and pm.current_state_id < $releasedId "+
-	            													"group by e.asset_entity_id having ( minstate != $holdId or minstate  is null )").size()
+	            													"group by e.asset_entity_id ").size()
 	            
 	            def sourceAssets = AssetEntity.findAll("from AssetEntity where moveBundle = ${moveBundleInstance.id} and sourceTeam = ${it.id} " ).size()
 	            
@@ -976,7 +976,7 @@ class AssetEntityController {
 	            def targetAssets = AssetEntity.findAll("from AssetEntity  where moveBundle = ${moveBundleInstance.id} and targetTeam = ${it.id} " ).size()
 	            
 	            def targetPendAssets = jdbcTemplate.queryForList(countQuery +	"and e.target_team_id = ${it.id} and pm.current_state_id < $stagedId "+
-	            												"group by e.asset_entity_id HAVING ( minstate != $holdId or minstate  is null ) ").size()
+	            												"group by e.asset_entity_id ").size()
 	
 	            def rerackedAssets = jdbcTemplate.queryForList(countQuery +	"and e.target_team_id = ${it.id} and pm.current_state_id >= $rerackedId group by e.asset_entity_id HAVING minstate != $holdId ").size()
 				
@@ -990,7 +990,7 @@ class AssetEntityController {
 	                           targetPendAssets:targetPendAssets ]
 	        }
 							
-			def sourcePendCleaned = jdbcTemplate.queryForList(countQuery +	" and pm.current_state_id < $unrackedId group by e.asset_entity_id having ( minstate != $holdId or minstate  is null )").size()
+			def sourcePendCleaned = jdbcTemplate.queryForList(countQuery +	" and pm.current_state_id < $unrackedId group by e.asset_entity_id ").size()
 			
 			def sourceAvailCleaned = jdbcTemplate.queryForList(countQuery +	" and pm.current_state_id = $unrackedId group by e.asset_entity_id having minstate != $holdId").size()
 			
@@ -1000,13 +1000,13 @@ class AssetEntityController {
       											
 	        def sourceTransportAvail = jdbcTemplate.queryForList(countQuery + " and pm.current_state_id = $cleanedId group by e.asset_entity_id having minstate != $holdId").size()
 
-	        def sourceTransportPend = jdbcTemplate.queryForList(countQuery + " and pm.current_state_id < $cleanedId group by e.asset_entity_id having ( minstate != $holdId or minstate  is null )").size()
+	        def sourceTransportPend = jdbcTemplate.queryForList(countQuery + " and pm.current_state_id < $cleanedId group by e.asset_entity_id ").size()
 			
 	        def targetMover = jdbcTemplate.queryForList(countQuery + " and pm.current_state_id >= $stagedId group by e.asset_entity_id having minstate != $holdId").size()
 
 	        def targetTransportAvail = jdbcTemplate.queryForList(countQuery + " and pm.current_state_id >= $onTruckId and pm.current_state_id < $offTruckId group by e.asset_entity_id having minstate != $holdId").size()
 	        
-	        def targetTransportPend = jdbcTemplate.queryForList(countQuery + " and pm.current_state_id < $onTruckId group by e.asset_entity_id having ( minstate != $holdId or minstate  is null )").size()
+	        def targetTransportPend = jdbcTemplate.queryForList(countQuery + " and pm.current_state_id < $onTruckId group by e.asset_entity_id ").size()
 	        											
 	        def cleaningTeam = ProjectTeam.findByTeamCode("Cleaning")
 	        def transportTeam = ProjectTeam.findByTeamCode("Transport")
