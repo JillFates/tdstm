@@ -117,6 +117,7 @@
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
+<input type="hidden" id="role" value="role"/>
 <div class="list">
 <table id="assetEntityTable">
 	<thead>

@@ -449,6 +449,7 @@ td .odd {
 	name="moveBundle" id="moveBundle" value="${moveBundleInstance.id}" />
 	<input type="hidden" name="showAll" id="showAllInChangeStatus">
 		<table style="border: 0px; width: 100%">
+	<input type="hidden" id="role" value="${role}"/>
 	<tr>
 		<td width="40%"><strong>Change status for selected
 		devices to:</strong></td>
@@ -919,9 +920,10 @@ td .odd {
 <table id="listCommentsTable">
 	<thead>
 		<tr>
-
+			<g:if test="${role}">
 			<th nowrap>Action</th>
-
+			</g:if>
+			
 			<th nowrap>Comment</th>
 
 			<th nowrap>Comment Type</th>

@@ -1,5 +1,6 @@
 // function to list the comments list
       		function listCommentsDialog(e,action) {
+      			var role = $("#role").val()
       			$("#editCommentDialog").dialog("close")
       			$("#showCommentDialog").dialog("close")
 				$("#createCommentDialog").dialog("close")
@@ -80,14 +81,16 @@
 					     
 					      //createTextNode(commentObj.commentInstance.mustVerify);
 					      link.appendChild( image )
-						  editTd.appendChild( link  )					      
+						  editTd.appendChild( link )	
 					      commentTd.appendChild( commentText )
 					      typeTd.appendChild( typeText )
 					      resolveTd.appendChild( resolveVal )
 					      verifyTd.appendChild( verifyText )
 					      categoryTd.appendChild( categoryText )
 					      commentCodeTd.appendChild( commentCodeText )
-					      tr.appendChild( editTd )
+					      if ( role ) {
+					      	tr.appendChild( editTd )
+					      }
 					      tr.appendChild( commentTd )
 					      tr.appendChild( typeTd )	     					      
 					      tr.appendChild( resolveTd )	     					      

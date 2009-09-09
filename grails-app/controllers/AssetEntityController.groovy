@@ -909,6 +909,14 @@ class AssetEntityController {
         def moveBundleInstance
         def stateVal
         def taskVal
+        /* user role check*/
+		def role = ""
+		def subject = SecurityUtils.subject
+		if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
+			role = "SUPERVISOR"
+		} else if(subject.hasRole("MANAGER")){
+			role = "MANAGER"
+		}
         if(bundleId){
         	userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
             moveBundleInstance = MoveBundle.findById(bundleId)
@@ -1094,7 +1102,7 @@ class AssetEntityController {
 	                timeToRefresh : timeToRefresh ? timeToRefresh.SUPER_CONSOLE_REFRESH : "never", showAll : showAll,
 	                applicationList : applicationList, appOwnerList : appOwnerList, appSmeList : appSmeList, 
 	                transitionStates : transitionStates, params:params, totalAssetsOnHold:totalAssetsOnHold,
-	                totalSourcePending: totalSourcePending, totalTargetPending: totalTargetPending ]
+	                totalSourcePending: totalSourcePending, totalTargetPending: totalTargetPending, role: role ]
         } else {
 	        flash.message = "Please create bundle to view Console"	
 	        redirect(controller:'project',action:'show',params:["id":params.projectId])

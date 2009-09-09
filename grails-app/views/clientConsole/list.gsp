@@ -374,7 +374,7 @@ var time = '${timeToRefresh}';
 <div style="width:100%">
 <div style="width: 100%;">
 	<g:form	name="listForm" action="list" method="post">
-	
+	<input type="hidden" id="role" value="${role}"/>
 	<table style="border: 0px;">
 		<tr>
 			<td valign="top" class="name"><label for="moveBundle">Move
@@ -513,9 +513,10 @@ var time = '${timeToRefresh}';
 <table id="listCommentsTable">
 	<thead>
 		<tr>
-
+			<g:if test="${role}">
 			<th nowrap>Action</th>
-
+			</g:if>
+			
 			<th nowrap>Comment</th>
 
 			<th nowrap>Comment Type</th>
