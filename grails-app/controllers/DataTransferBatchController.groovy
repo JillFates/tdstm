@@ -28,7 +28,7 @@ class DataTransferBatchController {
      * @author Lokanath
      * @return process the dataTransferBatch and return to datatransferBatchList
      * -------------------------------------------------------------------------    */
-    def process = { 
+    def process = {
     	sessionFactory.getCurrentSession().flush();
     	sessionFactory.getCurrentSession().clear();
     	session.setAttribute("TOTAL_BATCH_ASSETS",0)
@@ -48,13 +48,14 @@ class DataTransferBatchController {
     			dataTransferBatch = DataTransferBatch.get(params.batchId)
     			if(dataTransferBatch){
     				batchRecords = DataTransferValue.executeQuery("select count( distinct rowId  ) from DataTransferValue where dataTransferBatch = $dataTransferBatch.id ")[0]
-    				def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = $dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
+    				def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = "+
+    															"$dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
     				def assetsSize = dataTransferValueRowList.size()
     				session.setAttribute("TOTAL_BATCH_ASSETS",assetsSize)
     				for(int dataTransferValueRow =0; dataTransferValueRow < assetsSize; dataTransferValueRow ++) {
     					def rowId =dataTransferValueRowList[dataTransferValueRow].rowId
     					def dtvList = DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
-    					def  assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
+    					def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
     					def flag = 0
     					def isModified = "false"
     					def isNewValidate
@@ -89,60 +90,40 @@ class DataTransferBatchController {
     							if( attribName == "sourceTeam" || attribName == "targetTeam" ) {
     								def bundleInstance = assetEntity.moveBundle 
     								def teamInstance
-    								if( it.correctedValue && bundleInstance ) {
-    									teamInstance = projectTeam.findByTeamCodeAndMoveBundle(it.correctedValue,bundleInstance)
-    									if(!teamInstance){
-    										teamInstance = new ProjectTeam(teamCode:it.correctedValue,moveBundle:bundleInstance).save()
-    									}
-    								} else if( it.importValue && bundleInstance ) {
-    									teamInstance = ProjectTeam.findByTeamCodeAndMoveBundle(it.importValue,bundleInstance)
-    									if(!teamInstance){
-    										teamInstance = new ProjectTeam( name:it.importValue, teamCode:it.importValue, 
-			    														moveBundle:bundleInstance ).save()
-    									}
-    								}
-    								if( assetEntity."$attribName" != teamInstance ) {
+    								teamInstance = assetEntityAttributeLoaderService.getdtvTeam(it, bundleInstance ) 
+    								if( assetEntity."$attribName" != teamInstance || isNewValidate == "true" ) {
     									isModified = "true"
     									assetEntity."$attribName" = teamInstance
     								}
     							} else if ( attribName == "moveBundle" ) {
     								def moveBundleInstance
-				    				/*if( it.importValue != null && it.correctedValue != null ) {
-				    					importMoveBundleInstance = MoveBundle.findByName(it.importValue)
-				        				exportMoveBundleInstance = MoveBundle.findByName(it.correctedValue)
-				        				assetEntity."$attribName" = exportMoveBundleInstance ? exportMoveBundleInstance : importMoveBundleInstance
-				    				}*/
-				    				if(it.correctedValue){
-				    					moveBundleInstance = MoveBundle.findByNameAndProject(it.correctedValue,projectInstance)
-				    					if(!moveBundleInstance){
-				    						moveBundleInstance = new MoveBundle(name:it.correctedValue,project:projectInstance,operationalOrder:1).save()
-				    					}
-				    				} else if(it.importValue){
-				    					moveBundleInstance = MoveBundle.findByNameAndProject(it.importValue,projectInstance)
-				    					if(!moveBundleInstance){
-				    						moveBundleInstance = new MoveBundle(name:it.importValue,project:projectInstance,operationalOrder:1).save()
-				    					}
-				    				}
-				    				
-				    				if( assetEntity."$attribName" != moveBundleInstance ) {
+				    				moveBundleInstance = assetEntityAttributeLoaderService.getdtvMoveBundle(it, projectInstance ) 
+				    				if( assetEntity."$attribName" != moveBundleInstance || isNewValidate == "true" ) {
     									isModified = "true"
     									assetEntity."$attribName" = moveBundleInstance 
     								}
-    							} else if( it.eavAttribute.backendType == "int" ){
+    							} else if( it.eavAttribute.backendType == "int" || attribName == "usize" ){
     								def correctedPos
     								try {
     									if( it.correctedValue ) {
-    										correctedPos = Integer.parseInt(it.correctedValue)
+    										correctedPos = Integer.parseInt(it.correctedValue.trim())
     									} else if( it.importValue ) {
-    										correctedPos = Integer.parseInt(it.importValue)
+    										correctedPos = Integer.parseInt(it.importValue.trim())
     									}
     									//correctedPos = it.correctedValue
-    									if( assetEntity."$attribName" != correctedPos ) {
-        									isModified = "true"
-        									assetEntity."$attribName" = correctedPos 
-        								}
+    									if( attribName == "usize" ) {
+    										if( ( assetEntity."$attribName"?.trim() != it.correctedValue?.trim() && assetEntity."$attribName"?.trim() != it.importValue?.trim() )|| isNewValidate == "true" ) {
+            									isModified = "true"
+            									assetEntity."$attribName" = correctedPos 
+            								}
+    									}else {
+    										if( assetEntity."$attribName" != correctedPos || isNewValidate == "true" ) {
+    											isModified = "true"
+    	        									assetEntity."$attribName" = correctedPos 
+    	        							}
+    									}
     								} catch ( Exception ex ) {
-    									assetEntityErrorList << " ${attribName} at row ${dataTransferValueRow+1}"
+    									errorConflictCount+=1
     									it.hasError = 1
     									it.errorText = "format error"
     									it.save()
@@ -150,7 +131,7 @@ class DataTransferBatchController {
     									isFormatError = 1
     								}
     							} else {
-    								if( assetEntity."$attribName" != it.correctedValue && assetEntity."$attribName" != it.importValue  ) {
+    								if( (assetEntity."$attribName" != it.correctedValue && assetEntity."$attribName" != it.importValue) || isNewValidate == "true"  ) {
     									isModified = "true"
     									assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
     								}
@@ -158,11 +139,14 @@ class DataTransferBatchController {
     						}
     						if ( isFormatError != 1 ) {
     							if( isModified == "true" ) {
-    								assetEntity.save()
         							if ( isNewValidate == "true" ) {
-        								insertCount+=1
+        								if( assetEntity.save() ) {
+        									insertCount+=1
+        								}
         							} else {
-        								updateCount+=1
+        								if( assetEntity.save() ) {
+        									updateCount+=1
+        								}
         							}
     							}
     						} else {
@@ -176,7 +160,8 @@ class DataTransferBatchController {
     						session.setAttribute("TOTAL_PROCESSES_ASSETS",dataTransferValueRow)
     					}
     				}  
-    				def dataTransferCommentRowList = DataTransferComment.findAll(" From DataTransferComment dtc where dtc.dataTransferBatch = $dataTransferBatch.id and dtc.dataTransferBatch.statusCode = 'PENDING'")
+    				def dataTransferCommentRowList = DataTransferComment.findAll(" From DataTransferComment dtc where dtc.dataTransferBatch = "+
+    																	"$dataTransferBatch.id and dtc.dataTransferBatch.statusCode = 'PENDING'")
     				if(dataTransferCommentRowList){
     					dataTransferCommentRowList.each{
     						def assetComment
@@ -198,8 +183,7 @@ class DataTransferBatchController {
     							assetComment.save()
     						}
     					}
-		    		
-		    	}
+    				}
     				dataTransferBatch.statusCode = 'COMPLETED'
     				dataTransferBatch.save()
     			}
@@ -207,16 +191,10 @@ class DataTransferBatchController {
     			status.setRollbackOnly()
 				flash.message = "Import Batch process failed"
     		}
-    		//def errorCount = DataTransferValue.countByDataTransferBatchAndHasError(dataTransferBatch, 1)
     		if ( dataTransferBatch.dataTransferSet.id == 1 ) {
-    			flash.message = " Assets in Batch: ${batchRecords}; ${insertCount} Records Inserted; ${updateCount} Records Updated; ${errorCount} Asset Errors;  ${errorConflictCount} Attribute Erros " 
-    		}
-    		if ( assetEntityErrorList ) {
-    			if ( flash.message ) {
-    				flash.message = flash.message + " and ${assetEntityErrorList} is invalid format not updated "
-    			} else {
-    				flash.message = " ${errorCount} Asset Errors; ${assetEntityErrorList} is invalid format not updated "
-    			}
+    			flash.message = " Process Results:<ul><li>	Assets in Batch: ${batchRecords} <li>Records Inserted: ${insertCount}</li>"+
+    							"<li>Records Updated: ${updateCount}</li><li>Asset Errors: ${errorCount} </li> "+
+    							"<li>Attribute Errors: ${errorConflictCount}</li></ul> " 
     		}
     	}
     	redirect ( action:list, params:[projectId:projectId, 'flash.message':flash.message ] )

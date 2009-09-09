@@ -59,7 +59,7 @@
         	<table style="border: 0"><tr><td><h1>Data Transfer Batch List</h1></td>
         	<td style="vertical-align: bottom;" align="right"><div id="progressbar" style="display: none;" /></td></tr> </table>
             <g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
+            <div class="message" style="background: #f3f8fc">${flash.message}</div>
             </g:if>
             <div class="list">
                 <table>

@@ -386,4 +386,43 @@ class AssetEntityAttributeLoaderService {
 		dtValue.errorText = "change conflict"
 		dtValue.save()
 	}
+	
+	/* To get DataTransferValue Asset MoveBundle
+	 * @param dataTransferValue, projectInstance
+	 * @author srinivas
+	 */
+	 def getdtvMoveBundle(def dtv, def projectInstance ) {
+		def moveBundleInstance
+		 if( dtv.correctedValue ) {
+				moveBundleInstance = MoveBundle.findByNameAndProject( dtv.correctedValue, projectInstance )
+				if( !moveBundleInstance ) {
+					moveBundleInstance = new MoveBundle( name:dtv.correctedValue, project:projectInstance, operationalOrder:1 ).save()
+				}
+			} else if( dtv.importValue ) {
+				moveBundleInstance = MoveBundle.findByNameAndProject( dtv.importValue, projectInstance )
+				if( !moveBundleInstance ) {
+					moveBundleInstance = new MoveBundle( name:dtv.importValue, project:projectInstance, operationalOrder:1 ).save()
+				}
+			}
+		return moveBundleInstance
+	}
+	/* To get DataTransferValue source/target Team
+	 * @param dataTransferValue,moveBundle
+	 * @author srinivas
+	 */
+	def getdtvTeam(def dtv, def bundleInstance ){
+		def teamInstance
+		if( dtv.correctedValue && bundleInstance ) {
+			teamInstance = projectTeam.findByTeamCodeAndMoveBundle(dtv.correctedValue,bundleInstance)
+			if(!teamInstance){
+				teamInstance = new ProjectTeam(teamCode:dtv.correctedValue,moveBundle:bundleInstance).save()
+			}
+		} else if( dtv.importValue && bundleInstance ) {
+			teamInstance = ProjectTeam.findByTeamCodeAndMoveBundle(dtv.importValue,bundleInstance)
+			if(!teamInstance){
+				teamInstance = new ProjectTeam( name:dtv.importValue, teamCode:dtv.importValue,moveBundle:bundleInstance ).save()
+			}
+		}
+		return teamInstance
+	}
 }
