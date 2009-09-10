@@ -998,8 +998,9 @@ class MoveBundleAssetController {
             		}
             	
             	}
-        		racks.each{
-                	def rackRooms = it?.rack.split("~")
+        	racks.each{
+        		def rackRooms = it?.rack.split("~")
+        		if(rackRooms?.size() == 3){
     	            def assetDetails = []
                 	def assetDetail = []
                 	def finalAssetList = []
@@ -1137,8 +1138,9 @@ class MoveBundleAssetController {
     	            	rackLayout << [ assetDetails : assetDetails, rack : "", room : "", location : "("+location+")" , 
     	            	                frontViewRows : frontViewRows, backViewRows : backViewRows ]
     	            }
-            	}
-           render(view:'rackLayoutReport',model:[rackLayout : rackLayout, frontView : frontView, backView : backView])
+        	}
+        }
+        render(view:'rackLayoutReport',model:[rackLayout : rackLayout, frontView : frontView, backView : backView])
         }
     }
 	/*

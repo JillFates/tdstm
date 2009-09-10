@@ -134,6 +134,7 @@
 </head>
 <body>
 <div class="body">
+<g:if test="${rackLayout}">
 <g:each in="${rackLayout}" var="rackLayout">
 	<g:if test="${frontView}">
 	<table cellpadding=2 class="rack_elevation">
@@ -175,6 +176,10 @@
 	<br class="page-break-after"/>
 	</g:if>
 </g:each>
+</g:if>
+<g:else>
+<table><tr><td class="no_records">No reports found</td></tr></table>
+</g:else>
 </div>
 <div id="editDialog" title="Edit Asset Entity" style="display: none;">
 	<g:form method="post" name="editForm">

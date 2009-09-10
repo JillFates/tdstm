@@ -103,3 +103,9 @@ input, select, textarea {
 	background:transparent url(../images/skin/database_save.png) no-repeat scroll 5px 50%;
 	padding-left:28px;
 }
+.no_records{
+	font-size: 12px;
+	font-weight: bold;
+	color: maroon;
+	text-align: center;
+}
