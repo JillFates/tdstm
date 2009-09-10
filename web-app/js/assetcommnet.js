@@ -55,7 +55,7 @@
 					      image.src = "../images/skin/database_edit.png"
 					      image.border = 0
 					      var link = document.createElement('a');
-					      link.href = '#'
+					      //link.href = '#'
 					      link.id = 'link_'+commentObj.commentInstance.id
 					      link.name = commentObj.commentInstance.id
 					      link.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );commentChangeEdit('editResolveDiv','editCommentForm');}})} //;return false

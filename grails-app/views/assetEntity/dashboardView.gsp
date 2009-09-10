@@ -1038,6 +1038,7 @@ Comment</a></span></div>
 			</label></td>
 			<td valign="top" class="value" id="categoryTdId" />
 	</tr>
+	<tr class="prop">
 	<td valign="top" class="name"><label for="commentCode">comment
 			Code:</label></td>
 			<td valign="top" class="value" id="commentCodeTdId" />

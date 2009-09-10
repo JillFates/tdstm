@@ -408,6 +408,7 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 			<td valign="top" class="value" id="categoryTdId" />
 	</tr>
 	
+	<tr class="prop">
 	<td valign="top" class="name"><label for="commentCode">comment
 			Code:</label></td>
 			<td valign="top" class="value" id="commentCodeTdId" />
