@@ -47,7 +47,7 @@ class WalkThroughService {
 					doneQuery.append(" and a.sourceRoom is null and a.sourceRack is null")
 					args = [location]
 				}
-    			doneQuery.append("group by a.sourceRoom, a.sourceRack ")
+    			doneQuery.append(" group by a.sourceRoom, a.sourceRack ")
     			def doneList = AssetEntity.executeQuery(doneQuery.toString(),args)
     			def availTotal = rackList[2] - (doneList ? doneList : 0) 
     			if(availTotal == 0){
