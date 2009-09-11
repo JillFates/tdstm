@@ -258,10 +258,9 @@
 				</td>
 				<td valign="top"
 					class="value ${hasErrors(bean:projectInstance,field:'description','errors')}">
-				<textarea rows="3" cols="40" id="description" name="description"
-					onkeydown="textCounter(document.createProjectForm.description,200);"
-					onkeyup="textCounter(document.createProjectForm.description,200);">
-					${fieldValue(bean:projectInstance,field:'description')}</textarea>
+				<textarea rows="3" cols="40" id="description" name="description" 
+				onkeydown="textCounter(document.createProjectForm.description,200);" 
+				onkeyup="textCounter(document.createProjectForm.description,200);">${fieldValue(bean:projectInstance,field:'description')}</textarea>
 				<g:hasErrors bean="${projectInstance}" field="description">
 					<div class="errors"><g:renderErrors bean="${projectInstance}"
 						as="list" field="description" /></div>

@@ -23,7 +23,11 @@
 <jq:plugin name="ui.draggable" />
 <jq:plugin name="ui.resizable" />
 <jq:plugin name="ui.dialog" />
-
+<style type="text/css">
+html, body {
+overflow: hidden;
+} 
+</style>
 <g:javascript>
 function initialize(){
 var bundleId = ${moveBundleInstance.id}; 
@@ -336,6 +340,15 @@ var time = '${timeToRefresh}';
 	function showAssetDetails( assetId ){
 		${remoteFunction(controller:'assetEntity', action:'editShow', params:'\'id=\'+ assetId', before:'document.showForm.id.value ='+ assetId+';document.editForm.id.value = '+ assetId+';', onComplete:'showAssetDialog(e , \'show\')')}
 	}
+	function vpWidth(type) {
+		var data
+		if(type == "width"){
+			data  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+		} else {
+			data  = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+		}
+		return data
+	}
 </script>
 </head>
 <body>
@@ -467,7 +480,7 @@ var time = '${timeToRefresh}';
 
 		</tr>
 	</thead>
-	<tbody>
+	<tbody id="assetListTbody">
 		<g:if test="${assetEntityList}">
 		<g:each in="${assetEntityList}" var="assetEntity">
 			<tr id="assetRow_${assetEntity.id}" >
@@ -853,10 +866,17 @@ Comment</a></span></div>
         <li id="noOptions">No Options</li>
     </ul>
 </div>
-<g:javascript>
+<script type="text/javascript">
 initialize();
 timedRefresh($("#selectTimedId").val())
-</g:javascript>
-</body>
+if('${browserTest}' == 'true'){
+	$("div.tableContainerIE").css("height",vpWidth("height") - 144)
+	$("div.tableContainerIE").css("width",vpWidth("width"));
+} else {
+	$("div.tableContainer").css("width",vpWidth("width"));
+	$("#assetListTbody").css("height",vpWidth("height") - 299)
+}
 
+</script>
+</body>
 </html>

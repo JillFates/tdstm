@@ -116,6 +116,11 @@
 	color:#cccccc;
 	background:url(../images/menu_bg_hover.jpg) repeat-x;
 }
+
+.menu1 ul li a:visited  {
+	color:#ffffff;
+}
+
 .main_bottom
 {
 	width:100%;
@@ -170,6 +175,14 @@
 {
 	color:#ffffff;
 }
+.menu2 ul li a:visited  {
+	color:#9acaee;
+}
+	 
+.menu2 ul li a:hover   {
+	color:#ffffff;
+}
+
 .main_text_bottom
 {
 	width:100%;
@@ -322,13 +335,12 @@
 }
 
 /* dash board vertical scroll for fire fox only */
-div.tableContainer table {     
-   width: 99%;
+div.tableContainer {
+	overflow: auto;
 }
 
 div.tableContainer tbody {
    width: 99%;
-   height: 460px;
    overflow-y: scroll;
    overflow-x: hidden;
    border: 1px solid gray;

@@ -158,11 +158,7 @@ class ClientConsoleController {
 									stateEngineService.getState(projectInstance.workflowCode, transitionId))
 					def isHoldNa = AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+holdId)	
 					if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId) ){
-						if(stateId != holdId || isHoldNa){
-							cssClass='asset_pending'
-						} else {
-							cssClass='asset_hold'
-						}
+						cssClass='asset_pending'
 					} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 0 and stateTo = "+transitionId) ) {
 						if(stateId != holdId || isHoldNa){
 							cssClass='task_done'
@@ -452,11 +448,7 @@ class ClientConsoleController {
 									stateEngineService.getState(projectInstance.workflowCode, transitionId))
                     def isHoldNa = AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+holdId)
 					if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId)){
-						if(stateId != holdId || isHoldNa){
-							cssClass='asset_pending'
-						} else {
-							cssClass='asset_hold'
-						}
+						cssClass='asset_pending'
 					} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 0 and stateTo = "+transitionId)) {
 						if(stateId != holdId || isHoldNa){
 							cssClass='task_done'
@@ -769,11 +761,7 @@ class ClientConsoleController {
 									stateEngineService.getState(assetEntity.project.workflowCode, transitionId))
             def isHoldNa = AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+holdId)						
 			if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId) ){
-				if(currentstate != holdId || isHoldNa){
-					cssClass='asset_pending'
-				} else {
-					cssClass='asset_hold'
-				}
+				cssClass='asset_pending'
 			} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 0 and stateTo = "+transitionId)) {
 				if(currentstate != holdId || isHoldNa){
 					cssClass='task_done'
