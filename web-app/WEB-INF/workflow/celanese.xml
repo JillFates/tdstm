@@ -44,14 +44,13 @@
 		<transition to="PoweredOn" name="Powered On" id="170"  type="process" />
 
 		<transition to="CitrixTasksDone" name="Citrix Tasks Done" id="200" type="boolean" />
-		<transition to="BuSanTasksDone" name=" Tasks Done" id="205" type="boolean" />
+		<transition to="BuSanTasksDone" name="BU/SAN Tasks Done" id="205" type="boolean" />
 		<transition to="VMTasksDone" name="VM Tasks Done" id="210" type="boolean" />
 		<transition to="L3TasksDone" name="L3 Tasks Done" id="215" type="boolean" />
 		<transition to="DBTasksDone" name="DB Tasks Done" id="220" type="boolean" />
 		<transition to="AppTasksDone" name="App Tasks Done" id="225" type="boolean" />
 		<transition to="AppVerifying" name="App Verifying" id="230" type="boolean" />
 		<transition to="AppVerified" name="App Verified" id="235" type="boolean" />
-		<transition to="VMTasks" name="VM Tasks" id="240" type="boolean" />
 
 		<transition to="Completed" name="Completed" id="280"  type="process" />
 		<transition to="Terminated" name="Terminated" id="900"  type="process" />
