@@ -969,14 +969,14 @@ class MoveBundleAssetController {
         			racks<<[rack:it]
             	}
         		if( rack[0] == "" ){
-        			def sourceRackQuery = "select CONCAT_WS('~',IFNULL(source_location ,''),IFNULL(source_room,''),"+
-            								"IFNULL(source_rack,'')) as rack from asset_entity where"
+        			def sourceRackQuery = "select CONCAT_WS('~',IFNULL(source_location ,'blank'),IFNULL(source_room,'blank'),"+
+            								"IFNULL(source_rack,'blank')) as rack from asset_entity where"
             		if( bundleId ){
             			sourceRackQuery += " move_bundle_id = $bundleId "
             		} else {
             			sourceRackQuery += " project_id = $projectId "
             		}
-        			sourceRackQuery += " and asset_type NOT IN ('VM', 'Blade') "
+        			sourceRackQuery += " and asset_type NOT IN ('VM', 'Blade') and source_rack != '' and source_rack is not null "
         			racks = jdbcTemplate.queryForList(sourceRackQuery + "group by source_location, source_rack, source_room")
             	}
             } else {
@@ -985,14 +985,14 @@ class MoveBundleAssetController {
             		racks<<[rack:it]
             	}
             	if(rack[0] == ""){
-            		def targetRackQuery = "select CONCAT_WS('~',IFNULL(target_location ,''),IFNULL(target_room,''), "+
-            								"IFNULL(target_rack,'')) as rack from asset_entity where"
+            		def targetRackQuery = "select CONCAT_WS('~',IFNULL(target_location ,'blank'),IFNULL(target_room,'blank'), "+
+            								"IFNULL(target_rack,'blank')) as rack from asset_entity where"
 					if( bundleId ){
 						targetRackQuery += " move_bundle_id = $bundleId "
 					} else {
 						targetRackQuery += " project_id = $projectId "
 					}
-            		targetRackQuery += " and asset_type NOT IN ('VM', 'Blade') "
+            		targetRackQuery += " and asset_type NOT IN ('VM', 'Blade') and target_rack != '' and target_rack is not null "
             		racks = jdbcTemplate.queryForList( targetRackQuery  + "group by target_location, target_rack, target_room")
             		
             		}
@@ -1316,8 +1316,8 @@ class MoveBundleAssetController {
     	def rackDetails = []
     	def sourceRackList
     	def targetRackList
-    	def queryForSourceRacks = "select source_location as location, source_rack as rack, source_room as room from asset_entity where asset_type NOT IN ('VM', 'Blade')"
-    	def queryForTargetRacks = "select target_location as location, target_rack as rack, target_room as room from asset_entity where asset_type NOT IN ('VM', 'Blade')"
+    	def queryForSourceRacks = "select source_location as location, source_rack as rack, source_room as room from asset_entity where asset_type NOT IN ('VM', 'Blade') and source_rack != '' and source_rack is not null "
+    	def queryForTargetRacks = "select target_location as location, target_rack as rack, target_room as room from asset_entity where asset_type NOT IN ('VM', 'Blade') and target_rack != '' and target_rack is not null "
     	def sourceGroup = "group by source_location, source_rack, source_room"
     	def targetGroup = "group by target_location, target_rack, target_room"
     	if(bundleId){

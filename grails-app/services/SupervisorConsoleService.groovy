@@ -150,15 +150,19 @@ class SupervisorConsoleService {
     	}
     	assetsDetailsQuery.append(" and a.asset_type NOT IN ('VM', 'Blade')  ")
 		if(rackRooms.size() == 3){
-	    	if(rackRooms[0]){
+	    	if(rackRooms[0] != "blank"){
 				def location = rackRooms[0].replace("'","\\'")
 				location = location.replace('"','\\"')
 				assetsDetailsQuery.append(" and a."+type+"_location = '${location}' ")
+			} else {
+				assetsDetailsQuery.append(" and (a."+type+"_location is null or a."+type+"_location = '') ")
 			}
-			if(rackRooms[1]){
+			if(rackRooms[1] != "blank"){
 				def room = rackRooms[1].replace("'","\\'")
 				room =room.replace('"','\\"')
 				assetsDetailsQuery.append(" and a."+type+"_room = '${room}' ")
+			}else {
+				assetsDetailsQuery.append(" and (a."+type+"_room is null or a."+type+"_room = '') ")
 			}
 			if(rackRooms[2]){
 				def rack = rackRooms[2].replace("'","\\'")

@@ -21,9 +21,9 @@
 			selectObj.html("<option value='' selected='selected'>All</option>")
 			for (var i=0; i < length; i++) {
 				var rack = racks[i]
-				var locvalue = rack.location ? rack.location : '';
-				var rmvalue = rack.room ? rack.room : '';
-				var ravalue = rack.rack ? rack.rack : '';
+				var locvalue = rack.location ? rack.location : 'blank';
+				var rmvalue = rack.room ? rack.room : 'blank';
+				var ravalue = rack.rack ? rack.rack : 'blank';
 				var value = locvalue +"~"+rmvalue +"~"+ ravalue
 				var text =  locvalue +"/"+rmvalue +"/"+ ravalue
 				var option = document.createElement("option")
