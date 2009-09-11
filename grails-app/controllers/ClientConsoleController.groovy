@@ -156,10 +156,15 @@ class ClientConsoleController {
 					def transitionId = Integer.parseInt(trans.transId)
 					def stateType = stateEngineService.getStateType( projectInstance.workflowCode, 
 									stateEngineService.getState(projectInstance.workflowCode, transitionId))
-					if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId)){
-						cssClass='asset_pending'
-					} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 0 and stateTo = "+transitionId)) {
-						if(transitionId != holdId){
+					def isHoldNa = AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+holdId)	
+					if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId) ){
+						if(stateId != holdId || isHoldNa){
+							cssClass='asset_pending'
+						} else {
+							cssClass='asset_hold'
+						}
+					} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 0 and stateTo = "+transitionId) ) {
+						if(stateId != holdId || isHoldNa){
 							cssClass='task_done'
 						} else {
 							cssClass='asset_hold'
@@ -168,16 +173,19 @@ class ClientConsoleController {
 					if(stateType != 'boolean' || transitionId == holdId){
 						if( transitionId <= maxstate  ){
 							cssClass = "task_done"
-							if(stateId == holdId ){
+							if(stateId == holdId && !isHoldNa){
 								cssClass = "asset_hold"
 							} else if( transitionId == holdId ){
-								cssClass='task_pending'
+								if(isHoldNa){
+									cssClass='asset_pending'
+								} else {
+									cssClass='task_pending'
+								}
 							} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId)){
 								cssClass='asset_pending'
 							}
 						}
 					}
-					
 					htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass\" onclick=\"showAssetDetails($assetId)\">&nbsp;</td>"
 					htmlTdId.append("${assetId+"_"+trans.transId},")
 				}
@@ -442,10 +450,15 @@ class ClientConsoleController {
 					def transitionId = Integer.parseInt(trans)
 					def stateType = stateEngineService.getStateType( projectInstance.workflowCode, 
 									stateEngineService.getState(projectInstance.workflowCode, transitionId))
+                    def isHoldNa = AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+holdId)
 					if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId)){
-						cssClass='asset_pending'
+						if(stateId != holdId || isHoldNa){
+							cssClass='asset_pending'
+						} else {
+							cssClass='asset_hold'
+						}
 					} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 0 and stateTo = "+transitionId)) {
-						if(transitionId != holdId){
+						if(stateId != holdId || isHoldNa){
 							cssClass='task_done'
 						} else {
 							cssClass='asset_hold'
@@ -454,10 +467,14 @@ class ClientConsoleController {
 					if(stateType != 'boolean' || transitionId == holdId){
 						if( transitionId <= maxstate  ){
 							cssClass = "task_done"
-							if(stateId == holdId ){
+							if(stateId == holdId && !isHoldNa){
 								cssClass = "asset_hold"
 							} else if( transitionId == holdId ){
-								cssClass='task_pending'
+								if(isHoldNa){
+									cssClass='asset_pending'
+								} else {
+									cssClass='task_pending'
+								}
 							} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId)){
 								cssClass='asset_pending'
 							}
@@ -750,10 +767,15 @@ class ClientConsoleController {
 			def transitionId = Integer.parseInt(trans)
 			def stateType = stateEngineService.getStateType( assetEntity.project.workflowCode, 
 									stateEngineService.getState(assetEntity.project.workflowCode, transitionId))
-			if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId)){
-				cssClass='asset_pending'
+            def isHoldNa = AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+holdId)						
+			if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId) ){
+				if(currentstate != holdId || isHoldNa){
+					cssClass='asset_pending'
+				} else {
+					cssClass='asset_hold'
+				}
 			} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 0 and stateTo = "+transitionId)) {
-				if(transitionId != holdId){
+				if(currentstate != holdId || isHoldNa){
 					cssClass='task_done'
 				} else {
 					cssClass='asset_hold'
@@ -762,10 +784,14 @@ class ClientConsoleController {
 			if(stateType != 'boolean' || transitionId == holdId){
 				if( transitionId <= maxstate  ){
 					cssClass = "task_done"
-					if(currentstate == holdId ){
+					if(currentstate == holdId && !isHoldNa ){
 						cssClass = "asset_hold"
 					} else if( transitionId == holdId ){
-						cssClass='task_pending'
+						if(isHoldNa){
+							cssClass='asset_pending'
+						} else {
+							cssClass='task_pending'
+						}
 					} else if(AssetTransition.find(naTransQuery+"  and isNonApplicable = 1 and stateTo = "+transitionId)){
 						cssClass='asset_pending'
 					}
