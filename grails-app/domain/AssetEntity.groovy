@@ -33,6 +33,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String appSme = ""
 	Integer priority 
 	Project project
+	String shortName
 
 	// MoveBundleAsset fields
 	MoveBundle moveBundle
@@ -80,6 +81,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		appOwner( blank:true,nullable:false )
 		appSme( blank:true, nullable:false )
 		priority( nullable:true, inList:[1,2,3] )
+		shortName( blank:true, nullable:true )
 
 		// The following were the MoveBundleAsset fields
 		moveBundle( nullable:true )

@@ -151,12 +151,12 @@ class ClientConsoleController {
 					check = false
 				}
 				def naTransQuery = "from AssetTransition where assetEntity = $assetId and voided = 0 and type = 'boolean' "
+				def isHoldNa = AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+holdId)
 				processTransitionList.each() { trans ->
 					def cssClass='task_pending'
 					def transitionId = Integer.parseInt(trans.transId)
 					def stateType = stateEngineService.getStateType( projectInstance.workflowCode, 
 									stateEngineService.getState(projectInstance.workflowCode, transitionId))
-					def isHoldNa = AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+holdId)	
 					if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId) ){
 						cssClass='asset_pending'
 					} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 0 and stateTo = "+transitionId) ) {
@@ -182,7 +182,7 @@ class ClientConsoleController {
 							}
 						}
 					}
-					htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass\" onclick=\"showAssetDetails($assetId)\">&nbsp;</td>"
+					htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass\" >&nbsp;</td>"
 					htmlTdId.append("${assetId+"_"+trans.transId},")
 				}
 				assetEntityList << [id: assetId, application:it.application,appOwner:it.appOwner,appSme:it.appSme,assetName:it.assetName,transitions:htmlTd,checkVal:check]

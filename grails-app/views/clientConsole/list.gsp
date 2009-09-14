@@ -338,7 +338,8 @@ var time = '${timeToRefresh}';
 	}
 	
 	function showAssetDetails( assetId ){
-		${remoteFunction(controller:'assetEntity', action:'editShow', params:'\'id=\'+ assetId', before:'document.showForm.id.value ='+ assetId+';document.editForm.id.value = '+ assetId+';', onComplete:'showAssetDialog(e , \'show\')')}
+		document.editForm.id.value=assetId
+		${remoteFunction(controller:'assetEntity', action:'editShow', params:'\'id=\'+ assetId', before:'document.showForm.id.value ='+ assetId+';', onComplete:'showAssetDialog(e , \'show\')')}
 	}
 	function vpWidth(type) {
 		var data
@@ -348,6 +349,15 @@ var time = '${timeToRefresh}';
 			data  = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 		}
 		return data
+	}
+	function catchevent(event) {
+		var oSource = event.target
+		var srcElement = event.srcElement ? event.srcElement : event.target;
+		eventSrcID=(srcElement)?srcElement.id:'undefined';
+		var idArray = eventSrcID.split('_')
+		if( IsNumeric(idArray[0]) == true && idArray.length == 2 ) {
+			showAssetDetails(idArray[0])
+		}
 	}
 </script>
 </head>
@@ -425,7 +435,7 @@ var time = '${timeToRefresh}';
 <div class="tableContainer">
 </g:else>
 
-<table cellpadding="0" cellspacing="0"  style="border:0px;">
+<table cellpadding="0"   cellspacing="0"  style="border:0px;" >
 	<thead>
 	<tr>
 	<jsec:hasAnyRole in="['ADMIN','MANAGER', 'PROJ_MGR']">
@@ -480,7 +490,7 @@ var time = '${timeToRefresh}';
 
 		</tr>
 	</thead>
-	<tbody id="assetListTbody">
+	<tbody id="assetListTbody" onclick="catchevent(event);">
 		<g:if test="${assetEntityList}">
 		<g:each in="${assetEntityList}" var="assetEntity">
 			<tr id="assetRow_${assetEntity.id}" >
@@ -505,10 +515,10 @@ var time = '${timeToRefresh}';
 				</g:if>
 				<g:else>&nbsp;</g:else>
 			</td>
-			<td id="application_${assetEntity.id}" onclick="showAssetDetails(${assetEntity.id})">${assetEntity?.application}&nbsp;</td>
-			<td id="appOwner_${assetEntity.id}" onclick="showAssetDetails(${assetEntity.id})">${assetEntity?.appOwner}&nbsp;</td>
-			<td id="appSme_${assetEntity.id}" onclick="showAssetDetails(${assetEntity.id})">${assetEntity?.appSme}&nbsp;</td>
-			<td id="assetName_${assetEntity.id}" onclick="showAssetDetails(${assetEntity.id})">${assetEntity?.assetName}&nbsp;</td>
+			<td id="${assetEntity.id}_application" >${assetEntity?.application}&nbsp;</td>
+			<td id="${assetEntity.id}_appOwner" >${assetEntity?.appOwner}&nbsp;</td>
+			<td id="${assetEntity.id}_appSme" >${assetEntity?.appSme}&nbsp;</td>
+			<td id="${assetEntity.id}_assetName" >${assetEntity?.assetName}&nbsp;</td>
 			<g:each in="${assetEntity.transitions}" var="transition" >${transition}</g:each>
 			</tr>
 		</g:each>
@@ -523,7 +533,7 @@ var time = '${timeToRefresh}';
 <div id="commentsListDialog" title="Show Asset Comments"
 	style="display: none;"><br>
 <div class="list">
-<table id="listCommentsTable">
+<table id="listCommentsTable" >
 	<thead>
 		<tr>
 			<g:if test="${role}">
