@@ -60,7 +60,8 @@ class WalkThroughController {
 		def auditType = params.auditType
 		def sortOrder = params.sort
 		def location = params.location
-		def viewType = params.viewType
+		def viewType = params.viewType ? params.viewType : 'todo' 
+		
 		def locationQuery = "as location from asset_entity where move_bundle_id = $moveBundleId"
 		def locationsList
 		if(auditType == 'source'){
@@ -126,7 +127,7 @@ class WalkThroughController {
 			def sourceRacksListQuery = new StringBuffer("select a.sourceRoom, a.sourceRack, count(a.id) from AssetEntity a "+
 					"where a.sourceLocation = ? and a.moveBundle = $auditBundle ")
 			if(searchKey){
-				searchKey = searchKey+"%"
+				searchKey = "%"+searchKey+"%"
 				sourceRacksListQuery .append(" and ( a.sourceRoom like ? or a.sourceRack like ? ) ")
 				args = [auditLocation,searchKey,searchKey]
 			}
@@ -149,7 +150,7 @@ class WalkThroughController {
 		def auditRack = params.rack
 		def sortOrder = params.sort
 		def auditType = getSession().getAttribute("AUDIT_TYPE")
-		def viewType = params.viewType
+		def viewType = params.viewType ? params.viewType : 'todo' 
 		def assetsList
 		if(auditRoom == 'null' || auditRoom == ''){
 			auditRoom = null
@@ -160,19 +161,22 @@ class WalkThroughController {
 		if(auditLocation){
 			def asstesListQuery = new StringBuffer("from AssetEntity a where a.moveBundle = $moveBundle and a.sourceLocation = ? ")
 			def args = [auditLocation]
-			if(auditRoom && auditRack ){
+			/*if(auditRoom && auditRack ){
 				asstesListQuery.append(" and a.sourceRoom = ? and a.sourceRack = ? ")
 				args = [auditLocation,auditRoom,auditRack]
 			} else if(!auditRoom && auditRack){
-				asstesListQuery.append(" and a.sourceRoom is null and a.sourceRack = ? ")
+				asstesListQuery.append(" and (a.sourceRoom is null or a.sourceRoom = '') and a.sourceRack = ? ")
 				args = [auditLocation,auditRack]
 			} else if(auditRoom && !auditRack){
-				asstesListQuery.append(" and a.sourceRoom = ? and a.sourceRack is null")
+				asstesListQuery.append(" and a.sourceRoom = ? and (a.sourceRack is null or a.sourceRack = '' ) ")
 				args = [auditLocation,auditRoom]
 			} else {
-				asstesListQuery.append(" and a.sourceRoom is null and a.sourceRack is null")
+				asstesListQuery.append(" and (a.sourceRoom is null or a.sourceRoom = '' ) and ( a.sourceRack is null or a.sourceRack = '' )")
 				args = [auditLocation]
-			}
+			}*/
+			def constructedQuery = walkThroughService.constructQuery( auditRoom, auditRack, auditLocation )
+			asstesListQuery.append( constructedQuery.query )
+			args = constructedQuery.args 
 			if(sortOrder){
 				if(sortOrder == "assetTag"){
 					asstesListQuery.append(" order by a.assetTag $params.order")
@@ -187,7 +191,7 @@ class WalkThroughController {
 			assetsList = AssetEntity.executeQuery(asstesListQuery.toString(),args)
 		}
 		def assetsListView = walkThroughService.generateAssetListView( assetsList, auditLocation, auditType, viewType )
-    	render( view : 'assetList', model:[ assetsListView : assetsListView, params:params, auditType:auditType] )
+    	render( view : 'assetList', model:[ assetsListView : assetsListView, params:params, auditType:auditType, viewType:viewType] )
 	}
 	/*------------------------------------------------------------
 	 * @author : Lokanath Reddy
@@ -213,36 +217,39 @@ class WalkThroughController {
 			def asstesListQuery = new StringBuffer("from AssetEntity a where a.sourceLocation = ? ")
 			def args = [auditLocation]
 			if(searchKey){
-				searchKey = searchKey+"%"
+				searchKey = "%"+searchKey+"%"
 				asstesListQuery.append(" and ( a.assetTag like ? or a.assetName like ? ) ")
 				if(auditRoom && auditRack ){
 					asstesListQuery.append(" and a.sourceRoom = ? and a.sourceRack = ? ")
 					args = [auditLocation,searchKey,searchKey,auditRoom,auditRack]
 				} else if(!auditRoom && auditRack){
-					asstesListQuery.append(" and a.sourceRoom is null and a.sourceRack = ? ")
+					asstesListQuery.append(" and (a.sourceRoom is null or a.sourceRoom = '') and a.sourceRack = ? ")
 					args = [auditLocation,searchKey,searchKey,auditRack]
 				} else if(auditRoom && !auditRack){
-					asstesListQuery.append(" and a.sourceRoom = ? and a.sourceRack is null")
+					asstesListQuery.append(" and a.sourceRoom = ? and (a.sourceRack is null or a.sourceRack = '' ) ")
 					args = [auditLocation,searchKey,searchKey,auditRoom]
 				} else {
-					asstesListQuery.append(" and a.sourceRoom is null and a.sourceRack is null")
+					asstesListQuery.append(" and (a.sourceRoom is null or a.sourceRoom = '') and (a.sourceRack is null or a.sourceRack = '' ) ")
 					args = [auditLocation,searchKey,searchKey]
 				}
 			} else {
 				asstesListQuery.append(" and a.moveBundle = ${moveBundle} ")
-				if(auditRoom && auditRack ){
+				/*if(auditRoom && auditRack ){
 					asstesListQuery.append(" and a.sourceRoom = ? and a.sourceRack = ? ")
 					args = [auditLocation,auditRoom,auditRack]
 				} else if(!auditRoom && auditRack){
-					asstesListQuery.append(" and a.sourceRoom is null and a.sourceRack = ? ")
+					asstesListQuery.append(" and (a.sourceRoom is null or a.sourceRoom = '') and a.sourceRack = ? ")
 					args = [auditLocation,auditRack]
 				} else if(auditRoom && !auditRack){
-					asstesListQuery.append(" and a.sourceRoom = ? and a.sourceRack is null")
+					asstesListQuery.append(" and a.sourceRoom = ? and (a.sourceRack is null or a.sourceRack = '' )")
 					args = [auditLocation,auditRoom]
 				} else {
-					asstesListQuery.append(" and a.sourceRoom is null and a.sourceRack is null")
+					asstesListQuery.append(" and (a.sourceRoom is null or a.sourceRoom = '') and (a.sourceRack is null or a.sourceRack = '' )")
 					args = [auditLocation]
-				}
+				}*/
+				def constructedQuery = walkThroughService.constructQuery( auditRoom, auditRack, auditLocation )
+				asstesListQuery.append( constructedQuery.query )
+				args = constructedQuery.args
 			}
 			asstesListQuery.append(" order by a.sourceRackPosition ")
 			assetsList = AssetEntity.executeQuery(asstesListQuery.toString(),args)

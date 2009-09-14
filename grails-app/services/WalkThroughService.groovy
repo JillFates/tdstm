@@ -34,19 +34,22 @@ class WalkThroughService {
     			def doneQuery = new StringBuffer("select count(a.id) from AssetEntity a where a.sourceLocation = ? and a.id in "+
     					"(select t.assetEntity from AssetTransition t where t.voided = 0 and t.stateTo = $walkthruState) and a.moveBundle = $moveBundle ")
 				def args = [location]
-				if(rackList[0] && rackList[1]){
+				/*if(rackList[0] && rackList[1]){
 					doneQuery.append(" and a.sourceRoom = ? and a.sourceRack = ? ")
 					args = [location,rackList[0],rackList[1]]
 				} else if(!rackList[0] && rackList[1]){
-					doneQuery.append(" and a.sourceRoom is null and a.sourceRack = ? ")
+					doneQuery.append(" and (a.sourceRoom is null or a.sourceRoom = '' ) and a.sourceRack = ? ")
 					args = [location,rackList[1]]
 				} else if(rackList[0] && !rackList[1]){
-					doneQuery.append(" and a.sourceRoom = ? and a.sourceRack is null")
+					doneQuery.append(" and a.sourceRoom = ? and (a.sourceRack is null or a.sourceRack = '' ) ")
 					args = [location,rackList[0]]
 				} else {
-					doneQuery.append(" and a.sourceRoom is null and a.sourceRack is null")
+					doneQuery.append(" and ( a.sourceRoom is null or a.sourceRoom = '' ) and ( a.sourceRack is null or a.sourceRack = '' ) ")
 					args = [location]
-				}
+				}*/
+    			def constructedQuery = constructQuery( rackList[0], rackList[1], location )
+    			doneQuery.append( constructedQuery.query )
+    			args = constructedQuery.args
     			doneQuery.append(" group by a.sourceRoom, a.sourceRack ")
     			def doneList = AssetEntity.executeQuery(doneQuery.toString(),args)
     			def availTotal = rackList[2] - (doneList ? doneList : 0) 
@@ -116,5 +119,28 @@ class WalkThroughService {
 			 assetsListView.append("<TR class=jump><TD colSpan=3 align=middle style='color: red;font-weight: bold;'>No records found</TD></TR>") 
 		 }
 		 return assetsListView.toString()
+	}
+	/*-----------------------------------------------------
+	 * @author : Lokanath Reddy
+	 * @param  : AuditRoom, AuditRack, AudutLocation
+	 * @return : constructed query and args
+	 *---------------------------------------------------*/
+	def constructQuery(def auditRoom, def auditRack, def auditLocation ){
+		def args = [auditLocation]
+        def query = new StringBuffer()
+		if(auditRoom && auditRack ){
+			query.append(" and a.sourceRoom = ? and a.sourceRack = ? ")
+			args = [auditLocation,auditRoom,auditRack]
+		} else if(!auditRoom && auditRack){
+			query.append(" and (a.sourceRoom is null or a.sourceRoom = '') and a.sourceRack = ? ")
+			args = [auditLocation,auditRack]
+		} else if(auditRoom && !auditRack){
+			query.append(" and a.sourceRoom = ? and (a.sourceRack is null or a.sourceRack = '' )")
+			args = [auditLocation,auditRoom]
+		} else {
+			query.append(" and (a.sourceRoom is null or a.sourceRoom = '') and (a.sourceRack is null or a.sourceRack = '' )")
+			args = [auditLocation]
+		}
+		return [ args : args, query : query.toString() ]
 	}
 }

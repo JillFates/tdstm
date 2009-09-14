@@ -26,6 +26,9 @@
 		<transition to="BuSanTasks" name="BU/SAN Tasks" id="15" type="boolean" />
 		<transition to="CitrixTasks" name="Citrix Tasks" id="16" type="boolean" />
 
+		<transition to="SourceWalkthru" name="Source Walkthrough" id="17" type="boolean" />
+		<transition to="TargetWalkthru" name="Target Walkthrough" id="18" type="boolean" />
+		
 		<transition to="Ready" name="Ready" id="20" type="process" color="yellow"/>
 		<transition to="PoweredDown" name="Powered Down" id="30" type="process" color="orange"/>
 		<transition to="Release" name="Released" id="40" type="process" color="green" />

@@ -55,11 +55,11 @@ function confirmAssetBundle( e , assetId ){
 	<g:form method="post" action="selectAsset" name="selectAssetForm"> 
 		<TR>
 			<TD class=label>Room/Rack:</TD>
-			<TD class=field>${params.room}/${params.rack}</TD>
+			<TD class=field>${params.room ? params.room : 'blank'}/${params.rack ? params.rack : 'blank'}</TD>
 		</TR>
 		<TR>
 			<input type="hidden" name="id" id="assetId">
-			<input type="hidden" name="viewType" id="viewTypeId" value="${params.viewType}">
+			<input type="hidden" name="viewType" id="viewTypeId" value="${viewType}">
 			<input type="hidden" name="moveBundle" value="${params.moveBundle}">
 			<input type="hidden" name="location" value="${params.location}">
 			<input type="hidden" name="room" id="roomId" value="${params.room}">
@@ -80,11 +80,11 @@ function confirmAssetBundle( e , assetId ){
 				<thead>
 					<TR>
 						<g:sortableColumn property="uposition" title="U Pos" 
-						params="['moveBundle':params.moveBundle,'viewType':params.viewType,'location':params.location,'room':params.room,'rack':params.rack]"/>
+						params="['moveBundle':params.moveBundle,'viewType':viewType,'location':params.location,'room':params.room,'rack':params.rack]"/>
 						<g:sortableColumn property="usize" title="Size" 
-						params="['moveBundle':params.moveBundle,'viewType':params.viewType,'location':params.location,'room':params.room,'rack':params.rack]"/>
+						params="['moveBundle':params.moveBundle,'viewType':viewType,'location':params.location,'room':params.room,'rack':params.rack]"/>
 						<g:sortableColumn property="assetTag" title="Asset Tag" 
-						params="['moveBundle':params.moveBundle,'viewType':params.viewType,'location':params.location,'room':params.room,'rack':params.rack]"/>
+						params="['moveBundle':params.moveBundle,'viewType':viewType,'location':params.location,'room':params.room,'rack':params.rack]"/>
 					</TR>
 				</thead>
 				<tbody id="assetsListBody">
@@ -98,7 +98,7 @@ function confirmAssetBundle( e , assetId ){
 </DIV>
 </DIV>
 <script type="text/javascript">
-if('${params.viewType}'== 'todo'){
+if('${viewType}'== 'todo'){
 	$("#allId").attr('class','button unselected')
 	$("#todoId").attr('class','button')
 }
