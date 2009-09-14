@@ -240,8 +240,11 @@ var time = '${timeToRefresh}';
 	
 	function updateTransitions(e){
 		try{
-			var assetTransitions = eval('(' + e.responseText + ')');
+			var assetEntityCommentList = eval('(' + e.responseText + ')');
+			var assetTransitions = assetEntityCommentList.assetEntityList;
+			var assetComments = assetEntityCommentList.assetCommentsList;
 			var assetslength = assetTransitions.length;
+			var assetCommentsLength = assetComments.length;
 			var sessionStatus = isNaN(parseInt(assetslength));
 			if( !sessionStatus ){
 				if(assetTransitions){
@@ -251,19 +254,6 @@ var time = '${timeToRefresh}';
 						if(action){
 							if(!assetTransition.check){
 								action.html('&nbsp;');
-							} 
-						}
-						var commentIcon = $("#icon_"+assetTransition.id)
-						if(commentIcon){
-							if(!assetTransition.showCommentIcon){
-								commentIcon.html('&nbsp;');
-							}else{
-								var link = document.createElement('a');
-								link.href = '#'
-								link.id = assetTransition.id
-								link.onclick = function(){$('#createAssetCommentId').val( assetTransition.id );new Ajax.Request('../assetEntity/listComments?id='+this.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'action');}})} //;return false
-								link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
-								commentIcon.html(link);
 							} 
 						}
 						var application = $("#application_"+assetTransition.id)
@@ -287,6 +277,20 @@ var time = '${timeToRefresh}';
 							var transition = assetTransition.tdId[j]
 							var transTd = $("#"+transition.id)
 							transTd.attr("class",transition.cssClass )
+						}
+					}
+				}
+				if(assetComments){
+					for( i = 0; i <assetCommentsLength ; i++){
+						var assetComment = assetComments[i]
+						var commentIcon = $("#icon_"+assetComment.assetEntityId)
+						if(commentIcon){
+							var link = document.createElement('a');
+							link.href = '#'
+							link.id = assetComment.assetEntityId
+							link.onclick = function(){$('#createAssetCommentId').val( assetTransition.id );new Ajax.Request('../assetEntity/listComments?id='+this.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'action');}})} //;return false
+							link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
+							commentIcon.html(link);
 						}
 					}
 				}

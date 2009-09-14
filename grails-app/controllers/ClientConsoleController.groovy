@@ -375,6 +375,7 @@ class ClientConsoleController {
 		def appOwnerValue=params.appOwner
 		def appSmeValue=params.appSme
 		def assetEntityList = []
+		def assetEntityAndCommentList = []
 		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
 		if(bundleId){
 			def moveBundleInstance = MoveBundle.findById( bundleId )
@@ -474,17 +475,16 @@ class ClientConsoleController {
 					}
 					tdId << [id:"${assetId+"_"+trans}", cssClass:cssClass]
 				}
-				def showCommentIcon = false
-				def assetComment = AssetComment.find('from AssetComment where assetEntity = '+assetId+' and commentType = ? and isResolved = ?',['issue',0])
-				if(assetComment){
-					showCommentIcon = true
-				}
 				assetEntityList << [id: assetId, application:it.application ? it.application : "&nbsp;",appOwner:it.appOwner ? it.appOwner : "&nbsp;", 
 									appSme:it.appSme ? it.appSme : "&nbsp;",assetName:it.assetName ? it.assetName :"&nbsp;",tdId:tdId,
-									check:check, showCommentIcon:showCommentIcon]
+									check:check]
 			}
+			
+			def assetCommentsList = jdbcTemplate.queryForList("select asset_entity_id as assetEntityId from asset_comment where comment_type = 'issue' "+
+							                                  " and is_resolved = 0 and date_created between '$lastPoolTime' and '$currentPoolTime'")
+			assetEntityAndCommentList << [ assetEntityList: assetEntityList, assetCommentsList: assetCommentsList ]
 		}
-    	render assetEntityList as JSON
+    	render assetEntityAndCommentList as JSON
     }
 	
 	
