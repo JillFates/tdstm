@@ -672,8 +672,10 @@ class ClientConsoleController {
 				case "void" : 
 							def assetTeansitions = AssetTransition.findAll(assetTransitionQuery + " and t.stateTo >= $stateToId")
 							assetTeansitions.each{
-								it.voided = 1
-								it.save(flush:true)
+								if(it.type != "boolean"){
+									it.voided = 1
+									it.save(flush:true)
+								}
 							}
 							changeCurrentStatus(currStateQuery,assetEntity)
 							break;
