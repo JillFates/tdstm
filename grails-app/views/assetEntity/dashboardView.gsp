@@ -593,12 +593,12 @@ td .odd {
 						</g:each>
 						<td style="padding: 0px; border-right: 1px solid #333333">
 						<table style="border: 0;">
-							<th nowrap>${supportTeam?.cleaning.name}&nbsp;</th>
+							<th nowrap>Cleaning &nbsp;</th>
 							<tr>
 								<td nowrap>${supportTeam?.cleaningMembers}&nbsp;</td>
 							</tr>
 							<tr>
-								<td nowrap class="odd">${supportTeam?.cleaning.currentLocation}&nbsp;</td>
+								<td nowrap class="odd">${supportTeam?.cleaning?.currentLocation}&nbsp;</td>
 							</tr>
 							<tr>
 								<td nowrap>
@@ -622,12 +622,12 @@ td .odd {
 						</td>
 						<td style="padding: 0px;">
 						<table style="border: 0;">
-							<th nowrap>${supportTeam?.transport.name}&nbsp;</th>
+							<th nowrap>Transport &nbsp;</th>
 							<tr>
 								<td nowrap>${supportTeam?.transportMembers}&nbsp;</td>
 							</tr>
 							<tr>
-								<td nowrap class="odd">${supportTeam?.transport.currentLocation}&nbsp;</td>
+								<td nowrap class="odd">${supportTeam?.transport?.currentLocation}&nbsp;</td>
 							</tr>
 							<tr>
 								<td nowrap>&nbsp;</td>

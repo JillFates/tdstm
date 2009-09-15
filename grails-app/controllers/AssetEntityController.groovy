@@ -1015,11 +1015,17 @@ class AssetEntityController {
 	        def targetTransportAvail = jdbcTemplate.queryForList(countQuery + " and pm.current_state_id >= $onTruckId and pm.current_state_id < $offTruckId group by e.asset_entity_id having minstate != $holdId").size()
 	        
 	        def targetTransportPend = jdbcTemplate.queryForList(countQuery + " and pm.current_state_id < $onTruckId group by e.asset_entity_id ").size()
-	        											
-	        def cleaningTeam = ProjectTeam.findByTeamCode("Cleaning")
-	        def transportTeam = ProjectTeam.findByTeamCode("Transport")
-	        def cleaningMembers = partyRelationshipService.getBundleTeamMembersDashboard(cleaningTeam.id)
-	        def transportMembers = partyRelationshipService.getBundleTeamMembersDashboard(transportTeam.id)
+			
+	        def cleaningTeam = ProjectTeam.findByTeamCodeAndMoveBundle("Cleaning", moveBundleInstance)
+	        def transportTeam = ProjectTeam.findByTeamCodeAndMoveBundle("Transport", moveBundleInstance)
+			def cleaningMembers
+			if ( cleaningTeam ) {
+				cleaningMembers = partyRelationshipService.getBundleTeamMembersDashboard(cleaningTeam.id)
+			}
+			def transportMembers
+			if ( transportTeam ) {
+				transportMembers = partyRelationshipService.getBundleTeamMembersDashboard(transportTeam.id)
+			}
 	            supportTeam.put("sourcePendCleaned", sourcePendCleaned )
 	            supportTeam.put("sourceAvailCleaned", sourceAvailCleaned )
 	            supportTeam.put("sourceTransportAvail", sourceTransportAvail )
@@ -1031,9 +1037,9 @@ class AssetEntityController {
 		        supportTeam.put("sourceMover", sourceMover )
 		        supportTeam.put("targetMover", targetMover )
 		        supportTeam.put("cleaning", cleaningTeam )
-		        supportTeam.put("cleaningMembers", cleaningMembers.delete((cleaningMembers.length()-1), cleaningMembers.length()) )
+				supportTeam.put("cleaningMembers", cleaningMembers ? cleaningMembers?.delete((cleaningMembers?.length()-1), cleaningMembers?.length()) : "" )
 		        supportTeam.put("transport", transportTeam )
-		        supportTeam.put("transportMembers", transportMembers.delete((transportMembers.length()-1), transportMembers.length()) )
+				supportTeam.put("transportMembers", transportMembers ? transportMembers?.delete((transportMembers?.length()-1), transportMembers?.length()) : "" )
 	        totalAsset.each{
 	        	def check = true
 	        	def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
