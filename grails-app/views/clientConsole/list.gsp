@@ -343,7 +343,7 @@ var time = '${timeToRefresh}';
 	
 	function showAssetDetails( assetId ){
 		document.editForm.id.value=assetId
-		${remoteFunction(controller:'assetEntity', action:'editShow', params:'\'id=\'+ assetId', before:'document.showForm.id.value ='+ assetId+';', onComplete:'showAssetDialog(e , \'show\')')}
+		//${remoteFunction(controller:'assetEntity', action:'editShow', params:'\'id=\'+ assetId', before:'document.showForm.id.value ='+ assetId+';', onComplete:'showAssetDialog(e , \'show\')')}
 	}
 	function vpWidth(type) {
 		var data
@@ -353,15 +353,6 @@ var time = '${timeToRefresh}';
 			data  = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 		}
 		return data
-	}
-	function catchevent(event) {
-		var oSource = event.target
-		var srcElement = event.srcElement ? event.srcElement : event.target;
-		eventSrcID=(srcElement)?srcElement.id:'undefined';
-		var idArray = eventSrcID.split('_')
-		if( IsNumeric(idArray[0]) == true && idArray.length == 2 ) {
-			showAssetDetails(idArray[0])
-		}
 	}
 </script>
 </head>
@@ -443,37 +434,35 @@ var time = '${timeToRefresh}';
 	<thead>
 	<tr>
 	<jsec:hasAnyRole in="['ADMIN','MANAGER', 'PROJ_MGR']">
-	<td>
-	<input type="button" value="State..." onclick="changeState()" title="Change State"/>
+	<td style="width: 85px;">
+	<input type="button" value="State..." onclick="changeState()" title="Change State" />
 	</td>
 	</jsec:hasAnyRole>
-	<td>&nbsp;</td>
 			
-			<td style="padding-left: 0px;"><select id="applicationId" name="application" onchange="document.listForm.submit();" style="width: 120px;">
+			<td style="padding-left: 0px;"><select id="applicationId" name="application" onchange="document.listForm.submit();" style="width: 130px;">
 				<option value="" selected="selected">All</option>
 				<g:each in="${applicationList}" var="application">
 					<option value="${application[0] ? application[0] : 'blank'}">${application[0] ? application[0] : 'blank'}&nbsp;(${application[1]})</option>
 				</g:each>
 			</select></td>
-			<td style="padding-left: 0px;"><select id="appOwnerId" name="appOwner"	onchange="document.listForm.submit();" style="width: 120px;">
+			<td style="padding-left: 0px;"><select id="appOwnerId" name="appOwner"	onchange="document.listForm.submit();" style="width: 130px;">
 				<option value="" selected="selected">All</option>
 				<g:each in="${appOwnerList}" var="appOwner">
 					<option value="${appOwner[0] ? appOwner[0] : 'blank'}">${appOwner[0] ? appOwner[0] : 'blank'}&nbsp;(${appOwner[1]})</option>
 				</g:each>
 			</select></td>
 			<td style="padding-left: 0px;"><input type="hidden" id="projectId" name="projectId" value="${projectId }" />
-			 <select id="appSmeId" name="appSme" onchange="document.listForm.submit();" style="width: 120px;">
+			 <select id="appSmeId" name="appSme" onchange="document.listForm.submit();" style="width: 130px;">
 				<option value="" selected="selected">All</option>
 				<g:each in="${appSmeList}" var="appSme">
 					<option value="${appSme[0] ? appSme[0] : 'blank'}">${appSme[0] ? appSme[0] : 'blank'}&nbsp;(${appSme[1]})</option>
 				</g:each>
 			</select></td>
-	<td style="padding-left: 0px;"><select style="width: 120px;visibility: hidden;"/></td>
+	<td style="padding-left: 0px;"><select id="hiddenSelect" style="width: 128px;visibility: hidden;"/></td>
 		</tr>
 		<tr>
 		 <jsec:hasAnyRole in="['ADMIN','MANAGER', 'PROJ_MGR']">	<th style="padding-top:50px;">Actions <a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a></th></jsec:hasAnyRole>
 			
-			<th style="padding-top:50px;">Issue</th>
 			
 			 <g:sortableColumn style="padding-top:50px;" property="application"  title="Application" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
 			
@@ -494,7 +483,7 @@ var time = '${timeToRefresh}';
 
 		</tr>
 	</thead>
-	<tbody id="assetListTbody" onclick="catchevent(event);">
+	<tbody id="assetListTbody" >
 		<g:if test="${assetEntityList}">
 		<g:each in="${assetEntityList}" var="assetEntity">
 			<tr id="assetRow_${assetEntity.id}" >
@@ -502,23 +491,30 @@ var time = '${timeToRefresh}';
 			<td id="action_${assetEntity.id}">
 				
 					<g:if test="${assetEntity.checkVal == true}">
-						<g:checkBox name="checkChange" id="checkId_${assetEntity.id}" onclick="timedRefresh('never')"></g:checkBox> 
+						<g:checkBox name="checkChange" id="checkId_${assetEntity.id}" onclick="timedRefresh('never')"></g:checkBox>
+						 
 						<g:remoteLink action="getTask" params="['assetEntity':assetEntity.id]"	onComplete="showChangeStatusDialog(e);">
 							<img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}"	border="0px">
 						</g:remoteLink>
 					</g:if>
-					<g:else>&nbsp;</g:else>
-				
-			</td>
+					<g:else>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</g:else>
 			</jsec:hasAnyRole>
-			<td id="icon_${assetEntity.id}">
-				<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+assetEntity.id+' and commentType = ? and isResolved = ?',['issue',0])}">
+			<g:remoteLink controller="assetEntity" action="editShow" id="${assetEntity.id}" before="showAssetDetails('${assetEntity.id}');"	onComplete="showAssetDialog( e ,'show');">
+							<img src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px">
+			</g:remoteLink>
+			<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
+					<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+assetEntity.id+' and commentType = ? and isResolved = ?',['issue',0])}">
 					<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntity.id}" before="setAssetId('${assetEntity.id}');"	onComplete="listCommentsDialog( e ,'action');">
-						<img src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}"	border="0px">
+						<img id="icon_${assetEntity.id}" src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}"	border="0px">
 					</g:remoteLink>
 				</g:if>
-				<g:else>&nbsp;</g:else>
+				<g:else>
+					<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntity.id}" before="setAssetId('${assetEntity.id}');"	onComplete="listCommentsDialog( e ,'action');">
+						<img id="icon_${assetEntity.id}" src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}"	border="0px">
+					</g:remoteLink>
+				</g:else>
 			</td>
+			</jsec:hasAnyRole>
 			<td id="${assetEntity.id}_application" >${assetEntity?.application}&nbsp;</td>
 			<td id="${assetEntity.id}_appOwner" >${assetEntity?.appOwner}&nbsp;</td>
 			<td id="${assetEntity.id}_appSme" >${assetEntity?.appSme}&nbsp;</td>
@@ -889,6 +885,7 @@ if('${browserTest}' == 'true'){
 } else {
 	$("div.tableContainer").css("width",vpWidth("width"));
 	$("#assetListTbody").css("height",vpWidth("height") - 299)
+	$("#hiddenSelect").css("width",vpWidth("width") - 1150 )
 }
 
 </script>

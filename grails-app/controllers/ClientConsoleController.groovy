@@ -91,9 +91,13 @@ class ClientConsoleController {
         
 			if(sortby != "" && sortby != null){
 				query.append(" order by $sortby")
+			}else {
+				query.append(" order by ae.application, ae.asset_name")
 			}
 			if(order != "" && order != null){
 				query.append(" $order ")
+			}else {
+				query.append(" asc ")
 			}
 			def resultList=jdbcTemplate.queryForList(query.toString())
 			def today = new java.util.Date();
@@ -189,7 +193,6 @@ class ClientConsoleController {
 			}
 			userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")
 			def timeToRefresh = getSession().getAttribute("CLIENT_CONSOLE_REFRESH")
-			
 			return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,
 				appOwnerList:appOwnerList,applicationList:applicationList,appSmeList:appSmeList,projectId:projectId,
 				processTransitionList:processTransitionList,projectId:projectId,appOwnerValue:appOwnerValue,appValue:appValue,

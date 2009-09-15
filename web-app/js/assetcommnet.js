@@ -368,16 +368,11 @@
 		
 	/*UPDATE THE ASSET COMMENT ICON*/
 	function updateAssetCommentIcon( assetComments ){
-		var link = document.createElement('a');
-		link.href = '#'
-		link.onclick = function(){setAssetId(assetComments.assetComment.assetEntity);new Ajax.Request('../assetEntity/listComments?id='+assetComments.assetComment.assetEntity,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never');}})} //;return false
 		if( assetComments.status ){
-			link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
+			$("#icon_"+assetComments.assetComment.assetEntity).attr("src", "../images/skin/database_table_red.png");
 		}else{
-			link.innerHTML = "<img src=\"../images/skin/database_table_bold.png\" border=\"0px\">"
+			$("#icon_"+assetComments.assetComment.assetEntity).attr("src", "../images/skin/database_table_bold.png");
 		}
-		var iconObj = $('#icon_'+assetComments.assetComment.assetEntity);
-		iconObj.html(link)
 	}
 	
 	function resolveValidate(formName,idVal){
