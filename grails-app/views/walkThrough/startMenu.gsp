@@ -2,7 +2,6 @@
 <head>
 <title>Walkthru&gt; Start</title>
 <g:javascript library="prototype" />
-<g:javascript library="jquery" />
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
 <script type="text/javascript">
 /*-----------------------------------------------------------------
@@ -12,20 +11,21 @@
 *-----------------------------------------------------------------*/
 function appendBundles( e ) {
 	var moveBundleList = eval('(' + e.responseText + ')')
-	var moveBundleObj = $("#moveBundleId")
-	var options = ""
+	var moveBundleObj = document.startMenuForm.moveBundle
+	moveBundleObj.innerHTML = ""
 	if(moveBundleList){
 		var length = moveBundleList.length
 		for(i = 0; i < length; i++){
 			var moveBundle = moveBundleList[i]
+			var option = document.createElement("option");
+			option.value = moveBundle.id
+			option.innerHTML = moveBundle.name
 			if('${currBundle}' == moveBundle.id){
-				options += "<option value="+moveBundle.id+" selected>"+moveBundle.name+"</option>"
-			} else {
-				options += "<option value="+moveBundle.id+">"+moveBundle.name+"</option>"
+				option.selected = "selected"
 			}
+			moveBundleObj.appendChild(option);
 		}
 	}
-	moveBundleObj.html(options)
 }
 </script>
 </head>
@@ -77,7 +77,7 @@ function appendBundles( e ) {
 		</div>
 	</div>
 	<script type="text/javascript">
-		${remoteFunction(action:'getBundles', params:'\'id=\' + $(\'#projectId\').val() ', onComplete:'appendBundles(e)')}
+		${remoteFunction(action:'getBundles', params:'\'id=\' + document.startMenuForm.project.value ', onComplete:'appendBundles(e)')}
 	</script>
 </body>
 </html>
