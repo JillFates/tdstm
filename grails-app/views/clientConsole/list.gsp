@@ -241,8 +241,8 @@ var time = '${timeToRefresh}';
 	function updateTransitions(e){
 		try{
 			var assetEntityCommentList = eval('(' + e.responseText + ')');
-			var assetTransitions = assetEntityCommentList.assetEntityList;
-			var assetComments = assetEntityCommentList.assetCommentsList;
+			var assetTransitions = assetEntityCommentList[0].assetEntityList;
+			var assetComments = assetEntityCommentList[0].assetCommentsList;
 			var assetslength = assetTransitions.length;
 			var assetCommentsLength = assetComments.length;
 			var sessionStatus = isNaN(parseInt(assetslength));
@@ -393,6 +393,7 @@ var time = '${timeToRefresh}';
 <div style="width: 100%;">
 	<g:form	name="listForm" action="list" method="post">
 	<input type="hidden" id="role" value="${role}"/>
+	<input type="hidden" id="projectId" name="projectId" value="${projectId }" />
 	<table style="border: 0px;">
 		<tr>
 			<td valign="top" class="name"><label for="moveBundle">Move
@@ -432,46 +433,79 @@ var time = '${timeToRefresh}';
 
 <table cellpadding="0"   cellspacing="0"  style="border:0px;" >
 	<thead>
-	<tr>
-	<jsec:hasAnyRole in="['ADMIN','MANAGER', 'PROJ_MGR']">
-	<td style="width: 85px;">
-	<input type="button" value="State..." onclick="changeState()" title="Change State" />
-	</td>
-	</jsec:hasAnyRole>
-			
-			<td style="padding-left: 0px;"><select id="applicationId" name="application" onchange="document.listForm.submit();" style="width: 130px;">
-				<option value="" selected="selected">All</option>
-				<g:each in="${applicationList}" var="application">
-					<option value="${application[0] ? application[0] : 'blank'}">${application[0] ? application[0] : 'blank'}&nbsp;(${application[1]})</option>
-				</g:each>
-			</select></td>
-			<td style="padding-left: 0px;"><select id="appOwnerId" name="appOwner"	onchange="document.listForm.submit();" style="width: 130px;">
-				<option value="" selected="selected">All</option>
-				<g:each in="${appOwnerList}" var="appOwner">
-					<option value="${appOwner[0] ? appOwner[0] : 'blank'}">${appOwner[0] ? appOwner[0] : 'blank'}&nbsp;(${appOwner[1]})</option>
-				</g:each>
-			</select></td>
-			<td style="padding-left: 0px;"><input type="hidden" id="projectId" name="projectId" value="${projectId }" />
-			 <select id="appSmeId" name="appSme" onchange="document.listForm.submit();" style="width: 130px;">
-				<option value="" selected="selected">All</option>
-				<g:each in="${appSmeList}" var="appSme">
-					<option value="${appSme[0] ? appSme[0] : 'blank'}">${appSme[0] ? appSme[0] : 'blank'}&nbsp;(${appSme[1]})</option>
-				</g:each>
-			</select></td>
-	<td style="padding-left: 0px;"><select id="hiddenSelect" style="width: 128px;visibility: hidden;"/></td>
-		</tr>
 		<tr>
-		 <jsec:hasAnyRole in="['ADMIN','MANAGER', 'PROJ_MGR']">	<th style="padding-top:50px;">Actions <a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a></th></jsec:hasAnyRole>
-			
-			
-			 <g:sortableColumn style="padding-top:50px;" property="application"  title="Application" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
-			
-			<g:sortableColumn style="padding-top:50px;" property="app_owner" title="App Owner"  params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]" />
-
-			<g:sortableColumn style="padding-top:50px;" property="app_sme" title="App SME" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
-
-			<g:sortableColumn style="padding-top:50px;" property="asset_name" title="Asset Name" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
-			
+		 <jsec:hasAnyRole in="['ADMIN','MANAGER', 'PROJ_MGR']">	<th style="padding-top:35px;">Actions</span> 
+		 <input type="button" value="State..." onclick="changeState()" title="Change State" style="width: 80px;"/>
+		 <a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a></th></jsec:hasAnyRole>
+			<th style="padding-top:35px;" >
+			<table style="border: 0px;">
+				<thead>
+				<tr style="background-color: #CCC">
+					<g:sortableColumn style="border:0px;" property="application"  title="Application" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
+				</tr>
+				<tr style="background-color: #CCC">
+					<th style="border:0px;">
+						<select id="applicationId" name="application" onchange="document.listForm.submit();" style="width: 120px;">
+							<option value="" selected="selected">All</option>
+							<g:each in="${applicationList}" var="application">
+								<option value="${application[0] ? application[0] : 'blank'}">${application[0] ? application[0] : 'blank'}&nbsp;(${application[1]})</option>
+							</g:each>
+						</select>
+					</th>
+				</tr>
+				</thead>
+			</table>
+			</th>
+			<th style="padding-top:35px;">
+			<table style="border: 0px;">
+				<thead>
+				<tr style="background-color: #CCC">
+					<g:sortableColumn style="border:0px;" property="app_owner" title="App Owner"  params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]" />
+				</tr>
+				<tr style="background-color: #CCC">
+					<th style="border:0px;">
+						<select id="appOwnerId" name="appOwner"	onchange="document.listForm.submit();" style="width: 120px;">
+							<option value="" selected="selected">All</option>
+							<g:each in="${appOwnerList}" var="appOwner">
+								<option value="${appOwner[0] ? appOwner[0] : 'blank'}">${appOwner[0] ? appOwner[0] : 'blank'}&nbsp;(${appOwner[1]})</option>
+							</g:each>
+						</select>
+					</th>
+				</tr>
+				</thead>
+			</table>
+			</th>
+			<th style="padding-top:35px;">
+			<table style="border: 0px;">
+				<thead>
+				<tr style="background-color: #CCC">
+					<g:sortableColumn style="border:0px;" property="app_sme" title="App SME" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
+				</tr>
+				<tr style="background-color: #CCC">
+					<th style="border:0px;">
+						<select id="appSmeId" name="appSme" onchange="document.listForm.submit();" style="width: 120px;">
+							<option value="" selected="selected">All</option>
+							<g:each in="${appSmeList}" var="appSme">
+								<option value="${appSme[0] ? appSme[0] : 'blank'}">${appSme[0] ? appSme[0] : 'blank'}&nbsp;(${appSme[1]})</option>
+							</g:each>
+						</select>
+					</th>
+				</tr>
+				</thead>
+			</table>
+			</th>
+			<th style="padding-top:35px;">
+			<table style="border: 0px;">
+				<thead>
+				<tr style="background-color: #CCC">
+					<g:sortableColumn style="border:0px;" property="asset_name" title="Asset Name" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
+				</tr>
+				<tr style="background-color: #CCC">
+					<td style="padding-left: 0px;"><select id="hiddenSelect" style="width: 120px;visibility: hidden;"/></td>
+				</tr>
+				</thead>
+			</table>
+			</th>
 			<g:if test="${browserTest}">
 			<g:each in="${processTransitionList}"  var="task">
 				<th class="verticaltext" title="${task.header}">${task?.header}</th>
@@ -489,10 +523,8 @@ var time = '${timeToRefresh}';
 			<tr id="assetRow_${assetEntity.id}" >
 			<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">	
 			<td id="action_${assetEntity.id}">
-				
 					<g:if test="${assetEntity.checkVal == true}">
 						<g:checkBox name="checkChange" id="checkId_${assetEntity.id}" onclick="timedRefresh('never')"></g:checkBox>
-						 
 						<g:remoteLink action="getTask" params="['assetEntity':assetEntity.id]"	onComplete="showChangeStatusDialog(e);">
 							<img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}"	border="0px">
 						</g:remoteLink>
@@ -880,12 +912,11 @@ Comment</a></span></div>
 initialize();
 timedRefresh($("#selectTimedId").val())
 if('${browserTest}' == 'true'){
-	$("div.tableContainerIE").css("height",vpWidth("height") - 144)
+	$("div.tableContainerIE").css("height",vpWidth("height") - 142)
 	$("div.tableContainerIE").css("width",vpWidth("width"));
 } else {
 	$("div.tableContainer").css("width",vpWidth("width"));
-	$("#assetListTbody").css("height",vpWidth("height") - 299)
-	$("#hiddenSelect").css("width",vpWidth("width") - 1150 )
+	$("#assetListTbody").css("height",vpWidth("height") - 257)
 }
 
 </script>

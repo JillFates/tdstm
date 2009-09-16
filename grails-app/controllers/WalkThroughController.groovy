@@ -186,7 +186,7 @@ class WalkThroughController {
 					asstesListQuery.append(" order by a.sourceRackPosition $params.order")
 				}
 			} else {
-				asstesListQuery.append(" order by a.sourceRackPosition ")
+				asstesListQuery.append(" order by a.sourceRackPosition desc, a.assetTag")
 			}
 			assetsList = AssetEntity.executeQuery(asstesListQuery.toString(),args)
 		}
@@ -251,7 +251,7 @@ class WalkThroughController {
 				asstesListQuery.append( constructedQuery.query )
 				args = constructedQuery.args
 			}
-			asstesListQuery.append(" order by a.sourceRackPosition ")
+			asstesListQuery.append(" order by a.sourceRackPosition desc, a.assetTag")
 			assetsList = AssetEntity.executeQuery(asstesListQuery.toString(),args)
 		}
 		def assetsListView = walkThroughService.generateAssetListView( assetsList, auditLocation, auditType, viewType )
