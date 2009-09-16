@@ -5,7 +5,7 @@ class ClientConsoleController {
 	def stateEngineService
 	def userPreferenceService
 	def workflowService
-    def  jdbcTemplate
+    def jdbcTemplate
     def index = { 
     	redirect(action:list,params:params)
     }
@@ -14,7 +14,7 @@ class ClientConsoleController {
 	 *  @author : Lokanath Reddy
 	 *  @param  : asset filters and movebundle and project
 	 *  @return : AssetEntity Details and AssetTransition details
-	 */
+	 *---------------------------------------------------*/
     def list={
     	def headerCount = getHeaderNames()
     	def browserTest = request.getHeader("User-Agent").contains("MSIE")
@@ -24,9 +24,6 @@ class ClientConsoleController {
 		//def projectMap
         def stateVal
         def taskVal
-        def holdId
-        def releaseId
-        def reRackId
         def check 
         def appValue=params.application
         def appOwnerValue=params.appOwner
@@ -122,9 +119,10 @@ class ClientConsoleController {
 			} else if(subject.hasRole("MANAGER")){
 				role = "MANAGER"
 			}
-			holdId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Hold"))
-			releaseId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Release"))
-			reRackId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Reracked"))
+			def holdId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Hold"))
+			def releaseId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Release"))
+			def reRackId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Reracked"))
+			def terminatedId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Terminated"))
 			resultList.each{
 				def stateId = 0
 				def assetId = it.id
@@ -164,10 +162,12 @@ class ClientConsoleController {
 					if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId) ){
 						cssClass='asset_pending'
 					} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 0 and stateTo = "+transitionId) ) {
-						if(stateId != holdId || isHoldNa){
+						if((stateId != holdId && stateId != terminatedId ) || isHoldNa){
 							cssClass='task_done'
-						} else {
+						} else if(stateId != terminatedId){
 							cssClass='asset_hold'
+						} else {
+							cssClass='task_term'
 						}
 					}
 					if(stateType != 'boolean' || transitionId == holdId){
@@ -181,6 +181,8 @@ class ClientConsoleController {
 								} else {
 									cssClass='task_pending'
 								}
+							} else if(stateId == terminatedId){
+								cssClass='task_term'
 							} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId)){
 								cssClass='asset_pending'
 							}
@@ -414,6 +416,7 @@ class ClientConsoleController {
 			def holdId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Hold"))
 			def releaseId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Release"))
 			def reRackId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Reracked"))
+			def terminatedId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Terminated"))
 			resultList.each{
 				def stateId = 0
 				def assetId = it.id
@@ -454,10 +457,12 @@ class ClientConsoleController {
 					if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId)){
 						cssClass='asset_pending'
 					} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 0 and stateTo = "+transitionId)) {
-						if(stateId != holdId || isHoldNa){
+						if((stateId != holdId && stateId != terminatedId) || isHoldNa){
 							cssClass='task_done'
-						} else {
+						} else if(stateId != terminatedId){
 							cssClass='asset_hold'
+						} else {
+							cssClass='task_term'
 						}
 					}
 					if(stateType != 'boolean' || transitionId == holdId){
@@ -471,6 +476,8 @@ class ClientConsoleController {
 								} else {
 									cssClass='task_pending'
 								}
+							} else if(stateId == terminatedId){
+								cssClass='task_term'
 							} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId)){
 								cssClass='asset_pending'
 							}
@@ -586,7 +593,8 @@ class ClientConsoleController {
 	 *----------------------------------------------------*/
 	def constructManuOptions( def state, def assetEntity, def situation, def stateType ){
 		 def menuOptions = ""
-		 if(stateType != "process"){
+		 def holdId = Integer.parseInt(stateEngineService.getStateId(assetEntity.project.workflowCode,"Hold"))
+		 if(stateType != "process" && state != "Hold"){
 			 if(situation == "NA"){
 				 menuOptions = "naMenu"
 			 } else if(situation == "done"){
@@ -594,7 +602,7 @@ class ClientConsoleController {
 			 } else {
 				 menuOptions = "noTransMenu"
 			 }
-		 } else {
+		 } else if(state != "Hold"){
 			 def projectAssetMap = ProjectAssetMap.findByAsset(assetEntity)
 			 def taskList
 			 def role = ""
@@ -606,9 +614,16 @@ class ClientConsoleController {
 			 }
 			 if(projectAssetMap){
 				 def transitionSelected = stateEngineService.getStateIdAsInt( assetEntity.project.workflowCode, state )
+				 def currentTransition = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+												"where t.asset_entity_id = ${assetEntity?.id} and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
+												"order by date_created desc limit 1 ")
 				 def currentState = projectAssetMap.currentStateId
+                 if(currentTransition.size()){
+                	 currentState = currentTransition[0].stateTo
+                 }
 				 def stateVal = stateEngineService.getState(assetEntity.project.workflowCode,currentState)
 				 if(currentState < transitionSelected ){
+					 def roleCheck = stateEngineService.canDoTask( assetEntity.project.workflowCode, role, stateVal, state  )
 					 taskList = stateEngineService.getTasks(assetEntity.project.workflowCode,role,stateVal)
 					 taskList.each{
 						 if(it == state){
@@ -654,8 +669,8 @@ class ClientConsoleController {
 		}
 		def assetTransitionQuery = "from AssetTransition t where t.assetEntity = ${assetEntity.id} and t.voided = 0"
 		def comment = ""
-		if(stateTo == "Hold"){
-				comment = "Transition created for Boolean transition"
+		if(stateTo == "Terminated"){
+				comment = "Asset has been Terminated"
 		}
 		def message = ""
 		if(role){
@@ -746,6 +761,7 @@ class ClientConsoleController {
 		def currentstate = 0
 		def tdId = []
 		def holdId = Integer.parseInt(stateEngineService.getStateId(assetEntity.project.workflowCode,"Hold"))
+		def terminatedId = Integer.parseInt(stateEngineService.getStateId(assetEntity.project.workflowCode,"Terminated"))
 		def currentTransition = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
 														"where t.asset_entity_id = ${assetEntity?.id} and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
 														"order by date_created desc limit 1 ")
@@ -768,10 +784,12 @@ class ClientConsoleController {
 			if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId) ){
 				cssClass='asset_pending'
 			} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 0 and stateTo = "+transitionId)) {
-				if(currentstate != holdId || isHoldNa){
+				if((currentstate != holdId && currentstate != terminatedId) || isHoldNa){
 					cssClass='task_done'
-				} else {
+				} else if(currentstate != terminatedId) {
 					cssClass='asset_hold'
+				} else {
+					cssClass='task_term'
 				}
 			}
 			if(stateType != 'boolean' || transitionId == holdId){
@@ -785,6 +803,8 @@ class ClientConsoleController {
 						} else {
 							cssClass='task_pending'
 						}
+					} else if(currentstate == terminatedId){
+						cssClass='task_term'
 					} else if(AssetTransition.find(naTransQuery+"  and isNonApplicable = 1 and stateTo = "+transitionId)){
 						cssClass='asset_pending'
 					}

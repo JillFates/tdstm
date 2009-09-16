@@ -315,6 +315,9 @@
 .task_done{
 	background-color: green;
 }
+.task_term {
+	background-color: black;
+}
 .asset_pending{
 	background-color:#ccc;
 	color:black;
