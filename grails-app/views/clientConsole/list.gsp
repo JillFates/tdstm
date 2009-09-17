@@ -286,10 +286,10 @@ var time = '${timeToRefresh}';
 						var commentIcon = $("#icon_"+assetComment.assetEntityId)
 						if(commentIcon){
 							var link = document.createElement('a');
-							link.href = '#'
-							link.id = assetComment.assetEntityId
-							link.onclick = function(){$('#createAssetCommentId').val( assetTransition.id );new Ajax.Request('../assetEntity/listComments?id='+this.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'action');}})} //;return false
-							link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
+							link.href = '#';
+							link.id = assetComment.assetEntityId;
+							link.onclick = function(){$('#createAssetCommentId').val(this.id);new Ajax.Request('../assetEntity/listComments?id='+this.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'action');}})} //;return false
+							link.innerHTML = "<img src=\"../images/skin/"+assetComment.type+"\" border=\"0px\">";
 							commentIcon.html(link);
 						}
 					}
@@ -523,28 +523,35 @@ var time = '${timeToRefresh}';
 			<tr id="assetRow_${assetEntity.id}" >
 			<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">	
 			<td id="action_${assetEntity.id}">
-					<g:if test="${assetEntity.checkVal == true}">
-						<g:checkBox name="checkChange" id="checkId_${assetEntity.id}" onclick="timedRefresh('never')"></g:checkBox>
-						<g:remoteLink action="getTask" params="['assetEntity':assetEntity.id]"	onComplete="showChangeStatusDialog(e);">
-							<img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}"	border="0px">
-						</g:remoteLink>
-					</g:if>
-					<g:else>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</g:else>
-			</jsec:hasAnyRole>
-			<g:remoteLink controller="assetEntity" action="editShow" id="${assetEntity.id}" before="showAssetDetails('${assetEntity.id}');"	onComplete="showAssetDialog( e ,'show');">
+				<g:if test="${assetEntity.checkVal == true}">
+					<g:checkBox name="checkChange" id="checkId_${assetEntity.id}" onclick="timedRefresh('never')"></g:checkBox>
+					<g:remoteLink action="getTask" params="['assetEntity':assetEntity.id]"	onComplete="showChangeStatusDialog(e);">
+						<img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}"	border="0px">
+					</g:remoteLink>
+				</g:if>
+				<g:else>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</g:else>
+				<g:remoteLink controller="assetEntity" action="editShow" id="${assetEntity.id}" before="showAssetDetails('${assetEntity.id}');"	onComplete="showAssetDialog( e ,'show');">
 							<img src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px">
 			</g:remoteLink>
-			<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
-					<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+assetEntity.id+' and commentType = ? and isResolved = ?',['issue',0])}">
+			<span id="icon_${assetEntity.id}">
+				<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+assetEntity.id+' and commentType = ? and isResolved = ?',['issue',0])}">
 					<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntity.id}" before="setAssetId('${assetEntity.id}');"	onComplete="listCommentsDialog( e ,'action');">
-						<img id="icon_${assetEntity.id}" src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}"	border="0px">
+						<img  src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}"	border="0px">
 					</g:remoteLink>
 				</g:if>
 				<g:else>
-					<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntity.id}" before="setAssetId('${assetEntity.id}');"	onComplete="listCommentsDialog( e ,'action');">
-						<img id="icon_${assetEntity.id}" src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}"	border="0px">
-					</g:remoteLink>
-				</g:else>
+					<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+assetEntity.id)}">
+						<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntity.id}" before="setAssetId('${assetEntity.id}');"	onComplete="listCommentsDialog( e ,'action');">
+							<img  src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}"	border="0px">
+						</g:remoteLink>
+					</g:if>
+					<g:else>
+						<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntity.id}" before="setAssetId('${assetEntity.id}');"	onComplete="listCommentsDialog( e ,'action');">
+							<img src="${createLinkTo(dir:'images/skin',file:'database_table_light.png')}"	border="0px">
+						</g:remoteLink>
+					</g:else>
+			</g:else>
+			</span>
 			</td>
 			</jsec:hasAnyRole>
 			<td id="${assetEntity.id}_application" >${assetEntity?.application}&nbsp;</td>

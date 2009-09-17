@@ -490,8 +490,23 @@ class ClientConsoleController {
 									check:check]
 			}
 			
-			def assetCommentsList = jdbcTemplate.queryForList("select asset_entity_id as assetEntityId from asset_comment where comment_type = 'issue' "+
-							                                  " and is_resolved = 0 and date_created between '$lastPoolTime' and '$currentPoolTime'")
+			def assetCommentsList = []
+			if ( role ) {
+				def assetsList = AssetEntity.findAll("from AssetEntity where moveBundle = ${moveBundleInstance.id}")
+				assetsList.each {
+					def checkIssueType = AssetComment.find("from AssetComment where assetEntity=$it.id and commentType='issue' and isResolved = 0")
+					if ( checkIssueType ) {
+						assetCommentsList << ["assetEntityId":it.id, "type":"database_table_red.png"]
+					} else {
+						checkIssueType = AssetComment.find("from AssetComment where assetEntity=$it.id")
+						if ( checkIssueType ) {
+							assetCommentsList << ["assetEntityId":it.id, "type":"database_table_bold.png"]
+						} else {
+							assetCommentsList << ["assetEntityId":it.id, "type":"database_table_light.png"]
+						}
+					}
+				}
+			} 
 			assetEntityAndCommentList << [ assetEntityList: assetEntityList, assetCommentsList: assetCommentsList ]
 		}
     	render assetEntityAndCommentList as JSON
