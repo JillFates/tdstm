@@ -90,6 +90,9 @@ var time = '${timeToRefresh}';
 							} else {
 				          		return false
 				         	}
+				        },
+				        'noOptions': function(t){
+				        	$(".cell-selected").attr('class',$("#cssClassId").val());
 				        }
 			      	}
 		    	});
