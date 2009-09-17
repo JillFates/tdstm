@@ -2,25 +2,24 @@
 <head>
 <title>Walkthru&gt; Select Asset</title>
 <g:javascript library="prototype" />
-<g:javascript library="jquery" />
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
+<g:javascript src="betterinnerhtml.js" />
 <script type="text/javascript">
 var timeInterval;
 function searchAssets(){
-	var aserchKey = $('#assetSearchId').val()
-	${remoteFunction(action:'searchAssets', params:'\'room=\' + $(\'#roomId\').val() +\'&rack=\'+$(\'#rackId\').val() +\'&searchKey=\'+ aserchKey +\'&viewType=\'+$(\'#viewTypeId\').val()', onComplete:'updateAssets(e)')}
+	var aserchKey = document.selectAssetForm.assetSearch.value
+	${remoteFunction(action:'searchAssets', params:'\'room=\' + document.selectAssetForm.room.value +\'&rack=\'+document.selectAssetForm.rack.value +\'&searchKey=\'+ aserchKey +\'&viewType=\'+document.selectAssetForm.viewType.value', onComplete:'updateAssets(e)')}
 }
 function updateAssets( e ) {
 	var assetsList = e.responseText;
 	var result = assetsList.indexOf("No records found")
 	if(result != -1 ){
-		$('#assetSearchId').css("border","1px solid red")
+		document.selectAssetForm.assetSearch.style.border = "1px solid red"
 	} else {
-		$('#assetSearchId').css("border","1px solid #ccc")
+		document.selectAssetForm.assetSearch.style.border = "1px solid #ccc"
 	}
-	var assetsListBody = $("#assetsListBody");
-	assetsListBody.html( assetsList );
+	BetterInnerHTML(getObject('assetsListBody'), assetsList);
 }
 function showAssetMenu( id ) {
 	${remoteFunction(action:'confirmAssetBundle', params:'\'id=\' + id ', onComplete:'confirmAssetBundle(e,id)')}
@@ -34,14 +33,14 @@ function confirmAssetBundle( e , assetId ){
 		}
 	}
 	if(flag){
-		$("#assetId").val(assetId);
-		$("form#selectAssetForm").attr("action","assetMenu")
-		$("form#selectAssetForm").submit();
+		document.selectAssetForm.assetId.value = assetId
+		document.selectAssetForm.action = "assetMenu"
+		document.selectAssetForm.submit();
 	}
 }
 </script>
 </head>
-<body onload="$('#assetSearchId').focus()">
+<body onload="document.selectAssetForm.assetSearch.focus()">
 <DIV class=qvga_border><A name=select_asset></A>
 <DIV class=title>Walkthru&gt; Select Asset</DIV>
 <DIV class=input_area>
@@ -58,22 +57,22 @@ function confirmAssetBundle( e , assetId ){
 			<TD class=field>${params.room ? params.room : 'blank'}/${params.rack ? params.rack : 'blank'}</TD>
 		</TR>
 		<TR>
-			<input type="hidden" name="id" id="assetId">
+			<input type="hidden" name="id" name="assetId" id="assetId">
 			<input type="hidden" name="viewType" id="viewTypeId" value="${viewType}">
 			<input type="hidden" name="moveBundle" value="${params.moveBundle}">
 			<input type="hidden" name="location" value="${params.location}">
 			<input type="hidden" name="room" id="roomId" value="${params.room}">
 			<input type="hidden" name="rack" id="rackId" value="${params.rack}">
 			<TD align=middle><LABEL>View:</LABEL> 
-			<a class="button unselected" href="#" onclick="$('#viewTypeId').val('todo');$('form#selectAssetForm').submit();" id="todoId">ToDo</a>
-			<a class="button" href="#" onclick="$('#viewTypeId').val('all');$('form#selectAssetForm').submit();" id="allId">All</a>
+			<a class="button unselected" href="#" onclick="document.selectAssetForm.viewType.value='todo';document.selectAssetForm.submit();" id="todoId">ToDo</a>
+			<a class="button" href="#" onclick="document.selectAssetForm.viewTypeId.value='all';document.selectAssetForm.submit();" id="allId">All</a>
 			</TD>
 			<TD align=right><LABEL for=assetSearch>Scan Asset:</LABEL>
 				<INPUT style="width: 40px" id="assetSearchId" class="text search" size='8' name='assetSearch' 
 					onkeyup="timeInterval = setTimeout('searchAssets()',500)" onkeydown="if(timeInterval){clearTimeout(timeInterval)}"> 
 			</TD>
 		</TR>
-		</g:form>
+		
 		<TR>
 			<TD colSpan=2>
 			<TABLE class=grid>
@@ -87,20 +86,21 @@ function confirmAssetBundle( e , assetId ){
 						params="['moveBundle':params.moveBundle,'viewType':viewType,'location':params.location,'room':params.room,'rack':params.rack]"/>
 					</TR>
 				</thead>
-				<tbody id="assetsListBody">
+				<tbody id="assetsListBody" >
 				${assetsListView}
 				</tbody>
 			</TABLE>
 			</TD>
 		</TR>
+		</g:form>
 	</TBODY>
 </TABLE>
 </DIV>
 </DIV>
 <script type="text/javascript">
 if('${viewType}'== 'todo'){
-	$("#allId").attr('class','button unselected')
-	$("#todoId").attr('class','button')
+	getObject('todoId').className = 'button'
+	getObject('allId').className = 'button unselected'
 }
 </script>
 </body>

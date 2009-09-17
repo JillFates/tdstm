@@ -23,12 +23,12 @@ class WalkThroughService {
     			def cssClass = "asset_ready"
     			def flag = true
     			if(i == 6 && rackListSize != 7 ){
-    				rackListView.append("<TR class=jump><TD align=middle colspan='3'>"+
-    						"<A class=nav_button name='racklist"+i+"' href='#racklist"+i+"'>Page Down</A></TD></TR>")
+    				rackListView.append("<TR class='jump'><TD colspan='3' align='center'>"+
+    						"<A class='nav_button' name='racklist"+i+"' href='#racklist"+i+"'>Page Down</A></TD></TR>")
     			} else if(i > 6 && (i - 6) % 13 == 0 && (rackListSize - 7 ) % 13 != 0){
-    				rackListView.append("<TR class=jump><TD colSpan=3 align=middle><A class=nav_button href='#select_rack'>Top</A>&nbsp;&nbsp;&nbsp;"+ 
-    					"<A class=nav_button href='#racklist"+(i-13)+"'>Page Up</A>&nbsp;&nbsp;&nbsp;"+ 
-    					"<A class=nav_button name='racklist"+i+"' href='#racklist"+i+"'>Page Down</A></TD></TR>")
+    				rackListView.append("<TR class='jump'><TD colSpan='3' align='middle'><A class='nav_button' href='#select_rack'>Top</A>"+ 
+    					"<A class='nav_button' href='#racklist"+(i-13)+"'>Page Up</A>"+ 
+    					"<A class='nav_button'  name='racklist"+i+"' href='#racklist"+i+"'>Page Down</A></TD></TR>")
     			}
 				 
     			def doneQuery = new StringBuffer("select count(a.id) from AssetEntity a where a.sourceLocation = ? and a.id in "+
@@ -60,17 +60,17 @@ class WalkThroughService {
     				flag = false
 				}
 				if(flag){
-					rackListView.append("<tr class='$cssClass' onClick=\"location.href='selectAsset?moveBundle=${moveBundle}&location=${location}&room=${rackList[0]}&rack=${rackList[1]}'\">"+
-							"<td class='center'>${rackList[0] ? rackList[0] : '&nbsp;'}</td><td class='center'>${rackList[1] ? rackList[1] : ''}</td>")
+					rackListView.append("<tr class='$cssClass' onclick=\"showAssets('${moveBundle}','${location}','${rackList[0]}','${rackList[1]}')\">"+
+							"<td class='center'>${rackList[0] ? rackList[0] : ''}</td><td class='center'>${rackList[1] ? rackList[1] : ''}</td>")
 					rackListView.append("<td class='center'>${availTotal} of ${rackList[2]}</td></tr>")
 			 	}
 			 }
 			 if(rackListSize > 10){
-				 rackListView.append("<TR class=jump><TD colSpan=3 align=middle><A class=nav_button href='#select_rack'>Top</A>&nbsp;&nbsp;&nbsp;"+ 
-				 		"<A class=nav_button href='#racklist6'>Page Up</A></TD></TR>")
+				 rackListView.append("<TR class='jump'><TD colSpan='3' align='middle'><A class='nav_button' href='#select_rack'>Top</A>"+ 
+				 		"<A class='nav_button' href='#racklist6'>Page Up</A></TD></TR>")
 			 }
 		 } else {
-			 rackListView.append("<TR class=jump><TD colSpan=3 align=middle style='color: red;font-weight: bold;'>No records found</TD></TR>") 
+			 rackListView.append("<TR class='jump'><TD colSpan='3' align='middle' class='norecords_display'>No records found</TD></TR>") 
 		 }
 		 return rackListView.toString()
 	}
@@ -116,7 +116,7 @@ class WalkThroughService {
 				 		"<A class=nav_button href='#assetList6'>Page Up</A></TD></TR>")
 			 }
 		 } else {
-			 assetsListView.append("<TR class=jump><TD colSpan=3 align=middle style='color: red;font-weight: bold;'>No records found</TD></TR>") 
+			 assetsListView.append("<TR class='jump'><TD colSpan='3' align='middle' class='norecords_display'>No records found</TD></TR>") 
 		 }
 		 return assetsListView.toString()
 	}

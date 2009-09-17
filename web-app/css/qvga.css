@@ -230,3 +230,12 @@ th {
 	background:#aaefb8; 
 	float:left;
 }
+
+.comment_font {
+	font-size: 12px;
+}
+
+.norecords_display {
+	color:red;
+	font-weight:bold;
+}

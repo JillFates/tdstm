@@ -2,38 +2,24 @@
 <head>
 <title>Walkthru&gt; Select Asset</title>
 <g:javascript library="prototype" />
-<g:javascript library="jquery" />
-<jq:plugin name="jquery.contextMenu"/>
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'contextmenu.css')}" />
+<g:javascript src="contextmenu.js" />
+<g:javascript src="betterinnerhtml.js" />
+
 <script type="text/javascript">
-$(document).ready( function() {
-	// Show menu when #myDiv is clicked
-	$("#selector").contextMenu('myMenu',{
-		bindings: {
-			'all': function(t) {
-				$('#selectCmt').val('all');
-				$('#sort').val('desc');
-				${remoteFunction(action:'getComments', params:'\'id=\' + $(\'#assetId\').val() +\'&commentType=\'+$(\'#selectCmt\').val() +\'&sort=\'+$(\'#sort\').val() +\'&orderType=\'+$(\'#orderType\').val()', onComplete:'updateViewComment( e )')};
-			},
-			'comment': function(t) {
-				 $('#selectCmt').val('comment');
-				$('#sort').val('desc');
-				${remoteFunction(action:'getComments', params:'\'id=\' + $(\'#assetId\').val() +\'&commentType=\'+$(\'#selectCmt\').val() +\'&sort=\'+$(\'#sort\').val() +\'&orderType=\'+$(\'#orderType\').val()', onComplete:'updateViewComment( e )')};
-		    },
-			'instruction': function(t) {
-				$('#selectCmt').val('instruction');
-				$('#sort').val('desc');
-				${remoteFunction(action:'getComments', params:'\'id=\' + $(\'#assetId\').val() +\'&commentType=\'+$(\'#selectCmt\').val() +\'&sort=\'+$(\'#sort\').val() +\'&orderType=\'+$(\'#orderType\').val()', onComplete:'updateViewComment( e )')};
-			},
-			'issue': function(t) {
-				$('#selectCmt').val('issue');
-				$('#sort').val('desc');
-				${remoteFunction(action:'getComments', params:'\'id=\' + $(\'#assetId\').val() +\'&commentType=\'+$(\'#selectCmt\').val() +\'&sort=\'+$(\'#sort\').val() +\'&orderType=\'+$(\'#orderType\').val()', onComplete:'updateViewComment( e )')};
-			}
-		}
-	});
-});
+SimpleContextMenu.setup({'preventDefault':true, 'preventForms':false});
+SimpleContextMenu.attach('container', 'myMenu');
+
+  function filterByCommentType(val) {
+	document.commentsViewForm.selectCmt.value = val;
+	document.commentsViewForm.sort.value = 'desc';
+	document.commentsViewForm.orderType.value = 'comment';
+	${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.selectCmt.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')};
+	return false;	
+  }
+
 function missingAsset( type, id, message ){
 	if(confirm(message)){
 		${remoteFunction(action:'missingAsset', params:'\'id=\' + id +\'&type=\'+type', onComplete:'updateMissingAsset(e,type,id)')}
@@ -47,21 +33,21 @@ function updateMissingAsset( e, type, id ){
 		} else {
 			link +="('create','"+id+"', 'Mark asset as missing. Are you sure?')\" >Mark Asset Missing </a>"
 		}
-		$("#missingAsset").html(link)
+		getObject('missingAsset').innerHtml = link
 	}
 }
 function commentSelect( cmtVal ) {
 	if ( cmtVal == 'Select Common Comment' ) {
-		$('#comments').val('');
+		document.commentForm.comments.value = '';
 	} else {
-		$('#comments').val(cmtVal);
+		document.commentForm.comments.value = cmtVal;
 	}
 }
     
 function callUpdateComment( e, type ) {
 	var data = eval('(' + e.responseText + ')');
 	if ( data ) {
-		${remoteFunction(action:'saveComment', params:'\'id=\' + $(\'#assetId\').val() +\'&comment=\'+escape($(\'#comments\').val()) +\'&commentType=\'+type', onComplete:'callAssetMenu()')};
+		${remoteFunction(action:'saveComment', params:'\'id=\' + document.commentForm.assetId.value +\'&comment=\'+escape(document.commentForm.comments.value) +\'&commentType=\'+type', onComplete:'callAssetMenu()')};
 		return true;
 	} else {
 		alert( type +" already exists. " );
@@ -70,7 +56,7 @@ function callUpdateComment( e, type ) {
 }
     
 function validateCommentSelect() {
-	var commentValue = $('#comments').val();
+	var commentValue = document.commentForm.comments.value;
 	if ( commentValue ) {
 		return true;
 	} else {
@@ -82,68 +68,69 @@ var mustSave = false;
 function setMustSave( changed, actual, type, attribute ){
 	if( changed != actual ) {
 		mustSave = true;
-		$("#"+type+"CompleteId").css({'background-color' : 'green', 'color' : '#FFF'});
-		$("#"+type+"SaveId").css({'background-color' : 'green', 'color' : '#FFF'});
-		$("#generalCommentId").val($("#generalCommentId").val() + attribute+" form "+actual+" to "+ changed +", " )
+		getObject(type+"CompleteId").style.backgroundColor = 'green';
+		getObject(type+"CompleteId").style.color = '#FFF';
+		getObject(type+"SaveId").style.backgroundColor = 'green'
+		getObject(type+"SaveId").style.color = '#FFF';
+		document.auditForm.generalCommentId.value = (document.auditForm.generalCommentId.value + attribute+" form "+actual+" to "+ changed +", " )
 	}
 }
 function moveOption( objectId, actual, type, actionType ){
-	var optionList = $('#'+objectId+'Id').attr("options");
-    var selectedIndex = $('#'+objectId+'Id').attr("selectedIndex");
+	var optionList = getObject(objectId+'Id').options;
+    var selectedIndex = getObject(objectId+'Id').selectedIndex
     if( actionType != 'down'){
 	    if ( selectedIndex > 0) {
-	    	$('#'+objectId+'Id').attr("selectedIndex", selectedIndex-1);
+	    	getObject(objectId+'Id').selectedIndex = selectedIndex-1;
 	    }
     } else {
     	if ( selectedIndex < (optionList.length - 1) ) {
-        	$('#'+objectId+'Id').attr("selectedIndex",selectedIndex+1);
+    		getObject(objectId+'Id').selectedIndex = selectedIndex+1;
         }
     }
-    setMustSave( $('#'+objectId+'Id').val(), actual, type ,objectId )
+    setMustSave( getObject(objectId+'Id').value, actual, type ,objectId )
 }
 
 function callAssetMenu() {
-	$('#selectCmts').val('');
-	$('#comments').val('');
+	document.commentForm.selectCmts.value = '';
+	document.commentForm.comments.value = '';
 	location.href = "#asset_menu";
 }
 
 function populateComments() {
-	$('#selectCmt').val('all');
-	$('#sort').val('desc');
-	$('#orderType').val('commentType');
-	${remoteFunction(action:'getComments', params:'\'id=\' + $(\'#assetId\').val() +\'&commentType=\'+$(\'#selectCmt\').val() +\'&sort=\'+$(\'#sort\').val() +\'&orderType=\'+$(\'#orderType\').val()', onComplete:'updateViewComment( e )')};
+	document.commentsViewForm.selectCmt.value = 'all';
+	document.commentsViewForm.sort.value = 'desc';
+	document.commentsViewForm.orderType.value = 'commentType';
+	${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value+\'&commentType=\'+document.commentsViewForm.selectCmt.value+\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')};
 }
 
 function updateViewComment( e ) {
 	var assetComments = e.responseText;
-	var commentTbody = $('#listCommentsTbodyId');
-	$('#selectCmts').val('');
-	$('#comments').val('');
-	commentTbody.html( assetComments );
+	document.commentForm.selectCmts.value = '';
+	document.commentForm.comments.value = '';
+	BetterInnerHTML(getObject('listCommentsTbodyId'),assetComments);
 }
 
 function sortCommentList(orderType) {
-	var sortOrder = $('#sort').val();
-	$('#orderType').val(orderType);
+	var sortOrder = document.commentsViewForm.sort.value;
+	document.commentsViewForm.orderType.value = orderType;
 	if ( sortOrder == 'desc') {
-		$('#sort').val('asc');
+		document.commentsViewForm.sort.value = 'asc';
 	} else {
-		$('#sort').val('desc');
+		document.commentsViewForm.sort.value = 'desc';
 	}
-	${remoteFunction(action:'getComments', params:'\'id=\' + $(\'#assetId\').val() +\'&commentType=\'+$(\'#selectCmt\').val() +\'&sort=\'+$(\'#sort\').val() +\'&orderType=\'+$(\'#orderType\').val()', onComplete:'updateViewComment( e )')};
+	${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.selectCmt.value+\'&sort=\'+document.commentsViewForm.sort.value+\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')};
 }
 function getModels(){
-	var manufacturer = $("#manufacturerId").val()
-	var device = $("#kvmDeviceId").val()
+	var manufacturer = document.auditForm.manufacturerId.value
+	var device = document.auditForm.kvmDeviceId.value
 	${remoteFunction(action:'getModels', params:'\'manufacturer=\' + manufacturer +\'&device=\'+device ', onComplete:'updateModels( e )')};
 }
 function updateModels( e ){
 	var models = eval('(' + e.responseText + ')');
 	var length = models.length
 	if(length > 0){
-		$("#modelTdId").html("<select type=\"text\" name=\"model\" id=\"modelId\" />")
-		var modelObj = $("#modelId")
+		document.auditForm.modelTdId.innerHtml = "<select type=\"text\" name=\"model\" id=\"modelId\" />"
+		var modelObj = document.auditForm.modelTdId
 		for(i = 0; i < length; i++){
 			var model = models[i]
 			var option = document.createElement("option")
@@ -152,7 +139,7 @@ function updateModels( e ){
 			modelObj.append(option)
 		} 
 	} else {
-		$("#modelTdId").html("<input type=\"text\" name=\"model\" id=\"modelId\" >")
+		document.auditForm.modelTdId.innerHtml = "<input type=\"text\" name=\"model\" id=\"modelId\" >"
 	}
 }
 </script>
@@ -183,8 +170,8 @@ function updateModels( e ){
 		<div style="MARGIN-TOP: 15px" align=center>
 			<a class="button big" href="#asset_front1">Front Audit</a> <BR style="MARGIN-TOP: 6px">
 			<a class="button big" href="#asset_rear1">Rear Audit</a> <BR style="MARGIN-TOP: 6px">
-			<a class="button big" href="#comments">Issues/Comments</a> <BR style="MARGIN-TOP: 6px">
-			<span id="missingAsset">
+			<a class="button big" href="#view_comments" onclick="populateComments();">Issues/Comments</a> <BR style="MARGIN-TOP: 6px">
+			<span id="missingAsset" >
 				<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id +' and commentType = ? and isResolved = ? and commentCode = ?' ,['issue',0,'ASSET_MISSING'])}">
 					<a href="#" class="button big" onclick="missingAsset('resolve', '${assetEntity?.id}','Resolve missing asset issue. Are you sure?')">Missing Asset Found</a>
 				</g:if>
@@ -194,11 +181,13 @@ function updateModels( e ){
 			</span>
 			<div style="MARGIN-TOP: 10px">
 				<div class=thefield align=center>
-					<a class="button" href="#select_asset" onClick="$('#submitTypeId').val('save');$('form#auditForm').submit();">Save</a>&nbsp;&nbsp;&nbsp;
-			        <a class="button" href="#select_asset"  onClick="$('#submitTypeId').val('complete');$('form#auditForm').submit();">Completed</a>
+					<a class="button" href="#select_asset" onClick="document.auditForm.submitType.value='save';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
+			        <a class="button" href="#select_asset"  onClick="document.auditForm.submitType.value='complete';document.auditForm.submit();">Completed</a>
 				</div>
 			</div>
 		</div>
+      </div>
+      </div>
 		<div class="gap"></div>
 	<!-- Walkthru Asset:Front pg 1-->
 		<div class="qvga_border">
@@ -233,19 +222,23 @@ function updateModels( e ){
 			<tr>
 				<td class="label">Device Type:</td>
 				<td class="field">
-				<refcode:select domain="kvmDevice" noSelection="['':'']" id="kvmDeviceId" name="kvmDevice" value="${assetEntity?.kvmDevice}" 
-						onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name);getModels()"/> 
+				<!--  <refcode:select domain="kvmDevice" noSelection="['':'']" id="kvmDeviceId" name="kvmDevice" value="${assetEntity?.kvmDevice}" 
+						onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name);getModels()"/>-->
+						<input type="text" value="${assetEntity?.kvmDevice}" id="kvmDeviceId" name="kvmDevice" 
+								onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name);getModels()">
 			</tr>
 			
 			<tr>
 				<td class="label">Manufacturer:</td>
 				<td class="field">
 				<g:if test="${Manufacturer.list()}">
-				<g:select name="manufacturer" from="${Manufacturer.list()}" value="${assetEntity?.manufacturer}" id="manufacturerId" 
-					noSelection="['':'']"  onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name);getModels();"/>
+				<!--  <g:select name="manufacturer" from="${Manufacturer.list()}" value="${assetEntity?.manufacturer}" id="manufacturerId" 
+					noSelection="['':'']"  onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name);getModels();"/> -->
+					<input type="text" name="manufacturer" id="manufacturerId" value="${assetEntity?.manufacturer}" onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name);getModels();">
+					</input>
 				</g:if>
 				<g:else>
-				<input type="text" name="manufacturer" id="manufacturerId" >
+				<input type="text" name="manufacturer" id="manufacturerId" value="${assetEntity?.manufacturer}" onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name);getModels();">
 				</g:else>
 				</td>
 			</tr>
@@ -254,11 +247,12 @@ function updateModels( e ){
 				<td class="label">Model:</td>
 				<td class="field" id="modelTdId">
 				<g:if test="${Model.list()}">
-				<g:select name="model" from="${Model.list()}" id="modelId" noSelection="['':'']" 
-					value="${assetEntity?.model}" onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)"/>
+				<!-- <g:select name="model" from="${Model.list()}" id="modelId" noSelection="['':'']" 
+					value="${assetEntity?.model}" onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)"/> -->
+					<input type="text" id="modelId" name="model" value="${assetEntity?.model}" onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)" ></input>
 				</g:if>
 				 <g:else>
-				<input type="text" name="model" id="modelId" >
+				<input type="text" name="model" id="modelId" value="${assetEntity?.model}" onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)">
 				</g:else>
 				</td>
 			</tr>
@@ -266,8 +260,10 @@ function updateModels( e ){
 			<tr>
 				<td class="label">Rails:</td>
 				<td class="field">
-				 <refcode:select domain="railType" noSelection="['':'']" id="railTypeId" name="railType" value="${assetEntity?.railType}" 
-				onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)"/>
+				 <!-- <refcode:select domain="railType" noSelection="['':'']" id="railTypeId" name="railType" value="${assetEntity?.railType}" 
+				onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)"/> -->
+				<input type="text" name="railType" value="${assetEntity?.railType}" id="railTypeId" onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)" >
+				</input>
 				</td>
 			</tr>
 			</table>
@@ -275,8 +271,8 @@ function updateModels( e ){
 			<div style="margin-top:10px;">
 			   <div class="thefield" align="center">
 			      <a class="button" href="#asset_front2">Next</a>&nbsp;&nbsp;&nbsp;
-			      <a class="button" href="#select_asset" id="front1SaveId" onClick="$('#submitTypeId').val('save');$('form#auditForm').submit();">Save</a>&nbsp;&nbsp;&nbsp;
-			      <a class="button" href="#select_asset" id="front1CompleteId" onClick="$('#submitTypeId').val('complete');$('form#auditForm').submit();">Completed</a>
+			      <a class="button" href="#select_asset" id="front1SaveId" onClick="document.auditForm.submitType.value='save';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
+			      <a class="button" href="#select_asset" id="front1CompleteId" onClick="document.auditForm.submitType.value='complete';document.auditForm.submit();">Completed</a>
 			   </div>
 			</div>
 			
@@ -358,8 +354,8 @@ function updateModels( e ){
 			   <div class="thefield" align="center">
 			      <a class="button" href="#asset_rear1">Next</a>&nbsp;&nbsp;
 			      <a class="button" href="#asset_front1">Back</a>&nbsp;&nbsp;
-			      <a class="button" href="#select_asset" id="front2SaveId"  onClick="$('#submitTypeId').val('save');$('form#auditForm').submit();">Save</a>&nbsp;&nbsp;&nbsp;
-			      <a class="button" href="#select_asset"  id="front2CompleteId" onClick="$('#submitTypeId').val('complete');$('form#auditForm').submit();">Completed</a>
+			      <a class="button" href="#select_asset" id="front2SaveId"  onClick="document.auditForm.submitType.value='save';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
+			      <a class="button" href="#select_asset"  id="front2CompleteId" onClick="document.auditForm.submitType.value='complete';document.auditForm.submit();">Completed</a>
 			   </div>
 			</div>
 			
@@ -391,8 +387,10 @@ function updateModels( e ){
 			<g:select name="powerPort" from="${[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,24,32,40,48,56,64,72,80,88,96]}" value="${assetEntity?.powerPort}"
 				onchange="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)"/>
 			&nbsp;&nbsp;
-				<refcode:select domain="powerType" noSelection="['':'Unknown']" id="powerType" name="powerType" value="${assetEntity?.powerType}" 
-				onchange="setMustSave(this.value,'${assetEntity?.powerType}','rear', this.name)"/>
+				<!-- <refcode:select domain="powerType" noSelection="['':'Unknown']" id="powerType" name="powerType" value="${assetEntity?.powerType}" 
+				onchange="setMustSave(this.value,'${assetEntity?.powerType}','rear', this.name)"/> -->
+				<input type="text" id="powerType" name="powerType" value="${assetEntity?.powerType}" onchange="setMustSave(this.value,'${assetEntity?.powerType}','rear', this.name)" ></input>
+				
 			</td>
 		</tr>
 		
@@ -412,8 +410,9 @@ function updateModels( e ){
 				<g:select name="hbaPort" from="${[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,24,32,40,48,56,64,72,80,88,96]}" value="${assetEntity?.hbaPort}"
 						onchange="setMustSave(this.value,'${assetEntity?.hbaPort}','rear', this.name)"/>
 		        &nbsp;&nbsp;
-			<refcode:select domain="fiberCabinet" noSelection="['':'']" id="fiberCabinet" name="fiberCabinet" value="${assetEntity?.fiberCabinet}" 
-				onchange="setMustSave(this.value,'${assetEntity?.fiberCabinet}','rear', this.name)"/>
+			<!-- <refcode:select domain="fiberCabinet" noSelection="['':'']" id="fiberCabinet" name="fiberCabinet" value="${assetEntity?.fiberCabinet}" 
+				onchange="setMustSave(this.value,'${assetEntity?.fiberCabinet}','rear', this.name)"/> -->
+				<input type="text" id="fiberCabinet" name="fiberCabinet" value="${assetEntity?.fiberCabinet}" onchange="setMustSave(this.value,'${assetEntity?.fiberCabinet}','rear', this.name)" ></input>
 			</td>
 		</tr>
 		</table>
@@ -453,18 +452,17 @@ function updateModels( e ){
 		<div style="margin-top:20px;">
 		   <div class="thefield" align="center">
 		      <a class="button" href="#asset_front2">Back</a>&nbsp;&nbsp;
-		      <a class="button" href="#select_asset" id="rearSaveId" onClick="$('#submitTypeId').val('save');$('form#auditForm').submit();">Save</a>&nbsp;&nbsp;&nbsp;
-			  <a class="button" href="#select_asset" id="rearCompleteId" onClick="$('#submitTypeId').val('complete');$('form#auditForm').submit();">Completed</a>
+		      <a class="button" href="#select_asset" id="rearSaveId" onClick="document.auditForm.submitType.value='save';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
+			  <a class="button" href="#select_asset" id="rearCompleteId" onClick="document.auditForm.submitType.value='complete';document.auditForm.submit();">Completed</a>
 		   </div>
 		</div>
 		
 		</div>
 		</div>
+		</g:form>
 		<!-- end of Walkthru Asset:Back -->
 		
-		<div class="gap"></div>
-		</g:form>
-	
+	    <div class="gap"></div>
 		<!-- Walkthru Asset:Comments -->
 		<div class="qvga_border">
 		<a name="comments"></a>
@@ -501,9 +499,9 @@ function updateModels( e ){
 			<label>Save As:</label>
 			<br />
 			<div style="float:center;">
-			   	<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm)${remoteFunction(action:'validateComments', params:'\'id=\' + $(\'#assetId\').val() +\'&comment=\'+escape($(\'#comments\').val()) +\'&commentType=\'+$(\'#commentType\').val()', onComplete:'callUpdateComment( e, \'comment\' )')}">COMMENT</a>&nbsp;&nbsp;
-				<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm)${remoteFunction(action:'validateComments', params:'\'id=\' + $(\'#assetId\').val() +\'&comment=\'+escape($(\'#comments\').val()) +\'&commentType=\'+$(\'#instructionType\').val()', onComplete:'callUpdateComment( e, \'instruction\' )')}">INSTRUCTION</a>&nbsp;&nbsp;
-				<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm)${remoteFunction(action:'validateComments', params:'\'id=\' + $(\'#assetId\').val() +\'&comment=\'+escape($(\'#comments\').val()) +\'&commentType=\'+$(\'#issueType\').val()', onComplete:'callUpdateComment( e, \'issue\' )')}">ISSUE</a>
+			   	<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm)${remoteFunction(action:'validateComments', params:'\'id=\' + document.commentForm.assetId.value +\'&comment=\'+escape(document.commentForm.comments.value) +\'&commentType=\'+document.commentForm.commentType.value', onComplete:'callUpdateComment( e, \'comment\' )')}">COMMENT</a>&nbsp;&nbsp;
+				<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm)${remoteFunction(action:'validateComments', params:'\'id=\' + document.commentForm.assetId.value +\'&comment=\'+escape(document.commentForm.comments.value) +\'&commentType=\'+document.commentForm.value', onComplete:'callUpdateComment( e, \'instruction\' )')}">INSTRUCTION</a>&nbsp;&nbsp;
+				<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm)${remoteFunction(action:'validateComments', params:'\'id=\' + document.commentForm.assetId.value +\'&comment=\'+escape(document.commentForm.comments.value) +\'&commentType=\'+document.commentForm.issueType.value', onComplete:'callUpdateComment( e, \'issue\' )')}">ISSUE</a>
 			</div>
 			<br class="clear"/>
 			
@@ -522,8 +520,8 @@ function updateModels( e ){
 		<div class="title">Walkthru&gt; View Issue&amp;Comments</div>
 		<div class="input_area">
 		
-		<div style="FLOAT: left"><a class=button href="startMenu">Start Over</a></div>
-		<div style="float:right;"><a class="button" href="#comments">Issues&amp;Comments</a></div>
+		<div style="FLOAT: left"><a class=button href="#asset_menu">Asset Menu</a></div>
+		<div style="float:right;"><a class="button" href="#comments">Add Comments</a></div>
 		<br class="clear"/>
 		<g:form action="issuesandcommentsview" name="commentsViewForm">
 		<input type="hidden" name="selectCmt" id="selectCmt" value="all"/>
@@ -532,59 +530,63 @@ function updateModels( e ){
 		<table>
 		
 			<tr>
-			    <th id="selector" onclick="sortCommentList('commentType');">Type</th>
+			    <th class="container" onclick="sortCommentList('commentType');">Type</th>
 				<th onclick="sortCommentList('comment');">Text</th>
 				<th>Rsvld</th>
 			</tr>
 		<tbody id="listCommentsTbodyId">
 			<g:each in="${AssetComment.findAll('from AssetComment where assetEntity = '+ assetEntity?.id +' order by commentType')}" status="i" var="assetCommentsInstance">
 				<g:if test="${assetCommentsInstance.commentType == 'issue'}">
-				<tr><td>Iss</td><td>${assetCommentsInstance.comment}</td><td>
+				<tr class="comment_font"><td>Iss</td><td>${assetCommentsInstance.comment}</td><td>
 					<g:if test="${assetCommentsInstance.isResolved == 1}">
-						<input type="checkbox" checked disabled><br/>
+						<input type="checkbox" checked disabled/><br/>
 					</g:if>
 					<g:else>
-						<input type="checkbox" disabled><br/>
+						<input type="checkbox" disabled/><br/>
 					</g:else>
 				</td></tr>
 				</g:if>
 				<g:elseif test="${assetCommentsInstance.commentType == 'comment'}">
-					<tr><td>Cmnt</td><td>${assetCommentsInstance.comment}</td><td>&nbsp;</td></tr>
+					<tr class="comment_font"><td>Cmnt</td><td>${assetCommentsInstance.comment}</td><td>&nbsp;</td></tr>
+				</g:elseif>
+				<g:elseif test="${assetCommentsInstance.commentType == 'instruction'}">
+					<tr class="comment_font"><td>Inst</td><td>${assetCommentsInstance.comment}</td><td>&nbsp;</td></tr>
 				</g:elseif>
 				<g:else>
-					<tr><td>Inst</td><td>${assetCommentsInstance.comment}</td><td>&nbsp;</td></tr>
+					<tr class="comment_font"><td colSpan="3" align="center" class="norecords_display">No records found</td></tr>
 				</g:else>
 			</g:each>		
 		</tbody>
 		</table>
 		</g:form>
+        </div>
+        </div>
 		<div class="gap"></div>
-		<div id="myMenu" class="contextMenu">
-			<ul>
-				<li id="all">All</li>
-				<li id="comment">Comment</li>
-				<li id="instruction">Instruction</li>
-				<li id="issue">Issue</li>
-			</ul>	
-		</div>
+		
+			<ul id="myMenu" class="SimpleContextMenu">
+				<li><a href="#" onclick="return filterByCommentType('all');">All</a></li>
+				<li><a href="#" onclick="return filterByCommentType('comment');">Comment</a></li>
+				<li><a href="#" onclick="return filterByCommentType('instruction');">Instruction</a></li>
+				<li><a href="#" onclick="return filterByCommentType('issue');">Issue</a></li>
+		   </ul>
 	<script type="text/javascript">
 	if('${commentCodes.needAssetTag}'){
-		$("#needAssetTagYes").attr("checked",true)
+		getObject('needAssetTagYes').checked = true
 	}
 	if('${commentCodes.amberLights}'){
-		$("#hasAmberYes").attr("checked",true)
+		getObject('hasAmberYes').checked = true
 	}
 	if('${commentCodes.stackedOnTop}'){
-		$("#stuffOnTopYes").attr("checked",true)
+		getObject("stuffOnTopYes").checked = true
 	}
 	if('${commentCodes.poweredOff}'){
-		$("#poweredOffYes").attr("checked",true)
+		getObject("poweredOffYes").checked = true
 	}
 	if('${commentCodes.cablesMoved}'){
-		$("#moveCablesYes").attr("checked",true)
+		getObject("moveCablesYes").checked =true
 	}
-	$("#manufacturerId").val("${assetEntity?.manufacturer}")
-	$("#modelId").val("${assetEntity?.model}") 
+	getObject("manufacturerId").value = "${assetEntity?.manufacturer}"
+	getObject("modelId").value = "${assetEntity?.model}"
 	</script>
 </body>
 </html>

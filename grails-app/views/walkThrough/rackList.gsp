@@ -2,9 +2,9 @@
 <head>
 <title>Walkthru&gt; Select Rack</title>
 <g:javascript library="prototype" />
-<g:javascript library="jquery" />
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
+<g:javascript src="betterinnerhtml.js" />
 <script type="text/javascript">
 /*-----------------------------------------------------------------
 	function to load the Bundles for selected Project via AJAX
@@ -13,22 +13,18 @@
 *------------------------------------------------------------------*/
 function updateRacks( e , type ) {
 	var racksDetails = e.responseText;
-	var result = racksDetails.indexOf("No records found")
-	if(result != -1 && type == 'search'){
-		$('#searchId').css("border","1px solid red")
-	} else {
-			$('#searchId').css("border","1px solid #ccc")
-	}
-	var racksListBody = $("#racksListBody");
-	racksListBody.html( racksDetails );
+	BetterInnerHTML(getObject('racksListBodyId'), racksDetails);
 }
 var timeInterval;
 function searchRacks(){
-	${remoteFunction(action:'getRacksByLocation', params:'\'location=\' + $(\'#locationId\').val() +\'&viewType=\'+$(\'#viewTypeId\').val() +\'&searchKey=\'+$(\'#searchId\').val()', onComplete:'updateRacks(e, \'search\')')}
+	${remoteFunction(action:'getRacksByLocation', params:'\'location=\' + document.selectRackForm.location.value +\'&viewType=\'+document.selectRackForm.viewType.value +\'&searchKey=\'+document.selectRackForm.search.value', onComplete:'updateRacks(e, \'search\')')}
+}
+function showAssets(bundle, location, room, rack){
+	window.location.href='selectAsset?moveBundle='+bundle+'&location='+location+'&room='+room+'&rack='+rack
 }
 </script>
 </head>
-<body onload="$('#searchId').focus()">
+<body onload="document.selectRackForm.search.focus();">
 <div class="qvga_border">
 <a name="select_rack"></a> 
 <div class="title">Walkthru&gt; Select Rack</div>
@@ -40,7 +36,7 @@ function searchRacks(){
    <td class="label">Location:</td>
    <td class="field">
       <select name="location" id="locationId" class="select"
-      	onchange="${remoteFunction(action:'getRacksByLocation', params:'\'location=\' + this.value +\'&viewType=\'+$(\'#viewTypeId\').val() ', onComplete:'updateRacks(e,\'location\')')}">
+      	onchange="${remoteFunction(action:'getRacksByLocation', params:'\'location=\' + this.value +\'&viewType=\'+ document.selectRackForm.viewType.value ', onComplete:'updateRacks(e,\'location\')')}">
 	      <g:each in="${locationsList}" var="locationsList">
 	         <option value="${locationsList.location}">${locationsList.location}</option>
 	      </g:each>
@@ -54,8 +50,8 @@ function searchRacks(){
 		<input type="hidden" name="moveBundle" value="${moveBundle}">
 		<input type="hidden" name="auditType" value="${auditType}">
 		<label>View:</label>
-		<a class="button unselected" href="#" onclick="$('#viewTypeId').val('todo');$('form#selectRackForm').submit();" id="todoId">ToDo</a>
-		<a class="button" href="#" onclick="$('#viewTypeId').val('all');$('form#selectRackForm').submit();" id="allId">All</a>
+		<a name="todoId" class="button unselected"  href="#" onclick="document.selectRackForm.viewType.value='todo';document.selectRackForm.submit();" id="todoId">ToDo</a>
+		<a class="button" name="allId" href="#" onclick="document.selectRackForm.viewType.value = 'all';document.selectRackForm.submit();"  id="allId"  >All</a>
 	</td>
 	<td align="right">
 		<label for="search">Search:</label>
@@ -63,9 +59,8 @@ function searchRacks(){
 		onkeyup="timeInterval = setTimeout('searchRacks()',500)" onkeydown="if(timeInterval){clearTimeout(timeInterval)}"> 
 	</td>
 </tr>
-</g:form>
 <tr><td colspan="2">
-    <table class="grid" >
+    <table class="grid" id="racksListBody">
     	<thead>
         <tr>
         	<g:sortableColumn property="room" title="Room" params="['moveBundle':moveBundle,'auditType':auditType,'viewType':viewType]"/>
@@ -73,20 +68,23 @@ function searchRacks(){
         	<g:sortableColumn property="total" title="Remaining" params="['moveBundle':moveBundle,'auditType':auditType,'viewType':viewType]"/>
         </tr>
         </thead>
-        <tbody id="racksListBody">
+        <tbody id="racksListBodyId">
         	${rackListView}
 		</tbody>
     </table>
 </td></tr>
+</g:form>
 </table>
 </div>
 </div>
 <script type="text/javascript">
-$("#locationId").val('${auditLocation}')
+document.selectRackForm.location.value = '${auditLocation}'
 if('${viewType}'== 'todo'){
-	$("#allId").attr('class','button unselected')
-	$("#todoId").attr('class','button')
+	getObject('todoId').className = 'button'
+	getObject('allId').className = 'button unselected'
+		
 }
+//${remoteFunction(action:'getRacksByLocation', params:'\'location=\' + document.selectRackForm.location.value +\'&viewType=\'+ document.selectRackForm.viewType.value ', onComplete:'updateRacks(e,\'location\')')}
 </script>
 </body>
 </html>

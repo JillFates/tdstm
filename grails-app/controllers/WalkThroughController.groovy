@@ -446,40 +446,37 @@ class WalkThroughController {
   * @param  : commentsList
   * @return : Will return comment list view as string
   *----------------------------------------------------------*/
-  def getComments = {
-      def assetEntity = AssetEntity.findById( params.id )
-	  def assetCommentsList
-	  if ( params.commentType != 'all' ) {
-		  assetCommentsList = AssetComment.findAll(" from AssetComment where assetEntity=${assetEntity.id} and commentType='${params.commentType}' order by ${params.orderType} ${params.sort}")
-	  } else {
-		  assetCommentsList = AssetComment.findAll(" from AssetComment where assetEntity=${assetEntity.id} order by ${params.orderType} ${params.sort}")
-	  }
-		
-	 def commentListSize = assetCommentsList.size()
-	 def commentListView = new StringBuffer()
-	 if ( assetCommentsList ) {
-		 for ( int i=0; i<commentListSize; i++ ) {
-			 switch ( assetCommentsList[i].commentType ) {
-			 	case "comment" 		: commentListView.append("<TR><TD>Cmnt</TD>")
-										  commentListView.append("<TD>${assetCommentsList[i].comment}</TD><TD>&nbsp;</TD></TR>")
-									 	  break;
-				case "instruction" 	: commentListView.append("<TR><TD>Inst</TD>")
-										  commentListView.append("<TD>${assetCommentsList[i].comment}</TD><TD>&nbsp;</TD></TR>")
-										  break;
-				case "issue" 		: commentListView.append("<TR><TD>Iss</TD>")
-										  if ( assetCommentsList[i].isResolved == 1 ) {
-											  commentListView.append("<TD>${assetCommentsList[i].comment}</TD><TD><input type='checkbox' checked disabled></TD></TR>")
-										  } else {
-											  commentListView.append("<TD>${assetCommentsList[i].comment}</TD><TD><input type='checkbox' disabled></TD></TR>")
-										  }
-								   		  break;
-						
-			}
-				
+	def getComments = {
+		def assetEntity = AssetEntity.findById( params.id )
+		def assetCommentsList
+		if ( params.commentType != 'all' ) {
+			assetCommentsList = AssetComment.findAll(" from AssetComment where assetEntity=${assetEntity.id} and commentType='${params.commentType}' order by ${params.orderType} ${params.sort}")
+		} else {
+			assetCommentsList = AssetComment.findAll(" from AssetComment where assetEntity=${assetEntity.id} order by ${params.orderType} ${params.sort}")
 		}
-	} else {
-		commentListView.append("<TR><TD colSpan=3 align=middle style='color: red;font-weight: bold;'>No records found</TD></TR>")
+		def commentListSize = assetCommentsList.size()
+		def commentListView = new StringBuffer()
+		if ( assetCommentsList ) {
+			for ( int i=0; i<commentListSize; i++ ) {
+				switch ( assetCommentsList[i].commentType ) {
+					case "comment" 		: commentListView.append("<TR class='comment_font'><TD>Cmnt</TD>")
+						commentListView.append("<TD>${assetCommentsList[i].comment}</TD><TD></TD></TR>")
+						break;
+					case "instruction" 	: commentListView.append("<TR class='comment_font'><TD>Inst</TD>")
+						commentListView.append("<TD>${assetCommentsList[i].comment}</TD><TD></TD></TR>")
+						break;
+					case "issue" 		: commentListView.append("<TR class='comment_font'><TD>Iss</TD>")
+						if ( assetCommentsList[i].isResolved == 1 ) {
+							commentListView.append("<TD>${assetCommentsList[i].comment}</TD><TD><input type='checkbox' checked='yes' disabled='true'/></TD></TR>")
+						} else {
+							commentListView.append("<TD>${assetCommentsList[i].comment}</TD><TD><input type='checkbox' disabled='true'/></TD></TR>")
+						}
+						break;
+				}
+			}
+		} else {
+			commentListView.append("<TR class='comment_font'><TD colSpan='3' align='center' class='norecords_display'>No records found</TD></TR>")
+		}
+			render commentListView.toString()
 	}
-	render commentListView.toString()
-  }
 }
