@@ -182,6 +182,13 @@ var time = '${timeToRefresh}';
 			$("#changeStatusDialog").dialog('option', 'width', 400)
 			$("#changeStatusDialog").dialog('option', 'position', ['center','top']);
 			$('#changeStatusDialog').dialog('open');
+			$('#createCommentDialog').dialog('close');
+			$('#commentsListDialog').dialog('close');
+			$('#editCommentDialog').dialog('close');
+			$('#showCommentDialog').dialog('close');
+			$('#showDialog').dialog('close');
+			$('#editDialog').dialog('close');
+			$('#createDialog').dialog('close');
 		}
 	}
 	
@@ -291,7 +298,11 @@ var time = '${timeToRefresh}';
 							var link = document.createElement('a');
 							link.href = '#';
 							link.id = assetComment.assetEntityId;
-							link.onclick = function(){$('#createAssetCommentId').val(this.id);new Ajax.Request('../assetEntity/listComments?id='+this.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'action');}})} //;return false
+							if ( assetComment.type == "database_table_light.png" ) {
+								link.onclick = function(){$('#newAssetCommentId').val(this.id);createNewAssetComment('');};
+							} else {
+								link.onclick = function(){$('#createAssetCommentId').val(this.id);new Ajax.Request('../assetEntity/listComments?id='+this.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'action');}})} //;return false
+							}
 							link.innerHTML = "<img src=\"../images/skin/"+assetComment.type+"\" border=\"0px\">";
 							commentIcon.html(link);
 						}
@@ -356,6 +367,26 @@ var time = '${timeToRefresh}';
 			data  = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 		}
 		return data
+	}
+
+	function createNewAssetComment(asset){
+		if(asset) {
+			setAssetId( asset );
+		} else {
+			setAssetId( $('#newAssetCommentId').val() );
+		}
+		$('#statusId').val('new');
+		$('#createCommentDialog').dialog('option', 'width', 700);
+		$('#createCommentDialog').dialog('open');
+		$('#commentsListDialog').dialog('close');
+		$('#editCommentDialog').dialog('close');
+		$('#showCommentDialog').dialog('close');
+		$('#showDialog').dialog('close');
+		$('#editDialog').dialog('close');
+		$('#createDialog').dialog('close');
+		$('#changeStatusDialog').dialog('close');
+		document.createCommentForm.mustVerify.value=0;
+		document.createCommentForm.reset();
 	}
 </script>
 </head>
@@ -549,9 +580,9 @@ var time = '${timeToRefresh}';
 						</g:remoteLink>
 					</g:if>
 					<g:else>
-						<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntity.id}" before="setAssetId('${assetEntity.id}');"	onComplete="listCommentsDialog( e ,'action');">
+						<a href="javascript:createNewAssetComment(${assetEntity.id});" >
 							<img src="${createLinkTo(dir:'images/skin',file:'database_table_light.png')}"	border="0px">
-						</g:remoteLink>
+						</a>
 					</g:else>
 			</g:else>
 			</span>
@@ -611,7 +642,8 @@ Comment</a></span></div>
 <div id="createCommentDialog" title="Create Asset Comment"
 	style="display: none;"><input type="hidden" name="assetEntity.id"
 	id="createAssetCommentId" value=""> <input type="hidden"
-	name="status" id="statusId" value=""> <g:form
+	name="status" id="statusId" value=""> 
+	<input type="hidden" id="newAssetCommentId" value=""/><g:form
 	action="saveComment" method="post" name="createCommentForm">
 	<input type="hidden" name="category" value="moveday"/>
 	<div class="dialog" style="border: 1px solid #5F9FCF">

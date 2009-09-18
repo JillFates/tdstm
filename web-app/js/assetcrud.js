@@ -99,6 +99,8 @@
     	$('#commentsListDialog').dialog('close');
     	$('#editCommentDialog').dialog('close');
     	$('#showCommentDialog').dialog('close');
+		$('#changeStatusDialog').dialog('close');
+		$('#filterDialog').dialog('close');
     	 var browser=navigator.appName;
     			var assetEntityAttributes = eval('(' + e.responseText + ')');
     			var autoComp = new Array();

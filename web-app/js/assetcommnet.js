@@ -1,9 +1,14 @@
 // function to list the comments list
       		function listCommentsDialog(e,action) {
-      			var role = $("#role").val()
-      			$("#editCommentDialog").dialog("close")
-      			$("#showCommentDialog").dialog("close")
-				$("#createCommentDialog").dialog("close")
+      			var role = $("#role").val();
+      			$("#editCommentDialog").dialog("close");
+      			$("#showCommentDialog").dialog("close");
+				$("#createCommentDialog").dialog("close");
+				$('#showDialog').dialog('close');
+      			$('#editDialog').dialog('close');
+      			$('#createDialog').dialog('close');
+      			$('#changeStatusDialog').dialog('close');
+      			$('#filterDialog').dialog('close');
       			var assetComments = eval('(' + e.responseText + ')');
       			
       			var listTable = $('#listCommentsTable');
