@@ -17,7 +17,14 @@ class WalkThroughService {
     	if(racksList){
     		def rackListSize = racksList.size()
     		def moveBundleInstance = MoveBundle.findById( moveBundle )
-    		def walkthruState = stateEngineService.getStateId(moveBundleInstance?.project?.workflowCode,"SourceWalkthru")
+    		def walkthruState 
+    		def type = 'source'
+    		if(auditType == 'source'){
+    			walkthruState = stateEngineService.getStateId(moveBundleInstance?.project?.workflowCode,"SourceWalkthru")
+    		} else {
+    			type = 'target'
+    			walkthruState = stateEngineService.getStateId(moveBundleInstance?.project?.workflowCode,"TargetWalkthru")
+    		}
     		for (int i = 0; i < rackListSize; i++) {
     			def rackList = racksList[i] 
     			def cssClass = "asset_ready"
@@ -31,26 +38,13 @@ class WalkThroughService {
     					"<A class='nav_button'  name='racklist"+i+"' href='#racklist"+i+"'>Page Down</A></TD></TR>")
     			}
 				 
-    			def doneQuery = new StringBuffer("select count(a.id) from AssetEntity a where a.sourceLocation = ? and a.id in "+
+    			def doneQuery = new StringBuffer("select count(a.id) from AssetEntity a where a.${type}Location = ? and a.id in "+
     					"(select t.assetEntity from AssetTransition t where t.voided = 0 and t.stateTo = $walkthruState) and a.moveBundle = $moveBundle ")
 				def args = [location]
-				/*if(rackList[0] && rackList[1]){
-					doneQuery.append(" and a.sourceRoom = ? and a.sourceRack = ? ")
-					args = [location,rackList[0],rackList[1]]
-				} else if(!rackList[0] && rackList[1]){
-					doneQuery.append(" and (a.sourceRoom is null or a.sourceRoom = '' ) and a.sourceRack = ? ")
-					args = [location,rackList[1]]
-				} else if(rackList[0] && !rackList[1]){
-					doneQuery.append(" and a.sourceRoom = ? and (a.sourceRack is null or a.sourceRack = '' ) ")
-					args = [location,rackList[0]]
-				} else {
-					doneQuery.append(" and ( a.sourceRoom is null or a.sourceRoom = '' ) and ( a.sourceRack is null or a.sourceRack = '' ) ")
-					args = [location]
-				}*/
-    			def constructedQuery = constructQuery( rackList[0], rackList[1], location )
+    			def constructedQuery = constructQuery( rackList[0], rackList[1], location, type )
     			doneQuery.append( constructedQuery.query )
     			args = constructedQuery.args
-    			doneQuery.append(" group by a.sourceRoom, a.sourceRack ")
+    			doneQuery.append(" group by a.${type}Room, a.${type}Rack ")
     			def doneList = AssetEntity.executeQuery(doneQuery.toString(),args)
     			def availTotal = rackList[2] - (doneList ? doneList : 0) 
     			if(availTotal == 0){
@@ -85,6 +79,10 @@ class WalkThroughService {
     		def assetsListSize = assetsList.size()
     		for (int i = 0; i < assetsListSize; i++) {
     			def assetEntity = assetsList[i]
+                def position = assetEntity?.sourceRackPosition
+                if(auditType !="source"){
+                	position = assetEntity?.targetRackPosition
+                }
     			def moveBundleInstance = MoveBundle.findById( assetEntity?.moveBundle?.id )
         		def walkthruState = stateEngineService.getStateId(moveBundleInstance?.project?.workflowCode,"SourceWalkthru")
     			def cssClass = "asset_ready"
@@ -107,7 +105,7 @@ class WalkThroughService {
 				}
 				if(flag){
 					assetsListView.append("<tr class='$cssClass' onclick=\"showAssetMenu('${assetEntity?.id}')\">"+
-							"<td class='center'>${assetEntity?.sourceRackPosition}</td><td class='center'>${assetEntity?.usize}</td>"+
+							"<td class='center'>${position}</td><td class='center'>${assetEntity?.usize}</td>"+
 							"<td class='center'>${assetEntity?.assetTag}</td></tr>")
 			 	}
 			 }
@@ -125,20 +123,20 @@ class WalkThroughService {
 	 * @param  : AuditRoom, AuditRack, AudutLocation
 	 * @return : constructed query and args
 	 *---------------------------------------------------*/
-	def constructQuery(def auditRoom, def auditRack, def auditLocation ){
+	def constructQuery(def auditRoom, def auditRack, def auditLocation, def type ){
 		def args = [auditLocation]
         def query = new StringBuffer()
 		if(auditRoom && auditRack ){
-			query.append(" and a.sourceRoom = ? and a.sourceRack = ? ")
+			query.append(" and a.${type}Room = ? and a.${type}Rack = ? ")
 			args = [auditLocation,auditRoom,auditRack]
 		} else if(!auditRoom && auditRack){
-			query.append(" and (a.sourceRoom is null or a.sourceRoom = '') and a.sourceRack = ? ")
+			query.append(" and (a.${type}Room is null or a.${type}Room = '') and a.${type}Rack = ? ")
 			args = [auditLocation,auditRack]
 		} else if(auditRoom && !auditRack){
-			query.append(" and a.sourceRoom = ? and (a.sourceRack is null or a.sourceRack = '' )")
+			query.append(" and a.${type}Room = ? and (a.${type}Rack is null or a.${type}Rack = '' )")
 			args = [auditLocation,auditRoom]
 		} else {
-			query.append(" and (a.sourceRoom is null or a.sourceRoom = '') and (a.sourceRack is null or a.sourceRack = '' )")
+			query.append(" and (a.${type}Room is null or a.${type}Room = '') and (a.${type}Rack is null or a.${type}Rack = '' )")
 			args = [auditLocation]
 		}
 		return [ args : args, query : query.toString() ]

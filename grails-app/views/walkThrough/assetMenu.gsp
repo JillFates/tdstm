@@ -152,6 +152,8 @@ function updateModels( e ){
 		<div class=input_area>
 		<input type="hidden" name="id" value="${assetEntity.id}" />
 		<input type="hidden" name="submitType" id="submitTypeId">
+		<input type="hidden" name="room" value="${room}">
+		<input type="hidden" name="rack" value="${rack}">
 		<input type="hidden" name="generalComment" id="generalCommentId" value="Asset changed: ">
 		<div style="FLOAT: left"><a class=button href="startMenu">Start Over</a></div>
 		<div style="FLOAT: right"><a class=button href="selectAsset?moveBundle=${moveBundle}&location=${location}&room=${room}&rack=${rack}">Asset List</a></div>
