@@ -38,11 +38,20 @@ function appendBundles( e ) {
 			<br class="clear"/>
 			<g:form method='post' action="selectRack" name="startMenuForm">
 				<table width="100%" border="0" cellpadding="1">
-				<tr>
-				   	<td class="label">Project:</td>
+				<tr >
+				   	<td class="label" >Project:</td>
 				   	<td class="field">
-				   		<g:select optionKey="id" id="projectId" name="project" from="${Project.list()}" value="${currProj}" 
-				   			onchange="${remoteFunction(action:'getBundles', params:'\'id=\' + this.value ', onComplete:'appendBundles(e)')}" />
+				   		<select  id="projectId" name="project"  
+				   			onchange="${remoteFunction(action:'getBundles', params:'\'id=\' + this.value ', onComplete:'appendBundles(e)')}" >
+				   			<g:each in="${Project.list()}" var="project">
+				   			<g:if test="${currProj == project.id.toString()} ">
+				   				<option value="${project.id}" selected>${project.name}</option>
+				   			</g:if>
+				   			<g:else>
+				   				<option value="${project.id}">${project.name}</option>
+				   			</g:else>
+				   			</g:each>
+				   		</select>
 				   </td>
 				</tr>
 				
@@ -77,6 +86,7 @@ function appendBundles( e ) {
 		</div>
 	</div>
 	<script type="text/javascript">
+		
 		${remoteFunction(action:'getBundles', params:'\'id=\' + document.startMenuForm.project.value ', onComplete:'appendBundles(e)')}
 	</script>
 </body>

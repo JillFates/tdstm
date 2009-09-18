@@ -106,7 +106,7 @@ class WalkThroughService {
     				flag = false
 				}
 				if(flag){
-					assetsListView.append("<tr class='$cssClass' onClick=\"showAssetMenu(${assetEntity?.id})\">"+
+					assetsListView.append("<tr class='$cssClass' onclick=\"showAssetMenu('${assetEntity?.id}')\">"+
 							"<td class='center'>${assetEntity?.sourceRackPosition}</td><td class='center'>${assetEntity?.usize}</td>"+
 							"<td class='center'>${assetEntity?.assetTag}</td></tr>")
 			 	}

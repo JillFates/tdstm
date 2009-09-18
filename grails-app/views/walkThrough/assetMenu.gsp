@@ -319,33 +319,33 @@ function updateModels( e ){
 			<tr>
 				<td class="label">Need Asset Tag?</td>
 				<td class="field">
-					<input type="radio" name="needAssetTag" id="needAssetTagYes" value="Y"><label for="needAssetTagYes">Yes</label>
+					<input type="radio" name="needAssetTag" id="needAssetTagYes" value="Y" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)"><label for="needAssetTagYes">Yes</label>
 					&nbsp;&nbsp;
-					<input type="radio" name="needAssetTag" id="needAssetTagNo" value="N" checked><label for="needAssetTagNo">No</label>
+					<input type="radio" name="needAssetTag" id="needAssetTagNo" value="N" onchange="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" checked><label for="needAssetTagNo">No</label>
 				</td>
 			</tr>
 			<tr>
 				<td class="label">Has Amber Lights?</td>
 				<td class="field">
-					<input type="radio" name="hasAmber" id="hasAmberYes" value="Y" checked><label for="hasAmberYes">Yes</label>
+					<input type="radio" name="hasAmber" id="hasAmberYes" value="Y" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" checked><label for="hasAmberYes">Yes</label>
 					&nbsp;&nbsp;
-					<input type="radio" name="hasAmber" id="hasAmberNo" value="N" checked><label for="hasAmberNo">No</label>
+					<input type="radio" name="hasAmber" id="hasAmberNo" value="N" onchange="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" checked><label for="hasAmberNo">No</label>
 				</td>
 			</tr>
 			<tr>
 				<td class="label">Stuff Stacked On Top?</td>
 				<td class="field">
-					<input type="radio" name="stuffOnTop" id="stuffOnTopYes" value="Y"><label for="stuffOnTopYes">Yes</label>
+					<input type="radio" name="stuffOnTop" id="stuffOnTopYes" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" value="Y"><label for="stuffOnTopYes">Yes</label>
 					&nbsp;&nbsp;
-					<input type="radio" name="stuffOnTop" id="stuffOnTopNo" value="N" checked><label for="stuffOnTopNo">No</label>
+					<input type="radio" name="stuffOnTop" id="stuffOnTopNo" onchange="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" value="N" checked><label for="stuffOnTopNo">No</label>
 				</td>
 			</tr>
 			<tr>
 				<td class="label">Is Powered OFF?</td>
 				<td class="field">
-					<input type="radio" name="poweredOff" id="poweredOffYes" value="Y"><label for="poweredOffYes">Yes</label>
+					<input type="radio" name="poweredOff" id="poweredOffYes" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" value="Y" ><label for="poweredOffYes">Yes</label>
 					&nbsp;&nbsp;
-					<input type="radio" name="poweredOff" id="poweredOffNo" value="N" checked><label for="poweredOffNo">No</label>
+					<input type="radio" name="poweredOff" id="poweredOffNo" onchange="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" value="N" checked><label for="poweredOffNo">No</label>
 				</td>
 			</tr>
 			</table>
@@ -421,10 +421,10 @@ function updateModels( e ){
 		        <td class="label"><label for=attachedKVM>Attached to KVM:</label></td>
 		        <td class="field">
 		        <g:if test="${assetEntity?.kvmDevice || assetEntity?.kvmPort }">
-						<input type="checkbox" name=attachedKVM id="attachedKVM" checked="checked">
+						<input type="checkbox" name=attachedKVM id="attachedKVM" onclick="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)" checked="checked">
 				</g:if>
 				<g:else>
-						<input type="checkbox" name=attachedKVM id="attachedKVM">
+						<input type="checkbox" name=attachedKVM onclick="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)" id="attachedKVM">
 				</g:else>
 		        </td>
 		</tr>
@@ -432,19 +432,19 @@ function updateModels( e ){
 		        <td class="label"><label for="hasILO">Has ILO Mgmt:</label></td>
 		        <td class="field">
 		        <g:if test="${assetEntity?.remoteMgmtPort}">
-					<input type="checkbox" name=hasILO id="hasILO" checked="checked">
+					<input type="checkbox" name=hasILO id="hasILO" onclick="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)" checked="checked">
 				</g:if>
 				<g:else>
-					<input type="checkbox" name=hasILO id="hasILO">
+					<input type="checkbox" name=hasILO onclick="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)" id="hasILO">
 				</g:else>
 		        </td>
 		</tr>
 		<tr>
 		        <td class="label">Need cables moved?</td>
 		        <td class="field">
-		                <input type="radio" name="moveCables" id="moveCablesYes" value="Y"><label for="moveCablesYes">Yes</label>
+		                <input type="radio" name="moveCables" id="moveCablesYes" onclick="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)" value="Y"><label for="moveCablesYes">Yes</label>
 		                &nbsp;&nbsp;
-		                <input type="radio" name="moveCables" id="moveCablesNo" value="N" checked><label for="moveCablesNo">No</label>
+		                <input type="radio" name="moveCables" id="moveCablesNo" value="N" onchange="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)" checked><label for="moveCablesNo">No</label>
 		        </td>
 		</tr>
 		</table>      
