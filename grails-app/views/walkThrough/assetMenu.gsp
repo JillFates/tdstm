@@ -27,13 +27,13 @@ function missingAsset( type, id, message ){
 }
 function updateMissingAsset( e, type, id ){
 	if(e.responseText = "success"){
-		var link = "<a href='#' class='button big' onclick=\"missingAsset"
+		var link = "<a href='#' class='button big' onclick=\"missingAsset";
 		if(type == 'create'){
-			link +="('resolve','"+id+"', 'Resolve missing asset issue. Are you sure?')\">Missing Asset Found </a>"
+			link +="('resolve','"+id+"', 'Resolve missing asset issue. Are you sure?')\">Missing Asset Found </a>";
 		} else {
-			link +="('create','"+id+"', 'Mark asset as missing. Are you sure?')\" >Mark Asset Missing </a>"
+			link +="('create','"+id+"', 'Mark asset as missing. Are you sure?')\" >Mark Asset Missing </a>";
 		}
-		getObject('missingAsset').innerHtml = link
+		BetterInnerHTML(getObject('missingAsset'),link);
 	}
 }
 function commentSelect( cmtVal ) {
@@ -68,10 +68,22 @@ var mustSave = false;
 function setMustSave( changed, actual, type, attribute ){
 	if( changed != actual ) {
 		mustSave = true;
-		getObject(type+"CompleteId").style.backgroundColor = 'green';
-		getObject(type+"CompleteId").style.color = '#FFF';
-		getObject(type+"SaveId").style.backgroundColor = 'green'
-		getObject(type+"SaveId").style.color = '#FFF';
+		getObject("front1CompleteId").style.backgroundColor = 'green';
+		getObject("front1CompleteId").style.color = '#FFF';
+		getObject("front1SaveId").style.backgroundColor = 'green'
+		getObject("front1SaveId").style.color = '#FFF';
+		getObject("front2CompleteId").style.backgroundColor = 'green';
+		getObject("front2CompleteId").style.color = '#FFF';
+		getObject("front2SaveId").style.backgroundColor = 'green'
+		getObject("front2SaveId").style.color = '#FFF';
+		getObject("rearCompleteId").style.backgroundColor = 'green';
+		getObject("rearCompleteId").style.color = '#FFF';
+		getObject("rearSaveId").style.backgroundColor = 'green'
+		getObject("rearSaveId").style.color = '#FFF';
+		getObject("mainSaveId").style.backgroundColor = 'green'
+		getObject("mainSaveId").style.color = '#FFF';
+		getObject("mainCompleteId").style.backgroundColor = 'green'
+		getObject("mainCompleteId").style.color = '#FFF';
 		document.auditForm.generalCommentId.value = (document.auditForm.generalCommentId.value + attribute+" form "+actual+" to "+ changed +", " )
 	}
 }
@@ -183,8 +195,8 @@ function updateModels( e ){
 			</span>
 			<div style="MARGIN-TOP: 10px">
 				<div class=thefield align=center>
-					<a class="button" href="#select_asset" onClick="document.auditForm.submitType.value='save';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
-			        <a class="button" href="#select_asset"  onClick="document.auditForm.submitType.value='complete';document.auditForm.submit();">Completed</a>
+					<a class="button" id="mainSaveId" href="#select_asset" onClick="document.auditForm.submitType.value='save';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
+			        <a class="button" id="mainCompleteId" href="#select_asset"  onClick="document.auditForm.submitType.value='complete';document.auditForm.submit();">Completed</a>
 				</div>
 			</div>
 		</div>

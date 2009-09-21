@@ -1498,5 +1498,29 @@ class AssetEntityController {
  	    }
     	return timeFormate
     }
+    /*
+     * @author : Srinivas
+     * @param : assetId,StatusId
+     * @return : status message
+     */
+    def showStatus = {
+    	def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
+    	def arrayId = params.id.split("_")
+    	def statusMsg =""
+    	def assetId = arrayId[0]
+        def stateId = Integer.parseInt(arrayId[1])
+        def stateTo = arrayId[1]
+        def state = stateEngineService.getStateLabel( projectInstance.workflowCode.toString(),  stateId)
+        def assetEntityInstance = AssetEntity.findById(assetId)
+        def assetTrasitionInstance = AssetTransition.find( "from AssetTransition where assetEntity = $assetEntityInstance.id and voided=0 and stateTo= '$stateTo' and isNonApplicable = 0" )
+        if( assetTrasitionInstance ) {
+        	statusMsg = "$assetEntityInstance.assetName : $state is done and was updated by $assetTrasitionInstance.userLogin.person.firstName $assetTrasitionInstance.userLogin.person.lastName at  $assetTrasitionInstance.lastUpdated "
+        }else if( AssetTransition.find( "from AssetTransition where assetEntity = $assetEntityInstance.id and voided=0 and stateTo= '$stateTo' and isNonApplicable = 1" ) ) {
+        	statusMsg = "$assetEntityInstance.assetName : $state is not applicable "
+        }else {
+        	statusMsg = "$assetEntityInstance.assetName : $state pending "
+        }
+    	render statusMsg
+    }
     
 }

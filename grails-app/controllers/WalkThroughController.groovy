@@ -311,17 +311,20 @@ class WalkThroughController {
 	 * @param  : Asset Id
 	 * @return : Mark asset as missing Asset
 	 *----------------------------------------------------------*/
-    def missingAsset = {
+	def missingAsset = {
+		def principal = SecurityUtils.subject.principal
+		def loginUser = UserLogin.findByUsername ( principal )
 		def type = params.type
 		def assetComment
 		def assetEntity = AssetEntity.findById( params.id )
 		if(assetEntity){
 			if(type != 'create'){
 				assetComment = AssetComment.find("from AssetComment where assetEntity = ${assetEntity.id} and commentType = ? and isResolved = ? and commentCode = ?" ,['issue',0,'ASSET_MISSING'])
-				assetComment.isResolved = 1
-				assetComment.save()
+				assetComment?.isResolved = 1
+				assetComment?.resolution = "Asset Missing issue is resolved while in Audit"
+				assetComment?.save()
 			} else {
-				assetComment = new AssetComment(commentType:'issue', assetEntity:assetEntity, isResolved:0, commentCode:'ASSET_MISSING', category:'walkthru' ).save()
+				assetComment = new AssetComment(commentType:'issue', assetEntity:assetEntity, isResolved:0, commentCode:'ASSET_MISSING', category:'walkthru', createdBy:loginUser.person ).save()
 			}
 		}
 		def message = "success"
