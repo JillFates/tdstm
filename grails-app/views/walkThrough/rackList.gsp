@@ -17,7 +17,9 @@ function updateRacks( e , type ) {
 }
 var timeInterval;
 function searchRacks(){
-	${remoteFunction(action:'getRacksByLocation', params:'\'location=\' + document.selectRackForm.location.value +\'&viewType=\'+document.selectRackForm.viewType.value +\'&searchKey=\'+document.selectRackForm.search.value', onComplete:'updateRacks(e, \'search\')')}
+	//${remoteFunction(action:'getRacksByLocation', params:'\'location=\' + document.selectRackForm.location.value +\'&viewType=\'+document.selectRackForm.viewType.value +\'&searchKey=\'+document.selectRackForm.search.value', onComplete:'updateRacks(e, \'search\')')}
+	
+	document.selectRackForm.submit();
 }
 function showAssets(bundle, location, room, rack){
 	window.location.href='selectAsset?moveBundle='+bundle+'&location='+location+'&room='+room+'&rack='+rack
@@ -36,7 +38,7 @@ function showAssets(bundle, location, room, rack){
    <td class="label">Location:</td>
    <td class="field">
       <select name="location" id="locationId" class="select"
-      	onchange="${remoteFunction(action:'getRacksByLocation', params:'\'location=\' + this.value +\'&viewType=\'+ document.selectRackForm.viewType.value ', onComplete:'updateRacks(e,\'location\')')}">
+      	onchange="document.selectRackForm.submit()">
 	      <g:each in="${locationsList}" var="locationsList">
 	         <option value="${locationsList.location}">${locationsList.location}</option>
 	      </g:each>
@@ -55,7 +57,7 @@ function showAssets(bundle, location, room, rack){
 	</td>
 	<td align="right">
 		<label for="search">Search:</label>
-		<input type="text" class="text search" size=8 name="search" id="searchId"
+		<input type="text" class="text search" size=8 name="search" id="searchId" value="${search}"
 		onkeyup="timeInterval = setTimeout('searchRacks()',500)" onkeydown="if(timeInterval){clearTimeout(timeInterval)}"> 
 	</td>
 </tr>
@@ -84,7 +86,6 @@ if('${viewType}'== 'todo'){
 	getObject('allId').className = 'button unselected'
 		
 }
-//${remoteFunction(action:'getRacksByLocation', params:'\'location=\' + document.selectRackForm.location.value +\'&viewType=\'+ document.selectRackForm.viewType.value ', onComplete:'updateRacks(e,\'location\')')}
 </script>
 </body>
 </html>

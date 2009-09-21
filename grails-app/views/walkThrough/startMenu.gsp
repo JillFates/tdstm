@@ -1,7 +1,6 @@
 <html>
 <head>
 <title>Walkthru&gt; Start</title>
-<g:javascript library="prototype" />
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
 <script type="text/javascript">
 /*-----------------------------------------------------------------
@@ -9,8 +8,8 @@
 	@author : Lokanath Reddy
 	@params : bundle list object as JSON
 *-----------------------------------------------------------------*/
-function appendBundles( e ) {
-	var moveBundleList = eval('(' + e.responseText + ')')
+function appendBundles() {
+	<%--var moveBundleList = eval('(' + e.responseText + ')')
 	var moveBundleObj = document.startMenuForm.moveBundle
 	moveBundleObj.innerHTML = ""
 	if(moveBundleList){
@@ -25,7 +24,9 @@ function appendBundles( e ) {
 			}
 			moveBundleObj.appendChild(option);
 		}
-	}
+	} --%>
+	document.startMenuForm.action = "startMenu";
+	document.startMenuForm.submit();
 }
 </script>
 </head>
@@ -42,7 +43,7 @@ function appendBundles( e ) {
 				   	<td class="label" >Project:</td>
 				   	<td class="field">
 				   		<select  id="projectId" name="project"  
-				   			onchange="${remoteFunction(action:'getBundles', params:'\'id=\' + this.value ', onComplete:'appendBundles(e)')}" >
+				   			onchange="appendBundles()" >
 				   			<g:each in="${Project.list()}" var="project">
 				   			<g:if test="${currProj == project.id.toString()} ">
 				   				<option value="${project.id}" selected>${project.name}</option>
@@ -58,7 +59,16 @@ function appendBundles( e ) {
 				<tr>
 				   <td class="label">Bundle:</td>
 				   <td class="field">
-				      <select name="moveBundle" id="moveBundleId" class="select" ></select>
+				      <select name="moveBundle" id="moveBundleId" class="select" >
+				      	<g:each in="${moveBundlesList}" var="moveBundle">
+				   			<g:if test="${currBundle == moveBundle?.id.toString()} ">
+				   				<option value="${moveBundle?.id}" selected>${moveBundle?.name}</option>
+				   			</g:if>
+				   			<g:else>
+				   				<option value="${moveBundle?.id}">${moveBundle?.name}</option>
+				   			</g:else>
+				   		</g:each>
+				      </select>
 				   </td>
 				</tr>
 				
@@ -85,10 +95,6 @@ function appendBundles( e ) {
 			</g:form>
 		</div>
 	</div>
-	<script type="text/javascript">
-		
-		${remoteFunction(action:'getBundles', params:'\'id=\' + document.startMenuForm.project.value ', onComplete:'appendBundles(e)')}
-	</script>
 </body>
 </html>
 		

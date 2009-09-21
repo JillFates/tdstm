@@ -83,8 +83,8 @@ class WalkThroughService {
                 if(auditType !="source"){
                 	position = assetEntity?.targetRackPosition
                 }
-    			def moveBundleInstance = MoveBundle.findById( assetEntity?.moveBundle?.id )
-        		def walkthruState = stateEngineService.getStateId(moveBundleInstance?.project?.workflowCode,"SourceWalkthru")
+    			def moveBundle = MoveBundle.findById( assetEntity?.moveBundle?.id )
+        		def walkthruState = stateEngineService.getStateId(moveBundle?.project?.workflowCode,"SourceWalkthru")
     			def cssClass = "asset_ready"
     			def flag = true
     			if(i == 6 && assetsListSize != 7 ){
@@ -104,7 +104,7 @@ class WalkThroughService {
     				flag = false
 				}
 				if(flag){
-					assetsListView.append("<tr class='$cssClass' onclick=\"showAssetMenu('${assetEntity?.id}')\">"+
+					assetsListView.append("<tr class='$cssClass' onclick=\"showAssetMenu('${assetEntity?.id}','${assetEntity?.assetName}','${moveBundle?.id}','${moveBundle?.name}')\">"+
 							"<td class='center'>${position}</td><td class='center'>${assetEntity?.usize}</td>"+
 							"<td class='center'>${assetEntity?.assetTag}</td></tr>")
 			 	}

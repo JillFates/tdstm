@@ -24,6 +24,10 @@ class WalkThroughController {
 	 * @return : Will render Stat Menu
 	 *----------------------------------------------------------*/
     def startMenu = {
+		def projectId = params.project
+		if(projectId){
+			getSession().setAttribute("AUDIT_PROJ",projectId)
+		}
     	def currBundle = getSession().getAttribute("AUDIT_BUNDLE")
     	def currProj = getSession().getAttribute("AUDIT_PROJ")
     	if( !currBundle ){
@@ -34,7 +38,8 @@ class WalkThroughController {
     		userPreferenceService.loadPreferences("CURR_PROJ")
     		currProj = session.getAttribute("CURR_PROJ")?.CURR_PROJ
     	}
-    	render( view : 'startMenu', model:[ currProj : currProj, currBundle : currBundle ] )	
+    	def moveBundlesList = MoveBundle.findAll("from MoveBundle m where m.project = $currProj")
+    	render( view : 'startMenu', model:[ currProj : currProj, currBundle : currBundle, moveBundlesList : moveBundlesList ] )	
     }
     /*------------------------------------------------------------
 	 * @author : Lokanath Reddy
@@ -60,17 +65,23 @@ class WalkThroughController {
 		def auditType = params.auditType
 		def sortOrder = params.sort
 		def location = params.location
+		def searchKey = params.search
 		def viewType = params.viewType ? params.viewType : 'todo' 
 		def type = 'source'
 		def locationQuery = "as location from asset_entity where move_bundle_id = $moveBundleId"
 		def locationsList
 		if(auditType == 'source'){
-			locationsList = jdbcTemplate.queryForList("select distinct source_location "+locationQuery )
+			locationsList = jdbcTemplate.queryForList("select distinct source_location "+locationQuery+" and source_location is not null"+
+														" and source_location != ''" )
 		} else {
 			type = 'target'
-			locationsList = jdbcTemplate.queryForList("select distinct target_location "+locationQuery )
+			locationsList = jdbcTemplate.queryForList("select distinct target_location "+locationQuery +" and target_location is not null"+
+														" and target_location != ''" )
 		}
-		def auditLocation = ""
+		def auditLocation = getSession().getAttribute("AUDIT_LOCATION")
+		if(location != auditLocation){
+			searchKey = ""
+		}
 		def auditBundle = getSession().getAttribute("AUDIT_BUNDLE")
 		if( location ){
 			auditLocation = location
@@ -87,11 +98,16 @@ class WalkThroughController {
 		}
 		getSession().setAttribute("AUDIT_BUNDLE",moveBundleId)
 		getSession().setAttribute("AUDIT_TYPE",auditType)
-		
 		def racksList
+		def args = [auditLocation]
 		if(auditLocation){
-			def racksListQuery = "select a.${type}Room, a.${type}Rack, count(a.id) from AssetEntity a where a.${type}Location = ? "+
-										"and a.moveBundle = $moveBundleId group by a.${type}Room, a.${type}Rack"
+			def racksListQuery = new StringBuffer("select a.${type}Room, a.${type}Rack, count(a.id) from AssetEntity a where a.${type}Location = ? "+
+										"and a.moveBundle = $moveBundleId ")
+			if( searchKey ){
+				racksListQuery.append(" and ( a.${type}Room like ? or a.${type}Rack like ? ) ")
+				args = [auditLocation,"%"+searchKey+"%","%"+searchKey+"%"]
+			}
+			racksListQuery.append(" group by a.${type}Room, a.${type}Rack ")
 			if(sortOrder){
 				if(sortOrder == "room"){
 					racksListQuery += " order by a.${type}Room $params.order"
@@ -103,18 +119,18 @@ class WalkThroughController {
 			} else {
 				racksListQuery += " order by a.${type}Room, a.${type}Rack"
 			}
-			racksList = AssetEntity.executeQuery(racksListQuery,[auditLocation])
+			racksList = AssetEntity.executeQuery(racksListQuery,args)
 		}
 		def rackListView = walkThroughService.generateRackListView( racksList, moveBundleId, auditLocation, auditType, viewType )
     	render( view : 'rackList', model:[ locationsList : locationsList, rackListView : rackListView, auditType:auditType,
-    	                                   auditLocation : auditLocation, moveBundle : moveBundleId, viewType : viewType ] )	
+    	                                   auditLocation : auditLocation, moveBundle : moveBundleId, viewType : viewType, search:searchKey] )	
     }
 	/*------------------------------------------------------------
 	 * @author : Lokanath Reddy
 	 * @param  : location
 	 * @return : Will render Asset Menu for selected Asset
 	 *----------------------------------------------------------*/
-	def getRacksByLocation = {
+	/*def getRacksByLocation = {
 		def auditLocation = params.location
 		def viewType = params.viewType
 		def searchKey = params.searchKey
@@ -141,7 +157,7 @@ class WalkThroughController {
 		def rackListView = walkThroughService.generateRackListView( racksList, auditBundle, auditLocation, auditType, viewType)
 		//def racksDetails = [racksList:racksList, sortParams:sortParams]
 		render rackListView
-	}
+	}*/
     /*------------------------------------------------------------
 	 * @author : Lokanath Reddy
 	 * @param  : Bundle, location, room, rack
@@ -150,6 +166,7 @@ class WalkThroughController {
 	def selectAsset = {
 		def moveBundle = params.moveBundle
 		def auditLocation = params.location
+		def searchKey = params.assetSearch
 		def auditRoom = params.room
 		def auditRack = params.rack
 		def sortOrder = params.sort
@@ -167,34 +184,42 @@ class WalkThroughController {
 			auditRack = null
 		}
 		if(auditLocation){
-			def asstesListQuery = new StringBuffer("from AssetEntity a where a.moveBundle = $moveBundle and a.${type}Location = ? ")
+			def asstesListQuery = new StringBuffer("from AssetEntity a where a.${type}Location = ? ")
 			def args = [auditLocation]
-			def constructedQuery = walkThroughService.constructQuery( auditRoom, auditRack, auditLocation, type )
-			asstesListQuery.append( constructedQuery.query )
-			
-			args = constructedQuery.args 
-			if(sortOrder){
-				if(sortOrder == "assetTag"){
-					asstesListQuery.append(" order by a.assetTag $params.order")
-				} else if(sortOrder == "usize"){
-					asstesListQuery.append(" order by a.usize $params.order")
+			if(searchKey){
+				searchKey = "%"+searchKey+"%"
+				asstesListQuery.append(" and ( a.assetTag like ? or a.assetName like ? ) ")
+				if(auditRoom && auditRack ){
+					asstesListQuery.append(" and a.${type}Room = ? and a.${type}Rack = ? ")
+					args = [auditLocation,searchKey,searchKey,auditRoom,auditRack]
+				} else if(!auditRoom && auditRack){
+					asstesListQuery.append(" and (a.${type}Room is null or a.${type}Room = '') and a.${type}Rack = ? ")
+					args = [auditLocation,searchKey,searchKey,auditRack]
+				} else if(auditRoom && !auditRack){
+					asstesListQuery.append(" and a.${type}Room = ? and (a.${type}Rack is null or a.${type}Rack = '' ) ")
+					args = [auditLocation,searchKey,searchKey,auditRoom]
 				} else {
-					asstesListQuery.append(" order by a.${type}RackPosition $params.order")
+					asstesListQuery.append(" and (a.${type}Room is null or a.${type}Room = '') and (a.${type}Rack is null or a.${type}Rack = '' ) ")
+					args = [auditLocation,searchKey,searchKey]
 				}
 			} else {
-				asstesListQuery.append(" order by a.${type}RackPosition desc, a.assetTag")
+				asstesListQuery.append(" and a.moveBundle = ${moveBundle} ")
+				def constructedQuery = walkThroughService.constructQuery( auditRoom, auditRack, auditLocation, type )
+				asstesListQuery.append( constructedQuery.query )
+				args = constructedQuery.args
 			}
+			asstesListQuery.append(" order by a.${type}RackPosition desc, a.assetTag")
 			assetsList = AssetEntity.executeQuery(asstesListQuery.toString(),args)
 		}
 		def assetsListView = walkThroughService.generateAssetListView( assetsList, auditLocation, auditType, viewType )
-    	render( view : 'assetList', model:[ assetsListView : assetsListView, params:params, auditType:auditType, viewType:viewType] )
+    	render( view : 'assetList', model:[ assetsListView : assetsListView, params:params, auditType:auditType, viewType:viewType, searchKey : params.assetSearch] )
 	}
 	/*------------------------------------------------------------
 	 * @author : Lokanath Reddy
 	 * @param  : searck Key, room , rack
 	 * @return : Will return list of assets for a search key
 	 *----------------------------------------------------------*/
-	def searchAssets = {
+	/*def searchAssets = {
 		def auditLocation = getSession().getAttribute("AUDIT_LOCATION")
 		def moveBundle = getSession().getAttribute("AUDIT_BUNDLE")
 		def auditRoom = params.room
@@ -242,14 +267,15 @@ class WalkThroughController {
 			assetsList = AssetEntity.executeQuery(asstesListQuery.toString(),args)
 		}
 		def assetsListView = walkThroughService.generateAssetListView( assetsList, auditLocation, auditType, viewType )
-		render assetsListView
-	}
+		//render assetsListView
+		render( view : 'assetList', model:[ assetsListView : assetsListView, params:params, auditType:auditType, viewType:viewType, searchKey : params.searchKey] )
+	}*/
 	/*------------------------------------------------------------
 	 * @author : Lokanath Reddy
 	 * @param  : Asset Id
 	 * @return : Will return boolean flag if asset bundle does not match with Audit bundle
 	 *----------------------------------------------------------*/
-	def confirmAssetBundle = {
+	/*def confirmAssetBundle = {
 		def assetEntity = AssetEntity.findById(params.id)
 		def assetBundle = assetEntity?.moveBundle?.id
 		def auditBundle = Integer.parseInt(getSession().getAttribute("AUDIT_BUNDLE"))
@@ -258,7 +284,7 @@ class WalkThroughController {
 			message = "The asset ${assetEntity?.assetName} is not part of the bundle ${assetEntity?.moveBundle}. Do you want to proceed?"
 		}
 		render message
-	}
+	}*/
 	/*------------------------------------------------------------
 	 * @author : Lokanath Reddy
 	 * @param  : Asset Id, Audit bundle, location, room, rack

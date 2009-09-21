@@ -8,10 +8,11 @@
 <script type="text/javascript">
 var timeInterval;
 function searchAssets(){
-	var aserchKey = document.selectAssetForm.assetSearch.value
-	${remoteFunction(action:'searchAssets', params:'\'room=\' + document.selectAssetForm.room.value +\'&rack=\'+document.selectAssetForm.rack.value +\'&searchKey=\'+ aserchKey +\'&viewType=\'+document.selectAssetForm.viewType.value', onComplete:'updateAssets(e)')}
+	//var aserchKey = document.selectAssetForm.assetSearch.value
+	//${remoteFunction(action:'searchAssets', params:'\'room=\' + document.selectAssetForm.room.value +\'&rack=\'+document.selectAssetForm.rack.value +\'&searchKey=\'+ aserchKey +\'&viewType=\'+document.selectAssetForm.viewType.value', onComplete:'updateAssets(e)')}
+	document.selectAssetForm.submit();
 }
-function updateAssets( e ) {
+<%--function updateAssets( e ) {
 	var assetsList = e.responseText;
 	var result = assetsList.indexOf("No records found")
 	if(result != -1 ){
@@ -20,11 +21,23 @@ function updateAssets( e ) {
 		document.selectAssetForm.assetSearch.style.border = "1px solid #ccc"
 	}
 	BetterInnerHTML(getObject('assetsListBody'), assetsList);
+} --%>
+function showAssetMenu( assetId , assetName, bundleId, bundleName ) {
+	//${remoteFunction(action:'confirmAssetBundle', params:'\'id=\' + id ', onComplete:'confirmAssetBundle(e,id)')}
+	var flag = true
+	var auditBundle = '${params.moveBundle}'
+	if(bundleId != auditBundle){
+		if(!confirm("The asset "+assetName+" is not part of the bundle "+bundleName+". Do you want to proceed?")){
+			flag = false
+		}
+	}
+	if(flag){
+		document.selectAssetForm.assetId.value = assetId
+		document.selectAssetForm.action = "assetMenu"
+		document.selectAssetForm.submit();
+	}
 }
-function showAssetMenu( id ) {
-	${remoteFunction(action:'confirmAssetBundle', params:'\'id=\' + id ', onComplete:'confirmAssetBundle(e,id)')}
-}
-function confirmAssetBundle( e , assetId ){
+<%--function confirmAssetBundle( e , assetId ){
 	var confirmMessage = e.responseText
 	var flag = true
 	if(confirmMessage){
@@ -37,7 +50,7 @@ function confirmAssetBundle( e , assetId ){
 		document.selectAssetForm.action = "assetMenu"
 		document.selectAssetForm.submit();
 	}
-}
+} --%>
 </script>
 </head>
 <body onload="document.selectAssetForm.assetSearch.focus()">
@@ -68,7 +81,7 @@ function confirmAssetBundle( e , assetId ){
 			<a class="button" href="#" onclick="document.selectAssetForm.viewTypeId.value='all';document.selectAssetForm.submit();" id="allId">All</a>
 			</TD>
 			<TD align=right><LABEL for=assetSearch>Scan Asset:</LABEL>
-				<INPUT style="width: 40px" id="assetSearchId" class="text search" size='8' name='assetSearch' 
+				<INPUT style="width: 40px" id="assetSearchId" class="text search" size='8' name='assetSearch' value="${searchKey}"
 					onkeyup="timeInterval = setTimeout('searchAssets()',500)" onkeydown="if(timeInterval){clearTimeout(timeInterval)}"> 
 			</TD>
 		</TR>
