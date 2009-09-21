@@ -1514,7 +1514,12 @@ class AssetEntityController {
         def assetEntityInstance = AssetEntity.findById(assetId)
         def assetTrasitionInstance = AssetTransition.find( "from AssetTransition where assetEntity = $assetEntityInstance.id and voided=0 and stateTo= '$stateTo' and isNonApplicable = 0" )
         if( assetTrasitionInstance ) {
-        	statusMsg = "$assetEntityInstance.assetName : $state is done and was updated by $assetTrasitionInstance.userLogin.person.firstName $assetTrasitionInstance.userLogin.person.lastName at  $assetTrasitionInstance.lastUpdated "
+        	DateFormat formatter ; 
+            def formatterTime = new SimpleDateFormat("hh:mm:ss a");
+            def formatterDate = new SimpleDateFormat("MM/dd/yyyy");
+            def updatedTime = formatterTime.format(assetTrasitionInstance.lastUpdated)
+            def updatedDate = formatterDate.format(assetTrasitionInstance.lastUpdated)
+        	statusMsg = "$assetEntityInstance.assetName : $state is done and was updated by $assetTrasitionInstance.userLogin.person.firstName $assetTrasitionInstance.userLogin.person.lastName at $updatedTime on $updatedDate "
         }else if( AssetTransition.find( "from AssetTransition where assetEntity = $assetEntityInstance.id and voided=0 and stateTo= '$stateTo' and isNonApplicable = 1" ) ) {
         	statusMsg = "$assetEntityInstance.assetName : $state is not applicable "
         }else {
