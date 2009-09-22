@@ -19,7 +19,6 @@ SimpleContextMenu.attach('container', 'myMenu');
 	${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.selectCmt.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')};
 	return false;	
   }
-
 function missingAsset( type, id, message ){
 	if(confirm(message)){
 		${remoteFunction(action:'missingAsset', params:'\'id=\' + id +\'&type=\'+type', onComplete:'updateMissingAsset(e,type,id)')}
@@ -87,19 +86,33 @@ function setMustSave( changed, actual, type, attribute ){
 		document.auditForm.generalCommentId.value = (document.auditForm.generalCommentId.value + attribute+" form "+actual+" to "+ changed +", " )
 	}
 }
+//To move the option to Up/Down in list boxes
 function moveOption( objectId, actual, type, actionType ){
 	var optionList = getObject(objectId+'Id').options;
     var selectedIndex = getObject(objectId+'Id').selectedIndex
+    var selectedObject = getObject(objectId+'Id')
+    var selectedValue = selectedObject.value
     if( actionType != 'down'){
-	    if ( selectedIndex > 0) {
-	    	getObject(objectId+'Id').selectedIndex = selectedIndex-1;
-	    }
+    	if(selectOption(selectedObject, Number(selectedValue)+1) != true) {
+    		selectOption(selectedObject, Number(selectedValue)+8)
+    	}
     } else {
-    	if ( selectedIndex < (optionList.length - 1) ) {
-    		getObject(objectId+'Id').selectedIndex = selectedIndex+1;
-        }
+    	if(selectOption(selectedObject, Number(selectedValue)-1) != true ){
+    		selectOption(selectedObject, Number(selectedValue)-8)
+    	}		
     }
     setMustSave( getObject(objectId+'Id').value, actual, type ,objectId )
+}
+//To change the selected option in listBoxes
+function selectOption(selectedObject, selectedValue) {
+	var flag = false
+	for (var x = 0; x < selectedObject.length; x++) { 
+		if (selectedObject.options[x].value == (selectedValue) ) { 
+			selectedObject.options[x].selected = true; 
+			flag = true
+	    } 
+	}
+	return flag 
 }
 
 function callAssetMenu() {
@@ -315,8 +328,8 @@ function updateModels( e ){
 				<td class="field" nowrap>
 				<g:select name="sourceRackPosition" from="${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,'Undefined']}" 
 							id="sourceRackPositionId" value="${assetEntity?.sourceRackPosition}" onchange="setMustSave(this.value,'${assetEntity?.sourceRackPosition}','front2', this.name)"/>
-				<img src="${createLinkTo(dir:'images',file:'arrow_blue_up.png')}" height="18" onclick="moveOption('sourceRackPosition','${assetEntity?.sourceRackPosition}','front2','up')"/>
-				<img src="${createLinkTo(dir:'images',file:'arrow_blue_down.png')}" height="18" onclick="moveOption('sourceRackPosition','${assetEntity?.sourceRackPosition}','front2','down')"/>
+				<img src="${createLinkTo(dir:'images',file:'plus.gif')}" height="18" onclick="moveOption('sourceRackPosition','${assetEntity?.sourceRackPosition}','front2','up')"/>
+				<img src="${createLinkTo(dir:'images',file:'minus.gif')}" height="18" onclick="moveOption('sourceRackPosition','${assetEntity?.sourceRackPosition}','front2','down')"/>
 				</td>
 			</tr>
 			
@@ -325,8 +338,8 @@ function updateModels( e ){
 				<td class="field">
 				<g:select name="usize" from="${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,'Undefined']}"   
 							id="usizeId" value="${assetEntity?.usize}" onchange="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)"/>
-				<img src="${createLinkTo(dir:'images',file:'arrow_blue_up.png')}" height="18" onclick="moveOption('usize','${assetEntity?.usize}','front2','up')"/>
-				<img src="${createLinkTo(dir:'images',file:'arrow_blue_down.png')}" height="18" onclick="moveOption('usize','${assetEntity?.usize}','front2','down')"/>
+				<img src="${createLinkTo(dir:'images',file:'plus.gif')}" height="18" onclick="moveOption('usize','${assetEntity?.usize}','front2','up')"/>
+				<img src="${createLinkTo(dir:'images',file:'minus.gif')}" height="18" onclick="moveOption('usize','${assetEntity?.usize}','front2','down')"/>
 				</td>
 			</tr>
 			
@@ -413,8 +426,8 @@ function updateModels( e ){
 			<td class="field">
 			<g:select name="nicPort" from="${[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,24,32,40,48,56,64,72,80,88,96]}" value="${assetEntity?.nicPort}"
 						id="nicPortId" onchange="setMustSave(this.value,'${assetEntity?.nicPort}','rear', this.name)"/>
-		     	<img src="${createLinkTo(dir:'images',file:'arrow_blue_up.png')}" height="18" onclick="moveOption('nicPort','${assetEntity?.nicPort}','rear','up')"/>
-			 	<img src="${createLinkTo(dir:'images',file:'arrow_blue_down.png')}" height="18" onclick="moveOption('nicPort','${assetEntity?.nicPort}','rear','down')"/>
+		     	<img src="${createLinkTo(dir:'images',file:'plus.gif')}" height="18" onclick="moveOption('nicPort','${assetEntity?.nicPort}','rear','up')"/>
+			 	<img src="${createLinkTo(dir:'images',file:'minus.gif')}" height="18" onclick="moveOption('nicPort','${assetEntity?.nicPort}','rear','down')"/>
 			</td>
 		</tr>
 		
