@@ -335,11 +335,13 @@ class WalkThroughController {
 				def transactionStatus = workflowService.createTransition(assetEntity.project.workflowCode,"SUPERVISOR", stateTo, assetEntity, assetEntity.moveBundle, loginUser, null, "" )
 			}
 		}
-		def message = "success"
+		/*def message = "success"
 		if(!assetComment){
 			message = "failure"
 		}
-		render message
+		render message*/
+		redirect(action:selectAsset, params:[moveBundle:getSession().getAttribute("AUDIT_BUNDLE"),room:params.room, 
+		                                     location:getSession().getAttribute("AUDIT_LOCATION"), rack:params.rack, sort:'asc' ])
 	}
     /*------------------------------------------------------------
 	 * @author : Lokanath Reddy
@@ -494,14 +496,27 @@ class WalkThroughController {
     def saveComment = {
     	def principal = SecurityUtils.subject.principal
     	def loginUser = UserLogin.findByUsername ( principal )
-		def asset = AssetEntity.findById( params.id )
+		def assetEntity = AssetEntity.findById( params.assetId )
     	def assetComment = new AssetComment()
-    	assetComment.comment = params.comment
-    	assetComment.assetEntity = asset
+    	assetComment.comment = params.comments
+    	assetComment.assetEntity = assetEntity
     	assetComment.commentType = params.commentType
     	assetComment.category = 'walkthru'
     	assetComment.createdBy = loginUser.person
     	assetComment.save()
+    	def walkthruComments = []
+		def walkthruCommentsCount = Integer.parseInt(message ( code: "walkthru.defComment.count" ))
+		for ( int i=1; i<=walkthruCommentsCount; i++ ) {
+			walkthruComments << message ( code: "walkthru.defComment.${i}" )
+		}
+		def query = "from AssetComment where assetEntity = ${assetEntity.id} and commentType = ? and isResolved = ? and commentCode = ?"
+		def commentCodes = [needAssetTag : AssetComment.find(query,["issue", 0, "NEED_ASSET_TAG"])?.commentCode,
+		                    amberLights : AssetComment.find(query,["issue", 0, "AMBER_LIGHTS"])?.commentCode,
+		                    stackedOnTop : AssetComment.find(query,["issue", 0, "STACKED_ON_TOP"])?.commentCode,
+		                    poweredOff : AssetComment.find(query,["issue", 0, "POWERED_OFF"])?.commentCode,
+		                    cablesMoved : AssetComment.find(query,["issue", 0, "NEED_CABLES_MOVED"])?.commentCode]
+		render(view:'assetMenu', model:[ moveBundle:params.moveBundle, location:params.location, room:params.room,  viewType:'view_comments',
+		                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
 	 }
 	
  /*------------------------------------------------------------

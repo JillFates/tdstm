@@ -19,7 +19,14 @@ function validExit() {
 		return "You have unsaved changes that will be lost. Are you sure you want to do this?";
 	}
 }
-
+function validChanges() {
+	var mustSave = document.auditForm.mustSave.value;
+	var flag = true
+	if(mustSave == 'true') {
+		flag = confirm( "Changes have not been saved and will be lost.  Are you sure?" );
+	}
+	return flag
+}
 function createXMLHttpRequest(){
 	try {
 	    return new ActiveXObject("Msxml2.XMLHTTP");
@@ -49,13 +56,18 @@ function filterByCommentType(val) {
 	return false;	
   }
 function missingAsset( type, id, message ){
-	if(confirm(message)){
-		var xmlHttpReq = createXMLHttpRequest()
+	if( validChanges() == true ) {
+		document.auditForm.mustSave.value = 'false'
+		if(confirm(message)){
+			document.auditForm.action = "missingAsset"
+			document.auditForm.submit(); 
+		<%--var xmlHttpReq = createXMLHttpRequest()
 		xmlHttpReq.open("post", "missingAsset?id="+id+"&type="+type, false);
 		xmlHttpReq.send(null);
 		var serverResponse = xmlHttpReq.responseText;
 		updateMissingAsset(xmlHttpReq,type,id)
-		<%--${remoteFunction(action:'missingAsset', params:'\'id=\' + id +\'&type=\'+type', onComplete:'updateMissingAsset(e,type,id)')} --%>
+		${remoteFunction(action:'missingAsset', params:'\'id=\' + id +\'&type=\'+type', onComplete:'updateMissingAsset(e,type,id)')} --%>
+		}
 	}
 }
 function updateMissingAsset( e, type, id ){
@@ -80,13 +92,15 @@ function commentSelect( cmtVal ) {
 function callUpdateComment( e, type ) {
 	var data = eval('(' + e.responseText + ')');
 	if ( data ) {
-		var assetId = document.commentForm.assetId.value;
+		<%--var assetId = document.commentForm.assetId.value;
 		var comment = escape(document.commentForm.comments.value);
 		var xmlHttpReq = createXMLHttpRequest()
 		xmlHttpReq.open("post", "saveComment?id="+assetId+"&comment="+comment+"&commentType="+type, false);
 		xmlHttpReq.send(null);
 		var serverResponse = xmlHttpReq.responseText;
-		callAssetMenu()
+		callAssetMenu() --%>
+		document.commentForm.commentType.value = type
+		document.commentForm.submit()
 		<%-- ${remoteFunction(action:'saveComment', params:'\'id=\' + document.commentForm.assetId.value +\'&comment=\'+escape(document.commentForm.comments.value) +\'&commentType=\'+type', onComplete:'callAssetMenu()')}; --%>
 		return true;
 	} else {
@@ -164,14 +178,17 @@ function callAssetMenu() {
 }
 
 function populateComments() {
-	document.commentsViewForm.selectCmt.value = 'all';
-	document.commentsViewForm.sort.value = 'desc';
-	document.commentsViewForm.orderType.value = 'commentType';
-	var assetId = document.commentForm.assetId.value;
-	var commentType = document.commentsViewForm.selectCmt.value;
-	var sort = document.commentsViewForm.sort.value;
-	var orderType = document.commentsViewForm.orderType.value;
-	sendCommentRequest()
+	if(validChanges() == true ) {
+		document.auditForm.mustSave.value = 'false'
+		document.commentsViewForm.selectCmt.value = 'all';
+		document.commentsViewForm.sort.value = 'desc';
+		document.commentsViewForm.orderType.value = 'commentType';
+		var assetId = document.commentForm.assetId.value;
+		var commentType = document.commentsViewForm.selectCmt.value;
+		var sort = document.commentsViewForm.sort.value;
+		var orderType = document.commentsViewForm.orderType.value;
+		sendCommentRequest()
+	}
 	<%--${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.selectCmt.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')}; --%>
 	
 }
@@ -250,6 +267,7 @@ function checkComments(type) {
 		<input type="hidden" name="submitType" id="submitTypeId">
 		<input type="hidden" name="room" value="${room}">
 		<input type="hidden" name="rack" value="${rack}">
+		<input type="hidden" name="location" value="${location}">
 		<input type="hidden" name="generalComment" id="generalCommentId" value="Asset changed: ">
 		<input type="hidden" id="mustSave" name="mustSave" value=""/>
 		<div style="FLOAT: left"><a class=button href="startMenu">Start Over</a></div>
@@ -272,9 +290,11 @@ function checkComments(type) {
 			<a class="button big" href="#view_comments" onclick="populateComments();">Issues/Comments</a> <BR style="MARGIN-TOP: 6px">
 			<span id="missingAsset" >
 				<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id +' and commentType = ? and isResolved = ? and commentCode = ?' ,['issue',0,'ASSET_MISSING'])}">
+					<input name="type" value="resolve" type="hidden"/>
 					<a href="#" class="button big" onclick="missingAsset('resolve', '${assetEntity?.id}','Resolve missing asset issue. Are you sure?')">Missing Asset Found</a>
 				</g:if>
 				<g:else>
+					<input name="type" value="create" type="hidden"/>
 					<a href="#" class="button big" onclick="missingAsset('create', '${assetEntity?.id}','Mark asset as missing. Are you sure?')">Mark Asset Missing </a>
 				</g:else>
 			</span>
@@ -571,13 +591,17 @@ function checkComments(type) {
 		<div style="FLOAT: left"><a class=button href="startMenu">Start Over</a></div>
 		<div style="float:right;"><a class="button" href="#asset_menu">Asset Menu</a></div>
 		<br class="clear"/>
-		<g:form name="commentForm">	
+		<g:form name="commentForm" action="saveComment">	
 			<table>
 			<tr>
 				<input type="hidden" name="assetId" id="assetId" value="${assetEntity.id}" />
 				<input type="hidden" name="commentType" id="commentType" value="comment" />
 				<input type="hidden" name="instructionType" id="instructionType" value="instruction" />
 				<input type="hidden" name="issueType" id="issueType" value="issue" />
+				<input type="hidden" name="room" value="${room}">
+				<input type="hidden" name="rack" value="${rack}">
+				<input type="hidden" name="location" value="${location}">
+				<input type="hidden" name="moveBundle" value="${moveBundle}">
 				<td class="label">Asset Tag:</td>
 				<td class="field">${assetEntity.assetTag}</td>
 			</tr>
@@ -686,6 +710,9 @@ function checkComments(type) {
 	}
 	getObject("manufacturerId").value = "${assetEntity?.manufacturer}"
 	getObject("modelId").value = "${assetEntity?.model}"
+	if("${viewType}" == "view_comments"){
+		location.href = "#view_comments"
+	}
 	</script>
 </body>
 </html>
