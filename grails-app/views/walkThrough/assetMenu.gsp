@@ -426,7 +426,7 @@ function checkComments(type) {
 			<tr>
 				<td class="label">Has Amber Lights?</td>
 				<td class="field">
-					<input type="radio" name="hasAmber" id="hasAmberYes" value="Y" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" checked><label for="hasAmberYes">Yes</label>
+					<input type="radio" name="hasAmber" id="hasAmberYes" value="Y" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" ><label for="hasAmberYes">Yes</label>
 					&nbsp;&nbsp;
 					<input type="radio" name="hasAmber" id="hasAmberNo" value="N" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" checked><label for="hasAmberNo">No</label>
 				</td>
