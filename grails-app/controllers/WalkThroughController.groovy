@@ -327,6 +327,8 @@ class WalkThroughController {
 				assetComment = AssetComment.find("from AssetComment where assetEntity = ${assetEntity.id} and commentType = ? and isResolved = ? and commentCode = ?" ,['issue',0,'ASSET_MISSING'])
 				assetComment?.isResolved = 1
 				assetComment?.resolution = "Asset Missing issue is resolved while in Audit"
+				assetComment?.resolvedBy = loginUser.person
+				assetComment?.dateResolved = new Date()
 				assetComment?.save()
 			} else {
 				assetComment = new AssetComment(commentType:'issue', assetEntity:assetEntity, isResolved:0, commentCode:'ASSET_MISSING', category:'walkthru', createdBy:loginUser.person ).save()
@@ -370,6 +372,8 @@ class WalkThroughController {
     def saveAndCompleteAudit = {
 		def assetEntity = AssetEntity.get( params.id )
 		if( assetEntity ){
+			def principal = SecurityUtils.subject.principal
+			def loginUser = UserLogin.findByUsername ( principal )
 			def auditType = getSession().getAttribute("AUDIT_TYPE")
 			def type = "source"
 			def room = assetEntity.sourceRoom
@@ -384,46 +388,45 @@ class WalkThroughController {
 			assetEntity.properties = params
 			if(!assetEntity.hasErrors() && assetEntity.save() ) {
 				if(params.submitType != "save"){
-					def principal = SecurityUtils.subject.principal
-			    	def loginUser = UserLogin.findByUsername(principal)
 					def transactionStatus = workflowService.createTransition(assetEntity.project.workflowCode,"SUPERVISOR", stateTo, assetEntity, assetEntity.moveBundle, loginUser, null, "" )
 				}
 				def query = "from AssetComment where assetEntity = ${assetEntity.id} and commentType = ? and isResolved = ? and commentCode = ?"
+						
 				if(params.needAssetTag == "Y"){
-					def needAssetTagComment = AssetComment.find(query, ["issue", 0, "NEED_ASSET_TAG"])
-					if(!needAssetTagComment){
-						new AssetComment(assetEntity : assetEntity, isResolved : 0, commentType : 'issue', category : 'walkthru', commentCode : 'NEED_ASSET_TAG').save()
-					}
+					createComments( 'NEED_ASSET_TAG', loginUser, query, assetEntity )
+				} else {
+					resolveComments( 'NEED_ASSET_TAG', loginUser, query )
 				}
+				
 				if(params.hasAmber == "Y"){
-					def hasAmberComment = AssetComment.find(query, ["issue", 0, "AMBER_LIGHTS"])
-					if(!hasAmberComment){
-						new AssetComment(assetEntity : assetEntity, isResolved : 0, commentType : 'issue', category : 'walkthru', commentCode : 'AMBER_LIGHTS' ).save()
-					}
+					createComments( 'AMBER_LIGHTS', loginUser, query, assetEntity )
+				} else {
+					resolveComments( 'AMBER_LIGHTS', loginUser, query )
 				}
+				
 				if(params.stuffOnTop == "Y"){
-					def stuffOnTopComment = AssetComment.find(query, ["issue", 0, "STACKED_ON_TOP"])
-					if(!stuffOnTopComment){
-						new AssetComment(assetEntity : assetEntity, isResolved : 0, commentType : 'issue', category : 'walkthru', commentCode : 'STACKED_ON_TOP' ).save()
-					}
+					createComments( 'STACKED_ON_TOP', loginUser, query, assetEntity )
+				} else {
+					resolveComments( 'STACKED_ON_TOP', loginUser, query )
 				}
+				
 				if(params.poweredOff == "Y"){
-					def poweredOffComment = AssetComment.find(query, ["issue", 0, "POWERED_OFF"])
-					if(!poweredOffComment){
-						new AssetComment(assetEntity : assetEntity, isResolved : 0, commentType : 'issue', category : 'walkthru', commentCode : 'POWERED_OFF' ).save()
-					}
+					createComments( 'POWERED_OFF', loginUser, query, assetEntity )
+				} else {
+					resolveComments( 'POWERED_OFF', loginUser, query )
 				}
+				
 				if(params.moveCables == "Y"){
-					def moveCablesComment = AssetComment.find(query, ["issue", 0, "NEED_CABLES_MOVED"])
-					if(!moveCablesComment){
-						new AssetComment(assetEntity : assetEntity, isResolved : 0, commentType : 'issue', category : 'walkthru', commentCode : 'NEED_CABLES_MOVED' ).save()
-					}
+					createComments( 'NEED_CABLES_MOVED', loginUser, query, assetEntity )
+				} else {
+					resolveComments( 'NEED_CABLES_MOVED', loginUser, query )
 				}
+				
 				def generalComment = params.generalComment
 				if(generalComment.lastIndexOf(",") != -1){
 					def commentDescription = generalComment.substring(0,generalComment.lastIndexOf(",") > 255 ? 255 : generalComment.lastIndexOf(","))
 					new AssetComment(assetEntity : assetEntity, commentType : 'comment', category : 'walkthru', 
-									comment : commentDescription ).save()
+									comment : commentDescription,, createdBy : loginUser.person ).save()
 				}
 				redirect(action:selectAsset,params:[moveBundle: getSession().getAttribute("AUDIT_BUNDLE"),
 				                                    location : getSession().getAttribute("AUDIT_LOCATION"),
@@ -436,6 +439,33 @@ class WalkThroughController {
 			                                    location : getSession().getAttribute("AUDIT_LOCATION"),
 			                                    room : room, rack : rack ])
 		}
+	}
+	
+	 /*------------------------------------------------------------
+	  * To create asset comments
+	  * @author : Mallikarjun 
+	  * @param  : Asset Comment properties
+	  *----------------------------------------------------------*/
+	def createComments ( def commentCode, def loginUser, def query, def assetEntity ) {
+		def hasComment = AssetComment.find(query, ["issue", 0, commentCode])
+		if(!hasComment){
+			new AssetComment(assetEntity : assetEntity, isResolved : 0, commentType : 'issue', category : 'walkthru', commentCode : commentCode, createdBy : loginUser.person ).save()
+		}	 
+	}
+	 
+	 /*------------------------------------------------------------
+	  * To resolve asset comments
+	  * @author : Mallikarjun 
+	  * @param  : Asset Comment properties
+	  *----------------------------------------------------------*/
+	def resolveComments ( def commentCode, def loginUser, def query ) {
+		def assetComment = AssetComment.find(query, ["issue", 0, commentCode])
+		if( assetComment ) {
+			assetComment?.isResolved = 1
+			assetComment?.resolvedBy = loginUser.person	
+			assetComment?.dateResolved = new Date()
+			assetComment?.save()
+		}	 
 	}
     /*------------------------------------------------------------
 	 * @author : Mallikarjun 

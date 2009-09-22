@@ -10,6 +10,16 @@
 <script type="text/javascript">
 SimpleContextMenu.setup({'preventDefault':true, 'preventForms':false});
 SimpleContextMenu.attach('container', 'myMenu');
+
+window.onbeforeunload = validExit;
+
+function validExit() {
+	var mustSave = document.auditForm.mustSave.value;
+	if(mustSave == 'true') {
+		return "You have unsaved changes that will be lost. Are you sure you want to do this?";
+	}
+}
+
 function createXMLHttpRequest(){
 	try {
 	    return new ActiveXObject("Msxml2.XMLHTTP");
@@ -98,6 +108,7 @@ var mustSave = false;
 function setMustSave( changed, actual, type, attribute ){
 	if( changed != actual ) {
 		mustSave = true;
+		document.auditForm.mustSave.value = mustSave;
 		getObject("front1CompleteId").style.backgroundColor = 'green';
 		getObject("front1CompleteId").style.color = '#FFF';
 		getObject("front1SaveId").style.backgroundColor = 'green'
@@ -240,6 +251,7 @@ function checkComments(type) {
 		<input type="hidden" name="room" value="${room}">
 		<input type="hidden" name="rack" value="${rack}">
 		<input type="hidden" name="generalComment" id="generalCommentId" value="Asset changed: ">
+		<input type="hidden" id="mustSave" name="mustSave" value=""/>
 		<div style="FLOAT: left"><a class=button href="startMenu">Start Over</a></div>
 		<div style="FLOAT: right"><a class=button href="selectAsset?moveBundle=${moveBundle}&location=${location}&room=${room}&rack=${rack}">Asset List</a></div>
 		<table>
@@ -268,8 +280,8 @@ function checkComments(type) {
 			</span>
 			<div style="MARGIN-TOP: 10px">
 				<div class=thefield align=center>
-					<a class="button" id="mainSaveId" href="#select_asset" onClick="document.auditForm.submitType.value='save';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
-			        <a class="button" id="mainCompleteId" href="#select_asset"  onClick="document.auditForm.submitType.value='complete';document.auditForm.submit();">Completed</a>
+					<a class="button" id="mainSaveId" href="#select_asset" onClick="document.auditForm.submitType.value='save';document.auditForm.mustSave.value='false';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
+			        <a class="button" id="mainCompleteId" href="#select_asset"  onClick="document.auditForm.submitType.value='complete';document.auditForm.mustSave.value='false';document.auditForm.submit();">Completed</a>
 				</div>
 			</div>
 		</div>
@@ -358,8 +370,8 @@ function checkComments(type) {
 			<div style="margin-top:10px;">
 			   <div class="thefield" align="center">
 			      <a class="button" href="#asset_front2">Next</a>&nbsp;&nbsp;&nbsp;
-			      <a class="button" href="#select_asset" id="front1SaveId" onClick="document.auditForm.submitType.value='save';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
-			      <a class="button" href="#select_asset" id="front1CompleteId" onClick="document.auditForm.submitType.value='complete';document.auditForm.submit();">Completed</a>
+			      <a class="button" href="#select_asset" id="front1SaveId" onClick="document.auditForm.submitType.value='save';document.auditForm.mustSave.value='false';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
+			      <a class="button" href="#select_asset" id="front1CompleteId" onClick="document.auditForm.submitType.value='complete';document.auditForm.mustSave.value='false';document.auditForm.submit();">Completed</a>
 			   </div>
 			</div>
 			
@@ -408,7 +420,7 @@ function checkComments(type) {
 				<td class="field">
 					<input type="radio" name="needAssetTag" id="needAssetTagYes" value="Y" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)"><label for="needAssetTagYes">Yes</label>
 					&nbsp;&nbsp;
-					<input type="radio" name="needAssetTag" id="needAssetTagNo" value="N" onchange="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" checked><label for="needAssetTagNo">No</label>
+					<input type="radio" name="needAssetTag" id="needAssetTagNo" value="N" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" checked><label for="needAssetTagNo">No</label>
 				</td>
 			</tr>
 			<tr>
@@ -416,7 +428,7 @@ function checkComments(type) {
 				<td class="field">
 					<input type="radio" name="hasAmber" id="hasAmberYes" value="Y" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" checked><label for="hasAmberYes">Yes</label>
 					&nbsp;&nbsp;
-					<input type="radio" name="hasAmber" id="hasAmberNo" value="N" onchange="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" checked><label for="hasAmberNo">No</label>
+					<input type="radio" name="hasAmber" id="hasAmberNo" value="N" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" checked><label for="hasAmberNo">No</label>
 				</td>
 			</tr>
 			<tr>
@@ -424,7 +436,7 @@ function checkComments(type) {
 				<td class="field">
 					<input type="radio" name="stuffOnTop" id="stuffOnTopYes" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" value="Y"><label for="stuffOnTopYes">Yes</label>
 					&nbsp;&nbsp;
-					<input type="radio" name="stuffOnTop" id="stuffOnTopNo" onchange="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" value="N" checked><label for="stuffOnTopNo">No</label>
+					<input type="radio" name="stuffOnTop" id="stuffOnTopNo" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" value="N" checked><label for="stuffOnTopNo">No</label>
 				</td>
 			</tr>
 			<tr>
@@ -432,7 +444,7 @@ function checkComments(type) {
 				<td class="field">
 					<input type="radio" name="poweredOff" id="poweredOffYes" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" value="Y" ><label for="poweredOffYes">Yes</label>
 					&nbsp;&nbsp;
-					<input type="radio" name="poweredOff" id="poweredOffNo" onchange="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" value="N" checked><label for="poweredOffNo">No</label>
+					<input type="radio" name="poweredOff" id="poweredOffNo" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" value="N" checked><label for="poweredOffNo">No</label>
 				</td>
 			</tr>
 			</table>
@@ -441,8 +453,8 @@ function checkComments(type) {
 			   <div class="thefield" align="center">
 			      <a class="button" href="#asset_rear1">Next</a>&nbsp;&nbsp;
 			      <a class="button" href="#asset_front1">Back</a>&nbsp;&nbsp;
-			      <a class="button" href="#select_asset" id="front2SaveId"  onClick="document.auditForm.submitType.value='save';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
-			      <a class="button" href="#select_asset"  id="front2CompleteId" onClick="document.auditForm.submitType.value='complete';document.auditForm.submit();">Completed</a>
+			      <a class="button" href="#select_asset" id="front2SaveId"  onClick="document.auditForm.submitType.value='save';document.auditForm.mustSave.value='false';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
+			      <a class="button" href="#select_asset"  id="front2CompleteId" onClick="document.auditForm.submitType.value='complete';document.auditForm.mustSave.value='false';document.auditForm.submit();">Completed</a>
 			   </div>
 			</div>
 			
@@ -531,7 +543,7 @@ function checkComments(type) {
 		        <td class="field">
 		                <input type="radio" name="moveCables" id="moveCablesYes" onclick="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)" value="Y"><label for="moveCablesYes">Yes</label>
 		                &nbsp;&nbsp;
-		                <input type="radio" name="moveCables" id="moveCablesNo" value="N" onchange="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)" checked><label for="moveCablesNo">No</label>
+		                <input type="radio" name="moveCables" id="moveCablesNo" value="N" onclick="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)" checked><label for="moveCablesNo">No</label>
 		        </td>
 		</tr>
 		</table>      
@@ -539,8 +551,8 @@ function checkComments(type) {
 		<div style="margin-top:20px;">
 		   <div class="thefield" align="center">
 		      <a class="button" href="#asset_front2">Back</a>&nbsp;&nbsp;
-		      <a class="button" href="#select_asset" id="rearSaveId" onClick="document.auditForm.submitType.value='save';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
-			  <a class="button" href="#select_asset" id="rearCompleteId" onClick="document.auditForm.submitType.value='complete';document.auditForm.submit();">Completed</a>
+		      <a class="button" href="#select_asset" id="rearSaveId" onClick="document.auditForm.submitType.value='save';document.auditForm.mustSave.value='false';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
+			  <a class="button" href="#select_asset" id="rearCompleteId" onClick="document.auditForm.submitType.value='complete';document.auditForm.mustSave.value='false';document.auditForm.submit();">Completed</a>
 		   </div>
 		</div>
 		
