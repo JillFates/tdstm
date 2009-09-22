@@ -315,9 +315,14 @@ class WalkThroughController {
 		def principal = SecurityUtils.subject.principal
 		def loginUser = UserLogin.findByUsername ( principal )
 		def type = params.type
+		def auditType = getSession().getAttribute("AUDIT_TYPE")
 		def assetComment
 		def assetEntity = AssetEntity.findById( params.id )
 		if(assetEntity){
+			def stateTo = "SourceWalkthru"
+			if(auditType != "source"){
+				stateTo = "TargetWalkthru"
+			}
 			if(type != 'create'){
 				assetComment = AssetComment.find("from AssetComment where assetEntity = ${assetEntity.id} and commentType = ? and isResolved = ? and commentCode = ?" ,['issue',0,'ASSET_MISSING'])
 				assetComment?.isResolved = 1
@@ -325,6 +330,7 @@ class WalkThroughController {
 				assetComment?.save()
 			} else {
 				assetComment = new AssetComment(commentType:'issue', assetEntity:assetEntity, isResolved:0, commentCode:'ASSET_MISSING', category:'walkthru', createdBy:loginUser.person ).save()
+				def transactionStatus = workflowService.createTransition(assetEntity.project.workflowCode,"SUPERVISOR", stateTo, assetEntity, assetEntity.moveBundle, loginUser, null, "" )
 			}
 		}
 		def message = "success"
