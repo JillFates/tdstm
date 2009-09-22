@@ -1,7 +1,6 @@
 <html>
 <head>
 <title>Walkthru&gt; Select Asset</title>
-<g:javascript library="prototype" />
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'contextmenu.css')}" />
@@ -11,21 +10,46 @@
 <script type="text/javascript">
 SimpleContextMenu.setup({'preventDefault':true, 'preventForms':false});
 SimpleContextMenu.attach('container', 'myMenu');
-
-  function filterByCommentType(val) {
+function createXMLHttpRequest(){
+	try {
+	    return new ActiveXObject("Msxml2.XMLHTTP");
+	} catch (err1) {
+	    try {
+	        return new ActiveXObject("Microsoft.XMLHTTP");
+	    } catch (err2){
+		    try{
+			    return new XMLHttpRequest();
+		    } catch(err3){
+		        alert("XMLHttpRequest not supported")
+		        return null
+	    	}
+	    }
+	}
+}
+function filterByCommentType(val) {
 	document.commentsViewForm.selectCmt.value = val;
 	document.commentsViewForm.sort.value = 'desc';
 	document.commentsViewForm.orderType.value = 'comment';
-	${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.selectCmt.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')};
+	var assetId = document.commentForm.assetId.value;
+	var commentType = document.commentsViewForm.selectCmt.value;
+	var sort = document.commentsViewForm.sort.value;
+	var orderType = document.commentsViewForm.orderType.value;
+	sendCommentRequest()
+	<%--${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.selectCmt.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')}; --%>
 	return false;	
   }
 function missingAsset( type, id, message ){
 	if(confirm(message)){
-		${remoteFunction(action:'missingAsset', params:'\'id=\' + id +\'&type=\'+type', onComplete:'updateMissingAsset(e,type,id)')}
+		var xmlHttpReq = createXMLHttpRequest()
+		xmlHttpReq.open("post", "missingAsset?id="+id+"&type="+type, false);
+		xmlHttpReq.send(null);
+		var serverResponse = xmlHttpReq.responseText;
+		updateMissingAsset(xmlHttpReq,type,id)
+		<%--${remoteFunction(action:'missingAsset', params:'\'id=\' + id +\'&type=\'+type', onComplete:'updateMissingAsset(e,type,id)')} --%>
 	}
 }
 function updateMissingAsset( e, type, id ){
-	if(e.responseText = "success"){
+	if(e.responseText == "success"){
 		var link = "<a href='#' class='button big' onclick=\"missingAsset";
 		if(type == 'create'){
 			link +="('resolve','"+id+"', 'Resolve missing asset issue. Are you sure?')\">Missing Asset Found </a>";
@@ -46,7 +70,14 @@ function commentSelect( cmtVal ) {
 function callUpdateComment( e, type ) {
 	var data = eval('(' + e.responseText + ')');
 	if ( data ) {
-		${remoteFunction(action:'saveComment', params:'\'id=\' + document.commentForm.assetId.value +\'&comment=\'+escape(document.commentForm.comments.value) +\'&commentType=\'+type', onComplete:'callAssetMenu()')};
+		var assetId = document.commentForm.assetId.value;
+		var comment = escape(document.commentForm.comments.value);
+		var xmlHttpReq = createXMLHttpRequest()
+		xmlHttpReq.open("post", "saveComment?id="+assetId+"&comment="+comment+"&commentType="+type, false);
+		xmlHttpReq.send(null);
+		var serverResponse = xmlHttpReq.responseText;
+		callAssetMenu()
+		<%-- ${remoteFunction(action:'saveComment', params:'\'id=\' + document.commentForm.assetId.value +\'&comment=\'+escape(document.commentForm.comments.value) +\'&commentType=\'+type', onComplete:'callAssetMenu()')}; --%>
 		return true;
 	} else {
 		alert( type +" already exists. " );
@@ -125,7 +156,13 @@ function populateComments() {
 	document.commentsViewForm.selectCmt.value = 'all';
 	document.commentsViewForm.sort.value = 'desc';
 	document.commentsViewForm.orderType.value = 'commentType';
-	${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value+\'&commentType=\'+document.commentsViewForm.selectCmt.value+\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')};
+	var assetId = document.commentForm.assetId.value;
+	var commentType = document.commentsViewForm.selectCmt.value;
+	var sort = document.commentsViewForm.sort.value;
+	var orderType = document.commentsViewForm.orderType.value;
+	sendCommentRequest()
+	<%--${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.selectCmt.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')}; --%>
+	
 }
 
 function updateViewComment( e ) {
@@ -143,12 +180,14 @@ function sortCommentList(orderType) {
 	} else {
 		document.commentsViewForm.sort.value = 'desc';
 	}
-	${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.selectCmt.value+\'&sort=\'+document.commentsViewForm.sort.value+\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')};
+	sendCommentRequest()
+	<%--${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.selectCmt.value+\'&sort=\'+document.commentsViewForm.sort.value+\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')}; --%>
 }
+<%--
 function getModels(){
 	var manufacturer = document.auditForm.manufacturerId.value
 	var device = document.auditForm.kvmDeviceId.value
-	${remoteFunction(action:'getModels', params:'\'manufacturer=\' + manufacturer +\'&device=\'+device ', onComplete:'updateModels( e )')};
+	//${remoteFunction(action:'getModels', params:'\'manufacturer=\' + manufacturer +\'&device=\'+device ', onComplete:'updateModels( e )')};
 }
 function updateModels( e ){
 	var models = eval('(' + e.responseText + ')');
@@ -166,6 +205,27 @@ function updateModels( e ){
 	} else {
 		document.auditForm.modelTdId.innerHtml = "<input type=\"text\" name=\"model\" id=\"modelId\" >"
 	}
+} --%>
+function sendCommentRequest(){
+	var assetId = document.commentForm.assetId.value;
+	var commentType = document.commentsViewForm.selectCmt.value;
+	var sort = document.commentsViewForm.sort.value;
+	var orderType = document.commentsViewForm.orderType.value;
+	var xmlHttpReq = createXMLHttpRequest()
+	xmlHttpReq.open("post", "getComments?id="+assetId+"&commentType="+commentType+"&sort="+sort+"&orderType="+orderType, false);
+	xmlHttpReq.send(null);
+	var serverResponse = xmlHttpReq.responseText;
+	updateViewComment( xmlHttpReq )
+}
+function checkComments(type) {
+	var assetId = document.commentForm.assetId.value;
+	var comment = escape(document.commentForm.comments.value);
+	var xmlHttpReq = createXMLHttpRequest()
+	xmlHttpReq.open("post", "validateComments?id="+assetId+"&comment="+comment+"&commentType="+type, false);
+	xmlHttpReq.send(null);
+	var serverResponse = xmlHttpReq.responseText;
+	callUpdateComment( xmlHttpReq, type)
+	<%--${remoteFunction(action:'validateComments', params:'\'id=\' + document.commentForm.assetId.value +\'&comment=\'+escape(document.commentForm.comments.value) +\'&commentType=\'+document.commentForm.commentType.value', onComplete:'callUpdateComment( e, \'comment\' )')} --%>
 }
 </script>
 </head>
@@ -252,7 +312,7 @@ function updateModels( e ){
 				<!--  <refcode:select domain="kvmDevice" noSelection="['':'']" id="kvmDeviceId" name="kvmDevice" value="${assetEntity?.kvmDevice}" 
 						onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name);getModels()"/>-->
 						<input type="text" value="${assetEntity?.kvmDevice}" id="kvmDeviceId" name="kvmDevice" 
-								onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name);getModels()">
+								onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name);">
 			</tr>
 			
 			<tr>
@@ -261,11 +321,11 @@ function updateModels( e ){
 				<g:if test="${Manufacturer.list()}">
 				<!--  <g:select name="manufacturer" from="${Manufacturer.list()}" value="${assetEntity?.manufacturer}" id="manufacturerId" 
 					noSelection="['':'']"  onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name);getModels();"/> -->
-					<input type="text" name="manufacturer" id="manufacturerId" value="${assetEntity?.manufacturer}" onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name);getModels();">
+					<input type="text" name="manufacturer" id="manufacturerId" value="${assetEntity?.manufacturer}" onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name);">
 					</input>
 				</g:if>
 				<g:else>
-				<input type="text" name="manufacturer" id="manufacturerId" value="${assetEntity?.manufacturer}" onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name);getModels();">
+				<input type="text" name="manufacturer" id="manufacturerId" value="${assetEntity?.manufacturer}" onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name);">
 				</g:else>
 				</td>
 			</tr>
@@ -526,9 +586,9 @@ function updateModels( e ){
 			<label>Save As:</label>
 			<br />
 			<div style="float:center;">
-			   	<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm)${remoteFunction(action:'validateComments', params:'\'id=\' + document.commentForm.assetId.value +\'&comment=\'+escape(document.commentForm.comments.value) +\'&commentType=\'+document.commentForm.commentType.value', onComplete:'callUpdateComment( e, \'comment\' )')}">COMMENT</a>&nbsp;&nbsp;
-				<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm)${remoteFunction(action:'validateComments', params:'\'id=\' + document.commentForm.assetId.value +\'&comment=\'+escape(document.commentForm.comments.value) +\'&commentType=\'+document.commentForm.value', onComplete:'callUpdateComment( e, \'instruction\' )')}">INSTRUCTION</a>&nbsp;&nbsp;
-				<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm)${remoteFunction(action:'validateComments', params:'\'id=\' + document.commentForm.assetId.value +\'&comment=\'+escape(document.commentForm.comments.value) +\'&commentType=\'+document.commentForm.issueType.value', onComplete:'callUpdateComment( e, \'issue\' )')}">ISSUE</a>
+			   	<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm) checkComments('comment');">COMMENT</a>&nbsp;&nbsp;
+				<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm) checkComments('instruction');">INSTRUCTION</a>&nbsp;&nbsp;
+				<a class="button"  href="#comments" onclick="var booConfirm = validateCommentSelect();if(booConfirm) checkComments('issue');">ISSUE</a>
 			</div>
 			<br class="clear"/>
 			
