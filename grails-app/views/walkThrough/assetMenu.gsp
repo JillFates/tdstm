@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Walkthru&gt; Select Asset</title>
+<title>Walkthru&gt; Asset Menu</title>
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'contextmenu.css')}" />
@@ -193,6 +193,9 @@ function populateComments() {
 		sendCommentRequest() --%>
 		document.commentsViewForm.action = "getComments"
 		document.commentsViewForm.submit()
+		return true
+	} else {
+		return false
 	}
 	<%--${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.commentType.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')}; --%>
 	
@@ -295,7 +298,7 @@ function checkComments(type) {
 		<div style="MARGIN-TOP: 15px" align=center>
 			<a class="button big" href="#asset_front1">Front Audit</a> <BR style="MARGIN-TOP: 6px">
 			<a class="button big" href="#asset_rear1">Rear Audit</a> <BR style="MARGIN-TOP: 6px">
-			<a class="button big"  onclick="populateComments();">Issues/Comments</a> <BR style="MARGIN-TOP: 6px">
+			<a class="button big" href="#" onclick="return populateComments();">Issues/Comments</a> <BR style="MARGIN-TOP: 6px">
 			<span id="missingAsset" >
 				<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id +' and commentType = ? and isResolved = ? and commentCode = ?' ,['issue',0,'ASSET_MISSING'])}">
 					<input name="type" value="resolve" type="hidden"/>
@@ -644,7 +647,7 @@ function checkComments(type) {
 			
 			<br />
 			
-			<a class="button" href="#view_comments" onclick="populateComments();">View Issues &amp; Comments</a>
+			<a class="button" href="#view_comments" onclick="return populateComments();">View Issues &amp; Comments</a>
 		</g:form>
 		</div>
 		</div>
