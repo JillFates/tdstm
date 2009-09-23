@@ -607,7 +607,7 @@ function checkComments(type) {
 		<div style="FLOAT: left"><a class=button href="startMenu">Start Over</a></div>
 		<div style="float:right;"><a class="button" href="#asset_menu">Asset Menu</a></div>
 		<br class="clear"/>
-		<g:form name="commentForm" action="saveComment" method="post">	
+		<g:form name="commentForm" action="saveComment" method="get">	
 			<table>
 			<tr>
 				<input type="hidden" name="assetId" id="assetId" value="${assetEntity.id}" />
@@ -663,7 +663,7 @@ function checkComments(type) {
 		<div style="FLOAT: left"><a class=button href="#asset_menu">Asset Menu</a></div>
 		<div style="float:right;"><a class="button" href="#comments">Add Comments</a></div>
 		<br class="clear"/>
-		<g:form action="issuesandcommentsview" name="commentsViewForm" method="post">
+		<g:form action="issuesandcommentsview" name="commentsViewForm" method="get">
 		<input type="hidden" name="commentType" id="commentType" value="${commentType}"/>
 		<input type="hidden" name="sort" id="sort" value="${sort}"/>
 		<input type="hidden" name="orderType" id="orderType" value="commentType"/>
