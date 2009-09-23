@@ -44,15 +44,17 @@ function createXMLHttpRequest(){
 	}
 }
 function filterByCommentType(val) {
-	document.commentsViewForm.selectCmt.value = val;
+	document.commentsViewForm.commentType.value = val;
 	document.commentsViewForm.sort.value = 'desc';
 	document.commentsViewForm.orderType.value = 'comment';
-	var assetId = document.commentForm.assetId.value;
-	var commentType = document.commentsViewForm.selectCmt.value;
+	document.commentsViewForm.action = "getComments"
+	document.commentsViewForm.submit()
+	<%--var assetId = document.commentForm.assetId.value;
+	var commentType = document.commentsViewForm.commentType.value;
 	var sort = document.commentsViewForm.sort.value;
 	var orderType = document.commentsViewForm.orderType.value;
 	sendCommentRequest()
-	<%--${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.selectCmt.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')}; --%>
+	${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.commentType.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')}; --%>
 	return false;	
   }
 function missingAsset( type, id, message ){
@@ -180,16 +182,18 @@ function callAssetMenu() {
 function populateComments() {
 	if(validChanges() == true ) {
 		document.auditForm.mustSave.value = 'false'
-		document.commentsViewForm.selectCmt.value = 'all';
+		document.commentsViewForm.commentType.value = 'all';
 		document.commentsViewForm.sort.value = 'desc';
 		document.commentsViewForm.orderType.value = 'commentType';
-		var assetId = document.commentForm.assetId.value;
-		var commentType = document.commentsViewForm.selectCmt.value;
+		<%--var assetId = document.commentForm.assetId.value;
+		var commentType = document.commentsViewForm.commentType.value;
 		var sort = document.commentsViewForm.sort.value;
 		var orderType = document.commentsViewForm.orderType.value;
-		sendCommentRequest()
+		sendCommentRequest() --%>
+		document.commentsViewForm.action = "getComments"
+		document.commentsViewForm.submit()
 	}
-	<%--${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.selectCmt.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')}; --%>
+	<%--${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.commentType.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')}; --%>
 	
 }
 
@@ -208,8 +212,10 @@ function sortCommentList(orderType) {
 	} else {
 		document.commentsViewForm.sort.value = 'desc';
 	}
-	sendCommentRequest()
-	<%--${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.selectCmt.value+\'&sort=\'+document.commentsViewForm.sort.value+\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')}; --%>
+	document.commentsViewForm.action = "getComments"
+	document.commentsViewForm.submit()
+	//sendCommentRequest()
+	<%--${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.commentType.value+\'&sort=\'+document.commentsViewForm.sort.value+\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')}; --%>
 }
 <%--
 function getModels(){
@@ -236,7 +242,7 @@ function updateModels( e ){
 } --%>
 function sendCommentRequest(){
 	var assetId = document.commentForm.assetId.value;
-	var commentType = document.commentsViewForm.selectCmt.value;
+	var commentType = document.commentsViewForm.commentType.value;
 	var sort = document.commentsViewForm.sort.value;
 	var orderType = document.commentsViewForm.orderType.value;
 	var xmlHttpReq = createXMLHttpRequest()
@@ -591,10 +597,11 @@ function checkComments(type) {
 		<div style="FLOAT: left"><a class=button href="startMenu">Start Over</a></div>
 		<div style="float:right;"><a class="button" href="#asset_menu">Asset Menu</a></div>
 		<br class="clear"/>
-		<g:form name="commentForm" action="saveComment">	
+		<g:form name="commentForm" action="saveComment" method="post">	
 			<table>
 			<tr>
 				<input type="hidden" name="assetId" id="assetId" value="${assetEntity.id}" />
+				<input type="hidden" name="id" value="${assetEntity.id}" />
 				<input type="hidden" name="commentType" id="commentType" value="comment" />
 				<input type="hidden" name="instructionType" id="instructionType" value="instruction" />
 				<input type="hidden" name="issueType" id="issueType" value="issue" />
@@ -646,10 +653,15 @@ function checkComments(type) {
 		<div style="FLOAT: left"><a class=button href="#asset_menu">Asset Menu</a></div>
 		<div style="float:right;"><a class="button" href="#comments">Add Comments</a></div>
 		<br class="clear"/>
-		<g:form action="issuesandcommentsview" name="commentsViewForm">
-		<input type="hidden" name="selectCmt" id="selectCmt" value="all"/>
-		<input type="hidden" name="sort" id="sort" value"desc"/>
-		<input type="hidden" name="orderType" id="orderType" value"commentType"/>
+		<g:form action="issuesandcommentsview" name="commentsViewForm" method="post">
+		<input type="hidden" name="commentType" id="commentType" value="all"/>
+		<input type="hidden" name="sort" id="sort" value="${sort}"/>
+		<input type="hidden" name="orderType" id="orderType" value="commentType"/>
+		<input type="hidden" name="id" value="${assetEntity.id}" />
+		<input type="hidden" name="room" value="${room}">
+		<input type="hidden" name="rack" value="${rack}">
+		<input type="hidden" name="location" value="${location}">
+		<input type="hidden" name="moveBundle" value="${moveBundle}">
 		<table>
 		
 			<tr>
@@ -658,27 +670,32 @@ function checkComments(type) {
 				<th>Rsvld</th>
 			</tr>
 		<tbody id="listCommentsTbodyId">
-			<g:each in="${AssetComment.findAll('from AssetComment where assetEntity = '+ assetEntity?.id +' order by commentType')}" status="i" var="assetCommentsInstance">
-				<g:if test="${assetCommentsInstance.commentType == 'issue'}">
-				<tr class="comment_font"><td>Iss</td><td>${assetCommentsInstance.comment}</td><td>
-					<g:if test="${assetCommentsInstance.isResolved == 1}">
-						<input type="checkbox" checked disabled/><br/>
+			<g:if test="${commentListView}">
+				${commentListView}
+			</g:if>
+			<g:else>
+				<g:each in="${AssetComment.findAll('from AssetComment where assetEntity = '+ assetEntity?.id +' order by commentType')}" status="i" var="assetCommentsInstance">
+					<g:if test="${assetCommentsInstance.commentType == 'issue'}">
+					<tr class="comment_font"><td>Iss</td><td>${assetCommentsInstance.comment}</td><td>
+						<g:if test="${assetCommentsInstance.isResolved == 1}">
+							<input type="checkbox" checked disabled/><br/>
+						</g:if>
+						<g:else>
+							<input type="checkbox" disabled/><br/>
+						</g:else>
+					</td></tr>
 					</g:if>
+					<g:elseif test="${assetCommentsInstance.commentType == 'comment'}">
+						<tr class="comment_font"><td>Cmnt</td><td>${assetCommentsInstance.comment}</td><td>&nbsp;</td></tr>
+					</g:elseif>
+					<g:elseif test="${assetCommentsInstance.commentType == 'instruction'}">
+						<tr class="comment_font"><td>Inst</td><td>${assetCommentsInstance.comment}</td><td>&nbsp;</td></tr>
+					</g:elseif>
 					<g:else>
-						<input type="checkbox" disabled/><br/>
+						<tr class="comment_font"><td colSpan="3" align="center" class="norecords_display">No records found</td></tr>
 					</g:else>
-				</td></tr>
-				</g:if>
-				<g:elseif test="${assetCommentsInstance.commentType == 'comment'}">
-					<tr class="comment_font"><td>Cmnt</td><td>${assetCommentsInstance.comment}</td><td>&nbsp;</td></tr>
-				</g:elseif>
-				<g:elseif test="${assetCommentsInstance.commentType == 'instruction'}">
-					<tr class="comment_font"><td>Inst</td><td>${assetCommentsInstance.comment}</td><td>&nbsp;</td></tr>
-				</g:elseif>
-				<g:else>
-					<tr class="comment_font"><td colSpan="3" align="center" class="norecords_display">No records found</td></tr>
-				</g:else>
-			</g:each>		
+				</g:each>
+			</g:else>	
 		</tbody>
 		</table>
 		</g:form>

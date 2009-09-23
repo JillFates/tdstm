@@ -297,12 +297,7 @@ class WalkThroughController {
 		for ( int i=1; i<=walkthruCommentsCount; i++ ) {
 			walkthruComments << message ( code: "walkthru.defComment.${i}" )
 		}
-		def query = "from AssetComment where assetEntity = ${assetEntity.id} and commentType = ? and isResolved = ? and commentCode = ?"
-		def commentCodes = [needAssetTag : AssetComment.find(query,["issue", 0, "NEED_ASSET_TAG"])?.commentCode,
-		                    amberLights : AssetComment.find(query,["issue", 0, "AMBER_LIGHTS"])?.commentCode,
-		                    stackedOnTop : AssetComment.find(query,["issue", 0, "STACKED_ON_TOP"])?.commentCode,
-		                    poweredOff : AssetComment.find(query,["issue", 0, "POWERED_OFF"])?.commentCode,
-		                    cablesMoved : AssetComment.find(query,["issue", 0, "NEED_CABLES_MOVED"])?.commentCode]
+		def commentCodes = walkThroughCodes( assetEntity )
 		render(view:'assetMenu', model:[ moveBundle:params.moveBundle, location:params.location, room:params.room,
 		                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
 	}
@@ -509,12 +504,7 @@ class WalkThroughController {
 		for ( int i=1; i<=walkthruCommentsCount; i++ ) {
 			walkthruComments << message ( code: "walkthru.defComment.${i}" )
 		}
-		def query = "from AssetComment where assetEntity = ${assetEntity.id} and commentType = ? and isResolved = ? and commentCode = ?"
-		def commentCodes = [needAssetTag : AssetComment.find(query,["issue", 0, "NEED_ASSET_TAG"])?.commentCode,
-		                    amberLights : AssetComment.find(query,["issue", 0, "AMBER_LIGHTS"])?.commentCode,
-		                    stackedOnTop : AssetComment.find(query,["issue", 0, "STACKED_ON_TOP"])?.commentCode,
-		                    poweredOff : AssetComment.find(query,["issue", 0, "POWERED_OFF"])?.commentCode,
-		                    cablesMoved : AssetComment.find(query,["issue", 0, "NEED_CABLES_MOVED"])?.commentCode]
+		def commentCodes = walkThroughCodes( assetEntity )
 		render(view:'assetMenu', model:[ moveBundle:params.moveBundle, location:params.location, room:params.room,  viewType:'view_comments',
 		                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
 	 }
@@ -555,6 +545,27 @@ class WalkThroughController {
 		} else {
 			commentListView.append("<TR class='comment_font'><TD colSpan='3' align='center' class='norecords_display'>No records found</TD></TR>")
 		}
-			render commentListView.toString()
+		def walkthruComments = []
+		def walkthruCommentsCount = Integer.parseInt(message ( code: "walkthru.defComment.count" ))
+		for ( int i=1; i<=walkthruCommentsCount; i++ ) {
+			walkthruComments << message ( code: "walkthru.defComment.${i}" )
+		}
+		def commentCodes = walkThroughCodes( assetEntity )
+		render(view:'assetMenu', model:[ moveBundle:params.moveBundle, location:params.location, room:params.room,  
+		                                 viewType:'view_comments', commentListView : commentListView, sort : params.sort,
+			                             rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
 	}
+    /*-------------------------------------------------------
+     * @author : Lokanath Reddy 
+     * @param  : assetEntity
+     * @return : Will return commentCodes
+     *------------------------------------------------------*/
+    def walkThroughCodes(def assetEntity){
+    	def query = "from AssetComment where assetEntity = ${assetEntity.id} and commentType = ? and isResolved = ? and commentCode = ?"
+    	def commentCodes = [needAssetTag : AssetComment.find(query,["issue", 0, "NEED_ASSET_TAG"])?.commentCode,
+    						amberLights : AssetComment.find(query,["issue", 0, "AMBER_LIGHTS"])?.commentCode,
+    		                stackedOnTop : AssetComment.find(query,["issue", 0, "STACKED_ON_TOP"])?.commentCode,
+    		                poweredOff : AssetComment.find(query,["issue", 0, "POWERED_OFF"])?.commentCode,
+    		                cablesMoved : AssetComment.find(query,["issue", 0, "NEED_CABLES_MOVED"])?.commentCode]
+    }
 }
