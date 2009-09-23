@@ -439,7 +439,7 @@ function checkComments(type) {
 			</tr>
 			<tr>
 				<td class="label">Source Rack:</td>
-				<td class="field"><input type="text" name="sourceRack" value="${assetEntity?.sourceRack}"/></td>
+				<td class="field"><input type="text" name="sourceRack" value="${assetEntity?.sourceRack}" size="8" maxsize="50"/></td>
 			</tr>
 			
 			<tr>
