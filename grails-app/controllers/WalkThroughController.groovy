@@ -510,7 +510,7 @@ class WalkThroughController {
 			walkthruComments << message ( code: "walkthru.defComment.${i}" )
 		}
 		def commentCodes = walkThroughCodes( assetEntity )
-		render(view:'assetMenu', model:[ moveBundle:params.moveBundle, location:params.location, room:params.room,  viewType:'view_comments',
+		render(view:'assetMenu', model:[ moveBundle:params.moveBundle, location:params.location, room:params.room,  viewType:'view_comments', commentType : 'all',
 		                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
 	 }
 	

@@ -353,10 +353,10 @@ function checkComments(type) {
 				<td class="label">Device Type:</td>
 				<td class="field">
 				
-				<!-- <g:select from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('assetType'))?.value}" noSelection="['':'Select']" id="kvmDeviceId" name="kvmDevice" value="${assetEntity?.kvmDevice}" 
-						onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name);"/> -->
-					<input type="text" value="${assetEntity?.kvmDevice}" id="kvmDeviceId" name="kvmDevice" 
-								onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name);">
+				 <g:select from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('assetType'))?.value}" noSelection="['':'Undefined']" id="kvmDeviceId" name="assetType" value="${assetEntity?.assetType}" 
+						onchange="setMustSave(this.value,'${assetEntity?.assetType}','front1', this.name);"/>
+					<!--<input type="text" value="${assetEntity?.kvmDevice}" id="kvmDeviceId" name="kvmDevice" 
+								onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name);"> -->
 			</tr>
 			
 			<tr>
@@ -391,9 +391,9 @@ function checkComments(type) {
 			<tr>
 				<td class="label">Rails:</td>
 				<td class="field">
-				 <!-- <refcode:select domain="railType" noSelection="['':'']" id="railTypeId" name="railType" value="${assetEntity?.railType}" 
-				onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)"/> -->
-				<input type="text" name="railType" value="${assetEntity?.railType}" id="railTypeId" onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)" >
+				 <g:select noSelection="['':'Undefined']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('railType'))?.value}" id="railTypeId" name="railType" value="${assetEntity?.railType}" 
+				 onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)"/> 
+				<!-- <input type="text" name="railType" value="${assetEntity?.railType}" id="railTypeId" onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)" >-->
 				</input>
 				</td>
 			</tr>
@@ -522,9 +522,9 @@ function checkComments(type) {
 			<g:select name="powerPort" from="${[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,24,32,40,48,56,64,72,80,88,96]}" value="${assetEntity?.powerPort}"
 				onchange="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)"/>
 			&nbsp;&nbsp;
-				<!-- <refcode:select domain="powerType" noSelection="['':'Unknown']" id="powerType" name="powerType" value="${assetEntity?.powerType}" 
-				onchange="setMustSave(this.value,'${assetEntity?.powerType}','rear', this.name)"/> -->
-				<input type="text" id="powerType" name="powerType" value="${assetEntity?.powerType}" onchange="setMustSave(this.value,'${assetEntity?.powerType}','rear', this.name)" ></input>
+				 <g:select  noSelection="['':'Undefined']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('powerType'))?.value}" id="powerType" name="powerType" value="${assetEntity?.powerType}" 
+				onchange="setMustSave(this.value,'${assetEntity?.powerType}','rear', this.name)" />
+				<!--  <input type="text" id="powerType" name="powerType" value="${assetEntity?.powerType}" onchange="setMustSave(this.value,'${assetEntity?.powerType}','rear', this.name)" ></input> -->
 				
 			</td>
 		</tr>
@@ -545,9 +545,9 @@ function checkComments(type) {
 				<g:select name="hbaPort" from="${[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,24,32,40,48,56,64,72,80,88,96]}" value="${assetEntity?.hbaPort}"
 						onchange="setMustSave(this.value,'${assetEntity?.hbaPort}','rear', this.name)"/>
 		        &nbsp;&nbsp;
-			<!-- <refcode:select domain="fiberCabinet" noSelection="['':'']" id="fiberCabinet" name="fiberCabinet" value="${assetEntity?.fiberCabinet}" 
-				onchange="setMustSave(this.value,'${assetEntity?.fiberCabinet}','rear', this.name)"/> -->
-				<input type="text" id="fiberCabinet" name="fiberCabinet" value="${assetEntity?.fiberCabinet}" onchange="setMustSave(this.value,'${assetEntity?.fiberCabinet}','rear', this.name)" ></input>
+			<g:select noSelection="['':'Undefined']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('fiberCabinet'))?.value}" id="fiberCabinet" name="fiberCabinet" value="${assetEntity?.fiberCabinet}" 
+				onchange="setMustSave(this.value,'${assetEntity?.fiberCabinet}','rear', this.name)"/>
+					<!--  <input type="text" id="fiberCabinet" name="fiberCabinet" value="${assetEntity?.fiberCabinet}" onchange="setMustSave(this.value,'${assetEntity?.fiberCabinet}','rear', this.name)" ></input>-->
 			</td>
 		</tr>
 		</table>
