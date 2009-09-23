@@ -18,6 +18,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String usize
 	String railType
 	String fiberCabinet
+	String fiberType
+	Integer fiberQuantity
 	String hbaPort
 	String ipAddress
 	String hinfo
@@ -26,6 +28,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String newOrOld
 	String nicPort
 	String powerPort
+	Integer powerQuantity
 	String powerType
 	String remoteMgmtPort
 	String truck
@@ -64,6 +67,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		usize( blank:true, nullable:true )
 		railType( blank:true, nullable:true )
 		fiberCabinet( blank:true, nullable:true )
+		fiberType( blank:true, nullable:true )
+		fiberQuantity( blank:true, nullable:true )
 		hbaPort( blank:true, nullable:true )
 		ipAddress( blank:true, nullable:true )
 		hinfo( blank:true, nullable:true )
@@ -71,6 +76,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		kvmPort( blank:true, nullable:true )
 		newOrOld( blank:true, nullable:true )
 		nicPort( blank:true, nullable:true )
+		powerQuantity( blank:true, nullable:true )
 		powerPort( blank:true, nullable:true )
 		powerType( blank:true, nullable:true )
 		remoteMgmtPort( blank:true, nullable:true )
@@ -99,12 +105,4 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String toString(){
 		"id:$id name:$assetName tag:$assetTag serial#:$serialNumber"
 	}
-
-	// This is where we will/would define special details about the class
-
-	// TBD...
-	//static eavModel = {
-	//	attributeDomain: AssetAttribute
-	//	,decendent: this
-	//}
 }
