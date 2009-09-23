@@ -25,6 +25,9 @@ function validChanges() {
 	if(mustSave == 'true') {
 		flag = confirm( "Changes have not been saved and will be lost.  Are you sure?" );
 	}
+	if(flag){
+		document.auditForm.mustSave.value = 'false'
+	}
 	return flag
 }
 function createXMLHttpRequest(){
@@ -43,20 +46,21 @@ function createXMLHttpRequest(){
 	    }
 	}
 }
+<%--
 function filterByCommentType(val) {
 	document.commentsViewForm.commentType.value = val;
 	document.commentsViewForm.sort.value = 'desc';
 	document.commentsViewForm.orderType.value = 'comment';
 	document.commentsViewForm.action = "getComments"
 	document.commentsViewForm.submit()
-	<%--var assetId = document.commentForm.assetId.value;
+	var assetId = document.commentForm.assetId.value;
 	var commentType = document.commentsViewForm.commentType.value;
 	var sort = document.commentsViewForm.sort.value;
 	var orderType = document.commentsViewForm.orderType.value;
 	sendCommentRequest()
-	${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.commentType.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')}; --%>
+	${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.commentType.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')}; 
 	return false;	
-  }
+} --%>
 function missingAsset( type, id, message ){
 	if( validChanges() == true ) {
 		document.auditForm.mustSave.value = 'false'
@@ -72,6 +76,7 @@ function missingAsset( type, id, message ){
 		}
 	}
 }
+<%--
 function updateMissingAsset( e, type, id ){
 	if(e.responseText == "success"){
 		var link = "<a href='#' class='button big' onclick=\"missingAsset";
@@ -82,7 +87,7 @@ function updateMissingAsset( e, type, id ){
 		}
 		BetterInnerHTML(getObject('missingAsset'),link);
 	}
-}
+} --%>
 function commentSelect( cmtVal ) {
 	if ( cmtVal == 'Select Common Comment' ) {
 		document.commentForm.comments.value = '';
@@ -172,13 +177,13 @@ function selectOption(selectedObject, selectedValue) {
 	}
 	return flag 
 }
-
+<%--
 function callAssetMenu() {
 	document.commentForm.selectCmts.value = '';
 	document.commentForm.comments.value = '';
 	location.href = "#asset_menu";
 }
-<%--
+
 function populateComments() {
 	if(validChanges() == true ) {
 		location.href="#view_comments"
@@ -200,14 +205,14 @@ function populateComments() {
 	//${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.commentType.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')}; 
 	
 }
---%>
+
 function updateViewComment( e ) {
 	var assetComments = e.responseText;
 	document.commentForm.selectCmts.value = '';
 	document.commentForm.comments.value = '';
 	BetterInnerHTML(getObject('listCommentsTbodyId'),assetComments);
 }
-
+--%>
 function sortCommentList(orderType) {
 	var sortOrder = document.commentsViewForm.sort.value;
 	document.commentsViewForm.orderType.value = orderType;
@@ -216,8 +221,15 @@ function sortCommentList(orderType) {
 	} else {
 		document.commentsViewForm.sort.value = 'desc';
 	}
-	document.commentsViewForm.action = "getComments"
-	document.commentsViewForm.submit()
+	var sort = document.commentsViewForm.sort.value
+	var assetId = document.commentsViewForm.id.value
+	var room = document.commentsViewForm.room.value
+	var rack = document.commentsViewForm.rack.value
+	var location = document.commentsViewForm.location.value
+	var moveBundle = document.commentsViewForm.moveBundle.value
+	window.location.href="getComments?commentType=all&sort="+sort+"&orderType="+orderType+"&id="+assetId+"&room="+room+"&rack="+rack+"&location="+location+"&moveBundle="+moveBundle+"#view_comments"
+	//document.commentsViewForm.action = "getComments"
+	//document.commentsViewForm.submit()
 	//sendCommentRequest()
 	<%--${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.commentType.value+\'&sort=\'+document.commentsViewForm.sort.value+\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')}; --%>
 }
@@ -243,7 +255,7 @@ function updateModels( e ){
 	} else {
 		document.auditForm.modelTdId.innerHtml = "<input type=\"text\" name=\"model\" id=\"modelId\" >"
 	}
-} --%>
+} 
 function sendCommentRequest(){
 	var assetId = document.commentForm.assetId.value;
 	var commentType = document.commentsViewForm.commentType.value;
@@ -254,7 +266,7 @@ function sendCommentRequest(){
 	xmlHttpReq.send(null);
 	var serverResponse = xmlHttpReq.responseText;
 	updateViewComment( xmlHttpReq )
-}
+}--%>
 function checkComments(type) {
 	var assetId = document.commentForm.assetId.value;
 	var comment = escape(document.commentForm.comments.value);
@@ -297,7 +309,7 @@ function checkComments(type) {
 		<div style="MARGIN-TOP: 15px" align=center>
 			<a class="button big" href="#asset_front1">Front Audit</a> <BR style="MARGIN-TOP: 6px">
 			<a class="button big" href="#asset_rear1">Rear Audit</a> <BR style="MARGIN-TOP: 6px">
-			<a class="button big" href="getComments?commentType=all&sort=desc&orderType=commentType&id=${assetEntity?.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">Issues/Comments</a> <BR style="MARGIN-TOP: 6px">
+			<a class="button big" href="getComments?commentType=all&sort=desc&orderType=commentType&id=${assetEntity?.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments" onclick="return validChanges();">Issues/Comments</a> <BR style="MARGIN-TOP: 6px">
 			<span id="missingAsset" >
 				<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id +' and commentType = ? and isResolved = ? and commentCode = ?' ,['issue',0,'ASSET_MISSING'])}">
 					<input name="type" value="resolve" type="hidden"/>
@@ -713,10 +725,10 @@ function checkComments(type) {
 		<div class="gap"></div>
 		
 			<ul id="myMenu" class="SimpleContextMenu">
-				<li><a href="#" onclick="return filterByCommentType('all');">All</a></li>
-				<li><a href="#" onclick="return filterByCommentType('comment');">Comment</a></li>
-				<li><a href="#" onclick="return filterByCommentType('instruction');">Instruction</a></li>
-				<li><a href="#" onclick="return filterByCommentType('issue');">Issue</a></li>
+				<li><a href="getComments?commentType=all&sort=desc&orderType=comment&id=${assetEntity.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">All</a></li>
+				<li><a href="getComments?commentType=comment&sort=desc&orderType=comment&id=${assetEntity.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">Comment</a></li>
+				<li><a href="getComments?commentType=instruction&sort=desc&orderType=comment&id=${assetEntity.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">Instruction</a></li>
+				<li><a href="getComments?commentType=issue&sort=desc&orderType=comment&id=${assetEntity.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">Issue</a></li>
 		   </ul>
 	<script type="text/javascript">
 	if('${commentCodes.needAssetTag}'){
