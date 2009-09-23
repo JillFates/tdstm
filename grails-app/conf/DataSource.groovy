@@ -15,9 +15,9 @@ environments {
 	development {
 		dataSource {
 			// TDS Transitional Manager
-			dbCreate = "update" // one of 'create', 'create-drop','update'
-			// dbCreate = "create-drop" // one of 'create', 'create-drop','update'
-			url = "jdbc:mysql://localhost/tdstm"
+			// dbCreate = "update" // one of 'create', 'create-drop','update'
+			 dbCreate = "create-drop" // one of 'create', 'create-drop','update'
+			url = "jdbc:mysql://localhost/tdstm_dev"
 			driverClassName = "com.mysql.jdbc.Driver"
 			username = "tdstm"
 			password = "tdstm"

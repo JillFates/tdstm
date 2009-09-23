@@ -333,7 +333,7 @@ function checkComments(type) {
 			</tr>
 			
 			<tr>
-				<td class="label">Asset Name:</td>
+				<td class="label">Name:</td>
 				<td class="field">
 					<input type="text" class="text" name="assetName" value="${assetEntity?.assetName}" size=20 maxsize=50 
 							onchange="setMustSave(this.value,'${assetEntity?.assetName}','front1', this.name)">
@@ -349,7 +349,7 @@ function checkComments(type) {
 			</tr>
 			
 			<tr>
-				<td class="label">Device Type:</td>
+				<td class="label">Type:</td>
 				<td class="field">
 				
 				 <g:select from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('assetType'))?.value}" noSelection="['':'Undefined']" id="kvmDeviceId" name="assetType" value="${assetEntity?.assetType}" 
@@ -359,7 +359,7 @@ function checkComments(type) {
 			</tr>
 			
 			<tr>
-				<td class="label">Manufacturer:</td>
+				<td class="label">Manufact:</td>
 				<td class="field">
 				<g:if test="${Manufacturer.list()}">
 				<!--  <g:select name="manufacturer" from="${Manufacturer.list()}" value="${assetEntity?.manufacturer}" id="manufacturerId" 
