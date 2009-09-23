@@ -278,7 +278,6 @@ function checkComments(type) {
 		<input type="hidden" name="room" value="${room}">
 		<input type="hidden" name="rack" value="${rack}">
 		<input type="hidden" name="location" value="${location}">
-		<input type="hidden" name="moveBundle" value="${moveBundle}">
 		<input type="hidden" name="generalComment" id="generalCommentId" value="Asset changed: ">
 		<input type="hidden" id="mustSave" name="mustSave" value=""/>
 		<div style="FLOAT: left"><a class=button href="startMenu">Start Over</a></div>
@@ -485,7 +484,7 @@ function checkComments(type) {
 			</tr>
 			</table>
 			
-			<div style="margin-top:20px;">
+			<div style="margin-top:10px;">
 			   <div class="thefield" align="center">
 			      <a class="button" href="#asset_rear1">Next</a>&nbsp;&nbsp;
 			      <a class="button" href="#asset_front1">Back</a>&nbsp;&nbsp;

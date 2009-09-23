@@ -373,7 +373,6 @@ class WalkThroughController {
         for ( int i=1; i<=walkthruCommentsCount; i++ ) {
         	walkthruComments << message ( code: "walkthru.defComment.${i}" )
         }
-		def commentCodes = walkThroughCodes( assetEntity )
 		if( assetEntity ){
 			def principal = SecurityUtils.subject.principal
 			def loginUser = UserLogin.findByUsername ( principal )
@@ -394,7 +393,6 @@ class WalkThroughController {
 					def transactionStatus = workflowService.createTransition(assetEntity.project.workflowCode,"SUPERVISOR", stateTo, assetEntity, assetEntity.moveBundle, loginUser, null, "" )
 				}
 				def query = "from AssetComment where assetEntity = ${assetEntity.id} and commentType = ? and isResolved = ? and commentCode = ?"
-						
 				if(params.needAssetTag == "Y"){
 					createComments( 'NEED_ASSET_TAG', loginUser, query, assetEntity )
 				} else {
@@ -431,14 +429,17 @@ class WalkThroughController {
 					new AssetComment(assetEntity : assetEntity, commentType : 'comment', category : 'walkthru', 
 									comment : commentDescription, createdBy : loginUser.person ).save()
 				}
-				render(view:'assetMenu', model:[ moveBundle:params.moveBundle, location:params.location, room:params.room,  viewType:'assetMenu',
+				def commentCodes = walkThroughCodes( assetEntity )
+				render(view:'assetMenu', model:[ moveBundle:assetEntity?.moveBundle?.id, location:params.location, room:params.room,  viewType:'assetMenu',
 				                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
 			} else {
-				render(view:'assetMenu', model:[ moveBundle:params.moveBundle, location:params.location, room:params.room,  viewType:'assetMenu',
+				def commentCodes = walkThroughCodes( assetEntity )
+				render(view:'assetMenu', model:[ moveBundle:assetEntity?.moveBundle?.id, location:params.location, room:params.room,  viewType:'assetMenu',
 				                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
 			}
 		} else {
-			render(view:'assetMenu', model:[ moveBundle:params.moveBundle, location:params.location, room:params.room,  viewType:'assetMenu',
+			def commentCodes = walkThroughCodes( assetEntity )
+			render(view:'assetMenu', model:[ moveBundle:assetEntity?.moveBundle?.id, location:params.location, room:params.room,  viewType:'assetMenu',
 			                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
 		}
 	}
