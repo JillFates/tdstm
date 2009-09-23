@@ -537,8 +537,8 @@ function checkComments(type) {
 		<tr>
 			<td class="label">PDU Qty/Type:</td>
 			<td class="field">
-			<g:select name="powerQuantity" noSelection="['':'Undefined']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('powerQuantity'))?.value}" value="${assetEntity?.powerQuantity}"
-				onchange="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)"/>
+			<g:select name="pduQuantity" noSelection="['':'Undefined']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('pduQuantity'))?.value}" value="${assetEntity?.pduQuantity}"
+				onchange="setMustSave(this.value,'${assetEntity?.pduQuantity}','rear', this.name)"/>
 			&nbsp;&nbsp;
 				 <g:select  noSelection="['':'Undefined']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('pduType'))?.value}" id="pduType" name="pduType" value="${assetEntity?.pduType}" 
 				onchange="setMustSave(this.value,'${assetEntity?.pduType}','rear', this.name)" />
@@ -574,10 +574,10 @@ function checkComments(type) {
 		        <td class="label"><label for=attachedKVM>Attached to KVM:</label></td>
 		        <td class="field">
 		        <g:if test="${assetEntity?.kvmDevice || assetEntity?.kvmPort }">
-						<input type="checkbox" name=attachedKVM id="attachedKVM" onclick="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)" checked="checked">
+						<input type="checkbox" name=attachedKVM id="attachedKVM" onclick="setMustSave(this.value,'${assetEntity?.pduPort}','rear', this.name)" checked="checked">
 				</g:if>
 				<g:else>
-						<input type="checkbox" name=attachedKVM onclick="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)" id="attachedKVM">
+						<input type="checkbox" name=attachedKVM onclick="setMustSave(this.value,'${assetEntity?.pduPort}','rear', this.name)" id="attachedKVM">
 				</g:else>
 		        </td>
 		</tr>
@@ -585,19 +585,19 @@ function checkComments(type) {
 		        <td class="label"><label for="hasILO">Has ILO Mgmt:</label></td>
 		        <td class="field">
 		        <g:if test="${assetEntity?.remoteMgmtPort}">
-					<input type="checkbox" name=hasILO id="hasILO" onclick="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)" checked="checked">
+					<input type="checkbox" name=hasILO id="hasILO" onclick="setMustSave(this.value,'${assetEntity?.pduPort}','rear', this.name)" checked="checked">
 				</g:if>
 				<g:else>
-					<input type="checkbox" name=hasILO onclick="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)" id="hasILO">
+					<input type="checkbox" name=hasILO onclick="setMustSave(this.value,'${assetEntity?.pduPort}','rear', this.name)" id="hasILO">
 				</g:else>
 		        </td>
 		</tr>
 		<tr>
 		        <td class="label">Has Obstruction?</td>
 		        <td class="field">
-		                <input type="radio" name="moveCables" id="moveCablesYes" onclick="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)" value="Y"><label for="moveCablesYes">Yes</label>
+		                <input type="radio" name="moveCables" id="moveCablesYes" onclick="setMustSave(this.value,'${assetEntity?.pduPort}','rear', this.name)" value="Y"><label for="moveCablesYes">Yes</label>
 		                &nbsp;&nbsp;
-		                <input type="radio" name="moveCables" id="moveCablesNo" value="N" onclick="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)" checked><label for="moveCablesNo">No</label>
+		                <input type="radio" name="moveCables" id="moveCablesNo" value="N" onclick="setMustSave(this.value,'${assetEntity?.pduPort}','rear', this.name)" checked><label for="moveCablesNo">No</label>
 		        </td>
 		</tr>
 		</table>      
