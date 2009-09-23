@@ -364,7 +364,7 @@ function checkComments(type) {
 				<td class="label">Type:</td>
 				<td class="field">
 				
-				 <g:select from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('assetType'))?.value}" noSelection="['':'Undefined']" id="kvmDeviceId" name="assetType" value="${assetEntity?.assetType}" 
+				 <g:select from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('assetType'))?.value}" noSelection="['':'Undef']" id="kvmDeviceId" name="assetType" value="${assetEntity?.assetType}" 
 						onchange="setMustSave(this.value,'${assetEntity?.assetType}','front1', this.name);"/>
 					<!--<input type="text" value="${assetEntity?.kvmDevice}" id="kvmDeviceId" name="kvmDevice" 
 								onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name);"> -->
@@ -402,7 +402,7 @@ function checkComments(type) {
 			<tr>
 				<td class="label">Rails:</td>
 				<td class="field">
-				 <g:select noSelection="['':'Undefined']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('railType'))?.value}" id="railTypeId" name="railType" value="${assetEntity?.railType}" 
+				 <g:select noSelection="['':'Undef']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('railType'))?.value}" id="railTypeId" name="railType" value="${assetEntity?.railType}" 
 				 onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)"/> 
 				<!-- <input type="text" name="railType" value="${assetEntity?.railType}" id="railTypeId" onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)" >-->
 				</input>
@@ -439,13 +439,13 @@ function checkComments(type) {
 			</tr>
 			<tr>
 				<td class="label">Source Rack:</td>
-				<td class="field">${assetEntity?.sourceRack}</td>
+				<td class="field"><input type="text" name="sourceRack" value="${assetEntity?.sourceRack}"/></td>
 			</tr>
 			
 			<tr>
 				<td class="label">U-Position:</td>
 				<td class="field" nowrap>
-				<g:select name="sourceRackPosition" from="${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,'Undefined']}" 
+				<g:select name="sourceRackPosition" from="${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,'Undef']}" 
 							id="sourceRackPositionId" value="${assetEntity?.sourceRackPosition}" onchange="setMustSave(this.value,'${assetEntity?.sourceRackPosition}','front2', this.name)"/>
 				<img src="${createLinkTo(dir:'images',file:'plus.gif')}" height="18" onclick="moveOption('sourceRackPosition','${assetEntity?.sourceRackPosition}','front2','up')"/>
 				<img src="${createLinkTo(dir:'images',file:'minus.gif')}" height="18" onclick="moveOption('sourceRackPosition','${assetEntity?.sourceRackPosition}','front2','down')"/>
@@ -455,7 +455,7 @@ function checkComments(type) {
 			<tr>
 				<td class="label">U-Size:</td>
 				<td class="field">
-				<g:select name="usize" from="${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,'Undefined']}"   
+				<g:select name="usize" from="${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,'Undef']}"   
 							id="usizeId" value="${assetEntity?.usize}" onchange="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)"/>
 				<img src="${createLinkTo(dir:'images',file:'plus.gif')}" height="18" onclick="moveOption('usize','${assetEntity?.usize}','front2','up')"/>
 				<img src="${createLinkTo(dir:'images',file:'minus.gif')}" height="18" onclick="moveOption('usize','${assetEntity?.usize}','front2','down')"/>
@@ -529,7 +529,7 @@ function checkComments(type) {
 		<tr>
 			<td class="label">Power Type:</td>
 			<td class="field">
-				 <g:select  noSelection="['':'Undefined']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('powerType'))?.value}" id="powerType" name="powerType" value="${assetEntity?.powerType}" 
+				 <g:select  noSelection="['':'Undef']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('powerType'))?.value}" id="powerType" name="powerType" value="${assetEntity?.powerType}" 
 				onchange="setMustSave(this.value,'${assetEntity?.powerType}','rear', this.name)" />
 				
 			</td>
@@ -537,10 +537,10 @@ function checkComments(type) {
 		<tr>
 			<td class="label">PDU Qty/Type:</td>
 			<td class="field">
-			<g:select name="pduQuantity" noSelection="['':'Undefined']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('pduQuantity'))?.value}" value="${assetEntity?.pduQuantity}"
+			<g:select name="pduQuantity" noSelection="['':'Undef']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('pduQuantity'))?.value}" value="${assetEntity?.pduQuantity}"
 				onchange="setMustSave(this.value,'${assetEntity?.pduQuantity}','rear', this.name)"/>
 			&nbsp;&nbsp;
-				 <g:select  noSelection="['':'Undefined']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('pduType'))?.value}" id="pduType" name="pduType" value="${assetEntity?.pduType}" 
+				 <g:select  noSelection="['':'Undef']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('pduType'))?.value}" id="pduType" name="pduType" value="${assetEntity?.pduType}" 
 				onchange="setMustSave(this.value,'${assetEntity?.pduType}','rear', this.name)" />
 				<!--  <input type="text" id="powerType" name="powerType" value="${assetEntity?.powerType}" onchange="setMustSave(this.value,'${assetEntity?.powerType}','rear', this.name)" ></input> -->
 				
@@ -560,10 +560,10 @@ function checkComments(type) {
 		<tr>
 			<td class="label">Fiber Qty/Type:</td>
 			<td class="field">
-				<g:select name="fiberQuantity" noSelection="['':'Undefined']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('fiberQuantity'))?.value}" value="${assetEntity?.fiberQuantity}"
+				<g:select name="fiberQuantity" noSelection="['':'Undef']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('fiberQuantity'))?.value}" value="${assetEntity?.fiberQuantity}"
 						onchange="setMustSave(this.value,'${assetEntity?.fiberQuantity}','rear', this.name)"/>
 		        &nbsp;&nbsp;
-			<g:select noSelection="['':'Undefined']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('fiberType'))?.value}" id="fiberType" name="fiberType" value="${assetEntity?.fiberType}" 
+			<g:select noSelection="['':'Undef']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('fiberType'))?.value}" id="fiberType" name="fiberType" value="${assetEntity?.fiberType}" 
 				onchange="setMustSave(this.value,'${assetEntity?.fiberType}','rear', this.name)"/>
 					<!--  <input type="text" id="fiberCabinet" name="fiberCabinet" value="${assetEntity?.fiberCabinet}" onchange="setMustSave(this.value,'${assetEntity?.fiberCabinet}','rear', this.name)" ></input>-->
 			</td>
