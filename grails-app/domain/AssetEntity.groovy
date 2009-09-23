@@ -27,10 +27,10 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String kvmPort
 	String newOrOld
 	String nicPort
-	String powerPort
-	Integer powerQuantity
 	String powerType
 	String pduType
+	String pduPort
+	Integer pduQuantity
 	String remoteMgmtPort
 	String truck
 	String appOwner = ""
@@ -77,10 +77,10 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		kvmPort( blank:true, nullable:true )
 		newOrOld( blank:true, nullable:true )
 		nicPort( blank:true, nullable:true )
-		powerQuantity( blank:true, nullable:true )
-		powerPort( blank:true, nullable:true )
 		powerType( blank:true, nullable:true )
 		pduType( blank:true, nullable:true )
+		pduQuantity( blank:true, nullable:true )
+		pduPort( blank:true, nullable:true )
 		remoteMgmtPort( blank:true, nullable:true )
 		truck( blank:true, nullable:true )		
 		project( nullable:false )
