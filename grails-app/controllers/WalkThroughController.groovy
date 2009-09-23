@@ -427,7 +427,7 @@ class WalkThroughController {
 				if(generalComment.lastIndexOf(",") != -1){
 					def commentDescription = generalComment.substring(0,generalComment.lastIndexOf(",") > 255 ? 255 : generalComment.lastIndexOf(","))
 					new AssetComment(assetEntity : assetEntity, commentType : 'comment', category : 'walkthru', 
-									comment : commentDescription, createdBy : loginUser.person ).save()
+									comment : commentDescription, createdBy : loginUser.person ).save( flush:true )
 				}
 				def commentCodes = walkThroughCodes( assetEntity )
 				render(view:'assetMenu', model:[ moveBundle:assetEntity?.moveBundle?.id, location:params.location, room:params.room,  viewType:'assetMenu',
@@ -452,7 +452,7 @@ class WalkThroughController {
 	def createComments ( def commentCode, def loginUser, def query, def assetEntity, def comment ) {
 		def hasComment = AssetComment.find(query, ["issue", 0, commentCode])
 		if(!hasComment){
-			new AssetComment(assetEntity : assetEntity, comment:comment, isResolved : 0, commentType : 'issue', category : 'walkthru', commentCode : commentCode, createdBy : loginUser.person ).save()
+			new AssetComment(assetEntity : assetEntity, comment:comment, isResolved : 0, commentType : 'issue', category : 'walkthru', commentCode : commentCode, createdBy : loginUser.person ).save( flush:true )
 		}	 
 	}
 	 
@@ -467,7 +467,7 @@ class WalkThroughController {
 			assetComment?.isResolved = 1
 			assetComment?.resolvedBy = loginUser.person	
 			assetComment?.dateResolved = new Date()
-			assetComment?.save()
+			assetComment?.save(flush:true)
 		}	 
 	}
     /*------------------------------------------------------------

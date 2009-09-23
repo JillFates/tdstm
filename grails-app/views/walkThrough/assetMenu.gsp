@@ -574,10 +574,10 @@ function checkComments(type) {
 		        <td class="label"><label for=attachedKVM>Attached to KVM:</label></td>
 		        <td class="field">
 		        <g:if test="${assetEntity?.kvmDevice || assetEntity?.kvmPort }">
-						<input type="checkbox" name=attachedKVM id="attachedKVM" onclick="setMustSave(this.value,'${assetEntity?.pduPort}','rear', this.name)" checked="checked">
+						<input type="checkbox" name="kvmPort" id="attachedKVM" onclick="setMustSave(this.value,'${assetEntity?.kvmPort}','rear', this.name)" checked="checked">
 				</g:if>
 				<g:else>
-						<input type="checkbox" name=attachedKVM onclick="setMustSave(this.value,'${assetEntity?.pduPort}','rear', this.name)" id="attachedKVM">
+						<input type="checkbox" name="kvmPort" onclick="setMustSave(this.value,'${assetEntity?.kvmPort}','rear', this.name)" id="attachedKVM">
 				</g:else>
 		        </td>
 		</tr>
@@ -585,10 +585,10 @@ function checkComments(type) {
 		        <td class="label"><label for="hasILO">Has ILO Mgmt:</label></td>
 		        <td class="field">
 		        <g:if test="${assetEntity?.remoteMgmtPort}">
-					<input type="checkbox" name=hasILO id="hasILO" onclick="setMustSave(this.value,'${assetEntity?.pduPort}','rear', this.name)" checked="checked">
+					<input type="checkbox" name="remoteMgmtPort" id="hasILO" onclick="setMustSave(this.value,'${assetEntity?.pduPort}','rear', this.name)" checked="checked">
 				</g:if>
 				<g:else>
-					<input type="checkbox" name=hasILO onclick="setMustSave(this.value,'${assetEntity?.pduPort}','rear', this.name)" id="hasILO">
+					<input type="checkbox" name="remoteMgmtPort" onclick="setMustSave(this.value,'${assetEntity?.pduPort}','rear', this.name)" id="hasILO">
 				</g:else>
 		        </td>
 		</tr>
