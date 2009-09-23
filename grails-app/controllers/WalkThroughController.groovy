@@ -414,9 +414,9 @@ class WalkThroughController {
 				}
 				
 				if(params.moveCables == "Y"){
-					createComments( 'NEED_CABLES_MOVED', loginUser, query, assetEntity )
+					createComments( 'HAS_OBSTRUCTION', loginUser, query, assetEntity )
 				} else {
-					resolveComments( 'NEED_CABLES_MOVED', loginUser, query )
+					resolveComments( 'HAS_OBSTRUCTION', loginUser, query )
 				}
 				
 				def generalComment = params.generalComment
@@ -566,6 +566,6 @@ class WalkThroughController {
     						amberLights : AssetComment.find(query,["issue", 0, "AMBER_LIGHTS"])?.commentCode,
     		                stackedOnTop : AssetComment.find(query,["issue", 0, "STACKED_ON_TOP"])?.commentCode,
     		                poweredOff : AssetComment.find(query,["issue", 0, "POWERED_OFF"])?.commentCode,
-    		                cablesMoved : AssetComment.find(query,["issue", 0, "NEED_CABLES_MOVED"])?.commentCode]
+    		                cablesMoved : AssetComment.find(query,["issue", 0, "HAS_OBSTRUCTION"])?.commentCode]
     }
 }

@@ -565,7 +565,7 @@ function checkComments(type) {
 		        </td>
 		</tr>
 		<tr>
-		        <td class="label">Need cables moved?</td>
+		        <td class="label">Has Obstruction?</td>
 		        <td class="field">
 		                <input type="radio" name="moveCables" id="moveCablesYes" onclick="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)" value="Y"><label for="moveCablesYes">Yes</label>
 		                &nbsp;&nbsp;
