@@ -368,6 +368,12 @@ class WalkThroughController {
 	 *----------------------------------------------------------*/
     def saveAndCompleteAudit = {
 		def assetEntity = AssetEntity.get( params.id )
+		def walkthruComments = []
+        def walkthruCommentsCount = Integer.parseInt(message ( code: "walkthru.defComment.count" ))
+        for ( int i=1; i<=walkthruCommentsCount; i++ ) {
+        	walkthruComments << message ( code: "walkthru.defComment.${i}" )
+        }
+		def commentCodes = walkThroughCodes( assetEntity )
 		if( assetEntity ){
 			def principal = SecurityUtils.subject.principal
 			def loginUser = UserLogin.findByUsername ( principal )
@@ -423,18 +429,17 @@ class WalkThroughController {
 				if(generalComment.lastIndexOf(",") != -1){
 					def commentDescription = generalComment.substring(0,generalComment.lastIndexOf(",") > 255 ? 255 : generalComment.lastIndexOf(","))
 					new AssetComment(assetEntity : assetEntity, commentType : 'comment', category : 'walkthru', 
-									comment : commentDescription,, createdBy : loginUser.person ).save()
+									comment : commentDescription, createdBy : loginUser.person ).save()
 				}
-				redirect(action:selectAsset,params:[moveBundle: getSession().getAttribute("AUDIT_BUNDLE"),
-				                                    location : getSession().getAttribute("AUDIT_LOCATION"),
-				                                    room : room, rack : rack ])
+				render(view:'assetMenu', model:[ moveBundle:params.moveBundle, location:params.location, room:params.room,  viewType:'assetMenu',
+				                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
 			} else {
-				redirect(action:selectAsset,params:[id : assetEntity.id ])
+				render(view:'assetMenu', model:[ moveBundle:params.moveBundle, location:params.location, room:params.room,  viewType:'assetMenu',
+				                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
 			}
 		} else {
-			redirect(action:selectAsset,params:[moveBundle: getSession().getAttribute("AUDIT_BUNDLE"),
-			                                    location : getSession().getAttribute("AUDIT_LOCATION"),
-			                                    room : room, rack : rack ])
+			render(view:'assetMenu', model:[ moveBundle:params.moveBundle, location:params.location, room:params.room,  viewType:'assetMenu',
+			                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
 		}
 	}
 	
@@ -552,7 +557,7 @@ class WalkThroughController {
 		}
 		def commentCodes = walkThroughCodes( assetEntity )
 		render(view:'assetMenu', model:[ moveBundle:params.moveBundle, location:params.location, room:params.room,  
-		                                 viewType:'view_comments', commentListView : commentListView, sort : params.sort,
+		                                 viewType:'view_comments', commentListView : commentListView, sort : params.sort, commentType : params.commentType,
 			                             rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
 	}
     /*-------------------------------------------------------

@@ -181,6 +181,7 @@ function callAssetMenu() {
 
 function populateComments() {
 	if(validChanges() == true ) {
+		location.href="#view_comments"
 		document.auditForm.mustSave.value = 'false'
 		document.commentsViewForm.commentType.value = 'all';
 		document.commentsViewForm.sort.value = 'desc';
@@ -274,6 +275,7 @@ function checkComments(type) {
 		<input type="hidden" name="room" value="${room}">
 		<input type="hidden" name="rack" value="${rack}">
 		<input type="hidden" name="location" value="${location}">
+		<input type="hidden" name="moveBundle" value="${moveBundle}">
 		<input type="hidden" name="generalComment" id="generalCommentId" value="Asset changed: ">
 		<input type="hidden" id="mustSave" name="mustSave" value=""/>
 		<div style="FLOAT: left"><a class=button href="startMenu">Start Over</a></div>
@@ -293,7 +295,7 @@ function checkComments(type) {
 		<div style="MARGIN-TOP: 15px" align=center>
 			<a class="button big" href="#asset_front1">Front Audit</a> <BR style="MARGIN-TOP: 6px">
 			<a class="button big" href="#asset_rear1">Rear Audit</a> <BR style="MARGIN-TOP: 6px">
-			<a class="button big" href="#view_comments" onclick="populateComments();">Issues/Comments</a> <BR style="MARGIN-TOP: 6px">
+			<a class="button big"  onclick="populateComments();">Issues/Comments</a> <BR style="MARGIN-TOP: 6px">
 			<span id="missingAsset" >
 				<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id +' and commentType = ? and isResolved = ? and commentCode = ?' ,['issue',0,'ASSET_MISSING'])}">
 					<input name="type" value="resolve" type="hidden"/>
@@ -347,9 +349,10 @@ function checkComments(type) {
 			<tr>
 				<td class="label">Device Type:</td>
 				<td class="field">
-				<!--  <refcode:select domain="kvmDevice" noSelection="['':'']" id="kvmDeviceId" name="kvmDevice" value="${assetEntity?.kvmDevice}" 
-						onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name);getModels()"/>-->
-						<input type="text" value="${assetEntity?.kvmDevice}" id="kvmDeviceId" name="kvmDevice" 
+				
+				<!-- <g:select from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('assetType'))?.value}" noSelection="['':'Select']" id="kvmDeviceId" name="kvmDevice" value="${assetEntity?.kvmDevice}" 
+						onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name);"/> -->
+					<input type="text" value="${assetEntity?.kvmDevice}" id="kvmDeviceId" name="kvmDevice" 
 								onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name);">
 			</tr>
 			
@@ -419,6 +422,10 @@ function checkComments(type) {
 			<tr>
 				<td class="label">Asset Tag:</td>
 				<td class="field">${assetEntity?.assetTag}</td>
+			</tr>
+			<tr>
+				<td class="label">Source Rack:</td>
+				<td class="field">${assetEntity?.sourceRack}</td>
 			</tr>
 			
 			<tr>
@@ -654,7 +661,7 @@ function checkComments(type) {
 		<div style="float:right;"><a class="button" href="#comments">Add Comments</a></div>
 		<br class="clear"/>
 		<g:form action="issuesandcommentsview" name="commentsViewForm" method="post">
-		<input type="hidden" name="commentType" id="commentType" value="all"/>
+		<input type="hidden" name="commentType" id="commentType" value="${commentType}"/>
 		<input type="hidden" name="sort" id="sort" value="${sort}"/>
 		<input type="hidden" name="orderType" id="orderType" value="commentType"/>
 		<input type="hidden" name="id" value="${assetEntity.id}" />
