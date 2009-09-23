@@ -178,7 +178,7 @@ function callAssetMenu() {
 	document.commentForm.comments.value = '';
 	location.href = "#asset_menu";
 }
-
+<%--
 function populateComments() {
 	if(validChanges() == true ) {
 		location.href="#view_comments"
@@ -186,21 +186,21 @@ function populateComments() {
 		document.commentsViewForm.commentType.value = 'all';
 		document.commentsViewForm.sort.value = 'desc';
 		document.commentsViewForm.orderType.value = 'commentType';
-		<%--var assetId = document.commentForm.assetId.value;
+		var assetId = document.commentForm.assetId.value;
 		var commentType = document.commentsViewForm.commentType.value;
 		var sort = document.commentsViewForm.sort.value;
 		var orderType = document.commentsViewForm.orderType.value;
-		sendCommentRequest() --%>
+		sendCommentRequest()
 		document.commentsViewForm.action = "getComments"
 		document.commentsViewForm.submit()
 		return true
 	} else {
 		return false
 	}
-	<%--${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.commentType.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')}; --%>
+	//${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.commentType.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')}; 
 	
 }
-
+--%>
 function updateViewComment( e ) {
 	var assetComments = e.responseText;
 	document.commentForm.selectCmts.value = '';
@@ -298,7 +298,7 @@ function checkComments(type) {
 		<div style="MARGIN-TOP: 15px" align=center>
 			<a class="button big" href="#asset_front1">Front Audit</a> <BR style="MARGIN-TOP: 6px">
 			<a class="button big" href="#asset_rear1">Rear Audit</a> <BR style="MARGIN-TOP: 6px">
-			<a class="button big" href="#" onclick="return populateComments();">Issues/Comments</a> <BR style="MARGIN-TOP: 6px">
+			<a class="button big" href="getComments?commentType=all&sort=desc&orderType=commentType&id=${assetEntity?.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">Issues/Comments</a> <BR style="MARGIN-TOP: 6px">
 			<span id="missingAsset" >
 				<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id +' and commentType = ? and isResolved = ? and commentCode = ?' ,['issue',0,'ASSET_MISSING'])}">
 					<input name="type" value="resolve" type="hidden"/>
@@ -647,7 +647,7 @@ function checkComments(type) {
 			
 			<br />
 			
-			<a class="button" href="#view_comments" onclick="return populateComments();">View Issues &amp; Comments</a>
+			<a class="button" href="getComments?commentType=all&sort=desc&orderType=commentType&id=${assetEntity?.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments"">View Issues &amp; Comments</a>
 		</g:form>
 		</div>
 		</div>
@@ -737,9 +737,6 @@ function checkComments(type) {
 	}
 	getObject("manufacturerId").value = "${assetEntity?.manufacturer}"
 	getObject("modelId").value = "${assetEntity?.model}"
-	if("${viewType}" == "view_comments"){
-		location.href = "#view_comments"
-	}
 	</script>
 </body>
 </html>
