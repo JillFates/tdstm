@@ -394,31 +394,31 @@ class WalkThroughController {
 				}
 				def query = "from AssetComment where assetEntity = ${assetEntity.id} and commentType = ? and isResolved = ? and commentCode = ?"
 				if(params.needAssetTag == "Y"){
-					createComments( 'NEED_ASSET_TAG', loginUser, query, assetEntity )
+					createComments( 'NEED_ASSET_TAG', loginUser, query, assetEntity , "Need Asset Tag" )
 				} else {
 					resolveComments( 'NEED_ASSET_TAG', loginUser, query )
 				}
 				
 				if(params.hasAmber == "Y"){
-					createComments( 'AMBER_LIGHTS', loginUser, query, assetEntity )
+					createComments( 'AMBER_LIGHTS', loginUser, query, assetEntity, "Has Amber Lights" )
 				} else {
 					resolveComments( 'AMBER_LIGHTS', loginUser, query )
 				}
 				
 				if(params.stuffOnTop == "Y"){
-					createComments( 'STACKED_ON_TOP', loginUser, query, assetEntity )
+					createComments( 'STACKED_ON_TOP', loginUser, query, assetEntity, "Stuff Stacked On Top" )
 				} else {
 					resolveComments( 'STACKED_ON_TOP', loginUser, query )
 				}
 				
 				if(params.poweredOff == "Y"){
-					createComments( 'POWERED_OFF', loginUser, query, assetEntity )
+					createComments( 'POWERED_OFF', loginUser, query, assetEntity, "Is Powered OFF" )
 				} else {
 					resolveComments( 'POWERED_OFF', loginUser, query )
 				}
 				
 				if(params.moveCables == "Y"){
-					createComments( 'HAS_OBSTRUCTION', loginUser, query, assetEntity )
+					createComments( 'HAS_OBSTRUCTION', loginUser, query, assetEntity, "Has Obstruction" )
 				} else {
 					resolveComments( 'HAS_OBSTRUCTION', loginUser, query )
 				}
@@ -449,10 +449,10 @@ class WalkThroughController {
 	  * @author : Mallikarjun 
 	  * @param  : Asset Comment properties
 	  *----------------------------------------------------------*/
-	def createComments ( def commentCode, def loginUser, def query, def assetEntity ) {
+	def createComments ( def commentCode, def loginUser, def query, def assetEntity, def comment ) {
 		def hasComment = AssetComment.find(query, ["issue", 0, commentCode])
 		if(!hasComment){
-			new AssetComment(assetEntity : assetEntity, isResolved : 0, commentType : 'issue', category : 'walkthru', commentCode : commentCode, createdBy : loginUser.person ).save()
+			new AssetComment(assetEntity : assetEntity, comment:comment, isResolved : 0, commentType : 'issue', category : 'walkthru', commentCode : commentCode, createdBy : loginUser.person ).save()
 		}	 
 	}
 	 
