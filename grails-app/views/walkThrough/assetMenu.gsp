@@ -740,18 +740,23 @@ function checkComments(type) {
 	<script type="text/javascript">
 	if('${commentCodes.needAssetTag}'){
 		getObject('needAssetTagYes').checked = true
+		getObject('needAssetTagNo').checked = false
 	}
 	if('${commentCodes.amberLights}'){
 		getObject('hasAmberYes').checked = true
+		getObject('hasAmberNo').checked = false
 	}
 	if('${commentCodes.stackedOnTop}'){
 		getObject("stuffOnTopYes").checked = true
+		getObject("stuffOnTopNo").checked = false
 	}
 	if('${commentCodes.poweredOff}'){
 		getObject("poweredOffYes").checked = true
+		getObject("poweredOffNo").checked = false
 	}
 	if('${commentCodes.cablesMoved}'){
 		getObject("moveCablesYes").checked =true
+		getObject("moveCablesNo").checked = false
 	}
 	getObject("manufacturerId").value = "${assetEntity?.manufacturer}"
 	getObject("modelId").value = "${assetEntity?.model}"
