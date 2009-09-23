@@ -526,15 +526,22 @@ function checkComments(type) {
 			<td class="label">Asset Tag:</td>
 			<td class="field">${assetEntity?.assetTag}</td>
 		</tr>
-		
+		<tr>
+			<td class="label">Power Type:</td>
+			<td class="field">
+				 <g:select  noSelection="['':'Undefined']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('powerType'))?.value}" id="powerType" name="powerType" value="${assetEntity?.powerType}" 
+				onchange="setMustSave(this.value,'${assetEntity?.powerType}','rear', this.name)" />
+				
+			</td>
+		</tr>
 		<tr>
 			<td class="label">PDU Qty/Type:</td>
 			<td class="field">
-			<g:select name="powerPort" from="${[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,24,32,40,48,56,64,72,80,88,96]}" value="${assetEntity?.powerPort}"
+			<g:select name="powerQuantity" noSelection="['':'Undefined']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('powerQuantity'))?.value}" value="${assetEntity?.powerQuantity}"
 				onchange="setMustSave(this.value,'${assetEntity?.powerPort}','rear', this.name)"/>
 			&nbsp;&nbsp;
-				 <g:select  noSelection="['':'Undefined']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('powerType'))?.value}" id="powerType" name="powerType" value="${assetEntity?.powerType}" 
-				onchange="setMustSave(this.value,'${assetEntity?.powerType}','rear', this.name)" />
+				 <g:select  noSelection="['':'Undefined']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('pduType'))?.value}" id="pduType" name="pduType" value="${assetEntity?.pduType}" 
+				onchange="setMustSave(this.value,'${assetEntity?.pduType}','rear', this.name)" />
 				<!--  <input type="text" id="powerType" name="powerType" value="${assetEntity?.powerType}" onchange="setMustSave(this.value,'${assetEntity?.powerType}','rear', this.name)" ></input> -->
 				
 			</td>
@@ -553,11 +560,11 @@ function checkComments(type) {
 		<tr>
 			<td class="label">Fiber Qty/Type:</td>
 			<td class="field">
-				<g:select name="hbaPort" from="${[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,24,32,40,48,56,64,72,80,88,96]}" value="${assetEntity?.hbaPort}"
-						onchange="setMustSave(this.value,'${assetEntity?.hbaPort}','rear', this.name)"/>
+				<g:select name="fiberQuantity" noSelection="['':'Undefined']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('fiberQuantity'))?.value}" value="${assetEntity?.fiberQuantity}"
+						onchange="setMustSave(this.value,'${assetEntity?.fiberQuantity}','rear', this.name)"/>
 		        &nbsp;&nbsp;
-			<g:select noSelection="['':'Undefined']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('fiberCabinet'))?.value}" id="fiberCabinet" name="fiberCabinet" value="${assetEntity?.fiberCabinet}" 
-				onchange="setMustSave(this.value,'${assetEntity?.fiberCabinet}','rear', this.name)"/>
+			<g:select noSelection="['':'Undefined']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('fiberType'))?.value}" id="fiberType" name="fiberType" value="${assetEntity?.fiberType}" 
+				onchange="setMustSave(this.value,'${assetEntity?.fiberType}','rear', this.name)"/>
 					<!--  <input type="text" id="fiberCabinet" name="fiberCabinet" value="${assetEntity?.fiberCabinet}" onchange="setMustSave(this.value,'${assetEntity?.fiberCabinet}','rear', this.name)" ></input>-->
 			</td>
 		</tr>

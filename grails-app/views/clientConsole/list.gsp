@@ -415,7 +415,7 @@ var timeInterval
 		var srcElement = event.srcElement ? event.srcElement : event.target;
 		eventSrcID=(srcElement)?srcElement.id:'undefined';
 		var idArray = eventSrcID.split('_')
-		if( idArray.length = 2) {
+		if( idArray.length = 2 && isNumeric( idArray[0] ) == true && isNumeric( idArray[1] ) == true ) {
 			var assetId = idArray[1]
 			if( idArray[0] == "comment"  ) {
 				${remoteFunction(controller:'assetEntity', action:'listComments', params:'\'id=\'+assetId', before:'setAssetId(assetId);',onComplete:'listCommentsDialog( e ,\"action\");')}
