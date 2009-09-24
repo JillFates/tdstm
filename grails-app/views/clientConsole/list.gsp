@@ -981,6 +981,7 @@ if('${browserTest}' == 'true'){
 } else {
 	$("div.tableContainer").css("width",vpWidth("width"));
 	$("#assetListTbody").css("height",vpWidth("height") - 257)
+	window.onresize = pageReload;
 }
 
 </script>
