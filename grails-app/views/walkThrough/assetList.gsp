@@ -91,11 +91,11 @@ function showAssetMenu( assetId , assetName, bundleId, bundleName ) {
 			<TABLE class=grid>
 				<thead>
 					<TR>
-						<g:sortableColumn property="uposition" title="U Pos" 
-						params="['moveBundle':params.moveBundle,'viewType':viewType,'location':params.location,'room':params.room,'rack':params.rack]"/>
-						<g:sortableColumn property="usize" title="Size" 
+						<g:sortableColumn property="${auditType}RackPosition" title="U Pos" 
 						params="['moveBundle':params.moveBundle,'viewType':viewType,'location':params.location,'room':params.room,'rack':params.rack]"/>
 						<g:sortableColumn property="assetTag" title="Asset Tag" 
+						params="['moveBundle':params.moveBundle,'viewType':viewType,'location':params.location,'room':params.room,'rack':params.rack]"/>
+						<g:sortableColumn property="assetName" title="Asset Name" 
 						params="['moveBundle':params.moveBundle,'viewType':viewType,'location':params.location,'room':params.room,'rack':params.rack]"/>
 					</TR>
 				</thead>

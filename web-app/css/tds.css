@@ -315,6 +315,12 @@
 .task_done{
 	background-color: green;
 }
+.task_done2{
+	background-color: #32CD32;
+}
+.task_done5{
+	background-color: #9ACD32 ;
+}
 .task_term {
 	background-color: black;
 }

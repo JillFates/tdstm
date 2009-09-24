@@ -188,6 +188,7 @@ class ClientConsoleController {
 					} else {
 						cssClass='task_term'
 					}
+					cssClass = getRecentChangeStyle( assetId, cssClass, trans.transId )
 					htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass\"  >&nbsp;</td>"
 					htmlTdId.append("${assetId+"_"+trans.transId},")
 				}
@@ -483,6 +484,7 @@ class ClientConsoleController {
                     } else {
                     	cssClass='task_term'
                     }
+					cssClass = getRecentChangeStyle( assetId, cssClass, trans )
 					tdId << [id:"${assetId+"_"+trans}", cssClass:cssClass]
 				}
 				assetEntityList << [id: assetId, application:it.application ? it.application : "&nbsp;",appOwner:it.appOwner ? it.appOwner : "&nbsp;", 
@@ -825,8 +827,37 @@ class ClientConsoleController {
             } else {
             	cssClass='task_term'
 			}
+			
+			cssClass = getRecentChangeStyle( assetEntity?.id, cssClass, trans)
+			
 			tdId << [id:"${assetEntity?.id+"_"+trans}", cssClass:cssClass]
 		}
 		return tdId
+	}
+	
+	/*----------------------------------------------------------
+	 * @author : Lokanath Reddy
+	 * @param  : Asset Id, cssClass, TransitionId
+	 * @return : Changed CSS class
+	 *--------------------------------------------------------*/
+	
+	def getRecentChangeStyle( def assetId, def cssClass, def transId ){
+		def changedClass = cssClass
+		if(cssClass == "task_done"){
+			def createdTime = AssetTransition.find("from AssetTransition a where a.assetEntity = $assetId and a.voided = 0 and a.stateTo=${transId}")?.dateCreated?.getTime()
+			def currentTime = new Date().getTime()
+			Integer minutes
+			if(createdTime){
+				minutes = (currentTime - createdTime) / 1000
+			}
+			if(minutes){
+				if(minutes < 120){
+					changedClass = "task_done2"
+				} else if(minutes > 120 && minutes < 330){
+					changedClass = "task_done5"	
+				}
+			}
+		}
+		return changedClass
 	}
 }

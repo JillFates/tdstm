@@ -111,7 +111,7 @@ class AssetEntityAttributeLoaderService {
 						if( dataTransferAttributeMap ){
 							if ( ! dataTransferAttributeMap.save() ) {
 								log.error "Failed to load DataTransferAttributeMap for TDS Master" +
-                                com.tdssrc.grails.GormUtil.allErrorsString( eavAttribute )
+                                com.tdssrc.grails.GormUtil.allErrorsString( dataTransferAttributeMap )
 							}
 						}
 					} catch ( Exception ex ) {

@@ -234,9 +234,9 @@ class DataTransferBatchController {
                 									"and dataTransferBatch=$dataTransferBatchInstance.id")?.importValue
         	def assetEntity = AssetEntity.find("from AssetEntity where id=${it.asset_entity_id}")
         	if( it.attribute_code == "sourceTeam" || it.attribute_code == "targetTeam") {
-        		currentValues = assetEntity.(it.attribute_code).name
+        		currentValues = assetEntity?.(it.attribute_code).name
         	} else {
-        		currentValues = assetEntity.(it.attribute_code)
+        		currentValues = assetEntity?.(it.attribute_code)
         	}
         	completeDataTransferErrorList << ["assetName":assetName, "assetTag":assetTag, "attribute":it.attribute_code, "error":it.error_text,  
         	                                  "currentValue":currentValues, "importValue":it.import_value]

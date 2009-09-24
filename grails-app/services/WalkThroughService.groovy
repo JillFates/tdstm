@@ -105,8 +105,8 @@ class WalkThroughService {
 				}
 				if(flag){
 					assetsListView.append("<tr class='$cssClass' onclick=\"showAssetMenu('${assetEntity?.id}','${assetEntity?.assetName}','${moveBundle?.id}','${moveBundle?.name}')\">"+
-							"<td class='center'>${position}</td><td class='center'>${assetEntity?.usize}</td>"+
-							"<td class='center'>${assetEntity?.assetTag}</td></tr>")
+							"<td class='center'>${position}</td><td class='center'>${assetEntity?.assetTag}</td>"+
+							"<td class='center'>${assetEntity?.assetName}</td></tr>")
 			 	}
 			 }
 			 if(assetsListSize > 10){
