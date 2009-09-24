@@ -56,7 +56,7 @@
 		'<tr><td class="asset_details_block"><b>Location:</b>  '+location+'</td></tr>'+
 		'<tr><td class="asset_details_block"><b>Room:</b>  '+room+'</td></tr>'+
 		'<tr><td class="asset_details_block"><b>Rack/Position:</b>  '+rack+'/'+pos+'</td></tr>'+
-		'<tr><td class="asset_details_block"><b>PDU:</b>  '+asset[0].item.powerPort+'</td></tr>'+
+		'<tr><td class="asset_details_block"><b>PDU:</b>  '+asset[0].item.pduPort+'</td></tr>'+
 		'<tr><td class="asset_details_block"><b>NIC:</b>  '+asset[0].item.nicPort+'</td></tr>'+
 		'<tr><td class="asset_details_block"><b>HBA:</b>  '+asset[0].item.hbaPort+'</td></tr>'+
 		'</tbody></table>' 

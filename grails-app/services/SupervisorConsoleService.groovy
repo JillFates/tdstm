@@ -137,7 +137,7 @@ class SupervisorConsoleService {
      *----------------------------------------*/
     def getQueryForRackElevation( def bundleId, def projectId, def includeOtherBundle, def rackRooms, def type ) {
     	def assetsDetailsQuery = new StringBuffer("select if(a."+type+"_rack_position,a."+type+"_rack_position,0) as rackPosition, max(cast(if(a.usize,a.usize,'0') as UNSIGNED INTEGER)) as usize, "+
-    												"a.power_port as powerPort, nic_port as nicPort,remote_mgmt_port as remoteMgmtPort, "+
+    												"a.pdu_port as pduPort, nic_port as nicPort,remote_mgmt_port as remoteMgmtPort, "+
     												"CONCAT_WS(' / ',a.fiber_cabinet,a.hba_port ) as fiberCabinet,"+
     												"CONCAT_WS(' / ',a.kvm_device,a.kvm_port ) as kvmDevice,"+
 													"count(a.asset_entity_id) as racksize, a.move_bundle_id as bundleId, "+

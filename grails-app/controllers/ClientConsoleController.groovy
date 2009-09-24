@@ -188,7 +188,7 @@ class ClientConsoleController {
 					} else {
 						cssClass='task_term'
 					}
-					htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass\"  onmouseout=\"removeStatus();\" onmouseover=\"showAssetStatus('${assetId}_${trans.transId}');\">&nbsp;</td>"
+					htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass\"  >&nbsp;</td>"
 					htmlTdId.append("${assetId+"_"+trans.transId},")
 				}
 				assetEntityList << [id: assetId, application:it.application,appOwner:it.appOwner,appSme:it.appSme,assetName:it.assetName,transitions:htmlTd,checkVal:check]

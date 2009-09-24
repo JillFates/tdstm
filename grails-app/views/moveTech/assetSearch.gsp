@@ -223,7 +223,7 @@
 			   		<dt>Cart/Shelf:</dt><dd>&nbsp;${projMap?.asset?.cart}/${projMap?.asset?.shelf}</dd>
 			   		<dt>New or Old:</dt><dd>&nbsp;${projMap?.asset?.newOrOld}</dd>
 					<dt>Rail Type:</dt><dd>&nbsp;${projMap?.asset?.railType}</dd>  			   	
-			   		<dt>Power Port:</dt><dd>&nbsp;${projMap?.asset?.powerPort}</dd>
+			   		<dt>Power Port:</dt><dd>&nbsp;${projMap?.asset?.pduPort}</dd>
 			   		<dt>NIC Port:</dt><dd>&nbsp;${projMap?.asset?.nicPort}</dd>
 			   		<dt>Remote Mgmt Port:</dt><dd>&nbsp;${projMap?.asset?.remoteMgmtPort}</dd>
 			   		<dt>Fiber Cabinet:</dt><dd>&nbsp;${projMap?.asset?.fiberCabinet}</dd>

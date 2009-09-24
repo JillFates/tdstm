@@ -46,6 +46,7 @@ var time = '${timeToRefresh}';
 </g:javascript>
 <script>
 var timeInterval
+var fieldId
 	$(document).ready(function() {
 		$("#changeStatusDialog").dialog({ autoOpen: false })
 	    $("#showDialog").dialog({ autoOpen: false })
@@ -98,6 +99,13 @@ var timeInterval
 				        }
 			      	}
 		    	});
+				$("#"+cellId).mouseover(function(){
+					fieldId = this.id.toString()
+					timeInterval = setTimeout("${remoteFunction(controller:'assetEntity', action:'showStatus', params:'\'id=\'+fieldId', onComplete:'window.status = e.responseText')}",2000);
+				});
+				$("#"+cellId).mouseout(function(){
+					window.status = ""
+				});
 			}
 		}
 	});
@@ -390,32 +398,13 @@ var timeInterval
 		document.createCommentForm.mustVerify.value=0;
 		document.createCommentForm.reset();
 	}
-	//To show the Status msg of particular Asset for 2 sec's
-	var fieldId
-	function showAssetStatus(assetStateId) {
-		fieldId = assetStateId
-		timeInterval = setTimeout("showStatus(fieldId)",2000);
-		
-	}
-	function  showStatus(assetStateId) {
-		var assetName = assetStateId
-		var idArray = assetStateId.split('_')
-		${remoteFunction(controller:'assetEntity', action:'showStatus', params:'\'id=\'+assetName', onComplete:'showStatusMsg(e )')}
-	}
-	function showStatusMsg(e) {
-		window.status=""+e.responseText
-	}
-	// To Clear the staus msg of Asset on onmouseout
-	function removeStatus() {
-		window.status=""
-	}
 	//To catch the event and call the specific remotefunction 
 	function catchevent(event) {
 		var oSource = event.target
 		var srcElement = event.srcElement ? event.srcElement : event.target;
 		eventSrcID=(srcElement)?srcElement.id:'undefined';
 		var idArray = eventSrcID.split('_')
-		if( idArray.length = 2 && isNumeric( idArray[0] ) == true && isNumeric( idArray[1] ) == true ) {
+		if( idArray.length = 2  ) {
 			var assetId = idArray[1]
 			if( idArray[0] == "comment"  ) {
 				${remoteFunction(controller:'assetEntity', action:'listComments', params:'\'id=\'+assetId', before:'setAssetId(assetId);',onComplete:'listCommentsDialog( e ,\"action\");')}
@@ -426,6 +415,8 @@ var timeInterval
 			}
 		}
 	}
+	
+		
 </script>
 </head>
 <body>

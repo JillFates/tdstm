@@ -764,7 +764,7 @@ class MoveBundleAssetController {
    			 	                'completedAt':projectInstance?.completionDate, 'bundleName':bundleInstance?.name,
    			 	                'teamName':teamPartyGroup?.name +"-"+teamMembers, 'teamMembers':teamMembers,
    			 	                'location':"Source Team", 'rack':"SourceRack",'rackPos':"SourceRackPosition",'truck':asset.truck, 
-   			 	                'room':asset.sourceRoom, 'PDU':asset.powerPort,'NIC':asset.nicPort,
+   			 	                'room':asset.sourceRoom, 'PDU':asset.pduPort,'NIC':asset.nicPort,
    			 	                'kvmPort':asset.kvmDevice ? asset.kvmDevice : '' + asset.kvmPort ? asset.kvmPort :'', 
    			 	                'hbaPort':asset.fiberCabinet + asset.hbaPort, 'instructions':assetCommentString, 'sourcetargetLoc':"s"]
     		}
@@ -807,7 +807,7 @@ class MoveBundleAssetController {
    				                'completedAt':projectInstance?.completionDate, 'bundleName':bundleInstance?.name, 
    				                'teamName':teamPartyGroup?.name +"-"+teamMembers, 'teamMembers':teamMembers,
    				                'location':"Target Team", 'rack':"TargetRack",'rackPos':"TargetRackPosition",
-   				                'truck':(asset.truck ? asset.truck : "")+"\n"+cartShelf,'room':asset.targetRoom,'PDU':asset.powerPort,'NIC':asset.nicPort, 
+   				                'truck':(asset.truck ? asset.truck : "")+"\n"+cartShelf,'room':asset.targetRoom,'PDU':asset.pduPort,'NIC':asset.nicPort, 
    				                'kvmPort':kvmPort, 'hbaPort':hbaPort,'instructions':assetCommentString,'sourcetargetLoc':"t"]
     		}
     		//No assets were found for selected MoveBundle,Team and Location
@@ -1377,7 +1377,7 @@ class MoveBundleAssetController {
     		 		}
     		 		if(backView){
     		 			if(it.cssClass != "rack_error"){
-    		 				row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${it.asset?.assetEntity?.powerPort ? 'PDU:'+ it.asset?.assetEntity?.powerPort +'; ' : '' }"+
+    		 				row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${it.asset?.assetEntity?.pduPort ? 'PDU:'+ it.asset?.assetEntity?.pduPort +'; ' : '' }"+
     		 							"${it.asset?.assetEntity?.nicPort ? 'NIC:'+ it.asset?.assetEntity?.nicPort +'; ' : ''} "+
     		 							"${it.asset?.assetEntity?.fiberCabinet && it.asset?.assetEntity?.fiberCabinet != ' / ' ? 'Fiber:'+ it.asset?.assetEntity?.fiberCabinet +'; ' : ''}"+
     		 							"${it.asset?.assetEntity?.kvmDevice && it.asset?.assetEntity?.kvmDevice != ' / '? 'KVM:'+ it.asset?.assetEntity?.kvmDevice +'; ' : ''} "+
