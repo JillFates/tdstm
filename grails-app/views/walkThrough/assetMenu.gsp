@@ -14,19 +14,19 @@ SimpleContextMenu.attach('container', 'myMenu');
 window.onbeforeunload = validExit;
 
 function validExit() {
-	var mustSave = document.auditForm.mustSave.value;
+	var mustSave = getObject("mustSaveId").value;
 	if(mustSave == 'true') {
 		return "You have unsaved changes that will be lost. Are you sure you want to do this?";
 	}
 }
 function validChanges() {
-	var mustSave = document.auditForm.mustSave.value;
+	var mustSave = getObject("mustSaveId").value;
 	var flag = true
 	if(mustSave == 'true') {
 		flag = confirm( "Changes have not been saved and will be lost.  Are you sure?" );
 	}
 	if(flag){
-		document.auditForm.mustSave.value = 'false'
+		getObject("mustSaveId").value = 'false'
 	}
 	return flag
 }
@@ -63,7 +63,7 @@ function filterByCommentType(val) {
 } --%>
 function missingAsset( type, id, message ){
 	if( validChanges() == true ) {
-		document.auditForm.mustSave.value = 'false'
+		getObject("mustSaveId").value = 'false'
 		if(confirm(message)){
 			document.auditForm.action = "missingAsset"
 			document.auditForm.submit(); 
@@ -129,7 +129,7 @@ var mustSave = false;
 function setMustSave( changed, actual, type, attribute ){
 	if( changed != actual ) {
 		mustSave = true;
-		document.auditForm.mustSave.value = mustSave;
+		getObject("mustSaveId").value = mustSave;
 		getObject("front1CompleteId").style.backgroundColor = 'green';
 		getObject("front1CompleteId").style.color = '#FFF';
 		getObject("front1SaveId").style.backgroundColor = 'green'
@@ -187,7 +187,7 @@ function callAssetMenu() {
 function populateComments() {
 	if(validChanges() == true ) {
 		location.href="#view_comments"
-		document.auditForm.mustSave.value = 'false'
+		getObject("mustSaveId").value = 'false'
 		document.commentsViewForm.commentType.value = 'all';
 		document.commentsViewForm.sort.value = 'desc';
 		document.commentsViewForm.orderType.value = 'commentType';
@@ -291,7 +291,7 @@ function checkComments(type) {
 		<input type="hidden" name="rack" value="${rack}">
 		<input type="hidden" name="location" value="${location}">
 		<input type="hidden" name="generalComment" id="generalCommentId" value="Asset changed: ">
-		<input type="hidden" id="mustSave" name="mustSave" value=""/>
+		<input type="hidden" id="mustSaveId" name="mustSave" value=""/>
 		<div style="FLOAT: left"><a class=button href="startMenu">Start Over</a></div>
 		<div style="FLOAT: right"><a class=button href="selectAsset?moveBundle=${moveBundle}&location=${location}&room=${room}&rack=${rack}">Asset List</a></div>
 		<table>
@@ -322,8 +322,8 @@ function checkComments(type) {
 			</span>
 			<div style="MARGIN-TOP: 10px">
 				<div class=thefield align=center>
-					<a class="button" id="mainSaveId" href="#select_asset" onClick="document.auditForm.submitType.value='save';document.auditForm.mustSave.value='false';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
-			        <a class="button" id="mainCompleteId" href="#select_asset"  onClick="document.auditForm.submitType.value='complete';document.auditForm.mustSave.value='false';document.auditForm.submit();">Completed</a>
+					<a class="button" id="mainSaveId" href="#select_asset" onClick="document.auditForm.submitType.value='save';getObject('mustSaveId').value='false';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
+			        <a class="button" id="mainCompleteId" href="#select_asset"  onClick="document.auditForm.submitType.value='complete';getObject('mustSaveId').value='false';document.auditForm.submit();">Completed</a>
 				</div>
 			</div>
 		</div>
@@ -413,8 +413,8 @@ function checkComments(type) {
 			<div style="margin-top:10px;">
 			   <div class="thefield" align="center">
 			      <a class="button" href="#asset_front2">Next</a>&nbsp;&nbsp;&nbsp;
-			      <a class="button" href="#select_asset" id="front1SaveId" onClick="document.auditForm.submitType.value='save';document.auditForm.mustSave.value='false';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
-			      <a class="button" href="#select_asset" id="front1CompleteId" onClick="document.auditForm.submitType.value='complete';document.auditForm.mustSave.value='false';document.auditForm.submit();">Completed</a>
+			      <a class="button" href="#select_asset" id="front1SaveId" onClick="document.auditForm.submitType.value='save';getObject('mustSaveId').value='false';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
+			      <a class="button" href="#select_asset" id="front1CompleteId" onClick="document.auditForm.submitType.value='complete';getObject('mustSaveId').value='false';document.auditForm.submit();">Completed</a>
 			   </div>
 			</div>
 			
@@ -500,8 +500,8 @@ function checkComments(type) {
 			   <div class="thefield" align="center">
 			      <a class="button" href="#asset_rear1">Next</a>&nbsp;&nbsp;
 			      <a class="button" href="#asset_front1">Back</a>&nbsp;&nbsp;
-			      <a class="button" href="#select_asset" id="front2SaveId"  onClick="document.auditForm.submitType.value='save';document.auditForm.mustSave.value='false';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
-			      <a class="button" href="#select_asset"  id="front2CompleteId" onClick="document.auditForm.submitType.value='complete';document.auditForm.mustSave.value='false';document.auditForm.submit();">Completed</a>
+			      <a class="button" href="#select_asset" id="front2SaveId"  onClick="document.auditForm.submitType.value='save';getObject('mustSaveId').value='false';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
+			      <a class="button" href="#select_asset"  id="front2CompleteId" onClick="document.auditForm.submitType.value='complete';getObject('mustSaveId').value='false';document.auditForm.submit();">Completed</a>
 			   </div>
 			</div>
 			
@@ -605,8 +605,8 @@ function checkComments(type) {
 		<div style="margin-top:20px;">
 		   <div class="thefield" align="center">
 		      <a class="button" href="#asset_front2">Back</a>&nbsp;&nbsp;
-		      <a class="button" href="#select_asset" id="rearSaveId" onClick="document.auditForm.submitType.value='save';document.auditForm.mustSave.value='false';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
-			  <a class="button" href="#select_asset" id="rearCompleteId" onClick="document.auditForm.submitType.value='complete';document.auditForm.mustSave.value='false';document.auditForm.submit();">Completed</a>
+		      <a class="button" href="#select_asset" id="rearSaveId" onClick="document.auditForm.submitType.value='save';getObject('mustSaveId').value='false';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
+			  <a class="button" href="#select_asset" id="rearCompleteId" onClick="document.auditForm.submitType.value='complete';getObject('mustSaveId').value='false';document.auditForm.submit();">Completed</a>
 		   </div>
 		</div>
 		
