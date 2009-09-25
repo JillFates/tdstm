@@ -502,7 +502,7 @@ class ClientConsoleController {
 					checkIssueType = AssetComment.find("from AssetComment where assetEntity=$it.id")
 					if ( checkIssueType ) {
 						assetCommentsList << ["assetEntityId":it.id, "type":"database_table_bold.png"]
-					} else {
+					} else if( role ){
 						assetCommentsList << ["assetEntityId":it.id, "type":"database_table_light.png"]
 					}
 				}

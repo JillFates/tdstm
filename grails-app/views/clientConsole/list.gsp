@@ -608,9 +608,11 @@ var fieldId
 							<img  id="comment_${assetEntity.id}" src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}"	border="0px">
 					</g:if>
 					<g:else>
+					<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
 						<a href="javascript:createNewAssetComment(${assetEntity.id});" >
 							<img  src="${createLinkTo(dir:'images/skin',file:'database_table_light.png')}"	border="0px">
 						</a>
+					</jsec:hasAnyRole>
 					</g:else>
 			</g:else>
 			</span>
