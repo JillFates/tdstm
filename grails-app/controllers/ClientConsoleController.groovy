@@ -98,7 +98,7 @@ class ClientConsoleController {
 			}
 			def resultList=jdbcTemplate.queryForList(query.toString())
 			def today = new java.util.Date();
-			getSession().setAttribute("LAST_POOL_TIME",new java.sql.Timestamp(today.getTime()))
+			def lastPoolTime = new java.sql.Timestamp(today.getTime())
 			def assetEntityList=[]
 			def processTransitionList=[]
 			def tempTransitions = []
@@ -197,7 +197,7 @@ class ClientConsoleController {
 			userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")
 			def timeToRefresh = getSession().getAttribute("CLIENT_CONSOLE_REFRESH")
 			return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,
-				appOwnerList:appOwnerList,applicationList:applicationList,appSmeList:appSmeList,projectId:projectId,
+				appOwnerList:appOwnerList,applicationList:applicationList,appSmeList:appSmeList,projectId:projectId, lastPoolTime : lastPoolTime,
 				processTransitionList:processTransitionList,projectId:projectId,appOwnerValue:appOwnerValue,appValue:appValue,
 				appSmeValue:appSmeValue,timeToRefresh:timeToRefresh ? timeToRefresh.CLIENT_CONSOLE_REFRESH : "never",
 				headerCount:headerCount,browserTest:browserTest, myForm : params.myForm, htmlTdId:htmlTdId, role : role]
@@ -385,7 +385,7 @@ class ClientConsoleController {
 		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
 		if(bundleId){
 			def moveBundleInstance = MoveBundle.findById( bundleId )
-			def lastPoolTime = getSession().getAttribute("LAST_POOL_TIME")
+			def lastPoolTime = params.lastPoolTime
 			def today = new java.util.Date();
 			def currentPoolTime = new java.sql.Timestamp(today.getTime())
 			getSession().setAttribute("LAST_POOL_TIME",currentPoolTime)
@@ -493,23 +493,21 @@ class ClientConsoleController {
 			}
 			
 			def assetCommentsList = []
-			if ( role ) {
-				def assetsList = AssetEntity.findAll("from AssetEntity where moveBundle = ${moveBundleInstance.id}")
-				assetsList.each {
-					def checkIssueType = AssetComment.find("from AssetComment where assetEntity=$it.id and commentType='issue' and isResolved = 0")
+			def assetsList = AssetEntity.findAll("from AssetEntity where moveBundle = ${moveBundleInstance.id}")
+			assetsList.each {
+				def checkIssueType = AssetComment.find("from AssetComment where assetEntity=$it.id and commentType='issue' and isResolved = 0")
+				if ( checkIssueType ) {
+					assetCommentsList << ["assetEntityId":it.id, "type":"database_table_red.png"]
+				} else {
+					checkIssueType = AssetComment.find("from AssetComment where assetEntity=$it.id")
 					if ( checkIssueType ) {
-						assetCommentsList << ["assetEntityId":it.id, "type":"database_table_red.png"]
+						assetCommentsList << ["assetEntityId":it.id, "type":"database_table_bold.png"]
 					} else {
-						checkIssueType = AssetComment.find("from AssetComment where assetEntity=$it.id")
-						if ( checkIssueType ) {
-							assetCommentsList << ["assetEntityId":it.id, "type":"database_table_bold.png"]
-						} else {
-							assetCommentsList << ["assetEntityId":it.id, "type":"database_table_light.png"]
-						}
+						assetCommentsList << ["assetEntityId":it.id, "type":"database_table_light.png"]
 					}
 				}
-			} 
-			assetEntityAndCommentList << [ assetEntityList: assetEntityList, assetCommentsList: assetCommentsList ]
+			}
+			assetEntityAndCommentList << [ assetEntityList: assetEntityList, assetCommentsList: assetCommentsList, lastPoolTime : lastPoolTime ]
 		}
     	render assetEntityAndCommentList as JSON
     }

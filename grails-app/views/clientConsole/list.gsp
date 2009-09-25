@@ -59,12 +59,12 @@ var fieldId
 	
 		var cells = "${htmlTdId}"
 		var role = "${role}"
-		if(role && cells){
-			var cellIds = "${htmlTdId}".split(",")
-			var cellsCount = cellIds.length - 1
-			for(i = 0; i < cellsCount; i++){
-				var cellId = cellIds[i] 
-				// Show menu when #myDiv is clicked
+		var cellIds = "${htmlTdId}".split(",")
+		var cellsCount = cellIds.length - 1
+		for(i = 0; i < cellsCount; i++){
+			var cellId = cellIds[i] 
+			// Show menu when #myDiv is clicked
+			if(role && cells){
 				$("#"+cellId).contextMenu('transitionMenu', {
 					onShowMenu: function(e, menu) {
 						$(".cell-selected").attr('class',$("#cssClassId").val());
@@ -99,14 +99,14 @@ var fieldId
 				        }
 			      	}
 		    	});
-				$("#"+cellId).mouseover(function(){
-					fieldId = this.id.toString()
-					timeInterval = setTimeout("${remoteFunction(controller:'assetEntity', action:'showStatus', params:'\'id=\'+fieldId', onComplete:'window.status = e.responseText')}",2000);
-				});
-				$("#"+cellId).mouseout(function(){
-					window.status = ""
-				});
 			}
+			$("#"+cellId).mouseover(function(){
+				fieldId = this.id.toString()
+				timeInterval = setTimeout("${remoteFunction(controller:'assetEntity', action:'showStatus', params:'\'id=\'+fieldId', onComplete:'window.status = e.responseText')}",2000);
+			});
+			$("#"+cellId).mouseout(function(){
+				window.status = ""
+			});
 		}
 	});
 </script>
@@ -254,7 +254,8 @@ var fieldId
 		var application = $("#applicationId").val();
 		var appOwner = $("#appOwnerId").val();
 		var appSme = $("#appSmeId").val();
-		${remoteFunction(action:'getTransitions', params:'\'moveBundle=\' + moveBundle +\'&application=\'+application +\'&appOwner=\'+appOwner+\'&appSme=\'+appSme', onComplete:'updateTransitions(e);' )}
+		var lastPoolTime = $("#lastPoolTimeId").val();
+		${remoteFunction(action:'getTransitions', params:'\'moveBundle=\' + moveBundle +\'&application=\'+application +\'&appOwner=\'+appOwner+\'&appSme=\'+appSme +\'&lastPoolTime=\'+lastPoolTime', onComplete:'updateTransitions(e);' )}
 		timedRefresh($("#selectTimedId").val())
 	}
 	
@@ -273,8 +274,8 @@ var fieldId
 						var action = $("#action_"+assetTransition.id)
 						if(action){
 							if(!assetTransition.check){
-								action.html('&nbsp;');
-							} 
+								action.html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
+							}
 						}
 						var application = $("#application_"+assetTransition.id)
 						if(application){
@@ -318,6 +319,7 @@ var fieldId
 						}
 					}
 				}
+				$("#lastPoolTimeId").val(assetEntityCommentList[0].lastPoolTime)
 			} else {
 			location.reload(false);
 			//timedRefresh('never')
@@ -456,6 +458,7 @@ var fieldId
 <div style="width: 100%;">
 	<g:form	name="listForm" action="list" method="post">
 	<input type="hidden" id="role" value="${role}"/>
+	<input type="hidden" id="lastPoolTimeId" value="${lastPoolTime}">
 	<input type="hidden" id="projectId" name="projectId" value="${projectId }" />
 	<table style="border: 0px;">
 		<tr>
@@ -497,9 +500,9 @@ var fieldId
 <table cellpadding="0"   cellspacing="0"  style="border:0px;" >
 	<thead>
 		<tr>
-		 <jsec:hasAnyRole in="['ADMIN','MANAGER', 'PROJ_MGR']">	<th style="padding-top:35px;">Actions</span> 
+		 <th style="padding-top:35px;"><span>Actions</span><jsec:hasAnyRole in="['ADMIN','MANAGER', 'PROJ_MGR']"> 
 		 <input type="button" value="State..." onclick="changeState()" title="Change State" style="width: 80px;"/>
-		 <a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a></th></jsec:hasAnyRole>
+		 <a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a></jsec:hasAnyRole></th>
 			<th style="padding-top:35px;" >
 			<table style="border: 0px;">
 				<thead>
@@ -584,14 +587,17 @@ var fieldId
 		<g:if test="${assetEntityList}">
 		<g:each in="${assetEntityList}" var="assetEntity">
 			<tr id="assetRow_${assetEntity.id}" >
-			<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">	
-			<td id="action_${assetEntity.id}">
+			<td>
+			<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
+			<span id="action_${assetEntity.id}">
 				<g:if test="${assetEntity.checkVal == true}">
 					<g:checkBox name="checkChange" id="checkId_${assetEntity.id}" onclick="timedRefresh('never')"></g:checkBox>
 						<img id="task_${assetEntity.id}"src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}"	border="0px">
 				</g:if>
 				<g:else>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</g:else>
-							<img id="asset_${assetEntity.id}" src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px">
+			</span>
+			</jsec:hasAnyRole>
+			<img id="asset_${assetEntity.id}" src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px">
 			<span id="icon_${assetEntity.id}">
 				<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+assetEntity.id+' and commentType = ? and isResolved = ?',['issue',0])}">
 					
@@ -609,7 +615,6 @@ var fieldId
 			</g:else>
 			</span>
 			</td>
-			</jsec:hasAnyRole>
 			<td  id="${assetEntity.id}_application" >${assetEntity?.application}&nbsp;</td>
 			<td id="${assetEntity.id}_appOwner" >${assetEntity?.appOwner}&nbsp;</td>
 			<td id="${assetEntity.id}_appSme" >${assetEntity?.appSme}&nbsp;</td>
@@ -983,7 +988,6 @@ if('${browserTest}' == 'true'){
 	$("#assetListTbody").css("height",vpWidth("height") - 257)
 	window.onresize = pageReload;
 }
-
 </script>
 </body>
 </html>
