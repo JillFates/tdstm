@@ -146,7 +146,9 @@ function setMustSave( changed, actual, type, attribute ){
 		getObject("mainSaveId").style.color = '#FFF';
 		getObject("mainCompleteId").style.backgroundColor = 'green'
 		getObject("mainCompleteId").style.color = '#FFF';
-		document.auditForm.generalCommentId.value = (document.auditForm.generalCommentId.value + attribute+" form "+actual+" to "+ changed +", " )
+		if(attribute != "needAssetTag" && attribute != "hasAmber" && attribute != "stuffOnTop" && attribute != "poweredOff" && attribute != "moveCables" ){
+			document.auditForm.generalComment.value = (document.auditForm.generalComment.value + attribute+" form "+actual+" to "+ changed +", " )
+		}
 	}
 }
 //To move the option to Up/Down in list boxes
@@ -307,25 +309,24 @@ function checkComments(type) {
 			</trody>
 		</table>
 		<div style="MARGIN-TOP: 15px" align=center>
-			<a class="button big" href="#asset_front1">Front Audit</a> <BR style="MARGIN-TOP: 6px">
-			<a class="button big" href="#asset_rear1">Rear Audit</a> <BR style="MARGIN-TOP: 6px">
-			<a class="button big" href="getComments?commentType=all&sort=desc&orderType=commentType&id=${assetEntity?.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments" onclick="return validChanges();">Issues/Comments</a> <BR style="MARGIN-TOP: 6px">
-			<span id="missingAsset" >
-				<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id +' and commentType = ? and isResolved = ? and commentCode = ?' ,['issue',0,'ASSET_MISSING'])}">
-					<input name="type" value="resolve" type="hidden"/>
-					<a href="#" class="button big" onclick="missingAsset('resolve', '${assetEntity?.id}','Resolve missing asset issue. Are you sure?')">Missing Asset Found</a>
-				</g:if>
-				<g:else>
-					<input name="type" value="create" type="hidden"/>
-					<a href="#" class="button big" onclick="missingAsset('create', '${assetEntity?.id}','Mark asset as missing. Are you sure?')">Mark Asset Missing </a>
-				</g:else>
-			</span>
-			<div style="MARGIN-TOP: 10px">
-				<div class=thefield align=center>
-					<a class="button" id="mainSaveId" href="#select_asset" onClick="document.auditForm.submitType.value='save';getObject('mustSaveId').value='false';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
-			        <a class="button" id="mainCompleteId" href="#select_asset"  onClick="document.auditForm.submitType.value='complete';getObject('mustSaveId').value='false';document.auditForm.submit();">Completed</a>
+			<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id +' and commentType = ? and isResolved = ? and commentCode = ?' ,['issue',0,'ASSET_MISSING'])}">
+				<input name="type" value="resolve" type="hidden"/>
+				<a href="#" class="button big" onclick="missingAsset('resolve', '${assetEntity?.id}','Resolve missing asset issue. Are you sure?')">Missing Asset Found</a>
+			</g:if>
+			<g:else>
+				<a class="button big" href="#asset_front1">Front Audit</a> <BR style="MARGIN-TOP: 6px">
+				<a class="button big" href="#asset_rear1">Rear Audit</a> <BR style="MARGIN-TOP: 6px">
+				<a class="button big" href="getComments?commentType=all&sort=desc&orderType=commentType&id=${assetEntity?.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments" 
+					onclick="return validChanges();">Issues/Comments</a> <BR style="MARGIN-TOP: 6px">
+				<input name="type" value="create" type="hidden"/>
+				<a href="#" class="button big" onclick="missingAsset('create', '${assetEntity?.id}','Mark asset as missing. Are you sure?')">Mark Asset Missing </a>
+				<div style="MARGIN-TOP: 10px">
+					<div class=thefield align=center>
+						<a class="button" id="mainSaveId" href="#select_asset" onClick="document.auditForm.submitType.value='save';getObject('mustSaveId').value='false';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
+				        <a class="button" id="mainCompleteId" href="#select_asset"  onClick="document.auditForm.submitType.value='complete';getObject('mustSaveId').value='false';document.auditForm.submit();">Completed</a>
+					</div>
 				</div>
-			</div>
+			</g:else>
 		</div>
       </div>
       </div>

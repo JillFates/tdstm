@@ -827,7 +827,6 @@ class ClientConsoleController {
 			}
 			
 			cssClass = getRecentChangeStyle( assetEntity?.id, cssClass, trans)
-			
 			tdId << [id:"${assetEntity?.id+"_"+trans}", cssClass:cssClass]
 		}
 		return tdId
@@ -848,7 +847,7 @@ class ClientConsoleController {
 			if(createdTime){
 				minutes = (currentTime - createdTime) / 1000
 			}
-			if(minutes){
+			if( minutes != null ){
 				if(minutes < 120){
 					changedClass = "task_done2"
 				} else if(minutes > 120 && minutes < 330){

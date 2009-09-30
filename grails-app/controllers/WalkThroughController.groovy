@@ -296,11 +296,7 @@ class WalkThroughController {
 	 *----------------------------------------------------------*/
 	def assetMenu = {
 		def assetEntity = AssetEntity.findById(params.id)
-		def walkthruComments = []
-		def walkthruCommentsCount = Integer.parseInt(message ( code: "walkthru.defComment.count" ))
-		for ( int i=1; i<=walkthruCommentsCount; i++ ) {
-			walkthruComments << message ( code: "walkthru.defComment.${i}" )
-		}
+		def walkthruComments = walkthruComments()
 		def commentCodes = walkThroughCodes( assetEntity )
 		render(view:'assetMenu', model:[ moveBundle:params.moveBundle, location:params.location, room:params.room,
 		                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
@@ -318,10 +314,6 @@ class WalkThroughController {
 		def assetComment
 		def assetEntity = AssetEntity.findById( params.id )
 		if(assetEntity){
-			def stateTo = "SourceWalkthru"
-			if(auditType != "source"){
-				stateTo = "TargetWalkthru"
-			}
 			if(type != 'create'){
 				assetComment = AssetComment.find("from AssetComment where assetEntity = ${assetEntity.id} and commentType = ? and isResolved = ? and commentCode = ?" ,['issue',0,'ASSET_MISSING'])
 				assetComment?.isResolved = 1
@@ -331,16 +323,12 @@ class WalkThroughController {
 				assetComment?.save()
 			} else {
 				assetComment = new AssetComment(commentType:'issue', assetEntity:assetEntity, isResolved:0, commentCode:'ASSET_MISSING', category:'walkthru', createdBy:loginUser.person ).save()
-				def transactionStatus = workflowService.createTransition(assetEntity.project.workflowCode,"SUPERVISOR", stateTo, assetEntity, assetEntity.moveBundle, loginUser, null, "" )
 			}
 		}
-		/*def message = "success"
-		if(!assetComment){
-			message = "failure"
-		}
-		render message*/
-		redirect(action:selectAsset, params:[moveBundle:getSession().getAttribute("AUDIT_BUNDLE"),room:params.room, 
-		                                     location:getSession().getAttribute("AUDIT_LOCATION"), rack:params.rack, sort:'asc' ])
+		def walkthruComments = walkthruComments()
+		def commentCodes = walkThroughCodes( assetEntity )
+		render(view:'assetMenu', model:[ moveBundle:assetEntity?.moveBundle?.id, location:params.location, room:params.room,
+		                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
 	}
     /*------------------------------------------------------------
 	 * @author : Lokanath Reddy
@@ -372,11 +360,7 @@ class WalkThroughController {
 	 *----------------------------------------------------------*/
     def saveAndCompleteAudit = {
 		def assetEntity = AssetEntity.get( params.id )
-		def walkthruComments = []
-        def walkthruCommentsCount = Integer.parseInt(message ( code: "walkthru.defComment.count" ))
-        for ( int i=1; i<=walkthruCommentsCount; i++ ) {
-        	walkthruComments << message ( code: "walkthru.defComment.${i}" )
-        }
+		def walkthruComments = walkthruComments()
 		if( assetEntity ){
 			def principal = SecurityUtils.subject.principal
 			def loginUser = UserLogin.findByUsername ( principal )
@@ -509,11 +493,7 @@ class WalkThroughController {
     	assetComment.category = 'walkthru'
     	assetComment.createdBy = loginUser.person
     	assetComment.save()
-    	def walkthruComments = []
-		def walkthruCommentsCount = Integer.parseInt(message ( code: "walkthru.defComment.count" ))
-		for ( int i=1; i<=walkthruCommentsCount; i++ ) {
-			walkthruComments << message ( code: "walkthru.defComment.${i}" )
-		}
+    	def walkthruComments = walkthruComments()
 		def commentCodes = walkThroughCodes( assetEntity )
 		render(view:'assetMenu', model:[ moveBundle:params.moveBundle, location:params.location, room:params.room,  viewType:'view_comments', commentType : 'all',
 		                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
@@ -555,11 +535,7 @@ class WalkThroughController {
 		} else {
 			commentListView.append("<TR class='comment_font'><TD colSpan='3' align='center' class='norecords_display'>No records found</TD></TR>")
 		}
-		def walkthruComments = []
-		def walkthruCommentsCount = Integer.parseInt(message ( code: "walkthru.defComment.count" ))
-		for ( int i=1; i<=walkthruCommentsCount; i++ ) {
-			walkthruComments << message ( code: "walkthru.defComment.${i}" )
-		}
+		def walkthruComments = walkthruComments()
 		def commentCodes = walkThroughCodes( assetEntity )
 		render(view:'assetMenu', model:[ moveBundle:params.moveBundle, location:params.location, room:params.room,  
 		                                 viewType:'view_comments', commentListView : commentListView, sort : params.sort, commentType : params.commentType,
@@ -577,5 +553,13 @@ class WalkThroughController {
     		                stackedOnTop : AssetComment.find(query,["issue", 0, "STACKED_ON_TOP"])?.commentCode,
     		                poweredOff : AssetComment.find(query,["issue", 0, "POWERED_OFF"])?.commentCode,
     		                cablesMoved : AssetComment.find(query,["issue", 0, "HAS_OBSTRUCTION"])?.commentCode]
+    }
+    def walkthruComments(){
+    	def walkthruComments = []
+		def walkthruCommentsCount = Integer.parseInt(message ( code: "walkthru.defComment.count" ))
+		for ( int i=1; i<=walkthruCommentsCount; i++ ) {
+			walkthruComments << message ( code: "walkthru.defComment.${i}" )
+		}
+    	return walkthruComments;
     }
 }
