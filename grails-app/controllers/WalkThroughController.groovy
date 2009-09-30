@@ -405,7 +405,7 @@ class WalkThroughController {
 					resolveComments( 'POWERED_OFF', loginUser, query )
 				}
 				
-				if(params.moveCables == "Y"){
+				if(params.hasObstruction == "Y"){
 					createComments( 'HAS_OBSTRUCTION', loginUser, query, assetEntity, "Has Obstruction" )
 				} else {
 					resolveComments( 'HAS_OBSTRUCTION', loginUser, query )

@@ -52,8 +52,8 @@ class DataTransferBatchController {
     															"$dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
     				def assetsSize = dataTransferValueRowList.size()
     				session.setAttribute("TOTAL_BATCH_ASSETS",assetsSize)
-    				for(int dataTransferValueRow =0; dataTransferValueRow < assetsSize; dataTransferValueRow ++) {
-    					def rowId =dataTransferValueRowList[dataTransferValueRow].rowId
+    				for( int dataTransferValueRow =0; dataTransferValueRow < assetsSize; dataTransferValueRow++ ) {
+    					def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
     					def dtvList = DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
     					def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
     					def flag = 0
@@ -112,7 +112,7 @@ class DataTransferBatchController {
     									}
     									//correctedPos = it.correctedValue
     									if( attribName == "usize" ) {
-    										if( ( assetEntity."$attribName"?.trim() != it.correctedValue?.trim() && assetEntity."$attribName"?.trim() != it.importValue?.trim() )|| isNewValidate == "true" ) {
+    										if( ( ( it.correctedValue == null || assetEntity."$attribName"?.trim() != it.correctedValue?.trim() ) && assetEntity."$attribName"?.trim() != it.importValue?.trim() ) || isNewValidate == "true" ) {
             									isModified = "true"
             									assetEntity."$attribName" = correctedPos 
             								}
@@ -131,7 +131,7 @@ class DataTransferBatchController {
     									isFormatError = 1
     								}
     							} else {
-    								if( (assetEntity."$attribName" != it.correctedValue && assetEntity."$attribName" != it.importValue) || isNewValidate == "true"  ) {
+    								if( ( ( it.correctedValue == null || assetEntity."$attribName" != it.correctedValue ) && assetEntity."$attribName" != it.importValue) || isNewValidate == "true"  ) {
     									isModified = "true"
     									assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
     								}

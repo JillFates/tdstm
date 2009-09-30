@@ -596,9 +596,9 @@ function checkComments(type) {
 		<tr>
 		        <td class="label">Has Obstruction?</td>
 		        <td class="field">
-		                <input type="radio" name="moveCables" id="moveCablesYes" onclick="setMustSave(this.value,'${assetEntity?.pduPort}','rear', this.name)" value="Y"><label for="moveCablesYes">Yes</label>
+		                <input type="radio" name="hasObstruction" id="hasObstructionYes" onclick="setMustSave(this.value,'${assetEntity?.pduPort}','rear', this.name)" value="Y"><label for="hasObstructionYes">Yes</label>
 		                &nbsp;&nbsp;
-		                <input type="radio" name="moveCables" id="moveCablesNo" value="N" onclick="setMustSave(this.value,'${assetEntity?.pduPort}','rear', this.name)" checked><label for="moveCablesNo">No</label>
+		                <input type="radio" name="hasObstruction" id="hasObstructionNo" value="N" onclick="setMustSave(this.value,'${assetEntity?.pduPort}','rear', this.name)" checked><label for="hasObstructionNo">No</label>
 		        </td>
 		</tr>
 		</table>      
@@ -756,8 +756,8 @@ function checkComments(type) {
 		getObject("poweredOffNo").checked = false
 	}
 	if('${commentCodes.cablesMoved}'){
-		getObject("moveCablesYes").checked =true
-		getObject("moveCablesNo").checked = false
+		getObject("hasObstructionYes").checked =true
+		getObject("hasObstructionNo").checked = false
 	}
 	getObject("manufacturerId").value = "${assetEntity?.manufacturer}"
 	getObject("modelId").value = "${assetEntity?.model}"
