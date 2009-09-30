@@ -31,6 +31,8 @@ overflow: hidden;
 <g:javascript>
 
 function initialize(){
+window.onresize=pageReload;
+window.onload=cancelResize;
 var bundleId = ${moveBundleInstance.id}; 
 $("#moveBundleId").val(bundleId);
 $("#appSmeId").val("${appSmeValue}");
@@ -111,6 +113,10 @@ var fieldId
 	});
 </script>
 <script type="text/javascript">
+var eventType = "load"
+	function cancelResize(){
+	eventType = "load"
+	}
 	/*------------------------------------------------------------
 	 * update the menu for transition 
 	 *------------------------------------------------------------*/
@@ -242,11 +248,15 @@ var fieldId
 	}
 	
 	function pageReload(){
-		if('${myForm}'){
-		document.forms['${myForm}'].submit() ;
-		} else {
-			window.location = document.URL;
+		if(eventType != "load" || !window.ActiveXObject) {
+			if('${myForm}'){
+			document.forms['${myForm}'].submit() ;
+			} else {
+				window.location.href = document.URL;
+			}
 		}
+		eventType ="";
+		
 	}
 	
 	function doAjaxCall(){
@@ -421,7 +431,7 @@ var fieldId
 		
 </script>
 </head>
-<body>
+<body >
 <div title="Change Status" id="changeStatusDialog"
 	style="background-color: #808080;display: none;">
 	<input type="hidden" id="cssClassId">
@@ -988,7 +998,6 @@ if('${browserTest}' == 'true'){
 } else {
 	$("div.tableContainer").css("width",vpWidth("width"));
 	$("#assetListTbody").css("height",vpWidth("height") - 257)
-	window.onresize = pageReload;
 }
 </script>
 </body>
