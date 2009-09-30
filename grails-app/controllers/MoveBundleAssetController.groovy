@@ -971,7 +971,7 @@ class MoveBundleAssetController {
         		if( rack[0] == "" ){
         			def sourceRackQuery = "select CONCAT_WS('~',IFNULL(source_location ,'blank'),IFNULL(source_room,'blank'),"+
             								"IFNULL(source_rack,'blank')) as rack from asset_entity where"
-            		if( bundleId ){
+            		if( bundleId && !includeOtherBundle){
             			sourceRackQuery += " move_bundle_id = $bundleId "
             		} else {
             			sourceRackQuery += " project_id = $projectId "
@@ -987,7 +987,7 @@ class MoveBundleAssetController {
             	if(rack[0] == ""){
             		def targetRackQuery = "select CONCAT_WS('~',IFNULL(target_location ,'blank'),IFNULL(target_room,'blank'), "+
             								"IFNULL(target_rack,'blank')) as rack from asset_entity where"
-					if( bundleId ){
+					if( bundleId && !includeOtherBundle){
 						targetRackQuery += " move_bundle_id = $bundleId "
 					} else {
 						targetRackQuery += " project_id = $projectId "
