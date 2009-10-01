@@ -25,6 +25,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String hinfo
 	String kvmDevice
 	String kvmPort
+	Integer hasKvm = 0
+	Integer hasRemoteMgmt =0
 	String newOrOld
 	String nicPort
 	String powerType
@@ -82,6 +84,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		pduQuantity( blank:true, nullable:true )
 		pduPort( blank:true, nullable:true )
 		remoteMgmtPort( blank:true, nullable:true )
+		hasKvm( blank:true, nullable:true )
+		hasRemoteMgmt( blank:true, nullable:true )
 		truck( blank:true, nullable:true )		
 		project( nullable:false )
 		application( blank:true, nullable:false )
@@ -102,6 +106,10 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	static mapping  = {	
 		version true
 		id column:'asset_entity_id'
+		columns {
+			hasKvm sqltype: 'tinyint(1)'
+			hasRemoteMgmt sqltype: 'tinyint(1)'
+		}
 	}
 	
 	String toString(){
