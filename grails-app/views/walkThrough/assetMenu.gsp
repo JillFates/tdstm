@@ -127,6 +127,24 @@ function validateCommentSelect() {
 }
 var mustSave = false;
 function setMustSave( changed, actual, type, attribute ){
+	if(attribute=='remoteMgmtPort') {
+		if(document.auditForm.remoteMgmtPort.checked){
+			actual = 1
+			document.auditForm.hasRemoteMgmt.value=1
+		}else {
+			actual = 0
+			document.auditForm.hasRemoteMgmt.value=0
+		}
+	}
+	if(attribute=='kvmPort') {
+		if(document.auditForm.kvmPort.checked){
+			actual = 1
+			document.auditForm.hasKvm.value=1
+		}else {
+			actual = 0
+			document.auditForm.hasKvm.value=0
+		}
+	}
 	if( changed != actual ) {
 		mustSave = true;
 		getObject("mustSaveId").value = mustSave;
@@ -292,6 +310,8 @@ function checkComments(type) {
 		<input type="hidden" name="room" value="${room}">
 		<input type="hidden" name="rack" value="${rack}">
 		<input type="hidden" name="location" value="${location}">
+		<input type="hidden" name="hasKvm" value="${assetEntity.hasKvm}">
+		<input type="hidden" name="hasRemoteMgmt" value="${assetEntity.hasRemoteMgmt}">
 		<input type="hidden" name="generalComment" id="generalCommentId" value="Asset changed: ">
 		<input type="hidden" id="mustSaveId" name="mustSave" value=""/>
 		<div style="FLOAT: left"><a class=button href="startMenu">Start Over</a></div>
@@ -435,12 +455,12 @@ function checkComments(type) {
 			
 			<table>
 			<tr>
-				<td class="label">Asset Tag:</td>
-				<td class="field">${assetEntity?.assetTag}</td>
+				<td class="label">Room:</td>
+				<td class="field"><input type="text" name="sourceRoom" value="${assetEntity?.sourceRoom}" size="8" maxsize="50" onchange="setMustSave(this.value,'${assetEntity?.sourceRoom}','front2', this.name)"/></td>
 			</tr>
 			<tr>
-				<td class="label">Source Rack:</td>
-				<td class="field"><input type="text" name="sourceRack" value="${assetEntity?.sourceRack}" size="8" maxsize="50"/></td>
+				<td class="label">Rack:</td>
+				<td class="field"><input type="text" name="sourceRack" value="${assetEntity?.sourceRack}" size="8" maxsize="50" onchange="setMustSave(this.value,'${assetEntity?.sourceRack}','front2', this.name)"/></td>
 			</tr>
 			
 			<tr>
@@ -574,22 +594,22 @@ function checkComments(type) {
 		<tr>
 		        <td class="label"><label for=attachedKVM>Attached to KVM:</label></td>
 		        <td class="field">
-		        <g:if test="${assetEntity?.kvmDevice || assetEntity?.kvmPort }">
-						<input type="checkbox" name="kvmPort" id="attachedKVM" onclick="setMustSave(this.value,'${assetEntity?.kvmPort}','rear', this.name)" checked="checked">
+		        <g:if test="${assetEntity?.hasKvm }">
+						<input type="checkbox" name="kvmPort" id="attachedKVM" onclick="setMustSave(this.value,'${assetEntity?.hasKvm}','rear', this.name)" checked="checked">
 				</g:if>
 				<g:else>
-						<input type="checkbox" name="kvmPort" onclick="setMustSave(this.value,'${assetEntity?.kvmPort}','rear', this.name)" id="attachedKVM">
+						<input type="checkbox" name="kvmPort" onclick="setMustSave(this.value,'${assetEntity?.hasKvm}','rear', this.name)" id="attachedKVM">
 				</g:else>
 		        </td>
 		</tr>
 		<tr>
-		        <td class="label"><label for="hasILO">Has ILO Mgmt:</label></td>
+		        <td class="label"><label for="hasILO">Has Remote Mgmt:</label></td>
 		        <td class="field">
-		        <g:if test="${assetEntity?.remoteMgmtPort}">
-					<input type="checkbox" name="remoteMgmtPort" id="hasILO" onclick="setMustSave(this.value,'${assetEntity?.pduPort}','rear', this.name)" checked="checked">
+		        <g:if test="${assetEntity?.hasRemoteMgmt}">
+					<input type="checkbox" name="remoteMgmtPort" id="hasILO" onclick="setMustSave(this.value,'${assetEntity?.hasRemoteMgmt}','rear', this.name)" checked="checked">
 				</g:if>
 				<g:else>
-					<input type="checkbox" name="remoteMgmtPort" onclick="setMustSave(this.value,'${assetEntity?.pduPort}','rear', this.name)" id="hasILO">
+					<input type="checkbox" name="remoteMgmtPort" onclick="setMustSave(this.value,'${assetEntity?.hasRemoteMgmt}','rear', this.name)" id="hasILO">
 				</g:else>
 		        </td>
 		</tr>

@@ -47,6 +47,10 @@ function showAssets(bundle, location, room, rack){
 </tr>
 
 <tr>
+	<td colspan="2" align="right"><a name="rackButton" class="button"  href="#">Rack</a>/<a name="assetButton" class="button unselected"  href="#">Asset</a></td>
+</tr>
+
+<tr>
 	<td align="center" style="margin-top:8px; margin-bottom:8px;">
 		<input type="hidden" name="viewType" id="viewTypeId" value="${viewType}">
 		<input type="hidden" name="moveBundle" value="${moveBundle}">
