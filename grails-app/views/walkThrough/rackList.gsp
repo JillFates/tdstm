@@ -34,20 +34,12 @@ function showAssets(bundle, location, room, rack){
 <a class="button" href="startMenu">Start Over</a>
 <table>
 <g:form method="post" action="selectRack" name="selectRackForm"> 
-<tr>
-   <td class="label">Location:</td>
-   <td class="field">
-      <select name="location" id="locationId" class="select"
-      	onchange="document.selectRackForm.submit()">
-	      <g:each in="${locationsList}" var="locationsList">
-	         <option value="${locationsList.location}">${locationsList.location}</option>
-	      </g:each>
-      </select>
-   </td>
-</tr>
+
 
 <tr>
-	<td colspan="2" align="right"><a name="rackButton" class="button"  href="#">Rack</a>/<a name="assetButton" class="button unselected"  href="#">Asset</a></td>
+	<td colspan="2" align="right"><a name="rackButton" class="button"  href="#">Rack</a>/<a name="assetButton" class="button unselected"  href="#">Asset</a>
+	<input type="hidden" name="location" id="locationId">
+      	</td>
 </tr>
 
 <tr>

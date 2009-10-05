@@ -55,7 +55,7 @@ class WalkThroughService {
 				}
 				if(flag){
 					rackListView.append("<tr class='$cssClass' onclick=\"showAssets('${moveBundle}','${location}','${rackList[0]}','${rackList[1]}')\">"+
-							"<td class='center'>${rackList[0] ? rackList[0] : '&nbsp;'}</td><td class='center'>${rackList[1] ? rackList[1] : '&nbsp;'}</td>")
+							"<td class='center'>${rackList[0] ? rackList[0] : 'blank'}</td><td class='center'>${rackList[1] ? rackList[1] : 'blank'}</td>")
 					rackListView.append("<td class='center'>${availTotal} of ${rackList[2]}</td></tr>")
 			 	}
 			 }

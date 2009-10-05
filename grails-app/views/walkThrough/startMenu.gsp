@@ -59,13 +59,29 @@ function appendBundles() {
 				<tr>
 				   <td class="label">Bundle:</td>
 				   <td class="field">
-				      <select name="moveBundle" id="moveBundleId" class="select" >
+				      <select name="moveBundle" id="moveBundleId" class="select" onchange="appendBundles()">
 				      	<g:each in="${moveBundlesList}" var="moveBundle">
 				   			<g:if test="${currBundle == moveBundle?.id.toString()} ">
 				   				<option value="${moveBundle?.id}" selected>${moveBundle?.name}</option>
 				   			</g:if>
 				   			<g:else>
 				   				<option value="${moveBundle?.id}">${moveBundle?.name}</option>
+				   			</g:else>
+				   		</g:each>
+				      </select>
+				   </td>
+				</tr>
+				
+				<tr>
+				   <td class="label">Location:</td>
+				   <td class="field">
+				      <select name="location" id="locationId" class="select" >
+				      	<g:each in="${locationList}" var="location">
+				   			<g:if test="${currLocation == location} ">
+				   				<option value="${location}" selected>${location}</option>
+				   			</g:if>
+				   			<g:else>
+				   				<option value="${location}">${location}</option>
 				   			</g:else>
 				   		</g:each>
 				      </select>

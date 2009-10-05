@@ -25,11 +25,22 @@ class WalkThroughController {
 	 *----------------------------------------------------------*/
     def startMenu = {
 		def projectId = params.project
+		def currentProj = getSession().getAttribute("AUDIT_PROJ")
 		if(projectId){
 			getSession().setAttribute("AUDIT_PROJ",projectId)
 		}
+		def moveBundle = params.moveBundle
+		if(moveBundle){
+			getSession().setAttribute("AUDIT_BUNDLE",moveBundle)
+		}
+		def location = params.location
+		if(location){
+			getSession().setAttribute("AUDIT_LOCATION",location)
+		}
+		def locationList
     	def currBundle = getSession().getAttribute("AUDIT_BUNDLE")
     	def currProj = getSession().getAttribute("AUDIT_PROJ")
+    	def currLocation = getSession().getAttribute("AUDIT_LOCATION")
     	if( !currBundle ){
     		userPreferenceService.loadPreferences("CURR_BUNDLE")
     		currBundle = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
@@ -38,8 +49,19 @@ class WalkThroughController {
     		userPreferenceService.loadPreferences("CURR_PROJ")
     		currProj = session.getAttribute("CURR_PROJ")?.CURR_PROJ
     	}
+    	def projectInstance = Project.findById( currProj )
     	def moveBundlesList = MoveBundle.findAll("from MoveBundle m where m.project = $currProj")
-    	render( view : 'startMenu', model:[ currProj : currProj, currBundle : currBundle, moveBundlesList : moveBundlesList ] )	
+    	if((projectId == null || (projectId == currentProj)) && currBundle){
+    		def bundleInstance = MoveBundle.findById( currBundle )
+    		locationList =AssetEntity.executeQuery("select distinct(a.sourceLocation) from AssetEntity a where a.moveBundle =$bundleInstance.id and a.owner = $projectInstance.client.id ")
+		}else if(moveBundlesList.size > 0) {
+			if(projectId){
+				getSession().setAttribute("AUDIT_PROJ",projectId)
+			}
+			def bundleInstance = MoveBundle.findById( moveBundlesList[0].id )
+    		locationList =AssetEntity.executeQuery("select distinct(a.sourceLocation) from AssetEntity a where a.moveBundle =$bundleInstance.id and a.owner = $projectInstance.client.id ")
+		}
+    	render( view : 'startMenu', model:[ currProj : currProj, currBundle : currBundle, currLocation:currLocation, moveBundlesList : moveBundlesList, locationList:locationList ] )	
     }
     /*------------------------------------------------------------
 	 * @author : Lokanath Reddy
@@ -56,6 +78,7 @@ class WalkThroughController {
     	}
     	render moveBundleList as JSON
     }
+	
     /*------------------------------------------------------------
 	 * @author : Lokanath Reddy
 	 * @return : Racks list for selected Move Bundle
@@ -100,6 +123,8 @@ class WalkThroughController {
 		getSession().setAttribute("AUDIT_TYPE",auditType)
 		def racksList
 		def args = [auditLocation]
+        AssetEntity.executeUpdate( "update AssetEntity a set a.${type}Room = null where a.${type}Room = '' " )
+        AssetEntity.executeUpdate( "update AssetEntity a set a.${type}Rack = null where a.${type}Rack = '' " )
 		if(auditLocation){
 			def racksListQuery = new StringBuffer("select a.${type}Room, a.${type}Rack, count(a.id) from AssetEntity a where a.${type}Location = ? "+
 										"and a.moveBundle = $moveBundleId ")

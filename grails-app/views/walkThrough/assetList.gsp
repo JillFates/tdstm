@@ -67,7 +67,7 @@ function showAssetMenu( assetId , assetName, bundleId, bundleName ) {
 	<g:form method="post" action="selectAsset" name="selectAssetForm"> 
 		<TR>
 			<TD class=label>Room/Rack:</TD>
-			<TD class=field>${params.room ? params.room : 'blank'}/${params.rack ? params.rack : 'blank'}</TD>
+			<TD class=field>${params.room != 'null' ? params.room : 'blank'}/${params.rack != 'null' ? params.rack : 'blank'}</TD>
 		</TR>
 		<TR>
 			<input type="hidden" name="id" name="assetId" id="assetId">
