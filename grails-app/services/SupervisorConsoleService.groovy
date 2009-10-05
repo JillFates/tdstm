@@ -83,23 +83,23 @@ class SupervisorConsoleService {
 										          break;
 					case "target_done"  		: queryForConsole.append(" and pm.current_state_id >= $rerackedId ")
 										          break;
-					case "source_pend"  		: queryForConsole.append(" and pm.current_state_id < $releasedId")
+					case "source_pend"  		: queryForConsole.append(" and (pm.current_state_id < $releasedId or pm.current_state_id is null) ")
 					  					          break;
-					case "target_pend"  		: queryForConsole.append(" and pm.current_state_id < $stagedId")
+					case "target_pend"  		: queryForConsole.append(" and (pm.current_state_id < $stagedId or pm.current_state_id is null) ")
 					  					          break;
-					case "source_pend_clean"  	: queryForConsole.append(" and pm.current_state_id < $unrackedId")
+					case "source_pend_clean"  	: queryForConsole.append(" and (pm.current_state_id < $unrackedId or pm.current_state_id is null) ")
 					  							  break;
 					case "source_avail_clean"  	: queryForConsole.append(" and pm.current_state_id = $unrackedId")
 					  							  break;
 					case "source_done_clean"  	: queryForConsole.append(" and pm.current_state_id >= $cleanedId")
 					  							  break;
-					case "source_pend_trans"  	: queryForConsole.append(" and pm.current_state_id < $cleanedId")
+					case "source_pend_trans"  	: queryForConsole.append(" and (pm.current_state_id < $cleanedId or pm.current_state_id is null) ")
 					  							  break;
 					case "source_avail_trans"   : queryForConsole.append(" and pm.current_state_id = $cleanedId")
 					  							  break;
 					case "source_done_trans"    : queryForConsole.append(" and pm.current_state_id >= $onCartId")
 					  							  break;
-					case "target_pend_trans"    : queryForConsole.append(" and pm.current_state_id < $onTruckId")
+					case "target_pend_trans"    : queryForConsole.append(" and (pm.current_state_id < $onTruckId or pm.current_state_id is null) ")
 					  							  break;
 					case "target_avail_trans"   : queryForConsole.append(" and pm.current_state_id >= $onTruckId and pm.current_state_id < $offTruckId")
 												  break;

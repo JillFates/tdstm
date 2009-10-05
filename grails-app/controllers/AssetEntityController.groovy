@@ -962,7 +962,7 @@ class AssetEntityController {
 	        def projectTeamList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = ${moveBundleInstance.id} and "+
 	        											"pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport'  order by pt.name asc")
 	        def countQuery = "SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate, min(cast(t.state_to as UNSIGNED INTEGER)) as minstate "+
-	        				"FROM asset_transition t left join asset_entity e on (t.asset_entity_id = e.asset_entity_id and t.voided = 0) "+
+	        				"FROM asset_entity e left join asset_transition t on (t.asset_entity_id = e.asset_entity_id and t.voided = 0) "+
 							"left join project_asset_map pm on (pm.asset_id = e.asset_entity_id ) where e.move_bundle_id = ${moveBundleInstance.id} "
 	        projectTeamList.each{
 	            def teamMembers = partyRelationshipService.getBundleTeamMembersDashboard(it.id)
@@ -971,7 +971,7 @@ class AssetEntityController {
 	            	member = teamMembers.delete((teamMembers.length()-1), teamMembers.length())
 	            }
 	            
-	            def sourcePendAssets = jdbcTemplate.queryForList( countQuery + "and e.source_team_id = ${it.id} and pm.current_state_id < $releasedId "+
+	            def sourcePendAssets = jdbcTemplate.queryForList( countQuery + "and e.source_team_id = ${it.id} and (pm.current_state_id < $releasedId or pm.current_state_id is null)"+
 	            													"group by e.asset_entity_id ").size()
 	            
 	            def sourceAssets = AssetEntity.findAll("from AssetEntity where moveBundle = ${moveBundleInstance.id} and sourceTeam = ${it.id} " ).size()
@@ -983,7 +983,7 @@ class AssetEntityController {
 	            													
 	            def targetAssets = AssetEntity.findAll("from AssetEntity  where moveBundle = ${moveBundleInstance.id} and targetTeam = ${it.id} " ).size()
 	            
-	            def targetPendAssets = jdbcTemplate.queryForList(countQuery +	"and e.target_team_id = ${it.id} and pm.current_state_id < $stagedId "+
+	            def targetPendAssets = jdbcTemplate.queryForList(countQuery +	"and e.target_team_id = ${it.id} and (pm.current_state_id < $stagedId or pm.current_state_id is null)"+
 	            												"group by e.asset_entity_id ").size()
 	
 	            def rerackedAssets = jdbcTemplate.queryForList(countQuery +	"and e.target_team_id = ${it.id} and pm.current_state_id >= $rerackedId group by e.asset_entity_id HAVING minstate != $holdId ").size()
@@ -998,7 +998,7 @@ class AssetEntityController {
 	                           targetPendAssets:targetPendAssets ]
 	        }
 							
-			def sourcePendCleaned = jdbcTemplate.queryForList(countQuery +	" and pm.current_state_id < $unrackedId group by e.asset_entity_id ").size()
+			def sourcePendCleaned = jdbcTemplate.queryForList(countQuery +	" and (pm.current_state_id < $unrackedId or pm.current_state_id is null ) group by e.asset_entity_id ").size()
 			
 			def sourceAvailCleaned = jdbcTemplate.queryForList(countQuery +	" and pm.current_state_id = $unrackedId group by e.asset_entity_id having minstate != $holdId").size()
 			
@@ -1008,13 +1008,13 @@ class AssetEntityController {
       											
 	        def sourceTransportAvail = jdbcTemplate.queryForList(countQuery + " and pm.current_state_id = $cleanedId group by e.asset_entity_id having minstate != $holdId").size()
 
-	        def sourceTransportPend = jdbcTemplate.queryForList(countQuery + " and pm.current_state_id < $cleanedId group by e.asset_entity_id ").size()
+	        def sourceTransportPend = jdbcTemplate.queryForList(countQuery + " and (pm.current_state_id < $cleanedId or pm.current_state_id is null) group by e.asset_entity_id ").size()
 			
 	        def targetMover = jdbcTemplate.queryForList(countQuery + " and pm.current_state_id >= $stagedId group by e.asset_entity_id having minstate != $holdId").size()
 
 	        def targetTransportAvail = jdbcTemplate.queryForList(countQuery + " and pm.current_state_id >= $onTruckId and pm.current_state_id < $offTruckId group by e.asset_entity_id having minstate != $holdId").size()
 	        
-	        def targetTransportPend = jdbcTemplate.queryForList(countQuery + " and pm.current_state_id < $onTruckId group by e.asset_entity_id ").size()
+	        def targetTransportPend = jdbcTemplate.queryForList(countQuery + " and (pm.current_state_id < $onTruckId or pm.current_state_id is null) group by e.asset_entity_id ").size()
 			
 	        def cleaningTeam = ProjectTeam.findByTeamCodeAndMoveBundle("Cleaning", moveBundleInstance)
 	        def transportTeam = ProjectTeam.findByTeamCodeAndMoveBundle("Transport", moveBundleInstance)
@@ -1067,13 +1067,13 @@ class AssetEntityController {
 	        	}
 	        	assetsList<<[asset: it, status: stateEngineService.getStateLabel( projectInstance.workflowCode, curId ), cssClass : cssClass, checkVal:check]
 	        }
-	        def totalSourcePending = jdbcTemplate.queryForList(countQuery +	"and pm.current_state_id < $releasedId group by e.asset_entity_id having ( minstate != $holdId or minstate  is null )").size()
+	        def totalSourcePending = jdbcTemplate.queryForList(countQuery +	"and (pm.current_state_id < $releasedId or pm.current_state_id is null) group by e.asset_entity_id having ( minstate != $holdId or minstate  is null )").size()
 	        
 	        def totalUnracked = jdbcTemplate.queryForList(countQuery +	"and pm.current_state_id >= $unrackedId group by e.asset_entity_id having minstate != $holdId").size()
 	        
 	        def totalSourceAvail = jdbcTemplate.queryForList(countQuery + " and pm.current_state_id >= $releasedId and pm.current_state_id < $unrackedId group by e.asset_entity_id HAVING minstate != $holdId").size()
 	        
-	        def totalTargetPending = jdbcTemplate.queryForList(countQuery +	"and pm.current_state_id < $stagedId group by e.asset_entity_id having ( minstate != $holdId or minstate  is null )").size()
+	        def totalTargetPending = jdbcTemplate.queryForList(countQuery +	"and (pm.current_state_id < $stagedId or pm.current_state_id is null) group by e.asset_entity_id having ( minstate != $holdId or minstate  is null )").size()
 	        
 	        def totalReracked = jdbcTemplate.queryForList(countQuery + "and pm.current_state_id >= $rerackedId group by e.asset_entity_id HAVING minstate != $holdId").size()
 	        
