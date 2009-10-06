@@ -19,10 +19,28 @@ var timeInterval;
 function searchRacks(){
 	//${remoteFunction(action:'getRacksByLocation', params:'\'location=\' + document.selectRackForm.location.value +\'&viewType=\'+document.selectRackForm.viewType.value +\'&searchKey=\'+document.selectRackForm.search.value', onComplete:'updateRacks(e, \'search\')')}
 	
-	document.selectRackForm.submit();
+	var searchType = document.selectRackForm.searchType.value;
+	var search = document.selectRackForm.search.value;
+	if(searchType == "rack"){
+		document.selectRackForm.submit();
+	} else if(search){
+		document.selectRackForm.action = "selectAsset";
+		document.selectRackForm.submit();
+	}
 }
 function showAssets(bundle, location, room, rack){
 	window.location.href='selectAsset?moveBundle='+bundle+'&location='+location+'&room='+room+'&rack='+rack
+}
+function changeAction( searchType ){
+	document.selectRackForm.searchType.value = searchType
+	if(searchType == 'rack'){
+		getObject('rackButtonId').className = 'button'
+		getObject('assetButtonId').className = 'button unselected'
+	} else {
+		getObject('assetButtonId').className = 'button'
+		getObject('rackButtonId').className = 'button unselected'
+	}
+	document.selectRackForm.search.focus();
 }
 </script>
 </head>
@@ -37,8 +55,11 @@ function showAssets(bundle, location, room, rack){
 
 
 <tr>
-	<td colspan="2" align="right"><a name="rackButton" class="button"  href="#">Rack</a>/<a name="assetButton" class="button unselected"  href="#">Asset</a>
-	<input type="hidden" name="location" id="locationId">
+	<td colspan="2" align="right">
+		<a name="rackButton" id="rackButtonId" class="button"  href="#" onclick="changeAction('rack');">Rack</a>&nbsp;
+		<a name="assetButton" id="assetButtonId"  class="button unselected"  href="#" onclick="changeAction('asset');">Asset</a>
+		<input type="hidden" name="location" id="locationId" value="${auditLocation}">
+		<input type="hidden" name="searchType" id="searchTypeId" value="${searchType}">
       	</td>
 </tr>
 
@@ -82,6 +103,7 @@ if('${viewType}'== 'todo'){
 	getObject('allId').className = 'button unselected'
 		
 }
+changeAction("${searchType}")
 </script>
 </body>
 </html>

@@ -44,10 +44,12 @@ class WalkThroughController {
     	if( !currBundle ){
     		userPreferenceService.loadPreferences("CURR_BUNDLE")
     		currBundle = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
+    		getSession().setAttribute("AUDIT_BUNDLE",currBundle)
     	}
     	if( !currProj ){
     		userPreferenceService.loadPreferences("CURR_PROJ")
     		currProj = session.getAttribute("CURR_PROJ")?.CURR_PROJ
+    		getSession().setAttribute("AUDIT_PROJ",currProj)
     	}
     	def projectInstance = Project.findById( currProj )
     	def moveBundlesList = MoveBundle.findAll("from MoveBundle m where m.project = $currProj")
@@ -89,6 +91,7 @@ class WalkThroughController {
 		def sortOrder = params.sort
 		def location = params.location
 		def searchKey = params.search
+		def searchType = params.searchType
 		def viewType = params.viewType ? params.viewType : 'todo' 
 		def type = 'source'
 		def locationQuery = "as location from asset_entity where move_bundle_id = $moveBundleId"
@@ -146,8 +149,12 @@ class WalkThroughController {
 			}
 			racksList = AssetEntity.executeQuery(racksListQuery,args)
 		}
+		if(searchType){
+			getSession().setAttribute("SEARCH_TYPE",searchType)
+		}
+		searchType = getSession().getAttribute("SEARCH_TYPE") ? getSession().getAttribute("SEARCH_TYPE") : 'rack'
 		def rackListView = walkThroughService.generateRackListView( racksList, moveBundleId, auditLocation, auditType, viewType )
-    	render( view : 'rackList', model:[ locationsList : locationsList, rackListView : rackListView, auditType:auditType,
+    	render( view : 'rackList', model:[ locationsList : locationsList, rackListView : rackListView, auditType:auditType, searchType : searchType,
     	                                   auditLocation : auditLocation, moveBundle : moveBundleId, viewType : viewType, search:searchKey] )	
     }
 	/*------------------------------------------------------------
@@ -189,59 +196,88 @@ class WalkThroughController {
 	 * @return : Assets list for selected Rack
 	 *----------------------------------------------------------*/
 	def selectAsset = {
-		def moveBundle = params.moveBundle
-		def auditLocation = params.location
-		def searchKey = params.assetSearch
-		def auditRoom = params.room
-		def auditRack = params.rack
-		def sortOrder = params.sort
-		def auditType = getSession().getAttribute("AUDIT_TYPE")
-		def viewType = params.viewType ? params.viewType : 'todo' 
-		def assetsList
-		def type = 'source'
-		if(auditType != 'source'){
-			type = 'target'
-		}
-		if(auditRoom == 'null' || auditRoom == ''){
-			auditRoom = null
-		}
-		if(auditRack == 'null' || auditRack == ''){
-			auditRack = null
-		}
-		if(auditLocation){
-			def asstesListQuery = new StringBuffer("from AssetEntity a where a.${type}Location = ? ")
-			def args = [auditLocation]
-			if(searchKey){
-				searchKey = "%"+searchKey+"%"
-				asstesListQuery.append(" and ( a.assetTag like ? or a.assetName like ? ) ")
-				if(auditRoom && auditRack ){
-					asstesListQuery.append(" and a.${type}Room = ? and a.${type}Rack = ? ")
-					args = [auditLocation,searchKey,searchKey,auditRoom,auditRack]
-				} else if(!auditRoom && auditRack){
-					asstesListQuery.append(" and (a.${type}Room is null or a.${type}Room = '') and a.${type}Rack = ? ")
-					args = [auditLocation,searchKey,searchKey,auditRack]
-				} else if(auditRoom && !auditRack){
-					asstesListQuery.append(" and a.${type}Room = ? and (a.${type}Rack is null or a.${type}Rack = '' ) ")
-					args = [auditLocation,searchKey,searchKey,auditRoom]
+		def currentProj = getSession().getAttribute("AUDIT_PROJ")
+		if(currentProj){
+			def project = Project.findById( currentProj )
+			def moveBundle = params.moveBundle
+			def auditLocation = params.location
+			def searchKey = params.search
+			def auditRoom = params.room
+			def auditRack = params.rack
+			def sortOrder = params.sort
+			def auditType = getSession().getAttribute("AUDIT_TYPE")
+			def currBundle = getSession().getAttribute("AUDIT_BUNDLE")
+			def currLocation = getSession().getAttribute("AUDIT_LOCATION")
+			def viewType = params.viewType ? params.viewType : 'todo'
+			def searchType = params.searchType
+			if(searchType){
+				getSession().setAttribute("SEARCH_TYPE",searchType)
+			}			
+			def assetsList
+			def type = 'source'
+			if(auditType != 'source'){
+				type = 'target'
+			}
+			if(auditRoom == 'null' || auditRoom == ''){
+				auditRoom = null
+			}
+			if(auditRack == 'null' || auditRack == ''){
+				auditRack = null
+			}
+			if(auditLocation){
+				def asstesListQuery = new StringBuffer("from AssetEntity a where a.owner = ${project?.client?.id}")
+				def args = [auditLocation]
+				if(searchKey){
+					searchKey = "%"+searchKey+"%"
+					asstesListQuery.append(" and ( a.assetTag like ? or a.assetName like ? ) ")
+					args = [searchKey,searchKey]
+					/*if(auditRoom && auditRack ){
+						asstesListQuery.append(" and a.${type}Room = ? and a.${type}Rack = ? ")
+						args = [searchKey,searchKey,auditRoom,auditRack]
+					} else if(!auditRoom && auditRack){
+						asstesListQuery.append(" and (a.${type}Room is null or a.${type}Room = '') and a.${type}Rack = ? ")
+						args = [searchKey,searchKey,auditRack]
+					} else if(auditRoom && !auditRack){
+						asstesListQuery.append(" and a.${type}Room = ? and (a.${type}Rack is null or a.${type}Rack = '' ) ")
+						args = [searchKey,searchKey,auditRoom]
+					} else {
+						asstesListQuery.append(" and (a.${type}Room is null or a.${type}Room = '') and (a.${type}Rack is null or a.${type}Rack = '' ) ")
+						args = [searchKey,searchKey]
+					}*/
 				} else {
-					asstesListQuery.append(" and (a.${type}Room is null or a.${type}Room = '') and (a.${type}Rack is null or a.${type}Rack = '' ) ")
-					args = [auditLocation,searchKey,searchKey]
+					asstesListQuery.append(" and a.${type}Location = ?  and a.moveBundle = ${moveBundle} ")
+					def constructedQuery = walkThroughService.constructQuery( auditRoom, auditRack, auditLocation, type )
+					asstesListQuery.append( constructedQuery.query )
+					args = constructedQuery.args
 				}
+				if(sortOrder){
+					asstesListQuery.append(" order by a.${sortOrder} ${params.order}")
+				}else {
+					asstesListQuery.append(" order by a.${type}RackPosition desc, a.assetTag")
+				}
+				assetsList = AssetEntity.executeQuery(asstesListQuery.toString(),args)
+			}
+			if(assetsList?.size() != 1 || !searchKey){
+				def assetsListView = walkThroughService.generateAssetListView( assetsList, auditLocation, auditType, viewType )
+		    	render( view : 'assetList', model:[ assetsListView : assetsListView, params:params, auditType:auditType, 
+		    	                                    viewType:viewType, searchKey : params.search, searchType : searchType] )
 			} else {
-				asstesListQuery.append(" and a.moveBundle = ${moveBundle} ")
-				def constructedQuery = walkThroughService.constructQuery( auditRoom, auditRack, auditLocation, type )
-				asstesListQuery.append( constructedQuery.query )
-				args = constructedQuery.args
+				def walkthruComments = walkthruComments()
+				def room = assetsList[0]?.sourceRoom
+				def rack = assetsList[0]?.sourceRack
+				if(auditType != 'source'){
+					room = assetsList[0]?.targetRoom
+					rack = assetsList[0]?.targetRack	
+				}
+				def commentCodes = walkThroughCodes( assetsList[0] )
+				render(view:'assetMenu', model:[ moveBundle:currBundle, location:currLocation, room:room,searchKey : params.search,
+					                                rack:rack, assetEntity:assetsList[0], commentCodes:commentCodes, walkthruComments:walkthruComments,
+					                                assetBundle : assetsList[0]?.moveBundle?.id, auditType:auditType ] )
 			}
-			if(sortOrder){
-				asstesListQuery.append(" order by a.${sortOrder} ${params.order}")
-			}else {
-				asstesListQuery.append(" order by a.${type}RackPosition desc, a.assetTag")
-			}
-			assetsList = AssetEntity.executeQuery(asstesListQuery.toString(),args)
+		} else {
+			flash.message = "Your login has expired and must login again"
+			redirect(controller:"auth", action:"signOut")
 		}
-		def assetsListView = walkThroughService.generateAssetListView( assetsList, auditLocation, auditType, viewType )
-    	render( view : 'assetList', model:[ assetsListView : assetsListView, params:params, auditType:auditType, viewType:viewType, searchKey : params.assetSearch] )
 	}
 	/*------------------------------------------------------------
 	 * @author : Lokanath Reddy
@@ -390,6 +426,8 @@ class WalkThroughController {
 			def principal = SecurityUtils.subject.principal
 			def loginUser = UserLogin.findByUsername ( principal )
 			def auditType = getSession().getAttribute("AUDIT_TYPE")
+			def currBundle = getSession().getAttribute("AUDIT_BUNDLE")
+			def currLocation = getSession().getAttribute("AUDIT_LOCATION")
 			def type = "source"
 			def room = assetEntity.sourceRoom
 			def rack = assetEntity.sourceRack
@@ -443,16 +481,16 @@ class WalkThroughController {
 									comment : commentDescription, createdBy : loginUser.person ).save( flush:true )
 				}
 				def commentCodes = walkThroughCodes( assetEntity )
-				render(view:'assetMenu', model:[ moveBundle:assetEntity?.moveBundle?.id, location:params.location, room:params.room,  viewType:'assetMenu',
+				render(view:'assetMenu', model:[ moveBundle:currBundle, location:currLocation, room:params.room,  viewType:'assetMenu',
 				                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
 			} else {
 				def commentCodes = walkThroughCodes( assetEntity )
-				render(view:'assetMenu', model:[ moveBundle:assetEntity?.moveBundle?.id, location:params.location, room:params.room,  viewType:'assetMenu',
+				render(view:'assetMenu', model:[ moveBundle:currBundle, location:currLocation, room:params.room,  viewType:'assetMenu',
 				                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
 			}
 		} else {
 			def commentCodes = walkThroughCodes( assetEntity )
-			render(view:'assetMenu', model:[ moveBundle:assetEntity?.moveBundle?.id, location:params.location, room:params.room,  viewType:'assetMenu',
+			render(view:'assetMenu', model:[ moveBundle:currBundle, location:currLocation, room:params.room,  viewType:'assetMenu',
 			                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
 		}
 	}

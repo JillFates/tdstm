@@ -8,6 +8,11 @@
 <g:javascript src="betterinnerhtml.js" />
 
 <script type="text/javascript">
+if("${assetBundle}" && "${assetBundle}" != "${moveBundle}"){
+	if(!confirm("The asset '${assetEntity?.assetName}' is not part of the bundle '${assetEntity?.moveBundle?.name}'. Do you want to proceed?")){
+		window.location.href="selectRack?moveBundle=${moveBundle}&auditType=${auditType}"
+	}
+}
 SimpleContextMenu.setup({'preventDefault':true, 'preventForms':false});
 SimpleContextMenu.attach('container', 'myMenu');
 
@@ -314,6 +319,9 @@ function checkComments(type) {
 		<input type="hidden" name="hasRemoteMgmt" value="${assetEntity.hasRemoteMgmt}">
 		<input type="hidden" name="generalComment" id="generalCommentId" value="Asset changed: ">
 		<input type="hidden" id="mustSaveId" name="mustSave" value=""/>
+		<g:if test="${location != assetEntity.sourceLocation}">
+			<input type="hidden" id="sourceLocation" name="sourceLocation" value="${location}"/>
+		</g:if>
 		<div style="FLOAT: left"><a class=button href="startMenu">Start Over</a></div>
 		<div style="FLOAT: right"><a class=button href="selectAsset?moveBundle=${moveBundle}&location=${location}&room=${room}&rack=${rack}">Asset List</a></div>
 		<table>
@@ -781,6 +789,9 @@ function checkComments(type) {
 	}
 	getObject("manufacturerId").value = "${assetEntity?.manufacturer}"
 	getObject("modelId").value = "${assetEntity?.model}"
+	if("${location}" != "${assetEntity.sourceLocation}"){
+		setMustSave( "${location}", "${assetEntity.sourceLocation}", "", "sourceLocation");
+	}		
 	</script>
 </body>
 </html>

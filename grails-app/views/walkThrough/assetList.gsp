@@ -8,7 +8,7 @@
 <script type="text/javascript">
 var timeInterval;
 function searchAssets(){
-	//var aserchKey = document.selectAssetForm.assetSearch.value
+	//var aserchKey = document.selectAssetForm.search.value
 	//${remoteFunction(action:'searchAssets', params:'\'room=\' + document.selectAssetForm.room.value +\'&rack=\'+document.selectAssetForm.rack.value +\'&searchKey=\'+ aserchKey +\'&viewType=\'+document.selectAssetForm.viewType.value', onComplete:'updateAssets(e)')}
 	document.selectAssetForm.submit();
 }
@@ -16,9 +16,9 @@ function searchAssets(){
 	var assetsList = e.responseText;
 	var result = assetsList.indexOf("No records found")
 	if(result != -1 ){
-		document.selectAssetForm.assetSearch.style.border = "1px solid red"
+		document.selectAssetForm.search.style.border = "1px solid red"
 	} else {
-		document.selectAssetForm.assetSearch.style.border = "1px solid #ccc"
+		document.selectAssetForm.search.style.border = "1px solid #ccc"
 	}
 	BetterInnerHTML(getObject('assetsListBody'), assetsList);
 } --%>
@@ -53,7 +53,7 @@ function showAssetMenu( assetId , assetName, bundleId, bundleName ) {
 } --%>
 </script>
 </head>
-<body onload="document.selectAssetForm.assetSearch.focus()">
+<body onload="document.selectAssetForm.search.focus()">
 <DIV class=qvga_border><A name=select_asset></A>
 <DIV class=title>Walkthru&gt; Select Asset</DIV>
 <DIV class=input_area>
@@ -64,11 +64,13 @@ function showAssetMenu( assetId , assetName, bundleId, bundleName ) {
 <BR class=clear>
 <TABLE>
 	<TBODY>
-	<g:form method="post" action="selectAsset" name="selectAssetForm"> 
+	<g:form method="post" action="selectAsset" name="selectAssetForm">
+		<g:if test="${!searchType && !searchKey }">
 		<TR>
 			<TD class=label>Room/Rack:</TD>
 			<TD class=field>${params.room != 'null' ? params.room : 'blank'}/${params.rack != 'null' ? params.rack : 'blank'}</TD>
 		</TR>
+		</g:if>
 		<TR>
 			<input type="hidden" name="id" name="assetId" id="assetId">
 			<input type="hidden" name="viewType" id="viewTypeId" value="${viewType}">
@@ -80,8 +82,8 @@ function showAssetMenu( assetId , assetName, bundleId, bundleName ) {
 			<a class="button unselected" href="#" onclick="document.selectAssetForm.viewType.value='todo';document.selectAssetForm.submit();" id="todoId">ToDo</a>
 			<a class="button" href="#" onclick="document.selectAssetForm.viewTypeId.value='all';document.selectAssetForm.submit();" id="allId">All</a>
 			</TD>
-			<TD align=right><LABEL for=assetSearch>Scan Asset:</LABEL>
-				<INPUT style="width: 40px" id="assetSearchId" class="text search" size='8' name='assetSearch' value="${searchKey}"
+			<TD align=right><LABEL for=search>Scan Asset:</LABEL>
+				<INPUT style="width: 40px" id="assetSearchId" class="text search" size='8' name='search' value="${searchKey}"
 					onkeyup="timeInterval = setTimeout('searchAssets()',500)" onkeydown="if(timeInterval){clearTimeout(timeInterval)}"> 
 			</TD>
 		</TR>

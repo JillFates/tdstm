@@ -46,7 +46,7 @@ class WalkThroughService {
     			args = constructedQuery.args
     			doneQuery.append(" group by a.${type}Room, a.${type}Rack ")
     			def doneList = AssetEntity.executeQuery(doneQuery.toString(),args)
-    			def availTotal = rackList[2] - (doneList ? doneList : 0) 
+    			def availTotal = rackList[2] - (doneList[0] ? doneList[0] : 0) 
     			if(availTotal == 0){
     				cssClass = "asset_done"
 				}
@@ -62,6 +62,9 @@ class WalkThroughService {
 			 if(rackListSize > 10){
 				 rackListView.append("<TR class='jump'><TD colSpan='3' align='middle'><A class='nav_button' href='#select_rack'>Top</A>"+ 
 				 		"<A class='nav_button' href='#racklist6'>Page Up</A></TD></TR>")
+			 }
+			 if(!rackListView){
+				 rackListView.append("<TR class='jump'><TD colSpan='3' align='middle' class='norecords_display'>No records found</TD></TR>")
 			 }
 		 } else {
 			 rackListView.append("<TR class='jump'><TD colSpan='3' align='middle' class='norecords_display'>No records found</TD></TR>") 
@@ -112,6 +115,9 @@ class WalkThroughService {
 			 if(assetsListSize > 10){
 				 assetsListView.append("<TR class=jump><TD colSpan=3 align=middle><A class=nav_button href='#select_asset'>Top</A>&nbsp;&nbsp;&nbsp;"+ 
 				 		"<A class=nav_button href='#assetList6'>Page Up</A></TD></TR>")
+			 }
+			 if( !assetsListView ){
+				 assetsListView.append("<TR class='jump'><TD colSpan='3' align='middle' class='norecords_display'>No records found</TD></TR>")
 			 }
 		 } else {
 			 assetsListView.append("<TR class='jump'><TD colSpan='3' align='middle' class='norecords_display'>No records found</TD></TR>") 
