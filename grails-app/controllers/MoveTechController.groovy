@@ -368,7 +368,11 @@ class MoveTechController {
                 query.append (" and a.source_team_id = $team" )
                 countQuery +=" and a.source_team_id = $team"
             } else {
-                stateVal = stateEngineService.getStateId ( moveBundleInstance.project.workflowCode, "Reracked" )
+            	stateVal = stateEngineService.getStateId ( moveBundleInstance.project.workflowCode, "Cabled" )
+            	if(!stateVal)
+            	{
+            		stateVal = stateEngineService.getStateId ( moveBundleInstance.project.workflowCode, "Reracked" )
+            	}
                 query.append (" and a.target_team_id = $team" )
                 countQuery += " and a.target_team_id = $team" 
             }

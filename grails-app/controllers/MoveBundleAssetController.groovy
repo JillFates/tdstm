@@ -1377,16 +1377,25 @@ class MoveBundleAssetController {
     		 		}
     		 		if(backView){
     		 			if(it.cssClass != "rack_error"){
-    		 				row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${it.asset?.assetEntity?.pduPort ? 'PDU:'+ it.asset?.assetEntity?.pduPort +'; ' : '' }"+
-    		 							"${it.asset?.assetEntity?.nicPort ? 'NIC:'+ it.asset?.assetEntity?.nicPort +'; ' : ''} "+
-    		 							"${it.asset?.assetEntity?.fiberCabinet && it.asset?.assetEntity?.fiberCabinet != ' / ' ? 'Fiber:'+ it.asset?.assetEntity?.fiberCabinet +'; ' : ''}"+
-    		 							"${it.asset?.assetEntity?.kvmDevice && it.asset?.assetEntity?.kvmDevice != ' / '? 'KVM:'+ it.asset?.assetEntity?.kvmDevice +'; ' : ''} "+
-    		 							"${it.asset?.assetEntity?.remoteMgmtPort ? 'Mgmt:'+ it.asset?.assetEntity?.remoteMgmtPort : ''}</td>")
+    		 				def cablingString = "${it.asset?.assetEntity?.pduPort ? 'PDU: '+ it.asset?.assetEntity?.pduPort +' | ' : '' }"+ 
+    		 									"${it.asset?.assetEntity?.nicPort ? 'NIC: '+ it.asset?.assetEntity?.nicPort +' | ' : ''}"+
+    		 									"${it.asset?.assetEntity?.kvmDevice && it.asset?.assetEntity?.kvmDevice != 'blank / blank'? 'KVM: '+ it.asset?.assetEntity?.kvmDevice +' | ' : ''}"+
+    		 									"${it.asset?.assetEntity?.remoteMgmtPort ? 'RMgmt: '+ it.asset?.assetEntity?.remoteMgmtPort +' | ': ''}"+
+												"${it.asset?.assetEntity?.fiberCabinet && it.asset?.assetEntity?.fiberCabinet != 'blank / blank / blank' ? 'Fiber: '+ it.asset?.assetEntity?.fiberCabinet +' | ' : ''}"
+							
+							if ( cablingString ) {
+								cablingString = cablingString.substring( 0, cablingString.length() - 2 )
+							}
+							if ( cablingString.length() > 90 ) {
+								row.append("<td rowspan='${rowspan}' style='font-size:6px;' class='${it.cssClass}'>${cablingString}</td>")
+							} else {
+								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${cablingString}</td>")
+							}
     		 			} else {
     		 				row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>Devices Overlap</td>")
     		 			}
     		 		}
-    		 	} else if(rowspan <= 1){
+    		 	} else if(rowspan <= 1) {
     		 		rowspan = 1
     		 		rackStyle = it.rackStyle
     		 		row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan=1 class=${it.cssClass}></td><td>&nbsp;</td>")
@@ -1398,11 +1407,11 @@ class MoveBundleAssetController {
     		 		rowspan--
     		 	}
     		 row.append("<td class='${rackStyle}'>${it.rack}</td>")
-    		 if(rackStyle == "rack_current" && backView && rowspan == 1){
+    		 /*if(rackStyle == "rack_current" && backView && rowspan == 1){
     			 row.append("<td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td>"+
     			 			"<td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td>"+
     			 			"<td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td>")
-    		 }
+    		 }*/
     		 
     		 row.append("</tr>")
     		 rows.append(row.toString())

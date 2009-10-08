@@ -26,7 +26,10 @@ class SupervisorConsoleService {
         def onCartId = stateEngineService.getStateId( projectInstance.workflowCode, "OnCart" )
         def onTruckId = stateEngineService.getStateId( projectInstance.workflowCode, "OnTruck" )
 	    def offTruckId = stateEngineService.getStateId( projectInstance.workflowCode, "OffTruck" )
-        def rerackedId = stateEngineService.getStateId( projectInstance.workflowCode, "Reracked" )
+        def rerackedId = stateEngineService.getStateId( projectInstance.workflowCode, "Cabled" )
+        if(!rerackedId ) {
+        	rerackedId = stateEngineService.getStateId( projectInstance.workflowCode, "Reracked" )
+        }
         def stagedId = stateEngineService.getStateId( projectInstance.workflowCode, "Staged" )
         def unrackedId = stateEngineService.getStateId( projectInstance.workflowCode, "Unracked" )
         def releasedId = stateEngineService.getStateId( projectInstance.workflowCode, "Release" )
@@ -138,8 +141,8 @@ class SupervisorConsoleService {
     def getQueryForRackElevation( def bundleId, def projectId, def includeOtherBundle, def rackRooms, def type ) {
     	def assetsDetailsQuery = new StringBuffer("select if(a."+type+"_rack_position,a."+type+"_rack_position,0) as rackPosition, max(cast(if(a.usize,a.usize,'0') as UNSIGNED INTEGER)) as usize, "+
     												"a.pdu_port as pduPort, nic_port as nicPort,remote_mgmt_port as remoteMgmtPort, "+
-    												"CONCAT_WS(' / ',a.fiber_cabinet,a.hba_port ) as fiberCabinet,"+
-    												"CONCAT_WS(' / ',a.kvm_device,a.kvm_port ) as kvmDevice,"+
+    												"CONCAT_WS(' / ',IFNULL(a.fiber_type,'blank'),IFNULL(a.fiber_cabinet,'blank'),IFNULL(a.hba_port,'blank') ) as fiberCabinet,"+
+    												"CONCAT_WS(' / ',IFNULL(a.kvm_device,'blank'),IFNULL(a.kvm_port,'blank') ) as kvmDevice,"+
 													"count(a.asset_entity_id) as racksize, a.move_bundle_id as bundleId, "+
 													"GROUP_CONCAT(CONCAT_WS(' - ',a.asset_tag,a.asset_name ) SEPARATOR '<br>') "+
 													"as assetTag from asset_entity a where ")

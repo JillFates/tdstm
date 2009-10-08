@@ -154,7 +154,7 @@
 	<g:if test="${backView}">
 	<table cellpadding=2 class="rack_elevation">
 		<tr>
-			<td colspan="13" style="border:0px;"><h2>Room: ${rackLayout?.room} - Rack: ${rackLayout?.rack}</h2></td>
+			<td colspan="5" style="border:0px;"><h2>Room: ${rackLayout?.room} - Rack: ${rackLayout?.rack}</h2></td>
 		</tr>
 		<tr>
 			<th>U</th>
@@ -162,14 +162,14 @@
 			<th>Bundle</th>
 			<th>Cabling</th>
 			<th>U</th>
-			<th>Pos</th>
+	 	<%--<th>Pos</th>
 			<th>PDU</th>
 			<th>NIC</th>
 			<th>Mgmt</th>
 			<th>KVM</th>
 			<th>Fiber</th>
 			<th>Amber</th>
-			<th>OK</th>
+			<th>OK</th>--%>
 		</tr>
 		${rackLayout?.backViewRows}
 	</table>

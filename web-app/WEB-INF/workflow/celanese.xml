@@ -43,6 +43,7 @@
 		<transition to="Staged" name="Staged" id="130" type="process" />
 		<transition to="Reracking" name="Reracking" id="140" type="process" />
 		<transition to="Reracked" name="Reracked" id="150" type="process" />
+		<transition to="Cabled" name="Cabled" id="155" type="process" />
 		<transition to="QAVerified" name="QA Verified" id="160" type="process" />
 		<transition to="PoweredOn" name="Powered On" id="170"  type="process" />
 
@@ -75,6 +76,7 @@
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
 			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
@@ -98,6 +100,7 @@
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
 			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
@@ -118,6 +121,7 @@
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
 			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
@@ -332,6 +336,7 @@
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
 			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
@@ -351,6 +356,7 @@
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
 			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
@@ -383,6 +389,7 @@
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
 			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
@@ -402,6 +409,7 @@
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
 			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
@@ -429,6 +437,7 @@
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
 			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
@@ -448,6 +457,7 @@
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
 			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
@@ -474,6 +484,7 @@
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
 			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
@@ -493,6 +504,7 @@
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
 			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
@@ -514,6 +526,7 @@
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
 			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
@@ -532,6 +545,7 @@
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
 			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
@@ -546,6 +560,7 @@
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
 			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
@@ -557,6 +572,7 @@
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
 			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
@@ -579,6 +595,7 @@
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
 			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
@@ -598,6 +615,7 @@
 			<transition to="Staged"/>
 			<transition to="Reracking"/>
 			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
@@ -609,6 +627,7 @@
 			<transition to="Hold" flag="issue"/>
 			<transition to="Reracking"/>
 			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
@@ -617,6 +636,7 @@
 			<transition to="Hold" flag="issue"/>
 			<transition to="Reracking"/>
 			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
@@ -631,6 +651,7 @@
 		<task swimlane="MANAGER">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
@@ -638,13 +659,14 @@
 		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
 		</task>
 		<task swimlane="MOVE_TECH">
 			<transition to="Hold" flag="issue"/>
-			<transition to="Reracked" />
+			<transition to="Reracked" flag="busy"/>
 		</task>
 	</taskNode>
 
@@ -652,6 +674,7 @@
 		<task swimlane="MANAGER">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Reracking"/>
+			<transition to="Cabled" />
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
@@ -659,12 +682,38 @@
 		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
 			<transition to="Reracking"/>
+			<transition to="Cabled" />
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="MOVE_TECH">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Cabled" />
+		</task>
+	</taskNode>
+	
+	<taskNode name="Cabled">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
 			<transition to="QAVerified"/>
 			<transition to="PoweredOn"/>
 			<transition to="Completed"/>
 		</task>
 	</taskNode>
-
+	
 	<taskNode name="QAVerified">
 		<task swimlane="MANAGER">
 			<transition to="Hold" flag="issue"/>

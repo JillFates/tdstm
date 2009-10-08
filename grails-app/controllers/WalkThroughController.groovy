@@ -229,8 +229,8 @@ class WalkThroughController {
 				def args = [auditLocation]
 				if(searchKey){
 					searchKey = "%"+searchKey+"%"
-					asstesListQuery.append(" and ( a.assetTag like ? or a.assetName like ? ) ")
-					args = [searchKey,searchKey]
+					asstesListQuery.append(" and ( a.assetTag like ? or a.assetName like ? or a.serialNumber like ? ) ")
+					args = [searchKey, searchKey, searchKey]
 					/*if(auditRoom && auditRack ){
 						asstesListQuery.append(" and a.${type}Room = ? and a.${type}Rack = ? ")
 						args = [searchKey,searchKey,auditRoom,auditRack]
@@ -250,7 +250,7 @@ class WalkThroughController {
 					asstesListQuery.append( constructedQuery.query )
 					args = constructedQuery.args
 				}
-				if(sortOrder){
+				if(sortOrder && params.order){
 					asstesListQuery.append(" order by a.${sortOrder} ${params.order}")
 				}else {
 					asstesListQuery.append(" order by a.${type}RackPosition desc, a.assetTag")
