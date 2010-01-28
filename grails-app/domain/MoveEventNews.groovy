@@ -12,7 +12,6 @@ class AssetComment {
 	Person createdBy
 	String commentCode 
 	String category = "general"
-	String displayOption = "G"	// Used in dashboard to control display of user entered test (comment) or a generic message
 	
 	static constraints = {
 		
@@ -26,7 +25,6 @@ class AssetComment {
 		dateResolved( nullable:true  )
 		commentCode( blank:true, nullable:true  )
 		category( blank:false, nullable:false )
-		displayOption( blank:false, inList: ['G','U'] ) // Generic or User
 	}
 
 	static mapping  = {	
@@ -39,7 +37,6 @@ class AssetComment {
 			mustVerify sqltype: 'tinyint'
 			isResolved sqltype: 'tinyint'
 			resolution sqltype: 'text'
-			displayOption sqltype: 'char(1)'
 		}
 	}
 	
