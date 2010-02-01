@@ -1,4 +1,4 @@
-class AssetComment {
+class MoveEventNews {
 	
 	String comment
 	String commentType
@@ -6,7 +6,7 @@ class AssetComment {
 	AssetEntity assetEntity
 	Date dateCreated = new Date()
 	Integer isResolved = 0
-	Date dateResolved 
+	Date dateResolved
 	String resolution
 	Person resolvedBy
 	Person createdBy

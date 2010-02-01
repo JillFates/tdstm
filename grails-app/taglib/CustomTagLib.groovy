@@ -41,4 +41,15 @@ class CustomTagLib {
 		
 		}
 	}
+	def truncate = { attrs ->
+		String value = attrs['value'];
+		if(value){
+			def length = value.size()
+			if(length > 50){
+				out << value.substring(0,50)+".."
+			} else {
+				out << value
+			}
+		}
+	}
 }

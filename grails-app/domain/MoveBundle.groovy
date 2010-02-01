@@ -6,10 +6,11 @@ class MoveBundle extends Party {
     Date startTime
     Date completionTime
     Integer operationalOrder  // Order that the bundles are performed in
-
+    MoveEvent moveEvent
     static constraints = {        
 		name( blank:false, nullable:false )
 		project( nullable:false )
+		moveEvent( nullable:true )
 		description( blank:true, nullable:true )		
 		startTime( nullable:true )
 		completionTime( nullable:true )

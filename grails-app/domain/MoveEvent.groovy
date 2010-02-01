@@ -15,7 +15,7 @@ class MoveEvent extends Party {
 	}
 
 	static hasMany = [
-		moveBundles : MoveBundle
+		moveBundles : MoveBundle,
 		moveEventNewsList : MoveEventNews
 	]
 

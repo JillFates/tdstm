@@ -87,6 +87,9 @@
         		<li><a href="#" onclick="$('#assetMenu').show();$('#reportsMenu').hide();$('#bundleMenu').hide();">Assets</a></li> 
         		<li><g:link class="home" controller="moveBundle" params="[projectId:currProjObj?.id]">Move Bundles</g:link></li>
         	</jsec:lacksAllRoles>
+        	<jsec:hasAnyRole in="['ADMIN']">
+        		<li><g:link class="home" controller="newsEditor" params="[projectId:currProjObj?.id]" target="new">News Editor</g:link></li>
+        	</jsec:hasAnyRole>
        		<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
         		<li><g:link class="home" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console</g:link></li>
         	</jsec:hasAnyRole>
@@ -94,7 +97,7 @@
         		<li><g:link class="home" controller="cartTracking" action="cartTracking" params="[projectId:currProjObj?.id]">Carts</g:link></li>
         	</jsec:hasAnyRole>
         	<jsec:hasAnyRole in="['ADMIN','MANAGER','OBSERVER','SUPERVISOR']">
-        		<li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">PMO Dashboard</g:link> </li>
+        		<li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracking</g:link> </li>
         	</jsec:hasAnyRole>
          	<jsec:lacksAllRoles in="['MANAGER','OBSERVER']">
          		<li><a href="#" onclick="$('#reportsMenu').show();$('#assetMenu').hide();$('#bundleMenu').hide();">Reports</a></li>
