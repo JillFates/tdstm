@@ -1,47 +1,34 @@
 class MoveEventNews {
-	
-	String comment
-	String commentType
-	Integer mustVerify = 0
-	AssetEntity assetEntity
+	MoveEvent moveEvent
+	String message
+	Integer isArchived = 0
 	Date dateCreated = new Date()
-	Integer isResolved = 0
-	Date dateResolved
+	Date dateArchived 
 	String resolution
-	Person resolvedBy
+	Person archivedBy
 	Person createdBy
-	String commentCode 
-	String category = "general"
 	
 	static constraints = {
-		
-		comment( blank:true, nullable:true  )
-		commentType( blank:true, nullable:true, inList: ['issue','instruction','comment'] )
-		mustVerify( nullable:true )
-		isResolved( nullable:true )
+		message( blank:true, nullable:true  )
+		isArchived( nullable:true )
 		resolution( blank:true, nullable:true  )
-		resolvedBy( nullable:true  )
+		archivedBy( nullable:true  )
 		createdBy( nullable:true  )
-		dateResolved( nullable:true  )
-		commentCode( blank:true, nullable:true  )
-		category( blank:false, nullable:false )
+		dateArchived( nullable:true  )
 	}
 
 	static mapping  = {	
+		id column: 'move_event_news_id'
 		version true
-		id column: 'asset_comment_id'
-		resolvedBy column: 'resolved_by'
-		createdBy column: 'created_by'
 		columns {
 			comment sqltype: 'text'
-			mustVerify sqltype: 'tinyint'
-			isResolved sqltype: 'tinyint'
 			resolution sqltype: 'text'
+			isArchived sqltype: 'tinyint'
 		}
 	}
 	
 	String toString() {
-		 comment
+		 message
 	}
 	
 }
