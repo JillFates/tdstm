@@ -216,7 +216,12 @@ Move News and Issues</b></span>
 			</td>
 			<g:if test="${assetCommentInstance?.commentType == 'issue'}">
 				<td>Issue</td>
-				<td>${AssetEntity.get(assetCommentInstance?.assetEntity)?.assetName} : <tds:truncate value="${assetCommentInstance?.comment}"/></td>
+				<td>${AssetEntity.get(assetCommentInstance?.assetEntity)?.assetName} : 
+				<g:if test="${${assetCommentInstance?.displayOption != 'G' }}">
+				<tds:truncate value="${assetCommentInstance?.comment}"/>
+				</g:if>
+				<g:else>On Hold</g:else>
+				</td>
 			</g:if>
 			<g:else>
 				<td>News</td>

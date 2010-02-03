@@ -666,6 +666,24 @@ class BootStrap {
 				createdBy: it[4]
             ).save()
 		}
+//		--------------------------------
+		// Create MoveEventNews
+		//--------------------------------
+		def eventNewsList = [
+		  			
+			[moveEvent,'The truck has just arrived',personJohn],
+			[moveEvent,'Customer backups are delaying more start',personJohn],
+			[moveEvent,'After move we should upgrade this',personJohn],
+			[moveEvent,'The server is going to moved right after the move',personJohn]
+		]
+		//Insert the List of AssetComment
+		eventNewsList.each {
+			def moveEventNews = new MoveEventNews(
+				moveEvent: it[0],
+				message: it[1],
+				createdBy: it[2]
+            ).save()
+		}
 		/*
 		 * Getting Stream of object on AssetEntity_Attributes.xls and storing Stream as records in database 
 		 * using assetEntityAttributeLoaderService
