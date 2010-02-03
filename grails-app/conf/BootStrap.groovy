@@ -303,13 +303,16 @@ class BootStrap {
 			name: "Raiser's Edge",
 			appCode: "RE", environment:"Production",
 			owner: cedars).save()
-
-
+		// -------------------------------
+		// Create moveEvent Details
+		// -------------------------------
+		println "MOVE EVENT"
+		def moveEvent =  new MoveEvent(project:cedarsProject, name:"Move Event 1").save( insert : true );
 		// -------------------------------
 		// Create MoveBundle Details
 		// -------------------------------
 		println "MOVE BUNDLE"
-		def cedarsProjectMoveBundle1 = new MoveBundle( project: cedarsProject, name: "Bundle 1",
+		def cedarsProjectMoveBundle1 = new MoveBundle( project: cedarsProject, name: "Bundle 1", moveEvent : moveEvent,
             startTime: new Date(), completionTime: new Date()+1, operationalOrder:1 ).save( insert:true )
 		def cedarsProjectMoveBundle2 = new MoveBundle( project: cedarsProject, name: "Bundle 2",
             startTime: new Date()+1, completionTime: new Date()+2, operationalOrder:1 ).save( insert:true )

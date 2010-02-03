@@ -88,7 +88,7 @@
         		<li><g:link class="home" controller="moveBundle" params="[projectId:currProjObj?.id]">Move Bundles</g:link></li>
         	</jsec:lacksAllRoles>
         	<jsec:hasAnyRole in="['ADMIN']">
-        		<li><g:link class="home" controller="newsEditor" params="[projectId:currProjObj?.id]" target="new">News Editor</g:link></li>
+        		<li><g:link class="home" controller="newsEditor" params="[projectId:currProjObj?.id]" target="_blank">News Editor</g:link></li>
         	</jsec:hasAnyRole>
        		<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
         		<li><g:link class="home" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console</g:link></li>

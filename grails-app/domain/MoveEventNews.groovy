@@ -20,8 +20,10 @@ class MoveEventNews {
 	static mapping  = {	
 		id column: 'move_event_news_id'
 		version true
+		archivedBy column: 'archived_by'
+		createdBy column: 'created_by'
 		columns {
-			comment sqltype: 'text'
+			message sqltype: 'text'
 			resolution sqltype: 'text'
 			isArchived sqltype: 'tinyint'
 		}

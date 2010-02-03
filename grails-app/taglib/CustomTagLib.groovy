@@ -46,9 +46,9 @@ class CustomTagLib {
 		if(value){
 			def length = value.size()
 			if(length > 50){
-				out << value.substring(0,50)+".."
+				out << '"'+value.substring(0,50)+'.."'
 			} else {
-				out << value
+				out << '"'+value+'"'
 			}
 		}
 	}
