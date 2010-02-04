@@ -182,9 +182,6 @@ function validateCreateNewsForm(){
 						<option value="archived">Archived</option>
 					</select>
 				</span>
-				<span  style="padding-left: 10px;"><b>
-					Deal with filtering resolve or not, and sorting, and edit vs. display</b>
-				</span>
 			</td>
 		</tr>
 	</table>
