@@ -194,7 +194,13 @@ class NewsEditorController {
 		def loginUser = UserLogin.findByUsername(principal)
 		def moveEventNewsInstance = new MoveEventNews(params)
 		moveEventNewsInstance.createdBy = loginUser.person
-		moveEventNewsInstance.save()
+		
+		if(params.isArchived == '1'){
+			moveEventNewsInstance.isArchived = 1
+			moveEventNewsInstance.archivedBy = loginUser.person
+			moveEventNewsInstance.dateArchived = new Date()
+		}
+		moveEventNewsInstance.save(flush:true)
 		redirect(action:newsEditorList, params:[projectId:params.projectId, moveBundle : params.moveBundle, viewFilter:params.viewFilter])
 	}
 }

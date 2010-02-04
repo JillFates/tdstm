@@ -117,18 +117,18 @@ function validateNewsAndCommentForm(){
 	var resolveBoo = $("#isResolvedId").is(':checked');
 	var resolveVal = $("#resolutionId").val();
 	if(resolveBoo && resolveVal == ""){
-		alert('Please enter resolution');
+		alert('Please enter Resolution');
 		return false;
 	} else {
 		return true;
 	}
 }
-function updateHidden(){
-	var resolve = $("#isResolvedId").is(':checked');
+function updateHidden(checkBoxId,hiddenId){
+	var resolve = $("#"+checkBoxId).is(':checked');
 	if(resolve){
-		$("#isResolvedHiddenId").val(1);
+		$("#"+hiddenId).val(1);
 	} else {
-		$("#isResolvedHiddenId").val(0);
+		$("#"+hiddenId).val(0);
 	}
 }
 function openCreateNewsDialog(){
@@ -139,8 +139,16 @@ function openCreateNewsDialog(){
 }
 function validateCreateNewsForm(){
 	var moveEvent = $("#moveEventId").val();
+	var resolveBoo = $("#isArchivedId").is(':checked');
+	var resolveVal = $("#resolutionNewsId").val();
+	
 	if(moveEvent){
-		return true;
+		if(resolveBoo && resolveVal == ""){
+			alert('Please enter Resolution');
+			return false;
+		} else {
+			return true;
+		}
 	} else{
 		alert("Please Assign MoveEvent to Current Bundle")
 		return false;
@@ -301,7 +309,7 @@ Move News and Issues</b></span>
 			<tr class="prop">
 				<td valign="top" class="name" nowrap="nowrap"><label for="isResolved" >Resolved / Archived:</label></td>
 				<td valign="top" class="value" id="resolveTdId">
-				<input type="checkbox" id="isResolvedId" value="0" onclick="updateHidden()"/>
+				<input type="checkbox" id="isResolvedId" value="0" onclick="updateHidden('isResolvedId','isResolvedHiddenId')"/>
 				<input type="hidden" name="isResolved" value="0" id="isResolvedHiddenId">
 				</td>
 			</tr>
@@ -340,19 +348,52 @@ Move News and Issues</b></span>
 	<input name="moveEvent.id" value="${moveEvent?.id}" type="hidden" id="moveEventId">
 		<div class="dialog" style="border: 1px solid #5F9FCF">
 		<table id="createCommentTable" style="border: 0px">
-			
-				<tr class="prop">
-					<td valign="top" class="name"><label for="messageId">Comment:</label>
-					</td>
-					<td valign="top" class="value"><textarea cols="80" rows="5"
-						id="messageId" name="message"></textarea></td>
-				</tr>
-			
-	            </table>
-			
+			<td valign="top" class="name">
+			<label for="dateCreatedNewsId">Created At:</label></td>
+					<td valign="top" class="value" id="dateCreatedNewsId" />
+			</tr>
+			<tr>
+			<td valign="top" class="name"><label for="createdByNewsId">Created
+					By:</label></td>
+					<td valign="top" class="value" id="createdByNewsId" />
+			</tr>
+			<tr class="prop">
+				<td valign="top" class="name"><label for="messageId">Comment:</label>
+				</td>
+				<td valign="top" class="value"><textarea cols="80" rows="5"
+					id="messageId" name="message"></textarea></td>
+			</tr>
+			<tr class="prop">
+				<td valign="top" class="name" nowrap="nowrap"><label for="isArchivedId" >Resolved / Archived:</label></td>
+				<td valign="top" class="value" id="archivedTdId">
+				<input type="checkbox" id="isArchivedId" value="0" onclick="updateHidden('isArchivedId','isArchivedHiddenId')"/>
+				<input type="hidden" name="isArchived" value="0" id="isArchivedHiddenId">
+				</td>
+			</tr>
+			<tr class="prop">
+				<td valign="top" class="name"><label for="resolutionNewsId">Resolution:</label>
+				</td>
+				<td valign="top" class="value" ><textarea cols="80" rows="5"
+						id="resolutionNewsId" name="resolution"></textarea> </td>
+			</tr>
+			<tr>
+				<td valign="top" class="name"><label for="dateArchivedId">Resolved
+					At:</label></td>
+					<td valign="top" class="value" id="dateArchivedId" />
+			</tr>
+				<tr>
+			<td valign="top" class="name"><label for="archivedById">Resolved
+					By:</label></td>
+					<td valign="top" class="value" id="archivedById" />
+			</tr>
+		</table>
 		</div>
 		<div class="buttons"><span class="button"> 
-		<input class="save" type="submit" value="Create" onclick="return validateCreateNewsForm()"/></span></div>
+		<input class="save" type="submit" value="Create" onclick="return validateCreateNewsForm()"/></span>
+		<span class="button"> 
+	<input class="delete" type="button" value="Cancel" onclick="this.form.reset();$('#createNewsDialog').dialog('close');">
+	</span>
+		</div>
 	</g:form>
 </div>
 <script type="text/javascript">
