@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<title>PMO Dashboard</title>
+<title>Asset Tracking</title>
 <g:javascript library="prototype" />
 <g:javascript library="jquery" />
 <jq:plugin name="jquery.bgiframe.min" />

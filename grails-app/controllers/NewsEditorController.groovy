@@ -94,9 +94,12 @@ class NewsEditorController {
 		}
 		
     	def totalComments = jdbcTemplate.queryForList( queryForCommentsList.toString() )
-
+		
+		def principal = SecurityUtils.subject.principal
+		def loginUser = UserLogin.findByUsername(principal)
+		
 		return [moveBundlesList : moveBundlesList, assetCommentsList : totalComments, projectId : projectId, 
-				params : params, totalCommentsSize : totalCommentsSize, moveEvent : moveEvent]
+				params : params, totalCommentsSize : totalCommentsSize, moveEvent : moveEvent, loginPerson : loginUser.person]
     }
 	/*-------------------------------------------------------------------
 	 * @author : Lokanada Reddy

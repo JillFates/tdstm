@@ -347,12 +347,12 @@ Move News and Issues</b></span>
 		<table id="createCommentTable" style="border: 0px">
 			<td valign="top" class="name">
 			<label for="dateCreatedNewsId">Created At:</label></td>
-					<td valign="top" class="value" id="dateCreatedNewsId" />
+					<td valign="top" class="value" id="dateCreatedNewsId" ><tds:convertDateTime date="${new Date() }"/></td>
 			</tr>
 			<tr>
 			<td valign="top" class="name"><label for="createdByNewsId">Created
 					By:</label></td>
-					<td valign="top" class="value" id="createdByNewsId" />
+					<td valign="top" class="value" id="createdByNewsId" >${loginPerson}</td>
 			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="messageId">Comment:</label>

@@ -5,6 +5,11 @@ class UrlMappings {
 			 // apply constraints here
 		  }
 	  }
+      "/ws/moveEventNews/$id?" {
+          controller = "moveEventNews"
+          action = [GET:"list", PUT:"update", DELETE:"delete", POST:"save"]
+      }
+      
 	  "500"(view:'/error')
 	}
 }
