@@ -10,9 +10,8 @@ class AuthFilters {
 					
 				def moveEvent
 				def subject = SecurityUtils.subject
-				def person = UserLogin.findByUsername(principal)?.person
-		        
-				if( webSvcCtrl.contains( controllerName ) ){
+				if( webSvcCtrl.contains( controllerName ) && subject.principal){
+					def person = UserLogin.findByUsername(subject.principal)?.person
 					if(params.id){
 						moveEvent = MoveEvent.get(params.id)
 					}
