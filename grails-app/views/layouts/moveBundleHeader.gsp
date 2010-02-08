@@ -96,6 +96,7 @@
         	<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
         		<li><g:link class="home" controller="cartTracking" action="cartTracking" params="[projectId:currProjObj?.id]">Carts</g:link></li>
         	</jsec:hasAnyRole>
+        	<li><g:link class="home" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link> </li>
         	<jsec:hasAnyRole in="['ADMIN','MANAGER','OBSERVER','SUPERVISOR']">
         		<li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracking</g:link> </li>
         	</jsec:hasAnyRole>

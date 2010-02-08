@@ -1,0 +1,31 @@
+<chart bgAlpha='0' bgColor='FFFFFF' lowerLimit='0' upperLimit='100' numberSuffix='' showBorder='0' basefontColor='000000' chartTopMargin='15' chartBottomMargin='15' chartLeftMargin='5' chartRightMargin='5' toolTipBgColor='80A905' gaugeFillMix='{dark-10},FFFFFF,{dark-10}' gaugeFillRatio='3' showTickMarks='0'>
+   <colorRange>
+      <color minValue='0' maxValue='20' code='FF654F'/>
+      <color minValue='20' maxValue='40' code='F6BD0F'/>
+      <color minValue='40' maxValue='100' code='8BBA00'/>
+   </colorRange>
+
+   <dials>
+      <dial value='0' rearExtension='10'/>
+   </dials>
+
+   <trendpoints>
+      <point value='' displayValue='' fontcolor='FF4400' useMarker='' dashed='1' dashLen='2' dashGap='2' valueInside='1' />
+   </trendpoints>
+
+   <!--Rectangles behind the gauge -->
+   <annotations>
+      <annotationGroup id='Grp1' showBelow='1' >
+         <annotation type='rectangle' x='5' y='5' toX='345' toY='195' radius='10' color='ffffff,ffffff' showBorder='0' />
+      </annotationGroup>
+   </annotations>
+
+   <styles>
+      <definition>
+         <style name='RectShadow' type='shadow' strength='0'/>
+      </definition>
+      <application>
+         <apply toObject='Grp1' styles='RectShadow' />
+      </application>
+   </styles>
+</chart>

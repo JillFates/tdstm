@@ -1,0 +1,59 @@
+.shadetabs{
+padding: 3px 0;
+margin-left: 0;
+margin-top: 1px;
+margin-bottom: 0;
+font: bold 12px Verdana;
+list-style-type: none;
+text-align: left; /*set to left, center, or right to align the menu as desired*/
+}
+
+.shadetabs li{
+display: inline;
+text-align:center;
+margin: 0;
+width:127px;
+height:28px;
+}
+
+.shadetabs li a{
+text-decoration: none;
+display: inline-block;
+position: relative;
+z-index: 1;
+padding-left: 4px;
+margin-right: 3px;
+line-height:28px;
+color: #2d2b2b;
+width:123px;
+top:1px;
+background: white url(../images/button-off.png) top left repeat-x;
+}
+
+.shadetabs li a:visited{
+color: #2d2b2b;
+}
+
+.shadetabs li a:hover{
+text-decoration: none;
+color: #2d2b2b;
+}
+
+.shadetabs li a.selected{ /*selected main tab style */
+position: relative;
+top: 1px;
+}
+
+.shadetabs li a.selected{ /*selected main tab style */
+background-image: url(../images/button-on.png);
+border-bottom-color: white;
+color:#FFFFFF;
+}
+
+.shadetabs li a.selected:hover{ /*selected main tab style */
+text-decoration: none;
+}
+
+.tabcontent{
+display:block;
+}
