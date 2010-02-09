@@ -14,7 +14,6 @@
 <g:javascript src="event.js" />
 <g:javascript src="tabcontent.js" />
 <g:javascript src="textscroll.js" />
-<g:javascript src="textscroll.js" />
 
 <g:javascript library="jquery" />
 <jq:plugin name="ui.core" />
@@ -390,7 +389,7 @@ function updateMoveEventNews( news ){
 <g:else>
 <a href="http://www.transitionaldata.com/" target="new"><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;border: 0px"/></a>
 </g:else>
-<br><br>
+<br>
 <span id="date"></span><br>
 <span style="padding-left: 10px;">
 	<label for="moveEvent"><b>Event:</b></label>&nbsp;
