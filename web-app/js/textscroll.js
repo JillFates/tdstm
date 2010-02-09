@@ -1,4 +1,3 @@
-<script language="javascript">
 
 ypSimpleScroll.prototype.scrollNorth = function() { this.startScroll(90) }
 ypSimpleScroll.prototype.scrollSouth = function() { this.startScroll(270)  }
@@ -183,7 +182,5 @@ ypSimpleScroll.prototype.load = function() {
   this.scrollTop  = Math.max(Math.min(this.scrollTop, this.scrollH),0)
   this.jumpTo(this.scrollLeft, this.scrollTop)
 }
-  </script>
-  <script language="javascript">
-    var test = new ypSimpleScroll("myScroll", 20, 50, 150, 250, 100)
-  </script>
+
+var test = new ypSimpleScroll("myScroll", 20, 50, 150, 250, 100)
