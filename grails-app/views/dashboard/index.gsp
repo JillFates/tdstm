@@ -429,7 +429,7 @@ DATA CENTER RELOCATION</div>
 <div id="summary_gauge_div" align="center"> </div>
 		<script type="text/javascript">
         var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId", "280", "136", "0", "0");
-        myChart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'summary_guage.xml')}");
+        myChart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'summary_gauge.xml')}");
         myChart.render("summary_gauge_div");
         </script>Move Status vs. Plan
 </div>
@@ -445,7 +445,7 @@ Planned Completion<br>
 <div id="revised_gauge_div" align="center"></div>
 			<script type="text/javascript">
             var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId1", "180", "136", "0", "0");
-            myChart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'revised_guage.xml')}");
+            myChart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'revised_gauge.xml')}");
             myChart.render("revised_gauge_div");
             </script>Status vs. Revised Plan
 
@@ -724,48 +724,48 @@ if (xLength>12){
 <div id="bottomwidgets">
 <div id="chartdiv1b" align="center"></div>
 <script type="text/javascript">
-var myChart = new FusionCharts("../Charts/AngularGauge.swf", "myChartId1b", "100", "75", "0", "0");
-myChart.setDataURL("Data/Angular2.xml");
+var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId1b", "100", "75", "0", "0");
+myChart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'step_gauge.xml')}");
 myChart.render("chartdiv1b");
 </script>
 </div>
 <div id="bottomwidgets">
 <div id="chartdiv2b" align="center"></div>
 <script type="text/javascript">
-var myChart = new FusionCharts("../Charts/AngularGauge.swf", "myChartId2b", "100", "75", "0", "0");
-myChart.setDataURL("Data/Angular2.xml");
+var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId2b", "100", "75", "0", "0");
+myChart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'step_gauge.xml')}");
 myChart.render("chartdiv2b");
 </script>
 </div>
 <div id="bottomwidgets">
 <div id="chartdiv3b" align="center"></div>
 <script type="text/javascript">
-var myChart = new FusionCharts("../Charts/AngularGauge.swf", "myChartId3b", "100", "75", "0", "0");
-myChart.setDataURL("Data/Angular2.xml");
+var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId3b", "100", "75", "0", "0");
+myChart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'step_gauge.xml')}");
 myChart.render("chartdiv3b");
 </script>
 </div>
 <div id="bottomwidgets">
 <div id="chartdiv4b" align="center"></div>
 <script type="text/javascript">
-var myChart = new FusionCharts("../Charts/AngularGauge.swf", "myChartId4b", "100", "75", "0", "0");
-myChart.setDataURL("Data/Angular2.xml");
+var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId4b", "100", "75", "0", "0");
+myChart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'step_gauge.xml')}");
 myChart.render("chartdiv4b");
 </script>
 </div>
 <div id="bottomwidgets">
 <div id="chartdiv5b" align="center"></div>
 <script type="text/javascript">
-var myChart = new FusionCharts("../Charts/AngularGauge.swf", "myChartId5b", "100", "75", "0", "0");
-myChart.setDataURL("Data/Angular3.xml");
+var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId5b", "100", "75", "0", "0");
+myChart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'step_gauge.xml')}");
 myChart.render("chartdiv5b");
 </script>
 </div>
 <div id="bottomwidgets">
 <div id="chartdiv6b" align="center"></div>
 <script type="text/javascript">
-var myChart = new FusionCharts("../Charts/AngularGauge.swf", "myChartId6b", "100", "75", "0", "0");
-myChart.setDataURL("Data/Angular3.xml");
+var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId6b", "100", "75", "0", "0");
+myChart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'step_gauge.xml')}");
 myChart.render("chartdiv6b");
 </script>
 </div>
