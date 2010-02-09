@@ -3,20 +3,29 @@ class DashboardController {
     def index = { 
 		def projectId = params.projectId
 		def project
-		def moveEvents
+		def moveEventsList
 		def projectLogo
+		def moveEvent
 		if(projectId){
 			project = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
-			moveEvents = MoveEvent.findAllByProject(project)
+			moveEventsList = MoveEvent.findAllByProject(project)
 			projectLogo = ProjectLogo.findByProject(project)
 		}
-		
-        userPreferenceService.loadPreferences("MOVE_EVENT")
-		def moveEvent = userPreferenceService.getPreference("MOVE_EVENT")
-		if( !moveEvent && moveEvents){
-			userPreferenceService.setPreference("MOVE_EVENT","${moveEvents[0].id}")
-			moveEvent = "${moveEvents[0].id}"
+		def moveEventId = params.moveEvent
+		if(!moveEventId){
+			moveEventId = getSession().getAttribute( "MOVE_EVENT" )?.MOVE_EVENT
 		}
-		return [moveEvents : moveEvents, moveEvent : moveEvent, project : project, projectLogo :projectLogo ]
+		if(moveEventId){
+			moveEvent = MoveEvent.get(moveEventId)
+			userPreferenceService.setPreference("MOVE_EVENT",moveEventId)
+		} else {
+			moveEvent = moveEventsList?.get(0)
+		}
+        userPreferenceService.loadPreferences("MOVE_EVENT")
+		if( !moveEvent && moveEventsList){
+			userPreferenceService.setPreference("MOVE_EVENT","${moveEventsList[0].id}")
+			moveEvent = "${moveEventsList[0].id}"
+		}
+		return [moveEventsList : moveEventsList, moveEvent : moveEvent, project : project, projectLogo :projectLogo ]
     }
 }

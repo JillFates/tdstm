@@ -75,6 +75,7 @@ function showEditCommentForm(e , rowId){
 				$("#isResolvedHiddenId").val(0);
 			}
 			$("#displayOptionTr").hide();
+			$("#commentTypeOption").html("<option>News</option>");
 			$("#assetTrId").hide();
 			$("#showEditCommentDialog").dialog('option','title','Edit News Comment');
 
@@ -97,6 +98,7 @@ function showEditCommentForm(e , rowId){
 				$("#displayOptionUid").attr('checked', true);
 			}
 			$("#displayOptionTr").show();
+			$("#commentTypeOption").html("<option>Issue</option>");
 			$("#assetTrId").show();
 			$("#showEditCommentDialog").dialog('option','title','Edit Issues Comment');
 			
@@ -166,6 +168,14 @@ function validateCreateNewsForm(){
 		<tr>
 			<td nowrap="nowrap">
 				<span style="padding-left: 10px;">
+				<label for="moveEvent"><b>Event:</b></label>&nbsp;
+					<select id="moveEvent" name="moveEvent" onchange="$('#newsEditorForm').submit();">
+						<g:each status="i" in="${moveEventsList}" var="moveEventInstance">
+							<option value="${moveEventInstance?.id}">${moveEventInstance?.name}</option>
+						</g:each>
+					</select>
+				</span>
+				<span style="padding-left: 10px;">
 				<label for="moveBundle"><b>Bundle:</b></label>&nbsp;
 					<select id="moveBundleId" name="moveBundle" onchange="$('#newsEditorForm').submit();">
 						<option value="">All</option>
@@ -194,19 +204,19 @@ Move News and Issues</b></span>
 	<thead>
 		<tr>
 
-			<g:sortableColumn property="createdAt" title="Created At" params="[projectId:projectId, moveBundle:params.moveBundle, viewFilter:params.viewFilter]" />
+			<g:sortableColumn property="createdAt" title="Created At" params="[projectId:projectId, moveBundle:params.moveBundle,moveEvent : params.moveEvent, viewFilter:params.viewFilter]" />
 
-			<g:sortableColumn property="createdBy" title="Created By" params="[projectId:projectId, moveBundle:params.moveBundle, viewFilter:params.viewFilter]" />
+			<g:sortableColumn property="createdBy" title="Created By" params="[projectId:projectId, moveBundle:params.moveBundle,moveEvent : params.moveEvent, viewFilter:params.viewFilter]" />
 
-			<g:sortableColumn property="commentType" title="Type" params="[projectId:projectId, moveBundle:params.moveBundle, viewFilter:params.viewFilter]" />
+			<g:sortableColumn property="commentType" title="Type" params="[projectId:projectId, moveBundle:params.moveBundle,moveEvent : params.moveEvent, viewFilter:params.viewFilter]" />
 
-			<g:sortableColumn property="comment" title="Comment" params="[projectId:projectId, moveBundle:params.moveBundle, viewFilter:params.viewFilter]" />
+			<g:sortableColumn property="comment" title="Comment" params="[projectId:projectId, moveBundle:params.moveBundle,moveEvent : params.moveEvent, viewFilter:params.viewFilter]" />
 
-			<g:sortableColumn property="resolution" title="Resolution" params="[projectId:projectId, moveBundle:params.moveBundle, viewFilter:params.viewFilter]" />
+			<g:sortableColumn property="resolution" title="Resolution" params="[projectId:projectId, moveBundle:params.moveBundle,moveEvent : params.moveEvent, viewFilter:params.viewFilter]" />
 
-			<g:sortableColumn property="resolvedAt" title="Resolved At" params="[projectId:projectId, moveBundle:params.moveBundle, viewFilter:params.viewFilter]" />
+			<g:sortableColumn property="resolvedAt" title="Resolved At" params="[projectId:projectId, moveBundle:params.moveBundle,moveEvent : params.moveEvent, viewFilter:params.viewFilter]" />
 
-			<g:sortableColumn property="resolvedBy" title="Resolved By" params="[projectId:projectId, moveBundle:params.moveBundle, viewFilter:params.viewFilter]" />
+			<g:sortableColumn property="resolvedBy" title="Resolved By" params="[projectId:projectId, moveBundle:params.moveBundle,moveEvent : params.moveEvent, viewFilter:params.viewFilter]" />
 
 		</tr>
 	</thead>
@@ -268,6 +278,7 @@ Move News and Issues</b></span>
 	<input name="commentType" value="" id="commentTypeId" type="hidden">
 	<input name="projectId" value="${projectId}" type="hidden">
 	<input name="moveBundle" value="${params.moveBundle}" type="hidden">
+	<input name="moveEvent" value="${params.moveEvent}" type="hidden">
 	<input name="viewFilter" value="${params.viewFilter}" type="hidden">
 		<div>
 	<table id="showCommentTable" style="border: 0px">
@@ -281,6 +292,14 @@ Move News and Issues</b></span>
 		<td valign="top" class="name"><label for="createdBy">Created
 				By:</label></td>
 				<td valign="top" class="value" id="createdById" />
+		</tr>
+		<tr>
+		<td valign="top" class="name"><label>Comment Type:</label></td>
+				<td valign="top" class="value" > 
+				<select disabled="disabled" id="commentTypeOption">
+				<option>Issue</option>
+				</select>
+				</td>
 		</tr>
 		<tr id="displayOptionTr">
 			
@@ -345,15 +364,15 @@ Move News and Issues</b></span>
 	<input name="moveEvent.id" value="${moveEvent?.id}" type="hidden" id="moveEventId">
 		<div class="dialog" style="border: 1px solid #5F9FCF">
 		<table id="createCommentTable" style="border: 0px">
-			<td valign="top" class="name">
-			<label for="dateCreatedNewsId">Created At:</label></td>
-					<td valign="top" class="value" id="dateCreatedNewsId" ><tds:convertDateTime date="${new Date() }"/></td>
-			</tr>
+			
 			<tr>
-			<td valign="top" class="name"><label for="createdByNewsId">Created
-					By:</label></td>
-					<td valign="top" class="value" id="createdByNewsId" >${loginPerson}</td>
-			</tr>
+		<td valign="top" class="name"><label>Comment Type:</label></td>
+				<td valign="top" class="value" > 
+				<select disabled="disabled">
+				<option>News</option>
+				</select>
+				</td>
+		</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="messageId">Comment:</label>
 				</td>
@@ -373,16 +392,7 @@ Move News and Issues</b></span>
 				<td valign="top" class="value" ><textarea cols="80" rows="5"
 						id="resolutionNewsId" name="resolution"></textarea> </td>
 			</tr>
-			<tr>
-				<td valign="top" class="name"><label for="dateArchivedId">Resolved
-					At:</label></td>
-					<td valign="top" class="value" id="dateArchivedId" />
-			</tr>
-				<tr>
-			<td valign="top" class="name"><label for="archivedById">Resolved
-					By:</label></td>
-					<td valign="top" class="value" id="archivedById" />
-			</tr>
+			
 		</table>
 		</div>
 		<div class="buttons"><span class="button"> 
@@ -396,11 +406,15 @@ Move News and Issues</b></span>
 <script type="text/javascript">
 var moveBundle = "${params.moveBundle}"
 var viewFilter = "${params.viewFilter}"
+var moveEvent = "${params.moveEvent}"
 if(moveBundle){
 	$("#moveBundleId").val(moveBundle)
 }
 if(viewFilter){
 	$("#viewFilterId").val(viewFilter)
+}
+if(moveEvent){
+	$("#moveEvent").val(moveEvent)
 }
 /*------------------------------------------------------------------
 * function to Unhighlight the Asset row when the edit DIV is closed

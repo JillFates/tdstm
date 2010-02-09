@@ -25,7 +25,7 @@
     var count = 4;
     var prev = 0;
     function next1(x) {
-        var bundleValue = document.getElementById("bundleState").value;
+        var bundleValue = $("#bundleState").val();
         showResult('next', bundleValue);
 
         if (count < 16) {
@@ -72,7 +72,7 @@
     }
 
     function back1(x) {
-        var bundleValue = document.getElementById("bundleState").value;
+        var bundleValue = $("#bundleState").val();
         showResult('pre', bundleValue);
 
         if (prev >= 4) {
@@ -123,17 +123,12 @@
     function convertTimeZones()
     {            
 	
-        offset = document.getElementById("timezone").value;                
-     var xmlFileName = "bundledata" + document.getElementById("bundleState").value + ".xml"  
-	 var hdnState = document.getElementById("hdnState");
-        bundledata(parseInt(hdnState.value), xmlFileName);
-        convertTime(offset, document.getElementById("hdnPlan"), document.getElementById("spanPlan"));
-        convertTime(offset, document.getElementById("hdnPlan1"), document.getElementById("spanPlan1"));
-        //document.getElementById("spanPlanTZ").innerHTML = document.getElementById("timezone").options[document.getElementById("timezone").selectedIndex].text;
-        //var sel = document.getElementById("timezone");        
-        //document.getElementById("spanPlanTZ").innerHTML = sel.options[sel.selectedIndex].value
-        
-        //setTimeZone()
+        offset = $("#timezone").val();                
+     var xmlFileName = "bundledata" + $("#bundleState").val() + ".xml"  
+	 var hdnState = $("#hdnState");
+        bundledata(parseInt(hdnState.val()), xmlFileName);
+        convertTime(offset, $("#hdnPlan"), $("#spanPlan"));
+        convertTime(offset, $("#hdnPlan1"), $("#spanPlan1"));
     }
     function convertTime(offset, source, target)
     {
@@ -141,7 +136,7 @@
         //12/12: 12:30 AM: (-210m)        
         //d1 = new Date("12/12/2010 12:30 AM")        
                         
-        temp = source.value
+        temp = source.val()
         
         //alert(temp);
         dtemp = trimAll(temp.substring(0,5))
@@ -166,18 +161,15 @@
         //Extracts the month part            
         month = nd1.getMonth() + 1      
         
-        //document.getElementById("lblFinalResult").innerHTML = month + "/" + nd1.getDate() + ": " + gettime;                        
         target.innerHTML = month + "/" + nd1.getDate() + ": " + gettime;                        
             
         //*************************//
         
-        //document.getElementById("spanPlanTZ").innerHTML = document.getElementById("timezone").options[document.getElementById("timezone").selectedvalue].text;
     }
     function setTimeZone()
     {   
-        alert(document.getElementById("timezone").options[document.getElementById("timezone").value].text);
-        document.getElementById("spanPlanTZ").innerHTML = document.getElementById("timezone").options[document.getElementById("timezone").value].text;
-        document.getElementById("span2").innerHTML = document.getElementById("timezone").options[document.getElementById("timezone").value].text;
+        $("#spanPlanTZ").html($("#timezone").options[$("#timezone").val()].text ) ;
+        $("#span2").html($("#timezone").options[$("#timezone").val()].text );
     }
 
     function convertTimeforXML(offset, source)
@@ -336,8 +328,8 @@ var cdate="<small><font color='000000' face='Arial'><b>"+hours+":"+minutes+" "+d
 if (document.all)
 document.all.clock.innerHTML=cdate
 else if (document.getElementById) {
-document.getElementById("clock").innerHTML=cdate;
-document.getElementById("date").innerHTML=mydate.toLocaleDateString();
+$("#clock").html(cdate);
+$("#date").html(mydate.toLocaleDateString());
 }
 else
 document.write(cdate, cdate1)
@@ -352,12 +344,11 @@ setInterval("getthedate()",1000)
  * Function to load the data for a particular MoveEvent
  * 
  */
-function getMoveEventNewsDetails(){
-	var moveEvent = "${moveEvent}"
+function getMoveEventNewsDetails( moveEvent ){
 	if(moveEvent){
 		jQuery.ajax({
 	        type:"GET",
-	        url:"../ws/moveEventNews/"+moveEvent,
+	        url:"../ws/moveEventNews/"+moveEvent+"?type="+$("#typeId").val()+"&state="+$("#stateId").val()+"&maxLen="+$("#maxLenId").val()+"&sort="+$("#sortId").val(),
 	        dataType: 'json',
 	        success:updateMoveEventNews,
 	        error:function( data, error ) {
@@ -380,28 +371,40 @@ function updateMoveEventNews( news ){
 			scrollText +=" "+news[i].text +"..."
 		}
 	}
-	alert(scrollText)
 	$("#news_live").html(live);
 	$("#news_archived").html(archived);
-	$("#mycrawler").html(scrollText)
-	//var datalength = 
+	$("#mycrawlerId").html(scrollText)
 }
 </script>
 </head>
 
-<body onLoad="goforit();getMoveEventNewsDetails()">
+<body class="body_image" onLoad="goforit();getMoveEventNewsDetails($('#moveEvent').val())">
 <div id="doc">
 <div id="container">
 <!--Header Starts here-->
 <div id="header">
 <div id="logo">
 <g:if test="${projectLogo}">
-<img src="${createLink(controller:'project', action:'showImage', id:projectLogo?.id)}" style="height: 55px;"/><br>
+<img src="${createLink(controller:'project', action:'showImage', id:projectLogo?.id)}" style="height: 55px;"/>
 </g:if>
 <g:else>
-<img src="images/devon.png" width="122" height="55" alt="Devon" title="Devon"><br>
+<a href="http://www.transitionaldata.com/" target="new"><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;border: 0px"/></a>
 </g:else>
-<span id="date"></span></div>
+<br><br>
+<span id="date"></span><br>
+<span style="padding-left: 10px;">
+	<label for="moveEvent"><b>Event:</b></label>&nbsp;
+	<select id="moveEvent" name="moveEvent" onchange="getMoveEventNewsDetails(this.value)">
+		<g:each status="i" in="${moveEventsList}" var="moveEventInstance">
+			<option value="${moveEventInstance?.id}">${moveEventInstance?.name}</option>
+		</g:each>
+	</select>
+</span>
+<input type="hidden" id="typeId" value="${params.type}">
+<input type="hidden" id="stateId" value="${params.state}">
+<input type="hidden" id="maxLenId" value="${params.maxLen}">
+<input type="hidden" id="sortId" value="${params.sort}">
+</div>
 <div class="clientname">DEVON ENERGY<br>
 DATA CENTER RELOCATION</div>
 <div class="topdate"><span><img src="${createLinkTo(dir:'images',file:'powered_by.png')}" alt="Powered by TDS" width="158" height="53" title="Powered by TDS"></span><br><span id="clock"></span>&nbsp;<span>
@@ -526,7 +529,8 @@ if (iens6&&parseInt(crossobj.style.top)>=(contentheight*(-1)+80))
 crossobj.style.top=parseInt(crossobj.style.top)-speed+"px"
 else if (ns4&&crossobj.top>=(contentheight*(-1)+100))
 crossobj.top-=speed
-movedownvar=setTimeout("movedown()",20)
+movedownvar=setTimeout("movedown()",20) 
+
 }
 
 function moveup(){
@@ -606,12 +610,12 @@ window.onLoad=getcontent_height
  //ActiveBundleLink(1)
  function showResult(objValue, bundleValue) {
 
-     var hdnState = document.getElementById("hdnState");
+     var hdnState = $("#hdnState");
      var hdnStateValue = parseInt(hdnState.value);
      if (objValue == "load") {
          hdnStateValue = 1;
-         document.getElementById("hdnState").value = hdnStateValue;
-         document.getElementById("bundleState").value = bundleValue;
+         $("#hdnState").val(hdnStateValue);
+         $("#bundleState").val(bundleValue);
          count = 4;
          prev = 0;
      }
@@ -620,7 +624,7 @@ window.onLoad=getcontent_height
          //if (hdnState == 1) { return;}
          if (hdnStateValue > 1) {
              hdnStateValue = hdnStateValue - 1;
-             document.getElementById("hdnState").value = hdnStateValue;
+             $("#hdnState").val(hdnStateValue);
          }
          else { alert("No Data"); }
      }
@@ -628,18 +632,18 @@ window.onLoad=getcontent_height
          //if (hdnState == 4) { return;}
          if (hdnStateValue < 4) {
              hdnStateValue = hdnStateValue + 1;
-             document.getElementById("hdnState").value = hdnStateValue;
+             $("#hdnState").val(hdnStateValue);
          }
          else { alert("No Data"); }
      }
-     var xmlFileName = "bundledata" + document.getElementById("bundleState").value + ".xml"
+     var xmlFileName = "bundledata" + $("#bundleState").val()+ ".xml"
      bundledata(hdnStateValue, xmlFileName)
  }
 
  function ActiveBundleLink(Id) {
      var spanElm
      for (var i = 1; i < 8; i++) {
-         spanElm = document.getElementById('spnBundle' + i);
+         spanElm = $('#spnBundle' + i);
          spanElm.className = "mbhinactive";
          if (i == Id) {
              spanElm.className = "mbhactive";
@@ -671,48 +675,48 @@ if (xLength>12){
 	    bundletext +="<div style='float:left;margin-left:1px;margin-right:1px;width:130px;'><ul class=\"bdetails\"><li class=\"heading\">"+bundleChilds[i].getAttribute('name')+"</li>"
 	    bundletext +="<li class="+bundleChilds[i].getAttribute('clsName')+">";
 	    bundletext += bundleChilds[i].getAttribute('wid');
-	    bundletext += "</li><li class=\"schstart\">"+convertTimeforXML(document.getElementById("timezone").value, bundleChilds[i].getAttribute('Schstart'))+"</li>";
-	    bundletext += "<li class=\"schfinish\">"+convertTimeforXML(document.getElementById("timezone").value, bundleChilds[i].getAttribute('Schfinish'))+"</li>";
-	    bundletext += "<li class="+bundleChilds[i].getAttribute('ActstartClass')+">"+convertTimeforXML_AS_AF(document.getElementById("timezone").value, bundleChilds[i].getAttribute('Actstart'))+"&nbsp;</li>";
-	    bundletext += "<li class=\"actfinish1\"><span id="+bundleChilds[i].getAttribute('ActfinishClass')+">"+convertTimeforXML_AS_AF(document.getElementById("timezone").value, bundleChilds[i].getAttribute('Actfinish'))+"</span>&nbsp;</li></ul></div>";
+	    bundletext += "</li><li class=\"schstart\">"+convertTimeforXML($("#timezone").val(), bundleChilds[i].getAttribute('Schstart'))+"</li>";
+	    bundletext += "<li class=\"schfinish\">"+convertTimeforXML($("#timezone").val(), bundleChilds[i].getAttribute('Schfinish'))+"</li>";
+	    bundletext += "<li class="+bundleChilds[i].getAttribute('ActstartClass')+">"+convertTimeforXML_AS_AF($("#timezone").val(), bundleChilds[i].getAttribute('Actstart'))+"&nbsp;</li>";
+	    bundletext += "<li class=\"actfinish1\"><span id="+bundleChilds[i].getAttribute('ActfinishClass')+">"+convertTimeforXML_AS_AF($("#timezone").val(), bundleChilds[i].getAttribute('Actfinish'))+"</span>&nbsp;</li></ul></div>";
 	}
-	document.getElementById('bundlediv').innerHTML = bundletext;
+	$('#bundlediv').html(bundletext);
 
 	 var val1 = x[0].getElementsByTagName("Unracking")[0].getAttribute('wid');
      if (val1 == "100%" || val1 == "0%") {
-         document.getElementById("chartdiv1b").style.display = 'none';
+         $("#chartdiv1b").hide();
      }
-     else { document.getElementById("chartdiv1b").style.display = 'block'; }
+     else { $("#chartdiv1b").show(); }
 
      val1 = x[0].getElementsByTagName("Staging")[0].getAttribute('wid');
      if (val1 == "100%" || val1 == "0%") {
-         document.getElementById("chartdiv2b").style.display = 'none';
+         $("#chartdiv2b").hide();
      }
-     else { document.getElementById("chartdiv2b").style.display = 'block'; }
+     else { $("#chartdiv2b").show(); }
 
      val1 = x[0].getElementsByTagName("Transport")[0].getAttribute('wid');
      if (val1 == "100%" || val1 == "0%") {
-         document.getElementById("chartdiv3b").style.display = 'none';
+         $("#chartdiv3b").hide();
      }
-     else { document.getElementById("chartdiv3b").style.display = 'block'; }
+     else { $("#chartdiv3b").show(); }
 
      val1 = x[0].getElementsByTagName("Staging-2")[0].getAttribute('wid');
      if (val1 == "100%" || val1 == "0%") {
-         document.getElementById("chartdiv4b").style.display = 'none';
+         $("#chartdiv4b").hide();
      }
-     else { document.getElementById("chartdiv4b").style.display = 'block'; }
+     else { $("#chartdiv4b").show(); }
 
      val1 = x[0].getElementsByTagName("Reracking")[0].getAttribute('wid');
      if (val1 == "100%" || val1 == "0%") {
-         document.getElementById("chartdiv5b").style.display = 'none';
+         $("#chartdiv5b").hide();
      }
-     else { document.getElementById("chartdiv5b").style.display = 'block'; }
+     else { $("#chartdiv5b").show(); }
 
      val1 = x[0].getElementsByTagName("Cabling")[0].getAttribute('wid');
      if (val1 == "100%" || val1 == "0%") {
-         document.getElementById("chartdiv6b").style.display = 'none';
+         $("#chartdiv6b").hide();
      }
-     else { document.getElementById("chartdiv6b").style.display = 'block'; }
+     else { $("#chartdiv6b").show(); }
  }
 
 </script>
@@ -779,7 +783,7 @@ myChart.render("chartdiv6b");
 <!-- Footer starts here-->
 <div style="clear:both"></div>
 <div id="crawler">
-<div id="mycrawler">&nbsp;Move Event News</div>
+<div id="mycrawler"><div id="mycrawlerId" style="width: 900px;margin-top: -6px;" >.</div></div>
 </div>
 <!-- Footer Ends here-->
 
@@ -800,7 +804,7 @@ marqueeInit({
 	mouse: 'cursor driven', //mouseover behavior ('pause' 'cursor driven' or false)
 	moveatleast: 4,
 	neutral: 150,
-	savedirection: true
+	savedirection: false
 });
 
 //bundledata(1, 'bundledata1.xml');
@@ -854,6 +858,10 @@ marqueeInit({
 	}();
 	YAHOO.util.Event.onAvailable('doc',YAHOO.example.init, YAHOO.example, true);
 	//-->
+	var moveEvent = "${moveEvent?.id}"
+	if(moveEvent){
+		$("#moveEvent").val(moveEvent)
+	}
 	</script>
 </div>
 </body>

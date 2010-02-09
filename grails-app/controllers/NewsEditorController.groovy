@@ -30,11 +30,20 @@ class NewsEditorController {
 		def offset = params.offset
 		userPreferenceService.loadPreferences("CURR_BUNDLE")
         def defaultBundle = getSession().getAttribute("CURR_BUNDLE")
-        if(defaultBundle.CURR_BUNDLE){
-        	def bundleInSession = MoveBundle.findById(defaultBundle.CURR_BUNDLE)
-        	moveEvent = bundleInSession.moveEvent
-        }
-
+        
+		def moveEventsList = MoveEvent.findAllByProject(projectInstance)
+		def moveEventId = params.moveEvent
+		if(!moveEventId){
+			moveEventId = getSession().getAttribute( "MOVE_EVENT" )?.MOVE_EVENT
+		}
+		if(moveEventId){
+			moveEvent = MoveEvent.get(moveEventId)
+			userPreferenceService.setPreference("MOVE_EVENT",moveEventId)
+		} else {
+			moveEvent = moveEventsList?.get(0)
+		}
+		
+		
     	def moveBundlesList
     	if(moveEvent){
     		moveBundlesList = MoveBundle.findAll("from MoveBundle mb where mb.moveEvent = ${moveEvent.id} order by mb.name asc")
@@ -67,7 +76,7 @@ class NewsEditorController {
     	}
         
 		if(moveEvent){
-			moveEventNewsQuery.append(" mn.move_event_id = ${moveEvent.id}  ")
+			moveEventNewsQuery.append(" mn.move_event_id = ${moveEvent.id}  and p.project_id = ${projectInstance.id} ")
 		} else {
 			moveEventNewsQuery.append(" p.project_id = ${projectInstance.id} ")			
 		}
@@ -98,7 +107,7 @@ class NewsEditorController {
 		def principal = SecurityUtils.subject.principal
 		def loginUser = UserLogin.findByUsername(principal)
 		
-		return [moveBundlesList : moveBundlesList, assetCommentsList : totalComments, projectId : projectId, 
+		return [moveBundlesList : moveBundlesList, assetCommentsList : totalComments, projectId : projectId, moveEventsList : moveEventsList,
 				params : params, totalCommentsSize : totalCommentsSize, moveEvent : moveEvent, loginPerson : loginUser.person]
     }
 	/*-------------------------------------------------------------------
