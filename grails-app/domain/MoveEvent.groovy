@@ -2,7 +2,7 @@
  * The MoveEvent domain represents the concept of an event where one or move bundles that will occur at one logical 
  * period of time.
  */
-class MoveEvent extends Party {
+class MoveEvent {
 	
     Project project
     String name
