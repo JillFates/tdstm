@@ -20,18 +20,18 @@
 		<transition to="Hold" name="Hold" id="10" type="boolean" color="red"/>
 		<transition to="Ready" name="Ready" id="20" type="process" color="yellow"/>
 		<transition to="PoweredDown" name="Powered Down" id="30" type="process" color="orange"/>
-		<transition to="Release" name="Release" id="40" type="process" color="green" />
+		<transition to="Release" name="Release" id="40" type="process" color="green" dashboardLabel="Release" />
 		<transition to="Unracking" name="Unracking" id="50" type="process" color="blue"/>
-		<transition to="Unracked" name="Unracked" id="60" type="process" color="blue"/>
-		<transition to="Cleaned" name="Cleaned" id="70" type="process" />
+		<transition to="Unracked" name="Unracked" id="60" type="process" color="blue" dashboardLabel="Unracking" predecessor="50"/>
+		<transition to="Cleaned" name="Cleaned" id="70" type="process" dashboardLabel="Cleaned" />
 		<transition to="OnCart" name="On Cart" id="80" type="process" />
 		<transition to="OnTruck" name="On Truck" id="90" type="process" />
 		<transition to="InTransit" name="In Transit" id="100" type="process" />
-		<transition to="EndTransit" name="End Transit" id="110" type="process" />
+		<transition to="EndTransit" name="End Transit" id="110" type="process" dashboardLabel="Transport" predecessor="100" />
 		<transition to="OffTruck" name="Off Truck" id="120" type="process" />
 		<transition to="Staged" name="Staged" id="130" type="process" />
 		<transition to="Reracking" name="Reracking" id="140" type="process" />
-		<transition to="Reracked" name="Reracked" id="150" type="process" />
+		<transition to="Reracked" name="Reracked" id="150" type="process" dashboardLabel="Reracking" predecessor="140" />
 		<transition to="QAVerified" name="QA Verified" id="160" type="process" />
 		<transition to="PoweredOn" name="Powered On" id="170"  type="process" />
 		<transition to="NetVerifying" name="Net Verifying" id="180"  type="process" />
@@ -44,7 +44,7 @@
 		<transition to="AppFinished" name="App Done" id="250"  type="process" />
 		<transition to="AppVerifying" name="App Verifying" id="260"  type="process" />
 		<transition to="AppVerified" name="App Verified" id="270"  type="process" />
-		<transition to="Completed" name="Completed" id="280"  type="process" />
+		<transition to="Completed" name="Completed" id="280"  type="process" dashboardLabel="Completed" predecessor="150" />
 		<transition to="Terminated" name="Terminated" id="900"  type="process" />
 	</transitions>
 

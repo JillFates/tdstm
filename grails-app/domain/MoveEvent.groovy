@@ -8,6 +8,10 @@ class MoveEvent extends Party {
     String name
     String description
 
+	// Not sure if this is going to be stored or not....
+    Date actualStartTime
+    Date actualCompletionTime
+
     static constraints = {        
 		name( blank:false, nullable:false )
 		project( nullable:false )

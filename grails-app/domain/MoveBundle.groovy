@@ -1,11 +1,11 @@
-class MoveBundle extends Party {
-	
+class MoveBundle extends Party {	
     Project project
     String name
     String description
     Date startTime
     Date completionTime
-    Integer operationalOrder  // Order that the bundles are performed in
+	Integer lastSnapGroupId = 0		// Used when creating Step Snapshot data to group a series of steps
+    Integer operationalOrder  		// Order that the bundles are performed in
     MoveEvent moveEvent
     static constraints = {        
 		name( blank:false, nullable:false )
@@ -18,7 +18,8 @@ class MoveBundle extends Party {
 	}
 
 	static hasMany = [
-		assetTransitions : AssetTransition
+		assetTransitions : AssetTransition,
+		moveBundleSteps  : MoveBundleStep
 	]
 
 	static mapping  = {
