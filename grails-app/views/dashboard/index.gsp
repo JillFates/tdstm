@@ -396,7 +396,6 @@ setInterval("getthedate()",1000)
 <a href="http://www.transitionaldata.com/" target="new"><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;border: 0px"/></a>
 </g:else>
 <br>
-<span id="date"></span><br>
 <span style="padding-left: 10px;">
 	<label for="moveEvent"><b>Event:</b></label>&nbsp;
 	<select id="moveEvent" name="moveEvent" onchange="getMoveEventNewsDetails(this.value)">
@@ -412,7 +411,8 @@ setInterval("getthedate()",1000)
 </div>
 <div class="clientname">DEVON ENERGY<br>
 DATA CENTER RELOCATION</div>
-<div class="topdate"><span><img src="${createLinkTo(dir:'images',file:'powered_by.png')}" alt="Powered by TDS" width="158" height="53" title="Powered by TDS"></span><br><span id="clock"></span>&nbsp;<span>
+<div class="topdate"><span><img src="${createLinkTo(dir:'images',file:'powered_by.png')}" alt="Powered by TDS" width="158" height="53" title="Powered by TDS"></span>
+<br><span id="date"></span> <span id="clock"></span>&nbsp;<span>
 <label>
   <select name="timezone" id="timezone" onChange="convertTimeZones();" class="selecttext">
     <option value="0" selected>GMT</option>
