@@ -343,37 +343,43 @@ setInterval("getthedate()",1000)
  * Function to load the data for a particular MoveEvent
  * 
  */
-function getMoveEventNewsDetails( moveEvent ){
-	if(moveEvent){
-		jQuery.ajax({
-	        type:"GET",
-	        url:"../ws/moveEventNews/"+moveEvent+"?type="+$("#typeId").val()+"&state="+$("#stateId").val()+"&maxLen="+$("#maxLenId").val()+"&sort="+$("#sortId").val(),
-	        dataType: 'json',
-	        success:updateMoveEventNews,
-	        error:function( data, error ) {
-	            alert("error = "+error);
-	        }
-		});
-	}
-}
-function updateMoveEventNews( news ){
-	var newsLength = news.length;
-	var live = "";
-	var archived = "";
-	var scrollText = " "
-	for( i = 0; i< newsLength; i++){
-		var state = news[i].state;
-		if(state == "A"){
-			archived +=	"<li><span class='newstime'>"+news[i].created+":</span> <span class='normaltext'>"+news[i].text+"</span></li>";
-		} else {
-			live +=	"<li><span class='newstime'>"+news[i].created+":</span> <span class='normaltext'>"+news[i].text+"</span></li>";
-			scrollText +=" "+news[i].text +"..."
+	function getMoveEventNewsDetails( moveEvent ){
+		if(moveEvent){
+			jQuery.ajax({
+		        type:"GET",
+		        url:"../ws/moveEventNews/"+moveEvent+"?type="+$("#typeId").val()+"&state="+$("#stateId").val()+"&maxLen="+$("#maxLenId").val()+"&sort="+$("#sortId").val(),
+		        dataType: 'json',
+		        success:updateMoveEventNews,
+		        error:function( data, error ) {
+		            alert("error = "+error);
+		        }
+			});
 		}
 	}
-	$("#news_live").html(live);
-	$("#news_archived").html(archived);
-	$("#mycrawlerId").html(scrollText)
-}
+	function updateMoveEventNews( news ){
+		var newsLength = news.length;
+		var live = "";
+		var archived = "";
+		var scrollText = " "
+			var myDate = new Date();
+		for( i = 0; i< newsLength; i++){
+			var state = news[i].state;
+			if(state == "A"){
+				archived +=	"<li><span class='newstime'>"+news[i].created+":</span> <span class='normaltext'>"+news[i].text+"</span></li>";
+			} else {
+				live +=	"<li><span class='newstime'>"+news[i].created+":</span> <span class='normaltext'>"+news[i].text+"</span></li>";
+				scrollText +=" "+news[i].text +"..."
+			}
+		}
+		$("#news_live").html(live);
+		$("#news_archived").html(archived);
+		$("#mycrawlerId").html(scrollText)
+	}
+	var timer
+	function timedRefresh() {
+		var refreshTime = $("#refreshTimeId").val();
+		timer = setTimeout("getMoveEventNewsDetails($('#moveEvent').val())",refreshTime);
+	}
 </script>
 </head>
 
@@ -450,11 +456,11 @@ Planned Completion<br>
 
 </div>
 <div id="toprightbox">
-<div id="refresh">Refresh: <select name="timezone2" id="timezone2" class="selecttext">
-                                <option selected>1 Min</option>
-                                <option>5 Min</option>
-                                <option>10 Min</option>
-                                <option>30 Min</option>
+<div id="refresh">Refresh: <select name="refreshTime" id="refreshTimeId" class="selecttext">
+                                <option selected value="60000">1 Min</option>
+                                <option value="300000">5 Min</option>
+                                <option value="600000">10 Min</option>
+                                <option value="1800000">30 Min</option>
                               </select>
 </div>
 <div class="toprightcontent">
@@ -479,67 +485,52 @@ Move News
 <div id="newsmenu">
     <ul id="newstabs" class="shadetabs">
     <li><a href="#" rel="news_live_div" class="selected">Live</a></li>
-    <li><a href="#" rel="news_archived_div">Archive</a></li>
+    <li><a href="#" rel="news_archived_div" onmouseup="javascript:setCrossobjTop()">Archive</a></li>
     </ul>
  </div>
  </div>
 <div style="clear:both"></div>
 <div id="newsblock">
-<div id="newsbox"><SCRIPT language="JavaScript1.2">
-
-var speed=2
-
-iens6=document.all||document.getElementById
-ns4=document.layers
-
-if (iens6){
-document.write('<div id="container" style="position:absolute;width:900px;height:70px;overflow:hidden;border:0px solid grey">')
-document.write('<div id="content" style="position:relative;width:900px;left:0px;top:-15px">')
-}
-</script>
-<ilayer name="nscontainer" width="900px" height="80px" clip="0,0,900px,70px">
-<layer name="nscontent" width="900px" height="80px" visibility="hidden">
+<div id="newsbox">
+<div id="container" style="position:absolute;width:900px;height:70px;overflow:hidden;border:0px solid grey">
+<div id="content" style="position:relative;width:900px;left:0px;top:-15px">
 <div id="news_live_div" class="tabcontent">
 	<ul id="news_live" class="newscroll">
-	
 	</ul>
 </div>
 <div id="news_archived_div" class="tabcontent">
 	<ul id="news_archived" class="newscroll">
-	
 	</ul>
 </div>
-</layer>
-</ilayer>
+</div></div>
 <script type="text/javascript">
-if (iens6){
-document.write('</div></div>')
-var crossobj=document.getElementById? document.getElementById("content") : document.all.content
-var contentheight=crossobj.offsetHeight
-}
-else if (ns4){
-var crossobj=document.nscontainer.document.nscontent
-var contentheight=crossobj.clip.height
-}
-
-function movedown(){
-if (window.moveupvar) clearTimeout(moveupvar)
-if (iens6&&parseInt(crossobj.style.top)>=(contentheight*(-1)+80))
-crossobj.style.top=parseInt(crossobj.style.top)-speed+"px"
-else if (ns4&&crossobj.top>=(contentheight*(-1)+100))
-crossobj.top-=speed
-movedownvar=setTimeout("movedown()",20) 
-
-}
-
-function moveup(){
-if (window.movedownvar) clearTimeout(movedownvar)
-if (iens6&&parseInt(crossobj.style.top)<=5)
-crossobj.style.top=parseInt(crossobj.style.top)+speed+"px"
-else if (ns4&&crossobj.top<=10)
-crossobj.top+=speed
-moveupvar=setTimeout("moveup()",20)
-}
+	if(navigator.appName == "Microsoft Internet Explorer"){
+		$("#content").css("top",0)
+	}
+	var speed = 10
+	var crossobjTop = $("#content").css("top")
+	function movedown(){
+		var crossobj = $("#content")
+		var contentheight = crossobj.height()
+		if ( parseInt(crossobj.css("top")) >= (contentheight - 60)*(-1) ){
+			crossobj.css("top",parseInt(crossobj.css("top"))-speed+"px")
+		}
+	}
+	
+	function moveup(){
+		var crossobj=$("#content")
+		var contentheight=crossobj.height()
+		if (parseInt(crossobj.css("top"))<=-20){
+			crossobj.css("top",parseInt(crossobj.css("top"))+speed+"px")
+		}
+	}
+	function setCrossobjTop(){
+		$("#content").css("top",crossobjTop);
+		if(navigator.appName == "Microsoft Internet Explorer"){
+			$("#content").css("top",0)
+		}
+	}
+	<%--
 
 function stopscroll(){
 if (window.moveupvar) clearTimeout(moveupvar)
@@ -560,15 +551,15 @@ contentheight=crossobj.offsetHeight
 else if (ns4)
 document.nscontainer.document.nscontent.visibility="show"
 }
-window.onLoad=getcontent_height
+window.onLoad=getcontent_height --%>
 </script>
 </div>
 <div id="newsarrows">
 <div id="toparrow">
-<a href="javascript:movedown()"><img src="${createLinkTo(dir:'images',file:'up_arrow.png')}" alt="scroll up" width="10" height="6" border="0" /></a>
+<a href="javascript:moveup()"><img src="${createLinkTo(dir:'images',file:'up_arrow.png')}" alt="scroll up" width="10" height="6" border="0" /></a>
 </div>
 <div id="bottomarrow">
-<a href="javascript:moveup()"><img src="${createLinkTo(dir:'images',file:'down_arrow.png')}" alt="scroll down" width="10" height="6" border="0" /></a>
+<a href="javascript:movedown()"><img src="${createLinkTo(dir:'images',file:'down_arrow.png')}" alt="scroll down" width="10" height="6" border="0" /></a>
 </div>
 
 </div>
@@ -861,6 +852,7 @@ marqueeInit({
 	if(moveEvent){
 		$("#moveEvent").val(moveEvent)
 	}
+	timedRefresh();
 	</script>
 </div>
 </body>

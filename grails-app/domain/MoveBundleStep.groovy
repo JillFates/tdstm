@@ -8,7 +8,7 @@ class MoveBundleStep {
     Integer transitionId			// Maps to the id # of the transition in the workflow XML definition
 	String label					// Value to display in UI
     Date planStartTime				// The date/time of when the step will start, entered by the project manager enters while planning to move
-    Date PlanCompletionTime			// The date/time of when the step will complete, entered by the project manager enters while planning to move
+    Date planCompletionTime			// The date/time of when the step will complete, entered by the project manager enters while planning to move
 	String calcMethod				// The method that will be used to calculate the projection of completion for the step
 	Integer showOnDashboard=1		// Used to determine if the Step appears in the dashboard		
 	Date dateCreated = new Date()
@@ -21,8 +21,8 @@ class MoveBundleStep {
 
 	static constraints = { 
 		label( blank:false, nullable:false)
-		startTime( nullable:true )
-		completionTime( nullable:true )
+		planStartTime( nullable:true )
+		planCompletionTime( nullable:true )
 		calcMethod( blank:false, nullable:false, inList: ['L','M'] )	// Linear and Manual
 		showOnDashboard(range:0..1)	
 	}
@@ -37,6 +37,9 @@ class MoveBundleStep {
 			label sqltype: 'varchar(30)'
 			calcMethod sqltype: 'char(1)'
 			showOnDashboard sqltype: 'tinyint(1)'
+			planCompletionTime sqltype : 'DateTime'
+			planStartTime sqltype: 'DateTime'
+			
 		}
 	}
 	
@@ -44,7 +47,7 @@ class MoveBundleStep {
 	 * calculates the total time that step is planned to take to complete
 	 * @return int - the number of seconds the step was planned to take
 	 */
-	getPlanDuration() {
+	def getPlanDuration() {
 		// calculate # of seconds planCompletionTime - planStartTime
 	}
 	
@@ -53,7 +56,7 @@ class MoveBundleStep {
 	 * it will determine the duration from the start to the current time.
 	 * @return int - total duration that a step has taken to up to the current time (seconds)
 	 */
-	getActualDuration() {
+	def getActualDuration() {
 		/* 
 		if actualStartTime is null {
 			return 0

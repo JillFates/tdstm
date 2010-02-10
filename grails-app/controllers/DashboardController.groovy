@@ -18,7 +18,7 @@ class DashboardController {
 		if(moveEventId){
 			moveEvent = MoveEvent.get(moveEventId)
 			userPreferenceService.setPreference("MOVE_EVENT",moveEventId)
-		} else {
+		} else if(moveEventsList){
 			moveEvent = moveEventsList?.get(0)
 		}
         userPreferenceService.loadPreferences("MOVE_EVENT")

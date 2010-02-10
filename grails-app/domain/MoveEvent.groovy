@@ -15,7 +15,10 @@ class MoveEvent extends Party {
     static constraints = {        
 		name( blank:false, nullable:false )
 		project( nullable:false )
-		description( blank:true, nullable:true )		
+		description( blank:true, nullable:true )
+		actualStartTime(nullable:true )
+		actualCompletionTime(nullable:true )
+		
 	}
 
 	static hasMany = [
