@@ -8,8 +8,7 @@ class StepSnapshot {
 	int tasksCount				// The number of tasks/assets to be processed.  For Manual steps, it should be 100
 	int	tasksCompleted			// The number of tasks/assets completed.  For manual steps, it will be entered by the user as a percentage of completion
 	int duration				// The number of seconds that the task has been executing
-	int completionImpact		// The number of seconds that the step (if completed) impacts the overall schedule.  Finished early(-), Finish late(+) 
-	int projectedOver			// The time (seconds) that the projected completion is over(+)/under(-) the plan completion time
+	int planDelta				// The number of seconds that the step is over(+)/under(-) the planned finish time.
 	int dialIndicator			// Quantity to display in the dial/gage on dashboard
 	Date dateCreated = new Date()
 
@@ -22,8 +21,7 @@ class StepSnapshot {
 			taskCount sqltype: 'smallint unsigned'
 			tasksCompleted sqltype: 'smallint unsigned'
 			duration sqltype: 'mediumint unsigned'
-			completionImpact sqltype: 'mediumint unsigned'
-			projectedOver sqltype: 'mediumint unsigned'
+			planDelta sqltype: 'int'
 			dialIndicator sqltype: 'tinyint'		
 		}
 	}
