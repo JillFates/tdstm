@@ -49,6 +49,14 @@ class MoveBundleStep {
 	 */
 	def getPlanDuration() {
 		// calculate # of seconds planCompletionTime - planStartTime
+		def timeDuration = 0
+		if(planCompletionTime && planStartTime){
+			timeDuration = planCompletionTime.getTime() - planStartTime.getTime()
+			if(timeDuration) {
+				timeDuration = timeDuration / 1000 
+			}
+		}
+		return timeDuration
 	}
 	
 	/**
@@ -66,6 +74,17 @@ class MoveBundleStep {
 			return actualCompletionTime - actualStartTime
 		}
 		*/
+		def timeDuration = 0
+		if( actualStartTime && actualStartTime){
+			timeDuration = actualCompletionTime.getTime() - actualStartTime.getTime()
+		} else if( !actualCompletionTime && actualStartTime){
+			timeDuration = new Date().getTime() - actualStartTime.getTime()
+		}
+		
+		if(timeDuration){
+			timeDuration = timeDuration / 1000
+		}
+		return timeDuration
 	}
 
     String toString(){

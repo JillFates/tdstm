@@ -16,6 +16,7 @@ class AssetEntityController {
 	def missingHeader = ""
 	def added = 0
 	def skipped = []
+
 	def partyRelationshipService
 	def stateEngineService
 	def workflowService
@@ -24,8 +25,10 @@ class AssetEntityController {
 	def assetEntityInstanceList = []
 	def jdbcTemplate
     def filterService
-    def sessionFactory 
-    def index = {
+	def moveBundleService
+	def sessionFactory 
+    
+	def index = {
 		redirect( action:list, params:params )
 	}
 	/* -----------------------------------------------------
@@ -961,7 +964,9 @@ class AssetEntityController {
 		        	totalAsset<<it
 		        }
         	}
-        	totalAssetsSize = jdbcTemplate.queryForInt("select count(a.asset_entity_id) from asset_entity a where a.move_bundle_id = ${moveBundleInstance.id}" )
+        	
+        	totalAssetsSize = moveBundleService.assetCount( moveBundleInstance.id )
+			
 	        def projectTeamList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = ${moveBundleInstance.id} and "+
 	        											"pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport'  order by pt.name asc")
 	        def countQuery = "SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate, min(cast(t.state_to as UNSIGNED INTEGER)) as minstate "+
