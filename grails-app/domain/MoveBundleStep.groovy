@@ -23,6 +23,8 @@ class MoveBundleStep {
 		label( blank:false, nullable:false)
 		planStartTime( nullable:true )
 		planCompletionTime( nullable:true )
+		actualStartTime( nullable:true )
+		actualCompletionTime( nullable:true )
 		calcMethod( blank:false, nullable:false, inList: ['L','M'] )	// Linear and Manual
 		showOnDashboard(range:0..1)	
 	}
@@ -39,7 +41,8 @@ class MoveBundleStep {
 			showOnDashboard sqltype: 'tinyint(1)'
 			planCompletionTime sqltype : 'DateTime'
 			planStartTime sqltype: 'DateTime'
-			
+			actualCompletionTime sqltype : 'DateTime'
+			actualStartTime sqltype: 'DateTime'			
 		}
 	}
 	
@@ -58,7 +61,7 @@ class MoveBundleStep {
 		}
 		return timeDuration
 	}
-	
+		
 	/**
 	 * calculates the actual total time that the step has taken.  If the step hasn't completed
 	 * it will determine the duration from the start to the current time.
@@ -85,6 +88,14 @@ class MoveBundleStep {
 			timeDuration = timeDuration / 1000
 		}
 		return timeDuration
+	}
+	
+	/**
+	 * determines if the step is completed
+	 * @return bool - true if completed
+	 */
+	def isCompleted() {
+		// return actualCompletionTime != null
 	}
 
     String toString(){
