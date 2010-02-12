@@ -63,7 +63,15 @@ class StepSnapshot {
 	 *    3. step is completed:  return zero (0)
 	 */
 	def getProjectedTimeOver() {
-	
+		
+	}
+
+	/**
+	 * calculates the the projected time that the step will be completed based on the pace
+	 * @return date - projected completion time
+	 */
+	getProjectedCompletionTime() {
+		// return moveBundleStep.planCompletionTime + projectedTimeOver
 	}
 
 	/**
@@ -81,6 +89,14 @@ class StepSnapshot {
 	def hasStarted() {
 		// return moveBundleStep.actualStartTime not null
 	}
+	
+	/**
+	 * Returns the status bar color 
+	 * @return string - the color green/red indication the step status to planned completion time
+	 */
+	def getStatusColor() {
+		return planDelta > 0 ? "red" : "green"
+	}	
 	
     String toString(){
 		moveBundleStep.name + " " + dateCreated
