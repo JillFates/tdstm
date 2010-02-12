@@ -435,6 +435,21 @@ td .odd {
 	function vpWidth() {
 		return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 	}
+
+	/*------------------------------------------
+	 * function to call ConsoleController.invokeSnapshot
+	 *-----------------------------------------*/
+	function createSnapshot(){
+		var moveBundle = $("#moveBundleId").val()
+		${remoteFunction(controller:'console', action:'invokeSnapshot', params:'\'moveBundle=\' +moveBundle',onLoad="disableCreateSnapShot()", onComplete:"updateSanpShot( e );")}
+	}
+	function disableCreateSnapShot(){
+		$('#createSnapshotId').attr('disabled', 'true')
+	}
+	function updateSanpShot( e ){
+		
+		$('#createSnapshotId').removeAttr("disabled")
+	}
     </script>
 </head>
 
@@ -495,7 +510,9 @@ td .odd {
 					<option value="${moveBundleInstance?.id}">${moveBundleInstance?.name}</option>
 				</g:each>
 
-			</select></td>
+			</select>
+			<input type="button" value="Create Snapshot" id="createSnapshotId" onclick="createSnapshot()">
+			</td>
 			<td style="width:40%">
 			<h1 align="center">Supervisor Console</h1>
 			</td>

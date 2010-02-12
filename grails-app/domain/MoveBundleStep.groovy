@@ -95,7 +95,7 @@ class MoveBundleStep {
 	 * @return bool - true if completed
 	 */
 	def isCompleted() {
-		// return actualCompletionTime != null
+		 return actualCompletionTime != null
 	}
 
     String toString(){

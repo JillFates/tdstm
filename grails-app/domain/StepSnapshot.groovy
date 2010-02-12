@@ -31,6 +31,13 @@ class StepSnapshot {
 	 */
 	def getPlanTaskPace () {
 		// return tasksCount > 0 ? int moveBundleStep.planDuration / tasksCount : 0
+		def planDuration = moveBundleStep.getPlanDuration()
+		if( planDuration ){
+			return tasksCount > 0 ? (Integer)(planDuration / tasksCount ) : 0
+		} else {
+			return 0
+		}
+				
 	}
 	
 	/**
@@ -38,6 +45,7 @@ class StepSnapshot {
 	 */
 	def getActualTaskPace () {
 		// return tasksCompleted && duration ? int duration / tasksCompleted : 0
+		return tasksCompleted && duration ? (Integer)(duration / tasksCompleted ) : 0
 	}	
 	
 	/**
@@ -49,7 +57,13 @@ class StepSnapshot {
 	 *    3. step is completed - return zero (0)
 	 */
 	def getProjectedTimeRemaining() {
-		
+		def timeRemaining = 0
+		if(!hasStarted()){
+			timeRemaining = moveBundle.getPlanDuration()
+		} else if( !isCompleted() ){
+			timeRemaining = (tasksCount - tasksCompleted) * getActualTaskPace()
+		}
+		 return timeRemaining 
 	}
 	
 	/**
@@ -63,15 +77,28 @@ class StepSnapshot {
 	 *    3. step is completed:  return zero (0)
 	 */
 	def getProjectedTimeOver() {
+		def timeOver = 0
+		if(!hasStarted()){
+			if( moveBundleStep.planStartTime.getTime() > new Date().getTime() ) {
+				timeOver = ( new Date().getTime() + getProjectedTimeRemaining() * 1000 ) - moveBundleStep.planCompletionTime.getTime()
+			}
+		} else if(!isCompleted()){
+			timeOver = (new Date().getTime() + getProjectedTimeRemaining() * 1000 ) - moveBundleStep.planCompletionTime.getTime()
+		}
 		
+		if(timeOver){
+			timeOver = timeOver / 1000
+		}
+		 return timeOver 
 	}
 
 	/**
 	 * calculates the the projected time that the step will be completed based on the pace
 	 * @return date - projected completion time
 	 */
-	getProjectedCompletionTime() {
+	def getProjectedCompletionTime() {
 		// return moveBundleStep.planCompletionTime + projectedTimeOver
+		return ( moveBundleStep.planCompletionTime.getTime() / 1000 ) + projectedTimeOver
 	}
 
 	/**
@@ -87,7 +114,12 @@ class StepSnapshot {
 	 * @return boolean - true if the step has started
 	 */
 	def hasStarted() {
-		// return moveBundleStep.actualStartTime not null
+		 //	return moveBundleStep.actualStartTime not null
+		 if(moveBundleStep.actualStartTime){
+			 return true;
+		 } else {
+			 return false;
+		 }
 	}
 	
 	/**
