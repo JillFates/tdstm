@@ -356,6 +356,15 @@ setInterval("getthedate()",1000)
 		        }
 			});
 		}
+		jQuery.ajax({
+	        type:"GET",
+	        url:"../ws/dashboard/bundleData/27" ,
+	        dataType: 'json',
+	        success:updateMoveBundleSteps,
+	        error:function( data, error ) {
+	            alert("error = "+error);
+	        }
+		});
 	}
 	function updateMoveEventNews( news ){
 		var newsLength = news.length;
@@ -375,6 +384,9 @@ setInterval("getthedate()",1000)
 		$("#news_live").html(live);
 		$("#news_archived").html(archived);
 		$("#mycrawlerId").html(scrollText)
+	}
+	function updateMoveBundleSteps( steps ) {
+		//alert( steps )
 	}
 	var timer
 	function timedRefresh() {
