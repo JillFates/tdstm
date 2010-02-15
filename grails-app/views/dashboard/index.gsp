@@ -589,11 +589,11 @@ window.onLoad=getcontent_height --%>
 <div id="leftcol">
 <ul id="btitle">
 <li>Step</li>
-<li><span class="percentage">in percentage</span></li>
-<li>Scheduled Start</li>
-<li>Scheduled Finish</li>
+<li><span class="percentage">Completion</span></li>
+<li>Planned Start</li>
+<li>Planned Completion</li>
 <li>Actual Start</li>
-<li>Actual Finish</li>
+<li>Actual Completion</li>
 </ul>
 </div>
 
