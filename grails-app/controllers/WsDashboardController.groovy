@@ -1,10 +1,12 @@
 import grails.converters.JSON
+import java.text.SimpleDateFormat
 class WsDashboardController {
 	
 	def jdbcTemplate
         
     def bundleData = {
     		def moveBundleId = params.id
+			def moveEventId = params.moveEventId
 			def moveBundle
 			def dataPointsForEachStep = []
 			if( moveBundleId ){ 
@@ -13,84 +15,64 @@ class WsDashboardController {
     		def offsetTZ = ( new Date().getTimezoneOffset() / 60 ) * ( -1 )
 			 
 			if( moveBundle ){
-				def latestStepsRecordsQuery = "SELECT mbs.transition_id as tid, mbs.label as label, "+
-										" DATE_FORMAT(ADDDATE( mbs.plan_start_time , INTERVAL ${offsetTZ} HOUR),'%Y-%m-%d %h:%m:%s') as planStart, "+
-										" DATE_FORMAT(ADDDATE( mbs.plan_completion_time , INTERVAL ${offsetTZ} HOUR),'%Y-%m-%d %h:%m:%s') as planComp"+
-										" DATE_FORMAT(ADDDATE( mbs.actual_start_time , INTERVAL ${offsetTZ} HOUR),'%Y-%m-%d %h:%m:%s') as actStart, "+
-										" DATE_FORMAT(ADDDATE( mbs.actual_completion_time , INTERVAL ${offsetTZ} HOUR),'%Y-%m-%d %h:%m:%s') as actComp, "+
-										" DATE_FORMAT(ADDDATE( ss.date_created , INTERVAL ${offsetTZ} HOUR),'%Y-%m-%d %h:%m:%s') as projComp, "+
-										" ss.tasks_count as tskTot, ss.tasks_completed as tskComp, ss.dial_indicator as dialInd FROM move_bundle mb "+
-										" LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id " +
-										" LEFT JOIN step_snapshot ss ON ss.move_bundle_step_id = mbs.id "+
-										" WHERE mb.move_bundle_id = ${moveBundle.id}"+
-										" AND ss.date_created = (SELECT MAX(date_created) FROM step_snapshot ss2 WHERE ss2.move_bundle_step_id = mbs.id) "
-										
-				def stepsNotUpdatedQuery = "SELECT mbs.transition_id as tid, mbs.label as label, "+
-										" DATE_FORMAT(ADDDATE( mbs.plan_start_time , INTERVAL ${offsetTZ} HOUR),'%Y-%m-%d %h:%m:%s') as planStart, "+
-										" DATE_FORMAT(ADDDATE( mbs.plan_completion_time , INTERVAL ${offsetTZ} HOUR),'%Y-%m-%d %h:%m:%s') as planComp, "+
-										" DATE_FORMAT(ADDDATE( mbs.actual_start_time , INTERVAL ${offsetTZ} HOUR),'%Y-%m-%d %h:%m:%s') as actStart, "+
-										" DATE_FORMAT(ADDDATE( mbs.actual_completion_time , INTERVAL ${offsetTZ} HOUR),'%Y-%m-%d %h:%m:%s') as actComp,"+
-										" DATE_FORMAT(ADDDATE( ss.date_created , INTERVAL ${offsetTZ} HOUR),'%Y-%m-%d %h:%m:%s') as projComp,"+
-										" ss.tasks_count as tskTot, ss.tasks_completed as tskComp, ss.dial_indicator as dialInd FROM move_bundle mb "+
-										" LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id "+
-										" LEFT JOIN step_snapshot ss ON ss.move_bundle_step_id = mbs.id "+
-										" WHERE mb.move_bundle_id = ${moveBundle.id} AND ss.date_created IS NULL "
 				
-				dataPointsForEachStep = jdbcTemplate.queryForList( stepsNotUpdatedQuery + " UNION " + stepsNotUpdatedQuery + " ORDER BY tid" )
+				/* Get the latest step_snapshot record for each step that has started */
+				def latestStepsRecordsQuery = "SELECT mbs.transition_id as tid, ss.id as snapshotId, mbs.label as label, "+
+												" DATE_FORMAT(ADDDATE( mbs.plan_start_time , INTERVAL ${offsetTZ} HOUR),'%Y-%m-%d %h:%m:%s') as planStart, "+
+												" DATE_FORMAT(ADDDATE( mbs.plan_completion_time , INTERVAL ${offsetTZ} HOUR),'%Y-%m-%d %h:%m:%s') as planComp, "+
+												" DATE_FORMAT(ADDDATE( mbs.actual_start_time , INTERVAL ${offsetTZ} HOUR),'%Y-%m-%d %h:%m:%s') as actStart, "+
+												" DATE_FORMAT(ADDDATE( mbs.actual_completion_time , INTERVAL ${offsetTZ} HOUR),'%Y-%m-%d %h:%m:%s') as actComp, "+
+												" DATE_FORMAT(ADDDATE( ss.date_created , INTERVAL ${offsetTZ} HOUR),'%Y-%m-%d %h:%m:%s') as dateCreated, "+
+												" ss.tasks_count as tskTot, ss.tasks_completed as tskComp, ss.dial_indicator as dialInd FROM move_bundle mb "+
+												" LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id " +
+												" LEFT JOIN step_snapshot ss ON ss.move_bundle_step_id = mbs.id "+
+												" WHERE mb.move_bundle_id = ${moveBundle.id}"+
+												" AND ss.date_created = (SELECT MAX(date_created) FROM step_snapshot ss2 WHERE ss2.move_bundle_step_id = mbs.id) " 
+					
+				/*	Get the steps that have not started / don't have step_snapshot records	*/						
+				def stepsNotUpdatedQuery = "SELECT mbs.transition_id as tid, ss.id as snapshotId, mbs.label as label, "+
+											" DATE_FORMAT(ADDDATE( mbs.plan_start_time , INTERVAL ${offsetTZ} HOUR),'%Y-%m-%d %h:%m:%s') as planStart, "+
+											" DATE_FORMAT(ADDDATE( mbs.plan_completion_time , INTERVAL ${offsetTZ} HOUR),'%Y-%m-%d %h:%m:%s') as planComp, "+
+											" DATE_FORMAT(ADDDATE( mbs.actual_start_time , INTERVAL ${offsetTZ} HOUR),'%Y-%m-%d %h:%m:%s') as actStart, "+
+											" DATE_FORMAT(ADDDATE( mbs.actual_completion_time , INTERVAL ${offsetTZ} HOUR),'%Y-%m-%d %h:%m:%s') as actComp,"+
+											" DATE_FORMAT(ADDDATE( ss.date_created , INTERVAL ${offsetTZ} HOUR),'%Y-%m-%d %h:%m:%s') as dateCreated,"+
+											" ss.tasks_count as tskTot, ss.tasks_completed as tskComp, ss.dial_indicator as dialInd FROM move_bundle mb "+
+											" LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id "+
+											" LEFT JOIN step_snapshot ss ON ss.move_bundle_step_id = mbs.id "+
+											" WHERE mb.move_bundle_id = ${moveBundle.id} AND ss.date_created IS NULL " 
+					
+				dataPointsForEachStep = jdbcTemplate.queryForList( latestStepsRecordsQuery + " UNION " + stepsNotUpdatedQuery + " ORDER BY tid" )
+				
 			}
-    		
-    		def list  = [ "snapshot": [
+    		dataPointsForEachStep.each{ data ->
+    			def snapshot 
+				if( data.snapshotId ){
+					snapshot = StepSnapshot.findById( data.snapshotId )
+					data.put( "projComp", snapshot.getProjectedCompletionTime() )
+					data.put( "statColor", snapshot.getStatusColor() )
+				} else {
+					data.put( "projComp", "" )
+					data.put( "statColor", "red" )
+				}
+    		}
+    		def moveEvent 
+			if( moveEventId ){
+				moveEvent = MoveEvent.findById( moveEventId );
+			}
+    		def planSumCompTime
+    		if( moveEvent ){
+    			planSumCompTime = jdbcTemplate.queryForMap("SELECT max(mb.completion_time) as compTime "+
+    							" FROM move_bundle mb WHERE mb.move_event_id = ${moveEvent.id}")?.compTime
+    		}
+    		def dataPointStepMap  = [ "snapshot": [ 'moveEvent' : moveEvent,
 							"systime": "2010-04-27T21:15:18.20Z",
-							"planSum": [ "dialInd": 48, "confText": "High", "confColor": "green" ],
-							"revSum": [ "dialInd": -1 ],
-							"steps": [
-									  [
-									   	"tid": 60, 
-										"label": "Unracking", 
-										"statColor": "green", 
-										"planStart": "2010-04-27T20:00:00.00Z", 
-										"planComp": "2010-04-27T21:00:00.00Z", 
-										"actStart": "2010-04-27T20:01:02.03Z", 
-										"actComp": "2010-04-27T20:52:10.33Z", 
-										"projComp": "", 
-										"tskTot": 50, 
-										"tskComp": 50, 
-										"dialInd": -1],
-									  [
-									   	"tid" : 70, 
-										"label": "Staging", 
-										"statColor": "green", 
-										"planStart": "2010-04-27T20:10:50.52Z", 
-										"planComp": "2010-04-27T21:10:00.52Z", 
-										"actStart": "2010-04-27T20:04:10.41Z", 
-										"actComp": "2010-04-27T21:04:18.52Z", 
-										"projComp": "", 
-										"tskTot": 50, 
-										"tskComp": 50, 
-										"dialInd": -1],
-									  [
-									   "tid": 110, 
-									   "label": "Transport", 
-									   "statColor": "red", 
-									   "planStart": "2010-04-27T21:15:00.00Z", 
-									   "planComp": "2010-04-27T22:15:00.00Z",  
-									   "actStart": "2010-04-27T21:15:10.04Z", 
-									   "actComp": "", 
-									   "projComp": "2010-04-27T22:20:50.52Z", 
-									   "tskTot": 100, 
-									   "tskComp": 25, 
-									   "dialInd": 47
-									   ]
-									  ],
+							"planSum": [ "dialInd": 48, "confText": "High", "confColor": "green", 'compTime':planSumCompTime ],
+							"revSum": [ "dialInd": -1,'compTime':moveEvent?.revisedCompletionTime ],
+							"steps": dataPointsForEachStep,
 							] 
     		]
-    		/*list.get('snapshot').get('steps').each{
-    			println"it------------------->"+it
-				it.put('tid',100)
-				println"it------------------->"+it
-    		}*/
 
-			render list as JSON
+			render dataPointStepMap as JSON
 	
 	}
 }

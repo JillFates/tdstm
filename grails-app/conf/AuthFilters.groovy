@@ -1,33 +1,37 @@
 import org.jsecurity.SecurityUtils
 class AuthFilters {
 	// List of controllers that we need to validate autorization on
-	static webSvcCtrl = ['moveEventNews']
+	static webSvcCtrl = ['moveEventNews', 'wsDashboard']
   
 	def filters = {
 	
 		newAuthFilter(controller:'*', action:'*') {
 			before = {
 					
-				def moveEvent
+				def moveObject
 				def subject = SecurityUtils.subject
 				if( webSvcCtrl.contains( controllerName ) && subject.principal){
 					def person = UserLogin.findByUsername(subject.principal)?.person
 					if(params.id){
-						moveEvent = MoveEvent.get(params.id)
+						if(controllerName == "moveEventNews"){
+							moveObject = MoveEvent.get(params.id)
+						} else if(controllerName == "wsDashboard"){
+							moveObject = MoveBundle.get(params.id)
+						}
 					}
 					// Condition to verify the authentication
 					if( !subject.isAuthenticated() ) {
 						response.sendError( 401, "Unauthorized" )
 						return false
-					} else if( !moveEvent ){					// condition to verify the MoveEvent exist
+					} else if( !moveObject ){					// condition to verify the MoveEvent / moveBundle exist
 						response.sendError( 404 , "Not Found" )
 						return false
 					} else if( !subject.hasRole("ADMIN") ){		// verify the user role as ADMIN
 						def moveEventProjectClientStaff = PartyRelationship.find( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' "+
-															" and p.partyIdFrom = ${moveEvent?.project.client} and p.roleTypeCodeFrom = 'COMPANY'"+
+															" and p.partyIdFrom = ${moveObject?.project.client} and p.roleTypeCodeFrom = 'COMPANY'"+
 															" and p.roleTypeCodeTo = 'STAFF' and p.partyIdFrom = ${person.id}" )
-						if(!moveEventProjectClientStaff){		// if not ADMIN check whether user is associated to the Party that is associate to the Project.client of the moveEvent0 
-							response.sendError( 404 , "Not Found" )
+						if(!moveEventProjectClientStaff){		// if not ADMIN check whether user is associated to the Party that is associate to the Project.client of the moveEvent / MoveBundle 
+							response.sendError( 403 , "Forbidden" )
 							return false
 						} else{
 							return true;

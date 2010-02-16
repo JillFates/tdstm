@@ -38,11 +38,15 @@ body{
 	width:auto;
 	text-align:center;
 	}
-.body_image{
-	background-image:url(../images/body_bg.png);
+.sum_statusbar_good {
+	background-image:url(../images/sum_statusbar_green.png);
 }
-
-
+.sum_statusbar_bad {
+	background-image:url(../images/sum_statusbar_red.png);
+}
+#revised_summary {
+	display: none;
+}
 #container{
 	width:980px;
 	margin:auto;
@@ -94,7 +98,7 @@ body{
 	margin-top:10px;
 	}
 
-#status{
+#sum_statusbar{
 	text-align:center;
 	font-size:16px;
 	font-weight:bold;

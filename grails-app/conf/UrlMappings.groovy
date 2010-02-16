@@ -14,7 +14,7 @@ class UrlMappings {
     	
     	"/ws/dashboard/bundleData/$id?" {
     		controller = "wsDashboard"
-			action = [GET:"bundleData", PUT:"update", DELETE:"delete", POST:"save"]
+			action = [GET:"bundleData"]
     	}
     	   	
     	

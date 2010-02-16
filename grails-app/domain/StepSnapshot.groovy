@@ -100,8 +100,8 @@ class StepSnapshot {
 	def getProjectedCompletionTime() {
 		// return moveBundleStep.planCompletionTime + projectedTimeOver
 		def offsetTZ = ( ( new Date().getTimezoneOffset() / 60 ) * ( -1 ) )
-		def projectedCompletionTimeInseconds = ( moveBundleStep.planCompletionTime.getTime() / 1000 ) + projectedTimeOver + offsetTZ
-		def projectedCompletionTime = new Date(projectedCompletionTime * 1000)
+		def projectedCompletionTimeInseconds = ( moveBundleStep.planCompletionTime.getTime() / 1000 ) + getProjectedTimeOver() + offsetTZ
+		def projectedCompletionTime = new Date( (Long)(projectedCompletionTimeInseconds * 1000) )
 		def dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return dateformat.format(projectedCompletionTime)
 	}
@@ -141,7 +141,7 @@ class StepSnapshot {
 	}	
 	
     String toString(){
-		moveBundleStep.name + " " + dateCreated
+		moveBundleStep.label + " " + dateCreated
 	}
 
 }
