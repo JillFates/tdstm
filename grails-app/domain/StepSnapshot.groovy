@@ -1,3 +1,4 @@
+import java.text.SimpleDateFormat;
 /**
  * The StepSnapshot domain represents a point in time representation of the status of a Step in a MoveBundle. A group of
  * snapshot records will be created at one time for all MoveBundleStep records associated with a MoveBundle.
@@ -98,7 +99,11 @@ class StepSnapshot {
 	 */
 	def getProjectedCompletionTime() {
 		// return moveBundleStep.planCompletionTime + projectedTimeOver
-		return ( moveBundleStep.planCompletionTime.getTime() / 1000 ) + projectedTimeOver
+		def offsetTZ = ( ( new Date().getTimezoneOffset() / 60 ) * ( -1 ) )
+		def projectedCompletionTimeInseconds = ( moveBundleStep.planCompletionTime.getTime() / 1000 ) + projectedTimeOver + offsetTZ
+		def projectedCompletionTime = new Date(projectedCompletionTime * 1000)
+		def dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return dateformat.format(projectedCompletionTime)
 	}
 
 	/**
@@ -130,7 +135,7 @@ class StepSnapshot {
 		// Need to test on current snapshot so that this will work historically
 		if (tasksCompleted == tasksCount) {
 			return moveBundleStep.actualCompletionTime > moveBundleStep.planCompletionTime ? "red" : "green"
-		} else 
+		} else {
 			return planDelta > 0 ? "red" : "green"
 		}
 	}	
