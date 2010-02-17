@@ -78,10 +78,12 @@ class StepSnapshotService {
 					def planDelta
 					if (stepSnapshot.tasksCompleted > 0) {
 						// Need to determine the finish time based on weighted average of actual and planned paces
-						def wtFactor = stepSnapshot.duration > moveBundleStep.getPlanDuration() ? 1 : ( stepSnapshot.duration / moveBundleStep.getPlanDuration() )
+						def wtFactor = stepSnapshot.duration > moveBundleStep.getPlanDuration() 
+						   ? 1 : ( stepSnapshot.duration / moveBundleStep.getPlanDuration() )
 							
 						def tasksRemaining = stepSnapshot.tasksCount - stepSnapshot.tasksCompleted
-						def remainingDuration = tasksRemaining * (1 - wtFactor) * stepSnapshot.planTaskPace() +  tasksRemaining * wtFactor * stepSnapshot.actualTaskPace()
+						def remainingDuration = tasksRemaining * (1 - wtFactor) * stepSnapshot.planTaskPace() 
+						   + tasksRemaining * wtFactor * stepSnapshot.actualTaskPace()
 					
 						planDelta = ( new Date().getTime() + remainingDuration * 1000 ) - moveBundleStep.planCompletionTime.getTime()
 					
@@ -90,25 +92,26 @@ class StepSnapshotService {
 					   def projectedDuration = tasksCount * stepSnapshot.planTaskPace()
 					   planDelta = ( new Date().getTime() + projectedDuration * 1000 ) - moveBundleStep.planCompletionTime.getTime()
 					}
-					// assig planDelta to stepSnapshot.planDelta
-					if(planDelta){
+					
+					// assign planDelta to stepSnapshot.planDelta
+					if( planDelta ){
 						planDelta = planDelta / 1000
 					}
 					stepSnapshot.planDelta = planDelta
 					
-					// statements to calculete dialIndicator 
+					// statements to calculate dialIndicator 
 					def projected = moveBundleStep.getPlanDuration() + planDelta
 					def aheadFactor = 2
 					def behindFactor = 3
 					def adjust 
-					if ( planDelta / moveBundleStep.getPlanDuration() < 0 ) {
+					if( planDelta < 0 ) {
 					   adjust = 50 - ( projected / moveBundleStep.getPlanDuration() )^aheadFactor
 					} else {
 					   adjust = -50 + ( moveBundleStep.planDuration / projected )^behindFactor
 					}
 					def dialIndicator = 50 + 50 * adjust
 					
-					// assig dialIndicator to stepSnapshot.dialIndicator
+					// assign dialIndicator to stepSnapshot.dialIndicator
 					stepSnapshot.dialIndicator =  dialIndicator
 					stepSnapshot.save(flush:true)
 				}
