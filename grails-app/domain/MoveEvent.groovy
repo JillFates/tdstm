@@ -26,7 +26,7 @@ class MoveEvent {
 	static hasMany = [
 		moveBundles : MoveBundle,
 		moveEventNewsList : MoveEventNews
-		moveEventSnapshot : moveEventSnapshot
+		moveEventSnapshot : MoveEventSnapshot
 	]
 
 	static mapping  = {
