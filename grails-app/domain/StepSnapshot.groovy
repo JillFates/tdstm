@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
  */
 class StepSnapshot {
 	MoveBundleStep moveBundleStep
-	int snapGroupId				// used to group a series of steps as a single group
 	int tasksCount				// The number of tasks/assets to be processed.  For Manual steps, it should be 100
 	int	tasksCompleted			// The number of tasks/assets completed.  For manual steps, it will be entered by the user as a percentage of completion
 	int duration				// The number of seconds that the task has been executing
