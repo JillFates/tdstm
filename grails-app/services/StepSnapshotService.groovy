@@ -78,8 +78,7 @@ class StepSnapshotService {
 					def planDelta
 					if (stepSnapshot.tasksCompleted > 0) {
 						// Need to determine the finish time based on weighted average of actual and planned paces
-						def wtFactor = stepSnapshot.duration > moveBundleStep.getPlanDuration() 
-						   ? 1 : ( stepSnapshot.duration / moveBundleStep.getPlanDuration() )
+						def wtFactor = stepSnapshot.duration > moveBundleStep.getPlanDuration() ? 1 : ( stepSnapshot.duration / moveBundleStep.getPlanDuration() )
 							
 						def tasksRemaining = stepSnapshot.tasksCount - stepSnapshot.tasksCompleted
 						def remainingDuration = tasksRemaining * (1 - wtFactor) * stepSnapshot.planTaskPace() 
