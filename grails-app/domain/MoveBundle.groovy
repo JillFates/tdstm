@@ -4,7 +4,6 @@ class MoveBundle extends Party {
     String description
     Date startTime					// Time that the MoveBundle Tasks will begin
     Date completionTime				// Planned Completion Time of the MoveBundle
-	// Integer lastSnapGroupId = 0		// Used when creating Step Snapshot data to group a series of steps (NOT BEING USED)
     Integer operationalOrder  		// Order that the bundles are performed in (NOT BEING USED)
     MoveEvent moveEvent
 
