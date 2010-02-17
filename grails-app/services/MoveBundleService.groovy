@@ -1,3 +1,6 @@
+import org.springframework.dao.IncorrectResultSizeDataAccessException
+
+
 class MoveBundleService {
 	
 	def jdbcTemplate
@@ -41,7 +44,12 @@ class MoveBundleService {
 									" LEFT JOIN project_asset_map pam on pam.asset_id = ae.asset_entity_id "+ 
 									" WHERE ae.move_bundle_id = ${moveBundleId} and pam.current_state_id >= $transitionId "+ 
 									" GROUP BY ae.move_bundle_id "
-		def actualTimes = jdbcTemplate.queryForMap( queryForActualTimes )
+		def actualTimes
+		try {
+			actualTimes = jdbcTemplate.queryForMap( queryForActualTimes )
+		} catch (IncorrectResultSizeDataAccessException irsdae) {
+			// Common occurrence so we just bale
+		}
 		return actualTimes
 	
     }
