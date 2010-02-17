@@ -99,7 +99,7 @@ class MoveBundleStep {
 	}
 
     String toString(){
-		name
+		label
 	}
 
 }

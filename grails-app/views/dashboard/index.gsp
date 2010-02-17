@@ -17,6 +17,13 @@
 	
 	<g:javascript library="jquery" />
 	<jq:plugin name="ui.core" />
+	<script type="text/javascript">
+	function post_init( location, dialInd ){
+		var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId2b", "100", "75", "0", "0");
+		myChart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'step_gauge.xml')}");
+		myChart.render(location);
+	}
+	</script>
 </head>
 
 <body class="sum_statusbar_good" onLoad="getMoveEventNewsDetails($('#moveEvent').val())">
@@ -92,7 +99,7 @@
 			            </script>Status vs. Revised Plan
 				</div>
 				<div id="toprightbox">
-					<div id="refresh">Refresh: 
+					<div id="refresh" style="float: right;">Refresh: 
 						<select name="refreshTime" id="refreshTimeId" class="selecttext">
 							<option selected value="60000">1 Min</option>
 	            			<option value="300000">5 Min</option>
@@ -100,7 +107,7 @@
 	                        <option value="1800000">30 Min</option>
 						</select>
 					</div>
-					<div class="toprightcontent">
+					<div class="toprightcontent" id="revised_gauge_content">
 						Confidence in Revised Plan<br>
 						<span class="high">High</span><br>
 						<span class="redfont">Planned Completion:&#13;
@@ -152,23 +159,44 @@
 <!-- News section ends here-->
 <!-- Bundle Sections starts here-->
 		<div id="bdlsection">
-			<div id="bdltabs"><span id="spnBundle1" class="mbhactive" onClick="showResult('load',1); ActiveBundleLink(1)">OK City</span>&nbsp;&nbsp;<span id="spnBundle2" class="mbhinactive" onClick="showResult('load',2); ActiveBundleLink(2)">Houston</span></div>
+			<div id="bdltabs">
+				<g:each in="${moveBundleList}" status="i" var="moveBundle">
+					<span id="spnBundle${moveBundle.id}" class="${ i == 0 ? 'mbhactive' : 'mbhinactive' }" onClick="displayBundleTab(${moveBundle.id})">
+					${moveBundle.name}</span>&nbsp;&nbsp;
+				</g:each>
+			</div>
 			<div id="leftcol">
-				<ul id="btitle">
+				<ul id="btitle" >
 					<li>Step</li>
 					<li><span class="percentage">Completion</span></li>
 					<li>Planned Start</li>
 					<li>Planned Completion</li>
 					<li>Actual Start</li>
-					<li>Actual Completion</li>
+					<li >Actual Completion</li>
 				</ul>
 			</div>
 			<div id="leftarrow"><a href="javascript:void(0);" id="move-left"><img src="${createLinkTo(dir:'images',file:'left_arrow.png')}" alt="back" border="0" width="16" height="23" align="right"></a></div>
 			<div class="mod">
 				<div id="themes">
-					<div id="bundlediv"></div>
-					<input name="hdnState" id="hdnState" type="hidden" value="1">
-					<input name="bundleState" id="bundleState" type="hidden" value="1">
+				<input type="hidden" value="${moveBundleList[0]?.id}" id="defaultBundleId">
+				<g:each in="${moveBundleList}" status="i" var="moveBundle">
+					<div id="bundlediv${moveBundle.id}" class="${i == 0 ? 'show_bundle_step' : 'hide_bundle_step'}">
+						<g:each in="${MoveBundleStep.findAll('FROM MoveBundleStep mbs where mbs.moveBundle='+moveBundle.id+' ORDER BY mbs.transitionId')}" status="j" var="moveBundleStep">
+							<div style="float:left;width:130px;" >
+								<ul class="bdetails">
+									<li class="heading">${moveBundleStep.label}</li>
+									<li class="actfinish1"><span id="completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
+									<li class="schstart"><span id="plan_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
+									<li class="schfinish"><span id="plan_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
+									<li class="actfinish1"><span id="act_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
+									<li class="actfinish1"><span id="act_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
+								</ul>
+								<div id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}" align="center" style="display: none;"> </div>
+								<script type="text/javascript">post_init( "chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}", "${moveBundle.id}" ) </script>
+							</div>
+						</g:each>
+					</div>
+				</g:each>
 				</div>
 			<%--<div id="wunracking">
 					<div id="bottomwidgets">
@@ -221,8 +249,8 @@
 					</div>
 				</div> --%>
 			</div>
+<div id="rightarrow"><a href="javascript:void(0);" id="move-right"><img src="${createLinkTo(dir:'images',file:'right_arrow.png')}" alt="back" border="0" width="16" height="23" align="right"></a></div>
 		</div>
-		<div id="rightarrow"><a href="javascript:void(0);" id="move-right"><img src="${createLinkTo(dir:'images',file:'right_arrow.png')}" alt="back" border="0" width="16" height="23" align="right"></a></div>
 	</div>
 
 <!-- Bundle Sections ends here-->
@@ -324,15 +352,6 @@
 		        }
 			});
 		}
-		jQuery.ajax({
-	        type:"GET",
-	        url:"../ws/dashboard/bundleData/27?moveEventId="+ moveEvent,
-	        dataType: 'json',
-	        success:updateMoveBundleSteps,
-	        error:function( data, error ) {
-	            alert("error = "+error);
-	        }
-		});
 	}
 	/* Update the Move news once ajax call success*/
 	function updateMoveEventNews( news ){
@@ -353,10 +372,6 @@
 		$("#news_live").html(live);
 		$("#news_archived").html(archived);
 		$("#mycrawlerId").html(scrollText)
-	}
-	/* update move bundal data once ajax call success */
-	function updateMoveBundleSteps( steps ) {
-		//alert( steps )
 	}
 	/* set time to load the move news and move bundle data*/
 	var timer
@@ -523,59 +538,66 @@
 		}
 		return sString;
 	}
-
 	
-
-	
-	 <%--
+	/* display bundle tab and call refreshDash method to load the appropriate data*/
+	function displayBundleTab(Id) {
+		 $(".mbhactive").attr("class","mbhinactive");
+		 $("#spnBundle"+Id).attr("class","mbhactive");
+		 $(".show_bundle_step").attr("class","hide_bundle_step");
+		 $("#bundlediv"+Id).attr("class","show_bundle_step");
+		 refreshDash( Id )
+	 }
 	/*----------------------------------------
 	 * 
 	 *--------------------------------------*/
-	 //showResult('load',1); 
-	 //ActiveBundleLink(1)
-	 function showResult(objValue, bundleValue) {
-
-	     var hdnState = $("#hdnState");
-	     var hdnStateValue = parseInt(hdnState.value);
-	     if (objValue == "load") {
-	         hdnStateValue = 1;
-	         $("#hdnState").val(hdnStateValue);
-	         $("#bundleState").val(bundleValue);
-	         count = 4;
-	         prev = 0;
-	     }
-
-	     if (objValue == "pre") {
-	         //if (hdnState == 1) { return;}
-	         if (hdnStateValue > 1) {
-	             hdnStateValue = hdnStateValue - 1;
-	             $("#hdnState").val(hdnStateValue);
-	         }
-	         else { alert("No Data"); }
-	     }
-	     if (objValue == "next") {
-	         //if (hdnState == 4) { return;}
-	         if (hdnStateValue < 4) {
-	             hdnStateValue = hdnStateValue + 1;
-	             $("#hdnState").val(hdnStateValue);
-	         }
-	         else { alert("No Data"); }
-	     }
-	     var xmlFileName = "bundledata" + $("#bundleState").val()+ ".xml"
-	     bundledata(hdnStateValue, xmlFileName)
+	 
+	 function refreshDash( bundleId ) {
+		 var moveEvent = $("#moveEvent").val()
+		 jQuery.ajax({
+		        type:"GET",
+		        url:"../ws/dashboard/bundleData/"+ bundleId+"?moveEventId="+moveEvent,
+		        dataType: 'json',
+		        success:updateMoveBundleSteps,
+		        error:function( data, error ) {
+		            alert("error = "+error);
+		        }
+			});
 	 }
 
-	 function ActiveBundleLink(Id) {
-	     var spanElm
-	     for (var i = 1; i < 8; i++) {
-	         spanElm = $('#spnBundle' + i);
-	         spanElm.className = "mbhinactive";
-	         if (i == Id) {
-	             spanElm.className = "mbhactive";
-	         }
-	     }
-	 }
-	
+	 /* update move bundal data once ajax call success */
+	 
+	function updateMoveBundleSteps( dataPointStep ) {
+		var snapshot = dataPointStep.snapshot;
+		var moveBundleId = snapshot.moveBundleId;
+		var steps = snapshot.steps;
+		var revSum = snapshot.revSum;
+		
+		for( i = 0; i < steps.length; i++ ) {
+			var offset = $("#timezone").val()
+			$("#completion_"+moveBundleId+"_"+steps[i].tid).html(steps[i].projComp);
+			$("#plan_start_"+moveBundleId+"_"+steps[i].tid).html(steps[i].planStart);
+			$("#plan_completion_"+moveBundleId+"_"+steps[i].tid).html(steps[i].planComp);
+			$("#act_start_"+moveBundleId+"_"+steps[i].tid).html(steps[i].actStart);
+			if( steps[i].actStart && !steps[i].actComp ) {
+				$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).show();
+				$("#act_completion_"+moveBundleId+"_"+steps[i].tid).html("<span id='databox'>Total Devices "+steps[i].tskTot+" Completed "+steps[i].tskComp+"</span>")
+			} else {
+				$("#act_completion_"+moveBundleId+"_"+steps[i].tid).html(steps[i].actComp);
+			}
+		}
+		if(revSum.dialInd == "-1") {
+			$("#topindright").hide();
+			$("#revised_gauge_content").hide();
+		} else if(snapshot.moveEvent.revisedCompletionTime) {
+			$("#topindright").show();
+			$("#revised_gauge_content").show();
+		}
+		
+	}
+		
+		/* get first bundle data*/
+		refreshDash( $("#defaultBundleId").val() )
+	 <%--
 	 var str = 1;
 	function bundledata(str, xmlFileName) {
 	    var bundletext = '';
@@ -649,7 +671,7 @@
     var prev = 0;
     function next1(x) {
         var bundleValue = $("#bundleState").val();
-        showResult('next', bundleValue);
+        refreshDash('next', bundleValue);
 
         if (count < 16) {
             prev = x;
@@ -696,7 +718,7 @@
 
     function back1(x) {
         var bundleValue = $("#bundleState").val();
-        showResult('pre', bundleValue);
+        refreshDash('pre', bundleValue);
 
         if (prev >= 4) {
             prev = prev - 4;

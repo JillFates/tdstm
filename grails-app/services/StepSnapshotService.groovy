@@ -21,13 +21,13 @@ class StepSnapshotService {
 			// if moveBundleStep.transitionId has a predecessorId
 			if(predecessor){
 				actualStartTime = moveBundleService.getActualTimes( moveBundleId, predecessor).get("started")
+				actualCompletionTime  = moveBundleService.getActualTimes( moveBundleId, moveBundleStep.transitionId).get("completed")
 			} else { // other wise
-				actualStartTime = moveBundleService.getActualTimes( moveBundleId, moveBundleStep.transitionId).get("started")
+				def actualTimes = moveBundleService.getActualTimes( moveBundleId, moveBundleStep.transitionId)
+				actualStartTime = actualTimes.get("started")
+				actualCompletionTime = actualTimes.get("completed")
 			}
-    		actualCompletionTime  = moveBundleService.getActualTimes( moveBundleId, moveBundleStep.transitionId).get("completed")
-			
-			
-			
+
 			// If a MoveBundleStep.calcMethod = "M" (manual) additional records will NOT be created by this process
 			if(moveBundleStep.calcMethod != "M"){
 				def stepSnapshot
@@ -39,7 +39,7 @@ class StepSnapshotService {
 					//If MoveBundleStep.actualStartTime is not NULL and actualCompletionTime is not NULL
 				} else if( moveBundleStep.actualStartTime && moveBundleStep.actualCompletionTime ) {
 					
-					def existingStepSnapshot = StepSnapshot.findByMoveBundleStep( moveBundleStep )
+					def existingStepSnapshot = StepSnapshot.find( "FROM StepSnapshot ss WHERE ss.moveBundleStep= ${moveBundleStep.id} ORDER BY ss.dateCreated desc" )
 					
 					// Checking StepSnapshot record corresponding to the step
 					if( !existingStepSnapshot ){

@@ -44,9 +44,7 @@ body{
 .sum_statusbar_bad {
 	background-image:url(../images/sum_statusbar_red.png);
 }
-#revised_summary {
-	display: none;
-}
+
 #container{
 	width:980px;
 	margin:auto;
@@ -264,7 +262,7 @@ line-height:24px;
 }
 
 #bdltabs{
-	margin-left:120px;
+	margin-left:151px;
 	text-align:left;
 	padding-top:2px;
 	}
@@ -300,7 +298,7 @@ line-height:24px;
 	}
 	
 #leftcol{
-width:130px;
+width:129px;
 float:left;
 margin:auto;
 height:258px;
@@ -320,7 +318,6 @@ line-height:28px;
 	background-position:right;
 	background-repeat:no-repeat;
 	margin-right:5px;
-	padding-right:15px;
 	font-weight:bold;
 }
 
@@ -630,4 +627,10 @@ list-style-type:none;
 	border:1px solid #cccccc;
 	background-color:#efeeee;
 	margin-bottom:5px;
+}
+.show_bundle_step {
+	display: block;
+}
+.hide_bundle_step {
+	display: none;
 }

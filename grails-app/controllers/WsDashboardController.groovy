@@ -6,6 +6,7 @@ class WsDashboardController {
         
     def bundleData = {
     		def moveBundleId = params.id
+			
 			def moveEventId = params.moveEventId
 			def moveBundle
 			def dataPointsForEachStep = []
@@ -39,7 +40,7 @@ class WsDashboardController {
 											" ss.tasks_count as tskTot, ss.tasks_completed as tskComp, ss.dial_indicator as dialInd FROM move_bundle mb "+
 											" LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id "+
 											" LEFT JOIN step_snapshot ss ON ss.move_bundle_step_id = mbs.id "+
-											" WHERE mb.move_bundle_id = ${moveBundle.id} AND ss.date_created IS NULL " 
+											" WHERE mb.move_bundle_id = ${moveBundle.id} AND ss.date_created IS NULL AND mbs.transition_id IS NOT NULL" 
 					
 				dataPointsForEachStep = jdbcTemplate.queryForList( latestStepsRecordsQuery + " UNION " + stepsNotUpdatedQuery + " ORDER BY tid" )
 				
@@ -61,17 +62,21 @@ class WsDashboardController {
 			}
     		def planSumCompTime
     		if( moveEvent ){
-    			planSumCompTime = jdbcTemplate.queryForMap("SELECT max(mb.completion_time) as compTime "+
-    							" FROM move_bundle mb WHERE mb.move_event_id = ${moveEvent.id}")?.compTime
+    			planSumCompTime = jdbcTemplate.queryForMap( "SELECT max(mb.completion_time) as compTime "+
+    							" FROM move_bundle mb WHERE mb.move_event_id = ${moveEvent.id}" )?.compTime
     		}
-    		def dataPointStepMap  = [ "snapshot": [ 'moveEvent' : moveEvent,
-							"systime": "2010-04-27T21:15:18.20Z",
-							"planSum": [ "dialInd": 48, "confText": "High", "confColor": "green", 'compTime':planSumCompTime ],
-							"revSum": [ "dialInd": -1,'compTime':moveEvent?.revisedCompletionTime ],
-							"steps": dataPointsForEachStep,
-							] 
-    		]
-
+    		
+    		def dataPointStepMap  = [ 
+									  "snapshot": [ 
+													'moveEvent' : moveEvent, 
+													'moveBundleId' : moveBundleId,
+													"systime": "2010-04-27T21:15:18.20Z",
+													"planSum": [ "dialInd": 48, "confText": "High", "confColor": "green", 'compTime':planSumCompTime ],
+													"revSum": [ "dialInd": -1,'compTime':moveEvent?.revisedCompletionTime ],
+													"steps": dataPointsForEachStep,
+													] 
+    								]
+    	
 			render dataPointStepMap as JSON
 	
 	}

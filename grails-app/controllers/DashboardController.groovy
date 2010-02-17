@@ -1,11 +1,16 @@
 class DashboardController {
+	
 	def userPreferenceService
-    def index = { 
+    
+	def index = { 
+		
 		def projectId = params.projectId
 		def project
 		def moveEventsList
 		def projectLogo
 		def moveEvent
+		def moveBundleList
+		
 		if(projectId){
 			project = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
 			moveEventsList = MoveEvent.findAllByProject(project)
@@ -26,6 +31,10 @@ class DashboardController {
 			userPreferenceService.setPreference("MOVE_EVENT","${moveEventsList[0].id}")
 			moveEvent = "${moveEventsList[0].id}"
 		}
-		return [moveEventsList : moveEventsList, moveEvent : moveEvent, project : project, projectLogo :projectLogo ]
+        if( moveEvent ){
+			moveBundleList = MoveBundle.findAll(" FROM MoveBundle mb where moveEvent = ${moveEvent.id} ORDER BY mb.startTime ")				
+		}
+		return [ moveEventsList : moveEventsList, moveEvent : moveEvent, project : project, 
+				projectLogo : projectLogo, moveBundleList : moveBundleList ]
     }
 }
