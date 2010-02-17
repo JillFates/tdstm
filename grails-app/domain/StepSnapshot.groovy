@@ -16,7 +16,7 @@ class StepSnapshot {
 	}
 
 	static mapping  = {
-		version true
+		version false
 		columns {
 			taskCount sqltype: 'smallint unsigned'
 			tasksCompleted sqltype: 'smallint unsigned'

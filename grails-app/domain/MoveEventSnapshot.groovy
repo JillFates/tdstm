@@ -15,7 +15,7 @@ class MoveEventSnapshot {
 	}
 
 	static mapping  = {
-		version true
+		version false
 		columns {
 			type sqltype: "char(1)"
 			planDelta sqltype: 'int'
