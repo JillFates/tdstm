@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="" />
+<title>TMB-team-asset-assign</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">TMB-team-asset-assign</td></tr>
+</thead><tbody>
+<tr>
+	<td>open</td>
+	<td>/tds-0.1/moveBundle/list?projectId=456</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Move Bundles</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=test-bundle-20100215</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Bundle Asset Assignment</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>test-asset-tag</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a[@id='add']/img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>leftassetId_8052</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a[@id='add']/img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>selectAndWait</td>
+	<td>bundleLeftId</td>
+	<td>label=test-bundle-20100215</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Bundle Team Assignment</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Unrack Plan</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Unrack Plan</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>8052</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>assetTeamAssign_8052</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>assetTeamAssign_8052</td>
+	<td>label=testing-team-code</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//select[@id='8052']/option[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>filterTeam</td>
+	<td>label=testing-team-code</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//option[@value='testing-team-code']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>test-asset-tag</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Rerack Plan</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>8052</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>assetTeamAssign_8052</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>assetTeamAssign_8052</td>
+	<td>label=testing-team-code</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//select[@id='8052']/option[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>assetCartAssign_8052</td>
+	<td>c1</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>assetShelfAssign_8052</td>
+	<td>top</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>filterTeam</td>
+	<td>label=testing-team-code</td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>test-asset-name</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>testing-team-code	1</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>
