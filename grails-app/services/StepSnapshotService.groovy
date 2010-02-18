@@ -30,7 +30,7 @@ class StepSnapshotService {
 			}
 
 			// If a MoveBundleStep.calcMethod = "M" (manual) additional records will NOT be created by this process
-			if(moveBundleStep.calcMethod != "M"){
+			if(moveBundleStep.calcMethod != "M") {
 				def stepSnapshot
 				// If MoveBundleStep.actualStartTime is not NULL and actualCompletionTime is NULL create a record
 				if( moveBundleStep.actualStartTime && !moveBundleStep.actualCompletionTime ){
@@ -40,7 +40,8 @@ class StepSnapshotService {
 					//If MoveBundleStep.actualStartTime is not NULL and actualCompletionTime is not NULL
 				} else if( moveBundleStep.actualStartTime && moveBundleStep.actualCompletionTime ) {
 					
-					def existingStepSnapshot = StepSnapshot.find( "FROM StepSnapshot ss WHERE ss.moveBundleStep= ${moveBundleStep.id} ORDER BY ss.dateCreated desc" )
+					def existingStepSnapshot = StepSnapshot.find( "FROM StepSnapshot WHERE moveBundleStep=? ORDER BY dateCreated DESC",
+					 	[ moveBundleStep.id ] )
 					
 					// Checking StepSnapshot record corresponding to the step
 					if( !existingStepSnapshot ){
@@ -99,26 +100,8 @@ class StepSnapshotService {
 					}
 					stepSnapshot.planDelta = planDelta
 					
-					// statements to calculate dialIndicator 
-					def projected = moveBundleStep.planDuration + planDelta
-					def aheadFactor = 2
-					def behindFactor = 3
-					def adjust 
-					if( planDelta < 0 ) {
-						// adjust = 50 - ( projected / moveBundleStep.planDuration )^aheadFactor
-						def x=( projected / moveBundleStep.planDuration )
-						x = x * x 
-						adjust = 50 - x
-					} else {
-						// adjust = -50 + ( moveBundleStep.planDuration / projected )^behindFactor
-						def x=( projected / moveBundleStep.planDuration )
-						x = x * x * x 
-						adjust = -50 + x
-					}
-					def dialIndicator = 50 + 50 * adjust
+					stepSnapshot.dialIndicator =  calcDialIndicator( stepSnapshot.moveBundleStep.planDuration, planDelta )
 					
-					// assign dialIndicator to stepSnapshot.dialIndicator
-					stepSnapshot.dialIndicator =  dialIndicator
 					stepSnapshot.save(flush:true)
 				}
 			}
@@ -128,4 +111,27 @@ class StepSnapshotService {
 			moveBundleStep.save( flush : true )
 		}
     }
+
+	/**
+	 * Used to calculate the Dial Indicator value used in the dashboard display.  The value can range from 0-100 and 50 represents 
+	 * that the project is tracking to planned completion time.  A smaller value indicates behind schedule and larger values are ahead
+	 * of schedule.
+	 * @param planDuration - number representing the total planned duration
+	 * @param planDelta - number representing the different (projected or actual) that the task is off planned time
+	 * @return number - representing the dial position to display 
+	 */ 
+	def calcDialIndicator ( def planDuration, def planDelta ) {
+		// statements to calculate dialIndicator 
+		def projected = planDuration + planDelta
+		def aheadFactor = 2
+		def behindFactor = 3
+		def adjust 
+		if( planDelta < 0 ) {
+			adjust = 1 - Math.pow( projected / planDuration, aheadFactor )
+		} else {
+			adjust = -1 + Math.pow( planDuration / projected, behindFactor )
+		}
+		
+		return 50 + 50 * adjust	
+	}
 }
