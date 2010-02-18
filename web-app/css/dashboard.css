@@ -44,7 +44,26 @@ body{
 .sum_statusbar_bad {
 	background-image:url(../images/sum_statusbar_red.png);
 }
-
+.step_statusbar_good {
+	font-size:14px;
+	font-weight:bold;
+	text-align:center;
+	color:#ffffff;
+	line-height:24px;
+	display:block;
+	border:2px solid #595959;
+	background-color: green;
+}
+.step_statusbar_bad {
+	font-size:14px;
+	font-weight:bold;
+	text-align:center;
+	color:#ffffff;
+	line-height:24px;
+	display:block;
+	border:2px solid #595959;
+	background-color: red;
+}
 #container{
 	width:980px;
 	margin:auto;
