@@ -175,14 +175,13 @@ class StepSnapshotService {
 								" ORDER BY moveBundleId, transitioId "
 								
 		def stepsList = jdbcTemplate.queryForList( stepsListQuery , [ moveEventId, moveEventId ]);
-								
-		stepsList.each { eventStep ->
-			if (eventStep.moveBundleId != lastBundleId) {
+		for(int i = 0 ; i < stepsList.length(); i++){
+			if (stepsList[i].moveBundleId != lastBundleId) {
 				if (lastBundleId != null) {
 					if ( maxOverallDelta == null || maxDelta > maxOverallDelta ) 
-		            maxOverallDelta = maxDelta
-				}
-				lastBundleId = eventStep.moveBundleId
+			            maxOverallDelta = maxDelta
+					}
+				lastBundleId = stepsList[i].moveBundleId
 				maxDelta = null
 				lastIsCompleted = false
 				hasActive = false
@@ -190,42 +189,41 @@ class StepSnapshotService {
 			}
 			
 			// see if task is completed 
-			if(eventStep.actualCompletionTime){
+			if(stepsList[i].actualCompletionTime){
 				isCompleted  = true
 			}
-		
+				
 			// If we have an active Task then we ignore all completed
 			if ( hasActive && isCompleted ) continue  // continue not allowed in each loop - should change to a for loop perhaps
-
+			
 			// Determine if active (either has start time or planDelta > 0 and is not completed)
-			if( eventStep.actualStartTime  && eventStep.planDelta > 0  && ! isCompleted ){
+			if( stepsList[i].actualStartTime  && stepsList[i].planDelta > 0  && ! isCompleted ){
 				isActive =  true
 			}
-
+			
 			// Track that the bundle has an active step if that's the case
 			if( hasActive || isActive ){
 				hasActive = true
 			}
-
+			
 			// If this is a subsequent completed step then we just take the current delta
 			if ( isCompleted && lastIsCompleted ) {
-				maxDelta = eventStep.planDelta
+				maxDelta = stepsList[i].planDelta
 				continue
 			}
-
+			
 			// If last step was a completed and the current step is active then current step overrules          
 			if ( !isCompleted && lastIsCompleted ) {
-				maxDelta = eventStep.planDelta
+				maxDelta = stepsList[i].planDelta
 				lastIsCompleted = false
 				continue
 			}
-
+			
 			// see if this step is projected further into the future
-			if ( eventStep.planDelta > maxDelta || maxDelta == null ) {
-				maxDelta = eventStep.planDelta
+			if ( stepsList[i].planDelta > maxDelta || maxDelta == null ) {
+				maxDelta = stepsList[i].planDelta
 				lastIsCompleted = isCompleted
 			}
-
 		}
 		//  @lok :  I will move this into domain method 
 		def planTimes = jdbcTemplate.queryForMap("SELECT MAX(mb.start_time) as startTime ,  MAX(mb.completion_time) as completionTime "+
