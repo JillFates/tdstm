@@ -134,4 +134,139 @@ class StepSnapshotService {
 		
 		return 50 + 50 * adjust	
 	}
+	
+	/*
+	 * 
+	 */
+	def summaryProcess( def moveEventId ) {
+		
+		def moveEvent = MoveEvent.get( moveEventId )
+		def lastBundleId = null
+		def maxOverallDelta = null	// Tracks the max delta for all move events
+		def maxDelta = null
+		def lastIsCompleted = false
+		def hasActive = false
+		def isActive = false
+		def isCompleted = false
+		
+		def stepsListQuery = "SELECT mb.move_bundle_id as moveBundleId, mbs.transition_id as transitioId, mbs.label,"+
+								" mbs.plan_start_time as planStartTime, mbs.plan_completion_time as planCompletionTime,"+
+								" mbs.actual_start_time as actualStartTime, mbs.actual_completion_time as actualCompletionTime,"+
+								" ss.date_created as dateCreated, ss.tasks_count as tasksCount, ss.tasks_completed as tasksCompleted,"+
+								" ss.dial_indicator as dialIndicator, ss.plan_delta as planDelta"+
+								" FROM move_event me "+
+								" JOIN move_bundle mb ON mb.move_event_id = me.move_event_id "+
+								" LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id"+
+								" LEFT JOIN step_snapshot ss ON ss.move_bundle_step_id = mbs.id"+
+								" WHERE me.move_event_id = ? "+
+								" AND ss.date_created = (SELECT MAX(date_created) FROM step_snapshot ss2 WHERE ss2.move_bundle_step_id = mbs.id) "+
+								" UNION "+
+								" SELECT mb.move_bundle_id as moveBundleId, mbs.transition_id as transitioId, mbs.label,"+
+								" mbs.plan_start_time as planStartTime, mbs.plan_completion_time as planCompletionTime,"+
+								" mbs.actual_start_time as actualStartTime, mbs.actual_completion_time as actualCompletionTime,"+
+								" ss.date_created as dateCreated, ss.tasks_count as tasksCount, ss.tasks_completed as tasksCompleted,"+
+								" ss.dial_indicator as dialIndicator, ss.plan_delta as planDelta"+
+								" FROM move_event me "+
+								" JOIN move_bundle mb ON mb.move_event_id = me.move_event_id"+
+								" LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id"+
+								" LEFT JOIN step_snapshot ss ON ss.move_bundle_step_id = mbs.id"+
+								" WHERE mb.move_event_id = ? "+
+								" AND ss.date_created IS NULL "+
+								" ORDER BY moveBundleId, transitioId "
+								
+		def stepsList = jdbcTemplate.queryForList( stepsListQuery , [ moveEventId, moveEventId ]);
+								
+		stepsList.each { eventStep ->
+			if (eventStep.moveBundleId != lastBundleId) {
+				if (lastBundleId != null) {
+					if ( maxOverallDelta == null || maxDelta > maxOverallDelta ) 
+		            maxOverallDelta = maxDelta
+				}
+				lastBundleId = eventStep.moveBundleId
+				maxDelta = null
+				lastIsCompleted = false
+				hasActive = false
+				isActive = false
+			}
+			
+			// see if task is completed 
+			if(eventStep.actualCompletionTime){
+				isCompleted  = true
+			}
+		
+			// If we have an active Task then we ignore all completed
+			if ( hasActive && isCompleted ) continue  // continue not allowed in each loop - should change to a for loop perhaps
+
+			// Determine if active (either has start time or planDelta > 0 and is not completed)
+			if( eventStep.actualStartTime  && eventStep.planDelta > 0  && ! isCompleted ){
+				isActive =  true
+			}
+
+			// Track that the bundle has an active step if that's the case
+			if( hasActive || isActive ){
+				hasActive = true
+			}
+
+			// If this is a subsequent completed step then we just take the current delta
+			if ( isCompleted && lastIsCompleted ) {
+				maxDelta = eventStep.planDelta
+				continue
+			}
+
+			// If last step was a completed and the current step is active then current step overrules          
+			if ( !isCompleted && lastIsCompleted ) {
+				maxDelta = eventStep.planDelta
+				lastIsCompleted = false
+				continue
+			}
+
+			// see if this step is projected further into the future
+			if ( eventStep.planDelta > maxDelta || maxDelta == null ) {
+				maxDelta = eventStep.planDelta
+				lastIsCompleted = isCompleted
+			}
+
+		}
+		//  @lok :  I will move this into domain method 
+		def planTimes = jdbcTemplate.queryForMap("SELECT MAX(mb.start_time) as startTime ,  MAX(mb.completion_time) as completionTime "+
+												"FROM move_bundle WHERE mb.move_event_id = ? ",[moveEventId])
+		def planStartTime = planTimes.get("startTime").getTime()
+		def planCompletionTime = planTimes.get("completionTime").getTime()
+		def planDuration = ( planCompletionTime - planStartTime ) / 1000
+		def planDialIndicator = calcDialIndicator( planDuration, maxOverallDelta )
+		
+		new MoveEventSnapshot(moveEvent : moveEvent, type : "p", planDelta : maxOverallDelta, dialIndicator : dialIndicator ).save(flush:true)
+		
+		if(moveEvent.revisedCompletionTime){
+			def revsedPlanDuration = ( moveEvent.revisedCompletionTime.getTime() - planStartTime ) / 1000
+			def revisedDialIndicator = calcDialIndicator( revsedPlanDuration, maxOverallDelta )
+			new MoveEventSnapshot( moveEvent : moveEvent, type : "R", planDelta : maxOverallDelta, dialIndicator : revisedDialIndicator ).save(flush:true)
+		}
+	}
+	
+	/** 
+	  * Creates the MoveEventSnapshot records for a MoveEvent.  If event has revised completion it will create two records.
+	  * @...
+	  */
+	def createSummary( moveEvent, planDelta ) {
+		// @lok : I will move this into domain method 
+		def planTimes = jdbcTemplate.queryForMap("SELECT MAX(mb.start_time) as startTime ,  MAX(mb.completion_time) as completionTime "+
+												"FROM move_bundle WHERE mb.move_event_id = ? ",[moveEvent.id])
+		def planStartTime = planTimes.get("startTime").getTime()
+		def planCompletionTime = planTimes.get("completionTime").getTime()
+		def planDuration = ( planCompletionTime - planStartTime ) / 1000
+				
+		def dialIndicator = calcDialIndicator( planDuration, planDelta )
+		
+		// Create MoveEventSnapshot
+		new MoveEventSnapshot( moveEvent : moveEvent, type : "p", planDelta : planDelta, dialIndicator : dialIndicator ).save(flush:true)
+		// Create the revised snapshot if there is a revised completion tim
+	   	if (moveEvent.revisedCompletionTime) {
+	   		def revsedPlanDuration = ( moveEvent.revisedCompletionTime.getTime() - planStartTime ) / 1000
+			def revisedDialIndicator = calcDialIndicator( revsedPlanDuration, planDelta )
+			new MoveEventSnapshot( moveEvent : moveEvent, type : "R", planDelta : planDelta, dialIndicator : revisedDialIndicator ).save(flush:true)
+	   	}
+	   
+	}
+	
 }
