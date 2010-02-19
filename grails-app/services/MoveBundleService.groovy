@@ -30,23 +30,33 @@ class MoveBundleService {
 		def assetCompletionCount = jdbcTemplate.queryForList( queryForAssetsCount ).size()
 		return assetCompletionCount
     }
-    /*----------------------------------------------
-     *@author : Lokanada Reddy
-     *@param  : moveBundleId and transitionId 
-	 *@return : actualStart and completed datetimes for a specified move bundle and transition id
-	 *---------------------------------------------*/
+
+    /**
+	 * Looks up the first and last datetime of transition for a given move bundle 
+     * @author Lokanada Reddy
+     * @param moveBundleId 
+	 * @param transitionId 
+	 * @return Map[started,completed] datetimes for a specified move bundle and transition id
+	 */
 	def getActualTimes( def moveBundleId, def transitionId ) {
-    	def queryForActualTimes = "SELECT min(atran.date_created) as started, max(atran.date_created) as completed FROM asset_entity ae "+
-									" LEFT JOIN asset_transition atran ON atran.asset_entity_id = ae.asset_entity_id AND atran.voided=0 "+
-									" AND cast(atran.state_to as UNSIGNED INTEGER) = ( SELECT min(cast(atran2.state_to as UNSIGNED INTEGER)) as minstate "+
-									" FROM asset_transition atran2 WHERE atran2.asset_entity_id = ae.asset_entity_id and atran2.voided = 0 "+
-									" and cast(atran2.state_to as UNSIGNED INTEGER) >= ${transitionId} GROUP BY atran2.asset_entity_id ) "+
-									" LEFT JOIN project_asset_map pam on pam.asset_id = ae.asset_entity_id "+ 
-									" WHERE ae.move_bundle_id = ${moveBundleId} and pam.current_state_id >= $transitionId "+ 
-									" GROUP BY ae.move_bundle_id "
+    	def queryForActualTimes = """
+			SELECT MIN(atran.date_created) as started, MAX(atran.date_created) as completed 
+			FROM asset_entity ae
+			LEFT JOIN asset_transition atran ON atran.asset_entity_id = ae.asset_entity_id AND atran.voided=0
+			    AND cast(atran.state_to as UNSIGNED INTEGER) = 
+			    ( SELECT min(cast(atran2.state_to as UNSIGNED INTEGER)) as minstate
+			      FROM asset_transition atran2 
+			      WHERE atran2.asset_entity_id = ae.asset_entity_id AND atran2.voided = 0
+			         AND cast(atran2.state_to as UNSIGNED INTEGER) >= ? 
+			      GROUP BY atran2.asset_entity_id 
+			    )
+			LEFT JOIN project_asset_map pam on pam.asset_id = ae.asset_entity_id 
+			WHERE ae.move_bundle_id = ${moveBundleId} and pam.current_state_id >= ?
+			GROUP BY ae.move_bundle_id
+		"""
 		def actualTimes
 		try {
-			actualTimes = jdbcTemplate.queryForMap( queryForActualTimes )
+			actualTimes = jdbcTemplate.queryForMap( queryForActualTimes, [transitionId, transitionId] )
 		} catch (IncorrectResultSizeDataAccessException irsdae) {
 			// Common occurrence so we just bale
 		}

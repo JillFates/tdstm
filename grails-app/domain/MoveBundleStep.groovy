@@ -4,6 +4,9 @@
  * move event.  
  */
 class MoveBundleStep {	
+	static final String METHOD_LINEAR="L"
+	static final String METHOD_MANUAL="M"
+	
     MoveBundle moveBundle			// The bundle that the step is associated with
     Integer transitionId			// Maps to the id # of the transition in the workflow XML definition
 	String label					// Value to display in UI
@@ -25,7 +28,7 @@ class MoveBundleStep {
 		planCompletionTime( nullable:true )
 		actualStartTime( nullable:true )
 		actualCompletionTime( nullable:true )
-		calcMethod( blank:false, nullable:false, inList: ['L','M'] )	// Linear and Manual
+		calcMethod( blank:false, nullable:false, inList: [METHOD_LINEAR, METHOD_MANUAL] )
 		showOnDashboard(range:0..1)	
 	}
 
@@ -53,40 +56,32 @@ class MoveBundleStep {
 	def getPlanDuration() {
 		// calculate # of seconds planCompletionTime - planStartTime
 		def timeDuration = 0
-		if(planCompletionTime && planStartTime){
+		if (planCompletionTime && planStartTime) {
 			timeDuration = planCompletionTime.getTime() - planStartTime.getTime()
-			if(timeDuration) {
-				timeDuration = timeDuration / 1000 
+			if (timeDuration) {
+				timeDuration = (timeDuration / 1000).intValue()
 			}
 		}
 		return timeDuration
 	}
 		
 	/**
-	 * calculates the actual total time that the step has taken.  If the step hasn't completed
-	 * it will determine the duration from the start to the current time.
-	 * @return int - total duration that a step has taken to up to the current time (seconds)
+	 * calculates the actual time that the step has taken.  If the step hasn't completed
+	 * it will determine the duration from the start to the current time or time passed into method.
+	 * @param  Date  the date to base the duration off of if Step is not completed
+	 * @return int   total duration that a step has taken to up to the current time (seconds)
 	 */
-	def getActualDuration() {
-		/* 
-		if actualStartTime is null {
-			return 0
-		} else if actualCompletionTime is null {
-			return now - actualStartTime
-		} else {
-			return actualCompletionTime - actualStartTime
-		}
-		*/
-		def timeDuration = 0
-		if( actualStartTime && actualStartTime){
+	def getActualDuration( def asOfTime=new Date() ) {
+		def timeDuration
+		
+		if( actualStartTime && actualCompletionTime ){
 			timeDuration = actualCompletionTime.getTime() - actualStartTime.getTime()
 		} else if( !actualCompletionTime && actualStartTime){
-			timeDuration = new Date().getTime() - actualStartTime.getTime()
+			timeDuration = asOfTime.getTime() - actualStartTime.getTime()
 		}
 		
-		if(timeDuration){
-			timeDuration = timeDuration / 1000
-		}
+		timeDuration = timeDuration ? (timeDuration / 1000).intValue() : 0
+		
 		return timeDuration
 	}
 	
@@ -99,7 +94,8 @@ class MoveBundleStep {
 	}
 
     String toString(){
-		label
+		"MoveBundleStep( label:${label}, tranId=${transitionId}, method=${calcMethod}, planStart=${planStartTime}, planCompletionTime=${planCompletionTime}, " +
+		"actualStartTime=${actualStartTime}, actualCompletionTime=${actualCompletionTime} )"
 	}
 
 }

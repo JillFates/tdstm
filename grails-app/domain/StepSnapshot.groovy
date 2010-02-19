@@ -30,10 +30,10 @@ class StepSnapshot {
 	 * computes the pace of the task in seconds
 	 */
 	def getPlanTaskPace () {
-		// return tasksCount > 0 ? int moveBundleStep.planDuration / tasksCount : 0
-		def planDuration = moveBundleStep.getPlanDuration()
+		def planDuration = moveBundleStep.planDuration
+		// print "tasksCount=${tasksCount}, planDuration=${planDuration}\n"		
 		if( planDuration ){
-			return tasksCount > 0 ? (Integer)(planDuration / tasksCount ) : 0
+			return tasksCount > 0 ? (planDuration / tasksCount ).intValue() : 0
 		} else {
 			return 0
 		}
@@ -41,11 +41,10 @@ class StepSnapshot {
 	}
 	
 	/**
-	 * computes the pace of the task in seconds. Return zero (0) if no tasks have been completed
+	 * Computes the pace of the task in seconds. Return zero (0) if no tasks have been completed
 	 */
-	def getActualTaskPace () {
-		// return tasksCompleted && duration ? int duration / tasksCompleted : 0
-		return tasksCompleted && duration ? (Integer)(duration / tasksCompleted ) : 0
+	def getActualTaskPace() {
+		return (tasksCompleted > 0 && duration) ? (duration / tasksCompleted ).intValue() : 0
 	}	
 	
 	/**
@@ -56,12 +55,12 @@ class StepSnapshot {
 	 *    2. step in progress - return (taskCount - taskCompleted) * moveBundleStep.planPace
 	 *    3. step is completed - return zero (0)
 	 */
-	def getProjectedTimeRemaining() {
+	def getProjectedTimeRemaining( ) {
 		def timeRemaining = 0
-		if(!hasStarted()){
-			timeRemaining = moveBundle.getPlanDuration()
-		} else if( !isCompleted() ){
-			timeRemaining = (tasksCount - tasksCompleted) * getActualTaskPace()
+		
+		if ( tasksCompleted < tasksCount ){
+			// print "tasksCount:${tasksCount}, tasksCompleted=${tasksCompleted}, planTaskPace=${planTaskPace}\n"
+			timeRemaining = ((tasksCount - tasksCompleted) * planTaskPace ).intValue()
 		}
 		 return timeRemaining 
 	}
@@ -97,6 +96,9 @@ class StepSnapshot {
 	 * @return date - projected completion time
 	 */
 	def getProjectedCompletionTime() {
+	
+	// TODO : JPM : Shouldn't be converting TZ here....  We leave TZ switch in the web service ONLY
+	
 		// return moveBundleStep.planCompletionTime + projectedTimeOver
 		def offsetTZ = ( ( new Date().getTimezoneOffset() / 60 ) * ( -1 ) )
 		def projectedCompletionTimeInseconds = ( moveBundleStep.planCompletionTime.getTime() / 1000 ) + getProjectedTimeOver() + offsetTZ
@@ -118,12 +120,7 @@ class StepSnapshot {
 	 * @return boolean - true if the step has started
 	 */
 	def hasStarted() {
-		 //	return moveBundleStep.actualStartTime not null
-		 if(moveBundleStep.actualStartTime){
-			 return true;
-		 } else {
-			 return false;
-		 }
+		 return moveBundleStep.actualStartTime != null
 	}
 	
 	/**
