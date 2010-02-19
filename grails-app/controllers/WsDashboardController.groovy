@@ -94,7 +94,7 @@ class WsDashboardController {
     		def moveEventRevisedSnapshot
 			def revisedComp 
     		if( moveEvent ){
-    			planSumCompTime = jdbcTemplate.queryForMap( "SELECT DATE_FORMAT( ADDDATE( max(mb.completion_time) , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %h:%m:%s' ) as compTime "+
+    			planSumCompTime = jdbcTemplate.queryForMap( "SELECT DATE_FORMAT( ADDDATE( max(mb.completion_time) , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r' ) as compTime "+
     							" FROM move_bundle mb WHERE mb.move_event_id = ${moveEvent.id}" )?.compTime
     			/*
 				* select the most recent MoveEventSnapshot records for the event for both the P)lanned and R)evised types.
@@ -122,7 +122,7 @@ class WsDashboardController {
 													"steps": dataPointsForEachStep,
 													] 
     								]
-			render dataPointStepMap as JSON
+    		render dataPointStepMap as JSON
 	
 	}
 }
