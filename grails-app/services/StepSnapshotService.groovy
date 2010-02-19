@@ -93,7 +93,7 @@ class StepSnapshotService {
 	 * Used to create manual snapshots.  When creating it will update the MoveBundleStep as well appropriately.
 	 *
 	 */
-	def createManualSnapshot( moveBundleId, moveBundleStepId, tasksCompleted ) {
+	def createManualSnapshot( def moveBundleId, def moveBundleStepId, def tasksCompleted ) {
 	
 		// Check to see if we can find and return appropriate error codes (temporary solution)
 		def moveBundleStep = MoveBundleStep.get( moveBundleStepId )
@@ -102,8 +102,9 @@ class StepSnapshotService {
 		
 		def planDelta
 		def now = new Date()
-		def nowTime = now.getTime()
-		
+		def nowTime = now.getTime() / 1000
+		def planCompletionTime = moveBundleStep.planCompletionTime.getTime() / 1000
+
 		def taskCount = 100		// Default the total
 
 		if (tasksCompleted == taskCount) {
@@ -116,14 +117,14 @@ class StepSnapshotService {
 			if ( ! moveBundleStep.actualStartTime) moveBundleStep.actualStartTime = now
 			moveBundleStep.save(force:true)
 			
-			planDelta = moveBundleStep.actualCompletionTime - moveBundleStep.planCompletionTime
+			planDelta = moveBundleStep.actualCompletionTime - planCompletionTime
 			
 		} else {
 
 			// Task in  Progress
 			
-			def timeToFinish = (taskCount - tasksCompleted)  * moveBundleStep.getPlanDuration()
-			planDelta = now + timeToFinish - moveBundleStep.planCompletionTime
+			def timeToFinish = (taskCount - tasksCompleted) * moveBundleStep.getPlanPace()
+			planDelta = (nowTime + timeToFinish - planCompletionTime).intValue()
 
 			// Update actual start time if by chance it was never set
 			if ( moveBundleStep.actualStartTime) {
@@ -143,7 +144,7 @@ class StepSnapshotService {
 		stepSnapshot.tasksCompleted = tasksCompleted
 		stepSnapshot.duration = actualStartTime ? (( nowTime - actualStartTime.getTime() ) / 1000).intValue() : 0
 
-		def planDelta = calcProjectedDelta( stepSnapshot, dateNow )
+		planDelta = calcProjectedDelta( stepSnapshot, dateNow )
 		stepSnapshot.planDelta = planDelta
 		stepSnapshot.dialIndicator =  calcDialIndicator( stepSnapshot.moveBundleStep.planDuration, planDelta )
 		
@@ -252,6 +253,11 @@ class StepSnapshotService {
 		def planDuration = (( planCompletionTime - planStartTime ) / 1000).intValue()
 		def dialIndicator = calcDialIndicator( planDuration, maxDelta )
 		
+log.debug("******CREATING SUMMARY*******")
+
+log.debug("Creating Summary: planStartTime=${planStartTime}, planCompletionTime=${planCompletionTime}, planDuration=${planDuration}")
+print "Creating Summary: planStartTime=${planStartTime}, planCompletionTime=${planCompletionTime}, planDuration=${planDuration}, maxDelta${maxDelta}\n\n"
+
 		def mes = new MoveEventSnapshot(moveEvent: moveEvent, type: MoveEventSnapshot.TYPE_PLANNED, planDelta: maxDelta, dialIndicator: dialIndicator )
 		if (! mes.save(flush:true) ) {
 			log.error("Unable to save Planned MoveEventSnapshot: ${mes}")

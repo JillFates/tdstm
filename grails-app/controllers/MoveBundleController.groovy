@@ -181,16 +181,26 @@ class MoveBundleController {
 	 * @return Returns 200 okay or appropriate error message
 	 */
 	def createManualStep = {
-		def moveBundleId = params.moveBundleId
-		def moveBundleStepId = params.moveBundleStepId
-		def tasksCompleted = params.tasksCompleted
+		try {
+		def moveBundleId = Integer.parseInt(params.moveBundleId)
+		def moveBundleStepId = Integer.parseInt(params.moveBundleStepId)
+		def tasksCompleted = Integer.parseInt(params.tasksCompleted)
 		
+		if (! tasksCompleted || tasksCompleted < 0 || tasksCompleted > 10 ) {
+			response.sendError( 400, "Bad Request")
+			// render("400 Bad Request")
+			return false
+		}
+ 
 		def result = stepSnapshotService.createManualSnapshot( moveBundleId, moveBundleStepId, tasksCompleted )
 		
 		if (result == 200)
 			render ("Record created")
 		else
 			response.sendError( result , "Error ${result}" )
+	} catch(NumberFormatException nfe) {
+		response.sendError( 400, "Bad Request")
+	}
 
 	}
 }
