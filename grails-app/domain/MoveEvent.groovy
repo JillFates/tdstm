@@ -3,6 +3,8 @@
  * period of time.
  */
 class MoveEvent {
+	static transients = [ "jdbcTemplate" ]
+	def jdbcTemplate
 	
     Project project
     String name
@@ -43,8 +45,7 @@ class MoveEvent {
 	 */
 	def getPlanTimes() {
 		def planTimes = jdbcTemplate.queryForMap(
-			"SELECT MIN(start_time) as start,  MAX(completion_time) as completion FROM move_bundle WHERE move_event_id = ? ", 
-			[moveEventId])
+			"SELECT MIN(start_time) as start,  MAX(completion_time) as completion FROM move_bundle WHERE move_event_id = ${id} ")
 		return planTimes
 	}
 	

@@ -17,17 +17,25 @@ class MoveBundleService {
 		return assetsCountInBundle
     }
     
-    /*----------------------------------------------
+    /**
+	 * Determines the number of assets associated with a MoveBundle that have completed a particular transition.
+	 * The transition can be that of 
      * @author : Lokanada Reddy
      * @param  : moveBundleId and transitionId
 	 * @return : assetCompletionCount for a specified move bundle id and transition id
-	 *---------------------------------------------*/
+	 */
     def assetCompletionCount( def moveBundleId, def transitionId ){
-    	def queryForAssetsCount = """SELECT max(cast(atran.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_entity ae 
+    	def sql = """
+			SELECT max(cast(atran.state_to as UNSIGNED INTEGER)) AS maxstate
+			FROM asset_entity ae
 			LEFT JOIN asset_transition atran ON ( atran.asset_entity_id = ae.asset_entity_id AND atran.voided = 0 ) 
-			WHERE ae.move_bundle_id = ${moveBundleId} AND cast(atran.state_to as UNSIGNED INTEGER) >= ${transitionId} GROUP BY ae.asset_entity_id"""
+			WHERE ae.move_bundle_id = ${moveBundleId} 
+				AND atran.type="process" 
+				AND cast(atran.state_to as UNSIGNED INTEGER) >= ${transitionId} 
+			GROUP BY ae.asset_entity_id
+		"""
 		
-		def assetCompletionCount = jdbcTemplate.queryForList( queryForAssetsCount ).size()
+		def assetCompletionCount = jdbcTemplate.queryForList( sql ).size()
 		return assetCompletionCount
     }
 

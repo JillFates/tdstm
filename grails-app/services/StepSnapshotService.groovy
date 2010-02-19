@@ -21,7 +21,8 @@ class StepSnapshotService {
 
 		def moveBundle = MoveBundle.findById( moveBundleId )
 		def moveBundleSteps = MoveBundleStep.findAllByMoveBundle(moveBundle)
-		def timeNow = new Date().getTime()
+		def dateNow = new Date()
+		def timeNow = dateNow.getTime()
 		
 		def tasksCount = moveBundleService.assetCount( moveBundleId )
 	
@@ -48,7 +49,7 @@ class StepSnapshotService {
 			   return  // next step
 
 			// Get latest StepSnapshot
-			def latestStepSnapshot = StepSnapshot.find( "FROM StepSnapshot WHERE moveBundleStep=? ORDER BY dateCreated DESC", [ moveBundleStep.id ] )
+			def latestStepSnapshot = StepSnapshot.find( "from StepSnapshot as s where s.moveBundleStep=? ORDER BY s.dateCreated DESC", [ moveBundleStep ] )
 			
 			// If the Step was completed, lets make sure that a more recent transition hasn't occurred (i.e. a Step task was rolled back)
 			if ( moveBundleStep.isCompleted() && moveBundleStep.actualCompletionTime == actualCompletionTime )
@@ -65,7 +66,8 @@ class StepSnapshotService {
 			stepSnapshot.tasksCompleted = tasksCompleted
 			stepSnapshot.duration = actualStartTime ? (( timeNow - actualStartTime.getTime() ) / 1000).intValue() : 0
 
-			def planDelta = calcProjectedDelta( stepSnapshot, timeNow )
+			def planDelta = calcProjectedDelta( stepSnapshot, dateNow )
+			stepSnapshot.planDelta = planDelta
 			stepSnapshot.dialIndicator =  calcDialIndicator( stepSnapshot.moveBundleStep.planDuration, planDelta )
 			
 			log.debug("Creating StepSnapshot: ${stepSnapshot}")
@@ -124,13 +126,13 @@ class StepSnapshotService {
 		}
 		
 		stepsList.each { step ->
-		// for(int i = 0 ; i < stepsList.length(); i++) {
 			// If first or new bundle reset various vars that are bundle dependent
 			if (step.moveBundleId != lastBundleId) {
 				lastBundleId = step.moveBundleId
 				lastIsCompleted = false
 				hasActive = false
 				isActive = false
+// TODO : Need to work in the OverallMaxDelta as it is necessary when dealing with resets within bundle
 			}
 			
 			// see if task is completed 
@@ -146,8 +148,9 @@ class StepSnapshotService {
 				return
 			
 			// Determine if active (either has start time or planDelta > 0 and is not completed)
-			if ( step.actualStartTime  && step.planDelta > 0  && ! isCompleted ) 
-				isActive =  true
+			// For our purposes if the task was suppose to of started at this time, we are considering it active
+			if ( step.actualStartTime || ( step.planDelta > 0  && ! isCompleted )) 
+				isActive = true
 			
 			// Track that the bundle has an active step if that's the case
 			if ( hasActive || isActive ) 
@@ -155,7 +158,8 @@ class StepSnapshotService {
 			
 			// If this is a subsequent completed step then we just take the current delta
 			if ( isCompleted && lastIsCompleted ) {
-				maxDelta = step.planDelta
+				// Only set the maxDelta if there are no active tasks before this step
+				if ( ! hasActive ) maxDelta = step.planDelta
 				return
 			}
 			
@@ -182,7 +186,7 @@ class StepSnapshotService {
 		def planStartTime = planTimes.start.getTime()
 		def planCompletionTime = planTimes.completion.getTime()
 		def planDuration = (( planCompletionTime - planStartTime ) / 1000).intValue()
-		def dialIndicator = calcDialIndicator( planDuration, maxOverallDelta )
+		def dialIndicator = calcDialIndicator( planDuration, maxDelta )
 		
 		def mes = new MoveEventSnapshot(moveEvent: moveEvent, type: MoveEventSnapshot.TYPE_PLANNED, planDelta: maxDelta, dialIndicator: dialIndicator )
 		if (! mes.save(flush:true) ) {
@@ -192,7 +196,7 @@ class StepSnapshotService {
 		
 		if ( moveEvent.revisedCompletionTime ){
 			planDuration = (( moveEvent.revisedCompletionTime.getTime() - planStartTime ) / 1000).intValue()
-			dialIndicator = calcDialIndicator( planDuration, maxOverallDelta )
+			dialIndicator = calcDialIndicator( planDuration, maxDelta )
 			mes = new MoveEventSnapshot( moveEvent: moveEvent, type: TYPE_REVISED, planDelta: maxDelta, dialIndicator: dialIndicator )
 			if (! mes.save(flush:true) ) {
 				log.error("Unable to save Revised MoveEventSnapshot: ${mes}")
