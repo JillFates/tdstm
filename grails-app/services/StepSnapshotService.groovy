@@ -40,9 +40,10 @@ class StepSnapshotService {
 				log.error("Unable to get ActualTimes for ${moveBundleStep}")
 				return
 			}
+log.debug("actualTimes=${actualTimes}")
 			
 			def earliestStartTime = actualTimes.start
-			def latestCompletionTime = actualTimes.completed
+			def latestCompletionTime = actualTimes.completion
 
 log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${latestCompletionTime}, MBS: ${moveBundleStep}" )
 			

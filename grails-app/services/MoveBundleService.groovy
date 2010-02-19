@@ -47,7 +47,7 @@ class MoveBundleService {
 	 * @return Map[started,completed] datetimes for a specified move bundle and transition id
 	 */
 	def getActualTimes( def moveBundleId, def transitionId ) {
-    	def queryForActualTimes = """
+    	def sql = """
 			SELECT MIN(atran.date_created) as started, MAX(atran.date_created) as completed 
 			FROM asset_entity ae
 			LEFT JOIN asset_transition atran ON atran.asset_entity_id = ae.asset_entity_id AND atran.voided=0
@@ -66,7 +66,7 @@ class MoveBundleService {
 		def actualTimes
 		try {
 			// actualTimes = jdbcTemplate.queryForMap( queryForActualTimes, [moveBundleId: moveBundleId, transitionId: transitionId] )
-			actualTimes = jdbcTemplate.queryForMap( queryForActualTimes )
+			actualTimes = jdbcTemplate.queryForMap( sql )
 		} catch (IncorrectResultSizeDataAccessException irsdae) {
 			// Common occurrence so we just bale
 		}
