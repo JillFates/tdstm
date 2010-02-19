@@ -105,35 +105,7 @@ class StepSnapshotService {
 		def nowTime = now.getTime() / 1000
 		def planCompletionTime = moveBundleStep.planCompletionTime.getTime() / 1000
 
-		def taskCount = 100		// Default the total
-
-		if (tasksCompleted == taskCount) {
-			
-			// Completing Manual Process
-			
-			moveBundleStep.actualCompletionTime = now
-			
-			// Update actual start time if by chance it was never set
-			if ( ! moveBundleStep.actualStartTime) moveBundleStep.actualStartTime = now
-			moveBundleStep.save(force:true)
-			
-			planDelta = moveBundleStep.actualCompletionTime - planCompletionTime
-			
-		} else {
-
-			// Task in  Progress
-			
-			def timeToFinish = (taskCount - tasksCompleted) * moveBundleStep.getPlanPace()
-			planDelta = (nowTime + timeToFinish - planCompletionTime).intValue()
-
-			// Update actual start time if by chance it was never set
-			if ( moveBundleStep.actualStartTime) {
-				moveBundleStep.actualStartTime = now
-				moveBundleStep.save(force:true)
-			}
-		}
-		
-		def actualStartTime = moveBundleStep.actualStartTime
+		def tasksCount = 100		// Default the total
 
 		//
 		// Create the StepSnapshot
@@ -142,9 +114,43 @@ class StepSnapshotService {
 		stepSnapshot.moveBundleStep = moveBundleStep
 		stepSnapshot.tasksCount = tasksCount
 		stepSnapshot.tasksCompleted = tasksCompleted
-		stepSnapshot.duration = actualStartTime ? (( nowTime - actualStartTime.getTime() ) / 1000).intValue() : 0
 
-		planDelta = calcProjectedDelta( stepSnapshot, dateNow )
+		if (tasksCompleted == tasksCount) {
+			
+			// Completing Manual Process
+			
+			moveBundleStep.actualCompletionTime = now
+			
+			// Update actual start time if by chance it was never set
+			if ( ! moveBundleStep.actualStartTime )
+				moveBundleStep.actualStartTime = now
+
+			moveBundleStep.save(force:true)
+			
+			planDelta = ( nowTime - planCompletionTime ).intValue()
+			
+		} else {
+
+			// Task in  Progress
+			
+			def timeToFinish = (tasksCount - tasksCompleted) * stepSnapshot.getPlanTaskPace()
+			planDelta = (nowTime + timeToFinish - planCompletionTime).intValue()
+
+			// Update actual start time if by chance it was never set, or user reset time after completing
+			if ( ! moveBundleStep.actualStartTime )	moveBundleStep.actualStartTime = now
+			moveBundleStep.actualCompletionTime = null	// Clear out since it is not completed
+			moveBundleStep.save(force:true)
+
+		}
+		
+		def actualStartTime = moveBundleStep.actualStartTime
+
+		//
+		// Finish up the StepSnapshot
+		//
+		stepSnapshot.duration = actualStartTime ? ( nowTime - actualStartTime.getTime() / 1000  ).intValue() : 0
+
+		planDelta = calcProjectedDelta( stepSnapshot, now )
 		stepSnapshot.planDelta = planDelta
 		stepSnapshot.dialIndicator =  calcDialIndicator( stepSnapshot.moveBundleStep.planDuration, planDelta )
 		
