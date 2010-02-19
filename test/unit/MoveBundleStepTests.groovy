@@ -18,7 +18,7 @@ class MoveBundleStepTests extends GroovyTestCase {
 	
     void testPlanDuration() {
 		initTest()
-		assertEquals "Should be 2 hours (seconds)", 7200, mbs.planDuration
+		assertEquals "Should be 2 hours (seconds)", 7200, mbs.getPlanDuration()
     }
 
     void testActualDuration() {

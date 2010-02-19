@@ -71,8 +71,10 @@ class MoveBundleStep {
 	 * @param  Date  the date to base the duration off of if Step is not completed
 	 * @return int   total duration that a step has taken to up to the current time (seconds)
 	 */
-	def getActualDuration( def asOfTime=new Date() ) {
+	def getActualDuration( def asOfTime ) {
 		def timeDuration
+		
+		if ( ! asOfTime ) asOfTime = new Date()
 		
 		if( actualStartTime && actualCompletionTime ){
 			timeDuration = actualCompletionTime.getTime() - actualStartTime.getTime()

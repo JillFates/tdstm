@@ -37,6 +37,17 @@ class MoveEvent {
 		}        
 	}
 
+	/**
+	 * Retrieves the MIN/MAX Start and Completion times of the MoveBundles associate with the MoveEvent
+	 * @return Map[start, completion] times for the MoveEvent
+	 */
+	def getPlanTimes() {
+		def planTimes = jdbcTemplate.queryForMap(
+			"SELECT MIN(start_time) as start,  MAX(completion_time) as completion FROM move_bundle WHERE move_event_id = ? ", 
+			[moveEventId])
+		return planTimes
+	}
+	
     String toString(){
 		name
 	}
