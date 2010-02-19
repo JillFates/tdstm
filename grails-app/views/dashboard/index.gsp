@@ -55,10 +55,10 @@
 					<label>
 					  <select name="timezone" id="timezone" onChange="getMoveEventNewsDetails($('#moveEvent').val())" class="selecttext">
 					    <option value="0" selected>GMT</option>
-					    <option value="5">EST</option>
-					    <option value="6">CST</option>
-					    <option value="7">MST</option>
-					    <option value="8">PST</option>
+					    <option value="-5">EST</option>
+					    <option value="-6">CST</option>
+					    <option value="-7">MST</option>
+					    <option value="-8">PST</option>
 					  </select>
 					</label>
 				</span>
