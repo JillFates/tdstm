@@ -35,8 +35,7 @@
 				<g:form action="index" controller="dashboard" name="dashboardForm">
 				<span style="padding-left: 10px;">
 				
-					<label for="moveEvent"><b>Event:</b></label>&nbsp;
-					<select id="moveEvent" name="moveEvent" onchange="document.dashboardForm.submit();">
+					<label for="moveEvent"><b>Event:</b></label>&nbsp;<select id="moveEvent" name="moveEvent" onchange="document.dashboardForm.submit();">
 						<g:each status="i" in="${moveEventsList}" var="moveEventInstance">
 							<option value="${moveEventInstance?.id}">${moveEventInstance?.name}</option>
 						</g:each>
@@ -56,10 +55,10 @@
 					<label>
 					  <select name="timezone" id="timezone" onChange="getMoveEventNewsDetails($('#moveEvent').val())" class="selecttext">
 					    <option value="0" selected>GMT</option>
-					    <option value="-5">EST</option>
-					    <option value="-6">CST</option>
-					    <option value="-7">MST</option>
-					    <option value="-8">PST</option>
+					    <option value="5">EST</option>
+					    <option value="6">CST</option>
+					    <option value="7">MST</option>
+					    <option value="8">PST</option>
 					  </select>
 					</label>
 				</span>
@@ -152,12 +151,12 @@
 			<div id="leftcol">
 				<ul id="btitle" >
 					<li>Step</li>
-					<li><span class="percentage">in percentage</span></li>
+					<li><span class="percentage">In Percentage</span></li>
 					<!-- <li><span class="percentage">Completion</span></li> -->
 					<li>Planned Start</li>
-					<li>Planned Completion</li>
+					<li>Planned&nbsp;Completion</li>
 					<li>Actual Start</li>
-					<li >Actual Completion</li>
+					<li >Actual&nbsp;Completion</li>
 				</ul>
 			</div>
 			<div id="leftarrow"><a href="javascript:void(0);" id="move-left"><img src="${createLinkTo(dir:'images',file:'left_arrow.png')}" alt="back" border="0" width="16" height="23" align="right"></a></div>

@@ -189,8 +189,8 @@ class MoveBundleController {
 			def moveBundleStepId = Integer.parseInt(params.moveBundleStepId)
 			def tasksCompleted = Integer.parseInt(params.tasksCompleted)
 			
-			if (! tasksCompleted || tasksCompleted < 0 || tasksCompleted > 100 ) {
-				response.sendError( 400, "Bad Request")
+			if ( tasksCompleted < 0 || tasksCompleted > 100 ) {
+				response.sendError( 400, "Bad Request P")
 				// render("400 Bad Request")
 				return false
 			}
@@ -202,7 +202,7 @@ class MoveBundleController {
 			else
 				response.sendError( result , "Error ${result}" )
 		} catch(NumberFormatException nfe) {
-			response.sendError( 400, "Bad Request")
+			response.sendError( 400, "Bad Request NFE")
 		}
 
 	}
