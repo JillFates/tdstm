@@ -384,7 +384,9 @@
 	{
 		var timeString = ""
 		var month =  date.getMonth();
+		
 		if( !isNaN(month) ){
+		   month = month + 1
 		   var monthday    = date.getDate();
 		   var year        = date.getYear() + 1900;
 		   
