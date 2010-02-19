@@ -374,8 +374,7 @@
 	    	temp = trimAll(source);
 		}       
 		date = new Date(temp)
-		
-		utcDate = date.getTime() + (date.getTimezoneOffset()*(-1)* 60000);
+		utcDate = date.getTime() ;
 	    convertedDate = new Date(utcDate + (3600000*offset));                               
 	    return getTimeFormate( convertedDate )
 	    
