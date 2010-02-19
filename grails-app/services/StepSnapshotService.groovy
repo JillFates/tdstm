@@ -7,8 +7,9 @@ class StepSnapshotService {
 
 	def moveBundleService
 	def stateEngineService
-	
-    boolean transactional = true
+	def jdbcTemplate
+
+	boolean transactional = true
 
 	/**
 	 * The process method will generate StepSnapshot records for a MoveBundle.  It iterates 
@@ -43,7 +44,7 @@ class StepSnapshotService {
 			def actualCompletionTime = actualTimes.completed
 			
 			// If the Step hasn't started and it is not scheduled to start then we don't need to do anything
-			if ( ! actualStartTime && moveBundleStep.startTime?.getTime() > timeNow )
+			if ( ! actualStartTime && moveBundleStep.planStartTime.getTime() > timeNow )
 			   return  // next step
 
 			// Get latest StepSnapshot
@@ -122,17 +123,18 @@ class StepSnapshotService {
 			return
 		}
 		
-		for(int i = 0 ; i < stepsList.length(); i++) {
+		stepsList.each { step ->
+		// for(int i = 0 ; i < stepsList.length(); i++) {
 			// If first or new bundle reset various vars that are bundle dependent
-			if (stepsList[i].moveBundleId != lastBundleId) {
-				lastBundleId = stepsList[i].moveBundleId
+			if (step.moveBundleId != lastBundleId) {
+				lastBundleId = step.moveBundleId
 				lastIsCompleted = false
 				hasActive = false
 				isActive = false
 			}
 			
 			// see if task is completed 
-			if (stepsList[i].actualCompletionTime){
+			if (step.actualCompletionTime){
 				isCompleted  = true
 			}
 			
@@ -141,10 +143,10 @@ class StepSnapshotService {
 				
 			// If we have an active Task then we ignore all completed
 			if ( hasActive && isCompleted ) 
-				continue
+				return
 			
 			// Determine if active (either has start time or planDelta > 0 and is not completed)
-			if ( stepsList[i].actualStartTime  && stepsList[i].planDelta > 0  && ! isCompleted ) 
+			if ( step.actualStartTime  && step.planDelta > 0  && ! isCompleted ) 
 				isActive =  true
 			
 			// Track that the bundle has an active step if that's the case
@@ -153,27 +155,27 @@ class StepSnapshotService {
 			
 			// If this is a subsequent completed step then we just take the current delta
 			if ( isCompleted && lastIsCompleted ) {
-				maxDelta = stepsList[i].planDelta
-				continue
+				maxDelta = step.planDelta
+				return
 			}
 			
 			// If last step was a completed and the current step is active then current step overrules          
 			if ( !isCompleted && lastIsCompleted ) {
-				maxDelta = stepsList[i].planDelta
+				maxDelta = step.planDelta
 				lastIsCompleted = false
-				continue
+				return
 			}
 			
 			// see if this step is projected further into the future
-			if ( stepsList[i].planDelta > maxDelta || maxDelta == null ) {
-				maxDelta = stepsList[i].planDelta
+			if ( step.planDelta > maxDelta || maxDelta == null ) {
+				maxDelta = step.planDelta
 				lastIsCompleted = isCompleted
 			}
 		}
 		
-		def planTimes = moveBundle.getPlanTimes()
+		def planTimes = moveEvent.getPlanTimes()
 		if (! planTimes ) {
-			log.error("Unable to get MoveBundle planTimes: ${moveBundle}")
+			log.error("Unable to get MoveEvent planTimes: ${moveBundle}")
 			return
 		}
 		
@@ -315,7 +317,7 @@ class StepSnapshotService {
 	 */
 	def getLatestStepSnapshots( def moveEventId ) {
 		def stepsListQuery = """
-			SELECT mb.move_bundle_id as moveBundleId, mbs.transition_id as transitioId, mbs.label,
+			SELECT mb.move_bundle_id as moveBundleId, mbs.transition_id as transitionId, mbs.label,
 			   mbs.plan_start_time as planStartTime, mbs.plan_completion_time as planCompletionTime,
 			   mbs.actual_start_time as actualStartTime, mbs.actual_completion_time as actualCompletionTime,
 			   ss.date_created as dateCreated, ss.tasks_count as tasksCount, ss.tasks_completed as tasksCompleted,
@@ -324,12 +326,12 @@ class StepSnapshotService {
 			   JOIN move_bundle mb ON mb.move_event_id = me.move_event_id 
 			   LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id
 			   LEFT JOIN step_snapshot ss ON ss.move_bundle_step_id = mbs.id
-			   WHERE me.move_event_id = ? 
+			   WHERE me.move_event_id = ${moveEventId} 
 			   AND ss.date_created = (SELECT MAX(date_created) FROM step_snapshot ss2 WHERE ss2.move_bundle_step_id = mbs.id) 
 
 			UNION 
 
-			SELECT mb.move_bundle_id as moveBundleId, mbs.transition_id as transitioId, mbs.label,
+			SELECT mb.move_bundle_id as moveBundleId, mbs.transition_id as transitionId, mbs.label,
 			   mbs.plan_start_time as planStartTime, mbs.plan_completion_time as planCompletionTime,
 			   mbs.actual_start_time as actualStartTime, mbs.actual_completion_time as actualCompletionTime,
 			   ss.date_created as dateCreated, ss.tasks_count as tasksCount, ss.tasks_completed as tasksCompleted,
@@ -338,11 +340,11 @@ class StepSnapshotService {
 			   JOIN move_bundle mb ON mb.move_event_id = me.move_event_id
 			   LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id
 			   LEFT JOIN step_snapshot ss ON ss.move_bundle_step_id = mbs.id
-			   WHERE mb.move_event_id = ? 
+			   WHERE mb.move_event_id = ${moveEventId} 
 			      AND ss.date_created IS NULL 
 			ORDER BY moveBundleId, transitionId 
 		"""
 							
-		def stepsList = jdbcTemplate.queryForList( stepsListQuery , [ moveEventId, moveEventId ]);	
+		def stepsList = jdbcTemplate.queryForList( stepsListQuery )
 	}
 }
