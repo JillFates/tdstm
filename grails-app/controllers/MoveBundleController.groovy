@@ -1,5 +1,8 @@
-import java.text.SimpleDateFormat 
+import java.text.SimpleDateFormat
+ 
 class MoveBundleController {
+
+	def stepSnapshotService
     def partyRelationshipService
     def userPreferenceService
     def index = { redirect(action:list,params:params) }
@@ -169,4 +172,25 @@ class MoveBundleController {
             render(view:'create',model:[moveBundleInstance:moveBundleInstance, managers: managers, projectId:projectId, projectManager: projectManager, moveManager: moveManager])
         }
     }
+
+	/**
+	 * Used to create StepSnapshot records for specified MoveBundle/MoveBundleStep.  
+	 * @param moveBundleId
+	 * @param moveBundleStepId 
+	 * @param tasksCompleted value 0-100 representing % completed
+	 * @return Returns 200 okay or appropriate error message
+	 */
+	def createManualStep = {
+		def moveBundleId = params.moveBundleId
+		def moveBundleStepId = params.moveBundleStepId
+		def tasksCompleted = params.tasksCompleted
+		
+		def result = stepSnapshotService.createManualSnapshot( moveBundleId, moveBundleStepId, tasksCompleted )
+		
+		if (result == 200)
+			render ("Record created")
+		else
+			response.sendError( result , "Error ${result}" )
+
+	}
 }

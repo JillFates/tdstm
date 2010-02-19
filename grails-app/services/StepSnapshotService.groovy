@@ -90,6 +90,70 @@ class StepSnapshotService {
     }
 
 	/**
+	 * Used to create manual snapshots.  When creating it will update the MoveBundleStep as well appropriately.
+	 *
+	 */
+	def createManualSnapshot( moveBundleId, moveBundleStepId, tasksCompleted ) {
+	
+		// Check to see if we can find and return appropriate error codes (temporary solution)
+		def moveBundleStep = MoveBundleStep.get( moveBundleStepId )
+		if (! moveBundleStep ) return 401
+		if ( moveBundleStep.moveBundle.id != moveBundleId) return 403
+		
+		def planDelta
+		def now = new Date()
+		def nowTime = now.getTime()
+		
+		def taskCount = 100		// Default the total
+
+		if (tasksCompleted == taskCount) {
+			
+			// Completing Manual Process
+			
+			moveBundleStep.actualCompletionTime = now
+			
+			// Update actual start time if by chance it was never set
+			if ( ! moveBundleStep.actualStartTime) moveBundleStep.actualStartTime = now
+			moveBundleStep.save(force:true)
+			
+			planDelta = moveBundleStep.actualCompletionTime - moveBundleStep.planCompletionTime
+			
+		} else {
+
+			// Task in  Progress
+			
+			def timeToFinish = (taskCount - tasksCompleted)  * moveBundleStep.getPlanDuration()
+			planDelta = now + timeToFinish - moveBundleStep.planCompletionTime
+
+			// Update actual start time if by chance it was never set
+			if ( moveBundleStep.actualStartTime) {
+				moveBundleStep.actualStartTime = now
+				moveBundleStep.save(force:true)
+			}
+		}
+		
+		def actualStartTime = moveBundleStep.actualStartTime
+
+		//
+		// Create the StepSnapshot
+		//
+		def stepSnapshot = new StepSnapshot()
+		stepSnapshot.moveBundleStep = moveBundleStep
+		stepSnapshot.tasksCount = tasksCount
+		stepSnapshot.tasksCompleted = tasksCompleted
+		stepSnapshot.duration = actualStartTime ? (( nowTime - actualStartTime.getTime() ) / 1000).intValue() : 0
+
+		def planDelta = calcProjectedDelta( stepSnapshot, dateNow )
+		stepSnapshot.planDelta = planDelta
+		stepSnapshot.dialIndicator =  calcDialIndicator( stepSnapshot.moveBundleStep.planDuration, planDelta )
+		
+		log.debug("Creating StepSnapshot: ${stepSnapshot}")
+		stepSnapshot.save(flush:true)
+	
+		return 200
+	}
+
+	/**
 	 * Used to generate MoveEventSnapshot records for a MoveEvent.  The process looks over all latest StepSnapshot records
 	 * of the MoveBundles associated with the MoveEvent and determines the worst case MoveEventStep across all Steps in the 
 	 * moveEvent. It uses that value to determine offset of the completion time.
