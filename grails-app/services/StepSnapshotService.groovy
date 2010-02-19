@@ -41,18 +41,20 @@ class StepSnapshotService {
 				return
 			}
 			
-			def actualStartTime = actualTimes.start
-			def actualCompletionTime = actualTimes.completed
+			def earliestStartTime = actualTimes.start
+			def latestCompletionTime = actualTimes.completed
+
+log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${latestCompletionTime}, MBS: ${moveBundleStep}" )
 			
 			// If the Step hasn't started and it is not scheduled to start then we don't need to do anything
-			if ( ! actualStartTime && moveBundleStep.planStartTime.getTime() > timeNow )
+			if ( ! earliestStartTime && moveBundleStep.planStartTime.getTime() > timeNow )
 			   return  // next step
 
 			// Get latest StepSnapshot
 			def latestStepSnapshot = StepSnapshot.find( "from StepSnapshot as s where s.moveBundleStep=? ORDER BY s.dateCreated DESC", [ moveBundleStep ] )
 			
 			// If the Step was completed, lets make sure that a more recent transition hasn't occurred (i.e. a Step task was rolled back)
-			if ( moveBundleStep.isCompleted() && moveBundleStep.actualCompletionTime == actualCompletionTime )
+			if ( moveBundleStep.isCompleted() && moveBundleStep.actualCompletionTime == latestCompletionTime )
 				return // Don't need to do anything so on to the next step
 
 			def tasksCompleted = moveBundleService.assetCompletionCount( moveBundleId, moveBundleStep.transitionId )
@@ -64,7 +66,7 @@ class StepSnapshotService {
 			stepSnapshot.moveBundleStep = moveBundleStep
 			stepSnapshot.tasksCount = tasksCount
 			stepSnapshot.tasksCompleted = tasksCompleted
-			stepSnapshot.duration = actualStartTime ? (( timeNow - actualStartTime.getTime() ) / 1000).intValue() : 0
+			stepSnapshot.duration = earliestStartTime ? (( timeNow - earliestStartTime.getTime() ) / 1000).intValue() : 0
 
 			def planDelta = calcProjectedDelta( stepSnapshot, dateNow )
 			stepSnapshot.planDelta = planDelta
@@ -73,14 +75,18 @@ class StepSnapshotService {
 			log.debug("Creating StepSnapshot: ${stepSnapshot}")
 			stepSnapshot.save(flush:true)
 
-			// Update the MoveBundleStep if the actual times have changed
-			if ( moveBundleStep.actualCompletionTime != actualCompletionTime || moveBundleStep.actualStartTime != actualStartTime) {
-    			moveBundleStep.actualCompletionTime = actualCompletionTime
-				moveBundleStep.actualStartTime = actualStartTime
+			//
+			// Update the MoveStepBundle
+			// 
+			if ( stepSnapshot.isCompleted() &&  ( ! moveBundleStep.actualCompletionTime || moveBundleStep.actualCompletionTime != latestCompletionTime ) )
+				moveBundleStep.actualCompletionTime = latestCompletionTime
+				
+			if ( moveBundleStep.actualStartTime != earliestStartTime)
+				moveBundleStep.actualStartTime = earliestStartTime
 
-				log.debug("Updating MoveBundleStep with new times: ${moveBundleStep}")
-				moveBundleStep.save( flush : true )
-			}
+			log.debug("Updating MoveBundleStep with new times: ${moveBundleStep}")
+			if ( ! moveBundleStep.save( flush : true ) ) 
+				log.error("Unable to save changes to MoveBundleStep: ${moveBundleStep}")
 			
 		} // moveBundleSteps.each{ moveBundleStep ->
 		
