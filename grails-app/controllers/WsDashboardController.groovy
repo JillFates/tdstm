@@ -14,33 +14,35 @@ class WsDashboardController {
 				moveBundle = MoveBundle.findById( moveBundleId )
 			}
     		//def offsetTZ = ( new Date().getTimezoneOffset() / 60 ) * ( -1 )
-			 
+			def sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss a");
 			if( moveBundle ){
 				
 				/* Get the latest step_snapshot record for each step that has started */
-				def latestStepsRecordsQuery = "SELECT mbs.transition_id as tid, ss.id as snapshotId, mbs.label as label, "+
-												" DATE_FORMAT( mbs.plan_start_time ,'%Y/%m/%d %r') as planStart, "+
-												" DATE_FORMAT( mbs.plan_completion_time ,'%Y/%m/%d %r') as planComp, "+
-												" DATE_FORMAT( mbs.actual_start_time ,'%Y/%m/%d %r') as actStart, "+
-												" DATE_FORMAT( mbs.actual_completion_time ,'%Y/%m/%d %r') as actComp, "+
-												" DATE_FORMAT( ss.date_created ,'%Y/%m/%d %r') as dateCreated, "+
-												" ss.tasks_count as tskTot, ss.tasks_completed as tskComp, ss.dial_indicator as dialInd FROM move_bundle mb "+
-												" LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id " +
-												" LEFT JOIN step_snapshot ss ON ss.move_bundle_step_id = mbs.id "+
-												" WHERE mb.move_bundle_id = ${moveBundle.id}"+
-												" AND ss.date_created = (SELECT MAX(date_created) FROM step_snapshot ss2 WHERE ss2.move_bundle_step_id = mbs.id) " 
+				def latestStepsRecordsQuery = """SELECT mbs.transition_id as tid, ss.id as snapshotId, mbs.label as label,
+													DATE_FORMAT( mbs.plan_start_time ,'%Y/%m/%d %r') as planStart,
+													DATE_FORMAT( mbs.plan_completion_time ,'%Y/%m/%d %r') as planComp,
+													DATE_FORMAT( mbs.actual_start_time ,'%Y/%m/%d %r') as actStart,
+													DATE_FORMAT( mbs.actual_completion_time ,'%Y/%m/%d %r') as actComp,
+													DATE_FORMAT( ss.date_created ,'%Y/%m/%d %r') as dateCreated,
+													ss.tasks_count as tskTot, ss.tasks_completed as tskComp, ss.dial_indicator as dialInd 
+												FROM move_bundle mb
+												LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id 
+												LEFT JOIN step_snapshot ss ON ss.move_bundle_step_id = mbs.id
+												WHERE mb.move_bundle_id = ${moveBundle.id}
+												AND ss.date_created = (SELECT MAX(date_created) FROM step_snapshot ss2 WHERE ss2.move_bundle_step_id = mbs.id) """ 
 					
 				/*	Get the steps that have not started / don't have step_snapshot records	*/						
-				def stepsNotUpdatedQuery = "SELECT mbs.transition_id as tid, ss.id as snapshotId, mbs.label as label, "+
-											" DATE_FORMAT( mbs.plan_start_time ,'%Y/%m/%d %r') as planStart, "+
-											" DATE_FORMAT( mbs.plan_completion_time ,'%Y/%m/%d %r') as planComp, "+
-											" DATE_FORMAT( mbs.actual_start_time ,'%Y/%m/%d %r') as actStart, "+
-											" DATE_FORMAT( mbs.actual_completion_time ,'%Y/%m/%d %r') as actComp,"+
-											" DATE_FORMAT( ss.date_created ,'%Y/%m/%d %r') as dateCreated,"+
-											" ss.tasks_count as tskTot, ss.tasks_completed as tskComp, ss.dial_indicator as dialInd FROM move_bundle mb "+
-											" LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id "+
-											" LEFT JOIN step_snapshot ss ON ss.move_bundle_step_id = mbs.id "+
-											" WHERE mb.move_bundle_id = ${moveBundle.id} AND ss.date_created IS NULL AND mbs.transition_id IS NOT NULL" 
+				def stepsNotUpdatedQuery = """SELECT mbs.transition_id as tid, ss.id as snapshotId, mbs.label as label,
+												DATE_FORMAT( mbs.plan_start_time ,'%Y/%m/%d %r') as planStart,
+												DATE_FORMAT( mbs.plan_completion_time ,'%Y/%m/%d %r') as planComp,
+												DATE_FORMAT( mbs.actual_start_time ,'%Y/%m/%d %r') as actStart,
+												DATE_FORMAT( mbs.actual_completion_time ,'%Y/%m/%d %r') as actComp,
+												DATE_FORMAT( ss.date_created ,'%Y/%m/%d %r') as dateCreated,
+												ss.tasks_count as tskTot, ss.tasks_completed as tskComp, ss.dial_indicator as dialInd 
+											FROM move_bundle mb
+											LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id
+											LEFT JOIN step_snapshot ss ON ss.move_bundle_step_id = mbs.id 
+											WHERE mb.move_bundle_id = ${moveBundle.id} AND ss.date_created IS NULL AND mbs.transition_id IS NOT NULL"""
 					
 				dataPointsForEachStep = jdbcTemplate.queryForList( latestStepsRecordsQuery + " UNION " + stepsNotUpdatedQuery + " ORDER BY tid" )
 				
@@ -88,18 +90,30 @@ class WsDashboardController {
 				moveEvent = MoveEvent.findById( moveEventId );
 			}
     		def planSumCompTime
+    		def moveEventPlannedSnapshot
+    		def moveEventRevisedSnapshot
     		if( moveEvent ){
     			planSumCompTime = jdbcTemplate.queryForMap( "SELECT max(mb.completion_time) as compTime "+
     							" FROM move_bundle mb WHERE mb.move_event_id = ${moveEvent.id}" )?.compTime
+    			/*
+				* select the most recent MoveEventSnapshot records for the event for both the P)lanned and R)evised types.
+				*/
+				def query = """FROM MoveEventSnapshot mes WHERE mes.moveEvent = ? AND mes.type = ? ORDER BY mes.dateCreated """
+				moveEventPlannedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent , "P"] )[0]
+				moveEventRevisedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent, "R"] )[0]												 
     		}
     		
     		def dataPointStepMap  = [ 
 									  "snapshot": [ 
 													"moveEvent" : moveEvent, 
 													"moveBundleId" : moveBundleId,
+													"moveEventSnapshot" : ["planned":moveEventPlannedSnapshot, "revised": moveEventRevisedSnapshot],
 													"systime": sysTime,
-													"planSum": [ "dialInd": 48, "confText": "High", "confColor": "green", 'compTime':planSumCompTime ],
-													"revSum": [ "dialInd": -1,'compTime':moveEvent?.revisedCompletionTime ],
+													"planSum": [ "dialInd": moveEventPlannedSnapshot?.dialIndicator, "confText": "High", 
+																"confColor": "green", 'compTime':planSumCompTime ?  sdf.format(planSumCompTime) : ""],
+													"revSum": [ "dialInd": moveEventRevisedSnapshot?.dialIndicator,
+															'compTime':moveEvent?.revisedCompletionTime ? sdf.format(moveEvent?.revisedCompletionTime) : "" ],
+															
 													"steps": dataPointsForEachStep,
 													] 
     								]

@@ -32,26 +32,29 @@
 					<a href="http://www.transitionaldata.com/" target="new"><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;border: 0px"/></a>
 				</g:else>
 				<br>
+				<g:form action="index" controller="dashboard" name="dashboardForm">
 				<span style="padding-left: 10px;">
+				
 					<label for="moveEvent"><b>Event:</b></label>&nbsp;
-					<select id="moveEvent" name="moveEvent" onchange="getMoveEventNewsDetails(this.value)">
+					<select id="moveEvent" name="moveEvent" onchange="document.dashboardForm.submit();">
 						<g:each status="i" in="${moveEventsList}" var="moveEventInstance">
 							<option value="${moveEventInstance?.id}">${moveEventInstance?.name}</option>
 						</g:each>
 					</select>
 				</span>
+				</g:form>
 				<input type="hidden" id="typeId" value="${params.type}">
 				<input type="hidden" id="stateId" value="${params.state}">
 				<input type="hidden" id="maxLenId" value="${params.maxLen}">
 				<input type="hidden" id="sortId" value="${params.sort}">
 			</div>
-			<div class="clientname">DEVON ENERGY<br>DATA CENTER RELOCATION</div>
+			<div class="clientname">${project?.client}<br>DATA CENTER RELOCATION</div>
 			<div class="topdate">
 				<span><img src="${createLinkTo(dir:'images',file:'powered_by.png')}" alt="Powered by TDS" width="158" height="53" title="Powered by TDS"></span>
 				<br><span id="date"></span> <span id="clock"></span>&nbsp;
 				<span>
 					<label>
-					  <select name="timezone" id="timezone" onChange="convertTimeZones();" class="selecttext">
+					  <select name="timezone" id="timezone" onChange="getMoveEventNewsDetails($('#moveEvent').val())" class="selecttext">
 					    <option value="0" selected>GMT</option>
 					    <option value="-5">EST</option>
 					    <option value="-6">CST</option>
@@ -62,53 +65,41 @@
 				</span>
 			</div>
 		</div>
-		<div id="sum_statusbar"><span id="status_text">${moveEvent?.name}: GREEN</span></div>
+		<div id="sum_statusbar"><span id="status_text">${moveEvent?.name}: </span><span id="status_color">GREEN</span></div>
 		<!-- Header Ends here-->
 		<!-- Body Starts here-->
 		<div id="bodytop">
 			<div id="plan_summary">
 				<div id="topindleft">
 					<div id="summary_gauge_div" align="center"> </div>
-						<script type="text/javascript">
-				        var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId", "280", "136", "0", "0");
-				        myChart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'summary_gauge.xml')}");
-				        myChart.render("summary_gauge_div");
-				        </script>Move Status vs. Plan
+						Move Status vs. Plan
 				</div>
 				<div class="topleftcontent">
 						Planned Completion<br>
-						<input type="hidden" id="hdnPlan" value="12/12: 07:00 AM" />
 						<!--12/12: 07:00 AM EST&#13;-->
-						<span id="spanPlan">12/12: 07:00 AM</span> <span id="spanPlanTZ"></span>
+						<span id="spanPlanned"></span>
 				</div>
 			</div>
 			<div id="revised_summary" >
 				<div id="topindright" style="display: none;">
 					<div id="revised_gauge_div" align="center"></div>
-						<script type="text/javascript">
-			            var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId1", "180", "136", "0", "0");
-			            myChart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'revised_gauge.xml')}");
-			            myChart.render("revised_gauge_div");
-			            </script>Status vs. Revised Plan
+						Status vs. Revised Plan
 				</div>
-				<div id="toprightbox">
-					<div id="refresh" style="float: right;">Refresh: 
-						<select name="refreshTime" id="refreshTimeId" class="selecttext">
-							<option selected value="60000">1 Min</option>
-	            			<option value="300000">5 Min</option>
-	                    	<option value="600000">10 Min</option>
-	                        <option value="1800000">30 Min</option>
-						</select>
-					</div>
-					<div class="toprightcontent" id="revised_gauge_content" style="display: none;">
-						Confidence in Revised Plan<br>
-						<span class="high">High</span><br>
-						<span class="redfont">Planned Completion:&#13;
-						<input type="hidden" id="hdnPlan1" value="12/12: 07:00 AM" />
-						<!--12/12: 07:00 AM EST&#13;-->
-						<br />
-						<span id="spanPlan1">12/12: 07:00 AM</span> <span id="span2"></span></span>
-					</div>
+				<div id="refresh" style="float: right;">Refresh: 
+					<select name="refreshTime" id="refreshTimeId" class="selecttext" onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'timedRefresh()') }">
+						<option selected value="60000">1 Min</option>
+	            		<option value="300000">5 Min</option>
+	                	<option value="600000">10 Min</option>
+	                	<option value="1800000">30 Min</option>
+					</select>
+				</div>
+				<div class="toprightcontent" id="revised_gauge_content" style="display: none;">
+					Confidence in Revised Plan<br>
+					<span class="high">High</span><br>
+					<span class="redfont">Planned Completion:&#13;
+					<!--12/12: 07:00 AM EST&#13;-->
+					<br />
+					<span id="spanRevised"></span></span>
 				</div>
 			</div>
 		</div>
@@ -293,14 +284,12 @@
 		        url:"../ws/moveEventNews/"+moveEvent+"?type="+$("#typeId").val()+"&state="+$("#stateId").val()+"&maxLen="+$("#maxLenId").val()+"&sort="+$("#sortId").val(),
 		        dataType: 'json',
 		        success:updateMoveEventNews,
-		        error:function( data, error ) {
-		            alert("error = "+error);
-		        }
 			});
 		}
 	}
 	/* Update the Move news once ajax call success*/
 	function updateMoveEventNews( news ){
+		var offset = $("#timezone").val()
 		var newsLength = news.length;
 		var live = "";
 		var archived = "";
@@ -309,9 +298,9 @@
 		for( i = 0; i< newsLength; i++){
 			var state = news[i].state;
 			if(state == "A"){
-				archived +=	"<li><span class='newstime'>"+news[i].created+":</span> <span class='normaltext'>"+news[i].text+"</span></li>";
+				archived +=	"<li><span class='newstime'>"+convertTime(offset,news[i].created)+" :</span> <span class='normaltext'>"+news[i].text+"</span></li>";
 			} else {
-				live +=	"<li><span class='newstime'>"+news[i].created+":</span> <span class='normaltext'>"+news[i].text+"</span></li>";
+				live +=	"<li><span class='newstime'>"+convertTime(offset,news[i].created) +" :</span> <span class='normaltext'>"+news[i].text+"</span></li>";
 				scrollText +=" "+news[i].text +"..."
 			}
 		}
@@ -326,7 +315,6 @@
 		var refreshTime = $("#refreshTimeId").val();
 		timer = setTimeout("getMoveEventNewsDetails($('#moveEvent').val())",refreshTime);
 	}
-
 
 	/* function to load the user agent*/
 	if(navigator.appName == "Microsoft Internet Explorer"){
@@ -439,29 +427,46 @@
 		        url:"../ws/dashboard/bundleData/"+ bundleId+"?moveEventId="+moveEvent,
 		        dataType: 'json',
 		        success:updateMoveBundleSteps,
-		        error:function( data, error ) {
-		            alert("error = "+error);
-		        }
 			});
 	 }
 
 	 /* update move bundal data once ajax call success */
 	 
 	function updateMoveBundleSteps( dataPointStep ) {
+
+		var offset = $("#timezone").val()
+		
 		var snapshot = dataPointStep.snapshot;
 		var moveBundleId = snapshot.moveBundleId;
 		var steps = snapshot.steps;
 		var revSum = snapshot.revSum;
+		var planSum = snapshot.planSum
+
 		AditionalFrames = ( steps.length > 6 ? steps.length - 5 : 1 )
+		
+		var planned = snapshot.moveEventSnapshot.planned
+		if( planned.planDelta > 0){
+			$(".sum_statusbar_good").attr("class","sum_statusbar_bad")
+			$("#status_color").html("RED")
+		} else {
+			$(".sum_statusbar_bad").attr("class","sum_statusbar_good")
+			$("#status_color").html("GREEN")
+		}
+		updateSummaryGauge("summary_gauge_div",planSum.dialInd);
+		$("#spanPlanned").html(convertTime(offset, planSum.compTime))
+		
 		if(revSum.dialInd == "-1") {
 			$("#topindright").hide();
 			$("#revised_gauge_content").hide();
 		} else if(snapshot.moveEvent.revisedCompletionTime) {
+
+			updateRevisedGauge("revised_gauge_div",revSum.dialInd)
+			$("#spanRevised").html(convertTime(offset, revSum.compTime))
+			
 			$("#topindright").show();
 			$("#revised_gauge_content").show();
 		}
 		for( i = 0; i < steps.length; i++ ) {
-			var offset = $("#timezone").val()
 			
 			$("#percentage_"+moveBundleId+"_"+steps[i].tid).html(isNaN(steps[i].tskComp / steps[i].tskTot) ? 0+ "%" : parseInt( (steps[i].tskComp / steps[i].tskTot ) * 100 ) +"%");
 			$("#percentage_"+moveBundleId+"_"+steps[i].tid).attr("class",steps[i].percentageStyle)
@@ -486,7 +491,7 @@
 		
 	}
 	/* function to render the dials */
-	function post_init( location, dialInd ){
+	function post_init( divId, dialInd ){
 		var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId2b", "100", "75", "0", "0");
 		var xmlData = "<chart bgAlpha='0' bgColor='FFFFFF' lowerLimit='0' upperLimit='100' numberSuffix='' "+
 					" showBorder='0' basefontColor='000000' chartTopMargin='15' chartBottomMargin='15' chartLeftMargin='5'"+
@@ -501,8 +506,42 @@
 			  		" <styles><definition><style name='RectShadow' type='shadow' strength='0'/> </definition> <application>"+
 			  		" <apply toObject='Grp1' styles='RectShadow' /> </application> </styles> </chart>"
 		myChart.setDataXML( xmlData );
-		myChart.render(location);
-	}		
+		myChart.render(divId);
+	}
+	function updateSummaryGauge( divId, dialInd ){
+    var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId", "280", "136", "0", "0");
+    var xmlData = "<chart bgAlpha='0' bgColor='FFFFFF' lowerLimit='0' upperLimit='100' numberSuffix='' showBorder='0' basefontColor='000000'"+ 
+        				"chartTopMargin='15' chartBottomMargin='15' chartLeftMargin='5' chartRightMargin='5' toolTipBgColor='80A905' "+
+        				"gaugeFillMix='{dark-10},FFFFFF,{dark-10}' gaugeFillRatio='3' showTickMarks='0'>"+
+        				" <colorRange><color minValue='0' maxValue='25' code='FF654F'/><color minValue='25' maxValue='50' code='F6BD0F'/>"+
+        				" <color minValue='50' maxValue='100' code='8BBA00'/></colorRange>"+
+        				"<dials> <dial value='"+dialInd+"' rearExtension='10'/></dials>"+
+        				"<trendpoints><point value='' displayValue='' fontcolor='FF4400' useMarker='' dashed='1' dashLen='2' dashGap='2' valueInside='1' />"+
+        				"</trendpoints> <annotations> <annotationGroup id='Grp1' showBelow='1' >"+
+        				"<annotation type='rectangle' x='5' y='5' toX='345' toY='195' radius='10' color='ffffff,ffffff' showBorder='0' />"+
+        				"</annotationGroup></annotations>"+
+        				"<styles>  <definition> <style name='RectShadow' type='shadow' strength='0'/> </definition> <application>"+
+        				"<apply toObject='Grp1' styles='RectShadow' /></application></styles></chart>"
+    myChart.setDataXML( xmlData );
+    myChart.render(divId);
+	}
+	function updateRevisedGauge( divId, dialInd ){
+	    var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId1", "180", "136", "0", "0");
+	    var xmlData = "<chart bgAlpha='0' bgColor='FFFFFF' lowerLimit='0' upperLimit='100' numberSuffix='' showBorder='0' basefontColor='000000' "+
+	    	" chartTopMargin='15' chartBottomMargin='15' chartLeftMargin='5' chartRightMargin='5' toolTipBgColor='80A905' "+
+	    	" gaugeFillMix='{dark-10},FFFFFF,{dark-10}' gaugeFillRatio='3' showTickMarks='0'>"+
+	    	" <colorRange><color minValue='0' maxValue='25' code='FF654F'/><color minValue='25' maxValue='50' code='F6BD0F'/>"+
+	    	" <color minValue='50' maxValue='100' code='8BBA00'/></colorRange>"+
+	    	" <dials><dial value='"+dialInd+"' rearExtension='10'/></dials>"+
+			" <trendpoints><point value='' displayValue='' fontcolor='FF4400' useMarker='1' dashed='1' dashLen='2' dashGap='2' valueInside='1' />"+
+			" </trendpoints> <annotations> <annotationGroup id='Grp1' showBelow='1' >"+
+			" <annotation type='rectangle' x='5' y='5' toX='345' toY='195' radius='10' color='FFFFFF,FFFFFF' showBorder='0' /> "+
+			"</annotationGroup></annotations> "+
+			" <styles><definition><style name='RectShadow' type='shadow' strength='0'/></definition>"+
+			" <application><apply toObject='Grp1' styles='RectShadow' /></application></styles></chart>"
+	    myChart.setDataXML( xmlData );
+	    myChart.render(divId);
+	    }
 	</script>
 </body>
 </html>

@@ -55,19 +55,22 @@ class NewsEditorController {
             moveBundleInstance = MoveBundle.findById(bundleId)
         } 
 
-		def assetCommentsQuery = new StringBuffer( "select ac.asset_comment_id as id, date_created as createdAt, display_option as displayOption, "+
-								" CONCAT_WS(' ',p1.first_name, p1.last_name) as createdBy, CONCAT_WS(' ',p2.first_name, p2.last_name) as resolvedBy, ac.comment_type as commentType, comment , "+
-								" resolution, date_resolved as resolvedAt, ae.asset_entity_id as assetEntity from asset_comment ac"+
-								" left join asset_entity ae on (ae.asset_entity_id = ac.asset_entity_id)"+
-								" left join move_bundle mb on (mb.move_bundle_id = ae.move_bundle_id)"+
-								" left join project p on (p.project_id = ae.project_id) left join person p1 on (p1.person_id = ac.created_by)"+
-								" left join person p2 on (p2.person_id = ac.resolved_by) where ac.comment_type = 'issue' and " )
-        def moveEventNewsQuery = new StringBuffer( "select mn.move_event_news_id as id, date_created as createdAt, 'U' as displayOption, "+
-								" CONCAT_WS(' ',p1.first_name, p1.last_name) as createdBy, CONCAT_WS(' ',p2.first_name, p2.last_name) as resolvedBy, 'news' as commentType, message as comment , "+
-								" resolution, date_archived as resolvedAt, null as assetEntity from move_event_news mn"+
-								" left join move_event me on ( me.move_event_id = mn.move_event_id )"+
-								" left join project p on (p.project_id = me.project_id) left join person p1 on (p1.person_id = mn.created_by)"+
-								" left join person p2 on (p2.person_id = mn.archived_by) where " )
+		def assetCommentsQuery = new StringBuffer( """select ac.asset_comment_id as id, date_created as createdAt, display_option as displayOption,
+									CONCAT_WS(' ',p1.first_name, p1.last_name) as createdBy, CONCAT_WS(' ',p2.first_name, p2.last_name) as resolvedBy,
+									ac.comment_type as commentType, comment , resolution, date_resolved as resolvedAt, ae.asset_entity_id as assetEntity 
+									from asset_comment ac
+									left join asset_entity ae on (ae.asset_entity_id = ac.asset_entity_id)
+									left join move_bundle mb on (mb.move_bundle_id = ae.move_bundle_id)
+									left join project p on (p.project_id = ae.project_id) left join person p1 on (p1.person_id = ac.created_by)
+									left join person p2 on (p2.person_id = ac.resolved_by) where ac.comment_type = 'issue' and """ )
+		
+        def moveEventNewsQuery = new StringBuffer( """select mn.move_event_news_id as id, date_created as createdAt, 'U' as displayOption, 
+									CONCAT_WS(' ',p1.first_name, p1.last_name) as createdBy, CONCAT_WS(' ',p2.first_name, p2.last_name) as resolvedBy, 
+									'news' as commentType, message as comment ,	resolution, date_archived as resolvedAt, null as assetEntity 
+									from move_event_news mn
+									left join move_event me on ( me.move_event_id = mn.move_event_id )
+									left join project p on (p.project_id = me.project_id) left join person p1 on (p1.person_id = mn.created_by)
+									left join person p2 on (p2.person_id = mn.archived_by) where """ )
         
     	if(moveBundleInstance != null){
     		assetCommentsQuery.append(" mb.move_bundle_id = ${moveBundleInstance.id}  ")

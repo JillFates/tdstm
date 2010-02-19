@@ -1,3 +1,5 @@
+import grails.converters.JSON
+
 class DashboardController {
 	
 	def userPreferenceService
@@ -11,11 +13,13 @@ class DashboardController {
 		def moveEvent
 		def moveBundleList
 		
-		if(projectId){
+		if( !projectId ){
 			project = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
-			moveEventsList = MoveEvent.findAllByProject(project)
-			projectLogo = ProjectLogo.findByProject(project)
+		} else {
+			project = Project.findById( projectId )
 		}
+		moveEventsList = MoveEvent.findAllByProject(project)
+		projectLogo = ProjectLogo.findByProject(project)
 		def moveEventId = params.moveEvent
 		if(!moveEventId){
 			moveEventId = getSession().getAttribute( "MOVE_EVENT" )?.MOVE_EVENT
@@ -37,4 +41,21 @@ class DashboardController {
 		return [ moveEventsList : moveEventsList, moveEvent : moveEvent, project : project, 
 				projectLogo : projectLogo, moveBundleList : moveBundleList ]
     }
+	
+	/*---------------------------------------------------------
+	 * Will set user preference for DASHBOARD_REFRESH time
+	 * @author : Lokanath Reddy
+	 * @param  : refresh time 
+	 * @return : refresh time 
+	 *---------------------------------------------------------*/
+	def setTimePreference = {
+        def timer = params.timer
+        def refreshTime =[]
+        if(timer){
+            userPreferenceService.setPreference( "DASHBOARD_REFRESH", "${timer}" )
+        }
+        def timeToRefresh = getSession().getAttribute("DASHBOARD_REFRESH")
+        refreshTime <<[refreshTime:timeToRefresh]
+        render refreshTime as JSON
+	}
 }

@@ -25,8 +25,5 @@ class MoveEventSnapshot {
 			dialIndicator sqltype: 'tinyint'		
 		}
 	}
-    String toString(){
-		moveBundleStep.name + " " + dateCreated
-	}
 
 }
