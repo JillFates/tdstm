@@ -219,7 +219,7 @@
 	* function to move the data steps to right / left
 	*----------------------------------------------*/
 	var	AditionalFrames = 1;
-	function moveDateSteps(){
+	function moveDataSteps(){
 		YAHOO.example = function() {
 			
 			var $D = YAHOO.util.Dom;
@@ -267,7 +267,7 @@
 		}();
 		YAHOO.util.Event.onAvailable('doc',YAHOO.example.init, YAHOO.example, true);
 	}
-	moveDateSteps()
+	moveDataSteps()
 	
 	/* script to assign the move evnt value*/
 	var moveEvent = "${moveEvent?.id}"
@@ -373,30 +373,35 @@
 		} else {
 	    	temp = trimAll(source);
 		}       
-		d1 = new Date(temp)
-	    utc1 = d1.getTime() + (d1.getTimezoneOffset() * 60000);
-	    nd1 = new Date(utc1 + (3600000*offset));                               
-	    date = new Date(nd1.toLocaleString());
-	    //Constructs the time part (hr:mm AM/PM)
-	    gettime = nd1.toLocaleString();         
-	    gettime = trimAll(gettime.substring(gettime.length-11, gettime.length))                        
-		try{
-			var elementSubstr = gettime.substring(0, gettime.length).split(":");
-	    	gettime = elementSubstr[0] + ":" + elementSubstr[1] + " " + trimAll(elementSubstr[2].substring(elementSubstr[2].length-2, elementSubstr[2].length))
-	        
-			//Extracts the month part            
-	        month = nd1.getMonth() + 1      
-	        if (p == ")"){
-	            return month + "/" + nd1.getDate() + ": " + gettime.substring(0,5) +" "+(gettime.substring(5,gettime.length) == "AM" ? "PM" : "AM") + ": " + tsource2;            
-	        } else {
-	            return month + "/" + nd1.getDate() + ": " + gettime.substring(0,5) +" "+(gettime.substring(5,gettime.length) == "AM" ? "PM" : "AM");
-	        }
-
-		} catch(e) {
-	              // alert error message
-		}
-	}
+		date = new Date(temp)
+		utcDate = date.getTime() + (date.getTimezoneOffset()*(-1)* 60000);
+	    convertedDate = new Date(utcDate + (3600000*offset));                               
+	    return getTimeFormate( convertedDate )
 	    
+	}
+	function getTimeFormate( date )
+	{
+		var timeString = ""
+		var month =  date.getMonth();
+		if( !isNaN(month) ){
+		   var monthday    = date.getDate();
+		   var year        = date.getYear() + 1900;
+		   
+		   var hour   = date.getHours();
+		   var minute = date.getMinutes();
+		   var second = date.getSeconds();
+		   var ap = "AM";
+		   if (hour   > 11) { ap = "PM";             }
+		   if (hour   > 12) { hour = hour - 12;      }
+		   if (hour   == 0) { hour = 12;             }
+		   if (hour   < 10) { hour   = "0" + hour;   }
+		   if (minute < 10) { minute = "0" + minute; }
+		   if (second < 10) { second = "0" + second; }
+		   var timeString = month+"/"+monthday+" "+hour + ':' + minute + ':' +  second + " " +  ap;
+		}
+	   return timeString;
+	   
+	}
 	function trimAll(sString) {
 		while (sString.substring(0,1) == ' ') {
 			sString = sString.substring(1, sString.length);
