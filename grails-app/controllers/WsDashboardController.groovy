@@ -102,12 +102,11 @@ class WsDashboardController {
 				moveEventPlannedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent , "P"] )[0]
 				moveEventRevisedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent, "R"] )[0]												 
     		}
-    		
     		def dataPointStepMap  = [ 
 									  "snapshot": [ 
-													"moveEvent" : moveEvent, 
+													"revisedComp" : moveEvent?.revisedCompletionTime, 
 													"moveBundleId" : moveBundleId,
-													"moveEventSnapshot" : ["planned":moveEventPlannedSnapshot, "revised": moveEventRevisedSnapshot],
+													"planDelta" : moveEventPlannedSnapshot?.planDelta,
 													"systime": sysTime,
 													"planSum": [ "dialInd": moveEventPlannedSnapshot?.dialIndicator, "confText": "High", 
 																"confColor": "green", 'compTime':planSumCompTime ?  sdf.format(planSumCompTime) : ""],

@@ -374,6 +374,7 @@
 	    	temp = trimAll(source);
 		}       
 		date = new Date(temp)
+		
 		utcDate = date.getTime() + (date.getTimezoneOffset()*(-1)* 60000);
 	    convertedDate = new Date(utcDate + (3600000*offset));                               
 	    return getTimeFormate( convertedDate )
@@ -449,8 +450,7 @@
 
 		AditionalFrames = ( steps.length > 6 ? steps.length - 5 : 1 )
 		
-		var planned = snapshot.moveEventSnapshot.planned
-		if( planned.planDelta > 0){
+		if( snapshot.planDelta > 0){
 			$(".sum_statusbar_good").attr("class","sum_statusbar_bad")
 			$("#status_color").html("RED")
 		} else {
@@ -463,7 +463,7 @@
 		if(revSum.dialInd == "-1") {
 			$("#topindright").hide();
 			$("#revised_gauge_content").hide();
-		} else if(snapshot.moveEvent.revisedCompletionTime) {
+		} else if(snapshot.revisedComp) {
 
 			updateRevisedGauge("revised_gauge_div",revSum.dialInd)
 			$("#spanRevised").html(convertTime(offset, revSum.compTime))
