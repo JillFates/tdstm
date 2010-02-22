@@ -183,27 +183,37 @@ class MoveBundleController {
 	def createManualStep = {
 		// render( "HELLO WORLD!" )
 		// return
-
-		try {
-			def moveBundleId = Integer.parseInt(params.moveBundleId)
-			def moveBundleStepId = Integer.parseInt(params.moveBundleStepId)
-			def tasksCompleted = Integer.parseInt(params.tasksCompleted)
+		MoveBundleStep.withTransaction { status ->
+			try {
+				def moveBundleId = Integer.parseInt(params.moveBundleId)
+				def moveBundleSteps = request.getParameterValues( "moveBundleStepId" )
 			
-			if ( tasksCompleted < 0 || tasksCompleted > 100 ) {
-				response.sendError( 400, "Bad Request P")
-				// render("400 Bad Request")
-				return false
+				moveBundleSteps.each{ moveStep->
+					def tasksCompleted = Integer.parseInt( request.getParameter("tasksCompleted_"+moveStep) )
+					if (  tasksCompleted < 0 || tasksCompleted > 100 ) {
+						response.sendError( 400, "Bad Request P")
+						// render("400 Bad Request")
+						status.setRollbackOnly()
+						return false
+					}
+					def moveBundleStepId = Integer.parseInt(moveStep)
+					
+					def result = stepSnapshotService.createManualSnapshot( moveBundleId, moveBundleStepId, tasksCompleted )
+				
+					if (result == 200){
+						render ("Record created")
+						flash.result = "Record created"
+					} else {
+						response.sendError( result , "Error ${result}" )
+						flash.result = "Error ${result}"
+						status.setRollbackOnly()
+					}
+				}
+				redirect(action:show,params:[id:moveBundleId, projectId:params.projectId ])
+			} catch(NumberFormatException nfe) {
+				response.sendError( 400, "Bad Request NFE")
+				status.setRollbackOnly()
 			}
- 
-			def result = stepSnapshotService.createManualSnapshot( moveBundleId, moveBundleStepId, tasksCompleted )
-		
-			if (result == 200)
-				render ("Record created")
-			else
-				response.sendError( result , "Error ${result}" )
-		} catch(NumberFormatException nfe) {
-			response.sendError( 400, "Bad Request NFE")
 		}
-
 	}
 }

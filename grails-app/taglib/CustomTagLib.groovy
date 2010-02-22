@@ -24,23 +24,28 @@ class CustomTagLib {
 	}
 	def convertDateTime = { attrs ->
 	Date dt = attrs['date'];
+	def formate = attrs['formate'];
 	
 	String dtStr = dt.getClass().getName().toString();
 	String dtParam = dt.toString();	
 	
-	if(dtStr.equals("java.util.Date")){	
+	if( dtStr.equals("java.util.Date") || dtStr.equals("java.sql.Timestamp") ){	
 		   DateFormat formatter ; 
-		  formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		  formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm a");
 		  dtParam = formatter.format(dt);		
 	}  
 		/* if null or any plain string */
 		if (dtParam != "null") {
 		
 			dtParam = dtParam.trim();
-			out << dtParam[5..6]+"/"+dtParam[8..9]+"/"+dtParam[0..3]+" "+dtParam[11..12]+":"+dtParam[14..15]
-		
+			if(formate == "mm/dd"){
+				out << dtParam[5..6]+"/"+dtParam[8..9]+" "+dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
+			} else {
+				out << dtParam[5..6]+"/"+dtParam[8..9]+"/"+dtParam[0..3]+" "+dtParam[11..12]+":"+dtParam[14..15]
+			}
 		}
 	}
+	
 	def truncate = { attrs ->
 		String value = attrs['value'];
 		if(value){

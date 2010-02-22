@@ -10,7 +10,7 @@
   <body>   
     
     <div class="body">
-      <h1>Show MoveBundle</h1>
+      <h1>Show Move Bundle</h1>
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
       </g:if>
@@ -86,6 +86,47 @@
           <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
         </g:form>
       </div>
+    </div>
+    <div style="float: left;" class="steps_table">
+    <h1>Move Bundle Steps</h1>
+    <g:if test="${flash.result}">
+        <div class="message">${flash.result}</div>
+    </g:if>
+	<g:form action="createManualStep">
+      <div class="dialog">
+        <table >
+        	<thead>
+	        	<tr>
+	        		<th>Label</th>
+	        		<th>Start Time</th>
+	        		<th>Completion Time</th>
+	        		<th>Type</th>
+	        		<th>Value</th>
+	        	</tr>
+	        </thead>
+          <tbody>
+
+          		<input type="hidden" name="moveBundleId" value="${moveBundleInstance?.id}" />
+          		<input type="hidden" name="projectId" value="${projectId}">
+          		<g:each in="${MoveBundleStep.findAll('FROM MoveBundleStep mbs WHERE mbs.calcMethod = :cm AND mbs.moveBundle = :mb ',[cm:'M',mb:moveBundleInstance]) }"
+          			status="i" var="moveBundleStep">
+				<tr>
+				<td>
+				<input type="hidden" value="${moveBundleStep.id }" name="moveBundleStepId">
+				${moveBundleStep.label}</td>
+				<td><tds:convertDateTime date="${moveBundleStep.planStartTime}" formate="mm/dd"/></td>
+				<td><tds:convertDateTime date="${moveBundleStep.planCompletionTime}" formate="mm/dd"/></td>
+				<td>Manual</td>
+				<td><input type="text" name="tasksCompleted_${moveBundleStep.id}" style="width: 25px;" maxlength="3">%</td>
+				</tr>
+				</g:each>
+          </tbody>
+        </table>
+        <div class="buttons">
+          <span class="button"><input type="submit" class="save" value="Save" /></span>
+      </div>
+      </div>
+      </g:form>
     </div>
   </body>
 </html>

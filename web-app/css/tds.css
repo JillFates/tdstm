@@ -402,3 +402,14 @@ text-decoration: line-through;
 .cell-selected{
 	background-color: #FFAF09;
 }
+
+.steps_table table{
+	border: 1px solid #63A242;
+	border-collapse: collapse;
+}
+.steps_table .dialog{
+	border: 2px solid #63A242;
+}
+.steps_table td , th{
+	border: 0.5px solid #DDD
+}

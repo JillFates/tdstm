@@ -146,8 +146,10 @@ log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${l
 			// Update actual start time if by chance it was never set, or user reset time after completing
 			if ( ! moveBundleStep.actualStartTime )	moveBundleStep.actualStartTime = now
 			// If user resets tasks to zero then clear out the start
-			if ( tasksCompleted == 0 ) moveBundleStep.actualStartTime = null
-			moveBundleStep.actualCompletionTime = null	// Clear out since it is not completed
+			if ( tasksCompleted == 0 ){ 
+				moveBundleStep.actualStartTime = null
+				moveBundleStep.actualCompletionTime = null	// Clear out since it is not completed
+			}
 			moveBundleStep.save(force:true)
 
 		}
