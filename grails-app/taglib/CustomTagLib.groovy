@@ -57,4 +57,27 @@ class CustomTagLib {
 			}
 		}
 	}
+	/*
+	 * will return the time + GMT as hh:mm AM/PM formate 
+	 */
+	def convertToGMT = { attrs ->
+		Date dt = attrs['date'];
+		def offsetTZ =  new Date().getTimezoneOffset() / 60 ;
+		String dtStr = dt.getClass().getName().toString();
+		String dtParam = dt.toString();	
+		// check to see whether the input date is Date object or not
+		if( dtStr.equals("java.util.Date") || dtStr.equals("java.sql.Timestamp") ){
+			// convert the date into GMT
+			def date = new Date( (Long)(dt.getTime() + (3600000 * offsetTZ)) ) ;
+			DateFormat formatter ; 
+			// convert the date into required formate
+			formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm a");
+			dtParam = formatter.format(date);		
+		}  
+		/* if null or any plain string */
+		if (dtParam != "null") {
+			dtParam = dtParam.trim();
+			out << dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
+		}
+	}
 }

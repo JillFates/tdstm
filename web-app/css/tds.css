@@ -403,13 +403,18 @@ text-decoration: line-through;
 	background-color: #FFAF09;
 }
 
-.steps_table table{
-	border: 1px solid #63A242;
-	border-collapse: collapse;
+.steps_table{
+	height: auto; 
+	border: 1px solid #5F9FCF; 
+	margin-top: 20px; 
+	padding: 10px 5px 10px 5px; 
+	float: left;
 }
-.steps_table .dialog{
-	border: 2px solid #63A242;
-}
-.steps_table td , th{
-	border: 0.5px solid #DDD
+.steps_table .span{
+	position: absolute; 
+	text-align: center;
+	width: auto; 
+	margin: -17px 0 0 10px; 
+	padding: 0px 8px; 
+	background: #ffffff;
 }

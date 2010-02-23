@@ -5,6 +5,8 @@ class MoveBundleController {
 	def stepSnapshotService
     def partyRelationshipService
     def userPreferenceService
+	def stateEngineService
+	
     def index = { redirect(action:list,params:params) }
 
     // the delete, save and update actions only accept POST requests
@@ -41,7 +43,17 @@ class MoveBundleController {
         	def moveManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "MOVE_MGR" ) 
             //PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'MOVE_MGR' ")
         	
-        	return [ moveBundleInstance : moveBundleInstance, projectId:projectId, projectManager: projectManager, moveManager: moveManager ] 
+			
+			// get the list of Dashboard Steps that are associated to moveBundle
+			def moveBundleSteps = MoveBundleStep.findAll('FROM MoveBundleStep mbs WHERE mbs.calcMethod = :cm AND mbs.moveBundle = :mb ',[cm:'M',mb:moveBundleInstance]) 
+			def dashboardSteps = []
+
+			moveBundleSteps .each{
+				def stepSnapshot = StepSnapshot.findAll("FROM StepSnapshot ss WHERE ss.moveBundleStep = :msb ORDER BY ss.dateCreated DESC",[msb:it, max:1])
+				dashboardSteps << [moveBundleStep : it, stepSnapshot : stepSnapshot[0] ]
+			}
+        	return [ moveBundleInstance : moveBundleInstance, projectId:projectId, projectManager: projectManager, 
+					 moveManager: moveManager, dashboardSteps:dashboardSteps] 
         }
     }
 
@@ -181,6 +193,7 @@ class MoveBundleController {
 	 * @return Returns 200 okay or appropriate error message
 	 */
 	def createManualStep = {
+	/*
 		// render( "HELLO WORLD!" )
 		// return
 		MoveBundleStep.withTransaction { status ->
@@ -215,5 +228,27 @@ class MoveBundleController {
 				status.setRollbackOnly()
 			}
 		}
+	*/
+		try {
+			def moveBundleId = Integer.parseInt(params.moveBundleId)
+			def moveBundleStepId = Integer.parseInt(params.moveBundleStepId)
+			def tasksCompleted = Integer.parseInt(params.tasksCompleted)
+			if ( tasksCompleted < 0 || tasksCompleted > 100 ) {
+				response.sendError( 400, "Bad Request P")
+				// render("400 Bad Request")
+				return false
+			}
+			
+			def result = stepSnapshotService.createManualSnapshot( moveBundleId, moveBundleStepId, tasksCompleted )
+			
+			if (result == 200)
+				render ("Record created")
+				else
+					response.sendError( result , "Error ${result}" )
+		} catch(NumberFormatException nfe) {
+			nfe.printStackTrace()
+			response.sendError( 400, "Bad Request NFE")
+		}
+	 
 	}
 }

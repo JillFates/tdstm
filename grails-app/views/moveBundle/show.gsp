@@ -4,13 +4,63 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="moveBundleHeader" />
-   
-    <title>Show MoveBundle</title>
+   	<g:javascript library="prototype" />
+	<g:javascript library="jquery" />
+	<jq:plugin name="ui.core" />
+    <title>Show Move Bundle</title>
+    <script type="text/javascript">
+    
+   /*
+    function to invoke ESC key to abandon the field
+   */
+    document.onkeypress = keyCheck;   
+	function keyCheck( e ){
+		var keyID 
+		if(window.event){
+			keyID = window.event.keyCode;
+		} else {
+			keyID = e.keyCode;
+		}
+		if(keyID == 27) {
+			$("span[title='input']").each(function(){ 
+		    	  $(this).hide(); // hide value input field
+	    	});
+			$("span[title='text']").each(function(){ 
+		    	  $(this).show(); // show the value text 
+	  		});
+		}
+	}
+	/*
+	* will call the Ajax web service to invoke the moveBundle/createSnapshot method 
+	* when user hit the enter key
+	*/
+    function createSnapshot( stepId, value, e ) {
+        var moveBundle = $("#moveBundleId").val()
+    	var keyID = e.keyCode
+    	if(keyID == 13){
+    		${remoteFunction(controller:'moveBundle', action:'createManualStep', params:'\'moveBundleId=\'+ moveBundle +\'&moveBundleStepId=\'+ stepId +\'&tasksCompleted=\'+value', onComplete:'updateStepValue(e , stepId, value)')}
+    	}
+    }
+    /*
+    * update the value once ajax request success
+    */
+    
+    function updateStepValue(e, stepId, value){
+        if(e.status == 200){
+			$("#tasksCompletedText_"+stepId).html(value);
+			$("#tasksCompletedText_"+stepId).show();
+			$("#tasksCompletedInput_"+stepId).hide();
+        } else {
+            alert("Error : "+e.status+", Record not created")
+        }
+    }
+    </script>
   </head>
   <body>   
     
-    <div class="body">
-      <h1>Show Move Bundle</h1>
+    <div class="body" style="width: 250px;">
+    	<div class="steps_table">
+      <span class="span"><b> Show Move Bundle </b></span>
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
       </g:if>
@@ -67,6 +117,12 @@
               </td>
 
             </tr>
+            <tr class="prop">
+              <td valign="top" class="name">Move Event:</td>
+
+              <td valign="top" class="value"> ${fieldValue(bean:moveBundleInstance, field:'moveEvent')}</td>
+
+            </tr>
 
             <tr class="prop">
               <td valign="top" class="name">Order:</td>
@@ -86,47 +142,47 @@
           <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
         </g:form>
       </div>
+      </div>
     </div>
-    <div style="float: left;" class="steps_table">
-    <h1>Move Bundle Steps</h1>
-    <g:if test="${flash.result}">
-        <div class="message">${flash.result}</div>
-    </g:if>
-	<g:form action="createManualStep">
-      <div class="dialog">
-        <table >
-        	<thead>
-	        	<tr>
-	        		<th>Label</th>
-	        		<th>Start Time</th>
-	        		<th>Completion Time</th>
-	        		<th>Type</th>
-	        		<th>Value</th>
-	        	</tr>
-	        </thead>
-          <tbody>
-
-          		<input type="hidden" name="moveBundleId" value="${moveBundleInstance?.id}" />
-          		<input type="hidden" name="projectId" value="${projectId}">
-          		<g:each in="${MoveBundleStep.findAll('FROM MoveBundleStep mbs WHERE mbs.calcMethod = :cm AND mbs.moveBundle = :mb ',[cm:'M',mb:moveBundleInstance]) }"
-          			status="i" var="moveBundleStep">
+    <div  class="steps_table">
+		<span class="span"><b>Dashboard Steps </b></span>
+		<table id="assetEntityTable">
+			<thead>
 				<tr>
-				<td>
-				<input type="hidden" value="${moveBundleStep.id }" name="moveBundleStepId">
-				${moveBundleStep.label}</td>
-				<td><tds:convertDateTime date="${moveBundleStep.planStartTime}" formate="mm/dd"/></td>
-				<td><tds:convertDateTime date="${moveBundleStep.planCompletionTime}" formate="mm/dd"/></td>
-				<td>Manual</td>
-				<td><input type="text" name="tasksCompleted_${moveBundleStep.id}" style="width: 25px;" maxlength="3">%</td>
+					<th>Dashboard Label</th>
+					<th>Start</th>
+					<th>Completion</th>
+					<th>Duration</th>
+					<th>Type</th>
+					<th>Value</th>
 				</tr>
+			</thead>
+			<tbody id="commetAndNewsBodyId">
+				<input type="hidden" name="moveBundleId" id="moveBundleId" value="${moveBundleInstance?.id}" />
+		        <input type="hidden" name="projectId" value="${projectId}">
+		        <g:each in="${ dashboardSteps }"	status="i" var="dashboardStep">
+					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}" id="commentsRowId_${dashboardStep.moveBundleStep.id }">
+						<td>
+							${dashboardStep.moveBundleStep.label}
+						</td>
+						<td><tds:convertToGMT date="${dashboardStep.moveBundleStep.planStartTime}"/></td>
+						<td><tds:convertToGMT date="${dashboardStep.moveBundleStep.planCompletionTime}"/></td>
+						<td>${dashboardStep.moveBundleStep.getPlanDuration()}</td>
+						<td>Manual</td>
+						<td onclick="$('#tasksCompletedText_${dashboardStep.moveBundleStep.id }').hide();$('#tasksCompletedInput_${dashboardStep.moveBundleStep.id }').show();">
+							<span style="display: none;" id="tasksCompletedInput_${dashboardStep.moveBundleStep.id }" title="input">
+								<input type="text" name="tasksCompleted" style="width: 25px;" id="tasksCompleted_${dashboardStep.moveBundleStep.id }" maxlength="3" 
+								onkeypress="createSnapshot(${dashboardStep.moveBundleStep.id }, this.value, event )">
+							</span>
+							<span id="tasksCompletedText_${dashboardStep.moveBundleStep.id }" title="text">${dashboardStep.stepSnapshot?.tasksCompleted}</span>%
+						</td>
+					</tr>
 				</g:each>
-          </tbody>
-        </table>
-        <div class="buttons">
-          <span class="button"><input type="submit" class="save" value="Save" /></span>
+			</tbody>
+		</table>
+		<div>
+          <span style="float: right;">Dashboard Server : <input type="button" name="serverOn" value="On" />&nbsp;<input type="button" name="serverOff" value="Off" /></span>
       </div>
-      </div>
-      </g:form>
-    </div>
+	</div>
   </body>
 </html>
