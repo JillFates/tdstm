@@ -64,7 +64,6 @@
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
       </g:if>
-      <div class="dialog">
         <table>
           <tbody>
 
@@ -134,7 +133,8 @@
           </tbody>
         </table>
       </div>
-      <div class="buttons">
+      <br>
+      <div class="buttons" style="float: left;">
         <g:form>
           <input type="hidden" name="id" value="${moveBundleInstance?.id}" />
           <input type="hidden" name="projectId" value="${projectId}" />
@@ -142,8 +142,8 @@
           <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
         </g:form>
       </div>
-      </div>
     </div>
+    <div class="body" style="margin: 0;">
     <div  class="steps_table">
 		<span class="span"><b>Dashboard Steps </b></span>
 		<table id="assetEntityTable">
@@ -167,7 +167,7 @@
 						</td>
 						<td><tds:convertToGMT date="${dashboardStep.moveBundleStep.planStartTime}"/></td>
 						<td><tds:convertToGMT date="${dashboardStep.moveBundleStep.planCompletionTime}"/></td>
-						<td>${dashboardStep.moveBundleStep.getPlanDuration()}</td>
+						<td>${dashboardStep.stepSnapshot?.duration}</td>
 						<td>Manual</td>
 						<td onclick="$('#tasksCompletedText_${dashboardStep.moveBundleStep.id }').hide();$('#tasksCompletedInput_${dashboardStep.moveBundleStep.id }').show();">
 							<span style="display: none;" id="tasksCompletedInput_${dashboardStep.moveBundleStep.id }" title="input">
@@ -180,7 +180,8 @@
 				</g:each>
 			</tbody>
 		</table>
-		<div>
+	</div>
+	<div>
           <span style="float: right;">Dashboard Server : <input type="button" name="serverOn" value="On" />&nbsp;<input type="button" name="serverOff" value="Off" /></span>
       </div>
 	</div>

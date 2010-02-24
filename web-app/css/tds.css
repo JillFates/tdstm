@@ -407,8 +407,11 @@ text-decoration: line-through;
 	height: auto; 
 	border: 1px solid #5F9FCF; 
 	margin-top: 20px; 
-	padding: 10px 5px 10px 5px; 
+	padding: 10px 0px ; 
 	float: left;
+}
+.steps_table table{
+	border: 0px; 
 }
 .steps_table .span{
 	position: absolute; 

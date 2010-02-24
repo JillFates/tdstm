@@ -1,4 +1,5 @@
 import java.text.SimpleDateFormat
+import com.tdssrc.grails.GormUtil
  
 class MoveBundleController {
 
@@ -6,6 +7,7 @@ class MoveBundleController {
     def partyRelationshipService
     def userPreferenceService
 	def stateEngineService
+	def moveBundleService
 	
     def index = { redirect(action:list,params:params) }
 
@@ -35,8 +37,7 @@ class MoveBundleController {
         if(!moveBundleInstance) {
             flash.message = "MoveBundle not found with id ${params.id}"
             redirect(action:list)
-        }
-        else {
+        } else {
         	userPreferenceService.setPreference( "CURR_BUNDLE", "${moveBundleInstance.id}" )
             def projectManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "PROJ_MGR" ) 
             //PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'PROJ_MGR' ")
@@ -44,8 +45,8 @@ class MoveBundleController {
             //PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'MOVE_MGR' ")
         	
 			
-			// get the list of Dashboard Steps that are associated to moveBundle
-			def moveBundleSteps = MoveBundleStep.findAll('FROM MoveBundleStep mbs WHERE mbs.calcMethod = :cm AND mbs.moveBundle = :mb ',[cm:'M',mb:moveBundleInstance]) 
+			// get the list of Manual Dashboard Steps that are associated to moveBundle.project
+			def moveBundleSteps = MoveBundleStep.findAll('FROM MoveBundleStep mbs WHERE mbs.calcMethod = :cm AND mbs.moveBundle = :mb ORDER BY mbs.transitionId',[cm:'M',mb:moveBundleInstance]) 
 			def dashboardSteps = []
 
 			moveBundleSteps .each{
@@ -83,8 +84,7 @@ class MoveBundleController {
         if(!moveBundleInstance) {
             flash.message = "MoveBundle not found with id ${params.id}"
             redirect(action:list, params:[projectId: projectId])
-        }
-        else {
+        } else {
         	def managers = partyRelationshipService.getProjectStaff( projectId )
         	def projectManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "PROJ_MGR" )
             //PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'PROJ_MGR' ")
@@ -96,7 +96,14 @@ class MoveBundleController {
         	if( moveManager != null ){
         		moveManager = moveManager.partyIdTo.id
         	}
-        	return [ moveBundleInstance : moveBundleInstance, projectId: projectId, managers: managers, projectManager: projectManager, moveManager: moveManager]
+        	
+        	
+        	//get the all Dashboard Steps that are associated to moveBundle.project
+			def allDashboardSteps = moveBundleService.getAllDashboardSteps( moveBundleInstance )
+			def remainingSteps = allDashboardSteps.remainingSteps
+		       	
+        	return [ moveBundleInstance : moveBundleInstance, projectId: projectId, managers: managers, projectManager: projectManager, 
+					 moveManager: moveManager, dashboardSteps: allDashboardSteps.dashboardSteps, remainingSteps : remainingSteps]
         	
         }
     }
@@ -125,13 +132,18 @@ class MoveBundleController {
                 flash.message = "MoveBundle ${moveBundleInstance} updated"
                 //redirect(action:show,params:[id:moveBundleInstance.id, projectId:projectId])
                 redirect(action:show,id:moveBundleInstance.id, params:[projectId: projectId])
-            }
-            else {
+            } else {
+            	
+            	//	get the all Dashboard Steps that are associated to moveBundle.project
+    			def allDashboardSteps = moveBundleService.getAllDashboardSteps( moveBundleInstance )
+				def remainingSteps = allDashboardSteps.remainingSteps
+				
             	moveBundleInstance.discard()
             	def managers = partyRelationshipService.getProjectStaff( projectId )
             	def projectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'PROJ_MGR' ")
             	def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'MOVE_MGR' ")
-                render(view:'edit',model:[moveBundleInstance:moveBundleInstance, projectId: projectId, managers: managers, projectManager: projectManagerId, moveManager: moveManagerId ])
+                render(view:'edit',model:[moveBundleInstance:moveBundleInstance, projectId: projectId, managers: managers, projectManager: projectManagerId, 
+										  moveManager: moveManagerId, dashboardSteps:allDashboardSteps.dashboardSteps, remainingSteps : remainingSteps ])
             }
         }
         else {
@@ -250,5 +262,26 @@ class MoveBundleController {
 			response.sendError( 400, "Bad Request NFE")
 		}
 	 
+	}
+	/* if the checkbox is subsequently checked and the form submitted, a new MoveBundleStep shall be created for that transition.
+	 *  @param moveBundleId
+	 * 	@param transitionId
+	 * 	@return  new moveBundleStep
+	 */
+	def createMoveBundleStep = {
+		def moveBundle = MoveBundle.get( params.moveBundleId )
+		def transitionId = Integer.parseInt( params.transitionId )
+		def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundle , transitionId) 
+		if( !moveBundleStep ){	
+			moveBundleStep = new MoveBundleStep(moveBundle:moveBundle, transitionId:transitionId, calcMethod:"L")
+			moveBundleStep.label = stateEngineService.getDashboardLabel( moveBundle.project.workflowCode, transitionId )
+			if ( !moveBundleStep.validate() || !moveBundleStep.save(flush:true) ) {
+				def etext = "Unable to create moveBundleStep" +
+				GormUtil.allErrorsString( model )
+				response.sendError( 500, "Validation Error")
+		       	println etext
+			}
+		}
+		render moveBundleStep 
 	}
 }

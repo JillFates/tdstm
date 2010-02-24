@@ -4,6 +4,7 @@ import org.springframework.dao.IncorrectResultSizeDataAccessException
 class MoveBundleService {
 	
 	def jdbcTemplate
+	def stateEngineService
     
 	boolean transactional = true
 	
@@ -72,5 +73,29 @@ class MoveBundleService {
 		}
 		return actualTimes
 	
+    }
+    /* return all of the Transitions from the XML based on the workflow_code of the project that the move_bundle is associated with.
+     * @author Lokanada Reddy
+     * @param moveBundleId 
+	 * @return Map[step,movebundleStep,snapshot] 
+     */
+	def getAllDashboardSteps( def moveBundle ) {
+		def stepsList = stateEngineService.getDashboardSteps( moveBundle.project.workflowCode )
+		def moveBundleSteps = MoveBundleStep.findAll('FROM MoveBundleStep mbs WHERE mbs.moveBundle = :mb ORDER BY mbs.transitionId',[mb:moveBundle])
+		def dashboardSteps = []
+
+		stepsList.each{
+			def moveBundleStep
+			def stepSnapshot = []
+			def stepIndex = moveBundleSteps.transitionId.indexOf(it.id)
+			if(stepIndex != -1){
+				moveBundleStep = moveBundleSteps[stepIndex]
+				stepSnapshot = StepSnapshot.findAll("FROM StepSnapshot ss WHERE ss.moveBundleStep = :mbs ORDER BY ss.dateCreated DESC",[mbs:moveBundleStep, max:1])
+				moveBundleSteps.remove(stepIndex)
+			}
+			dashboardSteps << [step :it, moveBundleStep : moveBundleStep, stepSnapshot : stepSnapshot[0] ]
+		}
+		
+		return [dashboardSteps : dashboardSteps , remainingSteps : moveBundleSteps?.transitionId ]
     }
 }
