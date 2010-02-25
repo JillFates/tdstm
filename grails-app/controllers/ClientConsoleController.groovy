@@ -206,6 +206,7 @@ class ClientConsoleController {
     		redirect(controller:'project',action:'show',params:["id":params.projectId])
     	}
 	}
+
 	/*---------------------------------------------------------
 	 * To get list of task for an asset through ajax
 	 * @author : Bhuvaneshwari
@@ -383,13 +384,13 @@ class ClientConsoleController {
 		def assetEntityList = []
 		def assetEntityAndCommentList = []
 		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
-		if(bundleId){
+		if (bundleId) {
 			def moveBundleInstance = MoveBundle.findById( bundleId )
 			def lastPoolTime = params.lastPoolTime
 			def today = new java.util.Date();
 			def currentPoolTime = new java.sql.Timestamp(today.getTime())
 			getSession().setAttribute("LAST_POOL_TIME",currentPoolTime)
-			def query = new StringBuffer("select ae.asset_entity_id as id,ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,ae.asset_name "+
+			def query = new StringBuffer("SELECT ae.asset_entity_id as id, ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,ae.asset_name "+
 											" as assetName,max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_entity ae "+
 											" LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id and at.type = 'process' and at.voided = 0 ) where ae.asset_entity_id in "+
 											" ( select t.asset_entity_id from asset_transition t where t.voided = 0 and t.date_created between '$lastPoolTime' and '$currentPoolTime' )"+
@@ -507,7 +508,7 @@ class ClientConsoleController {
 					}
 				}
 			}
-			assetEntityAndCommentList << [ assetEntityList: assetEntityList, assetCommentsList: assetCommentsList, lastPoolTime : lastPoolTime ]
+			assetEntityAndCommentList << [ assetEntityList: assetEntityList, assetCommentsList: assetCommentsList, lastPoolTime : currentPoolTime ]
 		}
     	render assetEntityAndCommentList as JSON
     }
