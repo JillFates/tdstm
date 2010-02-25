@@ -80,22 +80,26 @@ class MoveBundleService {
 	 * @return Map[step,movebundleStep,snapshot] 
      */
 	def getAllDashboardSteps( def moveBundle ) {
-		def stepsList = stateEngineService.getDashboardSteps( moveBundle.project.workflowCode )
+    	
+		
 		def moveBundleSteps = MoveBundleStep.findAll('FROM MoveBundleStep mbs WHERE mbs.moveBundle = :mb ORDER BY mbs.transitionId',[mb:moveBundle])
 		def dashboardSteps = []
-
-		stepsList.each{
-			def moveBundleStep
-			def stepSnapshot = []
-			def stepIndex = moveBundleSteps.transitionId.indexOf(it.id)
-			if(stepIndex != -1){
-				moveBundleStep = moveBundleSteps[stepIndex]
-				stepSnapshot = StepSnapshot.findAll("FROM StepSnapshot ss WHERE ss.moveBundleStep = :mbs ORDER BY ss.dateCreated DESC",[mbs:moveBundleStep, max:1])
-				moveBundleSteps.remove(stepIndex)
+		try{
+			def stepsList = stateEngineService.getDashboardSteps( moveBundle.project.workflowCode )
+			stepsList.each{
+				def moveBundleStep
+				def stepSnapshot = []
+				def stepIndex = moveBundleSteps.transitionId.indexOf(it.id)
+				if(stepIndex != -1){
+					moveBundleStep = moveBundleSteps[stepIndex]
+					stepSnapshot = StepSnapshot.findAll("FROM StepSnapshot ss WHERE ss.moveBundleStep = :mbs ORDER BY ss.dateCreated DESC",[mbs:moveBundleStep, max:1])
+					moveBundleSteps.remove(stepIndex)
+				}
+				dashboardSteps << [step :it, moveBundleStep : moveBundleStep, stepSnapshot : stepSnapshot[0] ]
 			}
-			dashboardSteps << [step :it, moveBundleStep : moveBundleStep, stepSnapshot : stepSnapshot[0] ]
+		} catch(NullPointerException npe) {	
+			npe.printStackTrace()
 		}
-		
 		return [dashboardSteps : dashboardSteps , remainingSteps : moveBundleSteps?.transitionId ]
     }
 }

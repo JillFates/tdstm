@@ -1,8 +1,14 @@
-class StateEngineServiceTests extends GroovyTestCase {
-def stateEngineService =  new StateEngineService()
+import org.springframework.jdbc.core.JdbcTemplate
+
+class StateEngineServiceTests extends DatasourceTests {
+	
+	def stateEngineService =  new StateEngineService()
+	
+	def jdbcTemplate = new JdbcTemplate( getDatasource() )
 	
 	//test for def getTasks( String process, String swimlane, String currentState )
     void testgetTasks() {
+    	stateEngineService.jdbcTemplate = jdbcTemplate
 		stateEngineService.afterPropertiesSet()
 		assertEquals stateEngineService.getTasks("STD_PROCESS","ROLE_WF_MANAGER", "Ready") , ["Release", "Hold", "PoweredDown"]
     }
@@ -14,5 +20,28 @@ def stateEngineService =  new StateEngineService()
 	//test for def getFlags( String process, String swimlane, String currentState, String toState )
 	void testgetFlags() {
 		assertEquals "skipped", stateEngineService.getFlags("STD_PROCESS","ROLE_WF_MANAGER", "Ready", "Release")  
+	}
+	// test for def getPredecessor( String process, Integer transitionId )
+	void testgetPredecessor(){
+		
+		assertEquals "50", stateEngineService.getPredecessor("STD_PROCESS",60)
+		
+		assertEquals false, stateEngineService.getPredecessor("STD_PROCESS",50)
+	}
+	
+	// test for def getDashboardLabel( String process, Integer transitionId )
+	void testgetDashboardLabel(){
+		
+		assertEquals "Unracking", stateEngineService.getDashboardLabel("STD_PROCESS",60)
+		
+		assertEquals "Unracking", stateEngineService.getDashboardLabel("STD_PROCESS",50)
+	}
+	
+	// test for def getDashboardLabel( String process, Integer transitionId )
+	void testgetDashboardSteps(){
+		
+		assertEquals true, stateEngineService.getDashboardSteps("STD_PROCESS").contains(['id':60, 'label':'Unracking', 'name':'Unracked'])
+		
+		assertEquals false, stateEngineService.getDashboardSteps("STD_PROCESS").contains(['id':50, 'label':'Unracking', 'name':'Unracking'])
 	}
 }
