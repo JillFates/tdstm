@@ -1,7 +1,11 @@
 import grails.converters.JSON
 class MoveEventNewsController {
 	def jdbcTemplate
-
+	
+	/* will return the list of AssetComments and MoveEventNews
+	 * @param : moveEventId?type=[N|I}&state=[L|A]&maxLen= n &sort=[A|D]
+	 * @return : union (AssetComments , MoveEventNews) 
+	 */
 	def list = {
 			def projectId = getSession().getAttribute("CURR_PROJ")?.CURR_PROJ
 			def moveEventId = params.id
@@ -14,7 +18,7 @@ class MoveEventNewsController {
 			if(moveEventId){ 
 				moveEvent = MoveEvent.get(moveEventId)
 			}
-				def offsetTZ = ( new Date().getTimezoneOffset() / 60 ) * ( -1 )
+				def offsetTZ = ( new Date().getTimezoneOffset() / 60 ) 
 			if(moveEvent){
 			 
 				def assetCommentsQuery = new StringBuffer( "select ac.asset_comment_id as id,  'I' as type, "+
@@ -53,13 +57,30 @@ class MoveEventNewsController {
 					queryForCommentsList.append( " order by created desc" )
 				}
 				
-				if(maxLen){
-					queryForCommentsList.append( " limit ${maxLen}")	
-				}
 				totalComments = jdbcTemplate.queryForList( queryForCommentsList.toString() )
+				totalComments.each{
+					if(maxLen){
+						it.text = truncate(it.text, maxLen)
+					}
+				}
 				
 			}
+				
 			render totalComments as JSON
 	}
+	/* will truncate the test to specified length 
+	 * @param : text as value
+	 * @param : length to truncate
+	 */
+	def truncate (def value, def length){
+		if(value ){
+			def size = value.size()
+			if(size > length){
+				return value.substring(0,length -3 )+'...'
+			} else {
+				return value
+			}
+		}
+	}	
 	
 }
