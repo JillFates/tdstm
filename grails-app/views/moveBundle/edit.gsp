@@ -242,7 +242,7 @@
           <input type="hidden" name="project.id" value="${projectId }"/>
           <input type="hidden" name="projectId" value="${projectId }"/>
           <span class="button"><g:actionSubmit class="save" value="Update" /></span>
-          <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
+          <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Cancel" action="show" /></span>
         </div>
       </g:form>
       <g:javascript>

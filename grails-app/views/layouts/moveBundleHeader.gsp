@@ -111,6 +111,9 @@
 			<li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundle?.id]" >Team </g:link> </li>
 			<li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundle?.id]" >Bundle Asset Assignment</g:link> </li>
 			<li><g:link class="home" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundle?.id, rack:'UnrackPlan']" >Bundle Team Assignment </g:link> </li>
+			<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+				<li><g:link class="home" controller="moveEvent" action="list" params="[bundleId:moveBundle?.id]" >Move Event</g:link> </li>
+			</jsec:hasAnyRole>
 		</ul>
 	</div>
 	<div class="menu2" id="reportsMenu" style="background-color:#003366;display: none;">

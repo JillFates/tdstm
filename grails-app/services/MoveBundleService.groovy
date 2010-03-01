@@ -102,4 +102,15 @@ class MoveBundleService {
 		}
 		return [dashboardSteps : dashboardSteps , remainingSteps : moveBundleSteps?.transitionId ]
     }
+    /*----------------------------------------------------
+     * will update the moveBundles with moveEvent
+     * @author : Lokanada Reddy
+     * @param  : moveEvent, moveBundles
+     *--------------------------------------------------*/
+	def assignMoveEvent( def moveEvent, def moveBundles ){
+		MoveBundle.executeUpdate( "UPDATE MoveBundle mb SET mb.moveEvent = null where mb.moveEvent = :me",[ me:moveEvent ] )
+		moveBundles.each{
+			moveEvent.addToMoveBundles( MoveBundle.get( it ) )
+		}
+    }
 }
