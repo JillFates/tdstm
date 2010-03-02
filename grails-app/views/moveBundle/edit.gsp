@@ -310,11 +310,12 @@
 							</span>
 							</td>
 							<td>
-							<span id="durationText_${dashboardStep.step.id }" title="text">${dashboardStep.stepSnapshot?.duration}</span>
+							<span id="durationText_${dashboardStep.step.id }" title="text">
+							<tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/> </span>
 							
 							<span id="durationInput_${dashboardStep.step.id }" style="display: none;" title="input">
 								<input type="text" name="duration_${dashboardStep.step.id }" 
-								value="${dashboardStep.stepSnapshot?.duration}"	style="width: 60px;">
+								value="<tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/>"	style="width: 60px;">
 							</span>
 							</td>
 							<td>
@@ -328,12 +329,13 @@
 							</td>
 							<td>
 								<span id="tasksCompletedText_${dashboardStep.step.id }" title="text">${dashboardStep.stepSnapshot?.tasksCompleted}
-								<g:if test="${dashboardStep.moveBundleStep}">%</g:if></span>
+								</span>
 								
 								<span style="display: none;" id="tasksCompletedInput_${dashboardStep.step.id }" title="input">
 									<input type="text" name="tasksCompleted" style="width: 25px;" value="${dashboardStep.stepSnapshot?.tasksCompleted}" 
-									id="tasksCompleted_${dashboardStep.step.id }" maxlength="3" >%
+									id="tasksCompleted_${dashboardStep.step.id }" maxlength="3" >
 								</span>
+								<g:if test="${dashboardStep.moveBundleStep?.calcMethod == 'M'}">%</g:if>
 							</td>
 					</tr>
 				</g:each>

@@ -167,14 +167,20 @@
 						</td>
 						<td><tds:convertToGMT date="${dashboardStep.moveBundleStep.planStartTime}"/></td>
 						<td><tds:convertToGMT date="${dashboardStep.moveBundleStep.planCompletionTime}"/></td>
-						<td>${dashboardStep.stepSnapshot?.duration}</td>
-						<td>Manual</td>
+						<td><tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/></td>
+						<td>
+						<g:if test="${dashboardStep.moveBundleStep?.calcMethod != 'L'}">
+							Manual
+						</g:if>
+						<g:else>Linear</g:else>
+						</td>
 						<td onclick="$('#tasksCompletedText_${dashboardStep.moveBundleStep.id }').hide();$('#tasksCompletedInput_${dashboardStep.moveBundleStep.id }').show();">
 							<span style="display: none;" id="tasksCompletedInput_${dashboardStep.moveBundleStep.id }" title="input">
 								<input type="text" name="tasksCompleted" style="width: 25px;" id="tasksCompleted_${dashboardStep.moveBundleStep.id }" maxlength="3" 
 								onkeypress="createSnapshot(${dashboardStep.moveBundleStep.id }, this.value, event )">
 							</span>
-							<span id="tasksCompletedText_${dashboardStep.moveBundleStep.id }" title="text">${dashboardStep.stepSnapshot?.tasksCompleted}</span>%
+							<span id="tasksCompletedText_${dashboardStep.moveBundleStep.id }" title="text">${dashboardStep.stepSnapshot?.tasksCompleted}</span>
+							<g:if test="${dashboardStep.moveBundleStep?.calcMethod != 'L'}">%</g:if>
 						</td>
 					</tr>
 				</g:each>

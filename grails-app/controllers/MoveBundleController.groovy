@@ -46,7 +46,7 @@ class MoveBundleController {
         	
 			
 			// get the list of Manual Dashboard Steps that are associated to moveBundle.project
-			def moveBundleSteps = MoveBundleStep.findAll('FROM MoveBundleStep mbs WHERE mbs.calcMethod = :cm AND mbs.moveBundle = :mb ORDER BY mbs.transitionId',[cm:'M',mb:moveBundleInstance]) 
+			def moveBundleSteps = MoveBundleStep.findAll('FROM MoveBundleStep mbs WHERE mbs.moveBundle = :mb ORDER BY mbs.transitionId',[mb:moveBundleInstance]) 
 			def dashboardSteps = []
 
 			moveBundleSteps .each{

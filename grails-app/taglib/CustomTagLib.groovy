@@ -80,4 +80,22 @@ class CustomTagLib {
 			out << dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
 		}
 	}
+	/*
+	 * Convert seconds into HH:MM:SS format
+	 * value should be in seconds
+	 */
+	def formatIntoHHMMSS = { attrs ->
+		def value = attrs['value'];
+		if( value ){
+			def timeFormate 
+    	    def hours = (Integer)(value / 3600 )
+    	    	timeFormate = hours >= 10 ? hours : '0'+hours
+    	    def minutes = (Integer)(( value % 3600 ) / 60 )
+    	    	timeFormate += ":"+(minutes >= 10 ? minutes : '0'+minutes)
+			def seconds = (Integer)((value % 3600) % 60)
+				timeFormate += ":"+(seconds >= 10 ? seconds : '0'+seconds)
+			
+			out << timeFormate
+		}
+	}
 }
