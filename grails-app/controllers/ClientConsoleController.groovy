@@ -393,7 +393,7 @@ class ClientConsoleController {
 			def query = new StringBuffer("SELECT ae.asset_entity_id as id, ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,ae.asset_name "+
 											" as assetName,max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_entity ae "+
 											" LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id and at.type = 'process' and at.voided = 0 ) where ae.asset_entity_id in "+
-											" ( select t.asset_entity_id from asset_transition t where t.voided = 0 and t.date_created between '$lastPoolTime' and '$currentPoolTime' )"+
+											" ( select t.asset_entity_id from asset_transition t where t.voided = 0 and t.date_created between SUBTIME('$lastPoolTime','00:05:30') and '$currentPoolTime' )"+
 											" and ae.project_id = $moveBundleInstance.project.id and ae.move_bundle_id = ${moveBundleInstance.id}")
 			if(appValue!="" && appValue!= null){
 				query.append(" and ae.application ='$appValue'")
@@ -508,7 +508,7 @@ class ClientConsoleController {
 					}
 				}
 			}
-			assetEntityAndCommentList << [ assetEntityList: assetEntityList, assetCommentsList: assetCommentsList, lastPoolTime : currentPoolTime ]
+			assetEntityAndCommentList << [ assetEntityList: assetEntityList, assetCommentsList: assetCommentsList, lastPoolTime : currentPoolTime.toString() ]
 		}
     	render assetEntityAndCommentList as JSON
     }
