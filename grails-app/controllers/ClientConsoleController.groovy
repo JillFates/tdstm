@@ -496,16 +496,17 @@ class ClientConsoleController {
 			def assetCommentsList = []
 			def assetsList = AssetEntity.findAll("from AssetEntity where moveBundle = ${moveBundleInstance.id}")
 			assetsList.each {
-				def checkIssueType = AssetComment.find("from AssetComment where assetEntity=$it.id and commentType='issue' and isResolved = 0")
+				def checkIssueType = AssetComment.find("from AssetComment where assetEntity=$it.id and commentType='issue' and isResolved = 0"+
+													" and date_created between SUBTIME(CURRENT_TIMESTAMP,'00:10:00') and CURRENT_TIMESTAMP ")
 				if ( checkIssueType ) {
 					assetCommentsList << ["assetEntityId":it.id, "type":"database_table_red.png"]
 				} else {
-					checkIssueType = AssetComment.find("from AssetComment where assetEntity=$it.id")
+					checkIssueType = AssetComment.find("from AssetComment where assetEntity=$it.id and date_created between SUBTIME(CURRENT_TIMESTAMP,'00:10:00') and CURRENT_TIMESTAMP")
 					if ( checkIssueType ) {
 						assetCommentsList << ["assetEntityId":it.id, "type":"database_table_bold.png"]
-					} else if( role ){
+					} /*else if( role ){
 						assetCommentsList << ["assetEntityId":it.id, "type":"database_table_light.png"]
-					}
+					}*/
 				}
 			}
 			assetEntityAndCommentList << [ assetEntityList: assetEntityList, assetCommentsList: assetCommentsList, lastPoolTime : currentPoolTime.toString() ]
