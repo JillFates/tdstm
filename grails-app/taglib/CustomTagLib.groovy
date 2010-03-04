@@ -81,7 +81,7 @@ class CustomTagLib {
 		}
 	}
 	/*
-	 * Convert seconds into HH:MM:SS format
+	 * Convert seconds into HH:MM format
 	 * value should be in seconds
 	 */
 	def formatIntoHHMMSS = { attrs ->
@@ -92,8 +92,6 @@ class CustomTagLib {
     	    	timeFormate = hours >= 10 ? hours : '0'+hours
     	    def minutes = (Integer)(( value % 3600 ) / 60 )
     	    	timeFormate += ":"+(minutes >= 10 ? minutes : '0'+minutes)
-			def seconds = (Integer)((value % 3600) % 60)
-				timeFormate += ":"+(seconds >= 10 ? seconds : '0'+seconds)
 			
 			out << timeFormate
 		}
