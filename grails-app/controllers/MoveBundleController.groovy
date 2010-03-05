@@ -125,7 +125,15 @@ class MoveBundleController {
             	moveBundleInstance.completionTime =  formatter.parse( completionTime )
             }
             if(!moveBundleInstance.hasErrors() && moveBundleInstance.save() ) {
-            	           	
+            	def stepsList = stateEngineService.getDashboardSteps( moveBundleInstance.project.workflowCode )
+				stepsList.each{
+					def checkbox = params["checkbox_"+it.id]
+					if(checkbox  && checkbox == 'on'){
+						def moveBundleStep = moveBundleService.createMoveBundleStep(moveBundleInstance, it.id, params)
+						def tasksCompleted = params["tasksCompleted_"+it.id] ? Integer.parseInt(params["tasksCompleted_"+it.id]) : 0
+						stepSnapshotService.createManualSnapshot( moveBundleInstance.id, moveBundleStep.id, tasksCompleted, params["duration_"+it.id] )
+					}
+				}
             	//def projectManegerInstance = Party.findById( projectManagerId )
             	def updateMoveBundlePMRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", projectManagerId, "PROJ_MGR" )
             	def updateMoveBundleMMRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", moveManagerId, "MOVE_MGR" )
@@ -251,7 +259,7 @@ class MoveBundleController {
 				return false
 			}
 			
-			def result = stepSnapshotService.createManualSnapshot( moveBundleId, moveBundleStepId, tasksCompleted )
+			def result = stepSnapshotService.createManualSnapshot( moveBundleId, moveBundleStepId, tasksCompleted, null )
 			
 			if (result == 200)
 				render ("Record created")

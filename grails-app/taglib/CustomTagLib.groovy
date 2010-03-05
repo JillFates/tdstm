@@ -77,7 +77,7 @@ class CustomTagLib {
 		/* if null or any plain string */
 		if (dtParam != "null") {
 			dtParam = dtParam.trim();
-			out << dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
+			out << dtParam[5..6]+"/"+dtParam[8..9]+"/"+dtParam[0..3]+" "+dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
 		}
 	}
 	/*

@@ -58,7 +58,7 @@
 			}
 			
 		}
-    	function enableInput( stepId , type ){
+    	function enableInput( stepId){
     		if($("#checkbox_"+stepId ).is(':checked')){
 				$("#labelText_"+stepId ).hide();
 				$("#labelInput_"+stepId ).show();
@@ -70,12 +70,12 @@
 				$("#durationInput_"+stepId ).show();
 				$("#calcMethodText_"+stepId ).hide();
 				$("#calcMethodInput_"+stepId ).show();
-				$("#tasksCompletedText_"+stepId ).hide();
-				$("#tasksCompletedInput_"+stepId ).show();
-				var moveBundle = $("#moveBundleId").val()
-				if(type == 'L'){
-					${remoteFunction(controller:'moveBundle', action:'createMoveBundleStep', params:'\'moveBundleId=\'+ moveBundle +\'&transitionId=\'+ stepId ')}
+				if($("#calcMethod__"+stepId) == "M"){
+					$("#tasksCompletedText_"+stepId ).hide();
+					$("#tasksCompletedInput_"+stepId ).show();
 				}
+				var moveBundle = $("#moveBundleId").val()
+				//${remoteFunction(controller:'moveBundle', action:'createMoveBundleStep', params:'\'moveBundleId=\'+ moveBundle +\'&transitionId=\'+ stepId ')}
     		} else {
     			$("#labelText_"+stepId ).show();
 				$("#labelInput_"+stepId ).hide();
@@ -90,6 +90,66 @@
 				$("#tasksCompletedText_"+stepId ).show();
 				$("#tasksCompletedInput_"+stepId ).hide();
     		}
+        }
+        function showTaskCompleted(type, stepId){
+			if(type == "M" ){
+				$("#tasksCompletedText_"+stepId ).hide();
+				$("#tasksCompletedInput_"+stepId ).show();
+			} else {
+				$("#tasksCompletedText_"+stepId ).show();
+				$("#tasksCompletedInput_"+stepId ).hide();
+			}
+        }
+        function calculateDuration( stepId ){
+            var start = $("#startTime_"+stepId).val()
+            var completion = $("#completionTime_"+stepId).val()
+            if(completion && start ){
+            	var duration
+                var startTime = new Date( start ).getTime()
+                var completionTime  = new Date( completion ).getTime()
+                if(completionTime > startTime){
+                	duration = completionTime - startTime    
+                } else {
+                    alert("Completion Time should be greater than Start Time")
+                }
+                if(duration){
+                	$("#duration_"+stepId).val(convertIntoHHMM(duration / 1000))
+                	$("#durationIn_"+stepId).val(duration / 1000)
+                }
+            }
+        } 
+        function convertIntoHHMM( seconds ){
+        	var timeFormate 
+    	    var hours = parseInt(seconds / 3600) 
+    	    	timeFormate = hours >= 10 ? hours : '0'+hours
+    	    var minutes =  parseInt((seconds % 3600 ) / 60 )
+    	    	timeFormate += ":"+(minutes >= 10 ? minutes : '0'+minutes)
+    	    	return timeFormate
+        }
+        function changeCompletionTime(time, stepId){
+            var hours = time.substring(0,2)
+            var min = time.substring(3,5)
+            if(hours  && min){
+                var ms = (3600000 * hours )+ (60000 * min)
+            }
+            var completionTimeString = $("#completionTime_"+stepId).val()
+            if(completionTimeString){
+    	        var completionTime = new Date( completionTimeString )
+        	    var updatedTime = new Date(completionTime.getTime() + ms)
+	     		var month =  updatedTime.getMonth() + 1;
+        		var monthday    = updatedTime.getDate();
+        		var year        = updatedTime.getYear() + 1900;
+        		
+        		var hour   = updatedTime.getHours();
+        		var minute = updatedTime.getMinutes();
+        		var second = updatedTime.getSeconds();
+        		
+        		if (hour   < 10) { hour   = "0" + hour;   }
+        		if (minute < 10) { minute = "0" + minute; }
+        		if (second < 10) { second = "0" + second; }
+        		var timeString = month+"/"+monthday+"/"+year+" "+hour + ':' + minute ;
+        		$("#completionTime_"+stepId).val( timeString )
+            }
         }
     </script>
   </head>
@@ -244,7 +304,6 @@
           <span class="button"><g:actionSubmit class="save" value="Update" /></span>
           <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Cancel" action="show" /></span>
         </div>
-      </g:form>
       <g:javascript>
         initialize();
       </g:javascript>
@@ -269,22 +328,14 @@
 				</tr>
 			</thead>
 			<tbody id="commetAndNewsBodyId">
-			<g:form action="test" name="dashboardStepsForm" id="dashboardStepsForm">
 				<input type="hidden" name="moveBundleId" id="moveBundleId" value="${moveBundleInstance?.id}" />
-		        <input type="hidden" name="projectId" value="${projectId}">
 		        <g:each in="${ dashboardSteps }"	status="i" var="dashboardStep">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}" id="commentsRowId_${dashboardStep.step.id }">
-						<td>
-							${dashboardStep.step.name}
-						</td>
-						<g:if test="${dashboardStep.moveBundleStep}">
-							<td> <input type="checkbox" name="checkbox" checked="checked" id="checkbox_${dashboardStep.step.id }" 
-								onclick="enableInput(${dashboardStep.step.id }, 'M')"> </td>
-							</g:if>
-							<g:else>
-							<td> <input type="checkbox" name="checkbox" id="checkbox_${dashboardStep.step.id }" 
-								onclick="enableInput(${dashboardStep.step.id }, 'L')" title="linear"> </td>
-							</g:else>
+							<td>
+								${dashboardStep.step.name}
+							</td>
+							<td> <input type="checkbox" name="checkbox_${dashboardStep.step.id }" id="checkbox_${dashboardStep.step.id }" 
+								onclick="enableInput(${dashboardStep.step.id })"> </td>
 							<td>
 								<span id="labelText_${dashboardStep.step.id }" title="text">${dashboardStep.moveBundleStep?.label}</span>
 								<span id="labelInput_${dashboardStep.step.id }" style="display: none;" title="input">
@@ -295,18 +346,28 @@
 							<span id="startTimeText_${dashboardStep.step.id }" title="text"><tds:convertToGMT date="${dashboardStep.moveBundleStep?.planStartTime}"/></span>
 							
 							<span id="startTimeInput_${dashboardStep.step.id }" style="display: none;" title="input">
-								<input type="text" name="startTime_${dashboardStep.step.id }" 
-								value="<tds:convertToGMT date='${dashboardStep.moveBundleStep?.planStartTime}'/>"
-								style="width: 60px;">
+								<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" />
+			                  <script type="text/javascript">
+			                    $(document).ready(function(){
+			                      $("#startTime_${dashboardStep.step.id }").datetimepicker();
+			                    });
+			                  </script>
+								<input type="text" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }"
+								value="<tds:convertToGMT date='${dashboardStep.moveBundleStep?.planStartTime}'/>" onchange="calculateDuration(${dashboardStep.step.id })">
 							</span>
 							</td>
 							<td>
 							<span id="completionTimeText_${dashboardStep.step.id }" title="text"><tds:convertToGMT date="${dashboardStep.moveBundleStep?.planCompletionTime}"/></span>
 							
 							<span id="completionTimeInput_${dashboardStep.step.id }" style="display: none;" title="input">
-								<input type="text" name="completionTime_${dashboardStep.step.id }" 
-								value="<tds:convertToGMT date='${dashboardStep.moveBundleStep?.planCompletionTime}'/>" 
-								style="width: 60px;">
+							<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" />
+			                  <script type="text/javascript">
+			                    $(document).ready(function(){
+			                      $("#completionTime_${dashboardStep.step.id }").datetimepicker();
+			                    });
+			                  </script>
+								<input type="text" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }" 
+								value="<tds:convertToGMT date='${dashboardStep.moveBundleStep?.planCompletionTime}'/>" onchange="calculateDuration(${dashboardStep.step.id })">
 							</span>
 							</td>
 							<td>
@@ -314,8 +375,10 @@
 							<tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/> </span>
 							
 							<span id="durationInput_${dashboardStep.step.id }" style="display: none;" title="input">
-								<input type="text" name="duration_${dashboardStep.step.id }" 
-								value="<tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/>"	style="width: 60px;">
+							<input type="hidden" name="duration_${dashboardStep.step.id }" id="durationIn_${dashboardStep.step.id }"
+								value="<tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/>">
+								<input type="text" id="duration_${dashboardStep.step.id }"	style="width: 60px;"
+								value="<tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/>"	onchange="changeCompletionTime(this.value, ${dashboardStep.step.id })">
 							</span>
 							</td>
 							<td>
@@ -324,19 +387,21 @@
 							<g:else>Linear</g:else></g:if>
 							</span>
 							<span id="calcMethodInput_${dashboardStep.step.id }" style="display: none;" title="input">
-								<g:select from="${['L', 'M']}" valueMessagePrefix="step.calcMethod" value="${dashboardStep.moveBundleStep?.calcMethod}"/>
+								<g:select from="${['L', 'M']}" valueMessagePrefix="step.calcMethod" name="calcMethod_${dashboardStep.step.id }"
+								value="${dashboardStep.moveBundleStep?.calcMethod}" onchange="showTaskCompleted(this.value, ${dashboardStep.step.id })"/>
 							</span>
 							</td>
+							
 							<td>
 								<span id="tasksCompletedText_${dashboardStep.step.id }" title="text">${dashboardStep.stepSnapshot?.tasksCompleted}
 								</span>
 								
 								<span style="display: none;" id="tasksCompletedInput_${dashboardStep.step.id }" title="input">
-									<input type="text" name="tasksCompleted" style="width: 25px;" value="${dashboardStep.stepSnapshot?.tasksCompleted}" 
+									<input type="text" name="tasksCompleted_${dashboardStep.step.id }" style="width: 25px;" value="${dashboardStep.stepSnapshot?.tasksCompleted}" 
 									id="tasksCompleted_${dashboardStep.step.id }" maxlength="3" >
-								</span>
-								<g:if test="${dashboardStep.moveBundleStep?.calcMethod == 'M'}">%</g:if>
+								</span><g:if  test="${dashboardStep.moveBundleStep?.calcMethod == 'M'}">%</g:if>
 							</td>
+							
 					</tr>
 				</g:each>
 				</g:form>

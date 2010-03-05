@@ -113,4 +113,28 @@ class MoveBundleService {
 			moveEvent.addToMoveBundles( MoveBundle.get( it ) )
 		}
     }
+	 /*----------------------------------------------------
+     * will update the moveBundles with moveEvent
+     * @author : Lokanada Reddy
+     * @param  : moveEvent, moveBundles
+     *--------------------------------------------------*/
+    def createMoveBundleStep(def moveBundle, def transitionId, def params){
+
+		 def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundle , transitionId) 
+		if( !moveBundleStep ){	
+			moveBundleStep = new MoveBundleStep(moveBundle:moveBundle, transitionId:transitionId)
+			moveBundleStep.calcMethod = params["calcMethod_"+transitionId]
+			moveBundleStep.label = params["dashboardLabel_"+transitionId]
+			moveBundleStep.planStartTime = new Date( params["startTime_"+transitionId] )
+			moveBundleStep.planCompletionTime = new Date( params["completionTime_"+transitionId] )
+			if ( !moveBundleStep.validate() || !moveBundleStep.save(flush:true) ) {
+				def etext = "Unable to create moveBundleStep" +
+				GormUtil.allErrorsString( model )
+				response.sendError( 500, "Validation Error")
+		       	println etext
+			}
+			
+		}
+		return moveBundleStep 
+	}
 }

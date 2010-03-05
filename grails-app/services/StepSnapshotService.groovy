@@ -100,8 +100,7 @@ log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${l
 	 * Used to create manual snapshots.  When creating it will update the MoveBundleStep as well appropriately.
 	 *
 	 */
-	def createManualSnapshot( def moveBundleId, def moveBundleStepId, def tasksCompleted ) {
-	
+	def createManualSnapshot( def moveBundleId, def moveBundleStepId, def tasksCompleted, def duration ) {
 		// Check to see if we can find and return appropriate error codes (temporary solution)
 		def moveBundleStep = MoveBundleStep.get( moveBundleStepId )
 		if (! moveBundleStep ) return 401
@@ -112,7 +111,7 @@ log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${l
 		def nowTime = now.getTime() / 1000
 		def planCompletionTime = moveBundleStep.planCompletionTime.getTime() / 1000
 
-		def tasksCount = 100		// Default the total
+		int tasksCount = 100		// Default the total
 
 		//
 		// Create the StepSnapshot
@@ -139,7 +138,6 @@ log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${l
 		} else {
 
 			// Task in  Progress
-			
 			def timeToFinish = (tasksCount - tasksCompleted) * stepSnapshot.getPlanTaskPace()
 			planDelta = (nowTime + timeToFinish - planCompletionTime).intValue()
 
@@ -159,7 +157,11 @@ log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${l
 		//
 		// Finish up the StepSnapshot
 		//
-		stepSnapshot.duration = actualStartTime ? ( nowTime - actualStartTime.getTime() / 1000  ).intValue() : 0
+		if( duration ){
+			stepSnapshot.duration = Integer.parseInt(duration)
+		} else {
+			stepSnapshot.duration = actualStartTime ? ( nowTime - actualStartTime.getTime() / 1000  ).intValue() : 0
+		}
 
 		planDelta = calcProjectedDelta( stepSnapshot, now )
 		stepSnapshot.planDelta = planDelta
