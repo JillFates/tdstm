@@ -406,9 +406,15 @@
 		</tbody>
 	</table>
 	</div>
-	<div class="buttons"><span class="button"><input
-		class="save" type="submit" value="Create" /></span> <span class="button"><g:actionSubmit
-		class="delete" action="Cancel" value="Cancel" /></span></div>
+	<div class="buttons">
+		<span class="button">
+			<input class="save" type="submit" value="Create" />
+		</span> 
+		<span class="button">
+			<input type="button" class="delete" value="Cancel" 
+			onclick="document.createProjectForm.action = 'cancel';document.createProjectForm.submit();"/>
+		</span>
+	</div>
 </g:form></div>
 <g:javascript>
       initialize();
