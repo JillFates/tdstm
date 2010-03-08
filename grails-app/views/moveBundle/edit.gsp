@@ -33,125 +33,6 @@
       }
 	
     </g:javascript>
-    <script type="text/javascript">
-	    /*
-	    function to invoke ESC key to abandon the field
-	   */
-	    document.onkeypress = keyCheck;   
-		function keyCheck( e ){
-			var keyID 
-			if(window.event){
-				keyID = window.event.keyCode;
-			} else {
-				keyID = e.keyCode;
-			}
-			if(keyID == 27) {
-				$("span[title='input']").each(function(){ 
-			    	  $(this).hide(); // hide value input field
-		    	});
-				$("span[title='text']").each(function(){ 
-			    	  $(this).show(); // show the value text 
-		  		});
-				$("input[title='linear']").each(function(){ 
-			    	  $(this).attr("checked",false); // show the value text 
-		  		});
-			}
-			
-		}
-    	function enableInput( stepId){
-    		if($("#checkbox_"+stepId ).is(':checked')){
-				$("#labelText_"+stepId ).hide();
-				$("#labelInput_"+stepId ).show();
-				$("#startTimeText_"+stepId ).hide();
-				$("#startTimeInput_"+stepId ).show();
-				$("#completionTimeText_"+stepId ).hide();
-				$("#completionTimeInput_"+stepId ).show();
-				$("#durationText_"+stepId ).hide();
-				$("#durationInput_"+stepId ).show();
-				$("#calcMethodText_"+stepId ).hide();
-				$("#calcMethodInput_"+stepId ).show();
-				if($("#calcMethod__"+stepId) == "M"){
-					$("#tasksCompletedText_"+stepId ).hide();
-					$("#tasksCompletedInput_"+stepId ).show();
-				}
-				var moveBundle = $("#moveBundleId").val()
-				//${remoteFunction(controller:'moveBundle', action:'createMoveBundleStep', params:'\'moveBundleId=\'+ moveBundle +\'&transitionId=\'+ stepId ')}
-    		} else {
-    			$("#labelText_"+stepId ).show();
-				$("#labelInput_"+stepId ).hide();
-				$("#startTimeText_"+stepId ).show();
-				$("#startTimeInput_"+stepId ).hide();
-				$("#completionTimeText_"+stepId ).show();
-				$("#completionTimeInput_"+stepId ).hide();
-				$("#durationText_"+stepId ).show();
-				$("#durationInput_"+stepId ).hide();
-				$("#calcMethodText_"+stepId ).show();
-				$("#calcMethodInput_"+stepId ).hide();
-				$("#tasksCompletedText_"+stepId ).show();
-				$("#tasksCompletedInput_"+stepId ).hide();
-    		}
-        }
-        function showTaskCompleted(type, stepId){
-			if(type == "M" ){
-				$("#tasksCompletedText_"+stepId ).hide();
-				$("#tasksCompletedInput_"+stepId ).show();
-			} else {
-				$("#tasksCompletedText_"+stepId ).show();
-				$("#tasksCompletedInput_"+stepId ).hide();
-			}
-        }
-        function calculateDuration( stepId ){
-            var start = $("#startTime_"+stepId).val()
-            var completion = $("#completionTime_"+stepId).val()
-            if(completion && start ){
-            	var duration
-                var startTime = new Date( start ).getTime()
-                var completionTime  = new Date( completion ).getTime()
-                if(completionTime > startTime){
-                	duration = completionTime - startTime    
-                } else {
-                    alert("Completion Time should be greater than Start Time")
-                }
-                if(duration){
-                	$("#duration_"+stepId).val(convertIntoHHMM(duration / 1000))
-                	$("#durationIn_"+stepId).val(duration / 1000)
-                }
-            }
-        } 
-        function convertIntoHHMM( seconds ){
-        	var timeFormate 
-    	    var hours = parseInt(seconds / 3600) 
-    	    	timeFormate = hours >= 10 ? hours : '0'+hours
-    	    var minutes =  parseInt((seconds % 3600 ) / 60 )
-    	    	timeFormate += ":"+(minutes >= 10 ? minutes : '0'+minutes)
-    	    	return timeFormate
-        }
-        function changeCompletionTime(time, stepId){
-            var hours = time.substring(0,2)
-            var min = time.substring(3,5)
-            if(hours  && min){
-                var ms = (3600000 * hours )+ (60000 * min)
-            }
-            var completionTimeString = $("#completionTime_"+stepId).val()
-            if(completionTimeString){
-    	        var completionTime = new Date( completionTimeString )
-        	    var updatedTime = new Date(completionTime.getTime() + ms)
-	     		var month =  updatedTime.getMonth() + 1;
-        		var monthday    = updatedTime.getDate();
-        		var year        = updatedTime.getYear() + 1900;
-        		
-        		var hour   = updatedTime.getHours();
-        		var minute = updatedTime.getMinutes();
-        		var second = updatedTime.getSeconds();
-        		
-        		if (hour   < 10) { hour   = "0" + hour;   }
-        		if (minute < 10) { minute = "0" + minute; }
-        		if (second < 10) { second = "0" + second; }
-        		var timeString = month+"/"+monthday+"/"+year+" "+hour + ':' + minute ;
-        		$("#completionTime_"+stepId).val( timeString )
-            }
-        }
-    </script>
   </head>
   <body>
     <div class="body" style="width: 350px;">
@@ -301,7 +182,7 @@
         <div class="buttons" style="float: left;">
           <input type="hidden" name="project.id" value="${projectId }"/>
           <input type="hidden" name="projectId" value="${projectId }"/>
-          <span class="button"><g:actionSubmit class="save" value="Update" /></span>
+          <span class="button"><g:actionSubmit class="save" value="Update" onclick=" return validateStepsData()"/></span>
           <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Cancel" action="show" /></span>
         </div>
       <g:javascript>
@@ -333,13 +214,14 @@
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}" id="commentsRowId_${dashboardStep.step.id }">
 							<td>
 								${dashboardStep.step.name}
+								<input type="hidden"  id="keyOffStep_${dashboardStep.step.id }" value="${dashboardStep.step.name}">
 							</td>
 							<td> <input type="checkbox" name="checkbox_${dashboardStep.step.id }" id="checkbox_${dashboardStep.step.id }" 
 								onclick="enableInput(${dashboardStep.step.id })"> </td>
 							<td>
 								<span id="labelText_${dashboardStep.step.id }" title="text">${dashboardStep.moveBundleStep?.label}</span>
 								<span id="labelInput_${dashboardStep.step.id }" style="display: none;" title="input">
-								<input type="text" name="dashboardLabel_${dashboardStep.step.id }" value="${dashboardStep.moveBundleStep?.label}">
+								<input type="text" name="dashboardLabel_${dashboardStep.step.id }" id="dashboardLabel_${dashboardStep.step.id }" value="${dashboardStep.moveBundleStep?.label}">
 								</span>
 							</td>
 							<td>
@@ -353,7 +235,7 @@
 			                    });
 			                  </script>
 								<input type="text" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }"
-								value="<tds:convertToGMT date='${dashboardStep.moveBundleStep?.planStartTime}'/>" onchange="calculateDuration(${dashboardStep.step.id })">
+								value="<tds:convertToGMT date='${dashboardStep.moveBundleStep?.planStartTime}'/>" onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })">
 							</span>
 							</td>
 							<td>
@@ -367,7 +249,7 @@
 			                    });
 			                  </script>
 								<input type="text" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }" 
-								value="<tds:convertToGMT date='${dashboardStep.moveBundleStep?.planCompletionTime}'/>" onchange="calculateDuration(${dashboardStep.step.id })">
+								value="<tds:convertToGMT date='${dashboardStep.moveBundleStep?.planCompletionTime}'/>" onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })">
 							</span>
 							</td>
 							<td>
@@ -376,7 +258,7 @@
 							
 							<span id="durationInput_${dashboardStep.step.id }" style="display: none;" title="input">
 							<input type="hidden" name="duration_${dashboardStep.step.id }" id="durationIn_${dashboardStep.step.id }"
-								value="<tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/>">
+								value="${dashboardStep.stepSnapshot?.duration}">
 								<input type="text" id="duration_${dashboardStep.step.id }"	style="width: 60px;"
 								value="<tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/>"	onchange="changeCompletionTime(this.value, ${dashboardStep.step.id })">
 							</span>
@@ -412,5 +294,168 @@
           <span style="float: right;">Dashboard Server : <input type="button" name="serverOn" value="On" />&nbsp;<input type="button" name="serverOff" value="Off" /></span>
       </div>
 	</div>
+	<script type="text/javascript">
+	$("input[type='checkbox']").each(function(){ 
+  	  $(this).attr("checked",false); // show the value text 
+	});
+
+	/*
+    function to invoke ESC key to abandon the field
+   */
+    document.onkeypress = keyCheck;   
+	function keyCheck( e ){
+		var keyID 
+		if(window.event){
+			keyID = window.event.keyCode;
+		} else {
+			keyID = e.keyCode;
+		}
+		if(keyID == 27) {
+			$("span[title='input']").each(function(){ 
+		    	  $(this).hide(); // hide value input field
+	    	});
+			$("span[title='text']").each(function(){ 
+		    	  $(this).show(); // show the value text 
+	  		});
+			$("input[type='checkbox']").each(function(){ 
+		    	  $(this).attr("checked",false); // show the value text 
+	  		});
+		}
+		
+	}
+	function enableInput( stepId){
+		if($("#checkbox_"+stepId ).is(':checked')){
+			$("#labelText_"+stepId ).hide();
+			$("#labelInput_"+stepId ).show();
+			$("#startTimeText_"+stepId ).hide();
+			$("#startTimeInput_"+stepId ).show();
+			$("#completionTimeText_"+stepId ).hide();
+			$("#completionTimeInput_"+stepId ).show();
+			$("#durationText_"+stepId ).hide();
+			$("#durationInput_"+stepId ).show();
+			$("#calcMethodText_"+stepId ).hide();
+			$("#calcMethodInput_"+stepId ).show();
+			if($("#calcMethod__"+stepId) == "M"){
+				$("#tasksCompletedText_"+stepId ).hide();
+				$("#tasksCompletedInput_"+stepId ).show();
+			}
+			var moveBundle = $("#moveBundleId").val()
+			//${remoteFunction(controller:'moveBundle', action:'createMoveBundleStep', params:'\'moveBundleId=\'+ moveBundle +\'&transitionId=\'+ stepId ')}
+		} else {
+			$("#labelText_"+stepId ).show();
+			$("#labelInput_"+stepId ).hide();
+			$("#startTimeText_"+stepId ).show();
+			$("#startTimeInput_"+stepId ).hide();
+			$("#completionTimeText_"+stepId ).show();
+			$("#completionTimeInput_"+stepId ).hide();
+			$("#durationText_"+stepId ).show();
+			$("#durationInput_"+stepId ).hide();
+			$("#calcMethodText_"+stepId ).show();
+			$("#calcMethodInput_"+stepId ).hide();
+			$("#tasksCompletedText_"+stepId ).show();
+			$("#tasksCompletedInput_"+stepId ).hide();
+		}
+    }
+    function showTaskCompleted(type, stepId){
+		if(type == "M" ){
+			$("#tasksCompletedText_"+stepId ).hide();
+			$("#tasksCompletedInput_"+stepId ).show();
+		} else {
+			$("#tasksCompletedText_"+stepId ).show();
+			$("#tasksCompletedInput_"+stepId ).hide();
+		}
+    }
+    function calculateDuration( stepId ){
+        var start = $("#startTime_"+stepId).val()
+        var completion = $("#completionTime_"+stepId).val()
+        if(completion && start ){
+        	var duration
+            var startTime = new Date( start ).getTime()
+            var completionTime  = new Date( completion ).getTime()
+            if(completionTime > startTime){
+            	duration = completionTime - startTime    
+            } else {
+                alert("Completion Time should be greater than Start Time")
+            }
+            if(duration){
+            	$("#duration_"+stepId).val(convertIntoHHMM(duration / 1000))
+            	$("#durationIn_"+stepId).val(duration / 1000)
+            	$("#duration_"+stepId).focus()
+            }
+        }
+    } 
+    function convertIntoHHMM( seconds ){
+    	var timeFormate 
+	    var hours = parseInt(seconds / 3600) 
+	    	timeFormate = hours >= 10 ? hours : '0'+hours
+	    var minutes =  parseInt((seconds % 3600 ) / 60 )
+	    	timeFormate += ":"+(minutes >= 10 ? minutes : '0'+minutes)
+	    	return timeFormate
+    }
+    function changeCompletionTime(time, stepId){
+        var hours = time.substring(0,2)
+        var min = time.substring(3,5)
+        if(hours  && min){
+            var ms = (3600000 * hours )+ (60000 * min)
+        }
+        var completionTimeString = $("#completionTime_"+stepId).val()
+        if(completionTimeString){
+	        var completionTime = new Date( completionTimeString )
+    	    var updatedTime = new Date(completionTime.getTime() + ms)
+    		$("#completionTime_"+stepId).val( convertDate( updatedTime ))
+        }
+    }
+    function getTimeFormate( objId, dateString, stepId )
+	{
+    	var date= new Date(dateString)
+		$("#"+objId).val(convertDate( date ))
+	   	calculateDuration(stepId);
+	   
+	}
+	function convertDate( date ){
+		var timeString = ""
+		var month =  date.getMonth();
+			
+		if( !isNaN(month) ){
+			month = month + 1
+			var monthday    = date.getDate();
+			var year        = date.getYear() + 1900;
+			
+			var hour   = date.getHours();
+			var minute = date.getMinutes();
+			var second = date.getSeconds();
+			var ap = "AM";
+			if (hour   > 11) { ap = "PM";             }
+			if (hour   > 12) { hour = hour - 12;      }
+			if (hour   == 0) { hour = 12;             }
+			if (hour   < 10) { hour   = "0" + hour;   }
+			if (minute < 10) { minute = "0" + minute; }
+			if (second < 10) { second = "0" + second; }
+			var timeString = month+"/"+monthday+"/"+year+" "+hour + ':' + minute + ' ' + ap;
+		}
+		return timeString
+	}
+    function validateStepsData(){
+        var checked = true
+        var keyOffStep = ""
+    	$("input[type='checkbox']").each(function(){ 
+	    	  if($(this).is(':checked') ){
+		    	  var id= $(this).attr("id")
+		    	  var stepId = id.substring(9,id.length)
+		    	  var dashboardLabel = $("#dashboardLabel_"+stepId).val()
+		    	  if( !$("#dashboardLabel_"+stepId).val() || !$("#startTime_"+stepId).val() || !$("#completionTime_"+stepId).val()){
+						keyOffStep += "'"+$("#keyOffStep_"+stepId).val() +"', ";
+				    	checked =  false;
+		    	  }
+	    	  } 
+    	});
+    	if( !checked ){
+    		alert("Dashboard Label, Start & Completion times are mandatory for selected key off steps "+keyOffStep.substring(0,keyOffStep.length - 2));
+    		return checked;
+    	} else {
+    		return checked;
+    	}
+    }
+	</script>
   </body>
 </html>
