@@ -150,6 +150,7 @@ def userLogin = UserLogin.findByPerson(personInstance);
           <div>
             <table>
               <tbody>
+	              
               <tr class="prop">
                   <td valign="top" class="name">Company:</td>
 
@@ -228,6 +229,9 @@ def userLogin = UserLogin.findByPerson(personInstance);
           <div class="dialog">
             <table>
               <tbody>
+              <tr>
+				<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+				</tr>
               <tr class="prop">
                                 <td valign="top" class="name">
                                     <label>Company:</label>
@@ -248,6 +252,7 @@ def userLogin = UserLogin.findByPerson(personInstance);
                   </td>
                   <td valign="top" class="value ${hasErrors(bean:personInstance,field:'firstName','errors')}">
                     <input type="text" maxlength="64" id="firstName" name="firstName" value="${fieldValue(bean:personInstance,field:'firstName')}"/>
+                    &nbsp;<span style="color: red">*</span>
                     <g:hasErrors bean="${personInstance}" field="firstName">
                       <div class="errors">
                         <g:renderErrors bean="${personInstance}" as="list" field="firstName"/>
@@ -306,7 +311,7 @@ def userLogin = UserLogin.findByPerson(personInstance);
                       <g:each in="${Person.constraints.active.inList}" status="i" var="active">
                         <option value="${active}">${active}</option>
                       </g:each>
-                    </select>
+                    </select> &nbsp;<span style="color: red">*</span>
                     <g:hasErrors bean="${personInstance}" field="active">
                       <div class="errors">
                         <g:renderErrors bean="${personInstance}" as="list" field="active"/>
@@ -340,6 +345,9 @@ def userLogin = UserLogin.findByPerson(personInstance);
           <div class="dialog">
             <table>
               <tbody>
+              <tr>
+				<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+				</tr>
                <%-- <input type="hidden" name="companyId" value="${companyId}"> --%>
                 
  					<tr class="prop">
@@ -360,7 +368,8 @@ def userLogin = UserLogin.findByPerson(personInstance);
                     <label for="firstName">First Name:</label>
                   </td>
                   <td valign="top" class="value ${hasErrors(bean:personInstance,field:'firstName','errors')}">
-                    <input type="text" maxlength="34" size="34" id="firstName" name="firstName" value="${fieldValue(bean:personInstance,field:'firstName')}"/>
+                    <input type="text" maxlength="34" size="34" id="firstName" name="firstName" 
+                    value="${fieldValue(bean:personInstance,field:'firstName')}"/>&nbsp;<span style="color: red">*</span>
                     <g:hasErrors bean="${personInstance}" field="firstName">
                       <div class="errors">
                         <g:renderErrors bean="${personInstance}" as="list" field="firstName"/>
@@ -419,7 +428,7 @@ def userLogin = UserLogin.findByPerson(personInstance);
                       <g:each in="${Person.constraints.active.inList}" status="i" var="active">
                         <option value="${active}">${active}</option>
                       </g:each>
-                    </select>
+                    </select>&nbsp;<span style="color: red">*</span>
                     <g:hasErrors bean="${personInstance}" field="active">
                       <div class="errors">
                         <g:renderErrors bean="${personInstance}" as="list" field="active"/>

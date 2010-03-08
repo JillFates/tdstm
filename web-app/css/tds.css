@@ -421,3 +421,8 @@ text-decoration: line-through;
 	padding: 0px 8px; 
 	background: #ffffff;
 }
+.required {
+	float: right;
+	font-size: 9px;
+	color: red;
+}

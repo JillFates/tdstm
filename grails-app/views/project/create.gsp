@@ -212,11 +212,15 @@
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 
-</g:if> <g:form action="save" method="post" name="createProjectForm" enctype="multipart/form-data">
+</g:if> 
+
+<g:form action="save" method="post" name="createProjectForm" enctype="multipart/form-data">
 	<div class="dialog">
 	<table>
-		<tbody>		
-		
+		<tbody>	
+			<tr>
+			<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="client">Client:</label>
 				</td>
@@ -224,7 +228,7 @@
 					<g:each status="i" in="${clients}" var="clients">
 						<option value="${clients.partyIdTo.id}">${clients.partyIdTo}</option>
 					</g:each>
-				</select></td>
+				</select>&nbsp;<span style="color: red">*</span></td>
 			</tr>
 
 			<tr class="prop">
@@ -232,9 +236,8 @@
 				Code:</label></td>
 				<td valign="top"
 					class="value ${hasErrors(bean:projectInstance,field:'projectCode','errors')}">
-				<input type="text" id="projectCode" name="projectCode"
-					maxlength="20"
-					value="${fieldValue(bean:projectInstance,field:'projectCode')}" />
+				<input type="text" id="projectCode" name="projectCode" maxlength="20"
+					value="${fieldValue(bean:projectInstance,field:'projectCode')}" />&nbsp;<span style="color: red">*</span>
 				<g:hasErrors bean="${projectInstance}" field="projectCode">
 					<div class="errors"><g:renderErrors bean="${projectInstance}"
 						as="list" field="projectCode" /></div>
@@ -246,7 +249,8 @@
 				<td valign="top"
 					class="value ${hasErrors(bean:projectInstance,field:'name','errors')}">
 				<input type="text" id="name" name="name" maxlength="64"
-					value="${fieldValue(bean:projectInstance,field:'name')}" /> <g:hasErrors
+					value="${fieldValue(bean:projectInstance,field:'name')}" />&nbsp;<span style="color: red">*</span>
+					<g:hasErrors
 					bean="${projectInstance}" field="name">
 					<div class="errors"><g:renderErrors bean="${projectInstance}"
 						as="list" field="name" /></div>
@@ -381,8 +385,8 @@
 					class="value ${hasErrors(bean:projectInstance,field:'trackChanges','errors')}">
 				<g:select id="trackChanges" name="trackChanges"
 					from="${projectInstance.constraints.trackChanges.inList}"
-					value="${projectInstance.trackChanges}"></g:select> <g:hasErrors
-					bean="${projectInstance}" field="trackChanges">
+					value="${projectInstance.trackChanges}"></g:select>&nbsp;<span style="color: red">*</span>
+					 <g:hasErrors bean="${projectInstance}" field="trackChanges">
 					<div class="errors"><g:renderErrors bean="${projectInstance}"
 						as="list" field="trackChanges" /></div>
 				</g:hasErrors></td>
@@ -395,8 +399,8 @@
 					class="value ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">
 				<g:select id="workflowCode" name="workflowCode"
 					from="${workflowCodes}"
-					value="Please Select" noSelection="['':'Please Select']"></g:select><g:hasErrors
-					bean="${projectInstance}" field="workflowCode">
+					value="Please Select" noSelection="['':'Please Select']"></g:select>&nbsp;<span style="color: red">*</span>
+					<g:hasErrors bean="${projectInstance}" field="workflowCode">
 					<div class="errors"><g:renderErrors bean="${projectInstance}"
 						as="list" field="workflowCode" /></div>
 				</g:hasErrors></td>

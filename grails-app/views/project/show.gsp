@@ -291,13 +291,16 @@
         <div class="dialog">
           <table>
             <tbody>               
-			
+				<tr>
+				<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+				</tr>
               <tr class="prop">
                 <td valign="top" class="name">
                   <label for="name">Project Name:</label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'name','errors')}">
                   <input type="text" id="name" name="name" value="${fieldValue(bean:projectInstance,field:'name')}" maxlength="64"/>
+                  &nbsp;<span style="color: red">*</span>
                   <g:hasErrors bean="${projectInstance}" field="name">
                     <div class="errors">
                       <g:renderErrors bean="${projectInstance}" as="list" field="name"/>
@@ -457,6 +460,7 @@ class="value ${hasErrors(bean:projectInstance,field:'completionDate','errors')}"
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'trackChanges','errors')}">
                   <g:select id="trackChanges" name="trackChanges" from="${projectInstance.constraints.trackChanges.inList}" value="${projectInstance.trackChanges}" ></g:select>
+                  &nbsp;<span style="color: red">*</span>
                   <g:hasErrors bean="${projectInstance}" field="trackChanges">
                     <div class="errors">
                       <g:renderErrors bean="${projectInstance}" as="list" field="trackChanges"/>

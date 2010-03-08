@@ -37,6 +37,9 @@
                 <div class="dialog">
                     <table>
                         <tbody>
+	                        <tr>
+							<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+							</tr>
                         	<input name="companyId" type="hidden" value="${companyId}" >
                             <tr class="prop">
                                 <td valign="top" class="name">
@@ -49,12 +52,14 @@
                                 </g:if>
                                 <g:else>
                                     <g:select optionKey="id" from="${Person.executeQuery('from Person p where p.id not in (select person.id from UserLogin u) order by p.firstName')}" name="person.id" value="${userLoginInstance?.person?.id}" ></g:select>
+                                    
                                 </g:else>
                                 <g:hasErrors bean="${userLoginInstance}" field="person">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="person"/>
 					            </div>
 					            </g:hasErrors>
+					            &nbsp;<span style="color: red">*</span>
                                 </td>
                             </tr> 
                         
@@ -64,6 +69,7 @@
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'username','errors')}">
                                     <input type="text" maxlength="25" id="username" name="username" value="${fieldValue(bean:userLoginInstance,field:'username')}"/>
+                                    &nbsp;<span style="color: red">*</span>
                                 <g:hasErrors bean="${userLoginInstance}" field="username">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="username"/>
@@ -77,7 +83,7 @@
                                     <label for="password">Password:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'password','errors')}">
-                                    <input type="password" maxlength="25" id="password" name="password" value=""/>
+                                    <input type="password" maxlength="25" id="password" name="password" value=""/>&nbsp;<span style="color: red">*</span>
                                 <g:hasErrors bean="${userLoginInstance}" field="password">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="password"/>
@@ -91,6 +97,7 @@
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'active','errors')}">
                                     <g:select id="active" name="active" from="${userLoginInstance.constraints.active.inList}" value="${userLoginInstance.active}" ></g:select>
+                                    &nbsp;<span style="color: red">*</span>
                                 <g:hasErrors bean="${userLoginInstance}" field="active">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="active"/>

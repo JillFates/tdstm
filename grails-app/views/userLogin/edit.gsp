@@ -47,13 +47,16 @@
                 <div class="dialog">
                     <table>
                         <tbody>
-                        
+                         <tr>
+							<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+							</tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="person">Person:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'person','errors')}">
                                     <g:select optionKey="id" from="${Person.list()}" id="person" name="person.id" value="${userLoginInstance?.person?.id}" ></g:select>
+                                    &nbsp;<span style="color: red">*</span>
                                 <g:hasErrors bean="${userLoginInstance}" field="person">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="person"/>
@@ -68,6 +71,7 @@
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'username','errors')}">
                                     <input type="text" id="username" name="username" value="${fieldValue(bean:userLoginInstance,field:'username')}"/>
+                                    &nbsp;<span style="color: red">*</span>
                                 <g:hasErrors bean="${userLoginInstance}" field="username">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="username"/>
@@ -81,7 +85,7 @@
                                     <label for="password">Password:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'password','errors')}">
-                                    <input type="password" id="password" name="password" value=""/>
+                                    <input type="password" id="password" name="password" value=""/>&nbsp;<span style="color: red">*</span>
                                 <g:hasErrors bean="${userLoginInstance}" field="password">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="password"/>
@@ -95,6 +99,7 @@
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'active','errors')}">
                                     <g:select id="active" name="active" from="${userLoginInstance.constraints.active.inList}" value="${userLoginInstance.active}" ></g:select>
+									&nbsp;<span style="color: red">*</span>
                                 <g:hasErrors bean="${userLoginInstance}" field="active">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="active"/>
