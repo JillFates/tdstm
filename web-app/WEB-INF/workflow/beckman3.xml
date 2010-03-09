@@ -35,7 +35,7 @@
 
 		<transition to="IncStorage" name="Inc Storage" id="92" type="boolean" />
 		<transition to="ZoneMasking" name="Zone Masking" id="94" type="boolean" />
-		<transition to="HostStorageDiscov" name="Host Storage Discov" id="96" type="boolean" />
+		<transition to="HostStorDisc" name="Host Stor Disc" id="96" type="boolean" />
 		<transition to="ImportVM" name="Import VM" id="98" type="boolean" />
 
 		<transition to="InTransit" name="In Transit" id="100" type="process" />
