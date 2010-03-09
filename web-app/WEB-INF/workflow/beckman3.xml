@@ -1,0 +1,761 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process-definition xmlns="" name="Datacenter Move Operations - Beckman Coulter Process 2" code="BeckmanCoulter2">
+	<swimlane name="MANAGER">
+		<assignment actor-id="Manager"/>
+	</swimlane>
+	<swimlane name="SUPERVISOR">
+		<assignment actor-id="Supervisor"/>
+	</swimlane>
+	<swimlane name="MOVE_TECH">
+		<assignment actor-id="Technician"/>
+	</swimlane>
+	<swimlane name="CLEANER">
+		<assignment actor-id="Cleaner"/>
+	</swimlane>
+	<swimlane name="MOVER">
+		<assignment actor-id="Mover"/>
+	</swimlane>
+
+	<transitions>
+		<transition to="SourceWalkthru" name="Source Walkthrough" id="7" type="boolean" />
+		<transition to="TargetWalkthru" name="Target Walkthrough" id="8" type="boolean" />
+		
+		<transition to="Hold" name="Hold" id="10" type="boolean" color="red"/>
+
+		<transition to="Ready" name="Ready" id="20" type="process" color="yellow"/>
+        <transition to="AppShutdown" name="App Shutdown" id="22" type="boolean" />
+        <transition to="DBShutdown" name="DB Shutdown" id="23" type="boolean" />
+		<transition to="PoweredDown" name="Powered Down" id="30" type="process" color="orange"/>
+		<transition to="Release" name="Released" id="40" type="process" color="green" dashboardLabel="Release" />
+		<transition to="Unracking" name="Unracking" id="50" type="process" color="blue"/>
+		<transition to="Unracked" name="Unracked" id="60" type="process" color="blue" dashboardLabel="Unracking" predecessor="50"/>
+		<transition to="Cleaned" name="Cleaned" id="70" type="process" dashboardLabel="Cleaned" />
+		<transition to="OnCart" name="On Cart" id="80" type="process" />
+		<transition to="OnTruck" name="On Truck" id="90" type="process" />
+
+		<transition to="IncStorage" name="Inc Storage" id="92" type="boolean" />
+		<transition to="ZoneMasking" name="Zone Masking" id="94" type="boolean" />
+		<transition to="HostStorageDiscov" name="Host Storage Discov" id="96" type="boolean" />
+		<transition to="ImportVM" name="Import VM" id="98" type="boolean" />
+
+		<transition to="InTransit" name="In Transit" id="100" type="process" />
+		<transition to="EndTransit" name="End Transit" id="110" type="process" dashboardLabel="Transport" predecessor="100" />
+		<transition to="OffTruck" name="Off Truck" id="120" type="process" />
+		<transition to="Staged" name="Staged" id="130" type="process" />
+		<transition to="Reracking" name="Reracking" id="140" type="process" />
+		<transition to="Reracked" name="Reracked" id="150" type="process" dashboardLabel="Reracking" predecessor="140" />
+		<transition to="Cabled" name="Cabled" id="155" type="process" dashboardLabel="Cabled" />
+		<transition to="QAVerified" name="QA Verified" id="160" type="process" />
+		<transition to="PoweredOn" name="Powered On" id="170"  type="process" />
+
+		<transition to="NetValidated" name="Net Validated" id="181" type="boolean" />
+		<transition to="StorValidated" name="Stor Validated" id="182" type="boolean" />
+		<transition to="DBStarted" name="DB Started" id="183" type="boolean" />
+		<transition to="DBValidated" name="DB Validated" id="184" type="boolean" />
+		<transition to="AppStarted" name="App Started" id="185" type="boolean" />
+
+		<transition to="Completed" name="Completed" id="280"  type="process" dashboardLabel="Completed" predecessor="150" />
+		<transition to="Terminated" name="Terminated" id="900"  type="process" />
+	</transitions>
+
+	<startState name="Hold">
+		<task swimlane="SUPERVISOR">
+			<transition to="Ready" />
+			<transition to="PoweredDown" />
+			<transition to="Release" />
+			<transition to="Unracking"/>
+			<transition to="Unracked"/>
+			<transition to="Cleaned"/>
+			<transition to="OnCart"/>
+			<transition to="OnTruck"/>
+			<transition to="InTransit"/>
+			<transition to="EndTransit"/>
+			<transition to="OffTruck"/>
+			<transition to="Staged"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+			<transition to="Terminated" flag="comment"/>
+		</task>
+	</startState>
+
+	<taskNode name="Hold">
+		<task swimlane="MANAGER">
+			<transition to="Ready" />
+			<transition to="PoweredDown" />
+			<transition to="Release" />
+			<transition to="Unracking"/>
+			<transition to="Unracked"/>
+			<transition to="Cleaned"/>
+			<transition to="OnCart"/>
+			<transition to="OnTruck"/>
+			<transition to="InTransit"/>
+			<transition to="EndTransit"/>
+			<transition to="OffTruck"/>
+			<transition to="Staged"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+			<transition to="Terminated" flag="comment"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Ready" />
+			<transition to="PoweredDown" />
+			<transition to="Release" />
+			<transition to="Unracking"/>
+			<transition to="Unracked"/>
+			<transition to="Cleaned"/>
+			<transition to="OnCart"/>
+			<transition to="OnTruck"/>
+			<transition to="InTransit"/>
+			<transition to="EndTransit"/>
+			<transition to="OffTruck"/>
+			<transition to="Staged"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+			<transition to="Terminated" flag="comment"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="Ready">
+		<task swimlane="MANAGER">
+			<transition to="PoweredDown" />
+			<transition to="Release" flag="skipped"/>
+			<transition to="Unracking" flag="skipped"/>
+			<transition to="Unracked" flag="skipped"/>
+			<transition to="Cleaned" flag="skipped"/>
+			<transition to="OnCart" flag="skipped"/>
+			<transition to="OnTruck" flag="skipped"/>
+			<transition to="InTransit" flag="skipped"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="PoweredDown" />
+			<transition to="Release" flag="skipped"/>
+			<transition to="Unracking" flag="skipped"/>
+			<transition to="Unracked" flag="skipped"/>
+			<transition to="Cleaned" flag="skipped"/>
+			<transition to="OnCart" flag="skipped"/>
+			<transition to="OnTruck" flag="skipped"/>
+			<transition to="InTransit" flag="skipped"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="PoweredDown">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Ready" />
+			<transition to="PoweredDown" />
+			<transition to="Release" flag="skipped"/>
+			<transition to="Unracking" flag="skipped"/>
+			<transition to="Unracked" flag="skipped"/>
+			<transition to="Cleaned" flag="skipped"/>
+			<transition to="OnCart" flag="skipped"/>
+			<transition to="OnTruck" flag="skipped"/>
+			<transition to="InTransit" flag="skipped"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Ready" />
+			<transition to="PoweredDown" />
+			<transition to="Release" flag="skipped"/>
+			<transition to="Unracking" flag="skipped"/>
+			<transition to="Unracked" flag="skipped"/>
+			<transition to="Cleaned" flag="skipped"/>
+			<transition to="OnCart" flag="skipped"/>
+			<transition to="OnTruck" flag="skipped"/>
+			<transition to="InTransit" flag="skipped"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="Ready">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="PoweredDown" />
+			<transition to="Release" />
+			<transition to="Unracking" flag="skipped"/>
+			<transition to="Unracked" flag="skipped"/>
+			<transition to="Cleaned" flag="skipped"/>
+			<transition to="OnCart" flag="skipped"/>
+			<transition to="OnTruck" flag="skipped"/>
+			<transition to="InTransit" flag="skipped"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="PoweredDown" />
+			<transition to="Release" />
+			<transition to="Unracking" flag="skipped"/>
+			<transition to="Unracked" flag="skipped"/>
+			<transition to="Cleaned" flag="skipped"/>
+			<transition to="OnCart" flag="skipped"/>
+			<transition to="OnTruck" flag="skipped"/>
+			<transition to="InTransit" flag="skipped"/>
+		</task>
+		<task swimlane="MOVE_TECH">
+			<transition to="Hold" flag="issue"/>
+		</task>
+		<task swimlane="CLEANER">
+			<transition to="Hold" flag="issue"/>
+		</task>
+		<task swimlane="MOVER">
+			<transition to="Hold" flag="issue"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="PoweredDown">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Ready" />
+			<transition to="Release"/>
+			<transition to="Unracking" flag="skipped"/>
+			<transition to="Unracked" flag="skipped"/>
+			<transition to="Cleaned" flag="skipped"/>
+			<transition to="OnCart" flag="skipped"/>
+			<transition to="OnTruck" flag="skipped"/>
+			<transition to="InTransit" flag="skipped"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Ready" />
+			<transition to="Release"/>
+			<transition to="Unracking" flag="skipped"/>
+			<transition to="Unracked" flag="skipped"/>
+			<transition to="Cleaned" flag="skipped"/>
+			<transition to="OnCart" flag="skipped"/>
+			<transition to="OnTruck" flag="skipped"/>
+			<transition to="InTransit" flag="skipped"/>
+		</task>
+		<task swimlane="MOVE_TECH">
+			<transition to="Hold" flag="issue"/>
+		</task>
+		<task swimlane="CLEANER">
+			<transition to="Hold" flag="issue"/>
+		</task>
+		<task swimlane="MOVER">
+			<transition to="Hold" flag="issue"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="Release">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Ready" />
+			<transition to="PoweredDown" />
+			<transition to="Unracking"/>
+			<transition to="Unracked" flag="skipped"/>
+			<transition to="Cleaned" flag="skipped"/>
+			<transition to="OnCart" flag="skipped"/>
+			<transition to="OnTruck" flag="skipped"/>
+			<transition to="InTransit" flag="skipped"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Ready" />
+			<transition to="PoweredDown" />
+			<transition to="Unracking"/>
+			<transition to="Unracked" flag="skipped"/>
+			<transition to="Cleaned" flag="skipped"/>
+			<transition to="OnCart" flag="skipped"/>
+			<transition to="OnTruck" flag="skipped"/>
+			<transition to="InTransit" flag="skipped"/>
+		</task>
+		<task swimlane="MOVE_TECH">
+			<transition to="Hold" name="Hold" flag="issue,idle"/>
+			<transition to="Unracking" flag="busy" />
+		</task>
+		<task swimlane="CLEANER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Cleaned" flag="skipped"/>
+		</task>
+		<task swimlane="MOVER">
+			<transition to="Hold" flag="issue"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="Unracking">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Ready"/>
+			<transition to="PoweredDown" />
+			<transition to="Release" />
+			<transition to="Unracked"/>
+			<transition to="Cleaned" flag="skipped"/>
+			<transition to="OnCart" flag="skipped"/>
+			<transition to="OnTruck" flag="skipped"/>
+			<transition to="InTransit" flag="skipped"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Ready"/>
+			<transition to="PoweredDown" />
+			<transition to="Release" />
+			<transition to="Unracked"/>
+			<transition to="Cleaned" flag="skipped"/>
+			<transition to="OnCart" flag="skipped"/>
+			<transition to="OnTruck" flag="skipped"/>
+			<transition to="InTransit" flag="skipped"/>
+		</task>
+		<task swimlane="MOVE_TECH">
+			<transition to="Hold" flag="issue,idle"/>
+			<transition to="Unracked" flag="idle" />
+		</task>
+		<task swimlane="CLEANER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Cleaned" flag="skipped"/>
+		</task>
+		<task swimlane="MOVER">
+			<transition to="Hold" flag="issue"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="Unracked">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Ready" />
+			<transition to="PoweredDown" />
+			<transition to="Release" />
+			<transition to="Unracking"/>
+			<transition to="Cleaned"/>
+			<transition to="OnCart"/>
+			<transition to="OnTruck"/>
+			<transition to="InTransit"/>
+			<transition to="EndTransit"/>
+			<transition to="OffTruck"/>
+			<transition to="Staged"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Ready" />
+			<transition to="PoweredDown" />
+			<transition to="Release" />
+			<transition to="Unracking"/>
+			<transition to="Cleaned"/>
+			<transition to="OnCart"/>
+			<transition to="OnTruck"/>
+			<transition to="InTransit"/>
+			<transition to="EndTransit"/>
+			<transition to="OffTruck"/>
+			<transition to="Staged"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="MOVE_TECH">
+			<transition to="Hold" flag="issue,idle"/>
+		</task>
+		<task swimlane="CLEANER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Cleaned" flag="skipped"/>
+		</task>
+		<task swimlane="MOVER">
+			<transition to="Hold" flag="issue"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="Cleaned">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Ready" />
+			<transition to="PoweredDown" />
+			<transition to="Release" />
+			<transition to="Unracking"/>
+			<transition to="Unracked"/>
+			<transition to="OnCart"/>
+			<transition to="OnTruck"/>
+			<transition to="InTransit"/>
+			<transition to="EndTransit"/>
+			<transition to="OffTruck"/>
+			<transition to="Staged"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Ready" />
+			<transition to="PoweredDown" />
+			<transition to="Release" />
+			<transition to="Unracking"/>
+			<transition to="Unracked"/>
+			<transition to="OnCart"/>
+			<transition to="OnTruck"/>
+			<transition to="InTransit"/>
+			<transition to="EndTransit"/>
+			<transition to="OffTruck"/>
+			<transition to="Staged"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="MOVER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="OnCart"/>
+			<transition to="OnTruck" flag="skipped"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="OnCart">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Ready" />
+			<transition to="PoweredDown" />
+			<transition to="Release" />
+			<transition to="Unracking"/>
+			<transition to="Unracked"/>
+			<transition to="Cleaned"/>
+			<transition to="OnTruck"/>
+			<transition to="InTransit"/>
+			<transition to="EndTransit"/>
+			<transition to="OffTruck"/>
+			<transition to="Staged"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Ready" />
+			<transition to="PoweredDown" />
+			<transition to="Release" />
+			<transition to="Unracking"/>
+			<transition to="Unracked"/>
+			<transition to="Cleaned"/>
+			<transition to="OnTruck"/>
+			<transition to="InTransit"/>
+			<transition to="EndTransit"/>
+			<transition to="OffTruck"/>
+			<transition to="Staged"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="MOVER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="OnTruck"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="OnTruck">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Ready" />
+			<transition to="PoweredDown" />
+			<transition to="Release" />
+			<transition to="Unracking"/>
+			<transition to="Unracked"/>
+			<transition to="Cleaned"/>
+			<transition to="OnCart"/>
+			<transition to="InTransit"/>
+			<transition to="EndTransit"/>
+			<transition to="OffTruck"/>
+			<transition to="Staged"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Ready" />
+			<transition to="PoweredDown" />
+			<transition to="Release" />
+			<transition to="Unracking"/>
+			<transition to="Unracked"/>
+			<transition to="Cleaned"/>
+			<transition to="OnCart"/>
+			<transition to="InTransit"/>
+			<transition to="EndTransit"/>
+			<transition to="OffTruck"/>
+			<transition to="Staged"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="InTransit">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Ready" />
+			<transition to="Release" />
+			<transition to="Unracking"/>
+			<transition to="Unracked"/>
+			<transition to="Cleaned"/>
+			<transition to="OnCart"/>
+			<transition to="OnTruck"/>
+			<transition to="EndTransit"/>
+			<transition to="OffTruck"/>
+			<transition to="Staged"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Ready" />
+			<transition to="Release" />
+			<transition to="Unracking"/>
+			<transition to="Unracked"/>
+			<transition to="Cleaned"/>
+			<transition to="OnCart"/>
+			<transition to="OnTruck"/>
+			<transition to="EndTransit"/>
+			<transition to="OffTruck"/>
+			<transition to="Staged"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="EndTransit">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="InTransit"/>
+			<transition to="OffTruck"/>
+			<transition to="Staged"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="InTransit"/>
+			<transition to="OffTruck"/>
+			<transition to="Staged"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="OffTruck">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Ready" />
+			<transition to="Release" />
+			<transition to="Unracking"/>
+			<transition to="Unracked"/>
+			<transition to="Cleaned"/>
+			<transition to="OnCart"/>
+			<transition to="OnTruck"/>
+			<transition to="InTransit"/>
+			<transition to="EndTransit"/>
+			<transition to="OffTruck"/>
+			<transition to="Staged"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Ready" />
+			<transition to="Release" />
+			<transition to="Unracking"/>
+			<transition to="Unracked"/>
+			<transition to="Cleaned"/>
+			<transition to="OnCart"/>
+			<transition to="OnTruck"/>
+			<transition to="InTransit"/>
+			<transition to="EndTransit"/>
+			<transition to="OffTruck"/>
+			<transition to="Staged"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="Staged">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="MOVE_TECH">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracking" flag="busy"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="Reracking">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="MOVE_TECH">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracked" flag="busy"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="Reracked">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracking"/>
+			<transition to="Cabled" />
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracking"/>
+			<transition to="Cabled" />
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="MOVE_TECH">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Cabled" />
+		</task>
+	</taskNode>
+	
+	<taskNode name="Cabled">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Reracking"/>
+			<transition to="Reracked"/>
+			<transition to="Cabled"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+	</taskNode>
+	
+	<taskNode name="QAVerified">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="QAVerified"/>
+			<transition to="PoweredOn"/>
+			<transition to="Completed"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="PoweredOn">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Completed"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+			<transition to="Completed"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="Completed">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+		</task>
+	</taskNode>
+
+	<taskNode name="Terminated">
+		<task swimlane="MANAGER">
+			<transition to="Hold" flag="issue"/>
+		</task>
+		<task swimlane="SUPERVISOR">
+			<transition to="Hold" flag="issue"/>
+		</task>
+	</taskNode>
+
+	<end-state name="Completed"/>
+	<end-state name="Terminated"/>
+</process-definition>
