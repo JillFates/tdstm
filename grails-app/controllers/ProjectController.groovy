@@ -140,7 +140,7 @@ class ProjectController {
             // List of OK mime-types
             if( file ) {
 	            def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
-				if(file.getContentType() != "application/octet-stream"){
+				if( file.getContentType() ){
 					if(params.projectPartner == ""){
 		           		flash.message = " Please select Associated Partner to upload Image. "
 				        redirect(action:'show',id:projectInstance.id )
@@ -364,7 +364,7 @@ class ProjectController {
         def image      
         // List of OK mime-types
         def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
-        if(file.getContentType() != "application/octet-stream"){
+		if( file.getContentType() ){
         	if(params.projectPartner == ""){
            		flash.message = " Please select Associated Partner to upload Image. "
 		        redirect(action:'create' )
@@ -450,7 +450,7 @@ class ProjectController {
         	// set the projectInstance as CURR_PROJ
         	userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )       	
         	
-        	flash.message = "Project ${projectInstance.id} created"
+        	flash.message = "Project ${projectInstance} created"
             redirect( action:show, id:projectInstance.id, imageId:image.id )
         } else {
             def tdsParty = PartyGroup.findByName( 'TDS' ).id
