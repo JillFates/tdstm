@@ -311,7 +311,9 @@
         <div class="dialog">
           <table>
             <tbody>
-
+				<tr>
+						<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+				</tr>
               <tr class="prop">
                <td valign="top" class="name">
                 <label for="appCode">Company:</label>
@@ -323,7 +325,7 @@
 
               <tr class="prop">
                 <td valign="top" class="name">
-                  <label for="applicationName">Application Code:</label>
+                  <label for="applicationName"><b>Application Code:&nbsp;<span style="color: red">*</span></b></label>
                 </td>
                 <td valign="top">
                   <input type="text" id="applicationCoded" name="applicationCoded" value=""/>
@@ -331,7 +333,7 @@
               </tr>
 
               <tr class="prop">
-              <td valign="top" class="name">name:</td>
+              <td valign="top" class="name"><b>name:&nbsp;<span style="color: red">*</span></b></td>
 
               <td valign="top" class="value"><input type="text" id="named" name="named" value="" ></td>
 

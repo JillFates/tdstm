@@ -19,9 +19,11 @@
         <div class="dialog">
           <table>
             <tbody>
-
+				<tr>
+					<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+				</tr>
               <tr class="prop">
-                <td valign="top" class="name"><label for="id">Code:</label></td>
+                <td valign="top" class="name"><label for="id"><b>Code:&nbsp;<span style="color: red">*</span></b></label></td>
                 <td valign="top"
                     class="value ${hasErrors(bean:roleTypeInstance,field:'id','errors')}">
                   <input type="text" id="id" name="id"

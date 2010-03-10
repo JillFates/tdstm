@@ -256,7 +256,7 @@
 			<th>Company</th>
 			<th>Name</th>
 			<th>Title</th>
-			<th>Role</th>
+			<th>Role&nbsp;<span style="color: red">*</span></th>
 			<th>Action</th>
 
 		</tr>
@@ -296,7 +296,9 @@
                 <div class="dialog">
                     <table>
                         <tbody>
-                        
+	                        <tr>
+							<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+							</tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="firstName">Company:</label>
@@ -312,7 +314,7 @@
                             </tr> 
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="firstName">First Name:</label>
+                                    <label for="firstName"><b>First Name:<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ">
                                     <input type="text" maxlength="64" id="firstName" name="firstName" value=""/>
@@ -358,7 +360,7 @@
                             </tr> 
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="active">Role:</label>
+                                    <label for="active"><b>Role:&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ">
                                <tds:personRoleSelect name="roleType" id="roleType" optionKey="id" from="${RoleType.list()}" value="${roleType?.id}" isNew="true" ></tds:personRoleSelect>

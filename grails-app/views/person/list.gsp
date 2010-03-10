@@ -248,11 +248,10 @@ def userLogin = UserLogin.findByPerson(personInstance);
 
                 <tr class="prop">
                   <td valign="top" class="name">
-                    <label for="firstName">First Name:</label>
+                    <label for="firstName"><b>First Name:&nbsp;<span style="color: red">*</span></b></label>
                   </td>
                   <td valign="top" class="value ${hasErrors(bean:personInstance,field:'firstName','errors')}">
                     <input type="text" maxlength="64" id="firstName" name="firstName" value="${fieldValue(bean:personInstance,field:'firstName')}"/>
-                    &nbsp;<span style="color: red">*</span>
                     <g:hasErrors bean="${personInstance}" field="firstName">
                       <div class="errors">
                         <g:renderErrors bean="${personInstance}" as="list" field="firstName"/>
@@ -304,14 +303,14 @@ def userLogin = UserLogin.findByPerson(personInstance);
 
                 <tr class="prop">
                   <td valign="top" class="name">
-                    <label for="active">Active:</label>
+                    <label for="active"><b>Active:&nbsp;<span style="color: red">*</span></label>
                   </td>
                   <td valign="top" class="value ${hasErrors(bean:personInstance,field:'active','errors')}">
                     <select name="active" id="active" >
                       <g:each in="${Person.constraints.active.inList}" status="i" var="active">
                         <option value="${active}">${active}</option>
                       </g:each>
-                    </select> &nbsp;<span style="color: red">*</span>
+                    </select> 
                     <g:hasErrors bean="${personInstance}" field="active">
                       <div class="errors">
                         <g:renderErrors bean="${personInstance}" as="list" field="active"/>
@@ -365,11 +364,11 @@ def userLogin = UserLogin.findByPerson(personInstance);
                             </tr> 
                 <tr class="prop">
                   <td valign="top" class="name">
-                    <label for="firstName">First Name:</label>
+                    <label for="firstName"><b>First Name:&nbsp;<span style="color: red">*</span></b></label>
                   </td>
                   <td valign="top" class="value ${hasErrors(bean:personInstance,field:'firstName','errors')}">
                     <input type="text" maxlength="34" size="34" id="firstName" name="firstName" 
-                    value="${fieldValue(bean:personInstance,field:'firstName')}"/>&nbsp;<span style="color: red">*</span>
+                    value="${fieldValue(bean:personInstance,field:'firstName')}"/>
                     <g:hasErrors bean="${personInstance}" field="firstName">
                       <div class="errors">
                         <g:renderErrors bean="${personInstance}" as="list" field="firstName"/>
@@ -421,14 +420,14 @@ def userLogin = UserLogin.findByPerson(personInstance);
 
                 <tr class="prop">
                   <td valign="top" class="name">
-                    <label for="active">Active:</label>
+                    <label for="active"><b>Active:&nbsp;<span style="color: red">*</span></b></label>
                   </td>
                   <td valign="top" class="value ${hasErrors(bean:personInstance,field:'active','errors')}">
                     <select name="active" id="active" >
                       <g:each in="${Person.constraints.active.inList}" status="i" var="active">
                         <option value="${active}">${active}</option>
                       </g:each>
-                    </select>&nbsp;<span style="color: red">*</span>
+                    </select>
                     <g:hasErrors bean="${personInstance}" field="active">
                       <div class="errors">
                         <g:renderErrors bean="${personInstance}" as="list" field="active"/>

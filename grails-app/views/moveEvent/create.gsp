@@ -22,21 +22,19 @@
 							</tr>
                         	<tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="project">Project:</label>
+                                    <label for="project"><b>Project:&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'project','errors')}">
                                     <g:select optionKey="id" from="${Project.list()}" name="project.id" id="projectId"  
                                     value="${moveEventInstance?.project?.id}" onchange="loadMoveBundles();"></g:select>
-                                    &nbsp;<span style="color: red">*</span>
                                 </td>
                             </tr> 
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="name">Name:</label>
+                                    <label for="name"><b>Name:&nbsp;<span style="color: red">*</span></b> </label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'name','errors')}">
                                     <input type="text" id="name" name="name" value="${fieldValue(bean:moveEventInstance,field:'name')}"/>
-                                    &nbsp;<span style="color: red">*</span>
                                     <g:hasErrors bean="${moveEventInstance}" field="name">
 						            <div class="errors">
 						                <g:renderErrors bean="${moveEventInstance}" as="list" field="name"/>

@@ -1,4 +1,14 @@
- // function to generate createForm
+var requiredFields = ["assetName","assetTag"];
+Array.prototype.contains = function (element) {
+	for (var i = 0; i < this.length; i++) {
+		if (this[i] == element) {
+		return true;
+		}
+	}
+	return false;
+}
+
+// function to generate createForm
  function generateCreateForm( e ){
 		var browser=navigator.appName;		
     			var assetEntityAttributes = eval('(' + e.responseText + ')');
@@ -32,6 +42,12 @@
 			      var labelTdLeft = document.createElement('td');
 			      var labelLeft = document.createTextNode(attributeLeft.label);
 			      labelTdLeft.appendChild( labelLeft )
+			      if(requiredFields.contains(attributeLeft.attributeCode)){
+				      var spanAst = document.createElement("span")
+				      spanAst.style.color = 'red';
+				      spanAst.appendChild(document.createTextNode("*"))
+				      labelTdLeft.appendChild( spanAst )
+			      }
 			      var inputFieldLeft = getInputType(attributeLeft); 
 			      inputFieldLeft.id = attributeLeft.attributeCode+'Id';
 			      inputFieldLeft.setAttribute('name',attributeLeft.attributeCode); 
@@ -71,7 +87,8 @@
 		      tdRight.appendChild( tableRight )
 		      tr.appendChild( tdLeft )
 		      tr.appendChild( tdRight )
-		      tbody.appendChild( tr )
+		      filedRequiredMess(tbody)
+			  tbody.appendChild( tr )
 	      }
 	      createDiv.appendChild( tbody )			     
 	      if(browser == 'Microsoft Internet Explorer') {
@@ -79,7 +96,20 @@
 	      }
 	      new Ajax.Request('../assetEntity/getAutoCompleteDate?autoCompParams='+autoComp,{asynchronous:true,evalScripts:true,onComplete:function(e){createAutoComplete(e);}})
  }
-    		
+ function filedRequiredMess( table ){
+	 
+	 var etr = document.createElement('tr');
+     var etd = document.createElement('td');
+     etd.colSpan="4"
+     var divText = document.createElement('div');
+     var spanText = document.createTextNode("Fields marked ( * ) are mandatory ");
+
+     divText.className = "required";
+     divText.appendChild( spanText );
+     etd.appendChild( divText );
+     etr.appendChild( etd );
+     table.appendChild( etr )
+ }
  function createAutoComplete(e){
   	var data = eval('(' + e.responseText + ')');
   	if (data) {
@@ -167,6 +197,12 @@
 			      labelTdELeft.noWrap = 'nowrap';
 			      var labelELeft = document.createTextNode(attributeLeft.label);
 			      labelTdELeft.appendChild( labelELeft );
+			      if(requiredFields.contains(attributeLeft.attributeCode)){
+				      var spanAst = document.createElement("span")
+				      spanAst.style.color = 'red';
+				      spanAst.appendChild(document.createTextNode("*"))
+				      labelTdELeft.appendChild( spanAst )
+			      }
 			      var inputFieldELeft = getInputType(attributeLeft);
 			      	 inputFieldELeft.value = attributeLeft.value;
 					  inputFieldELeft.id = 'edit'+attributeLeft.attributeCode+'Id';							 
@@ -234,6 +270,7 @@
 		  str.appendChild( stdRight );
 		  etr.appendChild( etdRight );
 		  stbody.appendChild( str );
+		  filedRequiredMess(etbody)
 		  etbody.appendChild( etr );
 	      }
 	      

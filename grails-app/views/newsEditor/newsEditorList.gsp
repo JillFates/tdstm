@@ -364,7 +364,9 @@ Move News and Issues</b></span>
 	<input name="moveEvent.id" value="${moveEvent?.id}" type="hidden" id="moveEventId">
 		<div class="dialog" style="border: 1px solid #5F9FCF">
 		<table id="createCommentTable" style="border: 0px">
-			
+			<tr>
+				<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+			</tr>
 			<tr>
 		<td valign="top" class="name"><label>Comment Type:</label></td>
 				<td valign="top" class="value" > 
@@ -374,7 +376,7 @@ Move News and Issues</b></span>
 				</td>
 		</tr>
 			<tr class="prop">
-				<td valign="top" class="name"><label for="messageId">Comment:</label>
+				<td valign="top" class="name"><label for="messageId"><b>Comment:&nbsp;<span style="color: red">*</span></b></label>
 				</td>
 				<td valign="top" class="value"><textarea cols="80" rows="5"
 					id="messageId" name="message"></textarea></td>

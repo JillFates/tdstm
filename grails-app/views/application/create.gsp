@@ -13,15 +13,13 @@
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
-            <g:hasErrors bean="${applicationInstance}">
-            <div class="errors">
-                <g:renderErrors bean="${applicationInstance}" as="list" />
-            </div>
-            </g:hasErrors>
             <g:form action="save" method="post" >
                 <div class="dialog">
                     <table>
                         <tbody>
+                        <tr>
+						<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+						</tr>
                         <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="appCode">Company:</label>
@@ -32,21 +30,30 @@
                             </tr> 
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="appCode">App Code:</label>
+                                    <label for="appCode"><b>App Code:&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'appCode','errors')}">
-                                   
                                     <input type="hidden"   name="owner.id" value="${partyId}" />
                                     <input type="text" id="appCode" name="appCode" value="${fieldValue(bean:applicationInstance,field:'appCode')}"/>
+                                    <g:hasErrors bean="${applicationInstance}" field="appCode">
+						            <div class="errors">
+						                <g:renderErrors bean="${applicationInstance}" as="list" field="appCode"/>
+						            </div>
+						            </g:hasErrors>
                                 </td>
                             </tr> 
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="name">Name:</label>
+                                    <label for="name"><b>Name:&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'name','errors')}">
                                     <input type="text" id="name" name="name" value="${fieldValue(bean:applicationInstance,field:'name')}"/>
+                                    <g:hasErrors bean="${applicationInstance}" field="name">
+						            <div class="errors">
+						                <g:renderErrors bean="${applicationInstance}" as="list" field="name"/>
+						            </div>
+						            </g:hasErrors>
                                 </td>
                             </tr> 
                             

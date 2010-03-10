@@ -52,11 +52,10 @@
 							</tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="person">Person:</label>
+                                    <label for="person"><b>Person:&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'person','errors')}">
                                     <g:select optionKey="id" from="${Person.list()}" id="person" name="person.id" value="${userLoginInstance?.person?.id}" ></g:select>
-                                    &nbsp;<span style="color: red">*</span>
                                 <g:hasErrors bean="${userLoginInstance}" field="person">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="person"/>
@@ -67,11 +66,10 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="username">Username:</label>
+                                    <label for="username"><b>Username:&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'username','errors')}">
                                     <input type="text" id="username" name="username" value="${fieldValue(bean:userLoginInstance,field:'username')}"/>
-                                    &nbsp;<span style="color: red">*</span>
                                 <g:hasErrors bean="${userLoginInstance}" field="username">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="username"/>
@@ -82,10 +80,10 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="password">Password:</label>
+                                    <label for="password"><b>Password:&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'password','errors')}">
-                                    <input type="password" id="password" name="password" value=""/>&nbsp;<span style="color: red">*</span>
+                                    <input type="password" id="password" name="password" value=""/>
                                 <g:hasErrors bean="${userLoginInstance}" field="password">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="password"/>
@@ -95,11 +93,10 @@
                             </tr> 
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="active">Active:</label>
+                                    <label for="active"><b>Active:&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'active','errors')}">
                                     <g:select id="active" name="active" from="${userLoginInstance.constraints.active.inList}" value="${userLoginInstance.active}" ></g:select>
-									&nbsp;<span style="color: red">*</span>
                                 <g:hasErrors bean="${userLoginInstance}" field="active">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="active"/>

@@ -57,8 +57,12 @@
 <table>
 	<g:form action="rackLayoutReport" name="rackLayoutForm" method="post" target="_blank" onsubmit="return validateForm()">
 	<tbody>
+		<tr>
+			<td colspan="3"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+		</tr>
+	
 		<tr class="prop" id="bundleRow">
-			<td valign="top" class="name"><label>Current Move Bundle:</label></td>
+			<td valign="top" class="name"><label> <b>Current Move Bundle:<span style="color: red;">*</span> </b></label></td>
 			<td valign="top" class="value" colspan="2">
 				<select id="bundleId" name="moveBundle" onchange="${remoteFunction(action:'getRackDetails', params:'\'bundleId=\' + this.value', onComplete:'updateRackDetails(e)')}">
 					<option value="null" selected="selected">Please Select</option>
@@ -69,7 +73,7 @@
 			</td>
 		</tr>
 		<tr class="prop">
-			<td valign="top" class="name"><label>Location:</label></td>
+			<td valign="top" class="name"><label><b>Location:<span style="color: red;">*</span> </b></label></td>
 			<td valign="top">
 				<label for="source"><input type="radio" name="location" id="source" onclick="$('#targetRackId').hide();$('#sourceRackId').show();$('#locationNameId').val('source');" /> Source </label> 
 			</td>
@@ -103,7 +107,7 @@
 			<td valign="top" colspan="2"><input type="checkbox" name="bundleName" checked="checked"></td>
 		</tr>
 		<tr>
-			<td valign="top" class="name"><label>Print Views:</label></td>
+			<td valign="top" class="name"><label><b>Print Views:<span style="color: red;">*</span> </b></label></td>
 			<td valign="top"><label for="frontView" ><input type="checkbox" name="frontView" id="frontView" checked="checked" />&nbsp;Front</label></td>
 			<td valign="top"><label for="backView" ><input type="checkbox" name="backView" id="backView" checked="checked">&nbsp;Back</label></td>
 		</tr>

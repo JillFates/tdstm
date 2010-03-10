@@ -7,11 +7,10 @@
         <title>Create Manufacturer</title>         
     </head>
     <body>
-        <div class="nav">
-            <span class="menuButton"><g:link class="home" controller="auth" action="home">Home</g:link></span>
+        <div class="body">
+        <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
             <span class="menuButton"><g:link class="list" action="list">Manufacturer List</g:link></span>
         </div>
-        <div class="body">
             <h1>Create Manufacturer</h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
@@ -25,10 +24,12 @@
                 <div class="dialog">
                     <table>
                         <tbody>
-                        
+	                        <tr>
+							<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+							</tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="name">Name:</label>
+                                    <label for="name"><b>Name:&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:manufacturerInstance,field:'name','errors')}">
                                     <input type="text" id="name" name="name" value="${fieldValue(bean:manufacturerInstance,field:'name')}"/>

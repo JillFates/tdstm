@@ -7,42 +7,48 @@
         <title>Edit RefCode</title>
     </head>
     <body>
-        <div class="nav">
-            <span class="menuButton"><g:link class="home" controller="auth" action="home">Home</g:link></span>
-            <span class="menuButton"><g:link class="list" action="list">RefCode List</g:link></span>
-            <span class="menuButton"><g:link class="create" action="create">New RefCode</g:link></span>
-        </div>
         <div class="body">
+	        <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
+	            <span class="menuButton"><g:link class="list" action="list">RefCode List</g:link></span>
+	            <span class="menuButton"><g:link class="create" action="create">New RefCode</g:link></span>
+	        </div>
             <h1>Edit RefCode</h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
-            <g:hasErrors bean="${refCodeInstance}">
-            <div class="errors">
-                <g:renderErrors bean="${refCodeInstance}" as="list" />
-            </div>
-            </g:hasErrors>
             <g:form method="post" >
                 <input type="hidden" name="id" value="${refCodeInstance?.id}" />
                 <div class="dialog">
                     <table>
                         <tbody>
-                        
+                        <tr>
+						<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+						</tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="domain">Domain:</label>
+                                    <label for="domain"><b>Domain:&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:refCodeInstance,field:'domain','errors')}">
                                     <input type="text" maxlength="100" id="domain" name="domain" value="${fieldValue(bean:refCodeInstance,field:'domain')}"/>
+                                    <g:hasErrors bean="${refCodeInstance}" field="domain">
+						            <div class="errors">
+						                <g:renderErrors bean="${refCodeInstance}" as="list" field="domain"/>
+						            </div>
+						            </g:hasErrors>
                                 </td>
                             </tr> 
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="value">Value:</label>
+                                    <label for="value"><b>Value:&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:refCodeInstance,field:'value','errors')}">
                                     <input type="text" maxlength="240" id="value" name="value" value="${fieldValue(bean:refCodeInstance,field:'value')}"/>
+                                    <g:hasErrors bean="${refCodeInstance}" field="value">
+						            <div class="errors">
+						                <g:renderErrors bean="${refCodeInstance}" as="list" field="value"/>
+						            </div>
+						            </g:hasErrors>
                                 </td>
                             </tr> 
                         

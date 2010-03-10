@@ -39,8 +39,12 @@
 <div class="dialog">
 <table>
 	<tbody>
+		<tr>
+			<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+		</tr>
+	
 		<tr class="prop" id="bundleRow" >
-			<td valign="top" class="name" style="paddingleft:10px;"><label>&nbsp;&nbsp;&nbsp;&nbsp;Bundles:</label></td>
+			<td valign="top" class="name" style="paddingleft:10px;"><label>&nbsp;&nbsp;&nbsp;&nbsp;<b>Bundles:<span style="color: red;">*</span> </b></label></td>
 			<td valign="top" class="value" align="left">
 				<select id="moveBundleId" name="moveBundles" onchange="return populateBundle(this.value);">
 					<option value="null" selected="selected">Please Select</option>
@@ -52,7 +56,7 @@
 			</td>
 		</tr>
 		<tr>
-		<td valign="top" class="name" ><label>Sort report by: </label></td>
+		<td valign="top" class="name" nowrap="nowrap"><label>Sort report by: </label></td>
 		<td valign="top" class="value" align="left">
 				<select id="sortOrder" name="sortOrder" onchange="return populateSort(this.value);">
 					<option value="id" selected="selected">Asset Id </option>

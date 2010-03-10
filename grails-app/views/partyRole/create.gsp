@@ -20,7 +20,9 @@
                 <div class="dialog">
                     <table>
                         <tbody>
-                        
+                         <tr>
+						<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+						</tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="party">Party:</label>

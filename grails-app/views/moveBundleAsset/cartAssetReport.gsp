@@ -30,9 +30,12 @@
 <div class="dialog">
 <table>
 	<tbody>
+		<tr>
+			<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+		</tr>
 		<tr class="prop" id="bundleRow">
 
-			<td valign="top" class="name"><label>Bundles:</label></td>
+			<td valign="top" class="name"><label><b>Bundles:<span style="color: red;">*</span></b></label></td>
 
 			<td valign="top" class="value"><select id="moveBundleId"
 				name="moveBundles" onchange="return populateBundle(this.value);">

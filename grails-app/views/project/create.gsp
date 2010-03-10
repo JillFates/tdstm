@@ -222,34 +222,32 @@
 			<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 			</tr>
 			<tr class="prop">
-				<td valign="top" class="name"><label for="client">Client:</label>
+				<td valign="top" class="name"><label for="client"><b>Client:&nbsp;<span style="color: red">*</span></b></label>
 				</td>
 				<td valign="top" class="value"><select id="clientId" name="client.id" onchange="${remoteFunction(action:'getPartnerStaffList', params:'\'client=\'+ this.value +\'&partner=\'+document.getElementById(\'projectPartnerId\').value', onComplete:'updateMastersList(e)' )}">
 					<g:each status="i" in="${clients}" var="clients">
 						<option value="${clients.partyIdTo.id}">${clients.partyIdTo}</option>
 					</g:each>
-				</select>&nbsp;<span style="color: red">*</span></td>
+				</select></td>
 			</tr>
 
 			<tr class="prop">
-				<td valign="top" class="name"><label for="projectCode">Project
-				Code:</label></td>
+				<td valign="top" class="name"><label for="projectCode"><b>Project Code:&nbsp;<span style="color: red">*</span></b></label></td>
 				<td valign="top"
 					class="value ${hasErrors(bean:projectInstance,field:'projectCode','errors')}">
 				<input type="text" id="projectCode" name="projectCode" maxlength="20"
-					value="${fieldValue(bean:projectInstance,field:'projectCode')}" />&nbsp;<span style="color: red">*</span>
+					value="${fieldValue(bean:projectInstance,field:'projectCode')}" />
 				<g:hasErrors bean="${projectInstance}" field="projectCode">
 					<div class="errors"><g:renderErrors bean="${projectInstance}"
 						as="list" field="projectCode" /></div>
 				</g:hasErrors></td>
 			</tr>
 			<tr class="prop">
-				<td valign="top" class="name"><label for="name">Project
-				Name:</label></td>
+				<td valign="top" class="name"><label for="name"><b>Project Name:&nbsp;<span style="color: red">*</span></b></label></td>
 				<td valign="top"
 					class="value ${hasErrors(bean:projectInstance,field:'name','errors')}">
 				<input type="text" id="name" name="name" maxlength="64"
-					value="${fieldValue(bean:projectInstance,field:'name')}" />&nbsp;<span style="color: red">*</span>
+					value="${fieldValue(bean:projectInstance,field:'name')}" />
 					<g:hasErrors
 					bean="${projectInstance}" field="name">
 					<div class="errors"><g:renderErrors bean="${projectInstance}"
@@ -379,13 +377,12 @@
 			</tr>
 
 			<tr class="prop">
-				<td valign="top" class="name"><label for="trackChanges">Track
-				Changes:</label></td>
+				<td valign="top" class="name"><label for="trackChanges"><b>Track Changes:&nbsp;<span style="color: red">*</span></b></label></td>
 				<td valign="top"
 					class="value ${hasErrors(bean:projectInstance,field:'trackChanges','errors')}">
 				<g:select id="trackChanges" name="trackChanges"
 					from="${projectInstance.constraints.trackChanges.inList}"
-					value="${projectInstance.trackChanges}"></g:select>&nbsp;<span style="color: red">*</span>
+					value="${projectInstance.trackChanges}"></g:select>
 					 <g:hasErrors bean="${projectInstance}" field="trackChanges">
 					<div class="errors"><g:renderErrors bean="${projectInstance}"
 						as="list" field="trackChanges" /></div>
@@ -393,13 +390,12 @@
 			</tr>
 			
 			<tr class="prop">
-				<td valign="top" class="name"><label for="workflowCode">Workflow
-				Code:</label></td>
+				<td valign="top" class="name"><label for="workflowCode"><b>Workflow	Code:&nbsp;<span style="color: red">*</span></b></label></td>
 				<td valign="top"
 					class="value ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">
 				<g:select id="workflowCode" name="workflowCode"
 					from="${workflowCodes}"
-					value="Please Select" noSelection="['':'Please Select']"></g:select>&nbsp;<span style="color: red">*</span>
+					value="Please Select" noSelection="['':'Please Select']"></g:select>
 					<g:hasErrors bean="${projectInstance}" field="workflowCode">
 					<div class="errors"><g:renderErrors bean="${projectInstance}"
 						as="list" field="workflowCode" /></div>

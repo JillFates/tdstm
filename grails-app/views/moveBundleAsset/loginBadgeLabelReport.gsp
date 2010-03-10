@@ -260,9 +260,12 @@ var sHint = "C:\\temp\\output";
 			</div>
 <table>
 	<tbody>
+		<tr>
+			<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+		</tr>
 		<tr class="prop" id="bundleRow">
 
-			<td valign="top" class="name"><label>Bundles:</label><input type="hidden" name="urlPath" id="urlPath" value="<g:createLinkTo dir="resource" file="login_badge.tff" absolute="true"/>"/>
+			<td valign="top" class="name"><label><b>Bundles:<span style="color: red;">*</span></b> </label><input type="hidden" name="urlPath" id="urlPath" value="<g:createLinkTo dir="resource" file="login_badge.tff" absolute="true"/>"/>
 
 			<td valign="top" class="value"><select id="moveBundleId"
 				name="moveBundles" onchange="return populateTeams(this.value);">
@@ -305,11 +308,14 @@ var sHint = "C:\\temp\\output";
 			Target</td>
 		</tr>
 		<tr>
-		<td>
-			<input type= "hidden" id="RepPath" name="RepPath">
-      	  				<input type= "hidden" name="PrjName" id="PrjName">
-          				<input type= "hidden" name="FormName" id="FormName">
-          				Printer: </td><td><select type= "hidden" id="Printers" name="Printers"  onChange="javascript:mySelect(this);"/>
+			<td>
+					<input type= "hidden" id="RepPath" name="RepPath">
+	      	  		<input type= "hidden" name="PrjName" id="PrjName">
+	          		<input type= "hidden" name="FormName" id="FormName">
+	          		<b>Printer:<span style="color: red;">*</span></b> 
+			</td>
+			<td>
+			<select type= "hidden" id="Printers" name="Printers"  onChange="javascript:mySelect(this);"/>
           				<input type= "hidden" name="PrinterName" id="PrinterName">
 			</td>
 			</tr>

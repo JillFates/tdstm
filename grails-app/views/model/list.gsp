@@ -7,10 +7,6 @@
         <title>Model List</title>
     </head>
     <body>
-        <div class="nav">
-            <span class="menuButton"><g:link class="home" controller="auth" action="home">Home</g:link></span>
-            <span class="menuButton"><g:link class="create" action="create">New Model</g:link></span>
-        </div>
         <div class="body">
             <h1>Model List</h1>
             <g:if test="${flash.message}">
@@ -55,6 +51,11 @@
             <div class="paginateButtons">
                 <g:paginate total="${Model.count()}" />
             </div>
+            <div class="buttons">
+				<g:form>
+			    	<span class="button"><g:actionSubmit class="create" value="New Model" action="create" /></span>
+			    </g:form>
+			</div>
         </div>
     </body>
 </html>

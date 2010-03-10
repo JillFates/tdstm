@@ -34,10 +34,12 @@
                 <div class="dialog">
                     <table>
                         <tbody>
-                        
+                        	<tr>
+							<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+							</tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="teamCode">Team Code:</label>
+                                    <label for="teamCode"><b>Team Code:&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:projectTeamInstance,field:'teamCode','errors')}">
                                     <input type="text" id="teamCode" name="teamCode" value="${fieldValue(bean:projectTeamInstance,field:'teamCode')}"/>
@@ -51,7 +53,7 @@
                             
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="name">Team Name:</label>
+                                    <label for="name"><b>Team Name:&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:projectTeamInstance,field:'name','errors')}">
                                     <input type="text" id="name" name="name" value="${fieldValue(bean:projectTeamInstance,field:'name')}"/>
