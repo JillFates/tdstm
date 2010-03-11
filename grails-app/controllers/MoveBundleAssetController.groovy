@@ -584,27 +584,46 @@ class MoveBundleAssetController {
         def projectId = currProj.CURR_PROJ
         def projectInstance = Project.findById( projectId )
         def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
-        if (reportId == "Rack Layout") {
-        	userPreferenceService.loadPreferences("CURR_BUNDLE")
-            def currentBundle = getSession().getAttribute("CURR_BUNDLE")
-        	render(view:'rackLayout',model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, currentBundle:currentBundle])
-        } else if( reportId == "cart Asset" ){
-        	render(view:'cartAssetReport',model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
-        } else if( reportId == 'Issue Report' ){
-        	render(view:'issueReport',model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
-        } else if(reportId == 'Transportation Asset List') {
-        	render(view:'transportationAssetReport',model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
-        }
-        else if ( reportId == 'Login Badges' ) {
-        	def browserTest = false
-        	if ( !request.getHeader ( "User-Agent" ).contains ( "MSIE" ) ) {
-        		browserTest = true
-        	}
-        	render(view:'loginBadgeLabelReport',model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, 
-        	                                           browserTest: browserTest])
-        } else {
-        	render(view:'teamWorkSheets',model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
-        }
+		def browserTest = false
+		if ( !request.getHeader ( "User-Agent" ).contains ( "MSIE" ) ) {
+			browserTest = true
+		}
+		switch (reportId) {
+            case "Rack Layout" :  
+				            	userPreferenceService.loadPreferences("CURR_BUNDLE")
+					            def currentBundle = getSession().getAttribute("CURR_BUNDLE")
+					        	render( view:'rackLayout',
+					        			model:[moveBundleInstanceList: moveBundleInstanceList, 
+											   projectInstance:projectInstance, currentBundle:currentBundle])
+            					break;
+            case "cart Asset":  
+				            	render( view:'cartAssetReport',
+				            			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
+						        break;
+            case "Issue Report":  
+				            	render( view:'issueReport',
+				            			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
+						        break;
+            case "Transportation Asset List":  
+				            	render( view:'transportationAssetReport',
+				            			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
+						        break;
+            case "Asset Tag" :
+				            	render( view:'assetTagLabel',
+				            			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance,
+											   browserTest: browserTest])
+						        break;
+
+            case "Login Badges":  
+					        	render( view:'loginBadgeLabelReport',
+					        			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, 
+											   browserTest: browserTest])
+								break;
+            default: 
+				            	render( view:'teamWorkSheets',
+				            			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
+						        break;
+		}
     }
     //get teams for selected bundles.
     def getTeamsForBundles = {
@@ -1418,4 +1437,34 @@ class MoveBundleAssetController {
     	}
     	return rows
      }
+	/*----------------------------------------------
+	 * return the asset d
+	 *---------------------------------------------*/
+	def getAssetTagLabelData = {
+		def moveBundleId = params.moveBundle
+		def location = params.location
+		def projectId = params.project
+	    def reportFields = []
+		if( !moveBundleId || !projectId ) {    		
+			reportFields <<[ 'flashMessage': "Please Select Bundles."]
+			render reportFields as JSON
+	    } else {
+			def assetsQuery = new StringBuffer(" SELECT ae.asset_entity_id as id, ae.asset_name as assetName, ae.asset_tag as assetTag,"+
+								" ae.source_rack as rack, ae.source_rack_position as uposition"+
+								" FROM asset_entity ae WHERE ae.project_id = ${projectId} ")
+			if(moveBundleId != "all"){
+				assetsQuery.append(" AND ae.move_bundle_id = ${moveBundleId} ")
+			}
+			assetsQuery.append("ORDER BY ae.source_rack, ae.source_rack_position DESC")
+			println"-->$assetsQuery"
+	    	def assetEntityList = jdbcTemplate.queryForList( assetsQuery.toString() )
+			println"assetEntityList------------>"+assetEntityList
+			if( !assetEntityList ){
+				reportFields <<[ 'flashMessage': "Team Members not Found for selected Teams"]
+			} else {
+				reportFields << assetEntityList
+			}
+			render reportFields  as JSON
+	    }
+	}
 }   
