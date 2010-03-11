@@ -31,9 +31,8 @@ var jobdata = job.NewJobDataRecordSet();
     	return flase;
     } else {
 	    document.getElementById('teamNotFound').style.display = "none"   
-	    for(var i = 0; i < 1; i++) {
+	    for(var i = 0; i < assetsList.length; i++) {
 	    	jobdata.AddNewRecord();                					
-	    	jobdata.SetDataField('assetId', assetsList[i].id); 
 	    	jobdata.SetDataField('assetName', assetsList[i].assetName);       
 	    	jobdata.SetDataField('assetTag', assetsList[i].assetTag); 
 	    	jobdata.SetDataField('rack', assetsList[i].rack);

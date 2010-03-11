@@ -348,6 +348,10 @@ function checkComments(type) {
 					onclick="return validChanges();">Issues/Comments</a> <BR style="MARGIN-TOP: 6px">
 				<input name="type" value="create" type="hidden"/>
 				<a href="#" class="button big" onclick="missingAsset('create', '${assetEntity?.id}','Mark asset as missing. Are you sure?')">Mark Asset Missing </a>
+				 <BR style="MARGIN-TOP: 6px">
+				 <g:if test="${request.getHeader ( 'User-Agent' ).contains ( 'MSIE' )}">
+				<a class="button big" href="#generate_label" >Generate Label</a>
+				</g:if>
 				<div style="MARGIN-TOP: 10px">
 					<div class=thefield align=center>
 						<a class="button" id="mainSaveId" href="#select_asset" onClick="document.auditForm.submitType.value='save';getObject('mustSaveId').value='false';document.auditForm.submit();">Save</a>&nbsp;&nbsp;&nbsp;
@@ -641,9 +645,165 @@ function checkComments(type) {
 		
 		</div>
 		</div>
-		</g:form>
 		<!-- end of Walkthru Asset:Back -->
+		</g:form>
+		<g:if test="${request.getHeader ( 'User-Agent' ).contains ( 'MSIE' )}">
+		<div class="gap"></div>
 		
+		<!-- Walkthru Asset:Generate Label  -->
+		<div class="qvga_border">
+		<a name="generate_label"></a>
+		<div class="title">Walkthru&gt; Generate Label</div>
+		<div class="input_area">
+		
+		<div style="FLOAT: left"><a class=button href="startMenu">Start Over</a></div>
+		<div style="float:right;"><a class="button" href="#asset_menu">Asset Menu</a></div>
+		<br class="clear"/>
+		<object id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C" codebase="${createLinkTo(dir:'resource',file:'TFORMer60.cab')}"></object>
+		
+		<g:form name="assetTagLabelForm">
+		<table>
+		<tr>
+			<input type="hidden" name="urlPath" id="urlPath" value="<g:createLinkTo dir="resource" file="assetTag_label.tff" absolute="true"/>"/>
+			<input type= "hidden" id="RepPath" name="RepPath">
+	      	<input type= "hidden" name="PrjName" id="PrjName">
+	        <input type= "hidden" name="FormName" id="FormName">
+			<td class="label">Asset Tag:</td>
+			<td class="field">${assetEntity?.assetTag}</td>
+		</tr>
+		<tr>
+			<td class="label">Asset Name:</td>
+			<td class="field">${assetEntity?.assetName}</td>
+		</tr>
+		<tr>
+			<td class="label">Serial Nunber:</td>
+			<td class="field">${assetEntity?.serialNumber}</td>
+		</tr>
+		<tr>
+			<td class="label">Rack:</td>
+			<td class="field">${assetEntity?.sourceRack}</td>
+		</tr>
+		<tr>
+			<td class="label">U-Position:</td>
+			<td class="field">${assetEntity?.sourceRackPosition}</td>
+		</tr>
+		
+		<tr>
+			<td class="label">Manufacturer:</td>
+			<td class="field">${assetEntity?.manufacturer}</td>
+		</tr>
+		<tr>
+			<td class="label">Model:</td>
+			<td class="field">${assetEntity?.model}</td>
+		</tr>
+		<tr>
+			<td class="label">Printer</td>
+			<td class="field"><select type= "hidden" id="Printers" name="Printers"  onChange="javascript:mySelect(this);"/>
+          				<input type= "hidden" name="PrinterName" id="PrinterName"></td>
+		</tr>
+		</table>      
+		<div style="margin-top:20px;">
+		   <div class="thefield" align="center">
+		      <a class="button" id="printButton" href="javascript:startprintjob();">Print</a>
+		   </div>
+		</div>
+		</g:form>
+		</div>
+		<script type="text/javascript">
+		//=============================================================================
+		// PRINT HERE
+		//=============================================================================
+		function startprintjob()
+		{
+		var job = window.TF.CreateJob();
+		var form = window.document.assetTagLabelForm;
+		var jobdata = job.NewJobDataRecordSet();
+		    job.RepositoryName = document.getElementById('urlPath').value;       			 
+		    job.ProjectName = form.PrjName.value;     
+		    job.FormName = form.FormName.value;                   
+		    job.PrinterName = form.PrinterName.value;
+		    // THIS IS THE PLACE TO ADD YOUR DATA
+		    jobdata.ClearRecords();  
+		   	jobdata.AddNewRecord();                					
+		   	jobdata.SetDataField('assetName', "${assetEntity?.assetName}");       
+		   	jobdata.SetDataField('assetTag', "${assetEntity?.assetTag}"); 
+		   	jobdata.SetDataField('rack', "${assetEntity?.sourceRack}");
+		   	jobdata.SetDataField('upos', "${assetEntity?.sourceRackPosition}");  	   		
+		    	
+		    // now we print one copy of the label with default settings
+		    try 
+		    {
+		    	job.PrintForm();
+		    }
+		    catch (e)
+		    {
+			    alert ("TFORMer returned an error!" + 
+			           "\nError description: " + e.description + 
+			           "\nError name: " + e.name + 
+			           "\nError number: " + e.number + 
+			           "\nError message: " + e.message);
+		    }
+
+		}
+		//=============================================================================
+		//The selected dprinter has changed
+		//=============================================================================
+		function mySelect(x)
+		{
+			document.getElementById("PrinterName").value = x.options[x.selectedIndex].value;
+			
+		}
+		//=============================================================================
+		// Add a new option to select element
+		//=============================================================================
+		function AddOption (selElement, text, value)
+		{
+		  opt = new Option(text, value, false, true);
+		  selElement.options[selElement.length] = opt;
+		}
+
+		//=============================================================================
+		// Set default data for TFORMer Runtime Properties
+		//=============================================================================
+		function InitData()
+		{
+			var form = window.document.assetTagLabelForm;
+			var path = window.location.href;
+			var i = -1;
+			// the following code evaluates the path to the demo repository
+			for (n=1; n<=3; n++)
+			{
+				i = path.lastIndexOf('/');
+				if (i != -1)
+				{
+					path = path.substring(0,i)                              // one directory level up
+				}
+			}
+			if (path.substr (0, 8) == "file:///")			                // do not use URL-style for Repository file name - remove file:///
+			    path = path.substr (8);
+		    path= unescape(path);	                        				// unescape!
+		    form.RepPath.value 	= path + '/Demo Repository/Demos.tfr';  	// repository name
+		    form.PrjName.value 	= 'TFORMer_Runtime_Examples';				// project name
+		    form.FormName.value = 'BarcodeLabels';							// form name
+		    form.PrinterName.value = ''	
+			// get list of installed printers
+			var dropdown = document.getElementById("Printers");
+			window.TF.RefreshOSPrinters();
+			var def = 0;
+			for (i = 0; i < window.TF.GetOSPrintersCount(); i++) 
+			{
+			  AddOption (dropdown, window.TF.GetOSPrinter(i), window.TF.GetOSPrinter(i));
+			  if (window.TF.GetOSPrinter(i) == window.TF.GetOSDefaultPrinter())
+			    def = i;
+			}
+			dropdown.options[def].selected = true;
+		}
+		
+
+		InitData()
+		</script>
+		</div>
+		</g:if>
 	    <div class="gap"></div>
 		<!-- Walkthru Asset:Comments -->
 		<div class="qvga_border">
@@ -766,6 +926,7 @@ function checkComments(type) {
 				<li><a href="getComments?commentType=instruction&sort=desc&orderType=comment&id=${assetEntity.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">Instruction</a></li>
 				<li><a href="getComments?commentType=issue&sort=desc&orderType=comment&id=${assetEntity.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">Issue</a></li>
 		   </ul>
+		   
 	<script type="text/javascript">
 	if('${commentCodes.needAssetTag}'){
 		getObject('needAssetTagYes').checked = true
@@ -791,7 +952,8 @@ function checkComments(type) {
 	getObject("modelId").value = "${assetEntity?.model}"
 	if("${location}" != "${assetEntity.sourceLocation}"){
 		setMustSave( "${location}", "${assetEntity.sourceLocation}", "", "sourceLocation");
-	}		
-	</script>
+	}
+</script>
+
 </body>
 </html>
