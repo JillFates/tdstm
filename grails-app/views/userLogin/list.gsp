@@ -25,10 +25,11 @@
                         	<g:sortableColumn property="username" title="Username" />
                         	
                    	        <th>Person</th>
+                   	        
+                   	        <g:sortableColumn property="lastLogin" title="Last Login" />
                    	    
                    	        <g:sortableColumn property="createdDate" title="Created Date" />
                         
-                   	        <g:sortableColumn property="lastLogin" title="Last Login" />
                         
                         </tr>
                     </thead>
@@ -40,9 +41,9 @@
                         
                             <td>${fieldValue(bean:userLoginInstance, field:'person')}</td>
                         
-                            <td>${fieldValue(bean:userLoginInstance, field:'createdDate')}</td>
-                        
-                            <td>${fieldValue(bean:userLoginInstance, field:'lastLogin')}</td>
+                            <td><tds:convertDateTime date="${userLoginInstance?.lastLogin}"/></td>
+                            
+                             <td><tds:convertDateTime date="${userLoginInstance?.createdDate}"/></td>
                         
                         </tr>
                     </g:each>

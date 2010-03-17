@@ -17,7 +17,7 @@ class UserLoginController {
         if( !companyId ){
         	companyId = request.getSession().getAttribute("PARTYGROUP")?.id
         }
-		def isCompanyAdmin = SecurityUtils.getSubject().hasRole("COMPANY_ADMIN")
+		def isCompanyAdmin = SecurityUtils.getSubject().hasRole("ADMIN")
 		if( !isCompanyAdmin ){
 			def personsList = partyRelationshipService.getCompanyStaff( companyId )
 			def personIds = ""

@@ -1,7 +1,7 @@
 class UserLogin {
 	String username
 	String password
-	Date createdDate
+	Date createdDate = new Date()
 	Date lastLogin
 	String active
 	Person person

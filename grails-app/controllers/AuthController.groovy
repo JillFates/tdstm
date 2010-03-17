@@ -46,7 +46,13 @@ class AuthController {
 	             *  call loadPreferences() to load CURR_PROJ MAP into session
 	             */
 	            userPreferenceService.loadPreferences("CURR_PROJ")
+				/*
+				 *  call userPreferenceService.updateLastLogin( params.username ) to update the last login time
+				 */
+				userPreferenceService.updateLastLogin( params.username )
+				
 	            def browserTest = request.getHeader("User-Agent").contains("IEMobile")
+				
 	            if(browserTest) {
 	            	redirect(controller:'walkThrough')
 	            } else {

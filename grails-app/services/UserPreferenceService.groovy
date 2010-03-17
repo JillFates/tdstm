@@ -133,4 +133,15 @@ class UserPreferenceService  {
     	}
     	return activeStatus
     }
+    /*
+     * Update the lastlogin once user has logged in.
+     * @param  : login username.
+     */
+	def updateLastLogin( username ){
+    	if( username ){
+    		def userLogin = UserLogin.findByUsername( username )
+			userLogin.lastLogin = new Date()
+    		userLogin.save(flush:true)
+    	}
+    }
 }
