@@ -345,15 +345,20 @@ class MoveTechController {
             def assetList = []
             def colorCss
             def rdyState
-            def ipState
+            def ipState = new ArrayList()
             def moveBundleInstance = MoveBundle.findById( bundleId )
             def holdState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Hold" ) 
             if ( params.location == "s" ) {
                 rdyState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Release" )
-                ipState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Unracking" )
+                ipState.add( stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Unracking" ) )
             } else {
+            	
                 rdyState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Staged" )
-                ipState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Reracking" )
+                ipState.add(  stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Reracking" ) )
+				if( stateEngineService.getStateId ( moveBundleInstance.project.workflowCode, "Cabled" ) ){
+					ipState.add( stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Reracked" ) )
+				}
+                
             }
             def countQuery = "select a.asset_entity_id as id, a.asset_tag as assetTag, a.source_rack as sourceRack, " + 
 				            "a.source_rack_position as sourceRackPosition, a.target_rack as targetRack, " +
@@ -369,8 +374,7 @@ class MoveTechController {
                 countQuery +=" and a.source_team_id = $team"
             } else {
             	stateVal = stateEngineService.getStateId ( moveBundleInstance.project.workflowCode, "Cabled" )
-            	if(!stateVal)
-            	{
+            	if(!stateVal) {
             		stateVal = stateEngineService.getStateId ( moveBundleInstance.project.workflowCode, "Reracked" )
             	}
                 query.append (" and a.target_team_id = $team" )
@@ -383,14 +387,17 @@ class MoveTechController {
             query.append(" group by a.asset_entity_id ")
             if( params.sort != null ){
             	if( params.sort == "source_rack" ) {
-            		query.append(" order by min(cast(t.state_to as UNSIGNED INTEGER)) = $holdState desc ,p.current_state_id = $ipState desc, p.current_state_id = $rdyState desc, "+
+            		query.append(" order by min(cast(t.state_to as UNSIGNED INTEGER)) = $holdState desc ,"+
+            					"p.current_state_id in ${ipState.toString().replace(']',')').replace('[','(')} desc, p.current_state_id = $rdyState desc, "+
             					"p.current_state_id < $rdyState desc , a.$params.sort $params.order, a.source_rack_position $params.order" )
             	}else {
-            		query.append(" order by min(cast(t.state_to as UNSIGNED INTEGER)) = $holdState desc ,p.current_state_id = $ipState desc, p.current_state_id = $rdyState desc, "+
+            		query.append(" order by min(cast(t.state_to as UNSIGNED INTEGER)) = $holdState desc ,"+
+            					"p.current_state_id in ${ipState.toString().replace(']',')').replace('[','(')} desc, p.current_state_id = $rdyState desc, "+
             					"p.current_state_id < $rdyState desc , a.$params.sort $params.order" )
             	}
             }else {
-            	query.append(" order by min(cast(t.state_to as UNSIGNED INTEGER)) = $holdState desc ,p.current_state_id = $ipState desc, p.current_state_id = $rdyState desc, "+
+            	query.append(" order by min(cast(t.state_to as UNSIGNED INTEGER)) = $holdState desc ,"+
+            				"p.current_state_id in ${ipState.toString().replace(']',')').replace('[','(')} desc, p.current_state_id = $rdyState desc, "+
             				"p.current_state_id < $rdyState desc , a.source_rack, a.source_rack_position" )
             }
             proAssetMap = jdbcTemplate.queryForList ( query.toString() )
@@ -401,7 +408,7 @@ class MoveTechController {
 	                    colorCss = "asset_hold"
 	                } else if ( it.currentStateId == rdyState ) {
 	                    colorCss = "asset_ready"
-	                } else if ( it.currentStateId == ipState ) {
+	                } else if ( ipState.contains( it.currentStateId ) ) {
 	                    colorCss = "asset_process"
 	                } else if ( ( it.currentStateId > holdState ) && ( it.currentStateId < rdyState ) ) {
 	                    colorCss = "asset_pending"
