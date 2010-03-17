@@ -181,7 +181,7 @@ function startprintjob(){
 function AddOption (selElement, text, value)
 {
   opt = new Option(text, value, false, true);
-  selElement.options[selElement.length] = opt;
+  selElement.options[0] = opt;
 }
 
 //=============================================================================
@@ -231,7 +231,7 @@ function InitData()
 	   TFORMer initialization has been moved to Home page to get list of installed printers.
 	   Printers are added by getting form session, which are setted at HomePage
 	   Modified by Lokanath Reddy 
-	*-------------------------------------------------------------------------*/
+	
 	var printersString = '${session.getAttribute( "PRINTERS" )}'
 	var dropdownOptions = printersString.split(",");
 	for(opt=0; opt< dropdownOptions.length; opt++){
@@ -240,6 +240,7 @@ function InitData()
 		doption.innerHTML = dropdownOptions[opt];
 		dropdown.appendChild( doption );
 	}	
+	*-------------------------------------------------------------------------*/
 	retrieve_field(document.assetSearchForm.Printers)
 	mySelect(dropdown);
 	
@@ -561,7 +562,13 @@ function mySelect(x)
 					<input type= "hidden" id="RepPath" name="RepPath">
       	  				<input type= "hidden" name="PrjName" id="PrjName">
           				<input type= "hidden" name="FormName" id="FormName">
-	      				<b>Printer: </b><select type= "hidden" id="Printers" name="Printers" onChange="javascript:mySelect(this);"/>
+	      				<b>Printer: </b>
+	      				<select type= "hidden" id="Printers" name="Printers" onChange="javascript:mySelect(this);">
+	      				<option value="Zebra (ZPL-II)">Zebra (ZPL-II)</option>
+	      				<g:each in="${session.getAttribute( 'PRINTERS' )}" var="printer">
+							<option value="${printer}">${printer}</option>	      				
+	      				</g:each>
+	      				</select>
           				<input type= "hidden" name="PrinterName" id="PrinterName">
 		  				</td>
 					

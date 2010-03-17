@@ -1184,7 +1184,11 @@ class MoveTechController {
 	* @author : Lokanath Reddy
 	*---------------------------------------------------------*/
     def setPrintersIntoSession = {
-    	session.setAttribute( "PRINTERS", params.dropdown)
+		def printers 
+		if(params.dropdown){
+			printers = params.dropdown.split(",")
+		}
+    	session.setAttribute( "PRINTERS", printers)
     }
     /*----------------------------------------------------------------------------------
      * @author Lokanath Reddy
