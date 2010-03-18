@@ -58,7 +58,7 @@
   </head>
   <body>   
     
-    <div class="body" style="width: 250px;">
+    <div class="body" style="width: 260px;">
     	<div class="steps_table">
       <span class="span"><b> Show Move Bundle </b></span>
       <g:if test="${flash.message}">

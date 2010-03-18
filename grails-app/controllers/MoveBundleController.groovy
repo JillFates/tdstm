@@ -132,8 +132,14 @@ class MoveBundleController {
 						def moveBundleStep = moveBundleService.createMoveBundleStep(moveBundleInstance, it.id, params)
 						def tasksCompleted = params["tasksCompleted_"+it.id] ? Integer.parseInt(params["tasksCompleted_"+it.id]) : 0
 						stepSnapshotService.createManualSnapshot( moveBundleInstance.id, moveBundleStep.id, tasksCompleted, params["duration_"+it.id] )
+					} else {
+						def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundleInstance , it.id)
+						if( moveBundleStep ){
+							moveBundleService.deleteMoveBundleStep( moveBundleStep )
+						}
 					}
 				}
+            	
             	//def projectManegerInstance = Party.findById( projectManagerId )
             	def updateMoveBundlePMRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", projectManagerId, "PROJ_MGR" )
             	def updateMoveBundleMMRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", moveManagerId, "MOVE_MGR" )
@@ -291,5 +297,32 @@ class MoveBundleController {
 			}
 		}
 		render moveBundleStep 
+	}
+	/*-----------------------------------------------------
+	 * remote function to verify stepSnapshot records for a list of steps.
+	 * if there are more than one snapshots associated with any of the step in list 
+	 * then return failure otherwise success.
+	 * @param  : moveBundleId, list of unchecked steps
+	 * @return : success / failure
+	 *---------------------------------------------------*/
+	def checkStepSnapshotRecord = {
+		def steps = params.steps
+		def moveBundle = MoveBundle.findById( params.moveBundleId )
+		def transitionIds
+		def message = "success"
+		if(steps){
+			transitionIds =	steps.split(",")
+		}
+		transitionIds.each{ transitionId ->
+			def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId( moveBundle, transitionId )
+			if(moveBundleStep){
+				def stepSnapshot = StepSnapshot.findAllByMoveBundleStep( moveBundleStep )
+				if(stepSnapshot.size() > 1){
+					message = "failure"
+					return
+				}
+			}
+		}
+		 render message;
 	}
 }

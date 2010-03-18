@@ -87,7 +87,7 @@
                     $(document).ready(function(){
                       $("#startTime").datetimepicker();
                     });
-                  </script> <input type="text" class="dateRange" size="15" readOnly style="width: 112px; height: 14px;" id="startTime" name="startTime"
+                  </script> <input type="text" class="dateRange" size="15" readOnly style="width: 130px; height: 14px;" id="startTime" name="startTime"
         					value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"/>">
         					<g:hasErrors bean="${moveBundleInstance}" field="startTime">
                     		<div class="errors">
@@ -109,7 +109,7 @@
                       $("#completionTime").datetimepicker();
                     });
                   </script> <input type="text" class="dateRange" size="15" readOnly
-				        style="width: 112px; height: 14px;" id="completionTime" name="completionTime"
+				        style="width: 130px; height: 14px;" id="completionTime" name="completionTime"
 				        value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}"/>">
 				        <g:hasErrors bean="${moveBundleInstance}" field="completionTime">
 				                    <div class="errors">
@@ -218,12 +218,21 @@
 								${dashboardStep.step.name}
 								<input type="hidden"  id="keyOffStep_${dashboardStep.step.id }" value="${dashboardStep.step.name}">
 							</td>
-							<td> <input type="checkbox" name="checkbox_${dashboardStep.step.id }" id="checkbox_${dashboardStep.step.id }" 
-								onclick="enableInput(${dashboardStep.step.id })"> </td>
+							<td>
+							<g:if test="${dashboardStep.moveBundleStep}">
+							 <input type="checkbox" name="checkbox_${dashboardStep.step.id }" id="checkbox_${dashboardStep.step.id }" 
+								onclick="enableInput(${dashboardStep.step.id })" checked="checked">
+							</g:if>
+							<g:else>
+							<input type="checkbox" name="checkbox_${dashboardStep.step.id }" id="checkbox_${dashboardStep.step.id }" 
+								onclick="enableInput(${dashboardStep.step.id })">
+							</g:else>	
+							</td>
 							<td>
 								<span id="labelText_${dashboardStep.step.id }" title="text">${dashboardStep.moveBundleStep?.label}</span>
 								<span id="labelInput_${dashboardStep.step.id }" style="display: none;" title="input">
-								<input type="text" name="dashboardLabel_${dashboardStep.step.id }" id="dashboardLabel_${dashboardStep.step.id }" value="${dashboardStep.moveBundleStep?.label}">
+								<input type="text" name="dashboardLabel_${dashboardStep.step.id }" id="dashboardLabel_${dashboardStep.step.id }" 
+								value="${dashboardStep.moveBundleStep?.label ? dashboardStep.moveBundleStep?.label : dashboardStep.step.name}">
 								</span>
 							</td>
 							<td>
@@ -297,10 +306,6 @@
       </div>
 	</div>
 	<script type="text/javascript">
-	$("input[type='checkbox']").each(function(){ 
-  	  $(this).attr("checked",false); // show the value text 
-	});
-
 	/*
     function to invoke ESC key to abandon the field
    */
@@ -440,23 +445,45 @@
     function validateStepsData(){
         var checked = true
         var keyOffStep = ""
-    	$("input[type='checkbox']").each(function(){ 
+        var uncheckedSteps = new Array()
+    	$("input[type='checkbox']").each(function(){
+    		  var id = $(this).attr("id")
 	    	  if($(this).is(':checked') ){
-		    	  var id= $(this).attr("id")
 		    	  var stepId = id.substring(9,id.length)
 		    	  var dashboardLabel = $("#dashboardLabel_"+stepId).val()
 		    	  if( !$("#dashboardLabel_"+stepId).val() || !$("#startTime_"+stepId).val() || !$("#completionTime_"+stepId).val()){
 						keyOffStep += "'"+$("#keyOffStep_"+stepId).val() +"', ";
 				    	checked =  false;
+				    	
 		    	  }
-	    	  } 
+	    	  } else {
+	    		  uncheckedSteps.push(id.substring(id.indexOf("_")+1,id.length))
+	    	  }
     	});
+    	
     	if( !checked ){
     		alert("Dashboard Label, Start & Completion times are mandatory for selected key off steps "+keyOffStep.substring(0,keyOffStep.length - 2));
-    		return checked;
+	    	return checked;
     	} else {
-    		return checked;
+    		return checkForProgressSteps(uncheckedSteps);
     	}
+    }
+    function checkForProgressSteps(uncheckedSteps){
+    	var moveBundle = $("#moveBundleId").val()
+    	var checked = true
+    	$.ajax({
+    		  url: 'checkStepSnapshotRecord',
+    		  data: "moveBundleId="+moveBundle+"&steps="+uncheckedSteps,
+    		  async: false,
+    		  success: function(data) {
+    		    if(data == "failure"){
+        		    if( !confirm("You have chosen to not track dashboard status for some steps already in progress") ){
+        		    	checked =  false;
+        		    } 
+    		    }
+    		 }
+    	});
+    	return checked;
     }
 	</script>
   </body>

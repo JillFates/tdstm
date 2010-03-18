@@ -120,21 +120,29 @@ class MoveBundleService {
      *--------------------------------------------------*/
     def createMoveBundleStep(def moveBundle, def transitionId, def params){
 
-		 def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundle , transitionId) 
+		def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundle , transitionId) 
 		if( !moveBundleStep ){	
 			moveBundleStep = new MoveBundleStep(moveBundle:moveBundle, transitionId:transitionId)
-			moveBundleStep.calcMethod = params["calcMethod_"+transitionId]
-			moveBundleStep.label = params["dashboardLabel_"+transitionId]
-			moveBundleStep.planStartTime = new Date( params["startTime_"+transitionId] )
-			moveBundleStep.planCompletionTime = new Date( params["completionTime_"+transitionId] )
-			if ( !moveBundleStep.validate() || !moveBundleStep.save(flush:true) ) {
-				def etext = "Unable to create moveBundleStep" +
-				GormUtil.allErrorsString( model )
-				response.sendError( 500, "Validation Error")
-		       	println etext
-			}
-			
+		}
+		moveBundleStep.calcMethod = params["calcMethod_"+transitionId]
+		moveBundleStep.label = params["dashboardLabel_"+transitionId]
+		moveBundleStep.planStartTime = new Date( params["startTime_"+transitionId] )
+		moveBundleStep.planCompletionTime = new Date( params["completionTime_"+transitionId] )
+		if ( !moveBundleStep.validate() || !moveBundleStep.save(flush:true) ) {
+			def etext = "Unable to create moveBundleStep" +
+			GormUtil.allErrorsString( model )
+			response.sendError( 500, "Validation Error")
+			println etext
 		}
 		return moveBundleStep 
 	}
+	 /* -----------------------------------------------
+	  * delete moveBundleStep and associsted records
+	  * @author : Lokanada Reddy
+      * @param  : moveBundleStep
+	  *----------------------------------------------*/
+	 def deleteMoveBundleStep( def moveBundleStep ){
+		 def stepSnapshot = StepSnapshot.executeUpdate("DELETE from StepSnapshot ss where ss.moveBundleStep = ?",[moveBundleStep]);
+		 moveBundleStep.delete();
+	 }
 }
