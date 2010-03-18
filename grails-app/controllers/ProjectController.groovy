@@ -542,6 +542,7 @@ class ProjectController {
     		if( params.id ) {
 	    		def projectLogo = ProjectLogo.findById( params.id )
 	     		def image = projectLogo.partnerImage?.binaryStream
+	     		response.contentType = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']		
 	     		response.outputStream << image
     		} else {
     			return;
