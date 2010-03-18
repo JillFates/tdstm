@@ -458,16 +458,14 @@ td .odd {
 <div title="Change Status" id="showChangeStatusDialog"
 	style="background-color: #808080; display: none;">
 <form name="changeStatusForm" method="post">
-	<input type="hidden"
-	name="assetVal" id="assetVal" /> <input type="hidden" name="projectId"
-	id="projectId" value="${projectId}" /> <input type="hidden"
-	name="moveBundle" id="moveBundle" value="${moveBundleInstance.id}" />
-	<input type="hidden" name="showAll" id="showAllInChangeStatus">
-		<table style="border: 0px; width: 100%">
+	<input type="hidden" name="assetVal" id="assetVal" />
+	<input type="hidden" name="projectId" id="projectId" value="${projectId}" />
+	<input type="hidden" name="moveBundle" id="moveBundle" value="${moveBundleInstance.id}" />
+	<input type="hidden" name="showAll" id="showAllInChangeStatus" />
 	<input type="hidden" id="role" value="${role}"/>
+		<table style="border: 0px; width: 100%">
 	<tr>
-		<td width="40%"><strong>Change status for selected
-		devices to:</strong></td>
+		<td width="40%"><strong>Change status for selected devices to:</strong></td>
 		<td width="60%"></td>
 	</tr>
 	<tr>
@@ -543,7 +541,8 @@ td .odd {
 					style="border-right: 1px solid #333333; padding: 0px; width: 15%;">
 				<div style="width: 175px; float: left;">
 				<table style="border: 0; width: 175px;">
-					<th>TEAMS:</th>
+					<tr><th>TEAMS:</th>
+					</tr>
 					<tr>
 						<td>Names</td>
 					</tr>
@@ -575,7 +574,8 @@ td .odd {
 						<g:each in="${bundleTeams}" var="bundleTeam">
 							<td style="padding: 0px; border-right: 1px solid #333333">
 							<table style="border: 0;">
-								<th nowrap>${bundleTeam?.team?.name }&nbsp;</th>
+								<tr><th nowrap>${bundleTeam?.team?.name }&nbsp;</th>
+								<tr>
 								<tr>
 									<td nowrap>${bundleTeam?.members}&nbsp;</td>
 								</tr>
@@ -616,7 +616,8 @@ td .odd {
 						</g:each>
 						<td style="padding: 0px; border-right: 1px solid #333333">
 						<table style="border: 0;">
-							<th nowrap>Cleaning &nbsp;</th>
+							<tr><th nowrap>Cleaning &nbsp;</th>
+							</tr>
 							<tr>
 								<td nowrap>${supportTeam?.cleaningMembers}&nbsp;</td>
 							</tr>
@@ -648,7 +649,8 @@ td .odd {
 						</td>
 						<td style="padding: 0px;">
 						<table style="border: 0;">
-							<th nowrap>Transport &nbsp;</th>
+							<tr><th nowrap>Transport &nbsp;</th>
+							</tr>
 							<tr>
 								<td nowrap>${supportTeam?.transportMembers}&nbsp;</td>
 							</tr>
@@ -684,7 +686,8 @@ td .odd {
 					style="border-right: 1px solid #333333; padding: 0px; width: 15%;">
 				<div style="float: left; width: 100%;">
 				<table style="width: 100%; border: 0">
-					<th nowrap>TOTALS:</th>
+					<tr><th nowrap>TOTALS:</th>
+					</tr>
 					<tr>
 						<td>&nbsp;</td>
 					</tr>
@@ -1045,29 +1048,29 @@ Comment</a></span></div>
 	<tr>
 	<td valign="top" class="name"><label for="dateCreated">Created
 			At:</label></td>
-			<td valign="top" class="value" id="dateCreatedId" />
+			<td valign="top" class="value" id="dateCreatedId" ></td>
 	</tr>
 		<tr>
 	<td valign="top" class="name"><label for="createdBy">Created
 			By:</label></td>
-			<td valign="top" class="value" id="createdById" />
+			<td valign="top" class="value" id="createdById" ></td>
 	</tr>
 		
 		<tr class="prop">
 			<td valign="top" class="name"><label for="commentType">Comment
 			Type:</label></td>
-			<td valign="top" class="value" id="commentTypeTdId" />
+			<td valign="top" class="value" id="commentTypeTdId" ></td>
 		</tr>
 		
 		<tr>
 	<td valign="top" class="name"><label for="category">Category:
 			</label></td>
-			<td valign="top" class="value" id="categoryTdId" />
+			<td valign="top" class="value" id="categoryTdId" ></td>
 	</tr>
 	<tr class="prop">
 	<td valign="top" class="name"><label for="commentCode">comment
 			Code:</label></td>
-			<td valign="top" class="value" id="commentCodeTdId" />
+			<td valign="top" class="value" id="commentCodeTdId" ></td>
 	</tr>
 	
 		<tr class="prop">
@@ -1075,7 +1078,7 @@ Comment</a></span></div>
 			Verify:</label></td>
 			<td valign="top" class="value" id="verifyTdId"><input
 				type="checkbox" id="mustVerifyShowId" name="mustVerify" value="0"
-				disabled="disabled" /></td>
+				disabled="disabled" ></td>
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="comment">Comment:</label>
@@ -1092,7 +1095,7 @@ Comment</a></span></div>
 			Resolved:</label></td>
 			<td valign="top" class="value" id="resolveTdId"><input
 				type="checkbox" id="isResolvedId" name="isResolved" value="0"
-				disabled="disabled" /></td>
+				disabled="disabled" ></td>
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="resolution">Resolution:</label>
@@ -1135,12 +1138,12 @@ Comment</a></span></div>
 			<tr>
 	<td valign="top" class="name"><label for="dateCreated">Created
 			At:</label></td>
-			<td valign="top" class="value" id="dateCreatedEditId"  />
+			<td valign="top" class="value" id="dateCreatedEditId"  ></td>
 	</tr>
 		<tr>
 	<td valign="top" class="name"><label for="createdBy">Created
 			By:</label></td>
-			<td valign="top" class="value" id="createdByEditId" />
+			<td valign="top" class="value" id="createdByEditId" ></td>
 	</tr>
 			<tr class="prop" >
 				<td valign="top" class="name"><label for="commentType">Comment
@@ -1167,12 +1170,12 @@ Comment</a></span></div>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="category">Category:</label>
 				</td>
-				<td valign="top" class="value"	id="categoryEditId" />
+				<td valign="top" class="value"	id="categoryEditId" ></td>
 			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="commentCode">Comment Code:</label>
 				</td>
-				<td valign="top" class="value" id="commentCodeEditId" />
+				<td valign="top" class="value" id="commentCodeEditId" ></td>
 			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="comment">Comment:</label>
@@ -1205,12 +1208,12 @@ Comment</a></span></div>
                <tr>
 	<td valign="top" class="name"><label for="dateResolved">Resolved
 			At:</label></td>
-			<td valign="top" class="value" id="dateResolvedEditId" />
+			<td valign="top" class="value" id="dateResolvedEditId" ></td>
 	</tr>
 		<tr>
 	<td valign="top" class="name"><label for="resolvedBy">Resolved
 			By:</label></td>
-			<td valign="top" class="value" id="resolvedByEditId"  />
+			<td valign="top" class="value" id="resolvedByEditId"  ></td>
 	</tr>
             </table>
             </div>
