@@ -595,6 +595,9 @@ td .odd {
 										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_avail')"><u>${bundleTeam?.sourceAvailassets}</u></a> /
 										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_done')"><u>${bundleTeam?.unrackedAssets}</u></a> / 
 										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','')"><u>${bundleTeam?.sourceAssets}</u></a>
+										<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
+										<a title="Relogin as.."  href="#" onclick="window.open('../moveTech/login?username=mt-${moveBundleInstance.id}-${bundleTeam?.team?.id}-s','mtwindow','menubar=1,resizable=1,width=320,height=480'); ">@</a>
+										</jsec:lacksAllRoles>
 									</td>
 								</tr>
 								<tr>
@@ -603,6 +606,9 @@ td .odd {
 										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_avail')"><u>${bundleTeam?.targetAvailAssets}</u> </a> /
 										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_done')"><u> ${bundleTeam?.rerackedAssets}</u> </a> / 
 										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','')"><u>${bundleTeam?.targetAssets}</u></a>
+										<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
+										<a title="Relogin as.." href="#" onclick="window.open('../moveTech/login?username=mt-${moveBundleInstance.id}-${bundleTeam?.team?.id}-t','mtwindow','menubar=1,resizable=1,width=320,height=480'); ">@</a>
+										</jsec:lacksAllRoles>
 									</td>
 								</tr>
 							</table>
@@ -629,7 +635,10 @@ td .odd {
 								<a href="#" onclick="filterByDataPoints('source','','source_pend_clean')"><u> ${supportTeam.sourcePendCleaned}</u> </a> /
 								<a href="#" onclick="filterByDataPoints('source','','source_avail_clean')"><u> ${supportTeam.sourceAvailCleaned}</u> </a> /
 								<a href="#" onclick="filterByDataPoints('source','','source_done_clean')"><u> ${supportTeam.sourceCleaned}</u> </a>/
-								<a href="#" onclick="filterByDataPoints('source','','')"><u> ${supportTeam.totalAssets}</u> </a>  
+								<a href="#" onclick="filterByDataPoints('source','','')"><u> ${supportTeam.totalAssets}</u> </a> 
+								<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
+									<a title="Relogin as.." href="../moveTech/login?username=ct-${moveBundleInstance.id}-${supportTeam.cleaning?.id}-t">@</a>
+								</jsec:lacksAllRoles> 
 								</td>
 							</tr>
 							<tr>
