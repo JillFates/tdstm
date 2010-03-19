@@ -5,6 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="main" />
     <title>Edit MoveBundle</title>
+    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
     <g:javascript library="jquery" />
     <g:javascript library="ui.datepicker" />
 
@@ -90,8 +91,6 @@
 
               <td valign="top"
                   class="bundle ${hasErrors(bean:moveBundleInstance,field:'startTime','errors')}">
-                <link rel="stylesheet"
-                      href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
                 <script type="text/javascript" charset="utf-8">
                   jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                 </script> <input type="text" class="dateRange" size="15"
@@ -123,8 +122,6 @@
 
                 <td valign="top"
                     class="bundle ${hasErrors(bean:moveBundleInstance,field:'finishTime','errors')}">
-                <link rel="stylesheet"
-                      href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
                 <script type="text/javascript" charset="utf-8">
                   jQuery(function($){$('.datetRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                 </script> <input type="text" class="dateRange" size="15"
