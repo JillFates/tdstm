@@ -13,6 +13,7 @@
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}"  />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}"  />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
+    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
 	
     <jq:plugin name="ui.core"/>
     <jq:plugin name="ui.draggable"/>
@@ -325,22 +326,17 @@
               <tr class="prop">
                 <td valign="top" class="name"><label for="comment">Comment:</label>
                 </td>
-                <td valign="top"
-class="value ${hasErrors(bean:projectInstance,field:'comment','errors')}">
+                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'comment','errors')}">
                   <textarea cols="40"  rows="3" name="comment" onkeydown="textCounter(document.createProjectForm.comment,200);" onkeyup="textCounter(document.createProjectForm.comment,200);">${fieldValue(bean:projectInstance,field:'comment')}</textarea>
                   <g:hasErrors
                     bean="${projectInstance}" field="comment">
-                    <div class="errors"><g:renderErrors bean="${projectInstance}"
-                             as="list" field="comment" /></div>
+                    <div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="comment" /></div>
                 </g:hasErrors></td>
               </tr>
 
               <tr class="prop">
-                <td valign="top" class="name"><label for="startDate">Start
-                Date:</label></td>
-                <td valign="top"
-class="value ${hasErrors(bean:projectInstance,field:'startDate','errors')}">
-                  <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
+                <td valign="top" class="name"><label for="startDate">Start Date:</label></td>
+                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'startDate','errors')}">
                   <g:javascript library="ui.datepicker" />
                   <script type="text/javascript" charset="utf-8">
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
@@ -348,33 +344,27 @@ class="value ${hasErrors(bean:projectInstance,field:'startDate','errors')}">
                   <input type="text" class="dateRange" size="15" style="width:112px;height:14px;" name="startDate" value="<tds:convertDate date="${projectInstance?.startDate}"/>" onchange="setCompletionDate(this.value)">
 <g:hasErrors
                     bean="${projectInstance}" field="startDate">
-                    <div class="errors"><g:renderErrors bean="${projectInstance}"
-                             as="list" field="startDate" /></div>
+                    <div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="startDate" /></div>
                 </g:hasErrors></td>
               </tr>
 
               <tr class="prop">
-                <td valign="top" class="name"><label for="completionDate">Completion
-                Date:</label></td>
-                <td valign="top"
-class="value ${hasErrors(bean:projectInstance,field:'completionDate','errors')}">
-                  <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
+                <td valign="top" class="name"><label for="completionDate">Completion Date:</label></td>
+                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'completionDate','errors')}">
                   <script type="text/javascript" charset="utf-8">
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                   </script>
                   <input type="text" class="dateRange" size="15" style="width:112px;height:14px;" id="completionDateId" name="completionDate" value="<tds:convertDate date="${projectInstance?.completionDate}"/>">
 
 <g:hasErrors bean="${projectInstance}" field="completionDate">
-                    <div class="errors"><g:renderErrors bean="${projectInstance}"
-                             as="list" field="completionDate" /></div>
+                    <div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="completionDate" /></div>
                 </g:hasErrors></td>
               </tr>
 
               <tr class="prop">
                 <td valign="top" class="name"><label for="projectPartner">Partner:</label>
                 </td>
-                <td valign="top" class="value"><select id="projectPartnerId"
-                                 name="projectPartner"
+                <td valign="top" class="value"><select id="projectPartnerId" name="projectPartner"
                                  onchange="${remoteFunction(action:'getPartnerStaffList', params:'\'partner=\' + this.value', onComplete:'appendPartnerStaff(e)' )}">
                     <option value="" selected="selected">None</option>
                     <g:each status="i" in="${companyPartners}" var="companyPartners">
