@@ -246,7 +246,7 @@
 			                    });
 			                  </script>
 								<input type="text" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }"
-								value="<tds:convertToGMT date='${dashboardStep.moveBundleStep?.planStartTime}'/>" onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })">
+								value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}'/>" onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })">
 							</span>
 							</td>
 							<td>
@@ -260,7 +260,7 @@
 			                    });
 			                  </script>
 								<input type="text" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }" 
-								value="<tds:convertToGMT date='${dashboardStep.moveBundleStep?.planCompletionTime}'/>" onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })">
+								value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planCompletionTime}'/>" onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })">
 							</span>
 							</td>
 							<td>
