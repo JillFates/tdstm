@@ -140,7 +140,7 @@ class ProjectController {
             // List of OK mime-types
             if( file ) {
 	            def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
-				if( file.getContentType() ){
+				if( file.getContentType() && file.getContentType() != "application/octet-stream"){
 					if(params.projectPartner == ""){
 		           		flash.message = " Please select Associated Partner to upload Image. "
 				        redirect(action:'show',id:projectInstance.id )
@@ -364,7 +364,7 @@ class ProjectController {
         def image      
         // List of OK mime-types
         def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
-		if( file.getContentType() ){
+		if( file.getContentType() && file.getContentType() != "application/octet-stream" ){
         	if(params.projectPartner == ""){
            		flash.message = " Please select Associated Partner to upload Image. "
 		        redirect(action:'create' )
