@@ -114,6 +114,7 @@
 			<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
 				<li><g:link class="home" controller="moveEvent" action="list" params="[bundleId:moveBundle?.id]" >Move Event</g:link> </li>
 			</jsec:hasAnyRole>
+			<li><g:link class="home" controller="walkThrough" >Walk Through</g:link> </li>
 		</ul>
 	</div>
 	<div class="menu2" id="reportsMenu" style="background-color:#003366;display: none;">

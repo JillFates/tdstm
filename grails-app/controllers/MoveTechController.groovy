@@ -94,28 +94,31 @@ class MoveTechController {
      *----------------------------------------------------------------------------------------*/
     def login = {
     	def validate = true
-    	def message = flash.message
-    	if( message ) {
-    		if( message.contains( "Unknown" ) || message.contains( "Invalid" ) 
-    		    || message.contains( "No assets assigned" ) || message.contains( "presently inactive" ) ) {
-    			validate = false
-    		}
-    	}
+		def message = flash.message
+		if( message ) {
+			if( message.contains( "Unknown" ) || message.contains( "Invalid" ) 
+					|| message.contains( "No assets assigned" ) || message.contains( "presently inactive" ) ) {
+				validate = false
+			}
+		}
     	if( validate ) {
-            def username = session.getAttribute ( "USERNAME" ) 
-            if ( username ) {
-                redirect ( action:'signIn', params:["username":username] )
-            } else {
-                return [ username: params.username, rememberMe: (params.rememberMe != null), 
-                    targetUri: params.targetUri
-                ]
-            }
-        } else {
-            return [ username: params.username, rememberMe: (params.rememberMe != null), 
-                targetUri: params.targetUri
-            ]
-        }
-    }
+    		def username = session.getAttribute ( "USERNAME" ) 
+			def newUser = params.username
+			if ( username == newUser ) {
+				redirect ( action:'signIn', params:["username":username] )
+			} else {
+				session.setAttribute( "USERNAME","")
+				return [ username: params.username, rememberMe: (params.rememberMe != null), 
+						 targetUri: params.targetUri
+		                ]	
+			}
+    	} else {
+    		session.setAttribute( "USERNAME","")
+			return [ username: params.username, rememberMe: (params.rememberMe != null), 
+					 targetUri: params.targetUri
+					 ]
+    	}
+     }
     
     /*------------------------------------------------------------------
      * Sign in for moveTech by reading the barcode as userName
