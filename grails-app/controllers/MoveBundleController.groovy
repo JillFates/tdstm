@@ -8,6 +8,7 @@ class MoveBundleController {
     def userPreferenceService
 	def stateEngineService
 	def moveBundleService
+	def jdbcTemplate
 	
     def index = { redirect(action:list,params:params) }
 
@@ -62,14 +63,24 @@ class MoveBundleController {
         def moveBundleInstance = MoveBundle.get( params.id )
         def projectId = params.projectId
         if(moveBundleInstance) {
-            try{
-            	moveBundleInstance.delete()
-                flash.message = "MoveBundle ${moveBundleInstance} deleted"
-                redirect(action:list, params:[projectId: projectId])
-            }catch(Exception ex){
-            	flash.message = "Unable to Delete MoveBundle Assosiated with Teams "
-            	redirect(action:list)
-            }
+        	AssetEntity.withTransaction { status ->
+	            try{
+	            	AssetEntity.executeUpdate("UPDATE AssetEntity SET moveBundle = null WHERE moveBundle = ?",[moveBundleInstance])
+					def teamQuery = "SELECT project_team_id FROM project_team WHERE move_bundle_id = ${moveBundleInstance.id}"
+					jdbcTemplate.update("DELETE FROM party_relationship where party_relationship_type_id = 'PROJ_TEAM' "+
+										"and party_id_from_id in ($teamQuery) and role_type_code_from_id = 'TEAM' ")
+		            jdbcTemplate.update("UPDATE asset_entity set source_team_id = null WHERE source_team_id in ($teamQuery)")
+					jdbcTemplate.update("UPDATE asset_entity set target_team_id = null WHERE target_team_id in ($teamQuery)")
+					jdbcTemplate.update("DELETE FROM project_team WHERE move_bundle_id = ${moveBundleInstance.id}")
+	            	moveBundleInstance.delete()
+	                flash.message = "MoveBundle ${moveBundleInstance} deleted"
+	                redirect(action:list, params:[projectId: projectId])
+	            }catch(Exception ex){
+	            	status.setRollbackOnly()
+	            	flash.message = "Unable to Delete MoveBundle Assosiated with Teams "+ex
+	            	redirect(action:list)
+	            }
+        	}
         }
         else {
             flash.message = "MoveBundle not found with id ${params.id}"
