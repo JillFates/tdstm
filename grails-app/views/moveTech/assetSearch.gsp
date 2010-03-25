@@ -3,9 +3,9 @@
 <head>
 <title>Asset</title>
 <g:javascript library="jquery" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 	
     <script type="text/javascript">
@@ -104,14 +104,14 @@
     </script>
 </head>
 <body>
-<a name="top"/>
+<a name="top"></a>
 
 <div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 <div class="mainbody" style="border:0px solid #e7e7e7; width: 100%;">
-<div class="colum_techlogin" "float:left;">
+<div class="colum_techlogin" style="float:left;">
 	<table border=0 cellpadding=0 cellspacing=0><tr>
 		<td><g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt","fMess":"fMess"]' class="home" >Home</g:link></td>
-		<td><g:link action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo","fMess":"fMess"]' class="my_task">My Task</g:link></td>
+		<td><g:link action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo","fMess":"fMess"]' class="my_task">My Tasks</g:link></td>
 		<td><a href="#" class="asset_search_select">Asset</a></td>
 	</tr></table>
 
@@ -167,12 +167,13 @@
 	</g:if>
 
 	<div class="clear" style="margin:4px;"></div>
-		<a name="comments" />
+		<a name="comments"></a>
 		<table width="100%">
 			<tr>
 				<td class="heading"><a class="heading" href="#comments">Comments/Hold</a></td>
 				<td><span style="float:right;"><a href="#top">Top</a></span></td>
 			</tr>
+			<tr>
 			<td colspan=2>
 				<g:select style="width: 188px;padding:0px;" from="${commentsList}" id="selectCmt" name="selectCmt" value="Select a common reason:" noSelection="['Select a common reason:':'Select a common reason:']" onchange="commentSelect(this.value);"></g:select>
 			</td>
@@ -190,7 +191,7 @@
 
 
 		<div class="clear" style="margin:4px;"></div>
-		<a name="detail" />
+		<a name="detail" ></a>
 	 	<div>
 			<g:if test="${projMap}">
 
@@ -233,13 +234,11 @@
 				</g:else>
 				<dt>Current State:</dt><dd>&nbsp;${stateLabel}</dd>
 				</dl>
-				</g:if>
- 			</div>	
 		</tr>
 		</table>
+		</g:if>
+		</div>
 	</g:form>
-	</div>
-	</div>
 	</div>
 	</div>
 </body>

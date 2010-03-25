@@ -9,7 +9,7 @@
 	<g:javascript library="jquery" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'progressbar.css')}" />
 	<jq:plugin name="ui.progressbar"/>
-	<script>
+	<script type="text/javascript">
 		/* ---------------------------------
 		 * 	Author : Lokanada Reddy		
 		 *	function to show the Progress bar

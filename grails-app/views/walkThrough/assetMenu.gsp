@@ -1,8 +1,8 @@
 <html>
 <head>
 <title>Walkthru&gt; Asset Menu</title>
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'contextmenu.css')}" />
 <g:javascript src="contextmenu.js" />
 <g:javascript src="betterinnerhtml.js" />
@@ -334,7 +334,7 @@ function checkComments(type) {
 					<td class=label>Asset Name:</td>
 					<td class=field>${assetEntity?.assetName}</td>
 				</tr>
-			</trody>
+			</tbody>
 		</table>
 		<div style="MARGIN-TOP: 15px" align=center>
 			<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id +' and commentType = ? and isResolved = ? and commentCode = ?' ,['issue',0,'ASSET_MISSING'])}">
@@ -380,7 +380,7 @@ function checkComments(type) {
 			<tr>
 				<td class="label">Name:</td>
 				<td class="field">
-					<input type="text" class="text" name="assetName" value="${assetEntity?.assetName}" size=20 maxsize=50 
+					<input type="text" class="text" name="assetName" value="${assetEntity?.assetName}" size=20 maxlength="50" 
 							onchange="setMustSave(this.value,'${assetEntity?.assetName}','front1', this.name)">
 				</td>
 			</tr>
@@ -388,7 +388,7 @@ function checkComments(type) {
 			<tr>
 				<td class="label">Serial #:</td>
 				<td class="field">
-					<input type="text" class="text" name="serialNumber" value="${assetEntity?.serialNumber}" size=20 maxsize=50 
+					<input type="text" class="text" name="serialNumber" value="${assetEntity?.serialNumber}" size=20 maxlength=50 
 							onchange="setMustSave(this.value,'${assetEntity?.serialNumber}','front1', this.name)">
 				</td>
 			</tr>
@@ -409,8 +409,7 @@ function checkComments(type) {
 				<g:if test="${Manufacturer.list()}">
 				<!--  <g:select name="manufacturer" from="${Manufacturer.list()}" value="${assetEntity?.manufacturer}" id="manufacturerId" 
 					noSelection="['':'']"  onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name);getModels();"/> -->
-					<input type="text" name="manufacturer" id="manufacturerId" value="${assetEntity?.manufacturer}" onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name);">
-					</input>
+					<input type="text" name="manufacturer" id="manufacturerId" value="${assetEntity?.manufacturer}" onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name);"/>
 				</g:if>
 				<g:else>
 				<input type="text" name="manufacturer" id="manufacturerId" value="${assetEntity?.manufacturer}" onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name);">
@@ -424,7 +423,7 @@ function checkComments(type) {
 				<g:if test="${Model.list()}">
 				<!-- <g:select name="model" from="${Model.list()}" id="modelId" noSelection="['':'']" 
 					value="${assetEntity?.model}" onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)"/> -->
-					<input type="text" id="modelId" name="model" value="${assetEntity?.model}" onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)" ></input>
+					<input type="text" id="modelId" name="model" value="${assetEntity?.model}" onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)" />
 				</g:if>
 				 <g:else>
 				<input type="text" name="model" id="modelId" value="${assetEntity?.model}" onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)">
@@ -438,7 +437,6 @@ function checkComments(type) {
 				 <g:select noSelection="['':'Undef']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('railType'))?.value}" id="railTypeId" name="railType" value="${assetEntity?.railType}" 
 				 onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)"/> 
 				<!-- <input type="text" name="railType" value="${assetEntity?.railType}" id="railTypeId" onchange="setMustSave(this.value,'${assetEntity?.railType}','front1', this.name)" >-->
-				</input>
 				</td>
 			</tr>
 			</table>
@@ -468,11 +466,11 @@ function checkComments(type) {
 			<table>
 			<tr>
 				<td class="label">Room:</td>
-				<td class="field"><input type="text" name="sourceRoom" value="${assetEntity?.sourceRoom}" size="8" maxsize="50" onchange="setMustSave(this.value,'${assetEntity?.sourceRoom}','front2', this.name)"/></td>
+				<td class="field"><input type="text" name="sourceRoom" value="${assetEntity?.sourceRoom}" size="8" maxlength="50" onchange="setMustSave(this.value,'${assetEntity?.sourceRoom}','front2', this.name)"/></td>
 			</tr>
 			<tr>
 				<td class="label">Rack:</td>
-				<td class="field"><input type="text" name="sourceRack" value="${assetEntity?.sourceRack}" size="8" maxsize="50" onchange="setMustSave(this.value,'${assetEntity?.sourceRack}','front2', this.name)"/></td>
+				<td class="field"><input type="text" name="sourceRack" value="${assetEntity?.sourceRack}" size="8" maxlength="50" onchange="setMustSave(this.value,'${assetEntity?.sourceRack}','front2', this.name)"/></td>
 			</tr>
 			
 			<tr>
@@ -817,16 +815,17 @@ function checkComments(type) {
 		<g:form name="commentForm" action="saveComment" method="get">	
 			<table>
 			<tr>
+				<td class="label">Asset Tag:
 				<input type="hidden" name="assetId" id="assetId" value="${assetEntity.id}" />
 				<input type="hidden" name="id" value="${assetEntity.id}" />
 				<input type="hidden" name="commentType" id="commentType" value="comment" />
 				<input type="hidden" name="instructionType" id="instructionType" value="instruction" />
 				<input type="hidden" name="issueType" id="issueType" value="issue" />
-				<input type="hidden" name="room" value="${room}">
-				<input type="hidden" name="rack" value="${rack}">
-				<input type="hidden" name="location" value="${location}">
-				<input type="hidden" name="moveBundle" value="${moveBundle}">
-				<td class="label">Asset Tag:</td>
+				<input type="hidden" name="room" value="${room}" />
+				<input type="hidden" name="rack" value="${rack}" />
+				<input type="hidden" name="location" value="${location}" />
+				<input type="hidden" name="moveBundle" value="${moveBundle}" />
+				</td>
 				<td class="field">${assetEntity.assetTag}</td>
 			</tr>
 			</table>
@@ -838,8 +837,7 @@ function checkComments(type) {
 			</select>
 			<br/>
 			
-			<textarea name="comments" id="comments" rows="6" cols="8" value=""></textarea>
-			</textarea>
+			<textarea name="comments" id="comments" rows="6" cols="8" ></textarea>
 			<br />
 			<br />
 			
@@ -854,7 +852,7 @@ function checkComments(type) {
 			
 			<br />
 			
-			<a class="button" href="getComments?commentType=all&sort=desc&orderType=commentType&id=${assetEntity?.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments"">View Issues &amp; Comments</a>
+			<a class="button" href="getComments?commentType=all&sort=desc&orderType=commentType&id=${assetEntity?.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">View Issues &amp; Comments</a>
 		</g:form>
 		</div>
 		</div>

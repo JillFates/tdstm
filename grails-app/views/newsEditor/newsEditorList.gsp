@@ -7,22 +7,14 @@
 <g:javascript library="jquery" />
 <jq:plugin name="jquery.bgiframe.min" />
 <jq:plugin name="jquery.autocomplete" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
 <jq:plugin name="ui.core" />
 <jq:plugin name="ui.draggable" />
 <jq:plugin name="ui.resizable" />
@@ -258,7 +250,7 @@ Move News and Issues</b></span>
 	<table style="border: 0px;">
 		<tr>
 			<td style="width: 70px;padding: 0px;">
-				 <div class="buttons"> <span class="button"><input type="button" value="Create News" class="save" onclick="openCreateNewsDialog()"></span></div>
+				 <div class="buttons"> <span class="button"><input type="button" value="Create News" class="save" onclick="openCreateNewsDialog()"/></span></div>
 			</td>
 			<td style="width: 770px;vertical-align: middle;text-align: right;padding: 0px;">
 				<g:if test="${totalCommentsSize > 25 }">
@@ -274,12 +266,12 @@ Move News and Issues</b></span>
 	style="display: none;">
 <g:form action="updateNewsOrComment" method="post" name="editCommentForm">
 	<div class="dialog" style="border: 1px solid #5F9FCF">
-	<input name="id" value="" id="commentId" type="hidden">
-	<input name="commentType" value="" id="commentTypeId" type="hidden">
-	<input name="projectId" value="${projectId}" type="hidden">
-	<input name="moveBundle" value="${params.moveBundle}" type="hidden">
-	<input name="moveEvent" value="${params.moveEvent}" type="hidden">
-	<input name="viewFilter" value="${params.viewFilter}" type="hidden">
+	<input name="id" value="" id="commentId" type="hidden"/>
+	<input name="commentType" value="" id="commentTypeId" type="hidden"/>
+	<input name="projectId" value="${projectId}" type="hidden"/>
+	<input name="moveBundle" value="${params.moveBundle}" type="hidden"/>
+	<input name="moveEvent" value="${params.moveEvent}" type="hidden"/>
+	<input name="viewFilter" value="${params.viewFilter}" type="hidden"/>
 		<div>
 	<table id="showCommentTable" style="border: 0px">
 		
@@ -306,15 +298,15 @@ Move News and Issues</b></span>
 		<td valign="top" class="name" nowrap="nowrap">
 			<label for="category">User / Generic Cmt:</label></td>
 				<td valign="top" class="value" id="displayOption" >
-				<input type="radio" name="displayOption" value="U" id="displayOptionUid">&nbsp;
+				<input type="radio" name="displayOption" value="U" id="displayOptionUid"/>&nbsp;
 				<span style="vertical-align: text-top;">User Comment</span>&nbsp;&nbsp;&nbsp;
-				<input type="radio" name="displayOption" value="G" checked="checked" id="displayOptionGid">&nbsp;
+				<input type="radio" name="displayOption" value="G" checked="checked" id="displayOptionGid"/>&nbsp;
 				<span style="vertical-align:text-top;">Generic Comment&nbsp;</span>
 				</td>
 		</tr>
 		<tr class="prop" id="assetTrId">
 		<td valign="top" class="name"><label for="assetTdId">Asset:</label></td>
-				<td valign="top" class="value"><input type="text" disabled="disabled" id="assetTdId"></td>
+				<td valign="top" class="value"><input type="text" disabled="disabled" id="assetTdId"/></td>
 		</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="comment">Comment:</label>
@@ -326,7 +318,7 @@ Move News and Issues</b></span>
 				<td valign="top" class="name" nowrap="nowrap"><label for="isResolved" >Resolved / Archived:</label></td>
 				<td valign="top" class="value" id="resolveTdId">
 				<input type="checkbox" id="isResolvedId" value="0" onclick="updateHidden('isResolvedId','isResolvedHiddenId')"/>
-				<input type="hidden" name="isResolved" value="0" id="isResolvedHiddenId">
+				<input type="hidden" name="isResolved" value="0" id="isResolvedHiddenId"/>
 				</td>
 			</tr>
 			<tr class="prop">
@@ -351,17 +343,17 @@ Move News and Issues</b></span>
 	<div class="buttons"><span class="button"> 
 	<input class="save" type="submit" value="Update" onclick="return validateNewsAndCommentForm()"/>
 	</span> <span class="button"> 
-	<input class="delete" type="button" value="Cancel" onclick="this.form.reset();$('#showEditCommentDialog').dialog('close');">
+	<input class="delete" type="button" value="Cancel" onclick="this.form.reset();$('#showEditCommentDialog').dialog('close');"/>
 	</span></div>
 	</div>
 </g:form>
 </div>
 <div id="createNewsDialog" title="Create News Comment" style="display: none;">
 	<g:form action="saveNews" method="post" name="createNewsForm">
-	<input name="projectId" value="${projectId}" type="hidden">
-	<input name="moveBundle" value="${params.moveBundle}" type="hidden">
-	<input name="viewFilter" value="${params.viewFilter}" type="hidden">
-	<input name="moveEvent.id" value="${moveEvent?.id}" type="hidden" id="moveEventId">
+	<input name="projectId" value="${projectId}" type="hidden"/>
+	<input name="moveBundle" value="${params.moveBundle}" type="hidden"/>
+	<input name="viewFilter" value="${params.viewFilter}" type="hidden"/>
+	<input name="moveEvent.id" value="${moveEvent?.id}" type="hidden" id="moveEventId"/>
 		<div class="dialog" style="border: 1px solid #5F9FCF">
 		<table id="createCommentTable" style="border: 0px">
 			<tr>
@@ -385,7 +377,7 @@ Move News and Issues</b></span>
 				<td valign="top" class="name" nowrap="nowrap"><label for="isArchivedId" >Resolved / Archived:</label></td>
 				<td valign="top" class="value" id="archivedTdId">
 				<input type="checkbox" id="isArchivedId" value="0" onclick="updateHidden('isArchivedId','isArchivedHiddenId')"/>
-				<input type="hidden" name="isArchived" value="0" id="isArchivedHiddenId">
+				<input type="hidden" name="isArchived" value="0" id="isArchivedHiddenId"/>
 				</td>
 			</tr>
 			<tr class="prop">
@@ -400,11 +392,11 @@ Move News and Issues</b></span>
 		<div class="buttons"><span class="button"> 
 		<input class="save" type="submit" value="Create" onclick="return validateCreateNewsForm()"/></span>
 		<span class="button"> 
-	<input class="delete" type="button" value="Cancel" onclick="this.form.reset();$('#createNewsDialog').dialog('close');">
+	<input class="delete" type="button" value="Cancel" onclick="this.form.reset();$('#createNewsDialog').dialog('close');"/>
 	</span>
 		</div>
 	</g:form>
-</div>
+</div></div>
 <script type="text/javascript">
 var moveBundle = "${params.moveBundle}"
 var viewFilter = "${params.viewFilter}"

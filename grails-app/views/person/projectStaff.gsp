@@ -265,16 +265,16 @@
 		<g:each in="${companiesStaff}" status="i" var="companiesStaff">
 		<g:formRemote method="post" before="return addProjectStaff($i)" name="addSatffForm_$i" url="${[action:'saveProjectStaff']}" >
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-				<input type="hidden" name="projectId" value="${projectId}">
+				<input type="hidden" name="projectId" value="${projectId}"/>
 				<td>${companiesStaff?.company[0]}</td>
 				
-				<td><input type="hidden" name="person" value="${companiesStaff?.staff.id}" >${companiesStaff?.name}</td>
+				<td><input type="hidden" name="person" value="${companiesStaff?.staff.id}" />${companiesStaff?.name}</td>
 				
 				<td>${companiesStaff?.staff.title}</td>
 				
 				<td><tds:personRoleSelect name="roleType" id="roleType_$i" optionKey="id" from="${RoleType.list()}" value="${roleType?.id}" isNew="true" ></tds:personRoleSelect> </td>
 				
-				<td><input value="Add" type="submit" name="submit"> </td>
+				<td><input value="Add" type="submit" name="submit"/> </td>
 				
 			</tr>
 			

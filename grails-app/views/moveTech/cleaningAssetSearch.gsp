@@ -2,10 +2,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Asset</title>
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}"/>
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}"/>
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}"/>
-	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}"/>
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}"/>
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}"/>
+	<link type="image/x-icon" rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
@@ -15,7 +15,7 @@
 	
 	<jq:plugin name="ui.core" />
 	<jq:plugin name="ui.dialog" />
-	<script language="JavaScript" >
+	<script language="JavaScript" type="text/javascript">
 	/*--------------------------------------------------------
 	* function to call printjob when user press on 1,2,3 or 4
 	*--------------------------------------------------------*/
@@ -118,7 +118,7 @@ function retrieve_field(obj) {
 }
 	
 	</script>
-	<script>
+	<script type="text/javascript">
 	$(document).ready(function() {
 	$("#serverInfoDialog").dialog({ autoOpen: false })	       
 	})
@@ -467,7 +467,7 @@ function mySelect(x)
 			<div class="colum_techlogin" style="float: left;">
 			<div style="float: left; width: 97.5%; margin-left: 20px; margin-top:;">
 		        	<g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"ct"]' style="height:18px; padding-top:3px; width:45px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Home</g:link>
-					<g:link action="cleaningAssetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' style="height:18px; padding-top:3px; width:60px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">My Task</g:link>
+					<g:link action="cleaningAssetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' style="height:18px; padding-top:3px; width:60px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">My Tasks</g:link>
 					<a href="#" style="height:18px; padding-top:3px; width:63px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;background:#aaefb8;padding:auto 0px;text-align:center;">Asset</a>
 			</div>
 			<div style="float: left; width: 100%; margin: 5px 0;">
@@ -559,9 +559,9 @@ function mySelect(x)
 					<option value="3">3</option>
 					<option value="4">4</option>
 					</select>
-					<input type= "hidden" id="RepPath" name="RepPath">
-      	  				<input type= "hidden" name="PrjName" id="PrjName">
-          				<input type= "hidden" name="FormName" id="FormName">
+					<input type= "hidden" id="RepPath" name="RepPath"/>
+      	  				<input type= "hidden" name="PrjName" id="PrjName"/>
+          				<input type= "hidden" name="FormName" id="FormName"/>
 	      				<b>Printer: </b>
 	      				<select type= "hidden" id="Printers" name="Printers" onChange="javascript:mySelect(this);">
 	      				<option value="Zebra (ZPL-II)">Zebra (ZPL-II)</option>
@@ -569,16 +569,16 @@ function mySelect(x)
 							<option value="${printer}">${printer}</option>	      				
 	      				</g:each>
 	      				</select>
-          				<input type= "hidden" name="PrinterName" id="PrinterName">
+          				<input type= "hidden" name="PrinterName" id="PrinterName"/>
 		  				</td>
 					
 					<g:if test="${browserTest == true}" >
-						<td style="width:15%;"class="buttonR"><input id="printButton" type="button" value="Print"  onclick="startprintjob()"/></td></tr>
+						<td style="width:15%;" class="buttonR"><input id="printButton" type="button" value="Print"  onclick="startprintjob()"/></td></tr>
 					</g:if>
 					<g:else>
-					<td style="width:15%;"class="buttonR"><input id="printButton" type="button" value="Print"  onclick="startprintjob()"/></td>
+					<td style="width:15%;" class="buttonR"><input id="printButton" type="button" value="Print"  onclick="startprintjob()"/></td></tr>
 					</g:else>
-					</tr>
+					
 					</g:if>
 					<g:else>
 					<tr>
@@ -587,15 +587,14 @@ function mySelect(x)
 					<option value="2" selected="selected">2</option>
 					<option value="3">3</option>
 					</select>
-					<input type= "hidden" id="RepPath" name="RepPath">
-      	  				<input type= "hidden" name="PrjName" id="PrjName">
-          				<input type= "hidden" name="FormName" id="FormName">
-          				<b>Printer: </b><select type= "hidden" id="Printers" name="Printers" disabled="disabled" onChange="javascript:mySelect(this);"/>
-          				<input type= "hidden" name="PrinterName" id="PrinterName">
+					<input type= "hidden" id="RepPath" name="RepPath"/>
+      	  				<input type= "hidden" name="PrjName" id="PrjName"/>
+          				<input type= "hidden" name="FormName" id="FormName"/>
+          				<b>Printer: </b><select id="Printers" name="Printers" disabled="disabled" onChange="javascript:mySelect(this);"/>
+          				<input type= "hidden" name="PrinterName" id="PrinterName"/>
 						</td>
-					<td style="width:15%;" class="buttonR" style=" align:center;padding-right:40px;"><input id="printButton" type="button" value="Print" disabled="disabled"/></td></tr>
+					<td style="width:15%; align:center;padding-right:40px;" class="buttonR" ><input id="printButton" type="button" value="Print" disabled="disabled"/></td></tr>
 					</g:else>		
-					<tr>
 					</table>
 					</div>
 					<div  style="width:100%; height:auto; border:1px solid #5F9FCF; margin-top:10px;padding:10px 0;">
@@ -606,9 +605,9 @@ function mySelect(x)
 					<td style="width:90%;border-bottom:1px solid #5F9FCF;">
 					<div  style="height:auto;min-height:100px;border:1px solid #5F9FCF;">
 					<table style="min-height:200px;border:0px;">
-					<thead >
+					<thead ><tr>
 					<th style="background-color:#cccccc;width:90%;">Instruction/Comments</th>
-					<th style="background-color:#cccccc;width:10%;">Confirmed</th></thead>
+					<th style="background-color:#cccccc;width:10%;">Confirmed</th></tr></thead>
 					<tbody style="min-height:200px;">
 					<g:each in="${assetComment}" status="i" var="assetComment">
 					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
@@ -628,7 +627,7 @@ function mySelect(x)
 					<table style="border:0px;">
 					<g:if test="${actionLabel}">
 					<tr>
-					<td  style="width:15%;" class="buttonR" style="align:left; padding-right:20px;float:left" colspan="2"><input id="cleanButton" type="button" disabled="disabled" value="${actionLabel}" onclick="return clean()" /></td>
+					<td  style="width:15%;align:left; padding-right:20px;float:left" class="buttonR"  colspan="2"><input id="cleanButton" type="button" disabled="disabled" value="${actionLabel}" onclick="return clean()" /></td>
 					</tr>
 					</g:if>
 					<g:if test="${projMap}">

@@ -15,7 +15,7 @@
 	            <span class="menuButton"><g:link class="create" action="create">New PartyRelationshipType</g:link></span>
 	            </jsec:hasRole>
         	</div>
-        	<br>
+        	<br/>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>

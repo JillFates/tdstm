@@ -22,7 +22,7 @@
     <jq:plugin name="ui.resizable"/>
     <jq:plugin name="ui.dialog"/>
 
-    <script>
+    <script type="text/javascript">
 
       $(document).ready(function() {
 
@@ -191,7 +191,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                    
                      <%  int k = 1 %>
                     <g:each in="${applicationInstanceList}" status="i" var="applicationInstance">
                     <tr id="${k}" onClick="setRowId(this)" onmouseover="style.backgroundColor='#87CEEE';" onmouseout="style.backgroundColor='white';">
@@ -220,7 +219,7 @@
             </div>
             <div class="buttons">
                 <g:form>
-                <input type="hidden" name="partyId" id="partyId" value="${partyId}">
+                <input type="hidden" name="partyId" id="partyId" value="${partyId}"/>
                     <span class="button"><g:actionSubmit class="create" value="Create a New Application" action="create" /></span>
                 </g:form>
             </div>
@@ -242,56 +241,56 @@
             <tr class="prop">
               <td valign="top" class="name">Application Code:</td>
 
-              <td valign="top" class="value"><input type="text" id="applicationCodes" name="applicationCodes" value="" style="border: 0px" readonly></td>
+              <td valign="top" class="value"><input type="text" id="applicationCodes" name="applicationCodes" value="" style="border: 0px" readonly /></td>
 
             </tr>
             
             <tr class="prop">
               <td valign="top" class="name">name:</td>
 
-              <td valign="top" class="value"><input type="text" id="names" name="names" value="" style="border: 0px" readonly></td>
+              <td valign="top" class="value"><input type="text" id="names" name="names" value="" style="border: 0px" readonly /></td>
 
             </tr>
             
             <tr class="prop">
               <td valign="top" class="name">Environment:</td>
 
-              <td valign="top" class="value"><input type="text" id="environments" name="environments" value="" style="border: 0px" readonly></td>
+              <td valign="top" class="value"><input type="text" id="environments" name="environments" value="" style="border: 0px" readonly /></td>
 
             </tr>
             
             <tr class="prop">
               <td valign="top" class="name">Application Owner:</td>
 
-              <td valign="top" class="value"><input type="text" id="applicationOwners" name="applicationOwners" value="" style="border: 0px" readonly></td>
+              <td valign="top" class="value"><input type="text" id="applicationOwners" name="applicationOwners" value="" style="border: 0px" readonly /></td>
 
             </tr>
             
             <tr class="prop">
               <td valign="top" class="name">Subject Matter Expert:</td>
 
-              <td valign="top" class="value"><input type="text" id="subjectMatterExperts" name="subjectMatterExperts" value="" style="border: 0px" readonly></td>
+              <td valign="top" class="value"><input type="text" id="subjectMatterExperts" name="subjectMatterExperts" value="" style="border: 0px" readonly /></td>
 
             </tr>
             
             <tr class="prop">
               <td valign="top" class="name">Primary Contact:</td>
 
-              <td valign="top" class="value"><input type="text" id="primaryContacts" name="primaryContacts" value="" style="border: 0px" readonly></td>
+              <td valign="top" class="value"><input type="text" id="primaryContacts" name="primaryContacts" value="" style="border: 0px" readonly /></td>
 
             </tr>
             
             <tr class="prop">
               <td valign="top" class="name">Second Contact:</td>
 
-              <td valign="top" class="value"><input type="text" id="secondContacts" name="secondContacts" value="" style="border: 0px" readonly></td>
+              <td valign="top" class="value"><input type="text" id="secondContacts" name="secondContacts" value="" style="border: 0px" readonly /></td>
 
             </tr>
            
             <tr class="prop">
               <td valign="top" class="name">Comment:</td>
 
-              <td valign="top" class="value"><input type="text" id="commentss" name="commentss" value="" style="border: 0px" readonly></td>
+              <td valign="top" class="value"><input type="text" id="commentss" name="commentss" value="" style="border: 0px" readonly /></td>
 
             </tr>
 
@@ -301,9 +300,9 @@
       <div class="buttons">
         
           <span class="button"><input type="button" class="edit" value="Edit" onClick="return editApplicationDialog()"/></span>
-        </g:form>
+	  </div>
+      </g:form>
       </div>
-    </div>
 
     <div id="dialog1" title="Edit Application" style="display:none;">
      <g:form method="post" name="editForm">
@@ -335,7 +334,7 @@
               <tr class="prop">
               <td valign="top" class="name"><b>name:&nbsp;<span style="color: red">*</span></b></td>
 
-              <td valign="top" class="value"><input type="text" id="named" name="named" value="" ></td>
+              <td valign="top" class="value"><input type="text" id="named" name="named" value="" /></td>
 
             </tr>
             
@@ -377,7 +376,7 @@
             <tr class="prop">
               <td valign="top" class="name">Comment:</td>
 
-              <td valign="top" class="value"><input type="text" id="commentsd" name="commentsd" value=""  ></td>
+              <td valign="top" class="value"><input type="text" id="commentsd" name="commentsd" value=""  /></td>
 
             </tr>
 

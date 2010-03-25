@@ -1045,14 +1045,14 @@ class MoveBundleAssetController {
 		            			if(position > 42){
 		            				asset.position = 42
 	    	            			asset.rowspan = 1 
-	    	            			asset.assetTag = asset.assetTag +"<br>"+assetEntity.assetTag
+	    	            			asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
 	    	            			asset.overlapError = true
 	    	            			asset.cssClass = "rack_error"
 	    	            			flag = false
 		            			} else if(ignoreLow){
 		            				asset.position = currentHigh
 	    	            			asset.rowspan = currentHigh - currentLow + 1 
-	    	            			asset.assetTag = asset.assetTag +"<br>"+assetEntity.assetTag
+	    	            			asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
 	    	            			asset.overlapError = true
 	    	            			asset.cssClass = "rack_error"
 	    	            			flag = false
@@ -1061,7 +1061,7 @@ class MoveBundleAssetController {
 		            				asset.currentLow = newLow
 		            				asset.position = newHigh
 	    	            			asset.rowspan = newHigh - newLow + 1
-	    	            			asset.assetTag = asset.assetTag +"<br>"+assetEntity.assetTag
+	    	            			asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
 	    	            			asset.overlapError = true
 	    	            			asset.cssClass = "rack_error"
 	    	            			flag = false
@@ -1069,7 +1069,7 @@ class MoveBundleAssetController {
 		            				asset.currentHigh = newHigh
 		            				asset.position = newHigh
 	    	            			asset.rowspan = newHigh - currentLow  + 1
-	    	            			asset.assetTag = asset.assetTag +"<br>"+assetEntity.assetTag
+	    	            			asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
 	    	            			asset.overlapError = true
 	    	            			asset.cssClass = "rack_error"
 	    	            			flag = false
@@ -1077,7 +1077,7 @@ class MoveBundleAssetController {
 			            			asset.currentLow = newLow
 		            				asset.position = currentHigh
 	    	            			asset.rowspan = currentHigh - newLow +1
-	    	            			asset.assetTag = asset.assetTag +"<br>"+assetEntity.assetTag
+	    	            			asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
 	    	            			asset.overlapError = true
 	    	            			asset.cssClass = "rack_error"
 	    	            			flag = false
@@ -1366,7 +1366,7 @@ class MoveBundleAssetController {
     		 	if(it.asset){
     		 		rowspan = it.asset?.rowspan != 0 ? it.asset?.rowspan : 1
     		 		rackStyle = it.rackStyle
-    		 		def assetTagsList = (it.asset?.assetTag).split("<br>")
+    		 		def assetTagsList = (it.asset?.assetTag).split("<br/>")
     		 		def moveBundle = "" 
     		 		def assetTag = ""
     		 		def isAdmin = SecurityUtils.getSubject().hasRole("PROJ_MGR")
@@ -1382,8 +1382,8 @@ class MoveBundleAssetController {
     		 				tag = it
     		 			}
     		 			def assetInstance = AssetEntity.findByAssetTag( tag )
-    		 			moveBundle += (assetInstance?.moveBundle ? assetInstance?.moveBundle.name : "") + "<br>"
-    		 			assetTag += "<a href='javascript:openAssetEditDialig(${assetInstance?.id})' >$it</a> <br>"
+    		 			moveBundle += (assetInstance?.moveBundle ? assetInstance?.moveBundle.name : "") + "<br/>"
+    		 			assetTag += "<a href='javascript:openAssetEditDialig(${assetInstance?.id})' >$it</a> <br/>"
     		 		}
     		 		if( !isAdmin ){
     		 			assetTag = it.asset?.assetTag

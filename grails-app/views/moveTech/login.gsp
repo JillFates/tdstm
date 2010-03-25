@@ -3,9 +3,9 @@
 <head>
 
 <title>Login</title>
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
 <link rel="shortcut icon"
 	href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 <g:javascript library="application" />
@@ -36,7 +36,7 @@
 	<table style="border: 0px;">
 		<tbody>
 			<tr>
-				<td height="2px;"></td>
+				<td style="height: 2px;"></td>
 			</tr>
 			<tr>
 				<td style="text-align: center;"><span

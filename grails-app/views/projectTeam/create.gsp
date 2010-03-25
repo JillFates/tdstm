@@ -27,10 +27,11 @@
                     <table>
                         <tbody>
 	                        <tr>
-							<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+							<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div>
+							<input type="hidden" name="bundleId" value="${bundleInstance?.id}" />
+                        	<input type="hidden" name="moveBundle.id" value="${bundleInstance?.id}" />
+							 </td>
 							</tr>
-                        	<input type="hidden" name="bundleId" value="${bundleInstance?.id}">
-                        	<input type="hidden" name="moveBundle.id" value="${bundleInstance?.id}">
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="teamCode"><b>Team Code:&nbsp;<span style="color: red">*</span></b></label>
@@ -98,12 +99,12 @@
 			                                </g:each> 
 		                                </select>
 	                                </td>
-	                                <td valign="middle" style="vertical-align:middle;" style="width: auto;"  >
+	                                <td valign="middle" style="vertical-align:middle;width: auto;"  >
 		                                <span style="white-space: nowrap;height: 100px;" > <a href="#" id="add">
-										<img  src="${createLinkTo(dir:'images',file:'right-arrow.png')}" style="float: left; border: none;">
-										</a></span><br><br><br><br>
+										<img  src="${createLinkTo(dir:'images',file:'right-arrow.png')}" style="float: left; border: none;"/>
+										</a></span><br/><br/><br/><br/>
 		                                <span style="white-space: nowrap;"> <a href="#" id="remove">
-		                                <img  src="${createLinkTo(dir:'images',file:'left-arrow.png')}" style="float: left; border: none;">
+		                                <img  src="${createLinkTo(dir:'images',file:'left-arrow.png')}" style="float: left; border: none;"/>
 		                                </a></span>
 	                                </td>
 	                                <td valign="top" style="width: auto;">

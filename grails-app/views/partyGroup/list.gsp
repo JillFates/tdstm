@@ -33,7 +33,7 @@
                         
                             <td>
                             <g:form name="selectForm_$i">
-                            <input type="hidden" name="id" value="${partyGroupInstance.id}">
+                            <input type="hidden" name="id" value="${partyGroupInstance.id}"/>
                             <g:actionSubmit action="show" value="Select"  /></g:form>
                              </td>
                             <td><g:link action="edit" id="${partyGroupInstance.id}" title="Edit  '${fieldValue(bean:partyGroupInstance, field:'name')}'">${fieldValue(bean:partyGroupInstance, field:'name')}</g:link></td>

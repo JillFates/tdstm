@@ -2,8 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>My Tasks</title>
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-	 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
+	 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 	<%--<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
 	 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.move_tech_dialog.css')}" /> 
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />--%>
@@ -17,17 +17,11 @@
 	<jq:plugin name="ui.dialog" /> 
 	--%>
 	
-
-	
-	<script>
-	<%--
+    <script type="text/javascript">    	
+    <%--
 	$(document).ready(function() {
 	$("#serverInfoDialog").dialog({ autoOpen: false })	       
 	})--%>
-	</script>
-	
-
-    <script type="text/javascript">    	
 	<%--  function serverInfo(e){
         var loc = document.bundleTeamAssetForm.location.value;
         var location;
@@ -87,7 +81,7 @@
 	<div class="mainbody" style="width: 100%;" >
 		<table border=0 cellpadding=0 cellspacing=0><tr>
 		<td><g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt"]' class="home">Home</g:link></td>
-		<td><a href="#" class="my_task_select">My Task</a></td>
+		<td><a href="#" class="my_task_select">My Tasks</a></td>
 		<td><a href="#" class="asset_search">Asset</a></td>
 		</tr></table>
       					<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">
@@ -155,8 +149,7 @@
         					</div>
       				</g:form>
   				</div>
-  	</div>
-<script>setFocus();</script>
+<script type="text/javascript" >setFocus();</script>
 </body>
 </html>
                   				

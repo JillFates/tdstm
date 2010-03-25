@@ -4,8 +4,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
     <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
     <title><g:layoutTitle default="Grails" /></title>
-    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
+    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" type="text/css"/>
+    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" type="text/css"/>
     <link rel="shortcut icon"
           href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
             

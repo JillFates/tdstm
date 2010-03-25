@@ -37,7 +37,7 @@
 	            <span class="menuButton"><g:link class="list" action="list" id="${companyId}">UserLogin List</g:link></span>
 	            <span class="menuButton"><g:link class="create" action="create" params="[companyId:companyId]">New UserLogin</g:link></span>
         	</div>
-        	<br>
+        	<br/>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
@@ -129,9 +129,9 @@
 	                                </td>
 	                                <td valign="middle" style="vertical-align:middle" >
 		                                <span style="white-space: nowrap;height: 100px;" > <a href="#" id="add">
-										<img  src="${createLinkTo(dir:'images',file:'right-arrow.png')}" style="float: left; border: none;">
-										</a></span><br><br><br><br>
-		                                <span style="white-space: nowrap;"> <a href="#" id="remove"><img  src="${createLinkTo(dir:'images',file:'left-arrow.png')}" style="float: left; border: none;">
+										<img  src="${createLinkTo(dir:'images',file:'right-arrow.png')}" style="float: left; border: none;"/>
+										</a></span><br/><br/><br/><br/>
+		                                <span style="white-space: nowrap;"> <a href="#" id="remove"><img  src="${createLinkTo(dir:'images',file:'left-arrow.png')}" style="float: left; border: none;"/>
 		                                </a></span>
 	                                </td>
 	                                <td valign="top" class="name">

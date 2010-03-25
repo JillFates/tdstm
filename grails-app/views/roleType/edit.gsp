@@ -13,7 +13,7 @@
 	            <span class="menuButton"><g:link class="create" action="create">New RoleType</g:link></span>
 	            </jsec:hasRole>
         	</div>
-        	<br>
+        	<br/>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if> <g:form method="post">

@@ -9,6 +9,7 @@
     <g:javascript library="jquery"/>
 
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
+    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" />
 
     <jq:plugin name="ui.core"/>
     <jq:plugin name="ui.datetimepicker"/>
@@ -71,15 +72,13 @@
                   <label for="startTime">Start Time:</label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'startTime','errors')}">
-                  <link rel="stylesheet"
-                        href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" />
                   <script type="text/javascript">
                     $(document).ready(function(){
                       $("#startTime").datetimepicker();
                     });
                   </script> <input type="text" class="dateRange" size="15" readOnly
                                    style="width: 112px; height: 14px;" id="startTime" name="startTime"
-                                   value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"/>">
+                                   value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"/>" />
                                    <g:hasErrors bean="${moveBundleInstance}" field="startTime">
                     <div class="errors">
                       <g:renderErrors bean="${moveBundleInstance}" as="list" field="startTime"/>
@@ -93,15 +92,13 @@
                   <label for="completionTime">Completion Time:</label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'completionTime','errors')}">
-                  <link rel="stylesheet"
-                        href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" />
                   <script type="text/javascript">
                     $(document).ready(function(){
                       $("#completionTime").datetimepicker();
                     });
                   </script> <input type="text" class="dateRange" size="15" readOnly
                                    style="width: 112px; height: 14px;" id="completionTime" name="completionTime"
-                                   value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}"/>">
+                                   value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}"/>" />
                                    <g:hasErrors bean="${moveBundleInstance}" field="completionTime">
                     <div class="errors">
                       <g:renderErrors bean="${moveBundleInstance}" as="list" field="completionTime"/>

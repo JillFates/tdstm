@@ -19,7 +19,7 @@
     <jq:plugin name="ui.draggable"/>
     <jq:plugin name="ui.resizable"/>
     <jq:plugin name="ui.dialog"/>
-    <script>
+    <script type="text/javascript">
 	      $(document).ready(function() {
 	        $("#dialog").dialog({ autoOpen: false })	        
 	      })
@@ -161,7 +161,7 @@
         <span class="menuButton"><g:link class="create" action="create">New Project</g:link></span>
       </jsec:hasRole>
     </div>
-    <br>
+    <br/>
    
    
     
@@ -341,7 +341,7 @@
                   <script type="text/javascript" charset="utf-8">
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                   </script>
-                  <input type="text" class="dateRange" size="15" style="width:112px;height:14px;" name="startDate" value="<tds:convertDate date="${projectInstance?.startDate}"/>" onchange="setCompletionDate(this.value)">
+                  <input type="text" class="dateRange" size="15" style="width:112px;height:14px;" name="startDate" value="<tds:convertDate date="${projectInstance?.startDate}"/>" onchange="setCompletionDate(this.value)" />
 <g:hasErrors
                     bean="${projectInstance}" field="startDate">
                     <div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="startDate" /></div>
@@ -354,7 +354,7 @@
                   <script type="text/javascript" charset="utf-8">
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                   </script>
-                  <input type="text" class="dateRange" size="15" style="width:112px;height:14px;" id="completionDateId" name="completionDate" value="<tds:convertDate date="${projectInstance?.completionDate}"/>">
+                  <input type="text" class="dateRange" size="15" style="width:112px;height:14px;" id="completionDateId" name="completionDate" value="<tds:convertDate date="${projectInstance?.completionDate}"/>" />
 
 <g:hasErrors bean="${projectInstance}" field="completionDate">
                     <div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="completionDate" /></div>
@@ -439,7 +439,7 @@
                       </g:each>
                     </optgroup>
                   </select>
-                  <input type="hidden" id="companyManagersId" value="${companyStaff.size()+clientStaff.size()+ 1}">
+                  <input type="hidden" id="companyManagersId" value="${companyStaff.size()+clientStaff.size()+ 1}" />
                 </td>
               </tr>
 
@@ -493,8 +493,6 @@
           <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
         </jsec:hasRole>
       </g:form>
-    </div>
+    </div></div>
   </body>
-  </div>  
-  </body>  
 </html>

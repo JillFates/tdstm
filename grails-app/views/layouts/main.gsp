@@ -3,8 +3,8 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
     <title><g:layoutTitle default="Grails" /></title>
-    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
+    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" type="text/css"/>
+    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" type="text/css"/>
     <link rel="shortcut icon"
           href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
     <g:layoutHead />
@@ -21,8 +21,7 @@
   <body>
     <div class="main_body">
 
-      <div class="header"><img
-          src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;">
+      <div class="header"><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;"/>
         <div class="header_right"><br />
           <div style="font-weight: bold; color: #0000FF"><jsec:isLoggedIn>
               <strong>Welcome &nbsp;&nbsp;<jsec:principal />&nbsp;! </strong>

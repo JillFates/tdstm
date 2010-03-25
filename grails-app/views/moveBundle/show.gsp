@@ -133,7 +133,7 @@
           </tbody>
         </table>
       </div>
-      <br>
+      <br/>
       <div class="buttons" style="float: left;">
         <g:form>
           <input type="hidden" name="id" value="${moveBundleInstance?.id}" />
@@ -154,12 +154,11 @@
 					<th>Completion</th>
 					<th>Duration</th>
 					<th>Type</th>
-					<th>Value</th>
+					<th>Value<input type="hidden" name="moveBundleId" id="moveBundleId" value="${moveBundleInstance?.id}" />
+		        <input type="hidden" name="projectId" value="${projectId}"/></th>
 				</tr>
 			</thead>
 			<tbody id="commetAndNewsBodyId">
-				<input type="hidden" name="moveBundleId" id="moveBundleId" value="${moveBundleInstance?.id}" />
-		        <input type="hidden" name="projectId" value="${projectId}">
 		        <g:each in="${ dashboardSteps }"	status="i" var="dashboardStep">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}" id="commentsRowId_${dashboardStep.moveBundleStep.id }">
 						<td>
@@ -178,7 +177,7 @@
 						<td onclick="$('#tasksCompletedText_${dashboardStep.moveBundleStep.id }').hide();$('#tasksCompletedInput_${dashboardStep.moveBundleStep.id }').show();">
 							<span style="display: none;" id="tasksCompletedInput_${dashboardStep.moveBundleStep.id }" title="input">
 								<input type="text" name="tasksCompleted" style="width: 25px;" id="tasksCompleted_${dashboardStep.moveBundleStep.id }" maxlength="3" 
-								onkeypress="createSnapshot(${dashboardStep.moveBundleStep.id }, this.value, event )">
+								onkeypress="createSnapshot(${dashboardStep.moveBundleStep.id }, this.value, event )"/>
 							</span>
 							<span id="tasksCompletedText_${dashboardStep.moveBundleStep.id }" title="text">${dashboardStep.stepSnapshot?.tasksCompleted}</span>
 							%

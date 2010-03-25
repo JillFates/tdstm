@@ -54,8 +54,9 @@
 	<div class="message">${flash.message}</div>
 </g:if>
 <div class="dialog">
+<g:form action="rackLayoutReport" name="rackLayoutForm" method="post" target="_blank" onsubmit="return validateForm()">
 <table>
-	<g:form action="rackLayoutReport" name="rackLayoutForm" method="post" target="_blank" onsubmit="return validateForm()">
+	
 	<tbody>
 		<tr>
 			<td colspan="3"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
@@ -100,16 +101,16 @@
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label>Include other bundles:</label></td>
-			<td valign="top" colspan="2"><input type="checkbox" name="otherBundle" checked="checked"></td>
+			<td valign="top" colspan="2"><input type="checkbox" name="otherBundle" checked="checked" /></td>
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label>Include bundle names:</label></td>
-			<td valign="top" colspan="2"><input type="checkbox" name="bundleName" checked="checked"></td>
+			<td valign="top" colspan="2"><input type="checkbox" name="bundleName" checked="checked" /></td>
 		</tr>
 		<tr>
 			<td valign="top" class="name"><label><b>Print Views:<span style="color: red;">*</span> </b></label></td>
 			<td valign="top"><label for="frontView" ><input type="checkbox" name="frontView" id="frontView" checked="checked" />&nbsp;Front</label></td>
-			<td valign="top"><label for="backView" ><input type="checkbox" name="backView" id="backView" checked="checked">&nbsp;Back</label></td>
+			<td valign="top"><label for="backView" ><input type="checkbox" name="backView" id="backView" checked="checked" />&nbsp;Back</label></td>
 		</tr>
 		<tr>
 			<td colspan="3" class="buttonR" style="text-align: center;">
@@ -118,8 +119,8 @@
 			</td>
 		</tr>
 	</tbody>
-	</g:form>
 </table>
+	</g:form>
 </div>
 </div>
 <script type="text/javascript">

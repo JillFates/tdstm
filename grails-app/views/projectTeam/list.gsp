@@ -43,7 +43,7 @@
                              
                             <td>
                             	<g:each in="${projectTeamInstance?.teamMembers}" var="teamMember">
-			 					<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName},</g:if> ${teamMember?.staff?.firstName} <g:if test="${teamMember?.staff?.title}">- ${teamMember?.staff?.title}</g:if><br>
+			 					<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName},</g:if> ${teamMember?.staff?.firstName} <g:if test="${teamMember?.staff?.title}">- ${teamMember?.staff?.title}</g:if><br/>
 								</g:each>
 							</td>
                             
@@ -60,7 +60,7 @@
             </div>
             <div class="buttons">
             		<g:form>
-            		<input type="hidden" name="bundleId" value="${bundleInstance?.id}">
+            		<input type="hidden" name="bundleId" value="${bundleInstance?.id}" />
 					<span class="button"><g:actionSubmit class="create" action="Create" value="New Project Team" /></span>
 					</g:form>
 				</div>

@@ -9,7 +9,7 @@
     <g:javascript library="jquery"/>
 
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
-
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" type="text/css"/>
     <jq:plugin name="ui.core"/>
     <jq:plugin name="ui.datetimepicker"/>
     
@@ -25,11 +25,12 @@
     </g:javascript>
   </head>
   <body>
+  <g:form method="post" >
     <div class="body" style="width: 350px;">
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
       </g:if>
-      <g:form method="post" >
+      
         <input type="hidden" name="id" value="${moveBundleInstance?.id}" />
         <div class="steps_table">
         <span class="span"><b> Edit Move Bundle </b></span>
@@ -71,14 +72,12 @@
                   <label for="startTime">Start Time:</label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'startTime','errors')}">
-                  <link rel="stylesheet"
-                        href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" />
                   <script type="text/javascript">
                     $(document).ready(function(){
                       $("#startTime").datetimepicker();
                     });
                   </script> <input type="text" class="dateRange" size="15" readOnly style="width: 130px; height: 14px;" id="startTime" name="startTime"
-        					value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"/>">
+        					value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"/>"/>
         					<g:hasErrors bean="${moveBundleInstance}" field="startTime">
                     		<div class="errors">
                       			<g:renderErrors bean="${moveBundleInstance}" as="list" field="startTime"/>
@@ -92,15 +91,13 @@
                   <label for="completionTime">Completion Time:</label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'completionTime','errors')}">
-                  <link rel="stylesheet"
-                        href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" />
                   <script type="text/javascript">
                     $(document).ready(function(){
                       $("#completionTime").datetimepicker();
                     });
                   </script> <input type="text" class="dateRange" size="15" readOnly
 				        style="width: 130px; height: 14px;" id="completionTime" name="completionTime"
-				        value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}"/>">
+				        value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}"/>" />
 				        <g:hasErrors bean="${moveBundleInstance}" field="completionTime">
 				                    <div class="errors">
 				                      <g:renderErrors bean="${moveBundleInstance}" as="list" field="completionTime"/>
@@ -170,7 +167,7 @@
             </tbody>
           </table>
         </div>
-        <br>
+        <br/>
         <div class="buttons" style="float: left;">
           <input type="hidden" name="project.id" value="${projectId }"/>
           <input type="hidden" name="projectId" value="${projectId }"/>
@@ -197,60 +194,59 @@
 					<th>Completion</th>
 					<th>Duration</th>
 					<th>Type</th>
-					<th>Value</th>
+					<th>Value 
+					<input type="hidden" name="moveBundleId" id="moveBundleId" value="${moveBundleInstance?.id}" />
+					</th>
 				</tr>
 			</thead>
 			<tbody id="commetAndNewsBodyId">
-				<input type="hidden" name="moveBundleId" id="moveBundleId" value="${moveBundleInstance?.id}" />
 		        <g:each in="${ dashboardSteps }"	status="i" var="dashboardStep">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}" id="commentsRowId_${dashboardStep.step.id }">
 							<td>
 								${dashboardStep.step.name}
-								<input type="hidden"  id="keyOffStep_${dashboardStep.step.id }" value="${dashboardStep.step.name}">
+								<input type="hidden"  id="keyOffStep_${dashboardStep.step.id }" value="${dashboardStep.step.name}"/>
 							</td>
 							<td>
 							<g:if test="${dashboardStep.moveBundleStep}">
 							 <input type="checkbox" name="checkbox_${dashboardStep.step.id }" id="checkbox_${dashboardStep.step.id }" 
-								onclick="enableInput(${dashboardStep.step.id })" checked="checked">
+								onclick="enableInput(${dashboardStep.step.id })" checked="checked"/>
 							</g:if>
 							<g:else>
 							<input type="checkbox" name="checkbox_${dashboardStep.step.id }" id="checkbox_${dashboardStep.step.id }" 
-								onclick="enableInput(${dashboardStep.step.id })">
+								onclick="enableInput(${dashboardStep.step.id })"/>
 							</g:else>	
 							</td>
 							<td>
 								<span id="labelText_${dashboardStep.step.id }" title="text">${dashboardStep.moveBundleStep?.label}</span>
 								<span id="labelInput_${dashboardStep.step.id }" style="display: none;" title="input">
 								<input type="text" name="dashboardLabel_${dashboardStep.step.id }" id="dashboardLabel_${dashboardStep.step.id }" 
-								value="${dashboardStep.moveBundleStep?.label ? dashboardStep.moveBundleStep?.label : dashboardStep.step.name}">
+								value="${dashboardStep.moveBundleStep?.label ? dashboardStep.moveBundleStep?.label : dashboardStep.step.name}"/>
 								</span>
 							</td>
 							<td>
 							<span id="startTimeText_${dashboardStep.step.id }" title="text"><tds:convertToGMT date="${dashboardStep.moveBundleStep?.planStartTime}"/></span>
 							
 							<span id="startTimeInput_${dashboardStep.step.id }" style="display: none;" title="input">
-								<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" />
 			                  <script type="text/javascript">
 			                    $(document).ready(function(){
 			                      $("#startTime_${dashboardStep.step.id }").datetimepicker();
 			                    });
 			                  </script>
 								<input type="text" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }"
-								value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}'/>" onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })">
+								value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}'/>" onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })"/>
 							</span>
 							</td>
 							<td>
 							<span id="completionTimeText_${dashboardStep.step.id }" title="text"><tds:convertToGMT date="${dashboardStep.moveBundleStep?.planCompletionTime}"/></span>
 							
 							<span id="completionTimeInput_${dashboardStep.step.id }" style="display: none;" title="input">
-							<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" />
 			                  <script type="text/javascript">
 			                    $(document).ready(function(){
 			                      $("#completionTime_${dashboardStep.step.id }").datetimepicker();
 			                    });
 			                  </script>
 								<input type="text" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }" 
-								value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planCompletionTime}'/>" onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })">
+								value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planCompletionTime}'/>" onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })"/>
 							</span>
 							</td>
 							<td>
@@ -259,9 +255,9 @@
 							
 							<span id="durationInput_${dashboardStep.step.id }" style="display: none;" title="input">
 							<input type="hidden" name="duration_${dashboardStep.step.id }" id="durationIn_${dashboardStep.step.id }"
-								value="${dashboardStep.stepSnapshot?.duration}">
+								value="${dashboardStep.stepSnapshot?.duration}"/>
 								<input type="text" id="duration_${dashboardStep.step.id }"	style="width: 60px;"
-								value="<tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/>"	onchange="changeCompletionTime(this.value, ${dashboardStep.step.id })">
+								value="<tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/>"	onchange="changeCompletionTime(this.value, ${dashboardStep.step.id })"/>
 							</span>
 							</td>
 							<td>
@@ -281,20 +277,21 @@
 								
 								<span style="display: none;" id="tasksCompletedInput_${dashboardStep.step.id }" title="input">
 									<input type="text" name="tasksCompleted_${dashboardStep.step.id }" style="width: 25px;" value="${dashboardStep.stepSnapshot?.tasksCompleted}" 
-									id="tasksCompleted_${dashboardStep.step.id }" maxlength="3" >
+									id="tasksCompleted_${dashboardStep.step.id }" maxlength="3" />
 								</span><g:if  test="${dashboardStep.moveBundleStep?.calcMethod == 'M'}">%</g:if>
 							</td>
 							
 					</tr>
 				</g:each>
-				</g:form>
 			</tbody>
 		</table>
+		
 	</div>
 	<div>
           <span style="float: right;">Dashboard Server : <input type="button" name="serverOn" value="On" />&nbsp;<input type="button" name="serverOff" value="Off" /></span>
       </div>
 	</div>
+	</g:form>
 	<script type="text/javascript">
 	/*
     function to invoke ESC key to abandon the field

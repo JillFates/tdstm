@@ -9,12 +9,13 @@
 <body>
 
 <div class="body">
+<g:form>
   <h1>MoveBundle List</h1>
   <g:if test="${flash.message}">
     <div class="message">${flash.message}</div>
   </g:if>
   <div class="list">
-    <g:form>
+    
     <table>
       <thead>
         <tr>

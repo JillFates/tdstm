@@ -206,9 +206,9 @@
 				<td valign="top" class="value" colspan="2">
 				<table style="border: none;">
 				<g:form name="bundlesForm">
-				<input type="hidden" name="sortField" value="${sortField}"/>
-				<input type="hidden" name="orderField" value="${orderField}"/>
-				<input type="hidden" name="sideField" value="${sideField}"/>
+					<input type="hidden" name="sortField" value="${sortField}"/>
+					<input type="hidden" name="orderField" value="${orderField}"/>
+					<input type="hidden" name="sideField" value="${sideField}"/>
 					<tr>
 						<td valign="top" >Move Bundle:
 						<select name="bundleLeft" id="bundleLeftId" onchange="bundleChange();" >
@@ -227,12 +227,14 @@
 						</select>
 						
 						</td>
+						
 					</tr>
 					</g:form>
 					<tr>
+						
+						
 						<td valign="top" >
 						<g:form name="assignLeftAssetsForm">
-						
 						<div class="scrollTable" style="width: 100%;float: left;">  
 					       <table id="assetsLeftTableId" style="width: 100%;float: left; border: 0px">  
 					         <thead>  
@@ -255,16 +257,17 @@
 					         </tbody>  
 					       </table>  
 					     </div>
+					     </g:form>
 						</td>
-						</g:form>
+						
 						<td valign="middle" style="vertical-align: middle"><span
 							style="white-space: nowrap; height: 100px;"> 
 							<a href="#" id="add">
-							<img  src="${createLinkTo(dir:'images',file:'right-arrow.png')}" style="float: left; border: none;">
-							</a></span><br><br><br>
-						<br>
+							<img  src="${createLinkTo(dir:'images',file:'right-arrow.png')}" style="float: left; border: none;"/>
+							</a></span><br/><br/><br/>
+						<br/>
 						<span style="white-space: nowrap;"> <a href="#" id="remove" >
-						<img  src="${createLinkTo(dir:'images',file:'left-arrow.png')}" style="float: left; border: none;">
+						<img  src="${createLinkTo(dir:'images',file:'left-arrow.png')}" style="float: left; border: none;"/>
 						</a></span></td>
 						<td valign="top" >
 						<g:form name="assignRightAssetsForm">
@@ -296,10 +299,8 @@
 					</tr>
 				</table>
 				</td>
-			</tr>
+			</tr></table>
 			<!-- <tr align="right"><td colspan="2" ><input type="button" value="Done"> </td> </tr> -->
-	</div>
-</div>
 <script type="text/javascript">
 initialize()
 </script>

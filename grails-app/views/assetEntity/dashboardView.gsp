@@ -27,14 +27,14 @@
 <jq:plugin name="ui.dialog" />
 <jq:plugin name="jquery.scrollfollow" />
 
-<style>
+<style type="text/css">
 td .odd {
 	background: #DDDDDD;
 	nowrap
 }
 </style>
 
-<script>
+<script type="text/javascript">
 	$(document).ready(function() {
 	    $("#showDialog").dialog({ autoOpen: false })
 	    $("#editDialog").dialog({ autoOpen: false })
@@ -490,12 +490,12 @@ td .odd {
 	<div class="message">${flash.message}</div>
 </g:if>
 <g:form method="post" name="dashboardForm" controller="assetEntity" action="dashboardView">
-	<input type="hidden" name="projectId" value="${projectId}">
-	<input type="hidden" name="showAll" id="showAllId">
-	<input type="hidden" name="team" id="teamId" value="${params.team}">
-	<input type="hidden" name="assetLocation" id="assetLocationId" value="${params.assetLocation}">
-	<input type="hidden" name="assetStatus" id="assetStatusId" value="${params.assetStatus}">
-	<input type="hidden" name="myForm" value="dashboardForm">
+	<input type="hidden" name="projectId" value="${projectId}"/>
+	<input type="hidden" name="showAll" id="showAllId"/>
+	<input type="hidden" name="team" id="teamId" value="${params.team}"/>
+	<input type="hidden" name="assetLocation" id="assetLocationId" value="${params.assetLocation}"/>
+	<input type="hidden" name="assetStatus" id="assetStatusId" value="${params.assetStatus}"/>
+	<input type="hidden" name="myForm" value="dashboardForm"/>
 	<div class="dialog">
 	<table style="border: 0px;">
 		<tr class="prop">
@@ -509,14 +509,14 @@ td .odd {
 				</g:each>
 
 			</select>
-			<input type="button" value="Create Snapshot" id="createSnapshotId" onclick="createSnapshot()">
+			<input type="button" value="Create Snapshot" id="createSnapshotId" onclick="createSnapshot()"/>
 			</td>
 			<td style="width:40%">
 			<h1 align="center">Supervisor Console</h1>
 			</td>
 			<td style="text-align: right; vertical-align: bottom;width:30%">
-			<input type="hidden" id="lastRefreshId" name="lastRefresh" value="${new Date().getTime()}">
-			<input type="button" value="Refresh" onclick="pageReload();">
+			<input type="hidden" id="lastRefreshId" name="lastRefresh" value="${new Date().getTime()}"/>
+			<input type="button" value="Refresh" onclick="pageReload();"/>
 			<select id="selectTimedId"
 				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(e)') }">
 				<option value="60000">1 min</option>
@@ -890,9 +890,9 @@ td .odd {
 				</table>
 				</div>
 				<div>
-				<input type="hidden" name="asset" id="assetId" value="">
-				<input type="hidden" name="currentState" id="currentStateId" value="">
-				<input type="hidden" value="" id="validateCommentId" name="validateComment">
+				<input type="hidden" name="asset" id="assetId" value=""/>
+				<input type="hidden" name="currentState" id="currentStateId" value=""/>
+				<input type="hidden" value="" id="validateCommentId" name="validateComment"/>
 				<g:form name="assetdetailsForm">
 					<table style="border: 0">
 						<tbody>
@@ -927,8 +927,7 @@ td .odd {
 							</tr>
 							<tr>
 								<td colspan="2" style="text-align: center;" class="buttonR">
-								<input type="button" value="Cancel"
-									onclick="resetAssetDetails()">
+								<input type="button" value="Cancel"	onclick="resetAssetDetails()"/>
 								<input type="button" value="Submit"
 									onclick="setCommentValidation();${remoteFunction(action:'createTransition', params:'\'asset=\' + $(\'#assetId\').val() +\'&state=\'+ $(\'#stateSelectId\').val() +\'&priority=\'+ $(\'#priorityId\').val() +\'&assignTo=\'+$(\'#assignToId\').val() +\'&comment=\'+$(\'#commentId\').val() ', onComplete:'updateAsset(e)')}" /></td>
 							</tr>
@@ -944,7 +943,7 @@ td .odd {
 </table>
 </div>
 <div id="commentsListDialog" title="Show Asset Comments"
-	style="display: none;" ><br>
+	style="display: none;" ><br/>
 <div class="list">
 <table id="listCommentsTable">
 	<thead>
@@ -977,11 +976,10 @@ td .odd {
 	onclick="$('#statusId').val('');$('#createResolveDiv').hide();$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">New
 Comment</a></span></div>
 </div>
-<div id="createCommentDialog" title="Create Asset Comment"
-	style="display: none;"><input type="hidden" name="assetEntity.id"
-	id="createAssetCommentId" value=""> <input type="hidden"
-	name="status" id="statusId" value=""> <g:form
-	action="saveComment" method="post" name="createCommentForm">
+<div id="createCommentDialog" title="Create Asset Comment" style="display: none;">
+<input type="hidden" name="assetEntity.id" id="createAssetCommentId" value=""/> 
+<input type="hidden" name="status" id="statusId" value=""/> 
+<g:form	action="saveComment" method="post" name="createCommentForm">
 	<input type="hidden" name="category" value="moveday"/>
 	<div class="dialog" style="border: 1px solid #5F9FCF">
 	<div>
@@ -995,8 +993,7 @@ Comment</a></span></div>
 					from="${AssetComment.constraints.commentType.inList}" value=""
 					noSelection="['':'please select']" onChange="commentChange('#createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
 				
-				<input type="checkbox"
-					id="mustVerifyEdit" name="mustVerify" value="0"
+				<input type="checkbox" id="mustVerifyEdit" name="mustVerify" value="0"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
 					<label for="mustVerify">Must Verify</label>
 				</td>
@@ -1034,14 +1031,14 @@ Comment</a></span></div>
             </div>
 		
 	</div>
-	<div class="buttons"><span class="button"> <input
-		class="save" type="button" value="Create"
+	<div class="buttons"><span class="button"> 
+	<input class="save" type="button" value="Create"
 		onclick="resolveValidate('createCommentForm','createAssetCommentId');" /></span></div>
 </g:form></div>
 <div id="showCommentDialog" title="Show Asset Comment"
 	style="display: none;">
-<div class="dialog" style="border: 1px solid #5F9FCF"><input name="id" value="" id="commentId"
-	type="hidden">
+<div class="dialog" style="border: 1px solid #5F9FCF">
+<input name="id" value="" id="commentId" type="hidden"/>
 	<div>
 <table id="showCommentTable" style="border: 0px">
 	
@@ -1076,9 +1073,9 @@ Comment</a></span></div>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="mustVerify">Must
 			Verify:</label></td>
-			<td valign="top" class="value" id="verifyTdId"><input
-				type="checkbox" id="mustVerifyShowId" name="mustVerify" value="0"
-				disabled="disabled" ></td>
+			<td valign="top" class="value" id="verifyTdId">
+			<input type="checkbox" id="mustVerifyShowId" name="mustVerify" value="0" disabled="disabled" />
+			</td>
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="comment">Comment:</label>
@@ -1093,9 +1090,9 @@ Comment</a></span></div>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="isResolved">Is
 			Resolved:</label></td>
-			<td valign="top" class="value" id="resolveTdId"><input
-				type="checkbox" id="isResolvedId" name="isResolved" value="0"
-				disabled="disabled" ></td>
+			<td valign="top" class="value" id="resolveTdId">
+			<input type="checkbox" id="isResolvedId" name="isResolved" value="0"
+				disabled="disabled" /></td>
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="resolution">Resolution:</label>
@@ -1116,11 +1113,11 @@ Comment</a></span></div>
 	
 </table>
 </div>
- <div class="buttons"><span class="button"> <input
-	class="edit" type="button" value="Edit"
+ <div class="buttons"><span class="button"> 
+ <input class="edit" type="button" value="Edit"
 	onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
-</span> <span class="button"> <input class="delete" type="button"
-	value="Delete"
+</span> <span class="button"> 
+<input class="delete" type="button" value="Delete"
 	onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + $(\'#commentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e ,\'never\')')}" />
 </span> </div>
 </div>
@@ -1130,7 +1127,7 @@ Comment</a></span></div>
 	style="display: none;"><g:form action="updateComment"
 	method="post" name="editCommentForm">
 	<div class="dialog" style="border: 1px solid #5F9FCF">
-	<input type="hidden" name="id" id="updateCommentId" value="">
+	<input type="hidden" name="id" id="updateCommentId" value=""/>
 	<div>
 	<table id="updateCommentTable" style="border: 0px">
 		
@@ -1157,7 +1154,7 @@ Comment</a></span></div>
 				</jsec:hasAnyRole>
 				<jsec:lacksAllRoles in="['ADMIN','PROJ_MGR']">
 				
-				<input type="text" id="commentTypeEditId" name="commentType" readonly style="border: 0;">&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="text" id="commentTypeEditId" name="commentType" readonly style="border: 0;"/>&nbsp;&nbsp;&nbsp;&nbsp;
 				</jsec:lacksAllRoles>					
 				
 				<input type="checkbox"
@@ -1273,8 +1270,8 @@ Comment</a></span></div>
 	<g:form name="filterForm" action="dashboardView">
 		<input type="hidden" name="projectId" value="${projectId}" />
 		<input type="hidden" name="moveBundle" value="${moveBundleInstance.id}" />
-		<input type="hidden" name="showAll" id="filterShowAllId" value="${showAll}">
-		<input type="hidden" name="myForm" value="filterForm">
+		<input type="hidden" name="showAll" id="filterShowAllId" value="${showAll}"/>
+		<input type="hidden" name="myForm" value="filterForm"/>
 		<table>
 			<tr>
 				<td>Application : </td>
@@ -1321,9 +1318,9 @@ Comment</a></span></div>
 				</td>
 			</tr>
 			<tr>
-				<td colspan="2" style="text-align: center;"><input type="reset" value="Cancel" onclick="$('#filterDialog').dialog('close');">
-				<input type="reset" value="Clear">
-				<input type="submit" value="Apply" onclick="$('#filterShowAllId').val('show')">				
+				<td colspan="2" style="text-align: center;"><input type="reset" value="Cancel" onclick="$('#filterDialog').dialog('close');"/>
+				<input type="reset" value="Clear"/>
+				<input type="submit" value="Apply" onclick="$('#filterShowAllId').val('show')"/>				
 				</td>
 			</tr>
 		</table>

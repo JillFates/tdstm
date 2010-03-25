@@ -19,7 +19,7 @@
     <jq:plugin name="ui.resizable"/>
     <jq:plugin name="ui.dialog"/>
 
-    <script>
+    <script type="text/javascript">
 
       $(document).ready(function() {
 
@@ -138,7 +138,7 @@ def userLogin = UserLogin.findByPerson(personInstance);
       </div>
       <jsec:hasRole name="ADMIN">
         <div class="buttons"><g:form>
-            <input type="hidden" value="${companyId}" name="companyId" >
+            <input type="hidden" value="${companyId}" name="companyId" />
             <span class="button"><input type="button" value="New" class="create" onClick="createDialog()"/></span>
         </g:form></div>
     </jsec:hasRole></div>
@@ -303,7 +303,7 @@ def userLogin = UserLogin.findByPerson(personInstance);
 
                 <tr class="prop">
                   <td valign="top" class="name">
-                    <label for="active"><b>Active:&nbsp;<span style="color: red">*</span></label>
+                    <label for="active"><b>Active:&nbsp;<span style="color: red">*</span></b></label>
                   </td>
                   <td valign="top" class="value ${hasErrors(bean:personInstance,field:'active','errors')}">
                     <select name="active" id="active" >

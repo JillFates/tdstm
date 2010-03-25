@@ -33,7 +33,6 @@
 					                <g:renderErrors bean="${partyGroupInstance}" as="list" idCheck/>
 					            </div>
 					            </g:hasErrors>
-					            <input  type="hidden" name="partyType.id" value="COMPANY">
                            <!--  <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="partyType">Party Type:</label>
@@ -50,6 +49,7 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
+                                	<input  type="hidden" name="partyType.id" value="COMPANY"/>
                                     <label for="name"><b>Name:&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:partyGroupInstance,field:'name','errors')}">

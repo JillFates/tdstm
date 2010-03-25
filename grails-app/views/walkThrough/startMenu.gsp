@@ -1,7 +1,7 @@
 <html>
 <head>
 <title>Walkthru&gt; Start</title>
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
 <script type="text/javascript">
 /*-----------------------------------------------------------------
 	function to load the Bundles for selected Project via AJAX

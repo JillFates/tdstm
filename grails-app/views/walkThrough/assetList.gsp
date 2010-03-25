@@ -2,8 +2,8 @@
 <head>
 <title>Walkthru&gt; Select Asset</title>
 <g:javascript library="prototype" />
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
 <g:javascript src="betterinnerhtml.js" />
 <script type="text/javascript">
 var timeInterval;
@@ -62,9 +62,9 @@ function showAssetMenu( assetId , assetName, bundleId, bundleName ) {
 <DIV style="FLOAT: right"><A class=button
 	href="selectRack?moveBundle=${params.moveBundle}&auditType=${auditType}">Rack List</A></DIV>
 <BR class=clear>
+<g:form method="post" action="selectAsset" name="selectAssetForm">
 <TABLE>
 	<TBODY>
-	<g:form method="post" action="selectAsset" name="selectAssetForm">
 		<g:if test="${!searchType && !searchKey }">
 		<TR>
 			<TD class=label>Room/Rack:</TD>
@@ -72,19 +72,19 @@ function showAssetMenu( assetId , assetName, bundleId, bundleName ) {
 		</TR>
 		</g:if>
 		<TR>
-			<input type="hidden" name="id" name="assetId" id="assetId">
-			<input type="hidden" name="viewType" id="viewTypeId" value="${viewType}">
-			<input type="hidden" name="moveBundle" value="${params.moveBundle}">
-			<input type="hidden" name="location" value="${params.location}">
-			<input type="hidden" name="room" id="roomId" value="${params.room}">
-			<input type="hidden" name="rack" id="rackId" value="${params.rack}">
-			<TD align=middle><LABEL>View:</LABEL> 
+			<TD align="center"><LABEL>View:</LABEL> 
+			<input type="hidden" name="id" name="assetId" id="assetId"/>
+			<input type="hidden" name="viewType" id="viewTypeId" value="${viewType}"/>
+			<input type="hidden" name="moveBundle" value="${params.moveBundle}"/>
+			<input type="hidden" name="location" value="${params.location}"/>
+			<input type="hidden" name="room" id="roomId" value="${params.room}"/>
+			<input type="hidden" name="rack" id="rackId" value="${params.rack}"/>
 			<a class="button unselected" href="#" onclick="document.selectAssetForm.viewType.value='todo';document.selectAssetForm.submit();" id="todoId">ToDo</a>
 			<a class="button" href="#" onclick="document.selectAssetForm.viewTypeId.value='all';document.selectAssetForm.submit();" id="allId">All</a>
 			</TD>
 			<TD align=right><LABEL for=search>Scan Asset:</LABEL>
 				<INPUT style="width: 40px" id="assetSearchId" class="text search" size='8' name='search' value="${searchKey}"
-					onkeyup="timeInterval = setTimeout('searchAssets()',500)" onkeydown="if(timeInterval){clearTimeout(timeInterval)}"> 
+					onkeyup="timeInterval = setTimeout('searchAssets()',500)" onkeydown="if(timeInterval){clearTimeout(timeInterval)}"/> 
 			</TD>
 		</TR>
 		
@@ -107,9 +107,8 @@ function showAssetMenu( assetId , assetName, bundleId, bundleName ) {
 			</TABLE>
 			</TD>
 		</TR>
-		</g:form>
 	</TBODY>
-</TABLE>
+</TABLE></g:form>
 </DIV>
 </DIV>
 <script type="text/javascript">

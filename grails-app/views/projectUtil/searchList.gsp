@@ -7,7 +7,7 @@
 <title>Project List</title>
 </head>
 <body>
-<div class="body"><br>
+<div class="body"><br/>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
@@ -36,7 +36,7 @@
 				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
 					<td><input type="radio" name="selectProject"
-						value="${fieldValue(bean:projectInstance, field:'projectCode')}"></td>
+						value="${fieldValue(bean:projectInstance, field:'projectCode')}" /></td>
 
 					<td><g:link controller="project" action="show" id="${projectInstance.id}">${fieldValue(bean:projectInstance, field:'projectCode')}</g:link></td>
 
@@ -53,7 +53,7 @@
 		</tbody>
 	</table>
 	<div class="buttons">
-				<span class="button"><input class="select" type="submit" name="submit" value="Select"> </span> </div>
+				<span class="button"><input class="select" type="submit" name="submit" value="Select" /> </span> </div>
 </g:form></div>
 </div>
 </body>

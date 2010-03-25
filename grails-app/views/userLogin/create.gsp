@@ -29,7 +29,7 @@
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
             <span class="menuButton"><g:link class="list" action="list" id="${companyId}">UserLogin List</g:link></span>
         </div>
-        <br>
+        <br/>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
@@ -38,9 +38,10 @@
                     <table>
                         <tbody>
 	                        <tr>
-							<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+							<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> 
+							<input name="companyId" type="hidden" value="${companyId}" />
+							</td>
 							</tr>
-                        	<input name="companyId" type="hidden" value="${companyId}" >
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="person"><b>Person:&nbsp;<span style="color: red">*</span></b></label>
@@ -126,10 +127,10 @@
 	                                </td>
 	                                <td valign="middle" style="vertical-align:middle" >
 		                                <span style="white-space: nowrap;height: 100px;" > <a href="#" id="add">
-										<img  src="${createLinkTo(dir:'images',file:'right-arrow.png')}" style="float: left; border: none;">
-										</a></span><br><br><br><br>
+										<img  src="${createLinkTo(dir:'images',file:'right-arrow.png')}" style="float: left; border: none;"/>
+										</a></span><br/><br/><br/><br/>
 		                                <span style="white-space: nowrap;"> <a href="#" id="remove">
-		                                <img  src="${createLinkTo(dir:'images',file:'left-arrow.png')}" style="float: left; border: none;">
+		                                <img  src="${createLinkTo(dir:'images',file:'left-arrow.png')}" style="float: left; border: none;"/>
 		                                </a></span>
 	                                </td>
 	                                <td valign="top" class="name">

@@ -24,7 +24,7 @@
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 	            <span class="menuButton"><g:link class="list" action="list" params="[bundleId:bundleInstance?.id]">Project Team List</g:link></span>
         	</div>
-        	<br>
+        	<br/>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
@@ -104,12 +104,12 @@
 			                                </g:each> 
 		                                </select>
 	                                </td>
-	                                <td valign="middle" style="vertical-align:middle;" style="width: auto;"  >
+	                                <td valign="middle" style="vertical-align:middle;width: auto;"  >
 		                                <span style="white-space: nowrap;height: 100px;" > <a href="#" id="add">
-										<img  src="${createLinkTo(dir:'images',file:'right-arrow.png')}" style="float: left; border: none;">
-										</a></span><br><br><br><br>
+										<img  src="${createLinkTo(dir:'images',file:'right-arrow.png')}" style="float: left; border: none;"/>
+										</a></span><br/><br/><br/><br/>
 		                                <span style="white-space: nowrap;"> <a href="#" id="remove">
-		                                <img  src="${createLinkTo(dir:'images',file:'left-arrow.png')}" style="float: left; border: none;">
+		                                <img  src="${createLinkTo(dir:'images',file:'left-arrow.png')}" style="float: left; border: none;"/>
 		                                </a></span>
 	                                </td>
 	                                <td valign="top" style="width: auto;">

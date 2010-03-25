@@ -15,7 +15,7 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
-<script>
+<script type="text/javascript">
 	$(document).ready(function() {
 		$("#changeTruckDiv").dialog({ autoOpen: false })
 		$("#reassignAssetDiv").dialog({ autoOpen: false })
@@ -308,12 +308,12 @@
 <div class="list">
 <table cellpadding="0" cellspacing="0" >
 	<thead>
-		<th>Truck</th>
+		<tr><th>Truck</th>
 		<th>Cart</th>
 		<th>Total Assets</th>
 		<th>Pending Assets</th>
 		<th>U's Used</th>
-		<th>Completed</th>
+		<th>Completed</th></tr>
 	</thead>
 	<tbody id="cartTableHighlightId">
 		<g:if test="${cartTrackingDetails}">
@@ -341,19 +341,17 @@
 	</tbody>
 </table>
 </g:form>
-</div>
 <br>
 <div id="changeTruckDiv" title="Change Trucks" style="display: none;">
 	<g:form name="changeTruckForm">
 		<table style="border: 0px;">
 			<tr>
-				<input type="hidden" name="cart" id="changeTruckCartId">
-				<td id="changeTruckCartTdId">Cart : </td>
+				<td id="changeTruckCartTdId">Cart : <input type="hidden" name="cart" id="changeTruckCartId"></td>
 			</tr>
 			<tr>
 				<td style="vertical-align: middle;">Truck : <select name="truck" id="changeTruckSelectId" >
 				<g:each in="${trucks}" var="truck">
-					<option value="${truck?.truck}">${truck?.truck}</option>
+					<option value="${truck?.truck}">"${truck?.truck}"</option>
 				</g:each>
 				</select>
 				 </td>
@@ -375,12 +373,12 @@
 <div class="list">
 <table cellpadding="0" cellspacing="0" >
 	<thead>
-		<th>Asset Tag</th>
+		<tr><th>Asset Tag</th>
 		<th>Name</th>
 		<th>Mfg/Model</th>
 		<th>Status</th>
 		<th>Team</th>
-		<th>On Cart</th>
+		<th>On Cart</th></tr>
 	</thead>
 	<tbody id="assetsOnCartTbodyId"> 
 	</tbody>
@@ -392,10 +390,12 @@
 		</tbody>
 		<tbody>
 		<tr>
-		<input type="hidden" name="assetEntity" id="assetEntityId">
-		<input type="hidden" name="maxState" id="maxStateId">
-		<input type="hidden" name="onTruck" id="onTruckId">
-			<td style="vertical-align: middle;" nowrap="nowrap">Truck : <select name="truck" id="reassignAssetSelectId" >
+		
+			<td style="vertical-align: middle;" nowrap="nowrap">Truck : 
+			<input type="hidden" name="assetEntity" id="assetEntityId">
+			<input type="hidden" name="maxState" id="maxStateId">
+			<input type="hidden" name="onTruck" id="onTruckId">
+			<select name="truck" id="reassignAssetSelectId" >
 			<g:each in="${trucks}" var="truck">
 				<option value="${truck?.truck}">${truck?.truck}</option>
 			</g:each>
@@ -408,6 +408,7 @@
 		</td></tr>
 		</tbody>
 	</table>
+</div></div>
 </div>
 <g:javascript>
 initialize();

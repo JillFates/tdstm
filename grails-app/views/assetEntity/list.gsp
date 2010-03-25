@@ -33,7 +33,7 @@
 <jq:plugin name="ui.dialog" />
 
 
-<script>
+<script type="text/javascript">
 	      $(document).ready(function() {
 	        $("#showDialog").dialog({ autoOpen: false })
 	        $("#editDialog").dialog({ autoOpen: false })
@@ -157,22 +157,22 @@
 				onmouseout="style.backgroundColor='white';" >
 
 				<td><g:remoteLink controller="assetEntity" action="editShow" id="${assetEntityInstance.id}" before="document.showForm.id.value = ${assetEntityInstance.id};document.editForm.id.value = ${assetEntityInstance.id};" onComplete="showAssetDialog( e , 'edit');">
-					<img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px">
+					<img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/>
 				</g:remoteLink>
 				<span id="icon_${assetEntityInstance.id}">
 				<g:if test="${AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetEntityInstance,'issue',0])}">
 					<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
-						<img src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}" border="0px">
+						<img src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}" border="0px"/>
 					</g:remoteLink>
 				</g:if>
 				<g:elseif test="${AssetComment.findByAssetEntity(assetEntityInstance)}">
 				<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
-					<img src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}" border="0px">
+					<img src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}" border="0px"/>
 				</g:remoteLink>
 				</g:elseif>
 				<g:else>
 				<a href="#" onclick="$('#createAssetCommentId').val(${assetEntityInstance.id});$('#statusId').val('new');$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('open');$('#commentsListDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">
-					<img src="${createLinkTo(dir:'images/skin',file:'database_table_light.png')}" border="0px">
+					<img src="${createLinkTo(dir:'images/skin',file:'database_table_light.png')}" border="0px"/>
 				</a>
 				</g:else></span>
 				</td>
@@ -318,8 +318,8 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 </div>
 <div id="createCommentDialog" title="Create Asset Comment"
 	style="display: none;"><input type="hidden" name="assetEntity.id"
-	id="createAssetCommentId" value=""> <input type="hidden"
-	name="status" id="statusId" value=""> <g:form
+	id="createAssetCommentId" value=""/> <input type="hidden"
+	name="status" id="statusId" value=""/> <g:form
 	action="saveComment" method="post" name="createCommentForm">
 	<input type="hidden" name="category" value="general"/>
 	<div class="dialog" style="border: 1px solid #5F9FCF">
@@ -381,7 +381,7 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 <div id="showCommentDialog" title="Show Asset Comment"
 	style="display: none;">
 <div class="dialog" style="border: 1px solid #5F9FCF"><input name="id" value="" id="commentId"
-	type="hidden">
+	type="hidden"/>
 	<div>
 <table id="showCommentTable" style="border: 0px">
 	
@@ -469,7 +469,7 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 	style="display: none;"><g:form action="updateComment"
 	method="post" name="editCommentForm">
 	<div class="dialog" style="border: 1px solid #5F9FCF">
-	<input type="hidden" name="id" id="updateCommentId" value="">
+	<input type="hidden" name="id" id="updateCommentId" value=""/>
 	<div>
 	<table id="updateCommentTable" style="border: 0px">
 		
@@ -496,7 +496,7 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 				</jsec:hasAnyRole>
 				<jsec:lacksAllRoles in="['ADMIN','PROJ_MGR']">
 				
-				<input type="text" id="commentTypeEditId" name="commentType" readonly style="border: 0;">&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="text" id="commentTypeEditId" name="commentType" readonly style="border: 0;"/>&nbsp;&nbsp;&nbsp;&nbsp;
 				</jsec:lacksAllRoles>				
 				<input type="checkbox" id="mustVerifyEditId" name="mustVerify" value="0"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;

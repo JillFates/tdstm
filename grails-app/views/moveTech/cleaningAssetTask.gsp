@@ -2,8 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>My Tasks</title>
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}"/>
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}"/>
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}"/>
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}"/>
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
@@ -15,7 +15,7 @@
 	<jq:plugin name="ui.core" />
 	<jq:plugin name="ui.dialog" /> 
 
- 	<script>
+ 	<script type="text/javascript">
 	$(document).ready(function() {
 	$("#serverInfoDialog").dialog({ autoOpen: false })	       
 	})
@@ -48,7 +48,7 @@
 			<div class="colum_techlogin" style="float:left;">
 			<div style="float:left; width:97.5%; margin-left:20px; margin-top:17px;">              									
 		         <g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"ct"]' style="height:18px; padding-top:3px; width:45px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Home</g:link>
-				 <a href="#" style="height:18px; width:60px; float:left; padding-top:3px; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;background:#aaefb8;padding:auto 0px;text-align:center;">My Task</a>
+				 <a href="#" style="height:18px; width:60px; float:left; padding-top:3px; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;background:#aaefb8;padding:auto 0px;text-align:center;">My Tasks</a>
 				 <g:link action="cleaningAssetSearch" params='["bundle":bundle,"menu":"true","team":team,"location":location,"project":project,"user":"ct"]' style="height:18px; padding-top:3px; width:63px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Asset</g:link>								           
 			</div>			
 			<div class="w_techlog" style="margin-top:15px; height:auto;">				
@@ -86,7 +86,7 @@
 					</div>
 					</g:if></div>	
            <div style="float:left;border:0px; width:100%; height:auto; margin:5px 0;font-size:10px "><b>My Tasks:</b></div>
-           <div id="assetTable"style="float:left;width:100%;height:auto;">
+           <div id="assetDiv" style="float:left;width:100%;height:auto;">
                    <table id="assetTable" style="overflow:scroll;height:80px;">
               	   <thead>
                    <tr>
@@ -105,15 +105,15 @@
 						<g:else>
 						<td class="asset_details_block">${assetList?.item?.targetRack}/${assetList?.item?.targetRackPosition}</td>
 						</g:else>
-						<td sclass="asset_details_block">${assetList?.item?.model}</td>											
+						<td class="asset_details_block">${assetList?.item?.model}</td>											
 					    </tr>
 				        </g:each>
                         </tbody>
                         </table>
-        	 
+        	 	</div>
       			</g:form>
   			</div>
-  			</div>
-  			<script > setFocus();</script>
+  			</div></div>
+  			<script type="text/javascript"> setFocus();</script>
 </body>
 </html>

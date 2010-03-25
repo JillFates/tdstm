@@ -46,7 +46,7 @@ var time = '${timeToRefresh}';
 	}
 }
 </g:javascript>
-<script>
+<script type="text/javascript">
 var timeInterval
 var fieldId
 	$(document).ready(function() {
@@ -465,8 +465,9 @@ var eventType = "load"
 </form>
 </div>
 <div style="width:100%">
+<g:form	name="listForm" action="list" method="post">
 <div style="width: 100%;">
-	<g:form	name="listForm" action="list" method="post">
+	
 	<input type="hidden" id="role" value="${role}"/>
 	<input type="hidden" id="lastPoolTimeId" value="${lastPoolTime}">
 	<input type="hidden" id="projectId" name="projectId" value="${projectId }" />
@@ -682,8 +683,8 @@ Comment</a></span></div>
 	style="display: none;"><input type="hidden" name="assetEntity.id"
 	id="createAssetCommentId" value=""> <input type="hidden"
 	name="status" id="statusId" value=""> 
-	<input type="hidden" id="newAssetCommentId" value=""/><g:form
-	action="saveComment" method="post" name="createCommentForm">
+	<input type="hidden" id="newAssetCommentId" value=""/>
+	<g:form	action="saveComment" method="post" name="createCommentForm">
 	<input type="hidden" name="category" value="moveday"/>
 	<div class="dialog" style="border: 1px solid #5F9FCF">
 	<div>

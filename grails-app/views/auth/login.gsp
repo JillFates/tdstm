@@ -1,8 +1,10 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
 <html>
 <head>
 <title>Login</title>
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
+<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" type="text/css"/>
+<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" type="text/css"/>
 <link rel="shortcut icon"
 	href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 	
@@ -28,7 +30,7 @@
 <table width="100%" style="border: 0; vertical-align: top;" align="center" cellpadding="0"
 	cellspacing="0">
 	<tr>
-		<td width="292px" valign="top" style="">
+		<td  valign="top" style="width:292px" >
 		<div class="colum_login">
 		<div class="left_cornerlog"></div>
 		<div class="border_toplog"></div>

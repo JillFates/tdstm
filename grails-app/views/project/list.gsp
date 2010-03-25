@@ -15,7 +15,7 @@
 </head>
 <body>
 
-<div class="body"><br>
+<div class="body"><br/>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
@@ -43,10 +43,10 @@
 
 					<td>
 					<g:if test="${currProjObj?.id == projectInstance?.id}" >
-						<input type="radio" name="selectProject" id="selectProjectId" checked="checked" value="${fieldValue(bean:projectInstance, field:'projectCode')}">
+						<input type="radio" name="selectProject" id="selectProjectId" checked="checked" value="${fieldValue(bean:projectInstance, field:'projectCode')}" />
 					</g:if>
 					<g:else>
-						<input type="radio" name="selectProject" id="selectProjectId" value="${fieldValue(bean:projectInstance, field:'projectCode')}">
+						<input type="radio" name="selectProject" id="selectProjectId" value="${fieldValue(bean:projectInstance, field:'projectCode')}" />
 					</g:else>
 					</td>
 
@@ -65,7 +65,7 @@
 		</tbody>
 	</table>
 	<div class="buttons">
-				<span class="button"><input class="select" type="submit" name="submit" value="Select"> </span> </div>
+				<span class="button"><input class="select" type="submit" name="submit" value="Select" /> </span> </div>
 </g:form></div>
 </div>
 </body>

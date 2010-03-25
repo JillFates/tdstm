@@ -4,8 +4,8 @@
 <title>Home</title>
 <g:javascript library="jquery" />
 <g:javascript library="prototype" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}" />
 	<script type="text/javascript">
 	/*----------------------------------------------------------
 	* To load the installed printers into session by initializing TFORMer 
@@ -31,7 +31,7 @@
 				<div class="border_bundle_team">
           		<div style="float:left; width:97.5%; margin-left:20px;margin-top:17px;">              									
 		        	<a href="#" style="height:18px; width:45px; float:left;padding-top:3px; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;background:#aaefb8;padding:auto 0px;text-align:center;vertical-align:center ">Home</a>
-					<g:link action="cleaningAssetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' style="height:18px; padding-top:3px;width:60px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">My Task</g:link>
+					<g:link action="cleaningAssetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' style="height:18px; padding-top:3px;width:60px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">My Tasks</g:link>
 					<g:link action="cleaningAssetSearch" params='["bundle":bundle,"menu":"true","team":team,"location":location,"project":project,"user":"ct"]' style="height:18px; padding-top:3px; width:63px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Asset</g:link>								           
 			  	</div>		
 				<div id="mydiv" onclick='$("#mydiv").hide()'>
@@ -71,6 +71,7 @@
               			</g:form>
   				</div>
   				</div>  
+		</div>
 		</div>
 		<script type="text/javascript">
 		initializeTF();

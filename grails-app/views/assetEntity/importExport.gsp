@@ -7,7 +7,7 @@
 	<g:javascript library="jquery" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'progressbar.css')}" />
 	<jq:plugin name="ui.progressbar"/>
-	<script>
+	<script type="text/javascript">
 		/* ---------------------------------
 		 * 	Author : Lokanada Reddy		
 		 *	function to show the Progress bar
@@ -44,13 +44,11 @@
       
         <h1>Asset Import</h1>
         <g:form action="upload" method="post" name="importForm" enctype="multipart/form-data" >
-          <input type="hidden" value="${projectId}" name="projectIdImport" >
+          <input type="hidden" value="${projectId}" name="projectIdImport" />
           <div class="dialog">
             <table>
               <thead>
-                <th colspan="2">
-                  Import
-                </th>
+              	<tr><th colspan="2">Import</th></tr>
               </thead>
               <tbody>
               
@@ -89,12 +87,12 @@
       <h1>Asset Export</h1>
 
       <g:form action="export" method="post" name="exportForm">
-        <input type="hidden" value="${projectId}" name="projectIdExport" >
+        <input type="hidden" value="${projectId}" name="projectIdExport" />
         <div class="dialog">
           <table>
             <tbody>
             <thead>
-              <th colspan="2">Export</th>
+              <tr><th colspan="2">Export</th></tr>
             </thead>
             <tbody>
               <tr>

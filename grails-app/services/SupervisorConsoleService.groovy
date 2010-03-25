@@ -144,7 +144,7 @@ class SupervisorConsoleService {
     												"CONCAT_WS(' / ',IFNULL(a.fiber_type,'blank'),IFNULL(a.fiber_cabinet,'blank'),IFNULL(a.hba_port,'blank') ) as fiberCabinet,"+
     												"CONCAT_WS(' / ',IFNULL(a.kvm_device,'blank'),IFNULL(a.kvm_port,'blank') ) as kvmDevice,"+
 													"count(a.asset_entity_id) as racksize, a.move_bundle_id as bundleId, "+
-													"GROUP_CONCAT(CONCAT_WS(' - ',a.asset_tag,a.asset_name ) SEPARATOR '<br>') "+
+													"GROUP_CONCAT(CONCAT_WS(' - ',a.asset_tag,a.asset_name ) SEPARATOR '<br/>') "+
 													"as assetTag from asset_entity a where ")
     	if( bundleId && !includeOtherBundle){
     		assetsDetailsQuery.append(" a.move_bundle_id = $bundleId ")

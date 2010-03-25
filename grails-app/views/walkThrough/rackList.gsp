@@ -2,8 +2,8 @@
 <head>
 <title>Walkthru&gt; Select Rack</title>
 <g:javascript library="prototype" />
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
 <g:javascript src="betterinnerhtml.js" />
 <script type="text/javascript">
 /*-----------------------------------------------------------------
@@ -50,10 +50,8 @@ function changeAction( searchType ){
 <div class="title">Walkthru&gt; Select Rack</div>
 <div class="input_area">
 <a class="button" href="startMenu">Start Over</a>
-<table>
 <g:form method="post" action="selectRack" name="selectRackForm"> 
-
-
+<table>
 <tr>
 	<td colspan="2" align="right">
 		<a name="rackButton" id="rackButtonId" class="button"  href="#" onclick="changeAction('rack');">Rack</a>&nbsp;
@@ -92,8 +90,8 @@ function changeAction( searchType ){
 		</tbody>
     </table>
 </td></tr>
-</g:form>
 </table>
+</g:form>
 </div>
 </div>
 <script type="text/javascript">

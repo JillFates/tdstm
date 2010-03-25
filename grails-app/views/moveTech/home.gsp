@@ -3,8 +3,8 @@
 <head>
 <title>MoveTech Home</title>
 <g:javascript library="jquery" />
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 
 <style type="text/css">
 dt {
@@ -26,7 +26,7 @@ dt {
 	<div class="border_bundle_team" style="border:0px;">
 		<table border=0 cellpadding="0" cellspacing="0"><tr>
 		<td><a href="#" class="home_select">Home</a></td>
-		<td><g:link action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' class="my_task">My Task</g:link></td>
+		<td><g:link action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' class="my_task">My Tasks</g:link></td>
 		<td><a href="#" class="asset_search">Asset</a>
 		</tr></table>
 			<div class="w_techlog" style="border:0px;">
@@ -67,6 +67,6 @@ dt {
 			</div>
 		</div>
 	</div>
-<script>setFocus();</script>
+<script type="text/javascript">setFocus();</script>
 </body>
 </html>
