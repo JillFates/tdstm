@@ -483,7 +483,7 @@ var eventType = "load"
 			</g:each>
 
 		</select></td>
-			<td><h1 align="center">PMO Dashboard</h1></td>
+			<td><h1 align="center">PMO Asset Tracking</h1></td>
 			<td style="text-align: right;">
 			<input type="hidden" name="last_refresh" value="${new Date()}">
 			<input type="hidden" name="myForm" value="listForm">

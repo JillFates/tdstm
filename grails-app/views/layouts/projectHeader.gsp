@@ -91,9 +91,9 @@
         <jsec:hasAnyRole in="['ADMIN']">
         	<li><g:link class="home" controller="newsEditor" params="[projectId:currProjObj?.id]">News Editor</g:link></li>
         </jsec:hasAnyRole>
-        <li><g:link class="home" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link> </li>
+        <li><g:link class="home" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard -beta</g:link> </li>
         <jsec:hasAnyRole in="['ADMIN','MANAGER','OBSERVER','SUPERVISOR']">
-        	<li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracking</g:link> </li>
+        	<li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">PMO Asset Tracking</g:link> </li>
         </jsec:hasAnyRole>
         <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"><li><a href="#" onclick="$('#reportsMenu').show();$('#assetMenu').hide();">Reports</a></li></jsec:lacksAllRoles>
       </ul>
