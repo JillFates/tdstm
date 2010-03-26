@@ -273,12 +273,12 @@ Move News and Issues</b></span>
 		<tr>
 		<td valign="top" class="name"><label for="dateCreated">Created
 				At:</label></td>
-				<td valign="top" class="value" id="dateCreatedId" />
+				<td valign="top" class="value" id="dateCreatedId" ></td>
 		</tr>
 			<tr>
 		<td valign="top" class="name"><label for="createdBy">Created
 				By:</label></td>
-				<td valign="top" class="value" id="createdById" />
+				<td valign="top" class="value" id="createdById" ></td>
 		</tr>
 		<tr>
 		<td valign="top" class="name"><label>Comment Type:</label></td>
@@ -325,12 +325,12 @@ Move News and Issues</b></span>
 				<tr>
 		<td valign="top" class="name"><label for="dateResolved">Resolved
 				At:</label></td>
-				<td valign="top" class="value" id="dateResolvedId" />
+				<td valign="top" class="value" id="dateResolvedId" ></td>
 		</tr>
 			<tr>
 		<td valign="top" class="name"><label for="resolvedBy">Resolved
 				By:</label></td>
-				<td valign="top" class="value" id="resolvedById" />
+				<td valign="top" class="value" id="resolvedById" ></td>
 		</tr>
 		
 	</table>

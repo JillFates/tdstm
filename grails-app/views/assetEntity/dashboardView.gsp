@@ -1091,12 +1091,12 @@ Comment</a></span></div>
 			<tr>
 	<td valign="top" class="name"><label for="dateResolved">Resolved
 			At:</label></td>
-			<td valign="top" class="value" id="dateResolvedId" />
+			<td valign="top" class="value" id="dateResolvedId" ></td>
 	</tr>
 		<tr>
 	<td valign="top" class="name"><label for="resolvedBy">Resolved
 			By:</label></td>
-			<td valign="top" class="value" id="resolvedById" />
+			<td valign="top" class="value" id="resolvedById" ></td>
 	</tr>
 	
 </table>

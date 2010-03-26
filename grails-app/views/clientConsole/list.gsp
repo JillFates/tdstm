@@ -345,31 +345,31 @@ Comment</a></span></div>
 	<tr>
 	<td valign="top" class="name"><label for="dateCreated">Created
 			At:</label></td>
-			<td valign="top" class="value" id="dateCreatedId" />
+			<td valign="top" class="value" id="dateCreatedId" ></td>
 	</tr>
 		<tr>
 	<td valign="top" class="name"><label for="createdBy">Created
 			By:</label></td>
-			<td valign="top" class="value" id="createdById" />
+			<td valign="top" class="value" id="createdById" ></td>
 	</tr>
 		
 		<tr class="prop">
 			<td valign="top" class="name"><label for="commentType">Comment
 			Type:</label></td>
-			<td valign="top" class="value" id="commentTypeTdId" />
+			<td valign="top" class="value" id="commentTypeTdId" ></td>
 		</tr>
 		
 		<tr>
 		
 	<td valign="top" class="name"><label for="category">Category:
 			</label></td>
-			<td valign="top" class="value" id="categoryTdId" />
+			<td valign="top" class="value" id="categoryTdId" ></td>
 	</tr>
 	
 	<tr class="prop">
 	<td valign="top" class="name"><label for="commentCode">comment
 			Code:</label></td>
-			<td valign="top" class="value" id="commentCodeTdId" />
+			<td valign="top" class="value" id="commentCodeTdId" ></td>
 	</tr>
 	
 		<tr class="prop">
@@ -405,12 +405,12 @@ Comment</a></span></div>
 			<tr>
 	<td valign="top" class="name"><label for="dateResolved">Resolved
 			At:</label></td>
-			<td valign="top" class="value" id="dateResolvedId" />
+			<td valign="top" class="value" id="dateResolvedId" ></td>
 	</tr>
 		<tr>
 	<td valign="top" class="name"><label for="resolvedBy">Resolved
 			By:</label></td>
-			<td valign="top" class="value" id="resolvedById" />
+			<td valign="top" class="value" id="resolvedById" ></td>
 	</tr>
 	
 </table>
@@ -442,7 +442,7 @@ Comment</a></span></div>
 		<tr>
 	<td valign="top" class="name"><label for="createdBy">Created
 			By:</label></td>
-			<td valign="top" class="value" id="createdByEditId" />
+			<td valign="top" class="value" id="createdByEditId" ></td>
 	</tr>
 			<tr class="prop" >
 				<td valign="top" class="name"><label for="commentType">Comment
@@ -468,12 +468,12 @@ Comment</a></span></div>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="category">Category:</label>
 				</td>
-				<td valign="top" class="value" id="categoryEditId" />
+				<td valign="top" class="value" id="categoryEditId" ></td>
 			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="commentCode">Comment Code:</label>
 				</td>
-				<td valign="top" class="value" id="commentCodeEditId" />
+				<td valign="top" class="value" id="commentCodeEditId" ></td>
 			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="comment">Comment:</label>
@@ -506,7 +506,7 @@ Comment</a></span></div>
                <tr>
 	<td valign="top" class="name"><label for="dateResolved">Resolved
 			At:</label></td>
-			<td valign="top" class="value" id="dateResolvedEditId" />
+			<td valign="top" class="value" id="dateResolvedEditId" ></td>
 	</tr>
 		<tr>
 	<td valign="top" class="name"><label for="resolvedBy">Resolved

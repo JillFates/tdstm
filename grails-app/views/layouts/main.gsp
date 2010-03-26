@@ -38,7 +38,7 @@
         <div class="header_right"><br />
           <div style="font-weight: bold; color: #0000FF"><jsec:isLoggedIn>
               <strong>Welcome &nbsp;&nbsp;
-              	<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" style="color: #0000FF;" onComplete="showPersonDialog(e)">
+              	<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" style="color: #0000FF;" onComplete="updatePersonDetails(e)">
               		<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name }</span>
               	</g:remoteLink>&nbsp;! </strong>
               &nbsp;<g:link controller="auth" action="signOut"
@@ -140,7 +140,7 @@
       </div>
     </div>
     <script type="text/javascript">
-		function showPersonDialog( e ){
+		function updatePersonDetails( e ){
 			var person = eval("(" + e.responseText + ")");
 			$("#personId").val(person.id)
 			$("#firstNameId").val(person.firstName);
