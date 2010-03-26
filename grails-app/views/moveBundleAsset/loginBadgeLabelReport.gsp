@@ -6,8 +6,6 @@
 <title>Login Badges </title>
 
 
-<g:javascript library="prototype" />
-
 <script type="text/javascript"><!--
 //=============================================================================
 // PRINT HERE

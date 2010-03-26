@@ -140,6 +140,7 @@ class UserPreferenceService  {
 	def updateLastLogin( username ){
     	if( username ){
     		def userLogin = UserLogin.findByUsername( username )
+			getSession().setAttribute( "LOGIN_PERSON", ['name':userLogin.person.firstName, "id":userLogin.person.id ])
 			userLogin.lastLogin = new Date()
     		userLogin.save(flush:true)
     	}

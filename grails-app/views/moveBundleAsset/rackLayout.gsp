@@ -4,7 +4,6 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <title>Rack Elevations</title>
-<g:javascript library="prototype" />
 <script type="text/javascript">
 	function updateRackDetails(e) {
      	var rackDetails = eval('(' + e.responseText + ')')   	

@@ -3,50 +3,612 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <title>Asset Tracking</title>
-<g:javascript library="prototype" />
-<g:javascript library="jquery" />
+
 <jq:plugin name="jquery.bgiframe.min" />
 <jq:plugin name="jquery.autocomplete" />
 <jq:plugin name="jquery.contextMenu"/>
+
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dashboard.css')}" />
+
 <g:javascript src="assetcrud.js" />
 <g:javascript src="assetcommnet.js" />
-<jq:plugin name="ui.core" />
-<jq:plugin name="ui.draggable" />
+
 <jq:plugin name="ui.resizable" />
-<jq:plugin name="ui.dialog" />
+
 <style type="text/css">
 html, body {
 overflow: hidden;
 } 
 </style>
-<g:javascript>
+</head>
+<body >
+<div title="Change Status" id="changeStatusDialog"
+	style="background-color: #808080;display: none;">
+	<input type="hidden" id="cssClassId"/>
+<form name="changeStatusForm"><input type="hidden" name="asset"
+	id="asset" /> <input type="hidden" name="projectId" id="projectId"
+	value="${projectId}" />
+	<input type="hidden" name="moveBundle" id="moveBundle"
+	value="${moveBundleInstance.id}" />
+<table style="border: 0px; width: 100%">
+	<tr>
+		<td width="40%"><strong>Change status for selected
+		devices to:</strong></td>
+		<td width="60%"></td>
+	</tr>
+	<tr>
+		<td><select id="taskList" name="taskList" style="width: 250%">
 
-function initialize(){
-window.onresize=pageReload;
-window.onload=cancelResize;
-var bundleId = ${moveBundleInstance.id}; 
-$("#moveBundleId").val(bundleId);
-$("#appSmeId").val("${appSmeValue}");
-$("#appOwnerId").val("${appOwnerValue}");
-$("#applicationId").val("${appValue}");
-var time = '${timeToRefresh}';
-	if(time != "" ){
-		$("#selectTimedId").val( time ) ;
-	} else if(time == "" ){
-		$("selectTimedId").val( 120000 );	
-	}
-}
-</g:javascript>
+		</select></td>
+	</tr>
+	<tr>
+		<td>
+		<textarea rows="2" cols="1"  title="Enter Note..." name="enterNote" id="enterNote" style="width: 200%"></textarea>
+		</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td style="text-align: right;"><input type="button" value="Save"
+			onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)submitAction()" /></td>
+	</tr>
+</table>
+</form>
+</div>
+<div style="width:100%">
+<g:form	name="listForm" action="list" method="post">
+<div style="width: 100%;">
+	
+	<input type="hidden" id="role" value="${role}"/>
+	<input type="hidden" id="lastPoolTimeId" value="${lastPoolTime}"/>
+	<input type="hidden" id="projectId" name="projectId" value="${projectId }" />
+	<table style="border: 0px;">
+		<tr>
+			<td valign="top" class="name"><label for="moveBundle">Move
+		Bundle:</label>&nbsp;<select id="moveBundleId"
+			name="moveBundle" onchange="document.listForm.submit()" >	
+
+			<g:each status="i" in="${moveBundleInstanceList}"
+				var="moveBundleInstance">
+				<option value="${moveBundleInstance?.id}">${moveBundleInstance?.name}</option>
+			</g:each>
+
+		</select></td>
+			<td><h1 align="center">PMO Asset Tracking</h1></td>
+			<td style="text-align: right;">
+			<input type="hidden" name="last_refresh" value="${new Date()}"/>
+			<input type="hidden" name="myForm" value="listForm"/>
+			<input type="button"
+				value="Refresh" onclick="pageReload();"/> <select
+				id="selectTimedId"
+				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(e)') }">
+				<option value="30000">30 sec</option>
+				<option value="60000">1 min</option>
+				<option value="120000">2 min</option>
+				<option value="300000">5 min</option>
+				<option value="never">no refresh</option>
+			</select></td>
+		</tr>
+	</table>
+
+</div>
+<g:if test="${browserTest}">
+<div class="tableContainerIE">
+</g:if>
+<g:else>
+<div class="tableContainer">
+</g:else>
+
+<table cellpadding="0"   cellspacing="0"  style="border:0px;" >
+	<thead>
+		<tr>
+		 <th style="padding-top:35px;"><span>Actions</span><jsec:hasAnyRole in="['ADMIN','MANAGER', 'PROJ_MGR']"> 
+		 <input type="button" value="State..." onclick="changeState()" title="Change State" style="width: 80px;"/>
+		 <a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a></jsec:hasAnyRole></th>
+			<th style="padding-top:35px;" >
+			<table style="border: 0px;">
+				<thead>
+				<tr style="background-color: #CCC">
+					<g:sortableColumn style="border:0px;" property="application"  title="Application" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
+				</tr>
+				<tr style="background-color: #CCC">
+					<th style="border:0px;">
+						<select id="applicationId" name="application" onchange="document.listForm.submit();" style="width: 120px;">
+							<option value="" selected="selected">All</option>
+							<g:each in="${applicationList}" var="application">
+								<option value="${application[0] ? application[0] : 'blank'}">${application[0] ? application[0] : 'blank'}&nbsp;(${application[1]})</option>
+							</g:each>
+						</select>
+					</th>
+				</tr>
+				</thead>
+			</table>
+			</th>
+			<th style="padding-top:35px;">
+			<table style="border: 0px;">
+				<thead>
+				<tr style="background-color: #CCC">
+					<g:sortableColumn style="border:0px;" property="app_owner" title="App Owner"  params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]" />
+				</tr>
+				<tr style="background-color: #CCC">
+					<th style="border:0px;">
+						<select id="appOwnerId" name="appOwner"	onchange="document.listForm.submit();" style="width: 120px;">
+							<option value="" selected="selected">All</option>
+							<g:each in="${appOwnerList}" var="appOwner">
+								<option value="${appOwner[0] ? appOwner[0] : 'blank'}">${appOwner[0] ? appOwner[0] : 'blank'}&nbsp;(${appOwner[1]})</option>
+							</g:each>
+						</select>
+					</th>
+				</tr>
+				</thead>
+			</table>
+			</th>
+			<th style="padding-top:35px;">
+			<table style="border: 0px;">
+				<thead>
+				<tr style="background-color: #CCC">
+					<g:sortableColumn style="border:0px;" property="app_sme" title="App SME" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
+				</tr>
+				<tr style="background-color: #CCC">
+					<th style="border:0px;">
+						<select id="appSmeId" name="appSme" onchange="document.listForm.submit();" style="width: 120px;">
+							<option value="" selected="selected">All</option>
+							<g:each in="${appSmeList}" var="appSme">
+								<option value="${appSme[0] ? appSme[0] : 'blank'}">${appSme[0] ? appSme[0] : 'blank'}&nbsp;(${appSme[1]})</option>
+							</g:each>
+						</select>
+					</th>
+				</tr>
+				</thead>
+			</table>
+			</th>
+			<th style="padding-top:35px;">
+			<table style="border: 0px;">
+				<thead>
+				<tr style="background-color: #CCC">
+					<g:sortableColumn style="border:0px;" property="asset_name" title="Asset Name" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
+				</tr>
+				<tr style="background-color: #CCC">
+					<td style="padding-left: 0px;"><select id="hiddenSelect" style="width: 120px;visibility: hidden;"/></td>
+				</tr>
+				</thead>
+			</table>
+			</th>
+			<g:if test="${browserTest}">
+			<g:each in="${processTransitionList}"  var="task">
+				<th class="verticaltext" title="${task.header}">${task?.header}</th>
+			</g:each>
+			</g:if>
+			<g:else>
+			<th style="padding-left: 0px" colspan="${headerCount}"><embed src="${createLinkTo(dir:'templates',file:'headerSvg.svg')}" type="image/svg+xml" width="${headerCount*21.80}" height="102"/></th>
+			</g:else>
+
+		</tr>
+	</thead>
+	<tbody id="assetListTbody" onclick="catchevent(event)">
+		<g:if test="${assetEntityList}">
+		<g:each in="${assetEntityList}" var="assetEntity">
+			<tr id="assetRow_${assetEntity.id}" >
+			<td>
+			<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
+			<span id="action_${assetEntity.id}">
+				<g:if test="${assetEntity.checkVal == true}">
+					<g:checkBox name="checkChange" id="checkId_${assetEntity.id}" onclick="timedRefresh('never')"></g:checkBox>
+						<img id="task_${assetEntity.id}"src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}"	border="0px" />
+				</g:if>
+				<g:else>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</g:else>
+			</span>
+			</jsec:hasAnyRole>
+			<img id="asset_${assetEntity.id}" src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px" />
+			<span id="icon_${assetEntity.id}">
+				<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+assetEntity.id+' and commentType = ? and isResolved = ?',['issue',0])}">
+					
+						<img id="comment_${assetEntity.id}" src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}"	border="0px" />
+				</g:if>
+				<g:else>
+					<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+assetEntity.id)}">
+							<img  id="comment_${assetEntity.id}" src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}"	border="0px" />
+					</g:if>
+					<g:else>
+					<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
+						<a href="javascript:createNewAssetComment(${assetEntity.id});" >
+							<img  src="${createLinkTo(dir:'images/skin',file:'database_table_light.png')}"	border="0px" />
+						</a>
+					</jsec:hasAnyRole>
+					</g:else>
+			</g:else>
+			</span>
+			</td>
+			<td  id="${assetEntity.id}_application" >${assetEntity?.application}&nbsp;</td>
+			<td id="${assetEntity.id}_appOwner" >${assetEntity?.appOwner}&nbsp;</td>
+			<td id="${assetEntity.id}_appSme" >${assetEntity?.appSme}&nbsp;</td>
+			<td id="${assetEntity.id}_assetName" >${assetEntity?.assetName}&nbsp;</td>
+			<g:each in="${assetEntity.transitions}" var="transition" >${transition}</g:each>
+			</tr>
+		</g:each>
+		</g:if>
+		<g:else>
+			<tr><td colspan="40" class="no_records">No records found</td></tr>
+		</g:else>
+	</tbody>
+</table></div>
+</g:form>
+<div id="commentsListDialog" title="Show Asset Comments"
+	style="display: none;"><br/>
+<div class="list">
+<table id="listCommentsTable" >
+	<thead>
+		<tr>
+			<g:if test="${role}">
+			<th nowrap>Action</th>
+			</g:if>
+			
+			<th nowrap>Comment</th>
+
+			<th nowrap>Comment Type</th>
+			
+			<th nowrap>Resolved</th>
+
+			<th nowrap>Must Verify</th>
+			
+			<th nowrap>Category</th>  
+	          
+	        <th nowrap>Comment Code</th> 
+
+		</tr>
+	</thead>
+	<tbody id="listCommentsTbodyId">
+
+	</tbody>
+</table>
+</div>
+<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
+<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
+<span class="menuButton"><a class="create" href="#"
+	onclick="$('#statusId').val('');$('#createResolveDiv').css('display', 'none') ;$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">New
+Comment</a></span></div>
+</jsec:hasAnyRole>
+</div>
+<div id="createCommentDialog" title="Create Asset Comment"
+	style="display: none;"><input type="hidden" name="assetEntity.id"
+	id="createAssetCommentId" value=""/> <input type="hidden"
+	name="status" id="statusId" value=""/> 
+	<input type="hidden" id="newAssetCommentId" value=""/>
+	<g:form	action="saveComment" method="post" name="createCommentForm">
+	<input type="hidden" name="category" value="moveday"/>
+	<div class="dialog" style="border: 1px solid #5F9FCF">
+	<div>
+	<table id="createCommentTable" style="border: 0px">
+		
+			<tr class="prop" >
+				<td valign="top" class="name"><label for="commentType">Comment
+				Type:</label></td>
+				<td valign="top" style="width: 20%;" ><g:select id="commentType"
+					name="commentType"
+					from="${AssetComment.constraints.commentType.inList}" value=""
+					noSelection="['':'please select']" onChange="commentChange('#createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
+				
+				<input type="checkbox"
+					id="mustVerifyEdit" name="mustVerify" value="0"
+					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
+					<label for="mustVerify">Must Verify</label>
+				</td>
+			</tr>
+			<tr class="prop">
+				<td valign="top" class="name"><label for="comment">Comment:</label>
+				</td>
+				<td valign="top" class="value"><textarea cols="80" rows="5"
+					id="comment" name="comment"></textarea></td>
+			</tr>
+		
+	</table>
+	</div>
+	<div id="createResolveDiv" style="display: none;">
+		<table id="createResolveTable" style="border: 0px" >
+            <tr class="prop">
+            	<td valign="top" class="name">
+                <label for="isResolved">Resolved:</label>
+                </td>
+                <td valign="top" class="value">
+                <input type="checkbox" id="isResolved" name="isResolved" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
+                </td>
+            </tr>
+          
+            <tr class="prop">
+				<td valign="top" class="name">
+                <label for="resolution">Resolution:</label>
+                </td>
+				<td valign="top" class="value">
+                <textarea cols="80" rows="5" id="resolution" name="resolution" ></textarea>
+                </td>
+            </tr> 
+                
+            </table>
+            </div>
+		
+	</div>
+	<div class="buttons"><span class="button"> <input
+		class="save" type="button" value="Create"
+		onclick="resolveValidate('createCommentForm','createAssetCommentId');" /></span></div>
+</g:form></div>
+<div id="showCommentDialog" title="Show Asset Comment"
+	style="display: none;">
+<div class="dialog" style="border: 1px solid #5F9FCF"><input name="id" value="" id="commentId"
+	type="hidden"/>
+	<div>
+<table id="showCommentTable" style="border: 0px">
+	
+	<tr>
+	<td valign="top" class="name"><label for="dateCreated">Created
+			At:</label></td>
+			<td valign="top" class="value" id="dateCreatedId" />
+	</tr>
+		<tr>
+	<td valign="top" class="name"><label for="createdBy">Created
+			By:</label></td>
+			<td valign="top" class="value" id="createdById" />
+	</tr>
+		
+		<tr class="prop">
+			<td valign="top" class="name"><label for="commentType">Comment
+			Type:</label></td>
+			<td valign="top" class="value" id="commentTypeTdId" />
+		</tr>
+		
+		<tr>
+		
+	<td valign="top" class="name"><label for="category">Category:
+			</label></td>
+			<td valign="top" class="value" id="categoryTdId" />
+	</tr>
+	
+	<tr class="prop">
+	<td valign="top" class="name"><label for="commentCode">comment
+			Code:</label></td>
+			<td valign="top" class="value" id="commentCodeTdId" />
+	</tr>
+	
+		<tr class="prop">
+			<td valign="top" class="name"><label for="mustVerify">Must
+			Verify:</label></td>
+			<td valign="top" class="value" id="verifyTdId"><input
+				type="checkbox" id="mustVerifyShowId" name="mustVerify" value="0"
+				disabled="disabled" /></td>
+		</tr>
+		<tr class="prop">
+			<td valign="top" class="name"><label for="comment">Comment:</label>
+			</td>
+			<td valign="top" class="value" ><textarea cols="80" rows="5"
+					id="commentTdId" readonly="readonly"></textarea> </td>
+		</tr>
+		</table>
+		</div>
+		<div id="showResolveDiv" style="display: none;">
+		<table id="showResolveTable" style="border: 0px">
+		<tr class="prop">
+			<td valign="top" class="name"><label for="isResolved">Is
+			Resolved:</label></td>
+			<td valign="top" class="value" id="resolveTdId"><input
+				type="checkbox" id="isResolvedId" name="isResolved" value="0"
+				disabled="disabled" /></td>
+		</tr>
+		<tr class="prop">
+			<td valign="top" class="name"><label for="resolution">Resolution:</label>
+			</td>
+			<td valign="top" class="value" ><textarea cols="80" rows="5"
+					id="resolutionId" readonly="readonly"></textarea> </td>
+		</tr>
+			<tr>
+	<td valign="top" class="name"><label for="dateResolved">Resolved
+			At:</label></td>
+			<td valign="top" class="value" id="dateResolvedId" />
+	</tr>
+		<tr>
+	<td valign="top" class="name"><label for="resolvedBy">Resolved
+			By:</label></td>
+			<td valign="top" class="value" id="resolvedById" />
+	</tr>
+	
+</table>
+</div>
+<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
+<div class="buttons"><span class="button"> <input
+	class="edit" type="button" value="Edit"
+	onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
+</span> <span class="button"> <input class="delete" type="button"
+	value="Delete"
+	onclick="${remoteFunction(controller:'assetEntity', action:'deleteComment', params:'\'id=\' + $(\'#commentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'action\')')}" />
+</span></div>
+</jsec:hasAnyRole>
+</div></div>
+<div id="editCommentDialog" title="Edit Asset Comment"
+	style="display: none;"><g:form action="updateComment"
+	method="post" name="editCommentForm">
+	<div class="dialog" style="border: 1px solid #5F9FCF">
+	<input type="hidden" name="id" id="updateCommentId" value=""/>
+	<div>
+	<table id="updateCommentTable" style="border: 0px">
+		
+		
+			<tr>
+	<td valign="top" class="name"><label for="dateCreated">Created
+			At:</label></td>
+			<td valign="top" class="value" id="dateCreatedEditId"  />
+	</tr>
+		<tr>
+	<td valign="top" class="name"><label for="createdBy">Created
+			By:</label></td>
+			<td valign="top" class="value" id="createdByEditId" />
+	</tr>
+			<tr class="prop" >
+				<td valign="top" class="name"><label for="commentType">Comment
+				Type:</label></td>
+				<td valign="top" style="width: 20%;" >
+				<jsec:hasAnyRole in="['ADMIN','PROJ_MGR']">
+				<g:select id="commentTypeEditId"
+					name="commentType"
+					from="${AssetComment.constraints.commentType.inList}" value=""
+					 onChange="commentChange('#editResolveDiv','editCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
+				</jsec:hasAnyRole>
+				<jsec:lacksAllRoles in="['ADMIN','PROJ_MGR']">
+				
+				<input type="text" id="commentTypeEditId" name="commentType" readonly style="border: 0;"/>&nbsp;&nbsp;&nbsp;&nbsp;
+				</jsec:lacksAllRoles>						
+				
+				<input type="checkbox" id="mustVerifyEditId" name="mustVerify" value="0"
+					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
+					<label for="mustVerify">Must
+				Verify</label>
+				</td>
+			</tr>
+			<tr class="prop">
+				<td valign="top" class="name"><label for="category">Category:</label>
+				</td>
+				<td valign="top" class="value" id="categoryEditId" />
+			</tr>
+			<tr class="prop">
+				<td valign="top" class="name"><label for="commentCode">Comment Code:</label>
+				</td>
+				<td valign="top" class="value" id="commentCodeEditId" />
+			</tr>
+			<tr class="prop">
+				<td valign="top" class="name"><label for="comment">Comment:</label>
+				</td>
+				<td valign="top" class="value"><textarea cols="80" rows="5"
+					id="commentEditId" name="comment"></textarea></td>
+			</tr>
+			</table>
+			
+			</div>
+			<div id="editResolveDiv" style="display: none;">
+		<table id="updateResolveTable" style="border: 0px">
+            <tr class="prop">
+            	<td valign="top" class="name">
+                <label for="isResolved">Resolved:</label>
+                </td>
+                <td valign="top" class="value">
+                <input type="checkbox" id="isResolvedEditId" name="isResolved" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
+                </td>
+            </tr>
+          
+            <tr class="prop">
+				<td valign="top" class="name">
+                <label for="resolution">Resolution:</label>
+                </td>
+				<td valign="top" class="value">
+                <textarea cols="80" rows="5" id="resolutionEditId" name="resolution" ></textarea>
+                </td>
+            </tr> 
+               <tr>
+	<td valign="top" class="name"><label for="dateResolved">Resolved
+			At:</label></td>
+			<td valign="top" class="value" id="dateResolvedEditId" />
+	</tr>
+		<tr>
+	<td valign="top" class="name"><label for="resolvedBy">Resolved
+			By:</label></td>
+			<td valign="top" class="value" id="resolvedByEditId"  />
+	</tr>
+            </table>
+            </div>
+		
+		
+
+	</div>
+
+	<div class="buttons"><span class="button"> <input
+		class="save" type="button" value="Update"
+		onclick="resolveValidate('editCommentForm','updateCommentId');" />
+	</span> <span class="button"> <input class="delete" type="button"
+		value="Delete"
+		onclick="${remoteFunction(controller:'assetEntity', action:'deleteComment', params:'\'id=\' + $(\'#updateCommentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'action\')')}" />
+	</span></div>
+</g:form></div>
+<div id="showDialog" title="Show Asset Entity" style="display: none;">
+<g:form controller="assetEntity" action="save" method="post" name="showForm">
+	<div class="dialog" id="showDiv">
+	<table id="showTable">
+	</table>
+	</div>
+	<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
+	<div class="buttons">
+	<input type="hidden" name="id" value="" />
+	<input type="hidden" name="projectId" value="${projectId}" />
+	<input type="hidden" name="moveBundle" value="${moveBundleInstance.id}" />
+	<input type="hidden" name="clientList" value="clientList" />
+	 <span class="button"><input
+		type="button" class="edit" value="Edit"
+		onClick="return editAssetDialog()" /></span> <span class="button"><g:actionSubmit 
+		class="delete" onclick="return confirm('Delete Asset, are you sure?');"
+		value="Delete" /></span>
+		<span class="button"><g:actionSubmit action="remove"
+		class="delete"  onclick="return confirm('Remove Asset from project, are you sure?');"
+		value="Remove From Project" /></span>
+		</div>
+		</jsec:hasAnyRole>
+</g:form></div>
+
+<div id="editDialog" title="Edit Asset Entity" style="display: none;">
+<g:form method="post" name="editForm" controller="assetEntity">
+	<input type="hidden" name="id" value="" />
+	<input type="hidden" name="projectId" value="${projectId}" />
+	<input type="hidden" name="moveBundle" value="${moveBundleInstance.id}" />	
+	<input type="hidden" name="clientList" value="clientList" />
+	<div class="dialog" id="editDiv">
+	
+	</div>
+	<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
+	<div class="buttons"><span class="button">
+	<input type="button" class="save" value="Update Asset Entity" onClick="${remoteFunction(controller:'assetEntity', action:'getAssetAttributes', params:'\'assetId=\' + document.editForm.id.value ', onComplete:'callUpdateDialog(e)')}" />
+	</span> <span class="button"><input type="button"  
+		class="delete" onclick="return editDialogDeleteRemove('delete')"
+		value="Delete" /></span>
+		<span class="button"><input type="button"
+		class="delete" onclick="return editDialogDeleteRemove('remove');"
+		value="Remove From Project" /></span>
+		</div>
+		</jsec:hasAnyRole>
+</g:form></div>
+<div class="contextMenu" id="myMenu"/>
+<div class="contextMenu" id="transitionMenu" style="visibility: hidden;">
+	<ul>
+        <li id="done">Done</li>
+        <li id="NA">N/A</li>
+        <li id="pending">Pending</li>
+        <li id="void">Void</li>
+        <li id="ready">Ready</li>
+        <li id="noOptions">No Options</li>
+    </ul>
+</div></div>
 <script type="text/javascript">
+initialize();
+timedRefresh($("#selectTimedId").val())
+if('${browserTest}' == 'true'){
+	$("div.tableContainerIE").css("height",vpWidth("height") - 142)
+	$("div.tableContainerIE").css("width",vpWidth("width"));
+} else {
+	$("div.tableContainer").css("width",vpWidth("width"));
+	$("#assetListTbody").css("height",vpWidth("height") - 257)
+}
+function initialize(){
+	window.onresize=pageReload;
+	window.onload=cancelResize;
+	var bundleId = ${moveBundleInstance.id}; 
+	$("#moveBundleId").val(bundleId);
+	$("#appSmeId").val("${appSmeValue}");
+	$("#appOwnerId").val("${appOwnerValue}");
+	$("#applicationId").val("${appValue}");
+	var time = '${timeToRefresh}';
+		if(time != "" ){
+			$("#selectTimedId").val( time ) ;
+		} else if(time == "" ){
+			$("selectTimedId").val( 120000 );	
+		}
+}
 var timeInterval
 var fieldId
 	$(document).ready(function() {
@@ -111,9 +673,7 @@ var fieldId
 			});
 		}
 	});
-</script>
-<script type="text/javascript">
-var eventType = "load"
+	var eventType = "load"
 	function cancelResize(){
 	eventType = "load"
 	}
@@ -324,7 +884,7 @@ var eventType = "load"
 							} else {
 								link.onclick = function(){$('#createAssetCommentId').val(this.id);new Ajax.Request('../assetEntity/listComments?id='+this.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'action');}})} //;return false
 							}
-							link.innerHTML = "<img src=\"../images/skin/"+assetComment.type+"\" border=\"0px\">";
+							link.innerHTML = "<img src=\"../images/skin/"+assetComment.type+"\" border=\"0px\" />";
 							commentIcon.html(link);
 						}
 					}
@@ -429,577 +989,6 @@ var eventType = "load"
 	}
 	
 		
-</script>
-</head>
-<body >
-<div title="Change Status" id="changeStatusDialog"
-	style="background-color: #808080;display: none;">
-	<input type="hidden" id="cssClassId">
-<form name="changeStatusForm"><input type="hidden" name="asset"
-	id="asset" /> <input type="hidden" name="projectId" id="projectId"
-	value="${projectId}" />
-	<input type="hidden" name="moveBundle" id="moveBundle"
-	value="${moveBundleInstance.id}" />
-<table style="border: 0px; width: 100%">
-	<tr>
-		<td width="40%"><strong>Change status for selected
-		devices to:</strong></td>
-		<td width="60%"></td>
-	</tr>
-	<tr>
-		<td><select id="taskList" name="taskList" style="width: 250%">
-
-		</select></td>
-	</tr>
-	<tr>
-		<td>
-		<textarea rows="2" cols="1"  title="Enter Note..." name="enterNote" id="enterNote" style="width: 200%"></textarea>
-		</td>
-	</tr>
-	<tr>
-		<td></td>
-		<td style="text-align: right;"><input type="button" value="Save"
-			onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)submitAction()" /></td>
-	</tr>
-</table>
-</form>
-</div>
-<div style="width:100%">
-<g:form	name="listForm" action="list" method="post">
-<div style="width: 100%;">
-	
-	<input type="hidden" id="role" value="${role}"/>
-	<input type="hidden" id="lastPoolTimeId" value="${lastPoolTime}">
-	<input type="hidden" id="projectId" name="projectId" value="${projectId }" />
-	<table style="border: 0px;">
-		<tr>
-			<td valign="top" class="name"><label for="moveBundle">Move
-		Bundle:</label>&nbsp;<select id="moveBundleId"
-			name="moveBundle" onchange="document.listForm.submit()" >	
-
-			<g:each status="i" in="${moveBundleInstanceList}"
-				var="moveBundleInstance">
-				<option value="${moveBundleInstance?.id}">${moveBundleInstance?.name}</option>
-			</g:each>
-
-		</select></td>
-			<td><h1 align="center">PMO Asset Tracking</h1></td>
-			<td style="text-align: right;">
-			<input type="hidden" name="last_refresh" value="${new Date()}">
-			<input type="hidden" name="myForm" value="listForm">
-			<input type="button"
-				value="Refresh" onclick="pageReload();"> <select
-				id="selectTimedId"
-				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(e)') }">
-				<option value="30000">30 sec</option>
-				<option value="60000">1 min</option>
-				<option value="120000">2 min</option>
-				<option value="300000">5 min</option>
-				<option value="never">no refresh</option>
-			</select></td>
-		</tr>
-	</table>
-
-</div>
-<g:if test="${browserTest}">
-<div class="tableContainerIE">
-</g:if>
-<g:else>
-<div class="tableContainer">
-</g:else>
-
-<table cellpadding="0"   cellspacing="0"  style="border:0px;" >
-	<thead>
-		<tr>
-		 <th style="padding-top:35px;"><span>Actions</span><jsec:hasAnyRole in="['ADMIN','MANAGER', 'PROJ_MGR']"> 
-		 <input type="button" value="State..." onclick="changeState()" title="Change State" style="width: 80px;"/>
-		 <a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a></jsec:hasAnyRole></th>
-			<th style="padding-top:35px;" >
-			<table style="border: 0px;">
-				<thead>
-				<tr style="background-color: #CCC">
-					<g:sortableColumn style="border:0px;" property="application"  title="Application" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
-				</tr>
-				<tr style="background-color: #CCC">
-					<th style="border:0px;">
-						<select id="applicationId" name="application" onchange="document.listForm.submit();" style="width: 120px;">
-							<option value="" selected="selected">All</option>
-							<g:each in="${applicationList}" var="application">
-								<option value="${application[0] ? application[0] : 'blank'}">${application[0] ? application[0] : 'blank'}&nbsp;(${application[1]})</option>
-							</g:each>
-						</select>
-					</th>
-				</tr>
-				</thead>
-			</table>
-			</th>
-			<th style="padding-top:35px;">
-			<table style="border: 0px;">
-				<thead>
-				<tr style="background-color: #CCC">
-					<g:sortableColumn style="border:0px;" property="app_owner" title="App Owner"  params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]" />
-				</tr>
-				<tr style="background-color: #CCC">
-					<th style="border:0px;">
-						<select id="appOwnerId" name="appOwner"	onchange="document.listForm.submit();" style="width: 120px;">
-							<option value="" selected="selected">All</option>
-							<g:each in="${appOwnerList}" var="appOwner">
-								<option value="${appOwner[0] ? appOwner[0] : 'blank'}">${appOwner[0] ? appOwner[0] : 'blank'}&nbsp;(${appOwner[1]})</option>
-							</g:each>
-						</select>
-					</th>
-				</tr>
-				</thead>
-			</table>
-			</th>
-			<th style="padding-top:35px;">
-			<table style="border: 0px;">
-				<thead>
-				<tr style="background-color: #CCC">
-					<g:sortableColumn style="border:0px;" property="app_sme" title="App SME" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
-				</tr>
-				<tr style="background-color: #CCC">
-					<th style="border:0px;">
-						<select id="appSmeId" name="appSme" onchange="document.listForm.submit();" style="width: 120px;">
-							<option value="" selected="selected">All</option>
-							<g:each in="${appSmeList}" var="appSme">
-								<option value="${appSme[0] ? appSme[0] : 'blank'}">${appSme[0] ? appSme[0] : 'blank'}&nbsp;(${appSme[1]})</option>
-							</g:each>
-						</select>
-					</th>
-				</tr>
-				</thead>
-			</table>
-			</th>
-			<th style="padding-top:35px;">
-			<table style="border: 0px;">
-				<thead>
-				<tr style="background-color: #CCC">
-					<g:sortableColumn style="border:0px;" property="asset_name" title="Asset Name" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
-				</tr>
-				<tr style="background-color: #CCC">
-					<td style="padding-left: 0px;"><select id="hiddenSelect" style="width: 120px;visibility: hidden;"/></td>
-				</tr>
-				</thead>
-			</table>
-			</th>
-			<g:if test="${browserTest}">
-			<g:each in="${processTransitionList}"  var="task">
-				<th class="verticaltext" title="${task.header}">${task?.header}</th>
-			</g:each>
-			</g:if>
-			<g:else>
-			<th style="padding-left: 0px" colspan="${headerCount}"><embed src="${createLinkTo(dir:'templates',file:'headerSvg.svg')}" type="image/svg+xml" width="${headerCount*21.80}" height="102"/></th>
-			</g:else>
-
-		</tr>
-	</thead>
-	<tbody id="assetListTbody" onclick="catchevent(event)">
-		<g:if test="${assetEntityList}">
-		<g:each in="${assetEntityList}" var="assetEntity">
-			<tr id="assetRow_${assetEntity.id}" >
-			<td>
-			<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
-			<span id="action_${assetEntity.id}">
-				<g:if test="${assetEntity.checkVal == true}">
-					<g:checkBox name="checkChange" id="checkId_${assetEntity.id}" onclick="timedRefresh('never')"></g:checkBox>
-						<img id="task_${assetEntity.id}"src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}"	border="0px">
-				</g:if>
-				<g:else>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</g:else>
-			</span>
-			</jsec:hasAnyRole>
-			<img id="asset_${assetEntity.id}" src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px">
-			<span id="icon_${assetEntity.id}">
-				<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+assetEntity.id+' and commentType = ? and isResolved = ?',['issue',0])}">
-					
-						<img id="comment_${assetEntity.id}" src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}"	border="0px">
-				</g:if>
-				<g:else>
-					<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+assetEntity.id)}">
-							<img  id="comment_${assetEntity.id}" src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}"	border="0px">
-					</g:if>
-					<g:else>
-					<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
-						<a href="javascript:createNewAssetComment(${assetEntity.id});" >
-							<img  src="${createLinkTo(dir:'images/skin',file:'database_table_light.png')}"	border="0px">
-						</a>
-					</jsec:hasAnyRole>
-					</g:else>
-			</g:else>
-			</span>
-			</td>
-			<td  id="${assetEntity.id}_application" >${assetEntity?.application}&nbsp;</td>
-			<td id="${assetEntity.id}_appOwner" >${assetEntity?.appOwner}&nbsp;</td>
-			<td id="${assetEntity.id}_appSme" >${assetEntity?.appSme}&nbsp;</td>
-			<td id="${assetEntity.id}_assetName" >${assetEntity?.assetName}&nbsp;</td>
-			<g:each in="${assetEntity.transitions}" var="transition" >${transition}</g:each>
-			</tr>
-		</g:each>
-		</g:if>
-		<g:else>
-			<tr><td colspan="40" class="no_records">No records found</td></tr>
-		</g:else>
-	</tbody>
-</table>
-</g:form>
-</div>
-<div id="commentsListDialog" title="Show Asset Comments"
-	style="display: none;"><br>
-<div class="list">
-<table id="listCommentsTable" >
-	<thead>
-		<tr>
-			<g:if test="${role}">
-			<th nowrap>Action</th>
-			</g:if>
-			
-			<th nowrap>Comment</th>
-
-			<th nowrap>Comment Type</th>
-			
-			<th nowrap>Resolved</th>
-
-			<th nowrap>Must Verify</th>
-			
-			<th nowrap>Category</th>  
-	          
-	        <th nowrap>Comment Code</th> 
-
-		</tr>
-	</thead>
-	<tbody id="listCommentsTbodyId">
-
-	</tbody>
-</table>
-</div>
-<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
-<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-<span class="menuButton"><a class="create" href="#"
-	onclick="$('#statusId').val('');$('#createResolveDiv').css('display', 'none') ;$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">New
-Comment</a></span></div>
-</jsec:hasAnyRole>
-</div>
-<div id="createCommentDialog" title="Create Asset Comment"
-	style="display: none;"><input type="hidden" name="assetEntity.id"
-	id="createAssetCommentId" value=""> <input type="hidden"
-	name="status" id="statusId" value=""> 
-	<input type="hidden" id="newAssetCommentId" value=""/>
-	<g:form	action="saveComment" method="post" name="createCommentForm">
-	<input type="hidden" name="category" value="moveday"/>
-	<div class="dialog" style="border: 1px solid #5F9FCF">
-	<div>
-	<table id="createCommentTable" style="border: 0px">
-		
-			<tr class="prop" >
-				<td valign="top" class="name"><label for="commentType">Comment
-				Type:</label></td>
-				<td valign="top" style="width: 20%;" ><g:select id="commentType"
-					name="commentType"
-					from="${AssetComment.constraints.commentType.inList}" value=""
-					noSelection="['':'please select']" onChange="commentChange('#createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
-				
-				<input type="checkbox"
-					id="mustVerifyEdit" name="mustVerify" value="0"
-					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
-					<label for="mustVerify">Must Verify</label>
-				</td>
-			</tr>
-			<tr class="prop">
-				<td valign="top" class="name"><label for="comment">Comment:</label>
-				</td>
-				<td valign="top" class="value"><textarea cols="80" rows="5"
-					id="comment" name="comment"></textarea></td>
-			</tr>
-		
-	</table>
-	</div>
-	<div id="createResolveDiv" style="display: none;">
-		<table id="createResolveTable" style="border: 0px" >
-            <tr class="prop">
-            	<td valign="top" class="name">
-                <label for="isResolved">Resolved:</label>
-                </td>
-                <td valign="top" class="value">
-                <input type="checkbox" id="isResolved" name="isResolved" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
-                </td>
-            </tr>
-          
-            <tr class="prop">
-				<td valign="top" class="name">
-                <label for="resolution">Resolution:</label>
-                </td>
-				<td valign="top" class="value">
-                <textarea cols="80" rows="5" id="resolution" name="resolution" ></textarea>
-                </td>
-            </tr> 
-                
-            </table>
-            </div>
-		
-	</div>
-	<div class="buttons"><span class="button"> <input
-		class="save" type="button" value="Create"
-		onclick="resolveValidate('createCommentForm','createAssetCommentId');" /></span></div>
-</g:form></div>
-<div id="showCommentDialog" title="Show Asset Comment"
-	style="display: none;">
-<div class="dialog" style="border: 1px solid #5F9FCF"><input name="id" value="" id="commentId"
-	type="hidden">
-	<div>
-<table id="showCommentTable" style="border: 0px">
-	
-	<tr>
-	<td valign="top" class="name"><label for="dateCreated">Created
-			At:</label></td>
-			<td valign="top" class="value" id="dateCreatedId" />
-	</tr>
-		<tr>
-	<td valign="top" class="name"><label for="createdBy">Created
-			By:</label></td>
-			<td valign="top" class="value" id="createdById" />
-	</tr>
-		
-		<tr class="prop">
-			<td valign="top" class="name"><label for="commentType">Comment
-			Type:</label></td>
-			<td valign="top" class="value" id="commentTypeTdId" />
-		</tr>
-		
-		<tr>
-		
-	<td valign="top" class="name"><label for="category">Category:
-			</label></td>
-			<td valign="top" class="value" id="categoryTdId" />
-	</tr>
-	
-	<tr class="prop">
-	<td valign="top" class="name"><label for="commentCode">comment
-			Code:</label></td>
-			<td valign="top" class="value" id="commentCodeTdId" />
-	</tr>
-	
-		<tr class="prop">
-			<td valign="top" class="name"><label for="mustVerify">Must
-			Verify:</label></td>
-			<td valign="top" class="value" id="verifyTdId"><input
-				type="checkbox" id="mustVerifyShowId" name="mustVerify" value="0"
-				disabled="disabled" /></td>
-		</tr>
-		<tr class="prop">
-			<td valign="top" class="name"><label for="comment">Comment:</label>
-			</td>
-			<td valign="top" class="value" ><textarea cols="80" rows="5"
-					id="commentTdId" readonly="readonly"></textarea> </td>
-		</tr>
-		</table>
-		</div>
-		<div id="showResolveDiv" style="display: none;">
-		<table id="showResolveTable" style="border: 0px">
-		<tr class="prop">
-			<td valign="top" class="name"><label for="isResolved">Is
-			Resolved:</label></td>
-			<td valign="top" class="value" id="resolveTdId"><input
-				type="checkbox" id="isResolvedId" name="isResolved" value="0"
-				disabled="disabled" /></td>
-		</tr>
-		<tr class="prop">
-			<td valign="top" class="name"><label for="resolution">Resolution:</label>
-			</td>
-			<td valign="top" class="value" ><textarea cols="80" rows="5"
-					id="resolutionId" readonly="readonly"></textarea> </td>
-		</tr>
-			<tr>
-	<td valign="top" class="name"><label for="dateResolved">Resolved
-			At:</label></td>
-			<td valign="top" class="value" id="dateResolvedId" />
-	</tr>
-		<tr>
-	<td valign="top" class="name"><label for="resolvedBy">Resolved
-			By:</label></td>
-			<td valign="top" class="value" id="resolvedById" />
-	</tr>
-	
-</table>
-</div>
-<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
-<div class="buttons"><span class="button"> <input
-	class="edit" type="button" value="Edit"
-	onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
-</span> <span class="button"> <input class="delete" type="button"
-	value="Delete"
-	onclick="${remoteFunction(controller:'assetEntity', action:'deleteComment', params:'\'id=\' + $(\'#commentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'action\')')}" />
-</span></div>
-</jsec:hasAnyRole>
-</div></div>
-<div id="editCommentDialog" title="Edit Asset Comment"
-	style="display: none;"><g:form action="updateComment"
-	method="post" name="editCommentForm">
-	<div class="dialog" style="border: 1px solid #5F9FCF">
-	<input type="hidden" name="id" id="updateCommentId" value="">
-	<div>
-	<table id="updateCommentTable" style="border: 0px">
-		
-		
-			<tr>
-	<td valign="top" class="name"><label for="dateCreated">Created
-			At:</label></td>
-			<td valign="top" class="value" id="dateCreatedEditId"  />
-	</tr>
-		<tr>
-	<td valign="top" class="name"><label for="createdBy">Created
-			By:</label></td>
-			<td valign="top" class="value" id="createdByEditId" />
-	</tr>
-			<tr class="prop" >
-				<td valign="top" class="name"><label for="commentType">Comment
-				Type:</label></td>
-				<td valign="top" style="width: 20%;" >
-				<jsec:hasAnyRole in="['ADMIN','PROJ_MGR']">
-				<g:select id="commentTypeEditId"
-					name="commentType"
-					from="${AssetComment.constraints.commentType.inList}" value=""
-					 onChange="commentChange('#editResolveDiv','editCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
-				</jsec:hasAnyRole>
-				<jsec:lacksAllRoles in="['ADMIN','PROJ_MGR']">
-				
-				<input type="text" id="commentTypeEditId" name="commentType" readonly style="border: 0;">&nbsp;&nbsp;&nbsp;&nbsp;
-				</jsec:lacksAllRoles>						
-				
-				<input type="checkbox" id="mustVerifyEditId" name="mustVerify" value="0"
-					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
-					<label for="mustVerify">Must
-				Verify</label>
-				</td>
-			</tr>
-			<tr class="prop">
-				<td valign="top" class="name"><label for="category">Category:</label>
-				</td>
-				<td valign="top" class="value" id="categoryEditId" />
-			</tr>
-			<tr class="prop">
-				<td valign="top" class="name"><label for="commentCode">Comment Code:</label>
-				</td>
-				<td valign="top" class="value" id="commentCodeEditId" />
-			</tr>
-			<tr class="prop">
-				<td valign="top" class="name"><label for="comment">Comment:</label>
-				</td>
-				<td valign="top" class="value"><textarea cols="80" rows="5"
-					id="commentEditId" name="comment"></textarea></td>
-			</tr>
-			</table>
-			
-			</div>
-			<div id="editResolveDiv" style="display: none;">
-		<table id="updateResolveTable" style="border: 0px">
-            <tr class="prop">
-            	<td valign="top" class="name">
-                <label for="isResolved">Resolved:</label>
-                </td>
-                <td valign="top" class="value">
-                <input type="checkbox" id="isResolvedEditId" name="isResolved" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
-                </td>
-            </tr>
-          
-            <tr class="prop">
-				<td valign="top" class="name">
-                <label for="resolution">Resolution:</label>
-                </td>
-				<td valign="top" class="value">
-                <textarea cols="80" rows="5" id="resolutionEditId" name="resolution" ></textarea>
-                </td>
-            </tr> 
-               <tr>
-	<td valign="top" class="name"><label for="dateResolved">Resolved
-			At:</label></td>
-			<td valign="top" class="value" id="dateResolvedEditId" />
-	</tr>
-		<tr>
-	<td valign="top" class="name"><label for="resolvedBy">Resolved
-			By:</label></td>
-			<td valign="top" class="value" id="resolvedByEditId"  />
-	</tr>
-            </table>
-            </div>
-		
-		
-
-	</div>
-
-	<div class="buttons"><span class="button"> <input
-		class="save" type="button" value="Update"
-		onclick="resolveValidate('editCommentForm','updateCommentId');" />
-	</span> <span class="button"> <input class="delete" type="button"
-		value="Delete"
-		onclick="${remoteFunction(controller:'assetEntity', action:'deleteComment', params:'\'id=\' + $(\'#updateCommentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'action\')')}" />
-	</span></div>
-</g:form></div>
-<div id="showDialog" title="Show Asset Entity" style="display: none;">
-<g:form controller="assetEntity" action="save" method="post" name="showForm">
-	<div class="dialog" id="showDiv">
-	<table id="showTable">
-	</table>
-	</div>
-	<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
-	<div class="buttons">
-	<input type="hidden" name="id" value="" />
-	<input type="hidden" name="projectId" value="${projectId}" />
-	<input type="hidden" name="moveBundle" value="${moveBundleInstance.id}" />
-	<input type="hidden" name="clientList" value="clientList" />
-	 <span class="button"><input
-		type="button" class="edit" value="Edit"
-		onClick="return editAssetDialog()" /></span> <span class="button"><g:actionSubmit 
-		class="delete" onclick="return confirm('Delete Asset, are you sure?');"
-		value="Delete" /></span>
-		<span class="button"><g:actionSubmit action="remove"
-		class="delete"  onclick="return confirm('Remove Asset from project, are you sure?');"
-		value="Remove From Project" /></span>
-		</div>
-		</jsec:hasAnyRole>
-</g:form></div>
-
-<div id="editDialog" title="Edit Asset Entity" style="display: none;">
-<g:form method="post" name="editForm" controller="assetEntity">
-	<input type="hidden" name="id" value="" />
-	<input type="hidden" name="projectId" value="${projectId}" />
-	<input type="hidden" name="moveBundle" value="${moveBundleInstance.id}" />	
-	<input type="hidden" name="clientList" value="clientList" />
-	<div class="dialog" id="editDiv">
-	
-	</div>
-	<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
-	<div class="buttons"><span class="button">
-	<input type="button" class="save" value="Update Asset Entity" onClick="${remoteFunction(controller:'assetEntity', action:'getAssetAttributes', params:'\'assetId=\' + document.editForm.id.value ', onComplete:'callUpdateDialog(e)')}" />
-	</span> <span class="button"><input type="button"  
-		class="delete" onclick="return editDialogDeleteRemove('delete')"
-		value="Delete" /></span>
-		<span class="button"><input type="button"
-		class="delete" onclick="return editDialogDeleteRemove('remove');"
-		value="Remove From Project" /></span>
-		</div>
-		</jsec:hasAnyRole>
-</g:form></div>
-<div class="contextMenu" id="myMenu"/>
-<div class="contextMenu" id="transitionMenu" style="visibility: hidden;">
-	<ul>
-        <li id="done">Done</li>
-        <li id="NA">N/A</li>
-        <li id="pending">Pending</li>
-        <li id="void">Void</li>
-        <li id="ready">Ready</li>
-        <li id="noOptions">No Options</li>
-    </ul>
-</div>
-<script type="text/javascript">
-initialize();
-timedRefresh($("#selectTimedId").val())
-if('${browserTest}' == 'true'){
-	$("div.tableContainerIE").css("height",vpWidth("height") - 142)
-	$("div.tableContainerIE").css("width",vpWidth("width"));
-} else {
-	$("div.tableContainer").css("width",vpWidth("width"));
-	$("#assetListTbody").css("height",vpWidth("height") - 257)
-}
 </script>
 </body>
 </html>

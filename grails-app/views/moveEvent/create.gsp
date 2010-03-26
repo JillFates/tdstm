@@ -2,9 +2,6 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="moveBundleHeader" />
-         <g:javascript library="prototype" />
-        <g:javascript library="jquery"/>
-        <jq:plugin name="ui.core"/>
         <title>Create Move Event</title>         
     </head>
     <body>

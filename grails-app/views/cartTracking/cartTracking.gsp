@@ -3,18 +3,13 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <title>Cart Tracking</title>
-<g:javascript library="prototype" />
-<g:javascript library="jquery" />
-<jq:plugin name="ui.core" />
-<jq:plugin name="ui.draggable" />
+
 <jq:plugin name="ui.resizable" />
-<jq:plugin name="ui.dialog" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
+
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
+
 <script type="text/javascript">
 	$(document).ready(function() {
 		$("#changeTruckDiv").dialog({ autoOpen: false })
@@ -141,7 +136,7 @@
 						"<td>"+assetOnCart.assetDetails.manufacturer +" "+ assetOnCart.assetDetails.model +"</td>"+
 						"<td>"+assetOnCart.currentState+"</td><td>"+assetOnCart.team+"</td>"
 						if(assetOnCart.checked){
-							check +="<td><input type='checkbox' disabled='disabled' checked='checked'></td></tr>"
+							check +="<td><input type='checkbox' disabled='disabled' checked='checked'/></td></tr>"
 						} else {
 							check += "<td>&nbsp;</td></tr>"
 						}
@@ -259,7 +254,7 @@
 		if(message){
 			alert(message +" transitions are failed")
 		} else if('${cartAction}' == 'allId'){
-			$("#completedTd_"+rowId).html('<input type="checkbox" checked="checked" disabled="disabled">')			
+			$("#completedTd_"+rowId).html('<input type="checkbox" checked="checked" disabled="disabled" />')			
 		} else {
 			$("#cartRow_"+rowId).hide()
 		}
@@ -276,7 +271,7 @@
 				<td valign="top" class="name">
 					<input type="hidden" id="projectId" name="projectId" value="${projectId }" />
 					<input type="hidden" id="cartActionId" name="cartAction" value="${cartAction}" />
-					<input type="hidden" name="myForm" value="cartTrackingForm">
+					<input type="hidden" name="myForm" value="cartTrackingForm"/>
 					<label for="moveBundle">Move Bundle:</label>&nbsp;
 					<select id="moveBundleId" name="moveBundle"	onchange="document.cartTrackingForm.submit()">
 						<g:each status="i" in="${moveBundleInstanceList}" var="moveBundleInstance">
@@ -288,8 +283,8 @@
 				<h1 align="left">Cart Tracking</h1>
 				</td>
 				<td style="text-align: right;">
-					<input type="hidden" name="last_refresh_2342131123" value="${new Date()}">
-					<input type="button" value="Refresh" onclick="pageReload();">
+					<input type="hidden" name="last_refresh_2342131123" value="${new Date()}"/>
+					<input type="button" value="Refresh" onclick="pageReload();"/>
 					<select id="selectTimedId" onchange="${remoteFunction( action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(e)') }">
 						<option value="60000">1 min</option>
 						<option value="120000">2 min</option>
@@ -303,7 +298,7 @@
 		</table>
 </div>
 <div class="cart_style">
-	<span>Carts</span>&nbsp;&nbsp;&nbsp;<input type="button" id="remainingId" value="Remaining" onclick="getCartDetatls(this.id)" style="background-color: #aaefb8"><input type="button" id="allId" value="All" onclick="getCartDetatls(this.id)">
+	<span>Carts</span>&nbsp;&nbsp;&nbsp;<input type="button" id="remainingId" value="Remaining" onclick="getCartDetatls(this.id)" style="background-color: #aaefb8"/><input type="button" id="allId" value="All" onclick="getCartDetatls(this.id)"/>
 </div>
 <div class="list">
 <table cellpadding="0" cellspacing="0" >
@@ -326,7 +321,7 @@
 			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}',${i})">${cartTrackingDetails?.cartDetails?.usize ? (Integer)cartTrackingDetails?.cartDetails?.usize : ''}</td>
 			<td id="completedTd_${i}">
 			<g:if test="${cartTrackingDetails?.completed}">
-				<input type="checkbox" checked="checked" disabled="disabled">
+				<input type="checkbox" checked="checked" disabled="disabled"/>
 			</g:if>
 			<g:elseif test="${cartTrackingDetails?.pendingAssets == 0 }" >
 				<a href="#" onclick="return moveToOnTruck('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}','${i}')">Move to Truck</a>
@@ -339,14 +334,14 @@
 		<tr><td colspan="6" class="no_records">No records found</td></tr>
 		</g:else>
 	</tbody>
-</table>
+</table></div>
 </g:form>
-<br>
+<br/>
 <div id="changeTruckDiv" title="Change Trucks" style="display: none;">
 	<g:form name="changeTruckForm">
 		<table style="border: 0px;">
 			<tr>
-				<td id="changeTruckCartTdId">Cart : <input type="hidden" name="cart" id="changeTruckCartId"></td>
+				<td id="changeTruckCartTdId">Cart : <input type="hidden" name="cart" id="changeTruckCartId" /></td>
 			</tr>
 			<tr>
 				<td style="vertical-align: middle;">Truck : <select name="truck" id="changeTruckSelectId" >
@@ -357,18 +352,18 @@
 				 </td>
 			</tr>
 			<tr><td>
-				<input type="button" value="Update" onclick="${remoteFunction(action:'changeTruck', params:'\'cart=\' + $(\'#changeTruckCartId\').val() +\'&truck=\'+$(\'#changeTruckSelectId\').val() +\'&projectId=\'+$(\'#projectId\').val() +\'&bundleId=\'+$(\'#moveBundleId\').val()', onComplete:'pageReload()')}">
-				<input type="button" value="Cancel" onclick="$('#changeTruckDiv').dialog('close');"> 
+				<input type="button" value="Update" onclick="${remoteFunction(action:'changeTruck', params:'\'cart=\' + $(\'#changeTruckCartId\').val() +\'&truck=\'+$(\'#changeTruckSelectId\').val() +\'&projectId=\'+$(\'#projectId\').val() +\'&bundleId=\'+$(\'#moveBundleId\').val()', onComplete:'pageReload()')}"/>
+				<input type="button" value="Cancel" onclick="$('#changeTruckDiv').dialog('close');"/> 
 			</td></tr>
 		</table>
 	</g:form>
 </div>
 <div id="assetsOnCartDiv" style="display: none;">
 <div class="cart_style">
-	<span>Assets on Cart </span>&nbsp;&nbsp;&nbsp;<input type="button" id="remainingAssetsId" value="Remaining" onclick="getAssetDetatls(this.id)" style="background-color: #aaefb8"><input type="button" id="allAssetsId" value="All" onclick="getAssetDetatls(this.id)">
-	<input type="hidden" id="assetsOnCartId" name="assetsOnCart">
-	<input type="hidden" id="assetsOnTruckId" name="assetsOnTruck">
-	<input type="hidden" id="assetActionId" name="assetAction">
+	<span>Assets on Cart </span>&nbsp;&nbsp;&nbsp;<input type="button" id="remainingAssetsId" value="Remaining" onclick="getAssetDetatls(this.id)" style="background-color: #aaefb8"/><input type="button" id="allAssetsId" value="All" onclick="getAssetDetatls(this.id)"/>
+	<input type="hidden" id="assetsOnCartId" name="assetsOnCart"/>
+	<input type="hidden" id="assetsOnTruckId" name="assetsOnTruck"/>
+	<input type="hidden" id="assetActionId" name="assetAction"/>
 </div>
 <div class="list">
 <table cellpadding="0" cellspacing="0" >
@@ -392,19 +387,19 @@
 		<tr>
 		
 			<td style="vertical-align: middle;" nowrap="nowrap">Truck : 
-			<input type="hidden" name="assetEntity" id="assetEntityId">
-			<input type="hidden" name="maxState" id="maxStateId">
-			<input type="hidden" name="onTruck" id="onTruckId">
+			<input type="hidden" name="assetEntity" id="assetEntityId"/>
+			<input type="hidden" name="maxState" id="maxStateId"/>
+			<input type="hidden" name="onTruck" id="onTruckId"/>
 			<select name="truck" id="reassignAssetSelectId" >
 			<g:each in="${trucks}" var="truck">
 				<option value="${truck?.truck}">${truck?.truck}</option>
 			</g:each>
 			</select>
-			 Cart : <input type="text" name="reassignCart" id="reassignCartId"> Shelf : <input type="text" name="reassignShelf" id="reassignShelfId"></td>
+			 Cart : <input type="text" name="reassignCart" id="reassignCartId" /> Shelf : <input type="text" name="reassignShelf" id="reassignShelfId"/></td>
 		</tr>
 		<tr><td>
-			<input type="button" value="Update" onclick="return reassignAsset()">
-			<input type="button" value="Cancel" onclick="$('#reassignAssetDiv').dialog('close');"> 
+			<input type="button" value="Update" onclick="return reassignAsset()"/>
+			<input type="button" value="Cancel" onclick="$('#reassignAssetDiv').dialog('close');"/> 
 		</td></tr>
 		</tbody>
 	</table>

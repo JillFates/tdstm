@@ -5,7 +5,6 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>        
         <meta name="layout" content="moveBundleHeader" />
         <title>Edit Move Bundle Team</title>
-        <g:javascript library="jquery" />
         <script type="text/javascript">  
 			   $().ready(function() {  
 			    $('#add').click(function() {  

@@ -5,8 +5,6 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="projectHeader" />
         <title>Data Transfer Batch List</title>
-        <g:javascript library="prototype" />
-	<g:javascript library="jquery" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'progressbar.css')}" />
 	<jq:plugin name="ui.progressbar"/>
 	<script type="text/javascript">

@@ -6,8 +6,6 @@
     <meta name="layout" content="main" />
     <title>Edit MoveBundle</title>
     <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
-    <g:javascript library="jquery" />
-    <g:javascript library="ui.datepicker" />
 
     <g:javascript>
       function callBundleChange(val){

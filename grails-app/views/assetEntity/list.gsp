@@ -5,32 +5,19 @@
 <meta name="layout" content="projectHeader" />
 <title>Asset Entity List</title>
 
-<g:javascript library="prototype" />
-<g:javascript library="jquery" />
 <jq:plugin name="jquery.bgiframe.min"/>
 <jq:plugin name="jquery.autocomplete"/>
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
+
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
+
 <g:javascript src="assetcrud.js" />
 <g:javascript src="assetcommnet.js" />
-<jq:plugin name="ui.core" />
-<jq:plugin name="ui.draggable" />
+
 <jq:plugin name="ui.resizable" />
-<jq:plugin name="ui.dialog" />
 
 
 <script type="text/javascript">
@@ -285,7 +272,7 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 </g:form></div>
 
 <div id="commentsListDialog" title="Show Asset Comments" style="display: none;">
-<br>
+<br/>
 	<div class="list">
 		<table id="listCommentsTable">
 		<thead>

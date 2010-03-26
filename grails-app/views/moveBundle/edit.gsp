@@ -6,11 +6,8 @@
     <meta name="layout" content="moveBundleHeader" />
     <title>Edit MoveBundle</title>
 
-    <g:javascript library="jquery"/>
-
-    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" type="text/css"/>
-    <jq:plugin name="ui.core"/>
+
     <jq:plugin name="ui.datetimepicker"/>
     
     <g:javascript>

@@ -5,8 +5,6 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="projectHeader" />
         <title>Data Transfer Error List</title>
-        <g:javascript library="prototype" />
-	<g:javascript library="jquery" />
     </head>
     <body>
     

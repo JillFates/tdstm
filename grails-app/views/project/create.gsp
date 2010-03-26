@@ -3,8 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <title>Create Project</title>
-<g:javascript library="prototype" />
-<g:javascript library="jquery" />
+
 <g:javascript library="ui.datepicker" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
 

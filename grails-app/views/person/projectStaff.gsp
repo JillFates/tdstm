@@ -3,21 +3,15 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <title>Project Staff List</title>
-<g:javascript library="prototype" />
-<g:javascript library="jquery"/>
+
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}"  />
-    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
-    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}"  />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}"  />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}"  />
-    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
 
-    <jq:plugin name="ui.core"/>
-    <jq:plugin name="ui.draggable"/>
     <jq:plugin name="ui.resizable"/>
-    <jq:plugin name="ui.dialog"/>
-	    <script type="text/javascript">
+
+    <script type="text/javascript">
 	    $(document).ready(function(){
 		        $("#editPerson").dialog({ autoOpen: false });
 	      	});

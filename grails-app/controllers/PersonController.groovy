@@ -1,5 +1,7 @@
 import grails.converters.JSON
 import java.text.SimpleDateFormat
+import org.jsecurity.crypto.hash.Sha1Hash
+
 class PersonController {
     
 	def partyRelationshipService
@@ -278,5 +280,36 @@ class PersonController {
 			flash.message = " Person FirstName cannot be blank. "
 			redirect( action:'projectStaff', params:[ projectId:projectId,submit:'Add' ] )
 		}
-    }	
+    }
+	/*-----------------------------------------------------------
+	 * Will return person details for a given personId as JSON
+	 * @author : Lokanada Reddy 
+	 * @param  : person id
+	 * @return : person details as JSON
+	 *----------------------------------------------------------*/
+	def getPersonDetails = {
+    	def personId = params.id
+		def person = Person.findById( personId  )
+		render person as JSON
+    }
+	/*-----------------------------------------------------------
+	 * Update the person details and user password, Return person first name
+	 * @author : Lokanada Reddy 
+	 * @param  : person details and user password
+	 * @return : person firstname
+	 *----------------------------------------------------------*/
+	def updatePerson = {
+			def personInstance = Person.get(params.id)
+			personInstance.properties = params
+			if ( !personInstance.hasErrors() && personInstance.save() ) {
+				getSession().setAttribute( "LOGIN_PERSON", ['name':personInstance.firstName, "id":personInstance.id ])
+				def userLogin = UserLogin.findByPerson( personInstance )
+				def password = params.password
+				if( password ){
+					userLogin.password = new Sha1Hash( password ).toHex()
+					userLogin.save();
+				}
+			}
+			render personInstance.firstName
+    }
 }

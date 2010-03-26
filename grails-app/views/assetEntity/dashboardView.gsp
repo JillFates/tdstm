@@ -3,29 +3,17 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <title>Supervisor Console</title>
-<g:javascript library="prototype" />
-<g:javascript library="jquery" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
-<link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
+
 <g:javascript src="assetcrud.js" />
 <g:javascript src="assetcommnet.js" />
-<jq:plugin name="ui.core" />
-<jq:plugin name="ui.draggable" />
+
 <jq:plugin name="ui.resizable" />
-<jq:plugin name="ui.dialog" />
 <jq:plugin name="jquery.scrollfollow" />
+
 
 <style type="text/css">
 td .odd {
@@ -322,7 +310,7 @@ td .odd {
 				var link = document.createElement('a');
 				link.href = '#'
 				link.onclick = function(){$('#createAssetCommentId').val( asset[0].assetEntity.id ) ;new Ajax.Request('listComments?id='+asset[0].assetEntity.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never');}})} //;return false
-				link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
+				link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\" />"
 				var iconObj = $('#icon_'+asset[0].assetEntity.id);
 				iconObj.html(link)
 			}
@@ -805,12 +793,12 @@ td .odd {
 										</g:if>
 									</jsec:hasAnyRole>
 									<g:remoteLink controller="assetEntity" action="editShow" id="${assetsList?.asset.id}" before="document.showForm.id.value = ${assetsList?.asset.id};document.editForm.id.value = ${assetsList?.asset.id};" onComplete="showAssetDialog( e , 'show');">
-										<img src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px">
+										<img src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px" />
 									</g:remoteLink>
 									 <span style="visibility: hidden;"
 										id="image_${assetsList?.asset.id}"><img
 										src="${createLinkTo(dir:'images',file:'row_arrow.gif')}"
-										border="0px"></span>
+										border="0px"/></span>
 										
 										</td></jsec:hasAnyRole>
 									<td id="priority_${assetsList?.asset.id}"
@@ -831,17 +819,17 @@ td .odd {
 											onComplete="listCommentsDialog( e ,'never' );">
 											<img
 												src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}"
-												border="0px">
+												border="0px"/>
 										</g:remoteLink>
 									</g:if>
 									<g:elseif test="${AssetComment.find('from AssetComment where assetEntity = '+ assetsList?.asset?.id)}">
 										<g:remoteLink controller="assetEntity" action="listComments" id="${assetsList?.asset.id}" before="setAssetId(${assetsList?.asset.id});" onComplete="listCommentsDialog( e ,'never' ); ">
-											<img src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}" border="0px">
+											<img src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}" border="0px"/>
 										</g:remoteLink>
 									</g:elseif>
 									<g:else>
 									<a onclick="createNewAssetComment(${assetsList?.asset.id});">
-										<img src="${createLinkTo(dir:'images/skin',file:'database_table_light.png')}" border="0px">
+										<img src="${createLinkTo(dir:'images/skin',file:'database_table_light.png')}" border="0px"/>
 									</a>
 									</g:else>
 									</td>
