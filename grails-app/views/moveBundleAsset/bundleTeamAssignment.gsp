@@ -378,228 +378,204 @@
     </script>
 
   </head>
-  <body>
- 
-  
-    <div class="body">
-<h1>Bundle Team Assignment</h1>
-<div>
-      	<table style="width:90%">
-			<tr class="prop">
-				<td style="width:100%; valign="top" class="value" colspan="2">
-      <g:form method="post" name="bundleTeamAssetForm">
-        <input type="hidden"  name="id" id="id" value="${moveBundleInstance?.id}" />
-        <input type="hidden"  name="rackPlan" id="rackPlan" value="${rack}" />
-        <div class="border_bundle_team">
-          <table style="border:0px;width:100%">
-            <tbody>
-              <tr style="width:100%">
-              &nbsp;<td valign="top" style="25%"class="name">
-                <label for="Name">
-                <g:select optionKey="id" from="${MoveBundle.findAll('from MoveBundle where project = '+moveBundleInstance.project.id)}" name="moveBundle" value="${moveBundleInstance.id}" onChange="submitForm()" />
-                </label>
-              </td>
-              <td style="width:250px; float:left;">
-              	<table style="width:250px; float:left;">
-              		<tr>
-              			<g:if test="${rack == 'UnrackPlan'}">
-              				<td style="width:100px; float:left; background-color:#43ca56; padding-left:10px;">
-              			</g:if>
-              			<g:else>
-              				<td style="width:112px; float:left;   padding-left:10px;">
-              			</g:else>
-              			<g:link controller="moveBundleAsset"  action="bundleTeamAssignment"  params="[bundleId:moveBundleInstance?.id, rackPlan:'unrackPlan']"  >Unrack Plan</g:link>
-              			<g:if test="${rack == 'RerackPlan'}">
-              				<td style="width:100px; float:left; background-color:#43ca56; padding-left:10px;">
-              			</g:if>
-              			<g:else>
-              				<td style="width:100px; float:left; border-left:1px solid #5585c7; padding-left:10px;">
-              			</g:else>
-              			<g:link controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleInstance?.id, rackPlan:'RerackPlan']"  >Rerack Plan</g:link>
-              			</td>
-              		</tr>
-              	</table>
-              </td>
-              
-              <td style="width:250px; height:auto; margin-left:100px;">
-              <b style="margin-left:100px;">Team Assignments</b>
-              	<table id="teamAssetCountTable" style="width:150px; height:auto; margin-left:100px;">
-              		<thead>
-              			<tr>
-              				<th>Team</th>
-              				<th>Assets</th>
-              			</tr>
-              		</thead>
-              		<tbody>
-              			<g:each in="${teamAssetCount}" var="teamAsset">
-              				
-              				<tr><td>${teamAsset?.teamCode}</td><td>${teamAsset?.assetCount}</td></tr>
-              				
-              			</g:each>
-              		</tbody>		
-              	</table>
-              </td>
-              <g:if test="${rack == 'RerackPlan'}">
-              <td style="width:150px; height:auto;">
-              <b>Cart Assignments</b>
-              	<table id="cartAssetCountTable" style="width:200px; height:auto;">
-              		<thead>
-              			<tr>
-              				<th>Cart</th>
-              				<th>Assets</th>
-              				<th>U's Used</th>
-              			</tr>
-              		</thead>
-              		<tbody>
-              			<g:each in="${cartAssetCountList}" var="cartAsset">
-              				
-              				<tr><td>${cartAsset?.cart}</td><td>${cartAsset?.cartAssetCount}</td><td>${cartAsset?.usizeUsed}</td></tr>
-              				
-              			</g:each>
-              		</tbody>		
-              	</table>
-              </td>
-              </g:if>
-              </tr>
-              <tr>
-              <td valign="middle">
-              	<div style="width:140px;">
-              	<span><b>Filter By Racks</b></span>
-              	<div style="float:left; width:30px;"><a href="#" onclick="moveRackUp()" id="add"><img src="${createLinkTo(dir:'images',file:'up-arrow.png')}" style="float: left; border: none;" /></a><br/>
-              	
-              	<a href="#" onclick="moveRackDown()" id="add"><img src="${createLinkTo(dir:'images',file:'down-arrow.png')}" style="float: left; border: none;" /></a><br/>
-              	
-              	</div>
-              	<div style="float:left;">
-              		<select id="filterRack" multiple="multiple" onMouseUp="filterAssetsOnRack(this.value)"  style="width: 100px; height: 70px;">
-              			<option value="all" selected="selected">All Racks</option>
-              			<g:each in="${assetEntitysRacks}" var="assetEntitysRacks">
-              				<g:if test="${rack == 'UnrackPlan'}">
-              					<option value="${assetEntitysRacks?.sourceRack}">${assetEntitysRacks?.sourceRack}</option>
-              				</g:if>
-              				<g:else>
-              					<option value="${assetEntitysRacks?.targetRack}">${assetEntitysRacks?.targetRack}</option>
-              				</g:else>
-       	      				
-	           			</g:each>
-              		</select>
-              		</div>
-              	</div>
-    	       </td>
-    	          
-    	          <td style="padding-left:50px;">
-    	          	<div style="border:0px; width:auto; height:auto; float:left;">
-    	          		<b>Filter By Team</b>    	          	
-    	          			<div>
-    	          				<select id="filterTeam" onchange="filterAssetsOnTeam(this.value)">
-	              					<option value="">All Teams</option>
-              						<g:each in="${projectTeamInstance}" var="projectTeam">
-       	      							<option value="${projectTeam?.teamCode}">${projectTeam?.teamCode}</option>
-	           						</g:each>
-	           						<option value="unAssign">UnAssigned</option>
-             					</select>
-    	          			</div>
-    	          	</div>
-              		
-    	          </td>
-    	          
-    	          <td style="padding-left:50px; padding-top: 50px;">
-    	          	<table style="border:0px;">
-    	          		
-    	          		<tr>
-    	          			<td>
-    	          				<select id="team" onchange="autoFillTeam(this.value)">
-              						<option value="null">Select Team to Assign All Assets To</option>
-              							<g:each in="${projectTeamInstance}" var="projectTeam">
-       	      								<option value="${projectTeam?.teamCode}">${projectTeam?.teamCode}</option>
-	           							</g:each>
-	           							<option value="UnAssign">UnAssign</option>
-             					</select>	
-    	          			</td>
-    	          		</tr>
-    	          	</table>
-    	          </td>
-    	          
-              </tr>
-          </table>
-          <div  id="processDiv" style="overflow:scroll; width:100%; display:none;">
-          <img src="../images/processing.gif"/>
-          </div>
-           <div  id="assetDiv" style="overflow:scroll; width:100%;">
-            <table id="assetTable">
-              <thead>
-                <tr>
-                  <th>Asset</th>
-
-                  <th>Server</th>
-
-                  <th>Model</th>
-
-                  <th>Room</th>
-
-                  <th>Rack</th>
-
-                  <th>Pos</th>
-
-                  <th>Size</th>
-                  
-                  <th>Team</th>
-                  
-                  <g:if test="${rack == 'RerackPlan'}">
-                  
-                  <th>Cart</th>
-                  
-                  <th>Shelf</th>
-                  
-                  </g:if>
-
-                </tr>
-              </thead>
-              <tbody>
-             <%int row=0;%>
-                <g:each in="${assetEntityInstanceList}" var="assetEntityInstance" status="i">
-                  <tr style="background-color: ${(i % 2) == 0 ? '#FFFFFF' : '#E0E0E0'}" id="row_${assetEntityInstance?.id}">
-
-                    <td style="border:1px;"><input type="hidden" name="asset" id="asset" value="${assetEntityInstance?.id}" />${assetEntityInstance?.assetTag}</td>
-                    
-                    <td>${assetEntityInstance?.assetName}</td>
-                    
-                    <td>${assetEntityInstance?.model}</td>
-                    <g:if test="${rack == 'UnrackPlan'}">
-                    	<td>${assetEntityInstance?.sourceLocation}</td>
-                    
-                    	<td>${assetEntityInstance?.sourceRack}</td>
-                    	<td>${assetEntityInstance?.sourceRackPosition}</td>
-                    </g:if>
-                    <g:else>
-                    	<td>${assetEntityInstance?.targetLocation}</td>
-                    
-                    	<td>${assetEntityInstance?.targetRack}</td>
-                    	<td>${assetEntityInstance?.sourceRackPosition}</td>
-                    </g:else>
-                    
-                    
-                    <td>${assetEntityInstance?.usize}</td>
-					<g:if test="${rack == 'UnrackPlan'}">
-					<td id="${assetEntityInstance?.id}" onclick="makeSelect(this,${assetEntityInstance?.id})" >
-							<g:select style="display:none;" from= "${projectTeamInstance?.teamCode}" name="assetTeamAssign_${assetEntityInstance?.id}" value="${assetEntityInstance?.sourceTeam?.teamCode}" id="${assetEntityInstance?.id}" value="${assetEntityInstance?.sourceTeam?.teamCode}" noSelection="['null':'Unassigned']" onChange="assetToTeamAssign(this.value,'${assetEntityInstance?.id}');"/>
-							<span id="span_${assetEntityInstance?.id}">${assetEntityInstance?.sourceTeam?.teamCode} </span></td>
-                    </g:if>
-                    <g:else >
-                    <td id="${assetEntityInstance?.id}" onclick="makeSelect(this,${assetEntityInstance?.id})" >
-							<g:select style="display:none;"  from= "${projectTeamInstance?.teamCode}" name="assetTeamAssign_${assetEntityInstance?.id}" value="${assetEntityInstance?.targetTeam?.teamCode}" id="${assetEntityInstance?.id}" noSelection="['null':'Unassigned']" onChange="assetToTeamAssign(this.value,'${assetEntityInstance?.id}');"/>
-							<span id="span_${assetEntityInstance?.id}">${assetEntityInstance?.targetTeam?.teamCode} </span></td>
-						<td><input size=5px; type=text name="assetCartAssign_${assetEntityInstance?.id}" id="${assetEntityInstance?.id}" value="${assetEntityInstance?.cart}" onblur="assetCartAssign(this,'${assetEntityInstance?.id}');"/></td>
-						<td><input size=5px; type=text name="assetShelfAssign_${assetEntityInstance?.id}" id="${assetEntityInstance?.id}" value="${assetEntityInstance?.shelf}" onblur="assetShelfAssign(this,'${assetEntityInstance?.id}');"/></td>
-					</g:else>
-                  </tr>
-                  <% row++;%>
-                </g:each>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </g:form></td></tr></table>
-    </div></div>
-  </body>
+<body>
+	<div class="body">
+		<h1>Bundle Team Assignment</h1>
+		<div>
+	      	<table style="width:90%">
+				<tr class="prop">
+					<td style="width:100%; valign="top" class="value" colspan="2">
+		      		<g:form method="post" name="bundleTeamAssetForm">
+		        	<input type="hidden"  name="id" id="id" value="${moveBundleInstance?.id}" />
+		        	<input type="hidden"  name="rackPlan" id="rackPlan" value="${rack}" />
+		        	<div class="border_bundle_team">
+		          	<table style="border:0px;width:100%">
+		            	<tbody>
+		              		<tr style="width:100%">
+								<td valign="top" style="25%"class="name">&nbsp;
+		                			<label for="Name">
+		                				<g:select optionKey="id" from="${MoveBundle.findAll('from MoveBundle where project = '+moveBundleInstance.project.id)}" name="moveBundle" value="${moveBundleInstance.id}" onChange="submitForm()" />
+		                			</label>
+		              			</td>
+		              			<td style="width:250px; float:left;">
+		              				<table style="width:250px; float:left;">
+		              					<tr>
+		              					<g:if test="${rack == 'UnrackPlan'}">
+		              						<td style="width:100px; float:left; background-color:#43ca56; padding-left:10px;">
+		              					</g:if>
+		              					<g:else>
+		              						<td style="width:112px; float:left;   padding-left:10px;">
+		              					</g:else>
+		              					<g:link controller="moveBundleAsset"  action="bundleTeamAssignment"  params="[bundleId:moveBundleInstance?.id, rackPlan:'unrackPlan']"  >Unrack Plan</g:link>
+		              					<g:if test="${rack == 'RerackPlan'}">
+		              						<td style="width:100px; float:left; background-color:#43ca56; padding-left:10px;">
+		              					</g:if>	
+		              					<g:else>
+		              						<td style="width:100px; float:left; border-left:1px solid #5585c7; padding-left:10px;">
+		              					</g:else>
+		              					<g:link controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleInstance?.id, rackPlan:'RerackPlan']"  >Rerack Plan</g:link>
+		              						</td>
+		              					</tr>
+		              				</table>
+		              			</td>
+			              
+								<td style="width:250px; height:auto; margin-left:100px;">
+		              				<b style="margin-left:100px;">Team Assignments</b>
+		              				<table id="teamAssetCountTable" style="width:150px; height:auto; margin-left:100px;">
+		              					<thead>
+		              						<tr>
+		              							<th>Team</th>
+		              							<th>Assets</th>
+		              						</tr>
+		              					</thead>
+		              					<tbody>
+		              						<g:each in="${teamAssetCount}" var="teamAsset">
+			    	          					<tr><td>${teamAsset?.teamCode}</td><td>${teamAsset?.assetCount}</td></tr>
+		              						</g:each>
+		              					</tbody>		
+		              				</table>
+		              			</td>
+		              			<g:if test="${rack == 'RerackPlan'}">
+		              			<td style="width:150px; height:auto;">
+		              				<b>Cart Assignments</b>
+		              				<table id="cartAssetCountTable" style="width:200px; height:auto;">
+		              					<thead>
+		              						<tr>
+		              							<th>Cart</th>
+		              							<th>Assets</th>
+		              							<th>U's Used</th>
+		              						</tr>
+		              					</thead>
+		              					<tbody>
+		              						<g:each in="${cartAssetCountList}" var="cartAsset">
+					              				<tr><td>${cartAsset?.cart}</td><td>${cartAsset?.cartAssetCount}</td><td>${cartAsset?.usizeUsed}</td></tr>
+					              			</g:each>
+		    			          		</tbody>		
+		              				</table>
+		              			</td>
+		              			</g:if>
+		              		</tr>
+		              		<tr>
+		              			<td valign="middle">
+			              			<div style="width:140px;">
+			              				<span><b>Filter By Racks</b></span>
+			              				<div style="float:left; width:30px;"><a href="#" onclick="moveRackUp()" id="add"><img src="${createLinkTo(dir:'images',file:'up-arrow.png')}" style="float: left; border: none;" /></a><br/>
+							              	<a href="#" onclick="moveRackDown()" id="add"><img src="${createLinkTo(dir:'images',file:'down-arrow.png')}" style="float: left; border: none;" /></a><br/>
+						              	</div>
+						              	
+				              			<div style="float:left;">
+				              				<select id="filterRack" multiple="multiple" onMouseUp="filterAssetsOnRack(this.value)"  style="width: 100px; height: 70px;">
+				              					<option value="all" selected="selected">All Racks</option>
+				              					<g:each in="${assetEntitysRacks}" var="assetEntitysRacks">
+				              						<g:if test="${rack == 'UnrackPlan'}">
+				              							<option value="${assetEntitysRacks?.sourceRack}">${assetEntitysRacks?.sourceRack}</option>
+				              						</g:if>
+					              					<g:else>
+					              						<option value="${assetEntitysRacks?.targetRack}">${assetEntitysRacks?.targetRack}</option>
+					              					</g:else>
+						           				</g:each>
+				              				</select>
+				              			</div>
+			              			</div>
+		    	       			</td>
+		    	          
+		    	          		<td style="padding-left:50px;">
+			    	          		<div style="border:0px; width:auto; height:auto; float:left;">
+			    	          			<b>Filter By Team</b>    	          	
+			    	          				<div>
+			    	          					<select id="filterTeam" onchange="filterAssetsOnTeam(this.value)">
+				              						<option value="">All Teams</option>
+			              							<g:each in="${projectTeamInstance}" var="projectTeam">
+			       	      								<option value="${projectTeam?.teamCode}">${projectTeam?.teamCode}</option>
+				           							</g:each>
+				           							<option value="unAssign">UnAssigned</option>
+			             						</select>
+			    	          				</div>
+			    	          		</div>
+		    	          		</td>
+		    	          
+		    	          		<td style="padding-left:50px; padding-top: 50px;">
+		    	          			<table style="border:0px;">
+				    	          		<tr>
+				    	          			<td>
+		    			          				<select id="team" onchange="autoFillTeam(this.value)">
+		              								<option value="null">Select Team to Assign All Assets To</option>
+		              								<g:each in="${projectTeamInstance}" var="projectTeam">
+		       	      									<option value="${projectTeam?.teamCode}">${projectTeam?.teamCode}</option>
+			           								</g:each>
+			           								<option value="UnAssign">UnAssign</option>
+		             							</select>	
+		    	          					</td>
+		    	          				</tr>
+		    	          			</table>
+		    	          		</td>
+			              </tr>
+		          	</table>
+		          	<div  id="processDiv" style="overflow:scroll; width:100%; display:none;">
+		          		<img src="../images/processing.gif"/>
+		          	</div>
+		           	<div  id="assetDiv" style="overflow:scroll; width:100%;">
+		            	<table id="assetTable">
+		              		<thead>
+		                		<tr>
+		                  			<th>Asset</th>
+				                  	<th>Server</th>
+									<th>Model</th>
+									<th>Room</th>
+				                  	<th>Rack</th>
+				                  	<th>Pos</th>
+				                  	<th>Size</th>
+				                  	<th>Team</th>
+				                  	<g:if test="${rack == 'RerackPlan'}">
+				                  	<th>Cart</th>
+				                  	<th>Shelf</th>
+				                  	</g:if>
+				                </tr>
+			              	</thead>
+		              		<tbody>
+		             			<%int row=0;%>
+		                			<g:each in="${assetEntityInstanceList}" var="assetEntityInstance" status="i">
+		                  				<tr style="background-color: ${(i % 2) == 0 ? '#FFFFFF' : '#E0E0E0'}" id="row_${assetEntityInstance?.id}">
+						                    <td style="border:1px;"><input type="hidden" name="asset" id="asset" value="${assetEntityInstance?.id}" />${assetEntityInstance?.assetTag}</td>
+		                    				<td>${assetEntityInstance?.assetName}</td>
+		                    				<td>${assetEntityInstance?.model}</td>
+		                    				<g:if test="${rack == 'UnrackPlan'}">
+		                    					<td>${assetEntityInstance?.sourceLocation}</td>
+						                    	<td>${assetEntityInstance?.sourceRack}</td>
+		                    					<td>${assetEntityInstance?.sourceRackPosition}</td>
+		                    				</g:if>
+		                    				<g:else>
+		                    					<td>${assetEntityInstance?.targetLocation}</td>
+						                    	<td>${assetEntityInstance?.targetRack}</td>
+		                    					<td>${assetEntityInstance?.sourceRackPosition}</td>
+		                    				</g:else>
+					                    	<td>${assetEntityInstance?.usize}</td>
+											<g:if test="${rack == 'UnrackPlan'}">
+												<td id="${assetEntityInstance?.id}" onclick="makeSelect(this,${assetEntityInstance?.id})" >
+													<g:select style="display:none;" from= "${projectTeamInstance?.teamCode}" name="assetTeamAssign_${assetEntityInstance?.id}" value="${assetEntityInstance?.sourceTeam?.teamCode}" id="${assetEntityInstance?.id}" value="${assetEntityInstance?.sourceTeam?.teamCode}" noSelection="['null':'Unassigned']" onChange="assetToTeamAssign(this.value,'${assetEntityInstance?.id}');"/>
+													<span id="span_${assetEntityInstance?.id}">${assetEntityInstance?.sourceTeam?.teamCode} </span>
+												</td>
+		                    				</g:if>
+		                    				<g:else >
+		                    					<td id="${assetEntityInstance?.id}" onclick="makeSelect(this,${assetEntityInstance?.id})" >
+													<g:select style="display:none;"  from= "${projectTeamInstance?.teamCode}" name="assetTeamAssign_${assetEntityInstance?.id}" value="${assetEntityInstance?.targetTeam?.teamCode}" id="${assetEntityInstance?.id}" noSelection="['null':'Unassigned']" onChange="assetToTeamAssign(this.value,'${assetEntityInstance?.id}');"/>
+													<span id="span_${assetEntityInstance?.id}">${assetEntityInstance?.targetTeam?.teamCode} </span>
+												</td>
+												<td><input size=5px; type=text name="assetCartAssign_${assetEntityInstance?.id}" id="${assetEntityInstance?.id}" value="${assetEntityInstance?.cart}" onblur="assetCartAssign(this,'${assetEntityInstance?.id}');"/></td>
+												<td><input size=5px; type=text name="assetShelfAssign_${assetEntityInstance?.id}" id="${assetEntityInstance?.id}" value="${assetEntityInstance?.shelf}" onblur="assetShelfAssign(this,'${assetEntityInstance?.id}');"/></td>
+											</g:else>
+		                  				</tr>
+		                  				<% row++;%>	
+		                			</g:each>
+		              		</tbody>
+		            	</table>
+		          	</div>
+		        </div>
+		      	</g:form>
+		      	</td>
+		  	</tr>
+			</table>
+	    </div>
+    </div>
+</body>
 </html>

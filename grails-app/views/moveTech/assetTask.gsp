@@ -74,9 +74,6 @@
         
 </head>
 <body>
-<%--  <div id="serverInfoDialog" title ="Server Info" onclick="$('#serverInfoDialog').dialog('close');setFocus()">			
-</div> 
---%>
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody" style="width: 100%;" >
 		<table border=0 cellpadding=0 cellspacing=0><tr>
@@ -146,7 +143,7 @@
 								</g:each>
                  				</tbody>
                 				</table>
-        					</div>
+        					</div></div>
       				</g:form>
   				</div>
 <script type="text/javascript" >setFocus();</script>

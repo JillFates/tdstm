@@ -104,16 +104,15 @@
     </script>
 </head>
 <body>
-<a name="top"></a>
-
-<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
-<div class="mainbody" style="border:0px solid #e7e7e7; width: 100%;">
-<div class="colum_techlogin" style="float:left;">
-	<table border=0 cellpadding=0 cellspacing=0><tr>
-		<td><g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt","fMess":"fMess"]' class="home" >Home</g:link></td>
-		<td><g:link action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo","fMess":"fMess"]' class="my_task">My Tasks</g:link></td>
-		<td><a href="#" class="asset_search_select">Asset</a></td>
-	</tr></table>
+	<a name="top"></a>
+	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
+	<div class="mainbody" style="border:0px solid #e7e7e7; width: 100%;">
+	<div class="colum_techlogin" style="float:left;">
+		<table border=0 cellpadding=0 cellspacing=0><tr>
+			<td><g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt","fMess":"fMess"]' class="home" >Home</g:link></td>
+			<td><g:link action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo","fMess":"fMess"]' class="my_task">My Tasks</g:link></td>
+			<td><a href="#" class="asset_search_select">Asset</a></td>
+		</tr></table>
 
 		<g:form name="assetSearchForm" action="placeHold">
 			<input name="bundle" type="hidden" value="${bundle}" />
@@ -135,25 +134,25 @@
 
 		<div class="clear" style="margin:2px;"></div>
 
-	<g:if test="${projMap}">			
-	<table>
-		<tr><td><dt>Asset Tag:</dt><dd><a href="#detail">&nbsp;${projMap?.asset?.assetTag}&nbsp;&nbsp;&nbsp;(Details)</a></dd></td></tr>
+		<g:if test="${projMap}">			
+		<table>
+			<tr><td><dt>Asset Tag:</dt><dd><a href="#detail">&nbsp;${projMap?.asset?.assetTag}&nbsp;&nbsp;&nbsp;(Details)</a></dd></td></tr>
 	
- 		<g:if test="${assetComment}">
-		<tr><td><table style="border:0px; width=100%">
+ 			<g:if test="${assetComment}">
+			<tr><td><table style="border:0px; width=100%">
 			<tr>
-			<td width="219px"><strong><u>Instructions</u></strong></td>
-			<td><strong><u>Confirm</u></strong></td>
+				<td style="width:219px"><strong><u>Instructions</u></strong></td>
+				<td><strong><u>Confirm</u></strong></td>
 			</tr>
 			<g:each status="i" in="${assetComment}" var="comments">
 				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 					<td>${comments.comment}</td>
-				<g:if test="${comments.mustVerify == 1}">
-					<td><g:checkBox name="myCheckbox" value="${false}" class="confirm_checkbox" /></td>
-				</g:if>
-				<g:else>
-					<td>&nbsp;</td>
-				</g:else>
+					<g:if test="${comments.mustVerify == 1}">
+						<td><g:checkBox name="myCheckbox" value="${false}" class="confirm_checkbox" /></td>
+					</g:if>
+					<g:else>
+						<td>&nbsp;</td>
+					</g:else>
 				</tr>
 			</g:each>
 			</g:if>
@@ -161,7 +160,9 @@
 			<tr>
 			<td colspan="2" style="text-align:center;"><input type="button" value="${label}" onclick="return unRack();" class="action_button"/></td>
 			</tr>
-		</table></td><tr>
+		</table>
+		</td>
+		</tr>
 		</g:if>
 	</table>
 	</g:if>
@@ -186,7 +187,8 @@
 			</td></tr>
 			<tr><td class="button_style" colspan=2 style="text-align:center;">
 				<input type="button" value="Place on HOLD" onclick="return doTransition('hold');" class="action_button_hold" />
-			</td></tr>	
+				</td>
+			</tr>	
 		</table>
 
 
@@ -195,7 +197,7 @@
 	 	<div>
 			<g:if test="${projMap}">
 
-			<div style="margin:2px;" class="reset" />
+			<div style="margin:2px;" class="reset" ></div>
 
 			<table width="100%">
 			<tr>

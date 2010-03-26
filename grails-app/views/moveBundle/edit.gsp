@@ -23,7 +23,7 @@
   </head>
   <body>
   <g:form method="post" >
-    <div class="body" style="width: 350px;">
+    <div class="body" style="width: auto;">
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
       </g:if>

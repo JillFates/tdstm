@@ -297,7 +297,7 @@
 					</tr>
 				</table>
 				</td>
-			</tr></table>
+			</tr></table></div></div>
 			<!-- <tr align="right"><td colspan="2" ><input type="button" value="Done"> </td> </tr> -->
 <script type="text/javascript">
 initialize()
