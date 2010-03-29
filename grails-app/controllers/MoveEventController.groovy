@@ -1,4 +1,9 @@
+import java.io.*
+import jxl.*
+import jxl.write.*
+import jxl.read.biff.*
 import grails.converters.JSON
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 
 class MoveEventController {
 	
@@ -135,5 +140,75 @@ class MoveEventController {
 			moveBundles = MoveBundle.findAllByProject( project )
 		}
     	render moveBundles as JSON
+    }
+        
+    /*---------------------------------------------------------
+     * Will export MoveEvent Transition time results data in XLS based on user input
+     * @author : lokanada Reddy
+     * @param  : moveEvent and reportType.
+     * @return : redirect to same page once data exported to Excel.
+     *-------------------------------------------------------*/
+	def getMoveResults = {
+    	def workbook
+		def book
+		def moveEvent = params.moveEvent
+		def reportType = params.reportType
+		if(moveEvent && reportType){
+			try {
+				def moveEventResults
+				File file 
+				if(reportType != "SUMMARY"){
+					file =  ApplicationHolder.application.parentContext.getResource( "/templates/MoveResults_Detailed.xls" ).getFile()
+				} else {
+					file =  ApplicationHolder.application.parentContext.getResource( "/templates/MoveResults_Summary.xls" ).getFile()	
+				}
+				
+				WorkbookSettings wbSetting = new WorkbookSettings()
+				wbSetting.setUseTemporaryFileDuringWrite(true)
+				workbook = Workbook.getWorkbook( file, wbSetting )
+				//set MIME TYPE as Excel
+				response.setContentType( "application/vnd.ms-excel" )
+				response.setHeader( "Content-Disposition", "attachment; filename= MoveResults_${params.reportType}" )
+				book = Workbook.createWorkbook( response.getOutputStream(), workbook )
+				def sheet = book.getSheet("Summary_results")
+				if(reportType != "SUMMARY"){
+					moveEventResults = moveBundleService.getMoveEventDetailedResults( moveEvent )
+					for ( int r = 1; r <= moveEventResults.size(); r++ ) {
+						sheet.addCell( new Label( 0, r, String.valueOf(moveEventResults[r-1].move_bundle_id )) )
+						sheet.addCell( new Label( 1, r, String.valueOf(moveEventResults[r-1].bundle_name )) )
+						sheet.addCell( new Label( 2, r, String.valueOf(moveEventResults[r-1].asset_id )) )
+						sheet.addCell( new Label( 3, r, String.valueOf(moveEventResults[r-1].asset_name )) )
+						sheet.addCell( new Label( 4, r, String.valueOf(moveEventResults[r-1].voided )) )
+						sheet.addCell( new Label( 5, r, String.valueOf(moveEventResults[r-1].from_name )) )
+						sheet.addCell( new Label( 6, r, String.valueOf(moveEventResults[r-1].to_name )) )
+						sheet.addCell( new Label( 7, r, String.valueOf(moveEventResults[r-1].transition_time )) )
+						sheet.addCell( new Label( 8, r, String.valueOf(moveEventResults[r-1].username )) )
+						sheet.addCell( new Label( 9, r, String.valueOf(moveEventResults[r-1].team_name )) )
+					}
+				} else {
+					moveEventResults = moveBundleService.getMoveEventSummaryResults( moveEvent )
+					for ( int r = 1; r <= moveEventResults.size(); r++ ) {
+						sheet.addCell( new Label( 0, r, String.valueOf(moveEventResults[r-1].move_bundle_id )) )
+						sheet.addCell( new Label( 1, r, String.valueOf(moveEventResults[r-1].bundle_name )) )
+						sheet.addCell( new Label( 2, r, String.valueOf(moveEventResults[r-1].state_to )) )
+						sheet.addCell( new Label( 3, r, String.valueOf(moveEventResults[r-1].name )) )
+						sheet.addCell( new Label( 4, r, String.valueOf(moveEventResults[r-1].started )) )
+						sheet.addCell( new Label( 5, r, String.valueOf(moveEventResults[r-1]. completed )) )
+					}	
+				}
+		            
+				book.write()
+				book.close()
+		        
+			} catch( Exception ex ) {
+				flash.message = "Exception occurred while exporting data"+
+				redirect( controller:'moveBundleAsset', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
+				return;
+			}	
+		} else {
+			flash.message = "Please select MoveEvent and report type. "
+			redirect( controller:'moveBundleAsset', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
+			return;
+		}
     }
 }

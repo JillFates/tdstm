@@ -619,6 +619,10 @@ class MoveBundleAssetController {
 					        			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, 
 											   browserTest: browserTest])
 								break;
+            case "MoveResults" :
+            					def moveEventInstanceList = MoveEvent.findAllByProject( projectInstance )
+								render( view:'moveResults', model:[moveEventInstanceList : moveEventInstanceList ])
+								break;
             default: 
 				            	render( view:'teamWorkSheets',
 				            			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])

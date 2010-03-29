@@ -145,4 +145,71 @@ class MoveBundleService {
 		 def stepSnapshot = StepSnapshot.executeUpdate("DELETE from StepSnapshot ss where ss.moveBundleStep = ?",[moveBundleStep]);
 		 moveBundleStep.delete();
 	 }
+	 /*-----------------------------------------------------
+	  * Return MoveEvent Detailed Results for given event.
+	  * @author : Lokanada Reddy
+	  * @param  : moveEventId
+	  * @return : MoveEvent Detailed Results 
+	  * --------------------------------------------------*/
+	 def getMoveEventDetailedResults(def moveEventId ){
+		 def detailedQuery = """SELECT 
+			   mb.move_bundle_id, 
+			   mb.name AS bundle_name,
+			   ae.asset_entity_id AS asset_id, ae.asset_name, 
+			   IF(atr.voided=1, "Y", "") AS voided,
+			   wtFrom.name AS from_name, wtTo.name AS to_name,
+			   atr.date_created AS transition_time, username, IF(team_code IS NULL, '', team_code) AS team_name
+			FROM move_event me
+			JOIN project p ON p.project_id = me.project_id
+			JOIN move_bundle mb ON mb.move_event_id = me.move_event_id 
+			JOIN asset_entity ae ON ae.move_bundle_id = mb.move_bundle_id
+			JOIN asset_transition atr ON atr.asset_entity_id = ae.asset_entity_id 
+			JOIN workflow_transition wtFrom ON wtFrom.trans_id = CAST(atr.state_from AS UNSIGNED INTEGER) AND wtFrom.process = p.workflow_code
+			JOIN workflow_transition wtTo ON wtTo.trans_id = CAST(atr.state_to AS UNSIGNED INTEGER) AND wtTo.process = p.workflow_code
+			JOIN user_login ul ON ul.user_login_id = atr.user_login_id
+			LEFT OUTER JOIN project_team pt ON pt.project_team_id = atr.project_team_id
+			WHERE me.move_event_id = ${moveEventId}
+			   AND atr.is_non_applicable = 0
+			ORDER BY move_bundle_id, asset_name, transition_time"""
+		def detailedResults = jdbcTemplate.queryForList(detailedQuery)
+		return detailedResults
+	 }
+	 /*-----------------------------------------------------
+	  * Return MoveEvent Summary Results for given event.
+	  * @author : Lokanada Reddy
+	  * @param  : moveEventId
+	  * @return : MoveEvent Summary Results 
+	  * --------------------------------------------------*/
+	 def getMoveEventSummaryResults( def moveEventId ){
+		 def createTemp = """CREATE TEMPORARY TABLE tmp_step_summary
+				SELECT mb.move_bundle_id,mb.name as bundle_name, atr.state_to, wt.name, NOW() AS started, NOW() AS completed
+				FROM move_event me
+				JOIN project p ON p.project_id = me.project_id
+				JOIN move_bundle mb ON mb.move_event_id = me.move_event_id 
+				JOIN asset_transition atr ON atr.move_bundle_id = mb.move_bundle_id AND atr.voided=0 
+				JOIN workflow_transition wt ON wt.trans_id = CAST(atr.state_to AS UNSIGNED INTEGER) AND wt.process = p.workflow_code
+				WHERE me.move_event_id = ${moveEventId}
+				GROUP BY mb.move_bundle_id, atr.state_to
+				ORDER BY CAST(state_to AS UNSIGNED INTEGER)"""
+		jdbcTemplate.execute(createTemp)
+		// UPDATE Start Time
+		def updateStartTime = """UPDATE tmp_step_summary
+									SET completed = (
+									   SELECT MAX(date_created) FROM asset_transition atr
+									   WHERE atr.move_bundle_id = tmp_step_summary.move_bundle_id AND atr.state_to = tmp_step_summary.state_to 
+									   and atr.voided = 0 AND is_non_applicable = 0)"""
+		jdbcTemplate.execute(updateStartTime)
+		// UPDATE Completion Time
+		def updateCompletionTime = """UPDATE tmp_step_summary
+									SET started = (
+									   SELECT MIN(date_created) FROM asset_transition atr
+									   WHERE atr.move_bundle_id = tmp_step_summary.move_bundle_id AND atr.state_to = tmp_step_summary.state_to 
+									   and atr.voided = 0 AND is_non_applicable = 0)"""
+		jdbcTemplate.execute(updateCompletionTime)
+		
+		def summaryResults = jdbcTemplate.queryForList( "SELECT * FROM tmp_step_summary" )
+
+		jdbcTemplate.execute( "DROP TEMPORARY TABLE IF EXISTS tmp_step_summary" )
+		return summaryResults;
+	 }
 }

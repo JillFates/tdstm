@@ -40,4 +40,18 @@ class MoveBundleServiceTests extends DatasourceTests {
 		
 		assertEquals false, moveBundleService.getAllDashboardSteps( moveBundle ).dashboardSteps.step.contains(['id':50, 'label':'Unracking', 'name':'Unracking'])
     }
+	
+	// method to test the MoveEvent Transition Times summary report details
+	void testgetMoveEventSummaryResults() {
+		moveBundleService.jdbcTemplate = jdbcTemplate
+		def summaryResults = moveBundleService.getMoveEventSummaryResults( 1 )
+		assetEquals 5,summaryResults.size()
+	}
+	
+	// method to test the MoveEvent Transition Times detailed report details
+	void testgetMoveEventDetailedResults() {
+		moveBundleService.jdbcTemplate = jdbcTemplate
+		def detailedResults = moveBundleService.getMoveEventDetailedResults( 1 )
+		assetEquals 16,detailedResults.size()
+	}
 }
