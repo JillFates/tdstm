@@ -168,9 +168,9 @@ class MoveEventController {
 				workbook = Workbook.getWorkbook( file, wbSetting )
 				//set MIME TYPE as Excel
 				response.setContentType( "application/vnd.ms-excel" )
-				response.setHeader( "Content-Disposition", "attachment; filename= MoveResults_${params.reportType}" )
+				response.setHeader( "Content-Disposition", "attachment; filename= MoveResults_${params.reportType}.xls" )
 				book = Workbook.createWorkbook( response.getOutputStream(), workbook )
-				def sheet = book.getSheet("Summary_results")
+				def sheet = book.getSheet("moveEvent_results")
 				if(reportType != "SUMMARY"){
 					moveEventResults = moveBundleService.getMoveEventDetailedResults( moveEvent )
 					for ( int r = 1; r <= moveEventResults.size(); r++ ) {
