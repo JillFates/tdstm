@@ -73,8 +73,9 @@
                     $(document).ready(function(){
                       $("#startTime").datetimepicker();
                     });
-                  </script> <input type="text" class="dateRange" size="15" readOnly style="width: 130px; height: 14px;" id="startTime" name="startTime"
-        					value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"/>"/>
+                  </script> <input type="text" class="dateRange" size="15" style="width: 130px; height: 14px;" id="startTime" name="startTime"
+        					value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"/>" 
+        					onchange="isValidDate(this.value)"/>
         					<g:hasErrors bean="${moveBundleInstance}" field="startTime">
                     		<div class="errors">
                       			<g:renderErrors bean="${moveBundleInstance}" as="list" field="startTime"/>
@@ -92,9 +93,9 @@
                     $(document).ready(function(){
                       $("#completionTime").datetimepicker();
                     });
-                  </script> <input type="text" class="dateRange" size="15" readOnly
-				        style="width: 130px; height: 14px;" id="completionTime" name="completionTime"
-				        value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}"/>" />
+                  </script> <input type="text" class="dateRange" size="15" style="width: 130px; height: 14px;" id="completionTime" name="completionTime"
+				        value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}"/>" 
+				        onchange="isValidDate(this.value)"/>
 				        <g:hasErrors bean="${moveBundleInstance}" field="completionTime">
 				                    <div class="errors">
 				                      <g:renderErrors bean="${moveBundleInstance}" as="list" field="completionTime"/>
@@ -398,9 +399,11 @@
     }
     function getTimeFormate( objId, dateString, stepId )
 	{
-    	var date= new Date(dateString)
-		$("#"+objId).val(convertDate( date ))
-	   	calculateDuration(stepId);
+    	if(dateString && isValidDate(dateString)){
+	    	var date= new Date(dateString)
+			$("#"+objId).val(convertDate( date ))
+		   	calculateDuration(stepId);
+    	}
 	   
 	}
 	function convertDate( date ){
@@ -415,6 +418,8 @@
 			var hour   = date.getHours();
 			var minute = date.getMinutes();
 			var second = date.getSeconds();
+			if(month < 10 ){ month = "0"+ month }
+			if(monthday < 10 ){ monthday = "0"+ monthday }
 			var ap = "AM";
 			if (hour   > 11) { ap = "PM";             }
 			if (hour   > 12) { hour = hour - 12;      }
@@ -422,23 +427,33 @@
 			if (hour   < 10) { hour   = "0" + hour;   }
 			if (minute < 10) { minute = "0" + minute; }
 			if (second < 10) { second = "0" + second; }
+			
 			var timeString = month+"/"+monthday+"/"+year+" "+hour + ':' + minute + ' ' + ap;
 		}
 		return timeString
 	}
+	var objRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2}$/;
     function validateStepsData(){
         var checked = true
         var keyOffStep = ""
+		var message = ""
         var uncheckedSteps = new Array()
     	$("input[type='checkbox']").each(function(){
     		  var id = $(this).attr("id")
 	    	  if($(this).is(':checked') ){
 		    	  var stepId = id.substring(9,id.length)
 		    	  var dashboardLabel = $("#dashboardLabel_"+stepId).val()
-		    	  if( !$("#dashboardLabel_"+stepId).val() || !$("#startTime_"+stepId).val() || !$("#completionTime_"+stepId).val()){
+		    	  var startTime = $("#startTime_"+stepId).val();
+		    	  var completionTime = $("#completionTime_"+stepId).val()
+		    	  if( !$("#dashboardLabel_"+stepId).val() || !startTime || !completionTime ){
 						keyOffStep += "'"+$("#keyOffStep_"+stepId).val() +"', ";
 				    	checked =  false;
+				    	message ="Dashboard Label, Start & Completion times are mandatory"
 				    	
+		    	  } else if( !objRegExp.test( startTime.substring(0,startTime.length-3) ) || !objRegExp.test( completionTime.substring(0,completionTime.length-3) ) ) {
+		    		  keyOffStep += "'"+$("#keyOffStep_"+stepId).val() +"', ";
+				      checked =  false;
+				      message = "Date should be in 'mm/dd/yyyy hh:mm' format "
 		    	  }
 	    	  } else {
 	    		  uncheckedSteps.push(id.substring(id.indexOf("_")+1,id.length))
@@ -446,7 +461,7 @@
     	});
     	
     	if( !checked ){
-    		alert("Dashboard Label, Start & Completion times are mandatory for selected key off steps "+keyOffStep.substring(0,keyOffStep.length - 2));
+    		alert(message+" for selected key off steps "+keyOffStep.substring(0,keyOffStep.length - 2));
 	    	return checked;
     	} else {
     		return checkForProgressSteps(uncheckedSteps);
@@ -467,8 +482,29 @@
     		    }
     		 }
     	});
-    	return checked;
+    	if( !checked ){
+    		return checked;
+    	} else {
+    		return validateDates();
+    	}
     }
+    function isValidDate( date ){
+        var returnVal = true;
+      	if( !objRegExp.test(date) ){
+          	alert("Date should be in 'mm/dd/yyyy HH:MM' format");
+          	returnVal  =  false;
+      	} 
+      	return returnVal;
+	}
+    function validateDates(){
+    	var returnval = false
+        var startTime = $("#startTime").val();
+        var completionTime = $("#completionTime").val();
+        if(isValidDate(startTime) && isValidDate(completionTime)){
+        	returnval = true;
+		} 
+		return returnval;
+	}
 	</script>
   </body>
 </html>

@@ -10,7 +10,7 @@
 
     <jq:plugin name="ui.datetimepicker"/>
 
-    <g:javascript>
+    <script type="text/javascript">
       function initialize(){
 
       // This is called when the page loads to initialize Managers
@@ -18,7 +18,25 @@
       $('#projectManagerId').val('${projectManager}')
 
       }
-    </g:javascript>
+      function isValidDate( date ){
+        var returnVal = true;
+      	var objRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2}$/;
+      	if( date && !objRegExp.test(date) ){
+          	alert("Date should be in 'mm/dd/yyyy HH:MM' format");
+          	returnVal  =  false;
+      	} 
+      	return returnVal;
+      }
+      function validateDates(){
+          var returnval = false
+          var startTime = $("#startTime").val();
+          var completionTime = $("#completionTime").val();
+          if(isValidDate(startTime) && isValidDate(completionTime)){
+        	  returnval = true;
+          } 
+          return returnval;
+      }
+    </script>
   </head>
   <body>
    
@@ -72,9 +90,9 @@
                     $(document).ready(function(){
                       $("#startTime").datetimepicker();
                     });
-                  </script> <input type="text" class="dateRange" size="15" readOnly
-                                   style="width: 112px; height: 14px;" id="startTime" name="startTime"
-                                   value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"/>" />
+                  </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" id="startTime" name="startTime"
+                                   value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"/> assdfs" 
+                                   onchange="isValidDate(this.value)"/>
                                    <g:hasErrors bean="${moveBundleInstance}" field="startTime">
                     <div class="errors">
                       <g:renderErrors bean="${moveBundleInstance}" as="list" field="startTime"/>
@@ -92,9 +110,9 @@
                     $(document).ready(function(){
                       $("#completionTime").datetimepicker();
                     });
-                  </script> <input type="text" class="dateRange" size="15" readOnly
-                                   style="width: 112px; height: 14px;" id="completionTime" name="completionTime"
-                                   value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}"/>" />
+                  </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" id="completionTime" name="completionTime"
+                                   value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}"/>" 
+                                   onchange="isValidDate(this.value)"/>
                                    <g:hasErrors bean="${moveBundleInstance}" field="completionTime">
                     <div class="errors">
                       <g:renderErrors bean="${moveBundleInstance}" as="list" field="completionTime"/>
@@ -151,7 +169,7 @@
         <div class="buttons">
           <input type="hidden"  name="project.id" value="${projectId}"/>
           <input type="hidden"  name="projectId" value="${projectId}"/>
-          <span class="button"><input class="save" type="submit" value="Create" /></span>
+          <span class="button"><input class="save" type="submit" value="Create" onclick="return validateDates()"/></span>
         </div>
       </g:form>
       <g:javascript>

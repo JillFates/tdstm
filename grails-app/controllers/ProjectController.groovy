@@ -50,6 +50,60 @@ class ProjectController {
         	}
         	session.setAttribute("setImage",imageId) 
         	def projectLogoForProject = ProjectLogo.findByProject(projectInstance)
+        	//def projectClient = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_CLIENT' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'CLIENT' ")
+        	def projectPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ")
+        	def projectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
+        	def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
+
+        	return [ projectInstance : projectInstance, projectPartner:projectPartner, 
+					 projectManager:projectManager, moveManager:moveManager, 
+					 projectLogoForProject:projectLogoForProject ]
+        }
+    }
+
+    def delete = {
+    	
+    	def currProj = session.getAttribute("CURR_PROJ").CURR_PROJ;
+        if(currProj != params.id){
+        	def projectInstance = Project.get( params.id )
+	        if(projectInstance) {
+	            projectInstance.delete()
+	            flash.message = "Project ${projectInstance} deleted"
+	            redirect(action:list)
+	        }
+	        else {
+	            flash.message = "Project not found with id ${params.id}"
+	            redirect(action:list)
+	        }
+        } else {
+            flash.message = "Unable to Delete the Current Project"
+            redirect(action:list)
+        }
+    }
+
+    def edit = {
+        def projectInstance = Project.get( params.id )
+
+        if(!projectInstance) {
+            flash.message = "Project not found with id ${params.id}"
+            redirect(action:list)
+        }
+        else { 
+        	def currProj = session.getAttribute("CURR_PROJ");
+        	def currProjectInstance = Project.get( currProj.CURR_PROJ )
+        	def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
+    		def userCompany = partyRelationshipService.getSatffCompany( loginUser.person )
+    		request.getSession(false).setAttribute("PARTYGROUP",userCompany?.partyIdFrom)
+        	def projectLogo
+        	if(currProjectInstance){
+        		projectLogo = ProjectLogo.findByProject(currProjectInstance)
+        	}
+        	def imageId
+        	if(projectLogo){
+        		imageId = projectLogo.id
+        	}
+        	session.setAttribute("setImage",imageId) 
+        	def projectLogoForProject = ProjectLogo.findByProject(projectInstance)
         	def partnerStaff
         	def projectCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_COMPANY' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'COMPANY' ")
         	//def projectClient = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_CLIENT' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'CLIENT' ")
@@ -84,38 +138,6 @@ class ProjectController {
         	clientStaff.each{staff->
         	}
         	return [ projectInstance : projectInstance, projectPartner:projectPartner, projectManager:projectManager, moveManager:moveManager, companyStaff:companyStaff, clientStaff:clientStaff, partnerStaff:partnerStaff, companyPartners:companyPartners,projectLogoForProject:projectLogoForProject ]
-        }
-    }
-
-    def delete = {
-    	
-    	def currProj = session.getAttribute("CURR_PROJ").CURR_PROJ;
-        if(currProj != params.id){
-        	def projectInstance = Project.get( params.id )
-	        if(projectInstance) {
-	            projectInstance.delete()
-	            flash.message = "Project ${projectInstance} deleted"
-	            redirect(action:list)
-	        }
-	        else {
-	            flash.message = "Project not found with id ${params.id}"
-	            redirect(action:list)
-	        }
-        } else {
-            flash.message = "Unable to Delete the Current Project"
-            redirect(action:list)
-        }
-    }
-
-    def edit = {
-        def projectInstance = Project.get( params.id )
-
-        if(!projectInstance) {
-            flash.message = "Project not found with id ${params.id}"
-            redirect(action:list)
-        }
-        else {
-            return [ projectInstance : projectInstance ]
         }
     }
     /*
@@ -297,7 +319,7 @@ class ProjectController {
             }
             else {
             	flash.message = "Project ${projectInstance} not updated"
-                redirect(action:list )
+            	redirect( action:edit, id:params.id )
             }
         } else {
             flash.message = "Project not found with id ${params.id}"

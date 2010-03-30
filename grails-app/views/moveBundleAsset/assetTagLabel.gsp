@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<title>Login Badges </title>
+<title>Asset Tags </title>
 
 <script type="text/javascript">
 //=============================================================================

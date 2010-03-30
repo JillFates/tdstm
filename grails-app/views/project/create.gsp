@@ -8,7 +8,7 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
 
 <script type="text/javascript">
-
+	
       function updateMastersList(e){
       // The response comes back as a bunch-o-JSON
 	
@@ -192,6 +192,24 @@
     		completionDateObj.value = startDate;
     	}
       }
+      var dateRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d$/;
+      function isValidDate( date ){
+          var returnVal = true;
+        	if( date && !dateRegExp.test(date) ){
+            	alert("Date should be in 'mm/dd/yyyy' format");
+            	returnVal  =  false;
+        	} 
+        	return returnVal;
+        }
+        function validateDates(){
+            var returnval = false
+            var startDateId = $("#startDateId").val();
+            var completionDateId = $("#completionDateId").val();
+            if(isValidDate(startDateId) && isValidDate(completionDateId)){
+          	  returnval = true;
+            } 
+            return returnval;
+        }
     </script>
 <%
 	def currProj = session.getAttribute("CURR_PROJ");
@@ -289,8 +307,8 @@
 					class="value ${hasErrors(bean:projectInstance,field:'startDate','errors')}">
 				<script type="text/javascript" charset="utf-8">
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-                  </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="startDate"
-					value="<tds:convertDate date="${projectInstance?.startDate}"/>" onchange="setCompletionDate(this.value)"/> 
+                  </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="startDate" id="startDateId"
+					value="<tds:convertDate date="${projectInstance?.startDate}"/>" onchange="setCompletionDate(this.value);isValidDate(this.value);"/> 
 					<!--  <g:datePicker name="startDate" value="${projectInstance?.startDate}"
        noSelection="['':'']"></g:datePicker> -->
        			<g:hasErrors bean="${projectInstance}" field="startDate">
@@ -308,10 +326,8 @@
 					class="value ${hasErrors(bean:projectInstance,field:'completionDate','errors')}">
 				<script type="text/javascript" charset="utf-8">
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-                  </script> <input type="text" class="dateRange" size="15"
-					style="width: 112px; height: 14px;" id="completionDateId"
-					name="completionDate"
-					value="<tds:convertDate date="${projectInstance?.completionDate}"/>" />
+                  </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" id="completionDateId"	name="completionDate"
+					value="<tds:convertDate date="${projectInstance?.completionDate}"/>" onchange="isValidDate(this.value);"/>
 				<!--  <g:datePicker name="completionDate"
                     value="${projectInstance?.completionDate}" noSelection="['':'']"></g:datePicker> -->
 				<g:hasErrors bean="${projectInstance}" field="completionDate">
@@ -403,7 +419,7 @@
 	</div>
 	<div class="buttons">
 		<span class="button">
-			<input class="save" type="submit" value="Create" />
+			<input class="save" type="submit" value="Create" onclick="return validateDates();"/>
 		</span> 
 		<span class="button">
 			<input type="button" class="delete" value="Cancel" 
