@@ -23,7 +23,7 @@
   </head>
   <body>
   <g:form method="post" >
-    <div class="body" style="width: auto;">
+    <div class="body" style="width: 350px;">
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
       </g:if>
@@ -385,8 +385,9 @@
 	    	return timeFormate
     }
     function changeCompletionTime(time, stepId){
-        var hours = time.substring(0,2)
-        var min = time.substring(3,5)
+        var timeArr = time.split(":")
+        var hours = timeArr[0]
+        var min = timeArr[1]
         if(hours  && min){
             var ms = (3600000 * hours )+ (60000 * min)
         }
@@ -400,8 +401,8 @@
     function getTimeFormate( objId, dateString, stepId )
 	{
     	if(dateString && isValidDate(dateString)){
-	    	var date= new Date(dateString)
-			$("#"+objId).val(convertDate( date ))
+	    	//var date= new Date(dateString)
+			//$("#"+objId).val(convertDate( date ))
 		   	calculateDuration(stepId);
     	}
 	   
@@ -413,22 +414,18 @@
 		if( !isNaN(month) ){
 			month = month + 1
 			var monthday    = date.getDate();
-			var year        = date.getYear() + 1900;
+			var year        = date.getFullYear();
 			
 			var hour   = date.getHours();
 			var minute = date.getMinutes();
 			var second = date.getSeconds();
 			if(month < 10 ){ month = "0"+ month }
 			if(monthday < 10 ){ monthday = "0"+ monthday }
-			var ap = "AM";
-			if (hour   > 11) { ap = "PM";             }
-			if (hour   > 12) { hour = hour - 12;      }
-			if (hour   == 0) { hour = 12;             }
 			if (hour   < 10) { hour   = "0" + hour;   }
 			if (minute < 10) { minute = "0" + minute; }
 			if (second < 10) { second = "0" + second; }
 			
-			var timeString = month+"/"+monthday+"/"+year+" "+hour + ':' + minute + ' ' + ap;
+			var timeString = month+"/"+monthday+"/"+year+" "+hour + ':' + minute ;
 		}
 		return timeString
 	}
@@ -450,7 +447,7 @@
 				    	checked =  false;
 				    	message ="Dashboard Label, Start & Completion times are mandatory"
 				    	
-		    	  } else if( !objRegExp.test( startTime.substring(0,startTime.length-3) ) || !objRegExp.test( completionTime.substring(0,completionTime.length-3) ) ) {
+		    	  } else if( !objRegExp.test( startTime ) || !objRegExp.test( completionTime ) ) {
 		    		  keyOffStep += "'"+$("#keyOffStep_"+stepId).val() +"', ";
 				      checked =  false;
 				      message = "Date should be in 'mm/dd/yyyy hh:mm' format "
@@ -490,7 +487,7 @@
     }
     function isValidDate( date ){
         var returnVal = true;
-      	if( !objRegExp.test(date) ){
+      	if( date && !objRegExp.test(date) ){
           	alert("Date should be in 'mm/dd/yyyy HH:MM' format");
           	returnVal  =  false;
       	} 
