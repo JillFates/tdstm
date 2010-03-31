@@ -432,7 +432,7 @@
 		        type:"GET",
 		        url:"../ws/dashboard/bundleData/"+ bundleId+"?moveEventId="+moveEvent,
 		        dataType: 'json',
-		        success:updateMoveBundleSteps,
+		        success:updateMoveBundleSteps
 			});
 	 }
 
