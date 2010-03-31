@@ -19,7 +19,7 @@
 	<jq:plugin name="ui.core" />
 </head>
 
-<body class="sum_statusbar_good" onLoad="getMoveEventNewsDetails($('#moveEvent').val())">
+<body class="sum_statusbar_good" onload="getMoveEventNewsDetails($('#moveEvent').val())">
 <div id="doc">
 	<div id="container">
 	<!--Header Starts here-->
@@ -282,7 +282,7 @@
 		        type:"GET",
 		        url:"../ws/moveEventNews/"+moveEvent+"?type="+$("#typeId").val()+"&state="+$("#stateId").val()+"&maxLen="+$("#maxLenId").val()+"&sort="+$("#sortId").val(),
 		        dataType: 'json',
-		        success:updateMoveEventNews,
+		        success:updateMoveEventNews
 			});
 		}
 	}
