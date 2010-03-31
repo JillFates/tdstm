@@ -292,8 +292,8 @@
 		var newsLength = news.length;
 		var live = "";
 		var archived = "";
-		var scrollText = " "
-			var myDate = new Date();
+		var scrollText = " ";
+		var myDate = new Date();
 		for( i = 0; i< newsLength; i++){
 			var state = news[i].state;
 			if(state == "A"){
@@ -360,10 +360,10 @@
 	    var tsource;
 	    var tsource1;
 	    var tsource2;
-	    var temp
+	    var temp;
 	    
 	    if (p == ")"){
-			tsource = source.substring(0,source.length).split("(");
+		tsource = source.substring(0,source.length).split("(");
 	        tsource1 = tsource[0];            
 	        tsource1 = tsource1.substring(0,tsource1.length-2);
 	        temp = tsource1;
@@ -372,7 +372,7 @@
 		} else {
 	    	temp = trimAll(source);
 		}       
-		date = new Date(temp)
+		date = new Date(temp);
 		utcDate = date.getTime() ;
 	    convertedDate = new Date(utcDate + (3600000*offset));                               
 	    return getTimeFormate( convertedDate )
@@ -384,7 +384,7 @@
 		var month =  date.getMonth();
 		
 		if( !isNaN(month) ){
-		   month = month + 1
+		   month = month + 1;
 		   var monthday    = date.getDate();
 		   var year        = date.getYear() + 1900;
 		   
