@@ -26,7 +26,7 @@ log.debug "offsetTZ=${offsetTZ}"
 						DATE_FORMAT( ADDDATE( mbs.plan_start_time , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as planStart,
 						DATE_FORMAT( ADDDATE( mbs.plan_completion_time , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as planComp,
 						DATE_FORMAT( ADDDATE( mbs.actual_start_time , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as actStart,
-						DATE_FORMAT( ADDDATE( mbs.actual_completion_time , INTERVAL ${offsetTZ} HOUR),'%Y/%i/%d %r') as actComp,
+						DATE_FORMAT( ADDDATE( mbs.actual_completion_time , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as actComp,
 						DATE_FORMAT( ADDDATE( ss.date_created , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as dateCreated,
 						ss.tasks_count as tskTot, ss.tasks_completed as tskComp, ss.dial_indicator as dialInd 
 					FROM move_bundle mb
