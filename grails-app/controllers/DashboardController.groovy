@@ -21,21 +21,25 @@ class DashboardController {
 		moveEventsList = MoveEvent.findAllByProject(project)
 		projectLogo = ProjectLogo.findByProject(project)
 		def moveEventId = params.moveEvent
-		if(!moveEventId){
-			moveEventId = getSession().getAttribute( "MOVE_EVENT" )?.MOVE_EVENT
-		}
+		
 		if(moveEventId){
-			moveEvent = MoveEvent.get(moveEventId)
-			userPreferenceService.setPreference("MOVE_EVENT",moveEventId)
-		} else if(moveEventsList){
-			moveEvent = moveEventsList?.get(0)
-		}
-        userPreferenceService.loadPreferences("MOVE_EVENT")
-		if( !moveEvent && moveEventsList){
-			userPreferenceService.setPreference("MOVE_EVENT","${moveEventsList[0].id}")
-			moveEvent = "${moveEventsList[0].id}"
-		}
+			userPreferenceService.setPreference( "MOVE_EVENT", "${moveEventId}" )
+            moveEvent = MoveEvent.findById(moveEventId)
+		} else {
+            userPreferenceService.loadPreferences("MOVE_EVENT")
+            def defaultEvent = getSession().getAttribute("MOVE_EVENT")
+            if(defaultEvent.MOVE_EVENT){
+            	moveEvent = MoveEvent.findById(defaultEvent.MOVE_EVENT)
+            	if( moveEvent.project.id != Integer.parseInt(projectId) ){
+            		moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
+            	}
+            } else {
+            	moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
+            }
+        }
+		
         if( moveEvent ){
+        	userPreferenceService.setPreference("MOVE_EVENT","${moveEventsList[0].id}")
 			moveBundleList = MoveBundle.findAll(" FROM MoveBundle mb where moveEvent = ${moveEvent.id} ORDER BY mb.startTime ")				
 		}
 		return [ moveEventsList : moveEventsList, moveEvent : moveEvent, project : project, 
