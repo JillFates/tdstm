@@ -34,7 +34,7 @@ overflow: hidden;
 	id="asset" /> <input type="hidden" name="projectId" id="projectId"
 	value="${projectId}" />
 	<input type="hidden" name="moveBundle" id="moveBundle"
-	value="${moveBundleInstance.id}" />
+	value="${moveBundleInstance?.id}" />
 <table style="border: 0px; width: 100%">
 	<tr>
 		<td width="40%"><strong>Change status for selected
@@ -68,16 +68,26 @@ overflow: hidden;
 	<input type="hidden" id="projectId" name="projectId" value="${projectId }" />
 	<table style="border: 0px;">
 		<tr>
-			<td valign="top" class="name"><label for="moveBundle">Move
-		Bundle:</label>&nbsp;<select id="moveBundleId"
-			name="moveBundle" onchange="document.listForm.submit()" >	
-
+			<td>
+			<span style="padding-left: 10px;">
+					<label for="moveEvent"><b>Move Event:</b></label>&nbsp;
+						<select id="moveEventId" name="moveEvent" onchange="$('#moveBundleId').val('');document.listForm.submit()">
+							<g:each status="i" in="${moveEventsList}" var="moveEventInstance">
+								<option value="${moveEventInstance?.id}">${moveEventInstance?.name}</option>
+							</g:each>
+						</select>
+					</span>
+			<span>
+			<label for="moveBundle"><b>Move Bundle:</b></label>&nbsp;
+			<select id="moveBundleId" name="moveBundle" onchange="document.listForm.submit()" >
+				<option value="">All</option>	
 			<g:each status="i" in="${moveBundleInstanceList}"
 				var="moveBundleInstance">
 				<option value="${moveBundleInstance?.id}">${moveBundleInstance?.name}</option>
 			</g:each>
 
-		</select></td>
+			</select></span>
+			</td>
 			<td><h1 align="center">PMO Asset Tracking</h1></td>
 			<td style="text-align: right;">
 			<input type="hidden" name="last_refresh" value="${new Date()}"/>
@@ -538,7 +548,7 @@ Comment</a></span></div>
 	<div class="buttons">
 	<input type="hidden" name="id" value="" />
 	<input type="hidden" name="projectId" value="${projectId}" />
-	<input type="hidden" name="moveBundle" value="${moveBundleInstance.id}" />
+	<input type="hidden" name="moveBundle" value="${moveBundleInstance?.id}" />
 	<input type="hidden" name="clientList" value="clientList" />
 	 <span class="button"><input
 		type="button" class="edit" value="Edit"
@@ -556,7 +566,7 @@ Comment</a></span></div>
 <g:form method="post" name="editForm" controller="assetEntity">
 	<input type="hidden" name="id" value="" />
 	<input type="hidden" name="projectId" value="${projectId}" />
-	<input type="hidden" name="moveBundle" value="${moveBundleInstance.id}" />	
+	<input type="hidden" name="moveBundle" value="${moveBundleInstance?.id}" />	
 	<input type="hidden" name="clientList" value="clientList" />
 	<div class="dialog" id="editDiv">
 	
@@ -597,8 +607,9 @@ if('${browserTest}' == 'true'){
 function initialize(){
 	window.onresize=pageReload;
 	window.onload=cancelResize;
-	var bundleId = ${moveBundleInstance.id}; 
-	$("#moveBundleId").val(bundleId);
+	
+	$("#moveBundleId").val(${moveBundleInstance?.id});
+	$("#moveEventId").val(${moveEventInstance?.id});
 	$("#appSmeId").val("${appSmeValue}");
 	$("#appOwnerId").val("${appOwnerValue}");
 	$("#applicationId").val("${appValue}");
@@ -820,12 +831,13 @@ var fieldId
 	}
 	
 	function doAjaxCall(){
+		var moveEvent = $("#moveEventId").val();
 		var moveBundle = $("#moveBundleId").val();
 		var application = $("#applicationId").val();
 		var appOwner = $("#appOwnerId").val();
 		var appSme = $("#appSmeId").val();
 		var lastPoolTime = $("#lastPoolTimeId").val();
-		${remoteFunction(action:'getTransitions', params:'\'moveBundle=\' + moveBundle +\'&application=\'+application +\'&appOwner=\'+appOwner+\'&appSme=\'+appSme +\'&lastPoolTime=\'+lastPoolTime', onComplete:'updateTransitions(e);' )}
+		${remoteFunction(action:'getTransitions', params:'\'moveBundle=\' + moveBundle +\'&moveEvent=\'+moveEvent +\'&application=\'+application +\'&appOwner=\'+appOwner+\'&appSme=\'+appSme +\'&lastPoolTime=\'+lastPoolTime', onComplete:'updateTransitions(e);' )}
 		timedRefresh($("#selectTimedId").val())
 	}
 	

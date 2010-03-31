@@ -91,7 +91,7 @@
                       $("#startTime").datetimepicker();
                     });
                   </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" id="startTime" name="startTime"
-                                   value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"/> assdfs" 
+                                   value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"/>" 
                                    onchange="isValidDate(this.value)"/>
                                    <g:hasErrors bean="${moveBundleInstance}" field="startTime">
                     <div class="errors">

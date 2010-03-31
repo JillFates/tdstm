@@ -20,7 +20,9 @@ class ClientConsoleController {
     	def browserTest = request.getHeader("User-Agent").contains("MSIE")
         def projectId=params.projectId
         def bundleId = params.moveBundle
+		def moveEventId = params.moveEvent
         def moveBundleInstance
+		def moveEventInstance
 		//def projectMap
         def stateVal
         def taskVal
@@ -31,72 +33,88 @@ class ClientConsoleController {
         def sortby = params.sort
         def order = params.order
         def projectInstance = Project.findById( projectId )
-        def moveBundleInstanceList = MoveBundle.findAll("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
-        if(bundleId){
-        	userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
-            moveBundleInstance = MoveBundle.findById(bundleId)
-        } else {
-            userPreferenceService.loadPreferences("CURR_BUNDLE")
-            def defaultBundle = getSession().getAttribute("CURR_BUNDLE")
-            if(defaultBundle.CURR_BUNDLE){
-            	moveBundleInstance = MoveBundle.findById(defaultBundle.CURR_BUNDLE)
-            	if( moveBundleInstance.project.id != Integer.parseInt(projectId) ){
-            		moveBundleInstance = MoveBundle.find("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
+		def moveEventsList = MoveEvent.findAll("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
+		if(moveEventId){
+			userPreferenceService.setPreference( "MOVE_EVENT", "${moveEventId}" )
+            moveEventInstance = MoveEvent.findById(moveEventId)
+		} else {
+            userPreferenceService.loadPreferences("MOVE_EVENT")
+            def defaultEvent = getSession().getAttribute("MOVE_EVENT")
+            if(defaultEvent.MOVE_EVENT){
+            	moveEventInstance = MoveEvent.findById(defaultEvent.MOVE_EVENT)
+            	if( moveEventInstance.project.id != Integer.parseInt(projectId) ){
+            		moveEventInstance = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
             	}
             } else {
-            	moveBundleInstance = MoveBundle.find("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
+            	moveEventInstance = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
             }
         }
-    	if(moveBundleInstance != null){
-			def applicationList=AssetEntity.executeQuery("select distinct ae.application , count(ae.id) from AssetEntity "+
-															"ae where  ae.moveBundle=${moveBundleInstance.id} "+
-															"group by ae.application order by ae.application")
-			def appOwnerList=AssetEntity.executeQuery("select distinct ae.appOwner, count(ae.id) from AssetEntity ae where "+
-														"ae.moveBundle=${moveBundleInstance.id} group by ae.appOwner order by ae.appOwner")
-			def appSmeList=AssetEntity.executeQuery("select distinct ae.appSme, count(ae.id) from AssetEntity ae where "+
-														" ae.moveBundle=${moveBundleInstance.id} group by ae.appSme order by ae.appSme")
-			def query = new StringBuffer("select ae.asset_entity_id as id,ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,"+
-											"ae.asset_name as assetName,max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate "+
-											" FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id and at.voided = 0 and at.type='process') "+
-											"where ae.project_id = $projectId and ae.move_bundle_id = ${moveBundleInstance.id}")
-			if(appValue!="" && appValue!= null){
-				if(appValue == 'blank'){
-					query.append(" and ae.application = '' ")
-				} else {
-					def app = appValue.replace("'","\\'")
-					query.append(" and ae.application ='$app'")
+    	
+    	if( moveEventInstance ){
+    		def bundles
+    		def moveBundleInstanceList = MoveBundle.findAll("from MoveBundle mb where mb.moveEvent = ? order by mb.name asc",[moveEventInstance])
+	        if( bundleId ){
+	        	userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
+	            moveBundleInstance = MoveBundle.findById(bundleId)
+				bundles = "("+bundleId+")"
+	        } else if(moveBundleInstanceList.size() > 0){
+	        	bundles = (moveBundleInstanceList.id).toString().replace("[","(").replace("]",")")
+	        }
+    		def resultList
+    		def applicationList
+			def appOwnerList
+			def appSmeList
+			if(bundles){
+				applicationList=AssetEntity.executeQuery("select distinct ae.application , count(ae.id) from AssetEntity "+
+																"ae where  ae.moveBundle in ${bundles} "+
+																"group by ae.application order by ae.application")
+				appOwnerList=AssetEntity.executeQuery("select distinct ae.appOwner, count(ae.id) from AssetEntity ae where "+
+															"ae.moveBundle in ${bundles} group by ae.appOwner order by ae.appOwner")
+				appSmeList=AssetEntity.executeQuery("select distinct ae.appSme, count(ae.id) from AssetEntity ae where "+
+															" ae.moveBundle in ${bundles} group by ae.appSme order by ae.appSme")
+				def query = new StringBuffer("select ae.asset_entity_id as id,ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,"+
+												"ae.asset_name as assetName,max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate "+
+												" FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id and at.voided = 0 and at.type='process') "+
+												"where ae.project_id = $projectId and ae.move_bundle_id  in ${bundles}")
+				if(appValue!="" && appValue!= null){
+					if(appValue == 'blank'){
+						query.append(" and ae.application = '' ")
+					} else {
+						def app = appValue.replace("'","\\'")
+						query.append(" and ae.application ='$app'")
+					}
 				}
-			}
-			if(appOwnerValue!="" && appOwnerValue!= null){
-				if(appOwnerValue == 'blank'){
-					query.append(" and ae.app_owner = '' ")
-				} else {
-					def owner = appOwnerValue.replace("'","\\'")
-					query.append(" and ae.app_owner='$owner'")
+				if(appOwnerValue!="" && appOwnerValue!= null){
+					if(appOwnerValue == 'blank'){
+						query.append(" and ae.app_owner = '' ")
+					} else {
+						def owner = appOwnerValue.replace("'","\\'")
+						query.append(" and ae.app_owner='$owner'")
+					}
+					
 				}
-				
-			}
-			if(appSmeValue!="" && appSmeValue!= null){
-				if(appSmeValue == 'blank'){
-					query.append(" and ae.app_sme = '' ")
-				} else {
-					def sme = appSmeValue.toString().replace("'","\\'")
-					query.append(" and ae.app_sme='$sme'")
+				if(appSmeValue!="" && appSmeValue!= null){
+					if(appSmeValue == 'blank'){
+						query.append(" and ae.app_sme = '' ")
+					} else {
+						def sme = appSmeValue.toString().replace("'","\\'")
+						query.append(" and ae.app_sme='$sme'")
+					}
 				}
+				query.append(" GROUP BY ae.asset_entity_id")
+	        
+				if(sortby != "" && sortby != null){
+					query.append(" order by $sortby")
+				}else {
+					query.append(" order by ae.application, ae.asset_name")
+				}
+				if(order != "" && order != null){
+					query.append(" $order ")
+				}else {
+					query.append(" asc ")
+				}
+				resultList=jdbcTemplate.queryForList(query.toString())
 			}
-			query.append(" GROUP BY ae.asset_entity_id")
-        
-			if(sortby != "" && sortby != null){
-				query.append(" order by $sortby")
-			}else {
-				query.append(" order by ae.application, ae.asset_name")
-			}
-			if(order != "" && order != null){
-				query.append(" $order ")
-			}else {
-				query.append(" asc ")
-			}
-			def resultList=jdbcTemplate.queryForList(query.toString())
 			def today = new java.util.Date();
 			def lastPoolTime = new java.sql.Timestamp(today.getTime())
 			def assetEntityList=[]
@@ -199,8 +217,9 @@ class ClientConsoleController {
 			return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,
 				appOwnerList:appOwnerList,applicationList:applicationList,appSmeList:appSmeList,projectId:projectId, lastPoolTime : lastPoolTime,
 				processTransitionList:processTransitionList,projectId:projectId,appOwnerValue:appOwnerValue,appValue:appValue,
-				appSmeValue:appSmeValue,timeToRefresh:timeToRefresh ? timeToRefresh.CLIENT_CONSOLE_REFRESH : "never",
-				headerCount:headerCount,browserTest:browserTest, myForm : params.myForm, htmlTdId:htmlTdId, role : role]
+				appSmeValue:appSmeValue,timeToRefresh:timeToRefresh ? timeToRefresh.CLIENT_CONSOLE_REFRESH : "never", 
+				headerCount:headerCount,browserTest:browserTest, myForm : params.myForm, htmlTdId:htmlTdId, role : role,
+				moveEventInstance:moveEventInstance, moveEventsList:moveEventsList ]
     	} else {
     		flash.message = "Please create bundle to view PMO Dashboard"
     		redirect(controller:'project',action:'show',params:["id":params.projectId])
@@ -378,14 +397,23 @@ class ClientConsoleController {
 	 *----------------------------------------------------*/
 	def getTransitions = {
 		def bundleId = params.moveBundle
+		def moveEventId = params.moveEvent
 		def appValue=params.application
 		def appOwnerValue=params.appOwner
 		def appSmeValue=params.appSme
 		def assetEntityList = []
 		def assetEntityAndCommentList = []
 		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
-		if (bundleId) {
-			def moveBundleInstance = MoveBundle.findById( bundleId )
+		if (moveEventId) {
+			def bundles
+			def moveEvent = MoveEvent.findById(moveEventId)
+    		def moveBundlesList = MoveBundle.findAll("from MoveBundle mb where mb.moveEvent = ? order by mb.name asc",[moveEvent])
+	        if( bundleId ){
+	        	userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
+				bundles = "("+bundleId+")"
+	        } else if(moveBundlesList.size() > 0){
+	        	bundles = (moveBundlesList.id).toString().replace("[","(").replace("]",")")
+	        }
 			def lastPoolTime = params.lastPoolTime
 			def today = new java.util.Date();
 			def currentPoolTime = new java.sql.Timestamp(today.getTime())
@@ -394,7 +422,7 @@ class ClientConsoleController {
 											" as assetName,max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_entity ae "+
 											" LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id and at.type = 'process' and at.voided = 0 ) where ae.asset_entity_id in "+
 											" ( select t.asset_entity_id from asset_transition t where t.voided = 0 and t.date_created between SUBTIME('$lastPoolTime','00:05:30') and '$currentPoolTime' )"+
-											" and ae.project_id = $moveBundleInstance.project.id and ae.move_bundle_id = ${moveBundleInstance.id}")
+											" and ae.project_id = $moveEvent.project.id and ae.move_bundle_id in ${bundles}")
 			if(appValue!="" && appValue!= null){
 				query.append(" and ae.application ='$appValue'")
 			}
@@ -494,7 +522,7 @@ class ClientConsoleController {
 			}
 			
 			def assetCommentsList = []
-			def assetsList = AssetEntity.findAll("from AssetEntity where moveBundle = ${moveBundleInstance.id}")
+			def assetsList = AssetEntity.findAll("from AssetEntity where moveBundle in ${bundles}")
 			assetsList.each {
 				def checkIssueType = AssetComment.find("from AssetComment where assetEntity=$it.id and commentType='issue' and isResolved = 0"+
 													" and date_created between SUBTIME(CURRENT_TIMESTAMP,'00:10:00') and CURRENT_TIMESTAMP ")

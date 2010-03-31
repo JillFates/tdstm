@@ -71,6 +71,7 @@
         <script type="text/javascript">
         loadMoveBundles();
         function loadMoveBundles(){
+        	$("#projectId").val(${session.getAttribute("CURR_PROJ").CURR_PROJ})
             var projectId = $("#projectId").val()
             ${remoteFunction(action:'getMoveBundles', params:'\'projectId=\' +projectId', onComplete:'updateMoveBundles(e)' )}
         }
