@@ -204,71 +204,126 @@
 								${dashboardStep.step.name}
 								<input type="hidden"  id="keyOffStep_${dashboardStep.step.id }" value="${dashboardStep.step.name}"/>
 							</td>
-							<td>
 							<g:if test="${dashboardStep.moveBundleStep}">
-							 <input type="checkbox" name="checkbox_${dashboardStep.step.id }" id="checkbox_${dashboardStep.step.id }" 
-								onclick="enableInput(${dashboardStep.step.id })" checked="checked"/>
+								<td>
+								 <input type="checkbox" name="checkbox_${dashboardStep.step.id }" id="checkbox_${dashboardStep.step.id }" 
+									onclick="enableInput(${dashboardStep.step.id })" checked="checked"/>
+								</td>
+								<td>
+									<span id="labelText_${dashboardStep.step.id }" title="text" style="display: none;" >${dashboardStep.moveBundleStep?.label}</span>
+									<span id="labelInput_${dashboardStep.step.id }" title="input">
+									<input type="text" name="dashboardLabel_${dashboardStep.step.id }" id="dashboardLabel_${dashboardStep.step.id }" 
+									value="${dashboardStep.moveBundleStep?.label ? dashboardStep.moveBundleStep?.label : dashboardStep.step.name}"/>
+									</span>
+								</td>
+								<td>
+								<span id="startTimeText_${dashboardStep.step.id }" title="text" style="display: none;" ><tds:convertToGMT date="${dashboardStep.moveBundleStep?.planStartTime}"/></span>
+								
+								<span id="startTimeInput_${dashboardStep.step.id }" title="input">
+				                  <script type="text/javascript">
+				                    $(document).ready(function(){
+				                      $("#startTime_${dashboardStep.step.id }").datetimepicker();
+				                    });
+				                  </script>
+									<input type="text" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }"
+									value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}' formate="12hrs"/>" onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })"/>
+								</span>
+								</td>
+								<td>
+								<span id="completionTimeText_${dashboardStep.step.id }" title="text" style="display: none;" ><tds:convertToGMT date="${dashboardStep.moveBundleStep?.planCompletionTime}"/></span>
+								
+								<span id="completionTimeInput_${dashboardStep.step.id }" title="input">
+				                  <script type="text/javascript">
+				                    $(document).ready(function(){
+				                      $("#completionTime_${dashboardStep.step.id }").datetimepicker();
+				                    });
+				                  </script>
+									<input type="text" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }" 
+									value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planCompletionTime}' formate="12hrs"/>" onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })"/>
+								</span>
+								</td>
+								<td>
+								<span id="durationText_${dashboardStep.step.id }" title="text" style="display: none;" >
+								<tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/> </span>
+								
+								<span id="durationInput_${dashboardStep.step.id }" title="input">
+								<input type="hidden" name="duration_${dashboardStep.step.id }" id="durationIn_${dashboardStep.step.id }"
+									value="${dashboardStep.stepSnapshot?.duration}"/>
+									<input type="text" id="duration_${dashboardStep.step.id }"	style="width: 60px;"
+									value="<tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/>"	onchange="changeCompletionTime(this.value, ${dashboardStep.step.id })"/>
+								</span>
+								</td>
+								<td>
+								<span id="calcMethodText_${dashboardStep.step.id }" title="text" style="display: none;" >
+								<g:if test="${dashboardStep.moveBundleStep}"><g:if test="${dashboardStep.moveBundleStep?.calcMethod != 'L'}">Manual</g:if>
+								<g:else>Linear</g:else></g:if>
+								</span>
+								<span id="calcMethodInput_${dashboardStep.step.id }" title="input">
+									<g:select from="${['L', 'M']}" valueMessagePrefix="step.calcMethod" name="calcMethod_${dashboardStep.step.id }"
+									value="${dashboardStep.moveBundleStep?.calcMethod}" onchange="showTaskCompleted(this.value, ${dashboardStep.step.id })"/>
+								</span>
+								</td>
 							</g:if>
 							<g:else>
-							<input type="checkbox" name="checkbox_${dashboardStep.step.id }" id="checkbox_${dashboardStep.step.id }" 
-								onclick="enableInput(${dashboardStep.step.id })"/>
-							</g:else>	
-							</td>
-							<td>
-								<span id="labelText_${dashboardStep.step.id }" title="text">${dashboardStep.moveBundleStep?.label}</span>
-								<span id="labelInput_${dashboardStep.step.id }" style="display: none;" title="input">
-								<input type="text" name="dashboardLabel_${dashboardStep.step.id }" id="dashboardLabel_${dashboardStep.step.id }" 
-								value="${dashboardStep.moveBundleStep?.label ? dashboardStep.moveBundleStep?.label : dashboardStep.step.name}"/>
+								<td>
+								<input type="checkbox" name="checkbox_${dashboardStep.step.id }" id="checkbox_${dashboardStep.step.id }" 
+									onclick="enableInput(${dashboardStep.step.id })"/>
+								</td>
+								<td>
+									<span id="labelText_${dashboardStep.step.id }" title="text">${dashboardStep.moveBundleStep?.label}</span>
+									<span id="labelInput_${dashboardStep.step.id }" style="display: none;" title="input">
+									<input type="text" name="dashboardLabel_${dashboardStep.step.id }" id="dashboardLabel_${dashboardStep.step.id }" 
+									value="${dashboardStep.moveBundleStep?.label ? dashboardStep.moveBundleStep?.label : dashboardStep.step.name}"/>
+									</span>
+								</td>
+								<td>
+								<span id="startTimeText_${dashboardStep.step.id }" title="text"><tds:convertToGMT date="${dashboardStep.moveBundleStep?.planStartTime}"/></span>
+								
+								<span id="startTimeInput_${dashboardStep.step.id }" style="display: none;" title="input">
+				                  <script type="text/javascript">
+				                    $(document).ready(function(){
+				                      $("#startTime_${dashboardStep.step.id }").datetimepicker();
+				                    });
+				                  </script>
+									<input type="text" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }"
+									value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}' formate="12hrs"/>" onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })"/>
 								</span>
-							</td>
-							<td>
-							<span id="startTimeText_${dashboardStep.step.id }" title="text"><tds:convertToGMT date="${dashboardStep.moveBundleStep?.planStartTime}"/></span>
-							
-							<span id="startTimeInput_${dashboardStep.step.id }" style="display: none;" title="input">
-			                  <script type="text/javascript">
-			                    $(document).ready(function(){
-			                      $("#startTime_${dashboardStep.step.id }").datetimepicker();
-			                    });
-			                  </script>
-								<input type="text" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }"
-								value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}'/>" onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })"/>
-							</span>
-							</td>
-							<td>
-							<span id="completionTimeText_${dashboardStep.step.id }" title="text"><tds:convertToGMT date="${dashboardStep.moveBundleStep?.planCompletionTime}"/></span>
-							
-							<span id="completionTimeInput_${dashboardStep.step.id }" style="display: none;" title="input">
-			                  <script type="text/javascript">
-			                    $(document).ready(function(){
-			                      $("#completionTime_${dashboardStep.step.id }").datetimepicker();
-			                    });
-			                  </script>
-								<input type="text" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }" 
-								value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planCompletionTime}'/>" onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })"/>
-							</span>
-							</td>
-							<td>
-							<span id="durationText_${dashboardStep.step.id }" title="text">
-							<tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/> </span>
-							
-							<span id="durationInput_${dashboardStep.step.id }" style="display: none;" title="input">
-							<input type="hidden" name="duration_${dashboardStep.step.id }" id="durationIn_${dashboardStep.step.id }"
-								value="${dashboardStep.stepSnapshot?.duration}"/>
-								<input type="text" id="duration_${dashboardStep.step.id }"	style="width: 60px;"
-								value="<tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/>"	onchange="changeCompletionTime(this.value, ${dashboardStep.step.id })"/>
-							</span>
-							</td>
-							<td>
-							<span id="calcMethodText_${dashboardStep.step.id }" title="text">
-							<g:if test="${dashboardStep.moveBundleStep}"><g:if test="${dashboardStep.moveBundleStep?.calcMethod != 'L'}">Manual</g:if>
-							<g:else>Linear</g:else></g:if>
-							</span>
-							<span id="calcMethodInput_${dashboardStep.step.id }" style="display: none;" title="input">
-								<g:select from="${['L', 'M']}" valueMessagePrefix="step.calcMethod" name="calcMethod_${dashboardStep.step.id }"
-								value="${dashboardStep.moveBundleStep?.calcMethod}" onchange="showTaskCompleted(this.value, ${dashboardStep.step.id })"/>
-							</span>
-							</td>
-							
+								</td>
+								<td>
+								<span id="completionTimeText_${dashboardStep.step.id }" title="text"><tds:convertToGMT date="${dashboardStep.moveBundleStep?.planCompletionTime}"/></span>
+								
+								<span id="completionTimeInput_${dashboardStep.step.id }" style="display: none;" title="input">
+				                  <script type="text/javascript">
+				                    $(document).ready(function(){
+				                      $("#completionTime_${dashboardStep.step.id }").datetimepicker();
+				                    });
+				                  </script>
+									<input type="text" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }" 
+									value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planCompletionTime}' formate="12hrs"/>" onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })"/>
+								</span>
+								</td>
+								<td>
+								<span id="durationText_${dashboardStep.step.id }" title="text">
+								<tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/> </span>
+								
+								<span id="durationInput_${dashboardStep.step.id }" style="display: none;" title="input">
+								<input type="hidden" name="duration_${dashboardStep.step.id }" id="durationIn_${dashboardStep.step.id }"
+									value="${dashboardStep.stepSnapshot?.duration}"/>
+									<input type="text" id="duration_${dashboardStep.step.id }"	style="width: 60px;"
+									value="<tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/>"	onchange="changeCompletionTime(this.value, ${dashboardStep.step.id })"/>
+								</span>
+								</td>
+								<td>
+								<span id="calcMethodText_${dashboardStep.step.id }" title="text">
+								<g:if test="${dashboardStep.moveBundleStep}"><g:if test="${dashboardStep.moveBundleStep?.calcMethod != 'L'}">Manual</g:if>
+								<g:else>Linear</g:else></g:if>
+								</span>
+								<span id="calcMethodInput_${dashboardStep.step.id }" style="display: none;" title="input">
+									<g:select from="${['L', 'M']}" valueMessagePrefix="step.calcMethod" name="calcMethod_${dashboardStep.step.id }"
+									value="${dashboardStep.moveBundleStep?.calcMethod}" onchange="showTaskCompleted(this.value, ${dashboardStep.step.id })"/>
+								</span>
+								</td>
+							</g:else>	
 							<td>
 								<span id="tasksCompletedText_${dashboardStep.step.id }" title="text">${dashboardStep.stepSnapshot?.tasksCompleted}
 								</span>
@@ -389,20 +444,21 @@
         var hours = timeArr[0]
         var min = timeArr[1]
         if(hours  && min){
-            var ms = (3600000 * hours )+ (60000 * min)
+            var ms = (3600000 * hours ) + (60000 * min)
         }
-        var completionTimeString = $("#completionTime_"+stepId).val()
-        if(completionTimeString){
-	        var completionTime = new Date( completionTimeString )
+        var startTimeString = $("#startTime_"+stepId).val()
+        if(startTimeString){
+	        var completionTime = new Date( startTimeString )
     	    var updatedTime = new Date(completionTime.getTime() + ms)
+	        $("#durationIn_"+stepId).val(ms / 1000)
     		$("#completionTime_"+stepId).val( convertDate( updatedTime ))
         }
     }
     function getTimeFormate( objId, dateString, stepId )
 	{
     	if(dateString && isValidDate(dateString)){
-	    	//var date= new Date(dateString)
-			//$("#"+objId).val(convertDate( date ))
+	    	var date= new Date(dateString)
+			$("#"+objId).val(convertDate( date ))
 		   	calculateDuration(stepId);
     	}
 	   
@@ -421,11 +477,15 @@
 			var second = date.getSeconds();
 			if(month < 10 ){ month = "0"+ month }
 			if(monthday < 10 ){ monthday = "0"+ monthday }
+			var ap = "AM";
+			if (hour   > 11) { ap = "PM";             }
+			if (hour   > 12) { hour = hour - 12;      }
+			if (hour   == 0) { hour = 12;             }
 			if (hour   < 10) { hour   = "0" + hour;   }
 			if (minute < 10) { minute = "0" + minute; }
 			if (second < 10) { second = "0" + second; }
 			
-			var timeString = month+"/"+monthday+"/"+year+" "+hour + ':' + minute ;
+			var timeString = month+"/"+monthday+"/"+year+" "+hour + ':' + minute + ' ' + ap;
 		}
 		return timeString
 	}
@@ -447,10 +507,10 @@
 				    	checked =  false;
 				    	message ="Dashboard Label, Start & Completion times are mandatory"
 				    	
-		    	  } else if( !objRegExp.test( startTime ) || !objRegExp.test( completionTime ) ) {
+		    	  } else if( !objRegExp.test( startTime.substring(0,startTime.length-3) ) || !objRegExp.test( completionTime.substring(0,completionTime.length-3) ) ) {
 		    		  keyOffStep += "'"+$("#keyOffStep_"+stepId).val() +"', ";
 				      checked =  false;
-				      message = "Date should be in 'mm/dd/yyyy hh:mm' format "
+				      message = "Dates should be in 'mm/dd/yyyy hh:mm' format "
 		    	  }
 	    	  } else {
 	    		  uncheckedSteps.push(id.substring(id.indexOf("_")+1,id.length))

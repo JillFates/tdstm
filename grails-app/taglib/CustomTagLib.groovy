@@ -31,7 +31,7 @@ class CustomTagLib {
 	
 	if( dtStr.equals("java.util.Date") || dtStr.equals("java.sql.Timestamp") ){	
 		   DateFormat formatter ; 
-		   if(formate == "mm/dd"){
+		   if(formate == "mm/dd" || formate == "12hrs"){
 			   formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm a");
 		   } else {
 			   formatter = new SimpleDateFormat("yyyy-MM-dd HH:MM");
@@ -43,10 +43,11 @@ class CustomTagLib {
 			dtParam = dtParam.trim();
 			if(formate == "mm/dd"){
 				out << dtParam[5..6]+"/"+dtParam[8..9]+" "+dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
-			} else {
+			} else if(formate == "12hrs") {
+				out << dtParam[5..6]+"/"+dtParam[8..9]+"/"+dtParam[0..3]+" "+dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
+			}else
 				out << dtParam[5..6]+"/"+dtParam[8..9]+"/"+dtParam[0..3]+" "+dtParam[11..12]+":"+dtParam[14..15]
 			}
-		}
 	}
 	
 	def truncate = { attrs ->
@@ -74,13 +75,13 @@ class CustomTagLib {
 			def date = new Date( (Long)(dt.getTime() + (3600000 * offsetTZ)) ) ;
 			DateFormat formatter ; 
 			// convert the date into required formate
-			formatter = new SimpleDateFormat("yyyy-MM-dd HH:MM");
+			formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm a");
 			dtParam = formatter.format(date);		
 		}  
 		/* if null or any plain string */
 		if (dtParam != "null") {
 			dtParam = dtParam.trim();
-			out << dtParam[5..6]+"/"+dtParam[8..9]+"/"+dtParam[0..3]+" "+dtParam[11..12]+":"+dtParam[14..15]
+			out << dtParam[5..6]+"/"+dtParam[8..9]+"/"+dtParam[0..3]+" "+dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
 		}
 	}
 	/*
