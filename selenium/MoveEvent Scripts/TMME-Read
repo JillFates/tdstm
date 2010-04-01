@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="" />
+<title>TMME-Read</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">TMME-Read</td></tr>
+</thead><tbody>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Project</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Move Bundles</td>
+	<td></td>
+</tr>
+<!--In the below case, replace 'Master Decomm' with the move bundle name that you want to select-->
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Master Decomm</td>
+	<td></td>
+</tr>
+<!--In the below case, replace 'Test Event 01' with the move event to be edited-->
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Move Event</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Test Event 01</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Show Move Event</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.0</td>
+	<td>exact:Project:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.1.0</td>
+	<td>exact:Name:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.2.0</td>
+	<td>exact:Description:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.3.0</td>
+	<td>Move Bundles:</td>
+</tr>
+<tr>
+	<td>assertElementPresent</td>
+	<td>_action_Edit</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertElementPresent</td>
+	<td>_action_Delete</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>

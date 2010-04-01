@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://ph1.tdsops.com/" />
+<title>Move Event-Create</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">Move Event-Create</td></tr>
+</thead><tbody>
+<!--In the below case, replace 24 with the project Id on which the case is being executed.-->
+<tr>
+	<td>open</td>
+	<td>/tds-0.1/project/show/24</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Move Bundles</td>
+	<td></td>
+</tr>
+<!--In the below case, replace 'Master Decomm' with the move bundle name that you want to select-->
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Master Decomm</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Move Event</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Move Event List</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Description</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.0</td>
+	<td>Name</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.1</td>
+	<td>Description</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.2</td>
+	<td>Project</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.3</td>
+	<td>Move Bundles</td>
+</tr>
+<tr>
+	<td>assertElementPresent</td>
+	<td>link=Create New</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Create New</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Create Move Event</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Project: *</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>projectId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Name: *</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>name</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Description:</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>description</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Move Bundle:</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>moveBundleList</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertElementPresent</td>
+	<td>//input[@value='Create']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertElementPresent</td>
+	<td>_action_list</td>
+	<td></td>
+</tr>
+<!--Below two commands are to test if mandatory fields are validated in this page-->
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Create']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Name cannot be blank</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name</td>
+	<td>Test Event 01</td>
+</tr>
+<tr>
+	<td>typeAndWait</td>
+	<td>description</td>
+	<td>Test Desc</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>moveBundle</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Create']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>MoveEvent Test Event 01 created</td>
+	<td></td>
+</tr>
+<!--Below cases are to test the functionality of Cancel Button in Create Move Event Page-->
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Move Event</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Create New</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>_action_list</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertConfirmation</td>
+	<td>Are you sure?</td>
+	<td>Yes</td>
+</tr>
+
+</tbody></table>
+</body>
+</html>
