@@ -33,16 +33,22 @@ class NewsEditorController {
         
 		def moveEventsList = MoveEvent.findAllByProject(projectInstance)
 		def moveEventId = params.moveEvent
-		if(!moveEventId){
-			moveEventId = getSession().getAttribute( "MOVE_EVENT" )?.MOVE_EVENT
-		}
-		if(moveEventId){
-			moveEvent = MoveEvent.get(moveEventId)
-			userPreferenceService.setPreference("MOVE_EVENT",moveEventId)
-		} else if(moveEventsList){
-			moveEvent = moveEventsList?.get(0)
-		}
 		
+		if(moveEventId){
+			userPreferenceService.setPreference( "MOVE_EVENT", "${moveEventId}" )
+            moveEvent = MoveEvent.findById(moveEventId)
+		} else {
+            userPreferenceService.loadPreferences("MOVE_EVENT")
+            def defaultEvent = getSession().getAttribute("MOVE_EVENT")
+            if(defaultEvent.MOVE_EVENT){
+            	moveEvent = MoveEvent.findById(defaultEvent.MOVE_EVENT)
+            	if( moveEvent.project.id != Integer.parseInt(projectId) ){
+            		moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
+            	}
+            } else {
+            	moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
+            }
+        }
 		
     	def moveBundlesList
     	if(moveEvent){
@@ -75,7 +81,8 @@ class NewsEditorController {
     	if(moveBundleInstance != null){
     		assetCommentsQuery.append(" mb.move_bundle_id = ${moveBundleInstance.id}  ")
     	} else {
-    		assetCommentsQuery.append(" p.project_id = ${projectInstance.id} ")
+    		
+    		assetCommentsQuery.append(" mb.move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEvent.id} )")
     	}
         
 		if(moveEvent){
@@ -216,6 +223,7 @@ class NewsEditorController {
 			moveEventNewsInstance.dateArchived = new Date()
 		}
 		moveEventNewsInstance.save(flush:true)
-		redirect(action:newsEditorList, params:[projectId:params.projectId, moveBundle : params.moveBundle, viewFilter:params.viewFilter])
+		redirect(action:newsEditorList, params:[projectId:params.projectId, moveBundle : params.moveBundle, 
+												viewFilter:params.viewFilter, moveEvent:params.moveEvent.id])
 	}
 }

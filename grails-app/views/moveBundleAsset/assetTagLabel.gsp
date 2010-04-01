@@ -33,7 +33,6 @@ var jobdata = job.NewJobDataRecordSet();
 	    	jobdata.SetDataField('assetName', assetsList[i].assetName);       
 	    	jobdata.SetDataField('assetTag', assetsList[i].assetTag); 
 	    	jobdata.SetDataField('rack', assetsList[i].rack);
-	    	jobdata.SetDataField('upos', assetsList[i].uposition);    	   		
 	    	
 	    }
 	    

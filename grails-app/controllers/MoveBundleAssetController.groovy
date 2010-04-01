@@ -1460,9 +1460,7 @@ class MoveBundleAssetController {
 				assetsQuery.append(" AND ae.move_bundle_id = ${moveBundleId} ")
 			}
 			assetsQuery.append("ORDER BY ae.source_rack, ae.source_rack_position DESC")
-			println"-->$assetsQuery"
 	    	def assetEntityList = jdbcTemplate.queryForList( assetsQuery.toString() )
-			println"assetEntityList------------>"+assetEntityList
 			if( !assetEntityList ){
 				reportFields <<[ 'flashMessage': "Team Members not Found for selected Teams"]
 			} else {
