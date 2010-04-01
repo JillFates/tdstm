@@ -47,7 +47,7 @@
 				<input type="hidden" id="maxLenId" value="${params.maxLen}">
 				<input type="hidden" id="sortId" value="${params.sort}">
 			</div>
-			<div class="clientname">${project?.client}<br/>DATA CENTER RELOCATION <br><g:link controller="project" action="show" id="${project?.id}" style="text-decoration:none;"><span class="project_link">Back to Project View</span> </g:link></div>
+			<div class="clientname">${project?.client}<br/>DATA CENTER RELOCATION <br><g:link controller="project" action="show" id="${project?.id}" style="text-decoration:none;"><span class="project_link">Return to Project</span> </g:link></div>
 			<div class="topdate">
 				<span><img src="${createLinkTo(dir:'images',file:'powered_by.png')}" alt="Powered by TDS" width="158" height="53" title="Powered by TDS"></span>
 				<br><span id="date"></span> <span id="clock"></span>&nbsp;
