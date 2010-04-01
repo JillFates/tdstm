@@ -201,7 +201,7 @@ class MoveEventController {
 				book.close()
 		        
 			} catch( Exception ex ) {
-				flash.message = "Exception occurred while exporting data"+
+				flash.message = "Exception occurred while exporting data"
 				redirect( controller:'moveBundleAsset', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
 				return;
 			}	
@@ -211,4 +211,50 @@ class MoveEventController {
 			return;
 		}
     }
+    /*---------------------------------------------------------
+     * Will export MoveEvent Transition time results data in PDF based on user input
+     * @author : lokanada Reddy
+     * @param  : moveEvent and reportType.
+     * @return : redirect to same page once data exported to PDF.
+     *-------------------------------------------------------*/
+	def getMoveEventResultsAsPDF = {
+			def moveEvent = params.moveEvent
+			def reportType = params.reportType
+			if(moveEvent && reportType){
+				try {
+					def moveEventResults
+					def reportFields =[]
+					if(reportType != "SUMMARY"){
+						moveEventResults = moveBundleService.getMoveEventDetailedResults( moveEvent )
+						moveEventResults.each { results->
+							reportFields <<["move_bundle_id":results.move_bundle_id, "bundle_name":results.bundle_name, 
+											"asset_id":results.asset_id, "team_name":results.team_name,
+											"asset_name":results.asset_name, "voided":results.voided, 
+											"from_name":results.from_name, "to_name":results.to_name, 
+											"transition_time":results.transition_time, "username":results.username]
+						}
+						chain(controller:'jasper',action:'index',model:[data:reportFields],
+								params:["_format":"PDF","_name":"MoveResults_${params.reportType}","_file":"moveEventDeailedReport"])
+					} else {
+						moveEventResults = moveBundleService.getMoveEventSummaryResults( moveEvent )
+						moveEventResults.each { results->
+							reportFields <<["move_bundle_id":results.move_bundle_id, "bundle_name":results.bundle_name, 
+											"state_to":results.state_to, "name":results.name,
+											"started":results.started, "completed":results.completed]
+						}
+						chain(controller:'jasper',action:'index',model:[data:reportFields],
+								params:["_format":"PDF","_name":"MoveResults_${params.reportType}","_file":"moveEventSummaryReport"])
+					}
+			            
+				} catch( Exception ex ) {
+					flash.message = "Exception occurred while exporting data"+ex
+					redirect( controller:'moveBundleAsset', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
+					return;
+				}	
+			} else {
+				flash.message = "Please select MoveEvent and report type. "
+				redirect( controller:'moveBundleAsset', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
+				return;
+			}
+        }
 }
