@@ -653,3 +653,11 @@ list-style-type:none;
 .hide_bundle_step {
 	display: none;
 }
+.project_link{
+	background-color: #0366B0;
+	color: white;
+	font-size: 13px;
+	padding-left: 5px;
+	padding-right: 5px;
+	font-weight: bold;
+}
