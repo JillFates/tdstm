@@ -547,7 +547,7 @@
 		                    				<g:else>
 		                    					<td>${assetEntityInstance?.targetLocation}</td>
 						                    	<td>${assetEntityInstance?.targetRack}</td>
-		                    					<td>${assetEntityInstance?.sourceRackPosition}</td>
+		                    					<td>${assetEntityInstance?.targetRackPosition}</td>
 		                    				</g:else>
 					                    	<td>${assetEntityInstance?.usize}</td>
 											<g:if test="${rack == 'UnrackPlan'}">
