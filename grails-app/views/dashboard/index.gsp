@@ -3,8 +3,8 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>Client Dashboard</title>
 	
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'dashboard.css')}" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tabcontent.css')}" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dashboard.css')}" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tabcontent.css')}" />
 	
 	<g:javascript src="FusionCharts.js" />
 	<g:javascript src="yahoo.js" />
@@ -50,7 +50,7 @@
 			<div class="clientname">${project?.client}<br/>DATA CENTER RELOCATION <br><g:link controller="project" action="show" id="${project?.id}" style="text-decoration:none;"><span class="project_link">Return to Project</span> </g:link></div>
 			<div class="topdate">
 				<span><img src="${createLinkTo(dir:'images',file:'powered_by.png')}" alt="Powered by TDS" width="158" height="53" title="Powered by TDS"></span>
-				<br><span id="date"></span> <span id="clock"></span>&nbsp;
+				<span id="date"></span> <span id="clock"></span>&nbsp;
 				<span>
 					<label>
 					  <select name="timezone" id="timezone" onChange="getMoveEventNewsDetails($('#moveEvent').val())" class="selecttext">
@@ -280,6 +280,8 @@
 		if(moveEvent){
 			jQuery.ajax({
 		        type:"GET",
+		        async : true,
+		        cache: false,
 		        url:"../ws/moveEventNews/"+moveEvent+"?type="+$("#typeId").val()+"&state="+$("#stateId").val()+"&maxLen="+$("#maxLenId").val()+"&sort="+$("#sortId").val(),
 		        dataType: 'json',
 		        success:updateMoveEventNews
@@ -288,6 +290,7 @@
 	}
 	/* Update the Move news once ajax call success*/
 	function updateMoveEventNews( news ){
+		
 		var offset = $("#timezone").val()
 		var newsLength = news.length;
 		var live = "";
@@ -348,34 +351,42 @@
 	 *-----------------------------------------------------------*/
 
 	function convertTime(offset, source) {
-		//12/11: 12:30 PM: (0m)     
-	    if (source ==  ""){
-		    return ""
-		} else if (source.substring(0,5).toLowerCase() ==  "total"){
-			return source
-		}  
-	                                
-	    var p = trimAll(source);
-	    p = p.substring(p.length-1, p.length);
-	    var tsource;
-	    var tsource1;
-	    var tsource2;
-	    var temp;
-	    
-	    if (p == ")"){
-		tsource = source.substring(0,source.length).split("(");
-	        tsource1 = tsource[0];            
-	        tsource1 = tsource1.substring(0,tsource1.length-2);
-	        temp = tsource1;
-	        tsource2 = trimAll(tsource[1]);        
-	        tsource2 = "(" + tsource2;
-		} else {
-	    	temp = trimAll(source);
-		}       
-		date = new Date(temp);
-		utcDate = date.getTime() ;
-	    convertedDate = new Date(utcDate + (3600000*offset));                               
-	    return getTimeFormate( convertedDate )
+		try{
+			//12/11: 12:30 PM: (0m)     
+		    if (source ==  ""){
+			    return ""
+			} else if (source.substring(0,5).toLowerCase() ==  "total"){
+				return source
+			}  
+		                                
+		    var p = trimAll(source);
+		    p = p.substring(p.length-1, p.length);
+		    var tsource;
+		    var tsource1;
+		    var tsource2;
+		    var temp
+		    
+		    if (p == ")"){
+			tsource = source.substring(0,source.length).split("(");
+		        tsource1 = tsource[0];            
+		        tsource1 = tsource1.substring(0,tsource1.length-2);
+		        temp = tsource1;
+		        tsource2 = trimAll(tsource[1]);        
+		        tsource2 = "(" + tsource2;
+			} else {
+		    	temp = trimAll(source);
+			}
+			if(temp == "null"){
+				return "";
+			} else {
+				var date = new Date(temp);
+				var utcDate = date.getTime() ;
+			    var convertedDate = new Date(utcDate + (3600000*offset));
+			    return getTimeFormate( convertedDate )
+			}
+	    }catch(e){
+	    	alert("Object Error occured")
+		}
 	    
 	}
 	function getTimeFormate( date )
@@ -386,7 +397,7 @@
 		if( !isNaN(month) ){
 		   month = month + 1;
 		   var monthday    = date.getDate();
-		   var year        = date.getYear() + 1900;
+		   var year        = date.getFullYear();
 		   
 		   var hour   = date.getHours();
 		   var minute = date.getMinutes();
@@ -430,6 +441,8 @@
 		 var moveEvent = $("#moveEvent").val()
 		 jQuery.ajax({
 		        type:"GET",
+		        async : true,
+		        cache: false,
 		        url:"../ws/dashboard/bundleData/"+ bundleId+"?moveEventId="+moveEvent,
 		        dataType: 'json',
 		        success:updateMoveBundleSteps
@@ -439,59 +452,68 @@
 	 /* update move bundal data once ajax call success */
 	 
 	function updateMoveBundleSteps( dataPointStep ) {
-
-		var offset = $("#timezone").val()
-		
-		var snapshot = dataPointStep.snapshot;
-		var moveBundleId = snapshot.moveBundleId;
-		var steps = snapshot.steps;
-		var revSum = snapshot.revSum;
-		var planSum = snapshot.planSum
-
-		AditionalFrames = ( steps.length > 6 ? steps.length - 5 : 1 )
-		
-		if( snapshot.planDelta > 0){
-			$(".sum_statusbar_good").attr("class","sum_statusbar_bad")
-			$("#status_color").html("RED")
-		} else {
-			$(".sum_statusbar_bad").attr("class","sum_statusbar_good")
-			$("#status_color").html("GREEN")
-		}
-		updateSummaryGauge("summary_gauge_div",planSum.dialInd);
-		$("#spanPlanned").html(convertTime(offset, planSum.compTime))
-		
-		if(revSum.dialInd == "-1") {
-			$("#topindright").hide();
-			$("#revised_gauge_content").hide();
-		} else if(snapshot.revisedComp) {
-
-			updateRevisedGauge("revised_gauge_div",revSum.dialInd)
-			$("#spanRevised").html(convertTime(offset, revSum.compTime))
+		try{
+			var offset = $("#timezone").val()
 			
-			$("#topindright").show();
-			$("#revised_gauge_content").show();
-		}
-		for( i = 0; i < steps.length; i++ ) {
+			var snapshot = dataPointStep.snapshot;
+			var moveBundleId = snapshot.moveBundleId;
 			
-			$("#percentage_"+moveBundleId+"_"+steps[i].tid).html(isNaN(steps[i].tskComp / steps[i].tskTot) ? 0+ "%" : parseInt( (steps[i].tskComp / steps[i].tskTot ) * 100 ) +"%");
-			$("#percentage_"+moveBundleId+"_"+steps[i].tid).attr("class",steps[i].percentageStyle)
-			//$("#completion_"+moveBundleId+"_"+steps[i].tid).html(steps[i].projComp);
-			$("#plan_start_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].planStart));
-			$("#plan_completion_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].planComp));
-			var startDelta = 0
-			var actDelta = 0
-			if( steps[i].actStart ){
-				startDelta = new Date(steps[i].actStart).getTime() - new Date(steps[i].planStart).getTime()
-			}
-			$("#act_start_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].actStart+": ("+ startDelta +"m)"));
-			if( steps[i].actStart && !steps[i].actComp ) {
-				$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).show();
-				$("#act_completion_"+moveBundleId+"_"+steps[i].tid).html("<span id='databox'>Total Devices "+steps[i].tskTot+" Completed "+steps[i].tskComp+"</span>")
+			var steps = snapshot.steps;
+			var revSum = snapshot.revSum;
+			var planSum = snapshot.planSum
+	
+			AditionalFrames = ( steps.length > 6 ? steps.length - 5 : 1 )
+			
+			if( snapshot.planDelta > 0){
+				$(".sum_statusbar_good").attr("class","sum_statusbar_bad")
+				$("#status_color").html("RED")
 			} else {
-				actDelta = new Date(steps[i].actComp).getTime() - new Date(steps[i].planComp).getTime()
-				$("#act_completion_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].actComp+": ("+actDelta+"m)"));
+				$(".sum_statusbar_bad").attr("class","sum_statusbar_good")
+				$("#status_color").html("GREEN")
 			}
-			post_init( "chartdiv_"+moveBundleId+"_"+steps[i].tid, steps[i].dialInd )
+			updateSummaryGauge("summary_gauge_div",planSum.dialInd);
+			$("#spanPlanned").html(convertTime(offset, planSum.compTime))
+			
+			if(revSum.dialInd == "-1") {
+				$("#topindright").hide();
+				$("#revised_gauge_content").hide();
+			} else if(snapshot.revisedComp) {
+	
+				updateRevisedGauge("revised_gauge_div",revSum.dialInd)
+				$("#spanRevised").html(convertTime(offset, revSum.compTime))
+				
+				$("#topindright").show();
+				$("#revised_gauge_content").show();
+			}
+			for( i = 0; i < steps.length; i++ ) {
+				$("#percentage_"+moveBundleId+"_"+steps[i].tid).html(isNaN(steps[i].tskComp / steps[i].tskTot) ? 0+ "%" : parseInt( (steps[i].tskComp / steps[i].tskTot ) * 100 ) +"%");
+				$("#percentage_"+moveBundleId+"_"+steps[i].tid).attr("class",steps[i].percentageStyle)
+				//$("#completion_"+moveBundleId+"_"+steps[i].tid).html(steps[i].projComp);
+				$("#plan_start_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].planStart));
+				$("#plan_completion_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].planComp));
+				var startDelta = 0
+				var actDelta = 0
+				if( steps[i].actStart ){
+					startDelta = new Date(steps[i].actStart).getTime() - new Date(steps[i].planStart).getTime()
+				}
+				$("#act_start_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].actStart+": ("+ startDelta +"m)"));
+				if( steps[i].actStart && !steps[i].actComp ) {
+					$("#act_completion_"+moveBundleId+"_"+steps[i].tid).html("<span id='databox'>Total Devices "+steps[i].tskTot+" Completed "+steps[i].tskComp+"</span>")
+				} else {
+					actDelta = new Date(steps[i].actComp).getTime() - new Date(steps[i].planComp).getTime()
+					$("#act_completion_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].actComp+": ("+actDelta+"m)"));
+				}
+				var percentage = $("#percentage_"+moveBundleId+"_"+steps[i].tid).html()
+				if(percentage != "100%" && percentage != "0%"){
+					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).show();
+					post_init( "chartdiv_"+moveBundleId+"_"+steps[i].tid, steps[i].dialInd )
+				} else {
+					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).hide();
+				}
+			}
+			timedRefresh();
+		} catch(ex){
+			alert("Error occured please refresh the page"+ex)
 		}
 		
 	}

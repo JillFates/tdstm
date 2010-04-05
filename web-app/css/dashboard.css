@@ -31,8 +31,6 @@ Css for client dashboard
 
 body{
 	margin:auto;
-	background-position:top;
-	background-repeat:repeat-x;
 	font-family:Arial, Helvetica, sans-serif;
 	font-size:12px;
 	width:auto;
@@ -40,9 +38,13 @@ body{
 	}
 .sum_statusbar_good {
 	background-image:url(../images/sum_statusbar_green.png);
+	background-position:top;
+	background-repeat:repeat-x;
 }
 .sum_statusbar_bad {
 	background-image:url(../images/sum_statusbar_red.png);
+	background-position:top;
+	background-repeat:repeat-x;
 }
 .step_statusbar_good {
 	font-size:14px;
