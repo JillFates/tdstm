@@ -72,7 +72,8 @@ class CustomTagLib {
 		// check to see whether the input date is Date object or not
 		if( dtStr.equals("java.util.Date") || dtStr.equals("java.sql.Timestamp") ){
 			// convert the date into GMT
-			def date = new Date( (Long)(dt.getTime() + (3600000 * offsetTZ)) ) ;
+			//def date = new Date( (Long)(dt.getTime() + (3600000 * offsetTZ)) ) ;
+			def date = new Date( (Long)(dt.getTime() + (0 * offsetTZ)) ) ;
 			DateFormat formatter ; 
 			// convert the date into required formate
 			formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm a");
