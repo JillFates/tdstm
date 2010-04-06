@@ -143,7 +143,12 @@ class MoveBundleController {
 					if(checkbox  && checkbox == 'on'){
 						def moveBundleStep = moveBundleService.createMoveBundleStep(moveBundleInstance, it.id, params)
 						def tasksCompleted = params["tasksCompleted_"+it.id] ? Integer.parseInt(params["tasksCompleted_"+it.id]) : 0
-						stepSnapshotService.createManualSnapshot( moveBundleInstance.id, moveBundleStep.id, tasksCompleted, params["duration_"+it.id] )
+						def calcMethod = params["calcMethod_"+it.id]
+						if(calcMethod == "L"){
+							stepSnapshotService.createLinearSnapshot( moveBundleInstance.id, moveBundleStep.id, params["duration_"+it.id] )	
+						} else {
+							stepSnapshotService.createManualSnapshot( moveBundleInstance.id, moveBundleStep.id, tasksCompleted, params["duration_"+it.id] )
+						}
 					} else {
 						def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundleInstance , it.id)
 						if( moveBundleStep ){

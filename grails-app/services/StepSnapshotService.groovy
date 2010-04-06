@@ -172,7 +172,50 @@ log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${l
 	
 		return 200
 	}
+	
+	/**
+	 * Used to create Linear snapshots.  When creating it will update the MoveBundleStep as well appropriately.
+	 *
+	 */
+	def createLinearSnapshot( def moveBundleId, def moveBundleStepId, def duration ) {
+		// Check to see if we can find and return appropriate error codes (temporary solution)
+		def moveBundleStep = MoveBundleStep.get( moveBundleStepId )
+		if (! moveBundleStep ) return 401
+		if ( moveBundleStep.moveBundle.id != moveBundleId) return 403
+		
+		int tasksCount = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = $moveBundleId").size()
 
+		// Update actual start time if by chance it was never set, or user reset time after completing
+		moveBundleStep.actualStartTime = null
+		moveBundleStep.actualCompletionTime = null	// Clear out since it is not completed
+		
+		moveBundleStep.save(flush:true)
+		
+		//
+		// Create the StepSnapshot
+		//
+		def stepSnapshot = new StepSnapshot()
+
+		stepSnapshot.moveBundleStep = moveBundleStep
+		stepSnapshot.tasksCount = tasksCount
+		stepSnapshot.tasksCompleted = 0
+		
+		if( duration ){
+			stepSnapshot.duration = Integer.parseInt(duration)
+		} else {
+			stepSnapshot.duration = 0
+		}
+		
+		def planDelta = calcProjectedDelta( stepSnapshot, new Date() )
+		stepSnapshot.planDelta = planDelta 
+		stepSnapshot.dialIndicator =  calcDialIndicator( stepSnapshot.moveBundleStep.planDuration, planDelta )
+		
+		log.debug("Creating StepSnapshot: ${stepSnapshot}")
+		stepSnapshot.save(flush:true)
+	
+		return 200
+	}
+	
 	/**
 	 * Used to generate MoveEventSnapshot records for a MoveEvent.  The process looks over all latest StepSnapshot records
 	 * of the MoveBundles associated with the MoveEvent and determines the worst case MoveEventStep across all Steps in the 
