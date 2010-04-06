@@ -3,6 +3,17 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="moveBundleHeader" />
         <title>Show Move Event</title>
+        <script type="text/javascript">
+        function clearHistoricData( moveEventId ){
+            $("#messageDiv").hide();
+            $("#messageDiv").html("");
+            var confirmStatus = confirm("Are you sure you want to permanently clear the historic data for this move event?")
+            if(confirmStatus){
+            	${remoteFunction(action:'clearHistoricData', params:'\'moveEventId=\' + moveEventId ', 
+                    	onSuccess:"jQuery('#messageDiv').html('Historic Data has been cleaned successfully');jQuery('#messageDiv').show()")}
+            }
+        }
+        </script>
     </head>
     <body>
         <div class="body">
@@ -10,6 +21,7 @@
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
+            <div id="messageDiv" class="message" style="display: none;"></div>
             <div class="dialog">
                 <table>
                     <tbody>
@@ -53,9 +65,10 @@
             </div>
             <div class="buttons">
                 <g:form>
-                    <input type="hidden" name="id" value="${moveEventInstance?.id}" />
+                    <input type="hidden" name="id" id="moveEventId"  value="${moveEventInstance?.id}" />
                     <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
+                    <span class="button"><input type="button" class="delete" value="Clear historic data" onclick="clearHistoricData( $('#moveEventId').val() )"/></span>
                 </g:form>
             </div>
         </div>

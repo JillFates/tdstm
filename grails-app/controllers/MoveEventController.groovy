@@ -9,6 +9,7 @@ class MoveEventController {
 	
     // Service initialization
 	def moveBundleService
+	def jdbcTemplate
 	
     def index = { redirect(action:list,params:params) }
 
@@ -257,4 +258,25 @@ class MoveEventController {
 				return;
 			}
         }
+    /*------------------------------------------------------
+     * Clear out any snapshot data records and reset any summary steps for given move event.
+     * @author : Lokanada Reddy
+     * @param  : moveEventId
+     *----------------------------------------------------*/
+	def clearHistoricData = {
+		def moveEventId = params.moveEventId
+		if(moveEventId ){
+			jdbcTemplate.update("DELETE FROM move_event_snapshot WHERE move_event_id = $moveEventId " )
+			def moveBundleSteps = jdbcTemplate.queryForList("""SELECT mbs.id FROM move_bundle_step mbs LEFT JOIN move_bundle mb
+										ON (mb.move_bundle_id = mbs.move_bundle_id) WHERE mb.move_event_id = $moveEventId """)
+			if(moveBundleSteps.size() > 0){
+				def ids = (moveBundleSteps.id).toString().replace("[","(").replace("]",")")
+				jdbcTemplate.update("DELETE FROM step_snapshot WHERE move_bundle_step_id in $ids " )
+			}
+			jdbcTemplate.update("""UPDATE move_bundle_step mbs SET mbs.actual_start_time = null, mbs.actual_completion_time = null 
+						WHERE move_bundle_id in (SELECT mb.move_bundle_id FROM move_bundle mb WHERE mb.move_event_id =  $moveEventId )""" )
+		}
+		render "success"
+    }
+    
 }
