@@ -22,7 +22,7 @@ log.debug "offsetTZ=${offsetTZ}"
 				
 				/* Get the latest step_snapshot record for each step that has started */
 				def latestStepsRecordsQuery = """
-					SELECT mbs.transition_id as tid, ss.id as snapshotId, mbs.label as label,
+					SELECT mbs.transition_id as tid, ss.id as snapshotId, mbs.label as label, mbs.calc_method as calcMethod,
 						DATE_FORMAT( ADDDATE( mbs.plan_start_time , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as planStart,
 						DATE_FORMAT( ADDDATE( mbs.plan_completion_time , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as planComp,
 						DATE_FORMAT( ADDDATE( mbs.actual_start_time , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as actStart,
@@ -39,7 +39,7 @@ log.debug "offsetTZ=${offsetTZ}"
 					
 				/*	Get the steps that have not started / don't have step_snapshot records	*/						
 				def stepsNotUpdatedQuery = """
-					SELECT mbs.transition_id as tid, ss.id as snapshotId, mbs.label as label,
+					SELECT mbs.transition_id as tid, ss.id as snapshotId, mbs.label as label, mbs.calc_method as calcMethod,
 						DATE_FORMAT( ADDDATE( mbs.plan_start_time , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as planStart,
 						DATE_FORMAT( ADDDATE( mbs.plan_completion_time , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as planComp,
 						DATE_FORMAT( ADDDATE( mbs.actual_start_time , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as actStart,

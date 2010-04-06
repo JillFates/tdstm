@@ -25,6 +25,7 @@
 	<!--Header Starts here-->
 		<div id="header">
 			<div id="logo">
+				<a name="page_up"></a>
 				<g:if test="${projectLogo}">
 					<img src="${createLink(controller:'project', action:'showImage', id:projectLogo?.id)}" style="height: 55px;"/>
 				</g:if>
@@ -90,7 +91,8 @@
 	            		<option value="300000">5 Min</option>
 	                	<option value="600000">10 Min</option>
 	                	<option value="1800000">30 Min</option>
-					</select>
+					</select><br/><a href="#page_down" class="nav_button">
+					<img src="${createLinkTo(dir:'images',file:'down-arrow.png')}" border="0" alt="Page Down"></a>
 				</div>
 				<div class="toprightcontent" id="revised_gauge_content" style="display: none;">
 					Confidence in Revised Plan<br>
@@ -184,6 +186,9 @@
 				</div>
 			</div>
 <div id="rightarrow"><a href="javascript:void(0);" id="move-right"><img src="${createLinkTo(dir:'images',file:'right_arrow.png')}" alt="back" border="0" width="16" height="23" align="right"></a></div>
+		</div>
+		<div style="text-align: right;">
+			<a name="page_down" href="#page_up"><img src="${createLinkTo(dir:'images',file:'up-arrow.png')}" border="0" alt="Page Up"></a>
 		</div>
 	</div>
 
@@ -497,7 +502,7 @@
 					startDelta = new Date(steps[i].actStart).getTime() - new Date(steps[i].planStart).getTime()
 				}
 				$("#act_start_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].actStart+": ("+ startDelta +"m)"));
-				if( steps[i].actStart && !steps[i].actComp ) {
+				if( steps[i].actStart && !steps[i].actComp && steps[i].calcMethod != "M") {
 					$("#act_completion_"+moveBundleId+"_"+steps[i].tid).html("<span id='databox'>Total Devices "+steps[i].tskTot+" Completed "+steps[i].tskComp+"</span>")
 				} else {
 					actDelta = new Date(steps[i].actComp).getTime() - new Date(steps[i].planComp).getTime()
