@@ -8,6 +8,6 @@ class ConsoleController {
     def invokeSnapshot = {
 		def moveBundleId = params.moveBundle
 		stepSnapshotService.process( moveBundleId )
-		//render moveBundleId as JSON
+		render "success"
     }
 }

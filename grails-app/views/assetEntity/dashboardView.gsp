@@ -429,14 +429,14 @@ td .odd {
 	 *-----------------------------------------*/
 	function createSnapshot(){
 		var moveBundle = $("#moveBundleId").val()
-		${remoteFunction(controller:'console', action:'invokeSnapshot', params:'\'moveBundle=\' +moveBundle',onLoad="disableCreateSnapShot()", onComplete:"updateSanpShot( e );")}
-	}
-	function disableCreateSnapShot(){
-		$('#createSnapshotId').attr('disabled', 'true')
-	}
-	function updateSanpShot( e ){
-		
-		$('#createSnapshotId').removeAttr("disabled")
+		$('#createSnapshotId').attr('disabled', 'true');
+		jQuery.ajax({
+	        type:"GET",
+	        async : true,
+	        cache: false,
+	        url:"../console/invokeSnapshot?moveBundle="+moveBundle,
+	        success:function(e){$('#createSnapshotId').removeAttr("disabled");}
+		});
 	}
     </script>
 </head>
