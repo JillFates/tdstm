@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="" />
+<title>Edit Move Bundle</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">Edit Move Bundle</td></tr>
+</thead><tbody>
+<tr>
+	<td>open</td>
+	<td>/tds-0.1/project/show/24</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Move Bundles</td>
+	<td></td>
+</tr>
+<!--In the below case, replace 'test bundle selenium' with the required move bundle-->
+<tr>
+	<td>clickAndWait</td>
+	<td>link=test bundle selenium</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>_action_Edit</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>startTime</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>startTime</td>
+	<td>04/06/2010 12:00</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>completionTime</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>completionTime</td>
+	<td>04/09/2010 12:00</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>projectManagerId</td>
+	<td>label=Doherty, John - Project Manager</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>moveManagerId</td>
+	<td>label=Doherty, John - Project Manager</td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Dashboard Steps</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Dashboard</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>checkbox_10</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyEditable</td>
+	<td>dashboardLabel_10</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyEditable</td>
+	<td>startTime_10</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyEditable</td>
+	<td>completionTime_10</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyEditable</td>
+	<td>duration_10</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Value</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>startTime_10</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=6</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>completionTime_10</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>completionTime_10</td>
+	<td>04/07/2010 15:15</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>checkbox_20</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>startTime_20</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>startTime_20</td>
+	<td>04/06/2010 16:20</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>completionTime_20</td>
+	<td>04/08/2010 12:00</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>_action_Update</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>MoveBundle test bundle selenium updated</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Show Move Bundle</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>
