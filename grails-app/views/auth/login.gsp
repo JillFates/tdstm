@@ -22,7 +22,7 @@
 			src="${createLinkTo(dir:'images',file:'tds.jpg')}" border="0"
 			alt="tds" /></a>--%>
 			<h1>Transition Manager</h1>
-			</td>
+		</td>
 		
 	</tr>
 </table>
@@ -61,6 +61,7 @@
 		<div class="left_bcornerlog"></div>
 		<div class="border_botlog"></div>
 		<div class="right_bcornerlog"></div>
+		<iframe src="/tds-0.1/build.txt" width="240" height="30" marginwidth="0" marginheight="0" scrolling="yes" frameborder="0"></iframe>
 		</div>
 		</td>
 	</tr>
@@ -70,4 +71,3 @@
 <div class="logo"></div>
 </body>
 </html>
-		
