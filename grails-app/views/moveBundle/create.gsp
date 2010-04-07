@@ -20,7 +20,7 @@
       }
       function isValidDate( date ){
         var returnVal = true;
-      	var objRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([AP]M)$/;
+      	var objRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([APap][Mm])$/;
       	if( date && !objRegExp.test(date) ){
           	alert("Date should be in 'mm/dd/yyyy HH:MM AM/PM' format");
           	returnVal  =  false;

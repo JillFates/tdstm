@@ -55,6 +55,7 @@ function DateTimepicker() {
                 dateStatus: 'Select DD, MS d', // Status text for the date selection
                 dateFormat: 'mm/dd/yy', // See format options on parseDate
                 timeFormat: 'hh:ii',
+                allowedChar : 'APMapm',
                 firstDay: 0, // The first day of the week, Sun = 0, Mon = 1, ...
                 initStatus: 'Select a date', // Initial Status text on opening
                 isRTL: false // True if right-to-left language, false if left-to-right
@@ -304,7 +305,7 @@ $.extend(DateTimepicker.prototype, {
         /* Filter entered characters - based on date format. */
         _doKeyPress: function(e) {
                 var inst = $.datetimepicker._getInst(this._calId);
-                var chars = $.datetimepicker._possibleChars(inst._get('dateFormat')+' '+inst._get('timeFormat'));
+                var chars = $.datetimepicker._possibleChars(inst._get('dateFormat')+' '+inst._get('timeFormat')+inst._get('allowedChar'));
                 var chr = String.fromCharCode(e.charCode == undefined ? e.keyCode : e.charCode);
                 return e.ctrlKey || (chr < ' ' || !chars || chars.indexOf(chr) > -1);
         },
