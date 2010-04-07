@@ -61,7 +61,7 @@
 		<div class="left_bcornerlog"></div>
 		<div class="border_botlog"></div>
 		<div class="right_bcornerlog"></div>
-		<iframe src="/tds-0.1/build.txt" width="240" height="30" marginwidth="0" marginheight="0" scrolling="yes" frameborder="0"></iframe>
+		<iframe src="/tds-0.1/build.txt" width="240" height="30" marginwidth="0" marginheight="0" scrolling="no" frameborder="0"></iframe>
 		</div>
 		</td>
 	</tr>
