@@ -52,7 +52,7 @@ function DateTimepicker() {
                 dayNamesShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], // For formatting
                 dayNamesMin: ['Su','Mo','Tu','We','Th','Fr','Sa'], // Column headings for days starting at Sunday
                 dayStatus: 'Set DD as first week day', // Status text for the day of the week selection
-                dateStatus: 'Select DD, M d', // Status text for the date selection
+                dateStatus: 'Select DD, MS d', // Status text for the date selection
                 dateFormat: 'mm/dd/yy', // See format options on parseDate
                 timeFormat: 'hh:ii',
                 firstDay: 0, // The first day of the week, Sun = 0, Mon = 1, ...
@@ -279,10 +279,10 @@ $.extend(DateTimepicker.prototype, {
                                 case 27: $.datetimepicker._hideDatepicker(null, inst._get('speed'));
                                                 break; // hide on escape
                                 case 33: $.datetimepicker._adjustDate(inst,
-                                                        (e.ctrlKey ? -1 : -inst._get('stepMonths')), (e.ctrlKey ? 'Y' : 'M'));
+                                                        (e.ctrlKey ? -1 : -inst._get('stepMonths')), (e.ctrlKey ? 'Y' : 'MS'));
                                                 break; // previous month/year on page up/+ ctrl
                                 case 34: $.datetimepicker._adjustDate(inst,
-                                                        (e.ctrlKey ? +1 : +inst._get('stepMonths')), (e.ctrlKey ? 'Y' : 'M'));
+                                                        (e.ctrlKey ? +1 : +inst._get('stepMonths')), (e.ctrlKey ? 'Y' : 'MS'));
                                                 break; // next month/year on page down/+ ctrl
                                 case 35: if (e.ctrlKey) $.datetimepicker._clearDate(inst);
                                                 break; // clear on ctrl+end
@@ -612,7 +612,7 @@ $.extend(DateTimepicker.prototype, {
         _selectMonthYear: function(id, select, period) {
                 var inst = this._getInst(id);
                 inst._selectingMonthYear = false;
-                inst[period == 'M' ? '_drawMonth' : '_drawYear'] =
+                inst[period == 'MS' ? '_drawMonth' : '_drawYear'] =
                         select.options[select.selectedIndex].value - 0;
                 this._adjustDate(inst);
 
@@ -626,7 +626,7 @@ $.extend(DateTimepicker.prototype, {
         _selectTime: function(id, select, period) {
                 var inst = this._getInst(id);
                 inst._selectingMonthYear = false;
-                inst[period == 'M' ? '_drawMinute' : '_drawHour'] =
+                inst[period == 'MS' ? '_drawMinute' : '_drawHour'] =
                         select.options[select.selectedIndex].value - 0;
                 this._adjustDate(inst);
 
@@ -786,7 +786,7 @@ $.extend(DateTimepicker.prototype, {
            DD - day name long
            m  - month of year (no leading zero)
            mm - month of year (two digit)
-           M  - month name short
+           MS  - month name short
            MM - month name long
            y  - year (two digit)
            yy - year (four digit)
@@ -887,8 +887,8 @@ $.extend(DateTimepicker.prototype, {
                                         case 'm':
                                                 month = getNumber('m');
                                                 break;
-                                        case 'M':
-                                                month = getName('M', monthNamesShort, monthNames);
+                                        case 'MS':
+                                                month = getName('MS', monthNamesShort, monthNames);
                                                 break;
                                         case 'y':
                                                 year = getNumber('y');
@@ -923,7 +923,7 @@ $.extend(DateTimepicker.prototype, {
            DD - day name long
            m  - month of year (no leading zero)
            mm - month of year (two digit)
-           M  - month name short
+           MS  - month name short
            MM - month name long
            y  - year (two digit)
            yy - year (four digit)
@@ -986,8 +986,8 @@ $.extend(DateTimepicker.prototype, {
                                                 case 'm':
                                                         output += formatNumber('m', date.getMonth() + 1);
                                                         break;
-                                                case 'M':
-                                                        output += formatName('M', date.getMonth(), monthNamesShort, monthNames);
+                                                case 'MS':
+                                                        output += formatName('MS', date.getMonth(), monthNamesShort, monthNames);
                                                         break;
                                                 case 'y':
                                                         output += (lookAhead('y') ? date.getFullYear() :
@@ -1022,7 +1022,7 @@ $.extend(DateTimepicker.prototype, {
                                         case 'd' || 'm' || 'y':
                                                 chars += '0123456789';
                                                 break;
-                                        case 'D' || 'M':
+                                        case 'D' || 'MS':
                                                 return null; // Accept anything
                                         case "'":
                                                 if (lookAhead("'"))
@@ -1116,7 +1116,7 @@ $.extend(DateTimepickerInstance.prototype, {
                 };
                 var offsetString = function(offset, getDaysInMonth) {
                         var date = new Date();
-                        var matches = /^([+-]?[0-9]+)\s*(d|D|w|W|m|M|y|Y)?$/.exec(offset);
+                        var matches = /^([+-]?[0-9]+)\s*(d|D|w|W|m|MS|y|Y)?$/.exec(offset);
                         if (matches) {
                                 var year = date.getFullYear();
                                 var month = date.getMonth();
@@ -1126,7 +1126,7 @@ $.extend(DateTimepickerInstance.prototype, {
                                                 day += (matches[1] - 0); break;
                                         case 'w' : case 'W' :
                                                 day += (matches[1] * 7); break;
-                                        case 'm' : case 'M' :
+                                        case 'm' : case 'MS' :
                                                 month += (matches[1] - 0);
                                                 day = Math.min(day, getDaysInMonth(year, month));
                                                 break;
@@ -1219,12 +1219,12 @@ $.extend(DateTimepickerInstance.prototype, {
                 }
                 // controls and links
                 var prev = '<div class="datetimepicker_prev">' + (this._canAdjustMonth(-1, drawYear, drawMonth) ?
-                        '<a onclick="jQuery.datetimepicker._adjustDate(' + this._id + ', -' + stepMonths + ', \'M\');"' +
+                        '<a onclick="jQuery.datetimepicker._adjustDate(' + this._id + ', -' + stepMonths + ', \'MS\');"' +
                         (showStatus ? this._addStatus(this._get('prevStatus') || '&#xa0;') : '') + '>' +
                         this._get('prevText') + '</a>' :
                         (hideIfNoPrevNext ? '' : '<label>' + this._get('prevText') + '</label>')) + '</div>';
                 var next = '<div class="datetimepicker_next">' + (this._canAdjustMonth(+1, drawYear, drawMonth) ?
-                        '<a onclick="jQuery.datetimepicker._adjustDate(' + this._id + ', +' + stepMonths + ', \'M\');"' +
+                        '<a onclick="jQuery.datetimepicker._adjustDate(' + this._id + ', +' + stepMonths + ', \'MS\');"' +
                         (showStatus ? this._addStatus(this._get('nextStatus') || '&#xa0;') : '') + '>' +
                         this._get('nextText') + '</a>' :
                         (hideIfNoPrevNext ? '>' : '<label>' + this._get('nextText') + '</label>')) + '</div>';
@@ -1339,7 +1339,7 @@ $.extend(DateTimepickerInstance.prototype, {
                         var inMinYear = (minDate && minDate.getFullYear() == drawYear);
                         var inMaxYear = (maxDate && maxDate.getFullYear() == drawYear);
                         html += '<select class="datetimepicker_newMonth" ' +
-                                'onchange="jQuery.datetimepicker._selectMonthYear(' + this._id + ', this, \'M\');" ' +
+                                'onchange="jQuery.datetimepicker._selectMonthYear(' + this._id + ', this, \'MS\');" ' +
                                 'onclick="jQuery.datetimepicker._clickMonthYear(' + this._id + ');"' +
                                 (showStatus ? this._addStatus(this._get('monthStatus') || '&#xa0;') : '') + '>';
                         for (var month = 0; month < 12; month++) {
@@ -1390,7 +1390,7 @@ $.extend(DateTimepickerInstance.prototype, {
                                 'onchange="jQuery.datetimepicker._selectTime(' + this._id + ', this, \'H\');" ' +
                                 'onclick="jQuery.datetimepicker._clickMonthYear(' + this._id + ');"' +
                                 (showStatus ? this._addStatus(this._get('hourStatus') || '&#xa0;') : '') + '>';
-                        for (hour=0; hour < 24; hour++) {
+                        for (hour=1; hour < 13; hour++) {
                                 html += '<option value="' + hour + '"' +
                                         (hour == drawHour ? ' selected="selected"' : '') +
                                         '>' + ((hour<10)?'0'+hour:hour) + '</option>';
@@ -1398,7 +1398,7 @@ $.extend(DateTimepickerInstance.prototype, {
                         html += '</select>';
                         html += ' : ';
                         html += '<select class="datetimepicker_newMinute" ' +
-                                'onchange="jQuery.datetimepicker._selectTime(' + this._id + ', this, \'M\');" ' +
+                                'onchange="jQuery.datetimepicker._selectTime(' + this._id + ', this, \'MS\');" ' +
                                 'onclick="jQuery.datetimepicker._clickMonthYear(' + this._id + ');"' +
                                 (showStatus ? this._addStatus(this._get('minuteStatus') || '&#xa0;') : '') + '>';
                         for (minute=0; minute < 60; minute++) {
@@ -1407,6 +1407,11 @@ $.extend(DateTimepickerInstance.prototype, {
                                         '>' + ((minute<10)?'0'+minute:minute) + '</option>';
                         }
                         html += '</select>';
+                        html += ' <select id="datetimepicker_ampm">';
+                        html += '<option value="A"' + ((drawHour < 12) ? ' selected="selected"' : '') + '>AM</option>';
+                        html += '<option value="P"' + ((drawHour >= 12) ? ' selected="selected"' : '') + '>PM</option>';
+                        html += '</select>';
+                       
                 }
                 html += '</div>'; // Close datetimepicker_header
                 return html;
@@ -1422,7 +1427,7 @@ $.extend(DateTimepickerInstance.prototype, {
         /* Adjust one of the date sub-fields. */
         _adjustDate: function(offset, period) {
                 var year = this._drawYear + (period == 'Y' ? offset : 0);
-                var month = this._drawMonth + (period == 'M' ? offset : 0);
+                var month = this._drawMonth + (period == 'MS' ? offset : 0);
                 var day = Math.min(this._selectedDay, this._getDaysInMonth(year, month)) +
                         (period == 'D' ? offset : 0);
                 var hour = this._drawHour + (period == 'H' ? offset : 0);
@@ -1509,7 +1514,8 @@ $.extend(DateTimepickerInstance.prototype, {
                 }
                 var date = (day ? (typeof day == 'object' ? day : new Date(year, month, day, hour, minute)) :
                         new Date(this._currentYear, this._currentMonth, this._currentDay, this._currentHour, this._currentMinute));
-                return $.datetimepicker.formatDate(this._get('dateFormat')+' '+this._get('timeFormat'), date, this._getFormatConfig());
+                var ampm = $("#datetimepicker_ampm").val() == 'A' ? 'AM' : 'PM';
+                return $.datetimepicker.formatDate(this._get('dateFormat')+' '+this._get('timeFormat')+' '+ampm, date, this._getFormatConfig());
         }
 });
 

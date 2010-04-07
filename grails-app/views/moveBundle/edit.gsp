@@ -74,7 +74,7 @@
                       $("#startTime").datetimepicker();
                     });
                   </script> <input type="text" class="dateRange" size="15" style="width: 130px; height: 14px;" id="startTime" name="startTime"
-        					value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"/>" 
+        					value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"  formate="12hrs"/>" 
         					onchange="isValidDate(this.value)"/>
         					<g:hasErrors bean="${moveBundleInstance}" field="startTime">
                     		<div class="errors">
@@ -93,8 +93,9 @@
                     $(document).ready(function(){
                       $("#completionTime").datetimepicker();
                     });
-                  </script> <input type="text" class="dateRange" size="15" style="width: 130px; height: 14px;" id="completionTime" name="completionTime"
-				        value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}"/>" 
+                  </script> <input type="text" class="dateRange" size="15" style="width: 130px; height: 14px;" 
+                  			id="completionTime" name="completionTime"
+				        value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}"  formate="12hrs"/>" 
 				        onchange="isValidDate(this.value)"/>
 				        <g:hasErrors bean="${moveBundleInstance}" field="completionTime">
 				                    <div class="errors">
@@ -457,8 +458,8 @@
     function getTimeFormate( objId, dateString, stepId )
 	{
     	if(dateString && isValidDate(dateString)){
-	    	var date= new Date(dateString)
-			$("#"+objId).val(convertDate( date ))
+	    	//var date= new Date(dateString)
+			//$("#"+objId).val(convertDate( date ))
 		   	calculateDuration(stepId);
     	}
 	   
@@ -489,7 +490,7 @@
 		}
 		return timeString
 	}
-	var objRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2}$/;
+	var objRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([AP]M)$/;
     function validateStepsData(){
         var checked = true
         var keyOffStep = ""
@@ -507,7 +508,7 @@
 				    	checked =  false;
 				    	message ="Dashboard Label, Start & Completion times are mandatory"
 				    	
-		    	  } else if( !objRegExp.test( startTime.substring(0,startTime.length-3) ) || !objRegExp.test( completionTime.substring(0,completionTime.length-3) ) ) {
+		    	  } else if( !objRegExp.test( startTime ) || !objRegExp.test( completionTime ) ) {
 		    		  keyOffStep += "'"+$("#keyOffStep_"+stepId).val() +"', ";
 				      checked =  false;
 				      message = "Dates should be in 'mm/dd/yyyy hh:mm' format "
@@ -548,7 +549,7 @@
     function isValidDate( date ){
         var returnVal = true;
       	if( date && !objRegExp.test(date) ){
-          	alert("Date should be in 'mm/dd/yyyy HH:MM' format");
+          	alert("Date should be in 'mm/dd/yyyy HH:MM AM/PM' format");
           	returnVal  =  false;
       	} 
       	return returnVal;

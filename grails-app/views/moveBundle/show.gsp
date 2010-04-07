@@ -81,14 +81,14 @@
             <tr class="prop">
               <td valign="top" class="name">Start Time:</td>
 
-              <td valign="top" class="value"><tds:convertDateTime date="${moveBundleInstance?.startTime}" /></td>
+              <td valign="top" class="value"><tds:convertDateTime date="${moveBundleInstance?.startTime}" formate="12hrs"/></td>
 
             </tr>
 
             <tr class="prop">
               <td valign="top" class="name">Completion Time:</td>
 
-              <td valign="top" class="value"><tds:convertDateTime date="${moveBundleInstance?.completionTime}" /></td>
+              <td valign="top" class="value"><tds:convertDateTime date="${moveBundleInstance?.completionTime}" formate="12hrs"/></td>
 
             </tr>
 

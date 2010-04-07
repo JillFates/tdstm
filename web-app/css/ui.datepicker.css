@@ -43,7 +43,7 @@ img.datepicker_trigger {
 .datepicker_control, .datepicker_links, .datepicker_header, .datepicker {
 	clear: both;
 	float: left;
-	width: 100%;
+	width: 200px;
 	color: #fff;
 }
 .datepicker_control {
@@ -126,7 +126,7 @@ img.datepicker_trigger {
 	display: block;
 }
 .datepicker_weekEndCell {
-	background: #ddd;
+	background: #777;
 }
 .datepicker_titleRow .datepicker_weekEndCell {
 	background: #777;

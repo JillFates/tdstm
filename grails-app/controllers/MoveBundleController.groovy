@@ -127,7 +127,7 @@ class MoveBundleController {
     	def moveManagerId = params.moveManager 
         if( moveBundleInstance ) {
             moveBundleInstance.properties = params
-            def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm")
+            def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
             def startTime = params.startTime
             def completionTime = params.completionTime
             if(startTime != null && startTime != ""){
@@ -196,7 +196,7 @@ class MoveBundleController {
     def save = {
     		
         def moveBundleInstance = new MoveBundle(params)
-        def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm")
+        def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
         def startTime = params.startTime
         def completionTime = params.completionTime
         if(startTime != null && startTime != ""){
