@@ -1,4 +1,4 @@
-<chart bgAlpha='0' bgColor='FFFFFF' lowerLimit='0' upperLimit='100' numberSuffix='' showBorder='0' basefontColor='000000' chartTopMargin='15' chartBottomMargin='15' chartLeftMargin='5' chartRightMargin='5' toolTipBgColor='80A905' gaugeFillMix='{dark-10},FFFFFF,{dark-10}' gaugeFillRatio='3' showTickMarks='0'>
+<chart bgAlpha='0' bgColor='FFFFFF' lowerLimit='0' upperLimit='100' numberSuffix='' showBorder='0' basefontColor='000000' chartTopMargin='15' chartBottomMargin='15' chartLeftMargin='5' chartRightMargin='5' toolTipBgColor='80A905' gaugeFillMix='{dark-10},FFFFFF,{dark-10}' gaugeFillRatio='3' showTickMarks='0' animation='0' showValues='1' rotateValues='1' placeValuesInside='1'>
    <colorRange>
       <color minValue='0' maxValue='25' code='FF654F'/>
       <color minValue='25' maxValue='50' code='F6BD0F'/>
@@ -6,7 +6,7 @@
    </colorRange>
 
    <dials>
-      <dial value='0' rearExtension='10'/>
+      <dial value='50' rearExtension='10'/>
    </dials>
 
    <trendpoints>

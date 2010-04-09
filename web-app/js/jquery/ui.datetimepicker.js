@@ -1204,7 +1204,8 @@ $.extend(DateTimepickerInstance.prototype, {
                 var maxDate = this._getMinMaxDate('max');
                 var drawMonth = this._drawMonth;
                 var drawYear = this._drawYear;
-                var drawHour = this._drawHour;
+                var drawHour = this._drawHour ;
+                drawHour = drawHour > 12 ? drawHour - 12 : drawHour ; 
                 var drawMinute = this._drawMinute;
                 if (maxDate) {
                         var maxDraw = new Date(maxDate.getFullYear(),

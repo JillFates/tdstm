@@ -72,6 +72,11 @@
 			<div id="plan_summary">
 				<div id="topindleft">
 					<div id="summary_gauge_div" align="center"> </div>
+					<script language="JavaScript">
+						var summarychart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "summary_gauge", "280", "136", "0", "0");
+						summarychart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'summary_gauge.xml')}");
+						summarychart.render("summary_gauge_div");
+					</script>
 						Move Status vs. Plan
 				</div>
 				<div class="topleftcontent">
@@ -83,6 +88,11 @@
 			<div id="revised_summary" >
 				<div id="topindright" style="display: none;">
 					<div id="revised_gauge_div" align="center"></div>
+					<script language="JavaScript">
+						var summarychart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "revised_gauge", "280", "136", "0", "0");
+						summarychart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'revised_gauge.xml')}");
+						summarychart.render("revised_gauge_div");
+					</script> 
 						Status vs. Revised Plan
 				</div>
 				<div id="refresh" style="float: right;">Refresh: 
@@ -179,6 +189,11 @@
 									<li class="actfinish1"><span id="act_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
 								</ul>
 								<div id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}" align="center" style="display: none;"> </div>
+								<script language="JavaScript">
+							         var stepchart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "chart_${moveBundle.id}_${moveBundleStep.transitionId}", "100", "75", "0", "0");
+							         stepchart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'step_gauge.xml')}");
+							         stepchart.render("chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}");
+						      	</script> 
 							</div>
 						</g:each>
 					</div>
@@ -203,7 +218,8 @@
 <!-- Body Ends here-->
 </div>
 <script type="text/javascript">
-
+	var timer
+	var dialReload = true;
 	var countries=new ddtabcontent("newstabs")
 	countries.setpersist(true)
 	countries.setselectedClassTarget("link") //"link" or "linkparent"
@@ -281,7 +297,10 @@
 	timedRefresh();
 	/* Function to load the data for a particular MoveEvent */
 	function getMoveEventNewsDetails( moveEvent ){
-		refreshDash( $("#defaultBundleId").val() )
+		refreshDash( $("#defaultBundleId").val() );
+		if(dialReload ){
+			timer = setTimeout( "getDialsData($('#defaultBundleId').val() )", 5000 );
+		}
 		if(moveEvent){
 			jQuery.ajax({
 		        type:"GET",
@@ -317,10 +336,10 @@
 		
 	}
 	/* set time to load the move news and move bundle data*/
-	var timer
+	var handler = 0
 	function timedRefresh() {
 		var refreshTime = $("#refreshTimeId").val();
-		timer = setTimeout("getMoveEventNewsDetails($('#moveEvent').val())",refreshTime);
+		handler = setInterval("getMoveEventNewsDetails($('#moveEvent').val())",refreshTime);
 	}
 
 	/* function to load the user agent*/
@@ -455,7 +474,7 @@
 	 }
 
 	 /* update move bundal data once ajax call success */
-	 
+	
 	function updateMoveBundleSteps( dataPointStep ) {
 		try{
 			var offset = $("#timezone").val()
@@ -476,7 +495,7 @@
 				$(".sum_statusbar_bad").attr("class","sum_statusbar_good")
 				$("#status_color").html("GREEN")
 			}
-			updateSummaryGauge("summary_gauge_div",planSum.dialInd);
+			updateSummaryGauge("summary_gauge",planSum.dialInd);
 			$("#spanPlanned").html(convertTime(offset, planSum.compTime))
 			
 			if(revSum.dialInd == "-1") {
@@ -484,7 +503,7 @@
 				$("#revised_gauge_content").hide();
 			} else if(snapshot.revisedComp) {
 	
-				updateRevisedGauge("revised_gauge_div",revSum.dialInd)
+				updateRevisedGauge("revised_gauge",revSum.dialInd)
 				$("#spanRevised").html(convertTime(offset, revSum.compTime))
 				
 				$("#topindright").show();
@@ -511,21 +530,66 @@
 				var percentage = $("#percentage_"+moveBundleId+"_"+steps[i].tid).html()
 				if(percentage != "100%" && percentage != "0%"){
 					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).show();
-					post_init( "chartdiv_"+moveBundleId+"_"+steps[i].tid, steps[i].dialInd )
+					post_init( "chart_"+moveBundleId+"_"+steps[i].tid, steps[i].dialInd )
 				} else {
 					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).hide();
 				}
 			}
-			timedRefresh();
 		} catch(ex){
 			alert("Error occured please refresh the page"+ex)
 		}
 		
 	}
+	function getDialsData( bundleId ) {
+		 var moveEvent = $("#moveEvent").val()
+		 jQuery.ajax({
+		        type:"GET",
+		        async : true,
+		        cache: false,
+		        url:"../ws/dashboard/bundleData/"+ bundleId+"?moveEventId="+moveEvent,
+		        dataType: 'json',
+		        success:updateDials
+			});
+	 }
+	function updateDials( dataPointStep ) {
+		try{
+			var snapshot = dataPointStep.snapshot;
+			var moveBundleId = snapshot.moveBundleId;
+			var steps = snapshot.steps;
+			var revSum = snapshot.revSum;
+			var planSum = snapshot.planSum
+	
+			if( snapshot.planDelta > 0){
+				$(".sum_statusbar_good").attr("class","sum_statusbar_bad")
+				$("#status_color").html("RED")
+			} else {
+				$(".sum_statusbar_bad").attr("class","sum_statusbar_good")
+				$("#status_color").html("GREEN")
+			}
+			updateSummaryGauge("summary_gauge",planSum.dialInd);
+			
+			if(snapshot.revisedComp) {
+				updateRevisedGauge("revised_gauge",revSum.dialInd)
+			}
+			for( i = 0; i < steps.length; i++ ) {
+				var percentage = $("#percentage_"+moveBundleId+"_"+steps[i].tid).html()
+				if(percentage != "100%" && percentage != "0%"){
+					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).show();
+					post_init( "chart_"+moveBundleId+"_"+steps[i].tid, steps[i].dialInd )
+				} else {
+					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).hide();
+				}
+			}
+			clearTimeout(timer)
+			dialReload = false;
+		} catch(ex){alert(ex)}
+		
+	}
 	/* function to render the dials */
 	function post_init( divId, dialInd ){
-		var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId2b", "100", "75", "0", "0");
-		var xmlData = "<chart bgAlpha='0' bgColor='FFFFFF' lowerLimit='0' upperLimit='100' numberSuffix='' "+
+	//var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId2b", "100", "75", "0", "0");
+		var xmlData = "<chart bgAlpha='0' bgColor='eeeded' lowerLimit='0' upperLimit='100' numberSuffix='' animation='0'"+
+					" showValues='0' rotateValues='1' placeValuesInside='1' "+
 					" showBorder='0' basefontColor='000000' chartTopMargin='15' chartBottomMargin='15' chartLeftMargin='5'"+
 					" chartRightMargin='5' toolTipBgColor='80A905' gaugeFillMix='{dark-10},FFFFFF,{dark-10}' gaugeFillRatio='3' showTickMarks='0'>"+
 			  		" <colorRange> <color minValue='0' maxValue='25' code='FF654F'/> <color minValue='25' maxValue='50' code='F6BD0F'/>"+
@@ -537,12 +601,15 @@
 			  		" </annotationGroup> </annotations>"+
 			  		" <styles><definition><style name='RectShadow' type='shadow' strength='0'/> </definition> <application>"+
 			  		" <apply toObject='Grp1' styles='RectShadow' /> </application> </styles> </chart>"
-		myChart.setDataXML( xmlData );
-		myChart.render(divId);
+			  		
+		updateChartXML(divId,xmlData); 
+		//myChart.setDataXML( xmlData );
+		//myChart.render(divId);
 	}
 	function updateSummaryGauge( divId, dialInd ){
-    var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId", "280", "136", "0", "0");
-    var xmlData = "<chart bgAlpha='0' bgColor='FFFFFF' lowerLimit='0' upperLimit='100' numberSuffix='' showBorder='0' basefontColor='000000'"+ 
+	//var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId", "280", "136", "0", "0");
+    var xmlData = "<chart bgAlpha='0' bgColor='FFFFFF' lowerLimit='0' upperLimit='100' numberSuffix='' showBorder='0' basefontColor='000000' "+
+    					"animation='0' showValues='0' rotateValues='1' placeValuesInside='1' "+ 
         				"chartTopMargin='15' chartBottomMargin='15' chartLeftMargin='5' chartRightMargin='5' toolTipBgColor='80A905' "+
         				"gaugeFillMix='{dark-10},FFFFFF,{dark-10}' gaugeFillRatio='3' showTickMarks='0'>"+
         				" <colorRange><color minValue='0' maxValue='25' code='FF654F'/><color minValue='25' maxValue='50' code='F6BD0F'/>"+
@@ -554,12 +621,14 @@
         				"</annotationGroup></annotations>"+
         				"<styles>  <definition> <style name='RectShadow' type='shadow' strength='0'/> </definition> <application>"+
         				"<apply toObject='Grp1' styles='RectShadow' /></application></styles></chart>"
-    myChart.setDataXML( xmlData );
-    myChart.render(divId);
+		updateChartXML(divId,xmlData);
+		//myChart.setDataXML( xmlData );
+	   	//myChart.render(divId);
 	}
 	function updateRevisedGauge( divId, dialInd ){
-	    var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId1", "180", "136", "0", "0");
+	    //var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId1", "180", "136", "0", "0");
 	    var xmlData = "<chart bgAlpha='0' bgColor='FFFFFF' lowerLimit='0' upperLimit='100' numberSuffix='' showBorder='0' basefontColor='000000' "+
+	    	" animation='0' showValues='0' rotateValues='1' placeValuesInside='1' "+
 	    	" chartTopMargin='15' chartBottomMargin='15' chartLeftMargin='5' chartRightMargin='5' toolTipBgColor='80A905' "+
 	    	" gaugeFillMix='{dark-10},FFFFFF,{dark-10}' gaugeFillRatio='3' showTickMarks='0'>"+
 	    	" <colorRange><color minValue='0' maxValue='25' code='FF654F'/><color minValue='25' maxValue='50' code='F6BD0F'/>"+
@@ -571,8 +640,9 @@
 			"</annotationGroup></annotations> "+
 			" <styles><definition><style name='RectShadow' type='shadow' strength='0'/></definition>"+
 			" <application><apply toObject='Grp1' styles='RectShadow' /></application></styles></chart>"
-	    myChart.setDataXML( xmlData );
-	    myChart.render(divId);
+		updateChartXML(divId, xmlData); 
+	    //myChart.setDataXML( xmlData );
+	   	//myChart.render(divId);
 	    }
 	</script>
 </body>
