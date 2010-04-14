@@ -595,6 +595,9 @@ Comment</a></span></div>
     </ul>
 </div></div>
 <script type="text/javascript">
+$('body').click(function(){
+   $(".cell-selected").attr('class',$("#cssClassId").val());
+});
 initialize();
 timedRefresh($("#selectTimedId").val())
 if('${browserTest}' == 'true'){

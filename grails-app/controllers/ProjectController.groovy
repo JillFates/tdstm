@@ -165,11 +165,11 @@ class ProjectController {
 				if( file.getContentType() && file.getContentType() != "application/octet-stream"){
 					if(params.projectPartner == ""){
 		           		flash.message = " Please select Associated Partner to upload Image. "
-				        redirect(action:'show',id:projectInstance.id )
+				        redirect(action:'edit',id:projectInstance.id )
 				        return;
 		           	} else if (! okcontents.contains(file.getContentType())) {
 		        		flash.message = "Image must be one of: ${okcontents}"
-		        		redirect(action:'show',id:projectInstance.id )
+		        		redirect(action:'edit',id:projectInstance.id )
 		        		return;
 		        	}
 	        	}
@@ -193,7 +193,7 @@ class ProjectController {
 	            def imageSize = image.getSize()
 	            if( imageSize > 50000 ) {
 	            	flash.message = " Image size is too large. Please select proper Image"
-	            	redirect(action:'show',id:projectInstance.id )
+	            	redirect(action:'edit',id:projectInstance.id )
 	    	    	return;
 	            }
 	            if(file.getContentType() == "application/octet-stream"){
@@ -201,7 +201,7 @@ class ProjectController {
 	            } else if(params.projectPartner){
                		if(!image.save()){
                			flash.message = " Image Upload Error."
-               			redirect(action:'show',id:projectInstance.id )
+               			redirect(action:'edit',id:projectInstance.id )
                			return;
                		}
 	            }
