@@ -22,6 +22,7 @@ class Person extends Party {
 	 */
 	static mapping  = {	
 		version false
+		autoTimestamp false
 		tablePerHierarchy false
 		id column:'person_id'
 		columns {

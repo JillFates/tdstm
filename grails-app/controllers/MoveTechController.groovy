@@ -136,6 +136,8 @@ class MoveTechController {
             //checking for valid barcode format or not size is 4 (mt-moveid- teamid- s/t)
             if ( barcodeText.size() == 4 ) {
             	try{
+            		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+            		def nowDate = GormUtil.convertInToGMT( "now", tzId )
 	                if ( barcodeText.get(0) == "mt" ) {
 	                	moveBundleInstance = MoveBundle.findById ( barcodeText.get(1) )
 	                    //checkin for movebundle and team instances
@@ -145,7 +147,7 @@ class MoveTechController {
 	                    		projectTeamInstance = ProjectTeam.findById( barcodeText.get(2) )
 	                    		if ( projectTeamInstance ){
 	                                //Validating is Logindate between startdate and completedate
-	                                if ( new Date() < projectInstance.startDate	|| new Date() > projectInstance.completionDate ) {
+	                                if ( nowDate < projectInstance.startDate	|| nowDate > projectInstance.completionDate ) {
 	                                    flash.message = message( code :"Move bundle presently inactive" )
 	                                    redirect( action: 'login' )
 	                                    return;
@@ -196,7 +198,7 @@ class MoveTechController {
 	                    		projectTeamInstance = ProjectTeam.findById ( barcodeText.get(2) )
 	                    		if ( projectTeamInstance != null && projectTeamInstance.teamCode == "Cleaning" ) {
 	                                //Validating is Logindate between startdate and completedate
-	                                if ( new Date() < projectInstance.startDate || new Date() > projectInstance.completionDate ) {
+	                                if ( nowDate < projectInstance.startDate || nowDate > projectInstance.completionDate ) {
 	                                    flash.message = message ( code : "Move bundle presently inactive" )
 	                                    redirect ( action: 'login' )
 	                                    return;

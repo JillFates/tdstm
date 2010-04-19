@@ -91,7 +91,7 @@
                       $("#startTime").datetimepicker();
                     });
                   </script> <input type="text" class="dateRange" size="15" style="width: 132px; height: 14px;" id="startTime" name="startTime"
-                                   value="<tds:convertDateTime date="${moveBundleInstance?.startTime}" formate="12hrs"/>" 
+                                   value="<tds:convertDateTime date="${moveBundleInstance?.startTime}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
                                    onchange="isValidDate(this.value)"/>
                                    <g:hasErrors bean="${moveBundleInstance}" field="startTime">
                     <div class="errors">
@@ -111,7 +111,7 @@
                       $("#completionTime").datetimepicker();
                     });
                   </script> <input type="text" class="dateRange" size="15" style="width: 132px; height: 14px;" id="completionTime" name="completionTime"
-                                   value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}" formate="12hrs"/>" 
+                                   value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
                                    onchange="isValidDate(this.value)"/>
                                    <g:hasErrors bean="${moveBundleInstance}" field="completionTime">
                     <div class="errors">

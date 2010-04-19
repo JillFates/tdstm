@@ -5,6 +5,7 @@
     <title><g:layoutTitle default="Grails" /></title>
     <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" type="text/css"/>
     <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" type="text/css"/>
+    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dropDown.css')}" />  
     <link rel="shortcut icon"
           href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
     <g:layoutHead />
@@ -36,14 +37,32 @@
 
       <div class="header"><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;"/>
         <div class="header_right"><br />
-          <div style="font-weight: bold; color: #0000FF"><jsec:isLoggedIn>
-              <strong>Welcome &nbsp;&nbsp;
+          <div style="font-weight: bold; color: #0000FF">
+          <jsec:isLoggedIn>
               	<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" style="color: #0000FF;" onComplete="updatePersonDetails(e)">
-              		<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name }</span>
-              	</g:remoteLink>&nbsp;! </strong>
+					<strong>
+						<div style="float: left;">
+	              			Welcome &nbsp;&nbsp; <span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name } </span>
+	              		</div>
+			 			<div class="tzmenu">&nbsp;-&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' }</span>  time<ul>   
+			    	      <li><a href="javascript:setUserTimeZone('GMT')">GMT </a></li>
+			    	      <li><a href="javascript:setUserTimeZone('PST')">PST</a></li>
+			    	      <li><a href="javascript:setUserTimeZone('PDT')">PDT</a></li>
+			    	      <li><a href="javascript:setUserTimeZone('MST')">MST</a></li>
+			    	      <li><a href="javascript:setUserTimeZone('MDT')">MDT</a></li>
+			    	      <li><a href="javascript:setUserTimeZone('CST')">CST</a></li>
+			    	      <li><a href="javascript:setUserTimeZone('CDT')">CDT</a></li>
+			    	      <li><a href="javascript:setUserTimeZone('EST')">EST</a></li>
+			    	      <li><a href="javascript:setUserTimeZone('EDT')">EDT</a></li>
+			              </ul>
+			            </div>
+	              	&nbsp;! 
+	              </strong>
+              </g:remoteLink>
               &nbsp;<g:link controller="auth" action="signOut"
                             style="color: #328714">sign out</g:link>
-          </jsec:isLoggedIn></div>
+          </jsec:isLoggedIn>
+          </div>
         </div>
       </div>
 
@@ -129,6 +148,15 @@
                     <input type="text" maxlength="34" id="titleId" name="title"/>
                   </td>
                 </tr>
+                 <tr class="prop">
+                  <td valign="top" class="name">
+                    <label for="title">Time Zone:</label>
+                  </td>
+                  <td valign="top" class="value">
+                    <g:select name="timeZone" id="timeZoneId" from="${['GMT','PST','PDT','MST','MDT','CST','CDT','EST','EDT']}" 
+                    value="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/>
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -151,13 +179,23 @@
 		    $("#personDialog").dialog("open")
 	  	}
 		function changePersonDetails(){
-				${remoteFunction(controller:'person', action:'updatePerson', 
-						params:'\'id=\' + $(\'#personId\').val() +\'&firstName=\'+$(\'#firstNameId\').val() +\'&lastName=\'+$(\'#lastNameId\').val()+\'&nickName=\'+$(\'#nickNameId\').val()+\'&title=\'+$(\'#titleId\').val()+\'&password=\'+$(\'#passwordId\').val()', 
-						onComplete:'updateWelcome(e)')}
+			${remoteFunction(controller:'person', action:'updatePerson', 
+					params:'\'id=\' + $(\'#personId\').val() +\'&firstName=\'+$(\'#firstNameId\').val() +\'&lastName=\'+$(\'#lastNameId\').val()+\'&nickName=\'+$(\'#nickNameId\').val()+\'&title=\'+$(\'#titleId\').val()+\'&password=\'+$(\'#passwordId\').val()+\'&timeZone=\'+$(\'#timeZoneId\').val()', 
+					onComplete:'updateWelcome(e)')}
 		}
 	  	function updateWelcome( e ){
-		  	$("#loginUserId").html(e.responseText)
+		  	var ret = eval("(" + e.responseText + ")");
+		  	$("#loginUserId").html(ret[0].name)
+		  	$("#tzId").html(ret[0].tz)
 		  	$("#personDialog").dialog('close')
+	  	}
+	  	function setUserTimeZone( tz ){
+	  		${remoteFunction(controller:'project', action:'setUserTimeZone', 
+					params:'\'tz=\' + tz ',	onComplete:'updateTimeZone(e)')}
+	  	}
+	  	function updateTimeZone( e ){
+		  	var sURL = unescape(window.location);
+		  	window.location.href = sURL;
 	  	}
 	</script>
   </body>

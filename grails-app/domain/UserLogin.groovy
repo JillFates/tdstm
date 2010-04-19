@@ -1,7 +1,9 @@
+import com.tdssrc.grails.GormUtil
+import org.jsecurity.SecurityUtils
 class UserLogin {
 	String username
 	String password
-	Date createdDate = new Date()
+	Date createdDate = GormUtil.convertInToGMT( "now", "EDT" )
 	Date lastLogin
 	String active
 	Person person
@@ -22,6 +24,7 @@ class UserLogin {
 
 	static mapping  = {
 		version false
+		autoTimestamp false
 		id column:'user_login_id'
 		username sqlType: 'varchar(25)'
 		password sqlType: 'varchar(100)'  // size must me more than 20 because it will store encripted code
@@ -31,5 +34,4 @@ class UserLogin {
 	String toString(){
 		username
 	}
-
 }

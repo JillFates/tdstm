@@ -1,4 +1,6 @@
 import java.text.SimpleDateFormat;
+import org.jsecurity.SecurityUtils
+import com.tdssrc.grails.GormUtil
 /**
  * The StepSnapshot domain represents a point in time representation of the status of a Step in a MoveBundle. A group of
  * snapshot records will be created at one time for all MoveBundleStep records associated with a MoveBundle.
@@ -10,13 +12,15 @@ class StepSnapshot {
 	int duration				// The number of seconds that the task has been executing
 	int planDelta				// The number of seconds that the step is over(+)/under(-) the planned finish time.
 	int dialIndicator			// Quantity to display in the dial/gage on dashboard
-	Date dateCreated = new Date()
+	Date dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
 
 	static constraints = { 
+		dateCreated( nullable:true )
 	}
 
 	static mapping  = {
 		version false
+		autoTimestamp false
 		columns {
 			taskCount sqltype: 'smallint unsigned'
 			tasksCompleted sqltype: 'smallint unsigned'
@@ -25,7 +29,6 @@ class StepSnapshot {
 			dialIndicator sqltype: 'tinyint'		
 		}
 	}
-	
 	/**
 	 * computes the pace of the task in seconds
 	 */
@@ -77,12 +80,14 @@ class StepSnapshot {
 	 */
 	def getProjectedTimeOver() {
 		def timeOver = 0
+		def tzId = getTimeZone()
+		def nowTime = GormUtil.convertInToGMT( "now", tzId ).getTime()
 		if(!hasStarted()){
-			if( moveBundleStep.planStartTime.getTime() > new Date().getTime() ) {
-				timeOver = ( new Date().getTime() + getProjectedTimeRemaining() * 1000 ) - moveBundleStep.planCompletionTime.getTime()
+			if( moveBundleStep.planStartTime.getTime() >  nowTime ) {
+				timeOver = ( nowTime + getProjectedTimeRemaining() * 1000 ) - moveBundleStep.planCompletionTime.getTime()
 			}
 		} else if(!isCompleted()){
-			timeOver = (new Date().getTime() + getProjectedTimeRemaining() * 1000 ) - moveBundleStep.planCompletionTime.getTime()
+			timeOver = ( nowTime + getProjectedTimeRemaining() * 1000 ) - moveBundleStep.planCompletionTime.getTime()
 		}
 		
 		if(timeOver){
@@ -100,8 +105,8 @@ class StepSnapshot {
 	// TODO : JPM : Shouldn't be converting TZ here....  We leave TZ switch in the web service ONLY
 	
 		// return moveBundleStep.planCompletionTime + projectedTimeOver
-		def offsetTZ =  new Date().getTimezoneOffset() / 60 
-		def projectedCompletionTimeInseconds = ( moveBundleStep.planCompletionTime.getTime() / 1000 ) + getProjectedTimeOver() + offsetTZ
+		//def offsetTZ =  new Date().getTimezoneOffset() / 60 
+		def projectedCompletionTimeInseconds = ( moveBundleStep.planCompletionTime.getTime() / 1000 ) + getProjectedTimeOver()
 		def projectedCompletionTime = new Date( (Long)(projectedCompletionTimeInseconds * 1000) )
 		def dateformat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		return dateformat.format(projectedCompletionTime)

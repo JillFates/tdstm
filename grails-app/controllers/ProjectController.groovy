@@ -1,6 +1,7 @@
 import grails.converters.JSON
 import java.text.SimpleDateFormat
 import org.jsecurity.SecurityUtils
+import com.tdssrc.grails.GormUtil
 class ProjectController {
     def userPreferenceService
     def partyRelationshipService
@@ -145,16 +146,20 @@ class ProjectController {
      */
     def update = {
         def projectInstance = Project.get( params.id )
-        projectInstance.lastUpdated = new Date()
+        //projectInstance.lastUpdated = new Date()
         
         if( projectInstance ) {
             projectInstance.properties = params
             def startDate = params.startDate
             def completionDate = params.completionDate
             //  When the Start date is initially selected and Completion Date is blank, set completion date to the Start date
-            if ( startDate != "" && completionDate == "" ) {
-                def formatter = new SimpleDateFormat("MM/dd/yyyy");
-                projectInstance.completionDate = formatter.parse(startDate);
+            def formatter = new SimpleDateFormat("MM/dd/yyyy");
+            def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+            if(startDate != null && startDate != ""){
+            	projectInstance.startDate =  GormUtil.convertInToGMT(formatter.parse(startDate), tzId)
+            }
+            if(completionDate != null && completionDate != ""){
+            	projectInstance.completionDate =  GormUtil.convertInToGMT(formatter.parse(completionDate), tzId)
             }
            //Get the Partner Image file from the multi-part request
             def file = request.getFile('partnerImage')
@@ -371,14 +376,18 @@ class ProjectController {
     def save = {
     	def workflowCodes = []
         def projectInstance = new Project(params)
-        projectInstance.dateCreated = new Date()
+        //projectInstance.dateCreated = new Date()
         def startDate = params.startDate
         def completionDate = params.completionDate   
 
         //  When the Start date is initially selected and Completion Date is blank, set completion date to the Start date
-        if ( startDate != "" && completionDate == "" ) {
-            def formatter = new SimpleDateFormat("MM/dd/yyyy");
-            projectInstance.completionDate = formatter.parse(startDate);
+		def formatter = new SimpleDateFormat("MM/dd/yyyy");
+        def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+        if(startDate != null && startDate != ""){
+        	projectInstance.startDate =  GormUtil.convertInToGMT(formatter.parse(startDate), tzId)
+        }
+        if(completionDate != null && completionDate != ""){
+        	projectInstance.completionDate =  GormUtil.convertInToGMT(formatter.parse(completionDate), tzId)
         }
         
         //Get the Partner Image file from the multi-part request
@@ -583,6 +592,13 @@ class ProjectController {
     			 redirect(action:'show',id:projectInstance.id )
     		 }
     		 
-     }
-
+    }
+    /*
+     * function to set the user preference time zone
+     */
+    def setUserTimeZone = {
+    	def timeZone = params.tz
+    	userPreferenceService.setPreference( "CURR_TZ", timeZone )
+		render timeZone 
+    }
 }

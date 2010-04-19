@@ -131,6 +131,7 @@ class AssetEntityController {
 	    sessionFactory.getCurrentSession().clear();
 		session.setAttribute("BATCH_ID",0) 
 		session.setAttribute("TOTAL_ASSETS",0)
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
         //get project Name
         def projectId
         def project
@@ -222,7 +223,7 @@ class AssetEntityController {
                     dataTransferBatch.dataTransferSet = dataTransferSetInstance
                     dataTransferBatch.project = project
                     dataTransferBatch.userLogin = userLogin
-                    dataTransferBatch.exportDatetime = exportTime
+                    dataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
                     if(dataTransferBatch.save()){
                     	session.setAttribute("BATCH_ID",dataTransferBatch.id)
                         def eavAttributeInstance
@@ -438,7 +439,7 @@ class AssetEntityController {
                 		titleInfoMap.add( projectId )
                 		titleInfoMap.add( project.name )
                 		titleInfoMap.add( partyRelationshipService.getProjectManagers(projectId) )
-                		titleInfoMap.add( format.format(new Date()) )
+                		titleInfoMap.add( format.format( new Date() ) )
                 		titleInfoMap.add( loginUser.person )
                 		titleInfoMap.add( bundleNameList )
                 		partyRelationshipService.exportTitleInfo(titleInfoMap,titleSheet)
@@ -807,7 +808,8 @@ class AssetEntityController {
         assetCommentInstance.createdBy = loginUser.person
         if(params.isResolved == '1'){
             assetCommentInstance.resolvedBy = loginUser.person
-            assetCommentInstance.dateResolved = new Date()
+            def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+            assetCommentInstance.dateResolved = GormUtil.convertInToGMT( "now", tzId )
         }
     	if(!assetCommentInstance.hasErrors() && assetCommentInstance.save()) {
     		def status = AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetCommentInstance.assetEntity,'issue',0])
@@ -828,18 +830,17 @@ class AssetEntityController {
         def dtCreated 
         def dtResolved 
         DateFormat formatter ; 
-        formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
- 	   
+        formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm a");
+        def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
         def assetComment = AssetComment.get(params.id)
         if(assetComment.createdBy){
             personCreateObj = Person.find("from Person p where p.id = $assetComment.createdBy.id")
-            dtCreated = formatter.format(assetComment.dateCreated);
+            dtCreated = formatter.format(GormUtil.convertInToUserTZ(assetComment.dateCreated, tzId));
         }
         if(assetComment.resolvedBy){
             personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")
-            dtResolved = formatter.format(assetComment.dateResolved);
+            dtResolved = formatter.format(GormUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
         }     
-    	
         commentList<<[ assetComment:assetComment,personCreateObj:personCreateObj,
                       personResolvedObj:personResolvedObj,dtCreated:dtCreated?dtCreated:"",
                       dtResolved:dtResolved?dtResolved:"" ]
@@ -857,8 +858,9 @@ class AssetEntityController {
         def loginUser = UserLogin.findByUsername(principal)
     	def assetCommentInstance = AssetComment.get(params.id)
     	if(params.isResolved == '1' && assetCommentInstance.isResolved == 0 ){
+    		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
             assetCommentInstance.resolvedBy = loginUser.person
-            assetCommentInstance.dateResolved = new Date()
+            assetCommentInstance.dateResolved = GormUtil.convertInToGMT( "now", tzId )
         }else if(params.isResolved == '1' && assetCommentInstance.isResolved == 1){
         }else{
         	assetCommentInstance.resolvedBy = null
@@ -1140,7 +1142,8 @@ class AssetEntityController {
 	        def assetTransition = AssetTransition.findAllByAssetEntity( assetDetail, [ sort:"dateCreated", order:"desc"] )
 	        def sinceTimeElapsed = "00:00:00" 
 	        if( assetTransition ){
-	        	sinceTimeElapsed = convertIntegerIntoTime( new Date().getTime() - assetTransition[0]?.dateCreated?.getTime() )
+	        	def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+	        	sinceTimeElapsed = convertIntegerIntoTime( GormUtil.convertInToGMT("now", tzId ).getTime() - assetTransition[0]?.dateCreated?.getTime() )
 	        }
 	        assetTransition.each{
 	        	def cssClass

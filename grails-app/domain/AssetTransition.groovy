@@ -2,6 +2,7 @@
  * An AssetTransition is used to record the state change or transition of an asset from
  * one state to another at a particular time and by whom.  
  */
+import com.tdssrc.grails.GormUtil
 class AssetTransition {
 
 	String stateFrom
@@ -10,19 +11,19 @@ class AssetTransition {
 	Integer wasOverridden = 0	// Indicates that the admin reset the state
 	Integer wasSkippedTo = 0	// Indicates that a state was skipped prior to this transtion stateTo
 	String comment
-	Date dateCreated = new Date()
+	Date dateCreated
 	Date lastUpdated
 	Integer voided = 0		// to place transition as voided when statusTo < new status
 	String type
 	Integer isNonApplicable = 0
-
+	
 	static belongsTo = [ 
 		assetEntity : AssetEntity,
 		moveBundle  : MoveBundle,
 		projectTeam : ProjectTeam,
 		userLogin   : UserLogin
 	]
-
+	
 	static constraints = {
 		assetEntity( nullable:false )
 		stateFrom( blank:false, nullable:false )
@@ -34,6 +35,7 @@ class AssetTransition {
 		timeElapsed( nullable:false )
 		wasOverridden( range:0..1, nullable:false )
 		wasSkippedTo( range:0..1, nullable:false )
+		dateCreated( nullable:true )
 		lastUpdated( nullable:true )
 		voided( range:0..1, nullable:false )
 		type( blank:false, nullable:false )
@@ -42,6 +44,7 @@ class AssetTransition {
 	
 	static mapping  = {
 		version false
+		autoTimestamp false
 		id column:'asset_transition_id'
         columns {
 		 	stateFrom sqlType: 'varchar(20)'
@@ -51,5 +54,15 @@ class AssetTransition {
 			voided sqlType: 'tinyint(1)'
 			timeElapsed sqlType: 'bigint(20)'
 		}        
+	}
+	/*
+	 * Date to insert in GMT
+	 */
+	def beforeInsert = {
+		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
+		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+	}
+	def beforeUpdate = {
+		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
 	}
 }

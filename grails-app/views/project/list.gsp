@@ -54,9 +54,9 @@
 
 					<td>${fieldValue(bean:projectInstance, field:'name')}</td>
 
-					<td><tds:convertDateTime date="${projectInstance?.dateCreated}"/> </td>
+					<td><tds:convertDateTime date="${projectInstance?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
 
-					<td><tds:convertDateTime date="${projectInstance?.lastUpdated}"/></td>
+					<td><tds:convertDateTime date="${projectInstance?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 
 					<td>${fieldValue(bean:projectInstance, field:'comment')}</td>
 

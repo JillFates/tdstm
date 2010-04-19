@@ -3,6 +3,7 @@ import grails.converters.JSON
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import org.jsecurity.SecurityUtils
+import com.tdssrc.grails.GormUtil
 
 class NewsEditorController {
 	
@@ -132,7 +133,8 @@ class NewsEditorController {
 		def dtCreated 
 		def dtResolved 
 		DateFormat formatter ; 
-		formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
+		formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm a");
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def assetName
 		def commentType = params.commentType
 		def commentObject
@@ -140,22 +142,21 @@ class NewsEditorController {
 			commentObject = AssetComment.get( params.id )
 			if(commentObject.resolvedBy){
 				personResolvedObj = Person.find("from Person p where p.id = $commentObject.resolvedBy.id")
-				dtResolved = formatter.format(commentObject.dateResolved);
+				dtResolved = formatter.format(GormUtil.convertInToUserTZ(commentObject.dateResolved, tzId));
 			} 
 			assetName = commentObject.assetEntity.assetName 
 		} else {
 			commentObject = MoveEventNews.get( params.id )
 			if(commentObject.archivedBy){
 				personResolvedObj = Person.find("from Person p where p.id = $commentObject.archivedBy.id")
-				dtResolved = formatter.format(commentObject.dateArchived);
+				dtResolved = formatter.format(GormUtil.convertInToUserTZ(commentObject.dateArchived, tzId));
 			} 
 			
 		}
 		if(commentObject.createdBy){
 			personCreateObj = Person.find("from Person p where p.id = $commentObject.createdBy.id")
-			dtCreated = formatter.format(commentObject.dateCreated);
+			dtCreated = formatter.format(GormUtil.convertInToUserTZ(commentObject.dateCreated, tzId));
 		}
-		
 		commentList<<[ commentObject:commentObject,personCreateObj:personCreateObj,
 					   personResolvedObj:personResolvedObj,dtCreated:dtCreated?dtCreated:"",
 					   dtResolved:dtResolved?dtResolved:"",assetName : assetName]
@@ -171,11 +172,12 @@ class NewsEditorController {
 		def principal = SecurityUtils.subject.principal
 		def loginUser = UserLogin.findByUsername(principal)
 		def commentType = params.commentType
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		if(commentType == "issue"){
 			def assetCommentInstance = AssetComment.get(params.id)
 			if(params.isResolved == '1' && assetCommentInstance.isResolved == 0 ){
 				assetCommentInstance.resolvedBy = loginUser.person
-				assetCommentInstance.dateResolved = new Date()
+				assetCommentInstance.dateResolved = GormUtil.convertInToGMT( "now", tzId )
 			}else if(params.isResolved == '1' && assetCommentInstance.isResolved == 1){
 			}else{
 				assetCommentInstance.resolvedBy = null
@@ -189,7 +191,7 @@ class NewsEditorController {
 			if(params.isResolved == '1' && moveEventNewsInstance.isArchived == 0 ){
 				moveEventNewsInstance.isArchived = 1
 				moveEventNewsInstance.archivedBy = loginUser.person
-				moveEventNewsInstance.dateArchived = new Date()
+				moveEventNewsInstance.dateArchived = GormUtil.convertInToGMT( "now", tzId )
 			}else if(params.isResolved == '1' && moveEventNewsInstance.isArchived == 1){
 			}else{
 				moveEventNewsInstance.isArchived = 0
@@ -218,9 +220,10 @@ class NewsEditorController {
 		moveEventNewsInstance.createdBy = loginUser.person
 		
 		if(params.isArchived == '1'){
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 			moveEventNewsInstance.isArchived = 1
 			moveEventNewsInstance.archivedBy = loginUser.person
-			moveEventNewsInstance.dateArchived = new Date()
+			moveEventNewsInstance.dateArchived = GormUtil.convertInToGMT( "now", tzId )
 		}
 		moveEventNewsInstance.save(flush:true)
 		redirect(action:newsEditorList, params:[projectId:params.projectId, moveBundle : params.moveBundle, 

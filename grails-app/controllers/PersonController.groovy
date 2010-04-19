@@ -1,10 +1,13 @@
 import grails.converters.JSON
 import java.text.SimpleDateFormat
 import org.jsecurity.crypto.hash.Sha1Hash
+import com.tdssrc.grails.GormUtil
+import java.text.DateFormat
 
 class PersonController {
     
 	def partyRelationshipService
+	def userPreferenceService
 	
     def index = { redirect(action:list,params:params) }
 
@@ -94,7 +97,7 @@ class PersonController {
 	        
         def personInstance = Person.get( params.id )
 	        
-        personInstance.lastUpdated = new Date()
+        //personInstance.lastUpdated = new Date()
 	        
         def companyId = params.company
         if(personInstance) {
@@ -130,7 +133,7 @@ class PersonController {
 		
         def personInstance = new Person( params )
         
-        personInstance.dateCreated = new Date()
+        //personInstance.dateCreated = new Date()
         if ( !personInstance.hasErrors() && personInstance.save() ) {
         	def fullName 
 			if(params.lastName == ""){
@@ -159,10 +162,10 @@ class PersonController {
         def personInstance = Person.get( params.id )        
         def companyId = params.companyId
         def companyParty = Party.findById(companyId)
-        SimpleDateFormat outputDateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm")
-		SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm")
-        def dateCreatedByFormat = outputDateFormat.format(inputDateFormat.parse(String.valueOf(personInstance.dateCreated)))
-        def lastUpdatedFormat = outputDateFormat.format(inputDateFormat.parse(String.valueOf(personInstance.lastUpdated)))
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+        def dateCreatedByFormat = formatter.format(GormUtil.convertInToUserTZ( personInstance.dateCreated, tzId ) )
+        def lastUpdatedFormat = formatter.format(GormUtil.convertInToUserTZ( personInstance.lastUpdated, tzId ) )
         if(!personInstance) {
             flash.message = "Person not found with id ${params.id}"
             redirect( action:list, params:[ id:companyId ] )
@@ -201,7 +204,7 @@ class PersonController {
     	def projectId = params.projectId
     	def roleType = params.roleType
     	def companyId = params.company
-    	personInstance.lastUpdated = new Date()
+    	//personInstance.lastUpdated = new Date()
     	if(personInstance) {
     		personInstance.properties = params
     		if(personInstance.lastName == null){
@@ -256,7 +259,7 @@ class PersonController {
 	def savePerson = {
 		def personInstance = new Person( params )
 		
-		personInstance.dateCreated = new Date()
+		//personInstance.dateCreated = new Date()
 		def companyId = params.company
 		def projectId = params.projectId
 		def roleType = params.roleType
@@ -300,6 +303,7 @@ class PersonController {
 	 *----------------------------------------------------------*/
 	def updatePerson = {
 			def personInstance = Person.get(params.id)
+			def ret = []
 			personInstance.properties = params
 			if ( !personInstance.hasErrors() && personInstance.save() ) {
 				getSession().setAttribute( "LOGIN_PERSON", ['name':personInstance.firstName, "id":personInstance.id ])
@@ -309,7 +313,10 @@ class PersonController {
 					userLogin.password = new Sha1Hash( password ).toHex()
 					userLogin.save();
 				}
+				userPreferenceService.setPreference( "CURR_TZ", params.timeZone )
+				userPreferenceService.loadPreferences("CURR_TZ")
 			}
-			render personInstance.firstName
+			ret << [name:personInstance.firstName, tz:getSession().getAttribute( "CURR_TZ" )?.CURR_TZ]
+			render  ret as JSON
     }
 }

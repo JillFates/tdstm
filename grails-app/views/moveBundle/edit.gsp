@@ -74,7 +74,7 @@
                       $("#startTime").datetimepicker();
                     });
                   </script> <input type="text" class="dateRange" size="15" style="width: 130px; height: 14px;" id="startTime" name="startTime"
-        					value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"  formate="12hrs"/>" 
+        					value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"  formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
         					onchange="isValidDate(this.value)"/>
         					<g:hasErrors bean="${moveBundleInstance}" field="startTime">
                     		<div class="errors">
@@ -95,7 +95,7 @@
                     });
                   </script> <input type="text" class="dateRange" size="15" style="width: 130px; height: 14px;" 
                   			id="completionTime" name="completionTime"
-				        value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}"  formate="12hrs"/>" 
+				        value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}"  formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
 				        onchange="isValidDate(this.value)"/>
 				        <g:hasErrors bean="${moveBundleInstance}" field="completionTime">
 				                    <div class="errors">
@@ -218,7 +218,9 @@
 									</span>
 								</td>
 								<td>
-								<span id="startTimeText_${dashboardStep.step.id }" title="text" style="display: none;" ><tds:convertToGMT date="${dashboardStep.moveBundleStep?.planStartTime}"/></span>
+								<span id="startTimeText_${dashboardStep.step.id }" title="text" style="display: none;" >
+									<tds:convertDateTime date="${dashboardStep.moveBundleStep?.planStartTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+							</span>
 								
 								<span id="startTimeInput_${dashboardStep.step.id }" title="input">
 				                  <script type="text/javascript">
@@ -227,11 +229,14 @@
 				                    });
 				                  </script>
 									<input type="text" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }"
-									value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}' formate="12hrs"/>" onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })"/>
+									value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
+									onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })"/>
 								</span>
 								</td>
 								<td>
-								<span id="completionTimeText_${dashboardStep.step.id }" title="text" style="display: none;" ><tds:convertToGMT date="${dashboardStep.moveBundleStep?.planCompletionTime}"/></span>
+								<span id="completionTimeText_${dashboardStep.step.id }" title="text" style="display: none;" >
+									<tds:convertDateTime date="${dashboardStep.moveBundleStep?.planCompletionTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+								</span>
 								
 								<span id="completionTimeInput_${dashboardStep.step.id }" title="input">
 				                  <script type="text/javascript">
@@ -240,7 +245,8 @@
 				                    });
 				                  </script>
 									<input type="text" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }" 
-									value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planCompletionTime}' formate="12hrs"/>" onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })"/>
+									value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planCompletionTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
+									onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })"/>
 								</span>
 								</td>
 								<td>
@@ -278,7 +284,9 @@
 									</span>
 								</td>
 								<td>
-								<span id="startTimeText_${dashboardStep.step.id }" title="text"><tds:convertToGMT date="${dashboardStep.moveBundleStep?.planStartTime}"/></span>
+								<span id="startTimeText_${dashboardStep.step.id }" title="text">
+									<tds:convertDateTime date="${dashboardStep.moveBundleStep?.planStartTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+								</span>
 								
 								<span id="startTimeInput_${dashboardStep.step.id }" style="display: none;" title="input">
 				                  <script type="text/javascript">
@@ -287,11 +295,14 @@
 				                    });
 				                  </script>
 									<input type="text" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }"
-									value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}' formate="12hrs"/>" onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })"/>
+									value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
+									onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })"/>
 								</span>
 								</td>
 								<td>
-								<span id="completionTimeText_${dashboardStep.step.id }" title="text"><tds:convertToGMT date="${dashboardStep.moveBundleStep?.planCompletionTime}"/></span>
+								<span id="completionTimeText_${dashboardStep.step.id }" title="text">
+									<tds:convertDateTime date="${dashboardStep.moveBundleStep?.planCompletionTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+								</span>
 								
 								<span id="completionTimeInput_${dashboardStep.step.id }" style="display: none;" title="input">
 				                  <script type="text/javascript">
@@ -300,7 +311,8 @@
 				                    });
 				                  </script>
 									<input type="text" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }" 
-									value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planCompletionTime}' formate="12hrs"/>" onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })"/>
+									value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planCompletionTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
+									onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })"/>
 								</span>
 								</td>
 								<td>

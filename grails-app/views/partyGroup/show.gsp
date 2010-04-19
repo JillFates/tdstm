@@ -41,14 +41,14 @@
                         <tr class="prop">
                             <td valign="top" class="name">Date Created:</td>
 
-                            <td valign="top" class="value"><tds:convertDateTime date="${partyGroupInstance?.dateCreated}"/> </td>
+                            <td valign="top" class="value"><tds:convertDateTime date="${partyGroupInstance?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
 
                         </tr>
 
                         <tr class="prop">
                             <td valign="top" class="name">Last Updated:</td>
 
-                            <td valign="top" class="value"><tds:convertDateTime date="${partyGroupInstance?.lastUpdated}" /> </td>
+                            <td valign="top" class="value"><tds:convertDateTime date="${partyGroupInstance?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
 
                         </tr>
                     

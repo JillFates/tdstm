@@ -212,7 +212,7 @@ Move News and Issues</b></span>
 	<g:each in="${assetCommentsList}" status="i" var="assetCommentInstance">
 		<tr class="${(i % 2) == 0 ? 'even' : 'odd'}" id="commentsRowId_${i}"
 			onclick="${remoteFunction(action:'getCommetOrNewsData',params:'\'id=\'+'+assetCommentInstance.id+'+\'&commentType='+assetCommentInstance?.commentType+'\'', onComplete:'showEditCommentForm( e, '+i+')')}">
-			<td><tds:convertDateTime date="${assetCommentInstance?.createdAt}"/></td>
+			<td><tds:convertDateTime date="${assetCommentInstance?.createdAt}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 			<td>
 			${assetCommentInstance?.createdBy}
 			</td>
@@ -232,7 +232,7 @@ Move News and Issues</b></span>
 			<td>
 				<tds:truncate value="${assetCommentInstance?.resolution}"/>
 			</td>
-			<td><tds:convertDateTime date="${assetCommentInstance?.resolvedAt}"/></td>
+			<td><tds:convertDateTime date="${assetCommentInstance?.resolvedAt}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 			<td>
 			${assetCommentInstance?.resolvedBy}
 			</td>

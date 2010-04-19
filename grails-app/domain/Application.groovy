@@ -23,6 +23,7 @@ class Application extends PartyGroup {
 
 	static mapping  = {
 		version true
+		autoTimestamp false
 		id column: 'app_id'
 		columns {
 			trackChanges sqlType: 'char(1)'

@@ -1,5 +1,7 @@
 import grails.converters.JSON
 import org.jsecurity.SecurityUtils
+import com.tdssrc.grails.GormUtil
+
 class MoveBundleAssetController {
 	def partyRelationshipService
 	def assetEntityAttributeLoaderService
@@ -1021,6 +1023,7 @@ class MoveBundleAssetController {
             		}
             	
             	}
+        	def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ	
         	racks.each{
         		def rackRooms = it?.rack.split("~")
         		if(rackRooms?.size() == 3){
@@ -1126,7 +1129,7 @@ class MoveBundleAssetController {
     	            			cssClass = 'rack_error'
     	            			rackStyle = 'rack_error'
     	            		} else if(bundleId && assetEnity.assetEntity?.bundleId != Integer.parseInt(bundleId)){
-    	            			def currentTime = new Date().getTime()
+    	            			def currentTime = GormUtil.convertInToGMT( "now", tzId ).getTime()
     	            			def moveBundle = MoveBundle.findById(bundleId)
     	            			def startTime = moveBundle.startTime ? moveBundle.startTime.getTime() : 0
     	            			if(startTime < currentTime){

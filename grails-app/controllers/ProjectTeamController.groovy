@@ -80,7 +80,7 @@ class ProjectTeamController {
 	 */
     def update = {
         def projectTeamInstance = ProjectTeam.get( params.id )
-        projectTeamInstance.lastUpdated = new Date()
+        //projectTeamInstance.lastUpdated = new Date()
         def bundleId = params.bundleId
         def bundleInstance = MoveBundle.findById( bundleId )
         def teamMembers = request.getParameterValues("teamMembers")

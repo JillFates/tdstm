@@ -1,6 +1,8 @@
 import grails.converters.JSON
 import org.jsecurity.SecurityUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import com.tdssrc.grails.GormUtil
+
 class ClientConsoleController {
 	def stateEngineService
 	def userPreferenceService
@@ -115,7 +117,8 @@ class ClientConsoleController {
 				}
 				resultList=jdbcTemplate.queryForList(query.toString())
 			}
-			def today = new java.util.Date();
+    		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			def today = GormUtil.convertInToGMT( "now", tzId );
 			def lastPoolTime = new java.sql.Timestamp(today.getTime())
 			def assetEntityList=[]
 			def processTransitionList=[]
@@ -415,7 +418,8 @@ class ClientConsoleController {
 	        	bundles = (moveBundlesList.id).toString().replace("[","(").replace("]",")")
 	        }
 			def lastPoolTime = params.lastPoolTime
-			def today = new java.util.Date();
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			def today = GormUtil.convertInToGMT( "now", tzId );
 			def currentPoolTime = new java.sql.Timestamp(today.getTime())
 			getSession().setAttribute("LAST_POOL_TIME",currentPoolTime)
 			def query = new StringBuffer("SELECT ae.asset_entity_id as id, ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,ae.asset_name "+
@@ -872,7 +876,8 @@ class ClientConsoleController {
 		def changedClass = cssClass
 		if(cssClass == "task_done"){
 			def createdTime = AssetTransition.find("from AssetTransition a where a.assetEntity = $assetId and a.voided = 0 and a.stateTo=${transId}")?.dateCreated?.getTime()
-			def currentTime = new Date().getTime()
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ					
+			def currentTime = GormUtil.convertInToGMT( "now", tzId ).getTime()
 			Integer minutes
 			if(createdTime){
 				minutes = (currentTime - createdTime) / 1000

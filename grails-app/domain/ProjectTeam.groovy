@@ -25,6 +25,7 @@ class ProjectTeam extends PartyGroup{
 	
 	static mapping  = {
 		version true
+		autoTimestamp false
 		id column: 'project_team_id'
 		columns {
 			isDisbanded sqlType: 'char(1)'

@@ -38,9 +38,9 @@
                              </td>
                             <td><g:link action="edit" id="${partyGroupInstance.id}" title="Edit  '${fieldValue(bean:partyGroupInstance, field:'name')}'">${fieldValue(bean:partyGroupInstance, field:'name')}</g:link></td>
                         
-                            <td><tds:convertDateTime date="${partyGroupInstance?.dateCreated}"/></td>
+                            <td><tds:convertDateTime date="${partyGroupInstance?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
                         
-                            <td><tds:convertDateTime date="${partyGroupInstance?.lastUpdated}" /></td>
+                            <td><tds:convertDateTime date="${partyGroupInstance?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
                         	
                         </tr>
                     </g:each>

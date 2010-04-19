@@ -3,6 +3,7 @@
  * information entered by the user plus some properties that are determined during the execution of the 
  * move event.  
  */
+import com.tdssrc.grails.GormUtil
 class MoveBundleStep {	
 	static final String METHOD_LINEAR="L"
 	static final String METHOD_MANUAL="M"
@@ -14,7 +15,7 @@ class MoveBundleStep {
     Date planCompletionTime			// The date/time of when the step will complete, entered by the project manager enters while planning to move
 	String calcMethod				// The method that will be used to calculate the projection of completion for the step
 	Integer showOnDashboard=1		// Used to determine if the Step appears in the dashboard		
-	Date dateCreated = new Date()
+	Date dateCreated
 	Date lastUpdated
 
 	// The following properties are subject to change during the project and will be recomputed on each snapshot process.  Since some of these
@@ -28,6 +29,8 @@ class MoveBundleStep {
 		planCompletionTime( nullable:true )
 		actualStartTime( nullable:true )
 		actualCompletionTime( nullable:true )
+		dateCreated( nullable:true )
+		lastUpdated( nullable:true )
 		calcMethod( blank:false, nullable:false, inList: [METHOD_LINEAR, METHOD_MANUAL] )
 		showOnDashboard(range:0..1)	
 	}
@@ -38,6 +41,7 @@ class MoveBundleStep {
 
 	static mapping  = {
 		version true
+		autoTimestamp false
 		columns {
 			label sqltype: 'varchar(30)'
 			calcMethod sqltype: 'char(1)'
@@ -48,7 +52,16 @@ class MoveBundleStep {
 			actualStartTime sqltype: 'DateTime'			
 		}
 	}
-	
+	/*
+	 * Date to insert in GMT
+	 */
+	def beforeInsert = {
+    	dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
+		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+	}
+	def beforeUpdate = {
+    	lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+	}
 	/**
 	 * calculates the total time that step is planned to take to complete
 	 * @return int - the number of seconds the step was planned to take
@@ -73,8 +86,8 @@ class MoveBundleStep {
 	 */
 	def getActualDuration( def asOfTime ) {
 		def timeDuration
-		
-		if ( ! asOfTime ) asOfTime = new Date()
+		def tzId = getTimeZone()
+		if ( ! asOfTime ) asOfTime = GormUtil.convertInToGMT( "now", tzId )
 		
 		if( actualStartTime && actualCompletionTime ){
 			timeDuration = actualCompletionTime.getTime() - actualStartTime.getTime()

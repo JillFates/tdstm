@@ -93,7 +93,7 @@
                   jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                 </script> <input type="text" class="dateRange" size="15"
                                  style="width: 112px; height: 14px;" name="startTime"
-                                 value="<tds:convertDate date="${moveBundleInstance?.startTime}"/>">
+                                 value="<tds:convertDate date="${moveBundleInstance?.startTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>">
 
                                  <g:hasErrors
                   bean="${moveBundleInstance}" field="startTime">
@@ -124,7 +124,7 @@
                   jQuery(function($){$('.datetRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                 </script> <input type="text" class="dateRange" size="15"
                                  style="width: 112px; height: 14px;" name="startTime"
-                                 value="<tds:convertDate date="${moveBundleInstance?.finishTime}"/>">
+                                 value="<tds:convertDate date="${moveBundleInstance?.finishTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>">
 
                                  <g:hasErrors
                   bean="${moveBundleInstance}" field="finishTime">

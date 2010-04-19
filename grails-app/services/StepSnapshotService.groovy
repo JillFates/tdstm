@@ -1,6 +1,7 @@
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.runtime.TimeCategory
+import com.tdssrc.grails.GormUtil
 
 class StepSnapshotService {
 	protected static Log log = LogFactory.getLog( StepSnapshotService.class )
@@ -21,7 +22,7 @@ class StepSnapshotService {
 
 		def moveBundle = MoveBundle.findById( moveBundleId )
 		def moveBundleSteps = MoveBundleStep.findAllByMoveBundle(moveBundle)
-		def dateNow = new Date()
+		def dateNow = GormUtil.convertInToGMT( "now", "EDT" )
 		def timeNow = dateNow.getTime()
 		
 		def tasksCount = moveBundleService.assetCount( moveBundleId )
@@ -107,7 +108,7 @@ log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${l
 		if ( moveBundleStep.moveBundle.id != moveBundleId) return 403
 		
 		def planDelta
-		def now = new Date()
+		def now = GormUtil.convertInToGMT( "now","EDT" )
 		def nowTime = now.getTime() / 1000
 		def planCompletionTime = moveBundleStep.planCompletionTime.getTime() / 1000
 
@@ -206,7 +207,7 @@ log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${l
 			stepSnapshot.duration = 0
 		}
 		
-		def planDelta = calcProjectedDelta( stepSnapshot, new Date() )
+		def planDelta = calcProjectedDelta( stepSnapshot, GormUtil.convertInToGMT( "now","EDT" ) )
 		stepSnapshot.planDelta = planDelta 
 		stepSnapshot.dialIndicator =  calcDialIndicator( stepSnapshot.moveBundleStep.planDuration, planDelta )
 		

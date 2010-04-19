@@ -49,9 +49,9 @@
             
             <td>${moveBundle?.assetCount}</td>
 
-            <td><tds:convertDateTime date="${moveBundle?.bundle?.startTime}" /></td>
+            <td><tds:convertDateTime date="${moveBundle?.bundle?.startTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 
-            <td><tds:convertDateTime date="${moveBundle?.bundle?.completionTime}" /></td>
+            <td><tds:convertDateTime date="${moveBundle?.bundle?.completionTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 
 
           </tr>

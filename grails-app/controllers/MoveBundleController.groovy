@@ -128,13 +128,14 @@ class MoveBundleController {
         if( moveBundleInstance ) {
             moveBundleInstance.properties = params
             def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+            def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
             def startTime = params.startTime
             def completionTime = params.completionTime
             if(startTime != null && startTime != ""){
-            	moveBundleInstance.startTime =  formatter.parse( startTime )
+            	moveBundleInstance.startTime =  GormUtil.convertInToGMT(formatter.parse( startTime ), tzId)
             }
             if(completionTime != null && completionTime != ""){
-            	moveBundleInstance.completionTime =  formatter.parse( completionTime )
+            	moveBundleInstance.completionTime =  GormUtil.convertInToGMT(formatter.parse( completionTime ), tzId)
             }
             if(!moveBundleInstance.hasErrors() && moveBundleInstance.save() ) {
             	def stepsList = stateEngineService.getDashboardSteps( moveBundleInstance.project.workflowCode )
@@ -197,13 +198,14 @@ class MoveBundleController {
     		
         def moveBundleInstance = new MoveBundle(params)
         def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+        def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
         def startTime = params.startTime
         def completionTime = params.completionTime
         if(startTime != null && startTime != ""){
-        	moveBundleInstance.startTime =  formatter.parse( startTime )
+        	moveBundleInstance.startTime =  GormUtil.convertInToGMT(formatter.parse( startTime ), tzId)
         }
         if(completionTime != null && completionTime != "" ){
-        	moveBundleInstance.completionTime =  formatter.parse( completionTime )
+        	moveBundleInstance.completionTime =  GormUtil.convertInToGMT(formatter.parse( completionTime ), tzId)
         }
         def projectId = params.projectId        
         def projectManager = params.projectManager

@@ -88,7 +88,7 @@
                         
                             <td>${fieldValue(bean:dataTransferBatch, field:'id')}</td>
                         
-                            <td><tds:convertDate date="${dataTransferBatch?.dateCreated}" /></td>
+                            <td><tds:convertDate date="${dataTransferBatch?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
                         
                             <td>${dataTransferBatch?.userLogin?.person?.lastName} ${dataTransferBatch?.userLogin?.person?.firstName}</td>
                         

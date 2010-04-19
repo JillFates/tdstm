@@ -23,11 +23,11 @@ log.debug "offsetTZ=${offsetTZ}"
 				/* Get the latest step_snapshot record for each step that has started */
 				def latestStepsRecordsQuery = """
 					SELECT mbs.transition_id as tid, ss.id as snapshotId, mbs.label as label, mbs.calc_method as calcMethod,
-						DATE_FORMAT( ADDDATE( mbs.plan_start_time , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as planStart,
-						DATE_FORMAT( ADDDATE( mbs.plan_completion_time , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as planComp,
-						DATE_FORMAT( ADDDATE( mbs.actual_start_time , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as actStart,
-						DATE_FORMAT( ADDDATE( mbs.actual_completion_time , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as actComp,
-						DATE_FORMAT( ADDDATE( ss.date_created , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as dateCreated,
+						DATE_FORMAT( mbs.plan_start_time ,'%Y/%m/%d %r') as planStart,
+						DATE_FORMAT( mbs.plan_completion_time ,'%Y/%m/%d %r') as planComp,
+						DATE_FORMAT( mbs.actual_start_time ,'%Y/%m/%d %r') as actStart,
+						DATE_FORMAT( mbs.actual_completion_time ,'%Y/%m/%d %r') as actComp,
+						DATE_FORMAT( ss.date_created ,'%Y/%m/%d %r') as dateCreated,
 						ss.tasks_count as tskTot, ss.tasks_completed as tskComp, ss.dial_indicator as dialInd 
 					FROM move_bundle mb
 					LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id 
@@ -40,11 +40,11 @@ log.debug "offsetTZ=${offsetTZ}"
 				/*	Get the steps that have not started / don't have step_snapshot records	*/						
 				def stepsNotUpdatedQuery = """
 					SELECT mbs.transition_id as tid, ss.id as snapshotId, mbs.label as label, mbs.calc_method as calcMethod,
-						DATE_FORMAT( ADDDATE( mbs.plan_start_time , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as planStart,
-						DATE_FORMAT( ADDDATE( mbs.plan_completion_time , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as planComp,
-						DATE_FORMAT( ADDDATE( mbs.actual_start_time , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as actStart,
-						DATE_FORMAT( ADDDATE( mbs.actual_completion_time , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as actComp,
-						DATE_FORMAT( ADDDATE( ss.date_created , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as dateCreated,
+						DATE_FORMAT( mbs.plan_start_time ,'%Y/%m/%d %r') as planStart,
+						DATE_FORMAT( mbs.plan_completion_time ,'%Y/%m/%d %r') as planComp,
+						DATE_FORMAT( mbs.actual_start_time ,'%Y/%m/%d %r') as actStart,
+						DATE_FORMAT( mbs.actual_completion_time ,'%Y/%m/%d %r') as actComp,
+						DATE_FORMAT( ss.date_created ,'%Y/%m/%d %r') as dateCreated,
 						ss.tasks_count as tskTot, ss.tasks_completed as tskComp, ss.dial_indicator as dialInd 
 					FROM move_bundle mb
 					LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id
@@ -104,7 +104,7 @@ log.debug "offsetTZ=${offsetTZ}"
     		if( moveEvent ){
 				
     			def resultMap = jdbcTemplate.queryForMap( """
-					SELECT DATE_FORMAT( ADDDATE( max(mb.completion_time) , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %h:%m:%s' ) as compTime
+					SELECT DATE_FORMAT( max(mb.completion_time) ,'%Y/%m/%d %h:%m:%s' ) as compTime
     				FROM move_bundle mb WHERE mb.move_event_id = ${moveEvent.id}
 					""" )
 
@@ -120,7 +120,7 @@ log.debug "offsetTZ=${offsetTZ}"
 				moveEventRevisedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent, "R"] )[0]
 				revisedComp = moveEvent.revisedCompletionTime
 				if(revisedComp){
-					def revisedCompTime = revisedComp.getTime() + (3600000 * offsetTZ)
+					def revisedCompTime = revisedComp.getTime()
 					revisedComp = new Date(revisedCompTime)
 				}
     		}

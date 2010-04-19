@@ -1,5 +1,6 @@
+import com.tdssrc.grails.GormUtil
 class DataTransferBatch {
-	Date dateCreated = new Date()
+	Date dateCreated
 	String statusCode
 	Date lastModified
 	Integer versionNumber
@@ -13,6 +14,7 @@ class DataTransferBatch {
 	
 	static mapping = {
 		version false
+		autoTimestamp false
 		columns {
 			id column:'batch_id'
 			hasErrors sqlType: 'TINYINT(1)'
@@ -27,5 +29,13 @@ class DataTransferBatch {
 		versionNumber( nullable:true )
 		hasErrors( nullable:false )
 	}
-
+	/*
+	 * Date to insert in GMT
+	 */
+	def beforeInsert = {
+		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
+	}
+	def beforeUpdate = {
+		lastModified = GormUtil.convertInToGMT( "now", "EDT" )
+	}
 }

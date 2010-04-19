@@ -1,19 +1,23 @@
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import com.tdssrc.grails.GormUtil
 class CustomTagLib {
 	static namespace = 'tds'
-
+	/*
+	 * 
+	 */
 	def convertDate = { attrs ->
-	Date dt = attrs['date'];
-	
-	String dtStr = dt.getClass().getName().toString();
-	String dtParam = dt.toString();	
-	
-	if(dtStr.equals("java.util.Date")){	
-		   DateFormat formatter ; 
-		  formatter = new SimpleDateFormat("yyyy-MM-dd  kk:mm:ss");
-		  dtParam = formatter.format(dt);		
-	}  
+		Date dt = attrs['date'];
+		def tzId = attrs['timeZone']
+		String dtStr = dt.getClass().getName().toString();
+		String dtParam = dt.toString();	
+		
+		if(dtStr.equals("java.util.Date")){	
+			DateFormat formatter ; 
+			formatter = new SimpleDateFormat("yyyy-MM-dd  kk:mm:ss");
+			dt = GormUtil.convertInToUserTZ( dt, tzId )
+			dtParam = formatter.format(dt);		
+		}  
 		/* if null or any plain string */
 		if (dtParam != "null") {
 		
@@ -22,34 +26,34 @@ class CustomTagLib {
 		
 		}
 	}
+	/*
+	 * 
+	 */
 	def convertDateTime = { attrs ->
-	Date dt = attrs['date'];
-	def formate = attrs['formate'];
-	
-	String dtStr = dt.getClass().getName().toString();
-	String dtParam = dt.toString();	
-	
-	if( dtStr.equals("java.util.Date") || dtStr.equals("java.sql.Timestamp") ){	
-		   DateFormat formatter ; 
-		   if(formate == "mm/dd" || formate == "12hrs"){
-			   formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm a");
-		   } else {
-			   formatter = new SimpleDateFormat("yyyy-MM-dd HH:MM");
-		   }
-		  dtParam = formatter.format(dt);		
-	}  
+		Date dt = attrs['date'];
+		def formate = attrs['formate'];
+		def tzId = attrs['timeZone']
+		String dtStr = dt.getClass().getName().toString();
+		String dtParam = dt.toString();	
+		
+		if( dtStr.equals("java.util.Date") || dtStr.equals("java.sql.Timestamp") ){	
+			DateFormat  formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm a");
+			dt = GormUtil.convertInToUserTZ( dt , tzId )
+			dtParam = formatter.format( dt );		
+		}  
 		/* if null or any plain string */
 		if (dtParam != "null") {
 			dtParam = dtParam.trim();
 			if(formate == "mm/dd"){
 				out << dtParam[5..6]+"/"+dtParam[8..9]+" "+dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
-			} else if(formate == "12hrs") {
+			} else {
 				out << dtParam[5..6]+"/"+dtParam[8..9]+"/"+dtParam[0..3]+" "+dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
-			}else
-				out << dtParam[5..6]+"/"+dtParam[8..9]+"/"+dtParam[0..3]+" "+dtParam[11..12]+":"+dtParam[14..15]
 			}
+		}
 	}
-	
+	/*
+	 * 
+	 */
 	def truncate = { attrs ->
 		String value = attrs['value'];
 		if(value){

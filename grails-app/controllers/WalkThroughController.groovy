@@ -1,5 +1,6 @@
 import grails.converters.JSON
 import org.jsecurity.SecurityUtils
+import com.tdssrc.grails.GormUtil
 /*------------------------------------------------------------
  * Controller for Walk Through Process
  * @author : Lokanath Reddy
@@ -376,11 +377,12 @@ class WalkThroughController {
 		def assetEntity = AssetEntity.findById( params.id )
 		if(assetEntity){
 			if(type != 'create'){
+				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 				assetComment = AssetComment.find("from AssetComment where assetEntity = ${assetEntity.id} and commentType = ? and isResolved = ? and commentCode = ?" ,['issue',0,'ASSET_MISSING'])
 				assetComment?.isResolved = 1
 				assetComment?.resolution = "Asset Missing issue is resolved while in Audit"
 				assetComment?.resolvedBy = loginUser.person
-				assetComment?.dateResolved = new Date()
+				assetComment?.dateResolved = GormUtil.convertInToGMT( "now", tzId )
 				assetComment?.save()
 			} else {
 				assetComment = new AssetComment(commentType:'issue', assetEntity:assetEntity, isResolved:0, commentCode:'ASSET_MISSING', category:'walkthru', createdBy:loginUser.person ).save()
@@ -515,9 +517,10 @@ class WalkThroughController {
 	def resolveComments ( def commentCode, def loginUser, def query ) {
 		def assetComment = AssetComment.find(query, ["issue", 0, commentCode])
 		if( assetComment ) {
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 			assetComment?.isResolved = 1
 			assetComment?.resolvedBy = loginUser.person	
-			assetComment?.dateResolved = new Date()
+			assetComment?.dateResolved = GormUtil.convertInToGMT( "now", tzId )
 			assetComment?.save(flush:true)
 		}	 
 	}

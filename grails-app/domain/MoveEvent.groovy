@@ -2,6 +2,8 @@
  * The MoveEvent domain represents the concept of an event where one or move bundles that will occur at one logical 
  * period of time.
  */
+import com.tdssrc.grails.GormUtil
+import org.jsecurity.SecurityUtils
 class MoveEvent {
 	static transients = [ "jdbcTemplate" ]
 	def jdbcTemplate
@@ -52,5 +54,24 @@ class MoveEvent {
     String toString(){
 		name
 	}
+    /*
+	 * Date to insert in GMT
+	 */
+	def beforeUpdate = {
+		def tzId = getTimeZone()
+		revisedCompletionTime = GormUtil.convertInToGMT( revisedCompletionTime, tzId )
+		actualStartTime = GormUtil.convertInToGMT( actualStartTime, tzId )
+		actualCompletionTime = GormUtil.convertInToGMT( actualCompletionTime, tzId )
+	}
+	def getTimeZone(){
+		def subject = SecurityUtils.getSubject();
+		def tzId 
+		if(subject?.authenticated && subject?.principal){
+			def userLogin = UserLogin.findByUsername( subject?.principal )
+	    	def userPreference = UserPreference.findByUserLoginAndPreferenceCode( userLogin,"CURR_TZ" )
+		    tzId = userPreference.value
+		}
+		return tzId 
+    }
 
 }

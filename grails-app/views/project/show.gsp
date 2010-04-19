@@ -73,14 +73,14 @@
           <tr class="prop">
             <td valign="top" class="name">Start Date:</td>
 
-            <td valign="top" class="value"><tds:convertDate date="${projectInstance?.startDate}" /></td>
+            <td valign="top" class="value"><tds:convertDate date="${projectInstance?.startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 
           </tr>
 
           <tr class="prop">
             <td valign="top" class="name">Completion Date:</td>
 
-            <td valign="top" class="value"><tds:convertDate date="${projectInstance?.completionDate}" /></td>
+            <td valign="top" class="value"><tds:convertDate date="${projectInstance?.completionDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 
           </tr>
 
@@ -135,14 +135,14 @@
             <td valign="top" class="name">
               <label for="dateCreated">Date Created:</label>
             </td>
-            <td valign="top" class="value"><tds:convertDateTime date="${projectInstance?.dateCreated}" /> </td>
+            <td valign="top" class="value"><tds:convertDateTime date="${projectInstance?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
           </tr>
 
           <tr class="prop">
             <td valign="top" class="name">
               <label for="lastUpdated">Last Updated:</label>
             </td>
-            <td valign="top" class="value"><tds:convertDateTime date="${projectInstance?.lastUpdated}" /> </td>
+            <td valign="top" class="value"><tds:convertDateTime date="${projectInstance?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
           </tr>
 
         </tbody>

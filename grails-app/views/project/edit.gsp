@@ -82,7 +82,7 @@
 			                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 			                  </script>
 			                  <input type="text" class="dateRange" size="15" style="width:112px;height:14px;" name="startDate" id="startDateId"
-			                   value="<tds:convertDate date="${projectInstance?.startDate}"/>" onchange="setCompletionDate(this.value);isValidDate(this.value);"/>
+			                   value="<tds:convertDate date="${projectInstance?.startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="setCompletionDate(this.value);isValidDate(this.value);"/>
 							<g:hasErrors bean="${projectInstance}" field="startDate">
 			                    <div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="startDate" /></div>
 			                </g:hasErrors></td>
@@ -95,7 +95,7 @@
 			                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 			                  </script>
 			                  <input type="text" class="dateRange" size="15" style="width:112px;height:14px;" id="completionDateId" 
-			                  name="completionDate" value="<tds:convertDate date="${projectInstance?.completionDate}"/>" onchange="isValidDate(this.value)"/>
+			                  name="completionDate" value="<tds:convertDate date="${projectInstance?.completionDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="isValidDate(this.value)"/>
 			
 							<g:hasErrors bean="${projectInstance}" field="completionDate">
 			                    <div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="completionDate" /></div>
@@ -200,14 +200,14 @@
 			                <td valign="top" class="name">
 			                  <label for="dateCreated">Date Created:</label>
 			                </td>
-			                <td valign="top" class="value"><tds:convertDateTime date="${projectInstance?.dateCreated}" /> </td>
+			                <td valign="top" class="value"><tds:convertDateTime date="${projectInstance?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
 			              </tr>
 			
 			              <tr class="prop">
 			                <td valign="top" class="name">
 			                  <label for="lastUpdated">Last Updated:</label>
 			                </td>
-			                <td valign="top" class="value"><tds:convertDateTime date="${projectInstance?.lastUpdated}" /> </td>
+			                <td valign="top" class="value"><tds:convertDateTime date="${projectInstance?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
 			              </tr>
                         
                         </tbody>

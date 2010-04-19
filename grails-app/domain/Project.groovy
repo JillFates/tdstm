@@ -1,3 +1,5 @@
+import com.tdssrc.grails.GormUtil
+import org.jsecurity.SecurityUtils
 class Project extends PartyGroup {
 
 	String projectCode
@@ -25,6 +27,7 @@ class Project extends PartyGroup {
 
 	static mapping  = {
 		version true
+		autoTimestamp false
 		id column: 'project_id'
 		columns {
 			trackChanges sqlType: 'char(1)'

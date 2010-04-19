@@ -1,10 +1,11 @@
 import org.springframework.dao.IncorrectResultSizeDataAccessException
-
+import com.tdssrc.grails.GormUtil
 
 class MoveBundleService {
 	
 	def jdbcTemplate
 	def stateEngineService
+	def userPreferenceService
     
 	boolean transactional = true
 	
@@ -124,10 +125,11 @@ class MoveBundleService {
 		if( !moveBundleStep ){	
 			moveBundleStep = new MoveBundleStep(moveBundle:moveBundle, transitionId:transitionId)
 		}
+		def tzId = userPreferenceService.getSession().getAttribute( "CURR_TZ" )?.CURR_TZ	
 		moveBundleStep.calcMethod = params["calcMethod_"+transitionId]
 		moveBundleStep.label = params["dashboardLabel_"+transitionId]
-		moveBundleStep.planStartTime = new Date( params["startTime_"+transitionId] )
-		moveBundleStep.planCompletionTime = new Date( params["completionTime_"+transitionId] )
+		moveBundleStep.planStartTime = GormUtil.convertInToGMT( new Date( params["startTime_"+transitionId] ),tzId )
+		moveBundleStep.planCompletionTime = GormUtil.convertInToGMT( new Date( params["completionTime_"+transitionId] ),tzId )
 		if ( !moveBundleStep.validate() || !moveBundleStep.save(flush:true) ) {
 			def etext = "Unable to create moveBundleStep" +
 			GormUtil.allErrorsString( model )

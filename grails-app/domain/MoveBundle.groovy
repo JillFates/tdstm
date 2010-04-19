@@ -2,11 +2,11 @@ class MoveBundle extends Party {
     Project project
     String name
     String description
-    Date startTime					// Time that the MoveBundle Tasks will begin
+    Date startTime			// Time that the MoveBundle Tasks will begin
     Date completionTime				// Planned Completion Time of the MoveBundle
     Integer operationalOrder  		// Order that the bundles are performed in (NOT BEING USED)
     MoveEvent moveEvent
-
+	
     static constraints = {        
 		name( blank:false, nullable:false )
 		project( nullable:false )
@@ -21,9 +21,9 @@ class MoveBundle extends Party {
 		assetTransitions : AssetTransition,
 		moveBundleSteps  : MoveBundleStep
 	]
-
 	static mapping  = {
 		version true
+		autoTimestamp false
 		id column:'move_bundle_id'
         columns {
 			name sqlType: 'varchar(30)'

@@ -41,9 +41,9 @@
                         
                             <td>${fieldValue(bean:userLoginInstance, field:'person')}</td>
                         
-                            <td><tds:convertDateTime date="${userLoginInstance?.lastLogin}"/></td>
+                            <td><tds:convertDateTime date="${userLoginInstance?.lastLogin}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
                             
-                             <td><tds:convertDateTime date="${userLoginInstance?.createdDate}"/></td>
+                             <td><tds:convertDateTime date="${userLoginInstance?.createdDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
                         
                         </tr>
                     </g:each>

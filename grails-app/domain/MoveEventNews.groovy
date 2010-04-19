@@ -1,8 +1,9 @@
+import com.tdssrc.grails.GormUtil
 class MoveEventNews {
 	MoveEvent moveEvent
 	String message
 	Integer isArchived = 0
-	Date dateCreated = new Date()
+	Date dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
 	Date dateArchived 
 	String resolution
 	Person archivedBy
@@ -14,12 +15,14 @@ class MoveEventNews {
 		resolution( blank:true, nullable:true  )
 		archivedBy( nullable:true  )
 		createdBy( nullable:true  )
+		dateCreated( nullable:true  )
 		dateArchived( nullable:true  )
 	}
 
 	static mapping  = {	
-		id column: 'move_event_news_id'
 		version true
+		autoTimestamp false
+		id column: 'move_event_news_id'
 		archivedBy column: 'archived_by'
 		createdBy column: 'created_by'
 		columns {

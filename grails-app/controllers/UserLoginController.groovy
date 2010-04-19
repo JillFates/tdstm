@@ -143,7 +143,7 @@ class UserLoginController {
 	 */
     def save = {
         def userLoginInstance = new UserLogin(params)
-        userLoginInstance.createdDate = new Date()
+        //userLoginInstance.createdDate = new Date()
         def companyId = params.companyId
         //convert password onto Hash code
         userLoginInstance.password = new Sha1Hash(params['password']).toHex()

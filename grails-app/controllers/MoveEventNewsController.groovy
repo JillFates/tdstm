@@ -18,11 +18,11 @@ class MoveEventNewsController {
 			if(moveEventId){ 
 				moveEvent = MoveEvent.get(moveEventId)
 			}
-				def offsetTZ = ( new Date().getTimezoneOffset() / 60 ) 
+				//def offsetTZ = ( new Date().getTimezoneOffset() / 60 ) 
 			if(moveEvent){
 			 
 				def assetCommentsQuery = new StringBuffer( """SELECT ac.asset_comment_id as id,  'I' as type, 
-									DATE_FORMAT( ADDDATE( date_created, INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as created,  
+									DATE_FORMAT( date_created,'%Y/%m/%d %r') as created,  
 									if(display_option = 'G', CONCAT_WS(':',ae.asset_name, 'is on hold' ), comment) as text, 
 									if(is_resolved = 0, 'L','A') as state from asset_comment ac 
 									left join asset_entity ae on (ae.asset_entity_id = ac.asset_entity_id) 
@@ -31,7 +31,7 @@ class MoveEventNewsController {
 									left join project p on (p.project_id = ae.project_id) 
 									where mb.move_event_id = ${moveEvent.id} and  ac.comment_type = 'issue' and p.project_id = ${projectId} """ )
 				def moveEventNewsQuery = new StringBuffer( """SELECT mn.move_event_news_id as id,  'N' as type, 
-									DATE_FORMAT(ADDDATE( date_created, INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r') as created,  
+									DATE_FORMAT( date_created,'%Y/%m/%d %r') as created,  
 									message as text, if(is_archived = 0, 'L','A') as state  from move_event_news mn 
 									left join move_event me on ( me.move_event_id = mn.move_event_id ) 
 									left join project p on (p.project_id = me.project_id) where mn.move_event_id = ${moveEvent.id} and p.project_id = ${projectId}""" )
@@ -66,7 +66,7 @@ class MoveEventNewsController {
 				}
 				
 			}
-				
+			
 			render totalComments as JSON
 	}
 	/* will truncate the test to specified length 

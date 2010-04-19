@@ -1,5 +1,6 @@
+import com.tdssrc.grails.GormUtil
 class Party {
-	Date dateCreated = new Date()
+	Date dateCreated
 	Date lastUpdated
 	PartyType partyType
 	
@@ -7,7 +8,7 @@ class Party {
 	 * Fields Validations
 	 */
 	static constraints = {
-		dateCreated( nullable:false )
+		dateCreated( nullable:true )
 		lastUpdated( nullable:true )
 		partyType( nullable:true )
 	}
@@ -17,8 +18,9 @@ class Party {
 	 */
 	static mapping  = {	
 		version false
-		id column:'party_id'
+		autoTimestamp false
 		tablePerHierarchy false
+		id column:'party_id'
 	}
 	
 /*	
@@ -31,5 +33,14 @@ class Party {
 	String toString(){
 		"$id : $dateCreated"
 	}
-	
+	/*
+	 * Date to insert in GMT
+	 */
+	def beforeInsert = {
+		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
+		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+	}
+	def beforeUpdate = {
+		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+	}
 }

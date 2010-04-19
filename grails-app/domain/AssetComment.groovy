@@ -1,10 +1,11 @@
+import com.tdssrc.grails.GormUtil
 class AssetComment {
 	
 	String comment
 	String commentType
 	Integer mustVerify = 0
 	AssetEntity assetEntity
-	Date dateCreated = new Date()
+	Date dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
 	Integer isResolved = 0
 	Date dateResolved 
 	String resolution
@@ -23,6 +24,7 @@ class AssetComment {
 		resolution( blank:true, nullable:true  )
 		resolvedBy( nullable:true  )
 		createdBy( nullable:true  )
+		dateCreated( nullable:true  )
 		dateResolved( nullable:true  )
 		commentCode( blank:true, nullable:true  )
 		category( blank:false, nullable:false )
@@ -31,6 +33,7 @@ class AssetComment {
 
 	static mapping  = {	
 		version true
+		autoTimestamp false
 		id column: 'asset_comment_id'
 		resolvedBy column: 'resolved_by'
 		createdBy column: 'created_by'
