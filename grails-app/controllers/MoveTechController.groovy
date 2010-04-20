@@ -67,6 +67,7 @@ class MoveTechController {
 	            	projectTeamInstance.save()
 	            	teamLocation = projectTeamInstance.currentLocation
 	            }
+	        	userPreferenceService.setPreference("CURR_BUNDLE","${bundleInstance?.id}")
 	            render ( view:'cleaningTechHome', model:[ projectTeam:team, members:teamMembers, project:params.project,
 	                                                      loc:teamLocation, bundle:params.bundle,bundleName:bundleInstance.name, team:params.team,
 	                                                      location:params.location, browserTest:browserTest 
@@ -883,7 +884,9 @@ class MoveTechController {
             def loginTeam
             def issuecomments
             def assetIssueCommentListSize
-            def moveBundleInstance = MoveBundle.findById( params.bundle )
+			def moveBundleId = params.bundle
+			moveBundleId = moveBundleId ? moveBundleId : session.getAttribute( "CURR_BUNDLE" )?.CURR_BUNDLE
+            def moveBundleInstance = MoveBundle.findById( moveBundleId )
             if ( team ) {
             	loginTeam = ProjectTeam.findById ( params.team )
             }
@@ -1152,6 +1155,7 @@ class MoveTechController {
                 projectTeamInstance.currentLocation = "Target"
                 projectTeamInstance.save()
             }
+            userPreferenceService.setPreference("CURR_BUNDLE","${params.bundle}")
             redirect ( action:'assetTask', 
                 params:[ projectTeam:team, members:teamMembers, project:params.project, loc:location,
                          bundle:params.bundle, team:params.team, location:params.location, "tab":"Todo"

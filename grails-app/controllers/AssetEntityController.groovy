@@ -1141,14 +1141,15 @@ class AssetEntityController {
 	        def teamName = assetDetail.sourceTeam
 	        def assetTransition = AssetTransition.findAllByAssetEntity( assetDetail, [ sort:"dateCreated", order:"desc"] )
 	        def sinceTimeElapsed = "00:00:00" 
-	        if( assetTransition ){
 	        	def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+	        if( assetTransition ){
 	        	sinceTimeElapsed = convertIntegerIntoTime( GormUtil.convertInToGMT("now", tzId ).getTime() - assetTransition[0]?.dateCreated?.getTime() )
 	        }
 	        assetTransition.each{
 	        	def cssClass
 	        	def taskLabel = stateEngineService.getStateLabel(assetDetail.project.workflowCode,Integer.parseInt(it.stateTo))
-	        	def time = it.dateCreated.toString().substring(11,19)
+				println"it.dateCreated-------->"+it.dateCreated
+	        	def time = GormUtil.convertInToUserTZ(it.dateCreated, tzId ).toString().substring(11,19)
 	    	    def timeElapsed = convertIntegerIntoTime( it.timeElapsed )
 	        	if(it.voided == 1){
 	        		cssClass = "void_transition"
