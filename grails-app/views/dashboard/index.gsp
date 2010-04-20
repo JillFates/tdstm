@@ -224,6 +224,8 @@
 <script type="text/javascript">
 	if("${session.getAttribute('CURR_TZ')?.CURR_TZ}"){
 		$("#timezone").find("option[text='${session.getAttribute('CURR_TZ')?.CURR_TZ}']").attr("selected","selected");
+	} else {
+		$("#timezone").find("option[text='EDT']").attr("selected","selected");
 	}
 	var timer
 	var dialReload = true;

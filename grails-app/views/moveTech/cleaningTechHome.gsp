@@ -60,7 +60,7 @@
 								<tr><td><g:link controller="moveTech" action="signOut" style="color: #5b5e5c; border:1px solid #5b5e5c; margin:5px;background:#aaefb8;">Log out</g:link></td>		
 								<td>
 									<g:select name="timeZone" id="timeZoneId" from="${['GMT','PST','PDT','MST','MDT','CST','CDT','EST','EDT']}" 
-	                    				value="${session.getAttribute('CURR_TZ')?.CURR_TZ}" onchange="setUserTimeZone(this.value)"/>
+	                    				value="${session.getAttribute('CURR_TZ')?.CURR_TZ ? session.getAttribute('CURR_TZ')?.CURR_TZ : 'EDT'}" onchange="setUserTimeZone(this.value)"/>
 								</td>						            		
 								</table>
 							</div>								
