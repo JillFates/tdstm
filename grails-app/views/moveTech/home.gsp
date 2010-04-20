@@ -16,6 +16,14 @@ dt {
 	function setFocus(){
 		document.bundleTeamAssetForm.search.focus();
 	}
+	function setUserTimeZone( tz ){
+		jQuery.ajax({
+		        type:"GET",
+		        async : true,
+		        cache: false,
+		        url:"../project/setUserTimeZone?tz="+tz
+		});
+  	}
 </script>  
 </head>
 <body>
@@ -45,6 +53,10 @@ dt {
 								<input type="text" size="12" value="" name="search" />
 							</td>
 							<td valign="middle"><g:link controller="moveTech" action="signOut" class="sign_out">Log out</g:link></td>
+							<td>
+							<g:select name="timeZone" id="timeZoneId" from="${['GMT','PST','PDT','MST','MDT','CST','CDT','EST','EDT']}" 
+                    			value="${session.getAttribute('CURR_TZ')?.CURR_TZ}" onchange="setUserTimeZone(this.value)"/>
+							</td>
 						</tr>
 					  </table>
 				</div>

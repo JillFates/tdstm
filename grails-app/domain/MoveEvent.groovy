@@ -69,7 +69,7 @@ class MoveEvent {
 		if(subject?.authenticated && subject?.principal){
 			def userLogin = UserLogin.findByUsername( subject?.principal )
 	    	def userPreference = UserPreference.findByUserLoginAndPreferenceCode( userLogin,"CURR_TZ" )
-		    tzId = userPreference.value
+		    tzId = userPreference?.value
 		}
 		return tzId 
     }

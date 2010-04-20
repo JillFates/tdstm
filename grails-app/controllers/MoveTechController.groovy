@@ -6,7 +6,7 @@ import org.jsecurity.authc.UsernamePasswordToken
 import org.jsecurity.SecurityUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import grails.converters.JSON
-
+import com.tdssrc.grails.GormUtil
 class MoveTechController {
     def jsecSecurityManager
     def userPreferenceService
@@ -136,8 +136,7 @@ class MoveTechController {
             //checking for valid barcode format or not size is 4 (mt-moveid- teamid- s/t)
             if ( barcodeText.size() == 4 ) {
             	try{
-            		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-            		def nowDate = GormUtil.convertInToGMT( "now", tzId )
+            		def nowDate = GormUtil.convertInToGMT( "now", "EDT" )
 	                if ( barcodeText.get(0) == "mt" ) {
 	                	moveBundleInstance = MoveBundle.findById ( barcodeText.get(1) )
 	                    //checkin for movebundle and team instances

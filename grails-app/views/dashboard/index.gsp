@@ -54,12 +54,16 @@
 				<span id="date"></span> <span id="clock"></span>&nbsp;
 				<span>
 					<label>
-					  <select name="timezone" id="timezone" onChange="getMoveEventNewsDetails($('#moveEvent').val())" class="selecttext">
-					    <option value="0" selected>GMT</option>
-					    <option value="-6">EDT</option>
-					    <option value="-7">CDT</option>
-					    <option value="-8">MDT</option>
-					    <option value="-9">PDT</option>
+					  <select name="timezone" id="timezone" onChange="getMoveEventNewsDetails($('#moveEvent').val());setUserTimeZone()" class="selecttext">
+					    <option value="0">GMT</option>
+					    <option value="-8">PST</option>
+					    <option value="-7">PDT</option>
+					    <option value="-7">MST</option>
+					    <option value="-6">MDT</option>
+					    <option value="-6">CST</option>
+					    <option value="-5">CDT</option>
+					    <option value="-5">EST</option>
+					    <option value="-4">EDT</option>
 					  </select>
 					</label>
 				</span>
@@ -218,6 +222,9 @@
 <!-- Body Ends here-->
 </div>
 <script type="text/javascript">
+	if("${session.getAttribute('CURR_TZ')?.CURR_TZ}"){
+		$("#timezone").find("option[text='${session.getAttribute('CURR_TZ')?.CURR_TZ}']").attr("selected","selected");
+	}
 	var timer
 	var dialReload = true;
 	var countries=new ddtabcontent("newstabs")
@@ -335,6 +342,10 @@
 		$("#mycrawlerId").html(scrollText)
 		
 	}
+	function setUserTimeZone(){
+		var timeZone = $("#timezone :selected").text()
+  		${remoteFunction(controller:'project', action:'setUserTimeZone', params:'\'tz=\' + timeZone ')}
+  	}
 	/* set time to load the move news and move bundle data*/
 	var handler = 0
 	function timedRefresh() {

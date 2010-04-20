@@ -19,7 +19,9 @@
 		}
 		${remoteFunction(action:'setPrintersIntoSession', params:'\'dropdown=\' + dropdown')}
 	}
-	
+	function setUserTimeZone( tz ){
+		${remoteFunction(controller:'project', action:'setUserTimeZone', params:'\'tz=\' + tz')}
+  	}
 	</script>
 </head>
 <body >
@@ -55,7 +57,11 @@
       					<g:form method="post" name="bundleTeamAssetForm">      										        
 							<div style="float:left; width:100%; margin:5px 0; ">              								
               					<table style="border:0px;">
-								<tr><td><g:link controller="moveTech" action="signOut" style="color: #5b5e5c; border:1px solid #5b5e5c; margin:5px;background:#aaefb8;">Log out</g:link></td>								            		
+								<tr><td><g:link controller="moveTech" action="signOut" style="color: #5b5e5c; border:1px solid #5b5e5c; margin:5px;background:#aaefb8;">Log out</g:link></td>		
+								<td>
+									<g:select name="timeZone" id="timeZoneId" from="${['GMT','PST','PDT','MST','MDT','CST','CDT','EST','EDT']}" 
+	                    				value="${session.getAttribute('CURR_TZ')?.CURR_TZ}" onchange="setUserTimeZone(this.value)"/>
+								</td>						            		
 								</table>
 							</div>								
               				<div style="float:left; width:100%; margin:5px 0; ">

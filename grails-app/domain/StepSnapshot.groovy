@@ -80,8 +80,7 @@ class StepSnapshot {
 	 */
 	def getProjectedTimeOver() {
 		def timeOver = 0
-		def tzId = getTimeZone()
-		def nowTime = GormUtil.convertInToGMT( "now", tzId ).getTime()
+		def nowTime = GormUtil.convertInToGMT( "now", "EDT" ).getTime()
 		if(!hasStarted()){
 			if( moveBundleStep.planStartTime.getTime() >  nowTime ) {
 				timeOver = ( nowTime + getProjectedTimeRemaining() * 1000 ) - moveBundleStep.planCompletionTime.getTime()

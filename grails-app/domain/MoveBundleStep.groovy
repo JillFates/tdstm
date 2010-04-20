@@ -86,8 +86,7 @@ class MoveBundleStep {
 	 */
 	def getActualDuration( def asOfTime ) {
 		def timeDuration
-		def tzId = getTimeZone()
-		if ( ! asOfTime ) asOfTime = GormUtil.convertInToGMT( "now", tzId )
+		if ( ! asOfTime ) asOfTime = GormUtil.convertInToGMT( "now", "EDT" )
 		
 		if( actualStartTime && actualCompletionTime ){
 			timeDuration = actualCompletionTime.getTime() - actualStartTime.getTime()
