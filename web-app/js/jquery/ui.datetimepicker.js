@@ -13,7 +13,7 @@
  * Patched by Haoyu Bai (baihaoyu@gmail.com) for date-picker only mode,
  * and better behavior. (Sync Year/Month select with input box)
  */
-
+var currTime;
 (function($) { // hide the namespace
 
 /* Date picker manager.
@@ -1205,6 +1205,7 @@ $.extend(DateTimepickerInstance.prototype, {
                 var drawMonth = this._drawMonth;
                 var drawYear = this._drawYear;
                 var drawHour = this._drawHour ;
+                currTime = drawHour; 
                 drawHour = drawHour > 12 ? drawHour - 12 : drawHour ; 
                 var drawMinute = this._drawMinute;
                 if (maxDate) {
@@ -1410,8 +1411,8 @@ $.extend(DateTimepickerInstance.prototype, {
                         }
                         html += '</select>';
                         html += ' <select id="datetimepicker_ampm">';
-                        html += '<option value="A"' + ((drawHour < 12) ? ' selected="selected"' : '') + '>AM</option>';
-                        html += '<option value="P"' + ((drawHour >= 12) ? ' selected="selected"' : '') + '>PM</option>';
+                        html += '<option value="A"' + ((currTime < 12) ? ' selected="selected"' : '') + '>AM</option>';
+                        html += '<option value="P"' + ((currTime >= 12) ? ' selected="selected"' : '') + '>PM</option>';
                         html += '</select>';
                        
                 }

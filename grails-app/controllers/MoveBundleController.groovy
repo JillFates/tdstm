@@ -92,7 +92,7 @@ class MoveBundleController {
     def edit = {
         def moveBundleInstance = MoveBundle.get( params.id )
         def projectId = params.projectId
-         
+        projectId = projectId ? projectId : getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
         if(!moveBundleInstance) {
             flash.message = "MoveBundle not found with id ${params.id}"
             redirect(action:list, params:[projectId: projectId])

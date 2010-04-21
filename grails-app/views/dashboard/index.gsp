@@ -227,12 +227,14 @@
 	} else {
 		$("#timezone").find("option[text='EDT']").attr("selected","selected");
 	}
+	var sURL = unescape(window.location);
 	var timer
 	var dialReload = true;
 	var countries=new ddtabcontent("newstabs")
 	countries.setpersist(true)
 	countries.setselectedClassTarget("link") //"link" or "linkparent"
 	countries.init()
+	
 	/*---------------------------------------------------
 	* Script to load the marquee to scroll the live news
 	*--------------------------------------------------*/
@@ -549,7 +551,7 @@
 				}
 			}
 		} catch(ex){
-			alert("Error occured please refresh the page"+ex)
+		  	window.location.href = sURL;
 		}
 		
 	}
