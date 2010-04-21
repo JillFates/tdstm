@@ -758,6 +758,7 @@ class MoveBundleAssetController {
     			}
     		}
     		//Source List of Assets
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
     		assetEntityList.each { asset ->
     			def bundleInstance
     			if(asset.moveBundle != null) {
@@ -785,8 +786,8 @@ class MoveBundleAssetController {
    			 	                "sourceTargetPos":(projectTeamLocationInstance?.currentLocation ? projectTeamLocationInstance?.currentLocation : "") +"(source/ unracking)", 
    			 	                "usize":asset.usize, "cart":asset.cart, "shelf":asset.shelf,"source_team_id":asset?.sourceTeam?.id, 
    			 	                "move_bundle_id":asset?.moveBundle?.id, "clientName":projectInstance?.client?.name,
-   			 	                'projectName':partyGroupInstance?.name,'startAt':projectInstance?.startDate, 
-   			 	                'completedAt':projectInstance?.completionDate, 'bundleName':bundleInstance?.name,
+   			 	                'projectName':partyGroupInstance?.name,'startAt':GormUtil.convertInToUserTZ( projectInstance?.startDate, tzId ), 
+   			 	                'completedAt':GormUtil.convertInToUserTZ( projectInstance?.completionDate, tzId ), 'bundleName':bundleInstance?.name,
    			 	                'teamName':teamPartyGroup?.name +"-"+teamMembers, 'teamMembers':teamMembers,
    			 	                'location':"Source Team", 'rack':"SourceRack",'rackPos':"SourceRackPosition",'truck':asset.truck, 
    			 	                'room':asset.sourceRoom, 'PDU':asset.pduPort,'NIC':asset.nicPort,
@@ -828,8 +829,8 @@ class MoveBundleAssetController {
    				                "sourceTargetPos":(projectTeamLocationInstance?.currentLocation ? projectTeamLocationInstance?.currentLocation : "") +"(target/ reracking)", 
    				                "usize":asset.usize, "cart":asset.cart, "shelf":asset.shelf,"source_team_id":asset?.targetTeam?.id, 
    				                "move_bundle_id":asset?.moveBundle?.id, "clientName":projectInstance?.client?.name,
-   				                'projectName':partyGroupInstance?.name,'startAt':projectInstance?.startDate, 
-   				                'completedAt':projectInstance?.completionDate, 'bundleName':bundleInstance?.name, 
+   				                'projectName':partyGroupInstance?.name,'startAt':GormUtil.convertInToUserTZ( projectInstance?.startDate, tzId ), 
+   				                'completedAt':GormUtil.convertInToUserTZ( projectInstance?.completionDate, tzId ), 'bundleName':bundleInstance?.name, 
    				                'teamName':teamPartyGroup?.name +"-"+teamMembers, 'teamMembers':teamMembers,
    				                'location':"Target Team", 'rack':"TargetRack",'rackPos':"TargetRackPosition",
    				                'truck':(asset.truck ? asset.truck : "")+"\n"+cartShelf,'room':asset.targetRoom,'PDU':asset.pduPort,'NIC':asset.nicPort, 
@@ -893,7 +894,7 @@ class MoveBundleAssetController {
                     									"asset.moveBundle != null order By asset.moveBundle,asset.cart,asset.shelf")
        		}
             
-            
+            def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
        		//Source AssetList 
        		if( assetEntityList != null) {
        			assetEntityList.each { asset ->
@@ -933,8 +934,8 @@ class MoveBundleAssetController {
        				                "sourceTargetPos":(teamPartyGroup?.currentLocation ? teamPartyGroup?.currentLocation : "") +"(source/ unracking)", 
        				                "cart":cartShelf, "shelf":asset.shelf,"source_team_id":teamPartyGroup?.id, 
        				                "move_bundle_id":asset?.moveBundle?.id,dlocation:asset.sourceLocation,
-       				                'projectName':partyGroupInstance?.name,'startAt':projectInstance?.startDate, 
-       				                'completedAt':projectInstance?.completionDate, 'bundleName':bundleInstance?.name, 
+       				                'projectName':partyGroupInstance?.name,'startAt':GormUtil.convertInToUserTZ( projectInstance?.startDate, tzId ), 
+       				                'completedAt':GormUtil.convertInToUserTZ( projectInstance?.completionDate, tzId ), 'bundleName':bundleInstance?.name, 
        				                'teamName':teamPartyGroup?.teamCode ? teamPartyGroup?.name+" - "+teamMembers : "", 
        				                'teamMembers':teamMembers,'location':"Source Team", 'truck':asset.truck, 
        				                'room':asset.sourceRoom,'moveTeam':asset?.sourceTeam?.name, 'instructions':assetCommentString,
@@ -1212,6 +1213,7 @@ class MoveBundleAssetController {
                     									"order by ac.assetEntity.${sortBy}")
     			bundleNames = "All"
         	}
+    		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
     		assetCommentList.each { assetComment ->
     			def createdBy
     			def sourceTargetRoom
@@ -1225,12 +1227,13 @@ class MoveBundleAssetController {
     				reportFields <<['assetName':assetComment?.assetEntity?.assetName, 'assetTag':assetComment?.assetEntity?.assetTag, 
     								'sourceTargetRoom':sourceTargetRoom,
     								'model':(assetComment?.assetEntity?.manufacturer ? assetComment?.assetEntity?.manufacturer : "")+" "+(assetComment?.assetEntity?.model ? assetComment?.assetEntity?.model : "" ), 
-    								'occuredAt':assetComment?.dateCreated, 'createdBy':assetComment?.createdBy?.firstName+" "+assetComment?.createdBy?.lastName, 
+    								'occuredAt':GormUtil.convertInToUserTZ( assetComment?.dateCreated, tzId ), 'createdBy':assetComment?.createdBy?.firstName+" "+assetComment?.createdBy?.lastName, 
     								'issue':assetComment?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
     								'clientName':projectInstance?.client?.name,"resolvedInfoInclude":resolvedInfoInclude]
     			}
     			if( params.reportResolveInfo == "true" && assetComment.isResolved == 1 ) {
-    				reportFields <<['assetName':null, 'assetTag':null, 'sourceTargetRoom':null,'model':null, 'occuredAt':assetComment?.dateResolved, 
+    				reportFields <<['assetName':null, 'assetTag':null, 'sourceTargetRoom':null,'model':null, 
+									'occuredAt':GormUtil.convertInToUserTZ( assetComment?.dateResolved, tzId ), 
     								'createdBy':assetComment?.resolvedBy?.firstName+" "+assetComment?.resolvedBy?.lastName, 
     								'issue':assetComment?.resolution, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
     								'clientName':projectInstance?.client?.name]

@@ -35,7 +35,7 @@
 	<field name="voided" class="java.lang.String"/>
 	<field name="from_name" class="java.lang.String"/>
 	<field name="to_name" class="java.lang.String"/>
-	<field name="transition_time" class="java.sql.Timestamp"/>
+	<field name="transition_time" class="java.lang.String"/>
 	<field name="username" class="java.lang.String"/>
 	<field name="team_name" class="java.lang.String"/>
 	<background>
@@ -166,7 +166,7 @@
 			<textField>
 				<reportElement style="style1" x="521" y="0" width="107" height="20"/>
 				<textElement textAlignment="Center"/>
-				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{transition_time}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{transition_time}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement style="style1" x="628" y="0" width="87" height="20"/>

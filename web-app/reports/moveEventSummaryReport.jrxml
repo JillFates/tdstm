@@ -32,7 +32,7 @@
 	<field name="bundle_name" class="java.lang.String"/>
 	<field name="state_to" class="java.lang.String"/>
 	<field name="name" class="java.lang.String"/>
-	<field name="started" class="java.sql.Timestamp"/>
+	<field name="started" class="java.lang.String"/>
 	<field name="completed" class="java.lang.String"/>
 	<background>
 		<band/>
@@ -90,7 +90,7 @@
 				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
-				<text><![CDATA[Complated Time]]></text>
+				<text><![CDATA[Completed Time]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -119,7 +119,7 @@
 			<textField>
 				<reportElement style="style1" x="339" y="0" width="132" height="20"/>
 				<textElement textAlignment="Center"/>
-				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{started}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{started}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement style="style1" x="471" y="0" width="145" height="20"/>

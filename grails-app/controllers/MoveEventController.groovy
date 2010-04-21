@@ -4,7 +4,9 @@ import jxl.write.*
 import jxl.read.biff.*
 import grails.converters.JSON
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-
+import com.tdssrc.grails.GormUtil
+import java.text.SimpleDateFormat
+import java.text.DateFormat
 class MoveEventController {
 	
     // Service initialization
@@ -172,6 +174,8 @@ class MoveEventController {
 				response.setHeader( "Content-Disposition", "attachment; filename= MoveResults_${params.reportType}.xls" )
 				book = Workbook.createWorkbook( response.getOutputStream(), workbook )
 				def sheet = book.getSheet("moveEvent_results")
+				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+				DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 				if(reportType != "SUMMARY"){
 					moveEventResults = moveBundleService.getMoveEventDetailedResults( moveEvent )
 					for ( int r = 1; r <= moveEventResults.size(); r++ ) {
@@ -182,7 +186,7 @@ class MoveEventController {
 						sheet.addCell( new Label( 4, r, String.valueOf(moveEventResults[r-1].voided )) )
 						sheet.addCell( new Label( 5, r, String.valueOf(moveEventResults[r-1].from_name )) )
 						sheet.addCell( new Label( 6, r, String.valueOf(moveEventResults[r-1].to_name )) )
-						sheet.addCell( new Label( 7, r, String.valueOf(moveEventResults[r-1].transition_time )) )
+						sheet.addCell( new Label( 7, r, String.valueOf(formatter.format(GormUtil.convertInToUserTZ( moveEventResults[r-1].transition_time, tzId ))) ))
 						sheet.addCell( new Label( 8, r, String.valueOf(moveEventResults[r-1].username )) )
 						sheet.addCell( new Label( 9, r, String.valueOf(moveEventResults[r-1].team_name )) )
 					}
@@ -193,8 +197,8 @@ class MoveEventController {
 						sheet.addCell( new Label( 1, r, String.valueOf(moveEventResults[r-1].bundle_name )) )
 						sheet.addCell( new Label( 2, r, String.valueOf(moveEventResults[r-1].state_to )) )
 						sheet.addCell( new Label( 3, r, String.valueOf(moveEventResults[r-1].name )) )
-						sheet.addCell( new Label( 4, r, String.valueOf(moveEventResults[r-1].started )) )
-						sheet.addCell( new Label( 5, r, String.valueOf(moveEventResults[r-1]. completed )) )
+						sheet.addCell( new Label( 4, r, String.valueOf(formatter.format(GormUtil.convertInToUserTZ( moveEventResults[r-1].started, tzId )) )) )
+						sheet.addCell( new Label( 5, r, String.valueOf(formatter.format(GormUtil.convertInToUserTZ( moveEventResults[r-1].completed, tzId )) )) )
 					}	
 				}
 		            
@@ -225,6 +229,8 @@ class MoveEventController {
 				try {
 					def moveEventResults
 					def reportFields =[]
+					def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+					DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 					if(reportType != "SUMMARY"){
 						moveEventResults = moveBundleService.getMoveEventDetailedResults( moveEvent )
 						moveEventResults.each { results->
@@ -232,7 +238,8 @@ class MoveEventController {
 											"asset_id":results.asset_id, "team_name":results.team_name,
 											"asset_name":results.asset_name, "voided":results.voided, 
 											"from_name":results.from_name, "to_name":results.to_name, 
-											"transition_time":results.transition_time, "username":results.username]
+											"transition_time":String.valueOf(formatter.format(GormUtil.convertInToUserTZ( results.transition_time, tzId )) ),
+											"username":results.username]
 						}
 						chain(controller:'jasper',action:'index',model:[data:reportFields],
 								params:["_format":"PDF","_name":"MoveResults_${params.reportType}","_file":"moveEventDeailedReport"])
@@ -241,7 +248,8 @@ class MoveEventController {
 						moveEventResults.each { results->
 							reportFields <<["move_bundle_id":results.move_bundle_id, "bundle_name":results.bundle_name, 
 											"state_to":results.state_to, "name":results.name,
-											"started":results.started, "completed":results.completed]
+											"started":String.valueOf(formatter.format(GormUtil.convertInToUserTZ( results.started, tzId )) ),
+											"completed":String.valueOf(formatter.format(GormUtil.convertInToUserTZ( results.completed, tzId )) )]
 						}
 						chain(controller:'jasper',action:'index',model:[data:reportFields],
 								params:["_format":"PDF","_name":"MoveResults_${params.reportType}","_file":"moveEventSummaryReport"])
