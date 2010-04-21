@@ -44,7 +44,7 @@ class ClientConsoleController {
             def defaultEvent = getSession().getAttribute("MOVE_EVENT")
             if(defaultEvent.MOVE_EVENT){
             	moveEventInstance = MoveEvent.findById(defaultEvent.MOVE_EVENT)
-            	if( moveEventInstance.project.id != Integer.parseInt(projectId) ){
+            	if( moveEventInstance?.project?.id != Integer.parseInt(projectId) ){
             		moveEventInstance = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
             	}
             } else {

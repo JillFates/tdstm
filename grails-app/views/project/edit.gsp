@@ -26,7 +26,7 @@
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
-            <g:form method="post" name="editProjectForm" enctype="multipart/form-data">
+            <g:form method="post" action="update" name="editProjectForm" enctype="multipart/form-data">
                 <input type="hidden" name="id" value="${projectInstance?.id}" />
                 <div class="dialog">
                     <table>
@@ -215,7 +215,7 @@
                 </div>
                 <div class="buttons">
                     <span class="button"><g:actionSubmit class="save" value="Update" onclick="return validateDates()"/></span>
-                    <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
+                    <span class="button"><g:actionSubmit class="delete" onclick="if(confirm('Are you sure?')){document.editProjectForm.action = 'delete'};" value="Delete" /></span>
                 </div>
             </g:form>
         </div>
