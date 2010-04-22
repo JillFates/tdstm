@@ -432,14 +432,16 @@ class AssetEntityController {
                 } else {
                 	//Add Title Information to master SpreadSheet
                 	titleSheet = book.getSheet("Title")
-            		SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss k");  
+            		SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss a");
+                	def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+                	def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
                 	if(titleSheet != null) {
                 		def titleInfoMap = new ArrayList();
                 		titleInfoMap.add (project.client )
                 		titleInfoMap.add( projectId )
                 		titleInfoMap.add( project.name )
                 		titleInfoMap.add( partyRelationshipService.getProjectManagers(projectId) )
-                		titleInfoMap.add( format.format( new Date() ) )
+                		titleInfoMap.add( format.format( currDate ) )
                 		titleInfoMap.add( loginUser.person )
                 		titleInfoMap.add( bundleNameList )
                 		partyRelationshipService.exportTitleInfo(titleInfoMap,titleSheet)
