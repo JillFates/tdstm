@@ -201,7 +201,9 @@ class MoveEventController {
 						sheet.addCell( new Label( 5, r, String.valueOf(formatter.format(GormUtil.convertInToUserTZ( moveEventResults[r-1].completed, tzId )) )) )
 					}	
 				}
-		            
+				tzId ? tzId : 'EDT'
+				sheet.addCell( new Label( 0, moveEventResults.size() + 2, "Note: All times are in $tzId time zone") )
+				
 				book.write()
 				book.close()
 		        
@@ -231,6 +233,7 @@ class MoveEventController {
 					def reportFields =[]
 					def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 					DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+					def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
 					if(reportType != "SUMMARY"){
 						moveEventResults = moveBundleService.getMoveEventDetailedResults( moveEvent )
 						moveEventResults.each { results->
@@ -239,7 +242,8 @@ class MoveEventController {
 											"asset_name":results.asset_name, "voided":results.voided, 
 											"from_name":results.from_name, "to_name":results.to_name, 
 											"transition_time":String.valueOf(formatter.format(GormUtil.convertInToUserTZ( results.transition_time, tzId )) ),
-											"username":results.username]
+											"username":results.username,"timezone":tzId ? tzId : "EDT",
+											"rptTime":String.valueOf(formatter.format( currDate ) )]
 						}
 						chain(controller:'jasper',action:'index',model:[data:reportFields],
 								params:["_format":"PDF","_name":"MoveResults_${params.reportType}","_file":"moveEventDeailedReport"])
@@ -249,7 +253,8 @@ class MoveEventController {
 							reportFields <<["move_bundle_id":results.move_bundle_id, "bundle_name":results.bundle_name, 
 											"state_to":results.state_to, "name":results.name,
 											"started":String.valueOf(formatter.format(GormUtil.convertInToUserTZ( results.started, tzId )) ),
-											"completed":String.valueOf(formatter.format(GormUtil.convertInToUserTZ( results.completed, tzId )) )]
+											"completed":String.valueOf(formatter.format(GormUtil.convertInToUserTZ( results.completed, tzId )) ),
+											"timezone":tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
 						}
 						chain(controller:'jasper',action:'index',model:[data:reportFields],
 								params:["_format":"PDF","_name":"MoveResults_${params.reportType}","_file":"moveEventSummaryReport"])

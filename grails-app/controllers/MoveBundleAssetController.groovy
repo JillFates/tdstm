@@ -1,7 +1,8 @@
 import grails.converters.JSON
 import org.jsecurity.SecurityUtils
 import com.tdssrc.grails.GormUtil
-
+import java.text.SimpleDateFormat
+import java.text.DateFormat
 class MoveBundleAssetController {
 	def partyRelationshipService
 	def assetEntityAttributeLoaderService
@@ -759,6 +760,8 @@ class MoveBundleAssetController {
     		}
     		//Source List of Assets
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
+			DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
     		assetEntityList.each { asset ->
     			def bundleInstance
     			if(asset.moveBundle != null) {
@@ -792,7 +795,8 @@ class MoveBundleAssetController {
    			 	                'location':"Source Team", 'rack':"SourceRack",'rackPos':"SourceRackPosition",'truck':asset.truck, 
    			 	                'room':asset.sourceRoom, 'PDU':asset.pduPort,'NIC':asset.nicPort,
    			 	                'kvmPort':asset.kvmDevice ? asset.kvmDevice : '' + asset.kvmPort ? asset.kvmPort :'', 
-   			 	                'hbaPort':asset.fiberCabinet + asset.hbaPort, 'instructions':assetCommentString, 'sourcetargetLoc':"s"]
+   			 	                'hbaPort':asset.fiberCabinet + asset.hbaPort, 'instructions':assetCommentString, 'sourcetargetLoc':"s",
+								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
     		}
     		//Target List of Assets
     		targetAssetEntitylist.each { asset ->
@@ -834,7 +838,8 @@ class MoveBundleAssetController {
    				                'teamName':teamPartyGroup?.name +"-"+teamMembers, 'teamMembers':teamMembers,
    				                'location':"Target Team", 'rack':"TargetRack",'rackPos':"TargetRackPosition",
    				                'truck':(asset.truck ? asset.truck : "")+"\n"+cartShelf,'room':asset.targetRoom,'PDU':asset.pduPort,'NIC':asset.nicPort, 
-   				                'kvmPort':kvmPort, 'hbaPort':hbaPort,'instructions':assetCommentString,'sourcetargetLoc':"t"]
+   				                'kvmPort':kvmPort, 'hbaPort':hbaPort,'instructions':assetCommentString,'sourcetargetLoc':"t",
+								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
     		}
     		//No assets were found for selected MoveBundle,Team and Location
     		if(reportFields.size() <= 0) {    		
@@ -895,6 +900,8 @@ class MoveBundleAssetController {
        		}
             
             def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+            def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
+			DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
        		//Source AssetList 
        		if( assetEntityList != null) {
        			assetEntityList.each { asset ->
@@ -940,7 +947,8 @@ class MoveBundleAssetController {
        				                'teamMembers':teamMembers,'location':"Source Team", 'truck':asset.truck, 
        				                'room':asset.sourceRoom,'moveTeam':asset?.sourceTeam?.name, 'instructions':assetCommentString,
        				                'teamTagSort':teamTagSort, 'roomTagSort':roomTagSort,'truckTagSort':truckTagSort,
-       				                'assetTagSort': (asset.assetTag ? asset.assetTag : ""),'sourcetargetLoc':"s", 'usize':asset.usize]
+       				                'assetTagSort': (asset.assetTag ? asset.assetTag : ""),'sourcetargetLoc':"s", 'usize':asset.usize,
+									'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
        			}
        		}
        		//No Assets were found for selected moveBundle,team and Location
@@ -1214,6 +1222,9 @@ class MoveBundleAssetController {
     			bundleNames = "All"
         	}
     		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+    		def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
+			println"currDate--------->"+currDate
+			DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
     		assetCommentList.each { assetComment ->
     			def createdBy
     			def sourceTargetRoom
@@ -1229,14 +1240,16 @@ class MoveBundleAssetController {
     								'model':(assetComment?.assetEntity?.manufacturer ? assetComment?.assetEntity?.manufacturer : "")+" "+(assetComment?.assetEntity?.model ? assetComment?.assetEntity?.model : "" ), 
     								'occuredAt':GormUtil.convertInToUserTZ( assetComment?.dateCreated, tzId ), 'createdBy':assetComment?.createdBy?.firstName+" "+assetComment?.createdBy?.lastName, 
     								'issue':assetComment?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
-    								'clientName':projectInstance?.client?.name,"resolvedInfoInclude":resolvedInfoInclude]
+    								'clientName':projectInstance?.client?.name,"resolvedInfoInclude":resolvedInfoInclude,
+    								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
     			}
     			if( params.reportResolveInfo == "true" && assetComment.isResolved == 1 ) {
     				reportFields <<['assetName':null, 'assetTag':null, 'sourceTargetRoom':null,'model':null, 
 									'occuredAt':GormUtil.convertInToUserTZ( assetComment?.dateResolved, tzId ), 
     								'createdBy':assetComment?.resolvedBy?.firstName+" "+assetComment?.resolvedBy?.lastName, 
     								'issue':assetComment?.resolution, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
-    								'clientName':projectInstance?.client?.name]
+    								'clientName':projectInstance?.client?.name,
+    								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
     			}
     		}
     		if(reportFields.size() <= 0) {    		
