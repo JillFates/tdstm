@@ -3,6 +3,7 @@
  *--------------------------------------*/
 class SupervisorConsoleService {
 	def stateEngineService
+	def userPreferenceService
     boolean transactional = true
     /*----------------------------------------
      * @author : Lokanath Reddy
@@ -21,7 +22,9 @@ class SupervisorConsoleService {
         def sortField = params.sort
         def orderField = params.order
         def holdCheck = true
-        def projectInstance = Project.findById( params.projectId )
+		def projectId = params.projectId 
+		projectId = projectId ? projectId : userPreferenceService.getSession().getAttribute( "CURR_PROJ" )?.CURR_PROJ
+        def projectInstance = Project.findById( projectId )
         def cleanedId = stateEngineService.getStateId( projectInstance.workflowCode, "Cleaned" )
         def onCartId = stateEngineService.getStateId( projectInstance.workflowCode, "OnCart" )
         def onTruckId = stateEngineService.getStateId( projectInstance.workflowCode, "OnTruck" )

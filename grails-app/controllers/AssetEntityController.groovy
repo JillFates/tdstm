@@ -911,6 +911,7 @@ class AssetEntityController {
         def totalAsset = []
     	def totalAssetsSize = 0
         def supportTeam = new HashMap()
+    	projectId = projectId ? projectId : getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
         def projectInstance = Project.findById( projectId )
         def moveBundleInstanceList = MoveBundle.findAll("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
         def moveBundleInstance
@@ -1150,7 +1151,6 @@ class AssetEntityController {
 	        assetTransition.each{
 	        	def cssClass
 	        	def taskLabel = stateEngineService.getStateLabel(assetDetail.project.workflowCode,Integer.parseInt(it.stateTo))
-				println"it.dateCreated-------->"+it.dateCreated
 	        	def time = GormUtil.convertInToUserTZ(it.dateCreated, tzId ).toString().substring(11,19)
 	    	    def timeElapsed = convertIntegerIntoTime( it.timeElapsed )
 	        	if(it.voided == 1){
