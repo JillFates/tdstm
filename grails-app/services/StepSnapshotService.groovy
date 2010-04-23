@@ -299,7 +299,7 @@ log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${l
 			}
 			
 			// see if this step is projected further into the future
-			if ( step.planDelta > maxDelta || maxDelta == null ) {
+			if ( step.planDelta < maxDelta || maxDelta == null ) {
 				maxDelta = step.planDelta
 				lastIsCompleted = isCompleted
 			}
