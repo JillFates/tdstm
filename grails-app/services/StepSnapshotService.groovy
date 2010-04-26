@@ -242,8 +242,6 @@ log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${l
 		def maxDelta = 0					// Tracks the max delta for all move events
 		def lastIsCompleted = false
 		def hasActive = false
-		def isActive = false
-		def isCompleted = false
 		def allCompleted = true
 		def noneStarted = true
 										
@@ -254,6 +252,9 @@ log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${l
 		}
 		
 		stepsList.each { step ->
+			
+			def isActive = false
+			def isCompleted = false
 			// If first or new bundle reset various vars that are bundle dependent
 			if (step.moveBundleId != lastBundleId) {
 				lastBundleId = step.moveBundleId
@@ -299,7 +300,7 @@ log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${l
 			}
 			
 			// see if this step is projected further into the future
-			if ( step.planDelta < maxDelta || maxDelta == null ) {
+			if ( step.planDelta > maxDelta || maxDelta == 0 ) {
 				maxDelta = step.planDelta
 				lastIsCompleted = isCompleted
 			}

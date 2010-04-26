@@ -5,6 +5,7 @@
 	
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dashboard.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tabcontent.css')}" />
+	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 	
 	<g:javascript src="FusionCharts.js" />
 	<g:javascript src="yahoo.js" />
@@ -510,7 +511,7 @@
 				$(".sum_statusbar_bad").attr("class","sum_statusbar_good")
 				$("#status_color").html("GREEN")
 			}
-			updateSummaryGauge("summary_gauge",planSum.dialInd);
+			updateSummaryGauge("summary_gauge",planSum.dialInd ? planSum.dialInd : '50');
 			$("#spanPlanned").html(convertTime(offset, planSum.compTime))
 			
 			if(revSum.dialInd == "-1") {
@@ -581,7 +582,7 @@
 				$(".sum_statusbar_bad").attr("class","sum_statusbar_good")
 				$("#status_color").html("GREEN")
 			}
-			updateSummaryGauge("summary_gauge",planSum.dialInd);
+			updateSummaryGauge("summary_gauge",planSum.dialInd ? planSum.dialInd : '50');
 			
 			if(snapshot.revisedComp) {
 				updateRevisedGauge("revised_gauge",revSum.dialInd)
