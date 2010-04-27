@@ -5,7 +5,7 @@
 <g:javascript library="jquery" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-<meta name="viewport" content="width=device-width" />
+<meta name="viewport" content="height=device-height,width=device-width" />
 
 <style type="text/css">
 dt {
@@ -25,6 +25,10 @@ dt {
 		        url:"../project/setUserTimeZone?tz="+tz
 		});
   	}
+
+	window.addEventListener('load', function(){
+	setTimeout(scrollTo, 0, 0, 1);
+	}, false);
 </script>  
 </head>
 <body>

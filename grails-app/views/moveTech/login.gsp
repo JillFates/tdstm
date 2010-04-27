@@ -9,7 +9,7 @@
 <link rel="shortcut icon"
 	href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 <g:javascript library="application" />
-<meta name="viewport" content="width=device-width" />
+<meta name="viewport" content="height=device-height,width=device-width" />
 
 </head>
 <body onload="document.loginForm.username.focus()">

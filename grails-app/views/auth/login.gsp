@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" type="text/css"/>
 <link rel="shortcut icon"
 	href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+<meta name="viewport" content="height=device-height,width=device-width" />
 	
 <g:javascript library="application" />
 </head>

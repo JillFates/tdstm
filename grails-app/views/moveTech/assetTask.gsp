@@ -8,7 +8,7 @@
 	 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.move_tech_dialog.css')}" /> 
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />--%>
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-<meta name="viewport" content="width=device-width" />
+<meta name="viewport" content="height=device-height,width=device-width" />
 	
 	<%--
 	<g:javascript library="jquery" />
