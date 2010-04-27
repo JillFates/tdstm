@@ -9,6 +9,11 @@
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 <meta name="viewport" content="height=device-height,width=device-width" />
 	
+<script type="text/javascript">
+        window.addEventListener('load', function(){
+                setTimeout(scrollTo, 0, 0, 1);
+        }, false);
+</script>
     <script type="text/javascript">
    
         function validation( actionType ){   

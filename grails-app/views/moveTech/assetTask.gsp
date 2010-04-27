@@ -19,6 +19,10 @@
 	--%>
 	
     <script type="text/javascript">    	
+	window.addEventListener('load', function(){
+		setTimeout(scrollTo, 0, 0, 1);
+	}, false);
+
     <%--
 	$(document).ready(function() {
 	$("#serverInfoDialog").dialog({ autoOpen: false })	       
@@ -82,71 +86,73 @@
 		<td><a href="#" class="my_task_select">My Tasks</a></td>
 		<td><a href="#" class="asset_search">Asset</a></td>
 		</tr></table>
-      					<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">
+
+      		<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">
       					
-					        <input name="bundle" type="hidden" value="${bundle}" />
-							<input name="team" type="hidden" value="${team}" />
-							<input name="location" type="hidden" value="${location}" />
-							<input name="project" type="hidden" value="${project}" />
-							<input name="tab" type="hidden" value="${tab}" />								              	
-							<div style="float:left; width:210px; margin:2px 0; ">              								
-              					<table style="border:0px;width:210px;">
-								    <tr>								            										            		
-								    <td id="todoId" class="tab">
-								    	<g:if test="${tab && tab == 'Todo'}">
-								    		<g:link class="tab_select" action="assetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link>
-								    	</g:if>
-								    	<g:else>
-								    		<g:link class="tab_deselect" action="assetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link>
-								    	</g:else>
-								    </td>
-								    <td id="allId" class="tab">
-								    	<g:if test="${tab == 'All'}">
-								    		<g:link class="tab_select" action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All&nbsp;(${allSize})</g:link>
-								    	</g:if>
-								    	<g:else>
-								    		<g:link class="tab_deselect" action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All&nbsp;(${allSize})</g:link>
-								    	</g:else>
-								    </td>
-								    <td class="tab_search"><input  type="text" size="08" value="" id="search" name="search" /></td>
-								    </tr>
-								    </table>
-						    </div> 
-							<div id="mydiv" onclick="this.style.display = 'none';setFocus()">						            
-			   					<g:if test="${flash.message}">
-								<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
-								</g:if> 
-							</div>		
-           					<div style="float:left; width:220px; margin:5px 0;"><b>My Tasks:</b></div>
-            				<div id="assetTable" style="float:left;width:220px; ">
-           					<div style=" width:220px; ">          
-             					<table id="assetTable" style="height:80px;">
-              					<thead>
+	        <input name="bundle" type="hidden" value="${bundle}" />
+		<input name="team" type="hidden" value="${team}" />
+		<input name="location" type="hidden" value="${location}" />
+		<input name="project" type="hidden" value="${project}" />
+		<input name="tab" type="hidden" value="${tab}" />								              	
+		<div style="float:left; width:210px; margin:2px 0; ">              								
+		<table style="border:0px;width:210px;">
+		<tr>
+			<td id="todoId" class="tab">
+				<g:if test="${tab && tab == 'Todo'}">
+			    		<g:link class="tab_select" action="assetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link>
+			    	</g:if>
+			    	<g:else>
+			    		<g:link class="tab_deselect" action="assetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link>
+			    	</g:else>
+			</td>
+			<td id="allId" class="tab">
+				<g:if test="${tab == 'All'}">
+			    		<g:link class="tab_select" action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All&nbsp;(${allSize})</g:link>
+			    	</g:if>
+			    	<g:else>
+			    		<g:link class="tab_deselect" action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All&nbsp;(${allSize})</g:link>
+			    	</g:else>
+			</td>
+			<td class="tab_search"><input  type="text" size="08" value="" id="search" name="search" /></td>
+		</tr>
+		</table>
+		</div> 
+		<div id="mydiv" onclick="this.style.display = 'none';setFocus()">						            
+ 			<g:if test="${flash.message}">
+				<br />
+				<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
+			</g:if> 
+		</div>		
+           	<div style="float:left; width:220px; margin:5px 0;"><b>My Tasks:</b></div>
+            	<div id="assetTable" style="float:left;width:220px; ">
+           		<div style=" width:220px; ">          
+             			<table id="assetTable" style="height:80px;">
+              				<thead>
                 				<tr>
                   				<g:sortableColumn class="sort_column" style="width:60px;" action="assetTask" property="asset_tag" title="AssetTag" params="['bundle':bundle, 'team':team, 'tab':tab,'location':location,'project':project ]"></g:sortableColumn>
                   				<g:sortableColumn class="sort_column" style="width:65px;" action="assetTask" property="source_rack" title="Rack/Pos" params="['bundle':bundle, 'team':team, 'tab':tab,'location':location,'project':project ]"></g:sortableColumn>
                   				<g:sortableColumn class="sort_column" action="assetTask" property="model" title="Model" params="['bundle':bundle, 'team':team, 'tab':tab,'location':location,'project':project ]"></g:sortableColumn>
 								</tr>
-               					</thead>
-               					<tbody>
-                  				<g:each status="i" in="${assetList}" var="assetList">
-                  				
-								<tr class="${assetList.cssVal}"  onclick="assetSubmit('${assetList?.item?.assetTag}');">						
+					</thead>
+					<tbody>
+						<g:each status="i" in="${assetList}" var="assetList">
+							<tr class="${assetList.cssVal}"  onclick="assetSubmit('${assetList?.item?.assetTag}');">
 								<td class="asset_details_block">${assetList?.item?.assetTag}</td>
 								<g:if test="${location == 's'}">
-								<td class="asset_details_block">${assetList?.item?.sourceRack}/${assetList?.item?.sourceRackPosition}</td>
+									<td class="asset_details_block">${assetList?.item?.sourceRack}/${assetList?.item?.sourceRackPosition}</td>
 								</g:if>
 								<g:else>
-								<td class="asset_details_block">${assetList?.item?.targetRack}/${assetList?.item?.targetRackPosition}</td>
+									<td class="asset_details_block">${assetList?.item?.targetRack}/${assetList?.item?.targetRackPosition}</td>
 								</g:else>
-								<td class="asset_details_block">${assetList?.item?.model}</td>											
-								</tr>
+									<td class="asset_details_block">${assetList?.item?.model}</td>
+									</tr>
 								</g:each>
-                 				</tbody>
-                				</table>
-        					</div></div>
-      				</g:form>
-  				</div>
+					</tbody>
+				</table>
+			</div>
+		</div>
+      		</g:form>
+  	</div>
 <script type="text/javascript" >setFocus();</script>
 </body>
 </html>
