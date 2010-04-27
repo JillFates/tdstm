@@ -5,6 +5,7 @@
 <g:javascript library="jquery" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+<meta name="viewport" content="width=device-width" />
 
 <style type="text/css">
 dt {

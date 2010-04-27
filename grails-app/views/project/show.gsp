@@ -23,6 +23,7 @@
     <h1>Show Project</h1>
         
     <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
+      <span class="menuButton"><g:link class="list" action="list">Project List</g:link></span>
       <jsec:hasRole name="ADMIN">
         <span class="menuButton"><g:link class="create" action="create">New Project</g:link></span>
       </jsec:hasRole>
