@@ -445,6 +445,7 @@ class AssetEntityController {
                 		titleInfoMap.add( loginUser.person )
                 		titleInfoMap.add( bundleNameList )
                 		partyRelationshipService.exportTitleInfo(titleInfoMap,titleSheet)
+						titleSheet.addCell(new Label(0,30,"Note: All times are in ${tzId ? tzId : 'EDT'} time zone"))
                 	}
                     //update data from Asset Entity table to EXCEL
                     def assetSize = asset.size()

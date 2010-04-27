@@ -48,14 +48,14 @@
                         <tr class="prop">
                             <td valign="top" class="name">Created Date:</td>
                             
-                            <td valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'createdDate')}</td>
+                            <td valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.createdDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
                             
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name">Last Login:</td>
                             
-                            <td valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'lastLogin')}</td>
+                            <td valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.lastLogin}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
                             
                         </tr>
                         
