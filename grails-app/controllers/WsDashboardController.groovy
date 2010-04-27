@@ -104,7 +104,7 @@ log.debug "offsetTZ=${offsetTZ}"
     		if( moveEvent ){
 				
     			def resultMap = jdbcTemplate.queryForMap( """
-					SELECT DATE_FORMAT( max(mb.completion_time) ,'%Y/%m/%d %h:%m:%s' ) as compTime
+					SELECT DATE_FORMAT( max(mb.completion_time) ,'%Y/%m/%d %r' ) as compTime
     				FROM move_bundle mb WHERE mb.move_event_id = ${moveEvent.id}
 					""" )
 
