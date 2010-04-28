@@ -112,7 +112,7 @@
 <body>
 	<a name="top"></a>
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
-	<div class="mainbody" style="border:0px solid #e7e7e7; width: 100%;">
+	<div class="mainbody" style="border:0px solid #e7e7e7; width:220px;">
 	<div class="colum_techlogin" style="float:left;">
 		<table border=0 cellpadding=0 cellspacing=0><tr>
 			<td><g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt","fMess":"fMess"]' class="home" >Home</g:link></td>

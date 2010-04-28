@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>My Tasks</title>
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-	 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-	<%--<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+<%--<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
 	 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.move_tech_dialog.css')}" /> 
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />--%>
-	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+	 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />--%>
+<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 <meta name="viewport" content="height=device-height,width=device-width" />
 	
 	<%--
@@ -18,7 +18,7 @@
 	<jq:plugin name="ui.dialog" /> 
 	--%>
 	
-    <script type="text/javascript">    	
+<script type="text/javascript">    	
 	window.addEventListener('load', function(){
 		setTimeout(scrollTo, 0, 0, 1);
 	}, false);
@@ -80,7 +80,7 @@
 </head>
 <body>
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
-	<div class="mainbody" style="width: 100%;" >
+	<div class="mainbody" style="width: 220px;" >
 		<table border=0 cellpadding=0 cellspacing=0><tr>
 		<td><g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt"]' class="home">Home</g:link></td>
 		<td><a href="#" class="my_task_select">My Tasks</a></td>
@@ -99,19 +99,19 @@
 		<tr>
 			<td id="todoId" class="tab">
 				<g:if test="${tab && tab == 'Todo'}">
-			    		<g:link class="tab_select" action="assetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link>
-			    	</g:if>
-			    	<g:else>
-			    		<g:link class="tab_deselect" action="assetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link>
-			    	</g:else>
+				  <g:link class="tab_select" action="assetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link>
+				</g:if>
+				<g:else>
+				  <g:link class="tab_deselect" action="assetTask"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link>
+				</g:else>
 			</td>
 			<td id="allId" class="tab">
 				<g:if test="${tab == 'All'}">
-			    		<g:link class="tab_select" action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All&nbsp;(${allSize})</g:link>
-			    	</g:if>
-			    	<g:else>
-			    		<g:link class="tab_deselect" action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All&nbsp;(${allSize})</g:link>
-			    	</g:else>
+				  <g:link class="tab_select" action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All&nbsp;(${allSize})</g:link>
+				</g:if>
+				<g:else>
+				  <g:link class="tab_deselect" action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All&nbsp;(${allSize})</g:link>
+				</g:else>
 			</td>
 			<td class="tab_search"><input  type="text" size="08" value="" id="search" name="search" /></td>
 		</tr>
@@ -132,21 +132,21 @@
                   				<g:sortableColumn class="sort_column" style="width:60px;" action="assetTask" property="asset_tag" title="AssetTag" params="['bundle':bundle, 'team':team, 'tab':tab,'location':location,'project':project ]"></g:sortableColumn>
                   				<g:sortableColumn class="sort_column" style="width:65px;" action="assetTask" property="source_rack" title="Rack/Pos" params="['bundle':bundle, 'team':team, 'tab':tab,'location':location,'project':project ]"></g:sortableColumn>
                   				<g:sortableColumn class="sort_column" action="assetTask" property="model" title="Model" params="['bundle':bundle, 'team':team, 'tab':tab,'location':location,'project':project ]"></g:sortableColumn>
-								</tr>
+						</tr>
 					</thead>
 					<tbody>
 						<g:each status="i" in="${assetList}" var="assetList">
 							<tr class="${assetList.cssVal}"  onclick="assetSubmit('${assetList?.item?.assetTag}');">
 								<td class="asset_details_block">${assetList?.item?.assetTag}</td>
 								<g:if test="${location == 's'}">
-									<td class="asset_details_block">${assetList?.item?.sourceRack}/${assetList?.item?.sourceRackPosition}</td>
+								<td class="asset_details_block">${assetList?.item?.sourceRack}/${assetList?.item?.sourceRackPosition}</td>
 								</g:if>
 								<g:else>
-									<td class="asset_details_block">${assetList?.item?.targetRack}/${assetList?.item?.targetRackPosition}</td>
+								<td class="asset_details_block">${assetList?.item?.targetRack}/${assetList?.item?.targetRackPosition}</td>
 								</g:else>
-									<td class="asset_details_block">${assetList?.item?.model}</td>
-									</tr>
-								</g:each>
+								<td class="asset_details_block">${assetList?.item?.model}</td>
+							</tr>
+						</g:each>
 					</tbody>
 				</table>
 			</div>
@@ -156,4 +156,3 @@
 <script type="text/javascript" >setFocus();</script>
 </body>
 </html>
-                  				
