@@ -275,7 +275,7 @@
 							}
 							var attributes = {
 								points : {
-									by : [132, 0]
+									by : [130, 0]
 								}
 							};
 							x--;
@@ -286,7 +286,7 @@
 							}
 							var attributes = {
 								points : {
-									by : [-132, 0]
+									by : [-130, 0]
 								}
 							};
 							x++;
