@@ -181,7 +181,7 @@ class AssetEntityController {
             }
             titleSheet = workbook.getSheet( "Title" )
             if( titleSheet != null) {
-            		SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss k");
+            		SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss a");
             		try {
             			exportTime = format.parse( (titleSheet.getCell( 1,5 ).contents).toString() )
             		}catch ( Exception e) {

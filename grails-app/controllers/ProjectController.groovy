@@ -40,7 +40,7 @@ class ProjectController {
         	def currProjectInstance = Project.get( currProj.CURR_PROJ )
         	def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
     		def userCompany = partyRelationshipService.getSatffCompany( loginUser.person )
-    		request.getSession(false).setAttribute("PARTYGROUP",userCompany?.partyIdFrom)
+			userPreferenceService.setPreference( "PARTYGROUP", "${userCompany?.partyIdFrom?.id}" )    
         	def projectLogo
         	if(currProjectInstance){
         		projectLogo = ProjectLogo.findByProject(currProjectInstance)
@@ -94,7 +94,7 @@ class ProjectController {
         	def currProjectInstance = Project.get( currProj.CURR_PROJ )
         	def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
     		def userCompany = partyRelationshipService.getSatffCompany( loginUser.person )
-    		request.getSession(false).setAttribute("PARTYGROUP",userCompany?.partyIdFrom)
+			userPreferenceService.setPreference( "PARTYGROUP", "${userCompany?.partyIdFrom?.id}" )
         	def projectLogo
         	if(currProjectInstance){
         		projectLogo = ProjectLogo.findByProject(currProjectInstance)

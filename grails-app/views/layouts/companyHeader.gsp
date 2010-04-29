@@ -32,7 +32,7 @@
     if( projectId != null){
       currProjObj = Project.findById(projectId)
     }
-    def partyGroup = request.getSession(false).getAttribute("PARTYGROUP") 
+    def partyGroup = session.getAttribute("PARTYGROUP")?.PARTYGROUP 
     
     %>
   </head>
@@ -106,9 +106,9 @@
       -->
        <div class="menu2">
 		<ul>
-			<li><g:link class="home" controller="partyGroup" action="show" id="${partyGroup?.id}">Company</g:link></li>
-			<li><g:link class="home" controller="person" id="${partyGroup?.id}">Staff</g:link></li>
-			<li><g:link class="home" controller="application" id="${partyGroup?.id}">Applications </g:link></li>
+			<li><g:link class="home" controller="partyGroup" action="show" id="${partyGroup}">Company</g:link></li>
+			<li><g:link class="home" controller="person" id="${partyGroup}">Staff</g:link></li>
+			<li><g:link class="home" controller="application" id="${partyGroup}">Applications </g:link></li>
 			<li><a href="#">Locations </a></li>
 			<li><a href="#">Rooms </a></li>
 		</ul>

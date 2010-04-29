@@ -15,7 +15,7 @@ class UserLoginController {
 		def companyId = params.id
         if(!params.max) params.max = 10
         if( !companyId ){
-        	companyId = request.getSession().getAttribute("PARTYGROUP")?.id
+        	companyId = session.getAttribute("PARTYGROUP")?.PARTYGROUP
         }
 		def isCompanyAdmin = SecurityUtils.getSubject().hasRole("ADMIN")
 		if( !isCompanyAdmin ){

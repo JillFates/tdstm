@@ -1,7 +1,8 @@
 class PartyGroupController {
     
 	def partyRelationshipService
-    
+    def userPreferenceService
+	
     def index = { redirect(action:list,params:params) }
 
     // the delete, save and update actions only accept POST requests
@@ -15,7 +16,7 @@ class PartyGroupController {
 
     def show = {
         def partyGroupInstance = PartyGroup.get( params.id )
-        request.getSession(false).setAttribute("PARTYGROUP",partyGroupInstance)
+		userPreferenceService.setPreference( "PARTYGROUP", "${partyGroupInstance?.id}" )
 
         if(!partyGroupInstance) {
             flash.message = "PartyGroup not found with id ${params.id}"
@@ -39,7 +40,7 @@ class PartyGroupController {
 
     def edit = {
         def partyGroupInstance = PartyGroup.get( params.id )
-        request.getSession(false).setAttribute("PARTYGROUP",partyGroupInstance)
+		userPreferenceService.setPreference( "PARTYGROUP", "${partyGroupInstance?.id}" )
         if(!partyGroupInstance) {
             flash.message = "PartyGroup not found with id ${params.id}"
             redirect(action:list)

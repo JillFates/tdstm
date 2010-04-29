@@ -404,6 +404,8 @@ if(viewFilter){
 }
 if(moveEvent){
 	$("#moveEvent").val(moveEvent)
+} else {
+	$("#moveEvent").val("${session.getAttribute('MOVE_EVENT')?.MOVE_EVENT}")
 }
 /*------------------------------------------------------------------
 * function to Unhighlight the Asset row when the edit DIV is closed
