@@ -292,7 +292,7 @@
 							x++;
 						break;
 					};
-					var anim = new $M('themes', attributes, 0.5, YAHOO.util.Easing.easeOut);
+					var anim = new $M('themes', attributes, 0.1, YAHOO.util.Easing.easeOut);
 					anim.animate();
 				}
 			};
