@@ -115,6 +115,8 @@ th {
 	height:21px; 
 	width:45px; 
 	float:left; 
+   -webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
 	margin:auto 0px;
 	color: #5b5e5c; 
 	border:1px solid #5b5e5c; 
@@ -126,6 +128,8 @@ th {
 	height:21px; 
 	width:45px; 
 	float:left; 
+   -webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
 	margin:auto 0px;
 	color: #5b5e5c; 
 	border:1px solid #5b5e5c; 
@@ -138,6 +142,8 @@ th {
 	height:21px; 
 	width:60px; 
 	float:left; 
+   -webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
 	margin:auto 0px;
 	color: #5b5e5c; 
 	border:1px solid #5b5e5c; 
@@ -149,6 +155,8 @@ th {
 	height:21px; 
 	width:60px; 
 	float:left; 
+   -webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
 	margin:auto 0px;
 	color: #5b5e5c; 
 	border:1px solid #5b5e5c; 
@@ -161,6 +169,8 @@ th {
 	height:21px; 
 	width:63px; 
 	float:left; 
+   -webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
 	margin:auto 0px;
 	color: #5b5e5c; 
 	border:1px solid #5b5e5c; 
@@ -172,6 +182,8 @@ th {
 	height:21px; 
 	width:63px; 
 	float:left; 
+   -webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
 	margin:auto 0px;
 	color: #5b5e5c; 
 	border:1px solid #5b5e5c;
@@ -193,6 +205,8 @@ th {
 	padding-right:0px;
 	padding-bottom:0px; 
 	height:10px;
+   -webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
 }
 .tab_search input {
 	color: #5b5e5c; 
@@ -206,12 +220,16 @@ th {
 	margin:2px;
 	background:#aaefb8;
 	padding:2px;
+   -webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
 }
 .tab_deselect {
 	color: #5b5e5c; 
 	border:1px solid #5b5e5c;
 	margin:2px;
 	padding:2px;
+   -webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
 }
 .sort_column {
 	color: #5b5e5c; 

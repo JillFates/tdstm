@@ -7,7 +7,7 @@
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-<meta name="viewport" content="height=device-height,width=device-width" />
+<meta name="viewport" content="height=device-height,width=220" />
 	
 <script type="text/javascript">
         window.addEventListener('load', function(){
@@ -141,7 +141,7 @@
 		<div class="clear" style="margin:2px;"></div>
 
 		<g:if test="${projMap}">			
-		<table>
+		<table style="border:0px; width=220">
 			<tr><td><dt>Asset Tag:</dt><dd><a href="#detail">&nbsp;${projMap?.asset?.assetTag}&nbsp;&nbsp;&nbsp;(Details)</a></dd></td></tr>
 	
  			<g:if test="${assetComment}">

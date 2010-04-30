@@ -9,7 +9,7 @@
 <link rel="shortcut icon"
 	href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 <g:javascript library="application" />
-<meta name="viewport" content="height=device-height,width=device-width" />
+<meta name="viewport" content="height=device-height,width=220" />
 <script type="text/javascript">
         window.addEventListener('load', function(){
                 setTimeout(scrollTo, 0, 0, 1);
@@ -47,7 +47,7 @@
 			<tr>
 				<td style="text-align: center;"><span
 					style="color: #328714; font: bold 15px arial;">Transition
-				Manager</span></td>
+				Manager - Mobile</span></td>
 			</tr>
 			<tr>
 				<td style="text-align:center;"><label>Username:</label>

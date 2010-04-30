@@ -5,7 +5,7 @@
 <g:javascript library="jquery" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-<meta name="viewport" content="height=device-height,width=device-width" />
+<meta name="viewport" content="height=device-height,width=220" />
 
 <style type="text/css">
 dt {
@@ -35,7 +35,7 @@ dt {
 	<div id="spinner" class="spinner" style="display: none;"><img
 		src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 	</div>
-	<div class="mainbody" style="width: 100%; border:0;" >
+	<div class="mainbody" style="width: 220px; border:0;" >
 	<div class="border_bundle_team" style="border:0px;">
 		<table border=0 cellpadding="0" cellspacing="0"><tr>
 		<td><a href="#" class="home_select">Home</a></td>
@@ -58,10 +58,6 @@ dt {
 								<input type="text" size="12" value="" name="search" />
 							</td>
 							<td valign="middle"><g:link controller="moveTech" action="signOut" class="sign_out">Log out</g:link></td>
-							<td>
-							<g:select name="timeZone" id="timeZoneId" from="${['GMT','PST','PDT','MST','MDT','CST','CDT','EST','EDT']}" 
-                    			value="${session.getAttribute('CURR_TZ')?.CURR_TZ ? session.getAttribute('CURR_TZ')?.CURR_TZ : 'EDT'}" onchange="setUserTimeZone(this.value)"/>
-							</td>
 						</tr>
 					  </table>
 				</div>
@@ -71,6 +67,9 @@ dt {
 					</g:if> 
 				</div>  
 				<div style="float:left; width:200px; margin:4px;">
+					<b>Timezone:</b> <g:select name="timeZone" id="timeZoneId" from="${['GMT','PST','PDT','MST','MDT','CST','CDT','EST','EDT']}" 
+                    			value="${session.getAttribute('CURR_TZ')?.CURR_TZ ? session.getAttribute('CURR_TZ')?.CURR_TZ : 'EDT'}" onchange="setUserTimeZone(this.value)"/>
+					<br />
 					<b>Currently Logged in as:</b>
 					<dl compact>
 						<dt>Project:&nbsp;</dt><dd>${project}</dd>

@@ -123,7 +123,7 @@
 				<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
 			</g:if> 
 		</div>		
-           	<div style="float:left; width:220px; margin:5px 0;"><b>My Tasks:</b></div>
+           	<div style="float:left; width:220px; margin:5px 5px;"><b>My Tasks:</b></div>
             	<div id="assetTable" style="float:left;width:220px; ">
            		<div style=" width:220px; ">          
              			<table id="assetTable" style="height:80px;">
