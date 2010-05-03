@@ -41,6 +41,9 @@ a:hover {
 			<td><g:link controller="manufacturer" style="color:black">Manufacturer</g:link></td>
 			<td><g:link controller="model" style="color:black">Model</g:link></td>
 		</tr>
+		<tr>
+			<td colspan="2"><g:link controller="admin" action="orphanSummary" style="color:black">Manage Orphan Records</g:link></td>
+		</tr>
 	</tbody>
 </table>
 </div>
