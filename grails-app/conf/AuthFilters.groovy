@@ -28,8 +28,8 @@ class AuthFilters {
 						return false
 					} else if( !subject.hasRole("ADMIN") ){		// verify the user role as ADMIN
 						def moveEventProjectClientStaff = PartyRelationship.find( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' "+
-															" and p.partyIdFrom = ${moveObject?.project.client} and p.roleTypeCodeFrom = 'COMPANY'"+
-															" and p.roleTypeCodeTo = 'STAFF' and p.partyIdFrom = ${person.id}" )
+															" and p.partyIdFrom = ${moveObject?.project?.client?.id} and p.roleTypeCodeFrom = 'COMPANY'"+
+															" and p.roleTypeCodeTo = 'STAFF' and p.partyIdTo = ${person.id}" )
 						if(!moveEventProjectClientStaff){		// if not ADMIN check whether user is associated to the Party that is associate to the Project.client of the moveEvent / MoveBundle 
 							response.sendError( 403 , "Forbidden" )
 							return false
