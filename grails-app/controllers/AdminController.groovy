@@ -388,9 +388,9 @@ class AdminController {
 		switch (table) {
 			case "application" :
 				if(type != "Null"){
-					query = "SELECT app.app_id as tableId, app.owner_id as refId FROM application app where app.owner_id not in (select p.party_group_id from party_group p )"
+					query = "SELECT * FROM application app where app.owner_id not in (select p.party_group_id from party_group p )"
 				} else {
-					query = "SELECT app.app_id as tableId, app.owner_id as refId FROM application app where app.owner_id is null"
+					query = "SELECT * FROM application app where app.owner_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
 			break;
@@ -399,17 +399,17 @@ class AdminController {
 				switch (column){
 					case "application_id" :
 						if(type != "Null"){
-							query = "SELECT asm.id as tableId,asm.application_id as refId FROM application_asset_map asm where asm.application_id not in (select app.app_id from application app )"
+							query = "SELECT * FROM application_asset_map asm where asm.application_id not in (select app.app_id from application app )"
 						} else {
-							query = "SELECT asm.id as tableId,asm.application_id as refId FROM application_asset_map asm where asm.application_id is null"
+							query = "SELECT * FROM application_asset_map asm where asm.application_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "asset_id" :
 						if(type != "Null"){
-							query = "SELECT asm.id as tableId,asm.asset_id as refId FROM application_asset_map asm where asm.asset_id not in (select ae.asset_entity_id from asset_entity ae )"
+							query = "SELECT * FROM application_asset_map asm where asm.asset_id not in (select ae.asset_entity_id from asset_entity ae )"
 						} else {
-							query = "SELECT asm.id as tableId,asm.asset_id as refId FROM application_asset_map asm where asm.asset_id is null"
+							query = "SELECT * FROM application_asset_map asm where asm.asset_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
@@ -420,22 +420,22 @@ class AdminController {
 				switch (column){
 					case "asset_entity_id" :
 						if(type != "Null"){
-							query = "SELECT ac.asset_comment_id as tableId, ac.asset_entity_id as refId FROM asset_comment ac where ac.asset_entity_id not in (select ae.asset_entity_id from asset_entity ae )"
+							query = "SELECT * FROM asset_comment ac where ac.asset_entity_id not in (select ae.asset_entity_id from asset_entity ae )"
 						} else {
-							query = "SELECT ac.asset_comment_id as tableId, ac.asset_entity_id as refId FROM asset_comment ac where ac.asset_entity_id is null"
+							query = "SELECT * FROM asset_comment ac where ac.asset_entity_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "created_by" :
 						if(type != "Null"){
-							query = "SELECT ac.asset_comment_id as tableId, ac.created_by as refId FROM asset_comment ac where ac.created_by not in (select p.person_id from person p )"
+							query = "SELECT * FROM asset_comment ac where ac.created_by not in (select p.person_id from person p )"
 						} else {
-							query = "SELECT ac.asset_comment_id as tableId, ac.created_by as refId FROM asset_comment ac where ac.created_by is null"
+							query = "SELECT * FROM asset_comment ac where ac.created_by is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "resolved_by" :
-						query = "SELECT ac.asset_comment_id as tableId, ac.resolved_by as refId FROM asset_comment ac where ac.resolved_by not in (select p.person_id from person p )"
+						query = "SELECT * FROM asset_comment ac where ac.resolved_by not in (select p.person_id from person p )"
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 				}
@@ -445,30 +445,30 @@ class AdminController {
 				switch (column){
 					case "project_id" :
 						if(type != "Null"){
-							query = "SELECT a.asset_entity_id as tableId, a.project_id as refId FROM asset_entity a where a.project_id not in (select p.project_id from project p )"
+							query = "SELECT * FROM asset_entity a where a.project_id not in (select p.project_id from project p )"
 						} else {
-							query = "SELECT a.asset_entity_id as tableId, a.project_id as refId FROM asset_entity a where a.project_id is null"
+							query = "SELECT * FROM asset_entity a where a.project_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "owner_id" :
 						if(type != "Null"){
-							query = "SELECT a.asset_entity_id as tableId, a.owner_id as refId FROM asset_entity a where a.owner_id not in (select p.party_group_id from party_group p )"
+							query = "SELECT * FROM asset_entity a where a.owner_id not in (select p.party_group_id from party_group p )"
 						} else {
-							query = "SELECT a.asset_entity_id as tableId, a.owner_id as refId FROM asset_entity a where a.owner_id is null"
+							query = "SELECT * FROM asset_entity a where a.owner_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "move_bundle_id" :
-						query = "SELECT a.asset_entity_id as tableId, a.move_bundle_id as refId FROM asset_entity a where a.move_bundle_id not in (select m.move_bundle_id from move_bundle m )"
+						query = "SELECT * FROM asset_entity a where a.move_bundle_id not in (select m.move_bundle_id from move_bundle m )"
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "source_team_id" :
-						query = "SELECT a.asset_entity_id as tableId, a.source_team_id as refId FROM asset_entity a where a.source_team_id not in (select pt.project_team_id from project_team pt )"
+						query = "SELECT * FROM asset_entity a where a.source_team_id not in (select pt.project_team_id from project_team pt )"
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "target_team_id" :
-						query = "SELECT a.asset_entity_id as tableId, a.target_team_id as refId FROM asset_entity a where a.target_team_id not in (select pt.project_team_id from project_team pt )"
+						query = "SELECT * FROM asset_entity a where a.target_team_id not in (select pt.project_team_id from project_team pt )"
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 				}
@@ -478,17 +478,17 @@ class AdminController {
 				switch (column) {
 					case "asset_entity_id" :
 						if(type != "Null"){
-							query = "SELECT aev.id as tableId, aev.asset_entity_id as refId FROM asset_entity_varchar aev where aev.asset_entity_id not in (select ae.asset_entity_id from asset_entity ae )"
+							query = "SELECT * FROM asset_entity_varchar aev where aev.asset_entity_id not in (select ae.asset_entity_id from asset_entity ae )"
 						} else {
-							query = "SELECT aev.id as tableId, aev.asset_entity_id as refId FROM asset_entity_varchar aev where aev.asset_entity_id is null"
+							query = "SELECT * FROM asset_entity_varchar aev where aev.asset_entity_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "attribute_id" :
 						if(type != "Null"){
-							query = "SELECT aev.id as tableId, aev.attribute_id as refId FROM asset_entity_varchar aev where aev.attribute_id not in (select ea.attribute_id from eav_attribute ea )"
+							query = "SELECT * FROM asset_entity_varchar aev where aev.attribute_id not in (select ea.attribute_id from eav_attribute ea )"
 						} else {
-							query = "SELECT aev.id as tableId, aev.attribute_id as refId FROM asset_entity_varchar aev where aev.attribute_id is null"
+							query = "SELECT * FROM asset_entity_varchar aev where aev.attribute_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
@@ -499,30 +499,30 @@ class AdminController {
 				switch (column) {
 					case "asset_entity_id" :
 						if(type != "Null"){
-							query = "SELECT at.asset_transition_id as tableId,at.asset_entity_id as refId FROM asset_transition at where at.asset_entity_id not in (select ae.asset_entity_id from asset_entity ae )"
+							query = "SELECT * FROM asset_transition at where at.asset_entity_id not in (select ae.asset_entity_id from asset_entity ae )"
 						} else {
-							query = "SELECT at.asset_transition_id as tableId,at.asset_entity_id as refId FROM asset_transition at where at.asset_entity_id is null"
+							query = "SELECT * FROM asset_transition at where at.asset_entity_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "move_bundle_id" :
 						if(type != "Null"){
-							query = "SELECT at.asset_transition_id as tableId, at.move_bundle_id as refId FROM asset_transition at where at.move_bundle_id not in (select m.move_bundle_id from move_bundle m )"
+							query = "SELECT * FROM asset_transition at where at.move_bundle_id not in (select m.move_bundle_id from move_bundle m )"
 						} else {
-							query = "SELECT at.asset_transition_id as tableId, at.move_bundle_id as refId FROM asset_transition at where at.move_bundle_id is null"
+							query = "SELECT * FROM asset_transition at where at.move_bundle_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "user_login_id" :
 						if(type != "Null"){
-							query = "SELECT at.asset_transition_id as tableId, at.user_login_id as refId FROM asset_transition at where at.user_login_id not in (select ul.user_login_id from user_login ul )"
+							query = "SELECT * FROM asset_transition at where at.user_login_id not in (select ul.user_login_id from user_login ul )"
 						} else {
-							query = "SELECT at.asset_transition_id as tableId, at.user_login_id as refId FROM asset_transition at where at.user_login_id is null"
+							query = "SELECT * FROM asset_transition at where at.user_login_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "project_team_id" :
-						query = "SELECT at.asset_transition_id as tableId, at.project_team_id as refId FROM asset_transition at where at.project_team_id not in (select pt.project_team_id from project_team pt ) "
+						query = "SELECT * FROM asset_transition at where at.project_team_id not in (select pt.project_team_id from project_team pt ) "
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 				}
@@ -532,17 +532,17 @@ class AdminController {
 				switch (column){
 					case "eav_attribute_id" :
 						if(type != "Null"){
-							query = "SELECT dam.id as tableId, dam.eav_attribute_id as refId FROM data_transfer_attribute_map dam where dam.eav_attribute_id not in (select ea.attribute_id from eav_attribute ea)"
+							query = "SELECT * FROM data_transfer_attribute_map dam where dam.eav_attribute_id not in (select ea.attribute_id from eav_attribute ea)"
 						} else {
-							query = "SELECT dam.id as tableId, dam.eav_attribute_id as refId FROM data_transfer_attribute_map dam where dam.eav_attribute_id is null"
+							query = "SELECT * FROM data_transfer_attribute_map dam where dam.eav_attribute_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "data_transfer_set_id" :
 						if(type != "Null"){
-							query = "SELECT dam.id as tableId, dam.data_transfer_set_id as refId FROM data_transfer_attribute_map dam where dam.data_transfer_set_id not in (select dts.data_transfer_id from data_transfer_set dts)"
+							query = "SELECT * FROM data_transfer_attribute_map dam where dam.data_transfer_set_id not in (select dts.data_transfer_id from data_transfer_set dts)"
 						} else {
-							query = "SELECT dam.id as tableId, dam.data_transfer_set_id as refId FROM data_transfer_attribute_map dam where dam.data_transfer_set_id is null"
+							query = "SELECT * FROM data_transfer_attribute_map dam where dam.data_transfer_set_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
@@ -553,25 +553,25 @@ class AdminController {
 				switch (column){
 					case "user_login_id" :
 						if(type != "Null"){
-							query = "SELECT dtb.batch_id as tableId, dtb.user_login_id as refId FROM data_transfer_batch dtb where dtb.user_login_id not in (select ul.user_login_id from user_login ul)"
+							query = "SELECT * FROM data_transfer_batch dtb where dtb.user_login_id not in (select ul.user_login_id from user_login ul)"
 						} else {
-							query = "SELECT dtb.batch_id as tableId, dtb.user_login_id as refId FROM data_transfer_batch dtb where dtb.user_login_id is null"
+							query = "SELECT * FROM data_transfer_batch dtb where dtb.user_login_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "data_transfer_set_id" :
 						if(type != "Null"){
-							query = "SELECT dtb.batch_id as tableId, dtb.data_transfer_set_id as refId FROM data_transfer_batch dtb where dtb.data_transfer_set_id not in (select dts.data_transfer_id from data_transfer_set dts)"
+							query = "SELECT * FROM data_transfer_batch dtb where dtb.data_transfer_set_id not in (select dts.data_transfer_id from data_transfer_set dts)"
 						} else {
-							query = "SELECT dtb.batch_id as tableId, dtb.data_transfer_set_id as refId FROM data_transfer_batch dtb where dtb.data_transfer_set_id is null"
+							query = "SELECT * FROM data_transfer_batch dtb where dtb.data_transfer_set_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "project_id" :
 						if(type != "Null"){
-							query = "SELECT dtb.batch_id as tableId, dtb.project_id as refId FROM data_transfer_batch dtb where dtb.project_id not in (select p.project_id from project p)"
+							query = "SELECT * FROM data_transfer_batch dtb where dtb.project_id not in (select p.project_id from project p)"
 						} else {
-							query = "SELECT dtb.batch_id as tableId, dtb.project_id as refId FROM data_transfer_batch dtb where dtb.project_id is null"
+							query = "SELECT * FROM data_transfer_batch dtb where dtb.project_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
@@ -580,9 +580,9 @@ class AdminController {
 			
 			case "data_transfer_comment" :
 				if(type != "Null"){
-					query = "SELECT dtm.id,dtm.data_transfer_batch_id as refId FROM data_transfer_comment dtm where dtm.data_transfer_batch_id not in (select dtb.batch_id from data_transfer_batch dtb)"
+					query = "SELECT * FROM data_transfer_comment dtm where dtm.data_transfer_batch_id not in (select dtb.batch_id from data_transfer_batch dtb)"
 				} else {
-					query = "SELECT dtm.id,dtm.data_transfer_batch_id as refId FROM data_transfer_comment dtm where dtm.data_transfer_batch_id is null"
+					query = "SELECT * FROM data_transfer_comment dtm where dtm.data_transfer_batch_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
 			break;
@@ -591,17 +591,17 @@ class AdminController {
 				switch (column){
 					case "data_transfer_batch_id" :
 						if(type != "Null"){
-							query = "SELECT dtv.value_id as tableId, dtv.data_transfer_batch_id as refId FROM data_transfer_value dtv where dtv.data_transfer_batch_id not in (select dtb.batch_id from data_transfer_batch dtb)"
+							query = "SELECT * FROM data_transfer_value dtv where dtv.data_transfer_batch_id not in (select dtb.batch_id from data_transfer_batch dtb)"
 						} else {
-							query = "SELECT dtv.value_id as tableId, dtv.data_transfer_batch_id as refId FROM data_transfer_value dtv where dtv.data_transfer_batch_id is null"
+							query = "SELECT * FROM data_transfer_value dtv where dtv.data_transfer_batch_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "eav_attribute_id" :
 						if(type != "Null"){
-							query = "SELECT dtv.value_id as tableId, dtv.eav_attribute_id as refId FROM data_transfer_value dtv where dtv.eav_attribute_id not in (select ea.attribute_id from eav_attribute ea)"
+							query = "SELECT * FROM data_transfer_value dtv where dtv.eav_attribute_id not in (select ea.attribute_id from eav_attribute ea)"
 						} else {
-							query = "SELECT dtv.value_id as tableId, dtv.eav_attribute_id as refId FROM data_transfer_value dtv where dtv.eav_attribute_id is null"
+							query = "SELECT * FROM data_transfer_value dtv where dtv.eav_attribute_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
@@ -610,36 +610,36 @@ class AdminController {
 			
 			case "eav_attribute" :
 				if(type != "Null"){
-					query = "SELECT ea.attribute_id as tableId, ea.entity_type_id as refId FROM eav_attribute ea where ea.entity_type_id not in (select et.entity_type_id from eav_entity_type et)"
+					query = "SELECT * FROM eav_attribute ea where ea.entity_type_id not in (select et.entity_type_id from eav_entity_type et)"
 				} else {
-					query = "SELECT ea.attribute_id as tableId, ea.entity_type_id as refId FROM eav_attribute ea where ea.entity_type_id is null"
+					query = "SELECT * FROM eav_attribute ea where ea.entity_type_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
 			break;
 				
 			case "eav_attribute_option" :
 				if(type != "Null"){
-					query = "SELECT eao.option_id as tableId, eao.attribute_id as refId FROM eav_attribute_option eao where eao.attribute_id not in (select ea.attribute_id from eav_attribute ea)"
+					query = "SELECT * FROM eav_attribute_option eao where eao.attribute_id not in (select ea.attribute_id from eav_attribute ea)"
 				} else {
-					query = "SELECT eao.option_id as tableId, eao.attribute_id as refId FROM eav_attribute_option eao where eao.attribute_id is null"
+					query = "SELECT * FROM eav_attribute_option eao where eao.attribute_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
 			break;
 			
 			case "eav_attribute_set" :
 				if(type != "Null"){
-					query = "SELECT eas.attribute_set_id as tableId, eas.entity_type_id as refId FROM eav_attribute_set eas where eas.entity_type_id not in (select et.entity_type_id from eav_entity_type et)"
+					query = "SELECT * FROM eav_attribute_set eas where eas.entity_type_id not in (select et.entity_type_id from eav_entity_type et)"
 				} else {
-					query = "SELECT eas.attribute_set_id as tableId, eas.entity_type_id as refId FROM eav_attribute_set eas where eas.entity_type_id is null"
+					query = "SELECT * FROM eav_attribute_set eas where eas.entity_type_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
 			break;
 				
 			case "eav_entity" :
 				if(type != "Null"){
-					query = "SELECT ee.entity_id as tableId, ee.attribute_set_id as refId FROM eav_entity ee where ee.attribute_set_id not in (select eas.attribute_set_id from eav_attribute_set eas)"
+					query = "SELECT * FROM eav_entity ee where ee.attribute_set_id not in (select eas.attribute_set_id from eav_attribute_set eas)"
 				} else {
-					query = "SELECT ee.entity_id as tableId, ee.attribute_set_id as refId FROM eav_entity ee where ee.attribute_set_id is null"
+					query = "SELECT * FROM eav_entity ee where ee.attribute_set_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
 			break;
@@ -648,22 +648,22 @@ class AdminController {
 				switch (column){
 					case "eav_attribute_set_id" :
 						if(type != "Null"){
-							query = "SELECT eea.entity_attribute_id as tableId, eea.eav_attribute_set_id as refId FROM eav_entity_attribute eea where eea.eav_attribute_set_id not in (select eas.attribute_set_id from eav_attribute_set eas)"
+							query = "SELECT * FROM eav_entity_attribute eea where eea.eav_attribute_set_id not in (select eas.attribute_set_id from eav_attribute_set eas)"
 						} else {
-							query = "SELECT eea.entity_attribute_id as tableId, eea.eav_attribute_set_id as refId FROM eav_entity_attribute eea where eea.eav_attribute_set_id is null"
+							query = "SELECT * FROM eav_entity_attribute eea where eea.eav_attribute_set_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "attribute_id" :
 						if(type != "Null"){
-							query = "SELECT eea.entity_attribute_id as tableId, eea.attribute_id as refId FROM eav_entity_attribute eea where eea.attribute_id not in (select ea.attribute_id from eav_attribute ea)"
+							query = "SELECT * FROM eav_entity_attribute eea where eea.attribute_id not in (select ea.attribute_id from eav_attribute ea)"
 						} else {
-							query = "SELECT eea.entity_attribute_id as tableId, eea.attribute_id as refId FROM eav_entity_attribute eea where eea.attribute_id is null"
+							query = "SELECT * FROM eav_entity_attribute eea where eea.attribute_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "eav_entity_id" :
-						query = "SELECT eea.entity_attribute_id as tableId, eea.eav_entity_id as refId FROM eav_entity_attribute eea where eea.eav_entity_id not in (select ee.entity_id from eav_entity ee)"
+						query = "SELECT * FROM eav_entity_attribute eea where eea.eav_entity_id not in (select ee.entity_id from eav_entity ee)"
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 				}
@@ -671,21 +671,21 @@ class AdminController {
 			
 			case "eav_entity_datatype" :
 				if(type != "Null"){
-					query = "SELECT eed.value_id as tableId, eed.attribute_id as refId FROM eav_entity_datatype eed where eed.attribute_id not in (select ea.attribute_id from eav_attribute ea)"
+					query = "SELECT * FROM eav_entity_datatype eed where eed.attribute_id not in (select ea.attribute_id from eav_attribute ea)"
 				} else {
-					query = "SELECT eed.value_id as tableId, eed.attribute_id as refId FROM eav_entity_datatype eed where eed.attribute_id is null"
+					query = "SELECT * FROM eav_entity_datatype eed where eed.attribute_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
 			break;
 				
 			case "model" :
 				switch (column){
-					case "eav_attribute_set_id" :
-						query = "SELECT m.model_id as tableId, m.device_type_id as refId FROM model m where m.device_type_id not in (select rc.id from ref_code rc)"
+					case "device_type_id" :
+						query = "SELECT * FROM model m where m.device_type_id not in (select rc.id from ref_code rc)"
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
-					case "eav_attribute_set_id" :
-						query = "SELECT m.model_id as tableId, m.manufacturer_id as refId FROM model m where m.manufacturer_id not in (select mn.manufacturer_id from manufacturer mn)"
+					case "manufacturer_id" :
+						query = "SELECT * FROM model m where m.manufacturer_id not in (select mn.manufacturer_id from manufacturer mn)"
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 				}
@@ -695,17 +695,17 @@ class AdminController {
 				switch (column){
 					case "project_id" :
 						if(type != "Null"){
-							query = "SELECT m.move_bundle_id as tableId, m.project_id as refId FROM move_bundle m where m.project_id not in (select p.project_id from project p )"
+							query = "SELECT * FROM move_bundle m where m.project_id not in (select p.project_id from project p )"
 						} else {
-							query = "SELECT m.move_bundle_id as tableId, m.project_id as refId FROM move_bundle m where m.project_id is null"
+							query = "SELECT * FROM move_bundle m where m.project_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "move_event_id" :
 						if(type != "Null"){
-							query = "SELECT m.move_bundle_id as tableId, m.move_event_id as refId FROM move_bundle m where m.move_event_id not in (select me.move_event_id from move_event me )"
+							query = "SELECT * FROM move_bundle m where m.move_event_id not in (select me.move_event_id from move_event me )"
 						} else {
-							query = "SELECT m.move_bundle_id as tableId, m.move_event_id as refId FROM move_bundle m where m.move_event_id is null"
+							query = "SELECT * FROM move_bundle m where m.move_event_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
@@ -715,18 +715,18 @@ class AdminController {
 			
 			case "move_bundle_step" :
 				if(type != "Null"){
-					query = "SELECT mbs.id as tableId, mbs.move_bundle_id as refId FROM move_bundle_step mbs where mbs.move_bundle_id not in (select m.move_bundle_id from move_bundle m )"
+					query = "SELECT * FROM move_bundle_step mbs where mbs.move_bundle_id not in (select m.move_bundle_id from move_bundle m )"
 				} else {
-					query = "SELECT mbs.id as tableId, mbs.move_bundle_id as refId FROM move_bundle_step mbs where mbs.move_bundle_id is null"
+					query = "SELECT * FROM move_bundle_step mbs where mbs.move_bundle_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
 			break;
 				
 			case "move_event" :
 				if(type != "Null"){
-					query = "SELECT me.move_event_id as tableId, me.project_id as refId FROM move_event me where me.project_id not in (select p.project_id from project p )"
+					query = "SELECT * FROM move_event me where me.project_id not in (select p.project_id from project p )"
 				} else {
-					query = "SELECT me.move_event_id as tableId, me.project_id as refId FROM move_event me where me.project_id is null"
+					query = "SELECT * FROM move_event me where me.project_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
 			break;
@@ -735,22 +735,22 @@ class AdminController {
 				switch (column){
 					case "move_event_id" :
 						if(type != "Null"){
-							query = "SELECT men.move_event_news_id as tableId, men.move_event_id as refId FROM move_event_news men where men.move_event_id not in (select me.move_event_id from move_event me )"
+							query = "SELECT * FROM move_event_news men where men.move_event_id not in (select me.move_event_id from move_event me )"
 						} else {
-							query = "SELECT men.move_event_news_id as tableId, men.move_event_id as refId FROM move_event_news men where men.move_event_id is null"
+							query = "SELECT * FROM move_event_news men where men.move_event_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "created_by" :
 						if(type != "Null"){
-							query = "SELECT men.move_event_news_id as tableId, men.created_by as refId FROM move_event_news men where men.created_by not in (select p.person_id from person p )"
+							query = "SELECT * FROM move_event_news men where men.created_by not in (select p.person_id from person p )"
 						} else {
-							query = "SELECT men.move_event_news_id as tableId, men.created_by as refId FROM move_event_news men where men.created_by is null"
+							query = "SELECT * FROM move_event_news men where men.created_by is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
-					case "resolved_by" :
-						query = "SELECT men.move_event_news_id as tableId, men.archived_by as refId FROM move_event_news men where men.archived_by not in (select p.person_id from person p )"
+					case "archived_by" :
+						query = "SELECT * FROM move_event_news men where men.archived_by not in (select p.person_id from person p )"
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 				}
@@ -758,18 +758,18 @@ class AdminController {
 			
 			case "move_event_snapshot" :
 				if(type != "Null"){
-					query = "SELECT mes.id as tableId,mes.move_event_id as refId FROM move_event_snapshot mes where mes.move_event_id not in (select me.move_event_id from move_event me )"
+					query = "SELECT * FROM move_event_snapshot mes where mes.move_event_id not in (select me.move_event_id from move_event me )"
 				} else {
-					query = "SELECT mes.id as tableId,mes.move_event_id as refId FROM move_event_snapshot mes where mes.move_event_id is null"
+					query = "SELECT * FROM move_event_snapshot mes where mes.move_event_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
 			break;
 				
 			case "step_snapshot" :
 				if(type != "Null"){
-					query = "SELECT ss.id as tableId, ss.move_bundle_step_id as refId FROM step_snapshot ss where ss.move_bundle_step_id not in (select m.id from move_bundle_step m)"
+					query = "SELECT * FROM step_snapshot ss where ss.move_bundle_step_id not in (select m.id from move_bundle_step m)"
 				} else {
-					query = "SELECT ss.id as tableId, ss.move_bundle_step_id as refId FROM step_snapshot ss where ss.move_bundle_step_id is null"
+					query = "SELECT * FROM step_snapshot ss where ss.move_bundle_step_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
 			break;
@@ -777,7 +777,7 @@ class AdminController {
 			case "party":
 				switch (column){
 					case "party_id" :
-	        		query = """SELECT p.party_id as tableId, p.party_id as refId FROM party p where p.party_id not in
+	        		query = """SELECT * FROM party p where p.party_id not in
 						(select distinct pr.party_id from (select party_group_id as party_id from party_group
 						union
 						select person_id as party_id from person
@@ -792,7 +792,7 @@ class AdminController {
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "" :
-	        			query = "SELECT p.party_id as tableId, p.party_type_id as refId FROM party p where p.party_type_id not in (select pt.party_type_code from party_type pt)"
+	        			query = "SELECT * FROM party p where p.party_type_id not in (select pt.party_type_code from party_type pt)"
 	        			orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 				}
@@ -802,41 +802,41 @@ class AdminController {
 				switch (column){
 					case "party_id_from_id" :
 						if(type != "Null"){
-							query = "SELECT pr.party_relationship_type_id as tableId, pr.party_id_from_id as refId FROM party_relationship pr where pr.party_id_from_id in ( $orphanParty )"
+							query = "SELECT * FROM party_relationship pr where pr.party_id_from_id in ( $orphanParty )"
 						} else {
-							query = "SELECT pr.party_relationship_type_id as tableId, pr.party_id_from_id as refId FROM party_relationship pr where pr.party_id_from_id is null"
+							query = "SELECT * FROM party_relationship pr where pr.party_id_from_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "party_id_to_id" :
 						if(type != "Null"){
-							query = "SELECT pr.party_relationship_type_id as tableId, pr.party_id_to_id as refId FROM party_relationship pr where pr.party_id_to_id in ( $orphanParty )"
+							query = "SELECT * FROM party_relationship pr where pr.party_id_to_id in ( $orphanParty )"
 						} else {
-							query = "SELECT pr.party_relationship_type_id as tableId, pr.party_id_to_id as refId FROM party_relationship pr where pr.party_id_to_id is null"
+							query = "SELECT * FROM party_relationship pr where pr.party_id_to_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "role_type_code_from_id" :
 						if(type != "Null"){
-							query = "SELECT pr.party_relationship_type_id as tableId, pr.role_type_code_from_id as refId FROM party_relationship pr where pr.role_type_code_from_id not in (select rt.role_type_code from role_type rt )"
+							query = "SELECT * FROM party_relationship pr where pr.role_type_code_from_id not in (select rt.role_type_code from role_type rt )"
 						} else {
-							query = "SELECT pr.party_relationship_type_id as tableId, pr.role_type_code_from_id as refId FROM party_relationship pr where pr.role_type_code_from_id is null"
+							query = "SELECT * FROM party_relationship pr where pr.role_type_code_from_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "role_type_code_to_id" :
 						if(type != "Null"){
-							query = "SELECT pr.party_relationship_type_id as tableId, pr.role_type_code_to_id as refId FROM party_relationship pr where pr.role_type_code_to_id not in (select rt.role_type_code from role_type rt )"
+							query = "SELECT * FROM party_relationship pr where pr.role_type_code_to_id not in (select rt.role_type_code from role_type rt )"
 						} else {
-							query = "SELECT pr.party_relationship_type_id as tableId, pr.role_type_code_to_id as refId FROM party_relationship pr where pr.role_type_code_to_id is null"
+							query = "SELECT * FROM party_relationship pr where pr.role_type_code_to_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "party_relationship_type_id" :
 						if(type != "Null"){
-							query = "SELECT pr.party_relationship_type_id as tableId, pr.party_relationship_type_id as refId FROM party_relationship pr where pr.party_relationship_type_id not in (select prt.party_relationship_type_code from party_relationship_type prt )"
+							query = "SELECT * FROM party_relationship pr where pr.party_relationship_type_id not in (select prt.party_relationship_type_code from party_relationship_type prt )"
 						} else {
-							query = "SELECT pr.party_relationship_type_id as tableId, pr.party_relationship_type_id as refId FROM party_relationship pr where pr.party_relationship_type_id is null"
+							query = "SELECT * FROM party_relationship pr where pr.party_relationship_type_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
@@ -846,17 +846,17 @@ class AdminController {
 				switch (column){
 					case "party_id" :
 						if(type != "Null"){
-							query = "SELECT pr.party_id as tableId, pr.party_id as refId FROM party_role pr where pr.party_id not in (select p.party_id from party p)"
+							query = "SELECT * FROM party_role pr where pr.party_id not in (select p.party_id from party p)"
 						} else {
-							query = "SELECT pr.party_id as tableId, pr.party_id as refId FROM party_role pr where pr.party_id is null"
+							query = "SELECT * FROM party_role pr where pr.party_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "role_type_id" :
 						if(type != "Null"){
-							query = "SELECT pr.party_id as tableId, pr.role_type_id as refId FROM party_role pr where pr.role_type_id not in (select rt.role_type_code from role_type rt)"
+							query = "SELECT * FROM party_role pr where pr.role_type_id not in (select rt.role_type_code from role_type rt)"
 						} else {
-							query = "SELECT pr.party_id as tableId, pr.role_type_id as refId FROM party_role pr where pr.role_type_id is null"
+							query = "SELECT * FROM party_role pr where pr.role_type_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
@@ -865,9 +865,9 @@ class AdminController {
 			
 			case "project" :
 				if(type != "Null"){
-					query = "SELECT pr.project_id as tableId, pr.client_id as refId FROM project pr where pr.client_id not in (select pg.party_group_id from party_group pg)"
+					query = "SELECT * FROM project pr where pr.client_id not in (select pg.party_group_id from party_group pg)"
 				} else {
-					query = "SELECT pr.project_id as tableId, pr.client_id as refId FROM project pr where pr.client_id is null"
+					query = "SELECT * FROM project pr where pr.client_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
 			break;
@@ -876,17 +876,17 @@ class AdminController {
 				switch (column){
 					case "project_id" :
 						if(type != "Null"){
-							query = "SELECT pam.id as tableId, pam.project_id as refId FROM project_asset_map pam where pam.project_id not in (select pr.project_id from project pr)"
+							query = "SELECT * FROM project_asset_map pam where pam.project_id not in (select pr.project_id from project pr)"
 						} else {
-							query = "SELECT pam.id as tableId, pam.project_id as refId FROM project_asset_map pam where pam.project_id is null"
+							query = "SELECT * FROM project_asset_map pam where pam.project_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "asset_id" :
 						if(type != "Null"){
-							query = "SELECT pam.id as tableId, pam.asset_id as refId FROM project_asset_map pam where pam.asset_id not in (select ae.asset_entity_id from asset_entity ae)"
+							query = "SELECT * FROM project_asset_map pam where pam.asset_id not in (select ae.asset_entity_id from asset_entity ae)"
 						} else {
-							query = "SELECT pam.id as tableId, pam.asset_id as refId FROM project_asset_map pam where pam.asset_id is null"
+							query = "SELECT * FROM project_asset_map pam where pam.asset_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
@@ -897,17 +897,17 @@ class AdminController {
 				switch (column){
 					case "party_id" :
 						if(type != "Null"){
-							query = "SELECT pl.project_logo_id as tableId, pl.party_id as refId FROM project_logo pl where pl.party_id not in (select pg.party_group_id from party_group pg)"
+							query = "SELECT * FROM project_logo pl where pl.party_id not in (select pg.party_group_id from party_group pg)"
 						} else {
-							query = "SELECT pl.project_logo_id as tableId, pl.party_id as refId FROM project_logo pl where pl.party_id is null"
+							query = "SELECT * FROM project_logo pl where pl.party_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "project_id" :
 						if(type != "Null"){
-							query = "SELECT pl.project_logo_id as tableId, pl.project_id as refId FROM project_logo pl where pl.project_id not in (select pr.project_id from project pr)"
+							query = "SELECT * FROM project_logo pl where pl.project_id not in (select pr.project_id from project pr)"
 						} else {
-							query = "SELECT pl.project_logo_id as tableId, pl.project_id as refId FROM project_logo pl where pl.project_id is null"
+							query = "SELECT * FROM project_logo pl where pl.project_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
@@ -918,14 +918,14 @@ class AdminController {
 				switch (column){
 					case "move_bundle_id" :
 						if(type != "Null"){
-							query = "SELECT pt.project_team_id as tableId, pt.move_bundle_id as refId FROM project_team pt where pt.move_bundle_id not in (select m.move_bundle_id from move_bundle m)"
+							query = "SELECT * FROM project_team pt where pt.move_bundle_id not in (select m.move_bundle_id from move_bundle m)"
 						} else {
-							query = "SELECT pt.project_team_id as tableId, pt.move_bundle_id as refId FROM project_team pt where pt.move_bundle_id is null"
+							query = "SELECT * FROM project_team pt where pt.move_bundle_id is null"
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "latest_asset_id" :
-						query = "SELECT pt.project_team_id as tableId, pt.latest_asset_id as refId FROM project_team pt where pt.latest_asset_id not in (select ae.asset_entity_id from asset_entity ae)"
+						query = "SELECT * FROM project_team pt where pt.latest_asset_id not in (select ae.asset_entity_id from asset_entity ae)"
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 				}
@@ -933,21 +933,22 @@ class AdminController {
 			
 			case "user_login" :
 				if(type != "Null"){
-					query = "SELECT ul.user_login_id as tableId,ul.person_id as refId FROM user_login ul where ul.person_id not in (select per.person_id from person per)"
+					query = "SELECT * FROM user_login ul where ul.person_id not in (select per.person_id from person per)"
 				} else {
-					query = "SELECT ul.user_login_id as tableId,ul.person_id as refId FROM user_login ul where ul.person_id is null"
+					query = "SELECT * FROM user_login ul where ul.person_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
 			break;
 			case "user_preference" :
 				if(type != "Null"){
-					query = "SELECT up.preference_code as tableId,up.user_login_id as refId FROM user_preference up where up.user_login_id not in (select ul.user_login_id from user_login ul)"
+					query = "SELECT * FROM user_preference up where up.user_login_id not in (select ul.user_login_id from user_login ul)"
 				} else {
-					query = "SELECT up.preference_code as tableId,up.user_login_id as refId FROM user_preference up where up.user_login_id is null"
+					query = "SELECT * FROM user_preference up where up.user_login_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
 			break;
 		}// END OF MAIN SWITCH
+		println"orphanDeatils--------------->"+orphanDeatils
 		render orphanDeatils as JSON
 	}
 }

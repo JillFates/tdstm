@@ -3,6 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="main" />
 <title>JsecUser List</title>
+<g:javascript src="orphanData.js" />
 <style type="text/css">
 a:hover {
 	text-decoration: underline;
@@ -42,9 +43,12 @@ a:hover {
 	</tbody>
 </table>
 </div>
+</div>
+<br/>
+<div style="margin: 0 15px 10px;">
 <div id="orphanDetailed" style="display: none;">
 <h1><b>Detailed Report</b></h1>
-<div style="float: left;">
+<div>
 	<ul><li><b>Table name : </b><span id="tableName"></span></li>
 	<li><b>Ref. Column name : </b><span id="columnName"></span></li></ul>
 		<br/>
@@ -53,15 +57,7 @@ a:hover {
 	<a href="javascript:alert('Implementation in progress')">Download SQL script</a>
 	</div>
 
-	<table>
-		<thead>
-			<tr>
-				<th>Table index Id</th>
-				<th>Ref. Column Id</th>
-			</tr>
-		</thead>
-		<tbody  id="orphanDetailsTbodyId"></tbody>
-	</table>
+	<table id="orphanDetailsTableId"></table>
 </div>
 </div>
 <script type="text/javascript">
@@ -69,23 +65,12 @@ a:hover {
 		$("#orphanDetailed").hide()
 		$("#tableName").html(table);
 		$("#columnName").html(column);
-		${remoteFunction(action:'orphanDetails', params:'\'table=\' + table +\'&column=\'+column +\'&type=\'+type', onComplete:'showOrphanDetails(e)')}
+		${remoteFunction(action:'orphanDetails', params:'\'table=\' + table +\'&column=\'+column +\'&type=\'+type', onComplete:'showOrphanDetails(e, table )')}
 	}
-	function showOrphanDetails(e){
+	function showOrphanDetails(e, table){
 		var orphanDetails = eval('(' + e.responseText + ')');
-		var totalRecords = orphanDetails.length;
-		var tbody =""
-		if(totalRecords != 0){
-			for( i = 0; i < totalRecords; i++){
-				var cssClass = 'odd'
-				if(i % 2 == 0){
-					cssClass = 'even'
-				}
-				var orphanRecord = orphanDetails[i]
-				tbody +="<tr class='"+cssClass+"'><td>"+orphanRecord.tableId+"</td><td>"+orphanRecord.refId+"</td></tr>"
-			}
-		}
-		$("#orphanDetailsTbodyId").html(tbody)
+		var tableBody = getDeatiledReport( orphanDetails, table )
+		$("#orphanDetailsTableId").html(tableBody)
 		$("#orphanDetailed").show();
 	}
 </script>
