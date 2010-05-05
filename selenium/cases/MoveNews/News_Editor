@@ -4,12 +4,12 @@
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="selenium.base" href="" />
-<title>News Editor</title>
+<title>News_Editor</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">News Editor</td></tr>
+<tr><td rowspan="1" colspan="3">News_Editor</td></tr>
 </thead><tbody>
 <tr>
 	<td>open</td>
@@ -174,7 +174,93 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
+	<td>//input[@value='Create']</td>
+	<td></td>
+</tr>
+<!--Updating the Move News-->
+<tr>
+	<td>click</td>
+	<td>//tr[@id='commentsRowId_0']/td[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//table[@id='showCommentTable']/tbody/tr[1]/td[1]/label</td>
+	<td>Created At:</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//table[@id='showCommentTable']/tbody/tr[2]/td[1]/label</td>
+	<td>Created By:</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//table[@id='showCommentTable']/tbody/tr[3]/td[1]/label</td>
+	<td>Comment Type:</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//table[@id='showCommentTable']/tbody/tr[6]/td[1]/label</td>
+	<td>exact:Comment:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>showCommentTable.6.0</td>
+	<td>Resolved / Archived:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>showCommentTable.7.0</td>
+	<td>exact:Resolution:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>showCommentTable.8.0</td>
+	<td>Resolved At:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>showCommentTable.9.0</td>
+	<td>Resolved By:</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
 	<td>//input[@value='Update' and @type='submit']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//input[@value='Cancel' and @type='button' and @onclick=&quot;this.form.reset();$('#showEditCommentDialog').dialog('close');&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>commentTdId</td>
+	<td>${Description}</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>isResolvedId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>resolutionId</td>
+	<td>test</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Update' and @type='submit']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetEntityTable.1.4</td>
+	<td>&quot;test&quot;</td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
 	<td></td>
 </tr>
 <!--Verifying for User preffered Move Event-->
