@@ -948,6 +948,7 @@ class AdminController {
 				orphanDeatils = jdbcTemplate.queryForList(query)
 			break;
 		}// END OF MAIN SWITCH
-		render orphanDeatils as JSON
+		def results = [orphanDeatils : orphanDeatils, query:query]  
+		render results as JSON
 	}
 }

@@ -44,23 +44,35 @@ a:hover {
 </table>
 </div>
 </div>
-<br/>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 <div style="margin: 0 15px 10px;">
 <div id="orphanDetailed" style="display: none;">
 <h1><b>Detailed Report</b></h1>
-<div>
+<div style="float: left;">
 	<ul><li><b>Table name : </b><span id="tableName"></span></li>
 	<li><b>Ref. Column name : </b><span id="columnName"></span></li></ul>
 		<br/>
 	</div>
 	<div style="float: left;margin-left: 10px">
-	<a href="javascript:alert('Implementation in progress')">Download SQL script</a>
+	<a href="javascript:showQuery()">Download SQL script</a>
 	</div>
 
 	<table id="orphanDetailsTableId"></table>
 </div>
 </div>
+<div id="queryTextDialog" title="SQL Script" style="display:none;">
+	<table>
+         <tbody>
+            <tr>
+				<td id="queryText" style="font-size: 12px;"></td>
+			</tr>
+         </tbody>
+	</table>
+</div>
 <script type="text/javascript">
+   	$(document).ready(function() {
+    	$("#queryTextDialog").dialog({ autoOpen: false })
+    })
 	function getOrphanDetails( table, column, type ){
 		$("#orphanDetailed").hide()
 		$("#tableName").html(table);
@@ -68,10 +80,15 @@ a:hover {
 		${remoteFunction(action:'orphanDetails', params:'\'table=\' + table +\'&column=\'+column +\'&type=\'+type', onComplete:'showOrphanDetails(e, table )')}
 	}
 	function showOrphanDetails(e, table){
-		var orphanDetails = eval('(' + e.responseText + ')');
-		var tableBody = getDeatiledReport( orphanDetails, table )
+		var records = eval('(' + e.responseText + ')');
+		var tableBody = getDeatiledReport( records.orphanDeatils, table )
 		$("#orphanDetailsTableId").html(tableBody)
 		$("#orphanDetailed").show();
+		$("#queryText").html(records.query)
+	}
+	function showQuery(){
+		$("#queryTextDialog").dialog('option', 'width', 500)
+		$('#queryTextDialog').dialog('open')
 	}
 </script>
 </body>
