@@ -948,7 +948,6 @@ class AdminController {
 				orphanDeatils = jdbcTemplate.queryForList(query)
 			break;
 		}// END OF MAIN SWITCH
-		println"orphanDeatils--------------->"+orphanDeatils
 		render orphanDeatils as JSON
 	}
 }

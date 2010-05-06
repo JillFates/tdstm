@@ -389,12 +389,100 @@ function getDeatiledReport( records, table ){
 							"<td nowrap>"+getConvertedTimeFormate(record.completion_date,offset)+"</td></tr>"
 				}
 			break;
+			/* for project_asset_map */
+			case "project_asset_map" :
+				var thead ="<tr><th>id</th><th>project_id</th><th>asset_id</th><th>current_state_id</th>"+
+							"<th>created_date</th><th>last_modified</th><tr>"	
+				for( i = 0; i < dataLength; i++){
+					var cssClass = 'odd'
+					if(i % 2 == 0){
+						cssClass = 'even'
+					}
+					var record = records[i]
+					tbody +="<tr class='"+cssClass+"'><td>"+record.id+"</td><td>"+record.project_id+"</td>"+
+							"<td>"+record.asset_id+"</td><td>"+record.current_state_id+"</td>"+
+							"<td nowrap>"+getConvertedTimeFormate(record.created_date,offset)+"</td>"+
+							"<td nowrap>"+getConvertedTimeFormate(record.last_modified,offset)+"</td></tr>"
+				}
+			break;
+			/* for project_logo */
+			case "project_logo" :
+				var thead ="<tr><th>project_logo_id</th><th>project_id</th><th>party_id</th><th>name</th><tr>"	
+				for( i = 0; i < dataLength; i++){
+					var cssClass = 'odd'
+					if(i % 2 == 0){
+						cssClass = 'even'
+					}
+					var record = records[i]
+					tbody +="<tr class='"+cssClass+"'><td>"+record.project_logo_id+"</td><td>"+record.project_id+"</td>"+
+							"<td>"+record.party_id+"</td><td>"+record.name+"</td></tr>"
+				}
+			break;
+			/* for project_team */
+			case "project_team" :
+				var thead ="<tr><th>project_team_id</th><th>move_bundle_id</th><th>team_code</th><th>latest_asset_id</th>"+
+							"<th>current_location</th><th>is_disbanded</th><th>is_idle</th><tr>"	
+				for( i = 0; i < dataLength; i++){
+					var cssClass = 'odd'
+					if(i % 2 == 0){
+						cssClass = 'even'
+					}
+					var record = records[i]
+					tbody +="<tr class='"+cssClass+"'><td>"+record.project_team_id+"</td><td>"+record.move_bundle_id+"</td>"+
+							"<td>"+record.team_code+"</td><td>"+record.latest_asset_id+"</td><td>"+record.current_location+"</td>"+
+							"<td>"+record.is_disbanded+"</td><td>"+record.is_idle+"</td></tr>"
+				}
+			break;
+			/* for step_snapshot */
+			case "step_snapshot" :
+				var thead ="<tr><th>id</th><th>move_bundle_step_id</th><th>tasks_count</th><th>tasks_completed</th>"+
+							"<th>date_created</th><th>dial_indicator</th><th>duration</th><th>plan_delta</th><tr>"	
+				for( i = 0; i < dataLength; i++){
+					var cssClass = 'odd'
+					if(i % 2 == 0){
+						cssClass = 'even'
+					}
+					var record = records[i]
+					tbody +="<tr class='"+cssClass+"'><td>"+record.id+"</td><td>"+record.move_bundle_step_id+"</td>"+
+							"<td>"+record.tasks_count+"</td><td>"+record.tasks_completed+"</td>"+
+							"<td>"+getConvertedTimeFormate(record.date_created,offset)+"</td>"+
+							"<td>"+record.dial_indicator+"</td><td>"+convertIntoHHMM(record.duration)+"</td><td>"+record.plan_delta+"</td></tr>"
+				}
+			break;
+			/* for user_login */
+			case "user_login" :
+				var thead ="<tr><th>user_login_id</th><th>username</th><th>person_id</th><th>active</th>"+
+							"<th>created_date</th><th>last_login</th><tr>"	
+				for( i = 0; i < dataLength; i++){
+					var cssClass = 'odd'
+					if(i % 2 == 0){
+						cssClass = 'even'
+					}
+					var record = records[i]
+					tbody +="<tr class='"+cssClass+"'><td>"+record.user_login_id+"</td><td>"+record.username+"</td>"+
+							"<td>"+record.person_id+"</td><td>"+record.active+"</td>"+
+							"<td>"+getConvertedTimeFormate(record.created_date,offset)+"</td>"+
+							"<td>"+getConvertedTimeFormate(record.last_login,offset)+"</td></tr>"
+				}
+			break;
+			/* for user_preference */
+			case "user_preference" :
+				var thead ="<tr><th>user_login_id</th><th>preference_code</th><th>value</th><tr>"	
+				for( i = 0; i < dataLength; i++){
+					var cssClass = 'odd'
+					if(i % 2 == 0){
+						cssClass = 'even'
+					}
+					var record = records[i]
+					tbody +="<tr class='"+cssClass+"'><td>"+record.user_login_id+"</td><td>"+record.preference_code+"</td>"+
+							"<td>"+record.value+"</td></tr>"
+				}
+			break;
 		}
 	}
 	return thead + tbody
 }
-function getConvertedTimeFormate( date, offset )
-{
+function getConvertedTimeFormate( date, offset ){
 	var timeString = ""
 	if(date){
 		var utcDate = date.getTime() ;
@@ -422,5 +510,12 @@ function getConvertedTimeFormate( date, offset )
 		}
 	}
    return timeString;
-   
+}
+function convertIntoHHMM( seconds ){
+	var timeFormate 
+    var hours = parseInt(seconds / 3600) 
+    	timeFormate = hours >= 10 ? hours : '0'+hours
+    var minutes =  parseInt((seconds % 3600 ) / 60 )
+    	timeFormate += ":"+(minutes >= 10 ? minutes : '0'+minutes)
+    	return timeFormate
 }
