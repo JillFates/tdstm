@@ -40,27 +40,27 @@
           <div style="font-weight: bold; color: #0000FF">
           <jsec:isLoggedIn>
               	<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" style="color: #0000FF;" onComplete="updatePersonDetails(e)">
-					<strong>
-						<div style="float: left;">
-	              			Welcome &nbsp;&nbsp; <span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name } </span>
-	              		</div>
-			 			<div class="tzmenu">&nbsp;-&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' }</span>  time<ul>   
-			    	      <li><a href="javascript:setUserTimeZone('GMT')">GMT </a></li>
-			    	      <li><a href="javascript:setUserTimeZone('PST')">PST</a></li>
-			    	      <li><a href="javascript:setUserTimeZone('PDT')">PDT</a></li>
-			    	      <li><a href="javascript:setUserTimeZone('MST')">MST</a></li>
-			    	      <li><a href="javascript:setUserTimeZone('MDT')">MDT</a></li>
-			    	      <li><a href="javascript:setUserTimeZone('CST')">CST</a></li>
-			    	      <li><a href="javascript:setUserTimeZone('CDT')">CDT</a></li>
-			    	      <li><a href="javascript:setUserTimeZone('EST')">EST</a></li>
-			    	      <li><a href="javascript:setUserTimeZone('EDT')">EDT</a></li>
-			              </ul>
-			            </div>
-	              	&nbsp;! 
+			<strong>
+			<div style="float: left;">
+	              		Welcome,nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name } </span>
+	              	</div>
+		 	<div class="tzmenu">&nbsp;|&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' }</span>
+			 time<ul>   
+				<li><a href="javascript:setUserTimeZone('GMT')">GMT </a></li>
+				<li><a href="javascript:setUserTimeZone('PST')">PST</a></li>
+				<li><a href="javascript:setUserTimeZone('PDT')">PDT</a></li>
+				<li><a href="javascript:setUserTimeZone('MST')">MST</a></li>
+				<li><a href="javascript:setUserTimeZone('MDT')">MDT</a></li>
+				<li><a href="javascript:setUserTimeZone('CST')">CST</a></li>
+				<li><a href="javascript:setUserTimeZone('CDT')">CDT</a></li>
+				<li><a href="javascript:setUserTimeZone('EST')">EST</a></li>
+				<li><a href="javascript:setUserTimeZone('EDT')">EDT</a></li>
+				</ul>
+		            </div>
+	              	&nbsp;| 
 	              </strong>
               </g:remoteLink>
-              &nbsp;<g:link controller="auth" action="signOut"
-                            style="color: #328714">sign out</g:link>
+              &nbsp;<g:link controller="auth" action="signOut" style="color: #328714">sign out</g:link>
           </jsec:isLoggedIn>
           </div>
         </div>

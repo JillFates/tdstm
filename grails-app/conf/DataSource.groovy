@@ -46,7 +46,7 @@ environments {
 			username = "tdstm"
 			password = "tdstm"
 			
-			loggingSql = true
+			// loggingSql = true
 			// logSql = true 
 		}
 	}
