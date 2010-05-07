@@ -92,7 +92,7 @@ overflow: hidden;
 			<td style="text-align: right;">
 			<input type="hidden" name="last_refresh" value="${new Date()}"/>
 			<input type="hidden" name="myForm" value="listForm"/>
-			<input type="button"
+			<input type="button" id="refreshId"
 				value="Refresh" onclick="pageReload();"/> <select
 				id="selectTimedId"
 				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(e)') }">
@@ -840,10 +840,18 @@ var fieldId
 		var appOwner = $("#appOwnerId").val();
 		var appSme = $("#appSmeId").val();
 		var lastPoolTime = $("#lastPoolTimeId").val();
-		${remoteFunction(action:'getTransitions', params:'\'moveBundle=\' + moveBundle +\'&moveEvent=\'+moveEvent +\'&application=\'+application +\'&appOwner=\'+appOwner+\'&appSme=\'+appSme +\'&lastPoolTime=\'+lastPoolTime', onComplete:'updateTransitions(e);' )}
+		${remoteFunction(action:'getTransitions', params:'\'moveBundle=\' + moveBundle +\'&moveEvent=\'+moveEvent +\'&application=\'+application +\'&appOwner=\'+appOwner+\'&appSme=\'+appSme +\'&lastPoolTime=\'+lastPoolTime', onFailure:"handleErrors()", onComplete:'updateTransitions(e);' )}
 		timedRefresh($("#selectTimedId").val())
 	}
-	
+	var doRefresh = true
+	function handleErrors(){
+		if( !doRefresh ){
+			clearTimeout(timer);
+		}
+		doRefresh = false
+		$("#refreshId").css("color","red");
+		alert("Sorry, there is a problem receiving updates to this page. Try reloading to resolve.");
+	}
 	function updateTransitions(e){
 		try{
 			var assetEntityCommentList = eval('(' + e.responseText + ')');
@@ -906,11 +914,14 @@ var fieldId
 				}
 				$("#lastPoolTimeId").val(assetEntityCommentList[0].lastPoolTime)
 			} else {
-			location.reload(false);
+				location.reload(false);
 			//timedRefresh('never')
 			}
 		} catch(ex){
-		location.reload(false);
+		//location.reload(false);
+			if( doRefresh ){
+				handleErrors();
+			}
 		}
 	}
 

@@ -230,6 +230,7 @@
 	}
 	var sURL = unescape(window.location);
 	var timer
+	var errorCode = '200'
 	var dialReload = true;
 	var countries=new ddtabcontent("newstabs")
 	countries.setpersist(true)
@@ -300,7 +301,12 @@
 		YAHOO.util.Event.onAvailable('doc',YAHOO.example.init, YAHOO.example, true);
 	}
 	moveDataSteps()
-	
+	/* set time to load the move news and move bundle data*/
+	var handler = 0
+	function timedRefresh() {
+		var refreshTime = $("#refreshTimeId").val();
+		handler = setInterval("getMoveEventNewsDetails($('#moveEvent').val())",refreshTime);
+	}
 	/* script to assign the move evnt value*/
 	var moveEvent = "${moveEvent?.id}"
 	if(moveEvent){
@@ -308,9 +314,10 @@
 	}
 	timedRefresh();
 	/* Function to load the data for a particular MoveEvent */
+	var doRefresh = true
 	function getMoveEventNewsDetails( moveEvent ){
 		refreshDash( $("#defaultBundleId").val() );
-		if(dialReload ){
+		if(dialReload && doRefresh){
 			timer = setTimeout( "getDialsData($('#defaultBundleId').val() )", 5000 );
 		}
 		if(moveEvent){
@@ -320,7 +327,20 @@
 		        cache: false,
 		        url:"../ws/moveEventNews/"+moveEvent+"?type="+$("#typeId").val()+"&state="+$("#stateId").val()+"&maxLen="+$("#maxLenId").val()+"&sort="+$("#sortId").val(),
 		        dataType: 'json',
-		        success:updateMoveEventNews
+		        success:updateMoveEventNews,
+                error:function (xhr, ajaxOptions, thrownError){
+            		if( doRefresh && errorCode ==  xhr.status ){
+	                    clearInterval(handler);
+	                    $("#refresh").css("color","red")
+	                    if( xhr.status == "403"){
+	                    	alert("403 Forbidden occurred, user don't have permission to load the current project data.");
+	                    } else {
+	                    	alert("Sorry, there is a problem receiving updates to this page. Try reloading to resolve.");
+	                    }    
+                	} else {
+                		errorCode =  xhr.status ; 
+                	}
+                }	 
 			});
 		}
 	}
@@ -351,12 +371,6 @@
 		var timeZone = $("#timezone :selected").text()
   		${remoteFunction(controller:'project', action:'setUserTimeZone', params:'\'tz=\' + timeZone ')}
   	}
-	/* set time to load the move news and move bundle data*/
-	var handler = 0
-	function timedRefresh() {
-		var refreshTime = $("#refreshTimeId").val();
-		handler = setInterval("getMoveEventNewsDetails($('#moveEvent').val())",refreshTime);
-	}
 
 	/* function to load the user agent*/
 	if(navigator.appName == "Microsoft Internet Explorer"){
@@ -425,7 +439,10 @@
 			    return getTimeFormate( convertedDate )
 			}
 	    }catch(e){
-	    	alert("Object Error occured")
+	    	clearInterval(handler);
+      		doRefresh = false;
+      		$("#refresh").css("color","red")
+			alert("Sorry, there is a problem receiving updates to this page. Try reloading to resolve.");
 		}
 	    
 	}
@@ -485,7 +502,22 @@
 		        cache: false,
 		        url:"../ws/dashboard/bundleData/"+ bundleId+"?moveEventId="+moveEvent,
 		        dataType: 'json',
-		        success:updateMoveBundleSteps
+		        success:updateMoveBundleSteps,
+                error:function (xhr, ajaxOptions, thrownError){
+	          		if(errorCode ==  xhr.status ){
+	          			clearInterval(handler);
+		          		doRefresh = false;
+		          		$("#refresh").css("color","red")
+		            	if( xhr.status == "403"){
+		             		alert("403 Forbidden occurred, user don't have permission to load the current project data.");
+						} else {
+		             		alert("Sorry, there is a problem receiving updates to this page. Try reloading to resolve.");
+		             	}    
+	          		} else {
+	          			errorCode = xhr.status;
+	          			doRefresh = false;
+	          		}
+		 		}
 			});
 	 }
 
@@ -552,20 +584,38 @@
 				}
 			}
 		} catch(ex){
-		  	window.location.href = sURL;
+			clearInterval(handler);
+      		doRefresh = false;
+      		$("#refresh").css("color","red")
+			alert("Sorry, there is a problem receiving updates to this page. Try reloading to resolve.");
 		}
 		
 	}
 	function getDialsData( bundleId ) {
 		 var moveEvent = $("#moveEvent").val()
-		 jQuery.ajax({
-		        type:"GET",
-		        async : true,
-		        cache: false,
-		        url:"../ws/dashboard/bundleData/"+ bundleId+"?moveEventId="+moveEvent,
-		        dataType: 'json',
-		        success:updateDials
+		 if(doRefresh){
+			 jQuery.ajax({
+			        type:"GET",
+			        async : true,
+			        cache: false,
+			        url:"../ws/dashboard/bundleData/"+ bundleId+"?moveEventId="+moveEvent,
+			        dataType: 'json',
+			        success:updateDials,
+	                error:function (xhr, ajaxOptions, thrownError){
+				 		if(doRefresh && errorCode ==  xhr.status ){
+			            	clearInterval(handler);
+			            	$("#refresh").css("color","red");
+			            	if( xhr.status == "403"){
+			             		alert("403 Forbidden occurred, user don't have permission to load the current project data.");
+			             	} else {
+				             	alert("Sorry, there is a problem receiving updates to this page. Try reloading to resolve.");
+				            }
+				 		} else {
+				 			errorCode = xhr.status;
+				 		}    
+			 		}     
 			});
+		 }
 	 }
 	function updateDials( dataPointStep ) {
 		try{
