@@ -1,6 +1,7 @@
 <html>
   <head>
-	  <title>Grails Runtime Exception</title>
+	  <title>Transition Manager Error</title>
+<meta name="viewport" content="height=device-height,width=device-width" />
 	  <style type="text/css">
 	  		.message {
 	  			border: 1px solid black;
@@ -22,12 +23,15 @@
 	  		}
 	  </style>
   </head>
-
   <body>
-    <h1>Grails Runtime Exception</h1>
-    <h2>Error Details</h2>
+<h2 style="color:#006DBA;">Transition Manager Error</h2>
+<strong>Ok I got an error, now what? </strong><br/>
+This error may be from a bug, a misconfiguration, bad data, or a system problem.  You can <a href="javascript:history.go(-1)">go back</a> then reload that page to try again.<br/><br />
+If this happens again and you'd like help diagnosing the problem, copy the text below and email it to your TDS contact or TranMan@transitionaldata.com.<br/>
 
-  	<div class="message">
+    <h2 style="color:#006DBA;">Precise Error details: </h2>
+    <div class="message">
+        <strong>Grails Runtime Exception</strong><br />
 		<strong>Error ${request.'javax.servlet.error.status_code'}:</strong> ${request.'javax.servlet.error.message'.encodeAsHTML()}<br/>
 		<strong>Servlet:</strong> ${request.'javax.servlet.error.servlet_name'}<br/>
 		<strong>URI:</strong> ${request.'javax.servlet.error.request_uri'}<br/>
@@ -45,7 +49,7 @@
 		</g:if>
   	</div>
 	<g:if test="${exception}">
-	    <h2>Stack Trace</h2>
+	    <strong>Stack Trace</strong>
 	    <div class="stack">
 	      <pre><g:each in="${exception.stackTraceLines}">${it.encodeAsHTML()}<br/></g:each></pre>
 	    </div>

@@ -50,7 +50,7 @@
             <div>
 		            <div class="paginateButtons">
 		            <span class="menuButton"><g:link class="create" action="create">Create New</g:link></span>
-		                <g:paginate total="${MoveEvent.count()}" />
+		                <g:paginate total="${MoveEvent.count()}" max="20" />
 		            </div>
             </div>
         </div>

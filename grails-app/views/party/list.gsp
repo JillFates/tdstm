@@ -51,7 +51,7 @@
 	</tbody>
 </table>
 </div>
-<div class="paginateButtons"><g:paginate total="${Party.count()}" />
+<div class="paginateButtons"><g:paginate total="${Party.count()}" max="20" >
 </div>
 </div>
 </body>

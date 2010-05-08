@@ -61,7 +61,7 @@
   </div>
   <g:if test="${MoveBundle.findAll('from MoveBundle where project = '+projectId).size() > 10}">
   <div class="paginateButtons">
-    <g:paginate total="${MoveBundle.findAll('from MoveBundle where project = '+projectId).size()}" />
+    <g:paginate total="${MoveBundle.findAll('from MoveBundle where project = '+projectId).size()}" max="20" />
   </div>
   </g:if>
   <input type="hidden" id="projectId" name="projectId" value="${projectId}"/>
