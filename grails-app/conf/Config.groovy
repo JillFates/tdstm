@@ -33,6 +33,7 @@ grails.enable.native2ascii = true
 
 // set pagination default (default was 10)
 grails.pagination.default="20"
+grails.pagination.max="20"
 
 //
 // set per-environment serverURL stem for creating absolute links
