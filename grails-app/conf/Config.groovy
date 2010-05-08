@@ -31,7 +31,12 @@ grails.converters.encoding="UTF-8"
 // enabled native2ascii conversion of i18n properties files
 grails.enable.native2ascii = true
 
+// set pagination default (default was 10)
+grails.pagination.default="20"
+
+//
 // set per-environment serverURL stem for creating absolute links
+//
 environments {
    development {
       // grails.serverURL = "http://localhost/tds"
