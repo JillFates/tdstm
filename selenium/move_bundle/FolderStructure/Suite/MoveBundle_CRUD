@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://ph1.tdsops.com/" />
+<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
 <title>MoveBundle_CRUD</title>
 </head>
 <body>
@@ -45,7 +45,7 @@
 <!--create move bundle-->
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Move Bundles</td>
+	<td>link=Bundles</td>
 	<td></td>
 </tr>
 <tr>
@@ -254,7 +254,7 @@
 <!--Read and Update MoveBundle-->
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Move Bundles</td>
+	<td>link=Bundles</td>
 	<td></td>
 </tr>
 <tr>
@@ -420,7 +420,67 @@
 <!--Deleting  Move Bundle-->
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Move Bundles</td>
+	<td>link=Bundles</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeElementPresent</td>
+	<td>link=${BundleName}</td>
+	<td>var2</td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label3</td>
+	<td></td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${var2}==false</td>
+	<td>label1</td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label4</td>
+	<td></td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${var2}==true</td>
+	<td>label2</td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>label1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Next</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeElementPresent</td>
+	<td>link=${BundleName}</td>
+	<td>var2</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${var2}==false</td>
+	<td>label3</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${var2}==true</td>
+	<td>label4</td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label2</td>
 	<td></td>
 </tr>
 <tr>
@@ -446,6 +506,11 @@
 <tr>
 	<td>verifyElementNotPresent</td>
 	<td>link=${BundleName}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextNotPresent</td>
+	<td>error</td>
 	<td></td>
 </tr>
 
