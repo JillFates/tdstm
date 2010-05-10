@@ -179,7 +179,7 @@
 			<div id="leftarrow"><a href="javascript:void(0);" id="move-left"><img src="${createLinkTo(dir:'images',file:'left_arrow.png')}" alt="back" border="0" width="16" height="23" align="right"></a></div>
 			<div class="mod">
 				<div id="themes">
-				<input type="hidden" value="${moveBundleList[0]?.id}" id="defaultBundleId">
+				<input type="hidden" value="${moveBundleList ? moveBundleList[0]?.id : ''}" id="defaultBundleId">
 				<g:each in="${moveBundleList}" status="i" var="moveBundle">
 					<div id="bundlediv${moveBundle.id}" class="${i == 0 ? 'show_bundle_step' : 'hide_bundle_step'}">
 						<g:each in="${MoveBundleStep.findAll('FROM MoveBundleStep mbs where mbs.moveBundle='+moveBundle.id+' ORDER BY mbs.transitionId')}" status="j" var="moveBundleStep">
