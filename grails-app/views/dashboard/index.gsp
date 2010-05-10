@@ -18,6 +18,58 @@
 	
 	<g:javascript library="jquery" />
 	<jq:plugin name="ui.core" />
+	<script type="text/javascript">
+	/* render the individual step dial data*/
+	function stepDialData( dialInd ){
+		var xmlData = "<chart bgAlpha='0' bgColor='eeeded' lowerLimit='0' upperLimit='100' numberSuffix='' animation='0'"+
+			" showValues='0' rotateValues='1' placeValuesInside='1' "+
+			" showBorder='0' basefontColor='000000' chartTopMargin='15' chartBottomMargin='15' chartLeftMargin='5'"+
+			" chartRightMargin='5' toolTipBgColor='80A905' gaugeFillMix='{dark-10},FFFFFF,{dark-10}' gaugeFillRatio='3' showTickMarks='0'>"+
+	  		" <colorRange> <color minValue='0' maxValue='25' code='FF654F'/> <color minValue='25' maxValue='50' code='F6BD0F'/>"+
+	  		" <color minValue='50' maxValue='100' code='8BBA00'/> </colorRange>"+
+	  		" <dials> <dial value='"+dialInd+"' rearExtension='10'/> </dials>"+
+	  		" <trendpoints> <point value='' displayValue='' fontcolor='FF4400' useMarker='1' dashed='1' dashLen='2' dashGap='2' valueInside='1' /> </trendpoints>"+
+	  		" <annotations> <annotationGroup id='Grp1' showBelow='1' > "+
+	  		" <annotation type='rectangle' x='5' y='5' toX='345' toY='195' radius='10' color='ffffff,ffffff' showBorder='0' /> "+
+	  		" </annotationGroup> </annotations>"+
+	  		" <styles><definition><style name='RectShadow' type='shadow' strength='0'/> </definition> <application>"+
+	  		" <apply toObject='Grp1' styles='RectShadow' /> </application> </styles> </chart>";
+  		return xmlData;
+	}
+	/* render the summary dial data*/
+	function summaryDiaData( dialInd ){
+		var xmlData = "<chart bgAlpha='0' bgColor='FFFFFF' lowerLimit='0' upperLimit='100' numberSuffix='' showBorder='0' basefontColor='000000' "+
+			"animation='0' showValues='0' rotateValues='1' placeValuesInside='1' "+ 
+			"chartTopMargin='15' chartBottomMargin='15' chartLeftMargin='5' chartRightMargin='5' toolTipBgColor='80A905' "+
+			"gaugeFillMix='{dark-10},FFFFFF,{dark-10}' gaugeFillRatio='3' showTickMarks='0'>"+
+			" <colorRange><color minValue='0' maxValue='25' code='FF654F'/><color minValue='25' maxValue='50' code='F6BD0F'/>"+
+			" <color minValue='50' maxValue='100' code='8BBA00'/></colorRange>"+
+			"<dials> <dial value='"+dialInd+"' rearExtension='10'/></dials>"+
+			"<trendpoints><point value='' displayValue='' fontcolor='FF4400' useMarker='' dashed='1' dashLen='2' dashGap='2' valueInside='1' />"+
+			"</trendpoints> <annotations> <annotationGroup id='Grp1' showBelow='1' >"+
+			"<annotation type='rectangle' x='5' y='5' toX='345' toY='195' radius='10' color='ffffff,ffffff' showBorder='0' />"+
+			"</annotationGroup></annotations>"+
+			"<styles>  <definition> <style name='RectShadow' type='shadow' strength='0'/> </definition> <application>"+
+			"<apply toObject='Grp1' styles='RectShadow' /></application></styles></chart>";
+		return xmlData;
+	}
+	/* render the revised dial data*/
+    function revisedDialData( dialInd ){
+    	var xmlData = "<chart bgAlpha='0' bgColor='FFFFFF' lowerLimit='0' upperLimit='100' numberSuffix='' showBorder='0' basefontColor='000000' "+
+	    	" animation='0' showValues='0' rotateValues='1' placeValuesInside='1' "+
+	    	" chartTopMargin='15' chartBottomMargin='15' chartLeftMargin='5' chartRightMargin='5' toolTipBgColor='80A905' "+
+	    	" gaugeFillMix='{dark-10},FFFFFF,{dark-10}' gaugeFillRatio='3' showTickMarks='0'>"+
+	    	" <colorRange><color minValue='0' maxValue='25' code='FF654F'/><color minValue='25' maxValue='50' code='F6BD0F'/>"+
+	    	" <color minValue='50' maxValue='100' code='8BBA00'/></colorRange>"+
+	    	" <dials><dial value='"+dialInd+"' rearExtension='10'/></dials>"+
+			" <trendpoints><point value='' displayValue='' fontcolor='FF4400' useMarker='1' dashed='1' dashLen='2' dashGap='2' valueInside='1' />"+
+			" </trendpoints> <annotations> <annotationGroup id='Grp1' showBelow='1' >"+
+			" <annotation type='rectangle' x='5' y='5' toX='345' toY='195' radius='10' color='FFFFFF,FFFFFF' showBorder='0' /> "+
+			"</annotationGroup></annotations> "+
+			" <styles><definition><style name='RectShadow' type='shadow' strength='0'/></definition>"+
+			" <application><apply toObject='Grp1' styles='RectShadow' /></application></styles></chart>"
+    }
+	</script>
 </head>
 
 <body class="sum_statusbar_good" onload="getMoveEventNewsDetails($('#moveEvent').val())">
@@ -79,7 +131,8 @@
 					<div id="summary_gauge_div" align="center"> </div>
 					<script language="JavaScript">
 						var summarychart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "summary_gauge", "280", "136", "0", "0");
-						summarychart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'summary_gauge.xml')}");
+	        			//summarychart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'summary_gauge.xml')}");
+	        			 summarychart.setDataXML( summaryDiaData( "50" ) )
 						summarychart.render("summary_gauge_div");
 					</script>
 						Move Status vs. Plan
@@ -94,9 +147,10 @@
 				<div id="topindright" style="display: none;">
 					<div id="revised_gauge_div" align="center"></div>
 					<script language="JavaScript">
-						var summarychart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "revised_gauge", "280", "136", "0", "0");
-						summarychart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'revised_gauge.xml')}");
-						summarychart.render("revised_gauge_div");
+						var revisedChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "revised_gauge", "280", "136", "0", "0");
+						//summarychart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'revised_gauge.xml')}");
+						revisedChart.setDataXML( revisedDialData( "50" ) )
+						revisedChart.render("revised_gauge_div");
 					</script> 
 						Status vs. Revised Plan
 				</div>
@@ -196,7 +250,8 @@
 								<div id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}" align="center" style="display: none;"> </div>
 								<script language="JavaScript">
 							         var stepchart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "chart_${moveBundle.id}_${moveBundleStep.transitionId}", "100", "75", "0", "0");
-							         stepchart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'step_gauge.xml')}");
+							         //stepchart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'step_gauge.xml')}");
+							         stepchart.setDataXML( stepDialData( "50" ) )
 							         stepchart.render("chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}");
 						      	</script> 
 							</div>
@@ -654,62 +709,22 @@
 	/* function to render the dials */
 	function post_init( divId, dialInd ){
 	//var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId2b", "100", "75", "0", "0");
-		var xmlData = "<chart bgAlpha='0' bgColor='eeeded' lowerLimit='0' upperLimit='100' numberSuffix='' animation='0'"+
-					" showValues='0' rotateValues='1' placeValuesInside='1' "+
-					" showBorder='0' basefontColor='000000' chartTopMargin='15' chartBottomMargin='15' chartLeftMargin='5'"+
-					" chartRightMargin='5' toolTipBgColor='80A905' gaugeFillMix='{dark-10},FFFFFF,{dark-10}' gaugeFillRatio='3' showTickMarks='0'>"+
-			  		" <colorRange> <color minValue='0' maxValue='25' code='FF654F'/> <color minValue='25' maxValue='50' code='F6BD0F'/>"+
-			  		" <color minValue='50' maxValue='100' code='8BBA00'/> </colorRange>"+
-			  		" <dials> <dial value='"+dialInd+"' rearExtension='10'/> </dials>"+
-			  		" <trendpoints> <point value='' displayValue='' fontcolor='FF4400' useMarker='1' dashed='1' dashLen='2' dashGap='2' valueInside='1' /> </trendpoints>"+
-			  		" <annotations> <annotationGroup id='Grp1' showBelow='1' > "+
-			  		" <annotation type='rectangle' x='5' y='5' toX='345' toY='195' radius='10' color='ffffff,ffffff' showBorder='0' /> "+
-			  		" </annotationGroup> </annotations>"+
-			  		" <styles><definition><style name='RectShadow' type='shadow' strength='0'/> </definition> <application>"+
-			  		" <apply toObject='Grp1' styles='RectShadow' /> </application> </styles> </chart>"
-			  		
-		updateChartXML(divId,xmlData); 
+		updateChartXML( divId, stepDialData( dialInd ) ); 
 		//myChart.setDataXML( xmlData );
 		//myChart.render(divId);
 	}
 	function updateSummaryGauge( divId, dialInd ){
 	//var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId", "280", "136", "0", "0");
-    var xmlData = "<chart bgAlpha='0' bgColor='FFFFFF' lowerLimit='0' upperLimit='100' numberSuffix='' showBorder='0' basefontColor='000000' "+
-    					"animation='0' showValues='0' rotateValues='1' placeValuesInside='1' "+ 
-        				"chartTopMargin='15' chartBottomMargin='15' chartLeftMargin='5' chartRightMargin='5' toolTipBgColor='80A905' "+
-        				"gaugeFillMix='{dark-10},FFFFFF,{dark-10}' gaugeFillRatio='3' showTickMarks='0'>"+
-        				" <colorRange><color minValue='0' maxValue='25' code='FF654F'/><color minValue='25' maxValue='50' code='F6BD0F'/>"+
-        				" <color minValue='50' maxValue='100' code='8BBA00'/></colorRange>"+
-        				"<dials> <dial value='"+dialInd+"' rearExtension='10'/></dials>"+
-        				"<trendpoints><point value='' displayValue='' fontcolor='FF4400' useMarker='' dashed='1' dashLen='2' dashGap='2' valueInside='1' />"+
-        				"</trendpoints> <annotations> <annotationGroup id='Grp1' showBelow='1' >"+
-        				"<annotation type='rectangle' x='5' y='5' toX='345' toY='195' radius='10' color='ffffff,ffffff' showBorder='0' />"+
-        				"</annotationGroup></annotations>"+
-        				"<styles>  <definition> <style name='RectShadow' type='shadow' strength='0'/> </definition> <application>"+
-        				"<apply toObject='Grp1' styles='RectShadow' /></application></styles></chart>"
-		updateChartXML(divId,xmlData);
+		updateChartXML(divId, summaryDiaData( dialInd ) );
 		//myChart.setDataXML( xmlData );
 	   	//myChart.render(divId);
 	}
 	function updateRevisedGauge( divId, dialInd ){
 	    //var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId1", "180", "136", "0", "0");
-	    var xmlData = "<chart bgAlpha='0' bgColor='FFFFFF' lowerLimit='0' upperLimit='100' numberSuffix='' showBorder='0' basefontColor='000000' "+
-	    	" animation='0' showValues='0' rotateValues='1' placeValuesInside='1' "+
-	    	" chartTopMargin='15' chartBottomMargin='15' chartLeftMargin='5' chartRightMargin='5' toolTipBgColor='80A905' "+
-	    	" gaugeFillMix='{dark-10},FFFFFF,{dark-10}' gaugeFillRatio='3' showTickMarks='0'>"+
-	    	" <colorRange><color minValue='0' maxValue='25' code='FF654F'/><color minValue='25' maxValue='50' code='F6BD0F'/>"+
-	    	" <color minValue='50' maxValue='100' code='8BBA00'/></colorRange>"+
-	    	" <dials><dial value='"+dialInd+"' rearExtension='10'/></dials>"+
-			" <trendpoints><point value='' displayValue='' fontcolor='FF4400' useMarker='1' dashed='1' dashLen='2' dashGap='2' valueInside='1' />"+
-			" </trendpoints> <annotations> <annotationGroup id='Grp1' showBelow='1' >"+
-			" <annotation type='rectangle' x='5' y='5' toX='345' toY='195' radius='10' color='FFFFFF,FFFFFF' showBorder='0' /> "+
-			"</annotationGroup></annotations> "+
-			" <styles><definition><style name='RectShadow' type='shadow' strength='0'/></definition>"+
-			" <application><apply toObject='Grp1' styles='RectShadow' /></application></styles></chart>"
-		updateChartXML(divId, xmlData); 
+		updateChartXML( divId, revisedDialData( dialInd ) ); 
 	    //myChart.setDataXML( xmlData );
 	   	//myChart.render(divId);
-	    }
+	}
 	</script>
 </body>
 </html>
