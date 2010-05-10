@@ -42,9 +42,9 @@
               	<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" style="color: #0000FF;" onComplete="updatePersonDetails(e)">
 			<strong>
 			<div style="float: left;">
-	              		Welcome,nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name } </span>
+	              		Welcome,&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name } </span>
 	              	</div>
-		 	<div class="tzmenu">&nbsp;|&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' }</span>
+		 	<div class="tzmenu">&nbsp;-&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' }</span>
 			 time<ul>   
 				<li><a href="javascript:setUserTimeZone('GMT')">GMT </a></li>
 				<li><a href="javascript:setUserTimeZone('PST')">PST</a></li>

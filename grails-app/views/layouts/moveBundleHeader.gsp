@@ -75,7 +75,7 @@
 			    	      <li><a href="javascript:setUserTimeZone('EDT')">EDT</a></li>
 				</ul>
 			</div>
-	              	&nbsp;! 
+	              	&nbsp;| 
 	              </strong>
               </g:remoteLink>
               &nbsp;<g:link controller="auth" action="signOut" style="color: #328714">sign out</g:link>
