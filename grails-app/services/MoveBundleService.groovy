@@ -190,7 +190,7 @@ class MoveBundleService {
 				JOIN move_bundle mb ON mb.move_event_id = me.move_event_id 
 				JOIN asset_transition atr ON atr.move_bundle_id = mb.move_bundle_id AND atr.voided=0 
 				JOIN workflow_transition wt ON wt.trans_id = CAST(atr.state_to AS UNSIGNED INTEGER) AND wt.process = p.workflow_code
-				WHERE me.move_event_id = ${moveEventId}
+				WHERE me.move_event_id = ${moveEventId} AND atr.is_non_applicable = 0
 				GROUP BY mb.move_bundle_id, atr.state_to
 				ORDER BY CAST(state_to AS UNSIGNED INTEGER)"""
 		jdbcTemplate.execute(createTemp)
@@ -210,7 +210,6 @@ class MoveBundleService {
 		jdbcTemplate.execute(updateCompletionTime)
 		
 		def summaryResults = jdbcTemplate.queryForList( "SELECT * FROM tmp_step_summary" )
-
 		jdbcTemplate.execute( "DROP TEMPORARY TABLE IF EXISTS tmp_step_summary" )
 		return summaryResults;
 	 }
