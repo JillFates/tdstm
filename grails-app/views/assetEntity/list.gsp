@@ -166,7 +166,7 @@
 				
 				<td id="application_${assetEntityInstance.id}" onclick="${remoteFunction(action:'editShow', params:'\'id=\'+'+assetEntityInstance.id, before:'document.showForm.id.value ='+ assetEntityInstance.id+';document.editForm.id.value = '+ assetEntityInstance.id+';', onComplete:'showAssetDialog(e , \'show\')')}"> ${fieldValue(bean:assetEntityInstance, field:'application')} </td>
 
-				<td id="assetName_${assetEntityInstance.id}" onclick="${remoteFunction(action:'editShow', params:'\'id=\'+'+assetEntityInstance.id, before:'document.showForm.id.value ='+ assetEntityInstance.id+';document.editForm.id.value = '+ assetEntityInstance.id+';', onComplete:'showAssetDialog(e , \'show\')')}">${fieldValue(bean:assetEntityInstance, field:'assetName')}</td>
+				<td><a href="#" id="assetName_${assetEntityInstance.id}" onclick="${remoteFunction(action:'editShow', params:'\'id=\'+'+assetEntityInstance.id, before:'document.showForm.id.value ='+ assetEntityInstance.id+';document.editForm.id.value = '+ assetEntityInstance.id+';', onComplete:'showAssetDialog(e , \'show\')')}">${fieldValue(bean:assetEntityInstance, field:'assetName')}</a> </td>
 
 				<td id="model_${assetEntityInstance.id}" onclick="${remoteFunction(action:'editShow', params:'\'id=\'+'+assetEntityInstance.id, before:'document.showForm.id.value ='+ assetEntityInstance.id+';document.editForm.id.value = '+ assetEntityInstance.id+';', onComplete:'showAssetDialog(e , \'show\')')}">${fieldValue(bean:assetEntityInstance, field:'model')}</td>
 
