@@ -25,7 +25,7 @@ class MoveEventController {
         if(!params.max) params.max = 10
         def currProj = session.getAttribute("CURR_PROJ").CURR_PROJ;
     	if(currProj) moveEventInstanceList = MoveEvent.findAllByProject( Project.get( currProj ), params )
-        [ moveEventInstanceList: moveEventInstanceList ]
+        [ moveEventInstanceList: moveEventInstanceList, projectId : currProj ]
     }
 	/*
 	 * return the MoveEvent details for selected MoveEvent

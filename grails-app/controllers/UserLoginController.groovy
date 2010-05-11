@@ -11,24 +11,33 @@ class UserLoginController {
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
     def list = {
-		def userLoginInstanceList = UserLogin.list( params )
 		def companyId = params.id
-        if(!params.max) params.max = 10
-        if( !companyId ){
-        	companyId = session.getAttribute("PARTYGROUP")?.PARTYGROUP
-        }
+		
+        if(!params.max) params.max = '3'
+        def max = Integer.parseInt( params.max )
+		def offset = params.offset ? Integer.parseInt( params.offset ) : 0
+		
+		def userLoginInstanceList 
+		def userLoginSize
+		
 		def isCompanyAdmin = SecurityUtils.getSubject().hasRole("ADMIN")
 		if( !isCompanyAdmin ){
+			if( !companyId ){
+				companyId = session.getAttribute("PARTYGROUP")?.PARTYGROUP
+			}
 			def personsList = partyRelationshipService.getCompanyStaff( companyId )
 			def personIds = ""
 			personsList.each{
 				personIds += "$it.id,"
 			}
 			personIds = personIds.substring(0,personIds.lastIndexOf(','))
-			userLoginInstanceList = UserLogin.findAll("from UserLogin u where u.person in ($personIds)")
+			userLoginInstanceList = UserLogin.findAll("from UserLogin u where u.person in ($personIds)",[max:max, offset:offset])
+			userLoginSize =  UserLogin.findAll("from UserLogin u where u.person in ($personIds)").size()
+		} else {
+			userLoginInstanceList = UserLogin.list( [max:max, offset:offset] )
+			userLoginSize = UserLogin.count() 
 		}
-		
-        return [ userLoginInstanceList : userLoginInstanceList, companyId:companyId ]
+        return [ userLoginInstanceList : userLoginInstanceList, companyId:companyId ,userLoginSize:userLoginSize]
     }
 
     def show = {

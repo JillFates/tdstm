@@ -114,6 +114,9 @@
                     </tbody>
                 </table>
             </div>
+             <div class="paginateButtons">
+                <g:paginate total="${DataTransferBatch.findAll('from DataTransferBatch where project = '+projectId).size()}" params ="[projectId:projectId]"/>
+            </div>
            <!--  <div class="buttons">
 	            <g:form>
 		            <span class="button"><input type="button" value="New" class="create" onClick="#"/></span>

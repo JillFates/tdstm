@@ -19,7 +19,9 @@ class DataTransferBatchController {
     def list = {
     		def projectId = params.projectId
     		def projectInstance = Project.findById( projectId )
-    		def dataTransferBatchList =  DataTransferBatch.findAllByProjectAndTransferMode( projectInstance, "I", [sort:"dateCreated", order:"desc"] )
+			if( !params.max ) params.max = 10
+    		def dataTransferBatchList =  DataTransferBatch.findAllByProjectAndTransferMode( projectInstance, "I", 
+    				[sort:"dateCreated", order:"desc",max:params.max,offset:params.offset ? params.offset : 0] )
             return [ dataTransferBatchList:dataTransferBatchList, projectId:projectId ]
     }
     /* -----------------------------------------------------------------------

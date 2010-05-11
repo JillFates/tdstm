@@ -48,7 +48,7 @@
                 </table>
             </div>
             <div class="paginateButtons">
-                <g:paginate total="${PartyGroup.count()}" />
+                <g:paginate total="${partyGroupSize}" />
             </div>
             <div class="buttons">
                 <g:form>

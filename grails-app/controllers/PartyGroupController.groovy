@@ -10,8 +10,12 @@ class PartyGroupController {
 	// Will Return PartyGroup list where PartyType = COMPANY
 	def list = {
         def query = "from PartyGroup as p where partyType = 'COMPANY' "
-        def partyGroupList = PartyGroup.findAll( query )
-        [ partyGroupInstanceList: partyGroupList ]
+        if( !params.max ) params.max = '10'
+		def max = Integer.parseInt( params.max )
+		def offset = params.offset ? Integer.parseInt( params.offset ) : 0
+        def partyGroupList = PartyGroup.findAll( query,[max : max, offset: offset ] )
+		def partyGroupSize = PartyGroup.findAll( query ).size()
+        [ partyGroupInstanceList: partyGroupList, partyGroupSize:partyGroupSize ]
     }
 
     def show = {
