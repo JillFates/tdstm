@@ -37,7 +37,7 @@
   		return xmlData;
 	}
 	/* render the summary dial data*/
-	function summaryDiaData( dialInd ){
+	function summaryDialData( dialInd ){
 		var xmlData = "<chart bgAlpha='0' bgColor='FFFFFF' lowerLimit='0' upperLimit='100' numberSuffix='' showBorder='0' basefontColor='000000' "+
 			"animation='0' showValues='0' rotateValues='1' placeValuesInside='1' "+ 
 			"chartTopMargin='15' chartBottomMargin='15' chartLeftMargin='5' chartRightMargin='5' toolTipBgColor='80A905' "+
@@ -132,7 +132,7 @@
 					<script language="JavaScript">
 						var summarychart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "summary_gauge", "280", "136", "0", "0");
 	        			//summarychart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'summary_gauge.xml')}");
-	        			 summarychart.setDataXML( summaryDiaData( "50" ) )
+	        			 summarychart.setDataXML( summaryDialData( "50" ) )
 						summarychart.render("summary_gauge_div");
 					</script>
 						Move Status vs. Plan
@@ -248,12 +248,14 @@
 									<li class="actfinish1"><span id="act_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
 								</ul>
 								<div id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}" align="center" style="display: none;"> </div>
+								<jsec:hasAnyRole in="['ADMIN']">
 								<script language="JavaScript">
 							         var stepchart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "chart_${moveBundle.id}_${moveBundleStep.transitionId}", "100", "75", "0", "0");
 							         //stepchart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'step_gauge.xml')}");
 							         stepchart.setDataXML( stepDialData( "50" ) )
 							         stepchart.render("chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}");
-						      	</script> 
+								</script> 
+								</jsec:hasAnyRole>
 							</div>
 						</g:each>
 					</div>
@@ -715,7 +717,7 @@
 	}
 	function updateSummaryGauge( divId, dialInd ){
 	//var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId", "280", "136", "0", "0");
-		updateChartXML(divId, summaryDiaData( dialInd ) );
+		updateChartXML(divId, summaryDialData( dialInd ) );
 		//myChart.setDataXML( xmlData );
 	   	//myChart.render(divId);
 	}
