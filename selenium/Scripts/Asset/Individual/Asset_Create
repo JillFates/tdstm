@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="" />
+<title>Asset_Create</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">Asset_Create</td></tr>
+</thead><tbody>
+<tr>
+	<td>open</td>
+	<td>/tds-0.1/auth/login</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>usernameId</td>
+	<td>john</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>password</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Sign in']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Project</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Assets</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=List Assets</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='New Asset Entity']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>attributeSetId</td>
+	<td>label=Server</td>
+</tr>
+<tr>
+	<td>waitForTextPresent</td>
+	<td>Fields marked ( * ) are mandatory</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Fields marked ( * ) are mandatory</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>assetNameId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>shortNameId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>assetTagId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>assetTypeId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>manufacturerId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>modelId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>applicationId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>appOwnerId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>appSmeId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>ipAddressId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>hinfoId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>serialNumberId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>usizeId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>railTypeId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>sourceLocationId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>sourceRoomId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>sourceRackId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>sourceRackPositionId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>targetLocationId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>targetRoomId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>targetRackId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>targetRackPositionId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>powerTypeId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>pduPortId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>pduQuantityId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>pduTypeId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>nicPortId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>remoteMgmtPortId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>fiberCabinetId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>fiberTypeId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>fiberQuantityId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>hbaPortId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>kvmDeviceId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>kvmPortId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>truckId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>newOrOldId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>priorityId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>cartId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>shelfId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>assetNameId</td>
+	<td>test-asset-name</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>shortNameId</td>
+	<td>test-asset-sname</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>assetTagId</td>
+	<td>test-asset-tag</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>assetTypeId</td>
+	<td>label=Server</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>manufacturerId</td>
+	<td>test-asset-man</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>modelId</td>
+	<td>test-asset-mod</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>applicationId</td>
+	<td>test-asset-app</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>appOwnerId</td>
+	<td>test-asset-appown</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>appSmeId</td>
+	<td>test-asset-sme</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>ipAddressId</td>
+	<td>test-asset-ip</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>hinfoId</td>
+	<td>test-asset-hinfo</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>serialNumberId</td>
+	<td>test-asset-sn</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>usizeId</td>
+	<td>2</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>railTypeId</td>
+	<td>label=Rails</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>sourceLocationId</td>
+	<td>test-asset-src</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>sourceRoomId</td>
+	<td>test-asset-src-rm</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>sourceRackId</td>
+	<td>test-asset-src-rk</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>sourceRackPositionId</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>targetLocationId</td>
+	<td>test-asset-tgt</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>targetRoomId</td>
+	<td>test-asset-tgt</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>targetRackId</td>
+	<td>test-asset-rk</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>targetRackPositionId</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>powerTypeId</td>
+	<td>label=110V Fixed</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>pduPortId</td>
+	<td>2</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>pduQuantityId</td>
+	<td>label=1</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>pduTypeId</td>
+	<td>label=C13</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>nicPortId</td>
+	<td>1</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>remoteMgmtPortId</td>
+	<td>1</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>kvmDeviceId</td>
+	<td>test-asset-kvm</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>kvmPortId</td>
+	<td>1</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>truckId</td>
+	<td>1</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>newOrOldId</td>
+	<td>label=Old</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>priorityId</td>
+	<td>label=1</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Create' and @type='submit']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>AssetEntity test-asset-name created</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>

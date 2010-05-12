@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://ph1.tdsops.com/" />
+<title>Asset_Read</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">Asset_Read</td></tr>
+</thead><tbody>
+<!--This test will pick up the first record from the list and perform the actions-->
+<tr>
+	<td>open</td>
+	<td>/tds-0.1/auth/login</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>usernameId</td>
+	<td>john</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>password</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Sign in']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Project</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Assets</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=List Assets</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Asset Entity List</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetEntityTable.0.0</td>
+	<td>Actions</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetEntityTable.0.1</td>
+	<td>Application</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetEntityTable.0.2</td>
+	<td>Asset Name</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetEntityTable.0.3</td>
+	<td>Model</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetEntityTable.0.4</td>
+	<td>Source Location</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetEntityTable.0.5</td>
+	<td>Source Rack/Cab</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetEntityTable.0.6</td>
+	<td>Target Location</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetEntityTable.0.7</td>
+	<td>Target Rack/Cab</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetEntityTable.0.8</td>
+	<td>Asset Type</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetEntityTable.0.9</td>
+	<td>Asset Tag</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetEntityTable.0.10</td>
+	<td>Serial #</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>link=Application</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>link=Asset Name</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>link=Model</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>link=Source Location</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>link=Source Rack/Cab</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>link=Target Location</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>link=Target Rack/Cab</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>link=Asset Type</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>link=Asset Tag</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>link=Serial #</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Pure and Unfiltered!</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>link=Filter</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='paginateRows']/table.0.1</td>
+	<td>Rows per Page:&nbsp;&nbsp;25 50 100 200</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//input[@value='New Asset Entity']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>assetEntityTable.1.1</td>
+	<td>appLn</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>assetEntityTable.1.2</td>
+	<td>assetName</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>assetEntityTable.1.3</td>
+	<td>modeL</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>assetEntityTable.1.4</td>
+	<td>sLoc</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>assetEntityTable.1.5</td>
+	<td>sRack</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>assetEntityTable.1.6</td>
+	<td>tLoc</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>assetEntityTable.1.7</td>
+	<td>tRack</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>assetEntityTable.1.8</td>
+	<td>aType</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>assetEntityTable.1.9</td>
+	<td>aTag</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>assetEntityTable.1.10</td>
+	<td>serialNo</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=${assetName}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForPopUp</td>
+	<td></td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Asset Entity List</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.0.0</td>
+	<td>Asset Name</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.1.0</td>
+	<td>Short Name</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.2.0</td>
+	<td>Asset Tag</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.3.0</td>
+	<td>Asset Type</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.4.0</td>
+	<td>Manufacturer</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.5.0</td>
+	<td>Model</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.6.0</td>
+	<td>Application</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.7.0</td>
+	<td>AppOwner</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.8.0</td>
+	<td>SME</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.9.0</td>
+	<td>IP Address</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.10.0</td>
+	<td>HINFO</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.11.0</td>
+	<td>Serial #</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.12.0</td>
+	<td>U Size</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.13.0</td>
+	<td>Rail Type</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.14.0</td>
+	<td>Source Location</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.15.0</td>
+	<td>Source Room</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.16.0</td>
+	<td>Source Rack/Cab</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.17.0</td>
+	<td>Source Position</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.18.0</td>
+	<td>Target Location</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.19.0</td>
+	<td>Target Room</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.0.0</td>
+	<td>Target Rack/Cab</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.1.0</td>
+	<td>Target Position</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.2.0</td>
+	<td>powerType</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.3.0</td>
+	<td>PDU Port</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.4.0</td>
+	<td>PDU Port Qty</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.5.0</td>
+	<td>PDU Type</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.6.0</td>
+	<td>NIC Port</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.7.0</td>
+	<td>Remote Mgmt Port</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.8.0</td>
+	<td>Fiber Cabinet</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.9.0</td>
+	<td>Fiber Type</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.10.0</td>
+	<td>Fiber Qty</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.11.0</td>
+	<td>Fiber Port</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.12.0</td>
+	<td>KVM Device</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.13.0</td>
+	<td>KVM Port</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.14.0</td>
+	<td>Truck</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.15.0</td>
+	<td>Old/New</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.16.0</td>
+	<td>Priority</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.17.0</td>
+	<td>Cart</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.18.0</td>
+	<td>Shelf</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//input[@value='Edit' and @type='button' and @onclick='return editAssetDialog()']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>_action_Delete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>_action_remove</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.0.1</td>
+	<td>${assetName}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.2.1</td>
+	<td>${aTag}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.3.1</td>
+	<td>${aType}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.5.1</td>
+	<td>${modeL}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.11.1</td>
+	<td>${serialNo}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.14.1</td>
+	<td>${sLoc}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.16.1</td>
+	<td>${sRack}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.18.1</td>
+	<td>${tLoc}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.6.1</td>
+	<td>${appLn}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.0.1</td>
+	<td>${tRack}</td>
+</tr>
+
+</tbody></table>
+</body>
+</html>
