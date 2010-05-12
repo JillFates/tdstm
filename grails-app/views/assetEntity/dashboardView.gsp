@@ -413,8 +413,8 @@ td .odd {
 		$("#assetStatusId").val( assetStatus );
 		$("form#dashboardForm").submit();
 	}
-	function submitFormWithBundle(){
-		$("#showAllId").val('');
+	function submitFormWithBundle( showAll ){
+		$("#showAllId").val( showAll );
 		$("#teamId").val('');
 		$("#assetLocationId").val('');
 		$("#assetStatusId").val('');
@@ -489,7 +489,7 @@ td .odd {
 		<tr class="prop">
 			<td style="vertical-align: bottom;width:30%" class="name"><label
 				for="moveBundle">Move Bundle:</label>&nbsp;<select id="moveBundleId"
-				name="moveBundle" onchange="submitFormWithBundle()">
+				name="moveBundle" onchange="submitFormWithBundle('show')">
 
 				<g:each status="i" in="${moveBundleInstanceList}"
 					var="moveBundleInstance">
@@ -732,7 +732,7 @@ td .odd {
 											 onclick="document.filterForm.reset();$('#filterShowAllId').val('');document.filterForm.submit();"><span class="clear_filter"><u>X</u></span></a>
 									</g:if>
 									<g:if test="${totalAssetsOnHold > 0}">
-									&nbsp;&nbsp;<input type="button" class="onhold_button" onclick="submitFormWithBundle()" id="onHoldButtonId" value="On Hold (${totalAssetsOnHold})"/>
+									&nbsp;&nbsp;<input type="button" class="onhold_button" onclick="submitFormWithBundle('')" id="onHoldButtonId" value="On Hold (${totalAssetsOnHold})"/>
 									</g:if>
 								</td>
 							</tr>
