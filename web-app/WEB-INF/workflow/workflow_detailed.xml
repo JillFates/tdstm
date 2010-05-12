@@ -43,7 +43,7 @@
 		<transition to="Staged" name="Staged" id="130" type="process" />
 		<transition to="Reracking" name="Reracking" id="140" type="process" />
 		<transition to="Reracked" name="Reracked" id="150" type="process" dashboardLabel="Reracking" predecessor="140" />
-		<transition to="Cabled" name="Cabled" id="155" type="process" dashboardLabel="Cabled" />
+		<transition to="Cabled" name="Cabled" id="155" type="process" />
 		<transition to="QAVerified" name="QA Verified" id="160" type="process" />
 		<transition to="PoweredOn" name="Powered On" id="170"  type="process" />
 
