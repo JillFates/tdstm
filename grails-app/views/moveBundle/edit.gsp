@@ -426,22 +426,51 @@
 		}
     }
     function calculateDuration( stepId ){
-        var start = $("#startTime_"+stepId).val()
-        var completion = $("#completionTime_"+stepId).val()
-        if(completion && start ){
-        	var duration
-            var startTime = new Date( start ).getTime()
-            var completionTime  = new Date( completion ).getTime()
-            if(completionTime > startTime){
-            	duration = completionTime - startTime    
-            } else {
-                alert("Completion Time should be greater than Start Time")
+        var bundleStart = $("#startTime").val();
+        var bundleCompletion = $("#completionTime").val();
+        if(bundleStart && bundleCompletion){
+        	var start = $("#startTime_"+stepId).val();
+            var completion = $("#completionTime_"+stepId).val();
+            var startTime
+            var completionTime
+            var bundleStartTime = new Date( bundleStart ).getTime()
+            var bundleCompletionTime = new Date( bundleCompletion ).getTime()
+            if(start){
+            	startTime = new Date( start ).getTime();
+            	if(bundleStartTime > startTime || bundleCompletionTime < startTime){
+    				alert("Step Start Time should be in between Bundle Start Time and Completion Time.");
+    				$("#startTime_"+stepId).val("");
+    				return;
+            	}
             }
-            if(duration){
-            	$("#duration_"+stepId).val(convertIntoHHMM(duration / 1000))
-            	$("#durationIn_"+stepId).val(duration / 1000)
-            	$("#duration_"+stepId).focus()
+            if(completion){
+            	completionTime = new Date( completion ).getTime();
+            	if(bundleStartTime > completionTime || bundleCompletionTime < completionTime){
+    				alert("Step Completion Time should be in between Bundle Start Time and Completion Time.");
+    				$("#completionTime_"+stepId).val("");
+    				return;
+            	}
             }
+        	
+        	
+	        if(completion && start){
+	        	var duration
+	            if(completionTime > startTime){
+	            	duration = completionTime - startTime    
+	            } else {
+	                alert("Completion Time should be greater than Start Time");
+	                $("#completionTime_"+stepId).val("");
+	            	return;
+	            }
+	            if(duration){
+	            	$("#duration_"+stepId).val(convertIntoHHMM(duration / 1000))
+	            	$("#durationIn_"+stepId).val(duration / 1000)
+	            	$("#duration_"+stepId).focus()
+	            }
+	        }
+        } else {
+        	alert("Budle Start Time and Completion Time should not be blank");
+			return;
         }
     } 
     function convertIntoHHMM( seconds ){

@@ -45,7 +45,10 @@ log.debug("actualTimes=${actualTimes}")
 			
 			def earliestStartTime = actualTimes.start
 			def latestCompletionTime = actualTimes.completion
-
+			
+			if(earliestStartTime && earliestStartTime < moveBundleStep.moveBundle.startTime)
+				earliestStartTime = moveBundleStep.moveBundle.startTime
+				
 log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${latestCompletionTime}, MBS: ${moveBundleStep}" )
 			
 			// If the Step hasn't started and it is not scheduled to start then we don't need to do anything
