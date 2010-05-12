@@ -37,9 +37,9 @@ class DashboardController {
             	moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
             }
         }
-		
+        
         if( moveEvent ){
-        	userPreferenceService.setPreference("MOVE_EVENT","${moveEventsList[0].id}")
+        	userPreferenceService.setPreference("MOVE_EVENT","${moveEvent.id}")
 			moveBundleList = MoveBundle.findAll(" FROM MoveBundle mb where moveEvent = ${moveEvent.id} ORDER BY mb.startTime ")				
 		}
 		return [ moveEventsList : moveEventsList, moveEvent : moveEvent, project : project, 
