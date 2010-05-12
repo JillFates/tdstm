@@ -580,10 +580,11 @@ class ClientConsoleController {
 		def count = 0
 		tempTransitions.sort().each{
 			def processTransition = stateEngineService.getStateLabel(projectInstance.workflowCode,it)
+			def stateType = stateEngineService.getStateType(projectInstance.workflowCode,it)
 			if(count == 0){
 				svgHeaderFile.append("${processTransition}")
 			} else {
-				svgHeaderFile.append("<tspan x='-11' dy='22'>${processTransition}</tspan>")
+				svgHeaderFile.append("<tspan x='-11' dy='22' class='${stateType}'>${processTransition}</tspan>")
 			}
 			count++
 		}
