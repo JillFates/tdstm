@@ -584,7 +584,7 @@ class ClientConsoleController {
 			if(count == 0){
 				svgHeaderFile.append("${processTransition}")
 			} else {
-				svgHeaderFile.append("<tspan x='-11' dy='22' class='"+${stateType}+"'>${processTransition}</tspan>")
+				svgHeaderFile.append("<tspan x='-11' dy='22' class='$stateType'>${processTransition}</tspan>")
 			}
 			count++
 		}
