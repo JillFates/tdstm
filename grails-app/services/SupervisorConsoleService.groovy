@@ -29,10 +29,7 @@ class SupervisorConsoleService {
         def onCartId = stateEngineService.getStateId( projectInstance.workflowCode, "OnCart" )
         def onTruckId = stateEngineService.getStateId( projectInstance.workflowCode, "OnTruck" )
 	    def offTruckId = stateEngineService.getStateId( projectInstance.workflowCode, "OffTruck" )
-        def rerackedId = stateEngineService.getStateId( projectInstance.workflowCode, "Cabled" )
-        if(!rerackedId ) {
-        	rerackedId = stateEngineService.getStateId( projectInstance.workflowCode, "Reracked" )
-        }
+        def rerackedId = stateEngineService.getStateId( projectInstance.workflowCode, "Reracked" )
         def stagedId = stateEngineService.getStateId( projectInstance.workflowCode, "Staged" )
         def unrackedId = stateEngineService.getStateId( projectInstance.workflowCode, "Unracked" )
         def releasedId = stateEngineService.getStateId( projectInstance.workflowCode, "Release" )

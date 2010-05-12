@@ -360,9 +360,7 @@ class MoveTechController {
             	
                 rdyState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Staged" )
                 ipState.add(  stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Reracking" ) )
-				if( stateEngineService.getStateId ( moveBundleInstance.project.workflowCode, "Cabled" ) ){
-					ipState.add( stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Reracked" ) )
-				}
+		ipState.add( stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Reracked" ) )
                 
             }
             def countQuery = "select a.asset_entity_id as id, a.asset_tag as assetTag, a.source_rack as sourceRack, " + 
@@ -378,10 +376,7 @@ class MoveTechController {
                 query.append (" and a.source_team_id = $team" )
                 countQuery +=" and a.source_team_id = $team"
             } else {
-            	stateVal = stateEngineService.getStateId ( moveBundleInstance.project.workflowCode, "Cabled" )
-            	if(!stateVal) {
-            		stateVal = stateEngineService.getStateId ( moveBundleInstance.project.workflowCode, "Reracked" )
-            	}
+            	stateVal = stateEngineService.getStateId ( moveBundleInstance.project.workflowCode, "Reracked" )
                 query.append (" and a.target_team_id = $team" )
                 countQuery += " and a.target_team_id = $team" 
             }

@@ -945,10 +945,7 @@ class AssetEntityController {
         if( moveBundleInstance != null ){
         	//  Get Id for respective States
 	        def cleanedId = stateEngineService.getStateId( projectInstance.workflowCode, "Cleaned" )
-	        def rerackedId = stateEngineService.getStateId( projectInstance.workflowCode, "Cabled" )
-	        if(!rerackedId){
-	        	rerackedId = stateEngineService.getStateId( projectInstance.workflowCode, "Reracked" )
-	        }
+	        def rerackedId = stateEngineService.getStateId( projectInstance.workflowCode, "Reracked" )
 	        def onCartId = stateEngineService.getStateId( projectInstance.workflowCode, "OnCart" )
 	        def stagedId = stateEngineService.getStateId( projectInstance.workflowCode, "Staged" )
 	        def unrackedId = stateEngineService.getStateId( projectInstance.workflowCode, "Unracked" )
@@ -1255,7 +1252,7 @@ class AssetEntityController {
 	    	def assignTo = params.assignTo
 	    	def priority = params.priority
 	    	def comment = params.comment
-	    	def rerackedId = stateEngineService.getStateId(assetEntity.project.workflowCode,"Cabled")
+	    	def rerackedId = stateEngineService.getStateId(assetEntity.project.workflowCode,"Reracked")
 	    	if(!rerackedId) {
 	    		rerackedId = stateEngineService.getStateId(assetEntity.project.workflowCode,"Reracked")
 	    	}
