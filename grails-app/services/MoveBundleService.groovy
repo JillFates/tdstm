@@ -27,15 +27,25 @@ class MoveBundleService {
 	 * @return : assetCompletionCount for a specified move bundle id and transition id
 	 */
     def assetCompletionCount( def moveBundleId, def transitionId ){
-    	def sql = """
-			SELECT max(cast(atran.state_to as UNSIGNED INTEGER)) AS maxstate
-			FROM asset_entity ae
-			LEFT JOIN asset_transition atran ON ( atran.asset_entity_id = ae.asset_entity_id AND atran.voided = 0 ) 
-			WHERE ae.move_bundle_id = ${moveBundleId} 
-				AND atran.type="process" 
-				AND cast(atran.state_to as UNSIGNED INTEGER) >= ${transitionId} 
-			GROUP BY ae.asset_entity_id
-		"""
+		 def sql = """
+				SELECT count(*)	FROM(SELECT max(cast(atran.state_to as UNSIGNED INTEGER)) AS maxstate, ae.asset_entity_id 
+				FROM asset_entity ae
+				LEFT JOIN asset_transition atran ON ( atran.asset_entity_id = ae.asset_entity_id AND atran.voided = 0 ) 
+				WHERE ae.move_bundle_id = ${moveBundleId} 
+					AND atran.type='process' 
+					AND cast(atran.state_to as UNSIGNED INTEGER) >= ${transitionId} 
+				GROUP BY ae.asset_entity_id
+				
+				UNION ALL
+
+				SELECT max(cast(atran.state_to as UNSIGNED INTEGER)) AS maxstate, ae.asset_entity_id 
+				FROM asset_entity ae
+				LEFT JOIN asset_transition atran ON ( atran.asset_entity_id = ae.asset_entity_id AND atran.voided = 0 ) 
+				WHERE ae.move_bundle_id = ${moveBundleId} 
+					AND atran.type='boolean' 
+					AND cast(atran.state_to as UNSIGNED INTEGER) = ${transitionId} 
+				GROUP BY ae.asset_entity_id ) atran GROUP BY atran.asset_entity_id
+			"""
 		
 		def assetCompletionCount = jdbcTemplate.queryForList( sql ).size()
 		return assetCompletionCount
