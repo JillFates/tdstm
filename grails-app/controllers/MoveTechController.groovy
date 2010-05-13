@@ -596,7 +596,7 @@ class MoveTechController {
                         	taskSize = taskList.size()
                         	if ( taskSize == 1 ) {
                         		if ( taskList.contains ( "Hold" ) ) {
-                        			flash.message = message ( code : "There is a problem with this asset. Place the asset on hold to alert the move coordinator " )
+                        			flash.message = message ( code : "NO ACTIONS FOR ASSET. You may place it on hold to alert the move coordinator " )
                         		}
                         	} else if ( taskSize > 1 ) {
                         		
@@ -1003,7 +1003,7 @@ class MoveTechController {
                             taskSize = taskList.size()
                             if ( taskSize == 1 ) {
                                 if ( taskList.contains ( "Hold" ) ) {
-                                    flash.message = message ( code : "There is a problem with this asset. Place the asset on hold to alert the move coordinator" )
+                                    flash.message = message ( code : "NO ACTIONS FOR ASSET. You may place it on hold to alert the move coordinator" )
                                 }
 	                        	
                             } else if ( taskSize > 1 ) {
