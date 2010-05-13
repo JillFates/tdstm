@@ -523,7 +523,7 @@
 		   if (hour   < 10) { hour   = "0" + hour;   }
 		   if (minute < 10) { minute = "0" + minute; }
 		   if (second < 10) { second = "0" + second; }
-		   var timeString = month+"/"+monthday+" "+hour + ':' + minute + ':' +  second + " " +  ap;
+		   var timeString = month+"/"+monthday+" "+hour + ':' + minute +" " +  ap;
 		}
 	   return timeString;
 	   

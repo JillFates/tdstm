@@ -1530,10 +1530,12 @@ class AssetEntityController {
         def assetTrasitionInstance = AssetTransition.find( "from AssetTransition where assetEntity = $assetEntityInstance.id and voided=0 and stateTo= '$stateTo' and isNonApplicable = 0" )
         if( assetTrasitionInstance ) {
         	DateFormat formatter ; 
-            def formatterTime = new SimpleDateFormat("hh:mm:ss a");
+            def formatterTime = new SimpleDateFormat("hh:mm a");
             def formatterDate = new SimpleDateFormat("MM/dd/yyyy");
-            def updatedTime = formatterTime.format(assetTrasitionInstance.lastUpdated)
-            def updatedDate = formatterDate.format(assetTrasitionInstance.lastUpdated)
+            def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+            def lastupdated = GormUtil.convertInToUserTZ(assetTrasitionInstance.lastUpdated, tzId)
+            def updatedTime = formatterTime.format(lastupdated)
+            def updatedDate = formatterDate.format(lastupdated)
         	statusMsg = "$assetEntityInstance.assetName : $state is done and was updated by $assetTrasitionInstance.userLogin.person.firstName $assetTrasitionInstance.userLogin.person.lastName at $updatedTime on $updatedDate "
         }else if( AssetTransition.find( "from AssetTransition where assetEntity = $assetEntityInstance.id and voided=0 and stateTo= '$stateTo' and isNonApplicable = 1" ) ) {
         	statusMsg = "$assetEntityInstance.assetName : $state is not applicable "
