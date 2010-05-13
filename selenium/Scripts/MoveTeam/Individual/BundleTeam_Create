@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
+<title>BundleTeam_Create</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">BundleTeam_Create</td></tr>
+</thead><tbody>
+<!--Pre-Requisite: There needs to be atleast one move bundle pre-existing in the user preferred project-->
+<tr>
+	<td>open</td>
+	<td>/tds-0.1/auth/login</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>usernameId</td>
+	<td>john</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>password</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Sign in']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Bundles</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//table.1.0</td>
+	<td>mBundle</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=${mBundle}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Team</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Move Bundle Team List</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.0</td>
+	<td>Team Code</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.1</td>
+	<td>Team Name</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.2</td>
+	<td>Team Members</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.3</td>
+	<td>Date Created</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.4</td>
+	<td>Last Updated</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.5</td>
+	<td>Comment</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>_action_Create</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>_action_Create</td>
+	<td></td>
+</tr>
+<!--Creating the Bundle Team-->
+<tr>
+	<td>verifyTitle</td>
+	<td>Create Move Bundle Team</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Fields marked ( * ) are mandatory</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.1.0</td>
+	<td>exact:Team Code: *</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.2.0</td>
+	<td>exact:Team Name: *</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.3.0</td>
+	<td>exact:Comment:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.4.0</td>
+	<td>Is Disbanded:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.4.1</td>
+	<td>Y N</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//td/table.0.0</td>
+	<td>Available Staff:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//td/table.0.2</td>
+	<td>Team Members:</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>availableStaffId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>teamMembersId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//input[@value='Create']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>teamCode</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>name</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>comment</td>
+	<td></td>
+</tr>
+<tr>
+	<td>randomString</td>
+	<td>3|alphanumeric</td>
+	<td>teamCode</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>teamCode</td>
+	<td>TestCode-${teamCode}</td>
+</tr>
+<tr>
+	<td>randomString</td>
+	<td>3|aplhanumeric</td>
+	<td>teamName</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name</td>
+	<td>TestName-${teamName}</td>
+</tr>
+<tr>
+	<td>randomString</td>
+	<td>4|alpha</td>
+	<td>commenT</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>comment</td>
+	<td>random comment - ${commenT}</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>isDisbanded</td>
+	<td>label=Y</td>
+</tr>
+<tr>
+	<td>storeElementPresent</td>
+	<td>//option[@value='1']</td>
+	<td>ok</td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>${ok}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${ok}==false</td>
+	<td>label1</td>
+</tr>
+<tr>
+	<td>addSelection</td>
+	<td>availableStaffId</td>
+	<td>index=0</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a[@id='add']/img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//td/table.1.2</td>
+	<td>aStaff</td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>${aStaff}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Create']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>created</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.1</td>
+	<td>TestCode-${teamCode}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.1.1</td>
+	<td>TestName-${teamName}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.2.1</td>
+	<td>random comment - ${commenT}</td>
+</tr>
+
+</tbody></table>
+</body>
+</html>

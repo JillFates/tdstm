@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://ph1.tdsops.com/" />
+<title>BundleTeam_Read</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">BundleTeam_Read</td></tr>
+</thead><tbody>
+<!--Pre-Requisite: There needs to be atleast one move bundle and one team in that move bundle pre-existing in the user preferred project-->
+<tr>
+	<td>open</td>
+	<td>/tds-0.1/auth/login</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>usernameId</td>
+	<td>john</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>password</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Sign in']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Bundles</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//table.1.0</td>
+	<td>mBundle</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=${mBundle}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Team</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Move Bundle Team List</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.0</td>
+	<td>Team Code</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.1</td>
+	<td>Team Name</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.2</td>
+	<td>Team Members</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.3</td>
+	<td>Date Created</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.4</td>
+	<td>Last Updated</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.5</td>
+	<td>Comment</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>_action_Create</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//table.1.0</td>
+	<td>tCode</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//table.1.1</td>
+	<td>tName</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//table.1.2</td>
+	<td>tMembers</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//table.1.3</td>
+	<td>dCreated</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//table.1.4</td>
+	<td>lUpdated</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//table.1.5</td>
+	<td>commenT</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=${tCode}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Show Move Bundle Team</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>link=Project Team List</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.0</td>
+	<td>Team Code:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.1</td>
+	<td>${tCode}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.1.0</td>
+	<td>Team Name:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.1.1</td>
+	<td>${tName}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.2.0</td>
+	<td>exact:Comment:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.2.1</td>
+	<td>${commenT}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.3.0</td>
+	<td>Is Disbanded:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.4.0</td>
+	<td>Team Members:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.4.1</td>
+	<td>${tMembers}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.5.0</td>
+	<td>Date Created:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.5.1</td>
+	<td>${dCreated}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.6.0</td>
+	<td>Last Updated:</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>_action_Edit</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.6.1</td>
+	<td>${lUpdated}</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>_action_Delete</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>
