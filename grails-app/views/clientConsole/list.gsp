@@ -190,7 +190,7 @@ overflow: hidden;
 			</th>
 			<g:if test="${browserTest}">
 			<g:each in="${processTransitionList}"  var="task">
-				<th class="verticaltext" title="${task.header}">${task?.header}</th>
+				<th class="verticaltext" title="${task.header}" style="color: ${task.fillColor}">${task?.header}</th>
 			</g:each>
 			</g:if>
 			<g:else>

@@ -129,7 +129,11 @@ class ClientConsoleController {
 			}
 			tempTransitions.sort().each{
 				def processTransition = stateEngineService.getState(projectInstance.workflowCode,it)
-				processTransitionList<<[header:stateEngineService.getStateLabel(projectInstance.workflowCode,it),transId:stateEngineService.getStateId(projectInstance.workflowCode,processTransition)]
+				def stateType = stateEngineService.getStateType(projectInstance.workflowCode,stateEngineService.getState(projectInstance.workflowCode,it))
+				def fillColor = stateType == 'boolean' ? '#FF8000' : 'green'
+				processTransitionList<<[header:stateEngineService.getStateLabel(projectInstance.workflowCode,it),
+										transId:stateEngineService.getStateId(projectInstance.workflowCode,processTransition),
+										fillColor:fillColor]
 			}
 			def htmlTdId = new StringBuffer()
 			/* user role check*/
@@ -580,10 +584,12 @@ class ClientConsoleController {
 		def count = 0
 		tempTransitions.sort().each{
 			def processTransition = stateEngineService.getStateLabel(projectInstance.workflowCode,it)
+			def stateType = stateEngineService.getStateType(projectInstance.workflowCode,stateEngineService.getState(projectInstance.workflowCode,it))
+			def fillColor = stateType == 'boolean' ? '#FF8000' : 'green'
 			if(count == 0){
-				svgHeaderFile.append("${processTransition}")
+				svgHeaderFile.append("<tspan fill='$fillColor'>${processTransition}</tspan>")
 			} else {
-				svgHeaderFile.append("<tspan x='-11' dy='22' class='workflow'>${processTransition}</tspan>")
+				svgHeaderFile.append("<tspan x='-11' dy='22' fill='$fillColor'>${processTransition}</tspan>")
 			}
 			count++
 		}
