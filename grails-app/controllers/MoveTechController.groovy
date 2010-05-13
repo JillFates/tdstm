@@ -360,7 +360,6 @@ class MoveTechController {
             	
                 rdyState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Staged" )
                 ipState.add(  stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Reracking" ) )
-		ipState.add( stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Reracked" ) )
                 
             }
             def countQuery = "select a.asset_entity_id as id, a.asset_tag as assetTag, a.source_rack as sourceRack, " + 
