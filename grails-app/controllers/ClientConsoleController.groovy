@@ -602,7 +602,7 @@ class ClientConsoleController {
 		}
 		svgHeaderFile.append("' stroke = '#FFFFFF' stroke-width = '1'/>")
 		svgHeaderFile.append("</svg>")
-		def f = ApplicationHolder.application.parentContext.getResource("templates/headerSvg.svg").getFile()
+		def f = ApplicationHolder.application.parentContext.getResource("templates/headerSvg_${projectInstance?.id}.svg").getFile()
 		def fop=new FileOutputStream(f)
 		if(f.exists()){
 			fop.write(svgHeaderFile.toString().getBytes())

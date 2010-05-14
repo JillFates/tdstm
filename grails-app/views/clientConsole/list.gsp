@@ -194,7 +194,7 @@ overflow: hidden;
 			</g:each>
 			</g:if>
 			<g:else>
-			<th style="padding-left: 0px" colspan="${headerCount}"><embed src="${createLinkTo(dir:'templates',file:'headerSvg.svg')}" type="image/svg+xml" width="${headerCount*21.80}" height="102"/></th>
+			<th style="padding-left: 0px" colspan="${headerCount}"><embed src="${createLinkTo(dir:'templates',file:'headerSvg_'+projectId+'.svg')}" type="image/svg+xml" width="${headerCount*21.80}" height="102"/></th>
 			</g:else>
 
 		</tr>
