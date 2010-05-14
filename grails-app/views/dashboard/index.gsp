@@ -71,12 +71,11 @@
     }
 	</script>
 </head>
-
 <body class="sum_statusbar_good" onload="getMoveEventNewsDetails($('#moveEvent').val())">
 <div id="doc">
 	<div id="container">
 	<!--Header Starts here-->
-		<div id="header">
+		<div id="header" style="margin-top: -2px;">
 			<div id="logo">
 				<a name="page_up"></a>
 				<g:if test="${projectLogo}">
@@ -86,16 +85,18 @@
 					<a href="http://www.transitionaldata.com/" target="new"><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;border: 0px"/></a>
 				</g:else>
 				<br>
-				<g:form action="index" controller="dashboard" name="dashboardForm">
-				<span style="padding-left: 10px;">
-				
-					<label for="moveEvent"><b>Event:</b></label>&nbsp;<select id="moveEvent" name="moveEvent" onchange="document.dashboardForm.submit();">
-						<g:each status="i" in="${moveEventsList}" var="moveEventInstance">
-							<option value="${moveEventInstance?.id}">${moveEventInstance?.name}</option>
-						</g:each>
-					</select>
-				</span>
-				</g:form>
+				<div style="float: left;padding-top: 5px;">
+					<g:form action="index" controller="dashboard" name="dashboardForm">
+					<span>
+					
+						<label for="moveEvent"><b>Event:</b></label>&nbsp;<select id="moveEvent" name="moveEvent" onchange="document.dashboardForm.submit();">
+							<g:each status="i" in="${moveEventsList}" var="moveEventInstance">
+								<option value="${moveEventInstance?.id}">${moveEventInstance?.name}</option>
+							</g:each>
+						</select>
+					</span>
+					</g:form>
+				</div>
 				<input type="hidden" id="typeId" value="${params.type}">
 				<input type="hidden" id="stateId" value="${params.state}">
 				<input type="hidden" id="maxLenId" value="${params.maxLen}">
@@ -103,9 +104,9 @@
 			</div>
 			<div class="clientname">${project?.client}<br/>DATA CENTER RELOCATION <br><g:link controller="project" action="show" id="${project?.id}" style="text-decoration:none;"><span class="project_link">Return to Project</span> </g:link></div>
 			<div class="topdate">
-				<span><img src="${createLinkTo(dir:'images',file:'powered_by.png')}" alt="Powered by TDS" width="158" height="53" title="Powered by TDS"></span>
-				<span id="date"></span> <span id="clock"></span>&nbsp;
-				<span>
+				<div><img src="${createLinkTo(dir:'images',file:'powered_by.png')}" alt="Powered by TDS" width="158" height="53" title="Powered by TDS"></div>
+				<div id="date"></div> <div id="clock"></div>
+				<div style="height: 35px;">
 					<label>
 					  <select name="timezone" id="timezone" onChange="getMoveEventNewsDetails($('#moveEvent').val());setUserTimeZone()" class="selecttext">
 					    <option value="0">GMT</option>
@@ -119,9 +120,10 @@
 					    <option value="-4">EDT</option>
 					  </select>
 					</label>
-				</span>
+				</div>
 			</div>
 		</div>
+		<div style="clear: both"></div>
 		<div id="sum_statusbar"><span id="status_text">${moveEvent?.name}: </span><span id="status_color">GREEN</span></div>
 		<!-- Header Ends here-->
 		<!-- Body Starts here-->
