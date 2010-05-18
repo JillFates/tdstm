@@ -11,6 +11,7 @@
 <thead>
 <tr><td rowspan="1" colspan="3">Company_Edit</td></tr>
 </thead><tbody>
+<!--Pre-requisite: There should be atleast one record existing in the Company List page for the selected login as the test picks up the first record-->
 <tr>
 	<td>open</td>
 	<td>/tds-0.1/auth/login</td>

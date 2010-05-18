@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://ph1.tdsops.com/" />
+<title>Staff_Delete</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">Staff_Delete</td></tr>
+</thead><tbody>
+<!--Pre-Requisite: There should be atleast one record in the Company List page for the admin and atleast one record in the Staff List page of that selected company as this test picks up the first record from both Company List page and Staff List page-->
+<tr>
+	<td>open</td>
+	<td>/tds-0.1/auth/login</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>usernameId</td>
+	<td>john</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>password</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Sign in']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Administration</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Company</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>_action_show</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Staff</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//table.1.0</td>
+	<td>firstName</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=${firstName}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForText</td>
+	<td>//body/div[5]/div[1]</td>
+	<td>Show Staffclose</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//form[@id='showForm']/div[2]/span[2]/input</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertConfirmation</td>
+	<td>Are you sure?</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForPageToLoad</td>
+	<td></td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>deleted</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementNotPresent</td>
+	<td>link=${firstName}</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>
