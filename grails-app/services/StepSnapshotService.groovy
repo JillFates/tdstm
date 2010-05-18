@@ -49,15 +49,18 @@ log.debug("actualTimes=${actualTimes}")
 			if(earliestStartTime && earliestStartTime < moveBundleStep.moveBundle.startTime)
 				earliestStartTime = moveBundleStep.moveBundle.startTime
 				
+			// Get latest StepSnapshot
+			def latestStepSnapshot = StepSnapshot.find( "from StepSnapshot as s where s.moveBundleStep=? ORDER BY s.dateCreated DESC", [ moveBundleStep ] )
+			if(latestStepSnapshot && !earliestStartTime && !latestCompletionTime){
+				earliestStartTime = latestStepSnapshot.dateCreated
+				latestCompletionTime = latestStepSnapshot.dateCreated
+			}
 log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${latestCompletionTime}, MBS: ${moveBundleStep}" )
 			
 			// If the Step hasn't started and it is not scheduled to start then we don't need to do anything
 			if ( ! earliestStartTime && moveBundleStep.planStartTime.getTime() > timeNow )
 			   return  // next step
 
-			// Get latest StepSnapshot
-			def latestStepSnapshot = StepSnapshot.find( "from StepSnapshot as s where s.moveBundleStep=? ORDER BY s.dateCreated DESC", [ moveBundleStep ] )
-			
 			// If the Step was completed, lets make sure that a more recent transition hasn't occurred (i.e. a Step task was rolled back)
 			if ( moveBundleStep.isCompleted() && moveBundleStep.actualCompletionTime == latestCompletionTime )
 				return // Don't need to do anything so on to the next step
@@ -187,36 +190,39 @@ log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${l
 		if (! moveBundleStep ) return 401
 		if ( moveBundleStep.moveBundle.id != moveBundleId) return 403
 		
-		int tasksCount = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = $moveBundleId").size()
-
-		// Update actual start time if by chance it was never set, or user reset time after completing
-		moveBundleStep.actualStartTime = null
-		moveBundleStep.actualCompletionTime = null	// Clear out since it is not completed
+		def latestStepSnapshot = StepSnapshot.find( "from StepSnapshot as s where s.moveBundleStep=? ORDER BY s.dateCreated DESC", [ moveBundleStep ] )
 		
-		moveBundleStep.save(flush:true)
-		
-		//
-		// Create the StepSnapshot
-		//
-		def stepSnapshot = new StepSnapshot()
-
-		stepSnapshot.moveBundleStep = moveBundleStep
-		stepSnapshot.tasksCount = tasksCount
-		stepSnapshot.tasksCompleted = 0
-		
-		if( duration ){
-			stepSnapshot.duration = Integer.parseInt(duration)
-		} else {
-			stepSnapshot.duration = 0
-		}
-		
-		def planDelta = calcProjectedDelta( stepSnapshot, GormUtil.convertInToGMT( "now","EDT" ) )
-		stepSnapshot.planDelta = planDelta 
-		stepSnapshot.dialIndicator =  calcDialIndicator( stepSnapshot.moveBundleStep.planDuration, planDelta )
-		
-		log.debug("Creating StepSnapshot: ${stepSnapshot}")
-		stepSnapshot.save(flush:true)
+		if( !latestStepSnapshot ){
+			// Update actual start time if by chance it was never set, or user reset time after completing
+			moveBundleStep.actualStartTime = null
+			moveBundleStep.actualCompletionTime = null	// Clear out since it is not completed
+			
+			moveBundleStep.save(flush:true)
+			
+			int tasksCount = AssetEntity.findAll("from AssetEntity ae where ae.moveBundle = $moveBundleId").size()
+			
+			//
+			// Create the StepSnapshot
+			//
+			def stepSnapshot = new StepSnapshot()
 	
+			stepSnapshot.moveBundleStep = moveBundleStep
+			stepSnapshot.tasksCount = tasksCount
+			stepSnapshot.tasksCompleted = 0
+			
+			if( duration ){
+				stepSnapshot.duration = Integer.parseInt(duration)
+			} else {
+				stepSnapshot.duration = 0
+			}
+			
+			def planDelta = calcProjectedDelta( stepSnapshot, GormUtil.convertInToGMT( "now","EDT" ) )
+			stepSnapshot.planDelta = planDelta 
+			stepSnapshot.dialIndicator =  calcDialIndicator( stepSnapshot.moveBundleStep.planDuration, planDelta )
+			
+			log.debug("Creating StepSnapshot: ${stepSnapshot}")
+			stepSnapshot.save(flush:true)
+		}
 		return 200
 	}
 	
