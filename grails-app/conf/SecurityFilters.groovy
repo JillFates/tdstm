@@ -39,6 +39,10 @@ class SecurityFilters {
                 	flash.message = "Your login has expired and must login again."
                 	redirect(controller:'auth', action:'login')
                 	return false					
+ 	           	} else if( controllerName == 'auth' && principal == null && actionName == 'home') {
+ 	           		flash.message = "Your login has expired and must login again."
+                	redirect(controller:'auth', action:'login')
+                	return false
  	           	}
             }
         }

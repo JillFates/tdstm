@@ -18,69 +18,74 @@ class AuthController {
     }
 
     def signIn = {
-        def authToken = new UsernamePasswordToken(params.username, params.password)
-        // Support for "remember me"
-        if (params.rememberMe) {
-            authToken.rememberMe = true
-        }
-
-        try{
-            // Perform the actual login. An AuthenticationException
-            // will be thrown if the username is unrecognised or the
-            // password is incorrect.
-            this.jsecSecurityManager.login(authToken)
-            // Check User and Person Activi status
-            
-            def activeStatus = userPreferenceService.checkActiveStatus()
-            if(!activeStatus){
-                flash.message = "User Authentication has been Disabled"
-                redirect(action: 'login')
-            } else {
-	            // If a controller redirected to this page, redirect back
-	            // to it. Otherwise redirect to the root URI.
-	            def targetUri = params.targetUri ?: "/"
+    	try {
+	        def authToken = new UsernamePasswordToken(params.username, params.password)
+	        // Support for "remember me"
+	        if (params.rememberMe) {
+	            authToken.rememberMe = true
+	        }
+	
+	        try{
+	            // Perform the actual login. An AuthenticationException
+	            // will be thrown if the username is unrecognised or the
+	            // password is incorrect.
+	            this.jsecSecurityManager.login(authToken)
+	            // Check User and Person Activi status
 	            
-	            log.info "Redirecting to '${targetUri}'."
-	            //redirect(uri: targetUri)
-	            /*
-	             *  call loadPreferences() to load CURR_PROJ MAP into session
-	             */
-	            userPreferenceService.loadPreferences("CURR_PROJ")
-				/*
-				 *  call userPreferenceService.updateLastLogin( params.username ) to update the last login time
-				 */
-				userPreferenceService.updateLastLogin( params.username )
-				
-	            def browserTest = request.getHeader("User-Agent").contains("IEMobile")
-				
-	            if(browserTest) {
-	            	redirect(controller:'walkThrough')
+	            def activeStatus = userPreferenceService.checkActiveStatus()
+	            if(!activeStatus){
+	                flash.message = "User Authentication has been Disabled"
+	                redirect(action: 'login')
 	            } else {
-	            	redirect(controller:'projectUtil')
+		            // If a controller redirected to this page, redirect back
+		            // to it. Otherwise redirect to the root URI.
+		            def targetUri = params.targetUri ?: "/"
+		            
+		            log.info "Redirecting to '${targetUri}'."
+		            //redirect(uri: targetUri)
+		            /*
+		             *  call loadPreferences() to load CURR_PROJ MAP into session
+		             */
+		            userPreferenceService.loadPreferences("CURR_PROJ")
+					/*
+					 *  call userPreferenceService.updateLastLogin( params.username ) to update the last login time
+					 */
+					userPreferenceService.updateLastLogin( params.username )
+					
+		            def browserTest = request.getHeader("User-Agent").contains("IEMobile")
+					
+		            if(browserTest) {
+		            	redirect(controller:'walkThrough')
+		            } else {
+		            	redirect(controller:'projectUtil')
+		            }
 	            }
-            }
-        }
-        catch (AuthenticationException ex){
-            // Authentication failed, so display the appropriate message
-            // on the login page.
-            log.info "Authentication failure for user '${params.username}'."
-            flash.message = message(code: "login.failed")
-
-            // Keep the username and "remember me" setting so that the
-            // user doesn't have to enter them again.
-            def m = [ username: params.username ]
-            if (params.rememberMe) {
-                m['rememberMe'] = true
-            }
-
-            // Remember the target URI too.
-            if (params.targetUri) {
-                m['targetUri'] = params.targetUri
-            }
-
-            // Now redirect back to the login page.
-            redirect(action: 'login', params: m)
-        }
+	        }
+	        catch (AuthenticationException ex){
+	            // Authentication failed, so display the appropriate message
+	            // on the login page.
+	            log.info "Authentication failure for user '${params.username}'."
+	            flash.message = message(code: "login.failed")
+	
+	            // Keep the username and "remember me" setting so that the
+	            // user doesn't have to enter them again.
+	            def m = [ username: params.username ]
+	            if (params.rememberMe) {
+	                m['rememberMe'] = true
+	            }
+	
+	            // Remember the target URI too.
+	            if (params.targetUri) {
+	                m['targetUri'] = params.targetUri
+	            }
+	
+	            // Now redirect back to the login page.
+	            redirect(action: 'login', params: m)
+	        }
+    	} catch(Exception e){
+			flash.message = "Authentication failure for user '${params.username}'."
+			redirect(action: 'login', params: params)
+    	}
     }
 
     def signOut = {
