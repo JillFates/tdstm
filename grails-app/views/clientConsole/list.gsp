@@ -208,7 +208,7 @@ overflow: hidden;
 			<span id="action_${assetEntity.id}">
 				<g:if test="${assetEntity.checkVal == true}">
 					<g:checkBox name="checkChange" id="checkId_${assetEntity.id}" onclick="timedUpdate('never')"></g:checkBox>
-						<img id="task_${assetEntity.id}"src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}"	border="0px" />
+						<img id="task_${assetEntity.id}"src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px" />
 				</g:if>
 				<g:else>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</g:else>
 			</span>
@@ -216,28 +216,27 @@ overflow: hidden;
 			<img id="asset_${assetEntity.id}" src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px" />
 			<span id="icon_${assetEntity.id}">
 				<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+assetEntity.id+' and commentType = ? and isResolved = ?',['issue',0])}">
-					
-						<img id="comment_${assetEntity.id}" src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}"	border="0px" />
+						<img id="comment_${assetEntity.id}" src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}" border="0px" />
 				</g:if>
 				<g:else>
 					<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+assetEntity.id)}">
-							<img  id="comment_${assetEntity.id}" src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}"	border="0px" />
+						<img  id="comment_${assetEntity.id}" src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}" border="0px" />
 					</g:if>
 					<g:else>
 					<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
 						<a href="javascript:createNewAssetComment(${assetEntity.id});" >
-							<img  src="${createLinkTo(dir:'images/skin',file:'database_table_light.png')}"	border="0px" />
+						<img  src="${createLinkTo(dir:'images/skin',file:'database_table_light.png')}"	border="0px" />
 						</a>
 					</jsec:hasAnyRole>
 					</g:else>
 			</g:else>
 			</span>
 			</td>
-			<td  id="${assetEntity.id}_application" >${assetEntity?.application}&nbsp;</td>
-			<td id="${assetEntity.id}_appOwner" >${assetEntity?.appOwner}&nbsp;</td>
-			<td id="${assetEntity.id}_appSme" >${assetEntity?.appSme}&nbsp;</td>
-			<td id="${assetEntity.id}_assetName" >${assetEntity?.assetName}&nbsp;</td>
-			<g:each in="${assetEntity.transitions}" var="transition" >${transition}</g:each>
+			<td  id="${assetEntity.id}_application">${assetEntity?.application}&nbsp;</td>
+			<td id="${assetEntity.id}_appOwner">${assetEntity?.appOwner}&nbsp;</td>
+			<td id="${assetEntity.id}_appSme">${assetEntity?.appSme}&nbsp;</td>
+			<td id="${assetEntity.id}_assetName">${assetEntity?.assetName}&nbsp;</td>
+			<g:each in="${assetEntity.transitions}" var="transition">${transition}</g:each>
 			</tr>
 		</g:each>
 		</g:if>
@@ -435,102 +434,72 @@ Comment</a></span></div>
 </span></div>
 </jsec:hasAnyRole>
 </div></div>
-<div id="editCommentDialog" title="Edit Asset Comment"
-	style="display: none;"><g:form action="updateComment"
-	method="post" name="editCommentForm">
+<div id="editCommentDialog" title="Edit Asset Comment" style="display: none;">
+	<g:form action="updateComment" method="post" name="editCommentForm">
 	<div class="dialog" style="border: 1px solid #5F9FCF">
 	<input type="hidden" name="id" id="updateCommentId" value=""/>
 	<div>
 	<table id="updateCommentTable" style="border: 0px">
-		
-		
-			<tr>
-	<td valign="top" class="name"><label for="dateCreated">Created
-			At:</label></td>
-			<td valign="top" class="value" id="dateCreatedEditId"  />
-	</tr>
 		<tr>
-	<td valign="top" class="name"><label for="createdBy">Created
-			By:</label></td>
-			<td valign="top" class="value" id="createdByEditId" ></td>
+		<td valign="top" class="name"><label for="dateCreated">Created At:</label></td>
+		<td valign="top" class="value" id="dateCreatedEditId"  />
 	</tr>
-			<tr class="prop" >
-				<td valign="top" class="name"><label for="commentType">Comment
-				Type:</label></td>
-				<td valign="top" style="width: 20%;" >
-				<jsec:hasAnyRole in="['ADMIN','PROJ_MGR']">
-				<g:select id="commentTypeEditId"
-					name="commentType"
-					from="${AssetComment.constraints.commentType.inList}" value=""
-					 onChange="commentChange('#editResolveDiv','editCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
-				</jsec:hasAnyRole>
-				<jsec:lacksAllRoles in="['ADMIN','PROJ_MGR']">
-				
+	<tr>
+		<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
+		<td valign="top" class="value" id="createdByEditId" ></td>
+	</tr>
+	<tr class="prop" >
+		<td valign="top" class="name"><label for="commentType">Comment Type:</label></td>
+		<td valign="top" style="width: 20%;" >
+			<jsec:hasAnyRole in="['ADMIN','PROJ_MGR']">
+				<g:select id="commentTypeEditId" name="commentType" from="${AssetComment.constraints.commentType.inList}" value="" onChange="commentChange('#editResolveDiv','editCommentForm')">
+				</g:select>&nbsp;&nbsp;&nbsp;&nbsp;
+			</jsec:hasAnyRole>
+			<jsec:lacksAllRoles in="['ADMIN','PROJ_MGR']">
 				<input type="text" id="commentTypeEditId" name="commentType" readonly style="border: 0;"/>&nbsp;&nbsp;&nbsp;&nbsp;
-				</jsec:lacksAllRoles>						
-				
-				<input type="checkbox" id="mustVerifyEditId" name="mustVerify" value="0"
-					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
-					<label for="mustVerify">Must
-				Verify</label>
-				</td>
-			</tr>
-			<tr class="prop">
-				<td valign="top" class="name"><label for="category">Category:</label>
-				</td>
-				<td valign="top" class="value" id="categoryEditId" ></td>
-			</tr>
-			<tr class="prop">
-				<td valign="top" class="name"><label for="commentCode">Comment Code:</label>
-				</td>
-				<td valign="top" class="value" id="commentCodeEditId" ></td>
-			</tr>
-			<tr class="prop">
-				<td valign="top" class="name"><label for="comment">Comment:</label>
-				</td>
-				<td valign="top" class="value"><textarea cols="80" rows="5"
-					id="commentEditId" name="comment"></textarea></td>
-			</tr>
-			</table>
-			
-			</div>
-			<div id="editResolveDiv" style="display: none;">
-		<table id="updateResolveTable" style="border: 0px">
-            <tr class="prop">
-            	<td valign="top" class="name">
-                <label for="isResolved">Resolved:</label>
-                </td>
+			</jsec:lacksAllRoles>
+				<input type="checkbox" id="mustVerifyEditId" name="mustVerify" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
+				<label for="mustVerify">Must Verify</label>
+		</td>
+	</tr>
+	<tr class="prop">
+		<td valign="top" class="name"><label for="category">Category:</label></td>
+		<td valign="top" class="value" id="categoryEditId" ></td>
+	</tr>
+	<tr class="prop">
+		<td valign="top" class="name"><label for="commentCode">Comment Code:</label></td>
+		<td valign="top" class="value" id="commentCodeEditId" ></td>
+	</tr>
+	<tr class="prop">
+		<td valign="top" class="name"><label for="comment">Comment:</label></td>
+		<td valign="top" class="value"><textarea cols="80" rows="5" id="commentEditId" name="comment"></textarea></td>
+	</tr>
+</table>
+</div>
+<div id="editResolveDiv" style="display: none;">
+<table id="updateResolveTable" style="border: 0px">
+	<tr class="prop">
+            	<td valign="top" class="name"><label for="isResolved">Resolved:</label></td>
                 <td valign="top" class="value">
                 <input type="checkbox" id="isResolvedEditId" name="isResolved" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
-                </td>
-            </tr>
-          
-            <tr class="prop">
-				<td valign="top" class="name">
-                <label for="resolution">Resolution:</label>
-                </td>
-				<td valign="top" class="value">
-                <textarea cols="80" rows="5" id="resolutionEditId" name="resolution" ></textarea>
-                </td>
-            </tr> 
-               <tr>
-	<td valign="top" class="name"><label for="dateResolved">Resolved
-			At:</label></td>
-			<td valign="top" class="value" id="dateResolvedEditId" ></td>
+		</td>
 	</tr>
-		<tr>
-	<td valign="top" class="name"><label for="resolvedBy">Resolved
-			By:</label></td>
-			<td valign="top" class="value" id="resolvedByEditId"  />
+	<tr class="prop">
+		<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
+		<td valign="top" class="value"><textarea cols="80" rows="5" id="resolutionEditId" name="resolution" ></textarea></td>
 	</tr>
-            </table>
-            </div>
-		
-		
-
-	</div>
-
-	<div class="buttons"><span class="button"> <input
+	<tr>
+		<td valign="top" class="name"><label for="dateResolved">Resolved At:</label></td>
+		<td valign="top" class="value" id="dateResolvedEditId" ></td>
+	</tr>
+	<tr>
+		<td valign="top" class="name"><label for="resolvedBy">Resolved By:</label></td>
+		<td valign="top" class="value" id="resolvedByEditId" />
+	</tr>
+</table>
+</div>
+</div>
+<div class="buttons"><span class="button"> <input
 		class="save" type="button" value="Update"
 		onclick="resolveValidate('editCommentForm','updateCommentId');" />
 	</span> <span class="button"> <input class="delete" type="button"
