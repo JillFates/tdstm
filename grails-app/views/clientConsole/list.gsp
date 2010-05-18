@@ -42,9 +42,7 @@ overflow: hidden;
 		<td width="60%"></td>
 	</tr>
 	<tr>
-		<td><select id="taskList" name="taskList" style="width: 250%">
-
-		</select></td>
+		<td><select id="taskList" name="taskList" style="width: 250%"></select></td>
 	</tr>
 	<tr>
 		<td>
@@ -183,7 +181,7 @@ overflow: hidden;
 					<g:sortableColumn style="border:0px;" property="asset_name" title="Asset Name" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
 				</tr>
 				<tr style="background-color: #CCC">
-					<td style="padding-left: 0px;"><select id="hiddenSelect" style="width: 120px;visibility: hidden;"/></td>
+					<td style="padding-left: 0px;"><select id="hiddenSelect" style="width: 120px;visibility: hidden;"></select></td>
 				</tr>
 				</thead>
 			</table>
@@ -319,33 +317,22 @@ Comment</a></span></div>
 	<div id="createResolveDiv" style="display: none;">
 		<table id="createResolveTable" style="border: 0px" >
             <tr class="prop">
-            	<td valign="top" class="name">
-                <label for="isResolved">Resolved:</label>
-                </td>
-                <td valign="top" class="value">
-                <input type="checkbox" id="isResolved" name="isResolved" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
-                </td>
+            	<td valign="top" class="name"><label for="isResolved">Resolved:</label></td>
+                <td valign="top" class="value"><input type="checkbox" id="isResolved" name="isResolved" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/></td>
             </tr>
-          
             <tr class="prop">
-				<td valign="top" class="name">
-                <label for="resolution">Resolution:</label>
-                </td>
-				<td valign="top" class="value">
-                <textarea cols="80" rows="5" id="resolution" name="resolution" ></textarea>
-                </td>
+		<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
+		<td valign="top" class="value"><textarea cols="80" rows="5" id="resolution" name="resolution" ></textarea></td>
             </tr> 
-                
             </table>
             </div>
 		
 	</div>
-	<div class="buttons"><span class="button"> <input
-		class="save" type="button" value="Create"
-		onclick="resolveValidate('createCommentForm','createAssetCommentId');" /></span></div>
+	<div class="buttons"><span class="button">
+	<input class="save" type="button" value="Create" onclick="resolveValidate('createCommentForm','createAssetCommentId');" />
+	</span></div>
 </g:form></div>
-<div id="showCommentDialog" title="Show Asset Comment"
-	style="display: none;">
+<div id="showCommentDialog" title="Show Asset Comment" style="display: none;">
 <div class="dialog" style="border: 1px solid #5F9FCF"><input name="id" value="" id="commentId"
 	type="hidden"/>
 	<div>
@@ -399,29 +386,21 @@ Comment</a></span></div>
 		<div id="showResolveDiv" style="display: none;">
 		<table id="showResolveTable" style="border: 0px">
 		<tr class="prop">
-			<td valign="top" class="name"><label for="isResolved">Is
-			Resolved:</label></td>
-			<td valign="top" class="value" id="resolveTdId"><input
-				type="checkbox" id="isResolvedId" name="isResolved" value="0"
-				disabled="disabled" /></td>
+			<td valign="top" class="name"><label for="isResolved">Is Resolved:</label></td>
+			<td valign="top" class="value" id="resolveTdId"><input type="checkbox" id="isResolvedId" name="isResolved" value="0" disabled="disabled" /></td>
 		</tr>
 		<tr class="prop">
-			<td valign="top" class="name"><label for="resolution">Resolution:</label>
-			</td>
-			<td valign="top" class="value" ><textarea cols="80" rows="5"
-					id="resolutionId" readonly="readonly"></textarea> </td>
+			<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
+			<td valign="top" class="value" ><textarea cols="80" rows="5" id="resolutionId" readonly="readonly"></textarea> </td>
 		</tr>
-			<tr>
-	<td valign="top" class="name"><label for="dateResolved">Resolved
-			At:</label></td>
-			<td valign="top" class="value" id="dateResolvedId" ></td>
-	</tr>
 		<tr>
-	<td valign="top" class="name"><label for="resolvedBy">Resolved
-			By:</label></td>
+			<td valign="top" class="name"><label for="dateResolved">Resolved At:</label></td>
+			<td valign="top" class="value" id="dateResolvedId" ></td>
+		</tr>
+		<tr>
+			<td valign="top" class="name"><label for="resolvedBy">Resolved By:</label></td>
 			<td valign="top" class="value" id="resolvedById" ></td>
-	</tr>
-	
+		</tr>
 </table>
 </div>
 <jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
@@ -442,11 +421,11 @@ Comment</a></span></div>
 	<table id="updateCommentTable" style="border: 0px">
 		<tr>
 		<td valign="top" class="name"><label for="dateCreated">Created At:</label></td>
-		<td valign="top" class="value" id="dateCreatedEditId"  />
+		<td valign="top" class="value" id="dateCreatedEditId"></td>
 	</tr>
 	<tr>
 		<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
-		<td valign="top" class="value" id="createdByEditId" ></td>
+		<td valign="top" class="value" id="createdByEditId"></td>
 	</tr>
 	<tr class="prop" >
 		<td valign="top" class="name"><label for="commentType">Comment Type:</label></td>
@@ -490,11 +469,11 @@ Comment</a></span></div>
 	</tr>
 	<tr>
 		<td valign="top" class="name"><label for="dateResolved">Resolved At:</label></td>
-		<td valign="top" class="value" id="dateResolvedEditId" ></td>
+		<td valign="top" class="value" id="dateResolvedEditId"></td>
 	</tr>
 	<tr>
 		<td valign="top" class="name"><label for="resolvedBy">Resolved By:</label></td>
-		<td valign="top" class="value" id="resolvedByEditId" />
+		<td valign="top" class="value" id="resolvedByEditId"></td>
 	</tr>
 </table>
 </div>
