@@ -202,13 +202,13 @@ overflow: hidden;
 	<tbody id="assetListTbody" onclick="catchevent(event)">
 		<g:if test="${assetEntityList}">
 		<g:each in="${assetEntityList}" var="assetEntity">
-			<tr id="assetRow_${assetEntity.id}" >
+			<tr id="assetRow_${assetEntity.id}">
 			<td>
 			<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
 			<span id="action_${assetEntity.id}">
 				<g:if test="${assetEntity.checkVal == true}">
 					<g:checkBox name="checkChange" id="checkId_${assetEntity.id}" onclick="timedUpdate('never')"></g:checkBox>
-						<img id="task_${assetEntity.id}"src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px" />
+						<img id="task_${assetEntity.id}"src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" />
 				</g:if>
 				<g:else>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</g:else>
 			</span>
@@ -216,16 +216,16 @@ overflow: hidden;
 			<img id="asset_${assetEntity.id}" src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px" />
 			<span id="icon_${assetEntity.id}">
 				<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+assetEntity.id+' and commentType = ? and isResolved = ?',['issue',0])}">
-						<img id="comment_${assetEntity.id}" src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}" border="0px" />
+						<img id="comment_${assetEntity.id}" src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="0px" />
 				</g:if>
 				<g:else>
 					<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+assetEntity.id)}">
-						<img  id="comment_${assetEntity.id}" src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}" border="0px" />
+						<img id="comment_${assetEntity.id}" src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px" />
 					</g:if>
 					<g:else>
 					<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
 						<a href="javascript:createNewAssetComment(${assetEntity.id});" >
-						<img  src="${createLinkTo(dir:'images/skin',file:'database_table_light.png')}"	border="0px" />
+						<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" />
 						</a>
 					</jsec:hasAnyRole>
 					</g:else>
@@ -425,11 +425,11 @@ Comment</a></span></div>
 </table>
 </div>
 <jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
-<div class="buttons"><span class="button"> <input
-	class="edit" type="button" value="Edit"
-	onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
-</span> <span class="button"> <input class="delete" type="button"
-	value="Delete"
+<div class="buttons">
+<span class="button">
+<input class="edit" type="button" value="Edit" onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
+</span>
+<span class="button"> <input class="delete" type="button" value="Delete"
 	onclick="${remoteFunction(controller:'assetEntity', action:'deleteComment', params:'\'id=\' + $(\'#commentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'action\')')}" />
 </span></div>
 </jsec:hasAnyRole>
@@ -519,38 +519,29 @@ Comment</a></span></div>
 	<input type="hidden" name="projectId" value="${projectId}" />
 	<input type="hidden" name="moveBundle" value="${moveBundleInstance?.id}" />
 	<input type="hidden" name="clientList" value="clientList" />
-	 <span class="button"><input
-		type="button" class="edit" value="Edit"
-		onClick="return editAssetDialog()" /></span> <span class="button"><g:actionSubmit 
-		class="delete" onclick="return confirm('Delete Asset, are you sure?');"
-		value="Delete" /></span>
-		<span class="button"><g:actionSubmit action="remove"
-		class="delete"  onclick="return confirm('Remove Asset from project, are you sure?');"
-		value="Remove From Project" /></span>
-		</div>
-		</jsec:hasAnyRole>
+	<span class="button"><input type="button" class="edit" value="Edit" onClick="return editAssetDialog()" /></span>
+	<span class="button"><g:actionSubmit class="delete" onclick="return confirm('Delete Asset, are you sure?');" value="Delete" /></span>
+	<span class="button"><g:actionSubmit action="remove" class="delete"  onclick="return confirm('Remove Asset from project, are you sure?');" value="Remove From Project" /></span>
+	</div>
+	</jsec:hasAnyRole>
 </g:form></div>
 
 <div id="editDialog" title="Edit Asset Entity" style="display: none;">
 <g:form method="post" name="editForm" controller="assetEntity">
 	<input type="hidden" name="id" value="" />
 	<input type="hidden" name="projectId" value="${projectId}" />
-	<input type="hidden" name="moveBundle" value="${moveBundleInstance?.id}" />	
+	<input type="hidden" name="moveBundle" value="${moveBundleInstance?.id}" />
 	<input type="hidden" name="clientList" value="clientList" />
 	<div class="dialog" id="editDiv">
-	
+
 	</div>
 	<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
 	<div class="buttons"><span class="button">
 	<input type="button" class="save" value="Update Asset Entity" onClick="${remoteFunction(controller:'assetEntity', action:'getAssetAttributes', params:'\'assetId=\' + document.editForm.id.value ', onComplete:'callUpdateDialog(e)')}" />
-	</span> <span class="button"><input type="button"  
-		class="delete" onclick="return editDialogDeleteRemove('delete')"
-		value="Delete" /></span>
-		<span class="button"><input type="button"
-		class="delete" onclick="return editDialogDeleteRemove('remove');"
-		value="Remove From Project" /></span>
+	</span> <span class="button"><input type="button" class="delete" onclick="return editDialogDeleteRemove('delete')" value="Delete" /></span>
+		<span class="button"><input type="button" class="delete" onclick="return editDialogDeleteRemove('remove');" value="Remove From Project" /></span>
 		</div>
-		</jsec:hasAnyRole>
+	</jsec:hasAnyRole>
 </g:form></div>
 <div class="contextMenu" id="myMenu"/>
 <div class="contextMenu" id="transitionMenu" style="visibility: hidden;">
@@ -876,7 +867,7 @@ var fieldId
 							} else {
 								link.onclick = function(){$('#createAssetCommentId').val(this.id);new Ajax.Request('../assetEntity/listComments?id='+this.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'action');}})} //;return false
 							}
-							link.innerHTML = "<img src=\"../images/skin/"+assetComment.type+"\" border=\"0px\" />";
+							link.innerHTML = "<img src=\"../i/"+assetComment.type+"\" border=\"0px\" />";
 							commentIcon.html(link);
 						}
 					}
