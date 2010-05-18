@@ -156,8 +156,8 @@
 					</script> 
 						Status vs. Revised Plan
 				</div>
-				<div id="refresh" style="float: right;">Refresh: 
-					<select name="refreshTime" id="refreshTimeId" class="selecttext" onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'timedRefresh()') }">
+				<div id="update" style="float: right;">Update:
+					<select name="updateTime" id="UpdateTimeId" class="selecttext" onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'timedUpdate()') }">
 						<option selected value="60000">1 Min</option>
 	            		<option value="300000">5 Min</option>
 	                	<option value="600000">10 Min</option>
@@ -362,21 +362,21 @@
 	moveDataSteps()
 	/* set time to load the move news and move bundle data*/
 	var handler = 0
-	function timedRefresh() {
-		var refreshTime = $("#refreshTimeId").val();
-		handler = setInterval("getMoveEventNewsDetails($('#moveEvent').val())",refreshTime);
+	function timedUpdate() {
+		var updateTime = $("#updateTimeId").val();
+		handler = setInterval("getMoveEventNewsDetails($('#moveEvent').val())",updateTime);
 	}
 	/* script to assign the move evnt value*/
 	var moveEvent = "${moveEvent?.id}"
 	if(moveEvent){
 		$("#moveEvent").val(moveEvent)
 	}
-	timedRefresh();
+	timedUpdate();
 	/* Function to load the data for a particular MoveEvent */
-	var doRefresh = true
+	var doUpdate = true
 	function getMoveEventNewsDetails( moveEvent ){
-		refreshDash( $("#defaultBundleId").val() );
-		if(dialReload && doRefresh){
+		updateDash( $("#defaultBundleId").val() );
+		if(dialReload && doUpdate){
 			timer = setTimeout( "getDialsData($('#defaultBundleId').val() )", 5000 );
 		}
 		if(moveEvent){
@@ -388,9 +388,9 @@
 		        dataType: 'json',
 		        success:updateMoveEventNews,
                 error:function (xhr, ajaxOptions, thrownError){
-            		if( doRefresh && errorCode ==  xhr.status ){
+            		if( doUpdate && errorCode ==  xhr.status ){
 	                    clearInterval(handler);
-	                    $("#refresh").css("color","red")
+	                    $("#update").css("color","red")
 	                    if( xhr.status == "403"){
 	                    	alert("403 Forbidden occurred, user don't have permission to load the current project data.");
 	                    } else {
@@ -499,8 +499,8 @@
 			}
 	    }catch(e){
 	    	clearInterval(handler);
-      		doRefresh = false;
-      		$("#refresh").css("color","red")
+      		doUpdate = false;
+      		$("#update").css("color","red")
 			alert("Sorry, there is a problem receiving updates to this page. Try reloading to resolve.");
 		}
 	    
@@ -540,20 +540,20 @@
 		return sString;
 	}
 	
-	/* display bundle tab and call refreshDash method to load the appropriate data*/
+	/* display bundle tab and call updateDash method to load the appropriate data*/
 	function displayBundleTab(Id) {
 		 $(".mbhactive").attr("class","mbhinactive");
 		 $("#spnBundle"+Id).attr("class","mbhactive");
 		 $(".show_bundle_step").attr("class","hide_bundle_step");
 		 $("#bundlediv"+Id).attr("class","show_bundle_step");
 		 $("#defaultBundleId").val(Id)
-		 refreshDash( Id )
+		 updateDash( Id )
 	 }
 	/*----------------------------------------
 	 * 
 	 *--------------------------------------*/
 	 
-	 function refreshDash( bundleId ) {
+	 function updateDash( bundleId ) {
 		 var moveEvent = $("#moveEvent").val()
 		 jQuery.ajax({
 		        type:"GET",
@@ -565,8 +565,8 @@
                 error:function (xhr, ajaxOptions, thrownError){
 	          		if(errorCode ==  xhr.status ){
 	          			clearInterval(handler);
-		          		doRefresh = false;
-		          		$("#refresh").css("color","red")
+		          		doUpdate = false;
+		          		$("#update").css("color","red")
 		            	if( xhr.status == "403"){
 		             		alert("403 Forbidden occurred, user don't have permission to load the current project data.");
 						} else {
@@ -574,7 +574,7 @@
 		             	}    
 	          		} else {
 	          			errorCode = xhr.status;
-	          			doRefresh = false;
+	          			doUpdate = false;
 	          		}
 		 		}
 			});
@@ -646,15 +646,15 @@
 			}
 		} catch(ex){
 			clearInterval(handler);
-      		doRefresh = false;
-      		$("#refresh").css("color","red")
+      		doUpdate = false;
+      		$("#update").css("color","red")
 			alert("Sorry, there is a problem receiving updates to this page. Try reloading to resolve.");
 		}
 		
 	}
 	function getDialsData( bundleId ) {
 		 var moveEvent = $("#moveEvent").val()
-		 if(doRefresh){
+		 if(doUpdate){
 			 jQuery.ajax({
 			        type:"GET",
 			        async : true,
@@ -663,9 +663,9 @@
 			        dataType: 'json',
 			        success:updateDials,
 	                error:function (xhr, ajaxOptions, thrownError){
-				 		if(doRefresh && errorCode ==  xhr.status ){
+				 		if(doUpdate && errorCode ==  xhr.status ){
 			            	clearInterval(handler);
-			            	$("#refresh").css("color","red");
+			            	$("#update").css("color","red");
 			            	if( xhr.status == "403"){
 			             		alert("403 Forbidden occurred, user don't have permission to load the current project data.");
 			             	} else {

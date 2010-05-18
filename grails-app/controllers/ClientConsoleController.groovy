@@ -220,11 +220,11 @@ class ClientConsoleController {
 				assetEntityList << [id: assetId, application:it.application,appOwner:it.appOwner,appSme:it.appSme,assetName:it.assetName,transitions:htmlTd,checkVal:check]
 			}
 			userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")
-			def timeToRefresh = getSession().getAttribute("CLIENT_CONSOLE_REFRESH")
+			def timeToUpdate = getSession().getAttribute("CLIENT_CONSOLE_REFRESH")
 			return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,
 				appOwnerList:appOwnerList,applicationList:applicationList,appSmeList:appSmeList,projectId:projectId, lastPoolTime : lastPoolTime,
 				processTransitionList:processTransitionList,projectId:projectId,appOwnerValue:appOwnerValue,appValue:appValue,
-				appSmeValue:appSmeValue,timeToRefresh:timeToRefresh ? timeToRefresh.CLIENT_CONSOLE_REFRESH : "never", 
+				appSmeValue:appSmeValue,timeToUpdate:timeToUpdate ? timeToUpdate.CLIENT_CONSOLE_REFRESH : "never", 
 				headerCount:headerCount,browserTest:browserTest, myForm : params.myForm, htmlTdId:htmlTdId, role : role,
 				moveEventInstance:moveEventInstance, moveEventsList:moveEventsList ]
     	} else {
@@ -283,18 +283,18 @@ class ClientConsoleController {
 	/*---------------------------------------------------------
 	 * Will set user preference for CLIENT_CONSOLE_REFRESH time
 	 * @author : Lokanath Reddy
-	 * @param  : refresh time 
-	 * @return : refresh time 
+	 * @param  : update time 
+	 * @return : update time 
 	 *---------------------------------------------------------*/
 	def setTimePreference = {
         def timer = params.timer
-        def refreshTime =[]
+        def updateTime =[]
         if(timer){
             userPreferenceService.setPreference( "CLIENT_CONSOLE_REFRESH", "${timer}" )
         }
-        def timeToRefresh = getSession().getAttribute("CLIENT_CONSOLE_REFRESH")
-        refreshTime <<[refreshTime:timeToRefresh]
-        render refreshTime as JSON
+        def timeToUpdate = getSession().getAttribute("CLIENT_CONSOLE_REFRESH")
+        updateTime <<[updateTime:timeToUpdate]
+        render updateTime as JSON
 	}
 	/*---------------------------------------------------------
 	 * To get unique list of task for list of assets through ajax

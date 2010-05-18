@@ -90,17 +90,17 @@ overflow: hidden;
 			</td>
 			<td><h1 align="center">PMO Asset Tracking</h1></td>
 			<td style="text-align: right;">
-			<input type="hidden" name="last_refresh" value="${new Date()}"/>
+			<input type="hidden" name="last_update" value="${new Date()}"/>
 			<input type="hidden" name="myForm" value="listForm"/>
-			<input type="button" id="refreshId"
-				value="Refresh" onclick="pageReload();"/> <select
+			<input type="button" id="updateId"
+				value="Update" onclick="pageReload();"/> <select
 				id="selectTimedId"
-				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(e)') }">
+				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setUpdateTime(e)') }">
 				<option value="30000">30 sec</option>
 				<option value="60000">1 min</option>
 				<option value="120000">2 min</option>
 				<option value="300000">5 min</option>
-				<option value="never">no refresh</option>
+				<option value="never">no update</option>
 			</select></td>
 		</tr>
 	</table>
@@ -207,7 +207,7 @@ overflow: hidden;
 			<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
 			<span id="action_${assetEntity.id}">
 				<g:if test="${assetEntity.checkVal == true}">
-					<g:checkBox name="checkChange" id="checkId_${assetEntity.id}" onclick="timedRefresh('never')"></g:checkBox>
+					<g:checkBox name="checkChange" id="checkId_${assetEntity.id}" onclick="timedUpdate('never')"></g:checkBox>
 						<img id="task_${assetEntity.id}"src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}"	border="0px" />
 				</g:if>
 				<g:else>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</g:else>
@@ -599,7 +599,7 @@ $('body').click(function(){
    $(".cell-selected").attr('class',$("#cssClassId").val());
 });
 initialize();
-timedRefresh($("#selectTimedId").val())
+timedUpdate($("#selectTimedId").val())
 if('${browserTest}' == 'true'){
 	$("div.tableContainerIE").css("height",vpWidth("height") - 142)
 	$("div.tableContainerIE").css("width",vpWidth("width"));
@@ -616,7 +616,7 @@ function initialize(){
 	$("#appSmeId").val("${appSmeValue}");
 	$("#appOwnerId").val("${appOwnerValue}");
 	$("#applicationId").val("${appValue}");
-	var time = '${timeToRefresh}';
+	var time = '${timeToUpdate}';
 		if(time != "" ){
 			$("#selectTimedId").val( time ) ;
 		} else if(time == "" ){
@@ -727,7 +727,7 @@ var fieldId
 		}
 	}
 	function editAssetDialog() {
-		timedRefresh('never')
+		timedUpdate('never')
 		$("#showDialog").dialog("close")
 		$("#editDialog").dialog('option', 'width', 600)
 		$("#editDialog").dialog('option', 'position', ['center','top']);
@@ -753,7 +753,7 @@ var fieldId
 	}
 
 	function showChangeStatusDialog(e){
-		timedRefresh('never')
+		timedUpdate('never')
 		var task = eval('(' + e.responseText + ')');
 		var taskLen = task[0].item.length;
 		var options = '';
@@ -786,7 +786,7 @@ var fieldId
 		if(doCheck()){
 			document.changeStatusForm.action = "changeStatus";
 			document.changeStatusForm.submit();
-			timedRefresh($("#selectTimedId").val())
+			timedUpdate($("#selectTimedId").val())
 		}else{
 			return false;
 		}
@@ -803,15 +803,15 @@ var fieldId
 		}
 	}
 	
-	function setRefreshTime(e) {
-		var timeRefresh = eval("(" + e.responseText + ")")
-		if(timeRefresh){
-			timedRefresh(timeRefresh[0].refreshTime.CLIENT_CONSOLE_REFRESH)
+	function setUpdateTime(e) {
+		var timeUpdate = eval("(" + e.responseText + ")")
+		if(timeUpdate){
+			timedUpdate(timeUpdate[0].updateTime.CLIENT_CONSOLE_REFRESH)
 		}
 	}
 	
 	var timer
-	function timedRefresh(timeoutPeriod) {
+	function timedUpdate(timeoutPeriod) {
 		if(timeoutPeriod != 'never'){
 			clearTimeout(timer)
 			timer = setTimeout("doAjaxCall()",timeoutPeriod);
@@ -841,15 +841,15 @@ var fieldId
 		var appSme = $("#appSmeId").val();
 		var lastPoolTime = $("#lastPoolTimeId").val();
 		${remoteFunction(action:'getTransitions', params:'\'moveBundle=\' + moveBundle +\'&moveEvent=\'+moveEvent +\'&application=\'+application +\'&appOwner=\'+appOwner+\'&appSme=\'+appSme +\'&lastPoolTime=\'+lastPoolTime', onFailure:"handleErrors()", onComplete:'updateTransitions(e);' )}
-		timedRefresh($("#selectTimedId").val())
+		timedUpdate($("#selectTimedId").val())
 	}
-	var doRefresh = true
+	var doUpdate = true
 	function handleErrors(){
-		if( !doRefresh ){
+		if( !doUpdate ){
 			clearTimeout(timer);
 		}
-		doRefresh = false
-		$("#refreshId").css("color","red");
+		doUpdate = false
+		$("#updateId").css("color","red");
 		alert("Sorry, there is a problem receiving updates to this page. Try reloading to resolve.");
 	}
 	function updateTransitions(e){
@@ -915,18 +915,18 @@ var fieldId
 				$("#lastPoolTimeId").val(assetEntityCommentList[0].lastPoolTime)
 			} else {
 				location.reload(false);
-			//timedRefresh('never')
+			//timedUpdate('never')
 			}
 		} catch(ex){
 		//location.reload(false);
-			if( doRefresh ){
+			if( doUpdate ){
 				handleErrors();
 			}
 		}
 	}
 
 	function changeState(){
-		timedRefresh('never')
+		timedUpdate('never')
 		var assetArr = new Array();
 		var totalAsset = ${assetEntityList.id};
 		var j=0;
@@ -948,7 +948,7 @@ var fieldId
 	
 	var isFirst = true;
 	function selectAll(){
-		timedRefresh('never')
+		timedUpdate('never')
 		var totalCheck = document.getElementsByName('checkChange');
 		if(isFirst){
 			for(i=0;i<totalCheck.length;i++){

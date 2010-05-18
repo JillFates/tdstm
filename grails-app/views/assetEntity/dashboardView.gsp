@@ -40,7 +40,7 @@ td .odd {
 <script type="text/javascript">
 
 	function editAssetDialog() {
-		timedRefresh('never')
+		timedUpdate('never')
 		$("#showDialog").dialog("close")
 		$("#editDialog").dialog('option', 'width', 600)
 		$("#editDialog").dialog('option', 'position', ['center','top']);
@@ -67,7 +67,7 @@ td .odd {
 	} 		
 
 	function showChangeStatusDialog(e){
-		timedRefresh('never')
+		timedUpdate('never')
 		var task = eval('(' + e.responseText + ')');
 		var taskLen = task[0].item.length;
 		var options = '';
@@ -97,7 +97,7 @@ td .odd {
 		if(doCheck()){
 			document.changeStatusForm.action = "changeStatus";
 			document.changeStatusForm.submit();
-			timedRefresh($("#selectTimedId").val())
+			timedUpdate($("#selectTimedId").val())
 		}else{
 			return false;
 		}
@@ -120,7 +120,7 @@ td .odd {
 		   	$("#image_"+rowVal).css('visibility','hidden');
 	   	}
 	   	$('#image_'+assetId).css('visibility','visible');
-	   	timedRefresh('never')
+	   	timedUpdate('never')
 	   	${remoteFunction(action:'assetDetails', params:'\'assetId=\'+ assetId ' , onComplete:'getAssetDetail(e)') }
 	}
    	function getAssetDetail(e){
@@ -166,10 +166,10 @@ td .odd {
 		var rowVal = rows[i].getAttribute("value")
 		   	$("#image_"+rowVal).css('visibility','hidden');
 	   	}
-	   	var seconds = new Date().getTime() - $("#lastRefreshId").val();
-	   	var refreshTime = $('#selectTimedId').val() - seconds
-	   	if( !isNaN(refreshTime) ){
-	   		timedRefresh( refreshTime )
+	   	var seconds = new Date().getTime() - $("#lastUpdateId").val();
+	   	var updateTime = $('#selectTimedId').val() - seconds
+	   	if( !isNaN(updateTime) ){
+	   		timedUpdate( updateTime )
 	   	}
    	}
    	function displayLess(){
@@ -235,7 +235,7 @@ td .odd {
    	function bundleChange(){
 	   var bundleId = ${moveBundleInstance.id}; 
 	   $("#moveBundleId").val( bundleId );
-	   var time = '${timeToRefresh}';
+	   var time = '${timeToUpdate}';
 	   if(time != '' ){
 	   		$("#selectTimedId").val( time );
 	   } 
@@ -268,7 +268,7 @@ td .odd {
 	   	}
    	}
    	var timer
-   	function timedRefresh(timeoutPeriod) {
+   	function timedUpdate(timeoutPeriod) {
    		if(timeoutPeriod != 'never'){
 			clearTimeout(timer);
 			timer = setTimeout("pageReload()",timeoutPeriod);
@@ -284,10 +284,10 @@ td .odd {
 			window.location = document.URL;
 		}
 	}
-	function setRefreshTime(e) {
-		var timeRefresh = eval("(" + e.responseText + ")")
-		if(timeRefresh){
-			timedRefresh(timeRefresh[0].refreshTime.SUPER_CONSOLE_REFRESH)
+	function setUpdateTime(e) {
+		var timeUpdate = eval("(" + e.responseText + ")")
+		if(timeUpdate){
+			timedUpdate(timeUpdate[0].updateTime.SUPER_CONSOLE_REFRESH)
 		}
 	}
 	function updateAsset(e){
@@ -319,12 +319,12 @@ td .odd {
 			$("#commentId").val("")
 			$('#statusCol_'+asset[0].assetEntity.id).click();
 		}
-		timedRefresh($('#selectTimedId').val());
+		timedUpdate($('#selectTimedId').val());
 	}
 	
 	var isFirst = true;
 	function selectAll(){
-		timedRefresh('never')
+		timedUpdate('never')
 		var totalCheck = document.getElementsByName('checkChange');
 		if(isFirst){
 		for(i=0;i<totalCheck.length;i++){
@@ -339,7 +339,7 @@ td .odd {
 		}
 	}
 	function changeState(){
-		timedRefresh('never')
+		timedUpdate('never')
 		var assetArr = new Array();
 		var totalAsset = ${assetsList?.asset.id};
 		var j=0;
@@ -385,7 +385,7 @@ td .odd {
 		document.createCommentForm.reset();
 	}
 	function showfilterDialog(){
-		timedRefresh('never')
+		timedUpdate('never')
 		$('#createCommentDialog').dialog('close');
 		$('#commentsListDialog').dialog('close');
 		$('#editCommentDialog').dialog('close');
@@ -503,10 +503,10 @@ td .odd {
 			<h1 align="center">Supervisor Console</h1>
 			</td>
 			<td style="text-align: right; vertical-align: bottom;width:30%">
-			<input type="hidden" id="lastRefreshId" name="lastRefresh" value="${new Date().getTime()}"/>
-			<input type="button" value="Refresh" onclick="pageReload();"/>
+			<input type="hidden" id="lastUpdateId" name="lastUpdate" value="${new Date().getTime()}"/>
+			<input type="button" value="Update" onclick="pageReload();"/>
 			<select id="selectTimedId"
-				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(e)') }">
+				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setUpdateTime(e)') }">
 				<option value="60000">1 min</option>
 				<option value="120000">2 min</option>
 				<option value="180000">3 min</option>
@@ -787,7 +787,7 @@ td .odd {
 										<span id="spanId_${assetsList?.asset.id}">
 											<g:checkBox name="checkChange"
 												id="checkId_${assetsList?.asset.id}"
-												onclick="timedRefresh('never')"></g:checkBox>
+												onclick="timedUpdate('never')"></g:checkBox>
 										</span>
 
 										</g:if>
@@ -1318,7 +1318,7 @@ Comment</a></span></div>
 <script type="text/javascript">
 bundleChange();
 $("#midDiv").css('width',vpWidth() - 340)
-timedRefresh($("#selectTimedId").val())
+timedUpdate($("#selectTimedId").val())
 </script>
 </div>
 </body>
