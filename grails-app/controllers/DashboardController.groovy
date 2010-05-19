@@ -30,7 +30,7 @@ class DashboardController {
             def defaultEvent = getSession().getAttribute("MOVE_EVENT")
             if(defaultEvent.MOVE_EVENT){
             	moveEvent = MoveEvent.findById(defaultEvent.MOVE_EVENT)
-            	if( moveEvent?.project?.id != Integer.parseInt(projectId) ){
+            	if( moveEvent?.project?.id != project?.id ){
             		moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
             	}
             } else {
