@@ -156,8 +156,8 @@
 					</script> 
 						Status vs. Revised Plan
 				</div>
-				<div id="update" style="float: right;">Update:
-					<select name="updateTime" id="UpdateTimeId" class="selecttext" onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'timedUpdate()') }">
+				<div id="update" style="float: right;">Update: 
+					<select name="updateTime" id="updateTimeId" class="selecttext" onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'timedUpdate()') }">
 						<option selected value="60000">1 Min</option>
 	            		<option value="300000">5 Min</option>
 	                	<option value="600000">10 Min</option>
@@ -217,7 +217,7 @@
 		<div id="bdlsection">
 			<div id="bdltabs">
 				<g:each in="${moveBundleList}" status="i" var="moveBundle">
-					<span id="spnBundle${moveBundle.id}" class="${ i == 0 ? 'mbhactive' : 'mbhinactive' }" onClick="displayBundleTab(${moveBundle.id})">
+					<span id="spnBundle${moveBundle.id}" class="${ i == 0 ? 'mbhactive' : 'mbhinactive' }" onClick="updateDash(${moveBundle.id})">
 					${moveBundle.name}</span>&nbsp;&nbsp;
 				</g:each>
 			</div>
@@ -547,7 +547,6 @@
 		 $(".show_bundle_step").attr("class","hide_bundle_step");
 		 $("#bundlediv"+Id).attr("class","show_bundle_step");
 		 $("#defaultBundleId").val(Id)
-		 updateDash( Id )
 	 }
 	/*----------------------------------------
 	 * 
@@ -555,6 +554,7 @@
 	 
 	 function updateDash( bundleId ) {
 		 var moveEvent = $("#moveEvent").val()
+		 displayBundleTab( bundleId )
 		 jQuery.ajax({
 		        type:"GET",
 		        async : true,
@@ -638,7 +638,7 @@
 				if(percentage != "100%" && percentage != "0%"){
 					<jsec:hasAnyRole in="['ADMIN']">
 					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).show();
-					post_init( "chart_"+moveBundleId+"_"+steps[i].tid, steps[i].dialInd )
+					setTimeout('post_init( "chart_'+moveBundleId+'_'+steps[i].tid+'", '+steps[i].dialInd+' )',1000)
 					</jsec:hasAnyRole>
 				} else {
 					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).hide();
