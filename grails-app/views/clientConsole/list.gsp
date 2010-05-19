@@ -91,14 +91,15 @@ overflow: hidden;
 			<input type="hidden" name="last_update" value="${new Date()}"/>
 			<input type="hidden" name="myForm" value="listForm"/>
 			<input type="button" id="updateId"
-				value="Update" onclick="pageReload();"/> <select
+				value="Update:" onclick="pageReload();"/> <select
 				id="selectTimedId"
 				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setUpdateTime(e)') }">
-				<option value="30000">30 sec</option>
-				<option value="60000">1 min</option>
-				<option value="120000">2 min</option>
-				<option value="300000">5 min</option>
-				<option value="never">no update</option>
+				<option value="30000">30s</option>
+				<option value="60000">1m</option>
+				<option value="120000">2m</option>
+				<option value="300000">5m</option>
+				<option value="600000">10m</option>
+				<option value="never">Never</option>
 			</select></td>
 		</tr>
 	</table>

@@ -156,12 +156,15 @@
 					</script> 
 						Status vs. Revised Plan
 				</div>
-				<div id="update" style="float: right;">Update: 
+				<div style="float: right;">
+					<input type="button" value="Update:" id="update" onclick="pageReload();"/> 
 					<select name="updateTime" id="updateTimeId" class="selecttext" onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'timedUpdate()') }">
-						<option selected value="60000">1 Min</option>
-	            		<option value="300000">5 Min</option>
-	                	<option value="600000">10 Min</option>
-	                	<option value="1800000">30 Min</option>
+						<option value="30000">30s</option>
+						<option value="60000">1m</option>
+						<option value="120000">2m</option>
+						<option value="300000">5m</option>
+						<option value="600000">10m</option>
+						<option value="never" selected="selected">Never</option>
 					</select><br/><a href="#page_down" class="nav_button">
 					<img src="${createLinkTo(dir:'images',file:'down-arrow.png')}" border="0" alt="Page Down"></a>
 				</div>
@@ -287,6 +290,7 @@
 	} else {
 		$("#timezone").find("option[text='EDT']").attr("selected","selected");
 	}
+	$("#updateTimeId").val("${timeToUpdate}")
 	var sURL = unescape(window.location);
 	var timer
 	var errorCode = '200'
@@ -364,7 +368,11 @@
 	var handler = 0
 	function timedUpdate() {
 		var updateTime = $("#updateTimeId").val();
-		handler = setInterval("getMoveEventNewsDetails($('#moveEvent').val())",updateTime);
+		if(updateTime != 'never'){
+			handler = setInterval("getMoveEventNewsDetails($('#moveEvent').val())",updateTime);
+		} else {
+			clearInterval(handler)
+		}
 	}
 	/* script to assign the move evnt value*/
 	var moveEvent = "${moveEvent?.id}"
@@ -498,10 +506,12 @@
 			    return getTimeFormate( convertedDate )
 			}
 	    }catch(e){
-	    	clearInterval(handler);
-      		doUpdate = false;
-      		$("#update").css("color","red")
-			alert("Sorry, there is a problem receiving updates to this page. Try reloading to resolve.");
+		    if(doUpdate){
+		    	clearInterval(handler);
+	      		doUpdate = false;
+	      		$("#update").css("color","red")
+				alert("Sorry, there is a problem receiving updates to this page. Try reloading to resolve.");
+		    }
 		}
 	    
 	}
@@ -645,10 +655,12 @@
 				}
 			}
 		} catch(ex){
-			clearInterval(handler);
-      		doUpdate = false;
-      		$("#update").css("color","red")
-			alert("Sorry, there is a problem receiving updates to this page. Try reloading to resolve.");
+			if(doUpdate){
+				clearInterval(handler);
+	      		doUpdate = false;
+	      		$("#update").css("color","red")
+				alert("Sorry, there is a problem receiving updates to this page. Try reloading to resolve.");
+			}
 		}
 		
 	}
@@ -716,10 +728,19 @@
 	}
 	/* function to render the dials */
 	function post_init( divId, dialInd ){
-	//var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId2b", "100", "75", "0", "0");
-		updateChartXML( divId, stepDialData( dialInd ) ); 
-		//myChart.setDataXML( xmlData );
-		//myChart.render(divId);
+		try{
+			//var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId2b", "100", "75", "0", "0");
+			updateChartXML( divId, stepDialData( dialInd ) ); 
+			//myChart.setDataXML( xmlData );
+			//myChart.render(divId);
+		} catch(e){
+			if(doUpdate){
+				clearInterval(handler);
+	      		doUpdate = false;
+	      		$("#update").css("color","red")
+				alert("Sorry, there is a problem receiving updates to this page. Try reloading to resolve.");
+			}
+		}
 	}
 	function updateSummaryGauge( divId, dialInd ){
 	//var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId", "280", "136", "0", "0");
@@ -732,6 +753,9 @@
 		updateChartXML( divId, revisedDialData( dialInd ) ); 
 	    //myChart.setDataXML( xmlData );
 	   	//myChart.render(divId);
+	}
+	function pageReload(){
+		window.location = document.URL;
 	}
 	</script>
 </body>

@@ -504,14 +504,14 @@ td .odd {
 			</td>
 			<td style="text-align: right; vertical-align: bottom;width:30%">
 			<input type="hidden" id="lastUpdateId" name="lastUpdate" value="${new Date().getTime()}"/>
-			<input type="button" value="Update" onclick="pageReload();"/>
+			<input type="button" value="Update:" onclick="pageReload();"/>
 			<select id="selectTimedId"
 				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setUpdateTime(e)') }">
-				<option value="60000">1 min</option>
-				<option value="120000">2 min</option>
-				<option value="180000">3 min</option>
-				<option value="240000">4 min</option>
-				<option value="300000">5 min</option>
+				<option value="30000">30s</option>
+				<option value="60000">1m</option>
+				<option value="120000">2m</option>
+				<option value="300000">5m</option>
+				<option value="600000">10m</option>
 				<option value="never">Never</option>
 			</select></td>
 		</tr>

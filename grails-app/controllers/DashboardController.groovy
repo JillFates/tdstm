@@ -37,13 +37,13 @@ class DashboardController {
             	moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
             }
         }
-        
+        def timeToUpdate = getSession().getAttribute("DASHBOARD_REFRESH")
         if( moveEvent ){
         	userPreferenceService.setPreference("MOVE_EVENT","${moveEvent.id}")
 			moveBundleList = MoveBundle.findAll(" FROM MoveBundle mb where moveEvent = ${moveEvent.id} ORDER BY mb.startTime ")				
 		}
-		return [ moveEventsList : moveEventsList, moveEvent : moveEvent, project : project, 
-				projectLogo : projectLogo, moveBundleList : moveBundleList ]
+		return [ moveEventsList : moveEventsList, moveEvent : moveEvent, project : project, projectLogo : projectLogo, 
+				 moveBundleList : moveBundleList, timeToUpdate : timeToUpdate ? timeToUpdate.DASHBOARD_REFRESH : "never" ]
     }
 	
 	/*---------------------------------------------------------

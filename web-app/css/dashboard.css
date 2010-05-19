@@ -172,7 +172,7 @@ body{
 	}
 
 .selecttext{
-	font-size:10px;
+	font-size:11px;
 	}
 
 .toprightcontent{
@@ -662,4 +662,11 @@ list-style-type:none;
 	padding-left: 5px;
 	padding-right: 5px;
 	font-weight: bold;
+}
+input, select, textarea {
+	background-color:#FCFCFC;
+	border:1px solid #CCCCCC;
+	font:11px verdana,arial,helvetica,sans-serif;
+	margin:2px 0;
+	padding:2px 4px;
 }

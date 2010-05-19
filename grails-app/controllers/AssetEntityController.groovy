@@ -1094,7 +1094,7 @@ class AssetEntityController {
 	        												"(a.asset_entity_id = t.asset_entity_id and t.voided = 0)  where "+
 	        												"a.move_bundle_id = ${moveBundleInstance.id} and t.state_to = $holdId")
 	        	userPreferenceService.loadPreferences("SUPER_CONSOLE_REFRESH")
-	        def timeToRefresh = getSession().getAttribute("SUPER_CONSOLE_REFRESH")
+	        def timeToUpdate = getSession().getAttribute("SUPER_CONSOLE_REFRESH")
 	        /*Get data for filter dropdowns*/
 	        def applicationList=AssetEntity.executeQuery("select distinct ae.application , count(ae.id) from AssetEntity "+
 															"ae where  ae.moveBundle=${moveBundleInstance.id} "+
@@ -1116,7 +1116,7 @@ class AssetEntityController {
 	                assetsList:assetsList, moveBundleInstance:moveBundleInstance, 
 	                supportTeam:supportTeam, totalUnracked:totalUnracked, totalSourceAvail:totalSourceAvail, 
 	                totalTargetAvail:totalTargetAvail, totalReracked:totalReracked, totalAsset:totalAssetsSize, 
-	                timeToRefresh : timeToRefresh ? timeToRefresh.SUPER_CONSOLE_REFRESH : "never", showAll : showAll,
+	                timeToUpdate : timeToUpdate ? timeToUpdate.SUPER_CONSOLE_REFRESH : "never", showAll : showAll,
 	                applicationList : applicationList, appOwnerList : appOwnerList, appSmeList : appSmeList, 
 	                transitionStates : transitionStates, params:params, totalAssetsOnHold:totalAssetsOnHold,
 	                totalSourcePending: totalSourcePending, totalTargetPending: totalTargetPending, role: role ]
@@ -1378,20 +1378,20 @@ class AssetEntityController {
         return stateIdList
     }
     /*---------------------------------------------
-     * Set browser refresh time interval as user preference
+     * Set browser Update time interval as user preference
      * @author : Lokanath Reddy
      * @param : time interval
      * @return : time interval
      *-------------------------------------------*/
     def setTimePreference = {
     	def timer = params.timer
-    	def refreshTime =[]
+    	def updateTime =[]
     	if(timer){
     		userPreferenceService.setPreference( "SUPER_CONSOLE_REFRESH", "${timer}" )
     	}
-    	def timeToRefresh = getSession().getAttribute("SUPER_CONSOLE_REFRESH")
-    	refreshTime <<[refreshTime:timeToRefresh] 
-    	render refreshTime as JSON
+    	def timeToUpdate = getSession().getAttribute("SUPER_CONSOLE_REFRESH")
+    	updateTime <<[updateTime:timeToUpdate] 
+    	render updateTime as JSON
     }
     /*-------------------------------------------
      * @author : Bhuvaneshwari
