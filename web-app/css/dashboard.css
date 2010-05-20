@@ -35,7 +35,21 @@ body{
 	font-size:12px;
 	width:auto;
 	text-align:center;
+	background-image:url(../images/body_bg.png);
+	background-position:top;
+	background-repeat:repeat-x;
 	}
+.body_bg{
+	margin:auto;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+	width:auto;
+	text-align:center;
+	background-image:url(../images/body_bg.png);
+	background-position:top;
+	background-repeat:repeat-x;
+	}
+/*
 .sum_statusbar_good {
 	background-image:url(../images/sum_statusbar_green.png);
 	background-position:top;
@@ -46,6 +60,8 @@ body{
 	background-position:top;
 	background-repeat:repeat-x;
 }
+*/
+
 .step_statusbar_good {
 	font-size:14px;
 	font-weight:bold;
@@ -54,7 +70,7 @@ body{
 	line-height:24px;
 	display:block;
 	border:2px solid #595959;
-	background-color: green;
+	background-color: #669900;
 }
 .step_statusbar_bad {
 	font-size:14px;
@@ -64,15 +80,20 @@ body{
 	line-height:24px;
 	display:block;
 	border:2px solid #595959;
-	background-color: red;
+	background-color: #CD3333;
 }
 #container{
+	width:980px;
+	margin:auto;
+	}
+#bodycontent{
 	width:980px;
 	margin:auto;
 	}
 
 #header{
 	width:980px;
+	margin:auto;
 	height:96px;
 	}
 
@@ -117,8 +138,18 @@ body{
 	margin-top:10px;
 	}
 
-#sum_statusbar{
+.sum_statusbar_good{
 	text-align:center;
+	background-color: #669900;
+	font-size:16px;
+	font-weight:bold;
+	color:#FFFFFF;
+	line-height:26px;
+	}
+	
+.sum_statusbar_bad{
+	text-align:center;
+	background-color: #CD3333;
 	font-size:16px;
 	font-weight:bold;
 	color:#FFFFFF;

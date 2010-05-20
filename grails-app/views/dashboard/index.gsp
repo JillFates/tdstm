@@ -71,9 +71,8 @@
     }
 	</script>
 </head>
-<body class="sum_statusbar_good" onload="getMoveEventNewsDetails($('#moveEvent').val())">
+<body topmargin="0" leftmargin="0" marginheight="0" marginwidth="0" class="body_bg" onload="getMoveEventNewsDetails($('#moveEvent').val())">
 <div id="doc">
-	<div id="container">
 	<!--Header Starts here-->
 		<div id="header" style="margin-top: -2px;">
 			<div id="logo">
@@ -124,9 +123,11 @@
 			</div>
 		</div>
 		<div style="clear: both"></div>
-		<div id="sum_statusbar"><span id="status_text">${moveEvent?.name}: </span><span id="status_color">GREEN</span></div>
+		<div id="sum_statusbar" class="sum_statusbar_good"><span id="status_text">${moveEvent?.name}: </span><span id="status_color">GREEN</span></div>
 		<!-- Header Ends here-->
+		
 		<!-- Body Starts here-->
+		<div id="bodycontent">
 		<div id="bodytop">
 			<div id="plan_summary">
 				<div id="topindleft">
