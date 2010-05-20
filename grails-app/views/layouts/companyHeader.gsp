@@ -7,18 +7,12 @@
     <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" type="text/css"/>
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dropDown.css')}" />  
     <link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-    
-    <g:javascript library="prototype" />
-     <g:javascript library="jquery" />
-     
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
-	
-    <jq:plugin name="ui.core"/>
-    <jq:plugin name="ui.draggable"/>
-    <jq:plugin name="ui.dialog"/>
     
+    <g:javascript library="prototype" />
+    <jq:plugin name="jquery.combined" />
     <g:layoutHead />
     <script type="text/javascript">
    		$(document).ready(function() {

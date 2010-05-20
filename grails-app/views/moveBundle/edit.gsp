@@ -8,7 +8,6 @@
 
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" type="text/css"/>
 
-    <jq:plugin name="ui.datetimepicker"/>
     
     <g:javascript>
 

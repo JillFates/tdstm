@@ -5,8 +5,6 @@
 <meta name="layout" content="projectHeader" />
 <title>Asset Entity List</title>
 
-<jq:plugin name="jquery.bgiframe.min"/>
-<jq:plugin name="jquery.autocomplete"/>
 
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
@@ -14,10 +12,8 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
 
-<g:javascript src="assetcrud.js" />
-<g:javascript src="assetcommnet.js" />
+<g:javascript src="asset.tranman.js" />
 
-<jq:plugin name="ui.resizable" />
 
 
 <script type="text/javascript">

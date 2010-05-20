@@ -8,12 +8,7 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
 
-<g:javascript src="assetcrud.js" />
-<g:javascript src="assetcommnet.js" />
-
-<jq:plugin name="ui.resizable" />
-<jq:plugin name="jquery.scrollfollow" />
-
+<g:javascript src="asset.tranman.js" />
 
 <style type="text/css">
 td .odd {

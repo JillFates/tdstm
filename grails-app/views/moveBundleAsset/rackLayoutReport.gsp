@@ -3,13 +3,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <g:javascript library="prototype" />
-<g:javascript library="jquery" />
-<jq:plugin name="ui.core" />
-<jq:plugin name="ui.draggable" />
-<jq:plugin name="ui.resizable" />
-<jq:plugin name="ui.dialog" />
-<jq:plugin name="jquery.scrollfollow" />
-<g:javascript src="assetcrud.js" />
+<jq:plugin name="jquery.combined" />
+<g:javascript src="asset.tranman.js" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
@@ -115,7 +110,7 @@
 			editDiv.innerHTML += "";
 		} 
 			    
-		${remoteFunction(action:'getAutoCompleteDate', params:'\'autoCompParams=\' + autoComp ', onComplete:'updateAutoComplete(e)')} 
+		${remoteFunction(controller:'assetEntity', action:'getAutoCompleteDate', params:'\'autoCompParams=\' + autoComp ', onComplete:'updateAutoComplete(e)')} 
 		$("#editDialog").dialog('option', 'width', 'auto')
 		$("#editDialog").dialog('option', 'position', ['center','top']);
 		$("#editDialog").dialog("open")

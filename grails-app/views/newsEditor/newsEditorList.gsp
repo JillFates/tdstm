@@ -3,8 +3,6 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <title>Move Event News</title>
-<jq:plugin name="jquery.bgiframe.min" />
-<jq:plugin name="jquery.autocomplete" />
 
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
@@ -12,7 +10,6 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
 
-<jq:plugin name="ui.resizable" />
 
 <script type="text/javascript">
 $(document).ready(function() {

@@ -11,10 +11,8 @@
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
 	
 	<g:javascript library="prototype" />
-	<g:javascript library="jquery" />
+	<jq:plugin name="jquery.combined" />
 	
-	<jq:plugin name="ui.core" />
-	<jq:plugin name="ui.dialog" />
 	<script language="JavaScript" type="text/javascript">
 	/*--------------------------------------------------------
 	* function to call printjob when user press on 1,2,3 or 4

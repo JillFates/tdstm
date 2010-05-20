@@ -4,10 +4,6 @@
 <meta name="layout" content="projectHeader" />
 <title>Asset Tracking</title>
 
-<jq:plugin name="jquery.bgiframe.min" />
-<jq:plugin name="jquery.autocomplete" />
-<jq:plugin name="jquery.contextMenu"/>
-
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
@@ -15,10 +11,7 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dashboard.css')}" />
 
-<g:javascript src="assetcrud.js" />
-<g:javascript src="assetcommnet.js" />
-
-<jq:plugin name="ui.resizable" />
+<g:javascript src="asset.tranman.js" />
 
 <style type="text/css">
 html, body {

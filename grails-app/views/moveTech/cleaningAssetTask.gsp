@@ -10,10 +10,8 @@
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 	
 	<g:javascript library="prototype" />
-	<g:javascript library="jquery" />
+	<jq:plugin name="jquery.combined" />
 	
-	<jq:plugin name="ui.core" />
-	<jq:plugin name="ui.dialog" /> 
 
  	<script type="text/javascript">
 	$(document).ready(function() {

@@ -4,8 +4,6 @@
 <meta name="layout" content="projectHeader" />
 <title>Cart Tracking</title>
 
-<jq:plugin name="ui.resizable" />
-
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />

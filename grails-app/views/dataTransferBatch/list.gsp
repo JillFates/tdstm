@@ -6,7 +6,6 @@
         <meta name="layout" content="projectHeader" />
         <title>Data Transfer Batch List</title>
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'progressbar.css')}" />
-	<jq:plugin name="ui.progressbar"/>
 	<script type="text/javascript">
 		/* ---------------------------------
 		 * 	Author : Lokanada Reddy		

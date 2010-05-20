@@ -6,18 +6,11 @@
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dashboard.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tabcontent.css')}" />
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-	
+
 	<g:javascript src="FusionCharts.js" />
-	<g:javascript src="yahoo.js" />
-	<g:javascript src="animation.js" />
-	<g:javascript src="crawler.js" />
-	<g:javascript src="dom.js" />
-	<g:javascript src="event.js" />
-	<g:javascript src="tabcontent.js" />
-	<g:javascript src="textscroll.js" />
+	<g:javascript src="yahoo.ui.dashboard.js" />
+	<jq:plugin name="jquery.combined" />
 	
-	<g:javascript library="jquery" />
-	<jq:plugin name="ui.core" />
 	<script type="text/javascript">
 	/* render the individual step dial data*/
 	function stepDialData( dialInd ){

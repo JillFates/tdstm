@@ -10,8 +10,6 @@
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}"  />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
 	
-    <jq:plugin name="ui.resizable"/>
-
   </head>
   <body>
   

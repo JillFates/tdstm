@@ -4,7 +4,6 @@
 <meta name="layout" content="projectHeader" />
 <title>Create Project</title>
 
-<g:javascript library="ui.datepicker" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
 
 <script type="text/javascript">

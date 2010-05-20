@@ -77,7 +77,6 @@
                         <tr class="prop">
 			                <td valign="top" class="name"><label for="startDate">Start Date:</label></td>
 			                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'startDate','errors')}">
-			                  <g:javascript library="ui.datepicker" />
 			                  <script type="text/javascript" charset="utf-8">
 			                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 			                  </script>

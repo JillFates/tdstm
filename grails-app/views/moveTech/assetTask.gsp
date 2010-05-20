@@ -11,11 +11,8 @@
 <meta name="viewport" content="height=device-height,width=220" />
 	
 	<%--
-	<g:javascript library="jquery" />
 	<g:javascript library="prototype" />
-	
-	<jq:plugin name="ui.core" />
-	<jq:plugin name="ui.dialog" /> 
+	<jq:plugin name="jquery.combined" />
 	--%>
 	
 <script type="text/javascript">    	
