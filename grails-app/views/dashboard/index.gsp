@@ -6,11 +6,11 @@
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dashboard.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tabcontent.css')}" />
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-
-	<g:javascript src="FusionCharts.js" />
+	<g:javascript library="prototype" />
+	<%--<g:javascript src="FusionCharts.js" /> --%> 
 	<g:javascript src="yahoo.ui.dashboard.js" />
 	<jq:plugin name="jquery.combined" />
-	
+	<%--
 	<script type="text/javascript">
 	/* render the individual step dial data*/
 	function stepDialData( dialInd ){
@@ -62,7 +62,7 @@
 			" <styles><definition><style name='RectShadow' type='shadow' strength='0'/></definition>"+
 			" <application><apply toObject='Grp1' styles='RectShadow' /></application></styles></chart>"
     }
-	</script>
+	</script> --%> 
 </head>
 <body topmargin="0" leftmargin="0" marginheight="0" marginwidth="0" class="body_bg" onload="getMoveEventNewsDetails($('#moveEvent').val())">
 <div id="doc">
@@ -124,13 +124,16 @@
 		<div id="bodytop">
 			<div id="plan_summary">
 				<div id="topindleft">
-					<div id="summary_gauge_div" align="center"> </div>
+					<div id="summary_gauge_div" align="center"> 
+					<img id="summary_gauge" alt="Move Event Summary" src="${createLinkTo(dir:'i/dials',file:'dial-50.png')}">
+					</div>
+					<%--
 					<script language="JavaScript">
 						var summarychart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "summary_gauge", "280", "136", "0", "0");
 	        			//summarychart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'summary_gauge.xml')}");
 	        			 summarychart.setDataXML( summaryDialData( "50" ) )
 						summarychart.render("summary_gauge_div");
-					</script>
+					</script>  --%>
 						Move Status vs. Plan
 				</div>
 				<div class="topleftcontent">
@@ -141,13 +144,15 @@
 			</div>
 			<div id="revised_summary" >
 				<div id="topindright" style="display: none;">
-					<div id="revised_gauge_div" align="center"></div>
-					<script language="JavaScript">
+					<div id="revised_gauge_div" align="center">
+					<img id="revised_gauge" alt="Move Event Revised Summary" src="${createLinkTo(dir:'i/dials',file:'dial-50.png')}">
+					</div>
+					<%--<script language="JavaScript">
 						var revisedChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "revised_gauge", "280", "136", "0", "0");
 						//summarychart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'revised_gauge.xml')}");
 						revisedChart.setDataXML( revisedDialData( "50" ) )
 						revisedChart.render("revised_gauge_div");
-					</script> 
+					</script>  --%> 
 						Status vs. Revised Plan
 				</div>
 				<div style="float: right;">
@@ -246,15 +251,17 @@
 									<li class="actfinish1"><span id="act_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
 									<li class="actfinish1"><span id="act_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
 								</ul>
-								<div id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}" align="center" style="display: none;"> </div>
-								<jsec:hasAnyRole in="['ADMIN']">
+								<div id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}" align="center" style="display: none;">
+									<jsec:hasAnyRole in="['ADMIN']"><img id="chart_${moveBundle.id}_${moveBundleStep.transitionId}" src="${createLinkTo(dir:'i/dials',file:'dial-50sm.png')}"></jsec:hasAnyRole>
+								</div>
+								<%-- <jsec:hasAnyRole in="['ADMIN']">
 								<script language="JavaScript">
 							         var stepchart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "chart_${moveBundle.id}_${moveBundleStep.transitionId}", "100", "75", "0", "0");
 							         //stepchart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'step_gauge.xml')}");
 							         stepchart.setDataXML( stepDialData( "50" ) )
 							         stepchart.render("chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}");
-								</script> 
-								</jsec:hasAnyRole>
+								</script>  
+								</jsec:hasAnyRole> --%>
 							</div>
 						</g:each>
 					</div>
@@ -378,9 +385,9 @@
 	var doUpdate = true
 	function getMoveEventNewsDetails( moveEvent ){
 		updateDash( $("#defaultBundleId").val() );
-		if(dialReload && doUpdate){
+	<%--	if(dialReload && doUpdate){
 			timer = setTimeout( "getDialsData($('#defaultBundleId').val() )", 5000 );
-		}
+		}  --%>
 		if(moveEvent){
 			jQuery.ajax({
 		        type:"GET",
@@ -613,11 +620,9 @@
 				$("#topindright").hide();
 				$("#revised_gauge_content").hide();
 			} else if(snapshot.revisedComp) {
-	
-				updateRevisedGauge("revised_gauge",revSum.dialInd)
-				$("#spanRevised").html(convertTime(offset, revSum.compTime))
-				
 				$("#topindright").show();
+				updateSummaryGauge("revised_gauge",revSum.dialInd)
+				$("#spanRevised").html(convertTime(offset, revSum.compTime))
 				$("#revised_gauge_content").show();
 			}
 			for( i = 0; i < steps.length; i++ ) {
@@ -642,7 +647,8 @@
 				if(percentage != "100%" && percentage != "0%"){
 					<jsec:hasAnyRole in="['ADMIN']">
 					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).show();
-					setTimeout('post_init( "chart_'+moveBundleId+'_'+steps[i].tid+'", '+steps[i].dialInd+' )',1000)
+					post_init( "chart_"+moveBundleId+"_"+steps[i].tid, steps[i].dialInd )
+					//post_init( "chart_'+moveBundleId+'_'+steps[i].tid+'", '+steps[i].dialInd+' )
 					</jsec:hasAnyRole>
 				} else {
 					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).hide();
@@ -658,6 +664,7 @@
 		}
 		
 	}
+	<%--
 	function getDialsData( bundleId ) {
 		 var moveEvent = $("#moveEvent").val()
 		 if(doUpdate){
@@ -702,7 +709,7 @@
 			updateSummaryGauge("summary_gauge",planSum.dialInd ? planSum.dialInd : '50');
 			
 			if(snapshot.revisedComp) {
-				updateRevisedGauge("revised_gauge",revSum.dialInd)
+				updateSummaryGauge("revised_gauge",revSum.dialInd)
 			}
 			for( i = 0; i < steps.length; i++ ) {
 				var percentage = $("#percentage_"+moveBundleId+"_"+steps[i].tid).html()
@@ -719,10 +726,15 @@
 			dialReload = false;
 		} catch(ex){alert(ex)}
 		
-	}
+	}  --%>
 	/* function to render the dials */
 	function post_init( divId, dialInd ){
-		try{
+
+		var dInd = dialInd % 2 == 0 ? dialInd : dialInd+1
+		var src = "../i/dials/dial-"+dInd+"sm.png";
+        $("#"+divId).attr("src", src);
+		
+		<%--try{
 			//var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId2b", "100", "75", "0", "0");
 			updateChartXML( divId, stepDialData( dialInd ) ); 
 			//myChart.setDataXML( xmlData );
@@ -734,20 +746,23 @@
 	      		$("#update").css("color","red")
 				alert("Sorry, there is a problem receiving updates to this page. Try reloading to resolve.");
 			}
-		}
+		} --%>
 	}
 	function updateSummaryGauge( divId, dialInd ){
-	//var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId", "280", "136", "0", "0");
+		var dInd = dialInd % 2 == 0 ? dialInd : dialInd+1
+		var src = "../i/dials/dial-"+dInd+".png";
+		$("#"+divId).attr("src", src);
+		<%--//var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId", "280", "136", "0", "0");
 		updateChartXML(divId, summaryDialData( dialInd ) );
 		//myChart.setDataXML( xmlData );
-	   	//myChart.render(divId);
+	   	//myChart.render(divId); --%>
 	}
-	function updateRevisedGauge( divId, dialInd ){
-	    //var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId1", "180", "136", "0", "0");
+	<%--function updateRevisedGauge( divId, dialInd ){
+		   //var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId1", "180", "136", "0", "0");
 		updateChartXML( divId, revisedDialData( dialInd ) ); 
 	    //myChart.setDataXML( xmlData );
-	   	//myChart.render(divId);
-	}
+	   	//myChart.render(divId); 
+	}--%>
 	function pageReload(){
 		window.location = document.URL;
 	}
