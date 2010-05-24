@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="" />
+<title>AssetImport_TeamAssignment_Console</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">AssetImport_TeamAssignment_Console</td></tr>
+</thead><tbody>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Assets</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Import/Export</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>dataTransferSet</td>
+	<td>label=TDS Master Spreadsheet</td>
+</tr>
+<!--Pre-Requisite: Enter the path of the Excel file in the below case to import assets. In the Move Bundle column of the excel sheet, enter the Move Bundle name that is created in the previous script for all assets.-->
+<tr>
+	<td>type</td>
+	<td>file</td>
+	<td>C:\Users\harish.nadipalli.BOSTONLOGIX\Desktop\TDSMaster_template.xls</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>run</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForFrameToLoad</td>
+	<td>//div[7]/div/div</td>
+	<td>5000000</td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>File uploaded successfully</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//form[@id='importForm']/div/table.5.1</td>
+	<td>Var1</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=${Var1}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Data Transfer Batch List</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[7]/div/div/table.1.7</td>
+	<td>Process|Void</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Process</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertConfirmation</td>
+	<td>Do you really want to process Batch ?</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForPageToLoad</td>
+	<td>500000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Bundles</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeElementPresent</td>
+	<td>link=${BundleName}</td>
+	<td>var1</td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>${var1}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label3</td>
+	<td></td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${var1}==false</td>
+	<td>label1</td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>${var1}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label4</td>
+	<td></td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${var1}==true</td>
+	<td>label2</td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>${var1}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>label1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Next</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeElementPresent</td>
+	<td>link=${BundleName}</td>
+	<td>var1</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${var1}==false</td>
+	<td>label3</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${var1}==true</td>
+	<td>label4</td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label2</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=${BundleName}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Bundle Team Assignment</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Bundle Team Assignment</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifySelectedLabel</td>
+	<td>moveBundle</td>
+	<td>${BundleName}</td>
+</tr>
+<tr>
+	<td>verifySelectOptions</td>
+	<td>filterTeam</td>
+	<td>All Teams,TestCode-${teamCode},UnAssigned</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='bundleTeamAssetForm']/div/table/tbody/tr[1]/td[2]/table.0.0</td>
+	<td>Unrack Plan</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='bundleTeamAssetForm']/div/table/tbody/tr[1]/td[2]/table.0.1</td>
+	<td>Rerack Plan</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>teamAssetCountTable.1.0</td>
+	<td>TestCode-${teamCode}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>teamAssetCountTable.2.0</td>
+	<td>UnAssigned</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>teamAssetCountTable.2.1</td>
+	<td>assetCount</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>team</td>
+	<td>label=TestCode-${teamCode}</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//option[@value='TestCode-${teamCode}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForPageToLoad</td>
+	<td></td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetTable.1.7</td>
+	<td>TestCode-${teamCode}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>teamAssetCountTable.1.1</td>
+	<td>${assetCount}</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Console</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Supervisor Console</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifySelectedLabel</td>
+	<td>moveBundleId</td>
+	<td>${BundleName}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='midDiv']/table/tbody/tr/td[1]/table.0.0</td>
+	<td>TestName-${teamName}</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//form[@id='dashboardForm']/div/table/tbody/tr/td[1]/label</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='midDiv']/table/tbody/tr/td[2]/table.0.0</td>
+	<td>Cleaning</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='midDiv']/table/tbody/tr/td[3]/table.0.0</td>
+	<td>Transport</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//td[3]/div/table.0.0</td>
+	<td>exact:TOTALS:</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>createSnapshotId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//input[@value='Update:']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//td/div/table/tbody/tr/td[1]/div/table.1.0</td>
+	<td>Names</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//td/div/table/tbody/tr/td[1]/div/table.2.0</td>
+	<td>Location</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//td/div/table/tbody/tr/td[1]/div/table.3.0</td>
+	<td>Latest Asset</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//td/div/table/tbody/tr/td[1]/div/table.4.0</td>
+	<td>Source (Pending/Avail/Done/Total)</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//td/div/table/tbody/tr/td[1]/div/table.5.0</td>
+	<td>Target (Pending/Avail/Done/Total)</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='midDiv']/table/tbody/tr/td[1]/table.5.0</td>
+	<td>${assetCount} / 0 / 0 / ${assetCount} @</td>
+</tr>
+
+</tbody></table>
+</body>
+</html>
