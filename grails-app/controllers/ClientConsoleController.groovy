@@ -67,13 +67,21 @@ class ClientConsoleController {
 			def appOwnerList
 			def appSmeList
 			if(bundles){
-				applicationList=AssetEntity.executeQuery("select distinct ae.application , count(ae.id) from AssetEntity "+
-																"ae where  ae.moveBundle in ${bundles} "+
+				/*-------------get filter details----------------*/
+				def tempAppList = jdbcTemplate.queryForList("select distinct ae.application as appname, count(ae.asset_entity_id) as total from asset_entity "+
+																"ae where  ae.move_bundle_id in ${bundles} "+
 																"group by ae.application order by ae.application")
-				appOwnerList=AssetEntity.executeQuery("select distinct ae.appOwner, count(ae.id) from AssetEntity ae where "+
-															"ae.moveBundle in ${bundles} group by ae.appOwner order by ae.appOwner")
-				appSmeList=AssetEntity.executeQuery("select distinct ae.appSme, count(ae.id) from AssetEntity ae where "+
-															" ae.moveBundle in ${bundles} group by ae.appSme order by ae.appSme")
+				applicationList= splitFilterExpansion( tempAppList )
+				
+				def tempAppOwnerList = jdbcTemplate.queryForList("select distinct ae.app_owner as appname, count(ae.asset_entity_id) as total from asset_entity ae where "+
+															"ae.move_bundle_id in ${bundles} group by ae.app_owner order by ae.app_owner")
+				appOwnerList= splitFilterExpansion( tempAppOwnerList )
+				
+				def tempAppSmeList = jdbcTemplate.queryForList("select distinct ae.app_sme as appname, count(ae.asset_entity_id) as total from asset_entity ae where "+
+															" ae.move_bundle_id in ${bundles} group by ae.app_sme order by ae.app_sme")
+				appSmeList= splitFilterExpansion( tempAppSmeList )
+				
+				/*-------------get asset details----------------*/
 				def query = new StringBuffer("select ae.asset_entity_id as id,ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,"+
 												"ae.asset_name as assetName,max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate "+
 												" FROM asset_entity ae LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id and at.voided = 0 and at.type='process') "+
@@ -83,7 +91,7 @@ class ClientConsoleController {
 						query.append(" and ae.application = '' ")
 					} else {
 						def app = appValue.replace("'","\\'")
-						query.append(" and ae.application ='$app'")
+						query.append(" and ae.application like '%$app%'")
 					}
 				}
 				if(appOwnerValue!="" && appOwnerValue!= null){
@@ -91,7 +99,7 @@ class ClientConsoleController {
 						query.append(" and ae.app_owner = '' ")
 					} else {
 						def owner = appOwnerValue.replace("'","\\'")
-						query.append(" and ae.app_owner='$owner'")
+						query.append(" and ae.app_owner like '%$owner%'")
 					}
 					
 				}
@@ -100,7 +108,7 @@ class ClientConsoleController {
 						query.append(" and ae.app_sme = '' ")
 					} else {
 						def sme = appSmeValue.toString().replace("'","\\'")
-						query.append(" and ae.app_sme='$sme'")
+						query.append(" and ae.app_sme like '%$sme%'")
 					}
 				}
 				query.append(" GROUP BY ae.asset_entity_id")
@@ -897,5 +905,36 @@ class ClientConsoleController {
 			}
 		}
 		return changedClass
+	}
+
+	/*--------------------------------------------------------
+	 * Will split the Application, App Owner, and AppSME of entries by a comma inside a given record.  
+	 * For example, there are three assets with "Adam", "Bob", and "Adam, Bob,Charlie" in the app owner fields.In the filter dropdown,
+	  	we currently show "Adam (1), Bob (1), and Adam,Bob,Charlie(1)" and will split like "Adam(2), Bob(2),Charlie(1)".
+	 * @author : Lokanada Reddy
+	 * @return : result as list.
+	 * -------------------------------------------------------*/
+	def splitFilterExpansion(def appsList){
+		def applicationMap = new HashMap()
+		def resList = []
+		appsList.each{ apps ->
+			def applications = apps.appname.split(",")
+			applications.each{ app ->
+				if( ! applicationMap.containsKey( app.trim() ) ){
+					applicationMap.put(app.trim(),apps.total)
+				} else {
+					def appCount = applicationMap.get(app) + apps.total
+					applicationMap.put( app, appCount ) 
+				}
+			}
+			
+		}
+		applicationMap.keySet().each{
+			resList << ["key":it, "value":applicationMap.get(it)]  
+		}
+		resList.sort(){
+			it.key
+		}
+		return resList
 	}
 }

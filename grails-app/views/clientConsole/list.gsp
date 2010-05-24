@@ -122,7 +122,7 @@ overflow: hidden;
 						<select id="applicationId" name="application" onchange="document.listForm.submit();" style="width: 120px;">
 							<option value="" selected="selected">All</option>
 							<g:each in="${applicationList}" var="application">
-								<option value="${application[0] ? application[0] : 'blank'}">${application[0] ? application[0] : 'blank'}&nbsp;(${application[1]})</option>
+								<option value="${application.key ? application.key : 'blank'}">${application.key ? application.key : 'blank'}&nbsp;(${application.value})</option>
 							</g:each>
 						</select>
 					</th>
@@ -141,7 +141,7 @@ overflow: hidden;
 						<select id="appOwnerId" name="appOwner"	onchange="document.listForm.submit();" style="width: 120px;">
 							<option value="" selected="selected">All</option>
 							<g:each in="${appOwnerList}" var="appOwner">
-								<option value="${appOwner[0] ? appOwner[0] : 'blank'}">${appOwner[0] ? appOwner[0] : 'blank'}&nbsp;(${appOwner[1]})</option>
+								<option value="${appOwner.key ? appOwner.key : 'blank'}">${appOwner.key ? appOwner.key : 'blank'}&nbsp;(${appOwner.value})</option>
 							</g:each>
 						</select>
 					</th>
@@ -160,7 +160,7 @@ overflow: hidden;
 						<select id="appSmeId" name="appSme" onchange="document.listForm.submit();" style="width: 120px;">
 							<option value="" selected="selected">All</option>
 							<g:each in="${appSmeList}" var="appSme">
-								<option value="${appSme[0] ? appSme[0] : 'blank'}">${appSme[0] ? appSme[0] : 'blank'}&nbsp;(${appSme[1]})</option>
+								<option value="${appSme.key  ? appSme.key  : 'blank'}">${appSme.key  ? appSme.key  : 'blank'}&nbsp;(${appSme.value})</option>
 							</g:each>
 						</select>
 					</th>
