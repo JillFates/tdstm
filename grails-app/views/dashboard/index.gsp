@@ -65,11 +65,11 @@
 	</script> --%> 
 </head>
 <body topmargin="0" leftmargin="0" marginheight="0" marginwidth="0" class="body_bg" onload="getMoveEventNewsDetails($('#moveEvent').val())">
+<a name="page_up"></a>
 <div id="doc">
 	<!--Header Starts here-->
 		<div id="header" style="margin-top: -2px;">
 			<div id="logo">
-				<a name="page_up"></a>
 				<g:if test="${projectLogo}">
 					<img src="${createLink(controller:'project', action:'showImage', id:projectLogo?.id)}" style="height: 55px;"/>
 				</g:if>
@@ -155,17 +155,19 @@
 					</script>  --%> 
 						Status vs. Revised Plan
 				</div>
-				<div style="float: right;">
-					<input type="button" value="Update:" id="update" onclick="pageReload();"/> 
-					<select name="updateTime" id="updateTimeId" class="selecttext" onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'timedUpdate()') }">
-						<option value="30000">30s</option>
-						<option value="60000">1m</option>
-						<option value="120000">2m</option>
-						<option value="300000">5m</option>
-						<option value="600000">10m</option>
-						<option value="never" selected="selected">Never</option>
-					</select><br/><a href="#page_down" class="nav_button">
-					<img src="${createLinkTo(dir:'images',file:'down-arrow.png')}" border="0" alt="Page Down"></a>
+				<div style="float: right;height: 50px;width: 150px;">
+					<div style="float: right;">
+						<input type="button" value="Update:" id="update" onclick="pageReload();"/> 
+						<select name="updateTime" id="updateTimeId" class="selecttext" onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'timedUpdate()') }">
+							<option value="30000">30s</option>
+							<option value="60000">1m</option>
+							<option value="120000">2m</option>
+							<option value="300000">5m</option>
+							<option value="600000">10m</option>
+							<option value="never" selected="selected">Never</option>
+						</select>
+					</div>
+					<%-- <div style="float: right;padding: 3px 0px;"> <a href="#page_down" class="nav_button">Page Down</a></div> --%>
 				</div>
 				<div class="toprightcontent" id="revised_gauge_content" style="display: none;">
 					Confidence in Revised Plan<br>
@@ -270,8 +272,8 @@
 			</div>
 <div id="rightarrow"><a href="javascript:void(0);" id="move-right"><img src="${createLinkTo(dir:'images',file:'right_arrow.png')}" alt="back" border="0" width="16" height="23" align="right"></a></div>
 		</div>
-		<div style="text-align: right;">
-			<a name="page_down" href="#page_up"><img src="${createLinkTo(dir:'images',file:'up-arrow.png')}" border="0" alt="Page Up"></a>
+		<div style="text-align: right;padding:4px 0px;">
+			<%--<a href="#page_up" class="nav_button" style="nowrap:nowrap;">Page Up</a> --%>
 		</div>
 	</div>
 
@@ -284,6 +286,7 @@
 	</div>
 <!-- Footer Ends here-->
 <!-- Body Ends here-->
+<a name="page_down"></a>
 </div>
 <script type="text/javascript">
 	if("${session.getAttribute('CURR_TZ')?.CURR_TZ}"){
