@@ -983,6 +983,7 @@ class MoveBundleAssetController {
      *---------------------------------------------------------*/
     def rackLayoutReport = {
     	def bundleId = params.moveBundle
+   		def maxUSize = 42
         if(bundleId == "null") {
             flash.message = " Please Select Bundles. "
             redirect( action:'getBundleListForReportDialog', params:[reportId: 'Rack Layout'] )
@@ -1058,8 +1059,8 @@ class MoveBundleAssetController {
 		            			def changeBoth = (currentLow >= newLow && currentHigh <= newHigh )
 		            			def changeLow = (currentLow >= newLow && currentHigh >= newHigh && currentLow <= newHigh)
 		            			def changeHigh = (currentLow <= newLow && currentHigh <= newHigh && currentHigh <= newLow)
-		            			if(position > 42){
-		            				asset.position = 42
+		            			if(position > maxUSize){
+		            				asset.position = maxUSize
 	    	            			asset.rowspan = 1 
 	    	            			asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
 	    	            			asset.overlapError = true
@@ -1101,9 +1102,9 @@ class MoveBundleAssetController {
 	    	            	}
 		            		
 		            		if(flag){
-		            			if(position > 42) {
-			            			position = 42
-			            			newLow = 42
+		            			if(position > maxUSize) {
+			            			position = maxUSize
+			            			newLow = maxUSize
 			            			assetEntity.usize = 1
 			            			overlapError = true
 			            		}
@@ -1111,9 +1112,9 @@ class MoveBundleAssetController {
 		            			              rowspan:assetEntity.usize, currentHigh : position, currentLow : newLow]
 		            		}
 		            	}else{
-		            		if(position > 42) {
-		            			position = 42
-		            			newLow = 42
+		            		if(position > maxUSize) {
+		            			position = maxUSize
+		            			newLow = maxUSize
 		            			assetEntity.usize = 1
 		            			overlapError = true
 		            		}
@@ -1121,7 +1122,7 @@ class MoveBundleAssetController {
 		            		              rowspan:assetEntity.usize, currentHigh : position, currentLow : newLow ]
 		            	}
 		            }
-    	            for (int i = 42; i > 0; i--) {
+		            for (int i = maxUSize; i > 0; i--) {
     	            	def assetEnity
     	            	def cssClass = "empty"
         	            def rackStyle = "rack_past"
@@ -1223,7 +1224,6 @@ class MoveBundleAssetController {
         	}
     		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
     		def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
-			println"currDate--------->"+currDate
 			DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
     		assetCommentList.each { assetComment ->
     			def createdBy

@@ -126,7 +126,6 @@
 			<input name="location" type="hidden" value="${location}" />
 			<input name="project" type="hidden" value="${project}" />
 			<input name="search" type="hidden" value="${search}"  />
-			<input name="assetComment" type="hidden" value="${assetComment}"  />
 			<input name="label" type="hidden" value="${label}"  />
 			<input name="actionLabel" type="hidden" value="${actionLabel}"  />
 			<input name="user" type="hidden" value="mt"  />

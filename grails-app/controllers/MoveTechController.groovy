@@ -735,8 +735,7 @@ class MoveTechController {
 	            }
 	            def flags = stateEngineService.getFlags( moveBundleInstance.project.workflowCode, "MOVE_TECH", currentState, actionLabel )
 	            def loginUser = UserLogin.findByUsername( principal )
-	            def assetComment = params.assetComment
-	            def workflow = workflowService.createTransition( moveBundleInstance.project.workflowCode, "MOVE_TECH", actionLabel, asset, bundle, loginUser, loginTeam, assetComment )
+	            def workflow = workflowService.createTransition( moveBundleInstance.project.workflowCode, "MOVE_TECH", actionLabel, asset, bundle, loginUser, loginTeam, params.enterNote )
 	            if ( workflow.success ) {
 	            	if(flags.contains("busy")){
 	            		flash.message = message ( code : workflow.message )
@@ -1061,8 +1060,7 @@ class MoveTechController {
 	            def actionLabel = params.actionLabel
 	            def loginUser = UserLogin.findByUsername ( principal )
 	            def loginTeam = ProjectTeam.findById(params.team)
-	            def assetComment = params.assetComment
-	            def workflow = workflowService.createTransition ( moveBundleInstance.project.workflowCode, "CLEANER", actionLabel, asset, bundle, loginUser, loginTeam, assetComment )
+	            def workflow = workflowService.createTransition ( moveBundleInstance.project.workflowCode, "CLEANER", actionLabel, asset, bundle, loginUser, loginTeam, params.enterNote )
 	            if ( workflow.success ) {
 	                def projMap = []
 	                def stateVal = null
@@ -1102,20 +1100,12 @@ class MoveTechController {
 			def asset = getAssetEntity ( params.search, params.user )
 			if(asset){
 				def bundle = asset.moveBundle
-				def actionLabel = params.actionLabel
 				def loginUser = UserLogin.findByUsername ( principal )
 				def team
-				def assetComment = params.assetComment
 				def projMap = []
-				assetComment = []
-				def stateVal = null
-				def label = null
-				actionLabel = null
 				render(view: 'cleaningAssetSearch',
-	                model:[	projMap:projMap, assetComment:assetComment, stateVal:stateVal, "search":params.search, "bundle":params.bundle,
-							"team":params.team, "project":params.project, "location":params.location, "tab":"Todo", label:label,
-							actionLabel:actionLabel
-							])
+	                model:[	projMap:projMap, "search":params.search, "bundle":params.bundle, "team":params.team, 
+	                       	"project":params.project, "location":params.location, "tab":"Todo" ])
 			} else {
 				flash.message = "Asset not found"
 				redirect ( action:'cleaningAssetSearch', params:params)
