@@ -157,6 +157,7 @@ class MoveEventController {
 		def moveEvent = params.moveEvent
 		def reportType = params.reportType
 		if(moveEvent && reportType){
+			def moveEventInstance = MoveEvent.get( moveEvent  )
 			try {
 				def moveEventResults
 				File file 
@@ -171,7 +172,12 @@ class MoveEventController {
 				workbook = Workbook.getWorkbook( file, wbSetting )
 				//set MIME TYPE as Excel
 				response.setContentType( "application/vnd.ms-excel" )
-				response.setHeader( "Content-Disposition", "attachment; filename= MoveResults_${params.reportType}.xls" )
+				
+				def type = params.reportType == "SUMMARY" ? "summary" : "detailed"
+				def filename = 	"MoveResults-${moveEventInstance?.project?.name}-${moveEventInstance?.name}-${type}.xls"
+					filename = filename.replace(" ", "_")
+				response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
+				
 				book = Workbook.createWorkbook( response.getOutputStream(), workbook )
 				def sheet = book.getSheet("moveEvent_results")
 				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
@@ -228,12 +234,15 @@ class MoveEventController {
 			def moveEvent = params.moveEvent
 			def reportType = params.reportType
 			if(moveEvent && reportType){
+				def moveEventInstance = MoveEvent.get( moveEvent  )
 				try {
 					def moveEventResults
 					def reportFields =[]
 					def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 					DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 					def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
+					def filename = 	"MoveResults-${moveEventInstance?.project?.name}-${moveEventInstance?.name}"
+					filename = filename.replace(" ", "_")
 					if(reportType != "SUMMARY"){
 						moveEventResults = moveBundleService.getMoveEventDetailedResults( moveEvent )
 						moveEventResults.each { results->
@@ -246,7 +255,7 @@ class MoveEventController {
 											"rptTime":String.valueOf(formatter.format( currDate ) )]
 						}
 						chain(controller:'jasper',action:'index',model:[data:reportFields],
-								params:["_format":"PDF","_name":"MoveResults_${params.reportType}","_file":"moveEventDeailedReport"])
+								params:["_format":"PDF","_name":"${filename}-detailed","_file":"moveEventDeailedReport"])
 					} else {
 						moveEventResults = moveBundleService.getMoveEventSummaryResults( moveEvent )
 						moveEventResults.each { results->
@@ -257,7 +266,7 @@ class MoveEventController {
 											"timezone":tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
 						}
 						chain(controller:'jasper',action:'index',model:[data:reportFields],
-								params:["_format":"PDF","_name":"MoveResults_${params.reportType}","_file":"moveEventSummaryReport"])
+								params:["_format":"PDF","_name":"${filename}-summary","_file":"moveEventSummaryReport"])
 					}
 			            
 				} catch( Exception ex ) {

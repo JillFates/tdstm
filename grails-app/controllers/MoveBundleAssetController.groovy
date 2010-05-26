@@ -846,7 +846,10 @@ class MoveBundleAssetController {
     			flash.message = " No Assets Were found for  selected values  "
     			redirect( action:'getBundleListForReportDialog', params:[reportId: 'Team Worksheets'] )
     		}else {
-    			chain(controller:'jasper',action:'index',model:[data:reportFields],params:params)
+    			def filename = 	"MoveTeam-${projectInstance.name}-${bundleName}-${teamName}"
+					filename = filename.replace(" ", "_")
+    			chain(controller:'jasper',action:'index',model:[data:reportFields],
+						params:["_format":"PDF","_name":"${filename}","_file":"workSheetsReport"])
     		}
     	}
     }
@@ -972,7 +975,13 @@ class MoveBundleAssetController {
                 		reportFields.sort{ it.assetTagSort }
                 	}
                 }
-        		chain(controller:'jasper',action:'index',model:[data:reportFields],params:params)
+        		
+				def name = reportName == "cartAsset" ? "CleanTeam" : "TransportTeam"
+				def filename = 	"${name}-${projectInstance.name}-${bundleName}"
+					filename = filename.replace(" ", "_")
+        		
+				chain(controller:'jasper',action:'index',model:[data:reportFields],
+						params:["_format":"PDF","_name":"${filename}","_file":"${params._file}"])
         	}
         }
     }
@@ -1216,6 +1225,7 @@ class MoveBundleAssetController {
                     									"where ae.moveBundle.id = $moveBundleInstance.id ) and ac.commentType= 'issue' "+
                     									"order by ac.assetEntity.${sortBy}")
     			bundleNames = moveBundleInstance?.name
+    			bundleName = bundleNames
     		}else {
     			assetCommentList = AssetComment.findAll("from AssetComment ac where ac.assetEntity.id in(select ae.id from AssetEntity ae "+
                     									"where ae.project.id = $projectInstance.id ) and ac.commentType= 'issue' "+
@@ -1256,7 +1266,10 @@ class MoveBundleAssetController {
         		flash.message = " No Issues Were found for  selected values  "
         		redirect( action:'getBundleListForReportDialog', params:[reportId: 'Issue Report'] )
         	}else {
-        		chain(controller:'jasper',action:'index',model:[data:reportFields],params:params)
+        		def filename = 	"IssueReport-${projectInstance.name}-${bundleName}"
+					filename = filename.replace(" ", "_")
+        		chain(controller:'jasper',action:'index',model:[data:reportFields],
+						params:["_format":"PDF","_name":"${filename}","_file":"${params._file}"])
         	}
         }
     }
