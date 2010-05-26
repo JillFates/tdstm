@@ -247,6 +247,8 @@ th {
 	width:50px; 
 	background:#aaefb8; 
 	float:left;
+   -webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
 }
 
 .comment_font {
