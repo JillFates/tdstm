@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="" />
+<title>Comment_Read</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">Comment_Read</td></tr>
+</thead><tbody>
+<!--Pre-Requisite: Select a project where there is atleast one asset in asset entity list page and also there are is a pre-exisitng comment for that asset as this test picks up the first record and performs the actions-->
+<tr>
+	<td>setSpeed</td>
+	<td>5000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>/tds-0.1/auth/login</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>usernameId</td>
+	<td>john</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>password</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Sign in']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Assets</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>xpath=//span/a/img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForElementPresent</td>
+	<td>//div[11]/div[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>listCommentsTable.0.0</td>
+	<td>Action</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>listCommentsTable.0.1</td>
+	<td>Comment</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>listCommentsTable.0.2</td>
+	<td>Comment Type</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>listCommentsTable.0.3</td>
+	<td>Resolved</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>listCommentsTable.0.4</td>
+	<td>Must Verify</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>listCommentsTable.0.5</td>
+	<td>Category</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>listCommentsTable.0.6</td>
+	<td>Comment Code</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//div[2]/div[1]/table/tbody/tr/td[1]/a/img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>listCommentsTable.1.1</td>
+	<td>cDesc</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>listCommentsTable.1.2</td>
+	<td>cType</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[1]/table/tbody/tr/td[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//div[10]/div[1]/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//table[@id='showCommentTable']/tbody/tr[1]/td[1]/label</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//table[@id='showCommentTable']/tbody/tr[2]/td[1]/label</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//table[@id='showCommentTable']/tbody/tr[3]/td[1]/label</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//table[@id='showCommentTable']/tbody/tr[4]/td[1]/label</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//table[@id='showCommentTable']/tbody/tr[5]/td[1]/label</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//table[@id='showCommentTable']/tbody/tr[6]/td[1]/label</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//table[@id='showCommentTable']/tbody/tr[7]/td[1]/label</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//input[@value='Edit' and @type='button' and @onclick=&quot;commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//input[@value='Delete' and @type='button' and @onclick=&quot;var booConfirm = confirm('Are you sure?');if(booConfirm)new Ajax.Request('/tds-0.1/assetEntity/deleteComment',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never')},parameters:'id=' + $('#commentId').val() +'&amp;assetEntity='+$('#createAssetCommentId').val() });&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>commentTdId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>showCommentTable.2.1</td>
+	<td>${cType}</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>commentTdId</td>
+	<td>${cDesc}</td>
+</tr>
+
+</tbody></table>
+</body>
+</html>
