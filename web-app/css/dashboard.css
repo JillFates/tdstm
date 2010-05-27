@@ -21,7 +21,27 @@ div.tableContainerIE thead th{
    border-right: 1px solid #F8F8F8;
 }
 
-
+.bulkedit_active {
+	border:2px solid #000000;
+	font-weight: bold;
+}
+.bulkedit_inactive {
+	border:1px solid #CCCCCC;
+}
+.bulkPending_active{
+	border:1px solid #000000;
+	font-weight: bold;
+}
+.bulkDone_active{
+	border:1px solid #000000;
+	background-color: #66CC66;
+	font-weight: bold;
+}
+.bulkNa_active{
+	border:1px solid #000000;
+	background-color: #CCCCCC;
+	font-weight: bold;
+}
 /*
 Css for client dashboard
 */

@@ -738,16 +738,21 @@ class ClientConsoleController {
 		def message = ""
 		if(role){
 			message = "Transaction created successfully"
+			def stateType = stateEngineService.getStateType( assetEntity.project.workflowCode,stateTo)
 			switch (type) {
 				case "done" :
-							def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
-							if(assetTeansition){
-								assetTeansition.voided = 1
-								assetTeansition.save(flush:true)
+							def menuOption = constructManuOptions( stateTo, assetEntity, "done", stateType )
+							def validOptions = "doneMenu doMenu"
+							if( validOptions.contains( menuOption ) || ( menuOption == "readyMenu" && stateTo == "Ready") ){
+								def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
+								if(assetTeansition){
+									assetTeansition.voided = 1
+									assetTeansition.save(flush:true)
+								}
+								transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,stateTo, assetEntity, 
+																					assetEntity.moveBundle, loginUser, null, comment )
+								message = transitionStatus.message
 							}
-							transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,stateTo, assetEntity, 
-																				assetEntity.moveBundle, loginUser, null, comment )
-							message = transitionStatus.message
 							break;
 					
 				case "void" : 
@@ -767,26 +772,30 @@ class ClientConsoleController {
 							message = transitionStatus.message
 							break;
 				case "NA" :
-							def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
-							if(assetTeansition){
-								assetTeansition.voided = 1
-								assetTeansition.save(flush:true)
+							if(stateType == "boolean"){
+								def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
+								if(assetTeansition){
+									assetTeansition.voided = 1
+									assetTeansition.save(flush:true)
+								}
+								transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,stateTo, assetEntity, 
+																					assetEntity.moveBundle, loginUser, null, comment )
+								message = transitionStatus.message
+								def currentTransition = AssetTransition.find("from AssetTransition t where t.assetEntity = ${assetEntity.id} "+
+																			"and voided = 0 order by dateCreated desc")
+								currentTransition.isNonApplicable = 1
+								currentTransition.save(flush:true)
 							}
-							transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,stateTo, assetEntity, 
-																				assetEntity.moveBundle, loginUser, null, comment )
-							message = transitionStatus.message
-							def currentTransition = AssetTransition.find("from AssetTransition t where t.assetEntity = ${assetEntity.id} "+
-																		"and voided = 0 order by dateCreated desc")
-							currentTransition.isNonApplicable = 1
-							currentTransition.save(flush:true)
 							break;
 				case "pending" :
-							def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
-							if(assetTeansition){
-								assetTeansition.voided = 1
-								assetTeansition.save(flush:true)
+							if(stateType == "boolean"){
+								def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
+								if(assetTeansition){
+									assetTeansition.voided = 1
+									assetTeansition.save(flush:true)
+								}
+								changeCurrentStatus(currStateQuery,assetEntity)
 							}
-							changeCurrentStatus(currStateQuery,assetEntity)
 						break;
 			}
 		} else {

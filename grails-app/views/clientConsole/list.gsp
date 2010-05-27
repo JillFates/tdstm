@@ -79,6 +79,22 @@ overflow: hidden;
 
 			</select></span>
 			</td>
+			
+			<jsec:hasAnyRole in="['ADMIN','PROJ_MGR']">
+			<td style="text-align: left;width: 270px;">
+				<span>
+					<input type="button" name="bulkEdit" id="bulkEditId" value="Bulk Edit" class="bulkedit_inactive" onclick="performBulkEdit()"/>
+				</span>
+				&nbsp;&nbsp;
+				<span style="display: none;" id="bulkTaskSpanId">
+					<input type="button" name="bulkPending" id="bulkPendingId" value="Pending" onclick="changeAction('pending')"/>
+					<input type="button" name="bulkDone" id="bulkDoneId" value="Done" onclick="changeAction('done')"/>
+					<input type="button" name="bulkNa" id="bulkNaId" value="N/A" onclick="changeAction('na')"/>
+					<input type="hidden" name="bulkAction" id="bulkActionId" value="done"/>
+				</span>
+			</td>
+			</jsec:hasAnyRole>
+			
 			<td><h1 align="center">PMO Asset Tracking</h1></td>
 			<td style="text-align: right;">
 			<input type="hidden" name="last_update" value="${new Date()}"/>
@@ -946,8 +962,66 @@ var fieldId
 			}
 		}
 	}
-	
-		
+	var bulkEdit = true;
+	function performBulkEdit(){
+		var bulkEditButton = $("#bulkEditId");
+		if(bulkEdit){
+			//alert("You are now in bulk edit mode. Select the state then the cells you want to change. Remember to turn off Bulk Edit when done." )
+			bulkEditButton.removeClass("bulkedit_inactive")
+			bulkEditButton.addClass("bulkedit_active")
+			bulkEdit = false
+			/*------- show Done as default ----------*/
+			changeAction( "done" )
+			
+			$("#bulkTaskSpanId").show();
+		} else {
+			bulkEditButton.removeClass("bulkedit_active")
+			bulkEditButton.addClass("bulkedit_inactive")
+			bulkEdit = true
+			$("#bulkTaskSpanId").hide();			
+		}
+	}
+	function changeAction( action ){
+		switch ( action ){
+			case "pending" :
+				$("#bulkDoneId").removeClass("bulkDone_active")
+				$("#bulkNaId").removeClass("bulkNa_active")
+				$("#bulkPendingId").addClass("bulkPending_active")
+				$("#bulkActionId").val("pending")
+			break;
+			case "done" :
+				$("#bulkNaId").removeClass("bulkNa_active")
+				$("#bulkPendingId").removeClass("bulkPending_active")
+				$("#bulkDoneId").addClass("bulkDone_active")
+				$("#bulkActionId").val("done")
+			break;
+			case "na" :
+				$("#bulkPendingId").removeClass("bulkPending_active")
+				$("#bulkDoneId").removeClass("bulkDone_active")
+				$("#bulkNaId").addClass("bulkNa_active")
+				$("#bulkActionId").val("na")
+			break;	
+		}
+	}
+	$(document).ready(function() {
+	    $("tbody#assetListTbody tr td").click(function () {
+	        if($("#bulkEditId").hasClass("bulkedit_active")){
+			    var action = $("#bulkActionId").val()
+			    var tdId = $(this).attr("id")
+			    switch (action){
+				    case "pending" :
+				    	${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=pending\'', onComplete:'updateTransitionRow(e)' )};
+					break;
+					case "done" :
+						${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=done\'', onComplete:'updateTransitionRow(e)' )};
+					break;
+					case "na" :
+						${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=NA\'', onComplete:'updateTransitionRow(e)' )};
+					break;	
+			    }
+	        }
+	    });
+	});
 </script>
 </body>
 </html>

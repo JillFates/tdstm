@@ -52,10 +52,6 @@ select {
    padding: 2px 2px 2px 0;
 }
 
-input:focus, select:focus, textarea:focus {
-    border: 1px solid #5F9FCF;
-}
-
 .body {
     float: left;
     margin: 0 15px 10px 15px;
