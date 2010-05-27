@@ -966,7 +966,7 @@ var fieldId
 	function performBulkEdit(){
 		var bulkEditButton = $("#bulkEditId");
 		if(bulkEdit){
-			//alert("You are now in bulk edit mode. Select the state then the cells you want to change. Remember to turn off Bulk Edit when done." )
+			alert("You are now in bulk edit mode. Select the state then the cells you want to change. Remember to turn off Bulk Edit when done." )
 			bulkEditButton.removeClass("bulkedit_inactive")
 			bulkEditButton.addClass("bulkedit_active")
 			bulkEdit = false
