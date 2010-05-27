@@ -232,9 +232,7 @@ overflow: hidden;
 					</g:if>
 					<g:else>
 					<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
-						<a href="javascript:createNewAssetComment(${assetEntity.id});" >
-						<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" />
-						</a>
+						<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" onclick="createNewAssetComment(${assetEntity.id});"/>
 					</jsec:hasAnyRole>
 					</g:else>
 			</g:else>
