@@ -80,7 +80,7 @@ overflow: hidden;
 			</select></span>
 			</td>
 			
-			<jsec:hasAnyRole in="['ADMIN','PROJ_MGR']">
+			<g:if test="${isAdmin || isProjManager}">
 			<td style="text-align: left;width: 270px;">
 				<span>
 					<input type="button" name="bulkEdit" id="bulkEditId" value="Bulk Edit" class="bulkedit_inactive" onclick="performBulkEdit()"/>
@@ -93,7 +93,7 @@ overflow: hidden;
 					<input type="hidden" name="bulkAction" id="bulkActionId" value="done"/>
 				</span>
 			</td>
-			</jsec:hasAnyRole>
+			</g:if>
 			
 			<td><h1 align="center">PMO Asset Tracking</h1></td>
 			<td style="text-align: right;">
@@ -124,9 +124,9 @@ overflow: hidden;
 <table cellpadding="0"   cellspacing="0"  style="border:0px;" >
 	<thead>
 		<tr>
-		 <th style="padding-top:35px;"><span>Actions</span><jsec:hasAnyRole in="['ADMIN','MANAGER', 'PROJ_MGR']"> 
+		 <th style="padding-top:35px;"><span>Actions</span><g:if test="${isAdmin || isManager || isProjManager}"> 
 		 <input type="button" value="State..." onclick="changeState()" title="Change State" style="width: 80px;"/>
-		 <a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a></jsec:hasAnyRole></th>
+		 <a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a></g:if></th>
 			<th style="padding-top:35px;" >
 			<table style="border: 0px;">
 				<thead>
@@ -212,7 +212,7 @@ overflow: hidden;
 		<g:each in="${assetEntityList}" var="assetEntity">
 			<tr id="assetRow_${assetEntity.id}">
 			<td>
-			<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
+			<g:if test="${isAdmin || isManager || isProjManager}">
 			<span id="action_${assetEntity.id}">
 				<g:if test="${assetEntity.checkVal == true}">
 					<g:checkBox name="checkChange" id="checkId_${assetEntity.id}" onclick="timedUpdate('never')"></g:checkBox>
@@ -220,7 +220,7 @@ overflow: hidden;
 				</g:if>
 				<g:else>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</g:else>
 			</span>
-			</jsec:hasAnyRole>
+			</g:if>
 			<img id="asset_${assetEntity.id}" src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px" />
 			<span id="icon_${assetEntity.id}">
 				<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+assetEntity.id+' and commentType = ? and isResolved = ?',['issue',0])}">
@@ -231,9 +231,9 @@ overflow: hidden;
 						<img id="comment_${assetEntity.id}" src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px" />
 					</g:if>
 					<g:else>
-					<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
+					<g:if test="${isAdmin || isManager || isProjManager}">
 						<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" onclick="createNewAssetComment(${assetEntity.id});"/>
-					</jsec:hasAnyRole>
+					</g:if>
 					</g:else>
 			</g:else>
 			</span>
@@ -281,12 +281,12 @@ overflow: hidden;
 	</tbody>
 </table>
 </div>
-<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
+<g:if test="${isAdmin || isManager || isProjManager}">
 <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 <span class="menuButton"><a class="create" href="#"
 	onclick="$('#statusId').val('');$('#createResolveDiv').css('display', 'none') ;$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">New
 Comment</a></span></div>
-</jsec:hasAnyRole>
+</g:if>
 </div>
 <div id="createCommentDialog" title="Create Asset Comment"
 	style="display: none;"><input type="hidden" name="assetEntity.id"
@@ -411,7 +411,7 @@ Comment</a></span></div>
 		</tr>
 </table>
 </div>
-<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
+<g:if test="${isAdmin || isManager || isProjManager}">
 <div class="buttons">
 <span class="button">
 <input class="edit" type="button" value="Edit" onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
@@ -419,7 +419,7 @@ Comment</a></span></div>
 <span class="button"> <input class="delete" type="button" value="Delete"
 	onclick="${remoteFunction(controller:'assetEntity', action:'deleteComment', params:'\'id=\' + $(\'#commentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'action\')')}" />
 </span></div>
-</jsec:hasAnyRole>
+</g:if>
 </div></div>
 <div id="editCommentDialog" title="Edit Asset Comment" style="display: none;">
 	<g:form action="updateComment" method="post" name="editCommentForm">
@@ -438,13 +438,13 @@ Comment</a></span></div>
 	<tr class="prop" >
 		<td valign="top" class="name"><label for="commentType">Comment Type:</label></td>
 		<td valign="top" style="width: 20%;" >
-			<jsec:hasAnyRole in="['ADMIN','PROJ_MGR']">
+			<g:if test="${isAdmin || isProjManager}">
 				<g:select id="commentTypeEditId" name="commentType" from="${AssetComment.constraints.commentType.inList}" value="" onChange="commentChange('#editResolveDiv','editCommentForm')">
 				</g:select>&nbsp;&nbsp;&nbsp;&nbsp;
-			</jsec:hasAnyRole>
-			<jsec:lacksAllRoles in="['ADMIN','PROJ_MGR']">
+			</g:if>
+			<g:else>
 				<input type="text" id="commentTypeEditId" name="commentType" readonly style="border: 0;"/>&nbsp;&nbsp;&nbsp;&nbsp;
-			</jsec:lacksAllRoles>
+			</g:else>
 				<input type="checkbox" id="mustVerifyEditId" name="mustVerify" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
 				<label for="mustVerify">Must Verify</label>
 		</td>
@@ -500,7 +500,7 @@ Comment</a></span></div>
 	<table id="showTable">
 	</table>
 	</div>
-	<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
+	<g:if test="${isAdmin || isManager || isProjManager}">
 	<div class="buttons">
 	<input type="hidden" name="id" value="" />
 	<input type="hidden" name="projectId" value="${projectId}" />
@@ -510,7 +510,7 @@ Comment</a></span></div>
 	<span class="button"><g:actionSubmit class="delete" onclick="return confirm('Delete Asset, are you sure?');" value="Delete" /></span>
 	<span class="button"><g:actionSubmit action="remove" class="delete"  onclick="return confirm('Remove Asset from project, are you sure?');" value="Remove From Project" /></span>
 	</div>
-	</jsec:hasAnyRole>
+	</g:if>
 </g:form></div>
 
 <div id="editDialog" title="Edit Asset Entity" style="display: none;">
@@ -522,13 +522,13 @@ Comment</a></span></div>
 	<div class="dialog" id="editDiv">
 
 	</div>
-	<jsec:hasAnyRole in="['ADMIN','MANAGER','PROJ_MGR']">
+	<g:if test="${isAdmin || isManager || isProjManager}">
 	<div class="buttons"><span class="button">
 	<input type="button" class="save" value="Update Asset Entity" onClick="${remoteFunction(controller:'assetEntity', action:'getAssetAttributes', params:'\'assetId=\' + document.editForm.id.value ', onComplete:'callUpdateDialog(e)')}" />
 	</span> <span class="button"><input type="button" class="delete" onclick="return editDialogDeleteRemove('delete')" value="Delete" /></span>
 		<span class="button"><input type="button" class="delete" onclick="return editDialogDeleteRemove('remove');" value="Remove From Project" /></span>
 		</div>
-	</jsec:hasAnyRole>
+	</g:if>
 </g:form></div>
 <div class="contextMenu" id="myMenu"/>
 <div class="contextMenu" id="transitionMenu" style="visibility: hidden;">

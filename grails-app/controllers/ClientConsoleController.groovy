@@ -139,9 +139,12 @@ class ClientConsoleController {
 				def processTransition = stateEngineService.getState(projectInstance.workflowCode,it)
 				def stateType = stateEngineService.getStateType(projectInstance.workflowCode,stateEngineService.getState(projectInstance.workflowCode,it))
 				def fillColor = stateType == 'boolean' ? '#FF8000' : 'green'
+				def transId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,processTransition))
 				processTransitionList<<[header:stateEngineService.getStateLabel(projectInstance.workflowCode,it),
-										transId:stateEngineService.getStateId(projectInstance.workflowCode,processTransition),
-										fillColor:fillColor]
+										transId:transId,
+										fillColor:fillColor,
+										stateType:stateEngineService.getStateType( projectInstance.workflowCode, 
+                                                        stateEngineService.getState(projectInstance.workflowCode, transId))]
 			}
 			def htmlTdId = new StringBuffer()
 			/* user role check*/
@@ -166,76 +169,88 @@ class ClientConsoleController {
 				if(projectMap){
 					stateId = projectMap.currentStateId
 				}*/
-				def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-																"where t.asset_entity_id = $assetId and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
-																"order by date_created desc limit 1 ")
-				if(transitionStates.size()){
-					stateId = transitionStates[0].stateTo
-				}
-				if(stateId == 0){
-					check = true
-				} else if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
-					stateVal = stateEngineService.getState(projectInstance.workflowCode,stateId)
-					taskVal = stateEngineService.getTasks(projectInstance.workflowCode, role ,stateVal)
-					if(taskVal.size() == 0){
-						check = false
-					}else{
-						check = true
-					}
-				}else{
-					check = false
-				}
-				def naTransQuery = "from AssetTransition where assetEntity = $assetId and voided = 0 and type = 'boolean' "
-				def isHoldNa = AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+holdId)
-				processTransitionList.each() { trans ->
-					def cssClass='task_pending'
-					def transitionId = Integer.parseInt(trans.transId)
-					def stateType = stateEngineService.getStateType( projectInstance.workflowCode, 
-									stateEngineService.getState(projectInstance.workflowCode, transitionId))
-					if(stateId != terminatedId){
-						if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId) ){
-							cssClass='asset_pending'
-						} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 0 and stateTo = "+transitionId) ) {
-							if(stateId != holdId || isHoldNa){
-								cssClass='task_done'
-							} else {
-								cssClass='asset_hold'
-							}
-						}
-						if(stateType != 'boolean' || transitionId == holdId){
-							if( transitionId <= maxstate  ){
-								cssClass = "task_done"
-								if(stateId == holdId && !isHoldNa){
-									cssClass = "asset_hold"
-								} else if( transitionId == holdId ){
-									if(isHoldNa){
-										cssClass='asset_pending'
-									} else {
-										cssClass='task_pending'
-									}
-								} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId)){
-									cssClass='asset_pending'
-								}
-							}
-						}
-					} else {
-						cssClass='task_term'
-					}
-					cssClass = getRecentChangeStyle( assetId, cssClass, trans.transId )
-					htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass\"  >&nbsp;</td>"
-					htmlTdId.append("${assetId+"_"+trans.transId},")
-				}
-				assetEntityList << [id: assetId, application:it.application,appOwner:it.appOwner,appSme:it.appSme,assetName:it.assetName,transitions:htmlTd,checkVal:check]
+                def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+                                                                "where t.asset_entity_id = $assetId and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
+                                                                "order by date_created desc limit 1 ")
+                if(transitionStates.size()){
+                    stateId = transitionStates[0].stateTo
+                }
+                if(stateId == 0){
+                    check = true
+                } else if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
+                    stateVal = stateEngineService.getState(projectInstance.workflowCode,stateId)
+                    taskVal = stateEngineService.getTasks(projectInstance.workflowCode, role ,stateVal)
+                    if(taskVal.size() == 0){
+                        check = false
+                    }else{
+                        check = true
+                    }
+                }else{
+                    check = false
+                }
+                def naTransQuery = "from AssetTransition where assetEntity = $assetId and voided = 0 and type = 'boolean' "
+                
+                def assetTransitions = AssetTransition.findAll(naTransQuery)
+  
+                def isHoldNa = assetTransitions.find { it.stateTo == holdId }
+                
+                processTransitionList.each() { trans ->
+                    def cssClass='task_pending'
+                    def transitionId = trans.transId
+                    def stateType = trans.stateType
+                    if(stateId != terminatedId){
+                        def assetTrans = assetTransitions.find { it.stateTo == transitionId }
+                        
+                        if(assetTrans && assetTrans.isNonApplicable) {
+                            cssClass='asset_pending'
+                        } else if(assetTrans) {
+                            if(stateId != holdId || isHoldNa){
+                                cssClass='task_done'
+                            } else {
+                                cssClass='asset_hold'
+                            }
+                        }
+                        
+                        if(stateType != 'boolean' || transitionId == holdId){
+                            if( transitionId <= maxstate  ){
+                                cssClass = "task_done"
+                                if(stateId == holdId && !isHoldNa){
+                                    cssClass = "asset_hold"
+                                } else if( transitionId == holdId ){
+                                    if(isHoldNa){
+                                        cssClass='asset_pending'
+                                    } else {
+                                        cssClass='task_pending'
+                                    }
+                                  } else if(assetTrans && assetTrans.isNonApplicable){
+                                    cssClass='asset_pending'
+                                }
+                            }
+                        }
+
+                        if(assetTrans != null)
+                            cssClass = getRecentChangeStyle( cssClass, assetTrans )
+                    } else {
+                        cssClass='task_term'
+                    }
+                    htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass\"  >&nbsp;</td>"
+                    htmlTdId.append("${assetId+"_"+trans.transId},")
+                }
+                assetEntityList << [id: assetId, application:it.application,appOwner:it.appOwner,appSme:it.appSme,assetName:it.assetName,transitions:htmlTd,checkVal:check]
 			}
+
 			userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")
 			def timeToUpdate = getSession().getAttribute("CLIENT_CONSOLE_REFRESH")
-			return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,
-				appOwnerList:appOwnerList,applicationList:applicationList,appSmeList:appSmeList,projectId:projectId, lastPoolTime : lastPoolTime,
-				processTransitionList:processTransitionList,projectId:projectId,appOwnerValue:appOwnerValue,appValue:appValue,
-				appSmeValue:appSmeValue,timeToUpdate:timeToUpdate ? timeToUpdate.CLIENT_CONSOLE_REFRESH : "never", 
-				headerCount:headerCount,browserTest:browserTest, myForm : params.myForm, htmlTdId:htmlTdId, role : role,
-				moveEventInstance:moveEventInstance, moveEventsList:moveEventsList ]
-    	} else {
+			
+            return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,
+                appOwnerList:appOwnerList,applicationList:applicationList,appSmeList:appSmeList,projectId:projectId, lastPoolTime : lastPoolTime,
+                processTransitionList:processTransitionList,projectId:projectId,appOwnerValue:appOwnerValue,appValue:appValue,
+                appSmeValue:appSmeValue,timeToUpdate:timeToUpdate ? timeToUpdate.CLIENT_CONSOLE_REFRESH : "never", 
+                headerCount:headerCount,browserTest:browserTest, myForm : params.myForm, htmlTdId:htmlTdId, role : role,
+                moveEventInstance:moveEventInstance, moveEventsList:moveEventsList,
+                isAdmin:subject.hasRole("ADMIN"), isManager:subject.hasRole("MANAGER"), isProjManager:subject.hasRole("PROJ_MGR")]
+    	
+        } else {
     		flash.message = "Please create bundle to view PMO Dashboard"
     		redirect(controller:'project',action:'show',params:["id":params.projectId])
     	}
@@ -899,6 +914,27 @@ class ClientConsoleController {
 		def changedClass = cssClass
 		if(cssClass == "task_done"){
 			def createdTime = AssetTransition.find("from AssetTransition a where a.assetEntity = $assetId and a.voided = 0 and a.stateTo=${transId}")?.dateCreated?.getTime()
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ					
+			def currentTime = GormUtil.convertInToGMT( "now", tzId ).getTime()
+			Integer minutes
+			if(createdTime){
+				minutes = (currentTime - createdTime) / 1000
+			}
+			if( minutes != null ){
+				if(minutes < 120){
+					changedClass = "task_done2"
+				} else if(minutes > 120 && minutes < 330){
+					changedClass = "task_done5"	
+				}
+			}
+		}
+		return changedClass
+	}
+
+	def getRecentChangeStyle( def cssClass, def trans ){
+		def changedClass = cssClass
+		if(cssClass == "task_done"){
+			def createdTime = trans.dateCreated?.getTime()
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ					
 			def currentTime = GormUtil.convertInToGMT( "now", tzId ).getTime()
 			Integer minutes
