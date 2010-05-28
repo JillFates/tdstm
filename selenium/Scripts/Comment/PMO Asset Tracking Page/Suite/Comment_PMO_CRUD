@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
+<link rel="selenium.base" href="http://ph1.tdsops.com/" />
 <title>Comment_PMO_CRUD</title>
 </head>
 <body>
@@ -11,7 +11,7 @@
 <thead>
 <tr><td rowspan="1" colspan="3">Comment_PMO_CRUD</td></tr>
 </thead><tbody>
-<!--<!--Pre-Requisite: There should be atleast one asset in the user selected project, move event and move bundle as the test picks up the first asset in PMO Asset Tracking page and performs the actions.-->-->
+<!--Pre-Requisite: There should be atleast one asset in the user selected project, move event and move bundle as the test picks up the first asset in PMO Asset Tracking page and performs the actions.-->
 <tr>
 	<td>setSpeed</td>
 	<td>5000</td>

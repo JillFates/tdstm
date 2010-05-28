@@ -11,10 +11,10 @@
 <thead>
 <tr><td rowspan="1" colspan="3">Comment_PMO_Read</td></tr>
 </thead><tbody>
-<!--<!--Pre-Requisite: There should be atleast one asset in the user selected project, move event and move bundle as the test picks up the first asset in PMO Asset Tracking page and performs the actions.-->-->
+<!--Pre-Requisite: There should be atleast one asset in the user selected project, move event and move bundle as the test picks up the first asset in PMO Asset Tracking page and performs the actions.-->
 <tr>
 	<td>setSpeed</td>
-	<td>2500</td>
+	<td>5000</td>
 	<td></td>
 </tr>
 <tr>

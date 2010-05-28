@@ -4,17 +4,17 @@
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="selenium.base" href="" />
-<title>Comment_AE_Create</title>
+<title>Comment_Console_Create</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">Comment_AE_Create</td></tr>
+<tr><td rowspan="1" colspan="3">Comment_Console_Create</td></tr>
 </thead><tbody>
-<!--Pre-Requisite: There should be atleast one asset in the user selected project as the test picks up the first asset in Asset Entity List page and performs the actions.-->
+<!--Pre-Requisite: There should be atleast one asset in the user selected project and move bundle as the test picks up the first asset in Console page and performs the actions.-->
 <tr>
 	<td>setSpeed</td>
-	<td>2500</td>
+	<td>5000</td>
 	<td></td>
 </tr>
 <tr>
@@ -39,13 +39,13 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Assets</td>
+	<td>link=Console</td>
 	<td></td>
 </tr>
 <!--Asset creation-->
 <tr>
 	<td>click</td>
-	<td>//span/a/img</td>
+	<td>//td[8]/a/img</td>
 	<td></td>
 </tr>
 <tr>
@@ -75,7 +75,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>link=New Comment</td>
+	<td>//a[contains(text(),'New<br />Comment')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -135,7 +135,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='Create' and @type='button']</td>
+	<td>//input[@value='Create']</td>
 	<td></td>
 </tr>
 <tr>
