@@ -426,3 +426,7 @@ text-decoration: line-through;
 	font-size: 9px;
 	color: red;
 }
+.field_error {
+	background-color: #FFCCCC;
+	border: 1px solid #CD3333;
+}

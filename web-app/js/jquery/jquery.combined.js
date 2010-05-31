@@ -9504,6 +9504,7 @@ $.extend(DateTimepickerInstance.prototype, {
      /* Generate the HTML for the current state of the date picker. */
      _generateDatepicker: function() {
              var today = new Date();
+             currTime = today.getHours()
              today = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // clear time
              var showStatus = this._get('showStatus');
              var isRTL = this._get('isRTL');
@@ -9527,7 +9528,6 @@ $.extend(DateTimepickerInstance.prototype, {
              var drawMonth = this._drawMonth;
              var drawYear = this._drawYear;
              var drawHour = this._drawHour ;
-             currTime = drawHour; 
              drawHour = drawHour > 12 ? drawHour - 12 : drawHour ; 
              var drawMinute = this._drawMinute;
              if (maxDate) {
