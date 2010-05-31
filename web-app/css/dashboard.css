@@ -626,36 +626,39 @@ list-style-type:none;
 .bdetails li.actstart{
 	color:#07ae53;
 	background-color:#d3d7dc;
-	line-height:28px;
+	line-height:32px;
 	margin-top:1px;
 	display:block;
 	font-size:11px;
 }
 	
-.bdetails li.actstartred{
+.bdetails li.actstart_red{
 	color:#FF0000;
 	background-color:#d3d7dc;
-	line-height:28px;
+	line-height:32px;
 	margin-top:1px;
 	display:block;
 	font-size:11px;
 }
 
-#actfinish{
-	color:#07ae53;
-	display:block;
-	font-size:11px;
-}
-	
-.bdetails li.actfinish1{
+.bdetails li.actfinish{
 	padding:2px;
 	background-color:#d3d7dc;
 	display:block;
 	text-align:center;
 	font-size:11px;
-	height:26px;
+	height:32px;
+	color: #07ae53;
 }
-	
+.bdetails li.actfinish_red{
+	padding:2px;
+	background-color:#d3d7dc;
+	display:block;
+	text-align:center;
+	font-size:11px;
+	height:32px;
+	color: #FF0000;
+}	
 #databox{
 	border:1px solid #9f9f9f;
 	width:95px;
@@ -668,14 +671,6 @@ list-style-type:none;
 	margin-top:-6px;
 }	
 
-#actfinishred{
-	color:#FF0000;
-	display:block;
-	font-size:11px;
-}
-	
-
-	
 #wunracking{
 	margin-right:0px;
 	display:block;

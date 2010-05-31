@@ -250,8 +250,8 @@
 									<!-- <li class="actfinish1"><span id="completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li> -->
 									<li class="schstart"><span id="plan_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
 									<li class="schfinish"><span id="plan_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
-									<li class="actfinish1"><span id="act_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
-									<li class="actfinish1"><span id="act_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
+									<li class="actstart" id="li_start_${moveBundle.id}_${moveBundleStep.transitionId}"><span id="act_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
+									<li class="actfinish" id="li_finish_${moveBundle.id}_${moveBundleStep.transitionId}"><span id="act_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
 								</ul>
 								<div id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}" align="center" style="display: none;">
 									<jsec:hasAnyRole in="['ADMIN']"><img id="chart_${moveBundle.id}_${moveBundleStep.transitionId}" src="${createLinkTo(dir:'i/dials',file:'dial-50sm.png')}"></jsec:hasAnyRole>
@@ -488,7 +488,7 @@
 		    p = p.substring(p.length-1, p.length);
 		    var tsource;
 		    var tsource1;
-		    var tsource2;
+		    var tsource2 = 0;
 		    var temp
 		    
 		    if (p == ")"){
@@ -507,7 +507,7 @@
 				var date = new Date(temp);
 				var utcDate = date.getTime() ;
 			    var convertedDate = new Date(utcDate + (3600000*offset));
-			    return getTimeFormate( convertedDate )
+			    return getTimeFormate( convertedDate ) +" "+ (tsource2 ? tsource2 : "")
 			}
 	    }catch(e){
 		    if(doUpdate){
@@ -567,6 +567,7 @@
 	 *--------------------------------------*/
 	 
 	 function updateDash( bundleId ) {
+		 $("#themes").css("left","0px");
 		 var moveEvent = $("#moveEvent").val()
 		 displayBundleTab( bundleId )
 		 jQuery.ajax({
@@ -637,13 +638,21 @@
 				var startDelta = 0
 				var actDelta = 0
 				if( steps[i].actStart ){
-					startDelta = new Date(steps[i].actStart).getTime() - new Date(steps[i].planStart).getTime()
+					startDelta = parseInt((new Date(steps[i].actStart).getTime() - new Date(steps[i].planStart).getTime())/60000);
+					if(startDelta > 0){
+						$("#li_start_"+moveBundleId+"_"+steps[i].tid).removeClass("actstart");
+						$("#li_start_"+moveBundleId+"_"+steps[i].tid).addClass("actstart_red");
+					}
 				}
 				$("#act_start_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].actStart+": ("+ startDelta +"m)"));
 				if( steps[i].actStart && !steps[i].actComp && steps[i].calcMethod != "M") {
 					$("#act_completion_"+moveBundleId+"_"+steps[i].tid).html("<span id='databox'>Total Devices "+steps[i].tskTot+" Completed "+steps[i].tskComp+"</span>")
 				} else {
-					actDelta = new Date(steps[i].actComp).getTime() - new Date(steps[i].planComp).getTime()
+					actDelta = parseInt((new Date(steps[i].actComp).getTime() - new Date(steps[i].planComp).getTime())/60000);
+					if(actDelta > 0){
+						$("#li_finish_"+moveBundleId+"_"+steps[i].tid).removeClass("actfinish");
+						$("#li_finish_"+moveBundleId+"_"+steps[i].tid).addClass("actfinish_red");
+					}
 					$("#act_completion_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].actComp+": ("+actDelta+"m)"));
 				}
 				var percentage = $("#percentage_"+moveBundleId+"_"+steps[i].tid).html()
