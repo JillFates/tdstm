@@ -420,9 +420,13 @@
 			$("#labelInput_"+stepId ).hide();
 			$("#startTimeText_"+stepId ).show();
 			$("#startTimeInput_"+stepId ).hide();
+			$("#startTime_"+stepId ).val("");
+			$("#startTime_"+stepId ).removeClass("field_error");
 			$("#startTimeImg_"+stepId ).hide();
 			$("#completionTimeText_"+stepId ).show();
 			$("#completionTimeInput_"+stepId ).hide();
+			$("#completionTime_"+stepId ).val("");
+			$("#completionTime_"+stepId ).removeClass("field_error");
 			$("#completionTimeImg_"+stepId ).hide();
 			$("#durationText_"+stepId ).show();
 			$("#durationInput_"+stepId ).hide();
