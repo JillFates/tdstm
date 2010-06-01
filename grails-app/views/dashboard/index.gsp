@@ -319,9 +319,10 @@
 	* function to move the data steps to right / left
 	*----------------------------------------------*/
 	var	AditionalFrames = 1;
+	var defaultBundle = $("#defaultBundleId").val();
 	function moveDataSteps(){
 		YAHOO.example = function() {
-			
+		
 			var $D = YAHOO.util.Dom;
 			var $E = YAHOO.util.Event;
 			var $A = YAHOO.util.Anim;
@@ -329,6 +330,7 @@
 			var $DD = YAHOO.util.DD;
 			var $ = $D.get;
 			var x = 1;
+			var bundle = defaultBundle;
 			
 			return {
 				init : function() {
@@ -336,6 +338,10 @@
 				},
 				move : function(e) {
 					$E.stopEvent(e);
+					if( bundle != defaultBundle ){
+						x = 1;
+						bundle = defaultBundle;
+					}
 					switch(this.id) {
 						case 'move-left':
 							if ( x === 1 ) {
@@ -567,7 +573,6 @@
 	 *--------------------------------------*/
 	 
 	 function updateDash( bundleId ) {
-		 $("#themes").css("left","0px");
 		 var moveEvent = $("#moveEvent").val()
 		 displayBundleTab( bundleId )
 		 jQuery.ajax({
@@ -608,7 +613,9 @@
 			var revSum = snapshot.revSum;
 			var planSum = snapshot.planSum
 	
-			AditionalFrames = ( steps.length > 6 ? steps.length - 5 : 1 )
+			AditionalFrames = ( steps.length > 6 ? steps.length - 5 : 1 );
+			$("#themes").css("left","0px");
+			defaultBundle = moveBundleId;
 			
 			if( snapshot.planDelta > 0){
 				$(".sum_statusbar_good").attr("class","sum_statusbar_bad")
