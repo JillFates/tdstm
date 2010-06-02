@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
+<link rel="selenium.base" href="http://ph1.tdsops.com/" />
 <title>MoveBundle_MoveTeam_Creation</title>
 </head>
 <body>
@@ -11,6 +11,11 @@
 <thead>
 <tr><td rowspan="1" colspan="3">MoveBundle_MoveTeam_Creation</td></tr>
 </thead><tbody>
+<tr>
+	<td>setSpeed</td>
+	<td>5000</td>
+	<td></td>
+</tr>
 <tr>
 	<td>open</td>
 	<td>/tds-0.1/auth/login</td>
