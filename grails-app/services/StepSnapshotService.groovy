@@ -50,11 +50,11 @@ log.debug("actualTimes=${actualTimes}")
 				earliestStartTime = moveBundleStep.moveBundle.startTime
 				
 			// Get latest StepSnapshot
-			def latestStepSnapshot = StepSnapshot.find( "from StepSnapshot as s where s.moveBundleStep=? ORDER BY s.dateCreated DESC", [ moveBundleStep ] )
+			/*def latestStepSnapshot = StepSnapshot.find( "from StepSnapshot as s where s.moveBundleStep=? ORDER BY s.dateCreated DESC", [ moveBundleStep ] )
 			if(latestStepSnapshot && !earliestStartTime && !latestCompletionTime){
 				earliestStartTime = latestStepSnapshot.dateCreated
 				latestCompletionTime = latestStepSnapshot.dateCreated
-			}
+			}*/
 log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${latestCompletionTime}, MBS: ${moveBundleStep}" )
 			
 			// If the Step hasn't started and it is not scheduled to start then we don't need to do anything
@@ -399,32 +399,35 @@ print "Creating Summary: planStartTime=${planStartTime}, planCompletionTime=${pl
 	 */
 	def calcProjectedDelta( def stepSnapshot, def timeAsOf ) {
 		def planDelta
-		def planCompletionTime = stepSnapshot.moveBundleStep.planCompletionTime.getTime() / 1000
-		def planDuration = stepSnapshot.moveBundleStep.planDuration
-		def planTaskPace = stepSnapshot.getPlanTaskPace()
-		def actualTaskPace = stepSnapshot.getActualTaskPace()
-		
 		// if ( ! timeAsOf ) timeAsOf = new Date() 
 		timeAsOf = timeAsOf.getTime() / 1000
 		
 		// print "timeAsOf=${timeAsOf}, planCompletion=${planCompletionTime}, difference=${ planCompletionTime - timeAsOf }\n"
 		if (stepSnapshot.tasksCompleted > 0) {
-			// Need to determine the finish time based on weighted average of actual and planned paces
-			/*def wtFactor = stepSnapshot.duration > planDuration ? 1 : ( stepSnapshot.duration / planDuration )
+			
+			def planCompletionTime = stepSnapshot.moveBundleStep.planCompletionTime.getTime() / 1000
+			def planStartTime = stepSnapshot.moveBundleStep.planStartTime.getTime() / 1000
+			def planDuration = stepSnapshot.moveBundleStep.planDuration
+			def planTaskPace = stepSnapshot.getPlanTaskPace()
+			def actualTaskPace = stepSnapshot.getActualTaskPace()
 			
 			def tasksRemaining = stepSnapshot.tasksCount - stepSnapshot.tasksCompleted
-			def remainingDuration = (tasksRemaining * (1 - wtFactor) * planTaskPace + tasksRemaining * wtFactor * actualTaskPace).intValue()
-	
-			planDelta = (timeAsOf + remainingDuration - planCompletionTime).intValue()*/
 			
-			def tasksRemaining = stepSnapshot.tasksCount - stepSnapshot.tasksCompleted
-			def actualStart = stepSnapshot.moveBundleStep.actualStartTime
-			def actualStartTime = actualStart ? actualStart.getTime() / 1000 : timeAsOf
+			def actualStartTime = stepSnapshot.moveBundleStep.actualStartTime?.getTime()
+				actualStartTime = actualStartTime ? actualStartTime / 1000 : timeAsOf 
 			
-			def projectedDuration =  (timeAsOf - actualStartTime) + (tasksRemaining * planTaskPace)
-			
-			planDelta  =  projectedDuration - planDuration
-			
+			if( actualStartTime < planStartTime  ){
+				// calculate the projectedDuration when plan started before planStartTime
+				def projectedDuration =  (timeAsOf - actualStartTime) + (tasksRemaining * planTaskPace)
+				planDelta  =  projectedDuration - planDuration
+
+			} else {
+				//	Need to determine the finish time based on weighted average of actual and planned paces
+				def wtFactor = stepSnapshot.duration > planDuration ? 1 : ( stepSnapshot.duration / planDuration )
+				def remainingDuration = (tasksRemaining * (1 - wtFactor) * planTaskPace + tasksRemaining * wtFactor * actualTaskPace).intValue()
+				planDelta = (timeAsOf + remainingDuration - planCompletionTime).intValue()
+				
+			}
 			// print "wtFactor=${wtFactor}, tasksRemaining=${tasksRemaining}, remainingDuration=${remainingDuration}, " +
 			//	"planTaskPace=${planTaskPace}, \nactualTaskPace=${actualTaskPace}, planDelta=${planDelta}\n"
 				
