@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://ph1.tdsops.com/" />
+<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
 <title>AssetImport_TeamAssignment_Console</title>
 </head>
 <body>
@@ -31,7 +31,7 @@
 	<td>dataTransferSet</td>
 	<td>label=TDS Master Spreadsheet</td>
 </tr>
-<!--Pre-Requisite: Enter the path of the Excel file in the below case to import assets. In the Move Bundle column of the excel sheet, enter the Move Bundle name that is created in the previous script for all assets.-->
+<!--Pre-Requisite: Enter the path of the Excel file in the below case to import assets. -->
 <tr>
 	<td>type</td>
 	<td>file</td>
@@ -170,6 +170,71 @@
 <tr>
 	<td>clickAndWait</td>
 	<td>link=${BundleName}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Bundle Asset Assignment</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Assign Assets</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifySelectedLabel</td>
+	<td>bundleLeftId</td>
+	<td>Unassigned</td>
+</tr>
+<tr>
+	<td>verifySelectedLabel</td>
+	<td>bundleRightId</td>
+	<td>${BundleName}</td>
+</tr>
+<tr>
+	<td>storeTableRows</td>
+	<td>assetsLeftTableId</td>
+	<td>p</td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>${p}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>store</td>
+	<td>1</td>
+	<td>loop1</td>
+</tr>
+<tr>
+	<td>while</td>
+	<td>${loop1}&lt;${p}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//form/div/table/tbody/tr[${loop1}]/td[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeEval</td>
+	<td>storedVars['loop1'] = ${loop1}+1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>${loop1}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>endWhile</td>
+	<td></td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//a[@id='add']/img</td>
 	<td></td>
 </tr>
 <tr>
@@ -1047,7 +1112,7 @@
 <tr>
 	<td>type</td>
 	<td>editshortNameId</td>
-	<td>edited </td>
+	<td>edited</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
@@ -1284,6 +1349,112 @@
 <tr>
 	<td>verifyElementPresent</td>
 	<td>//td[4]</td>
+	<td></td>
+</tr>
+<!--MoveEvent Creation and adding the movebundle to the event-->
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Events</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Move Event List</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Create New</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Create Move Event</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Fields marked ( * ) are mandatory</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.1.0</td>
+	<td>exact:Project: *</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.2.0</td>
+	<td>exact:Name: *</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.3.0</td>
+	<td>exact:Description:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.4.0</td>
+	<td>Move Bundle:</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>projectId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>name</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>description</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>moveBundleList</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//input[@value='Create']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>_action_list</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name</td>
+	<td>javascript{var ME =&quot;Test ME on - &quot;; var date = new Date();&nbsp;&nbsp;var month =&nbsp;&nbsp;date.getMonth();month = month + 1;var monthday&nbsp;&nbsp;&nbsp;&nbsp;= date.getDate();var year&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= date.getFullYear();&nbsp;&nbsp;if (monthday &lt; 10){monthday = '0' + monthday;}&nbsp;&nbsp;&nbsp;if (month &lt; 10){month = '0' + month;}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ME+month+&quot;/&quot;+monthday+&quot;/&quot;+year; }</td>
+</tr>
+<tr>
+	<td>randomString</td>
+	<td>6|alphanumeric</td>
+	<td>Desc</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>description</td>
+	<td>${Desc}</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@name='moveBundle' and @value='${bundleId}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Create']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>created</td>
 	<td></td>
 </tr>
 
