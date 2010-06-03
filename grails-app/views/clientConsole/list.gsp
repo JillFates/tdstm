@@ -89,6 +89,7 @@ overflow: hidden;
 				<span style="display: none;" id="bulkTaskSpanId">
 					<input type="button" name="bulkPending" id="bulkPendingId" value="Pending" onclick="changeAction('pending')"/>
 					<input type="button" name="bulkDone" id="bulkDoneId" value="Done" onclick="changeAction('done')"/>
+					<input type="button" name="bulkUndo" id="bulkUndoId" value="Undo" onclick="changeAction('void')"/>
 					<input type="button" name="bulkNa" id="bulkNaId" value="N/A" onclick="changeAction('na')"/>
 					<input type="hidden" name="bulkAction" id="bulkActionId" value="done"/>
 				</span>
@@ -536,7 +537,7 @@ Comment</a></span></div>
         <li id="done">Done</li>
         <li id="NA">N/A</li>
         <li id="pending">Pending</li>
-        <li id="void">Void</li>
+        <li id="void">Undo</li>
         <li id="ready">Ready</li>
         <li id="noOptions">No Options</li>
     </ul>
@@ -613,7 +614,7 @@ var fieldId
 				          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=pending\'', onComplete:'updateTransitionRow(e)' )};
 				        },
 				        'void': function(t) {
-				          	if(confirm("Void this and any successive transitions. Are you sure?")){
+				          	if(confirm("Undo this specific task and any dependent (workflow) transitions. Are you sure?")){
 				          		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=void\'', onComplete:'updateTransitionRow(e)' )};
 							} else {
 				          		return false
@@ -992,6 +993,12 @@ var fieldId
 				$("#bulkPendingId").removeClass("bulkPending_active")
 				$("#bulkDoneId").addClass("bulkDone_active")
 				$("#bulkActionId").val("done")
+			break;
+			case "undo" :
+				$("#bulkDoneId").removeClass("bulkDone_active")
+				$("#bulkNaId").removeClass("bulkNa_active")
+				$("#bulkPendingId").addClass("bulkPending_active")
+				$("#bulkActionId").val("pending")
 			break;
 			case "na" :
 				$("#bulkPendingId").removeClass("bulkPending_active")
