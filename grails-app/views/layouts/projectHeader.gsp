@@ -116,7 +116,7 @@
 		<li><g:link class="home" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link> </li>
 		<li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">PMO Asset Tracking</g:link> </li>
         </jsec:hasAnyRole>
-        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"><li><a href="#" onclick="$('#reportsMenu').show();$('#assetMenu').hide();">Reports</a></li>
+        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"><li><a href="#" onclick="$('#reportsMenu').show();$('#assetMenu').hide();this.style.background='#003366';">Reports</a></li>
 	</jsec:lacksAllRoles>
       </ul>
     </div>
