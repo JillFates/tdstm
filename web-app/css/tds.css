@@ -71,13 +71,13 @@
 }
 .title
 {
-	font: bold 14px Arial;
+	font: bold 16px Arial;
 	color:#ffffff;
-	width:100%;
+	width:70%;
         float:left;
 	text-align:center;
 	background:#5f9fcf;
-	height:25px;
+	height:30px;
 	padding-top: 2px;
 }
 .menu1

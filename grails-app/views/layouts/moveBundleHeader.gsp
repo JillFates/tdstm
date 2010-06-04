@@ -50,6 +50,7 @@
       <g:else>
      	 <a href="http://www.transitionaldata.com/" target="new"><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;border: 0px"/></a>
      </g:else>
+      <div class="title">&nbsp;Transition Manager <g:if test="${currProjObj}"> - ${currProjObj.name} : : ${moveBundle.name} </g:if></div>
         <div class="header_right"><br />
           <div style="font-weight: bold; color: #0000FF">
           <jsec:isLoggedIn>
@@ -80,7 +81,6 @@
         </div>
       </div>
 
-      <div class="title">&nbsp;Transition Manager <g:if test="${currProjObj}"> - ${currProjObj.name} : : ${moveBundle.name} </g:if></div>
       <!--
 <div class="menu1">
 <ul>
