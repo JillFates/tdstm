@@ -53,29 +53,41 @@ class WorkflowService {
 	        	}
 	    		//	If verification is successful then create AssetTransition and Update ProjectTeam
 	        	if ( verifyFlag ) {
-	        		def state = stateEngineService.getStateId( process, toState )
-	        		def assetTransition = new AssetTransition( stateFrom:currentState.toString(), stateTo:state, comment:comment, assetEntity:assetEntity, moveBundle:moveBundle, projectTeam:projectTeam, userLogin:userLogin, type:stateType )
-	        		if ( !assetTransition.validate() || !assetTransition.save() ) {
-	    				message = "Unable to create AssetTransition: " + GormUtil.allErrorsString( assetTransition )
-	    			} else {
-	    				def holdState = stateEngineService.getStateId( process, 'Hold' )
-	    				/* Set preexisting AssetTransitions as voided where stateTo >= new state */
-	    				setPreExistTransitionsAsVoided( process, assetEntity, state, assetTransition, stateType, holdState)
-	    				/* Set time elapsed for each transition */
-	    				message = setTransitionTimeElapsed(assetTransition)
-	    				message = "Transaction created successfully"
-	    				if(projectTeam){
-							projectTeam.isIdle = flag.contains('busy') ? 1 : 0
-							projectTeam.latestAsset = assetEntity
-							projectTeam.save()
-	    				}
-	    				if(stateType != "boolean"){
-	    					projectAssetMap.currentStateId = Integer.parseInt(stateEngineService.getStateId( process, toState ))
-	    				}
-	    				projectAssetMap.save()
-
-						success = true
-					}
+	        		AssetTransition.withTransaction { status ->
+		        		def state = stateEngineService.getStateId( process, toState )
+						def lastState
+						if(stateType != "boolean"){
+							lastState = doPreExistTransitions(process, currentState.toString(), state, assetEntity, moveBundle, projectTeam, userLogin)
+						}
+						lastState = lastState ? lastState : currentState.toString()
+								
+		        		def assetTransition = new AssetTransition( stateFrom:lastState, stateTo:state, comment:comment, assetEntity:assetEntity, moveBundle:moveBundle, projectTeam:projectTeam, userLogin:userLogin, type:stateType )
+						
+		        		if ( !assetTransition.validate() || !assetTransition.save() ) {
+		    				message = "Unable to create AssetTransition: " + GormUtil.allErrorsString( assetTransition )
+		    			} else {
+		    				def holdState = stateEngineService.getStateId( process, 'Hold' )
+		    				/* Set preexisting AssetTransitions as voided where stateTo >= new state */
+		    				setPreExistTransitionsAsVoided( process, assetEntity, state, assetTransition, stateType, holdState)
+		    				/* Set time elapsed for each transition */
+		    				message = setTransitionTimeElapsed(assetTransition)
+		    				message = "Transaction created successfully"
+		    				if(projectTeam){
+								projectTeam.isIdle = flag.contains('busy') ? 1 : 0
+								projectTeam.latestAsset = assetEntity
+								projectTeam.save()
+		    				}
+		    				if(stateType != "boolean"){
+		    					projectAssetMap.currentStateId = Integer.parseInt(stateEngineService.getStateId( process, toState ))
+		    				}
+		    				projectAssetMap.save()
+	
+							success = true
+						}
+						if(!success){
+							status.setRollbackOnly()
+						}
+	        		}
 	        	}
 	    	} else {
 	    		message = "$role does not have permission to change the State"
@@ -143,4 +155,33 @@ class WorkflowService {
 	    	}
     	}
     }
+    /*-------------------------------------------------------------------------------
+     * 
+     * When moving a given asset from one workflow status to another will do pre existing transitions if there are steps in between. 
+	 	If selected transition failed then this transitions will be rolled back at called place. 
+	 	For example, if current status is at 30 and the user wants to go to 33, fill in 31 and 32 with the same time as the 33 time. 
+		This assumes 30-33 are all in the workflow.
+     * 
+     * @author : Lokanath Reddy
+     * @param  : process, stateFrom, stateTo,  assetEntity, moveBundle, projectTeam, userLogin
+     * @return : last transition stateTo id.
+     *-----------------------------------------------------------------------------*/
+     def doPreExistTransitions( def process, def stateFrom, def stateTo,  def assetEntity, def moveBundle, def projectTeam, def userLogin ){
+		
+    	def min = Integer.parseInt(stateFrom) + 1
+		def max = Integer.parseInt(stateTo)
+		
+		def processTransitions = stateEngineService.getTasks( process, "TASK_ID")
+		def currentState = stateFrom
+
+		for (int i = min; i < max ; i++){
+			 if( processTransitions.contains(i.toString()) ){
+				 def assetTransition = new AssetTransition( stateFrom:currentState, stateTo:i.toString(), comment:"", assetEntity:assetEntity, moveBundle:moveBundle, projectTeam:projectTeam, userLogin:userLogin, type:"process" )
+				 if ( assetTransition.validate() && assetTransition.save(flush:true) ) {
+					 currentState = i.toString();
+	    		 } 
+			 }
+		}
+		return currentState
+     }
 }
