@@ -98,6 +98,9 @@
       <g:if test="${currProj}">
       <div class="menu2">
       	<ul>
+            <jsec:hasRole name="ADMIN">
+                <li><g:link class="home" controller="auth" action="home">Admin</g:link> </li>
+            </jsec:hasRole>
         	<li><g:link class="home" controller="projectUtil">Project </g:link> </li>
         	<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
         		<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>

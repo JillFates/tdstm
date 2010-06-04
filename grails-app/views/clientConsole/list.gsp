@@ -81,7 +81,7 @@ overflow: hidden;
 			</td>
 			
 			<g:if test="${isAdmin || isProjManager}">
-			<td style="text-align: left;width: 270px;">
+			<td style="text-align: left;width: 300px;">
 				<span>
 					<input type="button" name="bulkEdit" id="bulkEditId" value="Bulk Edit" class="bulkedit_inactive" onclick="performBulkEdit()"/>
 				</span>
@@ -89,7 +89,7 @@ overflow: hidden;
 				<span style="display: none;" id="bulkTaskSpanId">
 					<input type="button" name="bulkPending" id="bulkPendingId" value="Pending" onclick="changeAction('pending')"/>
 					<input type="button" name="bulkDone" id="bulkDoneId" value="Done" onclick="changeAction('done')"/>
-					<input type="button" name="bulkUndo" id="bulkUndoId" value="Undo" onclick="changeAction('void')"/>
+					<input type="button" name="bulkUndo" id="bulkUndoId" value="Undo" onclick="changeAction('undo')"/>
 					<input type="button" name="bulkNa" id="bulkNaId" value="N/A" onclick="changeAction('na')"/>
 					<input type="hidden" name="bulkAction" id="bulkActionId" value="done"/>
 				</span>
