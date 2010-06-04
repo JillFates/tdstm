@@ -25,8 +25,8 @@
   </head>
 	<% def currProj = session.getAttribute("CURR_PROJ");
 	   def setImage = session.getAttribute("setImage");
-    def moveEvent = session.getAttribute("MOVE_EVENT")
-    def moveBundle = session.getAttribute("MOVEBUNDLE")
+    def moveEvent = session.getAttribute("MOVE_EVENT");
+    def moveBundle = session.getAttribute("MOVEBUNDLE");
     def projectId = currProj.CURR_PROJ ;
     def currProjObj;
     if( projectId != null){
@@ -76,7 +76,7 @@
         </div>
       </div>
 
-      <div class="title">&nbsp;Transition Manager <g:if test="${currProjObj}"> - ${currProjObj.name} : ${moveEvent.name} :  ${moveBundle.name}</g:if></div>
+      <div class="title">&nbsp;Transition Manager <g:if test="${currProjObj}"> - ${currProjObj.name} :  :  ${moveBundle.name}</g:if></div>
       <!--
 	<div class="menu1">
 	<ul>
