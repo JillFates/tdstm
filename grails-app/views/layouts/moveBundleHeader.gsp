@@ -24,6 +24,8 @@
     
     <% def currProj = session.getAttribute("CURR_PROJ");
     def setImage = session.getAttribute("setImage");
+    def moveEvent = session.getAttribute("MOVE_EVENT")
+    def moveBundle = session.getAttribute("MOVEBUNDLE")
     def projectId = currProj.CURR_PROJ ;
     def currProjObj;
     if( projectId != null){
@@ -79,21 +81,7 @@
         </div>
       </div>
 
-      <div class="top_menu_layout">
-        <div class="menu1">
-          <ul>
-          <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
-            <li><g:link class="home" controller="projectUtil">Project Manager</g:link></li>
-            <jsec:hasRole name="ADMIN">
-              <li><g:link class="home" controller="auth" action="home">Administration </g:link> </li>
-            </jsec:hasRole>
-            <li><g:link class="home" controller="moveTech" action="moveTechLogin">Move Tech</g:link></li>
-            <li><g:link class="home" controller="moveTech" action="moveTechLogin">Cleaning</g:link></li>
-            </jsec:lacksAllRoles>
-          </ul>
-        </div>
-      </div>
-      <div class="title">&nbsp;Transition Manager <g:if test="${currProjObj}"> - ${currProjObj.name} ( ${currProjObj.projectCode} ) </g:if></div>
+      <div class="title">&nbsp;Transition Manager <g:if test="${currProjObj}"> - ${currProjObj.name} : ${moveEvent.name} : ${moveBundle.name} </g:if></div>
       <!--
 <div class="menu1">
 <ul>
