@@ -46,7 +46,11 @@
      			<a href="http://www.transitionaldata.com/" target="new"><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;border: 0px"/></a>      	    	 
     		</g:else>
     	</div>
-      
+      <div class="title">&nbsp;Transition Manager
+      	<g:if test="${currProjObj}"> - ${currProjObj.name} </g:if>
+      	<g:if test="${moveEventId}"> : ${MoveEvent.findById( moveEventId )?.name}</g:if>
+      	<g:if test="${moveBundleId}"> : ${MoveBundle.findById( moveBundleId )?.name}</g:if>
+      </div>
         <div class="header_right"><br />
           <div style="font-weight: bold; color: #0000FF">
           <jsec:isLoggedIn>
