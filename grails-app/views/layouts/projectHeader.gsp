@@ -52,11 +52,11 @@
       	<g:if test="${moveBundleId}"> : ${MoveBundle.findById( moveBundleId )?.name}</g:if>
       </div>
         <div class="header_right"><br />
-          <div style="font-weight: bold; color: #0000FF">
+          <div style="font-weight: bold;">
           <jsec:isLoggedIn>
 			<strong>
 			<div style="float: left;">
-			<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" style="color: #0000FF;" onComplete="updatePersonDetails(e)">
+			<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">
 			Welcome,&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name } </span>
 			</g:remoteLink>
 			</div>
@@ -75,7 +75,7 @@
 			</div>
 	              	&nbsp;| 
 	              </strong>
-              &nbsp;<g:link controller="auth" action="signOut" style="color: #003366">sign out</g:link>
+              &nbsp;<g:link controller="auth" action="signOut">sign out</g:link>
           </jsec:isLoggedIn>
           </div>
         </div>

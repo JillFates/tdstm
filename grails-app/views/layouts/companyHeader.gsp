@@ -51,12 +51,12 @@
       	<g:if test="${moveBundleId}"> : ${MoveBundle.findById( moveBundleId )?.name}</g:if>
        </div>
         <div class="header_right"><br />
-          <div style="font-weight: bold; color: #0000FF">
+          <div style="font-weight: bold;">
           <jsec:isLoggedIn>
-              	<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" style="color: #0000FF;" onComplete="updatePersonDetails(e)">
+              	<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">
 			<strong>
 			<div style="float: left;">
-				Welcome &nbsp;&nbsp; <span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name } </span>
+				Welcome,&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name } </span>
 			</div>
 			<div class="tzmenu">&nbsp;-&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' }</span>
 				time<ul>   
@@ -74,7 +74,7 @@
 	              	&nbsp;| 
 	              </strong>
               </g:remoteLink>
-              &nbsp;<g:link controller="auth" action="signOut" style="color: #003366">sign out</g:link>
+              &nbsp;<g:link controller="auth" action="signOut">sign out</g:link>
           </jsec:isLoggedIn>
           </div>
         </div>

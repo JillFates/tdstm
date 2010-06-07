@@ -209,7 +209,11 @@
 	height:auto;
 	float:right;
 	font:11px Arial;
-	color:#000000;
+	color:#FFFFFF;
+}
+.header_right a
+{
+	color:#FFFFFF;
 }
 .top_menu_layout
 {
