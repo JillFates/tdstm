@@ -22,11 +22,13 @@
     <% def currProj = session.getAttribute("CURR_PROJ");
        def setImage = session.getAttribute("setImage");
     def projectId = currProj.CURR_PROJ ;
+    def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
+    def moveBundleId = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE ;
     def currProjObj;
     if( projectId != null){
       currProjObj = Project.findById(projectId)
     }
-    def partyGroup = session.getAttribute("PARTYGROUP")?.PARTYGROUP 
+    def partyGroup = session.getAttribute("PARTYGROUP")?.PARTYGROUP ;
     
     %>
   </head>
@@ -35,14 +37,19 @@
     <div class="main_body">
 
       <div class="header">
-      <g:if test="${setImage}">
-      	<div class="header_left">
-    	  <img src="${createLink(controller:'project', action:'showImage', id:setImage)} " style="height: 30px;"/>
-    	</div> 
-      </g:if>
-      <g:else>
-     	 <a href="http://www.transitionaldata.com/" target="new"><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;border: 0px"/></a>
-     </g:else>
+       	<div class="header_left">
+      		<g:if test="${setImage}">
+    	  		<img src="${createLink(controller:'project', action:'showImage', id:setImage)}" style="height: 30px;"/>
+    	  	</g:if>
+	      	<g:else>      	
+     			<a href="http://www.transitionaldata.com/" target="new"><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;border: 0px"/></a>      	    	 
+    		</g:else>
+    	</div>
+    	<div class="title">&nbsp;Transition Manager 
+      	<g:if test="${currProjObj}"> - ${currProjObj.name} </g:if>
+      	<g:if test="${moveEventId}"> : ${MoveEvent.findById( moveEventId )?.name}</g:if>
+      	<g:if test="${moveBundleId}"> : ${MoveBundle.findById( moveBundleId )?.name}</g:if>
+       </div>
         <div class="header_right"><br />
           <div style="font-weight: bold; color: #0000FF">
           <jsec:isLoggedIn>
@@ -67,13 +74,13 @@
 	              	&nbsp;| 
 	              </strong>
               </g:remoteLink>
-              &nbsp;<g:link controller="auth" action="signOut" style="color: #328714">sign out</g:link>
+              &nbsp;<g:link controller="auth" action="signOut" style="color: #003366">sign out</g:link>
           </jsec:isLoggedIn>
           </div>
         </div>
       </div>
 
-      <div class="top_menu_layout">
+      <%-- <div class="top_menu_layout">
         <div class="menu1">
           <ul>
             <li><g:link class="home" controller="projectUtil">Project Manager</g:link></li>
@@ -82,8 +89,7 @@
             </jsec:hasRole>
           </ul>
         </div>
-      </div>
-      <div class="title">&nbsp;Transition Manager <g:if test="${currProjObj}"> - ${currProjObj.name} ( ${currProjObj.projectCode} ) </g:if></div>
+      </div> --%>
       <!--
 <div class="menu1">
 <ul>
@@ -100,6 +106,10 @@
       -->
        <div class="menu2">
 		<ul>
+			<jsec:hasRole name="ADMIN">
+			<li><g:link class="home" controller="auth" action="home">Admin</g:link> </li>
+	            </jsec:hasRole>
+			<li><g:link class="home" controller="projectUtil">Project </g:link> </li>
 			<li><g:link class="home" controller="partyGroup" action="show" id="${partyGroup}">Company</g:link></li>
 			<li><g:link class="home" controller="person" id="${partyGroup}">Staff</g:link></li>
 			<li><g:link class="home" controller="application" id="${partyGroup}">Applications </g:link></li>

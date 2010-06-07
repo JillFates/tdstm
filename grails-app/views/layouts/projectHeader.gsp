@@ -25,9 +25,9 @@
   </head>
 	<% def currProj = session.getAttribute("CURR_PROJ");
 	   def setImage = session.getAttribute("setImage");
-    def moveEvent = session.getAttribute("MOVE_EVENT");
-    def moveBundle = session.getAttribute("MOVEBUNDLE");
     def projectId = currProj.CURR_PROJ ;
+    def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
+    def moveBundleId = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE ;
     def currProjObj;
     if( projectId != null){
       currProjObj = Project.findById(projectId)
@@ -38,15 +38,15 @@
     <div class="main_body">
 
       <div class="header">
-      <g:if test="${setImage}">
       	<div class="header_left">
-    	  <img src="${createLink(controller:'project', action:'showImage', id:setImage)}" style="height: 30px;"/>
-    	 </div> 
-      </g:if>
-      <g:else>      	
-     	 <a href="http://www.transitionaldata.com/" target="new"><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;border: 0px"/></a>      	    	 
-     </g:else>
-      <div class="title">&nbsp;Transition Manager <g:if test="${currProjObj}"> - ${currProjObj.name} :  :  ${moveBundle.name}</g:if></div>
+      		<g:if test="${setImage}">
+    	  		<img src="${createLink(controller:'project', action:'showImage', id:setImage)}" style="height: 30px;"/>
+    	  	</g:if>
+	      	<g:else>      	
+     			<a href="http://www.transitionaldata.com/" target="new"><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;border: 0px"/></a>      	    	 
+    		</g:else>
+    	</div>
+      
         <div class="header_right"><br />
           <div style="font-weight: bold; color: #0000FF">
           <jsec:isLoggedIn>
@@ -71,7 +71,7 @@
 			</div>
 	              	&nbsp;| 
 	              </strong>
-              &nbsp;<g:link controller="auth" action="signOut" style="color: #328714">sign out</g:link>
+              &nbsp;<g:link controller="auth" action="signOut" style="color: #003366">sign out</g:link>
           </jsec:isLoggedIn>
           </div>
         </div>
@@ -99,7 +99,7 @@
 		<li><g:link class="home" controller="projectUtil">Project </g:link> </li>
         <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 		<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
-		<li><g:link class="home" controller="assetEntity" action="list" >Assets</g:link></li>
+		<li id="assetMenuId"><g:link class="home" controller="assetEntity" action="list" >Assets</g:link></li>
                 <li><g:link class="home" controller="moveEvent" action="list" >Events</g:link> </li>
 		<li><g:link class="home" controller="moveBundle" params="[projectId:currProjObj?.id]">Bundles</g:link></li>
         </jsec:lacksAllRoles>
@@ -116,7 +116,7 @@
 		<li><g:link class="home" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link> </li>
 		<li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">PMO Asset Tracking</g:link> </li>
         </jsec:hasAnyRole>
-        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"><li><a href="#" onclick="$('#reportsMenu').show();$('#assetMenu').hide();this.style.background='#003366';">Reports</a></li>
+        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"><li><a href="#" onclick="showReportsMenu();this.style.background='#003366';">Reports</a></li>
 	</jsec:lacksAllRoles>
       </ul>
     </div>
@@ -216,6 +216,9 @@
       </div>
     </div>
     <script type="text/javascript">
+	    if($("#assetMenu").is(":visible")){
+		  	$("#assetMenuId a").css('background-color','#003366')
+	  	}
 		function updatePersonDetails( e ){
 			var person = eval("(" + e.responseText + ")");
 			$("#personId").val(person.id)
@@ -244,6 +247,13 @@
 	  	function updateTimeZone( e ){
 		  	var sURL = unescape(window.location);
 		  	window.location.href = sURL;
+	  	}
+	  	function showReportsMenu(){
+	  		$('#reportsMenu').show();
+	  		$('#assetMenu').hide();
+	  		$('li a').each(function() {
+		  		$(this).css('background-color','');
+	  		});
 	  	}
 	</script>
   </body>

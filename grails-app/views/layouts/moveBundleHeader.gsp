@@ -24,8 +24,8 @@
     
     <% def currProj = session.getAttribute("CURR_PROJ");
     def setImage = session.getAttribute("setImage");
-    def moveEvent = session.getAttribute("MOVE_EVENT");
-    def moveBundle = session.getAttribute("MOVEBUNDLE");
+    def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
+    def moveBundleId = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE ;
     def projectId = currProj.CURR_PROJ ;
     def currProjObj;
     if( projectId != null){
@@ -50,7 +50,11 @@
       <g:else>
      	 <a href="http://www.transitionaldata.com/" target="new"><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;border: 0px"/></a>
      </g:else>
-      <div class="title">&nbsp;Transition Manager <g:if test="${currProjObj}"> - ${currProjObj.name} : : ${moveBundle.name} </g:if></div>
+      <div class="title">&nbsp;Transition Manager
+      	<g:if test="${currProjObj}"> - ${currProjObj.name} </g:if>
+      	<g:if test="${moveEventId}"> : ${MoveEvent.findById( moveEventId )?.name}</g:if>
+      	<g:if test="${moveBundleId}"> : ${MoveBundle.findById( moveBundleId )?.name}</g:if>
+      </div>
         <div class="header_right"><br />
           <div style="font-weight: bold; color: #0000FF">
           <jsec:isLoggedIn>
@@ -75,7 +79,7 @@
 			</div>
 	              	&nbsp;| 
 	              </strong>
-              &nbsp;<g:link controller="auth" action="signOut" style="color: #328714">sign out</g:link>
+              &nbsp;<g:link controller="auth" action="signOut" style="color: #003366">sign out</g:link>
           </jsec:isLoggedIn>
           </div>
         </div>
@@ -104,7 +108,7 @@
         	<li><g:link class="home" controller="projectUtil">Project </g:link> </li>
         	<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
         		<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
-        		<li><a href="#" onclick="$('#assetMenu').show();$('#reportsMenu').hide();$('#bundleMenu').hide();this.style.background='#003366';">Assets</a></li> 
+        		<li><g:link class="home" controller="assetEntity" action="list" >Assets</g:link></li></li> 
                         <li><g:link class="home" controller="moveEvent" action="list" >Events</g:link> </li>
         		<li><g:link class="home" controller="moveBundle" params="[projectId:currProjObj?.id]" style="background-color:#003366">Bundles</g:link></li>
         	</jsec:lacksAllRoles>
@@ -122,7 +126,7 @@
         		<li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">PMO Asset Tracking</g:link> </li>
         	</jsec:hasAnyRole>
          	<jsec:lacksAllRoles in="['MANAGER','OBSERVER']">
-         		<li><a href="#" onclick="$('#reportsMenu').show();$('#assetMenu').hide();$('#bundleMenu').hide();this.style.background='#003366';">Reports</a></li>
+         		<li><a href="#" onclick="showReportsMenu();this.style.background='#003366';">Reports</a></li>
          	</jsec:lacksAllRoles>
 		</ul>
     </div>
@@ -259,6 +263,14 @@
 	  	function updateTimeZone( e ){
 		  	var sURL = unescape(window.location);
 		  	window.location.href = sURL;
+	  	}
+	  	function showReportsMenu(){
+	  		$('#reportsMenu').show();
+	  		$('#assetMenu').hide();
+	  		$('#bundleMenu').hide();
+	  		$('li a').each(function() {
+		  		$(this).css('background-color','');
+	  		});
 	  	}
 	</script>
   </body>
