@@ -101,6 +101,16 @@ body{
 	border:2px solid #595959;
 	background-color: #CD3333;
 }
+.step_statusbar_yellow {
+	font-size:14px;
+	font-weight:bold;
+	text-align:center;
+	color:#000;
+	line-height:24px;
+	display:block;
+	border:2px solid #595959;
+	background-color: #FFCC66;
+}
 #container{
 	width:980px;
 	margin:auto;
@@ -173,8 +183,15 @@ body{
 	font-weight:bold;
 	color:#FFFFFF;
 	line-height:26px;
-	}
-
+}
+.sum_statusbar_yellow{
+	text-align:center;
+	background-color: #FFCC33;
+	font-size:16px;
+	font-weight:bold;
+	color:#000;
+	line-height:26px;
+}
 #bodytop{
 	height:185px;
 	}

@@ -1055,7 +1055,7 @@ class AssetEntityController {
 	        	def check = true
 	        	def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
 	        														"where t.asset_entity_id = $it.id and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
-	        														"order by date_created desc limit 1 ")
+	        														"order by t.date_created desc, t.state_to desc limit 1 ")
 	        	//def projectAssetMap = it.currentState
 	        	def curId = 0
 	        	if(transitionStates.size()){
@@ -1159,7 +1159,7 @@ class AssetEntityController {
 	        def holdId = stateEngineService.getStateId( assetDetail.project.workflowCode, "Hold" )
 	        def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
 	        											"where t.asset_entity_id = $assetId and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
-	        											"order by date_created desc limit 1 ")
+	        											"order by t.date_created desc, t.state_to desc  limit 1 ")
 	        def currentState = 0
 	        if(transitionStates.size()){
 		        	currentState = transitionStates[0].stateTo
@@ -1313,7 +1313,7 @@ class AssetEntityController {
     		}
     		def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
     															"where t.asset_entity_id = $assetId and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
-    															"order by date_created desc limit 1 ")
+    															"order by t.date_created desc, t.state_to desc limit 1 ")
 			def currentStatus = 0
 			if(transitionStates.size()){
 				currentStatus = transitionStates[0].stateTo
@@ -1418,7 +1418,7 @@ class AssetEntityController {
         		//def projectAssetMap = ProjectAssetMap.find("from ProjectAssetMap pam where pam.asset = $asset")
         		def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
     															"where t.asset_entity_id = $asset and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
-    															"order by date_created desc limit 1 ")
+    															"order by t.date_created desc, t.state_to desc limit 1 ")
         		if(transitionStates.size()){
         			stateVal = stateEngineService.getState(projectInstance.workflowCode,transitionStates[0].stateTo)
                     temp = stateEngineService.getTasks(projectInstance.workflowCode,"SUPERVISOR",stateVal)

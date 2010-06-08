@@ -77,8 +77,15 @@ log.debug "offsetTZ=${offsetTZ}"
     				}
     			} else if( !data.actComp ){
     				if(data.projComp){
-	    				if( new Date( data.projComp ).getTime() > new Date( data.planComp ).getTime() ){
+	    				/*if( new Date( data.projComp ).getTime() > new Date( data.planComp ).getTime() ){
 	    					data.put( "percentageStyle", "step_statusbar_bad" )
+	    				} else {
+	    					data.put( "percentageStyle", "step_statusbar_yellow" )
+	    				}*/
+	    				if(data.dialInd < 25){
+	    					data.put( "percentageStyle", "step_statusbar_bad" )
+	    				} else if(data.dialInd >= 25 && data.dialInd < 50){
+	    					data.put( "percentageStyle", "step_statusbar_yellow" )
 	    				} else {
 	    					data.put( "percentageStyle", "step_statusbar_good" )
 	    				}

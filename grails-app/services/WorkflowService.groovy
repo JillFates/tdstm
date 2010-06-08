@@ -80,7 +80,7 @@ class WorkflowService {
 		    				if(stateType != "boolean"){
 		    					projectAssetMap.currentStateId = Integer.parseInt(stateEngineService.getStateId( process, toState ))
 		    				}
-		    				projectAssetMap.save()
+		    				projectAssetMap.save(flush:true)
 	
 							success = true
 						}
@@ -175,12 +175,16 @@ class WorkflowService {
 		def currentState = stateFrom
 
 		for (int i = min; i < max ; i++){
-			 if( processTransitions.contains(i.toString()) ){
-				 def assetTransition = new AssetTransition( stateFrom:currentState, stateTo:i.toString(), comment:"", assetEntity:assetEntity, moveBundle:moveBundle, projectTeam:projectTeam, userLogin:userLogin, type:"process" )
-				 if ( assetTransition.validate() && assetTransition.save(flush:true) ) {
-					 currentState = i.toString();
-	    		 } 
+			 if( processTransitions.contains( i.toString()) ){
+				 def stateType = stateEngineService.getStateType( process, stateEngineService.getState( process, i ) )
+				 if(stateType != "boolean"){
+					 def assetTransition = new AssetTransition( stateFrom:currentState, stateTo:i.toString(), comment:"", assetEntity:assetEntity, moveBundle:moveBundle, projectTeam:projectTeam, userLogin:userLogin, type:"process" )
+					 if ( assetTransition.validate() && assetTransition.save(flush:true) ) {
+						 currentState = i.toString();
+		    		 }
+				 }
 			 }
+			
 		}
 		return currentState
      }

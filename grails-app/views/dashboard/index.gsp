@@ -612,16 +612,21 @@
 			var steps = snapshot.steps;
 			var revSum = snapshot.revSum;
 			var planSum = snapshot.planSum
-	
+			var sumDialInd = planSum.dialInd ? planSum.dialInd : 50
 			AditionalFrames = ( steps.length > 6 ? steps.length - 5 : 1 );
 			$("#themes").css("left","0px");
 			defaultBundle = moveBundleId;
-			
-			if( snapshot.planDelta > 0){
+			if( sumDialInd < 25){
 				$(".sum_statusbar_good").attr("class","sum_statusbar_bad")
+				$(".sum_statusbar_yellow").attr("class","sum_statusbar_bad")
 				$("#status_color").html("RED")
+			} else if( sumDialInd >= 25 && sumDialInd < 50){
+				$(".sum_statusbar_good").attr("class","sum_statusbar_yellow");
+				$(".sum_statusbar_bad").attr("class","sum_statusbar_yellow");
+				$("#status_color").html("YELLOW")
 			} else {
 				$(".sum_statusbar_bad").attr("class","sum_statusbar_good")
+				$(".sum_statusbar_yellow").attr("class","sum_statusbar_good")
 				$("#status_color").html("GREEN")
 			}
 			updateSummaryGauge("summary_gauge",planSum.dialInd ? planSum.dialInd : '50');
