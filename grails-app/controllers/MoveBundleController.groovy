@@ -31,32 +31,41 @@ class MoveBundleController {
     }
 
     def show = {
-        def moveBundleInstance = MoveBundle.get( params.id )
-        request.getSession(false).setAttribute("MOVEBUNDLE",moveBundleInstance)
-        def projectId = params.projectId 
-        
-        if(!moveBundleInstance) {
-            flash.message = "MoveBundle not found with id ${params.id}"
-            redirect(action:list)
-        } else {
-        	userPreferenceService.setPreference( "CURR_BUNDLE", "${moveBundleInstance.id}" )
-            def projectManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "PROJ_MGR" ) 
-            //PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'PROJ_MGR' ")
-        	def moveManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "MOVE_MGR" ) 
-            //PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'MOVE_MGR' ")
-        	
+		userPreferenceService.loadPreferences("MOVE_EVENT")
+		def moveBundleId = params.id
+		println"moveBundleId id------>"+moveBundleId
+		moveBundleId = moveBundleId ? moveBundleId : session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE;
+		if(moveBundleId){
 			
-			// get the list of Manual Dashboard Steps that are associated to moveBundle.project
-			def moveBundleSteps = MoveBundleStep.findAll('FROM MoveBundleStep mbs WHERE mbs.moveBundle = :mb ORDER BY mbs.transitionId',[mb:moveBundleInstance]) 
-			def dashboardSteps = []
+			def moveBundleInstance = MoveBundle.get( moveBundleId )
+	        //request.getSession(false).setAttribute("MOVEBUNDLE",moveBundleInstance)
+	        def projectId = params.projectId 
+	        
+	        if(!moveBundleInstance) {
+	            flash.message = "MoveBundle not found with id ${moveBundleId}"
+	            redirect(action:list)
+	        } else {
+	        	userPreferenceService.setPreference( "CURR_BUNDLE", "${moveBundleInstance.id}" )
+	            def projectManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "PROJ_MGR" ) 
+	            //PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'PROJ_MGR' ")
+	        	def moveManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "MOVE_MGR" ) 
+	            //PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'MOVE_MGR' ")
+	        	
+				
+				// get the list of Manual Dashboard Steps that are associated to moveBundle.project
+				def moveBundleSteps = MoveBundleStep.findAll('FROM MoveBundleStep mbs WHERE mbs.moveBundle = :mb ORDER BY mbs.transitionId',[mb:moveBundleInstance]) 
+				def dashboardSteps = []
 
-			moveBundleSteps .each{
-				def stepSnapshot = StepSnapshot.findAll("FROM StepSnapshot ss WHERE ss.moveBundleStep = :msb ORDER BY ss.dateCreated DESC",[msb:it, max:1])
-				dashboardSteps << [moveBundleStep : it, stepSnapshot : stepSnapshot[0] ]
-			}
-        	return [ moveBundleInstance : moveBundleInstance, projectId:projectId, projectManager: projectManager, 
-					 moveManager: moveManager, dashboardSteps:dashboardSteps] 
-        }
+				moveBundleSteps .each{
+					def stepSnapshot = StepSnapshot.findAll("FROM StepSnapshot ss WHERE ss.moveBundleStep = :msb ORDER BY ss.dateCreated DESC",[msb:it, max:1])
+					dashboardSteps << [moveBundleStep : it, stepSnapshot : stepSnapshot[0] ]
+				}
+	        	return [ moveBundleInstance : moveBundleInstance, projectId:projectId, projectManager: projectManager, 
+						 moveManager: moveManager, dashboardSteps:dashboardSteps] 
+	        }
+		} else {
+			redirect(action:list)
+		}
     }
 
     def delete = {

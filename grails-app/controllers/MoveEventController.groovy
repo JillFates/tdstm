@@ -12,6 +12,7 @@ class MoveEventController {
     // Service initialization
 	def moveBundleService
 	def jdbcTemplate
+	def userPreferenceService
 	
     def index = { redirect(action:list,params:params) }
 
@@ -33,14 +34,21 @@ class MoveEventController {
 	 * @return : MoveEvent details  
 	 */
     def show = {
-        def moveEventInstance = MoveEvent.get( params.id )
-
-        if(!moveEventInstance) {
-            flash.message = "MoveEvent not found with id ${params.id}"
-            redirect(action:list)
-        } else { 
-        	return [ moveEventInstance : moveEventInstance ] 
-        }
+		userPreferenceService.loadPreferences("MOVE_EVENT")
+		def moveEventId = params.id
+		moveEventId = moveEventId ? moveEventId : session.getAttribute("MOVE_EVENT")?.MOVE_EVENT;
+		if(moveEventId){
+	        def moveEventInstance = MoveEvent.get( moveEventId )
+	
+	        if(!moveEventInstance) {
+	            flash.message = "MoveEvent not found with id ${moveEventId}"
+	            redirect(action:list)
+	        } else { 
+	        	return [ moveEventInstance : moveEventInstance ] 
+	        }
+		} else {
+		    redirect(action:list)
+		}
     }
 	/*
 	 * redirect to list once selected record deleted

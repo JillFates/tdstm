@@ -54,10 +54,15 @@
     </script>
   </head>
   <body>   
-    
+    <div class="nav" style="border: 1px solid #CCCCCC; height: 11px;width: 219px; margin:9px 14px 0px">
+			<span class="menuButton"><g:link class="list" action="list">Bundle List</g:link></span>
+		    <jsec:hasRole name="ADMIN">
+		    	<span class="menuButton"><g:link class="create" action="create">New Bundle</g:link></span>
+			</jsec:hasRole>
+		</div>
     <div class="body" style="width: 330px;">
     	<div class="steps_table">
-      <span class="span"><b> Show Move Bundle </b></span>
+      	<span class="span"><b> Show Move Bundle </b></span>
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
       </g:if>

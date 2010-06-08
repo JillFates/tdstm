@@ -553,7 +553,7 @@ if('${browserTest}' == 'true'){
 	$("div.tableContainerIE").css("width",vpWidth("width"));
 } else {
 	$("div.tableContainer").css("width",vpWidth("width"));
-	$("#assetListTbody").css("height",vpWidth("height") - 257)
+	$("#assetListTbody").css("height",vpWidth("height") - 215)
 }
 function initialize(){
 	window.onresize=pageReload;

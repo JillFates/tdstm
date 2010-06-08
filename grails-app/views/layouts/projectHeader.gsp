@@ -104,8 +104,8 @@
         <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 		<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
 		<li id="assetMenuId"><g:link class="home" controller="assetEntity" action="list" >Assets</g:link></li>
-                <li><g:link class="home" controller="moveEvent" action="list" >Events</g:link> </li>
-		<li><g:link class="home" controller="moveBundle" params="[projectId:currProjObj?.id]">Bundles</g:link></li>
+        <li><g:link class="home" controller="moveEvent" action="show" >Events</g:link> </li>
+		<li><g:link class="home" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles</g:link></li>
         </jsec:lacksAllRoles>
         <jsec:hasAnyRole in="['ADMIN']">
 		<li><g:link class="home" controller="newsEditor" params="[projectId:currProjObj?.id]">News Editor</g:link></li>

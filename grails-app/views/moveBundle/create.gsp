@@ -40,6 +40,10 @@
    
     <div class="body">
       <h1>Create MoveBundle</h1>
+      <div class="nav" style="border: 1px solid #CCCCCC; height: 11px;">
+			<span class="menuButton"><g:link class="list" action="list">Bundle List</g:link></span>
+		</div>
+		<br/>
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
       </g:if>
