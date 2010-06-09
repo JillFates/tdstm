@@ -435,3 +435,37 @@ text-decoration: line-through;
 	background-color: #FFCCCC;
 	border: 1px solid #CD3333;
 }
+#head_crawler{
+	border:1px solid #cccccc;
+}
+#head_mycrawler {
+	float: left;
+}
+#crawlerHead {
+	float: left;
+	width: auto;
+	margin-top: 7px;
+	text-align: right;
+}
+.statusbar_good{
+	text-align:center;
+	background-color: #669900;
+	font-size:11px;
+	font-weight:bold;
+	color:#FFFFFF;
+	}
+	
+.statusbar_bad{
+	text-align:center;
+	background-color: #CD3333;
+	font-size:11px;
+	font-weight:bold;
+	color:#FFFFFF;
+}
+.statusbar_yellow{
+	text-align:center;
+	background-color: #FFCC33;
+	font-size:11px;
+	font-weight:bold;
+	color:#000;
+}

@@ -308,5 +308,48 @@ class MoveEventController {
 		}
 		render "success"
     }
+    /*------------------------------------------------
+     * Return the list of active news for a selected moveEvent and status of that evnt.
+     * @author : Lokanada Reddy
+     * @param  : id (moveEvent)
+     *----------------------------------------------*/
+    def getMoveEventNewsAndStatus = {
+    	
+    	def moveEvent = MoveEvent.findById(params.id)
+		def statusAndNewsList = []
+		if(moveEvent){
+	    	def moveEventNewsQuery = """SELECT mn.date_created as created, mn.message as message from move_event_news mn 
+							left join move_event me on ( me.move_event_id = mn.move_event_id ) 
+							left join project p on (p.project_id = me.project_id) 
+	    					where mn.is_archived = 0 and mn.move_event_id = ${moveEvent.id} and p.project_id = ${moveEvent.project.id}"""
+	    	
+			def moveEventNews = jdbcTemplate.queryForList( moveEventNewsQuery )
+			
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			DateFormat formatter = new SimpleDateFormat("MM/dd hh:mma");
+			def news = new StringBuffer()
+			
+			moveEventNews.each{
+	    		news.append(String.valueOf(formatter.format(GormUtil.convertInToUserTZ( it.created, tzId ))) +"&nbsp;:&nbsp;"+it.message+".&nbsp;&nbsp;")	
+	    	}
+			
+			def query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent = ? AND mes.type = ? ORDER BY mes.dateCreated DESC"    					
+	    	def moveEventSnapshot = MoveEventSnapshot.findAll( query , [moveEvent , "P"] )[0]
+	    	def cssClass = "statusbar_good"
+			def status = "GREEN"
+			def dialInd = moveEventSnapshot?.dialIndicator
+			dialInd = dialInd ? dialInd : 100
+			
+			if(dialInd < 25){
+				cssClass = "statusbar_bad"
+				status = "RED"
+			} else if(dialInd >= 25 && dialInd < 50){
+				cssClass = "statusbar_yellow"
+				status = "YELLOW"
+			}
+	    	statusAndNewsList << ['news':news.toString(), 'cssClass':cssClass, 'status':status]
+		}
+		render statusAndNewsList as JSON
+    }
     
 }

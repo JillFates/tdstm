@@ -12,7 +12,7 @@
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
 	<g:javascript library="prototype" />
     <jq:plugin name="jquery.combined" />
-    
+    <g:javascript src="crawler.js" />
     <g:layoutHead />
    
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dropDown.css')}" />    
@@ -20,7 +20,7 @@
    <script type="text/javascript">
    		$(document).ready(function() {
       		$("#personDialog").dialog({ autoOpen: false })
-     	})
+     	})    	
    </script>
   </head>
 	<% def currProj = session.getAttribute("CURR_PROJ");
@@ -29,9 +29,14 @@
     def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
     def moveBundleId = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE ;
     def currProjObj;
+    def moveEvent;
     if( projectId != null){
       currProjObj = Project.findById(projectId)
     }
+    if( moveEventId != null){
+    	moveEvent = MoveEvent.findById(moveEventId)
+    }
+    
     %>
   <body>
    
@@ -48,7 +53,7 @@
     	</div>
       <div class="title">&nbsp;Transition Manager
       	<g:if test="${currProjObj}"> - ${currProjObj.name} </g:if>
-      	<g:if test="${moveEventId}"> : ${MoveEvent.findById( moveEventId )?.name}</g:if>
+      	<g:if test="${moveEvent}"> : ${moveEvent?.name}</g:if>
       	<g:if test="${moveBundleId}"> : ${MoveBundle.findById( moveBundleId )?.name}</g:if>
       </div>
         <div class="header_right"><br />
@@ -95,61 +100,74 @@
 </div>
       -->
       <g:if test="${currProj}">
-      <div class="menu2">
-      <ul>
-            <jsec:hasRole name="ADMIN">
-		<li><g:link class="home" controller="auth" action="home">Admin</g:link> </li>
-            </jsec:hasRole>
-		<li><g:link class="home" controller="projectUtil">Project </g:link> </li>
-        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
-		<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
-		<li id="assetMenuId"><g:link class="home" controller="assetEntity" action="list" >Assets</g:link></li>
-        <li><g:link class="home" controller="moveEvent" action="show" >Events</g:link> </li>
-		<li><g:link class="home" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles</g:link></li>
-        </jsec:lacksAllRoles>
-        <jsec:hasAnyRole in="['ADMIN']">
-		<li><g:link class="home" controller="newsEditor" params="[projectId:currProjObj?.id]">News Editor</g:link></li>
-        </jsec:hasAnyRole>
-        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
-		<li><g:link class="home" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console</g:link></li>
-        </jsec:hasAnyRole>
-        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
-		<li><g:link class="home" controller="cartTracking" action="cartTracking" params="[projectId:currProjObj?.id]">Carts</g:link></li>
-        </jsec:hasAnyRole>
-        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER','OBSERVER']">
-		<li><g:link class="home" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link> </li>
-		<li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">PMO Asset Tracking</g:link> </li>
-        </jsec:hasAnyRole>
-        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"><li><a href="#" onclick="showReportsMenu();this.style.background='#003366';">Reports</a></li>
-	</jsec:lacksAllRoles>
-      </ul>
-    </div>
-    <div class="menu2" id="assetMenu" style="background-color:#003366;display: none;">
-        <ul>
-		<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Assets</g:link></li>
-    		<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link> </li>
-	</ul>
-	</div>
-	<div class="menu2" id="reportsMenu" style="background-color:#003366;display: none;">
-		<ul>
-		<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Login Badges']">Login Badges</g:link> </li>
-		<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Asset Tag']">Asset Tags</g:link> </li>
-		<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Team Worksheets']">Move Team Worksheets</g:link> </li>
-		<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'cart Asset']">Cleaning Team Worksheets</g:link></li>
-		<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Transportation Asset List']">Transport Worksheets</g:link></li>
-		<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Issue Report']">Issue Report</g:link></li>
-		<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Rack Layout']">Rack Elevations</g:link></li>
-		<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'MoveResults']">Move Results</g:link></li>
+	      <div class="menu2">
+	      <ul>
+	            <jsec:hasRole name="ADMIN">
+			<li><g:link class="home" controller="auth" action="home">Admin</g:link> </li>
+	            </jsec:hasRole>
+			<li><g:link class="home" controller="projectUtil">Project </g:link> </li>
+	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
+			<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
+			<li id="assetMenuId"><g:link class="home" controller="assetEntity" action="list" >Assets</g:link></li>
+	        <li><g:link class="home" controller="moveEvent" action="show" >Events</g:link> </li>
+			<li><g:link class="home" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles</g:link></li>
+	        </jsec:lacksAllRoles>
+	        <jsec:hasAnyRole in="['ADMIN']">
+			<li><g:link class="home" controller="newsEditor" params="[projectId:currProjObj?.id]">News Editor</g:link></li>
+	        </jsec:hasAnyRole>
+	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
+			<li><g:link class="home" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console</g:link></li>
+	        </jsec:hasAnyRole>
+	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+			<li><g:link class="home" controller="cartTracking" action="cartTracking" params="[projectId:currProjObj?.id]">Carts</g:link></li>
+	        </jsec:hasAnyRole>
+	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER','OBSERVER']">
+			<li><g:link class="home" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link> </li>
+			<li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">PMO Asset Tracking</g:link> </li>
+	        </jsec:hasAnyRole>
+	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"><li><a href="#" onclick="showReportsMenu();this.style.background='#003366';">Reports</a></li>
+		</jsec:lacksAllRoles>
+	      </ul>
+	    </div>
+	    <div class="menu2" id="assetMenu" style="background-color:#003366;display: none;">
+	        <ul>
+			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Assets</g:link></li>
+	    		<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link> </li>
 		</ul>
-	</div>
+		</div>
+		<div class="menu2" id="reportsMenu" style="background-color:#003366;display: none;">
+			<ul>
+			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Login Badges']">Login Badges</g:link> </li>
+			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Asset Tag']">Asset Tags</g:link> </li>
+			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Team Worksheets']">Move Team Worksheets</g:link> </li>
+			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'cart Asset']">Cleaning Team Worksheets</g:link></li>
+			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Transportation Asset List']">Transport Worksheets</g:link></li>
+			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Issue Report']">Issue Report</g:link></li>
+			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Rack Layout']">Rack Elevations</g:link></li>
+			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'MoveResults']">Move Results</g:link></li>
+			</ul>
+		</div>
+		<g:if test="${moveEvent && moveEvent?.inProgress == 'true'}">
+			<div id="head_crawler"  onclick="$('#head_crawler').hide()">
+				<div id="crawlerHead">${moveEvent.name} Move Event Status <span id="moveEventStatus"></span>. News: </div>
+				<div id="head_mycrawler"><div id="head_mycrawlerId" style="width: 1200px;margin-top: -10px;" >.</div></div>
+			</div>
+			<script type="text/javascript">
+			function updateEventHeader( e ){
+	   	     var newsAndStatus = eval("(" + e.responseText + ")")
+	   	     	$("#head_mycrawlerId").html(newsAndStatus[0].news);
+	   	     	$("#head_crawler").addClass(newsAndStatus[0].cssClass)
+	   	     	$("#moveEventStatus").html(newsAndStatus[0].status)
+	   		}
+			${remoteFunction(controller:'moveEvent', action:'getMoveEventNewsAndStatus', params:'\'id='+moveEventId+'\'',onComplete:'updateEventHeader(e)')}
+			</script>
+		</g:if>
     </g:if>
       <div class="main_bottom"><g:layoutBody /></div>
     </div>
     <div id="personDialog" title="Edit Person" style="display:none;">
       <div class="dialog">
           <div class="dialog">
-          
-          
             <table>
               <tbody>
               <tr>
@@ -220,6 +238,17 @@
       </div>
     </div>
     <script type="text/javascript">
+	    /*---------------------------------------------------
+		* Script to load the marquee to scroll the live news
+		*--------------------------------------------------*/
+		marqueeInit({
+			uniqueid: 'head_mycrawler',
+			inc: 8, //speed - pixel increment for each iteration of this marquee's movement
+			mouse: 'cursor driven', //mouseover behavior ('pause' 'cursor driven' or false)
+			moveatleast: 4,
+			neutral: 150,
+			savedirection: false
+		});
 	    if($("#assetMenu").is(":visible")){
 		  	$("#assetMenuId a").css('background-color','#003366')
 	  	}

@@ -17,8 +17,8 @@ function marqueeInit(config){
  req1 = {'position': 'relative', 'overflow': 'hidden'}, defaultconfig = {
   style: { //default style object for marquee containers without configured style
 	'margin': '0 auto',
-	'font-size': '12px',
-	'width': '900px',
+	'font-size': '11px',
+	'width': '95%',
 	'height': '25px'
 	},
   direction: 'left',
