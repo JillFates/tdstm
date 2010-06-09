@@ -72,7 +72,19 @@
 									</ul>
                                 </td>
                             </tr> 
-                        
+                        	<tr class="prop">
+				                <td valign="top" class="name">
+				                  <label for="inProgress"><b>In Progress:&nbsp;<span style="color: red">*</span></b></label>
+				                </td>
+				                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'inProgress','errors')}">
+				                  <g:select id="inProgress" name="inProgress" from="${moveEventInstance.constraints.inProgress.inList}" value="${moveEventInstance.inProgress}" ></g:select>
+				                  <g:hasErrors bean="${moveEventInstance}" field="inProgress">
+				                    <div class="errors">
+				                      <g:renderErrors bean="${moveEventInstance}" as="list" field="inProgress"/>
+				                    </div>
+				                  </g:hasErrors>
+				                </td>
+			              </tr>
                         </tbody>
                     </table>
                 </div>

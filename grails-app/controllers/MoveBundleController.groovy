@@ -33,7 +33,7 @@ class MoveBundleController {
     def show = {
 		userPreferenceService.loadPreferences("MOVE_EVENT")
 		def moveBundleId = params.id
-		println"moveBundleId id------>"+moveBundleId
+		
 		moveBundleId = moveBundleId ? moveBundleId : session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE;
 		if(moveBundleId){
 			

@@ -19,6 +19,8 @@
                         
                    	        <g:sortableColumn property="description" title="Description" />
                    	        
+                   	        <g:sortableColumn property="inProgress" title="In Progress" />
+                   	        
                    	        <g:sortableColumn property="project" title="Project" />
                    	        
                    	        <th>Move Bundles</th>
@@ -34,6 +36,8 @@
                         
                             <td>${fieldValue(bean:moveEventInstance, field:'description')}</td>
                             
+                             <td>${fieldValue(bean:moveEventInstance, field:'inProgress')}</td>
+
                              <td>${fieldValue(bean:moveEventInstance, field:'project')}</td>
                              
                              <td>

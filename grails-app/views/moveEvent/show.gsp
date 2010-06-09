@@ -63,8 +63,12 @@
                                 </g:each>
                                 </ul>
                             </td>
-                            
                         </tr>
+                        <tr class="prop">
+				            <td valign="top" class="name">In Progress:</td>
+				
+				            <td valign="top" class="value">${fieldValue(bean:moveEventInstance, field:'inProgress')}</td>
+						</tr>
                     
                     
                     </tbody>

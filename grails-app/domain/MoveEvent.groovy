@@ -9,6 +9,7 @@ class MoveEvent {
     Project project
     String name
     String description
+	String inProgress = "false" 
 
 	Date revisedCompletionTime		// Revised Completion Time of the MoveEvent which is only set as an exception
 
@@ -23,6 +24,7 @@ class MoveEvent {
 		actualStartTime(nullable:true )
 		actualCompletionTime(nullable:true )
 		revisedCompletionTime ( nullable:true )
+		inProgress( blank:false, nullable:false, inList:["true", "false"] )
 	}
 
 	static hasMany = [
