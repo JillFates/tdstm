@@ -295,21 +295,21 @@ log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${l
 				hasActive = true
 			
 			// If this is a subsequent completed step then we just take the current delta
-			if ( isCompleted && lastIsCompleted ) {
+			if ( step.planDelta && isCompleted && lastIsCompleted ) {
 				// Only set the maxDelta if there are no active tasks before this step
 				if ( ! hasActive ) maxDelta = step.planDelta
 				return
 			}
 			
 			// If last step was a completed and the current step is active then current step overrules          
-			if ( !isCompleted && lastIsCompleted ) {
+			if ( step.planDelta && !isCompleted && lastIsCompleted ) {
 				maxDelta = step.planDelta
 				lastIsCompleted = false
 				return
 			}
 			
 			// see if this step is projected further into the future
-			if ( step.planDelta > maxDelta || maxDelta == 0 ) {
+			if ( step.planDelta && (step.planDelta > maxDelta || maxDelta == 0 ) ) {
 				maxDelta = step.planDelta
 				lastIsCompleted = isCompleted
 			}
@@ -504,5 +504,33 @@ print "Creating Summary: planStartTime=${planStartTime}, planCompletionTime=${pl
 		"""
 							
 		def stepsList = jdbcTemplate.queryForList( stepsListQuery )
+		return stepsList
 	}
+	/*-------------------------------------------------------------------------
+	 * Background function to process the snapshots for all the move events and Bundles
+	 * This functions runs by quartz job periodically (every 120 seconds) and checks for inProgress flags on Move Events. 
+	 * If no flags, do nothing. If true, initiate the snapshot function for the bundles in that move event. 
+	 * If the current time is greater than the completion time for all bundles in that event, turn off the inProgress flag.
+	 * @author : Lokanada Reddy
+	 *------------------------------------------------------------------------*/
+	def backgroundSnapshotProcess(){
+		
+		def moveEventsList = MoveEvent.findAll()
+		def now = GormUtil.convertInToGMT( "now", "EDT" );
+		
+		moveEventsList.each{ event ->
+			def planTimes = event.getPlanTimes()
+			if(now.getTime() > planTimes.completion?.getTime()){
+				event.inProgress = "false"
+				event.save(flush:true)
+				return;
+			}
+			if(event.inProgress == "true"){
+				def moveBundlesList = MoveBundle.findAllByMoveEvent( event )
+				moveBundlesList.each{ bundle ->
+					process(bundle.id)
+				}
+			}
+		} // end of event loop
+	}// end of function
 }
