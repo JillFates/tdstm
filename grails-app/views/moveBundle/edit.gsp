@@ -24,7 +24,7 @@
   	<div class="nav" style="border: 1px solid #CCCCCC; height: 11px;width: 219px; margin:9px 14px 0px">
 			<span class="menuButton"><g:link class="list" action="list">Bundle List</g:link></span>
 		    <jsec:hasRole name="ADMIN">
-		    	<span class="menuButton"><g:link class="create" action="create">New Bundle</g:link></span>
+		    	<span class="menuButton"><g:link class="create" action="create" params="[projectId:projectId]">New Bundle</g:link></span>
 			</jsec:hasRole>
 	</div>
   <g:form method="post" >
