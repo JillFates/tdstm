@@ -484,8 +484,9 @@ print "Creating Summary: planStartTime=${planStartTime}, planCompletionTime=${pl
 			   JOIN move_bundle mb ON mb.move_event_id = me.move_event_id 
 			   LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id
 			   LEFT JOIN step_snapshot ss ON ss.move_bundle_step_id = mbs.id
+			   INNER JOIN (SELECT move_bundle_step_id, MAX(date_created) as date_created FROM step_snapshot group by move_bundle_step_id ) ss2
+			   ON ss2.move_bundle_step_id = mbs.id AND ss.date_created = ss2.date_created
 			   WHERE me.move_event_id = ${moveEventId} 
-			   AND ss.date_created = (SELECT MAX(date_created) FROM step_snapshot ss2 WHERE ss2.move_bundle_step_id = mbs.id) 
 
 			UNION 
 

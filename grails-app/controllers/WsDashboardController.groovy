@@ -32,9 +32,9 @@ log.debug "offsetTZ=${offsetTZ}"
 					FROM move_bundle mb
 					LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id 
 					LEFT JOIN step_snapshot ss ON ss.move_bundle_step_id = mbs.id
-					WHERE mb.move_bundle_id = ${moveBundle.id}
-						AND ss.date_created = 
-							(SELECT MAX(date_created) FROM step_snapshot ss2 WHERE ss2.move_bundle_step_id = mbs.id)
+					INNER JOIN (SELECT move_bundle_step_id, MAX(date_created) as date_created FROM step_snapshot GROUP BY move_bundle_step_id) ss2
+					ON ss2.move_bundle_step_id = mbs.id AND ss.date_created = ss2.date_created
+					WHERE mb.move_bundle_id = ${moveBundle.id} 
 				""" 
 					
 				/*	Get the steps that have not started / don't have step_snapshot records	*/						
@@ -52,7 +52,7 @@ log.debug "offsetTZ=${offsetTZ}"
 					WHERE mb.move_bundle_id = ${moveBundle.id} AND ss.date_created IS NULL AND mbs.transition_id IS NOT NULL
 				"""
 					
-				dataPointsForEachStep = jdbcTemplate.queryForList( latestStepsRecordsQuery + " UNION " + stepsNotUpdatedQuery + " ORDER BY tid" )
+				dataPointsForEachStep = jdbcTemplate.queryForList( latestStepsRecordsQuery + " UNION " + stepsNotUpdatedQuery )
 				
 			}
     		def sysTime  = jdbcTemplate.queryForMap("SELECT DATE_FORMAT( ADDDATE( CURRENT_TIMESTAMP , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r' ) as sysTime").get("sysTime")
