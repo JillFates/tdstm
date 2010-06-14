@@ -175,12 +175,12 @@
 <tr>
 	<td>randomString</td>
 	<td>5|numeric</td>
-	<td>desc</td>
+	<td>MNdesc</td>
 </tr>
 <tr>
 	<td>type</td>
 	<td>messageId</td>
-	<td>Test Desc-${desc}</td>
+	<td>Test Desc-${MNdesc}</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
@@ -231,7 +231,7 @@
 <tr>
 	<td>verifyTable</td>
 	<td>assetEntityTable.1.3</td>
-	<td>&quot;Test Desc-${desc}&quot;</td>
+	<td>&quot;Test Desc-${MNdesc}&quot;</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
@@ -266,7 +266,7 @@
 <tr>
 	<td>verifyText</td>
 	<td>//ul[@id='news_live']/li[1]/span[2]</td>
-	<td>Test Desc-${desc}</td>
+	<td>Test Desc-${MNdesc}</td>
 </tr>
 <!--Editing the Move News-->
 <tr>
@@ -337,7 +337,7 @@
 <tr>
 	<td>verifyValue</td>
 	<td>commentTdId</td>
-	<td>Test Desc-${desc}</td>
+	<td>Test Desc-${MNdesc}</td>
 </tr>
 <tr>
 	<td>click</td>
@@ -377,7 +377,7 @@
 <tr>
 	<td>verifyText</td>
 	<td>//ul[@id='news_archived']/li[1]/span[2]</td>
-	<td>Test Desc-${desc}</td>
+	<td>Test Desc-${MNdesc}</td>
 </tr>
 <!--Verifying for User preffered Move Event in PMO Asset Tracking page-->
 <tr>
