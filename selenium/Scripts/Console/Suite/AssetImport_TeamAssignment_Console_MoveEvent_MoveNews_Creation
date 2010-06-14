@@ -4,16 +4,16 @@
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
-<title>AssetImport_TeamAssignment_Console</title>
+<title>AssetImport_TeamAssignment_Console_MoveEvent_MoveNews_Creation</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">AssetImport_TeamAssignment_Console</td></tr>
+<tr><td rowspan="1" colspan="3">AssetImport_TeamAssignment_Console_MoveEvent_MoveNews_Creation</td></tr>
 </thead><tbody>
 <tr>
 	<td>setSpeed</td>
-	<td>5000</td>
+	<td>2500</td>
 	<td></td>
 </tr>
 <tr>
@@ -68,9 +68,9 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//div[7]/div/div/table.1.7</td>
-	<td>Process|Void</td>
+	<td>verifyElementPresent</td>
+	<td>link=Process</td>
+	<td></td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
@@ -90,6 +90,11 @@
 <tr>
 	<td>clickAndWait</td>
 	<td>link=Bundles</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Bundle List</td>
 	<td></td>
 </tr>
 <tr>
@@ -233,8 +238,13 @@
 	<td></td>
 </tr>
 <tr>
-	<td>clickAndWait</td>
+	<td>click</td>
 	<td>//a[@id='add']/img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForPageToLoad</td>
+	<td></td>
 	<td></td>
 </tr>
 <tr>
@@ -311,6 +321,11 @@
 	<td>clickAndWait</td>
 	<td>link=Console</td>
 	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>selectTimedId</td>
+	<td>label=Never</td>
 </tr>
 <!--Team Block UI related-->
 <tr>
@@ -1115,12 +1130,12 @@
 	<td>edited</td>
 </tr>
 <tr>
-	<td>clickAndWait</td>
+	<td>click</td>
 	<td>//input[@value='Update Asset Entity']</td>
 	<td></td>
 </tr>
 <tr>
-	<td>clickAndWait</td>
+	<td>click</td>
 	<td>//td[1]/a/img</td>
 	<td></td>
 </tr>
@@ -1238,7 +1253,7 @@
 <tr>
 	<td>select</td>
 	<td>stateSelectId</td>
-	<td>label=Release</td>
+	<td>label=Released</td>
 </tr>
 <tr>
 	<td>click</td>
@@ -1248,7 +1263,7 @@
 <tr>
 	<td>verifyTable</td>
 	<td>//form[@id='assetListForm']/table.2.4</td>
-	<td>Release</td>
+	<td>Released</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -1337,6 +1352,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>waitForPageToLoad</td>
+	<td></td>
+	<td></td>
+</tr>
+<tr>
 	<td>clickAndWait</td>
 	<td>showAllCheckbox</td>
 	<td></td>
@@ -1355,6 +1375,11 @@
 <tr>
 	<td>clickAndWait</td>
 	<td>link=Events</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Events List</td>
 	<td></td>
 </tr>
 <tr>
@@ -1428,9 +1453,19 @@
 	<td></td>
 </tr>
 <tr>
+	<td>verifySelectedLabel</td>
+	<td>projectId</td>
+	<td>${Pcode} : ${Pname}</td>
+</tr>
+<tr>
 	<td>type</td>
 	<td>name</td>
 	<td>javascript{var ME =&quot;Test ME on - &quot;; var date = new Date();&nbsp;&nbsp;var month =&nbsp;&nbsp;date.getMonth();month = month + 1;var monthday&nbsp;&nbsp;&nbsp;&nbsp;= date.getDate();var year&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= date.getFullYear();&nbsp;&nbsp;if (monthday &lt; 10){monthday = '0' + monthday;}&nbsp;&nbsp;&nbsp;if (month &lt; 10){month = '0' + month;}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ME+month+&quot;/&quot;+monthday+&quot;/&quot;+year; }</td>
+</tr>
+<tr>
+	<td>storeValue</td>
+	<td>name</td>
+	<td>MEname</td>
 </tr>
 <tr>
 	<td>randomString</td>
@@ -1443,8 +1478,43 @@
 	<td>${Desc}</td>
 </tr>
 <tr>
+	<td>storeElementPresent</td>
+	<td>//input[@name='moveBundle' and @value='${bundleId}']</td>
+	<td>bundlePresent</td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>${bundlePresent}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${bundlePresent}==true</td>
+	<td>label10</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${bundlePresent}==false</td>
+	<td>label20</td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label10</td>
+	<td></td>
+</tr>
+<tr>
 	<td>click</td>
 	<td>//input[@name='moveBundle' and @value='${bundleId}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label20</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>moveBundle</td>
 	<td></td>
 </tr>
 <tr>
@@ -1456,6 +1526,290 @@
 	<td>verifyTextPresent</td>
 	<td>created</td>
 	<td></td>
+</tr>
+<!--News Editor page-->
+<tr>
+	<td>clickAndWait</td>
+	<td>link=News Editor</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Move Event News</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>moveEvent</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifySelectedLabel</td>
+	<td>moveEvent</td>
+	<td>${MEname}</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>moveBundleId</td>
+	<td>All ${BundleName}</td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>All Active Archived</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>viewFilterId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetEntityTable.0.0</td>
+	<td>Created At</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetEntityTable.0.1</td>
+	<td>Created By</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetEntityTable.0.2</td>
+	<td>Type</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetEntityTable.0.3</td>
+	<td>Comment</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetEntityTable.0.4</td>
+	<td>Resolution</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetEntityTable.0.5</td>
+	<td>Resolved At</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetEntityTable.0.6</td>
+	<td>Resolved By</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//input[@value='Create News']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Create News']</td>
+	<td></td>
+</tr>
+<!--Creating a Move News-->
+<tr>
+	<td>selectPopUp</td>
+	<td></td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>exact:Fields marked ( * ) are mandatory</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>ui-dialog-title-createNewsDialog</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>createCommentTable.1.0</td>
+	<td>Comment Type:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>createCommentTable.2.0</td>
+	<td>exact:Comment: *</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>messageId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>createCommentTable.3.0</td>
+	<td>Resolved / Archived:</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>isArchivedId</td>
+	<td>off</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>createCommentTable.4.0</td>
+	<td>exact:Resolution:</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>resolutionNewsId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//input[@value='Create']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//input[@value='Cancel' and @type='button' and @onclick=&quot;this.form.reset();$('#createNewsDialog').dialog('close');&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>randomString</td>
+	<td>5|numeric</td>
+	<td>MNdesc</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>messageId</td>
+	<td>Test Desc-${MNdesc}</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Create']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetEntityTable.1.3</td>
+	<td>&quot;Test Desc-${MNdesc}&quot;</td>
+</tr>
+<!--Editing the Move News-->
+<tr>
+	<td>click</td>
+	<td>//tr[@id='commentsRowId_0']/td[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//table[@id='showCommentTable']/tbody/tr[1]/td[1]/label</td>
+	<td>Created At:</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//table[@id='showCommentTable']/tbody/tr[2]/td[1]/label</td>
+	<td>Created By:</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//table[@id='showCommentTable']/tbody/tr[3]/td[1]/label</td>
+	<td>Comment Type:</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//table[@id='showCommentTable']/tbody/tr[6]/td[1]/label</td>
+	<td>exact:Comment:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>showCommentTable.6.0</td>
+	<td>Resolved / Archived:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>showCommentTable.7.0</td>
+	<td>exact:Resolution:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>showCommentTable.8.0</td>
+	<td>Resolved At:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>showCommentTable.9.0</td>
+	<td>Resolved By:</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//input[@value='Update' and @type='submit']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//input[@value='Cancel' and @type='button' and @onclick=&quot;this.form.reset();$('#showEditCommentDialog').dialog('close');&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>commentTdId</td>
+	<td>Test Desc-${MNdesc}</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>isResolvedId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>resolutionId</td>
+	<td>test</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Update' and @type='submit']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>assetEntityTable.1.4</td>
+	<td>&quot;test&quot;</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Dashboard</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifySelectedLabel</td>
+	<td>moveEvent</td>
+	<td>${MEname}</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Archive</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//ul[@id='news_archived']/li[1]/span[2]</td>
+	<td>Test Desc-${MNdesc}</td>
+</tr>
+<!--Verifying for User preffered Move Event in PMO Asset Tracking page-->
+<tr>
+	<td>clickAndWait</td>
+	<td>//div[@id='header']/div[2]/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=PMO Asset Tracking</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>moveEventId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifySelectedLabel</td>
+	<td>moveEventId</td>
+	<td>${MEname}</td>
 </tr>
 
 </tbody></table>
