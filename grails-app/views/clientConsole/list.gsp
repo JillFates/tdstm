@@ -124,6 +124,7 @@ overflow: hidden;
 
 <table cellpadding="0"   cellspacing="0"  style="border:0px;" >
 	<thead>
+		<g:form action="list">
 		<tr>
 		 <th style="padding-top:35px;"><span>Actions</span><g:if test="${isAdmin || isManager || isProjManager}"> 
 		 <input type="button" value="State..." onclick="changeState()" title="Change State" style="width: 80px;"/>
@@ -132,14 +133,19 @@ overflow: hidden;
 			<table style="border: 0px;">
 				<thead>
 				<tr style="background-color: #CCC">
-					<g:sortableColumn style="border:0px;" property="application"  title="Application" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
-				</tr>
+					<g:sortableColumn id="column1Label" style="border:0px;" property="${columns?.column1.field}"  title="${columns?.column1.label}" params="['projectId':projectId,'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value]"/>
+					<th style="border: 0px;">
+						<span id="column1Select" style="display: none;"><g:select from="${com.tdssrc.eav.EavEntityAttribute.findAll()?.attribute}" optionKey="attributeCode" optionValue="frontendLabel" name="column1Attribute"  value="${columns?.column1.field}"></g:select></span>
+						<span id="column1Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
+						<span id="column1Save" style="display: none;"><input type="submit" value="Save"/>&nbsp;<input type="button" value="X" onclick="changeToLabel('1')"/></span> 
+					</th>
+					</tr>
 				<tr style="background-color: #CCC">
 					<th style="border:0px;">
-						<select id="applicationId" name="application" onchange="document.listForm.submit();" style="width: 120px;">
+						<select id="column1Id" name="column1" onchange="document.listForm.submit();" style="width: 120px;">
 							<option value="" selected="selected">All</option>
-							<g:each in="${applicationList}" var="application">
-								<option value="${application.key ? application.key : 'blank'}">${application.key ? application.key : 'blank'}&nbsp;(${application.value})</option>
+							<g:each in="${column1List}" var="column1Obj">
+								<option value="${column1Obj.key ? column1Obj.key : 'blank'}">${column1Obj.key ? column1Obj.key : 'blank'}&nbsp;(${column1Obj.value})</option>
 							</g:each>
 						</select>
 					</th>
@@ -151,14 +157,19 @@ overflow: hidden;
 			<table style="border: 0px;">
 				<thead>
 				<tr style="background-color: #CCC">
-					<g:sortableColumn style="border:0px;" property="app_owner" title="App Owner"  params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]" />
+					<g:sortableColumn id="column2Label" style="border:0px;" property="${columns?.column2.field}"  title="${columns?.column2.label}" params="['projectId':projectId,'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value]" />
+					<th style="border: 0px;">
+						<span id="column2Select" style="display: none;"><g:select from="${com.tdssrc.eav.EavEntityAttribute.findAll()?.attribute}" optionKey="attributeCode" optionValue="frontendLabel" name="column2Attribute" value="${columns?.column2.field}"></g:select></span>
+						<span id="column2Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
+						<span id="column2Save" style="display: none;"><input type="submit" value="Save"/>&nbsp;<input type="button" value="X" onclick="changeToLabel('2')"/></span> 
+					</th>
 				</tr>
 				<tr style="background-color: #CCC">
 					<th style="border:0px;">
-						<select id="appOwnerId" name="appOwner"	onchange="document.listForm.submit();" style="width: 120px;">
+						<select id="column2Id" name="column2"	onchange="document.listForm.submit();" style="width: 120px;">
 							<option value="" selected="selected">All</option>
-							<g:each in="${appOwnerList}" var="appOwner">
-								<option value="${appOwner.key ? appOwner.key : 'blank'}">${appOwner.key ? appOwner.key : 'blank'}&nbsp;(${appOwner.value})</option>
+							<g:each in="${column2List}" var="column2Obj">
+								<option value="${column2Obj.key ? column2Obj.key : 'blank'}">${column2Obj.key ? column2Obj.key : 'blank'}&nbsp;(${column2Obj.value})</option>	
 							</g:each>
 						</select>
 					</th>
@@ -170,14 +181,19 @@ overflow: hidden;
 			<table style="border: 0px;">
 				<thead>
 				<tr style="background-color: #CCC">
-					<g:sortableColumn style="border:0px;" property="app_sme" title="App SME" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
+					<g:sortableColumn id="column3Label" style="border:0px;" property="${columns?.column3.field}"  title="${columns?.column3.label}" params="['projectId':projectId,'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value]"/>
+					<th style="border: 0px;">
+						<span id="column3Select" style="display: none;"><g:select from="${com.tdssrc.eav.EavEntityAttribute.findAll()?.attribute}" optionKey="attributeCode" optionValue="frontendLabel" name="column3Attribute" value="${columns?.column3.field}" ></g:select></span>
+						<span id="column3Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
+						<span id="column3Save" style="display: none;"><input type="submit" value="Save"/>&nbsp;<input type="button" value="X" onclick="changeToLabel('3')"/></span> 
+					</th>
 				</tr>
 				<tr style="background-color: #CCC">
 					<th style="border:0px;">
-						<select id="appSmeId" name="appSme" onchange="document.listForm.submit();" style="width: 120px;">
+						<select id="column3Id" name="column3" onchange="document.listForm.submit();" style="width: 120px;">
 							<option value="" selected="selected">All</option>
-							<g:each in="${appSmeList}" var="appSme">
-								<option value="${appSme.key  ? appSme.key  : 'blank'}">${appSme.key  ? appSme.key  : 'blank'}&nbsp;(${appSme.value})</option>
+							<g:each in="${column3List}" var="column3Obj">
+								<option value="${column3Obj.key ? column3Obj.key : 'blank'}">${column3Obj.key ? column3Obj.key : 'blank'}&nbsp;(${column3Obj.value})</option>	
 							</g:each>
 						</select>
 					</th>
@@ -189,10 +205,22 @@ overflow: hidden;
 			<table style="border: 0px;">
 				<thead>
 				<tr style="background-color: #CCC">
-					<g:sortableColumn style="border:0px;" property="asset_name" title="Asset Name" params="['projectId':projectId,'application':appValue,'appOwner':appOwnerValue,'appSme':appSmeValue]"/>
+					<g:sortableColumn id="column4Label" style="border:0px;" property="${columns?.column4.field}"  title="${columns?.column4.label}" params="['projectId':projectId,'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value]"/>
+					<th style="border: 0px;">
+						<span id="column4Select" style="display: none;"><g:select from="${com.tdssrc.eav.EavEntityAttribute.findAll()?.attribute}" optionKey="attributeCode" optionValue="frontendLabel" name="column4Attribute" value="${columns?.column4.field}" ></g:select></span>
+						<span id="column4Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
+						<span id="column4Save" style="display: none;"><input type="submit" value="Save"/>&nbsp;<input type="button" value="X" onclick="changeToLabel('4')"/></span> 
+					</th>
 				</tr>
 				<tr style="background-color: #CCC">
-					<td style="padding-left: 0px;"><select id="hiddenSelect" style="width: 120px;visibility: hidden;"></select></td>
+					<th style="border:0px;">
+						<select id="column4Id" name="column4" onchange="document.listForm.submit();" style="width: 120px;">
+							<option value="" selected="selected">All</option>
+							<g:each in="${column4List}" var="column4Obj">
+								<option value="${column4Obj.key ? column4Obj.key : 'blank'}">${column4Obj.key ? column4Obj.key : 'blank'}&nbsp;(${column4Obj.value})</option>	
+							</g:each>
+						</select>
+					</th>
 				</tr>
 				</thead>
 			</table>
@@ -205,8 +233,8 @@ overflow: hidden;
 			<g:else>
 			<th style="padding-left: 0px" colspan="${headerCount}"><embed src="${createLinkTo(dir:'templates',file:'headerSvg_'+projectId+'.svg')}" type="image/svg+xml" width="${headerCount*21.80}" height="102"/></th>
 			</g:else>
-
 		</tr>
+		</g:form>
 	</thead>
 	<tbody id="assetListTbody" onclick="catchevent(event)">
 		<g:if test="${assetEntityList}">
@@ -239,10 +267,10 @@ overflow: hidden;
 			</g:else>
 			</span>
 			</td>
-			<td  id="${assetEntity.id}_application">${assetEntity?.application}&nbsp;</td>
-			<td id="${assetEntity.id}_appOwner">${assetEntity?.appOwner}&nbsp;</td>
-			<td id="${assetEntity.id}_appSme">${assetEntity?.appSme}&nbsp;</td>
-			<td id="${assetEntity.id}_assetName">${assetEntity?.assetName}&nbsp;</td>
+			<td  id="${assetEntity.id}_column1">${assetEntity.asset[columns?.column1.field]}&nbsp;</td>
+			<td id="${assetEntity.id}_column2">${assetEntity.asset[columns?.column2.field]}&nbsp;</td>
+			<td id="${assetEntity.id}_column3">${assetEntity.asset[columns?.column3.field]}&nbsp;</td>
+			<td id="${assetEntity.id}_column4">${assetEntity.asset[columns?.column4.field]}&nbsp;</td>
 			<g:each in="${assetEntity.transitions}" var="transition">${transition}</g:each>
 			</tr>
 		</g:each>
@@ -561,9 +589,10 @@ function initialize(){
 	
 	$("#moveBundleId").val(${moveBundleInstance?.id});
 	$("#moveEventId").val(${moveEventInstance?.id});
-	$("#appSmeId").val("${appSmeValue}");
-	$("#appOwnerId").val("${appOwnerValue}");
-	$("#applicationId").val("${appValue}");
+	$("#column4Id").val("${column4Value}");
+	$("#column3Id").val("${column3Value}");
+	$("#column2Id").val("${column2Value}");
+	$("#column1Id").val("${column1Value}");
 	var time = '${timeToUpdate}';
 		if(time != "" ){
 			$("#selectTimedId").val( time ) ;
@@ -784,11 +813,12 @@ var fieldId
 	function doAjaxCall(){
 		var moveEvent = $("#moveEventId").val();
 		var moveBundle = $("#moveBundleId").val();
-		var application = $("#applicationId").val();
-		var appOwner = $("#appOwnerId").val();
-		var appSme = $("#appSmeId").val();
+		var column1 = $("#column1Id").val();
+		var column2 = $("#column2Id").val();
+		var column3 = $("#column3Id").val();
+		var column4 = $("#column4Id").val();
 		var lastPoolTime = $("#lastPoolTimeId").val();
-		${remoteFunction(action:'getTransitions', params:'\'moveBundle=\' + moveBundle +\'&moveEvent=\'+moveEvent +\'&application=\'+application +\'&appOwner=\'+appOwner+\'&appSme=\'+appSme +\'&lastPoolTime=\'+lastPoolTime', onFailure:"handleErrors()", onComplete:'updateTransitions(e);' )}
+		${remoteFunction(action:'getTransitions', params:'\'moveBundle=\' + moveBundle +\'&moveEvent=\'+moveEvent +\'&column1=\'+column1 +\'&column2=\'+column2+\'&column3=\'+column3+\'&column4=\'+column4+\'&lastPoolTime=\'+lastPoolTime', onFailure:"handleErrors()", onComplete:'updateTransitions(e);' )}
 		timedUpdate($("#selectTimedId").val())
 	}
 	var doUpdate = true
@@ -1027,6 +1057,53 @@ var fieldId
 	        }
 	    });
 	});
+
+	/* 
+	 * Function to switch the Labels to Select list when user click on edit icon.
+	 */
+	function changeLabelToSelect(){
+		$("#column1Label").hide()
+		$("#column1Select").show()
+		$("#column1Edit").hide()
+		$("#column1Save").show()
+		$("#column2Label").hide()
+		$("#column2Select").show()
+		$("#column2Edit").hide()
+		$("#column2Save").show()
+		$("#column3Label").hide()
+		$("#column3Select").show()
+		$("#column3Edit").hide()
+		$("#column3Save").show()
+		$("#column4Label").hide()
+		$("#column4Select").show()
+		$("#column4Edit").hide()
+		$("#column4Save").show()
+	}
+	/*
+	* Function to switch the Select list to Label when user click on 'X' button.
+	*/
+	function changeToLabel( colId ){
+		var value = ""
+		switch (colId) {
+		case "1" :
+			value = "${columns?.column1.field}"
+			break;
+		case "2" :
+			value = "${columns?.column2.field}"
+			break;
+		case "3" :
+			value = "${columns?.column3.field}"
+			break;
+		case "4" :
+			value = "${columns?.column4.field}"
+			break;
+		}
+		$("#column"+colId+"Label").show()
+		$("#column"+colId+"Select select").val(value)
+		$("#column"+colId+"Select").hide()
+		$("#column"+colId+"Edit").show()
+		$("#column"+colId+"Save").hide()
+	}
 </script>
 </body>
 </html>
