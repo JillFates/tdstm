@@ -8,8 +8,8 @@
 <body>
 <table id="suiteTable" cellpadding="1" cellspacing="1" border="1" class="selenium"><tbody>
 <tr><td><b>Test Suite</b></td></tr>
-<tr><td><a href="MoveBundle_MoveTeam_Creation">MoveBundle_MoveTeam_Creation</a></td></tr>
-<tr><td><a href="AssetImport_TeamAssignment_Console">AssetImport_TeamAssignment_Console</a></td></tr>
+<tr><td><a href="Project_MoveBundle_MoveTeam_Creation">Project_MoveBundle_MoveTeam_Creation</a></td></tr>
+<tr><td><a href="AssetImport_TeamAssignment_Console_MoveEvent_MoveNews_Creation">AssetImport_TeamAssignment_Console_MoveEvent_MoveNews_Creation</a></td></tr>
 </tbody></table>
 </body>
 </html>
