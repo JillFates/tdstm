@@ -762,15 +762,13 @@ class ClientConsoleController {
 	def createTransitionForNA = {
 		def actionId = params.actionId
 		def type = params.type
-		def transitionStatus
 		def principal = SecurityUtils.subject.principal
         def loginUser = UserLogin.findByUsername(principal)
 		def actions = actionId.split("_")
 		def assetEntity = AssetEntity.findById(actions[0])
 		def stateToId = Integer.parseInt(actions[1])
 		def stateTo = stateEngineService.getState( assetEntity.project.workflowCode, stateToId )
-		def currStateQuery = "select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-		 					"where t.asset_entity_id = ${assetEntity.id} and t.voided = 0 and t.type = 'process' order by date_created desc limit 1 "
+		
 		def role = ""
 		def subject = SecurityUtils.subject
 		if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
@@ -785,67 +783,7 @@ class ClientConsoleController {
 		}
 		def message = ""
 		if(role){
-			message = "Transaction created successfully"
-			def stateType = stateEngineService.getStateType( assetEntity.project.workflowCode,stateTo)
-			switch (type) {
-				case "done" :
-							def menuOption = constructManuOptions( stateTo, assetEntity, "done", stateType )
-							def validOptions = "doneMenu doMenu"
-							if( validOptions.contains( menuOption ) || ( menuOption == "readyMenu" && stateTo == "Ready") ){
-								def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
-								if(assetTeansition){
-									assetTeansition.voided = 1
-									assetTeansition.save(flush:true)
-								}
-								transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,stateTo, assetEntity, 
-																					assetEntity.moveBundle, loginUser, null, comment )
-								message = transitionStatus.message
-							}
-							break;
-					
-				case "void" : 
-							def assetTeansitions = AssetTransition.findAll(assetTransitionQuery + " and t.stateTo >= $stateToId")
-							assetTeansitions.each{
-								if(it.type != "boolean"){
-									it.voided = 1
-									it.save(flush:true)
-								}
-							}
-							changeCurrentStatus(currStateQuery,assetEntity)
-							break;
-					
-				case "ready" :
-							transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,"Ready", assetEntity, 
-																		assetEntity.moveBundle, loginUser, null, comment )
-							message = transitionStatus.message
-							break;
-				case "NA" :
-							if(stateType == "boolean"){
-								def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
-								if(assetTeansition){
-									assetTeansition.voided = 1
-									assetTeansition.save(flush:true)
-								}
-								transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,stateTo, assetEntity, 
-																					assetEntity.moveBundle, loginUser, null, comment )
-								message = transitionStatus.message
-								def currentTransition = AssetTransition.find("from AssetTransition t where t.assetEntity = ${assetEntity.id} "+
-																			"and voided = 0 order by dateCreated desc")
-								currentTransition.isNonApplicable = 1
-								currentTransition.save(flush:true)
-							}
-							break;
-				case "pending" :
-							if(stateType == "boolean"){
-								def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
-								if(assetTeansition){
-									assetTeansition.voided = 1
-									assetTeansition.save(flush:true)
-								}
-								changeCurrentStatus(currStateQuery,assetEntity)
-							}
-						break;
-			}
+			message = createBulkTransition(type, assetEntity, stateTo, role, loginUser, comment)
 		} else {
 			message = " You don't have permission to create transition"
 		}
@@ -1015,5 +953,187 @@ class ClientConsoleController {
 			it.key
 		}
 		return resList
+	}
+	/*
+	 * Validate and return the message to the user. 
+	 */
+	def getAssetsCountForBulkTransition = {
+			
+		def message = "" 
+		def transId = params.transId
+		def moveBundleId = params.bundleId
+		def moveEventId = params.eventId
+		def moveEvent = MoveEvent.findById( moveEventId )
+		
+		def stateTo = stateEngineService.getState( moveEvent.project.workflowCode, Integer.parseInt(transId) )
+		def stateType = stateEngineService.getStateType(moveEvent.project.workflowCode, stateTo)
+		def holdId = Integer.parseInt(stateEngineService.getStateId(moveEvent.project.workflowCode,"Hold"))
+
+		def assetQuery = new StringBuffer("""SELECT a.asset_entity_id as id, a.project_id as projectId FROM asset_entity a LEFT JOIN move_bundle m on 
+							a.move_bundle_id = m.move_bundle_id WHERE m.move_event_id = $moveEventId """)
+		if(moveBundleId){
+			assetQuery .append(" AND a.move_bundle_id = $moveBundleId ")
+		}
+		def assetEntityList = jdbcTemplate.queryForList(assetQuery.toString())
+		def totalAssets = assetEntityList.size()
+		def possibleAssets = 0
+		
+		// send the response message when state to as Ready or state type as boolean
+		if(stateTo == "Ready" || stateType == "boolean"){
+			possibleAssets = totalAssets
+			message = "Set the $possibleAssets out of $totalAssets assets to $stateTo ?"
+			render message 
+			return
+		}
+		
+		def subject = SecurityUtils.subject
+		def role = ""
+		if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
+			role = "SUPERVISOR"
+		} else if(subject.hasRole("MANAGER")){
+			role = "MANAGER"
+		}
+		
+		assetEntityList.each{ asset ->
+			def currentTransition = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+												"where t.asset_entity_id = ${asset.id} and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
+												"order by date_created desc limit 1 ")
+			if( currentTransition.size() ){
+
+				def currentStateId = currentTransition[0].stateTo
+				def currentState = stateEngineService.getState( moveEvent.project.workflowCode, currentStateId)
+				def validate = stateEngineService.canDoTask( moveEvent.project.workflowCode, role, currentState, stateTo  ) 
+				if(validate){
+					possibleAssets += 1
+				}
+			}
+		}
+		message = "Set the $possibleAssets out of $totalAssets assets to $stateTo ?"
+		render message 
+	}
+	/*
+	 * Bulk edit of transitions by letting the project manager click on column head to transition the displayed assets to that step.
+	 * @params : transition Id, transition type, moveBundle, moveEvent
+	 */
+	def doBulkTransitionsByHeader = {
+		def transId = params.transId
+		def moveBundleId = params.bundleId
+		def moveEventId = params.eventId
+		def moveEvent = MoveEvent.findById( moveEventId )
+		def type = params.type
+		
+		def stateTo = stateEngineService.getState( moveEvent.project.workflowCode, Integer.parseInt(transId) )
+		def stateType = stateEngineService.getStateType(moveEvent.project.workflowCode, stateTo)
+		def holdId = Integer.parseInt(stateEngineService.getStateId(moveEvent.project.workflowCode,"Hold"))
+		
+		def assetQuery = new StringBuffer("""SELECT a.asset_entity_id as id, a.project_id as projectId FROM asset_entity a LEFT JOIN move_bundle m on 
+									a.move_bundle_id = m.move_bundle_id WHERE m.move_event_id = $moveEventId """)
+		if(moveBundleId){
+			assetQuery .append(" AND a.move_bundle_id = $moveBundleId ")
+		}
+		def assetEntityList = jdbcTemplate.queryForList(assetQuery.toString())
+		
+		def subject = SecurityUtils.subject
+		def role = ""
+		if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
+			role = "SUPERVISOR"
+		} else if(subject.hasRole("MANAGER")){
+			role = "MANAGER"
+		}
+		def loginUser = UserLogin.findByUsername(subject.principal)
+		assetEntityList.each{ asset ->
+			def currentTransition = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+							"where t.asset_entity_id = ${asset.id} and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
+							"order by date_created desc limit 1 ")
+			def assetEntity = AssetEntity.get(asset.id)
+			if( currentTransition.size() ){
+				def currentStateId = currentTransition[0].stateTo
+				def currentState = stateEngineService.getState( moveEvent.project.workflowCode, currentStateId)
+				def validate = stateEngineService.canDoTask( moveEvent.project.workflowCode, role, currentState, stateTo  ) 
+				if(validate){
+					createBulkTransition( type, assetEntity, stateTo, role, loginUser, "" )
+				}
+			} else if(stateTo == "Ready" || stateType == "boolean") {
+				createBulkTransition( type, assetEntity, stateTo, role, loginUser, "" )
+			}
+		}
+		
+		render ""
+	}
+	/*
+	 *  Will create bulk transition based on user input.
+	 */
+	def createBulkTransition(def type, def assetEntity, def stateTo, def role, def loginUser, def comment ){
+		
+		def transitionStatus
+		def message = "Transaction created successfully"
+		
+		def assetTransitionQuery = "from AssetTransition t where t.assetEntity = ${assetEntity.id} and t.voided = 0"
+		def currStateQuery = "select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+				"where t.asset_entity_id = ${assetEntity.id} and t.voided = 0 and t.type = 'process' order by date_created desc limit 1 "
+		
+		def stateType = stateEngineService.getStateType( assetEntity.project.workflowCode,stateTo)
+		def stateToId = stateEngineService.getStateId( assetEntity.project.workflowCode,stateTo)
+		
+		switch (type) {
+			case "done" :
+				def menuOption = constructManuOptions( stateTo, assetEntity, "done", stateType )
+				def validOptions = "doneMenu doMenu"
+				if( validOptions.contains( menuOption ) || ( menuOption == "readyMenu" && stateTo == "Ready") ){
+					def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
+					if(assetTeansition){
+						assetTeansition.voided = 1
+						assetTeansition.save(flush:true)
+					}
+					transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,stateTo, assetEntity, 
+																		assetEntity.moveBundle, loginUser, null, comment )
+					message = transitionStatus.message
+				}
+				break;
+			
+			case "void" : 
+				def assetTeansitions = AssetTransition.findAll(assetTransitionQuery + " and t.stateTo >= $stateToId")
+				assetTeansitions.each{
+					if(it.type != "boolean"){
+						it.voided = 1
+						it.save(flush:true)
+					}
+				}
+				changeCurrentStatus(currStateQuery,assetEntity)
+				break;
+					
+			case "ready" :
+				transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,"Ready", assetEntity, 
+						assetEntity.moveBundle, loginUser, null, comment )
+				message = transitionStatus.message
+				break;
+			case "NA" :
+				if(stateType == "boolean"){
+					def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
+					if(assetTeansition){
+						assetTeansition.voided = 1
+						assetTeansition.save(flush:true)
+					}
+					transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,stateTo, assetEntity, 
+																					assetEntity.moveBundle, loginUser, null, comment )
+					message = transitionStatus.message
+					def currentTransition = AssetTransition.find("from AssetTransition t where t.assetEntity = ${assetEntity.id} "+
+																	"and voided = 0 order by dateCreated desc")
+					currentTransition.isNonApplicable = 1
+					currentTransition.save(flush:true)
+				}
+				break;
+			case "pending" :
+				if(stateType == "boolean"){
+					def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
+					if(assetTeansition){
+						assetTeansition.voided = 1
+						assetTeansition.save(flush:true)
+					}
+					changeCurrentStatus(currStateQuery,assetEntity)
+				}
+				break;
+		}
+		return message
 	}
 }

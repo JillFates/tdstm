@@ -81,7 +81,7 @@ overflow: hidden;
 			</td>
 			
 			<g:if test="${isAdmin || isProjManager}">
-			<td style="text-align: left;width: 300px;">
+			<td style="text-align: left;width: 400px;">
 				<span>
 					<input type="button" name="bulkEdit" id="bulkEditId" value="Bulk Edit" class="bulkedit_inactive" onclick="performBulkEdit()"/>
 				</span>
@@ -90,7 +90,7 @@ overflow: hidden;
 					<input type="button" name="bulkPending" id="bulkPendingId" value="Pending" onclick="changeAction('pending')"/>
 					<input type="button" name="bulkDone" id="bulkDoneId" value="Done" onclick="changeAction('done')"/>
 					<input type="button" name="bulkUndo" id="bulkUndoId" value="Undo" onclick="changeAction('undo')"/>
-					<input type="button" name="bulkNa" id="bulkNaId" value="N/A" onclick="changeAction('na')"/>
+					<input type="button" name="bulkNa" id="bulkNaId" value="N/A" onclick="changeAction('NA')"/>
 					<input type="hidden" name="bulkAction" id="bulkActionId" value="done"/>
 				</span>
 			</td>
@@ -227,7 +227,7 @@ overflow: hidden;
 			</th>
 			<g:if test="${browserTest}">
 			<g:each in="${processTransitionList}"  var="task">
-				<th class="verticaltext" title="${task.header}" style="color: ${task.fillColor}">${task?.header}</th>
+				<th class="verticaltext" title="${task.header}" style="color: ${task.fillColor}" onclick="bulkTransitionsByHeader('${task.transId}')">${task?.header}</th>
 			</g:each>
 			</g:if>
 			<g:else>
@@ -1030,11 +1030,11 @@ var fieldId
 				$("#bulkPendingId").addClass("bulkPending_active")
 				$("#bulkActionId").val("pending")
 			break;
-			case "na" :
+			case "NA" :
 				$("#bulkPendingId").removeClass("bulkPending_active")
 				$("#bulkDoneId").removeClass("bulkDone_active")
 				$("#bulkNaId").addClass("bulkNa_active")
-				$("#bulkActionId").val("na")
+				$("#bulkActionId").val("NA")
 			break;	
 		}
 	}
@@ -1050,7 +1050,7 @@ var fieldId
 					case "done" :
 						${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=done\'', onComplete:'updateTransitionRow(e)' )};
 					break;
-					case "na" :
+					case "NA" :
 						${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=NA\'', onComplete:'updateTransitionRow(e)' )};
 					break;	
 			    }
@@ -1103,6 +1103,25 @@ var fieldId
 		$("#column"+colId+"Select").hide()
 		$("#column"+colId+"Edit").show()
 		$("#column"+colId+"Save").hide()
+	}
+	/*
+	* 	Bulk edit of transitions by letting the project manager click on column head to transition the displayed assets to that step.
+	*/
+	function bulkTransitionsByHeader( transId ){
+		if($("#bulkEditId").hasClass("bulkedit_active")){
+			var eventId = $("#moveEventId").val()
+			var bundleId = $("#moveBundleId").val()
+			${remoteFunction(action:'getAssetsCountForBulkTransition', params:'\'transId=\' + transId +\'&bundleId=\'+bundleId+\'&eventId=\'+eventId', onComplete:'doBulkTransitionsByHeader(e,transId)' )};
+		}
+	}
+	function doBulkTransitionsByHeader( e, transId){
+		var message = e.responseText
+		if(confirm( message )){
+			var eventId = $("#moveEventId").val()
+			var bundleId = $("#moveBundleId").val()
+			var type = $("#bulkActionId").val()
+			${remoteFunction(action:'doBulkTransitionsByHeader', params:'\'transId=\' + transId +\'&bundleId=\'+bundleId+\'&eventId=\'+eventId+\'&type=\'+type', onComplete:'doAjaxCall()' )};
+		}
 	}
 </script>
 </body>
