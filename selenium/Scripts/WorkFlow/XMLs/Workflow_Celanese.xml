@@ -1,0 +1,34 @@
+<testdata>
+	<test rowid="1" step="Hold"/>	
+	<test rowid="2" step="App Tasks"/>
+	<test rowid="3" step="L3 Tasks"/>
+	<test rowid="4" step="DB Tasks"/>
+	<test rowid="5" step="VM Tasks"/>
+	<test rowid="6" step="BU/SAN Tasks"/>
+	<test rowid="7" step="Citrix Tasks"/>
+	<test rowid="8" step="Ready"/>
+	<test rowid="9" step="Powered Down"/>
+	<test rowid="10" step="Released"/>
+	<test rowid="11" step="Unracked"/>
+	<test rowid="12" step="Cleaned"/>
+	<test rowid="13" step="On Cart"/>
+	<test rowid="14" step="On Truck"/>
+	<test rowid="15" step="End Transit"/>
+	<test rowid="16" step="Off Truck"/>
+	<test rowid="17" step="Staged"/>
+	<test rowid="18" step="Cabled"/>
+	<test rowid="19" step="QA Verified"/>
+	<test rowid="20" step="Powered On"/>
+	<test rowid="21" step="Citrix Tasks Done"/>
+	<test rowid="22" step="BU/SAN Tasks Done"/>
+	<test rowid="23" step="VM Tasks Done"/>
+	<test rowid="24" step="L3 Tasks Done"/>
+	<test rowid="25" step="DB Tasks Done"/>
+	<test rowid="26" step="App Tasks Done"/>
+	<test rowid="27" step="App Verifying"/>
+	<test rowid="28" step="App Verified"/>
+	<test rowid="29" step="Completed"/>
+	<test rowid="30" step="Terminated"/>
+	
+</testdata>
+
