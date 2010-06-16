@@ -643,9 +643,9 @@ class ClientConsoleController {
 			def stateType = stateEngineService.getStateType(projectInstance.workflowCode,stateEngineService.getState(projectInstance.workflowCode,it))
 			def fillColor = stateType == 'boolean' ? '#FF8000' : 'green'
 			if(count == 0){
-				svgHeaderFile.append("<tspan fill='$fillColor'>${processTransition}</tspan>")
+				svgHeaderFile.append("<tspan fill='$fillColor' id='$it' onclick='parent.bulkTransitionsByHeader(this.id)'>${processTransition}</tspan>")
 			} else {
-				svgHeaderFile.append("<tspan x='-11' dy='22' fill='$fillColor'>${processTransition}</tspan>")
+				svgHeaderFile.append("<tspan x='-11' dy='22' fill='$fillColor' id='$it' onclick='parent.bulkTransitionsByHeader(this.id)'>${processTransition}</tspan>")
 			}
 			count++
 		}
@@ -977,15 +977,20 @@ class ClientConsoleController {
 		def assetEntityList = jdbcTemplate.queryForList(assetQuery.toString())
 		def totalAssets = assetEntityList.size()
 		def possibleAssets = 0
-		
+					
 		// send the response message when state to as Ready or state type as boolean
-		if(stateTo == "Ready" || stateType == "boolean"){
+		if(stateTo == "Ready" || (stateType == "boolean" && stateTo != "Hold")){
 			possibleAssets = totalAssets
 			message = "Set the $possibleAssets out of $totalAssets assets to $stateTo ?"
 			render message 
 			return
 		}
-		
+		// Set possibleAssets = 0 when stateTo is Hold
+		if(stateTo == "Hold"){
+			message = "Set the 0 out of $totalAssets assets to Hold ?"
+			render message 
+			return
+		}
 		def subject = SecurityUtils.subject
 		def role = ""
 		if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
@@ -1046,14 +1051,15 @@ class ClientConsoleController {
 							"where t.asset_entity_id = ${asset.id} and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
 							"order by date_created desc limit 1 ")
 			def assetEntity = AssetEntity.get(asset.id)
-			if( currentTransition.size() ){
+
+			if( currentTransition.size() && type != "void"){
 				def currentStateId = currentTransition[0].stateTo
 				def currentState = stateEngineService.getState( moveEvent.project.workflowCode, currentStateId)
 				def validate = stateEngineService.canDoTask( moveEvent.project.workflowCode, role, currentState, stateTo  ) 
 				if(validate){
 					createBulkTransition( type, assetEntity, stateTo, role, loginUser, "" )
 				}
-			} else if(stateTo == "Ready" || stateType == "boolean") {
+			} else if(stateTo == "Ready" || stateType == "boolean" || type == "void") {
 				createBulkTransition( type, assetEntity, stateTo, role, loginUser, "" )
 			}
 		}

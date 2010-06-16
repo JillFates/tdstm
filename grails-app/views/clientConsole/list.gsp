@@ -89,7 +89,7 @@ overflow: hidden;
 				<span style="display: none;" id="bulkTaskSpanId">
 					<input type="button" name="bulkPending" id="bulkPendingId" value="Pending" onclick="changeAction('pending')"/>
 					<input type="button" name="bulkDone" id="bulkDoneId" value="Done" onclick="changeAction('done')"/>
-					<input type="button" name="bulkUndo" id="bulkUndoId" value="Undo" onclick="changeAction('undo')"/>
+					<input type="button" name="bulkUndo" id="bulkUndoId" value="Undo" onclick="changeAction('void')"/>
 					<input type="button" name="bulkNa" id="bulkNaId" value="N/A" onclick="changeAction('NA')"/>
 					<input type="hidden" name="bulkAction" id="bulkActionId" value="done"/>
 				</span>
@@ -1015,24 +1015,28 @@ var fieldId
 			case "pending" :
 				$("#bulkDoneId").removeClass("bulkDone_active")
 				$("#bulkNaId").removeClass("bulkNa_active")
+				$("#bulkUndoId").removeClass("bulkPending_active")
 				$("#bulkPendingId").addClass("bulkPending_active")
 				$("#bulkActionId").val("pending")
 			break;
 			case "done" :
 				$("#bulkNaId").removeClass("bulkNa_active")
 				$("#bulkPendingId").removeClass("bulkPending_active")
+				$("#bulkUndoId").removeClass("bulkPending_active")
 				$("#bulkDoneId").addClass("bulkDone_active")
 				$("#bulkActionId").val("done")
 			break;
-			case "undo" :
+			case "void" :
 				$("#bulkDoneId").removeClass("bulkDone_active")
 				$("#bulkNaId").removeClass("bulkNa_active")
-				$("#bulkPendingId").addClass("bulkPending_active")
-				$("#bulkActionId").val("pending")
+				$("#bulkPendingId").removeClass("bulkPending_active")
+				$("#bulkUndoId").addClass("bulkPending_active")
+				$("#bulkActionId").val("void")
 			break;
 			case "NA" :
 				$("#bulkPendingId").removeClass("bulkPending_active")
 				$("#bulkDoneId").removeClass("bulkDone_active")
+				$("#bulkUndoId").removeClass("bulkPending_active")
 				$("#bulkNaId").addClass("bulkNa_active")
 				$("#bulkActionId").val("NA")
 			break;	
@@ -1052,6 +1056,9 @@ var fieldId
 					break;
 					case "NA" :
 						${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=NA\'', onComplete:'updateTransitionRow(e)' )};
+					break;
+					case "void" :
+						${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=void\'', onComplete:'updateTransitionRow(e)' )};
 					break;	
 			    }
 	        }
@@ -1132,7 +1139,12 @@ var fieldId
 		if($("#bulkEditId").hasClass("bulkedit_active")){
 			var eventId = $("#moveEventId").val()
 			var bundleId = $("#moveBundleId").val()
-			${remoteFunction(action:'getAssetsCountForBulkTransition', params:'\'transId=\' + transId +\'&bundleId=\'+bundleId+\'&eventId=\'+eventId', onComplete:'doBulkTransitionsByHeader(e,transId)' )};
+			var type = $("#bulkActionId").val()
+			if(type != "void" ){
+				${remoteFunction(action:'getAssetsCountForBulkTransition', params:'\'transId=\' + transId +\'&bundleId=\'+bundleId+\'&eventId=\'+eventId', onComplete:'doBulkTransitionsByHeader(e,transId)' )};
+			} else {
+				${remoteFunction(action:'doBulkTransitionsByHeader', params:'\'transId=\' + transId +\'&bundleId=\'+bundleId+\'&eventId=\'+eventId+\'&type=\'+type', onComplete:'doAjaxCall()' )};
+			}
 		}
 	}
 	function doBulkTransitionsByHeader( e, transId){
