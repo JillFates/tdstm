@@ -1083,7 +1083,7 @@ var fieldId
 	* Function to switch the Select list to Label when user click on 'X' button.
 	*/
 	function changeToLabel( colId ){
-		var value = ""
+		/*var value = ""
 		switch (colId) {
 		case "1" :
 			value = "${columns?.column1.field}"
@@ -1102,7 +1102,28 @@ var fieldId
 		$("#column"+colId+"Select select").val(value)
 		$("#column"+colId+"Select").hide()
 		$("#column"+colId+"Edit").show()
-		$("#column"+colId+"Save").hide()
+		$("#column"+colId+"Save").hide()*/
+		
+		$("#column1Label").show()
+		$("#column1Select select").val("${columns?.column1.field}")
+		$("#column1Select").hide()
+		$("#column1Edit").show()
+		$("#column1Save").hide()
+		$("#column2Label").show()
+		$("#column2Select select").val("${columns?.column2.field}")
+		$("#column2Select").hide()
+		$("#column2Edit").show()
+		$("#column2Save").hide()
+		$("#column3Label").show()
+		$("#column3Select select").val("${columns?.column3.field}")
+		$("#column3Select").hide()
+		$("#column3Edit").show()
+		$("#column3Save").hide()
+		$("#column4Label").show()
+		$("#column4Select select").val("${columns?.column4.field}")
+		$("#column4Select").hide()
+		$("#column4Edit").show()
+		$("#column4Save").hide()
 	}
 	/*
 	* 	Bulk edit of transitions by letting the project manager click on column head to transition the displayed assets to that step.

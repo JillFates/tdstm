@@ -940,8 +940,8 @@ class ClientConsoleController {
 				if( ! applicationMap.containsKey( app.trim() ) ){
 					applicationMap.put(app.trim(),apps[1])
 				} else {
-					def appCount = applicationMap.get(app) + apps[1]
-					applicationMap.put( app, appCount ) 
+					def appCount = applicationMap.get(app.trim()) + apps[1]
+					applicationMap.put( app.trim(), appCount ) 
 				}
 			}
 			
