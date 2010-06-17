@@ -1137,23 +1137,47 @@ var fieldId
 	*/
 	function bulkTransitionsByHeader( transId ){
 		if($("#bulkEditId").hasClass("bulkedit_active")){
-			var eventId = $("#moveEventId").val()
-			var bundleId = $("#moveBundleId").val()
-			var type = $("#bulkActionId").val()
+			var eventId = $("#moveEventId").val();
+			var bundleId = $("#moveBundleId").val();
+			var type = $("#bulkActionId").val();
+			var c1f = "${columns.column1.field}"
+			var c1v = "${column1Value}"
+			var c2f = "${columns.column2.field}"
+			var c2v = "${column2Value}"
+			var c3f = "${columns.column3.field}"
+			var c3v = "${column3Value}"
+			var c4f = "${columns.column4.field}"
+			var c4v = "${column4Value}"
+				
 			if(type != "void" ){
-				${remoteFunction(action:'getAssetsCountForBulkTransition', params:'\'transId=\' + transId +\'&bundleId=\'+bundleId+\'&eventId=\'+eventId', onComplete:'doBulkTransitionsByHeader(e,transId)' )};
+				${remoteFunction(action:'getAssetsCountForBulkTransition', 
+								params:'\'transId=\' + transId +\'&bundleId=\'+bundleId+\'&eventId=\'+eventId+\'&c1f=\'+c1f+\'&c2f=\'+c2f+\'&c3f=\'+c3f+\'&c4f=\'+c4f+\'&c1v=\'+c1v+\'&c2v=\'+c2v+\'&c3v=\'+c3v+\'&c4v=\'+c4v', 
+								onComplete:'doBulkTransitionsByHeader(e,transId)' )};
 			} else {
-				${remoteFunction(action:'doBulkTransitionsByHeader', params:'\'transId=\' + transId +\'&bundleId=\'+bundleId+\'&eventId=\'+eventId+\'&type=\'+type', onComplete:'doAjaxCall()' )};
+				${remoteFunction(action:'doBulkTransitionsByHeader', 
+								params:'\'transId=\' + transId +\'&bundleId=\'+bundleId+\'&eventId=\'+eventId+\'&type=\'+type+\'&c1f=\'+c1f+\'&c2f=\'+c2f+\'&c3f=\'+c3f+\'&c4f=\'+c4f+\'&c1v=\'+c1v+\'&c2v=\'+c2v+\'&c3v=\'+c3v+\'&c4v=\'+c4v', 
+								onComplete:'doAjaxCall()' )};
 			}
 		}
 	}
 	function doBulkTransitionsByHeader( e, transId){
 		var message = e.responseText
 		if(confirm( message )){
-			var eventId = $("#moveEventId").val()
-			var bundleId = $("#moveBundleId").val()
+			var eventId = $("#moveEventId").val();
+			var bundleId = $("#moveBundleId").val();
+			var type = $("#bulkActionId").val();
 			var type = $("#bulkActionId").val()
-			${remoteFunction(action:'doBulkTransitionsByHeader', params:'\'transId=\' + transId +\'&bundleId=\'+bundleId+\'&eventId=\'+eventId+\'&type=\'+type', onComplete:'doAjaxCall()' )};
+			var c1f = "${columns.column1.field}"
+			var c1v = "${column1Value}"
+			var c2f = "${columns.column2.field}"
+			var c2v = "${column2Value}"
+			var c3f = "${columns.column3.field}"
+			var c3v = "${column3Value}"
+			var c4f = "${columns.column4.field}"
+			var c4v = "${column4Value}"
+			${remoteFunction(action:'doBulkTransitionsByHeader', 
+							params:'\'transId=\' + transId +\'&bundleId=\'+bundleId+\'&eventId=\'+eventId+\'&type=\'+type+\'&c1f=\'+c1f+\'&c2f=\'+c2f+\'&c3f=\'+c3f+\'&c4f=\'+c4f+\'&c1v=\'+c1v+\'&c2v=\'+c2v+\'&c3v=\'+c3v+\'&c4v=\'+c4v', 
+							onComplete:'doAjaxCall()' )};
 		}
 	}
 </script>
