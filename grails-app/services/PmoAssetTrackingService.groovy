@@ -49,6 +49,10 @@ class PmoAssetTrackingService {
 																		assetEntity.moveBundle, loginUser, null, comment )
 					message = transitionStatus.message
 				}
+				if(stateType == "boolean" && stateTo=="VMCompleted"){
+					transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,"Completed", assetEntity, 
+																		assetEntity.moveBundle, loginUser, null, comment )
+				}
 				break;
 			
 			case "void" : 

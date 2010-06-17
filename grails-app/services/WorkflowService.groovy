@@ -167,7 +167,15 @@ class WorkflowService {
      * @return : last transition stateTo id.
      *-----------------------------------------------------------------------------*/
      def doPreExistTransitions( def process, def stateFrom, def stateTo,  def assetEntity, def moveBundle, def projectTeam, def userLogin ){
-		
+	 	
+	 	// Skip the steps when setting asset to Completed once user set "VM Completed".
+		def lastTransition = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+    														"where t.asset_entity_id = ${assetEntity.id} order by date_created desc limit 1 ")
+		if(lastTransition[0] && stateEngineService.getState( process, lastTransition[0].stateTo ) == "VMCompleted" &&
+			stateEngineService.getState( process, Integer.parseInt(stateTo) ) == "Completed"){
+			return stateFrom
+		}
+	 	
     	def min = Integer.parseInt(stateFrom) + 1
 		def max = Integer.parseInt(stateTo)
 		
