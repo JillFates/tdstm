@@ -225,6 +225,8 @@ class ClientConsoleController {
   
                 def isHoldNa = assetTransitions.find { it.stateTo == holdId }
                 
+                def doneTransitionQuery = "from AssetTransition where assetEntity = $assetId and voided = 0 and type = 'process' "
+				
                 processTransitionList.each() { trans ->
                     def cssClass='task_pending'
                     def transitionId = trans.transId
@@ -234,7 +236,7 @@ class ClientConsoleController {
                         
                         if(assetTrans && assetTrans.isNonApplicable) {
                             cssClass='asset_pending'
-                        } else if(assetTrans) {
+                        } else if(assetTrans && stateType == 'boolean') {
                             if(stateId != holdId || isHoldNa){
                                 cssClass='task_done'
                             } else {
@@ -244,8 +246,9 @@ class ClientConsoleController {
                         
                         if(stateType != 'boolean' || transitionId == holdId){
                             if( transitionId <= maxstate  ){
-                                cssClass = "task_done"
-                                if(stateId == holdId && !isHoldNa){
+                            	if(transitionId != holdId && AssetTransition.find(doneTransitionQuery+"  and stateTo = "+transitionId)){
+        							cssClass = "task_done"
+        						} else if(stateId == holdId && !isHoldNa){
                                     cssClass = "asset_hold"
                                 } else if( transitionId == holdId ){
                                     if(isHoldNa){
@@ -253,7 +256,7 @@ class ClientConsoleController {
                                     } else {
                                         cssClass='task_pending'
                                     }
-                                  } else if(assetTrans && assetTrans.isNonApplicable){
+                                } else if(assetTrans && assetTrans.isNonApplicable){
                                     cssClass='asset_pending'
                                 }
                             }
@@ -543,16 +546,21 @@ class ClientConsoleController {
 					check = false
 				}
 				def naTransQuery = "from AssetTransition where assetEntity = $assetId and voided = 0 and type = 'boolean' "
+				
+				def doneTransitionQuery = "from AssetTransition where assetEntity = $assetId and voided = 0 and type = 'process' "
+					
 				processTransitions.each() { trans ->
 					def cssClass='task_pending'
-					def transitionId = Integer.parseInt(trans)
-					def stateType = stateEngineService.getStateType( projectInstance.workflowCode, 
-									stateEngineService.getState(projectInstance.workflowCode, transitionId))
-                    def isHoldNa = AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+holdId)
                     if(stateId != terminatedId){
+                    	
+                    	def transitionId = Integer.parseInt(trans)
+						def stateType = stateEngineService.getStateType( projectInstance.workflowCode, 
+										stateEngineService.getState(projectInstance.workflowCode, transitionId))
+	                    def isHoldNa = AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+holdId)
+						
 						if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId)){
 							cssClass='asset_pending'
-						} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 0 and stateTo = "+transitionId)) {
+						} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 0 and stateTo = "+transitionId) && stateType == 'boolean') {
 							if(stateId != holdId || isHoldNa){
 								cssClass='task_done'
 							} else {
@@ -561,8 +569,9 @@ class ClientConsoleController {
 						}
 						if(stateType != 'boolean' || transitionId == holdId){
 							if( transitionId <= maxstate  ){
-								cssClass = "task_done"
-								if(stateId == holdId && !isHoldNa){
+								if(transitionId != holdId && AssetTransition.find(doneTransitionQuery+"  and stateTo = "+transitionId)){
+        							cssClass = "task_done"
+        						}  else if(stateId == holdId && !isHoldNa){
 									cssClass = "asset_hold"
 								} else if( transitionId == holdId ){
 									if(isHoldNa){
@@ -575,10 +584,10 @@ class ClientConsoleController {
 								}
 							}
 						}
+						cssClass = pmoAssetTrackingService.getRecentChangeStyle( assetId, cssClass, trans )
                     } else {
                     	cssClass='task_term'
                     }
-					cssClass = pmoAssetTrackingService.getRecentChangeStyle( assetId, cssClass, trans )
 					tdId << [id:"${assetId+"_"+trans}", cssClass:cssClass]
 				}
 				assetEntityList << [id: assetId, application:it.application ? it.application : "&nbsp;",appOwner:it.appOwner ? it.appOwner : "&nbsp;", 

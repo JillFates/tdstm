@@ -142,17 +142,23 @@ class PmoAssetTrackingService {
 			maxstate = maxTransition[0].maxState
 		}
 		def processTransitions= stateEngineService.getTasks(assetEntity.project.workflowCode, "TASK_ID")
+		
 		def naTransQuery = "from AssetTransition where assetEntity = ${assetEntity?.id} and voided = 0 and type = 'boolean' "
+		
+		def doneTransitionQuery = "from AssetTransition where assetEntity = ${assetEntity?.id} and voided = 0 and type = 'process' " 
+		
 		processTransitions.each() { trans ->
 			def cssClass='task_pending'
-			def transitionId = Integer.parseInt(trans)
-			def stateType = stateEngineService.getStateType( assetEntity.project.workflowCode, 
-									stateEngineService.getState(assetEntity.project.workflowCode, transitionId))
-            def isHoldNa = AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+holdId)
             if(currentstate != terminatedId){
+            	
+            	def transitionId = Integer.parseInt(trans)
+				def stateType = stateEngineService.getStateType( assetEntity.project.workflowCode, 
+										stateEngineService.getState(assetEntity.project.workflowCode, transitionId))
+	            def isHoldNa = AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+holdId)
+				
 				if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId) ){
 					cssClass='asset_pending'
-				} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 0 and stateTo = "+transitionId)) {
+				} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 0 and stateTo = "+transitionId) && stateType == 'boolean') {
 					if(currentstate != holdId || isHoldNa){
 						cssClass='task_done'
 					} else {
@@ -161,8 +167,9 @@ class PmoAssetTrackingService {
 				}
 				if(stateType != 'boolean' || transitionId == holdId){
 					if( transitionId <= maxstate  ){
-						cssClass = "task_done"
-						if(currentstate == holdId && !isHoldNa ){
+						if(transitionId != holdId && AssetTransition.find(doneTransitionQuery+"  and stateTo = "+transitionId)){
+							cssClass = "task_done"
+						} else if(currentstate == holdId && !isHoldNa ){
 							cssClass = "asset_hold"
 						} else if( transitionId == holdId ){
 							if(isHoldNa){
@@ -175,11 +182,11 @@ class PmoAssetTrackingService {
 						}
 					}
 				}
+				cssClass = getRecentChangeStyle( assetEntity?.id, cssClass, trans)
             } else {
             	cssClass='task_term'
 			}
 			
-			cssClass = getRecentChangeStyle( assetEntity?.id, cssClass, trans)
 			tdId << [id:"${assetEntity?.id+"_"+trans}", cssClass:cssClass]
 		}
 		return tdId
