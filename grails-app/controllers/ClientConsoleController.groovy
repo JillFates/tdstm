@@ -169,8 +169,7 @@ class ClientConsoleController {
 			}
 			tempTransitions.sort().each{
 				def processTransition = stateEngineService.getState(projectInstance.workflowCode,it)
-				def stateType = stateEngineService.getStateType(projectInstance.workflowCode,stateEngineService.getState(projectInstance.workflowCode,it))
-				def fillColor = stateType == 'boolean' ? '#FF8000' : 'green'
+				def fillColor = stateEngineService.getHeaderColor(projectInstance.workflowCode, stateEngineService.getState(projectInstance.workflowCode,it))
 				def transId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,processTransition))
 				processTransitionList<<[header:stateEngineService.getStateLabel(projectInstance.workflowCode,it),
 										transId:transId,
@@ -642,8 +641,7 @@ class ClientConsoleController {
 		def count = 0
 		tempTransitions.sort().each{
 			def processTransition = stateEngineService.getStateLabel(projectInstance.workflowCode,it)
-			def stateType = stateEngineService.getStateType(projectInstance.workflowCode,stateEngineService.getState(projectInstance.workflowCode,it))
-			def fillColor = stateType == 'boolean' ? '#FF8000' : 'green'
+			def fillColor = stateEngineService.getHeaderColor(projectInstance.workflowCode, stateEngineService.getState(projectInstance.workflowCode,it))
 			if(count == 0){
 				svgHeaderFile.append("<tspan fill='$fillColor' id='$it' onclick='parent.bulkTransitionsByHeader(this.id)'>${processTransition}</tspan>")
 			} else {

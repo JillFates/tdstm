@@ -20,18 +20,18 @@
 		<transition to="SourceWalkthru" name="Source Walkthrough" id="7" type="boolean" />
 		<transition to="TargetWalkthru" name="Target Walkthrough" id="8" type="boolean" />
 		
-		<transition to="Hold" name="Hold" id="10" type="boolean" color="red"/>
+		<transition to="Hold" name="Hold" id="10" type="boolean" color="red" header="#FF8000" />
 
 		<transition to="Ready" name="Ready" id="20" type="process" color="yellow"/>
-        <transition to="AppShutdown" name="App Shutdown" id="22" type="boolean" />
-        <transition to="VMShutdown" name="VM Shutdown" id="24" type="boolean" />
-        <transition to="VMReplicated" name="VM Replicated" id="25" type="boolean" />
-        <transition to="VMStartup" name="VM Startup" id="26" type="boolean" />
-        <transition to="VMAppVerified" name="VM App Verified" id="27" type="boolean" />
-        <transition to="VMCompleted" name="VM Completed" id="28" type="boolean" />
-        <transition to="AppShutdown" name="App Shutdown" id="29" type="boolean" />
+        <transition to="AppShutdown" name="App Shutdown" id="22" type="boolean" header="#FF8000" />
+        <transition to="VMShutdown" name="VM Shutdown" id="24" type="boolean" header="#FF8000" />
+        <transition to="VMReplicated" name="VM Replicated" id="25" type="boolean" header="#FF8000" />
+        <transition to="VMStartup" name="VM Startup" id="26" type="boolean" header="#FF8000" />
+        <transition to="VMAppVerified" name="VM App Verified" id="27" type="boolean" header="#FF8000" />
+        <transition to="VMCompleted" name="VM Completed" id="28" type="boolean" header="#FF8000" />
+        <transition to="AppShutdown" name="App Shutdown" id="29" type="boolean" header="#FF8000" />
 		<transition to="PoweredDown" name="Powered Down" id="30" type="process" color="orange"/>
-        <transition to="CableDisc" name="Cable Disc" id="32" type="boolean" />
+        <transition to="CableDisc" name="Cable Disc" id="32" type="boolean" header="#336600" />
 		<transition to="Release" name="Released" id="40" type="process" color="green" dashboardLabel="Release" />
 		<transition to="Unracking" name="Unracking" id="50" type="process" color="blue"/>
 		<transition to="Unracked" name="Unracked" id="60" type="process" color="blue" dashboardLabel="Unracking" predecessor="50"/>
@@ -41,23 +41,23 @@
 
 		<transition to="InTransit" name="In Transit" id="100" type="process" />
 		<transition to="EndTransit" name="End Transit" id="110" type="process" dashboardLabel="Transport" predecessor="100" />
-        <transition to="DevonVerify" name="Devon Verify" id="112" type="boolean" />
+        <transition to="DevonVerify" name="Devon Verify" id="112" type="boolean" header="#336600" />
 		<transition to="OffTruck" name="Off Truck" id="120" type="process" />
 		<transition to="Staged" name="Staged" id="130" type="process" />
 		<transition to="Reracking" name="Reracking" id="140" type="process" />
 		<transition to="Reracked" name="Reracked" id="150" type="process" dashboardLabel="Reracking" predecessor="140" />
-        <transition to="RackVerified" name="Rack Verified" id="153" type="boolean" />
+        <transition to="RackVerified" name="Rack Verified" id="153" type="boolean" header="#336600" />
 		<transition to="Cabled" name="Cabled" id="155" type="process" />
 		<transition to="QAVerified" name="QA Verified" id="160" type="process" />
 		<transition to="PoweredOn" name="Powered On" id="170"  type="process" />
 
-		<transition to="HWVerified" name="HW Verified" id="181" type="boolean" />
-		<transition to="OSVerified" name="OS Verified" id="183" type="boolean" />
-		<transition to="NetVerified" name="Net Verified" id="185" type="boolean" />
-		<transition to="StorVerified" name="Stor Verified" id="187" type="boolean" />
-		<transition to="DBVerified" name="DB Verified" id="189" type="boolean" />
-		<transition to="AppStarted" name="App Started" id="191" type="boolean" />
-		<transition to="AppVerified" name="App Verified" id="193" type="boolean" />
+		<transition to="HWVerified" name="HW Verified" id="181" type="boolean" header="#336600"/>
+		<transition to="OSVerified" name="OS Verified" id="183" type="boolean" header="#336600"/>
+		<transition to="NetVerified" name="Net Verified" id="185" type="boolean" header="#336600"/>
+		<transition to="StorVerified" name="Stor Verified" id="187" type="boolean" header="#336600"/>
+		<transition to="DBVerified" name="DB Verified" id="189" type="boolean" header="#336600"/>
+		<transition to="AppStarted" name="App Started" id="191" type="boolean" header="#336600"/>
+		<transition to="AppVerified" name="App Verified" id="193" type="boolean" header="#336600"/>
 
 		<transition to="Completed" name="Completed" id="280"  type="process" dashboardLabel="Completed" />
 		<transition to="Terminated" name="Terminated" id="900"  type="process" />
@@ -142,6 +142,7 @@
 			<transition to="OnCart" flag="skipped"/>
 			<transition to="OnTruck" flag="skipped"/>
 			<transition to="InTransit" flag="skipped"/>
+			<transition to="Completed"/>
 		</task>
 		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
@@ -153,6 +154,7 @@
 			<transition to="OnCart" flag="skipped"/>
 			<transition to="OnTruck" flag="skipped"/>
 			<transition to="InTransit" flag="skipped"/>
+			<transition to="Completed"/>
 		</task>
 	</taskNode>
 
@@ -194,6 +196,7 @@
 			<transition to="OnCart" flag="skipped"/>
 			<transition to="OnTruck" flag="skipped"/>
 			<transition to="InTransit" flag="skipped"/>
+			<transition to="Completed"/>
 		</task>
 		<task swimlane="SUPERVISOR">
 			<transition to="Hold" flag="issue"/>
@@ -205,6 +208,7 @@
 			<transition to="OnCart" flag="skipped"/>
 			<transition to="OnTruck" flag="skipped"/>
 			<transition to="InTransit" flag="skipped"/>
+			<transition to="Completed"/>
 		</task>
 		<task swimlane="MOVE_TECH">
 			<transition to="Hold" flag="issue"/>
