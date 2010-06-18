@@ -347,6 +347,9 @@ class MoveEventController {
 				cssClass = "statusbar_yellow"
 				status = "YELLOW"
 			}
+	/* --- temp change to avoid red status in PMO for today's move --- */
+	    	cssClass = "statusbar_good"
+
 	    	statusAndNewsList << ['news':news.toString(), 'cssClass':cssClass, 'status':status]
 		}
 		render statusAndNewsList as JSON

@@ -23,13 +23,15 @@
 		<transition to="Hold" name="Hold" id="10" type="boolean" color="red" header="#FF8000" />
 
 		<transition to="Ready" name="Ready" id="20" type="process" color="yellow"/>
-        <transition to="AppShutdown" name="App Shutdown" id="22" type="boolean" header="#FF8000" />
-        <transition to="VMShutdown" name="VM Shutdown" id="24" type="boolean" header="#FF8000" />
-        <transition to="VMReplicated" name="VM Replicated" id="25" type="boolean" header="#FF8000" />
-        <transition to="VMStartup" name="VM Startup" id="26" type="boolean" header="#FF8000" />
-        <transition to="VMAppVerified" name="VM App Verified" id="27" type="boolean" header="#FF8000" />
-        <transition to="VMCompleted" name="VM Completed" id="28" type="boolean" header="#FF8000" />
-        <transition to="AppShutdown" name="App Shutdown" id="29" type="boolean" header="#FF8000" />
+		<transition to="AppShutdown" name="VM App Shutdwn" id="22" type="boolean" header="#FF8000" />
+		<transition to="VMShutdown" name="VM Shutdown" id="23" type="boolean" header="#FF8000" />
+		<transition to="VMReplicated" name="VM Replicated" id="24" type="boolean" header="#FF8000" />
+		<transition to="VMStartup" name="VM Startup" id="25" type="boolean" header="#FF8000" />
+		<transition to="VMAppVerified" name="VM App Verified" id="26" type="boolean" header="#FF8000" />
+		<transition to="VMCompleted" name="VM Completed" id="27" type="boolean" header="#FF8000" />
+		<transition to="PhysicalStart" name="Physical Steps" id="28" type="boolean" header="#336600" />
+		<transition to="AppShutdown" name="App Shutdown" id="29" type="boolean" header="#336600" />
+
 		<transition to="PoweredDown" name="Powered Down" id="30" type="process" color="orange"/>
         <transition to="CableDisc" name="Cable Disc" id="32" type="boolean" header="#336600" />
 		<transition to="Release" name="Released" id="40" type="process" color="green" dashboardLabel="Release" />
