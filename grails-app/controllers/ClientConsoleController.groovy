@@ -232,7 +232,7 @@ class ClientConsoleController {
                     def transitionId = trans.transId
                     def stateType = trans.stateType
                     if(stateId != terminatedId){
-                        def assetTrans = assetTransitions.find { it.stateTo == transitionId }
+                        def assetTrans = assetTransitions.find { it.stateTo == transitionId.toString() }
                         
                         if(assetTrans && assetTrans.isNonApplicable) {
                             cssClass='asset_pending'
