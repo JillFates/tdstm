@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://ph1.tdsops.com/" />
+<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
 <title>Project_MoveBundle_MoveTeam_Creation</title>
 </head>
 <body>
@@ -214,11 +214,6 @@
 <tr>
 	<td>clickAndWait</td>
 	<td>link=Bundles</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=Bundle List</td>
 	<td></td>
 </tr>
 <tr>

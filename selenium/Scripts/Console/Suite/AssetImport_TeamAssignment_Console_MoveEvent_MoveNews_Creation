@@ -1811,6 +1811,127 @@
 	<td>moveEventId</td>
 	<td>${MEname}</td>
 </tr>
+<!--Creating Cleaning Team-->
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Bundles</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Team</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>_action_Create</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>teamCode</td>
+	<td>Cleaning</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name</td>
+	<td>Cleaning Team Name</td>
+</tr>
+<tr>
+	<td>addSelection</td>
+	<td>availableStaffId</td>
+	<td>label=TDS:Doherty,John- Project Manager</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a[@id='add']/img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Create']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>created</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Console</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//div[@id='midDiv']/table/tbody/tr/td[2]/table/tbody/tr[5]/td/a[5]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>ransition Manager - Mobile</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='loginForm']/div[2]/table.2.0</td>
+	<td>exact:Username:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='loginForm']/div[2]/table.3.0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Login']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>link=Home</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>link=My Tasks</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>link=Asset</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='bundleTeamAssetForm']/div[1]/table.0.0</td>
+	<td>Log out</td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Currently Logged in as:</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='bundleTeamAssetForm']/div[2]/table.1.1</td>
+	<td>${Pname}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='bundleTeamAssetForm']/div[2]/table.2.1</td>
+	<td>${BundleName}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='bundleTeamAssetForm']/div[2]/table.3.1</td>
+	<td>Cleaning Team Name</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='bundleTeamAssetForm']/div[2]/table.5.1</td>
+	<td>Source</td>
+</tr>
 
 </tbody></table>
 </body>
