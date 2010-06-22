@@ -80,7 +80,7 @@ overflow: hidden;
 			</select></span>
 			</td>
 			
-			<g:if test="${isAdmin || isProjManager}">
+			<g:if test="${isAdmin || isProjManager || isManager}">
 			<td style="text-align: left;width: 400px;">
 				<span>
 					<input type="button" name="bulkEdit" id="bulkEditId" value="Bulk Edit" class="bulkedit_inactive" onclick="performBulkEdit()"/>

@@ -138,7 +138,7 @@ class NewsEditorController {
 		def assetName
 		def commentType = params.commentType
 		def commentObject
-		if( commentType == 'issue' ){
+		if( commentType == 'issue' || commentType == 'I'){
 			commentObject = AssetComment.get( params.id )
 			if(commentObject.resolvedBy){
 				personResolvedObj = Person.find("from Person p where p.id = $commentObject.resolvedBy.id")

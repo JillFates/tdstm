@@ -1,15 +1,14 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="layout" content="projectHeader" />
 	<title>Client Dashboard</title>
 	
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dashboard.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tabcontent.css')}" />
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-	<g:javascript library="prototype" />
 	<%--<g:javascript src="FusionCharts.js" /> --%> 
 	<g:javascript src="yahoo.ui.dashboard.js" />
-	<jq:plugin name="jquery.combined" />
 	<%--
 	<script type="text/javascript">
 	/* render the individual step dial data*/
@@ -64,7 +63,7 @@
     }
 	</script> --%> 
 </head>
-<body topmargin="0" leftmargin="0" marginheight="0" marginwidth="0" class="body_bg" onload="getMoveEventNewsDetails($('#moveEvent').val())">
+<div  class="body_bg">
 <a name="page_up"></a>
 <div id="doc">
 	<!--Header Starts here-->
@@ -94,7 +93,7 @@
 				<input type="hidden" id="maxLenId" value="${params.maxLen}">
 				<input type="hidden" id="sortId" value="${params.sort}">
 			</div>
-			<div class="clientname">${project?.client}<br/>DATA CENTER RELOCATION <br><g:link controller="project" action="show" id="${project?.id}" style="text-decoration:none;"><span class="project_link">Return to Project</span> </g:link></div>
+			<div class="clientname">${project?.client}<br/>DATA CENTER RELOCATION </div>
 			<div class="topdate">
 				<div><img src="${createLinkTo(dir:'images',file:'powered_by.png')}" alt="Powered by TDS" width="158" height="53" title="Powered by TDS"></div>
 				<div id="date"></div> <div id="clock"></div>
@@ -189,12 +188,15 @@
 				    	<li><a href="#" rel="news_archived_div" onmouseup="javascript:setCrossobjTop()">Archive</a></li>
 				    </ul>
 				</div>
+				<div style="float: right; margin-right: 5px;">
+					<input type="button" value="Add News" onclick="openCreateNewsDialog()">
+				</div>	
  			</div>
 			<div style="clear:both"></div>
 			<div id="newsblock">
 				<div id="newsbox">
 					<div id="container" style="position:absolute;width:900px;height:70px;overflow:hidden;border:0px solid grey">
-						<div id="content" style="position:relative;width:900px;left:0px;top:-15px">
+						<div id="content" style="position:relative;width:900px;left:0px;top:-5px">
 							<div id="news_live_div" class="tabcontent">
 								<ul id="news_live" class="newscroll">
 								</ul>
@@ -205,7 +207,7 @@
 							</div>
 						</div>
 					</div>
-				</div>
+				</div>			
 				<div id="newsarrows">
 					<div id="toparrow">
 						<a href="javascript:moveup()"><img src="${createLinkTo(dir:'images',file:'up_arrow.png')}" alt="scroll up" width="10" height="6" border="0" /></a>
@@ -281,14 +283,152 @@
 
 <!-- Footer starts here-->
 	<div style="clear:both"></div>
-	<div id="crawler">
+	<!--<div id="crawler">
 		<div id="mycrawler"><div id="mycrawlerId" style="width: 900px;margin-top: -6px;" >.</div></div>
-	</div>
+	</div>-->
 <!-- Footer Ends here-->
 <!-- Body Ends here-->
 <a name="page_down"></a>
 </div>
+<div id="createNewsDialog" title="Create News Comment" style="display: none;">
+	<input name="moveEvent.id" value="${moveEvent?.id}" type="hidden" id="moveEventId"/>
+		<div class="dialog" style="border: 1px solid #5F9FCF">
+		<table id="createCommentTable" style="border: 0px">
+			<tr>
+				<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+			</tr>
+			<tr>
+		<td valign="top" class="name"><label>Comment Type:</label></td>
+				<td valign="top" class="value" > 
+				<select disabled="disabled">
+				<option>News</option>
+				</select>
+				</td>
+		</tr>
+			<tr class="prop">
+				<td valign="top" class="name"><label for="messageId"><b>Comment:&nbsp;<span style="color: red">*</span></b></label>
+				</td>
+				<td valign="top" class="value"><textarea cols="80" rows="5"
+					id="messageId" name="message"></textarea></td>
+			</tr>
+			<tr class="prop">
+				<td valign="top" class="name" nowrap="nowrap"><label for="isArchivedId" >Resolved / Archived:</label></td>
+				<td valign="top" class="value" id="archivedTdId">
+				<input type="checkbox" id="isArchivedId" value="0" onclick="updateHidden('isArchivedId','isArchivedHiddenId')"/>
+				<input type="hidden" name="isArchived" value="0" id="isArchivedHiddenId"/>
+				</td>
+			</tr>
+			<tr class="prop">
+				<td valign="top" class="name"><label for="resolutionNewsId">Resolution:</label>
+				</td>
+				<td valign="top" class="value" ><textarea cols="80" rows="5"
+						id="resolutionNewsId" name="resolution"></textarea> </td>
+			</tr>
+			
+		</table>
+		</div>
+		<div class="buttons"><span class="button"> 
+		<input class="save" type="button" value="Create" onclick="return submitCreateNewsForm()"/></span>
+		<span class="button"> 
+	<input class="delete" type="button" value="Cancel" onclick="resetCreateNewsForm();"/>
+	</span>
+		</div>
+</div>
+<div id="showEditCommentDialog" title="Edit Issue Comment"
+	style="display: none;">
+	<div class="dialog" style="border: 1px solid #5F9FCF">
+	<input name="id" value="" id="commentId" type="hidden"/>
+	<input name="commentType" value="" id="commentTypeId" type="hidden"/>
+	<input name="moveEvent.id" value="${moveEvent?.id}" type="hidden"/>
+		<div>
+	<table id="showCommentTable" style="border: 0px">
+		
+		<tr>
+		<td valign="top" class="name"><label for="dateCreated">Created
+				At:</label></td>
+				<td valign="top" class="value" id="dateCreatedId" ></td>
+		</tr>
+			<tr>
+		<td valign="top" class="name"><label for="createdBy">Created
+				By:</label></td>
+				<td valign="top" class="value" id="createdById" ></td>
+		</tr>
+		<tr>
+		<td valign="top" class="name"><label>Comment Type:</label></td>
+				<td valign="top" class="value" > 
+				<select disabled="disabled" id="commentTypeOption">
+				<option>Issue</option>
+				</select>
+				</td>
+		</tr>
+		<tr id="displayOptionTr">
+			
+		<td valign="top" class="name" nowrap="nowrap">
+			<label for="category">User / Generic Cmt:</label></td>
+				<td valign="top" class="value" id="displayOption" >
+				<input type="radio" name="displayOption" value="U" id="displayOptionUid"/>&nbsp;
+				<span style="vertical-align: text-top;">User Comment</span>&nbsp;&nbsp;&nbsp;
+				<input type="radio" name="displayOption" value="G" checked="checked" id="displayOptionGid"/>&nbsp;
+				<span style="vertical-align:text-top;">Generic Comment&nbsp;</span>
+				</td>
+		</tr>
+		<tr class="prop" id="assetTrId">
+		<td valign="top" class="name"><label for="assetTdId">Asset:</label></td>
+				<td valign="top" class="value"><input type="text" disabled="disabled" id="assetTdId"/></td>
+		</tr>
+			<tr class="prop">
+				<td valign="top" class="name"><label for="comment">Comment:</label>
+				</td>
+				<td valign="top" class="value" ><textarea cols="80" rows="5"
+						id="commentTdId" name="comment"></textarea> </td>
+			</tr>
+			<tr class="prop">
+				<td valign="top" class="name" nowrap="nowrap"><label for="isResolved" >Resolved / Archived:</label></td>
+				<td valign="top" class="value" id="resolveTdId">
+				<input type="checkbox" id="isResolvedId" value="0" onclick="updateHidden('isResolvedId','isResolvedHiddenId')"/>
+				<input type="hidden" name="isResolved" value="0" id="isResolvedHiddenId"/>
+				</td>
+			</tr>
+			<tr class="prop">
+				<td valign="top" class="name"><label for="resolution">Resolution:</label>
+				</td>
+				<td valign="top" class="value" ><textarea cols="80" rows="5"
+						id="resolutionId" name="resolution"></textarea> </td>
+			</tr>
+				<tr>
+		<td valign="top" class="name"><label for="dateResolved">Resolved
+				At:</label></td>
+				<td valign="top" class="value" id="dateResolvedId" ></td>
+		</tr>
+			<tr>
+		<td valign="top" class="name"><label for="resolvedBy">Resolved
+				By:</label></td>
+				<td valign="top" class="value" id="resolvedById" ></td>
+		</tr>
+		
+	</table>
+	</div>
+	<div class="buttons"><span class="button"> 
+	<input class="save" type="button" value="Update" onclick="return submitUpdateNewsForm()"/>
+	</span> <span class="button"> 
+	<input class="delete" type="button" value="Cancel" onclick="$('#showEditCommentDialog').dialog('close');"/>
+	</span></div>
+	</div>
+</div>
 <script type="text/javascript">
+
+	$(document).ready(function() {
+	    $("#showEditCommentDialog").dialog({
+	        autoOpen: false,
+	        resizable: false
+ 		});
+	    $("#createNewsDialog").dialog({
+	        autoOpen: false,
+	        resizable: false
+ 		});
+	})
+	
+	
 	if("${session.getAttribute('CURR_TZ')?.CURR_TZ}"){
 		$("#timezone").find("option[text='${session.getAttribute('CURR_TZ')?.CURR_TZ}']").attr("selected","selected");
 	} else {
@@ -307,14 +447,14 @@
 	/*---------------------------------------------------
 	* Script to load the marquee to scroll the live news
 	*--------------------------------------------------*/
-	marqueeInit({
+	<%-- marqueeInit({
 		uniqueid: 'mycrawler',
 		inc: 8, //speed - pixel increment for each iteration of this marquee's movement
 		mouse: 'cursor driven', //mouseover behavior ('pause' 'cursor driven' or false)
 		moveatleast: 4,
 		neutral: 150,
 		savedirection: false
-	});
+	}); --%>
 	/*-----------------------------------------------
 	* function to move the data steps to right / left
 	*----------------------------------------------*/
@@ -393,6 +533,8 @@
 	/* Function to load the data for a particular MoveEvent */
 	var doUpdate = true
 	function getMoveEventNewsDetails( moveEvent ){
+		$("#createNewsDialog").dialog("close");
+		$("#showEditCommentDialog").dialog("close");
 		updateDash( $("#defaultBundleId").val() );
 	<%--	if(dialReload && doUpdate){
 			timer = setTimeout( "getDialsData($('#defaultBundleId').val() )", 5000 );
@@ -428,20 +570,21 @@
 		var newsLength = news.length;
 		var live = "";
 		var archived = "";
-		var scrollText = " ";
+		//var scrollText = " ";
 		var myDate = new Date();
 		for( i = 0; i< newsLength; i++){
 			var state = news[i].state;
+			var liId = news[i].type+"_"+news[i].id
 			if(state == "A"){
-				archived +=	"<li><span class='newstime'>"+convertTime(offset,news[i].created)+" :</span> <span class='normaltext'>"+news[i].text+"</span></li>";
+				archived +=	"<li id="+liId+" onclick='openEditNewsDialog(this.id)'><span class='newstime'>"+convertTime(offset,news[i].created)+" :</span> <span class='normaltext'>"+news[i].text+"</span></li>";
 			} else {
-				live +=	"<li><span class='newstime'>"+convertTime(offset,news[i].created) +" :</span> <span class='normaltext'>"+news[i].text+"</span></li>";
-				scrollText +=" "+news[i].text +"..."
+				live +=	"<li id="+liId+" onclick='openEditNewsDialog(this.id)'><span class='newstime'>"+convertTime(offset,news[i].created) +" :</span> <span class='normaltext'>"+news[i].text+"</span></li>";
+				//scrollText +=" "+news[i].text +"..."
 			}
 		}
 		$("#news_live").html(live);
 		$("#news_archived").html(archived);
-		$("#mycrawlerId").html(scrollText)
+		//$("#mycrawlerId").html(scrollText)
 		
 	}
 	function setUserTimeZone(){
@@ -456,6 +599,7 @@
 	var speed = 10
 	var crossobjTop = $("#content").css("top")
 	function movedown(){
+		
 		var crossobj = $("#content")
 		var contentheight = crossobj.height()
 		if ( parseInt(crossobj.css("top")) >= (contentheight - 60)*(-1) ){
@@ -464,9 +608,10 @@
 	}
 	
 	function moveup(){
+		
 		var crossobj=$("#content")
 		var contentheight=crossobj.height()
-		if (parseInt(crossobj.css("top"))<=-20){
+		if (parseInt(crossobj.css("top"))<=-15){
 			crossobj.css("top",parseInt(crossobj.css("top"))+speed+"px")
 		}
 	}
@@ -790,6 +935,157 @@
 	function pageReload(){
 		window.location = document.URL;
 	}
+	/*
+	will popup the dialog to create news
+	*/
+	function openCreateNewsDialog(){
+		$("#createNewsDialog").dialog('option', 'width', 700);
+		$("#createNewsDialog").dialog('option', 'position', ['center','top']);
+		$("#showEditCommentDialog").dialog("close");
+		$('#createNewsDialog').dialog('open');
+	}
+	function updateHidden(checkBoxId,hiddenId){
+		var resolve = $("#"+checkBoxId).is(':checked');
+		if(resolve){
+			$("#"+hiddenId).val(1);
+		} else {
+			$("#"+hiddenId).val(0);
+		}
+	}
+	/*
+	* this function is used to validate the crete news form before sending to server
+	*/
+	function submitCreateNewsForm(){
+		var moveEvent = $("#moveEventId").val();
+		var resolveBoo = $("#isArchivedId").is(':checked');
+		var resolveVal = $("#resolutionNewsId").val();
+		var news = $("#messageId").val()
+		var validate = false;
+		if(moveEvent){
+			if(resolveBoo && resolveVal == ""){
+				alert('Please enter Resolution');
+			} else if( !news ){
+				alert('Please enter Comment');
+			} else {
+				validate = true;
+			}
+		} else{
+			alert("Please Assign MoveEvent to Current Bundle")
+		}
+		if(validate){
+			${remoteFunction(action:'saveNews', 
+					params:'\'moveEvent.id=\' + moveEvent +\'&message=\'+ news +\'&isArchived=\'+$(\'#isArchivedHiddenId\').val()+\'&resolution=\'+$(\'#resolutionNewsId\').val()', 
+					onComplete:'getMoveEventNewsDetails(moveEvent)')}
+		}
+	}
+	function resetCreateNewsForm(){
+		$("#messageId").val("");
+		$('#isArchivedHiddenId').val("0");
+		$('#resolutionNewsId').val("")
+		$('#isArchivedId').attr("checked",false)
+		$('#createNewsDialog').dialog('close');
+	}
+	/* will popup the dialog to edit news */
+	function openEditNewsDialog( newsId ){
+		var idArray = newsId.split("_")
+		var type = idArray [0]
+		var id = idArray [1] 
+		${remoteFunction(controller:'newsEditor', action:'getCommetOrNewsData',params:'\'id=\' + id +\'&commentType=\'+type', onComplete:'showEditNewsForm( e )')}
+	}
+	function showEditNewsForm(){
+		
+	}
+	/*-------------------------------------------
+	 * @author : Lokanada Reddy
+	 * @param  : assetComment / moveEventNews object based on comment Type as JSON object
+	 * @return : Edit form
+	 *-------------------------------------------*/
+	function showEditNewsForm( e ){
+		var assetComments = eval('(' + e.responseText + ')');
+		if (assetComments) {
+			
+			$('#commentId').val(assetComments[0].commentObject.id)
+			$('#assetTdId').val(assetComments[0].assetName)
+			$('#dateCreatedId').html(assetComments[0].dtCreated);
+			if(assetComments[0].personResolvedObj != null){
+				$('#resolvedById').html(assetComments[0].personResolvedObj.firstName+" "+assetComments[0].personResolvedObj.lastName);
+			}else{
+				$('#resolvedById').html("");
+				$('#resolvedByEditId').html("");
+			}
+			$('#createdById').html(assetComments[0].personCreateObj.firstName+" "+assetComments[0].personCreateObj.lastName);
+			$('#resolutionId').val(assetComments[0].commentObject.resolution);
+			
+			if(assetComments[0].commentObject.commentType != 'issue'){
+
+				$('#commentTypeId').val("news")
+				$('#dateResolvedId').html(assetComments[0].dtResolved);
+				$('#isResolvedId').val(assetComments[0].commentObject.isArchived)
+				$('#commentTdId').val(assetComments[0].commentObject.message)
+				if(assetComments[0].commentObject.isArchived != 0){
+					$('#isResolvedId').attr('checked', true);
+					$("#isResolvedHiddenId").val(1);
+				} else {
+					$('#isResolvedId').attr('checked', false);
+					$("#isResolvedHiddenId").val(0);
+				}
+				$("#displayOptionTr").hide();
+				$("#commentTypeOption").html("<option>News</option>");
+				$("#assetTrId").hide();
+				$("#showEditCommentDialog").dialog('option','title','Edit News Comment');
+
+			} else {
+
+				$('#commentTypeId').val("issue")
+				$('#dateResolvedId').html(assetComments[0].dtResolved);
+				$('#isResolvedId').val(assetComments[0].commentObject.isResolved)
+				$('#commentTdId').val(assetComments[0].commentObject.comment)
+				if(assetComments[0].commentObject.isResolved != 0){
+					$('#isResolvedId').attr('checked', true);
+					$("#isResolvedHiddenId").val(1);
+				} else {
+					$('#isResolvedId').attr('checked', false);
+					$("#isResolvedHiddenId").val(0);
+				}
+				if(assetComments[0].commentObject.displayOption == "G"){
+					$("#displayOptionGid").attr('checked', true);
+				} else {
+					$("#displayOptionUid").attr('checked', true);
+				}
+				$("#displayOptionTr").show();
+				$("#commentTypeOption").html("<option>Issue</option>");
+				$("#assetTrId").show();
+				$("#showEditCommentDialog").dialog('option','title','Edit Issues Comment');
+				
+			}
+	     	
+			$("#showEditCommentDialog").dialog('option', 'width', 700);
+			$("#showEditCommentDialog").dialog('option', 'position', ['center','top']);
+			$("#showEditCommentDialog").dialog("open");
+			$("#createNewsDialog").dialog("close");
+			}
+	}
+	/* will submit news edit form*/
+	function submitUpdateNewsForm(){
+		var moveEvent = $("#moveEventId").val();
+		var id = $("#commentId").val();
+		var resolveBoo = $("#isResolvedId").is(':checked');
+		var resolveVal = $("#resolutionId").val();
+		var validate = false
+		if(resolveBoo && resolveVal == ""){
+			alert('Please enter Resolution');
+		} else {
+			validate = true;
+		}
+		alert($('input[name=displayOption]:checked').val())
+		if(validate){
+			${remoteFunction(action:'updateNewsOrComment', 
+					params:'\'moveEvent.id=\' + moveEvent +\'&id=\'+ id +\'&isResolved=\'+$(\'#isResolvedHiddenId\').val()+\'&comment=\'+$(\'#commentTdId\').val()+\'&resolution=\'+resolveVal+\'&commentType=\'+$(\'#commentTypeId\').val()+\'&displayOption=\'+$(\'input[name=displayOption]:checked\').val()', 
+					onComplete:'getMoveEventNewsDetails(moveEvent)')}
+		}
+	}
+	// used to call the function once page loaded
+	getMoveEventNewsDetails($('#moveEvent').val())
 	</script>
-</body>
+</div>
 </html>
