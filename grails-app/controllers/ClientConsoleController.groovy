@@ -781,6 +781,8 @@ class ClientConsoleController {
 		def message = "" 
 		def transId = params.transId
 		def moveEvent = MoveEvent.findById( params.eventId )
+		def type = params.type
+		
 		def stateTo = stateEngineService.getState( moveEvent.project.workflowCode, Integer.parseInt(transId) )
 		def stateType = stateEngineService.getStateType(moveEvent.project.workflowCode, stateTo)
 		def holdId = Integer.parseInt(stateEngineService.getStateId(moveEvent.project.workflowCode,"Hold"))
@@ -788,17 +790,22 @@ class ClientConsoleController {
 		def assetEntityList = pmoAssetTrackingService.getAssetEntityListForBulkEdit( params )
 		def totalAssets = assetEntityList.size()
 		def possibleAssets = 0
-					
+		// terminate if type is not appplicable 
+		if(stateType != "boolean" && (type == "NA" || type == "pending")){
+			message = " $type not allowed for Process steps"
+			render message 
+			return
+		}
 		// send the response message when state to as Ready or state type as boolean
 		if(stateTo == "Ready" || (stateType == "boolean" && stateTo != "Hold")){
 			possibleAssets = totalAssets
-			message = "Set the $possibleAssets out of $totalAssets assets to $stateTo ?"
+			message = "Set the $possibleAssets out of $totalAssets assets to $stateTo to $type ?"
 			render message 
 			return
 		}
 		// Set possibleAssets = 0 when stateTo is Hold
 		if(stateTo == "Hold"){
-			message = "Set the 0 out of $totalAssets assets to Hold ?"
+			message = "Set the 0 out of $totalAssets assets to Hold to $type ?"
 			render message 
 			return
 		}
@@ -825,7 +832,7 @@ class ClientConsoleController {
 				}
 			}
 		}
-		message = "Set the $possibleAssets out of $totalAssets assets to $stateTo ?"
+		message = "Set the $possibleAssets out of $totalAssets assets to $stateTo to $type ?"
 		render message 
 	}
 	/*
