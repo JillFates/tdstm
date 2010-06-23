@@ -3,13 +3,19 @@
  * period of time.
  */
 class MoveEvent {
+		
 	static transients = [ "jdbcTemplate" ]
 	def jdbcTemplate
 	
+	static final String METHOD_LINEAR="L"
+	static final String METHOD_MANUAL="M"
+		
+		
     Project project
     String name
     String description
 	String inProgress = "false" 
+	String calcMethod = METHOD_LINEAR
 
 	Date revisedCompletionTime		// Revised Completion Time of the MoveEvent which is only set as an exception
 
@@ -25,6 +31,7 @@ class MoveEvent {
 		actualCompletionTime(nullable:true )
 		revisedCompletionTime ( nullable:true )
 		inProgress( blank:false, nullable:false, inList:["true", "false"] )
+		calcMethod( blank:false, nullable:false, inList: [METHOD_LINEAR, METHOD_MANUAL] )
 	}
 
 	static hasMany = [

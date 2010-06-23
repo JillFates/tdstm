@@ -7,8 +7,12 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
 import com.tdssrc.grails.GormUtil
 import java.text.SimpleDateFormat
 import java.text.DateFormat
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
+
 class MoveEventController {
 	
+	protected static Log log = LogFactory.getLog( StepSnapshotService.class )
     // Service initialization
 	def moveBundleService
 	def jdbcTemplate
@@ -354,5 +358,23 @@ class MoveEventController {
 		}
 		render statusAndNewsList as JSON
     }
+    /*
+     * will update the moveEvent calcMethod = M and create a MoveEventSnapshot for summary dialIndicatorValue
+     * @author : Lokanada Reddy
+     * @param  : moveEventId and moveEvent dialIndicatorValue
+     */
+    def updateEventSumamry = {
+    	def moveEvent = MoveEvent.get( params.moveEventId )
+    		 
+		def moveEventSnapshot = new MoveEventSnapshot(moveEvent : moveEvent, planDelta:0, dialIndicator:params.value, type:"P")
+    	if ( ! moveEventSnapshot.save( flush : true ) ) 
+    		log.error("Unable to save changes to MoveEventSnapshot: ${moveEventSnapshot}")
+		
+		moveEvent.calcMethod = MoveEvent.METHOD_MANUAL
+		if ( ! moveEvent.save( flush : true ) ) 
+    		log.error("Unable to save changes to MoveEvent: ${moveEvent}")
+			
+		render "success"
+     }
     
 }

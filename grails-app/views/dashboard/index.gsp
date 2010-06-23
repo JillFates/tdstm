@@ -124,7 +124,14 @@
 			<div id="plan_summary">
 				<div id="topindleft">
 					<div id="summary_gauge_div" align="center"> 
-					<img id="summary_gauge" alt="Move Event Summary" src="${createLinkTo(dir:'i/dials',file:'dial-50.png')}">
+					<g:if test="${isAdmin || isProjManager }">
+						<a href="#manualSummary" onclick="javascript:$('#manualSumStatusSpan').show();">
+							<img id="summary_gauge" alt="Move Event Summary" src="${createLinkTo(dir:'i/dials',file:'dial-50.png')}" style="border: 0px;">
+						</a>
+					</g:if>
+					<g:else>
+						<img id="summary_gauge" alt="Move Event Summary" src="${createLinkTo(dir:'i/dials',file:'dial-50.png')}" style="border: 0px;">
+					</g:else>
 					</div>
 					<%--
 					<script language="JavaScript">
@@ -134,6 +141,11 @@
 						summarychart.render("summary_gauge_div");
 					</script>  --%>
 						Move Status vs. Plan
+					<br/>
+					<span id="manualSumStatusSpan" style="display: none;width: 10px;">
+						<input type="text" value="" name="manualSummaryStatus" id="manualSummaryStatusId" size="3" maxlength="3" onblur="validateManulaSummary(this.value)"/>&nbsp;
+						<input type="button" value="Save" onclick="changeEventSummary()"/>
+					</span>
 				</div>
 				<div class="topleftcontent">
 						Planned Completion<br>
@@ -1082,6 +1094,31 @@
 			${remoteFunction(action:'updateNewsOrComment', 
 					params:'\'moveEvent.id=\' + moveEvent +\'&id=\'+ id +\'&isResolved=\'+$(\'#isResolvedHiddenId\').val()+\'&comment=\'+$(\'#commentTdId\').val()+\'&resolution=\'+resolveVal+\'&commentType=\'+$(\'#commentTypeId\').val()+\'&displayOption=\'+$(\'input[name=displayOption]:checked\').val()', 
 					onComplete:'getMoveEventNewsDetails(moveEvent)')}
+		}
+	}
+	// validate the manual summary input value
+	function validateManulaSummary(value){
+		var check = true
+		if( !isNaN(value) ){
+			if(value > 100){
+				alert("Summary status should not be greater than 100")
+				check = false
+			}
+		} else {
+			alert("Summary status should Alpha Numeric ")
+			check = false
+		}
+		return check
+	}
+	// send the request to update the manual summary value if it is valid
+	function changeEventSummary(){
+		var value = $("#manualSummaryStatusId").val()
+		if(validateManulaSummary( value )){
+			var moveEvent = $("#moveEventId").val();
+			${remoteFunction(controller:"moveEvent",action:'updateEventSumamry', 
+					params:'\'moveEventId=\' + moveEvent +\'&value=\'+ value', 
+					onComplete:'updateDash( $("#defaultBundleId").val() )')}
+			$("#manualSumStatusSpan").hide();
 		}
 	}
 	// used to call the function once page loaded

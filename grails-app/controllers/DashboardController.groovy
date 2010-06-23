@@ -40,12 +40,14 @@ class DashboardController {
             }
         }
         def timeToUpdate = getSession().getAttribute("DASHBOARD_REFRESH")
+		def subject = SecurityUtils.subject
         if( moveEvent ){
         	userPreferenceService.setPreference("MOVE_EVENT","${moveEvent.id}")
 			moveBundleList = MoveBundle.findAll(" FROM MoveBundle mb where moveEvent = ${moveEvent.id} ORDER BY mb.startTime ")				
 		}
 		return [ moveEventsList : moveEventsList, moveEvent : moveEvent, project : project, projectLogo : projectLogo, 
-				 moveBundleList : moveBundleList, timeToUpdate : timeToUpdate ? timeToUpdate.DASHBOARD_REFRESH : "never" ]
+				 moveBundleList : moveBundleList, timeToUpdate : timeToUpdate ? timeToUpdate.DASHBOARD_REFRESH : "never",
+				 isAdmin:subject.hasRole("ADMIN"), isProjManager:subject.hasRole("PROJ_MGR")]
     }
 	
 	/*---------------------------------------------------------

@@ -243,10 +243,13 @@ log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${l
 		
 		def moveEvent = MoveEvent.get( moveEventId )
 		if ( !moveEvent ) {
-			log.error("Unable to get  moveEvent record with id=${moveEventId}")
+			log.error(": Unable to get  moveEvent record with id=${moveEventId}")
 			return
 		}
-		
+		if(moveEvent.calcMethod == MoveEvent.METHOD_MANUAL){
+			log.error(": MoveEvent '${moveEvent}' process has been changed to MANUAL")
+			return
+		}
 		def lastBundleId = null
 		def maxDelta = 0					// Tracks the max delta for all move events
 		def lastIsCompleted = false
