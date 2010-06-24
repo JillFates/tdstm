@@ -6,6 +6,12 @@ class UserPreferenceService  {
 
 	static transactional = true
 	
+	/*
+     * Return current session object
+     */
+    def HttpSession getSession() {
+        return RequestContextHolder.currentRequestAttributes().getSession()
+    }
     /*
      * Method to read all of the user's preferences into a MAP and 
      * saved into the user's session
@@ -51,7 +57,11 @@ class UserPreferenceService  {
      */
     
     def setPreference( String preferenceCode, String value ) {
-    	
+		if(preferenceCode == "CURR_PROJ"){
+			def principal = SecurityUtils.subject.principal
+	    	def userLogin = UserLogin.findByUsername( principal )
+	    	removeProjectAssociatedPreferences(userLogin )	
+		}
     	def prefValue = getPreference(preferenceCode)
     	def principal = SecurityUtils.subject.principal
     	def userLogin = UserLogin.findByUsername( principal )
@@ -71,13 +81,25 @@ class UserPreferenceService  {
     	// call loadPreferences() to load CURR_PROJ MAP into session
     	loadPreferences(preferenceCode)
     }
-    /*
-     * Return current session object
-     */
-    def HttpSession getSession() {
-        return RequestContextHolder.currentRequestAttributes().getSession()
+    /*-------------------------------------------------------------------------------------------
+     * Remove the Move Event and Move Bundle preferences when user switched to different project.
+     * @param : login user
+     * ----------------------------------------------------------------------------------------*/
+	def removeProjectAssociatedPreferences(def userLogin ){
+    	def eventPreference = UserPreference.findByUserLoginAndPreferenceCode( userLogin, "MOVE_EVENT")
+		if( eventPreference ){
+			eventPreference.delete(flush:true)
+			println"Removed MOVE_EVENT preference as user switched to other project"
+			loadPreferences("MOVE_EVENT")
+		}
+    	
+		def bundlePreference = UserPreference.findByUserLoginAndPreferenceCode( userLogin, "CURR_BUNDLE")
+		if( bundlePreference ){
+			bundlePreference.delete(flush:true)
+			println"Removed MOVE_BUNDLE preference as user switched to other project"
+			loadPreferences("CURR_BUNDLE")
+		}
     }
-    
     /*
      *	Set Roles to Persons in PartyRole  
      */
