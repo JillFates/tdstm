@@ -57,14 +57,15 @@ class UserPreferenceService  {
      */
     
     def setPreference( String preferenceCode, String value ) {
-		if(preferenceCode == "CURR_PROJ"){
-			def principal = SecurityUtils.subject.principal
-	    	def userLogin = UserLogin.findByUsername( principal )
-	    	removeProjectAssociatedPreferences(userLogin )	
-		}
+    	 
     	def prefValue = getPreference(preferenceCode)
     	def principal = SecurityUtils.subject.principal
     	def userLogin = UserLogin.findByUsername( principal )
+
+		//	remove the movebundle and event preferences if user switched to different project
+		if(preferenceCode == "CURR_PROJ" && prefValue && prefValue != value){
+	    	removeProjectAssociatedPreferences(userLogin )	
+		}
     	
     	if ( prefValue == null ) {
     		//	Statements to create UserPreference to login user
