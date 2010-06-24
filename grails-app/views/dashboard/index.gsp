@@ -99,7 +99,7 @@
 				<div id="date"></div> <div id="clock"></div>
 				<div style="height: 35px;">
 					<label>
-					  <select name="timezone" id="timezone" onChange="getMoveEventNewsDetails($('#moveEvent').val());setUserTimeZone()" class="selecttext">
+					  <select name="timezone" id="timezone" onChange="setUserPrefTimeZone()" class="selecttext">
 					    <option value="0">GMT</option>
 					    <option value="-8">PST</option>
 					    <option value="-7">PDT</option>
@@ -599,9 +599,9 @@
 		//$("#mycrawlerId").html(scrollText)
 		
 	}
-	function setUserTimeZone(){
+	function setUserPrefTimeZone(){
 		var timeZone = $("#timezone :selected").text()
-  		${remoteFunction(controller:'project', action:'setUserTimeZone', params:'\'tz=\' + timeZone ')}
+  		${remoteFunction(controller:'project', action:'setUserTimeZone', params:'\'tz=\' + timeZone ', onComplete:'getMoveEventNewsDetails($(\'#moveEvent\').val());')}
   	}
 
 	/* function to load the user agent*/
