@@ -41,7 +41,7 @@ class StepSnapshotService {
 				log.error("Unable to get ActualTimes for ${moveBundleStep}")
 				return
 			}
-log.debug("actualTimes=${actualTimes}")
+			log.debug("actualTimes=${actualTimes}")
 			
 			def earliestStartTime = actualTimes.start
 			def latestCompletionTime = actualTimes.completion
@@ -55,7 +55,7 @@ log.debug("actualTimes=${actualTimes}")
 				earliestStartTime = latestStepSnapshot.dateCreated
 				latestCompletionTime = latestStepSnapshot.dateCreated
 			}*/
-log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${latestCompletionTime}, MBS: ${moveBundleStep}" )
+			log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${latestCompletionTime}, MBS: ${moveBundleStep}" )
 			
 			// If the Step hasn't started and it is not scheduled to start then we don't need to do anything
 			if ( ! earliestStartTime && moveBundleStep.planStartTime.getTime() > timeNow )
@@ -78,7 +78,7 @@ log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${l
 
 			def planDelta = calcProjectedDelta( stepSnapshot, dateNow )
 			stepSnapshot.planDelta = planDelta
-			stepSnapshot.dialIndicator =  calcDialIndicator( stepSnapshot.moveBundleStep.planDuration, planDelta )
+			stepSnapshot.dialIndicator =  calcStepDialIndicator( stepSnapshot, dateNow )
 			
 			log.debug("Creating StepSnapshot: ${stepSnapshot}")
 			stepSnapshot.save(flush:true)
@@ -172,7 +172,7 @@ log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${l
 
 		planDelta = calcProjectedDelta( stepSnapshot, now )
 		stepSnapshot.planDelta = planDelta
-		stepSnapshot.dialIndicator =  calcDialIndicator( stepSnapshot.moveBundleStep.planDuration, planDelta )
+		stepSnapshot.dialIndicator =  calcStepDialIndicator( stepSnapshot, now )
 		
 		log.debug("Creating StepSnapshot: ${stepSnapshot}")
 		stepSnapshot.save(flush:true)
@@ -218,7 +218,7 @@ log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${l
 			
 			def planDelta = calcProjectedDelta( stepSnapshot, GormUtil.convertInToGMT( "now","EDT" ) )
 			stepSnapshot.planDelta = planDelta 
-			stepSnapshot.dialIndicator =  calcDialIndicator( stepSnapshot.moveBundleStep.planDuration, planDelta )
+			stepSnapshot.dialIndicator =  calcStepDialIndicator( stepSnapshot, GormUtil.convertInToGMT( "now","EDT" ) )
 			
 			log.debug("Creating StepSnapshot: ${stepSnapshot}")
 			stepSnapshot.save(flush:true)
@@ -273,7 +273,7 @@ log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${l
 				lastIsCompleted = false
 				hasActive = false
 				isActive = false
-// TODO : Need to work in the OverallMaxDelta as it is necessary when dealing with resets within bundle
+				// TODO : Need to work in the OverallMaxDelta as it is necessary when dealing with resets within bundle
 			}
 			
 			// see if task is completed 
@@ -329,10 +329,10 @@ log.debug("Process Step with earliestSTime=${earliestStartTime}, latestCTime=${l
 		def planDuration = (( planCompletionTime - planStartTime ) / 1000).intValue()
 		def dialIndicator = calcDialIndicator( planDuration, maxDelta )
 		
-log.debug("******CREATING SUMMARY*******")
-
-log.debug("Creating Summary: planStartTime=${planStartTime}, planCompletionTime=${planCompletionTime}, planDuration=${planDuration}")
-print "Creating Summary: planStartTime=${planStartTime}, planCompletionTime=${planCompletionTime}, planDuration=${planDuration}, maxDelta${maxDelta}\n\n"
+		log.debug("******CREATING SUMMARY*******")
+		
+		log.debug("Creating Summary: planStartTime=${planStartTime}, planCompletionTime=${planCompletionTime}, planDuration=${planDuration}")
+		print "Creating Summary: planStartTime=${planStartTime}, planCompletionTime=${planCompletionTime}, planDuration=${planDuration}, maxDelta${maxDelta}\n\n"
 
 		def mes = new MoveEventSnapshot(moveEvent: moveEvent, type: MoveEventSnapshot.TYPE_PLANNED, planDelta: maxDelta, dialIndicator: dialIndicator )
 		if (! mes.save(flush:true) ) {
@@ -412,23 +412,24 @@ print "Creating Summary: planStartTime=${planStartTime}, planCompletionTime=${pl
 			def planStartTime = stepSnapshot.moveBundleStep.planStartTime.getTime() / 1000
 			def planDuration = stepSnapshot.moveBundleStep.planDuration
 			def planTaskPace = stepSnapshot.getPlanTaskPace()
-			def actualTaskPace = stepSnapshot.getActualTaskPace()
+			//def actualTaskPace = stepSnapshot.getActualTaskPace()
 			
 			def tasksRemaining = stepSnapshot.tasksCount - stepSnapshot.tasksCompleted
 			
 			def actualStartTime = stepSnapshot.moveBundleStep.actualStartTime?.getTime()
 				actualStartTime = actualStartTime ? actualStartTime / 1000 : timeAsOf 
 			
-			if( actualStartTime < planStartTime  ){
+			if( actualStartTime < planStartTime){
 				// calculate the projectedDuration when plan started before planStartTime
 				def projectedDuration =  (timeAsOf - actualStartTime) + (tasksRemaining * planTaskPace)
-				planDelta  =  projectedDuration - planDuration
+				planDelta  = projectedDuration - planDuration
 
 			} else {
 				//	Need to determine the finish time based on weighted average of actual and planned paces
-				def wtFactor = stepSnapshot.duration > planDuration ? 1 : ( stepSnapshot.duration / planDuration )
-				def remainingDuration = (tasksRemaining * (1 - wtFactor) * planTaskPace + tasksRemaining * wtFactor * actualTaskPace).intValue()
-				planDelta = (timeAsOf + remainingDuration - planCompletionTime).intValue()
+				/*def wtFactor = stepSnapshot.duration > planDuration ? 1 : ( stepSnapshot.duration / planDuration )
+				def remainingDuration = (tasksRemaining * (1 - wtFactor) * planTaskPace + tasksRemaining * wtFactor * actualTaskPace).intValue()*/
+				def remainingDuration = tasksRemaining * planTaskPace
+				planDelta = (timeAsOf - planCompletionTime + remainingDuration).intValue()
 				
 			}
 			// print "wtFactor=${wtFactor}, tasksRemaining=${tasksRemaining}, remainingDuration=${remainingDuration}, " +
@@ -467,6 +468,42 @@ print "Creating Summary: planStartTime=${planStartTime}, planCompletionTime=${pl
 		// print "planDuration=${planDuration}, planDelta=${planDelta}, Adjust = ${adjust}, result=${result} \n"
 
 		return result
+	}
+	/**
+	 * Used to calculate the Dial Indicator value used in the dashboard display.  The value can range from 0-100 and 50 represents 
+	 * that the project is tracking to planned completion time.  A smaller value indicates behind schedule and larger values are ahead
+	 * of schedule.
+	 * @param planDuration - number representing the total planned duration
+	 * @param planDelta - number representing the different (projected or actual) that the task is off planned time
+	 * @return number - representing the dial position to display 
+	 */ 
+	def calcStepDialIndicator ( def stepSnapshot, def timeAsOf ) {
+		def resul = 50
+		
+		timeAsOf = timeAsOf.getTime() / 1000
+		def planCompletionTime = stepSnapshot.moveBundleStep.planCompletionTime.getTime() / 1000
+		def remainingStepTime = timeAsOf > planCompletionTime ? 0 : planCompletionTime - timeAsOf // D19 
+		def planTaskPace = stepSnapshot.getPlanTaskPace()
+		def tasksRemaining = stepSnapshot.tasksCount - stepSnapshot.tasksCompleted
+
+		def remainingEffort =  tasksRemaining * planTaskPace // D18
+		
+		def projectedMinOver = 0 // D20
+		if(stepSnapshot.moveBundleStep.actualStartTime){
+			projectedMinOver  = remainingEffort - remainingStepTime
+		} else {
+			projectedMinOver  =  timeAsOf + stepSnapshot.moveBundleStep.getPlanDuration()
+		}
+		def adjust 
+		
+		if (  projectedMinOver > 0) {
+			adjust =  -50 * (1-(remainingStepTime / remainingEffort))
+		} else {
+			adjust =  50 * (1-(remainingEffort / (planCompletionTime - timeAsOf ) ) )
+		}
+		def result = (50 + adjust).intValue()
+		
+		return result > 100 ? 100 : result  
 	}
 	
 	
