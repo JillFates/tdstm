@@ -24,6 +24,7 @@
             </g:hasErrors>
             <g:form method="post" >
                 <input type="hidden" name="id" value="${moveEventInstance?.id}" />
+                <input type="hidden" name="calcMethod" value="${moveEventInstance?.calcMethod}" />
                 <div class="dialog">
                     <table>
                         <tbody>

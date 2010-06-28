@@ -100,7 +100,7 @@ class StepSnapshotService {
 		
 		// Now create the summary
 		// TODO - JPM - The MoveEventSnapshot.processSummary should be called somewhere else...
-		processSummary( moveBundle.moveEvent.id )
+		processSummary( moveBundle.moveEvent.id, timeNow )
     }
 
 	/**
@@ -239,7 +239,7 @@ class StepSnapshotService {
 	 *
 	 * @param int moveEvent.id 
 	 */
-	def processSummary( def moveEventId ) {
+	def processSummary( def moveEventId , def timeNow) {
 		
 		def moveEvent = MoveEvent.get( moveEventId )
 		if ( !moveEvent ) {
@@ -317,7 +317,6 @@ class StepSnapshotService {
 				lastIsCompleted = isCompleted
 			}
 		}
-		
 		def planTimes = moveEvent.getPlanTimes()
 		if (! planTimes ) {
 			log.error("Unable to get MoveEvent planTimes: ${moveBundle}")
@@ -326,13 +325,13 @@ class StepSnapshotService {
 		
 		def planStartTime = planTimes.start.getTime()
 		def planCompletionTime = planTimes.completion.getTime()
-		def planDuration = (( planCompletionTime - planStartTime ) / 1000).intValue()
-		def dialIndicator = calcDialIndicator( planDuration, maxDelta )
+		def remainingDuration = (( planCompletionTime - timeNow ) / 1000).intValue()
+		def dialIndicator = calcSummaryDialIndicator( moveEvent, remainingDuration, timeNow )
 		
 		log.debug("******CREATING SUMMARY*******")
 		
-		log.debug("Creating Summary: planStartTime=${planStartTime}, planCompletionTime=${planCompletionTime}, planDuration=${planDuration}")
-		print "Creating Summary: planStartTime=${planStartTime}, planCompletionTime=${planCompletionTime}, planDuration=${planDuration}, maxDelta${maxDelta}\n\n"
+		log.debug("Creating Summary: planStartTime=${planStartTime}, planCompletionTime=${planCompletionTime}, remainingDuration =${remainingDuration }")
+		print "Creating Summary: planStartTime=${planStartTime}, planCompletionTime=${planCompletionTime}, remainingDuration =${remainingDuration }, maxDelta${maxDelta}\n\n"
 
 		def mes = new MoveEventSnapshot(moveEvent: moveEvent, type: MoveEventSnapshot.TYPE_PLANNED, planDelta: maxDelta, dialIndicator: dialIndicator )
 		if (! mes.save(flush:true) ) {
@@ -341,8 +340,8 @@ class StepSnapshotService {
 		}
 		
 		if ( moveEvent.revisedCompletionTime ){
-			planDuration = (( moveEvent.revisedCompletionTime.getTime() - planStartTime ) / 1000).intValue()
-			dialIndicator = calcDialIndicator( planDuration, maxDelta )
+			remainingDuration  = (( moveEvent.revisedCompletionTime.getTime() - planStartTime ) / 1000).intValue()
+			dialIndicator = calcSummaryDialIndicator(moveEvent, remainingDuration, timeNow )
 			mes = new MoveEventSnapshot( moveEvent: moveEvent, type: TYPE_REVISED, planDelta: maxDelta, dialIndicator: dialIndicator )
 			if (! mes.save(flush:true) ) {
 				log.error("Unable to save Revised MoveEventSnapshot: ${mes}")
@@ -452,22 +451,55 @@ class StepSnapshotService {
 	 * @param planDelta - number representing the different (projected or actual) that the task is off planned time
 	 * @return number - representing the dial position to display 
 	 */ 
-	def calcDialIndicator ( def planDuration, def planDelta ) {
-		def projected = planDuration + planDelta
-		def aheadFactor = 2
-		def behindFactor = 3
-		def adjust 
+	def calcSummaryDialIndicator ( def moveEvent, def remainingDuration, def timeNow ) {
 		
-		if ( planDelta < 0 ) {
-			adjust = 1 - Math.pow( projected / planDuration, aheadFactor )
-		} else {
-			adjust = -1 + Math.pow( planDuration / projected, behindFactor )
+		def timeAsOf = timeNow / 1000
+		// calculate B14
+		def impactOfLastFinished = 0
+		def lastFinishedStep = MoveBundleStep.findAll("FROM MoveBundleStep m WHERE m.moveBundle.moveEvent = ? AND m.actualCompletionTime is not null ORDER BY m.actualCompletionTime DESC",[moveEvent])
+		if(lastFinishedStep[0]){
+			impactOfLastFinished = lastFinishedStep[0].actualCompletionTime - lastFinishedStep[0].planCompletionTime
 		}
-		def result = (50 + 50 * adjust).intValue()
 		
-		// print "planDuration=${planDuration}, planDelta=${planDelta}, Adjust = ${adjust}, result=${result} \n"
+		// calculate B15
+		def maxImpactOfIp
+		def inProgressSteps = MoveBundleStep.findAll("FROM MoveBundleStep m WHERE m.moveBundle.moveEvent = ? AND m.actualCompletionTime is null ",[moveEvent])
+		inProgressSteps.each{ iPstep ->
+			
+			def maxvalue
+			def planCompletionTime = (iPstep.planCompletionTime.getTime() / 1000)
+			def planStartTime = (iPstep.planStartTime.getTime() / 1000)
+			if(iPstep.actualCompletionTime){
+				maxvalue = 0
+			} else if(iPstep.actualStartTime){
+				
+				def latestStepSnapshot = StepSnapshot.find( "from StepSnapshot as s where s.moveBundleStep=? ORDER BY s.dateCreated DESC", [ iPstep ] )
+				def remainingEffort =  (latestStepSnapshot.tasksCount - latestStepSnapshot.tasksCompleted) * latestStepSnapshot.getPlanTaskPace() // D18
+				def remainingStepTime = timeAsOf > planCompletionTime ? 0 : planCompletionTime - timeAsOf // D19
+						
+				maxvalue = remainingEffort - remainingStepTime // D20
+			
+			} else if(timeAsOf > planStartTime){
+				maxvalue = timeAsOf - planStartTime
+			}
+			if(maxvalue && (maxvalue > maxImpactOfIp || !maxImpactOfIp ) ){
+				maxImpactOfIp = maxvalue
+			}
+		}
 
-		return result
+		maxImpactOfIp = maxImpactOfIp ? maxImpactOfIp : 0
+	    def projected = impactOfLastFinished +  maxImpactOfIp	
+		
+		def adjust
+		if( projected > 0 ) {
+			adjust = -50*( projected / remainingDuration ) 
+		} else {
+			adjust = 50*(1-( projected / remainingDuration ) )
+		}
+
+		def result = (50 + adjust).intValue()
+		
+		return result > 100 ? 100 : result  
 	}
 	/**
 	 * Used to calculate the Dial Indicator value used in the dashboard display.  The value can range from 0-100 and 50 represents 
@@ -496,7 +528,7 @@ class StepSnapshotService {
 		}
 		def adjust 
 		
-		if (  remainingEffort && projectedMinOver > 0) {
+		if ( remainingEffort && projectedMinOver > 0) {
 			adjust =  -50 * (1-(remainingStepTime / remainingEffort))
 		} else {
 			adjust =  50 * (1-(remainingEffort / (planCompletionTime - timeAsOf ) ) )
