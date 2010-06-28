@@ -496,7 +496,7 @@ class StepSnapshotService {
 		}
 		def adjust 
 		
-		if (  projectedMinOver > 0) {
+		if (  remainingEffort && projectedMinOver > 0) {
 			adjust =  -50 * (1-(remainingStepTime / remainingEffort))
 		} else {
 			adjust =  50 * (1-(remainingEffort / (planCompletionTime - timeAsOf ) ) )
