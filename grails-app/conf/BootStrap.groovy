@@ -10,6 +10,8 @@ class BootStrap {
     def init = { servletContext ->
 
 	// Don't load bootstrap if production environment
+// TODO : JPM Disabled BootStrap for testing
+return
 	if ( grails.util.GrailsUtil.environment.equals("production") ) return
     	
     	// -------------------------------

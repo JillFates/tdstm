@@ -20,4 +20,32 @@ otherDataSource(BasicDataSource) {
 otherJdbcTemplate(JdbcTemplate) {
    dataSource = otherDataSource
 }
+
+
+/*
+ * Database Connection String that overrides that in conf/DataSource.groovy
+ */
+/**
+dataSource(BasicDataSource) {
+	driverClassName='com.mysql.jdbc.Driver'
+    url = 'jdbc:mysql://localhost:3306/tdstm'
+	username = 'tdstm'
+	password = 'tdstm'
+
+	maxActive = 50
+	maxIdle = 25
+	minIdle = 5
+	initialSize = 5
+
+	maxWait = 10000
+	minEvictableIdleTimeMillis=1800000
+	timeBetweenEvictionRunsMillis=1800000
+	numTestsPerEvictionRun=3
+	testOnBorrow=true
+	testWhileIdle=true
+	testOnReturn=true
+	validationQuery="SELECT 1"
+}
+**/
+
 }
