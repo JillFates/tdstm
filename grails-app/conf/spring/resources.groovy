@@ -11,7 +11,8 @@ jdbcTemplate(JdbcTemplate) {
 // use a different datasource
 otherDataSource(BasicDataSource) {
    driverClassName = "com.mysql.jdbc.Driver"
-   url = "jdbc:mysql://localhost:3306/tdstm"
+//   url = "jdbc:mysql://localhost:3306/tdstm"
+   url = "jdbc:mysql://tdstm-dbserver:3306/tdstm"
    username = "root"
    password = "admin"
 }

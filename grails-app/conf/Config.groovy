@@ -41,7 +41,7 @@ grails.pagination.max="20"
 environments {
    development {
       // grails.serverURL = "http://localhost/tds"
-      grails.serverURL = "http://tmdev.tdsops.com/tds-0.1"
+      grails.serverURL = "http://tmdev.tdsops.com/tdstm"
       log4j {
          appender.'errors.File'="/var/log/tomcat/stacktrace.log"
          appender.logfile = "org.apache.log4j.DailyRollingFileAppender "
