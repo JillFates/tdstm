@@ -1,5 +1,6 @@
 import grails.converters.JSON
 import java.text.SimpleDateFormat
+import com.tdssrc.grails.GormUtil
 class WsDashboardController {
 	
 	def jdbcTemplate
@@ -14,9 +15,11 @@ class WsDashboardController {
 			if( moveBundleId ){ 
 				moveBundle = MoveBundle.findById( moveBundleId )
 			}
+    		
     		// def offsetTZ = ( new Date().getTimezoneOffset() / 60 ) * ( -1 )
-    		def offsetTZ = ( new Date().getTimezoneOffset() / 60 ) 
-log.debug "offsetTZ=${offsetTZ}"
+    		/*def offsetTZ = ( new Date().getTimezoneOffset() / 60 ) 
+			log.debug "offsetTZ=${offsetTZ}"*/
+			
 			def sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss a");
 			if( moveBundle ){
 				
@@ -55,9 +58,8 @@ log.debug "offsetTZ=${offsetTZ}"
 				dataPointsForEachStep = jdbcTemplate.queryForList( latestStepsRecordsQuery + " UNION " + stepsNotUpdatedQuery )
 				
 			}
-    		def sysTime  = jdbcTemplate.queryForMap("SELECT DATE_FORMAT( ADDDATE( CURRENT_TIMESTAMP , INTERVAL ${offsetTZ} HOUR),'%Y/%m/%d %r' ) as sysTime").get("sysTime")
-			
-			def sysTimeInMs = new Date(sysTime).getTime()
+			def sysTime = GormUtil.convertInToGMT( "now", "EDT" )
+			def sysTimeInMs = sysTime.getTime()
 			
     		dataPointsForEachStep.each{ data ->
     			def snapshot 
@@ -137,7 +139,7 @@ log.debug "offsetTZ=${offsetTZ}"
 					"revisedComp" : moveEvent?.revisedCompletionTime, 
 					"moveBundleId" : moveBundleId,
 					"planDelta" : moveEventPlannedSnapshot?.planDelta,
-					"systime": sysTime,
+					"systime": sdf.format(sysTime),
 					"planSum": [ 
 						"dialInd": moveEventPlannedSnapshot?.dialIndicator, "confText": "High", 
 						"confColor": "green", "compTime":planSumCompTime 

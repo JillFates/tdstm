@@ -132,12 +132,18 @@ class StepSnapshot {
 	 * @return string - the color green/red indication the step status to planned completion time
 	 */
 	def getStatusColor() {
+		def color = "green"
 		// Need to test on current snapshot so that this will work historically
 		if (tasksCompleted == tasksCount) {
-			return moveBundleStep.actualCompletionTime > moveBundleStep.planCompletionTime ? "red" : "green"
+			color =  moveBundleStep.actualCompletionTime > moveBundleStep.planCompletionTime ? "red" : "green"
 		} else {
-			return planDelta > 0 ? "red" : "green"
+			if(dialIndicator < 25){
+				color = "red"
+			} else if(dialIndicator >= 25 && dialIndicator < 50){
+				color = "yellow"
+			}
 		}
+		return color
 	}	
 	
     String toString(){

@@ -65,6 +65,15 @@
                             </td>
                         </tr>
                         <tr class="prop">
+				            <td valign="top" class="name">Calculated Type:</td>
+				
+				            <td valign="top" class="value">
+				            	<g:if test="${moveEventInstance.calcMethod != 'L'}">Manual</g:if>
+								<g:else>Linear</g:else>
+							</td>
+						</tr>
+                        
+                        <tr class="prop">
 				            <td valign="top" class="name">In Progress:</td>
 				
 				            <td valign="top" class="value">${fieldValue(bean:moveEventInstance, field:'inProgress')}</td>

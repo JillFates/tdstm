@@ -46,8 +46,10 @@ class StepSnapshotService {
 			def earliestStartTime = actualTimes.start
 			def latestCompletionTime = actualTimes.completion
 			
-			if(earliestStartTime && earliestStartTime < moveBundleStep.moveBundle.startTime)
-				earliestStartTime = moveBundleStep.moveBundle.startTime
+			// Since we're not penalizing for early starts, the actual time should be used (even though it is earlier than the start)
+		
+			/*if(earliestStartTime && earliestStartTime < moveBundleStep.moveBundle.startTime)
+				earliestStartTime = moveBundleStep.moveBundle.startTime*/
 				
 			// Get latest StepSnapshot
 			/*def latestStepSnapshot = StepSnapshot.find( "from StepSnapshot as s where s.moveBundleStep=? ORDER BY s.dateCreated DESC", [ moveBundleStep ] )
@@ -318,8 +320,8 @@ class StepSnapshotService {
 			}
 		}
 		def planTimes = moveEvent.getPlanTimes()
-		if (! planTimes ) {
-			log.error("Unable to get MoveEvent planTimes: ${moveBundle}")
+		if (! planTimes.start ) {
+			log.error("Unable to get MoveEvent planTimes: ${moveEvent}")
 			return
 		}
 		
@@ -458,7 +460,7 @@ class StepSnapshotService {
 		def impactOfLastFinished = 0
 		def lastFinishedStep = MoveBundleStep.findAll("FROM MoveBundleStep m WHERE m.moveBundle.moveEvent = ? AND m.actualCompletionTime is not null ORDER BY m.actualCompletionTime DESC",[moveEvent])
 		if(lastFinishedStep[0]){
-			impactOfLastFinished = lastFinishedStep[0].actualCompletionTime - lastFinishedStep[0].planCompletionTime
+			impactOfLastFinished = (lastFinishedStep[0].actualCompletionTime?.getTime() - lastFinishedStep[0].planCompletionTime?.getTime()) / 1000
 		}
 		
 		// calculate B15
@@ -521,7 +523,7 @@ class StepSnapshotService {
 		def remainingEffort =  tasksRemaining * planTaskPace // D18
 		
 		def projectedMinOver = 0 // D20
-		if(stepSnapshot.moveBundleStep.actualStartTime){
+		if(stepSnapshot.moveBundleStep.actualStartTime ||  stepSnapshot.tasksCompleted > 0){
 			projectedMinOver  = remainingEffort - remainingStepTime
 		} else {
 			projectedMinOver  =  timeAsOf + stepSnapshot.moveBundleStep.getPlanDuration()

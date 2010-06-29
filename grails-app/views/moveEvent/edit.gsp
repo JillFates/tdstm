@@ -24,7 +24,6 @@
             </g:hasErrors>
             <g:form method="post" >
                 <input type="hidden" name="id" value="${moveEventInstance?.id}" />
-                <input type="hidden" name="calcMethod" value="${moveEventInstance?.calcMethod}" />
                 <div class="dialog">
                     <table>
                         <tbody>
@@ -72,7 +71,20 @@
 									</g:each>
 									</ul>
                                 </td>
-                            </tr> 
+                            </tr>
+                            <tr class="prop">
+				                <td valign="top" class="name">
+				                  <label for="calcMethod"><b>Calculated Type:&nbsp;<span style="color: red">*</span></b></label>
+				                </td>
+				                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'calcMethod','errors')}">
+				                  <g:select id="calcMethod" name="calcMethod" from="${moveEventInstance.constraints.calcMethod.inList}" valueMessagePrefix="step.calcMethod" value="${moveEventInstance.calcMethod}" ></g:select>
+				                  <g:hasErrors bean="${moveEventInstance}" field="calcMethod">
+				                    <div class="errors">
+				                      <g:renderErrors bean="${moveEventInstance}" as="list" field="calcMethod"/>
+				                    </div>
+				                  </g:hasErrors>
+				                </td>
+			              	</tr>
                         	<tr class="prop">
 				                <td valign="top" class="name">
 				                  <label for="inProgress"><b>In Progress:&nbsp;<span style="color: red">*</span></b></label>
