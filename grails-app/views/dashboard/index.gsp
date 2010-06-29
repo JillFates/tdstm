@@ -67,19 +67,9 @@
 <a name="page_up"></a>
 <div id="doc">
 	<!--Header Starts here-->
-		<div id="header" style="margin-top: -2px;">
-			<div id="logo">
-				<g:if test="${projectLogo}">
-					<img src="${createLink(controller:'project', action:'showImage', id:projectLogo?.id)}" style="height: 55px;"/>
-				</g:if>
-				<g:else>
-					<a href="http://www.transitionaldata.com/" target="new"><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;border: 0px"/></a>
-				</g:else>
-				<br>
-				<div style="float: left;padding-top: 5px;">
+				<div style="float: left;padding-top: 5px;padding-left: 5px;">
 					<g:form action="index" controller="dashboard" name="dashboardForm">
 					<span>
-					
 						<label for="moveEvent"><b>Event:</b></label>&nbsp;<select id="moveEvent" name="moveEvent" onchange="document.dashboardForm.submit();">
 							<g:each status="i" in="${moveEventsList}" var="moveEventInstance">
 								<option value="${moveEventInstance?.id}">${moveEventInstance?.name}</option>
@@ -92,32 +82,7 @@
 				<input type="hidden" id="stateId" value="${params.state}">
 				<input type="hidden" id="maxLenId" value="${params.maxLen}">
 				<input type="hidden" id="sortId" value="${params.sort}">
-			</div>
-			<div class="clientname">${project?.client}<br/>DATA CENTER RELOCATION </div>
-			<div class="topdate">
-				<div><img src="${createLinkTo(dir:'images',file:'powered_by.png')}" alt="Powered by TDS" width="158" height="53" title="Powered by TDS"></div>
-				<div id="date"></div> <div id="clock"></div>
-				<div style="height: 35px;">
-					<label>
-					  <select name="timezone" id="timezone" onChange="setUserPrefTimeZone()" class="selecttext">
-					    <option value="0">GMT</option>
-					    <option value="-8">PST</option>
-					    <option value="-7">PDT</option>
-					    <option value="-7">MST</option>
-					    <option value="-6">MDT</option>
-					    <option value="-6">CST</option>
-					    <option value="-5">CDT</option>
-					    <option value="-5">EST</option>
-					    <option value="-4">EDT</option>
-					  </select>
-					</label>
-				</div>
-			</div>
-		</div>
-		<div style="clear: both"></div>
-		<div id="sum_statusbar" class="sum_statusbar_good"><span id="status_text">${moveEvent?.name}: </span><span id="status_color">GREEN</span></div>
 		<!-- Header Ends here-->
-		
 		<!-- Body Starts here-->
 		<div id="bodycontent">
 		<div id="bodytop">
