@@ -595,11 +595,13 @@ class StepSnapshotService {
 		
 		moveEventsList.each{ event ->
 			def planTimes = event.getPlanTimes()
+/* craig: temp for testing without auto off feature
 			if(now.getTime() > planTimes.completion?.getTime()){
 				event.inProgress = "false"
 				event.save(flush:true)
 				return;
 			}
+*/
 			if(event.inProgress == "true"){
 				def moveBundlesList = MoveBundle.findAllByMoveEvent( event )
 				moveBundlesList.each{ bundle ->
