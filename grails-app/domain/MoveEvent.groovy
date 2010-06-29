@@ -54,7 +54,9 @@ class MoveEvent {
 	 */
 	def getPlanTimes() {
 		def planTimes = jdbcTemplate.queryForMap(
-			"SELECT MIN(start_time) as start,  MAX(completion_time) as completion FROM move_bundle WHERE move_event_id = ${id} ")
+						"""SELECT MIN(mbs.plan_start_time) as start,  MAX(mbs.plan_completion_time) as completion FROM move_bundle mb
+						LEFT JOIN move_bundle_step mbs on mb.move_bundle_id = mbs.move_bundle_id WHERE move_event_id = ${id} """
+						)
 		return planTimes
 	}
 	
