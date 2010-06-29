@@ -347,11 +347,11 @@ class AssetEntityController {
 	        	bundleNameList.append("ALL")
 	        } else if( i != bundleSize - 1) {
 	        	bundleNameList.append( MoveBundle.findById( bundle[i] ) )
-	        	bundleNameList.append( ", " )
+	        	bundleNameList.append( "," )
                 bundleList.append( bundle[i] + "," )
             } else {
                 bundleList.append( bundle[i] )
-                bundleNameList.append( MoveBundle.findById( bundle[i] ) )
+                bundleNameList.append( MoveBundle.findById( bundle[i] )?.name )
             }
         }
         def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
@@ -380,9 +380,11 @@ class AssetEntityController {
             wbSetting.setUseTemporaryFileDuringWrite(true)
             workbook = Workbook.getWorkbook( file, wbSetting )
             //set MIME TYPE as Excel
-            filenametoSet = filenametoSet.split("/")
+			def exportType = filenametoSet.split("/")[2]
+            exportType = exportType.substring(0,exportType.indexOf("_template.xls"))
+            def filename = project?.name?.replace(" ","_")+"-"+bundleNameList.toString().replace(" ","_")
             response.setContentType( "application/vnd.ms-excel" )
-            response.setHeader( "Content-Disposition", "attachment; filename= ${filenametoSet[2]}" )
+            response.setHeader( "Content-Disposition", "attachment; filename= ${exportType}-${filename}.xls" )
             //create workbook and sheet
             book = Workbook.createWorkbook( response.getOutputStream(), workbook )
             def sheet
