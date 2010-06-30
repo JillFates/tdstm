@@ -501,7 +501,11 @@ class StepSnapshotService {
 
 		def result = (50 + adjust).intValue()
 		
-		return result > 100 ? 100 : result  
+		// to show the dial inbetween 0 to 100
+		result = result > 100 ? 100 : result
+		result = result < 0 ? 0 : result
+				
+		return result  
 	}
 	/**
 	 * Used to calculate the Dial Indicator value used in the dashboard display.  The value can range from 0-100 and 50 represents 
@@ -537,7 +541,11 @@ class StepSnapshotService {
 		}
 		def result = (50 + adjust).intValue()
 		
-		return result > 100 ? 100 : result  
+		// to show the dial inbetween 0 to 100
+		result = result > 100 ? 100 : result
+		result = result < 0 ? 0 : result
+				
+		return result  
 	}
 	
 	
@@ -595,13 +603,14 @@ class StepSnapshotService {
 		
 		moveEventsList.each{ event ->
 			def planTimes = event.getPlanTimes()
-/* craig: temp for testing without auto off feature
+			if(!planTimes.completion)
+				return  // next event
+				
 			if(now.getTime() > planTimes.completion?.getTime()){
 				event.inProgress = "false"
 				event.save(flush:true)
 				return;
 			}
-*/
 			if(event.inProgress == "true"){
 				def moveBundlesList = MoveBundle.findAllByMoveEvent( event )
 				moveBundlesList.each{ bundle ->
