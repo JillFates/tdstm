@@ -11,7 +11,7 @@ class DashboardProcessJob {
 	 * If these properties are not specified default values are applied (1 minute for 'repeatInterval' property and 30 seconds for 'startDelay' property).
 	 */
 	static triggers = {
-	    simple name: 'snapshotProcessTrigger', startDelay: 12000, repeatInterval: 12000  
+	    simple name: 'snapshotProcessTrigger', startDelay: 120000, repeatInterval: 120000  
 	}
 	/*
 	 * Default method which will execute the trigger after delay time and for every intervel.
