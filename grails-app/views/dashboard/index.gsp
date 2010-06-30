@@ -243,7 +243,14 @@
 						<g:each in="${MoveBundleStep.findAll('FROM MoveBundleStep mbs where mbs.moveBundle='+moveBundle.id+' ORDER BY mbs.transitionId')}" status="j" var="moveBundleStep">
 							<div style="float:left;width:130px;" >
 								<ul class="bdetails">
-									<li class="heading">${moveBundleStep.label}</li>
+									<li class="heading" title="${moveBundleStep.label}">
+										<g:if test="${moveBundleStep.label.length()>10}">
+											${moveBundleStep.label.substring(0,11)}..
+										</g:if>
+										<g:else>
+											${moveBundleStep.label}
+										</g:else>
+									</li>
 									<li id="percentage_${moveBundle.id}_${moveBundleStep.transitionId}" > </li>
 									<!-- <li class="actfinish1"><span id="completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li> -->
 									<li class="schstart"><span id="plan_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
@@ -884,6 +891,7 @@
 		var dInd = dialInd % 2 == 0 ? dialInd : dialInd+1
 		var src = "../i/dials/dial-"+dInd+"sm.png";
         $("#"+divId).attr("src", src);
+        $("#"+divId).attr("title", dialInd);
 		
 		<%--try{
 			//var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId2b", "100", "75", "0", "0");
@@ -903,6 +911,7 @@
 		var dInd = dialInd % 2 == 0 ? dialInd : dialInd+1
 		var src = "../i/dials/dial-"+dInd+".png";
 		$("#"+divId).attr("src", src);
+		$("#"+divId).attr("title", dialInd);
 		<%--//var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId", "280", "136", "0", "0");
 		updateChartXML(divId, summaryDialData( dialInd ) );
 		//myChart.setDataXML( xmlData );
