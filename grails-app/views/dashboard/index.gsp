@@ -66,10 +66,15 @@
 <div  class="body_bg">
 <a name="page_up"></a>
 <div id="doc">
-	<!--Header Starts here-->
-				<div style="float: left;padding-top: 5px;padding-left: 5px;">
+	
+		<!-- Body Starts here-->
+		<div id="bodycontent">
+		<!--Header Starts here-->
+		<div id="header">
+			<div style="float: left;padding-top: 2px;">
 					<g:form action="index" controller="dashboard" name="dashboardForm">
 					<span>
+					
 						<label for="moveEvent"><b>Event:</b></label>&nbsp;<select id="moveEvent" name="moveEvent" onchange="document.dashboardForm.submit();">
 							<g:each status="i" in="${moveEventsList}" var="moveEventInstance">
 								<option value="${moveEventInstance?.id}">${moveEventInstance?.name}</option>
@@ -77,14 +82,42 @@
 						</select>
 					</span>
 					</g:form>
-				</div>
-				<input type="hidden" id="typeId" value="${params.type}">
-				<input type="hidden" id="stateId" value="${params.state}">
-				<input type="hidden" id="maxLenId" value="${params.maxLen}">
-				<input type="hidden" id="sortId" value="${params.sort}">
+			</div>
+			<div style="height: 35px;display: none;" >
+					<label>
+					  <select name="timezone" id="timezone" onChange="setUserPrefTimeZone()" class="selecttext">
+					    <option value="0">GMT</option>
+					    <option value="-8">PST</option>
+					    <option value="-7">PDT</option>
+					    <option value="-7">MST</option>
+					    <option value="-6">MDT</option>
+					    <option value="-6">CST</option>
+					    <option value="-5">CDT</option>
+					    <option value="-5">EST</option>
+					    <option value="-4">EDT</option>
+					  </select>
+					</label>
+			</div>
+			<div style="float: right;width: 150px;padding-top: 2px;">
+					<div style="float: right;">
+						<input type="button" value="Update:" id="update" onclick="pageReload();"/> 
+						<select name="updateTime" id="updateTimeId" class="selecttext" onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'timedUpdate()') }">
+							<option value="30000">30s</option>
+							<option value="60000">1m</option>
+							<option value="120000">2m</option>
+							<option value="300000">5m</option>
+							<option value="600000">10m</option>
+							<option value="never" selected="selected">Never</option>
+						</select>
+					</div>
+					<%-- <div style="float: right;padding: 3px 0px;"> <a href="#page_down" class="nav_button">Page Down</a></div> --%>
+			</div>
+			<input type="hidden" id="typeId" value="${params.type}">
+			<input type="hidden" id="stateId" value="${params.state}">
+			<input type="hidden" id="maxLenId" value="${params.maxLen}">
+			<input type="hidden" id="sortId" value="${params.sort}">
+		</div>
 		<!-- Header Ends here-->
-		<!-- Body Starts here-->
-		<div id="bodycontent">
 		<div id="bodytop">
 			<div id="plan_summary">
 				<div id="topindleft">
@@ -130,20 +163,6 @@
 						revisedChart.render("revised_gauge_div");
 					</script>  --%> 
 						Status vs. Revised Plan
-				</div>
-				<div style="float: right;height: 50px;width: 150px;">
-					<div style="float: right;">
-						<input type="button" value="Update:" id="update" onclick="pageReload();"/> 
-						<select name="updateTime" id="updateTimeId" class="selecttext" onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'timedUpdate()') }">
-							<option value="30000">30s</option>
-							<option value="60000">1m</option>
-							<option value="120000">2m</option>
-							<option value="300000">5m</option>
-							<option value="600000">10m</option>
-							<option value="never" selected="selected">Never</option>
-						</select>
-					</div>
-					<%-- <div style="float: right;padding: 3px 0px;"> <a href="#page_down" class="nav_button">Page Down</a></div> --%>
 				</div>
 				<div class="toprightcontent" id="revised_gauge_content" style="display: none;">
 					Confidence in Revised Plan<br>
@@ -734,24 +753,10 @@
 			var steps = snapshot.steps;
 			var revSum = snapshot.revSum;
 			var planSum = snapshot.planSum
-			var sumDialInd = planSum.dialInd ? planSum.dialInd : 50
 			AditionalFrames = ( steps.length > 6 ? steps.length - 5 : 1 );
 			$("#themes").css("left","0px");
 			defaultBundle = moveBundleId;
-			if( sumDialInd < 25){
-				$(".sum_statusbar_good").attr("class","sum_statusbar_bad")
-				$(".sum_statusbar_yellow").attr("class","sum_statusbar_bad")
-				$("#status_color").html("RED")
-			} else if( sumDialInd >= 25 && sumDialInd < 50){
-				$(".sum_statusbar_good").attr("class","sum_statusbar_yellow");
-				$(".sum_statusbar_bad").attr("class","sum_statusbar_yellow");
-				$("#status_color").html("YELLOW")
-			} else {
-				$(".sum_statusbar_bad").attr("class","sum_statusbar_good")
-				$(".sum_statusbar_yellow").attr("class","sum_statusbar_good")
-				$("#status_color").html("GREEN")
-			}
-			updateSummaryGauge("summary_gauge",planSum.dialInd ? planSum.dialInd : '50');
+			updateSummaryGauge("summary_gauge",planSum.dialInd != null ? planSum.dialInd : '50');
 			$("#spanPlanned").html(convertTime(offset, planSum.compTime))
 			
 			if(revSum.dialInd == "-1") {
@@ -1054,7 +1059,6 @@
 		} else {
 			validate = true;
 		}
-		alert($('input[name=displayOption]:checked').val())
 		if(validate){
 			${remoteFunction(action:'updateNewsOrComment', 
 					params:'\'moveEvent.id=\' + moveEvent +\'&id=\'+ id +\'&isResolved=\'+$(\'#isResolvedHiddenId\').val()+\'&comment=\'+$(\'#commentTdId\').val()+\'&resolution=\'+resolveVal+\'&commentType=\'+$(\'#commentTypeId\').val()+\'&displayOption=\'+$(\'input[name=displayOption]:checked\').val()', 
