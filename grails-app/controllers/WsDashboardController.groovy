@@ -95,7 +95,7 @@ class WsDashboardController {
     					data.put( "percentageStyle", "step_statusbar_good" )
     				}
     			} else {
-    				if( new Date( data.actComp ).getTime() > new Date( data.planComp ).getTime() ){
+    				if( new Date( data.actComp ).getTime() > new Date( data.planComp ).getTime() + 59000 ){ // 59000 ms added to planCompletion to consider the minuits instead of seconds 
     					data.put( "percentageStyle", "step_statusbar_bad" )
     				} else {
     					data.put( "percentageStyle", "step_statusbar_good" )

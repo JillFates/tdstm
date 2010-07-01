@@ -118,7 +118,7 @@ class StepSnapshotService {
 		def planDelta
 		def now = GormUtil.convertInToGMT( "now","EDT" )
 		def nowTime = now.getTime() / 1000
-		def planCompletionTime = moveBundleStep.planCompletionTime.getTime() / 1000
+		def planCompletionTime = (moveBundleStep.planCompletionTime.getTime() / 1000) + 59 // 59s added to planCompletion to consider the minuits instead of seconds
 
 		int tasksCount = 100		// Default the total
 
@@ -320,7 +320,7 @@ class StepSnapshotService {
 		}
 		
 		def planStartTime = planTimes.start.getTime()
-		def planCompletionTime = planTimes.completion.getTime()
+		def planCompletionTime = planTimes.completion.getTime() + 59000 // 59000ms added to planCompletion to consider the minuits instead of seconds
 		def remainingDuration = (( planCompletionTime - timeNow ) / 1000).intValue()
 		def dialIndicator = calcSummaryDialIndicator( moveEvent, remainingDuration, timeNow )
 		
@@ -403,7 +403,7 @@ class StepSnapshotService {
 		// print "timeAsOf=${timeAsOf}, planCompletion=${planCompletionTime}, difference=${ planCompletionTime - timeAsOf }\n"
 		if (stepSnapshot.tasksCompleted > 0) {
 			
-			def planCompletionTime = stepSnapshot.moveBundleStep.planCompletionTime.getTime() / 1000
+			def planCompletionTime = (stepSnapshot.moveBundleStep.planCompletionTime.getTime() / 1000 ) + 59 	// 59s added to planCompletion to consider the minuits instead of seconds
 			def planStartTime = stepSnapshot.moveBundleStep.planStartTime.getTime() / 1000
 			def planDuration = stepSnapshot.moveBundleStep.planDuration
 			def planTaskPace = stepSnapshot.getPlanTaskPace()
@@ -454,7 +454,7 @@ class StepSnapshotService {
 		def impactOfLastFinished = 0
 		def lastFinishedStep = MoveBundleStep.findAll("FROM MoveBundleStep m WHERE m.moveBundle.moveEvent = ? AND m.actualCompletionTime is not null ORDER BY m.actualCompletionTime DESC",[moveEvent])
 		if(lastFinishedStep[0]){
-			impactOfLastFinished = (lastFinishedStep[0].actualCompletionTime?.getTime() - lastFinishedStep[0].planCompletionTime?.getTime()) / 1000
+			impactOfLastFinished = (lastFinishedStep[0].actualCompletionTime?.getTime() - (lastFinishedStep[0].planCompletionTime?.getTime()+ 59000) ) / 1000  	// 59000ms added to planCompletion to consider the minuits instead of seconds
 		}
 		
 		// calculate B15
@@ -463,7 +463,7 @@ class StepSnapshotService {
 		inProgressSteps.each{ iPstep ->
 			
 			def maxvalue
-			def planCompletionTime = (iPstep.planCompletionTime.getTime() / 1000)
+			def planCompletionTime = (iPstep.planCompletionTime.getTime() / 1000) + 59  	// 59s added to planCompletion to consider the minuits instead of seconds
 			def planStartTime = (iPstep.planStartTime.getTime() / 1000)
 			if(iPstep.actualCompletionTime){
 				maxvalue = 0
@@ -513,7 +513,7 @@ class StepSnapshotService {
 		def resul = 50
 		
 		timeAsOf = timeAsOf.getTime() / 1000
-		def planCompletionTime = stepSnapshot.moveBundleStep.planCompletionTime.getTime() / 1000
+		def planCompletionTime = (stepSnapshot.moveBundleStep.planCompletionTime.getTime() / 1000 ) + 59  	// 59s added to planCompletion to consider the minuits instead of seconds
 		def remainingStepTime = timeAsOf > planCompletionTime ? 0 : planCompletionTime - timeAsOf // D19 
 		def planTaskPace = stepSnapshot.getPlanTaskPace()
 		def tasksRemaining = stepSnapshot.tasksCount - stepSnapshot.tasksCompleted
