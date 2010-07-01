@@ -1083,7 +1083,7 @@
 				check = false
 			}
 		} else {
-			alert("Summary status should Alpha Numeric ")
+			alert("Summary status should be Alpha Numeric ")
 			check = false
 		}
 		return check

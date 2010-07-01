@@ -239,7 +239,7 @@
 									value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
 									onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })"/>
 								</span>
-								<span id="startTimeImg_${dashboardStep.step.id }" style="display: none;"><img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}"></span>
+								<span id="startTimeImg_${dashboardStep.step.id }" style="display: none;" title=""><img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}"></span>
 								</td>
 								<td>
 								<span id="completionTimeText_${dashboardStep.step.id }" title="text" style="display: none;" >
@@ -256,28 +256,46 @@
 									value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planCompletionTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
 									onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })"/>
 								</span>
-								<span id="completionTimeImg_${dashboardStep.step.id }" style="display: none;"><img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}"></span>
+								<span id="completionTimeImg_${dashboardStep.step.id }" style="display: none;" title=""><img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}"></span>
 								</td>
 								<td>
 								<span id="durationText_${dashboardStep.step.id }" title="text" style="display: none;" >
-								<tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/> </span>
+								<tds:formatIntoHHMMSS value="${dashboardStep.moveBundleStep?.planDuration}"/> </span>
 								
 								<span id="durationInput_${dashboardStep.step.id }" title="input">
-								<input type="hidden" name="duration_${dashboardStep.step.id }" id="durationIn_${dashboardStep.step.id }"
-									value="${dashboardStep.stepSnapshot?.duration}"/>
 									<input type="text" id="duration_${dashboardStep.step.id }"	style="width: 60px;"
-									value="<tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/>"	onchange="changeCompletionTime(this.value, ${dashboardStep.step.id })"/>
+									value="<tds:formatIntoHHMMSS value="${dashboardStep.moveBundleStep?.planDuration}"/>"	onchange="changeCompletionTime(this.value, ${dashboardStep.step.id })"/>
 								</span>
 								</td>
 								<td>
-								<span id="calcMethodText_${dashboardStep.step.id }" title="text" style="display: none;" >
-								<g:if test="${dashboardStep.moveBundleStep}"><g:if test="${dashboardStep.moveBundleStep?.calcMethod != 'L'}">Manual</g:if>
-								<g:else>Linear</g:else></g:if>
-								</span>
-								<span id="calcMethodInput_${dashboardStep.step.id }" title="input">
-									<g:select from="${['L', 'M']}" valueMessagePrefix="step.calcMethod" name="calcMethod_${dashboardStep.step.id }"
-									value="${dashboardStep.moveBundleStep?.calcMethod}" onchange="showTaskCompleted(this.value, ${dashboardStep.step.id })"/>
-								</span>
+									<span id="calcMethodText_${dashboardStep.step.id }" title="text" style="display: none;" >
+									<g:if test="${dashboardStep.moveBundleStep}"><g:if test="${dashboardStep.moveBundleStep?.calcMethod != 'L'}">Manual</g:if>
+									<g:else>Linear</g:else></g:if>
+									</span>
+									<span id="calcMethodInput_${dashboardStep.step.id }" title="input">
+										<g:select from="${['L', 'M']}" valueMessagePrefix="step.calcMethod" name="calcMethod_${dashboardStep.step.id }"
+										value="${dashboardStep.moveBundleStep?.calcMethod}" onchange="showTaskCompleted(this.value, ${dashboardStep.step.id })"/>
+									</span>
+								</td>
+								<td>
+									<g:if  test="${dashboardStep.moveBundleStep?.calcMethod == 'M'}">
+										<span id="tasksCompletedInput_${dashboardStep.step.id }" title="input">
+											<input type="text" name="tasksCompleted_${dashboardStep.step.id }" style="width: 25px;" value="${dashboardStep.stepSnapshot?.tasksCompleted}" 
+											id="tasksCompleted_${dashboardStep.step.id }" maxlength="3"  onchange="validateManulaValue(this.value, ${dashboardStep.step.id })"/>%
+										</span>
+										<span id="stepValueImg_${dashboardStep.step.id }" style="display: none;" title="">
+											<img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}">
+										</span>
+									</g:if>
+									<g:else>
+										<span id="tasksCompletedInput_${dashboardStep.step.id }" title="input" style="display: none;">
+											<input type="text" name="tasksCompleted_${dashboardStep.step.id }" style="width: 25px;" value="" 
+											id="tasksCompleted_${dashboardStep.step.id }" maxlength="3"  onchange="validateManulaValue(this.value, ${dashboardStep.step.id })"/>%
+										</span>
+										<span id="stepValueImg_${dashboardStep.step.id }" style="display: none;" title="">
+											<img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}">
+										</span>
+									</g:else>
 								</td>
 							</g:if>
 							<g:else>
@@ -307,7 +325,7 @@
 										value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
 										onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id },'startTimeImg')"/>
 									</span>
-									<span id="startTimeImg_${dashboardStep.step.id }" style="display: none;">
+									<span id="startTimeImg_${dashboardStep.step.id }" style="display: none;" title="">
 										<img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}">
 									</span>
 									
@@ -327,17 +345,15 @@
 										value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planCompletionTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
 										onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id },'completionTimeImg')"/>
 									</span>
-									<span id="completionTimeImg_${dashboardStep.step.id }" style="display: none;"><img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}"></span>
+									<span id="completionTimeImg_${dashboardStep.step.id }" style="display: none;" title=""><img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}"></span>
 								</td>
 								<td>
 								<span id="durationText_${dashboardStep.step.id }" title="text">
-								<tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/> </span>
+								<tds:formatIntoHHMMSS value="${dashboardStep.moveBundleStep?.planDuration}"/> </span>
 								
 								<span id="durationInput_${dashboardStep.step.id }" style="display: none;" title="input">
-								<input type="hidden" name="duration_${dashboardStep.step.id }" id="durationIn_${dashboardStep.step.id }"
-									value="${dashboardStep.stepSnapshot?.duration}"/>
 									<input type="text" id="duration_${dashboardStep.step.id }"	style="width: 60px;"
-									value="<tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/>"	onchange="changeCompletionTime(this.value, ${dashboardStep.step.id })"/>
+									value="<tds:formatIntoHHMMSS value="${dashboardStep.moveBundleStep?.planDuration}"/>"	onchange="changeCompletionTime(this.value, ${dashboardStep.step.id })"/>
 								</span>
 								</td>
 								<td>
@@ -350,26 +366,22 @@
 									value="${dashboardStep.moveBundleStep?.calcMethod}" onchange="showTaskCompleted(this.value, ${dashboardStep.step.id })"/>
 								</span>
 								</td>
+								<td>
+									<span style="display: none;" id="tasksCompletedInput_${dashboardStep.step.id }" title="input">
+										<input type="text" name="tasksCompleted_${dashboardStep.step.id }" style="width: 25px;" value="${dashboardStep.stepSnapshot?.tasksCompleted}" 
+											id="tasksCompleted_${dashboardStep.step.id }" maxlength="3" onchange="validateManulaValue(this.value, ${dashboardStep.step.id })" />%
+									</span>
+									<span id="stepValueImg_${dashboardStep.step.id }" style="display: none;" title="">
+										<img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}">
+									</span>
+								</td>								
 							</g:else>	
-							<td>
-								<span id="tasksCompletedText_${dashboardStep.step.id }" title="text">${dashboardStep.stepSnapshot?.tasksCompleted}
-								</span>
-								
-								<span style="display: none;" id="tasksCompletedInput_${dashboardStep.step.id }" title="input">
-									<input type="text" name="tasksCompleted_${dashboardStep.step.id }" style="width: 25px;" value="${dashboardStep.stepSnapshot?.tasksCompleted}" 
-									id="tasksCompleted_${dashboardStep.step.id }" maxlength="3" />
-								</span><g:if  test="${dashboardStep.moveBundleStep?.calcMethod == 'M'}">%</g:if>
-							</td>
-							
 					</tr>
 				</g:each>
 			</tbody>
 		</table>
 		
 	</div>
-	<div>
-          <span style="float: right;">Dashboard Server : <input type="button" name="serverOn" value="On" />&nbsp;<input type="button" name="serverOff" value="Off" /></span>
-      </div>
 	</div>
 	</g:form>
 	<script type="text/javascript">
@@ -510,7 +522,6 @@
 	            }
 	            if(duration){
 	            	$("#duration_"+stepId).val(convertIntoHHMM(duration / 1000))
-	            	$("#durationIn_"+stepId).val(duration / 1000)
 	            	$("#duration_"+stepId).focus()
 	            }
 	        }
@@ -538,7 +549,6 @@
         if(startTimeString){
 	        var completionTime = new Date( startTimeString )
     	    var updatedTime = new Date(completionTime.getTime() + ms)
-	        $("#durationIn_"+stepId).val(ms / 1000)
     		$("#completionTime_"+stepId).val( convertDate( updatedTime ))
         }
     }
@@ -659,7 +669,23 @@
 		} 
 		return returnval;
 	}
-	
+ // validate the dial manual input valueinput value
+	function validateManulaValue( value, stepId ){
+		if( isNaN(value) ){
+			$("#tasksCompleted_"+stepId).addClass("field_error");
+			$("#stepValueImg_"+stepId).attr("title","Manula step value should be Alpha Numeric.")
+			$("#stepValueImg_"+stepId).show();
+		} else if(value > 100) {
+			$("#tasksCompleted_"+stepId).addClass("field_error");
+			$("#stepValueImg_"+stepId).attr("title","Manula step value should not be greater than 100.")
+			$("#stepValueImg_"+stepId).show();
+		} else {
+			$("#tasksCompleted_"+stepId).removeClass("field_error");
+			$("#stepValueImg_"+stepId).hide();
+		}
+		
+		return check
+	}
 	</script>
   </body>
 </html>

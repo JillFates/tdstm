@@ -109,7 +109,7 @@ class StepSnapshotService {
 	 * Used to create manual snapshots.  When creating it will update the MoveBundleStep as well appropriately.
 	 *
 	 */
-	def createManualSnapshot( def moveBundleId, def moveBundleStepId, def tasksCompleted, def duration ) {
+	def createManualSnapshot( def moveBundleId, def moveBundleStepId, def tasksCompleted ) {
 		// Check to see if we can find and return appropriate error codes (temporary solution)
 		def moveBundleStep = MoveBundleStep.get( moveBundleStepId )
 		if (! moveBundleStep ) return 401
@@ -166,11 +166,7 @@ class StepSnapshotService {
 		//
 		// Finish up the StepSnapshot
 		//
-		if( duration ){
-			stepSnapshot.duration = Integer.parseInt(duration)
-		} else {
-			stepSnapshot.duration = actualStartTime ? ( nowTime - actualStartTime.getTime() / 1000  ).intValue() : 0
-		}
+		stepSnapshot.duration = actualStartTime ? ( nowTime - actualStartTime.getTime() / 1000  ).intValue() : 0
 
 		planDelta = calcProjectedDelta( stepSnapshot, now )
 		stepSnapshot.planDelta = planDelta
@@ -186,7 +182,7 @@ class StepSnapshotService {
 	 * Used to create Linear snapshots.  When creating it will update the MoveBundleStep as well appropriately.
 	 *
 	 */
-	def createLinearSnapshot( def moveBundleId, def moveBundleStepId, def duration ) {
+	def createLinearSnapshot( def moveBundleId, def moveBundleStepId ) {
 		// Check to see if we can find and return appropriate error codes (temporary solution)
 		def moveBundleStep = MoveBundleStep.get( moveBundleStepId )
 		if (! moveBundleStep ) return 401
@@ -212,11 +208,9 @@ class StepSnapshotService {
 			stepSnapshot.tasksCount = tasksCount
 			stepSnapshot.tasksCompleted = 0
 			
-			if( duration ){
-				stepSnapshot.duration = Integer.parseInt(duration)
-			} else {
-				stepSnapshot.duration = 0
-			}
+			def actualStartTime = moveBundleStep.actualStartTime
+			
+			stepSnapshot.duration = actualStartTime ? ( nowTime - actualStartTime.getTime() / 1000  ).intValue() : 0
 			
 			def planDelta = calcProjectedDelta( stepSnapshot, GormUtil.convertInToGMT( "now","EDT" ) )
 			stepSnapshot.planDelta = planDelta 

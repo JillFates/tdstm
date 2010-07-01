@@ -155,9 +155,9 @@ class MoveBundleController {
 						def tasksCompleted = params["tasksCompleted_"+it.id] ? Integer.parseInt(params["tasksCompleted_"+it.id]) : 0
 						def calcMethod = params["calcMethod_"+it.id]
 						if(calcMethod == "L"){
-							stepSnapshotService.createLinearSnapshot( moveBundleInstance.id, moveBundleStep.id, params["duration_"+it.id] )	
+							stepSnapshotService.createLinearSnapshot( moveBundleInstance.id, moveBundleStep.id )	
 						} else {
-							stepSnapshotService.createManualSnapshot( moveBundleInstance.id, moveBundleStep.id, tasksCompleted, params["duration_"+it.id] )
+							stepSnapshotService.createManualSnapshot( moveBundleInstance.id, moveBundleStep.id, tasksCompleted )
 						}
 					} else {
 						def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundleInstance , it.id)
@@ -293,7 +293,7 @@ class MoveBundleController {
 				return false
 			}
 			
-			def result = stepSnapshotService.createManualSnapshot( moveBundleId, moveBundleStepId, tasksCompleted, null )
+			def result = stepSnapshotService.createManualSnapshot( moveBundleId, moveBundleStepId, tasksCompleted)
 			
 			if (result == 200)
 				render ("Record created")

@@ -34,7 +34,7 @@
     function createSnapshot( stepId, value, e ) {
         var moveBundle = $("#moveBundleId").val()
     	var keyID = e.keyCode
-    	if(keyID == 13){
+    	if(keyID == 13 && validateManulaValue( value )){
     		${remoteFunction(controller:'moveBundle', action:'createManualStep', params:'\'moveBundleId=\'+ moveBundle +\'&moveBundleStepId=\'+ stepId +\'&tasksCompleted=\'+value', onComplete:'updateStepValue(e , stepId, value)')}
     	}
     }
@@ -51,6 +51,20 @@
             alert("Error : "+e.status+", Record not created")
         }
     }
+ 	// validate the dial manual input valueinput value
+	function validateManulaValue(value){
+		var check = true
+		if( !isNaN(value) ){
+			if(value > 100){
+				alert("Manula step value should not be greater than 100")
+				check = false
+			}
+		} else {
+			alert("Manula step value should be Alpha Numeric ")
+			check = false
+		}
+		return check
+	}
     </script>
   </head>
   <body>   
@@ -168,7 +182,7 @@
 						</td>
 						<td><tds:convertDateTime date="${dashboardStep.moveBundleStep.planStartTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 						<td><tds:convertDateTime date="${dashboardStep.moveBundleStep.planCompletionTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-						<td><tds:formatIntoHHMMSS value="${dashboardStep.stepSnapshot?.duration}"/></td>
+						<td><tds:formatIntoHHMMSS value="${dashboardStep.moveBundleStep?.planDuration}"/></td>
 						<td>
 						<g:if test="${dashboardStep.moveBundleStep?.calcMethod != 'L'}">
 							Manual
@@ -185,17 +199,13 @@
 							%
 						</td></g:if>
 						<g:else>
-						<td>
-							<span>${dashboardStep.stepSnapshot?.tasksCompleted}</span>
-						</td></g:else>
+						<td>&nbsp;</td>
+						</g:else>
 					</tr>
 				</g:each>
 			</tbody>
 		</table>
 	</div>
-	<div>
-          <span style="float: right;">Dashboard Server : <input type="button" name="serverOn" value="On" />&nbsp;<input type="button" name="serverOff" value="Off" /></span>
-      </div>
 	</div>
   </body>
 </html>
