@@ -116,12 +116,12 @@ body{
 	margin:auto;
 	}
 #bodycontent{
-	width:980px;
+	width:97%;
 	margin:auto;
 	}
 
 #header{
-	width:980px;
+	width:97%;
 	margin:auto;
 	height:30px;
 	}
@@ -133,7 +133,6 @@ body{
 	width:180px;
 	}
 .mod {
-	width:781px;
 	height:250px;
 	overflow:hidden;
 	display:inline;

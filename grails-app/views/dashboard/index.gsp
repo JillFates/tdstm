@@ -419,7 +419,12 @@
 	</div>
 </div>
 <script type="text/javascript">
-
+	window.onresize=pageReload;
+	window.onload=cancelResize;
+	var eventType = "load"
+	function cancelResize(){
+		eventType = "load"
+	}
 	$(document).ready(function() {
 	    $("#showEditCommentDialog").dialog({
 	        autoOpen: false,
@@ -760,7 +765,8 @@
 			var steps = snapshot.steps;
 			var revSum = snapshot.revSum;
 			var planSum = snapshot.planSum
-			AditionalFrames = ( steps.length > 6 ? steps.length - 5 : 1 );
+			var modWidth = getStepDivWidth()
+			AditionalFrames = ( steps.length > modWidth ? steps.length - (modWidth-1) : 1 );
 			$("#themes").css("left","0px");
 			defaultBundle = moveBundleId;
 			updateSummaryGauge("summary_gauge",planSum.dialInd != null ? planSum.dialInd : '50');
@@ -924,7 +930,10 @@
 	   	//myChart.render(divId); 
 	}--%>
 	function pageReload(){
-		window.location = document.URL;
+		if(eventType != "load" || !window.ActiveXObject) {
+			window.location = document.URL;
+		}
+		eventType ="";
 	}
 	/*
 	will popup the dialog to create news
@@ -1098,6 +1107,13 @@
 					onComplete:'updateDash( $("#defaultBundleId").val() )')}
 			$("#manualSumStatusSpan").hide();
 		}
+	}
+	// FUNCTION TO SET THE STEP DIV WIDTH.
+	function getStepDivWidth() {
+		var viewPort = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+		var modWidth = parseInt((viewPort-200) / 130)
+		$(".mod").css("width",(modWidth * 130 )+"px");
+		return modWidth;
 	}
 	// used to call the function once page loaded
 	getMoveEventNewsDetails($('#moveEvent').val())
