@@ -9129,8 +9129,12 @@ $.extend(DateTimepicker.prototype, {
              if (format == null || value == null)
                      throw 'Invalid arguments';
              value = (typeof value == 'object' ? value.toString() : value + '');
-             if (value == '')
-                     return null;
+             currTime = ""
+             if (value == ''){
+            	 return null;
+             } else {
+            	 currTime = new Date(value).getHours()
+             }
              var shortYearCutoff = (settings ? settings.shortYearCutoff : null) || this._defaults.shortYearCutoff;
              var dayNamesShort = (settings ? settings.dayNamesShort : null) || this._defaults.dayNamesShort;
              var dayNames = (settings ? settings.dayNames : null) || this._defaults.dayNames;
@@ -9504,7 +9508,9 @@ $.extend(DateTimepickerInstance.prototype, {
      /* Generate the HTML for the current state of the date picker. */
      _generateDatepicker: function() {
              var today = new Date();
-             currTime = today.getHours()
+             if( !currTime || currTime == ""){
+            	 currTime = today.getHours()
+             }
              today = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // clear time
              var showStatus = this._get('showStatus');
              var isRTL = this._get('isRTL');
