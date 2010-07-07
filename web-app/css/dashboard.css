@@ -202,7 +202,7 @@ body{
 
 #topindleft{
 	float:left;
-	margin-top:5px;
+	margin-top:-1px;
 	text-align:center;
 	font-size:18px;
 	font-weight:bold;
@@ -223,7 +223,7 @@ body{
 
 #topindright{
 	float:left;
-	margin-top:5px;
+	margin-top:-1px;
 	text-align:center;
 	font-size:18px;
 	font-weight:bold;

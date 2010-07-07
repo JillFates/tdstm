@@ -770,6 +770,7 @@
 			$("#themes").css("left","0px");
 			defaultBundle = moveBundleId;
 			updateSummaryGauge("summary_gauge",planSum.dialInd != null ? planSum.dialInd : '50');
+			$("#manualSummaryStatusId").val(planSum.dialInd != null ? planSum.dialInd : '50');
 			$("#spanPlanned").html(convertTime(offset, planSum.compTime))
 			
 			if(revSum.dialInd == "-1") {
