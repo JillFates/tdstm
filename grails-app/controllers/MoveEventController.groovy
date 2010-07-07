@@ -41,7 +41,19 @@ class MoveEventController {
     def show = {
 		userPreferenceService.loadPreferences("MOVE_EVENT")
 		def moveEventId = params.id
-		moveEventId = moveEventId ? moveEventId : session.getAttribute("MOVE_EVENT")?.MOVE_EVENT;
+		if(moveEventId){
+			userPreferenceService.setPreference( "MOVE_EVENT", "${moveEventId}" )
+			def moveBundleId = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE;
+			if(moveBundleId){
+				def moveBundle = MoveBundle.get( moveBundleId )
+				if(moveBundle.moveEvent?.id != Integer.parseInt(moveEventId)){
+					userPreferenceService.removePreference( "CURR_BUNDLE" )
+				}
+			}
+		} else {
+			moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT;
+		}
+		
 		if(moveEventId){
 	        def moveEventInstance = MoveEvent.get( moveEventId )
 	

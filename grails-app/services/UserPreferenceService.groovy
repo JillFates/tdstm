@@ -49,7 +49,19 @@ class UserPreferenceService  {
     	}
     	return prefValue
     }
-    
+    /*
+     * Method will remove the user preference record for selected preferenceCode and loginUser
+     */
+   
+    def removePreference( String preferenceCode ) {
+    	def principal = SecurityUtils.subject.principal
+	    def userLogin = UserLogin.findByUsername( principal )
+    	def bundlePreference = UserPreference.findByUserLoginAndPreferenceCode( userLogin, preferenceCode)
+		if( bundlePreference ){
+			bundlePreference.delete(flush:true)
+			loadPreferences( preferenceCode )
+		}
+    }
     /*
      * method will call getPreference and if null insert the value 
      * otherwise it will lookup the UserPreference record in the database and 
