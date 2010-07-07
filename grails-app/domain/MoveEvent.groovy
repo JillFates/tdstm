@@ -49,8 +49,8 @@ class MoveEvent {
 	}
 
 	/**
-	 * Retrieves the MIN/MAX Start and Completion times of the MoveBundles associate with the MoveEvent
-	 * @return Map[start, completion] times for the MoveEvent
+	 * Retrieves the MIN/MAX Start and Completion times of the MoveBundleSteps associate with the MoveBundle.MoveEvent
+	 * @return Map[planStart, planCompletion] times for the MoveEvent
 	 */
 	def getPlanTimes() {
 		def planTimes = jdbcTemplate.queryForMap(
@@ -59,7 +59,14 @@ class MoveEvent {
 						)
 		return planTimes
 	}
-	
+	/**
+	 * Retrieves the MIN/MAX Start and Completion times of the MoveBundles associate with the MoveEvent
+	 * @return Map[start, completion] times for the MoveEvent
+	 */
+	def getEventTimes() {
+		def eventTimes = jdbcTemplate.queryForMap("SELECT MIN(start_time) as start,  MAX(completion_time) as completion FROM move_bundle WHERE move_event_id = ${id} ")
+		return eventTimes
+	}
     String toString(){
 		name
 	}

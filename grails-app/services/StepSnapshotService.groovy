@@ -596,7 +596,7 @@ class StepSnapshotService {
 		def now = GormUtil.convertInToGMT( "now", "EDT" );
 		
 		moveEventsList.each{ event ->
-			def planTimes = event.getPlanTimes()
+			def planTimes = event.getEventTimes()
 			if(!planTimes.completion)
 				return  // next event
 				
