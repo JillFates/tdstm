@@ -162,9 +162,9 @@
 			</ul>
 		</div>
 		<g:if test="${moveEvent && moveEvent?.inProgress == 'true'}">
-			<div id="head_crawler"  onclick="$('#head_crawler').hide()">
+			<div class="menu3" id="head_crawler" >
 				<div id="crawlerHead">${moveEvent.name} Move Event Status <span id="moveEventStatus"></span>. News: </div>
-				<div id="head_mycrawler"><div id="head_mycrawlerId" style="width: 1200px;margin-top: -10px;" >.</div></div>
+				<div id="head_mycrawler"><div id="head_mycrawlerId" style="width: 1200px;margin-top: -10px;" > </div></div>
 			</div>
 			<script type="text/javascript">
 			function updateEventHeader( e ){
