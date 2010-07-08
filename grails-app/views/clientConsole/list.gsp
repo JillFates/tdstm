@@ -61,7 +61,7 @@ overflow: hidden;
 		<tr>
 			<td>
 				<span style="padding-left: 10px;">
-					<label for="moveEvent"><b>Move Event:</b></label>&nbsp;
+					<label for="moveEvent"><b>Event:</b></label>&nbsp;
 					<select id="moveEventId" name="moveEvent" onchange="$('#moveBundleId').val('');document.listForm.submit()">
 						<g:each status="i" in="${moveEventsList}" var="moveEventInstance">
 							<option value="${moveEventInstance?.id}">${moveEventInstance?.name}</option>
@@ -69,7 +69,7 @@ overflow: hidden;
 					</select>
 				</span>
 				<span>
-					<label for="moveBundle"><b>Move Bundle:</b></label>&nbsp;
+					<label for="moveBundle"><b>Bundle:</b></label>&nbsp;
 					<select id="moveBundleId" name="moveBundle" onchange="document.listForm.submit()" >
 						<option value="">All</option>	
 						<g:each status="i" in="${moveBundleInstanceList}" var="moveBundleInstance">
@@ -81,12 +81,12 @@ overflow: hidden;
 					<input id="assetsInViewOffsetId" type="hidden" value="${params.offset}">
 					<input id="sortById" type="hidden" value="${params.sort}">
 					<input id="orderById" type="hidden" value="${params.order}">
-					<label for="assetsInViewId"><b>Assets in view:</b></label>&nbsp;
+					<label for="assetsInViewId"><b>Assets:</b></label>&nbsp;
 					<select id="assetsInViewId" name="assetsInView" onchange="document.listForm.submit()" >
 						<option value="">All</option>
-						<option value="1">25</option>
-						<option value="3">50</option>
-						<option value="4">100</option>	
+						<option value="25">25</option>
+						<option value="50">50</option>
+						<option value="100">100</option>	
 					</select>
 				</span>
 				<g:if test="${totalAssets > assetsInView }">
