@@ -766,11 +766,25 @@
 			var revSum = snapshot.revSum;
 			var planSum = snapshot.planSum
 			var modWidth = getStepDivWidth()
+			var sumDialInd = planSum.dialInd != null ? planSum.dialInd : 50
 			AditionalFrames = ( steps.length > modWidth ? steps.length - (modWidth-1) : 1 );
 			$("#themes").css("left","0px");
 			defaultBundle = moveBundleId;
-			updateSummaryGauge("summary_gauge",planSum.dialInd != null ? planSum.dialInd : '50');
-			$("#manualSummaryStatusId").val(planSum.dialInd != null ? planSum.dialInd : '50');
+			if( sumDialInd < 25){
+				$(".statusbar_good").attr("class","statusbar_bad")
+				$(".statusbar_yellow").attr("class","statusbar_bad")
+				$("#moveEventStatus").html("RED")
+			} else if( sumDialInd >= 25 && sumDialInd < 50){
+				$(".statusbar_good").attr("class","statusbar_yellow");
+				$(".statusbar_bad").attr("class","statusbar_yellow");
+				$("#moveEventStatus").html("YELLOW")
+			} else {
+				$(".statusbar_bad").attr("class","statusbar_good")
+				$(".statusbar_yellow").attr("class","statusbar_good")
+				$("#moveEventStatus").html("GREEN")
+			}
+			updateSummaryGauge("summary_gauge", sumDialInd);
+			$("#manualSummaryStatusId").val( sumDialInd );
 			$("#spanPlanned").html(convertTime(offset, planSum.compTime))
 			
 			if(revSum.dialInd == "-1") {
