@@ -60,26 +60,43 @@ overflow: hidden;
 	<table style="border: 0px;">
 		<tr>
 			<td>
-			<span style="padding-left: 10px;">
+				<span style="padding-left: 10px;">
 					<label for="moveEvent"><b>Move Event:</b></label>&nbsp;
-						<select id="moveEventId" name="moveEvent" onchange="$('#moveBundleId').val('');document.listForm.submit()">
-							<g:each status="i" in="${moveEventsList}" var="moveEventInstance">
-								<option value="${moveEventInstance?.id}">${moveEventInstance?.name}</option>
-							</g:each>
-						</select>
+					<select id="moveEventId" name="moveEvent" onchange="$('#moveBundleId').val('');document.listForm.submit()">
+						<g:each status="i" in="${moveEventsList}" var="moveEventInstance">
+							<option value="${moveEventInstance?.id}">${moveEventInstance?.name}</option>
+						</g:each>
+					</select>
+				</span>
+				<span>
+					<label for="moveBundle"><b>Move Bundle:</b></label>&nbsp;
+					<select id="moveBundleId" name="moveBundle" onchange="document.listForm.submit()" >
+						<option value="">All</option>	
+						<g:each status="i" in="${moveBundleInstanceList}" var="moveBundleInstance">
+							<option value="${moveBundleInstance?.id}">${moveBundleInstance?.name}</option>
+						</g:each>
+					</select>
+				</span>
+				<span>
+					<input id="assetsInViewOffsetId" type="hidden" value="${params.offset}">
+					<input id="sortById" type="hidden" value="${params.sort}">
+					<input id="orderById" type="hidden" value="${params.order}">
+					<label for="assetsInViewId"><b>Assets in view:</b></label>&nbsp;
+					<select id="assetsInViewId" name="assetsInView" onchange="document.listForm.submit()" >
+						<option value="">All</option>
+						<option value="1">25</option>
+						<option value="3">50</option>
+						<option value="4">100</option>	
+					</select>
+				</span>
+				<g:if test="${totalAssets > assetsInView }">
+					<br/><br/>
+					<span class="pmo_paginateButtons">
+							<g:paginate total="${totalAssets}" params="${params }"/>
 					</span>
-			<span>
-			<label for="moveBundle"><b>Move Bundle:</b></label>&nbsp;
-			<select id="moveBundleId" name="moveBundle" onchange="document.listForm.submit()" >
-				<option value="">All</option>	
-			<g:each status="i" in="${moveBundleInstanceList}"
-				var="moveBundleInstance">
-				<option value="${moveBundleInstance?.id}">${moveBundleInstance?.name}</option>
-			</g:each>
-
-			</select></span>
+				</g:if>				
 			</td>
-			
+			<td style="padding: 0px;"><h1>PMO Asset Tracking</h1></td>
 			<g:if test="${isAdmin || isProjManager || isManager}">
 			<td style="text-align: left;width: 400px;">
 				<span>
@@ -96,7 +113,6 @@ overflow: hidden;
 			</td>
 			</g:if>
 			
-			<td><h1 align="center">PMO Asset Tracking</h1></td>
 			<td style="text-align: right;">
 			<input type="hidden" name="last_update" value="${new Date()}"/>
 			<input type="hidden" name="myForm" value="listForm"/>
@@ -133,7 +149,7 @@ overflow: hidden;
 			<table style="border: 0px;">
 				<thead>
 				<tr style="background-color: #CCC">
-					<g:sortableColumn id="column1Label" style="border:0px;" property="${columns?.column1.field}"  title="${columns?.column1.label}" params="['projectId':projectId,'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value]"/>
+					<g:sortableColumn id="column1Label" style="border:0px;" property="${columns?.column1.field}"  title="${columns?.column1.label}" params="['projectId':projectId,'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]"/>
 					<th style="border: 0px;">
 						<span id="column1Select" style="display: none;"><g:select from="${com.tdssrc.eav.EavEntityAttribute.findAll()?.attribute}" optionKey="attributeCode" optionValue="frontendLabel" name="column1Attribute"  value="${columns?.column1.field}"></g:select></span>
 						<span id="column1Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
@@ -157,7 +173,7 @@ overflow: hidden;
 			<table style="border: 0px;">
 				<thead>
 				<tr style="background-color: #CCC">
-					<g:sortableColumn id="column2Label" style="border:0px;" property="${columns?.column2.field}"  title="${columns?.column2.label}" params="['projectId':projectId,'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value]" />
+					<g:sortableColumn id="column2Label" style="border:0px;" property="${columns?.column2.field}"  title="${columns?.column2.label}" params="['projectId':projectId,'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]" />
 					<th style="border: 0px;">
 						<span id="column2Select" style="display: none;"><g:select from="${com.tdssrc.eav.EavEntityAttribute.findAll()?.attribute}" optionKey="attributeCode" optionValue="frontendLabel" name="column2Attribute" value="${columns?.column2.field}"></g:select></span>
 						<span id="column2Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
@@ -181,7 +197,7 @@ overflow: hidden;
 			<table style="border: 0px;">
 				<thead>
 				<tr style="background-color: #CCC">
-					<g:sortableColumn id="column3Label" style="border:0px;" property="${columns?.column3.field}"  title="${columns?.column3.label}" params="['projectId':projectId,'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value]"/>
+					<g:sortableColumn id="column3Label" style="border:0px;" property="${columns?.column3.field}"  title="${columns?.column3.label}" params="['projectId':projectId,'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]"/>
 					<th style="border: 0px;">
 						<span id="column3Select" style="display: none;"><g:select from="${com.tdssrc.eav.EavEntityAttribute.findAll()?.attribute}" optionKey="attributeCode" optionValue="frontendLabel" name="column3Attribute" value="${columns?.column3.field}" ></g:select></span>
 						<span id="column3Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
@@ -205,7 +221,7 @@ overflow: hidden;
 			<table style="border: 0px;">
 				<thead>
 				<tr style="background-color: #CCC">
-					<g:sortableColumn id="column4Label" style="border:0px;" property="${columns?.column4.field}"  title="${columns?.column4.label}" params="['projectId':projectId,'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value]"/>
+					<g:sortableColumn id="column4Label" style="border:0px;" property="${columns?.column4.field}"  title="${columns?.column4.label}" params="['projectId':projectId,'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]"/>
 					<th style="border: 0px;">
 						<span id="column4Select" style="display: none;"><g:select from="${com.tdssrc.eav.EavEntityAttribute.findAll()?.attribute}" optionKey="attributeCode" optionValue="frontendLabel" name="column4Attribute" value="${columns?.column4.field}" ></g:select></span>
 						<span id="column4Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
@@ -593,6 +609,7 @@ function initialize(){
 	$("#column3Id").val("${column3Value}");
 	$("#column2Id").val("${column2Value}");
 	$("#column1Id").val("${column1Value}");
+	$("#assetsInViewId").val("${assetsInView}");
 	var time = '${timeToUpdate}';
 		if(time != "" ){
 			$("#selectTimedId").val( time ) ;
@@ -813,12 +830,20 @@ var fieldId
 	function doAjaxCall(){
 		var moveEvent = $("#moveEventId").val();
 		var moveBundle = $("#moveBundleId").val();
-		var column1 = $("#column1Id").val();
-		var column2 = $("#column2Id").val();
-		var column3 = $("#column3Id").val();
-		var column4 = $("#column4Id").val();
+		var c1f = "${columns.column1.field}"
+		var c1v = "${column1Value}"
+		var c2f = "${columns.column2.field}"
+		var c2v = "${column2Value}"
+		var c3f = "${columns.column3.field}"
+		var c3v = "${column3Value}"
+		var c4f = "${columns.column4.field}"
+		var c4v = "${column4Value}"
+		var offset = $("#assetsInViewOffsetId").val()
+		var max = $("#assetsInViewId").val()
+		var sort = $("#sortById").val()
+		var order = $("#orderById").val()
 		var lastPoolTime = $("#lastPoolTimeId").val();
-		${remoteFunction(action:'getTransitions', params:'\'moveBundle=\' + moveBundle +\'&moveEvent=\'+moveEvent +\'&column1=\'+column1 +\'&column2=\'+column2+\'&column3=\'+column3+\'&column4=\'+column4+\'&lastPoolTime=\'+lastPoolTime', onFailure:"handleErrors()", onComplete:'updateTransitions(e);' )}
+		${remoteFunction(action:'getTransitions', params:'\'moveBundle=\' + moveBundle +\'&moveEvent=\'+moveEvent +\'&c1f=\'+c1f+\'&c2f=\'+c2f+\'&c3f=\'+c3f+\'&c4f=\'+c4f+\'&c1v=\'+c1v+\'&c2v=\'+c2v+\'&c3v=\'+c3v+\'&c4v=\'+c4v+\'&lastPoolTime=\'+lastPoolTime+\'&offset=\'+offset+\'&max=\'+max+\'&sort=\'+sort+\'&order=\'+order', onFailure:"handleErrors()", onComplete:'updateTransitions(e);' )}
 		timedUpdate($("#selectTimedId").val())
 	}
 	var doUpdate = true
@@ -1148,14 +1173,17 @@ var fieldId
 			var c3v = "${column3Value}"
 			var c4f = "${columns.column4.field}"
 			var c4v = "${column4Value}"
-				
+			var offset = $("#assetsInViewOffsetId").val()
+			var max = $("#assetsInViewId").val()
+			var sort = $("#sortById").val()
+			var order = $("#orderById").val()
 			if(type != "void" ){
 				${remoteFunction(action:'getAssetsCountForBulkTransition', 
-								params:'\'transId=\' + transId +\'&bundleId=\'+bundleId+\'&eventId=\'+eventId+\'&type=\'+type+\'&c1f=\'+c1f+\'&c2f=\'+c2f+\'&c3f=\'+c3f+\'&c4f=\'+c4f+\'&c1v=\'+c1v+\'&c2v=\'+c2v+\'&c3v=\'+c3v+\'&c4v=\'+c4v', 
+								params:'\'transId=\' + transId +\'&bundleId=\'+bundleId+\'&eventId=\'+eventId+\'&type=\'+type+\'&c1f=\'+c1f+\'&c2f=\'+c2f+\'&c3f=\'+c3f+\'&c4f=\'+c4f+\'&c1v=\'+c1v+\'&c2v=\'+c2v+\'&c3v=\'+c3v+\'&c4v=\'+c4v+\'&offset=\'+offset+\'&max=\'+max+\'&sort=\'+sort+\'&order=\'+order', 
 								onComplete:'doBulkTransitionsByHeader(e,transId)' )};
 			} else {
 				${remoteFunction(action:'doBulkTransitionsByHeader', 
-								params:'\'transId=\' + transId +\'&bundleId=\'+bundleId+\'&eventId=\'+eventId+\'&type=\'+type+\'&c1f=\'+c1f+\'&c2f=\'+c2f+\'&c3f=\'+c3f+\'&c4f=\'+c4f+\'&c1v=\'+c1v+\'&c2v=\'+c2v+\'&c3v=\'+c3v+\'&c4v=\'+c4v', 
+								params:'\'transId=\' + transId +\'&bundleId=\'+bundleId+\'&eventId=\'+eventId+\'&type=\'+type+\'&c1f=\'+c1f+\'&c2f=\'+c2f+\'&c3f=\'+c3f+\'&c4f=\'+c4f+\'&c1v=\'+c1v+\'&c2v=\'+c2v+\'&c3v=\'+c3v+\'&c4v=\'+c4v+\'&offset=\'+offset+\'&max=\'+max+\'&sort=\'+sort+\'&order=\'+order', 
 								onComplete:'doAjaxCall()' )};
 			}
 		}
@@ -1175,8 +1203,12 @@ var fieldId
 			var c3v = "${column3Value}"
 			var c4f = "${columns.column4.field}"
 			var c4v = "${column4Value}"
+			var offset = $("#assetsInViewOffsetId").val()
+			var max = $("#assetsInViewId").val()
+			var sort = $("#sortById").val()
+			var order = $("#orderById").val()
 			${remoteFunction(action:'doBulkTransitionsByHeader', 
-							params:'\'transId=\' + transId +\'&bundleId=\'+bundleId+\'&eventId=\'+eventId+\'&type=\'+type+\'&c1f=\'+c1f+\'&c2f=\'+c2f+\'&c3f=\'+c3f+\'&c4f=\'+c4f+\'&c1v=\'+c1v+\'&c2v=\'+c2v+\'&c3v=\'+c3v+\'&c4v=\'+c4v', 
+							params:'\'transId=\' + transId +\'&bundleId=\'+bundleId+\'&eventId=\'+eventId+\'&type=\'+type+\'&c1f=\'+c1f+\'&c2f=\'+c2f+\'&c3f=\'+c3f+\'&c4f=\'+c4f+\'&c1v=\'+c1v+\'&c2v=\'+c2v+\'&c3v=\'+c3v+\'&c4v=\'+c4v+\'&offset=\'+offset+\'&max=\'+max+\'&sort=\'+sort+\'&order=\'+order', 
 							onComplete:'doAjaxCall()' )};
 		}
 	}

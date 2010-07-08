@@ -19,7 +19,6 @@ class ClientConsoleController {
 	 *  @return : AssetEntity Details and AssetTransition details
 	 *---------------------------------------------------*/
     def list={
-
     	def headerCount = getHeaderNames()
     	def browserTest = request.getHeader("User-Agent").contains("MSIE")
         def projectId=params.projectId
@@ -31,12 +30,6 @@ class ClientConsoleController {
         def stateVal
         def taskVal
         def check 
-        def column1Value = params.column1
-        def column2Value = params.column2
-        def column3Value = params.column3
-        def column4Value = params.column4
-        def sortby = params.sort
-        def order = params.order
         def projectInstance = Project.findById( projectId )
 		def moveEventsList = MoveEvent.findAll("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
 		def columns = userPreferenceService.setAssetTrackingPreference(params.column1Attribute, params.column2Attribute, params.column3Attribute, params.column4Attribute)
@@ -65,6 +58,7 @@ class ClientConsoleController {
 	            moveBundleInstance = MoveBundle.findById(bundleId)
 				bundles = "("+bundleId+")"
 	        } else if(moveBundleInstanceList.size() > 0){
+	        	
 	        	bundles = (moveBundleInstanceList.id).toString().replace("[","(").replace("]",")")
 	        }
     		def resultList
@@ -72,6 +66,7 @@ class ClientConsoleController {
 			def column2List
 			def column3List
 			def column4List
+			def totalAssets = 0
 			if(bundles){
 				/*-------------get filter details----------------*/
 				
@@ -92,70 +87,10 @@ class ClientConsoleController {
 				column4List = splitFilterExpansion( temp4List )
 				
 				/*-------------get asset details----------------*/
-				def query = new StringBuffer("""SELECT * FROM( select ae.asset_entity_id as id, ae.asset_name as assetName,ae.short_name as shortName,ae.asset_tag as assetTag,
-												ae.asset_type as assetType,ae.manufacturer, ae.model as model, ae.application, ae.app_owner as appOwner, ae.app_sme as appSme,
-												ae.ip_address as ipAddress, ae.hinfo, ae.serial_number as serialNumber,ae.usize, ae.rail_type as railType,
-												ae.source_location as sourceLocation, ae.source_room as sourceRoom, ae.source_rack as sourceRack, ae.source_rack_position as sourceRackPosition,
-												ae.target_location as targetLocation, ae.target_room as targetRoom, ae.target_rack as targetRack, ae.target_rack_position as targetRackPosition,
-												ae.power_type as powerType,ae.pdu_port as pduPort,ae.pdu_quantity as pduQuantity,ae.pdu_type as pduType,ae.nic_port as nicPort,
-												ae.remote_mgmt_port as remote_MgmtPort, ae.fiber_cabinet as fiberCabinet, ae.fiber_type as fiberType, ae.fiber_quantity as fiberQuantity,
-												ae.hba_port as hbaPort, ae.kvm_device as kvmDevice, ae.kvm_port as kvmPort, mb.name as moveBundle, ae.truck,
-												ae.new_or_old as newOrOld, ae.priority, ae.cart, ae.shelf, spt.team_code as sourceTeam, tpt.team_code as targetTeam,
-												max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate
-												FROM asset_entity ae
-												LEFT JOIN move_bundle mb ON (ae.move_bundle_id = mb.move_bundle_id )
-												LEFT JOIN project_team spt ON (ae.source_team_id = spt.project_team_id )
-						                        LEFT JOIN project_team tpt ON (ae.target_team_id = tpt.project_team_id )
-						                        LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id and at.voided = 0 and at.type='process')
-												where ae.project_id = $projectId and ae.move_bundle_id  in ${bundles} GROUP BY ae.asset_entity_id ) ae WHERE  1 = 1""")
-												
-				if(column1Value !="" && column1Value!= null){
-					if(column1Value == 'blank'){
-						query.append(" and ae.${columns?.column1.field} = '' OR ae.${columns?.column1.field} is null")
-					} else {
-						def app = column1Value.replace("'","\\'")
-						query.append(" and ae.${columns?.column1.field} like '%$app%'")
-					}
-				}
-				if(column2Value!="" && column2Value!= null){
-					if(column2Value == 'blank'){
-						query.append(" and ae.${columns?.column2.field} = '' OR ae.${columns?.column2.field} is null")
-					} else {
-						def owner = column2Value.replace("'","\\'")
-						query.append(" and ae.${columns?.column2.field} like '%$owner%'")
-					}
-					
-				}
-				if(column3Value!="" && column3Value!= null){
-					if(column3Value == 'blank'){
-						query.append(" and ae.${columns?.column3.field} = '' OR ae.${columns?.column3.field} is null")
-					} else {
-						def sme = column3Value.toString().replace("'","\\'")
-						query.append(" and ae.${columns?.column3.field} like '%$sme%'")
-					}
-				}
-				if(column4Value!="" && column4Value!= null){
-					if(column4Value == 'blank'){
-						query.append(" and ae.${columns?.column4.field} = '' OR ae.${columns?.column4.field} is null")
-					} else {
-						def name = column4Value.toString().replace("'","\\'")
-						query.append(" and ae.${columns?.column4.field} like '%$name%'")
-					}
-				}
+				def returnValue = pmoAssetTrackingService.getAssetsForListView( projectId, bundles, columns, params )
+				resultList = returnValue[0]
 				
-	        
-				if(sortby != "" && sortby != null){
-					query.append(" order by $sortby")
-				}else {
-					query.append(" order by ae.application, ae.assetName")
-				}
-				if(order != "" && order != null){
-					query.append(" $order ")
-				}else {
-					query.append(" asc ")
-				}
-				
-				resultList=jdbcTemplate.queryForList(query.toString())
+				totalAssets = returnValue[1]
 			}
     		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 			def today = GormUtil.convertInToGMT( "now", tzId );
@@ -276,14 +211,16 @@ class ClientConsoleController {
 			userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")
 			def timeToUpdate = getSession().getAttribute("CLIENT_CONSOLE_REFRESH")
 			
+			def assetsInView = params.assetsInView ? Integer.parseInt(params.assetsInView) : totalAssets
+			if ( !params.max ) params.max = assetsInView
             return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,
 				column1List:column1List, column2List:column2List,column3List:column3List, column4List:column4List,projectId:projectId, lastPoolTime : lastPoolTime,
-                processTransitionList:processTransitionList,projectId:projectId,column2Value:column2Value,column1Value:column1Value,
-                column3Value:column3Value,column4Value:column4Value,timeToUpdate:timeToUpdate ? timeToUpdate.CLIENT_CONSOLE_REFRESH : "never", 
+                processTransitionList:processTransitionList,projectId:projectId,column2Value:params.column2,column1Value:params.column1,
+                column3Value:params.column3,column4Value:params.column4,timeToUpdate:timeToUpdate ? timeToUpdate.CLIENT_CONSOLE_REFRESH : "never", 
                 headerCount:headerCount,browserTest:browserTest, myForm : params.myForm, htmlTdId:htmlTdId, role : role,
                 moveEventInstance:moveEventInstance, moveEventsList:moveEventsList,
                 isAdmin:subject.hasRole("ADMIN"), isManager:subject.hasRole("MANAGER"), isProjManager:subject.hasRole("PROJ_MGR"),
-				columns:columns]
+				columns:columns, assetsInView:assetsInView, totalAssets:totalAssets ]
     	
         } else {
     		flash.message = "Please create bundle to view PMO Dashboard"
@@ -461,12 +398,9 @@ class ClientConsoleController {
 	 * @return: AssetEntity object with recent transactions
 	 *----------------------------------------------------*/
 	def getTransitions = {
+		
 		def bundleId = params.moveBundle
 		def moveEventId = params.moveEvent
-		def column1Value = params.column1
-		def column2Value = params.column2
-		def column3Value = params.column3
-		def column4Value = params.column4
 		def assetEntityList = []
 		def assetEntityAndCommentList = []
 		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
@@ -485,23 +419,10 @@ class ClientConsoleController {
 			def today = GormUtil.convertInToGMT( "now", tzId );
 			def currentPoolTime = new java.sql.Timestamp(today.getTime())
 			getSession().setAttribute("LAST_POOL_TIME",currentPoolTime)
-			def query = new StringBuffer("""SELECT ae.asset_entity_id as id, ae.application,ae.app_owner as appOwner,ae.app_sme as appSme,ae.asset_name
-											as assetName,max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate FROM asset_entity ae
-											LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id and at.type = 'process' and at.voided = 0 )
-											where ae.asset_entity_id in	( select t.asset_entity_id from asset_transition t where 
-											(t.date_created between SUBTIME('$lastPoolTime','00:05:30') and '$currentPoolTime' OR t.last_updated between SUBTIME('$lastPoolTime','00:05:30') and '$currentPoolTime') )
-											and ae.project_id = $moveEvent.project.id and ae.move_bundle_id in ${bundles}""")
-			/*if(column1Value!="" && column1Value!= null){
-				query.append(" and ae.application ='$column1Value'")
-			}
-			if(column2Value!="" && column2Value!= null){
-				query.append(" and ae.app_owner='$column2Value'")
-			}
-			if(column3Value!="" && column3Value!= null){
-				query.append(" and ae.app_sme='$column3Value'")
-			}*/
-			query.append(" GROUP BY ae.asset_entity_id")
-			def resultList=jdbcTemplate.queryForList(query.toString())
+			
+			// get the assets list
+			def resultList= pmoAssetTrackingService.getAssetsForPmoUpdate( moveEvent.project.id, bundles, params, lastPoolTime, currentPoolTime)//jdbcTemplate.queryForList(query.toString())
+			
 			def processTransitions= stateEngineService.getTasks(projectInstance.workflowCode, "TASK_ID")
 			/* user role check*/
 			def role = ""
@@ -788,6 +709,7 @@ class ClientConsoleController {
 		def holdId = Integer.parseInt(stateEngineService.getStateId(moveEvent.project.workflowCode,"Hold"))
 
 		def assetEntityList = pmoAssetTrackingService.getAssetEntityListForBulkEdit( params )
+		
 		def totalAssets = assetEntityList.size()
 		def possibleAssets = 0
 		// terminate if type is not appplicable 
