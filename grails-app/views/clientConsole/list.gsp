@@ -71,7 +71,7 @@ overflow: hidden;
 				<span>
 					<label for="moveBundle"><b>Bundle:</b></label>&nbsp;
 					<select id="moveBundleId" name="moveBundle" onchange="document.listForm.submit()" >
-						<option value="">All</option>	
+						<option value="all">All</option>	
 						<g:each status="i" in="${moveBundleInstanceList}" var="moveBundleInstance">
 							<option value="${moveBundleInstance?.id}">${moveBundleInstance?.name}</option>
 						</g:each>
@@ -83,7 +83,7 @@ overflow: hidden;
 					<input id="orderById" type="hidden" value="${params.order}">
 					<label for="assetsInViewId"><b>Assets:</b></label>&nbsp;
 					<select id="assetsInViewId" name="assetsInView" onchange="document.listForm.submit()" >
-						<option value="">All</option>
+						<option value="all">All</option>
 						<option value="25">25</option>
 						<option value="50">50</option>
 						<option value="100">100</option>

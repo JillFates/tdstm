@@ -56,9 +56,9 @@ class UserPreferenceService  {
     def removePreference( String preferenceCode ) {
     	def principal = SecurityUtils.subject.principal
 	    def userLogin = UserLogin.findByUsername( principal )
-    	def bundlePreference = UserPreference.findByUserLoginAndPreferenceCode( userLogin, preferenceCode)
-		if( bundlePreference ){
-			bundlePreference.delete(flush:true)
+    	def userPreference = UserPreference.findByUserLoginAndPreferenceCode( userLogin, preferenceCode)
+		if( userPreference ){
+			userPreference.delete(flush:true)
 			loadPreferences( preferenceCode )
 		}
     }

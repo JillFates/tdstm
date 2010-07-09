@@ -271,7 +271,7 @@ class PmoAssetTrackingService {
         def order = params.order
 		
 		def assetQuery = new StringBuffer(" FROM AssetEntity ae WHERE ae.moveBundle.moveEvent.id = $moveEventId ")
-		if(moveBundleId){
+		if(moveBundleId && moveBundleId != 'all'){
 			assetQuery .append(" AND ae.moveBundle.id = $moveBundleId ")
 		}
 		if(column1Value !="" && column1Value!= null){
@@ -318,7 +318,7 @@ class PmoAssetTrackingService {
 			assetQuery.append(" asc ")
 		}
 		def assetEntityList 
-		if( limit ){
+		if( limit && limit != "all"){
 			if(offset){
 				assetEntityList = AssetEntity.findAll( assetQuery.toString(), [ max:Integer.parseInt(limit), offset:Integer.parseInt(offset) ] )
 			} else {
@@ -454,7 +454,7 @@ class PmoAssetTrackingService {
 			query.append(" asc ")
 		}
 		
-		if(limit){
+		if(limit && limit != "all"){
 			if(offset){
 				query.append(" limit ${offset},${limit}")
 			} else {
@@ -546,7 +546,7 @@ class PmoAssetTrackingService {
 		}else {
 			query.append(" asc ")
 		}
-		if(limit ){
+		if(limit && limit != "all"){
 			if(offset){
 				query.append(" limit ${offset},${limit} ) a")
 			} else {

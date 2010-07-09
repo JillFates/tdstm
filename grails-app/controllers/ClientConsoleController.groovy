@@ -34,6 +34,14 @@ class ClientConsoleController {
 		def moveEventsList = MoveEvent.findAll("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
 		def columns = userPreferenceService.setAssetTrackingPreference(params.column1Attribute, params.column2Attribute, params.column3Attribute, params.column4Attribute)
 		
+		def defalutBundleId = getSession().getAttribute("CURR_BUNDLE").CURR_BUNDLE
+		// set Pmo assetsInView into current session when changed
+		if ( !params.assetsInView ){ 
+			params.assetsInView = getSession().getAttribute("PMO_ASSETS_INVIEW")
+		} else {
+			getSession().setAttribute("PMO_ASSETS_INVIEW",params.assetsInView)
+		}
+    	
 		if(moveEventId){
 			userPreferenceService.setPreference( "MOVE_EVENT", "${moveEventId}" )
             moveEventInstance = MoveEvent.findById(moveEventId)
@@ -53,13 +61,27 @@ class ClientConsoleController {
     	if( moveEventInstance ){
     		def bundles
     		def moveBundleInstanceList = MoveBundle.findAll("from MoveBundle mb where mb.moveEvent = ? order by mb.name asc",[moveEventInstance])
-	        if( bundleId ){
+	        if( bundleId && bundleId != "all"  ){
 	        	userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
 	            moveBundleInstance = MoveBundle.findById(bundleId)
 				bundles = "("+bundleId+")"
 	        } else if(moveBundleInstanceList.size() > 0){
+	        	if(bundleId == "all"){
+	        		userPreferenceService.removePreference( "CURR_BUNDLE" )
+					bundles = (moveBundleInstanceList.id).toString().replace("[","(").replace("]",")")
+	        	} else if(defalutBundleId){ // check to see if there is any pref bundle exist
+	        		def defalutBundle = MoveBundle.get(defalutBundleId)
+	        		if(defalutBundle?.moveEvent?.id != moveEventInstance.id){ // check to see if preff bundle belongs to current event , if not remove the pref bundle
+	        			userPreferenceService.removePreference( "CURR_BUNDLE" )	
+						bundles = (moveBundleInstanceList.id).toString().replace("[","(").replace("]",")")
+	        		} else {
+	        			moveBundleInstance = defalutBundle
+	        			bundles = "("+defalutBundleId+")"
+	        		}
+	        	} else { // use all the bundles if pref bundle not exist
+	        		bundles = (moveBundleInstanceList.id).toString().replace("[","(").replace("]",")")
+	        	}
 	        	
-	        	bundles = (moveBundleInstanceList.id).toString().replace("[","(").replace("]",")")
 	        }
     		def resultList
     		def column1List
@@ -211,7 +233,7 @@ class ClientConsoleController {
 			userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")
 			def timeToUpdate = getSession().getAttribute("CLIENT_CONSOLE_REFRESH")
 			
-			def assetsInView = params.assetsInView ? Integer.parseInt(params.assetsInView) : totalAssets
+			def assetsInView = params.assetsInView && params.assetsInView != "all"? Integer.parseInt(params.assetsInView) : totalAssets
 			if ( !params.max ) params.max = assetsInView
 			if ( !params.offset ) params.offset = 0
             return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,
@@ -409,8 +431,8 @@ class ClientConsoleController {
 			def bundles
 			def moveEvent = MoveEvent.findById(moveEventId)
     		def moveBundlesList = MoveBundle.findAll("from MoveBundle mb where mb.moveEvent = ? order by mb.name asc",[moveEvent])
-	        if( bundleId ){
-	        	userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
+	        if( bundleId && bundleId != 'all' ){
+	        	//userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
 				bundles = "("+bundleId+")"
 	        } else if(moveBundlesList.size() > 0){
 	        	bundles = (moveBundlesList.id).toString().replace("[","(").replace("]",")")
