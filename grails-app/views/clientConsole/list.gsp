@@ -610,6 +610,9 @@ function initialize(){
 	$("#column2Id").val("${column2Value}");
 	$("#column1Id").val("${column1Value}");
 	$("#assetsInViewId").val("${assetsInView}");
+	if($("#assetsInViewId")[0].selectedIndex == -1)
+	  $("#assetsInViewId")[0].selectedIndex = 0;
+	  
 	var time = '${timeToUpdate}';
 		if(time != "" ){
 			$("#selectTimedId").val( time ) ;
