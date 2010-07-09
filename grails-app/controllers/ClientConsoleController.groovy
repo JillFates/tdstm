@@ -741,8 +741,13 @@ class ClientConsoleController {
 			render message 
 			return
 		}
+		if(stateType == "boolean" && type == "void" ){
+			message = " Undo not allowed for Boolean steps"
+			render message 
+			return
+		}
 		// send the response message when state to as Ready or state type as boolean
-		if(stateTo == "Ready" || (stateType == "boolean" && stateTo != "Hold")){
+		if((stateTo == "Ready" || (stateType == "boolean" && stateTo != "Hold")) && type != "void" ) {
 			possibleAssets = totalAssets
 			message = "Set the $possibleAssets out of $totalAssets assets to $stateTo to $type ?"
 			render message 
@@ -762,22 +767,34 @@ class ClientConsoleController {
 		} else if(subject.hasRole("MANAGER")){
 			role = "MANAGER"
 		}
-		
-		assetEntityList.each{ asset ->
-			def currentTransition = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-												"where t.asset_entity_id = ${asset.id} and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
-												"order by date_created desc limit 1 ")
-			if( currentTransition.size() ){
-
-				def currentStateId = currentTransition[0].stateTo
-				def currentState = stateEngineService.getState( asset.project.workflowCode, currentStateId)
-				def validate = stateEngineService.canDoTask( asset.project.workflowCode, role, currentState, stateTo  ) 
-				if(validate){
-					possibleAssets += 1
+		if(type != "void"){
+			assetEntityList.each{ asset ->
+				def currentTransition = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+													"where t.asset_entity_id = ${asset.id} and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
+													"order by date_created desc limit 1 ")
+				if( currentTransition.size() ){
+					def currentStateId = currentTransition[0].stateTo
+					def currentState = stateEngineService.getState( asset.project.workflowCode, currentStateId)
+					def validate = stateEngineService.canDoTask( asset.project.workflowCode, role, currentState, stateTo  ) 
+					if(validate){
+						possibleAssets += 1
+					}
 				}
 			}
+			message = "Set the $possibleAssets out of $totalAssets assets to $stateTo to $type ?"
+		} else {
+			def undoAssets = 0
+			assetEntityList.each{ asset ->
+				def currentTransition = jdbcTemplate.queryForList("select t.state_to from asset_transition t where t.asset_entity_id = ${asset.id} "+
+													" and t.state_to = $transId and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
+													"order by date_created desc limit 1 ")
+				if( currentTransition.size() ){
+					undoAssets += 1
+				}
+			}
+			message = "Undo the $undoAssets tasks and any dependent (workflow) transitions. Are you sure?"
 		}
-		message = "Set the $possibleAssets out of $totalAssets assets to $stateTo to $type ?"
+		
 		render message 
 	}
 	/*

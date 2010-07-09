@@ -1177,15 +1177,10 @@ var fieldId
 			var max = $("#assetsInViewId").val()
 			var sort = $("#sortById").val()
 			var order = $("#orderById").val()
-			if(type != "void" ){
-				${remoteFunction(action:'getAssetsCountForBulkTransition', 
+			
+			${remoteFunction(action:'getAssetsCountForBulkTransition', 
 								params:'\'transId=\' + transId +\'&bundleId=\'+bundleId+\'&eventId=\'+eventId+\'&type=\'+type+\'&c1f=\'+c1f+\'&c2f=\'+c2f+\'&c3f=\'+c3f+\'&c4f=\'+c4f+\'&c1v=\'+c1v+\'&c2v=\'+c2v+\'&c3v=\'+c3v+\'&c4v=\'+c4v+\'&offset=\'+offset+\'&max=\'+max+\'&sort=\'+sort+\'&order=\'+order', 
 								onComplete:'doBulkTransitionsByHeader(e,transId)' )};
-			} else {
-				${remoteFunction(action:'doBulkTransitionsByHeader', 
-								params:'\'transId=\' + transId +\'&bundleId=\'+bundleId+\'&eventId=\'+eventId+\'&type=\'+type+\'&c1f=\'+c1f+\'&c2f=\'+c2f+\'&c3f=\'+c3f+\'&c4f=\'+c4f+\'&c1v=\'+c1v+\'&c2v=\'+c2v+\'&c3v=\'+c3v+\'&c4v=\'+c4v+\'&offset=\'+offset+\'&max=\'+max+\'&sort=\'+sort+\'&order=\'+order', 
-								onComplete:'doAjaxCall()' )};
-			}
 		}
 	}
 	function doBulkTransitionsByHeader( e, transId){
