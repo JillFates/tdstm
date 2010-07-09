@@ -2,6 +2,7 @@ import grails.converters.JSON
 import org.jsecurity.SecurityUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import com.tdssrc.grails.GormUtil
+import javax.servlet.http.HttpSession
 
 class ClientConsoleController {
 	def stateEngineService
@@ -57,7 +58,7 @@ class ClientConsoleController {
             	moveEventInstance = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
             }
         }
-    	
+        
     	if( moveEventInstance ){
     		def bundles
     		def moveBundleInstanceList = MoveBundle.findAll("from MoveBundle mb where mb.moveEvent = ? order by mb.name asc",[moveEventInstance])
@@ -107,7 +108,7 @@ class ClientConsoleController {
 				def temp4List = AssetEntity.executeQuery("""select distinct ae.${columns?.column4.field} , count(ae.id) from AssetEntity 
 																ae where  ae.moveBundle.id in ${bundles} group by ae.${columns?.column4.field} order by ae.${columns?.column4.field}""")
 				column4List = splitFilterExpansion( temp4List )
-				
+                
 				/*-------------get asset details----------------*/
 				def returnValue = pmoAssetTrackingService.getAssetsForListView( projectId, bundles, columns, params )
 				resultList = returnValue[0]
@@ -152,11 +153,6 @@ class ClientConsoleController {
 				def assetId = it.id
 				def htmlTd = []
 				def maxstate = it.maxstate
-				def assetEntity = AssetEntity.get(assetId)
-				/*projectMap = ProjectAssetMap.findByAsset(assetEntity)
-				if(projectMap){
-					stateId = projectMap.currentStateId
-				}*/
                 def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
                                                                 "where t.asset_entity_id = $assetId and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
                                                                 "order by date_created desc limit 1 ")
@@ -176,20 +172,18 @@ class ClientConsoleController {
                 }else{
                     check = false
                 }
-                def naTransQuery = "from AssetTransition where assetEntity = $assetId and voided = 0 and type = 'boolean' "
                 
-                def assetTransitions = AssetTransition.findAll(naTransQuery)
-  
-                def isHoldNa = assetTransitions.find { it.stateTo == holdId }
+                def transQuery = "from AssetTransition where assetEntity = $assetId and voided = 0 and (type = 'boolean' OR type = 'process')"
                 
-                def doneTransitionQuery = "from AssetTransition where assetEntity = $assetId and voided = 0 and type = 'process' "
-				
+                def assetTransitions = AssetTransition.findAll(transQuery)
+                def isHoldNa = assetTransitions.find { it.type == 'boolean' && it.stateTo == holdId }
+                
                 processTransitionList.each() { trans ->
                     def cssClass='task_pending'
                     def transitionId = trans.transId
                     def stateType = trans.stateType
                     if(stateId != terminatedId){
-                        def assetTrans = assetTransitions.find { it.stateTo == transitionId.toString() }
+                        def assetTrans = assetTransitions.find { it.type == 'boolean' && it.stateTo == transitionId.toString() }
                         
                         if(assetTrans && assetTrans.isNonApplicable) {
                             cssClass='asset_pending'
@@ -203,9 +197,9 @@ class ClientConsoleController {
                         
                         if(stateType != 'boolean' || transitionId == holdId){
                             if( transitionId <= maxstate  ){
-                            	if(transitionId != holdId && AssetTransition.find(doneTransitionQuery+"  and stateTo = "+transitionId)){
-        							cssClass = "task_done"
-        						} else if(stateId == holdId && !isHoldNa){
+                                if(transitionId != holdId && assetTransitions.find { it.type == 'process' && it.stateTo == transitionId.toString() }){
+                                    cssClass = "task_done"
+                                } else if(stateId == holdId && !isHoldNa){
                                     cssClass = "asset_hold"
                                 } else if( transitionId == holdId ){
                                     if(isHoldNa){
@@ -220,7 +214,7 @@ class ClientConsoleController {
                         }
 
                         if(assetTrans != null)
-                            cssClass = pmoAssetTrackingService.getRecentChangeStyle( cssClass, assetTrans )
+                           cssClass = getRecentChangeStyle( assetTrans, cssClass )
                     } else {
                         cssClass='task_term'
                     }
@@ -421,7 +415,6 @@ class ClientConsoleController {
 	 * @return: AssetEntity object with recent transactions
 	 *----------------------------------------------------*/
 	def getTransitions = {
-		
 		def bundleId = params.moveBundle
 		def moveEventId = params.moveEvent
 		def assetEntityList = []
@@ -489,22 +482,23 @@ class ClientConsoleController {
 				}else{
 					check = false
 				}
-				def naTransQuery = "from AssetTransition where assetEntity = $assetId and voided = 0 and type = 'boolean' "
+                
+                def transQuery = "from AssetTransition where assetEntity = $assetId and voided = 0 and (type = 'boolean' OR type = 'process')"
+                
+                def assetTransitions = AssetTransition.findAll(transQuery)
+                def isHoldNa = assetTransitions.find { it.type == 'boolean' && it.stateTo == holdId }
 				
-				def doneTransitionQuery = "from AssetTransition where assetEntity = $assetId and voided = 0 and type = 'process' "
-					
 				processTransitions.each() { trans ->
 					def cssClass='task_pending'
+                	def transitionId = Integer.parseInt(trans)
+					def stateType = stateEngineService.getStateType( projectInstance.workflowCode, 
+									stateEngineService.getState(projectInstance.workflowCode, transitionId))
                     if(stateId != terminatedId){
-                    	
-                    	def transitionId = Integer.parseInt(trans)
-						def stateType = stateEngineService.getStateType( projectInstance.workflowCode, 
-										stateEngineService.getState(projectInstance.workflowCode, transitionId))
-	                    def isHoldNa = AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+holdId)
-						
-						if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId)){
+                        def assetTrans = assetTransitions.find { it.type == 'boolean' && it.stateTo == transitionId.toString() }
+                        
+                        if(assetTrans && assetTrans.isNonApplicable) {
 							cssClass='asset_pending'
-						} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 0 and stateTo = "+transitionId) && stateType == 'boolean') {
+                        } else if(assetTrans && stateType == 'boolean') {
 							if(stateId != holdId || isHoldNa){
 								cssClass='task_done'
 							} else {
@@ -513,7 +507,7 @@ class ClientConsoleController {
 						}
 						if(stateType != 'boolean' || transitionId == holdId){
 							if( transitionId <= maxstate  ){
-								if(transitionId != holdId && AssetTransition.find(doneTransitionQuery+"  and stateTo = "+transitionId)){
+                                if(transitionId != holdId && assetTransitions.find { it.type == 'process' && it.stateTo == transitionId.toString() }){
         							cssClass = "task_done"
         						}  else if(stateId == holdId && !isHoldNa){
 									cssClass = "asset_hold"
@@ -523,12 +517,12 @@ class ClientConsoleController {
 									} else {
 										cssClass='task_pending'
 									}
-								} else if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId)){
+                                } else if(assetTrans && assetTrans.isNonApplicable){
 									cssClass='asset_pending'
 								}
 							}
 						}
-						cssClass = pmoAssetTrackingService.getRecentChangeStyle( assetId, cssClass, trans )
+						cssClass = getRecentChangeStyle( assetEntity, cssClass )
                     } else {
                     	cssClass='task_term'
                     }
@@ -840,5 +834,26 @@ class ClientConsoleController {
 		}
 		
 		render ""
+	}
+	
+	private getRecentChangeStyle(def entity, def cssClass) {
+        def changedClass = cssClass
+        if(cssClass == "task_done") {
+            def createdTime = entity?.dateCreated?.getTime()
+            def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ                  
+            def currentTime = GormUtil.convertInToGMT( "now", tzId ).getTime()
+            Integer minutes
+            if(createdTime) {
+                minutes = (currentTime - createdTime) / 1000
+            }
+            if( minutes != null ) {
+                if(minutes < 120) {
+                    changedClass = "task_done2"
+                } else if(minutes > 120 && minutes < 330) {
+                    changedClass = "task_done5" 
+                }
+            }
+        }
+        return changedClass
 	}
 }
