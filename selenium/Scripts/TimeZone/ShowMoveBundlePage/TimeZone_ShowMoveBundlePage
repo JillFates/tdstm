@@ -4,12 +4,12 @@
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="selenium.base" href="http://ph1.tdsops.com/" />
-<title>TimeZone_MoveBundle</title>
+<title>TimeZone_ShowMoveBundlePage</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">TimeZone_MoveBundle</td></tr>
+<tr><td rowspan="1" colspan="3">TimeZone_ShowMoveBundlePage</td></tr>
 </thead><tbody>
 <!--This test will test if the date and time displayed in Show Move Bundle page is displayed as per the different time zones selected-->
 <tr>
@@ -19,7 +19,7 @@
 </tr>
 <tr>
 	<td>open</td>
-	<td>/tds-0.1/auth/login</td>
+	<td>/tdstm/auth/login</td>
 	<td></td>
 </tr>
 <tr>

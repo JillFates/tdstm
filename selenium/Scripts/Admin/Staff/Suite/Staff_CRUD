@@ -13,7 +13,7 @@
 </thead><tbody>
 <tr>
 	<td>open</td>
-	<td>/tds-0.1/auth/login</td>
+	<td>/tdstm/auth/login</td>
 	<td></td>
 </tr>
 <tr>

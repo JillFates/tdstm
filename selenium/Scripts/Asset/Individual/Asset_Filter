@@ -14,7 +14,7 @@
 <!--Pre-Requisite: Select a Project where there are assets in it pre-exisitng.-->
 <tr>
 	<td>open</td>
-	<td>/tds-0.1/auth/login;</td>
+	<td>/tdstm/auth/login</td>
 	<td></td>
 </tr>
 <tr>
@@ -634,7 +634,7 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>Filter Applied! </td>
+	<td>Filter Applied!</td>
 	<td></td>
 </tr>
 <tr>

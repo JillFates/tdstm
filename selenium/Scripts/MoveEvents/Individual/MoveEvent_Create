@@ -4,16 +4,16 @@
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
-<title>TMME-Create</title>
+<title>MoveEvent_Create</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">TMME-Create</td></tr>
+<tr><td rowspan="1" colspan="3">MoveEvent_Create</td></tr>
 </thead><tbody>
 <tr>
 	<td>open</td>
-	<td>/tds-0.1/auth/login</td>
+	<td>/tdstm/auth/login</td>
 	<td></td>
 </tr>
 <tr>

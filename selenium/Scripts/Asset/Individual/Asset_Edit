@@ -14,7 +14,7 @@
 <!--Pre-requisite: There should be atleast one asset in asset entity list page of the user selected project as this test picks up the first record from the list and perform the actions-->
 <tr>
 	<td>open</td>
-	<td>/tds-0.1/auth/login</td>
+	<td>/tdstm/auth/login</td>
 	<td></td>
 </tr>
 <tr>

@@ -14,7 +14,7 @@
 <!--Pre-Requisite: There should be atleast one record in the Company List page for the admin and atleast one record in the Staff List page of that selected company as this test picks up the first record from both Company List page and Staff List page-->
 <tr>
 	<td>open</td>
-	<td>/tds-0.1/auth/login</td>
+	<td>/tdstm/auth/login</td>
 	<td></td>
 </tr>
 <tr>

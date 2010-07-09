@@ -4,12 +4,12 @@
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="selenium.base" href="http://ph1.tdsops.com/" />
-<title>Reports</title>
+<title>Reports_All</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">Reports</td></tr>
+<tr><td rowspan="1" colspan="3">Reports_All</td></tr>
 </thead><tbody>
 <tr>
 	<td>setSpeed</td>
@@ -18,7 +18,7 @@
 </tr>
 <tr>
 	<td>open</td>
-	<td>/tds-0.1/auth/login</td>
+	<td>/tdstm/auth/login</td>
 	<td></td>
 </tr>
 <tr>
@@ -212,7 +212,7 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>Fields marked ( * ) are mandatory </td>
+	<td>Fields marked ( * ) are mandatory</td>
 	<td></td>
 </tr>
 <tr>
