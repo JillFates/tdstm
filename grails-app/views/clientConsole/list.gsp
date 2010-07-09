@@ -86,7 +86,7 @@ overflow: hidden;
 						<option value="">All</option>
 						<option value="25">25</option>
 						<option value="50">50</option>
-						<option value="100">100</option>	
+						<option value="100">100</option>
 					</select>
 				</span>
 				<g:if test="${totalAssets > assetsInView }">
@@ -149,7 +149,7 @@ overflow: hidden;
 			<table style="border: 0px;">
 				<thead>
 				<tr style="background-color: #CCC">
-					<g:sortableColumn id="column1Label" style="border:0px;" property="${columns?.column1.field}"  title="${columns?.column1.label}" params="['projectId':projectId,'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]"/>
+					<g:sortableColumn id="column1Label" style="border:0px;" property="${columns?.column1.field}"  title="${columns?.column1.label}" params="['projectId':projectId, moveEvent:moveEventInstance?.id, 'moveBundle':moveBundleInstance?.id,'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]"/>
 					<th style="border: 0px;">
 						<span id="column1Select" style="display: none;"><g:select from="${com.tdssrc.eav.EavEntityAttribute.findAll()?.attribute}" optionKey="attributeCode" optionValue="frontendLabel" name="column1Attribute"  value="${columns?.column1.field}"></g:select></span>
 						<span id="column1Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
@@ -173,7 +173,7 @@ overflow: hidden;
 			<table style="border: 0px;">
 				<thead>
 				<tr style="background-color: #CCC">
-					<g:sortableColumn id="column2Label" style="border:0px;" property="${columns?.column2.field}"  title="${columns?.column2.label}" params="['projectId':projectId,'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]" />
+					<g:sortableColumn id="column2Label" style="border:0px;" property="${columns?.column2.field}"  title="${columns?.column2.label}" params="['projectId':projectId,moveEvent:moveEventInstance?.id, 'moveBundle':moveBundleInstance?.id, 'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]" />
 					<th style="border: 0px;">
 						<span id="column2Select" style="display: none;"><g:select from="${com.tdssrc.eav.EavEntityAttribute.findAll()?.attribute}" optionKey="attributeCode" optionValue="frontendLabel" name="column2Attribute" value="${columns?.column2.field}"></g:select></span>
 						<span id="column2Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
@@ -197,7 +197,7 @@ overflow: hidden;
 			<table style="border: 0px;">
 				<thead>
 				<tr style="background-color: #CCC">
-					<g:sortableColumn id="column3Label" style="border:0px;" property="${columns?.column3.field}"  title="${columns?.column3.label}" params="['projectId':projectId,'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]"/>
+					<g:sortableColumn id="column3Label" style="border:0px;" property="${columns?.column3.field}"  title="${columns?.column3.label}" params="['projectId':projectId, moveEvent:moveEventInstance?.id, 'moveBundle':moveBundleInstance?.id, 'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]"/>
 					<th style="border: 0px;">
 						<span id="column3Select" style="display: none;"><g:select from="${com.tdssrc.eav.EavEntityAttribute.findAll()?.attribute}" optionKey="attributeCode" optionValue="frontendLabel" name="column3Attribute" value="${columns?.column3.field}" ></g:select></span>
 						<span id="column3Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
@@ -221,7 +221,7 @@ overflow: hidden;
 			<table style="border: 0px;">
 				<thead>
 				<tr style="background-color: #CCC">
-					<g:sortableColumn id="column4Label" style="border:0px;" property="${columns?.column4.field}"  title="${columns?.column4.label}" params="['projectId':projectId,'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]"/>
+					<g:sortableColumn id="column4Label" style="border:0px;" property="${columns?.column4.field}"  title="${columns?.column4.label}" params="['projectId':projectId, moveEvent:moveEventInstance?.id, 'moveBundle':moveBundleInstance?.id, 'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]"/>
 					<th style="border: 0px;">
 						<span id="column4Select" style="display: none;"><g:select from="${com.tdssrc.eav.EavEntityAttribute.findAll()?.attribute}" optionKey="attributeCode" optionValue="frontendLabel" name="column4Attribute" value="${columns?.column4.field}" ></g:select></span>
 						<span id="column4Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
