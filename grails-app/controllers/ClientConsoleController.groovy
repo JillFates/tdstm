@@ -34,7 +34,7 @@ class ClientConsoleController {
 		def moveEventsList = MoveEvent.findAll("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
 		def columns = userPreferenceService.setAssetTrackingPreference(params.column1Attribute, params.column2Attribute, params.column3Attribute, params.column4Attribute)
 		
-		def defalutBundleId = getSession().getAttribute("CURR_BUNDLE").CURR_BUNDLE
+		def defalutBundleId = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
 		// set Pmo assetsInView into current session when changed
 		if ( !params.assetsInView ){ 
 			params.assetsInView = getSession().getAttribute("PMO_ASSETS_INVIEW")
