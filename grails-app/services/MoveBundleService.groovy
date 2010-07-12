@@ -70,9 +70,8 @@ class MoveBundleService {
 			         AND cast(atran2.state_to as UNSIGNED INTEGER) >= ${transitionId}
 			      GROUP BY atran2.asset_entity_id 
 			    )
-			LEFT JOIN project_asset_map pam ON pam.asset_id = ae.asset_entity_id 
+			LEFT JOIN project_asset_map pam ON pam.asset_id = ae.asset_entity_id AND CAST(pam.current_state_id AS UNSIGNED INTEGER) >= ${transitionId}
 			WHERE ae.move_bundle_id = ${moveBundleId}
-			   AND CAST(pam.current_state_id AS UNSIGNED INTEGER) >= ${transitionId}
 			GROUP BY ae.move_bundle_id
 		"""
 		def actualTimes
