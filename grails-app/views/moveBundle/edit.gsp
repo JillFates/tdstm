@@ -7,18 +7,66 @@
     <title>Edit MoveBundle</title>
 
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" type="text/css"/>
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery-ui.css')}" type="text/css"/>
+	<g:javascript src="jquery/jquery.ui.widget.js"/>
+	<g:javascript src="jquery/jquery.ui.mouse.js"/>
+	<g:javascript src="jquery/jquery.ui.slider.js"/>
 
-    
-    <g:javascript>
-
-      function initialize(){
-      // This is called when the page loads to initialize Managers
-      $('#moveManagerId').val('${moveManager}');
-      $('#projectManagerId').val('${projectManager}');
-
-      }
 	
-    </g:javascript>
+    <script type="text/javascript">
+	     var maxDuration = calculateMaxDuration()
+	     function initialize(){
+	     	// This is called when the page loads to initialize Managers
+	     	$('#moveManagerId').val('${moveManager}');
+	      	$('#projectManagerId').val('${projectManager}');
+	     }
+	    /*
+	    	function to calculate the bundle duration to adjust the slider
+	    */ 
+		function calculateMaxDuration(){
+			var start = ${moveBundleInstance?.startTime?.getTime()}
+				
+			var completion = ${moveBundleInstance?.completionTime?.getTime()}
+			var startTime = 0
+			var completionTime = 300000
+			if(start){
+				startTime = new Date( start ).getTime()
+			}
+			if(completion){
+				completionTime = new Date( completion ).getTime()
+			}
+			var durationInMinutes = (completionTime - startTime ) / 60000
+			return durationInMinutes  
+		} 
+		/*
+		convert the date into HH:MM ap formate to show at slider place.
+		*/
+		function convertToTimeFormat( date ){
+	    	var timeString = ""
+	    	var month =  date.getMonth();
+	    	if( !isNaN(month) ){
+	    		//month = month + 1
+				//var monthday    = date.getDate();
+
+				var hour   = date.getHours();
+				var minute = date.getMinutes();
+				var second = date.getSeconds();
+				//if(month < 10 ){ month = "0"+ month }
+				//if(monthday < 10 ){ monthday = "0"+ monthday }
+	    		
+	    		var ap = "AM";
+	    		if (hour   > 11) { ap = "PM";             }
+	    		if (hour   > 12) { hour = hour - 12;      }
+	    		if (hour   == 0) { hour = 12;             }
+	    		if (hour   < 10) { hour   = "0" + hour;   }
+	    		if (minute < 10) { minute = "0" + minute; }
+	    		if (second < 10) { second = "0" + second; }
+	    			
+	    		var timeString = hour + ':' + minute + ' ' + ap;
+	    	}
+	    	return timeString
+		}
+    </script>
   </head>
   <body>
   	<div class="nav" style="border: 1px solid #CCCCCC; height: 11px;width: 219px; margin:9px 14px 0px">
@@ -177,7 +225,7 @@
         <div class="buttons" style="float: left;">
           <input type="hidden" name="project.id" value="${projectId }"/>
           <input type="hidden" name="projectId" value="${projectId }"/>
-          <span class="button"><g:actionSubmit class="save" value="Update" onclick=" return validateStepsData()"/></span>
+          <span class="button"><g:actionSubmit class="save" value="Update" onclick="return validateStepsData()"/></span>
           <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Cancel" action="show" /></span>
         </div>
       <g:javascript>
@@ -196,9 +244,10 @@
 					<th>Key off Step</th>
 					<th>Dashboard</th>
 					<th>Dashboard Label</th>
-					<th>Start</th>
+					<!--<th>Start</th>
 					<th>Completion</th>
-					<th>Duration</th>
+					<th>Duration</th> -->
+					<th>Start - Completion</th>
 					<th>Type</th>
 					<th>Value 
 					<input type="hidden" name="moveBundleId" id="moveBundleId" value="${moveBundleInstance?.id}" />
@@ -206,7 +255,7 @@
 				</tr>
 			</thead>
 			<tbody id="commetAndNewsBodyId">
-		        <g:each in="${ dashboardSteps }"	status="i" var="dashboardStep">
+			<g:each in="${ dashboardSteps }"	status="i" var="dashboardStep">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}" id="commentsRowId_${dashboardStep.step.id }">
 							<td>
 								${dashboardStep.step.name}
@@ -218,83 +267,74 @@
 									onclick="enableInput(${dashboardStep.step.id })" checked="checked"/>
 								</td>
 								<td>
-									<span id="labelText_${dashboardStep.step.id }" title="text" style="display: none;" >${dashboardStep.moveBundleStep?.label}</span>
-									<span id="labelInput_${dashboardStep.step.id }" title="input">
+									<div id="labelText_${dashboardStep.step.id }" title="text" style="display: none;" >${dashboardStep.moveBundleStep?.label}</div>
+									<div id="labelInput_${dashboardStep.step.id }" title="input">
 									<input type="text" name="dashboardLabel_${dashboardStep.step.id }" id="dashboardLabel_${dashboardStep.step.id }" 
 									value="${dashboardStep.moveBundleStep?.label ? dashboardStep.moveBundleStep?.label : dashboardStep.step.name}"/>
-									</span>
+									</div>
 								</td>
 								<td>
-								<span id="startTimeText_${dashboardStep.step.id }" title="text" style="display: none;" >
-									<tds:convertDateTime date="${dashboardStep.moveBundleStep?.planStartTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
-								</span>
-								
-								<span id="startTimeInput_${dashboardStep.step.id }" title="input">
-				                  <script type="text/javascript">
-				                    $(document).ready(function(){
-				                      $("#startTime_${dashboardStep.step.id }").datetimepicker();
-				                    });
-				                  </script>
-									<input type="text" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }"
-									value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
-									onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })"/>
-								</span>
-								<span id="startTimeImg_${dashboardStep.step.id }" style="display: none;" title=""><img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}"></span>
+								<div id="startTimeInput_${dashboardStep.step.id }" title="input">
+									<table>
+										<tr><td style="padding: 0 6px;width: 300px;">
+										<input type="hidden" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }"
+											value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"/>
+										<input type="hidden" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }"
+											value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planCompletionTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"/>
+										<div id="slider_${dashboardStep.step.id }"></div>
+										<script type="text/javascript">
+											$(function() {
+												$("#slider_${dashboardStep.step.id }").slider({
+													range: true,
+													min: 0,
+													max: maxDuration,
+													step:5,
+													values: [getDuration($("#startTime_${dashboardStep.step.id }").val()),
+													         getDuration($("#completionTime_${dashboardStep.step.id }").val())],
+													slide: function(event, ui) {
+														$("#show_${dashboardStep.step.id }").html( showSliderInput("start", "${dashboardStep.step.id }", ui.values[0])+" - "+showSliderInput("completion","${dashboardStep.step.id }", ui.values[1]));
+													}
+												});
+											});
+										</script>
+										</td>
+										<td id="show_${dashboardStep.step.id }" style="text-align: center;padding: 0 6px" nowrap="nowrap">
+											<script type="text/javascript">
+												$("#show_${dashboardStep.step.id }").html(convertToTimeFormat( new Date( $("#startTime_${dashboardStep.step.id }").val() ) )+" - "+convertToTimeFormat(new Date( $("#completionTime_${dashboardStep.step.id }").val() ) ))
+											</script>
+										</td>
+										</tr>
+									</table>
+								</div>
 								</td>
 								<td>
-								<span id="completionTimeText_${dashboardStep.step.id }" title="text" style="display: none;" >
-									<tds:convertDateTime date="${dashboardStep.moveBundleStep?.planCompletionTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
-								</span>
-								
-								<span id="completionTimeInput_${dashboardStep.step.id }" title="input">
-				                  <script type="text/javascript">
-				                    $(document).ready(function(){
-				                      $("#completionTime_${dashboardStep.step.id }").datetimepicker();
-				                    });
-				                  </script>
-									<input type="text" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }" 
-									value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planCompletionTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
-									onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id })"/>
-								</span>
-								<span id="completionTimeImg_${dashboardStep.step.id }" style="display: none;" title=""><img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}"></span>
-								</td>
-								<td>
-								<span id="durationText_${dashboardStep.step.id }" title="text" style="display: none;" >
-								<tds:formatIntoHHMMSS value="${dashboardStep.moveBundleStep?.planDuration}"/> </span>
-								
-								<span id="durationInput_${dashboardStep.step.id }" title="input">
-									<input type="text" id="duration_${dashboardStep.step.id }"	style="width: 60px;"
-									value="<tds:formatIntoHHMMSS value="${dashboardStep.moveBundleStep?.planDuration}"/>"	onchange="changeCompletionTime(this.value, ${dashboardStep.step.id })"/>
-								</span>
-								</td>
-								<td>
-									<span id="calcMethodText_${dashboardStep.step.id }" title="text" style="display: none;" >
+									<div id="calcMethodText_${dashboardStep.step.id }" title="text" style="display: none;" >
 									<g:if test="${dashboardStep.moveBundleStep}"><g:if test="${dashboardStep.moveBundleStep?.calcMethod != 'L'}">Manual</g:if>
 									<g:else>Linear</g:else></g:if>
-									</span>
-									<span id="calcMethodInput_${dashboardStep.step.id }" title="input">
+									</div>
+									<div id="calcMethodInput_${dashboardStep.step.id }" title="input">
 										<g:select from="${['L', 'M']}" valueMessagePrefix="step.calcMethod" name="calcMethod_${dashboardStep.step.id }"
 										value="${dashboardStep.moveBundleStep?.calcMethod}" onchange="showTaskCompleted(this.value, ${dashboardStep.step.id })"/>
-									</span>
+									</div>
 								</td>
 								<td>
 									<g:if  test="${dashboardStep.moveBundleStep?.calcMethod == 'M'}">
-										<span id="tasksCompletedInput_${dashboardStep.step.id }" title="input">
+										<div id="tasksCompletedInput_${dashboardStep.step.id }" title="input">
 											<input type="text" name="tasksCompleted_${dashboardStep.step.id }" style="width: 25px;" value="${dashboardStep.stepSnapshot?.tasksCompleted}" 
 											id="tasksCompleted_${dashboardStep.step.id }" maxlength="3"  onchange="validateManulaValue(this.value, ${dashboardStep.step.id })"/>%
-										</span>
-										<span id="stepValueImg_${dashboardStep.step.id }" style="display: none;" title="">
+										</div>
+										<div id="stepValueImg_${dashboardStep.step.id }" style="display: none;" title="">
 											<img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}">
-										</span>
+										</div>
 									</g:if>
 									<g:else>
-										<span id="tasksCompletedInput_${dashboardStep.step.id }" title="input" style="display: none;">
+										<div id="tasksCompletedInput_${dashboardStep.step.id }" title="input" style="display: none;">
 											<input type="text" name="tasksCompleted_${dashboardStep.step.id }" style="width: 25px;" value="" 
 											id="tasksCompleted_${dashboardStep.step.id }" maxlength="3"  onchange="validateManulaValue(this.value, ${dashboardStep.step.id })"/>%
-										</span>
-										<span id="stepValueImg_${dashboardStep.step.id }" style="display: none;" title="">
+										</div>
+										<div id="stepValueImg_${dashboardStep.step.id }" style="display: none;" title="">
 											<img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}">
-										</span>
+										</div>
 									</g:else>
 								</td>
 							</g:if>
@@ -304,76 +344,60 @@
 									onclick="enableInput(${dashboardStep.step.id })"/>
 								</td>
 								<td>
-									<span id="labelText_${dashboardStep.step.id }" title="text">${dashboardStep.moveBundleStep?.label}</span>
-									<span id="labelInput_${dashboardStep.step.id }" style="display: none;" title="input">
+									<div id="labelText_${dashboardStep.step.id }" title="text">${dashboardStep.moveBundleStep?.label}</div>
+									<div id="labelInput_${dashboardStep.step.id }" style="display: none;" title="input">
 									<input type="text" name="dashboardLabel_${dashboardStep.step.id }" id="dashboardLabel_${dashboardStep.step.id }" 
 									value="${dashboardStep.moveBundleStep?.label ? dashboardStep.moveBundleStep?.label : dashboardStep.step.name}"/>
-									</span>
+									</div>
 								</td>
 								<td>
-									<span id="startTimeText_${dashboardStep.step.id }" title="text">
-										<tds:convertDateTime date="${dashboardStep.moveBundleStep?.planStartTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
-									</span>
-									
-									<span id="startTimeInput_${dashboardStep.step.id }" style="display: none;" title="input">
-					                  <script type="text/javascript">
-					                    $(document).ready(function(){
-					                      $("#startTime_${dashboardStep.step.id }").datetimepicker();
-					                    });
-					                  </script>
-										<input type="text" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }"
-										value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
-										onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id },'startTimeImg')"/>
-									</span>
-									<span id="startTimeImg_${dashboardStep.step.id }" style="display: none;" title="">
-										<img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}">
-									</span>
-									
+									<div id="startTimeInput_${dashboardStep.step.id }" style="display: none;" title="input">
+					                  <table>
+										<tr><td style="padding: 0 6px;width: 300px;">
+										<input type="hidden" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }" 
+											value="<tds:convertDateTime date='${moveBundleInstance?.startTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"/>
+										<input type="hidden" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }" 
+											value="<tds:convertDateTime date='${moveBundleInstance?.completionTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"/>
+										<div id="slider_${dashboardStep.step.id }"></div>
+										<script type="text/javascript">
+											$(function() {
+												$("#slider_${dashboardStep.step.id }").slider({
+													range: true,
+													min: 0,
+													max: maxDuration,
+													step:5,
+													values: [0, maxDuration],
+													slide: function(event, ui) {
+														$("#show_${dashboardStep.step.id }").html( showSliderInput("start", "${dashboardStep.step.id }", ui.values[0])+" - "+showSliderInput("completion","${dashboardStep.step.id }", ui.values[1]));
+													}
+												});
+											});
+										</script>
+										</td>
+										<td id="show_${dashboardStep.step.id }" style="text-align: center;padding: 0 6px" nowrap="nowrap"></td>
+										</tr>
+										<tr><td></td> </tr>
+									</table>
+									</div>
 								</td>
 								<td>
-									<span id="completionTimeText_${dashboardStep.step.id }" title="text">
-										<tds:convertDateTime date="${dashboardStep.moveBundleStep?.planCompletionTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
-									</span>
-									
-									<span id="completionTimeInput_${dashboardStep.step.id }" style="display: none;" title="input">
-					                  <script type="text/javascript">
-					                    $(document).ready(function(){
-					                      $("#completionTime_${dashboardStep.step.id }").datetimepicker();
-					                    });
-					                  </script>
-										<input type="text" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }" 
-										value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planCompletionTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
-										onchange="getTimeFormate(this.id, this.value, ${dashboardStep.step.id },'completionTimeImg')"/>
-									</span>
-									<span id="completionTimeImg_${dashboardStep.step.id }" style="display: none;" title=""><img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}"></span>
-								</td>
-								<td>
-								<span id="durationText_${dashboardStep.step.id }" title="text">
-								<tds:formatIntoHHMMSS value="${dashboardStep.moveBundleStep?.planDuration}"/> </span>
-								
-								<span id="durationInput_${dashboardStep.step.id }" style="display: none;" title="input">
-									<input type="text" id="duration_${dashboardStep.step.id }"	style="width: 60px;"
-									value="<tds:formatIntoHHMMSS value="${dashboardStep.moveBundleStep?.planDuration}"/>"	onchange="changeCompletionTime(this.value, ${dashboardStep.step.id })"/>
-								</span>
-								</td>
-								<td>
-								<span id="calcMethodText_${dashboardStep.step.id }" title="text">
+								<div id="calcMethodText_${dashboardStep.step.id }" title="text">
 								<g:if test="${dashboardStep.moveBundleStep}"><g:if test="${dashboardStep.moveBundleStep?.calcMethod != 'L'}">Manual</g:if>
 								<g:else>Linear</g:else></g:if>
-								</span>
-								<span id="calcMethodInput_${dashboardStep.step.id }" style="display: none;" title="input">
+								</div>
+								<div id="calcMethodInput_${dashboardStep.step.id }" style="display: none;" title="input">
 									<g:select from="${['L', 'M']}" valueMessagePrefix="step.calcMethod" name="calcMethod_${dashboardStep.step.id }"
 									value="${dashboardStep.moveBundleStep?.calcMethod}" onchange="showTaskCompleted(this.value, ${dashboardStep.step.id })"/>
-								</span>
+								</div>
 								</td>
 								<td>
-									<span style="display: none;" id="tasksCompletedInput_${dashboardStep.step.id }" title="input">
+									<div style="display: none;" id="tasksCompletedInput_${dashboardStep.step.id }" title="input">
 										<input type="text" name="tasksCompleted_${dashboardStep.step.id }" style="width: 25px;" value="${dashboardStep.stepSnapshot?.tasksCompleted}" 
 											id="tasksCompleted_${dashboardStep.step.id }" maxlength="3" onchange="validateManulaValue(this.value, ${dashboardStep.step.id })" />%
-									</span>
-									<span id="stepValueImg_${dashboardStep.step.id }" style="display: none;" title="">
+									</div>
+									<div id="stepValueImg_${dashboardStep.step.id }" style="display: none;" title="">
 										<img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}">
-									</span>
+									</div>
 								</td>								
 							</g:else>	
 					</tr>
@@ -409,22 +433,19 @@
 		}
 		
 	}
+	/*
+	Will enable the step input fields when user select the checkbox.
+	*/
 	function enableInput( stepId){
 		if($("#checkbox_"+stepId ).is(':checked')){
 			$("#labelText_"+stepId ).hide();
 			$("#labelInput_"+stepId ).show();
-			$("#startTimeText_"+stepId ).hide();
 			$("#startTimeInput_"+stepId ).show();
-			if($("#startTime_"+stepId ).hasClass(".field_error")){
-				$("#startTimeImg_"+stepId ).show();
-			}
-			$("#completionTimeText_"+stepId ).hide();
-			$("#completionTimeInput_"+stepId ).show();
-			if($("#completionTime_"+stepId ).hasClass(".field_error")){
-				$("#completionTimeImg_"+stepId ).show();
-			}
-			$("#durationText_"+stepId ).hide();
-			$("#durationInput_"+stepId ).show();
+			
+			$("#startTime_"+stepId ).val($("#startTime").val())
+			$("#completionTime_"+stepId ).val($("#completionTime").val())
+			$("#show_"+stepId ).html(convertToTimeFormat( new Date( $("#startTime").val() ) )+" - "+convertToTimeFormat(new Date( $("#completionTime").val() ) ))
+
 			$("#calcMethodText_"+stepId ).hide();
 			$("#calcMethodInput_"+stepId ).show();
 			if($("#calcMethod__"+stepId) == "M"){
@@ -436,18 +457,7 @@
 		} else {
 			$("#labelText_"+stepId ).show();
 			$("#labelInput_"+stepId ).hide();
-			$("#startTimeText_"+stepId ).show();
 			$("#startTimeInput_"+stepId ).hide();
-			$("#startTime_"+stepId ).val("");
-			$("#startTime_"+stepId ).removeClass("field_error");
-			$("#startTimeImg_"+stepId ).hide();
-			$("#completionTimeText_"+stepId ).show();
-			$("#completionTimeInput_"+stepId ).hide();
-			$("#completionTime_"+stepId ).val("");
-			$("#completionTime_"+stepId ).removeClass("field_error");
-			$("#completionTimeImg_"+stepId ).hide();
-			$("#durationText_"+stepId ).show();
-			$("#durationInput_"+stepId ).hide();
 			$("#calcMethodText_"+stepId ).show();
 			$("#calcMethodInput_"+stepId ).hide();
 			$("#tasksCompletedText_"+stepId ).show();
@@ -463,104 +473,30 @@
 			$("#tasksCompletedInput_"+stepId ).hide();
 		}
     }
-    function calculateDuration( stepId ){
-        var bundleStart = $("#startTime").val();
-        var bundleCompletion = $("#completionTime").val();
-        if(bundleStart && bundleCompletion){
-        	var start = $("#startTime_"+stepId).val();
-            var completion = $("#completionTime_"+stepId).val();
-            var startTime
-            var completionTime
-            var bundleStartTime = new Date( bundleStart ).getTime()
-            var bundleCompletionTime = new Date( bundleCompletion ).getTime()
-            if(start){
-            	startTime = new Date( start ).getTime();
-            	if(bundleStartTime > startTime || bundleCompletionTime < startTime){
-            		<%--alert("Step Start Time should be in between Bundle Start Time and Completion Time.");
-    				 $("#startTime_"+stepId).val(""); --%>
-    				$("#startTime_"+stepId).addClass("field_error");
-    				$("#startTimeImg_"+stepId).attr("title","Step Start Time should be in between Bundle Start Time and Completion Time.")
-    				$("#startTimeImg_"+stepId).show()
-    				//return;
-            	} else {
-            		if( objRegExp.test( start ) ){
-	            		$("#startTime_"+stepId).removeClass("field_error");
-	    				$("#startTimeImg_"+stepId).hide()
-            		}
-            	}
-            }
-            if(completion){
-            	completionTime = new Date( completion ).getTime();
-            	if(bundleStartTime > completionTime || bundleCompletionTime < completionTime){
-            		<%-- alert("Step Completion Time should be in between Bundle Start Time and Completion Time.");
-    				$("#completionTime_"+stepId).val(""); --%>
-    				$("#completionTime_"+stepId).addClass("field_error");
-    				$("#completionTimeImg_"+stepId).attr("title","Step Completion Time should be in between Bundle Start Time and Completion Time.")
-    				$("#completionTimeImg_"+stepId).show();
-    				return;
-            	} else {
-            		if( objRegExp.test( completion ) ){
-	            		$("#completionTime_"+stepId).removeClass("field_error");
-	    				$("#completionTimeImg_"+stepId).hide()
-            		}
-            	}
-            }
-        	
-        	
-	        if(completion && start){
-	        	var duration
-	            if(completionTime > startTime){
-	            	duration = completionTime - startTime
-	            	$("#completionTime_"+stepId).removeClass("field_error");
-	                $("#completionTimeImg_"+stepId).hide();    
-	            } else {
-	                //alert("Completion Time should be greater than Start Time");
-	                $("#completionTime_"+stepId).addClass("field_error");
-	                $("#completionTimeImg_"+stepId).attr("title","Completion Time should be greater than Start Time.")
-	                $("#completionTimeImg_"+stepId).show();
-	            	return;
-	            }
-	            if(duration){
-	            	$("#duration_"+stepId).val(convertIntoHHMM(duration / 1000))
-	            	$("#duration_"+stepId).focus()
-	            }
-	        }
+    /*
+    	Change the minuits into HH:MM ap formate
+    */
+    function showSliderInput( type, stepId, minuits ){
+        var date
+        if(type =="start"){
+        	var startTime = new Date($("#startTime").val())
+        	date = convertToTimeFormat(new Date(startTime.getTime() + minuits * 60000 ))
+        	$("#startTime_"+stepId).val(convertDate(new Date(startTime.getTime() + minuits * 60000 )))
         } else {
-        	alert("Bundle Start Time and Completion Time should not be blank");
-			return;
+        	var completionTime = new Date($("#completionTime").val())
+        	minuits = minuits - maxDuration
+        	date = convertToTimeFormat(new Date(completionTime.getTime() + minuits * 60000 ))
+        	$("#completionTime_"+stepId).val(convertDate(new Date(completionTime.getTime() + minuits * 60000 )))
         }
-    } 
-    function convertIntoHHMM( seconds ){
-    	var timeFormate 
-	    var hours = parseInt(seconds / 3600) 
-	    	timeFormate = hours >= 10 ? hours : '0'+hours
-	    var minutes =  parseInt((seconds % 3600 ) / 60 )
-	    	timeFormate += ":"+(minutes >= 10 ? minutes : '0'+minutes)
-	    	return timeFormate
+        return date
     }
-    function changeCompletionTime(time, stepId){
-        var timeArr = time.split(":")
-        var hours = timeArr[0]
-        var min = timeArr[1]
-        if(hours  && min){
-            var ms = (3600000 * hours ) + (60000 * min)
-        }
-        var startTimeString = $("#startTime_"+stepId).val()
-        if(startTimeString){
-	        var completionTime = new Date( startTimeString )
-    	    var updatedTime = new Date(completionTime.getTime() + ms)
-    		$("#completionTime_"+stepId).val( convertDate( updatedTime ))
-        }
-    }
-    function getTimeFormate( objId, dateString, stepId , imgId)
-	{
-    	if(dateString && isValidDate(dateString, objId, imgId+"_"+stepId)){
-	    	//var date= new Date(dateString)
-			//$("#"+objId).val(convertDate( date ))
-		   	calculateDuration(stepId);
-    	}
-	   
+	function getDuration( dateString ){
+		var dateTime = new Date(dateString).getTime()
+		var startTime = new Date($("#startTime").val()).getTime()
+		var duration = (dateTime - startTime) / 60000
+		return duration 
 	}
+    
 	function convertDate( date ){
 		var timeString = ""
 		var month =  date.getMonth();
@@ -586,33 +522,39 @@
 			var timeString = month+"/"+monthday+"/"+year+" "+hour + ':' + minute + ' ' + ap;
 		}
 		return timeString
-	}
+	} 
 	var objRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([APap][Mm])$/;
     function validateStepsData(){
         var checked = true
         var keyOffStep = ""
 		var message = ""
         var uncheckedSteps = new Array()
+        var bundleStart = $("#startTime").val()
+        var bundleStartTime = bundleStart ? new Date(bundleStart).getTime() : new Date().getTime()
+                	
+        var bundleCompletion = $("#completionTime").val()
+        var bundleCompletionTime = bundleCompletion ? new Date(bundleCompletion).getTime() : new Date().getTime()
+                	
     	$("input[type='checkbox']").each(function(){
     		  var id = $(this).attr("id")
 	    	  if($(this).is(':checked') ){
 		    	  var stepId = id.substring(9,id.length)
 		    	  var dashboardLabel = $("#dashboardLabel_"+stepId).val()
-		    	  var startTime = $("#startTime_"+stepId).val();
-		    	  var completionTime = $("#completionTime_"+stepId).val()
-		    	  if( !$("#dashboardLabel_"+stepId).val() || !startTime || !completionTime ){
+		    	  var startTime = new Date($("#startTime_"+stepId).val()).getTime();
+		    	  var completionTime = new Date($("#completionTime_"+stepId).val()).getTime()
+		    	  // any step start/completion time that is earlier/later than the bundle start/completion should be changed to the bundle start/completion
+		    	  if( startTime < bundleStartTime ){
+		    		  $("#startTime_"+stepId).val(bundleStart)
+	  	    	  } else if( completionTime > bundleCompletionTime){
+	  	    		  $("#completionTime_"+stepId).val(bundleCompletion)
+	  	    	  }
+	  	    	  
+		    	  if( !$("#dashboardLabel_"+stepId).val()){
 				  	  checked =  false;
-				      message ="Dashboard Label, Start & Completion times are mandatory for selected key off steps";
+				      message ="Dashboard Labels are mandatory for selected key off steps";
 					  return false;
-		    	  } else if( !objRegExp.test( startTime ) || !objRegExp.test( completionTime ) ) {
-				      checked =  false;
-				      message = "Dates should be in 'mm/dd/yyyy hh:mm' format. Please correct highlighted fields before saving.";
-			    	  return false;
-		    	  } else if( $(".field_error").length > 0 ){
-				      checked =  false;
-				      message = "Date/Time entry problem. Please correct highlighted fields before saving.";
-			    	  return false;
 		    	  }
+		    	  
 	    	  } else {
 	    		  uncheckedSteps.push(id.substring(id.indexOf("_")+1,id.length));
 	    	  }
@@ -654,9 +596,30 @@
           	$("#"+imgObj).attr("title","Date should be in 'mm/dd/yyyy HH:MM AM/PM' format")
           	$("#"+imgObj).show();
           	returnVal  =  false;
-      	} else {
+      	} else if(date){
       		$("#"+objId).removeClass("field_error");
       		$("#"+imgObj).hide();
+      		var objDateinMs =  new Date(date).getTime()
+      		var alertMess
+      		 maxDuration = calculateMaxDuration()
+      		$("input[type='checkbox']").each(function(){
+  	    	  if($(this).is(':checked') ){
+  	    		  var id = $(this).attr("id")
+  		    	  var stepId = id.substring(9,id.length)
+  		    	  var dateTime = new Date($("#"+objId+"_"+stepId).val()).getTime();
+  		    	  if(objId =="startTime" && dateTime < objDateinMs){
+  		    		$("#show_"+stepId).html( showSliderInput("start", stepId, 0)+" - "+showSliderInput("completion",stepId, maxDuration));
+  		    		alertMess = "Step start times will be changed to the bundle start"
+  	    	  	  } else if(objId =="completionTime" && dateTime > objDateinMs){
+  	    	  		$("#show_"+stepId).html( showSliderInput("start", stepId, 0)+" - "+showSliderInput("completion",stepId, maxDuration));
+  	    	  		alertMess = "Step completion times will be changed to the bundle completion"
+  	    	  	  }
+  		    	$("#slider_"+stepId).slider( "option", "max", maxDuration );
+  	    	  }
+  	    	});
+      		if(alertMess){
+          		alert(alertMess)
+      		}
       	}
       	return returnVal;
 	}
