@@ -551,9 +551,9 @@
 	  	    		  $("#completionTime_"+stepId).val(bundleCompletion)
 	  	    	  }
 	  	    	  
-		    	  if( !$("#dashboardLabel_"+stepId).val()){
+		    	  if( !$("#dashboardLabel_"+stepId).val() || !$("#startTime_"+stepId).val() || !$("#completionTime_"+stepId).val()){
 				  	  checked =  false;
-				      message ="Dashboard Labels are mandatory for selected key off steps";
+				      message ="Dashboard Labels, Step times are mandatory for selected key off steps";
 					  return false;
 		    	  }
 		    	  
