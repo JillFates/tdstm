@@ -14,7 +14,6 @@
 
 	
     <script type="text/javascript">
-	     var maxDuration = calculateMaxDuration()
 	     function initialize(){
 	     	// This is called when the page loads to initialize Managers
 	     	$('#moveManagerId').val('${moveManager}');
@@ -24,9 +23,9 @@
 	    	function to calculate the bundle duration to adjust the slider
 	    */ 
 		function calculateMaxDuration(){
-			var start = ${moveBundleInstance?.startTime?.getTime()}
+			var start = new Date($("#startTime").val()).getTime()
 				
-			var completion = ${moveBundleInstance?.completionTime?.getTime()}
+			var completion = new Date($("#completionTime").val()).getTime()
 			var startTime = 0
 			var completionTime = 300000
 			if(start){
@@ -217,7 +216,7 @@
                   </g:hasErrors>
                 </td>
               </tr>
-
+			
             </tbody>
           </table>
         </div>
@@ -230,6 +229,7 @@
         </div>
       <g:javascript>
         initialize();
+        var maxDuration = calculateMaxDuration()
       </g:javascript>
     </div>
     <div class="body" style="margin: 0;">
@@ -445,7 +445,9 @@
 			$("#startTime_"+stepId ).val($("#startTime").val())
 			$("#completionTime_"+stepId ).val($("#completionTime").val())
 			$("#show_"+stepId ).html(convertToTimeFormat( new Date( $("#startTime").val() ) )+" - "+convertToTimeFormat(new Date( $("#completionTime").val() ) ))
-
+			$("#slider_"+stepId).slider( "option", "max", maxDuration );
+			$("#slider_"+stepId).slider( "option", "values", [getDuration($("#startTime_"+stepId).val()), getDuration($("#completionTime_"+stepId).val())] );
+			
 			$("#calcMethodText_"+stepId ).hide();
 			$("#calcMethodInput_"+stepId ).show();
 			if($("#calcMethod__"+stepId) == "M"){
@@ -601,21 +603,39 @@
       		$("#"+imgObj).hide();
       		var objDateinMs =  new Date(date).getTime()
       		var alertMess
-      		 maxDuration = calculateMaxDuration()
+      		maxDuration = calculateMaxDuration()
       		$("input[type='checkbox']").each(function(){
-  	    	  if($(this).is(':checked') ){
-  	    		  var id = $(this).attr("id")
-  		    	  var stepId = id.substring(9,id.length)
-  		    	  var dateTime = new Date($("#"+objId+"_"+stepId).val()).getTime();
-  		    	  if(objId =="startTime" && dateTime < objDateinMs){
-  		    		$("#show_"+stepId).html( showSliderInput("start", stepId, 0)+" - "+showSliderInput("completion",stepId, maxDuration));
-  		    		alertMess = "Step start times will be changed to the bundle start"
-  	    	  	  } else if(objId =="completionTime" && dateTime > objDateinMs){
-  	    	  		$("#show_"+stepId).html( showSliderInput("start", stepId, 0)+" - "+showSliderInput("completion",stepId, maxDuration));
-  	    	  		alertMess = "Step completion times will be changed to the bundle completion"
-  	    	  	  }
-  		    	$("#slider_"+stepId).slider( "option", "max", maxDuration );
-  	    	  }
+  	    		if($(this).is(':checked') ){
+  	    			var id = $(this).attr("id")
+  		    	  	var stepId = id.substring(9,id.length)
+  		    	  	var stepStartTime = new Date($("#startTime_"+stepId).val()).getTime();
+  	    		  	var stepCompletionTime = new Date($("#completionTime_"+stepId).val()).getTime();
+  		    	  	if(objId =="startTime" ){
+  	  		    		if( stepStartTime < objDateinMs){
+		  		    		$("#show_"+stepId).html( convertToTimeFormat( new Date( $("#startTime").val()) )+" - "+convertToTimeFormat( new Date( $("#completionTime_"+stepId).val()) ) );
+		  		    		$("#startTime_"+stepId).val( $("#startTime").val() )
+	  			    		alertMess = "Step start times will be changed to the bundle start"
+  	  			   		}
+  	  		    		if( stepCompletionTime < objDateinMs){
+  	  		    			$("#show_"+stepId).html( convertToTimeFormat( new Date( $("#startTime_"+stepId).val() ) )+" - "+convertToTimeFormat( new Date( $("#completionTime").val()) ) );
+  	  		    			$("#completionTime_"+stepId).val( $("#completionTime").val() )
+  	  		    			alertMess = "Step completion times will be changed to the bundle completion"
+   	  		    	  	}
+  	    	  	  	} else if(objId =="completionTime"){
+  	  	    	  		if(stepCompletionTime > objDateinMs){
+	  	  	    	  		$("#show_"+stepId).html( convertToTimeFormat( new Date( $("#startTime_"+stepId).val()) )+" - "+convertToTimeFormat( new Date( $("#completionTime").val()) ) );
+	  		    			$("#completionTime_"+stepId).val( $("#completionTime").val() )
+	  	    	  			alertMess = "Step completion times will be changed to the bundle completion"
+	  	    	  	  	}
+  	  	    	  		if(stepStartTime > objDateinMs){
+	  	  	    	  		$("#show_"+stepId).html( convertToTimeFormat( new Date( $("#startTime").val()) )+" - "+convertToTimeFormat( new Date( $("#completionTime_"+stepId).val()) ) );
+	  		    			$("#startTime_"+stepId).val( $("#startTime").val() )
+	  	    	  			alertMess = "Step start times will be changed to the bundle start"
+	  	    	  	  	}
+  	    	  	  	}
+  		    		$("#slider_"+stepId).slider( "option", "max", maxDuration );
+  		    		$("#slider_"+stepId).slider( "option", "values", [getDuration($("#startTime_"+stepId).val()), getDuration($("#completionTime_"+stepId).val())] );
+  	    	  	}
   	    	});
       		if(alertMess){
           		alert(alertMess)
