@@ -59,6 +59,11 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
+	<td>name</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
 	<td>description</td>
 	<td></td>
 </tr>
@@ -79,6 +84,36 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
+	<td>projectPartnerId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>partnerImage</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>projectManagerId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>moveManagerId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>trackChanges</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>workflowCode</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
 	<td>//input[@value='Create']</td>
 	<td></td>
 </tr>
@@ -88,8 +123,73 @@
 	<td></td>
 </tr>
 <tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Cancel']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Show Project</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=New Project</td>
+	<td></td>
+</tr>
+<tr>
 	<td>verifyElementPresent</td>
 	<td>link=Project List</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Project List</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Project List</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.1</td>
+	<td>Project Code</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.2</td>
+	<td>Name</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.3</td>
+	<td>Date Created</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.4</td>
+	<td>Last Updated</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.5</td>
+	<td>Comment</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>submit</td>
+	<td></td>
+</tr>
+<tr>
+	<td>goBackAndWait</td>
+	<td></td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTitle</td>
+	<td>Create Project</td>
 	<td></td>
 </tr>
 <tr>
@@ -98,13 +198,53 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>projectPartnerId</td>
+	<td>verifyTable</td>
+	<td>//form[@id='createProjectForm']/div[1]/table.12.1</td>
+	<td>Y N</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='createProjectForm']/div[1]/table.1.0</td>
+	<td>exact:Client: *</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='createProjectForm']/div[1]/table.2.0</td>
+	<td>exact:Project Code: *</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='createProjectForm']/div[1]/table.3.0</td>
+	<td>exact:Project Name: *</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='createProjectForm']/div[1]/table.12.0</td>
+	<td>exact:Track Changes: *</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='createProjectForm']/div[1]/table.13.0</td>
+	<td>exact:Workflow Code: *</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Create']</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>partnerImage</td>
+	<td>verifyTable</td>
+	<td>//form[@id='createProjectForm']/div[1]/table.2.1</td>
+	<td>Project Code cannot be blank</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='createProjectForm']/div[1]/table.3.1</td>
+	<td>Project Name cannot be blank</td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Please select Workflow Code</td>
 	<td></td>
 </tr>
 <tr>
@@ -221,6 +361,11 @@
 	<td>verifyTitle</td>
 	<td>Show Project</td>
 	<td></td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//div[5]/div[1]</td>
+	<td>Project ${Pcode} : ${Pname} created</td>
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
