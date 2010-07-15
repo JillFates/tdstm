@@ -135,7 +135,6 @@ class ClientConsoleController {
 										stateType:stateEngineService.getStateType( projectInstance.workflowCode, 
                                                         stateEngineService.getState(projectInstance.workflowCode, transId))]
 			}
-			def htmlTdId = new StringBuffer()
 			/* user role check*/
 			def role = ""
 			def subject = SecurityUtils.subject
@@ -219,7 +218,6 @@ class ClientConsoleController {
                         cssClass='task_term'
                     }
                     htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass\"  >&nbsp;</td>"
-                    htmlTdId.append("${assetId+"_"+trans.transId},")
                 }
                 assetEntityList << [id: assetId, asset:it,transitions:htmlTd,checkVal:check]
 			}
@@ -234,7 +232,7 @@ class ClientConsoleController {
 				column1List:column1List, column2List:column2List,column3List:column3List, column4List:column4List,projectId:projectId, lastPoolTime : lastPoolTime,
                 processTransitionList:processTransitionList,projectId:projectId,column2Value:params.column2,column1Value:params.column1,
                 column3Value:params.column3,column4Value:params.column4,timeToUpdate:timeToUpdate ? timeToUpdate.CLIENT_CONSOLE_REFRESH : "never", 
-                headerCount:headerCount,browserTest:browserTest, myForm : params.myForm, htmlTdId:htmlTdId, role : role,
+                headerCount:headerCount,browserTest:browserTest, myForm : params.myForm, role : role,
                 moveEventInstance:moveEventInstance, moveEventsList:moveEventsList,
                 isAdmin:subject.hasRole("ADMIN"), isManager:subject.hasRole("MANAGER"), isProjManager:subject.hasRole("PROJ_MGR"),
 				columns:columns, assetsInView:assetsInView, totalAssets:totalAssets ]

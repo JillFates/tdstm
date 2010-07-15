@@ -620,9 +620,7 @@ function initialize(){
 			$("selectTimedId").val( 120000 );	
 		}
 }
-var timeInterval
-var fieldId
-	$(document).ready(function() {
+$(document).ready(function() {
 		$("#changeStatusDialog").dialog({ autoOpen: false })
 	    $("#showDialog").dialog({ autoOpen: false })
 	    $("#editDialog").dialog({ autoOpen: false })
@@ -632,57 +630,74 @@ var fieldId
 	    $("#editCommentDialog").dialog({ autoOpen: false })
 	    $("#showChangeStatusDialog").dialog({ autoOpen: false })	        
 	
-		var cells = "${htmlTdId}"
 		var role = "${role}"
-		var cellIds = "${htmlTdId}".split(",")
-		var cellsCount = cellIds.length - 1
-		for(i = 0; i < cellsCount; i++){
-			var cellId = cellIds[i] 
-			// Show menu when #myDiv is clicked
-			if(role && cells){
-				$("#"+cellId).contextMenu('transitionMenu', {
-					onShowMenu: function(e, menu) {
-						$(".cell-selected").attr('class',$("#cssClassId").val());
-						var cssname = $("#"+$(e.target).attr("id")).attr('class')
-						$("#cssClassId").val(cssname)
-						$("#"+$(e.target).attr("id")).attr("class","cell-selected")
-			      		${remoteFunction(action:'getMenuList', params:'\'id=\' + $(e.target).attr("id") ', onComplete:'updateMenu(e,menu)')};
-			        	return menu;
-			      	},
-					bindings: {
-		        		'done': function(t) {
-				       		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=done\'', onComplete:'updateTransitionRow(e)' )};
-				        },
-				        'ready': function(t) {
-				          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=ready\'', onComplete:'updateTransitionRow(e)' )};
-				        },
-				        'NA': function(t) {
-				          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=NA\'', onComplete:'updateTransitionRow(e)' )};
-				        },
-				        'pending': function(t) {
-				          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=pending\'', onComplete:'updateTransitionRow(e)' )};
-				        },
-				        'void': function(t) {
-				          	if(confirm("Undo this specific task and any dependent (workflow) transitions. Are you sure?")){
-				          		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=void\'', onComplete:'updateTransitionRow(e)' )};
-							} else {
-				          		return false
-				         	}
-				        },
-				        'noOptions': function(t){
-				        	$(".cell-selected").attr('class',$("#cssClassId").val());
-				        }
-			      	}
-		    	});
-			}
-			$("#"+cellId).mouseover(function(){
-				fieldId = this.id.toString()
-				timeInterval = setTimeout("${remoteFunction(controller:'assetEntity', action:'showStatus', params:'\'id=\'+fieldId', onComplete:'window.status = e.responseText')}",2000);
-			});
-			$("#"+cellId).mouseout(function(){
-				window.status = ""
-			});
+		if( role ){
+			$("tbody#assetListTbody tr td").contextMenu('transitionMenu', {
+				onShowMenu: function(e, menu) {
+					$(".cell-selected").attr('class',$("#cssClassId").val());					
+					var tdId = $(e.target).attr("id") 
+					if(!isNaN(tdId.split("_")[1])){
+					var cssname = $("#"+tdId).attr('class')
+					$("#cssClassId").val(cssname)
+					$("#"+tdId).attr("class","cell-selected")
+		      		${remoteFunction(action:'getMenuList', params:'\'id=\' + tdId', onComplete:'updateMenu(e,menu)')};
+					}
+		        	return menu;
+					
+		      	},
+				bindings: {
+	        		'done': function(t) {
+			       		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=done\'', onComplete:'updateTransitionRow(e)' )};
+			        },
+			        'ready': function(t) {
+			          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=ready\'', onComplete:'updateTransitionRow(e)' )};
+			        },
+			        'NA': function(t) {
+			          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=NA\'', onComplete:'updateTransitionRow(e)' )};
+			        },
+			        'pending': function(t) {
+			          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=pending\'', onComplete:'updateTransitionRow(e)' )};
+			        },
+			        'void': function(t) {
+			          	if(confirm("Undo this specific task and any dependent (workflow) transitions. Are you sure?")){
+			          		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=void\'', onComplete:'updateTransitionRow(e)' )};
+						} else {
+			          		return false
+			         	}
+			        },
+			        'noOptions': function(t){
+			        	$(".cell-selected").attr('class',$("#cssClassId").val());
+			        }
+		      	}
+	    	});
 		}
+		$("tbody#assetListTbody tr td").click(function () {
+	    	var tdId = $(this).attr("id")
+	    	if(!isNaN(tdId.split("_")[1])){
+		        if($("#bulkEditId").hasClass("bulkedit_active")){
+				    var action = $("#bulkActionId").val()
+				    switch (action){
+					    case "pending" :
+					    	${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=pending\'', onComplete:'updateTransitionRow(e)' )};
+						break;
+						case "done" :
+							${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=done\'', onComplete:'updateTransitionRow(e)' )};
+						break;
+						case "NA" :
+							${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=NA\'', onComplete:'updateTransitionRow(e)' )};
+						break;
+						case "void" :
+							${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=void\'', onComplete:'updateTransitionRow(e)' )};
+						break;	
+				    }
+		        } else {
+		        	${remoteFunction(controller:'assetEntity', action:'showStatus', params:'\'id=\'+tdId', onComplete:'window.status = e.responseText')}
+		        }
+	    	}
+	    });
+		$("tbody#assetListTbody tr td").mouseout(function(){
+			window.status = ""
+		}); 
 	});
 	var eventType = "load"
 	function cancelResize(){
@@ -1070,29 +1085,6 @@ var fieldId
 			break;	
 		}
 	}
-	$(document).ready(function() {
-	    $("tbody#assetListTbody tr td").click(function () {
-	        if($("#bulkEditId").hasClass("bulkedit_active")){
-			    var action = $("#bulkActionId").val()
-			    var tdId = $(this).attr("id")
-			    switch (action){
-				    case "pending" :
-				    	${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=pending\'', onComplete:'updateTransitionRow(e)' )};
-					break;
-					case "done" :
-						${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=done\'', onComplete:'updateTransitionRow(e)' )};
-					break;
-					case "NA" :
-						${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=NA\'', onComplete:'updateTransitionRow(e)' )};
-					break;
-					case "void" :
-						${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=void\'', onComplete:'updateTransitionRow(e)' )};
-					break;	
-			    }
-	        }
-	    });
-	});
-
 	/* 
 	 * Function to switch the Labels to Select list when user click on edit icon.
 	 */
