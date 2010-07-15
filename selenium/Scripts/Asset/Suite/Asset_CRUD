@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://ph1.tdsops.com/" />
+<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
 <title>Asset_CRUD</title>
 </head>
 <body>
@@ -11,6 +11,11 @@
 <thead>
 <tr><td rowspan="1" colspan="3">Asset_CRUD</td></tr>
 </thead><tbody>
+<tr>
+	<td>setSpeed</td>
+	<td>5000</td>
+	<td></td>
+</tr>
 <tr>
 	<td>open</td>
 	<td>/tdstm/auth/login</td>
@@ -63,19 +68,24 @@
 </tr>
 <!--Creating an Asset-->
 <tr>
+	<td>verifyElementPresent</td>
+	<td>//input[@value='New Asset Entity']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>click</td>
 	<td>//input[@value='New Asset Entity']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>attributeSetId</td>
 	<td></td>
 </tr>
 <tr>
 	<td>select</td>
 	<td>attributeSetId</td>
 	<td>label=Server</td>
-</tr>
-<tr>
-	<td>waitForPageToLoad</td>
-	<td></td>
-	<td></td>
 </tr>
 <tr>
 	<td>waitForTextPresent</td>
@@ -278,9 +288,24 @@
 	<td></td>
 </tr>
 <tr>
+	<td>verifyElementPresent</td>
+	<td>//input[@value='Create' and @type='submit']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>randomString</td>
 	<td>6|alphanumeric</td>
 	<td>assetName</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Create' and @type='submit']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertAlert</td>
+	<td>Please Enter Asset Name.</td>
+	<td></td>
 </tr>
 <tr>
 	<td>type</td>
@@ -288,14 +313,29 @@
 	<td>${assetName}</td>
 </tr>
 <tr>
+	<td>click</td>
+	<td>//input[@value='Create' and @type='submit']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertAlert</td>
+	<td>Please Enter Asset Tag.</td>
+	<td></td>
+</tr>
+<tr>
 	<td>type</td>
 	<td>shortNameId</td>
 	<td>test-asset-sname</td>
 </tr>
 <tr>
+	<td>randomString</td>
+	<td>6|alphanumeric</td>
+	<td>assetTag</td>
+</tr>
+<tr>
 	<td>type</td>
 	<td>assetTagId</td>
-	<td>test-asset-tag</td>
+	<td>${assetTag}</td>
 </tr>
 <tr>
 	<td>select</td>
@@ -454,7 +494,7 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>created</td>
+	<td>AssetEntity ${assetName} created</td>
 	<td></td>
 </tr>
 <!--Reading the Asset-->
@@ -679,7 +719,7 @@
 	<td>serialNo</td>
 </tr>
 <tr>
-	<td>clickAndWait</td>
+	<td>click</td>
 	<td>link=${assetName}</td>
 	<td></td>
 </tr>
@@ -948,22 +988,18 @@
 	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.0.1</td>
 	<td>${tRack}</td>
 </tr>
+<tr>
+	<td>click</td>
+	<td>//div[11]/div[1]/a/span</td>
+	<td></td>
+</tr>
 <!--Editing the asset-->
 <tr>
 	<td>click</td>
-	<td>//input[@value='Edit' and @type='button' and @onclick='return editAssetDialog()']</td>
+	<td>xpath=//html/body/div/div[5]/div/div/table/tbody/tr/td/a[node()='${assetName}']/preceding::td[2]/a</td>
 	<td></td>
 </tr>
-<tr>
-	<td>waitForPopUp</td>
-	<td></td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTitle</td>
-	<td>Asset Entity List</td>
-	<td></td>
-</tr>
+<!--This xpath is to click on the comment icon( xpath=//html/body/div/div[5]/div/div/table/tbody/tr/td/a[node()='${assetName}']/preceding::td[2]/a). It is not used here though.-->
 <tr>
 	<td>verifyTextPresent</td>
 	<td>Fields marked ( * ) are mandatory</td>
@@ -1430,7 +1466,7 @@
 	<td>test short name</td>
 </tr>
 <tr>
-	<td>clickAndWait</td>
+	<td>click</td>
 	<td>//input[@value='Update Asset Entity']</td>
 	<td></td>
 </tr>
@@ -1440,7 +1476,7 @@
 	<td></td>
 </tr>
 <tr>
-	<td>clickAndWait</td>
+	<td>click</td>
 	<td>link=${assetName}</td>
 	<td></td>
 </tr>
@@ -1466,7 +1502,117 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>deleted</td>
+	<td>AssetEntity ${assetName} deleted</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementNotPresent</td>
+	<td>link=${assetName}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='New Asset Entity']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>attributeSetId</td>
+	<td>label=Server</td>
+</tr>
+<tr>
+	<td>randomString</td>
+	<td>6|alphanumeric</td>
+	<td>assetName2</td>
+</tr>
+<tr>
+	<td>randomString</td>
+	<td>6|alphanumeric</td>
+	<td>assetTag2</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>assetNameId</td>
+	<td>${assetName2}</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>assetTagId</td>
+	<td>${assetTag2}</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Create' and @type='submit']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>AssetEntity ${assetName2} created</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Filter</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>filter.op.assetName</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>filter.op.assetName</td>
+	<td>label=Equal</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//option[@value='Equal']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>assetName</td>
+	<td>${assetName2}</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>_action_filter</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForPageToLoad</td>
+	<td></td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=${assetName2}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>_action_remove</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertConfirmation</td>
+	<td>Remove Asset from project, are you sure?</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>AssetEntity ${assetName2} Removed from Project</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementNotPresent</td>
+	<td>link=${assetName2}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>xpath=//html/body/div/div[5]/div/div/table/tbody/tr/td/a[node()='Asem2']/preceding::td[2]/span/a</td>
 	<td></td>
 </tr>
 
