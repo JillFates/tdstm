@@ -42,7 +42,12 @@ a:hover {
 			<td><g:link controller="model" style="color:black">Model</g:link></td>
 		</tr>
 		<tr>
-			<td colspan="2"><g:link controller="admin" action="orphanSummary" style="color:black">Manage Orphan Records</g:link></td>
+			<td><g:link controller="admin" action="orphanSummary" style="color:black">Manage Orphan Records</g:link></td>
+			<td><g:link controller="admin" action="latestUsers" style="color:black">Last 20 users</g:link></td>
+		</tr>
+		<tr>
+			<td><g:link controller="admin" action="currentLiveEvents" style="color:black">Current live events</g:link></td>
+			<td><g:link controller="admin" action="upcomingBundles" style="color:black">Upcoming bundles</g:link></td>
 		</tr>
 	</tbody>
 </table>
