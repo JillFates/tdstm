@@ -356,15 +356,8 @@
 }
 
 /* dash board vertical scroll for fire fox only */
-div.tableContainer {
-	overflow: auto;
-}
-
 div.tableContainer tbody {
-   width: 99%;
-   overflow-y: scroll;
-   overflow-x: hidden;
-   border: 1px solid gray;
+  border: 1px solid gray;
 }
 div.tableContainer tbody td{
    border-bottom: 1px solid #E8E8E8;
@@ -377,6 +370,10 @@ div.tableContainer thead th{
    border-right: 1px solid #F8F8F8;
    padding: 0px 6px;
 }
+div.tableContainer thead th a {
+  display:inline;
+}
+
 .buttonClean input {
 	background-color:#5F9FCF;
 	border:1px solid #328714;

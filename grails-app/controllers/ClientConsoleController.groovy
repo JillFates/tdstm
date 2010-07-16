@@ -217,7 +217,7 @@ class ClientConsoleController {
                     } else {
                         cssClass='task_term'
                     }
-                    htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass\"  >&nbsp;</td>"
+                    htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass tranCell\"  >&nbsp;</td>"
                 }
                 assetEntityList << [id: assetId, asset:it,transitions:htmlTd,checkVal:check]
 			}

@@ -10,19 +10,20 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dashboard.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tableTheme.css')}" />
 
 <g:javascript src="asset.tranman.js" />
 
-<style type="text/css">
-html, body {
-overflow: hidden;
-} 
+<style type="text/css" media="screen">
+	.tranCell {
+		width: 9px !important;
+	}
 </style>
+
 </head>
 <body >
 <div title="Change Status" id="changeStatusDialog"
 	style="background-color: #808080;display: none;">
-	<input type="hidden" id="cssClassId"/>
 <form name="changeStatusForm"><input type="hidden" name="asset"
 	id="asset" /> <input type="hidden" name="projectId" id="projectId"
 	value="${projectId}" />
@@ -52,7 +53,7 @@ overflow: hidden;
 </div>
 <div style="width:100%">
 <g:form	name="listForm" action="list" method="post">
-<div style="width: 100%;">
+<div id="consoleHeader" style="width: 100%;">
 	
 	<input type="hidden" id="role" value="${role}"/>
 	<input type="hidden" id="lastPoolTimeId" value="${lastPoolTime}"/>
@@ -132,125 +133,91 @@ overflow: hidden;
 
 </div>
 <g:if test="${browserTest}">
-<div class="tableContainerIE">
+<div id="tableContainer" class="tableContainerIE" style="margin-left: 5px">
 </g:if>
 <g:else>
-<div class="tableContainer">
+<div id="tableContainer" class="tableContainer" style="margin-left: 5px">
 </g:else>
 
-<table cellpadding="0"   cellspacing="0"  style="border:0px;" >
+<table cellpadding="0" cellspacing="0" style="border:0px;">
 	<thead>
 		<g:form action="list">
 		<tr>
-		 <th style="padding-top:35px;"><span>Actions</span><g:if test="${isAdmin || isManager || isProjManager}"> 
-		 <input type="button" value="State..." onclick="changeState()" title="Change State" style="width: 80px;"/>
-		 <a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a></g:if></th>
+			<th style="padding-top:35px;">
+				<span>Actions</span><br />
+				<g:if test="${isAdmin || isManager || isProjManager}"> 
+					<input type="button" value="State..." onclick="changeState()" title="Change State" style="width: 80px;"/><br />
+					<a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a>
+				</g:if>
+			</th>
+			
 			<th style="padding-top:35px;" >
-			<table style="border: 0px;">
-				<thead>
-				<tr style="background-color: #CCC">
-					<g:sortableColumn id="column1Label" style="border:0px;" property="${columns?.column1.field}"  title="${columns?.column1.label}" params="['projectId':projectId, moveEvent:moveEventInstance?.id, 'moveBundle':moveBundleInstance?.id,'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]"/>
-					<th style="border: 0px;">
-						<span id="column1Select" style="display: none;"><g:select from="${com.tdssrc.eav.EavEntityAttribute.findAll()?.attribute}" optionKey="attributeCode" optionValue="frontendLabel" name="column1Attribute"  value="${columns?.column1.field}"></g:select></span>
-						<span id="column1Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
-						<span id="column1Save" style="display: none;"><input type="submit" value="Save"/>&nbsp;<input type="button" value="X" onclick="changeToLabel('1')"/></span> 
-					</th>
-					</tr>
-				<tr style="background-color: #CCC">
-					<th style="border:0px;">
-						<select id="column1Id" name="column1" onchange="document.listForm.submit();" style="width: 120px;">
-							<option value="" selected="selected">All</option>
-							<g:each in="${column1List}" var="column1Obj">
-								<option value="${column1Obj.key ? column1Obj.key : 'blank'}">${column1Obj.key ? column1Obj.key : 'blank'}&nbsp;(${column1Obj.value})</option>
-							</g:each>
-						</select>
-					</th>
-				</tr>
-				</thead>
-			</table>
+				<tds:sortableLink id="column1Label" style="border:0px;" property="${columns?.column1.field}"  title="${columns?.column1.label}" params="['projectId':projectId, moveEvent:moveEventInstance?.id, 'moveBundle':moveBundleInstance?.id,'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]"/>
+				<span id="column1Select" style="display: none;"><g:select from="${com.tdssrc.eav.EavEntityAttribute.findAll()?.attribute}" optionKey="attributeCode" optionValue="frontendLabel" name="column1Attribute"  value="${columns?.column1.field}"></g:select></span>
+				<span id="column1Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
+				<span id="column1Save" style="display: none;"><input type="submit" value="Save"/>&nbsp;<input type="button" value="X" onclick="changeToLabel('1')"/></span> 
+				<br />
+					
+				<select id="column1Id" name="column1" onchange="document.listForm.submit();" style="width: 120px;">
+					<option value="" selected="selected">All</option>
+					<g:each in="${column1List}" var="column1Obj">
+						<option value="${column1Obj.key ? column1Obj.key : 'blank'}">${column1Obj.key ? column1Obj.key : 'blank'}&nbsp;(${column1Obj.value})</option>
+					</g:each>
+				</select>
 			</th>
 			<th style="padding-top:35px;">
-			<table style="border: 0px;">
-				<thead>
-				<tr style="background-color: #CCC">
-					<g:sortableColumn id="column2Label" style="border:0px;" property="${columns?.column2.field}"  title="${columns?.column2.label}" params="['projectId':projectId,moveEvent:moveEventInstance?.id, 'moveBundle':moveBundleInstance?.id, 'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]" />
-					<th style="border: 0px;">
-						<span id="column2Select" style="display: none;"><g:select from="${com.tdssrc.eav.EavEntityAttribute.findAll()?.attribute}" optionKey="attributeCode" optionValue="frontendLabel" name="column2Attribute" value="${columns?.column2.field}"></g:select></span>
-						<span id="column2Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
-						<span id="column2Save" style="display: none;"><input type="submit" value="Save"/>&nbsp;<input type="button" value="X" onclick="changeToLabel('2')"/></span> 
-					</th>
-				</tr>
-				<tr style="background-color: #CCC">
-					<th style="border:0px;">
-						<select id="column2Id" name="column2"	onchange="document.listForm.submit();" style="width: 120px;">
-							<option value="" selected="selected">All</option>
-							<g:each in="${column2List}" var="column2Obj">
-								<option value="${column2Obj.key ? column2Obj.key : 'blank'}">${column2Obj.key ? column2Obj.key : 'blank'}&nbsp;(${column2Obj.value})</option>	
-							</g:each>
-						</select>
-					</th>
-				</tr>
-				</thead>
-			</table>
+				<tds:sortableLink id="column2Label" style="border:0px;" property="${columns?.column2.field}"  title="${columns?.column2.label}" params="['projectId':projectId,moveEvent:moveEventInstance?.id, 'moveBundle':moveBundleInstance?.id, 'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]" />
+				<span id="column2Select" style="display: none;"><g:select from="${com.tdssrc.eav.EavEntityAttribute.findAll()?.attribute}" optionKey="attributeCode" optionValue="frontendLabel" name="column2Attribute" value="${columns?.column2.field}"></g:select></span>
+				<span id="column2Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
+				<span id="column2Save" style="display: none;"><input type="submit" value="Save"/>&nbsp;<input type="button" value="X" onclick="changeToLabel('2')"/></span> 
+				<br />
+
+				<select id="column2Id" name="column2"	onchange="document.listForm.submit();" style="width: 120px;">
+					<option value="" selected="selected">All</option>
+					<g:each in="${column2List}" var="column2Obj">
+						<option value="${column2Obj.key ? column2Obj.key : 'blank'}">${column2Obj.key ? column2Obj.key : 'blank'}&nbsp;(${column2Obj.value})</option>	
+					</g:each>
+				</select>
 			</th>
 			<th style="padding-top:35px;">
-			<table style="border: 0px;">
-				<thead>
-				<tr style="background-color: #CCC">
-					<g:sortableColumn id="column3Label" style="border:0px;" property="${columns?.column3.field}"  title="${columns?.column3.label}" params="['projectId':projectId, moveEvent:moveEventInstance?.id, 'moveBundle':moveBundleInstance?.id, 'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]"/>
-					<th style="border: 0px;">
-						<span id="column3Select" style="display: none;"><g:select from="${com.tdssrc.eav.EavEntityAttribute.findAll()?.attribute}" optionKey="attributeCode" optionValue="frontendLabel" name="column3Attribute" value="${columns?.column3.field}" ></g:select></span>
-						<span id="column3Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
-						<span id="column3Save" style="display: none;"><input type="submit" value="Save"/>&nbsp;<input type="button" value="X" onclick="changeToLabel('3')"/></span> 
-					</th>
-				</tr>
-				<tr style="background-color: #CCC">
-					<th style="border:0px;">
-						<select id="column3Id" name="column3" onchange="document.listForm.submit();" style="width: 120px;">
-							<option value="" selected="selected">All</option>
-							<g:each in="${column3List}" var="column3Obj">
-								<option value="${column3Obj.key ? column3Obj.key : 'blank'}">${column3Obj.key ? column3Obj.key : 'blank'}&nbsp;(${column3Obj.value})</option>	
-							</g:each>
-						</select>
-					</th>
-				</tr>
-				</thead>
-			</table>
+				<tds:sortableLink id="column3Label" style="border:0px;" property="${columns?.column3.field}"  title="${columns?.column3.label}" params="['projectId':projectId, moveEvent:moveEventInstance?.id, 'moveBundle':moveBundleInstance?.id, 'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]"/>
+				<span id="column3Select" style="display: none;"><g:select from="${com.tdssrc.eav.EavEntityAttribute.findAll()?.attribute}" optionKey="attributeCode" optionValue="frontendLabel" name="column3Attribute" value="${columns?.column3.field}" ></g:select></span>
+				<span id="column3Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
+				<span id="column3Save" style="display: none;"><input type="submit" value="Save"/>&nbsp;<input type="button" value="X" onclick="changeToLabel('3')"/></span> 
+				<br />
+
+				<select id="column3Id" name="column3" onchange="document.listForm.submit();" style="width: 120px;">
+					<option value="" selected="selected">All</option>
+					<g:each in="${column3List}" var="column3Obj">
+						<option value="${column3Obj.key ? column3Obj.key : 'blank'}">${column3Obj.key ? column3Obj.key : 'blank'}&nbsp;(${column3Obj.value})</option>	
+					</g:each>
+				</select>
 			</th>
 			<th style="padding-top:35px;">
-			<table style="border: 0px;">
-				<thead>
-				<tr style="background-color: #CCC">
-					<g:sortableColumn id="column4Label" style="border:0px;" property="${columns?.column4.field}"  title="${columns?.column4.label}" params="['projectId':projectId, moveEvent:moveEventInstance?.id, 'moveBundle':moveBundleInstance?.id, 'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]"/>
-					<th style="border: 0px;">
-						<span id="column4Select" style="display: none;"><g:select from="${com.tdssrc.eav.EavEntityAttribute.findAll()?.attribute}" optionKey="attributeCode" optionValue="frontendLabel" name="column4Attribute" value="${columns?.column4.field}" ></g:select></span>
-						<span id="column4Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
-						<span id="column4Save" style="display: none;"><input type="submit" value="Save"/>&nbsp;<input type="button" value="X" onclick="changeToLabel('4')"/></span> 
-					</th>
-				</tr>
-				<tr style="background-color: #CCC">
-					<th style="border:0px;">
-						<select id="column4Id" name="column4" onchange="document.listForm.submit();" style="width: 120px;">
-							<option value="" selected="selected">All</option>
-							<g:each in="${column4List}" var="column4Obj">
-								<option value="${column4Obj.key ? column4Obj.key : 'blank'}">${column4Obj.key ? column4Obj.key : 'blank'}&nbsp;(${column4Obj.value})</option>	
-							</g:each>
-						</select>
-					</th>
-				</tr>
-				</thead>
-			</table>
+				<tds:sortableLink id="column4Label" style="border:0px;" property="${columns?.column4.field}"  title="${columns?.column4.label}" params="['projectId':projectId, moveEvent:moveEventInstance?.id, 'moveBundle':moveBundleInstance?.id, 'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]"/>
+				<span id="column4Select" style="display: none;"><g:select from="${com.tdssrc.eav.EavEntityAttribute.findAll()?.attribute}" optionKey="attributeCode" optionValue="frontendLabel" name="column4Attribute" value="${columns?.column4.field}" ></g:select></span>
+				<span id="column4Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
+				<span id="column4Save" style="display: none;"><input type="submit" value="Save"/>&nbsp;<input type="button" value="X" onclick="changeToLabel('4')"/></span> 
+				<br />
+
+				<select id="column4Id" name="column4" onchange="document.listForm.submit();" style="width: 120px;">
+					<option value="" selected="selected">All</option>
+					<g:each in="${column4List}" var="column4Obj">
+						<option value="${column4Obj.key ? column4Obj.key : 'blank'}">${column4Obj.key ? column4Obj.key : 'blank'}&nbsp;(${column4Obj.value})</option>	
+					</g:each>
+				</select>
 			</th>
+
 			<g:if test="${browserTest}">
 			<g:each in="${processTransitionList}"  var="task">
 				<th class="verticaltext" title="${task.header}" style="color: ${task.fillColor}" onclick="bulkTransitionsByHeader('${task.transId}')">${task?.header}</th>
 			</g:each>
 			</g:if>
 			<g:else>
-			<th style="padding-left: 0px" colspan="${headerCount}"><embed src="${createLinkTo(dir:'templates',file:'headerSvg_'+projectId+'.svg')}" type="image/svg+xml" width="${headerCount*21.80}" height="102"/></th>
+			<th style="padding-left: 0px" colspan="${headerCount}"><embed src="${createLinkTo(dir:'templates',file:'headerSvg_'+projectId+'.svg')}" type="image/svg+xml" width="${headerCount*21.80}" height="102px"/></th>
 			</g:else>
 		</tr>
-		</g:form>
+	</g:form>
 	</thead>
 	<tbody id="assetListTbody" onclick="catchevent(event)">
 		<g:if test="${assetEntityList}">
@@ -575,7 +542,7 @@ Comment</a></span></div>
 		</div>
 	</g:if>
 </g:form></div>
-<div class="contextMenu" id="myMenu"/>
+<div class="contextMenu" id="myMenu"></div>
 <div class="contextMenu" id="transitionMenu" style="visibility: hidden;">
 	<ul>
         <li id="done">Done</li>
@@ -586,65 +553,82 @@ Comment</a></span></div>
         <li id="noOptions">No Options</li>
     </ul>
 </div></div>
+
+<script type="text/javascript" src="/tdstm/js/jquery.fixedheadertable.1.1.2.js"></script>
+
 <script type="text/javascript">
-$('body').click(function(){
-   $(".cell-selected").attr('class',$("#cssClassId").val());
-});
-initialize();
-timedUpdate($("#selectTimedId").val())
-if('${browserTest}' == 'true'){
-	$("div.tableContainerIE").css("height",vpWidth("height") - 142)
-	$("div.tableContainerIE").css("width",vpWidth("width"));
-} else {
-	$("div.tableContainer").css("width",vpWidth("width"));
-	$("#assetListTbody").css("height",vpWidth("height") - 215)
-}
-function initialize(){
-	window.onresize=pageReload;
-	window.onload=cancelResize;
-	
-	$("#moveBundleId").val(${moveBundleInstance?.id});
-	$("#moveEventId").val(${moveEventInstance?.id});
-	$("#column4Id").val("${column4Value}");
-	$("#column3Id").val("${column3Value}");
-	$("#column2Id").val("${column2Value}");
-	$("#column1Id").val("${column1Value}");
-	$("#assetsInViewId").val("${assetsInView}");
-	if($("#assetsInViewId")[0].selectedIndex == -1)
-	  $("#assetsInViewId")[0].selectedIndex = 0;
-	  
-	var time = '${timeToUpdate}';
+/*<![CDATA[*/
+	var timeInterval;
+	var fieldId;
+	var hasTimedOut = false;
+	$(document).ready(function() {
+		var windowWidth = $(window).width();
+		var windowHeight = $(window).height() - $('.header').height() - $('#consoleHeader').height() - 25;
+		if ($.browser.msie == true) {
+			windowWidth -= 20;
+			windowHeight -= 10;
+		}
+		
+		$(window).resize(function() {
+			if(hasTimedOut != false) {
+				clearTimeout(hasTimedOut);
+			}
+			hasTimedOut = setTimeout(function() {
+				var windowWidth = $(window).width() - 10;
+				var windowHeight = $(window).height() - $('.header').height() - $('#consoleHeader').height() - 25;
+				if ($.browser.msie == true) {
+					windowWidth -= 20;
+					windowHeight -= 10;
+				}
+
+				$('#tableContainer').css({'width': windowWidth+'px', 'height': windowHeight+'px'});
+			}, 100);
+		});
+			
+		$('#tableContainer').css({'width': windowWidth+'px', 'height': windowHeight+'px'});
+		if(!$.browser.msie)
+			jQuery('#tableContainer').fixedHeaderTable({autoResize:true, footer:false});
+			
+		$('body').click(function(){
+			$(".cell-selected").removeClass('cell-selected');
+		});
+
+		$("#moveBundleId").val(${moveBundleInstance?.id});
+		$("#moveEventId").val(${moveEventInstance?.id});
+		$("#column4Id").val("${column4Value}");
+		$("#column3Id").val("${column3Value}");
+		$("#column2Id").val("${column2Value}");
+		$("#column1Id").val("${column1Value}");
+		$("#assetsInViewId").val("${assetsInView}");
+		if($("#assetsInViewId")[0].selectedIndex == -1)
+			$("#assetsInViewId")[0].selectedIndex = 0;
+		
+		timedUpdate($("#selectTimedId").val());
+		
+		var time = '${timeToUpdate}';
 		if(time != "" ){
 			$("#selectTimedId").val( time ) ;
 		} else if(time == "" ){
 			$("selectTimedId").val( 120000 );	
 		}
-}
-$(document).ready(function() {
+		
 		$("#changeStatusDialog").dialog({ autoOpen: false })
-	    $("#showDialog").dialog({ autoOpen: false })
-	    $("#editDialog").dialog({ autoOpen: false })
+		$("#showDialog").dialog({ autoOpen: false })
+		$("#editDialog").dialog({ autoOpen: false })
 		$("#commentsListDialog").dialog({ autoOpen: false })
-	    $("#createCommentDialog").dialog({ autoOpen: false })
-	    $("#showCommentDialog").dialog({ autoOpen: false })
-	    $("#editCommentDialog").dialog({ autoOpen: false })
-	    $("#showChangeStatusDialog").dialog({ autoOpen: false })	        
-	
-		var role = "${role}"
-		if( role ){
-			$("tbody#assetListTbody tr td").contextMenu('transitionMenu', {
+		var role = "${role}";
+		// Show menu when #myDiv is clicked
+		if(role) {
+			$('tbody#assetListTbody').contextMenu('transitionMenu', {
+				onContextMenu: function(e) {
+					return($(e.target).is('td.tranCell'));
+				},
 				onShowMenu: function(e, menu) {
-					$(".cell-selected").attr('class',$("#cssClassId").val());					
-					var tdId = $(e.target).attr("id") 
-					if(!isNaN(tdId.split("_")[1])){
-					var cssname = $("#"+tdId).attr('class')
-					$("#cssClassId").val(cssname)
-					$("#"+tdId).attr("class","cell-selected")
-		      		${remoteFunction(action:'getMenuList', params:'\'id=\' + tdId', onComplete:'updateMenu(e,menu)')};
-					}
-		        	return menu;
-					
-		      	},
+					$(".cell-selected").removeClass('cell-selected');
+					$(e.target).addClass('cell-selected');
+					${remoteFunction(action:'getMenuList', params:'\'id=\' + $(e.target).attr("id") ', onComplete:'updateMenu(e,menu)')};
+					return menu;
+				},
 				bindings: {
 	        		'done': function(t) {
 			       		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=done\'', onComplete:'updateTransitionRow(e)' )};
@@ -699,10 +683,7 @@ $(document).ready(function() {
 			window.status = ""
 		}); 
 	});
-	var eventType = "load"
-	function cancelResize(){
-	eventType = "load"
-	}
+	
 	/*------------------------------------------------------------
 	 * update the menu for transition 
 	 *------------------------------------------------------------*/
@@ -729,12 +710,13 @@ $(document).ready(function() {
 	 * update the row as per user transition transition 
 	 *------------------------------------------------------------*/
 	function updateTransitionRow( e ){
-		var assetTransitions = eval('(' + e.responseText + ')')
-		var length = assetTransitions.length
+		var assetTransitions = eval('(' + e.responseText + ')');
+		var length = assetTransitions.length;
 		if(length > 0){
 			for( i=0; i<length; i++ ) {
-				var transition = assetTransitions[i]
-				$("#"+transition.id).attr("class",transition.cssClass )
+				var transition = assetTransitions[i];
+				$("#"+transition.id).attr("class",transition.cssClass );
+				$("#"+transition.id).addClass('tranCell');
 			}
 		}
 	}
@@ -912,6 +894,7 @@ $(document).ready(function() {
 							var transition = assetTransition.tdId[j]
 							var transTd = $("#"+transition.id)
 							transTd.attr("class",transition.cssClass )
+							transTd.addClass('tranCell');
 						}
 					}
 				}
@@ -1085,6 +1068,7 @@ $(document).ready(function() {
 			break;	
 		}
 	}
+
 	/* 
 	 * Function to switch the Labels to Select list when user click on edit icon.
 	 */
@@ -1202,6 +1186,7 @@ $(document).ready(function() {
 							onComplete:'doAjaxCall()' )};
 		}
 	}
+/*]]>*/
 </script>
 </body>
 </html>
