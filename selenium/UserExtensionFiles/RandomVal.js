@@ -50,3 +50,37 @@ function generateRandomString( length, chars ) {
         string += chars[ Math.floor( Math.random() * chars.length ) ];
     return string;
 }
+
+
+/*
+ * Finds a get-variable in the url.
+ *
+ * Vincent Hindriksen
+ */
+
+
+function getQueryVariable(doc, location, variable) {
+	var query = location.search.substring(1).replace(/amp;/, "");
+	var vars = query.split("&");
+	for (var i=0;i<vars.length;i++) {
+		//alert('Query Variable :' + vars[i]); 
+		var pair = vars[i].split("=");
+		if (pair[0] == variable) {
+			return pair[1];
+		}
+	}
+	// comment next line, when "undefined" is needed as result.
+	return "";
+}
+
+/**
+ * Gets a get-var from the url
+ *  target - variable to find
+ *  value - the variable to store the result in
+ */
+Selenium.prototype.doStoreGetvar = function(target, value) {
+    var location = this.page().getCurrentWindow().location;   
+    var result = getQueryVariable(this.page(), location, target);
+    storedVars[value] = result;
+};
+
