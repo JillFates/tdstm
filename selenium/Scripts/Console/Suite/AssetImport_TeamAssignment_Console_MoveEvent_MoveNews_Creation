@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com/" />
 <title>AssetImport_TeamAssignment_Console_MoveEvent_MoveNews_Creation</title>
 </head>
 <body>
@@ -31,7 +31,7 @@
 	<td>dataTransferSet</td>
 	<td>label=TDS Master Spreadsheet</td>
 </tr>
-<!--Pre-Requisite: Enter the path of the Excel file in the below case to import assets. -->
+<!--Pre-Requisite: Enter the path of the Excel file in the below case to import assets. And leave the Bundle Name field blank for all the assets in the excel template (Since the test assigns the assets to the bundle it created)-->
 <tr>
 	<td>type</td>
 	<td>file</td>
@@ -1378,11 +1378,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>clickAndWait</td>
-	<td>link=Events List</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyTitle</td>
 	<td>Move Event List</td>
 	<td></td>
@@ -1793,11 +1788,6 @@
 <!--Verifying for User preffered Move Event in PMO Asset Tracking page-->
 <tr>
 	<td>clickAndWait</td>
-	<td>//div[@id='header']/div[2]/a/span</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
 	<td>link=PMO Asset Tracking</td>
 	<td></td>
 </tr>
@@ -1840,7 +1830,7 @@
 <tr>
 	<td>addSelection</td>
 	<td>availableStaffId</td>
-	<td>label=TDS:Doherty,John- Project Manager</td>
+	<td>index=0</td>
 </tr>
 <tr>
 	<td>click</td>
@@ -1869,7 +1859,7 @@
 </tr>
 <tr>
 	<td>assertTextPresent</td>
-	<td>ransition Manager - Mobile</td>
+	<td>Transition Manager - Mobile</td>
 	<td></td>
 </tr>
 <tr>
