@@ -5,13 +5,6 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <title>Project List</title>
- <% def currProj = session.getAttribute("CURR_PROJ");
-    def projectId = currProj.CURR_PROJ ;
-    def currProjObj;
-    if( projectId != null){
-      currProjObj = Project.findById(projectId);
-    }
-    %>
 </head>
 <body>
 
@@ -19,11 +12,10 @@
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
-<div class="list"><g:form action="addUserPreference" method="post">
+<div class="list"><g:form action="create" method="post">
 	<table>
 		<thead>
 			<tr>
-				<th></th>
 
 				<g:sortableColumn property="projectCode" title="Project Code" />
 
@@ -41,16 +33,8 @@
 			<g:each in="${projectInstanceList}" status="i" var="projectInstance">
 				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-					<td>
-					<g:if test="${currProjObj?.id == projectInstance?.id}" >
-						<input type="radio" name="selectProject" id="selectProjectId" checked="checked" value="${fieldValue(bean:projectInstance, field:'projectCode')}" />
-					</g:if>
-					<g:else>
-						<input type="radio" name="selectProject" id="selectProjectId" value="${fieldValue(bean:projectInstance, field:'projectCode')}" />
-					</g:else>
-					</td>
 
-					<td><g:link controller="project" action="show" id="${projectInstance.id}">${fieldValue(bean:projectInstance, field:'projectCode')}</g:link></td>
+					<td style="padding-left: 10px;"><g:link controller="project" action="addUserPreference" params="['selectProject':projectInstance.projectCode]">${fieldValue(bean:projectInstance, field:'projectCode')}</g:link></td>
 
 					<td>${fieldValue(bean:projectInstance, field:'name')}</td>
 
@@ -64,8 +48,7 @@
 			</g:each>
 		</tbody>
 	</table>
-	<div class="buttons">
-				<span class="button"><input class="select" type="submit" name="submit" value="Select" /> </span> </div>
+	<div class="buttons"> <span class="button"><g:actionSubmit class="save" action="Create" value="Create" /></span></div>
 </g:form></div>
 </div>
 </body>

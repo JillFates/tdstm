@@ -13,7 +13,7 @@ class UserLoginController {
     def list = {
 		def companyId = params.id
 		
-        if(!params.max) params.max = '3'
+        if(!params.max) params.max = '10'
         def max = Integer.parseInt( params.max )
 		def offset = params.offset ? Integer.parseInt( params.offset ) : 0
 		

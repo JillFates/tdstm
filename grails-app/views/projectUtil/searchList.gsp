@@ -1,5 +1,3 @@
-
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -11,12 +9,10 @@
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
-<div class="list"><g:form action="addUserPreference" method="post">
+<div class="list"><g:form controller="project" action="create" method="post">
 	<table>
 		<thead>
 			<tr>
-				<th></th>
-
 				<g:sortableColumn property="projectCode" title="Project Code" />
 
 				<g:sortableColumn property="name" title="Name" />
@@ -26,19 +22,13 @@
 				<g:sortableColumn property="lastUpdated" title="Last Updated" />
 
 				<g:sortableColumn property="comment" title="Comment" />
-
-
-
 			</tr>
 		</thead>
 		<tbody>
 			<g:each in="${projectList}" status="i" var="projectInstance">
 				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-					<td><input type="radio" name="selectProject"
-						value="${fieldValue(bean:projectInstance, field:'projectCode')}" /></td>
-
-					<td><g:link controller="project" action="show" id="${projectInstance.id}">${fieldValue(bean:projectInstance, field:'projectCode')}</g:link></td>
+					<td style="padding-left: 10px;"><g:link controller="project" action="addUserPreference" params="['selectProject':projectInstance.projectCode]">${fieldValue(bean:projectInstance, field:'projectCode')}</g:link></td>
 
 					<td>${fieldValue(bean:projectInstance, field:'name')}</td>
 
@@ -52,8 +42,7 @@
 			</g:each>
 		</tbody>
 	</table>
-	<div class="buttons">
-				<span class="button"><input class="select" type="submit" name="submit" value="Select" /> </span> </div>
+	<div class="buttons"> <span class="button"><g:actionSubmit class="save" action="Create" value="Create" /></span></div>
 </g:form></div>
 </div>
 </body>
