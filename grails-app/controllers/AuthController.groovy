@@ -1,7 +1,8 @@
 import org.jsecurity.authc.AuthenticationException
 import org.jsecurity.authc.UsernamePasswordToken
 import org.jsecurity.SecurityUtils
-
+import com.tdssrc.grails.GormUtil
+import java.text.SimpleDateFormat
 class AuthController {
     def jsecSecurityManager
     def userPreferenceService
@@ -100,8 +101,21 @@ class AuthController {
         flash.message = 'You do not have permission to access this page.'
         render( view:'home' )
     }
-    // method for home page
+    /*
+     *  Action to navigate the admin control home page
+     */
     def home = {
-        render( view:'home' )
+
+    	def dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	def dateNow = dateFormat.format(GormUtil.convertInToGMT( "now", "EDT" ))
+		
+		// retrive the list of 20 usernames with the most recent login times
+    	def recentUsers = UserLogin.findAll("FROM UserLogin ul WHERE ul.lastLogin is not null ORDER BY ul.lastLogin DESC",[max:20])
+		// retrive the list of events in progress
+		def currentLiveEvents = MoveEvent.findAll("FROM MoveEvent me WHERE me.inProgress = 'true'")
+		// retrive the list of 10 upcoming bundles
+		def upcomingBundles = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.startTime > '$dateNow' ORDER BY mb.startTime",[max:10])
+		
+        render( view:'home', model:[ recentUsers:recentUsers, moveEventsList:currentLiveEvents, moveBundlesList:upcomingBundles ] )
     }
 }

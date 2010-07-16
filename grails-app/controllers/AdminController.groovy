@@ -953,35 +953,4 @@ class AdminController {
 		def results = [orphanDeatils : orphanDeatils, query:query]  
 		render results as JSON
 	}
-	/*======================================
-	 * used to retrive the list of 20 usernames with the most recent login times
-	 *======================================*/
-	def latestUsers = {
-	
-		def latestUsers = UserLogin.findAll("FROM UserLogin ul WHERE ul.lastLogin is not null ORDER BY ul.lastLogin DESC",[max:20]) 
-		render( view:'latestUsers', model:[ latestUsers:latestUsers] )
-	
-	}
-	/*======================================
-	 * used to retrive the list of 10 upcoming bundles
-	 *======================================*/
-	def upcomingBundles = {
-		
-		def dateNow = GormUtil.convertInToGMT( "now", "EDT" )
-		def dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		dateNow = dateFormat.format(dateNow)
-
-		def upcomingBundles = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.startTime > '$dateNow' ORDER BY mb.startTime",[max:10]) 
-		render( view:'upcomingBundles', model:[ moveBundlesList:upcomingBundles ] )
-
-	}
-	/*======================================
-	 * used to retrive the list of events in progress
-	 *======================================*/
-	def currentLiveEvents = {
-
-		def currentLiveEvents = MoveEvent.findAll("FROM MoveEvent me WHERE me.inProgress = 'true'") 
-		render( view:'currentEvents', model:[ moveEventsList:currentLiveEvents ] )
-	
-	}
 }

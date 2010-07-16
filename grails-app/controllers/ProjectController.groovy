@@ -36,6 +36,7 @@ class ProjectController {
             flash.message = "Project not found with id ${params.id}"
             redirect( action:list )
         } else { 
+        	userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
         	def currProj = session.getAttribute("CURR_PROJ");
         	def currProjectInstance = Project.get( currProj.CURR_PROJ )
         	def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
