@@ -30,6 +30,7 @@
     if( projectId != null){
       currProjObj = Project.findById(projectId)
     }
+    def isIE6 = request.getHeader("User-Agent").contains("MSIE 6");
     %>
   
   <body>
@@ -52,6 +53,9 @@
         <div class="header_right"><br />
           <div style="font-weight: bold;">
           <jsec:isLoggedIn>
+          	<g:if test="${isIE6}">
+				<span><img title="Note: MS IE6 has limited capability so functions have been reduced." src="${createLinkTo(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
+			</g:if>
               	<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">
 			<strong>
 		

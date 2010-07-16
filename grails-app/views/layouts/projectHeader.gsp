@@ -36,7 +36,7 @@
     if( moveEventId != null){
     	moveEvent = MoveEvent.findById(moveEventId)
     }
-    
+    def isIE6 = request.getHeader("User-Agent").contains("MSIE 6");
     %>
   <body>
    
@@ -61,6 +61,9 @@
           <jsec:isLoggedIn>
 			<strong>
 			<div style="float: left;">
+			<g:if test="${isIE6}">
+				<span><img title="Note: MS IE6 has limited capability so functions have been reduced." src="${createLinkTo(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
+			</g:if>
 			<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">
 			Welcome,&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name } </span>
 			</g:remoteLink>

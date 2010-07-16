@@ -56,6 +56,11 @@
 						<td />
 						<td class="buttonR"><input type="submit" value="Sign in" /></td>
 					</tr>
+					<tr>
+						<td colspan="2" >
+							<g:if test="${request.getHeader('User-Agent').contains('MSIE 6')}"><div class="message" >Note: MS IE6 has limited capability so functions have been reduced.</div></g:if>
+						</td>
+					</tr>
 				</tbody>
 			</table>
 		</g:form></div>
