@@ -25,6 +25,9 @@ class PersonController {
         	def query = "from PartyGroup as p where partyType = 'COMPANY' "
             companiesList = PartyGroup.findAll( query )
         	//projectCompanies = partyRelationshipService.getProjectCompanies( projectId )        	
+        } else {
+        	flash.message = "Please select Company before navigating to Staff"
+            redirect(controller:'partyGroup',action:'list')
         }
 		return [ personInstanceList: personInstanceList, companyId:companyId,totalCompanies:companiesList ]
     }

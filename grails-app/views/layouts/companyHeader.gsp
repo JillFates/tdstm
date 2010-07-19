@@ -113,11 +113,12 @@
 			<li><g:link class="home" controller="auth" action="home">Admin</g:link> </li>
 	            </jsec:hasRole>
 			<li><g:link class="home" controller="projectUtil">Project </g:link> </li>
-			<li><g:link class="home" controller="partyGroup" action="show" id="${partyGroup}">Company</g:link></li>
+			<li><g:link class="home" controller="partyGroup" id="${partyGroup}">Company</g:link></li>
 			<li><g:link class="home" controller="person" id="${partyGroup}">Staff</g:link></li>
+			<li><g:link class="home" controller="userLogin" id="${partyGroup}">Users</g:link></li>
 			<li><g:link class="home" controller="application" id="${partyGroup}">Applications </g:link></li>
-			<li><a href="#">Locations </a></li>
-			<li><a href="#">Rooms </a></li>
+			<!--<li><a href="#">Locations </a></li>
+			<li><a href="#">Rooms </a></li> -->
 		</ul>
 	</div>
       <div class="main_bottom"><g:layoutBody /></div>

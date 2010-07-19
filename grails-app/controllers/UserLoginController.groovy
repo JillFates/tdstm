@@ -21,18 +21,23 @@ class UserLoginController {
 		def userLoginSize
 		
 		def isCompanyAdmin = SecurityUtils.getSubject().hasRole("ADMIN")
-		if( !isCompanyAdmin ){
+		if( isCompanyAdmin ){
 			if( !companyId ){
 				companyId = session.getAttribute("PARTYGROUP")?.PARTYGROUP
 			}
-			def personsList = partyRelationshipService.getCompanyStaff( companyId )
-			def personIds = ""
-			personsList.each{
-				personIds += "$it.id,"
+			if(companyId){
+				def personsList = partyRelationshipService.getCompanyStaff( companyId )
+				def personIds = ""
+				personsList.each{
+					personIds += "$it.id,"
+				}
+				personIds = personIds.substring(0,personIds.lastIndexOf(','))
+				userLoginInstanceList = UserLogin.findAll("from UserLogin u where u.person in ($personIds)",[max:max, offset:offset])
+				userLoginSize =  UserLogin.findAll("from UserLogin u where u.person in ($personIds)").size()
+			} else {
+				flash.message = "Please select Company before navigating to Users"
+		        redirect(controller:'partyGroup',action:'list')
 			}
-			personIds = personIds.substring(0,personIds.lastIndexOf(','))
-			userLoginInstanceList = UserLogin.findAll("from UserLogin u where u.person in ($personIds)",[max:max, offset:offset])
-			userLoginSize =  UserLogin.findAll("from UserLogin u where u.person in ($personIds)").size()
 		} else {
 			userLoginInstanceList = UserLogin.list( [max:max, offset:offset] )
 			userLoginSize = UserLogin.count() 

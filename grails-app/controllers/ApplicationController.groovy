@@ -14,6 +14,9 @@ class ApplicationController {
             	
             def query = "from Application a where a.id in (select a.id from Application a where  a.owner = $companyId ) "
             applicationInstanceList = Application.findAll( query )
+        } else {
+        	flash.message = "Please select Company before navigating to Application"
+        	redirect(controller:'partyGroup',action:'list')
         }
         def applicationInstance = new Application()
         applicationInstance.properties = params
