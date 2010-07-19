@@ -562,7 +562,7 @@ Comment</a></span></div>
 	var fieldId;
 	var hasTimedOut = false;
 	$(document).ready(function() {
-		var windowWidth = $(window).width();
+		var windowWidth = $(window).width() - 10;
 		var windowHeight = $(window).height() - $('.header').height() - $('#consoleHeader').height() - 25;
 		if ($.browser.msie == true) {
 			windowWidth -= 20;
@@ -584,15 +584,18 @@ Comment</a></span></div>
 				$('#tableContainer').css({'width': windowWidth+'px', 'height': windowHeight+'px'});
 			}, 100);
 		});
-			
+		
 		$('#tableContainer').css({'width': windowWidth+'px', 'height': windowHeight+'px'});
-		if(!$.browser.msie)
+		if(!$.browser.msie) {
 			jQuery('#tableContainer').fixedHeaderTable({autoResize:true, footer:false});
-			
+			$('.fht_table_body thead select').remove();
+			$('.fht_table_body thead input').remove();
+		}
+		
 		$('body').click(function(){
 			$(".cell-selected").removeClass('cell-selected');
 		});
-
+		
 		$("#moveBundleId").val(${moveBundleInstance?.id});
 		$("#moveEventId").val(${moveEventInstance?.id});
 		$("#column4Id").val("${column4Value}");

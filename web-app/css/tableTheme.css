@@ -101,6 +101,10 @@
     overflow:hidden;
 }
 
+.last-row {
+  display:none;
+}
+
 /**************/
 /* END LAYOUT */
 /**************/
