@@ -1,0 +1,14 @@
+<plugin name='webtest' version='3.0.0' grailsVersion='1.3 &gt; *'>
+  <author>Dierk Koenig &amp; Lee Butts</author>
+  <authorEmail>dierk.koenig at canoo.com &amp; leebutts@gmail.com</authorEmail>
+  <title>A plug-in that provides functional testing for Grails using Canoo Web Test</title>
+  <description>A plug-in that provides functional testing for Grails using Canoo Web Test</description>
+  <documentation>http://grails.org/plugin/webtest</documentation>
+  <resources>
+    <resource>BuildConfig</resource>
+  </resources>
+  <dependencies>
+    <plugin name='core' version='1.3 &gt; *' />
+  </dependencies>
+  <behavior />
+</plugin>

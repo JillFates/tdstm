@@ -1,0 +1,8 @@
+DefaultPackage
+grails-app.conf
+grails-app.domain
+grails-app.services
+grails-app.taglib
+grails-app.utils
+scripts
+test.integration

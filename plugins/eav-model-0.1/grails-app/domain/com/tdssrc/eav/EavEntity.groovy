@@ -1,6 +1,5 @@
 package com.tdssrc.eav
 
-import com.tdssrc.grails.GormUtil
 import org.jsecurity.SecurityUtils
 class EavEntity {
 
@@ -29,15 +28,4 @@ class EavEntity {
 			id column:'entity_id'
 		}
 	}
-	/*
-	 * Date to insert in GMT
-	 */
-	def beforeInsert = {
-		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
-	}
-	def beforeUpdate = {
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
-	}
-
 }

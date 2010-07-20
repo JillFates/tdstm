@@ -1,0 +1,13 @@
+<plugin name='ref-code' version='0.2.1' grailsVersion='1.1.1 &gt; *'>
+  <author>Marcel Overdijk, Jim Shingler</author>
+  <authorEmail>marceloverdijk@gmail.com, shinglerjim@gmail.com</authorEmail>
+  <documentation>http://grails.org/Ref+Code+Plugin</documentation>
+  <resources>
+    <resource>UrlMappings</resource>
+    <resource>RefCode</resource>
+    <resource>RefCodeService</resource>
+    <resource>RefCodeTagLib</resource>
+    <resource>RefCodeConstraint</resource>
+  </resources>
+  <dependencies />
+</plugin>

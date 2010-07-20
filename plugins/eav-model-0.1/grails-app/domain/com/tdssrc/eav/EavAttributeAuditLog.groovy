@@ -1,6 +1,5 @@
 package com.tdssrc.eav
 import org.jsecurity.SecurityUtils
-import com.tdssrc.grails.GormUtil
 /*
  * The EavAttributeAuditLog provides an audit log tracking the user, date and
  * reason for the change.  Any domains that extend EavEntityDatatypeAuditable will
@@ -9,7 +8,7 @@ import com.tdssrc.grails.GormUtil
 class EavAttributeAuditLog {
 	Integer	partyId		// This is to be set to the person/party that changed the record
 	String	comment		// Used to allow user or application to indicate the reason for the change
-	Date dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
+	Date dateCreated = new Date()
 	
 	static mapping = {
 		version false

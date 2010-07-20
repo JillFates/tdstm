@@ -1,0 +1,14 @@
+<plugin name='functional-test' version='1.2.7' grailsVersion='1.1.1 &gt; *'>
+  <author>Marc Palmer</author>
+  <authorEmail>marc@anyware.co.uk</authorEmail>
+  <title>Functional Testing</title>
+  <description>Simple 'pure grails' functional testing for your web applications
+</description>
+  <documentation>http://grails.org/Grails+Functional+Testing</documentation>
+  <resources>
+    <resource>BuildConfig</resource>
+    <resource>DataSource</resource>
+    <resource>UrlMappings</resource>
+  </resources>
+  <dependencies />
+</plugin>

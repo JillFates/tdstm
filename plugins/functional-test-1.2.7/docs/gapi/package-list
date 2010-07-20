@@ -1,0 +1,6 @@
+DefaultPackage
+grails-app.conf
+scripts
+src.groovy.functionaltestplugin
+test.functional
+test.unit
