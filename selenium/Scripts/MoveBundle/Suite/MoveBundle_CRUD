@@ -250,7 +250,6 @@
 	<td>created</td>
 	<td></td>
 </tr>
-<!---->
 <!--Read and Update MoveBundle-->
 <tr>
 	<td>clickAndWait</td>
@@ -430,32 +429,32 @@
 </tr>
 <tr>
 	<td>label</td>
-	<td>label3</td>
+	<td>label7</td>
 	<td></td>
 </tr>
 <tr>
 	<td>gotoIf</td>
 	<td>${var2}==false</td>
-	<td>label1</td>
+	<td>label5</td>
 </tr>
 <tr>
 	<td>label</td>
-	<td>label4</td>
+	<td>label8</td>
 	<td></td>
 </tr>
 <tr>
 	<td>gotoIf</td>
 	<td>${var2}==true</td>
-	<td>label2</td>
+	<td>label6</td>
 </tr>
 <tr>
 	<td>label</td>
-	<td>label1</td>
+	<td>label5</td>
 	<td></td>
 </tr>
 <tr>
 	<td>echo</td>
-	<td>label1</td>
+	<td>label5</td>
 	<td></td>
 </tr>
 <tr>
@@ -471,16 +470,16 @@
 <tr>
 	<td>gotoIf</td>
 	<td>${var2}==false</td>
-	<td>label3</td>
+	<td>label7</td>
 </tr>
 <tr>
 	<td>gotoIf</td>
 	<td>${var2}==true</td>
-	<td>label4</td>
+	<td>label8</td>
 </tr>
 <tr>
 	<td>label</td>
-	<td>label2</td>
+	<td>label6</td>
 	<td></td>
 </tr>
 <tr>

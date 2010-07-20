@@ -154,27 +154,27 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.1</td>
+	<td>//table.0.0</td>
 	<td>Project Code</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.2</td>
+	<td>//table.0.1</td>
 	<td>Name</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.3</td>
+	<td>//table.0.2</td>
 	<td>Date Created</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.4</td>
+	<td>//table.0.3</td>
 	<td>Last Updated</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.5</td>
+	<td>//table.0.4</td>
 	<td>Comment</td>
 </tr>
 <tr>
