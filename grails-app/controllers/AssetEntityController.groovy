@@ -567,7 +567,8 @@ class AssetEntityController {
         }
         def project = Project.findById( projectId )
         def assetEntityInstanceList = AssetEntity.findAllByProject( project, params ) 
-        [ assetEntityInstanceList: assetEntityInstanceList, projectId: projectId,maxVal : params.max ]
+        [ assetEntityInstanceList: assetEntityInstanceList, projectId: projectId,maxVal : params.max,
+		  filterParams: com.zeddware.grails.plugins.filterpane.FilterUtils.extractFilterParams(params)]
     }   
     /* ----------------------------------------
      * delete assetEntity

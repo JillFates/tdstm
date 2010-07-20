@@ -10,17 +10,19 @@
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
-	
 	<g:javascript library="prototype" />
     <jq:plugin name="jquery.combined" />
     <g:javascript src="crawler.js" />
-     <g:layoutHead />
-     <script type="text/javascript">
+    <g:layoutHead />
+   
+    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dropDown.css')}" />    
+   
+   <script type="text/javascript">
    		$(document).ready(function() {
       		$("#personDialog").dialog({ autoOpen: false })
-     	})
+     	})      
    	</script>
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dropDown.css')}" />
+  </head>	
     
     <% def currProj = session.getAttribute("CURR_PROJ");
     def setImage = session.getAttribute("setImage");
@@ -35,10 +37,10 @@
     if( moveEventId != null){
     	moveEvent = MoveEvent.findById(moveEventId)
     }
-    def isIE6 = request.getHeader("User-Agent").contains("MSIE 6");    
+    def isIE6 = request.getHeader("User-Agent").contains("MSIE 6");
     %>    
    
-  </head>
+
 
   <body>
     
@@ -138,10 +140,10 @@
 	    </div>
 		<div class="menu2" id="bundleMenu" style="background-color:#003366;">
 			<ul>
-				<li class="title1">Move Bundle: ${moveBundle?.name}</li>
-				<li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundle?.id]" >Team </g:link> </li>
-				<li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundle?.id]" >Bundle Asset Assignment</g:link> </li>
-				<li><g:link class="home" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundle?.id, rack:'UnrackPlan']" >Bundle Team Assignment </g:link> </li>
+				<li class="title1">Move Bundle: ${MoveBundle.findById( moveBundleId )?.name}</li>
+				<li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundleId]" >Team </g:link> </li>
+				<li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId]" >Bundle Asset Assignment</g:link> </li>
+				<li><g:link class="home" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleId, rack:'UnrackPlan']" >Bundle Team Assignment </g:link> </li>
 				<li><g:link class="home" controller="walkThrough" >Walkthrough</g:link> </li>
 			</ul>
 		</div>

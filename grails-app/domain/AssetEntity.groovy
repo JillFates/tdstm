@@ -1,3 +1,4 @@
+import com.tdssrc.grails.GormUtil
 class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String assetName	
 	String assetType
@@ -112,7 +113,16 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 			hasRemoteMgmt sqltype: 'tinyint(1)'
 		}
 	}
-	
+	/*
+	 * Date to insert in GMT
+	 */
+	def beforeInsert = {
+		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
+		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+	}
+	def beforeUpdate = {
+		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+	}
 	String toString(){
 		"id:$id name:$assetName tag:$assetTag serial#:$serialNumber"
 	}

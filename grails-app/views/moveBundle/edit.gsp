@@ -195,7 +195,7 @@
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'moveEvent','errors')}">
                   <g:select from="${MoveEvent.findAllByProject(Project.get(projectId))}" id="moveEvent" name="moveEvent.id" 
-                  value="${moveBundleInstance?.moveEvent?.id}" optionKey="id" noSelection="['null':'Please Select']"></g:select>
+                  value="${moveBundleInstance?.moveEvent?.id}" optionKey="id" noSelection="['':'Please Select']"></g:select>
                   <g:hasErrors bean="${moveBundleInstance}" field="moveEvent">
                     <div class="errors">
                       <g:renderErrors bean="${moveBundleInstance}" as="list" field="moveEvent"/>

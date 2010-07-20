@@ -135,7 +135,12 @@ class MoveBundleController {
         def projectManagerId = params.projectManager
     	def moveManagerId = params.moveManager 
         if( moveBundleInstance ) {
-            moveBundleInstance.properties = params
+            moveBundleInstance.name = params.name
+            moveBundleInstance.description = params.description
+			if(params.moveEvent.id){
+				moveBundleInstance.moveEvent = MoveEvent.get(params.moveEvent.id)
+			}
+            moveBundleInstance.operationalOrder = params.operationalOrder ? Integer.parseInt(params.operationalOrder) : 1
             def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
             def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
             def startTime = params.startTime
@@ -146,7 +151,7 @@ class MoveBundleController {
             if(completionTime != null && completionTime != ""){
             	moveBundleInstance.completionTime =  GormUtil.convertInToGMT(formatter.parse( completionTime ), tzId)
             }
-            if(!moveBundleInstance.hasErrors() && moveBundleInstance.save() ) {
+            if(moveBundleInstance.validate(true) && moveBundleInstance.save() ) {
             	def stepsList = stateEngineService.getDashboardSteps( moveBundleInstance.project.workflowCode )
 				stepsList.each{
 					def checkbox = params["checkbox_"+it.id]
@@ -174,7 +179,6 @@ class MoveBundleController {
                 //redirect(action:show,params:[id:moveBundleInstance.id, projectId:projectId])
                 redirect(action:show,id:moveBundleInstance.id, params:[projectId: projectId])
             } else {
-            	
             	//	get the all Dashboard Steps that are associated to moveBundle.project
     			def allDashboardSteps = moveBundleService.getAllDashboardSteps( moveBundleInstance )
 				def remainingSteps = allDashboardSteps.remainingSteps
