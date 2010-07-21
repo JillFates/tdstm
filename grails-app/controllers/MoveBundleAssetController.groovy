@@ -1007,6 +1007,12 @@ class MoveBundleAssetController {
         	def rack
         	def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
         	def rackLayout = []
+
+			def moveBundle = MoveBundle.findById(bundleId)
+     		def isAdmin = SecurityUtils.getSubject().hasRole("PROJ_MGR")
+     		if( !isAdmin ) {
+     			isAdmin = SecurityUtils.getSubject().hasRole("PROJECT_ADMIN")
+     		}
         	if(location == "source"){
         		rack = request.getParameterValues("sourcerack")
         		rack.each{
@@ -1149,7 +1155,6 @@ class MoveBundleAssetController {
     	            			rackStyle = 'rack_error'
     	            		} else if(bundleId && assetEnity.assetEntity?.bundleId != Integer.parseInt(bundleId)){
     	            			def currentTime = GormUtil.convertInToGMT( "now", tzId ).getTime()
-    	            			def moveBundle = MoveBundle.findById(bundleId)
     	            			def startTime = moveBundle.startTime ? moveBundle.startTime.getTime() : 0
     	            			if(startTime < currentTime){
     	            				cssClass = 'rack_past'
@@ -1171,10 +1176,10 @@ class MoveBundleAssetController {
     	            def backViewRows
     	            def frontViewRows
     	            if(backView){
-    	            	backViewRows = getRackLayout( assetDetails, includeBundleName, backView )
+    	            	backViewRows = getRackLayout( isAdmin, assetDetails, includeBundleName, backView )
     	            }
     	            if(frontView){
-    	            	frontViewRows = getRackLayout( assetDetails, includeBundleName, null )
+    	            	frontViewRows = getRackLayout( isAdmin, assetDetails, includeBundleName, null )
     	            }
     	            if(rackRooms.size() == 3){
     	            	rackLayout << [ assetDetails : assetDetails, rack : rackRooms[2] , room : rackRooms[1] , 
@@ -1392,7 +1397,7 @@ class MoveBundleAssetController {
 	 * @param  : asset details
 	 * @return : rack rows
 	 *---------------------------------------*/
-	def getRackLayout( def asset, def includeBundleName, def backView){
+	def getRackLayout( def isAdmin, def asset, def includeBundleName, def backView){
     	def rows= new StringBuffer()
     	def rowspan = 1
     	def cssClass = "empty"
@@ -1405,10 +1410,6 @@ class MoveBundleAssetController {
     		 		def assetTagsList = (it.asset?.assetTag).split("<br/>")
     		 		def moveBundle = "" 
     		 		def assetTag = ""
-    		 		def isAdmin = SecurityUtils.getSubject().hasRole("PROJ_MGR")
-    		 		if( !isAdmin ) {
-    		 			isAdmin = SecurityUtils.getSubject().hasRole("PROJECT_ADMIN")
-    		 		}
     		 		assetTagsList.each{
     		 			def index = it.indexOf('-')
     		 			def tag

@@ -107,6 +107,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	static mapping  = {	
 		version true
 		autoTimestamp false
+		assetTag index:'Asset_Tag_Idx'
 		id column:'asset_entity_id'
 		columns {
 			hasKvm sqltype: 'tinyint(1)'
