@@ -304,7 +304,7 @@
 </tr>
 <tr>
 	<td>assertAlert</td>
-	<td>Please Enter Asset Name.</td>
+	<td> Please Enter Asset Name. </td>
 	<td></td>
 </tr>
 <tr>
@@ -319,7 +319,7 @@
 </tr>
 <tr>
 	<td>assertAlert</td>
-	<td>Please Enter Asset Tag.</td>
+	<td> Please Enter Asset Tag. </td>
 	<td></td>
 </tr>
 <tr>
@@ -641,7 +641,7 @@
 <tr>
 	<td>select</td>
 	<td>filter.op.assetName</td>
-	<td>label=Equal</td>
+	<td>label=Equal To</td>
 </tr>
 <tr>
 	<td>click</td>
@@ -1563,7 +1563,7 @@
 <tr>
 	<td>select</td>
 	<td>filter.op.assetName</td>
-	<td>label=Equal</td>
+	<td>label=Equal To</td>
 </tr>
 <tr>
 	<td>click</td>
@@ -1608,11 +1608,6 @@
 <tr>
 	<td>verifyElementNotPresent</td>
 	<td>link=${assetName2}</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>xpath=//html/body/div/div[5]/div/div/table/tbody/tr/td/a[node()='Asem2']/preceding::td[2]/span/a</td>
 	<td></td>
 </tr>
 

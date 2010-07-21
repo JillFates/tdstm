@@ -33,7 +33,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Administration</td>
+	<td>link=Admin</td>
 	<td></td>
 </tr>
 <tr>
@@ -188,7 +188,7 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>created</td>
+	<td>PartyRelationship created</td>
 	<td></td>
 </tr>
 <!--Reading the PartyRelationship-->

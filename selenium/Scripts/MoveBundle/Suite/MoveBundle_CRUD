@@ -257,6 +257,16 @@
 	<td></td>
 </tr>
 <tr>
+	<td>verifyElementPresent</td>
+	<td>link=Bundle List</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Bundle List</td>
+	<td></td>
+</tr>
+<tr>
 	<td>storeElementPresent</td>
 	<td>link=${BundleName}</td>
 	<td>var1</td>

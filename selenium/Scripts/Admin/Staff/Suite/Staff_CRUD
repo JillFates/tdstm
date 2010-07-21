@@ -33,7 +33,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Administration</td>
+	<td>link=Admin</td>
 	<td></td>
 </tr>
 <tr>
@@ -48,7 +48,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>_action_show</td>
+	<td>link=${cName}</td>
 	<td></td>
 </tr>
 <tr>

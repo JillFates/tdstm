@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://ph1.tdsops.com/" />
+<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
 <title>MoveEvent_Edit</title>
 </head>
 <body>
@@ -37,6 +37,41 @@
 	<td></td>
 </tr>
 <tr>
+	<td>storeElementPresent</td>
+	<td>link=Events List</td>
+	<td>bundleList</td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>${bundleList}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>bundleList=true</td>
+	<td>label3</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>bundleList=false</td>
+	<td>label4</td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label3</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Events List</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label4</td>
+	<td></td>
+</tr>
+<tr>
 	<td>verifyTitle</td>
 	<td>Move Event List</td>
 	<td></td>
@@ -54,11 +89,16 @@
 <tr>
 	<td>verifyTable</td>
 	<td>//table.0.2</td>
-	<td>Project</td>
+	<td>In Progress</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
 	<td>//table.0.3</td>
+	<td>Project</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.4</td>
 	<td>Move Bundles</td>
 </tr>
 <tr>
@@ -78,12 +118,12 @@
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.2</td>
+	<td>//table.1.3</td>
 	<td>Proj</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.3</td>
+	<td>//table.1.4</td>
 	<td>MoveBundles</td>
 </tr>
 <tr>
@@ -193,7 +233,7 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>updated</td>
+	<td>MoveEvent '${EventName}' updated</td>
 	<td></td>
 </tr>
 <tr>
