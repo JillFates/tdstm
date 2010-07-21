@@ -372,8 +372,8 @@ class MoveBundleAssetController {
     			} else {
     				assetEntityInstance.targetTeam = projectTeamInstance
     			}
-    			assetEntityInstance.save()
-    			teamAssetCounts = assetEntityAttributeLoaderService.getTeamAssetCount( bundleId, rackPlan )
+    			assetEntityInstance.save(flush:true)
+    			teamAssetCounts = assetEntityAttributeLoaderService.getTeamAssetCount( bundleInstance, rackPlan )
     		}
     	} else {
     		def assetEntityInstance = AssetEntity.findById(asset)
@@ -382,8 +382,8 @@ class MoveBundleAssetController {
 			} else {
 				assetEntityInstance.targetTeam = null
 			}
-    		assetEntityInstance.save()
-			teamAssetCounts = assetEntityAttributeLoaderService.getTeamAssetCount( bundleId, rackPlan )
+    		assetEntityInstance.save(flush:true)
+			teamAssetCounts = assetEntityAttributeLoaderService.getTeamAssetCount( bundleInstance, rackPlan )
     	}
     	render teamAssetCounts as JSON
     }
@@ -412,11 +412,11 @@ class MoveBundleAssetController {
 				} else {
 					assetEntityInstance.targetTeam = null
 				}
-				assetEntityInstance.save()
+				assetEntityInstance.save(flush:true)
 				modifiedAssetList.add(assetEntityInstance)
 				assetEntityList = modifiedAssetList
 				assetList = assetEntityAttributeLoaderService.getAssetList( assetEntityList, rackPlan, bundleInstance)
-				teamAssetCounts = assetEntityAttributeLoaderService.getTeamAssetCount( bundleId, rackPlan )
+				teamAssetCounts = assetEntityAttributeLoaderService.getTeamAssetCount( bundleInstance, rackPlan )
 			}
     	} else {
     		def modifiedAssetList = []
@@ -429,13 +429,13 @@ class MoveBundleAssetController {
     				} else {
     					assetEntityInstance.targetTeam = projectTeamInstance
     				}
-    				assetEntityInstance.save()
+    				assetEntityInstance.save(flush:true)
     				modifiedAssetList.add(assetEntityInstance)
     			}
     		}
     		assetEntityList = modifiedAssetList
 			assetList = assetEntityAttributeLoaderService.getAssetList( assetEntityList, rackPlan, bundleInstance)
-			teamAssetCounts = assetEntityAttributeLoaderService.getTeamAssetCount( bundleId, rackPlan )
+			teamAssetCounts = assetEntityAttributeLoaderService.getTeamAssetCount( bundleInstance, rackPlan )
     	}
     	teamAssetList << [ teamAssetCounts:teamAssetCounts, assetList:assetList ]
     	render teamAssetList as JSON

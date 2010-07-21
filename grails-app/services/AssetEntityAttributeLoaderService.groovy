@@ -246,9 +246,9 @@ class AssetEntityAttributeLoaderService {
 	/*
 	 * get Team - #Asset count corresponding to Bundle
 	 */
-	def getTeamAssetCount ( def bundleId, def rackPlan ) {
+	def getTeamAssetCount ( def bundleInstance, def rackPlan ) {
 		def teamAssetCounts = []
-		def bundleInstance = MoveBundle.findById(bundleId)
+		//def bundleInstance = MoveBundle.findById(bundleId)
 		def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport' " )
     	if( rackPlan == 'RerackPlan') {
     		projectTeamInstanceList.each{projectTeam ->
