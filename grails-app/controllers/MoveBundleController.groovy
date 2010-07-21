@@ -145,10 +145,10 @@ class MoveBundleController {
             def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
             def startTime = params.startTime
             def completionTime = params.completionTime
-            if(startTime != null && startTime != ""){
+            if( startTime ){
             	moveBundleInstance.startTime =  GormUtil.convertInToGMT(formatter.parse( startTime ), tzId)
             }
-            if(completionTime != null && completionTime != ""){
+            if( completionTime ){
             	moveBundleInstance.completionTime =  GormUtil.convertInToGMT(formatter.parse( completionTime ), tzId)
             }
             if(moveBundleInstance.validate(true) && moveBundleInstance.save() ) {
@@ -208,18 +208,19 @@ class MoveBundleController {
     }
 
     def save = {
-    		
-        def moveBundleInstance = new MoveBundle(params)
-        def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+
+		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
         def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
         def startTime = params.startTime
         def completionTime = params.completionTime
-        if(startTime != null && startTime != ""){
-        	moveBundleInstance.startTime =  GormUtil.convertInToGMT(formatter.parse( startTime ), tzId)
+        if(startTime){
+        	params.startTime =  GormUtil.convertInToGMT(formatter.parse( startTime ), tzId)
         }
-        if(completionTime != null && completionTime != "" ){
-        	moveBundleInstance.completionTime =  GormUtil.convertInToGMT(formatter.parse( completionTime ), tzId)
+        if(completionTime){
+        	params.completionTime =  GormUtil.convertInToGMT(formatter.parse( completionTime ), tzId)
         }
+        
+        def moveBundleInstance = new MoveBundle(params)
         def projectId = params.projectId        
         def projectManager = params.projectManager
     	def moveManager = params.moveManager

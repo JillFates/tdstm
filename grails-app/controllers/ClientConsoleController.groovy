@@ -238,7 +238,7 @@ class ClientConsoleController {
 				columns:columns, assetsInView:assetsInView, totalAssets:totalAssets ]
     	
         } else {
-    		flash.message = "Please create bundle to view PMO Dashboard"
+    		flash.message = "Please create move event and bundle to view PMO Dashboard"
     		redirect(controller:'project',action:'show',params:["id":params.projectId])
     	}
 	}

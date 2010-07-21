@@ -151,18 +151,18 @@ class ProjectController {
         //projectInstance.lastUpdated = new Date()
         
         if( projectInstance ) {
-            projectInstance.properties = params
             def startDate = params.startDate
             def completionDate = params.completionDate
             //  When the Start date is initially selected and Completion Date is blank, set completion date to the Start date
             def formatter = new SimpleDateFormat("MM/dd/yyyy");
             def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-            if(startDate != null && startDate != ""){
-            	projectInstance.startDate =  GormUtil.convertInToGMT(formatter.parse(startDate), tzId)
+            if(startDate){
+            	params.startDate =  GormUtil.convertInToGMT(formatter.parse(startDate), tzId)
             }
-            if(completionDate != null && completionDate != ""){
-            	projectInstance.completionDate =  GormUtil.convertInToGMT(formatter.parse(completionDate), tzId)
+            if(completionDate){
+            	params.completionDate =  GormUtil.convertInToGMT(formatter.parse(completionDate), tzId)
             }
+            projectInstance.properties = params
            //Get the Partner Image file from the multi-part request
             def file = request.getFile('partnerImage')
             def image            
@@ -377,21 +377,19 @@ class ProjectController {
      */
     def save = {
     	def workflowCodes = []
-        def projectInstance = new Project(params)
         //projectInstance.dateCreated = new Date()
         def startDate = params.startDate
         def completionDate = params.completionDate   
-
         //  When the Start date is initially selected and Completion Date is blank, set completion date to the Start date
 		def formatter = new SimpleDateFormat("MM/dd/yyyy");
         def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-        if(startDate != null && startDate != ""){
-        	projectInstance.startDate =  GormUtil.convertInToGMT(formatter.parse(startDate), tzId)
+        if(startDate){
+        	params.startDate =  GormUtil.convertInToGMT(formatter.parse(startDate), tzId)
         }
-        if(completionDate != null && completionDate != ""){
-        	projectInstance.completionDate =  GormUtil.convertInToGMT(formatter.parse(completionDate), tzId)
+        if(completionDate){
+        	params.completionDate =  GormUtil.convertInToGMT(formatter.parse(completionDate), tzId)
         }
-        
+        def projectInstance = new Project(params)
         //Get the Partner Image file from the multi-part request
         def file = request.getFile('partnerImage')
         def image      
@@ -422,8 +420,7 @@ class ProjectController {
         	flash.message = " Image size is too large. Please select proper Image"
 	    	redirect(action:'create')
 	    	return;
-        }       
-
+        }
         if ( !projectInstance.hasErrors() && projectInstance.save() ) {
         	if(file.getContentType() == "application/octet-stream"){
         		//Nonthing to perform.
@@ -498,7 +495,7 @@ class ProjectController {
             def managers = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $tdsParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
             
             workflowCodes = stateEngineService.getWorkflowCode()
-             
+			  
             render( view:'create', model:[ projectInstance:projectInstance, clients:clients, partners:partners, managers:managers, workflowCodes: workflowCodes ] )
         }
     }
