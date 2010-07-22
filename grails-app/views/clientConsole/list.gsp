@@ -619,6 +619,10 @@ Comment</a></span></div>
 		$("#showDialog").dialog({ autoOpen: false })
 		$("#editDialog").dialog({ autoOpen: false })
 		$("#commentsListDialog").dialog({ autoOpen: false })
+		$("#createCommentDialog").dialog({ autoOpen: false })
+	    $("#showCommentDialog").dialog({ autoOpen: false })
+	    $("#editCommentDialog").dialog({ autoOpen: false })
+	    $("#showChangeStatusDialog").dialog({ autoOpen: false })
 		var role = "${role}";
 		// Show menu when #myDiv is clicked
 		if(role) {

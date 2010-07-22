@@ -69,30 +69,31 @@ class UserPreferenceService  {
      */
     
     def setPreference( String preferenceCode, String value ) {
-    	 
-    	def prefValue = getPreference(preferenceCode)
-    	def principal = SecurityUtils.subject.principal
-    	def userLogin = UserLogin.findByUsername( principal )
-
-		//	remove the movebundle and event preferences if user switched to different project
-		if(preferenceCode == "CURR_PROJ" && prefValue && prefValue != value){
-	    	removeProjectAssociatedPreferences(userLogin )	
-		}
-    	
-    	if ( prefValue == null ) {
-    		//	Statements to create UserPreference to login user
-    		def userPreference = new UserPreference( value: value )
-    		userPreference.userLogin = userLogin
-    		userPreference.preferenceCode = preferenceCode
-    		userPreference.save( insert: true)
-    	} else {
-    		//	Statements to Update UserPreference to login user
-    		def userPreference = UserPreference.get( new  UserPreference( userLogin:userLogin, preferenceCode: preferenceCode ) )
-    		userPreference.value = value;
-    		userPreference.save();
+    	if(value && value != "null"){
+	    	def prefValue = getPreference(preferenceCode)
+	    	def principal = SecurityUtils.subject.principal
+	    	def userLogin = UserLogin.findByUsername( principal )
+	
+			//	remove the movebundle and event preferences if user switched to different project
+			if(preferenceCode == "CURR_PROJ" && prefValue && prefValue != value){
+		    	removeProjectAssociatedPreferences(userLogin )	
+			}
+	    	
+	    	if ( prefValue == null ) {
+	    		//	Statements to create UserPreference to login user
+	    		def userPreference = new UserPreference( value: value )
+	    		userPreference.userLogin = userLogin
+	    		userPreference.preferenceCode = preferenceCode
+	    		userPreference.save( insert: true)
+	    	} else {
+	    		//	Statements to Update UserPreference to login user
+	    		def userPreference = UserPreference.get( new  UserPreference( userLogin:userLogin, preferenceCode: preferenceCode ) )
+	    		userPreference.value = value;
+	    		userPreference.save();
+	    	}
+	    	// call loadPreferences() to load CURR_PROJ MAP into session
+	    	loadPreferences(preferenceCode)
     	}
-    	// call loadPreferences() to load CURR_PROJ MAP into session
-    	loadPreferences(preferenceCode)
     }
     /*-------------------------------------------------------------------------------------------
      * Remove the Move Event and Move Bundle preferences when user switched to different project.
