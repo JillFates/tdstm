@@ -19,6 +19,7 @@
       		$("#personDialog").dialog({ autoOpen: false })
      	})
    </script>
+    </head>
     <% def currProj = session.getAttribute("CURR_PROJ");
        def setImage = session.getAttribute("setImage");
     def projectId = currProj.CURR_PROJ ;
@@ -31,7 +32,6 @@
     def partyGroup = session.getAttribute("PARTYGROUP")?.PARTYGROUP ;
     def isIE6 = request.getHeader("User-Agent").contains("MSIE 6");
     %>
-  </head>
 
   <body>
     <div class="main_body">
