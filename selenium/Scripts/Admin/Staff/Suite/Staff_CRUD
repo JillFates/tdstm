@@ -188,7 +188,7 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>created</td>
+	<td>Person TestUser${firstName} sample created</td>
 	<td></td>
 </tr>
 <!--Reading the Staff Person-->
@@ -305,7 +305,7 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>updated</td>
+	<td>Person TestUser${firstName} sample updated</td>
 	<td></td>
 </tr>
 <!--Deleting the staff person-->
@@ -336,7 +336,7 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>deleted</td>
+	<td>Person TestUser${firstName} sample deleted</td>
 	<td></td>
 </tr>
 <tr>

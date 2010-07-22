@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://tmdev.tdsops.com/" />
+<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
 <title>AssetImport_TeamAssignment_Console_MoveEvent_MoveNews_Creation</title>
 </head>
 <body>
@@ -48,7 +48,7 @@
 	<td>5000000</td>
 </tr>
 <tr>
-	<td>verifyTextPresent</td>
+	<td>assertTextPresent</td>
 	<td>File uploaded successfully</td>
 	<td></td>
 </tr>
@@ -193,7 +193,7 @@
 	<td>Unassigned</td>
 </tr>
 <tr>
-	<td>verifySelectedLabel</td>
+	<td>assertSelectedLabel</td>
 	<td>bundleRightId</td>
 	<td>${BundleName}</td>
 </tr>
@@ -1503,6 +1503,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>gotolabel</td>
+	<td>label30</td>
+	<td></td>
+</tr>
+<tr>
 	<td>label</td>
 	<td>label20</td>
 	<td></td>
@@ -1510,6 +1515,11 @@
 <tr>
 	<td>click</td>
 	<td>moveBundle</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label30</td>
 	<td></td>
 </tr>
 <tr>

@@ -41,11 +41,40 @@
 	<td>Show Project</td>
 	<td></td>
 </tr>
-<!---->
 <!--create move bundle-->
 <tr>
 	<td>clickAndWait</td>
 	<td>link=Bundles</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeElementPresent</td>
+	<td>link=Bundle List</td>
+	<td>userBundle</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>userBundle=true</td>
+	<td>label25</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>userBundle=false</td>
+	<td>label35</td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label25</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Bundle List</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label35</td>
 	<td></td>
 </tr>
 <tr>
@@ -247,7 +276,7 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>created</td>
+	<td>MoveBundle ${BundleName} created</td>
 	<td></td>
 </tr>
 <!--Read and Update MoveBundle-->
@@ -418,7 +447,7 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>updated</td>
+	<td>MoveBundle ${BundleName} updated</td>
 	<td></td>
 </tr>
 <tr>
@@ -430,71 +459,6 @@
 <tr>
 	<td>clickAndWait</td>
 	<td>link=Bundles</td>
-	<td></td>
-</tr>
-<tr>
-	<td>storeElementPresent</td>
-	<td>link=${BundleName}</td>
-	<td>var2</td>
-</tr>
-<tr>
-	<td>label</td>
-	<td>label7</td>
-	<td></td>
-</tr>
-<tr>
-	<td>gotoIf</td>
-	<td>${var2}==false</td>
-	<td>label5</td>
-</tr>
-<tr>
-	<td>label</td>
-	<td>label8</td>
-	<td></td>
-</tr>
-<tr>
-	<td>gotoIf</td>
-	<td>${var2}==true</td>
-	<td>label6</td>
-</tr>
-<tr>
-	<td>label</td>
-	<td>label5</td>
-	<td></td>
-</tr>
-<tr>
-	<td>echo</td>
-	<td>label5</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=Next</td>
-	<td></td>
-</tr>
-<tr>
-	<td>storeElementPresent</td>
-	<td>link=${BundleName}</td>
-	<td>var2</td>
-</tr>
-<tr>
-	<td>gotoIf</td>
-	<td>${var2}==false</td>
-	<td>label7</td>
-</tr>
-<tr>
-	<td>gotoIf</td>
-	<td>${var2}==true</td>
-	<td>label8</td>
-</tr>
-<tr>
-	<td>label</td>
-	<td>label6</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=${BundleName}</td>
 	<td></td>
 </tr>
 <tr>
