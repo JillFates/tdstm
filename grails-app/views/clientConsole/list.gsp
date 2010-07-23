@@ -823,17 +823,12 @@ Comment</a></span></div>
 			clearTimeout(timer)
 		}
 	}
-	
 	function pageReload(){
-		if(eventType != "load" || !window.ActiveXObject) {
-			if('${myForm}'){
+		if('${myForm}'){
 			document.forms['${myForm}'].submit() ;
-			} else {
-				window.location.href = document.URL;
-			}
+		} else {
+			window.location.href = document.URL;
 		}
-		eventType ="";
-		
 	}
 	
 	function doAjaxCall(){
