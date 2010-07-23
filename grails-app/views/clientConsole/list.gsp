@@ -626,6 +626,7 @@ Comment</a></span></div>
 		var role = "${role}";
 		// Show menu when #myDiv is clicked
 		if(role) {
+			var actionId
 			$('tbody#assetListTbody').contextMenu('transitionMenu', {
 				onContextMenu: function(e) {
 					return($(e.target).is('td.tranCell'));
@@ -633,25 +634,26 @@ Comment</a></span></div>
 				onShowMenu: function(e, menu) {
 					$(".cell-selected").removeClass('cell-selected');
 					$(e.target).addClass('cell-selected');
-					${remoteFunction(action:'getMenuList', params:'\'id=\' + $(e.target).attr("id") ', onComplete:'updateMenu(e,menu)')};
+					actionId = $(e.target).attr("id") 
+					${remoteFunction(action:'getMenuList', params:'\'id=\' + actionId ', onComplete:'updateMenu(e,menu)')};
 					return menu;
 				},
 				bindings: {
 	        		'done': function(t) {
-			       		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=done\'', onComplete:'updateTransitionRow(e)' )};
+			       		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=done\'', onComplete:'updateTransitionRow(e)' )};
 			        },
 			        'ready': function(t) {
-			          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=ready\'', onComplete:'updateTransitionRow(e)' )};
+			          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=ready\'', onComplete:'updateTransitionRow(e)' )};
 			        },
 			        'NA': function(t) {
-			          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=NA\'', onComplete:'updateTransitionRow(e)' )};
+			          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=NA\'', onComplete:'updateTransitionRow(e)' )};
 			        },
 			        'pending': function(t) {
-			          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=pending\'', onComplete:'updateTransitionRow(e)' )};
+			          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=pending\'', onComplete:'updateTransitionRow(e)' )};
 			        },
 			        'void': function(t) {
 			          	if(confirm("Undo this specific task and any dependent (workflow) transitions. Are you sure?")){
-			          		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + t.id +\'&type=void\'', onComplete:'updateTransitionRow(e)' )};
+			          		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=void\'', onComplete:'updateTransitionRow(e)' )};
 						} else {
 			          		return false
 			         	}
