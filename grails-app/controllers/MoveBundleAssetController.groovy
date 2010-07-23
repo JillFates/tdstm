@@ -1410,6 +1410,9 @@ class MoveBundleAssetController {
     		 		def assetTagsList = (it.asset?.assetTag).split("<br/>")
     		 		def moveBundle = "" 
     		 		def assetTag = ""
+    		 		if(it.cssClass == "rack_error")
+		 			    assetTag += "Devices Overlap:<br />"
+		 			
     		 		assetTagsList.each{
     		 			def index = it.indexOf('-')
     		 			def tag
