@@ -1410,6 +1410,7 @@ class MoveBundleAssetController {
     		 		def assetTagsList = (it.asset?.assetTag).split("<br/>")
     		 		def moveBundle = "" 
     		 		def assetTag = ""
+    		 		def assetEntityId = it.asset.assetEntity.assetEntityId
     		 		if(it.cssClass == "rack_error")
 		 			    assetTag += "Devices Overlap:<br />"
 		 			
@@ -1421,7 +1422,7 @@ class MoveBundleAssetController {
     		 			} else {
     		 				tag = it
     		 			}
-    		 			def assetInstance = AssetEntity.findByAssetTag( tag )
+    		 			def assetInstance = AssetEntity.get( assetEntityId )
     		 			moveBundle += (assetInstance?.moveBundle ? assetInstance?.moveBundle.name : "") + "<br/>"
     		 			assetTag += "<a href='javascript:openAssetEditDialig(${assetInstance?.id})' >$it</a> <br/>"
     		 		}
