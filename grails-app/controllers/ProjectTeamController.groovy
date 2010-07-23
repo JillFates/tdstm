@@ -49,7 +49,7 @@ class ProjectTeamController {
         	PartyRelationship.executeUpdate("delete from PartyRelationship p where p.partyRelationshipType = 'PROJ_TEAM' and p.partyIdFrom = $projectTeamInstance.id and p.roleTypeCodeFrom = 'TEAM' ")
             AssetEntity.executeUpdate("update AssetEntity ae set ae.sourceTeam = null where ae.sourceTeam = $projectTeamInstance.id")
             AssetEntity.executeUpdate("update AssetEntity ae set ae.targetTeam = null where ae.targetTeam = $projectTeamInstance.id")
-        	projectTeamInstance.delete()
+        	projectTeamInstance.delete(flush:true)
             flash.message = "ProjectTeam ${projectTeamInstance} deleted"
             redirect( action:list, params:[bundleId:bundleId] )
         }

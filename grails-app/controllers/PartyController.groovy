@@ -23,7 +23,7 @@ class PartyController {
     def delete = {
         def partyInstance = Party.get( params.id )
         if ( partyInstance ) {
-            partyInstance.delete()
+            partyInstance.delete(flush:true)
             flash.message = "Party ${params.id} deleted"
             redirect( action:list )
         }

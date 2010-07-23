@@ -30,16 +30,21 @@ class PartyGroupController {
     }
 
     def delete = {
-        def partyGroupInstance = PartyGroup.get( params.id )
-        if(partyGroupInstance) {
-            partyGroupInstance.delete()
-            flash.message = "PartyGroup ${partyGroupInstance} deleted"
-            redirect(action:list)
-        }
-        else {
-            flash.message = "PartyGroup not found with id ${params.id}"
-            redirect(action:list)
-        }
+		try{
+	        def partyGroupInstance = PartyGroup.get( params.id )
+	        if(partyGroupInstance) {
+	            partyGroupInstance.delete(flush:true)
+	            flash.message = "PartyGroup ${partyGroupInstance} deleted"
+	            redirect(action:list)
+	        }
+	        else {
+	            flash.message = "PartyGroup not found with id ${params.id}"
+	            redirect(action:list)
+	        }
+		} catch(Exception ex){
+    		flash.message = ex
+    		redirect(action:list)
+    	}
     }
 
     def edit = {

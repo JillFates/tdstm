@@ -60,7 +60,7 @@ class UserLoginController {
         def userLoginInstance = UserLogin.get( params.id )
         def companyId = params.companyId
         if(userLoginInstance) {
-            userLoginInstance.delete()
+            userLoginInstance.delete(flush:true)
             flash.message = "UserLogin ${userLoginInstance} deleted"
             redirect( action:list, params:[ id:companyId ] )
         }

@@ -73,7 +73,7 @@ class PartyRelationshipService {
     		if ( partyRelationship == null ) {
     			def otherRole = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$relationshipType' and p.partyIdFrom = $partyFrom.id and p.partyIdTo = $partyTo.id and p.roleTypeCodeFrom = '$roleTypeIdFrom' ")
                 if ( otherRole != null && otherRole != "" ) {
-                    otherRole.delete()
+                    otherRole.delete(flush:true)
                     def newPartyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, partyIdFrom:partyFrom, roleTypeCodeFrom:roleTypeFrom, partyIdTo:partyTo, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" ).save( insert:true )
                 } else {
                     def newPartyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, partyIdFrom:partyFrom, roleTypeCodeFrom:roleTypeFrom, partyIdTo:partyTo, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" ).save( insert:true )
@@ -83,7 +83,7 @@ class PartyRelationshipService {
     	/*else {
         def otherRole = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$relationshipType' and p.partyIdFrom = $partyFrom.id and p.partyIdTo = $partyTo.id and p.roleTypeCodeFrom = '$roleTypeIdFrom'")
         if ( otherRole != null && otherRole != "" ) {
-        otherRole.delete()
+        otherRole.delete(flush:true)
         }
 		}*/
     }
@@ -103,7 +103,7 @@ class PartyRelationshipService {
         		def otherRelationship = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$relationshipType' and p.partyIdFrom = $partyIdFrom  and p.roleTypeCodeFrom = '$roleTypeIdFrom' and p.roleTypeCodeTo = '$roleTypeIdTo' ")
                 if ( otherRelationship != null && otherRelationship != "" ) {
                     //	Delete existing partner and reinsert new partner For Project, if partner changed
-                    otherRelationship.delete()
+                    otherRelationship.delete(flush:true)
                     def newPartyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, partyIdFrom:partyFrom, roleTypeCodeFrom:roleTypeFrom, partyIdTo:partyTo, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" ).save( insert:true )
                 } else {
                     // Create Partner if there is no partner for this project
@@ -114,7 +114,7 @@ class PartyRelationshipService {
     		//	if user select a blank then remove Partner
     		def otherRelationship = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$relationshipType' and p.partyIdFrom = $partyIdFrom  and p.roleTypeCodeFrom = '$roleTypeIdFrom' and p.roleTypeCodeTo = '$roleTypeIdTo' ")
             if ( otherRelationship != null && otherRelationship != "" ) {
-            	otherRelationship.delete()
+            	otherRelationship.delete(flush:true)
             }
     	}
     }
@@ -130,7 +130,7 @@ class PartyRelationshipService {
     	if(partyRelationship == null){
             newPartyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, partyIdFrom:partyIdFrom, roleTypeCodeFrom:roleTypeFrom, partyIdTo:partyIdTo, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" ).save( insert:true )
     	}else{
-    		partyRelationship.delete()
+    		partyRelationship.delete(flush:true)
             newPartyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, partyIdFrom:partyIdFrom, roleTypeCodeFrom:roleTypeFrom, partyIdTo:partyIdTo, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" ).save( insert:true )
     		
     	}

@@ -73,17 +73,22 @@ class MoveEventController {
 	 * @return : list of remaining MoveEvents
 	 */
     def delete = {
-        def moveEventInstance = MoveEvent.get( params.id )
-        if(moveEventInstance) {
-        	def moveEventName = moveEventInstance.name
-            moveEventInstance.delete()
-            flash.message = "MoveEvent ${moveEventName} deleted"
+    	try{
+        	def moveEventInstance = MoveEvent.get( params.id )
+	        if(moveEventInstance) {
+    	    	def moveEventName = moveEventInstance.name
+        	    moveEventInstance.delete(flush:true)
+            	flash.message = "MoveEvent ${moveEventName} deleted"
+            	redirect(action:list)
+        	}
+    	    else {
+	            flash.message = "MoveEvent not found with id ${params.id}"
+            	redirect(action:list)
+        	}
+    	} catch(Exception ex){
+    		flash.message = ex
             redirect(action:list)
-        }
-        else {
-            flash.message = "MoveEvent not found with id ${params.id}"
-            redirect(action:list)
-        }
+    	}
     }
     /*
 	 * return the MoveEvent details for selected MoveEvent to the edit form

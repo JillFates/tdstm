@@ -888,7 +888,7 @@ class AssetEntityController {
     def deleteComment = {
         def assetCommentInstance = AssetComment.get(params.id)
         if(assetCommentInstance){
-            assetCommentInstance.delete()
+            assetCommentInstance.delete(flush:true)
         }
         def assetEntityInstance = AssetEntity.get( params.assetEntity )
         def assetCommentsInstance = AssetComment.findAllByAssetEntityAndIdNotEqual( assetEntityInstance, params.id )

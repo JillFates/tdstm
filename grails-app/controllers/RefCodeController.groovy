@@ -23,8 +23,8 @@ class RefCodeController {
     def delete = {
         def refCodeInstance = RefCode.get( params.id )
         if(refCodeInstance) {
-            refCodeInstance.delete()
-            flash.message = "RefCode ${params.id} deleted"
+            refCodeInstance.delete(flush:true)
+            flash.message = "RefCode ${refCodeInstance} deleted"
             redirect(action:list)
         }
         else {

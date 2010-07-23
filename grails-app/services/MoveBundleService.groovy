@@ -154,7 +154,7 @@ class MoveBundleService {
 	  *----------------------------------------------*/
 	 def deleteMoveBundleStep( def moveBundleStep ){
 		 def stepSnapshot = StepSnapshot.executeUpdate("DELETE from StepSnapshot ss where ss.moveBundleStep = ?",[moveBundleStep]);
-		 moveBundleStep.delete();
+		 moveBundleStep.delete(flush:true);
 	 }
 	 /*-----------------------------------------------------
 	  * Return MoveEvent Detailed Results for given event.

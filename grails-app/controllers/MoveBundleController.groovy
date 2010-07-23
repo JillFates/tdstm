@@ -82,7 +82,7 @@ class MoveBundleController {
 					jdbcTemplate.update("UPDATE asset_entity set target_team_id = null WHERE target_team_id in ($teamQuery)")
 					jdbcTemplate.update("DELETE FROM project_team WHERE move_bundle_id = ${moveBundleInstance.id}")
 					jdbcTemplate.update("DELETE FROM user_preference WHERE value = ${moveBundleInstance.id}")
-	            	moveBundleInstance.delete()
+	            	moveBundleInstance.delete(flush:true)
 	                flash.message = "MoveBundle ${moveBundleInstance} deleted"
 	                redirect(action:list, params:[projectId: projectId])
 	            }catch(Exception ex){

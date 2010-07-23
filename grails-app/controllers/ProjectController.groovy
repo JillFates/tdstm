@@ -70,7 +70,7 @@ class ProjectController {
         if(currProj != params.id){
         	def projectInstance = Project.get( params.id )
 	        if(projectInstance) {
-	            projectInstance.delete()
+	            projectInstance.delete(flush:true)
 	            flash.message = "Project ${projectInstance} deleted"
 	            redirect(action:list)
 	        }
@@ -185,7 +185,7 @@ class ProjectController {
 	            /*def imageInstance = ProjectLogo.findByProject(projectInstance)
 	            
 	            if(imageInstance){
-	            	imageInstance.delete()
+	            	imageInstance.delete(flush:true)
 	            }*/
 	            
 	            image = ProjectLogo.fromUpload(file)           
@@ -215,7 +215,7 @@ class ProjectController {
             }else {
             	image = ProjectLogo.findByProject(projectInstance)
             	if(!params.projectPartner){
-               	 image.delete()
+               	 image.delete(flush:true)
             	}
             }
            
@@ -584,7 +584,7 @@ class ProjectController {
     		 def imageInstance = ProjectLogo.findByProject(projectInstance)
     		 if(imageInstance){
     			 flash.message = "Image deleted"
-    			 imageInstance.delete()
+    			 imageInstance.delete(flush:true)
     			 redirect(action:'show',id:projectInstance.id )
     		 } else {
     			 flash.message = "No Image to delete"

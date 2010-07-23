@@ -21,16 +21,21 @@ class RoleTypeController {
     }
     // delete RoleType details 
     def delete = {
-        def roleTypeInstance = RoleType.get( params.id )
-        if ( roleTypeInstance ) {
-            roleTypeInstance.delete()
-            flash.message = "RoleType ${params.id} deleted"
-            redirect( action:list )
-        }
-        else {
-            flash.message = "RoleType not found with id ${params.id}"
-            redirect( action:list )
-        }
+    	try{
+    		def roleTypeInstance = RoleType.get( params.id )
+	        if ( roleTypeInstance ) {
+	            roleTypeInstance.delete(flush:true)
+	            flash.message = "RoleType ${params.id} deleted"
+	            redirect( action:list )
+	        }
+	        else {
+	            flash.message = "RoleType not found with id ${params.id}"
+	            redirect( action:list )
+	        }
+    	} catch(Exception ex){
+    		flash.message = ex
+			redirect( action:list )	
+    	}
     }
     //return roleType details to update form
     def edit = {

@@ -23,7 +23,7 @@ class ModelController {
     def delete = {
         def modelInstance = Model.get( params.id )
         if(modelInstance) {
-            modelInstance.delete()
+            modelInstance.delete(flush:true)
             flash.message = "Model ${params.id} deleted"
             redirect(action:list)
         }

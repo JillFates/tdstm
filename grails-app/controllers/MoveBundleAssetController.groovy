@@ -33,7 +33,7 @@ class MoveBundleAssetController {
     def delete = {
         def moveBundleAssetInstance = AssetEntity.get( params.id )
         if(moveBundleAssetInstance) {
-            moveBundleAssetInstance.delete()
+            moveBundleAssetInstance.delete(flush:true)
             flash.message = "MoveBundleAsset ${params.id} deleted"
             redirect( action:list )
         }

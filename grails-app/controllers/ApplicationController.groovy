@@ -34,21 +34,26 @@ class ApplicationController {
     }
 
     def delete = {
-        def applicationInstance = Application.get( params.id )
-        def partyGroupInstance = PartyGroup.get( params.id )
-        if(applicationInstance) {
-            applicationInstance.delete()
-            if( partyGroupInstance ){
-            	partyGroupInstance.delete()
-            }
-            flash.message = "Application ${params.id} deleted"
-            redirect(action:list, id:applicationInstance.owner.id)
-            
-        }
-        else {
-            flash.message = "Application not found with id ${params.id}"
-            redirect(action:list, id:params.id, partyId:params.id)
-        }
+		try{
+	        def applicationInstance = Application.get( params.id )
+	        def partyGroupInstance = PartyGroup.get( params.id )
+	        if(applicationInstance) {
+	            applicationInstance.delete(flush:true)
+	            if( partyGroupInstance ){
+	            	partyGroupInstance.delete(flush:true)
+	            }
+	            flash.message = "Application ${params.id} deleted"
+	            redirect(action:list, id:applicationInstance.owner.id)
+	            
+	        }
+	        else {
+	            flash.message = "Application not found with id ${params.id}"
+	            redirect(action:list, id:params.id, partyId:params.id)
+	        }
+		} catch(Exception ex){
+    		flash.message = ex
+    		 redirect(action:list, id:params.id, partyId:params.id)
+    	}
     }
 
     def edit = {
