@@ -17,7 +17,7 @@ class MoveBundleStep {
 	Integer showOnDashboard=1		// Used to determine if the Step appears in the dashboard		
 	Date dateCreated
 	Date lastUpdated
-
+	Integer showInGreen = 0			// used to show the step progress in green when user set to 1
 	// The following properties are subject to change during the project and will be recomputed on each snapshot process.  Since some of these
 	// values could be changed during the course of a move (i.e. quantity of assets +/-) we should create a 1-to-many but will hold off for now.
     Date actualStartTime
@@ -32,7 +32,8 @@ class MoveBundleStep {
 		dateCreated( nullable:true )
 		lastUpdated( nullable:true )
 		calcMethod( blank:false, nullable:false, inList: [METHOD_LINEAR, METHOD_MANUAL] )
-		showOnDashboard(range:0..1)	
+		showOnDashboard(range:0..1)
+		showInGreen(range:0..1)
 	}
 
 	static hasMany = [
@@ -49,7 +50,8 @@ class MoveBundleStep {
 			planCompletionTime sqltype : 'DateTime'
 			planStartTime sqltype: 'DateTime'
 			actualCompletionTime sqltype : 'DateTime'
-			actualStartTime sqltype: 'DateTime'			
+			actualStartTime sqltype: 'DateTime'
+			showInGreen sqltype: 'tinyint(1)'
 		}
 	}
 	/*

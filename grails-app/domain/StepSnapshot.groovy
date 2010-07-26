@@ -134,7 +134,9 @@ class StepSnapshot {
 	def getStatusColor() {
 		def color = "green"
 		// Need to test on current snapshot so that this will work historically
-		if (tasksCompleted == tasksCount) {
+		if(moveBundleStep.showInGreen){
+			color = "green"
+		} else if (tasksCompleted == tasksCount) {
 			color =  moveBundleStep.actualCompletionTime > moveBundleStep.planCompletionTime ? "red" : "green"
 		} else {
 			if(dialIndicator < 25){

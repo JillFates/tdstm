@@ -62,26 +62,41 @@ class WsDashboardController {
 			def sysTimeInMs = sysTime.getTime() / 1000
 			
     		dataPointsForEachStep.each{ data ->
+    			
     			def snapshot 
     			def planCompTime = new Date( data.planComp ).getTime() / 1000  
 				def planStartTime = new Date( data.planStart ).getTime() / 1000
+				
 				if( data.snapshotId ){
 					snapshot = StepSnapshot.findById( data.snapshotId )
 					data.put( "projComp", snapshot.getProjectedCompletionTime() )
 					data.put( "statColor", snapshot.getStatusColor() )
+					if(snapshot.moveBundleStep.showInGreen){
+						data.put( "percentageStyle", "step_statusbar_good" )
+						return;
+					}
 				} else {
 					data.put( "projComp", "" )
 					data.put( "statColor", "red" )
 				}
-    			if( !data.actStart ){
-    				if( sysTimeInMs > planStartTime ){
+    			
+    			if( !data.actComp ){
+    				if( sysTimeInMs > planCompTime+59 && data.tskComp < data.tskTot){  // 59s added to planCompletion to consider the minuits instead of seconds 
     					data.put( "percentageStyle", "step_statusbar_bad" )
-    				} else {
-    					data.put( "percentageStyle", "step_statusbar_good" )
+    				} else{
+    					def remainingStepTime = planCompTime - sysTimeInMs
+						// 20% of planned duration
+						def planDurationLeft = (planCompTime - planStartTime) * 0.2 
+						// 80% of remainin assets
+						def remainingTasks =  data.tskTot * 0.6
+						if(remainingStepTime <= planDurationLeft && remainingTasks > data.tskComp){
+    						data.put( "percentageStyle", "step_statusbar_yellow" )
+						} else {
+							data.put( "percentageStyle", "step_statusbar_good" )
+						}
     				}
-    			} else if( !data.actComp ){
-    				if(data.projComp){
-	    				/*if( new Date( data.projComp ).getTime() > new Date( data.planComp ).getTime() ){
+    				/*if(data.projComp){
+	    				if( new Date( data.projComp ).getTime() > new Date( data.planComp ).getTime() ){
 	    					data.put( "percentageStyle", "step_statusbar_bad" )
 	    				} else {
 	    					data.put( "percentageStyle", "step_statusbar_yellow" )
@@ -93,25 +108,11 @@ class WsDashboardController {
 	    					data.put( "percentageStyle", "step_statusbar_yellow" )
 	    				} else {
 	    					data.put( "percentageStyle", "step_statusbar_good" )
-	    				}*/
+	    				}
 	    				
-    					if( sysTimeInMs > planCompTime+59 ){  // 59s added to planCompletion to consider the minuits instead of seconds 
-        					data.put( "percentageStyle", "step_statusbar_bad" )
-        				} else{
-        					def remainingStepTime = planCompTime - sysTimeInMs
-							// 20% of planned duration
-							def planDurationLeft = (planCompTime - planStartTime) * 0.2 
-							// 80% of remainin assets
-							def remainingTasks =  data.tskTot * 0.6
-							if(remainingStepTime <= planDurationLeft && remainingTasks > data.tskComp){
-        						data.put( "percentageStyle", "step_statusbar_yellow" )
-							} else {
-								data.put( "percentageStyle", "step_statusbar_good" )
-							}
-        				}
     				} else {
     					data.put( "percentageStyle", "step_statusbar_good" )
-    				}
+    				}*/
     			} else {
     				def actCompTime = new Date( data.actComp ).getTime() / 1000
     				if( actCompTime > planCompTime+59 ){  // 59s added to planCompletion to consider the minuits instead of seconds 

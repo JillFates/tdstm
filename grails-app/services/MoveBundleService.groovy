@@ -129,7 +129,8 @@ class MoveBundleService {
      * @param  : moveEvent, moveBundles
      *--------------------------------------------------*/
     def createMoveBundleStep(def moveBundle, def transitionId, def params){
-
+		
+		def beGreen = params["beGreen_"+transitionId]
 		def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundle , transitionId) 
 		if( !moveBundleStep ){	
 			moveBundleStep = new MoveBundleStep(moveBundle:moveBundle, transitionId:transitionId)
@@ -139,6 +140,14 @@ class MoveBundleService {
 		moveBundleStep.label = params["dashboardLabel_"+transitionId]
 		moveBundleStep.planStartTime = GormUtil.convertInToGMT( new Date( params["startTime_"+transitionId] ),tzId )
 		moveBundleStep.planCompletionTime = GormUtil.convertInToGMT( new Date( params["completionTime_"+transitionId] ),tzId )
+		
+		//show the step progress in green when user select the beGreen option
+		if(beGreen && beGreen == 'on'){
+			moveBundleStep.showInGreen = 1
+		} else {
+			moveBundleStep.showInGreen = 0
+		}
+		
 		if ( !moveBundleStep.validate() || !moveBundleStep.save(flush:true) ) {
 			def etext = "Unable to create moveBundleStep" +
 			GormUtil.allErrorsString( model )

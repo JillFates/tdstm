@@ -172,6 +172,7 @@
 					<th>Type</th>
 					<th>Value<input type="hidden" name="moveBundleId" id="moveBundleId" value="${moveBundleInstance?.id}" />
 		        <input type="hidden" name="projectId" value="${projectId}"/></th>
+		        	<th>Be Green</th>
 				</tr>
 			</thead>
 			<tbody id="commetAndNewsBodyId">
@@ -201,6 +202,16 @@
 						<g:else>
 						<td>&nbsp;</td>
 						</g:else>
+						<td>
+							<span id="beGreenDiv_${dashboardStep.moveBundleStep.id }" style="text-align: center;" >
+								<g:if test="${dashboardStep.moveBundleStep?.showInGreen}">
+									<input type="checkbox" name="beGreen_${dashboardStep.moveBundleStep.id }" id="beGreen_${dashboardStep.moveBundleStep.id }" checked="checked" disabled="disabled"/>
+								</g:if>
+								<g:else>
+									<input type="checkbox" name="beGreen_${dashboardStep.moveBundleStep.id }" id="beGreen_${dashboardStep.moveBundleStep.id }" disabled="disabled"/>
+								</g:else>
+							</span>
+						</td>
 					</tr>
 				</g:each>
 			</tbody>

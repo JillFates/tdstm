@@ -252,6 +252,7 @@
 					<th>Value 
 					<input type="hidden" name="moveBundleId" id="moveBundleId" value="${moveBundleInstance?.id}" />
 					</th>
+					<th>Be Green</th>
 				</tr>
 			</thead>
 			<tbody id="commetAndNewsBodyId">
@@ -264,7 +265,7 @@
 							<g:if test="${dashboardStep.moveBundleStep}">
 								<td>
 								 <input type="checkbox" name="checkbox_${dashboardStep.step.id }" id="checkbox_${dashboardStep.step.id }" 
-									onclick="enableInput(${dashboardStep.step.id })" checked="checked"/>
+									onclick="enableInput(${dashboardStep.step.id })" checked="checked" title="Dashboard"/>
 								</td>
 								<td>
 									<div id="labelText_${dashboardStep.step.id }" title="text" style="display: none;" >${dashboardStep.moveBundleStep?.label}</div>
@@ -337,11 +338,22 @@
 										</div>
 									</g:else>
 								</td>
+								<td>
+									<div id="beGreenDiv_${dashboardStep.step.id }" style="text-align: center;" >
+										<g:if test="${dashboardStep.moveBundleStep?.showInGreen}">
+											<input type="checkbox" name="beGreen_${dashboardStep.step.id }" id="beGreen_${dashboardStep.step.id }" checked="checked"/>
+										</g:if>
+										<g:else>
+											<input type="checkbox" name="beGreen_${dashboardStep.step.id }" id="beGreen_${dashboardStep.step.id }"/>
+										</g:else>
+										
+									</div>
+								</td>
 							</g:if>
 							<g:else>
 								<td>
 								<input type="checkbox" name="checkbox_${dashboardStep.step.id }" id="checkbox_${dashboardStep.step.id }" 
-									onclick="enableInput(${dashboardStep.step.id })"/>
+									onclick="enableInput(${dashboardStep.step.id })" title="Dashboard"/>
 								</td>
 								<td>
 									<div id="labelText_${dashboardStep.step.id }" title="text">${dashboardStep.moveBundleStep?.label}</div>
@@ -398,6 +410,11 @@
 									<div id="stepValueImg_${dashboardStep.step.id }" style="display: none;" title="">
 										<img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}">
 									</div>
+								</td>
+								<td>
+									<div id="beGreenDiv_${dashboardStep.step.id }" style="display: none;text-align: center;">
+										<input type="checkbox" name="beGreen_${dashboardStep.step.id }" id="beGreen_${dashboardStep.step.id }" />
+									</div>
 								</td>								
 							</g:else>	
 					</tr>
@@ -427,7 +444,7 @@
 			$("span[title='text']").each(function(){ 
 		    	  $(this).show(); // show the value text 
 	  		});
-			$("input[type='checkbox']").each(function(){ 
+			$("input[title='Dashboard']").each(function(){ 
 		    	  $(this).attr("checked",false); // show the value text 
 	  		});
 		}
@@ -454,6 +471,7 @@
 				$("#tasksCompletedText_"+stepId ).hide();
 				$("#tasksCompletedInput_"+stepId ).show();
 			}
+			$("#beGreenDiv_"+stepId ).show();
 			var moveBundle = $("#moveBundleId").val()
 			//${remoteFunction(controller:'moveBundle', action:'createMoveBundleStep', params:'\'moveBundleId=\'+ moveBundle +\'&transitionId=\'+ stepId ')}
 		} else {
@@ -464,6 +482,7 @@
 			$("#calcMethodInput_"+stepId ).hide();
 			$("#tasksCompletedText_"+stepId ).show();
 			$("#tasksCompletedInput_"+stepId ).hide();
+			$("#beGreenDiv_"+stepId ).hide();
 		}
     }
     function showTaskCompleted(type, stepId){
@@ -537,7 +556,7 @@
         var bundleCompletion = $("#completionTime").val()
         var bundleCompletionTime = bundleCompletion ? new Date(bundleCompletion).getTime() : new Date().getTime()
                 	
-    	$("input[type='checkbox']").each(function(){
+    	$("input[title='Dashboard']").each(function(){
     		  var id = $(this).attr("id")
 	    	  if($(this).is(':checked') ){
 		    	  var stepId = id.substring(9,id.length)
@@ -561,7 +580,6 @@
 	    		  uncheckedSteps.push(id.substring(id.indexOf("_")+1,id.length));
 	    	  }
     	});
-    	
     	if( !checked ){
     		alert(message);
 	    	return checked;
@@ -604,7 +622,7 @@
       		var objDateinMs =  new Date(date).getTime()
       		var alertMess
       		maxDuration = calculateMaxDuration()
-      		$("input[type='checkbox']").each(function(){
+      		$("input[title='Dashboard']").each(function(){
   	    		if($(this).is(':checked') ){
   	    			var id = $(this).attr("id")
   		    	  	var stepId = id.substring(9,id.length)
