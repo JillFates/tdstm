@@ -214,7 +214,7 @@
 			</g:each>
 			</g:if>
 			<g:else>
-			<th style="padding-left: 0px" colspan="${headerCount}"><embed src="${createLinkTo(dir:'templates',file:'headerSvg_'+projectId+'.svg')}" type="image/svg+xml" width="${headerCount*21.80}" height="102px"/></th>
+			<th style="padding-left: 0px; height: 102px" colspan="${headerCount}"><embed src="${createLinkTo(dir:'templates',file:'headerSvg_'+projectId+'.svg')}" type="image/svg+xml" width="${headerCount*21.80}" height="102px"/></th>
 			</g:else>
 		</tr>
 	</g:form>
