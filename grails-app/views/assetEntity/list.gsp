@@ -31,11 +31,11 @@
 <script type="text/javascript">	
 	   		
 	    	function createDialog(){
-		      $("#createDialog").dialog('option', 'width', 600)
+		      $("#createDialog").dialog('option', 'width', 900)
 		      $("#createDialog").dialog('option', 'position', ['center','top']);
 		      if($('#createFormTbodyId')){
-		      $('#createFormTbodyId').css('display','none');
-		      $('#attributeSetId').val('');
+			      $('#createFormTbodyId').css('display','none');
+			      $('#attributeSetId').val('');
 		      }
 		      $("#createDialog").dialog("open")
 		      $("#editDialog").dialog("close")
@@ -49,7 +49,7 @@
 		    
 		    function editAssetDialog() {
 		      $("#showDialog").dialog("close")
-		      $("#editDialog").dialog('option', 'width', 600)
+		      $("#editDialog").dialog('option', 'width', 900)
 		      $("#editDialog").dialog('option', 'position', ['center','top']);
 		      $("#editDialog").dialog("open")
 		
@@ -218,10 +218,9 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 			<tr class="prop">
 				<td valign="top" class="name" ><label for="attributeSet">Attribute Set:</label><span style="padding-left: 46px;"><g:select optionKey="id" from="${com.tdssrc.eav.EavAttributeSet.list()}" id="attributeSetId" name="attributeSet.id" value="${assetEntityInstance?.attributeSet?.id}" noSelection="['':'select']" 
 				 onchange="${remoteFunction(action:'getAttributes', params:'\'attribSet=\' + this.value ', onComplete:'generateCreateForm(e)')}"></g:select></span> </td>
-
 			</tr>
-			</table>
-		
+		</table>
+		<table id="createFormTbodyId"></table>
 
 	</div>
 	
