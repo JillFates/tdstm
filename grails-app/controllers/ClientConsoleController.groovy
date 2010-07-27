@@ -172,7 +172,7 @@ class ClientConsoleController {
                     check = false
                 }
                 
-                def transQuery = "from AssetTransition where assetEntity = $assetId and voided = 0 and (type = 'boolean' OR type = 'process')"
+                def transQuery = "from AssetTransition where assetEntity = $assetId and voided = 0"
                 
                 def assetTransitions = AssetTransition.findAll(transQuery)
                 def isHoldNa = assetTransitions.find { it.type == 'boolean' && it.stateTo == holdId }
@@ -182,11 +182,11 @@ class ClientConsoleController {
                     def transitionId = trans.transId
                     def stateType = trans.stateType
                     if(stateId != terminatedId){
-                        def assetTrans = assetTransitions.find { it.type == 'boolean' && it.stateTo == transitionId.toString() }
-                        
-                        if(assetTrans && assetTrans.isNonApplicable) {
+                        def assetTrans = assetTransitions.find { it.stateTo == transitionId.toString() }
+
+                        if(assetTrans?.type == 'boolean' && assetTrans?.isNonApplicable) {
                             cssClass='asset_pending'
-                        } else if(assetTrans && stateType == 'boolean') {
+                        } else if(assetTrans?.type == 'boolean' && stateType == 'boolean') {
                             if(stateId != holdId || isHoldNa){
                                 cssClass='task_done'
                             } else {
@@ -196,23 +196,23 @@ class ClientConsoleController {
                         
                         if(stateType != 'boolean' || transitionId == holdId){
                             if( transitionId <= maxstate  ){
-                                if(transitionId != holdId && assetTransitions.find { it.type == 'process' && it.stateTo == transitionId.toString() }){
-                                    cssClass = "task_done"
-                                } else if(stateId == holdId && !isHoldNa){
+                            	if(stateId == holdId && !isHoldNa){ /* check the current state, if current state = hold , show all steps in yellow */
                                     cssClass = "asset_hold"
+                                } else if(transitionId != holdId && assetTrans?.type != 'boolean'){
+                                    cssClass = "task_done"
                                 } else if( transitionId == holdId ){
                                     if(isHoldNa){
                                         cssClass='asset_pending'
                                     } else {
                                         cssClass='task_pending'
                                     }
-                                } else if(assetTrans && assetTrans.isNonApplicable){
+                                } else if(assetTrans?.type == 'boolean' && assetTrans?.isNonApplicable){
                                     cssClass='asset_pending'
                                 }
                             }
                         }
 
-                        if(assetTrans != null)
+                        if( assetTrans )
                            cssClass = getRecentChangeStyle( assetTrans, cssClass )
                     } else {
                         cssClass='task_term'
@@ -492,11 +492,11 @@ class ClientConsoleController {
 					def stateType = stateEngineService.getStateType( projectInstance.workflowCode, 
 									stateEngineService.getState(projectInstance.workflowCode, transitionId))
                     if(stateId != terminatedId){
-                        def assetTrans = assetTransitions.find { it.type == 'boolean' && it.stateTo == transitionId.toString() }
+                        def assetTrans = assetTransitions.find { it.stateTo == transitionId.toString() }
                         
-                        if(assetTrans && assetTrans.isNonApplicable) {
+                        if(assetTrans?.type == 'boolean' && assetTrans?.isNonApplicable) {
 							cssClass='asset_pending'
-                        } else if(assetTrans && stateType == 'boolean') {
+                        } else if(assetTrans?.type == 'boolean' && stateType == 'boolean') {
 							if(stateId != holdId || isHoldNa){
 								cssClass='task_done'
 							} else {
@@ -505,22 +505,23 @@ class ClientConsoleController {
 						}
 						if(stateType != 'boolean' || transitionId == holdId){
 							if( transitionId <= maxstate  ){
-                                if(transitionId != holdId && assetTransitions.find { it.type == 'process' && it.stateTo == transitionId.toString() }){
-        							cssClass = "task_done"
-        						}  else if(stateId == holdId && !isHoldNa){
+                                if(stateId == holdId && !isHoldNa){ /* check the current state, if current state = hold , show all steps in yellow */
 									cssClass = "asset_hold"
-								} else if( transitionId == holdId ){
+								} else if(transitionId != holdId && assetTrans?.type != 'boolean'){ 
+        							cssClass = "task_done"
+        						} else if( transitionId == holdId ){
 									if(isHoldNa){
 										cssClass='asset_pending'
 									} else {
 										cssClass='task_pending'
 									}
-                                } else if(assetTrans && assetTrans.isNonApplicable){
+                                } else if(assetTrans?.type == 'boolean' && assetTrans.isNonApplicable){
 									cssClass='asset_pending'
 								}
 							}
 						}
-						cssClass = getRecentChangeStyle( assetEntity, cssClass )
+						if( assetTrans )
+	                           cssClass = getRecentChangeStyle( assetTrans, cssClass )
                     } else {
                     	cssClass='task_term'
                     }
