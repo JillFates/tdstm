@@ -218,6 +218,7 @@
 <!-- Bundle Sections starts here-->
 		<div id="bdlsection">
 			<div id="bdltabs">
+				<span style="line-height: 28px;">&nbsp;</span>
 				<g:each in="${moveBundleList}" status="i" var="moveBundle">
 					<span id="spnBundle${moveBundle.id}" class="${ i == 0 ? 'mbhactive' : 'mbhinactive' }" onClick="updateDash(${moveBundle.id})">
 					${moveBundle.name}</span>&nbsp;&nbsp;
@@ -419,13 +420,29 @@
 	</div>
 </div>
 <script type="text/javascript">
-	window.onresize=pageReload;
-	window.onload=cancelResize;
 	var eventType = "load"
-	function cancelResize(){
-		eventType = "load"
-	}
+	var hasTimedOut = false;
+	var modWidth
 	$(document).ready(function() {
+
+		var viewPort = $(window).width();
+		modWidth = parseInt((viewPort-200) / 130);
+		$(".mod").css("width",(modWidth * 130 )+"px");
+
+		$(window).resize(function() {
+			if(hasTimedOut != false) {
+				clearTimeout(hasTimedOut);
+			}
+			hasTimedOut = setTimeout(function() {
+				var viewPort = $(window).width() //window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+				modWidth = parseInt((viewPort-200) / 130)
+				$(".mod").css("width",(modWidth * 130 )+"px");
+				AditionalFrames = 1
+				stepCount = 1
+				updateDash( $("#defaultBundleId").val() );
+			}, 100);
+		});
+		
 	    $("#showEditCommentDialog").dialog({
 	        autoOpen: false,
 	        resizable: false
@@ -467,6 +484,7 @@
 	* function to move the data steps to right / left
 	*----------------------------------------------*/
 	var	AditionalFrames = 1;
+	var stepCount = 1;
 	var defaultBundle = $("#defaultBundleId").val();
 	function moveDataSteps(){
 		YAHOO.example = function() {
@@ -487,12 +505,12 @@
 				move : function(e) {
 					$E.stopEvent(e);
 					if( bundle != defaultBundle ){
-						x = 1;
+						stepCount = 1
 						bundle = defaultBundle;
 					}
 					switch(this.id) {
 						case 'move-left':
-							if ( x === 1 ) {
+							if ( stepCount == 1 ) {
 								return;
 							}
 							var attributes = {
@@ -500,10 +518,10 @@
 									by : [130, 0]
 								}
 							};
-							x--;
+							stepCount--;
 						break;
 						case 'move-right':
-							if ( x === AditionalFrames ) {
+							if ( stepCount == AditionalFrames ) {
 								return;
 							}
 							var attributes = {
@@ -511,7 +529,7 @@
 									by : [-130, 0]
 								}
 							};
-							x++;
+							stepCount++;
 						break;
 					};
 					var anim = new $M('themes', attributes, 0.1, YAHOO.util.Easing.easeOut);
@@ -727,8 +745,9 @@
 	 
 	 function updateDash( bundleId ) {
 		 var moveEvent = $("#moveEvent").val()
-		 displayBundleTab( bundleId )
-		 jQuery.ajax({
+		 if(moveEvent){
+		 	displayBundleTab( bundleId )
+		 	jQuery.ajax({
 		        type:"GET",
 		        async : true,
 		        cache: false,
@@ -751,6 +770,7 @@
 	          		}
 		 		}
 			});
+		 }
 	 }
 
 	 /* update move bundal data once ajax call success */
@@ -765,7 +785,6 @@
 			var steps = snapshot.steps;
 			var revSum = snapshot.revSum;
 			var planSum = snapshot.planSum
-			var modWidth = getStepDivWidth()
 			var sumDialInd = planSum.dialInd != null ? planSum.dialInd : 50
 			AditionalFrames = ( steps.length > modWidth ? steps.length - (modWidth-1) : 1 );
 			$("#themes").css("left","0px");

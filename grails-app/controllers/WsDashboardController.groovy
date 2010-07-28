@@ -88,7 +88,7 @@ class WsDashboardController {
 						// 20% of planned duration
 						def planDurationLeft = (planCompTime - planStartTime) * 0.2 
 						// 80% of remainin assets
-						def remainingTasks =  data.tskTot * 0.6
+						def remainingTasks =  data.tskTot ? data.tskTot * 0.6 : 0
 						if(remainingStepTime <= planDurationLeft && remainingTasks > data.tskComp){
     						data.put( "percentageStyle", "step_statusbar_yellow" )
 						} else {
