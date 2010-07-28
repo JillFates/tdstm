@@ -121,7 +121,7 @@ function showAssetDialog( e , action ) {
 			    labelTd += spanAst 
 		    }
 			      
-		    var inputTd = "<td style='width:25%;'>"+attribute.value+""
+		    var inputTd = "<td style='width:25%;' nowrap>"+attribute.value+"</td>"
 
 		    // td for Edit page
 		    var inputTdE = "<td>";
@@ -241,9 +241,9 @@ function showAssetDialog( e , action ) {
 		    for (var i=0; i < length; i++) {
 				var optionObj = options[i]
 			    if(attribute.value == optionObj.option){
-			    	inputOption += '<option value='+ optionObj.option+' selected>'+optionObj.option+'</option>'
+			    	inputOption += '<option value=\''+ optionObj.option+'\' selected>'+optionObj.option+'</option>'
 			    } else {
-			    	inputOption += '<option value='+ optionObj.option+' >'+optionObj.option+'</option>'
+			    	inputOption += '<option value=\''+ optionObj.option+'\' >'+optionObj.option+'</option>'
 			    }
 		    }
 		 }

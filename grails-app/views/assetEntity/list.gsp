@@ -74,12 +74,16 @@
 				}
       		}
 		    
-      		function validateAssetEntity() {
+      		function validateAssetEntity(formname) {
       			var attributeSet = $("#attributeSetId").val();
-      			if(attributeSet){
-      				var assetName = document.createForm.assetNameId.value;
-	      			if( assetName == null || assetName == "" ){
+      			if(attributeSet || formname == 'editForm'){
+      				var assetName = document.forms[formname].assetName.value;
+      				var assetTag = document.forms[formname].assetTag.value;
+	      			if( !assetName ){
 	      				alert(" Please Enter Asset Name. ");
+	      				return false;
+	      			} else if( !assetTag ){
+	      				alert(" Please Enter Asset Tag. ");
 	      				return false;
 	      			} else {
 	      				return true;
@@ -227,7 +231,7 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 	<div class="buttons"><input type="hidden" name="projectId"
 		value="${projectId }" /> <span class="button"><input
 		class="save" type="submit" value="Create"
-		onclick="return validateAssetEntity();" /></span></div>
+		onclick="return validateAssetEntity('createForm');" /></span></div>
 </g:form></div>
 <div id="showDialog" title="Show Asset Entity" style="display: none;">
 <g:form action="save" method="post" name="showForm">
@@ -256,7 +260,7 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 	
 	</div>
 	<div class="buttons"><span class="button">
-	<input type="button" class="save" value="Update Asset Entity" onClick="${remoteFunction(action:'getAssetAttributes', params:'\'assetId=\' + document.editForm.id.value ', onComplete:'callUpdateDialog(e)')}" />
+	<input type="button" class="save" value="Update Asset Entity" onClick="if(validateAssetEntity('editForm'))  ${remoteFunction(action:'getAssetAttributes', params:'\'assetId=\' + document.editForm.id.value ', onComplete:'callUpdateDialog(e)')}" />
 	</span> <span class="button"><input type="button"
 		class="delete" onclick="return editDialogDeleteRemove('delete')"
 		value="Delete" /></span>

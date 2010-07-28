@@ -49,6 +49,16 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String cart
 	String shelf
 	
+	// Custom fields
+	String custom1
+	String custom2
+	String custom3
+	String custom4
+	String custom5
+	String custom6
+	String custom7
+	String custom8
+	
 	static hasMany = [
 		assetEntityVarchars : AssetEntityVarchar
 	]
@@ -102,6 +112,16 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		targetTeam( nullable:true )
 		cart( blank:true, nullable:true )
 		shelf( blank:true, nullable:true )
+		
+		// custom fields
+		custom1( blank:true, nullable:true )
+		custom2( blank:true, nullable:true )
+		custom3( blank:true, nullable:true )
+		custom4( blank:true, nullable:true )
+		custom5( blank:true, nullable:true )
+		custom6( blank:true, nullable:true )
+		custom7( blank:true, nullable:true )
+		custom8( blank:true, nullable:true )
 	}
 	
 	static mapping  = {	

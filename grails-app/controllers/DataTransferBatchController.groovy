@@ -17,12 +17,15 @@ class DataTransferBatchController {
      * @return dataTransferBatchList
      * -------------------------------------------------------------------------- */
     def list = {
-    		def projectId = params.projectId
-    		def projectInstance = Project.findById( projectId )
-			if( !params.max ) params.max = 10
-    		def dataTransferBatchList =  DataTransferBatch.findAllByProjectAndTransferMode( projectInstance, "I", 
-    				[sort:"dateCreated", order:"desc",max:params.max,offset:params.offset ? params.offset : 0] )
-            return [ dataTransferBatchList:dataTransferBatchList, projectId:projectId ]
+    	if(params.message){
+    		flash.message = params.message
+    	}
+    	def projectId = params.projectId
+		def projectInstance = Project.findById( projectId )
+		if( !params.max ) params.max = 10
+		def dataTransferBatchList =  DataTransferBatch.findAllByProjectAndTransferMode( projectInstance, "I", 
+				[sort:"dateCreated", order:"desc",max:params.max,offset:params.offset ? params.offset : 0] )
+		return [ dataTransferBatchList:dataTransferBatchList, projectId:projectId ]
     }
     /* -----------------------------------------------------------------------
      * Process DataTransfervalues Corresponding to DataTransferBatch
@@ -64,7 +67,7 @@ class DataTransferBatchController {
     					def isFormatError = 0
 		    			def assetEntity
 		    			if( assetEntityId ) {
-		    				assetEntity = AssetEntity.findById(assetEntityId)
+		    				assetEntity = AssetEntity.get(assetEntityId)
 		    				if ( dataTransferBatch.dataTransferSet.id == 1 ) {
 		    					def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, assetEntity, dtvList, projectInstance )
 		    					flag = validateResultList[0]?.flag
@@ -133,9 +136,20 @@ class DataTransferBatchController {
     									isFormatError = 1
     								}
     							} else {
-    								if( ( ( it.correctedValue == null || assetEntity."$attribName" != it.correctedValue ) && assetEntity."$attribName" != it.importValue) || isNewValidate == "true"  ) {
-    									isModified = "true"
-    									assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
+    								try{
+	    								if( ( ( it.correctedValue == null || assetEntity."$attribName" != it.correctedValue ) && assetEntity."$attribName" != it.importValue) || isNewValidate == "true"  ) {
+	    									isModified = "true"
+											if(("$attribName" == "assetTag" || "$attribName" == "assetName" ) && !it.importValue) throw new Exception()
+												
+	    									assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
+	    								}
+    								} catch ( Exception ex ) {
+    									errorConflictCount+=1
+    									it.hasError = 1
+    									it.errorText = "Asset Tag should not be blank"
+    									it.save()
+    									dataTransferBatch.hasErrors = 1
+    									isFormatError = 1
     								}
     							}
     						}
@@ -167,7 +181,7 @@ class DataTransferBatchController {
     				if(dataTransferCommentRowList){
     					dataTransferCommentRowList.each{
     						def assetComment
-    						def assetEntity = AssetEntity.findById(it.assetId)
+    						def assetEntity = AssetEntity.get(it.assetId)
     						if(assetEntity){
     							def principal = SecurityUtils.subject.principal
     							def loginUser = UserLogin.findByUsername(principal)
@@ -193,13 +207,11 @@ class DataTransferBatchController {
     			status.setRollbackOnly()
 				flash.message = "Import Batch process failed"
     		}
-    		if ( dataTransferBatch.dataTransferSet.id == 1 ) {
-    			flash.message = " Process Results:<ul><li>	Assets in Batch: ${batchRecords} <li>Records Inserted: ${insertCount}</li>"+
+    		flash.message = " Process Results:<ul><li>	Assets in Batch: ${batchRecords} <li>Records Inserted: ${insertCount}</li>"+
     							"<li>Records Updated: ${updateCount}</li><li>Asset Errors: ${errorCount} </li> "+
     							"<li>Attribute Errors: ${errorConflictCount}</li></ul> " 
-    		}
     	}
-    	redirect ( action:list, params:[projectId:projectId, 'flash.message':flash.message ] )
+    	redirect ( action:list, params:[projectId:projectId, message:flash.message ] )
      }
     /* --------------------------------------
      * 	@author : Lokanada Reddy
