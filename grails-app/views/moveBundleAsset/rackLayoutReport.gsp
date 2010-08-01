@@ -24,73 +24,73 @@
 		var browser=navigator.appName;
       	var assetEntityAttributes = eval('(' + e.responseText + ')');
       	var autoComp = new Array()      			
-      	var editDiv = document.getElementById("editDiv");
-      	var etb = document.getElementById('editTbodyId')
+      	var editDiv = jQuery('#editDiv');
+      	var etb = jQuery('#editTbodyId')
 		if(etb != null){
-			editDiv.removeChild(etb)
+			editDiv.remove(etb)
 		}
-      	var etbody = document.createElement('table');
+      	var etbody = jQuery(document.createElement('table'));
 		etbody.id = "editTbodyId"
 		// Rebuild the select
 		if (assetEntityAttributes) {
 			var length = assetEntityAttributes.length
 			var halfLength = getLength(length) 
-			var etr = document.createElement('tr');
-			var etdLeft = document.createElement('td');
-			etdLeft.style.border = '0'
-			var etdRight = document.createElement('td');
-			etdRight.style.border = '0'
-			etdRight.style.verticalAlign = 'top'
-			var etableLeft = document.createElement('table');
-			etableLeft.style.width = '50%'
-			etableLeft.style.border = '0'
-			var etableRight = document.createElement('table');
-			etableRight.style.width = '50%'
-			etableRight.style.border = '0'
+			var etr = jQuery(document.createElement('tr'));
+			var etdLeft = jQuery(document.createElement('td'));
+			etdLeft.css('border', '0')
+			var etdRight = jQuery(document.createElement('td'));
+			etdRight.css('border', '0')
+			etdRight.css('verticalAlign', 'top')
+			var etableLeft = jQuery(document.createElement('table'));
+			etableLeft.css('width', '50%')
+			etableLeft.css('border', '0')
+			var etableRight = jQuery(document.createElement('table'));
+			etableRight.css('width', '50%')
+			etableRight.css('border','0')
 			for (var i=0; i < halfLength; i++ ) {
 				var attributeLeft = assetEntityAttributes[i]
-				var etrLeft = document.createElement('tr');
+				var etrLeft = jQuery(document.createElement('tr'));
 				// td for Edit page
-				var inputTdELeft = document.createElement('td');
-				var labelTdELeft = document.createElement('td');
-				labelTdELeft.noWrap = 'nowrap'
-				inputTdELeft.style.border = '0'
-				labelTdELeft.style.border = '0'
-				var labelELeft = document.createTextNode(attributeLeft.label);
-				labelTdELeft.appendChild( labelELeft )
-				var inputFieldELeft = getInputType(attributeLeft);
+				var inputTdELeft = jQuery(document.createElement('td'));
+				var labelTdELeft = jQuery(document.createElement('td'));
+				labelTdELeft.attr('noWrap', 'nowrap')
+				inputTdELeft.css('border', '0')
+				labelTdELeft.css('border', '0')
+				var labelELeft = jQuery(document.createTextNode(attributeLeft.label));
+				labelTdELeft.append( labelELeft )
+				var inputFieldELeft = jQuery(getInputType(attributeLeft, ''));
 				inputFieldELeft.value = attributeLeft.value;
 				inputFieldELeft.id = 'edit'+attributeLeft.attributeCode+'Id';
-				inputTdELeft.appendChild( inputFieldELeft )
-				labelTdELeft.style.background = '#f3f4f6 '
-				labelTdELeft.style.width = '25%'
-				inputTdELeft.style.width = '25%'
-				etrLeft.appendChild( labelTdELeft )
-				etrLeft.appendChild( inputTdELeft )
-				etableLeft.appendChild( etrLeft )
+				inputTdELeft.append( inputFieldELeft )
+				labelTdELeft.css('background','#f3f4f6 ')
+				labelTdELeft.css('width', '25%')
+				inputTdELeft.css('width', '25%')
+				etrLeft.append( labelTdELeft )
+				etrLeft.append( inputTdELeft )
+				etableLeft.append( etrLeft )
 			}
 				      	
 			for (var i=halfLength; i < length; i++ ) {
 				var attributeRight = assetEntityAttributes[i]
-				var etrRight = document.createElement('tr');
+				var etrRight = jQuery(document.createElement('tr'));
 				// td for Edit page
-				var inputTdERight = document.createElement('td');
-				var labelTdERight = document.createElement('td');
+				var inputTdERight = jQuery(document.createElement('td'));
+				var labelTdERight = jQuery(document.createElement('td'));
 				labelTdERight.noWrap = 'nowrap'
-				inputTdERight.style.border = '0'
-				labelTdERight.style.border = '0'
-				var labelERight = document.createTextNode(attributeRight.label);
-				labelTdERight.appendChild( labelERight )
-				var inputFieldERight = getInputType(attributeRight);
+				inputTdERight.css('border', '0')
+				labelTdERight.css('border', '0')
+				var labelERight = jQuery(document.createTextNode(attributeRight.label));
+				labelTdERight.append( labelERight )
+				var inputFieldERight = jQuery(getInputType(attributeRight, ''));
 				inputFieldERight.value = attributeRight.value;
 				inputFieldERight.id = 'edit'+attributeRight.attributeCode+'Id';
-				inputTdERight.appendChild( inputFieldERight )
-				labelTdERight.style.background = '#f3f4f6 '
-				labelTdERight.style.width = '25%'
-				inputTdERight.style.width = '25%'
-				etrRight.appendChild( labelTdERight )
-				etrRight.appendChild( inputTdERight )
-				etableRight.appendChild( etrRight )
+				inputTdERight.append( inputFieldERight )
+				labelTdERight.css('background','#f3f4f6 ')
+				labelTdERight.css('width', '25%')
+				inputTdERight.css('width', '25%')
+				etrRight.append( labelTdERight )
+				etrRight.append( inputTdERight )
+				etableRight.append( etrRight )
 			}
 			for (var i=0; i < length; i++ ) {
 				var attribute = assetEntityAttributes[i]
@@ -98,14 +98,14 @@
 					autoComp.push(attribute.attributeCode)
 				}
 			}
-			etdLeft.appendChild( etableLeft )
-			etdRight.appendChild( etableRight )
-			etr.appendChild( etdLeft )
-			etr.appendChild( etdRight )
-			etbody.appendChild( etr )
+			etdLeft.append( etableLeft )
+			etdRight.append( etableRight )
+			etr.append( etdLeft )
+			etr.append( etdRight )
+			etbody.append( etr )
 		}
 		
-		editDiv.appendChild( etbody )
+		editDiv.append( etbody )
 		if(browser == 'Microsoft Internet Explorer') {
 			editDiv.innerHTML += "";
 		} 
