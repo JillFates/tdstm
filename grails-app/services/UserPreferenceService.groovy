@@ -219,4 +219,66 @@ class UserPreferenceService  {
 					   column3:[label:attributeLabel3, field:attribute3], column4:[label:attributeLabel4, field:attribute4]]
 		return columns;
     }
+    /*
+     * 
+     */
+	def removeProjectAssociates( def projectInstance ){
+    	def message 
+		try{
+			//remove the AssetEntity
+			def assetsQuery = "select a.id from AssetEntity a where a.project = ${projectInstance.id}"
+			
+			ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset in ($assetsQuery)")
+			AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity in ($assetsQuery)")
+			AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar av where av.assetEntity in ($assetsQuery)")
+			AssetTransition.executeUpdate("delete from AssetTransition at where at.assetEntity in ($assetsQuery)")
+			ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.project = ${projectInstance.id}")
+			
+			ProjectTeam.executeUpdate("Update ProjectTeam pt SET pt.latestAsset = null where pt.latestAsset in ($assetsQuery)")
+			
+			AssetEntity.executeUpdate("delete from AssetEntity ae where ae.project = ${projectInstance.id}")
+			
+			// remove DataTransferBatch
+			def batchQuery = "select dtb.id from DataTransferBatch dtb where dtb.project = ${projectInstance.id}"
+			
+			DataTransferComment.executeUpdate("delete from DataTransferComment dtc where dtc.dataTransferBatch in ($batchQuery)")
+			DataTransferValue.executeUpdate("delete from DataTransferValue dtv where dtv.dataTransferBatch in ($batchQuery)")
+			
+			DataTransferBatch.executeUpdate("delete from DataTransferBatch dtb where dtb.project = ${projectInstance.id}")
+			
+			// remove Move Bundle
+			def bundleQuery = "select mb.id from MoveBundle mb where mb.project = ${projectInstance.id}"
+			
+			AssetEntity.executeUpdate("Update AssetEntity ae SET ae.moveBundle = null where ae.moveBundle in ($bundleQuery)")
+			AssetTransition.executeUpdate("delete from AssetTransition at where at.moveBundle in ($bundleQuery)")
+			StepSnapshot.executeUpdate("delete from StepSnapshot ss where ss.moveBundleStep in (select mbs.id from MoveBundleStep mbs where mbs.moveBundle in ($bundleQuery))")
+			MoveBundleStep.executeUpdate("delete from MoveBundleStep mbs where mbs.moveBundle in ($bundleQuery)")
+			
+			def teamQuery = "select pt.id From ProjectTeam pt where pt.moveBundle in ($bundleQuery)"
+			PartyRelationship.executeUpdate("delete from PartyRelationship pr where pr.partyIdFrom in ( $teamQuery ) or pr.partyIdTo in ( $teamQuery )")
+			PartyGroup.executeUpdate("delete from Party p where p.id in ( $teamQuery )")
+			Party.executeUpdate("delete from Party p where p.id in ( $teamQuery )")
+			ProjectTeam.executeUpdate("delete from ProjectTeam pt where pt.moveBundle in ($bundleQuery)")
+			
+			PartyRelationship.executeUpdate("delete from PartyRelationship pr where pr.partyIdFrom in ($bundleQuery) or pr.partyIdTo in ($bundleQuery)")
+			Party.executeUpdate("delete from Party p where p.id in ($bundleQuery)")
+			MoveBundle.executeUpdate("delete from MoveBundle mb where mb.project = ${projectInstance.id}")
+			
+			// remove Move Event
+			def eventQuery = "select me.id from MoveEvent me where me.project = ${projectInstance.id}"
+			
+			MoveBundle.executeUpdate("Update MoveBundle mb SET mb.moveEvent = null where mb.moveEvent in ($eventQuery)")
+			MoveEventNews.executeUpdate("delete from MoveEventNews men where men.moveEvent in ($eventQuery)")
+			MoveEventSnapshot.executeUpdate("delete from MoveEventNews mes where mes.moveEvent in ($eventQuery)")
+			
+			MoveEvent.executeUpdate("delete from MoveEvent me where me.project = ${projectInstance.id}")
+			// remove Project Logo
+			ProjectLogo.executeUpdate("delete from ProjectLogo pl where pl.project = ${projectInstance.id}")
+			// remove party relationship
+			PartyRelationship.executeUpdate("delete from PartyRelationship pr where pr.partyIdFrom  = ${projectInstance.id} or pr.partyIdTo = ${projectInstance.id}")
+		} catch(Exception ex){
+			message = "Unable to remove the $projectInstance.name project Error:"+ex
+		}	
+		return message
+    }
 }

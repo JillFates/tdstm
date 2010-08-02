@@ -629,7 +629,7 @@ Comment</a></span></div>
 			var actionId
 			$('tbody#assetListTbody').contextMenu('transitionMenu', {
 				onContextMenu: function(e) {
-					return($(e.target).is('td.tranCell'));
+					return($(e.target).is('td.tranCell') && !$(e.target).is('td.asset_hold'));
 				},
 				onShowMenu: function(e, menu) {
 					$(".cell-selected").removeClass('cell-selected');

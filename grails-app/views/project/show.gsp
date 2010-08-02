@@ -117,13 +117,6 @@
           </tr>
 
           <tr class="prop">
-            <td valign="top" class="name">Track Changes:</td>
-
-            <td valign="top" class="value">${fieldValue(bean:projectInstance, field:'trackChanges')}</td>
-
-          </tr>
-          
-          <tr class="prop">
             <td valign="top" class="name">Workflow Code:</td>
 
             <td valign="top" class="value">${fieldValue(bean:projectInstance, field:'workflowCode')}</td>
@@ -157,7 +150,7 @@
           </span>
         </jsec:hasRole>
         <jsec:hasRole name="ADMIN">
-          <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
+          <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Warning: This will delete the ${projectInstance?.name} project and all of the assets, events, bundles, and any historic data?');" value="Delete" /></span>
         </jsec:hasRole>
       </g:form>
     </div></div>

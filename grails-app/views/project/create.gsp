@@ -387,19 +387,6 @@
 			</tr>
 
 			<tr class="prop">
-				<td valign="top" class="name"><label for="trackChanges"><b>Track Changes:&nbsp;<span style="color: red">*</span></b></label></td>
-				<td valign="top"
-					class="value ${hasErrors(bean:projectInstance,field:'trackChanges','errors')}">
-				<g:select id="trackChanges" name="trackChanges"
-					from="${projectInstance.constraints.trackChanges.inList}"
-					value="${projectInstance.trackChanges}"></g:select>
-					 <g:hasErrors bean="${projectInstance}" field="trackChanges">
-					<div class="errors"><g:renderErrors bean="${projectInstance}"
-						as="list" field="trackChanges" /></div>
-				</g:hasErrors></td>
-			</tr>
-			
-			<tr class="prop">
 				<td valign="top" class="name"><label for="workflowCode"><b>Workflow	Code:&nbsp;<span style="color: red">*</span></b></label></td>
 				<td valign="top"
 					class="value ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">

@@ -65,23 +65,21 @@ class ProjectController {
     }
 
     def delete = {
-    	
-    	def currProj = session.getAttribute("CURR_PROJ").CURR_PROJ;
-        if(currProj != params.id){
-        	def projectInstance = Project.get( params.id )
-	        if(projectInstance) {
-	            projectInstance.delete(flush:true)
-	            flash.message = "Project ${projectInstance} deleted"
-	            redirect(action:list)
-	        }
-	        else {
-	            flash.message = "Project not found with id ${params.id}"
-	            redirect(action:list)
-	        }
-        } else {
-            flash.message = "Unable to Delete the Current Project"
-            redirect(action:list)
-        }
+    	def projectInstance = Project.get( params.id )
+	    if(projectInstance) {
+	    	def message = userPreferenceService.removeProjectAssociates(projectInstance)
+			println"message--------->"+message
+	    	projectInstance.delete(flush:true)
+			PartyGroup.executeUpdate("delete from Party p where p.id = ${params.id}")
+			Party.executeUpdate("delete from Party p where p.id = ${params.id}")
+			
+			flash.message = "Project ${projectInstance} deleted"
+			redirect(action:list)
+	    } else {
+	    	flash.message = "Project not found with id ${params.id}"
+	        redirect(action:list)
+	    }
+        
     }
 
     def edit = {

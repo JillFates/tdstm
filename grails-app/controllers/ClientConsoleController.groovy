@@ -195,10 +195,10 @@ class ClientConsoleController {
                         }
                         
                         if(stateType != 'boolean' || transitionId == holdId){
-                            if( transitionId <= maxstate  ){
-                            	if(stateId == holdId && !isHoldNa){ /* check the current state, if current state = hold , show all steps in yellow */
-                                    cssClass = "asset_hold"
-                                } else if(transitionId != holdId && assetTrans?.type != 'boolean'){
+                        	if(stateId == holdId && !isHoldNa){ /* check the current state, if current state = hold , show all steps in yellow */
+                                cssClass = "asset_hold"
+                            } else if( transitionId <= maxstate  ){
+                            	if(transitionId != holdId && assetTrans?.type != 'boolean'){
                                     cssClass = "task_done"
                                 } else if( transitionId == holdId ){
                                     if(isHoldNa){
@@ -504,10 +504,10 @@ class ClientConsoleController {
 							}
 						}
 						if(stateType != 'boolean' || transitionId == holdId){
-							if( transitionId <= maxstate  ){
-                                if(stateId == holdId && !isHoldNa){ /* check the current state, if current state = hold , show all steps in yellow */
-									cssClass = "asset_hold"
-								} else if(transitionId != holdId && assetTrans?.type != 'boolean'){ 
+							if(stateId == holdId && !isHoldNa){ /* check the current state, if current state = hold , show all steps in yellow */
+								cssClass = "asset_hold"
+							} else if( transitionId <= maxstate  ){
+                                if(transitionId != holdId && assetTrans?.type != 'boolean'){ 
         							cssClass = "task_done"
         						} else if( transitionId == holdId ){
 									if(isHoldNa){
@@ -728,6 +728,14 @@ class ClientConsoleController {
 		
 		def totalAssets = assetEntityList.size()
 		def possibleAssets = 0
+		
+		//Set possibleAssets = 0 when stateTo is Hold
+		if(stateTo == "Hold"){
+			message = "Transition not allowed"
+			render message 
+			return
+		}
+		
 		// terminate if type is not appplicable 
 		if(stateType != "boolean" && (type == "NA" || type == "pending")){
 			message = " $type not allowed for Process steps"
@@ -740,19 +748,13 @@ class ClientConsoleController {
 			return
 		}
 		// send the response message when state to as Ready or state type as boolean
-		if((stateTo == "Ready" || (stateType == "boolean" && stateTo != "Hold")) && type != "void" ) {
+		if(stateType == "boolean" && stateTo != "Hold" && type != "void" ) {
 			possibleAssets = totalAssets
 			message = "Set the $possibleAssets out of $totalAssets assets to $stateTo to $type ?"
 			render message 
 			return
 		}
-		// Set possibleAssets = 0 when stateTo is Hold
-		if(stateTo == "Hold"){
-			message = "Set the 0 out of $totalAssets assets to Hold to $type ?"
-			render message 
-			return
-		}
-		
+
 		def subject = SecurityUtils.subject
 		def role = ""
 		if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
@@ -760,28 +762,31 @@ class ClientConsoleController {
 		} else if(subject.hasRole("MANAGER")){
 			role = "MANAGER"
 		}
+		def assetIds = assetEntityList.id.toString().replace("[","(").replace("]",")")
+		
+		def currentTransitions = jdbcTemplate.queryForList("""SELECT * FROM ( select cast(t.state_to as UNSIGNED INTEGER) as stateTo, t.asset_entity_id as assetId from asset_transition t 
+															where t.asset_entity_id in ${assetIds} and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId )
+															order by date_created desc, stateTo desc ) tr group by tr.assetId """)
 		if(type != "void"){
 			assetEntityList.each{ asset ->
-				def currentTransition = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-													"where t.asset_entity_id = ${asset.id} and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
-													"order by date_created desc limit 1 ")
-				if( currentTransition.size() ){
-					def currentStateId = currentTransition[0].stateTo
-					def currentState = stateEngineService.getState( asset.project.workflowCode, currentStateId)
+				def currentTransition = currentTransitions.find { it.assetId == asset.id && it.stateTo != holdId }
+				if( currentTransition ){
+					def currentStateId = currentTransition.stateTo
+					def currentState = stateEngineService.getState( asset.project.workflowCode, currentTransition.stateTo)
 					def validate = stateEngineService.canDoTask( asset.project.workflowCode, role, currentState, stateTo  ) 
-					if(validate){
+					if(validate || stateTo =="Ready"){
 						possibleAssets += 1
 					}
+				} else if( !currentTransitions.find { it.assetId == asset.id && it.stateTo == holdId } && stateTo =="Ready"){
+					possibleAssets += 1
 				}
 			}
 			message = "Set the $possibleAssets out of $totalAssets assets to $stateTo to $type ?"
 		} else {
 			def undoAssets = 0
 			assetEntityList.each{ asset ->
-				def currentTransition = jdbcTemplate.queryForList("select t.state_to from asset_transition t where t.asset_entity_id = ${asset.id} "+
-													" and t.state_to = $transId and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
-													"order by date_created desc limit 1 ")
-				if( currentTransition.size() ){
+				def currentTransition = currentTransitions.find { it.assetId == asset.id && it.stateTo != holdId && it.stateTo >= Integer.parseInt(transId) }		
+				if( currentTransition ){
 					undoAssets += 1
 				}
 			}
@@ -801,6 +806,12 @@ class ClientConsoleController {
 		def type = params.type
 		
 		def stateTo = stateEngineService.getState( moveEvent.project.workflowCode, Integer.parseInt(transId) )
+		
+		if(stateTo == "Hold"){
+			render ""
+			return
+		}
+		
 		def stateType = stateEngineService.getStateType(moveEvent.project.workflowCode, stateTo)
 		def holdId = Integer.parseInt(stateEngineService.getStateId(moveEvent.project.workflowCode,"Hold"))
 		
@@ -814,20 +825,23 @@ class ClientConsoleController {
 			role = "MANAGER"
 		}
 		def loginUser = UserLogin.findByUsername(subject.principal)
+		def assetIds = assetEntityList.id.toString().replace("[","(").replace("]",")")
+		def currentTransitions = jdbcTemplate.queryForList("""SELECT * FROM ( select cast(t.state_to as UNSIGNED INTEGER) as stateTo, t.asset_entity_id as assetId from asset_transition t 
+															where t.asset_entity_id in ${assetIds} and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId )
+															order by date_created desc, stateTo desc ) tr group by tr.assetId """)
 		assetEntityList.each{ asset ->
 		
-			def currentTransition = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-							"where t.asset_entity_id = ${asset.id} and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
-							"order by date_created desc limit 1 ")
+			def currentTransition = currentTransitions.find { it.assetId == asset.id && it.stateTo != holdId }
 	
-			if( currentTransition.size() && type != "void"){
-				def currentStateId = currentTransition[0].stateTo
+			if( currentTransition && type != "void"){
+				def currentStateId = currentTransition.stateTo
 				def currentState = stateEngineService.getState( asset.project.workflowCode, currentStateId)
 				def validate = stateEngineService.canDoTask( asset.project.workflowCode, role, currentState, stateTo  ) 
-				if(validate){
+				if(validate || stateTo =="Ready"){
 					pmoAssetTrackingService.createBulkTransition( type, asset, stateTo, role, loginUser, "" )
 				}
-			} else if(stateTo == "Ready" || stateType == "boolean" || type == "void") {
+			} else if( ( !currentTransitions.find { it.assetId == asset.id && it.stateTo == holdId } && stateTo =="Ready") || 
+					stateType == "boolean" || type == "void") {
 				pmoAssetTrackingService.createBulkTransition( type, asset, stateTo, role, loginUser, "" )
 			}
 		}

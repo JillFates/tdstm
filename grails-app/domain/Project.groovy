@@ -4,7 +4,7 @@ class Project extends PartyGroup {
 
 	String projectCode
 	String description
-	String trackChanges
+	String trackChanges = 'Y'
 	Date startDate	// Date that the project will start
 	Date completionDate	// Date that the project will finish
 	PartyGroup client
