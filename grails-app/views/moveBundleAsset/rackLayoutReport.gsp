@@ -25,12 +25,9 @@
       	var assetEntityAttributes = eval('(' + e.responseText + ')');
       	var autoComp = new Array()      			
       	var editDiv = jQuery('#editDiv');
-      	var etb = jQuery('#editTbodyId')
-		if(etb != null){
-			editDiv.remove(etb)
-		}
+		jQuery('#editDiv #editTbodyId').remove();
       	var etbody = jQuery(document.createElement('table'));
-		etbody.id = "editTbodyId"
+		etbody.attr('id', "editTbodyId");
 		// Rebuild the select
 		if (assetEntityAttributes) {
 			var length = assetEntityAttributes.length
@@ -59,8 +56,8 @@
 				var labelELeft = jQuery(document.createTextNode(attributeLeft.label));
 				labelTdELeft.append( labelELeft )
 				var inputFieldELeft = jQuery(getInputType(attributeLeft, ''));
-				inputFieldELeft.value = attributeLeft.value;
-				inputFieldELeft.id = 'edit'+attributeLeft.attributeCode+'Id';
+				inputFieldELeft.attr('value', attributeLeft.value);
+				inputFieldELeft.attr('id', 'edit'+attributeLeft.attributeCode+'Id');
 				inputTdELeft.append( inputFieldELeft )
 				labelTdELeft.css('background','#f3f4f6 ')
 				labelTdELeft.css('width', '25%')
@@ -76,14 +73,14 @@
 				// td for Edit page
 				var inputTdERight = jQuery(document.createElement('td'));
 				var labelTdERight = jQuery(document.createElement('td'));
-				labelTdERight.noWrap = 'nowrap'
+				labelTdERight.attr('noWrap', 'nowrap')
 				inputTdERight.css('border', '0')
 				labelTdERight.css('border', '0')
 				var labelERight = jQuery(document.createTextNode(attributeRight.label));
 				labelTdERight.append( labelERight )
 				var inputFieldERight = jQuery(getInputType(attributeRight, ''));
-				inputFieldERight.value = attributeRight.value;
-				inputFieldERight.id = 'edit'+attributeRight.attributeCode+'Id';
+				inputFieldERight.attr('value', attributeRight.value);
+				inputFieldERight.attr('id', 'edit'+attributeRight.attributeCode+'Id');
 				inputTdERight.append( inputFieldERight )
 				labelTdERight.css('background','#f3f4f6 ')
 				labelTdERight.css('width', '25%')
