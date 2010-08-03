@@ -201,7 +201,7 @@
                 </div>
                 <div class="buttons">
                     <span class="button"><g:actionSubmit class="save" value="Update" onclick="return validateDates()"/></span>
-                    <span class="button"><g:actionSubmit class="delete" onclick="if(confirm('Are you sure?')){document.editProjectForm.action = 'delete'};" value="Delete" /></span>
+                    <span class="button"><g:actionSubmit class="delete" onclick="if(confirm('Warning: This will delete the ${projectInstance?.name} project and all of the assets, events, bundles, and any historic data?')){document.editProjectForm.action = 'delete'};" value="Delete" /></span>
                 </div>
             </g:form>
         </div>

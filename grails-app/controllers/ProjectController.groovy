@@ -68,8 +68,7 @@ class ProjectController {
     	def projectInstance = Project.get( params.id )
 	    if(projectInstance) {
 	    	def message = userPreferenceService.removeProjectAssociates(projectInstance)
-			println"message--------->"+message
-	    	projectInstance.delete(flush:true)
+			projectInstance.delete(flush:true)
 			PartyGroup.executeUpdate("delete from Party p where p.id = ${params.id}")
 			Party.executeUpdate("delete from Party p where p.id = ${params.id}")
 			
