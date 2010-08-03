@@ -42,49 +42,23 @@ function appendBundles() {
 				<tr >
 				   	<td class="label" >Project:</td>
 				   	<td class="field">
-				   		<select  id="projectId" name="project"  
-				   			onchange="appendBundles()" >
-				   			<g:each in="${Project.list()}" var="project">
-				   			<g:if test="${currProj == project.id.toString()} ">
-				   				<option value="${project.id}" selected>${project.name}</option>
-				   			</g:if>
-				   			<g:else>
-				   				<option value="${project.id}">${project.name}</option>
-				   			</g:else>
-				   			</g:each>
-				   		</select>
+				   		<g:select from ="${Project.list()}" value ="${currProj}" optionKey ="id" optionValue="name" 
+				   				id="projectId" name="project" onchange="appendBundles()"/>
 				   </td>
 				</tr>
 				
 				<tr>
 				   <td class="label">Bundle:</td>
 				   <td class="field">
-				      <select name="moveBundle" id="moveBundleId" class="select" onchange="appendBundles()">
-				      	<g:each in="${moveBundlesList}" var="moveBundle">
-				   			<g:if test="${currBundle == moveBundle?.id.toString()} ">
-				   				<option value="${moveBundle?.id}" selected>${moveBundle?.name}</option>
-				   			</g:if>
-				   			<g:else>
-				   				<option value="${moveBundle?.id}">${moveBundle?.name}</option>
-				   			</g:else>
-				   		</g:each>
-				      </select>
+				   <g:select from ="${moveBundlesList}" value ="${currBundle}" optionKey ="id" optionValue="name" 
+				   				name="moveBundle" id="moveBundleId" class="select" onchange="appendBundles()"/>
 				   </td>
 				</tr>
 				
 				<tr>
 				   <td class="label">Location:</td>
 				   <td class="field">
-				      <select name="location" id="locationId" class="select" >
-				      	<g:each in="${locationList}" var="location">
-				   			<g:if test="${currLocation == location} ">
-				   				<option value="${location}" selected>${location}</option>
-				   			</g:if>
-				   			<g:else>
-				   				<option value="${location}">${location}</option>
-				   			</g:else>
-				   		</g:each>
-				      </select>
+				   		<g:select from ="${locationList}" value ="${currLocation}" name="location" id="locationId" class="select"/>
 				   </td>
 				</tr>
 				
