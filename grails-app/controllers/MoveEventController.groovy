@@ -77,18 +77,18 @@ class MoveEventController {
         	def moveEventInstance = MoveEvent.get( params.id )
 	        if(moveEventInstance) {
     	    	def moveEventName = moveEventInstance.name
-        	    moveEventInstance.delete(flush:true)
+    	    	jdbcTemplate.update("DELETE FROM move_event_snapshot WHERE move_event_id = ${moveEventInstance?.id} " )
+				jdbcTemplate.update("DELETE FROM move_event_news WHERE move_event_id = ${moveEventInstance?.id} " )
+				jdbcTemplate.update("UPDATE move_bundle SET move_event_id = null WHERE move_event_id = ${moveEventInstance?.id} " )
+        	    moveEventInstance.delete()
             	flash.message = "MoveEvent ${moveEventName} deleted"
-            	redirect(action:list)
-        	}
-    	    else {
+        	} else {
 	            flash.message = "MoveEvent not found with id ${params.id}"
-            	redirect(action:list)
         	}
     	} catch(Exception ex){
     		flash.message = ex
-            redirect(action:list)
     	}
+    	redirect(action:list)
     }
     /*
 	 * return the MoveEvent details for selected MoveEvent to the edit form

@@ -155,7 +155,7 @@
           <input type="hidden" name="id" value="${moveBundleInstance?.id}" />
           <input type="hidden" name="projectId" value="${projectId}" />
           <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
-          <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
+          <span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this bundle will remove any move teams and any related step data?');" value="Delete" /></span>
         </g:form>
       </div>
     </div>

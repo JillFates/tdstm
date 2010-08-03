@@ -384,7 +384,7 @@ class AssetEntityAttributeLoaderService {
 		}
 		dtValue.hasError = 1
 		dtValue.errorText = "change conflict"
-		dtValue.save()
+		dtValue.save(flush:true)
 	}
 	
 	/* To get DataTransferValue Asset MoveBundle

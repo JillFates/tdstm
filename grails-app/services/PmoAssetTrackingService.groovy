@@ -166,11 +166,11 @@ class PmoAssetTrackingService {
 					}
 				}
 				if(stateType != 'boolean' || transitionId == holdId){
-					if( transitionId <= maxstate  ){
+					if(currentstate == holdId && !isHoldNa ){
+						cssClass = "asset_hold"
+					} else if( transitionId <= maxstate  ){
 						if(transitionId != holdId && AssetTransition.find(doneTransitionQuery+"  and stateTo = "+transitionId)){
 							cssClass = "task_done"
-						} else if(currentstate == holdId && !isHoldNa ){
-							cssClass = "asset_hold"
 						} else if( transitionId == holdId ){
 							if(isHoldNa){
 								cssClass='asset_pending'

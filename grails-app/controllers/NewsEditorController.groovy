@@ -41,9 +41,9 @@ class NewsEditorController {
 		} else {
             userPreferenceService.loadPreferences("MOVE_EVENT")
             def defaultEvent = getSession().getAttribute("MOVE_EVENT")
-            if(defaultEvent.MOVE_EVENT){
+            if(defaultEvent?.MOVE_EVENT){
             	moveEvent = MoveEvent.findById(defaultEvent.MOVE_EVENT)
-            	if( moveEvent.project.id != Integer.parseInt(projectId) ){
+            	if( moveEvent?.project?.id != Integer.parseInt(projectId) ){
             		moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
             	}
             } else {
@@ -53,7 +53,7 @@ class NewsEditorController {
 		
     	def moveBundlesList
     	if(moveEvent){
-    		moveBundlesList = MoveBundle.findAll("from MoveBundle mb where mb.moveEvent = ${moveEvent.id} order by mb.name asc")
+    		moveBundlesList = MoveBundle.findAll("from MoveBundle mb where mb.moveEvent = ${moveEvent?.id} order by mb.name asc")
     	} else {
     		moveBundlesList = MoveBundle.findAll("from MoveBundle mb where mb.project = ${projectId} order by mb.name asc")
     	}
@@ -83,11 +83,11 @@ class NewsEditorController {
     		assetCommentsQuery.append(" mb.move_bundle_id = ${moveBundleInstance.id}  ")
     	} else {
     		
-    		assetCommentsQuery.append(" mb.move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEvent.id} )")
+    		assetCommentsQuery.append(" mb.move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEvent?.id} )")
     	}
         
 		if(moveEvent){
-			moveEventNewsQuery.append(" mn.move_event_id = ${moveEvent.id}  and p.project_id = ${projectInstance.id} ")
+			moveEventNewsQuery.append(" mn.move_event_id = ${moveEvent?.id}  and p.project_id = ${projectInstance.id} ")
 		} else {
 			moveEventNewsQuery.append(" p.project_id = ${projectInstance.id} ")			
 		}
