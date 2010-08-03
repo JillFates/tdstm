@@ -39,6 +39,7 @@ class DashboardController {
             	moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
             }
         }
+		userPreferenceService.loadPreferences("DASHBOARD_REFRESH")
         def timeToUpdate = getSession().getAttribute("DASHBOARD_REFRESH")
 		def subject = SecurityUtils.subject
         if( moveEvent ){
