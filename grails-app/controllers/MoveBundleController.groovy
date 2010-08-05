@@ -151,6 +151,8 @@ class MoveBundleController {
             moveBundleInstance.description = params.description
 			if(params.moveEvent.id){
 				moveBundleInstance.moveEvent = MoveEvent.get(params.moveEvent.id)
+			} else {
+				moveBundleInstance.moveEvent = null
 			}
             moveBundleInstance.operationalOrder = params.operationalOrder ? Integer.parseInt(params.operationalOrder) : 1
             def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
