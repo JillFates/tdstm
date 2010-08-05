@@ -43,6 +43,8 @@ class ProjectController {
     		def userCompany = partyRelationshipService.getSatffCompany( loginUser.person )
 			userPreferenceService.setPreference( "PARTYGROUP", "${userCompany?.partyIdFrom?.id}" )
 			userPreferenceService.loadPreferences("CURR_TZ")
+			userPreferenceService.loadPreferences("CURR_BUNDLE")
+			userPreferenceService.loadPreferences("MOVE_EVENT")
         	def projectLogo
         	if(currProjectInstance){
         		projectLogo = ProjectLogo.findByProject(currProjectInstance)

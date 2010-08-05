@@ -277,11 +277,26 @@
 								<td>
 								<div id="startTimeInput_${dashboardStep.step.id }" title="input">
 									<table>
+										<tr>
+											<td colspan="2">
+												<div style="float: left;padding-right: 5px; ">
+													<span style="float: left;"><input type="text" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }"
+														value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"
+														onchange="validateDateInput(this.value, ${dashboardStep.step.id }, 'start')"/>
+													</span>
+													<span id="startTimeImg_${dashboardStep.step.id }" style="float:left; display: none;" title=""><img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}"></span>
+												</div>
+												<div style="float: left;">
+													<span style="float: left;"><input type="text" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }"
+														value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planCompletionTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"
+														onchange="validateDateInput(this.value, ${dashboardStep.step.id }, 'completion')"/>
+														</span>
+													<span id="completionTimeImg_${dashboardStep.step.id }" style="float: left;display: none;" title=""><img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}"></span>
+												</div>	
+											</td>
+										</tr>
 										<tr><td style="padding: 0 6px;width: 300px;">
-										<input type="hidden" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }"
-											value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"/>
-										<input type="hidden" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }"
-											value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planCompletionTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"/>
+										
 										<div id="slider_${dashboardStep.step.id }"></div>
 										<script type="text/javascript">
 											$(function() {
@@ -365,11 +380,25 @@
 								<td>
 									<div id="startTimeInput_${dashboardStep.step.id }" style="display: none;" title="input">
 					                  <table>
-										<tr><td style="padding: 0 6px;width: 300px;">
-										<input type="hidden" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }" 
-											value="<tds:convertDateTime date='${moveBundleInstance?.startTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"/>
-										<input type="hidden" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }" 
-											value="<tds:convertDateTime date='${moveBundleInstance?.completionTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"/>
+					                  	<tr>
+											<td colspan="2">
+												<div style="float: left;padding-right: 10px;">
+													<span style="float: left;"><input type="text" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }" 
+													value="<tds:convertDateTime date='${moveBundleInstance?.startTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"
+													onchange="validateDateInput(this.value, ${dashboardStep.step.id }, 'start')"/>
+													</span>
+													<span id="startTimeImg_${dashboardStep.step.id }" style="float:left; display: none;" title=""><img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}"></span>
+												</div>
+												<div style="float: left;">
+													<span style="float: left;"><input type="text" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }" 
+													value="<tds:convertDateTime date='${moveBundleInstance?.completionTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"
+													onchange="validateDateInput(this.value, ${dashboardStep.step.id }, 'completion')"/>
+													</span>
+													<span id="completionTimeImg_${dashboardStep.step.id }" style="float: left;display: none;" title=""><img src="${createLinkTo(dir:'images/skin',file:'exclamation.png')}"></span>
+												</div>
+											</td>
+										</tr>
+										<tr><td style="padding: 0 6px;width: 310px;">
 										<div id="slider_${dashboardStep.step.id }"></div>
 										<script type="text/javascript">
 											$(function() {
@@ -388,7 +417,6 @@
 										</td>
 										<td id="show_${dashboardStep.step.id }" style="text-align: center;padding: 0 6px" nowrap="nowrap"></td>
 										</tr>
-										<tr><td></td> </tr>
 									</table>
 									</div>
 								</td>
@@ -503,11 +531,13 @@
         	var startTime = new Date($("#startTime").val())
         	date = convertToTimeFormat(new Date(startTime.getTime() + minuits * 60000 ))
         	$("#startTime_"+stepId).val(convertDate(new Date(startTime.getTime() + minuits * 60000 )))
+        	validateDateInput( $("#startTime_"+stepId).val(), stepId, "start")
         } else {
         	var completionTime = new Date($("#completionTime").val())
         	minuits = minuits - maxDuration
         	date = convertToTimeFormat(new Date(completionTime.getTime() + minuits * 60000 ))
         	$("#completionTime_"+stepId).val(convertDate(new Date(completionTime.getTime() + minuits * 60000 )))
+        	validateDateInput( $("#completionTime_"+stepId).val(), stepId, "completion")
         }
         return date
     }
@@ -535,7 +565,7 @@
 			var ap = "AM";
 			if (hour   > 11) { ap = "PM";             }
 			if (hour   > 12) { hour = hour - 12;      }
-			if (hour   == 0) { hour = 12;             }
+			if (hour   == 0) { hour = 12 			  }
 			if (hour   < 10) { hour   = "0" + hour;   }
 			if (minute < 10) { minute = "0" + minute; }
 			if (second < 10) { second = "0" + second; }
@@ -574,6 +604,10 @@
 				  	  checked =  false;
 				      message ="Dashboard Labels, Step times are mandatory for selected key off steps";
 					  return false;
+		    	  } else if( $(".field_error").length > 0 ){
+				      checked =  false;
+				      message = "Date/Time entry problem. Please correct highlighted fields before saving.";
+			    	  return false;
 		    	  }
 		    	  
 	    	  } else {
@@ -661,6 +695,58 @@
       	}
       	return returnVal;
 	}
+    function validateDateInput(value, stepId, type){
+    	var bundleStartTime = new Date($("#startTime").val()).getTime()
+    	var bundleCompletionTime = new Date($("#completionTime").val()).getTime()
+    	var valueInMs = new Date(value).getTime()
+        if(type == "start"){
+            var completionTime = new Date($("#completionTime_"+stepId).val()).getTime()
+            if( !value ){
+            	$("#startTime_"+stepId).addClass("field_error");
+	    		$("#startTimeImg_"+stepId).attr("title"," Step Start Time should not be blank")
+	          	$("#startTimeImg_"+stepId).show();
+            } else if( !objRegExp.test(value) ){
+	    		$("#startTime_"+stepId).addClass("field_error");
+	    		$("#startTimeImg_"+stepId).attr("title","Step Start Time should be in 'mm/dd/yyyy HH:MM AM/PM' format")
+	          	$("#startTimeImg_"+stepId).show();
+	    	} else if(bundleStartTime > valueInMs || bundleCompletionTime < valueInMs){
+				$("#startTime_"+stepId).addClass("field_error");
+				$("#startTimeImg_"+stepId).attr("title","Step Start Time should be in between Bundle Start Time and Completion Time.")
+				$("#startTimeImg_"+stepId).show()
+       		} else if(completionTime < valueInMs){
+				$("#startTime_"+stepId).addClass("field_error");
+				$("#startTimeImg_"+stepId).attr("title","Step Start Time should be less than the Step Completion Time.")
+				$("#startTimeImg_"+stepId).show()
+       		} else {
+       			$("#startTime_"+stepId).removeClass("field_error");
+				$("#startTimeImg_"+stepId).hide()
+       		}
+        } else {
+        	var startTime = new Date($("#startTime_"+stepId).val()).getTime()
+            if( !value ){
+            	$("#completionTime_"+stepId).addClass("field_error");
+	    		$("#completionTimeImg_"+stepId).attr("title"," Step Completion Time should not be blank")
+	          	$("#completionTimeImg_"+stepId).show();
+            } else if( !objRegExp.test(value) ){
+	    		$("#completionTime_"+stepId).addClass("field_error");
+	    		$("#completionTimeImg_"+stepId).attr("title","Step Completion Time should be in 'mm/dd/yyyy HH:MM AM/PM' format")
+	          	$("#completionTimeImg_"+stepId).show();
+	    	} else if(bundleStartTime > valueInMs || bundleCompletionTime < valueInMs){
+				$("#completionTime_"+stepId).addClass("field_error");
+				$("#completionTimeImg_"+stepId).attr("title","Step Completion Time should be in between Bundle Start Time and Completion Time.")
+				$("#completionTimeImg_"+stepId).show()
+       		} else if(startTime > valueInMs){
+				$("#completionTime_"+stepId).addClass("field_error");
+				$("#completionTimeImg_"+stepId).attr("title","Step Completion Time should be greater than the Step Start Time.")
+				$("#completionTimeImg_"+stepId).show()
+       		} else {
+       			$("#completionTime_"+stepId).removeClass("field_error");
+				$("#completionTimeImg_"+stepId).hide()
+       		}
+        }
+    	$("#slider_"+stepId).slider( "option", "max", maxDuration );
+  		$("#slider_"+stepId).slider( "option", "values", [getDuration($("#startTime_"+stepId).val()), getDuration($("#completionTime_"+stepId).val())] );
+    }
     function validateDates(){
     	var returnval = false
         var startTime = $("#startTime").val();
