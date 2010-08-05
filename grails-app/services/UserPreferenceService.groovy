@@ -89,7 +89,7 @@ class UserPreferenceService  {
 	    		//	Statements to Update UserPreference to login user
 	    		def userPreference = UserPreference.get( new  UserPreference( userLogin:userLogin, preferenceCode: preferenceCode ) )
 	    		userPreference.value = value;
-	    		userPreference.save();
+	    		userPreference.save(flush:true);
 	    	}
 	    	// call loadPreferences() to load CURR_PROJ MAP into session
 	    	loadPreferences(preferenceCode)

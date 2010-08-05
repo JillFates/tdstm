@@ -33,7 +33,7 @@ class WorkflowService {
     	def stateType = stateEngineService.getStateType( process, toState )
     	if ( projectAssetMap ) {
     		def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-    														"where t.asset_entity_id = ${assetEntity.id} and voided = 0 order by date_created desc limit 1 ")
+    														"where t.asset_entity_id = ${assetEntity.id} and voided = 0 order by date_created desc, stateTo desc limit 1 ")
 			if(transitionStates.size()){
 				currentState = transitionStates[0].stateTo
 			}
@@ -170,7 +170,7 @@ class WorkflowService {
 	 	
 	 	// Skip the steps when setting asset to Completed once user set "VM Completed".
 		def lastTransition = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-    														"where t.asset_entity_id = ${assetEntity.id} order by date_created desc limit 1 ")
+    														"where t.asset_entity_id = ${assetEntity.id} order by date_created desc, stateTo desc limit 1 ")
 		if(lastTransition[0] && stateEngineService.getState( process, lastTransition[0].stateTo ) == "VMCompleted" &&
 			stateEngineService.getState( process, Integer.parseInt(stateTo) ) == "Completed"){
 			return stateFrom

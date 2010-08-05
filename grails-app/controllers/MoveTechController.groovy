@@ -557,7 +557,7 @@ class MoveTechController {
                         def holdId = stateEngineService.getStateId( moveBundleInstance.project.workflowCode, "Hold" )
                         def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
                         												"where t.asset_entity_id = ${assetItem.id} and voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
-                        												"order by date_created desc limit 1 ")
+                        												"order by date_created desc, stateTo desc limit 1 ")
                         projMap = ProjectAssetMap.findByAsset( assetItem )
                         if( !transitionStates.size() ) {
                         	flash.message = message ( code :" The asset has not yet been released " )
@@ -728,7 +728,7 @@ class MoveTechController {
 	            def holdId = stateEngineService.getStateId( moveBundleInstance.project.workflowCode, "Hold" )
 	            def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
                         										"where t.asset_entity_id = ${asset.id} and voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
-                    											"order by date_created desc limit 1 ")
+                    											"order by date_created desc, stateTo desc limit 1 ")
 	            def currentState = ""
 	            if(transitionStates.size()){
 	            	currentState = stateEngineService.getState( moveBundleInstance.project.workflowCode, transitionStates[0].stateTo )
@@ -957,7 +957,7 @@ class MoveTechController {
                     	def holdId = stateEngineService.getStateId( moveBundleInstance.project.workflowCode, "Hold" )
                     	def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
                     													"where t.asset_entity_id = ${assetItem.id} and voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
-                    													"order by date_created desc limit 1 ")
+                    													"order by date_created desc, stateTo desc limit 1 ")
                         projMap = ProjectAssetMap.findByAsset( assetItem )
                         if( !transitionStates.size()) {
                             flash.message = message ( code : " The asset has not yet been released " )
@@ -1133,11 +1133,11 @@ class MoveTechController {
             if ( params.location == 's' ) {
                 location = "Unracking"
                 projectTeamInstance.currentLocation = "Source"
-                projectTeamInstance.save()
+                projectTeamInstance.save(flush:true)
             } else if ( params.location == 't' ) {
                 location = "Reracking"
                 projectTeamInstance.currentLocation = "Target"
-                projectTeamInstance.save()
+                projectTeamInstance.save(flush:true)
             }
             userPreferenceService.setPreference("CURR_BUNDLE","${params.bundle}")
             redirect ( action:'assetTask', 

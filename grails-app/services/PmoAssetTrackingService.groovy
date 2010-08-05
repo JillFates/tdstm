@@ -30,7 +30,7 @@ class PmoAssetTrackingService {
 		
 		def assetTransitionQuery = "from AssetTransition t where t.assetEntity = ${assetEntity.id} and t.voided = 0"
 		def currStateQuery = "select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-				"where t.asset_entity_id = ${assetEntity.id} and t.voided = 0 and t.type = 'process' order by date_created desc limit 1 "
+				"where t.asset_entity_id = ${assetEntity.id} and t.voided = 0 and t.type = 'process' order by date_created desc, stateTo desc limit 1 "
 		
 		def stateType = stateEngineService.getStateType( assetEntity.project.workflowCode,stateTo)
 		def stateToId = stateEngineService.getStateId( assetEntity.project.workflowCode,stateTo)
@@ -132,7 +132,7 @@ class PmoAssetTrackingService {
 		def terminatedId = Integer.parseInt(stateEngineService.getStateId(assetEntity.project.workflowCode,"Terminated"))
 		def currentTransition = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
 														"where t.asset_entity_id = ${assetEntity?.id} and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
-														"order by date_created desc limit 1 ")
+														"order by date_created desc, stateTo desc limit 1 ")
 		if(currentTransition.size()){
 			currentstate = currentTransition[0].stateTo
 		}
@@ -221,7 +221,7 @@ class PmoAssetTrackingService {
 				 def transitionSelected = stateEngineService.getStateIdAsInt( assetEntity.project.workflowCode, state )
 				 def currentTransition = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
 												"where t.asset_entity_id = ${assetEntity?.id} and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
-												"order by date_created desc limit 1 ")
+												"order by date_created desc, stateTo desc limit 1 ")
 				 def currentState = projectAssetMap.currentStateId
                  if(currentTransition.size()){
                 	 currentState = currentTransition[0].stateTo
