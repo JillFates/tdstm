@@ -73,7 +73,7 @@ class ProjectController {
 			Party.executeUpdate("delete from Party p where p.id = ${params.id}")
 			
 			flash.message = "Project ${projectInstance} deleted"
-			redirect(action:list)
+			redirect(controller:"projectUtil")
 	    } else {
 	    	flash.message = "Project not found with id ${params.id}"
 	        redirect(action:list)
