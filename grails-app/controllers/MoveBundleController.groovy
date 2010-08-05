@@ -86,7 +86,9 @@ class MoveBundleController {
 					jdbcTemplate.update("DELETE FROM project_team WHERE move_bundle_id = ${moveBundleInstance.id}")
 					
 					jdbcTemplate.update("DELETE FROM user_preference WHERE value = ${moveBundleInstance.id}")
-	            	
+					
+	            	jdbcTemplate.update("DELETE FROM party_relationship where party_id_from_id  = ${moveBundleInstance.id} or party_id_to_id = ${moveBundleInstance.id}")
+					
 					AssetTransition.executeUpdate("delete from AssetTransition at where at.moveBundle = ${moveBundleInstance.id}")
 					StepSnapshot.executeUpdate("delete from StepSnapshot ss where ss.moveBundleStep in (select mbs.id from MoveBundleStep mbs where mbs.moveBundle = ${moveBundleInstance.id})")
 					MoveBundleStep.executeUpdate("delete from MoveBundleStep mbs where mbs.moveBundle = ${moveBundleInstance.id}")

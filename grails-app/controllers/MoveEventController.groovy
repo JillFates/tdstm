@@ -46,7 +46,7 @@ class MoveEventController {
 			def moveBundleId = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE;
 			if(moveBundleId){
 				def moveBundle = MoveBundle.get( moveBundleId )
-				if(moveBundle.moveEvent?.id != Integer.parseInt(moveEventId)){
+				if(moveBundle?.moveEvent?.id != Integer.parseInt(moveEventId)){
 					userPreferenceService.removePreference( "CURR_BUNDLE" )
 				}
 			}

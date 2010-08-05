@@ -269,9 +269,10 @@ class UserPreferenceService  {
 			
 			MoveBundle.executeUpdate("Update MoveBundle mb SET mb.moveEvent = null where mb.moveEvent in ($eventQuery)")
 			MoveEventNews.executeUpdate("delete from MoveEventNews men where men.moveEvent in ($eventQuery)")
-			MoveEventSnapshot.executeUpdate("delete from MoveEventNews mes where mes.moveEvent in ($eventQuery)")
+			MoveEventSnapshot.executeUpdate("delete from MoveEventSnapshot mes where mes.moveEvent in ($eventQuery)")
 			
 			MoveEvent.executeUpdate("delete from MoveEvent me where me.project = ${projectInstance.id}")
+			
 			// remove Project Logo
 			ProjectLogo.executeUpdate("delete from ProjectLogo pl where pl.project = ${projectInstance.id}")
 			// remove party relationship
