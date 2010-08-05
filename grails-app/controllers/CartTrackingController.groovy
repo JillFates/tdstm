@@ -36,9 +36,9 @@ class CartTrackingController {
         } else {
             userPreferenceService.loadPreferences("CURR_BUNDLE")
             def defaultBundle = getSession().getAttribute("CURR_BUNDLE")
-            if(defaultBundle.CURR_BUNDLE){
+            if(defaultBundle?.CURR_BUNDLE){
             	moveBundleInstance = MoveBundle.findById(defaultBundle.CURR_BUNDLE)
-            	if( moveBundleInstance.project.id != Integer.parseInt(projectId) ){
+            	if( moveBundleInstance?.project?.id != Integer.parseInt(projectId) ){
             		moveBundleInstance = MoveBundle.find("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
             	}
             } else {

@@ -277,6 +277,7 @@ class UserPreferenceService  {
 			ProjectLogo.executeUpdate("delete from ProjectLogo pl where pl.project = ${projectInstance.id}")
 			// remove party relationship
 			PartyRelationship.executeUpdate("delete from PartyRelationship pr where pr.partyIdFrom  = ${projectInstance.id} or pr.partyIdTo = ${projectInstance.id}")
+			UserPreference.executeUpdate("delete from UserPreference up where up.value = ${projectInstance.id}")
 		} catch(Exception ex){
 			message = "Unable to remove the $projectInstance.name project Error:"+ex
 		}	
