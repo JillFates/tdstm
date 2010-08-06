@@ -361,7 +361,7 @@ class MoveEventController {
 	    	def cssClass = "statusbar_good"
 			def status = "GREEN"
 			def dialInd = moveEventSnapshot?.dialIndicator
-			dialInd = dialInd ? dialInd : 100
+			dialInd = dialInd || dialInd == 0 ? dialInd : 100
 			
 			if(dialInd < 25){
 				cssClass = "statusbar_bad"

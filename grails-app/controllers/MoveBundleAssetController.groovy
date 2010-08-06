@@ -913,9 +913,9 @@ class MoveBundleAssetController {
        					bundleInstance = MoveBundle.findById(asset.moveBundle.id)
        				}
                     if(reportName == 'cartAsset') {
-                        teamPartyGroup =  ProjectTeam.findBymoveBundleAndTeamCode(bundleInstance, 'Cleaning')
+                        teamPartyGroup =  ProjectTeam.findByMoveBundleAndTeamCode(bundleInstance, 'Cleaning')
                     }else {
-       					teamPartyGroup =  ProjectTeam.findBymoveBundleAndTeamCode(bundleInstance, 'Transport')
+       					teamPartyGroup =  ProjectTeam.findByMoveBundleAndTeamCode(bundleInstance, 'Transport')
                     }
        				def assetCommentList = AssetComment.findAllByAssetEntity(asset)
        				def moveTeamName

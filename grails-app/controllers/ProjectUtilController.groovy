@@ -12,6 +12,9 @@ class ProjectUtilController {
             	def projectInstance = Project.findById( userPreference.value[0] )
                 redirect( controller:"project", action:"show",id:projectInstance.id)
             } else {
+            	if(params.message){
+            		flash.message = params.message
+            	}
             	redirect( action:"searchList" )
             }
         } catch (Exception e){
