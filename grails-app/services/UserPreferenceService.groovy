@@ -225,6 +225,10 @@ class UserPreferenceService  {
 	def removeProjectAssociates( def projectInstance ){
     	def message 
 		try{
+			// remove preferences
+			def bundleQuery = "select mb.id from MoveBundle mb where mb.project = ${projectInstance.id}"
+			def eventQuery = "select me.id from MoveEvent me where me.project = ${projectInstance.id}"
+			UserPreference.executeUpdate("delete from UserPreference up where up.value = ${projectInstance.id} or up.value in ($bundleQuery) or up.value in ($eventQuery) ")
 			//remove the AssetEntity
 			def assetsQuery = "select a.id from AssetEntity a where a.project = ${projectInstance.id}"
 			
@@ -247,7 +251,6 @@ class UserPreferenceService  {
 			DataTransferBatch.executeUpdate("delete from DataTransferBatch dtb where dtb.project = ${projectInstance.id}")
 			
 			// remove Move Bundle
-			def bundleQuery = "select mb.id from MoveBundle mb where mb.project = ${projectInstance.id}"
 			
 			AssetEntity.executeUpdate("Update AssetEntity ae SET ae.moveBundle = null where ae.moveBundle in ($bundleQuery)")
 			AssetTransition.executeUpdate("delete from AssetTransition at where at.moveBundle in ($bundleQuery)")
@@ -265,8 +268,6 @@ class UserPreferenceService  {
 			MoveBundle.executeUpdate("delete from MoveBundle mb where mb.project = ${projectInstance.id}")
 			
 			// remove Move Event
-			def eventQuery = "select me.id from MoveEvent me where me.project = ${projectInstance.id}"
-			
 			MoveBundle.executeUpdate("Update MoveBundle mb SET mb.moveEvent = null where mb.moveEvent in ($eventQuery)")
 			MoveEventNews.executeUpdate("delete from MoveEventNews men where men.moveEvent in ($eventQuery)")
 			MoveEventSnapshot.executeUpdate("delete from MoveEventSnapshot mes where mes.moveEvent in ($eventQuery)")
@@ -277,7 +278,6 @@ class UserPreferenceService  {
 			ProjectLogo.executeUpdate("delete from ProjectLogo pl where pl.project = ${projectInstance.id}")
 			// remove party relationship
 			PartyRelationship.executeUpdate("delete from PartyRelationship pr where pr.partyIdFrom  = ${projectInstance.id} or pr.partyIdTo = ${projectInstance.id}")
-			UserPreference.executeUpdate("delete from UserPreference up where up.value = ${projectInstance.id}")
 		} catch(Exception ex){
 			message = "Unable to remove the $projectInstance.name project Error:"+ex
 		}	
