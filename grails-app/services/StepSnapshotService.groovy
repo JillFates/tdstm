@@ -451,7 +451,7 @@ class StepSnapshotService {
 		
 		def timeAsOf = timeNow / 1000
 		// calculate B14
-		def impactOfLastFinished = 0
+		def impactOfLastFinished = 0 // B14
 		def lastFinishedStep = MoveBundleStep.findAll("FROM MoveBundleStep m WHERE m.moveBundle.moveEvent = ? AND m.actualCompletionTime is not null ORDER BY m.actualCompletionTime DESC",[moveEvent])
 		if(lastFinishedStep[0]){
 			impactOfLastFinished = (lastFinishedStep[0].actualCompletionTime?.getTime() - (lastFinishedStep[0].planCompletionTime?.getTime()+ 59000) ) / 1000  	// 59000ms added to planCompletion to consider the minuits instead of seconds
@@ -477,14 +477,16 @@ class StepSnapshotService {
 			
 			} else if(timeAsOf > planStartTime){
 				maxvalue = timeAsOf - planStartTime
-			}
+			} else if(!iPstep.actualStartTime){
+				maxvalue =  timeAsOf + (planCompletionTime - planStartTime) // current - planDuration
+			} 
+			
 			if(maxvalue && (maxvalue > maxImpactOfIp || !maxImpactOfIp ) ){
 				maxImpactOfIp = maxvalue
 			}
 		}
-
 		maxImpactOfIp = maxImpactOfIp ? maxImpactOfIp : 0
-	    def projected = impactOfLastFinished +  maxImpactOfIp	
+	    def projected = impactOfLastFinished +  maxImpactOfIp	 // B14 + B15
 		
 		def adjust
 		if( projected > 0 ) {
@@ -492,7 +494,6 @@ class StepSnapshotService {
 		} else {
 			adjust = 50*(1-( projected / remainingDuration ) )
 		}
-
 		def result = (50 + adjust).intValue()
 		
 		// to show the dial inbetween 0 to 100
