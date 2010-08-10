@@ -354,15 +354,15 @@ class ProjectController {
 	         */
 	        // 	Populate a SELECT listbox with a list of all CLIENTS relationship to COMPANY (TDS)
 	        def clients = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'CLIENTS' and p.partyIdFrom = $tdsParty.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'CLIENT' order by p.partyIdTo " ) 
-	        clients.sort{it.partyIdTo.name}
+	        clients.sort{it.partyIdTo?.name}
 	        //	Populate a SELECT listbox with a list of all PARTNERS relationship to COMPANY (TDS)
 	        //def partners = PartyRelationship.findAllWhere( partyRelationshipType: relationshipTypePartner, partyIdFrom: tdsParty, roleTypeCodeFrom: roleTypeCompany, roleTypeCodeTo: roleTypePartner )
 	        def partners = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'PARTNERS' and p.partyIdFrom = $tdsParty.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'PARTNER' order by p.partyIdTo" )
-	        partners.sort{it.partyIdTo.name}
+	        partners.sort{it.partyIdTo?.name}
 	        //	Populate a SELECT listbox with a list of all STAFF relationship to COMPANY (TDS)
 	        //def managers = PartyRelationship.findAllWhere( partyRelationshipType: relationshipTypeStaff, partyIdFrom: tdsParty, roleTypeCodeFrom: roleTypeCompany, roleTypeCodeTo: roleTypeStaff )
 	        def managers = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $tdsParty.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
-	        managers.sort{it.partyIdTo.lastName}
+	        managers.sort{it.partyIdTo?.lastName}
 	        workflowCodes = stateEngineService.getWorkflowCode()
 	        return [ 'projectInstance':projectInstance, 'clients':clients , 'partners':partners , 'managers':managers, 'workflowCodes': workflowCodes ]
         
