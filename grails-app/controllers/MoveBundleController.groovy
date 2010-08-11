@@ -81,9 +81,11 @@ class MoveBundleController {
 					jdbcTemplate.update("DELETE FROM party_relationship where party_id_from_id in ($teamQuery) or party_id_to_id in ($teamQuery) ")
 					jdbcTemplate.update("DELETE FROM party where party_id in ($teamQuery)")
 					jdbcTemplate.update("DELETE FROM party_group where party_group_id in ($teamQuery)")
+					jdbcTemplate.update("UPDATE asset_transition SET  project_team_id = null WHERE move_bundle_id = ${moveBundleInstance.id} or project_team_id in ($teamQuery) ")
 		            jdbcTemplate.update("UPDATE asset_entity set source_team_id = null WHERE source_team_id in ($teamQuery)")
 					jdbcTemplate.update("UPDATE asset_entity set target_team_id = null WHERE target_team_id in ($teamQuery)")
 					jdbcTemplate.update("DELETE FROM project_team WHERE move_bundle_id = ${moveBundleInstance.id}")
+					
 					
 					jdbcTemplate.update("DELETE FROM user_preference WHERE value = ${moveBundleInstance.id}")
 					
