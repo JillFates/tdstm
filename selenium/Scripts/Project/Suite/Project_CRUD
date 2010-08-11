@@ -11,6 +11,11 @@
 <thead>
 <tr><td rowspan="1" colspan="3">Project_CRUD</td></tr>
 </thead><tbody>
+<tr>
+	<td>setSpeed</td>
+	<td>2500</td>
+	<td></td>
+</tr>
 <!--Creating a Project-->
 <tr>
 	<td>open</td>
@@ -43,8 +48,53 @@
 	<td></td>
 </tr>
 <tr>
+	<td>storeElementPresent</td>
+	<td>link=New Project</td>
+	<td>isPresent</td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>${isPresent}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${isPresent}==true</td>
+	<td>label10</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${isPresent}==false</td>
+	<td>label20</td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label10</td>
+	<td></td>
+</tr>
+<tr>
 	<td>clickAndWait</td>
 	<td>link=New Project</td>
+	<td></td>
+</tr>
+<tr>
+	<td>gotolabel</td>
+	<td>label30</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label20</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>_action_Create</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label30</td>
 	<td></td>
 </tr>
 <tr>
@@ -100,11 +150,6 @@
 <tr>
 	<td>verifyElementPresent</td>
 	<td>moveManagerId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>trackChanges</td>
 	<td></td>
 </tr>
 <tr>
@@ -178,11 +223,6 @@
 	<td>Comment</td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>submit</td>
-	<td></td>
-</tr>
-<tr>
 	<td>goBackAndWait</td>
 	<td></td>
 	<td></td>
@@ -196,11 +236,6 @@
 	<td>verifyTextPresent</td>
 	<td>Fields marked ( * ) are mandatory</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='createProjectForm']/div[1]/table.12.1</td>
-	<td>Y N</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
@@ -220,11 +255,6 @@
 <tr>
 	<td>verifyTable</td>
 	<td>//form[@id='createProjectForm']/div[1]/table.12.0</td>
-	<td>exact:Track Changes: *</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='createProjectForm']/div[1]/table.13.0</td>
 	<td>exact:Workflow Code: *</td>
 </tr>
 <tr>
@@ -338,21 +368,6 @@
 	<td>wCode</td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//form[@id='createProjectForm']/div[1]/table.12.1</td>
-	<td>Y N</td>
-</tr>
-<tr>
-	<td>select</td>
-	<td>trackChanges</td>
-	<td>index=0</td>
-</tr>
-<tr>
-	<td>storeValue</td>
-	<td>trackChanges</td>
-	<td>tChanges</td>
-</tr>
-<tr>
 	<td>clickAndWait</td>
 	<td>//input[@value='Create']</td>
 	<td></td>
@@ -426,11 +441,6 @@
 <tr>
 	<td>verifyTable</td>
 	<td>//div[@id='updateShow']/table.11.1</td>
-	<td>${tChanges}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.12.1</td>
 	<td>${wCode}</td>
 </tr>
 <tr>
@@ -500,18 +510,8 @@
 	<td>${moveM}</td>
 </tr>
 <tr>
-	<td>verifySelectedLabel</td>
-	<td>trackChanges</td>
-	<td>${tChange}</td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
 	<td>//form[@id='editProjectForm']/div[1]/table/tbody/tr[12]/td[2]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>//form[@id='editProjectForm']/div[1]/table/tbody/tr[13]/td[2]</td>
 	<td></td>
 </tr>
 <tr>
@@ -561,7 +561,7 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>updated</td>
+	<td>Project ${Pcode} : ${Pname} updated</td>
 	<td></td>
 </tr>
 <tr>
@@ -582,12 +582,12 @@
 </tr>
 <tr>
 	<td>assertConfirmation</td>
-	<td>Are you sure?</td>
+	<td>Warning: This will delete the ${Pname} project and all of the assets, events, bundles, and any historic data?</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>deleted</td>
+	<td>Project ${Pcode} : ${Pname} deleted</td>
 	<td></td>
 </tr>
 

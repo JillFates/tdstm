@@ -55,11 +55,11 @@
 <tr>
 	<td>storeTable</td>
 	<td>//form[@id='importForm']/div/table.5.1</td>
-	<td>Var1</td>
+	<td>batches</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=${Var1}</td>
+	<td>link=${batches}</td>
 	<td></td>
 </tr>
 <tr>
@@ -465,204 +465,239 @@
 	<td></td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//form[@id='assetListForm']/table.2.3</td>
-	<td>assetName</td>
+	<td>verifyTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.0.0</td>
+	<td>exact:Asset Name*</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.0.0</td>
-	<td>Asset Name</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.1.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.0.0</td>
 	<td>Short Name</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.2.0</td>
-	<td>Asset Tag</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.0.0</td>
+	<td>exact:Asset Tag*</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.3.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.1.0</td>
 	<td>Asset Type</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.4.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.1.0</td>
 	<td>Manufacturer</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.5.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.1.0</td>
 	<td>Model</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.6.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.2.0</td>
 	<td>Application</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.7.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.2.0</td>
 	<td>AppOwner</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.8.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.2.0</td>
 	<td>SME</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.9.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.3.0</td>
 	<td>IP Address</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.10.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.3.0</td>
 	<td>HINFO</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.11.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.3.0</td>
 	<td>Serial #</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.12.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.4.0</td>
 	<td>U Size</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.13.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.4.0</td>
 	<td>Rail Type</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.14.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.4.0</td>
 	<td>Source Location</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.15.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.5.0</td>
 	<td>Source Room</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.16.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.5.0</td>
 	<td>Source Rack/Cab</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.17.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.5.0</td>
 	<td>Source Position</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.18.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.6.0</td>
 	<td>Target Location</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.19.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.6.0</td>
 	<td>Target Room</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.0.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.6.0</td>
 	<td>Target Rack/Cab</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.1.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.7.0</td>
 	<td>Target Position</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.2.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.7.0</td>
 	<td>powerType</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.3.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.7.0</td>
 	<td>PDU Port</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.4.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.8.0</td>
 	<td>PDU Port Qty</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.5.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.8.0</td>
 	<td>PDU Type</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.6.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.8.0</td>
 	<td>NIC Port</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.7.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.9.0</td>
 	<td>Remote Mgmt Port</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.8.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.9.0</td>
 	<td>Fiber Cabinet</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.9.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.9.0</td>
 	<td>Fiber Type</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.10.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.10.0</td>
 	<td>Fiber Qty</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.11.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.10.0</td>
 	<td>Fiber Port</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.12.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.10.0</td>
 	<td>KVM Device</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.13.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.11.0</td>
 	<td>KVM Port</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.14.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.11.0</td>
 	<td>Truck</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.15.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.11.0</td>
 	<td>Old/New</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.16.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.12.0</td>
 	<td>Priority</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.17.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.12.0</td>
 	<td>Cart</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.18.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.12.0</td>
 	<td>Shelf</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.13.0</td>
+	<td>Custom1</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.13.0</td>
+	<td>Custom2</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.13.0</td>
+	<td>Custom3</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.14.0</td>
+	<td>Custom4</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.14.0</td>
+	<td>Custom5</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.14.0</td>
+	<td>Custom6</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.15.0</td>
+	<td>Custom7</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.15.0</td>
+	<td>Custom8</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -680,6 +715,241 @@
 	<td></td>
 </tr>
 <tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.0.1</td>
+	<td>field1</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.0.1</td>
+	<td>field2</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.0.1</td>
+	<td>field3</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.1.1</td>
+	<td>field4</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.1.1</td>
+	<td>field5</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.1.1</td>
+	<td>field6</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.2.1</td>
+	<td>field7</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.2.1</td>
+	<td>field8</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.2.1</td>
+	<td>field9</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.3.1</td>
+	<td>field10</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.3.1</td>
+	<td>field11</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.3.1</td>
+	<td>field12</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.4.1</td>
+	<td>field13</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.4.1</td>
+	<td>field14</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.4.1</td>
+	<td>field15</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.5.1</td>
+	<td>field16</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.5.1</td>
+	<td>field17</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.5.1</td>
+	<td>field18</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.6.1</td>
+	<td>field19</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.6.1</td>
+	<td>field20</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.6.1</td>
+	<td>field21</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.7.1</td>
+	<td>field22</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.7.1</td>
+	<td>field23</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.7.1</td>
+	<td>field24</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.8.1</td>
+	<td>field25</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.8.1</td>
+	<td>field26</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.8.1</td>
+	<td>field27</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.9.1</td>
+	<td>field28</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.9.1</td>
+	<td>field29</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.9.1</td>
+	<td>field30</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.10.1</td>
+	<td>field31</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.10.1</td>
+	<td>field32</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.10.1</td>
+	<td>field33</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.11.1</td>
+	<td>field34</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.11.1</td>
+	<td>field35</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.11.1</td>
+	<td>field36</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.12.1</td>
+	<td>field37</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.12.1</td>
+	<td>field38</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.12.1</td>
+	<td>field39</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.13.1</td>
+	<td>field40</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.13.1</td>
+	<td>field41</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.13.1</td>
+	<td>field42</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.14.1</td>
+	<td>field43</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.14.1</td>
+	<td>field44</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.14.1</td>
+	<td>field45</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.15.1</td>
+	<td>field46</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.15.1</td>
+	<td>field47</td>
+</tr>
+<tr>
 	<td>clickAndWait</td>
 	<td>//input[@value='Edit' and @type='button' and @onclick='return editAssetDialog()']</td>
 	<td></td>
@@ -695,27 +965,12 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
-	<td>editassetNameId</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
 	<td>editshortNameId</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
-	<td>editshortNameId</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
-	<td>editassetTagId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
 	<td>editassetTagId</td>
 	<td></td>
 </tr>
@@ -735,17 +990,7 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
-	<td>editmanufacturerId</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
-	<td>editmodelId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
 	<td>editmodelId</td>
 	<td></td>
 </tr>
@@ -755,17 +1000,7 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
-	<td>editapplicationId</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
-	<td>editappOwnerId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
 	<td>editappOwnerId</td>
 	<td></td>
 </tr>
@@ -775,17 +1010,7 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
-	<td>editappSmeId</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
-	<td>editipAddressId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
 	<td>editipAddressId</td>
 	<td></td>
 </tr>
@@ -795,27 +1020,12 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
-	<td>edithinfoId</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
 	<td>editserialNumberId</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
-	<td>editserialNumberId</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
-	<td>editusizeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
 	<td>editusizeId</td>
 	<td></td>
 </tr>
@@ -835,17 +1045,7 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
-	<td>editsourceLocationId</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
-	<td>editsourceRoomId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
 	<td>editsourceRoomId</td>
 	<td></td>
 </tr>
@@ -855,17 +1055,7 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
-	<td>editsourceRackId</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
-	<td>editsourceRackPositionId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
 	<td>editsourceRackPositionId</td>
 	<td></td>
 </tr>
@@ -875,17 +1065,7 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
-	<td>edittargetLocationId</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
-	<td>edittargetRoomId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
 	<td>edittargetRoomId</td>
 	<td></td>
 </tr>
@@ -895,17 +1075,7 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
-	<td>edittargetRackId</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
-	<td>edittargetRackPositionId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
 	<td>edittargetRackPositionId</td>
 	<td></td>
 </tr>
@@ -921,11 +1091,6 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>editpduPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
 	<td>editpduPortId</td>
 	<td></td>
 </tr>
@@ -955,17 +1120,7 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
-	<td>editnicPortId</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
-	<td>editremoteMgmtPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
 	<td>editremoteMgmtPortId</td>
 	<td></td>
 </tr>
@@ -975,17 +1130,7 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
-	<td>editfiberCabinetId</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
-	<td>editfiberTypeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
 	<td>editfiberTypeId</td>
 	<td></td>
 </tr>
@@ -995,17 +1140,7 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
-	<td>editfiberQuantityId</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
-	<td>edithbaPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
 	<td>edithbaPortId</td>
 	<td></td>
 </tr>
@@ -1015,27 +1150,12 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
-	<td>editkvmDeviceId</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
 	<td>editkvmPortId</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
-	<td>editkvmPortId</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
-	<td>edittruckId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
 	<td>edittruckId</td>
 	<td></td>
 </tr>
@@ -1065,18 +1185,48 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
-	<td>editcartId</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
 	<td>editshelfId</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
-	<td>editshelfId</td>
+	<td>verifyElementPresent</td>
+	<td>editcustom1Id</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>editcustom2Id</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>editcustom3Id</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>editcustom4Id</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>editcustom5Id</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>editcustom6Id</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>editcustom7Id</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>editcustom8Id</td>
 	<td></td>
 </tr>
 <tr>

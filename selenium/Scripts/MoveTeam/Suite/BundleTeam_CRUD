@@ -4,14 +4,19 @@
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
-<title>BundleTeam_Suite</title>
+<title>BundleTeam_CRUD</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">BundleTeam_Suite</td></tr>
+<tr><td rowspan="1" colspan="3">BundleTeam_CRUD</td></tr>
 </thead><tbody>
 <!--Pre-Requisite: There needs to be atleast one move bundle pre-existing in the user preferred project-->
+<tr>
+	<td>setSpeed</td>
+	<td>2500</td>
+	<td></td>
+</tr>
 <tr>
 	<td>open</td>
 	<td>/tdstm/auth/login</td>
@@ -35,6 +40,36 @@
 <tr>
 	<td>clickAndWait</td>
 	<td>link=Bundles</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeElementPresent</td>
+	<td>link=Bundle List</td>
+	<td>preExist</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${preExist}==true</td>
+	<td>label10</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${preExist}==false</td>
+	<td>label20</td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label10</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Bundle List</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label20</td>
 	<td></td>
 </tr>
 <tr>
@@ -255,7 +290,7 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>created</td>
+	<td>ProjectTeam TestCode-${teamCode} : TestName-${teamName} created</td>
 	<td></td>
 </tr>
 <tr>
@@ -447,7 +482,7 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>updated</td>
+	<td>ProjectTeam TestCode-${teamCode} : TestName-${teamName} updated</td>
 	<td></td>
 </tr>
 <tr>
@@ -468,7 +503,7 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>deleted</td>
+	<td>ProjectTeam TestCode-${teamCode} : TestName-${teamName} deleted</td>
 	<td></td>
 </tr>
 

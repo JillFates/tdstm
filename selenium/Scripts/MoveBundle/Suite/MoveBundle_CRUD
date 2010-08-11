@@ -11,6 +11,12 @@
 <thead>
 <tr><td rowspan="1" colspan="3">MoveBundle_CRUD</td></tr>
 </thead><tbody>
+<!--Pre-requisite: Make sure there is a user-selected project already existing in the account-->
+<tr>
+	<td>setSpeed</td>
+	<td>2500</td>
+	<td></td>
+</tr>
 <tr>
 	<td>open</td>
 	<td>/tdstm/auth/login</td>
@@ -54,12 +60,12 @@
 </tr>
 <tr>
 	<td>gotoIf</td>
-	<td>userBundle=true</td>
+	<td>${userBundle}==true</td>
 	<td>label25</td>
 </tr>
 <tr>
 	<td>gotoIf</td>
-	<td>userBundle=false</td>
+	<td>${userBundle}==false</td>
 	<td>label35</td>
 </tr>
 <tr>
@@ -450,11 +456,6 @@
 	<td>MoveBundle ${BundleName} updated</td>
 	<td></td>
 </tr>
-<tr>
-	<td>verifyText</td>
-	<td>//tr[8]/td[2]</td>
-	<td>2</td>
-</tr>
 <!--Deleting  Move Bundle-->
 <tr>
 	<td>clickAndWait</td>
@@ -468,7 +469,7 @@
 </tr>
 <tr>
 	<td>assertConfirmation</td>
-	<td>Are you sure?</td>
+	<td>WARNING: Deleting this bundle will remove any move teams and any related step data?</td>
 	<td></td>
 </tr>
 <tr>
@@ -482,8 +483,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyTextNotPresent</td>
-	<td>error</td>
+	<td>verifyTextPresent</td>
+	<td>MoveBundle ${BundleName} deleted</td>
 	<td></td>
 </tr>
 
