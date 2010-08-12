@@ -48,7 +48,10 @@
 			</g:each>
 		</tbody>
 	</table>
-	<div class="buttons"> <span class="button"><g:actionSubmit class="save" action="Create" value="Create" /></span></div>
+	<div class="buttons"> 
+		<span class="button"><g:actionSubmit class="save" action="Create" value="Create Project" /></span>
+		<span class="button"><input type="button" class="save" onclick="javascript:location.href='../projectUtil/createDemo'" value="Create Demo Project" /></span>
+	</div>
 </g:form></div>
 </div>
 </body>

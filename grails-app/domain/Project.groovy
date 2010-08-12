@@ -9,6 +9,7 @@ class Project extends PartyGroup {
 	Date completionDate	// Date that the project will finish
 	PartyGroup client
     String workflowCode
+    String projectType = "Standard"
     
 	static hasMany = [ dataTransferBatch : DataTransferBatch ]
 	
@@ -23,6 +24,7 @@ class Project extends PartyGroup {
 		dateCreated( ) // related to party
 		lastUpdated( ) // related to party
 		workflowCode( blank:false, nullable:false )
+		projectType( blank:false, nullable:false, inList:['Standard', 'Template', 'Demo'] )
 	}
 
 	static mapping  = {

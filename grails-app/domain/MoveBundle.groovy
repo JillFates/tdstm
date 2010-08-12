@@ -4,7 +4,7 @@ class MoveBundle extends Party {
     String description
     Date startTime			// Time that the MoveBundle Tasks will begin
     Date completionTime				// Planned Completion Time of the MoveBundle
-    Integer operationalOrder  		// Order that the bundles are performed in (NOT BEING USED)
+    Integer operationalOrder = 1  		// Order that the bundles are performed in (NOT BEING USED)
     MoveEvent moveEvent
 	
     static constraints = {        

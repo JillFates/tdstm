@@ -48,6 +48,15 @@
 					            </g:hasErrors>
                                 </td>
                             </tr> 
+                            <tr class="prop">
+								<td valign="top" class="name"><label for="projectType"><b>Project Type:&nbsp;<span style="color: red">*</span></b></label></td>
+								<td valign="top" class="value ${hasErrors(bean:projectInstance,field:'projectType','errors')}">
+									<g:select id="projectType" name="projectType" from="${projectInstance.constraints.projectType.inList}" value="${projectInstance.projectType}"></g:select>
+									<g:hasErrors bean="${projectInstance}" field="projectType">
+										<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="projectType" /></div>
+									</g:hasErrors>
+								</td>
+							</tr>
                         	<tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="description">Description:</label>

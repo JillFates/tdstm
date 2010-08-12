@@ -54,6 +54,12 @@
             <td valign="top" class="value">${fieldValue(bean:projectInstance, field:'name')}</td>
 
           </tr>
+          
+          <tr class="prop">
+            	<td valign="top" class="name">Project Type:</td>
+
+            	<td valign="top" class="value">${fieldValue(bean:projectInstance, field:'projectType')}</td>
+          </tr>
 
           <tr class="prop">
             <td valign="top" class="name">Description:</td>
