@@ -90,14 +90,48 @@ class ProjectUtilController {
 			def startDateTime = GormUtil.convertInToGMT(new Date("$startDate"), tzId)
 			def timeDelta = startDateTime.getTime() - templateInstance?.startDate?.getTime() ? templateInstance?.startDate?.getTime() : 0
 			def completionDateTime = templateInstance?.completionDate?.getTime() ? new Date(templateInstance?.completionDate?.getTime() + timeDelta ) : null
-			projectInstance = new Project(name:name, projectCode:name, description:templateInstance?.description, 
-											client:templateInstance?.client, workflowCode:templateInstance?.workflowCode, 
-											projectType:"Demo", startDate:startDateTime, completionDate:completionDateTime )
+			projectInstance = new Project(name:name, 
+										projectCode:name,
+										comment:templateInstance?.comment,
+										description:templateInstance?.description, 
+										client:templateInstance?.client, 
+										workflowCode:templateInstance?.workflowCode, 
+										projectType:"Demo", 
+										startDate:startDateTime, 
+										completionDate:completionDateTime 
+										)
 			if(!projectInstance.hasErrors() && projectInstance.save(flush:true)){
 				// create party relation ship to demo project
 				def companyParty = PartyGroup.findByName( "TDS" )
 	        	def projectCompanyRel = partyRelationshipService.savePartyRelationship("PROJ_COMPANY", projectInstance, "PROJECT", companyParty, "COMPANY" )
-				
+				// create project partner
+				def tempProjectPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' and p.partyIdFrom = ${template} and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ")
+				if(tempProjectPartner){
+					def projectPartnerRel = partyRelationshipService.savePartyRelationship("PROJ_PARTNER", projectInstance, "PROJECT", tempProjectPartner.partyIdTo, "PARTNER" )
+				}
+				/* copy Project staff  */
+				def tempProjectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = ${template} and p.roleTypeCodeFrom = 'PROJECT' ")
+				tempProjectStaff.each{ staff->
+					def partyRelationship = new PartyRelationship(
+											partyRelationshipType : staff.partyRelationshipType,
+											partyIdFrom : projectInstance,
+											partyIdTo : staff.partyIdTo,
+											roleTypeCodeFrom : staff.roleTypeCodeFrom,
+											roleTypeCodeTo : staff.roleTypeCodeTo,
+											statusCode : staff.statusCode,
+											comment : staff.comment
+											)
+					if ( ! partyRelationship.validate() || ! partyRelationship.save(insert : true, flush:true) ) {
+						def etext = "Unable to create asset ${partyRelationship}" +
+						GormUtil.allErrorsString( partyRelationship )
+						println etext
+					}
+				}
+				/* Create project logo*/
+				def tempProjectLogo = ProjectLogo.findByProject( templateInstance )
+				if(tempProjectLogo){
+					def newProjectLogo = new ProjectLogo(project:projectInstance, name:tempProjectLogo.name, partnerImage:tempProjectLogo.partnerImage,party:tempProjectLogo.party).save(insert : true, flush:true)
+				}
 				/* Create Demo Bundle */
 				def attributeSet = com.tdssrc.eav.EavAttributeSet.findById(1)
 				def principal = SecurityUtils.subject.principal
@@ -115,7 +149,6 @@ class ProjectUtilController {
 						def etext = "Unable to create asset ${moveBundle}" +
 						GormUtil.allErrorsString( moveBundle )
 						println etext
-						log.error( etext )
 					} else {
 						/*
 						 *  Create Move Bundle Steps
@@ -124,8 +157,10 @@ class ProjectUtilController {
 						
 						/* Copy assets from template project to demo Project*/
 						copyAssetEntity(moveBundle, bundle, timeDelta, attributeSet, userLogin  )
-						
-						//stepSnapshotService.process( moveBundle.id )
+
+						/* copy bundle teams*/
+						copyBundleTeams(moveBundle, bundle)
+
 					}
 				}
 				
@@ -142,7 +177,6 @@ class ProjectUtilController {
 						def etext = "Unable to create asset ${moveEvent}" +
 						GormUtil.allErrorsString( moveEvent )
 						println etext
-						log.error( etext )
 					} else {
 						// assign event to appropriate bundles.
 						def newEventBundles = MoveBundle.findAll(" From MoveBundle mb where mb.project = ${projectInstance.id} and mb.name in ( select tmb.name from MoveBundle tmb where tmb.moveEvent = ${event.id})" )
@@ -156,7 +190,7 @@ class ProjectUtilController {
 				}
 				
 				userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
-				redirect(controller:'project', action:'list')
+				redirect(controller:'project', action:'show', id: projectInstance.id)
 				
 			} else {
 				projectInstance.errors.allErrors.each() { println it }
@@ -188,7 +222,6 @@ class ProjectUtilController {
 				def etext = "Unable to create asset ${moveBundleStep}" +
 				GormUtil.allErrorsString( moveBundleStep )
 				println etext
-				log.error( etext )
 			}
 		}
 	}
@@ -279,7 +312,6 @@ class ProjectUtilController {
 						def etext = "Unable to create asset ${assetTransition}" +
 						GormUtil.allErrorsString( assetTransition )
 						println etext
-						log.error( etext )
 					}
 				}
 				/*
@@ -313,7 +345,6 @@ class ProjectUtilController {
 						def etext = "Unable to create asset ${assetComment}" +
 						GormUtil.allErrorsString( assetComment )
 						println etext
-						log.error( etext )
 					}
 					
 				}
@@ -321,7 +352,6 @@ class ProjectUtilController {
 				def etext = "Unable to create asset ${assetEntity.assetName}" +
 				GormUtil.allErrorsString( assetEntity )
 				println etext
-				log.error( etext )
 			}
 		}
 	}
@@ -345,7 +375,51 @@ class ProjectUtilController {
 				def etext = "Unable to create asset ${moveNews}" +
 				GormUtil.allErrorsString( moveNews )
 				println etext
-				log.error( etext )
+			}
+		}
+	}
+	/*
+	 *  Copy bundleTeams and associated staff
+	 */
+	def copyBundleTeams(def moveBundle, def oldBundle){
+		def tempBundleTeams = partyRelationshipService.getBundleTeamInstanceList( oldBundle  )
+		def teamRelationshipType = PartyRelationshipType.findById("PROJ_TEAM")
+		def teamRole = RoleType.findById("TEAM")
+		def teamMemberRole = RoleType.findById("TEAM_MEMBER")
+		tempBundleTeams.each{ obj->
+			def bundleTeam = new ProjectTeam(
+							name : obj.projectTeam?.name,
+							comment : obj.projectTeam?.comment,
+							teamCode : obj.projectTeam?.teamCode,
+							currentLocation : obj.projectTeam?.currentLocation,
+							isIdle : obj.projectTeam?.isIdle,
+							isDisbanded : obj.projectTeam?.isDisbanded,
+							moveBundle : moveBundle,
+							latestAsset : null
+							)
+			if ( bundleTeam.validate() && bundleTeam.save(insert : true, flush:true) ) {
+				// Create Partyrelation ship to BundleTeam members.
+				obj.teamMembers.each{ member->
+					def teamRelationship = new PartyRelationship(
+										partyRelationshipType : teamRelationshipType,
+										partyIdFrom : bundleTeam,
+										partyIdTo : member.staff,
+										roleTypeCodeFrom : teamRole,
+										roleTypeCodeTo : teamMemberRole,
+										statusCode : "ENABLED",
+										comment : null
+										)
+					if ( ! teamRelationship.validate() || ! teamRelationship.save(insert : true, flush:true) ) {
+						def etext = "Unable to create asset ${teamRelationship}" +
+						GormUtil.allErrorsString( teamRelationship )
+						println etext
+					}
+				}
+				
+			} else {
+				def etext = "Unable to create asset ${bundleTeam}" +
+				GormUtil.allErrorsString( bundleTeam )
+				println etext
 			}
 		}
 	}
