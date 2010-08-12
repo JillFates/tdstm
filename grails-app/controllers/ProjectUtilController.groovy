@@ -88,8 +88,8 @@ class ProjectUtilController {
 			def templateInstance = Project.get(template)
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 			def startDateTime = GormUtil.convertInToGMT(new Date("$startDate"), tzId)
-			def timeDelta = startDateTime.getTime() - templateInstance?.startDate?.getTime()
-			def completionDateTime = new Date(templateInstance?.completionDate?.getTime() + timeDelta )
+			def timeDelta = startDateTime.getTime() - templateInstance?.startDate?.getTime() ? templateInstance?.startDate?.getTime() : 0
+			def completionDateTime = templateInstance?.completionDate?.getTime() ? new Date(templateInstance?.completionDate?.getTime() + timeDelta ) : null
 			projectInstance = new Project(name:name, projectCode:name, description:templateInstance?.description, 
 											client:templateInstance?.client, workflowCode:templateInstance?.workflowCode, 
 											projectType:"Demo", startDate:startDateTime, completionDate:completionDateTime )
@@ -108,8 +108,8 @@ class ProjectUtilController {
 												name:bundle.name,
 												description:bundle.description,
 												moveEvent:null,
-												startTime:new Date(bundle.startTime?.getTime() + timeDelta ), 
-												completionTime:new Date(bundle?.completionTime?.getTime() + timeDelta )
+												startTime:bundle.startTime?.getTime() ? new Date(bundle.startTime?.getTime() + timeDelta ) : null, 
+												completionTime:bundle?.completionTime?.getTime() ? new Date(bundle?.completionTime?.getTime() + timeDelta ) : null
 												)
 					if ( ! moveBundle.validate() || ! moveBundle.save(insert : true, flush:true) ) {
 						def etext = "Unable to create asset ${moveBundle}" +
