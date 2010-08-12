@@ -418,7 +418,7 @@ class PmoAssetTrackingService {
 		}
 		if(column2Value!="" && column2Value!= null){
 			if(column2Value == 'blank'){
-				query.append(" and ae.${column2Field} = '' OR ae.${columns?.column2.field} is null")
+				query.append(" and ae.${columns?.column2.field} = '' OR ae.${columns?.column2.field} is null")
 			} else {
 				def owner = column2Value.replace("'","\\'")
 				query.append(" and ae.${columns?.column2.field} like '%$owner%'")
