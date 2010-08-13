@@ -213,7 +213,7 @@ class ProjectController {
 	            }
             }else {
             	image = ProjectLogo.findByProject(projectInstance)
-            	if(!params.projectPartner){
+            	if(image && !params.projectPartner){
                	 image.delete(flush:true)
             	}
             }
