@@ -73,10 +73,9 @@
 {
 	font: bold 16px Arial;
 	color:#ffffff;
-	width:70%;
-        float:left;
+	width:auto;
+    float:left;
 	text-align:center;
-	
 	height:30px;
 	padding-top: 2px;
 }
@@ -206,17 +205,18 @@
 }
 .header_left
 {
-	width:auto;
+	width:20%;
 	height:auto;
 	float:left;
 }
 .header_right
 {
-	width:20%;
+	width:auto;
 	height:auto;
 	float:right;
 	font:11px Arial;
 	color:#FFFFFF;
+	padding-right: 5px;
 }
 .header_right a
 {
