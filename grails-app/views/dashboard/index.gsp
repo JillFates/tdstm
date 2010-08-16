@@ -426,7 +426,7 @@
 	$(document).ready(function() {
 
 		var viewPort = $(window).width();
-		modWidth = parseInt((viewPort-200) / 130);
+		modWidth = parseInt((viewPort-210) / 130);
 		$(".mod").css("width",(modWidth * 130 )+"px");
 
 		$(window).resize(function() {
@@ -435,7 +435,7 @@
 			}
 			hasTimedOut = setTimeout(function() {
 				var viewPort = $(window).width() //window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-				modWidth = parseInt((viewPort-200) / 130)
+				modWidth = parseInt((viewPort-210) / 130)
 				$(".mod").css("width",(modWidth * 130 )+"px");
 				AditionalFrames = 1
 				stepCount = 1
@@ -459,7 +459,9 @@
 	} else {
 		$("#timezone").find("option[text='EDT']").attr("selected","selected");
 	}
-	$("#updateTimeId").val("${timeToUpdate}")
+	if('${timeToUpdate}'){
+		$("#updateTimeId").val("${timeToUpdate}")
+	}
 	var sURL = unescape(window.location);
 	var timer
 	var errorCode = '200'
@@ -973,7 +975,7 @@
 	will popup the dialog to create news
 	*/
 	function openCreateNewsDialog(){
-		$("#createNewsDialog").dialog('option', 'width', 700);
+		$("#createNewsDialog").dialog('option', 'width', 'auto');
 		$("#createNewsDialog").dialog('option', 'position', ['center','top']);
 		$("#showEditCommentDialog").dialog("close");
 		$('#createNewsDialog').dialog('open');
@@ -1093,7 +1095,7 @@
 				
 			}
 	     	
-			$("#showEditCommentDialog").dialog('option', 'width', 700);
+			$("#showEditCommentDialog").dialog('option', 'width', 'auto');
 			$("#showEditCommentDialog").dialog('option', 'position', ['center','top']);
 			$("#showEditCommentDialog").dialog("open");
 			$("#createNewsDialog").dialog("close");
@@ -1145,7 +1147,7 @@
 	// FUNCTION TO SET THE STEP DIV WIDTH.
 	function getStepDivWidth() {
 		var viewPort = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-		var modWidth = parseInt((viewPort-200) / 130)
+		var modWidth = parseInt((viewPort-210) / 130)
 		$(".mod").css("width",(modWidth * 130 )+"px");
 		return modWidth;
 	}
