@@ -158,7 +158,7 @@
 				</g:remoteLink>
 				</g:elseif>
 				<g:else>
-				<a href="#" onclick="$('#createAssetCommentId').val(${assetEntityInstance.id});$('#statusId').val('new');$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('open');$('#commentsListDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">
+				<a href="#" onclick="$('#createAssetCommentId').val(${assetEntityInstance.id});$('#statusId').val('new');$('#createCommentDialog').dialog('option', 'width', 'auto');$('#createCommentDialog').dialog('open');$('#commentsListDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">
 					<img src="${createLinkTo(dir:'images/skin',file:'database_table_light.png')}" border="0px"/>
 				</a>
 				</g:else></span>
@@ -299,7 +299,7 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 		</table>
 	</div>
 	<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-		<span class="menuButton"><a class="create" href="#" onclick="$('#statusId').val('');$('#createResolveDiv').css('display','none');$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();" >New Comment</a></span>
+		<span class="menuButton"><a class="create" href="#" onclick="$('#statusId').val('');$('#createResolveDiv').css('display','none');$('#createCommentDialog').dialog('option', 'width', 'auto');$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();" >New Comment</a></span>
 	</div>
 </div>
 <div id="createCommentDialog" title="Create Asset Comment"
@@ -310,7 +310,7 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 	<input type="hidden" name="category" value="general"/>
 	<div class="dialog" style="border: 1px solid #5F9FCF">
 	<div>
-	<table id="createCommentTable" style="border: 0px">
+	<table id="createCommentTable" style="border: 0px;">
 		
 			<tr class="prop" >
 				<td valign="top" class="name"><label for="commentType">Comment
@@ -369,7 +369,7 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 <div class="dialog" style="border: 1px solid #5F9FCF"><input name="id" value="" id="commentId"
 	type="hidden"/>
 	<div>
-<table id="showCommentTable" style="border: 0px">
+<table id="showCommentTable" style="border: 0px;">
 	
 	<tr>
 	<td valign="top" class="name"><label for="dateCreated">Created
@@ -445,7 +445,7 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 </div>
 <div class="buttons"><span class="button"> <input
 	class="edit" type="button" value="Edit"
-	onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
+	onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 'auto');$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
 </span> <span class="button"> <input class="delete" type="button"
 	value="Delete"
 	onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + $(\'#commentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'never\')')}" />
@@ -457,7 +457,7 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 	<div class="dialog" style="border: 1px solid #5F9FCF">
 	<input type="hidden" name="id" id="updateCommentId" value=""/>
 	<div>
-	<table id="updateCommentTable" style="border: 0px">
+	<table id="updateCommentTable" style="border: 0px;">
 		
 		
 			<tr>
@@ -510,7 +510,7 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 			
 			</div>
 			<div id="editResolveDiv" style="display: none;">
-		<table id="updateResolveTable" style="border: 0px">
+		<table id="updateResolveTable" style="border: 0px;">
             <tr class="prop">
             	<td valign="top" class="name">
                 <label for="isResolved">Resolved:</label>

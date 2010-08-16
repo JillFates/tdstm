@@ -296,7 +296,7 @@
 <g:if test="${isAdmin || isManager || isProjManager}">
 <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 <span class="menuButton"><a class="create" href="#"
-	onclick="$('#statusId').val('');$('#createResolveDiv').css('display', 'none') ;$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">New
+	onclick="$('#statusId').val('');$('#createResolveDiv').css('display', 'none') ;$('#createCommentDialog').dialog('option', 'width', 'auto');$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">New
 Comment</a></span></div>
 </g:if>
 </div>
@@ -426,7 +426,7 @@ Comment</a></span></div>
 <g:if test="${isAdmin || isManager || isProjManager}">
 <div class="buttons">
 <span class="button">
-<input class="edit" type="button" value="Edit" onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
+<input class="edit" type="button" value="Edit" onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 'auto');$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
 </span>
 <span class="button"> <input class="delete" type="button" value="Delete"
 	onclick="${remoteFunction(controller:'assetEntity', action:'deleteComment', params:'\'id=\' + $(\'#commentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'action\')')}" />
@@ -992,7 +992,7 @@ Comment</a></span></div>
 			setAssetId( $('#newAssetCommentId').val() );
 		}
 		$('#statusId').val('new');
-		$('#createCommentDialog').dialog('option', 'width', 700);
+		$('#createCommentDialog').dialog('option', 'width', 'auto');
 		$('#createCommentDialog').dialog('open');
 		$('#commentsListDialog').dialog('close');
 		$('#editCommentDialog').dialog('close');

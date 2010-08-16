@@ -367,7 +367,7 @@ td .odd {
 	function createNewAssetComment( asset ){
 		setAssetId( asset );
 		$('#statusId').val('new');
-		$('#createCommentDialog').dialog('option', 'width', 700);
+		$('#createCommentDialog').dialog('option', 'width', 'auto');
 		$('#createCommentDialog').dialog('open');
 		$('#commentsListDialog').dialog('close');
 		$('#editCommentDialog').dialog('close');
@@ -956,7 +956,7 @@ td .odd {
 </div>
 <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 <span class="menuButton"><a class="create" href="#"
-	onclick="$('#statusId').val('');$('#createResolveDiv').hide();$('#createCommentDialog').dialog('option', 'width', 700);$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">New
+	onclick="$('#statusId').val('');$('#createResolveDiv').hide();$('#createCommentDialog').dialog('option', 'width', 'auto');$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">New
 Comment</a></span></div>
 </div>
 <div id="createCommentDialog" title="Create Asset Comment" style="display: none;">
@@ -1023,7 +1023,7 @@ Comment</a></span></div>
 <div class="dialog" style="border: 1px solid #5F9FCF">
 <input name="id" value="" id="commentId" type="hidden"/>
 	<div>
-<table id="showCommentTable" style="border: 0px">
+<table id="showCommentTable" style="border: 0px;">
 	
 	<tr>
 	<td valign="top" class="name"><label for="dateCreated">Created
@@ -1098,7 +1098,7 @@ Comment</a></span></div>
 </div>
  <div class="buttons"><span class="button"> 
  <input class="edit" type="button" value="Edit"
-	onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
+	onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 'auto');$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
 </span> <span class="button"> 
 <input class="delete" type="button" value="Delete"
 	onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + $(\'#commentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e ,\'never\')')}" />

@@ -88,7 +88,7 @@ function showEditCommentForm(e , rowId){
 			
 		}
      	
-		$("#showEditCommentDialog").dialog('option', 'width', 700);
+		$("#showEditCommentDialog").dialog('option', 'width', 'auto');
 		$("#showEditCommentDialog").dialog('option', 'position', ['center','top']);
 		$("#showEditCommentDialog").dialog("open");
 		$("#createNewsDialog").dialog("close");
@@ -118,7 +118,7 @@ function updateHidden(checkBoxId,hiddenId){
 	}
 }
 function openCreateNewsDialog(){
-	$("#createNewsDialog").dialog('option', 'width', 700);
+	$("#createNewsDialog").dialog('option', 'width', 'auto');
 	$("#createNewsDialog").dialog('option', 'position', ['center','top']);
 	$('#showEditCommentDialog').dialog('close');
 	$('#createNewsDialog').dialog('open');

@@ -175,12 +175,12 @@
 			      	 $('#mustVerifyEditId').val(assetComments[0].assetComment.mustVerify)
 			      	 $('#isResolvedEditId').val(assetComments[0].assetComment.isResolved)
 			      	 if(action == 'edit'){
-				      	$("#editCommentDialog").dialog('option', 'width', 700)
+				      	$("#editCommentDialog").dialog('option', 'width', 'auto')
 				      	$("#editCommentDialog").dialog('option', 'position', ['center','top']);
 				      	$("#editCommentDialog").dialog("open")
 				      	$("#showCommentDialog").dialog("close")
 			      	 } else if(action == 'show'){
-			      	 	$("#showCommentDialog").dialog('option', 'width', 700)
+			      	 	$("#showCommentDialog").dialog('option', 'width', 'auto')
 			      	 	$("#showCommentDialog").dialog('option', 'position', ['center','top']);
 			      	 	$("#showCommentDialog").dialog("open")
 			      	 	$("#editCommentDialog").dialog("close")
