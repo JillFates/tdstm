@@ -669,12 +669,10 @@ class AssetEntityController {
     		attributeOptions.each{option ->
     			options<<[option:option.value]
     		}
-        	if( it.attribute.attributeCode != "moveBundle" && it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam" ){
-        		items << [label:it.attribute.frontendLabel, attributeCode:it.attribute.attributeCode, 
+		items << [label:it.attribute.frontendLabel, attributeCode:it.attribute.attributeCode, 
         		          frontendInput:it.attribute.frontendInput, 
         		          options : options, 
-        		          value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode) : ""]
-        	}
+        		          value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode).toString() : ""]
         }
         render items as JSON
     }

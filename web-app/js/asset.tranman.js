@@ -120,7 +120,6 @@ function showAssetDialog( e , action ) {
 			  	var spanAst = "<span style='color:red;'>*</span>"//document.createElement("span")
 			    labelTd += spanAst 
 		    }
-			      
 		    var inputTd = "<td style='width:25%;' nowrap>"+attribute.value+"</td>"
 
 		    // td for Edit page
@@ -233,7 +232,9 @@ function showAssetDialog( e , action ) {
   	var options = attribute.options
   	var browser=navigator.appName;
   	var inputField
-  	if(type == 'select'){
+  	if( name == "moveBundle" || name == "sourceTeam" || name == "targetTeam"){
+  		inputField = attribute.value
+  	} else if(type == 'select'){
   		inputField = '<select name='+name +' id='+ id +name+'Id'+'>'
 		var inputOption = '<option value=\'\' >please select</option>'
 		if (options) {

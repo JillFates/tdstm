@@ -132,6 +132,8 @@
 			<g:sortableColumn property="assetTag" title="Asset Tag" params="${filterParams}"/>
 
 			<g:sortableColumn property="serialNumber" title="Serial #" params="${filterParams}"/>
+			
+			<g:sortableColumn property="moveBundle" title="Move Bundle &nbsp;" params="${filterParams}"/>
 
 
 		</tr>
@@ -183,6 +185,8 @@
 				<td id="assetTag_${assetEntityInstance.id}" onclick="${remoteFunction(action:'editShow', params:'\'id=\'+'+assetEntityInstance.id, before:'document.showForm.id.value ='+ assetEntityInstance.id+';document.editForm.id.value = '+ assetEntityInstance.id+';', onComplete:'showAssetDialog(e , \'show\')')}">${fieldValue(bean:assetEntityInstance, field:'assetTag')}</td>
 
 				<td id="serialNumber_${assetEntityInstance.id}" onclick="${remoteFunction(action:'editShow', params:'\'id=\'+'+assetEntityInstance.id, before:'document.showForm.id.value ='+ assetEntityInstance.id+';document.editForm.id.value = '+ assetEntityInstance.id+';', onComplete:'showAssetDialog(e , \'show\')')}">${fieldValue(bean:assetEntityInstance, field:'serialNumber')}</td>
+				
+				<td id="moveBundle_${assetEntityInstance.id}" onclick="${remoteFunction(action:'editShow', params:'\'id=\'+'+assetEntityInstance.id, before:'document.showForm.id.value ='+ assetEntityInstance.id+';document.editForm.id.value = '+ assetEntityInstance.id+';', onComplete:'showAssetDialog(e , \'show\')')}">${fieldValue(bean:assetEntityInstance, field:'moveBundle')}</td>
 
 			</tr>
 		</g:each>
