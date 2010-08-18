@@ -669,10 +669,13 @@ class AssetEntityController {
     		attributeOptions.each{option ->
     			options<<[option:option.value]
     		}
-		items << [label:it.attribute.frontendLabel, attributeCode:it.attribute.attributeCode, 
-        		          frontendInput:it.attribute.frontendInput, 
-        		          options : options, 
-        		          value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode).toString() : ""]
+			if( it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam" ){
+        		items << [label:it.attribute.frontendLabel, attributeCode:it.attribute.attributeCode, 
+						  	frontendInput:it.attribute.frontendInput, 
+        		          	options : options, 
+							value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode).toString() : "",
+							bundleId:assetEntityInstance?.moveBundle?.id]
+        	}
         }
         render items as JSON
     }
@@ -698,17 +701,35 @@ class AssetEntityController {
 	    	}
 	        def assetEntityInstance = AssetEntity.get( params.id )
 	        if(assetEntityInstance) {
+	        	def bundleId = map.get('moveBundle')
+				if(bundleId){
+					if(bundleId != assetEntityInstance.moveBundle?.id){
+						map.put('sourceTeam',null)
+						map.put('targetTeam',null)
+					}
+					map.put('moveBundle',MoveBundle.get(bundleId))
+				} else {
+					map.put('moveBundle',null)
+					map.put('sourceTeam',null)
+					map.put('targetTeam',null)
+				}
 	        	assetEntityInstance.properties = map
 	        	assetEntityInstance.lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+				
 	            if(!assetEntityInstance.hasErrors() && assetEntityInstance.save(flush:true)) {
 	            	def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
 	            	entityAttributeInstance.each{
-	                	if( it.attribute.attributeCode != "moveBundle" && it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam" ){
+	                	if( it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam" ){
 	                		assetItems << [id:assetEntityInstance.id, attributeCode:it.attribute.attributeCode, 
 	                		               frontendInput:it.attribute.frontendInput, 
-	                		               value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode) : ""]
+	                		               value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode).toString() : ""]
 	                	}
 	                }
+	            } else {
+	            	def etext = "Unable to Update Asset Entity" +
+	                GormUtil.allErrorsString( assetEntityInstance )
+					println etext
+					log.error( etext )	
 	            }
 	        }
     	}
@@ -757,7 +778,7 @@ class AssetEntityController {
     		entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntity.attributeSet.id order by eav.sortOrder ")
         }
     	entityAttributeInstance.each{
-    		if( it.attribute.attributeCode != "moveBundle" && it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam"){
+    		if( it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam"){
     			items<<[ attributeCode:it.attribute.attributeCode, frontendInput:it.attribute.frontendInput ]
     		}
     	}

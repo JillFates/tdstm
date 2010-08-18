@@ -231,11 +231,27 @@ function showAssetDialog( e , action ) {
   	var type = attribute.frontendInput
   	var options = attribute.options
   	var browser=navigator.appName;
-  	var inputField
-  	if( name == "moveBundle" || name == "sourceTeam" || name == "targetTeam"){
-  		inputField = attribute.value
+  	var inputField = ""
+  	if( name == "moveBundle"){
+  		new Ajax.Request('../moveBundle/projectMoveBundles',{
+  				asynchronous:false,
+  				evalScripts:true,
+  				onComplete:function(e){
+  					var  bundlesList = eval('(' + e.responseText + ')')
+  					inputField = '<select name=\''+name+'\' id=\''+ id +name+'Id'+'\'><option value=\'\'>Unassigned</option>'
+  					for(i=0; i<bundlesList.length; i++){
+  						var bundle = bundlesList[i]
+  						if(attribute.bundleId != bundle.id){
+  						inputField += '<option value=\''+bundle.id+'\'>'+bundle.name+'</option>'
+  						} else {
+  							inputField += '<option value=\''+bundle.id+'\' selected>'+bundle.name+'</option>'
+  						}
+  					}
+  					inputField += '</select>'
+  				}
+  			})
   	} else if(type == 'select'){
-  		inputField = '<select name='+name +' id='+ id +name+'Id'+'>'
+  		inputField = '<select name=\''+name +'\' id=\''+ id +name+'Id'+'\'>'
 		var inputOption = '<option value=\'\' >please select</option>'
 		if (options) {
 			var length = options.length
@@ -251,9 +267,9 @@ function showAssetDialog( e , action ) {
 		inputField += inputOption+'</select>'
 	 } else {
 		 	if(attribute.value){
-		 		inputField = '<input type="text" name='+name +' id='+ id + name + 'Id'+' value=\''+attribute.value +'\'></input>'
+		 		inputField = '<input type="text" name=\''+name +'\' id=\''+ id + name + 'Id'+'\' value=\''+attribute.value +'\'></input>'
 		 	} else {
-		 		inputField = '<input type="text" name='+name +' id='+ id + name + 'Id'+' ></input>'
+		 		inputField = '<input type="text" name=\''+name +'\' id=\''+ id + name + 'Id'+'\' ></input>'
 		 	}
 	 }
 	return inputField; 

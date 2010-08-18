@@ -1,5 +1,6 @@
 import java.text.SimpleDateFormat
 import com.tdssrc.grails.GormUtil
+import grails.converters.JSON
  
 class MoveBundleController {
 
@@ -373,5 +374,13 @@ class MoveBundleController {
 			}
 		}
 		 render message;
+	}
+	def projectMoveBundles = {
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def moveBundlesList 
+		if(projectId){
+			moveBundlesList = MoveBundle.findAllByProject(Project.get(projectId))
+	 	}
+		render moveBundlesList as JSON
 	}
 }
