@@ -703,7 +703,7 @@ class AssetEntityController {
 	        if(assetEntityInstance) {
 	        	def bundleId = map.get('moveBundle')
 				if(bundleId){
-					if(bundleId != assetEntityInstance.moveBundle?.id){
+					if(Integer.parseInt(bundleId) != assetEntityInstance.moveBundle?.id){
 						map.put('sourceTeam',null)
 						map.put('targetTeam',null)
 					}
