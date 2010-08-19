@@ -175,8 +175,8 @@ class ClientConsoleController {
                 def transQuery = "from AssetTransition where assetEntity = $assetId and voided = 0"
                 
                 def assetTransitions = AssetTransition.findAll(transQuery)
-                def isHoldNa = assetTransitions.find { it.type == 'boolean' && it.stateTo == holdId }
-                
+                def isHoldNa = assetTransitions.find { it.type == 'boolean' && it.stateTo == holdId.toString() }
+
                 processTransitionList.each() { trans ->
                     def cssClass='task_pending'
                     def transitionId = trans.transId
@@ -187,16 +187,16 @@ class ClientConsoleController {
                         if(assetTrans?.type == 'boolean' && assetTrans?.isNonApplicable) {
                             cssClass='asset_pending'
                         } else if(assetTrans?.type == 'boolean' && stateType == 'boolean') {
-                            if(stateId != holdId || isHoldNa){
+                            if(stateId != holdId || isHoldNa?.isNonApplicable){
                                 cssClass='task_done'
                             } else {
-                                cssClass='asset_hold'
+                                cssClass = (isHoldNa?.holdTimer && isHoldNa?.holdTimer?.getTime() < today.getTime()) ? 'asset_hold_overtime' : 'asset_hold'
                             }
                         }
                         
                         if(stateType != 'boolean' || transitionId == holdId){
-                        	if(stateId == holdId && !isHoldNa){ /* check the current state, if current state = hold , show all steps in yellow */
-                                cssClass = "asset_hold"
+                        	if(stateId == holdId && !isHoldNa?.isNonApplicable){ /* check the current state, if current state = hold , show all steps in yellow */
+                                cssClass = (isHoldNa?.holdTimer && isHoldNa?.holdTimer?.getTime() < today.getTime()) ? 'asset_hold_overtime' : 'asset_hold'
                             } else if( transitionId <= maxstate  ){
                             	if(transitionId != holdId && assetTrans?.type != 'boolean'){
                                     cssClass = "task_done"
@@ -211,7 +211,6 @@ class ClientConsoleController {
                                 }
                             }
                         }
-
                         if( assetTrans )
                            cssClass = getRecentChangeStyle( assetTrans, cssClass )
                     } else {
@@ -481,10 +480,10 @@ class ClientConsoleController {
 					check = false
 				}
                 
-                def transQuery = "from AssetTransition where assetEntity = $assetId and voided = 0 and (type = 'boolean' OR type = 'process')"
+                def transQuery = "from AssetTransition where assetEntity = $assetId and voided = 0 "
                 
                 def assetTransitions = AssetTransition.findAll(transQuery)
-                def isHoldNa = assetTransitions.find { it.type == 'boolean' && it.stateTo == holdId }
+                def isHoldNa = assetTransitions.find { it.type == 'boolean' && it.stateTo == holdId.toString() }
 				
 				processTransitions.each() { trans ->
 					def cssClass='task_pending'
@@ -497,15 +496,15 @@ class ClientConsoleController {
                         if(assetTrans?.type == 'boolean' && assetTrans?.isNonApplicable) {
 							cssClass='asset_pending'
                         } else if(assetTrans?.type == 'boolean' && stateType == 'boolean') {
-							if(stateId != holdId || isHoldNa){
+							if(stateId != holdId || isHoldNa?.isNonApplicable){
 								cssClass='task_done'
 							} else {
-								cssClass='asset_hold'
+								cssClass = (isHoldNa?.holdTimer && isHoldNa?.holdTimer?.getTime() < today.getTime()) ? 'asset_hold_overtime' : 'asset_hold' 
 							}
 						}
 						if(stateType != 'boolean' || transitionId == holdId){
-							if(stateId == holdId && !isHoldNa){ /* check the current state, if current state = hold , show all steps in yellow */
-								cssClass = "asset_hold"
+							if(stateId == holdId && !isHoldNa?.isNonApplicable){ /* check the current state, if current state = hold , show all steps in yellow */
+								cssClass = (isHoldNa?.holdTimer && isHoldNa?.holdTimer?.getTime() < today.getTime()) ? 'asset_hold_overtime' : 'asset_hold'
 							} else if( transitionId <= maxstate  ){
                                 if(transitionId != holdId && assetTrans?.type != 'boolean'){ 
         							cssClass = "task_done"

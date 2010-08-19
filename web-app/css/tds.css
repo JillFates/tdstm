@@ -344,6 +344,10 @@
 	background-color:#FFFF33;
 	color:black;
 }
+.asset_hold_overtime{
+	background-color:#CD3333;
+	color:black;
+}
 
 /* dashboards label display for IE only */
 	.verticaltext {

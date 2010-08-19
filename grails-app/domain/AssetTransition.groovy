@@ -13,6 +13,7 @@ class AssetTransition {
 	String comment
 	Date dateCreated
 	Date lastUpdated
+	Date holdTimer
 	Integer voided = 0		// to place transition as voided when statusTo < new status
 	String type
 	Integer isNonApplicable = 0
@@ -37,6 +38,7 @@ class AssetTransition {
 		wasSkippedTo( range:0..1, nullable:false )
 		dateCreated( nullable:true )
 		lastUpdated( nullable:true )
+		holdTimer( nullable:true )
 		voided( range:0..1, nullable:false )
 		type( blank:false, nullable:false )
 		isNonApplicable( range:0..1, nullable:false )
@@ -61,6 +63,9 @@ class AssetTransition {
 	def beforeInsert = {
 		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
 		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+		if(stateTo == '10'){
+			holdTimer = new Date( dateCreated.getTime() + 900000 )
+		}
 	}
 	def beforeUpdate = {
 		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )

@@ -556,7 +556,7 @@ class PmoAssetTrackingService {
 			query.append(" ) a")
 		}
 		query.append(""" WHERE a.id in	( select t.asset_entity_id from asset_transition t where 
-					(t.date_created between SUBTIME('$lastPoolTime','00:05:30') and '$currentPoolTime' OR t.last_updated between SUBTIME('$lastPoolTime','00:05:30') and '$currentPoolTime') )""")
+					(t.date_created between SUBTIME('$lastPoolTime','00:15:30') and '$currentPoolTime' OR t.last_updated between SUBTIME('$lastPoolTime','00:15:30') and '$currentPoolTime') )""")
 		
 		def resultList=jdbcTemplate.queryForList(query.toString())
 		
