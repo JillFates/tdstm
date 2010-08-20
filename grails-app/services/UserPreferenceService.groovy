@@ -2,6 +2,7 @@ import org.jsecurity.SecurityUtils
 import javax.servlet.http.HttpSession
 import org.springframework.web.context.request.RequestContextHolder
 import com.tdssrc.eav.*
+import com.tdssrc.grails.GormUtil
 class UserPreferenceService  {
 
 	static transactional = true
@@ -178,7 +179,7 @@ class UserPreferenceService  {
     	if( username ){
     		def userLogin = UserLogin.findByUsername( username )
 			getSession().setAttribute( "LOGIN_PERSON", ['name':userLogin.person.firstName, "id":userLogin.person.id ])
-			userLogin.lastLogin = new Date()
+			userLogin.lastLogin = GormUtil.convertInToGMT( "now", "EDT" )
     		userLogin.save(flush:true)
     	}
     }

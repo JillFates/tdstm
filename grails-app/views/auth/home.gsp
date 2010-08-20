@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="companyHeader" />
-<title>JsecUser List</title>
+<title>Transition Manager Admin Portal</title>
 <style type="text/css">
 a:hover {
 	text-decoration: underline;
