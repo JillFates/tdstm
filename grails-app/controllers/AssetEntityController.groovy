@@ -1275,6 +1275,9 @@ class AssetEntityController {
 	    	def assignTo = params.assignTo
 	    	def priority = params.priority
 	    	def comment = params.comment
+			def holdTime = params.holdTime
+			def principal = SecurityUtils.subject.principal
+	    	def loginUser = UserLogin.findByUsername(principal)
 	    	def rerackedId = stateEngineService.getStateId(assetEntity.project.workflowCode,"Reracked")
 	    	if(!rerackedId) {
 	    		rerackedId = stateEngineService.getStateId(assetEntity.project.workflowCode,"Reracked")
@@ -1286,20 +1289,10 @@ class AssetEntityController {
 	        if(projectAssetMap){
 	        	currentStateId = projectAssetMap.currentStateId
 	        }
+	        
 	    	if(status != "" ){
-		    	def principal = SecurityUtils.subject.principal
-		    	def loginUser = UserLogin.findByUsername(principal)
 		    	def transactionStatus = workflowService.createTransition(assetEntity.project.workflowCode,"SUPERVISOR", status, assetEntity, assetEntity.moveBundle, loginUser, null, comment )
 		    	if ( transactionStatus.success ) {
-		    		if(comment){
-			    		assetComment = new AssetComment()
-		          		assetComment.comment = comment
-		          		assetComment.assetEntity = assetEntity
-		          		assetComment.commentType = 'issue'
-		          		assetComment.category = 'moveday'		          			
-		          		assetComment.createdBy = loginUser.person
-		          		assetComment.save()
-		    		}
 		    		stateIdList = getStates(status)
 				    stateIdList.sort().each{
 				    	statesList<<[id:stateEngineService.getState(assetEntity.project.workflowCode,it),label:stateEngineService.getStateLabel(assetEntity.project.workflowCode,it)]
@@ -1334,14 +1327,31 @@ class AssetEntityController {
 	    			assetEntity.targetTeam = projectTeam
 	    		}
     		}
-    		def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+    		if(comment){
+	    		assetComment = new AssetComment()
+          		assetComment.comment = comment
+          		assetComment.assetEntity = assetEntity
+          		assetComment.commentType = 'issue'
+          		assetComment.category = 'moveday'		          			
+          		assetComment.createdBy = loginUser.person
+          		assetComment.save()
+    		}
+    		def transitionStates = jdbcTemplate.queryForList("select t.asset_transition_id as id, cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
     															"where t.asset_entity_id = $assetId and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
     															"order by t.date_created desc, stateTo desc limit 1 ")
 			def currentStatus = 0
 			if(transitionStates.size()){
 				currentStatus = transitionStates[0].stateTo
+				if(holdTime){
+		        	def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+		            def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		            def assetTransition = AssetTransition.get(transitionStates[0].id)
+					if(assetTransition.stateTo == holdId){
+			            assetTransition.holdTimer =  GormUtil.convertInToGMT(formatter.parse( holdTime ), tzId)
+						assetTransition.save(flush:true)
+					}
+		        }
 			}
-    		
 			if(statesList.size() == 0){
 				check = false    				
 			}else{

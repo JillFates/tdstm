@@ -7,6 +7,7 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" />
 
 <g:javascript src="asset.tranman.js" />
 
@@ -143,6 +144,11 @@ td .odd {
 		tableBody += '</tbody></table>'
 	    var selectObj = $("#asset")
 	   	selectObj.html(tableBody)
+	   	if(asset[0].assetDetails.currentState == "Hold"){
+		   	$("#setHoldTimerTr").show()
+	   	} else {
+	   		$("#setHoldTimerTr").hide()
+	   	}
 	   	createStateOptions(asset[0].statesList)
 	   	createAssighToOptions(asset[0].sourceTeams,asset[0].targetTeams)
 	   	document.assetdetailsForm.reset();
@@ -156,6 +162,7 @@ td .odd {
 	   	$("#asset").html(tableBody);
 	   	$("#stateSelectId").html("<option value=''>Status</option>");
 	   	$("#assignToId").html("<option value=''>Move Team</option><optgroup label='Source' id='sourceAssignTo'></optgroup><optgroup label='Target' id='targetAssignTo'></optgroup>")
+	   	$("#holdTimeId").val("");
 	   	var rows = $('#assetsTbody').children('tr')
 	   	for(i = 0 ; i<rows.length ; i++){
 		var rowVal = rows[i].getAttribute("value")
@@ -256,11 +263,23 @@ td .odd {
 	   	}
    	}
    	function setCommentValidation(){
-	   	if($("#validateCommentId").val() == 'true' || $("#stateSelectId").val() == 'Hold'){
+   	   	var returnVal = true;
+   	   	var holdTime = $("#holdTimeId").val()
+	   	if($("#validateCommentId").val() == 'true' || $("#stateSelectId").val() == 'Hold' || holdTime ){
 	   		if($("#commentId").val() == ''){
 	   			alert("A comment is required")
+	   			returnVal = false;
+	   		} else if( holdTime ) {
+	   			var objRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([APap][Mm])$/;
+	   	      	if( !objRegExp.test(holdTime) ){
+	   	      	 	$("#holdTimeId").addClass("field_error");
+	   	          	alert("Date should be in 'mm/dd/yyyy HH:MM AM/PM' format");
+	   	          	returnVal  =  false;
+	   	      	}
 	   		}
 	   	}
+	   	if( returnVal ) $("#holdTimeId").removeClass("field_error");
+	   	return returnVal;
    	}
    	var timer
    	function timedUpdate(timeoutPeriod) {
@@ -312,6 +331,7 @@ td .odd {
 			$("#currentStateId").val( asset[0].statusName )
 			$("#priorityId").val("");
 			$("#commentId").val("")
+			$("#holdTimeId").val("")
 			$('#statusCol_'+asset[0].assetEntity.id).click();
 		}
 		timedUpdate($('#selectTimedId').val());
@@ -879,6 +899,17 @@ td .odd {
 				<g:form name="assetdetailsForm">
 					<table style="border: 0">
 						<tbody>
+							<tr id="setHoldTimerTr" style="display: none;">
+								<td nowrap><b>Hold Time :</b></td>
+								<td>
+									<script type="text/javascript">
+					                    $(document).ready(function(){
+					                      $("#holdTimeId").datetimepicker();
+					                    });
+					                 </script> 
+					                 <input type="text" class="dateRange" size="15" style="width: 125px; height: 14px;" id="holdTimeId" name="holdTime"/>
+								</td>
+							</tr>
 							<tr>
 								<td><b>Change:</b></td>
 								<td><select id="stateSelectId" name="state"
@@ -912,7 +943,7 @@ td .odd {
 								<td colspan="2" style="text-align: center;" class="buttonR">
 								<input type="button" value="Cancel"	onclick="resetAssetDetails()"/>
 								<input type="button" value="Submit"
-									onclick="setCommentValidation();${remoteFunction(action:'createTransition', params:'\'asset=\' + $(\'#assetId\').val() +\'&state=\'+ $(\'#stateSelectId\').val() +\'&priority=\'+ $(\'#priorityId\').val() +\'&assignTo=\'+$(\'#assignToId\').val() +\'&comment=\'+$(\'#commentId\').val() ', onComplete:'updateAsset(e)')}" /></td>
+									onclick="if(setCommentValidation())${remoteFunction(action:'createTransition', params:'\'asset=\' + $(\'#assetId\').val() +\'&state=\'+ $(\'#stateSelectId\').val() +\'&priority=\'+ $(\'#priorityId\').val() +\'&assignTo=\'+$(\'#assignToId\').val() +\'&comment=\'+$(\'#commentId\').val()+\'&holdTime=\'+$(\'#holdTimeId\').val() ', onComplete:'updateAsset(e)')}" /></td>
 							</tr>
 						</tbody>
 					</table>
