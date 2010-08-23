@@ -161,7 +161,7 @@
 				<select id="column1Id" name="column1" onchange="document.listForm.submit();" style="width: 120px;">
 					<option value="" selected="selected">All</option>
 					<g:each in="${column1List}" var="column1Obj">
-						<option value="${column1Obj.key ? column1Obj.key : 'blank'}">${column1Obj.key ? column1Obj.key : 'blank'}&nbsp;(${column1Obj.value})</option>
+						<option value="${column1Obj.id ? column1Obj.id : 'blank'}">${column1Obj.key ? column1Obj.key : 'blank'}&nbsp;(${column1Obj.value})</option>
 					</g:each>
 				</select>
 			</th>
@@ -175,7 +175,7 @@
 				<select id="column2Id" name="column2"	onchange="document.listForm.submit();" style="width: 120px;">
 					<option value="" selected="selected">All</option>
 					<g:each in="${column2List}" var="column2Obj">
-						<option value="${column2Obj.key ? column2Obj.key : 'blank'}">${column2Obj.key ? column2Obj.key : 'blank'}&nbsp;(${column2Obj.value})</option>	
+						<option value="${column2Obj.id ? column2Obj.id : 'blank'}">${column2Obj.key ? column2Obj.key : 'blank'}&nbsp;(${column2Obj.value})</option>	
 					</g:each>
 				</select>
 			</th>
@@ -189,7 +189,7 @@
 				<select id="column3Id" name="column3" onchange="document.listForm.submit();" style="width: 120px;">
 					<option value="" selected="selected">All</option>
 					<g:each in="${column3List}" var="column3Obj">
-						<option value="${column3Obj.key ? column3Obj.key : 'blank'}">${column3Obj.key ? column3Obj.key : 'blank'}&nbsp;(${column3Obj.value})</option>	
+						<option value="${column3Obj.id ? column3Obj.id : 'blank'}">${column3Obj.key ? column3Obj.key : 'blank'}&nbsp;(${column3Obj.value})</option>	
 					</g:each>
 				</select>
 			</th>
@@ -203,7 +203,7 @@
 				<select id="column4Id" name="column4" onchange="document.listForm.submit();" style="width: 120px;">
 					<option value="" selected="selected">All</option>
 					<g:each in="${column4List}" var="column4Obj">
-						<option value="${column4Obj.key ? column4Obj.key : 'blank'}">${column4Obj.key ? column4Obj.key : 'blank'}&nbsp;(${column4Obj.value})</option>	
+						<option value="${column4Obj.id ? column4Obj.id : 'blank'}">${column4Obj.key ? column4Obj.key : 'blank'}&nbsp;(${column4Obj.value})</option>	
 					</g:each>
 				</select>
 			</th>
@@ -250,10 +250,38 @@
 			</g:else>
 			</span>
 			</td>
-			<td  id="${assetEntity.id}_column1">${assetEntity.asset[columns?.column1.field]}&nbsp;</td>
-			<td id="${assetEntity.id}_column2">${assetEntity.asset[columns?.column2.field]}&nbsp;</td>
-			<td id="${assetEntity.id}_column3">${assetEntity.asset[columns?.column3.field]}&nbsp;</td>
-			<td id="${assetEntity.id}_column4">${assetEntity.asset[columns?.column4.field]}&nbsp;</td>
+			<td  id="${assetEntity.id}_column1">
+				<g:if test="${columns?.column1.field != 'currentStatus'}">
+					${assetEntity.asset[columns?.column1.field]}&nbsp;
+				</g:if>
+				<g:else>
+					${assetEntity.currentStatus}&nbsp;
+				</g:else>
+			</td>
+			<td id="${assetEntity.id}_column2">
+				<g:if test="${columns?.column2.field != 'currentStatus'}">
+					${assetEntity.asset[columns?.column2.field]}&nbsp;
+				</g:if>
+				<g:else>
+					${assetEntity.currentStatus}&nbsp;
+				</g:else>
+			</td>
+			<td id="${assetEntity.id}_column3">
+				<g:if test="${columns?.column3.field != 'currentStatus'}">
+					${assetEntity.asset[columns?.column3.field]}&nbsp;
+				</g:if>
+				<g:else>
+					${assetEntity.currentStatus}&nbsp;
+				</g:else>
+			</td>
+			<td id="${assetEntity.id}_column4">
+				<g:if test="${columns?.column4.field != 'currentStatus'}">
+					${assetEntity.asset[columns?.column4.field]}&nbsp;
+				</g:if>
+				<g:else>
+					${assetEntity.currentStatus}&nbsp;
+				</g:else>
+			</td>
 			<g:each in="${assetEntity.transitions}" var="transition">${transition}</g:each>
 			</tr>
 		</g:each>
@@ -722,11 +750,52 @@ Comment</a></span></div>
 		var assetTransitions = eval('(' + e.responseText + ')');
 		var length = assetTransitions.length;
 		if(length > 0){
+			var moveEventId = $("#moveEventId").val()
+			${remoteFunction(action:'getCurrentStatusOptions', params:'\'moveEventId=\' + moveEventId ', onComplete:'updateCurrentStatusOptions(e);' )}
+			if($("#column1Attribute").val() == 'currentStatus'){ 
+				$("#"+assetTransitions[0].id+"_column1").html(assetTransitions[0].cssClass);
+			}
+			if($("#column2Attribute").val() == 'currentStatus'){ 
+				$("#"+assetTransitions[0].id+"_column2").html(assetTransitions[0].cssClass)
+			}
+			if($("#column3Attribute").val() == 'currentStatus'){ 
+				$("#"+assetTransitions[0].id+"_column3").html(assetTransitions[0].cssClass)
+			}
+			if($("#column4Attribute").val() == 'currentStatus'){ 
+				$("#"+assetTransitions[0].id+"_column4").html(assetTransitions[0].cssClass)
+			}
 			for( i=0; i<length; i++ ) {
 				var transition = assetTransitions[i];
 				$("#"+transition.id).attr("class",transition.cssClass );
 				$("#"+transition.id).addClass('tranCell');
 			}
+		}
+	}
+	/*
+	*	Update the current Status options when transition done through the Buld edit 
+	*/
+	function updateCurrentStatusOptions( e ){
+		var options = eval('(' + e.responseText + ')');
+		var optionsString = "<option value='' selected='selected'>All</option>"
+		if( options.length > 0 ){
+			for(i=0; i<options.length; i++ ){
+				var option = options[i] 
+				var value = option.id ? option.id : 'blank'
+				var text = option.key ? option.key : 'blank'
+				optionsString+= "<option value='"+value+"'>"+ text +"("+option.value+")</option>"	
+			}
+		}
+		if($("#column1Attribute").val() == 'currentStatus'){ 
+			$("#column1Id").html(optionsString)
+		}
+		if($("#column2Attribute").val() == 'currentStatus'){ 
+			$("#column2Id").html(optionsString)
+		}
+		if($("#column3Attribute").val() == 'currentStatus'){ 
+			$("#column3Id").html(optionsString)
+		}
+		if($("#column4Attribute").val() == 'currentStatus'){ 
+			$("#column4Id").html(optionsString)
 		}
 	}
 	function editAssetDialog() {
@@ -848,6 +917,7 @@ Comment</a></span></div>
 		var order = $("#orderById").val()
 		var lastPoolTime = $("#lastPoolTimeId").val();
 		${remoteFunction(action:'getTransitions', params:'\'moveBundle=\' + moveBundle +\'&moveEvent=\'+moveEvent +\'&c1f=\'+c1f+\'&c2f=\'+c2f+\'&c3f=\'+c3f+\'&c4f=\'+c4f+\'&c1v=\'+c1v+\'&c2v=\'+c2v+\'&c3v=\'+c3v+\'&c4v=\'+c4v+\'&lastPoolTime=\'+lastPoolTime+\'&offset=\'+offset+\'&max=\'+max+\'&sort=\'+sort+\'&order=\'+order', onFailure:"handleErrors()", onComplete:'updateTransitions(e);' )}
+		${remoteFunction(action:'getCurrentStatusOptions', params:'\'moveEventId=\' + moveEvent ', onComplete:'updateCurrentStatusOptions(e);' )}
 		timedUpdate($("#selectTimedId").val())
 	}
 	var doUpdate = true
@@ -877,22 +947,12 @@ Comment</a></span></div>
 								action.html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
 							}
 						}
-						var application = $("#application_"+assetTransition.id)
-						if(application){
-							application.html( assetTransition.application );
-						}
-						var owner = $("#appOwner_"+assetTransition.id)
-						if(owner){
-							owner.html( assetTransition.appOwner );
-						}
-						var sme = $("#appSme_"+assetTransition.id)
-						if(sme){
-							sme.html( assetTransition.appSme );
-						}
-						var assetName = $("#assetName_"+assetTransition.id)
-						if(assetName){
-							assetName.html( assetTransition.assetName );
-						}
+
+						$("#"+assetTransition.id+"_column1").html( assetTransition.column1value );
+						$("#"+assetTransition.id+"_column2").html( assetTransition.column2value );
+						$("#"+assetTransition.id+"_column3").html( assetTransition.column3value );
+						$("#"+assetTransition.id+"_column4").html( assetTransition.column4value );
+						
 						var tdIdslength = assetTransition.tdId.length
 						for(j = 0; j< tdIdslength ; j++){
 							var transition = assetTransition.tdId[j]
@@ -910,7 +970,7 @@ Comment</a></span></div>
 							var link = document.createElement('a');
 							link.href = '#';
 							link.id = assetComment.assetEntityId;
-							if ( assetComment.type == "database_table_light.png" ) {
+							if ( assetComment.type == "db_table_light.png" ) {
 								link.onclick = function(){$('#newAssetCommentId').val(this.id);createNewAssetComment('');};
 							} else {
 								link.onclick = function(){$('#createAssetCommentId').val(this.id);new Ajax.Request('../assetEntity/listComments?id='+this.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'action');}})} //;return false

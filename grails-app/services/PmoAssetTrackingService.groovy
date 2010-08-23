@@ -118,6 +118,8 @@ class PmoAssetTrackingService {
 		} else if( projectAssetMap ) {
 			projectAssetMap.delete(flush:true)
 		}
+		assetEntity.currentStatus = currState 
+		assetEntity.save(flush:true)
 	}
 	/* -----------------------------------------------------
 	 * @author : Lokanath Reddy
@@ -146,7 +148,7 @@ class PmoAssetTrackingService {
 		def naTransQuery = "from AssetTransition where assetEntity = ${assetEntity?.id} and voided = 0 and type = 'boolean' "
 		
 		def doneTransitionQuery = "from AssetTransition where assetEntity = ${assetEntity?.id} and voided = 0 and type = 'process' " 
-		
+		tdId << [id:"${assetEntity?.id}", cssClass:stateEngineService.getState(assetEntity.project.workflowCode,currentstate)]
 		processTransitions.each() { trans ->
 			def cssClass='task_pending'
             if(currentstate != terminatedId){
@@ -400,7 +402,7 @@ class PmoAssetTrackingService {
 				ae.remote_mgmt_port as remote_MgmtPort, ae.fiber_cabinet as fiberCabinet, ae.fiber_type as fiberType, ae.fiber_quantity as fiberQuantity,
 				ae.hba_port as hbaPort, ae.kvm_device as kvmDevice, ae.kvm_port as kvmPort, mb.name as moveBundle, ae.truck,
 				ae.new_or_old as newOrOld, ae.priority, ae.cart, ae.shelf, spt.team_code as sourceTeam, tpt.team_code as targetTeam,
-				max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate
+				max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate, ae.current_status as currentStatus
 				FROM asset_entity ae
 				LEFT JOIN move_bundle mb ON (ae.move_bundle_id = mb.move_bundle_id )
 				LEFT JOIN project_team spt ON (ae.source_team_id = spt.project_team_id )
@@ -495,7 +497,7 @@ class PmoAssetTrackingService {
 				ae.remote_mgmt_port as remote_MgmtPort, ae.fiber_cabinet as fiberCabinet, ae.fiber_type as fiberType, ae.fiber_quantity as fiberQuantity,
 				ae.hba_port as hbaPort, ae.kvm_device as kvmDevice, ae.kvm_port as kvmPort, mb.name as moveBundle, ae.truck,
 				ae.new_or_old as newOrOld, ae.priority, ae.cart, ae.shelf, spt.team_code as sourceTeam, tpt.team_code as targetTeam,
-				max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate
+				max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate, ae.current_status as currentStatus
 				FROM asset_entity ae
 				LEFT JOIN move_bundle mb ON (ae.move_bundle_id = mb.move_bundle_id )
 				LEFT JOIN project_team spt ON (ae.source_team_id = spt.project_team_id )

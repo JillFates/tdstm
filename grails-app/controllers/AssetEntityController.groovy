@@ -669,7 +669,7 @@ class AssetEntityController {
     		attributeOptions.each{option ->
     			options<<[option:option.value]
     		}
-			if( it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam" ){
+			if( it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam" && it.attribute.attributeCode != "currentStatus" ){
         		items << [label:it.attribute.frontendLabel, attributeCode:it.attribute.attributeCode, 
 						  	frontendInput:it.attribute.frontendInput, 
         		          	options : options, 
@@ -719,7 +719,7 @@ class AssetEntityController {
 	            if(!assetEntityInstance.hasErrors() && assetEntityInstance.save(flush:true)) {
 	            	def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
 	            	entityAttributeInstance.each{
-	                	if( it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam" ){
+	                	if( it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam" && it.attribute.attributeCode != "currentStatus" ){
 	                		assetItems << [id:assetEntityInstance.id, attributeCode:it.attribute.attributeCode, 
 	                		               frontendInput:it.attribute.frontendInput, 
 	                		               value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode).toString() : ""]
@@ -755,7 +755,7 @@ class AssetEntityController {
     		attributeOptions.each{option ->
     			options<<[option:option.value]
     		}
-    		if( it.attribute.attributeCode != "moveBundle" && it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam"){
+    		if( it.attribute.attributeCode != "moveBundle" && it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam" && it.attribute.attributeCode != "currentStatus"){
     			items<<[ label:it.attribute.frontendLabel, attributeCode:it.attribute.attributeCode, 
     			         frontendInput:it.attribute.frontendInput, options : options ]
     		}
@@ -778,7 +778,7 @@ class AssetEntityController {
     		entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntity.attributeSet.id order by eav.sortOrder ")
         }
     	entityAttributeInstance.each{
-    		if( it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam"){
+    		if( it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam" && it.attribute.attributeCode != "currentStatus"){
     			items<<[ attributeCode:it.attribute.attributeCode, frontendInput:it.attribute.frontendInput ]
     		}
     	}

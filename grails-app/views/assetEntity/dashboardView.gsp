@@ -324,7 +324,7 @@ td .odd {
 				var link = document.createElement('a');
 				link.href = '#'
 				link.onclick = function(){$('#createAssetCommentId').val( asset[0].assetEntity.id ) ;new Ajax.Request('listComments?id='+asset[0].assetEntity.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never');}})} //;return false
-				link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\" />"
+				link.innerHTML = "<img src=\"../i/db_table_red.png\" border=\"0px\" />"
 				var iconObj = $('#icon_'+asset[0].assetEntity.id);
 				iconObj.html(link)
 			}
@@ -833,18 +833,18 @@ td .odd {
 											before='setAssetId(${assetsList?.asset.id});'
 											onComplete="listCommentsDialog( e ,'never' );">
 											<img
-												src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}"
+												src="${createLinkTo(dir:'i',file:'db_table_red.png')}"
 												border="0px"/>
 										</g:remoteLink>
 									</g:if>
 									<g:elseif test="${AssetComment.find('from AssetComment where assetEntity = '+ assetsList?.asset?.id)}">
 										<g:remoteLink controller="assetEntity" action="listComments" id="${assetsList?.asset.id}" before="setAssetId(${assetsList?.asset.id});" onComplete="listCommentsDialog( e ,'never' ); ">
-											<img src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}" border="0px"/>
+											<img src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px"/>
 										</g:remoteLink>
 									</g:elseif>
 									<g:else>
 									<a onclick="createNewAssetComment(${assetsList?.asset.id});">
-										<img src="${createLinkTo(dir:'images/skin',file:'database_table_light.png')}" border="0px"/>
+										<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px"/>
 									</a>
 									</g:else>
 									</td>

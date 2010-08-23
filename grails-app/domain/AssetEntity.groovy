@@ -58,6 +58,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String custom6
 	String custom7
 	String custom8
+	Integer currentStatus
 	
 	static hasMany = [
 		assetEntityVarchars : AssetEntityVarchar
@@ -122,6 +123,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		custom6( blank:true, nullable:true )
 		custom7( blank:true, nullable:true )
 		custom8( blank:true, nullable:true )
+		currentStatus( blank:true, nullable:true )
 	}
 	
 	static mapping  = {	

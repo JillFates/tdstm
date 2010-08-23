@@ -95,19 +95,19 @@ class ClientConsoleController {
 				
 				def temp1List = AssetEntity.executeQuery("""select distinct ae.${columns?.column1.field} , count(ae.id) from AssetEntity 
 																ae where  ae.moveBundle.id in ${bundles} group by ae.${columns?.column1.field} order by ae.${columns?.column1.field}""")
-				column1List = splitFilterExpansion( temp1List )
+				column1List = splitFilterExpansion( temp1List, columns?.column1.field, projectInstance )
 				
 				def temp2List = AssetEntity.executeQuery("""select distinct ae.${columns?.column2.field} , count(ae.id) from AssetEntity 
 																ae where  ae.moveBundle.id in ${bundles} group by ae.${columns?.column2.field} order by ae.${columns?.column2.field}""")
-				column2List = splitFilterExpansion( temp2List )
+				column2List = splitFilterExpansion( temp2List, columns?.column2.field, projectInstance  )
 				
 				def temp3List = AssetEntity.executeQuery("""select distinct ae.${columns?.column3.field} , count(ae.id) from AssetEntity 
 																ae where  ae.moveBundle.id in ${bundles} group by ae.${columns?.column3.field} order by ae.${columns?.column3.field}""")
-				column3List = splitFilterExpansion( temp3List )
+				column3List = splitFilterExpansion( temp3List, columns?.column3.field, projectInstance  )
 				
 				def temp4List = AssetEntity.executeQuery("""select distinct ae.${columns?.column4.field} , count(ae.id) from AssetEntity 
 																ae where  ae.moveBundle.id in ${bundles} group by ae.${columns?.column4.field} order by ae.${columns?.column4.field}""")
-				column4List = splitFilterExpansion( temp4List )
+				column4List = splitFilterExpansion( temp4List, columns?.column4.field, projectInstance  )
                 
 				/*-------------get asset details----------------*/
 				def returnValue = pmoAssetTrackingService.getAssetsForListView( projectId, bundles, columns, params )
@@ -218,7 +218,8 @@ class ClientConsoleController {
                     }
                     htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass tranCell\"  >&nbsp;</td>"
                 }
-                assetEntityList << [id: assetId, asset:it,transitions:htmlTd,checkVal:check]
+                assetEntityList << [id: assetId, asset:it, transitions:htmlTd, checkVal:check, 
+									currentStatus : it.currentStatus ? stateEngineService.getState(projectInstance.workflowCode,it.currentStatus) : "" ]
 			}
 
 			userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")
@@ -449,6 +450,7 @@ class ClientConsoleController {
 			def releaseId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Release"))
 			def reRackId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Reracked"))
 			def terminatedId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Terminated"))
+			def columns = userPreferenceService.setAssetTrackingPreference(null, null, null, null)
 			resultList.each{
 				def stateId = 0
 				def assetId = it.id
@@ -526,22 +528,24 @@ class ClientConsoleController {
                     }
 					tdId << [id:"${assetId+"_"+trans}", cssClass:cssClass]
 				}
-				assetEntityList << [id: assetId, application:it.application ? it.application : "&nbsp;",appOwner:it.appOwner ? it.appOwner : "&nbsp;", 
-									appSme:it.appSme ? it.appSme : "&nbsp;",assetName:it.assetName ? it.assetName :"&nbsp;",tdId:tdId,
-									check:check]
+				assetEntityList << [id: assetId, column1value:it."${columns.column1.field}" ? columns.column1.field != "currentStatus" ? it."${columns.column1.field}" : stateEngineService.getState(projectInstance.workflowCode,it."${columns.column1.field}") : "&nbsp;",
+											column2value:it."${columns.column2.field}" ? columns.column2.field != "currentStatus" ? it."${columns.column2.field}" : stateEngineService.getState(projectInstance.workflowCode,it."${columns.column2.field}") : "&nbsp;",
+											column3value:it."${columns.column3.field}" ? columns.column3.field != "currentStatus" ? it."${columns.column3.field}" : stateEngineService.getState(projectInstance.workflowCode,it."${columns.column3.field}") : "&nbsp;",
+											column4value:it."${columns.column4.field}" ? columns.column4.field != "currentStatus" ? it."${columns.column4.field}" : stateEngineService.getState(projectInstance.workflowCode,it."${columns.column4.field}") : "&nbsp;",
+											tdId:tdId,	check:check]
 			}
 			
 			def assetCommentsList = []
 			def assetsList = AssetEntity.findAll("from AssetEntity where moveBundle in ${bundles}")
 			assetsList.each {
 				def checkIssueType = AssetComment.find("from AssetComment where assetEntity=$it.id and commentType='issue' and isResolved = 0"+
-													" and date_created between SUBTIME(CURRENT_TIMESTAMP,'00:10:00') and CURRENT_TIMESTAMP ")
+													" and date_created between SUBTIME('$currentPoolTime','00:10:00') and CURRENT_TIMESTAMP ")
 				if ( checkIssueType ) {
-					assetCommentsList << ["assetEntityId":it.id, "type":"database_table_red.png"]
+					assetCommentsList << ["assetEntityId":it.id, "type":"db_table_red.png"]
 				} else {
-					checkIssueType = AssetComment.find("from AssetComment where assetEntity=$it.id and date_created between SUBTIME(CURRENT_TIMESTAMP,'00:10:00') and CURRENT_TIMESTAMP")
+					checkIssueType = AssetComment.find("from AssetComment where assetEntity=$it.id and date_created between SUBTIME('$currentPoolTime','00:10:00') and CURRENT_TIMESTAMP")
 					if ( checkIssueType ) {
-						assetCommentsList << ["assetEntityId":it.id, "type":"database_table_bold.png"]
+						assetCommentsList << ["assetEntityId":it.id, "type":"db_table_bold.png"]
 					} /*else if( role ){
 						assetCommentsList << ["assetEntityId":it.id, "type":"database_table_light.png"]
 					}*/
@@ -685,7 +689,7 @@ class ClientConsoleController {
 	 * @author : Lokanada Reddy
 	 * @return : result as list.
 	 * -------------------------------------------------------*/
-	def splitFilterExpansion(def appsList){
+	def splitFilterExpansion( def appsList, def assetAttribute, def projectInstance  ){
 		def applicationMap = new HashMap()
 		def resList = []
 		appsList.each{ apps ->
@@ -701,11 +705,17 @@ class ClientConsoleController {
 			}
 			
 		}
-		applicationMap.keySet().each{
-			resList << ["key":it, "value":applicationMap.get(it)]  
+		if(assetAttribute != "currentStatus"){
+			applicationMap.keySet().each{
+				resList << ["key":it, "value":applicationMap.get(it), 'id':it ]  
+			}
+		} else {
+			applicationMap.keySet().each{
+				resList << ["key":it ? stateEngineService.getState(projectInstance.workflowCode,Integer.parseInt(it)) : "", "value":applicationMap.get(it), 'id':it]  
+			}
 		}
 		resList.sort(){
-			it.key
+			it.id
 		}
 		return resList
 	}
@@ -867,5 +877,21 @@ class ClientConsoleController {
             }
         }
         return changedClass
+	}
+	/*
+	*  Return the list of current status Transitions 
+	*/
+	def getCurrentStatusOptions = {
+		def moveEventId = params.moveEventId
+		def columnName = "currentStatus"
+		def moveEvent = MoveEvent.get( moveEventId )
+		def moveBundlesList = MoveBundle.findAllByMoveEvent( moveEvent )
+		def bundles = moveBundlesList.id.toString().replace("[","(").replace("]",")")
+
+		def tempList = AssetEntity.executeQuery("""select distinct ae.${columnName} , count(ae.id) from AssetEntity 
+										ae where  ae.moveBundle.id in ${bundles} group by ae.${columnName} order by ae.${columnName}""")
+		def columnList = splitFilterExpansion( tempList, columnName, moveEvent.project )
+
+		render columnList as JSON
 	}
 }

@@ -685,13 +685,13 @@ function commentChangeShow() {
 function updateAssetCommentIcon( assetComments ){
 var link = document.createElement('a');
 link.href = '#'
-link.onclick = function(){setAssetId(assetComments.assetComment.assetEntity);new Ajax.Request('../assetEntity/listComments?id='+assetComments.assetComment.assetEntity,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never');}})} //;return false
+link.onclick = function(){setAssetId(assetComments.assetComment.assetEntity);new Ajax.Request('../assetEntity/listComments?id='+assetComments.assetComment.assetEntity.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never');}})} //;return false
 if( assetComments.status ){
-	link.innerHTML = "<img src=\"../images/skin/database_table_red.png\" border=\"0px\">"
+	link.innerHTML = "<img src=\"../i/db_table_red.png\" border=\"0px\">"
 }else{
-	link.innerHTML = "<img src=\"../images/skin/database_table_bold.png\" border=\"0px\">"
+	link.innerHTML = "<img src=\"../i/db_table_bold.png\" border=\"0px\">"
 }
-var iconObj = $('#icon_'+assetComments.assetComment.assetEntity);
+var iconObj = $('#icon_'+assetComments.assetComment.assetEntity.id);
 iconObj.html(link)
 }
 

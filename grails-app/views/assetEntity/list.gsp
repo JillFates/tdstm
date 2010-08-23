@@ -151,17 +151,17 @@
 				<span id="icon_${assetEntityInstance.id}">
 				<g:if test="${AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetEntityInstance,'issue',0])}">
 					<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
-						<img src="${createLinkTo(dir:'images/skin',file:'database_table_red.png')}" border="0px"/>
+						<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="0px"/>
 					</g:remoteLink>
 				</g:if>
 				<g:elseif test="${AssetComment.findByAssetEntity(assetEntityInstance)}">
 				<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
-					<img src="${createLinkTo(dir:'images/skin',file:'database_table_bold.png')}" border="0px"/>
+					<img src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px"/>
 				</g:remoteLink>
 				</g:elseif>
 				<g:else>
 				<a href="#" onclick="$('#createAssetCommentId').val(${assetEntityInstance.id});$('#statusId').val('new');$('#createCommentDialog').dialog('option', 'width', 'auto');$('#createCommentDialog').dialog('open');$('#commentsListDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">
-					<img src="${createLinkTo(dir:'images/skin',file:'database_table_light.png')}" border="0px"/>
+					<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px"/>
 				</a>
 				</g:else></span>
 				</td>

@@ -81,7 +81,11 @@ class WorkflowService {
 		    					projectAssetMap.currentStateId = Integer.parseInt(stateEngineService.getStateId( process, toState ))
 		    				}
 		    				projectAssetMap.save(flush:true)
-	
+							// store the current status into asset 
+							if(stateType != "boolean" || toState == "Hold"){
+								assetEntity.currentStatus = Integer.parseInt(stateEngineService.getStateId( process, toState ))
+								assetEntity.save(flush:true)
+		    				}
 							success = true
 						}
 						if(!success){
@@ -111,6 +115,11 @@ class WorkflowService {
 			    		projectAssetMapInstance.currentStateId = Integer.parseInt(stateEngineService.getStateId( process, toState ))
 			    		projectAssetMapInstance.save()
 		    		}
+		    		// store the current status into asset 
+					if(stateType != "boolean" || toState == "Hold"){
+						assetEntity.currentStatus = Integer.parseInt(stateEngineService.getStateId( process, toState ))
+						assetEntity.save(flush:true)
+    				}
 		    		message = "Transaction created successfully"
 					success = true
 				}
