@@ -598,21 +598,22 @@
 		var newsLength = news.length;
 		var live = "";
 		var archived = "";
-		//var scrollText = " ";
+		var scrollText = " ";
 		var myDate = new Date();
 		for( i = 0; i< newsLength; i++){
 			var state = news[i].state;
 			var liId = news[i].type+"_"+news[i].id
+			var createdTime = convertTime(offset,news[i].created)
 			if(state == "A"){
-				archived +=	"<li id="+liId+" onclick='openEditNewsDialog(this.id)'><span class='newstime'>"+convertTime(offset,news[i].created)+" :</span> <span class='normaltext'>"+news[i].text+"</span></li>";
+				archived +=	"<li id="+liId+" onclick='openEditNewsDialog(this.id)'><span class='newstime'>"+createdTime+" :</span> <span class='normaltext'>"+news[i].text+"</span></li>";
 			} else {
-				live +=	"<li id="+liId+" onclick='openEditNewsDialog(this.id)'><span class='newstime'>"+convertTime(offset,news[i].created) +" :</span> <span class='normaltext'>"+news[i].text+"</span></li>";
-				//scrollText +=" "+news[i].text +"..."
+				live +=	"<li id="+liId+" onclick='openEditNewsDialog(this.id)'><span class='newstime'>"+createdTime +" :</span> <span class='normaltext'>"+news[i].text+"</span></li>";
+				scrollText += createdTime+" : "+news[i].text +". "
 			}
 		}
 		$("#news_live").html(live);
 		$("#news_archived").html(archived);
-		//$("#mycrawlerId").html(scrollText)
+		$("#head_mycrawlerId").html(scrollText)
 		
 	}
 	function setUserPrefTimeZone(){
