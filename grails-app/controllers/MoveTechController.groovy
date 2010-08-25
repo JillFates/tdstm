@@ -792,20 +792,20 @@ class MoveTechController {
 					"left join asset_transition t on(a.asset_entity_id = t.asset_entity_id and t.voided = 0) "+
 					"left join project_asset_map p on (a.asset_entity_id = p.asset_id) where a.move_bundle_id = $bundleId ")
             
-            stateVal = stateEngineService.getStateId ( moveBundleInstance.project.workflowCode, "Cleaned" )
+            stateVal = stateEngineService.getStateId ( moveBundleInstance?.project.workflowCode, "Cleaned" )
             allSize = jdbcTemplate.queryForList( query.toString() +" group by a.asset_entity_id" ).size()
-            holdState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Hold" )
+            holdState = stateEngineService.getStateIdAsInt( moveBundleInstance?.project.workflowCode, "Hold" )
             if ( tab == "Todo" ) {
                 query.append ( " and ( p.current_state_id < $stateVal or t.state_to = $holdState )" )
             }
             proAssetMap = jdbcTemplate.queryForList ( query.toString() +" group by a.asset_entity_id" )
             todoSize = proAssetMap.size()
             if ( params.location == "s" ) {
-                rdyState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Cleaned" )
-                ipState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Unracked" )
+                rdyState = stateEngineService.getStateIdAsInt( moveBundleInstance?.project.workflowCode, "Cleaned" )
+                ipState = stateEngineService.getStateIdAsInt( moveBundleInstance?.project.workflowCode, "Unracked" )
             } else {
-                rdyState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Cleaned" )
-                ipState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Staged" )
+                rdyState = stateEngineService.getStateIdAsInt( moveBundleInstance?.project.workflowCode, "Cleaned" )
+                ipState = stateEngineService.getStateIdAsInt( moveBundleInstance?.project.workflowCode, "Staged" )
             }
             proAssetMap.each {
                 if ( it.currentStateId ) {
@@ -886,7 +886,7 @@ class MoveTechController {
             def commentsList = getCommentsFromRemainderList( session )
             if ( params.menu == "true" ) {
             	render(view:'cleaningAssetSearch', 
-                    model:[ projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundle:params.bundle,
+                    model:[ projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundle:moveBundleId,
                             team:params.team, project:params.project, location:params.location, search:search,
                             label:label, actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList
                             ])
@@ -898,14 +898,14 @@ class MoveTechController {
                     flash.message = message ( code : "Asset Tag number '${search}' was not located" )
                     if ( textSearch ) {
                         render ( view:'cleaningAssetSearch',
-                            model:[ projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundle:params.bundle,
+                            model:[ projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundle:moveBundleId,
                                     team:params.team, project:params.project, location:params.location,
                                     search:search, label:label, actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList
                                     ])
                         return;
                     } else {
                         redirect( action:'cleaningAssetTask',
-                            params:[ "bundle":params.bundle, "team":params.team, "project":params.project,
+                            params:[ "bundle":moveBundleId, "team":params.team, "project":params.project,
                                      "location":params.location, "tab":params.tab
                                      ])
                         return;
@@ -924,31 +924,31 @@ class MoveTechController {
                         flash.message = message ( code : "The asset [${assetItem.assetName}] is not assigned to team [${loginTeam}]" )
                         if ( textSearch ) {
                             render ( view : 'cleaningAssetSearch',
-                                model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundle:params.bundle,
+                                model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundle:moveBundleId,
                                         team:params.team, project:params.project, location:params.location, search:search, label:label,
                                         actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList
                                         ])
                             return;
                         } else {
                             redirect ( action: 'cleaningAssetTask', 
-                                params:[ "bundle":params.bundle, "team":params.team, "project":params.project,
+                                params:[ "bundle":moveBundleId, "team":params.team, "project":params.project,
                                          "location":params.location, "tab":params.tab
                                          ])
                             return;
                         }
                     }
-                    /*if ( bundleId != Integer.parseInt ( params.bundle ) ) {
-                        flash.message = message ( code : "The asset [${assetItem.assetName}] is not part of move bundle [${params.bundle}]" )
+                    /*if ( bundleId != Integer.parseInt ( moveBundleId ) ) {
+                        flash.message = message ( code : "The asset [${assetItem.assetName}] is not part of move bundle [${moveBundleId}]" )
                         if ( textSearch ) {
                             render ( view:'cleaningAssetSearch',
                                 model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment, stateVal:stateVal,
-                                        bundle:params.bundle, team:params.team, project:params.project, location:params.location,
+                                        bundle:moveBundleId, team:params.team, project:params.project, location:params.location,
                                         search:search, label:label, actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList
                                         ])
                             return;
                         } else {
                             redirect ( action: 'cleaningAssetTask', 
-                                params:[ "bundle":params.bundle, "team":params.team, "project":params.project,
+                                params:[ "bundle":moveBundleId, "team":params.team, "project":params.project,
                                          "location":params.location, "tab":params.tab
                                          ])
                             return;
@@ -964,13 +964,13 @@ class MoveTechController {
                             if ( textSearch ) {
                                 render(view:'cleaningAssetSearch',
                                     model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment, stateVal:stateVal,
-                                            bundle:params.bundle, team:params.team, project:params.project, location:params.location,
+                                            bundle:moveBundleId, team:params.team, project:params.project, location:params.location,
                                             search:search, label:label, actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList
                                             ])
                                 return;
                             } else {
                                 redirect ( action: 'cleaningAssetTask',
-                                    params:[ "bundle":params.bundle, "team":params.team, "project":params.project, 
+                                    params:[ "bundle":moveBundleId, "team":params.team, "project":params.project, 
                                              "location":params.location,"tab":params.tab
                                              ])
                                 return;
@@ -984,7 +984,7 @@ class MoveTechController {
                                 if ( textSearch ) {
                                     render ( view:'cleaningAssetSearch',
                                         model:[	teamMembers:teamMembers, projMap:projMap,assetComment:assetComment, stateVal:stateVal,
-                                               	bundle:params.bundle, team:params.team, project:params.project, location:params.location,
+                                               	bundle:moveBundleId, team:params.team, project:params.project, location:params.location,
                                                	search:search, label:label, actionLabel:actionLabel, browserTest:browserTest, 
                                                	issuecomments: assetIssueCommentList, assetIssueCommentListSize: assetIssueCommentListSize,
                                                	commentsList: commentsList
@@ -992,7 +992,7 @@ class MoveTechController {
                                     return;
                                 } else {
                                     redirect ( action: 'cleaningAssetTask',
-                                        params:[ "bundle":params.bundle, "team":params.team, "project":params.project, 
+                                        params:[ "bundle":moveBundleId, "team":params.team, "project":params.project, 
                                                  "location":params.location,"tab":params.tab, "issueAssetId" : String.valueOf( assetItem.id )
                                                  ])
                                     return;
@@ -1029,7 +1029,7 @@ class MoveTechController {
                 				flash.message = "This is the last asset for cart "+assetItem.cart+" which should contain "+cartQty+" assest(s)"
                 			}
                             render ( view:'cleaningAssetSearch',
-                                model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment ? assetComment :"", stateVal:stateVal, bundle:params.bundle,
+                                model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment ? assetComment :"", stateVal:stateVal, bundle:moveBundleId,
                                 		team:params.team, project:params.project, location:params.location, search:search, label:label,
                                 		actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList, cartQty: cartQty
                                 		])
@@ -1056,11 +1056,11 @@ class MoveTechController {
         	def asset = getAssetEntity ( params.search, params.user )//AssetEntity.findByAssetTag(params.search)
         	if(asset){
 	            def bundle = asset.moveBundle
-	            def moveBundleInstance = MoveBundle.findById( params.bundle )
+	            //def moveBundleInstance = MoveBundle.findById( params.bundle )
 	            def actionLabel = params.actionLabel
 	            def loginUser = UserLogin.findByUsername ( principal )
 	            def loginTeam = ProjectTeam.findById(params.team)
-	            def workflow = workflowService.createTransition ( moveBundleInstance.project.workflowCode, "CLEANER", actionLabel, asset, bundle, loginUser, loginTeam, params.enterNote )
+	            def workflow = workflowService.createTransition ( asset.project.workflowCode, "CLEANER", actionLabel, asset, bundle, loginUser, loginTeam, params.enterNote )
 	            if ( workflow.success ) {
 	                def projMap = []
 	                def stateVal = null
