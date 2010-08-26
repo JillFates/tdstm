@@ -5,6 +5,7 @@ import org.jsecurity.SecurityUtils
 class DashboardProcessJob {
 	
 	def stepSnapshotService
+	def concurrent = false
 	/*
 	 * Will schedule to wait for 'startDelay' time and after that will call the 'execute' method every 'repeatInterval' time. 
 	 * The 'repeatInterval' and 'startDelay' properties are specified in milliseconds and must have Integer or Long type. 
