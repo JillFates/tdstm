@@ -593,7 +593,7 @@ class StepSnapshotService {
 	 *------------------------------------------------------------------------*/
 	def backgroundSnapshotProcess(){
 		
-		def moveEventsList = MoveEvent.findAll()
+		def moveEventsList = MoveEvent.findAll("FROM MoveEvent WHERE calcMethod = '${MoveEvent.METHOD_LINEAR}' AND inProgress ='true'")
 		def now = GormUtil.convertInToGMT( "now", "EDT" );
 		
 		moveEventsList.each{ event ->
