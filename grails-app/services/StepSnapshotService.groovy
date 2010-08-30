@@ -132,10 +132,11 @@ class StepSnapshotService {
 
 		if (tasksCompleted == tasksCount) {
 			
-			// Completing Manual Process
-			
+			// stop and return process if step already completed
+			if(moveBundleStep.actualCompletionTime)
+				return 200
+			//	 Completing Manual Process
 			moveBundleStep.actualCompletionTime = now
-			
 			// Update actual start time if by chance it was never set
 			if ( ! moveBundleStep.actualStartTime )
 				moveBundleStep.actualStartTime = now
@@ -155,8 +156,8 @@ class StepSnapshotService {
 			// If user resets tasks to zero then clear out the start
 			if ( tasksCompleted == 0 ){ 
 				moveBundleStep.actualStartTime = null
-				moveBundleStep.actualCompletionTime = null	// Clear out since it is not completed
 			}
+			moveBundleStep.actualCompletionTime = null	// Clear out since it is not completed
 			moveBundleStep.save(force:true)
 
 		}
