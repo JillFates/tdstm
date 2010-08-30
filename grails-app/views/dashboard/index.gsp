@@ -789,8 +789,10 @@
 			var revSum = snapshot.revSum;
 			var planSum = snapshot.planSum
 			var sumDialInd = planSum.dialInd != null ? planSum.dialInd : 50
-			AditionalFrames = ( steps.length > modWidth ? steps.length - (modWidth-1) : 1 );
-			$("#themes").css("left","0px");
+			if(AditionalFrames == 1 || defaultBundle != moveBundleId){
+				AditionalFrames = ( steps.length > modWidth ? steps.length - (modWidth-1) : 1 );
+				$("#themes").css("left","0px");
+			}
 			defaultBundle = moveBundleId;
 			if( sumDialInd < 25){
 				$(".statusbar_good").attr("class","statusbar_bad")
