@@ -57,6 +57,7 @@ td .odd {
 				}
 			}
 			$("#editDialog").dialog("close")
+			timedUpdate($("#selectTimedId").val())
 		} else {
 			alert("Asset Entity is not updated")
 		}
@@ -386,6 +387,7 @@ td .odd {
 	}
 	function createNewAssetComment( asset ){
 		setAssetId( asset );
+		timedUpdate('never');
 		$('#statusId').val('new');
 		$('#createCommentDialog').dialog('option', 'width', 'auto');
 		$('#createCommentDialog').dialog('open');

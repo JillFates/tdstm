@@ -101,7 +101,7 @@
 			<div style="float: right;width: 150px;padding-top: 2px;">
 					<div style="float: right;">
 						<input type="button" value="Update:" id="update" onclick="pageReload();"/> 
-						<select name="updateTime" id="updateTimeId" class="selecttext" onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'timedUpdate()') }">
+						<select name="updateTime" id="updateTimeId" class="selecttext" onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'timedUpdate(e.responseText)') }">
 							<option value="30000">30s</option>
 							<option value="60000">1m</option>
 							<option value="120000">2m</option>
@@ -415,7 +415,7 @@
 	<div class="buttons"><span class="button"> 
 	<input class="save" type="button" value="Update" onclick="return submitUpdateNewsForm()"/>
 	</span> <span class="button"> 
-	<input class="delete" type="button" value="Cancel" onclick="$('#showEditCommentDialog').dialog('close');"/>
+	<input class="delete" type="button" value="Cancel" onclick="timedUpdate( $('#updateTimeId').val() );$('#showEditCommentDialog').dialog('close');"/>
 	</span></div>
 	</div>
 </div>
@@ -544,10 +544,10 @@
 	moveDataSteps()
 	/* set time to load the move news and move bundle data*/
 	var handler = 0
-	function timedUpdate() {
-		var updateTime = $("#updateTimeId").val();
+	function timedUpdate( updateTime ) {
 		if(updateTime != 'never'){
 			handler = setInterval("getMoveEventNewsDetails($('#moveEvent').val())",updateTime);
+			$("#updateTimeId").val(updateTime)
 		} else {
 			clearInterval(handler)
 		}
@@ -557,7 +557,7 @@
 	if(moveEvent){
 		$("#moveEvent").val(moveEvent)
 	}
-	timedUpdate();
+	timedUpdate( $("#updateTimeId").val() );
 	/* Function to load the data for a particular MoveEvent */
 	var doUpdate = true
 	function getMoveEventNewsDetails( moveEvent ){
@@ -978,6 +978,7 @@
 	will popup the dialog to create news
 	*/
 	function openCreateNewsDialog(){
+		timedUpdate('never');
 		$("#createNewsDialog").dialog('option', 'width', 'auto');
 		$("#createNewsDialog").dialog('option', 'position', ['center','top']);
 		$("#showEditCommentDialog").dialog("close");
@@ -1012,6 +1013,7 @@
 			alert("Please Assign MoveEvent to Current Bundle")
 		}
 		if(validate){
+			timedUpdate( $("#updateTimeId").val() );
 			${remoteFunction(action:'saveNews', 
 					params:'\'moveEvent.id=\' + moveEvent +\'&message=\'+ news +\'&isArchived=\'+$(\'#isArchivedHiddenId\').val()+\'&resolution=\'+$(\'#resolutionNewsId\').val()', 
 					onComplete:'getMoveEventNewsDetails(moveEvent)')}
@@ -1023,6 +1025,7 @@
 		$('#resolutionNewsId').val("")
 		$('#isArchivedId').attr("checked",false)
 		$('#createNewsDialog').dialog('close');
+		timedUpdate( $("#updateTimeId").val() );
 	}
 	/* will popup the dialog to edit news */
 	function openEditNewsDialog( newsId ){
@@ -1032,7 +1035,7 @@
 		${remoteFunction(controller:'newsEditor', action:'getCommetOrNewsData',params:'\'id=\' + id +\'&commentType=\'+type', onComplete:'showEditNewsForm( e )')}
 	}
 	function showEditNewsForm(){
-		
+
 	}
 	/*-------------------------------------------
 	 * @author : Lokanada Reddy
@@ -1040,6 +1043,7 @@
 	 * @return : Edit form
 	 *-------------------------------------------*/
 	function showEditNewsForm( e ){
+		timedUpdate('never');
 		var assetComments = eval('(' + e.responseText + ')');
 		if (assetComments) {
 			
@@ -1117,6 +1121,7 @@
 			validate = true;
 		}
 		if(validate){
+			timedUpdate( $("#updateTimeId").val() );
 			${remoteFunction(action:'updateNewsOrComment', 
 					params:'\'moveEvent.id=\' + moveEvent +\'&id=\'+ id +\'&isResolved=\'+$(\'#isResolvedHiddenId\').val()+\'&comment=\'+$(\'#commentTdId\').val()+\'&resolution=\'+resolveVal+\'&commentType=\'+$(\'#commentTypeId\').val()+\'&displayOption=\'+$(\'input[name=displayOption]:checked\').val()', 
 					onComplete:'getMoveEventNewsDetails(moveEvent)')}

@@ -172,7 +172,7 @@ function showAssetDialog( e , action ) {
 	      $("#showDialog").dialog("open");
 	      $("#editDialog").dialog("close");
       }
-
+	  timedUpdate('never')
     }
     
   function updateAutoComplete(e){
@@ -427,7 +427,7 @@ function showAssetDialog( e , action ) {
 		$("#commentsListDialog").dialog('option', 'position', ['center','top']);
    	$("#commentsListDialog").dialog("open")
    	if(action == 'never'){
-   		timedRefresh('never')
+   		timedUpdate('never')
    	}
 	}
 	function showAssetCommentDialog( e , action){
@@ -495,7 +495,7 @@ function showAssetDialog( e , action ) {
 	      	 	$("#showCommentDialog").dialog("open")
 	      	 	$("#editCommentDialog").dialog("close")
 	      	 }
-	      	 
+	      	timedUpdate('never')
 		}
 	}
 	function addCommentsToList( e ){
@@ -708,17 +708,23 @@ function resolveValidate(formName,idVal){
 		return false;
 	}else if(resolveBoo){
 		if(resolveVal != ""){
-		if(formName == "createCommentForm"){
-			new Ajax.Request('../assetEntity/saveComment?assetEntity.id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value+'&category='+document.forms[formName].category.value,{asynchronous:true,evalScripts:true,onComplete:function(e){addCommentsToList(e);}})
-		}else{
-			new Ajax.Request('../assetEntity/updateComment?id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value,{asynchronous:true,evalScripts:true,onComplete:function(e){updateCommentsOnList(e);}})
-		}
+			if(formName == "createCommentForm"){
+				if($("#selectTimedId").length > 0){
+					timedUpdate($("#selectTimedId").val())
+				}
+				new Ajax.Request('../assetEntity/saveComment?assetEntity.id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value+'&category='+document.forms[formName].category.value,{asynchronous:true,evalScripts:true,onComplete:function(e){addCommentsToList(e);}})
+			}else{
+				new Ajax.Request('../assetEntity/updateComment?id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value,{asynchronous:true,evalScripts:true,onComplete:function(e){updateCommentsOnList(e);}})
+			}
 		}else{
 			alert('Please enter resolution');
 			return false;
 		}
 	}else{
 		if(formName == "createCommentForm"){
+			if($("#selectTimedId").length > 0){
+				timedUpdate($("#selectTimedId").val())
+			}
 			new Ajax.Request('../assetEntity/saveComment?assetEntity.id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value+'&category='+document.forms[formName].category.value,{asynchronous:true,evalScripts:true,onComplete:function(e){addCommentsToList(e);}})
 		}else{
 			new Ajax.Request('../assetEntity/updateComment?id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value,{asynchronous:true,evalScripts:true,onComplete:function(e){updateCommentsOnList(e);}})

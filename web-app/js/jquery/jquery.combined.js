@@ -7638,10 +7638,10 @@ $.widget("ui.dialog", {
 				})
 				.click(function(event) {
 					self.close(event);
-					if(title == "Show Asset Comments"){
-						if($("#selectTimedId").length > 0){
-							timedRefresh($("#selectTimedId").val())
-						}
+					if($("#selectTimedId").length > 0){
+						timedUpdate($("#selectTimedId").val())
+					} else if($("#updateTimeId").length > 0){
+						timedUpdate($("#updateTimeId").val())
 					}
 					return false;
 				})

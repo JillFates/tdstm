@@ -117,7 +117,7 @@
       			$("#commentsListDialog").dialog('option', 'position', ['center','top']);
 		      	$("#commentsListDialog").dialog("open")
 		      	if(action == 'never'){
-		      		timedRefresh('never')
+		      		timedUpdate('never')
 		      	}
       		}
       		function showAssetCommentDialog( e , action){

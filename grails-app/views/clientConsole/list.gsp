@@ -324,7 +324,7 @@
 <g:if test="${isAdmin || isManager || isProjManager}">
 <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 <span class="menuButton"><a class="create" href="#"
-	onclick="$('#statusId').val('');$('#createResolveDiv').css('display', 'none') ;$('#createCommentDialog').dialog('option', 'width', 'auto');$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">New
+	onclick="timedUpdate('never');$('#statusId').val('');$('#createResolveDiv').css('display', 'none') ;$('#createCommentDialog').dialog('option', 'width', 'auto');$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">New
 Comment</a></span></div>
 </g:if>
 </div>
@@ -818,7 +818,8 @@ Comment</a></span></div>
 				    	tdId.html( attribute.value )
 				    }
 				}
-				  $("#editDialog").dialog("close")
+				$("#editDialog").dialog("close")
+				timedUpdate($("#selectTimedId").val())
 			} else {
 		   		alert("Asset Entity is not updated")
 			}
@@ -1046,6 +1047,7 @@ Comment</a></span></div>
 	}
 
 	function createNewAssetComment(asset){
+		timedUpdate('never')
 		if(asset) {
 			setAssetId( asset );
 		} else {

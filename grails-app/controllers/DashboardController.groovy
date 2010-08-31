@@ -59,13 +59,11 @@ class DashboardController {
 	 *---------------------------------------------------------*/
 	def setTimePreference = {
         def timer = params.timer
-        def refreshTime =[]
         if(timer){
             userPreferenceService.setPreference( "DASHBOARD_REFRESH", "${timer}" )
         }
         def timeToRefresh = getSession().getAttribute("DASHBOARD_REFRESH")
-        refreshTime <<[refreshTime:timeToRefresh]
-        render refreshTime as JSON
+        render timeToRefresh ? timeToRefresh.DASHBOARD_REFRESH : 'never'
 	}
 	/*---------------------------------------------------------
      * @author : Lokanada Reddy

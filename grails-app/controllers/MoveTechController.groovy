@@ -1075,7 +1075,7 @@ class MoveTechController {
 	                flash.message = message ( code : workflow.message )
 	                redirect ( action:'cleaningAssetSearch', 
 	                    params:[ "bundle":params.bundle, "team":params.team, "project":params.project, "location":params.location,
-	                             "search":params.search, "assetComment":assetComment, "label":params.label, "actionLabel":actionLabel
+	                             "search":params.search, "label":params.label, "actionLabel":actionLabel
 	                             ])
 	            }
         	} else {
