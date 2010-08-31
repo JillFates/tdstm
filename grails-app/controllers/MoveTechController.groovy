@@ -352,6 +352,7 @@ class MoveTechController {
             def rdyState
             def ipState = new ArrayList()
             def moveBundleInstance = MoveBundle.findById( bundleId )
+			flash.message = ""
             def holdState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Hold" ) 
             if ( params.location == "s" ) {
                 rdyState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Release" )
@@ -884,6 +885,7 @@ class MoveTechController {
             	loginTeam = ProjectTeam.findById ( params.team )
             }
             def commentsList = getCommentsFromRemainderList( session )
+			flash.message = ""
             if ( params.menu == "true" ) {
             	render(view:'cleaningAssetSearch', 
                     model:[ projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundle:moveBundleId,

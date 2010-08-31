@@ -18,15 +18,23 @@
 	* function to call printjob when user press on 1,2,3 or 4
 	*--------------------------------------------------------*/
 	if(${ projMap ? true : false}){
-		document.onkeyup = keyCheck;   
-		function keyCheck(){
-		  var keyID = event.keyCode;
+		   
+		function keyCheck( e ){
+		  if(!e && window.event) e=window.event;
+		  var keyID = e.keyCode;
+		  if(keyID == 9 ){
+			  $('#textSearchId').focus();
+			  return;
+		  }
 		  var labelQty = keyID - 48 
 		  if(labelQty < 5 && labelQty > 0){
-		  	$('#labelQuantity').val(labelQty);
-		  	startprintjob();
+			  if($("input:focus").length < 1){
+			  	$('#labelQuantity').val(labelQty);
+			  	startprintjob();
+			  }
 		  }
 		}
+		document.onkeyup = keyCheck;
 	}
 	// Function to save a field.
 	var domain		= '';

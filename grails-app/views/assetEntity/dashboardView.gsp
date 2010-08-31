@@ -643,7 +643,7 @@ td .odd {
 								<a href="#" onclick="filterByDataPoints('source','','source_done_clean')"><u> ${supportTeam.sourceCleaned}</u> </a>/
 								<a href="#" onclick="filterByDataPoints('source','','')"><u> ${supportTeam.totalAssets}</u> </a> 
 								<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
-									<a title="Relogin as.." href="../moveTech/login?username=ct-${moveBundleInstance.id}-${supportTeam.cleaning?.id}-t">@</a>
+									<a title="Relogin as.." href="../moveTech/login?username=ct-${moveBundleInstance.id}-${supportTeam.cleaning?.id}-s">@</a>
 								</jsec:lacksAllRoles> 
 								</td>
 							</tr>
