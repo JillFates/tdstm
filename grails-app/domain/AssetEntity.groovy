@@ -8,10 +8,12 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String model
 	String application = ""
 	PartyGroup owner
+	Rack rackSource
 	String sourceLocation
 	String sourceRoom
 	String sourceRack
 	Integer sourceRackPosition
+	Rack rackTarget
 	String targetLocation
 	String targetRoom
 	String targetRack
@@ -41,6 +43,11 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	Integer priority 
 	Project project
 	String shortName
+	String bladeSize
+	String sourceBladeChassis
+	Integer sourceBladePosition
+	String targetBladeChassis
+	Integer targetBladePosition	
 
 	// MoveBundleAsset fields
 	MoveBundle moveBundle
@@ -106,6 +113,13 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		appSme( blank:true, nullable:false )
 		priority( nullable:true, inList:[1,2,3] )
 		shortName( blank:true, nullable:true )
+		rackSource( nullable:true )
+		rackTarget( nullable:true )
+		bladeSize( blank:true, nullable:true )
+		sourceBladeChassis( blank:true, nullable:true )
+		sourceBladePosition( nullable:true )
+		targetBladeChassis( blank:true, nullable:true )
+		targetBladePosition( nullable:true )
 
 		// The following were the MoveBundleAsset fields
 		moveBundle( nullable:true )
@@ -130,6 +144,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		version true
 		autoTimestamp false
 		id column:'asset_entity_id'
+		moveBundle ignoreNotFound:true
 		columns {
 			hasKvm sqltype: 'tinyint(1)'
 			hasRemoteMgmt sqltype: 'tinyint(1)'
@@ -145,7 +160,29 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	def beforeUpdate = {
 		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
 	}
+	def afterInsert = {
+		updateRacks()
+	}
+	def afterUpdate = {
+		updateRacks()
+	}
 	String toString(){
 		"id:$id name:$assetName tag:$assetTag serial#:$serialNumber"
 	}
+	
+	def updateRacks() {
+		// Make sure the asset points to source/target racks if there is enough information for it
+		if(assetType != 'Blade' && project != null) {
+			if(sourceRack != null && sourceRack != '' && (rackSource == null || !rackSource.sourceAssets?.contains(this))) {
+				rackSource = Rack.findOrCreateWhere(source:1, 'project.id':project.id, location:sourceLocation, room:sourceRoom, tag:sourceRack)
+				save()
+			}
+			
+			if(targetRack != null && targetRack != '' && (rackTarget == null || !rackTarget.targetAssets?.contains(this))) {
+				rackTarget = Rack.findOrCreateWhere(source:0, 'project.id':project.id, location:targetLocation, room:targetRoom, tag:targetRack)
+				save()
+			}
+		}
+	}
+	
 }

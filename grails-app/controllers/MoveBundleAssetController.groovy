@@ -287,6 +287,7 @@ class MoveBundleAssetController {
     	def moveBundleAssets = assetEntityAttributeLoaderService.saveAssetsToBundle( bundleTo, bundleFrom, assets )
     	if( moveBundleAssets != null ){
 	    	moveBundleAssets.each{bundleAsset ->
+		    	bundleAsset.updateRacks()
 				items <<[id:bundleAsset.id, assetName:bundleAsset.assetName, assetTag:bundleAsset.assetTag, 
 				         application:bundleAsset.application, srcLocation:bundleAsset.sourceLocation  +"/"+bundleAsset.sourceRack  ]
 	    	}

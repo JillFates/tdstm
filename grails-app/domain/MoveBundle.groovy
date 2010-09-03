@@ -19,7 +19,9 @@ class MoveBundle extends Party {
 
 	static hasMany = [
 		assetTransitions : AssetTransition,
-		moveBundleSteps  : MoveBundleStep
+		moveBundleSteps  : MoveBundleStep,
+		sourceRacks : Rack,
+		targetRacks : Rack
 	]
 	static mapping  = {
 		version true
@@ -30,6 +32,8 @@ class MoveBundle extends Party {
 		 	startTime sqlType: 'DateTime'
 		 	completionTime sqlType: 'DateTime'
 		}        
+		sourceRacks joinTable:[name: 'asset_entity', key:'move_bundle_id', column:'rack_source_id']
+		targetRacks joinTable:[name: 'asset_entity', key:'move_bundle_id', column:'rack_target_id']
 	}
 
     String toString(){

@@ -267,9 +267,9 @@ function showAssetDialog( e , action ) {
 		inputField += inputOption+'</select>'
 	 } else {
 		 	if(attribute.value){
-		 		inputField = '<input type="text" name=\''+name +'\' id=\''+ id + name + 'Id'+'\' value=\''+attribute.value +'\'></input>'
+		 		inputField = '<input type="text" name="'+name +'" id="'+ id + name + 'Id"'+' value="'+attribute.value +'"></input>'
 		 	} else {
-		 		inputField = '<input type="text" name=\''+name +'\' id=\''+ id + name + 'Id'+'\' ></input>'
+		 		inputField = '<input type="text" name="'+name +'" id="'+ id + name + 'Id"'+' ></input>'
 		 	}
 	 }
 	return inputField; 

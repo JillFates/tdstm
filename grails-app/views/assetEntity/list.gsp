@@ -31,7 +31,7 @@
 <script type="text/javascript">	
 	   		
 	    	function createDialog(){
-		      $("#createDialog").dialog('option', 'width', 900)
+		      $("#createDialog").dialog('option', 'width', 950)
 		      $("#createDialog").dialog('option', 'position', ['center','top']);
 		      if($('#createFormTbodyId')){
 			      $('#createFormTbodyId').css('display','none');
