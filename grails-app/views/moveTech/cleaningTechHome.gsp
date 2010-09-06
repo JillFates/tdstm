@@ -3,7 +3,7 @@
 <head>
 <title>Home</title>
 <g:javascript library="prototype" />
-<jq:plugin name="jquery.combined" />
+<jq:plugin name="jquery"/>
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}" />
 	<script type="text/javascript">
