@@ -63,7 +63,7 @@ class WorkflowService {
 								
 		        		def assetTransition = new AssetTransition( stateFrom:lastState, stateTo:state, comment:comment, assetEntity:assetEntity, moveBundle:moveBundle, projectTeam:projectTeam, userLogin:userLogin, type:stateType )
 						
-		        		if ( !assetTransition.validate() || !assetTransition.save() ) {
+		        		if ( !assetTransition.validate() || !assetTransition.save(flush:true) ) {
 		    				message = "Unable to create AssetTransition: " + GormUtil.allErrorsString( assetTransition )
 		    			} else {
 		    				def holdState = stateEngineService.getStateId( process, 'Hold' )
@@ -75,7 +75,7 @@ class WorkflowService {
 		    				if(projectTeam){
 								projectTeam.isIdle = flag.contains('busy') ? 1 : 0
 								projectTeam.latestAsset = assetEntity
-								projectTeam.save()
+								projectTeam.save(flush:true)
 		    				}
 		    				if(stateType != "boolean"){
 		    					projectAssetMap.currentStateId = Integer.parseInt(stateEngineService.getStateId( process, toState ))
@@ -106,14 +106,14 @@ class WorkflowService {
 	        }
     		if ( verifyFlag ) {
 		        def assetTransition = new AssetTransition( stateFrom:state, stateTo:state, comment:comment, assetEntity:assetEntity, moveBundle:moveBundle, projectTeam:projectTeam, userLogin:userLogin, type:stateType )
-		        if ( !assetTransition.validate() || !assetTransition.save() ) {
+		        if ( !assetTransition.validate() || !assetTransition.save(flush:true) ) {
 		    		message = "Unable to create AssetTransition: " + GormUtil.allErrorsString( assetTransition )
 		    	} else {
 		    		message = setTransitionTimeElapsed(assetTransition)
 		    		if(stateType != "boolean"){
 			    		def projectAssetMapInstance = new ProjectAssetMap(project:moveBundle.project, asset:assetEntity)
 			    		projectAssetMapInstance.currentStateId = Integer.parseInt(stateEngineService.getStateId( process, toState ))
-			    		projectAssetMapInstance.save()
+			    		projectAssetMapInstance.save(flush:true)
 		    		}
 		    		// store the current status into asset 
 					if(stateType != "boolean" || toState == "Hold"){
@@ -141,7 +141,7 @@ class WorkflowService {
     		def timeDiff = assetTransition.dateCreated.getTime() - previousTransition.dateCreated.getTime()
     		if(timeDiff != 0){
     			assetTransition.timeElapsed = timeDiff
-        		if ( !assetTransition.validate() || !assetTransition.save() ) {
+        		if ( !assetTransition.validate() || !assetTransition.save(flush:true) ) {
 					message = "Unable to create AssetTransition: " + GormUtil.allErrorsString( assetTransition )
     		    } 
     		}
@@ -160,7 +160,7 @@ class WorkflowService {
 	    														"where w.process = '$process' and w.transId != $holdState and w.type != 'process' ) ")
 	    	preExistTransitions.each{
 	    		it.voided = 1
-	    		it.save()
+	    		it.save(flush:true)
 	    	}
     	}
     }

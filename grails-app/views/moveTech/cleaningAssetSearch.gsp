@@ -648,7 +648,7 @@ function mySelect(x)
 					<td style="width:85%">
 						<g:select style="width: 170px;padding:0px;text-align:left;" from="${commentsList}" id="selectCmt" name="selectCmt" value="Select a common reason:" noSelection="['Select a common reason:':'Select a common reason:']" onchange="commentSelect(this.value);"></g:select>
 					<br/>
-					<textarea rows="5" cols="98" title="Enter Note..." id="enterNote" name="enterNote" onclick="clearComment(this)" onkeypress="clearComment(this)">Enter Comment</textarea></td>
+					<textarea rows="5" cols="98" title="Enter Note..." id="enterNote" name="enterNote" onclick="clearComment(this)" onkeypress="clearComment(this)" onkeydown="textCounter($('#enterNote'), 255)" onkeyup="textCounter($('#enterNote'), 255)">Enter Comment</textarea></td>
 					<g:if test="${projMap}">
 					<td class="buttonClean" style="text-align:center;vertical-align:bottom;align:left; " colspan="2">
 					<input  type="button"	value="Add Comment" onclick="return doTransition('comment')" /><br/><br/>
@@ -662,5 +662,15 @@ function mySelect(x)
 		</div>
 		</div>
 		</div>
+		<script type="text/javascript">
+		function textCounter(obj, maxlimit) {
+		      if (obj.val().length > maxlimit) {// if too long...trim it!
+		    	  obj.val( obj.val().substring(0, maxlimit) );
+			      return false;
+		      } else {
+		      	return true;
+		      }
+	     }
+		</script>
 </body>
 </html>

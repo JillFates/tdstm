@@ -42,7 +42,7 @@ class Rack {
 		// Create a new rack if it doesn't exist
 		def rack = results[0]
 		if(rack == null)
-			rack = new Rack(params).save()
+			rack = new Rack(params).save(flush:true)
 		
 		return rack
 	}

@@ -185,7 +185,7 @@
 			</td>
 			</tr>		
 			<tr><td colspan=2>
-			<textarea rows="2" cols="100" style="width:188px;padding:0px;" title="Enter Note..." id="enterNote" name="enterNote"></textarea>
+			<textarea rows="2" cols="100" style="width:188px;padding:0px;" title="Enter Note..." id="enterNote" name="enterNote" onkeydown="textCounter($('#enterNote'), 255)" onkeyup="textCounter($('#enterNote'), 255)"></textarea>
 			</td></tr>		
 			<tr><td class="button_style" colspan=2 style="text-align:center;">
 				<input type="button" value="Add Comment" onclick="return doTransition('comment');" class="action_button"/>
@@ -248,5 +248,15 @@
 	</g:form>
 	</div>
 	</div>
+	<script type="text/javascript">
+	function textCounter(obj, maxlimit) {
+	      if (obj.val().length > maxlimit) {// if too long...trim it!
+	    	  obj.val( obj.val().substring(0, maxlimit) );
+		      return false;
+	      } else {
+	      	return true;
+	      }
+   }
+	</script>
 </body>
 </html>
