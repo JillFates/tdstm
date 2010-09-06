@@ -370,9 +370,9 @@
 		<td valign="top" class="name" nowrap="nowrap">
 			<label for="category">User / Generic Cmt:</label></td>
 				<td valign="top" class="value" id="displayOption" >
-				<input type="radio" name="displayOption" value="U" id="displayOptionUid"/>&nbsp;
+				<input type="radio" name="displayOption" value="U" checked="checked" id="displayOptionUid"/>&nbsp;
 				<span style="vertical-align: text-top;">User Comment</span>&nbsp;&nbsp;&nbsp;
-				<input type="radio" name="displayOption" value="G" checked="checked" id="displayOptionGid"/>&nbsp;
+				<input type="radio" name="displayOption" value="G" id="displayOptionGid"/>&nbsp;
 				<span style="vertical-align:text-top;">Generic Comment&nbsp;</span>
 				</td>
 		</tr>
@@ -676,8 +676,19 @@
 		        tsource1 = tsource[0];            
 		        tsource1 = tsource1.substring(0,tsource1.length-2);
 		        temp = tsource1;
-		        tsource2 = trimAll(tsource[1]);        
-		        tsource2 = "(" + tsource2;
+		        tsource2 = trimAll(tsource[1]);      
+		       // tsource2 = "(" + tsource2;
+		        
+		        var deltaTemp = tsource2.replace("m)","")
+		        if(deltaTemp){
+		        	deltaTemp = parseInt( deltaTemp )
+		        	var sign = ""
+		        	if(deltaTemp < 0){
+		        		deltaTemp = deltaTemp * -1
+		        		sign = "-"
+		        	}
+		        	tsource2 = "("+sign + parseInt( deltaTemp / 60 ) +"h "+ deltaTemp % 60 +"m)"
+		        }
 			} else {
 		    	temp = trimAll(source);
 			}

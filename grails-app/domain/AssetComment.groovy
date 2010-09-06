@@ -13,7 +13,7 @@ class AssetComment {
 	Person createdBy
 	String commentCode 
 	String category = "general"
-	String displayOption = "G"	// Used in dashboard to control display of user entered test (comment) or a generic message
+	String displayOption = "U"	// Used in dashboard to control display of user entered test (comment) or a generic message
 	
 	static constraints = {
 		

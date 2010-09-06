@@ -290,9 +290,9 @@ Move News and Issues</b></span>
 		<td valign="top" class="name" nowrap="nowrap">
 			<label for="category">User / Generic Cmt:</label></td>
 				<td valign="top" class="value" id="displayOption" >
-				<input type="radio" name="displayOption" value="U" id="displayOptionUid"/>&nbsp;
+				<input type="radio" name="displayOption" value="U" checked="checked" id="displayOptionUid"/>&nbsp;
 				<span style="vertical-align: text-top;">User Comment</span>&nbsp;&nbsp;&nbsp;
-				<input type="radio" name="displayOption" value="G" checked="checked" id="displayOptionGid"/>&nbsp;
+				<input type="radio" name="displayOption" value="G" id="displayOptionGid"/>&nbsp;
 				<span style="vertical-align:text-top;">Generic Comment&nbsp;</span>
 				</td>
 		</tr>
