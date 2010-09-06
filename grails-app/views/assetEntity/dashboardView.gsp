@@ -621,7 +621,7 @@ td .odd {
 						</g:each>
 						<td style="padding: 0px; border-right: 1px solid #333333">
 						<table style="border: 0;">
-							<tr><th nowrap>Cleaning &nbsp;</th>
+							<tr><th nowrap>Logistics &nbsp;</th>
 							</tr>
 							<tr>
 								<td nowrap>${supportTeam?.cleaningMembers}&nbsp;</td>

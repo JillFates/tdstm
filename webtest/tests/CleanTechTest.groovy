@@ -6,10 +6,10 @@ class CleanTechTest extends MoveTechLoginTest {
         tryLoginMoveTech ( '', 'Invalid username format' )
         tryLoginMoveTech ( 'bt-27-34-s', 'Invalid username' )
         tryLoginMoveTech ( 'ct-88-34-s', 'Unknown move bundle' )
-        tryLoginMoveTech ( 'ct-27-99-s', 'Unknown Cleaning team' )
+        tryLoginMoveTech ( 'ct-27-99-s', 'Unknown Logistics team' )
         tryLoginMoveTech ( 'ct-27-34-k', 'No assets assigned to team for move bundle' )
         tryLoginMoveTech ( 'abcdef', 'Invalid username format' )
-        tryLoginMoveTech ( 'ct-27-34-s','Cleaning' )          //proper barcode for login
+        tryLoginMoveTech ( 'ct-27-34-s','Logistics' )          //proper barcode for login
         clickLink 'Log out'
 	}
 	

@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<title>Cleaning Team Worksheets </title>
+<title>Logistics Team Worksheets </title>
 
 <script type="text/javascript">
     
@@ -21,7 +21,7 @@
 <body>
 
 <div class="body">
-<h1>Cleaning Team Worksheets </h1>
+<h1>Logistics Team Worksheets </h1>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>

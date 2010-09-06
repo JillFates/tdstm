@@ -262,7 +262,7 @@ return
 		def normalUserRalph = new UserLogin( person:personJimL, username:"ralph", password:new Sha1Hash("user").toHex(), active:'Y' ).save()
 		def userRita = new UserLogin( person:personRita, username: "rbooke", password:new Sha1Hash("manager").toHex(), active:'Y' ).save()
 		def userWarren = new UserLogin( person:personWarren, username: "wpeace", password:new Sha1Hash("observer").toHex(), active:'Y' ).save()
-		// Create the Move Tech, Cleaning Tech and Mover (keep short for barcode)
+		// Create the Move Tech, Logistics Tech and Mover (keep short for barcode)
 		def userMoveTech = new UserLogin( person:personWorkStation, username:"mt", password:new Sha1Hash("xyzzy").toHex(), active:'Y' ).save()
 		def userCleanTech = new UserLogin( person:personWorkStation, username:"ct", password:new Sha1Hash("xyzzy").toHex(), active:'Y' ).save()
 		def userMover = new UserLogin( person:personWorkStation, username:"mv", password:new Sha1Hash("xyzzy").toHex(), active:'Y' ).save()
@@ -331,7 +331,7 @@ return
 		println "PROJECT TEAM"
 		def cedarsGreenProjectTeam = new ProjectTeam( name: "MoveTeam 1",	teamCode: "1", moveBundle:cedarsProjectMoveBundle1 ).save()
 		def cedarsRedProjectTeam = new ProjectTeam( name: "MoveTeam 2",	teamCode: "2", moveBundle:cedarsProjectMoveBundle1 ).save()
-		def cedarsCleanProjectTeam = new ProjectTeam( name: "Cleaning",	teamCode: "Cleaning", moveBundle:cedarsProjectMoveBundle1 ).save()
+		def cedarsCleanProjectTeam = new ProjectTeam( name: "Logistics",	teamCode: "Logistics", moveBundle:cedarsProjectMoveBundle1 ).save()
 		def cedarsTransportProjectTeam = new ProjectTeam( name: "Transport",	teamCode: "Transport", moveBundle:cedarsProjectMoveBundle1 ).save()
 		def twGreenProjectTeam = new ProjectTeam( name: "MoveTeam 1",	teamCode: "1", moveBundle:twProjectMoveBundle ).save()
 		def twRedProjectTeam = new ProjectTeam( name: "MoveTeam 2",	teamCode: "2", moveBundle:twProjectMoveBundle ).save()

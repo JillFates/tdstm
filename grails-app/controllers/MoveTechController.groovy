@@ -196,7 +196,7 @@ class MoveTechController {
 	                    	projectInstance = Project.findById ( moveBundleInstance.project.id )
 	                    	if ( projectInstance ) {
 	                    		projectTeamInstance = ProjectTeam.findById ( barcodeText.get(2) )
-	                    		if ( projectTeamInstance != null && projectTeamInstance.teamCode == "Cleaning" ) {
+	                    		if ( projectTeamInstance != null && projectTeamInstance.teamCode == "Logistics" ) {
 	                                //Validating is Logindate between startdate and completedate
 	                                if ( nowDate < projectInstance.startDate || nowDate > projectInstance.completionDate ) {
 	                                    flash.message = message ( code : "Move bundle presently inactive" )
@@ -224,7 +224,7 @@ class MoveTechController {
 	                                    }
 	                                }
 	                            } else {
-	                            	flash.message = message ( code : "Unknown Cleaning team" )
+	                            	flash.message = message ( code : "Unknown Logistics team" )
 	                                redirect ( action: 'login' )
 	                                return;
 	                            }

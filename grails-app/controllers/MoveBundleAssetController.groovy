@@ -316,7 +316,7 @@ class MoveBundleAssetController {
     	}
     	def bundleInstance = MoveBundle.findById(bundleId)
     	def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and "+
-                    										"pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport' " )
+                    										"pt.teamCode != 'Logistics' and pt.teamCode != 'Transport' " )
     	def teamAssetCounts = []
     	def cartAssetCounts
     	def assetEntitysRacks
@@ -453,7 +453,7 @@ class MoveBundleAssetController {
     	def projectTeam = []
     	def assetEntityList
     	def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and "+
-                    										"pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport' " )
+                    										"pt.teamCode != 'Logistics' and pt.teamCode != 'Transport' " )
        	projectTeamInstanceList.each{teams ->
             projectTeam << [ teamCode: teams.teamCode ]
         }
@@ -519,7 +519,7 @@ class MoveBundleAssetController {
        	def moveBundleAssetList
        	def projectTeam = []
        	def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and "+
-                    										"pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport' " )
+                    										"pt.teamCode != 'Logistics' and pt.teamCode != 'Transport' " )
        	projectTeamInstanceList.each{team ->
             projectTeam << [ teamCode: team.teamCode ]
         }
@@ -914,7 +914,7 @@ class MoveBundleAssetController {
        					bundleInstance = MoveBundle.findById(asset.moveBundle.id)
        				}
                     if(reportName == 'cartAsset') {
-                        teamPartyGroup =  ProjectTeam.findByMoveBundleAndTeamCode(bundleInstance, 'Cleaning')
+                        teamPartyGroup =  ProjectTeam.findByMoveBundleAndTeamCode(bundleInstance, 'Logistics')
                     }else {
        					teamPartyGroup =  ProjectTeam.findByMoveBundleAndTeamCode(bundleInstance, 'Transport')
                     }
@@ -977,7 +977,7 @@ class MoveBundleAssetController {
                 	}
                 }
         		
-				def name = reportName == "cartAsset" ? "CleanTeam" : "TransportTeam"
+				def name = reportName == "cartAsset" ? "LogisticsTeam" : "TransportTeam"
 				def filename = 	"${name}-${projectInstance.name}-${bundleName}"
 					filename = filename.replace(" ", "_")
         		
@@ -1339,7 +1339,7 @@ class MoveBundleAssetController {
     		teamMembers.each { members ->
     			members.each { member ->
     				def teamCode = "mt"
-    				if(member.partyIdFrom.teamCode == "Cleaning") {
+    				if(member.partyIdFrom.teamCode == "Logistics") {
     					teamCode = "ct"
     				}
     				if ( params.location == "source" || params.location == "both" ) {
@@ -1349,7 +1349,7 @@ class MoveBundleAssetController {
                                          'barCode': teamCode+'-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-s' 
                                          ]
     				}
-    				if ( member.partyIdFrom.teamCode != "Cleaning" && (params.location == "target" || params.location == "both") ) {
+    				if ( member.partyIdFrom.teamCode != "Logistics" && (params.location == "target" || params.location == "both") ) {
     					reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
     					                 'teamName': member.partyIdFrom.name+" - Target","sortField": member.partyIdFrom.moveBundle.name+member.partyIdTo.firstName+member.partyIdTo.lastName, 
     					                 'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? partyRelationshipService.convertDate(member.partyIdFrom.moveBundle.startTime) : " "),

@@ -249,7 +249,7 @@ class AssetEntityAttributeLoaderService {
 	def getTeamAssetCount ( def bundleInstance, def rackPlan ) {
 		def teamAssetCounts = []
 		//def bundleInstance = MoveBundle.findById(bundleId)
-		def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport' " )
+		def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.teamCode != 'Logistics' and pt.teamCode != 'Transport' " )
     	if( rackPlan == 'RerackPlan') {
     		projectTeamInstanceList.each{projectTeam ->
     			def assetCount = AssetEntity.countByMoveBundleAndTargetTeam( bundleInstance, projectTeam )
@@ -296,7 +296,7 @@ class AssetEntityAttributeLoaderService {
 	def getAssetList ( def assetEntityList, rackPlan, bundleInstance ) {
 		def assetEntity = []
 		def projectTeam =[]
-		def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport' " )
+		def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.teamCode != 'Logistics' and pt.teamCode != 'Transport' " )
 		projectTeamInstanceList.each{teams ->
 			
 			projectTeam << [ teamCode: teams.teamCode ]

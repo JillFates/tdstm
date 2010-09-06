@@ -994,7 +994,7 @@ class AssetEntityController {
         	totalAssetsSize = moveBundleService.assetCount( moveBundleInstance.id )
 			
 	        def projectTeamList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = ${moveBundleInstance.id} and "+
-	        											"pt.teamCode != 'Cleaning' and pt.teamCode != 'Transport'  order by pt.name asc")
+	        											"pt.teamCode != 'Logistics' and pt.teamCode != 'Transport'  order by pt.name asc")
 	        def countQuery = "SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate, min(cast(t.state_to as UNSIGNED INTEGER)) as minstate "+
 	        				"FROM asset_entity e left join asset_transition t on (t.asset_entity_id = e.asset_entity_id and t.voided = 0) "+
 							"left join project_asset_map pm on (pm.asset_id = e.asset_entity_id ) where e.move_bundle_id = ${moveBundleInstance.id} "
@@ -1050,7 +1050,7 @@ class AssetEntityController {
 	        
 	        def targetTransportPend = jdbcTemplate.queryForList(countQuery + " and (pm.current_state_id < $onTruckId or pm.current_state_id is null) group by e.asset_entity_id ").size()
 			
-	        def cleaningTeam = ProjectTeam.findByTeamCodeAndMoveBundle("Cleaning", moveBundleInstance)
+	        def cleaningTeam = ProjectTeam.findByTeamCodeAndMoveBundle("Logistics", moveBundleInstance)
 	        def transportTeam = ProjectTeam.findByTeamCodeAndMoveBundle("Transport", moveBundleInstance)
 			def cleaningMembers
 			if ( cleaningTeam ) {
@@ -1221,8 +1221,8 @@ class AssetEntityController {
 	        }
 	        map.put("currentState",stateEngineService.getStateLabel(assetDetail.project.workflowCode,currentState))
 	        map.put("state",state)
-	        def sourceQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
-	        def targetQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
+	        def sourceQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and teamCode != 'Logistics' and teamCode != 'Transport'")
+	        def targetQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and teamCode != 'Logistics' and teamCode != 'Transport'")
 	        if(assetDetail.sourceTeam){
 	        	sourceQuery.append(" and id != $assetDetail.sourceTeam.id ")
 	        }
@@ -1374,8 +1374,8 @@ class AssetEntityController {
 		    if(assetEntity.targetTeam){
 		    	targetTeam = assetEntity.targetTeam.name
 		    }
-		    def sourceQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetEntity.moveBundle.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
-	        def targetQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetEntity.moveBundle.id and teamCode != 'Cleaning' and teamCode != 'Transport'")
+		    def sourceQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetEntity.moveBundle.id and teamCode != 'Logistics' and teamCode != 'Transport'")
+	        def targetQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetEntity.moveBundle.id and teamCode != 'Logistics' and teamCode != 'Transport'")
 	        if(assetEntity.sourceTeam){
 	        	sourceQuery.append(" and id != $assetEntity.sourceTeam.id ")
 	        }
