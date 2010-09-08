@@ -37,34 +37,6 @@
 			var durationInMinutes = (completionTime - startTime ) / 60000
 			return durationInMinutes  
 		} 
-		/*
-		convert the date into HH:MM ap formate to show at slider place.
-		*/
-		function convertToTimeFormat( date ){
-	    	var timeString = ""
-	    	var month =  date.getMonth();
-	    	if( !isNaN(month) ){
-	    		//month = month + 1
-				//var monthday    = date.getDate();
-
-				var hour   = date.getHours();
-				var minute = date.getMinutes();
-				var second = date.getSeconds();
-				//if(month < 10 ){ month = "0"+ month }
-				//if(monthday < 10 ){ monthday = "0"+ monthday }
-	    		
-	    		var ap = "AM";
-	    		if (hour   > 11) { ap = "PM";             }
-	    		if (hour   > 12) { hour = hour - 12;      }
-	    		if (hour   == 0) { hour = 12;             }
-	    		if (hour   < 10) { hour   = "0" + hour;   }
-	    		if (minute < 10) { minute = "0" + minute; }
-	    		if (second < 10) { second = "0" + second; }
-	    			
-	    		var timeString = hour + ':' + minute + ' ' + ap;
-	    	}
-	    	return timeString
-		}
     </script>
   </head>
   <body>
@@ -278,7 +250,7 @@
 								<div id="startTimeInput_${dashboardStep.step.id }" title="input">
 									<table>
 										<tr>
-											<td colspan="2">
+											<td style="padding: 0 6px;width: 310px;">
 												<div style="float: left;padding-right: 5px; ">
 													<span style="float: left;"><input type="text" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }"
 														value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"
@@ -295,30 +267,26 @@
 												</div>	
 											</td>
 										</tr>
-										<tr><td style="padding: 0 6px;width: 300px;">
-										
-										<div id="slider_${dashboardStep.step.id }"></div>
-										<script type="text/javascript">
-											$(function() {
-												$("#slider_${dashboardStep.step.id }").slider({
-													range: true,
-													min: 0,
-													max: maxDuration,
-													step:5,
-													values: [getDuration($("#startTime_${dashboardStep.step.id }").val()),
-													         getDuration($("#completionTime_${dashboardStep.step.id }").val())],
-													slide: function(event, ui) {
-														$("#show_${dashboardStep.step.id }").html( showSliderInput("start", "${dashboardStep.step.id }", ui.values[0])+" - "+showSliderInput("completion","${dashboardStep.step.id }", ui.values[1]));
-													}
-												});
-											});
-										</script>
-										</td>
-										<td id="show_${dashboardStep.step.id }" style="text-align: center;padding: 0 6px" nowrap="nowrap">
-											<script type="text/javascript">
-												$("#show_${dashboardStep.step.id }").html(convertToTimeFormat( new Date( $("#startTime_${dashboardStep.step.id }").val() ) )+" - "+convertToTimeFormat(new Date( $("#completionTime_${dashboardStep.step.id }").val() ) ))
-											</script>
-										</td>
+										<tr>
+											<td style="padding: 0 6px;width: 300px;">
+												<div id="slider_${dashboardStep.step.id }"></div>
+												<script type="text/javascript">
+													$(function() {
+														$("#slider_${dashboardStep.step.id }").slider({
+															range: true,
+															min: 0,
+															max: maxDuration,
+															step:5,
+															values: [getDuration($("#startTime_${dashboardStep.step.id }").val()),
+															         getDuration($("#completionTime_${dashboardStep.step.id }").val())],
+															slide: function(event, ui) {
+																showSliderInput("start", "${dashboardStep.step.id }", ui.values[0]);
+																showSliderInput("completion","${dashboardStep.step.id }", ui.values[1]);
+															}
+														});
+													});
+												</script>
+											</td>
 										</tr>
 									</table>
 								</div>
@@ -381,7 +349,7 @@
 									<div id="startTimeInput_${dashboardStep.step.id }" style="display: none;" title="input">
 					                  <table>
 					                  	<tr>
-											<td colspan="2">
+											<td style="padding: 0 6px;width: 310px;">
 												<div style="float: left;padding-right: 10px;">
 													<span style="float: left;"><input type="text" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }" 
 													value="<tds:convertDateTime date='${moveBundleInstance?.startTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"
@@ -398,24 +366,25 @@
 												</div>
 											</td>
 										</tr>
-										<tr><td style="padding: 0 6px;width: 310px;">
-										<div id="slider_${dashboardStep.step.id }"></div>
-										<script type="text/javascript">
-											$(function() {
-												$("#slider_${dashboardStep.step.id }").slider({
-													range: true,
-													min: 0,
-													max: maxDuration,
-													step:5,
-													values: [0, maxDuration],
-													slide: function(event, ui) {
-														$("#show_${dashboardStep.step.id }").html( showSliderInput("start", "${dashboardStep.step.id }", ui.values[0])+" - "+showSliderInput("completion","${dashboardStep.step.id }", ui.values[1]));
-													}
-												});
-											});
-										</script>
-										</td>
-										<td id="show_${dashboardStep.step.id }" style="text-align: center;padding: 0 6px" nowrap="nowrap"></td>
+										<tr>
+											<td style="padding: 0 6px;width: 310px;">
+												<div id="slider_${dashboardStep.step.id }"></div>
+												<script type="text/javascript">
+													$(function() {
+														$("#slider_${dashboardStep.step.id }").slider({
+															range: true,
+															min: 0,
+															max: maxDuration,
+															step:5,
+															values: [0, maxDuration],
+															slide: function(event, ui) {
+																showSliderInput("start", "${dashboardStep.step.id }", ui.values[0]);
+																showSliderInput("completion","${dashboardStep.step.id }", ui.values[1]);
+															}
+														});
+													});
+												</script>
+											</td>
 										</tr>
 									</table>
 									</div>
@@ -489,7 +458,6 @@
 			
 			$("#startTime_"+stepId ).val($("#startTime").val())
 			$("#completionTime_"+stepId ).val($("#completionTime").val())
-			$("#show_"+stepId ).html(convertToTimeFormat( new Date( $("#startTime").val() ) )+" - "+convertToTimeFormat(new Date( $("#completionTime").val() ) ))
 			$("#slider_"+stepId).slider( "option", "max", maxDuration );
 			$("#slider_"+stepId).slider( "option", "values", [getDuration($("#startTime_"+stepId).val()), getDuration($("#completionTime_"+stepId).val())] );
 			
@@ -526,20 +494,16 @@
     	Change the minuits into HH:MM ap formate
     */
     function showSliderInput( type, stepId, minuits ){
-        var date
         if(type =="start"){
         	var startTime = new Date($("#startTime").val())
-        	date = convertToTimeFormat(new Date(startTime.getTime() + minuits * 60000 ))
         	$("#startTime_"+stepId).val(convertDate(new Date(startTime.getTime() + minuits * 60000 )))
         	validateDateInput( $("#startTime_"+stepId).val(), stepId, "start")
         } else {
         	var completionTime = new Date($("#completionTime").val())
         	minuits = minuits - maxDuration
-        	date = convertToTimeFormat(new Date(completionTime.getTime() + minuits * 60000 ))
         	$("#completionTime_"+stepId).val(convertDate(new Date(completionTime.getTime() + minuits * 60000 )))
         	validateDateInput( $("#completionTime_"+stepId).val(), stepId, "completion")
         }
-        return date
     }
 	function getDuration( dateString ){
 		var dateTime = new Date(dateString).getTime()
@@ -664,23 +628,19 @@
   	    		  	var stepCompletionTime = new Date($("#completionTime_"+stepId).val()).getTime();
   		    	  	if(objId =="startTime" ){
   	  		    		if( stepStartTime < objDateinMs){
-		  		    		$("#show_"+stepId).html( convertToTimeFormat( new Date( $("#startTime").val()) )+" - "+convertToTimeFormat( new Date( $("#completionTime_"+stepId).val()) ) );
 		  		    		$("#startTime_"+stepId).val( $("#startTime").val() )
 	  			    		alertMess = "Step start times will be changed to the bundle start"
   	  			   		}
   	  		    		if( stepCompletionTime < objDateinMs){
-  	  		    			$("#show_"+stepId).html( convertToTimeFormat( new Date( $("#startTime_"+stepId).val() ) )+" - "+convertToTimeFormat( new Date( $("#completionTime").val()) ) );
   	  		    			$("#completionTime_"+stepId).val( $("#completionTime").val() )
   	  		    			alertMess = "Step completion times will be changed to the bundle completion"
    	  		    	  	}
   	    	  	  	} else if(objId =="completionTime"){
   	  	    	  		if(stepCompletionTime > objDateinMs){
-	  	  	    	  		$("#show_"+stepId).html( convertToTimeFormat( new Date( $("#startTime_"+stepId).val()) )+" - "+convertToTimeFormat( new Date( $("#completionTime").val()) ) );
 	  		    			$("#completionTime_"+stepId).val( $("#completionTime").val() )
 	  	    	  			alertMess = "Step completion times will be changed to the bundle completion"
 	  	    	  	  	}
   	  	    	  		if(stepStartTime > objDateinMs){
-	  	  	    	  		$("#show_"+stepId).html( convertToTimeFormat( new Date( $("#startTime").val()) )+" - "+convertToTimeFormat( new Date( $("#completionTime_"+stepId).val()) ) );
 	  		    			$("#startTime_"+stepId).val( $("#startTime").val() )
 	  	    	  			alertMess = "Step start times will be changed to the bundle start"
 	  	    	  	  	}
