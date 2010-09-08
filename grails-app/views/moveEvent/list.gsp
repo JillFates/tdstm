@@ -19,7 +19,7 @@
                         
                    	        <g:sortableColumn property="description" title="Description" />
                    	        
-                   	        <g:sortableColumn property="inProgress" title="In Progress" />
+                   	        <g:sortableColumn property="inProgress" title="Status" />
                    	        
                    	        <g:sortableColumn property="project" title="Project" />
                    	        
@@ -36,7 +36,7 @@
                         
                             <td>${fieldValue(bean:moveEventInstance, field:'description')}</td>
                             
-                             <td>${fieldValue(bean:moveEventInstance, field:'inProgress')}</td>
+                             <td><g:message code="event.inProgress.${moveEventInstance?.inProgress}" /></td>
 
                              <td>${fieldValue(bean:moveEventInstance, field:'project')}</td>
                              

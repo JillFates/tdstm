@@ -74,9 +74,9 @@
 						</tr>
                         
                         <tr class="prop">
-				            <td valign="top" class="name">In Progress:</td>
+				            <td valign="top" class="name">Status:</td>
 				
-				            <td valign="top" class="value">${fieldValue(bean:moveEventInstance, field:'inProgress')}</td>
+				            <td valign="top" class="value"><g:message code="event.inProgress.${moveEventInstance?.inProgress}" /></td>
 						</tr>
                     
                     

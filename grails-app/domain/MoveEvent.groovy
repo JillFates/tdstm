@@ -14,7 +14,7 @@ class MoveEvent {
     Project project
     String name
     String description
-	String inProgress = "false" 
+	String inProgress = "auto" 
 	String calcMethod = METHOD_LINEAR
 
 	Date revisedCompletionTime		// Revised Completion Time of the MoveEvent which is only set as an exception
@@ -30,7 +30,7 @@ class MoveEvent {
 		actualStartTime(nullable:true )
 		actualCompletionTime(nullable:true )
 		revisedCompletionTime ( nullable:true )
-		inProgress( blank:false, nullable:false, inList:["true", "false"] )
+		inProgress( blank:false, nullable:false, inList:["auto", "true", "false"] )
 		calcMethod( blank:false, nullable:false, inList: [METHOD_LINEAR, METHOD_MANUAL] )
 	}
 

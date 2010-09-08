@@ -593,20 +593,26 @@ class StepSnapshotService {
 	 * @author : Lokanada Reddy
 	 *------------------------------------------------------------------------*/
 	def backgroundSnapshotProcess(){
-		
-		def moveEventsList = MoveEvent.findAll("FROM MoveEvent WHERE calcMethod = '${MoveEvent.METHOD_LINEAR}' AND inProgress ='true'")
+		def moveEventsList = MoveEvent.findAll("FROM MoveEvent WHERE calcMethod = '${MoveEvent.METHOD_LINEAR}'")
 		def now = GormUtil.convertInToGMT( "now", "EDT" );
 		
 		moveEventsList.each{ event ->
 			def planTimes = event.getEventTimes()
 			if(!planTimes.completion)
 				return  // next event
-				
+			
+			// stop the process if current time is greater than event completion time
 			if(now.getTime() > planTimes.completion?.getTime()){
 				event.inProgress = "false"
 				event.save(flush:true)
 				return;
 			}
+			//	start the process if current time in betweeen the event start and completion times.
+			if(event.inProgress == "auto" && now.getTime() >= planTimes.start?.getTime() && now.getTime() < planTimes.completion?.getTime() ){
+					event.inProgress = "true"
+					event.save(flush:true)
+			}
+			// Run the process if event is active
 			if(event.inProgress == "true"){
 				def moveBundlesList = MoveBundle.findAllByMoveEvent( event )
 				moveBundlesList.each{ bundle ->
