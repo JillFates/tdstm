@@ -77,23 +77,31 @@ a:hover {
 		</td>
 		<td>
 			<div>
-			<h1 style="margin-right: 0px;"><b>Current Live Events</b></h1>
+			<h1 style="margin-right: 0px;"><b>Recent Events</b></h1>
 			<table>
 				<thead>
-					<tr>
-						<th>Current Active Events:</th>
-					</tr>
+					<thead>
+						<tr>
+							<th>Event Name </th>
+							<th>Status</th>
+							<th>Start Time</th>
+							<th>Completion Time</th>
+						</tr>
+					</thead>
 				</thead>
 				<tbody>
 					<g:if test="${moveEventsList}">
-						<g:each in="${moveEventsList}" status="i"  var="event">			
+						<g:each in="${moveEventsList}" status="i"  var="eventList">			
 						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-							<td><g:link controller="project" action="show" id="${event.project?.id}">${event.project?.name} - ${event.name}</g:link></td>
+							<td><g:link controller="project" action="show" id="${eventList?.moveEvent?.project?.id}">${eventList?.moveEvent?.project?.name} - ${eventList?.moveEvent?.name}</g:link></td>
+							<td>${eventList?.status }</td>
+							<td><tds:convertDateTime date="${eventList?.startTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+							<td><tds:convertDateTime date="${eventList?.completionTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 						</tr>
 						</g:each>
 					</g:if>
 					<g:else>
-						<tr><td class="no_records">No records found</td></tr>
+						<tr><td class="no_records" colspan="4">No records found</td></tr>
 					</g:else>
 				</tbody>
 			</table>

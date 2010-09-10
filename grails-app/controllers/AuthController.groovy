@@ -108,14 +108,32 @@ class AuthController {
 
     	def dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     	def dateNow = dateFormat.format(GormUtil.convertInToGMT( "now", "EDT" ))
-		
+		def timeNow = GormUtil.convertInToGMT( "now", "EDT" ).getTime()
 		// retrive the list of 20 usernames with the most recent login times
     	def recentUsers = UserLogin.findAll("FROM UserLogin ul WHERE ul.lastLogin is not null ORDER BY ul.lastLogin DESC",[max:20])
 		// retrive the list of events in progress
-		def currentLiveEvents = MoveEvent.findAll("FROM MoveEvent me WHERE me.inProgress = 'true'")
+		def currentLiveEvents = MoveEvent.findAll()
+		def moveEventsList = []
+		currentLiveEvents.each{ moveEvent  ->
+			def completion = moveEvent.getEventTimes()?.completion?.getTime()
+			if(moveEvent.inProgress == "true" || (completion && completion < timeNow && completion + 2592000000 > timeNow)){
+	    		def query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent = ?  ORDER BY mes.dateCreated DESC"
+				def moveEventSnapshot = MoveEventSnapshot.findAll( query , [moveEvent] )[0]
+	    		def status =""
+				def dialInd = moveEventSnapshot?.dialIndicator 
+	    		if( dialInd && dialInd < 25){
+	    			status = "Red($dialInd)"
+				} else if( dialInd && dialInd >= 25 && dialInd < 50){
+					status = "Yellow($dialInd)"
+				} else if(dialInd){
+					status = "Green($dialInd)"
+				}
+	    		moveEventsList << [moveEvent : moveEvent, status : status, startTime : moveEvent.getEventTimes()?.start, completionTime : moveEvent.getEventTimes()?.completion]
+			}
+    	}
 		// retrive the list of 10 upcoming bundles
 		def upcomingBundles = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.startTime > '$dateNow' ORDER BY mb.startTime",[max:10])
 		
-        render( view:'home', model:[ recentUsers:recentUsers, moveEventsList:currentLiveEvents, moveBundlesList:upcomingBundles ] )
+        render( view:'home', model:[ recentUsers:recentUsers, moveEventsList:moveEventsList, moveBundlesList:upcomingBundles ] )
     }
 }
