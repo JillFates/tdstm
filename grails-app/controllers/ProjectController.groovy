@@ -36,6 +36,8 @@ class ProjectController {
             flash.message = "Project not found with id ${params.id}"
             redirect( action:list )
         } else { 
+        	// load transitions details into application memory.
+        	stateEngineService.loadWorkflowTransitionsIntoMap(projectInstance.workflowCode)
         	userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
         	def currProj = session.getAttribute("CURR_PROJ");
         	def currProjectInstance = Project.get( currProj.CURR_PROJ )

@@ -113,6 +113,7 @@
 			<li><g:link class="home" controller="auth" action="home">Admin</g:link> </li>
 	            </jsec:hasRole>
 			<li><g:link class="home" controller="projectUtil">Project </g:link> </li>
+			<li><g:link class="home" controller="workflow" action="home">Workflows </g:link> </li>
 			<li><g:link class="home" controller="partyGroup" id="${partyGroup}">Company</g:link></li>
 			<li><g:link class="home" controller="person" id="${partyGroup}">Staff</g:link></li>
 			<li><g:link class="home" controller="userLogin" id="${partyGroup}">Users</g:link></li>

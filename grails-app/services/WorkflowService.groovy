@@ -155,10 +155,12 @@ class WorkflowService {
      * -----------------------------------------------------------------------------*/
     def setPreExistTransitionsAsVoided( def process, def assetEntity, def state, def assetTransition, def stateType, def holdState ) {
     	if(stateType != "boolean"){
-	    	def preExistTransitions = AssetTransition.findAll("from AssetTransition where assetEntity = $assetEntity.id and ( stateTo >= $state or stateTo = $holdState ) "+
+    		def workflow = Workflow.findByProcess( process )
+	    	def preExistTransitions = AssetTransition.findAll("from AssetTransition where assetEntity = $assetEntity.id and voided = 0 and ( stateTo >= $state or stateTo = $holdState ) "+
 	    														"and id != $assetTransition.id and stateTo not in(select w.transId from WorkflowTransition w "+
-	    														"where w.process = '$process' and w.transId != $holdState and w.type != 'process' ) ")
+	    														"where w.workflow = '${workflow.id}' and w.transId != $holdState and w.type != 'process' ) ")
 	    	preExistTransitions.each{
+    			println"tesns-->"+it.stateTo
 	    		it.voided = 1
 	    		it.save(flush:true)
 	    	}

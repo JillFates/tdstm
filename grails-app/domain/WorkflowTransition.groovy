@@ -3,24 +3,36 @@
  */
 class WorkflowTransition {
 	
-	String process
 	String code
 	String name
 	Integer transId
 	String type
 	String color
+	String dashboardLabel
+	Integer predecessor
+	String header
+
+	static belongsTo = [ workflow : Workflow ]
+	static hasMany  = [ WorkflowTransitionMap ]
 	
 	static constraints = {
-		process( blank:false, nullable:false )
+		workflow( blank:false, nullable:false )
 		code( blank:false, nullable:false )
 		name( blank:false, nullable:false )
 		transId( nullable:false )
 		type( blank:false, nullable:false )
 		color( blank:true, nullable:true)
+		dashboardLabel( blank:true, nullable:true)
+		predecessor( blank:true, nullable:true)
+		header( blank:true, nullable:true)
 	}	
 	
 	static mapping  = {
 		version false
 		id column:'workflow_transition_id'
+	}
+	
+	String toString() {
+		"${workflow} : ${code}"
 	}
 }
