@@ -17,6 +17,7 @@
     <script type="text/javascript">
    		$(document).ready(function() {
       		$("#personDialog").dialog({ autoOpen: false })
+      		${remoteFunction(controller:'userLogin', action:'updateLastPageLoad')}
      	})
    </script>
     </head>

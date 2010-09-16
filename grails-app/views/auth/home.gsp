@@ -61,6 +61,7 @@ a:hover {
 						<th>Person</th>
 						<th>User Name</th>
 						<th>Last logged</th>
+						<th>Recent page load</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -69,6 +70,7 @@ a:hover {
 						<td><g:link controller="person" action="show" id="${user.person?.id}">${user.person}</g:link></td>
 						<td><g:link controller="userLogin" action="show" id="${user.id}">${user.username}</g:link></td>
 						<td><tds:convertDateTime date="${user.lastLogin}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+						<td><tds:convertDateTime date="${user.lastPage}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 					</tr>
 					</g:each>
 				</tbody>

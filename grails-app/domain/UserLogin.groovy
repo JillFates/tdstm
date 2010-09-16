@@ -7,6 +7,7 @@ class UserLogin {
 	Date lastLogin
 	String active
 	Person person
+	Date lastPage
     
 	static hasMany = [
 		assetTransitions : AssetTransition,
@@ -20,6 +21,7 @@ class UserLogin {
 		createdDate( nullable: true )
 		lastLogin( nullable: true )
 		active( nullable:false, inList:['Y', 'N'] )
+		lastPage( nullable: true )
 	}
 
 	static mapping  = {

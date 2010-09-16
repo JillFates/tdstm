@@ -1,5 +1,7 @@
 import org.jsecurity.crypto.hash.Sha1Hash;
 import org.jsecurity.SecurityUtils;
+import com.tdssrc.grails.GormUtil
+
 class UserLoginController {
     
 	def partyRelationshipService
@@ -179,4 +181,16 @@ class UserLoginController {
             render(view:'create',model:[ userLoginInstance:userLoginInstance,assignedRole:assignedRole,personInstance:personInstance, companyId:companyId ])
         }
     }
+	/*======================================================
+	 *  Update recent page load time into userLogin
+	 *=====================================================*/
+	def updateLastPageLoad = {
+		def principal = SecurityUtils.subject?.principal
+		if( principal ){
+			def userLogin = UserLogin.findByUsername( principal )
+			userLogin.lastPage = GormUtil.convertInToGMT( "now", "EDT" )
+			userLogin.save(flush:true)
+		}
+		render "SUCCESS"
+	 }
 }
