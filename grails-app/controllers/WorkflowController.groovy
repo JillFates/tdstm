@@ -42,6 +42,7 @@ class WorkflowController {
 			def transitionId = params.workflowTransition
 			def workflowTransitionsList
 			def workflowTransition
+			def swimlanes = []
 			def browserTest = request.getHeader("User-Agent").contains("MSIE")
 			def headerCount =0
 			if( transitionId ){
@@ -49,11 +50,49 @@ class WorkflowController {
 				if( !browserTest){
 					headerCount = generateHeder(workflowTransition.workflow.id)
 				}
-				workflowTransitionsList = WorkflowTransition.findAllByWorkflow( workflowTransition?.workflow )
+				workflowTransitionsList = WorkflowTransition.findAll("FROM WorkflowTransition w where w.workflow = ? AND w.code not in ('SourceWalkthru','TargetWalkthru') ", [workflowTransition?.workflow] )
+				def workflowTransitionMap = WorkflowTransitionMap.findAllByWorkflow( workflowTransition?.workflow )
+				def swimlane = Swimlane.findAllByWorkflow( workflowTransition?.workflow )
+				// construct a map for different swimlane roles
+				swimlane.each{ role ->
+					def transitionsMap = []
+					workflowTransitionsList.each { transition->
+						transitionsMap << [transition:transition, workflowTransitionMap : workflowTransitionMap.find{it.workflowTransition.id == workflowTransition.id && it.swimlane.id ==  role.id && it.transId == transition.transId}]
+					}
+					swimlanes << [swimlane : role, transitionsMap : transitionsMap]
+				}
 			}
-			return [workflowTransitionsList : workflowTransitionsList, workflow : workflowTransition?.workflow, browserTest : browserTest,
-					headerCount : headerCount]
+			return [workflowTransitionsList : workflowTransitionsList, workflowTransition:workflowTransition,
+					workflow : workflowTransition?.workflow, browserTest : browserTest,
+					headerCount : headerCount, swimlanes : swimlanes ]
 	}
+	/*====================================================
+	 *  Update the workflow roles
+	 *==================================================*/
+	 def updateWorkflowRoles = {
+		
+		def currentStatus = params.currentStatus
+		def workflowId = params.workflow
+		def workflow = Workflow.get( workflowId )
+		def swimlanes = Swimlane.findAllByWorkflow( workflow )
+		def currentTransition = WorkflowTransition.get( currentStatus )
+		def workflowTransitions = WorkflowTransition.findAll("FROM WorkflowTransition w where w.workflow = ? AND w.code not in ('SourceWalkthru','TargetWalkthru') ", [ workflow ] )
+		swimlanes.each{ role->
+			workflowTransitions.each{transition->
+				def input = params["${role.name}_${transition.id}"]
+				if(input && input.equalsIgnoreCase("on")){
+					def workflowransitionMap = WorkflowTransitionMap.findAll("From WorkflowTransitionMap wtm where wtm.workflowTransition = ? and wtm.swimlane = ? and wtm.transId = ?", [ currentTransition, role, transition.transId ])
+					if(!workflowransitionMap.size()){
+						workflowransitionMap = new WorkflowTransitionMap(workflow:workflow, workflowTransition:currentTransition,swimlane:role,transId:transition.transId, flag:'' ).save(flush:true)
+					}
+				}
+			}
+		}
+		//	load transitions details into application memory.
+    	stateEngineService.loadWorkflowTransitionsIntoMap(workflow.process)
+		
+		redirect(action:workflowList, params:[workflow:workflowId])
+	 }
 	/*-----------------------------------------------
 	 * @param : workfow
 	 * Generate .svg file for vertical text display in FF/ Safari
@@ -79,7 +118,7 @@ class WorkflowController {
 			svgHeaderFile.append("// ]]>")
 			svgHeaderFile.append("</script>")
 			svgHeaderFile.append("<text id='thetext' text-rendering='optimizeLegibility' transform='rotate(270, 90, 0)' font-weight='bold' "+
-								"font-size='12' fill='#333333' x='-11' y='-76' font-family='verdana,arial,helvetica,sans-serif'>")
+								"font-size='12' fill='#333333' x='-44' y='-76' font-family='verdana,arial,helvetica,sans-serif'>")
 			def count = 0
 			tempTransitions.sort{it.transId}.each{ transition ->
 				if(transition.code == "SourceWalkthru" || transition.code == "TargetWalkthru") return 
@@ -91,16 +130,16 @@ class WorkflowController {
 				if(count == 0){
 					svgHeaderFile.append("<tspan fill='$fillColor' id='${transition.transId}'>${processTransition}</tspan>")
 				} else {
-					svgHeaderFile.append("<tspan x='-11' dy='22' fill='$fillColor' id='${transition.transId}'>${processTransition}</tspan>")
+					svgHeaderFile.append("<tspan x='-44' dy='26.2' fill='$fillColor' id='${transition.transId}'>${processTransition}</tspan>")
 				}
 				count++
 			}
 			svgHeaderFile.append("</text>")
-			svgHeaderFile.append("<path d='M 22 0 l 0 120")
-			def value = 22
+			svgHeaderFile.append("<path d='M 26.2 0 l 0 140")
+			def value = 26.2
 			for(int i=0;i<count;i++){
-				value = value+22
-				svgHeaderFile.append(" M ${value} 0 l 0 120")
+				value = value+26.2
+				svgHeaderFile.append(" M ${value} 0 l 0 140")
 			}
 			svgHeaderFile.append("' stroke = '#FFFFFF' stroke-width = '1'/>")
 			svgHeaderFile.append("</svg>")

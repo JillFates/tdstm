@@ -45,7 +45,7 @@ class WorkflowService {
 	    	// Check whether role has permission to change the State
 	    	if ( roleCheck ) {
 	    		flag = stateEngineService.getFlags(process, role, fromState, toState)
-	    		if ( flag.contains("comment") || flag.contains("issue") ) {
+	    		if ( flag?.contains("comment") || flag?.contains("issue") ) {
 	        		if ( ! comment ) {
 	        			verifyFlag = false
 	        			message = "A comment is required"
@@ -160,7 +160,6 @@ class WorkflowService {
 	    														"and id != $assetTransition.id and stateTo not in(select w.transId from WorkflowTransition w "+
 	    														"where w.workflow = '${workflow.id}' and w.transId != $holdState and w.type != 'process' ) ")
 	    	preExistTransitions.each{
-    			println"tesns-->"+it.stateTo
 	    		it.voided = 1
 	    		it.save(flush:true)
 	    	}

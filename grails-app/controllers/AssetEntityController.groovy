@@ -1249,7 +1249,7 @@ class AssetEntityController {
     	def fromState = params.fromState
     	def status = []
     	def flag = stateEngineService.getFlags(projectInstance.workflowCode,"SUPERVISOR", fromState, toState)
-    	if(flag.contains("comment") || flag.contains("issue")){
+    	if(flag?.contains("comment") || flag?.contains("issue")){
     		status<< ['status':'true']
     	}
     	render status as JSON

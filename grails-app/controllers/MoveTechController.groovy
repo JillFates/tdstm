@@ -738,7 +738,7 @@ class MoveTechController {
 	            def loginUser = UserLogin.findByUsername( principal )
 	            def workflow = workflowService.createTransition( moveBundleInstance.project.workflowCode, "MOVE_TECH", actionLabel, asset, bundle, loginUser, loginTeam, params.enterNote )
 	            if ( workflow.success ) {
-	            	if(flags.contains("busy")){
+	            	if(flags?.contains("busy")){
 	            		flash.message = message ( code : workflow.message )
 	                    redirect ( action:'assetSearch', params:params)
 	            	} else {
