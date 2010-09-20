@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <process-definition xmlns="" name="Datacenter Move Operations - Celanese Process" code="DETAILED">
 	<swimlane name="MANAGER">
-		<assignment actor-id="Manager"/>
+		<assignment actor_id="Manager"/>
 	</swimlane>
 	<swimlane name="SUPERVISOR">
-		<assignment actor-id="Supervisor"/>
+		<assignment actor_id="Supervisor"/>
 	</swimlane>
 	<swimlane name="MOVE_TECH">
-		<assignment actor-id="Technician"/>
+		<assignment actor_id="Technician"/>
 	</swimlane>
 	<swimlane name="CLEANER">
-		<assignment actor-id="Cleaner"/>
+		<assignment actor_id="Cleaner"/>
 	</swimlane>
 	<swimlane name="MOVER">
-		<assignment actor-id="Mover"/>
+		<assignment actor_id="Mover"/>
 	</swimlane>
 
 	<transitions>
