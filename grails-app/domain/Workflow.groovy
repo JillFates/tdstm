@@ -9,7 +9,7 @@ class Workflow {
 	static hasMany  = [ WorkflowTransition, WorkflowTransitionMap, Swimlane ]
 	
 	static constraints = {
-		process( blank:false, nullable:false)
+		process( blank:false, nullable:false, unique:true)
 		dateCreated( blank:false, nullable:false  )
 		lastUpdated( blank:true, nullable:true  )
 		updateBy( blank:true, nullable:true  )

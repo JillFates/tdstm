@@ -54,7 +54,6 @@
 <g:form action="updateWorkflowRoles">
 
 <div id="tableContainer" class="${browserTest ? 'tableContainerIE' : 'tableContainer'}" style="margin-left: 5px;margin-right: 10px;">
-<g:if test="${ !browserTest }">
 <table cellpadding="0" cellspacing="0" style="border:1px solid #63A242;margin: 10px 5px 10px 2px;">
 	<thead>
 		<tr>
@@ -62,7 +61,7 @@
 			
 			<g:if test="${browserTest}">
 				<g:each in="${workflowTransitionsList}"  var="transitions">
-					<th class="verticaltext" title="${transitions.code}" style="color: ${transitions.header}" >${transitions?.name}</th>
+					<th class="verticaltext" title="${transitions.code}" style="color: ${transitions.header ? transitions.header : transitions.type == 'boolean' ? '#FF8000' : '#336600'}" nowrap="nowrap">${transitions?.name}</th>
 				</g:each>
 			</g:if>
 			<g:else>
@@ -74,7 +73,7 @@
 		<g:if test="${workflowTransitionsList}">
 		<g:each in="${swimlanes}" var="swimlaneMap">
 			<tr id="swim_${swimlaneMap.swimlane?.id}">
-			<td class="name">${swimlaneMap.swimlane?.name}</td>
+			<td class="name">${swimlaneMap.swimlane?.actorId}</td>
 			<g:each in="${swimlaneMap.transitionsMap}" var="transitionMap">
 				<td id="${swimlaneMap.swimlane?.name}_${transitionMap.transition?.transId}">
 					<g:if test="${transitionMap.workflowTransitionMap}">
@@ -93,10 +92,6 @@
 		</g:else>
 	</tbody>
 </table>
-</g:if>
-<g:else>
-<table><tr><td colspan="40" class="no_records">In progress for IE</td></tr></table>
-</g:else>
 </div>
 <div class="buttons" style="margin-left: 10px;margin-right: 10px;text-align: left;"> 
     	<input type="hidden" name="workflow" value="${workflow?.id}" />

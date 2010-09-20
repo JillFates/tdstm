@@ -1,4 +1,6 @@
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import com.tdssrc.grails.GormUtil
+import org.jsecurity.SecurityUtils
 
 /*------------------------------------------
  * @author : Lokanada Reddy
@@ -17,6 +19,7 @@ class WorkflowController {
 	 *  Will render Workflow data
 	 *---------------------------------------------*/
 	def home = {
+		flash.message = params.message
 		[ workflowInstanceList: Workflow.list( params ) ]
 	}
 
@@ -30,7 +33,7 @@ class WorkflowController {
 		def workflow
 		if( workflowId ){
 			workflow = Workflow.get(params.workflow)
-			workflowTransitionsList = WorkflowTransition.findAllByWorkflow( workflow )
+			workflowTransitionsList = WorkflowTransition.findAll("FROM WorkflowTransition w where w.workflow = ? order by w.transId", [workflow] )
 		}
 		return [workflowTransitionsList : workflowTransitionsList, workflow : workflow ]
 	}
@@ -67,10 +70,87 @@ class WorkflowController {
 					headerCount : headerCount, swimlanes : swimlanes ]
 	}
 	/*====================================================
+	 *  Create  new workflow workflow
+	 *==================================================*/
+	def createWorkflow = {
+		def process = params.process
+		def principal = SecurityUtils.subject.principal
+		def message
+		if(process && principal){
+			def userLogin = UserLogin.findByUsername( principal )
+			def dateNow = GormUtil.convertInToGMT( "now", "EDT" )
+			def workflowInstance = new Workflow( process : process, 
+										dateCreated : dateNow,
+										lastUpdated : dateNow,
+										updateBy : userLogin.person
+										)
+			if ( ! workflowInstance.validate() || ! workflowInstance.save(insert : true, flush:true) ) {
+				message =  "Workfolw \"${workflowInstance}\" should be unique"
+			} else {
+				// create Static swimlanes to the workflow
+				new Swimlane( workflow:workflowInstance, name:'MANAGER', actorId:'Manager').save(insert : true, flush:true)
+				new Swimlane( workflow:workflowInstance, name:'SUPERVISOR', actorId:'Supervisor').save(insert : true, flush:true)
+				new Swimlane( workflow:workflowInstance, name:'MOVE_TECH', actorId:'Technician').save(insert : true, flush:true)
+				new Swimlane( workflow:workflowInstance, name:'CLEANER', actorId:'Cleaner').save(insert : true, flush:true)
+				new Swimlane( workflow:workflowInstance, name:'MOVER', actorId:'Mover').save(insert : true, flush:true)
+				
+				message = "Workfolw \"${workflowInstance}\" created"
+			}
+		}
+		redirect( action:home, params:[ message : message ] )
+	}
+	/*====================================================
+	 *  Update the workflow steps for selected workflow
+	 *  @param : workflowId, steps 
+	 *==================================================*/
+	def updateWorkflowSteps = {
+		def workflowId = params.workflow
+		def workflowTransitionsList
+		def workflow
+		if(workflowId){
+			workflow = Workflow.get( workflowId )
+			def workflowTransitions = WorkflowTransition.findAllByWorkflow( workflow )
+			workflowTransitions.each{ workflowTransition ->
+				
+				workflowTransition.code = params["code_"+workflowTransition.id]
+				workflowTransition.name = params["name_"+workflowTransition.id]
+				workflowTransition.transId = params["transId_"+workflowTransition.id] ? Integer.parseInt( params["transId_"+workflowTransition.id] ) : null
+				workflowTransition.type = params["type_"+workflowTransition.id]
+				workflowTransition.color = params["color_"+workflowTransition.id]
+				workflowTransition.dashboardLabel = params["dashboardLabel_"+workflowTransition.id]
+				workflowTransition.predecessor = params["predecessor_"+workflowTransition.id] ? Integer.parseInt( params["predecessor_"+workflowTransition.id] ) : null
+				workflowTransition.header = params["header_"+workflowTransition.id]
+				
+				if ( workflowTransition.validate() && workflowTransition.save(insert : true, flush:true) ) {
+					println "Workfolw step \"${workflowTransition}\" updated"
+				}
+			}
+			// add new steps to the workflow
+			def additionalSteps = Integer.parseInt(params.additionalSteps)
+			for(int i=1; i <= additionalSteps; i++){
+				def workflowTransition = new WorkflowTransition(workflow : workflow,
+																code : params["code_$i"], 
+																name : params["name_$i"],
+																transId : params["transId_$i"] ? Integer.parseInt( params["transId_$i"] ) : null,
+																type : params["type_$i"],	
+																color : params["color_$i"],
+																dashboardLabel : params["dashboardLabel_$i"],
+																predecessor : params["predecessor_$i"] ? Integer.parseInt( params["predecessor_$i"] ) : null,
+																header : params["header_$i"]		
+																)
+				if ( workflowTransition.validate() && workflowTransition.save(insert : true, flush:true) ) {
+					println "Workfolw step \"${workflowTransition}\" updated"
+				}
+			}
+			
+			workflowTransitionsList = WorkflowTransition.findAll("FROM WorkflowTransition w where w.workflow = ? order by w.transId", [workflow] )
+		}
+		render( view : 'workflowList', model : [ workflowTransitionsList : workflowTransitionsList, workflow : workflow ] )
+	}
+	/*====================================================
 	 *  Update the workflow roles
 	 *==================================================*/
-	 def updateWorkflowRoles = {
-		
+	def updateWorkflowRoles = {
 		def currentStatus = params.currentStatus
 		def workflowId = params.workflow
 		def workflow = Workflow.get( workflowId )

@@ -93,7 +93,7 @@ println """Definition of table `workflow_transition_map` ....."""
 				def slist = new StringBuffer()
 				xml.swimlane.each{ s ->
 					s.assignment.each{
-						slist.append("(${workflow.id},'${s.@name.text()}','${s.@actorId.text()}'),")
+						slist.append("(${workflow.id},'${s.@name.text()}','${it.@actor_id.text()}'),")
 					}
 				}
 				
