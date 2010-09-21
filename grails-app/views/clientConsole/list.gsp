@@ -105,10 +105,10 @@
 				</span>
 				&nbsp;&nbsp;
 				<span style="display: none;" id="bulkTaskSpanId">
+					<input type="button" name="bulkNa" id="bulkNaId" value="N/A" onclick="changeAction('NA')"/>
 					<input type="button" name="bulkPending" id="bulkPendingId" value="Pending" onclick="changeAction('pending')"/>
 					<input type="button" name="bulkDone" id="bulkDoneId" value="Done" onclick="changeAction('done')"/>
 					<input type="button" name="bulkUndo" id="bulkUndoId" value="Undo" onclick="changeAction('void')"/>
-					<input type="button" name="bulkNa" id="bulkNaId" value="N/A" onclick="changeAction('NA')"/>
 					<input type="hidden" name="bulkAction" id="bulkActionId" value="done"/>
 				</span>
 			</td>
@@ -1085,22 +1085,31 @@ Comment</a></span></div>
 	}
 	var bulkEdit = true;
 	function performBulkEdit(){
-		var bulkEditButton = $("#bulkEditId");
+		
 		if(bulkEdit){
-			alert("You are now in bulk edit mode. Select the state then the cells you want to change. Remember to turn off Bulk Edit when done." )
-			bulkEditButton.removeClass("bulkedit_inactive")
-			bulkEditButton.addClass("bulkedit_active")
-			bulkEdit = false
-			/*------- show Done as default ----------*/
-			changeAction( "done" )
-			
-			$("#bulkTaskSpanId").show();
+			${remoteFunction(action:'setBulkWarning', onComplete:'showBulkEdit(e);' )}
 		} else {
+			var bulkEditButton = $("#bulkEditId");
 			bulkEditButton.removeClass("bulkedit_active")
 			bulkEditButton.addClass("bulkedit_inactive")
+			bulkEditButton.attr('value','Bulk Edit')
 			bulkEdit = true
 			$("#bulkTaskSpanId").hide();			
 		}
+	}
+	function showBulkEdit(e){
+		var bulkEditButton = $("#bulkEditId");
+		if(e.responseText != "true"){
+			alert("You are now in bulk edit mode. Select the state then the cells you want to change. Remember to turn off Bulk Edit when done." )
+		}
+		bulkEditButton.removeClass("bulkedit_inactive")
+		bulkEditButton.addClass("bulkedit_active")
+		bulkEditButton.attr('value','End Bulk Edit');
+		bulkEdit = false
+		/*------- show Done as default ----------*/
+		changeAction( "done" )
+		
+		$("#bulkTaskSpanId").show();
 	}
 	function changeAction( action ){
 		switch ( action ){

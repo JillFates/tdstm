@@ -894,4 +894,24 @@ class ClientConsoleController {
 
 		render columnList as JSON
 	}
+	/*
+	 * Add a user preference "BULK_WARNING" with a time stamp+24hrs. If the user re-enters bulk edit mode, and BulkWarning time is > now, don't show the popup warning.
+	 */
+	def setBulkWarning = {
+		def dateNow = GormUtil.convertInToGMT( "now", "EDT" )
+		userPreferenceService.loadPreferences("BULK_WARNING")
+		def bulkWarning = getSession().getAttribute("BULK_WARNING")?.BULK_WARNING
+		def status = "true"
+		if( !bulkWarning ){
+			status = "false"
+			userPreferenceService.setPreference("BULK_WARNING", "${dateNow.getTime()+86400000}")
+		} else {
+			def bulkWarningTime = Long.parseLong( bulkWarning )
+			if( bulkWarningTime < dateNow.getTime() ){
+				status = "false"
+				userPreferenceService.setPreference("BULK_WARNING", "${dateNow.getTime()+86400000}")
+			}
+		}
+		render status
+	}
 }
