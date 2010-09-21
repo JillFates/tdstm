@@ -38,7 +38,7 @@
 				<th>U</th>
 				<th>Device</th>
 				<th>Bundle</th>
-				<th>U</th>
+				<%--<th>U</th>--%>
 			</tr>
 			${rackLayout?.frontViewRows}
 		</table>
@@ -64,8 +64,8 @@
 				<th>Device</th>
 				<th>Bundle</th>
 				<th>Cabling</th>
-				<th>U</th>
-		 	<%--<th>Pos</th>
+				<%--<th>U</th>
+		 	<th>Pos</th>
 				<th>PDU</th>
 				<th>NIC</th>
 				<th>Mgmt</th>

@@ -13,8 +13,9 @@ class RackLayoutsController {
 		def projectInstance = Project.findById( projectId )
 		def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
 		userPreferenceService.loadPreferences("CURR_BUNDLE")
-		def currentBundle = getSession().getAttribute("CURR_BUNDLE")
-		
+		def currentBundle = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
+		/* set first bundle as default if user pref not exist */
+		currentBundle = currentBundle ? currentBundle : moveBundleInstanceList[0]?.id
 		[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, currentBundle:currentBundle]
 	}
 	
@@ -204,6 +205,8 @@ class RackLayoutsController {
 	
 	def getRackDetails = {
 		def bundle = MoveBundle.get(params.bundleId)
+		/* set user pref CURR_BUNDLE */
+		userPreferenceService.setPreference( "CURR_BUNDLE", params.bundleId )
 		def rackDetails = [[sourceRackList:bundle.sourceRacks, targetRackList:bundle.targetRacks]]
 		render rackDetails as JSON
 	}
@@ -346,7 +349,8 @@ class RackLayoutsController {
 				row.append("<td class='${rackStyle}'>${it.rack}</td>")
 				rowspan--
 			}
-			row.append("<td class='${rackStyle}'>${it.rack}</td>")
+			// Remove right U-position number 
+			//row.append("<td class='${rackStyle}'>${it.rack}</td>")
 			row.append("</tr>")
 			rows.append(row.toString())
 		}

@@ -109,7 +109,7 @@
 <div id="editWorkflowList" style="display: none;">
 <g:form action="updateWorkflowSteps" name="updateWorkflowStepsForm">
 <input type="hidden" name="workflow" value="${workflow?.id}" />
-<input type="text" name="additionalSteps" id="additionalStepsId" value="0">
+<input type="hidden" name="additionalSteps" id="additionalStepsId" value="0">
 <input type="hidden" name="currentSteps" id="currentStepsId" value="${workflowTransitionsList.size()}">
 <table>
 	<thead>

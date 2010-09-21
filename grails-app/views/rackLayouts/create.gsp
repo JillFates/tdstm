@@ -13,8 +13,10 @@
       	var targetSelectObj = $('#targetRackId');
       	var sourceRacks = rackDetails[0].sourceRackList;
       	var targetRacks = rackDetails[0].targetRackList;
-      	generateOptions(sourceSelectObj,sourceRacks,'all');
-      	generateOptions(targetSelectObj,targetRacks,'none');
+      	generateOptions(sourceSelectObj,sourceRacks,'none');
+      	generateOptions(targetSelectObj,targetRacks,'all');
+      	/* Start with generated default */
+      	$('input[value=Generate]').click();
      }
      function generateOptions(selectObj,racks,sel){
      	if (racks) {
@@ -211,7 +213,7 @@
 			<td>
 				<div style="width:150px">
 					<label for="frontView" ><input type="checkbox" name="frontView" id="frontView" checked="checked" />&nbsp;Front</label><br /><br />
-					<label for="backView" ><input type="checkbox" name="backView" id="backView" checked="checked" />&nbsp;Back</label><br /><br />
+					<label for="backView" ><input type="checkbox" name="backView" id="backView" />&nbsp;Back</label><br /><br />
 					<label for="bundleName" ><input type="checkbox" name="bundleName" checked="checked" />&nbsp;Include bundle names</label>
 				</div>
 			</td>
@@ -251,7 +253,7 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		var bundleObj = $("#bundleId");
-		bundleObj.val('${currentBundle?.CURR_BUNDLE}');
+		bundleObj.val('${currentBundle}');
 		var bundleId = bundleObj.val();
 		${remoteFunction(action:'getRackDetails', params:'\'bundleId=\' + bundleId', onComplete:'updateRackDetails(e)')};
 		
