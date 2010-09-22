@@ -17,7 +17,7 @@ class WorkflowTransition {
 	
 	static constraints = {
 		workflow( blank:false, nullable:false )
-		code( blank:false, nullable:false )
+		code( blank:false, nullable:false, unique:'workflow' )
 		name( blank:false, nullable:false )
 		transId( blank:false, nullable:false )
 		type( blank:false, nullable:false, inList: ['process', 'boolean'] )

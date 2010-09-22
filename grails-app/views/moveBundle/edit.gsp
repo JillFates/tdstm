@@ -339,10 +339,10 @@
 									onclick="enableInput(${dashboardStep.step.id })" title="Dashboard"/>
 								</td>
 								<td>
-									<div id="labelText_${dashboardStep.step.id }" title="text">${dashboardStep.moveBundleStep?.label}</div>
+									<div id="labelText_${dashboardStep.step.id }" title="text"></div>
 									<div id="labelInput_${dashboardStep.step.id }" style="display: none;" title="input">
 									<input type="text" name="dashboardLabel_${dashboardStep.step.id }" id="dashboardLabel_${dashboardStep.step.id }" 
-									value="${dashboardStep.moveBundleStep?.label ? dashboardStep.moveBundleStep?.label : dashboardStep.step.name}"/>
+									value="${dashboardStep.step?.label ? dashboardStep.step?.label : dashboardStep.step.name}"/>
 									</div>
 								</td>
 								<td>

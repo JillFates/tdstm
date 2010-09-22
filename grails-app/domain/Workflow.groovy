@@ -17,6 +17,7 @@ class Workflow {
 	
 	static mapping  = {
 		version false
+		autoTimestamp false
 		id column:'workflow_id'
 		updateBy column: 'updated_by'
 	}

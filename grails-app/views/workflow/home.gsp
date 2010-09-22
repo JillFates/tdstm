@@ -65,7 +65,7 @@
             <table>
               <tbody>
               <tr>
-				<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+				<td colspan="2"><div class="required"></div> </td>
 				</tr>
               	<tr class="prop">
                 	<td valign="top" class="name">

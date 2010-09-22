@@ -1,12 +1,15 @@
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import com.tdssrc.grails.GormUtil
 import org.jsecurity.SecurityUtils
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 
 /*------------------------------------------
  * @author : Lokanada Reddy
  * Controller to perform the workflow CRUD operations
  * ----------------------------------------*/
 class WorkflowController {
+	protected static Log log = LogFactory.getLog( WorkflowController.class )
 	
 	/* Initialize the services */
 	def stateEngineService
@@ -87,13 +90,34 @@ class WorkflowController {
 			if ( ! workflowInstance.validate() || ! workflowInstance.save(insert : true, flush:true) ) {
 				message =  "Workfolw \"${workflowInstance}\" should be unique"
 			} else {
-				// create Static swimlanes to the workflow
-				new Swimlane( workflow:workflowInstance, name:'MANAGER', actorId:'Manager').save(insert : true, flush:true)
-				new Swimlane( workflow:workflowInstance, name:'SUPERVISOR', actorId:'Supervisor').save(insert : true, flush:true)
-				new Swimlane( workflow:workflowInstance, name:'MOVE_TECH', actorId:'Technician').save(insert : true, flush:true)
-				new Swimlane( workflow:workflowInstance, name:'CLEANER', actorId:'Cleaner').save(insert : true, flush:true)
-				new Swimlane( workflow:workflowInstance, name:'MOVER', actorId:'Mover').save(insert : true, flush:true)
-				
+				def stdWorkflow = Workflow.findByProcess("STD_PROCESS")
+				if( stdWorkflow ){
+					/* create Standerd swimlanes to the workflow */
+					def stdSwimlanes = Swimlane.findAllByWorkflow( stdWorkflow )
+					stdSwimlanes.each{ stdSwimlane->
+						def swimlane = new Swimlane( workflow:workflowInstance, name:stdSwimlane.name, actorId:stdSwimlane?.actorId)
+						if (  swimlane.validate() && swimlane.save( flush:true) ) {
+							log.debug("Swimlane \"${swimlane}\" created")
+						}
+					}
+					/* create Standerd Workflow transitions to the workflow */
+					def stdWorkflowTransitions = WorkflowTransition.findAllByWorkflow( stdWorkflow )
+					stdWorkflowTransitions.each{ stdWorkflowTransition ->
+						def workflowTransition = new WorkflowTransition(workflow : workflowInstance,
+																		code : stdWorkflowTransition.code, 
+																		name : stdWorkflowTransition.name,
+																		transId : stdWorkflowTransition.transId,
+																		type : stdWorkflowTransition.type,	
+																		color : stdWorkflowTransition.color,
+																		dashboardLabel : stdWorkflowTransition.dashboardLabel,
+																		predecessor : stdWorkflowTransition.predecessor,
+																		header : stdWorkflowTransition.header
+																		)
+							if (  workflowTransition.validate() && workflowTransition.save( flush:true) ) {
+								log.debug("Standerd Workfolw step \"${workflowTransition}\" created")
+							} 
+					}
+				}
 				message = "Workfolw \"${workflowInstance}\" created"
 			}
 		}
@@ -107,8 +131,15 @@ class WorkflowController {
 		def workflowId = params.workflow
 		def workflowTransitionsList
 		def workflow
-		if(workflowId){
+		def principal = SecurityUtils.subject.principal
+		if(workflowId && principal){
+			 flash.message = ""
 			workflow = Workflow.get( workflowId )
+			// update the workflow updated by
+			workflow.updateBy = UserLogin.findByUsername( principal )?.person
+			if ( workflow.validate() && workflow.save(insert : true, flush:true) ) {
+				log.debug("Workfolw \"${workflow}\" updated")
+			}	
 			def workflowTransitions = WorkflowTransition.findAllByWorkflow( workflow )
 			workflowTransitions.each{ workflowTransition ->
 				
@@ -120,9 +151,10 @@ class WorkflowController {
 				workflowTransition.dashboardLabel = params["dashboardLabel_"+workflowTransition.id]
 				workflowTransition.predecessor = params["predecessor_"+workflowTransition.id] ? Integer.parseInt( params["predecessor_"+workflowTransition.id] ) : null
 				workflowTransition.header = params["header_"+workflowTransition.id]
-				
-				if ( workflowTransition.validate() && workflowTransition.save(insert : true, flush:true) ) {
-					println "Workfolw step \"${workflowTransition}\" updated"
+				if (  ! workflowTransition.validate() || ! workflowTransition.save( flush:true) ) {
+					//workflowTransition.errors.allErrors.each() { flash.message += it }
+				} else {
+					log.debug("Workfolw step \"${workflowTransition}\" updated")
 				}
 			}
 			// add new steps to the workflow
@@ -138,8 +170,11 @@ class WorkflowController {
 																predecessor : params["predecessor_$i"] ? Integer.parseInt( params["predecessor_$i"] ) : null,
 																header : params["header_$i"]		
 																)
-				if ( workflowTransition.validate() && workflowTransition.save(insert : true, flush:true) ) {
-					println "Workfolw step \"${workflowTransition}\" updated"
+				
+				if (  ! workflowTransition.validate() || ! workflowTransition.save( flush:true) ) {
+					flash.message += "["+workflowTransition.code +"]"
+				} else {
+					log.debug("Workfolw step \"${workflowTransition}\" updated")
 				}
 			}
 			
@@ -164,6 +199,13 @@ class WorkflowController {
 					def workflowransitionMap = WorkflowTransitionMap.findAll("From WorkflowTransitionMap wtm where wtm.workflowTransition = ? and wtm.swimlane = ? and wtm.transId = ?", [ currentTransition, role, transition.transId ])
 					if(!workflowransitionMap.size()){
 						workflowransitionMap = new WorkflowTransitionMap(workflow:workflow, workflowTransition:currentTransition,swimlane:role,transId:transition.transId, flag:'' ).save(flush:true)
+					}
+				} else {
+					def workflowransitionMap = WorkflowTransitionMap.findAll("From WorkflowTransitionMap wtm where wtm.workflowTransition = ? and wtm.swimlane = ? and wtm.transId = ?", [ currentTransition, role, transition.transId ])
+					if(workflowransitionMap.size()){
+						workflowransitionMap.each{
+							it.delete()
+						}
 					}
 				}
 			}
@@ -230,7 +272,7 @@ class WorkflowController {
 				fop.flush()
 				fop.close()
 			} else {
-				println("This file is not exist")
+				log.error("This file is not exist")
 			}
 			return count
 	}

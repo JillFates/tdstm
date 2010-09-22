@@ -3,6 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="companyHeader" />
 <title>Workflow</title>
+<script type="text/javascript"> var showOption = 'show'</script>
 </head>
 <body>
 <div class="body">
@@ -47,8 +48,17 @@
 	</tr>
 </table>
 </div>
+<div class="errors">
+	<g:each in="${workflowTransitionsList}" var="workflowTransition">
+		<g:hasErrors bean="${workflowTransition}">
+		<g:renderErrors bean="${workflowTransition}" as="list" />
+		<script type="text/javascript">showOption = 'edit'</script>
+		</g:hasErrors>
+	</g:each>
+</div>
 <g:if test="${flash.message}">
-	<div class="message">${flash.message}</div>
+	<div class="errors" style="padding-left:30px; background: url('../images/skin/exclamation.png') no-repeat scroll 8px 0 transparent"> Field with value ${flash.message} must be unique</div>
+	<script type="text/javascript">showOption = 'edit'</script>
 </g:if>
 <div class="required"> Fields marked ( * ) are mandatory </div>
 <br/>
@@ -222,6 +232,7 @@ function editWorkflowList(){
 	$("#additionalStepsId").val(0)
 	$("#currentStepsId").val("${workflowTransitionsList.size()}")
 }
+if(showOption == "edit"){editWorkflowList()}
 /*=========================================
  * Validate workflow steps update form before submit
  *========================================*/
