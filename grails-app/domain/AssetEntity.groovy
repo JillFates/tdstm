@@ -175,12 +175,12 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		if(assetType != 'Blade' && project != null) {
 			if(sourceRack != null && sourceRack != '' && (rackSource == null || !rackSource.sourceAssets?.contains(this))) {
 				rackSource = Rack.findOrCreateWhere(source:1, 'project.id':project.id, location:sourceLocation, room:sourceRoom, tag:sourceRack)
-				save(flush:true)
+				save()
 			}
 			
 			if(targetRack != null && targetRack != '' && (rackTarget == null || !rackTarget.targetAssets?.contains(this))) {
 				rackTarget = Rack.findOrCreateWhere(source:0, 'project.id':project.id, location:targetLocation, room:targetRoom, tag:targetRack)
-				save(flush:true)
+				save()
 			}
 		}
 	}
