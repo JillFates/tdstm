@@ -73,7 +73,7 @@ class WorkflowService {
 		    				message = setTransitionTimeElapsed(assetTransition)
 		    				message = "Transaction created successfully"
 		    				if(projectTeam){
-								projectTeam.isIdle = flag.contains('busy') ? 1 : 0
+								projectTeam.isIdle = flag?.contains('busy') ? 1 : 0
 								projectTeam.latestAsset = assetEntity
 								projectTeam.save(flush:true)
 		    				}

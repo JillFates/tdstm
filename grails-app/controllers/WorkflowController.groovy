@@ -37,6 +37,8 @@ class WorkflowController {
 		if( workflowId ){
 			workflow = Workflow.get(params.workflow)
 			workflowTransitionsList = WorkflowTransition.findAll("FROM WorkflowTransition w where w.workflow = ? order by w.transId", [workflow] )
+		} else {
+			redirect(action:home)
 		}
 		return [workflowTransitionsList : workflowTransitionsList, workflow : workflow ]
 	}
@@ -67,6 +69,8 @@ class WorkflowController {
 					}
 					swimlanes << [swimlane : role, transitionsMap : transitionsMap]
 				}
+			} else {
+				redirect(action:home)
 			}
 			return [workflowTransitionsList : workflowTransitionsList, workflowTransition:workflowTransition,
 					workflow : workflowTransition?.workflow, browserTest : browserTest,
@@ -179,6 +183,8 @@ class WorkflowController {
 			}
 			
 			workflowTransitionsList = WorkflowTransition.findAll("FROM WorkflowTransition w where w.workflow = ? order by w.transId", [workflow] )
+		} else {
+			redirect(action:home)
 		}
 		render( view : 'workflowList', model : [ workflowTransitionsList : workflowTransitionsList, workflow : workflow ] )
 	}
