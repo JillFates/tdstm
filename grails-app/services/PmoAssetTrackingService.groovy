@@ -402,7 +402,8 @@ class PmoAssetTrackingService {
 				ae.remote_mgmt_port as remote_MgmtPort, ae.fiber_cabinet as fiberCabinet, ae.fiber_type as fiberType, ae.fiber_quantity as fiberQuantity,
 				ae.hba_port as hbaPort, ae.kvm_device as kvmDevice, ae.kvm_port as kvmPort, mb.name as moveBundle, ae.truck,
 				ae.new_or_old as newOrOld, ae.priority, ae.cart, ae.shelf, spt.team_code as sourceTeam, tpt.team_code as targetTeam,
-				max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate, ae.current_status as currentStatus
+				max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate, ae.custom1 as custom1, ae.custom2 as custom2,ae.custom3 as custom3,
+				ae.custom3 as custom4,ae.custom5 as custom5,ae.custom6 as custom6,ae.custom7 as custom7,ae.custom8 as custom8,ae.current_status as currentStatus
 				FROM asset_entity ae
 				LEFT JOIN move_bundle mb ON (ae.move_bundle_id = mb.move_bundle_id )
 				LEFT JOIN project_team spt ON (ae.source_team_id = spt.project_team_id )
@@ -497,7 +498,8 @@ class PmoAssetTrackingService {
 				ae.remote_mgmt_port as remote_MgmtPort, ae.fiber_cabinet as fiberCabinet, ae.fiber_type as fiberType, ae.fiber_quantity as fiberQuantity,
 				ae.hba_port as hbaPort, ae.kvm_device as kvmDevice, ae.kvm_port as kvmPort, mb.name as moveBundle, ae.truck,
 				ae.new_or_old as newOrOld, ae.priority, ae.cart, ae.shelf, spt.team_code as sourceTeam, tpt.team_code as targetTeam,
-				max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate, ae.current_status as currentStatus
+				max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate, ae.custom1 as custom1, ae.custom2 as custom2,ae.custom3 as custom3,
+				ae.custom3 as custom4,ae.custom5 as custom5,ae.custom6 as custom6,ae.custom7 as custom7,ae.custom8 as custom8, ae.current_status as currentStatus
 				FROM asset_entity ae
 				LEFT JOIN move_bundle mb ON (ae.move_bundle_id = mb.move_bundle_id )
 				LEFT JOIN project_team spt ON (ae.source_team_id = spt.project_team_id )

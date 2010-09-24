@@ -6,7 +6,7 @@ import com.tdssrc.grails.GormUtil
 class UserPreferenceService  {
 
 	static transactional = true
-	
+    protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8']
 	/*
      * Return current session object
      */
@@ -215,7 +215,24 @@ class UserPreferenceService  {
 		def attributeLabel2 = EavAttribute.findByAttributeCode( attribute2 ).frontendLabel
 		def attributeLabel3 = EavAttribute.findByAttributeCode( attribute3 ).frontendLabel
 		def attributeLabel4 = EavAttribute.findByAttributeCode( attribute4 ).frontendLabel
+		
+		def projectId = getSession().getAttribute( "CURR_PROJ" )?.CURR_PROJ
+		def project = Project.findById( projectId )
+		
+		if( customLabels.contains( attributeLabel1 ) )
+			attributeLabel1 = project[attribute1] ? project[attribute1] : attributeLabel1 
+		
+		if( customLabels.contains( attributeLabel2 ) )
+			attributeLabel2 = project[attribute2] ? project[attribute2] : attributeLabel2
+		
+		if( customLabels.contains( attributeLabel3 ) )
+			attributeLabel3 = project[attribute3] ? project[attribute3] : attributeLabel3
 
+		if( customLabels.contains( attributeLabel4 ) )
+			attributeLabel4 = project[attribute4] ? project[attribute4] : attributeLabel4
+		
+
+		
 		def columns = [column1:[label:attributeLabel1, field:attribute1], column2:[label:attributeLabel2, field:attribute2], 
 					   column3:[label:attributeLabel3, field:attribute3], column4:[label:attributeLabel4, field:attribute4]]
 		return columns;

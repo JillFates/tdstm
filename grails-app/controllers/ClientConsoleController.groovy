@@ -3,16 +3,18 @@ import org.jsecurity.SecurityUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import com.tdssrc.grails.GormUtil
 import javax.servlet.http.HttpSession
-
+import com.tdssrc.eav.*
 class ClientConsoleController {
-	def stateEngineService
-	def userPreferenceService
-	def workflowService
-    def jdbcTemplate
-	def pmoAssetTrackingService
-    def index = { 
-    	redirect(action:list,params:params)
-    }
+	
+	 protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8']
+	 def stateEngineService
+	 def userPreferenceService
+	 def workflowService
+	 def jdbcTemplate
+	 def pmoAssetTrackingService
+	 def index = { 
+		 redirect(action:list,params:params)
+	 }
 	/*-----------------------------------------------------
 	 *  List of asset for client console
 	 *  @author : Lokanath Reddy
@@ -228,6 +230,17 @@ class ClientConsoleController {
 			def assetsInView = params.assetsInView && params.assetsInView != "all"? Integer.parseInt(params.assetsInView) : totalAssets
 			if ( !params.max ) params.max = assetsInView
 			if ( !params.offset ) params.offset = 0
+			
+			/* Asset Entity attributes for Filters*/
+			def attributes = EavEntityAttribute.findAll()?.attribute
+			def attributesList = []
+			attributes.each{ attribute ->
+				def frontendLabel = attribute.frontendLabel
+				if( customLabels.contains( frontendLabel ) ){
+					frontendLabel = moveEventInstance.project[attribute.attributeCode] ? moveEventInstance.project[attribute.attributeCode] : frontendLabel 
+				}
+				attributesList << [attributeCode: attribute.attributeCode, frontendLabel:frontendLabel]
+			}
             return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,
 				column1List:column1List, column2List:column2List,column3List:column3List, column4List:column4List,projectId:projectId, lastPoolTime : lastPoolTime,
                 processTransitionList:processTransitionList,projectId:projectId,column2Value:params.column2,column1Value:params.column1,
@@ -235,7 +248,7 @@ class ClientConsoleController {
                 headerCount:headerCount,browserTest:browserTest, myForm : params.myForm, role : role,
                 moveEventInstance:moveEventInstance, moveEventsList:moveEventsList,
                 isAdmin:subject.hasRole("ADMIN"), isManager:subject.hasRole("MANAGER"), isProjManager:subject.hasRole("PROJ_MGR"),
-				columns:columns, assetsInView:assetsInView, totalAssets:totalAssets ]
+				columns:columns, assetsInView:assetsInView, totalAssets:totalAssets, attributesList:attributesList ]
     	
         } else {
     		flash.message = "Please create move event and bundle to view PMO Dashboard"

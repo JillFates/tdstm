@@ -39,9 +39,6 @@
 
             <td valign="top" class="value">${projectInstance?.client}</td>
 
-          </tr>
-
-          <tr class="prop">
             <td valign="top" class="name">Project Code:</td>
 
             <td valign="top" class="value">${fieldValue(bean:projectInstance, field:'projectCode')}</td>
@@ -53,12 +50,9 @@
 
             <td valign="top" class="value">${fieldValue(bean:projectInstance, field:'name')}</td>
 
-          </tr>
-          
-          <tr class="prop">
-            	<td valign="top" class="name">Project Type:</td>
+	       	<td valign="top" class="name">Project Type:</td>
 
-            	<td valign="top" class="value">${fieldValue(bean:projectInstance, field:'projectType')}</td>
+          	<td valign="top" class="value">${fieldValue(bean:projectInstance, field:'projectType')}</td>
           </tr>
 
           <tr class="prop">
@@ -66,9 +60,6 @@
 
             <td valign="top" class="value"><textarea cols="40"  rows="3" readOnly="true" >${fieldValue(bean:projectInstance, field:'description')}</textarea></td>
 
-          </tr>
-
-          <tr class="prop">
             <td valign="top" class="name">Comment:</td>
 
             <td valign="top" class="value"><textarea cols="40"  rows="3" readOnly="true" >${fieldValue(bean:projectInstance, field:'comment')}</textarea></td>
@@ -80,9 +71,6 @@
 
             <td valign="top" class="value"><tds:convertDate date="${projectInstance?.startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 
-          </tr>
-
-          <tr class="prop">
             <td valign="top" class="name">Completion Date:</td>
 
             <td valign="top" class="value"><tds:convertDate date="${projectInstance?.completionDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
@@ -94,9 +82,6 @@
 
             <td valign="top" class="value">${projectPartner?.partyIdTo}</td>
 
-          </tr>
-          
-          <tr class="prop">
             <td valign="top" class="name">Partner Image:</td>
 			<g:if test="${projectLogoForProject}">
             <td valign="top" class="value"><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;"/></td>
@@ -105,23 +90,63 @@
 
           <tr class="prop">
             <td valign="top" class="name">Project Manager:</td>
-                <td valign="top" class="value">
+            <td valign="top" class="value">
                 <g:if test="${projectManager?.partyIdTo?.lastName}">${projectManager?.partyIdTo?.lastName},</g:if>
                 <g:if test="${projectManager?.partyIdTo?.firstName}"> ${projectManager?.partyIdTo?.firstName}</g:if>
                 <g:if test="${projectManager?.partyIdTo?.title}"> - ${projectManager?.partyIdTo?.title}</g:if>
-                 </td>
-          </tr>
-
-          <tr class="prop">
+            </td>
             <td valign="top" class="name">Move Manager:</td>
             <td valign="top" class="value">
-            <g:if test="${moveManager?.partyIdTo?.lastName}">${moveManager?.partyIdTo?.lastName},</g:if>
-            <g:if test="${moveManager?.partyIdTo?.firstName}"> ${moveManager?.partyIdTo?.firstName}</g:if>
-            <g:if test="${moveManager?.partyIdTo?.title}"> - ${moveManager?.partyIdTo?.title}</g:if>
-            
+	            <g:if test="${moveManager?.partyIdTo?.lastName}">${moveManager?.partyIdTo?.lastName},</g:if>
+	            <g:if test="${moveManager?.partyIdTo?.firstName}"> ${moveManager?.partyIdTo?.firstName}</g:if>
+	            <g:if test="${moveManager?.partyIdTo?.title}"> - ${moveManager?.partyIdTo?.title}</g:if>
             </td>
           </tr>
 
+		  <tr class="prop">
+		  
+          	<td valign="top" class="name"><g:message code="project.custom1.label" default="Custom1 Label" /></td>
+                            
+            <td valign="top" class="value">${fieldValue(bean: projectInstance, field: "custom1")}</td>
+            
+            <td valign="top" class="name"><g:message code="project.custom2.label" default="Custom2 Label" /></td>
+                            
+            <td valign="top" class="value">${fieldValue(bean: projectInstance, field: "custom2")}</td>
+            
+          </tr>
+          <tr class="prop">
+		  
+          	<td valign="top" class="name"><g:message code="project.custom3.label" default="Custom3 Label" /></td>
+                            
+            <td valign="top" class="value">${fieldValue(bean: projectInstance, field: "custom3")}</td>
+            
+            <td valign="top" class="name"><g:message code="project.custom4.label" default="Custom4 Label" /></td>
+                            
+            <td valign="top" class="value">${fieldValue(bean: projectInstance, field: "custom4")}</td>
+            
+          </tr>
+          <tr class="prop">
+		  
+          	<td valign="top" class="name"><g:message code="project.custom5.label" default="Custom5 Label" /></td>
+                            
+            <td valign="top" class="value">${fieldValue(bean: projectInstance, field: "custom5")}</td>
+            
+            <td valign="top" class="name"><g:message code="project.custom6.label" default="Custom6 Label" /></td>
+                            
+            <td valign="top" class="value">${fieldValue(bean: projectInstance, field: "custom6")}</td>
+            
+          </tr>
+          <tr class="prop">
+		  
+          	<td valign="top" class="name"><g:message code="project.custom7.label" default="Custom7 Label" /></td>
+                            
+            <td valign="top" class="value">${fieldValue(bean: projectInstance, field: "custom7")}</td>
+            
+            <td valign="top" class="name"><g:message code="project.custom8.label" default="Custom8 Label" /></td>
+                            
+            <td valign="top" class="value">${fieldValue(bean: projectInstance, field: "custom8")}</td>
+            
+          </tr>
           <tr class="prop">
             <td valign="top" class="name">Workflow Code:</td>
 
@@ -134,9 +159,6 @@
               <label for="dateCreated">Date Created:</label>
             </td>
             <td valign="top" class="value"><tds:convertDateTime date="${projectInstance?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
-          </tr>
-
-          <tr class="prop">
             <td valign="top" class="name">
               <label for="lastUpdated">Last Updated:</label>
             </td>

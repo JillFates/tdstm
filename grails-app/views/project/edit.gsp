@@ -32,9 +32,18 @@
                     <table>
                         <tbody>
 		                        <tr>
-								<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+								<td colspan="4"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 								</tr>
-                                                    
+                            <tr class="prop">
+					            <td valign="top" class="name">Associated Client:</td>
+					
+					            <td valign="top" class="value">${projectInstance?.client}</td>
+					
+					            <td valign="top" class="name">Project Code:</td>
+					
+					            <td valign="top" class="value">${fieldValue(bean:projectInstance, field:'projectCode')}</td>
+					
+					        </tr>           
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="name"><b>Project Name:&nbsp;<span style="color: red">*</span></b>:</label>
@@ -47,8 +56,6 @@
 					            </div>
 					            </g:hasErrors>
                                 </td>
-                            </tr> 
-                            <tr class="prop">
 								<td valign="top" class="name"><label for="projectType"><b>Project Type:&nbsp;<span style="color: red">*</span></b></label></td>
 								<td valign="top" class="value ${hasErrors(bean:projectInstance,field:'projectType','errors')}">
 									<g:select id="projectType" name="projectType" from="${projectInstance.constraints.projectType.inList}" value="${projectInstance.projectType}"></g:select>
@@ -69,8 +76,6 @@
 					            </div>
 					            </g:hasErrors>
                                 </td>
-                            </tr>
-                            <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="comment">Comment:</label>
                                 </td>
@@ -93,10 +98,8 @@
 			                   value="<tds:convertDate date="${projectInstance?.startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="setCompletionDate(this.value);isValidDate(this.value);"/>
 							<g:hasErrors bean="${projectInstance}" field="startDate">
 			                    <div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="startDate" /></div>
-			                </g:hasErrors></td>
-			              </tr>
-			
-			              <tr class="prop">
+			                </g:hasErrors>
+			                </td>
 			                <td valign="top" class="name"><label for="completionDate">Completion Date:</label></td>
 			                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'completionDate','errors')}">
 			                  <script type="text/javascript" charset="utf-8">
@@ -119,10 +122,8 @@
 			                    <g:each status="i" in="${companyPartners}" var="companyPartners">
 			                      <option value="${companyPartners?.partyIdTo.id}">${companyPartners?.partyIdTo}</option>
 			                    </g:each>
-			                </select></td>
-			              </tr>
-			              
-			              <tr class="prop">
+			                </select>
+			                </td>
 							<td valign="top" class="name"><label for="client">Partner Image:</label>
 							</td>
 							<g:if test="${projectLogoForProject}">
@@ -159,9 +160,6 @@
 			                      </g:each>
 			                    </optgroup>
 			                </select></td>
-			              </tr>
-			
-			              <tr class="prop">
 			                <td valign="top" class="name"><label for="moveManager">Move
 			                Manager:</label></td>
 			                <td valign="top" class="value"><select id="moveManagerId"
@@ -190,15 +188,74 @@
 			                  <input type="hidden" id="companyManagersId" value="${companyStaff.size()+clientStaff.size()+ 1}" />
 			                </td>
 			              </tr>
+			              <tr class="prop">
+                                <td valign="top" class="name">
+                                  <label for="custom1"><g:message code="project.custom1.label" default="Custom1" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom1', 'errors')}">
+                                    <g:textField name="custom1" value="${projectInstance?.custom1}" />
+                                </td>
+                                <td valign="top" class="name">
+                                  <label for="custom2"><g:message code="project.custom2.label" default="Custom2" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom2', 'errors')}">
+                                    <g:textField name="custom2" value="${projectInstance?.custom2}" />
+                                </td>
+                           </tr>
+                           <tr class="prop">
+                                <td valign="top" class="name">
+                                  <label for="custom3"><g:message code="project.custom3.label" default="Custom3" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom3', 'errors')}">
+                                    <g:textField name="custom3" value="${projectInstance?.custom3}" />
+                                </td>
+                                <td valign="top" class="name">
+                                  <label for="custom4"><g:message code="project.custom4.label" default="Custom4" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom4', 'errors')}">
+                                    <g:textField name="custom4" value="${projectInstance?.custom4}" />
+                                </td>
+                           </tr>
+                           <tr class="prop">
+                                <td valign="top" class="name">
+                                  <label for="custom5"><g:message code="project.custom5.label" default="Custom5" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom5', 'errors')}">
+                                    <g:textField name="custom5" value="${projectInstance?.custom5}" />
+                                </td>
+                                <td valign="top" class="name">
+                                  <label for="custom6"><g:message code="project.custom6.label" default="Custom6" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom6', 'errors')}">
+                                    <g:textField name="custom6" value="${projectInstance?.custom6}" />
+                                </td>
+                           </tr>
+                           <tr class="prop">
+                                <td valign="top" class="name">
+                                  <label for="custom7"><g:message code="project.custom7.label" default="Custom7" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom7', 'errors')}">
+                                    <g:textField name="custom7" value="${projectInstance?.custom7}" />
+                                </td>
+                                <td valign="top" class="name">
+                                  <label for="custom8"><g:message code="project.custom8.label" default="Custom8" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom8', 'errors')}">
+                                    <g:textField name="custom8" value="${projectInstance?.custom8}" />
+                                </td>
+                           </tr>
+						   <tr class="prop">
 			
+					            <td valign="top" class="name">Workflow Code:</td>
+					
+					            <td valign="top" class="value">${fieldValue(bean:projectInstance, field:'workflowCode')}</td>
+			
+			        	  </tr>
 			              <tr class="prop">
 			                <td valign="top" class="name">
 			                  <label for="dateCreated">Date Created:</label>
 			                </td>
 			                <td valign="top" class="value"><tds:convertDateTime date="${projectInstance?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
-			              </tr>
-			
-			              <tr class="prop">
 			                <td valign="top" class="name">
 			                  <label for="lastUpdated">Last Updated:</label>
 			                </td>

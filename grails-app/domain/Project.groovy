@@ -11,6 +11,16 @@ class Project extends PartyGroup {
     String workflowCode
     String projectType = "Standard"
     
+	// Custom field labels
+    	String custom1
+    	String custom2
+    	String custom3
+    	String custom4
+    	String custom5
+    	String custom6
+    	String custom7
+    	String custom8
+		
 	static hasMany = [ dataTransferBatch : DataTransferBatch ]
 	
 	static constraints = {
@@ -25,6 +35,15 @@ class Project extends PartyGroup {
 		lastUpdated( ) // related to party
 		workflowCode( blank:false, nullable:false )
 		projectType( blank:false, nullable:false, inList:['Standard', 'Template', 'Demo'] )
+		// custom fields
+		custom1( blank:true, nullable:true )
+		custom2( blank:true, nullable:true )
+		custom3( blank:true, nullable:true )
+		custom4( blank:true, nullable:true )
+		custom5( blank:true, nullable:true )
+		custom6( blank:true, nullable:true )
+		custom7( blank:true, nullable:true )
+		custom8( blank:true, nullable:true )
 	}
 
 	static mapping  = {

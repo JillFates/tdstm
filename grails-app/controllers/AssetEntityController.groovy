@@ -27,7 +27,7 @@ class AssetEntityController {
     def filterService
 	def moveBundleService
 	def sessionFactory 
-    
+    protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8']
 	def index = {
 		redirect( action:list, params:params )
 	}
@@ -663,6 +663,8 @@ class AssetEntityController {
         items = [id:assetEntityInstance.id, model: assetEntityInstance.model, sourceLocation: assetEntityInstance.sourceLocation, targetLocation: assetEntityInstance.targetLocation, sourceRack: assetEntityInstance.sourceRack, targetRack: assetEntityInstance.targetRack, sourceRackPosition: assetEntityInstance.sourceRackPosition, targetRackPosition: assetEntityInstance.targetRackPosition, usize: assetEntityInstance.usize, manufacturer: assetEntityInstance.manufacturer, fiberCabinet: assetEntityInstance.fiberCabinet, hbaPort: assetEntityInstance.hbaPort, hinfo: assetEntityInstance.hinfo, ipAddress: assetEntityInstance.ipAddress, kvmDevice: assetEntityInstance.kvmDevice, kvmPort: assetEntityInstance.kvmPort, newOrOld: assetEntityInstance.newOrOld, nicPort: assetEntityInstance.nicPort, pduPort: assetEntityInstance.pduPort, remoteMgmtPort: assetEntityInstance.remoteMgmtPort, truck: assetEntityInstance.truck, project:assetEntityInstance.project.name, projectId:assetEntityInstance.project.id, assetTag:assetEntityInstance.assetTag, assetName:assetEntityInstance.assetName, serialNumber:assetEntityInstance.serialNumber, application:assetEntityInstance.application ]
         }*/
         def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
+		def projectId = getSession().getAttribute( "CURR_PROJ" )?.CURR_PROJ
+		def project = Project.findById( projectId )
         entityAttributeInstance.each{
         	def attributeOptions = EavAttributeOption.findAllByAttribute( it.attribute )
     		def options = []
@@ -670,7 +672,11 @@ class AssetEntityController {
     			options<<[option:option.value]
     		}
 			if( it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam" && it.attribute.attributeCode != "currentStatus" ){
-        		items << [label:it.attribute.frontendLabel, attributeCode:it.attribute.attributeCode, 
+				def frontEndLabel = it.attribute.frontendLabel
+				if( customLabels.contains( frontEndLabel ) ){
+					frontEndLabel = project[it.attribute.attributeCode] ? project[it.attribute.attributeCode] : frontEndLabel 
+				}
+				items << [label:frontEndLabel, attributeCode:it.attribute.attributeCode, 
 						  	frontendInput:it.attribute.frontendInput, 
         		          	options : options, 
 							value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode).toString() : "",
@@ -749,6 +755,8 @@ class AssetEntityController {
     		//entityAttributeInstance =  EavEntityAttribute.findAllByEavAttributeSetOrderBySortOrder( attributeSetInstance )
     		entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $attributeSetId order by eav.sortOrder ")
         }
+    	def projectId = getSession().getAttribute( "CURR_PROJ" )?.CURR_PROJ
+		def project = Project.findById( projectId )
     	entityAttributeInstance.each{
     		def attributeOptions = EavAttributeOption.findAllByAttribute( it.attribute )
     		def options = []
@@ -756,7 +764,11 @@ class AssetEntityController {
     			options<<[option:option.value]
     		}
     		if( it.attribute.attributeCode != "moveBundle" && it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam" && it.attribute.attributeCode != "currentStatus"){
-    			items<<[ label:it.attribute.frontendLabel, attributeCode:it.attribute.attributeCode, 
+    			def frontEndLabel = it.attribute.frontendLabel
+				if( customLabels.contains( frontEndLabel ) ){
+					frontEndLabel = project[it.attribute.attributeCode] ? project[it.attribute.attributeCode] : frontEndLabel 
+				}
+    			items<<[ label:frontEndLabel, attributeCode:it.attribute.attributeCode, 
     			         frontendInput:it.attribute.frontendInput, options : options ]
     		}
     	}
