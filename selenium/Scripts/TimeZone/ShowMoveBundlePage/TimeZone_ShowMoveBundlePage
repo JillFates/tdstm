@@ -54,12 +54,12 @@
 </tr>
 <tr>
 	<td>gotoIf</td>
-	<td>bundleL=true</td>
+	<td>${bundleL}==true</td>
 	<td>label25</td>
 </tr>
 <tr>
 	<td>gotoIf</td>
-	<td>bundleL=false</td>
+	<td>${bundleL}==false</td>
 	<td>label30</td>
 </tr>
 <tr>

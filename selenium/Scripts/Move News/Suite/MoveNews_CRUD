@@ -249,6 +249,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>storeTable</td>
+	<td>assetEntityTable.1.0</td>
+	<td>createdAt</td>
+</tr>
+<tr>
 	<td>clickAndWait</td>
 	<td>link=Dashboard</td>
 	<td></td>
