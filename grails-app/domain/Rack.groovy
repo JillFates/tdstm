@@ -25,20 +25,24 @@ class Rack {
 	
 	static Rack findOrCreateWhere(params) {
 		def r = createCriteria()
-		def results = r.list {
-			eq('source', params.source.toInteger() ? 1 : 0)
-			eq('project.id', params['project.id'])
-			if(params.location == null)
-				isNull('location')
-			else
-				eq('location', params.location)
-			if(params.room == null)
-				isNull('room')
-			else
-				eq('room', params.room)
-			eq('tag', params.tag)
+		def results
+		try{
+			results = r.list {
+				eq('source', params.source.toInteger() ? 1 : 0)
+				eq('project.id', params['project.id'])
+				if(params.location == null)
+					isNull('location')
+				else
+					eq('location', params.location)
+				if(params.room == null)
+					isNull('room')
+				else
+					eq('room', params.room)
+				eq('tag', params.tag)
+			}
+		} catch( Exception ex ){
+			println"$ex"
 		}
-
 		// Create a new rack if it doesn't exist
 		def rack = results[0]
 		if(rack == null)
