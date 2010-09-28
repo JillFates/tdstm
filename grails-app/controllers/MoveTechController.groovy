@@ -917,7 +917,7 @@ class MoveTechController {
                     def membersCount = ( ( teamMembers.toString() ).tokenize("/") ).size()
                     teamMembers = membersCount + "(" + teamMembers.toString() + ")"
                     def bundleId = assetItem.moveBundle?.id
-                    def teamId
+                   /* def teamId
                     def teamName
                     if ( assetItem.sourceTeam ) {
                         teamId = ( assetItem.sourceTeam.id ).toString()
@@ -938,7 +938,7 @@ class MoveTechController {
                                          ])
                             return;
                         }
-                    }
+                    }*/
                     /*if ( bundleId != Integer.parseInt ( moveBundleId ) ) {
                         flash.message = message ( code : "The asset [${assetItem.assetName}] is not part of move bundle [${moveBundleId}]" )
                         if ( textSearch ) {

@@ -105,44 +105,44 @@
 
 		  <tr class="prop">
 		  
-          	<td valign="top" class="name"><g:message code="project.custom1.label" default="Custom1 Label" /></td>
+          	<td valign="top" class="name"><g:message code="project.custom1.label" default="Custom1 Label" />:</td>
                             
             <td valign="top" class="value">${fieldValue(bean: projectInstance, field: "custom1")}</td>
             
-            <td valign="top" class="name"><g:message code="project.custom2.label" default="Custom2 Label" /></td>
+            <td valign="top" class="name"><g:message code="project.custom2.label" default="Custom2 Label" />:</td>
                             
             <td valign="top" class="value">${fieldValue(bean: projectInstance, field: "custom2")}</td>
             
           </tr>
           <tr class="prop">
 		  
-          	<td valign="top" class="name"><g:message code="project.custom3.label" default="Custom3 Label" /></td>
+          	<td valign="top" class="name"><g:message code="project.custom3.label" default="Custom3 Label" />:</td>
                             
             <td valign="top" class="value">${fieldValue(bean: projectInstance, field: "custom3")}</td>
             
-            <td valign="top" class="name"><g:message code="project.custom4.label" default="Custom4 Label" /></td>
+            <td valign="top" class="name"><g:message code="project.custom4.label" default="Custom4 Label" />:</td>
                             
             <td valign="top" class="value">${fieldValue(bean: projectInstance, field: "custom4")}</td>
             
           </tr>
           <tr class="prop">
 		  
-          	<td valign="top" class="name"><g:message code="project.custom5.label" default="Custom5 Label" /></td>
+          	<td valign="top" class="name"><g:message code="project.custom5.label" default="Custom5 Label" />:</td>
                             
             <td valign="top" class="value">${fieldValue(bean: projectInstance, field: "custom5")}</td>
             
-            <td valign="top" class="name"><g:message code="project.custom6.label" default="Custom6 Label" /></td>
+            <td valign="top" class="name"><g:message code="project.custom6.label" default="Custom6 Label" />:</td>
                             
             <td valign="top" class="value">${fieldValue(bean: projectInstance, field: "custom6")}</td>
             
           </tr>
           <tr class="prop">
 		  
-          	<td valign="top" class="name"><g:message code="project.custom7.label" default="Custom7 Label" /></td>
+          	<td valign="top" class="name"><g:message code="project.custom7.label" default="Custom7 Label" />:</td>
                             
             <td valign="top" class="value">${fieldValue(bean: projectInstance, field: "custom7")}</td>
             
-            <td valign="top" class="name"><g:message code="project.custom8.label" default="Custom8 Label" /></td>
+            <td valign="top" class="name"><g:message code="project.custom8.label" default="Custom8 Label" />:</td>
                             
             <td valign="top" class="value">${fieldValue(bean: projectInstance, field: "custom8")}</td>
             

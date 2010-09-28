@@ -190,13 +190,13 @@
 			              </tr>
 			              <tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="custom1"><g:message code="project.custom1.label" default="Custom1" /></label>
+                                  <label for="custom1"><g:message code="project.custom1.label" default="Custom1 Label" />:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom1', 'errors')}">
                                     <g:textField name="custom1" value="${projectInstance?.custom1}" />
                                 </td>
                                 <td valign="top" class="name">
-                                  <label for="custom2"><g:message code="project.custom2.label" default="Custom2" /></label>
+                                  <label for="custom2"><g:message code="project.custom2.label" default="Custom2 Label" />:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom2', 'errors')}">
                                     <g:textField name="custom2" value="${projectInstance?.custom2}" />
@@ -204,13 +204,13 @@
                            </tr>
                            <tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="custom3"><g:message code="project.custom3.label" default="Custom3" /></label>
+                                  <label for="custom3"><g:message code="project.custom3.label" default="Custom3 Label" />:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom3', 'errors')}">
                                     <g:textField name="custom3" value="${projectInstance?.custom3}" />
                                 </td>
                                 <td valign="top" class="name">
-                                  <label for="custom4"><g:message code="project.custom4.label" default="Custom4" /></label>
+                                  <label for="custom4"><g:message code="project.custom4.label" default="Custom4 Label" />:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom4', 'errors')}">
                                     <g:textField name="custom4" value="${projectInstance?.custom4}" />
@@ -218,13 +218,13 @@
                            </tr>
                            <tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="custom5"><g:message code="project.custom5.label" default="Custom5" /></label>
+                                  <label for="custom5"><g:message code="project.custom5.label" default="Custom5 Label" />:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom5', 'errors')}">
                                     <g:textField name="custom5" value="${projectInstance?.custom5}" />
                                 </td>
                                 <td valign="top" class="name">
-                                  <label for="custom6"><g:message code="project.custom6.label" default="Custom6" /></label>
+                                  <label for="custom6"><g:message code="project.custom6.label" default="Custom6 Label" />:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom6', 'errors')}">
                                     <g:textField name="custom6" value="${projectInstance?.custom6}" />
@@ -232,13 +232,13 @@
                            </tr>
                            <tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="custom7"><g:message code="project.custom7.label" default="Custom7" /></label>
+                                  <label for="custom7"><g:message code="project.custom7.label" default="Custom7 Label" />:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom7', 'errors')}">
                                     <g:textField name="custom7" value="${projectInstance?.custom7}" />
                                 </td>
                                 <td valign="top" class="name">
-                                  <label for="custom8"><g:message code="project.custom8.label" default="Custom8" /></label>
+                                  <label for="custom8"><g:message code="project.custom8.label" default="Custom8 Label" />:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom8', 'errors')}">
                                     <g:textField name="custom8" value="${projectInstance?.custom8}" />
