@@ -53,12 +53,12 @@
 </tr>
 <tr>
 	<td>gotoIf</td>
-	<td>bundleList=true</td>
+	<td>${bundleList}==true</td>
 	<td>label3</td>
 </tr>
 <tr>
 	<td>gotoIf</td>
-	<td>bundleList=false</td>
+	<td>${bundleList}==false</td>
 	<td>label4</td>
 </tr>
 <tr>
@@ -237,12 +237,12 @@
 <!--Cleaning Team Worksheets page-->
 <tr>
 	<td>click</td>
-	<td>link=Cleaning Team Worksheets</td>
+	<td>link=Logistics Team Worksheets</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyTitle</td>
-	<td>Cleaning Team Worksheets</td>
+	<td>Logistics Team Worksheets</td>
 	<td></td>
 </tr>
 <tr>
