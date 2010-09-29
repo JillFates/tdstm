@@ -195,7 +195,7 @@ class PersonRoleSelectTagLib {
     void outputAttributes(attrs) {
         attrs.remove( 'tagName') // Just in case one is left
         attrs.each {k, v ->
-            out << k << "=\"" << v.encodeAsHTML() << "\" "
+            out << k << "=\"" << v?.encodeAsHTML() << "\" "
         }
     }
 

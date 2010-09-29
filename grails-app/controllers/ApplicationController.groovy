@@ -36,9 +36,13 @@ class ApplicationController {
     def delete = {
 		try{
 	        def applicationInstance = Application.get( params.id )
-	        def partyGroupInstance = PartyGroup.get( params.id )
+	        def partyGroupInstance = Party.get( params.id )
 	        if(applicationInstance) {
-	            applicationInstance.delete(flush:true)
+	            //applicationInstance.delete(flush:true)
+				def appPartyRelationship = PartyRelationship.findAllWhere( partyRelationshipType:PartyRelationshipType.findById( "APPLICATION" ), partyIdFrom:applicationInstance, roleTypeCodeFrom:RoleType.findById( "APP_ROLE" ))
+				appPartyRelationship.each{
+	            	it.delete()
+	            }
 	            if( partyGroupInstance ){
 	            	partyGroupInstance.delete(flush:true)
 	            }
