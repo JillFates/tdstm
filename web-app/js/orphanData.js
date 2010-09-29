@@ -482,13 +482,13 @@ function getDeatiledReport( records, table ){
 	}
 	return thead + tbody
 }
-function getConvertedTimeFormate( date, offset ){
+function getConvertedTimeFormate( dateString, offset ){
 	var timeString = ""
-	if(date){
+	if(dateString){
+		var date = new Date(dateString)
 		var utcDate = date.getTime() ;
 	    var convertedDate = new Date(utcDate + (3600000*offset));
 		var month =  convertedDate.getMonth();
-		
 		if( !isNaN(month) ){
 		   month = month + 1;
 		   var monthday    = convertedDate.getDate();
