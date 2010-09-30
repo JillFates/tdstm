@@ -268,7 +268,7 @@ function validateField(value, objId, field){
 			$("#"+objId).removeAttr("title")
 		}
 	} else if(field == "predecessor"){
-		if(!intRegExp.test(value)){
+		if(value && !intRegExp.test(value)){
 			$("#"+objId).addClass('field_error')
 			$("#"+objId).attr("title","Start should be numaric")
 		} else {
