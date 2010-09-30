@@ -69,7 +69,7 @@
                                     <label for="comment">Comment:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:projectTeamInstance,field:'comment','errors')}">
-                                    <textarea rows="3" cols="80" id="comment" name="comment">${fieldValue(bean:projectTeamInstance,field:'comment')}</textarea>
+                                    <textarea rows="3" cols="80" id="comment" name="comment"  onkeyup="textCounter(this.id,255)" onkeydown="textCounter(this.id,255)">${fieldValue(bean:projectTeamInstance,field:'comment')}</textarea>
                                 </td>
                             </tr>
                         
@@ -133,5 +133,19 @@
                 </div>
             </g:form>
         </div>
+         <script type="text/javascript">
+        /*
+         * validate the text area size
+        */
+        function textCounter(fieldId, maxlimit) {
+        	var value = $("#"+fieldId).val()
+            if (value.length > maxlimit) { // if too long...trim it!
+            	$("#"+fieldId).val(value.substring(0, maxlimit));
+            	return false;
+            } else {
+            	return true;
+            }
+        }
+        </script>
     </body>
 </html>

@@ -313,7 +313,7 @@
 				<td valign="top" class="name"><label for="messageId"><b>Comment:&nbsp;<span style="color: red">*</span></b></label>
 				</td>
 				<td valign="top" class="value"><textarea cols="80" rows="5"
-					id="messageId" name="message"></textarea></td>
+					id="messageId" name="message" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea></td>
 			</tr>
 			<tr class="prop">
 				<td valign="top" class="name" nowrap="nowrap"><label for="isArchivedId" >Resolved / Archived:</label></td>
@@ -326,7 +326,7 @@
 				<td valign="top" class="name"><label for="resolutionNewsId">Resolution:</label>
 				</td>
 				<td valign="top" class="value" ><textarea cols="80" rows="5"
-						id="resolutionNewsId" name="resolution"></textarea> </td>
+						id="resolutionNewsId" name="resolution" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea> </td>
 			</tr>
 			
 		</table>
@@ -384,7 +384,7 @@
 				<td valign="top" class="name"><label for="comment">Comment:</label>
 				</td>
 				<td valign="top" class="value" ><textarea cols="80" rows="5"
-						id="commentTdId" name="comment"></textarea> </td>
+						id="commentTdId" name="comment" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea> </td>
 			</tr>
 			<tr class="prop">
 				<td valign="top" class="name" nowrap="nowrap"><label for="isResolved" >Resolved / Archived:</label></td>
@@ -397,7 +397,7 @@
 				<td valign="top" class="name"><label for="resolution">Resolution:</label>
 				</td>
 				<td valign="top" class="value" ><textarea cols="80" rows="5"
-						id="resolutionId" name="resolution"></textarea> </td>
+						id="resolutionId" name="resolution" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea> </td>
 			</tr>
 				<tr>
 		<td valign="top" class="name"><label for="dateResolved">Resolved
@@ -1172,6 +1172,18 @@
 	}
 	// used to call the function once page loaded
 	getMoveEventNewsDetails($('#moveEvent').val())
+	/*
+	 * validate the text area size
+	*/
+	function textCounter(fieldId, maxlimit) {
+		var value = $("#"+fieldId).val()
+	    if (value.length > maxlimit) { // if too long...trim it!
+	    	$("#"+fieldId).val(value.substring(0, maxlimit));
+	    	return false;
+	    } else {
+	    	return true;
+	    }
+	}
 	</script>
 </div>
 </html>

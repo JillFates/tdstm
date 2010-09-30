@@ -480,7 +480,7 @@ td .odd {
 	</tr>
 	<tr>
 		<td><textarea rows="2" cols="1" title="Enter Note..."
-			name="enterNote" id="enterNote" style="width: 200%"></textarea></td>
+			name="enterNote" id="enterNote" style="width: 200%" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea></td>
 	</tr>
 	<tr>
 		<td></td>
@@ -939,7 +939,7 @@ td .odd {
 							</tr>
 							<tr>
 								<td colspan="2" style="text-align: center;">
-									<textarea name="comment" id="commentId" cols="25" rows="2"></textarea></td>
+									<textarea name="comment" id="commentId" cols="25" rows="2" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea></td>
 							</tr>
 							<tr>
 								<td colspan="2" style="text-align: center;" class="buttonR">
@@ -1018,7 +1018,7 @@ Comment</a></span></div>
 				<td valign="top" class="name"><label for="comment">Comment:</label>
 				</td>
 				<td valign="top" class="value"><textarea cols="80" rows="5"
-					id="comment" name="comment"></textarea></td>
+					id="comment" name="comment" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea></td>
 			</tr>
 		
 	</table>
@@ -1039,7 +1039,7 @@ Comment</a></span></div>
                 <label for="resolution">Resolution:</label>
                 </td>
 				<td valign="top" class="value">
-                <textarea cols="80" rows="5" id="resolution" name="resolution" ></textarea>
+                <textarea cols="80" rows="5" id="resolution" name="resolution" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)" ></textarea>
                 </td>
             </tr> 
                 
@@ -1194,7 +1194,7 @@ Comment</a></span></div>
 				<td valign="top" class="name"><label for="comment">Comment:</label>
 				</td>
 				<td valign="top" class="value"><textarea cols="80" rows="5"
-					id="commentEditId" name="comment"></textarea></td>
+					id="commentEditId" name="comment" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea></td>
 			</tr>
 			</table>
 			
@@ -1215,7 +1215,7 @@ Comment</a></span></div>
                 <label for="resolution">Resolution:</label>
                 </td>
 				<td valign="top" class="value">
-                <textarea cols="80" rows="5" id="resolutionEditId" name="resolution" ></textarea>
+                <textarea cols="80" rows="5" id="resolutionEditId" name="resolution" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea>
                 </td>
             </tr> 
                <tr>

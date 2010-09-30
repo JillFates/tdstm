@@ -40,7 +40,7 @@
 	</tr>
 	<tr>
 		<td>
-		<textarea rows="2" cols="1"  title="Enter Note..." name="enterNote" id="enterNote" style="width: 200%"></textarea>
+		<textarea rows="2" cols="1"  title="Enter Note..." name="enterNote" id="enterNote" style="width: 200%" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea>
 		</td>
 	</tr>
 	<tr>
@@ -357,7 +357,7 @@ Comment</a></span></div>
 				<td valign="top" class="name"><label for="comment">Comment:</label>
 				</td>
 				<td valign="top" class="value"><textarea cols="80" rows="5"
-					id="comment" name="comment"></textarea></td>
+					id="comment" name="comment" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea></td>
 			</tr>
 		
 	</table>
@@ -370,7 +370,7 @@ Comment</a></span></div>
             </tr>
             <tr class="prop">
 		<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
-		<td valign="top" class="value"><textarea cols="80" rows="5" id="resolution" name="resolution" ></textarea></td>
+		<td valign="top" class="value"><textarea cols="80" rows="5" id="resolution" name="resolution" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea></td>
             </tr> 
             </table>
             </div>
@@ -499,7 +499,7 @@ Comment</a></span></div>
 	</tr>
 	<tr class="prop">
 		<td valign="top" class="name"><label for="comment">Comment:</label></td>
-		<td valign="top" class="value"><textarea cols="80" rows="5" id="commentEditId" name="comment"></textarea></td>
+		<td valign="top" class="value"><textarea cols="80" rows="5" id="commentEditId" name="comment" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea></td>
 	</tr>
 </table>
 </div>
@@ -513,7 +513,7 @@ Comment</a></span></div>
 	</tr>
 	<tr class="prop">
 		<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
-		<td valign="top" class="value"><textarea cols="80" rows="5" id="resolutionEditId" name="resolution" ></textarea></td>
+		<td valign="top" class="value"><textarea cols="80" rows="5" id="resolutionEditId" name="resolution" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea></td>
 	</tr>
 	<tr>
 		<td valign="top" class="name"><label for="dateResolved">Resolved At:</label></td>
