@@ -151,6 +151,10 @@ class AssetEntityController {
             redirect( controller:"asset", action:"assetImport" )
             return;
         }
+        def projectCustomLabels = new HashMap()
+        for(int i = 1; i< 9; i++){
+        	if (project["custom"+i]) projectCustomLabels.put(project["custom"+i], "Custom"+i)
+        }
         // get File
         MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
         CommonsMultipartFile file = ( CommonsMultipartFile ) mpr.getFile("file")
@@ -165,7 +169,12 @@ class AssetEntityController {
         def dataTransferAttributeMapSheetName
         //get column name and sheets
         dataTransferAttributeMap.eachWithIndex { item, pos ->
-            list.add( item.columnName )
+            if(customLabels.contains( item.columnName )){
+            	def customLabel = project[item.eavAttribute?.attributeCode] ? project[item.eavAttribute?.attributeCode] : item.columnName
+            	list.add( customLabel )
+            } else {
+            	list.add( item.columnName )
+            }
             sheetNameMap.put( "sheetName", (item.sheetName).trim() )
         }
         try {
@@ -247,7 +256,15 @@ class AssetEntityController {
                         	if(server){
                         		def dataTransferValueList = new StringBuffer()
 	                        	for( int cols = 0; cols < col; cols++ ) {
-	                        		def dataTransferAttributeMapInstance = DataTransferAttributeMap.findByColumnName(sheet.getCell( cols, 0 ).contents)
+	                        		def dataTransferAttributeMapInstance
+	                        		def projectCustomLabel = projectCustomLabels[sheet.getCell( cols, 0 ).contents.toString()]
+	                        		if(projectCustomLabel){
+	                        			dataTransferAttributeMapInstance = dataTransferAttributeMap.find{it.columnName == projectCustomLabel}
+	                        		} else {
+	                        			dataTransferAttributeMapInstance = dataTransferAttributeMap.find{it.columnName == sheet.getCell( cols, 0 ).contents}
+	                        		}
+	                        			
+	                        		//dataTransferAttributeMapInstance = DataTransferAttributeMap.findByColumnName(sheet.getCell( cols, 0 ).contents)
 	                            	if( dataTransferAttributeMapInstance != null ) {
 	                            		def assetId
 	                            		if( sheetColumnNames.containsKey("assetId") && (sheet.getCell( 0, r ).contents != "") ) {
@@ -452,6 +469,16 @@ class AssetEntityController {
                     //update data from Asset Entity table to EXCEL
                     def assetSize = asset.size()
                     def columnNameListSize = columnNameList.size()
+					// update column header 
+					for ( int head =0; head <= sheetColumnNames.size(); head++ ) {
+						def cellData = sheet.getCell(head,0)?.getContents()
+						def attributeMap = dataTransferAttributeMap.find{it.columnName ==  cellData }?.eavAttribute
+						if(attributeMap?.attributeCode && customLabels.contains( cellData )){
+							def columnLabel = project[attributeMap?.attributeCode] ? project[attributeMap?.attributeCode] : cellData
+							def customColumn = new Label(head,0, columnLabel )
+                            sheet.addCell(customColumn)
+						}
+					}
                     for ( int r = 1; r <= assetSize; r++ ) {
                         //Add assetId for walkthrough template only.
                         if( sheetColumnNames.containsKey("assetId") ) {
