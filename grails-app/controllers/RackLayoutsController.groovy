@@ -94,14 +94,14 @@ class RackLayoutsController {
 							if(position > maxUSize) {
 								asset.position = maxUSize
 								asset.rowspan = 1 
-								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
+								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' - ' + assetEntity.assetName
 								asset.overlapError = true
 								asset.cssClass = "rack_error"
 								flag = false
 							} else if(ignoreLow) {
 								asset.position = currentHigh
 								asset.rowspan = currentHigh - currentLow + 1 
-								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
+								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' - ' + assetEntity.assetName
 								asset.overlapError = true
 								asset.cssClass = "rack_error"
 								flag = false
@@ -110,7 +110,7 @@ class RackLayoutsController {
 								asset.currentLow = newLow
 								asset.position = newHigh
 								asset.rowspan = newHigh - newLow + 1
-								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
+								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' - ' + assetEntity.assetName
 								asset.overlapError = true
 								asset.cssClass = "rack_error"
 								flag = false
@@ -118,7 +118,7 @@ class RackLayoutsController {
 								asset.currentHigh = newHigh
 								asset.position = newHigh
 								asset.rowspan = newHigh - currentLow  + 1
-								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
+								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' - ' + assetEntity.assetName
 								asset.overlapError = true
 								asset.cssClass = "rack_error"
 								flag = false
@@ -126,7 +126,7 @@ class RackLayoutsController {
 								asset.currentLow = newLow
 								asset.position = currentHigh
 								asset.rowspan = currentHigh - newLow +1
-								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
+								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' - ' + assetEntity.assetName
 								asset.overlapError = true
 								asset.cssClass = "rack_error"
 								flag = false
@@ -227,8 +227,8 @@ class RackLayoutsController {
 				def assetTag = ""
 				if(it.cssClass == "rack_error")
 					assetTag += "Devices Overlap:<br />"
-
-				assetTagsList.each{
+					
+				assetTagsList.each{	
 					def index = it.indexOf('-')
 					def tag
 					if (index != -1) {
@@ -236,8 +236,9 @@ class RackLayoutsController {
 					} else {
 						tag = it
 					}
+					def id = AssetEntity.findByAssetTag( tag )?.id
 					moveBundle += (assetEntity?.moveBundle ? assetEntity?.moveBundle.name : "") + "<br/>"
-					assetTag += "<a href='javascript:openAssetEditDialig(${assetEntity?.id})' >$it</a> <br/>"
+					assetTag += "<a href='javascript:openAssetEditDialig(${id})' >$it</a> <br/>"
 				}
 				if(!isAdmin)
 					assetTag = it.asset?.assetTag
