@@ -30,11 +30,11 @@ class Rack {
 			results = r.list {
 				eq('source', params.source.toInteger() ? 1 : 0)
 				eq('project.id', params['project.id'])
-				if(params.location == null)
+				if( !params.location )
 					isNull('location')
 				else
 					eq('location', params.location)
-				if(params.room == null)
+				if( !params.room)
 					isNull('room')
 				else
 					eq('room', params.room)
@@ -45,7 +45,7 @@ class Rack {
 		}
 		// Create a new rack if it doesn't exist
 		def rack = results[0]
-		if(rack == null)
+		if( !rack )
 			rack = new Rack(params).save()
 		
 		return rack

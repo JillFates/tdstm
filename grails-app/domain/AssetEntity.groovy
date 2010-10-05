@@ -174,12 +174,11 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		try{
 			// Make sure the asset points to source/target racks if there is enough information for it
 			if(assetType != 'Blade' && project != null) {
-				if(sourceRack != null && sourceRack != '' && (rackSource == null || !rackSource.sourceAssets?.contains(this))) {
+				if( sourceRack ) {
 					rackSource = Rack.findOrCreateWhere(source:1, 'project.id':project.id, location:sourceLocation, room:sourceRoom, tag:sourceRack)
 					save()
 				}
-				
-				if(targetRack != null && targetRack != '' && (rackTarget == null || !rackTarget.targetAssets?.contains(this))) {
+				if( targetRack ) {
 					rackTarget = Rack.findOrCreateWhere(source:0, 'project.id':project.id, location:targetLocation, room:targetRoom, tag:targetRack)
 					save()
 				}
