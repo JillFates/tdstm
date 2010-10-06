@@ -71,7 +71,13 @@ class RackLayoutsController {
 				def assetDetails = []
 				def assetDetail = []
 				def finalAssetList = []
-				rack.assets.findAll { it.moveBundle == moveBundle }.sort { rack?.source == '1' ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}.each { assetEntity ->
+				def racksByFilter
+				if(includeOtherBundle){
+					racksByFilter = rack.assets.sort { rack?.source == '1' ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
+				} else {
+					racksByFilter = rack.assets.findAll { it.moveBundle == moveBundle }.sort { rack?.source == '1' ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
+				}
+				racksByFilter.each { assetEntity ->
 					def overlapError = false
 					def rackPosition = rack.source == 1 ? assetEntity.sourceRackPosition : assetEntity.targetRackPosition
 					if(rackPosition == 0 || rackPosition == null)
@@ -236,9 +242,15 @@ class RackLayoutsController {
 					} else {
 						tag = it
 					}
-					def id = AssetEntity.findByAssetTag( tag )?.id
-					moveBundle += (assetEntity?.moveBundle ? assetEntity?.moveBundle.name : "") + "<br/>"
-					assetTag += "<a href='javascript:openAssetEditDialig(${id})' >$it</a> <br/>"
+					def overlappedAsset
+					def overlappedAssets = AssetEntity.findAllByAssetTag( tag )
+					if(overlappedAssets.size() > 1)
+						overlappedAsset = overlappedAssets.find{it.assetTag = tag && it.moveBundle == assetEntity.moveBundle }
+					else 
+						overlappedAsset = overlappedAssets[0]
+					
+					moveBundle += (overlappedAsset?.moveBundle ? overlappedAsset?.moveBundle.name : "") + "<br/>"
+					assetTag += "<a href='javascript:openAssetEditDialig(${overlappedAsset?.id})' >$it</a> <br/>"
 				}
 				if(!isAdmin)
 					assetTag = it.asset?.assetTag

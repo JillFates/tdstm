@@ -214,7 +214,8 @@
 				<div style="width:150px">
 					<label for="frontView" ><input type="checkbox" name="frontView" id="frontView" checked="checked" />&nbsp;Front</label><br /><br />
 					<label for="backView" ><input type="checkbox" name="backView" id="backView" />&nbsp;Back</label><br /><br />
-					<label for="bundleName" ><input type="checkbox" name="bundleName" checked="checked" />&nbsp;Include bundle names</label>
+					<label for="bundleName" ><input type="checkbox" name="bundleName" id="bundleName" checked="checked" />&nbsp;Include bundle names</label><br /><br />
+					<label for="otherBundle" ><input type="checkbox" name="otherBundle" id="otherBundle" checked="checked" />&nbsp;Include other bundles</label>
 				</div>
 			</td>
 			
