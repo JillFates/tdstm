@@ -175,7 +175,6 @@
 </head>
 <body>
 <div class="body" style="width:98%;">
-<h1>Rack View</h1>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
@@ -185,6 +184,7 @@
 	<tbody>
 		<tr>
 			<td>
+				<h1>Rack View</h1>
 				<label><b>Bundle</b></label><br />
 				<select id="bundleId" name="moveBundle" onchange="${remoteFunction(action:'getRackDetails', params:'\'bundleId=\' + this.value', onComplete:'updateRackDetails(e)')}" style="width:150px">
 					<option value="null" selected="selected">Please Select</option>
@@ -196,7 +196,7 @@
 			
 			<td>
 				<label><b>Source</b></label><br />
-				<select id="sourceRackId" multiple="multiple" name="sourcerack" style="width:200px" size="5">
+				<select id="sourceRackId" multiple="multiple" name="sourcerack" style="width:200px" size="4">
 					<option value="null" selected="selected">All</option>
 				</select>
 			</td>
@@ -204,7 +204,7 @@
 			<td>
 				<div style="width:250px">
 					<label><b>Target</b></label><br />
-					<select id="targetRackId" multiple="multiple" name="targetrack" style="width:200px" size="5">
+					<select id="targetRackId" multiple="multiple" name="targetrack" style="width:200px" size="4">
 						<option value="null" selected="selected">All</option>
 					</select>
 				</div>
@@ -212,7 +212,7 @@
 			
 			<td>
 				<div style="width:150px">
-					<label for="frontView" ><input type="checkbox" name="frontView" id="frontView" checked="checked" />&nbsp;Front</label><br /><br />
+					<label for="frontView" ><input type="checkbox" name="frontView" id="frontView" checked="checked" />&nbsp;Front</label>&nbsp
 					<label for="backView" ><input type="checkbox" name="backView" id="backView" />&nbsp;Back</label><br /><br />
 					<label for="bundleName" ><input type="checkbox" name="bundleName" id="bundleName" checked="checked" />&nbsp;Include bundle names</label><br /><br />
 					<label for="otherBundle" ><input type="checkbox" name="otherBundle" id="otherBundle" checked="checked" />&nbsp;Include other bundles</label>
