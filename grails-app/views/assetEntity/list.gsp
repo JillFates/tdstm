@@ -44,12 +44,13 @@
 		      $('#commentsListDialog').dialog('close');
 		      $('#editCommentDialog').dialog('close');
 		      $('#showCommentDialog').dialog('close');
-		      
+		      $("#attributeSetId").val(1)
+		      ${remoteFunction(action:'getAttributes', params:'\'attribSet=\' + $("#attributeSetId").val() ', onComplete:'generateCreateForm(e)')}
 		    }
 		    
 		    function editAssetDialog() {
 		      $("#showDialog").dialog("close")
-		      $("#editDialog").dialog('option', 'width', 900)
+		      $("#editDialog").dialog('option', 'width', 'auto')
 		      $("#editDialog").dialog('option', 'position', ['center','top']);
 		      $("#editDialog").dialog("open")
 		

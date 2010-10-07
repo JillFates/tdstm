@@ -5,6 +5,8 @@
 <g:javascript library="prototype" />
 <jq:plugin name="jquery.combined" />
 <g:javascript src="asset.tranman.js" />
+    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" type="text/css"/>
+    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" type="text/css"/>
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
@@ -18,8 +20,9 @@
 	})
 	function openAssetEditDialig( id ){
 		$("#editFormId").val(id)
-		${remoteFunction(controller:"assetEntity", action:"editShow", params:'\'id=\' + id ', onComplete:'showAssetEditDialog( e )')}
+		${remoteFunction(controller:"assetEntity", action:"editShow", params:'\'id=\' + id ', onComplete:"showAssetDialog( e , 'edit')")}
 	}
+	<%---
 	function showAssetEditDialog( e ) {
 		var browser=navigator.appName;
       	var assetEntityAttributes = eval('(' + e.responseText + ')');
@@ -112,7 +115,7 @@
 		$("#editDialog").dialog('option', 'position', ['center','top']);
 		$("#editDialog").dialog("open")
 		$("#showDialog").dialog("close")
-	}
+	} --%>
 	function showEditAsset(e) {
 		var assetEntityAttributes = eval('(' + e.responseText + ')')
 		if (assetEntityAttributes != "") {

@@ -162,12 +162,12 @@ function showAssetDialog( e , action ) {
 	  new Ajax.Request('../assetEntity/getAutoCompleteDate?autoCompParams='+autoComp,{asynchronous:true,evalScripts:true,onComplete:function(e){updateAutoComplete(e);}}) 
 	  $("#createDialog").dialog("close");
 	  if(action == 'edit'){
-	      $("#editDialog").dialog('option', 'width', 900);
+	      $("#editDialog").dialog('option', 'width', 'auto');
 	      $("#editDialog").dialog('option', 'position', ['center','top']);
 	      $("#editDialog").dialog("open");
 	      $("#showDialog").dialog("close");
       } else if(action == 'show'){
-          $("#showDialog").dialog('option', 'width', 900);
+          $("#showDialog").dialog('option', 'width', 'auto');
 	      $("#showDialog").dialog('option', 'position', ['center','top']);
 	      $("#showDialog").dialog("open");
 	      $("#editDialog").dialog("close");

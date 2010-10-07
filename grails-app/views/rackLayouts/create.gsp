@@ -67,8 +67,9 @@
 	})
 	function openAssetEditDialig( id ){
 		$("#editFormId").val(id)
-		${remoteFunction(controller:"assetEntity", action:"editShow", params:'\'id=\' + id ', onComplete:'showAssetEditDialog( e )')}
+		${remoteFunction(controller:"assetEntity", action:"editShow", params:'\'id=\' + id ', onComplete:"showAssetDialog( e , 'edit')")}
 	}
+	<%--
 	function showAssetEditDialog( e ) {
 		var browser=navigator.appName;
       	var assetEntityAttributes = eval('(' + e.responseText + ')');
@@ -161,7 +162,7 @@
 		$("#editDialog").dialog('option', 'position', ['center','top']);
 		$("#editDialog").dialog("open")
 		$("#showDialog").dialog("close")
-	}
+	} --%>
 	function showEditAsset(e) {
 		var assetEntityAttributes = eval('(' + e.responseText + ')')
 		if (assetEntityAttributes != "") {

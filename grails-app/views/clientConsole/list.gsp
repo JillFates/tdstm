@@ -801,7 +801,7 @@ Comment</a></span></div>
 	function editAssetDialog() {
 		timedUpdate('never')
 		$("#showDialog").dialog("close")
-		$("#editDialog").dialog('option', 'width', 900)
+		$("#editDialog").dialog('option', 'width', 'auto')
 		$("#editDialog").dialog('option', 'position', ['center','top']);
 		$("#editDialog").dialog("open")
 		
