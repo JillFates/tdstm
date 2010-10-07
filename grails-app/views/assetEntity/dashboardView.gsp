@@ -145,14 +145,15 @@ td .odd {
 		tableBody += '</tbody></table>'
 	    var selectObj = $("#asset")
 	   	selectObj.html(tableBody)
-	   	if(asset[0].assetDetails.currentState == "Hold"){
-		   	$("#setHoldTimerTr").show()
-	   	} else {
-	   		$("#setHoldTimerTr").hide()
-	   	}
 	   	createStateOptions(asset[0].statesList)
 	   	createAssighToOptions(asset[0].sourceTeams,asset[0].targetTeams)
 	   	document.assetdetailsForm.reset();
+		if(asset[0].assetDetails.currentState == "Hold"){
+		   	$("#setHoldTimerTr").show()
+		   	$("#holdTimeId").val(asset[0].holdTimer)
+	   	} else {
+	   		$("#setHoldTimerTr").hide()
+	   	}
 	   	$("#assetId").val( asset[0].assetDetails.assetDetail.id )
 	   	$("#currentStateId").val( asset[0].assetDetails.state )
    	}
@@ -440,7 +441,7 @@ td .odd {
 	function vpWidth() {
 		return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 	}
-
+	<%--
 	/*------------------------------------------
 	 * function to call ConsoleController.invokeSnapshot
 	 *-----------------------------------------*/
@@ -454,7 +455,7 @@ td .odd {
 	        url:"../console/invokeSnapshot?moveBundle="+moveBundle,
 	        success:function(e){$('#createSnapshotId').removeAttr("disabled");}
 		});
-	}
+	} --%>
     </script>
 </head>
 
@@ -514,7 +515,6 @@ td .odd {
 				</g:each>
 
 			</select>
-			<input type="button" value="Create Snapshot" id="createSnapshotId" onclick="createSnapshot()"/>
 			</td>
 			<td style="width:40%">
 			<h1 align="center">Supervisor Console</h1>
@@ -590,7 +590,12 @@ td .odd {
 								<tr>
 									<td nowrap>
 									<g:if test="${bundleTeam?.team?.latestAsset}">
-									<a href="#" onclick="assetDetails('${bundleTeam?.team?.latestAsset?.id}')"><u> ${bundleTeam?.team?.latestAsset?.assetTag}</u> </a>
+									<a href="#" onclick="assetDetails('${bundleTeam?.team?.latestAsset?.id}')">
+										<u> ${bundleTeam?.team?.latestAsset?.assetTag} </u>
+										<g:if test="${bundleTeam?.eventActive == 'true' && bundleTeam?.elapsedTime}">
+										 &nbsp;(${bundleTeam?.elapsedTime} ago)
+										</g:if>
+									</a>
 									</g:if>&nbsp;
 									</td>
 								</tr>

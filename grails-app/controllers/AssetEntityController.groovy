@@ -1063,12 +1063,16 @@ class AssetEntityController {
 				
 	            def targetAvailAssets = jdbcTemplate.queryForList( countQuery + " and e.target_team_id = ${it.id} and pm.current_state_id >= $stagedId "+
 	            													" and pm.current_state_id < $rerackedId group by e.asset_entity_id HAVING minstate != $holdId ").size()
-			
+				def latestAssetCreated = AssetTransition.findAll("FROM AssetTransition a where a.assetEntity = ? and a.projectTeam = ? Order By a.id desc",[it.latestAsset, it],[max:1])
+				def elapsedTime 
+				if(latestAssetCreated.size() > 0){
+					elapsedTime = convertIntegerIntoTime(GormUtil.convertInToGMT("now", "EDT" ).getTime() - latestAssetCreated[0].dateCreated.getTime() )?.toString()?.substring(0,5)
+				}
 	            bundleTeams <<[team:it,members:member, sourceAssets:sourceAssets, 
 	                           unrackedAssets:unrackedAssets, sourceAvailassets:sourceAvailassets , 
 	                           targetAvailAssets:targetAvailAssets , targetAssets:targetAssets, 
 	                           rerackedAssets:rerackedAssets, sourcePendAssets:sourcePendAssets, 
-	                           targetPendAssets:targetPendAssets ]
+	                           targetPendAssets:targetPendAssets, elapsedTime:elapsedTime, eventActive : it.moveBundle.moveEvent?.inProgress  ]
 	        }
 							
 			def sourcePendCleaned = jdbcTemplate.queryForList(countQuery +	" and (pm.current_state_id < $unrackedId or pm.current_state_id is null ) group by e.asset_entity_id ").size()
@@ -1204,7 +1208,7 @@ class AssetEntityController {
 	        def teamName = assetDetail.sourceTeam
 	        def assetTransition = AssetTransition.findAllByAssetEntity( assetDetail, [ sort:"dateCreated", order:"desc"] )
 	        def sinceTimeElapsed = "00:00:00" 
-	        	def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+	        def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 	        if( assetTransition ){
 	        	sinceTimeElapsed = convertIntegerIntoTime( GormUtil.convertInToGMT("now", tzId ).getTime() - assetTransition[0]?.dateCreated?.getTime() )
 	        }
@@ -1219,12 +1223,15 @@ class AssetEntityController {
 	        	recentChanges<<[transition:time+"/"+timeElapsed+" "+taskLabel+' ('+ it.userLogin.person.lastName +')',cssClass:cssClass]
 	        }
 	        def holdId = stateEngineService.getStateId( assetDetail.project.workflowCode, "Hold" )
-	        def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+	        def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo, t.hold_timer as holdTimer from asset_transition t "+
 	        											"where t.asset_entity_id = $assetId and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
 	        											"order by t.date_created desc, stateTo desc  limit 1 ")
 	        def currentState = 0
+			def holdTimer = ""
 	        if(transitionStates.size()){
-		        	currentState = transitionStates[0].stateTo
+	        	def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+	        	currentState = transitionStates[0].stateTo
+				holdTimer = transitionStates[0].holdTimer ? formatter.format(GormUtil.convertInToUserTZ(transitionStates[0].holdTimer, tzId )) : ""
         	}
 	        /*def projectAssetMap = ProjectAssetMap.findByAsset(assetDetail)
 	        if(projectAssetMap){
@@ -1270,7 +1277,7 @@ class AssetEntityController {
 	        }
 	        def sourceTeams = ProjectTeam.findAll(sourceQuery.toString())
 	        def targetTeams = ProjectTeam.findAll(targetQuery.toString())
-	        assetStatusDetails<<[ 'assetDetails':map, 'statesList':statesList, 
+	        assetStatusDetails<<[ 'assetDetails':map, 'statesList':statesList, holdTimer:holdTimer,
 	                              'recentChanges':recentChanges, 'sourceTeams':sourceTeams,
 	                              'targetTeams':targetTeams, 'sinceTimeElapsed':sinceTimeElapsed ]
         }
@@ -1525,27 +1532,30 @@ class AssetEntityController {
 		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
         def assetId = params.assetVal
         def assetEnt = AssetEntity.findAll("from AssetEntity ae where ae.id in ($assetId)")
-        assetEnt.each{
-        	def bundle = it.moveBundle
-	        def principal = SecurityUtils.subject.principal
-	        def loginUser = UserLogin.findByUsername(principal)
-	        def team = it.sourceTeam
-			     
-	        def workflow = workflowService.createTransition(projectInstance.workflowCode,"SUPERVISOR",params.taskList,it,bundle,loginUser,team,params.enterNote)
-	        if(workflow.success){
-	        	if(params.enterNote != ""){
-	                def assetComment = new AssetComment()
-	                assetComment.comment = params.enterNote
-	                assetComment.commentType = 'issue'
-	               	assetComment.createdBy = loginUser.person
-	                assetComment.assetEntity = it
-	                assetComment.save()
-	            }
-	        }else{
-	        	flash.message = message(code :workflow.message)		            
+        try{
+			assetEnt.each{
+	        	def bundle = it.moveBundle
+		        def principal = SecurityUtils.subject.principal
+		        def loginUser = UserLogin.findByUsername(principal)
+		        def team = it.sourceTeam
+				     
+		        def workflow = workflowService.createTransition(projectInstance.workflowCode,"SUPERVISOR",params.taskList,it,bundle,loginUser,team,params.enterNote)
+		        if(workflow.success){
+		        	if(params.enterNote != ""){
+		                def assetComment = new AssetComment()
+		                assetComment.comment = params.enterNote
+		                assetComment.commentType = 'issue'
+		               	assetComment.createdBy = loginUser.person
+		                assetComment.assetEntity = it
+		                assetComment.save()
+		            }
+		        }else{
+		        	flash.message = message(code :workflow.message)		            
+		        }
 	        }
+        } catch(Exception ex){
+        	println"$ex"
         }
-        
         redirect(action:'dashboardView',params:[moveBundle:params.moveBundle, showAll:params.showAll,
                                                 projectId:params.projectId] )
     }
