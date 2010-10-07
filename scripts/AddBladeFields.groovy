@@ -17,7 +17,7 @@ if(!EavAttribute.findWhere(attributeCode:'bladeSize')) {
 if(!EavAttribute.findWhere(attributeCode:'sourceBladeChassis')) {
 	attribute = new EavAttribute(attributeCode:'sourceBladeChassis', backendType:'String', defaultValue:'null', entityType:EavEntityType.get(1),
 					 frontendInput:'autocomplete', frontendLabel:'Source Blade', isRequired:0, isUnique:0, note:'Source blade chassis that the blade is installed in before the move.',
-					 sortOrder:340, validation:'')
+					 sortOrder:331, validation:'')
 	if(!attribute.save()) {
 		println "Unable to save attribute: ${attribute.errors}"
 	} else {
@@ -28,7 +28,7 @@ if(!EavAttribute.findWhere(attributeCode:'sourceBladeChassis')) {
 if(!EavAttribute.findWhere(attributeCode:'sourceBladePosition')) {
 	attribute = new EavAttribute(attributeCode:'sourceBladePosition', backendType:'int', defaultValue:'null', entityType:EavEntityType.get(1),
 					 frontendInput:'text', frontendLabel:'Source Blade Position', isRequired:0, isUnique:0, note:'The position on the chassis that the blade is located in before the move',
-					 sortOrder:350, validation:'')
+					 sortOrder:332, validation:'')
 	if(!attribute.save()) {
 		println "Unable to save attribute: ${attribute.errors}"
 	} else {
@@ -39,7 +39,7 @@ if(!EavAttribute.findWhere(attributeCode:'sourceBladePosition')) {
 if(!EavAttribute.findWhere(attributeCode:'targetBladeChassis')) {
 	attribute = new EavAttribute(attributeCode:'targetBladeChassis', backendType:'String', defaultValue:'null', entityType:EavEntityType.get(1),
 					 frontendInput:'autocomplete', frontendLabel:'Target Blade', isRequired:0, isUnique:0, note:'Target blade chassis that the blade is installed in after the move.',
-					 sortOrder:360, validation:'')
+					 sortOrder:333, validation:'')
 	if(!attribute.save()) {
 		println "Unable to save attribute: ${attribute.errors}"
 	} else {
@@ -50,7 +50,7 @@ if(!EavAttribute.findWhere(attributeCode:'targetBladeChassis')) {
 if(!EavAttribute.findWhere(attributeCode:'targetBladePosition')) {
 	attribute = new EavAttribute(attributeCode:'targetBladePosition', backendType:'int', defaultValue:'null', entityType:EavEntityType.get(1),
 					 frontendInput:'text', frontendLabel:'Target Blade Position', isRequired:0, isUnique:0, note:'The position on the chassis that the blade is located in after the move',
-					 sortOrder:370, validation:'')
+					 sortOrder:334, validation:'')
 	if(!attribute.save()) {
 		println "Unable to save attribute: ${attribute.errors}"
 	} else {
