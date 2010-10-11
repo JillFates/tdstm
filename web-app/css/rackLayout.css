@@ -8,20 +8,20 @@ br.page-break-after {
 }
 
 .empty {
-	background: #e7e7e7;
+	background: #ffffff;
 }
 
 table.rack_elevation .rack_current {
 	background: #7CFE80;
 	font-weight: bold;
 	font-size: 0.9em;
-	border: 2px solid black;
+	border: 1px solid black;
 }
 table.rack_elevation .rack_current a{
 	color: black;
 }
 table.rack_elevation .rack_past {
-	background: #ffffff;
+	background: #e7e7e7;
 }
 table.rack_elevation .rack_past a{
 	color: black;
@@ -36,7 +36,7 @@ table.rack_elevation .rack_error {
 	background: #D80B01 !important;
 	color: white !important;
 	font-size: 1.0em;
-	border: 2px dashed black !important;
+	border: 1px dashed black !important;
 }
 table.rack_elevation .rack_error a{
 	color: white !important;
@@ -154,10 +154,10 @@ table.rack_elevation table.bladeTable td {
 }
 
 table.rack_elevation table.bladeTable td.emptyBlade {
+	background-color:white;
 }
 
 table.rack_elevation table.bladeTable td.blade {
-	background-color:white;
 }
 
 table.rack_elevation table.bladeTable td.errorBlade {

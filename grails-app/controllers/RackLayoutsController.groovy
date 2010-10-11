@@ -73,9 +73,9 @@ class RackLayoutsController {
 				def finalAssetList = []
 				def racksByFilter
 				if(includeOtherBundle){
-					racksByFilter = rack.assets.sort { rack?.source == '1' ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
+					racksByFilter = rack.assets.sort { rack?.source == 1 ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
 				} else {
-					racksByFilter = rack.assets.findAll { it.moveBundle == moveBundle }.sort { rack?.source == '1' ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
+					racksByFilter = rack.assets.findAll { it.moveBundle == moveBundle }.sort { rack?.source == 1 ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
 				}
 				racksByFilter.each { assetEntity ->
 					def overlapError = false
@@ -168,7 +168,7 @@ class RackLayoutsController {
 					if(assetEnitiesAtPosition.size() > 1) {
 						cssClass = 'rack_error'
 						rackStyle = 'rack_error'
-	            		assetDetails<<[asset:null, rack:i, cssClass:cssClass, rackStyle:rackStyle, source:rack.source ]
+	            		assetDetails<<[asset:assetEnitiesAtPosition[0], rack:i, cssClass:cssClass, rackStyle:rackStyle, source:rack.source ]
 					} else if(assetEnitiesAtPosition.size() == 1) {
 						def assetEnity = assetEnitiesAtPosition[0]
 						if(assetEnity.overlapError) {
@@ -227,6 +227,7 @@ class RackLayoutsController {
 			if(it.asset) {
 				rowspan = it.asset?.rowspan != 0 ? it.asset?.rowspan : 1
 				rackStyle = it.rackStyle
+				def location = it.source
 				def assetEntity = it.asset?.assetEntity
 				def assetTagsList = (it.asset?.assetTag).split("<br/>")
 				def moveBundle = "" 
@@ -243,14 +244,23 @@ class RackLayoutsController {
 						tag = it
 					}
 					def overlappedAsset
-					def overlappedAssets = AssetEntity.findAllByAssetTag( tag )
-					if(overlappedAssets.size() > 1)
-						overlappedAsset = overlappedAssets.find{it.assetTag = tag && it.moveBundle == assetEntity.moveBundle }
-					else 
-						overlappedAsset = overlappedAssets[0]
+					def overlappedAssets
 					
-					moveBundle += (overlappedAsset?.moveBundle ? overlappedAsset?.moveBundle.name : "") + "<br/>"
-					assetTag += "<a href='javascript:openAssetEditDialig(${overlappedAsset?.id})' >$it</a> <br/>"
+					if(location == 1)
+						overlappedAssets = AssetEntity.findAllByAssetTagAndSourceRack( tag , assetEntity.sourceRack)
+					else 
+						overlappedAssets = AssetEntity.findAllByAssetTagAndTargetRack( tag , assetEntity.targetRack)
+						
+					if(overlappedAssets.size() > 1) {
+						overlappedAssets.each{ overlapAsset ->
+							moveBundle += (overlapAsset?.moveBundle ? overlapAsset?.moveBundle.name : "") + "<br/>"
+							assetTag += "<a href='javascript:openAssetEditDialig(${overlapAsset?.id})' >$it</a> <br/>"
+						}
+					} else if(overlappedAssets.size() > 0){
+						overlappedAsset = overlappedAssets[0]
+						moveBundle += (overlappedAsset?.moveBundle ? overlappedAsset?.moveBundle.name : "") + "<br/>"
+						assetTag += "<a href='javascript:openAssetEditDialig(${overlappedAsset?.id})' >$it</a> <br/>"
+					}
 				}
 				if(!isAdmin)
 					assetTag = it.asset?.assetTag
@@ -280,14 +290,14 @@ class RackLayoutsController {
 							bladeTable += "<td class='errorBlade' style='height:${tdHeight}px'>Conflict</td>"
 						else if(matching.size() == 1) {
 							def blade = matching[0]
-							def tag = blade.assetTag.split('')[1..-1].join('<br />')
+							def tag = blade.assetTag.split('')[1..-1].join('<br/>')
 							def bladeSpan = blade.bladeSize == 'Full' ? 2 : 1
 							if(bladeSpan == 2)
 								fullRows << i + 8
 							if((bladeSpan == 2) && blades.findAll { it.sourceBladePosition == i + 8 }.size() > 0)
 								bladeTable += "<td class='errorBlade' style='height:${tdHeight}px'>&nbsp;</td>"
 							else if(isAdmin)
-								bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href='javascript:openAssetEditDialig(${blade.id})'>${tag}</a></td>"
+								bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href='javascript:openAssetEditDialig(${blade.id})' title='${tag.replace('<br/>','')}'>${tag}</a></td>"
 							else
 								bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'>${tag}</td>"
 						} else
@@ -354,7 +364,7 @@ class RackLayoutsController {
 			} else if(rowspan <= 1) {
 				rowspan = 1
 				rackStyle = it.rackStyle
-				row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan=1 class=${it.cssClass}></td><td>&nbsp;</td>")
+				row.append("<td class='empty'>${it.rack}</td><td rowspan=1 class=${it.cssClass}></td><td>&nbsp;</td>")
 				if(backView)
 					row.append("<td>&nbsp;</td>")
 				
