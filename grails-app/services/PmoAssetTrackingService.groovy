@@ -119,7 +119,7 @@ class PmoAssetTrackingService {
 			projectAssetMap.delete()
 		}
 		assetEntity.currentStatus = currState 
-		assetEntity.save(flush:true)
+		assetEntity.save()
 	}
 	/* -----------------------------------------------------
 	 * @author : Lokanath Reddy

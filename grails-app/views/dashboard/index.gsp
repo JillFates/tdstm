@@ -868,6 +868,8 @@
 					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).hide();
 				}
 			}
+			//Append recent changes to status bar
+			${remoteFunction(controller:'moveEvent', action:'getMoveEventNewsAndStatus', params:'\'id=\' + moveEvent',onComplete:'updateEventHeader(e)')}
 		} catch(ex){
 			if(doUpdate){
 				clearInterval(handler);

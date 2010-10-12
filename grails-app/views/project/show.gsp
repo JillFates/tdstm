@@ -151,7 +151,10 @@
             <td valign="top" class="name">Workflow Code:</td>
 
             <td valign="top" class="value">${fieldValue(bean:projectInstance, field:'workflowCode')}</td>
+            
+			<td valign="top" class="name">Display Transitions in Status bar:</td>
 
+            <td valign="top" class="value"><g:message code="project.trackChanges.${bean:projectInstance?.trackChanges}" /></td>
           </tr>
 
           <tr class="prop">

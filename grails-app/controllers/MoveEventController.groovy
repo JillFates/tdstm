@@ -18,6 +18,7 @@ class MoveEventController {
 	def jdbcTemplate
 	def userPreferenceService
 	def stepSnapshotService
+	def stateEngineService
 	
     def index = { redirect(action:list,params:params) }
 
@@ -341,6 +342,8 @@ class MoveEventController {
     	def moveEvent = MoveEvent.findById(params.id)
 		def statusAndNewsList = []
 		if(moveEvent){
+			def holdId = Integer.parseInt(stateEngineService.getStateId(moveEvent.project.workflowCode,"Hold"))
+			
 	    	def moveEventNewsQuery = """SELECT mn.date_created as created, mn.message as message from move_event_news mn 
 							left join move_event me on ( me.move_event_id = mn.move_event_id ) 
 							left join project p on (p.project_id = me.project_id) 
@@ -356,6 +359,24 @@ class MoveEventController {
 	    		news.append(String.valueOf(formatter.format(GormUtil.convertInToUserTZ( it.created, tzId ))) +"&nbsp;:&nbsp;"+it.message+".&nbsp;&nbsp;")	
 	    	}
 			
+			// append recent asset transitions if moveEvent is ininProgress and project trackChanges is yes.
+			if(moveEvent.inProgress =="true" && moveEvent.project.trackChanges == "Y"){
+				def today = GormUtil.convertInToGMT( "now", tzId );
+				def currentPoolTime = new java.sql.Timestamp(today.getTime())
+				def recentAssetTransitions = """select p.current_state_id as stateTo, p.asset_id as assetId, p.last_modified as dateModified, p.created_date as dateCreated from project_asset_map p
+												left join asset_entity ae on ae.asset_entity_id = p.asset_id
+												left join move_bundle mb on mb.move_bundle_id = ae.move_bundle_id
+												where mb.move_event_id =  ${moveEvent.id} and
+												(p.created_date between SUBTIME('$currentPoolTime','00:15:00') and '$currentPoolTime' OR 
+												p.last_modified between SUBTIME('$currentPoolTime','00:15:00') and '$currentPoolTime')"""
+				def transitionResultList = jdbcTemplate.queryForList( recentAssetTransitions )
+				transitionResultList.each{
+					def asset = AssetEntity.get(it.assetId)
+					def message = asset.assetTag+"-"+asset.assetName +" moved to "+stateEngineService.getStateLabel(moveEvent.project.workflowCode,it.stateTo)+" state."
+					def date = it.dateModified ? GormUtil.convertInToUserTZ( it.dateModified, tzId ) : GormUtil.convertInToUserTZ( it.dateCreated, tzId )
+					news.append(String.valueOf(formatter.format(date)) +"&nbsp;:&nbsp;"+	message+".&nbsp;&nbsp;")	
+				}
+			}
 			def query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent = ? AND mes.type = ? ORDER BY mes.dateCreated DESC"    					
 	    	def moveEventSnapshot = MoveEventSnapshot.findAll( query , [moveEvent , "P"] )[0]
 	    	def cssClass = "statusbar_good"

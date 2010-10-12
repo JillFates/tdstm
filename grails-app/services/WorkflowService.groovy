@@ -84,7 +84,7 @@ class WorkflowService {
 							// store the current status into asset 
 							if(stateType != "boolean" || toState == "Hold"){
 								assetEntity.currentStatus = Integer.parseInt(stateEngineService.getStateId( process, toState ))
-								assetEntity.save(flush:true)
+								assetEntity.save()
 		    				}
 							success = true
 						}
@@ -118,7 +118,7 @@ class WorkflowService {
 		    		// store the current status into asset 
 					if(stateType != "boolean" || toState == "Hold"){
 						assetEntity.currentStatus = Integer.parseInt(stateEngineService.getStateId( process, toState ))
-						assetEntity.save(flush:true)
+						assetEntity.save()
     				}
 		    		message = "Transaction created successfully"
 					success = true

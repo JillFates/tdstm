@@ -441,6 +441,14 @@
 					<div class="errors"><g:renderErrors bean="${projectInstance}"
 						as="list" field="workflowCode" /></div>
 				</g:hasErrors></td>
+				<td valign="top" class="name">
+					<label for="trackChanges">Display Transitions in Status bar:</label>
+				</td>
+				<td valign="top">
+					<g:select id="trackChanges" name="trackChanges"	from="${projectInstance.constraints.trackChanges.inList}" 
+					value="${projectInstance.trackChanges}" valueMessagePrefix="project.trackChanges"></g:select>
+				</td>
+				
 			</tr>
 
 

@@ -28,6 +28,7 @@ class ProjectAssetMap {
 	 */
 	def beforeInsert = {
 		createdDate = GormUtil.convertInToGMT( "now", "EDT" )
+		lastModified = GormUtil.convertInToGMT( "now", "EDT" )
 	}
 	def beforeUpdate = {
 		lastModified = GormUtil.convertInToGMT( "now", "EDT" )

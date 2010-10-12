@@ -249,7 +249,18 @@
 					            <td valign="top" class="name">Workflow Code:</td>
 					
 					            <td valign="top" class="value">${fieldValue(bean:projectInstance, field:'workflowCode')}</td>
-			
+								<td valign="top" class="name">
+				                  <label for="inProgress"><b>Display Transitions in Status bar:&nbsp;<span style="color: red">*</span></b></label>
+				                </td>
+				                <td valign="top">
+									<g:select id="trackChanges" name="trackChanges"	from="${projectInstance.constraints.trackChanges.inList}" 
+									value="${projectInstance.trackChanges}" valueMessagePrefix="project.trackChanges"></g:select>
+				                  <g:hasErrors bean="${projectInstance}" field="trackChanges">
+				                    <div class="errors">
+				                      <g:renderErrors bean="${projectInstance}" as="list" field="trackChanges"/>
+				                    </div>
+				                  </g:hasErrors>
+				                </td>
 			        	  </tr>
 			              <tr class="prop">
 			                <td valign="top" class="name">
