@@ -10,9 +10,12 @@ import org.apache.commons.logging.LogFactory
  * ----------------------------------------*/
 class WorkflowController {
 	protected static Log log = LogFactory.getLog( WorkflowController.class )
-	
+	def static standardTransitions = ["Hold", "Ready", "PoweredDown", "Release", "Unracking", "Unracked", "Cleaned", "OnCart", 
+									  "OnTruck", "OffTruck", "Staged", "Reracking", "Reracked", "Completed", "Terminated"]
 	/* Initialize the services */
 	def stateEngineService
+	def jdbcTemplate
+	def userPreferenceService
 	/*-----------------------------------------------
 	 * Index method for default action
 	 *---------------------------------------------*/
@@ -32,13 +35,33 @@ class WorkflowController {
 	 *---------------------------------------------*/
 	def workflowList = {
 		def workflowId = params.workflow
-		def workflowTransitionsList
+		
+		def workflowTransitionsList = []
 		def workflow
+		def workflowTransitions
+		def stepsExistInWorkflowProject
 		if( workflowId ){
 			workflow = Workflow.get(params.workflow)
-			workflowTransitionsList = WorkflowTransition.findAll("FROM WorkflowTransition w where w.workflow = ? order by w.transId", [workflow] )
+			def query = """SELECT mbs.transition_id as transitionId FROM move_bundle_step mbs 
+							left join move_bundle mb on mb.move_bundle_id = mbs.move_bundle_id
+							left join project p on p.project_id = mb.project_id 
+							where p.workflow_code = '${workflow.process}' group by mbs.transition_id"""
+			stepsExistInWorkflowProject = jdbcTemplate.queryForList( query )
+			
+			workflowTransitions = WorkflowTransition.findAll("FROM WorkflowTransition w where w.workflow = ? order by w.transId", [workflow] )
 		} else {
 			redirect(action:home)
+		}
+		
+		workflowTransitions.each{ workflowTransition ->
+			def isExist = false
+			def donotDelete = false
+			if(!standardTransitions.contains(workflowTransition.code))
+				donotDelete = true
+			if( stepsExistInWorkflowProject.size() > 0 && stepsExistInWorkflowProject?.transitionId?.contains( workflowTransition.transId ))
+				isExist = true
+				
+			workflowTransitionsList << [transition : workflowTransition, isExist : isExist, donotDelete : donotDelete ]
 		}
 		return [workflowTransitionsList : workflowTransitionsList, workflow : workflow ]
 	}
@@ -133,7 +156,8 @@ class WorkflowController {
 	 *==================================================*/
 	def updateWorkflowSteps = {
 		def workflowId = params.workflow
-		def workflowTransitionsList
+		def workflowTransitions
+		def workflowTransitionsList = []
 		def workflow
 		def principal = SecurityUtils.subject.principal
 		if(workflowId && principal){
@@ -144,7 +168,7 @@ class WorkflowController {
 			if ( workflow.validate() && workflow.save(insert : true, flush:true) ) {
 				log.debug("Workfolw \"${workflow}\" updated")
 			}	
-			def workflowTransitions = WorkflowTransition.findAllByWorkflow( workflow )
+			workflowTransitions = WorkflowTransition.findAllByWorkflow( workflow )
 			workflowTransitions.each{ workflowTransition ->
 				
 				workflowTransition.code = params["code_"+workflowTransition.id]
@@ -181,8 +205,20 @@ class WorkflowController {
 					log.debug("Workfolw step \"${workflowTransition}\" updated")
 				}
 			}
+			def query = """SELECT mbs.transition_id as transitionId FROM move_bundle_step mbs 
+							left join move_bundle mb on mb.move_bundle_id = mbs.move_bundle_id
+							left join project p on p.project_id = mb.project_id 
+							where p.workflow_code = '${workflow.process}' group by mbs.transition_id"""
+			def stepsExistInWorkflowProject = jdbcTemplate.queryForList( query )
+			workflowTransitions = WorkflowTransition.findAll("FROM WorkflowTransition w where w.workflow = ? order by w.transId", [workflow] )
 			
-			workflowTransitionsList = WorkflowTransition.findAll("FROM WorkflowTransition w where w.workflow = ? order by w.transId", [workflow] )
+			workflowTransitions.each{ workflowTransition ->
+				def isExist = false
+			if( stepsExistInWorkflowProject.size() > 0 && stepsExistInWorkflowProject?.transitionId?.contains( workflowTransition.transId ) )
+				isExist = true
+				
+			workflowTransitionsList << [transition : workflowTransition, isExist : isExist ]
+			}
 		} else {
 			redirect(action:home)
 		}
@@ -217,10 +253,57 @@ class WorkflowController {
 			}
 		}
 		//	load transitions details into application memory.
-    	stateEngineService.loadWorkflowTransitionsIntoMap(workflow.process)
+    	stateEngineService.loadWorkflowTransitionsIntoMap(workflow.process, 'workflow')
 		
 		redirect(action:workflowList, params:[workflow:workflowId])
 	 }
+		
+	/*-----------------------------------------------
+	 * @param : workfow, workflowTransition
+	 * Delete the workflowTransition and associated data.
+	 *---------------------------------------------*/
+	def deleteTransitionFromWorkflow = {
+		def workflowId = params.workflow
+		def transitionId = params.id
+		if(transitionId){
+			def workflowTransition = WorkflowTransition.get( transitionId )
+			def process = workflowTransition.workflow.process
+			//AssetTransition.executeUpdate('delete from')
+			StepSnapshot.executeUpdate("delete from StepSnapshot ss where ss.moveBundleStep in (select mbs.id from MoveBundleStep mbs where mbs.moveBundle.project.workflowCode = '${workflowTransition.workflow.process}' and mbs.transitionId = ${workflowTransition.transId})")
+			MoveBundleStep.executeUpdate("delete from MoveBundleStep mbs where mbs.moveBundle in (select mb.id from MoveBundle mb where mb.project.workflowCode = '${workflowTransition.workflow.process}') and mbs.transitionId = ?",[ workflowTransition.transId])
+			WorkflowTransitionMap.executeUpdate("delete from WorkflowTransitionMap wtm where wtm.workflow = ?",[workflowTransition.workflow])
+			workflowTransition.delete(flush:true)
+			
+			//	load transitions details into application memory.
+	    	stateEngineService.loadWorkflowTransitionsIntoMap( process, 'workflow')
+		}
+		redirect(action:workflowList, params:[workflow:workflowId])
+	}
+	/*-----------------------------------------------
+	 * @param : workfow
+	 * Delete the workflow and associated projects and project's data.
+	 *---------------------------------------------*/
+	def deleteWorkflow = {
+		def workflowId = params.id
+		if(workflowId){
+			def workflow = Workflow.get( workflowId )
+			def process = workflow.process
+			def workflowProjects = Project.findAllByWorkflowCode(workflow?.process)
+			workflowProjects.each{ project ->
+				userPreferenceService.removeProjectAssociates(project)
+				def party = Party.get(project.id)
+				party.delete()
+			}
+			WorkflowTransitionMap.executeUpdate("delete from WorkflowTransitionMap wtm where wtm.workflow = ?",[workflow])
+			WorkflowTransition.executeUpdate("delete from WorkflowTransition wt where wt.workflow = ?",[workflow])
+			Swimlane.executeUpdate("delete from Swimlane s where s.workflow = ?",[workflow])
+			workflow.delete()
+			
+			//	load transitions details into application memory.
+	    	stateEngineService.loadWorkflowTransitionsIntoMap( process, 'workflow')
+		}
+		redirect(action:home)
+	}
 	/*-----------------------------------------------
 	 * @param : workfow
 	 * Generate .svg file for vertical text display in FF/ Safari

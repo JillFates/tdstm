@@ -37,7 +37,7 @@ class ProjectController {
             redirect( action:list )
         } else { 
         	// load transitions details into application memory.
-        	stateEngineService.loadWorkflowTransitionsIntoMap(projectInstance.workflowCode)
+        	stateEngineService.loadWorkflowTransitionsIntoMap(projectInstance.workflowCode, 'project')
         	userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
         	def currProj = session.getAttribute("CURR_PROJ");
         	def currProjectInstance = Project.get( currProj.CURR_PROJ )
@@ -573,7 +573,7 @@ class ProjectController {
     def showImage = {
     		if( params.id ) {
 	    		def projectLogo = ProjectLogo.findById( params.id )
-	     		def image = projectLogo.partnerImage?.binaryStream
+	     		def image = projectLogo?.partnerImage?.binaryStream
 	     		response.contentType = 'image/jpg'		
 	     		response.outputStream << image
     		} else {

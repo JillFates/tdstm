@@ -84,29 +84,43 @@
 			
 			<th class="sortable">Header</th>
 			
+			<th class="sortable">Action</th>
+			
 		</tr>
 	</thead>
 	<tbody>
 		<g:if test="${workflowTransitionsList}">
 		<g:each in="${workflowTransitionsList}" status="i" var="transitions">
-			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="showWorkflowRoles('${transitions.id}')">
+			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="showWorkflowRoles('${transitions.transition.id}')">
 
-				<td nowrap="nowrap">${transitions?.code}</td>
+				<td nowrap="nowrap">${transitions.transition?.code}</td>
 				
-				<td nowrap="nowrap">${transitions?.name}</td>
+				<td nowrap="nowrap">${transitions.transition?.name}</td>
 				
-				<td nowrap="nowrap">${transitions?.dashboardLabel}</td>
+				<td nowrap="nowrap">${transitions.transition?.dashboardLabel}</td>
 				
-				<td nowrap="nowrap">${transitions?.transId}</td>
+				<td nowrap="nowrap">${transitions.transition?.transId}</td>
 				
-				<td nowrap="nowrap"><g:message code="workflow.type.${transitions?.type}" /></td>
+				<td nowrap="nowrap"><g:message code="workflow.type.${transitions.transition?.type}" /></td>
 
-				<td nowrap="nowrap">${transitions?.predecessor}</td>
+				<td nowrap="nowrap">${transitions.transition?.predecessor}</td>
 
-				<td nowrap="nowrap">${transitions?.color}</td>
+				<td nowrap="nowrap">${transitions.transition?.color}</td>
 				
-				<td nowrap="nowrap">${transitions?.header}</td>
-
+				<td nowrap="nowrap">${transitions.transition?.header}</td>
+				
+				<td nowrap="nowrap">
+				<g:if test="${transitions.donotDelete}">
+					<g:link controller="workflow" action="deleteTransitionFromWorkflow" id="${transitions.transition.id}" params="['workflow':workflow.id]">
+						<g:if test="${transitions.isExist}">
+							Delete Step and History
+						</g:if>
+						<g:else>
+							Delete
+						</g:else>
+					</g:link>
+				</g:if>
+				</td>
 			</tr>
 		</g:each>
 		</g:if>
@@ -141,6 +155,8 @@
 			
 			<th class="sortable">Header</th>
 			
+			<th class="sortable">Action</th>
+			
 		</tr>
 	</thead>
 	<tbody id="editWorkflowStepsTbody">
@@ -149,37 +165,48 @@
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
 				<td nowrap="nowrap">
-					<input type="text" name="code_${transitions.id}" id="codeId_${transitions.id}" value="${transitions?.code}" onchange="validateField(this.value, this.id, 'Code')"/>
+					<input type="text" name="code_${transitions.transition.id}" id="codeId_${transitions.transition.id}" value="${transitions.transition?.code}" onchange="validateField(this.value, this.id, 'Code')"/>
 				</td>
 				
 				<td nowrap="nowrap">
-					<input type="text" name="name_${transitions.id}" id="nameId_${transitions.id}" value="${transitions?.name}"  onchange="validateField(this.value, this.id, 'Name')"/>
+					<input type="text" name="name_${transitions.transition.id}" id="nameId_${transitions.transition.id}" value="${transitions.transition?.name}"  onchange="validateField(this.value, this.id, 'Name')"/>
 				</td>
 				
 				<td nowrap="nowrap">
-					<input type="text" name="dashboardLabel_${transitions.id}" id="dashboardLabelId_${transitions.id}" value="${transitions?.dashboardLabel}"/>
+					<input type="text" name="dashboardLabel_${transitions.transition.id}" id="dashboardLabelId_${transitions.transition.id}" value="${transitions.transition?.dashboardLabel}"/>
 				</td>
 				
 				<td nowrap="nowrap">
-					<input type="text" name="transId_${transitions.id}" id="transIdId_${transitions.id}" value="${transitions?.transId}" style="width: 60px;" maxlength="3"  onchange="validateField(this.value, this.id, 'transId')"/>
+					<input type="text" name="transId_${transitions.transition.id}" id="transIdId_${transitions.transition.id}" value="${transitions.transition?.transId}" style="width: 60px;" maxlength="3"  onchange="validateField(this.value, this.id, 'transId')"/>
 				</td>
 				
 				<td nowrap="nowrap">
-					<g:select id="typeId_${transitions.id}" name="type_${transitions.id}" from="${transitions.constraints.type.inList}" value="${transitions.type}" valueMessagePrefix="workflow.type"></g:select>
+					<g:select id="typeId_${transitions.transition.id}" name="type_${transitions.transition.id}" from="${transitions.transition.constraints.type.inList}" value="${transitions.transition.type}" valueMessagePrefix="workflow.type"></g:select>
 				</td>
 
 				<td nowrap="nowrap">
-					<input type="text" name="predecessor_${transitions.id}" id="predecessorId_${transitions.id}" value="${transitions?.predecessor}"  style="width: 60px;" maxlength="3"  onchange="validateField(this.value, this.id, 'predecessor')"/>
+					<input type="text" name="predecessor_${transitions.transition.id}" id="predecessorId_${transitions.transition.id}" value="${transitions.transition?.predecessor}"  style="width: 60px;" maxlength="3"  onchange="validateField(this.value, this.id, 'predecessor')"/>
 				</td>
 
 				<td nowrap="nowrap">
-					<input type="text" name="color_${transitions.id}" id="colorId_${transitions.id}" value="${transitions?.color}"/>
+					<input type="text" name="color_${transitions.transition.id}" id="colorId_${transitions.transition.id}" value="${transitions.transition?.color}"/>
 				</td>
 				
 				<td nowrap="nowrap">
-					<input type="text" name="header_${transitions.id}" id="headerId_${transitions.id}" value="${transitions?.header}"  style="width: 60px;" maxlength="7"/>
+					<input type="text" name="header_${transitions.transition.id}" id="headerId_${transitions.transition.id}" value="${transitions.transition?.header}"  style="width: 60px;" maxlength="7"/>
 				</td>
-				
+				<td nowrap="nowrap">
+				<g:if test="${transitions.donotDelete}">
+					<g:link controller="workflow" action="deleteTransitionFromWorkflow" id="${transitions.transition.id}" params="['workflow':workflow.id]">
+						<g:if test="${transitions.isExist}">
+							Delete Step and History
+						</g:if>
+						<g:else>
+							Delete
+						</g:else>
+					</g:link>
+				</g:if>
+				</td>
 			</tr>
 		</g:each>
 		</g:if>
@@ -197,10 +224,10 @@
 			<input type="hidden" name="workflowTransition" id="workflowTransitionId">
 		</span>
 	</g:form>
-	<g:form onsubmit="return false">
+	<g:form action="deleteWorkflow" onsubmit="return confirm('WARNING: Deleting this Workflow will remove any associated Projects and projects related data?');">
     	<input type="hidden" name="id" value="${workflow?.id}" />
         <span class="button"><input type="button" class="edit" value="Edit" onclick="editWorkflowList()"/></span>
-        <span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this Workflow will remove any Projects and any related data?');" value="Delete" /></span>
+        <span class="button"><input type="submit" class="delete" value="Delete" /></span>
 	</g:form>
 </div>
 
