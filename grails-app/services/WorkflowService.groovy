@@ -77,12 +77,12 @@ class WorkflowService {
 								projectTeam.latestAsset = assetEntity
 								projectTeam.save(flush:true)
 		    				}
-		    				if(stateType != "boolean"){
-		    					projectAssetMap.currentStateId = Integer.parseInt(stateEngineService.getStateId( process, toState ))
-		    				}
-		    				projectAssetMap.save(flush:true)
 							// store the current status into asset 
 							if(stateType != "boolean" || toState == "Hold"){
+								
+								projectAssetMap.currentStateId = Integer.parseInt(stateEngineService.getStateId( process, toState ))
+			    				projectAssetMap.save(flush:true)
+								
 								assetEntity.currentStatus = Integer.parseInt(stateEngineService.getStateId( process, toState ))
 								assetEntity.save()
 		    				}
@@ -110,13 +110,13 @@ class WorkflowService {
 		    		message = "Unable to create AssetTransition: " + GormUtil.allErrorsString( assetTransition )
 		    	} else {
 		    		message = setTransitionTimeElapsed(assetTransition)
-		    		if(stateType != "boolean"){
-			    		def projectAssetMapInstance = new ProjectAssetMap(project:moveBundle.project, asset:assetEntity)
-			    		projectAssetMapInstance.currentStateId = Integer.parseInt(stateEngineService.getStateId( process, toState ))
-			    		projectAssetMapInstance.save(flush:true)
-		    		}
 		    		// store the current status into asset 
 					if(stateType != "boolean" || toState == "Hold"){
+						
+						def projectAssetMapInstance = new ProjectAssetMap(project:moveBundle.project, asset:assetEntity)
+			    		projectAssetMapInstance.currentStateId = Integer.parseInt(stateEngineService.getStateId( process, toState ))
+			    		projectAssetMapInstance.save(flush:true)
+						
 						assetEntity.currentStatus = Integer.parseInt(stateEngineService.getStateId( process, toState ))
 						assetEntity.save()
     				}
