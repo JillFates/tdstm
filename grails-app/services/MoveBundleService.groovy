@@ -184,8 +184,9 @@ class MoveBundleService {
 			JOIN move_bundle mb ON mb.move_event_id = me.move_event_id 
 			JOIN asset_entity ae ON ae.move_bundle_id = mb.move_bundle_id
 			JOIN asset_transition atr ON atr.asset_entity_id = ae.asset_entity_id 
-			JOIN workflow_transition wtFrom ON wtFrom.trans_id = CAST(atr.state_from AS UNSIGNED INTEGER) AND wtFrom.process = p.workflow_code
-			JOIN workflow_transition wtTo ON wtTo.trans_id = CAST(atr.state_to AS UNSIGNED INTEGER) AND wtTo.process = p.workflow_code
+			JOIN workflow w on w.process = p.workflow_code
+			JOIN workflow_transition wtFrom ON wtFrom.trans_id = CAST(atr.state_from AS UNSIGNED INTEGER) AND wtFrom.workflow_id = w.workflow_id
+			JOIN workflow_transition wtTo ON wtTo.trans_id = CAST(atr.state_to AS UNSIGNED INTEGER) AND wtTo.workflow_id = w.workflow_id
 			JOIN user_login ul ON ul.user_login_id = atr.user_login_id
 			LEFT OUTER JOIN project_team pt ON pt.project_team_id = atr.project_team_id
 			WHERE me.move_event_id = ${moveEventId}
@@ -207,7 +208,8 @@ class MoveBundleService {
 				JOIN project p ON p.project_id = me.project_id
 				JOIN move_bundle mb ON mb.move_event_id = me.move_event_id 
 				JOIN asset_transition atr ON atr.move_bundle_id = mb.move_bundle_id AND atr.voided=0 
-				JOIN workflow_transition wt ON wt.trans_id = CAST(atr.state_to AS UNSIGNED INTEGER) AND wt.process = p.workflow_code
+				JOIN workflow w on w.process = p.workflow_code
+				JOIN workflow_transition wt ON wt.trans_id = CAST(atr.state_to AS UNSIGNED INTEGER) AND wt.workflow_id = w.workflow_id
 				WHERE me.move_event_id = ${moveEventId} AND atr.is_non_applicable = 0
 				GROUP BY mb.move_bundle_id, atr.state_to
 				ORDER BY CAST(state_to AS UNSIGNED INTEGER)"""
