@@ -37,10 +37,15 @@
                             <td valign="top" class="value"><g:link controller="person" action="show" id="${userLoginInstance?.person?.id}">${userLoginInstance?.person?.encodeAsHTML()}</g:link></td>
                             
                         </tr>
-                    
+                    	<tr class="prop">
+                            <td valign="top" class="name"><g:message code="userLogin.expiryDate.label" default="Expiry Date" />:</td>
+                            
+                            <td valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.expiryDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+                            
+                        </tr>
                     	<tr class="prop">
                             <td valign="top" class="name">Active:</td>
-                            
+                            	
                             <td valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'active')}</td>
                             
                         </tr>

@@ -4,7 +4,6 @@
 <meta name="layout" content="projectHeader" />
 <title>Create Demo Project</title>
 
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" />
 </head>
 <body>
 

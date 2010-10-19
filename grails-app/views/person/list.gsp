@@ -19,10 +19,6 @@
 
       })
 
-    </script>
-
-    <g:javascript>
-
       function showPersonDialog( e ) {
 
       var person = eval('(' + e.responseText + ')')
@@ -38,6 +34,13 @@
       } else {
       document.showForm.nickName.value = person.nickName
       document.editForm.nickName.value = person.nickName
+      }
+      if( !person.email ) {
+          document.showForm.email.value = ""
+          document.editForm.email.value = ""
+      } else {
+          document.showForm.email.value = person.email
+          document.editForm.email.value = person.email
       }
       document.showForm.title.value = person.title
       document.editForm.title.value = person.title
@@ -71,7 +74,7 @@ document.createDialogForm.company.value = ${companyId}
       }
 
 
-    </g:javascript>
+   </script>
 
   </head>
   <body>
@@ -144,54 +147,59 @@ def userLogin = UserLogin.findByPerson(personInstance);
               <tr class="prop">
                   <td valign="top" class="name">Company:</td>
 
-                  <td valign="top" class="value"><input type="text" id="company" name="company" value="" style="border: 0px"/></td>
+                  <td valign="top" class="value"><input type="text" id="company" name="company" size="34" value=""  style="border: 0px;background: none;" readonly="readonly"/></td>
 
                 </tr>
 
                 <tr class="prop">
                   <td valign="top" class="name">First Name:</td>
 
-                  <td valign="top" class="value"><input type="text" id="firstName" name="firstName" value="" style="border: 0px"/></td>
+                  <td valign="top" class="value"><input type="text" id="firstName" name="firstName" size="34" value=""  style="border: 0px;background: none;" readonly="readonly"/></td>
 
                 </tr>
 
                 <tr class="prop">
                   <td valign="top" class="name">Last Name:</td>
 
-                  <td valign="top" class="value"><input type="text" id="lastName" name="lastName" value="" style="border: 0px"/></td>
+                  <td valign="top" class="value"><input type="text" id="lastName" name="lastName" size="34" value=""  style="border: 0px;background: none;" readonly="readonly"/></td>
 
                 </tr>
 
                 <tr class="prop">
                   <td valign="top" class="name">Nick Name:</td>
 
-                  <td valign="top" class="value"><input type="text" id="nickName" name="nickName" value="" style="border: 0px"/></td>
+                  <td valign="top" class="value"><input type="text" id="nickName" name="nickName" size="34" value=""  style="border: 0px;background: none;" readonly="readonly"/></td>
 
                 </tr>
                 <tr class="prop">
                   <td valign="top" class="name">Title:</td>
 
-                  <td valign="top" class="value"><input type="text" id="title" name="title" value="" style="border: 0px"/></td>
+                  <td valign="top" class="value"><input type="text" id="title" name="title" size="34" value=""  style="border: 0px;background: none;" readonly="readonly"/></td>
 
                 </tr>
-
+				<tr class="prop">
+		        	<td valign="top" class="name"><g:message code="person.email.label" default="Email" />:</td>
+		                            
+		            <td valign="top" class="value"><input type="text" id="email" name="email" size="34" value=""  style="border: 0px;background: none;" readonly="readonly"/></td>
+		                            
+		        </tr>
                 <tr class="prop">
                   <td valign="top" class="name">Active:</td>
 
-                  <td valign="top" class="value"><input type="text" id="active" name="active" value="" style="border: 0px"/></td>
+                  <td valign="top" class="value"><input type="text" id="active" name="active" size="34" value=""  style="border: 0px;background: none;" readonly="readonly"/></td>
 
                 </tr>
                 <tr class="prop">
                   <td valign="top" class="name">Date Created:</td>
 
-                  <td valign="top" class="value"><input type="text" id="dateCreated" name="dateCreated" value="" style="border: 0px"/></td>
+                  <td valign="top" class="value"><input type="text" id="dateCreated" name="dateCreated" size="34" value=""  style="border: 0px;background: none;" readonly="readonly"/></td>
 
                 </tr>
 
                 <tr class="prop">
                   <td valign="top" class="name">Last Updated:</td>
 
-                  <td valign="top" class="value"><input type="text" id="lastUpdated" name="lastUpdated" value="" style="border: 0px"/></td>
+                  <td valign="top" class="value"><input type="text" id="lastUpdated" name="lastUpdated" size="34" value=""  style="border: 0px;background: none;" readonly="readonly"/></td>
 
                 </tr>
 
@@ -241,7 +249,7 @@ def userLogin = UserLogin.findByPerson(personInstance);
                     <label for="firstName"><b>First Name:&nbsp;<span style="color: red">*</span></b></label>
                   </td>
                   <td valign="top" class="value ${hasErrors(bean:personInstance,field:'firstName','errors')}">
-                    <input type="text" maxlength="64" id="firstName" name="firstName" value="${fieldValue(bean:personInstance,field:'firstName')}"/>
+                    <input type="text" maxlength="64" size="34" id="firstName" name="firstName" value="${fieldValue(bean:personInstance,field:'firstName')}"/>
                     <g:hasErrors bean="${personInstance}" field="firstName">
                       <div class="errors">
                         <g:renderErrors bean="${personInstance}" as="list" field="firstName"/>
@@ -255,7 +263,7 @@ def userLogin = UserLogin.findByPerson(personInstance);
                     <label for="lastName">Last Name:</label>
                   </td>
                   <td valign="top" class="value ${hasErrors(bean:personInstance,field:'lastName','errors')}">
-                    <input type="text" maxlength="64" id="lastName" name="lastName" value="${fieldValue(bean:personInstance,field:'lastName')}"/>
+                    <input type="text" maxlength="64" size="34" id="lastName" name="lastName" value="${fieldValue(bean:personInstance,field:'lastName')}"/>
                     <g:hasErrors bean="${personInstance}" field="lastName">
                       <div class="errors">
                         <g:renderErrors bean="${personInstance}" as="list" field="lastName"/>
@@ -269,7 +277,7 @@ def userLogin = UserLogin.findByPerson(personInstance);
                     <label for="nickName">Nick Name:</label>
                   </td>
                   <td valign="top" class="value ${hasErrors(bean:personInstance,field:'nickName','errors')}">
-                    <input type="text" maxlength="64" id="nickName" name="nickName" value="${fieldValue(bean:personInstance,field:'nickName')}"/>
+                    <input type="text" maxlength="64" size="34" id="nickName" name="nickName" value="${fieldValue(bean:personInstance,field:'nickName')}"/>
                     <g:hasErrors bean="${personInstance}" field="nickName">
                       <div class="errors">
                         <g:renderErrors bean="${personInstance}" as="list" field="nickName"/>
@@ -282,7 +290,7 @@ def userLogin = UserLogin.findByPerson(personInstance);
                     <label for="title">Title:</label>
                   </td>
                   <td valign="top" class="value ${hasErrors(bean:personInstance,field:'title','errors')}">
-                    <input type="text" maxlength="34" id="title" name="title" value="${fieldValue(bean:personInstance,field:'title')}"/>
+                    <input type="text" maxlength="34" size="34" id="title" name="title" value="${fieldValue(bean:personInstance,field:'title')}"/>
                     <g:hasErrors bean="${personInstance}" field="title">
                       <div class="errors">
                         <g:renderErrors bean="${personInstance}" as="list" field="title"/>
@@ -290,7 +298,14 @@ def userLogin = UserLogin.findByPerson(personInstance);
                     </g:hasErrors>
                   </td>
                 </tr>
-
+				<tr class="prop">
+                	<td valign="top" class="name">
+                    	<label for="email"><g:message code="person.email.label" default="Email" /></label>
+                    </td>
+                    <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'email', 'errors')}">
+                    	<g:textField name="email" value="${personInstance?.email}" size="34" />
+					</td>
+				</tr>
                 <tr class="prop">
                   <td valign="top" class="name">
                     <label for="active"><b>Active:&nbsp;<span style="color: red">*</span></b></label>
@@ -317,7 +332,7 @@ def userLogin = UserLogin.findByPerson(personInstance);
           <div class="buttons">
             <input type="hidden" id="id" name="id" value="${personInstance?.id}" />
             <input type="hidden" id="companyId" name="companyId" value="${companyId}" />
-            <span class="button"><g:actionSubmit class="edit" value="Update" /></span>
+            <span class="button"><g:actionSubmit class="edit" value="Update"  onclick="return validatePersonForm('editForm');" /></span>
             <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
           </div>
           </jsec:hasRole>
@@ -330,7 +345,7 @@ def userLogin = UserLogin.findByPerson(personInstance);
     <div id="dialog2" title="Create Staff" style="display:none;">
       <div class="dialog">
 
-        <g:form action="save" method="post" name="createDialogForm">
+        <g:form action="save" method="post" name="createDialogForm" onsubmit="return validatePersonForm('createDialogForm')">
           <div class="dialog">
             <table>
               <tbody>
@@ -407,7 +422,14 @@ def userLogin = UserLogin.findByPerson(personInstance);
                     </g:hasErrors>
                   </td>
                 </tr>
-
+				<tr class="prop">
+                	<td valign="top" class="name">
+                    	<label for="email"><g:message code="person.email.label" default="Email" /></label>
+			        </td>
+                    <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'email', 'errors')}">
+						<g:textField name="email" value="${personInstance?.email}" size="34" />
+					</td>
+		       </tr>
                 <tr class="prop">
                   <td valign="top" class="name">
                     <label for="active"><b>Active:&nbsp;<span style="color: red">*</span></b></label>
@@ -436,6 +458,29 @@ def userLogin = UserLogin.findByPerson(personInstance);
       </div>
 
     </div>
+    <script type="text/javascript">
+    /*
+    	Validate person form
+    */
+    var emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/
+    function validatePersonForm( form ){
+        var returnVal = true 
+    	var firstName = $("form[name = 'createDialogForm'] input[name = 'firstName']").val()
+        var email = $("form[name = 'createDialogForm'] input[name = 'email']").val()
+        if(form == 'editForm'){
+	        firstName = $("form[name = 'editForm'] input[name = 'firstName']").val()
+	        email = $("form[name = 'editForm'] input[name = 'email']").val()
+        }
+        if(!firstName) {
+            alert("First Name should not be blank ")
+            returnVal = false
+        } else if( email && !emailExp.test(email)){
+        	 alert(email +" is not a valid e-mail address ")
+             returnVal = false
+        }
+        return returnVal
+    }
+    </script>
   </body>
 </html>
                

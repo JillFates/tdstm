@@ -29,7 +29,8 @@
                    	        <g:sortableColumn property="lastLogin" title="Last Login" />
                    	    
                    	        <g:sortableColumn property="createdDate" title="Created Date" />
-                        
+							
+							<g:sortableColumn property="expiryDate" title="Expiry Date" />                        
                         
                         </tr>
                     </thead>
@@ -44,6 +45,8 @@
                             <td><tds:convertDateTime date="${userLoginInstance?.lastLogin}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
                             
                              <td><tds:convertDateTime date="${userLoginInstance?.createdDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+                             
+                             <td><tds:convertDateTime date="${userLoginInstance?.expiryDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
                         
                         </tr>
                     </g:each>

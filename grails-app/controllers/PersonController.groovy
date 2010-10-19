@@ -175,7 +175,10 @@ class PersonController {
         }
         else {       	
 
-        	def items = [id: personInstance.id, firstName: personInstance.firstName, lastName: personInstance.lastName, nickName: personInstance.nickName, title: personInstance.title, active: personInstance.active, dateCreated: dateCreatedByFormat, lastUpdated: lastUpdatedFormat, companyId: companyId,companyParty:companyParty ]
+        	def items = [id: personInstance.id, firstName: personInstance.firstName, lastName: personInstance.lastName, 
+						 nickName: personInstance.nickName, title: personInstance.title, active: personInstance.active, 
+						 dateCreated: dateCreatedByFormat, lastUpdated: lastUpdatedFormat, companyId: companyId,
+						 companyParty:companyParty, email: personInstance.email]
             render items as JSON
         }
     }
@@ -195,7 +198,8 @@ class PersonController {
         map.put("lastName", personInstance.lastName)
         map.put("nickName", personInstance.nickName)
         map.put("title", personInstance.title)
-        map.put("active", personInstance.active)
+        map.put("email", personInstance.email)
+		map.put("active", personInstance.active)
         map.put("role", role)
         render map as JSON
     }
@@ -296,7 +300,14 @@ class PersonController {
 	def getPersonDetails = {
     	def personId = params.id
 		def person = Person.findById( personId  )
-		render person as JSON
+		def userLogin = UserLogin.findByPerson( person )
+		
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+        def expiryDate = userLogin.expiryDate ? formatter.format(GormUtil.convertInToUserTZ(userLogin.expiryDate,tzId)) : ""
+		
+        def personDetails = [person:person, expiryDate: expiryDate]
+		render personDetails as JSON
     }
 	/*-----------------------------------------------------------
 	 * Update the person details and user password, Return person first name
@@ -309,13 +320,20 @@ class PersonController {
 			def ret = []
 			personInstance.properties = params
 			if ( !personInstance.hasErrors() && personInstance.save() ) {
+				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+				def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
 				getSession().setAttribute( "LOGIN_PERSON", ['name':personInstance.firstName, "id":personInstance.id ])
 				def userLogin = UserLogin.findByPerson( personInstance )
 				def password = params.password
 				if( password ){
 					userLogin.password = new Sha1Hash( password ).toHex()
-					userLogin.save();
 				}
+				def expiryDate = params.expiryDate
+				if(expiryDate){
+					userLogin.expiryDate =  GormUtil.convertInToGMT(formatter.parse( expiryDate ), tzId)
+				}
+				userLogin.save();
+				
 				userPreferenceService.setPreference( "CURR_TZ", params.timeZone )
 				userPreferenceService.loadPreferences("CURR_TZ")
 			}

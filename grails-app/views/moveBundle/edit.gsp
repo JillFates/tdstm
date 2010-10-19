@@ -6,7 +6,6 @@
     <meta name="layout" content="moveBundleHeader" />
     <title>Edit MoveBundle</title>
 
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" type="text/css"/>
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery-ui.css')}" type="text/css"/>
 	<g:javascript src="jquery/jquery.ui.widget.js"/>
 	<g:javascript src="jquery/jquery.ui.mouse.js"/>

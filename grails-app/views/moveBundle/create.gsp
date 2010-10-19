@@ -6,8 +6,6 @@
     <meta name="layout" content="projectHeader" />
     <title>Create MoveBundle</title>
 
-    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" />
-
     <script type="text/javascript">
       function initialize(){
 

@@ -10,6 +10,7 @@
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
+    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" type="text/css"/>
 	<g:javascript library="prototype" />
     <jq:plugin name="jquery.combined" />
     <g:javascript src="crawler.js" />
@@ -22,6 +23,9 @@
       		$("#personDialog").dialog({ autoOpen: false })
       		${remoteFunction(controller:'userLogin', action:'updateLastPageLoad')}
      	})      
+     	var emailRegExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/
+     	var dateRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([APap][Mm])$/;
+     	
    	</script>
   </head>	
     
@@ -238,6 +242,27 @@
                     <input type="text" maxlength="34" id="titleId" name="title"/>
                   </td>
                 </tr>
+                <tr class="prop">
+                  <td valign="top" class="name">
+                    <label for="nickName">Email:</label>
+                  </td>
+                  <td valign="top" class="value">
+                    <input type="text" maxlength="64" id="emailId" name="email"/>
+                  </td>
+                </tr>
+                <tr class="prop">
+                  <td valign="top" class="name">
+                    <label for="nickName"><b>Expiry Date:<span style="color: red">*</span></label>
+                  </td>
+                  <td valign="top" class="value">
+                   <script type="text/javascript">
+						$(document).ready(function(){
+				        	$("#expiryDateId").datetimepicker();
+				        });
+				    </script>
+                    <input type="text" maxlength="64" id="expiryDateId" name="expiryDate"/>
+                  </td>
+                </tr>
                  <tr class="prop">
                   <td valign="top" class="name">
                     <label for="title">Time Zone:</label>
@@ -269,20 +294,43 @@
 			neutral: 150,
 			savedirection: false
 		});
+		// Update person details 
 		function updatePersonDetails( e ){
-			var person = eval("(" + e.responseText + ")");
-			$("#personId").val(person.id)
-			$("#firstNameId").val(person.firstName);
-			$("#lastNameId").val(person.lastName);
-			$("#nickNameId").val(person.nickName);
-			$("#titleId").val(person.title);
+			var personDetails = eval("(" + e.responseText + ")");
+			$("#personId").val(personDetails.person.id)
+			$("#firstNameId").val(personDetails.person.firstName);
+			$("#lastNameId").val(personDetails.person.lastName);
+			$("#nickNameId").val(personDetails.person.nickName);
+			$("#emailId").val(personDetails.person.email);
+			$("#titleId").val(personDetails.person.title);
+			$("#expiryDateId").val(personDetails.expiryDate);
 			$("#personDialog").dialog('option', 'width', 500)
 		    $("#personDialog").dialog("open")
 	  	}
 		function changePersonDetails(){
-			${remoteFunction(controller:'person', action:'updatePerson', 
-					params:'\'id=\' + $(\'#personId\').val() +\'&firstName=\'+$(\'#firstNameId\').val() +\'&lastName=\'+$(\'#lastNameId\').val()+\'&nickName=\'+$(\'#nickNameId\').val()+\'&title=\'+$(\'#titleId\').val()+\'&password=\'+$(\'#passwordId\').val()+\'&timeZone=\'+$(\'#timeZoneId\').val()', 
-					onComplete:'updateWelcome(e)')}
+			var returnVal = true 
+	    	var firstName = $("#firstNameId").val()
+	        var email = $("#emailId").val()
+	        var expiryDate = $("#expiryDateId").val()
+	        if(!firstName) {
+	            alert("First Name should not be blank ")
+	            returnVal = false
+	        } else if( email && !emailRegExp.test(email)){
+	        	 alert(email +" is not a valid e-mail address ")
+	             returnVal = false
+	        } else if(!expiryDate){
+	        	alert("Expiry Date should not be blank ")
+	            returnVal = false
+	        } else  if(!dateRegExp.test(expiryDate)){
+		        alert("Expiry Date should be in 'mm/dd/yyyy HH:MM AM/PM' format")
+		        returnVal = false
+	        }
+	        alert(returnVal)
+	        if(returnVal){
+				${remoteFunction(controller:'person', action:'updatePerson', 
+						params:'\'id=\' + $(\'#personId\').val() +\'&firstName=\'+$(\'#firstNameId\').val() +\'&lastName=\'+$(\'#lastNameId\').val()+\'&nickName=\'+$(\'#nickNameId\').val()+\'&title=\'+$(\'#titleId\').val()+\'&password=\'+$(\'#passwordId\').val()+\'&timeZone=\'+$(\'#timeZoneId\').val()+\'&email=\'+$(\'#emailId\').val()+\'&expiryDate=\'+$(\'#expiryDateId\').val()', 
+						onComplete:'updateWelcome(e)')}
+	        }
 		}
 	  	function updateWelcome( e ){
 		  	var ret = eval("(" + e.responseText + ")");

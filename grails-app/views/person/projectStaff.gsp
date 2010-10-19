@@ -29,9 +29,6 @@
 	      	
 	    </script>
 	    <script type="text/javascript">
-	    
-	    </script>
-		<g:javascript>
 
 	      	function editPersonDialog( e ) {
 
@@ -42,6 +39,7 @@
 		      	document.editForm.lastName.value = person.lastName
 		      	document.editForm.nickName.value = person.nickName
 		      	document.editForm.title.value = person.title
+		      	document.editForm.email.value = person.email
 		      	document.editForm.active.value = person.active
 		      	document.editForm.roleType.value = person.role
 		      
@@ -94,27 +92,29 @@
 				}
 		 	}
 		 	// function to validate CreateForm
+		 	 var emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/
 		 	function validateEditForm(){
-		 		
+				var returnVal = true
 		 		var firstName = document.editForm.firstName.value;
 		 		var roleType = document.editForm.roleType.value;
-		 		var companyVal = document.createForm.company.value;
+		 		var companyVal = document.editForm.company.value;
+		 		var email = document.editForm.email.value
 		 		if( companyVal == "" ){
 		 		    alert("please select Company ");
-		 			return false;
-		 		}else if( firstName != "" ){
-					if(roleType != "null" && roleType != ""){
-						return true;
-					}else{
-						alert("please select Role ");
-						return false;
-					}
-				}else{
-					alert("First Name can not be Blank");
-					return false;					
+		 		   returnVal = false;
+		 		} else if( !firstName ){
+		 			alert("First Name can not be Blank");
+					returnVal =  false;
+				} else if( email && !emailExp.test(email) ){
+					alert(email +" is not a valid e-mail address ")
+					returnVal =  false;
+				} else if( !roleType ){
+					alert("please select Role ");
+					returnVal =  false;
 				}
+				return returnVal
 		 	}
-	      	</g:javascript>
+	      	</script>
 </head>
 <body>
 
@@ -163,9 +163,12 @@
                 <div class="dialog">
                     <table>
                         <tbody>
+                        <tr>
+							<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+							</tr>
                      <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label>Company:</label>
+                                    <label><b>Company:<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ">
                                
@@ -179,7 +182,7 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="firstName">First Name:</label>
+                                    <label for="firstName"><b>First Name:<span style="color: red">*</span></b> </label>
                                 </td>
                                 <td valign="top" class="value ">
                                     <input type="text" maxlength="64" id="firstName" name="firstName" value=""/>
@@ -211,6 +214,14 @@
                                     <input type="text" maxlength="34" id="title" name="title" value=""/>
                                 </td>
                             </tr>
+                            <tr class="prop">
+			                	<td valign="top" class="name">
+			                    	<label for="email"><g:message code="person.email.label" default="Email" /></label>
+						        </td>
+			                    <td valign="top" class="value">
+									<g:textField name="email" />
+								</td>
+					       </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="active">Active:</label>

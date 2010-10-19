@@ -1,6 +1,7 @@
 import org.jsecurity.crypto.hash.Sha1Hash;
 import org.jsecurity.SecurityUtils;
 import com.tdssrc.grails.GormUtil
+import java.text.SimpleDateFormat
 
 class UserLoginController {
     
@@ -96,6 +97,16 @@ class UserLoginController {
 	        def userLoginInstance = UserLogin.get( params.id )
 	        def companyId = params.companyId
 	        if(userLoginInstance) {
+	        	try{
+		        	def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+		            def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		            def expiryDate = params.expiryDate
+		            if(expiryDate){
+		            	params.expiryDate =  GormUtil.convertInToGMT(formatter.parse( expiryDate ), tzId)
+		            }
+	        	} catch (Exception ex){
+	        		println"Invalid date format"
+	        	}
 	        	def password = params.password
 	        	def oldPassword = userLoginInstance.password
 	        	userLoginInstance.properties = params
@@ -152,12 +163,24 @@ class UserLoginController {
 		
         def userLoginInstance = new UserLogin()
         userLoginInstance.properties = params
+		def expiryDate = new Date(GormUtil.convertInToGMT( "now", "EDT" ).getTime() + 7776000000)
+        userLoginInstance.expiryDate = expiryDate
         return ['userLoginInstance':userLoginInstance, personInstance:personInstance, companyId:companyId ]
     }
 	/*
 	 *  Save the User details and set the user roles for Person
 	 */
     def save = {
+		try{
+			def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			def expiryDate = params.expiryDate
+			if(expiryDate){
+				params.expiryDate =  GormUtil.convertInToGMT(formatter.parse( expiryDate ), tzId)
+			}
+		} catch (Exception ex){
+			println"Invalid date format"
+		}
         def userLoginInstance = new UserLogin(params)
         //userLoginInstance.createdDate = new Date()
         def companyId = params.companyId

@@ -79,7 +79,7 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="password"><b>Password:&nbsp;<span style="color: red">*</span></b></label>
+                                    <label for="password">Password:&nbsp;</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'password','errors')}">
                                     <input type="password" id="password" name="password" value=""/>
@@ -90,6 +90,25 @@
 					            </g:hasErrors>
                                 </td>
                             </tr> 
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                  <label for="expiryDate"><g:message code="userLogin.expiryDate.label" default="Expiry Date" />:</label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: userLoginInstance, field: 'expiryDate', 'errors')}">
+                                <script type="text/javascript">
+				                    $(document).ready(function(){
+				                      $("#expiryDate").datetimepicker();
+				                    });
+				                  </script>
+                                    <input type="text" class="dateRange" id="expiryDate" name="expiryDate"
+        					value="<tds:convertDateTime date="${userLoginInstance?.expiryDate}"  formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"/>
+								<g:hasErrors bean="${userLoginInstance}" field="expiryDate">
+						            <div class="errors">
+						                <g:renderErrors bean="${userLoginInstance}" as="list" field="expiryDate"/>
+						            </div>
+					            </g:hasErrors>
+                                </td>
+                            </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="active"><b>Active:&nbsp;<span style="color: red">*</span></b></label>
