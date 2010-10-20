@@ -255,12 +255,18 @@
                     <label for="nickName"><b>Expiry Date:<span style="color: red">*</span></label>
                   </td>
                   <td valign="top" class="value">
+                   <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
                    <script type="text/javascript">
 						$(document).ready(function(){
 				        	$("#expiryDateId").datetimepicker();
 				        });
 				    </script>
+				    
                     <input type="text" maxlength="64" id="expiryDateId" name="expiryDate"/>
+                    </jsec:hasAnyRole>
+                    <jsec:lacksAllRoles in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+                    <input type="text" maxlength="64" id="expiryDateId" name="expiryDate" readonly="readonly" style="background: none;border: 0"/>
+                    </jsec:lacksAllRoles>
                   </td>
                 </tr>
                  <tr class="prop">
@@ -325,7 +331,6 @@
 		        alert("Expiry Date should be in 'mm/dd/yyyy HH:MM AM/PM' format")
 		        returnVal = false
 	        }
-	        alert(returnVal)
 	        if(returnVal){
 				${remoteFunction(controller:'person', action:'updatePerson', 
 						params:'\'id=\' + $(\'#personId\').val() +\'&firstName=\'+$(\'#firstNameId\').val() +\'&lastName=\'+$(\'#lastNameId\').val()+\'&nickName=\'+$(\'#nickNameId\').val()+\'&title=\'+$(\'#titleId\').val()+\'&password=\'+$(\'#passwordId\').val()+\'&timeZone=\'+$(\'#timeZoneId\').val()+\'&email=\'+$(\'#emailId\').val()+\'&expiryDate=\'+$(\'#expiryDateId\').val()', 
