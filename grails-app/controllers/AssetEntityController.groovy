@@ -1064,9 +1064,10 @@ class AssetEntityController {
 	            def targetAvailAssets = jdbcTemplate.queryForList( countQuery + " and e.target_team_id = ${it.id} and pm.current_state_id >= $stagedId "+
 	            													" and pm.current_state_id < $rerackedId group by e.asset_entity_id HAVING minstate != $holdId ").size()
 				def latestAssetCreated = AssetTransition.findAll("FROM AssetTransition a where a.assetEntity = ? and a.projectTeam = ? Order By a.id desc",[it.latestAsset, it],[max:1])
-				def elapsedTime 
+				def elapsedTime = "00:00m"
 				if(latestAssetCreated.size() > 0){
-					elapsedTime = convertIntegerIntoTime(GormUtil.convertInToGMT("now", "EDT" ).getTime() - latestAssetCreated[0].dateCreated.getTime() )?.toString()?.substring(0,5)
+					elapsedTime = convertIntegerIntoTime(GormUtil.convertInToGMT("now", "EDT" ).getTime() - latestAssetCreated[0].dateCreated.getTime() )?.toString()
+					elapsedTime = elapsedTime?.substring(0,elapsedTime.lastIndexOf(":")) + "m"
 				}
 	            bundleTeams <<[team:it,members:member, sourceAssets:sourceAssets, 
 	                           unrackedAssets:unrackedAssets, sourceAvailassets:sourceAvailassets , 

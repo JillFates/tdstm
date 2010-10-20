@@ -352,7 +352,7 @@ class MoveEventController {
 			def moveEventNews = jdbcTemplate.queryForList( moveEventNewsQuery )
 			
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-			DateFormat formatter = new SimpleDateFormat("MM/dd hh:mma");
+			DateFormat formatter = new SimpleDateFormat("MM/dd hh:mm a");
 			def news = new StringBuffer()
 			
 			moveEventNews.each{
@@ -371,10 +371,13 @@ class MoveEventController {
 												p.last_modified between SUBTIME('$currentPoolTime','00:15:00') and '$currentPoolTime')"""
 				def transitionResultList = jdbcTemplate.queryForList( recentAssetTransitions )
 				transitionResultList.each{
-					def asset = AssetEntity.get(it.assetId)
-					def message = asset.assetTag+"-"+asset.assetName +" moved to "+stateEngineService.getStateLabel(moveEvent.project.workflowCode,it.stateTo)+" state."
-					def date = it.dateModified ? GormUtil.convertInToUserTZ( it.dateModified, tzId ) : GormUtil.convertInToUserTZ( it.dateCreated, tzId )
-					news.append(String.valueOf(formatter.format(date)) +"&nbsp;:&nbsp;"+	message+".&nbsp;&nbsp;")	
+					def currentTransition = AssetTransition.findAll("FROM AssetTransition at WHERE at.assetEntity = ${it.assetId} AND at.stateTo = '${it.stateTo}' AND at.voided = 0 ORDER BY at.dateCreated")
+					if(currentTransition.size() > 0){
+						def asset = currentTransition[0].assetEntity
+						def message = asset.assetTag+"-"+asset.assetName +" marked "+stateEngineService.getStateLabel(moveEvent.project.workflowCode,it.stateTo)+" by "+currentTransition[0]?.userLogin?.person?.firstName
+						def date = String.valueOf( formatter.format(it.dateModified ? GormUtil.convertInToUserTZ( it.dateModified, tzId ) : GormUtil.convertInToUserTZ( it.dateCreated, tzId ) ) )
+						news.append(date.substring(6,14) +"&nbsp;:&nbsp;"+	message+".&nbsp;&nbsp;")
+					}
 				}
 			}
 			def query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent = ? AND mes.type = ? ORDER BY mes.dateCreated DESC"    					
