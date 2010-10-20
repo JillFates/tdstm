@@ -360,6 +360,7 @@ class MoveEventController {
 	    	}
 			
 			// append recent asset transitions if moveEvent is ininProgress and project trackChanges is yes.
+			def transitionComment = new StringBuffer()
 			if(moveEvent.inProgress =="true" && moveEvent.project.trackChanges == "Y"){
 				def today = GormUtil.convertInToGMT( "now", tzId );
 				def currentPoolTime = new java.sql.Timestamp(today.getTime())
@@ -376,7 +377,7 @@ class MoveEventController {
 						def asset = currentTransition[0].assetEntity
 						def message = asset.assetTag+"-"+asset.assetName +" marked "+stateEngineService.getStateLabel(moveEvent.project.workflowCode,it.stateTo)+" by "+currentTransition[0]?.userLogin?.person?.firstName
 						def date = String.valueOf( formatter.format(it.dateModified ? GormUtil.convertInToUserTZ( it.dateModified, tzId ) : GormUtil.convertInToUserTZ( it.dateCreated, tzId ) ) )
-						news.append(date.substring(6,14) +"&nbsp;:&nbsp;"+	message+".&nbsp;&nbsp;")
+						transitionComment.append(date.substring(6,14) +"&nbsp;:&nbsp;"+	message+".&nbsp;&nbsp;")
 					}
 				}
 			}
@@ -395,7 +396,7 @@ class MoveEventController {
 				status = "YELLOW"
 			}
 
-	    	statusAndNewsList << ['news':news.toString(), 'cssClass':cssClass, 'status':status]
+	    	statusAndNewsList << ['news':news.toString() + "<span style='font-weight:normal'>"+transitionComment.toString()+"</span>", 'cssClass':cssClass, 'status':status]
 	
 		}
 		render statusAndNewsList as JSON
