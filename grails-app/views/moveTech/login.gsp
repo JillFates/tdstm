@@ -13,17 +13,49 @@
         window.addEventListener('load', function(){
                 setTimeout(scrollTo, 0, 0, 1);
         }, false);
+   /*========================================
+	*	Check cookie if exist fill username
+	*=======================================*/
+	function getCookie(user_name){
+		document.loginForm.username.focus()
+		var username = "${username}"
+		if(!username){
+			username = ""
+			if (document.cookie.length>0){
+		  		user_start=document.cookie.indexOf(user_name + "=");
+		  		if (user_start!=-1) { 
+		    		user_start=user_start + user_name.length+1 ;
+		   			user_end=document.cookie.indexOf(";",user_start);
+		    		if (user_end==-1) user_end=document.cookie.length
+	
+		    		username = unescape(document.cookie.substring(user_start,user_end));
+		    	}
+		  	}
+			document.loginForm.username.value = username
+		}
+	}
+	/*==========================
+	*  Set username in cookie.
+	*==========================*/
+
+	function setCookie(user_name,expirehours){
+		var exdate=new Date();
+		var value = document.loginForm.username.value
+		exdate.setHours(exdate.getHours()+expirehours);
+		document.cookie=user_name+ "=" +escape(value)+((expirehours==null) ? "" : "; expires="+exdate);
+		return true
+	}
 </script>
 
 </head>
-<body onload="document.loginForm.username.focus()">
+<body onload="getCookie('username');">
 <div id="spinner" class="spinner" style="display: none;">
 <img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 </div>
 <div class="mainbody" style="width: auto;">
 <div class="colum_techlogin_login" style="float:left;">
-
-<div class="w_techlog_login"><g:form action="signIn" name="loginForm">
+<form onsubmit=""></form>
+<div class="w_techlog_login"><g:form action="signIn" name="loginForm" onsubmit="return setCookie('username',2)">
         <input type="hidden" name="targetUri" value="${targetUri}" />
         <input type="hidden" name="browserName" id="browserName" value="" />
         <g:if test="${flash.message}">

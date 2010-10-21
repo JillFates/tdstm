@@ -61,8 +61,14 @@ class MoveBundleController {
 					def stepSnapshot = StepSnapshot.findAll("FROM StepSnapshot ss WHERE ss.moveBundleStep = :msb ORDER BY ss.dateCreated DESC",[msb:it, max:1])
 					dashboardSteps << [moveBundleStep : it, stepSnapshot : stepSnapshot[0] ]
 				}
+	        	def showHistoryButton = false
+				def bundleTransition = AssetTransition.findWhere( moveBundle : moveBundleInstance )
+				
+				if( bundleTransition )
+					showHistoryButton = true
+					
 	        	return [ moveBundleInstance : moveBundleInstance, projectId:projectId, projectManager: projectManager, 
-						 moveManager: moveManager, dashboardSteps:dashboardSteps] 
+						 moveManager: moveManager, dashboardSteps:dashboardSteps, showHistoryButton : showHistoryButton ] 
 	        }
 		} else {
 			redirect(action:list)
@@ -375,6 +381,7 @@ class MoveBundleController {
 		}
 		 render message;
 	}
+	
 	def projectMoveBundles = {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def moveBundlesList 
@@ -382,5 +389,21 @@ class MoveBundleController {
 			moveBundlesList = MoveBundle.findAllByProject(Project.get(projectId))
 	 	}
 		render moveBundlesList as JSON
+	}
+	/*
+	 * Clear any transitions for the assets in that move bundle. 
+	 * @param : bundleId, ProjectId
+	 * */
+	def clearBundleAssetHistory = {
+		def bundleId = params.id
+		if(bundleId){
+			def moveBundle = MoveBundle.get( bundleId )
+			AssetTransition.executeUpdate("DELETE FROM AssetTransition at WHERE at.moveBundle = ?", [ moveBundle ] )
+			AssetEntity.executeUpdate("UPDATE AssetEntity ae SET ae.currentStatus = null WHERE ae.moveBundle = ?", [ moveBundle ] )
+			ProjectAssetMap.executeUpdate("DELETE FROM ProjectAssetMap WHERE asset in (SELECT ae.id FROM AssetEntity ae WHERE ae.moveBundle = ${moveBundle.id})")
+			MoveBundleStep.executeUpdate("UPDATE MoveBundleStep mbs SET mbs.actualStartTime = null , mbs.actualCompletionTime = null WHERE mbs.moveBundle = ?", [ moveBundle ] )
+			stepSnapshotService.process( bundleId )
+		}
+		redirect(action:show,params:[id:params.id, projectId:params.projectId])
 	}
 }
