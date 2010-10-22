@@ -17,7 +17,6 @@
 	*	Check cookie if exist fill username
 	*=======================================*/
 	function getCookie(user_name){
-		document.loginForm.username.focus()
 		var username = "${username}"
 		if(!username){
 			username = ""
@@ -33,6 +32,7 @@
 		  	}
 			document.loginForm.username.value = username
 		}
+		document.loginForm.username.focus()
 	}
 	/*==========================
 	*  Set username in cookie.
@@ -42,7 +42,7 @@
 		var exdate=new Date();
 		var value = document.loginForm.username.value
 		exdate.setHours(exdate.getHours()+expirehours);
-		document.cookie=user_name+ "=" +escape(value)+((expirehours==null) ? "" : "; expires="+exdate);
+		document.cookie = user_name+ "=" +escape(value)+((expirehours==null) ? "" : "; expires="+exdate);
 		return true
 	}
 </script>
@@ -54,7 +54,6 @@
 </div>
 <div class="mainbody" style="width: auto;">
 <div class="colum_techlogin_login" style="float:left;">
-<form onsubmit=""></form>
 <div class="w_techlog_login"><g:form action="signIn" name="loginForm" onsubmit="return setCookie('username',2)">
         <input type="hidden" name="targetUri" value="${targetUri}" />
         <input type="hidden" name="browserName" id="browserName" value="" />
@@ -78,7 +77,7 @@
                         </tr>
                         <tr>
                                 <td style="text-align:center;"><label>Username:</label>
-                                <input type="text" size="10" name="username" value="${username}" /></td>
+                                <input type="text" size="10" name="username" value="${username}" onfocus="select()"/></td>
                         </tr>
                         <tr>
                                 <td class="buttonR" style="text-align: center;">
