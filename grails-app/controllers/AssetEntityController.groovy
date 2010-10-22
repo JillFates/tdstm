@@ -50,6 +50,9 @@ class AssetEntityController {
             }
 		}
         def project = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
+		
+		params['project.id'] = project.id
+		
         def assetEntityList = filterService.filter( params, AssetEntity )
         assetEntityList.each{
             if( it.project.id == project.id ) {

@@ -20,7 +20,7 @@ class FilterService {
         def filterOpParams = filterParams.op
         def associationList = []
         def domainClass = FilterUtils.resolveDomainClass(grailsApplication, filterClass)
-
+		def project = params['project.id']
         //if (filterProperties != null) {
         if (filterOpParams != null && filterOpParams.size() > 0) {
 
@@ -73,7 +73,7 @@ class FilterService {
                                             def val2 = this.parseValue(thisDomainProp, realRawValue2, filterParams, parsingName)
 //                                            log.debug("val is ${val} and val2 is ${val2}")
 
-                                            this.addCriterion(c, realPropName, realOp, val, val2, filterParams, thisDomainProp)
+                                            this.addCriterion(c, realPropName, realOp, val, val2, filterParams, thisDomainProp, project)
                                         }
                                         if (!doCount && params.sort && params.sort.startsWith("${propName}.")) {
                                             def parts = params.sort.split("\\.")
@@ -90,7 +90,7 @@ class FilterService {
                                 def val  = this.parseValue(thisDomainProp, rawValue, filterParams, null)
                                 def val2 = this.parseValue(thisDomainProp, rawValue2, filterParams, "${propName}To")
                                 if (log.isDebugEnabled()) log.debug("== propName is ${propName}, rawValue is ${rawValue}, val is ${val} of type ${val?.class} val2 is ${val2} of type ${val2?.class}")
-                                this.addCriterion(c, propName, filterOp, val, val2, filterParams, thisDomainProp)
+                                this.addCriterion(c, propName, filterOp, val, val2, filterParams, thisDomainProp, project)
                             }
                         }
                         if (log.isDebugEnabled()) log.debug("==============================================================================='\n")
@@ -147,7 +147,7 @@ class FilterService {
         }
     }
 
-    private def addCriterion(def criteria, def propertyName, def op, def value, def value2, def filterParams, def domainProperty) {
+    private def addCriterion(def criteria, def propertyName, def op, def value, def value2, def filterParams, def domainProperty, def project) {
         if (log.isDebugEnabled()) log.debug("Adding ${propertyName} ${op} ${value} value2 ${value2}")
         boolean added = true
 
@@ -163,7 +163,9 @@ class FilterService {
             if (log.isDebugEnabled())
                 log.debug("Date criterion is Equal to day precision.  Changing it to between ${value} and ${value2}")
         }
-
+        
+        criteria.eq('project.id',project)
+		
         if(value != null) {
             switch(op) {
                 case 'Equal':

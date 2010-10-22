@@ -94,7 +94,9 @@
 	      			return false;
       			}
       		}
-      		
+      		function showAssetDetails( assetId ){
+      			${remoteFunction(action:'editShow', params:'\'id=\'+assetId', before:'document.showForm.id.value = assetId;document.editForm.id.value = assetId;', onComplete:"showAssetDialog(e , 'show')")}
+      		}
 	    </script>
 <filterpane:includes />
 </head>
@@ -167,27 +169,27 @@
 				</g:else></span>
 				</td>
 				
-				<td id="application_${assetEntityInstance.id}" onclick="${remoteFunction(action:'editShow', params:'\'id=\'+'+assetEntityInstance.id, before:'document.showForm.id.value ='+ assetEntityInstance.id+';document.editForm.id.value = '+ assetEntityInstance.id+';', onComplete:'showAssetDialog(e , \'show\')')}"> ${fieldValue(bean:assetEntityInstance, field:'application')} </td>
+				<td id="application_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )"> ${fieldValue(bean:assetEntityInstance, field:'application')} </td>
 
-				<td><a href="#" id="assetName_${assetEntityInstance.id}" onclick="${remoteFunction(action:'editShow', params:'\'id=\'+'+assetEntityInstance.id, before:'document.showForm.id.value ='+ assetEntityInstance.id+';document.editForm.id.value = '+ assetEntityInstance.id+';', onComplete:'showAssetDialog(e , \'show\')')}">${fieldValue(bean:assetEntityInstance, field:'assetName')}</a> </td>
+				<td><a href="#" id="assetName_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${fieldValue(bean:assetEntityInstance, field:'assetName')}</a> </td>
 
-				<td id="model_${assetEntityInstance.id}" onclick="${remoteFunction(action:'editShow', params:'\'id=\'+'+assetEntityInstance.id, before:'document.showForm.id.value ='+ assetEntityInstance.id+';document.editForm.id.value = '+ assetEntityInstance.id+';', onComplete:'showAssetDialog(e , \'show\')')}">${fieldValue(bean:assetEntityInstance, field:'model')}</td>
+				<td id="model_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${fieldValue(bean:assetEntityInstance, field:'model')}</td>
 
-				<td id="sourceLocation_${assetEntityInstance.id}" onclick="${remoteFunction(action:'editShow', params:'\'id=\'+'+assetEntityInstance.id, before:'document.showForm.id.value ='+ assetEntityInstance.id+';document.editForm.id.value = '+ assetEntityInstance.id+';', onComplete:'showAssetDialog(e , \'show\')')}">${fieldValue(bean:assetEntityInstance, field:'sourceLocation')}</td>
+				<td id="sourceLocation_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${fieldValue(bean:assetEntityInstance, field:'sourceLocation')}</td>
 
-				<td id="sourceRack_${assetEntityInstance.id}" onclick="${remoteFunction(action:'editShow', params:'\'id=\'+'+assetEntityInstance.id, before:'document.showForm.id.value ='+ assetEntityInstance.id+';document.editForm.id.value = '+ assetEntityInstance.id+';', onComplete:'showAssetDialog(e , \'show\')')}">${fieldValue(bean:assetEntityInstance, field:'sourceRack')}</td>
+				<td id="sourceRack_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${fieldValue(bean:assetEntityInstance, field:'sourceRack')}</td>
 
-				<td id="targetLocation_${assetEntityInstance.id}" onclick="${remoteFunction(action:'editShow', params:'\'id=\'+'+assetEntityInstance.id, before:'document.showForm.id.value ='+ assetEntityInstance.id+';document.editForm.id.value = '+ assetEntityInstance.id+';', onComplete:'showAssetDialog(e , \'show\')')}">${fieldValue(bean:assetEntityInstance, field:'targetLocation')}</td>
+				<td id="targetLocation_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${fieldValue(bean:assetEntityInstance, field:'targetLocation')}</td>
 				
-				<td id="targetRack_${assetEntityInstance.id}" onclick="${remoteFunction(action:'editShow', params:'\'id=\'+'+assetEntityInstance.id, before:'document.showForm.id.value ='+ assetEntityInstance.id+';document.editForm.id.value = '+ assetEntityInstance.id+';', onComplete:'showAssetDialog(e , \'show\')')}">${fieldValue(bean:assetEntityInstance, field:'targetRack')}</td>
+				<td id="targetRack_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${fieldValue(bean:assetEntityInstance, field:'targetRack')}</td>
 
-				<td id="assetType_${assetEntityInstance.id}" onclick="${remoteFunction(action:'editShow', params:'\'id=\'+'+assetEntityInstance.id, before:'document.showForm.id.value ='+ assetEntityInstance.id+';document.editForm.id.value = '+ assetEntityInstance.id+';', onComplete:'showAssetDialog(e , \'show\')')}">${fieldValue(bean:assetEntityInstance, field:'assetType')}</td>
+				<td id="assetType_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${fieldValue(bean:assetEntityInstance, field:'assetType')}</td>
 
-				<td id="assetTag_${assetEntityInstance.id}" onclick="${remoteFunction(action:'editShow', params:'\'id=\'+'+assetEntityInstance.id, before:'document.showForm.id.value ='+ assetEntityInstance.id+';document.editForm.id.value = '+ assetEntityInstance.id+';', onComplete:'showAssetDialog(e , \'show\')')}">${fieldValue(bean:assetEntityInstance, field:'assetTag')}</td>
+				<td id="assetTag_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${fieldValue(bean:assetEntityInstance, field:'assetTag')}</td>
 
-				<td id="serialNumber_${assetEntityInstance.id}" onclick="${remoteFunction(action:'editShow', params:'\'id=\'+'+assetEntityInstance.id, before:'document.showForm.id.value ='+ assetEntityInstance.id+';document.editForm.id.value = '+ assetEntityInstance.id+';', onComplete:'showAssetDialog(e , \'show\')')}">${fieldValue(bean:assetEntityInstance, field:'serialNumber')}</td>
+				<td id="serialNumber_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${fieldValue(bean:assetEntityInstance, field:'serialNumber')}</td>
 				
-				<td id="moveBundle_${assetEntityInstance.id}" onclick="${remoteFunction(action:'editShow', params:'\'id=\'+'+assetEntityInstance.id, before:'document.showForm.id.value ='+ assetEntityInstance.id+';document.editForm.id.value = '+ assetEntityInstance.id+';', onComplete:'showAssetDialog(e , \'show\')')}">${fieldValue(bean:assetEntityInstance, field:'moveBundle')}</td>
+				<td id="moveBundle_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${fieldValue(bean:assetEntityInstance, field:'moveBundle')}</td>
 
 			</tr>
 		</g:each>
