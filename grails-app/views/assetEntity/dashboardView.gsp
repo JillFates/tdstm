@@ -605,7 +605,7 @@ td .odd {
 										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_done')"><u>${bundleTeam?.unrackedAssets}</u></a> / 
 										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','')"><u>${bundleTeam?.sourceAssets}</u></a>
 										<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
-										<a title="Relogin as.."  href="#" onclick="window.open('../moveTech/login?username=mt-${moveBundleInstance.id}-${bundleTeam?.team?.id}-s','mtwindow','menubar=1,resizable=1,width=320,height=480'); ">@</a>
+										<a title="Login as.."  href="#" onclick="window.open('../moveTech/login?username=mt-${moveBundleInstance.id}-${bundleTeam?.team?.id}-s','mtwindow','menubar=1,resizable=1,width=320,height=480'); ">@</a>
 										</jsec:lacksAllRoles>
 									</td>
 								</tr>
@@ -616,7 +616,7 @@ td .odd {
 										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_done')"><u> ${bundleTeam?.rerackedAssets}</u> </a> / 
 										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','')"><u>${bundleTeam?.targetAssets}</u></a>
 										<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
-										<a title="Relogin as.." href="#" onclick="window.open('../moveTech/login?username=mt-${moveBundleInstance.id}-${bundleTeam?.team?.id}-t','mtwindow','menubar=1,resizable=1,width=320,height=480'); ">@</a>
+										<a title="Login as.." href="#" onclick="window.open('../moveTech/login?username=mt-${moveBundleInstance.id}-${bundleTeam?.team?.id}-t','mtwindow','menubar=1,resizable=1,width=320,height=480'); ">@</a>
 										</jsec:lacksAllRoles>
 									</td>
 								</tr>
@@ -647,7 +647,7 @@ td .odd {
 								<a href="#" onclick="filterByDataPoints('source','','source_done_clean')"><u> ${supportTeam.sourceCleaned}</u> </a>/
 								<a href="#" onclick="filterByDataPoints('source','','')"><u> ${supportTeam.totalAssets}</u> </a> 
 								<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
-									<a title="Relogin as.." href="../moveTech/login?username=ct-${moveBundleInstance.id}-${supportTeam.cleaning?.id}-s">@</a>
+									<a title="Login as.." href="../moveTech/login?username=ct-${moveBundleInstance.id}-${supportTeam.cleaning?.id}-s">@</a>
 								</jsec:lacksAllRoles> 
 								</td>
 							</tr>

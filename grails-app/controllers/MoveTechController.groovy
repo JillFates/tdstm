@@ -1,10 +1,10 @@
 /*
  * MoveTech Login 
  */
-import org.jsecurity.authc.AuthenticationException
+/*import org.jsecurity.authc.AuthenticationException
 import org.jsecurity.authc.UsernamePasswordToken
 import org.jsecurity.SecurityUtils
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.codehaus.groovy.grails.commons.ApplicationHolder*/
 import grails.converters.JSON
 import com.tdssrc.grails.GormUtil
 class MoveTechController {
@@ -28,7 +28,7 @@ class MoveTechController {
     	if ( params.fMess ) {
     		flash.clear()
     	}
-    	def principal = SecurityUtils.subject.principal
+    	def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
     	// Checking user existence
     	if( principal ){
 	        if( params.user == "mt" ) {
@@ -266,7 +266,37 @@ class MoveTechController {
      * @return : Redirect to Relevent Home pages if user is an authenticated user else redirect to login
      *--------------------------------------------------------------------------------------------------*/
     def checkAuth ( def barcodeText, def actionScreen ) {
-        def authToken = new UsernamePasswordToken( barcodeText, 'xyzzy' )
+    	 
+    	 def workStationUser = UserLogin.findByUsername(barcodeText)
+		 if( workStationUser ){
+			 session.setAttribute( "PRINCIPAL", barcodeText)
+			 if( barcodeText == "ct" ) {
+	            redirect ( controller:'moveTech', params:actionScreen )
+	            return;
+            } else {
+            	redirect( controller:'moveTech', action:'moveTechSuccessLogin', params:actionScreen )
+            	return;
+            }
+		 } else {
+			 	//	Authentication failed, so display the appropriate message
+	            // on the login page.
+	            log.info "Authentication failure for user '${params.username}'."
+	            flash.message = message ( code: "login.failed" )
+	            // Keep the username and "remember me" setting so that the
+	            // user doesn't have to enter them again.
+	            def m = [ username: params.username ]
+	            if ( params.rememberMe ) {
+	                m['rememberMe'] = true
+	            }
+	            // Remember the target URI too.
+	            if ( params.targetUri ) {
+	                m['targetUri'] = params.targetUri
+	            }
+	            // Now redirect back to the login page.
+	            redirect ( action: 'moveTechLogin', params: m  )
+	            return;
+		 }
+        /*def authToken = new UsernamePasswordToken( barcodeText, 'xyzzy' )
         try{
             // Perform the actual login. An AuthenticationException
             // will be thrown if the username is unrecognised or the
@@ -299,7 +329,7 @@ class MoveTechController {
             // Now redirect back to the login page.
             redirect ( action: 'moveTechLogin', params: m  )
             return;
-        }
+        }*/
     }
     
     /*------------------------------------------------------------------------------
@@ -308,8 +338,8 @@ class MoveTechController {
      *------------------------------------------------------------------------------*/
     def signOut = {
         // Log the user out of the application.
-        SecurityUtils.subject.logout()
-
+        //SecurityUtils.subject.logout()
+		session.setAttribute( "PRINCIPAL", null)
         // For now, redirect back to the login page.
         redirect ( action : 'moveTechLogin' )
     }
@@ -319,7 +349,7 @@ class MoveTechController {
      * @return Home page if the user session is not expired
      *------------------------------------------------------------------------------*/
     def home = {
-    	def principal = SecurityUtils.subject.principal
+    	def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
     	if( principal ){
     		render ( view:'home' )
     	} else {
@@ -338,7 +368,7 @@ class MoveTechController {
 		if ( params.fMess ) {
 			flash.clear()
 		}
-		def principal = SecurityUtils.subject.principal
+		def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
 		if( principal ) {
             def bundleId = params.bundle
             def tab = params.tab
@@ -441,7 +471,7 @@ class MoveTechController {
      * @return Array of arguments   
      *------------------------------------------------------------------------------*/
 	def assetSearch = {
-		def principal = SecurityUtils.subject.principal
+		def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
 		if ( principal ) {
             def assetItem
             def assetComment
@@ -635,7 +665,7 @@ class MoveTechController {
      * @return boolean for indication of transitions   
      *------------------------------------------------------------------------------*/
 	def placeHold = {
-        def principal = SecurityUtils.subject.principal
+        def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
         if ( principal ) {
         	def enterNote = params.enterNote
         	def moveBundleInstance = MoveBundle.findById( params.bundle )
@@ -717,7 +747,7 @@ class MoveTechController {
      * @return redirect to Asset details page if transition flag is busy otherwise redirect to asset task page   
      *--------------------------------------------------------------------------------------------------------*/
 	def unRack = {
-        def principal = SecurityUtils.subject.principal
+        def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
         if( principal ) {
         	def asset = getAssetEntity ( params.search, params.user )
         	if(asset){
@@ -768,7 +798,7 @@ class MoveTechController {
      * @return Array of arguments  
      *--------------------------------------------------------------------------------------------*/
 	def cleaningAssetTask = {
-		def principal = SecurityUtils.subject.principal
+		def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
 		if( principal ) {
             def bundleId = params.bundle
             def tab = params.tab
@@ -858,7 +888,7 @@ class MoveTechController {
 		if ( !request.getHeader( "User-Agent" ).contains( "MSIE" ) ) {
 			browserTest = true
 		}	
-        def principal = SecurityUtils.subject.principal
+        def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
         if ( principal ) {
             def textSearch = params.textSearch
             def assetItem
@@ -1053,7 +1083,7 @@ class MoveTechController {
      * @return Message with boolean for indication of transitions   
      *-------------------------------------------------------------------------------------------------------*/ 
 	def cleaning = {
-        def principal = SecurityUtils.subject.principal
+        def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
         if ( principal ) {
         	def asset = getAssetEntity ( params.search, params.user )//AssetEntity.findByAssetTag(params.search)
         	if(asset){
@@ -1097,7 +1127,7 @@ class MoveTechController {
      * @return render the cleaningAssetSearch with required params  
      *--------------------------------------------------------------------------------------*/
 	def cancelAssetSearch = {
-		def principal = SecurityUtils.subject.principal
+		def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
 		if ( principal ) {
 			def asset = getAssetEntity ( params.search, params.user )
 			if(asset){
@@ -1125,7 +1155,7 @@ class MoveTechController {
      * @return Redirect to assetTask with required params
      *----------------------------------------------------*/
 	def moveTechSuccessLogin = {
-    	def principal = SecurityUtils.subject.principal
+    	def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
     	// Checking user existence
     	if ( principal ) {	        
             def projectTeamInstance = ProjectTeam.findById ( params.team )
@@ -1197,7 +1227,7 @@ class MoveTechController {
      * @return Create a Comment for AssetEntity
      *----------------------------------------------------------------------------------*/
 	def addComment = {
-		def principal = SecurityUtils.subject.principal
+		def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
 		if( principal ){
 			def loginUser = UserLogin.findByUsername ( principal )
 			def asset = getAssetEntity ( params.search, params.user )
