@@ -7,10 +7,10 @@
         function clearHistoricData( moveEventId ){
             $("#messageDiv").hide();
             $("#messageDiv").html("");
-            var confirmStatus = confirm("Are you sure you want to permanently clear the historic data for this move event?")
+            var confirmStatus = confirm("Are you sure you want to permanently clear the dashboard data for this move event?")
             if(confirmStatus){
             	${remoteFunction(action:'clearHistoricData', params:'\'moveEventId=\' + moveEventId ', 
-                    	onSuccess:"jQuery('#messageDiv').html('Historic Data has been cleaned successfully');jQuery('#messageDiv').show()")}
+                    	onSuccess:"jQuery('#messageDiv').html('Dashboard History has been cleaned successfully');jQuery('#messageDiv').show()")}
             }
         }
         </script>
@@ -88,7 +88,7 @@
                     <input type="hidden" name="id" id="moveEventId"  value="${moveEventInstance?.id}" />
                     <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this Event will remove any move news and any related step data?');" value="Delete" /></span>
-                    <span class="button"><input type="button" class="delete" value="Clear historic data" onclick="clearHistoricData( $('#moveEventId').val() )"/></span>
+                    <span class="button"><input type="button" class="delete" value="Clear Dashboard History" onclick="clearHistoricData( $('#moveEventId').val() )"/></span>
                 </g:form>
             </div>
         </div>

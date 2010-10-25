@@ -62,9 +62,9 @@ class MoveBundleController {
 					dashboardSteps << [moveBundleStep : it, stepSnapshot : stepSnapshot[0] ]
 				}
 	        	def showHistoryButton = false
-				def bundleTransition = AssetTransition.findWhere( moveBundle : moveBundleInstance )
+				def bundleTransition = AssetTransition.findAll("FROM AssetTransition at WHERE at.assetEntity in (SELECT ae.id FROM AssetEntity ae WHERE ae.moveBundle = ${moveBundleInstance.id})" )
 				
-				if( bundleTransition )
+				if( bundleTransition.size() > 0 )
 					showHistoryButton = true
 					
 	        	return [ moveBundleInstance : moveBundleInstance, projectId:projectId, projectManager: projectManager, 
@@ -398,7 +398,7 @@ class MoveBundleController {
 		def bundleId = params.id
 		if(bundleId){
 			def moveBundle = MoveBundle.get( bundleId )
-			AssetTransition.executeUpdate("DELETE FROM AssetTransition at WHERE at.moveBundle = ?", [ moveBundle ] )
+			AssetTransition.executeUpdate("DELETE FROM AssetTransition at WHERE at.assetEntity in (SELECT ae.id FROM AssetEntity ae WHERE ae.moveBundle = ${moveBundle.id})" )
 			AssetEntity.executeUpdate("UPDATE AssetEntity ae SET ae.currentStatus = null WHERE ae.moveBundle = ?", [ moveBundle ] )
 			ProjectAssetMap.executeUpdate("DELETE FROM ProjectAssetMap WHERE asset in (SELECT ae.id FROM AssetEntity ae WHERE ae.moveBundle = ${moveBundle.id})")
 			MoveBundleStep.executeUpdate("UPDATE MoveBundleStep mbs SET mbs.actualStartTime = null , mbs.actualCompletionTime = null WHERE mbs.moveBundle = ?", [ moveBundle ] )
