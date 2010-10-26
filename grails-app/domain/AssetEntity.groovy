@@ -184,7 +184,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 				}
 			}
 		} catch( Exception ex ){
-			println"$ex"
+			println"-------------------->$ex"
 		}
 	}
 	

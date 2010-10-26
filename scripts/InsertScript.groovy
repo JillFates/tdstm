@@ -123,7 +123,22 @@ if(!EavAttribute.findWhere(attributeCode:'currentStatus')) {
 	}
 }
 
+/*=========================================
+ * DELETE duplicate CurrentStatus from ProjectAssetMap
+ *========================================*/
 
+def dupProjectAssetMap = jdbcTemplate.queryForList("select asset_id as assetId from project_asset_map p group by asset_id having count(asset_id) > 1")
+dupProjectAssetMap.each{ map->
+	/* remove one Project asset map when it mapped with different status*/
+	jdbcTemplate.update("""delete from project_asset_map where asset_id = ${map.assetId} and current_state_id != (select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t
+							where t.asset_entity_id = ${map.assetId} and t.voided = 0 and ( t.type = 'process' or t.state_To = 10 )
+							order by date_created desc, stateTo desc limit 1)""")
+	/* remove one Project asset map when it mapped with same status*/
+	def projectMap = ProjectAssetMap.findAll("from ProjectAssetMap p where p.asset = ${map.assetId} order by p.createdDate asc ")
+	if(projectMap.size() > 1){
+		jdbcTemplate.update("delete from project_asset_map where id = ${projectMap[0].id}")
+	}
+}
 /*=========================================
  * Update CurrentStatus of assetEntity
  *========================================*/
