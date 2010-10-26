@@ -1022,6 +1022,8 @@ class AssetEntityController {
         	def queryNotHold = supervisorConsoleService.getQueryForConsole(moveBundleInstance,params, 'notHold')
         	def holdTotalAsset = jdbcTemplate.queryForList( queryHold )
         	def otherTotalAsset = jdbcTemplate.queryForList( queryNotHold )
+			def today = GormUtil.convertInToGMT("now", "EDT" )
+			
         	if(!currentState && !params.assetStatus || params.assetStatus?.contains("pend")){
 	        	holdTotalAsset.each{
 	        		totalAsset<<it
@@ -1069,7 +1071,7 @@ class AssetEntityController {
 				def latestAssetCreated = AssetTransition.findAll("FROM AssetTransition a where a.assetEntity = ? and a.projectTeam = ? Order By a.id desc",[it.latestAsset, it],[max:1])
 				def elapsedTime = "00:00m"
 				if(latestAssetCreated.size() > 0){
-					elapsedTime = convertIntegerIntoTime(GormUtil.convertInToGMT("now", "EDT" ).getTime() - latestAssetCreated[0].dateCreated.getTime() )?.toString()
+					elapsedTime = convertIntegerIntoTime(today.getTime() - latestAssetCreated[0].dateCreated.getTime() )?.toString()
 					elapsedTime = elapsedTime?.substring(0,elapsedTime.lastIndexOf(":")) + "m"
 				}
 	            bundleTeams <<[team:it,members:member, sourceAssets:sourceAssets, 
@@ -1140,7 +1142,12 @@ class AssetEntityController {
 				}
 	        	def cssClass
 	        	if(it.minstate == Integer.parseInt(holdId) ){
-	        		cssClass = 'asset_hold'
+					def holdAssetTransition = AssetTransition.findAll("FROM AssetTransition t WHERE t.assetEntity = ${it.id} AND t.stateTo = '${holdId}' AND t.voided = 0")
+					cssClass = 'asset_hold'
+					if(holdAssetTransition.size() > 0){
+						def holdTimer = holdAssetTransition[0]?.holdTimer
+						cssClass = (holdTimer && holdTimer.getTime() < today.getTime()) ? 'asset_hold_overtime' : 'asset_hold'		
+					}
 	        	} else if(curId < Integer.parseInt(releasedId) && curId != Integer.parseInt(holdId) ){
 	        		cssClass = 'asset_pending'
 	        	} else if(curId > Integer.parseInt(rerackedId)){
@@ -1410,6 +1417,12 @@ class AssetEntityController {
     		def cssClass
     		if(currentStatus == Integer.parseInt(holdId) ){
         		cssClass = 'asset_hold'
+				def holdAssetTransition = AssetTransition.findAll("FROM AssetTransition t WHERE t.assetEntity = ${assetId} AND t.stateTo = '${holdId}' AND t.voided = 0")
+				cssClass = 'asset_hold'
+				if(holdAssetTransition.size() > 0){
+					def holdTimer = holdAssetTransition[0]?.holdTimer
+					cssClass = (holdTimer && holdTimer.getTime() < GormUtil.convertInToGMT("now", "EDT" ).getTime()) ? 'asset_hold_overtime' : 'asset_hold'		
+				}
         	} else if(currentStatus < Integer.parseInt(releasedId) && currentStatus != Integer.parseInt(holdId) ){
         		cssClass = 'asset_pending'
         	} else if(currentStatus > Integer.parseInt(rerackedId)){
