@@ -752,7 +752,7 @@ class AssetEntityController {
 	        	assetEntityInstance.properties = map
 	        	assetEntityInstance.lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
 				
-	            if(!assetEntityInstance.hasErrors() && assetEntityInstance.save(flush:true)) {
+	            if(!assetEntityInstance.hasErrors() && assetEntityInstance.save()) {
 	            	def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
 	            	entityAttributeInstance.each{
 	                	if( it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam" && it.attribute.attributeCode != "currentStatus" ){
