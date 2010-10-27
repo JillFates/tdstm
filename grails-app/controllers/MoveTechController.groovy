@@ -1171,7 +1171,7 @@ class MoveTechController {
                 projectTeamInstance.currentLocation = "Target"
                 projectTeamInstance.save(flush:true)
             }
-            userPreferenceService.setPreference("CURR_BUNDLE","${params.bundle}")
+            //userPreferenceService.setPreference("CURR_BUNDLE","${params.bundle}")
             redirect ( action:'assetTask', 
                 params:[ projectTeam:team, members:teamMembers, project:params.project, loc:location,
                          bundle:params.bundle, team:params.team, location:params.location, "tab":"Todo"
