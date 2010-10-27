@@ -128,14 +128,21 @@ if(!EavAttribute.findWhere(attributeCode:'currentStatus')) {
 def masteDataTransferSet = DataTransferSet.findByTitle( "TDS Master Spreadsheet" )
 def walkthruDataTransferSet = DataTransferSet.findByTitle( "TDS Walkthru" )
 def customAttributes = EavAttribute.findAll("FROM EavAttribute e where e.attributeCode in ('custom1','custom2','custom3','custom4','custom5','custom6','custom7','custom8')")
-
+jdbcTemplate.update("update data_transfer_attribute_map set sheet_name = 'Servers' where sheet_name = 'Server'")
 customAttributes.each{
-	new DataTransferAttributeMap( columnName: it.frontendLabel,	sheetName: "Server",
-			dataTransferSet: masteDataTransferSet,eavAttribute: it,
-			validation: 'Not required',	isRequired: 0 ).save()
-	new DataTransferAttributeMap( columnName: it.frontendLabel,	sheetName: "Server",
+	def masterDataAttribMap = DataTransferAttributeMap.findWhere( columnName: it.frontendLabel, sheetName: "Servers", dataTransferSet: masteDataTransferSet,eavAttribute: it)
+	if(!masterDataAttribMap){
+		new DataTransferAttributeMap( columnName: it.frontendLabel,	sheetName: "Servers",
+				dataTransferSet: masteDataTransferSet,eavAttribute: it,
+				validation: 'Not required',	isRequired: 0 ).save()
+	}
+	
+	def walkthruDataAttribMap = DataTransferAttributeMap.findWhere( columnName: it.frontendLabel, sheetName: "Servers", dataTransferSet: walkthruDataTransferSet,eavAttribute: it)
+	if(!walkthruDataAttribMap ){
+	new DataTransferAttributeMap( columnName: it.frontendLabel,	sheetName: "Servers",
 			dataTransferSet: walkthruDataTransferSet,eavAttribute: it,
 			validation: 'Not required',	isRequired: 0 ).save()
+	}
 }
 
 /*=========================================
