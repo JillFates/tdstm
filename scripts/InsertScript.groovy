@@ -122,6 +122,21 @@ if(!EavAttribute.findWhere(attributeCode:'currentStatus')) {
 		new EavEntityAttribute(attribute:attribute, eavAttributeSet:eavAttributeSet, sortOrder:attribute.sortOrder).save()
 	}
 }
+/*============================================================
+* Update the data_transfer_attribute_map for Custom attributes
+*============================================================*/
+def masteDataTransferSet = DataTransferSet.findByTitle( "TDS Master Spreadsheet" )
+def walkthruDataTransferSet = DataTransferSet.findByTitle( "TDS Walkthru" )
+def customAttributes = EavAttribute.findAll("FROM EavAttribute e where e.attributeCode in ('custom1','custom2','custom3','custom4','custom5','custom6','custom7','custom8')")
+
+customAttributes.each{
+	new DataTransferAttributeMap( columnName: it.frontendLabel,	sheetName: "Server",
+			dataTransferSet: masteDataTransferSet,eavAttribute: it,
+			validation: 'Not required',	isRequired: 0 ).save()
+	new DataTransferAttributeMap( columnName: it.frontendLabel,	sheetName: "Server",
+			dataTransferSet: walkthruDataTransferSet,eavAttribute: it,
+			validation: 'Not required',	isRequired: 0 ).save()
+}
 
 /*=========================================
  * DELETE duplicate CurrentStatus from ProjectAssetMap
