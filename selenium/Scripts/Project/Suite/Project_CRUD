@@ -114,6 +114,11 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
+	<td>projectType</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
 	<td>description</td>
 	<td></td>
 </tr>
@@ -150,6 +155,46 @@
 <tr>
 	<td>verifyElementPresent</td>
 	<td>moveManagerId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>custom1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>custom2</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>custom3</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>custom4</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>custom5</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>custom6</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>custom7</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>custom8</td>
 	<td></td>
 </tr>
 <tr>
@@ -238,38 +283,18 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//form[@id='createProjectForm']/div[1]/table.1.0</td>
-	<td>exact:Client: *</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='createProjectForm']/div[1]/table.2.0</td>
-	<td>exact:Project Code: *</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='createProjectForm']/div[1]/table.3.0</td>
-	<td>exact:Project Name: *</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='createProjectForm']/div[1]/table.12.0</td>
-	<td>exact:Workflow Code: *</td>
-</tr>
-<tr>
 	<td>clickAndWait</td>
 	<td>//input[@value='Create']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//form[@id='createProjectForm']/div[1]/table.2.1</td>
+	<td>//form[@id='createProjectForm']/div[1]/table.1.3</td>
 	<td>Project Code cannot be blank</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//form[@id='createProjectForm']/div[1]/table.3.1</td>
+	<td>//form[@id='createProjectForm']/div[1]/table.2.1</td>
 	<td>Project Name cannot be blank</td>
 </tr>
 <tr>
@@ -308,6 +333,11 @@
 	<td>Pname</td>
 </tr>
 <tr>
+	<td>storeSelectedLabel</td>
+	<td>projectType</td>
+	<td>pType</td>
+</tr>
+<tr>
 	<td>type</td>
 	<td>description</td>
 	<td>Test Desc</td>
@@ -330,7 +360,7 @@
 <tr>
 	<td>type</td>
 	<td>completionDateId</td>
-	<td>javascript{var date = new Date();&nbsp;&nbsp;var month =&nbsp;&nbsp;date.getMonth();month = month + 4;var monthday&nbsp;&nbsp;&nbsp;&nbsp;= date.getDate();var year&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= date.getFullYear()+1;var hour&nbsp;&nbsp;&nbsp;= date.getHours();var minute = date.getMinutes();var second = date.getSeconds();var ap = &quot;AM&quot;;&nbsp;&nbsp;&nbsp;if (month &lt; 10){month = '0' + month;}&nbsp;&nbsp;if (monthday &lt; 10){monthday = '0' + monthday;}&nbsp;&nbsp;&nbsp;&nbsp;month+&quot;/&quot;+monthday+&quot;/&quot;+year;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</td>
+	<td>javascript{var date = new Date();&nbsp;&nbsp;var month =&nbsp;&nbsp;date.getMonth();month = month + 1;var monthday&nbsp;&nbsp;&nbsp;&nbsp;= date.getDate();var year&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= date.getFullYear()+1;var hour&nbsp;&nbsp;&nbsp;= date.getHours();var minute = date.getMinutes();var second = date.getSeconds();var ap = &quot;AM&quot;;&nbsp;&nbsp;&nbsp;if (month &lt; 10){month = '0' + month;}&nbsp;&nbsp;if (monthday &lt; 10){monthday = '0' + monthday;}&nbsp;&nbsp;&nbsp;&nbsp;month+&quot;/&quot;+monthday+&quot;/&quot;+year;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</td>
 </tr>
 <tr>
 	<td>storeValue</td>
@@ -356,6 +386,11 @@
 	<td>storeSelectedLabel</td>
 	<td>moveManagerId</td>
 	<td>moveM</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>custom1</td>
+	<td>Sample</td>
 </tr>
 <tr>
 	<td>select</td>
@@ -400,47 +435,57 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.1.1</td>
+	<td>//div[@id='updateShow']/table.0.3</td>
 	<td>${Pcode}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.2.1</td>
+	<td>//div[@id='updateShow']/table.1.1</td>
 	<td>${Pname}</td>
 </tr>
 <tr>
+	<td>verifyTable</td>
+	<td>//div[@id='updateShow']/table.1.3</td>
+	<td>${pType}</td>
+</tr>
+<tr>
 	<td>verifyValue</td>
-	<td>//div[@id='updateShow']/table/tbody/tr[4]/td[2]/textarea</td>
+	<td>//div[@id='updateShow']/table/tbody/tr[3]/td[2]/textarea</td>
 	<td>Test Desc</td>
 </tr>
 <tr>
 	<td>verifyValue</td>
-	<td>//div[@id='updateShow']/table/tbody/tr[5]/td[2]/textarea</td>
+	<td>//div[@id='updateShow']/table/tbody/tr[3]/td[4]/textarea</td>
 	<td>Test Comment</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.5.1</td>
+	<td>//div[@id='updateShow']/table.3.1</td>
 	<td>${Sdate}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.6.1</td>
+	<td>//div[@id='updateShow']/table.3.3</td>
 	<td>${Cdate}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.9.1</td>
+	<td>//div[@id='updateShow']/table.5.1</td>
 	<td>${projM}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.10.1</td>
+	<td>//div[@id='updateShow']/table.5.3</td>
 	<td>${moveM}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.11.1</td>
+	<td>//div[@id='updateShow']/table.6.1</td>
+	<td>Sample</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='updateShow']/table.10.1</td>
 	<td>${wCode}</td>
 </tr>
 <tr>
@@ -566,7 +611,7 @@
 </tr>
 <tr>
 	<td>verifyValue</td>
-	<td>//div[@id='updateShow']/table/tbody/tr[4]/td[2]/textarea</td>
+	<td>//div[@id='updateShow']/table/tbody/tr[3]/td[2]/textarea</td>
 	<td>new</td>
 </tr>
 <!--Deleting the project-->

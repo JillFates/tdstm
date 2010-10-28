@@ -210,6 +210,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>click</td>
+	<td>//div[12]/div[1]/a/span</td>
+	<td></td>
+</tr>
+<tr>
 	<td>verifyElementPresent</td>
 	<td>//input[@value='Delete' and @type='button' and @onclick=&quot;var booConfirm = confirm('Are you sure?');if(booConfirm)new Ajax.Request('/tdstm/assetEntity/deleteComment',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e ,'never')},parameters:'id=' + $('#commentId').val() +'&amp;assetEntity='+$('#createAssetCommentId').val() });&quot;]</td>
 	<td></td>
@@ -217,7 +222,7 @@
 <!--Editing comment-->
 <tr>
 	<td>click</td>
-	<td>//input[@value='Edit' and @type='button' and @onclick=&quot;commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')&quot;]</td>
+	<td>//input[@value='Edit' and @type='button' and @onclick=&quot;commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 'auto');$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')&quot;]</td>
 	<td></td>
 </tr>
 <tr>

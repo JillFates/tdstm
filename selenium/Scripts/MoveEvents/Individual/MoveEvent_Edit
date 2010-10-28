@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com/" />
 <title>MoveEvent_Edit</title>
 </head>
 <body>
@@ -89,7 +89,7 @@
 <tr>
 	<td>verifyTable</td>
 	<td>//table.0.2</td>
-	<td>In Progress</td>
+	<td>Status</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
@@ -168,7 +168,7 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Clear historic data']</td>
+	<td>//input[@value='Clear Dashboard History']</td>
 	<td></td>
 </tr>
 <tr>

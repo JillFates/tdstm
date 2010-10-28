@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com/" />
 <title>Asset_CRUD</title>
 </head>
 <body>
@@ -730,203 +730,248 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.0.0</td>
-	<td>Asset Name</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.0.0</td>
+	<td>exact:Asset Name*</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.1.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.0.0</td>
 	<td>Short Name</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.2.0</td>
-	<td>Asset Tag</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.0.0</td>
+	<td>exact:Asset Tag*</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.3.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.1.0</td>
 	<td>Asset Type</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.4.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.1.0</td>
 	<td>Manufacturer</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.5.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.1.0</td>
 	<td>Model</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.6.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.2.0</td>
 	<td>Application</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.7.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.2.0</td>
 	<td>AppOwner</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.8.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.2.0</td>
 	<td>SME</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.9.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.3.0</td>
 	<td>IP Address</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.10.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.3.0</td>
 	<td>HINFO</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.11.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.3.0</td>
 	<td>Serial #</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.12.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.4.0</td>
 	<td>U Size</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.13.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.4.0</td>
 	<td>Rail Type</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.14.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.4.0</td>
 	<td>Source Location</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.15.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.5.0</td>
 	<td>Source Room</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.16.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.5.0</td>
 	<td>Source Rack/Cab</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.17.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.5.0</td>
 	<td>Source Position</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.18.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.6.0</td>
 	<td>Target Location</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.19.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.6.0</td>
 	<td>Target Room</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.0.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.6.0</td>
 	<td>Target Rack/Cab</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.1.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.7.0</td>
 	<td>Target Position</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.2.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.7.0</td>
 	<td>powerType</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.3.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.7.0</td>
 	<td>PDU Port</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.4.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.8.0</td>
 	<td>PDU Port Qty</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.5.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.8.0</td>
 	<td>PDU Type</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.6.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.8.0</td>
 	<td>NIC Port</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.7.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.9.0</td>
 	<td>Remote Mgmt Port</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.8.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.9.0</td>
 	<td>Fiber Cabinet</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.9.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.9.0</td>
 	<td>Fiber Type</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.10.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.10.0</td>
 	<td>Fiber Qty</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.11.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.10.0</td>
 	<td>Fiber Port</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.12.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.10.0</td>
 	<td>KVM Device</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.13.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.11.0</td>
 	<td>KVM Port</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.14.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.11.0</td>
 	<td>Truck</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.15.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.11.0</td>
 	<td>Old/New</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.16.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.12.0</td>
 	<td>Priority</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.17.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.12.0</td>
 	<td>Cart</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.18.0</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.12.0</td>
 	<td>Shelf</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.13.0</td>
+	<td>Custom1</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
 	<td>//input[@value='Edit' and @type='button' and @onclick='return editAssetDialog()']</td>
 	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.13.0</td>
+	<td>Custom2</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.13.0</td>
+	<td>Custom3</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.14.0</td>
+	<td>Custom4</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.14.0</td>
+	<td>Custom5</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.14.0</td>
+	<td>Custom6</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.15.0</td>
+	<td>Custom7</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.15.0</td>
+	<td>Custom8</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.15.0</td>
+	<td>Move Bundle</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -940,52 +985,47 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.0.1</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.0.1</td>
 	<td>${assetName}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.2.1</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.0.1</td>
 	<td>${aTag}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.3.1</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.1.1</td>
 	<td>${aType}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.5.1</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.1.1</td>
 	<td>${modeL}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.11.1</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.3.1</td>
 	<td>${serialNo}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.14.1</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.4.1</td>
 	<td>${sLoc}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.16.1</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.5.1</td>
 	<td>${sRack}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.18.1</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.6.1</td>
 	<td>${tLoc}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.6.1</td>
-	<td>${appLn}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.0.1</td>
+	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.6.1</td>
 	<td>${tRack}</td>
 </tr>
 <tr>
