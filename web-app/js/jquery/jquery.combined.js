@@ -10201,6 +10201,40 @@ Date: 09-03-2007  */
 * and better behavior. (Sync Year/Month select with input box)
 */
 var currTime;
+var inputField
+/* Change the time from AM/PM when user change from the date picker*/
+function addAmPM(value){
+	var inputVal = inputField.val(); 
+	if( inputVal ) {
+		inputField.val( inputVal.substring( 0,inputVal.lastIndexOf(' ') ) +' '+ value+'M' );
+	} else {
+		inputField.val( convertDateFormate(new Date(), value) )
+	}
+}
+function convertDateFormate( date, value ){
+	var timeString = ""
+	var month =  date.getMonth();
+		
+	if( !isNaN(month) ){
+		month = month + 1
+		var monthday    = date.getDate();
+		var year        = date.getFullYear();
+		var hour   = date.getHours();
+		var minute = date.getMinutes();
+		var second = date.getSeconds();
+		if(month < 10 ){ month = "0"+ month }
+		if(monthday < 10 ){ monthday = "0"+ monthday }
+		if (hour   > 12) { hour = hour - 12;      }
+		if (hour   == 0) { hour = 12 			  }
+		if (hour   < 10) { hour   = "0" + hour;   }
+		if (minute < 10) { minute = "0" + minute; }
+		if (second < 10) { second = "0" + second; }
+		
+		var timeString = month+"/"+monthday+"/"+year+" "+hour + ':' + minute + ' ' + value+'M';
+	}
+	return timeString
+}
+
 (function($) { // hide the namespace
 
 /* Date picker manager.
@@ -11258,6 +11292,7 @@ $.extend(DateTimepickerInstance.prototype, {
 
      /* Parse existing date and initialise date picker. */
      _setDateFromField: function(input) {
+    	 	 inputField = $(input);
              this._input = $(input);
              var dateFormat = this._get('dateFormat')+' '+this._get('timeFormat');
              var dates = this._input ? this._input.val().split(this._get('rangeSeparator')) : null;
@@ -11603,7 +11638,7 @@ $.extend(DateTimepickerInstance.prototype, {
                                      '>' + ((minute<10)?'0'+minute:minute) + '</option>';
                      }
                      html += '</select>';
-                     html += ' <select id="datetimepicker_ampm">';
+                     html += ' <select id="datetimepicker_ampm" onchange="addAmPM(this.value)">';
                      html += '<option value="A"' + ((currTime < 12) ? ' selected="selected"' : '') + '>AM</option>';
                      html += '<option value="P"' + ((currTime >= 12) ? ' selected="selected"' : '') + '>PM</option>';
                      html += '</select>';
@@ -11612,8 +11647,8 @@ $.extend(DateTimepickerInstance.prototype, {
              html += '</div>'; // Close datetimepicker_header
              return html;
      },
-
-
+     
+     
      /* Provide code to set and clear the status panel. */
      _addStatus: function(text) {
              return ' onmouseover="jQuery(\'#datetimepicker_status_' + this._id + '\').html(\'' + text + '\');" ' +
