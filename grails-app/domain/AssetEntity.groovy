@@ -173,7 +173,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	def updateRacks() {
 		try{
 			// Make sure the asset points to source/target racks if there is enough information for it
-			if(assetType != 'Blade' && project != null) {
+			if(assetType != 'Blade' && project != null && moveBundle) {
 				if( sourceRack ) {
 					rackSource = Rack.findOrCreateWhere(source:1, 'project.id':project.id, location:sourceLocation, room:sourceRoom, tag:sourceRack)
 					save(flush:true)
@@ -184,7 +184,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 				}
 			}
 		} catch( Exception ex ){
-			println"-------------------->$ex"
+			println"$ex"
 		}
 	}
 	
