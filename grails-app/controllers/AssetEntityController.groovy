@@ -670,6 +670,7 @@ class AssetEntityController {
         assetEntityInstance.project = projectInstance
         assetEntityInstance.owner = projectInstance.client
         if(!assetEntityInstance.hasErrors() && assetEntityInstance.save()) {
+        	assetEntityInstance.updateRacks()
             flash.message = "AssetEntity ${assetEntityInstance.assetName} created"
             redirect( action:list, params:[projectId: projectId] )
         }
@@ -753,6 +754,7 @@ class AssetEntityController {
 	        	assetEntityInstance.lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
 				
 	            if(!assetEntityInstance.hasErrors() && assetEntityInstance.save()) {
+	            	assetEntityInstance.updateRacks()
 	            	def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
 	            	entityAttributeInstance.each{
 	                	if( it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam" && it.attribute.attributeCode != "currentStatus" ){

@@ -160,12 +160,12 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	def beforeUpdate = {
 		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
 	}
-	def afterInsert = {
+	/*def afterInsert = {
 		updateRacks()
 	}
 	def afterUpdate = {
 		updateRacks()
-	}
+	}*/
 	String toString(){
 		"id:$id name:$assetName tag:$assetTag serial#:$serialNumber"
 	}
@@ -173,7 +173,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	def updateRacks() {
 		try{
 			// Make sure the asset points to source/target racks if there is enough information for it
-			if(assetType != 'Blade' && project != null && moveBundle) {
+			if(assetType != 'Blade' && project != null ) {
 				if( sourceRack ) {
 					rackSource = Rack.findOrCreateWhere(source:1, 'project.id':project.id, location:sourceLocation, room:sourceRoom, tag:sourceRack)
 					save(flush:true)
