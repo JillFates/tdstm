@@ -42,7 +42,7 @@ table.rack_elevation .rack_error a{
 	color: white !important;
 }
 table.rack_elevation h2 {
-	text-size:1.1em;
+	font-size:1.5em;
 	font-weight:bold;
 	margin:1px;
 }
