@@ -34,7 +34,7 @@ class RackLayoutsController {
 			def targetRacks = []
 			def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
 			def rackLayout = []
-			
+			def project = Project.findById(projectId)
 			def moveBundle = MoveBundle.findById(bundleId)
 			def isAdmin = SecurityUtils.getSubject().hasRole("PROJ_MGR")
 			if( !isAdmin ) {
@@ -73,9 +73,9 @@ class RackLayoutsController {
 				def finalAssetList = []
 				def racksByFilter
 				if(includeOtherBundle){
-					racksByFilter = rack.assets.sort { rack?.source == 1 ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
+					racksByFilter = rack.assets.findAll { it.project == project }.sort { rack?.source == 1 ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
 				} else {
-					racksByFilter = rack.assets.findAll { it.moveBundle == moveBundle }.sort { rack?.source == 1 ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
+					racksByFilter = rack.assets.findAll { it.moveBundle == moveBundle && it.project == project }.sort { rack?.source == 1 ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
 				}
 				racksByFilter.each { assetEntity ->
 					def overlapError = false
@@ -100,14 +100,14 @@ class RackLayoutsController {
 							if(position > maxUSize) {
 								asset.position = maxUSize
 								asset.rowspan = 1 
-								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' - ' + assetEntity.assetName
+								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' ~- ' + assetEntity.assetName
 								asset.overlapError = true
 								asset.cssClass = "rack_error"
 								flag = false
 							} else if(ignoreLow) {
 								asset.position = currentHigh
 								asset.rowspan = currentHigh - currentLow + 1 
-								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' - ' + assetEntity.assetName
+								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' ~- ' + assetEntity.assetName
 								asset.overlapError = true
 								asset.cssClass = "rack_error"
 								flag = false
@@ -116,7 +116,7 @@ class RackLayoutsController {
 								asset.currentLow = newLow
 								asset.position = newHigh
 								asset.rowspan = newHigh - newLow + 1
-								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' - ' + assetEntity.assetName
+								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' ~- ' + assetEntity.assetName
 								asset.overlapError = true
 								asset.cssClass = "rack_error"
 								flag = false
@@ -124,7 +124,7 @@ class RackLayoutsController {
 								asset.currentHigh = newHigh
 								asset.position = newHigh
 								asset.rowspan = newHigh - currentLow  + 1
-								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' - ' + assetEntity.assetName
+								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' ~- ' + assetEntity.assetName
 								asset.overlapError = true
 								asset.cssClass = "rack_error"
 								flag = false
@@ -132,7 +132,7 @@ class RackLayoutsController {
 								asset.currentLow = newLow
 								asset.position = currentHigh
 								asset.rowspan = currentHigh - newLow +1
-								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' - ' + assetEntity.assetName
+								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' ~- ' + assetEntity.assetName
 								asset.overlapError = true
 								asset.cssClass = "rack_error"
 								flag = false
@@ -146,7 +146,7 @@ class RackLayoutsController {
 								assetEntity.usize = 1
 								overlapError = true
 							}
-							assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag + ' - ' + assetEntity.assetName, position:position, overlapError:overlapError, 
+							assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag + ' ~- ' + assetEntity.assetName, position:position, overlapError:overlapError, 
 											rowspan:rackSize, currentHigh : position, currentLow : newLow, source:rack.source ]
 						}
 					} else {
@@ -156,7 +156,7 @@ class RackLayoutsController {
 							assetEntity.usize = 1
 							overlapError = true
 						}
-						assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag + ' - ' + assetEntity.assetName, position:position, overlapError:overlapError, 
+						assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag + ' ~- ' + assetEntity.assetName, position:position, overlapError:overlapError, 
 										rowspan:rackSize, currentHigh : position, currentLow : newLow, source:rack.source ]
 					}
 				}
@@ -236,7 +236,7 @@ class RackLayoutsController {
 					assetTag += "Devices Overlap:<br />"
 					
 				assetTagsList.each{	
-					def index = it.indexOf('-')
+					def index = it.indexOf('~-')
 					def tag
 					if (index != -1) {
 						tag = it?.substring(0,index)
@@ -247,24 +247,27 @@ class RackLayoutsController {
 					def overlappedAssets
 					
 					if(location == 1)
-						overlappedAssets = AssetEntity.findAllByAssetTagAndSourceRack( tag , assetEntity.sourceRack)
+						overlappedAssets = AssetEntity.findAllWhere( project:assetEntity.project, assetTag : tag, sourceRack: assetEntity.sourceRack )
 					else 
-						overlappedAssets = AssetEntity.findAllByAssetTagAndTargetRack( tag , assetEntity.targetRack)
-						
+						overlappedAssets = AssetEntity.findAllWhere( project:assetEntity.project, assetTag : tag, targetRack: assetEntity.targetRack )
 					if(overlappedAssets.size() > 1) {
 						overlappedAssets.each{ overlapAsset ->
 							moveBundle += (overlapAsset?.moveBundle ? overlapAsset?.moveBundle.name : "") + "<br/>"
-							assetTag += "<a href='javascript:openAssetEditDialig(${overlapAsset?.id})' >$it</a> <br/>"
+							if(isAdmin)
+								assetTag += "<a href='javascript:openAssetEditDialig(${overlapAsset?.id})' >${it.replace('~-','-')}</a> <br/>"
+							else
+								assetTag += "${it.replace('~-','-')}<br/>"
 						}
 					} else if(overlappedAssets.size() > 0){
 						overlappedAsset = overlappedAssets[0]
 						moveBundle += (overlappedAsset?.moveBundle ? overlappedAsset?.moveBundle.name : "") + "<br/>"
-						assetTag += "<a href='javascript:openAssetEditDialig(${overlappedAsset?.id})' >$it</a> <br/>"
+						if(isAdmin)
+							assetTag += "<a href='javascript:openAssetEditDialig(${overlappedAsset?.id})' >${it.replace('~-','-')}</a> <br/>"
+						else
+							assetTag += "${it.replace('~-','-')}<br/>"
 					}
 				}
-				if(!isAdmin)
-					assetTag = it.asset?.assetTag
-				
+
 				if(assetEntity.assetType == 'Blade Chassis') {
 					def tdHeight = rowspan * 7
 					
