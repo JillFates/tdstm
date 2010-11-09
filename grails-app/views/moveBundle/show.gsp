@@ -75,7 +75,7 @@
 			</jsec:hasRole>
 		</div>
     <div class="body" style="width: 330px;">
-    	<div class="steps_table">
+    	<div class="steps_table" style="float: none;">
       	<span class="span"><b> Show Move Bundle </b></span>
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
@@ -149,7 +149,6 @@
           </tbody>
         </table>
       </div>
-      <br/>
       <div class="buttons" style="float: left;">
         <g:form>
           <input type="hidden" name="id" value="${moveBundleInstance?.id}" />

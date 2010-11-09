@@ -614,7 +614,8 @@ class AssetEntityController {
             AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity = ${assetEntityInstance.id}")
             ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset = ${assetEntityInstance.id}")
             AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar aev where aev.assetEntity = ${assetEntityInstance.id}")
-            AssetEntity.executeUpdate("delete from AssetEntity ae where ae.id = ${assetEntityInstance.id}")
+            ProjectTeam.executeUpdate("update ProjectTeam pt set pt.latestAsset = null where pt.latestAsset = ${assetEntityInstance.id}")
+			AssetEntity.executeUpdate("delete from AssetEntity ae where ae.id = ${assetEntityInstance.id}")
           
             flash.message = "AssetEntity ${assetEntityInstance.assetName} deleted"         
         }
@@ -622,9 +623,9 @@ class AssetEntityController {
             flash.message = "AssetEntity not found with id ${params.id}"          
         }
     	if ( params.clientList ){
-    		redirect( controller:"clientConsole", action:"list", params:[projectId:projectId, moveBundle:params.moveBundle] )
-    	} else if ( params.moveBundle ) {
-         	redirect( action:dashboardView, params:[projectId:projectId, moveBundle:params.moveBundle] )
+    		redirect( controller:"clientConsole", action:"list", params:[projectId:projectId, moveBundle:params.moveBundleId] )
+    	} else if ( params.moveBundleId ) {
+         	redirect( action:dashboardView, params:[projectId:projectId, moveBundle:params.moveBundleId, showAll : params.showAll] )
         } else {
             redirect( action:list, params:[projectId:projectId] )
         }
@@ -641,7 +642,7 @@ class AssetEntityController {
         def projectId = params.projectId
         if(assetEntityInstance) {
             ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${params.id}")
-            	
+            ProjectTeam.executeUpdate("update ProjectTeam pt set pt.latestAsset = null where pt.latestAsset = ${params.id}")
             AssetEntity.executeUpdate("update AssetEntity ae set ae.moveBundle = null , ae.project = null , ae.sourceTeam = null , ae.targetTeam = null where ae.id = ${params.id}")
             flash.message = "AssetEntity ${assetEntityInstance.assetName} Removed from Project"
                            
@@ -650,9 +651,9 @@ class AssetEntityController {
             flash.message = "AssetEntity not found with id ${params.id}"
         }
         if ( params.clientList ){
-    		redirect( controller:"clientConsole", action:"list", params:[projectId:projectId, moveBundle:params.moveBundle] )
-    	} else if ( params.moveBundle ){
-            redirect( action:dashboardView, params:[projectId:projectId, moveBundle : params.moveBundle] )
+    		redirect( controller:"clientConsole", action:"list", params:[projectId:projectId, moveBundle:params.moveBundleId] )
+    	} else if ( params.moveBundleId ){
+            redirect( action:dashboardView, params:[projectId:projectId, moveBundle : params.moveBundleId, showAll : params.showAll] )
         }else{
             redirect( action:list, params:[projectId:projectId] )
         }

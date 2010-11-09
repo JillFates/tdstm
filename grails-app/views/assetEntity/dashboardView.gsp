@@ -542,9 +542,8 @@ td .odd {
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
 			<tr>
 				<td valign="top"
-					style="border-right: 1px solid #333333; padding: 0px; width: 15%;">
-				<div style="width: 175px; float: left;">
-				<table style="border: 0; width: 175px;">
+					style="border-right: 1px solid #333333; padding: 0px; width: 100px;">
+				<table style="border: 0; width: 100%;">
 					<tr><th>TEAMS:</th>
 					</tr>
 					<tr>
@@ -554,20 +553,15 @@ td .odd {
 						<td class="odd">Location</td>
 					</tr>
 					<tr>
-						<td>Latest Asset</td>
+						<td nowrap="nowrap">Latest Asset</td>
 					</tr>
 					<tr>
-						<td class="odd" nowrap>Source <span
-							style="font: 9px bold verdana, arial, helvetica, sans-serif;">(Pending/Avail/Done/Total)</span>
-						</td>
+						<td class="odd" nowrap>Source </td>
 					</tr>
 					<tr>
-						<td nowrap>Target <span
-							style="font: 9px bold verdana, arial, helvetica, sans-serif;">(Pending/Avail/Done/Total)</span>
-						</td>
+						<td nowrap>Target </td>
 					</tr>
 				</table>
-				</div>
 				</td>
 				<td valign="top"
 					style="border-right: 1px solid #333333; padding: 0px; width: 1%;">
@@ -600,9 +594,9 @@ td .odd {
 								</tr>
 								<tr>
 									<td nowrap class="odd">
-										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_pend')"><u>${bundleTeam?.sourcePendAssets}</u></a> /
-										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_avail')"><u>${bundleTeam?.sourceAvailassets}</u></a> /
-										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_done')"><u>${bundleTeam?.unrackedAssets}</u></a> / 
+										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_pend')"><u>${bundleTeam?.sourcePendAssets}<span style="font-weight: normal;">pend</span></u></a> +
+										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_avail')"><u>${bundleTeam?.sourceAvailassets}<span style="font-weight: normal;">rdy</span></u></a> +
+										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_done')"><u>${bundleTeam?.unrackedAssets}<span style="font-weight: normal;">dn</span></u></a> = 
 										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','')"><u>${bundleTeam?.sourceAssets}</u></a>
 										<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 										<a title="Login as.."  href="#" onclick="window.open('../moveTech/login?username=mt-${moveBundleInstance.id}-${bundleTeam?.team?.id}-s','mtwindow','menubar=1,resizable=1,width=320,height=480'); ">@</a>
@@ -611,9 +605,9 @@ td .odd {
 								</tr>
 								<tr>
 									<td nowrap>
-										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_pend')"><u>${bundleTeam?.targetPendAssets}</u> </a> /
-										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_avail')"><u>${bundleTeam?.targetAvailAssets}</u> </a> /
-										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_done')"><u> ${bundleTeam?.rerackedAssets}</u> </a> / 
+										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_pend')"><u>${bundleTeam?.targetPendAssets}<span style="font-weight: normal;">pend</span></u> </a> +
+										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_avail')"><u>${bundleTeam?.targetAvailAssets}<span style="font-weight: normal;">rdy</span></u> </a> +
+										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_done')"><u> ${bundleTeam?.rerackedAssets}<span style="font-weight: normal;">dn</span></u> </a> = 
 										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','')"><u>${bundleTeam?.targetAssets}</u></a>
 										<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 										<a title="Login as.." href="#" onclick="window.open('../moveTech/login?username=mt-${moveBundleInstance.id}-${bundleTeam?.team?.id}-t','mtwindow','menubar=1,resizable=1,width=320,height=480'); ">@</a>
@@ -642,9 +636,9 @@ td .odd {
 							</tr>
 							<tr>
 								<td nowrap class="odd">
-								<a href="#" onclick="filterByDataPoints('source','','source_pend_clean')"><u> ${supportTeam.sourcePendCleaned}</u> </a> /
-								<a href="#" onclick="filterByDataPoints('source','','source_avail_clean')"><u> ${supportTeam.sourceAvailCleaned}</u> </a> /
-								<a href="#" onclick="filterByDataPoints('source','','source_done_clean')"><u> ${supportTeam.sourceCleaned}</u> </a>/
+								<a href="#" onclick="filterByDataPoints('source','','source_pend_clean')"><u> ${supportTeam.sourcePendCleaned}<span style="font-weight: normal;">pend</span></u> </a> +
+								<a href="#" onclick="filterByDataPoints('source','','source_avail_clean')"><u> ${supportTeam.sourceAvailCleaned}<span style="font-weight: normal;">rdy</span></u> </a> +
+								<a href="#" onclick="filterByDataPoints('source','','source_done_clean')"><u> ${supportTeam.sourceCleaned}<span style="font-weight: normal;">dn</span></u> </a> =
 								<a href="#" onclick="filterByDataPoints('source','','')"><u> ${supportTeam.totalAssets}</u> </a> 
 								<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 									<a title="Login as.." href="../moveTech/login?username=ct-${moveBundleInstance.id}-${supportTeam.cleaning?.id}-s">@</a>
@@ -671,17 +665,17 @@ td .odd {
 							</tr>
 							<tr>
 								<td nowrap class="odd">
-								<a href="#" onclick="filterByDataPoints('source','','source_pend_trans')"><u> ${supportTeam.sourceTransportPend}</u> </a> /
-								<a href="#" onclick="filterByDataPoints('source','','source_avail_trans')"><u> ${supportTeam.sourceTransportAvail}</u> </a> /
-								<a href="#" onclick="filterByDataPoints('source','','source_done_trans')"><u> ${supportTeam.sourceMover}</u> </a> /
+								<a href="#" onclick="filterByDataPoints('source','','source_pend_trans')"><u> ${supportTeam.sourceTransportPend}<span style="font-weight: normal;">pend</span></u> </a> +
+								<a href="#" onclick="filterByDataPoints('source','','source_avail_trans')"><u> ${supportTeam.sourceTransportAvail}<span style="font-weight: normal;">rdy</span></u> </a> +
+								<a href="#" onclick="filterByDataPoints('source','','source_done_trans')"><u> ${supportTeam.sourceMover}<span style="font-weight: normal;">dn</span></u> </a> =
 								<a href="#" onclick="filterByDataPoints('source','','')"><u> ${supportTeam.totalAssets}</u> </a> 
 								</td>
 							</tr>
 							<tr>
 								<td nowrap>
-								<a href="#" onclick="filterByDataPoints('target','','target_pend_trans')"><u> ${supportTeam.targetTransportPend}</u> </a> /
-								<a href="#" onclick="filterByDataPoints('target','','target_avail_trans')"><u> ${supportTeam.targetTransportAvail}</u> </a> /
-								<a href="#" onclick="filterByDataPoints('target','','target_done_trans')"><u> ${supportTeam.targetMover}</u> </a> /
+								<a href="#" onclick="filterByDataPoints('target','','target_pend_trans')"><u> ${supportTeam.targetTransportPend}<span style="font-weight: normal;">pend</span></u> </a> +
+								<a href="#" onclick="filterByDataPoints('target','','target_avail_trans')"><u> ${supportTeam.targetTransportAvail}<span style="font-weight: normal;">rdy</span></u> </a> +
+								<a href="#" onclick="filterByDataPoints('target','','target_done_trans')"><u> ${supportTeam.targetMover}<span style="font-weight: normal;">dn</span></u> </a> =
 								<a href="#" onclick="filterByDataPoints('target','','')"><u> ${supportTeam.totalAssets}</u> </a> 
 								</td>
 							</tr>
@@ -692,8 +686,7 @@ td .odd {
 				</div>
 				</td>
 				<td valign="top"
-					style="border-right: 1px solid #333333; padding: 0px; width: 15%;">
-				<div style="float: left; width: 100%;">
+					style="border-right: 1px solid #333333; padding: 0px; width: 250px;">
 				<table style="width: 100%; border: 0">
 					<tr><th nowrap>TOTALS:</th>
 					</tr>
@@ -708,22 +701,21 @@ td .odd {
 					</tr>
 					<tr>
 						<td nowrap class="odd">
-							<a href="#" onclick="filterByDataPoints('source','','source_pend')"><u> ${totalSourcePending}</u> </a> /
-							<a href="#" onclick="filterByDataPoints('source','','source_avail')"><u> ${totalSourceAvail}</u> </a> /
-							<a href="#" onclick="filterByDataPoints('source','','source_done')"><u> ${totalUnracked}</u> </a> / 
+							<a href="#" onclick="filterByDataPoints('source','','source_pend')"><u> ${totalSourcePending}<span style="font-weight: normal;">pend</span></u> </a> +
+							<a href="#" onclick="filterByDataPoints('source','','source_avail')"><u> ${totalSourceAvail}<span style="font-weight: normal;">rdy</span></u> </a> +
+							<a href="#" onclick="filterByDataPoints('source','','source_done')"><u> ${totalUnracked}<span style="font-weight: normal;">dn</span></u> </a> = 
 							<a href="#" onclick="filterByDataPoints('source','','')"><u>${totalAsset}</u> </a>
 						</td>
 					</tr>
 					<tr>
 						<td nowrap>
-							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_pend')"><u>${totalTargetPending}</u></a> /
-							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_avail')"><u>${totalTargetAvail}</u></a> /
-							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_done')"><u>${totalReracked}</u></a> / 
+							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_pend')"><u>${totalTargetPending}<span style="font-weight: normal;">pend</span></u></a> +
+							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_avail')"><u>${totalTargetAvail}<span style="font-weight: normal;">rdy</span></u></a> +
+							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_done')"><u>${totalReracked}<span style="font-weight: normal;">dn</span></u></a> = 
 							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','')"><u>${totalAsset}</u> </a>
 						</td>
 					</tr>
 				</table>
-				</div>
 				</td>
 			</tr>
 
@@ -748,13 +740,14 @@ td .odd {
 								<td style="vertical-align: middle;" colspan="3">
 									<label for="showAllCheckbox"><input type="checkbox" onclick="showAll()" id="showAllCheckbox"/>&nbsp;Show All&nbsp;</label>
 									&nbsp;&nbsp;<input type="button" onclick="showfilterDialog()" id="filterButtonId" value="Filter"/>
+									&nbsp;&nbsp;<span>Viewing: ${assetsList?.size()}</span>
 									<g:if test="${params.application || params.appOwner || params.appSme || params.currentState || params.assetLocation || params.assetStatus }">
 									&nbsp;<a href="#"
 											 onclick="document.filterForm.reset();$('#filterShowAllId').val('');document.filterForm.submit();"><span class="clear_filter"><u>X</u></span></a>
 									</g:if>
 									<g:if test="${totalAssetsOnHold > 0}">
 									&nbsp;&nbsp;<input type="button" class="onhold_button" onclick="submitFormWithBundle('')" id="onHoldButtonId" value="On Hold (${totalAssetsOnHold})"/>
-									</g:if>
+									</g:if>									
 								</td>
 							</tr>
 							<tr>
@@ -1255,7 +1248,8 @@ Comment</a></span></div>
 	<div class="buttons">
 	<input type="hidden" name="id" value="" />
 	<input type="hidden" name="projectId" value="${projectId}" />
-	<input type="hidden" name="moveBundle" value="${moveBundleInstance.id}" />
+	<input type="hidden" name="moveBundleId" value="${moveBundleInstance.id}" />
+	<input type="hidden" name="showAll" value="${showAll}"/>
 	 <span class="button"><input
 		type="button" class="edit" value="Edit"
 		onClick="return editAssetDialog()" /></span> <span class="button"><g:actionSubmit 
@@ -1271,7 +1265,8 @@ Comment</a></span></div>
 <g:form method="post" name="editForm">
 	<input type="hidden" name="id" id="editFormId" value="" />
 	<input type="hidden" name="projectId" value="${projectId}" />
-	<input type="hidden" name="moveBundle" value="${moveBundleInstance.id}" />
+	<input type="hidden" name="moveBundleId" value="${moveBundleInstance.id}" />
+	<input type="hidden" name="showAll" value="${showAll}"/>
 	<div class="dialog" id="editDiv">
 	
 	</div>

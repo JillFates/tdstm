@@ -544,7 +544,7 @@ Comment</a></span></div>
 	<div class="buttons">
 	<input type="hidden" name="id" value="" />
 	<input type="hidden" name="projectId" value="${projectId}" />
-	<input type="hidden" name="moveBundle" value="${moveBundleInstance?.id}" />
+	<input type="hidden" name="moveBundleId" value="${moveBundleInstance?.id}" />
 	<input type="hidden" name="clientList" value="clientList" />
 	<span class="button"><input type="button" class="edit" value="Edit" onClick="return editAssetDialog()" /></span>
 	<span class="button"><g:actionSubmit class="delete" onclick="return confirm('Delete Asset, are you sure?');" value="Delete" /></span>
@@ -557,7 +557,7 @@ Comment</a></span></div>
 <g:form method="post" name="editForm" controller="assetEntity">
 	<input type="hidden" name="id" value="" />
 	<input type="hidden" name="projectId" value="${projectId}" />
-	<input type="hidden" name="moveBundle" value="${moveBundleInstance?.id}" />
+	<input type="hidden" name="moveBundleId" value="${moveBundleInstance?.id}" />
 	<input type="hidden" name="clientList" value="clientList" />
 	<div class="dialog" id="editDiv">
 
@@ -1034,6 +1034,7 @@ Comment</a></span></div>
 	
 	function showAssetDetails( assetId ){
 		document.editForm.id.value=assetId
+		document.showForm.id.value=assetId
 		//${remoteFunction(controller:'assetEntity', action:'editShow', params:'\'id=\'+ assetId', before:'document.showForm.id.value ='+ assetId+';', onComplete:'showAssetDialog(e , \'show\')')}
 	}
 	function vpWidth(type) {
