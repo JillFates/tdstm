@@ -57,3 +57,25 @@ if(!EavAttribute.findWhere(attributeCode:'targetBladePosition')) {
 		new EavEntityAttribute(attribute:attribute, eavAttributeSet:EavAttributeSet.get(1), sortOrder:attribute.sortOrder).save()
 	}
 }
+
+/*============================================================
+* Update the data_transfer_attribute_map for Blade attributes
+*============================================================*/
+def masteDataTransferSet = DataTransferSet.findByTitle( "TDS Master Spreadsheet" )
+def walkthruDataTransferSet = DataTransferSet.findByTitle( "TDS Walkthru" )
+def bladeAttributes = EavAttribute.findAll("FROM EavAttribute e where e.attributeCode in ('bladeSize','sourceBladeChassis','sourceBladePosition','targetBladeChassis','targetBladePosition')")
+	bladeAttributes.each{
+		def masterDataAttribMap = DataTransferAttributeMap.findWhere( columnName: it.frontendLabel, sheetName: "Servers", dataTransferSet: masteDataTransferSet,eavAttribute: it)
+		if(!masterDataAttribMap){
+			new DataTransferAttributeMap( columnName: it.frontendLabel,	sheetName: "Servers",
+					dataTransferSet: masteDataTransferSet,eavAttribute: it,
+					validation: it.validation,	isRequired: it.isRequired ).save()
+		}
+		
+		def walkthruDataAttribMap = DataTransferAttributeMap.findWhere( columnName: it.frontendLabel, sheetName: "Servers", dataTransferSet: walkthruDataTransferSet,eavAttribute: it)
+		if(!walkthruDataAttribMap ){
+		new DataTransferAttributeMap( columnName: it.frontendLabel,	sheetName: "Servers",
+				dataTransferSet: walkthruDataTransferSet,eavAttribute: it,
+				validation: it.validation,	isRequired: it.isRequired ).save()
+		}
+	}
