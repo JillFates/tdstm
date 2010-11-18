@@ -593,7 +593,14 @@ class StepSnapshotService {
 	 * @author : Lokanada Reddy
 	 *------------------------------------------------------------------------*/
 	def backgroundSnapshotProcess(){
-		def moveEventsList = MoveEvent.findAll()
+		def workflowCodes = []
+		stateEngineService.getCurrentWorkflowCodes().each{
+			workflowCodes << it
+		}
+		def moveEventsList
+		if(workflowCodes.size() > 0)
+			moveEventsList = MoveEvent.findAll("from MoveEvent m where m.project.workflowCode in (:workflowCode)", [ workflowCode: workflowCodes] )
+		
 		def now = GormUtil.convertInToGMT( "now", "EDT" );
 		
 		moveEventsList.each{ event ->

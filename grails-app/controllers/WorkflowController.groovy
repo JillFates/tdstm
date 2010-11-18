@@ -219,6 +219,8 @@ class WorkflowController {
 				
 			workflowTransitionsList << [transition : workflowTransition, isExist : isExist ]
 			}
+			//load transitions details into application memory.
+			stateEngineService.loadWorkflowTransitionsIntoMap(workflow.process, 'workflow')
 		} else {
 			redirect(action:home)
 		}
