@@ -42,7 +42,7 @@
 			</tr>
 			${rackLayout?.frontViewRows}
 		</table>
-
+		<br class="page-break-after"/>
 		<g:if test="${params.commit == 'Generate'}">
 		</td>
 		</g:if>
@@ -76,6 +76,7 @@
 			</tr>
 			${rackLayout?.backViewRows}
 		</table>
+		<br class="page-break-after"/>
 		<g:if test="${params.commit == 'Generate'}">
 		</td>
 		</g:if>

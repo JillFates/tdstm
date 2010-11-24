@@ -163,3 +163,6 @@ table.rack_elevation table.bladeTable td.blade {
 table.rack_elevation table.bladeTable td.errorBlade {
 	background-color:red;
 }
+.rack_elevation_td {
+	vertical-align: top;
+}
