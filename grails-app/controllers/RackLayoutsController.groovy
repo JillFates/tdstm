@@ -351,18 +351,21 @@ class RackLayoutsController {
 			else if(matching.size() == 1) {
 				def blade = matching[0]
 				def tag = blade.assetTag.split('')[1..-1].join('<br/>')
-				for(int x=0; x < tag.size(); x++ ){
-					
+				def taglabel = "<div style='float:left'>"+tag.substring(0,tag.length())+"</div>"
+				if(blade.assetTag.length() >= 8){
+					taglabel = "<div style='float:left'>"+tag.substring(0,19)+"</div><div style='float:right'>"+tag.substring(24,43)+"</div>"
 				}
 				def bladeSpan = blade.bladeSize == 'Full' ? 2 : 1
-				if(bladeSpan == 2)
+				if(bladeSpan == 2){
 					fullRows << i + 8
+					taglabel = tag
+				}
 				if((bladeSpan == 2) && blades.findAll { it.sourceBladePosition == i + 8 }.size() > 0)
 					bladeTable += "<td class='errorBlade' style='height:${tdHeight}px'>&nbsp;</td>"
 				else if(isAdmin)
-					bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href='javascript:openAssetEditDialig(${blade.id})' title='${tag.replace('<br/>','')}'>${tag}</a></td>"
+					bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href='javascript:openAssetEditDialig(${blade.id})' title='${tag.replace('<br/>','')}'>${taglabel}</a></td>"
 				else
-					bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px' title='${tag.replace('<br/>','')}'>${tag}</td>"
+					bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px' title='${tag.replace('<br/>','')}'>${taglabel}</td>"
 			} else
 				bladeTable += "<td class='emptyBlade' style='height:${tdHeight}px'>&nbsp;</td>"
 		}
@@ -382,12 +385,15 @@ class RackLayoutsController {
 				bladeTable += "<td class='errorBlade' style='height:${tdHeight}px'>&nbsp;</td>"
 			else if(matching.size() == 1) {
 				def blade = matching[0]
-				def tag = blade.assetTag.split('')[1..-1].join('<br />')
-
+				def tag = blade.assetTag.split('')[1..-1].join('<br/>')
+				def taglabel = "<div style='float:left'>"+tag.substring(0,tag.length())+"</div>"
+				if(blade.assetTag.length() >= 8){
+					taglabel = "<div style='float:left;'>"+tag.substring(0,19)+"</div><div style='float:right'>"+tag.substring(24,43)+"</div>"
+				}
 				if(isAdmin)
-					bladeTable += "<td class='blade' style='height:${tdHeight}px'><a href='javascript:openAssetEditDialig(${blade.id})' title='${tag.replace('<br/>','')}' >${tag}</a></td>"
+					bladeTable += "<td class='blade' style='height:${tdHeight}px'><a href='javascript:openAssetEditDialig(${blade.id})' title='${tag.replace('<br/>','')}' >${taglabel}</a></td>"
 				else                                 
-					bladeTable += "<td class='blade' style='height:${tdHeight}px' title='${tag.replace('<br/>','')}'>${tag}</td>"
+					bladeTable += "<td class='blade' style='height:${tdHeight}px' title='${tag.replace('<br/>','')}'>${taglabel}</td>"
 			} else
 				bladeTable += "<td class='emptyBlade' style='height:${tdHeight}px'>&nbsp;</td>"
 		}
