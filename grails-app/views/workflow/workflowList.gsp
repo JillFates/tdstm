@@ -11,7 +11,11 @@
 <div class="steps_table">
 	<span class="span"><b>Workflow</b></span>
 <div class="nav" style="border: 1px solid #CCCCCC; height: 11px;margin: 0px 10px 10px 10px;">
-	<span class="menuButton"><g:link class="list" action="home">Workflow List</g:link></span>
+	<span class="menuButton">
+		<g:link class="list" action="home">Workflow List</g:link>
+		<a class="create" href="#" onclick="openWorkflowDialog()">Copy Workflow</a>
+	</span>
+	
 </div>
 <div>
 <table border="0" style="width: 400px;margin: 0px 10px 10px 20px; ">
@@ -239,8 +243,37 @@
 	    <span class="button"><input type="button" class="create" onclick="addStep('edit');" value="Add Step" /></span>
     </g:form>
 </div>
+<div id="copyWorkflowDialog" title="Copy Workflow" style="display:none;">
+	<g:form action="createWorkflow" onsubmit="return checkInputData()">
+		<input type="hidden" name="workflow" value="${workflow?.id}" />
+          <div class="dialog">
+            <table>
+              <tbody>
+              <tr>
+				<td colspan="2"><div class="required"></div> </td>
+				</tr>
+              	<tr class="prop">
+                	<td valign="top" class="name">
+                    	<label for="password">Workflow:&nbsp;</label>
+					</td>
+                    <td valign="top" class="value">
+						<input type="text" name="process" id="processId" value=""/>
+					</td>
+				</tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="buttons">
+            <span class="button"><input type="submit" class="create" value="Copy" /></span>
+            <span class="button"><input type="button" class="delete" value="Cancel" onclick="$('#copyWorkflowDialog').dialog('close');"/></span>
+          </div>
+    </g:form>
+</div>
 </div>
 <script type="text/javascript">
+$(document).ready(function() {
+	$("#copyWorkflowDialog").dialog({ autoOpen: false })
+})    	
 /*=========================================
  * redirect to steps roles form
  *========================================*/
@@ -327,6 +360,21 @@ function addStep( type ){
 	$("#additionalStepsId").val(additionalSteps)
 	$("#"+type+"WorkflowStepsTbody").append(stepRow)
 	$("#currentStepsId").val(additionalSteps + 1)
+}
+/****************************************
+ * Copy workflow to anther workflow
+ ***************************************/
+function openWorkflowDialog(){
+	$('#copyWorkflowDialog').dialog('open');
+}
+function checkInputData(){
+	var process = $("#processId").val()
+	var returnVal = true
+	if( !process ) {
+		alert("Workflow should not be blank ")
+		returnVal = false 
+	}
+	return returnVal
 }
 </script>
 </body>

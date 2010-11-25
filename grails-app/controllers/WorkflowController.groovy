@@ -104,6 +104,7 @@ class WorkflowController {
 	 *==================================================*/
 	def createWorkflow = {
 		def process = params.process
+		def workflow = params.workflow
 		def principal = SecurityUtils.subject.principal
 		def message
 		if(process && principal){
@@ -117,7 +118,7 @@ class WorkflowController {
 			if ( ! workflowInstance.validate() || ! workflowInstance.save(insert : true, flush:true) ) {
 				message =  "Workfolw \"${workflowInstance}\" should be unique"
 			} else {
-				def stdWorkflow = Workflow.findByProcess("STD_PROCESS")
+				def stdWorkflow = Workflow.get( workflow )
 				if( stdWorkflow ){
 					/* create Standerd swimlanes to the workflow */
 					def stdSwimlanes = Swimlane.findAllByWorkflow( stdWorkflow )
@@ -141,8 +142,22 @@ class WorkflowController {
 																		header : stdWorkflowTransition.header
 																		)
 							if (  workflowTransition.validate() && workflowTransition.save( flush:true) ) {
-								log.debug("Standerd Workfolw step \"${workflowTransition}\" created")
+								log.debug(" Workfolw step \"${workflowTransition}\" created")
 							} 
+					}
+					/* Create workflow roles based on the template roles*/
+					def swimlanes = Swimlane.findAllByWorkflow( workflowInstance )
+					def workflowTransitions = WorkflowTransition.findAllByWorkflow( workflowInstance )
+					def workflowTransitionMaps = WorkflowTransitionMap.findAllByWorkflow( stdWorkflow )
+					workflowTransitionMaps.each{ map->
+						def workflowTransition = workflowTransitions.find{	it.code == map.workflowTransition.code &&
+																			it.transId == map.workflowTransition.transId }
+						def swimlane = swimlanes.find{	it.name == map.swimlane.name }
+						
+						def workflowTransitionMap = new WorkflowTransitionMap(workflow:workflowInstance, workflowTransition:workflowTransition,swimlane:swimlane,transId:map.transId, flag:map.flag )
+						if (  workflowTransitionMap.validate() && workflowTransitionMap.save( flush:true) ) {
+							log.debug(" Workfolw Roles \"${workflowTransitionMap}\" created")
+						}
 					}
 				}
 				message = "Workfolw \"${workflowInstance}\" created"
