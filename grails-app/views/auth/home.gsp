@@ -38,10 +38,6 @@ a:hover {
 					<td><g:link controller="userLogin" style="color:black">Manage Users</g:link></td>
 					<td><g:link controller="refCode" style="color:black">Manage RefCode</g:link></td>
 				</tr>
-				<tr class="even">
-					<td><g:link controller="manufacturer" style="color:black">Manufacturer</g:link></td>
-					<td><g:link controller="model" style="color:black">Model</g:link></td>
-				</tr>
 				<tr class="odd">
 					<td><g:link controller="admin" action="orphanSummary"
 						style="color:black">Manage Orphan Records</g:link></td>

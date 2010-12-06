@@ -288,7 +288,7 @@ class WorkflowController {
 			//AssetTransition.executeUpdate('delete from')
 			StepSnapshot.executeUpdate("delete from StepSnapshot ss where ss.moveBundleStep in (select mbs.id from MoveBundleStep mbs where mbs.moveBundle.project.workflowCode = '${workflowTransition.workflow.process}' and mbs.transitionId = ${workflowTransition.transId})")
 			MoveBundleStep.executeUpdate("delete from MoveBundleStep mbs where mbs.moveBundle in (select mb.id from MoveBundle mb where mb.project.workflowCode = '${workflowTransition.workflow.process}') and mbs.transitionId = ?",[ workflowTransition.transId])
-			WorkflowTransitionMap.executeUpdate("delete from WorkflowTransitionMap wtm where wtm.workflow = ?",[workflowTransition.workflow])
+			WorkflowTransitionMap.executeUpdate("delete from WorkflowTransitionMap wtm where wtm.workflowTransition = ?",[workflowTransition])
 			workflowTransition.delete(flush:true)
 			
 			//	load transitions details into application memory.

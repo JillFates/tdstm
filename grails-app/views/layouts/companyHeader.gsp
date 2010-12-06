@@ -122,6 +122,8 @@
 			<li><g:link class="home" controller="partyGroup" id="${partyGroup}">Company</g:link></li>
 			<li><g:link class="home" controller="person" id="${partyGroup}">Staff</g:link></li>
 			<li><g:link class="home" controller="userLogin" id="${partyGroup}">Users</g:link></li>
+			<li><g:link class="home" controller="manufacturer" id="${partyGroup}">Manufacturers</g:link></li>
+			<li><g:link class="home" controller="model" id="${partyGroup}">Models</g:link></li>
 			<li><g:link class="home" controller="application" id="${partyGroup}">Applications </g:link></li>
 			<!--<li><a href="#">Locations </a></li>
 			<li><a href="#">Rooms </a></li> -->

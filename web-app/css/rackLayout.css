@@ -166,3 +166,64 @@ table.rack_elevation table.bladeTable td.errorBlade {
 .rack_elevation_td {
 	vertical-align: top;
 }
+.inputbdr {
+	border:1px solid #333333;
+	font-size:11px;
+}
+.inputs_div input{
+	border:1px solid #333333;
+	font-size:11px;
+}
+.unknown {
+	border:1px solid #333333;
+	font-size:11px;.
+	background-color: #FFFFFF;
+}
+.empty_cable {
+	border:1px solid #333333;
+	font-size:11px;
+	background-color: #CCCCCC;
+}
+.cabled {
+	border:1px solid #333333;
+	font-size:11px;
+	background-color: #3300FF;
+}
+.cabled_details {
+	border:1px solid #333333;
+	font-size:11px;
+	background-color: green;
+}
+
+#cablingPanel {
+	width: 379px;
+	height: 199px;
+	border: 1px solid #5F9FCF;
+	margin-right: 5px;
+	margin-bottom: 5px;
+	float: left;
+	background-color: lightyellow; 
+	position: relative;
+}
+#cablingPanel div {
+	position: absolute; 
+	left: 0; 
+	top: 0
+}
+#optionsPanel {
+	border: 1px solid #5F9FCF;
+	margin-right: 5px;
+	float: left;
+}
+#optionsPanel li {
+	list-style: none;
+	margin-bottom: 5px;
+	margin-top: 5px;
+	margin-right: 5px;
+}
+#optionsPanel li a:link, a:visited, a:hover {
+	border: 0;
+}
+#optionsPanel li img{
+	vertical-align: middle;
+}
