@@ -7,8 +7,8 @@ class Model {
 	Integer powerUse
 	String aka
 	Integer usize
-	String frontImage
-	String rearImage
+	byte[] frontImage
+	byte[] rearImage
 	
 	
 	static belongsTo = [ manufacturer : Manufacturer]
@@ -27,7 +27,12 @@ class Model {
 	
 	static mapping  = {	
 		version false
-		id column:'model_id'
+		columns {
+			id column:'model_id'
+			modelName column: 'name'
+			frontImage sqlType:'LONGBLOB'
+			rearImage sqlType:'LONGBLOB'
+		}
 	}
 	def getAssetTypeList(){
 		return EavAttributeOption.findAllByAttribute(EavAttribute.findByAttributeCode("assetType"))?.value

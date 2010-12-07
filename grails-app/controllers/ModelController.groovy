@@ -22,6 +22,27 @@ class ModelController {
 
     def save = {
         def modelInstance = new Model(params)
+		def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
+		def frontImage = request.getFile('frontImage')
+        if( frontImage ) {
+			if( frontImage.getContentType() && frontImage.getContentType() != "application/octet-stream"){
+				if (! okcontents.contains(frontImage.getContentType())) {
+	        		flash.message = "Front Image must be one of: ${okcontents}"
+	        		render(view: "create", model: [modelInstance: modelInstance])
+	        		return;
+	        	}
+        	}
+        }
+        def rearImage = request.getFile('rearImage')
+        if( rearImage ) {
+			if( rearImage.getContentType() && rearImage.getContentType() != "application/octet-stream"){
+				if (! okcontents.contains(rearImage.getContentType())) {
+	        		flash.message = "Rear Image must be one of: ${okcontents}"
+	        		render(view: "create", model: [modelInstance: modelInstance])
+	        		return;
+	        	}
+        	}
+        }
         if (modelInstance.save(flush: true)) {
         	def connectorCount = Integer.parseInt(params.connectorCount)
 			if(connectorCount > 0){
@@ -45,6 +66,7 @@ class ModelController {
             redirect(action: "show", id: modelInstance.id)
         }
         else {
+        	flash.message = modelInstance.errors.allErrors.each() {  it }
             render(view: "create", model: [modelInstance: modelInstance])
         }
     }
@@ -80,15 +102,37 @@ class ModelController {
     def update = {
         def modelInstance = Model.get(params.id)
         if (modelInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (modelInstance.version > version) {
-                    
-                    render(view: "edit", model: [modelInstance: modelInstance])
-                    return
+            def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
+    		def frontImage = request.getFile('frontImage')
+            if( frontImage ) {
+    			if( frontImage.getContentType() && frontImage.getContentType() != "application/octet-stream"){
+    				if (! okcontents.contains(frontImage.getContentType())) {
+    	        		flash.message = "Front Image must be one of: ${okcontents}"
+    	        		render(view: "create", model: [modelInstance: modelInstance])
+    	        		return;
+    	        	}
+    				frontImage = frontImage.bytes
+            	} else {
+            		frontImage = modelInstance.frontImage
+            	}
+            }
+            def rearImage = request.getFile('rearImage')
+            if( rearImage ) {
+    			if( rearImage.getContentType() && rearImage.getContentType() != "application/octet-stream"){
+    				if (! okcontents.contains(rearImage.getContentType())) {
+    	        		flash.message = "Rear Image must be one of: ${okcontents}"
+    	        		render(view: "create", model: [modelInstance: modelInstance])
+    	        		return;
+    	        	}
+    				rearImage = rearImage.bytes
+            	} else {
+                	rearImage = modelInstance.rearImage
                 }
             }
             modelInstance.properties = params
+            modelInstance.rearImage = rearImage
+            modelInstance.frontImage = frontImage
+			
             if (!modelInstance.hasErrors() && modelInstance.save(flush: true)) {
             	def connectorCount = Integer.parseInt(params.connectorCount)
 				if(connectorCount > 0){
@@ -157,5 +201,31 @@ class ModelController {
         	flash.message = "Model not found with Id ${params.id}"
             redirect(action: "list")
         }
+    }
+    /*
+     *  Send FrontImage as inputStream
+     */
+    def getFrontImage = {
+		if( params.id ) {
+    		def model = Model.findById( params.id )
+     		def image = model?.frontImage
+     		response.contentType = 'image/jpg'		
+     		response.outputStream << image
+		} else {
+			return;
+		}
+    }
+    /*
+     *  Send RearImage as inputStream
+     */
+    def getRearImage = {
+		if( params.id ) {
+    		def model = Model.findById( params.id )
+     		def image = model?.rearImage
+     		response.contentType = 'image/jpg'		
+     		response.outputStream << image
+		} else {
+			return;
+		}
     }
 }

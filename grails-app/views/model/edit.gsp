@@ -18,8 +18,8 @@
 <div style="border: 0px;margin-top: 5px;" >
 <fieldset>
 <legend><b>Edit Model Template</b></legend>
-<g:form action="save">
-<div style="margin-left: 10px;margin-right: 10px; float: left;width: 400px;">
+<g:form action="save"  enctype="multipart/form-data">
+<div style="margin-left: 10px;margin-right: 10px; float: left;width: auto;">
 <table style="border: 0px;">
 	<tbody>
 		<tr>
@@ -57,12 +57,12 @@
 			<td><g:select id="powerUseId" name="powerUse" from="${modelInstance.constraints.powerUse.inList}" value="${modelInstance.powerUse}"></g:select>&nbsp;Watts</td>
 		</tr>
 		<tr>
-		<td>Front img:</label></td>
+		<td>Front image:</label></td>
         <td><input size="20" type="file" name="frontImage" id="frontImageId" />
 		</td>
 		</tr>
 		<tr>
-        <td>Rear img:</td>
+        <td>Rear image:</td>
         <td><input size="20" type="file" name="rearImage" id="rearImageId" />
         </td>
         </tr>
@@ -87,6 +87,7 @@
 <div style="float: left;">
 	<div>
 		<div id="cablingPanel">
+			<img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}" />
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
 				<div id="connector${modelConnector.connector}" style="top:${180 -(modelConnector.connectorPosY / 2)}px ;left:${modelConnector.connectorPosX}px "><img src="../i/cabling/${modelConnector.status}.png"/><span id='connectorLabelText${modelConnector.connector}'>${modelConnector.label}</span></div>
 			</g:each>

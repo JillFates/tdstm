@@ -14,64 +14,67 @@
 <div class="steps_table" style="border: 0px;">
 <fieldset>
 <legend><b>Create Model Template</b></legend>
-<g:form action="save">
-<div style="margin-left: 10px;margin-right: 10px; float: left;width: 400px;">
+<g:form action="save" enctype="multipart/form-data">
+<div style="margin-left: 10px;margin-right: 10px; float: left;width: auto;">
 <table>
 	<tbody>
 		<tr>
-			<td>Manufacturer:</td>
-			<td>
-				<g:select id="manufacturerId" name="manufacturer.id" from="${Manufacturer.list()}" optionKey="id" ></g:select>
+			<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+		</tr>
+		<tr>
+			<td valign="top" class="name"><b>Manufacturer:<span style="color: red">*</span></b></td>
+			<td valign="top" class="name">
+				<g:select id="manufacturerId" name="manufacturer.id" from="${Manufacturer.list()}" optionKey="id" value="${modelInstance?.manufacturer.id}"></g:select>
 				<g:hasErrors bean="${modelInstance}" field="manufacturer">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="manufacturer" /></div>
 				</g:hasErrors>
 			</td>
 		</tr>
 		<tr>
-			<td>Model Name:</td>
+			<td valign="top" class="name" nowrap="nowrap"><b>Model Name:<span style="color: red">*</span></b></td>
 			<td>
-				<input type="text" name="modelName" id="modelNameId">
+				<input type="text" name="modelName" id="modelNameId" value="${modelInstance?.modelName}">
 				<g:hasErrors bean="${modelInstance}" field="modelName">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelName" /></div>
 				</g:hasErrors> 
 			</td>
 		</tr>
 		<tr>
-			<td>AKA:</td>
+			<td valign="top" class="name">AKA:</td>
 			<td>
-				<input type="text" name="aka" id="akaId">
+				<input type="text" name="aka" id="akaId" value="${modelInstance?.aka}">
 				<g:hasErrors bean="${modelInstance}" field="aka">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="aka" /></div>
 				</g:hasErrors> 
 			</td>
 		</tr>
 		<tr>
-			<td>Asset Type:</td>
+			<td valign="top" class="name" nowrap="nowrap">Asset Type:</td>
 			<td><g:select id="assetTypeId" name="assetType" from="${modelInstance.assetTypeList}" value="${modelInstance.assetType}"></g:select></td>
 		</tr>
 		<tr>
-			<td>Usize:</td>
+			<td valign="top" class="name">Usize:</td>
 			<td>
 				<g:select id="usizeId" name="usize" from="${modelInstance.constraints.usize.inList}" value="${modelInstance.usize}"></g:select>
 			</td>
 		</tr>
 		<tr>
-			<td>Power (typical):</td>
+			<td valign="top" class="name" nowrap="nowrap">Power (typical):</td>
 			<td><g:select id="powerUseId" name="powerUse" from="${modelInstance.constraints.powerUse.inList}" value="${modelInstance.powerUse}"></g:select>&nbsp;Watts</td>
 		</tr>
 		<tr>
-		<td>Front img:</label></td>
+		<td valign="top" class="name" nowrap="nowrap">Front image:</label></td>
         <td><input size="20" type="file" name="frontImage" id="frontImageId" />
 		</td>
 		</tr>
 		<tr>
-        <td>Rear img:</td>
+        <td valign="top" class="name" nowrap="nowrap">Rear image:</td>
         <td><input size="20" type="file" name="rearImage" id="rearImageId" />
         </td>
         </tr>
         <tr>
-			<td>Notes:</td>
-			<td><input type="text" name="description" id="descriptionId"> </td>
+			<td valign="top" class="name">Notes:</td>
+			<td><input type="text" name="description" id="descriptionId" value="${modelInstance.description}" > </td>
 		</tr>
 		<tr>
 			<td colspan="2">

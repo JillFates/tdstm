@@ -18,7 +18,7 @@
 <div style="border: 0px;margin-top: 5px;">
 <fieldset>
 <legend><b>Show Model Template</b></legend>
-<div style="margin-left: 10px;margin-right: 10px; float: left;width: 400px;">
+<div style="margin-left: 10px;margin-right: 10px; float: left;width: auto;">
 <table style="border: 0px;">
 	<tbody>
 		<tr>
@@ -48,12 +48,12 @@
 			<td>${modelInstance?.powerUse}&nbsp;Watts</td>
 		</tr>
 		<tr>
-			<td>Front img:</label></td>
-        	<td></td>
+			<td>Front image:</label></td>
+        	<td><img src="${createLink(controller:'model', action:'getFrontImage', id:modelInstance.id)}" /></td>
 		</tr>
 		<tr>
-        	<td>Rear img:</td>
-        	<td></td>
+        	<td>Rear image:</td>
+        	<td><img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}" /></td>
         </tr>
         <tr>
 			<td>Notes:</td>
@@ -78,6 +78,7 @@
 <div style="float: left;">
 	<div>
 		<div id="cablingPanel">
+			<img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}" />
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
 				<div id="connector${i}" style="top:${180 -(modelConnector.connectorPosY / 2)}px ;left:${modelConnector.connectorPosX}px "><img src="../../i/cabling/${modelConnector.status}.png"/><span>${modelConnector.label}</span></div>
 			</g:each>
