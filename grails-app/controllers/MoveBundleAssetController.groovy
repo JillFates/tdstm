@@ -484,7 +484,7 @@ class MoveBundleAssetController {
     			displayTeam = assetEntityList[assetRow]?.sourceTeam?.teamCode
     		}
     		def assetEntityInstance = AssetEntity.findById( assetEntityList[assetRow]?.id )
-    		assetEntity <<[id:assetEntityInstance?.id, assetName:assetEntityInstance?.assetName, model:assetEntityInstance?.model, 
+    		assetEntity <<[id:assetEntityInstance?.id, assetName:assetEntityInstance?.assetName, model:assetEntityInstance?.model?.toString(), 
     						sourceLocation:assetEntityInstance?.sourceLocation, sourceRack:assetEntityInstance?.sourceRack, 
     						targetLocation:assetEntityInstance?.targetLocation, targetRack:assetEntityInstance?.targetRack, 
     						sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, 
@@ -539,7 +539,7 @@ class MoveBundleAssetController {
     				displayTeam = moveBundleAssetList[assetRow]?.sourceTeam?.teamCode
     			}
     			def assetEntityInstance = AssetEntity.findById( moveBundleAssetList[assetRow]?.id )
-    			moveBundleAsset << [id:assetEntityInstance?.id, assetName:assetEntityInstance?.assetName, model:assetEntityInstance?.model, 
+    			moveBundleAsset << [id:assetEntityInstance?.id, assetName:assetEntityInstance?.assetName, model:assetEntityInstance?.model?.toString(), 
 			    					sourceLocation:assetEntityInstance?.sourceLocation, sourceRack:assetEntityInstance?.sourceRack, 
 			    					targetLocation:assetEntityInstance?.targetLocation, targetRack:assetEntityInstance?.targetRack, 
 			    					sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, 
@@ -785,7 +785,7 @@ class MoveBundleAssetController {
    					rackPos = ""
    				}
    			 	reportFields <<['assetName':asset.assetName , 'assetTag':asset.assetTag, "assetType":asset.assetType, 
-   			 	                "manufacturer":asset.manufacturer, "model":asset.model, "sourceTargetrack":rackPos, 
+   			 	                "manufacturer":asset.manufacturer?.toString(), "model":asset.model?.toString(), "sourceTargetrack":rackPos, 
    			 	                "position":asset.sourceRackPosition, 
    			 	                "sourceTargetPos":(projectTeamLocationInstance?.currentLocation ? projectTeamLocationInstance?.currentLocation : "") +"(source/ unracking)", 
    			 	                "usize":asset.usize, "cart":asset.cart, "shelf":asset.shelf,"source_team_id":asset?.sourceTeam?.id, 
@@ -829,7 +829,7 @@ class MoveBundleAssetController {
    					cartShelf = ""
    				}
    				reportFields <<['assetName':asset.assetName , 'assetTag':asset.assetTag, "assetType":asset.assetType, 
-   				                "manufacturer":asset.manufacturer, "model":asset.model, "sourceTargetrack":rackPos, 
+   				                "manufacturer":asset.manufacturer?.toString(), "model":asset.model?.toString(), "sourceTargetrack":rackPos, 
    				                "position":asset.targetRackPosition, 
    				                "sourceTargetPos":(projectTeamLocationInstance?.currentLocation ? projectTeamLocationInstance?.currentLocation : "") +"(target/ reracking)", 
    				                "usize":asset.usize, "cart":asset.cart, "shelf":asset.shelf,"source_team_id":asset?.targetTeam?.id, 
@@ -941,7 +941,7 @@ class MoveBundleAssetController {
        				def truckTagSort = (asset.truck ? asset.truck : "") +" "+ (asset.cart ? asset.cart : "") +" "+ (asset.shelf ? asset.shelf : "")
        				
        				def teamMembers = partyRelationshipService.getTeamMemberNames(teamPartyGroup?.id) 
-       				reportFields <<['assetName':asset.assetName , "model":asset.model, 
+       				reportFields <<['assetName':asset.assetName , "model":asset.model?.toString(), 
        				                "sourceTargetPos":(teamPartyGroup?.currentLocation ? teamPartyGroup?.currentLocation : "") +"(source/ unracking)", 
        				                "cart":cartShelf, "shelf":asset.shelf,"source_team_id":teamPartyGroup?.id, 
        				                "move_bundle_id":asset?.moveBundle?.id,dlocation:asset.sourceLocation,
@@ -1253,7 +1253,7 @@ class MoveBundleAssetController {
     			if( params.reportResolveInfo == "true" || assetComment.isResolved != 1 ) {
     				reportFields <<['assetName':assetComment?.assetEntity?.assetName, 'assetTag':assetComment?.assetEntity?.assetTag, 
     								'sourceTargetRoom':sourceTargetRoom,
-    								'model':(assetComment?.assetEntity?.manufacturer ? assetComment?.assetEntity?.manufacturer : "")+" "+(assetComment?.assetEntity?.model ? assetComment?.assetEntity?.model : "" ), 
+    								'model':(assetComment?.assetEntity?.manufacturer ? assetComment?.assetEntity?.manufacturer?.toString() : "")+" "+(assetComment?.assetEntity?.model ? assetComment?.assetEntity?.model : "" ), 
     								'occuredAt':GormUtil.convertInToUserTZ( assetComment?.dateCreated, tzId ), 'createdBy':assetComment?.createdBy?.firstName+" "+assetComment?.createdBy?.lastName, 
     								'issue':assetComment?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
     								'clientName':projectInstance?.client?.name,"resolvedInfoInclude":resolvedInfoInclude,

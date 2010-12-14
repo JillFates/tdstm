@@ -131,7 +131,7 @@
 				var assetOnCart = assetsOnCart[i]
 				tbody +="<tr id='assetRow_"+assetOnCart.assetDetails.id+"' onclick='getReassignDetails("+assetOnCart.assetDetails.id+")' class='"+cssClass+"'>"+
 						"<td>"+assetOnCart.assetDetails.assetTag+"</td><td>"+assetOnCart.assetDetails.assetName+"</td>"+
-						"<td>"+assetOnCart.assetDetails.manufacturer +" "+ assetOnCart.assetDetails.model +"</td>"+
+						"<td>"+assetOnCart.manufacturer +" "+ assetOnCart.model +"</td>"+
 						"<td>"+assetOnCart.currentState+"</td><td>"+assetOnCart.team+"</td>"
 						if(assetOnCart.checked){
 							check +="<td><input type='checkbox' disabled='disabled' checked='checked'/></td></tr>"
@@ -184,7 +184,7 @@
 		if(assetDetails[0]){
 			tbody += "<tr></td> <strong>Asset Tag </strong> :  "+assetDetails[0].assetEntity.assetTag+"</td></tr>"+
 					 "<tr></td> <strong>Name </strong>: "+assetDetails[0].assetEntity.assetName+"</td></tr>"+
-					 "<tr></td> <strong>Mfg/Model</strong> : "+assetDetails[0].assetEntity.manufacturer+" "+assetDetails[0].assetEntity.model+"</td></tr>"+
+					 "<tr></td> <strong>Mfg/Model</strong> : "+assetDetails[0].manufacturer+" "+assetDetails[0].model+"</td></tr>"+
 					 "<tr></td> <strong>Team</strong> : "+assetDetails[0].team+"</td></tr>"
 			$("#reassignCartId").val(assetDetails[0].assetEntity.cart);
 			$("#reassignShelfId").val(assetDetails[0].assetEntity.shelf);

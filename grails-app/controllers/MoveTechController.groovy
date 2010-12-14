@@ -393,13 +393,14 @@ class MoveTechController {
                 ipState.add(  stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Reracking" ) )
                 
             }
-            def countQuery = "select a.asset_entity_id as id, a.asset_tag as assetTag, a.source_rack as sourceRack, " + 
-				            "a.source_rack_position as sourceRackPosition, a.target_rack as targetRack, " +
-				            "min(cast(t.state_to as UNSIGNED INTEGER)) as minstate, "+
-				            "a.target_rack_position as targetRackPosition, a.model as model, p.current_state_id as currentStateId " +
-				            "from asset_entity a left join project_asset_map p on (a.asset_entity_id = p.asset_id) " +
-				            "left join asset_transition t on(a.asset_entity_id = t.asset_entity_id and t.voided = 0)"+
-				            "where a.move_bundle_id = $bundleId"
+            def countQuery = """select a.asset_entity_id as id, a.asset_tag as assetTag, a.source_rack as sourceRack, 
+							a.source_rack_position as sourceRackPosition, a.target_rack as targetRack,
+				            min(cast(t.state_to as UNSIGNED INTEGER)) as minstate,
+				            a.target_rack_position as targetRackPosition, m.name as model, p.current_state_id as currentStateId 
+				            from asset_entity a left join project_asset_map p on (a.asset_entity_id = p.asset_id) 
+				            left join asset_transition t on(a.asset_entity_id = t.asset_entity_id and t.voided = 0)
+            				left join model m on (a.model_id = m.model_id )
+				            where a.move_bundle_id = $bundleId"""
             def query = new StringBuffer (countQuery)
             if ( params.location == "s" ) {
                 stateVal = stateEngineService.getStateId ( moveBundleInstance.project.workflowCode, "Unracked" )
@@ -815,13 +816,15 @@ class MoveTechController {
             def issuecomments
             def assetIssueCommentListSize
             def moveBundleInstance = MoveBundle.findById( bundleId )
-            def query = new StringBuffer("select a.asset_entity_id as id, a.asset_tag as assetTag, " +
-					"a.source_rack as sourceRack, a.source_rack_position as sourceRackPosition, " +
-					"a.target_rack as targetRack, a.target_rack_position as targetRackPosition, " +
-					"min(cast(t.state_to as UNSIGNED INTEGER)) as minstate, "+
-					"a.model as model, p.current_state_id as currentStateId from asset_entity a " +
-					"left join asset_transition t on(a.asset_entity_id = t.asset_entity_id and t.voided = 0) "+
-					"left join project_asset_map p on (a.asset_entity_id = p.asset_id) where a.move_bundle_id = $bundleId ")
+            def query = new StringBuffer("""select a.asset_entity_id as id, a.asset_tag as assetTag,
+					a.source_rack as sourceRack, a.source_rack_position as sourceRackPosition,
+					a.target_rack as targetRack, a.target_rack_position as targetRackPosition,
+					min(cast(t.state_to as UNSIGNED INTEGER)) as minstate,
+					m.name as model, p.current_state_id as currentStateId from asset_entity a 
+					left join asset_transition t on(a.asset_entity_id = t.asset_entity_id and t.voided = 0) 
+					left join project_asset_map p on (a.asset_entity_id = p.asset_id)
+            		left join model m on (a.model_id = m.model_id) 
+            		where a.move_bundle_id = $bundleId """)
             
             stateVal = stateEngineService.getStateId ( moveBundleInstance?.project.workflowCode, "Cleaned" )
             allSize = jdbcTemplate.queryForList( query.toString() +" group by a.asset_entity_id" ).size()

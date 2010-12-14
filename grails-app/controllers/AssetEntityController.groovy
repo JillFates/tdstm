@@ -665,18 +665,32 @@ class AssetEntityController {
      * @return assetList Page
      * ------------------------------------------ */
     def save = {
+    		
+    	def manufacturerId = params.manufacturer
+		if( manufacturerId )
+			params["manufacturer"] = Manufacturer.get(manufacturerId)
+		
+		def modelId = params.model
+		if( modelId )
+			params["model"] = Model.get(modelId)
+				
         def assetEntityInstance = new AssetEntity(params)
         def projectId = params.projectId
         def projectInstance = Project.findById( projectId )
         assetEntityInstance.project = projectInstance
         assetEntityInstance.owner = projectInstance.client
+        
         if(!assetEntityInstance.hasErrors() && assetEntityInstance.save()) {
         	assetEntityInstance.updateRacks()
             flash.message = "AssetEntity ${assetEntityInstance.assetName} created"
             redirect( action:list, params:[projectId: projectId] )
         }
         else {
+        	
         	flash.message = "AssetEntity ${assetEntityInstance.assetName} not created"
+        	def etext = "Unable to Update Asset Entity" +
+						GormUtil.allErrorsString( assetEntityInstance )
+			println etext
             redirect( action:list, params:[projectId: projectId] )
         }
     }
@@ -690,9 +704,9 @@ class AssetEntityController {
         def items = []
         def assetEntityInstance = AssetEntity.get( params.id )
         /*if( assetEntityInstance.assetType != null ){
-        items = [id:assetEntityInstance.id, model: assetEntityInstance.model, sourceLocation: assetEntityInstance.sourceLocation, targetLocation: assetEntityInstance.targetLocation, sourceRack: assetEntityInstance.sourceRack, targetRack: assetEntityInstance.targetRack, sourceRackPosition: assetEntityInstance.sourceRackPosition, targetRackPosition: assetEntityInstance.targetRackPosition, usize: assetEntityInstance.usize, manufacturer: assetEntityInstance.manufacturer, fiberCabinet: assetEntityInstance.fiberCabinet, hbaPort: assetEntityInstance.hbaPort, hinfo: assetEntityInstance.hinfo, ipAddress: assetEntityInstance.ipAddress, kvmDevice: assetEntityInstance.kvmDevice, kvmPort: assetEntityInstance.kvmPort, newOrOld: assetEntityInstance.newOrOld, nicPort: assetEntityInstance.nicPort, pduPort: assetEntityInstance.pduPort, remoteMgmtPort: assetEntityInstance.remoteMgmtPort, truck: assetEntityInstance.truck, project:assetEntityInstance.project.name, projectId:assetEntityInstance.project.id, assetType:assetEntityInstance.assetType, assetTypeId:assetEntityInstance.assetType.id, assetTag:assetEntityInstance.assetTag, assetName:assetEntityInstance.assetName, serialNumber:assetEntityInstance.serialNumber, , application:assetEntityInstance.application ]
+        items = [id:assetEntityInstance.id, model: assetEntityInstance.model, sourceLocation: assetEntityInstance.sourceLocation, targetLocation: assetEntityInstance.targetLocation, sourceRack: assetEntityInstance.sourceRack, targetRack: assetEntityInstance.targetRack, sourceRackPosition: assetEntityInstance.sourceRackPosition, targetRackPosition: assetEntityInstance.targetRackPosition, usize: assetEntityInstance.usize, manufacturer: assetEntityInstance.manufacturer?.toSting(), fiberCabinet: assetEntityInstance.fiberCabinet, hbaPort: assetEntityInstance.hbaPort, hinfo: assetEntityInstance.hinfo, ipAddress: assetEntityInstance.ipAddress, kvmDevice: assetEntityInstance.kvmDevice, kvmPort: assetEntityInstance.kvmPort, newOrOld: assetEntityInstance.newOrOld, nicPort: assetEntityInstance.nicPort, pduPort: assetEntityInstance.pduPort, remoteMgmtPort: assetEntityInstance.remoteMgmtPort, truck: assetEntityInstance.truck, project:assetEntityInstance.project.name, projectId:assetEntityInstance.project.id, assetType:assetEntityInstance.assetType, assetTypeId:assetEntityInstance.assetType.id, assetTag:assetEntityInstance.assetTag, assetName:assetEntityInstance.assetName, serialNumber:assetEntityInstance.serialNumber, , application:assetEntityInstance.application ]
         } else {
-        items = [id:assetEntityInstance.id, model: assetEntityInstance.model, sourceLocation: assetEntityInstance.sourceLocation, targetLocation: assetEntityInstance.targetLocation, sourceRack: assetEntityInstance.sourceRack, targetRack: assetEntityInstance.targetRack, sourceRackPosition: assetEntityInstance.sourceRackPosition, targetRackPosition: assetEntityInstance.targetRackPosition, usize: assetEntityInstance.usize, manufacturer: assetEntityInstance.manufacturer, fiberCabinet: assetEntityInstance.fiberCabinet, hbaPort: assetEntityInstance.hbaPort, hinfo: assetEntityInstance.hinfo, ipAddress: assetEntityInstance.ipAddress, kvmDevice: assetEntityInstance.kvmDevice, kvmPort: assetEntityInstance.kvmPort, newOrOld: assetEntityInstance.newOrOld, nicPort: assetEntityInstance.nicPort, pduPort: assetEntityInstance.pduPort, remoteMgmtPort: assetEntityInstance.remoteMgmtPort, truck: assetEntityInstance.truck, project:assetEntityInstance.project.name, projectId:assetEntityInstance.project.id, assetTag:assetEntityInstance.assetTag, assetName:assetEntityInstance.assetName, serialNumber:assetEntityInstance.serialNumber, application:assetEntityInstance.application ]
+        items = [id:assetEntityInstance.id, model: assetEntityInstance.model, sourceLocation: assetEntityInstance.sourceLocation, targetLocation: assetEntityInstance.targetLocation, sourceRack: assetEntityInstance.sourceRack, targetRack: assetEntityInstance.targetRack, sourceRackPosition: assetEntityInstance.sourceRackPosition, targetRackPosition: assetEntityInstance.targetRackPosition, usize: assetEntityInstance.usize, manufacturer: assetEntityInstance.manufacturer?.toSting(), fiberCabinet: assetEntityInstance.fiberCabinet, hbaPort: assetEntityInstance.hbaPort, hinfo: assetEntityInstance.hinfo, ipAddress: assetEntityInstance.ipAddress, kvmDevice: assetEntityInstance.kvmDevice, kvmPort: assetEntityInstance.kvmPort, newOrOld: assetEntityInstance.newOrOld, nicPort: assetEntityInstance.nicPort, pduPort: assetEntityInstance.pduPort, remoteMgmtPort: assetEntityInstance.remoteMgmtPort, truck: assetEntityInstance.truck, project:assetEntityInstance.project.name, projectId:assetEntityInstance.project.id, assetTag:assetEntityInstance.assetTag, assetName:assetEntityInstance.assetName, serialNumber:assetEntityInstance.serialNumber, application:assetEntityInstance.application ]
         }*/
         def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
 		def projectId = getSession().getAttribute( "CURR_PROJ" )?.CURR_PROJ
@@ -712,7 +726,8 @@ class AssetEntityController {
 						  	frontendInput:it.attribute.frontendInput, 
         		          	options : options, 
 							value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode).toString() : "",
-							bundleId:assetEntityInstance?.moveBundle?.id]
+							bundleId:assetEntityInstance?.moveBundle?.id, modelId:assetEntityInstance?.model?.id,
+									manufacturerId:assetEntityInstance?.manufacturer?.id]
         	}
         }
         render items as JSON
@@ -751,6 +766,15 @@ class AssetEntityController {
 					map.put('sourceTeam',null)
 					map.put('targetTeam',null)
 				}
+	        	
+	        	def manufacturerId = map.get('manufacturer')
+				if( manufacturerId )
+					map.put('manufacturer', Manufacturer.get(manufacturerId) )
+					
+	        	def modelId = map.get('model')
+				if( modelId )
+					map.put('model',Model.get(modelId) )
+				
 	        	assetEntityInstance.properties = map
 	        	assetEntityInstance.lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
 				
@@ -844,7 +868,7 @@ class AssetEntityController {
             def projectId = currProj.CURR_PROJ
     		def project = Project.findById( projectId )
     		autoCompAttribsList.each{
-    			def assetEntity = AssetEntity.executeQuery( "select distinct $it from AssetEntity where owner = $project.client.id" ) 
+    			def assetEntity = AssetEntity.executeQuery( "select distinct a.$it from AssetEntity a where a.owner = $project.client.id" ) 
     			data<<[value:assetEntity , attributeCode : it]
 	    	}
     	}
@@ -1298,6 +1322,7 @@ class AssetEntityController {
 	        }
 	        def map = new HashMap()
 	        map.put("assetDetail",assetDetail)
+			map.put("model",assetDetail.model?.modelName)
 	        map.put("srcRack",(assetDetail.sourceRoom ? assetDetail.sourceRoom : '') +" / "+ 
 	        					(assetDetail.sourceRack ? assetDetail.sourceRack : '') +" / "+
 	        					(assetDetail.sourceRackPosition ? assetDetail.sourceRackPosition : ''))

@@ -123,7 +123,7 @@ td .odd {
 	   	var asset = eval("(" + e.responseText + ")")
 	    var tableBody = '<table style=\'border:0\' cellpadding=\'0\' cellspacing=\'0\' ><thead><tr><th colspan="2">Asset Details </th></tr></thead><tbody>'+
 		'<tr><td><b>Name: </b>'+asset[0].assetDetails.assetDetail.assetName+'</td></tr>'+
-		'<tr><td><b>Model: </b>'+asset[0].assetDetails.assetDetail.model+'</td></tr>'+
+		'<tr><td><b>Model: </b>'+asset[0].assetDetails.model+'</td></tr>'+
 		'<tr><td><b>Src Rack: </b>'+asset[0].assetDetails.srcRack+'</td></tr>'+
 		'<tr><td><b>Tgt Rack: </b>'+asset[0].assetDetails.tgtRack+'</td></tr>'+
 		'<tr><td><b>Status: </b>'+asset[0].assetDetails.currentState+'</td></tr>'+

@@ -481,20 +481,19 @@ return
 		def dellManu = new Manufacturer(name:"DELL").save()
 		def hclManu = new Manufacturer(name:"HCL").save()
 		def modelList = [
-		    [ "server", RefCode.findByDomainAndValue('kvmDevice','Proliant'), dellManu ],
-		    [ "leaptop", RefCode.findByDomainAndValue('kvmDevice','V490'), dellManu ],
-		   	[ "mouse", RefCode.findByDomainAndValue('kvmDevice','Proliant'), dellManu ],
-		    [ "hardisk", RefCode.findByDomainAndValue('kvmDevice','V490'), dellManu ],
-		    [ "monitor", RefCode.findByDomainAndValue('kvmDevice','Proliant'), hclManu ],
-		    [ "keyboard", RefCode.findByDomainAndValue('kvmDevice','V490'), hclManu ],
-		    [ "cpu", RefCode.findByDomainAndValue('kvmDevice','Proliant'), hclManu ],
-		    [ "charger", RefCode.findByDomainAndValue('kvmDevice','V490'), hclManu ]
+		    [ "server", dellManu ],
+		    [ "leaptop", dellManu ],
+		   	[ "mouse", dellManu ],
+		    [ "hardisk", dellManu ],
+		    [ "monitor", hclManu ],
+		    [ "keyboard", hclManu ],
+		    [ "cpu", hclManu ],
+		    [ "charger", hclManu ]
 		    ]
 		modelList.each {
 			def model = new Model(
-				name: it[0],
-				deviceType: it[1],
-				manufacturer : it[2]
+				modeName: it[0],
+				manufacturer : it[1]
 			)
 			if ( !model.validate() || !model.save() ) {
 				def etext = "Unable to create model" +

@@ -141,12 +141,14 @@ class CartTrackingController {
 		def pendingAssetsOnCart = []
 		def allAssetsOnCart = []
 		def assetsOnCart = []
-		def query = "select ae.asset_entity_id as id,ae.asset_tag as assetTag, ae.asset_name as assetName, "+
-					"ae.manufacturer as manufacturer,ae.model as model, ae.source_team_id as source, "+
-					" max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate "+
-					"from asset_entity ae left join asset_transition at on (at.asset_entity_id = ae.asset_entity_id "+
-					"and at.voided = 0 and at.type = 'process') where ae.project_id = $projectId and ae.move_bundle_id = $bundleId "+
-					"and ae.cart = '$cart' and ae.asset_type != 'VM' group by ae.asset_entity_id"
+		def query = """select ae.asset_entity_id as id,ae.asset_tag as assetTag, ae.asset_name as assetName,
+					mf.name as manufacturer, m.name as model, ae.source_team_id as source,
+					max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate 
+					from asset_entity ae left join model m on (ae.model_id = m.model_id )
+					left join manufacturer mf on (ae.manufacturer_id = mf.manufacturer_id )
+					left join asset_transition at on (at.asset_entity_id = ae.asset_entity_id and at.voided = 0 and at.type = 'process') 
+					where ae.project_id = $projectId and ae.move_bundle_id = $bundleId 
+					and ae.cart = '$cart' and ae.asset_type != 'VM' group by ae.asset_entity_id"""
 		def resultList = jdbcTemplate.queryForList( query )
 		def cleanedId = stateEngineService.getStateIdAsInt(projectInstance.workflowCode,"Cleaned")
 		def stagedId = stateEngineService.getStateIdAsInt(projectInstance.workflowCode,"Staged")
@@ -170,10 +172,12 @@ class CartTrackingController {
 			}
 			if(!completed){
 				pendingAssetsOnCart << [ assetDetails:it, currentState:currentState, checked:checked,
-				                         completed:completed, team:team, assetAction:assetAction ]
+				                         completed:completed, team:team, assetAction:assetAction, 
+										 model : it.model ? it.model : "", manufacturer : it.manufacturer ? it.manufacturer : "" ]
 			}
 			allAssetsOnCart << [ assetDetails:it, currentState:currentState, checked:checked,
-			                     completed:completed, team:team, assetAction:assetAction ]
+			                     completed:completed, team:team, assetAction:assetAction, 
+								 model : it.model ? it.model : "", manufacturer : it.manufacturer ? it.manufacturer : "" ]
 		}
 		
 		if(assetAction == "allAssetsId" ){
@@ -197,7 +201,8 @@ class CartTrackingController {
 													"and at.voided = 0 and at.type = 'process' group by at.asset_entity_id")
 		def onTruckId = stateEngineService.getStateIdAsInt(assetEntity.project.workflowCode,"OnTruck")
 		assetDetails<<[assetEntity:assetEntity,team:assetEntity.sourceTeam? assetEntity.sourceTeam.teamCode : "", 
-		               state: transition[0] ? transition[0].maxstate : "", onTruck :onTruckId ]
+		               state: transition[0] ? transition[0].maxstate : "", onTruck :onTruckId, 
+		               model : assetEntity.model ? assetEntity.model.modelName: "", manufacturer : assetEntity.manufacturer ? it.manufacturer : ""  ]
 		render assetDetails as JSON
 	}
 	/*---------------------------------------------------------

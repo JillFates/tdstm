@@ -406,6 +406,51 @@ class AssetEntityAttributeLoaderService {
 			}
 		return moveBundleInstance
 	}
+	/* To get DataTransferValue Asset Manufacturer
+	 * @param dataTransferValue
+	 * @author Lokanada Reddy
+	 */
+	def getdtvManufacturer( def dtv ) {
+		def manufacturerInstance
+		def manufacturerValue = dtv.correctedValue ? dtv.correctedValue : dtv.importValue
+		if(manufacturerValue){
+			manufacturerInstance = Manufacturer.findByName( manufacturerValue )
+			if( !manufacturerInstance ){
+				manufacturerInstance = new Manufacturer( name : manufacturerValue )
+				if ( !manufacturerInstance.validate() || !manufacturerInstance.save() ) {
+					def etext = "Unable to create manufacturerInstance" +
+	                GormUtil.allErrorsString( manufacturerInstance )
+					println etext
+				}
+			}
+		}
+		return manufacturerInstance
+	}
+	/* To get DataTransferValue Asset Model
+	 * @param dataTransferValue, dataTransferValueList
+	 * @author Lokanada Reddy
+	 */
+	def getdtvModel(def dtv, def dtvList ) {
+		def modelInstance
+		def modelValue = dtv.correctedValue ? dtv.correctedValue : dtv.importValue
+		if(modelValue){
+			def dtvManufacturer = dtvList.find{it.eavAttribute.attributeCode == "manufacturer"}
+			def manufacturerName = dtvManufacturer?.correctedValue ? dtvManufacturer?.correctedValue : dtvManufacturer?.importValue
+			def manufacturerInstance = manufacturerName ? Manufacturer.findByName(manufacturerName) : null
+			if(manufacturerInstance){
+				modelInstance = Model.findByModelNameAndManufacturer( modelValue, manufacturerInstance )
+				if( !modelInstance ){
+					modelInstance = new Model( modelName:modelValue, manufacturer:manufacturerInstance )
+					if ( !modelInstance.validate() || !modelInstance.save() ) {
+					def etext = "Unable to create modelInstance" +
+	                GormUtil.allErrorsString( modelInstance )
+					println etext
+				}
+				}
+			}
+		}
+		return modelInstance
+	}
 	/* To get DataTransferValue source/target Team
 	 * @param dataTransferValue,moveBundle
 	 * @author srinivas

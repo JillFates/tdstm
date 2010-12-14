@@ -239,8 +239,10 @@ function showAssetDialog( e , action ) {
   				onComplete:function(e){
   					var  bundlesList = eval('(' + e.responseText + ')')
   					inputField = '<select name=\''+name+'\' id=\''+ id +name+'Id'+'\'><option value=\'\'>Unassigned</option>'
+  					
   					for(i=0; i<bundlesList.length; i++){
   						var bundle = bundlesList[i]
+  						                         
   						if(attribute.bundleId != bundle.id){
   						inputField += '<option value=\''+bundle.id+'\'>'+bundle.name+'</option>'
   						} else {
@@ -250,7 +252,47 @@ function showAssetDialog( e , action ) {
   					inputField += '</select>'
   				}
   			})
-  	} else if(type == 'select'){
+  	} else if( name == "model"){
+  		new Ajax.Request('../model/getModelsListAsJSON',{
+				asynchronous:false,
+				evalScripts:true,
+				onComplete:function(e){
+					var  modelsList = eval('(' + e.responseText + ')')
+					inputField = '<select name=\''+name+'\' id=\''+ id +name+'Id'+'\'><option value=\'\'>Unassigned</option>'
+					
+					for(i=0; i<modelsList.length; i++){
+						var model = modelsList[i]
+						                       
+						if(attribute.modelId != model.id){
+						inputField += '<option value=\''+model.id+'\'>'+model.modelName+'</option>'
+						} else {
+							inputField += '<option value=\''+model.id+'\' selected>'+model.modelName+'</option>'
+						}
+					}
+					inputField += '</select>'
+				}
+			})
+  	} else if( name == "manufacturer"){
+  		new Ajax.Request('../manufacturer/getManufacturersListAsJSON ',{
+				asynchronous:false,
+				evalScripts:true,
+				onComplete:function(e){
+					var  manufacturersList = eval('(' + e.responseText + ')')
+					inputField = '<select name=\''+name+'\' id=\''+ id +name+'Id'+'\'><option value=\'\'>Unassigned</option>'
+					
+					for(i=0; i<manufacturersList.length; i++){
+						var manufacturer = manufacturersList[i]
+						                       
+						if(attribute.manufacturerId != manufacturer.id){
+						inputField += '<option value=\''+manufacturer.id+'\'>'+manufacturer.name+'</option>'
+						} else {
+							inputField += '<option value=\''+manufacturer.id+'\' selected>'+manufacturer.name+'</option>'
+						}
+					}
+					inputField += '</select>'
+				}
+			})
+	} else if(type == 'select'){
   		inputField = '<select name=\''+name +'\' id=\''+ id +name+'Id'+'\'>'
 		var inputOption = '<option value=\'\' >please select</option>'
 		if (options) {

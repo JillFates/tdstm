@@ -107,6 +107,19 @@ class DataTransferBatchController {
     									isModified = "true"
     									assetEntity."$attribName" = moveBundleInstance 
     								}
+    							} else if ( attribName == "manufacturer" ) {
+									def manufacturerInstance = assetEntityAttributeLoaderService.getdtvManufacturer( it ) 
+				    				if( assetEntity."$attribName" != manufacturerInstance || isNewValidate == "true" ) {
+    									isModified = "true"
+    									assetEntity."$attribName" = manufacturerInstance 
+    								}
+    							} else if ( attribName == "model" ) {
+    								def modelInstance
+    								modelInstance = assetEntityAttributeLoaderService.getdtvModel(it, dtvList) 
+				    				if( assetEntity."$attribName" != modelInstance || isNewValidate == "true" ) {
+    									isModified = "true"
+    									assetEntity."$attribName" = modelInstance 
+    								}
     							} else if( it.eavAttribute.backendType == "int" || attribName == "usize" ){
     								def correctedPos
     								try {

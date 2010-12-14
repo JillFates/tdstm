@@ -347,7 +347,7 @@ class MoveBundleController {
 			moveBundleStep.label = stateEngineService.getDashboardLabel( moveBundle.project.workflowCode, transitionId )
 			if ( !moveBundleStep.validate() || !moveBundleStep.save(flush:true) ) {
 				def etext = "Unable to create moveBundleStep" +
-				GormUtil.allErrorsString( model )
+				GormUtil.allErrorsString( moveBundleStep )
 				response.sendError( 500, "Validation Error")
 		       	println etext
 			}

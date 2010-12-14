@@ -24,7 +24,7 @@
 		<tr>
 			<td valign="top" class="name"><b>Manufacturer:<span style="color: red">*</span></b></td>
 			<td valign="top" class="name">
-				<g:select id="manufacturerId" name="manufacturer.id" from="${Manufacturer.list()}" optionKey="id" value="${modelInstance?.manufacturer.id}"></g:select>
+				<g:select id="manufacturerId" name="manufacturer.id" from="${Manufacturer.list()}" optionKey="id" value="${modelInstance?.manufacturer?.id}"></g:select>
 				<g:hasErrors bean="${modelInstance}" field="manufacturer">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="manufacturer" /></div>
 				</g:hasErrors>

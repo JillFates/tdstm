@@ -4,8 +4,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String assetType
 	String assetTag
 	String serialNumber	
-	String manufacturer
-	String model
+	Manufacturer manufacturer
+	Model model
 	String application = ""
 	PartyGroup owner
 	Rack rackSource

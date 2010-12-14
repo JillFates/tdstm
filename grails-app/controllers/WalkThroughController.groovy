@@ -402,16 +402,9 @@ class WalkThroughController {
 		def manufacturer = params.manufacturer
 		def deviceType = params.device
 		def modelQuery = "from Model m "
-		if(deviceType  && manufacturer ){
-			def device = RefCode.findByDomainAndValue('kvmDevice',deviceType)
-			def manu = Manufacturer.findByName(manufacturer)
-			modelQuery += " where deviceType = $device.id and manufacturer = $manu.id "
-		} else if( !deviceType  && manufacturer ){
+		if( manufacturer ){
 			def manu = Manufacturer.findByName(manufacturer)
 			modelQuery += " where manufacturer = $manu.id "
-		} else if( deviceType  && !manufacturer ){
-			def device = RefCode.findByDomainAndValue('kvmDevice',deviceType)
-			modelQuery += " where deviceType = $device.id "
 		}
 		def model = Model.findAll(modelQuery)
 		render model as JSON

@@ -1,3 +1,5 @@
+import grails.converters.JSON
+
 class ManufacturerController {
     
     def index = { redirect(action:list,params:params) }
@@ -78,5 +80,12 @@ class ManufacturerController {
         else {
             render(view:'create',model:[manufacturerInstance:manufacturerInstance])
         }
+    }
+    /*
+     *  Send List of Manufacturer as JSON object
+     */
+	def getManufacturersListAsJSON = {
+    	def manufacturers = Manufacturer.list()
+		render manufacturers as JSON
     }
 }

@@ -1,4 +1,5 @@
 import com.tdssrc.grails.GormUtil;
+import grails.converters.JSON
 
 class ModelController {
 
@@ -227,5 +228,12 @@ class ModelController {
 		} else {
 			return;
 		}
+    }
+    /*
+     *  Send List of model as JSON object
+     */
+	def getModelsListAsJSON = {
+    	def models = Model.list()
+		render models as JSON
     }
 }

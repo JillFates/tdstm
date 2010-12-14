@@ -91,9 +91,7 @@ class AdminController {
 
 			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR MODEL-------------------------------------------*/
-			SELECT * FROM (	SELECT 'model' as mainTable,'device_type_id' as refId,'Orphan' as type,count(*) as totalCount FROM model m where m.device_type_id not in (select rc.id from ref_code rc)
-				UNION
-				SELECT 'model' as mainTable,'manufacturer_id' as refId,'Orphan' as type,count(*) as totalCount FROM model m where m.manufacturer_id not in (select mn.manufacturer_id from manufacturer mn)) aev
+			SELECT * FROM (	SELECT 'model' as mainTable,'manufacturer_id' as refId,'Orphan' as type,count(*) as totalCount FROM model m where m.manufacturer_id not in (select mn.manufacturer_id from manufacturer mn) ) aev
 			WHERE aev.totalCount > 0
 			"""
 		
@@ -682,10 +680,6 @@ class AdminController {
 				
 			case "model" :
 				switch (column){
-					case "device_type_id" :
-						query = "SELECT * FROM model m where m.device_type_id not in (select rc.id from ref_code rc)"
-						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
 					case "manufacturer_id" :
 						query = "SELECT * FROM model m where m.manufacturer_id not in (select mn.manufacturer_id from manufacturer mn)"
 						orphanDeatils = jdbcTemplate.queryForList(query)

@@ -15,7 +15,7 @@ class Model {
 	
 	static constraints = {
 		modelName( blank:false, nullable:false, unique:'manufacturer' )
-		manufacturer( blank:true, nullable:true )
+		manufacturer( blank:false, nullable:false )
 		description( blank:true, nullable:true )
 		assetType( blank:true, nullable:true )
 		powerUse( blank:true, nullable:true, inList:[1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000] )

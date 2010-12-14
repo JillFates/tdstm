@@ -397,7 +397,7 @@ class PmoAssetTrackingService {
 		def limit = params.assetsInView
 		def offset = params.offset
 		def query = new StringBuffer("""SELECT * FROM( select ae.asset_entity_id as id, ae.asset_name as assetName,ae.short_name as shortName,ae.asset_tag as assetTag,
-				ae.asset_type as assetType,ae.manufacturer, ae.model as model, ae.application, ae.app_owner as appOwner, ae.app_sme as appSme,
+				ae.asset_type as assetType,mf.name as manufacturer, m.name as model, ae.application, ae.app_owner as appOwner, ae.app_sme as appSme,
 				ae.ip_address as ipAddress, ae.hinfo, ae.serial_number as serialNumber,ae.usize, ae.rail_type as railType,
 				ae.source_location as sourceLocation, ae.source_room as sourceRoom, ae.source_rack as sourceRack, ae.source_rack_position as sourceRackPosition,
 				ae.target_location as targetLocation, ae.target_room as targetRoom, ae.target_rack as targetRack, ae.target_rack_position as targetRackPosition,
@@ -411,6 +411,8 @@ class PmoAssetTrackingService {
 				LEFT JOIN move_bundle mb ON (ae.move_bundle_id = mb.move_bundle_id )
 				LEFT JOIN project_team spt ON (ae.source_team_id = spt.project_team_id )
                 LEFT JOIN project_team tpt ON (ae.target_team_id = tpt.project_team_id )
+				LEFT JOIN model m ON (ae.model_id = m.model_id )
+				LEFT JOIN manufacturer mf ON (ae.manufacturer_id = mf.manufacturer_id )
                 LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id and at.voided = 0 and at.type='process')
 				where ae.project_id = $projectId and ae.move_bundle_id  in ${bundles} GROUP BY ae.asset_entity_id ) ae WHERE  1 = 1""")
 				
@@ -493,7 +495,7 @@ class PmoAssetTrackingService {
 		def sortby = params.sort
         def order = params.order
 		def query = new StringBuffer("""SELECT * FROM (SELECT * FROM( select ae.asset_entity_id as id, ae.asset_name as assetName,ae.short_name as shortName,ae.asset_tag as assetTag,
-				ae.asset_type as assetType,ae.manufacturer, ae.model as model, ae.application, ae.app_owner as appOwner, ae.app_sme as appSme,
+				ae.asset_type as assetType,mf.name as manufacturer, m.name as model, ae.application, ae.app_owner as appOwner, ae.app_sme as appSme,
 				ae.ip_address as ipAddress, ae.hinfo, ae.serial_number as serialNumber,ae.usize, ae.rail_type as railType,
 				ae.source_location as sourceLocation, ae.source_room as sourceRoom, ae.source_rack as sourceRack, ae.source_rack_position as sourceRackPosition,
 				ae.target_location as targetLocation, ae.target_room as targetRoom, ae.target_rack as targetRack, ae.target_rack_position as targetRackPosition,
@@ -507,6 +509,8 @@ class PmoAssetTrackingService {
 				LEFT JOIN move_bundle mb ON (ae.move_bundle_id = mb.move_bundle_id )
 				LEFT JOIN project_team spt ON (ae.source_team_id = spt.project_team_id )
                 LEFT JOIN project_team tpt ON (ae.target_team_id = tpt.project_team_id )
+				LEFT JOIN model m ON (ae.model_id = m.model_id )
+				LEFT JOIN manufacturer mf ON (ae.manufacturer_id = mf.manufacturer_id )
                 LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id and at.voided = 0 and at.type='process')
 				where ae.project_id = $projectId and ae.move_bundle_id in ${bundles} GROUP BY ae.asset_entity_id ) ae WHERE  1 = 1""")
 				

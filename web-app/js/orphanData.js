@@ -243,7 +243,7 @@ function getDeatiledReport( records, table ){
 			break;
 			/* for model */
 			case "model" :
-				var thead ="<tr><th>model_id</th><th>description</th><th>device_type_id</th><th>manufacturer_id</th><th>name</th><tr>"	
+				var thead ="<tr><th>model_id</th><th>description</th><th>manufacturer_id</th><th>name</th><tr>"	
 				for( i = 0; i < dataLength; i++){
 					var cssClass = 'odd'
 					if(i % 2 == 0){
@@ -251,7 +251,7 @@ function getDeatiledReport( records, table ){
 					}
 					var record = records[i]
 					tbody +="<tr class='"+cssClass+"'><td>"+record.model_id+"</td><td>"+record.description+"</td>"+
-							"<td>"+record.device_type_id+"</td><td>"+record.manufacturer_id+"</td><td>"+record.name+"</td></tr>"
+							"<td>"+record.manufacturer_id+"</td><td>"+record.name+"</td></tr>"
 				}
 			break;
 			/* for move_bundle */
