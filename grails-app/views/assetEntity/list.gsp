@@ -14,8 +14,6 @@
 
 <g:javascript src="asset.tranman.js" />
 
-
-
 <script type="text/javascript">
 	      $(document).ready(function() {
 	        $("#showDialog").dialog({ autoOpen: false })
@@ -213,7 +211,7 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 </table>
 </g:form>
 </div>
-<filterpane:filterPane domainBean="AssetEntity"  excludeProperties="sourceRackPosition,targetRackPosition,usize,railType,fiberCabinet,hbaPort,ipAddress,hinfo,kvmDevice,kvmPort,newOrOld,nicPort,powerPort,remoteMgmtPort,truck,priority,cart,shelf,dateCreated,project.name" />
+<filterpane:filterPane domainBean="AssetEntity"  excludeProperties="sourceRackPosition,targetRackPosition,usize,railType,fiberCabinet,hbaPort,ipAddress,hinfo,kvmDevice,kvmPort,newOrOld,nicPort,remoteMgmtPort,truck,priority,cart,shelf,dateCreated,project.name" />
 <div class="buttons"><g:form>
 	<span class="button"><input type="button"
 		value="New Asset Entity" class="create" onClick="createDialog()" /></span>

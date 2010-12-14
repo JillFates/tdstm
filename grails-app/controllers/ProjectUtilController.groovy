@@ -266,7 +266,6 @@ class ProjectUtilController {
 					hasRemoteMgmt: asset.hasRemoteMgmt,
 					newOrOld: asset.newOrOld,
 					nicPort: asset.nicPort,
-					powerType: asset.powerType,
 					pduType: asset.pduType,
 					pduPort: asset.pduPort,
 					pduQuantity: asset.pduQuantity,

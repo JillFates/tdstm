@@ -558,14 +558,6 @@ function checkComments(type) {
 			<td class="field">${assetEntity?.assetTag}</td>
 		</tr>
 		<tr>
-			<td class="label">Power Type:</td>
-			<td class="field">
-				 <g:select  noSelection="['':'Undef']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('powerType'))?.value}" id="powerType" name="powerType" value="${assetEntity?.powerType}" 
-				onchange="setMustSave(this.value,'${assetEntity?.powerType}','rear', this.name)" />
-				
-			</td>
-		</tr>
-		<tr>
 			<td class="label">PDU Qty/Type:</td>
 			<td class="field">
 			<g:select name="pduQuantity" noSelection="['':'Undef']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('pduQuantity'))?.value}" value="${assetEntity?.pduQuantity}"

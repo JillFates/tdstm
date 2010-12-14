@@ -32,7 +32,6 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	Integer hasRemoteMgmt =0
 	String newOrOld
 	String nicPort
-	String powerType
 	String pduType
 	String pduPort
 	Integer pduQuantity
@@ -98,7 +97,6 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		kvmPort( blank:true, nullable:true )
 		newOrOld( blank:true, nullable:true )
 		nicPort( blank:true, nullable:true )
-		powerType( blank:true, nullable:true )
 		pduType( blank:true, nullable:true )
 		pduQuantity( blank:true, nullable:true )
 		pduPort( blank:true, nullable:true )

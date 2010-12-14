@@ -2,8 +2,8 @@ class AssetCableMap {
 	String cable
 	AssetEntity fromAsset
 	AssetEntity toAsset
-	Integer fromConnectorNumber
-	Integer toConnectorNumber
+	ModelConnector fromConnectorNumber
+	ModelConnector toConnectorNumber
 	Integer state
 	
 	static constraints = {
