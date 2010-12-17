@@ -115,7 +115,7 @@
 			<li><g:link class="home" controller="projectUtil">Project </g:link> </li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 			<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
-			<li id="assetMenuId"><g:link class="home" controller="assetEntity" action="list" >Assets</g:link></li>
+			<li id="assetMenuId"><g:link class="home" controller="assetEntity" action="assetImport" >Assets</g:link></li>
 	        </jsec:lacksAllRoles>
 			<li><g:link class="home" controller="rackLayouts" action="create">Racks</g:link></li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
@@ -141,8 +141,8 @@
 	    </div>
 	    <div class="menu2" id="assetMenu" style="background-color:#003366;display: none;">
 	        <ul>
-			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Assets</g:link></li>
 	    		<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link> </li>
+			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Assets</g:link></li>
 		</ul>
 		</div>
 		<div class="menu2" id="reportsMenu" style="background-color:#003366;display: none;">
