@@ -312,7 +312,6 @@
 		$("#cablingPanel").append(details)
 	}
 	function openActionButtonsDiv( cabledId, status ){
-		alert(cabledId)
 		$("#cabledTypeId").val(cabledId)
 		$("#actionButtonsDiv").show()
 	}
