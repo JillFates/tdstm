@@ -4,15 +4,15 @@ class AssetCableMap {
 	AssetEntity toAsset
 	ModelConnector fromConnectorNumber
 	ModelConnector toConnectorNumber
-	Integer state
+	String status
 	
 	static constraints = {
 		cable( nullable:false, blank:false )
 		fromAsset( nullable:false, blank:false )
-		toAsset( nullable:false, blank:false )
-		fromConnectorNumber( nullable:true, blank:true )
+		toAsset( nullable:true, blank:true )
+		fromConnectorNumber( nullable:false, blank:false )
 		toConnectorNumber( nullable:true, blank:true )
-		state( nullable:true, blank:true )
+		status( nullable:false, blank:false, inList: ['missing','empty','cabled','cabledDetails'] )
 	}
 	
 	static mapping = {

@@ -65,7 +65,6 @@ class RackLayoutsController {
 			}
 			
 			def racks = sourceRacks + targetRacks
-			println"racks---->"+racks.size()
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ	
 			racks.each { rack ->
 				def assetDetails = []
@@ -298,9 +297,9 @@ class RackLayoutsController {
 							cablingString = cablingString.substring( 0, cablingString.length() - 2 )
 						
 						if ( cablingString.length() > 90 )
-							row.append("<td rowspan='${rowspan}' style='font-size:6px;' class='${it.cssClass}'>${cablingString}</td>")
+							row.append("<td rowspan='${rowspan}' style='font-size:6px;' class='${it.cssClass}'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id}, this.innerHTML)'>${cablingString}</a></td>")
 						else
-							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${cablingString}</td>")
+							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id}, this.innerHTML)'>${cablingString}</a></td>")
 						
 					} else {
 						row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>Devices Overlap</td>")
@@ -411,5 +410,37 @@ class RackLayoutsController {
 			trimmedVal = trimmedVal.substring(0,30)+"..."
 		}
 		return trimmedVal
+	}
+	def modelTemplate = {
+			return [params:params]
+	}
+	/*
+	 * Return AssetCableMap record details to display at RackLayout cabling screen
+	 */
+	def getCablingDetails = {
+		def assetId = params.assetId
+		def assetEntity = assetId ? AssetEntity.get(assetId) : ""
+		def assetCableMapList
+		if( assetEntity ){
+			assetCableMapList = AssetCableMap.findAllByFromAsset( assetEntity )
+		}
+		def assetCablingDetails = []
+		assetCableMapList.each {
+			assetCablingDetails << [model:assetEntity.model.id, id:it.id, connectorPosX:it.fromConnectorNumber.connectorPosX,
+								   connectorPosY:it.fromConnectorNumber.connectorPosY, status:it.status, label:it.fromConnectorNumber.label]
+		}
+		render assetCablingDetails as JSON
+	}
+	/*
+	 * Update the AssetCablingMap with the date send from RackLayout cabling screen
+	 */
+	def updateCablingDetails = {
+		def assetCableId = params.assetCableId
+		if(assetCableId){
+			def assetCableMap = AssetCableMap.findById( assetCableId )
+			assetCableMap.status = params.status
+			assetCableMap.save(flush:true)
+		}
+		render "success"
 	}
 }

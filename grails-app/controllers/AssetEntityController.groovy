@@ -682,6 +682,25 @@ class AssetEntityController {
         
         if(!assetEntityInstance.hasErrors() && assetEntityInstance.save()) {
         	assetEntityInstance.updateRacks()
+			 
+			if(assetEntityInstance.model){
+				def assetConnectors = ModelConnector.findAllByModel( assetEntityInstance.model )
+				assetConnectors.each{
+					def assetCableMap = new AssetCableMap(
+														cable : "Cable"+it.connector,
+														fromAsset: assetEntityInstance,
+														fromConnectorNumber : it,
+														status : it.status
+														)
+					if ( !assetCableMap.validate() || !assetCableMap.save() ) {
+						def etext = "Unable to create assetCableMap" +
+		                GormUtil.allErrorsString( assetCableMap )
+						println etext
+						log.error( etext )
+					}
+				}
+			}
+
             flash.message = "AssetEntity ${assetEntityInstance.assetName} created"
             redirect( action:list, params:[projectId: projectId] )
         }

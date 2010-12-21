@@ -19,7 +19,7 @@ class ModelConnector {
 		labelPosition( blank:true, nullable:true )
 		connectorPosX( blank:true, nullable:true )
 		connectorPosY( blank:true, nullable:true )
-		status( blank:false, nullable:false)
+		status( blank:false, nullable:false, inList: ['missing','empty','cabled','cabledDetails'] )
     }
 	
 	static mapping  = {	

@@ -49,6 +49,7 @@
      	} else if( !$("#frontView").is(":checked") && !$("#backView").is(":checked") ) {
      		alert("Please select print view")
      	} else if($('#commit').val() == 'Generate') {
+			$("#cablingDialogId").dialog("close")
 			$('#rackLayout').html('Loading...');
 			jQuery.ajax({
 				url: $(form).attr('action'),
@@ -64,6 +65,7 @@
      }
 	$(document).ready(function() {
 	    $("#editDialog").dialog({ autoOpen: false })
+	    $("#cablingDialogId").dialog({ autoOpen: false })
 	})
 	function openAssetEditDialig( id ){
 		$("#editFormId").val(id)
@@ -167,6 +169,7 @@
 		var assetEntityAttributes = eval('(' + e.responseText + ')')
 		if (assetEntityAttributes != "") {
 			$("#editDialog").dialog("close")
+			$("#cablingDialogId").dialog("close")
 			submitForm($('#rackLayoutCreate'));
 		} else {
 			alert("Asset Entity is not updated")
@@ -214,7 +217,7 @@
 			<td>
 				<div style="width:150px">
 					<label for="frontView" ><input type="checkbox" name="frontView" id="frontView" checked="checked" />&nbsp;Front</label>&nbsp
-					<label for="backView" ><input type="checkbox" name="backView" id="backView" />&nbsp;Back</label><br /><br />
+					<label for="backView" ><input type="checkbox" name="backView" id="backView" checked="checked"/>&nbsp;Back</label><br /><br />
 					<label for="bundleName" ><input type="checkbox" name="bundleName" id="bundleName" checked="checked" />&nbsp;Include bundle names</label><br /><br />
 					<label for="otherBundle" ><input type="checkbox" name="otherBundle" id="otherBundle" checked="checked" />&nbsp;Include other bundles</label>
 				</div>
@@ -227,7 +230,7 @@
 			</td>
 
 			<td class="buttonR">
-				<br /><br />
+				<br/><br/>
 				<input type="submit" class="submit" value="Print View" />
 			</td>
 		</tr>
@@ -252,6 +255,30 @@
 		</div>
 	</g:form>
 </div>
+<div style="display: none;" id="cablingDialogId">
+	<div id="cablingPanel">
+		<g:each in="${AssetEntity.executeQuery('SELECT model.id FROM AssetEntity WHERE moveBundle.id = ? GROUP BY model',[Long.parseLong(currentBundle)]) }" var="modelId">
+		<img id="rearImage${modelId}" src="${createLink(controller:'model', action:'getRearImage', id:modelId)}" style="display: none;"/>
+		</g:each>
+	</div>
+	<div class="inputs_div">
+		<div id="actionButtonsDiv" style="margin-top: 5px;float: left;display: none;">
+			<input type="button" value="Unknown" onclick="openActionDiv(this.id)" id="unknownId"/>
+			<input type="button" value="0" onclick="openActionDiv(this.id)" style="background-color: #5F9FCF;" id="emptyId"/>
+			<input type="button" value="X" onclick="openActionDiv(this.id)" id="cabledId"/>
+			<input type="button" value="Assign" onclick="openActionDiv(this.id)" id="assignId"/>
+		</div>
+		<div id="actionDiv" style="margin-top: 5px;float: right;display: none;">
+			<input type="button" value="Ok" onclick="submitAction()"/>
+			<input type="button" value="Cancel"  onclick="$('#cablingDialogId').dialog('close')"/>
+		</div>
+		<div style="text-align: center;display: none;" id="assignFieldDiv">
+		<input type="text" name="cabledDetails"/>
+		<input type="hidden" name="cabledType" id="cabledTypeId"/>
+		<input type="hidden" name="actionTypeId" id="actionTypeId"/>
+		</div>
+	</div>
+</div>
 <script type="text/javascript">
 	$(document).ready(function() {
 		var bundleObj = $("#bundleId");
@@ -263,6 +290,61 @@
 			$('#commit').val($(this).val());
 		});
 	});
+	function openCablingDiv( id, value ){
+		${remoteFunction(action:'getCablingDetails', params:'\'assetId=\' + id', onComplete:'showCablingDetails(e)')};
+		$("#cablingDialogId").dialog( "option", "title", value+" cabling" );
+		$("#cablingDialogId").dialog( "option", "width", 400 )
+		$("#cablingDialogId").dialog("open")
+	}
+	function showCablingDetails( e ){
+		$("#cablingPanel img").hide()
+		$("#cablingPanel div").hide()
+		$("#actionButtonsDiv").hide()
+		$("#actionDiv").hide()
+		var assetCablingDetails = eval('(' + e.responseText + ')');
+		var model = assetCablingDetails[0].model
+		$("#rearImage"+model).show()
+		var details = ""
+		for(i=0;i<assetCablingDetails.length;i++){
+			var assetCabling = assetCablingDetails[i]
+			details += "<div id='connector"+assetCabling.id+"' style='top: "+(180 -( assetCabling.connectorPosY / 2))+"px; left: "+assetCabling.connectorPosX+"px;'><a href='#'><img id='"+assetCabling.status+"' src='../i/cabling/"+assetCabling.status+".png' onclick='openActionButtonsDiv( "+assetCabling.id+", this.id )'></a><span>"+assetCabling.label+"</span></div>"
+		}
+		$("#cablingPanel").append(details)
+	}
+	function openActionButtonsDiv( cabledId, status ){
+		alert(cabledId)
+		$("#cabledTypeId").val(cabledId)
+		$("#actionButtonsDiv").show()
+	}
+	function openActionDiv( id ){
+		$("#unknownId").css("background-color","")
+		$("#emptyId").css("background-color","")
+		$("#cabledId").css("background-color","")
+		$("#assignId").css("background-color","")
+		$("#"+id).css("background-color","#5F9FCF");
+		if(id == "assignId")
+			$("#assignFieldDiv").show()
+		else
+			$("#assignFieldDiv").hide()
+		$("#actionTypeId").val(id)
+		$("#actionDiv").show()
+		
+	}
+	function submitAction(){
+		var actionId = $("#actionTypeId").val()
+		var cabledId = $("#cabledTypeId").val()
+		var status = "missing"
+		switch(actionId){
+			case "emptyId" : status = "empty" ; break;
+			case "cabledId" : status = "cabled"; break;
+			case "assignId" : status = "cabledDetails"; break;
+		}
+		${remoteFunction(action:'updateCablingDetails', params:'\'assetCableId=\' + cabledId+\'&status=\'+status' )};
+		$("#assignFieldDiv").hide()
+		$("#actionButtonsDiv").hide()
+		$("#actionDiv").hide()
+		$('#cablingDialogId').dialog('close')
+	}
 </script>
 </body>
 </html>
