@@ -2,7 +2,6 @@
 class ModelConnector {
 	// Declare propertied
 	String connector
-	Integer exist = 0
 	String label
 	String type
 	String labelPosition

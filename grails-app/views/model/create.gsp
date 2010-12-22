@@ -97,13 +97,13 @@
 			</g:each>
 		</div>
 		<div id="optionsPanel">
-			<ul><li style="font-weight: bold;">Click to add Connector</li></ul>
+			<ul><li style="font-weight: bold;"><a href="javascript:createConnector('missing')">Add Connector</a></li></ul>
 			<ul><li>&nbsp;</li></ul>
 			<ul>
-				<li><a href="javascript:createConnector('missing')"><img src="${createLinkTo(dir:'i/cabling',file:'missing.png')}"/></a> Missing/Unknown</li>
-				<li><a href="javascript:createConnector('empty')"><img src="${createLinkTo(dir:'i/cabling',file:'empty.png')}"/></a> Empty connector</li>
-				<li><a href="javascript:createConnector('cabled')"><img src="${createLinkTo(dir:'i/cabling',file:'cabled.png')}"/></a> Cabled</li>
-				<li><a href="javascript:createConnector('cabledDetails')"><img src="${createLinkTo(dir:'i/cabling',file:'cabledDetails.png')}"/></a> Cabled with details</li>
+				<li><img src="${createLinkTo(dir:'i/cabling',file:'missing.png')}"/>Missing/Unknown</li>
+				<li><img src="${createLinkTo(dir:'i/cabling',file:'empty.png')}"/>Empty connector</li>
+				<li><img src="${createLinkTo(dir:'i/cabling',file:'cabled.png')}"/>Cabled</li>
+				<li><img src="${createLinkTo(dir:'i/cabling',file:'cabledDetails.png')}"/>Cabled with details</li>
 			</ul>
 		</div>
 	</div>
@@ -113,7 +113,6 @@
 			<thead>
 				<tr>
 					<th>Connector<input type="hidden" id="connectorCount" name="connectorCount" value="0"></th>
-					<th>Exists</th>
 					<th>Type</th>
 					<th>Label</th>
 					<th>Label Position</th>
@@ -125,7 +124,6 @@
 			<g:each in="${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50]}" var="count">
 			<tr id="connectorTr${count}" style="display: none;">
 					<td><input id="connectorId${count}" maxlength="5" style="width: 35px;" type="text" value="${count}"></td>
-					<td><input id="existId${count}" type="checkbox"></td>
 					<td><g:select id="typeId${count}" name="type" from="${ModelConnector.constraints.type.inList}"></g:select></td>
 					<td><input id="labelId${count}" type="text" onchange="changeLabel(${count}, this.value)"></td>
 					<td><g:select id="labelPositionId${count}" name="labelPosition" from="${['Right','Left','Top','Bottom']}"></g:select></td>
@@ -160,7 +158,6 @@
 			$("#connectorTr"+count).show()
 			$("#connectorModelBody input[id=connectorId"+count+"]").val(count)
 			$("#connectorModelBody input[id=connectorId"+count+"]").attr("name","connector"+count)
-			$("#connectorModelBody input[id=existId"+count+"]").attr("name","exist"+count)
 			$("#connectorModelBody select[id=typeId"+count+"]").attr("name","type"+count)
 			$("#connectorModelBody input[id=labelId"+count+"]").attr("name","label"+count)
 			$("#connectorModelBody input[id=labelId"+count+"]").val("Connector"+count)

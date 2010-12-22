@@ -52,7 +52,7 @@
                 <g:paginate total="${modelInstanceTotal}" />
             </div>
             <div class="buttons"> 
-				<span class="button"><g:actionSubmit class="save" action="Create" value="Create Project" /></span>
+				<span class="button"><g:actionSubmit class="save" action="Create" value="Create Model" /></span>
 			</div>
 			</g:form>
         </div>

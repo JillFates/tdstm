@@ -96,13 +96,13 @@
 			</g:each>
 		</div>
 		<div id="optionsPanel">
-			<ul><li style="font-weight: bold;">Click to add Connector</li></ul>
+			<ul><li style="font-weight: bold;"><a href="javascript:createConnector('missing')">Add Connector</a></li></ul>
 			<ul><li>&nbsp;</li></ul>
 			<ul>
-				<li><a href="javascript:createConnector('missing')"><img src="${createLinkTo(dir:'i/cabling',file:'missing.png')}"/></a> Missing/Unknown</li>
-				<li><a href="javascript:createConnector('empty')"><img src="${createLinkTo(dir:'i/cabling',file:'empty.png')}"/></a> Empty connector</li>
-				<li><a href="javascript:createConnector('cabled')"><img src="${createLinkTo(dir:'i/cabling',file:'cabled.png')}"/></a> Cabled</li>
-				<li><a href="javascript:createConnector('cabledDetails')"><img src="${createLinkTo(dir:'i/cabling',file:'cabledDetails.png')}"/></a> Cabled with details</li>
+				<li><img src="${createLinkTo(dir:'i/cabling',file:'missing.png')}"/>Missing/Unknown</li>
+				<li><img src="${createLinkTo(dir:'i/cabling',file:'empty.png')}"/>Empty connector</li>
+				<li><img src="${createLinkTo(dir:'i/cabling',file:'cabled.png')}"/>Cabled</li>
+				<li><img src="${createLinkTo(dir:'i/cabling',file:'cabledDetails.png')}"/>Cabled with details</li>
 			</ul>
 		</div>
 	</div>
@@ -112,7 +112,6 @@
 			<thead>
 				<tr>
 					<th>Connector<input type="hidden" id="connectorCount" name="connectorCount" value="${modelConnectors.size()}"></th>
-					<th>Exists</th>
 					<th>Type</th>
 					<th>Label</th>
 					<th>Label Position</th>
@@ -124,14 +123,6 @@
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
 			<tr id="connectorTr${modelConnector.connector}">
 					<td><input id="connectorId${modelConnector.connector}" name="connector${modelConnector.connector}" maxlength="5" style="width: 35px;" type="text" value="${modelConnector.connector}"></td>
-					<td>
-						<g:if test="${modelConnector.exist}">
-							<input id="existId${modelConnector.connector}" name="exist${modelConnector.connector}" type="checkbox" checked="checked">
-						</g:if>
-						<g:else>
-							<input id="existId${modelConnector.connector}" name="exist${modelConnector.connector}" type="checkbox">
-						</g:else>
-					</td>
 					<td><g:select id="typeId${modelConnector.connector}" name="type${modelConnector.connector}" from="${ModelConnector.constraints.type.inList}" value="${modelConnector.type}"></g:select></td>
 					<td><input id="labelId${modelConnector.connector}" name="label${modelConnector.connector}" type="text" value="${modelConnector.label}" onchange="changeLabel(${modelConnector.connector}, this.value)"></td>
 					<td><g:select id="labelPositionId${modelConnector.connector}" name="labelPosition${modelConnector.connector}" from="${['Right','Left','Top','Bottom']}" value="${modelConnector.labelPosition}"></g:select></td>
@@ -145,7 +136,6 @@
 			<g:each in="${otherConnectors}" var="count">
 			<tr id="connectorTr${count}" style="display: none;">
 					<td><input id="connectorId${count}" maxlength="5" style="width: 35px;" type="text" value="${count}"></td>
-					<td><input id="existId${count}" type="checkbox"></td>
 					<td><g:select id="typeId${count}" name="type" from="${ModelConnector.constraints.type.inList}"></g:select></td>
 					<td><input id="labelId${count}" type="text" onchange="changeLabel(${count}, this.value)"></td>
 					<td><g:select id="labelPositionId${count}" name="labelPosition" from="${['Right','Left','Top','Bottom']}"></g:select></td>
@@ -180,7 +170,6 @@
 			$("#connectorTr"+count).show()
 			$("#connectorModelBody input[id=connectorId"+count+"]").val(count)
 			$("#connectorModelBody input[id=connectorId"+count+"]").attr("name","connector"+count)
-			$("#connectorModelBody input[id=existId"+count+"]").attr("name","exist"+count)
 			$("#connectorModelBody select[id=typeId"+count+"]").attr("name","type"+count)
 			$("#connectorModelBody input[id=labelId"+count+"]").attr("name","label"+count)
 			$("#connectorModelBody input[id=labelId"+count+"]").val("Connector"+count)

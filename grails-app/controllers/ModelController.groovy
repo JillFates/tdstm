@@ -10,7 +10,7 @@ class ModelController {
     }
 
     def list = {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+        params.max = Math.min(params.max ? params.int('max') : 25, 100)
         [modelInstanceList: Model.list(params), modelInstanceTotal: Model.count()]
     }
 
@@ -48,10 +48,8 @@ class ModelController {
         	def connectorCount = Integer.parseInt(params.connectorCount)
 			if(connectorCount > 0){
 	        	for(int i=1; i<=connectorCount; i++){
-	        		int exit = params["exist"+i] ? 1 : 0
 	        		def modelConnector = new ModelConnector(model : modelInstance,
 	        												connector : params["connector"+i],
-									        				exist : exit,
 															label : params["label"+i],
 															type :params["type"+i],
 															labelPosition : params["labelPosition"+i],
@@ -67,7 +65,7 @@ class ModelController {
             redirect(action: "show", id: modelInstance.id)
         }
         else {
-        	flash.message = modelInstance.errors.allErrors.each() {  it }
+        	//flash.message = modelInstance.errors.allErrors.each() {  it }
             render(view: "create", model: [modelInstance: modelInstance])
         }
     }
@@ -138,12 +136,10 @@ class ModelController {
             	def connectorCount = Integer.parseInt(params.connectorCount)
 				if(connectorCount > 0){
 		        	for(int i=1; i<=connectorCount; i++){
-		        		int exit = params["exist"+i] ? 1 : 0
 
 		        		def modelConnector = ModelConnector.findByModelAndConnector(modelInstance,params["connector"+i])
 						if(modelConnector){
 							modelConnector.connector = params["connector"+i]
-							modelConnector.exist = exit
 							modelConnector.label = params["label"+i]
 							modelConnector.type = params["type"+i]
 							modelConnector.labelPosition = params["labelPosition"+i]
@@ -154,7 +150,6 @@ class ModelController {
 						} else {
 							modelConnector = new ModelConnector(model : modelInstance,
 		        												connector : params["connector"+i],
-										        				exist : exit,
 																label : params["label"+i],
 																type : params["type"+i],
 																labelPosition : params["labelPosition"+i],
@@ -167,6 +162,30 @@ class ModelController {
 		        			modelConnector.save(flush: true)
 		        	}
 	        	}
+            	def assetEntitysByModel = AssetEntity.findAllByModel( modelInstance )
+				def assetConnectors = ModelConnector.findAllByModel( modelInstance )
+				assetEntitysByModel.each{ assetEntity ->
+            		assetConnectors.each{connector->
+            			
+    					def assetCableMap = AssetCableMap.findByFromAssetAndFromConnectorNumber( assetEntity, connector )
+						
+						if( !assetCableMap ){
+	    					assetCableMap = new AssetCableMap(
+	    														cable : "Cable"+connector.connector,
+	    														fromAsset: assetEntity,
+	    														fromConnectorNumber : connector,
+	    														status : connector.status
+	    														)
+	    					if ( !assetCableMap.validate() || !assetCableMap.save() ) {
+	    						def etext = "Unable to create assetCableMap for assetEntity ${assetEntity}" +
+	    		                GormUtil.allErrorsString( assetCableMap )
+	    						println etext
+	    						log.error( etext )
+	    					}
+						}
+    				}
+            	}
+            	
                 flash.message = "${modelInstance.modelName} Updated"
                 redirect(action: "show", id: modelInstance.id)
             }

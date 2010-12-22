@@ -49,11 +49,11 @@
 		</tr>
 		<tr>
 			<td>Front image:</label></td>
-        	<td><img src="${createLink(controller:'model', action:'getFrontImage', id:modelInstance.id)}" /></td>
+        	<td><img src="${createLink(controller:'model', action:'getFrontImage', id:modelInstance.id)}" style="height: 50px;width: 100px;"/></td>
 		</tr>
 		<tr>
         	<td>Rear image:</td>
-        	<td><img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}" /></td>
+        	<td><img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}"  style="height: 50px;width: 100px;"/></td>
         </tr>
         <tr>
 			<td>Notes:</td>
@@ -90,7 +90,6 @@
 			<thead>
 				<tr>
 					<th>Connector</th>
-					<th>Exists</th>
 					<th>Type</th>
 					<th>Label</th>
 					<th>Label Position</th>
@@ -102,14 +101,6 @@
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
 				<tr id="connectorTr${i}"  class="${(i % 2) == 0 ? 'odd' : 'even'}">
 					<td>${modelConnector.connector}</td>
-					<td>
-						<g:if test="${modelConnector.exist}">
-							<input id="existId${i}" type="checkbox" checked="checked">	
-						</g:if>
-						<g:else>
-							<input id="existId${i}" type="checkbox">
-						</g:else>
-					</td>
 					<td>${modelConnector.type}</td>
 					<td>${modelConnector.label}</td>
 					<td>${modelConnector.labelPosition}</td>

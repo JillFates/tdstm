@@ -684,21 +684,7 @@ class AssetEntityController {
         	assetEntityInstance.updateRacks()
 			 
 			if(assetEntityInstance.model){
-				def assetConnectors = ModelConnector.findAllByModel( assetEntityInstance.model )
-				assetConnectors.each{
-					def assetCableMap = new AssetCableMap(
-														cable : "Cable"+it.connector,
-														fromAsset: assetEntityInstance,
-														fromConnectorNumber : it,
-														status : it.status
-														)
-					if ( !assetCableMap.validate() || !assetCableMap.save() ) {
-						def etext = "Unable to create assetCableMap" +
-		                GormUtil.allErrorsString( assetCableMap )
-						println etext
-						log.error( etext )
-					}
-				}
+				createModelConnectors( assetEntityInstance )
 			}
 
             flash.message = "AssetEntity ${assetEntityInstance.assetName} created"
@@ -758,7 +744,7 @@ class AssetEntityController {
      * @return assetEnntiAttribute JSON oObject 
      * ----------------------------------------------------------*/
     def updateAssetEntity = {
-    	def assetItems = []
+    	def assetItems = []    	
     	def assetEntityParams = params.assetEntityParams
     	if(assetEntityParams) {
     		def assetEntityParamsList = ( assetEntityParams.substring( 0, assetEntityParams.lastIndexOf('~') ) ).split("~,")
@@ -772,6 +758,7 @@ class AssetEntityController {
 	    		}
 	    	}
 	        def assetEntityInstance = AssetEntity.get( params.id )
+			def existingModelId = assetEntityInstance.model?.id 
 	        if(assetEntityInstance) {
 	        	def bundleId = map.get('moveBundle')
 				if(bundleId){
@@ -807,6 +794,10 @@ class AssetEntityController {
 	                		               value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode).toString() : ""]
 	                	}
 	                }
+	            	if(existingModelId != assetEntityInstance.model?.id){
+	            		AssetCableMap.executeUpdate("delete from AssetCableMap where fromAsset = ?",[assetEntityInstance])
+	            		createModelConnectors( assetEntityInstance )
+	            	}
 	            } else {
 	            	def etext = "Unable to Update Asset Entity" +
 	                GormUtil.allErrorsString( assetEntityInstance )
@@ -1719,6 +1710,26 @@ class AssetEntityController {
         	statusMsg = "$assetEntityInstance.assetName : $state pending "
         }
     	render statusMsg
+    }
+    /*
+    *  Create asset_cabled_Map for all asset model connectors 
+    */
+    def createModelConnectors( assetEntity ){
+    	def assetConnectors = ModelConnector.findAllByModel( assetEntity.model )
+		assetConnectors.each{
+			def assetCableMap = new AssetCableMap(
+												cable : "Cable"+it.connector,
+												fromAsset: assetEntity,
+												fromConnectorNumber : it,
+												status : it.status
+												)
+			if ( !assetCableMap.validate() || !assetCableMap.save() ) {
+				def etext = "Unable to create assetCableMap" +
+                GormUtil.allErrorsString( assetCableMap )
+				println etext
+				log.error( etext )
+			}
+		}
     }
     
 }
