@@ -81,7 +81,7 @@ class WorkflowController {
 				if( !browserTest){
 					headerCount = generateHeder(workflowTransition.workflow.id)
 				}
-				workflowTransitionsList = WorkflowTransition.findAll("FROM WorkflowTransition w where w.workflow = ? AND w.code not in ('SourceWalkthru','TargetWalkthru') ", [workflowTransition?.workflow] )
+				workflowTransitionsList = WorkflowTransition.findAll("FROM WorkflowTransition w where w.workflow = ? AND w.code not in ('SourceWalkthru','TargetWalkthru') order by w.transId", [workflowTransition?.workflow] )
 				def workflowTransitionMap = WorkflowTransitionMap.findAllByWorkflow( workflowTransition?.workflow )
 				def swimlane = Swimlane.findAllByWorkflow( workflowTransition?.workflow )
 				// construct a map for different swimlane roles
@@ -328,7 +328,7 @@ class WorkflowController {
 	def generateHeder(def workflowId){
 			
 			def workflow = Workflow.get( workflowId )
-			def tempTransitions = WorkflowTransition.findAllByWorkflow( workflow )
+			def tempTransitions = WorkflowTransition.findAllByWorkflow( workflow, [sort:"transId"] )
 		       
 			def svgHeaderFile = new StringBuffer()
 			svgHeaderFile.append("<?xml version='1.0' encoding='UTF-8' standalone='no'?>")
