@@ -89,7 +89,7 @@
 		<div id="cablingPanel">
 			<img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}" />
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
-				<div id="connector${modelConnector.connector}" style="top:${180 -(modelConnector.connectorPosY / 2)}px ;left:${modelConnector.connectorPosX}px "><img src="../i/cabling/${modelConnector.status}.png"/><span id='connectorLabelText${modelConnector.connector}'>${modelConnector.label}</span></div>
+				<div id="connector${modelConnector.connector}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px "><img src="../i/cabling/${modelConnector.status}.png"/><span id='connectorLabelText${modelConnector.connector}'>${modelConnector.label}</span></div>
 			</g:each>
 			<g:each in="${otherConnectors}" var="count">
 				<div id="connector${count}"></div>
@@ -155,8 +155,14 @@
 </div>
 <script type="text/javascript">
 	$('#connectorCount').val(${modelConnectors.size()});
+	var image = "${modelInstance.rearImage.hashCode().equals(29248850)}"
+	var usize = "${modelInstance.usize}"
+	if(image == 'true'){
+		initializeConnectors( usize )
+	} else {
+		initializeConnectors( 4 )
+	}
 	
-	initializeConnectors()
 
 	function createConnector( type ) {
 		$("#connectorCount").val(parseInt($("#connectorCount").val()) + 1)
@@ -177,7 +183,7 @@
 			$("#connectorModelBody input[id=connectorPosXId"+count+"]").attr("name","connectorPosX"+count)
 			$("#connectorModelBody input[id=connectorPosYId"+count+"]").attr("name","connectorPosY"+count)			
 			$("#connectorModelBody input[id=connectorPosXId"+count+"]").val(0)
-			$("#connectorModelBody input[id=connectorPosYId"+count+"]").val(360)
+			$("#connectorModelBody input[id=connectorPosYId"+count+"]").val(0)
 			$("#connectorModelBody input[id=statusId"+count+"]").attr("name","status"+count)			
 			$("#connectorModelBody input[id=statusId"+count+"]").val(type)
 			

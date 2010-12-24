@@ -53,7 +53,7 @@
 		</tr>
 		<tr>
         	<td>Rear image:</td>
-        	<td><img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}"  style="height: 50px;width: 100px;"/></td>
+        	<td><img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}"  style="height: 50px;width: 100px;" id="rearImageId"/></td>
         </tr>
         <tr>
 			<td>Notes:</td>
@@ -80,7 +80,7 @@
 		<div id="cablingPanel">
 			<img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}" />
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
-				<div id="connector${i}" style="top:${180 -(modelConnector.connectorPosY / 2)}px ;left:${modelConnector.connectorPosX}px "><img src="../../i/cabling/${modelConnector.status}.png"/><span>${modelConnector.label}</span></div>
+				<div id="connector${i}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px "><img src="../../i/cabling/${modelConnector.status}.png"/><span>${modelConnector.label}</span></div>
 			</g:each>
 		</div>
 	</div>
@@ -113,6 +113,13 @@
 	</div>
 </div>
 </fieldset>
+<script type="text/javascript">
+var image = "${modelInstance.rearImage.hashCode().equals(29248850)}"
+var usize = "${modelInstance.usize}"
+if(image == 'true'){
+	$("#cablingPanel").css("height",usize*50)
+}
+</script>
 </div>
 </body>
 </html>

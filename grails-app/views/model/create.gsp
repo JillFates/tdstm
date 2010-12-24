@@ -144,7 +144,7 @@
 <script type="text/javascript">
 	$('#connectorCount').val(0);
 	
-	initializeConnectors()
+	initializeConnectors( 1 )
 		
 	function createConnector( type ) {
 		$("#connectorCount").val(parseInt($("#connectorCount").val()) + 1)
@@ -165,7 +165,7 @@
 			$("#connectorModelBody input[id=connectorPosXId"+count+"]").attr("name","connectorPosX"+count)
 			$("#connectorModelBody input[id=connectorPosYId"+count+"]").attr("name","connectorPosY"+count)			
 			$("#connectorModelBody input[id=connectorPosXId"+count+"]").val(0)
-			$("#connectorModelBody input[id=connectorPosYId"+count+"]").val(360)
+			$("#connectorModelBody input[id=connectorPosYId"+count+"]").val(0)
 			$("#connectorModelBody input[id=statusId"+count+"]").attr("name","status"+count)			
 			$("#connectorModelBody input[id=statusId"+count+"]").val(type)
 			

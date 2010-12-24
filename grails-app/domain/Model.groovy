@@ -6,7 +6,7 @@ class Model {
 	String assetType
 	Integer powerUse
 	String aka
-	Integer usize
+	Integer usize = 1
 	byte[] frontImage
 	byte[] rearImage
 	

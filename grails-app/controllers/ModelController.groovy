@@ -232,7 +232,7 @@ class ModelController {
      		response.contentType = 'image/jpg'		
      		response.outputStream << image
 		} else {
-			return;
+			return "";
 		}
     }
     /*
@@ -245,7 +245,7 @@ class ModelController {
      		response.contentType = 'image/jpg'		
      		response.outputStream << image
 		} else {
-			return;
+			return "";
 		}
     }
     /*
