@@ -427,7 +427,8 @@ class RackLayoutsController {
 		def assetCablingDetails = []
 		assetCableMapList.each {
 			assetCablingDetails << [model:assetEntity.model.id, id:it.id, connectorPosX:it.fromConnectorNumber.connectorPosX,
-								   connectorPosY:it.fromConnectorNumber.connectorPosY, status:it.status, label:it.fromConnectorNumber.label]
+								   connectorPosY:it.fromConnectorNumber.connectorPosY, status:it.status, label:it.fromConnectorNumber.label,
+								   hasImageExist:assetEntity.model.rearImage ? true : false, usize:assetEntity.model.usize ]
 		}
 		render assetCablingDetails as JSON
 	}

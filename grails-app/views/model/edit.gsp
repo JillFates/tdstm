@@ -155,9 +155,9 @@
 </div>
 <script type="text/javascript">
 	$('#connectorCount').val(${modelConnectors.size()});
-	var image = "${modelInstance.rearImage.hashCode().equals(29248850)}"
+	var image = "${modelInstance.rearImage}"
 	var usize = "${modelInstance.usize}"
-	if(image == 'true'){
+	if(!image){
 		initializeConnectors( usize )
 	} else {
 		initializeConnectors( 4 )

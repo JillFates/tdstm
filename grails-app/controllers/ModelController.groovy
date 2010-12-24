@@ -25,7 +25,7 @@ class ModelController {
         def modelInstance = new Model(params)
 		def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
 		def frontImage = request.getFile('frontImage')
-        if( frontImage ) {
+        if( frontImage.bytes.size() > 0 ) {
 			if( frontImage.getContentType() && frontImage.getContentType() != "application/octet-stream"){
 				if (! okcontents.contains(frontImage.getContentType())) {
 	        		flash.message = "Front Image must be one of: ${okcontents}"
@@ -33,9 +33,11 @@ class ModelController {
 	        		return;
 	        	}
         	}
+        } else {
+        	modelInstance.frontImage = null
         }
         def rearImage = request.getFile('rearImage')
-        if( rearImage ) {
+        if( rearImage.bytes.size() > 0 ) {
 			if( rearImage.getContentType() && rearImage.getContentType() != "application/octet-stream"){
 				if (! okcontents.contains(rearImage.getContentType())) {
 	        		flash.message = "Rear Image must be one of: ${okcontents}"
@@ -43,6 +45,8 @@ class ModelController {
 	        		return;
 	        	}
         	}
+        } else {
+        	modelInstance.rearImage = null
         }
         if (modelInstance.save(flush: true)) {
         	def connectorCount = Integer.parseInt(params.connectorCount)

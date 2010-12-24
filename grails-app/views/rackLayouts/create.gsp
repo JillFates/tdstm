@@ -280,6 +280,7 @@
 	</div>
 </div>
 <script type="text/javascript">
+	
 	$(document).ready(function() {
 		var bundleObj = $("#bundleId");
 		bundleObj.val('${currentBundle}');
@@ -304,10 +305,14 @@
 		var assetCablingDetails = eval('(' + e.responseText + ')');
 		var model = assetCablingDetails[0].model
 		$("#rearImage"+model).show()
+		var hasImageExist = assetCablingDetails[0].hasImageExist
+		if(!hasImageExist){
+			$("#cablingPanel").css("height",assetCablingDetails[0].usize*50+2)
+		}
 		var details = ""
 		for(i=0;i<assetCablingDetails.length;i++){
 			var assetCabling = assetCablingDetails[i]
-			details += "<div id='connector"+assetCabling.id+"' style='top: "+(180 -( assetCabling.connectorPosY / 2))+"px; left: "+assetCabling.connectorPosX+"px;'><a href='#'><img id='"+assetCabling.status+"' src='../i/cabling/"+assetCabling.status+".png' onclick='openActionButtonsDiv( "+assetCabling.id+", this.id )'></a><span>"+assetCabling.label+"</span></div>"
+			details += "<div id='connector"+assetCabling.id+"' style='top: "+(assetCabling.connectorPosY / 2)+"px; left: "+assetCabling.connectorPosX+"px;'><a href='#'><img id='"+assetCabling.status+"' src='../i/cabling/"+assetCabling.status+".png' onclick='openActionButtonsDiv( "+assetCabling.id+", this.id )'></a><span>"+assetCabling.label+"</span></div>"
 		}
 		$("#cablingPanel").append(details)
 	}

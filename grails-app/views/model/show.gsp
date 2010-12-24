@@ -114,9 +114,9 @@
 </div>
 </fieldset>
 <script type="text/javascript">
-var image = "${modelInstance.rearImage.hashCode().equals(29248850)}"
+var image = "${modelInstance.rearImage}"
 var usize = "${modelInstance.usize}"
-if(image == 'true'){
+if(!image){
 	$("#cablingPanel").css("height",usize*50)
 }
 </script>
