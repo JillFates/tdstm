@@ -21,19 +21,21 @@ class UserPreferenceService  {
     def loadPreferences(def preferenceCode) {
     	
     	def principal = SecurityUtils.subject.principal
-    	def userLogin = UserLogin.findByUsername( principal )
-    	def userPreference = UserPreference.findAllByUserLogin( userLogin )
-    	
-    	if ( userPreference != null ) {
-    		// Initialize Map
-    		def currProj = new HashMap()
-    		
-    		for (int i = 0; i < userPreference.size(); i++) {
-    			currProj.put( userPreference[i].preferenceCode, userPreference[i].value )
-    		}
-    		// Set CURR_PROJ into User session
-    		getSession().setAttribute( preferenceCode, currProj )
-    	}
+		if(principal){
+	    	def userLogin = UserLogin.findByUsername( principal )
+	    	def userPreference = UserPreference.findAllByUserLogin( userLogin )
+	    	
+	    	if ( userPreference != null ) {
+	    		// Initialize Map
+	    		def currProj = new HashMap()
+	    		
+	    		for (int i = 0; i < userPreference.size(); i++) {
+	    			currProj.put( userPreference[i].preferenceCode, userPreference[i].value )
+	    		}
+	    		// Set CURR_PROJ into User session
+	    		getSession().setAttribute( preferenceCode, currProj )
+	    	}
+		}
     }
 	
     /*
@@ -70,9 +72,11 @@ class UserPreferenceService  {
      */
     
     def setPreference( String preferenceCode, String value ) {
-    	if(value && value != "null"){
+    	
+    	def principal = SecurityUtils.subject.principal
+		
+    	if(value && value != "null" && principal){
 	    	def prefValue = getPreference(preferenceCode)
-	    	def principal = SecurityUtils.subject.principal
 	    	def userLogin = UserLogin.findByUsername( principal )
 	
 			//	remove the movebundle and event preferences if user switched to different project

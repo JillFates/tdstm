@@ -67,7 +67,7 @@ class MoveTechController {
 	            	projectTeamInstance.save()
 	            	teamLocation = projectTeamInstance.currentLocation
 	            }
-	        	userPreferenceService.setPreference("CURR_BUNDLE","${bundleInstance?.id}")
+	        	//userPreferenceService.setPreference("CURR_BUNDLE","${bundleInstance?.id}")
 	            render ( view:'cleaningTechHome', model:[ projectTeam:team, members:teamMembers, project:params.project,
 	                                                      loc:teamLocation, bundle:params.bundle,bundleName:bundleInstance.name, team:params.team,
 	                                                      location:params.location, browserTest:browserTest 
