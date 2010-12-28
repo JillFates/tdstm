@@ -4,6 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
 <g:javascript src="asset.tranman.js" />
 <title>Rack View</title>
 <script type="text/javascript">
@@ -262,6 +263,7 @@
 		</g:each>
 	</div>
 	<div class="inputs_div">
+		<g:form action="updateCablingDetails" name="cablingDetailsForm">
 		<div id="actionButtonsDiv" style="margin-top: 5px;float: left;display: none;">
 			<input type="button" value="Unknown" onclick="openActionDiv(this.id)" id="unknownId"/>
 			<input type="button" value="0" onclick="openActionDiv(this.id)" style="background-color: #5F9FCF;" id="emptyId"/>
@@ -269,14 +271,18 @@
 			<input type="button" value="Assign" onclick="openActionDiv(this.id)" id="assignId"/>
 		</div>
 		<div id="actionDiv" style="margin-top: 5px;float: right;display: none;">
-			<input type="button" value="Ok" onclick="submitAction()"/>
+			<input type="button" value="Ok" onclick="submitAction($('form[name=cablingDetailsForm]'))"/>
 			<input type="button" value="Cancel"  onclick="$('#cablingDialogId').dialog('close')"/>
+			<input type="reset" id="formReset" style="display: none;"/>
 		</div>
 		<div style="text-align: center;display: none;" id="assignFieldDiv">
-		<input type="text" name="cabledDetails"/>
-		<input type="hidden" name="cabledType" id="cabledTypeId"/>
-		<input type="hidden" name="actionTypeId" id="actionTypeId"/>
+		<input type="text" name="rack" id="rackId" size="10" onchange="validateRackData(this.value, this.id)"/>
+		<input type="text" name="uposition" id="upositionId" size="2" maxlength="2" onchange="validateUpositionData(this.value, this.id)"/>
+		<input type="text" name="connector" id="connectorId" size="2" maxlength="2" onchange="validateConnectorData(this.value, this.id)"/>
+		<input type="hidden" name="assetCable" id="cabledTypeId"/>
+		<input type="hidden" name="actionType" id="actionTypeId"/>
 		</div>
+		</g:form>
 	</div>
 </div>
 <script type="text/javascript">
@@ -317,6 +323,7 @@
 		$("#cablingPanel").append(details)
 	}
 	function openActionButtonsDiv( cabledId, status ){
+		$('#formReset').click()
 		$("#cabledTypeId").val(cabledId)
 		$("#actionButtonsDiv").show()
 	}
@@ -334,7 +341,7 @@
 		$("#actionDiv").show()
 		
 	}
-	function submitAction(){
+	function submitAction(form){
 		var actionId = $("#actionTypeId").val()
 		var cabledId = $("#cabledTypeId").val()
 		var status = "missing"
@@ -343,12 +350,92 @@
 			case "cabledId" : status = "cabled"; break;
 			case "assignId" : status = "cabledDetails"; break;
 		}
-		${remoteFunction(action:'updateCablingDetails', params:'\'assetCableId=\' + cabledId+\'&status=\'+status' )};
+		jQuery.ajax({
+			url: $(form).attr('action'),
+			data: $(form).serialize(),
+			type:'POST',
+		});
+		//${remoteFunction(action:'updateCablingDetails', params:'\'assetCableId=\' + cabledId+\'&status=\'+status' )};
+		
 		$("#assignFieldDiv").hide()
 		$("#actionButtonsDiv").hide()
 		$("#actionDiv").hide()
 		$('#cablingDialogId').dialog('close')
 	}
+	/*
+		RACK Autocomplete functionality
+	*/
+	${remoteFunction(action:'getAutoCompleteDetails', params:'\'field=rack\'', onComplete:"updateAutoComplete( e , 'rack')" )};
+	function updateAutoComplete(e, field){
+	  	var data = eval('(' + e.responseText + ')');
+	    if (data) {
+			var code = field+"Id";
+		  	$("#"+code).autocomplete(data);
+		}
+	}
+	function validateRackData(value, field){
+		if( !$(".ac_results ul").html()){
+			$("#"+field).addClass("field_error")
+		} else {
+			$("#"+field).removeClass("field_error")
+			<%--jQuery.ajax({
+				url: "getAutoCompleteDetails",
+				data: "field=uposition&rack="+value,
+				type:'POST',
+				success: function(data) {
+					$("#upositionId").autocomplete(data);
+				}
+			});--%>
+		}
+	}
+	function validateUpositionData(value, field){
+		var rack = $("#rackId").val()
+		if(rack){
+			if(value){
+			jQuery.ajax({
+				url: "getAutoCompleteDetails",
+				data: "field=isValidUposition&rack="+rack+"&value="+value,
+				type:'POST',
+				success: function(data) {
+					if(data.length > 0){
+						$("#"+field).removeClass("field_error")
+					} else {
+						$("#"+field).addClass("field_error")
+					}
+				}
+			});
+			} else {
+				alert("Please enter Uposition data")	
+			}
+		} else{
+			alert("Please enter rack data")
+		}
+	}
+	function validateConnectorData(value, field){
+		var rack = $("#rackId").val()
+		var uposition = $("#upositionId").val() 
+		if(rack && uposition){
+			if(value){
+				jQuery.ajax({
+					url: "getAutoCompleteDetails",
+					data: "field=isValidConnector&rack="+rack+"&uposition="+uposition+"&value="+value,
+					type:'POST',
+					success: function(data) {
+						if(data.length > 0){
+							$("#"+field).removeClass("field_error")
+						} else {
+							$("#"+field).addClass("field_error")
+						}
+					}
+				});
+			} else {
+				alert("Please enter Connector data")	
+			}
+		} else{
+			alert("Rack or uposition data missing")
+		}
+	}
+	
 </script>
 </body>
 </html>

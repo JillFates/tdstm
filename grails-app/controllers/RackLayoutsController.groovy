@@ -436,12 +436,79 @@ class RackLayoutsController {
 	 * Update the AssetCablingMap with the date send from RackLayout cabling screen
 	 */
 	def updateCablingDetails = {
-		def assetCableId = params.assetCableId
+		def assetCableId = params.assetCable
+			
 		if(assetCableId){
+			def currProj = getSession().getAttribute( "CURR_PROJ" )
+			def projectId = currProj.CURR_PROJ
+			def project = Project.get( projectId )
+			def actionType = params.actionType
+			def status = "missing"
+			def toAssetRack
+			def toAssetUposition
+			def toConnector
+			def toAsset
+			switch(actionType){
+				case "emptyId" : status = "empty" ; break;
+				case "cabledId" : status = "cabled"; break;
+				case "assignId" : 
+					status = "cabledDetails"; 
+					toAssetRack = params.rack
+					toAssetUposition = params.uposition
+					def rack = Rack.findWhere(tag:toAssetRack,source:0,project:project)
+					def assetEntity = rack?.targetAssets?.find{it.targetRackPosition == Integer.parseInt(params.uposition)}
+					def modelConnectors
+					if(assetEntity?.model){
+						modelConnectors = ModelConnector.findAllByModel(assetEntity?.model)
+						toAsset = assetEntity 
+						toConnector = modelConnectors?.find{it.connector == params.connector }
+					}
+					break;
+			}
 			def assetCableMap = AssetCableMap.findById( assetCableId )
-			assetCableMap.status = params.status
+			assetCableMap.status = status
+			assetCableMap.toAsset = toAsset
+			assetCableMap.toConnectorNumber = toConnector
+			assetCableMap.toAssetRack = toAssetRack
+			assetCableMap.toAssetUposition = toAsset.targetRackPosition
+			
 			assetCableMap.save(flush:true)
 		}
 		render "success"
+	}
+	/*
+	 *  Provide the Rack auto complete details and connector, uposition validation 
+	 */
+	def getAutoCompleteDetails = {
+		def currProj = getSession().getAttribute( "CURR_PROJ" )
+		def projectId = currProj.CURR_PROJ
+		def project = Project.get( projectId )
+		def data
+		def field = params.field
+		def value = params.value
+		switch(field){
+			case "rack" :
+				data = Rack.executeQuery( "select distinct r.tag from Rack r where r.source = 0 and r.project = $projectId " )
+				break;
+			case "uposition":
+				def rack = Rack.findWhere(tag:params.rack,source:0,project:project)
+				data = rack?.targetAssets?.targetRackPosition
+				break;
+			case "isValidUposition":
+				def rack = Rack.findWhere(tag:params.rack,source:0,project:project)
+				data = rack?.targetAssets?.findAll{it.targetRackPosition == Integer.parseInt(params.value)} 
+				break;
+			case "isValidConnector":
+				def rack = Rack.findWhere(tag:params.rack,source:0,project:project)
+				def assetEntity = rack?.targetAssets?.findAll{it.targetRackPosition == Integer.parseInt(params.uposition)}
+				def modelConnectors
+				if(assetEntity?.model[0])
+					modelConnectors = ModelConnector.findAllByModel(assetEntity?.model[0])
+				data = modelConnectors?.findAll{it.connector == params.value }
+				break;
+		}
+		if(!data)
+			data = []
+		render data as JSON
 	}
 }
