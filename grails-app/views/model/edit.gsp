@@ -62,9 +62,20 @@
 		</td>
 		</tr>
 		<tr>
-        <td>Rear image:</td>
-        <td><input size="20" type="file" name="rearImage" id="rearImageId" />
-        </td>
+        	<td>Rear image:</td>
+	        <td><input size="20" type="file" name="rearImage" id="rearImageId" />
+	        </td>
+        </tr>
+        <tr>
+        	<td>Use Image:</td>
+	        <td>
+	        <g:if test="${modelInstance.useImage}">
+	       		<input type="checkbox" name="useImage" id="useImageId"  checked="checked"/>
+	        </g:if>
+	        <g:else>
+	        	<input type="checkbox" name="useImage" id="useImageId" />
+	        </g:else>
+	        </td>
         </tr>
         <tr>
 			<td>Notes:</td>
@@ -76,7 +87,7 @@
 					<input name="id" value="${modelInstance.id}" type="hidden"/>
 					<span class="button">
 						<g:actionSubmit class="save" action="update" value="Update"></g:actionSubmit>
-						<g:actionSubmit class="delete" action="show" value="Cancel"></g:actionSubmit>
+						<g:actionSubmit class="delete" action="delete" value="Delete"></g:actionSubmit>
 					</span>
 				</div>
 			</td>
@@ -87,7 +98,9 @@
 <div style="float: left;">
 	<div>
 		<div id="cablingPanel">
-			<img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}" />
+			<g:if test="${modelInstance.rearImage && modelInstance.useImage == 1}">
+				<img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}" />
+			</g:if>
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
 				<div id="connector${modelConnector.connector}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px "><img src="../i/cabling/${modelConnector.status}.png"/><span id='connectorLabelText${modelConnector.connector}'>${modelConnector.label}</span></div>
 			</g:each>
@@ -96,14 +109,7 @@
 			</g:each>
 		</div>
 		<div id="optionsPanel">
-			<ul><li style="font-weight: bold;"><a href="javascript:createConnector('missing')">Add Connector</a></li></ul>
-			<ul><li>&nbsp;</li></ul>
-			<ul>
-				<li><img src="${createLinkTo(dir:'i/cabling',file:'missing.png')}"/>Missing/Unknown</li>
-				<li><img src="${createLinkTo(dir:'i/cabling',file:'empty.png')}"/>Empty connector</li>
-				<li><img src="${createLinkTo(dir:'i/cabling',file:'cabled.png')}"/>Cabled</li>
-				<li><img src="${createLinkTo(dir:'i/cabling',file:'cabledDetails.png')}"/>Cabled with details</li>
-			</ul>
+			<span style="font-weight: bold;"><a href="javascript:createConnector('missing')">Add Connector</a></span>
 		</div>
 	</div>
 	<div style="clear: both;"></div>
@@ -157,7 +163,8 @@
 	$('#connectorCount').val(${modelConnectors.size()});
 	var image = "${modelInstance.rearImage}"
 	var usize = "${modelInstance.usize}"
-	if(!image){
+	var useImage = "${modelInstance.useImage}" 
+	if(!image || useImage != '1'){
 		initializeConnectors( usize )
 	} else {
 		initializeConnectors( 4 )

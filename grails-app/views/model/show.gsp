@@ -49,11 +49,30 @@
 		</tr>
 		<tr>
 			<td>Front image:</label></td>
-        	<td><img src="${createLink(controller:'model', action:'getFrontImage', id:modelInstance.id)}" style="height: 50px;width: 100px;"/></td>
+        	<td>
+        	<g:if test="${modelInstance.frontImage}">
+        	<img src="${createLink(controller:'model', action:'getFrontImage', id:modelInstance.id)}" style="height: 50px;width: 100px;"/>
+        	</g:if>
+        	</td>
 		</tr>
 		<tr>
         	<td>Rear image:</td>
-        	<td><img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}"  style="height: 50px;width: 100px;" id="rearImageId"/></td>
+        	<td>
+        	<g:if test="${modelInstance.rearImage}">
+        	<img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}"  style="height: 50px;width: 100px;" id="rearImageId"/>
+        	</g:if>
+        	</td>
+        </tr>
+        <tr>
+        	<td>Use Image:</td>
+	        <td>
+		        <g:if test="${modelInstance.useImage}">
+		        	<input type="checkbox" name="useImage" id="useImageId" checked="checked" disabled="disabled"/>
+		        </g:if>
+		        <g:else>
+		       	 <input type="checkbox" name="useImage" id="useImageId" disabled="disabled"/>
+		        </g:else>
+	        </td>
         </tr>
         <tr>
 			<td>Notes:</td>
@@ -78,7 +97,9 @@
 <div style="float: left;">
 	<div>
 		<div id="cablingPanel">
+			<g:if test="${modelInstance.rearImage && modelInstance.useImage == 1}">
 			<img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}" />
+			</g:if>
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
 				<div id="connector${i}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px "><img src="../../i/cabling/${modelConnector.status}.png"/><span>${modelConnector.label}</span></div>
 			</g:each>
@@ -116,7 +137,8 @@
 <script type="text/javascript">
 var image = "${modelInstance.rearImage}"
 var usize = "${modelInstance.usize}"
-if(!image){
+var useImage = "${modelInstance.useImage}" 
+if(!image || useImage != '1'){
 	$("#cablingPanel").css("height",usize*50)
 }
 </script>

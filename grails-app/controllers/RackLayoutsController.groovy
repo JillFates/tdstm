@@ -287,7 +287,7 @@ class RackLayoutsController {
 				
 				if(backView) {
 					if(it.cssClass != "rack_error") {
-						def cablingString = "${it.asset?.assetEntity?.pduPort ? 'PDU: '+ it.asset?.assetEntity?.pduPort +' | ' : '' }"+ 
+						/*def cablingString = "${it.asset?.assetEntity?.pduPort ? 'PDU: '+ it.asset?.assetEntity?.pduPort +' | ' : '' }"+ 
 											"${it.asset?.assetEntity?.nicPort ? 'NIC: '+ it.asset?.assetEntity?.nicPort +' | ' : ''}"+
 											"${it.asset?.assetEntity?.kvmDevice && it.asset?.assetEntity?.kvmDevice != 'blank / blank'? 'KVM: '+ it.asset?.assetEntity?.kvmDevice +' | ' : ''}"+
 											"${it.asset?.assetEntity?.remoteMgmtPort ? 'RMgmt: '+ it.asset?.assetEntity?.remoteMgmtPort +' | ': ''}"+
@@ -295,11 +295,12 @@ class RackLayoutsController {
 						
 						if ( cablingString )
 							cablingString = cablingString.substring( 0, cablingString.length() - 2 )
-						
-						if ( cablingString.length() > 90 )
-							row.append("<td rowspan='${rowspan}' style='font-size:6px;' class='${it.cssClass}'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id}, this.innerHTML)'>${cablingString}</a></td>")
+						*/
+						def assetCables = AssetCableMap.findByFromAsset(it.asset?.assetEntity)
+						if ( assetCables )
+							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id}, \"${it.asset?.assetEntity.assetTag}\")'>view</a></td>")
 						else
-							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id}, this.innerHTML)'>${cablingString}</a></td>")
+							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>&nbsp;</td>")
 						
 					} else {
 						row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>Devices Overlap</td>")
@@ -428,7 +429,8 @@ class RackLayoutsController {
 		assetCableMapList.each {
 			assetCablingDetails << [model:assetEntity.model.id, id:it.id, connectorPosX:it.fromConnectorNumber.connectorPosX,
 								   connectorPosY:it.fromConnectorNumber.connectorPosY, status:it.status, label:it.fromConnectorNumber.label,
-								   hasImageExist:assetEntity.model.rearImage ? true : false, usize:assetEntity.model.usize ]
+								   hasImageExist:assetEntity.model.rearImage && assetEntity.model?.useImage ? true : false, 
+								   usize:assetEntity.model.usize ]
 		}
 		render assetCablingDetails as JSON
 	}
@@ -470,7 +472,7 @@ class RackLayoutsController {
 			assetCableMap.toAsset = toAsset
 			assetCableMap.toConnectorNumber = toConnector
 			assetCableMap.toAssetRack = toAssetRack
-			assetCableMap.toAssetUposition = toAsset.targetRackPosition
+			assetCableMap.toAssetUposition = toAsset?.targetRackPosition
 			
 			assetCableMap.save(flush:true)
 		}

@@ -257,7 +257,7 @@
 	</g:form>
 </div>
 <div style="display: none;" id="cablingDialogId">
-	<div id="cablingPanel">
+	<div id="cablingPanel" style="height: auto; ">
 		<g:each in="${AssetEntity.executeQuery('SELECT model.id FROM AssetEntity WHERE moveBundle.id = ? GROUP BY model',[Long.parseLong(currentBundle)]) }" var="modelId">
 		<img id="rearImage${modelId}" src="${createLink(controller:'model', action:'getRearImage', id:modelId)}" style="display: none;"/>
 		</g:each>
@@ -307,13 +307,15 @@
 		$("#cablingPanel img").hide()
 		$("#cablingPanel div").hide()
 		$("#actionButtonsDiv").hide()
+		$("#assignFieldDiv").hide()
 		$("#actionDiv").hide()
 		var assetCablingDetails = eval('(' + e.responseText + ')');
 		var model = assetCablingDetails[0].model
-		$("#rearImage"+model).show()
 		var hasImageExist = assetCablingDetails[0].hasImageExist
 		if(!hasImageExist){
 			$("#cablingPanel").css("height",assetCablingDetails[0].usize*50+2)
+		} else {
+			$("#rearImage"+model).show()
 		}
 		var details = ""
 		for(i=0;i<assetCablingDetails.length;i++){
@@ -360,7 +362,6 @@
 		$("#assignFieldDiv").hide()
 		$("#actionButtonsDiv").hide()
 		$("#actionDiv").hide()
-		$('#cablingDialogId').dialog('close')
 	}
 	/*
 		RACK Autocomplete functionality

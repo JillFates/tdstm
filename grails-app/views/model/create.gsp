@@ -97,14 +97,7 @@
 			</g:each>
 		</div>
 		<div id="optionsPanel">
-			<ul><li style="font-weight: bold;"><a href="javascript:createConnector('missing')">Add Connector</a></li></ul>
-			<ul><li>&nbsp;</li></ul>
-			<ul>
-				<li><img src="${createLinkTo(dir:'i/cabling',file:'missing.png')}"/>Missing/Unknown</li>
-				<li><img src="${createLinkTo(dir:'i/cabling',file:'empty.png')}"/>Empty connector</li>
-				<li><img src="${createLinkTo(dir:'i/cabling',file:'cabled.png')}"/>Cabled</li>
-				<li><img src="${createLinkTo(dir:'i/cabling',file:'cabledDetails.png')}"/>Cabled with details</li>
-			</ul>
+			<span style="font-weight: bold;"><a href="javascript:createConnector('missing')">Add Connector</a></span>
 		</div>
 	</div>
 	<div style="clear: both;"></div>

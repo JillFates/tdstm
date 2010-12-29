@@ -105,6 +105,7 @@ class ModelController {
     def update = {
         def modelInstance = Model.get(params.id)
         if (modelInstance) {
+        	params.useImage = params.useImage == 'on' ? 1 : 0
             def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
     		def frontImage = request.getFile('frontImage')
             if( frontImage ) {
@@ -135,7 +136,6 @@ class ModelController {
             modelInstance.properties = params
             modelInstance.rearImage = rearImage
             modelInstance.frontImage = frontImage
-			
             if (!modelInstance.hasErrors() && modelInstance.save(flush: true)) {
             	def connectorCount = Integer.parseInt(params.connectorCount)
 				if(connectorCount > 0){
@@ -212,6 +212,10 @@ class ModelController {
         def modelInstance = Model.get(params.id)
         if (modelInstance) {
             try {
+            	AssetCableMap.executeUpdate("update AssetEntity set model = null where model = ?",[modelInstance])
+				
+            	AssetCableMap.executeUpdate("delete AssetCableMap where fromConnectorNumber in (from ModelConnector where model = ${modelInstance.id})")
+				AssetCableMap.executeUpdate("delete AssetCableMap where toConnectorNumber in (from ModelConnector where model = ${modelInstance.id})")
             	ModelConnector.executeUpdate("delete ModelConnector where model = ?",[modelInstance])
                 modelInstance.delete(flush: true)
                 flash.message = "${modelInstance} deleted"

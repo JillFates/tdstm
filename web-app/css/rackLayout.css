@@ -201,7 +201,6 @@ table.rack_elevation table.bladeTable td.errorBlade {
 	border: 1px solid #5F9FCF;
 	margin-right: 5px;
 	margin-bottom: 5px;
-	float: left;
 	background-color: lightyellow; 
 	position: relative;
 }
@@ -211,9 +210,7 @@ table.rack_elevation table.bladeTable td.errorBlade {
 	top: 0
 }
 #optionsPanel {
-	border: 1px solid #5F9FCF;
-	margin-right: 5px;
-	float: left;
+	margin-bottom: 5px;
 }
 #optionsPanel li {
 	list-style: none;
