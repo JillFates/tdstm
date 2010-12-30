@@ -167,7 +167,7 @@
 	if(!image || useImage != '1'){
 		initializeConnectors( usize )
 	} else {
-		initializeConnectors( 4 )
+		initializeConnectors( 2 )
 	}
 	
 

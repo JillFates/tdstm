@@ -82,7 +82,7 @@ class RackLayoutsController {
 					if(rackPosition == 0 || rackPosition == null)
 						rackPosition = 1
 					
-					def rackSize = assetEntity.usize == 0 || assetEntity.usize == null ? 1 : assetEntity.usize.toInteger()
+					def rackSize = assetEntity.model.usize == 0 || assetEntity.model.usize == null ? 1 : assetEntity.model.usize.toInteger()
 					def position = rackPosition + rackSize - 1
 					def newHigh = position
 					def newLow = rackPosition
@@ -142,7 +142,7 @@ class RackLayoutsController {
 							if(position > maxUSize) {
 								position = maxUSize
 								newLow = maxUSize
-								assetEntity.usize = 1
+								assetEntity.model.usize = 1
 								overlapError = true
 							}
 							assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag + ' ~- ' + assetEntity.assetName, position:position, overlapError:overlapError, 
@@ -152,7 +152,7 @@ class RackLayoutsController {
 						if(position > maxUSize) {
 							position = maxUSize
 							newLow = maxUSize
-							assetEntity.usize = 1
+							assetEntity.model.usize = 1
 							overlapError = true
 						}
 						assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag + ' ~- ' + assetEntity.assetName, position:position, overlapError:overlapError, 
@@ -185,7 +185,7 @@ class RackLayoutsController {
 							cssClass = 'rack_current'
 							rackStyle = 'rack_current'
 						}
-						if(assetEnity.position == 0 || assetEnity.assetEntity?.usize == 0 || assetEnity.assetEntity?.usize == null ) {
+						if(assetEnity.position == 0 || assetEnity.assetEntity?.model.usize == 0 || assetEnity.assetEntity?.model.usize == null ) {
 							rackStyle = 'rack_error'
 						}
 						assetDetails << [asset:assetEnity, rack:i, cssClass:cssClass, rackStyle:rackStyle, source:rack.source ]
@@ -427,10 +427,11 @@ class RackLayoutsController {
 		}
 		def assetCablingDetails = []
 		assetCableMapList.each {
-			assetCablingDetails << [model:assetEntity.model.id, id:it.id, connectorPosX:it.fromConnectorNumber.connectorPosX,
+			assetCablingDetails << [model:assetEntity.model.id, id:it.id, connector : it.fromConnectorNumber.connector, 
+									type:it.fromConnectorNumber.type, connectorPosX:it.fromConnectorNumber.connectorPosX,
 								   connectorPosY:it.fromConnectorNumber.connectorPosY, status:it.status, label:it.fromConnectorNumber.label,
 								   hasImageExist:assetEntity.model.rearImage && assetEntity.model?.useImage ? true : false, 
-								   usize:assetEntity.model.usize ]
+								   usize:assetEntity.model.usize, rackUposition : it.toConnectorNumber ? it.toAssetRack+"/"+it.toAssetUposition+"/"+it.toConnectorNumber.connector : "" ]
 		}
 		render assetCablingDetails as JSON
 	}
@@ -439,7 +440,7 @@ class RackLayoutsController {
 	 */
 	def updateCablingDetails = {
 		def assetCableId = params.assetCable
-			
+		def assetCableMap
 		if(assetCableId){
 			def currProj = getSession().getAttribute( "CURR_PROJ" )
 			def projectId = currProj.CURR_PROJ
@@ -467,7 +468,7 @@ class RackLayoutsController {
 					}
 					break;
 			}
-			def assetCableMap = AssetCableMap.findById( assetCableId )
+			assetCableMap = AssetCableMap.findById( assetCableId )
 			assetCableMap.status = status
 			assetCableMap.toAsset = toAsset
 			assetCableMap.toConnectorNumber = toConnector
@@ -476,7 +477,7 @@ class RackLayoutsController {
 			
 			assetCableMap.save(flush:true)
 		}
-		render "success"
+		render assetCableMap as JSON
 	}
 	/*
 	 *  Provide the Rack auto complete details and connector, uposition validation 

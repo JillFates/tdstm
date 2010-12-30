@@ -96,7 +96,7 @@
 </div>
 <div style="float: left;">
 	<div>
-		<div id="cablingPanel">
+		<div id="cablingPanel" style="height: auto; ">
 			<g:if test="${modelInstance.rearImage && modelInstance.useImage == 1}">
 			<img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}" />
 			</g:if>

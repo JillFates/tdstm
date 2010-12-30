@@ -258,8 +258,10 @@
 </div>
 <div style="display: none;" id="cablingDialogId">
 	<div id="cablingPanel" style="height: auto; ">
-		<g:each in="${AssetEntity.executeQuery('SELECT model.id FROM AssetEntity WHERE moveBundle.id = ? GROUP BY model',[Long.parseLong(currentBundle)]) }" var="modelId">
-		<img id="rearImage${modelId}" src="${createLink(controller:'model', action:'getRearImage', id:modelId)}" style="display: none;"/>
+		<g:each in="${AssetEntity.findAll('FROM AssetEntity WHERE moveBundle.id = ? GROUP BY model',[Long.parseLong(currentBundle)]) }" var="assetEntity">
+			<g:if test="${assetEntity.model.rearImage && assetEntity.model.useImage == 1}">
+			<img id="rearImage${assetEntity.model.id}" src="${createLink(controller:'model', action:'getRearImage', id:assetEntity.model.id)}" style="display: none;"/>
+			</g:if>
 		</g:each>
 	</div>
 	<div class="inputs_div">
@@ -272,17 +274,36 @@
 		</div>
 		<div id="actionDiv" style="margin-top: 5px;float: right;display: none;">
 			<input type="button" value="Ok" onclick="submitAction($('form[name=cablingDetailsForm]'))"/>
-			<input type="button" value="Cancel"  onclick="$('#cablingDialogId').dialog('close')"/>
+			<input type="button" value="Cancel"  onclick="$('#assignFieldDiv').hide();$('#actionButtonsDiv').hide();$('#actionDiv').hide()"/>
 			<input type="reset" id="formReset" style="display: none;"/>
 		</div>
 		<div style="text-align: center;display: none;" id="assignFieldDiv">
-		<input type="text" name="rack" id="rackId" size="10" onchange="validateRackData(this.value, this.id)"/>
-		<input type="text" name="uposition" id="upositionId" size="2" maxlength="2" onchange="validateUpositionData(this.value, this.id)"/>
-		<input type="text" name="connector" id="connectorId" size="2" maxlength="2" onchange="validateConnectorData(this.value, this.id)"/>
-		<input type="hidden" name="assetCable" id="cabledTypeId"/>
-		<input type="hidden" name="actionType" id="actionTypeId"/>
+			<input type="text" name="rack" id="rackId" size="10" onchange="validateRackData(this.value, this.id)"/>
+			<input type="text" name="uposition" id="upositionId" size="2" maxlength="2" onchange="validateUpositionData(this.value, this.id)"/>
+			<input type="text" name="connector" id="connectorId" size="2" maxlength="2" onchange="validateConnectorData(this.value, this.id)"/>
+			<input type="hidden" name="assetCable" id="cabledTypeId"/>
+			<input type="hidden" name="actionType" id="actionTypeId"/>
 		</div>
 		</g:form>
+	</div>
+	<div style="clear: both;"></div>
+	<div class="list">
+		<table>
+			<thead>
+				<tr>
+					<th>Connector</th>
+					<th>Type</th>
+					<th>Label</th>
+					<th>Status</th>
+					<th>Rack/Upos/Conn</th>
+				</tr>
+			</thead>
+			<tbody id="cablingTableBody">
+			<tr>
+				<td colspan="5">No Connectors found</td>
+			</tr>
+			</tbody>
+		</table>
 	</div>
 </div>
 <script type="text/javascript">
@@ -318,11 +339,16 @@
 			$("#rearImage"+model).show()
 		}
 		var details = ""
+		var tbodyDetails = ""
 		for(i=0;i<assetCablingDetails.length;i++){
 			var assetCabling = assetCablingDetails[i]
 			details += "<div id='connector"+assetCabling.id+"' style='top: "+(assetCabling.connectorPosY / 2)+"px; left: "+assetCabling.connectorPosX+"px;'><a href='#'><img id='"+assetCabling.status+"' src='../i/cabling/"+assetCabling.status+".png' onclick='openActionButtonsDiv( "+assetCabling.id+", this.id )'></a><span>"+assetCabling.label+"</span></div>"
+			tbodyDetails += "<tr id='connectorTr"+assetCabling.id+"' onclick='openActionButtonsDiv( "+assetCabling.id+", "+assetCabling.status+" )'><td>"+assetCabling.connector+"</td><td>"+assetCabling.type+"</td><td>"+assetCabling.label+"</td><td>"+assetCabling.status+"</td><td>"+assetCabling.rackUposition+"</td></tr>"
 		}
 		$("#cablingPanel").append(details)
+		if( tbodyDetails ){
+			$("#cablingTableBody").html( tbodyDetails )
+		}
 	}
 	function openActionButtonsDiv( cabledId, status ){
 		$('#formReset').click()
@@ -345,23 +371,37 @@
 	}
 	function submitAction(form){
 		var actionId = $("#actionTypeId").val()
-		var cabledId = $("#cabledTypeId").val()
-		var status = "missing"
-		switch(actionId){
-			case "emptyId" : status = "empty" ; break;
-			case "cabledId" : status = "cabled"; break;
-			case "assignId" : status = "cabledDetails"; break;
+		var rack = $("#rackId").val()
+		var uposition = $("#upositionId").val()
+		var connector = $("#connectorId").val()
+		var isValid = true
+		if(actionId == "assignId"){
+			if( !rack || !uposition || !connector){
+				isValid = false
+				alert("Please Enter the target connector details")
+			} else {
+				if($(".field_error").length){
+					isValid = false
+					alert("Error with target connector details")
+				}
+			}
 		}
-		jQuery.ajax({
-			url: $(form).attr('action'),
-			data: $(form).serialize(),
-			type:'POST',
-		});
-		//${remoteFunction(action:'updateCablingDetails', params:'\'assetCableId=\' + cabledId+\'&status=\'+status' )};
-		
-		$("#assignFieldDiv").hide()
-		$("#actionButtonsDiv").hide()
-		$("#actionDiv").hide()
+		if(isValid){
+			jQuery.ajax({
+				url: $(form).attr('action'),
+				data: $(form).serialize(),
+				type:'POST',
+				success: function(data) {
+					$("#connector"+data.id+" img").attr("src","../i/cabling/"+data.status+".png")
+					$("#connector"+data.id+" img").attr("id", data.status)
+				}
+			});
+			//${remoteFunction(action:'updateCablingDetails', params:'\'assetCableId=\' + cabledId+\'&status=\'+status' )};
+			
+			$("#assignFieldDiv").hide()
+			$("#actionButtonsDiv").hide()
+			$("#actionDiv").hide()
+		}
 	}
 	/*
 		RACK Autocomplete functionality
