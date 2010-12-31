@@ -343,7 +343,7 @@
 		for(i=0;i<assetCablingDetails.length;i++){
 			var assetCabling = assetCablingDetails[i]
 			details += "<div id='connector"+assetCabling.id+"' style='top: "+(assetCabling.connectorPosY / 2)+"px; left: "+assetCabling.connectorPosX+"px;'><a href='#'><img id='"+assetCabling.status+"' src='../i/cabling/"+assetCabling.status+".png' onclick='openActionButtonsDiv( "+assetCabling.id+", this.id )'></a><span>"+assetCabling.label+"</span></div>"
-			tbodyDetails += "<tr id='connectorTr"+assetCabling.id+"' onclick='openActionButtonsDiv( "+assetCabling.id+", "+assetCabling.status+" )'><td>"+assetCabling.connector+"</td><td>"+assetCabling.type+"</td><td>"+assetCabling.label+"</td><td>"+assetCabling.status+"</td><td>"+assetCabling.rackUposition+"</td></tr>"
+			tbodyDetails += "<tr id='connectorTr"+assetCabling.id+"' onclick='openActionButtonsDiv( "+assetCabling.id+", "+assetCabling.status+" )'><td>"+assetCabling.connector+"</td><td>"+assetCabling.type+"</td><td>"+assetCabling.label+"</td><td>"+assetCabling.displayStatus+"</td><td>"+assetCabling.rackUposition+"</td></tr>"
 		}
 		$("#cablingPanel").append(details)
 		if( tbodyDetails ){
@@ -354,6 +354,8 @@
 		$('#formReset').click()
 		$("#cabledTypeId").val(cabledId)
 		$("#actionButtonsDiv").show()
+		$("#cablingTableBody tr").css("background","")
+		$("#connectorTr"+cabledId).css("background","none repeat scroll 0 0 #7CFE80")
 	}
 	function openActionDiv( id ){
 		$("#unknownId").css("background-color","")
@@ -394,6 +396,7 @@
 				success: function(data) {
 					$("#connector"+data.id+" img").attr("src","../i/cabling/"+data.status+".png")
 					$("#connector"+data.id+" img").attr("id", data.status)
+					$("#connectorTr"+data.id).html("<td>"+data.connector+"</td><td>"+data.type+"</td><td>"+data.label+"</td><td>"+data.displayStatus+"</td><td>"+data.rackUposition+"</td></tr>")
 				}
 			});
 			//${remoteFunction(action:'updateCablingDetails', params:'\'assetCableId=\' + cabledId+\'&status=\'+status' )};

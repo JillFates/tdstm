@@ -6,7 +6,7 @@ class RackLayoutsController {
 	def userPreferenceService
 	def jdbcTemplate
 	def supervisorConsoleService
-	
+	def static final statusDetails = ["missing":"Unknown", "cabledDetails":"Cabled with Details","empty":"Empty","cabled":"Cabled"]
 	def create = {
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
@@ -429,8 +429,8 @@ class RackLayoutsController {
 		assetCableMapList.each {
 			assetCablingDetails << [model:assetEntity.model.id, id:it.id, connector : it.fromConnectorNumber.connector, 
 									type:it.fromConnectorNumber.type, connectorPosX:it.fromConnectorNumber.connectorPosX,
-								   connectorPosY:it.fromConnectorNumber.connectorPosY, status:it.status, label:it.fromConnectorNumber.label,
-								   hasImageExist:assetEntity.model.rearImage && assetEntity.model?.useImage ? true : false, 
+								   connectorPosY:it.fromConnectorNumber.connectorPosY, status:it.status,displayStatus:statusDetails[it.status], 
+								   label:it.fromConnectorNumber.label, hasImageExist:assetEntity.model.rearImage && assetEntity.model?.useImage ? true : false,
 								   usize:assetEntity.model.usize, rackUposition : it.toConnectorNumber ? it.toAssetRack+"/"+it.toAssetUposition+"/"+it.toConnectorNumber.connector : "" ]
 		}
 		render assetCablingDetails as JSON
@@ -477,7 +477,11 @@ class RackLayoutsController {
 			
 			assetCableMap.save(flush:true)
 		}
-		render assetCableMap as JSON
+		def assetCable = [id:assetCableMap.id, connector : assetCableMap.fromConnectorNumber.connector, 
+							type:assetCableMap.fromConnectorNumber.type, displayStatus:statusDetails[assetCableMap.status],
+							status:assetCableMap.status, label:assetCableMap.fromConnectorNumber.label,
+							rackUposition : assetCableMap.toConnectorNumber ? assetCableMap.toAssetRack+"/"+assetCableMap.toAssetUposition+"/"+assetCableMap.toConnectorNumber.connector : "" ]
+		render assetCable as JSON
 	}
 	/*
 	 *  Provide the Rack auto complete details and connector, uposition validation 
