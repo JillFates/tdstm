@@ -15,7 +15,10 @@ class RackLayoutsController {
 		userPreferenceService.loadPreferences("CURR_BUNDLE")
 		def currentBundle = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
 		/* set first bundle as default if user pref not exist */
-		currentBundle = currentBundle ? currentBundle : moveBundleInstanceList[0]?.id
+
+		if(!currentBundle)
+			currentBundle = moveBundleInstanceList[0]?.id?.toString()
+					
 		[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, currentBundle:currentBundle]
 	}
 	
@@ -497,6 +500,9 @@ class RackLayoutsController {
 			case "rack" :
 				data = Rack.executeQuery( "select distinct r.tag from Rack r where r.source = 0 and r.project = $projectId " )
 				break;
+			case "isValidRack":
+				data = Rack.findAllWhere(tag:value,source:0,project:project)
+				break;
 			case "uposition":
 				def rack = Rack.findWhere(tag:params.rack,source:0,project:project)
 				data = rack?.targetAssets?.targetRackPosition
@@ -504,6 +510,13 @@ class RackLayoutsController {
 			case "isValidUposition":
 				def rack = Rack.findWhere(tag:params.rack,source:0,project:project)
 				data = rack?.targetAssets?.findAll{it.targetRackPosition == Integer.parseInt(params.value)} 
+				break;
+			case "connector":
+				def rack = Rack.findWhere(tag:params.rack,source:0,project:project)
+				def assetEntity = rack?.targetAssets?.findAll{it.targetRackPosition == Integer.parseInt(params.uposition)}
+				def modelConnectors
+				if(assetEntity?.model[0])
+					data = ModelConnector.findAllByModel(assetEntity?.model[0])?.connector
 				break;
 			case "isValidConnector":
 				def rack = Rack.findWhere(tag:params.rack,source:0,project:project)

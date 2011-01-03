@@ -258,11 +258,13 @@
 </div>
 <div style="display: none;" id="cablingDialogId">
 	<div id="cablingPanel" style="height: auto; ">
+		<g:if test="${currentBundle}">
 		<g:each in="${AssetEntity.findAll('FROM AssetEntity WHERE moveBundle.id = ? GROUP BY model',[Long.parseLong(currentBundle)]) }" var="assetEntity">
 			<g:if test="${assetEntity.model.rearImage && assetEntity.model.useImage == 1}">
 			<img id="rearImage${assetEntity.model.id}" src="${createLink(controller:'model', action:'getRearImage', id:assetEntity.model.id)}" style="display: none;"/>
 			</g:if>
 		</g:each>
+		</g:if>
 	</div>
 	<div class="inputs_div">
 		<g:form action="updateCablingDetails" name="cablingDetailsForm">
@@ -278,9 +280,9 @@
 			<input type="reset" id="formReset" style="display: none;"/>
 		</div>
 		<div style="text-align: center;display: none;" id="assignFieldDiv">
-			<input type="text" name="rack" id="rackId" size="10" onchange="validateRackData(this.value, this.id)"/>
-			<input type="text" name="uposition" id="upositionId" size="2" maxlength="2" onchange="validateUpositionData(this.value, this.id)"/>
-			<input type="text" name="connector" id="connectorId" size="2" maxlength="2" onchange="validateConnectorData(this.value, this.id)"/>
+			<input type="text" name="rack" id="rackId" size="10" onchange="validateRackData( this.value, this.id );"/>
+			<input type="text" name="uposition" id="upositionId" size="2" maxlength="2" onfocus="getUpositionData()" onchange="validateUpositionData( this.value, this.id)"/>
+			<input type="text" name="connector" id="connectorId" size="2" maxlength="2" onfocus="getConnectorData()" onchange="validateConnectorData(this.value, this.id)" />
 			<input type="hidden" name="assetCable" id="cabledTypeId"/>
 			<input type="hidden" name="actionType" id="actionTypeId"/>
 		</div>
@@ -343,7 +345,7 @@
 		for(i=0;i<assetCablingDetails.length;i++){
 			var assetCabling = assetCablingDetails[i]
 			details += "<div id='connector"+assetCabling.id+"' style='top: "+(assetCabling.connectorPosY / 2)+"px; left: "+assetCabling.connectorPosX+"px;'><a href='#'><img id='"+assetCabling.status+"' src='../i/cabling/"+assetCabling.status+".png' onclick='openActionButtonsDiv( "+assetCabling.id+", this.id )'></a><span>"+assetCabling.label+"</span></div>"
-			tbodyDetails += "<tr id='connectorTr"+assetCabling.id+"' onclick='openActionButtonsDiv( "+assetCabling.id+", "+assetCabling.status+" )'><td>"+assetCabling.connector+"</td><td>"+assetCabling.type+"</td><td>"+assetCabling.label+"</td><td>"+assetCabling.displayStatus+"</td><td>"+assetCabling.rackUposition+"</td></tr>"
+			tbodyDetails += "<tr id='connectorTr"+assetCabling.id+"' title="+assetCabling.status+" onclick='openActionButtonsDiv( "+assetCabling.id+", this.title )'><td>"+assetCabling.connector+"</td><td>"+assetCabling.type+"</td><td>"+assetCabling.label+"</td><td>"+assetCabling.displayStatus+"</td><td>"+assetCabling.rackUposition+"</td></tr>"
 		}
 		$("#cablingPanel").append(details)
 		if( tbodyDetails ){
@@ -354,6 +356,21 @@
 		$('#formReset').click()
 		$("#cabledTypeId").val(cabledId)
 		$("#actionButtonsDiv").show()
+		$("#actionButtonsDiv input").css("background-color", "")
+		switch(status){
+			case "missing":
+				$("#unknownId").css("background-color", "#5F9FCF")
+				break;
+			case "cabledDetails":
+				$("#assignId").css("background-color", "#5F9FCF")
+				break;
+			case "cabled":
+				$("#cabledId").css("background-color", "#5F9FCF")
+				break;
+			case "empty":
+				$("#emptyId").css("background-color", "#5F9FCF")
+				break;
+		}
 		$("#cablingTableBody tr").css("background","")
 		$("#connectorTr"+cabledId).css("background","none repeat scroll 0 0 #7CFE80")
 	}
@@ -414,22 +431,51 @@
 	  	var data = eval('(' + e.responseText + ')');
 	    if (data) {
 			var code = field+"Id";
-		  	$("#"+code).autocomplete(data);
+		  	$("#"+code).autocomplete(data,{autoFill:true});
 		}
 	}
 	function validateRackData(value, field){
-		if( !$(".ac_results ul").html()){
-			$("#"+field).addClass("field_error")
-		} else {
-			$("#"+field).removeClass("field_error")
-			<%--jQuery.ajax({
+		if(value){
+			jQuery.ajax({
 				url: "getAutoCompleteDetails",
-				data: "field=uposition&rack="+value,
+				data: "field=isValidRack&value="+value,
 				type:'POST',
 				success: function(data) {
-					$("#upositionId").autocomplete(data);
+					if(data.length > 0){
+						$("#"+field).removeClass("field_error")
+						$("#upositionId").val("")
+						$("#upositionId").removeClass("field_error")
+						$("#connectorId").val("")
+						$("#connectorId").removeClass("field_error")
+					} else {
+						$("#"+field).addClass("field_error")
+					}
 				}
-			});--%>
+			});
+		} else {
+			alert("Please enter Rack data")	
+		}
+	}
+	/*
+		Update and validate the Uposition data
+	*/
+	function getUpositionData(){
+		var rack = $("#rackId").val()
+		if(rack){
+			${remoteFunction(action:'getAutoCompleteDetails', params:'\'field=uposition\'+\'&rack=\'+rack', onComplete:"updateUpositionData( e )" )};
+		} else {
+			alert("Please enter rack data")
+		}
+	}
+	function updateUpositionData( e ){
+		var data = eval('(' + e.responseText + ')');
+	    if (data) {
+		    var dataArray = new Array()
+		    for(i=0;i<data.length;i++){
+		    	dataArray[i] = data[i].toString()
+		    }
+		    $("#upositionId").flushCache( )
+		  	$("#upositionId").autocomplete(dataArray,{autoFill:true});
 		}
 	}
 	function validateUpositionData(value, field){
@@ -443,6 +489,8 @@
 				success: function(data) {
 					if(data.length > 0){
 						$("#"+field).removeClass("field_error")
+						$("#connectorId").val("")
+						$("#connectorId").removeClass("field_error")
 					} else {
 						$("#"+field).addClass("field_error")
 					}
@@ -453,6 +501,29 @@
 			}
 		} else{
 			alert("Please enter rack data")
+		}
+	}
+	/*
+		Update and validate the Connector data
+	*/
+	function getConnectorData(){
+		var rack = $("#rackId").val()
+		var uposition = $("#upositionId").val()
+		if(rack && uposition){
+			${remoteFunction(action:'getAutoCompleteDetails', params:'\'field=connector\'+\'&rack=\'+rack+\'&uposition=\'+uposition', onComplete:"updateConnectorData( e )" )};
+		} else {
+			alert("Please enter rack data")
+		}
+	}
+	function updateConnectorData( e ){
+		var data = eval('(' + e.responseText + ')');
+	    if (data) {
+		    var dataArray = new Array()
+		    for(i=0;i<data.length;i++){
+		    	dataArray[i] = data[i].toString()
+		    }
+		    $("#connectorId").flushCache( )
+		  	$("#connectorId").autocomplete(dataArray,{autoFill:true});
 		}
 	}
 	function validateConnectorData(value, field){
