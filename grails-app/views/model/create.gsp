@@ -119,7 +119,7 @@
 					<td><input id="connectorId${count}" maxlength="5" style="width: 35px;" type="text" value="${count}"></td>
 					<td><g:select id="typeId${count}" name="type" from="${ModelConnector.constraints.type.inList}"></g:select></td>
 					<td><input id="labelId${count}" type="text" onchange="changeLabel(${count}, this.value)"></td>
-					<td><g:select id="labelPositionId${count}" name="labelPosition" from="${['Right','Left','Top','Bottom']}"></g:select></td>
+					<td><g:select id="labelPositionId${count}" name="labelPosition" from="${['Right','Bottom']}" onchange="changeLabelPosition(${count}, this.value)"></g:select></td>
 					<td><input id="connectorPosXId${count}" maxlength="3" style="width: 25px;" type="text" value="0"></td>
 					<td>
 						<input id="connectorPosYId${count}" maxlength="3" style="width: 25px;" type="text" value="360">
@@ -143,7 +143,7 @@
 		$("#connectorCount").val(parseInt($("#connectorCount").val()) + 1)
 		var count = $("#connectorCount").val()
 		if(count < 51 ){
-			var connector = "<img src='../i/cabling/"+type+".png'/><span id='connectorLabelText"+count+"'>Connector"+count+"</span>"
+			var connector = "<div><img src='../i/cabling/"+type+".png'/></div><div id='labelPositionDiv"+count+"' class='connector_right'><span id='connectorLabelText"+count+"'>Connector"+count+"</span></div>"
 			$("#connector"+count).html(connector)
 			var modelConnector = $("#connectorTabe tbody").html()
 			$("#connectorModelBody").append(modelConnector)
@@ -168,6 +168,16 @@
 	}
 	function changeLabel( count, value){
 		$("#connectorLabelText"+count).html(value)
+	}
+	function changeLabelPosition(count, value){
+		if(value == "Right"){
+			$("#labelPositionDiv"+count).removeClass("connector_bottom")
+			$("#labelPositionDiv"+count).addClass("connector_right")
+		} else {
+			$("#labelPositionDiv"+count).removeClass("connector_right")
+			$("#labelPositionDiv"+count).addClass("connector_bottom")
+		}
+		
 	}
 </script>
 </body>

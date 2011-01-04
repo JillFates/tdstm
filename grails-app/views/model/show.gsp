@@ -101,7 +101,14 @@
 			<img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}" />
 			</g:if>
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
-				<div id="connector${i}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px "><img src="../../i/cabling/${modelConnector.status}.png"/><span>${modelConnector.label}</span></div>
+				<div id="connector${i}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px ">
+					<div>
+					<img src="../../i/cabling/${modelConnector.status}.png"/>
+					</div>
+					<div class="${modelConnector.labelPosition == 'Right' ? 'connector_right' : 'connector_bottom'}">
+					<span>${modelConnector.label}</span>
+					</div>
+				</div>
 			</g:each>
 		</div>
 	</div>

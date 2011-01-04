@@ -70,10 +70,10 @@
         	<td>Use Image:</td>
 	        <td>
 	        <g:if test="${modelInstance.useImage}">
-	       		<input type="checkbox" name="useImage" id="useImageId"  checked="checked"/>
+	       		<input type="checkbox" name="useImage" id="useImageId"  checked="checked" onclick="showImage(this.id)"/>
 	        </g:if>
 	        <g:else>
-	        	<input type="checkbox" name="useImage" id="useImageId" />
+	        	<input type="checkbox" name="useImage" id="useImageId" onclick="showImage(this.id)"/>
 	        </g:else>
 	        </td>
         </tr>
@@ -98,11 +98,18 @@
 <div style="float: left;">
 	<div>
 		<div id="cablingPanel">
-			<g:if test="${modelInstance.rearImage && modelInstance.useImage == 1}">
-				<img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}" />
+			<g:if test="${modelInstance.rearImage}">
+				<img id="rearImage" src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}" style="display: ${modelInstance.useImage != 1 ? 'none':'block' }"/>
 			</g:if>
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
-				<div id="connector${modelConnector.connector}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px "><img src="../i/cabling/${modelConnector.status}.png"/><span id='connectorLabelText${modelConnector.connector}'>${modelConnector.label}</span></div>
+				<div id="connector${modelConnector.connector}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px ">
+					<div>
+						<img src="../i/cabling/${modelConnector.status}.png"/>
+					</div>
+					<div id="labelPositionDiv${modelConnector.connector}" class="${modelConnector.labelPosition == 'Right' ? 'connector_right' : 'connector_bottom'}">
+						<span id='connectorLabelText${modelConnector.connector}'>${modelConnector.label}</span>
+					</div>
+				</div>
 			</g:each>
 			<g:each in="${otherConnectors}" var="count">
 				<div id="connector${count}"></div>
@@ -131,7 +138,7 @@
 					<td><input id="connectorId${modelConnector.connector}" name="connector${modelConnector.connector}" maxlength="5" style="width: 35px;" type="text" value="${modelConnector.connector}"></td>
 					<td><g:select id="typeId${modelConnector.connector}" name="type${modelConnector.connector}" from="${ModelConnector.constraints.type.inList}" value="${modelConnector.type}"></g:select></td>
 					<td><input id="labelId${modelConnector.connector}" name="label${modelConnector.connector}" type="text" value="${modelConnector.label}" onchange="changeLabel(${modelConnector.connector}, this.value)"></td>
-					<td><g:select id="labelPositionId${modelConnector.connector}" name="labelPosition${modelConnector.connector}" from="${['Right','Left','Top','Bottom']}" value="${modelConnector.labelPosition}"></g:select></td>
+					<td><g:select id="labelPositionId${modelConnector.connector}" name="labelPosition${modelConnector.connector}" from="${['Right','Bottom']}" value="${modelConnector.labelPosition}" onchange="changeLabelPosition(${modelConnector.connector}, this.value)"></g:select></td>
 					<td><input id="connectorPosXId${modelConnector.connector}" name="connectorPosX${modelConnector.connector}" maxlength="3" style="width: 25px;" type="text" value="${modelConnector.connectorPosX}"></td>
 					<td>
 						<input id="connectorPosYId${modelConnector.connector}" name="connectorPosY${modelConnector.connector}" maxlength="3" style="width: 25px;" type="text" value="${modelConnector.connectorPosY}">
@@ -144,7 +151,7 @@
 					<td><input id="connectorId${count}" maxlength="5" style="width: 35px;" type="text" value="${count}"></td>
 					<td><g:select id="typeId${count}" name="type" from="${ModelConnector.constraints.type.inList}"></g:select></td>
 					<td><input id="labelId${count}" type="text" onchange="changeLabel(${count}, this.value)"></td>
-					<td><g:select id="labelPositionId${count}" name="labelPosition" from="${['Right','Left','Top','Bottom']}"></g:select></td>
+					<td><g:select id="labelPositionId${count}" name="labelPosition" from="${['Right','Bottom']}" onchange="changeLabelPosition(${count}, this.value)"></g:select></td>
 					<td><input id="connectorPosXId${count}" maxlength="3" style="width: 25px;" type="text" value="0"></td>
 					<td>
 						<input id="connectorPosYId${count}" maxlength="3" style="width: 25px;" type="text" value="360">
@@ -175,7 +182,7 @@
 		$("#connectorCount").val(parseInt($("#connectorCount").val()) + 1)
 		var count = $("#connectorCount").val()
 		if(count < 51 ){
-			var connector = "<img src='../i/cabling/"+type+".png'/><span id='connectorLabelText"+count+"'>Connector"+count+"</span>"
+			var connector = "<div><img src='../i/cabling/"+type+".png'/></div><div id='labelPositionDiv"+count+"' class='connector_right'><span id='connectorLabelText"+count+"'>Connector"+count+"</span></div>"
 			$("#connector"+count).html(connector)
 			var modelConnector = $("#connectorTabe tbody").html()
 			$("#connectorModelBody").append(modelConnector)
@@ -200,6 +207,29 @@
 	}
 	function changeLabel( count, value){
 		$("#connectorLabelText"+count).html(value)
+	}
+	function changeLabelPosition(count, value){
+		if(value == "Right"){
+			$("#labelPositionDiv"+count).removeClass("connector_bottom")
+			$("#labelPositionDiv"+count).addClass("connector_right")
+		} else {
+			$("#labelPositionDiv"+count).removeClass("connector_right")
+			$("#labelPositionDiv"+count).addClass("connector_bottom")
+		}
+		
+	}
+	function showImage( value ){
+		if($("#"+value).is(":checked")){
+			if(image ){
+				initializeConnectors( 2 )
+				$("#rearImage").show()
+			} else {
+				alert("Rear image does not exist")
+			}
+		} else {
+			$("#rearImage").hide()
+			initializeConnectors( usize )
+		}
 	}
 </script>
 </body>

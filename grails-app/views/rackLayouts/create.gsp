@@ -344,7 +344,11 @@
 		var tbodyDetails = ""
 		for(i=0;i<assetCablingDetails.length;i++){
 			var assetCabling = assetCablingDetails[i]
-			details += "<div id='connector"+assetCabling.id+"' style='top: "+(assetCabling.connectorPosY / 2)+"px; left: "+assetCabling.connectorPosX+"px;'><a href='#'><img id='"+assetCabling.status+"' src='../i/cabling/"+assetCabling.status+".png' onclick='openActionButtonsDiv( "+assetCabling.id+", this.id )'></a><span>"+assetCabling.label+"</span></div>"
+			var cssClass = "connector_right"
+			if(assetCabling.labelPosition != "Right"){
+				cssClass = "connector_bottom"
+			}
+			details += "<div id='connector"+assetCabling.id+"' style='top: "+(assetCabling.connectorPosY / 2)+"px; left: "+assetCabling.connectorPosX+"px;'><a href='#'><div><img id='"+assetCabling.status+"' src='../i/cabling/"+assetCabling.status+".png' onclick='openActionButtonsDiv( "+assetCabling.id+", this.id )'></div></a><div class='"+cssClass+"'><span>"+assetCabling.label+"</span></div></div>"
 			tbodyDetails += "<tr id='connectorTr"+assetCabling.id+"' title="+assetCabling.status+" onclick='openActionButtonsDiv( "+assetCabling.id+", this.title )'><td>"+assetCabling.connector+"</td><td>"+assetCabling.type+"</td><td>"+assetCabling.label+"</td><td>"+assetCabling.displayStatus+"</td><td>"+assetCabling.rackUposition+"</td></tr>"
 		}
 		$("#cablingPanel").append(details)

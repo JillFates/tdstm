@@ -224,3 +224,9 @@ table.rack_elevation table.bladeTable td.errorBlade {
 #optionsPanel li img{
 	vertical-align: middle;
 }
+.connector_bottom{
+	margin-top: 19px;
+}
+.connector_right{
+	margin-left: 19px;
+}

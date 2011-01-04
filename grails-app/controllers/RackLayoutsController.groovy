@@ -432,9 +432,10 @@ class RackLayoutsController {
 		assetCableMapList.each {
 			assetCablingDetails << [model:assetEntity.model.id, id:it.id, connector : it.fromConnectorNumber.connector, 
 									type:it.fromConnectorNumber.type, connectorPosX:it.fromConnectorNumber.connectorPosX,
-								   connectorPosY:it.fromConnectorNumber.connectorPosY, status:it.status,displayStatus:statusDetails[it.status], 
-								   label:it.fromConnectorNumber.label, hasImageExist:assetEntity.model.rearImage && assetEntity.model?.useImage ? true : false,
-								   usize:assetEntity.model.usize, rackUposition : it.toConnectorNumber ? it.toAssetRack+"/"+it.toAssetUposition+"/"+it.toConnectorNumber.connector : "" ]
+									labelPosition:it.fromConnectorNumber.labelPosition,
+									connectorPosY:it.fromConnectorNumber.connectorPosY, status:it.status,displayStatus:statusDetails[it.status], 
+									label:it.fromConnectorNumber.label, hasImageExist:assetEntity.model.rearImage && assetEntity.model?.useImage ? true : false,
+									usize:assetEntity.model.usize, rackUposition : it.toConnectorNumber ? it.toAssetRack+"/"+it.toAssetUposition+"/"+it.toConnectorNumber.connector : "" ]
 		}
 		render assetCablingDetails as JSON
 	}
