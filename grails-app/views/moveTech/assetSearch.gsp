@@ -277,7 +277,7 @@
 	var usize = "${projMap?.asset?.model?.usize}"
 	var useImage = "${projMap?.asset?.model?.useImage}" 
 	if(!image || useImage != '1'){
-		document.getElementById("cablingPanel").style.height = usize*50+"px";
+		document.getElementById("cablingPanel").style.height = usize*30+"px";
 	}
 	</script>
 </body>
