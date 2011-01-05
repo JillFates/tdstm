@@ -113,7 +113,7 @@
 	<a name="top"></a>
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody" style="border:0px solid #e7e7e7; width:220px;">
-	<div class="colum_techlogin" style="float:left;">
+	<div class="colum_techlogin">
 		<table border=0 cellpadding=0 cellspacing=0><tr>
 			<td><g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"mt","fMess":"fMess"]' class="home" >Home</g:link></td>
 			<td><g:link action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo","fMess":"fMess"]' class="my_task">My Tasks</g:link></td>
@@ -247,6 +247,21 @@
 		</div>
 	</g:form>
 	</div>
+	<div id="cablingPanel" style="height: auto; ">
+		<g:if test="${projMap?.asset?.model?.rearImage && projMap?.asset?.model?.useImage == 1}">
+			<img src="${createLink(controller:'model', action:'getRearImage', id:projMap?.asset?.model?.id)}" />
+		</g:if>
+		<g:each in="${modelConnectors}" status="i" var="modelConnector">
+			<div id="connector${i}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px ">
+				<div>
+					<img src="../i/cabling/${modelConnector.status}.png"/>
+				</div>
+				<div class="${modelConnector.labelPosition == 'Right' ? 'connector_right' : 'connector_bottom'}">
+					<span>${modelConnector.label}</span>
+				</div>
+			</div>
+		</g:each>
+	</div>
 	</div>
 	<script type="text/javascript">
 	function textCounter(obj, maxlimit) {
@@ -256,7 +271,14 @@
 	      } else {
 	      	return true;
 	      }
-   }
+	}
+	  /* cabling diagram*/
+	var image = "${projMap?.asset?.model?.rearImage}"
+	var usize = "${projMap?.asset?.model?.usize}"
+	var useImage = "${projMap?.asset?.model?.useImage}" 
+	if(!image || useImage != '1'){
+		document.getElementById("cablingPanel").style.height = usize*50+"px";
+	}
 	</script>
 </body>
 </html>

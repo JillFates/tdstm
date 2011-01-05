@@ -642,10 +642,11 @@ class MoveTechController {
                         	}
                         	assetComment = AssetComment.findAllByAssetEntity( assetItem )
                         	def stateLabel = stateEngineService.getStateLabel( moveBundleInstance.project.workflowCode, transitionStates[0].stateTo )
+							def modelConnectors = ModelConnector.findAllByModel( assetItem.model )
                         	render ( view:'assetSearch',
                                 model:[ projMap:projMap, assetComment:assetComment?assetComment :"", stateVal:stateVal, bundle:params.bundle, 
                                 		team:params.team, project:params.project, location:params.location, search:params.search, label:label,
-                                		actionLabel:actionLabel, commentsList: commentsList, stateLabel: stateLabel
+                                		actionLabel:actionLabel, commentsList: commentsList, stateLabel: stateLabel, modelConnectors : modelConnectors
                                 		])
                         }
                     //}
