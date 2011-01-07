@@ -77,7 +77,7 @@
                         </tr>
                         <tr>
                                 <td style="text-align:center;"><label>Username:</label>
-                                <input type="text" size="13" name="username" value="${username}" onfocus="select()"/></td>
+                                <input type="text" size="13" name="username" value="${username}" onfocus="select()" autocorrect="off" autocapitalize="off" /></td>
                         </tr>
                         <tr>
                                 <td class="buttonR" style="text-align: center;">

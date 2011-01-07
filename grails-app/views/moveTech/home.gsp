@@ -55,7 +55,7 @@ dt {
 						<tr>
 							<td style="text-align:left;">
 								Scan Asset:<br/>
-								<input type="text" size="12" value="" name="search" />
+								<input type="text" size="12" value="" name="search" autocorrect="off" autocapitalize="off" />
 							</td>
 							<td valign="middle"><g:link controller="moveTech" action="signOut" class="sign_out">Log out</g:link></td>
 						</tr>

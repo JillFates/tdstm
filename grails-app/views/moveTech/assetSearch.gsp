@@ -7,7 +7,7 @@
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-<meta name="viewport" content="height=device-height,width=220" />
+<meta name="viewport" content="width = 220,initial-scale = 1.0" />
 	
 <script type="text/javascript">
         window.addEventListener('load', function(){
@@ -176,7 +176,7 @@
 		<a name="comments"></a>
 		<table width="100%">
 			<tr>
-				<td class="heading" colspan=2><a class="heading" href="#comments">Comments/Hold</a></td>
+				<td class="heading" colspan=2><a class="heading" href="#comments">Other Actions</a></td>
 			</tr>
 			<tr>
 			<td colspan=2>
@@ -190,7 +190,7 @@
 				<input type="button" value="Comment" onclick="return doTransition('comment');" class="action_button_small"/>
 			</td>
 			<td class="button_style" colspan=1 style="text-align:center;">
-				<input type="button" value="Put on HOLD" onclick="return doTransition('hold');" class="action_button_hold" />
+				<input type="button" value="HOLD" onclick="return doTransition('hold');" class="action_button_hold" />
 				</td>
 			</tr>	
 		</table>

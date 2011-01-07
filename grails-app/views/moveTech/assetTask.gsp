@@ -110,7 +110,7 @@
 				  <g:link class="tab_deselect" action="assetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All&nbsp;(${allSize})</g:link>
 				</g:else>
 			</td>
-			<td class="tab_search"><input  type="text" size="08" value="" id="search" name="search" /></td>
+			<td class="tab_search"><input  type="text" size="08" value="" id="search" name="search" autocorrect="off" autocapitalize="off" /></td>
 		</tr>
 		</table>
 		</div> 
