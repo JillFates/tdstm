@@ -120,7 +120,7 @@ class DataTransferBatchController {
     									isModified = "true"
     									assetEntity."$attribName" = modelInstance 
     								}
-    							} else if( it.eavAttribute.backendType == "int" || attribName == "usize" ){
+    							} else if( it.eavAttribute.backendType == "int"){
     								def correctedPos
     								try {
     									if( it.correctedValue ) {
@@ -129,17 +129,10 @@ class DataTransferBatchController {
     										correctedPos = Integer.parseInt(it.importValue.trim())
     									}
     									//correctedPos = it.correctedValue
-    									if( attribName == "usize" ) {
-    										if( ( ( it.correctedValue == null || assetEntity."$attribName"?.trim() != it.correctedValue?.trim() ) && assetEntity."$attribName"?.trim() != it.importValue?.trim() ) || isNewValidate == "true" ) {
-            									isModified = "true"
-            									assetEntity."$attribName" = correctedPos 
-            								}
-    									}else {
-    										if( assetEntity."$attribName" != correctedPos || isNewValidate == "true" ) {
-    											isModified = "true"
-    	        									assetEntity."$attribName" = correctedPos 
-    	        							}
-    									}
+										if( assetEntity."$attribName" != correctedPos || isNewValidate == "true" ) {
+											isModified = "true"
+											assetEntity."$attribName" = correctedPos 
+    	        						}
     								} catch ( Exception ex ) {
     									errorConflictCount+=1
     									it.hasError = 1

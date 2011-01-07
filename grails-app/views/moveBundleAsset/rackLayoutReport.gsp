@@ -157,14 +157,6 @@
 			<th>Bundle</th>
 			<th>Cabling</th>
 			<th>U</th>
-	 	<%--<th>Pos</th>
-			<th>PDU</th>
-			<th>NIC</th>
-			<th>Mgmt</th>
-			<th>KVM</th>
-			<th>Fiber</th>
-			<th>Amber</th>
-			<th>OK</th>--%>
 		</tr>
 		${rackLayout?.backViewRows}
 	</table>

@@ -85,7 +85,7 @@ class RackLayoutsController {
 					if(rackPosition == 0 || rackPosition == null)
 						rackPosition = 1
 					
-					def rackSize = assetEntity.model.usize == 0 || assetEntity.model.usize == null ? 1 : assetEntity.model.usize.toInteger()
+					def rackSize = assetEntity?.model?.usize == 0 || assetEntity?.model?.usize == null ? 1 : assetEntity?.model?.usize?.toInteger()
 					def position = rackPosition + rackSize - 1
 					def newHigh = position
 					def newLow = rackPosition
@@ -145,7 +145,7 @@ class RackLayoutsController {
 							if(position > maxUSize) {
 								position = maxUSize
 								newLow = maxUSize
-								assetEntity.model.usize = 1
+								assetEntity?.model?.usize = 1
 								overlapError = true
 							}
 							assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag + ' ~- ' + assetEntity.assetName, position:position, overlapError:overlapError, 
@@ -155,7 +155,7 @@ class RackLayoutsController {
 						if(position > maxUSize) {
 							position = maxUSize
 							newLow = maxUSize
-							assetEntity.model.usize = 1
+							assetEntity?.model?.usize = 1
 							overlapError = true
 						}
 						assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag + ' ~- ' + assetEntity.assetName, position:position, overlapError:overlapError, 
@@ -188,7 +188,7 @@ class RackLayoutsController {
 							cssClass = 'rack_current'
 							rackStyle = 'rack_current'
 						}
-						if(assetEnity.position == 0 || assetEnity.assetEntity?.model.usize == 0 || assetEnity.assetEntity?.model.usize == null ) {
+						if(assetEnity.position == 0 || assetEnity.assetEntity?.model?.usize == 0 || assetEnity.assetEntity?.model?.usize == null ) {
 							rackStyle = 'rack_error'
 						}
 						assetDetails << [asset:assetEnity, rack:i, cssClass:cssClass, rackStyle:rackStyle, source:rack.source ]
@@ -435,7 +435,7 @@ class RackLayoutsController {
 									labelPosition:it.fromConnectorNumber.labelPosition,
 									connectorPosY:it.fromConnectorNumber.connectorPosY, status:it.status,displayStatus:statusDetails[it.status], 
 									label:it.fromConnectorNumber.label, hasImageExist:assetEntity.model.rearImage && assetEntity.model?.useImage ? true : false,
-									usize:assetEntity.model.usize, rackUposition : it.toConnectorNumber ? it.toAssetRack+"/"+it.toAssetUposition+"/"+it.toConnectorNumber.connector : "" ]
+									usize:assetEntity?.model?.usize, rackUposition : it.toConnectorNumber ? it.toAssetRack+"/"+it.toAssetUposition+"/"+it.toConnectorNumber.connector : "" ]
 		}
 		render assetCablingDetails as JSON
 	}

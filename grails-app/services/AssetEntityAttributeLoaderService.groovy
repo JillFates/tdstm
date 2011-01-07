@@ -281,7 +281,7 @@ class AssetEntityAttributeLoaderService {
 			def usize = 0
 			for(int AssetEntityRow = 0; AssetEntityRow < AssetEntityList.size(); AssetEntityRow++ ) {
 				try {
-					usize = usize + Integer.parseInt(AssetEntityList[AssetEntityRow].usize? (AssetEntityList[AssetEntityRow].usize).trim() : "0")
+					usize = usize + Integer.parseInt(AssetEntityList[AssetEntityRow]?.model?.usize? (AssetEntityList[AssetEntityRow]?.model?.usize).trim() : "0")
 				} catch ( Exception e ) {
 					println "uSize containing blank value."
 				}
@@ -313,7 +313,7 @@ class AssetEntityAttributeLoaderService {
     		               	sourceLocation:assetEntityInstance.sourceLocation, sourceRack:assetEntityInstance.sourceRack, 
     		               	targetLocation:assetEntityInstance.targetLocation, targetRack:assetEntityInstance.targetRack, 
     		               	sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, 
-    		            	uSize:assetEntityInstance.usize, team:displayTeam, cart:assetEntityList[assetRow]?.cart, 
+    		            	uSize:assetEntityInstance?.model?.usize, team:displayTeam, cart:assetEntityList[assetRow]?.cart, 
     		            	shelf:assetEntityList[assetRow]?.shelf, projectTeam:projectTeam, assetTag:assetEntityInstance?.assetTag]
     	}
 		return assetEntity

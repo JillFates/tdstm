@@ -46,12 +46,118 @@ def modelResultMap = jdbcTemplate.queryForList("select model, manufacturer_id as
 			println "Updated '${model}' Model id ${modelInstance.id} for ${updated} assets"
 		}
 	}
-println"**************DELETE POWER_TYPE***************"
+println"**************Delete Asset properties ***************"
+/*
+ * Power
+ */
 def powerTypeAttribute = EavAttribute.findByAttributeCode('powerType')
-
-	if(powerTypeAttribute) {
-		
-		EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[powerTypeAttribute])
-		EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[powerTypeAttribute])
-		EavAttribute.executeUpdate("Delete from EavAttribute where id = ?",[powerTypeAttribute.id])
+if(powerTypeAttribute) {
+	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[powerTypeAttribute])
+	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[powerTypeAttribute])
+	DataTransferAttributeMap.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[powerTypeAttribute])
+	EavAttribute.executeUpdate("Delete from EavAttribute where id = ?",[powerTypeAttribute.id])
+}
+/*
+ * PDU
+ */
+def pduPortAttribute = EavAttribute.findByAttributeCode('pduPort')
+if(pduPortAttribute) {
+		EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[pduPortAttribute])
+		EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[pduPortAttribute])
+		DataTransferAttributeMap.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[pduPortAttribute])
+		EavAttribute.executeUpdate("Delete from EavAttribute where id = ?",[pduPortAttribute.id])
 	}
+
+def pduQuantityAttribute = EavAttribute.findByAttributeCode('pduQuantity')
+if(pduQuantityAttribute) {
+	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[pduQuantityAttribute])
+	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[pduQuantityAttribute])
+	DataTransferAttributeMap.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[pduQuantityAttribute])
+	EavAttribute.executeUpdate("Delete from EavAttribute where id = ?",[pduQuantityAttribute.id])
+}
+
+def pduTypeAttribute = EavAttribute.findByAttributeCode('pduType')
+if(pduTypeAttribute) {
+	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[pduTypeAttribute])
+	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[pduTypeAttribute])
+	DataTransferAttributeMap.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[pduTypeAttribute])
+	EavAttribute.executeUpdate("Delete from EavAttribute where id = ?",[pduTypeAttribute.id])
+}
+ /*
+  * NIC
+  */
+def nicPortAttribute = EavAttribute.findByAttributeCode('nicPort')
+if(nicPortAttribute) {
+	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[nicPortAttribute])
+	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[nicPortAttribute])
+	DataTransferAttributeMap.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[powerTypeAttribute])
+	EavAttribute.executeUpdate("Delete from EavAttribute where id = ?",[nicPortAttribute.id])
+}
+
+/*
+ * Fiber
+ */
+def fiberCabinetAttribute = EavAttribute.findByAttributeCode('fiberCabinet')
+if(fiberCabinetAttribute) {
+	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[fiberCabinetAttribute])
+	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[fiberCabinetAttribute])
+	DataTransferAttributeMap.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[fiberCabinetAttribute])
+	EavAttribute.executeUpdate("Delete from EavAttribute where id = ?",[fiberCabinetAttribute.id])
+}
+
+def fiberTypeAttribute = EavAttribute.findByAttributeCode('fiberType')
+if(fiberTypeAttribute) {
+	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[fiberTypeAttribute])
+	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[fiberTypeAttribute])
+	DataTransferAttributeMap.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[fiberTypeAttribute])
+	EavAttribute.executeUpdate("Delete from EavAttribute where id = ?",[fiberTypeAttribute.id])
+}
+
+def fiberQuantityAttribute = EavAttribute.findByAttributeCode('fiberQuantity')
+if(fiberQuantityAttribute) {
+	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[fiberQuantityAttribute])
+	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[fiberQuantityAttribute])
+	DataTransferAttributeMap.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[fiberQuantityAttribute])
+	EavAttribute.executeUpdate("Delete from EavAttribute where id = ?",[fiberQuantityAttribute.id])
+}
+/*
+ *  HBA
+ */
+def hbaPortAttribute = EavAttribute.findByAttributeCode('hbaPort')
+if(hbaPortAttribute) {
+	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[hbaPortAttribute])
+	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[hbaPortAttribute])
+	DataTransferAttributeMap.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[hbaPortAttribute])
+	EavAttribute.executeUpdate("Delete from EavAttribute where id = ?",[hbaPortAttribute.id])
+}
+/*
+ * KVM 
+ */
+def kvmDeviceAttribute = EavAttribute.findByAttributeCode('kvmDevice')
+if(kvmDeviceAttribute) {
+	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[kvmDeviceAttribute])
+ 	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[kvmDeviceAttribute])
+	DataTransferAttributeMap.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[kvmDeviceAttribute])
+ 	EavAttribute.executeUpdate("Delete from EavAttribute where id = ?",[kvmDeviceAttribute.id])
+}
+
+def kvmPortAttribute = EavAttribute.findByAttributeCode('kvmPort')
+if(kvmPortAttribute) {
+ 	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[kvmPortAttribute])
+ 	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[kvmPortAttribute])
+	DataTransferAttributeMap.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[kvmPortAttribute])
+ 	EavAttribute.executeUpdate("Delete from EavAttribute where id = ?",[kvmPortAttribute.id])
+}
+/*
+ * usize
+ */
+def usizeAttribute = EavAttribute.findByAttributeCode('usize')
+if(usizeAttribute) {
+	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[usizeAttribute])
+	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[usizeAttribute])
+	DataTransferAttributeMap.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[usizeAttribute])
+	EavAttribute.executeUpdate("Delete from EavAttribute where id = ?",[usizeAttribute.id])
+}
+
+
+

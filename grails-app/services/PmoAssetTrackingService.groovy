@@ -398,12 +398,10 @@ class PmoAssetTrackingService {
 		def offset = params.offset
 		def query = new StringBuffer("""SELECT * FROM( select ae.asset_entity_id as id, ae.asset_name as assetName,ae.short_name as shortName,ae.asset_tag as assetTag,
 				ae.asset_type as assetType,mf.name as manufacturer, m.name as model, ae.application, ae.app_owner as appOwner, ae.app_sme as appSme,
-				ae.ip_address as ipAddress, ae.hinfo, ae.serial_number as serialNumber,ae.usize, ae.rail_type as railType,
+				ae.ip_address as ipAddress, ae.hinfo, ae.serial_number as serialNumber,m.usize, ae.rail_type as railType,
 				ae.source_location as sourceLocation, ae.source_room as sourceRoom, ae.source_rack as sourceRack, ae.source_rack_position as sourceRackPosition,
 				ae.target_location as targetLocation, ae.target_room as targetRoom, ae.target_rack as targetRack, ae.target_rack_position as targetRackPosition,
-				ae.pdu_port as pduPort,ae.pdu_quantity as pduQuantity,ae.pdu_type as pduType,ae.nic_port as nicPort,
-				ae.remote_mgmt_port as remote_MgmtPort, ae.fiber_cabinet as fiberCabinet, ae.fiber_type as fiberType, ae.fiber_quantity as fiberQuantity,
-				ae.hba_port as hbaPort, ae.kvm_device as kvmDevice, ae.kvm_port as kvmPort, mb.name as moveBundle, ae.truck,
+				ae.remote_mgmt_port as remote_MgmtPort,mb.name as moveBundle, ae.truck,
 				ae.new_or_old as newOrOld, ae.priority, ae.cart, ae.shelf, spt.team_code as sourceTeam, tpt.team_code as targetTeam,
 				max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate, ae.custom1 as custom1, ae.custom2 as custom2,ae.custom3 as custom3,
 				ae.custom3 as custom4,ae.custom5 as custom5,ae.custom6 as custom6,ae.custom7 as custom7,ae.custom8 as custom8,ae.current_status as currentStatus
@@ -496,12 +494,10 @@ class PmoAssetTrackingService {
         def order = params.order
 		def query = new StringBuffer("""SELECT * FROM (SELECT * FROM( select ae.asset_entity_id as id, ae.asset_name as assetName,ae.short_name as shortName,ae.asset_tag as assetTag,
 				ae.asset_type as assetType,mf.name as manufacturer, m.name as model, ae.application, ae.app_owner as appOwner, ae.app_sme as appSme,
-				ae.ip_address as ipAddress, ae.hinfo, ae.serial_number as serialNumber,ae.usize, ae.rail_type as railType,
+				ae.ip_address as ipAddress, ae.hinfo, ae.serial_number as serialNumber,m.usize, ae.rail_type as railType,
 				ae.source_location as sourceLocation, ae.source_room as sourceRoom, ae.source_rack as sourceRack, ae.source_rack_position as sourceRackPosition,
 				ae.target_location as targetLocation, ae.target_room as targetRoom, ae.target_rack as targetRack, ae.target_rack_position as targetRackPosition,
-				ae.pdu_port as pduPort,ae.pdu_quantity as pduQuantity,ae.pdu_type as pduType,ae.nic_port as nicPort,
-				ae.remote_mgmt_port as remote_MgmtPort, ae.fiber_cabinet as fiberCabinet, ae.fiber_type as fiberType, ae.fiber_quantity as fiberQuantity,
-				ae.hba_port as hbaPort, ae.kvm_device as kvmDevice, ae.kvm_port as kvmPort, mb.name as moveBundle, ae.truck,
+				ae.remote_mgmt_port as remote_MgmtPort, mb.name as moveBundle, ae.truck,
 				ae.new_or_old as newOrOld, ae.priority, ae.cart, ae.shelf, spt.team_code as sourceTeam, tpt.team_code as targetTeam,
 				max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate, ae.custom1 as custom1, ae.custom2 as custom2,ae.custom3 as custom3,
 				ae.custom3 as custom4,ae.custom5 as custom5,ae.custom6 as custom6,ae.custom7 as custom7,ae.custom8 as custom8, ae.current_status as currentStatus

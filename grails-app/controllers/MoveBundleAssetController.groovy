@@ -488,7 +488,7 @@ class MoveBundleAssetController {
     						sourceLocation:assetEntityInstance?.sourceLocation, sourceRack:assetEntityInstance?.sourceRack, 
     						targetLocation:assetEntityInstance?.targetLocation, targetRack:assetEntityInstance?.targetRack, 
     						sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, 
-    						uSize:assetEntityInstance?.usize,team:displayTeam,, cart:assetEntityList[assetRow]?.cart, 
+    						uSize:assetEntityInstance?.model?.usize,team:displayTeam, cart:assetEntityList[assetRow]?.cart, 
     						shelf:assetEntityList[assetRow]?.shelf, projectTeam:projectTeam, assetTag:assetEntityInstance?.assetTag]
     	}
     	render assetEntity as JSON
@@ -543,7 +543,7 @@ class MoveBundleAssetController {
 			    					sourceLocation:assetEntityInstance?.sourceLocation, sourceRack:assetEntityInstance?.sourceRack, 
 			    					targetLocation:assetEntityInstance?.targetLocation, targetRack:assetEntityInstance?.targetRack, 
 			    					sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, 
-			    					uSize:assetEntityInstance?.usize, team:displayTeam, cart:moveBundleAssetList[assetRow]?.cart, 
+			    					uSize:assetEntityInstance?.model?.usize, team:displayTeam, cart:moveBundleAssetList[assetRow]?.cart, 
 			    					shelf:moveBundleAssetList[assetRow]?.shelf, projectTeam:projectTeam, assetTag:assetEntityInstance?.assetTag]
     		}
     	}
@@ -788,15 +788,14 @@ class MoveBundleAssetController {
    			 	                "manufacturer":asset.manufacturer?.toString(), "model":asset.model?.toString(), "sourceTargetrack":rackPos, 
    			 	                "position":asset.sourceRackPosition, 
    			 	                "sourceTargetPos":(projectTeamLocationInstance?.currentLocation ? projectTeamLocationInstance?.currentLocation : "") +"(source/ unracking)", 
-   			 	                "usize":asset.usize, "cart":asset.cart, "shelf":asset.shelf,"source_team_id":asset?.sourceTeam?.id, 
+   			 	                "usize":asset?.model?.usize, "cart":asset.cart, "shelf":asset.shelf,"source_team_id":asset?.sourceTeam?.id, 
    			 	                "move_bundle_id":asset?.moveBundle?.id, "clientName":projectInstance?.client?.name,
    			 	                'projectName':partyGroupInstance?.name,'startAt':GormUtil.convertInToUserTZ( projectInstance?.startDate, tzId ), 
    			 	                'completedAt':GormUtil.convertInToUserTZ( projectInstance?.completionDate, tzId ), 'bundleName':bundleInstance?.name,
    			 	                'teamName':teamPartyGroup?.name +"-"+teamMembers, 'teamMembers':teamMembers,
    			 	                'location':"Source Team", 'rack':"SourceRack",'rackPos':"SourceRackPosition",'truck':asset.truck, 
-   			 	                'room':asset.sourceRoom, 'PDU':asset.pduPort,'NIC':asset.nicPort,
-   			 	                'kvmPort':asset.kvmDevice ? asset.kvmDevice : '' + asset.kvmPort ? asset.kvmPort :'', 
-   			 	                'hbaPort':asset.fiberCabinet + asset.hbaPort, 'instructions':assetCommentString, 'sourcetargetLoc':"s",
+   			 	                'room':asset.sourceRoom, 'PDU':'','NIC':'','kvmPort':'', 
+   			 	                'hbaPort':'', 'instructions':assetCommentString, 'sourcetargetLoc':"s",
 								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
     		}
     		//Target List of Assets
@@ -818,8 +817,6 @@ class MoveBundleAssetController {
    				assetCommentList.each { assetComment ->
    					assetCommentString = assetCommentString + assetComment?.comment +"\n"
    				}
-   				def kvmPort = (asset.kvmDevice ? asset.kvmDevice : '')+" "+ (asset.kvmPort ? asset.kvmPort : '')
-   				def hbaPort = (asset.fiberCabinet ? asset.fiberCabinet : '')+" "+ (asset.hbaPort ? asset.hbaPort : '')
    				def rackPos = (asset.targetRack ? asset.targetRack : "")+"/"+ (asset.targetRackPosition ? asset.targetRackPosition : "")
    				if (rackPos == "/"){
    					rackPos = ""
@@ -832,14 +829,14 @@ class MoveBundleAssetController {
    				                "manufacturer":asset.manufacturer?.toString(), "model":asset.model?.toString(), "sourceTargetrack":rackPos, 
    				                "position":asset.targetRackPosition, 
    				                "sourceTargetPos":(projectTeamLocationInstance?.currentLocation ? projectTeamLocationInstance?.currentLocation : "") +"(target/ reracking)", 
-   				                "usize":asset.usize, "cart":asset.cart, "shelf":asset.shelf,"source_team_id":asset?.targetTeam?.id, 
+   				                "usize":asset?.model?.usize, "cart":asset.cart, "shelf":asset.shelf,"source_team_id":asset?.targetTeam?.id, 
    				                "move_bundle_id":asset?.moveBundle?.id, "clientName":projectInstance?.client?.name,
    				                'projectName':partyGroupInstance?.name,'startAt':GormUtil.convertInToUserTZ( projectInstance?.startDate, tzId ), 
    				                'completedAt':GormUtil.convertInToUserTZ( projectInstance?.completionDate, tzId ), 'bundleName':bundleInstance?.name, 
    				                'teamName':teamPartyGroup?.name +"-"+teamMembers, 'teamMembers':teamMembers,
    				                'location':"Target Team", 'rack':"TargetRack",'rackPos':"TargetRackPosition",
-   				                'truck':(asset.truck ? asset.truck : "")+"\n"+cartShelf,'room':asset.targetRoom,'PDU':asset.pduPort,'NIC':asset.nicPort, 
-   				                'kvmPort':kvmPort, 'hbaPort':hbaPort,'instructions':assetCommentString,'sourcetargetLoc':"t",
+   				                'truck':(asset.truck ? asset.truck : "")+"\n"+cartShelf,'room':asset.targetRoom,'PDU':'','NIC':'', 
+   				                'kvmPort':'', 'hbaPort':'','instructions':assetCommentString,'sourcetargetLoc':"t",
 								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
     		}
     		//No assets were found for selected MoveBundle,Team and Location
@@ -936,7 +933,7 @@ class MoveBundleAssetController {
        				// sort options for reportFields
        				def teamTagSort = (asset.sourceTeam ? asset.sourceTeam?.name : "") +" "+ (asset.assetTag ? asset.assetTag : "")
        				
-       				def roomTagSort = (asset.sourceRoom ? asset.sourceRoom : "") +" "+ (asset.sourceRack ? asset.sourceRack : "") +" "+ (asset.usize ? asset.usize : "")
+       				def roomTagSort = (asset.sourceRoom ? asset.sourceRoom : "") +" "+ (asset.sourceRack ? asset.sourceRack : "") +" "+ (asset?.model?.usize ? asset?.model?.usize : "")
        				
        				def truckTagSort = (asset.truck ? asset.truck : "") +" "+ (asset.cart ? asset.cart : "") +" "+ (asset.shelf ? asset.shelf : "")
        				
@@ -951,7 +948,7 @@ class MoveBundleAssetController {
        				                'teamMembers':teamMembers,'location':"Source Team", 'truck':asset.truck, 
        				                'room':asset.sourceRoom,'moveTeam':asset?.sourceTeam?.name, 'instructions':assetCommentString,
        				                'teamTagSort':teamTagSort, 'roomTagSort':roomTagSort,'truckTagSort':truckTagSort,
-       				                'assetTagSort': (asset.assetTag ? asset.assetTag : ""),'sourcetargetLoc':"s", 'usize':asset.usize,
+       				                'assetTagSort': (asset.assetTag ? asset.assetTag : ""),'sourcetargetLoc':"s", 'usize':asset?.model?.usize,
 									'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
        			}
        		}
@@ -1061,7 +1058,7 @@ class MoveBundleAssetController {
     	            assetEntityList.each{assetEntity ->
     	            	def overlapError = false
     	            	def rackPosition = assetEntity.rackPosition != 0 ? assetEntity.rackPosition : 1
-    	            	def rackSize = assetEntity.usize != 0 ? assetEntity.usize : 1
+    	            	def rackSize = assetEntity?.usize != 0 ? assetEntity?.usize : 1
 		            	def position = rackPosition + rackSize - 1
 		            	def newHigh = position
             			def newLow = rackPosition
@@ -1121,21 +1118,21 @@ class MoveBundleAssetController {
 		            			if(position > maxUSize) {
 			            			position = maxUSize
 			            			newLow = maxUSize
-			            			assetEntity.usize = 1
+			            			assetEntity?.usize = 1
 			            			overlapError = true
 			            		}
 		            			assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag, position:position, overlapError:overlapError, 
-		            			              rowspan:assetEntity.usize, currentHigh : position, currentLow : newLow]
+		            			              rowspan:assetEntity?.usize, currentHigh : position, currentLow : newLow]
 		            		}
 		            	}else{
 		            		if(position > maxUSize) {
 		            			position = maxUSize
 		            			newLow = maxUSize
-		            			assetEntity.usize = 1
+		            			assetEntity?.usize = 1
 		            			overlapError = true
 		            		}
 		            		assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag, position:position, overlapError:overlapError, 
-		            		              rowspan:assetEntity.usize, currentHigh : position, currentLow : newLow ]
+		            		              rowspan:assetEntity?.usize, currentHigh : position, currentLow : newLow ]
 		            	}
 		            }
 		            for (int i = maxUSize; i > 0; i--) {
@@ -1438,7 +1435,7 @@ class MoveBundleAssetController {
     		 		}
     		 		if(backView){
     		 			if(it.cssClass != "rack_error"){
-    		 				def cablingString = "${it.asset?.assetEntity?.pduPort ? 'PDU: '+ it.asset?.assetEntity?.pduPort +' | ' : '' }"+ 
+    		 				def cablingString = ""/*"${it.asset?.assetEntity?.pduPort ? 'PDU: '+ it.asset?.assetEntity?.pduPort +' | ' : '' }"+ 
     		 									"${it.asset?.assetEntity?.nicPort ? 'NIC: '+ it.asset?.assetEntity?.nicPort +' | ' : ''}"+
     		 									"${it.asset?.assetEntity?.kvmDevice && it.asset?.assetEntity?.kvmDevice != 'blank / blank'? 'KVM: '+ it.asset?.assetEntity?.kvmDevice +' | ' : ''}"+
     		 									"${it.asset?.assetEntity?.remoteMgmtPort ? 'RMgmt: '+ it.asset?.assetEntity?.remoteMgmtPort +' | ': ''}"+
@@ -1446,7 +1443,7 @@ class MoveBundleAssetController {
 							
 							if ( cablingString ) {
 								cablingString = cablingString.substring( 0, cablingString.length() - 2 )
-							}
+							}*/
 							if ( cablingString.length() > 90 ) {
 								row.append("<td rowspan='${rowspan}' style='font-size:6px;' class='${it.cssClass}'>${cablingString}</td>")
 							} else {

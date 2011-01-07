@@ -453,11 +453,6 @@ return
 		//---------------------------------
 		println "MODEL"
 		def refCodeList = [
-            [ "fiberCabinet", "LC", 0 ],
-            [ "fiberCabinet", "SC", 0 ],
-            [ "fiberCabinet", "ST", 0 ],
-            [ "kvmDevice", "V490", 0 ],
-            [ "kvmDevice", "Proliant", 0 ],
             [ "railType", "StorageWorks", 0 ],
             [ "railType", "Ultrium Tape", 0 ]
 		]
@@ -526,7 +521,6 @@ return
 				targetRack: it[5],
 				sourceRackPosition: it[6],
 				targetRackPosition: it[7],
-				usize: it[8],
 				attributeSet: it[9],
 				project: it[10],
 				assetType: it[11],

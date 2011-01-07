@@ -50,10 +50,12 @@ class CartTrackingController {
 		def onTruckId = stateEngineService.getStateIdAsInt(projectInstance.workflowCode,"OnTruck")
 		def holdId = stateEngineService.getStateIdAsInt(projectInstance.workflowCode,"Hold")
 		// query for list of carts and trucks
-    	def query = new StringBuffer("select ae.truck as truck , ae.cart as cart, count(ae.asset_entity_id) as totalAssets, "+
-    								"sum(ae.usize) as usize from asset_entity ae left join project_asset_map pm on "+
-    								"(pm.asset_id = ae.asset_entity_id ) where ae.project_id = ${projectInstance.id} "+
-    								"and ae.move_bundle_id = ${moveBundleInstance.id} and ae.asset_type != 'VM' group by ae.cart ")
+    	def query = new StringBuffer("""select ae.truck as truck , ae.cart as cart, count(ae.asset_entity_id) as totalAssets,
+    								sum(m.usize) as usize from asset_entity ae 
+									left join project_asset_map pm on (pm.asset_id = ae.asset_entity_id ) 
+    								left join model m on m.model_id = ae.model_id
+    								where ae.project_id = ${projectInstance.id}	and ae.move_bundle_id = ${moveBundleInstance.id} 
+    								and ae.asset_type != 'VM' group by ae.cart """)
     	def resultList = jdbcTemplate.queryForList( query.toString() )
     	// iterate the carts details for completed and pending assets
     	resultList.each{

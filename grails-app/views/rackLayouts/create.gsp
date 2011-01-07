@@ -260,7 +260,7 @@
 	<div id="cablingPanel" style="height: auto; ">
 		<g:if test="${currentBundle}">
 		<g:each in="${AssetEntity.findAll('FROM AssetEntity WHERE moveBundle.id = ? GROUP BY model',[Long.parseLong(currentBundle)]) }" var="assetEntity">
-			<g:if test="${assetEntity.model.rearImage && assetEntity.model.useImage == 1}">
+			<g:if test="${assetEntity?.model?.rearImage && assetEntity?.model?.useImage == 1}">
 			<img id="rearImage${assetEntity.model.id}" src="${createLink(controller:'model', action:'getRearImage', id:assetEntity.model.id)}" style="display: none;"/>
 			</g:if>
 		</g:each>

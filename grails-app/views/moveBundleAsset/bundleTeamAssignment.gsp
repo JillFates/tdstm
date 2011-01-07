@@ -548,7 +548,7 @@
 						                    	<td>${assetEntityInstance?.targetRack}</td>
 		                    					<td>${assetEntityInstance?.targetRackPosition}</td>
 		                    				</g:else>
-					                    	<td>${assetEntityInstance?.usize}</td>
+					                    	<td>${assetEntityInstance?.model?.usize}</td>
 											<g:if test="${rack == 'UnrackPlan'}">
 												<td id="${assetEntityInstance?.id}" onclick="makeSelect(this,${assetEntityInstance?.id})" >
 													<g:select style="display:none;" from= "${projectTeamInstance?.teamCode}" name="assetTeamAssign_${assetEntityInstance?.id}" value="${assetEntityInstance?.sourceTeam?.teamCode}" id="${assetEntityInstance?.id}" value="${assetEntityInstance?.sourceTeam?.teamCode}" noSelection="['null':'Unassigned']" onChange="assetToTeamAssign(this.value,'${assetEntityInstance?.id}');"/>

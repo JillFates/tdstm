@@ -18,23 +18,12 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String targetRoom
 	String targetRack
 	Integer targetRackPosition
-	String usize
 	String railType
-	String fiberCabinet
-	String fiberType
-	Integer fiberQuantity
-	String hbaPort
 	String ipAddress
 	String hinfo
-	String kvmDevice
-	String kvmPort
-	Integer hasKvm = 0
 	Integer hasRemoteMgmt =0
 	String newOrOld
 	String nicPort
-	String pduType
-	String pduPort
-	Integer pduQuantity
 	String remoteMgmtPort
 	String truck
 	String appOwner = ""
@@ -85,23 +74,12 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		targetRoom( blank:true, nullable:true )
 		targetRack( blank:true, nullable:true )
 		targetRackPosition( nullable:true )
-		usize( blank:true, nullable:true )
 		railType( blank:true, nullable:true )
-		fiberCabinet( blank:true, nullable:true )
-		fiberType( blank:true, nullable:true )
-		fiberQuantity( blank:true, nullable:true )
-		hbaPort( blank:true, nullable:true )
 		ipAddress( blank:true, nullable:true )
 		hinfo( blank:true, nullable:true )
-		kvmDevice( blank:true, nullable:true )
-		kvmPort( blank:true, nullable:true )
 		newOrOld( blank:true, nullable:true )
 		nicPort( blank:true, nullable:true )
-		pduType( blank:true, nullable:true )
-		pduQuantity( blank:true, nullable:true )
-		pduPort( blank:true, nullable:true )
 		remoteMgmtPort( blank:true, nullable:true )
-		hasKvm( blank:true, nullable:true )
 		hasRemoteMgmt( blank:true, nullable:true )
 		truck( blank:true, nullable:true )		
 		project( nullable:false )
@@ -144,7 +122,6 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		id column:'asset_entity_id'
 		moveBundle ignoreNotFound:true
 		columns {
-			hasKvm sqltype: 'tinyint(1)'
 			hasRemoteMgmt sqltype: 'tinyint(1)'
 		}
 	}

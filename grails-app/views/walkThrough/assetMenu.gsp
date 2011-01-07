@@ -141,15 +141,6 @@ function setMustSave( changed, actual, type, attribute ){
 			document.auditForm.hasRemoteMgmt.value=0
 		}
 	}
-	if(attribute=='kvmPort') {
-		if(document.auditForm.kvmPort.checked){
-			actual = 1
-			document.auditForm.hasKvm.value=1
-		}else {
-			actual = 0
-			document.auditForm.hasKvm.value=0
-		}
-	}
 	if( changed != actual ) {
 		mustSave = true;
 		getObject("mustSaveId").value = mustSave;
@@ -315,7 +306,6 @@ function checkComments(type) {
 		<input type="hidden" name="room" value="${room}">
 		<input type="hidden" name="rack" value="${rack}">
 		<input type="hidden" name="location" value="${location}">
-		<input type="hidden" name="hasKvm" value="${assetEntity.hasKvm}">
 		<input type="hidden" name="hasRemoteMgmt" value="${assetEntity.hasRemoteMgmt}">
 		<input type="hidden" name="generalComment" id="generalCommentId" value="Asset changed: ">
 		<input type="hidden" id="mustSaveId" name="mustSave" value=""/>
@@ -399,8 +389,6 @@ function checkComments(type) {
 				
 				 <g:select from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('assetType'))?.value}" noSelection="['':'Undef']" id="kvmDeviceId" name="assetType" value="${assetEntity?.assetType}" 
 						onchange="setMustSave(this.value,'${assetEntity?.assetType}','front1', this.name);"/>
-					<!--<input type="text" value="${assetEntity?.kvmDevice}" id="kvmDeviceId" name="kvmDevice" 
-								onchange="setMustSave(this.value,'${assetEntity?.kvmDevice}','front1', this.name);"> -->
 			</tr>
 			
 			<tr>
@@ -484,45 +472,35 @@ function checkComments(type) {
 			</tr>
 			
 			<tr>
-				<td class="label">U-Size:</td>
-				<td class="field">
-				<g:select name="usize" from="${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,'Undef']}"   
-							id="usizeId" value="${assetEntity?.usize}" onchange="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)"/>
-				<img src="${createLinkTo(dir:'images',file:'plus.gif')}" height="18" onclick="moveOption('usize','${assetEntity?.usize}','front2','up')"/>
-				<img src="${createLinkTo(dir:'images',file:'minus.gif')}" height="18" onclick="moveOption('usize','${assetEntity?.usize}','front2','down')"/>
-				</td>
-			</tr>
-			
-			<tr>
 				<td class="label">Need Asset Tag?</td>
 				<td class="field">
-					<input type="radio" name="needAssetTag" id="needAssetTagYes" value="Y" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)"><label for="needAssetTagYes">Yes</label>
+					<input type="radio" name="needAssetTag" id="needAssetTagYes" value="Y" onclick="setMustSave(this.value,'${assetEntity?.model?.usize}','front2', this.name)"><label for="needAssetTagYes">Yes</label>
 					&nbsp;&nbsp;
-					<input type="radio" name="needAssetTag" id="needAssetTagNo" value="N" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" checked><label for="needAssetTagNo">No</label>
+					<input type="radio" name="needAssetTag" id="needAssetTagNo" value="N" onclick="setMustSave(this.value,'${assetEntity?.model?.usize}','front2', this.name)" checked><label for="needAssetTagNo">No</label>
 				</td>
 			</tr>
 			<tr>
 				<td class="label">Has Amber Lights?</td>
 				<td class="field">
-					<input type="radio" name="hasAmber" id="hasAmberYes" value="Y" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" ><label for="hasAmberYes">Yes</label>
+					<input type="radio" name="hasAmber" id="hasAmberYes" value="Y" onclick="setMustSave(this.value,'${assetEntity?.model?.usize}','front2', this.name)" ><label for="hasAmberYes">Yes</label>
 					&nbsp;&nbsp;
-					<input type="radio" name="hasAmber" id="hasAmberNo" value="N" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" checked><label for="hasAmberNo">No</label>
+					<input type="radio" name="hasAmber" id="hasAmberNo" value="N" onclick="setMustSave(this.value,'${assetEntity?.model?.usize}','front2', this.name)" checked><label for="hasAmberNo">No</label>
 				</td>
 			</tr>
 			<tr>
 				<td class="label">Stuff Stacked On Top?</td>
 				<td class="field">
-					<input type="radio" name="stuffOnTop" id="stuffOnTopYes" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" value="Y"><label for="stuffOnTopYes">Yes</label>
+					<input type="radio" name="stuffOnTop" id="stuffOnTopYes" onclick="setMustSave(this.value,'${assetEntity?.model?.usize}','front2', this.name)" value="Y"><label for="stuffOnTopYes">Yes</label>
 					&nbsp;&nbsp;
-					<input type="radio" name="stuffOnTop" id="stuffOnTopNo" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" value="N" checked><label for="stuffOnTopNo">No</label>
+					<input type="radio" name="stuffOnTop" id="stuffOnTopNo" onclick="setMustSave(this.value,'${assetEntity?.model?.usize}','front2', this.name)" value="N" checked><label for="stuffOnTopNo">No</label>
 				</td>
 			</tr>
 			<tr>
 				<td class="label">Is Powered OFF?</td>
 				<td class="field">
-					<input type="radio" name="poweredOff" id="poweredOffYes" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" value="Y" ><label for="poweredOffYes">Yes</label>
+					<input type="radio" name="poweredOff" id="poweredOffYes" onclick="setMustSave(this.value,'${assetEntity?.model?.usize}','front2', this.name)" value="Y" ><label for="poweredOffYes">Yes</label>
 					&nbsp;&nbsp;
-					<input type="radio" name="poweredOff" id="poweredOffNo" onclick="setMustSave(this.value,'${assetEntity?.usize}','front2', this.name)" value="N" checked><label for="poweredOffNo">No</label>
+					<input type="radio" name="poweredOff" id="poweredOffNo" onclick="setMustSave(this.value,'${assetEntity?.model?.usize}','front2', this.name)" value="N" checked><label for="poweredOffNo">No</label>
 				</td>
 			</tr>
 			</table>
@@ -557,53 +535,8 @@ function checkComments(type) {
 			<td class="label">Asset Tag:</td>
 			<td class="field">${assetEntity?.assetTag}</td>
 		</tr>
-		<tr>
-			<td class="label">PDU Qty/Type:</td>
-			<td class="field">
-			<g:select name="pduQuantity" noSelection="['':'Undef']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('pduQuantity'))?.value}" value="${assetEntity?.pduQuantity}"
-				onchange="setMustSave(this.value,'${assetEntity?.pduQuantity}','rear', this.name)"/>
-			&nbsp;&nbsp;
-				 <g:select  noSelection="['':'Undef']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('pduType'))?.value}" id="pduType" name="pduType" value="${assetEntity?.pduType}" 
-				onchange="setMustSave(this.value,'${assetEntity?.pduType}','rear', this.name)" />
-				<!--  <input type="text" id="powerType" name="powerType" value="${assetEntity?.powerType}" onchange="setMustSave(this.value,'${assetEntity?.powerType}','rear', this.name)" ></input> -->
-				
-			</td>
-		</tr>
-		
-		<tr>
-			<td class="label">NIC Qty:</td>
-			<td class="field">
-			<g:select name="nicPort" from="${[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,24,32,40,48,56,64,72,80,88,96]}" value="${assetEntity?.nicPort}"
-						id="nicPortId" onchange="setMustSave(this.value,'${assetEntity?.nicPort}','rear', this.name)"/>
-		     	<img src="${createLinkTo(dir:'images',file:'plus.gif')}" height="18" onclick="moveOption('nicPort','${assetEntity?.nicPort}','rear','up')"/>
-			 	<img src="${createLinkTo(dir:'images',file:'minus.gif')}" height="18" onclick="moveOption('nicPort','${assetEntity?.nicPort}','rear','down')"/>
-			</td>
-		</tr>
-		
-		<tr>
-			<td class="label">Fiber Qty/Type:</td>
-			<td class="field">
-				<g:select name="fiberQuantity" noSelection="['':'Undef']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('fiberQuantity'))?.value}" value="${assetEntity?.fiberQuantity}"
-						onchange="setMustSave(this.value,'${assetEntity?.fiberQuantity}','rear', this.name)"/>
-		        &nbsp;&nbsp;
-			<g:select noSelection="['':'Undef']" from="${com.tdssrc.eav.EavAttributeOption.findAllByAttribute(com.tdssrc.eav.EavAttribute.findByAttributeCode('fiberType'))?.value}" id="fiberType" name="fiberType" value="${assetEntity?.fiberType}" 
-				onchange="setMustSave(this.value,'${assetEntity?.fiberType}','rear', this.name)"/>
-					<!--  <input type="text" id="fiberCabinet" name="fiberCabinet" value="${assetEntity?.fiberCabinet}" onchange="setMustSave(this.value,'${assetEntity?.fiberCabinet}','rear', this.name)" ></input>-->
-			</td>
-		</tr>
 		</table>
 		<table>
-		<tr>
-		        <td class="label"><label for=attachedKVM>Attached to KVM:</label></td>
-		        <td class="field">
-		        <g:if test="${assetEntity?.hasKvm }">
-						<input type="checkbox" name="kvmPort" id="attachedKVM" onclick="setMustSave(this.value,'${assetEntity?.hasKvm}','rear', this.name)" checked="checked">
-				</g:if>
-				<g:else>
-						<input type="checkbox" name="kvmPort" onclick="setMustSave(this.value,'${assetEntity?.hasKvm}','rear', this.name)" id="attachedKVM">
-				</g:else>
-		        </td>
-		</tr>
 		<tr>
 		        <td class="label"><label for="hasILO">Has Remote Mgmt:</label></td>
 		        <td class="field">
@@ -618,9 +551,9 @@ function checkComments(type) {
 		<tr>
 		        <td class="label">Has Obstruction?</td>
 		        <td class="field">
-		                <input type="radio" name="hasObstruction" id="hasObstructionYes" onclick="setMustSave(this.value,'${assetEntity?.pduPort}','rear', this.name)" value="Y"><label for="hasObstructionYes">Yes</label>
+		                <input type="radio" name="hasObstruction" id="hasObstructionYes" onclick="setMustSave(this.value,'0','rear', this.name)" value="Y"><label for="hasObstructionYes">Yes</label>
 		                &nbsp;&nbsp;
-		                <input type="radio" name="hasObstruction" id="hasObstructionNo" value="N" onclick="setMustSave(this.value,'${assetEntity?.pduPort}','rear', this.name)" checked><label for="hasObstructionNo">No</label>
+		                <input type="radio" name="hasObstruction" id="hasObstructionNo" value="N" onclick="setMustSave(this.value,'1','rear', this.name)" checked><label for="hasObstructionNo">No</label>
 		        </td>
 		</tr>
 		</table>      
