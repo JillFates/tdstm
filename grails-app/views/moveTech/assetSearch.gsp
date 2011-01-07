@@ -176,8 +176,7 @@
 		<a name="comments"></a>
 		<table width="100%">
 			<tr>
-				<td class="heading"><a class="heading" href="#comments">Comments/Hold</a></td>
-				<td><span style="float:right;"><a href="#top">Top</a></span></td>
+				<td class="heading" colspan=2><a class="heading" href="#comments">Comments/Hold</a></td>
 			</tr>
 			<tr>
 			<td colspan=2>
