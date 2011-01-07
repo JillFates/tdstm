@@ -186,11 +186,11 @@
 			<tr><td colspan=2>
 			<textarea rows="2" cols="100" style="width:188px;padding:0px;" title="Enter Note..." id="enterNote" name="enterNote" onkeydown="textCounter($('#enterNote'), 255)" onkeyup="textCounter($('#enterNote'), 255)"></textarea>
 			</td></tr>		
-			<tr><td class="button_style" colspan=2 style="text-align:center;">
-				<input type="button" value="Add Comment" onclick="return doTransition('comment');" class="action_button"/>
-			</td></tr>
-			<tr><td class="button_style" colspan=2 style="text-align:center;">
-				<input type="button" value="Place on HOLD" onclick="return doTransition('hold');" class="action_button_hold" />
+			<tr><td class="button_style" colspan=1 style="text-align:center;">
+				<input type="button" value="Comment" onclick="return doTransition('comment');" class="action_button_small"/>
+			</td>
+			<td class="button_style" colspan=1 style="text-align:center;">
+				<input type="button" value="Put on HOLD" onclick="return doTransition('hold');" class="action_button_hold" />
 				</td>
 			</tr>	
 		</table>
