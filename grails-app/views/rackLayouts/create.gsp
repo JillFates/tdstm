@@ -336,7 +336,7 @@
 		var model = assetCablingDetails[0].model
 		var hasImageExist = assetCablingDetails[0].hasImageExist
 		if(!hasImageExist){
-			$("#cablingPanel").css("height",assetCablingDetails[0].usize*50+2)
+			$("#cablingPanel").css("height",assetCablingDetails[0].usize*30+2)
 		} else {
 			$("#rearImage"+model).show()
 		}

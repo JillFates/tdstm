@@ -146,7 +146,7 @@ var image = "${modelInstance.rearImage}"
 var usize = "${modelInstance.usize}"
 var useImage = "${modelInstance.useImage}" 
 if(!image || useImage != '1'){
-	$("#cablingPanel").css("height",usize*50)
+	$("#cablingPanel").css("height",usize*30)
 }
 </script>
 </div>
