@@ -240,7 +240,7 @@
 		</div>
 	</g:form>
 	</div>
-	<div style="height: auto: width:220px; overflow: auto;">
+	<div class="cabling_div">
 		<div id="cablingPanel" style="height: auto;">
 		<g:if test="${projMap?.asset?.model?.rearImage && projMap?.asset?.model?.useImage == 1}">
 			<img src="${createLink(controller:'model', action:'getRearImage', id:projMap?.asset?.model?.id)}" />
@@ -255,6 +255,32 @@
 				</div>
 			</div>
 		</g:each>
+		</div>
+		<div class="list" style="margin-bottom: 10px;margin-right: 5px;">
+		<table>
+			<thead>
+				<tr>
+					<th>Connector</th>
+					<th>Type</th>
+					<th>Label</th>
+					<th>Label Position</th>
+					<th>Conn Pos X</th>
+					<th>Conn Pos Y</th>
+				</tr>
+			</thead>
+			<tbody id="connectorModelBody">
+			<g:each in="${modelConnectors}" status="i" var="modelConnector">
+				<tr id="connectorTr${i}"  class="${(i % 2) == 0 ? 'odd' : 'even'}">
+					<td>${modelConnector.connector}</td>
+					<td>${modelConnector.type}</td>
+					<td>${modelConnector.label}</td>
+					<td>${modelConnector.labelPosition}</td>
+					<td>${modelConnector.connectorPosX}</td>
+					<td>${modelConnector.connectorPosY}</td>
+				</tr>
+			</g:each>
+			</tbody>
+		</table>
 		</div>
 	</div>
 	</div>
