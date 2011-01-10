@@ -75,7 +75,7 @@ a:hover {
 		</td>
 		<td>
 			<div>
-			<h1 style="margin-right: 0px;"><b>Recent Events</b></h1>
+			<h1 style="margin-right: 0px;"><b>Current and Recent Events</b></h1>
 			<table>
 				<thead>
 					<thead>
