@@ -132,15 +132,7 @@ function validateCommentSelect() {
 }
 var mustSave = false;
 function setMustSave( changed, actual, type, attribute ){
-	if(attribute=='remoteMgmtPort') {
-		if(document.auditForm.remoteMgmtPort.checked){
-			actual = 1
-			document.auditForm.hasRemoteMgmt.value=1
-		}else {
-			actual = 0
-			document.auditForm.hasRemoteMgmt.value=0
-		}
-	}
+	
 	if( changed != actual ) {
 		mustSave = true;
 		getObject("mustSaveId").value = mustSave;
@@ -537,17 +529,6 @@ function checkComments(type) {
 		</tr>
 		</table>
 		<table>
-		<tr>
-		        <td class="label"><label for="hasILO">Has Remote Mgmt:</label></td>
-		        <td class="field">
-		        <g:if test="${assetEntity?.hasRemoteMgmt}">
-					<input type="checkbox" name="remoteMgmtPort" id="hasILO" onclick="setMustSave(this.value,'${assetEntity?.hasRemoteMgmt}','rear', this.name)" checked="checked">
-				</g:if>
-				<g:else>
-					<input type="checkbox" name="remoteMgmtPort" onclick="setMustSave(this.value,'${assetEntity?.hasRemoteMgmt}','rear', this.name)" id="hasILO">
-				</g:else>
-		        </td>
-		</tr>
 		<tr>
 		        <td class="label">Has Obstruction?</td>
 		        <td class="field">

@@ -230,7 +230,6 @@
 			   		<dt>Cart/Shelf:</dt><dd>&nbsp;${projMap?.asset?.cart}/${projMap?.asset?.shelf}</dd>
 			   		<dt>New or Old:</dt><dd>&nbsp;${projMap?.asset?.newOrOld}</dd>
 					<dt>Rail Type:</dt><dd>&nbsp;${projMap?.asset?.railType}</dd>  			   	
-			   		<dt>Remote Mgmt Port:</dt><dd>&nbsp;${projMap?.asset?.remoteMgmtPort}</dd>
 				</g:else>
 				<dt>Current State:</dt><dd>&nbsp;${stateLabel}</dd>
 				</dl>

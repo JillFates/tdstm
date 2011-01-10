@@ -147,8 +147,12 @@ class MoveTechController {
 	                    		projectTeamInstance = ProjectTeam.findById( barcodeText.get(2) )
 	                    		if ( projectTeamInstance ){
 	                                //Validating is Logindate between startdate and completedate
-	                                if ( nowDate < projectInstance.startDate	|| nowDate > projectInstance.completionDate ) {
+									if ( nowDate < moveBundleInstance.startTime || nowDate > moveBundleInstance.completionTime ) {
 	                                    flash.message = message( code :"Move bundle presently inactive" )
+	                                    redirect( action: 'login' )
+	                                    return;
+	                                } else if ( nowDate < projectInstance.startDate || nowDate > projectInstance.completionDate ) {
+	                                    flash.message = message( code :"Move bundle Project presently inactive" )
 	                                    redirect( action: 'login' )
 	                                    return;
 	                                } else {
@@ -198,8 +202,12 @@ class MoveTechController {
 	                    		projectTeamInstance = ProjectTeam.findById ( barcodeText.get(2) )
 	                    		if ( projectTeamInstance != null && projectTeamInstance.teamCode == "Logistics" ) {
 	                                //Validating is Logindate between startdate and completedate
-	                                if ( nowDate < projectInstance.startDate || nowDate > projectInstance.completionDate ) {
-	                                    flash.message = message ( code : "Move bundle presently inactive" )
+	                                if ( nowDate < moveBundleInstance.startTime || nowDate > moveBundleInstance.completionTime ) {
+	                                    flash.message = message( code :"Move bundle presently inactive" )
+	                                    redirect( action: 'login' )
+	                                    return;
+	                                } else if ( nowDate < projectInstance.startDate || nowDate > projectInstance.completionDate ) {
+	                                    flash.message = message ( code : "Move bundle Project presently inactive" )
 	                                    redirect ( action: 'login' )
 	                                    return;
 	                                } else {
@@ -642,7 +650,9 @@ class MoveTechController {
                         	}
                         	assetComment = AssetComment.findAllByAssetEntity( assetItem )
                         	def stateLabel = stateEngineService.getStateLabel( moveBundleInstance.project.workflowCode, transitionStates[0].stateTo )
-							def modelConnectors = ModelConnector.findAllByModel( assetItem.model )
+							def modelConnectors
+							if(assetItem.model)
+								modelConnectors = ModelConnector.findAllByModel( assetItem.model )
                         	render ( view:'assetSearch',
                                 model:[ projMap:projMap, assetComment:assetComment?assetComment :"", stateVal:stateVal, bundle:params.bundle, 
                                 		team:params.team, project:params.project, location:params.location, search:params.search, label:label,

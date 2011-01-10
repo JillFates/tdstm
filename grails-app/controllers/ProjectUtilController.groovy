@@ -257,7 +257,6 @@ class ProjectUtilController {
 					hinfo: asset.hinfo,
 					hasRemoteMgmt: asset.hasRemoteMgmt,
 					newOrOld: asset.newOrOld,
-					remoteMgmtPort: asset.remoteMgmtPort,
 					truck: asset.truck,
 					appOwner: asset.appOwner,
 					appSme: asset.appSme,
