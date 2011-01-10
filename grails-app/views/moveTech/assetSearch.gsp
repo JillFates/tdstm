@@ -7,7 +7,7 @@
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-<meta name="viewport" content="width = 220,initial-scale = 1.0" />
+<meta name="viewport" content="height=device-height,width=220" />
 	
 <script type="text/javascript">
         window.addEventListener('load', function(){
