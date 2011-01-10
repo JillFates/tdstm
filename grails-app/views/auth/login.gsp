@@ -46,7 +46,7 @@
 				<tbody>
 					<tr>
 						<td>Username:</td>
-						<td><input type="text" name="username" id="usernameId" value="${username}" /></td>
+						<td><input type="text" name="username" id="usernameId" value="${username}" autocorrect="off" autocapitalize="off" /></td>
 					</tr>
 					<tr>
 						<td>Password:</td>
