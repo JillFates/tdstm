@@ -14,7 +14,7 @@ class MoveTechController {
     def stateEngineService
     def workflowService
     def jdbcTemplate
-    
+    def static final statusDetails = ["missing":"Unknown", "cabledDetails":"Cabled with Details","empty":"Empty","cabled":"Cabled"]
     /*------------------------------------------------------------
      * Index action to enter to home if the session is not expired
      * @param  : String user, String team, String location
@@ -653,10 +653,23 @@ class MoveTechController {
 							def modelConnectors
 							if(assetItem.model)
 								modelConnectors = ModelConnector.findAllByModel( assetItem.model )
+								
+							def assetCableMapList = AssetCableMap.findAllByFromAsset( assetItem )
+							def assetCablingDetails = []
+							assetCableMapList.each {
+								assetCablingDetails << [connector : it.fromConnectorNumber.connector, type:it.fromConnectorNumber.type,
+														labelPosition:it.fromConnectorNumber.labelPosition, label:it.fromConnectorNumber.label, 
+														status:it.status,displayStatus:statusDetails[it.status], 
+														connectorPosX:it.fromConnectorNumber.connectorPosX, connectorPosY:it.fromConnectorNumber.connectorPosY,
+														hasImageExist:assetItem.model.rearImage && assetItem.model?.useImage ? true : false,
+														rackUposition : it.toConnectorNumber ? it.toAssetRack+"/"+it.toAssetUposition+"/"+it.toConnectorNumber.connector : "" 
+														]
+							}	
+								
                         	render ( view:'assetSearch',
                                 model:[ projMap:projMap, assetComment:assetComment?assetComment :"", stateVal:stateVal, bundle:params.bundle, 
                                 		team:params.team, project:params.project, location:params.location, search:params.search, label:label,
-                                		actionLabel:actionLabel, commentsList: commentsList, stateLabel: stateLabel, modelConnectors : modelConnectors
+                                		actionLabel:actionLabel, commentsList: commentsList, stateLabel: stateLabel, assetCablingDetails : assetCablingDetails
                                 		])
                         }
                     //}

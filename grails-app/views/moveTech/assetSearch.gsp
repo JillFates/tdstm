@@ -244,13 +244,13 @@
 		<g:if test="${projMap?.asset?.model?.rearImage && projMap?.asset?.model?.useImage == 1}">
 			<img src="${createLink(controller:'model', action:'getRearImage', id:projMap?.asset?.model?.id)}" />
 		</g:if>
-		<g:each in="${modelConnectors}" status="i" var="modelConnector">
-			<div id="connector${i}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px ">
+		<g:each in="${assetCablingDetails}" status="i" var="assetCable">
+			<div id="connector${i}" style="top:${assetCable.connectorPosY / 2}px ;left:${assetCable.connectorPosX}px ">
 				<div>
-					<img src="../i/cabling/${modelConnector.status}.png"/>
+					<img src="../i/cabling/${assetCable.status}.png"/>
 				</div>
-				<div class="${modelConnector.labelPosition == 'Right' ? 'connector_right' : 'connector_bottom'}">
-					<span>${modelConnector.label}</span>
+				<div class="${assetCable.labelPosition == 'Right' ? 'connector_right' : 'connector_bottom'}">
+					<span>${assetCable.label}</span>
 				</div>
 			</div>
 		</g:each>
@@ -262,20 +262,18 @@
 					<th>Connector</th>
 					<th>Type</th>
 					<th>Label</th>
-					<th>Label Position</th>
-					<th>Conn Pos X</th>
-					<th>Conn Pos Y</th>
+					<th>Status</th>
+					<th>Rack/Upos/Conn</th>
 				</tr>
 			</thead>
 			<tbody id="connectorModelBody">
-			<g:each in="${modelConnectors}" status="i" var="modelConnector">
+			<g:each in="${assetCablingDetails}" status="i" var="assetCable">
 				<tr id="connectorTr${i}"  class="${(i % 2) == 0 ? 'odd' : 'even'}">
-					<td>${modelConnector.connector}</td>
-					<td>${modelConnector.type}</td>
-					<td>${modelConnector.label}</td>
-					<td>${modelConnector.labelPosition}</td>
-					<td>${modelConnector.connectorPosX}</td>
-					<td>${modelConnector.connectorPosY}</td>
+					<td>${assetCable.connector}</td>
+					<td>${assetCable.type}</td>
+					<td>${assetCable.label}</td>
+					<td>${assetCable.displayStatus}</td>
+					<td>${assetCable.rackUposition}</td>
 				</tr>
 			</g:each>
 			</tbody>
