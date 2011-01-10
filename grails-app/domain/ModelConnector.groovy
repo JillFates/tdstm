@@ -27,6 +27,6 @@ class ModelConnector {
 	}
 	
 	String toString(){
-		"${model.modelName} : ${connector}"
+		"${model?.modelName} : ${connector}"
 	}
 }
