@@ -50,6 +50,7 @@
 	       			document.assetSearchForm.action = "addComment";
 	       			document.assetSearchForm.submit();
 	       		}else {
+	       			document.assetSearchForm.action = "placeHold";
 	       			document.assetSearchForm.submit();
 	       		}
 	       }else {
@@ -64,7 +65,7 @@
 	       		return false;
 	       }
        }
-      
+              
        function doCheckValidation(){
 	   var j = 0;
        var boxes = document.getElementsByTagName('input'); 
@@ -120,12 +121,11 @@
 			<td><a href="#" class="asset_search_select">Asset</a></td>
 		</tr></table>
 
-		<g:form name="assetSearchForm" action="placeHold">
+		<g:form name="assetSearchForm" action="assetSearch">
 			<input name="bundle" type="hidden" value="${bundle}" />
 			<input name="team" type="hidden" value="${team}" />
 			<input name="location" type="hidden" value="${location}" />
 			<input name="project" type="hidden" value="${project}" />
-			<input name="search" type="hidden" value="${search}"  />
 			<input name="label" type="hidden" value="${label}"  />
 			<input name="actionLabel" type="hidden" value="${actionLabel}"  />
 			<input name="user" type="hidden" value="mt"  />
@@ -141,7 +141,8 @@
 
 		<g:if test="${projMap}">			
 		<table style="border:0px; width=220">
-			<tr><td><dt>Asset Tag:</dt><dd><a href="#detail">&nbsp;${projMap?.asset?.assetTag}&nbsp;&nbsp;&nbsp;(Details)</a></dd></td></tr>
+			<tr><td><dt>Asset Tag:&nbsp;<input name="search" type="text" size="08" value="${search}" id="search" autocorrect="off" autocapitalize="off"  /></dt><dd><a href="#detail">&nbsp;${projMap?.asset?.assetTag}&nbsp;&nbsp;&nbsp;(Details)</a></dd></td>
+			</tr>
 	
  			<g:if test="${assetComment}">
 			<tr><td><table style="border:0px; width=100%">

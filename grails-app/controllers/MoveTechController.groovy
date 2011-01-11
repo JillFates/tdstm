@@ -376,6 +376,7 @@ class MoveTechController {
 		if ( params.fMess ) {
 			flash.clear()
 		}
+		String message = flash.message
 		def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
 		if( principal ) {
             def bundleId = params.bundle
@@ -464,6 +465,9 @@ class MoveTechController {
                 todoSize = jdbcTemplate.queryForList ( countQuery ).size()
                 
             }
+            if(!flash.message){
+            	flash.message = message
+            }
             return[ bundle:bundleId, team:team, project:params.project, location:params.location, 
                     assetList:assetList, allSize:allSize, todoSize:todoSize, 'tab':tab
                     ]
@@ -480,6 +484,9 @@ class MoveTechController {
      * @return Array of arguments   
      *------------------------------------------------------------------------------*/
 	def assetSearch = {
+    	if(flash.message?.contains("was not located")){
+    		flash.clear()
+    	}
 		def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
 		if ( principal ) {
             def assetItem
