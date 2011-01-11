@@ -339,6 +339,7 @@
 			$("#cablingPanel").css("height",assetCablingDetails[0].usize*30+2)
 		} else {
 			$("#rearImage"+model).show()
+			$("#cablingPanel").css("background-color","#FFF")
 		}
 		var details = ""
 		var tbodyDetails = ""

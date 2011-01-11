@@ -73,6 +73,15 @@
         </td>
         </tr>
         <tr>
+        	<td>Use Image:</td>
+	        <td>
+	        	<input type="checkbox" name="useImage" id="useImageId"/>
+	        	<g:hasErrors bean="${modelInstance}" field="useImage">
+					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="useImage" /></div>
+				</g:hasErrors>
+	        </td>
+        </tr>
+        <tr>
 			<td valign="top" class="name">Notes:</td>
 			<td><input type="text" name="description" id="descriptionId" value="${modelInstance.description}" > </td>
 		</tr>

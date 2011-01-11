@@ -85,7 +85,7 @@
 						<input name="id" value="${modelInstance.id}" type="hidden"/>
 						<span class="button">
 							<g:actionSubmit class="edit" action="edit" value="Edit"></g:actionSubmit>
-							<g:actionSubmit class="delete" action="delete" value="Delete"></g:actionSubmit>
+							<g:actionSubmit class="delete" action="delete" value="Delete" onclick="return validateModelDependency(${modelInstance.id})"></g:actionSubmit>
 						</span>
 					</g:form>
 				</div>
@@ -99,7 +99,16 @@
 		<div id="cablingPanel" style="height: auto; ">
 			<g:if test="${modelInstance.rearImage && modelInstance.useImage == 1}">
 			<img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}" />
+			<script type="text/javascript">
+					$("#cablingPanel").css("background-color","#FFF")
+				</script>
 			</g:if>
+			<g:else>
+				<script type="text/javascript">
+					var usize = "${modelInstance.usize}"
+					$("#cablingPanel").css("height",usize*30)
+				</script>
+			</g:else>
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
 				<div id="connector${i}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px ">
 					<div>
@@ -142,11 +151,21 @@
 </div>
 </fieldset>
 <script type="text/javascript">
-var image = "${modelInstance.rearImage}"
-var usize = "${modelInstance.usize}"
-var useImage = "${modelInstance.useImage}" 
-if(!image || useImage != '1'){
-	$("#cablingPanel").css("height",usize*30)
+function validateModelDependency( modelId ){
+	var returnValue = true
+	jQuery.ajax({
+		url: "../checkModelDependency",
+		data: "modelId="+modelId,
+		type:'POST',
+		async:false,
+		success: function(data) {
+			if(data != 'false'){
+				if( !confirm("Asset cabling data will be impacted, Do you want to proceed..") )
+					returnValue = false
+			}
+		}
+	});
+	return returnValue
 }
 </script>
 </div>

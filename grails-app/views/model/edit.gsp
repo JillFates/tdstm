@@ -79,7 +79,7 @@
         </tr>
         <tr>
 			<td>Notes:</td>
-			<td><input type="text" name="description" id="descriptionId"> </td>
+			<td><input type="text" name="description" id="descriptionId" value="${modelInstance.description}"> </td>
 		</tr>
 		<tr>
 			<td colspan="2">
@@ -175,6 +175,7 @@
 		initializeConnectors( usize )
 	} else {
 		initializeConnectors( 2 )
+		$("#cablingPanel").css("background-color","#FFF")
 	}
 	
 

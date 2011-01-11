@@ -26,6 +26,8 @@
                             <g:sortableColumn property="assetType" title="${message(code: 'model.assetType.label', default: 'Asset Type')}" />
                         
                             <g:sortableColumn property="powerUse" title="${message(code: 'model.powerUse.label', default: 'powerUse')}" />
+                            
+                            <th>No Of Connectors </th>
                         
                         </tr>
                     </thead>
@@ -41,8 +43,9 @@
                         
                             <td>${fieldValue(bean: modelInstance, field: "assetType")}</td>
                         
-                            <td>${fieldValue(bean: modelInstance, field: "powerUse")}W</td>
-                        
+                            <td>${modelInstance?.powerUse ? modelInstance?.powerUse+'W' : ''}</td>
+                            
+                        	<td>${ModelConnector.countByModel(modelInstance)}</td>
                         </tr>
                     </g:each>
                     </tbody>

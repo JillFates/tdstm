@@ -22,6 +22,7 @@ class ModelController {
     }
 
     def save = {
+    	params.useImage = params.useImage == 'on' ? 1 : 0
         def modelInstance = new Model(params)
 		def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
 		def frontImage = request.getFile('frontImage')
@@ -262,5 +263,19 @@ class ModelController {
 	def getModelsListAsJSON = {
     	def models = Model.list()
 		render models as JSON
+    }
+    /*
+     *  check to see that if they were any Asset records exist for the selected model before deleting it
+     */
+    def checkModelDependency = {
+    	def modelId = params.modelId
+		def modelInstance = Model.findById(Integer.parseInt(modelId))
+		def returnValue = false
+		if( modelInstance ){
+			println"--->"+AssetEntity.findByModel( modelInstance )
+			if( AssetEntity.findByModel( modelInstance ) )
+				returnValue = true
+		}
+    	render returnValue
     }
 }

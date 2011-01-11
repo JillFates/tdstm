@@ -297,6 +297,8 @@
 	var useImage = "${projMap?.asset?.model?.useImage}" 
 	if(!image || useImage != '1'){
 		document.getElementById("cablingPanel").style.height = usize*30+"px";
+	} else {
+		$("#cablingPanel").css("background-color","#FFF")
 	}
 	</script>
 </body>
