@@ -172,9 +172,9 @@
 	var usize = "${modelInstance.usize}"
 	var useImage = "${modelInstance.useImage}" 
 	if(!image || useImage != '1'){
-		initializeConnectors( usize )
+		initializeConnectors( usize, null )
 	} else {
-		initializeConnectors( 2 )
+		initializeConnectors( 3, 'auto' )
 		$("#cablingPanel").css("background-color","#FFF")
 	}
 	
@@ -222,14 +222,14 @@
 	function showImage( value ){
 		if($("#"+value).is(":checked")){
 			if(image ){
-				initializeConnectors( 2 )
+				initializeConnectors( 2, 'auto' )
 				$("#rearImage").show()
 			} else {
 				alert("Rear image does not exist")
 			}
 		} else {
 			$("#rearImage").hide()
-			initializeConnectors( usize )
+			initializeConnectors( usize, null )
 		}
 	}
 </script>

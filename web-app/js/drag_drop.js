@@ -110,9 +110,9 @@ var Drag = {
 		return e;
 	}
 };
-function initializeConnectors( usize ){
-	var valueY = usize*50 - 19
-	$("#cablingPanel").css("height",usize*50)
+function initializeConnectors( usize, type ){
+	var valueY = usize*30 - 19
+	$("#cablingPanel").css("height",type == 'auto' ? 'auto' : usize*30)
 	var connector1 = document.getElementById("connector1");
 	Drag.init(connector1, null, 0, 360, 0, valueY);
 	connector1.onDrag = function(x, y) {

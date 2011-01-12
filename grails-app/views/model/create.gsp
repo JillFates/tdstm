@@ -19,7 +19,9 @@
 <table>
 	<tbody>
 		<tr>
-			<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+			<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> 
+			<input name="modelId" type="hidden" value="${modelTemplate?.id}">
+			</td>
 		</tr>
 		<tr>
 			<td valign="top" class="name"><b>Manufacturer:<span style="color: red">*</span></b></td>
@@ -75,10 +77,12 @@
         <tr>
         	<td>Use Image:</td>
 	        <td>
-	        	<input type="checkbox" name="useImage" id="useImageId"/>
-	        	<g:hasErrors bean="${modelInstance}" field="useImage">
-					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="useImage" /></div>
-				</g:hasErrors>
+	        	<g:if test="${modelTemplate.useImage}">
+	       			<input type="checkbox" name="useImage" id="useImageId"  checked="checked" onclick="showImage(this.id)"/>
+		        </g:if>
+		        <g:else>
+		        	<input type="checkbox" name="useImage" id="useImageId" onclick="showImage(this.id)"/>
+		        </g:else>
 	        </td>
         </tr>
         <tr>
@@ -88,10 +92,10 @@
 		<tr>
 			<td colspan="2">
 				<div class="buttons" style="margin-left: 10px;margin-right: 10px;"> 
-						<span class="button">
-							<g:actionSubmit class="save" action="save" value="Save"></g:actionSubmit>
-							<g:actionSubmit class="delete" action="list" value="Cancel"></g:actionSubmit>
-						</span>
+					<span class="button">
+						<g:actionSubmit class="save" action="save" value="Save"></g:actionSubmit>
+						<g:actionSubmit class="delete" action="list" value="Cancel"></g:actionSubmit>
+					</span>
 				</div>
 			</td>
 		</tr>
@@ -101,7 +105,20 @@
 <div style="float: left;">
 	<div>
 		<div id="cablingPanel">
-			<g:each in="${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50]}" var="count">
+			<g:if test="${modelTemplate.rearImage}">
+				<img id="rearImage" src="${createLink(controller:'model', action:'getRearImage', id:modelTemplate.id)}" style="display: ${modelTemplate.useImage != 1 ? 'none':'block' }"/>
+			</g:if>
+			<g:each in="${modelConnectors}" status="i" var="modelConnector">
+				<div id="connector${modelConnector.connector}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px ">
+					<div>
+						<img src="../i/cabling/${modelConnector.status}.png"/>
+					</div>
+					<div id="labelPositionDiv${modelConnector.connector}" class="${modelConnector.labelPosition == 'Right' ? 'connector_right' : 'connector_bottom'}">
+						<span id='connectorLabelText${modelConnector.connector}'>${modelConnector.label}</span>
+					</div>
+				</div>
+			</g:each>
+			<g:each in="${otherConnectors}" var="count">
 				<div id="connector${count}"></div>
 			</g:each>
 		</div>
@@ -114,7 +131,7 @@
 		<table>
 			<thead>
 				<tr>
-					<th>Connector<input type="hidden" id="connectorCount" name="connectorCount" value="0"></th>
+					<th>Connector<input type="hidden" id="connectorCount" name="connectorCount" value="${modelConnectors.size()}"></th>
 					<th>Type</th>
 					<th>Label</th>
 					<th>Label Position</th>
@@ -123,7 +140,20 @@
 				</tr>
 			</thead>
 			<tbody id="connectorModelBody">
-			<g:each in="${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50]}" var="count">
+			<g:each in="${modelConnectors}" status="i" var="modelConnector">
+			<tr id="connectorTr${modelConnector.connector}">
+					<td><input id="connectorId${modelConnector.connector}" name="connector${modelConnector.connector}" maxlength="5" style="width: 35px;" type="text" value="${modelConnector.connector}"></td>
+					<td><g:select id="typeId${modelConnector.connector}" name="type${modelConnector.connector}" from="${ModelConnector.constraints.type.inList}" value="${modelConnector.type}"></g:select></td>
+					<td><input id="labelId${modelConnector.connector}" name="label${modelConnector.connector}" type="text" value="${modelConnector.label}" onchange="changeLabel(${modelConnector.connector}, this.value)"></td>
+					<td><g:select id="labelPositionId${modelConnector.connector}" name="labelPosition${modelConnector.connector}" from="${['Right','Bottom']}" value="${modelConnector.labelPosition}" onchange="changeLabelPosition(${modelConnector.connector}, this.value)"></g:select></td>
+					<td><input id="connectorPosXId${modelConnector.connector}" name="connectorPosX${modelConnector.connector}" maxlength="3" style="width: 25px;" type="text" value="${modelConnector.connectorPosX}"></td>
+					<td>
+						<input id="connectorPosYId${modelConnector.connector}" name="connectorPosY${modelConnector.connector}" maxlength="3" style="width: 25px;" type="text" value="${modelConnector.connectorPosY}">
+						<input id="statusId${modelConnector.connector}" name="status${modelConnector.connector}" type="hidden" value="${modelConnector.status}">
+					</td>
+				</tr>
+			</g:each>
+			<g:each in="${otherConnectors}" var="count">
 			<tr id="connectorTr${count}" style="display: none;">
 					<td><input id="connectorId${count}" maxlength="5" style="width: 35px;" type="text" value="${count}"></td>
 					<td><g:select id="typeId${count}" name="type" from="${ModelConnector.constraints.type.inList}"></g:select></td>
@@ -144,10 +174,18 @@
 </fieldset>
 </div>
 <script type="text/javascript">
-	$('#connectorCount').val(0);
+	$('#connectorCount').val(${modelConnectors.size()});
+	var image = "${modelTemplate.rearImage}"
+	var usize = "${modelTemplate.usize}"
+	var useImage = "${modelTemplate.useImage}" 
+	if(!image || useImage != '1'){
+		initializeConnectors( usize, null )
+	} else {
+		initializeConnectors( 3, 'auto' )
+		$("#cablingPanel").css("background-color","#FFF")
+	}
 	
-	initializeConnectors( 1 )
-		
+	
 	function createConnector( type ) {
 		$("#connectorCount").val(parseInt($("#connectorCount").val()) + 1)
 		var count = $("#connectorCount").val()
@@ -187,6 +225,19 @@
 			$("#labelPositionDiv"+count).addClass("connector_bottom")
 		}
 		
+	}
+	function showImage( value ){
+		if($("#"+value).is(":checked")){
+			if(image ){
+				initializeConnectors( 2, 'auto' )
+				$("#rearImage").show()
+			} else {
+				alert("Rear image does not exist")
+			}
+		} else {
+			$("#rearImage").hide()
+			initializeConnectors( usize, null )
+		}
 	}
 </script>
 </body>

@@ -15,13 +15,27 @@ class ModelController {
     }
 
     def create = {
+    	def modelId = params.modelId
         def modelInstance = new Model()
-        modelInstance.properties = params
-		def modelConnector = new ModelConnector()
-        return [modelInstance: modelInstance, modelConnector : modelConnector ]
+    	def modelConnectors
+		def modelTemplate
+	    if(modelId){
+	    	modelTemplate = Model.get( modelId )
+			modelConnectors = ModelConnector.findAllByModel( modelTemplate )
+	    }
+    	def otherConnectors = []
+		for(int i = modelConnectors.size()+1 ; i<51; i++ ){
+			otherConnectors << i
+		}
+        return [modelInstance: modelInstance, modelConnectors : modelConnectors, 
+				otherConnectors:otherConnectors, modelTemplate:modelTemplate ]
     }
 
     def save = {
+    	def modelId = params.modelId
+    	def modelTemplate 
+		if(modelId)
+			modelTemplate = Model.get(modelId)
     	params.useImage = params.useImage == 'on' ? 1 : 0
         def modelInstance = new Model(params)
 		def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
@@ -34,6 +48,8 @@ class ModelController {
 	        		return;
 	        	}
         	}
+        } else if(modelTemplate){
+        	modelInstance.frontImage = modelTemplate.frontImage
         } else {
         	modelInstance.frontImage = null
         }
@@ -46,6 +62,8 @@ class ModelController {
 	        		return;
 	        	}
         	}
+        } else if(modelTemplate){
+        	modelInstance.rearImage = modelTemplate.rearImage
         } else {
         	modelInstance.rearImage = null
         }
@@ -71,7 +89,13 @@ class ModelController {
         }
         else {
         	//flash.message = modelInstance.errors.allErrors.each() {  it }
-            render(view: "create", model: [modelInstance: modelInstance])
+			def	modelConnectors = modelTemplate ? ModelConnector.findAllByModel( modelTemplate ) : null
+	    	def otherConnectors = []
+			for(int i = modelConnectors.size()+1 ; i<51; i++ ){
+				otherConnectors << i
+			}
+            render(view: "create", model: [modelInstance: modelInstance, modelConnectors:modelConnectors,
+										   otherConnectors:otherConnectors, modelTemplate:modelTemplate ] )
         }
     }
 
