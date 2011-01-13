@@ -443,8 +443,9 @@ class RackLayoutsController {
 	 * Update the AssetCablingMap with the date send from RackLayout cabling screen
 	 */
 	def updateCablingDetails = {
+		def assetId = params.asset
 		def assetCableId = params.assetCable
-		def assetCableMap
+		
 		if(assetCableId){
 			def currProj = getSession().getAttribute( "CURR_PROJ" )
 			def projectId = currProj.CURR_PROJ
@@ -455,6 +456,12 @@ class RackLayoutsController {
 			def toAssetUposition
 			def toConnector
 			def toAsset
+			def assetCableMap = AssetCableMap.findById( assetCableId )
+			def fromAssetCableMap = AssetCableMap.findByToAssetAndToConnectorNumber( assetCableMap.fromAsset, assetCableMap.fromConnectorNumber )
+			if(fromAssetCableMap){
+				AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing', toAsset=null,toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
+											where toAsset = ? and toConnectorNumber = ?""",[assetCableMap.fromAsset, assetCableMap.fromConnectorNumber])
+			}
 			switch(actionType){
 				case "emptyId" : status = "empty" ; break;
 				case "cabledId" : status = "cabled"; break;
@@ -469,22 +476,27 @@ class RackLayoutsController {
 						modelConnectors = ModelConnector.findAllByModel(assetEntity?.model)
 						toAsset = assetEntity 
 						toConnector = modelConnectors?.find{it.connector == params.connector }
+						AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
+														toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
+														where toAsset = ? and toConnectorNumber = ?""",[toAsset, toConnector])
 					}
 					break;
 			}
-			assetCableMap = AssetCableMap.findById( assetCableId )
 			assetCableMap.status = status
 			assetCableMap.toAsset = toAsset
 			assetCableMap.toConnectorNumber = toConnector
 			assetCableMap.toAssetRack = toAssetRack
 			assetCableMap.toAssetUposition = toAsset?.targetRackPosition
-			
-			assetCableMap.save(flush:true)
+			if(assetCableMap.save(flush:true) && toAsset){
+				def toAssetCableMap = AssetCableMap.findByFromAssetAndFromConnectorNumber( toAsset, toConnector )
+				toAssetCableMap.status = status
+				toAssetCableMap.toAsset = assetCableMap.fromAsset
+				toAssetCableMap.toConnectorNumber = assetCableMap.fromConnectorNumber
+				toAssetCableMap.toAssetRack = assetCableMap.fromAsset?.rackTarget?.tag
+				toAssetCableMap.toAssetUposition = assetCableMap.fromAsset?.targetRackPosition
+			}
 		}
-		def assetCable = [id:assetCableMap.id, connector : assetCableMap.fromConnectorNumber.connector, 
-							type:assetCableMap.fromConnectorNumber.type, displayStatus:statusDetails[assetCableMap.status],
-							status:assetCableMap.status, label:assetCableMap.fromConnectorNumber.label,
-							rackUposition : assetCableMap.toConnectorNumber ? assetCableMap.toAssetRack+"/"+assetCableMap.toAssetUposition+"/"+assetCableMap.toConnectorNumber.connector : "" ]
+		def assetCable = [assetId : assetId, assetTag : AssetEntity.get(assetId)?.assetTag ]
 		render assetCable as JSON
 	}
 	/*

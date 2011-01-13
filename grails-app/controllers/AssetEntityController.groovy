@@ -615,6 +615,10 @@ class AssetEntityController {
             ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset = ${assetEntityInstance.id}")
             AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar aev where aev.assetEntity = ${assetEntityInstance.id}")
             ProjectTeam.executeUpdate("update ProjectTeam pt set pt.latestAsset = null where pt.latestAsset = ${assetEntityInstance.id}")
+			AssetCableMap.executeUpdate("delete AssetCableMap where fromAsset = ? ",[assetEntityInstance])
+			AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
+											toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
+											where toAsset = ?""",[assetEntityInstance])
 			AssetEntity.executeUpdate("delete from AssetEntity ae where ae.id = ${assetEntityInstance.id}")
           
             flash.message = "AssetEntity ${assetEntityInstance.assetName} deleted"         
@@ -790,6 +794,10 @@ class AssetEntityController {
 	                	}
 	                }
 	            	if(existingModelId != assetEntityInstance.model?.id){
+	            		AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
+														toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
+														where toAsset = ? """,[assetEntityInstance])
+
 	            		AssetCableMap.executeUpdate("delete from AssetCableMap where fromAsset = ?",[assetEntityInstance])
 	            		createModelConnectors( assetEntityInstance )
 	            	}

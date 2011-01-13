@@ -237,10 +237,12 @@ class ModelController {
         def modelInstance = Model.get(params.id)
         if (modelInstance) {
             try {
-            	AssetCableMap.executeUpdate("update AssetEntity set model = null where model = ?",[modelInstance])
+            	AssetEntity.executeUpdate("update AssetEntity set model = null where model = ?",[modelInstance])
 				
             	AssetCableMap.executeUpdate("delete AssetCableMap where fromConnectorNumber in (from ModelConnector where model = ${modelInstance.id})")
-				AssetCableMap.executeUpdate("delete AssetCableMap where toConnectorNumber in (from ModelConnector where model = ${modelInstance.id})")
+				AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
+														toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
+														where toConnectorNumber in (from ModelConnector where model = ${modelInstance.id})""")
             	ModelConnector.executeUpdate("delete ModelConnector where model = ?",[modelInstance])
                 modelInstance.delete(flush: true)
                 flash.message = "${modelInstance} deleted"

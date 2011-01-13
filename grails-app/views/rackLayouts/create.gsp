@@ -285,6 +285,7 @@
 			<input type="text" name="connector" id="connectorId" size="2" maxlength="2" onfocus="getConnectorData()" onchange="validateConnectorData(this.value, this.id)" />
 			<input type="hidden" name="assetCable" id="cabledTypeId"/>
 			<input type="hidden" name="actionType" id="actionTypeId"/>
+			<input type="hidden" name="asset" id="assetEntityId"/>
 		</div>
 		</g:form>
 	</div>
@@ -321,6 +322,7 @@
 		});
 	});
 	function openCablingDiv( id, value ){
+		$("#assetEntityId").val(id)
 		${remoteFunction(action:'getCablingDetails', params:'\'assetId=\' + id', onComplete:'showCablingDetails(e)')};
 		$("#cablingDialogId").dialog( "option", "title", value+" cabling" );
 		$("#cablingDialogId").dialog( "option", "width", 400 )
@@ -416,9 +418,7 @@
 				data: $(form).serialize(),
 				type:'POST',
 				success: function(data) {
-					$("#connector"+data.id+" img").attr("src","../i/cabling/"+data.status+".png")
-					$("#connector"+data.id+" img").attr("id", data.status)
-					$("#connectorTr"+data.id).html("<td>"+data.connector+"</td><td>"+data.type+"</td><td>"+data.label+"</td><td>"+data.displayStatus+"</td><td>"+data.rackUposition+"</td></tr>")
+					openCablingDiv( data.assetId, data.assetTag )
 				}
 			});
 			//${remoteFunction(action:'updateCablingDetails', params:'\'assetCableId=\' + cabledId+\'&status=\'+status' )};
