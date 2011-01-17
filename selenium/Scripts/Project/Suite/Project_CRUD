@@ -204,6 +204,11 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
+	<td>//form[@id='createProjectForm']/div[1]/table/tbody/tr[12]/td[3]/label</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
 	<td>//input[@value='Create']</td>
 	<td></td>
 </tr>
@@ -218,6 +223,36 @@
 	<td></td>
 </tr>
 <tr>
+	<td>gotoIf</td>
+	<td>${isPresent}==false</td>
+	<td>label40</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${isPresent}==true</td>
+	<td>label50</td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label40</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>_action_Create</td>
+	<td></td>
+</tr>
+<tr>
+	<td>gotolabel</td>
+	<td>label60</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label50</td>
+	<td></td>
+</tr>
+<tr>
 	<td>verifyTitle</td>
 	<td>Show Project</td>
 	<td></td>
@@ -225,6 +260,11 @@
 <tr>
 	<td>clickAndWait</td>
 	<td>link=New Project</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label60</td>
 	<td></td>
 </tr>
 <tr>
@@ -417,11 +457,6 @@
 	<td>//div[5]/div[1]</td>
 	<td>Project ${Pcode} : ${Pname} created</td>
 </tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>created</td>
-	<td></td>
-</tr>
 <!--Reading the Project-->
 <tr>
 	<td>verifyElementPresent</td>
@@ -487,6 +522,11 @@
 	<td>verifyTable</td>
 	<td>//div[@id='updateShow']/table.10.1</td>
 	<td>${wCode}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='updateShow']/table.10.2</td>
+	<td>Display Transitions in Status bar:</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -608,6 +648,31 @@
 	<td>verifyTextPresent</td>
 	<td>Project ${Pcode} : ${Pname} updated</td>
 	<td></td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='updateShow']/table.11.1</td>
+	<td>dateCreated</td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>${dateCreated}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='updateShow']/table.11.3</td>
+	<td>lastUpdated</td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>${lastUpdated}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyExpression</td>
+	<td>javascript{storedVars['dateCreated']!=storedVars['lastUpdated']}</td>
+	<td>true</td>
 </tr>
 <tr>
 	<td>verifyValue</td>
