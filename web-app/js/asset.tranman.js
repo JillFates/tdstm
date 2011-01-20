@@ -80,7 +80,7 @@ Array.prototype.contains = function (element) {
 	  }
 	}
  }
- 
+var modelId
   // function to show asset dialog
 function showAssetDialog( e , action ) {
 	
@@ -172,9 +172,50 @@ function showAssetDialog( e , action ) {
 	      $("#showDialog").dialog("open");
 	      $("#editDialog").dialog("close");
       }
+	  var manufacturer = $("#editmanufacturerId").val()
+	  updateModelOptions( manufacturer, modelId, 2 ) //  assume that 2 is for edit action
 	  timedUpdate('never')
     }
     
+	function updateModelOptions( manufacturer, modelId, type ){
+		new Ajax.Request('../model/getModelsListAsJSON?manufacturer='+manufacturer,{
+			asynchronous:false,
+			evalScripts:true,
+			onComplete:function(e){
+				var modelsList = eval('(' + e.responseText + ')')
+				var inputField = '<option value=\'\'>Unassigned</option>'
+				for(i=0; i<modelsList.length; i++){
+					var model = modelsList[i]
+					if( modelId != model.id){
+						inputField += '<option value=\''+model.id+'\'>'+model.modelName+'</option>'
+					} else {
+						inputField += '<option value=\''+model.id+'\' selected>'+model.modelName+'</option>'
+					}
+				}
+				if( type == 2 ){
+					$("#editmodelId").html( inputField )
+				} else {
+					$("#modelId").html( inputField )	
+				}
+			}
+		})
+	}
+	function confirmManufacturerChange( oldValue, newValue, type ){
+		if(type == 2 ){
+			if(confirm("WARNING : Change of Manufacturer may impact on cabling data, Do you want to continue ?")){
+				updateModelOptions(newValue, null, type )
+			} else {
+				$("#editmanufacturerId").val( oldValue )
+			}
+		} else {
+			updateModelOptions(newValue, null, type)
+		}
+	}
+	function confirmModelChange( oldValue, newValue, type ){
+		if(type == 2 && !confirm("WARNING : Change of Model may impact on cabling data, Do you want to continue ?")){
+			$("#editmodelId").val( oldValue )
+		}
+	}
   function updateAutoComplete(e){
   	var data = eval('(' + e.responseText + ')');
     if (data) {
@@ -253,7 +294,10 @@ function showAssetDialog( e , action ) {
   				}
   			})
   	} else if( name == "model"){
-  		new Ajax.Request('../model/getModelsListAsJSON',{
+  		modelId = attribute.modelId
+  		var type = id ? 2 : 1 // Assume that 1 : create and 2 : edit 
+  		inputField = '<select name=\''+name+'\' id=\''+ id +name+'Id'+'\' onchange=\'confirmModelChange('+ attribute.modelId +', this.value, '+type+');\'><option value=\'\'>Unassigned</option></select>'
+  		/*new Ajax.Request('../model/getModelsListAsJSON',{
 				asynchronous:false,
 				evalScripts:true,
 				onComplete:function(e){
@@ -271,14 +315,15 @@ function showAssetDialog( e , action ) {
 					}
 					inputField += '</select>'
 				}
-			})
+			})*/
   	} else if( name == "manufacturer"){
+  		var type = id ? 2 : 1 // Assume that 1 : create and 2 : edit
   		new Ajax.Request('../manufacturer/getManufacturersListAsJSON ',{
 				asynchronous:false,
 				evalScripts:true,
 				onComplete:function(e){
 					var  manufacturersList = eval('(' + e.responseText + ')')
-					inputField = '<select name=\''+name+'\' id=\''+ id +name+'Id'+'\'><option value=\'\'>Unassigned</option>'
+					inputField = "<select name='"+name+"' id='"+ id +name+"Id' onchange='confirmManufacturerChange("+ attribute.manufacturerId +", this.value, "+type+" )'><option value=''>Unassigned</option>"
 					
 					for(i=0; i<manufacturersList.length; i++){
 						var manufacturer = manufacturersList[i]

@@ -287,7 +287,14 @@ class ModelController {
      *  Send List of model as JSON object
      */
 	def getModelsListAsJSON = {
-    	def models = Model.list()
+    	def manufacturer = params.manufacturer
+    	def models
+		if(manufacturer){
+			def manufacturerInstance = Manufacturer.get(manufacturer)
+			models = manufacturerInstance ? Model.findAllByManufacturer( manufacturerInstance ) : null
+		}
+    	if(!models)
+    		models = []
 		render models as JSON
     }
     /*
