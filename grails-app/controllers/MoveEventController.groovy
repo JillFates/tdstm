@@ -247,12 +247,12 @@ class MoveEventController {
 		        
 			} catch( Exception ex ) {
 				flash.message = "Exception occurred while exporting data"
-				redirect( controller:'moveBundleAsset', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
+				redirect( controller:'reports', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
 				return;
 			}	
 		} else {
 			flash.message = "Please select MoveEvent and report type. "
-			redirect( controller:'moveBundleAsset', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
+			redirect( controller:'reports', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
 			return;
 		}
     }
@@ -303,12 +303,12 @@ class MoveEventController {
 			            
 				} catch( Exception ex ) {
 					flash.message = "Exception occurred while exporting data"+ex
-					redirect( controller:'moveBundleAsset', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
+					redirect( controller:'reports', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
 					return;
 				}	
 			} else {
 				flash.message = "Please select MoveEvent and report type. "
-				redirect( controller:'moveBundleAsset', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
+				redirect( controller:'reports', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
 				return;
 			}
         }

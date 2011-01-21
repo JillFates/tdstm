@@ -147,14 +147,15 @@
 		</div>
 		<div class="menu2" id="reportsMenu" style="background-color:#003366;display: none;">
 			<ul>
-			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Login Badges']">Login Badges</g:link> </li>
-			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Asset Tag']">Asset Tags</g:link> </li>
-			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Team Worksheets']">Move Team Worksheets</g:link> </li>
-			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'cart Asset']">Logistics Team Worksheets</g:link></li>
-			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Transportation Asset List']">Transport Worksheets</g:link></li>
-			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Issue Report']">Issue Report</g:link></li>
-			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'Rack Layout']">Rack Elevations</g:link></li>
-			<li><g:link class="home" controller="moveBundleAsset" action="getBundleListForReportDialog" params="[reportId:'MoveResults']">Move Results</g:link></li>
+			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Login Badges']">Login Badges</g:link> </li>
+			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Asset Tag']">Asset Tags</g:link> </li>
+			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Team Worksheets']">Move Team Worksheets</g:link> </li>
+			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'cart Asset']">Logistics Team Worksheets</g:link></li>
+			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Transportation Asset List']">Transport Worksheets</g:link></li>
+			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Issue Report']">Issue Report</g:link></li>
+			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Rack Layout']">Rack Elevations</g:link></li>
+			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'MoveResults']">Move Results</g:link></li>
+			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'CablingQA']">Cabling QA</g:link></li>
 			</ul>
 		</div>
 		<g:if test="${moveEvent && moveEvent?.inProgress == 'true'}">

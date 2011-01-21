@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<title>Logistics Team Worksheets </title>
+<title>Cabling QA Report</title>
 
 <script type="text/javascript">
     
@@ -11,8 +11,8 @@
 	     	jQuery('#moveBundle').val( moveBundleVal );
         }
 
-     	function setSortOrder( sortVal ) {
-     		jQuery('#sortType').val( sortVal );
+     	function setCableType( cableVal ) {
+     		jQuery('#cableType').val( cableVal );
      	}
 
 </script>
@@ -21,7 +21,7 @@
 <body>
 
 <div class="body">
-<h1>Logistics Team Worksheets </h1>
+<h1>Cabling QA Report </h1>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
@@ -38,9 +38,7 @@
 			<td valign="top" class="value"><select id="moveBundleId"
 				name="moveBundles" onchange="return populateBundle(this.value);">
 
-				<option value="null" selected="selected">Please Select</option>
-
-				<option value="">All Bundles</option>
+				<option value="" selected="selected">All Bundles</option>
 				<g:each in="${moveBundleInstanceList}" var="moveBundleList">
 					<option value="${moveBundleList?.id}">${moveBundleList?.name}</option>
 				</g:each>
@@ -49,28 +47,33 @@
 
 		</tr>
 		<tr class="prop">
-			<td valign="top" class="name"><label>Sort By:</label></td>
-			<td valign="top" class="value"><select id="sortOrderId"
-				name="sortOrder" onchange="setSortOrder(this.value);">
+			<td valign="top" class="name"><label>Cable Type</label></td>
+			<td valign="top" class="value">
+				<select id="cableTypeId"
+				name="cableType" onchange="setCableType(this.value);">
 
-				<option value="null" selected="selected">Please Select</option>
+				<option value="" selected="selected">All Cables</option>
 
-				<option value="TEAM_ASSET">Team/Asset Tag</option>
-				<option value="ROOM_RACK_USIZE">Room/Rack/UPos</option>
-				<option value="TRUCK_CART_SHELF">Truck/Cart/Shelf</option>
-				<option value="ASSET_TAG">Asset Tag</option>				
+				<option value="ether">Ether</option>
+				<option value="serial">Serial</option>
+				<option value="power">Power</option>
+				<option value="fiber">Fiber</option>
+				<option value="SCSI">SCSI</option>
+				<option value="USB">USB</option>
+				<option value="KVM">KVM</option>
+				<option value="others">Others</option>
 
 			</select></td>
 		</tr>
 		
 		<tr>
 
-			<td class="buttonR"><g:jasperReport controller="moveBundleAsset"
-				action="cartAssetReport" jasper="cartReport" format="PDF"
+			<td class="buttonR"><g:jasperReport controller="reports"
+				action="cablingQAReport" jasper="CablingQAReport" format="PDF"
 				name="Generate">
-				<input type="hidden" name="reportName" id="reportName" value="cartAsset" />
-				<input type="hidden" name="moveBundle" id="moveBundle" value="null" />
-				<input type="hidden" name="sortType" id="sortType" value="null" />
+				<input type="hidden" name="reportName" id="reportName" value="cablingQA" />
+				<input type="hidden" name="moveBundle" id="moveBundle" value="" />
+				<input type="hidden" name="cableType" id="cableType" value="" />
 
 			</g:jasperReport></td>
 

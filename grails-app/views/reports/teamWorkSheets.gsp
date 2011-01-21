@@ -164,7 +164,7 @@
 
 		<tr>
 
-			<td class="buttonR"><g:jasperReport controller="moveBundleAsset"
+			<td class="buttonR"><g:jasperReport controller="reports"
 				action="teamSheetReport" jasper="workSheetsReport" format="PDF"
 				name="Generate">
 
