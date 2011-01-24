@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<title>Cabling ${ type == 'QA' ? 'QA' : 'Conflict' } Report</title>
+<title>Cabling Report</title>
 
 <script type="text/javascript">
     
@@ -21,7 +21,7 @@
 <body>
 
 <div class="body">
-<h1>Cabling ${ type == 'QA' ? 'QA' : 'Conflict' } Report </h1>
+<h1>Structured Cabling Report </h1>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
@@ -69,9 +69,9 @@
 		<tr>
 
 			<td class="buttonR"><g:jasperReport controller="reports"
-				action="cablingQAReport" jasper="CablingQAReport" format="PDF"
+				action="cablingDataReport" jasper="CablingDataReport" format="XLS"
 				name="Generate">
-				<input type="hidden" name="reportName" id="reportName" value="${ type == 'QA' ? 'cablingQA' : 'cablingConflict' }" />
+				<input type="hidden" name="reportName" id="reportName" value="cablingData" />
 				<input type="hidden" name="moveBundle" id="moveBundle" value="" />
 				<input type="hidden" name="cableType" id="cableType" value="" />
 

@@ -1,8 +1,13 @@
+import java.io.*
+import jxl.*
+import jxl.write.*
+import jxl.read.biff.*
 import grails.converters.JSON
 import org.jsecurity.SecurityUtils
 import com.tdssrc.grails.GormUtil
 import java.text.SimpleDateFormat
 import java.text.DateFormat
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 
 class ReportsController {
 	
@@ -33,10 +38,6 @@ class ReportsController {
 					        			model:[moveBundleInstanceList: moveBundleInstanceList, 
 											   projectInstance:projectInstance, currentBundle:currentBundle])
             					break;
-            case "CablingQA":  
-				            	render( view:'cablingQAReport',
-				            			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
-						        break;
             case "cart Asset":  
 				            	render( view:'cartAssetReport',
 				            			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
@@ -64,6 +65,18 @@ class ReportsController {
             					def moveEventInstanceList = MoveEvent.findAllByProject( projectInstance )
 								render( view:'moveResults', model:[moveEventInstanceList : moveEventInstanceList ])
 								break;
+            case "CablingQA":  
+				            	render( view:'cablingQAReport',
+				            			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, type:'QA'])
+						        break;
+			case "CablingConflict":  
+				            	render( view:'cablingQAReport',
+				            			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, type:'conflict'])
+						        break;
+			case "CablingData":  
+						    	render( view:'cablingData',
+						    			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance ])
+						        break;
             default: 
 				            	render( view:'teamWorkSheets',
 				            			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
@@ -856,14 +869,15 @@ class ReportsController {
     	}
     	return rows
      }
-	//  Cabling QA report
+	/*
+	 *  Generate PDF Cabling QA / Conflict report 
+	 */
 	def cablingQAReport = {
     	def reportName = params.reportName
     	def currProj = getSession().getAttribute( "CURR_PROJ" )
     	def projectId = currProj.CURR_PROJ
     	def projectInstance = Project.findById( projectId )
     	def cableType = params.cableType
-    	def teamPartyGroup
     	// if no moveBundle was selected
     	if(params.moveBundle == "null") {
             flash.message = " Please Select Bundles. "
@@ -885,8 +899,25 @@ class ReportsController {
             if(cableType){
             	cablesQuery.append(" and acm.fromConnectorNumber.type = '${cableType}' ")
             }
-            cablesQuery.append(" order By acm.fromAsset ")
-            def assetCablesList = AssetCableMap.findAll( cablesQuery.toString() )
+            
+            
+			List assetCablesList = new ArrayList()
+			if(reportName == "cablingQA"){
+				cablesQuery.append(" order By acm.fromAsset ")
+				assetCablesList = AssetCableMap.findAll( cablesQuery.toString() )
+			} else {
+				def conflictQuery = " and acm.toConnectorNumber is not null group by acm.toConnectorNumber having count(acm.toConnectorNumber) > 1"
+				def conflictList =  AssetCableMap.findAll( cablesQuery.toString() + conflictQuery )
+
+				def unknownList = AssetCableMap.findAll( cablesQuery.toString() + " and acm.status ='missing' " )
+
+				def orphanedQuery = " and acm.toConnectorNumber is not null and acm.toConnectorNumber not in( select mc.id from ModelConnector mc )"
+				def orphanedList = AssetCableMap.findAll( cablesQuery.toString() + orphanedQuery )
+
+				if(conflictList.size() > 0) assetCablesList.addAll(conflictList)
+				if(unknownList.size() > 0) assetCablesList.addAll(unknownList)
+				if(orphanedList.size() > 0) assetCablesList.addAll(orphanedList)
+			}
 			
             def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
             def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
@@ -912,16 +943,17 @@ class ReportsController {
 									'to_asset_name':cable.toAsset ? cable.toAsset?.assetName :"",
        				                "asset_id":cable.fromAsset?.id,
        				                'project_name':projectInstance?.name,
-       				                'bundle_name':bundleInstance?.name, 
+       				                'bundle_name':bundleInstance?.name,
+       				                'report_type': reportName == 'cablingQA' ? "Cabling QA Report" : "Cabling Conflict Report",
 									'timezone':tzId ? tzId : "EDT", "rpt_time":String.valueOf(formatter.format( currDate ) )]
        			}
        		}
        		//No Assets were found for selected moveBundle,team and Location
        		if(reportFields.size() <= 0) {    		
-       			flash.message = " No Cables / Assets were found for  selected values  "
+       			flash.message = " No Cables were found for  selected values  "
 				redirect( action:'getBundleListForReportDialog', params:[reportId: 'CablingQA'] )
         	}else {
-				def name = "CablingQA"
+				def name = reportName == 'cablingQA' ? "CablingQA" : "CablingConflict"
 				def filename = 	"${name}-${projectInstance.name}-${bundleName}"
 					filename = filename.replace(" ", "_")
         		
@@ -930,4 +962,75 @@ class ReportsController {
         	}
         }
     }
+	/*
+	 *  Generate XLS Structured Cabling data report 
+	 */
+	def cablingDataReport = {
+		def currProj = getSession().getAttribute( "CURR_PROJ" )
+    	def projectId = currProj.CURR_PROJ
+    	def projectInstance = Project.findById( projectId )
+    	def cableType = params.cableType
+    	// if no moveBundle was selected
+    	if(params.moveBundle == "null") {
+            flash.message = " Please Select Bundles. "
+			redirect( action:'getBundleListForReportDialog', params:[reportId: 'CablingQA'] )
+        } else {
+        	def moveBundleInstance = MoveBundle.findById(params.moveBundle)
+            def reportFields = []
+            def bundleName = "All Bundles"
+			def cablesQuery = new StringBuffer("from AssetCableMap acm where acm.fromAsset.project.id = $projectInstance.id ")
+            //if moveBundleinstance is selected (single moveBundle)
+            if( moveBundleInstance ) {
+                bundleName = moveBundleInstance?.name
+                cablesQuery.append(" and acm.fromAsset.moveBundle = $moveBundleInstance.id ")
+            }
+            //All Bundles Selected
+            else {
+            	cablesQuery.append(" and acm.fromAsset.moveBundle != null ")
+       		}
+            if(cableType){
+            	cablesQuery.append(" and acm.fromConnectorNumber.type = '${cableType}' ")
+            }
+            cablesQuery.append(" order By acm.fromAsset ")
+			def assetCablesList = AssetCableMap.findAll( cablesQuery.toString() )
+			try {
+				File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Cabling_Details.xls" ).getFile()
+				WorkbookSettings wbSetting = new WorkbookSettings()
+				wbSetting.setUseTemporaryFileDuringWrite(true)
+				def workbook = Workbook.getWorkbook( file, wbSetting )
+				//set MIME TYPE as Excel
+				response.setContentType( "application/vnd.ms-excel" )
+				def filename = 	"CablingData-${projectInstance.name}-${bundleName}.xls"
+					filename = filename.replace(" ", "_")
+				response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
+				
+				def book = Workbook.createWorkbook( response.getOutputStream(), workbook )
+				
+				def sheet = book.getSheet("cabling_data")
+				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+				DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+				
+				for ( int r = 2; r <= assetCablesList.size(); r++ ) {
+					sheet.addCell( new Label( 0, r, String.valueOf(assetCablesList[r-2].fromConnectorNumber.type )) )
+					sheet.addCell( new Label( 1, r, String.valueOf(assetCablesList[r-2].fromAsset.assetName )) )
+					sheet.addCell( new Label( 2, r, String.valueOf(assetCablesList[r-2].fromAsset.assetTag )) )
+					sheet.addCell( new Label( 3, r, String.valueOf(assetCablesList[r-1].fromConnectorNumber.label )) )
+					sheet.addCell( new Label( 4, r, String.valueOf(assetCablesList[r-1].fromAsset?.rackTarget?.tag )) )
+					sheet.addCell( new Label( 5, r, String.valueOf(assetCablesList[r-1].fromAsset?.targetRackPosition )) )
+					sheet.addCell( new Label( 7, r, String.valueOf(assetCablesList[r-1].toAsset ? assetCablesList[r-1].toAsset?.assetName :"" )) )
+					sheet.addCell( new Label( 8, r, String.valueOf(assetCablesList[r-1].toAsset ? assetCablesList[r-1].toAsset?.assetTag :"" )) )
+					sheet.addCell( new Label( 9, r, String.valueOf(assetCablesList[r-1].toConnectorNumber ? assetCablesList[r-1].toConnectorNumber?.label :"" )) )
+					sheet.addCell( new Label( 10, r, String.valueOf(assetCablesList[r-1].toAsset ? assetCablesList[r-1].toAsset?.rackTarget?.tag :"" )) )
+					sheet.addCell( new Label( 11, r, String.valueOf(assetCablesList[r-1].toAssetUposition ? assetCablesList[r-1].toAssetUposition :"" )) )
+				}
+				
+				book.write()
+				book.close()
+			} catch( Exception ex ) {
+				flash.message = "Exception occurred while exporting data"
+				redirect( controller:'reports', action:"getBundleListForReportDialog", params:[reportId:'CablingData', message:flash.message] )
+				return;
+			}
+        }
+	}
 }

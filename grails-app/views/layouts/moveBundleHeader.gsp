@@ -164,6 +164,8 @@
 	    		<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Rack Layout']">Rack Elevations</g:link></li>
 	    		<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'MoveResults']">Move Results</g:link></li>
 	    		<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'CablingQA']">Cabling QA</g:link></li>
+	    		<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'CablingConflict']">Cabling Conflict</g:link></li>
+				<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'CablingData']">Cabling Data</g:link></li>
 			</ul>
 		</div>
 		<div class="menu2" id="assetMenu" style="background-color:#003366;display: none;">

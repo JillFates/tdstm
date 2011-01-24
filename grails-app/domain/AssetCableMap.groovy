@@ -7,6 +7,7 @@ class AssetCableMap {
 	String toAssetRack
 	Integer toAssetUposition
 	String status
+	String color
 	
 	static constraints = {
 		cable( nullable:false, blank:false )
@@ -17,6 +18,7 @@ class AssetCableMap {
 		toAssetRack( nullable:true, blank:true )
 		toAssetUposition( nullable:true, blank:true )
 		status( nullable:false, blank:false, inList: ['missing','empty','cabled','cabledDetails'] )
+		color( nullable:true, blank:true)
 	}
 	
 	static mapping = {

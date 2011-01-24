@@ -46,6 +46,7 @@
 	<field name="bundle_name" class="java.lang.String"/>
 	<field name="timezone" class="java.lang.String"/>
 	<field name="rpt_time" class="java.lang.String"/>
+	<field name="report_type" class="java.lang.String"/>
 	<group name="Asset" isStartNewPage="true">
 		<groupExpression><![CDATA[$F{asset_id}]]></groupExpression>
 		<groupFooter>
@@ -57,13 +58,13 @@
 	</background>
 	<title>
 		<band height="40">
-			<staticText>
-				<reportElement x="309" y="5" width="253" height="35"/>
-				<textElement textAlignment="Center">
-					<font size="26" isBold="true"/>
+			<textField>
+				<reportElement x="1" y="0" width="858" height="38"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="24" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Cabling QA Report]]></text>
-			</staticText>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{report_type}]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<pageHeader>
@@ -83,18 +84,18 @@
 				<text><![CDATA[Move Bundle:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="509" y="1" width="100" height="20"/>
+				<reportElement x="549" y="1" width="100" height="20"/>
 				<textElement textAlignment="Right">
 					<font size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Asset Name:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="509" y="20" width="100" height="20"/>
+				<reportElement x="549" y="20" width="100" height="20"/>
 				<textElement textAlignment="Right">
 					<font size="14" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Asset Name:]]></text>
+				<text><![CDATA[Asset Tag:]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="105" y="0" width="250" height="20"/>
@@ -111,14 +112,14 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{bundle_name}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="614" y="0" width="236" height="20"/>
+				<reportElement x="654" y="0" width="200" height="20"/>
 				<textElement textAlignment="Left">
 					<font size="14" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{from_asset_name}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="614" y="20" width="236" height="20"/>
+				<reportElement x="654" y="20" width="200" height="20"/>
 				<textElement textAlignment="Left">
 					<font size="14" isBold="true"/>
 				</textElement>
