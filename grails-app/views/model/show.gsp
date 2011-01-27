@@ -127,7 +127,6 @@
 		<table style="border: 0px;">
 			<thead>
 				<tr>
-					<th>Connector</th>
 					<th>Type</th>
 					<th>Label</th>
 					<th>Label Position</th>
@@ -138,7 +137,6 @@
 			<tbody id="connectorModelBody">
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
 				<tr id="connectorTr${i}"  class="${(i % 2) == 0 ? 'odd' : 'even'}">
-					<td>${modelConnector.connector}</td>
 					<td>${modelConnector.type}</td>
 					<td>${modelConnector.label}</td>
 					<td>${modelConnector.labelPosition}</td>

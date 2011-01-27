@@ -435,7 +435,7 @@ class RackLayoutsController {
 									labelPosition:it.fromConnectorNumber.labelPosition,
 									connectorPosY:it.fromConnectorNumber.connectorPosY, status:it.status,displayStatus:statusDetails[it.status], 
 									label:it.fromConnectorNumber.label, hasImageExist:assetEntity.model.rearImage && assetEntity.model?.useImage ? true : false,
-									usize:assetEntity?.model?.usize, rackUposition : it.toConnectorNumber ? it.toAssetRack+"/"+it.toAssetUposition+"/"+it.toConnectorNumber.connector : "" ]
+									usize:assetEntity?.model?.usize, rackUposition : it.toConnectorNumber ? it.toAssetRack+"/"+it.toAssetUposition+"/"+it.toConnectorNumber.label : "" ]
 		}
 		render assetCablingDetails as JSON
 	}
@@ -475,7 +475,7 @@ class RackLayoutsController {
 					if(assetEntity?.model){
 						modelConnectors = ModelConnector.findAllByModel(assetEntity?.model)
 						toAsset = assetEntity 
-						toConnector = modelConnectors?.find{it.connector == params.connector }
+						toConnector = modelConnectors?.find{it.label.equalsIgnoreCase(params.connector) }
 						AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
 														toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
 														where toAsset = ? and toConnectorNumber = ?""",[toAsset, toConnector])
@@ -529,7 +529,7 @@ class RackLayoutsController {
 				def assetEntity = rack?.targetAssets?.findAll{it.targetRackPosition == Integer.parseInt(params.uposition)}
 				def modelConnectors
 				if(assetEntity?.model[0])
-					data = ModelConnector.findAllByModel(assetEntity?.model[0])?.connector
+					data = ModelConnector.findAllByModel(assetEntity?.model[0])?.label
 				break;
 			case "isValidConnector":
 				def rack = Rack.findWhere(tag:params.rack,source:0,project:project)
@@ -537,7 +537,7 @@ class RackLayoutsController {
 				def modelConnectors
 				if(assetEntity?.model[0])
 					modelConnectors = ModelConnector.findAllByModel(assetEntity?.model[0])
-				data = modelConnectors?.findAll{it.connector == params.value }
+				data = modelConnectors?.findAll{it.label.equalsIgnoreCase(params.value) }
 				break;
 		}
 		if(!data)

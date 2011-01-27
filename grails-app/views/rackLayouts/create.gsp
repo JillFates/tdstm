@@ -280,9 +280,9 @@
 			<input type="reset" id="formReset" style="display: none;"/>
 		</div>
 		<div style="text-align: center;display: none;" id="assignFieldDiv">
-			<input type="text" name="rack" id="rackId" size="10" onchange="validateRackData( this.value, this.id );"/>
-			<input type="text" name="uposition" id="upositionId" size="2" maxlength="2" onfocus="getUpositionData()" onchange="validateUpositionData( this.value, this.id)"/>
-			<input type="text" name="connector" id="connectorId" size="2" maxlength="2" onfocus="getConnectorData()" onchange="validateConnectorData(this.value, this.id)" />
+			<input type="text" name="rack" id="rackId" size="10"  onblur="validateRackData( this.value, this.id );"/>
+			<input type="text" name="uposition" id="upositionId" size="2" maxlength="2" onfocus="getUpositionData()" onblur="validateUpositionData( this.value, this.id)"/>
+			<input type="text" name="connector" id="connectorId" size="15" onfocus="getConnectorData()" onblur="validateConnectorData(this.value, this.id)" />
 			<input type="hidden" name="assetCable" id="cabledTypeId"/>
 			<input type="hidden" name="actionType" id="actionTypeId"/>
 			<input type="hidden" name="asset" id="assetEntityId"/>
@@ -294,7 +294,6 @@
 		<table>
 			<thead>
 				<tr>
-					<th>Connector</th>
 					<th>Type</th>
 					<th>Label</th>
 					<th>Status</th>
@@ -310,7 +309,8 @@
 	</div>
 </div>
 <script type="text/javascript">
-	
+
+	var click = 1
 	$(document).ready(function() {
 		var bundleObj = $("#bundleId");
 		bundleObj.val('${currentBundle}');
@@ -339,6 +339,7 @@
 		var hasImageExist = assetCablingDetails[0].hasImageExist
 		if(!hasImageExist){
 			$("#cablingPanel").css("height",assetCablingDetails[0].usize*30+2)
+			$("#cablingPanel").css("background-color","LightGreen")
 		} else {
 			$("#rearImage"+model).show()
 			$("#cablingPanel").css("background-color","#FFF")
@@ -352,7 +353,7 @@
 				cssClass = "connector_bottom"
 			}
 			details += "<div id='connector"+assetCabling.id+"' style='top: "+(assetCabling.connectorPosY / 2)+"px; left: "+assetCabling.connectorPosX+"px;'><a href='#'><div><img id='"+assetCabling.status+"' src='../i/cabling/"+assetCabling.status+".png' onclick='openActionButtonsDiv( "+assetCabling.id+", this.id )'></div></a><div class='"+cssClass+"'><span>"+assetCabling.label+"</span></div></div>"
-			tbodyDetails += "<tr id='connectorTr"+assetCabling.id+"' title="+assetCabling.status+" onclick='openActionButtonsDiv( "+assetCabling.id+", this.title )'><td>"+assetCabling.connector+"</td><td>"+assetCabling.type+"</td><td>"+assetCabling.label+"</td><td>"+assetCabling.displayStatus+"</td><td id='connectorTd"+assetCabling.id+"'>"+assetCabling.rackUposition+"</td></tr>"
+			tbodyDetails += "<tr id='connectorTr"+assetCabling.id+"' title="+assetCabling.status+" onclick='openActionButtonsDiv( "+assetCabling.id+", this.title )'><td>"+assetCabling.type+"</td><td>"+assetCabling.label+"</td><td>"+assetCabling.displayStatus+"</td><td id='connectorTd"+assetCabling.id+"'>"+assetCabling.rackUposition+"</td></tr>"
 		}
 		$("#cablingPanel").append(details)
 		if( tbodyDetails ){
@@ -448,25 +449,30 @@
 		}
 	}
 	function validateRackData(value, field){
-		if(value){
-			jQuery.ajax({
-				url: "getAutoCompleteDetails",
-				data: "field=isValidRack&value="+value,
-				type:'POST',
-				success: function(data) {
-					if(data.length > 0){
-						$("#"+field).removeClass("field_error")
-						$("#upositionId").val("")
-						$("#upositionId").removeClass("field_error")
-						$("#connectorId").val("")
-						$("#connectorId").removeClass("field_error")
-					} else {
-						$("#"+field).addClass("field_error")
+		if(click == 2){
+			click = 1
+			if(value){
+				jQuery.ajax({
+					url: "getAutoCompleteDetails",
+					data: "field=isValidRack&value="+value,
+					type:'POST',
+					success: function(data) {
+						if(data.length > 0){
+							$("#"+field).removeClass("field_error")
+							$("#upositionId").val("")
+							$("#upositionId").removeClass("field_error")
+							$("#connectorId").val("")
+							$("#connectorId").removeClass("field_error")
+						} else {
+							$("#"+field).addClass("field_error")
+						}
 					}
-				}
-			});
-		} else {
-			alert("Please enter Rack data")	
+				});
+			} else {
+				alert("Please enter Rack data")	
+			}
+		} else{
+			click = 2
 		}
 	}
 	/*
@@ -493,27 +499,32 @@
 	}
 	function validateUpositionData(value, field){
 		var rack = $("#rackId").val()
-		if(rack){
-			if(value){
-			jQuery.ajax({
-				url: "getAutoCompleteDetails",
-				data: "field=isValidUposition&rack="+rack+"&value="+value,
-				type:'POST',
-				success: function(data) {
-					if(data.length > 0){
-						$("#"+field).removeClass("field_error")
-						$("#connectorId").val("")
-						$("#connectorId").removeClass("field_error")
-					} else {
-						$("#"+field).addClass("field_error")
+		if(click == 2){
+			click = 1
+			if(rack){
+				if(value){
+				jQuery.ajax({
+					url: "getAutoCompleteDetails",
+					data: "field=isValidUposition&rack="+rack+"&value="+value,
+					type:'POST',
+					success: function(data) {
+						if(data.length > 0){
+							$("#"+field).removeClass("field_error")
+							$("#connectorId").val("")
+							$("#connectorId").removeClass("field_error")
+						} else {
+							$("#"+field).addClass("field_error")
+						}
 					}
+				});
+				} else {
+					alert("Please enter Uposition data")	
 				}
-			});
-			} else {
-				alert("Please enter Uposition data")	
+			} else{
+				alert("Please enter rack data")
 			}
-		} else{
-			alert("Please enter rack data")
+		} else {
+			click = 2
 		}
 	}
 	/*
@@ -540,27 +551,31 @@
 		}
 	}
 	function validateConnectorData(value, field){
-		var rack = $("#rackId").val()
-		var uposition = $("#upositionId").val() 
-		if(rack && uposition){
-			if(value){
-				jQuery.ajax({
-					url: "getAutoCompleteDetails",
-					data: "field=isValidConnector&rack="+rack+"&uposition="+uposition+"&value="+value,
-					type:'POST',
-					success: function(data) {
-						if(data.length > 0){
-							$("#"+field).removeClass("field_error")
-						} else {
-							$("#"+field).addClass("field_error")
+		if(click == 2){
+			var rack = $("#rackId").val()
+			var uposition = $("#upositionId").val() 
+			if(rack && uposition){
+				if(value){
+					jQuery.ajax({
+						url: "getAutoCompleteDetails",
+						data: "field=isValidConnector&rack="+rack+"&uposition="+uposition+"&value="+value,
+						type:'POST',
+						success: function(data) {
+							if(data.length > 0){
+								$("#"+field).removeClass("field_error")
+							} else {
+								$("#"+field).addClass("field_error")
+							}
 						}
-					}
-				});
-			} else {
-				alert("Please enter Connector data")	
+					});
+				} else {
+					alert("Please enter Connector data")	
+				}
+			} else{
+				alert("Rack or uposition data missing")
 			}
-		} else{
-			alert("Rack or uposition data missing")
+		} else {
+			click = 2
 		}
 	}
 	

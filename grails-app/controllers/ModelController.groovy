@@ -24,7 +24,8 @@ class ModelController {
 			modelConnectors = ModelConnector.findAllByModel( modelTemplate )
 	    }
     	def otherConnectors = []
-		for(int i = modelConnectors.size()+1 ; i<51; i++ ){
+    	def existingConnectors = modelConnectors ? modelConnectors.size()+1 : 1
+		for(int i = existingConnectors ; i<51; i++ ){
 			otherConnectors << i
 		}
         return [modelInstance: modelInstance, modelConnectors : modelConnectors, 
@@ -91,7 +92,8 @@ class ModelController {
         	//flash.message = modelInstance.errors.allErrors.each() {  it }
 			def	modelConnectors = modelTemplate ? ModelConnector.findAllByModel( modelTemplate ) : null
 	    	def otherConnectors = []
-			for(int i = modelConnectors.size()+1 ; i<51; i++ ){
+			def existingConnectors = modelConnectors ? modelConnectors.size()+1 : 1
+			for(int i = existingConnectors ; i<51; i++ ){
 				otherConnectors << i
 			}
             render(view: "create", model: [modelInstance: modelInstance, modelConnectors:modelConnectors,

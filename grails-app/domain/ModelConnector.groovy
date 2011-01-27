@@ -14,7 +14,7 @@ class ModelConnector {
 	
     static constraints = {
 		connector( blank:false, nullable:false, unique:'model' )
-		label( blank:true, nullable:true )
+		label( blank:true, nullable:true, unique:'model' )
 		type( blank:true, nullable:true, inList: ["Ether", "Serial", "Power", "Fiber", "SCSI", "USB", "KVM", "Other"] )
 		labelPosition( blank:true, nullable:true )
 		connectorPosX( blank:true, nullable:true )
