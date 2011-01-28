@@ -93,7 +93,7 @@
 			<td colspan="2">
 				<div class="buttons" style="margin-left: 10px;margin-right: 10px;"> 
 					<span class="button">
-						<g:actionSubmit class="save" action="save" value="Save"></g:actionSubmit>
+						<g:actionSubmit class="save" action="save" value="Save" onclick="return validateForm()"></g:actionSubmit>
 						<g:actionSubmit class="delete" action="list" value="Cancel"></g:actionSubmit>
 					</span>
 				</div>
@@ -212,7 +212,22 @@
 			alert("You are attempt to create more than 50 connectors")
 		}
 	}
-	function changeLabel( count, value){
+	function changeLabel( id, value){
+		var count = $("#connectorCount").val()
+		for(j=1; j<=count; j++){
+			var matchConnectors = 0
+			for(i=1; i<=count; i++){
+				if($("#labelId"+j).val().toLowerCase() == $("#labelId"+i).val().toLowerCase()){
+					matchConnectors = matchConnectors + 1 
+				}
+			}
+			if(matchConnectors > 1){
+				$("#labelId"+j).attr("title","Connector label '"+$("#labelId"+j).val()+"' should be unique")
+				$("#labelId"+j).addClass("field_error")
+			} else {
+				$("#labelId"+j).removeClass("field_error")
+			}
+		}
 		$("#connectorLabelText"+count).html(value)
 	}
 	function changeLabelPosition(count, value){
@@ -237,6 +252,14 @@
 			$("#rearImage").hide()
 			initializeConnectors( usize, null )
 		}
+	}
+	function validateForm(){
+		var isValid = true
+		if($(".field_error").length){
+			isValid = false
+			alert("WARNING : Connector labels should be unique")
+		}
+		return isValid
 	}
 </script>
 </body>
