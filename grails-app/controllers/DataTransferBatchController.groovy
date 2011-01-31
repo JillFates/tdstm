@@ -145,9 +145,11 @@ class DataTransferBatchController {
     								try{
 	    								if( ( ( it.correctedValue == null || assetEntity."$attribName" != it.correctedValue ) && assetEntity."$attribName" != it.importValue) || isNewValidate == "true"  ) {
 	    									isModified = "true"
-											if(("$attribName" == "assetTag" || "$attribName" == "assetName" ) && !it.importValue) throw new Exception()
-												
-	    									assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
+											if(("$attribName" == "assetTag" || "$attribName" == "assetName" ) && !it.importValue){
+												assetEntity."$attribName" = assetEntity?.id ? "TDS${assetEntity?.id}" :"TDS${projectId}${rowId+1}"
+											} else {
+												assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
+											}
 	    								}
     								} catch ( Exception ex ) {
     									errorConflictCount+=1
