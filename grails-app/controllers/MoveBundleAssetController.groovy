@@ -654,9 +654,10 @@ class MoveBundleAssetController {
 			reportFields <<[ 'flashMessage': "Please Select Bundles."]
 			render reportFields as JSON
 	    } else {
-			def assetsQuery = new StringBuffer(" SELECT ae.asset_entity_id as id, ae.asset_name as assetName, ae.asset_tag as assetTag,"+
-								" ae.source_rack as rack, ae.source_rack_position as uposition"+
-								" FROM asset_entity ae WHERE ae.project_id = ${projectId} ")
+			def assetsQuery = new StringBuffer(""" SELECT ae.asset_entity_id as id, ae.asset_name as assetName, ae.asset_tag as assetTag,
+								ae.move_bundle_id as bundle, ae.asset_type as type, ae.source_blade_chassis as chassis, ae.source_rack as rack, 
+								ae.source_blade_position as bladePos, ae.source_rack_position as uposition
+								FROM asset_entity ae WHERE ae.project_id = ${projectId} """)
 			if(moveBundleId != "all"){
 				assetsQuery.append(" AND ae.move_bundle_id = ${moveBundleId} ")
 			}
@@ -665,8 +666,21 @@ class MoveBundleAssetController {
 			if( !assetEntityList ){
 				reportFields <<[ 'flashMessage': "Team Members not Found for selected Teams"]
 			} else {
+				assetEntityList.each{
+					if(it.type == "Blade"){
+						def chassisAsset = AssetEntity.findWhere(assetTag:it.chassis,moveBundle:MoveBundle.get(it.bundle))
+						def pos = it.bladePos ? "-"+it.bladePos : ""
+						it.rack = chassisAsset.sourceRack +  pos
+						it.assetName = chassisAsset.assetName
+					} else {
+						def pos = it.uposition ? "-"+it.uposition : ""
+						it.rack = it.rack + pos
+					}
+				}
+				
 				reportFields << assetEntityList
 			}
+			
 			render reportFields  as JSON
 	    }
 	}

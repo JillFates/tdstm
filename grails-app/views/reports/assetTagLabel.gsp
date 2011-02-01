@@ -35,7 +35,7 @@ var jobdata = job.NewJobDataRecordSet();
 	    	jobdata.SetDataField('rack', assetsList[i].rack);
 	    	
 	    }
-	    
+	  
 	    // now we print one copy of the label with default settings
 	    try 
 	    {
@@ -138,7 +138,7 @@ function mySelect(x)
 	 function generateLabels() {
 	 	var projectId = ${projectInstance?.id}
 	 	var moveBundle = document.getElementById( 'moveBundleId' ).value
-		${remoteFunction(action:'getAssetTagLabelData', params:'\'moveBundle=\' + moveBundle +\'&project=\'+projectId ', onComplete:'startprintjob(e)')}
+		${remoteFunction(controller:'moveBundleAsset', action:'getAssetTagLabelData', params:'\'moveBundle=\' + moveBundle +\'&project=\'+projectId ', onComplete:'startprintjob(e)')}
 	 }
      
     </script>
