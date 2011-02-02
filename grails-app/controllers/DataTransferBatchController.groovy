@@ -68,7 +68,15 @@ class DataTransferBatchController {
 		    			def assetEntity
 		    			if( assetEntityId ) {
 		    				assetEntity = AssetEntity.get(assetEntityId)
-		    				if ( dataTransferBatch.dataTransferSet.id == 1 ) {
+							errorCount += assetEntity ? 0 : 1 
+							if(!assetEntity){
+								def obj = dataTransferValueRowList[dataTransferValueRow]
+								obj.hasError = 1
+								obj.errorText = "Unknown AssetID"
+								obj.save(flush:true)
+								dataTransferBatch.hasErrors = 1
+							}
+		    				if ( assetEntity && dataTransferBatch.dataTransferSet.id == 1 ) {
 		    					def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, assetEntity, dtvList, projectInstance )
 		    					flag = validateResultList[0]?.flag
 		    					errorConflictCount = errorConflictCount+validateResultList[0]?.errorConflictCount 

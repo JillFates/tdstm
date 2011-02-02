@@ -271,8 +271,14 @@ class AssetEntityController {
 	                            	if( dataTransferAttributeMapInstance != null ) {
 	                            		def assetId
 	                            		if( sheetColumnNames.containsKey("assetId") && (sheet.getCell( 0, r ).contents != "") ) {
-	                            			assetId = Integer.parseInt(sheet.getCell( 0, r ).contents)
-	                                    }
+	                            			try{
+	                            				assetId = Integer.parseInt(sheet.getCell( 0, r ).contents)
+	                            			} catch( NumberFormatException ex ) {
+									            flash.message = "AssetId Should be Integer"
+									            redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+									            return;
+									        } 
+	                            		}
 	                            		def dataTransferValues = "("+assetId+",'"+sheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+dataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
 	                            		dataTransferValueList.append(dataTransferValues)
 	                            		dataTransferValueList.append(",")
@@ -341,11 +347,15 @@ class AssetEntityController {
                 redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
 	            return;  
 	        }
-        }catch( Exception ex ) {
+        } catch( NumberFormatException ex ) {
+            flash.message = ex
+            redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+            return;
+        } catch( Exception ex ) {
             flash.message = grailsApplication.metadata[ 'app.file.format' ]
             redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
             return;
-        }
+        } 
     }
     /*------------------------------------------------------------
      * download data form Asset Entity table into Excel file
