@@ -545,10 +545,12 @@ class WalkThroughController {
     	def principal = SecurityUtils.subject.principal
     	def loginUser = UserLogin.findByUsername ( principal )
 		def assetEntity = AssetEntity.findById( params.assetId )
+		def commentType = params.commentType
     	def assetComment = new AssetComment()
     	assetComment.comment = params.comments
     	assetComment.assetEntity = assetEntity
-    	assetComment.commentType = params.commentType
+		if(commentType =='instruction') assetComment.mustVerify = 1
+    	assetComment.commentType = commentType
     	assetComment.category = 'walkthru'
     	assetComment.createdBy = loginUser.person
     	assetComment.save()

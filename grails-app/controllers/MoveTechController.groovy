@@ -655,7 +655,7 @@ class MoveTechController {
 	                    			
                         		}
                         	}
-                        	assetComment = AssetComment.findAllByAssetEntity( assetItem )
+                        	assetComment = AssetComment.findAllByAssetEntityAndCommentType( assetItem,'instruction' )
                         	def stateLabel = stateEngineService.getStateLabel( moveBundleInstance.project.workflowCode, transitionStates[0].stateTo )
 							def modelConnectors
 							if(assetItem.model)
@@ -1079,7 +1079,7 @@ class MoveTechController {
                                     }
                                 }
                             }
-                            assetComment = AssetComment.findAll( "from AssetComment ac where ac.assetEntity = $assetItem.id and ac.commentType != 'issue' " )
+                            assetComment = AssetComment.findAllByAssetEntityAndCommentType( assetItem,'instruction' )
                             def cleanedId = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Cleaned" )
                             def cartAssetCountQuery = new StringBuffer(" select count(a.asset_entity_id) as assetCount from asset_entity a "+
                             											"left join project_asset_map p on ( a.asset_entity_id = p.asset_id  ) " +

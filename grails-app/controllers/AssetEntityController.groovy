@@ -274,7 +274,7 @@ class AssetEntityController {
 	                            			try{
 	                            				assetId = Integer.parseInt(sheet.getCell( 0, r ).contents)
 	                            			} catch( NumberFormatException ex ) {
-									            flash.message = "AssetId Should be Integer"
+									            flash.message = "AssetId should be Integer"
 									            redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
 									            return;
 									        } 
