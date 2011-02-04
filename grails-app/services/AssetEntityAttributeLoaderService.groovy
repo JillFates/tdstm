@@ -470,4 +470,24 @@ class AssetEntityAttributeLoaderService {
 		}
 		return teamInstance
 	}
+	/*
+    *  Create asset_cabled_Map for all asset model connectors 
+    */
+    def createModelConnectors( assetEntity ){
+    	def assetConnectors = ModelConnector.findAllByModel( assetEntity.model )
+		assetConnectors.each{
+			def assetCableMap = new AssetCableMap(
+												cable : "Cable"+it.connector,
+												fromAsset: assetEntity,
+												fromConnectorNumber : it,
+												status : it.status
+												)
+			if ( !assetCableMap.validate() || !assetCableMap.save() ) {
+				def etext = "Unable to create assetCableMap" +
+                GormUtil.allErrorsString( assetCableMap )
+				println etext
+				log.error( etext )
+			}
+		}
+    }
 }

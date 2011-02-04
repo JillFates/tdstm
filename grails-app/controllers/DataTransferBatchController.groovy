@@ -127,6 +127,12 @@ class DataTransferBatchController {
 				    				if( assetEntity."$attribName" != modelInstance || isNewValidate == "true" ) {
     									isModified = "true"
     									assetEntity."$attribName" = modelInstance 
+    									AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
+																		toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
+																		where toAsset = ? """,[assetEntity])
+						
+						        		AssetCableMap.executeUpdate("delete from AssetCableMap where fromAsset = ?",[assetEntity])
+						        		assetEntityAttributeLoaderService.createModelConnectors( assetEntity )
     								}
     							} else if( it.eavAttribute.backendType == "int"){
     								def correctedPos

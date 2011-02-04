@@ -27,6 +27,7 @@ class AssetEntityController {
     def filterService
 	def moveBundleService
 	def sessionFactory 
+	def assetEntityAttributeLoaderService
     protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8']
 	def index = {
 		redirect( action:list, params:params )
@@ -698,7 +699,7 @@ class AssetEntityController {
         	assetEntityInstance.updateRacks()
 			 
 			if(assetEntityInstance.model){
-				createModelConnectors( assetEntityInstance )
+				assetEntityAttributeLoaderService.createModelConnectors( assetEntityInstance )
 			}
 
             flash.message = "AssetEntity ${assetEntityInstance.assetName} created"
@@ -809,7 +810,7 @@ class AssetEntityController {
 														where toAsset = ? """,[assetEntityInstance])
 
 	            		AssetCableMap.executeUpdate("delete from AssetCableMap where fromAsset = ?",[assetEntityInstance])
-	            		createModelConnectors( assetEntityInstance )
+	            		assetEntityAttributeLoaderService.createModelConnectors( assetEntityInstance )
 	            	}
 	            } else {
 	            	def etext = "Unable to Update Asset Entity" +
@@ -1724,25 +1725,4 @@ class AssetEntityController {
         }
     	render statusMsg
     }
-    /*
-    *  Create asset_cabled_Map for all asset model connectors 
-    */
-    def createModelConnectors( assetEntity ){
-    	def assetConnectors = ModelConnector.findAllByModel( assetEntity.model )
-		assetConnectors.each{
-			def assetCableMap = new AssetCableMap(
-												cable : "Cable"+it.connector,
-												fromAsset: assetEntity,
-												fromConnectorNumber : it,
-												status : it.status
-												)
-			if ( !assetCableMap.validate() || !assetCableMap.save() ) {
-				def etext = "Unable to create assetCableMap" +
-                GormUtil.allErrorsString( assetCableMap )
-				println etext
-				log.error( etext )
-			}
-		}
-    }
-    
 }
