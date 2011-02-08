@@ -227,9 +227,10 @@ class DataTransferBatchController {
     			status.setRollbackOnly()
 				flash.message = "Import Batch process failed"
     		}
+    		def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
     		flash.message = " Process Results:<ul><li>	Assets in Batch: ${batchRecords} <li>Records Inserted: ${insertCount}</li>"+
     							"<li>Records Updated: ${updateCount}</li><li>Asset Errors: ${errorCount} </li> "+
-    							"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}(${unknowAssets.substring(0,unknowAssets.length()-1)})</li></ul> " 
+    							"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> " 
     	}
     	redirect ( action:list, params:[projectId:projectId, message:flash.message ] )
      }
