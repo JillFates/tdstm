@@ -49,6 +49,9 @@ class DataTransferBatchController {
     		def updateCount = 0
     		def errorCount = 0
     		def batchRecords = 0
+			def unknowAssetIds = 0
+			def unknowAssets = ""
+			def assetsList = new ArrayList()
     		try{
     			dataTransferBatch = DataTransferBatch.get(params.batchId)
     			if(dataTransferBatch){
@@ -67,27 +70,24 @@ class DataTransferBatchController {
     					def isFormatError = 0
 		    			def assetEntity
 		    			if( assetEntityId ) {
-		    				assetEntity = AssetEntity.get(assetEntityId)
-							errorCount += assetEntity ? 0 : 1 
-							if(!assetEntity){
-								def obj = dataTransferValueRowList[dataTransferValueRow]
-								obj.hasError = 1
-								obj.errorText = "Unknown AssetID"
-								obj.save(flush:true)
-								dataTransferBatch.hasErrors = 1
+		    				assetEntity = AssetEntity.findByIdAndProject(assetEntityId,projectInstance)
+							if(assetEntity?.id != null){
+			    				if ( dataTransferBatch.dataTransferSet.id == 1 ) {
+			    					def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, assetEntity, dtvList, projectInstance )
+			    					flag = validateResultList[0]?.flag
+			    					errorConflictCount = errorConflictCount+validateResultList[0]?.errorConflictCount 
+			    					if( flag == 0 ) {
+			    						isNewValidate = "false"
+			    					}else {
+			    						errorCount+=1
+			    					}
+			    				} else {
+			    					flag = 0;
+			    				}
+							} else {
+								unknowAssetIds += 1
+								unknowAssets += assetEntityId+"," 
 							}
-		    				if ( assetEntity && dataTransferBatch.dataTransferSet.id == 1 ) {
-		    					def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, assetEntity, dtvList, projectInstance )
-		    					flag = validateResultList[0]?.flag
-		    					errorConflictCount = errorConflictCount+validateResultList[0]?.errorConflictCount 
-		    					if( flag == 0 ) {
-		    						isNewValidate = "false"
-		    					}else {
-		    						errorCount+=1
-		    					}
-		    				} else {
-		    					flag = 0;
-		    				}
 		    			} else {
 		    				assetEntity = new AssetEntity()
 		    				assetEntity.attributeSet = EavAttributeSet.findById(1)
@@ -127,12 +127,7 @@ class DataTransferBatchController {
 				    				if( assetEntity."$attribName" != modelInstance || isNewValidate == "true" ) {
     									isModified = "true"
     									assetEntity."$attribName" = modelInstance 
-    									AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-																		toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-																		where toAsset = ? """,[assetEntity])
-						
-						        		AssetCableMap.executeUpdate("delete from AssetCableMap where fromAsset = ?",[assetEntity])
-						        		assetEntityAttributeLoaderService.createModelConnectors( assetEntity )
+										assetsList.add(assetEntity)
     								}
     							} else if( it.eavAttribute.backendType == "int"){
     								def correctedPos
@@ -160,7 +155,7 @@ class DataTransferBatchController {
 	    								if( ( ( it.correctedValue == null || assetEntity."$attribName" != it.correctedValue ) && assetEntity."$attribName" != it.importValue) || isNewValidate == "true"  ) {
 	    									isModified = "true"
 											if(("$attribName" == "assetTag" || "$attribName" == "assetName" ) && !it.importValue){
-												assetEntity."$attribName" = assetEntity?.id ? "TDS${assetEntity?.id}" :"TDS${projectId}${rowId+1}"
+												assetEntity."$attribName" = assetEntity?.id ? "TDS${assetEntity?.id}" :"TDS${projectId}${rowId+1}${dataTransferBatch.id}"
 											} else {
 												assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
 											}
@@ -224,6 +219,9 @@ class DataTransferBatchController {
     				}
     				dataTransferBatch.statusCode = 'COMPLETED'
     				dataTransferBatch.save()
+					/* update assets racks, cabling data once process done */
+					updateAssetsCabling( assetsList )
+					updateAssetRacks()
     			}
     		}catch (Exception e) {
     			status.setRollbackOnly()
@@ -231,10 +229,8 @@ class DataTransferBatchController {
     		}
     		flash.message = " Process Results:<ul><li>	Assets in Batch: ${batchRecords} <li>Records Inserted: ${insertCount}</li>"+
     							"<li>Records Updated: ${updateCount}</li><li>Asset Errors: ${errorCount} </li> "+
-    							"<li>Attribute Errors: ${errorConflictCount}</li></ul> " 
+    							"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}(${unknowAssets.substring(0,unknowAssets.length()-1)})</li></ul> " 
     	}
-    	/* update assets racks once process done */
-		updateAssetRacks()
     	redirect ( action:list, params:[projectId:projectId, message:flash.message ] )
      }
     /* --------------------------------------
@@ -393,5 +389,18 @@ class DataTransferBatchController {
 				println "Updated ${source} rack to ${rack.id} for ${updated} assets"
 			}
 		}
+    }
+    /*
+     *  Update assets cabling data for selected list of assets 
+     */
+    def updateAssetsCabling( assetsList ){
+    	assetsList.each{ assetEntity->
+    		AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
+								toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
+								where toAsset = ? """,[assetEntity])
+			
+			AssetCableMap.executeUpdate("delete from AssetCableMap where fromAsset = ?",[assetEntity])
+			assetEntityAttributeLoaderService.createModelConnectors( assetEntity )
+    	}
     }
 }
