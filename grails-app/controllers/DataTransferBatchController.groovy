@@ -70,8 +70,8 @@ class DataTransferBatchController {
     					def isFormatError = 0
 		    			def assetEntity
 		    			if( assetEntityId ) {
-		    				assetEntity = AssetEntity.findByIdAndProject(assetEntityId,projectInstance)
-							if(assetEntity?.id != null){
+		    				assetEntity = AssetEntity.get(assetEntityId)
+							if(assetEntity?.id != null && assetEntity.project.id == projectInstance.id ){
 			    				if ( dataTransferBatch.dataTransferSet.id == 1 ) {
 			    					def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, assetEntity, dtvList, projectInstance )
 			    					flag = validateResultList[0]?.flag
