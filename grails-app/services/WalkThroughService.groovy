@@ -86,31 +86,33 @@ class WalkThroughService {
                 if(auditType !="source"){
                 	position = assetEntity?.targetRackPosition
                 }
-    			def moveBundle = MoveBundle.findById( assetEntity?.moveBundle?.id )
-        		def walkthruState = stateEngineService.getStateId(moveBundle?.project?.workflowCode,"SourceWalkthru")
-    			def cssClass = "asset_ready"
-    			def flag = true
-    			if(i == 6 && assetsListSize != 7 ){
-    				assetsListView.append("<TR class=jump><TD align=middle colspan='3'>"+
-    						"<A class=nav_button name='assetList"+i+"' href='#assetList"+i+"'>Page Down</A></TD></TR>")
-    			} else if(i > 6 && (i - 6) % 13 == 0 && (assetsListSize - 7 ) % 13 != 0){
-    				assetsListView.append("<TR class=jump><TD colSpan=3 align=middle><A class=nav_button href='#select_asset'>Top</A>&nbsp;&nbsp;&nbsp;"+ 
-    					"<A class=nav_button href='#assetList"+(i-13)+"'>Page Up</A>&nbsp;&nbsp;&nbsp;"+ 
-    					"<A class=nav_button name='assetList"+i+"' href='#assetList"+i+"'>Page Down</A></TD></TR>")
+    			if(assetEntity?.moveBundle){
+	    			def moveBundle = MoveBundle.findById( assetEntity?.moveBundle?.id )
+	        		def walkthruState = stateEngineService.getStateId(moveBundle?.project?.workflowCode,"SourceWalkthru")
+	    			def cssClass = "asset_ready"
+	    			def flag = true
+	    			if(i == 6 && assetsListSize != 7 ){
+	    				assetsListView.append("<TR class=jump><TD align=middle colspan='3'>"+
+	    						"<A class=nav_button name='assetList"+i+"' href='#assetList"+i+"'>Page Down</A></TD></TR>")
+	    			} else if(i > 6 && (i - 6) % 13 == 0 && (assetsListSize - 7 ) % 13 != 0){
+	    				assetsListView.append("<TR class=jump><TD colSpan=3 align=middle><A class=nav_button href='#select_asset'>Top</A>&nbsp;&nbsp;&nbsp;"+ 
+	    					"<A class=nav_button href='#assetList"+(i-13)+"'>Page Up</A>&nbsp;&nbsp;&nbsp;"+ 
+	    					"<A class=nav_button name='assetList"+i+"' href='#assetList"+i+"'>Page Down</A></TD></TR>")
+	    			}
+					def doneAsset = AssetTransition.find("from AssetTransition t where t.assetEntity = ${assetEntity.id} "+
+														"and t.voided = 0 and t.stateTo = ${walkthruState}")
+	    			if(doneAsset){
+	    				cssClass = "asset_done"
+					}
+	    			if( doneAsset && viewType == 'todo' ){
+	    				flag = false
+					}
+					if(flag){
+						assetsListView.append("<tr class='$cssClass' onclick=\"showAssetMenu('${assetEntity?.id}','${assetEntity?.assetName}','${moveBundle?.id}','${moveBundle?.name}')\">"+
+								"<td class='center'>${position}</td><td class='center'>${assetEntity?.assetTag}</td>"+
+								"<td class='center'>${assetEntity?.assetName}</td></tr>")
+				 	}
     			}
-				def doneAsset = AssetTransition.find("from AssetTransition t where t.assetEntity = ${assetEntity.id} "+
-													"and t.voided = 0 and t.stateTo = ${walkthruState}")
-    			if(doneAsset){
-    				cssClass = "asset_done"
-				}
-    			if( doneAsset && viewType == 'todo' ){
-    				flag = false
-				}
-				if(flag){
-					assetsListView.append("<tr class='$cssClass' onclick=\"showAssetMenu('${assetEntity?.id}','${assetEntity?.assetName}','${moveBundle?.id}','${moveBundle?.name}')\">"+
-							"<td class='center'>${position}</td><td class='center'>${assetEntity?.assetTag}</td>"+
-							"<td class='center'>${assetEntity?.assetName}</td></tr>")
-			 	}
 			 }
 			 if(assetsListSize > 10){
 				 assetsListView.append("<TR class=jump><TD colSpan=3 align=middle><A class=nav_button href='#select_asset'>Top</A>&nbsp;&nbsp;&nbsp;"+ 
