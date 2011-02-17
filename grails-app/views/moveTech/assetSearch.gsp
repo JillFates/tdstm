@@ -133,7 +133,7 @@
 
 	 	<div id="mydiv" onclick="this.style.display = 'none';">
  			<g:if test="${flash.message}">
-				<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
+				<div style="color: red;"><ul>${flash.message}</ul></div>
 			</g:if> 
 		</div>
 

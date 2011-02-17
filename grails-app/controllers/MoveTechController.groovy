@@ -487,6 +487,7 @@ class MoveTechController {
     	if(flash.message?.contains("was not located")){
     		flash.clear()
     	}
+    	flash.message= ""
 		def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
 		if ( principal ) {
             def assetItem
@@ -510,7 +511,7 @@ class MoveTechController {
             	def query = new StringBuffer ("from AssetEntity ae where ae.moveBundle=${moveBundleInstance.id} and ae.assetTag = :search ")
                 assetItem = AssetEntity.find( query.toString(), [ search : search ] )
                 if ( assetItem == null ) {
-                    flash.message = message ( code : "Asset Tag number '${search}' was not located" )
+                    flash.message += message ( code : "<li>Asset Tag number '${search}' was not located</li>" )
                     if ( checkHome ) {
                         redirect ( action : 'index', 
                             params:["bundle":params.bundle, "team":params.team, "project":params.project,
@@ -549,7 +550,7 @@ class MoveTechController {
                                 teamId = ( assetItem.sourceTeam.id ).toString()
                                 teamName = assetItem.sourceTeam.name
                             } else {
-                                flash.message = message ( code : "The asset [${assetItem.assetName}] is not assigned to team [${loginTeam}] " )
+                                flash.message += message ( code : "<li>The asset [${assetItem.assetName}] is not assigned to team [${loginTeam}] </li>" )
                                 if ( checkHome ) {
                                     redirect ( action: 'index',
                                         params:["bundle":params.bundle, "team":params.team, "project":params.project,
@@ -569,7 +570,7 @@ class MoveTechController {
                                 teamId = ( assetItem.targetTeam.id ).toString()
                                 teamName = assetItem.targetTeam.name
                             } else {
-                                flash.message = message( code : "The asset [${assetItem.assetName}] is not assigned to team [${loginTeam}] " )
+                                flash.message += message( code : "<li>The asset [${assetItem.assetName}] is not assigned to team [${loginTeam}] </li>" )
                                 if ( checkHome ) {
                                     redirect ( action: 'index',
                                         params:["bundle":params.bundle, "team":params.team, "project":params.project,
@@ -586,8 +587,7 @@ class MoveTechController {
                             }
                         }
                         if ( teamId != params.team ) {
-    	                    	
-                            flash.message = message ( code : "The asset [${assetItem.assetName}] is assigned to team [${teamName}] " )
+                            flash.message += message ( code : "<li>The asset [${assetItem.assetName}] is assigned to team [${teamName}] </li>" )
                             // commented as per JIRA:TM-199 
                             /* if ( checkHome ) {
                             redirect ( action: 'index',
@@ -607,7 +607,7 @@ class MoveTechController {
                         												"order by date_created desc, stateTo desc limit 1 ")
                         projMap = ProjectAssetMap.findByAsset( assetItem )
                         if( !transitionStates.size() ) {
-                        	flash.message = message ( code :" The asset has not yet been released " )
+                        	flash.message += message ( code :"<li> No actions for this asset </li>" )
                         	if ( checkHome ) {
                         		redirect ( action: 'index',
                                     params:["bundle":params.bundle, "team":params.team, "project":params.project,
@@ -624,7 +624,7 @@ class MoveTechController {
                         } else {
                         	stateVal = stateEngineService.getState( moveBundleInstance.project.workflowCode, transitionStates[0].stateTo )
                         	if ( stateVal == "Hold" ) {
-                        		flash.message = message ( code : "The asset is on Hold. Please contact manager to resolve issue." )
+                        		flash.message += message ( code : "<li>The asset is on Hold. Please contact manager to resolve issue.</li>" )
                         		if( checkHome ) {
                         			redirect ( action: 'index',
                                         params:["bundle":params.bundle, "team":params.team, "project":params.project,
@@ -643,7 +643,7 @@ class MoveTechController {
                         	taskSize = taskList.size()
                         	if ( taskSize == 1 ) {
                         		if ( taskList.contains ( "Hold" ) ) {
-                        			flash.message = message ( code : "NO ACTIONS FOR ASSET. You may place it on hold to alert the move coordinator " )
+                        			flash.message += message ( code : "<li>NO ACTIONS FOR ASSET. You may place it on hold to alert the move coordinator </li>" )
                         		}
                         	} else if ( taskSize > 1 ) {
                         		
@@ -1026,7 +1026,7 @@ class MoveTechController {
                     													"order by date_created desc, stateTo desc limit 1 ")
                         projMap = ProjectAssetMap.findByAsset( assetItem )
                         if( !transitionStates.size()) {
-                            flash.message = message ( code : " The asset has not yet been released " )
+                            flash.message = message ( code : " No actions for this asset " )
                             if ( textSearch ) {
                                 render(view:'cleaningAssetSearch',
                                     model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment, stateVal:stateVal,

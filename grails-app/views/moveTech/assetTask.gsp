@@ -117,7 +117,7 @@
 		<div id="mydiv" onclick="this.style.display = 'none';setFocus()">						            
  			<g:if test="${flash.message}">
 				<br />
-				<div style="color: red;"><ul><li>${flash.message}</li></ul></div>
+				<div style="color: red;"><ul>${flash.message}</ul></div>
 			</g:if> 
 		</div>		
            	<div style="float:left; width:220px; margin:5px 5px;"><b>My Tasks:</b></div>
