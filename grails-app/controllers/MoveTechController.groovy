@@ -714,6 +714,15 @@ class MoveTechController {
             if ( params.user == "mt" ) {
                 workflow = workflowService.createTransition ( moveBundleInstance.project.workflowCode, "MOVE_TECH", "Hold", asset,bundle, loginUser, loginTeam, params.enterNote )
                 if ( workflow.success ) {
+                	
+                	if(params.location == 's' && asset.sourceTeam.id != loginTeam.id ){
+            			asset.sourceTeam = loginTeam
+						asset.save(flush:true)
+            		} else if(params.location == 't' && asset.targetTeam.id != loginTeam.id ){
+            			asset.targetTeam = loginTeam
+						asset.save(flush:true)
+            		}
+                	
                     def assetComment = new AssetComment()
                     assetComment.comment = enterNote
                     assetComment.assetEntity = asset
@@ -801,6 +810,15 @@ class MoveTechController {
 	            def workflow = workflowService.createTransition( moveBundleInstance.project.workflowCode, "MOVE_TECH", actionLabel, asset, bundle, loginUser, loginTeam, params.enterNote )
 	            if ( workflow.success ) {
 	            	if(flags?.contains("busy")){
+	            		
+	            		if(params.location == 's' && asset.sourceTeam.id != loginTeam.id ){
+	            			asset.sourceTeam = loginTeam
+							asset.save(flush:true)
+	            		} else if(params.location == 't' && asset.targetTeam.id != loginTeam.id ){
+	            			asset.targetTeam = loginTeam
+							asset.save(flush:true)
+	            		}
+	            			
 	            		flash.message = message ( code : workflow.message )
 	                    redirect ( action:'assetSearch', params:params)
 	            	} else {
