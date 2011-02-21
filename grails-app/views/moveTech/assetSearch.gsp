@@ -141,7 +141,7 @@
 
 		<g:if test="${projMap}">			
 		<table style="border:0px; width=220">
-			<tr><td><dt>Asset Tag:&nbsp;<input name="search" type="text" size="08" value="${search}" id="search" autocorrect="off" autocapitalize="off"  /></dt><dd><a href="#detail">&nbsp;${projMap?.asset?.assetTag}&nbsp;&nbsp;&nbsp;(Details)</a></dd></td>
+			<tr><td style="padding:0px;">Asset:&nbsp;<input name="search" type="text" size="12" value="${search}" id="search" autocorrect="off" autocapitalize="off"  /><a href="#detail">(Details...)</a></td>
 			</tr>
 	
  			<g:if test="${assetComment}">
