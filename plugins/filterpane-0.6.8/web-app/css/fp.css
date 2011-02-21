@@ -1,10 +1,10 @@
 @CHARSET "ISO-8859-1";
 .filterPane {
-	position: relative;
+	position: static;
 	width:50%;
-        left: 50%;
+    left: 50%;
 	margin-left: -25%;
-	top: -575px;
+	top: -1141px;
 	border: 2px solid #666666;
 	background-color: white;
 	padding: 5px;

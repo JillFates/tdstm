@@ -211,11 +211,11 @@ Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" 
 </table>
 </g:form>
 </div>
-<filterpane:filterPane domainBean="AssetEntity"  excludeProperties="sourceRackPosition,targetRackPosition,railType,ipAddress,hinfo,newOrOld,truck,priority,cart,shelf,dateCreated,project.name" />
 <div class="buttons"><g:form>
 	<span class="button"><input type="button"
 		value="New Asset Entity" class="create" onClick="createDialog()" /></span>
 </g:form></div>
+<filterpane:filterPane domainBean="AssetEntity"  excludeProperties="sourceRackPosition,targetRackPosition,railType,ipAddress,hinfo,newOrOld,truck,priority,cart,shelf,dateCreated,project.name" />
 </div>
 
 <div id="createDialog" title="Create Asset Entity" style="display: none;">
