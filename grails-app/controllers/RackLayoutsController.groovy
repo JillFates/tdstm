@@ -15,15 +15,17 @@ class RackLayoutsController {
 		userPreferenceService.loadPreferences("CURR_BUNDLE")
 		def currentBundle = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
 		/* set first bundle as default if user pref not exist */
-
-		if(!currentBundle)
+		def isCurrentBundle = true
+		if(!currentBundle){
 			currentBundle = moveBundleInstanceList[0]?.id?.toString()
-					
-		[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, currentBundle:currentBundle]
+			isCurrentBundle = false
+		}
+		return [moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, 
+				currentBundle:currentBundle, isCurrentBundle : isCurrentBundle]
 	}
 	
 	def save = {
-		def bundleId = params.moveBundle
+		List bundleId = request.getParameterValues("moveBundle")
 		def maxUSize = 42
 		if(bundleId == "null") {
 			return [errorMessage: "Please Select a Bundle."]
@@ -38,15 +40,24 @@ class RackLayoutsController {
 			def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
 			def rackLayout = []
 			def project = Project.findById(projectId)
-			def moveBundle = MoveBundle.findById(bundleId)
+			def moveBundles = MoveBundle.findAllByProject( project )
+			if(!bundleId.contains("all")){
+				def bundlesString = bundleId.toString().replace("[","(").replace("]",")")
+				moveBundles = MoveBundle.findAll("from MoveBundle m where id in ${bundlesString} ")
+			}
 			def isAdmin = SecurityUtils.getSubject().hasRole("PROJ_MGR")
 			if( !isAdmin ) {
 				isAdmin = SecurityUtils.getSubject().hasRole("PROJECT_ADMIN")
 			}
+			
 			if(request.getParameterValues("sourcerack") != ['none']) {
 				def rack = request.getParameterValues("sourcerack")
 				if(rack[0] == "") {
-					sourceRacks = moveBundle.sourceRacks
+					moveBundles.each{ bundle->
+						bundle.sourceRacks.each{ sourceRack->
+							sourceRacks << sourceRack		
+						}
+					}
 				} else {
 					rack.each {
 						sourceRacks << Rack.get(new Long(it))
@@ -58,7 +69,11 @@ class RackLayoutsController {
 			if(request.getParameterValues("targetrack") != ['none']) {
 				def rack = request.getParameterValues("targetrack")
 				if(rack[0] == "") {
-					targetRacks = moveBundle.targetRacks
+					moveBundles.each{ bundle->
+						bundle.targetRacks.each{ targetRack->
+							targetRacks << targetRack	
+						}
+					}
 				} else {
 					rack.each {
 						targetRacks << Rack.get(new Long(it))
@@ -77,7 +92,7 @@ class RackLayoutsController {
 				if(includeOtherBundle){
 					racksByFilter = rack.assets.findAll { it.project == project }.sort { rack?.source == 1 ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
 				} else {
-					racksByFilter = rack.assets.findAll { it.moveBundle == moveBundle && it.project == project }.sort { rack?.source == 1 ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
+					racksByFilter = rack.assets.findAll { moveBundles?.id?.contains(it.moveBundle?.id) && it.project == project }.sort { rack?.source == 1 ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
 				}
 				racksByFilter.each { assetEntity ->
 					def overlapError = false
@@ -176,9 +191,9 @@ class RackLayoutsController {
 						if(assetEnity.overlapError) {
 							cssClass = 'rack_error'
 							rackStyle = 'rack_error'
-						} else if(bundleId && assetEnity.assetEntity?.moveBundle != moveBundle) {
+						} else if(bundleId && !moveBundles?.id?.contains(assetEnity.assetEntity?.moveBundle?.id) ) {
 							def currentTime = GormUtil.convertInToGMT( "now", tzId ).getTime()
-							def startTime = moveBundle.startTime ? moveBundle.startTime.getTime() : 0
+							def startTime = assetEnity.assetEntity?.moveBundle.startTime ? assetEnity.assetEntity?.moveBundle.startTime.getTime() : 0
 							if(startTime < currentTime){
 								cssClass = 'rack_past'
 							} else {
@@ -212,10 +227,26 @@ class RackLayoutsController {
 	}
 	
 	def getRackDetails = {
-		def bundle = MoveBundle.get(params.bundleId)
-		/* set user pref CURR_BUNDLE */
-		userPreferenceService.setPreference( "CURR_BUNDLE", params.bundleId )
-		def rackDetails = [[sourceRackList:bundle.sourceRacks, targetRackList:bundle.targetRacks]]
+		def bundleIds = params.bundles
+		def moveBundles
+		if(bundleIds.contains('all')){
+			def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
+			moveBundles = MoveBundle.findAllByProject( Project.get( projectId ) )
+		} else {
+			moveBundles = MoveBundle.findAll( "from MoveBundle m where m.id in ($bundleIds)" )
+		}
+		def sourceRacks = []
+		def targetRacks = []
+		moveBundles.each{moveBundle ->
+			moveBundle.sourceRacks.each{
+				sourceRacks << it
+			}
+			moveBundle.targetRacks.each{
+				targetRacks << it
+			}
+		}
+		
+		def rackDetails = [[sourceRackList:sourceRacks, targetRackList:targetRacks]]
 		render rackDetails as JSON
 	}
 

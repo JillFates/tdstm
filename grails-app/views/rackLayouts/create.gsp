@@ -176,6 +176,15 @@
 			alert("Asset Entity is not updated")
 		}
 	}
+	// Script to get the combined rack list
+	function getRackDetails( objId ){
+		var bundles = new Array()
+		$("#"+objId+" option:selected").each(function () {
+			bundles.push($(this).val())
+       	});
+       	
+		${remoteFunction(action:'getRackDetails', params:'\'bundles=\' +bundles', onComplete:'updateRackDetails(e)')}
+	}
     </script>
 </head>
 <body>
@@ -189,10 +198,10 @@
 	<tbody>
 		<tr>
 			<td>
-				<h1>Rack View</h1>
+				<h1 style="margin: 0px;">Rack View</h1>
 				<label><b>Bundle</b></label><br />
-				<select id="bundleId" name="moveBundle" onchange="${remoteFunction(action:'getRackDetails', params:'\'bundleId=\' + this.value', onComplete:'updateRackDetails(e)')}" style="width:150px">
-					<option value="null" selected="selected">Please Select</option>
+				<select id="bundleId" name="moveBundle" multiple="multiple" size="3" onchange="getRackDetails(this.id)" style="width:150px">
+					<option value="all" selected="selected">All</option>
 					<g:each in="${moveBundleInstanceList}" var="moveBundleList">
 						<option value="${moveBundleList?.id}">${moveBundleList?.name}</option>
 					</g:each>
@@ -313,9 +322,13 @@
 	var click = 1
 	$(document).ready(function() {
 		var bundleObj = $("#bundleId");
-		bundleObj.val('${currentBundle}');
-		var bundleId = bundleObj.val();
-		${remoteFunction(action:'getRackDetails', params:'\'bundleId=\' + bundleId', onComplete:'updateRackDetails(e)')};
+		var isCurrentBundle = '${isCurrentBundle}'
+		var bundleId = 'all';
+		if(isCurrentBundle == "true"){
+			bundleObj.val('${currentBundle}');
+			bundleId = bundleObj.val();
+		}
+		${remoteFunction(action:'getRackDetails', params:'\'bundles=\' + bundleId', onComplete:'updateRackDetails(e)')};
 		
 		$('input.submit').click(function() {
 			$('#commit').val($(this).val());
