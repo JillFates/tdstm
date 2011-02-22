@@ -809,16 +809,14 @@ class MoveTechController {
 	            def loginUser = UserLogin.findByUsername( principal )
 	            def workflow = workflowService.createTransition( moveBundleInstance.project.workflowCode, "MOVE_TECH", actionLabel, asset, bundle, loginUser, loginTeam, params.enterNote )
 	            if ( workflow.success ) {
+	            	if(params.location == 's' && asset.sourceTeam.id != loginTeam.id ){
+            			asset.sourceTeam = loginTeam
+						asset.save(flush:true)
+            		} else if(params.location == 't' && asset.targetTeam.id != loginTeam.id ){
+            			asset.targetTeam = loginTeam
+						asset.save(flush:true)
+            		}
 	            	if(flags?.contains("busy")){
-	            		
-	            		if(params.location == 's' && asset.sourceTeam.id != loginTeam.id ){
-	            			asset.sourceTeam = loginTeam
-							asset.save(flush:true)
-	            		} else if(params.location == 't' && asset.targetTeam.id != loginTeam.id ){
-	            			asset.targetTeam = loginTeam
-							asset.save(flush:true)
-	            		}
-	            			
 	            		flash.message = message ( code : workflow.message )
 	                    redirect ( action:'assetSearch', params:params)
 	            	} else {
