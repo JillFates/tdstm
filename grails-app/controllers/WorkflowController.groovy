@@ -73,31 +73,30 @@ class WorkflowController {
 			def transitionId = params.workflowTransition
 			def workflowTransitionsList
 			def workflowTransition
-			def swimlanes = []
-			def browserTest = request.getHeader("User-Agent").contains("MSIE")
+			def roleWiseTransitions = []
+			def swimlanes
 			def headerCount =0
 			if( transitionId ){
 				workflowTransition = WorkflowTransition.get( transitionId )
-				if( !browserTest){
-					headerCount = generateHeder(workflowTransition.workflow.id)
-				}
 				workflowTransitionsList = WorkflowTransition.findAll("FROM WorkflowTransition w where w.workflow = ? AND w.code not in ('SourceWalkthru','TargetWalkthru') order by w.transId", [workflowTransition?.workflow] )
 				def workflowTransitionMap = WorkflowTransitionMap.findAllByWorkflow( workflowTransition?.workflow )
-				def swimlane = Swimlane.findAllByWorkflow( workflowTransition?.workflow )
+				swimlanes = Swimlane.findAllByWorkflow( workflowTransition?.workflow )
 				// construct a map for different swimlane roles
-				swimlane.each{ role ->
+				workflowTransitionsList.each{ transition ->
 					def transitionsMap = []
-					workflowTransitionsList.each { transition->
-						transitionsMap << [transition:transition, workflowTransitionMap : workflowTransitionMap.find{it.workflowTransition.id == workflowTransition.id && it.swimlane.id ==  role.id && it.transId == transition.transId}]
+					swimlanes.each{ role ->
+						transitionsMap << [ swimlane : role, workflowTransitionMap : workflowTransitionMap.find{it.workflowTransition.id == workflowTransition.id && it.swimlane.id ==  role.id && it.transId == transition.transId}]
 					}
-					swimlanes << [swimlane : role, transitionsMap : transitionsMap]
+					roleWiseTransitions << [ transition:transition, transitionsMap : transitionsMap]
 				}
+			
 			} else {
 				redirect(action:home)
 			}
+			
 			return [workflowTransitionsList : workflowTransitionsList, workflowTransition:workflowTransition,
-					workflow : workflowTransition?.workflow, browserTest : browserTest,
-					headerCount : headerCount, swimlanes : swimlanes ]
+					workflow : workflowTransition?.workflow, swimlanes : swimlanes,
+					headerCount : headerCount, roleWiseTransitions : roleWiseTransitions ]
 	}
 	/*====================================================
 	 *  Create  new workflow workflow

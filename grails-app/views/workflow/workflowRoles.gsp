@@ -53,34 +53,29 @@
 </div>
 <g:form action="updateWorkflowRoles">
 
-<div id="tableContainer" class="${browserTest ? 'tableContainerIE' : 'tableContainer'}" style="margin-left: 5px;margin-right: 10px;">
-<table cellpadding="0" cellspacing="0" style="border:1px solid #63A242;margin: 10px 5px 10px 2px;">
+<div id="tableContainer" class="tableContainer" style="margin-left: 5px;margin-right: 10px;">
+<table cellpadding="0" cellspacing="0" style="border:1px solid #63A242;width: 600px;">
 	<thead>
 		<tr>
-			<th style="padding: 80px 0px 0px 28px;">Roles</th>
+			<th style="padding: 5px 6px">Transitions</th>
 			
-			<g:if test="${browserTest}">
-				<g:each in="${workflowTransitionsList}"  var="transitions">
-					<th class="verticaltext" title="${transitions.code}" style="color: ${transitions.header ? transitions.header : transitions.type == 'boolean' ? '#FF8000' : '#336600'}" nowrap="nowrap">${transitions?.name}</th>
-				</g:each>
-			</g:if>
-			<g:else>
-				<th style="padding-left: 0px; height: 137px" colspan="${headerCount}"><embed src="${createLinkTo(dir:'templates',file:'headerSvg_workflow.svg')}" type="image/svg+xml" width="${headerCount*25.88}" height="137px"/></th>
-			</g:else>
+			<g:each in="${swimlanes}" var="swimlane">
+				<th class="name" style="width: 80px;">${swimlane?.actorId}</th>
+			</g:each>
 		</tr>
 	</thead>
 	<tbody id="workflowRolesBody">
 		<g:if test="${workflowTransitionsList}">
-		<g:each in="${swimlanes}" var="swimlaneMap">
-			<tr id="swim_${swimlaneMap.swimlane?.id}">
-			<td class="name">${swimlaneMap.swimlane?.actorId}</td>
-			<g:each in="${swimlaneMap.transitionsMap}" var="transitionMap">
-				<td id="${swimlaneMap.swimlane?.name}_${transitionMap.transition?.transId}">
+		<g:each in="${roleWiseTransitions}" var="roleWiseTransition">
+			<tr id="transition_${roleWiseTransition.transition?.id}">
+			<td class="name"  style="color: ${roleWiseTransition?.transition.header ? roleWiseTransition?.transition.header : roleWiseTransition?.transition.type == 'boolean' ? '#FF8000' : '#336600'}" nowrap="nowrap">${roleWiseTransition?.transition?.name}</td>
+			<g:each in="${roleWiseTransition.transitionsMap}" var="transitionMap">
+				<td id="${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.transId}">
 					<g:if test="${transitionMap.workflowTransitionMap}">
-						<input type="checkbox" name="${swimlaneMap.swimlane?.name}_${transitionMap.transition?.id}" checked="checked"/>	
+						<input type="checkbox" name="${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.id}" checked="checked"/>	
 					</g:if>
 					<g:else>
-						<input type="checkbox" name="${swimlaneMap.swimlane?.name}_${transitionMap.transition?.id}"/>
+						<input type="checkbox" name="${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.id}"/>
 					</g:else>
 				</td>
 			</g:each>
