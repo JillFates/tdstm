@@ -294,8 +294,10 @@
 			<input type="text" name="connector" id="connectorId" size="15" onfocus="getConnectorData()" onblur="validateConnectorData(this.value, this.id)" />
 			<input type="hidden" name="assetCable" id="cabledTypeId"/>
 			<input type="hidden" name="actionType" id="actionTypeId"/>
+			<input type="hidden" name="connectorType" id="connectorTypeId"/>
 			<input type="hidden" name="asset" id="assetEntityId"/>
 		</div>
+		
 		</g:form>
 	</div>
 	<div style="clear: both;"></div>
@@ -334,9 +336,9 @@
 			$('#commit').val($(this).val());
 		});
 	});
-	function openCablingDiv( id, value ){
-		$("#assetEntityId").val(id)
-		${remoteFunction(action:'getCablingDetails', params:'\'assetId=\' + id', onComplete:'showCablingDetails(e)')};
+	function openCablingDiv( assetId, value ){
+		$("#assetEntityId").val(assetId)
+		${remoteFunction(action:'getCablingDetails', params:'\'assetId=\' + assetId', onComplete:'showCablingDetails(e)')};
 		$("#cablingDialogId").dialog( "option", "title", value+" cabling" );
 		$("#cablingDialogId").dialog( "option", "width", 400 )
 		$("#cablingDialogId").dialog("open")
@@ -365,17 +367,18 @@
 			if(assetCabling.labelPosition != "Right"){
 				cssClass = "connector_bottom"
 			}
-			details += "<div id='connector"+assetCabling.id+"' style='top: "+(assetCabling.connectorPosY / 2)+"px; left: "+assetCabling.connectorPosX+"px;'><a href='#'><div><img id='"+assetCabling.status+"' src='../i/cabling/"+assetCabling.status+".png' onclick='openActionButtonsDiv( "+assetCabling.id+", this.id )'></div></a><div class='"+cssClass+"'><span>"+assetCabling.label+"</span></div></div>"
-			tbodyDetails += "<tr id='connectorTr"+assetCabling.id+"' title="+assetCabling.status+" onclick='openActionButtonsDiv( "+assetCabling.id+", this.title )'><td>"+assetCabling.type+"</td><td>"+assetCabling.label+"</td><td>"+assetCabling.displayStatus+"</td><td id='connectorTd"+assetCabling.id+"'>"+assetCabling.rackUposition+"</td></tr>"
+			details += "<div id='connector"+assetCabling.id+"' style='top: "+(assetCabling.connectorPosY / 2)+"px; left: "+assetCabling.connectorPosX+"px;'><a href='#'><div><img id='"+assetCabling.status+"' src='../i/cabling/"+assetCabling.status+".png' onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.id, '"+assetCabling.type+"')\"></div></a><div class='"+cssClass+"'><span>"+assetCabling.label+"</span></div></div>"
+			tbodyDetails += "<tr id='connectorTr"+assetCabling.id+"' title="+assetCabling.status+" onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.title, '"+assetCabling.type+"' )\"><td>"+assetCabling.type+"</td><td>"+assetCabling.label+"</td><td>"+assetCabling.displayStatus+"</td><td id='connectorTd"+assetCabling.id+"'>"+assetCabling.rackUposition+"</td></tr>"
 		}
 		$("#cablingPanel").append(details)
 		if( tbodyDetails ){
 			$("#cablingTableBody").html( tbodyDetails )
 		}
 	}
-	function openActionButtonsDiv( cabledId, status ){
+	function openActionButtonsDiv( cabledId, status, type ){
 		$('#formReset').click()
 		$("#cabledTypeId").val(cabledId)
+		$("#connectorTypeId").val(type)
 		$("#actionButtonsDiv").show()
 		$("#actionButtonsDiv input").css("background-color", "")
 		$("#assignFieldDiv").hide()
@@ -409,10 +412,18 @@
 		$("#cabledId").css("background-color","")
 		$("#assignId").css("background-color","")
 		$("#"+id).css("background-color","#5F9FCF");
-		if(id == "assignId")
+		if(id == "assignId"){
 			$("#assignFieldDiv").show()
-		else
+			if($("#connectorTypeId").val()=='Power'){
+				$("#rackId").hide()
+				$("#upositionId").hide()
+			} else {
+				$("#rackId").show()
+				$("#upositionId").show()
+			}			
+		} else {
 			$("#assignFieldDiv").hide()
+		}
 		$("#actionTypeId").val(id)
 		$("#actionDiv").show()
 		
@@ -424,17 +435,26 @@
 		var connector = $("#connectorId").val()
 		var isValid = true
 		if(actionId == "assignId"){
-			if( !rack || !uposition || !connector){
-				isValid = false
-				alert("Please Enter the target connector details")
-			} else {
-				if($(".field_error").length){
+			
+			if($("#connectorTypeId").val() != 'Power'){
+				if( !rack || !uposition || !connector){
 					isValid = false
-					alert("Error with target connector details")
+					alert("Please Enter the target connector details")
+				} else {
+					if($(".field_error").length){
+						isValid = false
+						alert("Error with target connector details")
+					}
+				}
+			} else {
+				if( !connector ){
+					isValid = false
+					alert("Please Enter the target connector details")
 				}
 			}
 		}
 		if(isValid){
+			alert($("#assetEntityId").val())
 			jQuery.ajax({
 				url: $(form).attr('action'),
 				data: $(form).serialize(),
@@ -544,12 +564,14 @@
 		Update and validate the Connector data
 	*/
 	function getConnectorData(){
-		var rack = $("#rackId").val()
-		var uposition = $("#upositionId").val()
-		if(rack && uposition){
-			${remoteFunction(action:'getAutoCompleteDetails', params:'\'field=connector\'+\'&rack=\'+rack+\'&uposition=\'+uposition', onComplete:"updateConnectorData( e )" )};
-		} else {
-			alert("Please enter rack data")
+		if($("#connectorTypeId").val() != 'Power'){
+			var rack = $("#rackId").val()
+			var uposition = $("#upositionId").val()
+			if(rack && uposition){
+				${remoteFunction(action:'getAutoCompleteDetails', params:'\'field=connector\'+\'&rack=\'+rack+\'&uposition=\'+uposition', onComplete:"updateConnectorData( e )" )};
+			} else {
+				alert("Please enter rack data")
+			}
 		}
 	}
 	function updateConnectorData( e ){
@@ -564,7 +586,7 @@
 		}
 	}
 	function validateConnectorData(value, field){
-		if(click == 2){
+		if(click == 2 && $("#connectorTypeId").val() != 'Power'){
 			var rack = $("#rackId").val()
 			var uposition = $("#upositionId").val() 
 			if(rack && uposition){

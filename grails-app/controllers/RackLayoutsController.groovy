@@ -462,12 +462,16 @@ class RackLayoutsController {
 		}
 		def assetCablingDetails = []
 		assetCableMapList.each {
+			def rackUposition = it.toConnectorNumber ? it.toAssetRack+"/"+it.toAssetUposition+"/"+it.toConnectorNumber.label : ""
+			if(it.fromConnectorNumber.type == "Power"){
+				rackUposition = it.toPower ? it.toAssetRack+"/"+it.toAssetUposition+"/"+it.toPower : ""
+			}
 			assetCablingDetails << [model:assetEntity.model.id, id:it.id, connector : it.fromConnectorNumber.connector, 
 									type:it.fromConnectorNumber.type, connectorPosX:it.fromConnectorNumber.connectorPosX,
 									labelPosition:it.fromConnectorNumber.labelPosition,
 									connectorPosY:it.fromConnectorNumber.connectorPosY, status:it.status,displayStatus:statusDetails[it.status], 
 									label:it.fromConnectorNumber.label, hasImageExist:assetEntity.model.rearImage && assetEntity.model?.useImage ? true : false,
-									usize:assetEntity?.model?.usize, rackUposition : it.toConnectorNumber ? it.toAssetRack+"/"+it.toAssetUposition+"/"+it.toConnectorNumber.label : "" ]
+									usize:assetEntity?.model?.usize, rackUposition : rackUposition ]
 		}
 		render assetCablingDetails as JSON
 	}
@@ -488,29 +492,41 @@ class RackLayoutsController {
 			def toAssetUposition
 			def toConnector
 			def toAsset
+			def toPower
+			def connectorType = params.connectorType
 			def assetCableMap = AssetCableMap.findById( assetCableId )
-			def fromAssetCableMap = AssetCableMap.findByToAssetAndToConnectorNumber( assetCableMap.fromAsset, assetCableMap.fromConnectorNumber )
-			if(fromAssetCableMap){
-				AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing', toAsset=null,toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-											where toAsset = ? and toConnectorNumber = ?""",[assetCableMap.fromAsset, assetCableMap.fromConnectorNumber])
+			if(connectorType != "Power"){
+				def fromAssetCableMap = AssetCableMap.findByToAssetAndToConnectorNumber( assetCableMap.fromAsset, assetCableMap.fromConnectorNumber )
+				if(fromAssetCableMap){
+					AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing', toAsset=null,toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
+												where toAsset = ? and toConnectorNumber = ?""",[assetCableMap.fromAsset, assetCableMap.fromConnectorNumber])
+			}
 			}
 			switch(actionType){
 				case "emptyId" : status = "empty" ; break;
 				case "cabledId" : status = "cabled"; break;
 				case "assignId" : 
 					status = "cabledDetails"; 
-					toAssetRack = params.rack
-					toAssetUposition = params.uposition
-					def rack = Rack.findWhere(tag:toAssetRack,source:0,project:project)
-					def assetEntity = rack?.targetAssets?.find{it.targetRackPosition == Integer.parseInt(params.uposition)}
-					def modelConnectors
-					if(assetEntity?.model){
-						modelConnectors = ModelConnector.findAllByModel(assetEntity?.model)
-						toAsset = assetEntity 
-						toConnector = modelConnectors?.find{it.label.equalsIgnoreCase(params.connector) }
-						AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-														toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-														where toAsset = ? and toConnectorNumber = ?""",[toAsset, toConnector])
+					if(connectorType != "Power"){
+						toAssetRack = params.rack
+						toAssetUposition = params.uposition
+						def rack = Rack.findWhere(tag:toAssetRack,source:0,project:project)
+						def assetEntity = rack?.targetAssets?.find{it.targetRackPosition == Integer.parseInt(params.uposition)}
+						def modelConnectors
+						if(assetEntity?.model){
+							modelConnectors = ModelConnector.findAllByModel(assetEntity?.model)
+							toAsset = assetEntity 
+							toConnector = modelConnectors?.find{it.label.equalsIgnoreCase(params.connector) }
+							AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
+															toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
+															where toAsset = ? and toConnectorNumber = ?""",[toAsset, toConnector])
+						}
+					} else {
+						toAsset = assetCableMap.fromAsset
+						toAssetRack = assetCableMap?.fromAsset?.rackTarget?.tag
+						toAssetUposition = 0
+						toConnector = null
+						toPower = params.connector
 					}
 					break;
 			}
@@ -518,8 +534,10 @@ class RackLayoutsController {
 			assetCableMap.toAsset = toAsset
 			assetCableMap.toConnectorNumber = toConnector
 			assetCableMap.toAssetRack = toAssetRack
-			assetCableMap.toAssetUposition = toAsset?.targetRackPosition
-			if(assetCableMap.save(flush:true) && toAsset){
+			assetCableMap.toAssetUposition = connectorType != "Power" ? toAsset?.targetRackPosition : toAssetUposition
+			assetCableMap.toPower = toPower
+			
+			if(assetCableMap.save(flush:true) && toAsset && connectorType != "Power"){
 				def toAssetCableMap = AssetCableMap.findByFromAssetAndFromConnectorNumber( toAsset, toConnector )
 				toAssetCableMap.status = status
 				toAssetCableMap.toAsset = assetCableMap.fromAsset
@@ -529,6 +547,7 @@ class RackLayoutsController {
 			}
 		}
 		def assetCable = [assetId : assetId, assetTag : AssetEntity.get(assetId)?.assetTag ]
+		println"-->"+assetCable 
 		render assetCable as JSON
 	}
 	/*

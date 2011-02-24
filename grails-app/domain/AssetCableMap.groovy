@@ -8,6 +8,7 @@ class AssetCableMap {
 	Integer toAssetUposition
 	String status
 	String color
+	String toPower
 	
 	static constraints = {
 		cable( nullable:false, blank:false )
@@ -19,6 +20,7 @@ class AssetCableMap {
 		toAssetUposition( nullable:true, blank:true )
 		status( nullable:false, blank:false, inList: ['missing','empty','cabled','cabledDetails'] )
 		color( nullable:true, blank:true)
+		toPower( nullable:true, blank:true)
 	}
 	
 	static mapping = {
