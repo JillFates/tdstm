@@ -97,23 +97,23 @@
 		<g:each in="${workflowTransitionsList}" status="i" var="transitions">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="showWorkflowRoles('${transitions.transition.id}')">
 
-				<td nowrap="nowrap">${transitions.transition?.code}</td>
+				<td class="name">${transitions.transition?.code}</td>
 				
-				<td nowrap="nowrap">${transitions.transition?.name}</td>
+				<td class="name">${transitions.transition?.name}</td>
 				
-				<td nowrap="nowrap">${transitions.transition?.dashboardLabel}</td>
+				<td class="name">${transitions.transition?.dashboardLabel}</td>
 				
-				<td nowrap="nowrap">${transitions.transition?.transId}</td>
+				<td class="name">${transitions.transition?.transId}</td>
 				
-				<td nowrap="nowrap"><g:message code="workflow.type.${transitions.transition?.type}" /></td>
+				<td class="name"><g:message code="workflow.type.${transitions.transition?.type}" /></td>
 
-				<td nowrap="nowrap">${transitions.transition?.predecessor}</td>
+				<td class="name">${transitions.transition?.predecessor}</td>
 
-				<td nowrap="nowrap">${transitions.transition?.color}</td>
+				<td class="name">${transitions.transition?.color}</td>
 				
-				<td nowrap="nowrap">${transitions.transition?.header}</td>
+				<td class="name">${transitions.transition?.header}</td>
 				
-				<td nowrap="nowrap">
+				<td class="name">
 				<g:if test="${transitions.donotDelete}">
 					<g:link controller="workflow" action="deleteTransitionFromWorkflow" id="${transitions.transition.id}" params="['workflow':workflow.id]">
 						<g:if test="${transitions.isExist}">
