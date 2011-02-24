@@ -53,7 +53,7 @@
 </div>
 <g:form action="updateWorkflowRoles">
 
-<div id="tableContainer" class="tableContainer" style="margin-left: 5px;margin-right: 10px;">
+<div id="tableContainer" class="list" style="margin-left: 5px;margin-right: 10px;">
 <table cellpadding="0" cellspacing="0" style="border:1px solid #63A242;width: 600px;">
 	<thead>
 		<tr>
@@ -66,16 +66,21 @@
 	</thead>
 	<tbody id="workflowRolesBody">
 		<g:if test="${workflowTransitionsList}">
-		<g:each in="${roleWiseTransitions}" var="roleWiseTransition">
-			<tr id="transition_${roleWiseTransition.transition?.id}">
-			<td class="name"  style="color: ${roleWiseTransition?.transition.header ? roleWiseTransition?.transition.header : roleWiseTransition?.transition.type == 'boolean' ? '#FF8000' : '#336600'}" nowrap="nowrap">${roleWiseTransition?.transition?.name}</td>
+		<g:each in="${roleWiseTransitions}" var="roleWiseTransition" status="i">
+			<tr id="transition_${roleWiseTransition.transition?.id}"  class="${(i % 2) == 0 ? 'odd' : 'even'}">
+			<td class="name"  style="font-weight: ${workflowTransition?.id == roleWiseTransition?.transition.id ? 'bold' : 'normal'}; color: ${roleWiseTransition?.transition.header ? roleWiseTransition?.transition.header : roleWiseTransition?.transition.type == 'boolean' ? '#FF8000' : '#336600'}" nowrap="nowrap">${roleWiseTransition?.transition?.name}</td>
 			<g:each in="${roleWiseTransition.transitionsMap}" var="transitionMap">
 				<td id="${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.transId}">
-					<g:if test="${transitionMap.workflowTransitionMap}">
-						<input type="checkbox" name="${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.id}" checked="checked"/>	
+					<g:if test="${workflowTransition?.id != roleWiseTransition?.transition.id }">
+						<g:if test="${transitionMap.workflowTransitionMap}">
+							<input type="checkbox" name="${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.id}" checked="checked"/>	
+						</g:if>
+						<g:else>
+							<input type="checkbox" name="${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.id}"/>
+						</g:else>
 					</g:if>
 					<g:else>
-						<input type="checkbox" name="${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.id}"/>
+						<input type="checkbox" name="${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.id}" disabled="disabled"/>
 					</g:else>
 				</td>
 			</g:each>
