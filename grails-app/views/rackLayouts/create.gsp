@@ -454,7 +454,6 @@
 			}
 		}
 		if(isValid){
-			alert($("#assetEntityId").val())
 			jQuery.ajax({
 				url: $(form).attr('action'),
 				data: $(form).serialize(),
