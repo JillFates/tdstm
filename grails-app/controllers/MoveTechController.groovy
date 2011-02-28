@@ -648,9 +648,10 @@ class MoveTechController {
                         	} else if ( taskSize > 1 ) {
                         		
                         		taskList.each {
-                        			if ( it != "Hold" ) {
+                        			if ( it != "Hold" && !actionLabel) {
                         				actionLabel = it
                         				label =	stateEngineService.getStateLabel ( moveBundleInstance.project.workflowCode, stateEngineService.getStateIdAsInt(moveBundleInstance.project.workflowCode,it) )
+										return;
                         			}
 	                    			
                         		}
@@ -1089,9 +1090,10 @@ class MoveTechController {
 	                        	
                             } else if ( taskSize > 1 ) {
                                 taskList.each {
-                                    if ( it != "Hold" ) {
+                                    if ( it != "Hold" && !actionLabel ) {
                                         actionLabel = it
                                         label =	stateEngineService.getStateLabel ( moveBundleInstance.project.workflowCode, stateEngineService.getStateIdAsInt(moveBundleInstance.project.workflowCode,it) )
+										return;
                                     }
                                 }
                             }
