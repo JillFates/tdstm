@@ -35,8 +35,8 @@ class RackLayoutsController {
 			def printQuantity = params.printQuantity
 			def frontView = params.frontView
 			def backView = params.backView
-			def sourceRacks = []
-			def targetRacks = []
+			def sourceRacks = new ArrayList()
+			def targetRacks = new ArrayList()
 			def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
 			def rackLayout = []
 			def project = Project.findById(projectId)
@@ -55,12 +55,15 @@ class RackLayoutsController {
 				if(rack[0] == "") {
 					moveBundles.each{ bundle->
 						bundle.sourceRacks.each{ sourceRack->
-							sourceRacks << sourceRack		
+							if( !sourceRacks.contains( sourceRack ) )
+								sourceRacks.add( sourceRack )		
 						}
 					}
 				} else {
 					rack.each {
-						sourceRacks << Rack.get(new Long(it))
+						def thisRack = Rack.get(new Long(it))
+						if( !sourceRacks.contains( thisRack ) )
+							sourceRacks.add( thisRack )
 					}
 				}
 				sourceRacks = sourceRacks.sort { it.tag }
@@ -71,12 +74,15 @@ class RackLayoutsController {
 				if(rack[0] == "") {
 					moveBundles.each{ bundle->
 						bundle.targetRacks.each{ targetRack->
-							targetRacks << targetRack	
+							if( !targetRacks.contains( targetRack ) )
+								targetRacks.add( targetRack	)
 						}
 					}
 				} else {
 					rack.each {
-						targetRacks << Rack.get(new Long(it))
+						def thisRack = Rack.get(new Long(it))
+						if( !targetRacks.contains( thisRack ) )
+							targetRacks.add( thisRack )
 					}
 				}
 				targetRacks = targetRacks.sort { it.tag }
@@ -236,14 +242,18 @@ class RackLayoutsController {
 		} else {
 			moveBundles = MoveBundle.findAll( "from MoveBundle m where m.id in ($bundleIds)" )
 		}
-		def sourceRacks = []
-		def targetRacks = []
+		
+		def sourceRacks = new ArrayList()
+		def targetRacks = new ArrayList()
+		
 		moveBundles.each{moveBundle ->
 			moveBundle.sourceRacks.each{
-				sourceRacks << it
+				if( !sourceRacks.contains(it) )
+					sourceRacks.add(it)
 			}
 			moveBundle.targetRacks.each{
-				targetRacks << it
+				if( !targetRacks.contains(it) )
+					targetRacks.add(it)
 			}
 		}
 		
