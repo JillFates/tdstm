@@ -70,13 +70,15 @@
 			<tr id="transition_${roleWiseTransition.transition?.id}"  class="${(i % 2) == 0 ? 'odd' : 'even'}">
 			<td class="name"  style="font-weight: ${workflowTransition?.id == roleWiseTransition?.transition.id ? 'bold' : 'normal'}; color: ${roleWiseTransition?.transition.header ? roleWiseTransition?.transition.header : roleWiseTransition?.transition.type == 'boolean' ? '#FF8000' : '#336600'}" nowrap="nowrap">${roleWiseTransition?.transition?.name}</td>
 			<g:each in="${roleWiseTransition.transitionsMap}" var="transitionMap">
-				<td id="${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.transId}">
+				<td id="${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.transId}" nowrap="nowrap">
 					<g:if test="${workflowTransition?.id != roleWiseTransition?.transition.id }">
 						<g:if test="${transitionMap.workflowTransitionMap}">
 							<input type="checkbox" name="${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.id}" checked="checked"/>	
+							<g:select name="flag_${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.id}" from="${WorkflowTransitionMap.constraints.flag.inList}" value="${transitionMap.workflowTransitionMap.flag}" noSelection="${['':'']}"  valueMessagePrefix="workflow.flag"></g:select>
 						</g:if>
 						<g:else>
 							<input type="checkbox" name="${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.id}"/>
+							<g:select name="flag_${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.id}" from="${WorkflowTransitionMap.constraints.flag.inList}"  noSelection="${['':'']}" valueMessagePrefix="workflow.flag"></g:select>
 						</g:else>
 					</g:if>
 					<g:else>

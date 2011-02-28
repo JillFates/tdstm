@@ -8,7 +8,7 @@ class WorkflowTransitionMap {
 	
 	static constraints = {
 		transId( blank:false, nullable:false )
-		flag( blank:true, nullable:true)
+		flag( blank:true, nullable:true, inList: [ "busy", "comment", "idle", "issue", "skipped" ])
 		workflow( blank:false, nullable:false )
 		workflowTransition( blank:false, nullable:false )
 		swimlane( blank:false, nullable:false )

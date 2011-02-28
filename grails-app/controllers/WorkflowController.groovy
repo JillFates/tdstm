@@ -255,8 +255,14 @@ class WorkflowController {
 				def input = params["${role.name}_${transition.id}"]
 				if(input && input.equalsIgnoreCase("on")){
 					def workflowransitionMap = WorkflowTransitionMap.findAll("From WorkflowTransitionMap wtm where wtm.workflowTransition = ? and wtm.swimlane = ? and wtm.transId = ?", [ currentTransition, role, transition.transId ])
+					def flag = params["flag_${role.name}_${transition.id}"]
 					if(!workflowransitionMap.size()){
-						workflowransitionMap = new WorkflowTransitionMap(workflow:workflow, workflowTransition:currentTransition,swimlane:role,transId:transition.transId, flag:'' ).save(flush:true)
+						workflowransitionMap = new WorkflowTransitionMap(workflow:workflow, workflowTransition:currentTransition,swimlane:role,transId:transition.transId, flag:flag ).save(flush:true)
+					}else{
+						workflowransitionMap.each{
+							it.flag = flag
+							it.save()
+						}
 					}
 				} else {
 					def workflowransitionMap = WorkflowTransitionMap.findAll("From WorkflowTransitionMap wtm where wtm.workflowTransition = ? and wtm.swimlane = ? and wtm.transId = ?", [ currentTransition, role, transition.transId ])
