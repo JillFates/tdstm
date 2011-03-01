@@ -536,7 +536,7 @@ class RackLayoutsController {
 						toAssetRack = assetCableMap?.fromAsset?.rackTarget?.tag
 						toAssetUposition = 0
 						toConnector = null
-						toPower = params.connector
+						toPower = params.staticConnector
 					}
 					break;
 			}

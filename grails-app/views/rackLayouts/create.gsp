@@ -288,14 +288,24 @@
 			<input type="button" value="Cancel"  onclick="$('#assignFieldDiv').hide();$('#actionButtonsDiv').hide();$('#actionDiv').hide()"/>
 			<input type="reset" id="formReset" style="display: none;"/>
 		</div>
-		<div style="text-align: center;display: none;" id="assignFieldDiv">
-			<input type="text" name="rack" id="rackId" size="10"  onblur="validateRackData( this.value, this.id );"/>
-			<input type="text" name="uposition" id="upositionId" size="2" maxlength="2" onfocus="getUpositionData()" onblur="validateUpositionData( this.value, this.id)"/>
-			<input type="text" name="connector" id="connectorId" size="15" onfocus="getConnectorData()" onblur="validateConnectorData(this.value, this.id)" />
-			<input type="hidden" name="assetCable" id="cabledTypeId"/>
-			<input type="hidden" name="actionType" id="actionTypeId"/>
-			<input type="hidden" name="connectorType" id="connectorTypeId"/>
-			<input type="hidden" name="asset" id="assetEntityId"/>
+		<div style="clear: both;"></div>
+		<div style="text-align: center;margin-bottom: 5px;display: none;" id="assignFieldDiv">
+			<div id="inputDiv">
+				<input type="text" name="rack" id="rackId" size="10"  onblur="validateRackData( this.value, this.id );"/>
+				<input type="text" name="uposition" id="upositionId" size="2" maxlength="2" onfocus="getUpositionData()" onblur="validateUpositionData( this.value, this.id)"/>
+				<input type="text" name="connector" id="connectorId" size="15" onfocus="getConnectorData()" onblur="validateConnectorData(this.value, this.id)" />
+			</div>
+			<div id="powerDiv" style="display: none;">
+				<input type="radio" name="staticConnector" id="staticConnector_A" value="A">A</input>
+				<input type="radio" name="staticConnector" id="staticConnector_B" value="B">B</input>
+				<input type="radio" name="staticConnector" id="staticConnector_C" value="C">C</input>
+			</div>
+			<div>
+				<input type="hidden" name="assetCable" id="cabledTypeId"/>
+				<input type="hidden" name="actionType" id="actionTypeId"/>
+				<input type="hidden" name="connectorType" id="connectorTypeId"/>
+				<input type="hidden" name="asset" id="assetEntityId"/>
+			</div>
 		</div>
 		
 		</g:form>
@@ -394,6 +404,8 @@
 				cabledDetails = cabledDetails.substring(cabledDetails.indexOf("/")+1, cabledDetails.length)
 				$("#upositionId").val( cabledDetails.substring(0,cabledDetails.indexOf("/")) )
 				$("#connectorId").val( cabledDetails.substring(cabledDetails.indexOf("/")+1, cabledDetails.length) )
+				var presetValue = $("#connectorId").val()
+				$("#staticConnector_"+presetValue).attr("checked",true)
 				openActionDiv( 'assignId' )
 				break;
 			case "cabled":
@@ -415,11 +427,11 @@
 		if(id == "assignId"){
 			$("#assignFieldDiv").show()
 			if($("#connectorTypeId").val()=='Power'){
-				$("#rackId").hide()
-				$("#upositionId").hide()
+				$("#inputDiv").hide()
+				$("#powerDiv").show()
 			} else {
-				$("#rackId").show()
-				$("#upositionId").show()
+				$("#inputDiv").show()
+				$("#powerDiv").hide()
 			}			
 		} else {
 			$("#assignFieldDiv").hide()
@@ -430,16 +442,18 @@
 	}
 	function submitAction(form){
 		var actionId = $("#actionTypeId").val()
-		var rack = $("#rackId").val()
-		var uposition = $("#upositionId").val()
-		var connector = $("#connectorId").val()
 		var isValid = true
 		if(actionId == "assignId"){
 			
 			if($("#connectorTypeId").val() != 'Power'){
+
+				var rack = $("#rackId").val()
+				var uposition = $("#upositionId").val()
+				var connector = $("#connectorId").val()
+				
 				if( !rack || !uposition || !connector){
 					isValid = false
-					alert("Please Enter the target connector details")
+					alert("Please enter the target connector details")
 				} else {
 					if($(".field_error").length){
 						isValid = false
@@ -447,9 +461,10 @@
 					}
 				}
 			} else {
-				if( !connector ){
+				var staticConn = $("input:radio[name=staticConnector]:checked").val()
+				if( !staticConn ){
 					isValid = false
-					alert("Please Enter the target connector details")
+					alert("Please select the target connector")
 				}
 			}
 		}
