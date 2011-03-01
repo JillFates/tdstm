@@ -624,6 +624,7 @@ class ReportsController {
     	def reportFields = []
     	def resolvedInfoInclude
     	def sortBy = params.reportSort
+		def comment = params.commentInfo
     	if( params.reportSort == "sourceLocation" ) {
     		sortBy = params.reportSort+",source_room,source_rack,source_rack_position"
     	}else if( params.reportSort == "targetLocation" ){
@@ -635,24 +636,30 @@ class ReportsController {
     	if(params.moveBundle == "null") {    		
     		flash.message = " Please Select Bundles. "
     		redirect( action:'getBundleListForReportDialog', params:[reportId: 'Issue Report'] )
-        }
-    	else {
+        } else {
     		def moveBundleInstance = MoveBundle.findById(params.moveBundle)
     		def bundleName = "All Bundles"
-    		def assetCommentList
     		def targetAssetEntitylist
+			def commentType = "('issue','comment')"
+	    	if(comment == "false"){
+	    		commentType = "('issue')"
+	    	}
+    		def commentCode = params.commentCode
+    		def commentsQuery = new StringBuffer("from AssetComment ac where ac.commentType in ${commentType} ")
+    		if(commentCode)
+    			commentsQuery.append(" and ac.commentCode = '${commentCode}' ")
+				
     		if( moveBundleInstance != null ){
-    			assetCommentList = AssetComment.findAll("from AssetComment ac where ac.assetEntity.id in(select ae.id from AssetEntity ae "+
-                    									"where ae.moveBundle.id = $moveBundleInstance.id ) and ac.commentType= 'issue' "+
-                    									"order by ac.assetEntity.${sortBy}")
+    			commentsQuery.append(" and ac.assetEntity.id in (select ae.id from AssetEntity ae where ae.moveBundle.id = $moveBundleInstance.id ) order by ac.assetEntity.${sortBy} ")
     			bundleNames = moveBundleInstance?.name
     			bundleName = bundleNames
     		}else {
-    			assetCommentList = AssetComment.findAll("from AssetComment ac where ac.assetEntity.id in(select ae.id from AssetEntity ae "+
-                    									"where ae.project.id = $projectInstance.id ) and ac.commentType= 'issue' "+
-                    									"order by ac.assetEntity.${sortBy}")
+    			commentsQuery.append(" and ac.assetEntity.id in (select ae.id from AssetEntity ae where ae.project.id = $projectInstance.id ) order by ac.assetEntity.${sortBy} ")
     			bundleNames = "All"
         	}
+    		
+    		def assetCommentList = AssetComment.findAll( commentsQuery.toString() )
+			
     		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
     		def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
 			DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
@@ -667,7 +674,8 @@ class ReportsController {
     								(assetComment?.assetEntity?.targetRackPosition ? assetComment?.assetEntity?.targetRackPosition : "--")
     			if( params.reportResolveInfo == "true" || assetComment.isResolved != 1 ) {
     				reportFields <<['assetName':assetComment?.assetEntity?.assetName, 'assetTag':assetComment?.assetEntity?.assetTag, 
-    								'sourceTargetRoom':sourceTargetRoom,
+    								'sourceTargetRoom':sourceTargetRoom,'commentCode':assetComment.commentCode ? assetComment.commentCode : "",
+    								'commentType':assetComment.commentType,
     								'model':(assetComment?.assetEntity?.manufacturer ? assetComment?.assetEntity?.manufacturer?.toString() : "")+" "+(assetComment?.assetEntity?.model ? assetComment?.assetEntity?.model : "" ), 
     								'occuredAt':GormUtil.convertInToUserTZ( assetComment?.dateCreated, tzId ), 'createdBy':assetComment?.createdBy?.firstName+" "+assetComment?.createdBy?.lastName, 
     								'issue':assetComment?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
@@ -676,6 +684,7 @@ class ReportsController {
     			}
     			if( params.reportResolveInfo == "true" && assetComment.isResolved == 1 ) {
     				reportFields <<['assetName':null, 'assetTag':null, 'sourceTargetRoom':null,'model':null, 
+									'commentCode':assetComment.commentCode ? assetComment.commentCode : "",'commentType':assetComment.commentType,
 									'occuredAt':GormUtil.convertInToUserTZ( assetComment?.dateResolved, tzId ), 
     								'createdBy':assetComment?.resolvedBy?.firstName+" "+assetComment?.resolvedBy?.lastName, 
     								'issue':assetComment?.resolution, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
@@ -689,6 +698,7 @@ class ReportsController {
         	}else {
         		def filename = 	"IssueReport-${projectInstance.name}-${bundleName}"
 					filename = filename.replace(" ", "_")
+					println"params===>"+params.format
         		chain(controller:'jasper',action:'index',model:[data:reportFields],
 						params:["_format":"PDF","_name":"${filename}","_file":"${params._file}"])
         	}

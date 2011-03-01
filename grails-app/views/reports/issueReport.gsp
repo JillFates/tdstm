@@ -6,26 +6,16 @@
 <title>Issue Report</title>
 <script type="text/javascript">
     
-    	function populateBundle(val) {    	
-	     	var hiddenBundle = document.getElementById('moveBundle')
-	     	hiddenBundle.value = val
-
-     }
-     function populateSort(val){
-     	var hiddenBundle = document.getElementById('reportSort')
-     	hiddenBundle.value = val
-     }
-     function resolvedCheckChange(val) {
-     	var resolveCheck = document.getElementById('resolvedCheck')
-     	var resolveInfo = document.getElementById('reportResolveInfo')
-     	if(resolveCheck.checked == true) {
-     		resolveInfo.value = "true";
+    function populateSelect( id, value ) {    	
+		$('#'+id).val( value )
+    }
+    function checkBoxChange(toId, fromId, value ) {
+		if($('#'+toId).is(":checked")) {
+     		$("#"+fromId).val("true");
      	}else{
-     		resolveInfo.value = "false";
+     		$("#"+fromId).val("false");
      	}
-     }
-    
-     
+    }
     </script>
 </head>
 <body>
@@ -45,7 +35,7 @@
 		<tr class="prop" id="bundleRow" >
 			<td valign="top" class="name" style="paddingleft:10px;"><label>&nbsp;&nbsp;&nbsp;&nbsp;<b>Bundles:<span style="color: red;">*</span> </b></label></td>
 			<td valign="top" class="value" align="left">
-				<select id="moveBundleId" name="moveBundles" onchange="return populateBundle(this.value);">
+				<select id="moveBundleId" name="moveBundles" onchange="return populateSelect('moveBundle', this.value);">
 					<option value="null" selected="selected">Please Select</option>
 					<option value="">All Bundles</option>
 					<g:each in="${moveBundleInstanceList}" var="moveBundleList">
@@ -57,7 +47,7 @@
 		<tr>
 		<td valign="top" class="name" nowrap="nowrap"><label>Sort report by: </label></td>
 		<td valign="top" class="value" align="left">
-				<select id="sortOrder" name="sortOrder" onchange="return populateSort(this.value);">
+				<select id="sortOrder" name="sortOrder" onchange="return populateSelect('reportSort', this.value);">
 					<option value="id" selected="selected">Asset Id </option>
 					<option value="assetName">Asset Name</option>
 					<option value="sourceLocation">Source Location</option>
@@ -66,14 +56,36 @@
 			</td>
 		</tr>
 		<tr>
-		<td></td>
-		<td style="width:auto;"><input id="resolvedCheck" type="checkbox" name="resolvedCheck" checked="checked" onclick="resolvedCheckChange(this.checked)"/>Include resolved issues in report</td>
+		<td valign="top" class="name" nowrap="nowrap"><label>Comment Code: </label></td>
+		<td style="width:auto;">
+			<select id="commentCode" onchange="return populateSelect('commentCodeId', this.value);">
+				<option value="" selected="selected">Please Select</option>
+				<option value="NEED_ASSET_TAG">Need Asset Tag</option>
+				<option value="AMBER_LIGHTS">Amber Lights</option>
+				<option value="STACKED_ON_TOP">Stacked On Top</option>
+				<option value="POWERED_OFF">Powered Off</option>
+				<option value="HAS_OBSTRUCTION">Has Obstruction</option>
+				<option value="ASSET_MISSING">Asset Missing</option>
+			</select>
+		</td>
+		</tr>
+		<tr>
+		<td>
+		</td>
+		<td style="width:auto;"><input id="commentCheck" type="checkbox" name="commentCheck" checked="checked" onclick="checkBoxChange(this.id,'commentInfoId', this.checked)"/>Include comments in report</td>
+		</tr>
+		<tr>
+		<td>
+		</td>
+		<td style="width:auto;"><input id="resolvedCheck" type="checkbox" name="resolvedCheck" checked="checked" onclick="checkBoxChange(this.id, 'reportResolveInfo', this.checked)"/>Include resolved issues in report</td>
 		</tr>
 		<tr>
 			<td class="buttonR"><g:jasperReport controller="reports" action="issueReport" jasper="issueReport" format="PDF" name="Generate">
 				<input type="hidden" name="moveBundle" id="moveBundle" value="null" />
 				<input type="hidden" name="reportSort" id="reportSort" value="id" />
 				<input type="hidden" name="reportResolveInfo" id="reportResolveInfo" value="true" />
+				<input type="hidden" name="commentCode" id="commentCodeId"/>
+				<input type="hidden" name="commentInfo" id="commentInfoId" value="true" />
 				</g:jasperReport>
 			</td>
 		</tr>
