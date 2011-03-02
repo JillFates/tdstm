@@ -386,27 +386,21 @@ function checkComments(type) {
 			<tr>
 				<td class="label">Manufact:</td>
 				<td class="field">
-				<g:if test="${Manufacturer.list()}">
-				<!--  <g:select name="manufacturer" from="${Manufacturer.list()}" value="${assetEntity?.manufacturer}" id="manufacturerId" 
-					noSelection="['':'']"  onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name);getModels();"/> -->
-					<input type="text" name="manufacturer" id="manufacturerId" value="${assetEntity?.manufacturer}" onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name);"/>
-				</g:if>
-				<g:else>
-				<input type="text" name="manufacturer" id="manufacturerId" value="${assetEntity?.manufacturer}" onchange="setMustSave(this.value,'${assetEntity?.manufacturer}','front1', this.name);">
-				</g:else>
+				<g:select name="manufacturer.id" from="${Manufacturer.list()}" value="${assetEntity?.manufacturer?.id}" id="manufacturerId" optionKey="id"
+					noSelection="['':'Unassigned']"  onchange="setMustSave(this.value,'${assetEntity?.manufacturer.id}','front1', this.name);getModels( this.value );"/>
 				</td>
 			</tr>
 			
 			<tr>
 				<td class="label">Model:</td>
 				<td class="field" id="modelTdId">
-				<g:if test="${Model.list()}">
-				<!-- <g:select name="model" from="${Model.list()}" id="modelId" noSelection="['':'']" 
-					value="${assetEntity?.model}" onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)"/> -->
-					<input type="text" id="modelId" name="model" value="${assetEntity?.model}" onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)" />
+				<g:if test="${assetEntity?.manufacturer}">
+				<g:select name="model.id" from="${Model.findAllByManufacturer( assetEntity?.manufacturer )}" value="${assetEntity?.model.id}" id="modelId" optionKey="id" noSelection="['':'Unassigned']"
+					onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)"/>
 				</g:if>
-				 <g:else>
-				<input type="text" name="model" id="modelId" value="${assetEntity?.model}" onchange="setMustSave(this.value,'${assetEntity?.model}','front1', this.name)">
+				<g:else>
+				<g:select name="model" from="${assetEntity?.manufacturer}" id="modelId" noSelection="['':'Unassigned']" 
+					value="${assetEntity?.model}" onchange="setMustSave(this.value,'${assetEntity?.model.id}','front1', this.name)"/>
 				</g:else>
 				</td>
 			</tr>
@@ -852,11 +846,44 @@ function checkComments(type) {
 		getObject("hasObstructionYes").checked =true
 		getObject("hasObstructionNo").checked = false
 	}
-	getObject("manufacturerId").value = "${assetEntity?.manufacturer}"
-	getObject("modelId").value = "${assetEntity?.model}"
+	
 	if("${location}" != "${assetEntity.sourceLocation}"){
 		setMustSave( "${location}", "${assetEntity.sourceLocation}", "", "sourceLocation");
 	}
+	/*
+	* Script for Manufacturer and Model.
+	*/
+	function getXmlhttp(){
+		var xmlhttp;
+		if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+		  	xmlhttp=new XMLHttpRequest();
+		} else {// code for IE6, IE5
+			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		return xmlhttp
+	}
+	function getModels( manufacturerId ){
+		var xmlhttp = getXmlhttp()
+		xmlhttp.onreadystatechange=function() {
+			if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+				try{
+				var modelsList = eval('(' + xmlhttp.responseText + ')')
+				var inputField = "<select name='model.id' id='modelId' onchange='setMustSave(this.value,'${assetEntity?.model.id}','front1', this.name)'/><option value=\'\'>Unassigned</option>"
+				for(i=0; i<modelsList.length; i++){
+					var model = modelsList[i]
+					inputField += '<option value=\''+model.id+'\'>'+model.modelName+'</option>'
+				}
+				inputField +="</select>"
+				getObject("modelTdId").innerHTML = inputField
+				}catch(e){
+					//alert(e.message)
+				}	
+		    }
+		}
+		xmlhttp.open("POST","../model/getModelsListAsJSON?manufacturer="+manufacturerId,true);
+		xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+		xmlhttp.send();
+	} 
 </script>
 
 </body>

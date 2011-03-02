@@ -434,6 +434,7 @@ class WalkThroughController {
 				stateTo = "TargetWalkthru"
 			}
 			assetEntity.properties = params
+			println"---"+params.generalComment
 			if(!assetEntity.hasErrors() && assetEntity.save() ) {
 				if(params.submitType != "save"){
 					def transactionStatus = workflowService.createTransition(assetEntity.project.workflowCode,"SUPERVISOR", stateTo, assetEntity, assetEntity.moveBundle, loginUser, null, "" )
@@ -470,6 +471,7 @@ class WalkThroughController {
 				}
 				
 				def generalComment = params.generalComment
+				println"generalComment-->"+generalComment
 				if(generalComment.lastIndexOf(",") != -1){
 					def commentDescription = generalComment.substring(0,generalComment.lastIndexOf(",") > 255 ? 255 : generalComment.lastIndexOf(","))
 					new AssetComment(assetEntity : assetEntity, commentType : 'comment', category : 'walkthru', 
@@ -479,6 +481,7 @@ class WalkThroughController {
 				render(view:'assetMenu', model:[ moveBundle:currBundle, location:currLocation, room:params.room,  viewType:'assetMenu',
 				                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
 			} else {
+				assetEntity?.errors.allErrors.each() { println "-->"+it }
 				def commentCodes = walkThroughCodes( assetEntity )
 				render(view:'assetMenu', model:[ moveBundle:currBundle, location:currLocation, room:params.room,  viewType:'assetMenu',
 				                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
