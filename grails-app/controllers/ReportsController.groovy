@@ -625,6 +625,7 @@ class ReportsController {
     	def resolvedInfoInclude
     	def sortBy = params.reportSort
 		def comment = params.commentInfo
+		def reportFormat = params._format
     	if( params.reportSort == "sourceLocation" ) {
     		sortBy = params.reportSort+",source_room,source_rack,source_rack_position"
     	}else if( params.reportSort == "targetLocation" ){
@@ -698,10 +699,48 @@ class ReportsController {
         	}else {
         		def filename = 	"IssueReport-${projectInstance.name}-${bundleName}"
 					filename = filename.replace(" ", "_")
-					println"params===>"+params.format
-        		chain(controller:'jasper',action:'index',model:[data:reportFields],
-						params:["_format":"PDF","_name":"${filename}","_file":"${params._file}"])
+				if(reportFormat == "PDF"){
+	        		chain(controller:'jasper',action:'index',model:[data:reportFields],
+							params:["_format":"PDF","_name":"${filename}","_file":"${params._file}"])
+				} else { // Generate XLS report
+					try {
+						File file =  ApplicationHolder.application.parentContext.getResource( "/templates/IssueReport.xls" ).getFile()
+						WorkbookSettings wbSetting = new WorkbookSettings()
+						wbSetting.setUseTemporaryFileDuringWrite(true)
+						def workbook = Workbook.getWorkbook( file, wbSetting )
+						//set MIME TYPE as Excel
+						response.setContentType( "application/vnd.ms-excel" )
+						response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
+						
+						def book = Workbook.createWorkbook( response.getOutputStream(), workbook )
+						
+						def sheet = book.getSheet("issues")
+						sheet.addCell( new Label( 1, 1, String.valueOf( projectInstance?.client?.name )) )
+						sheet.addCell( new Label( 1, 2, String.valueOf( partyGroupInstance?.name )) )
+						sheet.addCell( new Label( 1, 3, String.valueOf( bundleNames )) )
+						for ( int r = 0; r < reportFields.size(); r++ ) {
+							sheet.addCell( new Label( 0, r+6, String.valueOf(reportFields[r].assetName )) )
+							sheet.addCell( new Label( 1, r+6, String.valueOf(reportFields[r].assetTag )) )
+							sheet.addCell( new Label( 2, r+6, String.valueOf(reportFields[r].sourceTargetRoom )) )
+							sheet.addCell( new Label( 3, r+6, String.valueOf(reportFields[r].model )) )
+							sheet.addCell( new Label( 4, r+6, String.valueOf(reportFields[r].commentCode )) )
+							sheet.addCell( new Label( 5, r+6, String.valueOf(reportFields[r].commentType )) )
+							sheet.addCell( new Label( 6, r+6, String.valueOf(reportFields[r].occuredAt ? formatter.format( reportFields[r].occuredAt ) : "")) )
+							sheet.addCell( new Label( 7, r+6, String.valueOf(reportFields[r].createdBy )) )
+							sheet.addCell( new Label( 8, r+6, String.valueOf(reportFields[r].issue )) )
+						}
+						sheet.addCell( new Label( 0, reportFields.size()+7, String.valueOf("Note : All times are in "+reportFields[0].timezone+" time zone") ))
+						
+						book.write()
+						book.close()
+					} catch( Exception ex ) {
+						flash.message = "Exception occurred while exporting data"+ex
+						redirect( controller:'reports', action:"getBundleListForReportDialog", params:[reportId:'Issue Report'] )
+						return;
+					}
+				}
         	}
+    		
         }
     }
 
