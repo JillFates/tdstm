@@ -68,7 +68,11 @@
 		<g:if test="${workflowTransitionsList}">
 		<g:each in="${roleWiseTransitions}" var="roleWiseTransition" status="i">
 			<tr id="transition_${roleWiseTransition.transition?.id}"  class="${(i % 2) == 0 ? 'odd' : 'even'}">
-			<td class="name"  style="font-weight: ${workflowTransition?.id == roleWiseTransition?.transition.id ? 'bold' : 'normal'}; color: ${roleWiseTransition?.transition.header ? roleWiseTransition?.transition.header : roleWiseTransition?.transition.type == 'boolean' ? '#FF8000' : '#336600'}" nowrap="nowrap">${roleWiseTransition?.transition?.name}</td>
+			<td class="name"  nowrap="nowrap">
+				<g:link action="workflowRoles" params="[workflowTransition:roleWiseTransition.transition?.id]" style="font-weight: ${workflowTransition?.id == roleWiseTransition?.transition.id ? 'bold' : 'normal'}; color: ${roleWiseTransition?.transition.header ? roleWiseTransition?.transition.header : roleWiseTransition?.transition.type == 'boolean' ? '#FF8000' : '#336600'}">
+				${roleWiseTransition?.transition?.name}
+				</g:link>
+			</td>
 			<g:each in="${roleWiseTransition.transitionsMap}" var="transitionMap">
 				<td id="${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.transId}" nowrap="nowrap">
 					<g:if test="${workflowTransition?.id != roleWiseTransition?.transition.id }">
