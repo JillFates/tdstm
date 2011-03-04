@@ -40,14 +40,12 @@
 		<td valign="top"  class="name">Used On:</td>
 		<td valign="top"  class="value">
 		<g:if test="${workflow?.process}">
-			<table><ul>
+			<div style="height:60px; width:300px; overflow-x:auto;"><ul>
 				<g:each in="${Project.findAllByWorkflowCode(workflow?.process)}" var="project">
-				<tr>
 				<li><g:link controller="project" action="show" id="${project.id}">${project?.name}</g:link></li>
-				</tr>
 				</g:each>
 				</ul>
-			</table>
+			</div>
 			</g:if>
 		</td>
 	</tr>
