@@ -261,14 +261,14 @@ class WorkflowController {
 					}else{
 						workflowransitionMap.each{
 							it.flag = flag
-							it.save()
+							it.save( flush:true )
 						}
 					}
 				} else {
 					def workflowransitionMap = WorkflowTransitionMap.findAll("From WorkflowTransitionMap wtm where wtm.workflowTransition = ? and wtm.swimlane = ? and wtm.transId = ?", [ currentTransition, role, transition.transId ])
 					if(workflowransitionMap.size()){
 						workflowransitionMap.each{
-							it.delete()
+							it.delete( flush:true )
 						}
 					}
 				}

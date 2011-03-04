@@ -10,12 +10,37 @@
 
 <div class="steps_table">
 	<span class="span"><b>Workflow</b></span>
-<div class="nav" style="border: 1px solid #CCCCCC; height: 11px;margin: 0px 10px 10px 10px;">
-	<span class="menuButton">
+<div class="buttons" style="margin-left: 10px;margin-right: 10px;" id="showWorkflowActionButtons"> 
+	<div class="menuButton" style="float: left;padding-top: 5px;">
 		<g:link class="list" action="home">Workflow List</g:link>
 		<a class="create" href="#" onclick="openWorkflowDialog()">Copy Workflow</a>
-	</span>
-	
+	</div>
+	<g:form action="workflowRoles" name="workflowRolesForm">
+		<div class="button" style="float: left;">
+			<input type="hidden" name="workflowTransition" id="workflowTransitionId">
+		</div>
+	</g:form>
+	<div style="float: left;">
+	<g:form action="deleteWorkflow" onsubmit="return confirm('WARNING: Deleting this Workflow will remove any associated Projects and projects related data?');">
+    	<input type="hidden" name="id" value="${workflow?.id}" />
+        <span class="button"><input type="button" class="edit" value="Edit" onclick="editWorkflowList()"/></span>
+        <span class="button"><input type="submit" class="delete" value="Delete" /></span>
+	</g:form>
+	</div>
+</div>
+<div class="buttons" style="margin-left: 10px;margin-right: 10px;display: none;" id="editWorkflowActionButtons"> 
+	<div class="menuButton" style="float: left;padding-top: 5px;">
+		<g:link class="list" action="home">Workflow List</g:link>
+		<a class="create" href="#" onclick="openWorkflowDialog()">Copy Workflow</a>
+	</div>
+	<div style="float: left;">
+	<g:form action="workflowList">
+		<input type="hidden" name="workflow" value="${workflow?.id}" />
+		<span class="button"><input type="button" class="save" value="Update" onclick="validateAndSubmitUpdateForm()"/></span>
+	    <span class="button"><input type="submit" class="delete" onclick="return confirm('Are you sure?')" value="Cancel" /></span>
+	    <span class="button"><input type="button" class="create" onclick="addStep('edit');" value="Add Step" /></span>
+    </g:form>
+    </div>
 </div>
 <div>
 <table border="0" style="width: 400px;margin: 0px 10px 10px 20px; ">
@@ -222,18 +247,6 @@
 </g:form>
 </div>
 </div>
-<div class="buttons" style="margin-left: 10px;margin-right: 10px;" id="showWorkflowActionButtons"> 
-	<g:form action="workflowRoles" name="workflowRolesForm">
-		<span class="button">
-			<input type="hidden" name="workflowTransition" id="workflowTransitionId">
-		</span>
-	</g:form>
-	<g:form action="deleteWorkflow" onsubmit="return confirm('WARNING: Deleting this Workflow will remove any associated Projects and projects related data?');">
-    	<input type="hidden" name="id" value="${workflow?.id}" />
-        <span class="button"><input type="button" class="edit" value="Edit" onclick="editWorkflowList()"/></span>
-        <span class="button"><input type="submit" class="delete" value="Delete" /></span>
-	</g:form>
-</div>
 
 <div class="buttons" style="margin-left: 10px;margin-right: 10px;display: none;" id="editWorkflowActionButtons"> 
 	<g:form action="workflowList">
@@ -360,6 +373,7 @@ function addStep( type ){
 	$("#additionalStepsId").val(additionalSteps)
 	$("#"+type+"WorkflowStepsTbody").append(stepRow)
 	$("#currentStepsId").val(additionalSteps + 1)
+	$("#codeId_"+additionalSteps).focus()
 }
 /****************************************
  * Copy workflow to anther workflow

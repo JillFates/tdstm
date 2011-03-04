@@ -7,10 +7,16 @@
 </head>
 <body>
 <div class="body">
+<g:form action="updateWorkflowRoles">
 <div class="steps_table" style="text-align: left;">
 	<span class="span"><b>Workflow Roles</b></span>
-<div class="nav" style="border: 1px solid #CCCCCC; height: 11px;margin: 0px 10px 10px 10px;text-align: left;">
+
+<div class="buttons" style="margin-left: 10px;margin-right: 10px;text-align: left;"> 
+	<input type="hidden" name="workflow" value="${workflow?.id}" />
+    <input type="hidden" name="currentStatus" value="${workflowTransition?.id}" />
 	<span class="menuButton"><g:link class="list" action="home">Workflow List</g:link></span>
+	<span class="button"><input type="submit" class="edit" value="Update" /></span>
+	<span class="button"><input type="submit" class="delete" onclick="return setAction()" value="Cancel" /></span>
 </div>
 <div>
 <table border="0" style="width: 400px;margin: 0px 10px 10px 20px; ">
@@ -51,7 +57,6 @@
 	</tr>
 </table>
 </div>
-<g:form action="updateWorkflowRoles">
 
 <div id="tableContainer" class="list" style="margin-left: 5px;margin-right: 10px;">
 <table cellpadding="0" cellspacing="0" style="border:1px solid #63A242;width: 600px;">
@@ -99,12 +104,17 @@
 	</tbody>
 </table>
 </div>
-<div class="buttons" style="margin-left: 10px;margin-right: 10px;text-align: left;"> 
-    	<input type="hidden" name="workflow" value="${workflow?.id}" />
-    	<input type="hidden" name="currentStatus" value="${workflowTransition?.id}" />
-        <span class="button"><input type="submit" class="edit" value="Update" /></span>
-</div>
 </g:form>
 </div>
+<script type="text/javascript">
+function setAction(){
+	if(confirm('Are you sure?')){
+		$("form").attr("action","workflowList")
+		return true;
+	} else {
+		return false;
+	}
+}
+</script>
 </body>
 </html>

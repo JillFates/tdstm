@@ -645,10 +645,7 @@ class ReportsController {
 	    	if(comment == "false"){
 	    		commentType = "('issue')"
 	    	}
-    		def commentCode = params.commentCode
     		def commentsQuery = new StringBuffer("from AssetComment ac where ac.commentType in ${commentType} ")
-    		if(commentCode)
-    			commentsQuery.append(" and ac.commentCode = '${commentCode}' ")
 				
     		if( moveBundleInstance != null ){
     			commentsQuery.append(" and ac.assetEntity.id in (select ae.id from AssetEntity ae where ae.moveBundle.id = $moveBundleInstance.id ) order by ac.assetEntity.${sortBy} ")

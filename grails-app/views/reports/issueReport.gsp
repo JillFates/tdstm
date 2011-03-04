@@ -56,20 +56,6 @@
 			</td>
 		</tr>
 		<tr>
-		<td valign="top" class="name" nowrap="nowrap"><label>Comment Code: </label></td>
-		<td style="width:auto;">
-			<select id="commentCode" onchange="return populateSelect('commentCodeId', this.value);">
-				<option value="" selected="selected">Please Select</option>
-				<option value="NEED_ASSET_TAG">Need Asset Tag</option>
-				<option value="AMBER_LIGHTS">Amber Lights</option>
-				<option value="STACKED_ON_TOP">Stacked On Top</option>
-				<option value="POWERED_OFF">Powered Off</option>
-				<option value="HAS_OBSTRUCTION">Has Obstruction</option>
-				<option value="ASSET_MISSING">Asset Missing</option>
-			</select>
-		</td>
-		</tr>
-		<tr>
 		<td>
 		</td>
 		<td style="width:auto;"><input id="commentCheck" type="checkbox" name="commentCheck" checked="checked" onclick="checkBoxChange(this.id,'commentInfoId', this.checked)"/>Include comments in report</td>
