@@ -220,7 +220,7 @@
 			   		<dt>Location:</dt><dd>&nbsp;${projMap?.asset?.sourceLocation}</dd>
 			   		<dt>Room:</dt><dd>&nbsp;${projMap?.asset?.sourceRoom}</dd>
 			   		<dt>Rack/Pos:</dt><dd>&nbsp;${projMap?.asset?.sourceRack}/${projMap?.asset?.sourceRackPosition}</dd>
-			   		<dt>New or Old:</dt><dd>&nbsp;${projMap?.asset?.newOrOld}</dd>
+			   		<dt>Plan Status:</dt><dd>&nbsp;${projMap?.asset?.planStatus}</dd>
 					<dt>Rail Type:</dt><dd>&nbsp;${projMap?.asset?.railType}</dd>  			   	
 				</g:if>
 				<g:else>				
@@ -229,7 +229,7 @@
 			   		<dt>Rack/Pos:</dt><dd>&nbsp;${projMap?.asset?.targetRack}/${projMap?.asset?.targetRackPosition}</dd>
 			   		<dt>Truck:</dt><dd>&nbsp;${projMap?.asset?.truck}</dd>
 			   		<dt>Cart/Shelf:</dt><dd>&nbsp;${projMap?.asset?.cart}/${projMap?.asset?.shelf}</dd>
-			   		<dt>New or Old:</dt><dd>&nbsp;${projMap?.asset?.newOrOld}</dd>
+			   		<dt>Plan Status:</dt><dd>&nbsp;${projMap?.asset?.planStatus}</dd>
 					<dt>Rail Type:</dt><dd>&nbsp;${projMap?.asset?.railType}</dd>  			   	
 				</g:else>
 				<dt>Current State:</dt><dd>&nbsp;${stateLabel}</dd>

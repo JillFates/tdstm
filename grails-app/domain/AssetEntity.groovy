@@ -20,9 +20,9 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	Integer targetRackPosition
 	String railType
 	String ipAddress
-	String hinfo
+	String os
 	Integer hasRemoteMgmt =0
-	String newOrOld
+	String planStatus
 	String nicPort
 	String truck
 	String appOwner = ""
@@ -75,8 +75,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		targetRackPosition( nullable:true )
 		railType( blank:true, nullable:true )
 		ipAddress( blank:true, nullable:true )
-		hinfo( blank:true, nullable:true )
-		newOrOld( blank:true, nullable:true )
+		os( blank:true, nullable:true )
+		planStatus( blank:true, nullable:true )
 		nicPort( blank:true, nullable:true )
 		hasRemoteMgmt( blank:true, nullable:true )
 		truck( blank:true, nullable:true )		
@@ -118,6 +118,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		version true
 		autoTimestamp false
 		id column:'asset_entity_id'
+		os column:'hinfo'
+		planStatus column:'new_or_old'
 		moveBundle ignoreNotFound:true
 		columns {
 			hasRemoteMgmt sqltype: 'tinyint(1)'

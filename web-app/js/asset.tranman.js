@@ -20,9 +20,7 @@ Array.prototype.contains = function (element) {
     	if (assetEntityAttributes != "") {
     		var length = assetEntityAttributes.length
     		
-    		var tableLeft = "<table style='width:50%;border:0px;'>"
-    		var tableCenter = "<table style='width:50%;border:0px;'>"
-    		var tableRight = "<table style='width:50%;border:0px;'>"
+    		var tableLeft = ""
 
     		for (var i=0; i < length; i ++ ) {
     			var attribute = assetEntityAttributes[i]
@@ -39,23 +37,20 @@ Array.prototype.contains = function (element) {
 			    inputTd += "</td>"
 			    
 			    if( i % 3 == 0){
-			    	tableLeft +="<tr>"+labelTd + inputTd+"</tr>"
+			    	tableLeft +="<tr>"+labelTd + inputTd
 				} else if( i % 3 == 1){
-					tableCenter +="<tr>"+labelTd + inputTd+"</tr>"
+					tableLeft += labelTd + inputTd
 				} else {
-					tableRight +="<tr>"+labelTd + inputTd+"</tr>"
+					tableLeft += labelTd + inputTd+"</tr>"
 				}
 			    var attribute = assetEntityAttributes[i]
                 if(attribute.frontendInput == 'autocomplete'){
                 	autoComp.push(attribute.attributeCode)
                 }
     		}
-		    tableLeft +="</table>"
-	    	tableCenter +="</table>"
-	    	tableRight +="</table>"
 		     
 		    tbody += filedRequiredMess()
-		    tbody +="<tr><td>"+tableLeft+"</td><td>"+tableCenter+"</td><td>"+tableRight+"</td></tr>"
+		    tbody += tableLeft 
     	}
     	tb.html( tbody );
     	$('#createFormTbodyId').css('display','block');
@@ -103,15 +98,9 @@ function showAssetDialog( e , action ) {
     if (assetEntityAttributes) {
     	var length = assetEntityAttributes.length;
 			 
-    	var stableLeft = "<table style='width:50%;border:0px;'>";
-		var etableLeft = "<table style='width:50%;border:0px;'>";
+    	var stableLeft = "";
+		var etableLeft = "";
 		 
-		var stableCenter = "<table style='width:50%;border:0px;'>";
-		var etableCenter = "<table style='width:50%;border:0px;'>";
-			
-		var stableRight = "<table style='width:50%;border:0px;'>";
-		var etableRight = "<table style='width:50%;border:0px;'>";
-			 
 		for (var i=0; i < length; i++ ) {
 		   	var attribute = assetEntityAttributes[i];
 			      
@@ -126,34 +115,32 @@ function showAssetDialog( e , action ) {
 		    var inputTdE = "<td>";
 		    inputTdE += getInputType(attribute,'edit');
 		    inputTdE += "</td>"   
-			if( i % 3 == 0){
-			   	stableLeft +="<tr>"+labelTd + inputTd+"</tr>"
-			   	etableLeft +="<tr>"+labelTd + inputTdE+"</tr>"
+		    
+		    if( i % 3 == 0){
+			   	stableLeft +="<tr>"+labelTd + inputTd
+			   	etableLeft +="<tr>"+labelTd + inputTdE
 			} else if( i % 3 == 1){
-				stableCenter +="<tr>"+labelTd + inputTd+"</tr>"
-				etableCenter +="<tr>"+labelTd + inputTdE+"</tr>"
+				stableLeft += labelTd + inputTd 
+				etableLeft += labelTd + inputTdE 
 			} else {
-				stableRight +="<tr>"+labelTd + inputTd+"</tr>"
-				etableRight +="<tr>"+labelTd + inputTdE+"</tr>"
+				stableLeft +=labelTd + inputTd+"</tr>"
+				etableLeft +=labelTd + inputTdE+"</tr>"
 			}
-			var attribute = assetEntityAttributes[i];
+			
+		    var attribute = assetEntityAttributes[i];
 		    if(attribute.frontendInput == 'autocomplete'){
 		    	autoComp.push(attribute.attributeCode);
 		    }
 		}
 		stableLeft +="</table>"
-		stableCenter +="</table>"
-		stableRight +="</table>"
 				
 		etableLeft +="</table>"
-		etableCenter +="</table>"
-		etableRight +="</table>"
 
-		stbody +="<table><tr><td>"+stableLeft+"</td><td>"+stableCenter+"</td><td>"+stableRight+"</td></tr></table>"
+		stbody +="<table>"+stableLeft+"</table>"
 		
 		
 		etbody += "<table>" + filedRequiredMess()
-		etbody +="<tr><td>"+etableLeft+"</td><td>"+etableCenter+"</td><td>"+etableRight+"</td></tr></table>"
+		etbody += etableLeft+"</table>"
 
 		showDiv.html( stbody )
 		editDiv.html( etbody );
