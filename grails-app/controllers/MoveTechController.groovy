@@ -644,6 +644,9 @@ class MoveTechController {
                         	if ( taskSize == 1 ) {
                         		if ( taskList.contains ( "Hold" ) ) {
                         			flash.message += message ( code : "<li>NO ACTIONS FOR ASSET. You may place it on hold to alert the move coordinator </li>" )
+                        		} else {
+                        			actionLabel = taskList[0]
+                    				label =	stateEngineService.getStateLabel ( moveBundleInstance.project.workflowCode, stateEngineService.getStateIdAsInt(moveBundleInstance.project.workflowCode,actionLabel) )
                         		}
                         	} else if ( taskSize > 1 ) {
                         		
@@ -1086,6 +1089,9 @@ class MoveTechController {
                             if ( taskSize == 1 ) {
                                 if ( taskList.contains ( "Hold" ) ) {
                                     flash.message = message ( code : "NO ACTIONS FOR ASSET. You may place it on hold to alert the move coordinator" )
+                                } else {
+                                	 actionLabel = taskList[0]
+                                     label =	stateEngineService.getStateLabel ( moveBundleInstance.project.workflowCode, stateEngineService.getStateIdAsInt(moveBundleInstance.project.workflowCode,actionLabel) )
                                 }
 	                        	
                             } else if ( taskSize > 1 ) {
