@@ -173,8 +173,13 @@ if(remoteMgmtPortAttribute) {
  */
 def newOrOldAttribute = EavAttribute.findByAttributeCode('newOrOld')
 if(newOrOldAttribute) {
-	DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'planStatus' where eavAttribute = ?",[newOrOldAttribute])
+	DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'PlanStatus' where eavAttribute = ?",[newOrOldAttribute])
 	EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'planStatus', frontendLabel='Plan Status' where id = ?",[newOrOldAttribute.id])
+}
+def planStatusAttribute = EavAttribute.findByAttributeCode('planStatus')
+if(planStatusAttribute) {
+	DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'PlanStatus' where eavAttribute = ?",[planStatusAttribute])
+	EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'planStatus', frontendLabel='Plan Status' where id = ?",[planStatusAttribute.id])
 }
 
 /*
@@ -182,10 +187,14 @@ if(newOrOldAttribute) {
  */
 def hinfoAttribute = EavAttribute.findByAttributeCode('hinfo')
 if(hinfoAttribute) {
-	DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'os' where eavAttribute = ?",[hinfoAttribute])
+	DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'OS' where eavAttribute = ?",[hinfoAttribute])
 	EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'os', frontendLabel = 'OS' where id = ?",[hinfoAttribute.id])
 }
-
+def osAttribute = EavAttribute.findByAttributeCode('os')
+if(osAttribute) {
+	DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'OS' where eavAttribute = ?",[osAttribute])
+	EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'os', frontendLabel = 'OS' where id = ?",[osAttribute.id])
+}
 DataTransferAttributeMap.executeUpdate("Delete from DataTransferAttributeMap where eavAttribute.id not in ( select ea.id from EavAttribute ea) )")
 
 EavAttribute.executeUpdate("Update from EavAttribute set frontendInput='text' where attributeCode in('model','manufacturer')")
