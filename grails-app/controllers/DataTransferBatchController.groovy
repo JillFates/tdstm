@@ -60,9 +60,12 @@ class DataTransferBatchController {
     															"$dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
     				def assetsSize = dataTransferValueRowList.size()
     				session.setAttribute("TOTAL_BATCH_ASSETS",assetsSize)
+					def dataTransferValues = DataTransferValue.findAllByDataTransferBatch( dataTransferBatch )
+					def eavAttributeSet = EavAttributeSet.findById(1)
+					
     				for( int dataTransferValueRow =0; dataTransferValueRow < assetsSize; dataTransferValueRow++ ) {
     					def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
-    					def dtvList = DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
+    					def dtvList = dataTransferValues.findAll{ it.rowId== rowId }//DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
     					def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
     					def flag = 0
     					def isModified = "false"
@@ -90,7 +93,7 @@ class DataTransferBatchController {
 							}
 		    			} else {
 		    				assetEntity = new AssetEntity()
-		    				assetEntity.attributeSet = EavAttributeSet.findById(1)
+		    				assetEntity.attributeSet = eavAttributeSet
 		    				isNewValidate = "true"
 		    			}
 		    		
@@ -99,76 +102,88 @@ class DataTransferBatchController {
     						assetEntity.owner = projectInstance.client
     						dtvList.each {
     							def attribName = it.eavAttribute.attributeCode
-    							//sourceteam and targetTeam assignment to assetEntity
-    							if( attribName == "sourceTeam" || attribName == "targetTeam" ) {
-    								def bundleInstance = assetEntity.moveBundle 
-    								def teamInstance
-    								teamInstance = assetEntityAttributeLoaderService.getdtvTeam(it, bundleInstance ) 
-    								if( assetEntity."$attribName" != teamInstance || isNewValidate == "true" ) {
-    									isModified = "true"
-    									assetEntity."$attribName" = teamInstance
-    								}
-    							} else if ( attribName == "moveBundle" ) {
-    								def moveBundleInstance
-				    				moveBundleInstance = assetEntityAttributeLoaderService.getdtvMoveBundle(it, projectInstance ) 
-				    				if( assetEntity."$attribName" != moveBundleInstance || isNewValidate == "true" ) {
-    									isModified = "true"
-    									assetEntity."$attribName" = moveBundleInstance 
-    								}
-    							} else if ( attribName == "manufacturer" ) {
-									def manufacturerInstance = assetEntityAttributeLoaderService.getdtvManufacturer( it ) 
-				    				if( assetEntity."$attribName" != manufacturerInstance || isNewValidate == "true" ) {
-    									isModified = "true"
-    									assetEntity."$attribName" = manufacturerInstance 
-    								}
-    							} else if ( attribName == "model" ) {
-    								def modelInstance
-    								modelInstance = assetEntityAttributeLoaderService.getdtvModel(it, dtvList) 
-				    				if( assetEntity."$attribName" != modelInstance || isNewValidate == "true" ) {
-    									isModified = "true"
-    									assetEntity."$attribName" = modelInstance 
-										assetsList.add(assetEntity)
-    								}
-    							} else if( it.eavAttribute.backendType == "int"){
-    								def correctedPos
-    								try {
-    									if( it.correctedValue ) {
-    										correctedPos = Integer.parseInt(it.correctedValue.trim())
-    									} else if( it.importValue ) {
-    										correctedPos = Integer.parseInt(it.importValue.trim())
-    									}
-    									//correctedPos = it.correctedValue
-										if( assetEntity."$attribName" != correctedPos || isNewValidate == "true" ) {
-											isModified = "true"
-											assetEntity."$attribName" = correctedPos 
-    	        						}
-    								} catch ( Exception ex ) {
-    									errorConflictCount+=1
-    									it.hasError = 1
-    									it.errorText = "format error"
-    									it.save()
-    									dataTransferBatch.hasErrors = 1
-    									isFormatError = 1
-    								}
-    							} else {
-    								try{
-	    								if( ( ( it.correctedValue == null || assetEntity."$attribName" != it.correctedValue ) && assetEntity."$attribName" != it.importValue) || isNewValidate == "true"  ) {
+								switch(attribName){
+									case "sourceTeam":
+										def bundleInstance = assetEntity.moveBundle 
+	    								def teamInstance = assetEntityAttributeLoaderService.getdtvTeam(it, bundleInstance ) 
+	    								if( assetEntity."$attribName" != teamInstance || isNewValidate == "true" ) {
 	    									isModified = "true"
-											if(("$attribName" == "assetTag" || "$attribName" == "assetName" ) && !it.importValue){
-												assetEntity."$attribName" = assetEntity?.id ? "TDS${assetEntity?.id}" :"TDS${projectId}${rowId+1}${dataTransferBatch.id}"
-											} else {
-												assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
-											}
+	    									assetEntity."$attribName" = teamInstance
 	    								}
-    								} catch ( Exception ex ) {
-    									errorConflictCount+=1
-    									it.hasError = 1
-    									it.errorText = "Asset Tag should not be blank"
-    									it.save()
-    									dataTransferBatch.hasErrors = 1
-    									isFormatError = 1
-    								}
-    							}
+										break;
+									case "targetTeam":
+										def bundleInstance = assetEntity.moveBundle 
+	    								def teamInstance = assetEntityAttributeLoaderService.getdtvTeam(it, bundleInstance ) 
+	    								if( assetEntity."$attribName" != teamInstance || isNewValidate == "true" ) {
+	    									isModified = "true"
+	    									assetEntity."$attribName" = teamInstance
+	    								}
+										break;
+									case "moveBundle":
+	    								def moveBundleInstance = assetEntityAttributeLoaderService.getdtvMoveBundle(it, projectInstance ) 
+					    				if( assetEntity."$attribName" != moveBundleInstance || isNewValidate == "true" ) {
+	    									isModified = "true"
+	    									assetEntity."$attribName" = moveBundleInstance 
+	    								}
+										break;
+									case "manufacturer":
+										def manufacturerInstance = assetEntityAttributeLoaderService.getdtvManufacturer( it ) 
+					    				if( assetEntity."$attribName" != manufacturerInstance || isNewValidate == "true" ) {
+	    									isModified = "true"
+	    									assetEntity."$attribName" = manufacturerInstance 
+	    								}
+										break;
+									case "model":
+										def modelInstance = assetEntityAttributeLoaderService.getdtvModel(it, dtvList) 
+					    				if( assetEntity."$attribName" != modelInstance || isNewValidate == "true" ) {
+	    									isModified = "true"
+	    									assetEntity."$attribName" = modelInstance 
+											assetsList.add(assetEntity)
+	    								}
+										break;
+									default:
+										if( it.eavAttribute.backendType == "int"){
+		    								def correctedPos
+		    								try {
+		    									if( it.correctedValue ) {
+		    										correctedPos = Integer.parseInt(it.correctedValue.trim())
+		    									} else if( it.importValue ) {
+		    										correctedPos = Integer.parseInt(it.importValue.trim())
+		    									}
+		    									//correctedPos = it.correctedValue
+												if( assetEntity."$attribName" != correctedPos || isNewValidate == "true" ) {
+													isModified = "true"
+													assetEntity."$attribName" = correctedPos 
+		    	        						}
+		    								} catch ( Exception ex ) {
+		    									errorConflictCount+=1
+		    									it.hasError = 1
+		    									it.errorText = "format error"
+		    									it.save()
+		    									dataTransferBatch.hasErrors = 1
+		    									isFormatError = 1
+		    								}
+		    							} else {
+		    								try{
+			    								if( ( ( it.correctedValue == null || assetEntity."$attribName" != it.correctedValue ) && assetEntity."$attribName" != it.importValue) || isNewValidate == "true"  ) {
+			    									isModified = "true"
+													if(("$attribName" == "assetTag" || "$attribName" == "assetName" ) && !it.importValue){
+														assetEntity."$attribName" = assetEntity?.id ? "TDS${assetEntity?.id}" :"TDS${projectId}${rowId+1}${dataTransferBatch.id}"
+													} else {
+														assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
+													}
+			    								}
+		    								} catch ( Exception ex ) {
+		    									errorConflictCount+=1
+		    									it.hasError = 1
+		    									it.errorText = "Asset Tag should not be blank"
+		    									it.save()
+		    									dataTransferBatch.hasErrors = 1
+		    									isFormatError = 1
+		    								}
+		    							}
+										break
+								}
     						}
     						if ( isFormatError != 1 ) {
     							if( isModified == "true" ) {
@@ -218,7 +233,7 @@ class DataTransferBatchController {
     					}
     				}
     				dataTransferBatch.statusCode = 'COMPLETED'
-    				dataTransferBatch.save()
+    				dataTransferBatch.save(flush:true)
 					/* update assets racks, cabling data once process done */
 					updateAssetsCabling( assetsList )
 					updateAssetRacks()
