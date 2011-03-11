@@ -11,6 +11,7 @@ class WalkThroughController {
 	def jdbcTemplate
 	def walkThroughService
 	def workflowService
+	def assetEntityAttributeLoaderService
 	
     def index = { redirect(action: 'mainMenu', params: params) }
 	/*------------------------------------------------------------
@@ -416,6 +417,7 @@ class WalkThroughController {
 	 *----------------------------------------------------------*/
     def saveAndCompleteAudit = {
 		def assetEntity = AssetEntity.get( params.id )
+		def existingModelId = assetEntity.model?.id 
 		def walkthruComments = walkthruComments()
 		if( assetEntity ){
 			def principal = SecurityUtils.subject.principal
@@ -435,6 +437,15 @@ class WalkThroughController {
 			}
 			assetEntity.properties = params
 			if(!assetEntity.hasErrors() && assetEntity.save() ) {
+				if(existingModelId != assetEntity.model?.id){
+            		AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
+													toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
+													where toAsset = ? """,[assetEntity])
+
+            		AssetCableMap.executeUpdate("delete from AssetCableMap where fromAsset = ?",[assetEntity])
+            		assetEntityAttributeLoaderService.createModelConnectors( assetEntity )
+            	}
+				
 				if(params.submitType != "save"){
 					def transactionStatus = workflowService.createTransition(assetEntity.project.workflowCode,"SUPERVISOR", stateTo, assetEntity, assetEntity.moveBundle, loginUser, null, "" )
 				}
