@@ -487,6 +487,7 @@ class WalkThroughController {
 									comment : commentDescription, createdBy : loginUser.person ).save( flush:true )
 				}
 				def commentCodes = walkThroughCodes( assetEntity )
+				assetEntity.updateRacks()
 				render(view:'assetMenu', model:[ moveBundle:currBundle, location:currLocation, room:params.room,  viewType:'assetMenu',
 				                                rack:params.rack, assetEntity:assetEntity, commentCodes:commentCodes, walkthruComments:walkthruComments ] )
 			} else {
