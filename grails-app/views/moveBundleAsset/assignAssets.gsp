@@ -25,7 +25,7 @@
 			if(document.assignLeftAssetsForm.elements[i].type == "checkbox")
 			{
 				var obj = document.assignLeftAssetsForm.elements[i]
-				if(obj.checked == true ){
+				if(obj.checked == true && !isNaN(obj.value)){
 				 	assets.push(obj.value);
 				} 
 			}
@@ -35,6 +35,7 @@
 			tb.removeChild( trleft )
 		}
 		if(assets != ""){
+			$("#leftassetId").removeAttr("checked")
 			${remoteFunction(action:'saveAssetsToBundle', params:'\'assets=\'+ assets +\'&bundleFrom=\'+bundleLeft +\'&bundleTo=\'+bundleRight', onComplete:'showAssetsRight(e)')}
 		}
 	}
@@ -49,7 +50,7 @@
 			if(document.assignRightAssetsForm.elements[i].type == "checkbox")
 			{
 				var obj = document.assignRightAssetsForm.elements[i]
-				if(obj.checked == true ){
+				if(obj.checked == true && !isNaN(obj.value)){
 				 	assets.push(obj.value);
 				} 
 			}
@@ -59,6 +60,7 @@
 			tb.removeChild( trright )
 		}
 		if(assets != ""){
+			$("#rightassetId").removeAttr("checked")
 			${remoteFunction(action:'saveAssetsToBundle', params:'\'assets=\'+ assets +\'&bundleFrom=\'+bundleRight +\'&bundleTo=\'+bundleLeft', onComplete:'showAssetsLeft(e)')}
 		}
 	}
@@ -84,15 +86,19 @@
 			      var tr = document.createElement('tr');
 			      	tr.id = "trleft_"+asset.id;
 			      	tr.name = asset.id;
-			      var td1 = document.createElement('td');
+			      var checkboxtd = document.createElement('td');
+			      checkboxtd.style.width = '20px'
 			      var checkbox = document.createElement('input');
 					checkbox.type = 'checkbox';
 					checkbox.name = 'leftasset_'+asset.id;
 					checkbox.id = 'leftassetId_'+asset.id;
 					checkbox.value = asset.id;
-					checkbox.onclick = function() { selectCheckBox( this.id, 'trleft_'+this.value); };
+					checkbox.onclick = function() { selectCheckBox('leftassetId', this.id, 'trleft_'+this.value); };
+				  
+				  checkboxtd.appendChild( checkbox )
+				  tr.appendChild( checkboxtd )
+				  var td1 = document.createElement('td');
 			      var id = document.createTextNode(asset.assetTag);
-			      td1.appendChild( checkbox )
 			      td1.appendChild( id )
 			      tr.appendChild( td1 )
 			      var td2 = document.createElement('td');
@@ -107,7 +113,7 @@
 			      var srcLocation = document.createTextNode(asset.srcLocation);
 			      td4.appendChild( srcLocation )
 			      tr.appendChild( td4 )
-			      tr.onclick = function() { selectCheckBox('leftassetId_'+this.name, this.id); };
+			      tr.onclick = function() { selectCheckBox('leftassetId', 'leftassetId_'+this.name, this.id); };
 			      tbody.appendChild( tr )
 		      	}
 	      }
@@ -133,15 +139,19 @@
 			      var tr = document.createElement('tr');
 			      	tr.id = "trright_"+asset.id;
 			      	tr.name = asset.id;
-			      var td1 = document.createElement('td');
+			      var checkboxtd = document.createElement('td');
+			      checkboxtd.style.width = '20px'
 			      var checkbox = document.createElement('input');
 					checkbox.type = 'checkbox';
 					checkbox.name = 'rightasset_'+asset.id;
 					checkbox.id = 'rightassetId_'+asset.id;
 					checkbox.value = asset.id;
-					checkbox.onclick = function() { selectCheckBox(this.id, 'trright_'+this.value); };
+					checkbox.onclick = function() { selectCheckBox('rightassetId', this.id, 'trright_'+this.value); };
+			      
+			      checkboxtd.appendChild( checkbox );
+			      tr.appendChild( checkboxtd );
+			      var td1 = document.createElement('td');
 			      var id = document.createTextNode(asset.assetTag);
-			      td1.appendChild( checkbox );
 			      td1.appendChild( id );
 			      tr.appendChild( td1 );
 			      var td2 = document.createElement('td');
@@ -156,7 +166,7 @@
 			      var srcLocation = document.createTextNode(asset.srcLocation);
 			      td4.appendChild( srcLocation );
 			      tr.appendChild( td4 );
-			      tr.onclick = function() { selectCheckBox('rightassetId_'+this.name, this.id); };
+			      tr.onclick = function() { selectCheckBox('rightassetId', 'rightassetId_'+this.name, this.id); };
 			      tbody.appendChild( tr );
 		      }
 	      }
@@ -164,7 +174,7 @@
 	    rselect.appendChild( tbody );
 	}
 	
-	function selectCheckBox( name, trId ){
+	function selectCheckBox( moveType, name, trId ){
 		var checkboxName = document.getElementById(name)
 		var trObj = document.getElementById(trId)
 		var bcolor = trObj.style.backgroundColor
@@ -174,6 +184,23 @@
 		} else {
 			checkboxName.checked = true
 			trObj.style.backgroundColor = '#5F9FCF'
+		}
+		var selectHeader = true
+		if(moveType == "rightassetId"){
+			$("#assetsRightTbodyId input[type=checkbox]").each( function() {
+				if(!$(this).attr("checked"))
+					selectHeader = false
+			})
+		} else {
+			$("#assetsLeftTbodyId input[type=checkbox]").each( function() {
+				if(!$(this).attr("checked"))
+					selectHeader = false
+			})
+		}
+		if(selectHeader){
+			$("#"+moveType).attr("checked",true)
+		} else {
+			$("#"+moveType).removeAttr("checked")
 		}
 	}
 	function initialize(){
@@ -190,6 +217,18 @@
 	function bundleChange(){
 	document.bundlesForm.action = "assignAssetsToBundleChange";
 	document.bundlesForm.submit();
+	}
+	// Select and deselect assets
+	function selectAllCheckBoxes(id, tbodyId ){
+		var isChecked = $("#"+id).is(":checked")
+		var allCheckBoxes = $("#"+tbodyId+" input[type=checkbox]")
+		var bgColor = isChecked ? "#5F9FCF" : "#FFFFFF" 
+		allCheckBoxes.each( function() {
+			$(this).attr("checked", isChecked );
+		})
+		$("#"+tbodyId+" tr").each( function() {
+			$(this).css("backgroundColor", bgColor );
+		})	
 	}
 	</script> 
 </head>
@@ -237,6 +276,7 @@
 					       <table id="assetsLeftTableId" style="width: 100%;float: left; border: 0px">  
 					         <thead>  
 					           <tr>  
+					           <th style="width: 20px;"><input type="checkbox" id="leftassetId" onclick="selectAllCheckBoxes(this.id, 'assetsLeftTbodyId')" /></th>
 					           <g:sortableColumn action="sortAssetList"  property="assetTag" title="Asset Tag" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id,'side':'left','sortField':sortField,'sideField':sideField,'orderField':orderField]" />
 					           <g:sortableColumn action="sortAssetList"  property="assetName" title="Server Name" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'left','sortField':sortField,'sideField':sideField,'orderField':orderField]"/>
 					           <g:sortableColumn action="sortAssetList" property="lapplication" title="Application" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'left','sortField':sortField,'sideField':sideField,'orderField':orderField]"/>
@@ -245,8 +285,9 @@
 					         </thead>  
 					         <tbody id="assetsLeftTbodyId">
 					         <g:each in="${moveBundleAssets}" var="moveBundleAsset" status="i">
-					           <tr id="trleft_${moveBundleAsset?.id}" onclick="selectCheckBox('leftassetId_${moveBundleAsset?.id}', this.id)">  
-					             <td> <input type="checkbox" name="leftasset_${moveBundleAsset?.id}" id="leftassetId_${moveBundleAsset?.id}" value="${moveBundleAsset?.id}" onclick="selectCheckBox(this.id, 'trleft_${moveBundleAsset?.id}')" />${moveBundleAsset?.assetTag}</td>  
+					           <tr id="trleft_${moveBundleAsset?.id}" onclick="selectCheckBox('leftassetId', 'leftassetId_${moveBundleAsset?.id}', this.id)">  
+					             <td  style="width: 20px;"> <input type="checkbox" name="leftasset_${moveBundleAsset?.id}" id="leftassetId_${moveBundleAsset?.id}" value="${moveBundleAsset?.id}" onclick="selectCheckBox('leftassetId', this.id, 'trleft_${moveBundleAsset?.id}')" /></td>
+					             <td>${moveBundleAsset?.assetTag}</td>  
 					             <td>${moveBundleAsset?.assetName}</td>  
 					             <td>${moveBundleAsset?.application}</td>  
 					             <td>${moveBundleAsset?.sourceLocation}/${moveBundleAsset?.sourceRack}</td>  
@@ -274,6 +315,7 @@
 					       <table id="assetsRightTableId" style="width: 100%;float: left;border: 0px">  
 					         <thead>  
 					          <tr>  
+					          	<th style="width: 20px;"><input type="checkbox" id="rightassetId" onclick="selectAllCheckBoxes(this.id, 'assetsRightTbodyId')" /></th>
 					             <g:sortableColumn action="sortAssetList" property="asset_tag" title="Asset Tag" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'right','sortField':sortField,'sideField':sideField,'orderField':orderField]"/>
 					             <g:sortableColumn action="sortAssetList" property="asset_name" title="Server Name" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'right','sortField':sortField,'sideField':sideField,'orderField':orderField]"/>
 					             <g:sortableColumn action="sortAssetList" property="application" title="Application" params="['rightBundle':moveBundleInstance?.id, 'leftBundle':leftBundleInstance?.id, 'side':'right','sortField':sortField,'sideField':sideField,'orderField':orderField]"/>
@@ -282,8 +324,9 @@
 					         </thead>  
 					         <tbody id="assetsRightTbodyId" >
 					         	<g:each in="${currentBundleAssets}" var="currentBundleAsset" status="i">
-					           <tr id="trright_${currentBundleAsset?.id}" onclick="selectCheckBox('rightassetId_${currentBundleAsset?.id}', this.id )">  
-					             <td><input type="checkbox" name="rightasset_${currentBundleAsset?.id}" id="rightassetId_${currentBundleAsset?.id}" value="${currentBundleAsset?.id}" onclick="selectCheckBox( this.id, 'trright_${currentBundleAsset?.id}' )"/>${currentBundleAsset?.assetTag}</td>  
+					           <tr id="trright_${currentBundleAsset?.id}" onclick="selectCheckBox('rightassetId','rightassetId_${currentBundleAsset?.id}', this.id )">  
+					             <td style="width: 20px;"><input type="checkbox" name="rightasset_${currentBundleAsset?.id}" id="rightassetId_${currentBundleAsset?.id}" value="${currentBundleAsset?.id}" onclick="selectCheckBox('rightassetId', this.id, 'trright_${currentBundleAsset?.id}' )"/></td>
+					             <td>${currentBundleAsset?.assetTag}</td>  
 					             <td style="vertical-align:middle;">${currentBundleAsset?.assetName}</td>  
 					             <td style="vertical-align:middle;">${currentBundleAsset?.application}</td>  
 					             <td style="vertical-align:middle;">${currentBundleAsset?.sourceLocation}/${currentBundleAsset?.sourceRack}</td>
