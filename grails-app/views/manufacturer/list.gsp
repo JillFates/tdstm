@@ -27,8 +27,6 @@
                     <g:each in="${manufacturerInstanceList}" status="i" var="manufacturerInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                         
-                            <td><g:link action="show" id="${manufacturerInstance.id}">${fieldValue(bean:manufacturerInstance, field:'id')}</g:link></td>
-                        
                             <td><g:link action="show" id="${manufacturerInstance.id}">${fieldValue(bean:manufacturerInstance, field:'name')}</g:link></td>
                         
                             <td>${fieldValue(bean:manufacturerInstance, field:'description')}</td>
