@@ -17,8 +17,6 @@
                     <thead>
                         <tr>
                         
-                   	        <g:sortableColumn property="id" title="Id" />
-                        
                    	        <g:sortableColumn property="name" title="Name" />
                         
                    	        <g:sortableColumn property="description" title="Description" />
@@ -31,7 +29,7 @@
                         
                             <td><g:link action="show" id="${manufacturerInstance.id}">${fieldValue(bean:manufacturerInstance, field:'id')}</g:link></td>
                         
-                            <td>${fieldValue(bean:manufacturerInstance, field:'name')}</td>
+                            <td><g:link action="show" id="${manufacturerInstance.id}">${fieldValue(bean:manufacturerInstance, field:'name')}</g:link></td>
                         
                             <td>${fieldValue(bean:manufacturerInstance, field:'description')}</td>
                         

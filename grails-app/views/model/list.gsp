@@ -19,7 +19,7 @@
                         
                             <g:sortableColumn property="modelName" title="${message(code: 'model.modelName.label', default: 'Model Name')}" />
                         
-                            <th><g:message code="model.manufacturer.label" default="Manufacturer" /></th>
+                            <g:sortableColumn property="manufacturer" title="${message(code: 'model.manufacturer.label', default: 'Manufacturer')}" />
                         
                             <g:sortableColumn property="description" title="${message(code: 'model.description.label', default: 'Description')}" />
                         
