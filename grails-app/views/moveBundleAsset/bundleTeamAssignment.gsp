@@ -350,30 +350,50 @@
 	 	jQuery('form#bundleTeamAssetForm').attr({action: "bundleTeamAssignment"}); 
 	 	jQuery('form#bundleTeamAssetForm').submit();
 	 }
- var loaded = false;
-        function showProcessing()
-        {		
-               loaded =false;
-               showLoadingImage()
-         }
+ 	var loaded = false;
+    function showProcessing()
+    {		
+    	loaded =false;
+          showLoadingImage()
+    }
 
-         function showLoadingImage()
-         {
-                var processTab = jQuery('#processDiv');
-                processTab.attr("style", "display:block");
-                var assetTab = jQuery('#assetDiv');
-                assetTab.attr("style", "display:none");
-                
-                
-           }
-
-          function hideProcessing()
-          {
-              var processTab = jQuery('#processDiv');
-                processTab.attr("style", "display:none");
-                var assetTab = jQuery('#assetDiv');
-                assetTab.attr("style", "display:block");
-          }
+    function showLoadingImage()
+    {
+		var processTab = jQuery('#processDiv');
+        processTab.attr("style", "display:block");
+        var assetTab = jQuery('#assetDiv');
+        assetTab.attr("style", "display:none");
+	}
+	function hideProcessing()
+    {
+    	var processTab = jQuery('#processDiv');
+        processTab.attr("style", "display:none");
+        var assetTab = jQuery('#assetDiv');
+        assetTab.attr("style", "display:block");
+    }
+    function sortAssets( sortBy ){
+    	var arSelected = new Array();
+     	var team = jQuery('#filterTeam').val();
+     	var filterRacks = document.getElementById('filterRack')
+     	var rackPlan = jQuery('#rackPlan').val();
+     	for(var rack=0;rack<filterRacks.length;rack++)
+     	{ 
+     		if (filterRacks[rack].selected) {
+     			arSelected.push(filterRacks[rack].value);
+     		}
+     	} 
+     	var order = 'asc'
+        var thClass = $("#"+sortBy).attr("class")
+        if(thClass == "sortable sorted asc"){
+        	order = 'desc'
+        }
+     	$("#assetTable th").each( function() {
+			$(this).attr("class","sortable");
+		})	
+		$("#"+sortBy).attr("class","sortable sorted "+order)
+     	var bundleId = jQuery('#id').val();
+     	${remoteFunction(action:'sortAssets', params:'\'rack=\'+arSelected+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId+\'&team=\'+team+\'&sortBy=\'+sortBy+\'&order=\'+order', onComplete:"filterByTeam( e );")}
+    }
     </script>
 
   </head>
@@ -517,17 +537,17 @@
 		            	<table id="assetTable">
 		              		<thead>
 		                		<tr>
-		                  			<th>Asset</th>
-				                  	<th>Server</th>
-									<th>Model</th>
-									<th>Room</th>
-				                  	<th>Rack</th>
-				                  	<th>Pos</th>
-				                  	<th>Size</th>
-				                  	<th>Team</th>
+		                  			<th class="sortable" id="assetTag"><a href="javascript:sortAssets('assetTag')" >Asset Tag</a></th>
+				                  	<th class="sortable" id="assetName"><a href="javascript:sortAssets('assetName')" >Asset</a></th>
+									<th class="sortable" id="model"><a href="javascript:sortAssets('model')" >Model</a></th>
+									<th class="sortable" id="room"><a href="javascript:sortAssets('room')" >Room</a></th>
+				                  	<th class="sortable" id="rack"><a href="javascript:sortAssets('rack')" >Rack</a></th>
+				                  	<th class="sortable" id="uposition"><a href="javascript:sortAssets('uposition')" >Pos</a></th>
+				                  	<th class="sortable" id="usize"><a href="javascript:sortAssets('usize')" >Size</a></th>
+				                  	<th class="sortable" id="teamHeader"><a href="javascript:sortAssets('teamHeader')" >Team</a></th>
 				                  	<g:if test="${rack == 'RerackPlan'}">
-				                  	<th>Cart</th>
-				                  	<th>Shelf</th>
+				                  	<th class="sortable" id="cart"><a href="javascript:sortAssets('cart')" >Cart</a></th>
+				                  	<th class="sortable" id="shelf"><a href="javascript:sortAssets('rack')" >Shelf</a></th>
 				                  	</g:if>
 				                </tr>
 			              	</thead>

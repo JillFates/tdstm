@@ -530,6 +530,7 @@ class MoveBundleAssetController {
        	} else {
        		moveBundleAssetList = AssetEntity.findAll( " from AssetEntity ma where ma.moveBundle = $bundleInstance.id and ma.targetRack in $rackString ")
        	}
+       	
     	if( moveBundleAssetList != null ) {
     		for( int assetRow = 0; assetRow < moveBundleAssetList.size(); assetRow++) {
     			def displayTeam  
@@ -684,4 +685,132 @@ class MoveBundleAssetController {
 			render reportFields  as JSON
 	    }
 	}
+	/*********************************************************************
+     * Sort Assets By selected value
+     * @param : sort field, order, filters(rack, team), bundle, rackPlan
+     * @return : assetEntity list as JSON
+     ********************************************************************/
+    def sortAssets = {
+    	def rackList = []
+    	rackList = (params.rack).tokenize(",")
+    	def rackString = "("
+    	if( rackList.size()<=0 || rackList[0] == null || rackList[0] == "all" ){
+    		rackString = null
+    	} else {
+    		for( int rack = 0; rack<rackList.size(); rack++ ) {
+    			rackString = rackString +"'"+ rackList[rack]+"'"
+    			if( rack+1 >= rackList.size ){
+    				rackString = rackString+')'
+    			} else {
+    				rackString = rackString+','
+    			}
+    		}
+    	}
+       	def bundleId = params.bundleId
+       	def rackPlan = params.rackPlan
+		def moveTeam = params.team
+       	def bundleInstance = MoveBundle.findById(bundleId)
+       	def moveBundleAsset = []
+       	def moveBundleAssetList
+       	def projectTeam = []
+       	def sortBy = params.sortBy
+		def order = params.order
+       	def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and "+
+                    										"pt.teamCode != 'Logistics' and pt.teamCode != 'Transport' " )
+       	projectTeamInstanceList.each{team ->
+            projectTeam << [ teamCode: team.teamCode ]
+        }
+       	def queryString = new StringBuffer(" from AssetEntity ma where ma.moveBundle = $bundleInstance.id ")
+       	if( rackString != "" && rackString != null ) {
+	       	if ( rackPlan == "UnrackPlan" ) {
+	       		queryString.append( " and ma.sourceRack in $rackString ")
+	       	} else {
+	       		queryString.append( " and ma.targetRack in $rackString ")
+	       	}
+       	}
+       	if( moveTeam != "" && moveTeam != null ) {
+	       	if ( rackPlan == "UnrackPlan" ) {
+	    		if( moveTeam == "unAssign" ) {
+	    			queryString.append( " and ma.sourceTeam = null ")
+	        	} else {
+	        		def projectTeamInstance = ProjectTeam.find( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and  pt.teamCode = '${moveTeam}' " )
+	        		queryString.append(" and ma.sourceTeam = $projectTeamInstance.id ")
+	        	}
+	    	} else {
+	    		if( moveTeam == "unAssign" ) {
+	    			queryString.append( " and ma.targetTeam = null ")
+	        	} else {
+	        		def projectTeamInstance = ProjectTeam.find( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and  pt.teamCode = '${moveTeam}' " )
+	        		queryString.append(" and ma.targetTeam = $projectTeamInstance.id ")
+	        	}
+	    	}
+       	}
+       	switch(sortBy ){
+       	case "assetTag":
+       		queryString.append( " order by ma.assetTag ${order} ")
+       		break;
+    	case "assetName":
+    		queryString.append( " order by ma.assetName ${order} ")
+       		break;
+    	case "model":
+    		queryString.append( " order by ma.model.modelName ${order} ")
+       		break;
+    	case "room":
+    		if ( rackPlan == "UnrackPlan" ) {
+    			queryString.append( " order by ma.sourceRoom ${order} ")
+    		} else {
+    			queryString.append( " order by ma.targetRoom ${order} ")
+    		}
+       		break;
+    	case "rack":
+    		if ( rackPlan == "UnrackPlan" ) {
+    			queryString.append( " order by ma.sourceRack ${order} ")
+    		} else {
+    			queryString.append( " order by ma.targetRack ${order} ")
+    		}
+       		break;
+    	case "uposition":
+    		if ( rackPlan == "UnrackPlan" ) {
+    			queryString.append( " order by ma.sourceRackPosition ${order} ")
+    		} else {
+    			queryString.append( " order by ma.targetRackPosition ${order} ")
+    		}
+       		break;
+    	case "usize":
+    		queryString.append( " order by ma.model.usize ${order} ")
+       		break;
+    	case "teamHeader":
+    		if ( rackPlan == "UnrackPlan" ) {
+    			queryString.append( " order by ma.sourceTeam.teamCode ${order} ")
+    		} else {
+    			queryString.append( " order by ma.targetTeam.teamCode ${order} ")
+    		}
+       		break;
+    	case "cart":
+    		queryString.append( " order by ma.cart ${order} ")
+       		break;
+    	case "shelf":
+    		queryString.append( " order by ma.shelf ${order} ")
+       		break;
+       	}
+       	moveBundleAssetList = AssetEntity.findAll(queryString.toString())
+    	if( moveBundleAssetList != null ) {
+    		for( int assetRow = 0; assetRow < moveBundleAssetList.size(); assetRow++) {
+    			def displayTeam  
+    			if( rackPlan == "RerackPlan" ) {
+    				displayTeam = moveBundleAssetList[assetRow]?.targetTeam?.teamCode
+    			}else {
+    				displayTeam = moveBundleAssetList[assetRow]?.sourceTeam?.teamCode
+    			}
+    			def assetEntityInstance = AssetEntity.findById( moveBundleAssetList[assetRow]?.id )
+    			moveBundleAsset << [id:assetEntityInstance?.id, assetName:assetEntityInstance?.assetName, model:assetEntityInstance?.model?.toString(), 
+			    					sourceLocation:assetEntityInstance?.sourceLocation, sourceRack:assetEntityInstance?.sourceRack, 
+			    					targetLocation:assetEntityInstance?.targetLocation, targetRack:assetEntityInstance?.targetRack, 
+			    					sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition, 
+			    					uSize:assetEntityInstance?.model?.usize, team:displayTeam, cart:moveBundleAssetList[assetRow]?.cart, 
+			    					shelf:moveBundleAssetList[assetRow]?.shelf, projectTeam:projectTeam, assetTag:assetEntityInstance?.assetTag]
+    		}
+    	}
+        render moveBundleAsset as JSON
+    }
 }   
