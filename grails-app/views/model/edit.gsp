@@ -44,7 +44,7 @@
 		</tr>
 		<tr>
 			<td>Asset Type:</td>
-			<td><g:select id="assetTypeId" name="assetType" from="${modelInstance.assetTypeList}" value="${modelInstance.assetType}" ></g:select></td>
+			<td><g:select id="assetTypeId" name="assetType" from="${modelInstance.assetTypeList}" value="${modelInstance.assetType}" onchange="showBladeFields(this.value)"></g:select></td>
 		</tr>
 		<tr>
 			<td>Usize:</td>
@@ -77,6 +77,30 @@
 	        </g:else>
 	        </td>
         </tr>
+        <tr id="bladeRowsId" style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
+			<td valign="top" class="name">Blade Rows:</td>
+			<td><input type="text" name="bladeRows" value="${modelInstance.bladeRows}" >
+			<g:hasErrors bean="${modelInstance}" field="bladeRows">
+					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="bladeRows" /></div>
+				</g:hasErrors> 
+			</td>
+		</tr>
+		<tr id="bladeCountId" style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
+			<td valign="top" class="name">Blade Count:</td>
+			<td><input type="text" name="bladeCount" value="${modelInstance.bladeCount}" >
+			<g:hasErrors bean="${modelInstance}" field="bladeRows">
+					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="bladeCount" /></div>
+				</g:hasErrors> 
+			</td>
+		</tr>
+		<tr id="bladeLabelCountId" style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
+			<td valign="top" class="name">Blade Label Count:</td>
+			<td><input type="text" name="bladeLabelCount" value="${modelInstance.bladeLabelCount}" >
+			<g:hasErrors bean="${modelInstance}" field="bladeRows">
+					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="bladeLabelCount" /></div>
+				</g:hasErrors> 
+			</td>
+		</tr>
         <tr>
 			<td>Notes:</td>
 			<td><input type="text" name="description" id="descriptionId" value="${modelInstance.description}"> </td>
@@ -254,6 +278,18 @@
 		}
 		return isValid
 	}
+	function showBladeFields( value ){
+		if(value == "Blade Chassis"){
+			$("#bladeRowsId").show()
+			$("#bladeCountId").show()
+			$("#bladeLabelCountId").show()
+		} else {
+			$("#bladeRowsId").hide()
+			$("#bladeCountId").hide()
+			$("#bladeLabelCountId").hide()
+		}
+	}
+	showBladeFields($("#assetTypeId").val())
 </script>
 </body>
 </html>

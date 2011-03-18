@@ -76,6 +76,7 @@ Array.prototype.contains = function (element) {
 	}
  }
 var modelId
+var manufacturerId
   // function to show asset dialog
 function showAssetDialog( e , action ) {
 	
@@ -159,13 +160,39 @@ function showAssetDialog( e , action ) {
 	      $("#showDialog").dialog("open");
 	      $("#editDialog").dialog("close");
       }
-	  var manufacturer = $("#editmanufacturerId").val()
-	  updateModelOptions( manufacturer, modelId, 2 ) //  assume that 2 is for edit action
+	  var assetType = $("#editassetTypeId").val()
+	  updateManufacturerOptions(assetType, manufacturerId, 2)
 	  timedUpdate('never')
     }
-    
+    function updateManufacturerOptions(assetType, manufacturerId, type){
+    	new Ajax.Request('../manufacturer/getManufacturersListAsJSON?assetType='+assetType,{
+			asynchronous:false,
+			evalScripts:true,
+			onComplete:function(e){
+				var  manufacturersList = eval('(' + e.responseText + ')')
+				var inputField  = '<option value=\'\'>Unassigned</option>'
+				for(i=0; i<manufacturersList.length; i++){
+					var manufacturer = manufacturersList[i]
+					                       
+					if( manufacturerId != manufacturer.id){
+						inputField += '<option value=\''+manufacturer.id+'\'>'+manufacturer.name+'</option>'
+					} else {
+						inputField += '<option value=\''+manufacturer.id+'\' selected>'+manufacturer.name+'</option>'
+					}
+				}
+				if( type == 2 ){
+					$("#editmanufacturerId").html( inputField )
+				} else {
+					$("#manufacturerId").html( inputField )	
+				}
+			}
+		})
+    	var manufacturer = $("#editmanufacturerId").val()
+  	    updateModelOptions( manufacturer, modelId, 2 ) //  assume that 2 is for edit action
+    }
 	function updateModelOptions( manufacturer, modelId, type ){
-		new Ajax.Request('../model/getModelsListAsJSON?manufacturer='+manufacturer,{
+		var assetType = $("#editassetTypeId").val()
+		new Ajax.Request('../model/getModelsListAsJSON?manufacturer='+manufacturer+"&assetType="+assetType,{
 			asynchronous:false,
 			evalScripts:true,
 			onComplete:function(e){
@@ -187,9 +214,20 @@ function showAssetDialog( e , action ) {
 			}
 		})
 	}
+	function confirmAssetTypeChange( oldValue, newValue, type ){
+		if(type == 2 ){
+			if(confirm("WARNING : Change of Asset Type may impact on Manufacturer and Model, Do you want to continue ?")){
+				updateManufacturerOptions(newValue, null, type )
+			} else {
+				$("#editassetTypeId").val( oldValue )
+			}
+		} else {
+			updateManufacturerOptions(newValue, null, type)
+		}
+	}
 	function confirmManufacturerChange( oldValue, newValue, type ){
 		if(type == 2 ){
-			if(confirm("WARNING : Change of Manufacturer may impact on cabling data, Do you want to continue ?")){
+			if(confirm("WARNING : Change of Manufacturer may impact on Model data, Do you want to continue ?")){
 				updateModelOptions(newValue, null, type )
 			} else {
 				$("#editmanufacturerId").val( oldValue )
@@ -304,13 +342,14 @@ function showAssetDialog( e , action ) {
 				}
 			})*/
   	} else if( name == "manufacturer"){
+  		manufacturerId = attribute.manufacturerId
   		var type = id ? 2 : 1 // Assume that 1 : create and 2 : edit
-  		new Ajax.Request('../manufacturer/getManufacturersListAsJSON ',{
+  		inputField = "<select name='"+name+"' id='"+ id +name+"Id' onchange='confirmManufacturerChange("+ attribute.manufacturerId +", this.value, "+type+" )'><option value=''>Unassigned</option>"
+  		/*new Ajax.Request('../manufacturer/getManufacturersListAsJSON ',{
 				asynchronous:false,
 				evalScripts:true,
 				onComplete:function(e){
 					var  manufacturersList = eval('(' + e.responseText + ')')
-					inputField = "<select name='"+name+"' id='"+ id +name+"Id' onchange='confirmManufacturerChange("+ attribute.manufacturerId +", this.value, "+type+" )'><option value=''>Unassigned</option>"
 					
 					for(i=0; i<manufacturersList.length; i++){
 						var manufacturer = manufacturersList[i]
@@ -323,7 +362,24 @@ function showAssetDialog( e , action ) {
 					}
 					inputField += '</select>'
 				}
-			})
+			})*/
+  	} else if( name == "assetType"){
+  		var actiontype = id ? 2 : 1 // Assume that 1 : create and 2 : edit
+  		inputField = "<select name='"+name+"' id='"+ id +name+"Id' onchange=\"confirmAssetTypeChange('"+ attribute.value +"', this.value, "+actiontype+" )\">"
+  		//"<select name='"+name +"' id='"+ id +name+"Id' onchange='confirmAssetTypeChange("+ attribute.value +", this.value, "+type+" ) '>"
+		var inputOption = '<option value=\'\' >please select</option>'
+		if (options) {
+			var length = options.length
+		    for (var i=0; i < length; i++) {
+				var optionObj = options[i]
+			    if(attribute.value == optionObj.option){
+			    	inputOption += '<option value=\''+ optionObj.option+'\' selected>'+optionObj.option+'</option>'
+			    } else {
+			    	inputOption += '<option value=\''+ optionObj.option+'\' >'+optionObj.option+'</option>'
+			    }
+		    }
+		 }
+		inputField += inputOption+'</select>'
 	} else if(type == 'select'){
   		inputField = '<select name=\''+name +'\' id=\''+ id +name+'Id'+'\'>'
 		var inputOption = '<option value=\'\' >please select</option>'

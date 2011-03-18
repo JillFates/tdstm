@@ -3,6 +3,10 @@ import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
 
 def jdbcTemplate = ctx.getBean("jdbcTemplate")
+/*
+ * Set Server as AssetEntity default type
+ */
+AssetEntity.executeUpdate("UPDATE from AssetEntity set assetType = 'Server' where assetType is null")
 
 println"**************UPDATE MANUFACTURER***************"
 // Create manufactures if not exist
@@ -25,14 +29,15 @@ def manufacturerResultMap = jdbcTemplate.queryForList("select manufacturer from 
 	}
 println"**************UPDATE MODEL***************"
 //Create model if not exist
-def modelResultMap = jdbcTemplate.queryForList("select model, manufacturer_id as manufacturer from asset_entity where model_id is null && model != '' && model is not null group by model")
+def modelResultMap = jdbcTemplate.queryForList("select model, manufacturer_id as manufacturer, asset_type as assetType from asset_entity where model_id is null && model != '' && model is not null group by model")
 	modelResultMap.each{ result->
 		def manufacturerInstance = result.manufacturer ? Manufacturer.findById( result.manufacturer ) : ""
 		def model = result.model.replaceAll("\\s+\$", "").replaceAll("^\\s+", "")
-		if( manufacturerInstance ){
-			def modelInstance = Model.findByModelNameAndManufacturer( model, manufacturerInstance  )
+		def assetType = result.assetType
+		if( manufacturerInstance && assetType ){
+			def modelInstance = Model.findWhere(modelName:model,assetType : assetType,manufacturer: manufacturerInstance  )
 			if(!modelInstance){
-				modelInstance = new Model( modelName : model, manufacturer : manufacturerInstance )
+				modelInstance = new Model( modelName : model, assetType:assetType, manufacturer : manufacturerInstance )
 				if ( !modelInstance.validate() || !modelInstance.save() ) {
 					def etext = "Unable to create modelInstance" +
 					GormUtil.allErrorsString( modelInstance )
@@ -212,12 +217,12 @@ EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 40 where att
 EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 40 where attribute = ?",[EavAttribute.findByAttributeCode('serialNumber')])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 50 where attributeCode = 'assetTag'")
 EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 50 where attribute = ?",[EavAttribute.findByAttributeCode('assetTag')])
-EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 60 where attributeCode = 'manufacturer'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 60 where attribute = ?",[EavAttribute.findByAttributeCode('manufacturer')])
-EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 70 where attributeCode = 'model'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 70 where attribute = ?",[EavAttribute.findByAttributeCode('model')])
-EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 80 where attributeCode = 'assetType'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 80 where attribute = ?",[EavAttribute.findByAttributeCode('assetType')])
+EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 60 where attributeCode = 'assetType'")
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 60 where attribute = ?",[EavAttribute.findByAttributeCode('assetType')])
+EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 70 where attributeCode = 'manufacturer'")
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 70 where attribute = ?",[EavAttribute.findByAttributeCode('manufacturer')])
+EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 80 where attributeCode = 'model'")
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 80 where attribute = ?",[EavAttribute.findByAttributeCode('model')])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 90 where attributeCode = 'bladeSize'")
 EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 90 where attribute = ?",[EavAttribute.findByAttributeCode('bladeSize')])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 100 where attributeCode = 'ipAddress'")
@@ -288,6 +293,3 @@ EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 420 where at
 EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 420 where attribute = ?",[EavAttribute.findByAttributeCode('planStatus')])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 430 where attributeCode = 'currentStatus'")
 EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 430 where attribute = ?",[EavAttribute.findByAttributeCode('currentStatus')])
-
-
-

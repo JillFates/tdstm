@@ -85,7 +85,8 @@ class ManufacturerController {
      *  Send List of Manufacturer as JSON object
      */
 	def getManufacturersListAsJSON = {
-    	def manufacturers = Manufacturer.list()
+    	def assetType = params.assetType
+    	def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer ",[assetType])?.manufacturer
 		render manufacturers as JSON
     }
 }

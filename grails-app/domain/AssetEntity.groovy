@@ -1,7 +1,7 @@
 import com.tdssrc.grails.GormUtil
 class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String assetName	
-	String assetType
+	String assetType = "Server"
 	String assetTag
 	String serialNumber	
 	Manufacturer manufacturer

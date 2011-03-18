@@ -290,10 +290,11 @@ class ModelController {
      */
 	def getModelsListAsJSON = {
     	def manufacturer = params.manufacturer
+		def assetType = params.assetType
     	def models
 		if(manufacturer){
 			def manufacturerInstance = Manufacturer.get(manufacturer)
-			models = manufacturerInstance ? Model.findAllByManufacturer( manufacturerInstance ) : null
+			models = manufacturerInstance ? Model.findAllByManufacturer( manufacturerInstance )?.findAll{it.assetType == assetType } : null
 		}
     	if(!models)
     		models = []

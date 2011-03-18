@@ -75,7 +75,19 @@
 		        </g:else>
 	        </td>
         </tr>
-        <tr>
+		<tr style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
+			<td>Blade Rows:</td>
+			<td>${modelInstance?.bladeRows}</td>
+		</tr>
+		<tr style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
+			<td>Blade Count:</td>
+			<td>${modelInstance?.bladeCount}</td>
+		</tr>
+		<tr style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
+			<td>Blade Label Count:</td>
+			<td>${modelInstance?.bladeLabelCount}</td>
+		</tr>
+		<tr>
 			<td>Notes:</td>
 			<td>${modelInstance?.description}</td>
 		</tr>
