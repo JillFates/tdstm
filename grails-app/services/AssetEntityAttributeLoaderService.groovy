@@ -430,7 +430,7 @@ class AssetEntityAttributeLoaderService {
 	 * @param dataTransferValue, dataTransferValueList
 	 * @author Lokanada Reddy
 	 */
-	def getdtvModel(def dtv, def dtvList ) {
+	def getdtvModel(def dtv, def dtvList, def assetEntity ) {
 		def modelInstance
 		def modelValue = dtv.correctedValue ? dtv.correctedValue : dtv.importValue
 		if(modelValue){
@@ -438,9 +438,9 @@ class AssetEntityAttributeLoaderService {
 			def manufacturerName = dtvManufacturer?.correctedValue ? dtvManufacturer?.correctedValue : dtvManufacturer?.importValue
 			def manufacturerInstance = manufacturerName ? Manufacturer.findByName(manufacturerName) : null
 			if(manufacturerInstance){
-				modelInstance = Model.findByModelNameAndManufacturer( modelValue, manufacturerInstance )
+				modelInstance = Model.findByModelNameAndManufacturer( modelValue, manufacturerInstance )?.find{it.assetType == assetEntity?.assetType}
 				if( !modelInstance ){
-					modelInstance = new Model( modelName:modelValue, manufacturer:manufacturerInstance )
+					modelInstance = new Model( modelName:modelValue, manufacturer:manufacturerInstance, assetType:assetEntity?.assetType )
 					if ( !modelInstance.validate() || !modelInstance.save() ) {
 					def etext = "Unable to create modelInstance" +
 	                GormUtil.allErrorsString( modelInstance )

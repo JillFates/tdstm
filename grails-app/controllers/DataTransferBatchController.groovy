@@ -52,6 +52,7 @@ class DataTransferBatchController {
 			def unknowAssetIds = 0
 			def unknowAssets = ""
 			def assetsList = new ArrayList()
+    		def existingAssetsList = new ArrayList()
     		try{
     			dataTransferBatch = DataTransferBatch.get(params.batchId)
     			if(dataTransferBatch){
@@ -75,6 +76,7 @@ class DataTransferBatchController {
 		    			if( assetEntityId ) {
 		    				assetEntity = AssetEntity.get(assetEntityId)
 							if(assetEntity?.id != null && assetEntity.project.id == projectInstance.id ){
+								existingAssetsList.add( assetEntity )
 			    				if ( dataTransferBatch.dataTransferSet.id == 1 ) {
 			    					def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, assetEntity, dtvList, projectInstance )
 			    					flag = validateResultList[0]?.flag
@@ -134,7 +136,7 @@ class DataTransferBatchController {
 	    								}
 										break;
 									case "model":
-										def modelInstance = assetEntityAttributeLoaderService.getdtvModel(it, dtvList) 
+										def modelInstance = assetEntityAttributeLoaderService.getdtvModel(it, dtvList, assetEntity) 
 					    				if( assetEntity."$attribName" != modelInstance || isNewValidate == "true" ) {
 	    									isModified = "true"
 	    									assetEntity."$attribName" = modelInstance 
@@ -235,8 +237,8 @@ class DataTransferBatchController {
     				dataTransferBatch.statusCode = 'COMPLETED'
     				dataTransferBatch.save(flush:true)
 					/* update assets racks, cabling data once process done */
-					updateAssetsCabling( assetsList )
-					updateAssetRacks()
+					updateAssetsCabling( assetsList, existingAssetsList )
+					updateAssetRacks( projectId )
     			}
     		}catch (Exception e) {
     			status.setRollbackOnly()
@@ -368,48 +370,52 @@ class DataTransferBatchController {
 	/*=========================================================
 	 * Update Asset Racks once import batch process done.
 	 *========================================================*/
-	def updateAssetRacks(){
-    	def sourceRackQuery = "select project_id as `project.id`, source_location as location, source_room as room, source_rack as tag, 1 as source " +
-							"from asset_entity where asset_type <> 'Blade' and source_rack != '' and source_rack is not null and " +
-							"project_id is not null and rack_source_id is null group by source_location, source_rack, source_room"
-
-		def targetRackQuery = "select project_id as `project.id`, target_location as location, target_room as room, target_rack as tag, 0 as source " +
-							"from asset_entity where asset_type <> 'Blade' and target_rack != '' and target_rack is not null and " +
-							"project_id is not null and rack_target_id is null group by target_location, target_rack, target_room"
+	def updateAssetRacks( projectId ){
+		try{
+	    	def sourceRackQuery = "select project_id as `project.id`, source_location as location, source_room as room, source_rack as tag, 1 as source " +
+								"from asset_entity where asset_type <> 'Blade' and source_rack != '' and source_rack is not null and " +
+								"project_id is not null and project_id = ${projectId} group by source_location, source_rack, source_room"
 	
-		def sourceRacks = jdbcTemplate.queryForList(sourceRackQuery)
-		def targetRacks = jdbcTemplate.queryForList(targetRackQuery)
-	
-		(sourceRacks + targetRacks).each { rackFields ->
-			def rack = Rack.findOrCreateWhere(rackFields)
-			
-			// Update all assets with this rack info to point to this rack
-			if(rack.id == null)
-				println "Unable to create rack: ${rack.errors}"
-			else {
-				def source = rack.source ? 'source' : 'target'
+			def targetRackQuery = "select project_id as `project.id`, target_location as location, target_room as room, target_rack as tag, 0 as source " +
+								"from asset_entity where asset_type <> 'Blade' and target_rack != '' and target_rack is not null and " +
+								"project_id is not null and project_id = ${projectId} group by target_location, target_rack, target_room"
+		
+			def sourceRacks = jdbcTemplate.queryForList(sourceRackQuery)
+			def targetRacks = jdbcTemplate.queryForList(targetRackQuery)
+		
+			(sourceRacks + targetRacks).each { rackFields ->
+				def rack = Rack.findOrCreateWhere(rackFields)
 				
-				def updateQuery = "update asset_entity set rack_${source}_id='${rack.id}' where project_id='${rack.project.id}' AND rack_${source}_id is null AND "
-				if(rackFields.location == null)
-					updateQuery += "${source}_location is null AND "
-				else
-					updateQuery += "${source}_location=\"${rackFields.location}\" AND "
-				
-				if(rackFields.room == null)
-					updateQuery += "${source}_room is null AND "
-				else
-					updateQuery += "${source}_room=\"${rackFields.room}\" AND "
-				updateQuery += "${source}_rack=\"${rackFields.tag}\""
-				
-				def updated = jdbcTemplate.update(updateQuery)
-				println "Updated ${source} rack to ${rack.id} for ${updated} assets"
+				// Update all assets with this rack info to point to this rack
+				if(rack.id == null)
+					println "Unable to create rack: ${rack.errors}"
+				else {
+					def source = rack.source ? 'source' : 'target'
+					
+					def updateQuery = "update asset_entity set rack_${source}_id='${rack.id}' where project_id='${rack.project.id}' AND "
+					if(rackFields.location == null)
+						updateQuery += "${source}_location is null AND "
+					else
+						updateQuery += "${source}_location=\"${rackFields.location}\" AND "
+					
+					if(rackFields.room == null)
+						updateQuery += "${source}_room is null AND "
+					else
+						updateQuery += "${source}_room=\"${rackFields.room}\" AND "
+					updateQuery += "${source}_rack=\"${rackFields.tag}\""
+					
+					def updated = jdbcTemplate.update(updateQuery)
+					println "Updated ${source} rack to ${rack.id} for ${updated} assets"
+				}
 			}
+		}catch(Exception ex){
+			println ex
 		}
     }
     /*
      *  Update assets cabling data for selected list of assets 
      */
-    def updateAssetsCabling( assetsList ){
+    def updateAssetsCabling( assetsList, existingAssetsList ){
     	assetsList.each{ assetEntity->
     		AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
 								toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
@@ -418,5 +424,9 @@ class DataTransferBatchController {
 			AssetCableMap.executeUpdate("delete from AssetCableMap where fromAsset = ?",[assetEntity])
 			assetEntityAttributeLoaderService.createModelConnectors( assetEntity )
     	}
+		existingAssetsList.each{ assetEntity->
+			AssetCableMap.executeUpdate("""Update AssetCableMap set toAssetRack='${assetEntity.targetRack}',
+					toAssetUposition=${assetEntity.targetRackPosition} where toAsset = ? """,[assetEntity])
+		}
     }
 }

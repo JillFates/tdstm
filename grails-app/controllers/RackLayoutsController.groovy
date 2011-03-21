@@ -167,7 +167,7 @@ class RackLayoutsController {
 							if(position > maxUSize) {
 								position = maxUSize
 								newLow = maxUSize
-								assetEntity?.model?.usize = 1
+								//assetEntity?.model?.usize = 1
 								overlapError = true
 							}
 							assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag + ' ~- ' + assetEntity.assetName, position:position, overlapError:overlapError, 
@@ -177,7 +177,7 @@ class RackLayoutsController {
 						if(position > maxUSize) {
 							position = maxUSize
 							newLow = maxUSize
-							assetEntity?.model?.usize = 1
+							//assetEntity?.model?.usize = 1
 							overlapError = true
 						}
 						assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag + ' ~- ' + assetEntity.assetName, position:position, overlapError:overlapError, 
@@ -557,7 +557,6 @@ class RackLayoutsController {
 			}
 		}
 		def assetCable = [assetId : assetId, assetTag : AssetEntity.get(assetId)?.assetTag ]
-		println"-->"+assetCable 
 		render assetCable as JSON
 	}
 	/*

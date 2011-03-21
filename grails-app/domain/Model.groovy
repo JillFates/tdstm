@@ -20,7 +20,7 @@ class Model {
 	static belongsTo = [ manufacturer : Manufacturer]
 	
 	static constraints = {
-		modelName( blank:false, nullable:false, unique:'manufacturer' )
+		modelName( blank:false, nullable:false )
 		manufacturer( blank:false, nullable:false )
 		description( blank:true, nullable:true )
 		assetType( blank:true, nullable:true )

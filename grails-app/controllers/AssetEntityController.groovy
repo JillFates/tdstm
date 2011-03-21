@@ -769,6 +769,8 @@ class AssetEntityController {
 	    	}
 	        def assetEntityInstance = AssetEntity.get( params.id )
 			def existingModelId = assetEntityInstance.model?.id 
+			def existingTargetRack = assetEntityInstance.targetRack
+			def existingUposition = assetEntityInstance.targetRackPosition
 	        if(assetEntityInstance) {
 	        	def bundleId = map.get('moveBundle')
 				if(bundleId){
@@ -811,6 +813,11 @@ class AssetEntityController {
 
 	            		AssetCableMap.executeUpdate("delete from AssetCableMap where fromAsset = ?",[assetEntityInstance])
 	            		assetEntityAttributeLoaderService.createModelConnectors( assetEntityInstance )
+	            	}
+	            	if(existingTargetRack != assetEntityInstance.targetRack || existingUposition != assetEntityInstance.targetRackPosition){
+
+	            		AssetCableMap.executeUpdate("""Update AssetCableMap set toAssetRack='${assetEntityInstance.targetRack}',
+	            				toAssetUposition=${assetEntityInstance.targetRackPosition} where toAsset = ? """,[assetEntityInstance])
 	            	}
 	            } else {
 	            	def etext = "Unable to Update Asset Entity" +
