@@ -21,7 +21,7 @@
 		}
 		/* ---------------------------------
 		 * 	Author : Lokanada Reddy
-		 *	JQuary function to set the interval to display Progress
+		 *	JQuery function to set the interval to display Progress
 		 * ------------------------------- */
 		jQuery(function($){
 	        $("#run").click(function(){
@@ -73,8 +73,8 @@
                 </tr>
                 
                 <tr>
-                	<td valign="top" class="name">Manage Batches:</td>
-                	<td valign="top" class="name"><g:link controller="dataTransferBatch" params="[projectId:projectId]">${dataTransferBatchs}</g:link></td>
+                	<td valign="top" class="buttonR"><g:link controller="dataTransferBatch" params="[projectId:projectId]">Manage Batches: ${dataTransferBatchs}</g:link></td>
+                	<td valign="top" class="name">&nbsp;</td>
                 </tr>
               </tbody>
             </table>
