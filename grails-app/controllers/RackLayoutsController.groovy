@@ -96,9 +96,9 @@ class RackLayoutsController {
 				def finalAssetList = []
 				def racksByFilter
 				if(includeOtherBundle){
-					racksByFilter = rack.assets.findAll { it.moveBundle && it.project == project }.sort { rack?.source == 1 ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
+					racksByFilter = rack.assets.findAll { it.assetType !='Blade' && it.moveBundle && it.project == project }.sort { rack?.source == 1 ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
 				} else {
-					racksByFilter = rack.assets.findAll { moveBundles?.id?.contains(it.moveBundle?.id) && it.project == project }.sort { rack?.source == 1 ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
+					racksByFilter = rack.assets.findAll { it.assetType !='Blade' && moveBundles?.id?.contains(it.moveBundle?.id) && it.project == project }.sort { rack?.source == 1 ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
 				}
 				racksByFilter.each { assetEntity ->
 				
@@ -297,7 +297,7 @@ class RackLayoutsController {
 					if(overlappedAssets.size() > 1) {
 						overlappedAssets.each{ overlapAsset ->
 							moveBundle += (overlapAsset?.moveBundle ? overlapAsset?.moveBundle.name : "") + "<br/>"
-							if(overlapAsset.assetType == 'Blade Chassis'){
+							if(overlappedAsset.model && overlapAsset.model.assetType == 'Blade Chassis'){
 								hasBlades = true
 								bladeTable = generateBladeLayout(it, overlapAsset, isAdmin)
 							}
@@ -309,7 +309,7 @@ class RackLayoutsController {
 					} else if(overlappedAssets.size() > 0){
 						overlappedAsset = overlappedAssets[0]
 						moveBundle += (overlappedAsset?.moveBundle ? overlappedAsset?.moveBundle.name : "") + "<br/>"
-						if(overlappedAsset.assetType == 'Blade Chassis'){
+						if(overlappedAsset.model && overlappedAsset.model.assetType == 'Blade Chassis'){
 							hasBlades = true
 							bladeTable = generateBladeLayout(it, overlappedAsset,isAdmin)
 						}
@@ -384,66 +384,50 @@ class RackLayoutsController {
 			blades = AssetEntity.findAllWhere(project:assetEntity.project, moveBundle:assetEntity.moveBundle, assetType:'Blade', targetBladeChassis:assetEntity.assetTag)
 
 		def fullRows = []
-		for(int i = 1; i < 9; i++) {
-			def matching = []
-			if(assetDetails.asset.source == 1)
-				matching = blades.findAll { it.sourceBladePosition == i }
-			else
-				matching = blades.findAll { it.targetBladePosition == i }
-			
-			if(matching.size() > 1)
-				bladeTable += "<td class='errorBlade' style='height:${tdHeight}px'>Conflict</td>"
-			else if(matching.size() == 1) {
-				def blade = matching[0]
-				def tag = blade.assetTag.split('')[1..-1].join('<br/>')
-				def taglabel = "<div style='float:left'>"+tag.substring(0,tag.length())+"</div>"
-				if(blade.assetTag.length() >= 8){
-					taglabel = "<div style='float:left'>"+tag.substring(0,19)+"</div><div style='float:right'>"+tag.substring(24,43)+"</div>"
-				}
-				def bladeSpan = blade.bladeSize == 'Full' ? 2 : 1
-				if(bladeSpan == 2){
-					fullRows << i + 8
-					taglabel = tag
-				}
-				if((bladeSpan == 2) && blades.findAll { it.sourceBladePosition == i + 8 }.size() > 0)
-					bladeTable += "<td class='errorBlade' style='height:${tdHeight}px'>&nbsp;</td>"
-				else if(isAdmin)
-					bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href='javascript:openAssetEditDialig(${blade.id})' title='${tag.replace('<br/>','')}'>${taglabel}</a></td>"
+		def chassisRows = assetEntity.model.bladeRows
+		def bladesPerRow = (assetEntity.model.bladeCount / chassisRows ).intValue()
+		def bladeLabelCount = assetEntity.model.bladeLabelCount
+
+		for(int k = 1; k <= chassisRows; k++){
+			int initialColumn = (k-1)*bladesPerRow + 1
+			for(int i = initialColumn; i <= k*bladesPerRow; i++){
+				def matching = []
+				if(assetDetails.asset.source == 1)
+					matching = blades.findAll { it.sourceBladePosition == i }
 				else
-					bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px' title='${tag.replace('<br/>','')}'>${taglabel}</td>"
-			} else
-				bladeTable += "<td class='emptyBlade' style='height:${tdHeight}px'>&nbsp;</td>"
+					matching = blades.findAll { it.targetBladePosition == i }
+				
+				if(fullRows.contains(i))
+					bladeTable += ''
+				else if(matching.size() > 1)
+					bladeTable += "<td class='errorBlade' style='height:${tdHeight}px'>Conflict</td>"
+				else if(matching.size() == 1) {
+					def blade = matching[0]
+					def tag = blade.assetTag
+					if(tag.length() >= bladeLabelCount){
+						tag = tag.substring(0,bladeLabelCount)
+					}
+					tag = tag.split('')[1..-1].join('<br/>')
+					def taglabel = "<div>"+tag.substring(0,tag.length())+"</div>"
+					def bladeSpan = blade.bladeSize == 'Full' ? chassisRows : 1
+					if(bladeSpan == chassisRows){
+						for(int y = i; y <= chassisRows*bladesPerRow; y += bladesPerRow ){
+							fullRows << y + bladesPerRow
+						}
+					}
+					def hasError = assetDetails.asset.source == 1 ? blades.findAll { it.sourceBladePosition == i + bladeLabelCount }.size() > 0 : blades.findAll { it.targetBladePosition == i + bladeLabelCount }.size() > 0
+					if((bladeSpan == 2) &&  hasError )
+						bladeTable += "<td class='errorBlade' style='height:${tdHeight}px'>&nbsp;</td>"
+					else if(isAdmin)
+						bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href='javascript:openAssetEditDialig(${blade.id})' title='${tag.replace('<br/>','')}'>${taglabel}</a></td>"
+					else
+						bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px' title='${tag.replace('<br/>','')}'>${taglabel}</td>"
+				} else
+					bladeTable += "<td class='emptyBlade' style='height:${tdHeight}px'>&nbsp;</td>"
+			}
+			bladeTable += k == chassisRows ? "</tr>" : "</tr><tr>"
 		}
 		
-		bladeTable += "</tr><tr>"
-		
-		for(int i = 9; i < 17; i++) {
-			def matching = []
-			if(assetDetails.asset.source == 1)
-				matching = blades.findAll { it.sourceBladePosition == i }
-			else
-				matching = blades.findAll { it.targetBladePosition == i }
-			
-			if(fullRows.contains(i))
-				bladeTable += ''
-			else if(matching.size() > 1)
-				bladeTable += "<td class='errorBlade' style='height:${tdHeight}px'>&nbsp;</td>"
-			else if(matching.size() == 1) {
-				def blade = matching[0]
-				def tag = blade.assetTag.split('')[1..-1].join('<br/>')
-				def taglabel = "<div style='float:left'>"+tag.substring(0,tag.length())+"</div>"
-				if(blade.assetTag.length() >= 8){
-					taglabel = "<div style='float:left;'>"+tag.substring(0,19)+"</div><div style='float:right'>"+tag.substring(24,43)+"</div>"
-				}
-				if(isAdmin)
-					bladeTable += "<td class='blade' style='height:${tdHeight}px'><a href='javascript:openAssetEditDialig(${blade.id})' title='${tag.replace('<br/>','')}' >${taglabel}</a></td>"
-				else                                 
-					bladeTable += "<td class='blade' style='height:${tdHeight}px' title='${tag.replace('<br/>','')}'>${taglabel}</td>"
-			} else
-				bladeTable += "<td class='emptyBlade' style='height:${tdHeight}px'>&nbsp;</td>"
-		}
-		
-		bladeTable += "</tr>"
 		bladeTable += '</table>'
 	}
 	/********************************************
