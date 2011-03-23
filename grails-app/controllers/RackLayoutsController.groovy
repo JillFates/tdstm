@@ -6,7 +6,7 @@ class RackLayoutsController {
 	def userPreferenceService
 	def jdbcTemplate
 	def supervisorConsoleService
-	def static final statusDetails = ["missing":"Unknown", "cabledDetails":"Cabled with Details","empty":"Empty","cabled":"Cabled"]
+	def static final statusDetails = ["missing":"Unknown", "cabledDetails":"Assigned","empty":"Empty","cabled":"Cabled"]
 	def create = {
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ

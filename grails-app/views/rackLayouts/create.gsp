@@ -226,7 +226,7 @@
 			
 			<td>
 				<div style="width:150px">
-					<label for="frontView" ><input type="checkbox" name="frontView" id="frontView" checked="checked" />&nbsp;Front</label>&nbsp
+					<label for="frontView" ><input type="checkbox" name="frontView" id="frontView" />&nbsp;Front</label>&nbsp
 					<label for="backView" ><input type="checkbox" name="backView" id="backView" checked="checked"/>&nbsp;Back</label><br /><br />
 					<label for="bundleName" ><input type="checkbox" name="bundleName" id="bundleName" checked="checked" />&nbsp;Include bundle names</label><br /><br />
 					<label for="otherBundle" ><input type="checkbox" name="otherBundle" id="otherBundle" checked="checked" />&nbsp;Include other bundles</label>
@@ -296,8 +296,8 @@
 				<input type="text" name="connector" id="connectorId" size="15" onfocus="getConnectorData()" onblur="validateConnectorData(this.value, this.id)" />
 			</div>
 			<div id="powerDiv" style="display: none;">
-				<input type="radio" name="staticConnector" id="staticConnector_A" value="A">A</input>
-				<input type="radio" name="staticConnector" id="staticConnector_B" value="B">B</input>
+				<input type="radio" name="staticConnector" id="staticConnector_A" value="A">A</input>&nbsp;
+				<input type="radio" name="staticConnector" id="staticConnector_B" value="B">B</input>&nbsp;
 				<input type="radio" name="staticConnector" id="staticConnector_C" value="C">C</input>
 			</div>
 			<div>
