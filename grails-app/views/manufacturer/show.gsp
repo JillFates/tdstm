@@ -22,19 +22,15 @@
 
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Id:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:manufacturerInstance, field:'id')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
                             <td valign="top" class="name">Name:</td>
                             
                             <td valign="top" class="value">${fieldValue(bean:manufacturerInstance, field:'name')}</td>
                             
                         </tr>
-                    
+                    	<tr>
+							 <td valign="top" class="name">AKA:</td>
+							<td valign="top" class="value">${fieldValue(bean:manufacturerInstance, field:'aka')}</td>
+						</tr>
                         <tr class="prop">
                             <td valign="top" class="name">Description:</td>
                             

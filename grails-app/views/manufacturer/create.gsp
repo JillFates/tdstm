@@ -35,7 +35,15 @@
                                     <input type="text" id="name" name="name" value="${fieldValue(bean:manufacturerInstance,field:'name')}"/>
                                 </td>
                             </tr> 
-                        
+                        	<tr>
+							<td valign="top" class="name">AKA:</td>
+								<td>
+									<input type="text" name="aka" id="akaId" value="${manufacturerInstance?.aka}">
+									<g:hasErrors bean="${manufacturerInstance}" field="aka">
+										<div class="errors"><g:renderErrors bean="${manufacturerInstance}" as="list" field="aka" /></div>
+									</g:hasErrors> 
+								</td>
+							</tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="description">Description:</label>

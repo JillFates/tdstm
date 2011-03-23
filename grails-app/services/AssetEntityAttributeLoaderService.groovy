@@ -416,11 +416,19 @@ class AssetEntityAttributeLoaderService {
 		if(manufacturerValue){
 			manufacturerInstance = Manufacturer.findByName( manufacturerValue )
 			if( !manufacturerInstance ){
-				manufacturerInstance = new Manufacturer( name : manufacturerValue )
-				if ( !manufacturerInstance.validate() || !manufacturerInstance.save() ) {
-					def etext = "Unable to create manufacturerInstance" +
-	                GormUtil.allErrorsString( manufacturerInstance )
-					println etext
+				def manufacuturers = Manufacturer.findAllByAkaIsNotNull()
+				manufacuturers.each{manufacuturer->
+					if(manufacuturer.aka.toLowerCase().contains( manufacturerValue.toLowerCase() )){
+						manufacturerInstance = manufacuturer
+					}
+				}
+				if(!manufacturerInstance){
+					manufacturerInstance = new Manufacturer( name : manufacturerValue )
+					if ( !manufacturerInstance.validate() || !manufacturerInstance.save() ) {
+						def etext = "Unable to create manufacturerInstance" +
+		                GormUtil.allErrorsString( manufacturerInstance )
+						println etext
+					}
 				}
 			}
 		}
@@ -433,21 +441,42 @@ class AssetEntityAttributeLoaderService {
 	def getdtvModel(def dtv, def dtvList, def assetEntity ) {
 		def modelInstance
 		def modelValue = dtv.correctedValue ? dtv.correctedValue : dtv.importValue
+		try{
 		if(modelValue){
 			def dtvManufacturer = dtvList.find{it.eavAttribute.attributeCode == "manufacturer"}
 			def manufacturerName = dtvManufacturer?.correctedValue ? dtvManufacturer?.correctedValue : dtvManufacturer?.importValue
 			def manufacturerInstance = manufacturerName ? Manufacturer.findByName(manufacturerName) : null
-			if(manufacturerInstance){
-				modelInstance = Model.findByModelNameAndManufacturer( modelValue, manufacturerInstance )?.find{it.assetType == assetEntity?.assetType}
-				if( !modelInstance ){
-					modelInstance = new Model( modelName:modelValue, manufacturer:manufacturerInstance, assetType:assetEntity?.assetType )
-					if ( !modelInstance.validate() || !modelInstance.save() ) {
-					def etext = "Unable to create modelInstance" +
-	                GormUtil.allErrorsString( modelInstance )
-					println etext
-				}
+			if( !manufacturerInstance ){
+				def manufacuturers = Manufacturer.findAllByAkaIsNotNull()
+				manufacuturers.each{manufacuturer->
+					if(manufacuturer.aka.toLowerCase().contains( manufacturerName.toLowerCase() )){
+						manufacturerInstance = manufacuturer
+					}
 				}
 			}
+			if(manufacturerInstance){
+				modelInstance = Model.findByModelNameAndManufacturer( modelValue, manufacturerInstance )
+				modelInstance = modelInstance?.find{it.assetType == assetEntity?.assetType}
+				if( !modelInstance ){
+					def models = Model.findAllByManufacturerAndAkaIsNotNull( manufacturerInstance ).findAll{it.assetType == assetEntity?.assetType}
+					models.each{ model->
+						if(model.aka.toLowerCase().contains( modelValue.toLowerCase() )){
+							modelInstance = model
+						}
+					}
+					if(!modelInstance){
+						modelInstance = new Model( modelName:modelValue, manufacturer:manufacturerInstance, assetType:assetEntity?.assetType )
+						if ( !modelInstance.validate() || !modelInstance.save() ) {
+							def etext = "Unable to create modelInstance" +
+			                GormUtil.allErrorsString( modelInstance )
+							println etext
+						}
+					}
+				}
+			}
+		}
+		} catch(Exception ex){
+			ex.printStackTrace()
 		}
 		return modelInstance
 	}

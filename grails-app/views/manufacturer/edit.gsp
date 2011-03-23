@@ -37,6 +37,15 @@
                                     <input type="text" id="name" name="name" value="${fieldValue(bean:manufacturerInstance,field:'name')}"/>
                                 </td>
                             </tr> 
+                            
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="aka">AKA:</label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean:manufacturerInstance,field:'aka','errors')}">
+                                    <input type="text" id="aka" name="aka" value="${fieldValue(bean:manufacturerInstance,field:'aka')}"/>
+                                </td>
+                            </tr> 
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
