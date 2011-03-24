@@ -227,9 +227,10 @@
 			<td>
 				<div style="width:150px">
 					<label for="frontView" ><input type="checkbox" name="frontView" id="frontView" />&nbsp;Front</label>&nbsp
-					<label for="backView" ><input type="checkbox" name="backView" id="backView" checked="checked"/>&nbsp;Back</label><br /><br />
-					<label for="bundleName" ><input type="checkbox" name="bundleName" id="bundleName" checked="checked" />&nbsp;Include bundle names</label><br /><br />
-					<label for="otherBundle" ><input type="checkbox" name="otherBundle" id="otherBundle" checked="checked" />&nbsp;Include other bundles</label>
+					<label for="backView" ><input type="checkbox" name="backView" id="backView" checked="checked"/>&nbsp;Back</label><br />
+					<label for="bundleName" ><input type="checkbox" name="bundleName" id="bundleName" checked="checked" />&nbsp;w/ bundle names</label><br />
+					<label for="otherBundle" ><input type="checkbox" name="otherBundle" id="otherBundle" checked="checked" />&nbsp;w/ other bundles</label><br />
+					<label for="showDetails" ><input type="checkbox" name="showDetails" id="showDetails" disabled />&nbsp;w/ diagrams</label>
 				</div>
 			</td>
 			
