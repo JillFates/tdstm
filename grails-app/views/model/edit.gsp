@@ -148,7 +148,7 @@
 		<table style="border: 0px;">
 			<thead>
 				<tr>
-					<th>Type<input type="hidden" id="connectorCount" name="connectorCount" value="${modelConnectors.size()}"></th>
+					<th>Type<input type="hidden" id="connectorCount" name="connectorCount" value="${nextConnector}"></th>
 					<th>Label</th>
 					<th>Label Position</th>
 					<th>Conn Pos X</th>
@@ -158,7 +158,7 @@
 			<tbody id="connectorModelBody">
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
 			<tr id="connectorTr${modelConnector.connector}">
-					<td><g:select id="typeId${modelConnector.connector}" name="type${modelConnector.connector}" from="${ModelConnector.constraints.type.inList}" value="${modelConnector.type}"></g:select></td>
+					<td><a href="javascript:verifyAndDeleteConnector(${modelConnector.connector})"><span class="clear_filter"><u>X</u></span></a>&nbsp;<g:select id="typeId${modelConnector.connector}" name="type${modelConnector.connector}" from="${ModelConnector.constraints.type.inList}" value="${modelConnector.type}"></g:select></td>
 					<td><input id="labelId${modelConnector.connector}" name="label${modelConnector.connector}" type="text" value="${modelConnector.label}" onchange="changeLabel(${modelConnector.connector}, this.value)"></td>
 					<td><g:select id="labelPositionId${modelConnector.connector}" name="labelPosition${modelConnector.connector}" from="${['Right','Bottom']}" value="${modelConnector.labelPosition}" onchange="changeLabelPosition(${modelConnector.connector}, this.value)"></g:select></td>
 					<td><input id="connectorPosXId${modelConnector.connector}" name="connectorPosX${modelConnector.connector}" maxlength="3" style="width: 25px;" type="text" value="${modelConnector.connectorPosX}"></td>
@@ -171,7 +171,7 @@
 			</g:each>
 			<g:each in="${otherConnectors}" var="count">
 			<tr id="connectorTr${count}" style="display: none;">
-					<td><g:select id="typeId${count}" name="type" from="${ModelConnector.constraints.type.inList}"></g:select></td>
+					<td><a href="javascript:verifyAndDeleteConnector(${count})"><span class="clear_filter"><u>X</u></span></a>&nbsp;<g:select id="typeId${count}" name="type" from="${ModelConnector.constraints.type.inList}"></g:select></td>
 					<td><input id="labelId${count}" type="text" onchange="changeLabel(${count}, this.value)"></td>
 					<td><g:select id="labelPositionId${count}" name="labelPosition" from="${['Right','Bottom']}" onchange="changeLabelPosition(${count}, this.value)"></g:select></td>
 					<td><input id="connectorPosXId${count}" maxlength="3" style="width: 25px;" type="text" value="0"></td>
@@ -190,7 +190,7 @@
 </fieldset>
 </div>
 <script type="text/javascript">
-	$('#connectorCount').val(${modelConnectors.size()});
+	//$('#connectorCount').val(${modelConnectors.size()});
 	var image = "${modelInstance.rearImage}"
 	var usize = "${modelInstance.usize}"
 	var useImage = "${modelInstance.useImage}" 
@@ -290,6 +290,25 @@
 		}
 	}
 	showBladeFields($("#assetTypeId").val())
+	function verifyAndDeleteConnector( connector ){
+		var modelId = "${modelInstance.id}"
+		jQuery.ajax({
+			url: "getAssetCablesForConnector",
+			data: "connector="+connector+"&modelId="+modelId,
+			type:'POST',
+			success: function(data) {
+				if(data.length > 0){
+					if(confirm("Some assets used this connector. Be sure you want to remove it before proceeding")){
+						$("#connectorTr"+connector).remove() // Remove row from table
+						$("#connector"+connector).remove() // Remove the image from model panel
+					}
+				} else {
+					$("#connectorTr"+connector).remove() // Remove row from table
+					$("#connector"+connector).remove() // Remove the image from model panel
+				}
+			}
+		});
+	}
 </script>
 </body>
 </html>

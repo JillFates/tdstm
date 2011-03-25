@@ -120,12 +120,13 @@ class ModelController {
             redirect(action: "list")
         }
         else {
-        	def modelConnectors = ModelConnector.findAllByModel( modelInstance )
+        	def modelConnectors = ModelConnector.findAllByModel( modelInstance,[sort:"id"] )
+			def nextConnector = modelConnectors.size() > 0 ? Integer.parseInt(modelConnectors[modelConnectors.size()-1]?.connector) : 0 
 			def otherConnectors = []
-			for(int i = modelConnectors.size()+1 ; i<51; i++ ){
+			for(int i = nextConnector+1 ; i<51; i++ ){
 				otherConnectors << i
 			}
-            return [ modelInstance: modelInstance, modelConnectors : modelConnectors, otherConnectors : otherConnectors ]
+            return [ modelInstance: modelInstance, modelConnectors : modelConnectors, otherConnectors : otherConnectors, nextConnector:nextConnector ]
         }
     }
 
@@ -167,30 +168,50 @@ class ModelController {
             	def connectorCount = Integer.parseInt(params.connectorCount)
 				if(connectorCount > 0){
 		        	for(int i=1; i<=connectorCount; i++){
-
-		        		def modelConnector = ModelConnector.findByModelAndConnector(modelInstance,params["connector"+i])
-						if(modelConnector){
-							modelConnector.connector = params["connector"+i]
-							modelConnector.label = params["label"+i]
-							modelConnector.type = params["type"+i]
-							modelConnector.labelPosition = params["labelPosition"+i]
-							modelConnector.connectorPosX = Integer.parseInt(params["connectorPosX"+i])
-							modelConnector.connectorPosY = Integer.parseInt(params["connectorPosY"+i])
-							modelConnector.status = params["status"+i]
+		        		def modelConnector = ModelConnector.findByModelAndConnector(modelInstance,i)
+						def connector = params["connector"+i]
+						if( !connector && modelConnector ){
+							AssetCableMap.executeUpdate("Delete from AssetCableMap where fromConnectorNumber = ? ", [modelConnector])
+							def assetCables = AssetCableMap.findAll("from AssetCableMap where toConnectorNumber = ? ",[modelConnector])
+							assetCables.each{ assetCableMap->
+								assetCableMap.status = 'missing' 
+								assetCableMap.toAsset = null
+								assetCableMap.toConnectorNumber = null
+								assetCableMap.toAssetRack = null
+								assetCableMap.toAssetUposition = null
+								if ( !assetCableMap.validate() || !assetCableMap.save(flush:true) ) {
+		    						def etext = "Unable to Update assetCableMap : " +
+		    		                GormUtil.allErrorsString( assetCableMap )
+		    						println etext
+		    					}
+							}
+							
+							modelConnector.delete(flush:true)
 							
 						} else {
-							modelConnector = new ModelConnector(model : modelInstance,
-		        												connector : params["connector"+i],
-																label : params["label"+i],
-																type : params["type"+i],
-																labelPosition : params["labelPosition"+i],
-																connectorPosX : Integer.parseInt(params["connectorPosX"+i]),
-																connectorPosY : Integer.parseInt(params["connectorPosY"+i]),
-																status : params["status"+i] )
-		        		
+							if(modelConnector){
+								modelConnector.connector = params["connector"+i]
+								modelConnector.label = params["label"+i]
+								modelConnector.type = params["type"+i]
+								modelConnector.labelPosition = params["labelPosition"+i]
+								modelConnector.connectorPosX = Integer.parseInt(params["connectorPosX"+i])
+								modelConnector.connectorPosY = Integer.parseInt(params["connectorPosY"+i])
+								modelConnector.status = params["status"+i]
+								
+							} else if(connector){
+								modelConnector = new ModelConnector(model : modelInstance,
+			        												connector : params["connector"+i],
+																	label : params["label"+i],
+																	type : params["type"+i],
+																	labelPosition : params["labelPosition"+i],
+																	connectorPosX : Integer.parseInt(params["connectorPosX"+i]),
+																	connectorPosY : Integer.parseInt(params["connectorPosY"+i]),
+																	status : params["status"+i] )
+			        		
+							}
+			        		if (modelConnector && !modelConnector.hasErrors() )
+			        			modelConnector.save(flush: true)
 						}
-		        		if (!modelConnector.hasErrors() )
-		        			modelConnector.save(flush: true)
 		        	}
 	        	}
             	def assetEntitysByModel = AssetEntity.findAllByModel( modelInstance )
@@ -308,10 +329,23 @@ class ModelController {
 		def modelInstance = Model.findById(Integer.parseInt(modelId))
 		def returnValue = false
 		if( modelInstance ){
-			println"--->"+AssetEntity.findByModel( modelInstance )
 			if( AssetEntity.findByModel( modelInstance ) )
 				returnValue = true
 		}
     	render returnValue
+    }
+    /*
+     *  Return AssetCables to alert the user while deleting the connectors
+     */
+	def getAssetCablesForConnector = {
+    	def modelId = params.modelId
+		def modelInstance = Model.get(modelId)
+		def assetCableMap = []
+		if(modelInstance){
+			def connector = params.connector
+			def modelConnector = ModelConnector.findByConnectorAndModel( connector, modelInstance )
+			assetCableMap = AssetCableMap.findAll("from AssetCableMap where toConnectorNumber = ? ",[modelConnector])
+		}
+    	render assetCableMap as JSON
     }
 }

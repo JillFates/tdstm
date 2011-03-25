@@ -15,11 +15,19 @@ def manufacturerResultMap = jdbcTemplate.queryForList("select manufacturer from 
 		def manufacturer = result.manufacturer.replaceAll("\\s+\$", "").replaceAll("^\\s+", "")
 		def manufacturerInstance = Manufacturer.findByName( manufacturer )
 		if( !manufacturerInstance ){
-			manufacturerInstance = new Manufacturer( name : manufacturer )
-			if ( !manufacturerInstance.validate() || !manufacturerInstance.save() ) {
-				def etext = "Unable to create manufacturerInstance" +
-				GormUtil.allErrorsString( manufacturerInstance )
-				println etext
+			def manufacuturers = Manufacturer.findAllByAkaIsNotNull()
+			manufacuturers.each{manufacuturer->
+				if(manufacuturer.aka.toLowerCase().contains( manufacturerValue.toLowerCase() )){
+					manufacturerInstance = manufacuturer
+				}
+			}
+			if(!manufacturerInstance){
+				manufacturerInstance = new Manufacturer( name : manufacturer )
+				if ( !manufacturerInstance.validate() || !manufacturerInstance.save() ) {
+					def etext = "Unable to create manufacturerInstance" +
+					GormUtil.allErrorsString( manufacturerInstance )
+					println etext
+				}
 			}
 		}
 		manufacturer = manufacturer.replace("'","\\'")
@@ -34,14 +42,30 @@ def modelResultMap = jdbcTemplate.queryForList("select model, manufacturer_id as
 		def manufacturerInstance = result.manufacturer ? Manufacturer.findById( result.manufacturer ) : ""
 		def model = result.model.replaceAll("\\s+\$", "").replaceAll("^\\s+", "")
 		def assetType = result.assetType
+		if( !manufacturerInstance ){
+			def manufacuturers = Manufacturer.findAllByAkaIsNotNull()
+			manufacuturers.each{manufacuturer->
+				if(manufacuturer.aka.toLowerCase().contains( manufacturerName.toLowerCase() )){
+					manufacturerInstance = manufacuturer
+				}
+			}
+		}
 		if( manufacturerInstance && assetType ){
 			def modelInstance = Model.findWhere(modelName:model,assetType : assetType,manufacturer: manufacturerInstance  )
 			if(!modelInstance){
-				modelInstance = new Model( modelName : model, assetType:assetType, manufacturer : manufacturerInstance )
-				if ( !modelInstance.validate() || !modelInstance.save() ) {
-					def etext = "Unable to create modelInstance" +
-					GormUtil.allErrorsString( modelInstance )
-					println etext
+				def models = Model.findAllByManufacturerAndAkaIsNotNull( manufacturerInstance ).findAll{it.assetType == assetEntity?.assetType}
+				models.each{ 
+					if(it.aka.toLowerCase().contains( modelValue.toLowerCase() )){
+						modelInstance = it
+					}
+				}
+				if(!modelInstance){
+					modelInstance = new Model( modelName : model, assetType:assetType, manufacturer : manufacturerInstance )
+					if ( !modelInstance.validate() || !modelInstance.save() ) {
+						def etext = "Unable to create modelInstance" +
+						GormUtil.allErrorsString( modelInstance )
+						println etext
+					}
 				}
 			}
 			
