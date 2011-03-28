@@ -11,7 +11,24 @@ class ModelController {
 
     def list = {
         params.max = Math.min(params.max ? params.int('max') : 25, 100)
-        [modelInstanceList: Model.list(params), modelInstanceTotal: Model.count()]
+		if(!params.sort) params.sort = 'modelName'
+    	if(!params.order) params.order = 'asc'
+		def modelsList
+		if(params.sort == 'connector'){
+			String hql = '''
+				SELECT m.id
+				FROM Model m LEFT JOIN m.modelConnectors AS connector 
+				GROUP BY m.id
+				ORDER BY COUNT(connector)
+			'''
+			hql += params.order
+			def offset = params.offset ? Integer.parseInt( params.offset ) : 0
+			def ids = Model.executeQuery(hql,[ max : params.max, offset: offset ])
+			modelsList = Model.getAll(ids)
+		} else {
+			modelsList = Model.list(params)
+		}
+        [modelInstanceList: modelsList, modelInstanceTotal: Model.count()]
     }
 
     def create = {

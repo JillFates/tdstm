@@ -16,7 +16,7 @@ class UserLoginController {
     def list = {
 		def companyId = params.id
 		
-        if(!params.max) params.max = '10'
+        if(!params.max) params.max = '20'
         def max = Integer.parseInt( params.max )
 		def offset = params.offset ? Integer.parseInt( params.offset ) : 0
 		
@@ -35,7 +35,9 @@ class UserLoginController {
 					personIds += "$it.id,"
 				}
 				personIds = personIds.substring(0,personIds.lastIndexOf(','))
-				userLoginInstanceList = UserLogin.findAll("from UserLogin u where u.person in ($personIds)",[max:max, offset:offset])
+				def sort = params.sort ? params.sort : 'person.firstName'
+				def order = params.order ? params.order : 'asc'
+				userLoginInstanceList = UserLogin.findAll("from UserLogin u where u.person in ($personIds) order by u.${sort} ${order}",[max:max, offset:offset])
 				userLoginSize =  UserLogin.findAll("from UserLogin u where u.person in ($personIds)").size()
 			} else {
 				flash.message = "Please select Company before navigating to Users"

@@ -9,11 +9,13 @@ class PartyGroupController {
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 	// Will Return PartyGroup list where PartyType = COMPANY
 	def list = {
-        def query = "from PartyGroup as p where partyType = 'COMPANY' "
-        if( !params.max ) params.max = '10'
+        if( !params.max ) params.max = '20'
 		def max = Integer.parseInt( params.max )
+		def sort = params.sort ? params.sort : 'name'
+		def order = params.order ? params.order : 'asc'
 		def offset = params.offset ? Integer.parseInt( params.offset ) : 0
-        def partyGroupList = PartyGroup.findAll( query,[max : max, offset: offset ] )
+		def query = "from PartyGroup as p where partyType = 'COMPANY' order by p.${sort} ${order}"
+		def partyGroupList = PartyGroup.findAll( query,[ max : max, offset: offset ] )
 		def partyGroupSize = PartyGroup.findAll( query ).size()
         [ partyGroupInstanceList: partyGroupList, partyGroupSize:partyGroupSize ]
     }

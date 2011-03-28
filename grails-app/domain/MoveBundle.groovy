@@ -21,7 +21,8 @@ class MoveBundle extends Party {
 		assetTransitions : AssetTransition,
 		moveBundleSteps  : MoveBundleStep,
 		sourceRacks : Rack,
-		targetRacks : Rack
+		targetRacks : Rack,
+		assets : AssetEntity
 	]
 	static mapping  = {
 		version true

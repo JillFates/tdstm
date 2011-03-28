@@ -27,7 +27,7 @@
                         
                             <g:sortableColumn property="powerUse" title="${message(code: 'model.powerUse.label', default: 'powerUse')}" />
                             
-                            <th>No Of Connectors </th>
+                            <g:sortableColumn property="connector" title="No Of Connectors" />
                         
                         </tr>
                     </thead>

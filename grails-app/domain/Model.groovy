@@ -19,6 +19,8 @@ class Model {
 	
 	static belongsTo = [ manufacturer : Manufacturer]
 	
+	static hasMany = [ modelConnectors : ModelConnector ]
+	
 	static constraints = {
 		modelName( blank:false, nullable:false )
 		manufacturer( blank:false, nullable:false )

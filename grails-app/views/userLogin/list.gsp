@@ -24,7 +24,7 @@
                         
                         	<g:sortableColumn property="username" title="Username" />
                         	
-                   	        <th>Person</th>
+                   	        <g:sortableColumn property="person.firstName" title="Person" />
                    	        
                    	        <g:sortableColumn property="lastLogin" title="Last Login" />
                    	    

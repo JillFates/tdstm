@@ -17,14 +17,32 @@ class MoveBundleController {
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
     def list = {
-    	if(!params.max) params.max = 10
+    	if(!params.max) params.max = 20
+    	if(!params.sort) params.sort = 'name'
+    	if(!params.order) params.order = 'asc'
     	def projectId = params.projectId
     	if(projectId == null || projectId == ""){
         	projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
         }
     	def moveBundleList = []
     	def projectInstance = Project.findById( projectId )
-    	def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance, params )
+		def moveBundleInstanceList
+		if(params.sort == 'asset'){
+			String hql = '''
+				SELECT m.id
+				FROM MoveBundle m LEFT JOIN m.assets AS asset 
+				WHERE m.project = ?
+				GROUP BY m.id
+				ORDER BY COUNT(asset)
+			'''
+			hql += params.order
+			def offset = params.offset ? Integer.parseInt( params.offset ) : 0
+			def ids = MoveBundle.executeQuery(hql,[projectInstance],[ max : params.max, offset: offset ])
+			moveBundleInstanceList = MoveBundle.getAll(ids)
+		} else {
+			moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance, params )
+		}
+		
     	moveBundleInstanceList.each{
     		moveBundleList <<[ bundle:it, assetCount:AssetEntity.countByMoveBundle(it) ]
     	}

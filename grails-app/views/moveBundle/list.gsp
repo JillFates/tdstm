@@ -27,7 +27,7 @@
 
           <g:sortableColumn property="operationalOrder" title="Order" />
           
-          <th class="sortable"><a href="#">Asset Qty</a></th>
+           <g:sortableColumn property="asset" title="Asset Qty" />
 
           <g:sortableColumn property="startTime" title="Start Time" />
 
