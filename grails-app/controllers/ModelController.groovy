@@ -344,7 +344,7 @@ class ModelController {
 		if(modelInstance){
 			def connector = params.connector
 			def modelConnector = ModelConnector.findByConnectorAndModel( connector, modelInstance )
-			assetCableMap = AssetCableMap.findAll("from AssetCableMap where toConnectorNumber = ? ",[modelConnector])
+			assetCableMap = AssetCableMap.findAll("from AssetCableMap where status in ('empty','cabled','cabledDetails') and (fromConnectorNumber = ? or toConnectorNumber = ? )",[modelConnector,modelConnector])
 		}
     	render assetCableMap as JSON
     }

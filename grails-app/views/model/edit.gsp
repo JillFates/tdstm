@@ -112,6 +112,7 @@
 					<span class="button">
 						<g:actionSubmit class="save" action="update" value="Update" onclick="return validateForm()"></g:actionSubmit>
 						<g:actionSubmit class="delete" action="delete" value="Delete"></g:actionSubmit>
+						<g:actionSubmit class="delete" action="show" value="Cancel"></g:actionSubmit>
 					</span>
 				</div>
 			</td>
