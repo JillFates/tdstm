@@ -343,7 +343,7 @@ class RackLayoutsController {
 						*/
 						def assetCables = AssetCableMap.findByFromAsset(it.asset?.assetEntity)
 						if ( assetCables )
-							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id}, \"${it.asset?.assetEntity.assetTag}\")'>view</a></td>")
+							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'>view</a></td>")
 						else
 							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>&nbsp;</td>")
 						
@@ -449,23 +449,31 @@ class RackLayoutsController {
 	 */
 	def getCablingDetails = {
 		def assetId = params.assetId
-		def assetEntity = assetId ? AssetEntity.get(assetId) : ""
+		def assetEntity = assetId ? AssetEntity.get(assetId) : null
 		def assetCableMapList
+		def title =  ""
 		if( assetEntity ){
 			assetCableMapList = AssetCableMap.findAllByFromAsset( assetEntity )
+			title = assetEntity.assetName+" ( "+assetEntity.model.manufacturer+" / "+assetEntity.model+" )"
 		}
 		def assetCablingDetails = []
 		assetCableMapList.each {
 			def rackUposition = it.toConnectorNumber ? it.toAssetRack+"/"+it.toAssetUposition+"/"+it.toConnectorNumber.label : ""
+			def toAssetId
+			def toTitle =  ""
 			if(it.fromConnectorNumber.type == "Power"){
 				rackUposition = it.toPower ? it.toAssetRack+"/"+it.toAssetUposition+"/"+it.toPower : ""
+			} else if(it.toAsset){
+				toAssetId = it.toAsset.id
+				toTitle = it.toAsset.assetName+" ( "+it.toAsset.model.manufacturer+" / "+it.toAsset.model+" )"
 			}
+			
 			assetCablingDetails << [model:assetEntity.model.id, id:it.id, connector : it.fromConnectorNumber.connector, 
 									type:it.fromConnectorNumber.type, connectorPosX:it.fromConnectorNumber.connectorPosX,
 									labelPosition:it.fromConnectorNumber.labelPosition,
 									connectorPosY:it.fromConnectorNumber.connectorPosY, status:it.status,displayStatus:statusDetails[it.status], 
 									label:it.fromConnectorNumber.label, hasImageExist:assetEntity.model.rearImage && assetEntity.model?.useImage ? true : false,
-									usize:assetEntity?.model?.usize, rackUposition : rackUposition ]
+									usize:assetEntity?.model?.usize, rackUposition : rackUposition, toAssetId : toAssetId, toTitle:toTitle, title:title]
 		}
 		render assetCablingDetails as JSON
 	}

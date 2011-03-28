@@ -347,10 +347,9 @@
 			$('#commit').val($(this).val());
 		});
 	});
-	function openCablingDiv( assetId, value ){
+	function openCablingDiv( assetId ){
 		$("#assetEntityId").val(assetId)
 		${remoteFunction(action:'getCablingDetails', params:'\'assetId=\' + assetId', onComplete:'showCablingDetails(e)')};
-		$("#cablingDialogId").dialog( "option", "title", value+" cabling" );
 		$("#cablingDialogId").dialog( "option", "width", 400 )
 		$("#cablingDialogId").dialog("open")
 	}
@@ -372,6 +371,7 @@
 		}
 		var details = ""
 		var tbodyDetails = ""
+		$("#cablingDialogId").dialog( "option", "title", assetCablingDetails[0].title );
 		for(i=0;i<assetCablingDetails.length;i++){
 			var assetCabling = assetCablingDetails[i]
 			var cssClass = "connector_right"
@@ -379,7 +379,13 @@
 				cssClass = "connector_bottom"
 			}
 			details += "<div id='connector"+assetCabling.id+"' style='top: "+(assetCabling.connectorPosY / 2)+"px; left: "+assetCabling.connectorPosX+"px;'><a href='#'><div><img id='"+assetCabling.status+"' src='../i/cabling/"+assetCabling.status+".png' onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.id, '"+assetCabling.type+"')\"></div></a><div class='"+cssClass+"'><span>"+assetCabling.label+"</span></div></div>"
-			tbodyDetails += "<tr id='connectorTr"+assetCabling.id+"' title="+assetCabling.status+" onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.title, '"+assetCabling.type+"' )\"><td>"+assetCabling.type+"</td><td>"+assetCabling.label+"</td><td>"+assetCabling.displayStatus+"</td><td id='connectorTd"+assetCabling.id+"'>"+assetCabling.rackUposition+"</td></tr>"
+			tbodyDetails += "<tr id='connectorTr"+assetCabling.id+"'><td title="+assetCabling.status+" onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.title, '"+assetCabling.type+"' )\">"+assetCabling.type+"</td><td title="+assetCabling.status+" onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.title, '"+assetCabling.type+"' )\">"+assetCabling.label+"</td><td title="+assetCabling.status+" onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.title, '"+assetCabling.type+"' )\">"+assetCabling.displayStatus+"</td>"
+			
+			if(assetCabling.toAssetId != null){
+				tbodyDetails += "<td id='connectorTd"+assetCabling.id+"'><a title='"+assetCabling.title+"' style='text-decoration: underline;color:blue;' href='javascript:openCablingDiv("+assetCabling.toAssetId+")'>"+assetCabling.rackUposition+"</a></td></tr>"
+			} else {
+				tbodyDetails += "<td id='connectorTd"+assetCabling.id+"'>"+assetCabling.rackUposition+"</td></tr>"
+			}
 		}
 		$("#cablingPanel").append(details)
 		if( tbodyDetails ){
@@ -400,7 +406,7 @@
 				break;
 			case "cabledDetails":
 				$("#assignId").css("background-color", "#5F9FCF")
-				var cabledDetails = $("#connectorTd"+cabledId).html()
+				var cabledDetails = $("#connectorTd"+cabledId+" a").html()
 				$("#rackId").val( cabledDetails.substring(0,cabledDetails.indexOf("/")) )
 				cabledDetails = cabledDetails.substring(cabledDetails.indexOf("/")+1, cabledDetails.length)
 				$("#upositionId").val( cabledDetails.substring(0,cabledDetails.indexOf("/")) )
@@ -475,7 +481,7 @@
 				data: $(form).serialize(),
 				type:'POST',
 				success: function(data) {
-					openCablingDiv( data.assetId, data.assetTag )
+					openCablingDiv( data.assetId )
 				}
 			});
 			//${remoteFunction(action:'updateCablingDetails', params:'\'assetCableId=\' + cabledId+\'&status=\'+status' )};
