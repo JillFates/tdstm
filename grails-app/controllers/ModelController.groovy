@@ -125,7 +125,7 @@ class ModelController {
             redirect(action: "list")
         }
         else {
-        	def modelConnectors = ModelConnector.findAllByModel( modelInstance )
+        	def modelConnectors = ModelConnector.findAllByModel( modelInstance,[sort:"id"] )
             return [ modelInstance : modelInstance, modelConnectors : modelConnectors ]
         }
     }
@@ -364,5 +364,11 @@ class ModelController {
 			assetCableMap = AssetCableMap.findAll("from AssetCableMap where status in ('empty','cabled','cabledDetails') and (fromConnectorNumber = ? or toConnectorNumber = ? )",[modelConnector,modelConnector])
 		}
     	render assetCableMap as JSON
+    }
+    /*
+     *  TEMP method to redirect to action : show
+     */
+    def cancel = {
+    		 redirect(action: "show", id: params.id)
     }
 }
