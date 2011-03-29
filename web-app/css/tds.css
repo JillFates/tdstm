@@ -477,3 +477,49 @@ text-decoration: line-through;
 	font-weight:bold;
 	color:#000;
 }
+/* Cabling Colors*/
+.White{
+	background-color: white;
+	border: 1px solid black;
+	color: black;
+}
+.Grey{
+	background-color: gray;
+	border: 1px solid black;
+	color: white;
+}
+.Green{
+	background-color: green;
+	border: 1px solid black;
+	color: white;
+}
+.Yellow{
+	background-color: yellow;
+	border: 1px solid black;
+	color: black;
+}
+.Orange{
+	background-color: Orange;
+	border: 1px solid black;
+	color: black;
+}
+.Red{
+	background-color: red;
+	border: 1px solid black;
+	color: white;
+}
+.Blue{
+	background-color: blue;
+	border: 1px solid black;
+	color: white;
+}
+.Purple{
+	background-color: purple;
+	border: 1px solid black;
+	color: white;
+}
+.Black{
+	background-color: black;
+	border: 1px solid black;
+	color: white;
+}

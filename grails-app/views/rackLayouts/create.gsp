@@ -287,6 +287,7 @@
 		<div id="actionDiv" style="margin-top: 5px;float: right;display: none;">
 			<input type="button" value="Ok" onclick="submitAction($('form[name=cablingDetailsForm]'))"/>
 			<input type="button" value="Cancel"  onclick="$('#assignFieldDiv').hide();$('#actionButtonsDiv').hide();$('#actionDiv').hide()"/>
+			<g:select id="colorId" name="color" from="${AssetCableMap.constraints.color.inList}" noSelection="${['':'']}" onchange="updateCell(this.value)"></g:select>
 			<input type="reset" id="formReset" style="display: none;"/>
 		</div>
 		<div style="clear: both;"></div>
@@ -319,6 +320,7 @@
 					<th>Type</th>
 					<th>Label</th>
 					<th>Status</th>
+					<th>Color</th>
 					<th>Rack/Upos/Conn</th>
 				</tr>
 			</thead>
@@ -379,10 +381,16 @@
 				cssClass = "connector_bottom"
 			}
 			details += "<div id='connector"+assetCabling.id+"' style='top: "+(assetCabling.connectorPosY / 2)+"px; left: "+assetCabling.connectorPosX+"px;'><a href='#'><div><img id='"+assetCabling.status+"' src='../i/cabling/"+assetCabling.status+".png' onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.id, '"+assetCabling.type+"')\"></div></a><div class='"+cssClass+"'><span>"+assetCabling.label+"</span></div></div>"
-			tbodyDetails += "<tr id='connectorTr"+assetCabling.id+"'><td title="+assetCabling.status+" onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.title, '"+assetCabling.type+"' )\">"+assetCabling.type+"</td><td title="+assetCabling.status+" onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.title, '"+assetCabling.type+"' )\">"+assetCabling.label+"</td><td title="+assetCabling.status+" onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.title, '"+assetCabling.type+"' )\">"+assetCabling.displayStatus+"</td>"
 			
+			tbodyDetails += "<tr id='connectorTr"+assetCabling.id+"'><td title="+assetCabling.status+" onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.title, '"+assetCabling.type+"' )\">"+assetCabling.type+"</td><td title="+assetCabling.status+" onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.title, '"+assetCabling.type+"' )\">"+assetCabling.label+"</td><td title="+assetCabling.status+" onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.title, '"+assetCabling.type+"' )\">"+assetCabling.displayStatus+"</td>"
+
+			if(assetCabling.color != "" ){
+				tbodyDetails += "<td id='color_"+assetCabling.id+"' title="+assetCabling.status+" class='"+assetCabling.color+"' onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.title, '"+assetCabling.type+"' )\">&nbsp;</td>"
+			} else {
+				tbodyDetails += "<td id='color_"+assetCabling.id+"' title="+assetCabling.status+" onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.title, '"+assetCabling.type+"' )\">&nbsp;</td>"
+			}
 			if(assetCabling.toAssetId != null){
-				tbodyDetails += "<td id='connectorTd"+assetCabling.id+"'><a title='"+assetCabling.title+"' style='text-decoration: underline;color:blue;' href='javascript:openCablingDiv("+assetCabling.toAssetId+")'>"+assetCabling.rackUposition+"</a></td></tr>"
+					tbodyDetails += "<td id='connectorTd"+assetCabling.id+"'><a title='"+assetCabling.title+"' style='text-decoration: underline;color:blue;' href='javascript:openCablingDiv("+assetCabling.toAssetId+")'>"+assetCabling.rackUposition+"</a></td></tr>"
 			} else {
 				tbodyDetails += "<td id='connectorTd"+assetCabling.id+"'>"+assetCabling.rackUposition+"</td></tr>"
 			}
@@ -406,7 +414,10 @@
 				break;
 			case "cabledDetails":
 				$("#assignId").css("background-color", "#5F9FCF")
-				var cabledDetails = $("#connectorTd"+cabledId+" a").html()
+				var cabledDetails = $("#connectorTd"+cabledId).html()
+				if($("#connectorTypeId").val() !='Power'){
+					cabledDetails = $("#connectorTd"+cabledId+" a").html()
+				}
 				$("#rackId").val( cabledDetails.substring(0,cabledDetails.indexOf("/")) )
 				cabledDetails = cabledDetails.substring(cabledDetails.indexOf("/")+1, cabledDetails.length)
 				$("#upositionId").val( cabledDetails.substring(0,cabledDetails.indexOf("/")) )
@@ -424,6 +435,7 @@
 		}
 		$("#cablingTableBody tr").css("background","")
 		$("#connectorTr"+cabledId).css("background","none repeat scroll 0 0 #7CFE80")
+		$("#colorId").val($("#color_"+cabledId).attr("class"))
 	}
 	function openActionDiv( id ){
 		$("#unknownId").css("background-color","")
@@ -634,7 +646,15 @@
 			click = 2
 		}
 	}
-	
+	function updateCell(color){
+		var connectorId = $("#cabledTypeId").val()
+		if(connectorId){
+			$("#color_"+connectorId).removeAttr("class")
+			$("#color_"+connectorId).addClass(color)
+			$("#colorId option").removeAttr("class")
+			$("#colorId option:selected").addClass(color)
+		}
+	}
 </script>
 </body>
 </html>

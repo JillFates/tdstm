@@ -6,7 +6,10 @@ class RackLayoutsController {
 	def userPreferenceService
 	def jdbcTemplate
 	def supervisorConsoleService
+	def sessionFactory
+	
 	def static final statusDetails = ["missing":"Unknown", "cabledDetails":"Assigned","empty":"Empty","cabled":"Cabled"]
+	
 	def create = {
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
@@ -470,7 +473,7 @@ class RackLayoutsController {
 			
 			assetCablingDetails << [model:assetEntity.model.id, id:it.id, connector : it.fromConnectorNumber.connector, 
 									type:it.fromConnectorNumber.type, connectorPosX:it.fromConnectorNumber.connectorPosX,
-									labelPosition:it.fromConnectorNumber.labelPosition,
+									labelPosition:it.fromConnectorNumber.labelPosition, color : it.color ? it.color : "",
 									connectorPosY:it.fromConnectorNumber.connectorPosY, status:it.status,displayStatus:statusDetails[it.status], 
 									label:it.fromConnectorNumber.label, hasImageExist:assetEntity.model.rearImage && assetEntity.model?.useImage ? true : false,
 									usize:assetEntity?.model?.usize, rackUposition : rackUposition, toAssetId : toAssetId, toTitle:toTitle, title:title]
@@ -497,10 +500,11 @@ class RackLayoutsController {
 			def toPower
 			def connectorType = params.connectorType
 			def assetCableMap = AssetCableMap.findById( assetCableId )
+		
 			if(connectorType != "Power"){
 				def fromAssetCableMap = AssetCableMap.findByToAssetAndToConnectorNumber( assetCableMap.fromAsset, assetCableMap.fromConnectorNumber )
 				if(fromAssetCableMap){
-					AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing', toAsset=null,toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
+					AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing', toAsset=null,toConnectorNumber=null,toAssetRack=null,toAssetUposition=null, color=null
 												where toAsset = ? and toConnectorNumber = ?""",[assetCableMap.fromAsset, assetCableMap.fromConnectorNumber])
 			}
 			}
@@ -520,8 +524,8 @@ class RackLayoutsController {
 							toAsset = assetEntity 
 							toConnector = modelConnectors?.find{it.label.equalsIgnoreCase(params.connector) }
 							AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-															toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-															where toAsset = ? and toConnectorNumber = ?""",[toAsset, toConnector])
+															toConnectorNumber=null,toAssetRack=null,toAssetUposition=null, color=null
+															where toAsset = ? and toConnectorNumber = ? """,[toAsset, toConnector])
 						}
 					} else {
 						toAsset = assetCableMap.fromAsset
@@ -532,13 +536,15 @@ class RackLayoutsController {
 					}
 					break;
 			}
+			sessionFactory.getCurrentSession().flush();
+	    	sessionFactory.getCurrentSession().clear();
 			assetCableMap.status = status
 			assetCableMap.toAsset = toAsset
 			assetCableMap.toConnectorNumber = toConnector
 			assetCableMap.toAssetRack = toAssetRack
 			assetCableMap.toAssetUposition = connectorType != "Power" ? toAsset?.targetRackPosition : toAssetUposition
 			assetCableMap.toPower = toPower
-			
+			assetCableMap.color = connectorType != "Power" ? params.color : null
 			if(assetCableMap.save(flush:true) && toAsset && connectorType != "Power"){
 				def toAssetCableMap = AssetCableMap.findByFromAssetAndFromConnectorNumber( toAsset, toConnector )
 				toAssetCableMap.status = status
@@ -546,6 +552,16 @@ class RackLayoutsController {
 				toAssetCableMap.toConnectorNumber = assetCableMap.fromConnectorNumber
 				toAssetCableMap.toAssetRack = assetCableMap.fromAsset?.rackTarget?.tag
 				toAssetCableMap.toAssetUposition = assetCableMap.fromAsset?.targetRackPosition
+				toAssetCableMap.color = params.color
+				if(!toAssetCableMap.save(flush:true)){
+					def etext = "Unable to create toAssetCableMap" +
+	                GormUtil.allErrorsString( toAssetCableMap )
+					println etext
+				}
+			} else {
+				def etext = "Unable to create FromAssetCableMap" +
+                GormUtil.allErrorsString( assetCableMap )
+				println etext
 			}
 		}
 		def assetCable = [assetId : assetId, assetTag : AssetEntity.get(assetId)?.assetTag ]

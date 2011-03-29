@@ -982,6 +982,7 @@ class ReportsController {
 									'from_rack':cable.fromAsset?.rackTarget?.tag,
 									'to_rack':cable.toAsset ? cable.toAsset?.rackTarget?.tag : "",
 									'from_upos':cable.fromAsset?.targetRackPosition,
+									'color':cable.color ? cable.color : "",
 									'to_upos':cable.toAssetUposition ? cable.toAssetUposition  : "" ,
 									'from_connector_label':cable.fromConnectorNumber.label,
 									'to_connector_label':cable.toConnectorNumber ? cable.toConnectorNumber.label : "",
@@ -1063,11 +1064,12 @@ class ReportsController {
 					sheet.addCell( new Label( 3, r, String.valueOf(assetCablesList[r-1].fromConnectorNumber.label )) )
 					sheet.addCell( new Label( 4, r, String.valueOf(assetCablesList[r-1].fromAsset?.rackTarget?.tag )) )
 					sheet.addCell( new Label( 5, r, String.valueOf(assetCablesList[r-1].fromAsset?.targetRackPosition )) )
-					sheet.addCell( new Label( 7, r, String.valueOf(assetCablesList[r-1].toAsset ? assetCablesList[r-1].toAsset?.assetName :"" )) )
-					sheet.addCell( new Label( 8, r, String.valueOf(assetCablesList[r-1].toAsset ? assetCablesList[r-1].toAsset?.assetTag :"" )) )
-					sheet.addCell( new Label( 9, r, String.valueOf(assetCablesList[r-1].toConnectorNumber ? assetCablesList[r-1].toConnectorNumber?.label :"" )) )
-					sheet.addCell( new Label( 10, r, String.valueOf(assetCablesList[r-1].toAsset ? assetCablesList[r-1].toAsset?.rackTarget?.tag :"" )) )
-					sheet.addCell( new Label( 11, r, String.valueOf(assetCablesList[r-1].toAssetUposition ? assetCablesList[r-1].toAssetUposition :"" )) )
+					sheet.addCell( new Label( 7, r, String.valueOf(assetCablesList[r-1].color ? assetCablesList[r-1].color : "" )) )
+					sheet.addCell( new Label( 8, r, String.valueOf(assetCablesList[r-1].toAsset ? assetCablesList[r-1].toAsset?.assetName :"" )) )
+					sheet.addCell( new Label( 9, r, String.valueOf(assetCablesList[r-1].toAsset ? assetCablesList[r-1].toAsset?.assetTag :"" )) )
+					sheet.addCell( new Label( 10, r, String.valueOf(assetCablesList[r-1].toConnectorNumber ? assetCablesList[r-1].toConnectorNumber?.label :"" )) )
+					sheet.addCell( new Label( 11, r, String.valueOf(assetCablesList[r-1].toAsset ? assetCablesList[r-1].toAsset?.rackTarget?.tag :"" )) )
+					sheet.addCell( new Label( 12, r, String.valueOf(assetCablesList[r-1].toAssetUposition ? assetCablesList[r-1].toAssetUposition :"" )) )
 				}
 				
 				book.write()

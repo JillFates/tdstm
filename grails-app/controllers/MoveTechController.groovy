@@ -670,7 +670,7 @@ class MoveTechController {
 							assetCableMapList.each {
 								assetCablingDetails << [connector : it.fromConnectorNumber.connector, type:it.fromConnectorNumber.type,
 														labelPosition:it.fromConnectorNumber.labelPosition, label:it.fromConnectorNumber.label, 
-														status:it.status,displayStatus:statusDetails[it.status], 
+														status:it.status,displayStatus:statusDetails[it.status], color:it.color ? it.color : "",
 														connectorPosX:it.fromConnectorNumber.connectorPosX, connectorPosY:it.fromConnectorNumber.connectorPosY,
 														hasImageExist:assetItem.model.rearImage && assetItem.model?.useImage ? true : false,
 														rackUposition : it.toConnectorNumber ? it.toAssetRack+"/"+it.toAssetUposition+"/"+it.toConnectorNumber.connector : "" 

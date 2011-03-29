@@ -264,6 +264,7 @@
 					<th>Type</th>
 					<th>Label</th>
 					<th>Status</th>
+					<th>Color</th>
 					<th>Rack/Upos/Conn</th>
 				</tr>
 			</thead>
@@ -274,6 +275,7 @@
 					<td>${assetCable.type}</td>
 					<td>${assetCable.label}</td>
 					<td>${assetCable.displayStatus}</td>
+					<td class="${assetCable.color}">&nbsp;</td>
 					<td>${assetCable.rackUposition}</td>
 				</tr>
 			</g:each>

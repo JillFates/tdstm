@@ -19,7 +19,7 @@ class AssetCableMap {
 		toAssetRack( nullable:true, blank:true )
 		toAssetUposition( nullable:true, blank:true )
 		status( nullable:false, blank:false, inList: ['missing','empty','cabled','cabledDetails'] )
-		color( nullable:true, blank:true)
+		color( nullable:true, blank:true, inList: ['White', 'Grey', 'Green', 'Yellow', 'Orange', 'Red', 'Blue', 'Purple', 'Black'] )
 		toPower( nullable:true, blank:true)
 	}
 	
