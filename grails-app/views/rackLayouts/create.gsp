@@ -230,7 +230,7 @@
 					<label for="backView" ><input type="checkbox" name="backView" id="backView" checked="checked"/>&nbsp;Back</label><br />
 					<label for="bundleName" ><input type="checkbox" name="bundleName" id="bundleName" checked="checked" />&nbsp;w/ bundle names</label><br />
 					<label for="otherBundle" ><input type="checkbox" name="otherBundle" id="otherBundle" checked="checked" />&nbsp;w/ other bundles</label><br />
-					<label for="showDetails" ><input type="checkbox" name="showDetails" id="showDetails" disabled />&nbsp;w/ diagrams</label>
+					<label for="showCabling" ><input type="checkbox" name="showCabling" id="showCabling" />&nbsp;w/ diagrams</label>
 				</div>
 			</td>
 			

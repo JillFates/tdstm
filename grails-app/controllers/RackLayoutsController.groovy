@@ -224,10 +224,10 @@ class RackLayoutsController {
 				def backViewRows
 				def frontViewRows
 				if(backView) {
-					backViewRows = getRackLayout(isAdmin, assetDetails, includeBundleName, backView)
+					backViewRows = getRackLayout(isAdmin, assetDetails, includeBundleName, backView, params.showCabling)
 				}
 				if(frontView) {
-					frontViewRows = getRackLayout(isAdmin, assetDetails, includeBundleName, null)
+					frontViewRows = getRackLayout(isAdmin, assetDetails, includeBundleName, null, params.showCabling)
 				}
 				rackLayout << [ assetDetails : assetDetails, rack : rack.tag , room : rack.room,
 								frontViewRows : frontViewRows, backViewRows : backViewRows ]
@@ -264,7 +264,7 @@ class RackLayoutsController {
 		render rackDetails as JSON
 	}
 
-	private getRackLayout( def isAdmin, def asset, def includeBundleName, def backView){
+	private getRackLayout( def isAdmin, def asset, def includeBundleName, def backView, def showCabling ){
 		def rows = new StringBuffer()
 		def rowspan = 1
 		def cssClass = "empty"
@@ -281,7 +281,8 @@ class RackLayoutsController {
 				def assetTag = ""
 				if(it.cssClass == "rack_error")
 					assetTag += "Devices Overlap:<br />"
-						def hasBlades = false
+				def hasBlades = false
+				def cabling = ""
 				assetTagsList.each{ assetTagValue ->
 					def index = assetTagValue.indexOf('~-')
 					def tagValue
@@ -300,50 +301,55 @@ class RackLayoutsController {
 					if(overlappedAssets.size() > 1) {
 						overlappedAssets.each{ overlapAsset ->
 							moveBundle += (overlapAsset?.moveBundle ? overlapAsset?.moveBundle.name : "") + "<br/>"
-							if(overlappedAsset.model && overlapAsset.model.assetType == 'Blade Chassis'){
+							if(overlappedAsset.model && overlapAsset.model.assetType == 'Blade Chassis' && (!backView || showCabling != 'on')){
 								hasBlades = true
 								bladeTable = generateBladeLayout(it, overlapAsset, isAdmin)
 							}
-							if(isAdmin)
-								assetTag += "<a href='javascript:openAssetEditDialig(${overlapAsset?.id})' >"+trimString(assetTagValue.replace('~-','-'))+"</a> <br/>"+bladeTable+"</br>"
-							else
-								assetTag += trimString(assetTagValue.replace('~-','-'))+"<br/>"+bladeTable+"</br>"
+							if(isAdmin){
+								assetTag += "<a href='javascript:openAssetEditDialig(${overlapAsset?.id})' >"+trimString(assetTagValue.replace('~-','-'))+"</a>" 
+								if(hasBlades){
+									assetTag += "<br/>"+bladeTable+"</br>"
+								}
+							} else {
+								assetTag += trimString(assetTagValue.replace('~-','-'))
+								if(hasBlades){
+									assetTag += " <br/>"+bladeTable+"</br>"
+								}
+							}
 						}
 					} else if(overlappedAssets.size() > 0){
 						overlappedAsset = overlappedAssets[0]
 						moveBundle += (overlappedAsset?.moveBundle ? overlappedAsset?.moveBundle.name : "") + "<br/>"
-						if(overlappedAsset.model && overlappedAsset.model.assetType == 'Blade Chassis'){
+						if(overlappedAsset.model && overlappedAsset.model.assetType == 'Blade Chassis' && (!backView || showCabling != 'on') ){
 							hasBlades = true
 							bladeTable = generateBladeLayout(it, overlappedAsset,isAdmin)
 						}
-						if(isAdmin)
-							assetTag += "<a href='javascript:openAssetEditDialig(${overlappedAsset?.id})' >"+trimString(assetTagValue.replace('~-','-'))+"</a> <br/>"+bladeTable+"</br>"
-						else
-							assetTag += trimString(assetTagValue.replace('~-','-'))+"<br/>"+bladeTable+"</br>"
+						cabling = !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset ) : ""
+						if(isAdmin){
+							assetTag += "<a href='javascript:openAssetEditDialig(${overlappedAsset?.id})' >"+trimString(assetTagValue.replace('~-','-'))+"</a>"
+							if(hasBlades){
+								assetTag += "<br/>"+bladeTable+"</br>"
+							}
+						} else {
+							assetTag += trimString(assetTagValue.replace('~-','-'))
+							if(hasBlades){
+								assetTag += "<br/>"+bladeTable+"</br>"
+							}
+						}
 					}
 				}
 					
-				if( hasBlades ){
-					row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
-				} else {
-					row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
-					if(includeBundleName)
-						row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${moveBundle}</td>")
-					else
-						row.append("<td rowspan='${rowspan}' class='${it.cssClass}'></td>")
-				}
-				
 				if(backView) {
+					if( hasBlades && showCabling != 'on'){
+						row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
+					} else {
+						row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}${cabling}</td>")
+						if(includeBundleName)
+							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${moveBundle}</td>")
+						else
+							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'></td>")
+					}
 					if(it.cssClass != "rack_error") {
-						/*def cablingString = "${it.asset?.assetEntity?.pduPort ? 'PDU: '+ it.asset?.assetEntity?.pduPort +' | ' : '' }"+ 
-											"${it.asset?.assetEntity?.nicPort ? 'NIC: '+ it.asset?.assetEntity?.nicPort +' | ' : ''}"+
-											"${it.asset?.assetEntity?.kvmDevice && it.asset?.assetEntity?.kvmDevice != 'blank / blank'? 'KVM: '+ it.asset?.assetEntity?.kvmDevice +' | ' : ''}"+
-											"${it.asset?.assetEntity?.remoteMgmtPort ? 'RMgmt: '+ it.asset?.assetEntity?.remoteMgmtPort +' | ': ''}"+
-											"${it.asset?.assetEntity?.fiberCabinet && it.asset?.assetEntity?.fiberCabinet != 'blank / blank / blank' ? 'Fiber: '+ it.asset?.assetEntity?.fiberCabinet +' | ' : ''}"
-						
-						if ( cablingString )
-							cablingString = cablingString.substring( 0, cablingString.length() - 2 )
-						*/
 						def assetCables = AssetCableMap.findByFromAsset(it.asset?.assetEntity)
 						if ( assetCables )
 							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'>view</a></td>")
@@ -352,6 +358,16 @@ class RackLayoutsController {
 						
 					} else {
 						row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>Devices Overlap</td>")
+					}
+				} else {
+					if( hasBlades ){
+						row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
+					} else {
+						row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}${cabling}</td>")
+						if(includeBundleName)
+							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${moveBundle}</td>")
+						else
+							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'></td>")
 					}
 				}
 			} else if(rowspan <= 1) {
@@ -611,5 +627,35 @@ class RackLayoutsController {
 		if(!data)
 			data = []
 		render data as JSON
+	}
+	/*
+	 *  Generate Cabling diagram for given asset
+	 */
+	def generateCablingLayout( assetEntity ){
+		
+		def cableDiagram =  ""
+		if(assetEntity.model && ModelConnector.findByModel( assetEntity.model )){
+			cableDiagram = new StringBuffer("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;padding:0;'>")
+			if(assetEntity.model.rearImage && assetEntity.model.useImage == 1){
+				cableDiagram.append("<div id='cablingPanel' style='height:auto;background-color:#FFF'>")
+				cableDiagram.append("<img src=\'${createLink(controller:'model', action:'getRearImage', id:assetEntity?.model?.id)}\' />")
+			} else {
+				cableDiagram.append("<div id='cablingPanel' style='height: "+assetEntity.model.usize*30+"px'>")
+			}
+			def assetCableMapList = AssetCableMap.findAllByFromAsset( assetEntity )
+			assetCableMapList.each {assetCable->
+				cableDiagram.append("""<div style="top:${assetCable.fromConnectorNumber.connectorPosY / 2}px ;left:${assetCable.fromConnectorNumber.connectorPosX}px ">
+											<div>
+												<img src="../i/cabling/${assetCable.status}.png"/>
+											</div>
+											<div class="${assetCable.fromConnectorNumber.labelPosition == 'Right' ? 'connector_right' : 'connector_bottom'}">
+												<span>${assetCable.fromConnectorNumber.label}</span>
+											</div>
+										</div>
+									""")
+			}
+			cableDiagram.append("</div></td></tr></table>")
+		}
+		return cableDiagram
 	}
 }
