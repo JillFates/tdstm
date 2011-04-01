@@ -7,10 +7,25 @@ def jdbcTemplate = ctx.getBean("jdbcTemplate")
  * Set Server as AssetEntity default type
  */
 AssetEntity.executeUpdate("UPDATE from AssetEntity set assetType = 'Server' where assetType is null")
-
+def eavAttribute = EavAttribute.findByAttributeCode("assetType")
+def assetTypes = AssetEntity.findAll("From AssetEntity group by assetType")
+assetTypes?.assetType?.each{ option->
+	def eavAttributeOption = EavAttributeOption.findByValueAndAttribute(option,eavAttribute)
+	if( !eavAttributeOption ){
+		eavAttributeOption = new EavAttributeOption(
+													value : option,
+													attribute : eavAttribute
+													)
+		if ( !eavAttributeOption.validate() || !eavAttributeOption.save() ) {
+			def etext = "Unable to create eavAttributeOption" +
+			GormUtil.allErrorsString( eavAttributeOption )
+			println etext
+		}
+	}
+}
 println"**************UPDATE MANUFACTURER***************"
 // Create manufactures if not exist
-def manufacturerResultMap = jdbcTemplate.queryForList("select manufacturer from asset_entity where manufacturer_id is null && manufacturer != '' && manufacturer is not null group by manufacturer")
+def manufacturerResultMap = jdbcTemplate.queryForList("select manufacturer from asset_entity where manufacturer != '' and manufacturer is not null group by manufacturer")
 	manufacturerResultMap.each{ result->
 		def manufacturer = result.manufacturer.replaceAll("\\s+\$", "").replaceAll("^\\s+", "")
 		def manufacturerInstance = Manufacturer.findByName( manufacturer )
@@ -37,15 +52,15 @@ def manufacturerResultMap = jdbcTemplate.queryForList("select manufacturer from 
 	}
 println"**************UPDATE MODEL***************"
 //Create model if not exist
-def modelResultMap = jdbcTemplate.queryForList("select model, manufacturer_id as manufacturer, asset_type as assetType from asset_entity where model_id is null && model != '' && model is not null group by model")
+def modelResultMap = jdbcTemplate.queryForList("select distinct model, manufacturer as manufacturer, asset_type as assetType from asset_entity where model != '' and model is not null and manufacturer != '' and manufacturer is not null and asset_type != '' and asset_type is not null")
 	modelResultMap.each{ result->
-		def manufacturerInstance = result.manufacturer ? Manufacturer.findById( result.manufacturer ) : ""
+		def manufacturerInstance = result.manufacturer ? Manufacturer.findByName( result.manufacturer ) : ""
 		def model = result.model.replaceAll("\\s+\$", "").replaceAll("^\\s+", "")
 		def assetType = result.assetType
 		if( !manufacturerInstance ){
 			def manufacuturers = Manufacturer.findAllByAkaIsNotNull()
 			manufacuturers.each{manufacuturer->
-				if(manufacuturer.aka.toLowerCase().contains( manufacturerName.toLowerCase() )){
+				if(manufacuturer.aka.toLowerCase().contains( result.manufacturer.toLowerCase() )){
 					manufacturerInstance = manufacuturer
 				}
 			}
@@ -53,9 +68,9 @@ def modelResultMap = jdbcTemplate.queryForList("select model, manufacturer_id as
 		if( manufacturerInstance && assetType ){
 			def modelInstance = Model.findWhere(modelName:model,assetType : assetType,manufacturer: manufacturerInstance  )
 			if(!modelInstance){
-				def models = Model.findAllByManufacturerAndAkaIsNotNull( manufacturerInstance ).findAll{it.assetType == assetEntity?.assetType}
+				def models = Model.findAllByManufacturerAndAkaIsNotNull( manufacturerInstance ).findAll{it.assetType == assetType}
 				models.each{ 
-					if(it.aka.toLowerCase().contains( modelValue.toLowerCase() )){
+					if(it.aka.toLowerCase().contains( model.toLowerCase() )){
 						modelInstance = it
 					}
 				}
