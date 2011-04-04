@@ -102,6 +102,10 @@
 
 <div class="body">
 <h1>Asset Entity List</h1>
+<form id="filterFormSmall" name=filterFormSmall" action="filter" method="post"><input type=hidden name="filterProperties" value="assetName">
+<input type="hidden" name="filter.op.assetName" id="filter.op.assetName" value="ILike">Filter Name:<input type="text" name="filter.assetName" value id="assetName">
+<input type="hidden" name="_action_filter" value="Apply">
+</form>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
