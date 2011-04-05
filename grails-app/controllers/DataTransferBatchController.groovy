@@ -143,6 +143,13 @@ class DataTransferBatchController {
 											assetsList.add(assetEntity)
 	    								}
 										break;
+									case "assetType":
+					    				if( !it.importValue && !it.correctedValue ) {
+	    									assetEntity."$attribName" = "Server" 
+	    								} else {
+	    									assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
+	    								}
+										break;
 									default:
 										if( it.eavAttribute.backendType == "int"){
 		    								def correctedPos

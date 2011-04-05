@@ -442,8 +442,9 @@ class AssetEntityAttributeLoaderService {
 		def modelInstance
 		def modelValue = dtv.correctedValue ? dtv.correctedValue : dtv.importValue
 		try{
-		if(modelValue){
-			def dtvManufacturer = dtvList.find{it.eavAttribute.attributeCode == "manufacturer"}
+		assetEntity.assetType = assetEntity.assetType ? assetEntity.assetType : "Server"
+		def dtvManufacturer = dtvList.find{it.eavAttribute.attributeCode == "manufacturer"}
+		if(modelValue && dtvManufacturer){
 			def manufacturerName = dtvManufacturer?.correctedValue ? dtvManufacturer?.correctedValue : dtvManufacturer?.importValue
 			def manufacturerInstance = manufacturerName ? Manufacturer.findByName(manufacturerName) : null
 			if( !manufacturerInstance ){
