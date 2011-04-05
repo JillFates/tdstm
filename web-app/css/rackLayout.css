@@ -209,6 +209,20 @@ table.rack_elevation table.bladeTable td.errorBlade {
 	left: 0; 
 	top: 0
 }
+.cablingPanel {
+	width: 379px;
+	height: 199px;
+	border: 2px solid black;
+	margin-right: 5px;
+	margin-bottom: 5px;
+	background-color: LightGreen; 
+	position: relative;
+}
+.cablingPanel div {
+	position: absolute; 
+	left: 0; 
+	top: 0
+}
 #optionsPanel {
 	margin-bottom: 5px;
 }

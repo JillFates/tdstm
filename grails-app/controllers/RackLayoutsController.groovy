@@ -19,12 +19,14 @@ class RackLayoutsController {
 		def currentBundle = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
 		/* set first bundle as default if user pref not exist */
 		def isCurrentBundle = true
+		def models = AssetEntity.findAll('FROM AssetEntity WHERE project = ? GROUP BY model',[ projectInstance ])?.model
 		if(!currentBundle){
 			currentBundle = moveBundleInstanceList[0]?.id?.toString()
 			isCurrentBundle = false
 		}
+		
 		return [moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, 
-				currentBundle:currentBundle, isCurrentBundle : isCurrentBundle]
+				currentBundle:currentBundle, isCurrentBundle : isCurrentBundle, models:models]
 	}
 	
 	def save = {
@@ -324,7 +326,7 @@ class RackLayoutsController {
 							hasBlades = true
 							bladeTable = generateBladeLayout(it, overlappedAsset,isAdmin)
 						}
-						cabling = !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset ) : ""
+						cabling = !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : ""
 						if(isAdmin){
 							assetTag += "<a href='javascript:openAssetEditDialig(${overlappedAsset?.id})' >"+trimString(assetTagValue.replace('~-','-'))+"</a>"
 							if(hasBlades){
@@ -631,30 +633,39 @@ class RackLayoutsController {
 	/*
 	 *  Generate Cabling diagram for given asset
 	 */
-	def generateCablingLayout( assetEntity ){
+	def generateCablingLayout( assetEntity, backView ){
 		
 		def cableDiagram =  ""
 		if(assetEntity.model && ModelConnector.findByModel( assetEntity.model )){
-			cableDiagram = new StringBuffer("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;padding:0;'>")
-			if(assetEntity.model.rearImage && assetEntity.model.useImage == 1){
-				cableDiagram.append("<div id='cablingPanel' style='height:auto;background-color:#FFF'>")
-				cableDiagram.append("<img src=\'${createLink(controller:'model', action:'getRearImage', id:assetEntity?.model?.id)}\' />")
+			if(backView){
+				cableDiagram = new StringBuffer("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;padding:0;'>")
+				if(assetEntity.model.rearImage && assetEntity.model.useImage == 1){
+					cableDiagram.append("<div class='cablingPanel' style='height:auto;background-color:#FFF'>")
+					cableDiagram.append("<img src=\'${createLink(controller:'model', action:'getRearImage', id:assetEntity?.model?.id)}\' />")
+				} else {
+					cableDiagram.append("<div class='cablingPanel' style='height: "+assetEntity.model.usize*30+"px'>")
+				}
+				def assetCableMapList = AssetCableMap.findAllByFromAsset( assetEntity )
+				assetCableMapList.each {assetCable->
+					cableDiagram.append("""<div style="top:${assetCable.fromConnectorNumber.connectorPosY / 2}px ;left:${assetCable.fromConnectorNumber.connectorPosX}px ">
+												<div>
+													<img src="../i/cabling/${assetCable.status}.png"/>
+												</div>
+												<div class="${assetCable.fromConnectorNumber.labelPosition == 'Right' ? 'connector_right' : 'connector_bottom'}">
+													<span>${assetCable.fromConnectorNumber.label}</span>
+												</div>
+											</div>
+										""")
+				}
+				cableDiagram.append("</div></td></tr></table>")
 			} else {
-				cableDiagram.append("<div id='cablingPanel' style='height: "+assetEntity.model.usize*30+"px'>")
+				if( assetEntity.model.frontImage ){
+					cableDiagram = new StringBuffer("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;padding:0;'>")
+					cableDiagram.append("<div class='cablingPanel' style='height:auto;background-color:#FFF'>")
+					cableDiagram.append("<img src=\'${createLink(controller:'model', action:'getFrontImage', id:assetEntity?.model?.id)}\' />")
+					cableDiagram.append("</div></td></tr></table>")
+				}
 			}
-			def assetCableMapList = AssetCableMap.findAllByFromAsset( assetEntity )
-			assetCableMapList.each {assetCable->
-				cableDiagram.append("""<div style="top:${assetCable.fromConnectorNumber.connectorPosY / 2}px ;left:${assetCable.fromConnectorNumber.connectorPosX}px ">
-											<div>
-												<img src="../i/cabling/${assetCable.status}.png"/>
-											</div>
-											<div class="${assetCable.fromConnectorNumber.labelPosition == 'Right' ? 'connector_right' : 'connector_bottom'}">
-												<span>${assetCable.fromConnectorNumber.label}</span>
-											</div>
-										</div>
-									""")
-			}
-			cableDiagram.append("</div></td></tr></table>")
 		}
 		return cableDiagram
 	}
