@@ -52,7 +52,7 @@ def manufacturerResultMap = jdbcTemplate.queryForList("select manufacturer from 
 	}
 println"**************UPDATE MODEL***************"
 //Create model if not exist
-def modelResultMap = jdbcTemplate.queryForList("select distinct model, manufacturer as manufacturer, asset_type as assetType from asset_entity where model != '' and model is not null and manufacturer != '' and manufacturer is not null and asset_type != '' and asset_type is not null")
+def modelResultMap = jdbcTemplate.queryForList("select distinct model, manufacturer as manufacturer, asset_type as assetType from asset_entity where model != '' and model is not null and manufacturer != '' and manufacturer is not null and asset_type != '' and asset_type is not null order by model")
 	modelResultMap.each{ result->
 		def manufacturerInstance = result.manufacturer ? Manufacturer.findByName( result.manufacturer ) : ""
 		def model = result.model.replaceAll("\\s+\$", "").replaceAll("^\\s+", "")
@@ -85,7 +85,7 @@ def modelResultMap = jdbcTemplate.queryForList("select distinct model, manufactu
 			}
 			
 			model = model.replace("'","\\'")
-			def updateQuery = "update asset_entity set model_id = ${modelInstance.id} where model='${model}'"
+			def updateQuery = "update asset_entity set model_id = ${modelInstance.id} where model='${model}' and manufacturer='${manufacturerInstance.name}' and asset_type = '${assetType}'"
 			def updated = jdbcTemplate.update(updateQuery)
 			println "Updated '${model}' Model id ${modelInstance.id} for ${updated} assets"
 		}
