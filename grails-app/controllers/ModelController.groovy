@@ -6,7 +6,8 @@ class ModelController {
 	//Initialize services
     def jdbcTemplate
 	def assetEntityAttributeLoaderService 
-    
+    def sessionFactory 
+	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def index = {
@@ -388,15 +389,8 @@ class ModelController {
     	// Get the Model instances for params ids
 		def toModel = Model.get(params.id)
 		def fromModel = Model.get(params.fromId)
-		// Add to the AKA field list in the target record
-		if(!toModel.aka?.contains(fromModel.modelName)){
-			def aka = toModel.aka ? toModel.aka +","+fromModel.modelName : fromModel.modelName
-			toModel.aka = aka 
-			if(!toModel.hasErrors())
-				toModel.save(flush:true)
-		}
-    	
-    	//	Revise Asset, and any other records that may point to this model
+		
+		//	Revise Asset, and any other records that may point to this model
 		def fromModelAssets = AssetEntity.findAllByModel( fromModel )
 		fromModelAssets.each{ assetEntity->
 			assetEntity.model = toModel
@@ -404,14 +398,31 @@ class ModelController {
 			assetEntity.save(flush:true)
 			assetEntityAttributeLoaderService.updateModelConnectors( assetEntity )
 		}
-    	// Delete model record
+    	// Delete model associated record
 		AssetCableMap.executeUpdate("delete AssetCableMap where fromConnectorNumber in (from ModelConnector where model = ${fromModel.id})")
 		AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
 												toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
 												where toConnectorNumber in (from ModelConnector where model = ${fromModel.id})""")
     	ModelConnector.executeUpdate("delete ModelConnector where model = ?",[fromModel])
-        fromModel.delete(flush: true)
 		
+		// Add to the AKA field list in the target record
+		if(!toModel.aka?.contains(fromModel.modelName)){
+			def aka = new StringBuffer(toModel.aka ? toModel.aka+"," : "")
+			aka.append(fromModel.modelName)
+			aka.append(fromModel.aka ? ","+fromModel.aka : "")
+			
+			// Delete model record
+			fromModel.delete()
+			sessionFactory.getCurrentSession().flush();
+			
+			toModel.aka = aka 
+			if(!toModel.hasErrors())
+				toModel.save(flush:true)
+		} else {
+			//	Delete model record
+			fromModel.delete()
+			sessionFactory.getCurrentSession().flush();
+		}
 		// Return to model list view with the flash message "Merge completed."
     	flash.message = "Merge completed."
     	redirect(action:list)

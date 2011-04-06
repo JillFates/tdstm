@@ -4,6 +4,7 @@ class ManufacturerController {
 	
 	// Initialize services
     def jdbcTemplate
+	def sessionFactory
 	
     def index = { redirect(action:list,params:params) }
 
@@ -109,14 +110,6 @@ class ManufacturerController {
 		def toManufacturer = Manufacturer.get(params.id)
 		def fromManufacturer = Manufacturer.get(params.fromId)
 		
-		// Add to the AKA field list in the target record
-		if(!toManufacturer.aka?.contains(fromManufacturer.name)){
-			def aka = toManufacturer.aka ? toManufacturer.aka +","+fromManufacturer.name : fromManufacturer.name
-			toManufacturer.aka = aka 
-			if(!toManufacturer.hasErrors())
-				toManufacturer.save(flush:true)
-		}
-		
 		// Revise Model, Asset, and any other records that may point to this manufacturer
 		def updateAssetsQuery = "update asset_entity set manufacturer_id = ${toManufacturer.id} where manufacturer_id='${fromManufacturer.id}'"
 		jdbcTemplate.update(updateAssetsQuery)
@@ -124,8 +117,29 @@ class ManufacturerController {
 		def updateModelsQuery = "update model set manufacturer_id = ${toManufacturer.id} where manufacturer_id='${fromManufacturer.id}'"
 		jdbcTemplate.update(updateModelsQuery)
 		
-		// Delete manufacturer record.
-		fromManufacturer.delete(flush:true)
+		// Add to the AKA field list in the target record
+		if(!toManufacturer.aka?.contains(fromManufacturer.name)){
+			def aka = new StringBuffer(toManufacturer.aka ? toManufacturer.aka+"," : "")
+			aka.append(fromManufacturer.name)
+			aka.append(fromManufacturer.aka ? ","+fromManufacturer.aka : "")
+			
+			// Delete manufacturer record.
+			fromManufacturer.delete()
+			
+			sessionFactory.getCurrentSession().flush();
+						
+			toManufacturer.aka = aka.toString() 
+			if(toManufacturer.validate(true))
+				toManufacturer.save(flush:true)
+			else 
+				toManufacturer.errors.allErrors.each() {println it }
+			
+		} else {
+			//	Delete manufacturer record.
+			fromManufacturer.delete()
+			
+			sessionFactory.getCurrentSession().flush();
+		}
 		
 		// Return to manufacturer list view with the flash message "Merge completed."
     	flash.message = "Merge completed."
