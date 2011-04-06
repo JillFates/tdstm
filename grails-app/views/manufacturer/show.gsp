@@ -1,10 +1,13 @@
-
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="companyHeader" />
         <title>Show Manufacturer</title>
+        <script type="text/javascript">
+			$(document).ready(function() {
+			   $("#showMergeDialog").dialog({ autoOpen: false })
+			})
+		</script>
     </head>
     <body>
         <div class="body">
@@ -45,9 +48,35 @@
                 <g:form>
                     <input type="hidden" name="id" value="${manufacturerInstance?.id}" />
                     <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
+                    <span class="button"><input class="create" type="button" value="Merge" onclick="showMergeDialog()"/></span>
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
                 </g:form>
             </div>
+            <div id="showMergeDialog" title="Select the item to merge to:" style="display: none;" class="list">
+				<table cellpadding="0" cellspacing="0">
+					<thead>
+						<tr><th>Name</th><th>AKA</th></tr>
+					</thead>
+                    <tbody>
+                    	<g:each in="${Manufacturer.findAllByIdNotEqual(manufacturerInstance?.id)?.sort{it.name}}" status="i" var="manufacturer">
+                    		<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+	                            <td valign="top" class="name">
+	                            	<g:link action="merge" id="${manufacturer.id}" params="[fromId:manufacturerInstance?.id]" style="font-weight: ${manufacturer.aka ? 'bold' : 'normal'}">
+		                            	${manufacturer.name}
+		                            </g:link>
+	                            </td>
+	                            <td valign="top" class="value">${manufacturer.aka}</td>
+	                        </tr>
+                    	</g:each>
+                    </tbody>
+                </table>
+			</div>
         </div>
+        <script type="text/javascript">
+        function showMergeDialog(){
+        	$("#showMergeDialog").dialog('option', 'height', 530 )
+            $("#showMergeDialog").dialog('open')
+        }
+        </script>
     </body>
 </html>

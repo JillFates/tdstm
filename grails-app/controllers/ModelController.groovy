@@ -2,8 +2,12 @@ import com.tdssrc.grails.GormUtil;
 import grails.converters.JSON
 
 class ModelController {
-
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+	
+	//Initialize services
+    def jdbcTemplate
+	def assetEntityAttributeLoaderService 
+    
+	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def index = {
         redirect(action: "list", params: params)
@@ -254,8 +258,10 @@ class ModelController {
 						}
     				}
             	}
-            	
-                flash.message = "${modelInstance.modelName} Updated"
+            	def updateAssetsQuery = "update asset_entity set asset_type = '${modelInstance.assetType}' where model_id='${modelInstance.id}'"
+            	jdbcTemplate.update(updateAssetsQuery)
+                
+				flash.message = "${modelInstance.modelName} Updated"
                 redirect(action: "show", id: modelInstance.id)
             }
             else {
@@ -370,5 +376,44 @@ class ModelController {
      */
     def cancel = {
     		 redirect(action: "show", id: params.id)
+    }
+    /*
+     *  When the user clicks on an item do the following actions:
+     *	1. Add to the AKA field list in the target record
+	 *	2. Revise Asset, and any other records that may point to this model
+	 *	3. Delete model record
+	 *	4. Return to model list view with the flash message "Merge completed."
+     */
+	def merge = {
+    	// Get the Model instances for params ids
+		def toModel = Model.get(params.id)
+		def fromModel = Model.get(params.fromId)
+		// Add to the AKA field list in the target record
+		if(!toModel.aka?.contains(fromModel.modelName)){
+			def aka = toModel.aka ? toModel.aka +","+fromModel.modelName : fromModel.modelName
+			toModel.aka = aka 
+			if(!toModel.hasErrors())
+				toModel.save(flush:true)
+		}
+    	
+    	//	Revise Asset, and any other records that may point to this model
+		def fromModelAssets = AssetEntity.findAllByModel( fromModel )
+		fromModelAssets.each{ assetEntity->
+			assetEntity.model = toModel
+			assetEntity.assetType = toModel.assetType
+			assetEntity.save(flush:true)
+			assetEntityAttributeLoaderService.updateModelConnectors( assetEntity )
+		}
+    	// Delete model record
+		AssetCableMap.executeUpdate("delete AssetCableMap where fromConnectorNumber in (from ModelConnector where model = ${fromModel.id})")
+		AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
+												toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
+												where toConnectorNumber in (from ModelConnector where model = ${fromModel.id})""")
+    	ModelConnector.executeUpdate("delete ModelConnector where model = ?",[fromModel])
+        fromModel.delete(flush: true)
+		
+		// Return to model list view with the flash message "Merge completed."
+    	flash.message = "Merge completed."
+    	redirect(action:list)
     }
 }

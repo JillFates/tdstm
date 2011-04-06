@@ -5,6 +5,11 @@
     <title>Model Template</title>
     <g:javascript src="drag_drop.js" />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
+    <script type="text/javascript">
+		$(document).ready(function() {
+		   $("#showMergeDialog").dialog({ autoOpen: false })
+		})
+	</script>
   </head>
   <body>
 <div class="body">
@@ -98,6 +103,7 @@
 						<input name="id" value="${modelInstance.id}" type="hidden"/>
 						<span class="button">
 							<g:actionSubmit class="edit" action="edit" value="Edit"></g:actionSubmit>
+							<span class="button"><input class="create" type="button" value="Merge" onclick="showMergeDialog()"/></span>
 							<g:actionSubmit class="delete" action="delete" value="Delete" onclick="return validateModelDependency(${modelInstance.id})"></g:actionSubmit>
 						</span>
 					</g:form>
@@ -159,6 +165,25 @@
 			</tbody>
 		</table>
 	</div>
+	<div id="showMergeDialog" title="Select the item to merge to:" style="display: none;" class="list">
+		<table cellpadding="0" cellspacing="0">
+			<thead>
+				<tr><th>Name</th><th>AKA</th></tr>
+			</thead>
+            <tbody>
+            	<g:each in="${Model.findAll('from Model where id != ? and manufacturer = ?', [modelInstance?.id, modelInstance?.manufacturer])?.sort{it.modelName}}" status="i" var="model">
+            		<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+                     <td valign="top" class="name">
+                     	<g:link action="merge" id="${model.id}" params="[fromId:modelInstance?.id]" style="font-weight: ${model.aka ? 'bold' : 'normal'}">
+                      	${model.modelName}
+                      </g:link>
+                     </td>
+                     <td valign="top" class="value">${model.aka}</td>
+                 </tr>
+            	</g:each>
+            </tbody>
+        </table>
+	</div>
 </div>
 </fieldset>
 <script type="text/javascript">
@@ -177,6 +202,10 @@ function validateModelDependency( modelId ){
 		}
 	});
 	return returnValue
+}
+function showMergeDialog(){
+	$("#showMergeDialog").dialog('option', 'height', 530 )
+    $("#showMergeDialog").dialog('open')
 }
 </script>
 </div>

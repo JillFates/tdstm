@@ -522,4 +522,33 @@ class AssetEntityAttributeLoaderService {
 			}
 	    }
     }
+    /*
+     *  Create asset_cabled_Map for all asset model connectors 
+     */
+     def updateModelConnectors( assetEntity ){
+     	if(assetEntity.model){
+     		// Set to connectors to blank if associated 
+     		AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
+					toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
+					where toAsset = ? """,[assetEntity])
+			// Delete AssetCableMap for this asset
+			AssetCableMap.executeUpdate("delete from AssetCableMap where fromAsset = ?",[assetEntity])
+ 	    	// Create new connectors 
+			def assetConnectors = ModelConnector.findAllByModel( assetEntity.model )
+ 			assetConnectors.each{
+ 				def assetCableMap = new AssetCableMap(
+ 													cable : "Cable"+it.connector,
+ 													fromAsset: assetEntity,
+ 													fromConnectorNumber : it,
+ 													status : it.status
+ 													)
+ 				if ( !assetCableMap.validate() || !assetCableMap.save() ) {
+ 					def etext = "Unable to create assetCableMap" +
+ 	                GormUtil.allErrorsString( assetCableMap )
+ 					println etext
+ 					log.error( etext )
+ 				}
+ 			}
+ 	    }
+     }
 }
