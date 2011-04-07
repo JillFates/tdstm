@@ -442,7 +442,7 @@ class AssetEntityAttributeLoaderService {
 		def modelInstance
 		def modelValue = dtv.correctedValue ? dtv.correctedValue : dtv.importValue
 		try{
-		assetEntity.assetType = assetEntity.assetType ? assetEntity.assetType : "Server"
+		//assetEntity.assetType = assetEntity.assetType ? assetEntity.assetType : "Server"
 		def dtvManufacturer = dtvList.find{it.eavAttribute.attributeCode == "manufacturer"}
 		if(modelValue && dtvManufacturer){
 			def manufacturerName = dtvManufacturer?.correctedValue ? dtvManufacturer?.correctedValue : dtvManufacturer?.importValue
@@ -457,16 +457,18 @@ class AssetEntityAttributeLoaderService {
 			}
 			if(manufacturerInstance){
 				modelInstance = Model.findByModelNameAndManufacturer( modelValue, manufacturerInstance )
-				modelInstance = modelInstance?.find{it.assetType == assetEntity?.assetType}
+				//modelInstance = modelInstance?.find{it.assetType == assetEntity?.assetType}
 				if( !modelInstance ){
-					def models = Model.findAllByManufacturerAndAkaIsNotNull( manufacturerInstance ).findAll{it.assetType == assetEntity?.assetType}
+					def models = Model.findAllByManufacturerAndAkaIsNotNull( manufacturerInstance )//.findAll{it.assetType == assetEntity?.assetType}
 					models.each{ model->
 						if(model.aka.toLowerCase().contains( modelValue.toLowerCase() )){
 							modelInstance = model
 						}
 					}
 					if(!modelInstance){
-						modelInstance = new Model( modelName:modelValue, manufacturer:manufacturerInstance, assetType:assetEntity?.assetType )
+						def dtvAssetType = dtvList.find{it.eavAttribute.attributeCode == "assetType"}
+						dtvAssetType = dtvAssetType ? dtvAssetType : "Server"
+						modelInstance = new Model( modelName:modelValue, manufacturer:manufacturerInstance, assetType:dtvAssetType )
 						if ( !modelInstance.validate() || !modelInstance.save() ) {
 							def etext = "Unable to create modelInstance" +
 			                GormUtil.allErrorsString( modelInstance )

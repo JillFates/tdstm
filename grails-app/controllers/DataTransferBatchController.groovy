@@ -144,9 +144,9 @@ class DataTransferBatchController {
 	    								}
 										break;
 									case "assetType":
-					    				if( !it.importValue && !it.correctedValue ) {
-	    									assetEntity."$attribName" = "Server" 
-	    								} else {
+										if(assetEntity.model){
+											assetEntity."$attribName" = assetEntity.model.assetType
+										} else {
 	    									assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
 	    								}
 										break;
