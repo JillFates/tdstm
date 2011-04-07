@@ -71,7 +71,7 @@ table.rack_elevation td {
 	font: 8px arial, helvetica, sans-serif;
 	border: 1px solid #999999;
 	padding:0px 2px 0px 2px;
-  vertical-align: middle;
+  vertical-align: top;
   font-weight: bold;
 }
 
@@ -80,7 +80,7 @@ table.rack_elevation th {
 	font-weight: bold;
 	text-decoration: underline;
 	padding:0px 2px 0px 2px;
-  vertical-align: middle;
+  vertical-align: top;
   font-weight: bold;
   background: none;
   color: #333333;

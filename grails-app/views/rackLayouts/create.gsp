@@ -286,7 +286,7 @@
 		</div>
 		<div id="actionDiv" style="margin-top: 5px;float: right;display: none;">
 			<input type="button" value="Ok" onclick="submitAction($('form[name=cablingDetailsForm]'))"/>
-			<input type="button" value="Cancel"  onclick="$('#assignFieldDiv').hide();$('#actionButtonsDiv').hide();$('#actionDiv').hide()"/>
+			<input type="button" value="Cancel"  onclick="cancelAction()"/>
 			<g:select id="colorId" name="color" from="${AssetCableMap.constraints.color.inList}" noSelection="${['':'']}" onchange="updateCell(this.value)"></g:select>
 			<input type="reset" id="formReset" style="display: none;"/>
 		</div>
@@ -307,6 +307,7 @@
 				<input type="hidden" name="actionType" id="actionTypeId"/>
 				<input type="hidden" name="connectorType" id="connectorTypeId"/>
 				<input type="hidden" name="asset" id="assetEntityId"/>
+				<input type="hidden" id="previousColor"/>
 			</div>
 		</div>
 		
@@ -455,6 +456,16 @@
 		} else {
 			$("#assignFieldDiv").hide()
 		}
+		if(id == "unknownId" || id == "emptyId"){
+			var connectorId = $("#cabledTypeId").val()
+			var color = $("#color_"+connectorId).attr("class")
+			if(color){
+				$("#previousColor").val($("#color_"+connectorId).attr("class"))
+				$("#color_"+connectorId).removeAttr("class")
+			}
+			$("#colorId").val("")
+			$("#colorId option").removeAttr("class")
+		}
 		$("#actionTypeId").val(id)
 		$("#actionDiv").show()
 		
@@ -502,6 +513,14 @@
 			$("#actionButtonsDiv").hide()
 			$("#actionDiv").hide()
 		}
+	}
+	function cancelAction(){
+		var color = $("#previousColor").val()
+		var connectorId = $("#cabledTypeId").val()
+		$("#color_"+connectorId).addClass(color)
+		$('#assignFieldDiv').hide();
+		$('#actionButtonsDiv').hide();
+		$('#actionDiv').hide()
 	}
 	/*
 		RACK Autocomplete functionality

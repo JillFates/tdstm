@@ -431,7 +431,7 @@ class RackLayoutsController {
 		
 		def bladeTable = '<table class="bladeTable"><tr>'
 		def rowspan = assetDetails.asset?.rowspan != 0 ? assetDetails.asset?.rowspan : 1
-		def tdHeight = rowspan * (rowspan-1)
+		def tdHeight = rowspan * 6
 		def blades = []
 		if(assetDetails.asset.source == 1)
 			blades = AssetEntity.findAllWhere(project:assetEntity.project, moveBundle:assetEntity.moveBundle, assetType:'Blade', sourceBladeChassis:assetEntity.assetTag)
@@ -462,7 +462,7 @@ class RackLayoutsController {
 					if(tag.length() >= bladeLabelCount){
 						tag = tag.substring(0,bladeLabelCount)
 					}
-					//tag = tag.split('')[1..-1].join('<br/>')
+					tag = tag.split('')[1..-1].join('<br/>')
 					def taglabel = "<div>"+tag.substring(0,tag.length())+"</div>"
 					def bladeSpan = blade.bladeSize == 'Full' ? chassisRows : 1
 					if(bladeSpan == chassisRows){
@@ -596,7 +596,7 @@ class RackLayoutsController {
 			assetCableMap.toAssetRack = toAssetRack
 			assetCableMap.toAssetUposition = connectorType != "Power" ? toAsset?.targetRackPosition : toAssetUposition
 			assetCableMap.toPower = toPower
-			assetCableMap.color = connectorType != "Power" ? params.color : null
+			assetCableMap.color = params.color
 			if(assetCableMap.save(flush:true) && toAsset && connectorType != "Power"){
 				def toAssetCableMap = AssetCableMap.findByFromAssetAndFromConnectorNumber( toAsset, toConnector )
 				toAssetCableMap.status = status
