@@ -310,12 +310,12 @@ class RackLayoutsController {
 							if(isAdmin){
 								assetTag += "<a href='javascript:openAssetEditDialig(${overlapAsset?.id})' >"+trimString(assetTagValue.replace('~-','-'))+"</a>" 
 								if(hasBlades){
-									assetTag += "<br/>"+bladeTable+"</br>"
+									assetTag += "<br/>"+bladeTable
 								}
 							} else {
 								assetTag += trimString(assetTagValue.replace('~-','-'))
 								if(hasBlades){
-									assetTag += " <br/>"+bladeTable+"</br>"
+									assetTag += " <br/>"+bladeTable
 								}
 							}
 						}
@@ -330,42 +330,76 @@ class RackLayoutsController {
 						if(isAdmin){
 							assetTag += "<a href='javascript:openAssetEditDialig(${overlappedAsset?.id})' >"+trimString(assetTagValue.replace('~-','-'))+"</a>"
 							if(hasBlades){
-								assetTag += "<br/>"+bladeTable+"</br>"
+								assetTag += "<br/>"+bladeTable
 							}
 						} else {
 							assetTag += trimString(assetTagValue.replace('~-','-'))
 							if(hasBlades){
-								assetTag += "<br/>"+bladeTable+"</br>"
+								assetTag += "<br/>"+bladeTable
 							}
 						}
 					}
 				}
 					
 				if(backView) {
-					if( hasBlades && showCabling != 'on'){
-						row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
-					} else {
-						row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}${cabling}</td>")
-						if(includeBundleName)
-							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${moveBundle}</td>")
-						else
-							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'></td>")
-					}
-					if(it.cssClass != "rack_error") {
+					if(cabling != "" && it.cssClass != "rack_error"){
 						def assetCables = AssetCableMap.findByFromAsset(it.asset?.assetEntity)
-						if ( assetCables )
-							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'>view</a></td>")
-						else
-							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>&nbsp;</td>")
-						
+						if( hasBlades && showCabling != 'on'){
+							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
+							if ( assetCables )
+								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'>view</a></td>")
+							else
+								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>&nbsp;</td>")
+						} else {
+							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' colspan='3' class='${it.cssClass}'>")
+							row.append("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;'>${assetTag}</td>")
+							
+							if(includeBundleName)
+								row.append("<td style='border:0;'>${moveBundle}</td>")
+							else
+								row.append("<td style='border:0;'>&nbsp;</td>")
+							if ( assetCables )
+								row.append("<td style='border:0;'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'>view</a></td></tr>")
+							else
+								row.append("<td style='border:0;'>&nbsp;</td></tr>")
+								
+							row.append("<tr><td colspan='3' style='border:0;'>${cabling}</td></tr></table></td>")	
+						}
 					} else {
-						row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>Devices Overlap</td>")
+						if( hasBlades && showCabling != 'on'){
+							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
+						} else {
+							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}${cabling}</td>")
+							if(includeBundleName)
+								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${moveBundle}</td>")
+							else
+								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'></td>")
+						}
+						if(it.cssClass != "rack_error") {
+							def assetCables = AssetCableMap.findByFromAsset(it.asset?.assetEntity)
+							if ( assetCables )
+								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'>view</a></td>")
+							else
+								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>&nbsp;</td>")
+							
+						} else {
+							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>Devices Overlap</td>")
+						}
 					}
 				} else {
 					if( hasBlades ){
 						row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
+					} else if(cabling != ""){
+						row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' colspan='2' class='${it.cssClass}'>")
+						row.append("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;'>${assetTag}</td>")
+						if(includeBundleName)
+							row.append("<td style='border:0;'>${moveBundle}</td></tr>")
+						else
+							row.append("<td style='border:0;'>&nbsp;</td></tr>")
+						row.append("<tr><td colspan='2' style='border:0;'>${cabling}</td></tr></table></td>")
+						
 					} else {
-						row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}${cabling}</td>")
+						row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
 						if(includeBundleName)
 							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${moveBundle}</td>")
 						else
@@ -397,7 +431,7 @@ class RackLayoutsController {
 		
 		def bladeTable = '<table class="bladeTable"><tr>'
 		def rowspan = assetDetails.asset?.rowspan != 0 ? assetDetails.asset?.rowspan : 1
-		def tdHeight = rowspan * 7
+		def tdHeight = rowspan * (rowspan-1)
 		def blades = []
 		if(assetDetails.asset.source == 1)
 			blades = AssetEntity.findAllWhere(project:assetEntity.project, moveBundle:assetEntity.moveBundle, assetType:'Blade', sourceBladeChassis:assetEntity.assetTag)
@@ -428,7 +462,7 @@ class RackLayoutsController {
 					if(tag.length() >= bladeLabelCount){
 						tag = tag.substring(0,bladeLabelCount)
 					}
-					tag = tag.split('')[1..-1].join('<br/>')
+					//tag = tag.split('')[1..-1].join('<br/>')
 					def taglabel = "<div>"+tag.substring(0,tag.length())+"</div>"
 					def bladeSpan = blade.bladeSize == 'Full' ? chassisRows : 1
 					if(bladeSpan == chassisRows){

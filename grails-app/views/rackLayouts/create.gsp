@@ -171,7 +171,7 @@
 		if (assetEntityAttributes != "") {
 			$("#editDialog").dialog("close")
 			$("#cablingDialogId").dialog("close")
-			submitForm($('#rackLayoutCreate'));
+			submitForm($('form [name=rackLayoutCreate]'));
 		} else {
 			alert("Asset Entity is not updated")
 		}
@@ -193,7 +193,7 @@
 	<div class="message">${flash.message}</div>
 </g:if>
 <div class="dialog">
-<g:form action="save" id="rackLayoutCreate" name="rackLayoutCreate" method="post" target="_blank" onsubmit="return submitForm(this)" style="border: 1px solid black; width: 100%">
+<g:form action="save" name="rackLayoutCreate" method="post" target="_blank" onsubmit="return submitForm(this)" style="border: 1px solid black; width: 100%">
 <table style="width:auto; border: none">
 	<tbody>
 		<tr>

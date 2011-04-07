@@ -210,7 +210,7 @@ table.rack_elevation table.bladeTable td.errorBlade {
 	top: 0
 }
 .cablingPanel {
-	width: 379px;
+	width: auto;
 	height: 199px;
 	border: 2px solid black;
 	margin-right: 5px;
@@ -243,4 +243,10 @@ table.rack_elevation table.bladeTable td.errorBlade {
 }
 .connector_right{
 	margin-left: 19px;
+}
+.rack_cable_table {
+	border: 0px solid black;
+}
+.rack_cable_table td {
+	border: 0px solid black;
 }
