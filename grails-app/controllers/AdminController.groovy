@@ -58,7 +58,11 @@ class AdminController {
 				UNION
 				SELECT 'asset_entity' as mainTable,'source_team_id' as refId,'Orphan' as type,count(*) as totalCount FROM asset_entity a where a.source_team_id not in (select pt.project_team_id from project_team pt )
 				UNION
-				SELECT 'asset_entity' as mainTable,'target_team_id' as refId,'Orphan' as type,count(*) as totalCount FROM asset_entity a where a.target_team_id not in (select pt.project_team_id from project_team pt )) a
+				SELECT 'asset_entity' as mainTable,'target_team_id' as refId,'Orphan' as type,count(*) as totalCount FROM asset_entity a where a.target_team_id not in (select pt.project_team_id from project_team pt )
+				UNION
+				SELECT 'asset_entity' as mainTable,'model_id' as refId,'Orphan' as type,count(*) as totalCount FROM asset_entity a where a.model_id not in (select m.model_id from model m)
+				UNION
+				SELECT 'asset_entity' as mainTable,'manufacturer_id' as refId,'Orphan' as type,count(*) as totalCount FROM asset_entity a where a.manufacturer_id not in (select mn.manufacturer_id from manufacturer mn)) a
 			WHERE a.totalCount > 0
 						
 			UNION
@@ -91,8 +95,26 @@ class AdminController {
 
 			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR MODEL-------------------------------------------*/
-			SELECT * FROM (	SELECT 'model' as mainTable,'manufacturer_id' as refId,'Orphan' as type,count(*) as totalCount FROM model m where m.manufacturer_id not in (select mn.manufacturer_id from manufacturer mn) ) aev
+			SELECT * FROM (	SELECT 'model' as mainTable,'manufacturer_id' as refId,'Orphan' as type,count(*) as totalCount FROM model m where m.manufacturer_id not in (select mn.manufacturer_id from manufacturer mn) OR m.manufacturer_id is null OR m.manufacturer_id = '' ) aev
 			WHERE aev.totalCount > 0
+			
+			UNION 
+
+			/*-----------------------------------ORPHAN RESULTS QUERY FOR MODEL WHERE Manufacturers with no Models -------------------------------------------*/
+			SELECT * FROM (	SELECT 'manufacturer' as mainTable,'manufacturer_id' as refId,'Orphan' as type,count(*) as totalCount FROM manufacturer mn where mn.manufacturer_id not in (select m.manufacturer_id from model m) ) mnm
+			WHERE mnm.totalCount > 0
+
+			UNION 
+
+			/*-----------------------------------ORPHAN RESULTS QUERY FOR MODEL WHERE Models with no assets-------------------------------------------*/
+			SELECT * FROM (	SELECT 'model' as mainTable,'model_id' as refId,'Orphan' as type,count(*) as totalCount FROM model m where m.model_id not in (select ae.model_id from asset_entity ae where ae.model_id is not null)  ) mae
+			WHERE mae.totalCount > 0
+			
+			UNION 
+
+			/*-----------------------------------ORPHAN RESULTS QUERY FOR MODEL WHERE Models with no assets-------------------------------------------*/
+			SELECT * FROM (	SELECT 'model_connector' as mainTable,'model_id' as refId,'Orphan' as type,count(*) as totalCount FROM model_connector mn where mn.model_id not in (select m.model_id from model m)  ) mae
+			WHERE mae.totalCount > 0
 			"""
 		
 		summaryRecords << jdbcTemplate.queryForList( AssetsummaryQuery )
@@ -471,6 +493,14 @@ class AdminController {
 						query = "SELECT * FROM asset_entity a where a.target_team_id not in (select pt.project_team_id from project_team pt )"
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
+					case "model_id" :
+						query = "SELECT * FROM asset_entity a where a.model_id not in (select m.model_id from model m ) and a.model_id is not null "
+						orphanDeatils = jdbcTemplate.queryForList(query)
+					break;
+					case "manufacturer_id" :
+						query = "SELECT * FROM asset_entity a where a.manufacturer_id not in (select mn.manufacturer_id from manufacturer mn) and a.manunfacturer_id is not null"
+						orphanDeatils = jdbcTemplate.queryForList(query)
+					break;
 				}
 			break;
 			
@@ -677,16 +707,34 @@ class AdminController {
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
 			break;
-				
-			case "model" :
+			case "manufacturer" :
 				switch (column){
 					case "manufacturer_id" :
-						query = "SELECT * FROM model m where m.manufacturer_id not in (select mn.manufacturer_id from manufacturer mn)"
+						query = "SELECT * FROM manufacturer mn where mn.manufacturer_id not in (select m.manufacturer_id from model m)"
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 				}
 			break;
-			
+			case "model" :
+				switch (column){
+					case "manufacturer_id" :
+						query = "SELECT * FROM model m where m.manufacturer_id not in (select mn.manufacturer_id from manufacturer mn) OR m.manufacturer_id is null OR m.manufacturer_id = ''"
+						orphanDeatils = jdbcTemplate.queryForList(query)
+					break;
+					case "model_id" :
+						query = "SELECT * FROM model m where m.model_id not in (select ae.model_id from asset_entity ae where ae.model_id is not null) "
+						orphanDeatils = jdbcTemplate.queryForList(query)
+					break;
+				}
+			break;
+			case "model_connector" :
+				switch (column){
+					case "model_id" :
+						query = "SELECT * FROM model_connector mn where mn.model_id not in (select m.model_id from model m ) "
+						orphanDeatils = jdbcTemplate.queryForList(query)
+					break;
+				}
+			break;
 			case "move_bundle" :
 				switch (column){
 					case "project_id" :

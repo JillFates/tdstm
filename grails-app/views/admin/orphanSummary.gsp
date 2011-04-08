@@ -57,7 +57,11 @@ a:hover {
 	<a href="javascript:showQuery()">Download SQL script</a>
 	</div>
 
-	<table id="orphanDetailsTableId"></table>
+	<table id="orphanDetailsTableId">
+	<tr>
+		<td><img src="../images/processing.gif"/></td>
+	</tr>
+	</table>
 </div>
 </div>
 <div id="queryTextDialog" title="SQL Script" style="display:none;">
@@ -74,7 +78,11 @@ a:hover {
     	$("#queryTextDialog").dialog({ autoOpen: false })
     })
 	function getOrphanDetails( table, column, type ){
-		$("#orphanDetailed").hide()
+   		$("#orphanDetailed").show()
+   		$("#tableName").html(table)
+   		$("#columnName").html(column)
+   		$("#queryText").html("")
+   		$("#orphanDetailsTableId").html("<tr><td><img src='../images/processing.gif'/></td></tr>")
 		$("#tableName").html(table);
 		$("#columnName").html(column);
 		${remoteFunction(action:'orphanDetails', params:'\'table=\' + table +\'&column=\'+column +\'&type=\'+type', onComplete:'showOrphanDetails(e, table )')}

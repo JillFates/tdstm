@@ -61,7 +61,7 @@ function getDeatiledReport( records, table ){
 			/* for asset_entity */
 			case "asset_entity" :
 				var thead ="<tr><th>asset_entity_id</th><th>project_id</th><th>owner_id</th><th>move_bundle_id</th><th>source_team_id</th>"+
-							"<th>target_team_id</th><th>application</th><th>asset_name</th><th>model</th><th>asset_tag</th><th>asset_type</th><th>serial_number</th><tr>"	
+							"<th>target_team_id</th><th>application</th><th>asset_name</th><th>model</th><th>manufacturer</th><th>asset_tag</th><th>asset_type</th><th>serial_number</th><tr>"	
 				for( i = 0; i < dataLength; i++){
 					var cssClass = 'odd'
 					if(i % 2 == 0){
@@ -70,7 +70,7 @@ function getDeatiledReport( records, table ){
 					var record = records[i]
 					tbody +="<tr class='"+cssClass+"'><td>"+record.asset_entity_id+"</td><td>"+record.project_id+"</td><td>"+record.owner_id+"</td>"+
 							"<td>"+record.move_bundle_id+"</td><td>"+record.source_team_id+"</td><td>"+record.target_team_id+"</td>"+
-							"<td>"+record.application+"</td><td>"+record.asset_name +"</td><td>"+record.model +"</td>"+
+							"<td>"+record.application+"</td><td>"+record.asset_name +"</td><td>"+record.model_id +"</td><td>"+record.manufacturer_id +"</td>"+
 							"<td>"+record.asset_tag+"</td><td>"+record.asset_type +"</td><td>"+record.serial_number +"</td></tr>"
 				}
 			break;
@@ -241,6 +241,19 @@ function getDeatiledReport( records, table ){
 					tbody +="<tr class='"+cssClass+"'><td>"+record.value_id+"</td><td>"+record.attribute_id+"</td></tr>"
 				}
 			break;
+			/* for manufacturer */
+			case "manufacturer" :
+				var thead ="<tr><th>manufacturer_id</th><th>Name</th><th>Description</th><th>AKA</th><tr>"	
+				for( i = 0; i < dataLength; i++){
+					var cssClass = 'odd'
+					if(i % 2 == 0){
+						cssClass = 'even'
+					}
+					var record = records[i]
+					tbody +="<tr class='"+cssClass+"'><td>"+record.manufacturer_id+"</td><td>"+record.name+"</td>"+
+							"<td>"+record.description+"</td><td>"+record.aka+"</td></tr>"
+				}
+			break;
 			/* for model */
 			case "model" :
 				var thead ="<tr><th>model_id</th><th>description</th><th>manufacturer_id</th><th>name</th><tr>"	
@@ -252,6 +265,19 @@ function getDeatiledReport( records, table ){
 					var record = records[i]
 					tbody +="<tr class='"+cssClass+"'><td>"+record.model_id+"</td><td>"+record.description+"</td>"+
 							"<td>"+record.manufacturer_id+"</td><td>"+record.name+"</td></tr>"
+				}
+			break;
+			/* for model */
+			case "model_connector" :
+				var thead ="<tr><th>model_connector_id</th><th>model_id</th><th>label</th><th>type</th><tr>"	
+				for( i = 0; i < dataLength; i++){
+					var cssClass = 'odd'
+					if(i % 2 == 0){
+						cssClass = 'even'
+					}
+					var record = records[i]
+					tbody +="<tr class='"+cssClass+"'><td>"+record.model_connectors_id+"</td><td>"+record.model_id+"</td>"+
+							"<td>"+record.label+"</td><td>"+record.type+"</td></tr>"
 				}
 			break;
 			/* for move_bundle */
