@@ -250,7 +250,7 @@
 				<div>
 					<img src="../i/cabling/${assetCable.status}.png"/>
 				</div>
-				<div class="${assetCable.labelPosition == 'Right' ? 'connector_right' : 'connector_bottom'}">
+				<div class="connector_${assetCable.labelPosition}">
 					<span>${assetCable.label}</span>
 				</div>
 			</div>

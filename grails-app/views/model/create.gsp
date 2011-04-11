@@ -137,7 +137,7 @@
 					<div>
 						<img src="../i/cabling/${modelConnector.status}.png"/>
 					</div>
-					<div id="labelPositionDiv${modelConnector.connector}" class="${modelConnector.labelPosition == 'Right' ? 'connector_right' : 'connector_bottom'}">
+					<div id="labelPositionDiv${modelConnector.connector}" class="connector_${modelConnector.labelPosition}">
 						<span id='connectorLabelText${modelConnector.connector}'>${modelConnector.label}</span>
 					</div>
 				</div>
@@ -167,7 +167,7 @@
 			<tr id="connectorTr${modelConnector.connector}">
 					<td><g:select id="typeId${modelConnector.connector}" name="type${modelConnector.connector}" from="${ModelConnector.constraints.type.inList}" value="${modelConnector.type}"></g:select></td>
 					<td><input title="Label" id="labelId${modelConnector.connector}" name="label${modelConnector.connector}" type="text" value="${modelConnector.label}" onchange="changeLabel(${modelConnector.connector}, this.value)"></td>
-					<td><g:select id="labelPositionId${modelConnector.connector}" name="labelPosition${modelConnector.connector}" from="${['Right','Bottom']}" value="${modelConnector.labelPosition}" onchange="changeLabelPosition(${modelConnector.connector}, this.value)"></g:select></td>
+					<td><g:select id="labelPositionId${modelConnector.connector}" name="labelPosition${modelConnector.connector}" from="${['Right','Left','Top','Bottom']}" value="${modelConnector.labelPosition}" onchange="changeLabelPosition(${modelConnector.connector}, this.value)"></g:select></td>
 					<td><input id="connectorPosXId${modelConnector.connector}" name="connectorPosX${modelConnector.connector}" maxlength="3" style="width: 25px;" type="text" value="${modelConnector.connectorPosX}"></td>
 					<td>
 						<input id="connectorId${modelConnector.connector}" name="connector${modelConnector.connector}" maxlength="5" style="width: 35px;" type="hidden" value="${modelConnector.connector}">
@@ -180,7 +180,7 @@
 			<tr id="connectorTr${count}" style="display: none;">
 					<td><g:select id="typeId${count}" name="type" from="${ModelConnector.constraints.type.inList}"></g:select></td>
 					<td><input id="labelId${count}" type="text" onchange="changeLabel(${count}, this.value)"></td>
-					<td><g:select id="labelPositionId${count}" name="labelPosition" from="${['Right','Bottom']}" onchange="changeLabelPosition(${count}, this.value)"></g:select></td>
+					<td><g:select id="labelPositionId${count}" name="labelPosition" from="${['Right','Left','Top','Bottom']}" onchange="changeLabelPosition(${count}, this.value)"></g:select></td>
 					<td><input id="connectorPosXId${count}" maxlength="3" style="width: 25px;" type="text" value="0"></td>
 					<td>
 						<input id="connectorId${count}" maxlength="5" style="width: 35px;" type="hidden" value="${count}">
@@ -213,7 +213,7 @@
 		$("#connectorCount").val(parseInt($("#connectorCount").val()) + 1)
 		var count = $("#connectorCount").val()
 		if(count < 51 ){
-			var connector = "<div><img src='../i/cabling/"+type+".png'/></div><div id='labelPositionDiv"+count+"' class='connector_right'><span id='connectorLabelText"+count+"'>Connector"+count+"</span></div>"
+			var connector = "<div><img src='../i/cabling/"+type+".png'/></div><div id='labelPositionDiv"+count+"' class='connector_Right'><span id='connectorLabelText"+count+"'>Connector"+count+"</span></div>"
 			$("#connector"+count).html(connector)
 			var modelConnector = $("#connectorTabe tbody").html()
 			$("#connectorModelBody").append(modelConnector)
@@ -252,17 +252,19 @@
 				$("#labelId"+j).removeClass("field_error")
 			}
 		}
-		$("#connectorLabelText"+count).html(value)
+		$("#connectorLabelText"+id).html(value)
+		if($("#labelPositionId"+id).val() == "Left"){
+			$("#labelPositionDiv"+id).attr("style","margin-left:-"+$('#connectorLabelText'+id).outerWidth()+"px")	
+		}
 	}
 	function changeLabelPosition(count, value){
-		if(value == "Right"){
-			$("#labelPositionDiv"+count).removeClass("connector_bottom")
-			$("#labelPositionDiv"+count).addClass("connector_right")
-		} else {
-			$("#labelPositionDiv"+count).removeClass("connector_right")
-			$("#labelPositionDiv"+count).addClass("connector_bottom")
+		$("#labelPositionDiv"+count).removeAttr("class")
+		$("#labelPositionDiv"+count).removeAttr("style")
+		$("#labelPositionDiv"+count).addClass("connector_"+value)
+		if(value == "Left"){
+			$("#labelPositionDiv"+count).attr("style","margin-left:-"+$('#connectorLabelText'+count).outerWidth()+"px")	
 		}
-		
+		//$('body').find('span:last').width();
 	}
 	function showImage( value ){
 		if($("#"+value).is(":checked")){

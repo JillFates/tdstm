@@ -133,7 +133,7 @@
 					<div>
 					<img src="../../i/cabling/${modelConnector.status}.png"/>
 					</div>
-					<div class="${modelConnector.labelPosition == 'Right' ? 'connector_right' : 'connector_bottom'}">
+					<div class="connector_${modelConnector.labelPosition}">
 					<span>${modelConnector.label}</span>
 					</div>
 				</div>
@@ -187,6 +187,9 @@
 </div>
 </fieldset>
 <script type="text/javascript">
+$('div.connector_Left').each(function(index) {
+	$(this).attr("style","margin-left:-"+$(this).children().width()+"px");
+});
 function validateModelDependency( modelId ){
 	var returnValue = true
 	jQuery.ajax({

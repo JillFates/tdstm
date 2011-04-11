@@ -284,11 +284,17 @@ th {
 	left: 0; 
 	top: 0
 }
-.connector_bottom{
+.connector_Bottom{
 	margin-top: 19px;
 }
-.connector_right{
+.connector_Right{
 	margin-left: 19px;
+}
+.connector_Left{
+	margin-left: -66px;
+}
+.connector_Top{
+	margin-top: -13px;
 }
 .cabling_div {
 	border:1px solid #63A242;

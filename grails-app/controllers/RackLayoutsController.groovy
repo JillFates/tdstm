@@ -685,7 +685,7 @@ class RackLayoutsController {
 												<div>
 													<img src="../i/cabling/${assetCable.status}.png"/>
 												</div>
-												<div class="${assetCable.fromConnectorNumber.labelPosition == 'Right' ? 'connector_right' : 'connector_bottom'}">
+												<div class="connector_${assetCable.fromConnectorNumber.labelPosition}">
 													<span>${assetCable.fromConnectorNumber.label}</span>
 												</div>
 											</div>
