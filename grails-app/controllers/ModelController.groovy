@@ -1,5 +1,8 @@
 import com.tdssrc.grails.GormUtil;
 import grails.converters.JSON
+import org.jmesa.facade.TableFacade
+import org.jmesa.facade.TableFacadeImpl
+import org.jmesa.limit.Limit
 
 class ModelController {
 	
@@ -15,7 +18,7 @@ class ModelController {
     }
 
     def list = {
-        params.max = Math.min(params.max ? params.int('max') : 25, 100)
+       // params.max = Math.min(params.max ? params.int('max') : 25, 100)
 		if(!params.sort) params.sort = 'modelName'
     	if(!params.order) params.order = 'asc'
 		def modelsList
@@ -33,7 +36,17 @@ class ModelController {
 		} else {
 			modelsList = Model.list(params)
 		}
-        [modelInstanceList: modelsList, modelInstanceTotal: Model.count()]
+        TableFacade tableFacade = new TableFacadeImpl("tag",request)
+        tableFacade.items = modelsList
+        Limit limit = tableFacade.limit
+		if(limit.isExported()){
+            tableFacade.setExportTypes(response,limit.getExportType())
+            tableFacade.setColumnProperties("modelName","manufacturer")
+            tableFacade.render()
+        }else
+            return [modelsList : modelsList]
+        
+       // [modelInstanceList: modelsList, modelInstanceTotal: Model.count()]
     }
 
     def create = {

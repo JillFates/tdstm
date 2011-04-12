@@ -51,7 +51,7 @@
     
     <div class="main_body">
 
-      <div class="header">
+      <div class="tds_header">
       <g:if test="${setImage}">
       	<div class="header_left">
     	  <img src="${createLink(controller:'project', action:'showImage', id:setImage)} " style="height: 30px;"/>

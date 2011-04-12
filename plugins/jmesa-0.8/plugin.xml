@@ -1,0 +1,6 @@
+<plugin name='jmesa' version='0.8'>
+  <author>jeff.jie</author>
+  <resources>
+    <resource>JmesaTagLib</resource>
+  </resources>
+</plugin>

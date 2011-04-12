@@ -1,63 +1,52 @@
-
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="companyHeader" />
         <title>Model List</title>
+    <script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jquery.jmesa.js")}"></script>
+        <script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
+
+        <link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
+        <script type="text/javascript">
+        function onInvokeAction(id) {
+            setExportToLimit(id, '');
+            createHiddenInputFieldsForLimitAndSubmit(id);
+        }
+        function onInvokeExportAction(id) {
+            var parameterString = createParameterStringForLimit(id);
+            location.href = '../list?' + parameterString;
+        }
+        </script>
     </head>
     <body>
-        <div class="body"><g:form action="create" method="post">
+    <div class="body">
             <h1>Model List</h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
-            <div class="list">
-                <table>
-                    <thead>
-                        <tr>
-                        
-                            <g:sortableColumn property="modelName" title="${message(code: 'model.modelName.label', default: 'Model Name')}" />
-                        
-                            <g:sortableColumn property="manufacturer" title="${message(code: 'model.manufacturer.label', default: 'Manufacturer')}" />
-                        
-                            <g:sortableColumn property="description" title="${message(code: 'model.description.label', default: 'Description')}" />
-                        
-                            <g:sortableColumn property="assetType" title="${message(code: 'model.assetType.label', default: 'Asset Type')}" />
-                        
-                            <g:sortableColumn property="powerUse" title="${message(code: 'model.powerUse.label', default: 'powerUse')}" />
-                            
-                            <g:sortableColumn property="connector" title="No Of Connectors" />
-                        
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <g:each in="${modelInstanceList}" status="i" var="modelInstance">
-                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                        
-                            <td><g:link action="show" id="${modelInstance.id}">${fieldValue(bean: modelInstance, field: "modelName")}</g:link></td>
-                        
-                            <td>${fieldValue(bean: modelInstance, field: "manufacturer")}</td>
-                        
-                            <td>${fieldValue(bean: modelInstance, field: "description")}</td>
-                        
-                            <td>${fieldValue(bean: modelInstance, field: "assetType")}</td>
-                        
-                            <td>${modelInstance?.powerUse ? modelInstance?.powerUse+'W' : ''}</td>
-                            
-                        	<td>${ModelConnector.countByModel(modelInstance)}</td>
-                        </tr>
-                    </g:each>
-                    </tbody>
-                </table>
-            </div>
-            <div class="paginateButtons">
-                <g:paginate total="${modelInstanceTotal}" />
+            <div>
+            <form name="modelForm" action="list">
+                <jmesa:tableFacade id="tag" items="${modelsList}" maxRows="15" exportTypes="csv,excel" stateAttr="restore" var="modelInstance" autoFilterAndSort="true" >
+                    <jmesa:htmlTable style=" border-collapse: separate">
+                        <jmesa:htmlRow>
+                            <jmesa:htmlColumn property="modelName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+								<g:link action="show" id="${modelInstance.id}">${modelInstance.modelName}</g:link>
+							 </jmesa:htmlColumn>
+							 <jmesa:htmlColumn property="manufacturer.name" title="Manufacturer" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${modelInstance.manufacturer}</jmesa:htmlColumn>
+                            <jmesa:htmlColumn property="description" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${modelInstance.description}</jmesa:htmlColumn>
+                            <jmesa:htmlColumn property="assetType" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${modelInstance.assetType}</jmesa:htmlColumn>
+                            <jmesa:htmlColumn property="powerUse" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${modelInstance.powerUse}</jmesa:htmlColumn>
+                            <jmesa:htmlColumn width="50px" property="id" sortable="false" filterable="false" title="No Of Connectors">${ModelConnector.countByModel(modelInstance)}</jmesa:htmlColumn>
+                        </jmesa:htmlRow>
+                    </jmesa:htmlTable>
+                </jmesa:tableFacade>
+            </form>
             </div>
             <div class="buttons"> 
+            <g:form action="create" method="post">
 				<span class="button"><g:actionSubmit class="save" action="Create" value="Create Model" /></span>
-			</div>
 			</g:form>
+			</div>
         </div>
     </body>
 </html>
