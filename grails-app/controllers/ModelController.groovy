@@ -41,7 +41,7 @@ class ModelController {
         Limit limit = tableFacade.limit
 		if(limit.isExported()){
             tableFacade.setExportTypes(response,limit.getExportType())
-            tableFacade.setColumnProperties("modelName","manufacturer")
+            tableFacade.setColumnProperties("modelName","manufacturer","description","assetType","powerUse")
             tableFacade.render()
         }else
             return [modelsList : modelsList]

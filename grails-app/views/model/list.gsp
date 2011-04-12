@@ -3,7 +3,6 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="companyHeader" />
         <title>Model List</title>
-    <script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jquery.jmesa.js")}"></script>
         <script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
 
         <link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
