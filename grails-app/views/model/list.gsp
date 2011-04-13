@@ -35,7 +35,7 @@
                             <jmesa:htmlColumn property="description" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${modelInstance.description}</jmesa:htmlColumn>
                             <jmesa:htmlColumn property="assetType" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${modelInstance.assetType}</jmesa:htmlColumn>
                             <jmesa:htmlColumn property="powerUse" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${modelInstance.powerUse}</jmesa:htmlColumn>
-                            <jmesa:htmlColumn width="50px" property="id" sortable="false" filterable="false" title="No Of Connectors">${ModelConnector.countByModel(modelInstance)}</jmesa:htmlColumn>
+                            <jmesa:htmlColumn width="50px" property="noOfConnectors" sortable="true" filterable="true" title="No Of Connectors">${modelInstance.noOfConnectors}</jmesa:htmlColumn>
                         </jmesa:htmlRow>
                     </jmesa:htmlTable>
                 </jmesa:tableFacade>

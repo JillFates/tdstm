@@ -98,4 +98,11 @@ class Model {
 	def getAssetTypeList(){
 		return EavAttributeOption.findAllByAttribute(EavAttribute.findByAttributeCode("assetType"))?.value
 	}
+	/*******************************************************************
+	 * @return : Total number of connectors associated with this model
+	 * @param : this model
+	 * ****************************************************************/
+	def getNoOfConnectors(){
+		return ModelConnector.countByModel( this )
+	}
 }
