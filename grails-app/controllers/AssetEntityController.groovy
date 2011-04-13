@@ -11,6 +11,10 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
 import com.tdssrc.grails.GormUtil
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import org.jmesa.facade.TableFacade
+import org.jmesa.facade.TableFacadeImpl
+import org.jmesa.limit.Limit
+
 class AssetEntityController {	
     //TODO : Fix indentation
 	def missingHeader = ""
@@ -571,7 +575,7 @@ class AssetEntityController {
 	 * @author Mallikarjun
 	 * @return bollenValue 
 	 *------------------------------------------------------- */  
-    def checkHeader( def list, def sheetColumnNames  ) {       
+    def checkHeader( def list, def sheetColumnNames  ) {  
         def listSize = list.size()
         for ( int coll = 0; coll < listSize; coll++ ) {
             if( sheetColumnNames.containsKey( list[coll] ) ) {
@@ -595,21 +599,35 @@ class AssetEntityController {
      *-------------------------------------------*/
     def list = {
     	
-        userPreferenceService.loadPreferences("MAX_ASSET_LIST")
+       /* userPreferenceService.loadPreferences("MAX_ASSET_LIST")
         def userMax = getSession().getAttribute("MAX_ASSET_LIST")
         if(userMax.MAX_ASSET_LIST){
         	if(!params.max) params.max = userMax.MAX_ASSET_LIST
         }else{
         	if(!params.max) params.max = 50
-        }
+        }*/
         def projectId = params.projectId
         if(projectId == null || projectId == ""){
         	projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
         }
         def project = Project.findById( projectId )
         def assetEntityInstanceList = AssetEntity.findAllByProject( project, params ) 
-        [ assetEntityInstanceList: assetEntityInstanceList, projectId: projectId,maxVal : params.max,
-		  filterParams: com.zeddware.grails.plugins.filterpane.FilterUtils.extractFilterParams(params)]
+		try{
+		TableFacade tableFacade = new TableFacadeImpl("tag",request)
+        tableFacade.items = assetEntityInstanceList
+        Limit limit = tableFacade.limit
+		if(limit.isExported()){
+            tableFacade.setExportTypes(response,limit.getExportType())
+            tableFacade.setColumnProperties("id","application","assetName","shortName","serialNumber","assetTag","manufacturer","model","assetType","bladeSize","ipAddress","os","sourceLocation","sourceRoom","sourceRack","sourceRackPosition","sourceBladeChassis","sourceBladePosition","targetLocation","targetRoom","targetRack","targetRackPosition","targetBladeChassis","targetBladePosition","custom1","custom2","custom3","custom4","custom5","custom6","custom7","custom8","moveBundle","sourceTeam","targetTeam","truck","cart","shelf","railType","appOwner","appSme","priority")
+            tableFacade.render()
+        }else
+            return [assetEntityInstanceList : assetEntityInstanceList,projectId: projectId]
+		} catch(Exception ex ){
+			return [assetEntityInstanceList : null,projectId: projectId]
+		}
+        
+        /*[ assetEntityInstanceList: assetEntityInstanceList, projectId: projectId,maxVal : params.max,
+		  filterParams: com.zeddware.grails.plugins.filterpane.FilterUtils.extractFilterParams(params)]*/
     }   
     /* ----------------------------------------
      * delete assetEntity
@@ -680,7 +698,6 @@ class AssetEntityController {
      * @return assetList Page
      * ------------------------------------------ */
     def save = {
-    		
     	def manufacturerId = params.manufacturer
 		if( manufacturerId )
 			params["manufacturer"] = Manufacturer.get(manufacturerId)

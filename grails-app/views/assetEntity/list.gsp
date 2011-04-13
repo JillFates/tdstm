@@ -13,7 +13,18 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
 
 <g:javascript src="asset.tranman.js" />
-
+<script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
+<link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
+<script type="text/javascript">
+function onInvokeAction(id) {
+    setExportToLimit(id, '');
+    createHiddenInputFieldsForLimitAndSubmit(id);
+}
+function onInvokeExportAction(id) {
+    var parameterString = createParameterStringForLimit(id);
+    location.href = 'list?' + parameterString;
+}
+</script>
 <script type="text/javascript">
 	      $(document).ready(function() {
 	        $("#showDialog").dialog({ autoOpen: false })
@@ -102,126 +113,80 @@
 
 <div class="body">
 <h1>Asset Entity List</h1>
-<form id="filterFormSmall" name=filterFormSmall" action="filter" method="post"><input type=hidden name="filterProperties" value="assetName">
-<input type="hidden" name="filter.op.assetName" id="filter.op.assetName" value="ILike">Filter Name:<input type="text" name="filter.assetName" value id="assetName">
-<input type="hidden" name="_action_filter" value="Apply">
-</form>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
 <input type="hidden" id="role" value="role"/>
-<div class="list">
-<table id="assetEntityTable">
-	<thead>
-		<tr>
-
-			<th>Actions</th>			
-
-			<g:sortableColumn property="application" title="Application" params="${filterParams}"/>
-			
-			<g:sortableColumn property="assetName" title="Asset Name" params="${filterParams}"/>
-			
-			<g:sortableColumn property="model" title="Model" params="${filterParams}"/>
-
-			<g:sortableColumn property="sourceLocation" title="Source Location" params="${filterParams}"/>
-
-			<g:sortableColumn property="sourceRack" title="Source Rack/Cab" params="${filterParams}"/>
-
-			<g:sortableColumn property="targetLocation"	title="Target Location" params="${filterParams}"/>
-			
-			<g:sortableColumn property="targetRack"	title="Target Rack/Cab" params="${filterParams}"/>
-			
-
-			<g:sortableColumn property="assetType" title="Asset Type" params="${filterParams}"/>
-
-			<g:sortableColumn property="assetTag" title="Asset Tag" params="${filterParams}"/>
-
-			<g:sortableColumn property="serialNumber" title="Serial #" params="${filterParams}"/>
-			
-			<g:sortableColumn property="moveBundle" title="Move Bundle &nbsp;" params="${filterParams}"/>
-
-
-		</tr>
-	</thead>
-	<tbody>
-		<g:each in="${assetEntityInstanceList}" status="i"
-			var="assetEntityInstance">
-			<tr id="assetRow_${assetEntityInstance.id}" 
-				onmouseover="style.backgroundColor='#87CEEE';"
-				onmouseout="style.backgroundColor='white';" >
-
-				<td><g:remoteLink controller="assetEntity" action="editShow" id="${assetEntityInstance.id}" before="document.showForm.id.value = ${assetEntityInstance.id};document.editForm.id.value = ${assetEntityInstance.id};" onComplete="showAssetDialog( e , 'edit');">
-					<img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/>
-				</g:remoteLink>
-				<span id="icon_${assetEntityInstance.id}">
-				<g:if test="${AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetEntityInstance,'issue',0])}">
-					<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
-						<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="0px"/>
-					</g:remoteLink>
-				</g:if>
-				<g:elseif test="${AssetComment.findByAssetEntity(assetEntityInstance)}">
-				<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
-					<img src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px"/>
-				</g:remoteLink>
-				</g:elseif>
-				<g:else>
-				<a href="#" onclick="$('#createAssetCommentId').val(${assetEntityInstance.id});$('#statusId').val('new');$('#createCommentDialog').dialog('option', 'width', 'auto');$('#createCommentDialog').dialog('open');$('#commentsListDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">
-					<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px"/>
-				</a>
-				</g:else></span>
-				</td>
-				
-				<td id="application_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )"> ${fieldValue(bean:assetEntityInstance, field:'application')} </td>
-
-				<td><a href="#" id="assetName_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${fieldValue(bean:assetEntityInstance, field:'assetName')}</a> </td>
-
-				<td id="model_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${fieldValue(bean:assetEntityInstance, field:'model')}</td>
-
-				<td id="sourceLocation_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${fieldValue(bean:assetEntityInstance, field:'sourceLocation')}</td>
-
-				<td id="sourceRack_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${fieldValue(bean:assetEntityInstance, field:'sourceRack')}</td>
-
-				<td id="targetLocation_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${fieldValue(bean:assetEntityInstance, field:'targetLocation')}</td>
-				
-				<td id="targetRack_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${fieldValue(bean:assetEntityInstance, field:'targetRack')}</td>
-
-				<td id="assetType_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${fieldValue(bean:assetEntityInstance, field:'assetType')}</td>
-
-				<td id="assetTag_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${fieldValue(bean:assetEntityInstance, field:'assetTag')}</td>
-
-				<td id="serialNumber_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${fieldValue(bean:assetEntityInstance, field:'serialNumber')}</td>
-				
-				<td id="moveBundle_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${fieldValue(bean:assetEntityInstance, field:'moveBundle')}</td>
-
-			</tr>
-		</g:each>
-	</tbody>
-</table>
-
-</div>
-
-<div class="paginateButtons">
-<g:form name="paginateRows" action="list">
-<table>
-<tr>
-<td style="width: 770px;">
-<g:paginate total="${assetEntityCount == null ? AssetEntity.findAll('from AssetEntity where project = '+projectId).size() :  assetEntityCount }" params="${filterParams}"/>
-<filterpane:filterButton textKey="fp.tag.filterButton.text" appliedTextKey="fp.tag.filterButton.appliedText" text="Filter Me" appliedText="Change Filter" />
-<filterpane:isNotFiltered>Pure and Unfiltered!</filterpane:isNotFiltered>
-<filterpane:isFiltered>Filter Applied!</filterpane:isFiltered>
-</td>
-<td >
-Rows per Page:&nbsp;<g:select  from="[25,50,100,200]" id="rowVal" name="rowVal" value="${maxVal}" onchange="document.filterForm.rowVal.value = this.value;document.filterForm.submit();"></g:select></td>
-</table>
-</g:form>
+<div>
+	<form name="assetEntityForm" action="list">
+		<jmesa:tableFacade id="tag" items="${assetEntityInstanceList}" maxRows="15" exportTypes="csv,excel" stateAttr="restore" var="assetEntityInstance" autoFilterAndSort="true" >
+		    <jmesa:htmlTable style=" border-collapse: separate">
+		        <jmesa:htmlRow>
+		        	<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" >
+		        		<g:remoteLink controller="assetEntity" action="editShow" id="${assetEntityInstance.id}" before="document.showForm.id.value = ${assetEntityInstance.id};document.editForm.id.value = ${assetEntityInstance.id};" onComplete="showAssetDialog( e , 'edit');">
+							<img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/>
+						</g:remoteLink>
+						<span id="icon_${assetEntityInstance.id}">
+							<g:if test="${AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetEntityInstance,'issue',0])}">
+								<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
+									<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="0px"/>
+								</g:remoteLink>
+							</g:if>
+							<g:elseif test="${AssetComment.findByAssetEntity(assetEntityInstance)}">
+							<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
+								<img src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px"/>
+							</g:remoteLink>
+							</g:elseif>
+							<g:else>
+							<a href="#" onclick="$('#createAssetCommentId').val(${assetEntityInstance.id});$('#statusId').val('new');$('#createCommentDialog').dialog('option', 'width', 'auto');$('#createCommentDialog').dialog('open');$('#commentsListDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();">
+								<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px"/>
+							</a>
+							</g:else>
+						</span>
+		        	</jmesa:htmlColumn>
+		        	<jmesa:htmlColumn property="application" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        		<span  onclick="showAssetDetails( ${assetEntityInstance.id} )">${assetEntityInstance.application}</span>
+		        	</jmesa:htmlColumn>
+		        	<jmesa:htmlColumn property="assetName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        		<a href="#" id="assetName_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${assetEntityInstance.assetName}</a>
+		        	</jmesa:htmlColumn>
+		        	<jmesa:htmlColumn property="model" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        		<span id="model_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${assetEntityInstance.model}</span>
+		        	</jmesa:htmlColumn>
+		        	<jmesa:htmlColumn property="sourceLocation" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        		<span id="sourceLocation_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${assetEntityInstance.sourceLocation}</span>
+		        	</jmesa:htmlColumn>
+		        	<jmesa:htmlColumn property="sourceRack" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        		<span id="sourceRack_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${assetEntityInstance.sourceRack}</span>
+		        	</jmesa:htmlColumn>
+		        	<jmesa:htmlColumn property="targetLocation" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        		<span id="targetLocation_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${assetEntityInstance.targetLocation}</span>
+		        	</jmesa:htmlColumn>
+		        	<jmesa:htmlColumn property="targetRack" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        		<span id="targetRack_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${assetEntityInstance.targetRack}</span>
+		        	</jmesa:htmlColumn>
+		        	<jmesa:htmlColumn property="assetType" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        		<span id="assetType_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${assetEntityInstance.assetType}</span>
+		        	</jmesa:htmlColumn>
+		        	<jmesa:htmlColumn property="assetTag" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        		<span id="assetTag_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${assetEntityInstance.assetTag}</span>
+		        	</jmesa:htmlColumn>
+		        	<jmesa:htmlColumn property="serialNumber" title="Serial #" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        		<span id="serialNumber_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${assetEntityInstance.serialNumber}</span>
+		        	</jmesa:htmlColumn>
+		        	<jmesa:htmlColumn property="moveBundle" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        		<span id="moveBundle_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${assetEntityInstance.moveBundle}</span>
+		        	</jmesa:htmlColumn>
+		        </jmesa:htmlRow>
+			</jmesa:htmlTable>
+		</jmesa:tableFacade>
+	</form>
 </div>
 <div class="buttons"><g:form>
 	<span class="button"><input type="button"
 		value="New Asset Entity" class="create" onClick="createDialog()" /></span>
 </g:form></div>
-<filterpane:filterPane domainBean="AssetEntity"  excludeProperties="sourceRackPosition,targetRackPosition,railType,ipAddress,os,planStatus,truck,priority,cart,shelf,dateCreated,project.name" />
-</div>
-
+</div> <%-- End of Body --%>
 <div id="createDialog" title="Create Asset Entity" style="display: none;">
 <g:form action="save" method="post" name="createForm" >
 
