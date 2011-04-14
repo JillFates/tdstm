@@ -8,6 +8,9 @@ import com.tdssrc.grails.GormUtil
 import java.text.SimpleDateFormat
 import java.text.DateFormat
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.jmesa.facade.TableFacade
+import org.jmesa.facade.TableFacadeImpl
+import org.jmesa.limit.Limit
 
 class ReportsController {
 	
@@ -1080,5 +1083,176 @@ class ReportsController {
 				return;
 			}
         }
+	}
+	/*
+	 * request page for power report
+	 */
+	def powerReport = {
+		def currProj = getSession().getAttribute( "CURR_PROJ" )
+		def projectId = currProj.CURR_PROJ
+		def projectInstance = Project.findById( projectId )
+		def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
+		userPreferenceService.loadPreferences("CURR_BUNDLE")
+		def currentBundle = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
+		/* set first bundle as default if user pref not exist */
+		def isCurrentBundle = true
+		def models = AssetEntity.findAll('FROM AssetEntity WHERE project = ? GROUP BY model',[ projectInstance ])?.model
+		if(!currentBundle){
+			currentBundle = moveBundleInstanceList[0]?.id?.toString()
+			isCurrentBundle = false
+		}
+		
+		return [moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, 
+				currentBundle:currentBundle, isCurrentBundle : isCurrentBundle, models:models]
+	}
+	/*
+	 *  Generate Power report in WEb, PDF, Excel format based on user input
+	 */
+	def powerReportDetails = {
+
+		List bundleId = request.getParameterValues("moveBundle")
+		def maxUSize = 42
+		if(bundleId == "null") {
+			return [errorMessage: "Please Select a Bundle."]
+		} else {
+			def includeOtherBundle = params.otherBundle
+			def includeBundleName = params.bundleName
+			def printQuantity = params.printQuantity
+			def frontView = params.frontView
+			def backView = params.backView
+			def sourceRacks = new ArrayList()
+			def targetRacks = new ArrayList()
+			def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
+			def rackLayout = []
+			def project = Project.findById(projectId)
+			def moveBundles = MoveBundle.findAllByProject( project )
+			if(!bundleId.contains("all")){
+				def bundlesString = bundleId.toString().replace("[","(").replace("]",")")
+				moveBundles = MoveBundle.findAll("from MoveBundle m where id in ${bundlesString} ")
+			}
+			def isAdmin = SecurityUtils.getSubject().hasRole("PROJ_MGR")
+			if( !isAdmin ) {
+				isAdmin = SecurityUtils.getSubject().hasRole("PROJECT_ADMIN")
+			}
+			
+			if(request.getParameterValues("sourcerack") != ['none']) {
+				def rack = request.getParameterValues("sourcerack")
+				if(rack[0] == "") {
+					moveBundles.each{ bundle->
+						bundle.sourceRacks.each{ sourceRack->
+							if( !sourceRacks.contains( sourceRack ) )
+								sourceRacks.add( sourceRack )		
+						}
+					}
+				} else {
+					rack.each {
+						def thisRack = Rack.get(new Long(it))
+						if( !sourceRacks.contains( thisRack ) )
+							sourceRacks.add( thisRack )
+					}
+				}
+				sourceRacks = sourceRacks.sort { it.tag }
+			}
+
+			if(request.getParameterValues("targetrack") != ['none']) {
+				def rack = request.getParameterValues("targetrack")
+				if(rack[0] == "") {
+					moveBundles.each{ bundle->
+						bundle.targetRacks.each{ targetRack->
+							if( !targetRacks.contains( targetRack ) )
+								targetRacks.add( targetRack	)
+						}
+					}
+				} else {
+					rack.each {
+						def thisRack = Rack.get(new Long(it))
+						if( !targetRacks.contains( thisRack ) )
+							targetRacks.add( thisRack )
+					}
+				}
+				targetRacks = targetRacks.sort { it.tag }
+			}
+			
+			def racks = sourceRacks + targetRacks
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ	
+			def reportDetails = []
+			racks.each { rack->
+				def assets = rack.assets.findAll { it.assetType !='Blade' && moveBundles?.id?.contains(it.moveBundle?.id) && it.project == project }
+				def powerA = 0
+				def powerB = 0
+				def powerC = 0
+				def powerTBD = 0
+				def totalPower = 0
+				assets.each{ asset->
+					def assetPowerCabling = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.fromConnectorNumber.type = ? AND cap.fromAsset = ?",["Power",asset])
+					def powerConnectors = assetPowerCabling.size()
+					def powerUse = asset.model?.powerUse ? asset.model?.powerUse : 0
+					totalPower += powerUse
+					if(powerConnectors){
+						def powerUseForConnector = powerUse ? powerUse / powerConnectors : 0
+						assetPowerCabling.each{ cables ->
+							if(cables.toPower){
+								switch(cables.toPower){
+									case "A": powerA += powerUseForConnector
+									break;
+									case "B": powerB += powerUseForConnector
+									break;
+									case "C": powerC += powerUseForConnector
+									break;
+								}
+							} else {
+								powerTBD += powerUseForConnector
+							}
+						}
+					} else {
+						powerTBD += powerUse
+					}
+				}
+				reportDetails << [location:rack.location, room:rack.room, rack:rack.tag, devices:assets.size(),
+								  powerA:powerA,powerB:powerB,powerC:powerC,powerTBD:powerTBD,totalPower:totalPower]
+			}
+			if(params.output == "excel"){
+				try {
+					File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Power_Report.xls" ).getFile()
+					WorkbookSettings wbSetting = new WorkbookSettings()
+					wbSetting.setUseTemporaryFileDuringWrite(true)
+					def workbook = Workbook.getWorkbook( file, wbSetting )
+					//set MIME TYPE as Excel
+					response.setContentType( "application/vnd.ms-excel" )
+					def filename = 	"Power_Report-${project.name}.xls"
+						filename = filename.replace(" ", "_")
+					response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
+					
+					def book = Workbook.createWorkbook( response.getOutputStream(), workbook )
+					
+					def sheet = book.getSheet("Power_Report")
+					
+					for ( int r = 1; r <= reportDetails.size(); r++ ) {
+						sheet.addCell( new Label( 0, r, String.valueOf(reportDetails[r-1].location )) )
+						sheet.addCell( new Label( 1, r, String.valueOf(reportDetails[r-1].room )) )
+						sheet.addCell( new Label( 2, r, String.valueOf(reportDetails[r-1].rack )) )
+						sheet.addCell( new Label( 3, r, String.valueOf(reportDetails[r-1].devices )) )
+						sheet.addCell( new Label( 4, r, String.valueOf(reportDetails[r-1].powerA )) )
+						sheet.addCell( new Label( 5, r, String.valueOf(reportDetails[r-1].powerB )) )
+						sheet.addCell( new Label( 6, r, String.valueOf(reportDetails[r-1].powerC )) )
+						sheet.addCell( new Label( 7, r, String.valueOf(reportDetails[r-1].powerTBD )) )
+						sheet.addCell( new Label( 8, r, String.valueOf(reportDetails[r-1].totalPower )) )
+					}
+					
+					book.write()
+					book.close()
+				} catch( Exception ex ) {
+					println "Exception occurred while exporting data"+ex
+					return;
+				}
+			} else if(params.output == "pdf"){
+				def filename = 	"Power_Report-${project.name}"
+					filename = filename.replace(" ", "_")
+        		
+				chain(controller:'jasper',action:'index',model:[data:reportDetails],
+						params:["_format":"PDF","_name":"${filename}","_file":"Power_Report"])
+			}
+			return [reportDetails : reportDetails]
+		}
 	}
 }
