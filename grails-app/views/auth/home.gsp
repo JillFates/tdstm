@@ -17,38 +17,7 @@ a:hover {
 </g:if>
 <table style="border: 0">
 	<tr>
-		<td>
-		<table>
-			<thead>
-				<tr>
-					<th colspan="2">List of Party Actions</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr class="odd">
-					<td><g:link controller="partyGroup" style="color:black">Company</g:link></td>
-					<td><g:link controller="roleType" style="color:black">Role Type </g:link></td>
-				</tr>
-				<tr class="even">
-					<td><g:link controller="partyRelationship" style="color:black">Party Relationship</g:link></td>
-					<td><g:link controller="partyRelationshipType"
-						style="color:black">Party RelationshipType</g:link></td>
-				</tr>
-				<tr class="odd">
-					<td><g:link controller="userLogin" style="color:black">Manage Users</g:link></td>
-					<td><g:link controller="refCode" style="color:black">Manage RefCode</g:link></td>
-				</tr>
-				<tr class="odd">
-					<td><g:link controller="admin" action="orphanSummary"
-						style="color:black">Manage Orphan Records</g:link></td>
-					<td></td>
-				</tr>
-			</tbody>
-		</table>
-		</td>
-	</tr>
-	<tr>
-		<td>
+		<td style="vertical-align:top">
 			<div>
 			<h1 style="margin-right: 0px;"><b>Recent Users</b></h1>
 			<table>
@@ -73,7 +42,7 @@ a:hover {
 			</table>
 			</div>
 		</td>
-		<td>
+		<td style="vertical-align:top">
 			<div>
 			<h1 style="margin-right: 0px;"><b>Current and Recent Events</b></h1>
 			<table>
@@ -130,6 +99,36 @@ a:hover {
 						</g:else>
 					</tbody>
 				</table>
+			</div>
+			<br />
+			<div>
+		<table>
+			<thead>
+				<tr>
+					<th colspan="2">List of Party Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="odd">
+					<td><g:link controller="partyGroup" style="color:black">Company</g:link></td>
+					<td><g:link controller="roleType" style="color:black">Role Type </g:link></td>
+				</tr>
+				<tr class="even">
+					<td><g:link controller="partyRelationship" style="color:black">Party Relationship</g:link></td>
+					<td><g:link controller="partyRelationshipType"
+						style="color:black">Party RelationshipType</g:link></td>
+				</tr>
+				<tr class="odd">
+					<td><g:link controller="userLogin" style="color:black">Manage Users</g:link></td>
+					<td><g:link controller="refCode" style="color:black">Manage RefCode</g:link></td>
+				</tr>
+				<tr class="odd">
+					<td><g:link controller="admin" action="orphanSummary"
+						style="color:black">Manage Orphan Records</g:link></td>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
 			</div>
 		</td>
 	</tr>
