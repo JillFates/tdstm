@@ -136,7 +136,6 @@
 			<li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">PMO Asset Tracking</g:link> </li>
 	        </jsec:hasAnyRole>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"><li><a href="#" onclick="showReportsMenu();this.style.background='#003366';">Reports</a></li></jsec:lacksAllRoles>
-	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"><li><g:link class="home" controller="reports" action="powerReport">Power Report</g:link></li></jsec:lacksAllRoles>
 	      </ul>
 	    </div>
 	    <div class="menu2" id="assetMenu" style="background-color:#003366;display: none;">
@@ -153,11 +152,12 @@
 			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'cart Asset']">Logistics Team Worksheets</g:link></li>
 			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Transportation Asset List']">Transport Worksheets</g:link></li>
 			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Issue Report']">Issue Report</g:link></li>
-			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Rack Layout']">Rack Elevations</g:link></li>
+			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Rack Layout']">Racks</g:link></li>
 			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'MoveResults']">Move Results</g:link></li>
 			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'CablingQA']">Cabling QA</g:link></li>
 			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'CablingConflict']">Cabling Conflict</g:link></li>
 			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'CablingData']">Cabling Data</g:link></li>
+			<li><g:link class="home" controller="reports" action="powerReport">Power</g:link></li>
 			</ul>
 		</div>
 		<g:if test="${moveEvent && moveEvent?.inProgress == 'true'}">
