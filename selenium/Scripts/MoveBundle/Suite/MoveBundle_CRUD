@@ -18,6 +18,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>storeEval</td>
+	<td>javascript{var startTime=new Date().getTime(); startTime;}</td>
+	<td>tdssuitestart</td>
+</tr>
+<tr>
 	<td>open</td>
 	<td>/tdstm/auth/login</td>
 	<td></td>
@@ -487,7 +492,16 @@
 	<td>MoveBundle ${BundleName} deleted</td>
 	<td></td>
 </tr>
-
+<tr>
+	<td>storeEval</td>
+	<td>javascript{var endTime=new Date().getTime(); var tdsdur=endTime -storedVars['tdssuitestart'];tdsdur;}</td>
+	<td>tdssuiteduration</td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>javascript{var tdsdur=storedVars['tdssuiteduration'];alert('It took ' + tdsdur + 'msec to run');'suite duration '+tdsdur+' msec';}</td>
+	<td></td>
+</tr>
 </tbody></table>
 </body>
 </html>
