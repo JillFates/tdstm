@@ -3,6 +3,11 @@ import java.util.Date;
 
 import org.jsecurity.SecurityUtils
 import com.tdssrc.grails.GormUtil
+
+import org.jmesa.facade.TableFacade
+import org.jmesa.facade.TableFacadeImpl
+import org.jmesa.limit.Limit
+
 class ProjectUtilController {
 
 	def userPreferenceService
@@ -54,7 +59,15 @@ class ProjectUtilController {
 						"or p.client = ${userCompany?.partyIdFrom?.id} order by ${sort} ${order}"
     			projectList = Project.findAll(query)
     	}
-    	return [ projectList:projectList ]
+		TableFacade tableFacade = new TableFacadeImpl("tag",request)
+        tableFacade.items = projectList
+        Limit limit = tableFacade.limit
+		if(limit.isExported()){
+            tableFacade.setExportTypes(response,limit.getExportType())
+            tableFacade.setColumnProperties("projectCode","name","dateCreated","lastUpdated","comment")
+            tableFacade.render()
+        }else
+        	return [ projectList:projectList ]
     }
     /*
      * Action to setPreferences
