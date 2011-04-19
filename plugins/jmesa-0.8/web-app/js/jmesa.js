@@ -103,9 +103,9 @@ TableFacade.prototype.createHiddenInputFields = function(form) {
     var limit = this.limit;
 
     var exists = jQuery(form).find(':hidden[@name=' + limit.id + '_p_]').val();
-    if (exists) {
+    /*if (exists) {
         return false;
-    }
+    }*/
 
     if (this.worksheet.save) {
         jQuery(form).append('<input type="hidden" name="' + limit.id + '_sw_" value="true"/>');

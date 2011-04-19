@@ -162,5 +162,13 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 			println"$ex"
 		}
 	}
-	
+	/*
+	 *  methods for JMESA filter/sort
+	 */
+	def getModelName(){
+		return this.model?.modelName
+	}
+	def getMoveBundleName(){
+		return this.moveBundle?.name
+	}
 }

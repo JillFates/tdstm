@@ -119,7 +119,7 @@ function onInvokeExportAction(id) {
 <input type="hidden" id="role" value="role"/>
 <div>
 	<form name="assetEntityForm" action="list">
-		<jmesa:tableFacade id="tag" items="${assetEntityInstanceList}" maxRows="15" exportTypes="csv,excel" stateAttr="restore" var="assetEntityInstance" autoFilterAndSort="true" >
+		<jmesa:tableFacade id="tag" items="${assetEntityInstanceList}" maxRows="25" exportTypes="csv,excel" stateAttr="restore" var="assetEntityInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
 		    <jmesa:htmlTable style=" border-collapse: separate">
 		        <jmesa:htmlRow>
 		        	<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" >
@@ -150,7 +150,7 @@ function onInvokeExportAction(id) {
 		        	<jmesa:htmlColumn property="assetName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<a href="#" id="assetName_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${assetEntityInstance.assetName}</a>
 		        	</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="model" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        	<jmesa:htmlColumn property="modelName" title="Model" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<span id="model_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${assetEntityInstance.model}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="sourceLocation" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
@@ -174,7 +174,7 @@ function onInvokeExportAction(id) {
 		        	<jmesa:htmlColumn property="serialNumber" title="Serial #" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<span id="serialNumber_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${assetEntityInstance.serialNumber}</span>
 		        	</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="moveBundle" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        	<jmesa:htmlColumn property="moveBundleName" title="Move Bundle" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<span id="moveBundle_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${assetEntityInstance.moveBundle}</span>
 		        	</jmesa:htmlColumn>
 		        </jmesa:htmlRow>

@@ -1,4 +1,8 @@
 import grails.converters.JSON
+import org.jmesa.facade.TableFacade
+import org.jmesa.facade.TableFacadeImpl
+import org.jmesa.limit.Limit
+
 
 class ManufacturerController {
 	
@@ -12,12 +16,21 @@ class ManufacturerController {
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
     def list = {
-        if(!params.max) params.max = 25
+        
         if(!params.sort){ 
         	params.sort = 'name'
 			params.order = 'asc'
         }
-        [ manufacturerInstanceList: Manufacturer.list( params ) ]
+        def manufacturersList = Manufacturer.list( params )
+        TableFacade tableFacade = new TableFacadeImpl("tag",request)
+        tableFacade.items = manufacturersList
+        Limit limit = tableFacade.limit
+		if(limit.isExported()){
+            tableFacade.setExportTypes(response,limit.getExportType())
+            tableFacade.setColumnProperties("name","aka","description")
+            tableFacade.render()
+        }else
+            return [manufacturersList : manufacturersList]
     }
 
     def show = {
