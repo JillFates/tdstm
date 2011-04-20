@@ -5,68 +5,46 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   <meta name="layout" content="projectHeader" />
   <title>MoveBundle List</title>
+<script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
+<link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
+<script type="text/javascript">
+function onInvokeAction(id) {
+    setExportToLimit(id, '');
+    createHiddenInputFieldsForLimitAndSubmit(id);
+}
+</script>
 </head>
 <body>
 
 <div class="body">
-<g:form>
   <h1>MoveBundle List</h1>
   <g:if test="${flash.message}">
     <div class="message">${flash.message}</div>
   </g:if>
-  <div class="list">
-    
-    <table>
-      <thead>
-        <tr>
-
-
-          <g:sortableColumn property="name" title="Name" />
-
-          <g:sortableColumn property="description" title="Description" />
-
-          <g:sortableColumn property="operationalOrder" title="Order" />
-          
-           <g:sortableColumn property="asset" title="Asset Qty" />
-
-          <g:sortableColumn property="startTime" title="Start Time" />
-
-          <g:sortableColumn property="completionTime" title="Completion Time" />
-
-
-        </tr>
-      </thead>
-      <tbody>
-        <g:each in="${moveBundleList}" status="i" var="moveBundle">
-          <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-
-
-            <td><g:link params="[projectId:projectId]" action="show" id="${moveBundle?.bundle?.id}">${moveBundle?.bundle?.name}</g:link></td>
-
-            <td>${moveBundle?.bundle?.description}</td>
-
-            <td>${moveBundle?.bundle?.operationalOrder}</td>
-            
-            <td>${moveBundle?.assetCount}</td>
-
-            <td><tds:convertDateTime date="${moveBundle?.bundle?.startTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-
-            <td><tds:convertDateTime date="${moveBundle?.bundle?.completionTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-
-
-          </tr>
-        </g:each>
-      </tbody>
-    </table>
+  <div>
+    <form name="projectForm" action="list">
+         <jmesa:tableFacade id="tag" items="${moveBundleInstanceList}" maxRows="25" stateAttr="restore" var="moveBundle" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
+             <jmesa:htmlTable style=" border-collapse: separate">
+                 <jmesa:htmlRow>
+                     <jmesa:htmlColumn property="name" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+						<g:link params="[projectId:projectId]" action="show" id="${moveBundle?.id}">${moveBundle?.name}</g:link>
+					 </jmesa:htmlColumn>
+					 <jmesa:htmlColumn property="description" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${moveBundle?.description}</jmesa:htmlColumn>
+					 <jmesa:htmlColumn property="operationalOrder" title="Order" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${moveBundle?.operationalOrder}</jmesa:htmlColumn>
+					 <jmesa:htmlColumn property="assetQty" title="Asset Qty" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${moveBundle?.assetQty}</jmesa:htmlColumn>
+                     <jmesa:htmlColumn property="dateCreated" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor"><tds:convertDateTime date="${moveBundle?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>
+                     <jmesa:htmlColumn property="lastUpdated" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor"><tds:convertDateTime date="${moveBundle?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>
+                 </jmesa:htmlRow>
+             </jmesa:htmlTable>
+         </jmesa:tableFacade>
+     </form>
   </div>
-  <g:if test="${MoveBundle.findAll('from MoveBundle where project = '+projectId).size() > 10}">
-  <div class="paginateButtons">
-    <g:paginate total="${MoveBundle.findAll('from MoveBundle where project = '+projectId).size()}"/>
-  </div>
-  </g:if>
-  <input type="hidden" id="projectId" name="projectId" value="${projectId}"/>
-  <div class="buttons"> <span class="button"><g:actionSubmit	class="save" action="Create" value="Create" /></span></div>
+  <div class="buttons"> 
+  <g:form>
+	<input type="hidden" id="projectId" name="projectId" value="${projectId}"/>
+  	<span class="button"><g:actionSubmit	class="save" action="Create" value="Create" /></span>
   </g:form>
+  </div>
 </div>
 </body>
 </html>

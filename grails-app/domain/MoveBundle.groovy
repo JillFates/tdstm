@@ -40,5 +40,8 @@ class MoveBundle extends Party {
     String toString(){
 		name
 	}
+    def getAssetQty(){
+    	return AssetEntity.countByMoveBundle(this)
+    }
 
 }
