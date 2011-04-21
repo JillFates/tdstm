@@ -2,6 +2,8 @@ import org.jsecurity.crypto.hash.Sha1Hash;
 import org.jsecurity.SecurityUtils;
 import com.tdssrc.grails.GormUtil
 import java.text.SimpleDateFormat
+import org.jmesa.facade.TableFacade
+import org.jmesa.facade.TableFacadeImpl
 
 class UserLoginController {
     
@@ -47,6 +49,9 @@ class UserLoginController {
 			userLoginInstanceList = UserLogin.list( [max:max, offset:offset] )
 			userLoginSize = UserLogin.count() 
 		}
+		// Statements for JMESA integration
+    	TableFacade tableFacade = new TableFacadeImpl("tag",request)
+        tableFacade.items = userLoginInstanceList
         return [ userLoginInstanceList : userLoginInstanceList, companyId:companyId ,userLoginSize:userLoginSize]
     }
 

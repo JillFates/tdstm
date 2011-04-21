@@ -9,6 +9,8 @@ import java.text.SimpleDateFormat
 import java.text.DateFormat
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.jmesa.facade.TableFacade
+import org.jmesa.facade.TableFacadeImpl
 
 class MoveEventController {
 	
@@ -32,6 +34,9 @@ class MoveEventController {
         if(!params.max) params.max = 10
         def currProj = session.getAttribute("CURR_PROJ").CURR_PROJ;
     	if(currProj) moveEventInstanceList = MoveEvent.findAllByProject( Project.get( currProj ), params )
+		// Statements for JMESA integration
+    	TableFacade tableFacade = new TableFacadeImpl("tag",request)
+        tableFacade.items = moveEventInstanceList
         [ moveEventInstanceList: moveEventInstanceList, projectId : currProj ]
     }
 	/*

@@ -1,3 +1,6 @@
+import org.jmesa.facade.TableFacade
+import org.jmesa.facade.TableFacadeImpl
+
 class PartyGroupController {
     
 	def partyRelationshipService
@@ -9,15 +12,14 @@ class PartyGroupController {
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 	// Will Return PartyGroup list where PartyType = COMPANY
 	def list = {
-        if( !params.max ) params.max = '20'
-		def max = Integer.parseInt( params.max )
 		def sort = params.sort ? params.sort : 'name'
 		def order = params.order ? params.order : 'asc'
-		def offset = params.offset ? Integer.parseInt( params.offset ) : 0
-		def query = "from PartyGroup as p where partyType = 'COMPANY' order by p.${sort} ${order}"
-		def partyGroupList = PartyGroup.findAll( query,[ max : max, offset: offset ] )
-		def partyGroupSize = PartyGroup.findAll( query ).size()
-        [ partyGroupInstanceList: partyGroupList, partyGroupSize:partyGroupSize ]
+		def query = "from PartyGroup as p where partyType = 'COMPANY'"
+		def partyGroupList = PartyGroup.findAll( query )
+		// Statements for JMESA integration
+    	TableFacade tableFacade = new TableFacadeImpl("tag",request)
+        tableFacade.items = partyGroupList
+        return [ partyGroupList: partyGroupList ]
     }
 
     def show = {

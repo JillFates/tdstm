@@ -3,7 +3,9 @@ import java.text.SimpleDateFormat
 import org.jsecurity.crypto.hash.Sha1Hash
 import com.tdssrc.grails.GormUtil
 import java.text.DateFormat
-
+import org.jmesa.facade.TableFacade
+import org.jmesa.facade.TableFacadeImpl
+import net.tds.util.jmesa.PersonBean
 class PersonController {
     
 	def partyRelationshipService
@@ -29,7 +31,28 @@ class PersonController {
         	flash.message = "Please select Company before navigating to Staff"
             redirect(controller:'partyGroup',action:'list')
         }
-		return [ personInstanceList: personInstanceList, companyId:companyId,totalCompanies:companiesList ]
+		List personsList = new ArrayList()
+		personInstanceList.each{
+			PersonBean personBean = new PersonBean()
+			personBean.setId(it.id)
+			personBean.setFirstName(it.firstName)
+			personBean.setLastName(it.lastName)
+			def userLogin = UserLogin.findByPerson(it);
+			if(userLogin){
+				personBean.setUserLogin(userLogin.username)
+				personBean.setUserLoginId(userLogin.id)
+			} else {
+				personBean.setUserLogin("CREATE")
+			}
+			personBean.setDateCreated(it.dateCreated)
+			personBean.setLastUpdated(it.lastUpdated)
+			personsList.add(personBean)
+		}
+		// Statements for JMESA integration
+    	TableFacade tableFacade = new TableFacadeImpl("tag",request)
+        tableFacade.items = personsList
+		
+		return [ personsList: personsList, companyId:companyId,totalCompanies:companiesList ]
     }
 
     def show = {

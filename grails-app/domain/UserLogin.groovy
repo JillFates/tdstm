@@ -38,4 +38,10 @@ class UserLogin {
 	String toString(){
 		username
 	}
+	/*
+	 *  Render person details as firstName + lastName
+	 */
+	def getPersonDetails(){
+		return "${this.person.firstName} ${this.person.lastName}"
+	}
 }

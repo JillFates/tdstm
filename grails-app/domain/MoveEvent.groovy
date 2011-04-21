@@ -67,6 +67,12 @@ class MoveEvent {
 		def eventTimes = jdbcTemplate.queryForMap("SELECT MIN(start_time) as start,  MAX(completion_time) as completion FROM move_bundle WHERE move_event_id = ${id} ")
 		return eventTimes
 	}
+	/*
+	 *  Render moveBundles list as comma separated value string
+	 */
+	def getMoveBundlesString(){
+		return "${this.moveBundles.toString().replace('[','').replace(']','')}"
+	}
     String toString(){
 		name
 	}

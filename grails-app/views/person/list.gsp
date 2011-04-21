@@ -8,7 +8,14 @@
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}"  />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}"  />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}"  />
-
+	<link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
+	<script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
+	<script type="text/javascript">
+	function onInvokeAction(id) {
+	    setExportToLimit(id, '');
+	    createHiddenInputFieldsForLimitAndSubmit(id);
+	}
+	</script>
     <script type="text/javascript">
 
       $(document).ready(function() {
@@ -85,49 +92,31 @@ document.createDialogForm.company.value = ${companyId}
         <div class="message">${flash.message}</div>
       </g:if>
 
-      <div class="list">
-        <table>
-          <thead>
-            <tr>
-              <g:sortableColumn property="firstName" title="First Name" />
-
-              <g:sortableColumn property="lastName" title="Last Name" />
-
-              <th>User Login</th>
-
-              <g:sortableColumn property="dateCreated" title="Date Created" />
-
-              <g:sortableColumn property="lastUpdated" title="Last Updated" />
-
-            </tr>
-          </thead>
-          <tbody>
-            <g:each in="${personInstanceList}" status="i" var="personInstance">
-              <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-
-
-                <td><g:remoteLink controller="person" action="editShow" id="${personInstance.id}" params="[companyId:companyId]" onComplete ="showPersonDialog( e );">${fieldValue(bean:personInstance, field:'firstName')}</g:remoteLink></td>
-
-                <td><g:remoteLink controller="person" action="editShow" id="${personInstance.id}" params="[companyId:companyId]" onComplete ="showPersonDialog( e );">${fieldValue(bean:personInstance, field:'lastName')}</g:remoteLink></td>
-
-                <td>
-                  <%
-def userLogin = UserLogin.findByPerson(personInstance);
-%> <g:if test="${userLogin}">
-                    <g:link controller="userLogin" action="edit" id="${userLogin.id}" params="[companyId:companyId]">${userLogin}</g:link>
-                  </g:if> <g:else>
-                    <g:link controller="userLogin" action="create"
-                            id="${personInstance.id}" params="[companyId:companyId]">CREATE</g:link>
-                </g:else></td>
-
-                <td><tds:convertDateTime date="${personInstance?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-
-                <td><tds:convertDateTime date="${personInstance?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-
-              </tr>
-            </g:each>
-          </tbody>
-        </table>
+      <div>
+      <form name="personForm">
+	      <jmesa:tableFacade id="tag" items="${personsList}" maxRows="25" stateAttr="restore" var="personBean" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
+	          <jmesa:htmlTable style=" border-collapse: separate">
+	              <jmesa:htmlRow highlighter="true">
+	              	 <jmesa:htmlColumn property="firstName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+	                     <g:remoteLink controller="person" action="editShow" id="${personBean.id}" params="[companyId:companyId]" onComplete ="showPersonDialog( e );">${personBean.firstName}</g:remoteLink>
+					 </jmesa:htmlColumn>
+					 <jmesa:htmlColumn property="lastName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+						<g:remoteLink controller="person" action="editShow" id="${personBean.id}" params="[companyId:companyId]" onComplete ="showPersonDialog( e );">${personBean.lastName}</g:remoteLink>
+					 </jmesa:htmlColumn>
+					 <jmesa:htmlColumn property="userLogin" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+						<g:if test="${personBean.userLoginId}">
+							<g:link controller="userLogin" action="edit" id="${personBean.userLoginId}" params="[companyId:companyId]">${personBean.userLogin}</g:link>
+						</g:if>
+						<g:else>
+							 <g:link controller="userLogin" action="create" id="${personBean.id}" params="[companyId:companyId]">CREATE</g:link>
+						</g:else>
+					 </jmesa:htmlColumn>
+	                 <jmesa:htmlColumn property="dateCreated" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor"><tds:convertDateTime date="${personBean.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>
+	                 <jmesa:htmlColumn property="lastUpdated" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor"><tds:convertDateTime date="${personBean.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>
+	              </jmesa:htmlRow>
+	          </jmesa:htmlTable>
+	      </jmesa:tableFacade>
+	  </form>
       </div>
       <jsec:hasRole name="ADMIN">
         <div class="buttons"><g:form>
