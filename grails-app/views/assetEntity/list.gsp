@@ -121,7 +121,7 @@ function onInvokeExportAction(id) {
 	<form name="assetEntityForm" action="list">
 		<jmesa:tableFacade id="tag" items="${assetEntityInstanceList}" maxRows="25" exportTypes="csv,excel" stateAttr="restore" var="assetEntityInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
 		    <jmesa:htmlTable style=" border-collapse: separate">
-		        <jmesa:htmlRow>
+		        <jmesa:htmlRow highlighter="true">
 		        	<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" >
 		        		<g:remoteLink controller="assetEntity" action="editShow" id="${assetEntityInstance.id}" before="document.showForm.id.value = ${assetEntityInstance.id};document.editForm.id.value = ${assetEntityInstance.id};" onComplete="showAssetDialog( e , 'edit');">
 							<img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/>

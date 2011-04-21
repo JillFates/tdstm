@@ -25,7 +25,7 @@ function onInvokeExportAction(id) {
 	<form name="projectForm" action="searchList">
          <jmesa:tableFacade id="tag" items="${projectList}" maxRows="25" stateAttr="restore" var="projectInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
              <jmesa:htmlTable style=" border-collapse: separate">
-                 <jmesa:htmlRow>
+                 <jmesa:htmlRow highlighter="true">
                      <jmesa:htmlColumn property="projectCode" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 						<g:link controller="project" action="addUserPreference" params="['selectProject':projectInstance.projectCode]">${projectInstance.projectCode}</g:link>
 					 </jmesa:htmlColumn>

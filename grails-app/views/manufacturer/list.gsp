@@ -28,7 +28,7 @@
             	<form name="modelForm" action="list">
 	                <jmesa:tableFacade id="tag" items="${manufacturersList}" maxRows="25" exportTypes="csv,excel" stateAttr="restore" var="manufacturer" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
 	                    <jmesa:htmlTable style=" border-collapse: separate">
-	                        <jmesa:htmlRow>
+	                        <jmesa:htmlRow highlighter="true">
 	                            <jmesa:htmlColumn property="name" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 									<g:link action="show" id="${manufacturer.id}">${manufacturer.name}</g:link>
 								 </jmesa:htmlColumn>

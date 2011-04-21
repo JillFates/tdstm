@@ -9,7 +9,14 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
-
+<script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
+<link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
+<script type="text/javascript">
+function onInvokeAction(id) {
+    setExportToLimit(id, '');
+    createHiddenInputFieldsForLimitAndSubmit(id);
+}
+</script>
 
 <script type="text/javascript">
 $(document).ready(function() {
@@ -144,9 +151,8 @@ function validateCreateNewsForm(){
 </head>
 <body>
 <div class="body">
-
+<g:form action="newsEditorList" name="newsEditorForm" method="get">
 <div>
-<g:form action="newsEditorList" name="newsEditorForm">
 <input type="hidden" name="projectId" value="${projectId}"/>
 	<table style="border: none;" >
 		<tr>
@@ -179,75 +185,48 @@ function validateCreateNewsForm(){
 			</td>
 		</tr>
 	</table>
-	</g:form>
 </div>
 <div style="width: 100%; height: auto; border: 1px solid #5F9FCF; margin-top: 10px; padding: 10px 5px 10px 5px;">
 <span style="position: absolute; text-align: center; width: auto; margin: -17px 0 0 10px; padding: 0px 8px; background: #ffffff;"><b>Display
 Move News and Issues</b></span>
-<table id="assetEntityTable">
-	<thead>
-		<tr>
-
-			<g:sortableColumn property="createdAt" title="Created At" params="[projectId:projectId, moveBundle:params.moveBundle,moveEvent : params.moveEvent, viewFilter:params.viewFilter]" />
-
-			<g:sortableColumn property="createdBy" title="Created By" params="[projectId:projectId, moveBundle:params.moveBundle,moveEvent : params.moveEvent, viewFilter:params.viewFilter]" />
-
-			<g:sortableColumn property="commentType" title="Type" params="[projectId:projectId, moveBundle:params.moveBundle,moveEvent : params.moveEvent, viewFilter:params.viewFilter]" />
-
-			<g:sortableColumn property="comment" title="Comment" params="[projectId:projectId, moveBundle:params.moveBundle,moveEvent : params.moveEvent, viewFilter:params.viewFilter]" />
-
-			<g:sortableColumn property="resolution" title="Resolution" params="[projectId:projectId, moveBundle:params.moveBundle,moveEvent : params.moveEvent, viewFilter:params.viewFilter]" />
-
-			<g:sortableColumn property="resolvedAt" title="Resolved At" params="[projectId:projectId, moveBundle:params.moveBundle,moveEvent : params.moveEvent, viewFilter:params.viewFilter]" />
-
-			<g:sortableColumn property="resolvedBy" title="Resolved By" params="[projectId:projectId, moveBundle:params.moveBundle,moveEvent : params.moveEvent, viewFilter:params.viewFilter]" />
-
-		</tr>
-	</thead>
-	<tbody id="commetAndNewsBodyId">
-	
-	<g:each in="${assetCommentsList}" status="i" var="assetCommentInstance">
-		<tr class="${(i % 2) == 0 ? 'even' : 'odd'}" id="commentsRowId_${i}"
-			onclick="${remoteFunction(action:'getCommetOrNewsData',params:'\'id=\'+'+assetCommentInstance.id+'+\'&commentType='+assetCommentInstance?.commentType+'\'', onComplete:'showEditCommentForm( e, '+i+')')}">
-			<td><tds:convertDateTime date="${assetCommentInstance?.createdAt}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-			<td>
-			${assetCommentInstance?.createdBy}
-			</td>
-			<g:if test="${assetCommentInstance?.commentType == 'issue'}">
-				<td>Issue</td>
-				<td>${AssetEntity.get(assetCommentInstance?.assetEntity)?.assetName} : 
-				<g:if test="${assetCommentInstance?.displayOption != 'G' }">
-				<tds:truncate value="${assetCommentInstance?.comment}"/>
-				</g:if>
-				<g:else>On Hold</g:else>
-				</td>
-			</g:if>
-			<g:else>
-				<td>News</td>
-				<td><tds:truncate value="${assetCommentInstance?.comment}"/></td>
-			</g:else>
-			<td>
-				<tds:truncate value="${assetCommentInstance?.resolution}"/>
-			</td>
-			<td><tds:convertDateTime date="${assetCommentInstance?.resolvedAt}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-			<td>
-			${assetCommentInstance?.resolvedBy}
-			</td>
-		</tr>
-	</g:each>
-	</tbody>
-</table>
+<jmesa:tableFacade id="tag" items="${newsAndCommentsList}" maxRows="25" stateAttr="restore" var="assetCommentInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
+       <jmesa:htmlTable style=" border-collapse: separate">
+           <jmesa:htmlRow highlighter="true">
+               	<jmesa:htmlColumn property="createdAt" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor">
+					<span onclick="${remoteFunction(action:'getCommetOrNewsData',params:'\'id=\'+'+assetCommentInstance.id+'+\'&commentType='+assetCommentInstance?.commentType+'\'', onComplete:'showEditCommentForm( e, '+i+')')}">
+						<tds:convertDateTime date="${assetCommentInstance?.createdAt}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+					</span>
+				</jmesa:htmlColumn>
+				<jmesa:htmlColumn property="createdBy" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+					<span onclick="${remoteFunction(action:'getCommetOrNewsData',params:'\'id=\'+'+assetCommentInstance.id+'+\'&commentType='+assetCommentInstance?.commentType+'\'', onComplete:'showEditCommentForm( e, '+i+')')}">${assetCommentInstance.createdBy}</span>
+				</jmesa:htmlColumn>
+				<jmesa:htmlColumn property="commentType" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+					<span onclick="${remoteFunction(action:'getCommetOrNewsData',params:'\'id=\'+'+assetCommentInstance.id+'+\'&commentType='+assetCommentInstance?.commentType+'\'', onComplete:'showEditCommentForm( e, '+i+')')}">${assetCommentInstance.commentType}</span>
+				</jmesa:htmlColumn>
+				<jmesa:htmlColumn property="comment" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+					<span onclick="${remoteFunction(action:'getCommetOrNewsData',params:'\'id=\'+'+assetCommentInstance.id+'+\'&commentType='+assetCommentInstance?.commentType+'\'', onComplete:'showEditCommentForm( e, '+i+')')}">${assetCommentInstance.comment}</span>
+				</jmesa:htmlColumn>
+	            <jmesa:htmlColumn property="resolution" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+	            	<span onclick="${remoteFunction(action:'getCommetOrNewsData',params:'\'id=\'+'+assetCommentInstance.id+'+\'&commentType='+assetCommentInstance?.commentType+'\'', onComplete:'showEditCommentForm( e, '+i+')')}"><tds:truncate value="${assetCommentInstance.resolution}"/></span>
+	            </jmesa:htmlColumn>
+	            <jmesa:htmlColumn property="resolvedAt" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor">
+	            	<span onclick="${remoteFunction(action:'getCommetOrNewsData',params:'\'id=\'+'+assetCommentInstance.id+'+\'&commentType='+assetCommentInstance?.commentType+'\'', onComplete:'showEditCommentForm( e, '+i+')')}">
+	            		<tds:convertDateTime date="${assetCommentInstance?.resolvedAt}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+	            	</span>
+	            </jmesa:htmlColumn>
+	            <jmesa:htmlColumn property="resolvedBy" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+	            	<span onclick="${remoteFunction(action:'getCommetOrNewsData',params:'\'id=\'+'+assetCommentInstance.id+'+\'&commentType='+assetCommentInstance?.commentType+'\'', onComplete:'showEditCommentForm( e, '+i+')')}"><tds:truncate value="${assetCommentInstance.resolvedBy}"/></span>
+	            </jmesa:htmlColumn>
+        </jmesa:htmlRow>
+    </jmesa:htmlTable>
+</jmesa:tableFacade>
+</g:form>
 <div class="paginateButtons" style="padding: 0px;">
 <g:form name="paginateRows" action="newsEditorList">
 	<table style="border: 0px;">
 		<tr>
 			<td style="width: 70px;padding: 0px;">
 				 <div class="buttons"> <span class="button"><input type="button" value="Create News" class="save" onclick="openCreateNewsDialog()"/></span></div>
-			</td>
-			<td style="width: 770px;vertical-align: middle;text-align: right;padding: 0px;">
-				<g:if test="${totalCommentsSize > 25 }">
-					<g:paginate total="${totalCommentsSize}" params="${params }"/>
-				</g:if>
 			</td>
 		</tr>
 	</table>

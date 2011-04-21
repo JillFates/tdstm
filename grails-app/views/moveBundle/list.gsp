@@ -25,7 +25,7 @@ function onInvokeAction(id) {
     <form name="projectForm" action="list">
          <jmesa:tableFacade id="tag" items="${moveBundleInstanceList}" maxRows="25" stateAttr="restore" var="moveBundle" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
              <jmesa:htmlTable style=" border-collapse: separate">
-                 <jmesa:htmlRow>
+                 <jmesa:htmlRow highlighter="true">
                      <jmesa:htmlColumn property="name" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 						<g:link params="[projectId:projectId]" action="show" id="${moveBundle?.id}">${moveBundle?.name}</g:link>
 					 </jmesa:htmlColumn>

@@ -4,7 +4,10 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import org.jsecurity.SecurityUtils
 import com.tdssrc.grails.GormUtil
-
+import org.jmesa.facade.TableFacade
+import org.jmesa.facade.TableFacadeImpl
+import org.jmesa.limit.Limit
+import net.tds.util.jmesa.NewsEditorBean
 class NewsEditorController {
 	
 	def userPreferenceService
@@ -19,7 +22,7 @@ class NewsEditorController {
      * @return : Union of assets issues and move event news
      *--------------------------------------------------------*/
 	def newsEditorList = {
-		if ( !params.max ) params.max = 25
+			
     	def projectId =  params.projectId
     	def projectInstance = Project.findById( projectId )
     	def bundleId = params.moveBundle
@@ -101,25 +104,38 @@ class NewsEditorController {
 		
 		def queryForCommentsList = new StringBuffer(assetCommentsQuery.toString() +" union all "+ moveEventNewsQuery.toString())
 		    	
-    	if(params.sort && params.order){
-    		queryForCommentsList.append( " order by ${params.sort} ${params.order}" )
-    	} else {
-    		queryForCommentsList.append( " order by createdAt desc" )
-    	}
-		def totalCommentsSize = jdbcTemplate.queryForList( queryForCommentsList.toString() )?.size()
-		if(offset){
-			queryForCommentsList.append( " limit ${offset}, ${params.max}")
-		} else {
-			queryForCommentsList.append( " limit ${params.max}")	
+		def totalComments = jdbcTemplate.queryForList( queryForCommentsList.toString() )
+		
+		List newsAndCommentsList = new ArrayList()
+		totalComments.each{
+			NewsEditorBean newsEditorBean= new NewsEditorBean()
+			newsEditorBean.setId(it.id)
+			newsEditorBean.setDisplayOption(it.displayOption)
+			if(it.commentType == 'issue'){
+				newsEditorBean.setCommentType("Issue")
+				def comment = AssetEntity.get(it.assetEntity)?.assetName +": "
+				if(it?.displayOption != 'G'){
+					comment+=truncate(it?.comment)
+				} else {
+					comment+= "On Hold"
+				}
+				newsEditorBean.setComment(comment)
+			} else {
+				newsEditorBean.setCommentType("News")
+				newsEditorBean.setComment(truncate(it?.comment))
+			}
+			newsEditorBean.setResolution(it.resolution)
+			newsEditorBean.setCreatedBy(it.createdBy)
+			newsEditorBean.setResolvedBy(it.resolvedBy)
+			newsEditorBean.setCreatedAt(it.createdAt)
+			newsEditorBean.setResolvedAt(it.resolvedAt)
+			newsAndCommentsList.add(newsEditorBean)
 		}
+		TableFacade tableFacade = new TableFacadeImpl("tag",request)
+        tableFacade.items = newsAndCommentsList
 		
-    	def totalComments = jdbcTemplate.queryForList( queryForCommentsList.toString() )
-		
-		def principal = SecurityUtils.subject.principal
-		def loginUser = UserLogin.findByUsername(principal)
-		
-		return [moveBundlesList : moveBundlesList, assetCommentsList : totalComments, projectId : projectId, moveEventsList : moveEventsList,
-				params : params, totalCommentsSize : totalCommentsSize, moveEvent : moveEvent, loginPerson : loginUser.person]
+		return [moveBundlesList : moveBundlesList, newsAndCommentsList : newsAndCommentsList, projectId : projectId, moveEventsList : moveEventsList,
+				params : params, moveEvent : moveEvent]
     }
 	/*-------------------------------------------------------------------
 	 * @author : Lokanada Reddy
@@ -228,5 +244,17 @@ class NewsEditorController {
 		moveEventNewsInstance.save(flush:true)
 		redirect(action:newsEditorList, params:[projectId:params.projectId, moveBundle : params.moveBundle, 
 												viewFilter:params.viewFilter, moveEvent:params.moveEvent.id])
+	}
+	def truncate( value ){
+		def returnVal = ""
+		if(value){
+			def length = value.size()
+			if(length > 50){
+				returnVal = '"'+value.substring(0,50)+'.."'
+			} else {
+				returnVal = '"'+value+'"'
+			}
+		}
+		return returnVal
 	}
 }
