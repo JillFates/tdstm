@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
 import org.jmesa.limit.Limit
+import net.tds.util.jmesa.AssetEntityBean
 
 class AssetEntityController {	
     //TODO : Fix indentation
@@ -1293,9 +1294,36 @@ class AssetEntityController {
 		    	transitionStates << [state:stateEngineService.getState( projectInstance.workflowCode, stateId ),
 									 stateLabel:stateEngineService.getStateLabel( projectInstance.workflowCode, stateId )] 
 		    }
-				
+		    List assetBeansList = new ArrayList()
+		    assetsList.each{
+		    	AssetEntityBean assetEntityBean = new AssetEntityBean()
+		    	assetEntityBean.setId(it.asset.id)
+				assetEntityBean.setAssetTag(it.asset.assetTag)
+				assetEntityBean.setAssetName(it.asset.assetName)
+				if(AssetComment.find("from AssetComment where assetEntity = ${it?.asset?.id} and commentType = ? and isResolved = ?",['issue',0])){
+					assetEntityBean.setCommentType("issue")
+				} else if(AssetComment.find('from AssetComment where assetEntity = '+ it?.asset?.id)){
+					assetEntityBean.setCommentType("comment")
+				} else {
+					assetEntityBean.setCommentType("blank")
+				}
+				assetEntityBean.setPriority(it.asset.priority)
+				if(it?.asset.sourceTeam){
+					assetEntityBean.setSourceTeam(ProjectTeam.findById(it?.asset?.sourceTeam)?.name)
+				}
+				if(it?.asset.targetTeam){
+					assetEntityBean.setTargetTeam(ProjectTeam.findById(it?.asset?.targetTeam)?.name)
+				}
+				assetEntityBean.setStatus(it.status)
+				assetEntityBean.setCssClass(it.cssClass)
+				assetEntityBean.setCheckVal(it.checkVal)
+				assetBeansList.add( assetEntityBean )
+		    }
+		    // Statements for JMESA integration
+	    	TableFacade tableFacade = new TableFacadeImpl("tag",request)
+	        tableFacade.items = assetBeansList
 		    return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams, 
-					assetsList:assetsList, moveBundleInstance:moveBundleInstance, 
+					assetBeansList:assetBeansList, moveBundleInstance:moveBundleInstance, 
 					supportTeam:supportTeam, totalUnracked:totalUnracked, totalSourceAvail:totalSourceAvail, 
 					totalTargetAvail:totalTargetAvail, totalReracked:totalReracked, totalAsset:totalAssetsSize, 
 					timeToUpdate : timeToUpdate ? timeToUpdate.SUPER_CONSOLE_REFRESH : "never", showAll : showAll,

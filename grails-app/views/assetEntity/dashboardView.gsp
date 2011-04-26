@@ -16,7 +16,14 @@ td .odd {
 	nowrap
 }
 </style>
-
+<link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
+<script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
+<script type="text/javascript">
+function onInvokeAction(id) {
+    setExportToLimit(id, '');
+    createHiddenInputFieldsForLimitAndSubmit(id);
+}
+</script>
 <script type="text/javascript">
 	$(document).ready(function() {
 	    $("#showDialog").dialog({ autoOpen: false })
@@ -110,12 +117,8 @@ td .odd {
 	}
    	function assetDetails(assetId) {
 		var assetId = assetId;
-	   	var rows = $('#assetsTbody').children('tr')
-	   	for(i = 0 ; i<rows.length ; i++){
-			var rowVal = rows[i].getAttribute("value")
-		   	$("#image_"+rowVal).css('visibility','hidden');
-	   	}
-	   	$('#image_'+assetId).css('visibility','visible');
+	   	$("span.selected").hide()
+	   	$('#image_'+assetId).show()
 	   	timedUpdate('never')
 	   	${remoteFunction(action:'assetDetails', params:'\'assetId=\'+ assetId ' , onComplete:'getAssetDetail(e)') }
 	}
@@ -164,11 +167,7 @@ td .odd {
 	   	$("#stateSelectId").html("<option value=''>Status</option>");
 	   	$("#assignToId").html("<option value=''>Move Team</option><optgroup label='Source' id='sourceAssignTo'></optgroup><optgroup label='Target' id='targetAssignTo'></optgroup>")
 	   	$("#holdTimeId").val("");
-	   	var rows = $('#assetsTbody').children('tr')
-	   	for(i = 0 ; i<rows.length ; i++){
-		var rowVal = rows[i].getAttribute("value")
-		   	$("#image_"+rowVal).css('visibility','hidden');
-	   	}
+	   	$("span.selected").hide()
 	   	var seconds = new Date().getTime() - $("#lastUpdateId").val();
 	   	var updateTime = $('#selectTimedId').val() - seconds
 	   	if( !isNaN(updateTime) ){
@@ -357,7 +356,7 @@ td .odd {
 	function changeState(){
 		timedUpdate('never')
 		var assetArr = new Array();
-		var totalAsset = ${assetsList?.asset.id};
+		var totalAsset = ${assetBeansList?.id};
 		var j=0;
 		for(i=0; i< totalAsset.size() ; i++){
 			if($('#checkId_'+totalAsset[i]) != null){
@@ -375,7 +374,7 @@ td .odd {
 		}
 	}	
 	
-	function showAll(){
+	function showAllAssets(){
 		var showAll = $("#showAllCheckbox").is(':checked');
 		if(showAll){
 			$("#showAllId").val('show');
@@ -728,19 +727,32 @@ td .odd {
 		<table style="border: 0px;">
 			<tr>
 				<td valign="top" style="padding: 0px;">
-				<div class="list"><g:form name="assetListForm">
+				<div id="assetsTbody">
+				<g:form name="assetListForm" controller="assetEntity" action="dashboardView" method='get'>
 					<table>
 						<thead>
 							<tr	id="rowId" onmouseover="$('#rowId').css('background','white');">
 								<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJ_MGR']">
-								<td id="tdId"><input id="state" type="button"
-									value="State..." onclick="changeState()" title="Change State" />
+								<td id="tdId">
+								<input id="state" type="button" value="State..." onclick="changeState()" title="Change State" />
+								<input type="hidden" name="projectId" value="${projectId}" />
+								<input type="hidden" name="moveBundle" value="${moveBundleInstance.id}" />
+								<input type="hidden" name="showAll" value="${showAll}"/>
+								<input type="hidden" name="application" value="${params.application}"/>
+								<input type="hidden" name="appOwner" value="${params.appOwner}"/>
+								<input type="hidden" name="currentState" value="${params.currentState}"/>
+								<input type="hidden" name="team" value="${params.team}"/>
+								<input type="hidden" name="assetLocation" value="${params.assetLocation}"/>
+								<input type="hidden" name="assetStatus" value="${params.assetStatus}"/>
+								<jsec:hasAnyRole in="['ADMIN','PROJ_MGR']">
+									<input id="state" type="button" value="All.." onclick="selectAll()" title="Select All" />
+								</jsec:hasAnyRole>
 								</td>
 								</jsec:hasAnyRole>
 								<td style="vertical-align: middle;" colspan="3">
-									<label for="showAllCheckbox"><input type="checkbox" onclick="showAll()" id="showAllCheckbox"/>&nbsp;Show All&nbsp;</label>
+									<label for="showAllCheckbox"><input type="checkbox" onclick="showAllAssets()" id="showAllCheckbox"/>&nbsp;Show All&nbsp;</label>
 									&nbsp;&nbsp;<input type="button" onclick="showfilterDialog()" id="filterButtonId" value="Filter"/>
-									&nbsp;&nbsp;<span>Viewing: ${assetsList?.size()}</span>
+									&nbsp;&nbsp;<span>Viewing: ${assetBeansList?.size()}</span>
 									<g:if test="${params.application || params.appOwner || params.appSme || params.currentState || params.assetLocation || params.assetStatus }">
 									&nbsp;<a href="#"
 											 onclick="document.filterForm.reset();$('#filterShowAllId').val('');document.filterForm.submit();"><span class="clear_filter"><u>X</u></span></a>
@@ -750,113 +762,72 @@ td .odd {
 									</g:if>									
 								</td>
 							</tr>
-							<tr>
-								<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJ_MGR']">
-									<th>Actions <jsec:hasAnyRole in="['ADMIN','PROJ_MGR']"><a href="#" onclick="selectAll()"><u
-									style="color: blue;">All</u></a></jsec:hasAnyRole></th></jsec:hasAnyRole>
-								<g:sortableColumn property="priority" title="Priority" 
-									params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll,
-											application:params.application,appOwner:params.appOwner,appSme:params.appSme,
-											currentState:params.currentState,team:params.team,assetLocation:params.assetLocation,
-											assetStatus:params.assetStatus]'/>
-								<g:sortableColumn property="assetTag" title="Asset Tag" 
-									params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll,
-											application:params.application,appOwner:params.appOwner,appSme:params.appSme,
-											currentState:params.currentState,team:params.team,assetLocation:params.assetLocation,
-											assetStatus:params.assetStatus]'/>
-								<g:sortableColumn property="assetName" title="Asset Name" 
-									params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll,
-											application:params.application,appOwner:params.appOwner,appSme:params.appSme,
-											currentState:params.currentState,team:params.team,assetLocation:params.assetLocation,
-											assetStatus:params.assetStatus]'/>
-								<g:sortableColumn property="currentState" title="Status" 
-									params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll,
-											application:params.application,appOwner:params.appOwner,appSme:params.appSme,
-											currentState:params.currentState,team:params.team,assetLocation:params.assetLocation,
-											assetStatus:params.assetStatus]'/>
-								<g:sortableColumn property="sourceTeam" title="Source Team" 
-									params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll,
-											application:params.application,appOwner:params.appOwner,appSme:params.appSme,
-											currentState:params.currentState,team:params.team,assetLocation:params.assetLocation,
-											assetStatus:params.assetStatus]'/>
-								<g:sortableColumn property="targetTeam" title="Target Team" 
-									params='["projectId":projectId,"moveBundle":moveBundleInstance.id,"showAll":showAll,
-											application:params.application,appOwner:params.appOwner,appSme:params.appSme,
-											currentState:params.currentState,team:params.team,assetLocation:params.assetLocation,
-											assetStatus:params.assetStatus]'/>
-								<th>Issues</th>
-							</tr>
-						</thead>
-						<tbody id="assetsTbody">
-						<g:if test="${assetsList}">
-							<g:each status="i" in="${assetsList}" var="assetsList">
-
-								<tr name="assetDetailRow"
-									id="assetDetailRow_${assetsList?.asset.id}"
-									class="${assetsList?.cssClass}" value="${assetsList?.asset.id}">
-
-									<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJ_MGR']">
-									<td><jsec:hasAnyRole in="['ADMIN','PROJ_MGR']">
-										<g:if test="${assetsList.checkVal == true}">
-										<span id="spanId_${assetsList?.asset.id}">
-											<g:checkBox name="checkChange"
-												id="checkId_${assetsList?.asset.id}"
-												onclick="timedUpdate('never')"></g:checkBox>
-										</span>
-
+							</thead>
+					</table>
+					<jmesa:tableFacade id="tag" items="${assetBeansList}" maxRows="25" stateAttr="restore" var="assetEntityBean" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
+			             <jmesa:htmlTable style=" border-collapse: separate" editable="true">
+			                 <jmesa:htmlRow highlighter="true">
+			                 	<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJ_MGR']">
+			                 	 <jmesa:htmlColumn property="Actions" title="" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap class="${assetEntityBean?.cssClass}">
+		                         	<jsec:hasAnyRole in="['ADMIN','PROJ_MGR']">
+										<g:if test="${assetEntityBean.checkVal == true}">
+											<span id="spanId_${assetEntityBean.id}">
+												<g:checkBox name="checkChange" id="checkId_${assetEntityBean.id}" onclick="timedUpdate('never')"></g:checkBox>
+											</span>
 										</g:if>
 									</jsec:hasAnyRole>
-									<g:remoteLink controller="assetEntity" action="editShow" id="${assetsList?.asset.id}" before="document.showForm.id.value = ${assetsList?.asset.id};document.editForm.id.value = ${assetsList?.asset.id};" onComplete="showAssetDialog( e , 'show');">
+									<g:remoteLink controller="assetEntity" action="editShow" id="${assetEntityBean.id}" before="document.showForm.id.value = ${assetEntityBean.id};document.editForm.id.value = ${assetEntityBean.id};" onComplete="showAssetDialog( e , 'show');">
 										<img src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px" />
 									</g:remoteLink>
-									 <span style="visibility: hidden;"
-										id="image_${assetsList?.asset.id}"><img
-										src="${createLinkTo(dir:'images',file:'row_arrow.gif')}"
-										border="0px"/></span>
-										
-										</td></jsec:hasAnyRole>
-									<td id="priority_${assetsList?.asset.id}"
-										onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.priority}</td>
-									<td id="assetTag_${assetsList?.asset.id}" onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.assetTag}</td>
-									<td  id="assetName_${assetsList?.asset.id}" onclick="assetDetails('${assetsList?.asset.id}')">${assetsList?.asset.assetName}</td>
-									<td onclick="assetDetails('${assetsList?.asset.id}')"
-										id="statusCol_${assetsList?.asset.id}">${assetsList?.status}</td>
-									<td onclick="assetDetails('${assetsList?.asset.id}')"
-										id="source_${assetsList?.asset.id}"><g:if test="${assetsList?.asset.sourceTeam}">${ProjectTeam.findById(assetsList?.asset.sourceTeam)?.name}</g:if></td>
-									<td onclick="assetDetails('${assetsList?.asset.id}')"
-										id="target_${assetsList?.asset.id}"><g:if test="${assetsList?.asset.targetTeam}"> ${ProjectTeam.findById(assetsList?.asset.targetTeam)?.name}</g:if></td>
-									<td id="icon_${assetsList?.asset.id}"><g:if
-										test="${AssetComment.find('from AssetComment where assetEntity = '+ assetsList?.asset?.id +' and commentType = ? and isResolved = ?',['issue',0])}">
-										<g:remoteLink controller="assetEntity" action="listComments"
-											id="${assetsList?.asset.id}"
-											before='setAssetId(${assetsList?.asset.id});'
-											onComplete="listCommentsDialog( e ,'never' );">
-											<img
-												src="${createLinkTo(dir:'i',file:'db_table_red.png')}"
-												border="0px"/>
-										</g:remoteLink>
-									</g:if>
-									<g:elseif test="${AssetComment.find('from AssetComment where assetEntity = '+ assetsList?.asset?.id)}">
-										<g:remoteLink controller="assetEntity" action="listComments" id="${assetsList?.asset.id}" before="setAssetId(${assetsList?.asset.id});" onComplete="listCommentsDialog( e ,'never' ); ">
-											<img src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px"/>
-										</g:remoteLink>
-									</g:elseif>
-									<g:else>
-									<a onclick="createNewAssetComment(${assetsList?.asset.id});">
-										<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px"/>
-									</a>
-									</g:else>
-									</td>
-								</tr>
-							</g:each>
-							</g:if>
-						<g:else>
-							<tr><td colspan="8" class="no_records">No records found</td></tr>
-						</g:else>
-						</tbody>
-					</table>
-
-				</g:form></div>
+									<span style="display: none;" id="image_${assetEntityBean.id}" class="selected" >
+										<img src="${createLinkTo(dir:'images',file:'row_arrow.gif')}" border="0px"/>
+									</span>
+		                         </jmesa:htmlColumn>
+								</jsec:hasAnyRole>
+	 		                     <jmesa:htmlColumn property="priority" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+									<div id="priority_${assetEntityBean.id}" style="width: 100%"
+										onclick="assetDetails('${assetEntityBean.id}')">${assetEntityBean.priority}&nbsp;</div>
+								 </jmesa:htmlColumn>
+								 <jmesa:htmlColumn property="assetTag" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+									<div id="assetTag_${assetEntityBean.id}" onclick="assetDetails('${assetEntityBean.id}')" style="width: 100%">${assetEntityBean.assetTag}&nbsp;</div>
+								 </jmesa:htmlColumn>
+								 <jmesa:htmlColumn property="assetName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+									<div id="assetName_${assetEntityBean.id}" onclick="assetDetails('${assetEntityBean.id}')" style="width: 100%">${assetEntityBean.assetName}&nbsp;</div>
+								 </jmesa:htmlColumn>
+								 <jmesa:htmlColumn property="status" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+									<div onclick="assetDetails('${assetEntityBean.id}')"	id="statusCol_${assetEntityBean.id}" style="width: 100%">${assetEntityBean.status}&nbsp;</div>
+								 </jmesa:htmlColumn>
+								 <jmesa:htmlColumn property="sourceTeam" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+									<div onclick="assetDetails('${assetEntityBean.id}')"	id="source_${assetEntityBean.id}" style="width: 100%">${assetEntityBean.sourceTeam}&nbsp;</div>
+								 </jmesa:htmlColumn>
+								 <jmesa:htmlColumn property="targetTeam" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+									<div onclick="assetDetails('${assetEntityBean.id}')" id="target_${assetEntityBean.id}" style="width: 100%">${assetEntityBean.targetTeam}&nbsp;</div>
+								 </jmesa:htmlColumn>
+								 <jmesa:htmlColumn property="commentType" title="Issues" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+									<div id="icon_${assetEntityBean.id}">
+										<g:if test="${assetEntityBean.commentType == 'issue'}">
+											<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityBean.id}" before='setAssetId(${assetEntityBean.id});'	onComplete="listCommentsDialog( e ,'never' );">
+												<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}"	border="0px"/>
+											</g:remoteLink>
+										</g:if>
+										<g:elseif test="${assetEntityBean.commentType == 'comment'}">
+											<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityBean.id}" before="setAssetId(${assetEntityBean.id});" onComplete="listCommentsDialog( e ,'never' ); ">
+												<img src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px"/>
+											</g:remoteLink>
+										</g:elseif>
+										<g:else>
+										<a onclick="createNewAssetComment(${assetEntityBean.id});">
+											<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px"/>
+										</a>
+										</g:else>
+									</div>
+								 </jmesa:htmlColumn>
+			                 </jmesa:htmlRow>
+			             </jmesa:htmlTable>
+			         </jmesa:tableFacade>
+				</g:form>
+				
+				</div>
 				</td>
 				<td valign="top" style="padding: 0px;width:250px;">
 				<div id="floatMenu" style="position:relative;">
