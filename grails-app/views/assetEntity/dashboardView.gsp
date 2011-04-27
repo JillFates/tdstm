@@ -766,7 +766,7 @@ function onInvokeAction(id) {
 					</table>
 					<jmesa:tableFacade id="tag" items="${assetBeansList}" maxRows="25" stateAttr="restore" var="assetEntityBean" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
 			             <jmesa:htmlTable style=" border-collapse: separate" editable="true">
-			                 <jmesa:htmlRow highlighter="true">
+			                 <jmesa:htmlRow>
 			                 	<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJ_MGR']">
 			                 	 <jmesa:htmlColumn property="Actions" title="" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap class="${assetEntityBean?.cssClass}">
 		                         	<jsec:hasAnyRole in="['ADMIN','PROJ_MGR']">
@@ -787,6 +787,7 @@ function onInvokeAction(id) {
 	 		                     <jmesa:htmlColumn property="priority" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 									<div id="priority_${assetEntityBean.id}" style="width: 100%"
 										onclick="assetDetails('${assetEntityBean.id}')">${assetEntityBean.priority}&nbsp;</div>
+									<input type="hidden" class="input" value="${assetEntityBean?.cssClass}">
 								 </jmesa:htmlColumn>
 								 <jmesa:htmlColumn property="assetTag" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 									<div id="assetTag_${assetEntityBean.id}" onclick="assetDetails('${assetEntityBean.id}')" style="width: 100%">${assetEntityBean.assetTag}&nbsp;</div>
@@ -1317,6 +1318,12 @@ Comment</a></span></div>
 bundleChange();
 $("#midDiv").css('width',vpWidth() - 340)
 timedUpdate($("#selectTimedId").val())
+
+$("tbody.tbody tr").removeAttr("class")
+var inputs = $("tbody.tbody tr input.input")
+for(i=1;i<=inputs.length;i++){
+	$("#tag_row"+i).addClass(inputs[i-1].value)
+}
 </script>
 </div>
 </body>

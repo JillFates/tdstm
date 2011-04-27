@@ -1315,13 +1315,14 @@ class AssetEntityController {
 					assetEntityBean.setTargetTeam(ProjectTeam.findById(it?.asset?.targetTeam)?.name)
 				}
 				assetEntityBean.setStatus(it.status)
-				assetEntityBean.setCssClass(it.cssClass)
+				assetEntityBean.setCssClass(it.cssClass ? it.cssClass : "")
 				assetEntityBean.setCheckVal(it.checkVal)
 				assetBeansList.add( assetEntityBean )
 		    }
-		    // Statements for JMESA integration
+		    //Statements for JMESA integration
 	    	TableFacade tableFacade = new TableFacadeImpl("tag",request)
 	        tableFacade.items = assetBeansList
+	        
 		    return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams, 
 					assetBeansList:assetBeansList, moveBundleInstance:moveBundleInstance, 
 					supportTeam:supportTeam, totalUnracked:totalUnracked, totalSourceAvail:totalSourceAvail, 

@@ -129,7 +129,7 @@ class SupervisorConsoleService {
 		if( sortField ) {
 			queryForConsole.append(" order by ${sortField} ${orderField}" )
 		} else {
-			queryForConsole.append(" order by date_created desc ")
+			queryForConsole.append(" order by dateCreated desc ")
 		}
 		return queryForConsole.toString()
     }
