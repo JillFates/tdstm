@@ -6,7 +6,7 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
 <g:javascript src="asset.tranman.js" />
-<title>Rack View</title>
+<title>Power Report</title>
 <script type="text/javascript">
 	function updateRackDetails(e) {
      	var rackDetails = eval('(' + e.responseText + ')')   	
@@ -100,7 +100,7 @@
 	<tbody>
 		<tr>
 			<td>
-				<h1 style="margin: 0px;">Rack View</h1>
+				<h1 style="margin: 0px;">Rack Selection</h1>
 				<label><b>Bundle</b></label><br />
 				<select id="bundleId" name="moveBundle" multiple="multiple" size="3" onchange="getRackDetails(this.id)" style="width:150px">
 					<option value="all" selected="selected">All</option>
