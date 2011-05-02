@@ -62,7 +62,7 @@
 		</tr>
 		<tr>
 			<td valign="top" class="name" nowrap="nowrap">Power (typical):</td>
-			<td><g:select id="powerUseId" name="powerUse" from="${modelInstance.constraints.powerUse.inList}" value="${modelInstance.powerUse}"></g:select>&nbsp;Watts</td>
+			<td><input type="text" name="powerUse" id="powerUseId" value="${modelInstance.powerUse}" >&nbsp;Watts</td>
 		</tr>
 		<tr>
 		<td valign="top" class="name" nowrap="nowrap">Front image:</label></td>
