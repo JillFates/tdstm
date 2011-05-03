@@ -6,6 +6,10 @@ class Person extends Party {
 	String active = "Y"
 	String title
 	String email
+	String department
+	String location
+	String workPhone
+	String mobilePhone
 
 	/*
 	 * Fields Validations
@@ -17,6 +21,11 @@ class Person extends Party {
 		 nickName( blank:true, nullable:true, maxLength:34 )
 		 active( blank:false, nullable:false, inList:['Y','N'] )
 		 email(email:true, blank:true, nullable:true)
+		 department( blank:true, nullable:true )
+		 location( blank:true, nullable:true )
+		 workPhone(blank:true, nullable:true, phoneNumber:true)
+		 mobilePhone(blank:true, nullable:true, phoneNumber:true)
+		 
 	 }
 
 	/*

@@ -52,6 +52,34 @@
       document.showForm.title.value = person.title
       document.editForm.title.value = person.title
       document.showForm.active.value = person.active
+      if( !person.department ) {
+          document.showForm.department.value = ""
+          document.editForm.department.value = ""
+      } else {
+          document.showForm.department.value = person.department
+          document.editForm.department.value = person.department
+      }
+      if( !person.location ) {
+          document.showForm.location.value = ""
+          document.editForm.location.value = ""
+      } else {
+          document.showForm.location.value = person.location
+          document.editForm.location.value = person.location
+      }
+      if( !person.workPhone ) {
+          document.showForm.workPhone.value = ""
+          document.editForm.workPhone.value = ""
+      } else {
+          document.showForm.workPhone.value = person.workPhone
+          document.editForm.workPhone.value = person.workPhone
+      }
+      if( !person.mobilePhone ) {
+          document.showForm.mobilePhone.value = ""
+          document.editForm.mobilePhone.value = ""
+      } else {
+          document.showForm.mobilePhone.value = person.mobilePhone
+          document.editForm.mobilePhone.value = person.mobilePhone
+      }
       document.editForm.companyId.value = person.companyId
       document.showForm.companyId.value = person.companyId
       document.showForm.dateCreated.value = person.dateCreated
@@ -179,6 +207,30 @@ document.createDialogForm.company.value = ${companyId}
 
                 </tr>
                 <tr class="prop">
+                  <td valign="top" class="name">Department:</td>
+
+                  <td valign="top" class="value"><input type="text" id="department" name="department" value=""  style="border: 0px;background: none;" readonly="readonly"/></td>
+
+                </tr>
+                <tr class="prop">
+                  <td valign="top" class="name">Location:</td>
+
+                  <td valign="top" class="value"><input type="text" id="location" name="location" value=""  style="border: 0px;background: none;" readonly="readonly"/></td>
+
+                </tr>
+                <tr class="prop">
+                  <td valign="top" class="name">Work Phone:</td>
+
+                  <td valign="top" class="value"><input type="text" id="workPhone" name="workPhone" value=""  style="border: 0px;background: none;" readonly="readonly"/></td>
+
+                </tr>
+                <tr class="prop">
+                  <td valign="top" class="name">Mobile Phone:</td>
+
+                  <td valign="top" class="value"><input type="text" id="mobilePhone" name="mobilePhone" value=""  style="border: 0px;background: none;" readonly="readonly"/></td>
+
+                </tr>
+                <tr class="prop">
                   <td valign="top" class="name">Date Created:</td>
 
                   <td valign="top" class="value"><input type="text" id="dateCreated" name="dateCreated" size="34" value=""  style="border: 0px;background: none;" readonly="readonly"/></td>
@@ -289,7 +341,7 @@ document.createDialogForm.company.value = ${companyId}
                 </tr>
 				<tr class="prop">
                 	<td valign="top" class="name">
-                    	<label for="email"><g:message code="person.email.label" default="Email" /></label>
+                    	<label for="email"><g:message code="person.email.label" default="Email" />:</label>
                     </td>
                     <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'email', 'errors')}">
                     	<g:textField name="email" value="${personInstance?.email}" size="34" />
@@ -312,8 +364,38 @@ document.createDialogForm.company.value = ${companyId}
                     </g:hasErrors>
                   </td>
                 </tr>
-
-
+				<tr class="prop">
+                	<td valign="top" class="name">
+                    	<label for="department"><g:message code="person.department.label" default="Department" />:</label>
+                    </td>
+                    <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'department', 'errors')}">
+                    	<g:textField name="department" value="${personInstance?.department}" size="34"/>
+					</td>
+				</tr>
+				<tr class="prop">
+                	<td valign="top" class="name">
+                    	<label for="location"><g:message code="person.location.label" default="Department" />:</label>
+                    </td>
+                    <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'location', 'errors')}">
+                    	<g:textField name="location" value="${personInstance?.location}" size="34"/>
+					</td>
+				</tr>
+				<tr class="prop">
+                	<td valign="top" class="name">
+                    	<label for="workPhone"><g:message code="person.workPhone.label" default="Work Phone" />:</label>
+                    </td>
+                    <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'workPhone', 'errors')}">
+                    	<g:textField name="workPhone" value="${personInstance?.workPhone}" size="34"/>
+					</td>
+				</tr>
+				<tr class="prop">
+                	<td valign="top" class="name">
+                    	<label for="mobilePhone"><g:message code="person.mobilePhone.label" default="Mobile Phone" />:</label>
+                    </td>
+                    <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'mobilePhone', 'errors')}">
+                    	<g:textField name="mobilePhone" value="${personInstance?.mobilePhone}" size="34"/>
+					</td>
+				</tr>
               </tbody>
             </table>
           </div>
@@ -436,7 +518,38 @@ document.createDialogForm.company.value = ${companyId}
                     </g:hasErrors>
                   </td>
                 </tr>
-
+				<tr class="prop">
+                	<td valign="top" class="name">
+                    	<label for="department"><g:message code="person.department.label" default="Department" />:</label>
+                    </td>
+                    <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'department', 'errors')}">
+                    	<g:textField name="department" value="${personInstance?.department}" size="34"/>
+					</td>
+				</tr>
+				<tr class="prop">
+                	<td valign="top" class="name">
+                    	<label for="location"><g:message code="person.location.label" default="Department" />:</label>
+                    </td>
+                    <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'location', 'errors')}">
+                    	<g:textField name="location" value="${personInstance?.location}" size="34"/>
+					</td>
+				</tr>
+				<tr class="prop">
+                	<td valign="top" class="name">
+                    	<label for="workPhone"><g:message code="person.workPhone.label" default="Work Phone" />:</label>
+                    </td>
+                    <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'workPhone', 'errors')}">
+                    	<g:textField name="workPhone" value="${personInstance?.workPhone}" size="34"/>
+					</td>
+				</tr>
+				<tr class="prop">
+                	<td valign="top" class="name">
+                    	<label for="mobilePhone"><g:message code="person.mobilePhone.label" default="Mobile Phone" />:</label>
+                    </td>
+                    <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'mobilePhone', 'errors')}">
+                    	<g:textField name="mobilePhone" value="${personInstance?.mobilePhone}" size="34"/>
+					</td>
+				</tr>
               </tbody>
             </table>
           </div>
@@ -456,16 +569,25 @@ document.createDialogForm.company.value = ${companyId}
         var returnVal = true 
     	var firstName = $("form[name = 'createDialogForm'] input[name = 'firstName']").val()
         var email = $("form[name = 'createDialogForm'] input[name = 'email']").val()
+        var workPhone = $("form[name = 'createDialogForm'] input[name = 'workPhone']").val().replace(/[\(\)\.\-\ ]/g, '')
+        var mobilePhone = $("form[name = 'createDialogForm'] input[name = 'mobilePhone']").val().replace(/[\(\)\.\-\ ]/g, '')
         if(form == 'editForm'){
 	        firstName = $("form[name = 'editForm'] input[name = 'firstName']").val()
 	        email = $("form[name = 'editForm'] input[name = 'email']").val()
+	        workPhone = $("form[name = 'editForm'] input[name = 'workPhone']").val().replace(/[\(\)\.\-\ ]/g, '')
+	        mobilePhone = $("form[name = 'editForm'] input[name = 'mobilePhone']").val().replace(/[\(\)\.\-\ ]/g, '')
         }
         if(!firstName) {
             alert("First Name should not be blank ")
             returnVal = false
         } else if( email && !emailExp.test(email)){
         	 alert(email +" is not a valid e-mail address ")
-             returnVal = false
+        } else if(workPhone){
+            if (isNaN(parseInt(workPhone))) { alert("The Work phone number contains illegal characters.");returnVal = false }
+	        if (!(workPhone.length == 10)) { alert("The Work phone number is the wrong length. Make sure you included an area code.\n");returnVal = false }
+        } else if(mobilePhone){
+            if (isNaN(parseInt(mobilePhone))) { alert("The Mobile phone number contains illegal characters.");returnVal = false }
+	        if (!(mobilePhone == 10)) { alert("The Mobile phone number is the wrong length. Make sure you included an area code.\n");returnVal = false }
         }
         return returnVal
     }

@@ -201,7 +201,8 @@ class PersonController {
         	def items = [id: personInstance.id, firstName: personInstance.firstName, lastName: personInstance.lastName, 
 						 nickName: personInstance.nickName, title: personInstance.title, active: personInstance.active, 
 						 dateCreated: dateCreatedByFormat, lastUpdated: lastUpdatedFormat, companyId: companyId,
-						 companyParty:companyParty, email: personInstance.email]
+						 companyParty:companyParty, email: personInstance.email, department: personInstance.department,
+						 location: personInstance.location, workPhone: personInstance.workPhone, mobilePhone: personInstance.mobilePhone]
             render items as JSON
         }
     }
