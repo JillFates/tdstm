@@ -105,4 +105,7 @@ class Model {
 	def getNoOfConnectors(){
 		return ModelConnector.countByModel( this )
 	}
+	def getAssetsCount(){
+		return AssetEntity.countByModel( this )
+	}
 }
