@@ -3,6 +3,13 @@ import grails.converters.JSON
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
 import org.jmesa.limit.Limit
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.io.*
+import jxl.*
+import jxl.write.*
+import jxl.read.biff.*
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 
 class ModelController {
 	
@@ -120,6 +127,8 @@ class ModelController {
 	        			modelConnector.save(flush: true)
 	        	}
         	}
+        	modelInstance.sourceTDSVersion = 1
+        	modelInstance.save(flush: true)
             flash.message = "${modelInstance.modelName} created"
             redirect(action: "show", id: modelInstance.id)
         }
@@ -275,6 +284,13 @@ class ModelController {
             	def updateAssetsQuery = "update asset_entity set asset_type = '${modelInstance.assetType}' where model_id='${modelInstance.id}'"
             	jdbcTemplate.update(updateAssetsQuery)
                 
+				if(modelInstance.sourceTDSVersion){
+	        		modelInstance.sourceTDSVersion ++
+	    		} else {
+	    			modelInstance.sourceTDSVersion = 1
+	    		}
+	        	modelInstance.save(flush: true)
+				
 				flash.message = "${modelInstance.modelName} Updated"
                 redirect(action: "show", id: modelInstance.id)
             }
@@ -439,5 +455,45 @@ class ModelController {
 		// Return to model list view with the flash message "Merge completed."
     	flash.message = "Merge completed."
     	redirect(action:list)
+    }
+    /*
+     * 
+     */
+	def importExport = {
+    	
+    }
+    def export = {
+        //get template Excel
+        try {
+			File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Sync_model_template.xls" ).getFile()
+			WorkbookSettings wbSetting = new WorkbookSettings()
+			wbSetting.setUseTemporaryFileDuringWrite(true)
+			def workbook = Workbook.getWorkbook( file, wbSetting )
+			//set MIME TYPE as Excel
+			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			def filename = 	"TDS-Sync-Data-"+formatter.format(new Date())+".xls"
+					filename = filename.replace(" ", "_")
+			response.setContentType( "application/vnd.ms-excel" )
+			response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
+			
+			def book = Workbook.createWorkbook( response.getOutputStream(), workbook )
+			
+			def sheet = book.getSheet("manufacturer")
+			def manufacturers = Model.findAll("FROM Model where sourceTDS = 1 GROUP BY manufacturer").manufacturer
+			
+			for ( int r = 0; r < manufacturers.size(); r++ ) {
+				sheet.addCell( new Label( 0, r+1, String.valueOf(manufacturers[r].id )) )
+				sheet.addCell( new Label( 1, r+1, String.valueOf(manufacturers[r].name )) )
+				sheet.addCell( new Label( 2, r+1, String.valueOf(manufacturers[r].aka ? manufacturers[r].aka : "" )) )
+				sheet.addCell( new Label( 3, r+1, String.valueOf(manufacturers[r].description ? manufacturers[r].description : "" )) )
+			}
+			
+			book.write()
+			book.close()
+		} catch( Exception ex ) {
+			flash.message = "Exception occurred while exporting data"+ex
+			redirect( controller:'model', action:"importExport")
+			return;
+		}
     }
 }

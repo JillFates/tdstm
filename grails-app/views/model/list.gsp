@@ -32,11 +32,12 @@
 								<g:link action="show" id="${modelInstance.id}">${modelInstance.modelName}</g:link>
 							 </jmesa:htmlColumn>
 							 <jmesa:htmlColumn property="manufacturer.name" title="Manufacturer" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${modelInstance.manufacturer}</jmesa:htmlColumn>
-                            <jmesa:htmlColumn property="description" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${modelInstance.description}</jmesa:htmlColumn>
-                            <jmesa:htmlColumn property="assetType" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${modelInstance.assetType}</jmesa:htmlColumn>
-                            <jmesa:htmlColumn property="powerUse" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${modelInstance.powerUse}</jmesa:htmlColumn>
-                            <jmesa:htmlColumn width="50px" property="noOfConnectors" sortable="true" filterable="true" title="No Of Connectors">${modelInstance.noOfConnectors}</jmesa:htmlColumn>
+    	                     <jmesa:htmlColumn property="description" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${modelInstance.description}</jmesa:htmlColumn>
+        	                 <jmesa:htmlColumn property="assetType" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${modelInstance.assetType}</jmesa:htmlColumn>
+            	             <jmesa:htmlColumn property="powerUse" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${modelInstance.powerUse}</jmesa:htmlColumn>
+                	         <jmesa:htmlColumn width="50px" property="noOfConnectors" sortable="true" filterable="true" title="No Of Connectors">${modelInstance.noOfConnectors}</jmesa:htmlColumn>
                              <jmesa:htmlColumn width="50px" property="assetsCount" sortable="true" filterable="true" title="Assets">${modelInstance.assetsCount}</jmesa:htmlColumn>
+                             <jmesa:htmlColumn width="50px" property="sourceTDSVersion" sortable="true" filterable="true" title="Version">${modelInstance.sourceTDSVersion}</jmesa:htmlColumn>
                         </jmesa:htmlRow>
                     </jmesa:htmlTable>
                 </jmesa:tableFacade>

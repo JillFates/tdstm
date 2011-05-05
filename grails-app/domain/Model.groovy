@@ -16,7 +16,9 @@ class Model {
 	Integer bladeCount
 	Integer bladeLabelCount
 	
-	
+	// files to sync data for multiple Transition Manager instances
+	Integer sourceTDS = 1
+	Integer sourceTDSVersion
 	static belongsTo = [ manufacturer : Manufacturer]
 	
 	static hasMany = [ modelConnectors : ModelConnector ]
@@ -52,6 +54,9 @@ class Model {
 				return true
 			}
         })
+		sourceTDS( blank:true, nullable:true )
+		sourceTDSVersion( blank:true, nullable:true )
+		
 	}
 	
 	static mapping  = {	
@@ -62,6 +67,7 @@ class Model {
 			frontImage sqlType:'LONGBLOB'
 			rearImage sqlType:'LONGBLOB'
 			useImage sqltype: 'tinyint'
+			sourceTDS sqltype: 'tinyint'
 		}
 	}
 	String toString(){
