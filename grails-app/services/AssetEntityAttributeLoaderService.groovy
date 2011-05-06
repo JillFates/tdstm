@@ -468,7 +468,7 @@ class AssetEntityAttributeLoaderService {
 					if(!modelInstance){
 						def dtvAssetType = dtvList.find{it.eavAttribute.attributeCode == "assetType"}
 						dtvAssetType = dtvAssetType ? dtvAssetType : "Server"
-						modelInstance = new Model( modelName:modelValue, manufacturer:manufacturerInstance, assetType:dtvAssetType )
+						modelInstance = new Model( modelName:modelValue, manufacturer:manufacturerInstance, assetType:dtvAssetType, sourceTDS : 0 )
 						if ( !modelInstance.validate() || !modelInstance.save() ) {
 							def etext = "Unable to create modelInstance" +
 			                GormUtil.allErrorsString( modelInstance )

@@ -10,6 +10,8 @@ import jxl.*
 import jxl.write.*
 import jxl.read.biff.*
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.springframework.web.multipart.*
+import org.springframework.web.multipart.commons.*
 
 class ModelController {
 	
@@ -460,8 +462,14 @@ class ModelController {
      * 
      */
 	def importExport = {
-    	
+		if( params.message ) {
+			flash.message = params.message
+		}
     }
+    /*
+     * Use excel format with the manufacturer,model and connector sheets. 
+     * The file name should be of the format TDS-Sync-Data-2011-05-02.xls with the current date.
+     */
     def export = {
         //get template Excel
         try {
@@ -478,16 +486,50 @@ class ModelController {
 			
 			def book = Workbook.createWorkbook( response.getOutputStream(), workbook )
 			
-			def sheet = book.getSheet("manufacturer")
+			def manuSheet = book.getSheet("manufacturer")
 			def manufacturers = Model.findAll("FROM Model where sourceTDS = 1 GROUP BY manufacturer").manufacturer
 			
 			for ( int r = 0; r < manufacturers.size(); r++ ) {
-				sheet.addCell( new Label( 0, r+1, String.valueOf(manufacturers[r].id )) )
-				sheet.addCell( new Label( 1, r+1, String.valueOf(manufacturers[r].name )) )
-				sheet.addCell( new Label( 2, r+1, String.valueOf(manufacturers[r].aka ? manufacturers[r].aka : "" )) )
-				sheet.addCell( new Label( 3, r+1, String.valueOf(manufacturers[r].description ? manufacturers[r].description : "" )) )
+				manuSheet.addCell( new Label( 0, r+1, String.valueOf(manufacturers[r].id )) )
+				manuSheet.addCell( new Label( 1, r+1, String.valueOf(manufacturers[r].name )) )
+				manuSheet.addCell( new Label( 2, r+1, String.valueOf(manufacturers[r].aka ? manufacturers[r].aka : "" )) )
+				manuSheet.addCell( new Label( 3, r+1, String.valueOf(manufacturers[r].description ? manufacturers[r].description : "" )) )
 			}
 			
+			def modelSheet = book.getSheet("model")
+			def models = Model.findAllBySourceTDS(1)
+			
+			for ( int r = 0; r < models.size(); r++ ) {
+				modelSheet.addCell( new Label( 0, r+1, String.valueOf(models[r].id )) )
+				modelSheet.addCell( new Label( 1, r+1, String.valueOf(models[r].modelName )) )
+				modelSheet.addCell( new Label( 2, r+1, String.valueOf(models[r].aka ? models[r].aka : "" )) )
+				modelSheet.addCell( new Label( 3, r+1, String.valueOf(models[r].description ? models[r].description : "" )) )
+				modelSheet.addCell( new Label( 4, r+1, String.valueOf(models[r].manufacturer.id )) )
+				modelSheet.addCell( new Label( 5, r+1, String.valueOf(models[r].manufacturer.name )) )
+				modelSheet.addCell( new Label( 6, r+1, String.valueOf(models[r].assetType )) )
+				modelSheet.addCell( new Label( 7, r+1, String.valueOf(models[r].bladeCount ? models[r].bladeCount : "" )) )
+				modelSheet.addCell( new Label( 8, r+1, String.valueOf(models[r].bladeLabelCount ? models[r].bladeLabelCount : "" )) )
+				modelSheet.addCell( new Label( 9, r+1, String.valueOf(models[r].bladeRows ? models[r].bladeRows : "" )) )
+				modelSheet.addCell( new Label( 11, r+1, String.valueOf(models[r].powerUse ? models[r].powerUse : "" )) )
+				modelSheet.addCell( new Label( 13, r+1, String.valueOf(models[r].useImage == 1 ? "yes" : "no" )) )
+				modelSheet.addCell( new Label( 14, r+1, String.valueOf(models[r].usize)) )
+			}
+			def connectorSheet = book.getSheet("connector")
+			def connectors = ModelConnector.findAll("FROM ModelConnector where model.sourceTDS = 1 order by model.id")
+			
+			for ( int r = 0; r < connectors.size(); r++ ) {
+				connectorSheet.addCell( new Label( 0, r+1, String.valueOf(connectors[r].id )) )
+				connectorSheet.addCell( new Label( 1, r+1, String.valueOf(connectors[r].connector )) )
+				connectorSheet.addCell( new Label( 2, r+1, String.valueOf(connectors[r].connectorPosX )) )
+				connectorSheet.addCell( new Label( 3, r+1, String.valueOf(connectors[r].connectorPosY )) )
+				connectorSheet.addCell( new Label( 4, r+1, String.valueOf(connectors[r].label ? connectors[r].label : "" )) )
+				connectorSheet.addCell( new Label( 5, r+1, String.valueOf(connectors[r].labelPosition )) )
+				connectorSheet.addCell( new Label( 6, r+1, String.valueOf(connectors[r].model.id )) )
+				connectorSheet.addCell( new Label( 7, r+1, String.valueOf(connectors[r].model.modelName )) )
+				connectorSheet.addCell( new Label( 8, r+1, String.valueOf(connectors[r].option ? connectors[r].option : "" )) )
+				connectorSheet.addCell( new Label( 9, r+1, String.valueOf(connectors[r].status )) )
+				connectorSheet.addCell( new Label( 10, r+1, String.valueOf(connectors[r].type )) )
+			}
 			book.write()
 			book.close()
 		} catch( Exception ex ) {
@@ -495,5 +537,106 @@ class ModelController {
 			redirect( controller:'model', action:"importExport")
 			return;
 		}
+    }
+    /*
+     *1. On upload the system should put the data into temporary tables and then perform validation to make sure the data is proper and ready.
+	 *2. Step through each imported model:
+	 *2a if it's SourceTDSVersion is higher than the one in the database, update the database with the new model and connector data.
+	 *2b If it is lower, skip it.
+	 *3. Report the number of Model records updated.
+     */
+    def upload = {
+		def added = 0
+		def skipped = []
+        // get File
+        MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
+        CommonsMultipartFile file = ( CommonsMultipartFile ) mpr.getFile("file")
+		def batchNo = jdbcTemplate.queryForInt("select max(batch) from t_manufacturer")
+        // create workbook
+        def workbook
+        def sheetNameMap = new HashMap()
+        //get column name and sheets
+		sheetNameMap.put( "manufacturer", ["manufacturer_id", "name", "aka", "description"] )
+		sheetNameMap.put( "model", ["model_id", "name","aka","description","manufacturer_id","manufacturer_name","asset_type","blade_count","blade_label_count","blade_rows","front_image","power_use","rear_image","use_image","usize"] )
+		sheetNameMap.put( "connector", ["model_connector_id", "connector", "connector_posx", "connector_posy", "label", "label_position", "model_id", "model_name", "connector_option", "status", "type"] )
+		
+        try {
+            workbook = Workbook.getWorkbook( file.inputStream )
+            List sheetNames = workbook.getSheetNames()
+			def sheets = sheetNameMap.keySet()
+			def missingSheets = []
+            def flag = 1
+            def sheetsLength = sheets.size()
+			
+			sheets.each{
+				if ( !sheetNames.contains( it ) ) {
+                    flag = 0
+					missingSheets<< it
+                }
+			}
+            if( flag == 0 ) {
+                flash.message = "${missingSheets} sheets not found, Please check it."
+                redirect( action:importExport, params:[message:flash.message] )
+                return;
+            } else {
+            	def sheetColumnNames = [:]
+                //check for column
+				def manuSheet = workbook.getSheet( "manufacturer" )
+                def manuCol = manuSheet.getColumns()
+                for ( int c = 0; c < manuCol; c++ ) {
+                    def cellContent = manuSheet.getCell( c, 0 ).contents
+                    sheetColumnNames.put(cellContent, c)
+                }
+                def missingHeader = checkHeader( sheetNameMap.get("manufacturer"), sheetColumnNames )
+                // Statement to check Headers if header are not found it will return Error message
+                if ( missingHeader != "" ) {
+                    flash.message = " Column Headers : ${missingHeader} not found, Please check it."
+                    redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+                    return;
+                } else {
+                    def sheetrows = manuSheet.rows
+                    for ( int r = 1; r < sheetrows ; r++ ) {
+                		def valueList = new StringBuffer("(")
+                    	for( int cols = 0; cols < manuCol; cols++ ) {
+                    		valueList.append("'"+manuSheet.getCell( cols, r ).contents.replace("'","\\'")+"',")
+                        }
+                		try{
+                			jdbcTemplate.update("insert into t_manufacturer( manufacturer_temp_id, name,aka, description, batch) values "+valueList.toString()+"${batchNo+1})")
+                			added = r
+                		} catch (Exception e) {
+                			skipped += ( r +1 )
+                		}
+                    }
+
+                } // generate error message
+                workbook.close()
+                if (skipped.size() > 0) {
+                    flash.message = " File Uploaded Successfully with ${added} records. and  ${skipped} Records skipped Please click the Manage Batches to review and post these changes."
+                } else {
+                    flash.message = " File uploaded successfully with ${added} records.  Please click the Manage Batches to review and post these changes."
+                }
+                redirect( action:importExport, params:[message:flash.message] )
+	            return;  
+	        }
+        } catch( NumberFormatException ex ) {
+            flash.message = ex
+            redirect( action:importExport, params:[message:flash.message] )
+            return;
+        } catch( Exception ex ) {
+        	ex.printStackTrace()
+            flash.message = grailsApplication.metadata[ 'app.file.format' ]
+            redirect( action:importExport, params:[message:flash.message] )
+            return;
+        } 
+    }
+    def checkHeader( def list, def sheetColumnNames  ) {  
+    	def missingHeader = ""
+        def listSize = list.size()
+        for ( int coll = 0; coll < listSize; coll++ ) {
+            if( !sheetColumnNames.containsKey( list[coll] ) ) {
+                missingHeader = missingHeader + ", " + list[coll]
+            }
+        }
+    	return missingHeader
     }
 }

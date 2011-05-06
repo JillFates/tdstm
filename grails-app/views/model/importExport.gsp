@@ -13,7 +13,7 @@
       </g:if>
       
         <h1 style="font-size: 12px;">Import or export TDS model data. Only synchronizes those with the Source TDS flag.</h1>
-        <g:form action="import" method="post" name="importForm" enctype="multipart/form-data" >
+        <g:form action="upload" method="post" name="importForm" enctype="multipart/form-data" >
           <input type="hidden" value="${projectId}" name="projectIdImport" />
           <div class="dialog">
             <table>
