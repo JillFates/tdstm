@@ -15,6 +15,7 @@ class Model {
 	Integer bladeRows
 	Integer bladeCount
 	Integer bladeLabelCount
+	String bladeHeight
 	
 	// files to sync data for multiple Transition Manager instances
 	Integer sourceTDS = 1
@@ -35,6 +36,7 @@ class Model {
 		bladeRows( blank:true, nullable:true )
 		bladeCount( blank:true, nullable:true )
 		bladeLabelCount( blank:true, nullable:true )
+		bladeHeight( blank:true, nullable:true inList[Full,Half] )
 		aka( blank:true, nullable:true, validator: { val, obj ->
 			if(val){
 				def isDuplicated = false

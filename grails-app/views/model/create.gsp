@@ -109,6 +109,13 @@
 				</g:hasErrors> 
 			</td>
 		</tr>
+		<tr id="bladeHeightId" style="display: ${modelInstance.assetType == 'Blade' ? 'block' : 'none'}">
+			<td>Blade Height:</td>
+			<td>
+				<g:select id="bladeHeightId" name="bladeHeight" from="${modelInstance.constraints.bladeHeight.inList}" ></g:select>
+			</td>
+		</tr>
+
 		 <tr>
 			<td valign="top" class="name">Notes:</td>
 			<td><input type="text" name="description" id="descriptionId" value="${modelInstance.description}" > </td>
