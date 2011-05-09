@@ -36,7 +36,7 @@ class Model {
 		bladeRows( blank:true, nullable:true )
 		bladeCount( blank:true, nullable:true )
 		bladeLabelCount( blank:true, nullable:true )
-		bladeHeight( blank:true, nullable:true inList[Full,Half] )
+		bladeHeight( blank:true, nullable:true inList:[Full,Half] )
 		aka( blank:true, nullable:true, validator: { val, obj ->
 			if(val){
 				def isDuplicated = false
