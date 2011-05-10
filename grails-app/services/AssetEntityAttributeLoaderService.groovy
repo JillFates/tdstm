@@ -7,6 +7,7 @@ import java.io.*
 import jxl.*
 import jxl.write.*
 import jxl.read.biff.*
+import com.tdssrc.grails.GormUtil
 
 class AssetEntityAttributeLoaderService {
 
@@ -467,8 +468,9 @@ class AssetEntityAttributeLoaderService {
 					}
 					if(!modelInstance){
 						def dtvAssetType = dtvList.find{it.eavAttribute.attributeCode == "assetType"}
-						dtvAssetType = dtvAssetType ? dtvAssetType : "Server"
-						modelInstance = new Model( modelName:modelValue, manufacturer:manufacturerInstance, assetType:dtvAssetType, sourceTDS : 0 )
+						def assetType = dtvAssetType?.correctedValue ? dtvAssetType?.correctedValue : dtvAssetType?.importValue
+						assetType = assetType ? assetType : "Server"
+						modelInstance = new Model( modelName:modelValue, manufacturer:manufacturerInstance, assetType:assetType, sourceTDS : 0 )
 						if ( !modelInstance.validate() || !modelInstance.save() ) {
 							def etext = "Unable to create modelInstance" +
 			                GormUtil.allErrorsString( modelInstance )
