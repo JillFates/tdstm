@@ -107,6 +107,17 @@
 				<g:select id="bladeHeightId" name="bladeHeight" from="${modelInstance.constraints.bladeHeight.inList}" value="${modelInstance.bladeHeight}"></g:select>
 			</td>
 		</tr>
+		<tr>
+        	<td>Source TDS:</td>
+	        <td>
+	        <g:if test="${modelInstance.sourceTDS}">
+	       		<input type="checkbox" name="sourceTDS" id="sourceTDSId"  checked="checked" />
+	        </g:if>
+	        <g:else>
+	        	<input type="checkbox" name="sourceTDS" id="sourceTDSId" />
+	        </g:else>
+	        </td>
+        </tr>
         <tr>
 			<td>Notes:</td>
 			<td><input type="text" name="description" id="descriptionId" value="${modelInstance.description}"> </td>

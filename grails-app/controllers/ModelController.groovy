@@ -12,6 +12,7 @@ import jxl.read.biff.*
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.springframework.web.multipart.*
 import org.springframework.web.multipart.commons.*
+import org.jsecurity.SecurityUtils
 
 class ModelController {
 	
@@ -82,6 +83,7 @@ class ModelController {
 		if(modelId)
 			modelTemplate = Model.get(modelId)
     	params.useImage = params.useImage == 'on' ? 1 : 0
+    	params.sourceTDS = params.sourceTDS == 'on' ? 1 : 0
         def modelInstance = new Model(params)
 		def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
 		def frontImage = request.getFile('frontImage')
@@ -180,6 +182,7 @@ class ModelController {
         def modelInstance = Model.get(params.id)
         if (modelInstance) {
         	params.useImage = params.useImage == 'on' ? 1 : 0
+        	params.sourceTDS = params.sourceTDS == 'on' ? 1 : 0
             def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
     		def frontImage = request.getFile('frontImage')
             if( frontImage ) {
@@ -465,6 +468,9 @@ class ModelController {
 		if( params.message ) {
 			flash.message = params.message
 		}
+		
+		def batchCount = jdbcTemplate.queryForInt("select count(*) from ( select * from manufacturer_sync group by batch_id ) a")
+		[batchCount:batchCount]
     }
     /*
      * Use excel format with the manufacturer,model and connector sheets. 
@@ -510,7 +516,9 @@ class ModelController {
 				modelSheet.addCell( new Label( 7, r+1, String.valueOf(models[r].bladeCount ? models[r].bladeCount : "" )) )
 				modelSheet.addCell( new Label( 8, r+1, String.valueOf(models[r].bladeLabelCount ? models[r].bladeLabelCount : "" )) )
 				modelSheet.addCell( new Label( 9, r+1, String.valueOf(models[r].bladeRows ? models[r].bladeRows : "" )) )
+				modelSheet.addCell( new Label( 10, r+1, String.valueOf(models[r].sourceTDS == 1 ? "TDS" : "" )) )
 				modelSheet.addCell( new Label( 11, r+1, String.valueOf(models[r].powerUse ? models[r].powerUse : "" )) )
+				modelSheet.addCell( new Label( 12, r+1, String.valueOf(models[r].sourceTDSVersion ? models[r].sourceTDSVersion : 1 )) )
 				modelSheet.addCell( new Label( 13, r+1, String.valueOf(models[r].useImage == 1 ? "yes" : "no" )) )
 				modelSheet.addCell( new Label( 14, r+1, String.valueOf(models[r].usize)) )
 			}
@@ -546,88 +554,234 @@ class ModelController {
 	 *3. Report the number of Model records updated.
      */
     def upload = {
-		def added = 0
-		def skipped = []
-        // get File
-        MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
-        CommonsMultipartFile file = ( CommonsMultipartFile ) mpr.getFile("file")
-		def batchNo = jdbcTemplate.queryForInt("select max(batch) from t_manufacturer")
-        // create workbook
-        def workbook
-        def sheetNameMap = new HashMap()
-        //get column name and sheets
-		sheetNameMap.put( "manufacturer", ["manufacturer_id", "name", "aka", "description"] )
-		sheetNameMap.put( "model", ["model_id", "name","aka","description","manufacturer_id","manufacturer_name","asset_type","blade_count","blade_label_count","blade_rows","front_image","power_use","rear_image","use_image","usize"] )
-		sheetNameMap.put( "connector", ["model_connector_id", "connector", "connector_posx", "connector_posy", "label", "label_position", "model_id", "model_name", "connector_option", "status", "type"] )
-		
-        try {
-            workbook = Workbook.getWorkbook( file.inputStream )
-            List sheetNames = workbook.getSheetNames()
-			def sheets = sheetNameMap.keySet()
-			def missingSheets = []
-            def flag = 1
-            def sheetsLength = sheets.size()
+		DataTransferBatch.withTransaction { status ->
+			//get user name.
+			def subject = SecurityUtils.subject
+			def principal = subject.principal
+			def userLogin = UserLogin.findByUsername( principal )
+	        // get File
+	        MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
+	        CommonsMultipartFile file = ( CommonsMultipartFile ) mpr.getFile("file")
+	        def modelSyncBatch = new ModelSyncBatch(userLogin:userLogin).save()
+	        // create workbook
+	        def workbook
+	        def sheetNameMap = new HashMap()
+	        //get column name and sheets
+			sheetNameMap.put( "manufacturer", ["manufacturer_id", "name", "aka", "description"] )
+			sheetNameMap.put( "model", ["model_id", "name","aka","description","manufacturer_id","manufacturer_name","asset_type","blade_count","blade_label_count","blade_rows","sourcetds","power_use","sourcetdsversion","use_image","usize"] )
+			sheetNameMap.put( "connector", ["model_connector_id", "connector", "connector_posx", "connector_posy", "label", "label_position", "model_id", "model_name", "connector_option", "status", "type"] )
 			
-			sheets.each{
-				if ( !sheetNames.contains( it ) ) {
-                    flag = 0
-					missingSheets<< it
-                }
-			}
-            if( flag == 0 ) {
-                flash.message = "${missingSheets} sheets not found, Please check it."
-                redirect( action:importExport, params:[message:flash.message] )
-                return;
-            } else {
-            	def sheetColumnNames = [:]
-                //check for column
-				def manuSheet = workbook.getSheet( "manufacturer" )
-                def manuCol = manuSheet.getColumns()
-                for ( int c = 0; c < manuCol; c++ ) {
-                    def cellContent = manuSheet.getCell( c, 0 ).contents
-                    sheetColumnNames.put(cellContent, c)
-                }
-                def missingHeader = checkHeader( sheetNameMap.get("manufacturer"), sheetColumnNames )
-                // Statement to check Headers if header are not found it will return Error message
-                if ( missingHeader != "" ) {
-                    flash.message = " Column Headers : ${missingHeader} not found, Please check it."
-                    redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
-                    return;
-                } else {
-                    def sheetrows = manuSheet.rows
-                    for ( int r = 1; r < sheetrows ; r++ ) {
-                		def valueList = new StringBuffer("(")
-                    	for( int cols = 0; cols < manuCol; cols++ ) {
-                    		valueList.append("'"+manuSheet.getCell( cols, r ).contents.replace("'","\\'")+"',")
-                        }
-                		try{
-                			jdbcTemplate.update("insert into t_manufacturer( manufacturer_temp_id, name,aka, description, batch) values "+valueList.toString()+"${batchNo+1})")
-                			added = r
-                		} catch (Exception e) {
-                			skipped += ( r +1 )
-                		}
-                    }
-
-                } // generate error message
-                workbook.close()
-                if (skipped.size() > 0) {
-                    flash.message = " File Uploaded Successfully with ${added} records. and  ${skipped} Records skipped Please click the Manage Batches to review and post these changes."
-                } else {
-                    flash.message = " File uploaded successfully with ${added} records.  Please click the Manage Batches to review and post these changes."
-                }
-                redirect( action:importExport, params:[message:flash.message] )
-	            return;  
-	        }
-        } catch( NumberFormatException ex ) {
-            flash.message = ex
-            redirect( action:importExport, params:[message:flash.message] )
-            return;
-        } catch( Exception ex ) {
-        	ex.printStackTrace()
-            flash.message = grailsApplication.metadata[ 'app.file.format' ]
-            redirect( action:importExport, params:[message:flash.message] )
-            return;
-        } 
+	        try {
+	            workbook = Workbook.getWorkbook( file.inputStream )
+	            List sheetNames = workbook.getSheetNames()
+				def sheets = sheetNameMap.keySet()
+				def missingSheets = []
+	            def flag = 1
+	            def sheetsLength = sheets.size()
+				
+				sheets.each{
+					if ( !sheetNames.contains( it ) ) {
+	                    flag = 0
+						missingSheets<< it
+	                }
+				}
+	            if( flag == 0 ) {
+	                flash.message = "${missingSheets} sheets not found, Please check it."
+	                redirect( action:importExport, params:[message:flash.message] )
+	                return;
+	            } else {
+	            	def manuAdded = 0
+					def manuSkipped = []
+	            	def sheetColumnNames = [:]
+	                //check for column
+					def manuSheet = workbook.getSheet( "manufacturer" )
+	                def manuCol = manuSheet.getColumns()
+	                for ( int c = 0; c < manuCol; c++ ) {
+	                    def cellContent = manuSheet.getCell( c, 0 ).contents
+	                    sheetColumnNames.put(cellContent, c)
+	                }
+	                def missingHeader = checkHeader( sheetNameMap.get("manufacturer"), sheetColumnNames )
+	                // Statement to check Headers if header are not found it will return Error message
+	                if ( missingHeader != "" ) {
+	                    flash.message = " Column Headers : ${missingHeader} not found, Please check it."
+	                    redirect( action:importExport, params:[message:flash.message] )
+	                    return;
+	                } else {
+	                    def sheetrows = manuSheet.rows
+	                    for ( int r = 1; r < sheetrows ; r++ ) {
+	                		def valueList = new StringBuffer("(")
+	                    	for( int cols = 0; cols < manuCol; cols++ ) {
+	                    		valueList.append("'"+manuSheet.getCell( cols, r ).contents.replace("'","\\'")+"',")
+	                        }
+	                		try{
+	                			jdbcTemplate.update("insert into manufacturer_sync( manufacturer_temp_id, name,aka, description, batch_id) values "+valueList.toString()+"${modelSyncBatch.id})")
+								manuAdded = r
+	                		} catch (Exception e) {
+	                			manuSkipped += ( r +1 )
+	                		}
+	                    }
+	
+	                }
+	                /*
+	                 *  Import Model Information
+	                 */
+					def modelSheetColumnNames = [:]
+					def modelAdded = 0
+					def modelSkipped = []
+	                 //check for column
+	 				def modelSheet = workbook.getSheet( "model" )
+					def modelCol = modelSheet.getColumns()
+					for ( int c = 0; c < modelCol; c++ ) {
+						def cellContent = modelSheet.getCell( c, 0 ).contents
+						modelSheetColumnNames.put(cellContent, c)
+					}
+	                missingHeader = checkHeader( sheetNameMap.get("model"), modelSheetColumnNames )
+					// Statement to check Headers if header are not found it will return Error message
+					if ( missingHeader != "" ) {
+						flash.message = " Column Headers : ${missingHeader} not found, Please check it."
+						redirect( action:importExport, params:[ message:flash.message] )
+						return;
+					} else {
+						def sheetrows = modelSheet.rows
+						for ( int r = 1; r < sheetrows ; r++ ) {
+							def valueList = new StringBuffer("(")
+		             		def manuId
+		                 	for( int cols = 0; cols < modelCol; cols++ ) {
+		                 		
+								switch(modelSheet.getCell( cols, 0 ).contents){
+								case "manufacturer_name" : 
+									def manuName = modelSheet.getCell( cols, r ).contents
+									manuId = ManufacturerSync.findByNameAndBatch(manuName,modelSyncBatch)?.id
+									valueList.append("'"+modelSheet.getCell( cols, r ).contents.replace("'","\\'")+"',")
+									break;
+								case "blade_count" : 
+									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									break;
+								case "blade_label_count" :
+									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									break;
+								case "blade_rows" : 
+									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									break;
+								case "use_image" : 
+									int useImage = 0
+									if(modelSheet.getCell( cols, r ).contents.toLowerCase() != "no"){
+										useImage = 1
+									}
+									valueList.append(useImage+",")
+									break;
+								case "power_use" : 
+									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									break;
+								case "usize" : 
+									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									break;
+								case "sourcetds" : 
+									int isTDS = 0
+									if(modelSheet.getCell( cols, r ).contents.toLowerCase() == "tds"){
+										isTDS = 1
+									}
+									valueList.append(isTDS+",")
+									break;
+								case "sourcetdsversion" : 
+									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									break;
+								default : 
+									valueList.append("'"+modelSheet.getCell( cols, r ).contents.replace("'","\\'")+"',")
+									break;
+								}
+		                 									
+		                 	}
+		             		try{
+		             			if(manuId){
+			             			jdbcTemplate.update("insert into model_sync( model_temp_id, name,aka, description,manufacturer_temp_id,manufacturer_name,asset_type,blade_count,blade_label_count,blade_rows,front_image,power_use,sourcetdsversion,use_image,usize,batch_id,manufacturer_id ) values "+valueList.toString()+"${modelSyncBatch.id}, $manuId)")
+									modelAdded = r
+		             			} else {
+		             				modelSkipped += ( r +1 )
+		             			}
+		             		} catch (Exception e) {
+		             			modelSkipped += ( r +1 )
+		             		}
+		                }
+					}
+	                /*
+	                 *  Import Model Information
+	                 */
+					def connectorSheetColumnNames = [:]
+					def connectorAdded = 0
+					def connectorSkipped = []
+	                 //check for column
+	 				def connectorSheet = workbook.getSheet( "connector" )
+					def connectorCol = connectorSheet.getColumns()
+					for ( int c = 0; c < connectorCol; c++ ) {
+						def cellContent = connectorSheet.getCell( c, 0 ).contents
+						connectorSheetColumnNames.put(cellContent, c)
+					}
+	                missingHeader = checkHeader( sheetNameMap.get("connector"), connectorSheetColumnNames )
+					// Statement to check Headers if header are not found it will return Error message
+					if ( missingHeader != "" ) {
+						flash.message = " Column Headers : ${missingHeader} not found, Please check it."
+						redirect( action:importExport, params:[message:flash.message] )
+						return;
+					} else {
+						def sheetrows = connectorSheet.rows
+						for ( int r = 1; r < sheetrows ; r++ ) {
+							def valueList = new StringBuffer("(")
+		             		def modelId
+		                 	for( int cols = 0; cols < connectorCol; cols++ ) {
+		                 		
+								switch(connectorSheet.getCell( cols, 0 ).contents){
+								case "model_name" : 
+									def modelName = connectorSheet.getCell( cols, r ).contents
+									modelId = ModelSync.findByModelNameAndBatch(modelName,modelSyncBatch)?.id
+									valueList.append("'"+connectorSheet.getCell( cols, r ).contents.replace("'","\\'")+"',")
+									break;
+								case "connector_posx" : 
+									valueList.append((connectorSheet.getCell( cols, r ).contents ? connectorSheet.getCell( cols, r ).contents : null)+",")
+									break;
+								case "connector_posy" :
+									valueList.append((connectorSheet.getCell( cols, r ).contents ? connectorSheet.getCell( cols, r ).contents : null)+",")
+									break;
+								default : 
+									valueList.append("'"+connectorSheet.getCell( cols, r ).contents.replace("'","\\'")+"',")
+									break;
+								}
+		                 									
+		                 	}
+		             		try{
+		             			if(modelId){
+			             			jdbcTemplate.update("insert into model_connector_sync( connector_temp_id,connector,connector_posx,connector_posy,label,label_position,model_temp_id,model_name,connector_option,status,type,batch_id,model_id ) values "+valueList.toString()+"${modelSyncBatch.id}, $modelId)")
+									connectorAdded = r
+		             			} else {
+		             				connectorSkipped += ( r +1 )
+		             			}
+		             		} catch (Exception e) {
+		             			connectorSkipped += ( r +1 )
+		             		}
+		                }
+					}                
+	                workbook.close()
+	                if (manuSkipped.size() > 0 || modelSkipped.size() > 0 || connectorSkipped.size() > 0) {
+	                    flash.message = " File Uploaded Successfully with Manufactures:${manuAdded},Model:${modelAdded},Connectors:${connectorAdded} records. and  Manufactures:${manuSkipped},Model:${modelSkipped},Connectors:${connectorSkipped} Records skipped Please click the Manage Batches to review and post these changes."
+	                } else {
+	                    flash.message = " File uploaded successfully with Manufactures:${manuAdded},Model:${modelAdded},Connectors:${connectorAdded} records.  Please click the Manage Batches to review and post these changes."
+	                }
+	                redirect( action:importExport, params:[message:flash.message] )
+		            return;  
+		        }
+	        } catch( NumberFormatException ex ) {
+	            flash.message = ex
+	            status.setRollbackOnly()
+	            redirect( action:importExport, params:[message:flash.message] )
+	            return;
+	        } catch( Exception ex ) {
+	        	ex.printStackTrace()
+				status.setRollbackOnly()
+	            flash.message = ex
+	            redirect( action:importExport, params:[message:flash.message] )
+	            return;
+	        } 
+		}
     }
     def checkHeader( def list, def sheetColumnNames  ) {  
     	def missingHeader = ""
@@ -639,4 +793,8 @@ class ModelController {
         }
     	return missingHeader
     }
+    def manageImports = {
+    	[modelSyncBatch:ModelSyncBatch.list()]
+    }
+	
 }

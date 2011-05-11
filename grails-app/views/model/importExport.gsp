@@ -34,7 +34,7 @@
                 </tr>
                 
                 <tr>
-                	<td valign="top" class="buttonR"><g:link controller="dataTransferBatch" params="[projectId:projectId]">Manage Imports: ${dataTransferBatchs}</g:link></td>
+                	<td valign="top" class="buttonR"><g:link controller="modelSyncBatch" >Manage Imports: ${batchCount}</g:link></td>
                 	<td valign="top" class="name">&nbsp;</td>
                 </tr>
               </tbody>

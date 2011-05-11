@@ -93,6 +93,17 @@
 			<td>${modelInstance?.bladeLabelCount}</td>
 		</tr>
 		<tr>
+        	<td>Source TDS:</td>
+	        <td>
+		        <g:if test="${modelInstance.sourceTDS}">
+		        	<input type="checkbox" name="sourceTDS" id="sourceTDSId" checked="checked" disabled="disabled"/>
+		        </g:if>
+		        <g:else>
+		       	 <input type="checkbox" name="sourceTDS" id="sourceTDSId" disabled="disabled"/>
+		        </g:else>
+	        </td>
+        </tr>
+		<tr>
 			<td>Notes:</td>
 			<td>${modelInstance?.description}</td>
 		</tr>

@@ -18,7 +18,7 @@ class Model {
 	
 	// files to sync data for multiple Transition Manager instances
 	Integer sourceTDS = 1
-	Integer sourceTDSVersion
+	Integer sourceTDSVersion = 1
 	static belongsTo = [ manufacturer : Manufacturer]
 	
 	static hasMany = [ modelConnectors : ModelConnector ]
@@ -113,5 +113,8 @@ class Model {
 	}
 	def getAssetsCount(){
 		return AssetEntity.countByModel( this )
+	}
+	def getSource(){
+		return this.sourceTDS == 1 ? "TDS" : ""
 	}
 }

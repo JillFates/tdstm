@@ -38,6 +38,7 @@
                 	         <jmesa:htmlColumn width="50px" property="noOfConnectors" sortable="true" filterable="true" title="No Of Connectors">${modelInstance.noOfConnectors}</jmesa:htmlColumn>
                              <jmesa:htmlColumn width="50px" property="assetsCount" sortable="true" filterable="true" title="Assets">${modelInstance.assetsCount}</jmesa:htmlColumn>
                              <jmesa:htmlColumn width="50px" property="sourceTDSVersion" sortable="true" filterable="true" title="Version">${modelInstance.sourceTDSVersion}</jmesa:htmlColumn>
+                             <jmesa:htmlColumn width="50px" property="source" sortable="true" filterable="true" title="Source TDS">${modelInstance.source}</jmesa:htmlColumn>
                         </jmesa:htmlRow>
                     </jmesa:htmlTable>
                 </jmesa:tableFacade>
