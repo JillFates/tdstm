@@ -107,7 +107,7 @@ class ManufacturerController {
      */
 	def getManufacturersListAsJSON = {
     	def assetType = params.assetType
-    	def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer ",[assetType])?.manufacturer
+    	def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
 		render manufacturers as JSON
     }
     /*

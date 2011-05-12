@@ -373,7 +373,7 @@ class ModelController {
     	def models
 		if(manufacturer){
 			def manufacturerInstance = Manufacturer.get(manufacturer)
-			models = manufacturerInstance ? Model.findAllByManufacturer( manufacturerInstance )?.findAll{it.assetType == assetType } : null
+			models = manufacturerInstance ? Model.findAllByManufacturer( manufacturerInstance,[sort:'modelName',order:'asc'] )?.findAll{it.assetType == assetType } : null
 		}
     	if(!models)
     		models = []

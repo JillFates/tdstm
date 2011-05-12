@@ -745,7 +745,7 @@ class AssetEntityController {
 		def projectId = getSession().getAttribute( "CURR_PROJ" )?.CURR_PROJ
 		def project = Project.findById( projectId )
         entityAttributeInstance.each{
-        	def attributeOptions = EavAttributeOption.findAllByAttribute( it.attribute )
+        	def attributeOptions = EavAttributeOption.findAllByAttribute( it.attribute,[sort:'value',order:'asc'] )
     		def options = []
     		attributeOptions.each{option ->
     			options<<[option:option.value]
@@ -864,7 +864,7 @@ class AssetEntityController {
     	def projectId = getSession().getAttribute( "CURR_PROJ" )?.CURR_PROJ
 		def project = Project.findById( projectId )
     	entityAttributeInstance.each{
-    		def attributeOptions = EavAttributeOption.findAllByAttribute( it.attribute )
+    		def attributeOptions = EavAttributeOption.findAllByAttribute( it.attribute,[sort:'value',order:'asc'] )
     		def options = []
     		attributeOptions.each{option ->
     			options<<[option:option.value]

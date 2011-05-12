@@ -393,7 +393,7 @@ class MoveBundleController {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def moveBundlesList 
 		if(projectId){
-			moveBundlesList = MoveBundle.findAllByProject(Project.get(projectId))
+			moveBundlesList = MoveBundle.findAllByProject(Project.get(projectId),[sort:'name',order:'asc'])
 	 	}
 		render moveBundlesList as JSON
 	}

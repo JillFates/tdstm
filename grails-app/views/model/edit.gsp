@@ -24,7 +24,7 @@
 	<tbody>
 		<tr>
 			<td>Manufacturer:</td>
-			<td><g:select id="manufacturerId" name="manufacturer.id" from="${Manufacturer.list()}" optionKey="id" value="${modelInstance?.manufacturer.id}"></g:select></td>
+			<td><g:select id="manufacturerId" name="manufacturer.id" from="${Manufacturer.list([sort:'name',order:'asc'])}" optionKey="id" value="${modelInstance?.manufacturer.id}"></g:select></td>
 		</tr>
 		<tr>
 			<td>Model Name:</td>
@@ -101,12 +101,12 @@
 				</g:hasErrors> 
 			</td>
 		</tr>
-		<tr id="bladeHeightId" style="display: ${modelInstance.assetType == 'Blade' ? 'block' : 'none'}">
+		<%--<tr id="bladeHeightId" style="display: ${modelInstance.assetType == 'Blade' ? 'block' : 'none'}">
 			<td>Blade Height:</td>
 			<td>
 				<g:select id="bladeHeightId" name="bladeHeight" from="${modelInstance.constraints.bladeHeight.inList}" value="${modelInstance.bladeHeight}"></g:select>
 			</td>
-		</tr>
+		</tr>--%>
 		<tr>
         	<td>Source TDS:</td>
 	        <td>
