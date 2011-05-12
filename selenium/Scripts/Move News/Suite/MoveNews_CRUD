@@ -11,6 +11,7 @@
 <thead>
 <tr><td rowspan="1" colspan="3">MoveNews_CRUD</td></tr>
 </thead><tbody>
+<!--Pre-requisite: Make sure there is a user-selected Event and Bundle in the project-->
 <tr>
 	<td>setSpeed</td>
 	<td>2500</td>
