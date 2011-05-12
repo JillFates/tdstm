@@ -75,7 +75,7 @@
 			$("#cablingDialogId").dialog("close")
 			submitForm($('form [name=rackLayoutCreate]'));
 		} else {
-			alert("Asset Entity is not updated")
+			alert("Asset Entity is not updated, Please check the required fields")
 		}
 	}
 	// Script to get the combined rack list

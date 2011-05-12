@@ -821,7 +821,7 @@ Comment</a></span></div>
 				$("#editDialog").dialog("close")
 				timedUpdate($("#selectTimedId").val())
 			} else {
-		   		alert("Asset Entity is not updated")
+		   		alert("Asset Entity is not updated, Please check the required fields")
 			}
 	}
 

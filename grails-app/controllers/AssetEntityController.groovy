@@ -712,7 +712,6 @@ class AssetEntityController {
         def projectInstance = Project.findById( projectId )
         assetEntityInstance.project = projectInstance
         assetEntityInstance.owner = projectInstance.client
-        
         if(!assetEntityInstance.hasErrors() && assetEntityInstance.save()) {
         	assetEntityInstance.updateRacks()
 			 
@@ -774,6 +773,7 @@ class AssetEntityController {
     def updateAssetEntity = {
     	def assetItems = []    	
     	def assetEntityParams = params.assetEntityParams
+		println"assetEntityParams-->"+assetEntityParams
     	if(assetEntityParams) {
     		def assetEntityParamsList = ( assetEntityParams.substring( 0, assetEntityParams.lastIndexOf('~') ) ).split("~,")
 	    	def map = new HashMap()

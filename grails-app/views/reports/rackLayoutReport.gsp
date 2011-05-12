@@ -121,7 +121,7 @@
 		if (assetEntityAttributes != "") {
 			$("#editDialog").dialog("close");
 		} else {
-			alert("Asset Entity is not updated");
+			alert("Asset Entity is not updated, Please check the required fields");
 		}
 	}
 </script>

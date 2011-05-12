@@ -80,20 +80,17 @@ function onInvokeExportAction(id) {
 				      	}
 				  $("#editDialog").dialog("close")
 				} else {
-					alert("Asset Entity is not updated")
+					alert("Asset Entity is not updated, Please check the required fields")
 				}
       		}
 		    
       		function validateAssetEntity(formname) {
       			var attributeSet = $("#attributeSetId").val();
       			if(attributeSet || formname == 'editForm'){
-      				var assetName = document.forms[formname].assetName.value;
-      				var assetTag = document.forms[formname].assetTag.value;
+      				var assetName = document.forms[formname].assetName.value.replace(/^\s*/, "").replace(/\s*$/, "");
+      				
 	      			if( !assetName ){
 	      				alert(" Please Enter Asset Name. ");
-	      				return false;
-	      			} else if( !assetTag ){
-	      				alert(" Please Enter Asset Tag. ");
 	      				return false;
 	      			} else {
 	      				return true;

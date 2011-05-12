@@ -129,10 +129,12 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	 * Date to insert in GMT
 	 */
 	def beforeInsert = {
+		assetTag = assetTag ? assetTag : "TDS-${project.id}" 
 		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
 		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
 	}
 	def beforeUpdate = {
+		assetTag = assetTag ? assetTag : "TDS-${project.id}"
 		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
 	}
 	/*def afterInsert = {

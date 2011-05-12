@@ -170,9 +170,10 @@
 		if (assetEntityAttributes != "") {
 			$("#editDialog").dialog("close")
 			$("#cablingDialogId").dialog("close")
-			submitForm($('form [name=rackLayoutCreate]'));
+			$('#commit').val('Generate')
+			$("#generateId").click()
 		} else {
-			alert("Asset Entity is not updated")
+			alert("Asset Entity is not updated, Please check the required fields")
 		}
 	}
 	// Script to get the combined rack list
@@ -236,7 +237,7 @@
 			<td class="buttonR">
 				<br /><br />
 				<input type="hidden" id="commit" name="commit" value="" />
-				<input type="submit" class="submit" value="Generate" />
+				<input type="submit" class="submit" value="Generate" id="generateId"/>
 			</td>
 
 			<td class="buttonR">
