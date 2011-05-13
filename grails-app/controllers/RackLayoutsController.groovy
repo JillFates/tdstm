@@ -464,7 +464,7 @@ class RackLayoutsController {
 					}
 					tag = tag.split('')[1..-1].join('<br/>')
 					def taglabel = "<div>"+tag.substring(0,tag.length())+"</div>"
-					def bladeSpan = blade.bladeSize == 'Full' ? chassisRows : 1
+					def bladeSpan = blade.model.bladeHeight == 'Full' ? chassisRows : 1
 					if(bladeSpan == chassisRows){
 						for(int y = i; y <= chassisRows*bladesPerRow; y += bladesPerRow ){
 							fullRows << y + bladesPerRow

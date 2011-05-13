@@ -92,6 +92,10 @@
 			<td>Blade Label Count:</td>
 			<td>${modelInstance?.bladeLabelCount}</td>
 		</tr>
+		<tr style="display: ${modelInstance.assetType == 'Blade' ? 'block' : 'none'}">
+			<td>Blade Height:</td>
+			<td>${modelInstance?.bladeHeight}</td>
+		</tr>
 		<tr>
         	<td>Source TDS:</td>
 	        <td>

@@ -109,12 +109,12 @@
 				</g:hasErrors> 
 			</td>
 		</tr>
-		<%--<tr id="bladeHeightId" style="display: ${modelInstance.assetType == 'Blade' ? 'block' : 'none'}">
+		<tr id="bladeHeightId" style="display: ${modelInstance.assetType == 'Blade' ? 'block' : 'none'}">
 			<td>Blade Height:</td>
 			<td>
 				<g:select id="bladeHeightId" name="bladeHeight" from="${modelInstance.constraints.bladeHeight.inList}" ></g:select>
 			</td>
-		</tr> --%>
+		</tr>
 		<tr>
         	<td>Source TDS:</td>
 	        <td>
@@ -314,6 +314,11 @@
 			$("#bladeRowsId").hide()
 			$("#bladeCountId").hide()
 			$("#bladeLabelCountId").hide()
+		}
+		if(value == "Blade"){
+			$("#bladeHeightId").show()
+		} else {
+			$("#bladeHeightId").hide()
 		}
 	}
 	showBladeFields($("#assetTypeId").val())

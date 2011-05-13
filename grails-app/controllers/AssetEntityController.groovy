@@ -619,7 +619,7 @@ class AssetEntityController {
         Limit limit = tableFacade.limit
 		if(limit.isExported()){
             tableFacade.setExportTypes(response,limit.getExportType())
-            tableFacade.setColumnProperties("id","application","assetName","shortName","serialNumber","assetTag","manufacturer","model","assetType","bladeSize","ipAddress","os","sourceLocation","sourceRoom","sourceRack","sourceRackPosition","sourceBladeChassis","sourceBladePosition","targetLocation","targetRoom","targetRack","targetRackPosition","targetBladeChassis","targetBladePosition","custom1","custom2","custom3","custom4","custom5","custom6","custom7","custom8","moveBundle","sourceTeam","targetTeam","truck","cart","shelf","railType","appOwner","appSme","priority")
+            tableFacade.setColumnProperties("id","application","assetName","shortName","serialNumber","assetTag","manufacturer","model","assetType","ipAddress","os","sourceLocation","sourceRoom","sourceRack","sourceRackPosition","sourceBladeChassis","sourceBladePosition","targetLocation","targetRoom","targetRack","targetRackPosition","targetBladeChassis","targetBladePosition","custom1","custom2","custom3","custom4","custom5","custom6","custom7","custom8","moveBundle","sourceTeam","targetTeam","truck","cart","shelf","railType","appOwner","appSme","priority")
             tableFacade.render()
         }else
             return [assetEntityInstanceList : assetEntityInstanceList,projectId: projectId]
@@ -773,8 +773,7 @@ class AssetEntityController {
     def updateAssetEntity = {
     	def assetItems = []    	
     	def assetEntityParams = params.assetEntityParams
-		println"assetEntityParams-->"+assetEntityParams
-    	if(assetEntityParams) {
+		if(assetEntityParams) {
     		def assetEntityParamsList = ( assetEntityParams.substring( 0, assetEntityParams.lastIndexOf('~') ) ).split("~,")
 	    	def map = new HashMap()
 	    	assetEntityParamsList.each {

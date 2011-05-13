@@ -262,8 +262,6 @@ EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 70 where att
 EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 70 where attribute = ?",[EavAttribute.findByAttributeCode('manufacturer')])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 80 where attributeCode = 'model'")
 EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 80 where attribute = ?",[EavAttribute.findByAttributeCode('model')])
-EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 90 where attributeCode = 'bladeSize'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 90 where attribute = ?",[EavAttribute.findByAttributeCode('bladeSize')])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 100 where attributeCode = 'ipAddress'")
 EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 100 where attribute = ?",[EavAttribute.findByAttributeCode('ipAddress')])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 110 where attributeCode = 'os'")

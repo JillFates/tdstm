@@ -30,7 +30,6 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	Integer priority 
 	Project project
 	String shortName
-	String bladeSize
 	String sourceBladeChassis
 	Integer sourceBladePosition
 	String targetBladeChassis
@@ -89,7 +88,6 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		shortName( blank:true, nullable:true )
 		rackSource( nullable:true )
 		rackTarget( nullable:true )
-		bladeSize( blank:true, nullable:true )
 		sourceBladeChassis( blank:true, nullable:true )
 		sourceBladePosition( nullable:true )
 		targetBladeChassis( blank:true, nullable:true )

@@ -1,17 +1,11 @@
 // Adds blade fields to the EAV tables
 import com.tdssrc.eav.*
-
-if(!EavAttribute.findWhere(attributeCode:'bladeSize')) {
-	attribute = new EavAttribute(attributeCode:'bladeSize', backendType:'String', defaultValue:'null', entityType:EavEntityType.get(1),
-					 frontendInput:'select', frontendLabel:'Blade Size', isRequired:0, isUnique:0, note:'Blade size (full or half)',
-					 sortOrder:330, validation:'')
-	if(!attribute.save()) {
-		println "Unable to save attribute: ${attribute.errors}"
-	} else {
-		new EavAttributeOption(attribute:attribute, sortOrder:330, value:'Full').save()
-		new EavAttributeOption(attribute:attribute, sortOrder:330, value:'Half').save()
-		new EavEntityAttribute(attribute:attribute, eavAttributeSet:EavAttributeSet.get(1), sortOrder:attribute.sortOrder).save()
-	}
+def bladeSizeAttribute = EavAttribute.findWhere(attributeCode:'bladeSize')
+if(bladeSizeAttribute) {
+	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[bladeSizeAttribute])
+	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[bladeSizeAttribute])
+	DataTransferAttributeMap.executeUpdate("Delete from DataTransferAttributeMap where eavAttribute = ?",[bladeSizeAttribute])
+	bladeSizeAttribute.delete()
 }
 
 if(!EavAttribute.findWhere(attributeCode:'sourceBladeChassis')) {
