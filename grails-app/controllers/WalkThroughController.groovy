@@ -57,13 +57,13 @@ class WalkThroughController {
     	def moveBundlesList = MoveBundle.findAll("from MoveBundle m where m.project = $currProj")
     	if((projectId == null || (projectId == currentProj)) && currBundle){
     		def bundleInstance = MoveBundle.findById( currBundle )
-    		locationList =AssetEntity.executeQuery("select distinct(a.sourceLocation) from AssetEntity a where a.moveBundle =$bundleInstance.id and a.owner = $projectInstance.client.id ")
+    		locationList = AssetEntity.executeQuery("select distinct(a.sourceLocation) from AssetEntity a where a.moveBundle =$bundleInstance.id and a.owner = $projectInstance.client.id and a.sourceLocation is not null and a.sourceLocation != ''")
 		}else if(moveBundlesList.size > 0) {
 			if(projectId){
 				getSession().setAttribute("AUDIT_PROJ",projectId)
 			}
 			def bundleInstance = MoveBundle.findById( moveBundlesList[0].id )
-    		locationList =AssetEntity.executeQuery("select distinct(a.sourceLocation) from AssetEntity a where a.moveBundle =$bundleInstance.id and a.owner = $projectInstance.client.id ")
+    		locationList = AssetEntity.executeQuery("select distinct(a.sourceLocation) from AssetEntity a where a.moveBundle =$bundleInstance.id and a.owner = $projectInstance.client.id and a.sourceLocation is not null and a.sourceLocation != ''")
 		}
     	render( view : 'startMenu', model:[ currProj : currProj, currBundle : currBundle, currLocation:currLocation, moveBundlesList : moveBundlesList, locationList:locationList ] )	
     }
