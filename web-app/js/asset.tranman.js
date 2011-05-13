@@ -188,10 +188,15 @@ function showAssetDialog( e , action ) {
 			}
 		})
     	var manufacturer = $("#editmanufacturerId").val()
-  	    updateModelOptions( manufacturer, modelId, 2 ) //  assume that 2 is for edit action
+  	    if(manufacturer && !isNaN(manufacturer)){
+  	    	updateModelOptions( manufacturer, modelId, 2 ) //  assume that 2 is for edit action
+  	    }
     }
 	function updateModelOptions( manufacturer, modelId, type ){
 		var assetType = $("#editassetTypeId").val()
+		if(type == 1){
+			assetType = $("#assetTypeId").val()
+		}
 		new Ajax.Request('../model/getModelsListAsJSON?manufacturer='+manufacturer+"&assetType="+assetType,{
 			asynchronous:false,
 			evalScripts:true,
