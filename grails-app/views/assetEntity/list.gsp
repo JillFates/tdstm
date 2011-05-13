@@ -181,7 +181,7 @@ function onInvokeExportAction(id) {
 </div>
 <div class="buttons"><g:form>
 	<span class="button"><input type="button"
-		value="New Asset Entity" class="create" onClick="createDialog()" /></span>
+		value="New Asset" class="create" onClick="createDialog()" /></span>
 </g:form></div>
 </div> <%-- End of Body --%>
 <div id="createDialog" title="Create Asset Entity" style="display: none;">
