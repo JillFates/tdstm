@@ -25,7 +25,7 @@
             </g:if>
             <div>
             <form name="modelForm" action="list">
-                <jmesa:tableFacade id="tag" items="${modelsList}" maxRows="25" exportTypes="csv,excel" stateAttr="restore" var="modelInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
+                <jmesa:tableFacade id="tag" items="${modelsList}" maxRows="25" stateAttr="restore" var="modelInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
                     <jmesa:htmlTable style=" border-collapse: separate">
                         <jmesa:htmlRow highlighter="true">
                             <jmesa:htmlColumn property="modelName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>

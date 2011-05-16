@@ -177,14 +177,14 @@
 				<textElement textAlignment="Center">
 					<font size="14"/>
 				</textElement>
-				<text><![CDATA[Source]]></text>
+				<text><![CDATA[From Location]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="l_border" mode="Opaque" x="497" y="4" width="363" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
 				<textElement textAlignment="Center">
 					<font size="14"/>
 				</textElement>
-				<text><![CDATA[Target]]></text>
+				<text><![CDATA[To Location]]></text>
 			</staticText>
 			<staticText>
 				<reportElement mode="Opaque" x="301" y="23" width="79" height="18" forecolor="#FFFFFF" backcolor="#000000"/>

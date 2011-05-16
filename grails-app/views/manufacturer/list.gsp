@@ -26,7 +26,7 @@
             </g:if>
             <div>
             	<form name="modelForm" action="list">
-	                <jmesa:tableFacade id="tag" items="${manufacturersList}" maxRows="25" exportTypes="csv,excel" stateAttr="restore" var="manufacturer" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
+	                <jmesa:tableFacade id="tag" items="${manufacturersList}" maxRows="25" stateAttr="restore" var="manufacturer" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
 	                    <jmesa:htmlTable style=" border-collapse: separate">
 	                        <jmesa:htmlRow highlighter="true">
 	                            <jmesa:htmlColumn property="name" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
@@ -34,6 +34,7 @@
 								 </jmesa:htmlColumn>
 								 <jmesa:htmlColumn property="aka" title="AKA" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${manufacturer.aka}</jmesa:htmlColumn>
 	                            <jmesa:htmlColumn property="description" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${manufacturer.description}</jmesa:htmlColumn>
+	                            <jmesa:htmlColumn property="modelsCount" title="Models" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${manufacturer.modelsCount}</jmesa:htmlColumn>
 	                        </jmesa:htmlRow>
 	                    </jmesa:htmlTable>
 	                </jmesa:tableFacade>

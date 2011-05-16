@@ -35,4 +35,10 @@ class Manufacturer {
 	String toString(){
 		name
 	}
+	/*
+	 * @return: Number of Models associated with this Manufacturer 
+	 */
+	def getModelsCount(){
+		return Model.countByManufacturer(this)
+	}
 }
