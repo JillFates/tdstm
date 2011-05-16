@@ -108,7 +108,11 @@ class ManufacturerController {
 	def getManufacturersListAsJSON = {
     	def assetType = params.assetType
     	def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
-		render manufacturers as JSON
+		def manufacturersList = []
+    	manufacturers.each{
+    		manufacturersList << [id:it.id,name:it.name]
+    	}
+    	render manufacturersList as JSON
     }
     /*
      * When the user clicks on an item do the following actions:

@@ -375,9 +375,13 @@ class ModelController {
 			def manufacturerInstance = Manufacturer.get(manufacturer)
 			models = manufacturerInstance ? Model.findAllByManufacturer( manufacturerInstance,[sort:'modelName',order:'asc'] )?.findAll{it.assetType == assetType } : null
 		}
-    	if(!models)
-    		models = []
-		render models as JSON
+    	def modelsList = []
+    	if(models.size() > 0){
+    		models.each{
+    			modelsList << [id:it.id, modelName:it.modelName]
+    		}
+    	}
+		render modelsList as JSON
     }
     /*
      *  check to see that if they were any Asset records exist for the selected model before deleting it
