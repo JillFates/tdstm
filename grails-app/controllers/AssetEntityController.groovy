@@ -725,7 +725,7 @@ class AssetEntityController {
         else {
         	
         	flash.message = "AssetEntity ${assetEntityInstance.assetName} not created"
-        	def etext = "Unable to Update Asset Entity" +
+        	def etext = "Unable to Update Asset" +
 						GormUtil.allErrorsString( assetEntityInstance )
 			println etext
             redirect( action:list, params:[projectId: projectId] )
@@ -837,7 +837,7 @@ class AssetEntityController {
 	            				toAssetUposition=${assetEntityInstance.targetRackPosition} where toAsset = ? """,[assetEntityInstance])
 	            	}
 	            } else {
-	            	def etext = "Unable to Update Asset Entity" +
+	            	def etext = "Unable to Update Asset" +
 	                GormUtil.allErrorsString( assetEntityInstance )
 					println etext
 					log.error( etext )	

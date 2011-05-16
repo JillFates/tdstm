@@ -121,7 +121,7 @@
 		if (assetEntityAttributes != "") {
 			$("#editDialog").dialog("close");
 		} else {
-			alert("Asset Entity is not updated, Please check the required fields");
+			alert("Asset is not updated, Please check the required fields");
 		}
 	}
 </script>
@@ -168,14 +168,14 @@
 <table><tr><td class="no_records">No reports found</td></tr></table>
 </g:else>
 </div>
-<div id="editDialog" title="Edit Asset Entity" style="display: none;">
+<div id="editDialog" title="Edit Asset" style="display: none;">
 	<g:form method="post" name="editForm">
 		<input type="hidden" name="id" id="editFormId" value="" />
 		<div class="dialog" id="editDiv">
 		</div>
 		<div class="buttons">
 			<span class="button">
-				<input class="save" type="button" style="font-size: 12px;" value="Update Asset Entity" onClick="${remoteFunction(controller:'assetEntity', action:'getAssetAttributes', params:'\'assetId=\' + $(\'#editFormId\').val() ', onComplete:'callUpdateDialog(e)')}" />
+				<input class="save" type="button" style="font-size: 12px;" value="Update Asset" onClick="${remoteFunction(controller:'assetEntity', action:'getAssetAttributes', params:'\'assetId=\' + $(\'#editFormId\').val() ', onComplete:'callUpdateDialog(e)')}" />
 			</span>
 		</div>
 	</g:form>

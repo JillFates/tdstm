@@ -65,7 +65,7 @@ function onInvokeAction(id) {
 			$("#editDialog").dialog("close")
 			timedUpdate($("#selectTimedId").val())
 		} else {
-			alert("Asset Entity is not updated, Please check the required fields")
+			alert("Asset is not updated, Please check the required fields")
 		}
 	} 		
 
@@ -1212,7 +1212,7 @@ Comment</a></span></div>
 		onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + $(\'#updateCommentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'never\')')}" />
 	</span></div>
 </g:form></div>
-<div id="showDialog" title="Show Asset Entity" style="display: none;">
+<div id="showDialog" title="Show Asset" style="display: none;">
 <g:form action="save" method="post" name="showForm">
 	<div class="dialog" id="showDiv">
 	
@@ -1233,7 +1233,7 @@ Comment</a></span></div>
 		</div>
 </g:form></div>
 
-<div id="editDialog" title="Edit Asset Entity" style="display: none;">
+<div id="editDialog" title="Edit Asset" style="display: none;">
 <g:form method="post" name="editForm">
 	<input type="hidden" name="id" id="editFormId" value="" />
 	<input type="hidden" name="projectId" value="${projectId}" />
@@ -1243,7 +1243,7 @@ Comment</a></span></div>
 	
 	</div>
 	<div class="buttons"><span class="button">
-	<input type="button" class="save" value="Update Asset Entity" onClick="${remoteFunction(action:'getAssetAttributes', params:'\'assetId=\' + $(\'#editFormId\').val() ', onComplete:'callUpdateDialog(e)')}" />
+	<input type="button" class="save" value="Update Asset" onClick="${remoteFunction(action:'getAssetAttributes', params:'\'assetId=\' + $(\'#editFormId\').val() ', onComplete:'callUpdateDialog(e)')}" />
 	</span> <span class="button"><input type="button"
 		class="delete" onclick="return editDialogDeleteRemove('delete')"
 		value="Delete" /></span>

@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<title>Asset Entity List</title>
+<title>Asset List</title>
 
 
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
@@ -80,7 +80,7 @@ function onInvokeExportAction(id) {
 				      	}
 				  $("#editDialog").dialog("close")
 				} else {
-					alert("Asset Entity is not updated, Please check the required fields")
+					alert("Asset is not updated, Please check the required fields")
 				}
       		}
 		    
@@ -109,7 +109,7 @@ function onInvokeExportAction(id) {
 <body>
 
 <div class="body">
-<h1>Asset Entity List</h1>
+<h1>AssetList</h1>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
@@ -184,7 +184,7 @@ function onInvokeExportAction(id) {
 		value="New Asset" class="create" onClick="createDialog()" /></span>
 </g:form></div>
 </div> <%-- End of Body --%>
-<div id="createDialog" title="Create Asset Entity" style="display: none;">
+<div id="createDialog" title="Create Asset" style="display: none;">
 <g:form action="save" method="post" name="createForm" >
 
 	<div class="dialog" id="createDiv" >
@@ -204,7 +204,7 @@ function onInvokeExportAction(id) {
 		class="save" type="submit" value="Create"
 		onclick="return validateAssetEntity('createForm');" /></span></div>
 </g:form></div>
-<div id="showDialog" title="Show Asset Entity" style="display: none;">
+<div id="showDialog" title="Show Asset" style="display: none;">
 <g:form action="save" method="post" name="showForm">
 	<div class="dialog" id="showDiv">
 	
@@ -223,7 +223,7 @@ function onInvokeExportAction(id) {
 		</div>
 </g:form></div>
 
-<div id="editDialog" title="Edit Asset Entity" style="display: none;">
+<div id="editDialog" title="Edit Asset" style="display: none;">
 <g:form method="post" name="editForm">
 	<input type="hidden" name="id" value="" />
 	<input type="hidden" name="projectId" value="${projectId}" />
@@ -231,7 +231,7 @@ function onInvokeExportAction(id) {
 	
 	</div>
 	<div class="buttons"><span class="button">
-	<input type="button" class="save" value="Update Asset Entity" onClick="if(validateAssetEntity('editForm'))  ${remoteFunction(action:'getAssetAttributes', params:'\'assetId=\' + document.editForm.id.value ', onComplete:'callUpdateDialog(e)')}" />
+	<input type="button" class="save" value="Update Asset" onClick="if(validateAssetEntity('editForm'))  ${remoteFunction(action:'getAssetAttributes', params:'\'assetId=\' + document.editForm.id.value ', onComplete:'callUpdateDialog(e)')}" />
 	</span> <span class="button"><input type="button"
 		class="delete" onclick="return editDialogDeleteRemove('delete')"
 		value="Delete" /></span>
