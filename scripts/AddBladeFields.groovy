@@ -1,11 +1,13 @@
 // Adds blade fields to the EAV tables
 import com.tdssrc.eav.*
-def bladeSizeAttribute = EavAttribute.findWhere(attributeCode:'bladeSize')
+def jdbcTemplate = ctx.getBean("jdbcTemplate")
+def bladeSizeAttribute = EavAttribute.findByAttributeCode('bladeSize')
 if(bladeSizeAttribute) {
-	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[bladeSizeAttribute])
-	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[bladeSizeAttribute])
-	DataTransferAttributeMap.executeUpdate("Delete from DataTransferAttributeMap where eavAttribute = ?",[bladeSizeAttribute])
-	bladeSizeAttribute.delete()
+	jdbcTemplate.update("delete from data_transfer_value where eav_attribute_id = ${bladeSizeAttribute.id}")
+	jdbcTemplate.update("delete from eav_attribute_option where attribute_id = ${bladeSizeAttribute.id}")
+	jdbcTemplate.update("delete from eav_entity_attribute where attribute_id = ${bladeSizeAttribute.id}")
+	jdbcTemplate.update("delete from data_transfer_attribute_map where eav_attribute_id = ${bladeSizeAttribute.id}")
+	jdbcTemplate.update("delete from eav_attribute where attribute_id = ${bladeSizeAttribute.id}")
 }
 
 if(!EavAttribute.findWhere(attributeCode:'sourceBladeChassis')) {
@@ -57,7 +59,7 @@ if(!EavAttribute.findWhere(attributeCode:'targetBladePosition')) {
 *============================================================*/
 def masteDataTransferSet = DataTransferSet.findByTitle( "TDS Master Spreadsheet" )
 def walkthruDataTransferSet = DataTransferSet.findByTitle( "TDS Walkthru" )
-def bladeAttributes = EavAttribute.findAll("FROM EavAttribute e where e.attributeCode in ('bladeSize','sourceBladeChassis','sourceBladePosition','targetBladeChassis','targetBladePosition')")
+def bladeAttributes = EavAttribute.findAll("FROM EavAttribute e where e.attributeCode in ('sourceBladeChassis','sourceBladePosition','targetBladeChassis','targetBladePosition')")
 	bladeAttributes.each{
 		def masterDataAttribMap = DataTransferAttributeMap.findWhere( columnName: it.frontendLabel, sheetName: "Servers", dataTransferSet: masteDataTransferSet,eavAttribute: it)
 		if(!masterDataAttribMap){

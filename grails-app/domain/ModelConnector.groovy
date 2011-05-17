@@ -25,8 +25,11 @@ class ModelConnector {
 	
 	static mapping  = {	
 		version false
-		id column:'model_connectors_id'
-		option column:'connector_option'
+		columns {
+			id column:'model_connectors_id'
+			option column:'connector_option'
+			type sqltype: 'varchar(20)'
+		}
 	}
 	
 	String toString(){

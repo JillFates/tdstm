@@ -374,7 +374,7 @@ document.createDialogForm.company.value = ${companyId}
 				</tr>
 				<tr class="prop">
                 	<td valign="top" class="name">
-                    	<label for="location"><g:message code="person.location.label" default="Department" />:</label>
+                    	<label for="location"><g:message code="person.location.label" default="Location" />:</label>
                     </td>
                     <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'location', 'errors')}">
                     	<g:textField name="location" value="${personInstance?.location}" size="34"/>
@@ -528,7 +528,7 @@ document.createDialogForm.company.value = ${companyId}
 				</tr>
 				<tr class="prop">
                 	<td valign="top" class="name">
-                    	<label for="location"><g:message code="person.location.label" default="Department" />:</label>
+                    	<label for="location"><g:message code="person.location.label" default="Location" />:</label>
                     </td>
                     <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'location', 'errors')}">
                     	<g:textField name="location" value="${personInstance?.location}" size="34"/>
@@ -580,14 +580,18 @@ document.createDialogForm.company.value = ${companyId}
         if(!firstName) {
             alert("First Name should not be blank ")
             returnVal = false
-        } else if( email && !emailExp.test(email)){
+        } 
+        if( email && !emailExp.test(email)){
         	 alert(email +" is not a valid e-mail address ")
-        } else if(workPhone){
-            if (isNaN(parseInt(workPhone))) { alert("The Work phone number contains illegal characters.");returnVal = false }
+        	 returnVal = false
+        } 
+        if(workPhone){
+            if (isNaN(workPhone)) { alert("The Work phone number contains illegal characters.");returnVal = false }
 	        if (!(workPhone.length == 10)) { alert("The Work phone number is the wrong length. Make sure you included an area code.\n");returnVal = false }
-        } else if(mobilePhone){
-            if (isNaN(parseInt(mobilePhone))) { alert("The Mobile phone number contains illegal characters.");returnVal = false }
-	        if (!(mobilePhone == 10)) { alert("The Mobile phone number is the wrong length. Make sure you included an area code.\n");returnVal = false }
+        }
+        if(mobilePhone){
+            if (isNaN(mobilePhone)) { alert("The Mobile phone number contains illegal characters.");returnVal = false }
+	        if (!(mobilePhone.length == 10)) { alert("The Mobile phone number is the wrong length. Make sure you included an area code.\n");returnVal = false }
         }
         return returnVal
     }
