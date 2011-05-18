@@ -607,7 +607,7 @@ Comment</a></span></div>
 	        <span class="button"><input type="submit" class="edit" value="Edit" onclick="$('#manufacturerShowDialog').dialog('close')"/></span>
 	    </g:form>
 	</div>
-	<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+	</jsec:hasAnyRole >
 </div>
 <div id="modelShowDialog"  title="Show Model">
 <div class="dialog">
