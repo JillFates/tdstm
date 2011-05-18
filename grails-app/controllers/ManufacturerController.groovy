@@ -162,4 +162,12 @@ class ManufacturerController {
     	flash.message = "Merge completed."
     	redirect(action:list)
     }
+    /*
+     *  Send Manufacturer details as JSON object
+     */
+	def getManufacturerAsJSON = {
+    	def id = params.id
+    	def manufacturer = Manufacturer.get(params.id)
+    	render manufacturer as JSON
+    }
 }

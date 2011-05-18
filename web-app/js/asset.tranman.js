@@ -110,7 +110,14 @@ function showAssetDialog( e , action ) {
 			  	var spanAst = "<span style='color:red;'>*</span>"//document.createElement("span")
 			    labelTd += spanAst 
 		    }
-		    var inputTd = "<td style='width:25%;' nowrap>"+attribute.value+"</td>"
+		    var inputTd = ""
+		    if(attribute.attributeCode == "manufacturer"){
+		    	inputTd = "<td style='width:25%;' nowrap><a href='javascript:showManufacturer("+attribute.manufacturerId+")'>"+attribute.value+"</a></td>"
+		    } else if(attribute.attributeCode == "model"){
+		    	inputTd = "<td style='width:25%;' nowrap><a href='javascript:showModel("+attribute.modelId+")'>"+attribute.value+"</a></td>"
+		    } else {
+		    	inputTd = "<td style='width:25%;' nowrap>"+attribute.value+"</td>"
+		    }
 
 		    // td for Edit page
 		    var inputTdE = "<td>";
@@ -879,4 +886,69 @@ function textCounter(fieldId, maxlimit) {
     } else {
     	return true;
     }
+}
+/*
+ * 
+ */
+function showManufacturer(id){
+	new Ajax.Request('../manufacturer/getManufacturerAsJSON?id='+id,{
+		asynchronous:false,
+		evalScripts:true,
+		onComplete:function(e){
+			var manufacturer = eval('(' + e.responseText + ')')
+			$("#showManuName").html( manufacturer.name )
+			$("#showManuAka").html( manufacturer.aka )
+			$("#showManuDescription").html( manufacturer.description )
+			$("#manufacturerId").val( manufacturer.id )
+			$("#manufacturerShowDialog").dialog("open")
+		}
+	})
+}
+function showModel(id){
+	new Ajax.Request('../model/getModelAsJSON?id='+id,{
+		asynchronous:false,
+		evalScripts:true,
+		onComplete:function(e){
+			var model = eval('(' + e.responseText + ')')
+			$("#modelId").val( model.id )
+			$("#showManufacturer").html( model.manufacturer )
+			$("#showModelName").html( model.modelName )
+			$("#showModelAka").html( model.aka )
+			$("#showModelNotes").html( model.description )
+			$("#showModelAssetType").html( model.assetType )
+			$("#showModelUsize").html( model.usize )
+			$("#showModelPower").html( model.powerUse )
+			if(model.frontImage){
+				$("#showModelFrontImage").html( "<img src='../model/getFrontImage/"+model.id+"' style='height: 50px; width: 100px;' id='rearImageId'>" )
+			}
+			if(model.rearImage){
+				$("#showModelRearImage").html( "<img src='../model/getRearImage/"+model.id+"' style='height: 50px; width: 100px;' id='rearImageId'>" )
+			}
+			if(model.useImage){
+				$("#showModelUseImage").html( "<input type='checkbox' checked='checked' disabled='disabled'/>" )
+			} else {
+				$("#showModelUseImage").html( "<input type='checkbox' disabled='disabled'/>" )
+			}
+			if(model.assetType == 'Blade Chassis'){
+				$("#showModelBladeRows").html( model.bladeRows )
+				$("#showModelBladeCount").html( model.bladeCount )
+				$("#showModelBladLabelCount").html( model.bladeLabelCount )
+			} else {
+				$("#showModelBladeRowsTr").hide()
+				$("#showModelBladeCountTr").hide()
+				$("#showModelBladLabelCountTr").hide()
+			}
+			if(model.assetType == 'Blade'){
+				$("#showModelBladeHeight").html( model.bladeHeight )
+			} else {
+				$("#showModelBladeHeightTr").hide()
+			}
+			if(model.sourceTDS){
+				$("#showModelSourceTds").html( "<input type='checkbox' checked='checked' disabled='disabled'/>" )
+			} else {
+				$("#showModelSourceTds").html( "<input type='checkbox' disabled='disabled'/>" )
+			}
+			$("#modelShowDialog").dialog("open")
+		}
+	})
 }

@@ -800,5 +800,12 @@ class ModelController {
     def manageImports = {
     	[modelSyncBatch:ModelSyncBatch.list()]
     }
-	
+    /*
+     *  Send Model details as JSON object
+     */
+	def getModelAsJSON = {
+    	def id = params.id
+    	def model = Model.get(params.id)
+    	render model as JSON
+    }
 }
