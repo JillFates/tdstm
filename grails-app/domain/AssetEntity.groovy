@@ -11,12 +11,14 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	Rack rackSource
 	String sourceLocation
 	String sourceRoom
+	Room roomSource
 	String sourceRack
 	Integer sourceRackPosition
 	Rack rackTarget
 	String targetLocation
 	String targetRoom
 	String targetRack
+	Room roomTarget
 	Integer targetRackPosition
 	String railType
 	String ipAddress

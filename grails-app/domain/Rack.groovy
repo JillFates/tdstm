@@ -2,8 +2,13 @@ class Rack {
 	Project project
 	Integer source
 	String location
-	String room
+	Room room
 	String tag
+	Integer roomX
+	Integer roomY
+	Integer powerA
+	Integer powerB
+	Integer powerC 
 	
 	static hasMany = [sourceAssets:AssetEntity, targetAssets:AssetEntity]
 	static mappedBy = [sourceAssets:"rackSource", targetAssets:"rackTarget"]
@@ -14,6 +19,11 @@ class Rack {
 		location( blank:true, nullable:true )
 		room( blank:true, nullable:true )
 		tag( blank:true, nullable:true )
+		roomX( blank:true, nullable:true )
+		roomY( blank:true, nullable:true )
+		powerA( blank:true, nullable:true )
+		powerB( blank:true, nullable:true )
+		powerC( blank:true, nullable:true )
 	}
 
 	static mapping  = {	
@@ -24,6 +34,7 @@ class Rack {
 	}
 	
 	static Rack findOrCreateWhere(params) {
+		def room = Room.findByRoomName(params.room)
 		def r = createCriteria()
 		def results
 		try{
@@ -34,10 +45,10 @@ class Rack {
 					isNull('location')
 				else
 					eq('location', params.location)
-				if( !params.room)
+				if( !room)
 					isNull('room')
 				else
-					eq('room', params.room)
+					eq('room', room )
 				eq('tag', params.tag)
 			}
 		} catch( Exception ex ){
