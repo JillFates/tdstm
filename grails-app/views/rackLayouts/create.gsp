@@ -31,7 +31,7 @@
 				var locvalue = e.location ? e.location : 'blank';
 				var rmvalue = e.room ? e.room : 'blank';
 				var ravalue = e.tag ? e.tag : 'blank';
-				return({'value':e.id, 'innerHTML':locvalue +"/"+rmvalue +"/"+ ravalue});
+				return({'value':e.id, 'innerHTML':locvalue +"/"+rmvalue+"/"+ ravalue});
 			}).sort(function(a, b) {
 				var compA = a.innerHTML;
 				var compB = b.innerHTML;

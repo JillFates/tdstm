@@ -379,13 +379,13 @@ class DataTransferBatchController {
 	 *========================================================*/
 	def updateAssetRacks( projectId ){
 		try{
-	    	def sourceRackQuery = "select project_id as `project.id`, source_location as location, source_room as room, source_rack as tag, 1 as source " +
+	    	def sourceRackQuery = "select project_id as `project.id`, source_location as location, room_source_id as `room.id`, source_rack as tag, 1 as source " +
 								"from asset_entity where asset_type <> 'Blade' and source_rack != '' and source_rack is not null and " +
-								"project_id is not null and project_id = ${projectId} group by source_location, source_rack, source_room"
+								"project_id is not null and project_id = ${projectId} group by source_location, source_rack, room_source_id"
 	
-			def targetRackQuery = "select project_id as `project.id`, target_location as location, target_room as room, target_rack as tag, 0 as source " +
+			def targetRackQuery = "select project_id as `project.id`, target_location as location, room_target_id as `room.id`, target_rack as tag, 0 as source " +
 								"from asset_entity where asset_type <> 'Blade' and target_rack != '' and target_rack is not null and " +
-								"project_id is not null and project_id = ${projectId} group by target_location, target_rack, target_room"
+								"project_id is not null and project_id = ${projectId} group by target_location, target_rack, room_target_id"
 		
 			def sourceRacks = jdbcTemplate.queryForList(sourceRackQuery)
 			def targetRacks = jdbcTemplate.queryForList(targetRackQuery)
@@ -394,7 +394,7 @@ class DataTransferBatchController {
 				def rack = Rack.findOrCreateWhere(rackFields)
 				
 				// Update all assets with this rack info to point to this rack
-				if(rack.id == null)
+				if( !rack )
 					println "Unable to create rack: ${rack.errors}"
 				else {
 					def source = rack.source ? 'source' : 'target'
@@ -405,10 +405,10 @@ class DataTransferBatchController {
 					else
 						updateQuery += "${source}_location=\"${rackFields.location}\" AND "
 					
-					if(rackFields.room == null)
-						updateQuery += "${source}_room is null AND "
+					if(rackFields['room.id'] == null)
+						updateQuery += "room_${source}_id is null AND "
 					else
-						updateQuery += "${source}_room=\"${rackFields.room}\" AND "
+						updateQuery += "room_${source}_id =\"${rackFields['room.id']}\" AND "
 					updateQuery += "${source}_rack=\"${rackFields.tag}\""
 					
 					def updated = jdbcTemplate.update(updateQuery)

@@ -46,11 +46,8 @@ class Room {
 			results = r.list {
 				eq('source', params.source.toInteger() ? 1 : 0)
 				eq('project.id', params['project.id'])
-				if( !params.location )
-					isNull('location')
-				else
-					eq('location', params.location)
-				eq('roomName', params.roomName)
+				eq('location', "${params.location}")
+				eq('roomName', "${params.roomName}")
 			}
 		} catch( Exception ex ){
 			println"$ex"

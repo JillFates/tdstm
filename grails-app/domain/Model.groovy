@@ -22,7 +22,7 @@ class Model {
 	Integer sourceTDSVersion = 1
 	static belongsTo = [ manufacturer : Manufacturer]
 	
-	static hasMany = [ modelConnectors : ModelConnector ]
+	static hasMany = [ modelConnectors : ModelConnector, racks:Rack ]
 	
 	static constraints = {
 		modelName( blank:false, nullable:false )

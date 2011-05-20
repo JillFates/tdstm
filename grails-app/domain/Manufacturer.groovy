@@ -2,6 +2,8 @@ class Manufacturer {
 	String name
 	String description
 	String aka
+
+	static hasMany = [ models : Model, racks:Rack ]
 	
 	static constraints = {
 		name( blank:false, nullable:false, unique:true )
