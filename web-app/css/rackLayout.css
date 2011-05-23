@@ -256,3 +256,16 @@ table.rack_elevation table.bladeTable td.errorBlade {
 .rack_cable_table td {
 	border: 0px solid black;
 }
+
+#room_layout {
+	margin-left: 10px;
+	margin-top: 10px;
+}
+.roomLayoutTable {
+	margin-right: 20px;
+}
+.roomLayoutTable td {
+	border-left: 1px solid #63a242;
+	border-top: 1px solid #63a242;
+	border-right: 1px solid #63a242;
+}

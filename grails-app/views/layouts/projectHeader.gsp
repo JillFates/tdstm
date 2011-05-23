@@ -115,7 +115,7 @@
 			<li><g:link class="home" controller="projectUtil">Project </g:link> </li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 			<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
-			<li><g:link class="home" controller="rackLayouts" action="create">Rooms</g:link></li>
+			<li><g:link class="home" controller="room">Rooms</g:link></li>
 	        </jsec:lacksAllRoles>
 			<li><g:link class="home" controller="rackLayouts" action="create">Racks</g:link></li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
