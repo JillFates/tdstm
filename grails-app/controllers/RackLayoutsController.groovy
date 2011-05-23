@@ -253,12 +253,12 @@ class RackLayoutsController {
 		
 		moveBundles.each{moveBundle ->
 			moveBundle.sourceRacks.each{
-				if( !sourceRacks.contains(it) )
-					sourceRacks.add(it)
+				if( !sourceRacks.contains([location:it.location,room:it.room?.roomName,tag:it.tag]) )
+					sourceRacks.add([location:it.location,room:it.room?.roomName,tag:it.tag])
 			}
 			moveBundle.targetRacks.each{
-				if( !targetRacks.contains(it) )
-					targetRacks.add(it)
+				if( !targetRacks.contains([location:it.location,room:it.room?.roomName,tag:it.tag]) )
+					targetRacks.add([location:it.location,room:it.room?.roomName,tag:it.tag])
 			}
 		}
 		
