@@ -52,6 +52,27 @@ class MoveTechController {
                             loc:location, bundle:params.bundle,bundleName:bundleInstance.name,
                             team:params.team, location:params.location
                             ])
+	        } else if( params.user == "st" ) {
+	        	def projectTeamInstance = ProjectTeam.findById( params.team )
+	            def team = projectTeamInstance.name
+	            def teamMembers = partyRelationshipService.getTeamMemberNames( params.team )
+	            def bundleInstance = MoveBundle.findById(params.bundle)
+	            def location = ""
+	            if ( params.location == 's' ) {
+	            	location = "Unracking"
+	                projectTeamInstance.currentLocation = "Source"
+	                projectTeamInstance.save()
+	            } else if ( params.location == 't' ) {
+	                location = "Reracking"
+	                projectTeamInstance.currentLocation = "Target"
+	                projectTeamInstance.save()
+	            }
+						
+	            render ( view:'clientHome',
+                    model:[ projectTeam:team, members:teamMembers, project:params.project,
+                            loc:location, bundle:params.bundle,bundleName:bundleInstance.name,
+                            team:params.team, location:params.location
+                            ])
 	        } else if ( params.user == "ct" ) {
 	        	def projectTeamInstance = ProjectTeam.findById( params.team )
 	            def team = projectTeamInstance.name
@@ -724,11 +745,11 @@ class MoveTechController {
                 if ( workflow.success ) {
                 	
                 	if(params.location == 's' && asset.sourceTeam.id != loginTeam.id ){
-            			asset.sourceTeam = loginTeam
-						asset.save(flush:true)
+				asset.sourceTeam = loginTeam
+				asset.save(flush:true)
             		} else if(params.location == 't' && asset.targetTeam.id != loginTeam.id ){
-            			asset.targetTeam = loginTeam
-						asset.save(flush:true)
+				asset.targetTeam = loginTeam
+				asset.save(flush:true)
             		}
                 	
                     def assetComment = new AssetComment()
@@ -736,7 +757,38 @@ class MoveTechController {
                     assetComment.assetEntity = asset
                     assetComment.commentType = 'issue'
                     assetComment.category = 'moveday'
-                  	assetComment.createdBy = loginUser.person
+                    assetComment.createdBy = loginUser.person
+                    assetComment.save()
+                    redirect ( action: 'assetTask', 
+                        params:["bundle":params.bundle, "team":params.team, "project":params.project,
+                                "location":params.location, "tab":"Todo"
+                                ])
+                } else {
+                    flash.message = message ( code : workflow.message )
+                    redirect ( action : 'assetTask', 
+                        params:["bundle":params.bundle, "team":params.team, "project":params.project,
+                                "location":params.location, "tab":"Todo"
+                                ])
+                }
+
+            } else if ( params.user == "st" ) {
+                workflow = workflowService.createTransition ( moveBundleInstance.project.workflowCode, "ENGINEER", "Hold", asset,bundle, loginUser, loginTeam, params.enterNote )
+                if ( workflow.success ) {
+                	
+                	if(params.location == 's' && asset.sourceTeam.id != loginTeam.id ){
+				asset.sourceTeam = loginTeam
+				asset.save(flush:true)
+            		} else if(params.location == 't' && asset.targetTeam.id != loginTeam.id ){
+				asset.targetTeam = loginTeam
+				asset.save(flush:true)
+            		}
+                	
+                    def assetComment = new AssetComment()
+                    assetComment.comment = enterNote
+                    assetComment.assetEntity = asset
+                    assetComment.commentType = 'issue'
+                    assetComment.category = 'moveday'
+                    assetComment.createdBy = loginUser.person
                     assetComment.save()
                     redirect ( action: 'assetTask', 
                         params:["bundle":params.bundle, "team":params.team, "project":params.project,
@@ -763,7 +815,7 @@ class MoveTechController {
                     assetComment.assetEntity = asset
                     assetComment.commentType = 'issue'
                     assetComment.category = 'moveday'
-                 	assetComment.createdBy = loginUser.person
+                    assetComment.createdBy = loginUser.person
                     assetComment.save()
                     render(view: 'cleaningAssetSearch',
                         model:[ projMap:projMap, assetComment:assetComment, stateVal:stateVal, "bundle":params.bundle, "team":params.team,
