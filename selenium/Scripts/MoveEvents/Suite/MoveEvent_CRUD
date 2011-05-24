@@ -88,27 +88,27 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.0</td>
+	<td>tag.2.0</td>
 	<td>Name</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.1</td>
+	<td>tag.2.1</td>
 	<td>Description</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.2</td>
+	<td>tag.2.2</td>
 	<td>Status</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.3</td>
-	<td>Project</td>
+	<td>tag.2.3</td>
+	<td>Calculated Type</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.4</td>
+	<td>tag.2.4</td>
 	<td>Move Bundles</td>
 </tr>
 <tr>
@@ -195,6 +195,16 @@
 <tr>
 	<td>clickAndWait</td>
 	<td>//input[@value='Create']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeSelectedLabel</td>
+	<td>projectId</td>
+	<td>Proj</td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>${Proj}</td>
 	<td></td>
 </tr>
 <tr>
@@ -432,6 +442,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>waitForPageToLoad</td>
+	<td></td>
+	<td></td>
+</tr>
+<tr>
 	<td>verifyTextPresent</td>
 	<td>MoveEvent '${eventName}' deleted</td>
 	<td></td>
@@ -446,7 +461,6 @@
 	<td>javascript{var tdsdur=storedVars['tdssuiteduration'];alert('It took ' + tdsdur + 'msec to run');'suite duration '+tdsdur+' msec';}</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

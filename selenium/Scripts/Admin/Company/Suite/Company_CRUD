@@ -17,6 +17,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>storeEval</td>
+	<td>javascript{var startTime=new Date().getTime(); startTime;}</td>
+	<td>tdssuitestart</td>
+</tr>
+<tr>
 	<td>type</td>
 	<td>usernameId</td>
 	<td>john</td>
@@ -44,6 +49,41 @@
 <tr>
 	<td>verifyTitle</td>
 	<td>Company List</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>tag.2.0</td>
+	<td>Action</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>tag.2.1</td>
+	<td>Name</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>tag.2.2</td>
+	<td>Date Created</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>tag.2.3</td>
+	<td>Last Updated</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//div[@onclick=&quot;addSortToLimit('tag','1','name','asc');onInvokeAction('tag', 'sort')&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//div[@onclick=&quot;addSortToLimit('tag','2','dateCreated','asc');onInvokeAction('tag', 'sort')&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//div[@onclick=&quot;addSortToLimit('tag','3','lastUpdated','asc');onInvokeAction('tag', 'sort')&quot;]</td>
 	<td></td>
 </tr>
 <tr>
@@ -171,6 +211,7 @@
 	<td>_action_Delete</td>
 	<td></td>
 </tr>
+<!--Editing the Comapany-->
 <tr>
 	<td>clickAndWait</td>
 	<td>_action_Edit</td>
@@ -231,7 +272,32 @@
 	<td>//table.2.1</td>
 	<td>${dCreated}</td>
 </tr>
-
+<!--Deleting the Company-->
+<tr>
+	<td>click</td>
+	<td>_action_Delete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertConfirmation</td>
+	<td>Are you sure?</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>PartyGroup ${cName} deleted</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeEval</td>
+	<td>javascript{var endTime=new Date().getTime(); var tdsdur=endTime -storedVars['tdssuitestart'];tdsdur;}</td>
+	<td>tdssuiteduration</td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>javascript{var tdsdur=storedVars['tdssuiteduration'];alert('It took ' + tdsdur + 'msec to run');'suite duration '+tdsdur+' msec';}</td>
+	<td></td>
+</tr>
 </tbody></table>
 </body>
 </html>

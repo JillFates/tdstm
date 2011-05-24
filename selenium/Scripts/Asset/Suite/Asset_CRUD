@@ -13,7 +13,7 @@
 </thead><tbody>
 <tr>
 	<td>setSpeed</td>
-	<td>5000</td>
+	<td>2500</td>
 	<td></td>
 </tr>
 <tr>
@@ -74,12 +74,12 @@
 <!--Creating an Asset-->
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='New Asset Entity']</td>
+	<td>//input[@value='New Asset']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='New Asset Entity']</td>
+	<td>//input[@value='New Asset']</td>
 	<td></td>
 </tr>
 <tr>
@@ -99,12 +99,22 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
+	<td>applicationId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
 	<td>assetNameId</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
 	<td>shortNameId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>serialNumberId</td>
 	<td></td>
 </tr>
 <tr>
@@ -129,42 +139,12 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>applicationId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>appOwnerId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>appSmeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
 	<td>ipAddressId</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>hinfoId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>serialNumberId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>usizeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>railTypeId</td>
+	<td>osId</td>
 	<td></td>
 </tr>
 <tr>
@@ -189,6 +169,16 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
+	<td>sourceBladeChassisId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>sourceBladePositionId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
 	<td>targetLocationId</td>
 	<td></td>
 </tr>
@@ -209,77 +199,57 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>powerTypeId</td>
+	<td>targetBladeChassisId</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>pduPortId</td>
+	<td>targetBladePositionId</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>pduQuantityId</td>
+	<td>custom1Id</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>pduTypeId</td>
+	<td>custom2Id</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>nicPortId</td>
+	<td>custom3Id</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>remoteMgmtPortId</td>
+	<td>custom4Id</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>fiberCabinetId</td>
+	<td>custom5Id</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>fiberTypeId</td>
+	<td>custom6Id</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>fiberQuantityId</td>
+	<td>custom7Id</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>hbaPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>kvmDeviceId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>kvmPortId</td>
+	<td>custom8Id</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
 	<td>truckId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>newOrOldId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>priorityId</td>
 	<td></td>
 </tr>
 <tr>
@@ -294,6 +264,31 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
+	<td>railTypeId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>appOwnerId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>appSmeId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>priorityId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>planStatusId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
 	<td>//input[@value='Create' and @type='submit']</td>
 	<td></td>
 </tr>
@@ -303,29 +298,9 @@
 	<td>assetName</td>
 </tr>
 <tr>
-	<td>click</td>
-	<td>//input[@value='Create' and @type='submit']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>assertAlert</td>
-	<td>Please Enter Asset Name.</td>
-	<td></td>
-</tr>
-<tr>
 	<td>type</td>
 	<td>assetNameId</td>
 	<td>${assetName}</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//input[@value='Create' and @type='submit']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>assertAlert</td>
-	<td>Please Enter Asset Tag.</td>
-	<td></td>
 </tr>
 <tr>
 	<td>type</td>
@@ -333,29 +308,19 @@
 	<td>test-asset-sname</td>
 </tr>
 <tr>
-	<td>randomString</td>
-	<td>6|alphanumeric</td>
-	<td>assetTag</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>assetTagId</td>
-	<td>${assetTag}</td>
-</tr>
-<tr>
 	<td>select</td>
 	<td>assetTypeId</td>
 	<td>label=Server</td>
 </tr>
 <tr>
-	<td>type</td>
+	<td>select</td>
 	<td>manufacturerId</td>
-	<td>test-asset-man</td>
+	<td>Dell</td>
 </tr>
 <tr>
-	<td>type</td>
+	<td>select</td>
 	<td>modelId</td>
-	<td>test-asset-mod</td>
+	<td>1650</td>
 </tr>
 <tr>
 	<td>type</td>
@@ -379,18 +344,8 @@
 </tr>
 <tr>
 	<td>type</td>
-	<td>hinfoId</td>
-	<td>test-asset-hinfo</td>
-</tr>
-<tr>
-	<td>type</td>
 	<td>serialNumberId</td>
 	<td>test-asset-sn</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>usizeId</td>
-	<td>2</td>
 </tr>
 <tr>
 	<td>select</td>
@@ -438,54 +393,14 @@
 	<td>10</td>
 </tr>
 <tr>
-	<td>select</td>
-	<td>powerTypeId</td>
-	<td>label=110V Fixed</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>pduPortId</td>
-	<td>2</td>
-</tr>
-<tr>
-	<td>select</td>
-	<td>pduQuantityId</td>
-	<td>label=1</td>
-</tr>
-<tr>
-	<td>select</td>
-	<td>pduTypeId</td>
-	<td>label=C13</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>nicPortId</td>
-	<td>1</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>remoteMgmtPortId</td>
-	<td>1</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>kvmDeviceId</td>
-	<td>test-asset-kvm</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>kvmPortId</td>
-	<td>1</td>
-</tr>
-<tr>
 	<td>type</td>
 	<td>truckId</td>
 	<td>1</td>
 </tr>
 <tr>
 	<td>select</td>
-	<td>newOrOldId</td>
-	<td>label=Old</td>
+	<td>planStatusId</td>
+	<td>Old</td>
 </tr>
 <tr>
 	<td>select</td>
@@ -510,473 +425,203 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.0</td>
+	<td>tag.2.0</td>
 	<td>Actions</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.1</td>
+	<td>tag.2.1</td>
 	<td>Application</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.2</td>
+	<td>tag.2.2</td>
 	<td>Asset Name</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.3</td>
+	<td>tag.2.3</td>
 	<td>Model</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.4</td>
+	<td>tag.2.4</td>
 	<td>Source Location</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.5</td>
-	<td>Source Rack/Cab</td>
+	<td>tag.2.5</td>
+	<td>Source Rack</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.6</td>
+	<td>tag.2.6</td>
 	<td>Target Location</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.7</td>
-	<td>Target Rack/Cab</td>
+	<td>tag.2.7</td>
+	<td>Target Rack</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.8</td>
+	<td>tag.2.8</td>
 	<td>Asset Type</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.9</td>
+	<td>tag.2.9</td>
 	<td>Asset Tag</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.10</td>
+	<td>tag.2.10</td>
 	<td>Serial #</td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>link=Application</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>link=Asset Name</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>link=Model</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>link=Source Location</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>link=Source Rack/Cab</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>link=Target Location</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>link=Target Rack/Cab</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>link=Asset Type</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>link=Asset Tag</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>link=Serial #</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Pure and Unfiltered!</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>link=Filter</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyTable</td>
-	<td>//form[@id='paginateRows']/table.0.1</td>
-	<td>Rows per Page:&nbsp;&nbsp;25 50 100 200</td>
+	<td>tag.2.11</td>
+	<td>Move Bundle</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='New Asset Entity']</td>
+	<td>//div[@onclick=&quot;addSortToLimit('tag','1','application','asc');onInvokeAction('tag', 'sort')&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//div[@onclick=&quot;addSortToLimit('tag','2','assetName','asc');onInvokeAction('tag', 'sort')&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//div[@onclick=&quot;addSortToLimit('tag','3','modelName','asc');onInvokeAction('tag', 'sort')&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//div[@onclick=&quot;addSortToLimit('tag','4','sourceLocation','asc');onInvokeAction('tag', 'sort')&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//div[@onclick=&quot;addSortToLimit('tag','5','sourceRack','asc');onInvokeAction('tag', 'sort')&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//div[@onclick=&quot;addSortToLimit('tag','6','targetLocation','asc');onInvokeAction('tag', 'sort')&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//div[@onclick=&quot;addSortToLimit('tag','7','targetRack','asc');onInvokeAction('tag', 'sort')&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//div[@onclick=&quot;addSortToLimit('tag','8','assetType','asc');onInvokeAction('tag', 'sort')&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//div[@onclick=&quot;addSortToLimit('tag','8','assetType','asc');onInvokeAction('tag', 'sort')&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//div[@onclick=&quot;addSortToLimit('tag','9','assetTag','asc');onInvokeAction('tag', 'sort')&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//div[@onclick=&quot;addSortToLimit('tag','10','serialNumber','asc');onInvokeAction('tag', 'sort')&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//div[@onclick=&quot;addSortToLimit('tag','11','moveBundleName','asc');onInvokeAction('tag', 'sort')&quot;]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>link=Filter</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>filter.op.assetName</td>
-	<td></td>
-</tr>
-<tr>
-	<td>select</td>
-	<td>filter.op.assetName</td>
-	<td>label=Equal To</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//option[@value='Equal']</td>
+	<td>//div[@onclick=&quot;createDynFilter(this, 'tag','assetName')&quot;]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>assetName</td>
+	<td>dynFilterInput</td>
 	<td>${assetName}</td>
 </tr>
 <tr>
+	<td>keyPressAndWait</td>
+	<td>dynFilterInput</td>
+	<td>13</td>
+</tr>
+<tr>
 	<td>clickAndWait</td>
-	<td>_action_filter</td>
-	<td></td>
-</tr>
-<tr>
-	<td>waitForPageToLoad</td>
-	<td></td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Filter Applied!</td>
-	<td></td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>assetEntityTable.1.1</td>
-	<td>appLn</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>assetEntityTable.1.2</td>
-	<td>assetName</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>assetEntityTable.1.3</td>
-	<td>modeL</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>assetEntityTable.1.4</td>
-	<td>sLoc</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>assetEntityTable.1.5</td>
-	<td>sRack</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>assetEntityTable.1.6</td>
-	<td>tLoc</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>assetEntityTable.1.7</td>
-	<td>tRack</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>assetEntityTable.1.8</td>
-	<td>aType</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>assetEntityTable.1.9</td>
-	<td>aTag</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>assetEntityTable.1.10</td>
-	<td>serialNo</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>link=${assetName}</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTitle</td>
-	<td>Asset Entity List</td>
+	<td>//table[@id='tag']/tbody[@class='tbody']/tr[@id='tag_row1']/td[3]/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.0.0</td>
-	<td>exact:Asset Name*</td>
+	<td>//div[@id='showDiv']/table.0.1</td>
+	<td>test-asset-app</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.0.0</td>
-	<td>Short Name</td>
+	<td>//div[@id='showDiv']/table.0.3</td>
+	<td>${assetName}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.0.0</td>
-	<td>exact:Asset Tag*</td>
+	<td>//div[@id='showDiv']/table.0.5</td>
+	<td>test-asset-sname</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.1.0</td>
-	<td>Asset Type</td>
+	<td>//div[@id='showDiv']/table.1.1</td>
+	<td>test-asset-sn</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.1.0</td>
-	<td>Manufacturer</td>
+	<td>//div[@id='showDiv']/table.1.5</td>
+	<td>Server</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.1.0</td>
-	<td>Model</td>
+	<td>//div[@id='showDiv']/table.2.1</td>
+	<td>Dell</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.2.0</td>
-	<td>Application</td>
+	<td>//div[@id='showDiv']/table.2.3</td>
+	<td>1650</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.2.0</td>
-	<td>AppOwner</td>
+	<td>//div[@id='showDiv']/table.2.5</td>
+	<td>test-asset-ip</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.2.0</td>
-	<td>SME</td>
+	<td>//div[@id='showDiv']/table.12.5</td>
+	<td>Old</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>//div[@id='showDiv']/table.1.3</td>
+	<td>assetTag</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.3.0</td>
-	<td>IP Address</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.3.0</td>
-	<td>HINFO</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.3.0</td>
-	<td>Serial #</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.4.0</td>
-	<td>U Size</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.4.0</td>
-	<td>Rail Type</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.4.0</td>
-	<td>Source Location</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.5.0</td>
-	<td>Source Room</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.5.0</td>
-	<td>Source Rack/Cab</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.5.0</td>
-	<td>Source Position</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.6.0</td>
-	<td>Target Location</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.6.0</td>
-	<td>Target Room</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.6.0</td>
-	<td>Target Rack/Cab</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.7.0</td>
-	<td>Target Position</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.7.0</td>
-	<td>powerType</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.7.0</td>
-	<td>PDU Port</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.8.0</td>
-	<td>PDU Port Qty</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.8.0</td>
-	<td>PDU Type</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.8.0</td>
-	<td>NIC Port</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.9.0</td>
-	<td>Remote Mgmt Port</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.9.0</td>
-	<td>Fiber Cabinet</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.9.0</td>
-	<td>Fiber Type</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.10.0</td>
-	<td>Fiber Qty</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.10.0</td>
-	<td>Fiber Port</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.10.0</td>
-	<td>KVM Device</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.11.0</td>
-	<td>KVM Port</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.11.0</td>
-	<td>Truck</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.11.0</td>
-	<td>Old/New</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.12.0</td>
-	<td>Priority</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.12.0</td>
-	<td>Cart</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.12.0</td>
-	<td>Shelf</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.13.0</td>
-	<td>Custom1</td>
+	<td>//div[@id='showDiv']/table.11.5</td>
+	<td>test-asset-appown</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
 	<td>//input[@value='Edit' and @type='button' and @onclick='return editAssetDialog()']</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.13.0</td>
-	<td>Custom2</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.13.0</td>
-	<td>Custom3</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.14.0</td>
-	<td>Custom4</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.14.0</td>
-	<td>Custom5</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.14.0</td>
-	<td>Custom6</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.15.0</td>
-	<td>Custom7</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.15.0</td>
-	<td>Custom8</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.15.0</td>
-	<td>Move Bundle</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -988,457 +633,31 @@
 	<td>_action_remove</td>
 	<td></td>
 </tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.0.1</td>
-	<td>${assetName}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.0.1</td>
-	<td>${aTag}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.1.1</td>
-	<td>${aType}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.1.1</td>
-	<td>${modeL}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.3.1</td>
-	<td>${serialNo}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.4.1</td>
-	<td>${sLoc}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.5.1</td>
-	<td>${sRack}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.6.1</td>
-	<td>${tLoc}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.6.1</td>
-	<td>${tRack}</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[11]/div[1]/a/span</td>
-	<td></td>
-</tr>
 <!--Editing the asset-->
 <tr>
 	<td>click</td>
-	<td>xpath=//html/body/div/div[5]/div/div/table/tbody/tr/td/a[node()='${assetName}']/preceding::td[2]/a</td>
-	<td></td>
-</tr>
-<!--This xpath is to click on the comment icon( xpath=//html/body/div/div[5]/div/div/table/tbody/tr/td/a[node()='${assetName}']/preceding::td[2]/a). It is not used here though.-->
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Fields marked ( * ) are mandatory</td>
+	<td>//input[@value='Edit' and @type='button' and @onclick='return editAssetDialog()']</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
+	<td>verifyValue</td>
 	<td>editassetNameId</td>
-	<td></td>
+	<td>${assetName}</td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
-	<td>editassetNameId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editshortNameId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editshortNameId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
+	<td>verifyValue</td>
 	<td>editassetTagId</td>
-	<td></td>
+	<td>${assetTag}</td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
-	<td>editassetTagId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editassetTypeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>editassetTypeId</td>
-	<td>please selectArrayCabinetCable ManagementCacheBladeBlade ChassisControllerDiskDisplayEnclosureEncryptorHVAC UnitKVMKVM SwitchLoad BalancerModemMonitorMultiplexerNetwork SwitchNSPOpticalPatch PanelPCPDUPower StripRackReservedRouterSANServerShelfSnifferStorageSwitchTapeTelecom SwitchUPSVMVPNWorkstationOther</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editmanufacturerId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editmanufacturerId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editmodelId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editmodelId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editapplicationId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editapplicationId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editappOwnerId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editappOwnerId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editappSmeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editappSmeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editipAddressId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editipAddressId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>edithinfoId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>edithinfoId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editserialNumberId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editserialNumberId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editusizeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editusizeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editrailTypeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>editrailTypeId</td>
-	<td>please selectRailsSnap RailsScrew RailsEarsShelfNone</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
+	<td>verifyValue</td>
 	<td>editsourceLocationId</td>
-	<td></td>
+	<td>test-asset-src</td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
+	<td>type</td>
 	<td>editsourceLocationId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editsourceRoomId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editsourceRoomId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editsourceRackId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editsourceRackId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editsourceRackPositionId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editsourceRackPositionId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>edittargetLocationId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>edittargetLocationId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>edittargetRoomId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>edittargetRoomId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>edittargetRackId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>edittargetRackId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>edittargetRackPositionId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>edittargetRackPositionId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editpowerTypeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>editpowerTypeId</td>
-	<td>please select110V Fixed110V Switch220V Fixed220V Switch</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editpduPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editpduPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editpduQuantityId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>editpduQuantityId</td>
-	<td>please select123456</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editpduTypeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>editpduTypeId</td>
-	<td>please selectC13C14C15C16C17C18C19C20IEC 309</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editnicPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editnicPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editremoteMgmtPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editremoteMgmtPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editfiberCabinetId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editfiberCabinetId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editfiberTypeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editfiberTypeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editfiberQuantityId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editfiberQuantityId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>edithbaPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>edithbaPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editkvmDeviceId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editkvmDeviceId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editkvmPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editkvmPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>edittruckId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>edittruckId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editnewOrOldId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>editnewOrOldId</td>
-	<td>please selectOldNew</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editpriorityId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>editpriorityId</td>
-	<td>please select123</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editcartId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editcartId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editshelfId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editshelfId</td>
-	<td></td>
+	<td>test-asset-src is modified</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -1456,82 +675,23 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyValue</td>
-	<td>editassetNameId</td>
-	<td>${assetName}</td>
-</tr>
-<tr>
-	<td>verifyValue</td>
-	<td>editassetTagId</td>
-	<td>${aTag}</td>
-</tr>
-<tr>
-	<td>verifySelectedLabel</td>
-	<td>editassetTypeId</td>
-	<td>${aType}</td>
-</tr>
-<tr>
-	<td>verifyValue</td>
-	<td>editmodelId</td>
-	<td>${modeL}</td>
-</tr>
-<tr>
-	<td>verifyValue</td>
-	<td>editapplicationId</td>
-	<td>${appLn}</td>
-</tr>
-<tr>
-	<td>verifyValue</td>
-	<td>editserialNumberId</td>
-	<td>${serialNo}</td>
-</tr>
-<tr>
-	<td>verifyValue</td>
-	<td>editsourceLocationId</td>
-	<td>${sLoc}</td>
-</tr>
-<tr>
-	<td>verifyValue</td>
-	<td>editsourceRackId</td>
-	<td>${sRack}</td>
-</tr>
-<tr>
-	<td>verifyValue</td>
-	<td>edittargetLocationId</td>
-	<td>${tLoc}</td>
-</tr>
-<tr>
-	<td>verifyValue</td>
-	<td>edittargetRackId</td>
-	<td>${tRack}</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>editshortNameId</td>
-	<td>test short name</td>
-</tr>
-<tr>
 	<td>click</td>
 	<td>//input[@value='Update Asset Entity']</td>
 	<td></td>
 </tr>
 <tr>
-	<td>waitForPageToLoad</td>
-	<td></td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>link=${assetName}</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.1.1</td>
-	<td>test short name</td>
+	<td>tag.3.4</td>
+	<td>test-asset-src is modified</td>
 </tr>
+<!--Deleting the asset-->
 <tr>
 	<td>click</td>
+	<td>//table[@id='tag']/tbody[@class='tbody']/tr[@id='tag_row1']/td[3]/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
 	<td>_action_Delete</td>
 	<td></td>
 </tr>
@@ -1541,118 +701,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>waitForPageToLoad</td>
-	<td>30000</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyTextPresent</td>
 	<td>AssetEntity ${assetName} deleted</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementNotPresent</td>
-	<td>link=${assetName}</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//input[@value='New Asset Entity']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>select</td>
-	<td>attributeSetId</td>
-	<td>label=Server</td>
-</tr>
-<tr>
-	<td>randomString</td>
-	<td>6|alphanumeric</td>
-	<td>assetName2</td>
-</tr>
-<tr>
-	<td>randomString</td>
-	<td>6|alphanumeric</td>
-	<td>assetTag2</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>assetNameId</td>
-	<td>${assetName2}</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>assetTagId</td>
-	<td>${assetTag2}</td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>//input[@value='Create' and @type='submit']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>AssetEntity ${assetName2} created</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>link=Filter</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>filter.op.assetName</td>
-	<td></td>
-</tr>
-<tr>
-	<td>select</td>
-	<td>filter.op.assetName</td>
-	<td>label=Equal To</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//option[@value='Equal']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>assetName</td>
-	<td>${assetName2}</td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>_action_filter</td>
-	<td></td>
-</tr>
-<tr>
-	<td>waitForPageToLoad</td>
-	<td></td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>link=${assetName2}</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>_action_remove</td>
-	<td></td>
-</tr>
-<tr>
-	<td>assertConfirmation</td>
-	<td>Remove Asset from project, are you sure?</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>AssetEntity ${assetName2} Removed from Project</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementNotPresent</td>
-	<td>link=${assetName2}</td>
 	<td></td>
 </tr>
 <tr>

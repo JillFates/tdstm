@@ -17,6 +17,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>storeEval</td>
+	<td>javascript{var startTime=new Date().getTime(); startTime;}</td>
+	<td>tdssuitestart</td>
+</tr>
+<tr>
 	<td>type</td>
 	<td>usernameId</td>
 	<td>john</td>
@@ -316,7 +321,7 @@
 <tr>
 	<td>verifySelectedLabel</td>
 	<td>statusCode</td>
-	<td>${statusCode}</td>
+	<td>ENABLED</td>
 </tr>
 <tr>
 	<td>verifyValue</td>
@@ -358,7 +363,16 @@
 	<td>deleted</td>
 	<td></td>
 </tr>
-
+<tr>
+	<td>storeEval</td>
+	<td>javascript{var endTime=new Date().getTime(); var tdsdur=endTime -storedVars['tdssuitestart'];tdsdur;}</td>
+	<td>tdssuiteduration</td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>javascript{var tdsdur=storedVars['tdssuiteduration'];alert('It took ' + tdsdur + 'msec to run');'suite duration '+tdsdur+' msec';}</td>
+	<td></td>
+</tr>
 </tbody></table>
 </body>
 </html>

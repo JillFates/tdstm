@@ -12,6 +12,16 @@
 <tr><td rowspan="1" colspan="3">Staff_CRUD</td></tr>
 </thead><tbody>
 <tr>
+	<td>setSpeed</td>
+	<td>2500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeEval</td>
+	<td>javascript{var startTime=new Date().getTime(); startTime;}</td>
+	<td>tdssuitestart</td>
+</tr>
+<tr>
 	<td>open</td>
 	<td>/tdstm/auth/login</td>
 	<td></td>
@@ -43,7 +53,7 @@
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.1</td>
+	<td>tag.3.1</td>
 	<td>cName</td>
 </tr>
 <tr>
@@ -63,27 +73,27 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.0</td>
+	<td>tag.2.0</td>
 	<td>First Name</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.1</td>
+	<td>tag.2.1</td>
 	<td>Last Name</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.2</td>
+	<td>tag.2.2</td>
 	<td>User Login</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.3</td>
+	<td>tag.2.3</td>
 	<td>Date Created</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.4</td>
+	<td>tag.2.4</td>
 	<td>Last Updated</td>
 </tr>
 <tr>
@@ -133,8 +143,28 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//form[@id='createDialogForm']/div[1]/table.6.0</td>
+	<td>//form[@id='createDialogForm']/div[1]/table.7.0</td>
 	<td>exact:Active: *</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='createDialogForm']/div[1]/table.8.0</td>
+	<td>exact:Department:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='createDialogForm']/div[1]/table.9.0</td>
+	<td>exact:Location:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='createDialogForm']/div[1]/table.10.0</td>
+	<td>Work Phone:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='createDialogForm']/div[1]/table.11.0</td>
+	<td>Mobile Phone:</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -150,11 +180,6 @@
 	<td>randomString</td>
 	<td>4|numeric</td>
 	<td>firstName</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//input[@value='New']</td>
-	<td></td>
 </tr>
 <tr>
 	<td>type</td>
@@ -182,7 +207,72 @@
 	<td>Mr</td>
 </tr>
 <tr>
-	<td>clickAndWait</td>
+	<td>randomString</td>
+	<td>11|numeric</td>
+	<td>wPhone</td>
+</tr>
+<tr>
+	<td>randomString</td>
+	<td>11|alphanumeric</td>
+	<td>mPhone</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>//form[@id='createDialogForm']/div[1]/table/tbody/tr[11]/td[2]/input</td>
+	<td>${wPhone}</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Create']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertAlert</td>
+	<td>The Work phone number is the wrong length. Make sure you included an area code.<br /></td>
+	<td></td>
+</tr>
+<tr>
+	<td>randomString</td>
+	<td>10|numeric</td>
+	<td>wPhone</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>//form[@id='createDialogForm']/div[1]/table/tbody/tr[11]/td[2]/input</td>
+	<td>${wPhone}</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>//form[@id='createDialogForm']/div[1]/table/tbody/tr[12]/td[2]/input</td>
+	<td>${mPhone}</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Create']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertAlert</td>
+	<td>The Mobile phone number contains illegal characters.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertAlert</td>
+	<td>The Mobile phone number is the wrong length. Make sure you included an area code.<br /></td>
+	<td></td>
+</tr>
+<tr>
+	<td>randomString</td>
+	<td>10|numeric</td>
+	<td>mPhone</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>//form[@id='createDialogForm']/div[1]/table/tbody/tr[12]/td[2]/input</td>
+	<td>${mPhone}</td>
+</tr>
+<tr>
+	<td>click</td>
 	<td>//input[@value='Create']</td>
 	<td></td>
 </tr>
@@ -192,6 +282,21 @@
 	<td></td>
 </tr>
 <!--Reading the Staff Person-->
+<tr>
+	<td>click</td>
+	<td>//div[@onclick=&quot;createDynFilter(this, 'tag','firstName')&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>dynFilterInput</td>
+	<td>TestUser${firstName}</td>
+</tr>
+<tr>
+	<td>keyPress</td>
+	<td>dynFilterInput</td>
+	<td>13</td>
+</tr>
 <tr>
 	<td>click</td>
 	<td>link=${personF}</td>
@@ -311,22 +416,27 @@
 <!--Deleting the staff person-->
 <tr>
 	<td>click</td>
+	<td>//div[@onclick=&quot;createDynFilter(this, 'tag','firstName')&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>dynFilterInput</td>
+	<td>TestUser${firstName}</td>
+</tr>
+<tr>
+	<td>keyPress</td>
+	<td>dynFilterInput</td>
+	<td>13</td>
+</tr>
+<tr>
+	<td>click</td>
 	<td>link=${personF}</td>
 	<td></td>
 </tr>
 <tr>
-	<td>waitForText</td>
-	<td>//body/div[5]/div[1]</td>
-	<td>Show Staffclose</td>
-</tr>
-<tr>
 	<td>clickAndWait</td>
 	<td>//form[@id='showForm']/div[2]/span[2]/input</td>
-	<td></td>
-</tr>
-<tr>
-	<td>assertConfirmation</td>
-	<td>Are you sure?</td>
 	<td></td>
 </tr>
 <tr>
@@ -340,11 +450,15 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyElementNotPresent</td>
-	<td>link=${firstName}</td>
+	<td>storeEval</td>
+	<td>javascript{var endTime=new Date().getTime(); var tdsdur=endTime -storedVars['tdssuitestart'];tdsdur;}</td>
+	<td>tdssuiteduration</td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>javascript{var tdsdur=storedVars['tdssuiteduration'];alert('It took ' + tdsdur + 'msec to run');'suite duration '+tdsdur+' msec';}</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

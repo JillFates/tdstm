@@ -12,6 +12,7 @@
 <tr><td rowspan="1" colspan="3">TimeZone_ShowMoveBundlePage</td></tr>
 </thead><tbody>
 <!--This test will test if the date and time displayed in Show Move Bundle page is displayed as per the different time zones selected-->
+<!--Pre-requisite: User selected project must be pre-existing in the account-->
 <tr>
 	<td>setSpeed</td>
 	<td>2500</td>

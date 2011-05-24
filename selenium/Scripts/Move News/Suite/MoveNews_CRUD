@@ -74,37 +74,37 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.0</td>
+	<td>tag.2.0</td>
 	<td>Created At</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.1</td>
+	<td>tag.2.1</td>
 	<td>Created By</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.2</td>
-	<td>Type</td>
+	<td>tag.2.2</td>
+	<td>Comment Type</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.3</td>
+	<td>tag.2.3</td>
 	<td>Comment</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.4</td>
+	<td>tag.2.4</td>
 	<td>Resolution</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.5</td>
+	<td>tag.2.5</td>
 	<td>Resolved At</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.6</td>
+	<td>tag.2.6</td>
 	<td>Resolved By</td>
 </tr>
 <tr>
@@ -195,68 +195,8 @@
 </tr>
 <!--Reading the Move News-->
 <tr>
-	<td>verifyTable</td>
-	<td>assetEntityTable.0.0</td>
-	<td>Created At</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>assetEntityTable.0.1</td>
-	<td>Created By</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>assetEntityTable.0.2</td>
-	<td>Type</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>assetEntityTable.0.3</td>
-	<td>Comment</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>assetEntityTable.0.4</td>
-	<td>Resolution</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>assetEntityTable.0.5</td>
-	<td>Resolved At</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>assetEntityTable.0.6</td>
-	<td>Resolved By</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>assetEntityTable.1.2</td>
-	<td>News</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>assetEntityTable.1.3</td>
-	<td>&quot;Test Desc-${MNdesc}&quot;</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>assetEntityTable.1.4</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>assetEntityTable.1.5</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>assetEntityTable.1.6</td>
-	<td></td>
-</tr>
-<tr>
 	<td>storeTable</td>
-	<td>assetEntityTable.1.0</td>
+	<td>tag.3.0</td>
 	<td>createdAt</td>
 </tr>
 <tr>
@@ -287,7 +227,22 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//tr[@id='commentsRowId_0']/td[4]</td>
+	<td>//div[@onclick=&quot;createDynFilter(this, 'tag','comment')&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>dynFilterInput</td>
+	<td>Test Desc-${MNdesc}</td>
+</tr>
+<tr>
+	<td>keyPress</td>
+	<td>dynFilterInput</td>
+	<td>13</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//tr[@id='tag_row1']/td[4]/span</td>
 	<td></td>
 </tr>
 <tr>
@@ -361,8 +316,23 @@
 	<td></td>
 </tr>
 <tr>
+	<td>click</td>
+	<td>//div[@onclick=&quot;createDynFilter(this, 'tag','comment')&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>dynFilterInput</td>
+	<td>Test Desc-${MNdesc}</td>
+</tr>
+<tr>
+	<td>keyPress</td>
+	<td>dynFilterInput</td>
+	<td>13</td>
+</tr>
+<tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.1.4</td>
+	<td>tag.3.4</td>
 	<td>&quot;test&quot;</td>
 </tr>
 <tr>
