@@ -28,7 +28,6 @@ class Room {
 	static mapping  = {	
 		version true
 		id column:'room_id'
-		sort name:'roomName'
 		autoTimestamp false
 		columns {
 			source sqltype: 'tinyint(1)'
@@ -73,5 +72,12 @@ class Room {
 	}
 	def beforeUpdate = {
 		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+	}
+	
+	def getRackCount(){
+		return Rack.findAllByRoom(this).size()
+	}
+	def getAssetCount(){
+		return AssetEntity.findAll("FROM AssetEntity where roomSource=? or roomTarget = ?",[this, this]).size()
 	}
 }

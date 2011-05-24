@@ -34,7 +34,6 @@ class Rack {
 
 	static mapping  = {	
 		id column:'rack_id'
-		sort name:'tag'
 		sourceAssets sort:'sourceRackPosition'
 		targetAssets sort:'targetRackPosition'
 	}
