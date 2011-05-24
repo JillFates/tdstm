@@ -47,7 +47,8 @@ class RoomController {
             redirect(action: "list")
         }
         else {
-            [roomInstance: roomInstance, roomInstanceList:roomInstanceList, moveBundleList:moveBundleList]
+            [roomInstance: roomInstance, roomInstanceList:roomInstanceList, moveBundleList:moveBundleList, 
+			 moveBundleId:params.moveBundleId, source:params.source, target:params.target]
         }
     }
 

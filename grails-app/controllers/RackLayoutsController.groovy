@@ -46,7 +46,9 @@ class RackLayoutsController {
 			def rackLayout = []
 			def project = Project.findById(projectId)
 			def moveBundles = MoveBundle.findAllByProject( project )
-			if(!bundleId.contains("all")){
+			def rackId = params.rackId
+			
+			if(bundleId && !bundleId.contains("all")){
 				def bundlesString = bundleId.toString().replace("[","(").replace("]",")")
 				moveBundles = MoveBundle.findAll("from MoveBundle m where id in ${bundlesString} ")
 			}
@@ -55,9 +57,9 @@ class RackLayoutsController {
 				isAdmin = SecurityUtils.getSubject().hasRole("PROJECT_ADMIN")
 			}
 			
-			if(request.getParameterValues("sourcerack") != ['none']) {
+			if(request && request.getParameterValues("sourcerack") != ['none']) {
 				def rack = request.getParameterValues("sourcerack")
-				if(rack[0] == "") {
+				if(rack && rack[0] == "") {
 					moveBundles.each{ bundle->
 						bundle.sourceRacks.each{ sourceRack->
 							if( !sourceRacks.contains( sourceRack ) )
@@ -74,9 +76,9 @@ class RackLayoutsController {
 				sourceRacks = sourceRacks.sort { it.tag }
 			}
 
-			if(request.getParameterValues("targetrack") != ['none']) {
+			if(request && request.getParameterValues("targetrack") != ['none']) {
 				def rack = request.getParameterValues("targetrack")
-				if(rack[0] == "") {
+				if(rack && rack[0] == "") {
 					moveBundles.each{ bundle->
 						bundle.targetRacks.each{ targetRack->
 							if( !targetRacks.contains( targetRack ) )
@@ -94,6 +96,9 @@ class RackLayoutsController {
 			}
 			
 			def racks = sourceRacks + targetRacks
+			if(racks.size() == 0 && rackId){
+				racks = Rack.findAllById(rackId)
+			}
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ	
 			racks.each { rack ->
 				def assetDetails = []

@@ -263,9 +263,11 @@ table.rack_elevation table.bladeTable td.errorBlade {
 }
 .roomLayoutTable {
 	margin-right: 20px;
+	border: 1px solid black;
 }
 .roomLayoutTable td {
-	border-left: 1px solid #63a242;
-	border-top: 1px solid #63a242;
-	border-right: 1px solid #63a242;
+	border-top: 1px solid black;
+}
+.highlight{
+	background-color: #7CFE80;
 }

@@ -70,4 +70,12 @@ class Rack {
 	def getAssets() {
 		return(source == 1 ? sourceAssets : targetAssets)
 	}
+	def hasBelongsToMoveBundle( moveBundleId ){
+		boolean returnVal = false
+		def assets = this.source == 1 ? sourceAssets : targetAssets
+		if(moveBundleId){
+			returnVal = assets.moveBundle.id.contains(Long.parseLong(moveBundleId))
+		}
+		return returnVal
+	}
 }
