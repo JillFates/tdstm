@@ -11,6 +11,12 @@ br.page-break-after {
 	background: #ffffff;
 }
 
+table.rack_elevation .rack_upos {
+	background: #ffffff;
+	font-weight: bold;
+	font-size: 0.9em;
+	border: 1px solid black;
+}
 table.rack_elevation .rack_current {
 	background: #7CFE80;
 	font-weight: bold;
