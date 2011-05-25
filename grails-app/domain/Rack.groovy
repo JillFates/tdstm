@@ -4,8 +4,8 @@ class Rack {
 	String location
 	Room room
 	String tag
-	Integer roomX
-	Integer roomY
+	Integer roomX = 0
+	Integer roomY = 180
 	Integer powerA
 	Integer powerB
 	Integer powerC 

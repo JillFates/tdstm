@@ -5,44 +5,50 @@
 <span class="span">
 <b> Room View </b>
 </span>
-<div class="dialog"><g:form action="save" name="rackLayoutCreate"
-	method="post" target="_blank" onsubmit="return submitForm(this)"
-	style="border: 1px solid black; width: 100%">
+<div class="dialog">
 	<table style="width: auto; border: none">
 		<tbody>
 			<tr>
 				<td class="buttonR">
 				<div>
-				<g:select id="roomId" name="id" from="${roomInstanceList}" value="${roomInstance.id}" optionKey="id" optionValue="${{it.roomName +' / '+it.location}}" onchange="${remoteFunction(action:'show', params:'\'id=\'+this.value+\'&moveBundleId=\'+$(\'#bundleId\').val()+\'&source=\'+$(\'#sourceView\').val()+\'&target=\'+$(\'#targetView\').val()', onComplete:'openRoomView(e)')}"/>
+				<g:select id="roomId" name="id" from="${roomInstanceList}" value="${roomInstance.id}" optionKey="id" optionValue="${{it.roomName +' / '+it.location}}" onchange="${remoteFunction(action:'show', params:'\'id=\'+this.value+\'&moveBundleId=\'+$(\'#bundleId\').val()+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}"/>
 				<br />
-				<input type="Button" class="submit" value="List" /> <input
-					type="Button" class="submit" value="Edit" /></div>
+				<input type="Button" class="submit" value="List" onclick="document.location.href = document.location.href"/>
+				<input type="Button" class="submit" value="Edit" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}"/>
+				</div>
 				</td>
-
 				<td>
 				<div style="width: 150px"><label><b>Highlight:</b></label><br />
 				<br />
 				<label><b>Bundle</b></label><br />
 				<g:select id="bundleId" name="moveBundle" from="${moveBundleList}" value="${moveBundleId}" optionKey="id" optionValue="name" noSelection="${['':'Select Bundle...']}" 
-					onchange="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+this.value+\'&source=\'+$(\'#sourceView\').val()+\'&target=\'+$(\'#targetView\').val()', onComplete:'openRoomView(e)')}"/>
+					onchange="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+this.value+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}"/>
 					</div>
 				</td>
-
 				<td class="buttonR">
 				<div style="width: 150px">
 				<label for="sourceView">
-					<input type="checkbox" name="sourceView" id="sourceView" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+$(\'#bundleId\').val()+\'&source=\'+this.value+\'&target=\'+$(\'#targetView\').val()', onComplete:'openRoomView(e)')}"/>&nbsp;Source
+					<g:if test="${source == 'true'}">
+						<input type="checkbox" name="sourceView" id="sourceView" value="" checked="checked" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+$(\'#bundleId\').val()+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}"/>&nbsp;Source
+					</g:if>
+					<g:else>
+						<input type="checkbox" name="sourceView" id="sourceView" value="" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+$(\'#bundleId\').val()+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}"/>&nbsp;Source
+					</g:else>
 					</label><br />
 				<label for="targetView">
-					<input type="checkbox" name="targetView" id="targetView" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+$(\'#bundleId\').val()+\'&source=\'+$(\'#sourceView\').val()+\'&target=\'+this.value', onComplete:'openRoomView(e)')}"/>&nbsp;Target
+					<g:if test="${target == 'true'}">
+						<input type="checkbox" name="targetView" id="targetView" value="" checked="checked" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+$(\'#bundleId\').val()+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}"/>&nbsp;Target
+					</g:if>
+					<g:else>
+						<input type="checkbox" name="targetView" id="targetView" value="" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+$(\'#bundleId\').val()+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}"/>&nbsp;Target
+					</g:else>
 					</label><br />
 				</div>
 				</td>
-
 			</tr>
 		</tbody>
 	</table>
-</g:form></div>
+</div>
 <div id="roomLayout"
 	style="width: 100%; overflow-x: auto; border: 1px solid black">
 <div id="room_layout" style="float: left;width: 800px;overflow-x: auto; border: 1px solid black">
@@ -51,7 +57,7 @@
 		<td style="vertical-align: top;" nowrap="nowrap"><b>Current Room :</b><br/>
 		<table class="roomLayoutTable" cellpadding="0" cellspacing="0">
 			<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack">
-				<tr><td nowrap="nowrap" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : '' }">
+				<tr><td nowrap="nowrap" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : '' }">
 				<g:remoteLink controller="rackLayouts" action="save" params="[rackId:rack.id,frontView:'on',showCabling:'on']" onComplete="jQuery('#rackLayout').html(e.responseText);">
 				${rack.tag}
 				</g:remoteLink>
@@ -64,7 +70,7 @@
 			<td  style="vertical-align: top;" nowrap="nowrap"><b>${room} :</b><br/>
 				<table class="roomLayoutTable" cellpadding="0" cellspacing="0">
 					<g:each in="${Rack.findAllByRoom(room)}" var="rack">
-						<tr><td nowrap="nowrap" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : '' }">${rack.tag}</td></tr>
+						<tr><td nowrap="nowrap" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : '' }">${rack.tag}</td></tr>
 					</g:each>
 				</table>
 			</td>
