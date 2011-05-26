@@ -347,7 +347,7 @@ class RackLayoutsController {
 						}
 					}
 				}
-				if(it.cssClass=="empty" ){
+				if(it.cssClass=="empty" || it.cssClass=="" ){
 					it.rackStyleUpos="rack_upos"
 					} else {
 					it.rackStyleUpos=it.rackStyle
@@ -420,16 +420,16 @@ class RackLayoutsController {
 			} else if(rowspan <= 1) {
 				rowspan = 1
 				rackStyle = it.rackStyle
-				row.append("<td class='rack_upos'>${it.rack}</td><td rowspan=1 class=${it.cssClass}>&nbsp;</td><td>&nbsp;</td>")
+				row.append("<td class='${it.rackStyleUpos}'>${it.rack}</td><td rowspan=1 class=${it.cssClass}>&nbsp;</td><td>&nbsp;</td>")
 				if(backView)
 					row.append("<td>&nbsp;</td>")
 				
 			} else {
-				row.append("<td class='${rackStyleUpos}'>${it.rack}</td>")
+				row.append("<td class='${it.rackStyleUpos}'>${it.rack}</td>")
 				rowspan--
 			}
 			// Remove right U-position number 
-			//row.append("<td class='${rackStyleUpos}'>${it.rack}</td>")
+			//row.append("<td class='${it.rackStyleUpos}'>${it.rack}</td>")
 			row.append("</tr>")
 			rows.append(row.toString())
 		}

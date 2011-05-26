@@ -58,7 +58,7 @@
 		<table class="roomLayoutTable" cellpadding="0" cellspacing="0">
 			<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack">
 				<tr><td nowrap="nowrap" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : '' }">
-				<g:remoteLink controller="rackLayouts" action="save" params="[rackId:rack.id,frontView:'on',showCabling:'on']" onComplete="jQuery('#rackLayout').html(e.responseText);">
+				<g:remoteLink controller="rackLayouts" action="save" params="[rackId:rack.id,frontView:'on',showCabling:'off']" onComplete="jQuery('#rackLayout').html(e.responseText);">
 				${rack.tag}
 				</g:remoteLink>
 				</td></tr>
