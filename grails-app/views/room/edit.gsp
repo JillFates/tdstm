@@ -3,10 +3,10 @@
 <div class="body">
 <div id="roomListView">
 <span class="span">
-<b> Room View </b>
+<b> Room Edit View </b>
 </span>
 <g:form action="update" onsubmit="return submitForm(this)">
-	<div class="dialog">
+	<div class="dialog"  style="border: 1px solid black;">
 		<table style="width: auto; border: none">
 			<tbody>
 				<tr>

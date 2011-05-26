@@ -1,5 +1,6 @@
 class RoomController {
 
+	def userPreferenceService
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def index = {
@@ -14,7 +15,9 @@ class RoomController {
         }
 		def project = Project.findById( projectId )
 		def roomInstanceList = Room.findAllByProject( project, params )
-        [roomInstanceList: roomInstanceList, roomInstanceTotal: roomInstanceList.size(), projectId:projectId]
+		def roomId = getSession().getAttribute( "CURR_ROOM" )?.CURR_ROOM
+		[roomInstanceList: roomInstanceList, roomInstanceTotal: roomInstanceList.size(), 
+		 projectId:projectId, roomId:roomId, viewType:params.viewType]
     }
 
     def create = {
@@ -37,11 +40,12 @@ class RoomController {
     def show = {
         def roomInstance = Room.get(params.id)
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		userPreferenceService.setPreference( "CURR_ROOM", "${roomInstance.id}" )
 		def project = Project.findById( projectId )
 		def roomInstanceList = Room.findAllByProject( project, [sort:"roomName",order:'asc'])
 		def moveBundleList = MoveBundle.findAllByProject( project )
         if (!roomInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'room.label', default: 'Room'), params.id])}"
+            flash.message = "Current Room not found"
             redirect(action: "list")
         }
         else {
@@ -57,7 +61,7 @@ class RoomController {
 		def roomInstanceList = Room.findAllByProject( project, [sort:"roomName",order:'asc'])
 		def moveBundleList = MoveBundle.findAllByProject( project )
         if (!roomInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'room.label', default: 'Room'), params.id])}"
+        	flash.message = "Current Room not found"
             redirect(action: "list")
         }
         else {

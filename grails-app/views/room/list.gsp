@@ -6,6 +6,13 @@
 <meta name="layout" content="projectHeader" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
 <title>Room List</title>
+<script type="text/javascript">
+var roomId = "${roomId}"
+var viewType = "${viewType}"
+if(roomId && viewType != 'list'){
+${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomView(e)')}
+}
+</script>
 </head>
 <body>
 <div class="body" style="margin-top: 10px;">
@@ -13,6 +20,12 @@
 	<div class="message">${flash.message}</div>
 </g:if>
 <div id="roomListView">
+<g:if test="${roomId && viewType != 'list'}">
+<script type="text/javascript">
+${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomView(e)')}
+</script>
+</g:if>
+<g:else>
 <fieldset><legend><b>Room List</b></legend>
 <div style="float: left; width: auto;">
 <table>
@@ -60,11 +73,9 @@
 </div>
 </div>
 </fieldset>
+</g:else>
 </div>
 <div id="roomShowView" style="display: none;">
-<fieldset><legend><b>Room View</b></legend>
-<div></div>
-</fieldset>
 </div>
 </div>
 <script type="text/javascript">

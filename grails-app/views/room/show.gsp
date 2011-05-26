@@ -5,7 +5,7 @@
 <span class="span">
 <b> Room View </b>
 </span>
-<div class="dialog">
+<div class="dialog" style="border: 1px solid black;">
 	<table style="width: auto; border: none">
 		<tbody>
 			<tr>
@@ -13,8 +13,11 @@
 				<div>
 				<g:select id="roomId" name="id" from="${roomInstanceList}" value="${roomInstance.id}" optionKey="id" optionValue="${{it.roomName +' / '+it.location}}" onchange="${remoteFunction(action:'show', params:'\'id=\'+this.value+\'&moveBundleId=\'+$(\'#bundleId\').val()+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}"/>
 				<br />
-				<input type="Button" class="submit" value="List" onclick="document.location.href = document.location.href"/>
+				<g:form action="list">
+				<input type="hidden" name="viewType" value="list"/>
+				<input type="submit" class="submit" value="List"/>
 				<input type="Button" class="submit" value="Edit" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}"/>
+				</g:form>
 				</div>
 				</td>
 				<td>
