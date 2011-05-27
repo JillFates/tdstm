@@ -48,9 +48,9 @@
 			</table>
 				<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack">
 			<div style="position:absolute;background-color:white;border:1px solid black;width:60px;height:40px;top:${rack.roomY}px;left:${rack.roomX}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : '' }">
-				<g:remoteLink controller="rackLayouts" action="save" params="[rackId:rack.id,frontView:'on',showCabling:'off']" onComplete="jQuery('#rackLayout').html(e.responseText);">
+				<a href="#" onclick="$('#room_layout').css('width',700);$('#rackShowRow_'+${rack.id}).hide();$('#rackEditRow_'+${rack.id}).show()">
 				${rack.tag}
-				</g:remoteLink>
+				</a>
 			</div>
 		</g:each>
 	</div>
@@ -67,7 +67,7 @@
 			<th>Assets</th>
 		</tr>
 		<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack" status="i">
-			<tr id="rackShowRow_${rack.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}" >
+			<tr id="rackShowRow_${rack.id}" style="display: none;"> 
 				<td>${rack.tag}</td>
 				<td>${rack.roomX}</td>
 				<td>${rack.roomY}</td>
@@ -77,14 +77,14 @@
 				<td>${rack.powerC}</td>
 				<td>${rack.assets.size()}</td>
 			</tr>
-			<tr id="rackEditRow_${rack.id}" style="display: none;">
-				<td><input type="text" name="tag_${rack.id}" value="${rack.tag}" size="5"></td>
-				<td><input type="text" name="roomX_${rack.id}" value="${rack.roomX}" size="3"/></td>
-				<td><input type="text" name="roomY_${rack.id}" value="${rack.roomY}" size="3"/></td>
+			<tr id="rackEditRow_${rack.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}" >
+				<td><input type="text" name="tag_${rack.id}" value="${rack.tag}" size="5" /></td>
+				<td><input type="text" name="roomX_${rack.id}" value="${rack.roomX}" size="3" /></td>
+				<td><input type="text" name="roomY_${rack.id}" value="${rack.roomY}" size="3" /></td>
 				<td>&nbsp;</td>
-				<td><input type="text" name="powerA_${rack.id}" value="${rack.powerA}"  size="3"/></td>
-				<td><input type="text" name="powerB_${rack.id}" value="${rack.powerB}" size="3"/></td>
-				<td><input type="text" name="powerC_${rack.id}" value="${rack.powerC}" size="3"/></td>
+				<td><input type="text" name="powerA_${rack.id}" value="${rack.powerA}"  size="3" /></td>
+				<td><input type="text" name="powerB_${rack.id}" value="${rack.powerB}" size="3" /></td>
+				<td><input type="text" name="powerC_${rack.id}" value="${rack.powerC}" size="3" /></td>
 				<td>${rack.assets.size()}</td>
 			</tr>
 		</g:each>
