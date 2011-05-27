@@ -19,6 +19,7 @@ def targetRooms = jdbcTemplate.queryForList(targetRoomQuery)
 	if( !room )
 		println "Unable to create room: ${room.errors}"
 	else {
+		
 		def source = room.source ? 'source' : 'target'
 		
 		def updateQuery = "update asset_entity set room_${source}_id='${room.id}' where project_id='${room.project.id}' AND "
@@ -29,6 +30,9 @@ def targetRooms = jdbcTemplate.queryForList(targetRoomQuery)
 		println "Updated ${source} room to ${room.id} for ${updated} assets"
 	}
 }
+	
+jdbcTemplate.update("update room set room_depth=25 where room_depth is null OR room_depth = ''")
+jdbcTemplate.update("update room set room_width=25 where room_width is null OR room_width = ''")
 
 def rackQuery = """select distinct project_id as `project.id`, location as location, room as roomName, source as source 
 					from rack where rack_id is not null and room is not null and location is not null and room != '' and location != ''"""
@@ -51,3 +55,4 @@ racks.each{ roomFields ->
 		println "Updated ${updated} with ${room.id} room id"
 	}
 }
+jdbcTemplate.update("update rack set rack_type='Rack' where rack_type is null OR rack_type = ''")

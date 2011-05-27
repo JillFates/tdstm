@@ -6,12 +6,16 @@
 <meta name="layout" content="projectHeader" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
 <title>Room List</title>
+<g:javascript src="asset.tranman.js" />
 <script type="text/javascript">
 var roomId = "${roomId}"
 var viewType = "${viewType}"
 if(roomId && viewType != 'list'){
 ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomView(e)')}
 }
+$(document).ready(function() {
+    $("#editDialog").dialog({ autoOpen: false })
+})
 </script>
 </head>
 <body>
@@ -78,12 +82,41 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 <div id="roomShowView" style="display: none;">
 </div>
 </div>
+<div id="editDialog" title="Edit Asset" style="display: none;">
+	<g:form method="post" name="editForm">
+		<input type="hidden" name="id" id="editFormId" value="" />
+		<div class="dialog" id="editDiv">
+		</div>
+		<div class="buttons">
+			<span class="button">
+				<input class="save" type="button" style="font-size: 12px;" value="Update Asset" onClick="${remoteFunction(controller:'assetEntity', action:'getAssetAttributes', params:'\'assetId=\' + $(\'#editFormId\').val() ', onComplete:'callUpdateDialog(e)')}" />
+			</span>
+		</div>
+	</g:form>
+</div>
+
 <script type="text/javascript">
 function openRoomView(e){
 	var resp = e.responseText
 	$("#roomShowView").html(resp)
 	$("#roomShowView").show()
 	$("#roomListView").hide()
+}
+function openAssetEditDialig( id ){
+	$("#editFormId").val(id)
+	${remoteFunction(controller:"assetEntity", action:"editShow", params:'\'id=\' + id ', onComplete:"showAssetDialog( e , 'edit')")}
+}
+
+function showEditAsset(e) {
+	var assetEntityAttributes = eval('(' + e.responseText + ')')
+	if (assetEntityAttributes != "") {
+		$("#editDialog").dialog("close")
+		$("#cablingDialogId").dialog("close")
+		$('#commit').val('Generate')
+		$("#generateId").click()
+	} else {
+		alert("Asset is not updated, Please check the required fields")
+	}
 }
 </script>
 </body>

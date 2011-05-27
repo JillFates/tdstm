@@ -34,7 +34,7 @@
 		</table>
 	</div>
 <div id="roomLayout" style="width: 1250px; overflow-x: auto; border: 2px solid black">
-	<div id="room_layout" style="position:relative;width: 800px;height: 800px;overflow-x: auto; border: 2px solid black">
+	<div id="room_layout" style="position:relative;width: 700px;height: 800px;overflow-x: auto; border: 2px solid black">
 		<table cellpadding="0" cellspacing="0" style="width:auto;height:auto;border:0px">
 			<g:set var="numrows" value="${1}" />
 			<g:while test="${numrows < roomInstance.roomDepth / 2 }">
@@ -67,16 +67,6 @@
 			<th>Assets</th>
 		</tr>
 		<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack" status="i">
-			<tr id="rackShowRow_${rack.id}" style="display: none;"> 
-				<td>${rack.tag}</td>
-				<td>${rack.roomX}</td>
-				<td>${rack.roomY}</td>
-				<td>&nbsp;</td>
-				<td>${rack.powerA}</td>
-				<td>${rack.powerB}</td>
-				<td>${rack.powerC}</td>
-				<td>${rack.assets.size()}</td>
-			</tr>
 			<tr id="rackEditRow_${rack.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}" >
 				<td><input type="text" name="tag_${rack.id}" value="${rack.tag}" size="5" /></td>
 				<td><input type="text" name="roomX_${rack.id}" value="${rack.roomX}" size="3" /></td>
