@@ -11,12 +11,14 @@
 			<tr>
 				<td class="buttonR">
 				<div>
-				<g:select id="roomId" name="id" from="${roomInstanceList}" value="${roomInstance.id}" optionKey="id" optionValue="${{it.roomName +' / '+it.location}}" onchange="${remoteFunction(action:'show', params:'\'id=\'+this.value+\'&moveBundleId=\'+$(\'#bundleId\').val()+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}"/>
+				<g:select id="roomId" name="id" from="${roomInstanceList}" value="${roomInstance.id}" optionKey="id" optionValue="${{it.location +' / '+it.roomName}}" onchange="${remoteFunction(action:'show', params:'\'id=\'+this.value+\'&moveBundleId=\'+$(\'#bundleId\').val()+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}" />
 				<br />
+
 				<g:form action="list">
-				<input type="hidden" name="viewType" value="list"/>
-				<input type="submit" class="submit" value="List"/>
-				<input type="Button" class="submit" value="Edit" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}"/>
+				<input type="hidden" name="viewType" value="list" />
+				<input type="submit" class="submit" value="List" />
+				<input type="Button" class="submit" value="Edit" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
+
 				</g:form>
 				</div>
 				</td>
@@ -25,25 +27,25 @@
 				<br />
 				<label><b>Bundle</b></label><br />
 				<g:select id="bundleId" name="moveBundle" from="${moveBundleList}" value="${moveBundleId}" optionKey="id" optionValue="name" noSelection="${['':'Select Bundle...']}" 
-					onchange="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+this.value+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}"/>
+					onchange="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+this.value+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}" />
 					</div>
 				</td>
 				<td class="buttonR">
 				<div style="width: 150px">
 				<label for="sourceView">
 					<g:if test="${source == 'true'}">
-						<input type="checkbox" name="sourceView" id="sourceView" value="" checked="checked" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+$(\'#bundleId\').val()+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}"/>&nbsp;Source
+					<input type="checkbox" name="sourceView" id="sourceView" value="" checked="checked" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+$(\'#bundleId\').val()+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}" />&nbsp;Source
 					</g:if>
 					<g:else>
-						<input type="checkbox" name="sourceView" id="sourceView" value="" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+$(\'#bundleId\').val()+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}"/>&nbsp;Source
+					<input type="checkbox" name="sourceView" id="sourceView" value="" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+$(\'#bundleId\').val()+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}" />&nbsp;Source
 					</g:else>
 					</label><br />
 				<label for="targetView">
 					<g:if test="${target == 'true'}">
-						<input type="checkbox" name="targetView" id="targetView" value="" checked="checked" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+$(\'#bundleId\').val()+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}"/>&nbsp;Target
+					<input type="checkbox" name="targetView" id="targetView" value="" checked="checked" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+$(\'#bundleId\').val()+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}" />&nbsp;Target
 					</g:if>
 					<g:else>
-						<input type="checkbox" name="targetView" id="targetView" value="" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+$(\'#bundleId\').val()+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}"/>&nbsp;Target
+					<input type="checkbox" name="targetView" id="targetView" value="" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+$(\'#bundleId\').val()+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}" />&nbsp;Target
 					</g:else>
 					</label><br />
 				</div>
@@ -52,295 +54,76 @@
 		</tbody>
 	</table>
 </div>
-<div id="roomLayout"
-	style="width: 100%; overflow-x: auto; border: 1px solid black">
-<div id="room_layout" style="float: left;width: 800px;overflow-x: auto; border: 1px solid black">
-<table border="0">
-	<tr>
-		<td style="vertical-align: top;" nowrap="nowrap"><b>Current Room :</b><br/>
-		<table class="roomLayoutTable" cellpadding="0" cellspacing="0">
+<div id="roomLayout" style="width: 1250px; overflow-x: auto; border: 2px solid black">
+	<div id="room_layout" style="position:relative;width: 800px;height: 800px;overflow-x: auto; border: 2px solid black">
+		<table cellpadding="0" cellspacing="0" style="width:auto;height:auto;border:0px">
+			<g:set var="numrows" value="${1}" />
+			<g:while test="${numrows < roomInstance.roomDepth / 2 }">
+				<tr>
+					<g:set var="numcols" value="${1}" />
+					<g:while test="${numcols < roomInstance.roomWidth / 2 }">
+						<td style="height:40px;width:40px;border:1px solid black;padding:0px" numcols="${numcols++}">&nbsp;</td>
+					</g:while>
+				</tr ><!-- ${numrows++} -->
+			</g:while>
+		</table>
 			<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack">
-				<tr><td nowrap="nowrap" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : '' }">
+<%--
+			<g:if test="${rack.roomX != '0' || rack.roomY != '0'}">
+			</g:if>
+--%>
+			<div style="position:absolute;background-color:white;border:1px solid black;width:60px;height:40px;top:${rack.roomY}px;left:${rack.roomX}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : '' }">
 				<g:remoteLink controller="rackLayouts" action="save" params="[rackId:rack.id,frontView:'on',showCabling:'off']" onComplete="jQuery('#rackLayout').html(e.responseText);">
 				${rack.tag}
 				</g:remoteLink>
-				</td></tr>
-			</g:each>
-		</table>
-		</td>
-		<g:each in="${roomInstanceList}" var="room">
-			<g:if test="${room.id != roomInstance.id}">
-			<td  style="vertical-align: top;" nowrap="nowrap"><b>${room} :</b><br/>
-				<table class="roomLayoutTable" cellpadding="0" cellspacing="0">
-					<g:each in="${Rack.findAllByRoom(room)}" var="rack">
-						<tr><td nowrap="nowrap" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : '' }">${rack.tag}</td></tr>
-					</g:each>
-				</table>
-			</td>
-			</g:if>
+			</div>
 		</g:each>
-	</tr>
-</table>
 </div>
-<div style="float: left; margin-left: 50px;" id="rackLayout">
+	<div style="position:relative;top:-800px;float: right; margin-left: 50px;" id="rackLayout">
 <table cellpadding=2 class="rack_elevation back">
-	<tr>
-		<th>U</th>
-		<th>Device</th>
-		<th>Bundle</th>
-	</tr>
-
-	<tr>
-		<td class='empty'>42</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-	</tr>
-	<tr>
-		<td class='empty'>41</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-	</tr>
-	<tr>
-		<td class='empty'>40</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>39</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>38</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>37</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>36</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>35</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>34</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>33</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>32</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>31</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>30</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>29</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>28</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>27</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>26</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>25</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>24</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>23</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>22</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>21</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>20</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>19</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>18</td>
-		<td rowspan='1' class='empty'>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>17</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>16</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>15</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>14</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>13</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>12</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>11</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>10</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>9</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>8</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>7</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>6</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>5</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>4</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>3</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>2</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-	<tr>
-		<td class='empty'>1</td>
-		<td rowspan=1 class=empty>&nbsp;</td>
-		<td>&nbsp;</td>
-
-	</tr>
-
+	<tr><th>U</th><th>Device</th><th>Bundle</th></tr>
+	<tr><td class='rack_upos'>42</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>41</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>40</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>39</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>38</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>37</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>36</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>35</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>34</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>33</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>32</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>31</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>30</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>29</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>28</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>27</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>26</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>25</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>24</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>23</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>22</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>21</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>20</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>19</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>18</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>17</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>16</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>15</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>14</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>13</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>12</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>11</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>10</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>9</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>8</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>7</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>6</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>5</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>4</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>3</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>2</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td class='rack_upos'>1</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
 </table>
 </div>
 </div>
