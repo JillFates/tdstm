@@ -23,12 +23,11 @@
 				</div>
 				</td>
 				<td>
-				<div style="width: 150px"><label><b>Highlight:</b></label><br />
-				<br />
+				<div style="width: 150px"><label><b>Highlight:</b></label><br /><br />
 				<label><b>Bundle</b></label><br />
-				<g:select id="bundleId" name="moveBundle" from="${moveBundleList}" value="${moveBundleId}" optionKey="id" optionValue="name" noSelection="${['':'Select Bundle...']}" 
-					onchange="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+this.value+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}" />
-					</div>
+					<g:select id="bundleId" name="moveBundle" from="${moveBundleList}" value="${moveBundleId}" optionKey="id" optionValue="name" noSelection="${['':'Select Bundle...']}" 
+						onchange="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+this.value+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}" />
+				</div>
 				</td>
 				<td class="buttonR">
 				<div style="width: 150px">
@@ -72,7 +71,7 @@
 			<g:if test="${rack.roomX != '0' || rack.roomY != '0'}">
 			</g:if>
 --%>
-			<div style="position:absolute;background-color:white;border:1px solid black;width:60px;height:40px;top:${rack.roomY}px;left:${rack.roomX}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : '' }">
+			<div style="position:absolute;border:1px solid black;width:60px;height:40px;top:${rack.roomY}px;left:${rack.roomX}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : 'racktop_h' }">
 				<g:remoteLink controller="rackLayouts" action="save" params="[rackId:rack.id,frontView:'on',showCabling:'off']" onComplete="jQuery('#rackLayout').html(e.responseText);">
 				${rack.tag}
 				</g:remoteLink>
