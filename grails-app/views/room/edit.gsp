@@ -26,44 +26,35 @@
 				</tr>
 				<tr>
 					<td class="buttonR">
-						<input type="button" class="submit" value="Cancel" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}"/>
-						<input type="submit" class="submit" value="Update"/>
+						<input type="button" class="submit" value="Cancel" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
+						<input type="submit" class="submit" value="Update" />
 					</td>
 				</tr>
 			</tbody>
 		</table>
 	</div>
-	<div id="roomLayout"
-		style="width: 100%; overflow-x: auto; border: 1px solid black">
-	<div id="room_layout" style="float: left;width: 800px;overflow-x: auto; border: 1px solid black">
-	<table border="0">
-		<tr>
-			<td style="vertical-align: top;" nowrap="nowrap"><b>Current Room :</b><br/>
-			<table class="roomLayoutTable" cellpadding="0" cellspacing="0">
-				<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack">
-					<tr><td nowrap="nowrap" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : '' }">
-					<a href="#" onclick="$('#room_layout').css('width',700);$('#rackShowRow_'+${rack.id}).hide();$('#rackEditRow_'+${rack.id}).show()">
-					${rack.tag}
-					</a>
-					</td></tr>
-				</g:each>
+<div id="roomLayout" style="width: 1250px; overflow-x: auto; border: 2px solid black">
+	<div id="room_layout" style="position:relative;width: 800px;height: 800px;overflow-x: auto; border: 2px solid black">
+		<table cellpadding="0" cellspacing="0" style="width:auto;height:auto;border:0px">
+			<g:set var="numrows" value="${1}" />
+			<g:while test="${numrows < roomInstance.roomDepth / 2 }">
+				<tr>
+					<g:set var="numcols" value="${1}" />
+					<g:while test="${numcols < roomInstance.roomWidth / 2 }">
+						<td style="height:40px;width:40px;border:1px solid black;padding:0px" numcols="${numcols++}">&nbsp;</td>
+					</g:while>
+				</tr ><!-- ${numrows++} -->
+			</g:while>
 			</table>
-			</td>
-			<g:each in="${roomInstanceList}" var="room">
-				<g:if test="${room.id != roomInstance.id}">
-				<td  style="vertical-align: top;" nowrap="nowrap"><b>${room} :</b><br/>
-					<table class="roomLayoutTable" cellpadding="0" cellspacing="0">
-						<g:each in="${Rack.findAllByRoom(room)}" var="rack">
-							<tr><td nowrap="nowrap" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : '' }">${rack.tag}</td></tr>
-						</g:each>
-					</table>
-				</td>
-				</g:if>
-			</g:each>
-		</tr>
-	</table>
+				<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack">
+			<div style="position:absolute;background-color:white;border:1px solid black;width:60px;height:40px;top:${rack.roomY}px;left:${rack.roomX}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : '' }">
+				<g:remoteLink controller="rackLayouts" action="save" params="[rackId:rack.id,frontView:'on',showCabling:'off']" onComplete="jQuery('#rackLayout').html(e.responseText);">
+				${rack.tag}
+				</g:remoteLink>
+			</div>
+		</g:each>
 	</div>
-	<div style="float: left; margin-left: 10px;" id="rackLayout">
+	<div style="position:relative;top:-800px;float: right; margin-left: 10px;" id="rackLayout">
 	<table border="0">
 		<tr>
 			<th>Rack</th>
