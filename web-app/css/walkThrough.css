@@ -1,5 +1,5 @@
 body {
-   font-size:10px;
+   font-size:12px;
    margin : 0px;
    font-family: arial,helvetica,sans-serif;
 }
@@ -8,7 +8,7 @@ div.title {
    border: 1px solid #e7e7e7;
    background: green;
    color: white;
-   font-size:12px;
+   font-size:14px;
    font-weight:bold;
    padding-left:3px;
    padding-bottom:2px;
@@ -16,7 +16,7 @@ div.title {
 }
  
 select, submit, input, textarea{
-   font-size:10px;
+   font-size:12px;
 }
  
 textarea {
@@ -49,43 +49,49 @@ table {
    width:100%;
 }
 td {
-   padding: 0px;
+   font-family: arial,helvetica,sans-serif;
+   padding: 2px;
    margin: 0px;
 }
 th {
    border: 1px solid #bcbcbc;
-   font-size:10px;
+   font-size:12px;
 }
 table.grid td {
    border: 1px solid #bcbcbc;
-   font-size:10px;
+   font-size:12px;
 }
 tr.jump {
 }
  
 td.center {
+   font-family: arial,helvetica,sans-serif;
    text-align:center;
 }
 td.label {
-   font-size:9;
+   font-family: arial,helvetica,sans-serif;
+   font-size:11;
    font-weight:bold;
    text-align:right;
    white-space:nowrap;
 }
 label {
-   font-size:9;
+   font-family: arial,helvetica,sans-serif;
+   font-size:11;
    font-weight:bold;
    text-align:right;
 }
 a.button {
    border:1px outset black;
-   font-size:10px;
+   font-size:12px;
    font-weight:bold;
    background: #FCBF31;
    color:black;
    text-decoration: none;
-   padding-left: 3px;
-   padding-right: 3px;
+   padding-left: 30px;
+   padding-right: 30px;
+   padding-top: 5px;
+   padding-bottom: 5px;
 }
  
 a.big {
@@ -109,17 +115,17 @@ a.nav_button {
 }
  
 input.select {
-	font-size:10px;
+	font-size:12px;
 	width:120px;
-	margin:1px;
-	padding:1px;
+	margin:2px;
+	padding:2px;
 }
  
 input.text {
-	font-size:10px;
+	font-size:12px;
 	width:120px;
-	margin:1px;
-	padding:1px;
+	margin:2px;
+	padding:2px;
 }
  
 input.search {

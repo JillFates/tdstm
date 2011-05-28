@@ -324,13 +324,13 @@ function checkComments(type) {
 				<a href="#" class="button big" onclick="missingAsset('resolve', '${assetEntity?.id}','Resolve missing asset issue. Are you sure?')">Missing Asset Found</a>
 			</g:if>
 			<g:else>
-				<a class="button big" href="#asset_front1">Front Audit</a> <BR style="MARGIN-TOP: 6px">
-				<a class="button big" href="#asset_rear1">Rear Audit</a> <BR style="MARGIN-TOP: 6px">
+				<a class="button big" href="#asset_front1">Front Audit</a> <BR /><BR />
+				<a class="button big" href="#asset_rear1">Rear Audit</a> <BR /><BR />
 				<a class="button big" href="getComments?commentType=all&sort=desc&orderType=commentType&id=${assetEntity?.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments" 
-					onclick="return validChanges();">Issues/Comments</a> <BR style="MARGIN-TOP: 6px">
+					onclick="return validChanges();">Issues/Comments</a> <BR /><BR />
 				<input name="type" value="create" type="hidden"/>
 				<a href="#" class="button big" onclick="missingAsset('create', '${assetEntity?.id}','Mark asset as missing. Are you sure?')">Mark Asset Missing </a>
-				 <BR style="MARGIN-TOP: 6px">
+				 <BR /><BR />
 				 <g:if test="${request.getHeader ( 'User-Agent' ).contains ( 'MSIE' )}">
 				<a class="button big" href="#generate_label" >Generate Label</a>
 				</g:if>
