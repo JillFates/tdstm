@@ -350,7 +350,7 @@ class RackLayoutsController {
 				if(it.cssClass=="empty" || it.cssClass=="" ){
 					it.rackStyleUpos="rack_upos"
 					} else {
-					it.rackStyleUpos=it.rackStyle
+					it.rackStyleUpos=it.cssClass
 				}	
 				if(backView) {
 					if(cabling != "" && it.cssClass != "rack_error"){

@@ -12,10 +12,12 @@ br.page-break-after {
 }
 
 .racktop_h {
-	background: #ffffff;
+	border: 2px solid black;
+	background-color: #ffffff;
 }
 .racktop_v {
-	background: #ffffff;
+	border: 2px solid black;
+	background-color: #ffffff;
 }
 table.rack_elevation .rack_upos {
 	background: #ffffff;

@@ -3,7 +3,7 @@
 <div class="body">
 <div id="roomListView">
 <span class="span">
-<b> Room View </b>
+<b> Data Center / Room View </b>
 </span>
 <div class="dialog" style="border: 1px solid black;">
 	<table style="width: auto; border: none">
@@ -71,7 +71,7 @@
 			<g:if test="${rack.roomX != '0' || rack.roomY != '0'}">
 			</g:if>
 --%>
-			<div style="position:absolute;border:1px solid black;width:60px;height:40px;top:${rack.roomY}px;left:${rack.roomX}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : 'racktop_h' }">
+			<div style="position:absolute;width:60px;height:40px;top:${rack.roomY}px;left:${rack.roomX}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : 'racktop_h' }">
 				<g:remoteLink controller="rackLayouts" action="save" params="[rackId:rack.id,frontView:'on',showCabling:'off']" onComplete="jQuery('#rackLayout').html(e.responseText);">
 				${rack.tag}
 				</g:remoteLink>
