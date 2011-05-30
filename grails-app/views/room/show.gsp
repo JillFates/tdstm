@@ -67,7 +67,7 @@
 			</g:while>
 		</table>
 			<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack">
-				<g:if test="${rack.type == 'Rack'}">
+				<g:if test="${rack.rackType == 'Rack'}">
 					<div style="position:absolute;top:${rack.roomY}px;left:${rack.roomX}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : 'racktop_h' }">
 						<div class="racktop_label">
 						<g:remoteLink controller="rackLayouts" action="save" params="[rackId:rack.id,frontView:'on',showCabling:'off']" onComplete="jQuery('#rackLayout').html(e.responseText);">
