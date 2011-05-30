@@ -72,9 +72,11 @@
 			</g:if>
 --%>
 			<div style="position:absolute;width:60px;height:40px;top:${rack.roomY}px;left:${rack.roomX}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : 'racktop_h' }">
+				<div class="racktop_label">
 				<g:remoteLink controller="rackLayouts" action="save" params="[rackId:rack.id,frontView:'on',showCabling:'off']" onComplete="jQuery('#rackLayout').html(e.responseText);">
 				${rack.tag}
 				</g:remoteLink>
+				</div>
 			</div>
 		</g:each>
 </div>

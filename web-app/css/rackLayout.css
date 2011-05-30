@@ -11,6 +11,11 @@ br.page-break-after {
 	background: #ffffff;
 }
 
+.racktop_label {
+	postition: relative;
+	top: 30%;
+	background-color: transparent;
+}
 .racktop_h {
 	border: 2px solid black;
 	background-color: #ffffff;
