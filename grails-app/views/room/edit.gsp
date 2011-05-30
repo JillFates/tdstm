@@ -34,7 +34,7 @@
 		</table>
 	</div>
 <div id="roomLayout" style="width: 1250px; overflow-x: auto; border: 2px solid black">
-	<div id="room_layout" style="position:relative;width: 700px;height: 800px;overflow-x: auto; border: 2px solid black">
+	<div id="room_layout" style="position:relative;width: 700px;height: 800px;overflow-x: auto; border: 0px solid black">
 		<table cellpadding="0" cellspacing="0" style="width:auto;height:auto;border:0px">
 			<g:set var="numrows" value="${1}" />
 			<g:while test="${numrows < roomInstance.roomDepth / 2 }">

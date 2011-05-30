@@ -112,9 +112,9 @@ function showAssetDialog( e , action ) {
 		    }
 		    var inputTd = ""
 		    if(attribute.attributeCode == "manufacturer"){
-		    	inputTd = "<td style='width:25%;' nowrap><a href='javascript:showManufacturer("+attribute.manufacturerId+")'>"+attribute.value+"</a></td>"
+		    	inputTd = "<td style='width:25%;color:#00f;font-style:underline;' nowrap><a href='javascript:showManufacturer("+attribute.manufacturerId+")'>"+attribute.value+"</a></td>"
 		    } else if(attribute.attributeCode == "model"){
-		    	inputTd = "<td style='width:25%;' nowrap><a href='javascript:showModel("+attribute.modelId+")'>"+attribute.value+"</a></td>"
+		    	inputTd = "<td style='width:25%;color:#00f;font-style:underline;' nowrap><a href='javascript:showModel("+attribute.modelId+")'>"+attribute.value+"</a></td>"
 		    } else {
 		    	inputTd = "<td style='width:25%;' nowrap>"+attribute.value+"</td>"
 		    }
@@ -157,12 +157,12 @@ function showAssetDialog( e , action ) {
 	  new Ajax.Request('../assetEntity/getAutoCompleteDate?autoCompParams='+autoComp,{asynchronous:true,evalScripts:true,onComplete:function(e){updateAutoComplete(e);}}) 
 	  $("#createDialog").dialog("close");
 	  if(action == 'edit'){
-	      $("#editDialog").dialog('option', 'width', 'auto');
+	      $("#editDialog").dialog('option', 'width', '1000px');
 	      $("#editDialog").dialog('option', 'position', ['center','top']);
 	      $("#editDialog").dialog("open");
 	      $("#showDialog").dialog("close");
       } else if(action == 'show'){
-          $("#showDialog").dialog('option', 'width', 'auto');
+          $("#showDialog").dialog('option', 'width', '1000px');
 	      $("#showDialog").dialog('option', 'position', ['center','top']);
 	      $("#showDialog").dialog("open");
 	      $("#editDialog").dialog("close");

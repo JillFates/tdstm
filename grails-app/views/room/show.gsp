@@ -54,7 +54,7 @@
 	</table>
 </div>
 <div id="roomLayout" style="width: 1250px; overflow-x: auto; border: 2px solid black">
-	<div id="room_layout" style="position:relative;width: 800px;height: 800px;overflow-x: auto; border: 2px solid black">
+	<div id="room_layout" style="position:relative;width: 800px;height: 800px;overflow-x: auto; border: 0px solid black">
 		<table cellpadding="0" cellspacing="0" style="width:auto;height:auto;border:0px">
 			<g:set var="numrows" value="${1}" />
 			<g:while test="${numrows < roomInstance.roomDepth / 2 }">
@@ -67,17 +67,22 @@
 			</g:while>
 		</table>
 			<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack">
-<%--
-			<g:if test="${rack.roomX != '0' || rack.roomY != '0'}">
-			</g:if>
---%>
-			<div style="position:absolute;width:60px;height:40px;top:${rack.roomY}px;left:${rack.roomX}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : 'racktop_h' }">
-				<div class="racktop_label">
-				<g:remoteLink controller="rackLayouts" action="save" params="[rackId:rack.id,frontView:'on',showCabling:'off']" onComplete="jQuery('#rackLayout').html(e.responseText);">
-				${rack.tag}
-				</g:remoteLink>
-				</div>
-			</div>
+				<g:if test="${rack.type == 'Rack'}">
+					<div style="position:absolute;top:${rack.roomY}px;left:${rack.roomX}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : 'racktop_h' }">
+						<div class="racktop_label">
+						<g:remoteLink controller="rackLayouts" action="save" params="[rackId:rack.id,frontView:'on',showCabling:'off']" onComplete="jQuery('#rackLayout').html(e.responseText);">
+						${rack.tag}
+						</g:remoteLink>
+						</div>
+					</div>
+				</g:if>
+				<g:else>
+					<div style="position:absolute;top:${rack.roomY}px;left:${rack.roomX}px;" class="room_${rack.type}">
+						<div class="racktop_label">
+						${rack.tag}
+						</div>
+					</div>
+				</g:else>
 		</g:each>
 </div>
 	<div style="position:relative;top:-800px;float: right; margin-left: 50px;" id="rackLayout">
