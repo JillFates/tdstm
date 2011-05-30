@@ -77,7 +77,7 @@
 					</div>
 				</g:if>
 				<g:else>
-					<div style="position:absolute;top:${rack.roomY}px;left:${rack.roomX}px;" class="room_${rack.type}">
+					<div style="position:absolute;top:${rack.roomY}px;left:${rack.roomX}px;" class="room_${rack.rackType}">
 						<div class="racktop_label">
 						${rack.tag}
 						</div>
