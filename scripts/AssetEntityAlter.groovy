@@ -27,17 +27,17 @@ println"**************UPDATE MANUFACTURER***************"
 // Create manufactures if not exist
 def manufacturerResultMap = jdbcTemplate.queryForList("select manufacturer from asset_entity where manufacturer != '' and manufacturer is not null group by manufacturer")
 	manufacturerResultMap.each{ result->
-		def manufacturer = result.manufacturer.replaceAll("\\s+\$", "").replaceAll("^\\s+", "")
-		def manufacturerInstance = Manufacturer.findByName( manufacturer )
+		def manufacturerName = result.manufacturer.replaceAll("\\s+\$", "").replaceAll("^\\s+", "")
+		def manufacturerInstance = Manufacturer.findByName( manufacturerName )
 		if( !manufacturerInstance ){
-			def manufacuturers = Manufacturer.findAllByAkaIsNotNull()
-			manufacuturers.each{manufacuturer->
-				if(manufacuturer.aka.toLowerCase().contains( manufacturerValue.toLowerCase() )){
-					manufacturerInstance = manufacuturer
+			def manufacturers = Manufacturer.findAllByAkaIsNotNull()
+			manufacturers.each{manufacturer->
+				if(manufacturer.aka.toLowerCase().contains( manufacturerName.toLowerCase() )){
+					manufacturerInstance = manufacturer
 				}
 			}
 			if(!manufacturerInstance){
-				manufacturerInstance = new Manufacturer( name : manufacturer )
+				manufacturerInstance = new Manufacturer( name : manufacturerName )
 				if ( !manufacturerInstance.validate() || !manufacturerInstance.save() ) {
 					def etext = "Unable to create manufacturerInstance" +
 					GormUtil.allErrorsString( manufacturerInstance )
@@ -45,10 +45,10 @@ def manufacturerResultMap = jdbcTemplate.queryForList("select manufacturer from 
 				}
 			}
 		}
-		manufacturer = manufacturer.replace("'","\\'")
-		def updateQuery = "update asset_entity set manufacturer_id = ${manufacturerInstance.id} where manufacturer='${manufacturer}'"
+		manufacturerName = manufacturerName.replace("'","\\'")
+		def updateQuery = "update asset_entity set manufacturer_id = ${manufacturerInstance.id} where manufacturer='${manufacturerName}'"
 		def updated = jdbcTemplate.update(updateQuery)
-		println "Updated '${manufacturer}' Manufacturer id ${manufacturerInstance.id} for ${updated} assets"
+		println "Updated '${manufacturerName}' Manufacturer id ${manufacturerInstance.id} for ${updated} assets"
 	}
 println"**************UPDATE MODEL***************"
 //Create model if not exist
