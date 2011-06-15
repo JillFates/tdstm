@@ -28,6 +28,16 @@ class ModelController {
     }
 
     def list = {
+		boolean filter = params.filter
+		if(filter){
+			session.modelFilters.each{
+				if(it.key.contains("tag")){
+					request.parameterMap[it.key] = [session.modelFilters[it.key]]
+				}
+			}
+		} else {
+			session.modelFilters = params
+		}
        // params.max = Math.min(params.max ? params.int('max') : 25, 100)
 		if(!params.sort) params.sort = 'modelName'
     	if(!params.order) params.order = 'asc'

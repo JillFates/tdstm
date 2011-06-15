@@ -119,4 +119,7 @@ class Model {
 	def getSource(){
 		return this.sourceTDS == 1 ? "TDS" : ""
 	}
+	def getManufacturerName(){
+		return manufacturer.name
+	}
 }

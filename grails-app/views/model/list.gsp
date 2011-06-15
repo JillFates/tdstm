@@ -31,7 +31,7 @@
                             <jmesa:htmlColumn property="modelName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 								<g:link action="show" id="${modelInstance.id}">${modelInstance.modelName}</g:link>
 							 </jmesa:htmlColumn>
-							 <jmesa:htmlColumn property="manufacturer.name" title="Manufacturer" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${modelInstance.manufacturer}</jmesa:htmlColumn>
+							 <jmesa:htmlColumn property="manufacturerName" title="Manufacturer" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${modelInstance.manufacturer}</jmesa:htmlColumn>
     	                     <jmesa:htmlColumn property="description" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${modelInstance.description}</jmesa:htmlColumn>
         	                 <jmesa:htmlColumn property="assetType" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${modelInstance.assetType}</jmesa:htmlColumn>
             	             <jmesa:htmlColumn property="powerUse" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${modelInstance.powerUse}</jmesa:htmlColumn>

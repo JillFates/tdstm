@@ -9,7 +9,7 @@
   <body>
 <div class="body">
 <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-            <span class="menuButton"><g:link class="list" action="list">Model List</g:link></span>
+            <span class="menuButton"><g:link class="list" action="list"  params="[filter:true]">Model List</g:link></span>
             <span class="menuButton"><g:link class="create" action="create">New Model</g:link></span>
         </div>
 <g:if test="${flash.message}">
