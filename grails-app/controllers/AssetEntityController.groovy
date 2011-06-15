@@ -498,6 +498,9 @@ class AssetEntityController {
                             sheet.addCell(customColumn)
 						}
 					}
+					// Hardcode the Usize at the end of all columns
+					sheet.addCell(new Label(columnNameListSize+1,0, "Usize"))
+					
                     for ( int r = 1; r <= assetSize; r++ ) {
                         //Add assetId for walkthrough template only.
                         if( sheetColumnNames.containsKey("assetId") ) {
@@ -521,6 +524,10 @@ class AssetEntityController {
                             }
                             sheet.addCell( addContentToSheet )
                         }
+						// add model Usize at the end of all columns
+						if(asset[r-1]?.model?.usize){
+							sheet.addCell(new Number(columnNameListSize+1,r, asset[r-1]?.model?.usize))
+	                    }
                     } 
                     //update data from Asset Comment table to EXCEL
                     for( int sl=0;  sl < sheetNamesLength; sl++ ) {
@@ -565,7 +572,7 @@ class AssetEntityController {
                 }
             }
         } catch( Exception fileEx ) {
-            flash.message = "Excel template not found. "
+            flash.message = "Exception occurred wile exporting Excel. "
             redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
             return;
         }
