@@ -21,6 +21,16 @@ class ManufacturerController {
         	params.sort = 'name'
 			params.order = 'asc'
         }
+		boolean filter = params.filter
+		if(filter){
+			session.modelFilters.each{
+				if(it.key.contains("tag")){
+					request.parameterMap[it.key] = [session.modelFilters[it.key]]
+				}
+			}
+		} else {
+			session.modelFilters = params
+		}
         def manufacturersList = Manufacturer.list( params )
         TableFacade tableFacade = new TableFacadeImpl("tag",request)
         tableFacade.items = manufacturersList

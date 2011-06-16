@@ -12,6 +12,16 @@ class PartyGroupController {
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 	// Will Return PartyGroup list where PartyType = COMPANY
 	def list = {
+		boolean filter = params.filter
+		if(filter){
+			session.companyFilters.each{
+				if(it.key.contains("tag")){
+					request.parameterMap[it.key] = [session.companyFilters[it.key]]
+				}
+			}
+		} else {
+			session.companyFilters = params
+		}
 		def sort = params.sort ? params.sort : 'name'
 		def order = params.order ? params.order : 'asc'
 		def query = "from PartyGroup as p where partyType = 'COMPANY'"

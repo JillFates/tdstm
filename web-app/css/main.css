@@ -281,6 +281,10 @@ th.desc a {
     background: transparent url(../images/skin/database_delete.png) 5px 50% no-repeat;
     padding-left: 28px;
 }
+.buttons input.show {
+    background: transparent url(../images/skin/database_table.png) 5px 50% no-repeat;
+    padding-left: 28px;
+}
 .buttons input.edit {
     background: transparent url(../images/skin/database_edit.png) 5px 50% no-repeat;
     padding-left: 28px;

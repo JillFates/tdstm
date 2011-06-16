@@ -11,7 +11,7 @@
         <div class="body">
             <h1>Show UserLogin</h1>
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-	            <span class="menuButton"><g:link class="list" action="list" id="${companyId}">UserLogin List</g:link></span>
+	            <span class="menuButton"><g:link class="list" action="list" id="${companyId}"  params="[filter:true]">UserLogin List</g:link></span>
 	            <jsec:hasRole name="ADMIN">
 	            <span class="menuButton"><g:link class="create" action="create" params="[companyId:companyId]">New UserLogin</g:link></span>
 	            </jsec:hasRole>

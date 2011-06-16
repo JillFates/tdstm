@@ -9,7 +9,7 @@
     <body>
         <div class="body">
 	        <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-	            <span class="menuButton"><g:link class="list" action="list">Manufacturer List</g:link></span>
+	            <span class="menuButton"><g:link class="list" action="list"  params="[filter:true]">Manufacturer List</g:link></span>
 	            <span class="menuButton"><g:link class="create" action="create">New Manufacturer</g:link></span>
 	        </div>
             <h1>Edit Manufacturer</h1>

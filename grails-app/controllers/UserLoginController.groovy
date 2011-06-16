@@ -17,7 +17,16 @@ class UserLoginController {
 
     def list = {
 		def companyId = params.id
-		
+		boolean filter = params.filter
+		if(filter){
+			session.userFilters.each{
+				if(it.key.contains("tag")){
+					request.parameterMap[it.key] = [session.userFilters[it.key]]
+				}
+			}
+		} else {
+			session.userFilters = params
+		}
         if(!params.max) params.max = '20'
         def max = Integer.parseInt( params.max )
 		def offset = params.offset ? Integer.parseInt( params.offset ) : 0

@@ -14,7 +14,7 @@
 <div class="steps_table" style="border: 0px;">
 <fieldset>
 <legend><b>Create Model Template</b></legend>
-<g:form action="save" enctype="multipart/form-data">
+<g:form action="list" enctype="multipart/form-data">
 <div style="margin-left: 10px;margin-right: 10px; float: left;width: auto;">
 <table>
 	<tbody>
@@ -135,7 +135,7 @@
 				<div class="buttons" style="margin-left: 10px;margin-right: 10px;"> 
 					<span class="button">
 						<g:actionSubmit class="save" action="save" value="Save" onclick="return validateForm()"></g:actionSubmit>
-						<g:actionSubmit class="delete" action="list" value="Cancel"></g:actionSubmit>
+						 <span class="menuButton"><g:link class="list" action="list"  params="[filter:true]">Cancel</g:link></span>
 					</span>
 				</div>
 			</td>
