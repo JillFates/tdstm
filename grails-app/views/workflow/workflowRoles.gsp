@@ -81,11 +81,11 @@
 					<g:if test="${workflowTransition?.id != roleWiseTransition?.transition.id }">
 						<g:if test="${transitionMap.workflowTransitionMap}">
 							<input type="checkbox" name="${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.id}" checked="checked"/>	
-							<g:select name="flag_${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.id}" from="${WorkflowTransitionMap.constraints.flag.inList}" value="${transitionMap.workflowTransitionMap.flag}" noSelection="${['':'']}"  valueMessagePrefix="workflow.flag"></g:select>
+							<input type="text" name="flag_${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.id}" value="${transitionMap.workflowTransitionMap.flag}" />
 						</g:if>
 						<g:else>
 							<input type="checkbox" name="${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.id}"/>
-							<g:select name="flag_${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.id}" from="${WorkflowTransitionMap.constraints.flag.inList}"  noSelection="${['':'']}" valueMessagePrefix="workflow.flag"></g:select>
+							<input type="text" name="flag_${transitionMap.swimlane?.name}_${roleWiseTransition.transition?.id}" value=""/>
 						</g:else>
 					</g:if>
 					<g:else>
