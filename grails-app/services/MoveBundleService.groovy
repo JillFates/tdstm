@@ -233,4 +233,63 @@ class MoveBundleService {
 		jdbcTemplate.execute( "DROP TEMPORARY TABLE IF EXISTS tmp_step_summary" )
 		return summaryResults;
 	 }
+	 /**
+	  *  Delete Bundle AssetEntitys and its associated records
+	  */
+	 def deleteBundleAssetsAndAssociates( def moveBundleInstance ){
+		 def message
+		 try{
+			 // remove preferences
+			 def bundleQuery = "select mb.id from MoveBundle mb where mb.id = ${moveBundleInstance.id}"
+			 UserPreference.executeUpdate("delete from UserPreference up where up.value = ${moveBundleInstance.id} ")
+			 //remove the AssetEntity
+			 def assetsQuery = "select a.id from AssetEntity a where a.moveBundle = ${moveBundleInstance.id}"
+			 
+			 ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset in ($assetsQuery)")
+			 AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity in ($assetsQuery)")
+			 AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar av where av.assetEntity in ($assetsQuery)")
+			 AssetTransition.executeUpdate("delete from AssetTransition at where at.assetEntity in ($assetsQuery)")
+			 ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset in ($assetsQuery)")
+			 AssetCableMap.executeUpdate("delete AssetCableMap where fromAsset in ($assetsQuery)")
+			 AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
+											 toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
+											 where toAsset in ($assetsQuery)""")
+			 ProjectTeam.executeUpdate("Update ProjectTeam pt SET pt.latestAsset = null where pt.latestAsset in ($assetsQuery)")
+			 
+			 AssetEntity.executeUpdate("delete from AssetEntity ae where a.moveBundle = ${moveBundleInstance.id}")
+			 
+		 } catch(Exception ex){
+			 message = "Unable to remove the $moveBundleInstance Assets Error:"+ex
+		 }
+		 return message
+	 }
+	 /**
+	 *  Delete MoveBundle associated records
+	 */
+	 def deleteMoveBundleAssociates( def moveBundleInstance ){
+		def message
+		try{
+			def teamQuery = "SELECT project_team_id FROM project_team WHERE move_bundle_id = ${moveBundleInstance.id}"
+			jdbcTemplate.update("DELETE FROM party_relationship where party_id_from_id in ($teamQuery) or party_id_to_id in ($teamQuery) ")
+			jdbcTemplate.update("DELETE FROM party where party_id in ($teamQuery)")
+			jdbcTemplate.update("DELETE FROM party_group where party_group_id in ($teamQuery)")
+			jdbcTemplate.update("UPDATE asset_transition SET  project_team_id = null WHERE move_bundle_id = ${moveBundleInstance.id} or project_team_id in ($teamQuery) ")
+            jdbcTemplate.update("UPDATE asset_entity set source_team_id = null WHERE source_team_id in ($teamQuery)")
+			jdbcTemplate.update("UPDATE asset_entity set target_team_id = null WHERE target_team_id in ($teamQuery)")
+			jdbcTemplate.update("DELETE FROM project_team WHERE move_bundle_id = ${moveBundleInstance.id}")
+			
+			
+			jdbcTemplate.update("DELETE FROM user_preference WHERE value = ${moveBundleInstance.id}")
+			
+        	jdbcTemplate.update("DELETE FROM party_relationship where party_id_from_id  = ${moveBundleInstance.id} or party_id_to_id = ${moveBundleInstance.id}")
+			
+			AssetTransition.executeUpdate("delete from AssetTransition at where at.moveBundle = ${moveBundleInstance.id}")
+			StepSnapshot.executeUpdate("delete from StepSnapshot ss where ss.moveBundleStep in (select mbs.id from MoveBundleStep mbs where mbs.moveBundle = ${moveBundleInstance.id})")
+			MoveBundleStep.executeUpdate("delete from MoveBundleStep mbs where mbs.moveBundle = ${moveBundleInstance.id}")
+			
+		} catch(Exception ex){
+			message = "Unable to remove the $moveBundleInstance Error:"+ex
+		}
+		return message
+	}
 }

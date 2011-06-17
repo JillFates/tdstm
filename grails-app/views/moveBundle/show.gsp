@@ -155,6 +155,7 @@
           <input type="hidden" name="projectId" value="${projectId}" />
           <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
           <span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this bundle will remove any move teams and any related step data?');" value="Delete" /></span>
+          <span class="button"><g:actionSubmit class="delete" action="deleteBundleAndAssets" onclick="return confirm('WARNING: Deleting this bundle will remove any move teams, any related step data, AND ASSIGNED ASSETS? (NO UNDO)?');" value="Delete bundle and assets" /></span>
           <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
           	<g:if test="${showHistoryButton}">
           		<span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Are you sure you want to permanently clear transitions for assets in this bundle?');" value="Clear Asset History" action="clearBundleAssetHistory"/></span>

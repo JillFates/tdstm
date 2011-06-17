@@ -90,27 +90,11 @@ class MoveBundleController {
 	            try{
 	            	// Update asset associations
 	            	AssetEntity.executeUpdate("UPDATE AssetEntity SET moveBundle = null WHERE moveBundle = ?",[moveBundleInstance])
-					// Delete asset associations
-					def teamQuery = "SELECT project_team_id FROM project_team WHERE move_bundle_id = ${moveBundleInstance.id}"
-					jdbcTemplate.update("DELETE FROM party_relationship where party_id_from_id in ($teamQuery) or party_id_to_id in ($teamQuery) ")
-					jdbcTemplate.update("DELETE FROM party where party_id in ($teamQuery)")
-					jdbcTemplate.update("DELETE FROM party_group where party_group_id in ($teamQuery)")
-					jdbcTemplate.update("UPDATE asset_transition SET  project_team_id = null WHERE move_bundle_id = ${moveBundleInstance.id} or project_team_id in ($teamQuery) ")
-		            jdbcTemplate.update("UPDATE asset_entity set source_team_id = null WHERE source_team_id in ($teamQuery)")
-					jdbcTemplate.update("UPDATE asset_entity set target_team_id = null WHERE target_team_id in ($teamQuery)")
-					jdbcTemplate.update("DELETE FROM project_team WHERE move_bundle_id = ${moveBundleInstance.id}")
-					
-					
-					jdbcTemplate.update("DELETE FROM user_preference WHERE value = ${moveBundleInstance.id}")
-					
-	            	jdbcTemplate.update("DELETE FROM party_relationship where party_id_from_id  = ${moveBundleInstance.id} or party_id_to_id = ${moveBundleInstance.id}")
-					
-					AssetTransition.executeUpdate("delete from AssetTransition at where at.moveBundle = ${moveBundleInstance.id}")
-					StepSnapshot.executeUpdate("delete from StepSnapshot ss where ss.moveBundleStep in (select mbs.id from MoveBundleStep mbs where mbs.moveBundle = ${moveBundleInstance.id})")
-					MoveBundleStep.executeUpdate("delete from MoveBundleStep mbs where mbs.moveBundle = ${moveBundleInstance.id}")
+					// Delete Bundle and associations
+					moveBundleService.deleteMoveBundleAssociates(moveBundleInstance)
 					
 					moveBundleInstance.delete(flush:true)
-	                
+					
 					flash.message = "MoveBundle ${moveBundleInstance} deleted"
 	                redirect(action:list, params:[projectId: projectId])
 	            
@@ -125,7 +109,32 @@ class MoveBundleController {
             redirect(action:list)
         }
     }
-
+	def deleteBundleAndAssets = {
+		def moveBundleInstance = MoveBundle.get( params.id )
+		def projectId = params.projectId
+		if(moveBundleInstance) {
+			AssetEntity.withTransaction { status ->
+				try{
+					// Update asset associations
+					moveBundleService.deleteBundleAssetsAndAssociates(moveBundleInstance)
+					// Delete Bundle and associations
+					moveBundleService.deleteMoveBundleAssociates(moveBundleInstance)
+					
+					moveBundleInstance.delete(flush:true)
+					flash.message = "MoveBundle ${moveBundleInstance} deleted"
+					redirect(action:list, params:[projectId: projectId])
+				
+				}catch(Exception ex){
+					status.setRollbackOnly()
+					flash.message = "Unable to Delete MoveBundle Assosiated with Teams "+ex
+					redirect(action:list)
+				}
+			}
+		} else {
+			flash.message = "MoveBundle not found with id ${params.id}"
+			redirect(action:list)
+		}
+	}
     def edit = {
         def moveBundleInstance = MoveBundle.get( params.id )
         def projectId = params.projectId
