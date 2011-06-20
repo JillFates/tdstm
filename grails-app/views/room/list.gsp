@@ -7,6 +7,7 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
 <title>Room List</title>
 <g:javascript src="asset.tranman.js" />
+ <g:javascript src="drag_drop.js" />
 <script type="text/javascript">
 var roomId = "${roomId}"
 var viewType = "${viewType}"

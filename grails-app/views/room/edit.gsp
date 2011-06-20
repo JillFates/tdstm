@@ -35,7 +35,7 @@
 	</div>
 <div id="roomLayout" style="width: 1250px; overflow-x: auto; border: 2px solid black">
 	<div id="room_layout" style="position:relative;width: 700px;height: 800px;overflow-x: auto; border: 0px solid black">
-		<table cellpadding="0" cellspacing="0" style="width:auto;height:auto;border:0px">
+		<table cellpadding="0" cellspacing="0" style="width:auto;height:auto;border:0px" id="room_layout_table">
 			<g:set var="numrows" value="${1}" />
 			<g:while test="${numrows < roomInstance.roomDepth / 2 }">
 				<tr>
@@ -45,9 +45,9 @@
 					</g:while>
 				</tr ><!-- ${numrows++} -->
 			</g:while>
-			</table>
-				<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack">
-			<div style="position:absolute;background-color:white;border:1px solid black;width:60px;height:40px;top:${rack.roomY}px;left:${rack.roomX}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : '' }">
+		</table>
+		<g:each in="${rackInstanceList}" var="rack">
+			<div id="rack_${rack.id}" style="top:${rack.roomY}px;left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : 'highlight_no' }">
 				<a href="#" onclick="$('#room_layout').css('width',700);$('#rackShowRow_'+${rack.id}).hide();$('#rackEditRow_'+${rack.id}).show()">
 				${rack.tag}
 				</a>
@@ -66,11 +66,11 @@
 			<th>C</th>
 			<th>Assets</th>
 		</tr>
-		<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack" status="i">
+		<g:each in="${rackInstanceList}" var="rack" status="i">
 			<tr id="rackEditRow_${rack.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}" >
 				<td><input type="text" name="tag_${rack.id}" value="${rack.tag}" size="5" /></td>
-				<td><input type="text" name="roomX_${rack.id}" value="${rack.roomX}" size="3" /></td>
-				<td><input type="text" name="roomY_${rack.id}" value="${rack.roomY}" size="3" /></td>
+				<td><input type="text" id="roomXId_${rack.id}" name="roomX_${rack.id}" value="${rack.roomX}" size="3" readonly="readonly" /></td>
+				<td><input type="text" id="roomYId_${rack.id}" name="roomY_${rack.id}" value="${rack.roomY}" size="3" readonly="readonly" /></td>
 				<td>&nbsp;</td>
 				<td><input type="text" name="powerA_${rack.id}" value="${rack.powerA}"  size="3" /></td>
 				<td><input type="text" name="powerB_${rack.id}" value="${rack.powerB}" size="3" /></td>
@@ -85,6 +85,7 @@
 </div>
 </div>
 <script type="text/javascript">
+initializeRacksInRoom( ${rackInstanceList.id} )
 function submitForm(form){
  	if($("#locationId").val() == '') {
  		alert("Please enter location")
@@ -104,6 +105,13 @@ function submitForm(form){
  	}
  	return false;
  }
+function updateXYPositions(id){
+	var rackId = id.split("_")[1]
+	var x = $("#"+id).css("left")
+	var y = $("#"+id).css("top")
+	$("#roomXId_"+rackId).val(x.substring(0,x.indexOf('px')))
+	$("#roomYId_"+rackId).val(y.substring(0,y.indexOf('px')))
+}
 </script>
 </body>
 </html>

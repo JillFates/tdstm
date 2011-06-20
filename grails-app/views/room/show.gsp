@@ -54,7 +54,7 @@
 	</table>
 </div>
 <div id="roomLayout" style="width: 1250px; overflow-x: auto; border: 2px solid black">
-	<div id="room_layout" style="position:relative;width: 800px;height: 800px;overflow-x: auto; border: 0px solid black">
+	<div id="room_layout" style="position:relative;width: 700px;height: 800px;overflow-x: auto; border: 0px solid black">
 		<table cellpadding="0" cellspacing="0" style="width:auto;height:auto;border:0px">
 			<g:set var="numrows" value="${1}" />
 			<g:while test="${numrows < roomInstance.roomDepth / 2 }">
@@ -68,7 +68,7 @@
 		</table>
 			<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack">
 				<g:if test="${rack.rackType == 'Rack'}">
-					<div style="position:absolute;top:${rack.roomY}px;left:${rack.roomX}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : 'racktop_h' }">
+					<div style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : 'highlight_no' }">
 						<div class="racktop_label">
 						<g:remoteLink controller="rackLayouts" action="save" params="[rackId:rack.id,frontView:'on',showCabling:'off']" onComplete="jQuery('#rackLayout').html(e.responseText);">
 						${rack.tag}
@@ -77,7 +77,7 @@
 					</div>
 				</g:if>
 				<g:else>
-					<div style="position:absolute;top:${rack.roomY}px;left:${rack.roomX}px;" class="room_${rack.rackType}">
+					<div style="position:absolute;background-color:white;border:1px solid black;width:60px;height:40px;top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="room_${rack.rackType}">
 						<div class="racktop_label">
 						${rack.tag}
 						</div>

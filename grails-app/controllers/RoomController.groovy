@@ -58,14 +58,15 @@ class RoomController {
         def roomInstance = Room.get(params.id)
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.findById( projectId )
-		def roomInstanceList = Room.findAllByProject( project, [sort:"roomName",order:'asc'])
+		def rackInstanceList = Rack.findAllByRoom(roomInstance)
 		def moveBundleList = MoveBundle.findAllByProject( project )
+		
         if (!roomInstance) {
         	flash.message = "Current Room not found"
             redirect(action: "list")
         }
         else {
-            [roomInstance: roomInstance, roomInstanceList:roomInstanceList, moveBundleList:moveBundleList, 
+            [roomInstance: roomInstance, rackInstanceList:rackInstanceList, moveBundleList:moveBundleList, 
 			 moveBundleId:params.moveBundleId, source:params.source, target:params.target]
         }
     }

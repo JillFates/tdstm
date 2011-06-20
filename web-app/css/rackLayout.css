@@ -334,4 +334,12 @@ table.rack_elevation table.bladeTable td.errorBlade {
 	height:40px;
 	border: 2px solid black;
 	background-color: #7CFE80;
+	position:absolute;
+}
+.highlight_no{
+	width:60px;
+	height:40px;
+	border: 1px solid black;
+	background-color: #FFF;
+	position:absolute;
 }
