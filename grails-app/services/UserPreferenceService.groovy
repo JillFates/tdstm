@@ -118,6 +118,12 @@ class UserPreferenceService  {
 			println"Removed MOVE_BUNDLE preference as user switched to other project"
 			loadPreferences("CURR_BUNDLE")
 		}
+		def roomPreference = UserPreference.findByUserLoginAndPreferenceCode( userLogin, "CURR_ROOM")
+		if( roomPreference  ){
+			roomPreference .delete(flush:true)
+			println"Removed CURR_ROOM preference as user switched to other project"
+			loadPreferences("CURR_ROOM")
+		}
     }
     /*
      *	Set Roles to Persons in PartyRole  
