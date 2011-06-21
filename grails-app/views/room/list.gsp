@@ -32,6 +32,7 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 </g:if>
 <g:else>
 <fieldset><legend><b>Room List</b></legend>
+<g:form action="create" >
 <div style="float: left; width: auto;">
 <table>
 	<thead>
@@ -68,15 +69,14 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 	</tbody>
 </table>
 <div class="buttons"> 
-	<g:form action="update" >
-		<span class="button">
-			<input type="button" class="edit" action="edit" value="Create Room"/>
-			<span class="button"><input class="create" type="button" value="Merge" onclick="showMergeDialog()"/></span>
-			<input type="button" class="delete" action="delete" value="Delete" onclick="#"/>
-		</span>
-	</g:form>
+	<span class="button">
+		<input type="button" class="edit" action="edit" value="Create Room"/>
+		<span class="button"><input class="create" type="button" value="Merge" onclick="showMergeDialog()"/></span>
+		<g:actionSubmit class="delete" action="delete" value="Delete" />
+	</span>
 </div>
 </div>
+</g:form>
 </fieldset>
 </g:else>
 </div>

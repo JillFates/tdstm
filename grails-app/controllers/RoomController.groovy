@@ -139,22 +139,40 @@ class RoomController {
     }
 
     def delete = {
-        def roomInstance = Room.get(params.id)
-        if (roomInstance) {
-            try {
-                roomInstance.delete(flush: true)
-                flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'room.label', default: 'Room'), params.id])}"
-                redirect(action: "list")
-            }
-            catch (org.springframework.dao.DataIntegrityViolationException e) {
-                flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'room.label', default: 'Room'), params.id])}"
-                redirect(action: "show", id: params.id)
-            }
-        }
-        else {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'room.label', default: 'Room'), params.id])}"
-            redirect(action: "list")
-        }
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def project = Project.get(projectId)
+		def roomInstanceList = Room.findAllByProject( project )
+		def skippingRooms = []
+		roomInstanceList.each {roomInstance->
+			def isSelected = params["checkbox_"+roomInstance.id]
+			if (isSelected == "on") {
+				try {
+					if(AssetEntity.findByRoomSource(roomInstance) || AssetEntity.findByRoomTarget(roomInstance) || Rack.findByRoom(roomInstance)){
+						skippingRooms << roomInstance.roomName
+					} else {
+						roomInstance.delete(flush: true)
+					}
+					/**
+					AssetEntity.executeUpdate("Update AssetEntity set roomSource = null where roomSource = ${roomInstance.id}")
+					AssetEntity.executeUpdate("Update AssetEntity set roomTarget = null where roomTarget = ${roomInstance.id}")
+					
+					def rackQuery = "select r.id from Rack r where r.room = ${roomInstance.id}"
+					AssetEntity.executeUpdate("Update AssetEntity set rackSource = null where rackSource in (${rackQuery})")
+					AssetEntity.executeUpdate("Update AssetEntity set rackTarget = null where rackTarget in (${rackQuery})")
+					Rack.executeUpdate("delete from Rack where room = ${roomInstance.id}")
+					
+					*/
+				}
+				catch (org.springframework.dao.DataIntegrityViolationException e) {
+					flash.message = "Error occured while deleting Rack : ${roomInstance.roomName}"
+				}
+			}
+		}
+		if(skippingRooms.size() > 0){
+			flash.message = "Rooms : ${skippingRooms} are not deleted as they were associated with AssetEntity or Rack"
+		}
+		userPreferenceService.removePreference("CURR_ROOM")
+		redirect(action: "list", params:[viewType : "list"])
     }
 	
 	/**
