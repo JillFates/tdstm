@@ -579,6 +579,12 @@ function initializeRacksInRoom( racks, width, height ){
 			Drag.init(rack, null, 0, width, 0, height);
 		}
 	}
+	for(i=50000;i<50051;i++){
+		var rack = document.getElementById("rack_"+i);
+		if(rack){
+			Drag.init(rack, null, 0, width, 0, height);
+		}
+	}
 }
 /*----------------------------------------*/
 function assignExistingConnectors( modelConnectors ){

@@ -25,9 +25,12 @@
 					</td>
 				</tr>
 				<tr>
-					<td class="buttonR">
+					<td class="buttonR" colspan="4">
 						<input type="button" class="submit" value="Cancel" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
 						<input type="submit" class="submit" value="Update" />
+					</td>
+					<td class="buttonR" style="padding-left: 200px;">
+						<input type="button" class="submit" value="Add Rack" onclick="createRack()" />
 					</td>
 				</tr>
 			</tbody>
@@ -49,15 +52,20 @@
 		<g:each in="${rackInstanceList}" var="rack">
 			<div id="rack_${rack.id}" style="top:${rack.roomY}px;left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : 'highlight_no' }">
 				<a href="#" onclick="$('#room_layout').css('width',700);$('#rackShowRow_'+${rack.id}).hide();$('#rackEditRow_'+${rack.id}).show()">
-				${rack.tag}
+				<span id="rackLabel_${rack.id}">${rack.tag}</span>
 				</a>
+			</div>
+		</g:each>
+		<g:each in="${newRacks}" var="rack">
+			<div id="rack_${rack}" style="top:0px;left:0px;display: none;" onmouseout="updateXYPositions(this.id)" class="highlight_no" >
+				<span id="rackLabel_${rack}">&nbsp;</span>
 			</div>
 		</g:each>
 	</div>
 	<div style="position:relative;top:-800px;float: right; margin-left: 10px;" id="rackLayout">
 	<table border="0">
 		<tr>
-			<th>Rack</th>
+			<th>Rack<input type="hidden" id="rackCount" name="rackCount" value="50000"></th>
 			<th>X</th>
 			<th>Y</th>
 			<th>Front</th>
@@ -68,14 +76,32 @@
 		</tr>
 		<g:each in="${rackInstanceList}" var="rack" status="i">
 			<tr id="rackEditRow_${rack.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}" >
-				<td><input type="text" name="tag_${rack.id}" value="${rack.tag}" size="5" /></td>
+				<td>
+					<input type="hidden" name="rackId" value="${rack.id}"/>
+					<input type="text" name="tag_${rack.id}" value="${rack.tag}" size="5" onchange="changeLabel(${rack.id},this.value)"/>
+				</td>
 				<td><input type="text" id="roomXId_${rack.id}" name="roomX_${rack.id}" value="${rack.roomX}" size="3" readonly="readonly" /></td>
 				<td><input type="text" id="roomYId_${rack.id}" name="roomY_${rack.id}" value="${rack.roomY}" size="3" readonly="readonly" /></td>
 				<td>&nbsp;</td>
 				<td><input type="text" name="powerA_${rack.id}" value="${rack.powerA}"  size="3" /></td>
 				<td><input type="text" name="powerB_${rack.id}" value="${rack.powerB}" size="3" /></td>
 				<td><input type="text" name="powerC_${rack.id}" value="${rack.powerC}" size="3" /></td>
-				<td>${rack.assets.size()}</td>
+				<td>${rack.assets.size()}&nbsp;&nbsp;&nbsp;<a href="javascript:verifyAndDeleteRacks(${rack.id})"><span class="clear_filter"><u>X</u></span></a></td>
+			</tr>
+		</g:each>
+		<g:each in="${newRacks}" var="rack" status="i">
+			<tr id="rackEditRow_${rack}" class="${(i % 2) == 0 ? 'odd' : 'even'}" style="display: none;">
+				<td>
+					<input type="hidden" name="rackId" value="${rack}"/>
+					<input type="text" name="tag_${rack}" value="" size="5" onchange="changeLabel(${rack},this.value)"/>
+				</td>
+				<td><input type="text" id="roomXId_${rack}" name="roomX_${rack}" value="" size="3" readonly="readonly" /></td>
+				<td><input type="text" id="roomYId_${rack}" name="roomY_${rack}" value="" size="3" readonly="readonly" /></td>
+				<td>&nbsp;</td>
+				<td><input type="text" name="powerA_${rack}" value=""  size="3" /></td>
+				<td><input type="text" name="powerB_${rack}" value="" size="3" /></td>
+				<td><input type="text" name="powerC_${rack}" value="" size="3" /></td>
+				<td>0&nbsp;&nbsp;&nbsp;<a href="javascript:verifyAndDeleteRacks(${rack})"><span class="clear_filter"><u>X</u></span></a></td>
 			</tr>
 		</g:each>
 	</table>
@@ -111,6 +137,33 @@ function updateXYPositions(id){
 	var y = $("#"+id).css("top")
 	$("#roomXId_"+rackId).val(x.substring(0,x.indexOf('px')))
 	$("#roomYId_"+rackId).val(y.substring(0,y.indexOf('px')))
+}
+function verifyAndDeleteRacks(id){
+	jQuery.ajax({
+		url: "verifyRackAssociatedRecords",
+		data: "rackId="+id,
+		type:'POST',
+		success: function(data) {
+			if(data != null && data != ""){
+				if(confirm("Some assets used this Rack. Be sure you want to remove it before proceeding")){
+					$("#rackEditRow_"+id).remove() // Remove row from table
+					$("#rack_"+id).remove() // Remove the image from model panel
+				}
+			} else {
+				$("#rackEditRow_"+id).remove() // Remove row from table
+				$("#rack_"+id).remove() // Remove the image from model panel
+			}
+		}
+	});
+}
+function createRack(){
+	var newRackId = $("#rackCount").val()
+	$("#rackEditRow_"+newRackId).show()
+	$("#rack_"+newRackId).show()
+	$("#rackCount").val( parseInt(newRackId)+1 )
+}
+function changeLabel(id,value){
+	$("#rackLabel_"+id).html(value)
 }
 </script>
 </body>

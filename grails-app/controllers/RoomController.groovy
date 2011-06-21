@@ -1,3 +1,5 @@
+import grails.converters.JSON;
+
 class RoomController {
 
 	def userPreferenceService
@@ -60,35 +62,63 @@ class RoomController {
 		def project = Project.findById( projectId )
 		def rackInstanceList = Rack.findAllByRoom(roomInstance)
 		def moveBundleList = MoveBundle.findAllByProject( project )
-		
+		def newRacks = []
+		for(int i = 50000 ; i<50051; i++ ){
+			newRacks << i
+		}
         if (!roomInstance) {
         	flash.message = "Current Room not found"
             redirect(action: "list")
         }
         else {
             [roomInstance: roomInstance, rackInstanceList:rackInstanceList, moveBundleList:moveBundleList, 
-			 moveBundleId:params.moveBundleId, source:params.source, target:params.target]
+			 moveBundleId:params.moveBundleId, source:params.source, target:params.target, newRacks : newRacks]
         }
     }
 
     def update = {
         def roomInstance = Room.get(params.id)
+		List rackIds = request.getParameterValues("rackId")
+
         if (roomInstance) {
     		roomInstance.roomName = params.roomName
 			roomInstance.location = params.location
 			roomInstance.roomWidth = params.roomWidth ? Integer.parseInt(params.roomWidth) : null
 			roomInstance.roomDepth = params.roomDepth ? Integer.parseInt(params.roomDepth) : null
             if (!roomInstance.hasErrors() && roomInstance.save(flush: true)) {
+				
                 def racks = Rack.findAllByRoom( roomInstance )
 				racks.each{rack->
-                	rack.tag = params["tag_"+rack.id]
-                	rack.roomX = params["roomX_"+rack.id] ? Integer.parseInt(params["roomX_"+rack.id]) : 0
-                	rack.roomY = params["roomY_"+rack.id] ? Integer.parseInt(params["roomY_"+rack.id]) : 0
-                	rack.powerA = params["powerA_"+rack.id] ? Integer.parseInt(params["powerA_"+rack.id]) : 0
-                	rack.powerB = params["powerB_"+rack.id] ? Integer.parseInt(params["powerB_"+rack.id]) : 0
-                	rack.powerC = params["powerC_"+rack.id] ? Integer.parseInt(params["powerC_"+rack.id]) : 0
-                	rack.save(flush:true)
+                	if(rackIds?.contains(rack.id.toString())){
+						rack.tag = params["tag_"+rack.id]
+	                	rack.roomX = params["roomX_"+rack.id] ? Integer.parseInt(params["roomX_"+rack.id]) : 0
+	                	rack.roomY = params["roomY_"+rack.id] ? Integer.parseInt(params["roomY_"+rack.id]) : 0
+	                	rack.powerA = params["powerA_"+rack.id] ? Integer.parseInt(params["powerA_"+rack.id]) : 0
+	                	rack.powerB = params["powerB_"+rack.id] ? Integer.parseInt(params["powerB_"+rack.id]) : 0
+	                	rack.powerC = params["powerC_"+rack.id] ? Integer.parseInt(params["powerC_"+rack.id]) : 0
+	                	rack.save(flush:true)
+                	} else {
+						AssetEntity.executeUpdate("Update AssetEntity set rackSource = null where rackSource = ${rack.id}")
+						AssetEntity.executeUpdate("Update AssetEntity set rackTarget = null where rackTarget = ${rack.id}")
+						rack.delete(flush:true)
+					}
                 }
+				rackIds.each{id->
+					if(id < params.rackCount ){
+						def rack = Rack.get( id )
+						if( !rack ){
+							def newRack = Rack.findOrCreateWhere(source:1, 'project.id':roomInstance.project.id, location:roomInstance.location, 'room.id':roomInstance?.id, tag:params["tag_"+id])
+							if(newRack){
+								newRack.roomX = params["roomX_"+id] ? Integer.parseInt(params["roomX_"+id]) : 0
+								newRack.roomY = params["roomY_"+id] ? Integer.parseInt(params["roomY_"+id]) : 0
+								newRack.powerA = params["powerA_"+id] ? Integer.parseInt(params["powerA_"+id]) : 0
+								newRack.powerB = params["powerB_"+id] ? Integer.parseInt(params["powerB_"+id]) : 0
+								newRack.powerC = params["powerC_"+id] ? Integer.parseInt(params["powerC_"+id]) : 0
+								newRack.save(flush:true)
+							}
+						}
+					}
+				}
             }
         }
     	// Update the Assests which are pointing to Room and Rack
@@ -126,4 +156,19 @@ class RoomController {
             redirect(action: "list")
         }
     }
+	
+	/**
+	 *  Verify if rack has associated with any assets before deleting it.
+	 */
+	def verifyRackAssociatedRecords = {
+		def id = params.rackId
+		def rack = Rack.get(id)
+		def assetEntity
+		if(rack){
+			assetEntity = AssetEntity.findByRackSourceOrRackTarget(rack,rack)
+		} 
+		if(!assetEntity)
+			assetEntity = []
+		render assetEntity as JSON
+	}
 }
