@@ -277,6 +277,7 @@ class RoomController {
 						   break;
 						   case "C": powerC += powerUseForConnector
 						   break;
+						   powerX += powerUseForConnector
 					   }
 				   }
 			   }
@@ -284,6 +285,6 @@ class RoomController {
 		   		powerX += powerUse
 		   }
 	   }
-	   render "<table border=0><tr><td colspan=4><b>Rack : ${rack.tag}</b></td></tr><tr><td>Power In Rack:</td><td>A:${rack.powerA}</td><td>B:${rack.powerB}</td><td>C:${rack.powerC}</td></tr><tr><td>Power Used:</td><td>A:${powerA}</td><td>B:${powerB}</td><td>C:${powerC}</td></tr><tr><td>Power Used:</td><td colspan=3>tbd: ${powerX}</td></tr></table>"
+	   render "<table border=0><tr><td colspan=4><b>Rack : ${rack.tag}</b></td></tr><tr><td>Power</td><td>A</td><td>B</td><td>C</td><td>TBD</td></tr><tr><td>&nbsp;In Rack:</td><td>${rack.powerA}</td><td>${rack.powerB}</td><td>${rack.powerC}</td><td>&nbsp;</td></tr><tr><td>&nbsp;Used:</td><td>${powerA}</td><td>${powerB}</td><td>${powerC}</td><td>${powerX}</td></tr></table>"
    }
 }
