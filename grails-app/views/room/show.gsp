@@ -17,7 +17,9 @@
 				<g:form action="list">
 				<input type="hidden" name="viewType" value="list" />
 				<input type="submit" class="submit" value="List" />
-				<input type="Button" class="submit" value="Edit" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
+				<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+					<input type="Button" class="submit" value="Edit" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
+				</jsec:hasAnyRole>
 
 				</g:form>
 				</div>
@@ -26,7 +28,7 @@
 				<div style="width: 150px"><label><b>Highlight:</b></label><br /><br />
 				<label><b>Bundle</b></label><br />
 					<g:select id="bundleId" name="moveBundle" from="${moveBundleList}" value="${moveBundleId}" optionKey="id" optionValue="name" noSelection="${['':'Select Bundle...']}" 
-						onchange="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+this.value+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}" />
+						onchange="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+this.value+\'&source=\'+true+\'&target=\'+true', onComplete:'openRoomView(e)')}" />
 				</div>
 				</td>
 				<td class="buttonR">
@@ -49,6 +51,9 @@
 					</label><br />
 				</div>
 				</td>
+				<td style="padding-left: 500px;" id="rackPowerTd">
+					
+				</td>
 			</tr>
 		</tbody>
 	</table>
@@ -70,7 +75,7 @@
 				<g:if test="${rack.rackType == 'Rack'}">
 					<div style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : 'highlight_no' }">
 						<div class="racktop_label">
-						<g:remoteLink controller="rackLayouts" action="save" params="[rackId:rack.id,frontView:'on',showCabling:'off']" onComplete="jQuery('#rackLayout').html(e.responseText);">
+						<g:remoteLink controller="rackLayouts" action="save" params="[rackId:rack.id,frontView:'on',showCabling:'off']" onSuccess="updateRackPower(${rack.id})" onComplete="jQuery('#rackLayout').html(e.responseText);">
 						${rack.tag}
 						</g:remoteLink>
 						</div>
@@ -135,5 +140,17 @@
 </div>
 </div>
 </div>
+<script type="text/javascript">
+function updateRackPower(rackId){
+	jQuery.ajax({
+		url: "getRackPowerData",
+		data: "rackId="+rackId,
+		type:'POST',
+		success: function(data) {
+			$("#rackPowerTd").html(data)
+		}
+	});
+}
+</script>
 </body>
 </html>

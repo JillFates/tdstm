@@ -11,7 +11,7 @@ class Room {
 	Date lastUpdated
 	
 	// for temp use
-	Integer source
+	Integer source = 1
 	
 	static hasMany = [racks:Rack, sourceAssets:AssetEntity, targetAssets:AssetEntity]
 	static mappedBy = [sourceAssets:"roomSource", targetAssets:"roomTarget"]

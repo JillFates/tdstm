@@ -10,6 +10,7 @@ class Rack {
 	Integer powerB
 	Integer powerC 
 	String rackType = "Rack"
+	String front = "L"
 	
 	static hasMany = [sourceAssets:AssetEntity, targetAssets:AssetEntity]
 	static mappedBy = [sourceAssets:"rackSource", targetAssets:"rackTarget"]
@@ -28,6 +29,7 @@ class Rack {
 		powerB( blank:true, nullable:true )
 		powerC( blank:true, nullable:true )
 		rackType( blank:true, nullable:true )
+		front( blank:true, nullable:true, inList: ["L","R","T","B"] )
 		manufacturer( blank:true, nullable:true )
 		model( blank:true, nullable:true )
 	}

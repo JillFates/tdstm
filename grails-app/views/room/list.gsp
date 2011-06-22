@@ -16,6 +16,8 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 }
 $(document).ready(function() {
     $("#editDialog").dialog({ autoOpen: false })
+    $("#createRoomDialog").dialog({ autoOpen: false })
+    $("#mergeRoomDialog").dialog({ autoOpen: false })
 })
 </script>
 </head>
@@ -38,7 +40,7 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 	<thead>
 		<tr>
 
-			<th><a href="#">Action</a></th>
+			<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']"><th><a href="#">Action</a></th></jsec:hasAnyRole>
 
 			<g:sortableColumn property="location" title="Data Center" />
 
@@ -54,8 +56,9 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 		<g:each in="${roomInstanceList}" status="i" var="roomInstance">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-				<td><input type="checkbox" name="checkbox_${roomInstance.id}" id="checkboxId_${roomInstance.id}"></td>
-
+				<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+					<td><input type="checkbox" name="checkbox_${roomInstance.id}" id="checkboxId_${roomInstance.id}" onclick="enableActions()"></td>
+				</jsec:hasAnyRole>
 				<td onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "location")}</td>
 				
 				<td onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "roomName")}</td>
@@ -70,9 +73,11 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 </table>
 <div class="buttons"> 
 	<span class="button">
-		<input type="button" class="edit" action="edit" value="Create Room"/>
-		<span class="button"><input class="create" type="button" value="Merge" onclick="showMergeDialog()"/></span>
-		<g:actionSubmit class="delete" action="delete" value="Delete" />
+		<input type="button" class="edit" value="Create Room" onclick="$('#createRoomDialog').dialog('open');$('#mergeRoomDialog').dialog('close')"/>
+		<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+			<span class="button"><input class="create" id="mergeId" type="button" value="Merge" onclick="showMergeDialog()" style="display: none;"/></span>
+			<g:actionSubmit class="delete" action="delete" id="deleteId" value="Delete" style="display: none;"/>
+		</jsec:hasAnyRole>
 	</span>
 </div>
 </div>
@@ -95,7 +100,68 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 		</div>
 	</g:form>
 </div>
+<div id="createRoomDialog" title="Create Room" style="display: none;">
+	<g:form method="post" name="createRoomForm" action="save" onsubmit="return validateForm()">
+		<table>
+			<tbody>
+				<tr>
+					<td>Data Center<td/>
+					<td>
+						<input type="hidden" name="project.id" id="projectId" value="${projectId}">
+						<input type="text" name="location" id="locationId" value="${roomInstance.location}">
+					</td>
+				</tr>
+				<tr>
+					<td>Room<td/>
+					<td>
+						<input type="text" name="roomName" id="roomNameId" value="${roomInstance.roomName}">
+					</td>
+				</tr>
+				<tr>
+					<td>Width<td/>
+					<td>
+						<input type="text" name="roomWidth" id="roomWidthId" value="${roomInstance.roomWidth}">
+					</td>
+				</tr>
+				<tr>
+					<td>Depth<td/>
+					<td>
+						<input type="text" name="roomDepth" id="roomDepthId" value="${roomInstance.roomDepth}">
+					</td>
+				</tr>
+				<tr>
+					<td class="buttons" colspan="4">
+						<input type="submit" class="save" value="Save" />
+						<input type="button" class="show" value="Cancel" onclick="$('#createRoomDialog').dialog('close');" />
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</g:form>
+</div>
+<div id="mergeRoomDialog" title="Merge Room" style="display: none;">
+	<g:form method="post" name="mergeRoomForm" action="mergeRoom">
+		<table>
+			<thead>
+				<tr>
+					<th>Data Center<input type="hidden" name="sourceRoom" id="sourceRoomId"> </th>
+					<th>Room<input type="hidden" name="targetRoom" id="targetRoomId"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<g:each in="${roomInstanceList}" status="i" var="roomInstance">
+					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" id="mergeRow_${roomInstance.id}" onclick="submitMergeForm(this.id)">
+						
+						<td>${fieldValue(bean: roomInstance, field: "location")}</td>
+				
+						<td>${fieldValue(bean: roomInstance, field: "roomName")}</td>
 
+					</tr>
+				</g:each>
+			</tbody>
+		</table>
+	</g:form>
+</div>
 <script type="text/javascript">
 function openRoomView(e){
 	var resp = e.responseText
@@ -117,6 +183,64 @@ function showEditAsset(e) {
 		$("#generateId").click()
 	} else {
 		alert("Asset is not updated, Please check the required fields")
+	}
+}
+function enableActions(){
+	var inputCheckBox = $("input:checkbox")
+	var enableButtons = 0
+	inputCheckBox.each(function() {
+		if($(this).is(":checked")){
+			enableButtons ++
+		}
+	});
+	if(enableButtons == 1){
+		$("#mergeId").show()
+		var checkBoxId = $("input:checked").attr('id')
+		var roomId = checkBoxId.substring(11,checkBoxId.length)
+		jQuery.ajax({
+			url: "verifyRoomAssociatedRecords",
+			data: "roomId="+roomId,
+			type:'POST',
+			success: function(data) {
+				if(data == null || data == ""){
+					$("#deleteId").show()
+				}
+			}
+		});
+	} else {
+		$("#mergeId").hide()
+		$("#deleteId").hide()
+	}
+}
+function showMergeDialog(){
+	var inputCheckBox = $("input:checked")
+	var checkBoxId = inputCheckBox.attr('id')
+	var sourceRoomId = inputCheckBox.attr('id').substring(11,checkBoxId.length)
+	$("#mergeRoomDialog table tr").each(function() {
+		var rowId = $(this).attr('id')
+		if(rowId.substring(9,rowId.length) == sourceRoomId){
+			$(this).hide()
+		} else {
+			$(this).show()
+		}
+	});
+	$("#sourceRoomId").val(sourceRoomId)
+	$('#createRoomDialog').dialog('close');
+	$('#mergeRoomDialog').dialog('open')
+}
+function submitMergeForm(selectedRoom){
+	var targetRoomId = selectedRoom.substring(9,selectedRoom.length)
+	if(targetRoomId){
+		$("#targetRoomId").val(targetRoomId)
+		$("form#mergeRoomForm").submit()
+	}
+}
+function validateForm(){
+	if($("#locationId").val()!="" && $("#roomName").val()!=""){
+		return true
+	} else {
+		alert("ERROR : Data Center and Room should not be blank")
+		return false
 	}
 }
 </script>

@@ -18,8 +18,9 @@ class RoomController {
 		def project = Project.findById( projectId )
 		def roomInstanceList = Room.findAllByProject( project, params )
 		def roomId = getSession().getAttribute( "CURR_ROOM" )?.CURR_ROOM
+		def roomInstance = new Room()
 		[roomInstanceList: roomInstanceList, roomInstanceTotal: roomInstanceList.size(), 
-		 projectId:projectId, roomId:roomId, viewType:params.viewType]
+		 projectId:projectId, roomId:roomId, viewType:params.viewType, roomInstance:roomInstance]
     }
 
     def create = {
@@ -31,24 +32,26 @@ class RoomController {
     def save = {
         def roomInstance = new Room(params)
         if (roomInstance.save(flush: true)) {
-            flash.message = "${message(code: 'default.created.message', args: [message(code: 'room.label', default: 'Room'), roomInstance.id])}"
-            redirect(action: "show", id: roomInstance.id)
+            flash.message = "Room : ${roomInstance.roomName} is created"
+            redirect(action: "list", params:[viewType : "list"])
         }
         else {
-            render(view: "create", model: [roomInstance: roomInstance])
+			flash.message = "Room : ${roomInstance.roomName} is not created"
+            redirect(action: "list",params:[viewType : "list"])
         }
     }
 
     def show = {
         def roomInstance = Room.get(params.id)
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		userPreferenceService.setPreference( "CURR_ROOM", "${roomInstance.id}" )
+		userPreferenceService.setPreference( "CURR_ROOM", "${roomInstance?.id}" )
 		def project = Project.findById( projectId )
 		def roomInstanceList = Room.findAllByProject( project, [sort:"roomName",order:'asc'])
 		def moveBundleList = MoveBundle.findAllByProject( project )
         if (!roomInstance) {
+			userPreferenceService.removePreference("CURR_ROOM")
             flash.message = "Current Room not found"
-            redirect(action: "list")
+            redirect(action: "list", params:[viewType : "list"])
         }
         else {
             [roomInstance: roomInstance, roomInstanceList:roomInstanceList, moveBundleList:moveBundleList, 
@@ -96,6 +99,7 @@ class RoomController {
 	                	rack.powerA = params["powerA_"+rack.id] ? Integer.parseInt(params["powerA_"+rack.id]) : 0
 	                	rack.powerB = params["powerB_"+rack.id] ? Integer.parseInt(params["powerB_"+rack.id]) : 0
 	                	rack.powerC = params["powerC_"+rack.id] ? Integer.parseInt(params["powerC_"+rack.id]) : 0
+						rack.front = params["front_"+rack.id]
 	                	rack.save(flush:true)
                 	} else {
 						AssetEntity.executeUpdate("Update AssetEntity set rackSource = null where rackSource = ${rack.id}")
@@ -114,6 +118,7 @@ class RoomController {
 								newRack.powerA = params["powerA_"+id] ? Integer.parseInt(params["powerA_"+id]) : 0
 								newRack.powerB = params["powerB_"+id] ? Integer.parseInt(params["powerB_"+id]) : 0
 								newRack.powerC = params["powerC_"+id] ? Integer.parseInt(params["powerC_"+id]) : 0
+								rack.front = params["front_"+id]
 								newRack.save(flush:true)
 							}
 						}
@@ -189,4 +194,93 @@ class RoomController {
 			assetEntity = []
 		render assetEntity as JSON
 	}
+	/**
+	*  Verify if Room has associated with any assets before deleting it.
+	*/
+   def verifyRoomAssociatedRecords = {
+	   def id = params.roomId
+	   def room = Room.get(id)
+	   def associatedRecords
+	   
+	   if(room){
+		   associatedRecords = AssetEntity.findByRoomSourceOrRoomTarget(room,room)
+		   if(!associatedRecords)
+		   associatedRecords = Rack.findByRoom(room)
+	   }
+	   if(!associatedRecords)
+	   		associatedRecords = []
+	   render associatedRecords as JSON
+   }
+	/**
+	 *  Merge Racks and delete the selected Room and Racks
+	 */
+   def mergeRoom = {
+	   def sourceRoomId = params.sourceRoom
+	   def targetRoomId = params.targetRoom
+	   if(sourceRoomId && targetRoomId){
+		   def sourceRoom = Room.get(sourceRoomId)
+		   def targetRoom = Room.get(targetRoomId)
+		   updateAssetEntityToMergeRooms(sourceRoom,targetRoom)
+		   updateRackToMergeRooms(sourceRoom,targetRoom)
+		   sourceRoom.delete(flush:true)
+		   redirect(action: "list", params:[viewType : "list"])
+	   } else {
+	   	   redirect(action: "list", params:[viewType : "list"])
+	   }
+   }
+   def updateAssetEntityToMergeRooms(sourceRoom,targetRoom){
+	   AssetEntity.executeUpdate("Update AssetEntity set sourceLocation = '${targetRoom.location}', sourceRoom = '${targetRoom.roomName}', roomSource = ${targetRoom.id} where roomSource = ${sourceRoom.id}")
+	   AssetEntity.executeUpdate("Update AssetEntity set targetLocation = '${targetRoom.location}', targetRoom = '${targetRoom.roomName}', roomTarget = ${targetRoom.id} where roomTarget = ${sourceRoom.id}")
+   }
+   def updateRackToMergeRooms(sourceRoom,targetRoom){
+	   def sourceRoomRacks = Rack.findAllByRoom( sourceRoom )
+	   sourceRoomRacks.each{ sourceRack ->
+		   def rackTarget = Rack.findOrCreateWhere(source:sourceRack.source, 'project.id':sourceRack.project.id, location:sourceRack.location, 'room.id':targetRoom?.id, tag:sourceRack.tag)
+		   // Update all assets with this rack info to point to this rack
+		   if(!rackTarget){
+			   println "Unable to create rack: ${rackTarget.errors}"
+			   AssetEntity.executeUpdate("Update AssetEntity set rackSource = null where rackSource = ${sourceRack.id}")
+			   AssetEntity.executeUpdate("Update AssetEntity set rackTarget = null where rackTarget = ${sourceRack.id}")
+		   } else {
+			   AssetEntity.executeUpdate("Update AssetEntity set rackSource = ${rackTarget.id} where rackSource = ${sourceRack.id}")
+			   AssetEntity.executeUpdate("Update AssetEntity set rackTarget = ${rackTarget.id} where rackTarget = ${sourceRack.id}")
+		   }
+		   sourceRack.delete(flush:true)
+	   }
+   }
+   /**
+    *  Return Power details as string to show at room layout.
+    */
+   def getRackPowerData = {
+	   def rackId = params.rackId
+	   def rack = Rack.get(rackId)
+	   def powerA = 0
+	   def powerB = 0
+	   def powerC = 0
+	   def assets = AssetEntity.findAllByRackSource( rack )
+	   if(rack.source != 1){
+	   		assets = AssetEntity.findAllByRackTarget( rack )
+	   }
+	   assets.each{ asset->
+		   def assetPowerCabling = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.fromConnectorNumber.type = ? AND cap.fromAsset = ?",["Power",asset])
+		   def powerConnectors = assetPowerCabling.size()
+		   def powerUse = asset.model?.powerUse ? asset.model?.powerUse : 0
+		   if(powerConnectors){
+			   def powerUseForConnector = powerUse ? powerUse / powerConnectors : 0
+			   assetPowerCabling.each{ cables ->
+				   if(cables.toPower){
+					   switch(cables.toPower){
+						   case "A": powerA += powerUseForConnector
+						   break;
+						   case "B": powerB += powerUseForConnector
+						   break;
+						   case "C": powerC += powerUseForConnector
+						   break;
+					   }
+				   }
+			   }
+		   }
+	   }
+	   render "<b>Rack : ${rack.tag}<br/><br/>Power In Rack:<br/>&nbsp;&nbsp;&nbsp;A:${rack.powerA}&nbsp;B:${rack.powerB}&nbsp;C:${rack.powerC}<br/><br/>Power Used:<br/>&nbsp;&nbsp;&nbsp;A:${powerA}&nbsp;B:${powerB}&nbsp;C:${powerC}</b>"
+   }
 }
