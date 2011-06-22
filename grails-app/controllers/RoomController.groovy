@@ -257,6 +257,7 @@ class RoomController {
 	   def powerA = 0
 	   def powerB = 0
 	   def powerC = 0
+	   def powerX = 0
 	   def assets = AssetEntity.findAllByRackSource( rack )
 	   if(rack.source != 1){
 	   		assets = AssetEntity.findAllByRackTarget( rack )
@@ -279,8 +280,10 @@ class RoomController {
 					   }
 				   }
 			   }
+		   } else {
+		   		powerX += powerUse
 		   }
 	   }
-	   render "<b>Rack : ${rack.tag}<br/><br/>Power In Rack:<br/>&nbsp;&nbsp;&nbsp;A:${rack.powerA}&nbsp;B:${rack.powerB}&nbsp;C:${rack.powerC}<br/><br/>Power Used:<br/>&nbsp;&nbsp;&nbsp;A:${powerA}&nbsp;B:${powerB}&nbsp;C:${powerC}</b>"
+	   render "<table border="0"><tr><td colspan=4><b>Rack : ${rack.tag}</b></td></tr><tr><td>Power In Rack:</td><td>A:${rack.powerA}</td><td>B:${rack.powerB}</td><td>C:${rack.powerC}</td></tr><tr><td>Power Used:</td><td>A:${powerA}</td><td>B:${powerB}</td><td>C:${powerC}</td></tr><tr><td>Power Used:</td><td colspan=3>tbd: ${powerX}</td></tr></table>"
    }
 }
