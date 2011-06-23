@@ -329,7 +329,7 @@ table.rack_elevation table.bladeTable td.errorBlade {
 .roomLayoutTable td {
 	border-top: 1px solid black;
 }
-.rack_highlight_{
+.rack_highlight{
 	width:60px;
 	height:40px;
 	border: 2px solid black;
@@ -339,6 +339,7 @@ table.rack_elevation table.bladeTable td.errorBlade {
 .rack_highlight_L{
 	width:60px;
 	height:40px;
+	border-style: solid;
 	border-top-width: 2px;
 	border-right-width: 2px;
 	border-bottom-width: 2px;
@@ -353,6 +354,7 @@ table.rack_elevation table.bladeTable td.errorBlade {
 .rack_highlight_R{
 	width:60px;
 	height:40px;
+	border-style: solid;
 	border-top-width: 2px;
 	border-right-width: 3px;
 	border-bottom-width: 2px;
@@ -367,6 +369,7 @@ table.rack_elevation table.bladeTable td.errorBlade {
 .rack_highlight_T{
 	width:40px;
 	height:60px;
+	border-style: solid;
 	border-top-width: 3px;
 	border-right-width: 2px;
 	border-bottom-width: 2px;
@@ -381,6 +384,7 @@ table.rack_elevation table.bladeTable td.errorBlade {
 .rack_highlight_B{
 	width:40px;
 	height:60px;
+	border-style: solid;
 	border-top-width: 2px;
 	border-right-width: 2px;
 	border-bottom-width: 3px;
@@ -392,7 +396,7 @@ table.rack_elevation table.bladeTable td.errorBlade {
 	background-color: #7CFE80;
 	position:absolute;
 }
-.rack_highlight_no_{
+.rack_highlight_no{
 	width:60px;
 	height:40px;
 	border: 1px solid black;
@@ -402,6 +406,7 @@ table.rack_elevation table.bladeTable td.errorBlade {
 .rack_highlight_no_L{
 	width:60px;
 	height:40px;
+	border-style: solid;
 	border-top-width: 1px;
 	border-right-width: 1px;
 	border-bottom-width: 1px;
@@ -416,6 +421,7 @@ table.rack_elevation table.bladeTable td.errorBlade {
 .rack_highlight_no_R{
 	width:60px;
 	height:40px;
+	border-style: solid;
 	border-top-width: 1px;
 	border-right-width: 2px;
 	border-bottom-width: 1px;
@@ -430,6 +436,7 @@ table.rack_elevation table.bladeTable td.errorBlade {
 .rack_highlight_no_T{
 	width:40px;
 	height:60px;
+	border-style: solid;
 	border-top-width: 2px;
 	border-right-width: 1px;
 	border-bottom-width: 1px;
@@ -444,6 +451,7 @@ table.rack_elevation table.bladeTable td.errorBlade {
 .rack_highlight_no_B{
 	width:40px;
 	height:60px;
+	border-style: solid;
 	border-top-width: 1px;
 	border-right-width: 1px;
 	border-bottom-width: 2px;

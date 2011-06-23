@@ -50,11 +50,20 @@
 			</g:while>
 		</table>
 		<g:each in="${rackInstanceList}" var="rack">
-			<div id="rack_${rack.id}" style="top:${rack.roomY}px;left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'rack_highlight' : source=='true' && rack.source == 1 ? 'rack_highlight' : target == 'true' && rack.source == 0 ? 'rack_highlight' : 'rack_highlight_no' }_${rack.front}">
-				<a href="#" onclick="$('#room_layout').css('width',700);$('#rackShowRow_'+${rack.id}).hide();$('#rackEditRow_'+${rack.id}).show()">
-				<span id="rackLabel_${rack.id}">${rack.tag}</span>
-				</a>
-			</div>
+			<g:if test="${rack.rackType == 'Rack'}">
+				<div id="rack_${rack.id}" style="top:${rack.roomY}px;left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'rack_highlight' : source=='true' && rack.source == 1 ? 'rack_highlight' : target == 'true' && rack.source == 0 ? 'rack_highlight' : 'rack_highlight_no' }_${rack.front}">
+					<a href="#" onclick="$('#room_layout').css('width',700);$('#rackShowRow_'+${rack.id}).hide();$('#rackEditRow_'+${rack.id}).show()">
+					<span id="rackLabel_${rack.id}">${rack.tag}</span>
+					</a>
+				</div>
+			</g:if>
+			<g:else>
+				<div id="rack_${rack.id}" style="top:${rack.roomY}px;left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="room_${rack.rackType}">
+					<a href="#" onclick="$('#room_layout').css('width',700);$('#rackShowRow_'+${rack.id}).hide();$('#rackEditRow_'+${rack.id}).show()">
+					<span id="rackLabel_${rack.id}">${rack.tag}</span>
+					</a>
+				</div>
+			</g:else>
 		</g:each>
 		<g:each in="${newRacks}" var="rack">
 			<div id="rack_${rack}" style="top:0px;left:0px;display: none;" onmouseout="updateXYPositions(this.id)" class="rack_highlight_no" >
@@ -87,7 +96,7 @@
 				<td><input type="text" name="powerA_${rack.id}" value="${rack.powerA}"  size="3" /></td>
 				<td><input type="text" name="powerB_${rack.id}" value="${rack.powerB}" size="3" /></td>
 				<td><input type="text" name="powerC_${rack.id}" value="${rack.powerC}" size="3" /></td>
-				<td><select name="rackType_${rack.id}" value=${rack.rackType}">
+				<td><select name="rackType_${rack.id}" value="${rack.rackType}">
 					<option value="Rack">Rack</option>
 					<option value="crac_h">CRAC H</option>
 					<option value="crac_v">CRAC V</option>

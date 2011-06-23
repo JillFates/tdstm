@@ -83,9 +83,7 @@
 				</g:if>
 				<g:else>
 					<div style="position:absolute;background-color:white;border:1px solid black;width:60px;height:40px;top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="room_${rack.rackType}">
-						<div class="racktop_label">
-						${rack.tag}
-						</div>
+						<div class="racktop_label">${rack.tag}</div>
 					</div>
 				</g:else>
 		</g:each>
