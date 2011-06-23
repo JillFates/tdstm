@@ -50,14 +50,14 @@
 			</g:while>
 		</table>
 		<g:each in="${rackInstanceList}" var="rack">
-			<div id="rack_${rack.id}" style="top:${rack.roomY}px;left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'highlight' : source=='true' && rack.source == 1 ? 'highlight' : target == 'true' && rack.source == 0 ? 'highlight' : 'highlight_no' }">
+			<div id="rack_${rack.id}" style="top:${rack.roomY}px;left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'rack_highlight' : source=='true' && rack.source == 1 ? 'rack_highlight' : target == 'true' && rack.source == 0 ? 'rack_highlight' : 'rack_highlight_no' }_${rack.front}">
 				<a href="#" onclick="$('#room_layout').css('width',700);$('#rackShowRow_'+${rack.id}).hide();$('#rackEditRow_'+${rack.id}).show()">
 				<span id="rackLabel_${rack.id}">${rack.tag}</span>
 				</a>
 			</div>
 		</g:each>
 		<g:each in="${newRacks}" var="rack">
-			<div id="rack_${rack}" style="top:0px;left:0px;display: none;" onmouseout="updateXYPositions(this.id)" class="highlight_no" >
+			<div id="rack_${rack}" style="top:0px;left:0px;display: none;" onmouseout="updateXYPositions(this.id)" class="rack_highlight_no" >
 				<span id="rackLabel_${rack}">&nbsp;</span>
 			</div>
 		</g:each>
@@ -72,6 +72,7 @@
 			<th>A</th>
 			<th>B</th>
 			<th>C</th>
+			<th>Type</th>
 			<th>Assets</th>
 		</tr>
 		<g:each in="${rackInstanceList}" var="rack" status="i">
@@ -86,6 +87,15 @@
 				<td><input type="text" name="powerA_${rack.id}" value="${rack.powerA}"  size="3" /></td>
 				<td><input type="text" name="powerB_${rack.id}" value="${rack.powerB}" size="3" /></td>
 				<td><input type="text" name="powerC_${rack.id}" value="${rack.powerC}" size="3" /></td>
+				<td><select name="rackType_${rack.id}" value=${rack.rackType}">
+					<option value="Rack">Rack</option>
+					<option value="crac_h">CRAC H</option>
+					<option value="crac_v">CRAC V</option>
+					<option value="door_top">Door T</option>
+					<option value="door_bottom">Door B</option>
+					<option value="door_left">Door L</option>
+					<option value="door_right">Door R</option></td>
+				</select></td>
 				<td>${rack.assets.size()}&nbsp;&nbsp;&nbsp;
 				<g:if test="${rack.assets.size() == 0}">
 					<a href="javascript:verifyAndDeleteRacks(${rack.id})"><span class="clear_filter"><u>X</u></span></a>
@@ -105,6 +115,15 @@
 				<td><input type="text" name="powerA_${rack}" value=""  size="3" /></td>
 				<td><input type="text" name="powerB_${rack}" value="" size="3" /></td>
 				<td><input type="text" name="powerC_${rack}" value="" size="3" /></td>
+				<td><select name="rackType_${rack}" value="Rack">
+					<option value="Rack">Rack</option>
+					<option value="crac_h">CRAC H</option>
+					<option value="crac_v">CRAC V</option>
+					<option value="door_top">Door T</option>
+					<option value="door_bottom">Door B</option>
+					<option value="door_left">Door L</option>
+					<option value="door_right">Door R</option></td>
+				</select></td>
 				<td>0&nbsp;&nbsp;&nbsp;<a href="javascript:verifyAndDeleteRacks(${rack})"><span class="clear_filter"><u>X</u></span></a></td>
 			</tr>
 		</g:each>
