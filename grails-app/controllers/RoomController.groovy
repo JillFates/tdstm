@@ -118,7 +118,7 @@ class RoomController {
 								newRack.powerA = params["powerA_"+id] ? Integer.parseInt(params["powerA_"+id]) : 0
 								newRack.powerB = params["powerB_"+id] ? Integer.parseInt(params["powerB_"+id]) : 0
 								newRack.powerC = params["powerC_"+id] ? Integer.parseInt(params["powerC_"+id]) : 0
-								rack.front = params["front_"+id]
+								newRack.front = params["front_"+id]
 								newRack.save(flush:true)
 							}
 						}
@@ -263,7 +263,7 @@ class RoomController {
 	   		assets = AssetEntity.findAllByRackTarget( rack )
 	   }
 	   assets.each{ asset->
-		   def assetPowerCabling = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.fromConnectorNumber.type = ? AND cap.fromAsset = ?",["Power",asset])
+		   def assetPowerCabling = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.fromConnectorNumber.type = ? AND cap.fromAsset = ? and (cap.toPower is not null OR toPower <> '')",["Power",asset])
 		   def powerConnectors = assetPowerCabling.size()
 		   def powerUse = asset.model?.powerUse ? asset.model?.powerUse : 0
 		   if(powerConnectors){

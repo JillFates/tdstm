@@ -6,9 +6,9 @@ class Rack {
 	String tag
 	Integer roomX = 0
 	Integer roomY = 180
-	Integer powerA
-	Integer powerB
-	Integer powerC 
+	Integer powerA = 3300
+	Integer powerB = 3300
+	Integer powerC = 0
 	String rackType = "Rack"
 	String front = "L"
 	
