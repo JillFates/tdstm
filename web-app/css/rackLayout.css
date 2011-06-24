@@ -61,6 +61,9 @@ br.page-break-after {
 	height:60px;
 	border: 1px solid black;
 	background-color: transparent;
+	background-image: url(/i/Door_R_R.gif);
+	background-repeat: no-repeat;
+	background-position: right top;
 	position:absolute;
 }
 .room_Door_R_L {
@@ -68,20 +71,27 @@ br.page-break-after {
 	height:60px;
 	border: 1px solid black;
 	background-color: transparent;
-	position:absolute;
+	background-image: url(/i/Door_R_L.gif);
+	background-repeat: no-repeat;
+	background-position: right top;	position:absolute;
 }
 .room_Door_R_T {
 	width:30px;
 	height:60px;
 	border: 1px solid black;
 	background-color: transparent;
-	position:absolute;
+	background-image: url(/i/Door_R_T.gif);
+	background-repeat: no-repeat;
+	background-position: right top;	position:absolute;
 }
 .room_Door_R_B {
 	width:30px;
 	height:60px;
 	border: 1px solid black;
 	background-color: transparent;
+	background-image: url(/i/Door_R_B.gif);
+	background-repeat: no-repeat;
+	background-position: right top;
 	position:absolute;
 }
 .room_mt {
