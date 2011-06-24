@@ -18,6 +18,7 @@ $(document).ready(function() {
     $("#editDialog").dialog({ autoOpen: false })
     $("#createRoomDialog").dialog({ autoOpen: false })
     $("#mergeRoomDialog").dialog({ autoOpen: false })
+    $("#createDialog").dialog({ autoOpen: false })
 })
 </script>
 </head>
@@ -88,6 +89,20 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 <div id="roomShowView" style="display: none;">
 </div>
 </div>
+<div id="createDialog" title="Create Asset" style="display: none;">
+<g:form action="save" controller="assetEntity" method="post" name="createForm" >
+
+	<div class="dialog" id="createDiv" >
+		<table id="createFormTbodyId"></table>
+	</div>
+	
+	<div class="buttons">
+	<input type="hidden" name="projectId" value="${projectId }" />
+	<input type="hidden" id="attributeSetId" name="attributeSet.id" value="${projectId }" />
+	<input type="hidden" name="redirectTo" value="room" />
+	<span class="button"><input class="save" type="submit" value="Create" onclick="return validateAssetEntity('createForm');" /></span>
+	</div>
+</g:form></div>
 <div id="editDialog" title="Edit Asset" style="display: none;">
 	<g:form method="post" name="editForm">
 		<input type="hidden" name="id" id="editFormId" value="" />
@@ -144,8 +159,8 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 		<table>
 			<thead>
 				<tr>
-					<th>Data Center<input type="hidden" name="sourceRoom" id="sourceRoomId"> </th>
-					<th>Room<input type="hidden" name="targetRoom" id="targetRoomId"></th>
+					<th>Data Center<input type="hidden" name="sourceRoom" id="sRoomId"> </th>
+					<th>Room<input type="hidden" name="targetRoom" id="tRoomId"></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -215,23 +230,23 @@ function enableActions(){
 function showMergeDialog(){
 	var inputCheckBox = $("input:checked")
 	var checkBoxId = inputCheckBox.attr('id')
-	var sourceRoomId = inputCheckBox.attr('id').substring(11,checkBoxId.length)
+	var sRoomId = inputCheckBox.attr('id').substring(11,checkBoxId.length)
 	$("#mergeRoomDialog table tr").each(function() {
 		var rowId = $(this).attr('id')
-		if(rowId.substring(9,rowId.length) == sourceRoomId){
+		if(rowId.substring(9,rowId.length) == sRoomId){
 			$(this).hide()
 		} else {
 			$(this).show()
 		}
 	});
-	$("#sourceRoomId").val(sourceRoomId)
+	$("#sRoomId").val(sRoomId)
 	$('#createRoomDialog').dialog('close');
 	$('#mergeRoomDialog').dialog('open')
 }
 function submitMergeForm(selectedRoom){
-	var targetRoomId = selectedRoom.substring(9,selectedRoom.length)
-	if(targetRoomId){
-		$("#targetRoomId").val(targetRoomId)
+	var tRoomId = selectedRoom.substring(9,selectedRoom.length)
+	if(tRoomId){
+		$("#tRoomId").val(tRoomId)
 		$("form#mergeRoomForm").submit()
 	}
 }
@@ -241,6 +256,38 @@ function validateForm(){
 	} else {
 		alert("ERROR : Data Center and Room should not be blank")
 		return false
+	}
+}
+function createDialog(source,rack,roomName,location,position){
+	$("#createDialog").dialog('option', 'width', 950)
+    $("#createDialog").dialog('option', 'position', ['center','top']);
+    $("#editDialog").dialog("close")
+    $("#createDialog").dialog("open")
+    $("#attributeSetId").val(1)
+    ${remoteFunction(controller:"assetEntity",action:'getAttributes', params:'\'attribSet=\' + $("#attributeSetId").val() ', onComplete:"generateCreateForm(e);updateAssetInfo(source,rack,roomName,location,position)")}
+  }
+function updateAssetInfo(source,rack,roomName,location,position){
+	var target = source != '1' ? 'target' : 'source'
+	$("#"+target+"RackId").val(rack)
+	$("#"+target+"LocationId").val(location)
+	$("#"+target+"RoomId").val(roomName)
+	$("#"+target+"RackPositionId").val(position)
+    
+}
+function validateAssetEntity(formname) {
+	var attributeSet = $("#attributeSetId").val();
+	if(attributeSet || formname == 'editForm'){
+		var assetName = document.forms[formname].assetName.value.replace(/^\s*/, "").replace(/\s*$/, "");
+		
+		if( !assetName ){
+			alert(" Please Enter Asset Name. ");
+			return false;
+		} else {
+			return true;
+		}
+	} else {
+		alert(" Please select Attribute Set. ");
+		return false;
 	}
 }
 </script>

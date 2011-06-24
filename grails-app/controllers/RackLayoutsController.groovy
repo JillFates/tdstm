@@ -106,7 +106,7 @@ class RackLayoutsController {
 				def finalAssetList = []
 				def racksByFilter
 				if(includeOtherBundle){
-					racksByFilter = rack.assets.findAll { it.assetType !='Blade' && it.moveBundle && it.project == project }.sort { rack?.source == 1 ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
+					racksByFilter = rack.assets.findAll { it.assetType !='Blade' && it.project == project }.sort { rack?.source == 1 ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
 				} else {
 					racksByFilter = rack.assets.findAll { it.assetType !='Blade' && moveBundles?.id?.contains(it.moveBundle?.id) && it.project == project }.sort { rack?.source == 1 ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
 				}
@@ -223,9 +223,9 @@ class RackLayoutsController {
 						if(assetEnity.position == 0 || assetEnity.assetEntity?.model?.usize == 0 || assetEnity.assetEntity?.model?.usize == null ) {
 							rackStyle = 'rack_error'
 						}
-						assetDetails << [asset:assetEnity, rack:i, cssClass:cssClass, rackStyle:rackStyle, source:rack.source ]
+						assetDetails << [asset:assetEnity, rack:i, cssClass:cssClass, rackStyle:rackStyle, source:rack.source, rackDetails:rack ]
 					} else {
-						assetDetails << [asset:null, rack:i, cssClass:cssClass, rackStyle:rackStyle, source:rack.source ]
+						assetDetails << [asset:null, rack:i, cssClass:cssClass, rackStyle:rackStyle, source:rack.source, rackDetails:rack ]
 					}
 				}
 				def backViewRows
@@ -258,12 +258,12 @@ class RackLayoutsController {
 		
 		moveBundles.each{moveBundle ->
 			moveBundle.sourceRacks.each{
-				if( !sourceRacks.contains([location:it.location,room:it.room?.roomName,tag:it.tag]) )
-					sourceRacks.add([location:it.location,room:it.room?.roomName,tag:it.tag])
+				if( !sourceRacks.contains([id:it.id,location:it.location,room:it.room?.roomName,tag:it.tag]) )
+					sourceRacks.add([id:it.id,location:it.location,room:it.room?.roomName,tag:it.tag])
 			}
 			moveBundle.targetRacks.each{
-				if( !targetRacks.contains([location:it.location,room:it.room?.roomName,tag:it.tag]) )
-					targetRacks.add([location:it.location,room:it.room?.roomName,tag:it.tag])
+				if( !targetRacks.contains([id:it.id,location:it.location,room:it.room?.roomName,tag:it.tag]) )
+					targetRacks.add([id:it.id,location:it.location,room:it.room?.roomName,tag:it.tag])
 			}
 		}
 		
@@ -310,7 +310,7 @@ class RackLayoutsController {
 					if(overlappedAssets.size() > 1) {
 						overlappedAssets.each{ overlapAsset ->
 							moveBundle += (overlapAsset?.moveBundle ? overlapAsset?.moveBundle.name : "") + "<br/>"
-							if(overlappedAsset.model && overlapAsset.model.assetType == 'Blade Chassis' && (!backView || showCabling != 'on')){
+							if(overlapAsset.model && overlapAsset.model.assetType == 'Blade Chassis' && (!backView || showCabling != 'on')){
 								hasBlades = true
 								bladeTable = generateBladeLayout(it, overlapAsset, isAdmin)
 							}
@@ -420,7 +420,9 @@ class RackLayoutsController {
 			} else if(rowspan <= 1) {
 				rowspan = 1
 				rackStyle = it.rackStyle
-				row.append("<td class='${it.rackStyleUpos}'>${it.rack}</td><td rowspan=1 class=${it.cssClass}>&nbsp;</td><td>&nbsp;</td>")
+				row.append("""<td class='${it.rackStyleUpos}'>${it.rack}</td><td rowspan=1 class=${it.cssClass}>
+				<img src="../i/rack_add.png" onclick=\"createDialog('${it.source}','${it.rackDetails.tag}','${it.rackDetails.room.roomName}','${it.rackDetails.location}','${it.rack}')\"/>&nbsp;<img src="../i/rack_list.png" />
+				&nbsp;</td><td>&nbsp;</td>""")
 				if(backView)
 					row.append("<td>&nbsp;</td>")
 				

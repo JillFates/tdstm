@@ -727,7 +727,11 @@ class AssetEntityController {
 			}
 
             flash.message = "AssetEntity ${assetEntityInstance.assetName} created"
-            redirect( action:list, params:[projectId: projectId] )
+			if(params.redirectTo == "room"){
+				redirect( controller:'room',action:list, params:[projectId: projectId] )
+			} else {
+            	redirect( action:list, params:[projectId: projectId] )
+			}
         }
         else {
         	
@@ -735,7 +739,11 @@ class AssetEntityController {
         	def etext = "Unable to Update Asset" +
 						GormUtil.allErrorsString( assetEntityInstance )
 			println etext
-            redirect( action:list, params:[projectId: projectId] )
+			if(params.redirectTo == "room"){
+				redirect( controller:'room',action:list, params:[projectId: projectId] )
+			} else {
+				redirect( action:list, params:[projectId: projectId] )
+			}
         }
     }
     /*--------------------------------------------------------

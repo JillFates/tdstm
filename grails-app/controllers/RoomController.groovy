@@ -55,7 +55,7 @@ class RoomController {
         }
         else {
             [roomInstance: roomInstance, roomInstanceList:roomInstanceList, moveBundleList:moveBundleList, 
-			 moveBundleId:params.moveBundleId, source:params.source, target:params.target]
+			 moveBundleId:params.moveBundleId, source:params.source, target:params.target, projectId : projectId]
         }
     }
 
@@ -74,7 +74,7 @@ class RoomController {
             redirect(action: "list")
         }
         else {
-            [roomInstance: roomInstance, rackInstanceList:rackInstanceList, moveBundleList:moveBundleList, 
+            [roomInstance: roomInstance, rackInstanceList:rackInstanceList, moveBundleList:moveBundleList,
 			 moveBundleId:params.moveBundleId, source:params.source, target:params.target, newRacks : newRacks]
         }
     }

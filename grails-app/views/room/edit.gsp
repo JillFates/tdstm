@@ -116,7 +116,7 @@
 				<td><input type="text" name="powerA_${rack}" value=""  size="3" /></td>
 				<td><input type="text" name="powerB_${rack}" value="" size="3" /></td>
 				<td><input type="text" name="powerC_${rack}" value="" size="3" /></td>
-				<td><g:select name="rackType_${rack}" from="${rack.constraints.rackType.inList}" value="Rack"></g:select></td>
+				<td><g:select name="rackType_${rack}" from="${Rack.constraints.rackType.inList}" value="Rack"></g:select></td>
 				<td>0&nbsp;&nbsp;&nbsp;<a href="javascript:verifyAndDeleteRacks(${rack})"><span class="clear_filter"><u>X</u></span></a></td>
 			</tr>
 		</g:each>
