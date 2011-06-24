@@ -276,9 +276,14 @@ class RackLayoutsController {
 		def rowspan = 1
 		def cssClass = "empty"
 		def rackStyle = ""
-		def rackStyleUpos = ""
+		def rackStyleUpos = "rack_upos"
 		asset.each {
 			def row = new StringBuffer("<tr>")
+			if(it.cssClass=="rack_current" || it.cssClass=="rack_error" ){
+				it.rackStyleUpos=it.cssClass
+				} else {
+				it.rackStyleUpos="rack_upos"
+			}	
 			if(it.asset) {
 				rowspan = it.asset?.rowspan != 0 ? it.asset?.rowspan : 1
 				rackStyle = it.rackStyle
@@ -347,10 +352,10 @@ class RackLayoutsController {
 						}
 					}
 				}
-				if(it.cssClass=="empty" || it.cssClass=="" ){
-					it.rackStyleUpos="rack_upos"
-					} else {
+				if(it.cssClass=="rack_current" || it.cssClass=="rack_error" ){
 					it.rackStyleUpos=it.cssClass
+					} else {
+					it.rackStyleUpos="rack_upos"
 				}	
 				if(backView) {
 					if(cabling != "" && it.cssClass != "rack_error"){
