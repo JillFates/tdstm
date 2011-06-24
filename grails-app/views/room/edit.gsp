@@ -36,7 +36,7 @@
 			</tbody>
 		</table>
 	</div>
-<div id="roomLayout" style="width: 1250px; overflow-x: auto; border: 2px solid black">
+<div id="roomLayout" style="width: 1000px; overflow-x: auto; border: 2px solid black">
 	<div id="room_layout" style="position:relative;width: 700px;height: 800px;overflow-x: auto; border: 0px solid black">
 		<table cellpadding="0" cellspacing="0" style="width:auto;height:auto;border:0px" id="room_layout_table">
 			<g:set var="numrows" value="${1}" />
@@ -58,7 +58,7 @@
 				</div>
 			</g:if>
 			<g:else>
-				<div id="rack_${rack.id}" style="top:${rack.roomY}px;left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="room_${rack.rackType}">
+				<div id="rack_${rack.id}" style="top:${rack.roomY}px;left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="room_${rack.rackType}_${rack.front}">
 					<a href="#" onclick="$('#room_layout').css('width',700);$('#rackShowRow_'+${rack.id}).hide();$('#rackEditRow_'+${rack.id}).show()">
 					<span id="rackLabel_${rack.id}">${rack.tag}</span>
 					</a>
