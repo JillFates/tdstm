@@ -92,11 +92,11 @@
 				</td>
 				<td><input type="text" id="roomXId_${rack.id}" name="roomX_${rack.id}" value="${rack.roomX}" size="3" readonly="readonly" /></td>
 				<td><input type="text" id="roomYId_${rack.id}" name="roomY_${rack.id}" value="${rack.roomY}" size="3" readonly="readonly" /></td>
-				<td><g:select name="front_${rack.id}" from="${rack.constraints.front.inList}" value="${rack.front}"></g:select></td>
+				<td><g:select name="front_${rack.id}" from="${Rack.constraints.front.inList}" value="${rack.front}"></g:select></td>
 				<td><input type="text" name="powerA_${rack.id}" value="${rack.powerA}"  size="3" /></td>
 				<td><input type="text" name="powerB_${rack.id}" value="${rack.powerB}" size="3" /></td>
 				<td><input type="text" name="powerC_${rack.id}" value="${rack.powerC}" size="3" /></td>
-				<td><g:select name="rackType_${rack.id}" from="${rack.constraints.rackType.inList}" value="${rack.rackType}"></g:select></td>
+				<td><g:select name="rackType_${rack.id}" from="${Rack.constraints.rackType.inList}" value="${rack.rackType}"></g:select></td>
 				<td>${rack.assets.size()}&nbsp;&nbsp;&nbsp;
 				<g:if test="${rack.assets.size() == 0}">
 					<a href="javascript:verifyAndDeleteRacks(${rack.id})"><span class="clear_filter"><u>X</u></span></a>
@@ -180,6 +180,9 @@ function createRack(){
 }
 function changeLabel(id,value){
 	$("#rackLabel_"+id).html(value)
+}
+function changeRackType(id,value){
+	$("#rack_"+id).html(value)
 }
 </script>
 </body>

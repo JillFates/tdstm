@@ -99,6 +99,7 @@ class RoomController {
 	                	rack.powerA = params["powerA_"+rack.id] ? Integer.parseInt(params["powerA_"+rack.id]) : 0
 	                	rack.powerB = params["powerB_"+rack.id] ? Integer.parseInt(params["powerB_"+rack.id]) : 0
 	                	rack.powerC = params["powerC_"+rack.id] ? Integer.parseInt(params["powerC_"+rack.id]) : 0
+						rack.rackType = params["rackType_"+rack.id]
 						rack.front = params["front_"+rack.id]
 	                	rack.save(flush:true)
                 	} else {
@@ -118,6 +119,7 @@ class RoomController {
 								newRack.powerA = params["powerA_"+id] ? Integer.parseInt(params["powerA_"+id]) : 0
 								newRack.powerB = params["powerB_"+id] ? Integer.parseInt(params["powerB_"+id]) : 0
 								newRack.powerC = params["powerC_"+id] ? Integer.parseInt(params["powerC_"+id]) : 0
+								newRack.rackType = params["rackType_"+id]
 								newRack.front = params["front_"+id]
 								newRack.save(flush:true)
 							}
