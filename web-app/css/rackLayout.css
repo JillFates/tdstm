@@ -28,6 +28,12 @@ br.page-break-after {
 	border: 2px solid black;
 	background-color: #ffffff;
 }
+.room_tile {
+	height:40px;
+	width:40px;
+	border:1px solid grey;
+	padding:0px
+}
 .room_CRAC_L {
 	width:100px;
 	height:60px;
@@ -56,40 +62,84 @@ br.page-break-after {
 	background-color:white;
 	position:absolute;
 }
-.room_Door_R_R {
+
+.room_DoorR_R {
 	width:30px;
 	height:60px;
-	border: 1px solid black;
+	border: 0px solid black;
 	background-color: transparent;
-	background-image: url(/i/Door_R_R.gif);
+	background-image: url(/tdstm/i/DoorR_R.gif);
 	background-repeat: no-repeat;
 	background-position: right top;
 	position:absolute;
 }
-.room_Door_R_L {
+.room_DoorR_L {
 	width:30px;
 	height:60px;
-	border: 1px solid black;
+	border: 0px solid black;
 	background-color: transparent;
-	background-image: url(/i/Door_R_L.gif);
+	background-image: url(/tdstm/i/DoorR_L.gif);
 	background-repeat: no-repeat;
-	background-position: right top;	position:absolute;
+	background-position: right top;
+	position:absolute;
 }
-.room_Door_R_T {
+.room_DoorR_T {
 	width:30px;
 	height:60px;
-	border: 1px solid black;
+	border: 0px solid black;
 	background-color: transparent;
-	background-image: url(/i/Door_R_T.gif);
+	background-image: url(/tdstm/i/DoorR_T.gif);
 	background-repeat: no-repeat;
-	background-position: right top;	position:absolute;
+	background-position: right top;
+	position:absolute;
 }
-.room_Door_R_B {
+.room_DoorR_B {
 	width:30px;
 	height:60px;
-	border: 1px solid black;
+	border: 0px solid black;
 	background-color: transparent;
-	background-image: url(/i/Door_R_B.gif);
+	background-image: url(/tdstm/i/DoorR_B.gif);
+	background-repeat: no-repeat;
+	background-position: right top;
+	position:absolute;
+}
+
+.room_DoorL_R {
+	width:30px;
+	height:60px;
+	border: 0px solid black;
+	background-color: transparent;
+	background-image: url(/tdstm/i/DoorL_R.gif);
+	background-repeat: no-repeat;
+	background-position: right top;
+	position:absolute;
+}
+.room_DoorL_L {
+	width:30px;
+	height:60px;
+	border: 0px solid black;
+	background-color: transparent;
+	background-image: url(/tdstm/i/DoorL_L.gif);
+	background-repeat: no-repeat;
+	background-position: right top;
+	position:absolute;
+}
+.room_DoorL_T {
+	width:30px;
+	height:60px;
+	border: 0px solid black;
+	background-color: transparent;
+	background-image: url(/tdstm/i/DoorL_T.gif);
+	background-repeat: no-repeat;
+	background-position: right top;
+	position:absolute;
+}
+.room_DoorL_B {
+	width:30px;
+	height:60px;
+	border: 0px solid black;
+	background-color: transparent;
+	background-image: url(/tdstm/i/DoorL_B.gif);
 	background-repeat: no-repeat;
 	background-position: right top;
 	position:absolute;

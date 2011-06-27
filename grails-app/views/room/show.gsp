@@ -58,7 +58,7 @@
 		</tbody>
 	</table>
 </div>
-<div id="roomLayout" style="width: 1000px; overflow-x: auto; border: 2px solid black">
+<div id="roomLayout" style="width: 1100px; overflow-x: auto; border: 2px solid black">
 	<div id="room_layout" style="position:relative;width: 700px;height: 800px;overflow-x: auto; border: 0px solid black">
 		<table cellpadding="0" cellspacing="0" style="width:auto;height:auto;border:0px">
 			<g:set var="numrows" value="${1}" />
@@ -66,7 +66,7 @@
 				<tr>
 					<g:set var="numcols" value="${1}" />
 					<g:while test="${numcols < roomInstance.roomWidth / 2 }">
-						<td style="height:40px;width:40px;border:1px solid black;padding:0px" numcols="${numcols++}">&nbsp;</td>
+						<td class="room_tile" numcols="${numcols++}">&nbsp;</td>
 					</g:while>
 				</tr ><!-- ${numrows++} -->
 			</g:while>
@@ -74,7 +74,7 @@
 			<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack">
 				<g:if test="${rack.rackType == 'Rack'}">
 					<div style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'rack_highlight' : source=='true' && rack.source == 1 ? 'rack_highlight' : target == 'true' && rack.source == 0 ? 'rack_highlight' : 'rack_highlight_no' }_${rack.front}">
-						<g:remoteLink controller="rackLayouts" action="save" params="[rackId:rack.id,frontView:'on',showCabling:'off',otherBundle:'on']" onSuccess="updateRackPower(${rack.id})" onComplete="jQuery('#rackLayout').html(e.responseText);">
+						<g:remoteLink controller="rackLayouts" action="save" params="[rackId:rack.id,frontView:'off',showCabling:'off',otherBundle:'on']" onSuccess="updateRackPower(${rack.id})" onComplete="jQuery('#rackLayout').html(e.responseText);">
 						<div class="racktop_label">${rack.tag}</div>
 						</g:remoteLink>
 					</div>

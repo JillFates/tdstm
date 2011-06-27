@@ -287,6 +287,6 @@ class RoomController {
 		   		powerX += powerUse
 		   }
 	   }
-	   render "<table border=0><tr><td colspan=4 class='powertable_L'><b>Rack : ${rack.tag}</b></td></tr><tr><td class='powertable_L'>Power (w)</td><td class='powertable_C'>A</td><td class='powertable_C'>B</td><td class='powertable_C'>C</td><td class='powertable_C'>TBD</td></tr><tr><td class='powertable_R'>&nbsp;In Rack:</td><td class='powertable_R'>${rack.powerA}</td><td class='powertable_R'>${rack.powerB}</td><td class='powertable_R'>${rack.powerC}</td><td class='powertable_R'>&nbsp;</td></tr><tr><td class='powertable_L'>&nbsp;Used:</td><td class='powertable_R'>${powerA}</td><td class='powertable_R'>${powerB}</td><td class='powertable_R'>${powerC}</td><td class='powertable_R'>${powerX}</td></tr></table>"
+	   render "<table border=0><tr><td colspan=4 class='powertable_L'><b>Rack : ${rack.tag}</b></td></tr><tr><td class='powertable_L'>Power (w)</td><td class='powertable_C'>A</td><td class='powertable_C'>B</td><td class='powertable_C'>C</td><td class='powertable_C'>TBD</td></tr><tr><td class='powertable_R'>&nbsp;In Rack:</td><td class='powertable_R'>${rack.powerA}</td><td class='powertable_R'>${rack.powerB}</td><td class='powertable_R'>${rack.powerC}</td><td class='powertable_R'>&nbsp;</td></tr><tr><td class='powertable_R'>&nbsp;Used:</td><td class='powertable_R'>${powerA}</td><td class='powertable_R'>${powerB}</td><td class='powertable_R'>${powerC}</td><td class='powertable_R'>${powerX}</td></tr></table>"
    }
 }

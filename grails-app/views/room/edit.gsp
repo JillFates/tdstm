@@ -36,7 +36,7 @@
 			</tbody>
 		</table>
 	</div>
-<div id="roomLayout" style="width: 1000px; overflow-x: auto; border: 2px solid black">
+<div id="roomLayout" style="width: 1100px; overflow-x: auto; border: 2px solid black">
 	<div id="room_layout" style="position:relative;width: 700px;height: 800px;overflow-x: auto; border: 0px solid black">
 		<table cellpadding="0" cellspacing="0" style="width:auto;height:auto;border:0px" id="room_layout_table">
 			<g:set var="numrows" value="${1}" />
@@ -44,7 +44,7 @@
 				<tr>
 					<g:set var="numcols" value="${1}" />
 					<g:while test="${numcols < roomInstance.roomWidth / 2 }">
-						<td style="height:40px;width:40px;border:1px solid black;padding:0px" numcols="${numcols++}">&nbsp;</td>
+						<td class="room_tile" numcols="${numcols++}">&nbsp;</td>
 					</g:while>
 				</tr ><!-- ${numrows++} -->
 			</g:while>
