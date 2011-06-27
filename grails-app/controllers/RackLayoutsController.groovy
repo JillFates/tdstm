@@ -47,6 +47,7 @@ class RackLayoutsController {
 			def project = Project.findById(projectId)
 			def moveBundles = MoveBundle.findAllByProject( project )
 			def rackId = params.rackId
+			def hideIcons = params.hideIcons
 			
 			if(bundleId && !bundleId.contains("all")){
 				def bundlesString = bundleId.toString().replace("[","(").replace("]",")")
@@ -231,10 +232,10 @@ class RackLayoutsController {
 				def backViewRows
 				def frontViewRows
 				if(backView) {
-					backViewRows = getRackLayout(isAdmin, assetDetails, includeBundleName, backView, params.showCabling)
+					backViewRows = getRackLayout(isAdmin, assetDetails, includeBundleName, backView, params.showCabling, hideIcons)
 				}
 				if(frontView) {
-					frontViewRows = getRackLayout(isAdmin, assetDetails, includeBundleName, null, params.showCabling)
+					frontViewRows = getRackLayout(isAdmin, assetDetails, includeBundleName, null, params.showCabling, hideIcons)
 				}
 				rackLayout << [ assetDetails : assetDetails, rack : rack.tag , room : rack.room,
 								frontViewRows : frontViewRows, backViewRows : backViewRows ]
@@ -271,7 +272,7 @@ class RackLayoutsController {
 		render rackDetails as JSON
 	}
 
-	private getRackLayout( def isAdmin, def asset, def includeBundleName, def backView, def showCabling ){
+	private getRackLayout( def isAdmin, def asset, def includeBundleName, def backView, def showCabling, def hideIcons ){
 		def rows = new StringBuffer()
 		def rowspan = 1
 		def cssClass = "empty"
@@ -317,7 +318,7 @@ class RackLayoutsController {
 							moveBundle += (overlapAsset?.moveBundle ? overlapAsset?.moveBundle.name : "") + "<br/>"
 							if(overlapAsset.model && overlapAsset.model.assetType == 'Blade Chassis' && (!backView || showCabling != 'on')){
 								hasBlades = true
-								bladeTable = generateBladeLayout(it, overlapAsset, isAdmin)
+								bladeTable = generateBladeLayout(it, overlapAsset, isAdmin, hideIcons)
 							}
 							if(isAdmin){
 								assetTag += "<a href='javascript:openAssetEditDialig(${overlapAsset?.id})' >"+trimString(assetTagValue.replace('~-','-'))+"</a>" 
@@ -336,7 +337,7 @@ class RackLayoutsController {
 						moveBundle += (overlappedAsset?.moveBundle ? overlappedAsset?.moveBundle.name : "") + "<br/>"
 						if(overlappedAsset.model && overlappedAsset.model.assetType == 'Blade Chassis' && (!backView || showCabling != 'on') ){
 							hasBlades = true
-							bladeTable = generateBladeLayout(it, overlappedAsset,isAdmin)
+							bladeTable = generateBladeLayout(it, overlappedAsset,isAdmin, hideIcons)
 						}
 						cabling = !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : ""
 						if(isAdmin){
@@ -426,7 +427,7 @@ class RackLayoutsController {
 				rowspan = 1
 				rackStyle = it.rackStyle
 				row.append("<td class='${it.rackStyleUpos}'>${it.rack}</td><td rowspan=1 class=${it.cssClass}>")
-				if(isAdmin){
+				if(isAdmin && hideIcons == "on"){
 				row.append("""<img src="../i/rack_add.png" onclick=\"createDialog('${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')\"/>&nbsp;
 								<img src="../i/rack_list.png" onclick=\"listDialog('${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')\"/>&nbsp;</td><td>&nbsp;</td>""")
 				} else { 
@@ -449,7 +450,7 @@ class RackLayoutsController {
 	/*************************************************
 	 * Construct Balde layout for RackLayouts report
 	 **************************************************/
-	def generateBladeLayout(def assetDetails, def assetEntity, def isAdmin){
+	def generateBladeLayout(def assetDetails, def assetEntity, def isAdmin, def hideIcons){
 		
 		def bladeTable = '<table class="bladeTable"><tr>'
 		def rowspan = assetDetails.asset?.rowspan != 0 ? assetDetails.asset?.rowspan : 1
@@ -486,7 +487,7 @@ class RackLayoutsController {
 					}
 					tag = tag.split('')[1..-1].join('<br/>')
 					def taglabel = "<div>"+tag.substring(0,tag.length())+"</div>"
-					def bladeSpan = blade.model.bladeHeight == 'Full' ? chassisRows : 1
+					def bladeSpan = blade.model?.bladeHeight == 'Full' ? chassisRows : 1
 					if(bladeSpan == chassisRows){
 						for(int y = i; y <= chassisRows*bladesPerRow; y += bladesPerRow ){
 							fullRows << y + bladesPerRow
@@ -499,8 +500,14 @@ class RackLayoutsController {
 						bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href='javascript:openAssetEditDialig(${blade.id})' title='${tag.replace('<br/>','')}'>${taglabel}</a></td>"
 					else
 						bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px' title='${tag.replace('<br/>','')}'>${taglabel}</td>"
-				} else
-					bladeTable += "<td class='emptyBlade' style='height:${tdHeight}px'>&nbsp;</td>"
+				} else {
+					if(isAdmin && hideIcons == 'on'){
+						bladeTable += """<td class='emptyBlade' style='height:${tdHeight}px'><img src="../i/rack_add.png" onclick=\"createBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}')\"/>&nbsp;
+								<img src="../i/rack_list.png" onclick=\"listBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}')\"/></td>"""
+					} else {
+						bladeTable += "<td class='emptyBlade' style='height:${tdHeight}px'>&nbsp;</td>"
+					}
+				}
 			}
 			bladeTable += k == chassisRows ? "</tr>" : "</tr><tr>"
 		}

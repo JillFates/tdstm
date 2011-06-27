@@ -315,7 +315,6 @@ function listDialog(source,rack,roomName,location,position){
 			if(data != null && data != ""){
 				$("#listDiv").html(data)
 				$("#listDialog").dialog('option', 'width', 600)
-				$("#listDialog").dialog('option', 'height', 600)
 				$("#listDialog").dialog('option', 'position', ['center','top']);
 				$("#createDialog").dialog("close")
 				$("#listDialog").dialog("open")
@@ -336,6 +335,47 @@ function updateEditForm(source,rack,roomName,location,position){
 }
 function openSelectedRackLayout(){
 	setTimeout("$('#'+$('#selectedRackId').val()).click()",1000);
+}
+function createBladeDialog(source,blade,position){
+	alert(source+"/"+blade+"/"+position)
+	$("#createDialog").dialog('option', 'width', 950)
+    $("#createDialog").dialog('option', 'position', ['center','top']);
+    $("#editDialog").dialog("close")
+    $("#createDialog").dialog("open")
+    $("#attributeSetId").val(1)
+    ${remoteFunction(controller:"assetEntity",action:'getAttributes', params:'\'attribSet=\' + $("#attributeSetId").val() ', onComplete:"generateCreateForm(e);updateAssetBladeInfo(source,blade,position)")}
+}
+function updateAssetBladeInfo(source,blade,position){
+	var target = source != '1' ? 'target' : 'source'
+	$("#assetTypeId").val("Blade")	
+	$("#"+target+"BladeChassisId").val(blade)
+	$("#"+target+"BladePositionId").val(position)
+}
+function listBladeDialog(source,blade,position){
+	jQuery.ajax({
+		url: "getBladeAssetsListToAddRack",
+		data: "source="+source+"&blade="+blade+"&position="+position,
+		type:'POST',
+		success: function(data) {
+			if(data != null && data != ""){
+				$("#listDiv").html(data)
+				$("#listDialog").dialog('option', 'width', 600)
+				$("#listDialog").dialog('option', 'position', ['center','top']);
+				$("#createDialog").dialog("close")
+				$("#listDialog").dialog("open")
+			}
+		}
+	});
+}
+function editBladeDialog(assetId,source,blade,position){
+	openAssetEditDialig(assetId)
+	setTimeout("updateBladeEditForm('"+source+"','"+blade+"','"+position+"')",1000);
+}
+function updateBladeEditForm(source,blade,position){
+	var target = source != '1' ? 'target' : 'source'
+	$("#editassetTypeId").val("Blade")	
+	$("#edit"+target+"BladeChassisId").val(blade)
+	$("#edit"+target+"BladePositionId").val(position)
 }
 </script>
 </body>

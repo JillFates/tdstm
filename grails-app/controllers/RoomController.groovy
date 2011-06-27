@@ -315,4 +315,30 @@ class RoomController {
 	   }
 	   render stringToReturn
    }
+   /**
+    *  Return blades list as html row format to assign blade chassis
+    */
+   def getBladeAssetsListToAddRack = {
+	   def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+	   def source = params.source
+	   def assetEntityList = null
+	   if(source == '1'){
+			   assetEntityList = AssetEntity.findAll("from AssetEntity where sourceBladeChassis is null and project = ${projectId} and assetType = 'Blade'")
+	   } else {
+			   assetEntityList = AssetEntity.findAll("from AssetEntity where targetBladeChassis is null and project = ${projectId} and assetType = 'Blade'")
+	   }
+	   def stringToReturn = new StringBuffer()
+	   if(assetEntityList.size() > 0){
+		   assetEntityList.eachWithIndex{ obj, i ->
+			   stringToReturn.append("""<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="editBladeDialog( ${obj.id},'${source}','${params.blade}','${params.position}')">
+											<td>${obj.assetName}</td>
+											<td>${obj.assetTag}</td>
+											<td>${obj.model ? obj.model.modelName : ''}</td>
+										</tr>""")
+		   }
+	   } else {
+			   stringToReturn.append("<tr><td colspan='3' class='no_records'>No records found</td></tr>")
+	   }
+	   render stringToReturn
+   }
 }
