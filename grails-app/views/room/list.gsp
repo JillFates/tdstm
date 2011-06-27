@@ -19,6 +19,7 @@ $(document).ready(function() {
     $("#createRoomDialog").dialog({ autoOpen: false })
     $("#mergeRoomDialog").dialog({ autoOpen: false })
     $("#createDialog").dialog({ autoOpen: false })
+    $("#listDialog").dialog({ autoOpen: false })
 })
 </script>
 </head>
@@ -110,10 +111,25 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 		</div>
 		<div class="buttons">
 			<span class="button">
-				<input class="save" type="button" style="font-size: 12px;" value="Update Asset" onClick="${remoteFunction(controller:'assetEntity', action:'getAssetAttributes', params:'\'assetId=\' + $(\'#editFormId\').val() ', onComplete:'callUpdateDialog(e)')}" />
+				<input class="save" type="button" style="font-size: 12px;" value="Update Asset" onClick="${remoteFunction(controller:'assetEntity', action:'getAssetAttributes', params:'\'assetId=\' + $(\'#editFormId\').val() ', onComplete:'callUpdateDialog(e)')};openSelectedRackLayout()" />
 			</span>
 		</div>
 	</g:form>
+</div>
+<div id="listDialog" title="Asset List" style="display: none;">
+		<div class="dialog" >
+			<table>
+			<thead>
+				<tr>
+				<th>Asset Name</th>
+				<th>Asset Tag</th>
+				<th>Model</th>
+				</tr>
+			</thead>
+			<tbody class="tbody" id="listDiv">
+			</tbody>
+			</table>
+		</div>
 </div>
 <div id="createRoomDialog" title="Create Room" style="display: none;">
 	<g:form method="post" name="createRoomForm" action="save" onsubmit="return validateForm()">
@@ -289,6 +305,37 @@ function validateAssetEntity(formname) {
 		alert(" Please select Attribute Set. ");
 		return false;
 	}
+}
+function listDialog(source,rack,roomName,location,position){
+	jQuery.ajax({
+		url: "getAssetsListToAddRack",
+		data: "source="+source+"&rack="+rack+"&roomName="+roomName+"&location="+location+"&position="+position,
+		type:'POST',
+		success: function(data) {
+			if(data != null && data != ""){
+				$("#listDiv").html(data)
+				$("#listDialog").dialog('option', 'width', 600)
+				$("#listDialog").dialog('option', 'height', 600)
+				$("#listDialog").dialog('option', 'position', ['center','top']);
+				$("#createDialog").dialog("close")
+				$("#listDialog").dialog("open")
+			}
+		}
+	});
+}
+function editDialog(assetId,source,rack,roomName,location,position){
+	openAssetEditDialig(assetId)
+	setTimeout("updateEditForm('"+source+"','"+rack+"','"+roomName+"','"+location+"','"+position+"')",1000);
+}
+function updateEditForm(source,rack,roomName,location,position){
+	var target = source != '1' ? 'target' : 'source'
+	$("#edit"+target+"RackId").val(rack)
+	$("#edit"+target+"LocationId").val(location)
+	$("#edit"+target+"RoomId").val(roomName)
+	$("#edit"+target+"RackPositionId").val(position)
+}
+function openSelectedRackLayout(){
+	setTimeout("$('#'+$('#selectedRackId').val()).click()",1000);
 }
 </script>
 </body>

@@ -10,9 +10,9 @@
 <script type="text/javascript">
 	function updateRackDetails(e) {
      	var rackDetails = eval('(' + e.responseText + ')')   	
-      	var sourceSelectObj = $('#sourceRackId');
-      	var targetSelectObj = $('#targetRackId');
-      	var sourceRacks = rackDetails[0].sourceRackList;
+      	var sourceSelectObj = $('#sourceRackIdSelect');
+      	var targetSelectObj = $('#targetRackIdSelect');
+      	var sourceRacks = rackDetails[0].sourceRackList
       	var targetRacks = rackDetails[0].targetRackList;
       	generateOptions(sourceSelectObj,sourceRacks,'none');
       	generateOptions(targetSelectObj,targetRacks,'all');
@@ -66,6 +66,8 @@
 	$(document).ready(function() {
 	    $("#editDialog").dialog({ autoOpen: false })
 	    $("#cablingDialogId").dialog({ autoOpen: false })
+	    $("#createDialog").dialog({ autoOpen: false })
+	    $("#listDialog").dialog({ autoOpen: false })
 	})
 	function openAssetEditDialig( id ){
 		$("#editFormId").val(id)
@@ -210,7 +212,7 @@
 			
 			<td>
 				<label><b>Source</b></label><br />
-				<select id="sourceRackId" multiple="multiple" name="sourcerack" style="width:200px" size="4">
+				<select id="sourceRackIdSelect" multiple="multiple" name="sourcerack" style="width:200px" size="4">
 					<option value="null" selected="selected">All</option>
 				</select>
 			</td>
@@ -218,7 +220,7 @@
 			<td>
 				<div style="width:250px">
 					<label><b>Target</b></label><br />
-					<select id="targetRackId" multiple="multiple" name="targetrack" style="width:200px" size="4">
+					<select id="targetRackIdSelect" multiple="multiple" name="targetrack" style="width:200px" size="4">
 						<option value="null" selected="selected">All</option>
 					</select>
 				</div>
@@ -253,7 +255,35 @@
 <div id="rackLayout" style="width:100%; overflow-x:auto; border: 1px solid black">
 
 </div>
+<div id="createDialog" title="Create Asset" style="display: none;">
+<g:form action="save" controller="assetEntity" method="post" name="createForm" >
 
+	<div class="dialog" id="createDiv" >
+		<table id="createFormTbodyId"></table>
+	</div>
+	
+	<div class="buttons">
+	<input type="hidden" name="projectId" value="${projectId }" />
+	<input type="hidden" id="attributeSetId" name="attributeSet.id" value="" />
+	<input type="hidden" name="redirectTo" value="rack" />
+	<span class="button"><input class="save" type="submit" value="Create" onclick="return validateAssetEntity('createForm');" /></span>
+	</div>
+</g:form></div>
+<div id="listDialog" title="Asset List" style="display: none;">
+		<div class="dialog" >
+			<table>
+			<thead>
+				<tr>
+				<th>Asset Name</th>
+				<th>Asset Tag</th>
+				<th>Model</th>
+				</tr>
+			</thead>
+			<tbody class="tbody" id="listDiv">
+			</tbody>
+			</table>
+		</div>
+</div>
 <div id="editDialog" title="Edit Asset" style="display: none;">
 	<g:form method="post" name="editForm">
 		<input type="hidden" name="id" id="editFormId" value="" />
@@ -261,7 +291,7 @@
 		</div>
 		<div class="buttons">
 			<span class="button">
-				<input class="save" type="button" style="font-size: 12px;" value="Update Asset" onClick="${remoteFunction(controller:'assetEntity', action:'getAssetAttributes', params:'\'assetId=\' + $(\'#editFormId\').val() ', onComplete:'callUpdateDialog(e)')}" />
+				<input class="save" type="button" style="font-size: 12px;" value="Update Asset" onClick="${remoteFunction(controller:'assetEntity', action:'getAssetAttributes', params:'\'assetId=\' + $(\'#editFormId\').val() ', onComplete:'callUpdateDialog(e);openSelectedRackLayout()')}" />
 			</span>
 		</div>
 	</g:form>
@@ -674,6 +704,72 @@
 			$("#colorId option").removeAttr("class")
 			$("#colorId option:selected").addClass(color)
 		}
+	}
+	function createDialog(source,rack,roomName,location,position){
+		$("#createDialog").dialog('option', 'width', 950)
+	    $("#createDialog").dialog('option', 'position', ['center','top']);
+	    $("#editDialog").dialog("close")
+	    $("#createDialog").dialog("open")
+	    $("#attributeSetId").val(1)
+	    ${remoteFunction(controller:"assetEntity",action:'getAttributes', params:'\'attribSet=\' + $("#attributeSetId").val() ', onComplete:"generateCreateForm(e);updateAssetInfo(source,rack,roomName,location,position)")}
+	  }
+	function updateAssetInfo(source,rack,roomName,location,position){
+		var target = source != '1' ? 'target' : 'source'
+		$("#"+target+"RackId").val(rack)
+		$("#"+target+"LocationId").val(location)
+		$("#"+target+"RoomId").val(roomName)
+		$("#"+target+"RackPositionId").val(position)
+	    
+	}
+	function validateAssetEntity(formname) {
+		var attributeSet = $("#attributeSetId").val();
+		if(attributeSet || formname == 'editForm'){
+			var assetName = document.forms[formname].assetName.value.replace(/^\s*/, "").replace(/\s*$/, "");
+			
+			if( !assetName ){
+				alert(" Please Enter Asset Name. ");
+				return false;
+			} else {
+				return true;
+			}
+		} else {
+			alert(" Please select Attribute Set. ");
+			return false;
+		}
+	}
+	function listDialog(source,rack,roomName,location,position){
+		jQuery.ajax({
+			url: "../room/getAssetsListToAddRack",
+			data: "source="+source+"&rack="+rack+"&roomName="+roomName+"&location="+location+"&position="+position,
+			type:'POST',
+			success: function(data) {
+				if(data != null && data != ""){
+					$("#listDiv").html(data)
+					$("#listDialog").dialog('option', 'width', 600)
+					$("#listDialog").dialog('option', 'height', 600)
+					$("#listDialog").dialog('option', 'position', ['center','top']);
+					$("#createDialog").dialog("close")
+					$("#listDialog").dialog("open")
+				}
+			}
+		});
+	}
+	function editDialog(assetId,source,rack,roomName,location,position){
+		openAssetEditDialig(assetId)
+		setTimeout("updateEditForm('"+source+"','"+rack+"','"+roomName+"','"+location+"','"+position+"')",1000);
+	}
+	function updateEditForm(source,rack,roomName,location,position){
+		var target = source != '1' ? 'target' : 'source'
+		$("#edit"+target+"RackId").val(rack)
+		$("#edit"+target+"LocationId").val(location)
+		$("#edit"+target+"RoomId").val(roomName)
+		$("#edit"+target+"RackPositionId").val(position)
+	}
+	function openSelectedRackLayout(){
+		$('#generateId').click()
+		$("#editDialog").dialog("close")
+	    $("#createDialog").dialog("close")
+	    $("#listDialog").dialog("close")
 	}
 </script>
 </body>

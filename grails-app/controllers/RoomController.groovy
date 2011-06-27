@@ -289,4 +289,30 @@ class RoomController {
 	   }
 	   render "<table border=0><tr><td colspan=4 class='powertable_L'><b>Rack : ${rack.tag}</b></td></tr><tr><td class='powertable_L'>Power (w)</td><td class='powertable_C'>A</td><td class='powertable_C'>B</td><td class='powertable_C'>C</td><td class='powertable_C'>TBD</td></tr><tr><td class='powertable_R'>&nbsp;In Rack:</td><td class='powertable_R'>${rack.powerA}</td><td class='powertable_R'>${rack.powerB}</td><td class='powertable_R'>${rack.powerC}</td><td class='powertable_R'>&nbsp;</td></tr><tr><td class='powertable_R'>&nbsp;Used:</td><td class='powertable_R'>${powerA}</td><td class='powertable_R'>${powerB}</td><td class='powertable_R'>${powerC}</td><td class='powertable_R'>${powerX}</td></tr></table>"
    }
+   /**
+    *  Return assets list as html row format to assign racks
+    */
+   def getAssetsListToAddRack = {
+	   def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+	   def source = params.source
+	   def assetEntityList = null
+	   if(source == '1'){
+		   	assetEntityList = AssetEntity.findAll("from AssetEntity where rackSource is null and project = ${projectId} and assetType != 'Blade'")
+	   } else {
+	   		assetEntityList = AssetEntity.findAll("from AssetEntity where rackTarget is null and project = ${projectId} and assetType != 'Blade'")
+	   }
+	   def stringToReturn = new StringBuffer()
+	   if(assetEntityList.size() > 0){
+		   assetEntityList.eachWithIndex{ obj, i ->
+			   stringToReturn.append("""<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="editDialog( ${obj.id},'${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">
+											<td>${obj.assetName}</td>
+											<td>${obj.assetTag}</td>
+											<td>${obj.model ? obj.model.modelName : ''}</td>
+										</tr>""")
+		   }
+	   } else {
+	   		stringToReturn.append("<tr><td colspan='3' class='no_records'>No records found</td></tr>")
+	   }
+	   render stringToReturn
+   }
 }

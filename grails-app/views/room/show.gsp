@@ -59,6 +59,7 @@
 	</table>
 </div>
 <div id="roomLayout" style="width: 1100px; overflow-x: auto; border: 2px solid black">
+	<input id="selectedRackId" type="hidden">
 	<div id="room_layout" style="position:relative;width: 700px;height: 800px;overflow-x: auto; border: 0px solid black">
 		<table cellpadding="0" cellspacing="0" style="width:auto;height:auto;border:0px">
 			<g:set var="numrows" value="${1}" />
@@ -71,11 +72,11 @@
 				</tr ><!-- ${numrows++} -->
 			</g:while>
 		</table>
-			<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack">
+			<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack" status='i'>
 				<g:if test="${rack.rackType == 'Rack'}">
 					<div style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'rack_highlight' : source=='true' && rack.source == 1 ? 'rack_highlight' : target == 'true' && rack.source == 0 ? 'rack_highlight' : 'rack_highlight_no' }_${rack.front}">
 						<g:remoteLink controller="rackLayouts" action="save" params="[rackId:rack.id,frontView:'off',showCabling:'off',otherBundle:'on']" onSuccess="updateRackPower(${rack.id})" onComplete="jQuery('#rackLayout').html(e.responseText);">
-						<div class="racktop_label">${rack.tag}</div>
+						<div id="rack_div_${i}" class="racktop_label" onclick="$('#selectedRackId').val(this.id)">${rack.tag}</div>
 						</g:remoteLink>
 					</div>
 				</g:if>
@@ -146,6 +147,11 @@ function updateRackPower(rackId){
 			$("#rackPowerTd").html(data)
 		}
 	});
+	$("#editDialog").dialog("close")
+    $("#createRoomDialog").dialog("close")
+    $("#mergeRoomDialog").dialog("close")
+    $("#createDialog").dialog("close")
+    $("#listDialog").dialog("close")
 }
 </script>
 </body>

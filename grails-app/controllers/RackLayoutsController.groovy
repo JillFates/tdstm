@@ -25,7 +25,7 @@ class RackLayoutsController {
 			isCurrentBundle = false
 		}
 		
-		return [moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, 
+		return [moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, projectId:projectId,
 				currentBundle:currentBundle, isCurrentBundle : isCurrentBundle, models:models]
 	}
 	
@@ -425,9 +425,13 @@ class RackLayoutsController {
 			} else if(rowspan <= 1) {
 				rowspan = 1
 				rackStyle = it.rackStyle
-				row.append("""<td class='${it.rackStyleUpos}'>${it.rack}</td><td rowspan=1 class=${it.cssClass}>
-				<img src="../i/rack_add.png" onclick=\"createDialog('${it.source}','${it.rackDetails.tag}','${it.rackDetails.room.roomName}','${it.rackDetails.location}','${it.rack}')\"/>&nbsp;<img src="../i/rack_list.png" />
-				&nbsp;</td><td>&nbsp;</td>""")
+				row.append("<td class='${it.rackStyleUpos}'>${it.rack}</td><td rowspan=1 class=${it.cssClass}>")
+				if(isAdmin){
+				row.append("""<img src="../i/rack_add.png" onclick=\"createDialog('${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')\"/>&nbsp;
+								<img src="../i/rack_list.png" onclick=\"listDialog('${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')\"/>&nbsp;</td><td>&nbsp;</td>""")
+				} else { 
+					row.append("&nbsp;</td><td>&nbsp;</td>")
+				}
 				if(backView)
 					row.append("<td>&nbsp;</td>")
 				

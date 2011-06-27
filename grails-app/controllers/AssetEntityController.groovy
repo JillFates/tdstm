@@ -729,6 +729,8 @@ class AssetEntityController {
             flash.message = "AssetEntity ${assetEntityInstance.assetName} created"
 			if(params.redirectTo == "room"){
 				redirect( controller:'room',action:list, params:[projectId: projectId] )
+			} else if(params.redirectTo == "rack"){
+				redirect( controller:'rackLayouts',action:'create', params:[projectId: projectId] )
 			} else {
             	redirect( action:list, params:[projectId: projectId] )
 			}
@@ -741,6 +743,8 @@ class AssetEntityController {
 			println etext
 			if(params.redirectTo == "room"){
 				redirect( controller:'room',action:list, params:[projectId: projectId] )
+			} else if(params.redirectTo == "rack"){
+				redirect( controller:'rackLayouts',action:'create', params:[projectId: projectId] )
 			} else {
 				redirect( action:list, params:[projectId: projectId] )
 			}
