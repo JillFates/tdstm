@@ -5,9 +5,11 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
 <title>Room List</title>
 <g:javascript src="asset.tranman.js" />
- <g:javascript src="drag_drop.js" />
+<g:javascript src="drag_drop.js" />
+<g:javascript src="room.rack.combined.js"/>
 <script type="text/javascript">
 var roomId = "${roomId}"
 var viewType = "${viewType}"
@@ -20,6 +22,7 @@ $(document).ready(function() {
     $("#mergeRoomDialog").dialog({ autoOpen: false })
     $("#createDialog").dialog({ autoOpen: false })
     $("#listDialog").dialog({ autoOpen: false })
+    $("#cablingDialogId").dialog({ autoOpen: false })
 })
 </script>
 </head>
@@ -193,6 +196,73 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 		</table>
 	</g:form>
 </div>
+<div style="display: none;" id="cablingDialogId">
+	<div id="cablingPanel" style="height: auto; ">
+		<g:if test="${currentBundle}">
+		<g:each in="${models}" var="model">
+			<g:if test="${model?.rearImage && model?.useImage == 1}">
+			<img id="rearImage${model.id}" src="${createLink(controller:'model', action:'getRearImage', id:model.id)}" style="display: none;"/>
+			</g:if>
+		</g:each>
+		</g:if>
+	</div>
+	<div class="inputs_div">
+		<g:form controller='rackLayouts' action="updateCablingDetails" name="cablingDetailsForm">
+		<div id="actionButtonsDiv" style="margin-top: 5px;float: left;display: none;">
+			<input type="button" value="Unknown" onclick="openActionDiv(this.id)" id="unknownId"/>
+			<input type="button" value="0" onclick="openActionDiv(this.id)" style="background-color: #5F9FCF;" id="emptyId"/>
+			<input type="button" value="X" onclick="openActionDiv(this.id)" id="cabledId"/>
+			<input type="button" value="Assign" onclick="openActionDiv(this.id)" id="assignId"/>
+		</div>
+		<div id="actionDiv" style="margin-top: 5px;float: right;display: none;">
+			<input type="button" value="Ok" onclick="submitAction($('form[name=cablingDetailsForm]'))"/>
+			<input type="button" value="Cancel"  onclick="cancelAction()"/>
+			<g:select id="colorId" name="color" from="${AssetCableMap.constraints.color.inList}" noSelection="${['':'']}" onchange="updateCell(this.value)"></g:select>
+			<input type="reset" id="formReset" style="display: none;"/>
+		</div>
+		<div style="clear: both;"></div>
+		<div style="text-align: center;margin-bottom: 5px;display: none;" id="assignFieldDiv">
+			<div id="inputDiv">
+				<input type="text" name="rack" id="rackId" size="10"  onblur="validateRackData( this.value, this.id );"/>
+				<input type="text" name="uposition" id="upositionId" size="2" maxlength="2" onfocus="getUpositionData()" onblur="validateUpositionData( this.value, this.id)"/>
+				<input type="text" name="connector" id="connectorId" size="15" onfocus="getConnectorData()" onblur="validateConnectorData(this.value, this.id)" />
+			</div>
+			<div id="powerDiv" style="display: none;">
+				<input type="radio" name="staticConnector" id="staticConnector_A" value="A">A</input>&nbsp;
+				<input type="radio" name="staticConnector" id="staticConnector_B" value="B">B</input>&nbsp;
+				<input type="radio" name="staticConnector" id="staticConnector_C" value="C">C</input>
+			</div>
+			<div>
+				<input type="hidden" name="assetCable" id="cabledTypeId"/>
+				<input type="hidden" name="actionType" id="actionTypeId"/>
+				<input type="hidden" name="connectorType" id="connectorTypeId"/>
+				<input type="hidden" name="asset" id="assetEntityId"/>
+				<input type="hidden" id="previousColor"/>
+			</div>
+		</div>
+		
+		</g:form>
+	</div>
+	<div style="clear: both;"></div>
+	<div class="list">
+		<table>
+			<thead>
+				<tr>
+					<th>Type</th>
+					<th>Label</th>
+					<th>Status</th>
+					<th>Color</th>
+					<th>Rack/Upos/Conn</th>
+				</tr>
+			</thead>
+			<tbody id="cablingTableBody">
+			<tr>
+				<td colspan="5">No Connectors found</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
 <script type="text/javascript">
 function openRoomView(e){
 	var resp = e.responseText
@@ -200,22 +270,7 @@ function openRoomView(e){
 	$("#roomShowView").show()
 	$("#roomListView").hide()
 }
-function openAssetEditDialig( id ){
-	$("#editFormId").val(id)
-	${remoteFunction(controller:"assetEntity", action:"editShow", params:'\'id=\' + id ', onComplete:"showAssetDialog( e , 'edit')")}
-}
 
-function showEditAsset(e) {
-	var assetEntityAttributes = eval('(' + e.responseText + ')')
-	if (assetEntityAttributes != "") {
-		$("#editDialog").dialog("close")
-		$("#cablingDialogId").dialog("close")
-		$('#commit').val('Generate')
-		$("#generateId").click()
-	} else {
-		alert("Asset is not updated, Please check the required fields")
-	}
-}
 function enableActions(){
 	var inputCheckBox = $("input:checkbox")
 	var enableButtons = 0
@@ -274,109 +329,10 @@ function validateForm(){
 		return false
 	}
 }
-function createDialog(source,rack,roomName,location,position){
-	$("#createDialog").dialog('option', 'width', 950)
-    $("#createDialog").dialog('option', 'position', ['center','top']);
-    $("#editDialog").dialog("close")
-    $("#createDialog").dialog("open")
-    $("#attributeSetId").val(1)
-    ${remoteFunction(controller:"assetEntity",action:'getAttributes', params:'\'attribSet=\' + $("#attributeSetId").val() ', onComplete:"generateCreateForm(e);updateAssetInfo(source,rack,roomName,location,position)")}
-  }
-function updateAssetInfo(source,rack,roomName,location,position){
-	var target = source != '1' ? 'target' : 'source'
-	$("#"+target+"RackId").val(rack)
-	$("#"+target+"LocationId").val(location)
-	$("#"+target+"RoomId").val(roomName)
-	$("#"+target+"RackPositionId").val(position)
-    
-}
-function validateAssetEntity(formname) {
-	var attributeSet = $("#attributeSetId").val();
-	if(attributeSet || formname == 'editForm'){
-		var assetName = document.forms[formname].assetName.value.replace(/^\s*/, "").replace(/\s*$/, "");
-		
-		if( !assetName ){
-			alert(" Please Enter Asset Name. ");
-			return false;
-		} else {
-			return true;
-		}
-	} else {
-		alert(" Please select Attribute Set. ");
-		return false;
-	}
-}
-function listDialog(source,rack,roomName,location,position){
-	jQuery.ajax({
-		url: "getAssetsListToAddRack",
-		data: "source="+source+"&rack="+rack+"&roomName="+roomName+"&location="+location+"&position="+position,
-		type:'POST',
-		success: function(data) {
-			if(data != null && data != ""){
-				$("#listDiv").html(data)
-				$("#listDialog").dialog('option', 'width', 600)
-				$("#listDialog").dialog('option', 'position', ['center','top']);
-				$("#createDialog").dialog("close")
-				$("#listDialog").dialog("open")
-			}
-		}
-	});
-}
-function editDialog(assetId,source,rack,roomName,location,position){
-	openAssetEditDialig(assetId)
-	setTimeout("updateEditForm('"+source+"','"+rack+"','"+roomName+"','"+location+"','"+position+"')",1000);
-}
-function updateEditForm(source,rack,roomName,location,position){
-	var target = source != '1' ? 'target' : 'source'
-	$("#edit"+target+"RackId").val(rack)
-	$("#edit"+target+"LocationId").val(location)
-	$("#edit"+target+"RoomId").val(roomName)
-	$("#edit"+target+"RackPositionId").val(position)
-}
-function openSelectedRackLayout(){
-	setTimeout("$('#'+$('#selectedRackId').val()).click()",1000);
-}
-function createBladeDialog(source,blade,position){
-	alert(source+"/"+blade+"/"+position)
-	$("#createDialog").dialog('option', 'width', 950)
-    $("#createDialog").dialog('option', 'position', ['center','top']);
-    $("#editDialog").dialog("close")
-    $("#createDialog").dialog("open")
-    $("#attributeSetId").val(1)
-    ${remoteFunction(controller:"assetEntity",action:'getAttributes', params:'\'attribSet=\' + $("#attributeSetId").val() ', onComplete:"generateCreateForm(e);updateAssetBladeInfo(source,blade,position)")}
-}
-function updateAssetBladeInfo(source,blade,position){
-	var target = source != '1' ? 'target' : 'source'
-	$("#assetTypeId").val("Blade")	
-	$("#"+target+"BladeChassisId").val(blade)
-	$("#"+target+"BladePositionId").val(position)
-}
-function listBladeDialog(source,blade,position){
-	jQuery.ajax({
-		url: "getBladeAssetsListToAddRack",
-		data: "source="+source+"&blade="+blade+"&position="+position,
-		type:'POST',
-		success: function(data) {
-			if(data != null && data != ""){
-				$("#listDiv").html(data)
-				$("#listDialog").dialog('option', 'width', 600)
-				$("#listDialog").dialog('option', 'position', ['center','top']);
-				$("#createDialog").dialog("close")
-				$("#listDialog").dialog("open")
-			}
-		}
-	});
-}
-function editBladeDialog(assetId,source,blade,position){
-	openAssetEditDialig(assetId)
-	setTimeout("updateBladeEditForm('"+source+"','"+blade+"','"+position+"')",1000);
-}
-function updateBladeEditForm(source,blade,position){
-	var target = source != '1' ? 'target' : 'source'
-	$("#editassetTypeId").val("Blade")	
-	$("#edit"+target+"BladeChassisId").val(blade)
-	$("#edit"+target+"BladePositionId").val(position)
-}
+/*
+RACK Autocomplete functionality
+*/
+${remoteFunction(controller:'rackLayouts',action:'getAutoCompleteDetails', params:'\'field=rack\'', onComplete:"updateAutoComplete( e , 'rack')" )};
 </script>
 </body>
 </html>
