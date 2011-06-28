@@ -265,11 +265,13 @@ class RoomController {
 	   		assets = AssetEntity.findAllByRackTarget( rack )
 	   }
 	   assets.each{ asset->
-		   def assetPowerCabling = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.fromConnectorNumber.type = ? AND cap.fromAsset = ? and (cap.toPower is not null OR toPower <> '')",["Power",asset])
+		   def assetPowerCabling = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.fromConnectorNumber.type = ? AND cap.fromAsset = ? ",["Power",asset])
 		   def powerConnectors = assetPowerCabling.size()
+		   def powerConnectorsAssigned = assetPowerCabling.findAll{it.toPower != null && it.toPower != '' }.size()
+		   
 		   def powerUse = asset.model?.powerUse ? asset.model?.powerUse : 0
-		   if(powerConnectors){
-			   def powerUseForConnector = powerUse ? powerUse / powerConnectors : 0
+		   if(powerConnectorsAssigned){
+			   def powerUseForConnector = powerUse ? powerUse / powerConnectorsAssigned : 0
 			   assetPowerCabling.each{ cables ->
 				   if(cables.toPower){
 					   switch(cables.toPower){
@@ -279,7 +281,6 @@ class RoomController {
 						   break;
 						   case "C": powerC += powerUseForConnector
 						   break;
-						   powerX += powerUseForConnector
 					   }
 				   }
 			   }
@@ -287,7 +288,23 @@ class RoomController {
 		   		powerX += powerUse
 		   }
 	   }
-	   render "<table border=0><tr><td colspan=4 class='powertable_L'><b>Rack : ${rack.tag}</b></td></tr><tr><td class='powertable_L'>Power (w)</td><td class='powertable_C'>A</td><td class='powertable_C'>B</td><td class='powertable_C'>C</td><td class='powertable_C'>TBD</td></tr><tr><td class='powertable_R'>&nbsp;In Rack:</td><td class='powertable_R'>${rack.powerA}</td><td class='powertable_R'>${rack.powerB}</td><td class='powertable_R'>${rack.powerC}</td><td class='powertable_R'>&nbsp;</td></tr><tr><td class='powertable_R'>&nbsp;Used:</td><td class='powertable_R'>${powerA}</td><td class='powertable_R'>${powerB}</td><td class='powertable_R'>${powerC}</td><td class='powertable_R'>${powerX}</td></tr></table>"
+	   powerA = Math.round(powerA) 
+	   powerB = Math.round(powerB) 
+	   powerC = Math.round(powerC) 
+	   powerX = Math.round(powerX) 
+	   
+	   def redTBD = false
+	   if((powerA +powerB+ powerC+ powerX) > (rack.powerA+rack.powerB+rack.powerC)){
+		   redTBD = true
+	   }
+	   def op="<table border=0><tr><td colspan=4 class='powertable_L'><b>Rack : ${rack.tag}</b></td></tr><tr><td class='powertable_L'>Power (w)</td>"
+		   op+="<td style='background:${ powerA>rack.powerA ? 'red':''};' class='powertable_C'>A</td>"
+		   op+="<td style='background:${ powerB>rack.powerB ? 'red':''};' class='powertable_C'>B</td>"
+		   op+="<td style='background:${ powerC>rack.powerC ? 'red':''};' class='powertable_C'>C</td>"
+		   op+="<td style='background:${redTBD ? 'red':''};' class='powertable_C'>TBD</td>"
+		   op+="</tr><tr><td class='powertable_R'>&nbsp;In Rack:</td><td class='powertable_R'>${rack.powerA}</td><td class='powertable_R'>${rack.powerB}</td><td class='powertable_R'>${rack.powerC}</td><td class='powertable_R'>&nbsp;</td></tr><tr><td class='powertable_R'>&nbsp;Used:</td><td class='powertable_R'>${powerA}</td><td class='powertable_R'>${powerB}</td><td class='powertable_R'>${powerC}</td><td class='powertable_R'>${powerX}</td></tr></table>"
+		   
+		render  op
    }
    /**
     *  Return assets list as html row format to assign racks

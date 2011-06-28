@@ -113,9 +113,9 @@
 				<td><input type="text" id="roomXId_${rack}" name="roomX_${rack}" value="" size="3" readonly="readonly" /></td>
 				<td><input type="text" id="roomYId_${rack}" name="roomY_${rack}" value="" size="3" readonly="readonly" /></td>
 				<td><g:select name="front_${rack}" from="${Rack.constraints.front.inList}"></g:select></td>
-				<td><input type="text" name="powerA_${rack}" value=""  size="3" /></td>
-				<td><input type="text" name="powerB_${rack}" value="" size="3" /></td>
-				<td><input type="text" name="powerC_${rack}" value="" size="3" /></td>
+				<td><input type="text" name="powerA_${rack}" value="${new Rack().powerA}"  size="3" /></td>
+				<td><input type="text" name="powerB_${rack}" value="${new Rack().powerB}" size="3" /></td>
+				<td><input type="text" name="powerC_${rack}" value="${new Rack().powerC}" size="3" /></td>
 				<td><g:select name="rackType_${rack}" from="${Rack.constraints.rackType.inList}" value="Rack"></g:select></td>
 				<td>0&nbsp;&nbsp;&nbsp;<a href="javascript:verifyAndDeleteRacks(${rack})"><span class="clear_filter"><u>X</u></span></a></td>
 			</tr>
