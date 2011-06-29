@@ -277,18 +277,11 @@ class RackLayoutsController {
 		def rowspan = 1
 		def cssClass = "empty"
 		def rackStyle = ""
-		def rackStyleUpos = "rack_upos"
 		asset.each {
 			def row = new StringBuffer("<tr>")
-			if(it.cssClass=="rack_current" || it.cssClass=="rack_error" ){
-				it.rackStyleUpos=it.cssClass
-				} else {
-				it.rackStyleUpos="rack_upos"
-			}	
 			if(it.asset) {
 				rowspan = it.asset?.rowspan != 0 ? it.asset?.rowspan : 1
 				rackStyle = it.rackStyle
-				rackStyleUpos = it.rackStyleUpos
 				def location = it.source
 				def assetEntity = it.asset?.assetEntity
 				def assetTagsList = (it.asset?.assetTag).split("<br/>")
@@ -353,22 +346,17 @@ class RackLayoutsController {
 						}
 					}
 				}
-				if(it.cssClass=="rack_current" || it.cssClass=="rack_error" ){
-					it.rackStyleUpos=it.cssClass
-					} else {
-					it.rackStyleUpos="rack_upos"
-				}	
 				if(backView) {
 					if(cabling != "" && it.cssClass != "rack_error"){
 						def assetCables = AssetCableMap.findByFromAsset(it.asset?.assetEntity)
 						if( hasBlades && showCabling != 'on'){
-							row.append("<td class='${it.rackStyleUpos}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
+							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
 							if ( assetCables )
 								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'>view</a></td>")
 							else
 								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>&nbsp;</td>")
 						} else {
-							row.append("<td class='${it.rackStyleUpos}'>${it.rack}</td><td rowspan='${rowspan}' colspan='3' class='${it.cssClass}'>")
+							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' colspan='3' class='${it.cssClass}'>")
 							row.append("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;'>${assetTag}</td>")
 							
 							if(includeBundleName)
@@ -384,9 +372,9 @@ class RackLayoutsController {
 						}
 					} else {
 						if( hasBlades && showCabling != 'on'){
-							row.append("<td class='${it.rackStyleUpos}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
+							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
 						} else {
-							row.append("<td class='${it.rackStyleUpos}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}${cabling}</td>")
+							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}${cabling}</td>")
 							if(includeBundleName)
 								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${moveBundle}</td>")
 							else
@@ -405,9 +393,9 @@ class RackLayoutsController {
 					}
 				} else {
 					if( hasBlades ){
-						row.append("<td class='${it.rackStyleUpos}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
+						row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
 					} else if(cabling != ""){
-						row.append("<td class='${it.rackStyleUpos}'>${it.rack}</td><td rowspan='${rowspan}' colspan='2' class='${it.cssClass}'>")
+						row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' colspan='2' class='${it.cssClass}'>")
 						row.append("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;'>${assetTag}</td>")
 						if(includeBundleName)
 							row.append("<td style='border:0;'>${moveBundle}</td></tr>")
@@ -416,7 +404,7 @@ class RackLayoutsController {
 						row.append("<tr><td colspan='2' style='border:0;'>${cabling}</td></tr></table></td>")
 						
 					} else {
-						row.append("<td class='${it.rackStyleUpos}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
+						row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
 						if(includeBundleName)
 							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${moveBundle}</td>")
 						else
@@ -426,7 +414,7 @@ class RackLayoutsController {
 			} else if(rowspan <= 1) {
 				rowspan = 1
 				rackStyle = it.rackStyle
-				row.append("<td class='${it.rackStyleUpos}'>${it.rack}</td><td rowspan=1 class=${it.cssClass}>")
+				row.append("<td class='empty'>${it.rack}</td><td rowspan=1 class=${it.cssClass}>")
 				if(isAdmin && hideIcons == "on"){
 				row.append("""<img src="../i/rack_add.png" onclick=\"createDialog('${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')\"/>&nbsp;
 								<img src="../i/rack_list.png" onclick=\"listDialog('${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')\"/>&nbsp;</td><td>&nbsp;</td>""")
@@ -437,7 +425,7 @@ class RackLayoutsController {
 					row.append("<td>&nbsp;</td>")
 				
 			} else {
-				row.append("<td class='${it.rackStyleUpos}'>${it.rack}</td>")
+				row.append("<td class='${rackStyle}'>${it.rack}</td>")
 				rowspan--
 			}
 			// Remove right U-position number 
