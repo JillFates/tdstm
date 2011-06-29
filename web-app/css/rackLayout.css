@@ -35,29 +35,29 @@ br.page-break-after {
 	padding:0px
 }
 .room_CRAC_L {
-	width:100px;
-	height:60px;
+	width:60px;
+	height:100px;
 	border: 1px solid black;
 	background-color:white;
 	position:absolute;
 }
 .room_CRAC_R {
+	width:60px;
+	height:100px;
+	border: 1px solid black;
+	background-color:white;
+	position:absolute;
+}
+.room_CRAC_T {
 	width:100px;
 	height:60px;
 	border: 1px solid black;
 	background-color:white;
 	position:absolute;
 }
-.room_CRAC_T {
-	width:60px;
-	height:100px;
-	border: 1px solid black;
-	background-color:white;
-	position:absolute;
-}
 .room_CRAC_B {
-	width:60px;
-	height:100px;
+	width:100px;
+	height:60px;
 	border: 1px solid black;
 	background-color:white;
 	position:absolute;
@@ -84,8 +84,8 @@ br.page-break-after {
 	position:absolute;
 }
 .room_DoorR_T {
-	width:30px;
-	height:60px;
+	width:60px;
+	height:30px;
 	border: 0px solid black;
 	background-color: transparent;
 	background-image: url(/tdstm/i/DoorR_T.gif);
@@ -94,8 +94,8 @@ br.page-break-after {
 	position:absolute;
 }
 .room_DoorR_B {
-	width:30px;
-	height:60px;
+	width:60px;
+	height:30px;
 	border: 0px solid black;
 	background-color: transparent;
 	background-image: url(/tdstm/i/DoorR_B.gif);
@@ -125,8 +125,8 @@ br.page-break-after {
 	position:absolute;
 }
 .room_DoorL_T {
-	width:30px;
-	height:60px;
+	width:60px;
+	height:30px;
 	border: 0px solid black;
 	background-color: transparent;
 	background-image: url(/tdstm/i/DoorL_T.gif);
@@ -135,8 +135,8 @@ br.page-break-after {
 	position:absolute;
 }
 .room_DoorL_B {
-	width:30px;
-	height:60px;
+	width:60px;
+	height:30px;
 	border: 0px solid black;
 	background-color: transparent;
 	background-image: url(/tdstm/i/DoorL_B.gif);
