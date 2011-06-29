@@ -310,15 +310,32 @@ class RoomController {
     *  Return assets list as html row format to assign racks
     */
    def getAssetsListToAddRack = {
+	   def order = params.order ? params.order : 'asc'
 	   def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 	   def source = params.source
 	   def assetEntityList = null
-	   if(source == '1'){
-		   	assetEntityList = AssetEntity.findAll("from AssetEntity where rackSource is null and project = ${projectId} and assetType != 'Blade'")
+	   def sort = params.sort ?  params.sort : 'assetName'
+	   def assign = params.assign
+	   if(assign != 'all') {
+		   if(source == '1'){
+			   	assetEntityList = AssetEntity.findAll("from AssetEntity where rackSource is null and project = ${projectId} and assetType != 'Blade' order by ${sort} ${order}")
+		   } else {
+		   		assetEntityList = AssetEntity.findAll("from AssetEntity where rackTarget is null and project = ${projectId} and assetType != 'Blade' order by ${sort} ${order}")
+		   }
 	   } else {
-	   		assetEntityList = AssetEntity.findAll("from AssetEntity where rackTarget is null and project = ${projectId} and assetType != 'Blade'")
+	   		assetEntityList = AssetEntity.findAll("from AssetEntity where project = ${projectId} and assetType != 'Blade' order by ${sort} ${order}")
 	   }
+	   order = order == 'asc' ? 'desc' : 'asc'
 	   def stringToReturn = new StringBuffer()
+	   stringToReturn.append("""<thead>
+									<tr>
+									<th class="sortable ${sort=='assetName' ? 'sorted '+order :''}"><a href="javascript:listDialog('${assign}', 'assetName','${order}','${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">Asset Name</a></th>
+									<th class="sortable ${sort=='assetTag' ? 'sorted '+order :''}"><a href="javascript:listDialog('${assign}', 'assetTag','${order}','${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">Asset Tag</a></th>
+									<th class="sortable ${sort=='model' ? 'sorted '+order :''}"><a href="javascript:listDialog('${assign}', 'model','${order}','${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">Model</a></th>
+									</tr>
+								</thead>
+								<tbody class="tbody" >
+								</tbody>""")
 	   if(assetEntityList.size() > 0){
 		   assetEntityList.eachWithIndex{ obj, i ->
 			   stringToReturn.append("""<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="editDialog( ${obj.id},'${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">

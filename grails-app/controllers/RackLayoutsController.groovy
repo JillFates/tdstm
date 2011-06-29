@@ -414,10 +414,14 @@ class RackLayoutsController {
 			} else if(rowspan <= 1) {
 				rowspan = 1
 				rackStyle = it.rackStyle
-				row.append("<td class='empty'>${it.rack}</td><td rowspan=1 class=${it.cssClass}>")
+				row.append("<td class='empty' nowrap>${it.rack}</td><td rowspan=1 class=${it.cssClass}>")
 				if(isAdmin && hideIcons == "on"){
-				row.append("""<img src="../i/rack_add.png" onclick=\"createDialog('${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')\"/>&nbsp;
-								<img src="../i/rack_list.png" onclick=\"listDialog('${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')\"/>&nbsp;</td><td>&nbsp;</td>""")
+				row.append("""<div class="rack_menu"><img src="../i/rack_add.png">
+							<ul>
+								<li><a href="javascript:createDialog('${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Create asset  </a></li>
+								<li><a href="javascript:listDialog('','','asc','${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Assign asset </a></li>
+								<li><a href="javascript:listDialog('all','','asc','${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Reassign asset </a></li>
+							</ul></img></div>&nbsp;</td><td>&nbsp;</td>""")
 				} else { 
 					row.append("&nbsp;</td><td>&nbsp;</td>")
 				}
@@ -490,8 +494,14 @@ class RackLayoutsController {
 						bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px' title='${tag.replace('<br/>','')}'>${taglabel}</td>"
 				} else {
 					if(isAdmin && hideIcons == 'on'){
-						bladeTable += """<td class='emptyBlade' style='height:${tdHeight}px'><img src="../i/rack_add.png" onclick=\"createBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}')\"/>&nbsp;
-								<img src="../i/rack_list.png" onclick=\"listBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}')\"/></td>"""
+						bladeTable += """<td class='emptyBlade' style='height:${tdHeight}px'>
+									<div class="rack_menu"><img src="../i/rack_add.png"/>
+										<ul>
+											<li><a href="javascript:createBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}')">Create asset  </a></li>
+											<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}')">Assign asset </a></li>
+											<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}')">Reassign asset </a></li>
+										</ul>
+									</div></td>"""
 					} else {
 						bladeTable += "<td class='emptyBlade' style='height:${tdHeight}px'>&nbsp;</td>"
 					}

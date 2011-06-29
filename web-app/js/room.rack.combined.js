@@ -18,6 +18,7 @@ function createDialog(source,rack,roomName,location,position){
 	$("#createDialog").dialog('option', 'width', 950)
     $("#createDialog").dialog('option', 'position', ['center','top']);
     $("#editDialog").dialog("close")
+    $("#listDialog").dialog("close")
     $("#createDialog").dialog("open")
     $("#attributeSetId").val(1)
     new Ajax.Request('../assetEntity/getAttributes?attribSet='+$("#attributeSetId").val(),{asynchronous:true,evalScripts:true,onComplete:function(e){generateCreateForm(e);updateAssetInfo(source,rack,roomName,location,position);}})
@@ -46,10 +47,10 @@ function validateAssetEntity(formname) {
 		return false;
 	}
 }
-function listDialog(source,rack,roomName,location,position){
+function listDialog(assign,sort,order,source,rack,roomName,location,position){
 	jQuery.ajax({
 		url: "../room/getAssetsListToAddRack",
-		data: "source="+source+"&rack="+rack+"&roomName="+roomName+"&location="+location+"&position="+position,
+		data: "source="+source+"&rack="+rack+"&roomName="+roomName+"&location="+location+"&position="+position+"&sort="+sort+"&order="+order+"&assign="+assign,
 		type:'POST',
 		success: function(data) {
 			if(data != null && data != ""){
@@ -86,6 +87,7 @@ function createBladeDialog(source,blade,position){
 	$("#createDialog").dialog('option', 'width', 950)
     $("#createDialog").dialog('option', 'position', ['center','top']);
     $("#editDialog").dialog("close")
+    $("#listDialog").dialog("close")
     $("#createDialog").dialog("open")
     $("#attributeSetId").val(1)
     new Ajax.Request('../assetEntity/getAttributes?attribSet='+$("#attributeSetId").val(),{asynchronous:true,evalScripts:true,onComplete:function(e){generateCreateForm(e);updateAssetBladeInfo(source,blade,position);}})

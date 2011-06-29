@@ -121,16 +121,7 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 </div>
 <div id="listDialog" title="Asset List" style="display: none;">
 		<div class="dialog" >
-			<table>
-			<thead>
-				<tr>
-				<th>Asset Name</th>
-				<th>Asset Tag</th>
-				<th>Model</th>
-				</tr>
-			</thead>
-			<tbody class="tbody" id="listDiv">
-			</tbody>
+			<table id="listDiv">
 			</table>
 		</div>
 </div>
