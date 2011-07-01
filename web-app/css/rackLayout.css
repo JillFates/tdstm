@@ -178,12 +178,18 @@ table.rack_elevation .rack_current a{
 }
 table.rack_elevation .rack_past {
 	background: #e7e7e7;
+	font-weight: bold;
+	font-size: 0.9em;
+	border: 1px solid grey;
 }
 table.rack_elevation .rack_past a{
 	color: black;
 }
 table.rack_elevation .rack_future {
 	background: #F7D375;
+	font-weight: bold;
+	font-size: 0.9em;
+	border: 1px solid grey;
 }
 table.rack_elevation .rack_future {
 	color: black;

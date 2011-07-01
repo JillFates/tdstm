@@ -428,7 +428,7 @@ class RackLayoutsController {
 				rackStyle = it.rackStyle
 				row.append("<td class='empty' nowrap>${it.rack}</td><td rowspan=1 class=${it.cssClass}>")
 				if(isAdmin && hideIcons == "on"){
-				row.append("""<div class="rack_menu"><img src="../i/rack_add.png">
+				row.append("""<div class="rack_menu"><img src="../i/rack_add2.png">
 							<ul>
 								<li><a href="javascript:createDialog('${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Create asset  </a></li>
 								<li><a href="javascript:listDialog('','','asc','${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Assign asset </a></li>
@@ -507,7 +507,7 @@ class RackLayoutsController {
 				} else {
 					if(isAdmin && hideIcons == 'on'){
 						bladeTable += """<td class='emptyBlade' style='height:${tdHeight}px'>
-									<div class="rack_menu"><img src="../i/rack_add.png"/>
+									<div class="rack_menu"><img src="../i/rack_add2.png"/>
 										<ul>
 											<li><a href="javascript:createBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}')">Create asset  </a></li>
 											<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}')">Assign asset </a></li>
