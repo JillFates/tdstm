@@ -99,6 +99,7 @@ class RackLayoutsController {
 			def racks = sourceRacks + targetRacks
 			if(racks.size() == 0 && rackId){
 				racks = Rack.findAllById(rackId)
+				moveBundles = []
 				if(params.moveBundleId){
 					moveBundles = MoveBundle.findAllById(params.moveBundleId)
 					bundleId = [params.moveBundleId]
@@ -221,7 +222,7 @@ class RackLayoutsController {
 							} else {
 								cssClass = "rack_future"
 							}
-						} else if(rackId) {
+						} else if(rackId && !moveBundles?.id?.contains(assetEnity.assetEntity?.moveBundle?.id) ) {
 							def startTime = assetEnity.assetEntity?.moveBundle?.startTime ? assetEnity.assetEntity?.moveBundle?.startTime.getTime() : 0
 							if(startTime < currentTime){
 								cssClass = 'rack_past'
