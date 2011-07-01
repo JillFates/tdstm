@@ -533,7 +533,7 @@ class AssetEntityAttributeLoaderService {
 													fromConnectorNumber : it,
 													status : it.status
 													)
-				if(assetEntity?.rackTarget && connector.type == "Power" && connector.label?.toLowerCase() == 'pwr1'){
+				if(assetEntity?.rackTarget && it.type == "Power" && it.label?.toLowerCase() == 'pwr1'){
 					assetCableMap.toAsset = assetEntity
 					assetCableMap.toAssetRack = assetEntity?.rackTarget?.tag
 					assetCableMap.toAssetUposition = 0
@@ -569,7 +569,7 @@ class AssetEntityAttributeLoaderService {
  													fromConnectorNumber : it,
  													status : it.status
  													)
-				 if(assetEntity?.rackTarget && connector.type == "Power" && connector.label?.toLowerCase() == 'pwr1'){
+				 if(assetEntity?.rackTarget && it.type == "Power" && it.label?.toLowerCase() == 'pwr1'){
 					 assetCableMap.toAsset = assetEntity
 					 assetCableMap.toAssetRack = assetEntity?.rackTarget?.tag
 					 assetCableMap.toAssetUposition = 0
