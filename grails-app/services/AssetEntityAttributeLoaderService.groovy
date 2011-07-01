@@ -471,10 +471,26 @@ class AssetEntityAttributeLoaderService {
 						def assetType = dtvAssetType?.correctedValue ? dtvAssetType?.correctedValue : dtvAssetType?.importValue
 						assetType = assetType ? assetType : "Server"
 						modelInstance = new Model( modelName:modelValue, manufacturer:manufacturerInstance, assetType:assetType, sourceTDS : 0 )
-						if ( !modelInstance.validate() || !modelInstance.save() ) {
+						if ( !modelInstance.validate() || !modelInstance.save(flush:true) ) {
 							def etext = "Unable to create modelInstance" +
 			                GormUtil.allErrorsString( modelInstance )
 							println etext
+						} else {
+							def powerConnector = new ModelConnector(model : modelInstance,
+																	connector : "Pwr1",
+																	label : "Pwr1",
+																	type : "Power",
+																	labelPosition : "Right",
+																	connectorPosX : 0,
+																	connectorPosY : 0,
+																	status: "missing"
+																	)
+								
+							if (!powerConnector.save(flush: true)){
+							 def etext = "Unable to create Power Connectors for ${modelInstance}" +
+									 GormUtil.allErrorsString( powerConnector )
+									 println etext
+							}
 						}
 					}
 				}
@@ -517,6 +533,13 @@ class AssetEntityAttributeLoaderService {
 													fromConnectorNumber : it,
 													status : it.status
 													)
+				if(assetEntity?.rackTarget && connector.type == "Power" && connector.label?.toLowerCase() == 'pwr1'){
+					assetCableMap.toAsset = assetEntity
+					assetCableMap.toAssetRack = assetEntity?.rackTarget?.tag
+					assetCableMap.toAssetUposition = 0
+					assetCableMap.toConnectorNumber = null
+					assetCableMap.toPower = "A"
+				}
 				if ( !assetCableMap.validate() || !assetCableMap.save() ) {
 					def etext = "Unable to create assetCableMap" +
 	                GormUtil.allErrorsString( assetCableMap )
@@ -546,6 +569,13 @@ class AssetEntityAttributeLoaderService {
  													fromConnectorNumber : it,
  													status : it.status
  													)
+				 if(assetEntity?.rackTarget && connector.type == "Power" && connector.label?.toLowerCase() == 'pwr1'){
+					 assetCableMap.toAsset = assetEntity
+					 assetCableMap.toAssetRack = assetEntity?.rackTarget?.tag
+					 assetCableMap.toAssetUposition = 0
+					 assetCableMap.toConnectorNumber = null
+					 assetCableMap.toPower = "A"
+				 }
  				if ( !assetCableMap.validate() || !assetCableMap.save() ) {
  					def etext = "Unable to create assetCableMap" +
  	                GormUtil.allErrorsString( assetCableMap )
