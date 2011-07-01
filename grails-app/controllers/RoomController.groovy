@@ -10,7 +10,7 @@ class RoomController {
     }
 
     def list = {
-        params.max = Math.min(params.max ? params.int('max') : 20, 100)
+        params.max = Math.min(params.max ? params.int('max') : 100, 100)
 		def projectId = params.projectId
     	if(projectId == null || projectId == ""){
         	projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ

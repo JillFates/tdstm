@@ -28,7 +28,7 @@
 				<div style="width: 150px"><label><b>Highlight:</b></label><br /><br />
 				<label><b>Bundle</b></label><br />
 					<g:select id="bundleId" name="moveBundle" from="${moveBundleList}" value="${moveBundleId}" optionKey="id" optionValue="name" noSelection="${['':'Select Bundle...']}" 
-						onchange="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+this.value+\'&source=\'+true+\'&target=\'+true', onComplete:'openRoomView(e)')}" />
+						onchange="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+this.value', onComplete:'openRoomView(e)')}" />
 				</div>
 				</td>
 				<td class="buttonR">
@@ -74,11 +74,11 @@
 		</table>
 			<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack" status='i'>
 				<g:if test="${rack.rackType == 'Rack'}">
-					<div style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'rack_highlight' : source=='true' && rack.source == 1 ? 'rack_highlight' : target == 'true' && rack.source == 0 ? 'rack_highlight' : 'rack_highlight_no' }_${rack.front}">
-						<g:remoteLink controller="rackLayouts" action="save" params="[rackId:rack.id,backView:'off',showCabling:'off',otherBundle:'on',hideIcons:'on']" onSuccess="updateRackPower(${rack.id})" onComplete="jQuery('#rackLayout').html(e.responseText);">
+					<g:remoteLink controller="rackLayouts" action="save" params="[moveBundleId:moveBundleId,rackId:rack.id,backView:'off',showCabling:'off',otherBundle:'on',bundleName:'on',hideIcons:'on']" onSuccess="updateRackPower(${rack.id})" onComplete="jQuery('#rackLayout').html(e.responseText);">
+					<div style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'rack_highlight' : source=='true' && rack.source == 1 ? 'rack_highlight' : target == 'true' && rack.source == 0 ? 'rack_highlight' : rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_L' }">
 						<div id="rack_div_${i}" class="racktop_label" onclick="$('#selectedRackId').val(this.id)">${rack.tag}</div>
-						</g:remoteLink>
 					</div>
+					</g:remoteLink>
 				</g:if>
 				<g:else>
 					<div style="position:absolute;top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="room_${rack.rackType}_${rack.front}">

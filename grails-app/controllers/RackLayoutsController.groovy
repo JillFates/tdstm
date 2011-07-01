@@ -99,6 +99,10 @@ class RackLayoutsController {
 			def racks = sourceRacks + targetRacks
 			if(racks.size() == 0 && rackId){
 				racks = Rack.findAllById(rackId)
+				if(params.moveBundleId){
+					moveBundles = MoveBundle.findAllById(params.moveBundleId)
+					bundleId = [params.moveBundleId]
+				}
 			}
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ	
 			racks.each { rack ->
@@ -206,18 +210,25 @@ class RackLayoutsController {
 	            		assetDetails<<[asset:assetEnitiesAtPosition[0], rack:i, cssClass:cssClass, rackStyle:rackStyle, source:rack.source ]
 					} else if(assetEnitiesAtPosition.size() == 1) {
 						def assetEnity = assetEnitiesAtPosition[0]
+						def currentTime = GormUtil.convertInToGMT( "now", tzId ).getTime()
 						if(assetEnity.overlapError) {
 							cssClass = 'rack_error'
 							rackStyle = 'rack_error'
 						} else if(bundleId && !moveBundles?.id?.contains(assetEnity.assetEntity?.moveBundle?.id) ) {
-							def currentTime = GormUtil.convertInToGMT( "now", tzId ).getTime()
 							def startTime = assetEnity.assetEntity?.moveBundle?.startTime ? assetEnity.assetEntity?.moveBundle?.startTime.getTime() : 0
 							if(startTime < currentTime){
 								cssClass = 'rack_past'
 							} else {
 								cssClass = "rack_future"
 							}
-						} else {
+						} else if(rackId) {
+							def startTime = assetEnity.assetEntity?.moveBundle?.startTime ? assetEnity.assetEntity?.moveBundle?.startTime.getTime() : 0
+							if(startTime < currentTime){
+								cssClass = 'rack_past'
+							} else {
+								cssClass = "rack_future"
+							}
+						} else  {
 							cssClass = 'rack_current'
 							rackStyle = 'rack_current'
 						}

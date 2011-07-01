@@ -571,8 +571,8 @@ function initializeConnectors( usize, type ){
 function initializeRacksInRoom( racks, width, height ){
 	var height = $("#room_layout_table tr").length 
 	var width = $("#room_layout_table tr td").length / height
-	height = height*40 - 42
-	width = width*40 - 40
+	height = height*40 - 103
+	width = width*40 - 75
 	for(i=0;i<racks.length;i++){
 		var rack = document.getElementById("rack_"+racks[i]);
 		if(rack){

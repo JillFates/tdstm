@@ -51,7 +51,7 @@
 		</table>
 		<g:each in="${rackInstanceList}" var="rack">
 			<g:if test="${rack.rackType == 'Rack'}">
-				<div id="rack_${rack.id}" style="top:${rack.roomY}px;left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'rack_highlight' : source=='true' && rack.source == 1 ? 'rack_highlight' : target == 'true' && rack.source == 0 ? 'rack_highlight' : 'rack_highlight_no' }_${rack.front}">
+				<div id="rack_${rack.id}" style="top:${rack.roomY}px;left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'rack_highlight' : source=='true' && rack.source == 1 ? 'rack_highlight' : target == 'true' && rack.source == 0 ? 'rack_highlight' : rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_L' }">
 					<a href="#" onclick="$('#room_layout').css('width',700);$('#rackShowRow_'+${rack.id}).hide();$('#rackEditRow_'+${rack.id}).show()">
 					<span id="rackLabel_${rack.id}">${rack.tag}</span>
 					</a>
@@ -66,7 +66,7 @@
 			</g:else>
 		</g:each>
 		<g:each in="${newRacks}" var="rack">
-			<div id="rack_${rack}" style="top:0px;left:0px;display: none;" onmouseout="updateXYPositions(this.id)" class="rack_highlight_no" >
+			<div id="rack_${rack}" style="top:0px;left:0px;display: none;" onmouseout="updateXYPositions(this.id)" class="rack_highlight_no_L" >
 				<span id="rackLabel_${rack}">&nbsp;</span>
 			</div>
 		</g:each>
@@ -92,11 +92,11 @@
 				</td>
 				<td><input type="text" id="roomXId_${rack.id}" name="roomX_${rack.id}" value="${rack.roomX}" size="3" readonly="readonly" /></td>
 				<td><input type="text" id="roomYId_${rack.id}" name="roomY_${rack.id}" value="${rack.roomY}" size="3" readonly="readonly" /></td>
-				<td><g:select name="front_${rack.id}" from="${Rack.constraints.front.inList}" value="${rack.front}"></g:select></td>
+				<td><g:select id="frontId_${rack.id}" name="front_${rack.id}" from="${Rack.constraints.front.inList}" value="${rack.front}" onchange="updateRackStyle(${rack.id}, this.value, jQuery('#rackTypeId_'+${rack.id}).val())"></g:select></td>
 				<td><input type="text" name="powerA_${rack.id}" value="${rack.powerA}"  size="3" /></td>
 				<td><input type="text" name="powerB_${rack.id}" value="${rack.powerB}" size="3" /></td>
 				<td><input type="text" name="powerC_${rack.id}" value="${rack.powerC}" size="3" /></td>
-				<td><g:select name="rackType_${rack.id}" from="${Rack.constraints.rackType.inList}" value="${rack.rackType}"></g:select></td>
+				<td><g:select id="rackTypeId_${rack.id}" name="rackType_${rack.id}" from="${Rack.constraints.rackType.inList}" value="${rack.rackType}" onchange="updateRackStyle(${rack.id}, jQuery('#frontId_'+${rack.id}).val(), this.value)"></g:select></td>
 				<td>${rack.assets.size()}&nbsp;&nbsp;&nbsp;
 				<g:if test="${rack.assets.size() == 0}">
 					<a href="javascript:verifyAndDeleteRacks(${rack.id})"><span class="clear_filter"><u>X</u></span></a>
@@ -112,11 +112,11 @@
 				</td>
 				<td><input type="text" id="roomXId_${rack}" name="roomX_${rack}" value="" size="3" readonly="readonly" /></td>
 				<td><input type="text" id="roomYId_${rack}" name="roomY_${rack}" value="" size="3" readonly="readonly" /></td>
-				<td><g:select name="front_${rack}" from="${Rack.constraints.front.inList}"></g:select></td>
+				<td><g:select id="frontId_${rack}" name="front_${rack}" from="${Rack.constraints.front.inList}" onchange="updateRackStyle(${rack}, this.value, jQuery('#rackTypeId_'+${rack}).val())"></g:select></td>
 				<td><input type="text" name="powerA_${rack}" value="${new Rack().powerA}"  size="3" /></td>
 				<td><input type="text" name="powerB_${rack}" value="${new Rack().powerB}" size="3" /></td>
 				<td><input type="text" name="powerC_${rack}" value="${new Rack().powerC}" size="3" /></td>
-				<td><g:select name="rackType_${rack}" from="${Rack.constraints.rackType.inList}" value="Rack"></g:select></td>
+				<td><g:select id="rackTypeId_${rack}" name="rackType_${rack}" from="${Rack.constraints.rackType.inList}" value="Rack" onchange="updateRackStyle(${rack}, jQuery('#frontId_'+${rack}).val(), this.value)"></g:select></td>
 				<td>0&nbsp;&nbsp;&nbsp;<a href="javascript:verifyAndDeleteRacks(${rack})"><span class="clear_filter"><u>X</u></span></a></td>
 			</tr>
 		</g:each>
@@ -183,6 +183,14 @@ function changeLabel(id,value){
 }
 function changeRackType(id,value){
 	$("#rack_"+id).html(value)
+}
+function updateRackStyle(id, frontValue, rackTypeValue){
+	$("#rack_"+id).removeAttr("class")
+	if(rackTypeValue == "Rack"){
+		$("#rack_"+id).addClass("rack_highlight_no_"+frontValue)
+	} else {
+		$("#rack_"+id).addClass("room_"+rackTypeValue+"_"+frontValue )
+	}
 }
 </script>
 </body>
