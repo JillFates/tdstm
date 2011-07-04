@@ -36,8 +36,8 @@
 			</tbody>
 		</table>
 	</div>
-<div id="roomLayout" style="width: 1100px; overflow-x: auto; border: 2px solid black">
-	<div id="room_layout" style="position:relative;width: 700px;height: 800px;overflow-x: auto; border: 0px solid black">
+<div id="roomLayout" style="width: auto; overflow-x: auto; border: 2px solid black">
+	<div id="room_layout" style="position:relative;width: 700px;height: 800px;overflow-x: auto; border: 0px solid black;float: left;">
 		<table cellpadding="0" cellspacing="0" style="width:auto;height:auto;border:0px" id="room_layout_table">
 			<g:set var="numrows" value="${1}" />
 			<g:while test="${numrows < roomInstance.roomDepth / 2 }">
@@ -52,16 +52,12 @@
 		<g:each in="${rackInstanceList}" var="rack">
 			<g:if test="${rack.rackType == 'Rack'}">
 				<div id="rack_${rack.id}" style="top:${rack.roomY}px;left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'rack_highlight' : source=='true' && rack.source == 1 ? 'rack_highlight' : target == 'true' && rack.source == 0 ? 'rack_highlight' : rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_L' }">
-					<a href="#" onclick="$('#room_layout').css('width',700);$('#rackShowRow_'+${rack.id}).hide();$('#rackEditRow_'+${rack.id}).show()">
 					<span id="rackLabel_${rack.id}">${rack.tag}</span>
-					</a>
 				</div>
 			</g:if>
 			<g:else>
 				<div id="rack_${rack.id}" style="top:${rack.roomY}px;left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="room_${rack.rackType}_${rack.front}">
-					<a href="#" onclick="$('#room_layout').css('width',700);$('#rackShowRow_'+${rack.id}).hide();$('#rackEditRow_'+${rack.id}).show()">
-					<span id="rackLabel_${rack.id}">${rack.tag}</span>
-					</a>
+					<span id="rackLabel_${rack.id}" >${rack.tag}</span>
 				</div>
 			</g:else>
 		</g:each>
@@ -71,7 +67,7 @@
 			</div>
 		</g:each>
 	</div>
-	<div style="position:relative;top:-800px;float: right; margin-left: 10px;" id="rackLayout">
+	<div style="position:relative;float: right;top:-800px; margin-left: 10px;" id="rackLayout">
 	<table border="0">
 		<tr>
 			<th>Rack<input type="hidden" id="rackCount" name="rackCount" value="50000"></th>
@@ -151,8 +147,35 @@ function updateXYPositions(id){
 	var rackId = id.split("_")[1]
 	var x = $("#"+id).css("left")
 	var y = $("#"+id).css("top")
-	$("#roomXId_"+rackId).val(x.substring(0,x.indexOf('px')))
-	$("#roomYId_"+rackId).val(y.substring(0,y.indexOf('px')))
+	x = x.substring(0,x.indexOf('px'))
+	y = y.substring(0,y.indexOf('px'))
+	var top = $("#room_layout_table").css("height")
+	var left = $("#room_layout_table").css("width")
+	top = top.substring(0,top.indexOf('px'))
+	left = left.substring(0,left.indexOf('px'))	
+	var cssClass = $("#"+id).attr("class")
+	if(cssClass == "room_CRAC_L" || cssClass == "room_CRAC_R"){
+		if(parseInt(top) < parseInt(y) + 102){
+			y = parseInt(top) - 102;
+			$("#"+id).css("top",y+"px")
+		}
+	} else if(cssClass == "room_CRAC_T" || cssClass == "room_CRAC_B"){
+		if(parseInt(left) < parseInt(x) + 100){
+			x = parseInt(left) - 105;
+			$("#"+id).css("left",x+"px")
+		}
+	} else if(cssClass == "room_DoorL_L" || cssClass == "room_DoorL_R" || cssClass == "room_DoorR_L" || cssClass == "room_DoorR_R"){
+		if(parseInt(left) < parseInt(x) + 100){
+			x = parseInt(left) - 60;
+			$("#"+id).css("left",x+"px")
+		}
+		if(parseInt(top) < parseInt(y) + 102){
+			y = parseInt(top) - 60;
+			$("#"+id).css("top",y+"px")
+		}
+	}
+	$("#roomXId_"+rackId).val(x)
+	$("#roomYId_"+rackId).val(y)
 }
 function verifyAndDeleteRacks(id){
 	jQuery.ajax({
@@ -191,6 +214,7 @@ function updateRackStyle(id, frontValue, rackTypeValue){
 	} else {
 		$("#rack_"+id).addClass("room_"+rackTypeValue+"_"+frontValue )
 	}
+	updateXYPositions("rack_"+id)
 }
 </script>
 </body>
