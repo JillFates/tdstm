@@ -145,35 +145,29 @@ function submitForm(form){
  }
 function updateXYPositions(id){
 	var rackId = id.split("_")[1]
+
+	var width = $("#"+id).css("width")
+	var height = $("#"+id).css("height")
+	
 	var x = $("#"+id).css("left")
 	var y = $("#"+id).css("top")
 	x = x.substring(0,x.indexOf('px'))
 	y = y.substring(0,y.indexOf('px'))
+	
 	var top = $("#room_layout_table").css("height")
 	var left = $("#room_layout_table").css("width")
-	top = top.substring(0,top.indexOf('px'))
-	left = left.substring(0,left.indexOf('px'))	
-	var cssClass = $("#"+id).attr("class")
-	if(cssClass == "room_CRAC_L" || cssClass == "room_CRAC_R"){
-		if(parseInt(top) < parseInt(y) + 102){
-			y = parseInt(top) - 102;
-			$("#"+id).css("top",y+"px")
-		}
-	} else if(cssClass == "room_CRAC_T" || cssClass == "room_CRAC_B"){
-		if(parseInt(left) < parseInt(x) + 100){
-			x = parseInt(left) - 105;
-			$("#"+id).css("left",x+"px")
-		}
-	} else if(cssClass == "room_DoorL_L" || cssClass == "room_DoorL_R" || cssClass == "room_DoorR_L" || cssClass == "room_DoorR_R"){
-		if(parseInt(left) < parseInt(x) + 100){
-			x = parseInt(left) - 60;
-			$("#"+id).css("left",x+"px")
-		}
-		if(parseInt(top) < parseInt(y) + 102){
-			y = parseInt(top) - 60;
-			$("#"+id).css("top",y+"px")
-		}
+	top = top.substring(0,top.indexOf('px')) - parseInt(height)
+	left = left.substring(0,left.indexOf('px'))	- parseInt(width)
+	
+	if(parseInt(left) <= parseInt(x)){
+		x = left-3
+		$("#"+id).css("left",x+"px")
 	}
+	if(parseInt(left) <= parseInt(y)){
+		y = top-2;
+		$("#"+id).css("top",y+"px")
+	}
+	
 	$("#roomXId_"+rackId).val(x)
 	$("#roomYId_"+rackId).val(y)
 }
