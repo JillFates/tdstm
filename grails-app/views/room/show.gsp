@@ -60,7 +60,7 @@
 </div>
 <div id="roomLayout" style="width: 1100px; overflow-x: auto; border: 2px solid black">
 	<input id="selectedRackId" type="hidden">
-	<div id="room_layout" style="position:relative;width: 700px;height: 800px;overflow-x: auto; border: 0px solid black">
+	<div id="room_layout" style="position:relative;width: 700px;height: 800px;overflow-x: auto; border: 0px solid black;float: left;">
 		<table cellpadding="0" cellspacing="0" style="width:auto;height:auto;border:0px" id="room_layout_table">
 			<g:set var="numrows" value="${1}" />
 			<g:while test="${numrows < roomInstance.roomDepth / 2 }">
@@ -87,7 +87,7 @@
 				</g:else>
 		</g:each>
 </div>
-	<div style="position:relative;top:-800px;float: right; margin-left: 50px;" id="rackLayout">
+	<div style="float: left; margin-left: 50px;width: 350px;" id="rackLayout">
 <table cellpadding=2 class="rack_elevation back">
 	<tr><th>U</th><th>Device</th><th>Bundle</th></tr>
 	<tr><td class='rack_upos'>42</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>

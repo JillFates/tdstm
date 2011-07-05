@@ -573,6 +573,9 @@ function initializeRacksInRoom( racks ){
 	var width = $("#room_layout_table tr td").length / height
 	
 	$("#room_layout_table").css({'height' : height*40, 'width' : width*40});
+	$("#room_layout").css({'height' : height*40+30, 'width' : width*40+20});
+	var rackWidth = $("#rackLayout").css('width');
+	$("#roomLayout").css('width',width*40 + parseInt(rackWidth.substring(0,rackWidth.indexOf('px'))) + 100);
 	
 	height = height*40
 	width = width*40
