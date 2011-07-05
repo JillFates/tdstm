@@ -126,12 +126,8 @@ class ModelController {
         }
         if (modelInstance.save(flush: true)) {
         	def connectorCount = Integer.parseInt(params.connectorCount)
-			def hasPwr1 = false
 			if(connectorCount > 0){
 	        	for(int i=1; i<=connectorCount; i++){
-					if(params["type"+i] == "Power" && params["label"+i]?.toLowerCase() == 'pwr1'){
-						hasPwr1 = true
-					}
 	        		def modelConnector = new ModelConnector(model : modelInstance,
 	        												connector : params["connector"+i],
 															label : params["label"+i],
@@ -144,10 +140,9 @@ class ModelController {
 	        		if (!modelConnector.hasErrors() )
 	        			modelConnector.save(flush: true)
 	        	}
-        	}
-			if(!hasPwr1){
+        	} else {
 				def powerConnector = new ModelConnector(model : modelInstance,
-														connector : "Pwr1",
+														connector : 1,
 														label : "Pwr1",
 														type : "Power",
 														labelPosition : "Right",
@@ -162,6 +157,7 @@ class ModelController {
 					println etext
 				}
 			}
+			
         	modelInstance.sourceTDSVersion = 1
         	modelInstance.save(flush: true)
             flash.message = "${modelInstance.modelName} created"
@@ -200,7 +196,12 @@ class ModelController {
         }
         else {
         	def modelConnectors = ModelConnector.findAllByModel( modelInstance,[sort:"id"] )
-			def nextConnector = modelConnectors.size() > 0 ? Integer.parseInt(modelConnectors[modelConnectors.size()-1]?.connector) : 0 
+			def nextConnector
+			try{
+				nextConnector = modelConnectors.size() > 0 ? Integer.parseInt(modelConnectors[modelConnectors.size()-1]?.connector) : 0
+			} catch( NumberFormatException ex){
+				nextConnector = modelConnectors.size()+1
+			}
 			def otherConnectors = []
 			for(int i = nextConnector+1 ; i<51; i++ ){
 				otherConnectors << i
@@ -248,8 +249,8 @@ class ModelController {
             	def connectorCount = Integer.parseInt(params.connectorCount)
 				if(connectorCount > 0){
 		        	for(int i=1; i<=connectorCount; i++){
-		        		def modelConnector = ModelConnector.findByModelAndConnector(modelInstance,i)
 						def connector = params["connector"+i]
+		        		def modelConnector = connector ? ModelConnector.findByModelAndConnector(modelInstance,connector) : null
 						if( !connector && modelConnector ){
 							AssetCableMap.executeUpdate("Delete from AssetCableMap where fromConnectorNumber = ? ", [modelConnector])
 							def assetCables = AssetCableMap.findAll("from AssetCableMap where toConnectorNumber = ? ",[modelConnector])
@@ -293,7 +294,25 @@ class ModelController {
 			        			modelConnector.save(flush: true)
 						}
 		        	}
-	        	}
+	        	} else {
+				
+					def powerConnector = new ModelConnector(model : modelInstance,
+															connector : 1,
+															label : "Pwr1",
+															type : "Power",
+															labelPosition : "Right",
+															connectorPosX : 0,
+															connectorPosY : 0,
+															status: "missing"
+															)
+					
+					if (!powerConnector.save(flush: true)){
+						def etext = "Unable to create Power Connectors for ${modelInstance}" +
+						GormUtil.allErrorsString( powerConnector )
+						println etext
+					}
+				
+				}
             	def assetEntitysByModel = AssetEntity.findAllByModel( modelInstance )
 				def assetConnectors = ModelConnector.findAllByModel( modelInstance )
 				assetEntitysByModel.each{ assetEntity ->
@@ -325,6 +344,15 @@ class ModelController {
 							log.error( etext )
 						}
     				}
+					def assetCableMaps = AssetCableMap.findAllByFromAsset( assetEntity )
+					assetCableMaps.each{assetCableMap->
+						if(!assetConnectors.id?.contains(assetCableMap.fromConnectorNumber?.id)){
+							AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
+														toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
+														where toConnectorNumber = ${assetCableMap.fromConnectorNumber?.id}""")
+							AssetCableMap.executeUpdate("delete AssetCableMap where fromConnectorNumber = ${assetCableMap.fromConnectorNumber?.id}")
+						}
+					}
             	}
             	def updateAssetsQuery = "update asset_entity set asset_type = '${modelInstance.assetType}' where model_id='${modelInstance.id}'"
             	jdbcTemplate.update(updateAssetsQuery)

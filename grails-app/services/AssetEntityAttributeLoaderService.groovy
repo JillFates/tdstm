@@ -477,7 +477,7 @@ class AssetEntityAttributeLoaderService {
 							println etext
 						} else {
 							def powerConnector = new ModelConnector(model : modelInstance,
-																	connector : "Pwr1",
+																	connector : 1,
 																	label : "Pwr1",
 																	type : "Power",
 																	labelPosition : "Right",
