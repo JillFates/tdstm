@@ -335,7 +335,7 @@ class MoveBundleAssetController {
 			cartAssetCounts = assetEntityAttributeLoaderService.getCartAssetCounts(bundleId)
     		render(view:'bundleTeamAssignment',model:[assetEntityInstanceList: assetEntityList, moveBundleInstance:bundleInstance, 
     		                                          projectTeamInstance:projectTeamInstanceList, teamAssetCount:teamAssetCounts, 
-    		                                          assetEntitysRacks:assetEntitysRacks, rack:rackPlan, cartAssetCountList:cartAssetCounts ])
+    		                                          assetEntitysRacks:assetEntitysRacks, rack:rackPlan, cartAssetCountList:cartAssetCounts, role:params.role ])
     	}else 
     	{
     		rackPlan = "UnrackPlan"
@@ -348,7 +348,7 @@ class MoveBundleAssetController {
 			teamAssetCounts << [ teamCode: "UnAssigned" , assetCount:unAssignCount ]
     		render(view:'bundleTeamAssignment',model:[assetEntityInstanceList: assetEntityList, moveBundleInstance:bundleInstance, 
     		                                          projectTeamInstance:projectTeamInstanceList, teamAssetCount:teamAssetCounts, 
-    		                                          assetEntitysRacks:assetEntitysRacks, rack:rackPlan ])
+    		                                          assetEntitysRacks:assetEntitysRacks, rack:rackPlan, role:params.role ])
     	}
     }
     

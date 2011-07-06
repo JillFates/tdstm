@@ -21,6 +21,8 @@
 							<th>Team Code</th>
 
                    	        <th>Team Name</th>
+                   	        
+							<th>Role</th>
 							
 							<th>Team Members</th>
 							                        
@@ -40,6 +42,7 @@
                         
                             <td>${projectTeamInstance?.projectTeam?.name}</td>
                             
+                            <td><g:message code="ProjectTeam.role.${projectTeamInstance?.projectTeam?.role}" /></td>
                              
                             <td>
                             	<g:each in="${projectTeamInstance?.teamMembers}" var="teamMember">

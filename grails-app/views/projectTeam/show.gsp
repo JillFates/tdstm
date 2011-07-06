@@ -34,7 +34,11 @@
                             <td valign="top" class="value">${fieldValue(bean:projectTeamInstance, field:'name')}</td>
                             
                         </tr>
-                        
+                        <tr class="prop">
+				            <td valign="top" class="name">Role:</td>
+				
+				            <td valign="top" class="value"><g:message code="ProjectTeam.role.${projectTeamInstance?.role}" /></td>
+						</tr>
 						<tr class="prop">
                             <td valign="top" class="name">Comment:</td>
                             

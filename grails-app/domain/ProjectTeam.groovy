@@ -3,6 +3,7 @@ class ProjectTeam extends PartyGroup{
 	String currentLocation = ""
 	Integer isIdle=1
 	String isDisbanded = "N"
+	String role = "MOVE_TECH"
 
 	static belongsTo = [ 
 	                    moveBundle : MoveBundle,
@@ -19,6 +20,7 @@ class ProjectTeam extends PartyGroup{
 		moveBundle( nullable:false )
 		latestAsset( nullable:true )
 		isDisbanded( blank:true, nullable:true, inList:['Y', 'N'] )
+		role( blank:true, nullable:true, inList:['MOVE_TECH', 'CLEANER','SYS_ADMIN',"DB_ADMIN"] )
 		dateCreated( ) // related to party
 		lastUpdated( ) // related to party
 	}

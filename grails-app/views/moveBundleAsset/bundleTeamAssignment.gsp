@@ -416,6 +416,11 @@
 		                				<g:select optionKey="id" from="${MoveBundle.findAll('from MoveBundle where project = '+moveBundleInstance.project.id)}" name="moveBundle" value="${moveBundleInstance.id}" onChange="submitForm()" />
 		                			</label>
 		              			</td>
+		              			<td valign="top" style="25%"class="name">&nbsp;
+		                			<label for="role">
+		                				<g:select id="role" name="role" from="${ProjectTeam.constraints.role.inList}" valueMessagePrefix="ProjectTeam.role" value="${role}" onChange="submitForm()"></g:select>
+		                			</label>
+		              			</td>
 		              			<td style="width:250px; float:left;">
 		              				<table style="width:250px; float:left;">
 		              					<tr>
@@ -425,14 +430,14 @@
 		              					<g:else>
 		              						<td style="width:112px; float:left;   padding-left:10px;">
 		              					</g:else>
-		              					<g:link controller="moveBundleAsset"  action="bundleTeamAssignment"  params="[bundleId:moveBundleInstance?.id, rackPlan:'unrackPlan']"  >Unrack Plan</g:link>
+		              					<g:link controller="moveBundleAsset"  action="bundleTeamAssignment"  params="[bundleId:moveBundleInstance?.id, rackPlan:'unrackPlan']"  >Source Plan</g:link>
 		              					<g:if test="${rack == 'RerackPlan'}">
 		              						<td style="width:100px; float:left; background-color:#43ca56; padding-left:10px;">
 		              					</g:if>	
 		              					<g:else>
 		              						<td style="width:100px; float:left; border-left:1px solid #5585c7; padding-left:10px;">
 		              					</g:else>
-		              					<g:link controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleInstance?.id, rackPlan:'RerackPlan']"  >Rerack Plan</g:link>
+		              					<g:link controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleInstance?.id, rackPlan:'RerackPlan']"  >Target Plan</g:link>
 		              						</td>
 		              					</tr>
 		              				</table>

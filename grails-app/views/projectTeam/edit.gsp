@@ -63,7 +63,19 @@
 						            </g:hasErrors>
                                 </td>
                             </tr> 
-                        
+                        	<tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="role"><b>Role:&nbsp;<span style="color: red">*</span></b></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean:projectTeamInstance,field:'role','errors')}">
+                                    <g:select id="role" name="role" from="${projectTeamInstance.constraints.role.inList}" valueMessagePrefix="ProjectTeam.role" value="${projectTeamInstance.role}" ></g:select>
+                                    <g:hasErrors bean="${projectTeamInstance}" field="role">
+						            <div class="errors">
+						                <g:renderErrors bean="${projectTeamInstance}" as="list"  field="role" />
+						            </div>
+						            </g:hasErrors>
+                                </td>
+                            </tr> 
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="comment">Comment:</label>
