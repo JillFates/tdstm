@@ -23,73 +23,7 @@ assetTypes?.assetType?.each{ option->
 		}
 	}
 }
-println"**************UPDATE MANUFACTURER***************"
-// Create manufactures if not exist
-def manufacturerResultMap = jdbcTemplate.queryForList("select manufacturer from asset_entity where manufacturer != '' and manufacturer is not null group by manufacturer")
-	manufacturerResultMap.each{ result->
-		def manufacturerName = result.manufacturer.replaceAll("\\s+\$", "").replaceAll("^\\s+", "")
-		def manufacturerInstance = Manufacturer.findByName( manufacturerName )
-		if( !manufacturerInstance ){
-			def manufacturers = Manufacturer.findAllByAkaIsNotNull()
-			manufacturers.each{manufacturer->
-				if(manufacturer.aka.toLowerCase().contains( manufacturerName.toLowerCase() )){
-					manufacturerInstance = manufacturer
-				}
-			}
-			if(!manufacturerInstance){
-				manufacturerInstance = new Manufacturer( name : manufacturerName )
-				if ( !manufacturerInstance.validate() || !manufacturerInstance.save() ) {
-					def etext = "Unable to create manufacturerInstance" +
-					GormUtil.allErrorsString( manufacturerInstance )
-					println etext
-				}
-			}
-		}
-		manufacturerName = manufacturerName.replace("'","\\'")
-		def updateQuery = "update asset_entity set manufacturer_id = ${manufacturerInstance.id} where manufacturer='${manufacturerName}'"
-		def updated = jdbcTemplate.update(updateQuery)
-		println "Updated '${manufacturerName}' Manufacturer id ${manufacturerInstance.id} for ${updated} assets"
-	}
-println"**************UPDATE MODEL***************"
-//Create model if not exist
-def modelResultMap = jdbcTemplate.queryForList("select distinct model, manufacturer as manufacturer, asset_type as assetType from asset_entity where model != '' and model is not null and manufacturer != '' and manufacturer is not null and asset_type != '' and asset_type is not null order by model")
-	modelResultMap.each{ result->
-		def manufacturerInstance = result.manufacturer ? Manufacturer.findByName( result.manufacturer ) : ""
-		def model = result.model.replaceAll("\\s+\$", "").replaceAll("^\\s+", "")
-		def assetType = result.assetType
-		if( !manufacturerInstance ){
-			def manufacuturers = Manufacturer.findAllByAkaIsNotNull()
-			manufacuturers.each{manufacuturer->
-				if(manufacuturer.aka.toLowerCase().contains( result.manufacturer.toLowerCase() )){
-					manufacturerInstance = manufacuturer
-				}
-			}
-		}
-		if( manufacturerInstance && assetType ){
-			def modelInstance = Model.findWhere(modelName:model,assetType : assetType,manufacturer: manufacturerInstance  )
-			if(!modelInstance){
-				def models = Model.findAllByManufacturerAndAkaIsNotNull( manufacturerInstance ).findAll{it.assetType == assetType}
-				models.each{ 
-					if(it.aka.toLowerCase().contains( model.toLowerCase() )){
-						modelInstance = it
-					}
-				}
-				if(!modelInstance){
-					modelInstance = new Model( modelName : model, assetType:assetType, manufacturer : manufacturerInstance )
-					if ( !modelInstance.validate() || !modelInstance.save() ) {
-						def etext = "Unable to create modelInstance" +
-						GormUtil.allErrorsString( modelInstance )
-						println etext
-					}
-				}
-			}
-			
-			model = model.replace("'","\\'")
-			def updateQuery = "update asset_entity set model_id = ${modelInstance.id} where model='${model}' and manufacturer='${manufacturerInstance.name}' and asset_type = '${assetType}'"
-			def updated = jdbcTemplate.update(updateQuery)
-			println "Updated '${model}' Model id ${modelInstance.id} for ${updated} assets"
-		}
-	}
+
 println"**************Delete Asset properties ***************"
 /*
  * Power
@@ -244,6 +178,32 @@ DataTransferAttributeMap.executeUpdate("Delete from DataTransferAttributeMap whe
 EavAttribute.executeUpdate("Update from EavAttribute set frontendInput='text' where attributeCode in('model','manufacturer')")
 
 /*
+* replace sourceTeam with sourceTeamMt
+*/
+def sourceTeamAttribute = EavAttribute.findByAttributeCode('sourceTeam')
+if(sourceTeamAttribute) {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'SourceTeamMt' where eavAttribute = ?",[sourceTeamAttribute])
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'sourceTeamMt', frontendLabel='Source Team Mt' where id = ?",[sourceTeamAttribute.id])
+}
+def sourceTeamMtAttribute = EavAttribute.findByAttributeCode('sourceTeamMt')
+if(sourceTeamMtAttribute) {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'SourceTeamMt' where eavAttribute = ?",[sourceTeamMtAttribute])
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'sourceTeamMt', frontendLabel='Source Team Mt' where id = ?",[sourceTeamMtAttribute.id])
+}
+/*
+* replace targetTeam with targetTeamMt
+*/
+def targetTeamAttribute = EavAttribute.findByAttributeCode('targetTeam')
+if(targetTeamAttribute) {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'TargetTeamMt' where eavAttribute = ?",[targetTeamAttribute])
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'targetTeamMt', frontendLabel='Target Team Mt' where id = ?",[targetTeamAttribute.id])
+}
+def targetTeamMtAttribute = EavAttribute.findByAttributeCode('targetTeamMt')
+if(targetTeamMtAttribute) {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'TargetTeamMt' where eavAttribute = ?",[targetTeamMtAttribute])
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'targetTeamMt', frontendLabel='Target Team Mt' where id = ?",[targetTeamMtAttribute.id])
+}
+/*
  * Set Attributes order 
  */
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 10 where attributeCode = 'application'")
@@ -308,10 +268,10 @@ EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 310 where at
 EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 310 where attribute = ?",[EavAttribute.findByAttributeCode('custom8')])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 320 where attributeCode = 'moveBundle'")
 EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 320 where attribute = ?",[EavAttribute.findByAttributeCode('moveBundle')])
-EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 330 where attributeCode = 'sourceTeam'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 330 where attribute = ?",[EavAttribute.findByAttributeCode('sourceTeam')])
-EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 340 where attributeCode = 'targetTeam'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 340 where attribute = ?",[EavAttribute.findByAttributeCode('targetTeam')])
+EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 330, attributeCode = 'sourceTeamMt' where attributeCode in ('sourceTeam','sourceTeamMt')")
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 330 where attribute = ?",[EavAttribute.findByAttributeCode('sourceTeamMt')])
+EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 340, attributeCode = 'targetTeamMt' where attributeCode in ('targetTeam','targetTeamMt')")
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 340 where attribute = ?",[EavAttribute.findByAttributeCode('targetTeamMt')])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 350 where attributeCode = 'truck'")
 EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 350 where attribute = ?",[EavAttribute.findByAttributeCode('truck')])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 360 where attributeCode = 'cart'")

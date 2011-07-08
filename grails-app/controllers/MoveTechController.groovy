@@ -180,10 +180,10 @@ class MoveTechController {
 	                                    def assetEntityInstance
 	                                    def query = new StringBuffer("from AssetEntity ae where ae.moveBundle = $moveBundleInstance.id") 
 	                                    if ( barcodeText.get(3) == 's' ) {
-	                                    	query.append(" and ae.sourceTeam = $projectTeamInstance.id")
+	                                    	query.append(" and ae.sourceTeamMt = $projectTeamInstance.id")
 	                                    	assetEntityInstance = AssetEntity.find( query.toString() )
 	                                    } else if ( barcodeText.get(3) == 't' ) {
-	                                    	query.append(" and ae.targetTeam = $projectTeamInstance.id" )
+	                                    	query.append(" and ae.targetTeamMt = $projectTeamInstance.id" )
 	                                        assetEntityInstance = AssetEntity.find( query.toString() )
 	                                    }
 	                                    //checking for Assets corresponding to moveBundle exist or not
@@ -567,9 +567,9 @@ class MoveTechController {
                         }
                     } else {*/
                         if ( params.location == "s" ) {
-                            if ( assetItem.sourceTeam ) {
-                                teamId = ( assetItem.sourceTeam.id ).toString()
-                                teamName = assetItem.sourceTeam.name
+                            if ( assetItem.sourceTeamMt ) {
+                                teamId = ( assetItem.sourceTeamMt.id ).toString()
+                                teamName = assetItem.sourceTeamMt.name
                             } else {
                                 flash.message += message ( code : "<li>The asset [${assetItem.assetName}] is not assigned to team [${loginTeam}] </li>" )
                                 if ( checkHome ) {
@@ -587,9 +587,9 @@ class MoveTechController {
                                 }
                             }
                         } else {
-                            if ( assetItem.targetTeam ) {
-                                teamId = ( assetItem.targetTeam.id ).toString()
-                                teamName = assetItem.targetTeam.name
+                            if ( assetItem.targetTeamMt ) {
+                                teamId = ( assetItem.targetTeamMt.id ).toString()
+                                teamName = assetItem.targetTeamMt.name
                             } else {
                                 flash.message += message( code : "<li>The asset [${assetItem.assetName}] is not assigned to team [${loginTeam}] </li>" )
                                 if ( checkHome ) {
@@ -744,11 +744,11 @@ class MoveTechController {
                 workflow = workflowService.createTransition ( moveBundleInstance.project.workflowCode, "MOVE_TECH", "Hold", asset,bundle, loginUser, loginTeam, params.enterNote )
                 if ( workflow.success ) {
                 	
-                	if(params.location == 's' && asset.sourceTeam.id != loginTeam.id ){
-				asset.sourceTeam = loginTeam
+                	if(params.location == 's' && asset.sourceTeamMt.id != loginTeam.id ){
+				asset.sourceTeamMt = loginTeam
 				asset.save(flush:true)
-            		} else if(params.location == 't' && asset.targetTeam.id != loginTeam.id ){
-				asset.targetTeam = loginTeam
+            		} else if(params.location == 't' && asset.targetTeamMt.id != loginTeam.id ){
+				asset.targetTeamMt = loginTeam
 				asset.save(flush:true)
             		}
                 	
@@ -775,11 +775,11 @@ class MoveTechController {
                 workflow = workflowService.createTransition ( moveBundleInstance.project.workflowCode, "ENGINEER", "Hold", asset,bundle, loginUser, loginTeam, params.enterNote )
                 if ( workflow.success ) {
                 	
-                	if(params.location == 's' && asset.sourceTeam.id != loginTeam.id ){
-				asset.sourceTeam = loginTeam
+                	if(params.location == 's' && asset.sourceTeamMt.id != loginTeam.id ){
+				asset.sourceTeamMt = loginTeam
 				asset.save(flush:true)
-            		} else if(params.location == 't' && asset.targetTeam.id != loginTeam.id ){
-				asset.targetTeam = loginTeam
+            		} else if(params.location == 't' && asset.targetTeamMt.id != loginTeam.id ){
+				asset.targetTeamMt = loginTeam
 				asset.save(flush:true)
             		}
                 	
@@ -869,11 +869,11 @@ class MoveTechController {
 	            def loginUser = UserLogin.findByUsername( principal )
 	            def workflow = workflowService.createTransition( moveBundleInstance.project.workflowCode, "MOVE_TECH", actionLabel, asset, bundle, loginUser, loginTeam, params.enterNote )
 	            if ( workflow.success ) {
-	            	if(params.location == 's' && asset.sourceTeam.id != loginTeam.id ){
-            			asset.sourceTeam = loginTeam
+	            	if(params.location == 's' && asset.sourceTeamMt.id != loginTeam.id ){
+            			asset.sourceTeamMt = loginTeam
 						asset.save(flush:true)
-            		} else if(params.location == 't' && asset.targetTeam.id != loginTeam.id ){
-            			asset.targetTeam = loginTeam
+            		} else if(params.location == 't' && asset.targetTeamMt.id != loginTeam.id ){
+            			asset.targetTeamMt = loginTeam
 						asset.save(flush:true)
             		}
 	            	if(flags?.contains("busy")){
@@ -1053,15 +1053,15 @@ class MoveTechController {
                         return;
                     }
                 } else {
-                    teamMembers = partyRelationshipService.getTeamMemberNames( assetItem.sourceTeam?.id )
+                    teamMembers = partyRelationshipService.getTeamMemberNames( assetItem.sourceTeamMt?.id )
                     def membersCount = ( ( teamMembers.toString() ).tokenize("/") ).size()
                     teamMembers = membersCount + "(" + teamMembers.toString() + ")"
                     def bundleId = assetItem.moveBundle?.id
                    /* def teamId
                     def teamName
-                    if ( assetItem.sourceTeam ) {
-                        teamId = ( assetItem.sourceTeam.id ).toString()
-                        teamName = assetItem.sourceTeam.name
+                    if ( assetItem.sourceTeamMt ) {
+                        teamId = ( assetItem.sourceTeamMt.id ).toString()
+                        teamName = assetItem.sourceTeamMt.name
                     } else {
                         flash.message = message ( code : "The asset [${assetItem.assetName}] is not assigned to team [${loginTeam}]" )
                         if ( textSearch ) {
@@ -1312,9 +1312,9 @@ class MoveTechController {
 		// commented as per JIRA:TM-199  
 		/*if ( user != "ct" ) {
         if ( location == "s" ) {
-        query.append(" and sourceTeam = $bundleteam")
+        query.append(" and sourceTeamMt = $bundleteam")
         } else {
-        query.append(" and targetTeam = $bundleteam")
+        query.append(" and targetTeamMt = $bundleteam")
         }
 		}*/
 		def asset 

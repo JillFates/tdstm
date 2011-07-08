@@ -192,9 +192,9 @@
                       </select>
                     </td>
 
-                    <td><g:select optionKey="id" from="${ProjectTeam.list()}" name="${moveBundleAssetEditInstance?.id}" value="${moveBundleAssetEditInstance?.sourceTeam?.id}" onchange="saveMoveBundleSourceTeamAsset(this);"></g:select></td>
+                    <td><g:select optionKey="id" from="${ProjectTeam.list()}" name="${moveBundleAssetEditInstance?.id}" value="${moveBundleAssetEditInstance?.sourceTeamMt?.id}" onchange="saveMoveBundleSourceTeamAsset(this);"></g:select></td>
 
-                    <td><g:select optionKey="id" from="${ProjectTeam.list()}" name="${moveBundleAssetEditInstance?.id}" value="${moveBundleAssetEditInstance?.targetTeam?.id}" onchange="saveMoveBundleTargetTeamAsset(this);"></g:select></td>
+                    <td><g:select optionKey="id" from="${ProjectTeam.list()}" name="${moveBundleAssetEditInstance?.id}" value="${moveBundleAssetEditInstance?.targetTeamMt?.id}" onchange="saveMoveBundleTargetTeamAsset(this);"></g:select></td>
 
                     <td><g:checkBox name="myCheckbox" value="${true}" /></td>
 

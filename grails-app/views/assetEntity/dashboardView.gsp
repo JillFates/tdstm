@@ -150,7 +150,7 @@ function onInvokeAction(id) {
 	    var selectObj = $("#asset")
 	   	selectObj.html(tableBody)
 	   	createStateOptions(asset[0].statesList)
-	   	createAssighToOptions(asset[0].sourceTeams,asset[0].targetTeams)
+	   	createAssighToOptions(asset[0].sourceTeamMts,asset[0].targetTeamMts)
 	   	document.assetdetailsForm.reset();
 		if(asset[0].assetDetails.currentState == "Hold"){
 		   	$("#setHoldTimerTr").show()
@@ -205,15 +205,15 @@ function onInvokeAction(id) {
 	      }
 		}
 	}
-   	function createAssighToOptions(sourceTeams,targetTeams){
+   	function createAssighToOptions(sourceTeamMts,targetTeamMts){
    		var teamObj = $("#assignToId")
 	   	var sourceObj = $("#sourceAssignTo")
 	   	var targetObj = $("#targetAssignTo")
 	   	sourceObj.html("")
 	   	targetObj.html("")
-		var sourceLength = sourceTeams.length
+		var sourceLength = sourceTeamMts.length
 	    for (var i=0; i < sourceLength; i++) {
-	      var team = sourceTeams[i]
+	      var team = sourceTeamMts[i]
 	      var popt = document.createElement('option');
 		  popt.innerHTML = team.name
 	      popt.value = "s/"+team.id
@@ -223,9 +223,9 @@ function onInvokeAction(id) {
 	      sourceObj.append(popt) // IE only
 	      }
 		}
-		var targetLength = targetTeams.length
+		var targetLength = targetTeamMts.length
 	    for (var i=0; i < targetLength; i++) {
-	      var team = targetTeams[i]
+	      var team = targetTeamMts[i]
 	      var popt = document.createElement('option');
 		  popt.innerHTML = team.name
 	      popt.value = "t/"+team.id
@@ -310,16 +310,16 @@ function onInvokeAction(id) {
 		var asset = eval("(" + e.responseText + ")")
 		if(asset[0]){
 			createStateOptions(asset[0].statesList)
-			createAssighToOptions(asset[0].sourceTeams,asset[0].targetTeams)
+			createAssighToOptions(asset[0].sourceTeamMts,asset[0].targetTeamMts)
 			if(asset[0].checkVal == false){
 				var spanEle = $('#spanId_'+asset[0].assetEntity.id);
 				spanEle.html("&nbsp;&nbsp;&nbsp;");
 			}		
-	
+
 			$('#priority_'+asset[0].assetEntity.id).html( asset[0].assetEntity.priority )
 			$('#statusCol_'+asset[0].assetEntity.id).html( asset[0].status )
-			$('#source_'+asset[0].assetEntity.id).html( asset[0].sourceTeam )
-			$('#target_'+asset[0].assetEntity.id).html( asset[0].targetTeam )
+			$('#source_'+asset[0].assetEntity.id).html( asset[0].sourceTeamMt )
+			$('#target_'+asset[0].assetEntity.id).html( asset[0].targetTeamMt )
 			$('#assetDetailRow_'+asset[0].assetEntity.id).removeAttr( "class" ) ;
 			$('#assetDetailRow_'+asset[0].assetEntity.id).addClass(asset[0].cssClass)
 			if(asset[0].assetComment != null){
@@ -800,11 +800,11 @@ function onInvokeAction(id) {
 								 <jmesa:htmlColumn property="status" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 									<div onclick="assetDetails('${assetEntityBean.id}')"	id="statusCol_${assetEntityBean.id}" style="width: 100%">${assetEntityBean.status}&nbsp;</div>
 								 </jmesa:htmlColumn>
-								 <jmesa:htmlColumn property="sourceTeam" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-									<div onclick="assetDetails('${assetEntityBean.id}')"	id="source_${assetEntityBean.id}" style="width: 100%">${assetEntityBean.sourceTeam}&nbsp;</div>
+								 <jmesa:htmlColumn property="sourceTeamMt" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+									<div onclick="assetDetails('${assetEntityBean.id}')"	id="source_${assetEntityBean.id}" style="width: 100%">${assetEntityBean.sourceTeamMt}&nbsp;</div>
 								 </jmesa:htmlColumn>
-								 <jmesa:htmlColumn property="targetTeam" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-									<div onclick="assetDetails('${assetEntityBean.id}')" id="target_${assetEntityBean.id}" style="width: 100%">${assetEntityBean.targetTeam}&nbsp;</div>
+								 <jmesa:htmlColumn property="targetTeamMt" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+									<div onclick="assetDetails('${assetEntityBean.id}')" id="target_${assetEntityBean.id}" style="width: 100%">${assetEntityBean.targetTeamMt}&nbsp;</div>
 								 </jmesa:htmlColumn>
 								 <jmesa:htmlColumn property="commentType" title="Issues" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 									<div id="icon_${assetEntityBean.id}">

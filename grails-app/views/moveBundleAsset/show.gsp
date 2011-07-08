@@ -46,7 +46,7 @@
             <tr class="prop">
               <td valign="top" class="name">Source Team:</td>
 
-              <td valign="top" class="value"><g:link controller="projectTeam" action="show" id="${moveBundleAssetInstance?.sourceTeam?.id}">${moveBundleAssetInstance?.sourceTeam?.encodeAsHTML()}</g:link></td>
+              <td valign="top" class="value"><g:link controller="projectTeam" action="show" id="${moveBundleAssetInstance?.sourceTeamMt?.id}">${moveBundleAssetInstance?.sourceTeamMt?.encodeAsHTML()}</g:link></td>
 
             </tr>
 

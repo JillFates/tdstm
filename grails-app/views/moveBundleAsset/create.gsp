@@ -46,19 +46,19 @@
 
               <tr class="prop">
                 <td valign="top" class="name">
-                  <label for="sourceTeam">Source Team:</label>
+                  <label for="sourceTeamMt">Source Team:</label>
                 </td>
-                <td valign="top" class="value ${hasErrors(bean:moveBundleAssetInstance,field:'sourceTeam','errors')}">
-                  <g:select optionKey="id" from="${ProjectTeam.list()}" name="sourceTeam.id" value="${moveBundleAssetInstance?.sourceTeam?.id}" ></g:select>
+                <td valign="top" class="value ${hasErrors(bean:moveBundleAssetInstance,field:'sourceTeamMt','errors')}">
+                  <g:select optionKey="id" from="${ProjectTeam.list()}" name="sourceTeamMt.id" value="${moveBundleAssetInstance?.sourceTeamMt?.id}" ></g:select>
                 </td>
               </tr>
 
               <tr class="prop">
                 <td valign="top" class="name">
-                  <label for="targetTeam">Target Team:</label>
+                  <label for="targetTeamMt">Target Team:</label>
                 </td>
-                <td valign="top" class="value ${hasErrors(bean:moveBundleAssetInstance,field:'targetTeam','errors')}">
-                  <g:select optionKey="id" from="${ProjectTeam.list()}" name="targetTeam.id" value="${moveBundleAssetInstance?.targetTeam?.id}" ></g:select>
+                <td valign="top" class="value ${hasErrors(bean:moveBundleAssetInstance,field:'targetTeamMt','errors')}">
+                  <g:select optionKey="id" from="${ProjectTeam.list()}" name="targetTeamMt.id" value="${moveBundleAssetInstance?.targetTeamMt?.id}" ></g:select>
                 </td>
               </tr>
 

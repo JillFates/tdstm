@@ -105,7 +105,7 @@ class DataTransferBatchController {
     						dtvList.each {
     							def attribName = it.eavAttribute.attributeCode
 								switch(attribName){
-									case "sourceTeam":
+									case "sourceTeamMt":
 										def bundleInstance = assetEntity.moveBundle 
 	    								def teamInstance = assetEntityAttributeLoaderService.getdtvTeam(it, bundleInstance ) 
 	    								if( assetEntity."$attribName" != teamInstance || isNewValidate == "true" ) {
@@ -113,7 +113,7 @@ class DataTransferBatchController {
 	    									assetEntity."$attribName" = teamInstance
 	    								}
 										break;
-									case "targetTeam":
+									case "targetTeamMt":
 										def bundleInstance = assetEntity.moveBundle 
 	    								def teamInstance = assetEntityAttributeLoaderService.getdtvTeam(it, bundleInstance ) 
 	    								if( assetEntity."$attribName" != teamInstance || isNewValidate == "true" ) {
@@ -292,7 +292,7 @@ class DataTransferBatchController {
         	def assetTag = DataTransferValue.find("from DataTransferValue where rowId=$it.row_id and eavAttribute=$assetTagId "+
                 									"and dataTransferBatch=$dataTransferBatchInstance.id")?.importValue
         	def assetEntity = AssetEntity.find("from AssetEntity where id=${it.asset_entity_id}")
-        	if( it.attribute_code == "sourceTeam" || it.attribute_code == "targetTeam") {
+        	if( it.attribute_code == "sourceTeamMt" || it.attribute_code == "targetTeamMt") {
         		currentValues = assetEntity?.(it.attribute_code).name
         	} else {
         		currentValues = assetEntity?.(it.attribute_code)

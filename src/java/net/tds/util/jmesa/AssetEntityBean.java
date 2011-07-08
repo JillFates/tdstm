@@ -11,8 +11,8 @@ private static final long serialVersionUID = 1L;
 	private String assetName;
 	private String commentType;
 	private Integer priority;
-	private String sourceTeam;
-	private String targetTeam;
+	private String sourceTeamMt;
+	private String targetTeamMt;
 	private String status;
 	private String cssClass;
 	private boolean checkVal;
@@ -61,20 +61,20 @@ private static final long serialVersionUID = 1L;
 		this.priority = priority;
 	}
 
-	public String getSourceTeam() {
-		return sourceTeam;
+	public String getSourceTeamMt() {
+		return sourceTeamMt;
 	}
 
-	public void setSourceTeam(String sourceTeam) {
-		this.sourceTeam = sourceTeam;
+	public void setSourceTeamMt(String sourceTeamMt) {
+		this.sourceTeamMt = sourceTeamMt;
 	}
 
-	public String getTargetTeam() {
-		return targetTeam;
+	public String getTargetTeamMt() {
+		return targetTeamMt;
 	}
 
-	public void setTargetTeam(String targetTeam) {
-		this.targetTeam = targetTeam;
+	public void setTargetTeamMt(String targetTeamMt) {
+		this.targetTeamMt = targetTeamMt;
 	}
 
 	public String getStatus() {

@@ -515,8 +515,8 @@ class AssetEntityController {
                                 addContentToSheet = new Label( map[columnNameList.get(coll)], r, "" )
                             } 
                             else {
-                            	//if attributeCode is sourceTeam or TargetTeam export the teamCode 
-                            	if( dataTransferAttributeMap.eavAttribute.attributeCode[coll] == "sourceTeam" || dataTransferAttributeMap.eavAttribute.attributeCode[coll] == "targetTeam" ) {
+                            	//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode 
+                            	if( dataTransferAttributeMap.eavAttribute.attributeCode[coll] == "sourceTeamMt" || dataTransferAttributeMap.eavAttribute.attributeCode[coll] == "targetTeamMt" ) {
                             		addContentToSheet = new Label( map[columnNameList.get(coll)], r, String.valueOf(asset[r-1].(dataTransferAttributeMap.eavAttribute.attributeCode[coll]).teamCode) )
                             	}else {
                             		addContentToSheet = new Label( map[columnNameList.get(coll)], r, String.valueOf(asset[r-1].(dataTransferAttributeMap.eavAttribute.attributeCode[coll])) )
@@ -626,7 +626,7 @@ class AssetEntityController {
         Limit limit = tableFacade.limit
 		if(limit.isExported()){
             tableFacade.setExportTypes(response,limit.getExportType())
-            tableFacade.setColumnProperties("id","application","assetName","shortName","serialNumber","assetTag","manufacturer","model","assetType","ipAddress","os","sourceLocation","sourceRoom","sourceRack","sourceRackPosition","sourceBladeChassis","sourceBladePosition","targetLocation","targetRoom","targetRack","targetRackPosition","targetBladeChassis","targetBladePosition","custom1","custom2","custom3","custom4","custom5","custom6","custom7","custom8","moveBundle","sourceTeam","targetTeam","truck","cart","shelf","railType","appOwner","appSme","priority")
+            tableFacade.setColumnProperties("id","application","assetName","shortName","serialNumber","assetTag","manufacturer","model","assetType","ipAddress","os","sourceLocation","sourceRoom","sourceRack","sourceRackPosition","sourceBladeChassis","sourceBladePosition","targetLocation","targetRoom","targetRack","targetRackPosition","targetBladeChassis","targetBladePosition","custom1","custom2","custom3","custom4","custom5","custom6","custom7","custom8","moveBundle","sourceTeamMt","targetTeamMt","truck","cart","shelf","railType","appOwner","appSme","priority")
             tableFacade.render()
         }else
             return [assetEntityInstanceList : assetEntityInstanceList,projectId: projectId]
@@ -684,7 +684,7 @@ class AssetEntityController {
         if(assetEntityInstance) {
             ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${params.id}")
             ProjectTeam.executeUpdate("update ProjectTeam pt set pt.latestAsset = null where pt.latestAsset = ${params.id}")
-            AssetEntity.executeUpdate("update AssetEntity ae set ae.moveBundle = null , ae.project = null , ae.sourceTeam = null , ae.targetTeam = null where ae.id = ${params.id}")
+            AssetEntity.executeUpdate("update AssetEntity ae set ae.moveBundle = null , ae.project = null , ae.sourceTeamMt = null , ae.targetTeamMt = null where ae.id = ${params.id}")
             flash.message = "AssetEntity ${assetEntityInstance.assetName} Removed from Project"
                            
         }
@@ -768,7 +768,7 @@ class AssetEntityController {
     		attributeOptions.each{option ->
     			options<<[option:option.value]
     		}
-			if( it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam" && it.attribute.attributeCode != "currentStatus" ){
+			if( it.attribute.attributeCode != "sourceTeamMt" && it.attribute.attributeCode != "targetTeamMt" && it.attribute.attributeCode != "currentStatus" ){
 				def frontEndLabel = it.attribute.frontendLabel
 				if( customLabels.contains( frontEndLabel ) ){
 					frontEndLabel = project[it.attribute.attributeCode] ? project[it.attribute.attributeCode] : frontEndLabel 
@@ -811,14 +811,14 @@ class AssetEntityController {
 	        	def bundleId = map.get('moveBundle')
 				if(bundleId){
 					if(Integer.parseInt(bundleId) != assetEntityInstance.moveBundle?.id){
-						map.put('sourceTeam',null)
-						map.put('targetTeam',null)
+						map.put('sourceTeamMt',null)
+						map.put('targetTeamMt',null)
 					}
 					map.put('moveBundle',MoveBundle.get(bundleId))
 				} else {
 					map.put('moveBundle',null)
-					map.put('sourceTeam',null)
-					map.put('targetTeam',null)
+					map.put('sourceTeamMt',null)
+					map.put('targetTeamMt',null)
 				}
 	        	
 	        	def manufacturerId = map.get('manufacturer')
@@ -836,7 +836,7 @@ class AssetEntityController {
 	            	assetEntityInstance.updateRacks()
 	            	def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
 	            	entityAttributeInstance.each{
-	                	if( it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam" && it.attribute.attributeCode != "currentStatus" ){
+	                	if( it.attribute.attributeCode != "sourceTeamMt" && it.attribute.attributeCode != "targetTeamMt" && it.attribute.attributeCode != "currentStatus" ){
 	                		assetItems << [id:assetEntityInstance.id, attributeCode:it.attribute.attributeCode, 
 	                		               frontendInput:it.attribute.frontendInput, 
 	                		               value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode).toString() : ""]
@@ -887,7 +887,7 @@ class AssetEntityController {
     		attributeOptions.each{option ->
     			options<<[option:option.value]
     		}
-    		if( it.attribute.attributeCode != "moveBundle" && it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam" && it.attribute.attributeCode != "currentStatus"){
+    		if( it.attribute.attributeCode != "moveBundle" && it.attribute.attributeCode != "sourceTeamMt" && it.attribute.attributeCode != "targetTeamMt" && it.attribute.attributeCode != "currentStatus"){
     			def frontEndLabel = it.attribute.frontendLabel
 				if( customLabels.contains( frontEndLabel ) ){
 					frontEndLabel = project[it.attribute.attributeCode] ? project[it.attribute.attributeCode] : frontEndLabel 
@@ -914,7 +914,7 @@ class AssetEntityController {
     		entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntity.attributeSet.id order by eav.sortOrder ")
         }
     	entityAttributeInstance.each{
-    		if( it.attribute.attributeCode != "sourceTeam" && it.attribute.attributeCode != "targetTeam" && it.attribute.attributeCode != "currentStatus"){
+    		if( it.attribute.attributeCode != "sourceTeamMt" && it.attribute.attributeCode != "targetTeamMt" && it.attribute.attributeCode != "currentStatus"){
     			items<<[ attributeCode:it.attribute.attributeCode, frontendInput:it.attribute.frontendInput ]
     		}
     	}
@@ -1149,7 +1149,7 @@ class AssetEntityController {
 					member = teamMembers.delete((teamMembers.length()-1), teamMembers.length())
 				}
 
-				def sourceAssetsList = bundleAssetsList.findAll{it.sourceTeam?.id == teamId }
+				def sourceAssetsList = bundleAssetsList.findAll{it.sourceTeamMt?.id == teamId }
 
 				def sourceAssets = sourceAssetsList.size()
 					
@@ -1164,7 +1164,7 @@ class AssetEntityController {
 		            	//jdbcTemplate.queryForList( countQuery + " and e.source_team_id = ${it.id} and pm.current_state_id >= $releasedId and pm.current_state_id < $unrackedId  "+
 		            													//"group by e.asset_entity_id HAVING minstate != $holdId ").size()
 		            
-				def targetAssetsList = bundleAssetsList.findAll{it.targetTeam?.id == teamId }
+				def targetAssetsList = bundleAssetsList.findAll{it.targetTeamMt?.id == teamId }
 		        def targetAssets = targetAssetsList.size()
 		            
 		        def targetPendAssets = targetAssetsList.findAll{it.currentStatus < stagedId || !it.currentStatus }.size()
@@ -1326,11 +1326,11 @@ class AssetEntityController {
 					assetEntityBean.setCommentType("blank")
 				}
 				assetEntityBean.setPriority(it.asset.priority)
-				if(it?.asset.sourceTeam){
-					assetEntityBean.setSourceTeam(ProjectTeam.findById(it?.asset?.sourceTeam)?.name)
+				if(it?.asset.sourceTeamMt){
+					assetEntityBean.setSourceTeamMt(ProjectTeam.findById(it?.asset?.sourceTeamMt)?.name)
 				}
-				if(it?.asset.targetTeam){
-					assetEntityBean.setTargetTeam(ProjectTeam.findById(it?.asset?.targetTeam)?.name)
+				if(it?.asset.targetTeamMt){
+					assetEntityBean.setTargetTeamMt(ProjectTeam.findById(it?.asset?.targetTeamMt)?.name)
 				}
 				assetEntityBean.setStatus(it.status)
 				assetEntityBean.setCssClass(it.cssClass ? it.cssClass : "")
@@ -1368,7 +1368,7 @@ class AssetEntityController {
         def stateIdList = []
         if(assetId){
 	        def assetDetail = AssetEntity.findById(assetId)
-	        def teamName = assetDetail.sourceTeam
+	        def teamName = assetDetail.sourceTeamMt
 	        def assetTransition = AssetTransition.findAllByAssetEntity( assetDetail, [ sort:"dateCreated", order:"desc"] )
 	        def sinceTimeElapsed = "00:00:00" 
 	        def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
@@ -1433,17 +1433,17 @@ class AssetEntityController {
 	        map.put("state",state)
 	        def sourceQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and teamCode != 'Logistics' and teamCode != 'Transport'")
 	        def targetQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and teamCode != 'Logistics' and teamCode != 'Transport'")
-	        if(assetDetail.sourceTeam){
-	        	sourceQuery.append(" and id != $assetDetail.sourceTeam.id ")
+	        if(assetDetail.sourceTeamMt){
+	        	sourceQuery.append(" and id != $assetDetail.sourceTeamMt.id ")
 	        }
-	        if(assetDetail.targetTeam){
-	        	targetQuery.append(" and id != $assetDetail.targetTeam.id ")
+	        if(assetDetail.targetTeamMt){
+	        	targetQuery.append(" and id != $assetDetail.targetTeamMt.id ")
 	        }
-	        def sourceTeams = ProjectTeam.findAll(sourceQuery.toString())
-	        def targetTeams = ProjectTeam.findAll(targetQuery.toString())
+	        def sourceTeamMts = ProjectTeam.findAll(sourceQuery.toString())
+	        def targetTeamMts = ProjectTeam.findAll(targetQuery.toString())
 	        assetStatusDetails<<[ 'assetDetails':map, 'statesList':statesList, holdTimer:holdTimer,
-	                              'recentChanges':recentChanges, 'sourceTeams':sourceTeams,
-	                              'targetTeams':targetTeams, 'sinceTimeElapsed':sinceTimeElapsed ]
+	                              'recentChanges':recentChanges, 'sourceTeamMts':sourceTeamMts,
+	                              'targetTeamMts':targetTeamMts, 'sinceTimeElapsed':sinceTimeElapsed ]
         }
         render assetStatusDetails as JSON
         		
@@ -1532,9 +1532,9 @@ class AssetEntityController {
 	    		def assignToList = assignTo.split('/')
 	    		def projectTeam = ProjectTeam.get(assignToList[1])
 	    		if(assignToList[0] == 's'){
-	    			assetEntity.sourceTeam = projectTeam
+	    			assetEntity.sourceTeamMt = projectTeam
 	    		} else if(assignToList[0] == 't'){
-	    			assetEntity.targetTeam = projectTeam
+	    			assetEntity.targetTeamMt = projectTeam
 	    		}
     		}
     		if(comment){
@@ -1582,26 +1582,27 @@ class AssetEntityController {
         		cssClass = 'asset_done'
         	}
     		assetEntity.save()
-    		def sourceTeam
-    		def targetTeam
-    		if(assetEntity.sourceTeam){
-    			sourceTeam = assetEntity.sourceTeam.name
+    		def sourceTeamMt
+    		def targetTeamMt
+    		if(assetEntity.sourceTeamMt){
+    			sourceTeamMt = assetEntity.sourceTeamMt.name
     		}
-		    if(assetEntity.targetTeam){
-		    	targetTeam = assetEntity.targetTeam.name
+		    if(assetEntity.targetTeamMt){
+		    	targetTeamMt = assetEntity.targetTeamMt.name
 		    }
 		    def sourceQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetEntity.moveBundle.id and teamCode != 'Logistics' and teamCode != 'Transport'")
 	        def targetQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetEntity.moveBundle.id and teamCode != 'Logistics' and teamCode != 'Transport'")
-	        if(assetEntity.sourceTeam){
-	        	sourceQuery.append(" and id != $assetEntity.sourceTeam.id ")
+	        if(assetEntity.sourceTeamMt){
+	        	sourceQuery.append(" and id != $assetEntity.sourceTeamMt.id ")
 	        }
-	        if(assetEntity.targetTeam){
-	        	targetQuery.append(" and id != $assetEntity.targetTeam.id ")
+	        if(assetEntity.targetTeamMt){
+	        	targetQuery.append(" and id != $assetEntity.targetTeamMt.id ")
 	        }
-	        def sourceTeams = ProjectTeam.findAll(sourceQuery.toString())
-	        def targetTeams = ProjectTeam.findAll(targetQuery.toString())
-		    assetList <<['assetEntity':assetEntity, 'sourceTeam':sourceTeam, 'targetTeam':targetTeam, 
-		                 'sourceTeams':sourceTeams,'targetTeams':targetTeams, 'statesList':statesList,
+	        println"cssClass-->"+cssClass
+	        def sourceTeamMts = ProjectTeam.findAll(sourceQuery.toString())
+	        def targetTeamMts = ProjectTeam.findAll(targetQuery.toString())
+		    assetList <<['assetEntity':assetEntity, 'sourceTeamMt':sourceTeamMt, 'targetTeamMt':targetTeamMt, 
+		                 'sourceTeamMts':sourceTeamMts,'targetTeamMts':targetTeamMts, 'statesList':statesList,
 		                 'status':statusLabel,'cssClass':cssClass,'checkVal':check, 
 		                 'statusName':statusName, assetComment:assetComment]
     	}
@@ -1707,7 +1708,7 @@ class AssetEntityController {
 	        	def bundle = it.moveBundle
 		        def principal = SecurityUtils.subject.principal
 		        def loginUser = UserLogin.findByUsername(principal)
-		        def team = it.sourceTeam
+		        def team = it.sourceTeamMt
 				     
 		        def workflow = workflowService.createTransition(projectInstance.workflowCode,"SUPERVISOR",params.taskList,it,bundle,loginUser,team,params.enterNote)
 		        if(workflow.success){

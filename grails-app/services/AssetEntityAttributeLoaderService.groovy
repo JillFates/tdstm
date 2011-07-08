@@ -215,7 +215,7 @@ class AssetEntityAttributeLoaderService {
 			// assign assets to bundle
 			assetsList.each{asset->
 				if ( bundleFrom ) {
-					def updateAssets = AssetEntity.executeUpdate("update AssetEntity set moveBundle = $bundleTo,project = $moveBundleTo.project.id, sourceTeam = null, targetTeam = null where moveBundle = $bundleFrom  and id = $asset")
+					def updateAssets = AssetEntity.executeUpdate("update AssetEntity set moveBundle = $bundleTo,project = $moveBundleTo.project.id, sourceTeamMt = null, targetTeamMt = null where moveBundle = $bundleFrom  and id = $asset")
 				
 				} else {
 					/*def assetEntity = AssetEntity.findById( asset )
@@ -223,12 +223,12 @@ class AssetEntityAttributeLoaderService {
 					if ( !assetsExist ) {
 					def moveBundleAsset = new AssetEntity( moveBundle:moveBundleTo, asset:assetEntity ).save()
 					}*/
-					def updateAssets = AssetEntity.executeUpdate("update AssetEntity set moveBundle = $bundleTo, sourceTeam = null, targetTeam = null where id = $asset")
+					def updateAssets = AssetEntity.executeUpdate("update AssetEntity set moveBundle = $bundleTo, sourceTeamMt = null, targetTeamMt = null where id = $asset")
 				}
 			}
 			moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = $bundleTo ")
 		} else{
-			def deleteAssets = AssetEntity.executeUpdate("update AssetEntity set moveBundle = null, sourceTeam = null, targetTeam = null where moveBundle = $bundleFrom and id in ($assets)")
+			def deleteAssets = AssetEntity.executeUpdate("update AssetEntity set moveBundle = null, sourceTeamMt null, targetTeamMt = null where moveBundle = $bundleFrom and id in ($assets)")
 		}
 		return moveBundleAssets
 	}
@@ -253,18 +253,18 @@ class AssetEntityAttributeLoaderService {
 		def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.teamCode != 'Logistics' and pt.teamCode != 'Transport' " )
     	if( rackPlan == 'RerackPlan') {
     		projectTeamInstanceList.each{projectTeam ->
-    			def assetCount = AssetEntity.countByMoveBundleAndTargetTeam( bundleInstance, projectTeam )
+    			def assetCount = AssetEntity.countByMoveBundleAndTargetTeamMt( bundleInstance, projectTeam )
     			teamAssetCounts << [ teamCode: projectTeam.teamCode , assetCount:assetCount ]
     		}
-    		def unAssignCount = AssetEntity.countByMoveBundleAndTargetTeam( bundleInstance, null )
+    		def unAssignCount = AssetEntity.countByMoveBundleAndTargetTeamMt( bundleInstance, null )
     		teamAssetCounts << [ teamCode: "UnAssigned" , assetCount:unAssignCount ]
     		
     	} else {
     		projectTeamInstanceList.each{projectTeam ->
-				def assetCount = AssetEntity.countByMoveBundleAndSourceTeam( bundleInstance, projectTeam )
+				def assetCount = AssetEntity.countByMoveBundleAndSourceTeamMt( bundleInstance, projectTeam )
 				teamAssetCounts << [ teamCode: projectTeam.teamCode , assetCount:assetCount ]
     		}
-    		def unAssignCount = AssetEntity.countByMoveBundleAndSourceTeam( bundleInstance, null )
+    		def unAssignCount = AssetEntity.countByMoveBundleAndSourceTeamMt( bundleInstance, null )
     		teamAssetCounts << [ teamCode: "UnAssigned" , assetCount:unAssignCount ]
     	}
 		return teamAssetCounts
@@ -305,9 +305,9 @@ class AssetEntityAttributeLoaderService {
 		for( int assetRow = 0; assetRow < assetEntityList.size(); assetRow++) {
     		def displayTeam  
     		if( rackPlan == "RerackPlan" ) {
-    			displayTeam = assetEntityList[assetRow]?.targetTeam?.teamCode
+    			displayTeam = assetEntityList[assetRow]?.targetTeamMt?.teamCode
     		}else {
-    			displayTeam = assetEntityList[assetRow]?.sourceTeam?.teamCode
+    			displayTeam = assetEntityList[assetRow]?.sourceTeamMt?.teamCode
     		}
     		def assetEntityInstance = AssetEntity.findById( assetEntityList[assetRow].id )
     		assetEntity <<[id:assetEntityInstance.id, assetName:assetEntityInstance.assetName, model:assetEntityInstance?.model?.toString(), 
@@ -334,8 +334,8 @@ class AssetEntityAttributeLoaderService {
 			flag = 1
 			dtvList.each { dtValue->
 				def attribName = dtValue.eavAttribute.attributeCode
-				//validation for sourceTeam and targetTeam and MoveBundle and Backendtype int field
-				if( attribName == "sourceTeam" || attribName == "targetTeam" ) {
+				//validation for sourceTeamMt and targetTeamMt and MoveBundle and Backendtype int field
+				if( attribName == "sourceTeamMt" || attribName == "targetTeamMt" ) {
 					def bundleInstance = assetEntity.moveBundle 
     				def teamInstance
 					if(assetEntity?."$attribName"?.teamCode != dtValue.correctedValue && assetEntity?."$attribName"?.teamCode != dtValue.importValue ){

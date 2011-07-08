@@ -576,14 +576,14 @@
 					                    	<td>${assetEntityInstance?.model?.usize}</td>
 											<g:if test="${rack == 'UnrackPlan'}">
 												<td id="${assetEntityInstance?.id}" onclick="makeSelect(this,${assetEntityInstance?.id})" >
-													<g:select style="display:none;" from= "${projectTeamInstance?.teamCode}" name="assetTeamAssign_${assetEntityInstance?.id}" value="${assetEntityInstance?.sourceTeam?.teamCode}" id="${assetEntityInstance?.id}" value="${assetEntityInstance?.sourceTeam?.teamCode}" noSelection="['null':'Unassigned']" onChange="assetToTeamAssign(this.value,'${assetEntityInstance?.id}');"/>
-													<span id="span_${assetEntityInstance?.id}">${assetEntityInstance?.sourceTeam?.teamCode} </span>
+													<g:select style="display:none;" from= "${projectTeamInstance?.teamCode}" name="assetTeamAssign_${assetEntityInstance?.id}" value="${assetEntityInstance?.sourceTeamMt?.teamCode}" id="${assetEntityInstance?.id}" value="${assetEntityInstance?.sourceTeamMt?.teamCode}" noSelection="['null':'Unassigned']" onChange="assetToTeamAssign(this.value,'${assetEntityInstance?.id}');"/>
+													<span id="span_${assetEntityInstance?.id}">${assetEntityInstance?.sourceTeamMt?.teamCode} </span>
 												</td>
 		                    				</g:if>
 		                    				<g:else >
 		                    					<td id="${assetEntityInstance?.id}" onclick="makeSelect(this,${assetEntityInstance?.id})" >
-													<g:select style="display:none;"  from= "${projectTeamInstance?.teamCode}" name="assetTeamAssign_${assetEntityInstance?.id}" value="${assetEntityInstance?.targetTeam?.teamCode}" id="${assetEntityInstance?.id}" noSelection="['null':'Unassigned']" onChange="assetToTeamAssign(this.value,'${assetEntityInstance?.id}');"/>
-													<span id="span_${assetEntityInstance?.id}">${assetEntityInstance?.targetTeam?.teamCode} </span>
+													<g:select style="display:none;"  from= "${projectTeamInstance?.teamCode}" name="assetTeamAssign_${assetEntityInstance?.id}" value="${assetEntityInstance?.targetTeamMt?.teamCode}" id="${assetEntityInstance?.id}" noSelection="['null':'Unassigned']" onChange="assetToTeamAssign(this.value,'${assetEntityInstance?.id}');"/>
+													<span id="span_${assetEntityInstance?.id}">${assetEntityInstance?.targetTeamMt?.teamCode} </span>
 												</td>
 												<td><input size=5px; type=text name="assetCartAssign_${assetEntityInstance?.id}" id="${assetEntityInstance?.id}" value="${assetEntityInstance?.cart}" onblur="assetCartAssign(this,'${assetEntityInstance?.id}');"/></td>
 												<td><input size=5px; type=text name="assetShelfAssign_${assetEntityInstance?.id}" id="${assetEntityInstance?.id}" value="${assetEntityInstance?.shelf}" onblur="assetShelfAssign(this,'${assetEntityInstance?.id}');"/></td>

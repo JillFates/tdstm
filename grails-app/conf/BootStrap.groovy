@@ -529,8 +529,8 @@ return
 				application: it[14],
 				owner: it[15],
 				moveBundle: it[16],
-				sourceTeam: it[17],
-				targetTeam: it[18],
+				sourceTeamMt: it[17],
+				targetTeamMt: it[18],
 				cart:it[19],
 				shelf:it[20],
 				priority:it[21]

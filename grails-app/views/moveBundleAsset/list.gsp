@@ -43,9 +43,9 @@
 
                 <td>${fieldValue(bean:moveBundleAssetInstance, field:'asset')}</td>
 
-                <td>${fieldValue(bean:moveBundleAssetInstance, field:'sourceTeam')}</td>
+                <td>${fieldValue(bean:moveBundleAssetInstance, field:'sourceTeamMt')}</td>
 
-                <td>${fieldValue(bean:moveBundleAssetInstance, field:'targetTeam')}</td>
+                <td>${fieldValue(bean:moveBundleAssetInstance, field:'targetTeamMt')}</td>
 
               </tr>
             </g:each>

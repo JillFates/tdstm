@@ -39,8 +39,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 
 	// MoveBundleAsset fields
 	MoveBundle moveBundle
-	ProjectTeam sourceTeam
-	ProjectTeam targetTeam
+	ProjectTeam sourceTeamMt
+	ProjectTeam targetTeamMt
 	String cart
 	String shelf
 	
@@ -99,8 +99,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 
 		// The following were the MoveBundleAsset fields
 		moveBundle( nullable:true )
-		sourceTeam( nullable:true )
-		targetTeam( nullable:true )
+		sourceTeamMt( nullable:true )
+		targetTeamMt( nullable:true )
 		cart( blank:true, nullable:true )
 		shelf( blank:true, nullable:true )
 		
@@ -122,6 +122,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		id column:'asset_entity_id'
 		os column:'hinfo'
 		planStatus column:'new_or_old'
+		sourceTeamMt column:'source_team_id'
+		targetTeamMt column:'target_team_id'
 		moveBundle ignoreNotFound:true
 		columns {
 			hasRemoteMgmt sqltype: 'tinyint(1)'

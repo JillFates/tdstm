@@ -398,7 +398,7 @@ class ClientConsoleController {
 	        def bundle = it.moveBundle
 	        def principal = SecurityUtils.subject.principal
 	        def loginUser = UserLogin.findByUsername(principal)
-	        def team = it.sourceTeam
+	        def team = it.sourceTeamMt
 			     
 	        def workflow = workflowService.createTransition(projectInstance.workflowCode, role ,params.taskList,it,bundle,loginUser,team,params.enterNote)
 	        if(workflow.success){

@@ -402,7 +402,7 @@ class PmoAssetTrackingService {
 				ae.source_location as sourceLocation, ae.source_room as sourceRoom, ae.source_rack as sourceRack, ae.source_rack_position as sourceRackPosition,
 				ae.target_location as targetLocation, ae.target_room as targetRoom, ae.target_rack as targetRack, ae.target_rack_position as targetRackPosition,
 				ae.remote_mgmt_port as remote_MgmtPort,mb.name as moveBundle, ae.truck,
-				ae.new_or_old as planStatus, ae.priority, ae.cart, ae.shelf, spt.team_code as sourceTeam, tpt.team_code as targetTeam,
+				ae.new_or_old as planStatus, ae.priority, ae.cart, ae.shelf, spt.team_code as sourceTeamMt, tpt.team_code as targetTeamMt,
 				max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate, ae.custom1 as custom1, ae.custom2 as custom2,ae.custom3 as custom3,
 				ae.custom3 as custom4,ae.custom5 as custom5,ae.custom6 as custom6,ae.custom7 as custom7,ae.custom8 as custom8,ae.current_status as currentStatus
 				FROM asset_entity ae
@@ -498,7 +498,7 @@ class PmoAssetTrackingService {
 				ae.source_location as sourceLocation, ae.source_room as sourceRoom, ae.source_rack as sourceRack, ae.source_rack_position as sourceRackPosition,
 				ae.target_location as targetLocation, ae.target_room as targetRoom, ae.target_rack as targetRack, ae.target_rack_position as targetRackPosition,
 				ae.remote_mgmt_port as remote_MgmtPort, mb.name as moveBundle, ae.truck,
-				ae.new_or_old as planStatus, ae.priority, ae.cart, ae.shelf, spt.team_code as sourceTeam, tpt.team_code as targetTeam,
+				ae.new_or_old as planStatus, ae.priority, ae.cart, ae.shelf, spt.team_code as sourceTeamMt, tpt.team_code as targetTeamMt,
 				max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate, ae.custom1 as custom1, ae.custom2 as custom2,ae.custom3 as custom3,
 				ae.custom3 as custom4,ae.custom5 as custom5,ae.custom6 as custom6,ae.custom7 as custom7,ae.custom8 as custom8, ae.current_status as currentStatus
 				FROM asset_entity ae

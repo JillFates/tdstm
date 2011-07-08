@@ -116,39 +116,39 @@ class ReportsController {
     				teamName = projectTeamInstance?.teamCode
     				if(location == "source"){
     					assetEntityList = AssetEntity.findAll("from AssetEntity asset  where asset.moveBundle = $moveBundleInstance.id and "+
-                    											"asset.sourceTeam = $projectTeamInstance.id order By asset.sourceTeam,"+
+                    											"asset.sourceTeamMt = $projectTeamInstance.id order By asset.sourceTeamMt,"+
                     											"asset.moveBundle,asset.assetName,asset.assetTag")
     				}else if(location == "target"){
     					targetAssetEntitylist = AssetEntity.findAll("from AssetEntity asset  where asset.moveBundle = $moveBundleInstance.id "+
-                    												"and asset.targetTeam = $projectTeamInstance.id order By asset.targetTeam,"+
+                    												"and asset.targetTeamMt = $projectTeamInstance.id order By asset.targetTeamMt,"+
                     												"asset.moveBundle,asset.assetName,asset.assetTag")
     				}else {
     					assetEntityList = AssetEntity.findAll("from AssetEntity asset  where asset.moveBundle = $moveBundleInstance.id and "+
-                    											"asset.sourceTeam = $projectTeamInstance.id order By asset.sourceTeam,"+
+                    											"asset.sourceTeamMt = $projectTeamInstance.id order By asset.sourceTeamMt,"+
                     											"asset.moveBundle,asset.assetName,asset.assetTag")
     					targetAssetEntitylist = AssetEntity.findAll("from AssetEntity asset  where asset.moveBundle = $moveBundleInstance.id and "+
-                    												"asset.targetTeam = $projectTeamInstance.id order By asset.targetTeam,"+
+                    												"asset.targetTeamMt = $projectTeamInstance.id order By asset.targetTeamMt,"+
                     												"asset.moveBundle,asset.assetName,asset.assetTag")
     				}
     			}else {
     				//source Location selected
     				if(location == "source"){
     					assetEntityList = AssetEntity.findAll("from AssetEntity asset  where asset.moveBundle = $moveBundleInstance.id and "+
-                    											"asset.sourceTeam != null order By asset.sourceTeam,asset.moveBundle,"+
+                    											"asset.sourceTeamMt != null order By asset.sourceTeamMt,asset.moveBundle,"+
                     											"asset.assetName,asset.assetTag")
     				}
     				//target Location selected
     				else if(location == "target"){
     					targetAssetEntitylist = AssetEntity.findAll("from AssetEntity asset  where asset.moveBundle = $moveBundleInstance.id and "+
-                    												"asset.targetTeam != null order By asset.targetTeam,asset.moveBundle,"+
+                    												"asset.targetTeamMt != null order By asset.targetTeamMt,asset.moveBundle,"+
                     												"asset.assetName,asset.assetTag")
     				}
     				//Location Both selected
     				else {
     					assetEntityList = AssetEntity.findAll("from AssetEntity asset  where asset.moveBundle = $moveBundleInstance.id and "+
-                    										"asset.sourceTeam != null order By asset.sourceTeam,asset.moveBundle,asset.assetName,asset.assetTag")
+                    										"asset.sourceTeamMt != null order By asset.sourceTeamMt,asset.moveBundle,asset.assetName,asset.assetTag")
     					targetAssetEntitylist = AssetEntity.findAll("from AssetEntity asset  where asset.moveBundle = $moveBundleInstance.id and "+
-                    										"asset.targetTeam != null order By asset.targetTeam,asset.moveBundle,asset.assetName,asset.assetTag")
+                    										"asset.targetTeamMt != null order By asset.targetTeamMt,asset.moveBundle,asset.assetName,asset.assetTag")
     				}
     			}
     		}
@@ -158,38 +158,38 @@ class ReportsController {
     			if( projectTeamInstance  ) {
     				teamName = projectTeamInstance?.teamCode
     				if(location == "source"){
-    					assetEntityList = AssetEntity.findAll("from AssetEntity asset  where asset.sourceTeam = $projectTeamInstance.id and "+
+    					assetEntityList = AssetEntity.findAll("from AssetEntity asset  where asset.sourceTeamMt = $projectTeamInstance.id and "+
                     											"asset.project.id = $projectInstance.id and asset.moveBundle != null order By "+
-                    											"asset.sourceTeam,asset.moveBundle,asset.assetName,asset.assetTag")
+                    											"asset.sourceTeamMt,asset.moveBundle,asset.assetName,asset.assetTag")
     				}else if(location == "target"){
-    					targetAssetEntitylist = AssetEntity.findAll("from AssetEntity asset  where asset.targetTeam = $projectTeamInstance.id and "+
+    					targetAssetEntitylist = AssetEntity.findAll("from AssetEntity asset  where asset.targetTeamMt = $projectTeamInstance.id and "+
                     												"asset.project.id = $projectInstance.id and asset.moveBundle != null order By "+
-                    												"asset.targetTeam,asset.moveBundle,asset.assetName,asset.assetTag")
+                    												"asset.targetTeamMt,asset.moveBundle,asset.assetName,asset.assetTag")
     				}else {
-    					assetEntityList = AssetEntity.findAll("from AssetEntity asset  where asset.sourceTeam = $projectTeamInstance.id  and "+
+    					assetEntityList = AssetEntity.findAll("from AssetEntity asset  where asset.sourceTeamMt = $projectTeamInstance.id  and "+
                     											"asset.project.id = $projectInstance.id and asset.moveBundle != null order By "+
-                    											"asset.sourceTeam,asset.moveBundle,asset.assetName,asset.assetTag")
-    					targetAssetEntitylist = AssetEntity.findAll("from AssetEntity asset  where asset.targetTeam = $projectTeamInstance.id and "+
+                    											"asset.sourceTeamMt,asset.moveBundle,asset.assetName,asset.assetTag")
+    					targetAssetEntitylist = AssetEntity.findAll("from AssetEntity asset  where asset.targetTeamMt = $projectTeamInstance.id and "+
                     												"asset.project.id = $projectInstance.id and asset.moveBundle != null order By "+
-                    												"asset.targetTeam,asset.moveBundle,asset.assetName,asset.assetTag")
+                    												"asset.targetTeamMt,asset.moveBundle,asset.assetName,asset.assetTag")
     				}
     			}
     			//Team MoveBundle Both not selected (moveBundle="AllBundles)
     			else {
     				if(location == "source"){
     					assetEntityList = AssetEntity.findAll("from AssetEntity asset  where asset.project.id = $projectInstance.id and "+
-                    											"asset.moveBundle != null and asset.sourceTeam != null order By asset.sourceTeam,asset.moveBundle,asset.assetName,asset.assetTag")
+                    											"asset.moveBundle != null and asset.sourceTeamMt != null order By asset.sourceTeamMt,asset.moveBundle,asset.assetName,asset.assetTag")
     				}else if(location == "target"){
     					targetAssetEntitylist = AssetEntity.findAll("from AssetEntity asset where asset.project.id = $projectInstance.id "+
-                    												"and asset.moveBundle != null and asset.targetTeam != null order By "+
-                    												"asset.targetTeam,asset.moveBundle,asset.assetName,asset.assetTag")
+                    												"and asset.moveBundle != null and asset.targetTeamMt != null order By "+
+                    												"asset.targetTeamMt,asset.moveBundle,asset.assetName,asset.assetTag")
     				}else {
     					assetEntityList = AssetEntity.findAll("from AssetEntity asset  where asset.project.id = $projectInstance.id and "+
-                    											"asset.moveBundle != null and asset.sourceTeam != null order By "+
-                    											"asset.sourceTeam,asset.moveBundle,asset.assetName,asset.assetTag")
+                    											"asset.moveBundle != null and asset.sourceTeamMt != null order By "+
+                    											"asset.sourceTeamMt,asset.moveBundle,asset.assetName,asset.assetTag")
     					targetAssetEntitylist = AssetEntity.findAll("from AssetEntity asset  where asset.project.id = $projectInstance.id "+
-                    										"and asset.moveBundle != null and asset.targetTeam != null order By "+
-                    										"asset.targetTeam,asset.moveBundle,asset.assetName,asset.assetTag")
+                    										"and asset.moveBundle != null and asset.targetTeamMt != null order By "+
+                    										"asset.targetTeamMt,asset.moveBundle,asset.assetName,asset.assetTag")
     				}
     			}
     		}
@@ -204,16 +204,16 @@ class ReportsController {
     			}
     			def teamPartyGroup 
     			def projectTeamLocationInstance
-    			if( asset.sourceTeam != null ) {
-    				teamPartyGroup = PartyGroup.findById(asset.sourceTeam.id)
-    				projectTeamLocationInstance = ProjectTeam.findById(asset.sourceTeam.id)
+    			if( asset.sourceTeamMt != null ) {
+    				teamPartyGroup = PartyGroup.findById(asset.sourceTeamMt.id)
+    				projectTeamLocationInstance = ProjectTeam.findById(asset.sourceTeamMt.id)
     			}
     			def assetCommentList = AssetComment.findAllByAssetEntity(asset)
     			def assetCommentString =""
     			assetCommentList.each { assetComment ->
     				assetCommentString = assetCommentString + assetComment.comment +"\n"
    			 	}
-    			def teamMembers = partyRelationshipService.getTeamMemberNames(asset.sourceTeam?.id)
+    			def teamMembers = partyRelationshipService.getTeamMemberNames(asset.sourceTeamMt?.id)
     			def rackPos = (asset.sourceRack ? asset.sourceRack : "")+"/"+ (asset.sourceRackPosition ? asset.sourceRackPosition : "")
    				if (rackPos == "/"){
    					rackPos = ""
@@ -222,7 +222,7 @@ class ReportsController {
    			 	                "manufacturer":asset.manufacturer?.toString(), "model":asset.model?.toString(), "sourceTargetrack":rackPos, 
    			 	                "position":asset.sourceRackPosition, 
    			 	                "sourceTargetPos":(projectTeamLocationInstance?.currentLocation ? projectTeamLocationInstance?.currentLocation : "") +"(source/ unracking)", 
-   			 	                "usize":asset?.model?.usize, "cart":asset.cart, "shelf":asset.shelf,"source_team_id":asset?.sourceTeam?.id, 
+   			 	                "usize":asset?.model?.usize, "cart":asset.cart, "shelf":asset.shelf,"source_team_id":asset?.sourceTeamMt?.id, 
    			 	                "move_bundle_id":asset?.moveBundle?.id, "clientName":projectInstance?.client?.name,
    			 	                'projectName':partyGroupInstance?.name,'startAt':GormUtil.convertInToUserTZ( projectInstance?.startDate, tzId ), 
    			 	                'completedAt':GormUtil.convertInToUserTZ( projectInstance?.completionDate, tzId ), 'bundleName':bundleInstance?.name,
@@ -241,10 +241,10 @@ class ReportsController {
    				def teamPartyGroup 
    				def projectTeamLocationInstance
    				def teamMembers
-   				if(asset.targetTeam != null ) {
-   					teamPartyGroup = PartyGroup.findById(asset.targetTeam.id)
-   					projectTeamLocationInstance = ProjectTeam.findById(asset.targetTeam.id)
-   					teamMembers = partyRelationshipService.getTeamMemberNames(asset.targetTeam.id) 
+   				if(asset.targetTeamMt != null ) {
+   					teamPartyGroup = PartyGroup.findById(asset.targetTeamMt.id)
+   					projectTeamLocationInstance = ProjectTeam.findById(asset.targetTeamMt.id)
+   					teamMembers = partyRelationshipService.getTeamMemberNames(asset.targetTeamMt.id) 
    				}
    				def assetCommentList = AssetComment.findAllByAssetEntity(asset)
    				def assetCommentString =""
@@ -263,7 +263,7 @@ class ReportsController {
    				                "manufacturer":asset.manufacturer?.toString(), "model":asset.model?.toString(), "sourceTargetrack":rackPos, 
    				                "position":asset.targetRackPosition, 
    				                "sourceTargetPos":(projectTeamLocationInstance?.currentLocation ? projectTeamLocationInstance?.currentLocation : "") +"(target/ reracking)", 
-   				                "usize":asset?.model?.usize, "cart":asset.cart, "shelf":asset.shelf,"source_team_id":asset?.targetTeam?.id, 
+   				                "usize":asset?.model?.usize, "cart":asset.cart, "shelf":asset.shelf,"source_team_id":asset?.targetTeamMt?.id, 
    				                "move_bundle_id":asset?.moveBundle?.id, "clientName":projectInstance?.client?.name,
    				                'projectName':partyGroupInstance?.name,'startAt':GormUtil.convertInToUserTZ( projectInstance?.startDate, tzId ), 
    				                'completedAt':GormUtil.convertInToUserTZ( projectInstance?.completionDate, tzId ), 'bundleName':bundleInstance?.name, 
@@ -352,7 +352,7 @@ class ReportsController {
        				}
        				
        				// sort options for reportFields
-       				def teamTagSort = (asset.sourceTeam ? asset.sourceTeam?.name : "") +" "+ (asset.assetTag ? asset.assetTag : "")
+       				def teamTagSort = (asset.sourceTeamMt ? asset.sourceTeamMt?.name : "") +" "+ (asset.assetTag ? asset.assetTag : "")
        				
        				def roomTagSort = (asset.sourceRoom ? asset.sourceRoom : "") +" "+ (asset.sourceRack ? asset.sourceRack : "") +" "+ (asset?.model?.usize ? asset?.model?.usize : "")
        				
@@ -367,7 +367,7 @@ class ReportsController {
        				                'completedAt':GormUtil.convertInToUserTZ( projectInstance?.completionDate, tzId ), 'bundleName':bundleInstance?.name, 
        				                'teamName':teamPartyGroup?.teamCode ? teamPartyGroup?.name+" - "+teamMembers : "", 
        				                'teamMembers':teamMembers,'location':"Source Team", 'truck':asset.truck, 
-       				                'room':asset.sourceRoom,'moveTeam':asset?.sourceTeam?.name, 'instructions':assetCommentString,
+       				                'room':asset.sourceRoom,'moveTeam':asset?.sourceTeamMt?.name, 'instructions':assetCommentString,
        				                'teamTagSort':teamTagSort, 'roomTagSort':roomTagSort,'truckTagSort':truckTagSort,
        				                'assetTagSort': (asset.assetTag ? asset.assetTag : ""),'sourcetargetLoc':"s", 'usize':asset?.model?.usize,
 									'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]

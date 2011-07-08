@@ -202,7 +202,7 @@ class CartTrackingController {
 													"from asset_transition at where at.asset_entity_id = $assetEntity.id "+
 													"and at.voided = 0 and at.type = 'process' group by at.asset_entity_id")
 		def onTruckId = stateEngineService.getStateIdAsInt(assetEntity.project.workflowCode,"OnTruck")
-		assetDetails<<[assetEntity:assetEntity,team:assetEntity.sourceTeam? assetEntity.sourceTeam.teamCode : "", 
+		assetDetails<<[assetEntity:assetEntity,team:assetEntity.sourceTeamMt? assetEntity.sourceTeamMt.teamCode : "", 
 		               state: transition[0] ? transition[0].maxstate : "", onTruck :onTruckId, 
 		               model : assetEntity.model ? assetEntity.model.modelName: "", manufacturer : assetEntity.manufacturer ? it.manufacturer : ""  ]
 		render assetDetails as JSON
