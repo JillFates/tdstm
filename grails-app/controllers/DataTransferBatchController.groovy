@@ -6,6 +6,12 @@ class DataTransferBatchController {
     def sessionFactory
     def assetEntityAttributeLoaderService
     def jdbcTemplate
+	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
+	protected static bundleTeamRoles = ['sourceTeamMt':'MOVE_TECH','targetTeamMt':'MOVE_TECH',
+										'sourceTeamLog':'CLEANER','targetTeamLog':'CLEANER',
+										'sourceTeamSa':'SYS_ADMIN','targetTeamSa':'SYS_ADMIN',
+										'sourceTeamDba':'DB_ADMIN','targetTeamDba':'DB_ADMIN'
+										]
     def index = { redirect(action:list,params:params) }
 
     // the delete, save and update actions only accept POST requests
@@ -106,16 +112,15 @@ class DataTransferBatchController {
     							def attribName = it.eavAttribute.attributeCode
 								switch(attribName){
 									case "sourceTeamMt":
-										def bundleInstance = assetEntity.moveBundle 
-	    								def teamInstance = assetEntityAttributeLoaderService.getdtvTeam(it, bundleInstance ) 
-	    								if( assetEntity."$attribName" != teamInstance || isNewValidate == "true" ) {
-	    									isModified = "true"
-	    									assetEntity."$attribName" = teamInstance
-	    								}
-										break;
 									case "targetTeamMt":
+									case "sourceTeamLog":
+									case "targetTeamLog":
+									case "sourceTeamSa":
+									case "targetTeamSa":
+									case "sourceTeamDba":
+									case "targetTeamDba":
 										def bundleInstance = assetEntity.moveBundle 
-	    								def teamInstance = assetEntityAttributeLoaderService.getdtvTeam(it, bundleInstance ) 
+	    								def teamInstance = assetEntityAttributeLoaderService.getdtvTeam(it, bundleInstance, bundleTeamRoles.get(attribName) ) 
 	    								if( assetEntity."$attribName" != teamInstance || isNewValidate == "true" ) {
 	    									isModified = "true"
 	    									assetEntity."$attribName" = teamInstance
@@ -292,7 +297,7 @@ class DataTransferBatchController {
         	def assetTag = DataTransferValue.find("from DataTransferValue where rowId=$it.row_id and eavAttribute=$assetTagId "+
                 									"and dataTransferBatch=$dataTransferBatchInstance.id")?.importValue
         	def assetEntity = AssetEntity.find("from AssetEntity where id=${it.asset_entity_id}")
-        	if( it.attribute_code == "sourceTeamMt" || it.attribute_code == "targetTeamMt") {
+        	if( bundleMoveAndClientTeams.contains(it.attribute_code) ) {
         		currentValues = assetEntity?.(it.attribute_code).name
         	} else {
         		currentValues = assetEntity?.(it.attribute_code)

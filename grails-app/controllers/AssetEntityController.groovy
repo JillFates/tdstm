@@ -34,6 +34,8 @@ class AssetEntityController {
 	def sessionFactory 
 	def assetEntityAttributeLoaderService
     protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8']
+	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
+	
 	def index = {
 		redirect( action:list, params:params )
 	}
@@ -516,7 +518,7 @@ class AssetEntityController {
                             } 
                             else {
                             	//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode 
-                            	if( dataTransferAttributeMap.eavAttribute.attributeCode[coll] == "sourceTeamMt" || dataTransferAttributeMap.eavAttribute.attributeCode[coll] == "targetTeamMt" ) {
+                            	if( bundleMoveAndClientTeams.contains(dataTransferAttributeMap.eavAttribute.attributeCode[coll]) ) {
                             		addContentToSheet = new Label( map[columnNameList.get(coll)], r, String.valueOf(asset[r-1].(dataTransferAttributeMap.eavAttribute.attributeCode[coll]).teamCode) )
                             	}else {
                             		addContentToSheet = new Label( map[columnNameList.get(coll)], r, String.valueOf(asset[r-1].(dataTransferAttributeMap.eavAttribute.attributeCode[coll])) )
@@ -626,7 +628,7 @@ class AssetEntityController {
         Limit limit = tableFacade.limit
 		if(limit.isExported()){
             tableFacade.setExportTypes(response,limit.getExportType())
-            tableFacade.setColumnProperties("id","application","assetName","shortName","serialNumber","assetTag","manufacturer","model","assetType","ipAddress","os","sourceLocation","sourceRoom","sourceRack","sourceRackPosition","sourceBladeChassis","sourceBladePosition","targetLocation","targetRoom","targetRack","targetRackPosition","targetBladeChassis","targetBladePosition","custom1","custom2","custom3","custom4","custom5","custom6","custom7","custom8","moveBundle","sourceTeamMt","targetTeamMt","truck","cart","shelf","railType","appOwner","appSme","priority")
+            tableFacade.setColumnProperties("id","application","assetName","shortName","serialNumber","assetTag","manufacturer","model","assetType","ipAddress","os","sourceLocation","sourceRoom","sourceRack","sourceRackPosition","sourceBladeChassis","sourceBladePosition","targetLocation","targetRoom","targetRack","targetRackPosition","targetBladeChassis","targetBladePosition","custom1","custom2","custom3","custom4","custom5","custom6","custom7","custom8","moveBundle","sourceTeamMt","targetTeamMt","sourceTeamLog","targetTeamLog","sourceTeamSa","targetTeamSa","sourceTeamDba","targetTeamDba","truck","cart","shelf","railType","appOwner","appSme","priority")
             tableFacade.render()
         }else
             return [assetEntityInstanceList : assetEntityInstanceList,projectId: projectId]
@@ -684,7 +686,7 @@ class AssetEntityController {
         if(assetEntityInstance) {
             ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${params.id}")
             ProjectTeam.executeUpdate("update ProjectTeam pt set pt.latestAsset = null where pt.latestAsset = ${params.id}")
-            AssetEntity.executeUpdate("update AssetEntity ae set ae.moveBundle = null , ae.project = null , ae.sourceTeamMt = null , ae.targetTeamMt = null where ae.id = ${params.id}")
+            AssetEntity.executeUpdate("update AssetEntity ae set ae.moveBundle = null , ae.project = null , ae.sourceTeamMt = null , ae.targetTeamMt = null, ae.sourceTeamLog = null , ae.targetTeamLog = null, ae.sourceTeamSa = null , ae.targetTeamSa = null, ae.sourceTeamDba = null , ae.targetTeamDba = null where ae.id = ${params.id}")
             flash.message = "AssetEntity ${assetEntityInstance.assetName} Removed from Project"
                            
         }
@@ -768,7 +770,7 @@ class AssetEntityController {
     		attributeOptions.each{option ->
     			options<<[option:option.value]
     		}
-			if( it.attribute.attributeCode != "sourceTeamMt" && it.attribute.attributeCode != "targetTeamMt" && it.attribute.attributeCode != "currentStatus" ){
+			if( !bundleMoveAndClientTeams.contains(it.attribute.attributeCode) && it.attribute.attributeCode != "currentStatus" ){
 				def frontEndLabel = it.attribute.frontendLabel
 				if( customLabels.contains( frontEndLabel ) ){
 					frontEndLabel = project[it.attribute.attributeCode] ? project[it.attribute.attributeCode] : frontEndLabel 
@@ -813,12 +815,24 @@ class AssetEntityController {
 					if(Integer.parseInt(bundleId) != assetEntityInstance.moveBundle?.id){
 						map.put('sourceTeamMt',null)
 						map.put('targetTeamMt',null)
+						map.put('sourceTeamLog',null)
+						map.put('targetTeamLog',null)
+						map.put('sourceTeamSa',null)
+						map.put('targetTeamSa',null)
+						map.put('sourceTeamDba',null)
+						map.put('targetTeamDba',null)
 					}
 					map.put('moveBundle',MoveBundle.get(bundleId))
 				} else {
 					map.put('moveBundle',null)
 					map.put('sourceTeamMt',null)
 					map.put('targetTeamMt',null)
+					map.put('sourceTeamLog',null)
+					map.put('targetTeamLog',null)
+					map.put('sourceTeamSa',null)
+					map.put('targetTeamSa',null)
+					map.put('sourceTeamDba',null)
+					map.put('targetTeamDba',null)
 				}
 	        	
 	        	def manufacturerId = map.get('manufacturer')
@@ -836,7 +850,7 @@ class AssetEntityController {
 	            	assetEntityInstance.updateRacks()
 	            	def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
 	            	entityAttributeInstance.each{
-	                	if( it.attribute.attributeCode != "sourceTeamMt" && it.attribute.attributeCode != "targetTeamMt" && it.attribute.attributeCode != "currentStatus" ){
+	                	if( !bundleMoveAndClientTeams.contains(it.attribute.attributeCode) && it.attribute.attributeCode != "currentStatus" ){
 	                		assetItems << [id:assetEntityInstance.id, attributeCode:it.attribute.attributeCode, 
 	                		               frontendInput:it.attribute.frontendInput, 
 	                		               value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode).toString() : ""]
@@ -887,7 +901,7 @@ class AssetEntityController {
     		attributeOptions.each{option ->
     			options<<[option:option.value]
     		}
-    		if( it.attribute.attributeCode != "moveBundle" && it.attribute.attributeCode != "sourceTeamMt" && it.attribute.attributeCode != "targetTeamMt" && it.attribute.attributeCode != "currentStatus"){
+    		if( it.attribute.attributeCode != "moveBundle" && !bundleMoveAndClientTeams.contains(it.attribute.attributeCode) && it.attribute.attributeCode != "currentStatus"){
     			def frontEndLabel = it.attribute.frontendLabel
 				if( customLabels.contains( frontEndLabel ) ){
 					frontEndLabel = project[it.attribute.attributeCode] ? project[it.attribute.attributeCode] : frontEndLabel 
@@ -914,7 +928,7 @@ class AssetEntityController {
     		entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntity.attributeSet.id order by eav.sortOrder ")
         }
     	entityAttributeInstance.each{
-    		if( it.attribute.attributeCode != "sourceTeamMt" && it.attribute.attributeCode != "targetTeamMt" && it.attribute.attributeCode != "currentStatus"){
+    		if( !bundleMoveAndClientTeams.contains(it.attribute.attributeCode) && it.attribute.attributeCode != "currentStatus"){
     			items<<[ attributeCode:it.attribute.attributeCode, frontendInput:it.attribute.frontendInput ]
     		}
     	}

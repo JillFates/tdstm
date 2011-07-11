@@ -41,6 +41,13 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	MoveBundle moveBundle
 	ProjectTeam sourceTeamMt
 	ProjectTeam targetTeamMt
+	ProjectTeam sourceTeamLog
+	ProjectTeam targetTeamLog
+	ProjectTeam sourceTeamSa
+	ProjectTeam targetTeamSa
+	ProjectTeam sourceTeamDba
+	ProjectTeam targetTeamDba
+	
 	String cart
 	String shelf
 	
@@ -99,8 +106,16 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 
 		// The following were the MoveBundleAsset fields
 		moveBundle( nullable:true )
+		
 		sourceTeamMt( nullable:true )
 		targetTeamMt( nullable:true )
+		sourceTeamLog( nullable:true )
+		targetTeamLog( nullable:true )
+		sourceTeamSa( nullable:true )
+		targetTeamSa( nullable:true )
+		sourceTeamDba( nullable:true )
+		targetTeamDba( nullable:true )
+		
 		cart( blank:true, nullable:true )
 		shelf( blank:true, nullable:true )
 		

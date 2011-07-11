@@ -13,7 +13,8 @@ class AssetEntityAttributeLoaderService {
 
 	boolean transactional = true
 	def eavAttribute
-
+	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
+	
 	/*
 	 * upload records in to EavAttribute table from from AssetEntity.xls
 	 */
@@ -335,7 +336,7 @@ class AssetEntityAttributeLoaderService {
 			dtvList.each { dtValue->
 				def attribName = dtValue.eavAttribute.attributeCode
 				//validation for sourceTeamMt and targetTeamMt and MoveBundle and Backendtype int field
-				if( attribName == "sourceTeamMt" || attribName == "targetTeamMt" ) {
+				if( bundleMoveAndClientTeams.contains(attribName) ) {
 					def bundleInstance = assetEntity.moveBundle 
     				def teamInstance
 					if(assetEntity?."$attribName"?.teamCode != dtValue.correctedValue && assetEntity?."$attribName"?.teamCode != dtValue.importValue ){
@@ -505,17 +506,17 @@ class AssetEntityAttributeLoaderService {
 	 * @param dataTransferValue,moveBundle
 	 * @author srinivas
 	 */
-	def getdtvTeam(def dtv, def bundleInstance ){
+	def getdtvTeam(def dtv, def bundleInstance, def role ){
 		def teamInstance
 		if( dtv.correctedValue && bundleInstance ) {
-			teamInstance = projectTeam.findByTeamCodeAndMoveBundle(dtv.correctedValue,bundleInstance)
-			if(!teamInstance){
-				teamInstance = new ProjectTeam(teamCode:dtv.correctedValue,moveBundle:bundleInstance).save()
+			teamInstance = projectTeam.findByTeamCodeAndMoveBundle(dtv.correctedValue, bundleInstance )
+			if(!teamInstance && !teamInstance.find{it.role==role}){
+				teamInstance = new ProjectTeam(teamCode:dtv.correctedValue, moveBundle:bundleInstance, role:role).save()
 			}
 		} else if( dtv.importValue && bundleInstance ) {
-			teamInstance = ProjectTeam.findByTeamCodeAndMoveBundle(dtv.importValue,bundleInstance)
-			if(!teamInstance){
-				teamInstance = new ProjectTeam( name:dtv.importValue, teamCode:dtv.importValue,moveBundle:bundleInstance ).save()
+			teamInstance = ProjectTeam.findByTeamCodeAndMoveBundle(dtv.importValue, bundleInstance )
+			if(!teamInstance && !teamInstance.find{it.role==role}){
+				teamInstance = new ProjectTeam( name:dtv.importValue, teamCode:dtv.importValue, moveBundle:bundleInstance, role:role ).save()
 			}
 		}
 		return teamInstance

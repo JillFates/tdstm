@@ -402,13 +402,23 @@ class PmoAssetTrackingService {
 				ae.source_location as sourceLocation, ae.source_room as sourceRoom, ae.source_rack as sourceRack, ae.source_rack_position as sourceRackPosition,
 				ae.target_location as targetLocation, ae.target_room as targetRoom, ae.target_rack as targetRack, ae.target_rack_position as targetRackPosition,
 				ae.remote_mgmt_port as remote_MgmtPort,mb.name as moveBundle, ae.truck,
-				ae.new_or_old as planStatus, ae.priority, ae.cart, ae.shelf, spt.team_code as sourceTeamMt, tpt.team_code as targetTeamMt,
+				ae.new_or_old as planStatus, ae.priority, ae.cart, ae.shelf, 
+				sptMt.team_code as sourceTeamMt, tptMt.team_code as targetTeamMt,
+				sptLog.team_code as sourceTeamLog, tptLog.team_code as targetTeamLog,
+				sptSa.team_code as sourceTeamSa, tptSa.team_code as targetTeamSa,
+				sptDba.team_code as sourceTeamDba, tptDba.team_code as targetTeamDba,
 				max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate, ae.custom1 as custom1, ae.custom2 as custom2,ae.custom3 as custom3,
 				ae.custom3 as custom4,ae.custom5 as custom5,ae.custom6 as custom6,ae.custom7 as custom7,ae.custom8 as custom8,ae.current_status as currentStatus
 				FROM asset_entity ae
 				LEFT JOIN move_bundle mb ON (ae.move_bundle_id = mb.move_bundle_id )
-				LEFT JOIN project_team spt ON (ae.source_team_id = spt.project_team_id )
-                LEFT JOIN project_team tpt ON (ae.target_team_id = tpt.project_team_id )
+				LEFT JOIN project_team sptMt ON (ae.source_team_id = sptMt.project_team_id )
+                LEFT JOIN project_team tptMt ON (ae.target_team_id = tptMt.project_team_id )
+                LEFT JOIN project_team sptLog ON (ae.source_team_id = sptLog.project_team_id )
+                LEFT JOIN project_team tptLog ON (ae.target_team_id = tptLog.project_team_id )
+                LEFT JOIN project_team sptSa ON (ae.source_team_id = sptSa.project_team_id )
+                LEFT JOIN project_team tptSa ON (ae.target_team_id = tptSa.project_team_id )
+                LEFT JOIN project_team sptDba ON (ae.source_team_id = sptDba.project_team_id )
+                LEFT JOIN project_team tptDba ON (ae.target_team_id = tptDba.project_team_id )
 				LEFT JOIN model m ON (ae.model_id = m.model_id )
 				LEFT JOIN manufacturer mf ON (ae.manufacturer_id = mf.manufacturer_id )
                 LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id and at.voided = 0 and at.type='process')
@@ -498,13 +508,23 @@ class PmoAssetTrackingService {
 				ae.source_location as sourceLocation, ae.source_room as sourceRoom, ae.source_rack as sourceRack, ae.source_rack_position as sourceRackPosition,
 				ae.target_location as targetLocation, ae.target_room as targetRoom, ae.target_rack as targetRack, ae.target_rack_position as targetRackPosition,
 				ae.remote_mgmt_port as remote_MgmtPort, mb.name as moveBundle, ae.truck,
-				ae.new_or_old as planStatus, ae.priority, ae.cart, ae.shelf, spt.team_code as sourceTeamMt, tpt.team_code as targetTeamMt,
+				ae.new_or_old as planStatus, ae.priority, ae.cart, ae.shelf, 
+				sptMt.team_code as sourceTeamMt, tptMt.team_code as targetTeamMt,
+				sptLog.team_code as sourceTeamLog, tptLog.team_code as targetTeamLog,
+				sptSa.team_code as sourceTeamSa, tptSa.team_code as targetTeamSa,
+				sptDba.team_code as sourceTeamDba, tptDba.team_code as targetTeamDba,
 				max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate, ae.custom1 as custom1, ae.custom2 as custom2,ae.custom3 as custom3,
 				ae.custom3 as custom4,ae.custom5 as custom5,ae.custom6 as custom6,ae.custom7 as custom7,ae.custom8 as custom8, ae.current_status as currentStatus
 				FROM asset_entity ae
 				LEFT JOIN move_bundle mb ON (ae.move_bundle_id = mb.move_bundle_id )
-				LEFT JOIN project_team spt ON (ae.source_team_id = spt.project_team_id )
-                LEFT JOIN project_team tpt ON (ae.target_team_id = tpt.project_team_id )
+				LEFT JOIN project_team sptMt ON (ae.source_team_id = sptMt.project_team_id )
+                LEFT JOIN project_team tptMt ON (ae.target_team_id = tptMt.project_team_id )
+                LEFT JOIN project_team sptLog ON (ae.source_team_id = sptLog.project_team_id )
+                LEFT JOIN project_team tptLog ON (ae.target_team_id = tptLog.project_team_id )
+                LEFT JOIN project_team sptSa ON (ae.source_team_id = sptSa.project_team_id )
+                LEFT JOIN project_team tptSa ON (ae.target_team_id = tptSa.project_team_id )
+                LEFT JOIN project_team sptDba ON (ae.source_team_id = sptDba.project_team_id )
+                LEFT JOIN project_team tptDba ON (ae.target_team_id = tptDba.project_team_id )
 				LEFT JOIN model m ON (ae.model_id = m.model_id )
 				LEFT JOIN manufacturer mf ON (ae.manufacturer_id = mf.manufacturer_id )
                 LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id and at.voided = 0 and at.type='process')
