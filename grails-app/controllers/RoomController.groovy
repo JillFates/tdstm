@@ -293,16 +293,20 @@ class RoomController {
 	   powerC = Math.round(powerC) 
 	   powerX = Math.round(powerX) 
 	   
+	   int rackPowerA = rack.powerA ? Math.round(rack.powerA) : 0
+	   int rackPowerB = rack.powerB ? Math.round(rack.powerB) : 0
+	   int rackPowerC = rack.powerB ? Math.round(rack.powerC) : 0
+	   
 	   def redTBD = false
-	   if((powerA +powerB+ powerC+ powerX) > (rack.powerA+rack.powerB+rack.powerC)){
+	   if((powerA +powerB+ powerC+ powerX) > (rackPowerA+ rackPowerB + rackPowerC )){
 		   redTBD = true
 	   }
 	   def op="<table border=0><tr><td colspan=4 class='powertable_L'><b>Rack : ${rack.tag}</b></td></tr><tr><td class='powertable_L'>Power (w)</td>"
-		   op+="<td style='background:${ powerA>rack.powerA ? 'red':''};' class='powertable_C'>A</td>"
-		   op+="<td style='background:${ powerB>rack.powerB ? 'red':''};' class='powertable_C'>B</td>"
-		   op+="<td style='background:${ powerC>rack.powerC ? 'red':''};' class='powertable_C'>C</td>"
+		   op+="<td style='background:${ powerA > rackPowerA ? 'red':''};' class='powertable_C'>A</td>"
+		   op+="<td style='background:${ powerB > rackPowerB ? 'red':''};' class='powertable_C'>B</td>"
+		   op+="<td style='background:${ powerC > rackPowerC ? 'red':''};' class='powertable_C'>C</td>"
 		   op+="<td style='background:${redTBD ? 'red':''};' class='powertable_C'>TBD</td>"
-		   op+="</tr><tr><td class='powertable_R'>&nbsp;In Rack:</td><td class='powertable_R'>${rack.powerA}</td><td class='powertable_R'>${rack.powerB}</td><td class='powertable_R'>${rack.powerC}</td><td class='powertable_R'>&nbsp;</td></tr><tr><td class='powertable_R'>&nbsp;Used:</td><td class='powertable_R'>${powerA}</td><td class='powertable_R'>${powerB}</td><td class='powertable_R'>${powerC}</td><td class='powertable_R'>${powerX}</td></tr></table>"
+		   op+="</tr><tr><td class='powertable_R'>&nbsp;In Rack:</td><td class='powertable_R'>${rackPowerA}</td><td class='powertable_R'>${rackPowerB}</td><td class='powertable_R'>${rackPowerC}</td><td class='powertable_R'>&nbsp;</td></tr><tr><td class='powertable_R'>&nbsp;Used:</td><td class='powertable_R'>${powerA}</td><td class='powertable_R'>${powerB}</td><td class='powertable_R'>${powerC}</td><td class='powertable_R'>${powerX}</td></tr></table>"
 		   
 		render  op
    }

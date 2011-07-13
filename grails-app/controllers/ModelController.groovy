@@ -874,6 +874,23 @@ class ModelController {
 	def getModelAsJSON = {
     	def id = params.id
     	def model = Model.get(params.id)
-    	render model as JSON
+		def modelMap = [id:model.id,
+						modelName:model.modelName,
+						description:model.description,
+						assetType:model.assetType,
+						powerUse:model.powerUse,
+						aka:model.aka,
+						usize:model.usize,
+						frontImage:model.frontImage ? model.frontImage : '',
+						rearImage:model.rearImage ? model.rearImage : '',
+						useImage:model.useImage,
+						bladeRows:model.bladeRows,
+						bladeCount:model.bladeCount,
+						bladeLabelCount:model.bladeLabelCount,
+						bladeHeight:model.bladeHeight,
+						bladeHeight:model.bladeHeight,
+						sourceTDSVersion:model.sourceTDSVersion,
+						]
+    	render modelMap as JSON
     }
 }

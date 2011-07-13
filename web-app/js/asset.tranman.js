@@ -106,9 +106,20 @@ function showAssetDialog( e , action ) {
 		   	var attribute = assetEntityAttributes[i];
 			      
 		    var labelTd = "<td style='background:#f3f4f6;width:25%;' nowrap>"+attribute.label+""
+		    
+		    var labelTdE = ""
+	    	if(attribute.attributeCode == "manufacturer" && attribute.value != "" && attribute.value != null){
+	    		labelTdE = "<td style='width:25%;background:#f3f4f6;font-style:underline;' nowrap><a href='javascript:showManufacturer("+attribute.manufacturerId+")'>"+attribute.label+"</a></td>"
+		    } else if(attribute.attributeCode == "model"&& attribute.value != "" && attribute.value != null ){
+		    	labelTdE = "<td style='width:25%;background:#f3f4f6;font-style:underline;' nowrap><a href='javascript:showModel("+attribute.modelId+")'>"+attribute.label+"</a></td>"
+		    } else {
+		    	labelTdE = "<td style='background:#f3f4f6;width:25%;' nowrap>"+attribute.label+"</td>"
+		    }
+		    
 		    if(requiredFields.contains(attribute.attributeCode)){
 			  	var spanAst = "<span style='color:red;'>*</span>"//document.createElement("span")
 			    labelTd += spanAst 
+			    labelTdE += spanAst
 		    }
 		    var inputTd = ""
 		    if(attribute.attributeCode == "manufacturer"){
@@ -126,13 +137,13 @@ function showAssetDialog( e , action ) {
 		    
 		    if( i % 3 == 0){
 			   	stableLeft +="<tr>"+labelTd + inputTd
-			   	etableLeft +="<tr>"+labelTd + inputTdE
+			   	etableLeft +="<tr>"+labelTdE + inputTdE
 			} else if( i % 3 == 1){
 				stableLeft += labelTd + inputTd 
-				etableLeft += labelTd + inputTdE 
+				etableLeft += labelTdE + inputTdE 
 			} else {
 				stableLeft +=labelTd + inputTd+"</tr>"
-				etableLeft +=labelTd + inputTdE+"</tr>"
+				etableLeft +=labelTdE + inputTdE+"</tr>"
 			}
 			
 		    var attribute = assetEntityAttributes[i];
@@ -161,11 +172,15 @@ function showAssetDialog( e , action ) {
 	      $("#editDialog").dialog('option', 'position', ['center','top']);
 	      $("#editDialog").dialog("open");
 	      $("#showDialog").dialog("close");
+	      $("#modelShowDialog").dialog("close")
+	      $("#manufacturerShowDialog").dialog("close")
       } else if(action == 'show'){
           $("#showDialog").dialog('option', 'width', '1000px');
 	      $("#showDialog").dialog('option', 'position', ['center','top']);
 	      $("#showDialog").dialog("open");
 	      $("#editDialog").dialog("close");
+	      $("#modelShowDialog").dialog("close")
+	      $("#manufacturerShowDialog").dialog("close")
       }
 	  var assetType = $("#editassetTypeId").val()
 	  updateManufacturerOptions(assetType, manufacturerId, 2)
@@ -918,11 +933,16 @@ function showModel(id){
 			$("#showModelAssetType").html( model.assetType )
 			$("#showModelUsize").html( model.usize )
 			$("#showModelPower").html( model.powerUse )
-			if(model.frontImage){
+			
+			if(model.frontImage != ''){
 				$("#showModelFrontImage").html( "<img src='../model/getFrontImage/"+model.id+"' style='height: 50px; width: 100px;' id='rearImageId'>" )
+			} else {
+				$("#showModelFrontImage").html("")
 			}
-			if(model.rearImage){
+			if(model.rearImage != ''){
 				$("#showModelRearImage").html( "<img src='../model/getRearImage/"+model.id+"' style='height: 50px; width: 100px;' id='rearImageId'>" )
+			} else {
+				$("#showModelRearImage").html("")
 			}
 			if(model.useImage){
 				$("#showModelUseImage").html( "<input type='checkbox' checked='checked' disabled='disabled'/>" )

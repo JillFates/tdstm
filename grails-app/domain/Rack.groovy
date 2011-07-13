@@ -62,10 +62,13 @@ class Rack {
 			println"$ex"
 		}
 		// Create a new rack if it doesn't exist
-		def rack = results[0]
+		def rack = results ? results[0] : null
 		if( !rack )
-			rack = new Rack(params).save()
-		
+			try{
+				rack = new Rack(params).save()
+			} catch(Exception ex){
+				println"$ex"
+			}
 		return rack
 	}
 	

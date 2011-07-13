@@ -549,7 +549,7 @@ function onInvokeExportAction(id) {
 	</div>
 	<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
 	<div class="buttons">
-	    <g:form controller="manufacturer" action="edit" target="_blank">
+	    <g:form controller="manufacturer" action="edit" target="new">
 	        <input type="hidden" name="id" id="manufacturerId" />
 	        <span class="button"><input type="submit" class="edit" value="Edit" onclick="$('#manufacturerShowDialog').dialog('close')"/></span>
 	    </g:form>
@@ -625,7 +625,7 @@ function onInvokeExportAction(id) {
 </div>
 <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
 <div class="buttons"> 
-	<g:form action="edit" controller="model" target="_blank">
+	<g:form action="edit" controller="model" target="new">
 		<input name="id" type="hidden" id="modelId"/>
 		<span class="button">
 			<input type="submit" class="edit" value="Edit"></input>
