@@ -9,6 +9,8 @@ class MoveBundleAssetController {
 	def userPreferenceService
 	def jdbcTemplate
 	def supervisorConsoleService
+	protected static targetTeamType = ['MOVE_TECH':'targetTeamMt', 'CLEANER':'targetTeamLog','SYS_ADMIN':'targetTeamSa',"DB_ADMIN":'targetTeamDba']
+	protected static sourceTeamType = ['MOVE_TECH':'sourceTeamMt', 'CLEANER':'sourceTeamLog','SYS_ADMIN':'sourceTeamSa',"DB_ADMIN":'sourceTeamDba']
 	
     def index = { redirect( action:list, params:params ) }
 
@@ -305,9 +307,8 @@ class MoveBundleAssetController {
      * Get the Assets and Teams those belongs to Selected  MoveBundle
      */
     def bundleTeamAssignment = {
-    	if(!params.max) params.max = 10
-    	
     	def bundleId = params.moveBundle
+		if(!params.role) params.role = "MOVE_TECH"
     	if( bundleId ){
     		userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
     	} else {
@@ -315,8 +316,7 @@ class MoveBundleAssetController {
     		bundleId = getSession().getAttribute("CURR_BUNDLE").CURR_BUNDLE
     	}
     	def bundleInstance = MoveBundle.findById(bundleId)
-    	def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and "+
-                    										"pt.teamCode != 'Logistics' and pt.teamCode != 'Transport' " )
+    	def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.role = '${params.role}' " )
     	def teamAssetCounts = []
     	def cartAssetCounts
     	def assetEntitysRacks
@@ -324,29 +324,59 @@ class MoveBundleAssetController {
     	def assetEntityList = AssetEntity.findAllByMoveBundle( bundleInstance )
     	if( params.rackPlan == 'RerackPlan' ) {
     		rackPlan = "RerackPlan"
+			def assetEntityInstanceList = []
+			assetEntityList.each{ assetEntity->
+				assetEntityInstanceList << [id:assetEntity.id,
+											assetTag:assetEntity.assetTag,
+											assetName:assetEntity.assetName,
+											modelName:assetEntity.model ,
+											usize:assetEntity.model?.usize,
+											room:assetEntity.targetRoom,
+											rack:assetEntity.targetRack,
+											rackPosition:assetEntity.targetRackPosition,
+											teamCode:assetEntity[targetTeamType.get(params.role)]?.teamCode,
+											teamId:assetEntity[targetTeamType.get(params.role)]?.id,
+											cart:assetEntity.cart,
+											shelf:assetEntity.shelf
+											]
+			}
     		assetEntitysRacks = AssetEntity.findAll("from AssetEntity ma where ma.moveBundle = $bundleInstance.id  group by ma.targetRack")
     		projectTeamInstanceList.each{projectTeam ->
-    			def assetCount = AssetEntity.countByMoveBundleAndTargetTeamMt( bundleInstance, projectTeam )
-    			teamAssetCounts << [ teamCode: projectTeam.teamCode , assetCount:assetCount ]
+				def assetCount = assetEntityInstanceList.findAll{it.teamId == projectTeam.id}?.size()
+				teamAssetCounts << [ teamCode: projectTeam.teamCode , assetCount:assetCount ]
     		}
-    		def unAssignCount = AssetEntity.countByMoveBundleAndTargetTeamMt( bundleInstance, null )
+    		def unAssignCount = assetEntityInstanceList.findAll{!it.teamId}?.size()
 			teamAssetCounts << [ teamCode: "UnAssigned" , assetCount:unAssignCount ]
     		def cartList = AssetEntity.findAll("from AssetEntity ma where ma.moveBundle = $bundleInstance.id  group by ma.cart")
 			cartAssetCounts = assetEntityAttributeLoaderService.getCartAssetCounts(bundleId)
-    		render(view:'bundleTeamAssignment',model:[assetEntityInstanceList: assetEntityList, moveBundleInstance:bundleInstance, 
+    		render(view:'bundleTeamAssignment',model:[assetEntityInstanceList: assetEntityInstanceList, moveBundleInstance:bundleInstance, 
     		                                          projectTeamInstance:projectTeamInstanceList, teamAssetCount:teamAssetCounts, 
     		                                          assetEntitysRacks:assetEntitysRacks, rack:rackPlan, cartAssetCountList:cartAssetCounts, role:params.role ])
     	}else 
     	{
     		rackPlan = "UnrackPlan"
+			def assetEntityInstanceList = []
+			assetEntityList.each{ assetEntity->
+				assetEntityInstanceList << [id:assetEntity.id,
+											assetTag:assetEntity.assetTag,
+											assetName:assetEntity.assetName,
+											modelName:assetEntity.model ,
+											usize:assetEntity.model?.usize,
+											room:assetEntity.sourceRoom,
+											rack:assetEntity.sourceRack,
+											rackPosition:assetEntity.sourceRackPosition,
+											teamCode:assetEntity[sourceTeamType.get(params.role)]?.teamCode,
+											teamId:assetEntity[sourceTeamType.get(params.role)]?.id
+											]
+			}
     		assetEntitysRacks = AssetEntity.findAll("from AssetEntity ma  where ma.moveBundle = $bundleInstance.id group by ma.sourceRack") 
     		projectTeamInstanceList.each{projectTeam ->
-				def assetCount = AssetEntity.countByMoveBundleAndSourceTeamMt( bundleInstance, projectTeam )
+				def assetCount = assetEntityInstanceList.findAll{it.teamId == projectTeam.id}?.size()//AssetEntity.countByMoveBundleAndSourceTeamMt( bundleInstance, projectTeam )
 				teamAssetCounts << [ teamCode: projectTeam.teamCode , assetCount:assetCount ]
     		}
-    		def unAssignCount = AssetEntity.countByMoveBundleAndSourceTeamMt( bundleInstance, null )
+    		def unAssignCount = assetEntityInstanceList.findAll{!it.teamId}?.size()
 			teamAssetCounts << [ teamCode: "UnAssigned" , assetCount:unAssignCount ]
-    		render(view:'bundleTeamAssignment',model:[assetEntityInstanceList: assetEntityList, moveBundleInstance:bundleInstance, 
+    		render(view:'bundleTeamAssignment',model:[assetEntityInstanceList: assetEntityInstanceList, moveBundleInstance:bundleInstance, 
     		                                          projectTeamInstance:projectTeamInstanceList, teamAssetCount:teamAssetCounts, 
     		                                          assetEntitysRacks:assetEntitysRacks, rack:rackPlan, role:params.role ])
     	}
@@ -358,6 +388,7 @@ class MoveBundleAssetController {
     def assetTeamAssign = {
     	def team = params.teamId
     	def asset = params.asset
+		def role = params.role
     	def rackPlan = params.rackPlan
     	def bundleId = params.bundleId
     	def teamAssetCounts = []
@@ -365,26 +396,26 @@ class MoveBundleAssetController {
     	def assetAssigned = []
     	if( team != null && team != "" && team != "null" )
     	{
-    		def projectTeamInstance = ProjectTeam.find( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and  pt.teamCode = '${team}' " )
+    		def projectTeamInstance = ProjectTeam.findById(team)
     		if( projectTeamInstance ) {
     			def assetEntityInstance = AssetEntity.findById(asset)
     			if( rackPlan == "UnrackPlan" ) {
-    				assetEntityInstance.sourceTeamMt = projectTeamInstance
+    				assetEntityInstance[sourceTeamType.get(role)] = projectTeamInstance
     			} else {
-    				assetEntityInstance.targetTeamMt = projectTeamInstance
+    				assetEntityInstance[targetTeamType.get(role)] = projectTeamInstance
     			}
     			assetEntityInstance.save(flush:true)
-    			teamAssetCounts = assetEntityAttributeLoaderService.getTeamAssetCount( bundleInstance, rackPlan )
+    			teamAssetCounts = assetEntityAttributeLoaderService.getTeamAssetCount( bundleInstance, rackPlan, role )
     		}
     	} else {
     		def assetEntityInstance = AssetEntity.findById(asset)
 			if( rackPlan == "UnrackPlan" ) {
-				assetEntityInstance.sourceTeamMt = null
+				assetEntityInstance[sourceTeamType.get(role)] = null
 			} else {
-				assetEntityInstance.targetTeamMt = null
+				assetEntityInstance[targetTeamType.get(role)] = null
 			}
     		assetEntityInstance.save(flush:true)
-			teamAssetCounts = assetEntityAttributeLoaderService.getTeamAssetCount( bundleInstance, rackPlan )
+			teamAssetCounts = assetEntityAttributeLoaderService.getTeamAssetCount( bundleInstance, rackPlan, role )
     	}
     	render teamAssetCounts as JSON
     }
@@ -397,6 +428,7 @@ class MoveBundleAssetController {
     	def  assets= assetString.tokenize(",")
     	def bundleId = params.bundleId
     	def rackPlan = params.rackPlan
+		def role = params.role
     	def teamAssetCounts
     	def assetEntityList
     	def teamAssetList = []
@@ -409,34 +441,34 @@ class MoveBundleAssetController {
     		for( int assetRow = 0; assetRow < assets.size(); assetRow ++ ) {
 				def assetEntityInstance = AssetEntity.findById(assets[ assetRow ] )
 				if( rackPlan == "UnrackPlan" ) {
-					assetEntityInstance.sourceTeamMt = null
+					assetEntityInstance[sourceTeamType.get(role)] = null
 				} else {
-					assetEntityInstance.targetTeamMt = null
+					assetEntityInstance[targetTeamType.get(role)] = null
 				}
 				assetEntityInstance.save(flush:true)
 				modifiedAssetList.add(assetEntityInstance)
 				assetEntityList = modifiedAssetList
-				assetList = assetEntityAttributeLoaderService.getAssetList( assetEntityList, rackPlan, bundleInstance)
-				teamAssetCounts = assetEntityAttributeLoaderService.getTeamAssetCount( bundleInstance, rackPlan )
+				assetList = assetEntityAttributeLoaderService.getAssetList( assetEntityList, rackPlan, bundleInstance, role)
+				teamAssetCounts = assetEntityAttributeLoaderService.getTeamAssetCount( bundleInstance, rackPlan, role )
 			}
     	} else {
     		def modifiedAssetList = []
-    		def projectTeamInstance = ProjectTeam.find( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and  pt.teamCode = '${team}' " )
+    		def projectTeamInstance = ProjectTeam.findById(team)
     		if( projectTeamInstance ) {
     			for( int assetRow = 0; assetRow < assets.size(); assetRow ++ ) {
     				def assetEntityInstance = AssetEntity.findById(assets[assetRow] )
     				if( rackPlan == "UnrackPlan" || team == "UnAssign" ) {
-    					assetEntityInstance.sourceTeamMt = projectTeamInstance
+    					assetEntityInstance[sourceTeamType.get(role)] = projectTeamInstance
     				} else {
-    					assetEntityInstance.targetTeamMt = projectTeamInstance
+    					assetEntityInstance[targetTeamType.get(role)] = projectTeamInstance
     				}
     				assetEntityInstance.save(flush:true)
     				modifiedAssetList.add(assetEntityInstance)
     			}
     		}
     		assetEntityList = modifiedAssetList
-			assetList = assetEntityAttributeLoaderService.getAssetList( assetEntityList, rackPlan, bundleInstance)
-			teamAssetCounts = assetEntityAttributeLoaderService.getTeamAssetCount( bundleInstance, rackPlan )
+			assetList = assetEntityAttributeLoaderService.getAssetList( assetEntityList, rackPlan, bundleInstance, role)
+			teamAssetCounts = assetEntityAttributeLoaderService.getTeamAssetCount( bundleInstance, rackPlan, role )
     	}
     	teamAssetList << [ teamAssetCounts:teamAssetCounts, assetList:assetList ]
     	render teamAssetList as JSON
@@ -448,40 +480,38 @@ class MoveBundleAssetController {
     	def team = params.teamCode
     	def bundleId = params.bundleId
     	def rackPlan = params.rackPlan
+		def role = params.role
     	def bundleInstance = MoveBundle.findById(bundleId)
     	def assetEntity = []
     	def projectTeam = []
     	def assetEntityList
-    	def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and "+
-                    										"pt.teamCode != 'Logistics' and pt.teamCode != 'Transport' " )
+    	def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.role = '${role}' " )
+		def projectTeamInstance = team != "unAssign" ? ProjectTeam.findById(team) : null
        	projectTeamInstanceList.each{teams ->
-            projectTeam << [ teamCode: teams.teamCode ]
+            projectTeam << [ teamCode: teams.teamCode, id:teams.id ]
         }
     	if( team == "" || team == null ) {
     		assetEntityList = AssetEntity.findAll( " from AssetEntity ma where ma.moveBundle = $bundleInstance.id ")
     	} else if ( rackPlan == "UnrackPlan" ) {
     		if( team == "unAssign" ) {
-    			assetEntityList = AssetEntity.findAll( " from AssetEntity ma where ma.moveBundle = $bundleInstance.id and ma.sourceTeamMt = null ")
+    			assetEntityList = AssetEntity.findAll( " from AssetEntity where moveBundle = $bundleInstance.id and ${sourceTeamType.get(params.role)} = null ")
         	} else {
-        		def projectTeamInstance = ProjectTeam.find( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and  pt.teamCode = '${team}' " )
-        		assetEntityList = AssetEntity.findAll( " from AssetEntity ma where ma.moveBundle = $bundleInstance.id and "+
-                    									"ma.sourceTeamMt = $projectTeamInstance.id ")
+        		
+        		assetEntityList = AssetEntity.findAll( " from AssetEntity where moveBundle = $bundleInstance.id and ${sourceTeamType.get(params.role)} = $projectTeamInstance.id ")
         	}
     	} else {
     		if( team == "unAssign" ) {
-    			assetEntityList = AssetEntity.findAll( " from AssetEntity ma where ma.moveBundle = $bundleInstance.id and ma.targetTeamMt = null ")
+    			assetEntityList = AssetEntity.findAll( " from AssetEntity where moveBundle = $bundleInstance.id and ${targetTeamType.get(params.role)} = null ")
         	} else {
-        		def projectTeamInstance = ProjectTeam.find( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and  pt.teamCode = '${team}' " )
-        		assetEntityList = AssetEntity.findAll( " from AssetEntity ma where ma.moveBundle = $bundleInstance.id and "+
-        												"ma.targetTeamMt = $projectTeamInstance.id ")
+        		assetEntityList = AssetEntity.findAll( " from AssetEntity where moveBundle = $bundleInstance.id and ${targetTeamType.get(params.role)} = $projectTeamInstance.id ")
         	}
     	}
     	for( int assetRow = 0; assetRow < assetEntityList.size(); assetRow++) {
     		def displayTeam  
     		if( rackPlan == "RerackPlan" ) {
-    			displayTeam = assetEntityList[assetRow]?.targetTeamMt?.teamCode
+    			displayTeam = assetEntityList[assetRow][targetTeamType.get(params.role)]?.teamCode
     		} else {
-    			displayTeam = assetEntityList[assetRow]?.sourceTeamMt?.teamCode
+    			displayTeam = assetEntityList[assetRow][sourceTeamType.get(params.role)]?.teamCode
     		}
     		def assetEntityInstance = AssetEntity.findById( assetEntityList[assetRow]?.id )
     		assetEntity <<[id:assetEntityInstance?.id, assetName:assetEntityInstance?.assetName, model:assetEntityInstance?.model?.toString(), 
@@ -514,14 +544,14 @@ class MoveBundleAssetController {
     	}
        	def bundleId = params.bundleId
        	def rackPlan = params.rackPlan
+		def role = params.role
        	def bundleInstance = MoveBundle.findById(bundleId)
        	def moveBundleAsset = []
        	def moveBundleAssetList
        	def projectTeam = []
-       	def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and "+
-                    										"pt.teamCode != 'Logistics' and pt.teamCode != 'Transport' " )
+       	def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.role = '${role}' " )
        	projectTeamInstanceList.each{team ->
-            projectTeam << [ teamCode: team.teamCode ]
+            projectTeam << [ teamCode: team.teamCode, id:team.id ]
         }
        	if( rackString == "" || rackString == null ) {
        		moveBundleAssetList = AssetEntity.findAll( " from AssetEntity ma where ma.moveBundle = $bundleInstance.id ")
@@ -535,9 +565,9 @@ class MoveBundleAssetController {
     		for( int assetRow = 0; assetRow < moveBundleAssetList.size(); assetRow++) {
     			def displayTeam  
     			if( rackPlan == "RerackPlan" ) {
-    				displayTeam = moveBundleAssetList[assetRow]?.targetTeamMt?.teamCode
+    				displayTeam = moveBundleAssetList[assetRow][targetTeamType.get(params.role)]?.teamCode
     			}else {
-    				displayTeam = moveBundleAssetList[assetRow]?.sourceTeamMt?.teamCode
+    				displayTeam = moveBundleAssetList[assetRow][sourceTeamType.get(params.role)]?.teamCode
     			}
     			def assetEntityInstance = AssetEntity.findById( moveBundleAssetList[assetRow]?.id )
     			moveBundleAsset << [id:assetEntityInstance?.id, assetName:assetEntityInstance?.assetName, model:assetEntityInstance?.model?.toString(), 
@@ -715,10 +745,9 @@ class MoveBundleAssetController {
        	def projectTeam = []
        	def sortBy = params.sortBy
 		def order = params.order
-       	def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and "+
-                    										"pt.teamCode != 'Logistics' and pt.teamCode != 'Transport' " )
+       	def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.role = '${params.role}'" )
        	projectTeamInstanceList.each{team ->
-            projectTeam << [ teamCode: team.teamCode ]
+            projectTeam << [ teamCode: team.teamCode, id:team.id ]
         }
        	def queryString = new StringBuffer(" from AssetEntity ma where ma.moveBundle = $bundleInstance.id ")
        	if( rackString != "" && rackString != null ) {
@@ -728,20 +757,21 @@ class MoveBundleAssetController {
 	       		queryString.append( " and ma.targetRack in $rackString ")
 	       	}
        	}
+		   
        	if( moveTeam != "" && moveTeam != null ) {
 	       	if ( rackPlan == "UnrackPlan" ) {
 	    		if( moveTeam == "unAssign" ) {
-	    			queryString.append( " and ma.sourceTeamMt = null ")
+	    			queryString.append( " and ma.sourceTeamLog = null ")
 	        	} else {
-	        		def projectTeamInstance = ProjectTeam.find( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and  pt.teamCode = '${moveTeam}' " )
-	        		queryString.append(" and ma.sourceTeamMt = $projectTeamInstance.id ")
+	        		def projectTeamInstance = ProjectTeam.findById(moveTeam)
+	        		queryString.append(" and ma.${sourceTeamType.get(params.role)} = $projectTeamInstance.id ")
 	        	}
 	    	} else {
 	    		if( moveTeam == "unAssign" ) {
-	    			queryString.append( " and ma.targetTeamMt = null ")
+	    			queryString.append( " and ma.${targetTeamType.get(params.role)} = null")
 	        	} else {
-	        		def projectTeamInstance = ProjectTeam.find( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and  pt.teamCode = '${moveTeam}' " )
-	        		queryString.append(" and ma.targetTeamMt = $projectTeamInstance.id ")
+	        		def projectTeamInstance = ProjectTeam.findById(moveTeam)
+					queryString.append(" and ma.${targetTeamType.get(params.role)} = $projectTeamInstance.id ")
 	        	}
 	    	}
        	}
@@ -781,9 +811,9 @@ class MoveBundleAssetController {
        		break;
     	case "teamHeader":
     		if ( rackPlan == "UnrackPlan" ) {
-    			queryString.append( " order by ma.sourceTeamMt.teamCode ${order} ")
+    			queryString.append( " order by ma.${sourceTeamType.get(params.role)}.teamCode ${order} ")
     		} else {
-    			queryString.append( " order by ma.targetTeamMt.teamCode ${order} ")
+    			queryString.append( " order by ma.${targetTeamType.get(params.role)}.teamCode ${order} ")
     		}
        		break;
     	case "cart":
@@ -798,9 +828,9 @@ class MoveBundleAssetController {
     		for( int assetRow = 0; assetRow < moveBundleAssetList.size(); assetRow++) {
     			def displayTeam  
     			if( rackPlan == "RerackPlan" ) {
-    				displayTeam = moveBundleAssetList[assetRow]?.targetTeamMt?.teamCode
+    				displayTeam = moveBundleAssetList[assetRow][targetTeamType.get(params.role)]?.teamCode
     			}else {
-    				displayTeam = moveBundleAssetList[assetRow]?.sourceTeamMt?.teamCode
+    				displayTeam = moveBundleAssetList[assetRow][sourceTeamType.get(params.role)]?.teamCode
     			}
     			def assetEntityInstance = AssetEntity.findById( moveBundleAssetList[assetRow]?.id )
     			moveBundleAsset << [id:assetEntityInstance?.id, assetName:assetEntityInstance?.assetName, model:assetEntityInstance?.model?.toString(), 

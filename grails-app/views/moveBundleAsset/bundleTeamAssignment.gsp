@@ -59,8 +59,9 @@
          		var teamNumber = team
            		var asset = asset
            		var rackPlan = jQuery('#rackPlan').val();
-           		var bundleId = jQuery('#id').val();
-         		${remoteFunction(action:'assetTeamAssign', params:'\'teamId=\' +teamNumber+\'&asset=\'+asset+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId', onComplete:"teamAssignComplete(e);")}
+         		var role = jQuery('#role').val();
+           		var bundleId = jQuery('#moveBundleId').val();
+         		${remoteFunction(action:'assetTeamAssign', params:'\'teamId=\' +teamNumber+\'&asset=\'+asset+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId+\'&role=\'+role', onComplete:"teamAssignComplete(e);")}
          }
          
          function assetCartAssign(cart, asset)
@@ -68,7 +69,7 @@
          	
          		var cartNumber = cart.value
            		var asset = asset
-           		var bundleId = jQuery('#id').val();
+           		var bundleId = jQuery('#moveBundleId').val();
          		${remoteFunction(action:'assetCartAssign', params:'\'cartNumber=\' +cartNumber+\'&asset=\'+asset+\'&bundleId=\'+bundleId', onComplete:"cartAssignComplete(e);")}
          	
          }
@@ -78,7 +79,7 @@
          		var shelfNumber = shelf.value
            		var asset = asset
            		var rackPlan = jQuery('#rackPlan').val();
-           		var bundleId = jQuery('#id').val();
+           		var bundleId = jQuery('#moveBundleId').val();
          		${remoteFunction(action:'assetShelfAssign', params:'\'shelfNumber=\' +shelfNumber+\'&asset=\'+asset+\'&bundleId=\'+bundleId')}
          	
          }
@@ -92,11 +93,12 @@
          	for(var assetRow = 0; assetRow < assets.length; assetRow++) {
          		assetList[assetRow] = assets[assetRow].value
          	}
-         	var bundleId = jQuery('#id').val();
+         	var bundleId = jQuery('#moveBundleId').val();
          	var rackPlan = jQuery('#rackPlan').val();
+         	var role = jQuery('#role').val();
          	if(teamCode != 'null' && teamCode!= '' && assetList.length > 0 && bundleId != null)
          	{
-	         	${remoteFunction(action:'autoFillTeamAssign', params:'\'teamCode=\' +teamCode+\'&assets=\'+assetList+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId',onLoading:"showProcessing();", onComplete:"autoTeamAssignComplete( e );")}
+	         	${remoteFunction(action:'autoFillTeamAssign', params:'\'teamCode=\' +teamCode+\'&assets=\'+assetList+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId+\'&role=\'+role',onLoading:"showProcessing();", onComplete:"autoTeamAssignComplete( e );")}
 	        }
          }
          
@@ -104,9 +106,10 @@
          	jQuery('#filterRack').attr("selectedIndex","0");
          	var teamCode = teamCode
          	var rackPlan = jQuery('#rackPlan').val();
-         	var bundleId = jQuery('#id').val();
+         	var role = jQuery('#role').val();
+         	var bundleId = jQuery('#moveBundleId').val();
          	if(bundleId != null && bundleId != "") {
-	         	${remoteFunction(action:'filterAssetByTeam', params:'\'teamCode=\' +teamCode+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId',onLoad="showProcessing()", onComplete:"filterByTeam( e );")}
+	         	${remoteFunction(action:'filterAssetByTeam', params:'\'teamCode=\' +teamCode+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId+\'&role=\'+role',onLoad="showProcessing()", onComplete:"filterByTeam( e );")}
     		}     	
          }
          
@@ -121,8 +124,9 @@
          			arSelected.push(filterRacks[rack].value);
          		}
          	} 
-         	var bundleId = jQuery('#id').val();
-         	${remoteFunction(action:'filterAssetByRack', params:'\'rack=\'+arSelected+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId', onComplete:"filterByTeam( e );")}
+         	var bundleId = jQuery('#moveBundleId').val();
+         	var role = jQuery('#role').val();
+         	${remoteFunction(action:'filterAssetByRack', params:'\'rack=\'+arSelected+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId+\'&role=\'+role', onComplete:"filterByTeam( e );")}
          }
          
          function moveRackUp() {
@@ -235,7 +239,7 @@
             
             	var teamOption = document.createElement('option');
     			teamOption.text = projectTeamList[teamRow].teamCode
-    			teamOption.value = projectTeamList[teamRow].teamCode
+    			teamOption.value = projectTeamList[teamRow].id
     			
     			try {
       				teamAssignSelectElement.add(teamOption,null);
@@ -391,8 +395,9 @@
 			$(this).attr("class","sortable");
 		})	
 		$("#"+sortBy).attr("class","sortable sorted "+order)
-     	var bundleId = jQuery('#id').val();
-     	${remoteFunction(action:'sortAssets', params:'\'rack=\'+arSelected+\'&rackPlan=\'+rackPlan+\'&bundleId=\'+bundleId+\'&team=\'+team+\'&sortBy=\'+sortBy+\'&order=\'+order', onComplete:"filterByTeam( e );")}
+     	var bundleId = jQuery('#moveBundleId').val();
+     	var role = jQuery('#role').val();
+     	${remoteFunction(action:'sortAssets', params:'\'rack=\'+arSelected+\'&rackPlan=\'+rackPlan+\'&role=\'+role+\'&bundleId=\'+bundleId+\'&team=\'+team+\'&sortBy=\'+sortBy+\'&order=\'+order', onComplete:"filterByTeam( e );")}
     }
     </script>
 
@@ -404,16 +409,15 @@
 	      	<table style="width:90%">
 				<tr class="prop">
 					<td style="width:100%; valign="top" class="value" colspan="2">
-		      		<g:form method="post" name="bundleTeamAssetForm">
-		        	<input type="hidden"  name="id" id="id" value="${moveBundleInstance?.id}" />
-		        	<input type="hidden"  name="rackPlan" id="rackPlan" value="${rack}" />
 		        	<div class="border_bundle_team">
+		        	<g:form method="post" name="bundleTeamAssetForm">
+		        	<input type="hidden"  name="id" id="id" value="${moveBundleInstance?.id}" />
 		          	<table style="border:0px;width:100%">
 		            	<tbody>
 		              		<tr style="width:100%">
 								<td valign="top" style="25%"class="name">&nbsp;
 		                			<label for="Name">
-		                				<g:select optionKey="id" from="${MoveBundle.findAll('from MoveBundle where project = '+moveBundleInstance.project.id)}" name="moveBundle" value="${moveBundleInstance.id}" onChange="submitForm()" />
+		                				<g:select optionKey="id" from="${MoveBundle.findAll('from MoveBundle where project = '+moveBundleInstance.project.id)}" id="moveBundleId" name="moveBundle" value="${moveBundleInstance.id}" onChange="submitForm()" />
 		                			</label>
 		              			</td>
 		              			<td valign="top" style="25%"class="name">&nbsp;
@@ -422,25 +426,9 @@
 		                			</label>
 		              			</td>
 		              			<td style="width:250px; float:left;">
-		              				<table style="width:250px; float:left;">
-		              					<tr>
-		              					<g:if test="${rack == 'UnrackPlan'}">
-		              						<td style="width:100px; float:left; background-color:#43ca56; padding-left:10px;">
-		              					</g:if>
-		              					<g:else>
-		              						<td style="width:112px; float:left;   padding-left:10px;">
-		              					</g:else>
-		              					<g:link controller="moveBundleAsset"  action="bundleTeamAssignment"  params="[bundleId:moveBundleInstance?.id, rackPlan:'unrackPlan']"  >Source Plan</g:link>
-		              					<g:if test="${rack == 'RerackPlan'}">
-		              						<td style="width:100px; float:left; background-color:#43ca56; padding-left:10px;">
-		              					</g:if>	
-		              					<g:else>
-		              						<td style="width:100px; float:left; border-left:1px solid #5585c7; padding-left:10px;">
-		              					</g:else>
-		              					<g:link controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleInstance?.id, rackPlan:'RerackPlan']"  >Target Plan</g:link>
-		              						</td>
-		              					</tr>
-		              				</table>
+		              				<label for="location">
+		              					<g:select name="rackPlan" from="${['UnrackPlan', 'RerackPlan']}" id="rackPlan" valueMessagePrefix="bundle.rackPlan" value="${rack}" onChange="submitForm()" />
+		              				</label>
 		              			</td>
 			              
 								<td style="width:250px; height:auto; margin-left:100px;">
@@ -510,7 +498,7 @@
 			    	          					<select id="filterTeam" onchange="filterAssetsOnTeam(this.value)">
 				              						<option value="">All Teams</option>
 			              							<g:each in="${projectTeamInstance}" var="projectTeam">
-			       	      								<option value="${projectTeam?.teamCode}">${projectTeam?.teamCode}</option>
+			       	      								<option value="${projectTeam?.id}">${projectTeam?.teamCode}</option>
 				           							</g:each>
 				           							<option value="unAssign">UnAssigned</option>
 			             						</select>
@@ -525,7 +513,7 @@
 		    			          				<select id="team" onchange="autoFillTeam(this.value)">
 		              								<option value="null">Select Team to Assign All Assets To</option>
 		              								<g:each in="${projectTeamInstance}" var="projectTeam">
-		       	      									<option value="${projectTeam?.teamCode}">${projectTeam?.teamCode}</option>
+		       	      									<option value="${projectTeam?.id}">${projectTeam?.teamCode}</option>
 			           								</g:each>
 			           								<option value="UnAssign">UnAssign</option>
 		             							</select>	
@@ -535,6 +523,7 @@
 		    	          		</td>
 			              </tr>
 		          	</table>
+		          	</g:form>
 		          	<div  id="processDiv" style="overflow:scroll; width:100%; display:none;">
 		          		<img src="../images/processing.gif"/>
 		          	</div>
@@ -562,32 +551,19 @@
 		                  				<tr style="background-color: ${(i % 2) == 0 ? '#FFFFFF' : '#E0E0E0'}" id="row_${assetEntityInstance?.id}">
 						                    <td style="border:1px;"><input type="hidden" name="asset" id="asset" value="${assetEntityInstance?.id}" />${assetEntityInstance?.assetTag}</td>
 		                    				<td>${assetEntityInstance?.assetName}</td>
-		                    				<td>${assetEntityInstance?.model}</td>
-		                    				<g:if test="${rack == 'UnrackPlan'}">
-		                    					<td>${assetEntityInstance?.sourceLocation}</td>
-						                    	<td>${assetEntityInstance?.sourceRack}</td>
-		                    					<td>${assetEntityInstance?.sourceRackPosition}</td>
-		                    				</g:if>
-		                    				<g:else>
-		                    					<td>${assetEntityInstance?.targetLocation}</td>
-						                    	<td>${assetEntityInstance?.targetRack}</td>
-		                    					<td>${assetEntityInstance?.targetRackPosition}</td>
-		                    				</g:else>
-					                    	<td>${assetEntityInstance?.model?.usize}</td>
-											<g:if test="${rack == 'UnrackPlan'}">
-												<td id="${assetEntityInstance?.id}" onclick="makeSelect(this,${assetEntityInstance?.id})" >
-													<g:select style="display:none;" from= "${projectTeamInstance?.teamCode}" name="assetTeamAssign_${assetEntityInstance?.id}" value="${assetEntityInstance?.sourceTeamMt?.teamCode}" id="${assetEntityInstance?.id}" value="${assetEntityInstance?.sourceTeamMt?.teamCode}" noSelection="['null':'Unassigned']" onChange="assetToTeamAssign(this.value,'${assetEntityInstance?.id}');"/>
-													<span id="span_${assetEntityInstance?.id}">${assetEntityInstance?.sourceTeamMt?.teamCode} </span>
-												</td>
-		                    				</g:if>
-		                    				<g:else >
-		                    					<td id="${assetEntityInstance?.id}" onclick="makeSelect(this,${assetEntityInstance?.id})" >
-													<g:select style="display:none;"  from= "${projectTeamInstance?.teamCode}" name="assetTeamAssign_${assetEntityInstance?.id}" value="${assetEntityInstance?.targetTeamMt?.teamCode}" id="${assetEntityInstance?.id}" noSelection="['null':'Unassigned']" onChange="assetToTeamAssign(this.value,'${assetEntityInstance?.id}');"/>
-													<span id="span_${assetEntityInstance?.id}">${assetEntityInstance?.targetTeamMt?.teamCode} </span>
-												</td>
+		                    				<td>${assetEntityInstance?.modelName}</td>
+	                    					<td>${assetEntityInstance?.room}</td>
+					                    	<td>${assetEntityInstance?.rack}</td>
+	                    					<td>${assetEntityInstance?.rackPosition}</td>
+					                    	<td>${assetEntityInstance?.usize}</td>
+					                    	<td id="${assetEntityInstance?.id}" onclick="makeSelect(this,${assetEntityInstance?.id})" >
+												<g:select style="display:none;" from= "${projectTeamInstance}" name="assetTeamAssign_${assetEntityInstance?.id}" value="${assetEntityInstance?.teamId}" optionKey="id" optionValue="teamCode" noSelection="['null':'Unassigned']" onChange="assetToTeamAssign(this.value,'${assetEntityInstance?.id}');"/>
+												<span id="span_${assetEntityInstance?.id}">${assetEntityInstance?.teamCode} </span>
+											</td>
+											<g:if test="${rack != 'UnrackPlan'}">
 												<td><input size=5px; type=text name="assetCartAssign_${assetEntityInstance?.id}" id="${assetEntityInstance?.id}" value="${assetEntityInstance?.cart}" onblur="assetCartAssign(this,'${assetEntityInstance?.id}');"/></td>
 												<td><input size=5px; type=text name="assetShelfAssign_${assetEntityInstance?.id}" id="${assetEntityInstance?.id}" value="${assetEntityInstance?.shelf}" onblur="assetShelfAssign(this,'${assetEntityInstance?.id}');"/></td>
-											</g:else>
+											</g:if>
 		                  				</tr>
 		                  				<% row++;%>	
 		                			</g:each>
@@ -595,7 +571,6 @@
 		            	</table>
 		          	</div>
 		        </div>
-		      	</g:form>
 		      	</td>
 		  	</tr>
 			</table>

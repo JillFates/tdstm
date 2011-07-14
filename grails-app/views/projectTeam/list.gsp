@@ -42,7 +42,7 @@
                         
                             <td>${projectTeamInstance?.projectTeam?.name}</td>
                             
-                            <td><g:message code="ProjectTeam.role.${projectTeamInstance?.projectTeam?.role}" /></td>
+                            <td><g:if test="${projectTeamInstance?.projectTeam?.role}"> <g:message code="ProjectTeam.role.${projectTeamInstance?.projectTeam?.role}" /></g:if></td>
                              
                             <td>
                             	<g:each in="${projectTeamInstance?.teamMembers}" var="teamMember">
