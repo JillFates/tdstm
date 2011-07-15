@@ -761,14 +761,14 @@ class MoveBundleAssetController {
        	if( moveTeam != "" && moveTeam != null ) {
 	       	if ( rackPlan == "UnrackPlan" ) {
 	    		if( moveTeam == "unAssign" ) {
-	    			queryString.append( " and ma.sourceTeamLog = null ")
+	    			queryString.append( " and (ma.${sourceTeamType.get(params.role)} = null or ma.${sourceTeamType.get(params.role)} = '')")
 	        	} else {
 	        		def projectTeamInstance = ProjectTeam.findById(moveTeam)
 	        		queryString.append(" and ma.${sourceTeamType.get(params.role)} = $projectTeamInstance.id ")
 	        	}
 	    	} else {
 	    		if( moveTeam == "unAssign" ) {
-	    			queryString.append( " and ma.${targetTeamType.get(params.role)} = null")
+	    			queryString.append( " and (ma.${targetTeamType.get(params.role)} = null or ma.${targetTeamType.get(params.role)} = '')")
 	        	} else {
 	        		def projectTeamInstance = ProjectTeam.findById(moveTeam)
 					queryString.append(" and ma.${targetTeamType.get(params.role)} = $projectTeamInstance.id ")
@@ -811,9 +811,9 @@ class MoveBundleAssetController {
        		break;
     	case "teamHeader":
     		if ( rackPlan == "UnrackPlan" ) {
-    			queryString.append( " order by ma.${sourceTeamType.get(params.role)}.teamCode ${order} ")
+    			queryString.append( " order by ma.${sourceTeamType.get(params.role)} ${order} ")
     		} else {
-    			queryString.append( " order by ma.${targetTeamType.get(params.role)}.teamCode ${order} ")
+    			queryString.append( " order by ma.${targetTeamType.get(params.role)} ${order} ")
     		}
        		break;
     	case "cart":
