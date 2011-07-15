@@ -100,7 +100,7 @@
 			</div>
 			<div style="float: right;width: 150px;padding-top: 2px;">
 					<div style="float: right;">
-						<input type="button" value="Update:" id="update" onclick="pageReload();"/> 
+						<input type="button" value="Update:" id="update" onclick="getMoveEventNewsDetails($('#moveEvent').val());"/> 
 						<select name="updateTime" id="updateTimeId" class="selecttext" onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'timedUpdate(e.responseText)') }">
 							<option value="30000">30s</option>
 							<option value="60000">1m</option>
@@ -981,12 +981,6 @@
 	    //myChart.setDataXML( xmlData );
 	   	//myChart.render(divId); 
 	}--%>
-	function pageReload(){
-		if(eventType != "load" || !window.ActiveXObject) {
-			window.location = document.URL;
-		}
-		eventType ="";
-	}
 	/*
 	will popup the dialog to create news
 	*/
