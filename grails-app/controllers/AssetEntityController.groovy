@@ -35,7 +35,9 @@ class AssetEntityController {
 	def assetEntityAttributeLoaderService
     protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8']
 	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
-	
+	protected static targetTeamType = ['MOVE_TECH':'targetTeamMt', 'CLEANER':'targetTeamLog','SYS_ADMIN':'targetTeamSa',"DB_ADMIN":'targetTeamDba']
+	protected static sourceTeamType = ['MOVE_TECH':'sourceTeamMt', 'CLEANER':'sourceTeamLog','SYS_ADMIN':'sourceTeamSa',"DB_ADMIN":'sourceTeamDba']
+	protected static teamsByType = ["MOVE":"'MOVE_TECH','CLEANER'","ADMIN":"'SYS_ADMIN','DB_ADMIN'"]
 	def index = {
 		redirect( action:list, params:params )
 	}
@@ -1086,6 +1088,12 @@ class AssetEntityController {
     	def totalAssetsSize = 0
 		def supportTeam = new HashMap()
     	projectId = projectId ? projectId : getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def teamType = params.teamType
+		teamType = teamType ? teamType : getSession().getAttribute( "CONSOLE_TEAM_TYPE" )?.CONSOLE_TEAM_TYPE
+		if(!teamType){
+			teamType = "MOVE"
+		}
+		userPreferenceService.setPreference( "CONSOLE_TEAM_TYPE", "${teamType}" )
     	def projectInstance = Project.findById( projectId )
 		def moveBundleInstanceList = MoveBundle.findAll("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
 		def moveBundleInstance
@@ -1145,25 +1153,24 @@ class AssetEntityController {
 	        }
 			
 			totalAssetsSize = moveBundleService.assetCount( moveBundleInstance.id )
-			
-			def projectTeamList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = ${moveBundleInstance.id} and "+
-		        											"pt.teamCode != 'Logistics' and pt.teamCode != 'Transport'  order by pt.name asc")
-			
+			def projectTeamList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = ${moveBundleInstance.id} and pt.role in (${teamsByType.get(teamType)}) order by pt.role, pt.name asc")
+
 			/*def countQuery = "SELECT max(cast(t.state_to as UNSIGNED INTEGER)) as maxstate, min(cast(t.state_to as UNSIGNED INTEGER)) as minstate "+
 		        				"FROM asset_entity e left join asset_transition t on (t.asset_entity_id = e.asset_entity_id and t.voided = 0) "+
 								"left join project_asset_map pm on (pm.asset_id = e.asset_entity_id ) where e.move_bundle_id = ${moveBundleInstance.id} "*/
 								
 			def bundleAssetsList = AssetEntity.findAllWhere( moveBundle : moveBundleInstance )
 
-			projectTeamList.each{ 
-				def teamId = it.id
-				def teamMembers = partyRelationshipService.getBundleTeamMembersDashboard(it.id)
+			projectTeamList.each{ projectTeam->
+				def teamId = projectTeam.id
+				def teamRole = projectTeam.role
+				def teamMembers = partyRelationshipService.getBundleTeamMembersDashboard(projectTeam.id)
 				def member
 				if(teamMembers.length() > 0){
 					member = teamMembers.delete((teamMembers.length()-1), teamMembers.length())
 				}
 
-				def sourceAssetsList = bundleAssetsList.findAll{it.sourceTeamMt?.id == teamId }
+				def sourceAssetsList = bundleAssetsList.findAll{it[sourceTeamType.get(teamRole)]?.id == teamId }
 
 				def sourceAssets = sourceAssetsList.size()
 					
@@ -1178,7 +1185,7 @@ class AssetEntityController {
 		            	//jdbcTemplate.queryForList( countQuery + " and e.source_team_id = ${it.id} and pm.current_state_id >= $releasedId and pm.current_state_id < $unrackedId  "+
 		            													//"group by e.asset_entity_id HAVING minstate != $holdId ").size()
 		            
-				def targetAssetsList = bundleAssetsList.findAll{it.targetTeamMt?.id == teamId }
+				def targetAssetsList = bundleAssetsList.findAll{it[targetTeamType.get(teamRole)]?.id == teamId }
 		        def targetAssets = targetAssetsList.size()
 		            
 		        def targetPendAssets = targetAssetsList.findAll{it.currentStatus < stagedId || !it.currentStatus }.size()
@@ -1191,17 +1198,25 @@ class AssetEntityController {
 		        def targetAvailAssets = targetAssetsList.findAll{it.currentStatus >= stagedId && it.currentStatus < rerackedId }.size()
 		            	//jdbcTemplate.queryForList( countQuery + " and e.target_team_id = ${it.id} and pm.current_state_id >= $stagedId "+
 		            													//" and pm.current_state_id < $rerackedId group by e.asset_entity_id HAVING minstate != $holdId ").size()
-				def latestAssetCreated = AssetTransition.findAll("FROM AssetTransition a where a.assetEntity = ? and a.projectTeam = ? Order By a.id desc",[it.latestAsset, it],[max:1])
+				def latestAssetCreated = AssetTransition.findAll("FROM AssetTransition a where a.assetEntity = ? and a.projectTeam = ? Order By a.id desc",[projectTeam.latestAsset, projectTeam],[max:1])
 				def elapsedTime = "00:00m"
 				if(latestAssetCreated.size() > 0){
 					elapsedTime = convertIntegerIntoTime(today.getTime() - latestAssetCreated[0].dateCreated.getTime() )?.toString()
 					elapsedTime = elapsedTime?.substring(0,elapsedTime.lastIndexOf(":")) + "m"
 				}
-		        bundleTeams <<[team:it,members:member, sourceAssets:sourceAssets, 
+				def headColor = 'white'
+				if(sourceAvailassets > 0){
+					headColor = 'green'
+				} else if(sourceAssets==sourcePendAssets && sourceAssets > 0){
+					headColor = 'grey'
+				} else if(unrackedAssets != sourceAssets && sourceAssets > 0){
+					headColor = 'blue'
+				}
+		        bundleTeams <<[team:projectTeam,members:member, sourceAssets:sourceAssets, 
 							   unrackedAssets:unrackedAssets, sourceAvailassets:sourceAvailassets , 
 							   targetAvailAssets:targetAvailAssets , targetAssets:targetAssets, 
-							   rerackedAssets:rerackedAssets, sourcePendAssets:sourcePendAssets, 
-							   targetPendAssets:targetPendAssets, elapsedTime:elapsedTime, eventActive : it.moveBundle.moveEvent?.inProgress  ]
+							   rerackedAssets:rerackedAssets, sourcePendAssets:sourcePendAssets, headColor:headColor,
+							   targetPendAssets:targetPendAssets, elapsedTime:elapsedTime, eventActive : projectTeam.moveBundle.moveEvent?.inProgress  ]
 			}
 								
 			def sourcePendCleaned = bundleAssetsList.findAll{ it.currentStatus < unrackedId || !it.currentStatus }.size()
@@ -1362,7 +1377,7 @@ class AssetEntityController {
 					timeToUpdate : timeToUpdate ? timeToUpdate.SUPER_CONSOLE_REFRESH : "never", showAll : showAll,
 					applicationList : applicationList, appOwnerList : appOwnerList, appSmeList : appSmeList, 
 		            transitionStates : transitionStates, params:params, totalAssetsOnHold:totalAssetsOnHold,
-					totalSourcePending: totalSourcePending, totalTargetPending: totalTargetPending, role: role ]
+					totalSourcePending: totalSourcePending, totalTargetPending: totalTargetPending, role: role, teamType:teamType ]
 		} else {
 			flash.message = "Please create bundle to view Console"	
 			redirect(controller:'project',action:'show',params:["id":params.projectId])
@@ -1445,8 +1460,8 @@ class AssetEntityController {
 	        }
 	        map.put("currentState",stateEngineService.getStateLabel(assetDetail.project.workflowCode,currentState))
 	        map.put("state",state)
-	        def sourceQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and teamCode != 'Logistics' and teamCode != 'Transport'")
-	        def targetQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and teamCode != 'Logistics' and teamCode != 'Transport'")
+	        def sourceQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and role = 'MOVE_TECH'")
+	        def targetQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and role = 'MOVE_TECH'")
 	        if(assetDetail.sourceTeamMt){
 	        	sourceQuery.append(" and id != $assetDetail.sourceTeamMt.id ")
 	        }

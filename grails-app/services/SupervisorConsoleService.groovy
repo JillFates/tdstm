@@ -5,6 +5,9 @@ class SupervisorConsoleService {
 	def stateEngineService
 	def userPreferenceService
     boolean transactional = true
+	protected static targetTeamType = ['MOVE_TECH':'target_team_id', 'CLEANER':'target_team_log_id','SYS_ADMIN':'target_team_sa_id',"DB_ADMIN":'target_team_dba_id']
+	protected static sourceTeamType = ['MOVE_TECH':'source_team_id', 'CLEANER':'source_team_log_id','SYS_ADMIN':'source_team_sa_id',"DB_ADMIN":'source_team_dba_id']
+	
     /*----------------------------------------
      * @author : Lokanath Reddy
      * @param  : move bundle and request params
@@ -62,14 +65,15 @@ class SupervisorConsoleService {
 			}
 		}
 		if(filterTeam){
+			def teamRole = ProjectTeam.findById(filterTeam).role
 			if(assetLocation){
 				if(assetLocation == "source"){
-					queryForConsole.append(" and ae.source_team_id = $filterTeam ")
+					queryForConsole.append(" and ae.${sourceTeamType.get(teamRole)} = $filterTeam ")
 				} else if(assetLocation == "target"){
-					queryForConsole.append(" and ae.target_team_id = $filterTeam ")
+					queryForConsole.append(" and ae.${targetTeamType.get(teamRole)} = $filterTeam ")
 				}
 			} else {
-				queryForConsole.append(" and ( ae.source_team_id = $filterTeam or ae.target_team_id = $filterTeam ) ")
+				queryForConsole.append(" and ( ae.${sourceTeamType.get(teamRole)} = $filterTeam or ae.${targetTeamType.get(teamRole)} = $filterTeam ) ")
 			}
 		}
 		

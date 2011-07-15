@@ -516,6 +516,10 @@ function onInvokeAction(id) {
 
 			</select>
 			</td>
+			<td style="vertical-align: bottom;width:100px;" class="name">
+				<label for="teamType">Team Types:</label>&nbsp;
+				<g:select name="teamType" from="${['MOVE', 'ADMIN']}" id="teamTypeId" valueMessagePrefix="bundle.teamType" value="${teamType}" onchange="submitFormWithBundle('show')"/>
+			</td>
 			<td style="width:40%">
 			<h1 align="center">Supervisor Console</h1>
 			</td>
@@ -573,7 +577,7 @@ function onInvokeAction(id) {
 						<g:each in="${bundleTeams}" var="bundleTeam">
 							<td style="padding: 0px; border-right: 1px solid #333333">
 							<table style="border: 0;">
-								<tr><th nowrap>${bundleTeam?.team?.name }&nbsp;</th>
+								<tr><th nowrap style="background-color: ${bundleTeam.headColor};border: 1px solid #ccc;">${bundleTeam?.team?.name }&nbsp;</th>
 								<tr>
 								<tr>
 									<td nowrap>${bundleTeam?.members}&nbsp;</td>
@@ -600,7 +604,12 @@ function onInvokeAction(id) {
 										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_done')"><u>${bundleTeam?.unrackedAssets}<span style="font-weight: normal;">dn</span></u></a> = 
 										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','')"><u>${bundleTeam?.sourceAssets}</u></a>
 										<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
+										<g:if test="${bundleTeam.team?.role != 'CLEANER'}">
 										<a title="Login as.."  href="#" onclick="window.open('../moveTech/login?username=mt-${moveBundleInstance.id}-${bundleTeam?.team?.id}-s','mtwindow','menubar=1,resizable=1,width=320,height=480'); ">@</a>
+										</g:if>
+										<g:else>
+										<a title="Login as.." href="../moveTech/login?username=ct-${moveBundleInstance.id}-${bundleTeam?.team?.id}-s">@</a>
+										</g:else>
 										</jsec:lacksAllRoles>
 									</td>
 								</tr>
@@ -611,46 +620,18 @@ function onInvokeAction(id) {
 										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_done')"><u> ${bundleTeam?.rerackedAssets}<span style="font-weight: normal;">dn</span></u> </a> = 
 										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','')"><u>${bundleTeam?.targetAssets}</u></a>
 										<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
+										<g:if test="${bundleTeam.team?.role != 'CLEANER'}">
 										<a title="Login as.." href="#" onclick="window.open('../moveTech/login?username=mt-${moveBundleInstance.id}-${bundleTeam?.team?.id}-t','mtwindow','menubar=1,resizable=1,width=320,height=480'); ">@</a>
+										</g:if>
+										<g:else>
+										<a title="Login as.." href="../moveTech/login?username=ct-${moveBundleInstance.id}-${bundleTeam?.team?.id}-t">@</a>
+										</g:else>
 										</jsec:lacksAllRoles>
 									</td>
 								</tr>
 							</table>
 							</td>
 						</g:each>
-						<td style="padding: 0px; border-right: 1px solid #333333">
-						<table style="border: 0;">
-							<tr><th nowrap>Logistics &nbsp;</th>
-							</tr>
-							<tr>
-								<td nowrap>${supportTeam?.cleaningMembers}&nbsp;</td>
-							</tr>
-							<tr>
-								<td nowrap class="odd">${supportTeam?.cleaning?.currentLocation}&nbsp;</td>
-							</tr>
-							<tr>
-								<td nowrap>
-									<g:if test="${supportTeam?.cleaning?.latestAsset}">
-									<a href="#" onclick="assetDetails('${supportTeam?.cleaning?.latestAsset?.id}')"> ${supportTeam?.cleaning?.latestAsset?.assetTag}</a>
-									</g:if>&nbsp;
-								</td>
-							</tr>
-							<tr>
-								<td nowrap class="odd">
-								<a href="#" onclick="filterByDataPoints('source','','source_pend_clean')"><u> ${supportTeam.sourcePendCleaned}<span style="font-weight: normal;">pend</span></u> </a> +
-								<a href="#" onclick="filterByDataPoints('source','','source_avail_clean')"><u style="color: green;"> ${supportTeam.sourceAvailCleaned}<span style="font-weight: normal;">rdy</span></u> </a> +
-								<a href="#" onclick="filterByDataPoints('source','','source_done_clean')"><u> ${supportTeam.sourceCleaned}<span style="font-weight: normal;">dn</span></u> </a> =
-								<a href="#" onclick="filterByDataPoints('source','','')"><u> ${supportTeam.totalAssets}</u> </a> 
-								<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
-									<a title="Login as.." href="../moveTech/login?username=ct-${moveBundleInstance.id}-${supportTeam.cleaning?.id}-s">@</a>
-								</jsec:lacksAllRoles> 
-								</td>
-							</tr>
-							<tr>
-								<td nowrap>N/A</td>
-							</tr>
-						</table>
-						</td>
 						<td style="padding: 0px;">
 						<table style="border: 0;">
 							<tr><th nowrap>Transport &nbsp;</th>
