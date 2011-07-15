@@ -447,7 +447,7 @@
 		              					</tbody>		
 		              				</table>
 		              			</td>
-		              			<g:if test="${rack == 'RerackPlan'}">
+		              			<g:if test="${rack == 'RerackPlan' && ['MOVE_TECH','CLEANER'].contains(role)}">
 		              			<td style="width:150px; height:auto;">
 		              				<b>Cart Assignments</b>
 		              				<table id="cartAssetCountTable" style="width:200px; height:auto;">
@@ -479,7 +479,7 @@
 				              				<select id="filterRack" multiple="multiple" onMouseUp="filterAssetsOnRack(this.value)"  style="width: 100px; height: 70px;">
 				              					<option value="all" selected="selected">All Racks</option>
 				              					<g:each in="${assetEntitysRacks}" var="assetEntitysRacks">
-				              						<g:if test="${rack == 'UnrackPlan'}">
+				              						<g:if test="${rack == 'UnrackPlan' }">
 				              							<option value="${assetEntitysRacks?.sourceRack}">${assetEntitysRacks?.sourceRack}</option>
 				              						</g:if>
 					              					<g:else>
@@ -539,7 +539,7 @@
 				                  	<th class="sortable" id="uposition"><a href="javascript:sortAssets('uposition')" >Pos</a></th>
 				                  	<th class="sortable" id="usize"><a href="javascript:sortAssets('usize')" >Size</a></th>
 				                  	<th class="sortable" id="teamHeader"><a href="javascript:sortAssets('teamHeader')" >Team</a></th>
-				                  	<g:if test="${rack == 'RerackPlan'}">
+				                  	<g:if test="${rack == 'RerackPlan' && ['MOVE_TECH','CLEANER'].contains(role)}">
 				                  	<th class="sortable" id="cart"><a href="javascript:sortAssets('cart')" >Cart</a></th>
 				                  	<th class="sortable" id="shelf"><a href="javascript:sortAssets('rack')" >Shelf</a></th>
 				                  	</g:if>
@@ -560,7 +560,7 @@
 												<g:select style="display:none;" from= "${projectTeamInstance}" name="assetTeamAssign_${assetEntityInstance?.id}" value="${assetEntityInstance?.teamId}" optionKey="id" optionValue="teamCode" noSelection="['null':'Unassigned']" onChange="assetToTeamAssign(this.value,'${assetEntityInstance?.id}');"/>
 												<span id="span_${assetEntityInstance?.id}">${assetEntityInstance?.teamCode} </span>
 											</td>
-											<g:if test="${rack != 'UnrackPlan'}">
+											<g:if test="${rack != 'UnrackPlan' && ['MOVE_TECH','CLEANER'].contains(role)}">
 												<td><input size=5px; type=text name="assetCartAssign_${assetEntityInstance?.id}" id="${assetEntityInstance?.id}" value="${assetEntityInstance?.cart}" onblur="assetCartAssign(this,'${assetEntityInstance?.id}');"/></td>
 												<td><input size=5px; type=text name="assetShelfAssign_${assetEntityInstance?.id}" id="${assetEntityInstance?.id}" value="${assetEntityInstance?.shelf}" onblur="assetShelfAssign(this,'${assetEntityInstance?.id}');"/></td>
 											</g:if>
