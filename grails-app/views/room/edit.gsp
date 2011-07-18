@@ -17,10 +17,10 @@
 					<td>Room<br/>
 						<input type="text" name="roomName" id="roomNameId" value="${roomInstance.roomName}">
 					</td>
-					<td>Width<br/>
+					<td>Width (ft)<br/>
 						<input type="text" name="roomWidth" id="roomWidthId" value="${roomInstance.roomWidth}">
 					</td>
-					<td>Depth<br/>
+					<td>Depth (ft)<br/>
 						<input type="text" name="roomDepth" id="roomDepthId" value="${roomInstance.roomDepth}">
 					</td>
 				</tr>

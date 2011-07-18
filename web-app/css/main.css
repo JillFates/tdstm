@@ -170,6 +170,18 @@ th.asc a {
 th.desc a {
     background-image: url(../images/skin/sorted_desc.gif);
 }
+th.teamstatus_pending {
+	background-color:#ccc;
+}
+th.teamstatus_ready {
+	background-color:#33ff00;
+}
+th.teamstatus_process {
+	background-color:#66ffff;
+}
+th.teamstatus_done {
+	background-color:#fff;
+}
 
 .odd {
     background: #f0f0f0;
@@ -309,8 +321,14 @@ th.desc a {
 	clear:both;
 }
 
+
+
 .clear_filter {
+
 	font-size: 14px;
+
 	color: #B80000;
+
 	vertical-align: baseline;
+
 }

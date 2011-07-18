@@ -1204,13 +1204,13 @@ class AssetEntityController {
 					elapsedTime = convertIntegerIntoTime(today.getTime() - latestAssetCreated[0].dateCreated.getTime() )?.toString()
 					elapsedTime = elapsedTime?.substring(0,elapsedTime.lastIndexOf(":")) + "m"
 				}
-				def headColor = 'white'
-				if(sourceAvailassets > 0){
-					headColor = 'green'
+				def headColor = 'done'
+				if(unrackedAssets != sourceAssets && sourceAssets > 0){
+					headColor = 'process'
+				} else if(sourceAvailassets > 0){
+					headColor = 'ready'
 				} else if(sourceAssets==sourcePendAssets && sourceAssets > 0){
-					headColor = 'grey'
-				} else if(unrackedAssets != sourceAssets && sourceAssets > 0){
-					headColor = 'blue'
+					headColor = 'pending'
 				}
 		        bundleTeams <<[team:projectTeam,members:member, sourceAssets:sourceAssets, 
 							   unrackedAssets:unrackedAssets, sourceAvailassets:sourceAvailassets , 
