@@ -685,18 +685,22 @@ function onInvokeAction(id) {
 					</tr>
 					<tr>
 						<td nowrap class="odd">
+							<g:if test="${teamType != 'ADMIN'}">
 							<a href="#" onclick="filterByDataPoints('source','','source_pend')"><u> ${totalSourcePending}<span style="font-weight: normal;">pend</span></u> </a> +
 							<a href="#" onclick="filterByDataPoints('source','','source_avail')"><u style="color: green;"> ${totalSourceAvail}<span style="font-weight: normal;">rdy</span></u> </a> +
 							<a href="#" onclick="filterByDataPoints('source','','source_done')"><u> ${totalUnracked}<span style="font-weight: normal;">dn</span></u> </a> = 
 							<a href="#" onclick="filterByDataPoints('source','','')"><u>${totalAsset}</u> </a>
+							</g:if>&nbsp;
 						</td>
 					</tr>
 					<tr>
 						<td nowrap>
+							<g:if test="${teamType != 'ADMIN'}">
 							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_pend')"><u>${totalTargetPending}<span style="font-weight: normal;">pend</span></u></a> +
 							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_avail')"><u style="color: green;">${totalTargetAvail}<span style="font-weight: normal;">rdy</span></u></a> +
 							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_done')"><u>${totalReracked}<span style="font-weight: normal;">dn</span></u></a> = 
 							<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','')"><u>${totalAsset}</u> </a>
+							</g:if>&nbsp;
 						</td>
 					</tr>
 				</table>
