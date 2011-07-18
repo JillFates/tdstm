@@ -1126,9 +1126,11 @@ class AssetEntityController {
 		if( moveBundleInstance != null ){
 			//  Get Id for respective States
 			def cleanedId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "Cleaned" ) )
+			def rerackingId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "Reracking" ) )
 			def rerackedId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "Reracked" ) )
 			def onCartId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "OnCart" ) )
 			def stagedId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "Staged" ) )
+			def unrackingId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "Unracking" ) )
 			def unrackedId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "Unracked" ) )
 			def holdId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "Hold" ) )
 			def releasedId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "Release" ) )
@@ -1177,7 +1179,8 @@ class AssetEntityController {
 				def sourcePendAssets = sourceAssetsList.findAll{it.currentStatus < releasedId || !it.currentStatus }.size()
 		            	//jdbcTemplate.queryForList( countQuery + "and e.source_team_id = ${it.id} and (pm.current_state_id < $releasedId or pm.current_state_id is null)"+
 		            						//							"group by e.asset_entity_id ").size()
-		            
+				def unrackingAssets = sourceAssetsList.findAll{it.currentStatus == unrackingId }.size()
+				
 				def unrackedAssets = sourceAssetsList.findAll{it.currentStatus >= unrackedId }.size()
 		            	//jdbcTemplate.queryForList( countQuery + "and e.source_team_id = ${it.id} and pm.current_state_id >= $unrackedId group by e.asset_entity_id having minstate != $holdId").size()
 		            
@@ -1192,7 +1195,9 @@ class AssetEntityController {
 		            	//jdbcTemplate.queryForList(countQuery +	"and e.target_team_id = ${it.id} and (pm.current_state_id < $stagedId or pm.current_state_id is null)"+
 		            												//"group by e.asset_entity_id ").size()
 		
-		        def rerackedAssets = targetAssetsList.findAll{it.currentStatus >= rerackedId }.size() 
+		        def rerackingAssets = targetAssetsList.findAll{it.currentStatus == rerackingId }.size() 
+				
+				def rerackedAssets = targetAssetsList.findAll{it.currentStatus >= rerackedId }.size()
 		            	//jdbcTemplate.queryForList(countQuery +	"and e.target_team_id = ${it.id} and pm.current_state_id >= $rerackedId group by e.asset_entity_id HAVING minstate != $holdId ").size()
 					
 		        def targetAvailAssets = targetAssetsList.findAll{it.currentStatus >= stagedId && it.currentStatus < rerackedId }.size()
@@ -1204,13 +1209,24 @@ class AssetEntityController {
 					elapsedTime = convertIntegerIntoTime(today.getTime() - latestAssetCreated[0].dateCreated.getTime() )?.toString()
 					elapsedTime = elapsedTime?.substring(0,elapsedTime.lastIndexOf(":")) + "m"
 				}
+				
 				def headColor = 'done'
-				if(unrackedAssets != sourceAssets && sourceAssets > 0){
-					headColor = 'process'
-				} else if(sourceAvailassets > 0){
-					headColor = 'ready'
-				} else if(sourceAssets==sourcePendAssets && sourceAssets > 0){
-					headColor = 'pending'
+				if(projectTeam.currentLocation != "Target"){
+					if(unrackingAssets > 0 && sourceAssets > 0){
+						headColor = 'process'
+					} else if(sourceAvailassets > 0){
+						headColor = 'ready'
+					} else if(sourceAssets != unrackedAssets && sourceAssets > 0){
+						headColor = 'pending'
+					}
+				} else {
+					if(rerackingAssets > 0 && targetAssets > 0){
+						headColor = 'process'
+					} else if(targetAvailAssets > 0){
+						headColor = 'ready'
+					} else if(targetAssets != rerackedAssets && targetAssets > 0){
+						headColor = 'pending'
+					}
 				}
 		        bundleTeams <<[team:projectTeam,members:member, sourceAssets:sourceAssets, 
 							   unrackedAssets:unrackedAssets, sourceAvailassets:sourceAvailassets , 
@@ -1239,7 +1255,7 @@ class AssetEntityController {
 				
 		    def targetMover = bundleAssetsList.findAll{ it.currentStatus >= stagedId }.size()
 		        	//jdbcTemplate.queryForList(countQuery + " and pm.current_state_id >= $stagedId group by e.asset_entity_id having minstate != $holdId").size()
-
+			
 			def targetTransportAvail = bundleAssetsList.findAll{ it.currentStatus >= onTruckId && it.currentStatus < offTruckId }.size()
 		        	//jdbcTemplate.queryForList(countQuery + " and pm.current_state_id >= $onTruckId and pm.current_state_id < $offTruckId group by e.asset_entity_id having minstate != $holdId").size()
 		        

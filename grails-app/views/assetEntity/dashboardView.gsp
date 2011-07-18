@@ -577,7 +577,7 @@ function onInvokeAction(id) {
 						<g:each in="${bundleTeams}" var="bundleTeam">
 							<td style="padding: 0px; border-right: 1px solid #333333">
 							<table style="border: 0;">
-								<tr><th nowrap style="background-color: ${bundleTeam.headColor};border: 1px solid #ccc;">${bundleTeam?.team?.name }&nbsp;</th>
+								<tr><th nowrap class="teamstatus_${bundleTeam.headColor}" style="border: 1px solid #ccc;">${bundleTeam?.team?.name }&nbsp;</th>
 								<tr>
 								<tr>
 									<td nowrap>${bundleTeam?.members}&nbsp;</td>
@@ -632,37 +632,39 @@ function onInvokeAction(id) {
 							</table>
 							</td>
 						</g:each>
-						<td style="padding: 0px;">
-						<table style="border: 0;">
-							<tr><th nowrap>Transport &nbsp;</th>
-							</tr>
-							<tr>
-								<td nowrap>${supportTeam?.transportMembers}&nbsp;</td>
-							</tr>
-							<tr>
-								<td nowrap class="odd">${supportTeam?.transport?.currentLocation}&nbsp;</td>
-							</tr>
-							<tr>
-								<td nowrap>&nbsp;</td>
-							</tr>
-							<tr>
-								<td nowrap class="odd">
-								<a href="#" onclick="filterByDataPoints('source','','source_pend_trans')"><u> ${supportTeam.sourceTransportPend}<span style="font-weight: normal;">pend</span></u> </a> +
-								<a href="#" onclick="filterByDataPoints('source','','source_avail_trans')"><u style="color: green;"> ${supportTeam.sourceTransportAvail}<span style="font-weight: normal;">rdy</span></u> </a> +
-								<a href="#" onclick="filterByDataPoints('source','','source_done_trans')"><u> ${supportTeam.sourceMover}<span style="font-weight: normal;">dn</span></u> </a> =
-								<a href="#" onclick="filterByDataPoints('source','','')"><u> ${supportTeam.totalAssets}</u> </a> 
-								</td>
-							</tr>
-							<tr>
-								<td nowrap>
-								<a href="#" onclick="filterByDataPoints('target','','target_pend_trans')"><u> ${supportTeam.targetTransportPend}<span style="font-weight: normal;">pend</span></u> </a> +
-								<a href="#" onclick="filterByDataPoints('target','','target_avail_trans')"><u style="color: green;"> ${supportTeam.targetTransportAvail}<span style="font-weight: normal;">rdy</span></u> </a> +
-								<a href="#" onclick="filterByDataPoints('target','','target_done_trans')"><u> ${supportTeam.targetMover}<span style="font-weight: normal;">dn</span></u> </a> =
-								<a href="#" onclick="filterByDataPoints('target','','')"><u> ${supportTeam.totalAssets}</u> </a> 
-								</td>
-							</tr>
-						</table>
-						</td>
+						<g:if test="${teamType != 'ADMIN'}">
+							<td style="padding: 0px;">
+							<table style="border: 0;">
+								<tr><th nowrap class="teamstatus_pending" style='border: 1px solid #ccc;'>Transport &nbsp;</th>
+								</tr>
+								<tr>
+									<td nowrap>${supportTeam?.transportMembers}&nbsp;</td>
+								</tr>
+								<tr>
+									<td nowrap class="odd">${supportTeam?.transport?.currentLocation}&nbsp;</td>
+								</tr>
+								<tr>
+									<td nowrap>&nbsp;</td>
+								</tr>
+								<tr>
+									<td nowrap class="odd">
+									<a href="#" onclick="filterByDataPoints('source','','source_pend_trans')"><u> ${supportTeam.sourceTransportPend}<span style="font-weight: normal;">pend</span></u> </a> +
+									<a href="#" onclick="filterByDataPoints('source','','source_avail_trans')"><u style="color: green;"> ${supportTeam.sourceTransportAvail}<span style="font-weight: normal;">rdy</span></u> </a> +
+									<a href="#" onclick="filterByDataPoints('source','','source_done_trans')"><u> ${supportTeam.sourceMover}<span style="font-weight: normal;">dn</span></u> </a> =
+									<a href="#" onclick="filterByDataPoints('source','','')"><u> ${supportTeam.totalAssets}</u> </a> 
+									</td>
+								</tr>
+								<tr>
+									<td nowrap>
+									<a href="#" onclick="filterByDataPoints('target','','target_pend_trans')"><u> ${supportTeam.targetTransportPend}<span style="font-weight: normal;">pend</span></u> </a> +
+									<a href="#" onclick="filterByDataPoints('target','','target_avail_trans')"><u style="color: green;"> ${supportTeam.targetTransportAvail}<span style="font-weight: normal;">rdy</span></u> </a> +
+									<a href="#" onclick="filterByDataPoints('target','','target_done_trans')"><u> ${supportTeam.targetMover}<span style="font-weight: normal;">dn</span></u> </a> =
+									<a href="#" onclick="filterByDataPoints('target','','')"><u> ${supportTeam.totalAssets}</u> </a> 
+									</td>
+								</tr>
+							</table>
+							</td>
+						</g:if>
 					</tr>
 				</table>
 				</div>
@@ -781,12 +783,14 @@ function onInvokeAction(id) {
 								 <jmesa:htmlColumn property="status" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 									<div onclick="assetDetails('${assetEntityBean.id}')"	id="statusCol_${assetEntityBean.id}" style="width: 100%">${assetEntityBean.status}&nbsp;</div>
 								 </jmesa:htmlColumn>
+								 <g:if test="${teamType != 'ADMIN'}">
 								 <jmesa:htmlColumn property="sourceTeamMt" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 									<div onclick="assetDetails('${assetEntityBean.id}')"	id="source_${assetEntityBean.id}" style="width: 100%">${assetEntityBean.sourceTeamMt}&nbsp;</div>
 								 </jmesa:htmlColumn>
 								 <jmesa:htmlColumn property="targetTeamMt" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 									<div onclick="assetDetails('${assetEntityBean.id}')" id="target_${assetEntityBean.id}" style="width: 100%">${assetEntityBean.targetTeamMt}&nbsp;</div>
 								 </jmesa:htmlColumn>
+								 </g:if>
 								 <jmesa:htmlColumn property="commentType" title="Issues" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 									<div id="icon_${assetEntityBean.id}">
 										<g:if test="${assetEntityBean.commentType == 'issue'}">
