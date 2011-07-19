@@ -158,6 +158,7 @@ class WsDashboardController {
 				"snapshot": [ 
 					"revisedComp" : moveEvent?.revisedCompletionTime, 
 					"moveBundleId" : moveBundleId,
+					"calcMethod":moveEvent?.calcMethod,
 					"planDelta" : moveEventPlannedSnapshot?.planDelta,
 					"systime": sdf.format(sysTime),
 					"planSum": [ 

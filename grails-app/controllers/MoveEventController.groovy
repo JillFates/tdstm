@@ -413,11 +413,15 @@ class MoveEventController {
      */
     def updateEventSumamry = {
     	def moveEvent = MoveEvent.get( params.moveEventId )
-    	def dialIndicator = params.value
-		if(dialIndicator){
+    	def dialIndicator
+    	def checkbox = params.checkbox;
+    	if(checkbox == "true") {
+			dialIndicator = params.value
+		}
+		if(dialIndicator  || dialIndicator == 0){
 			def moveEventSnapshot = new MoveEventSnapshot(moveEvent : moveEvent, planDelta:0, dialIndicator:dialIndicator, type:"P")
 	    	if ( ! moveEventSnapshot.save( flush : true ) ) 
-	    		log.error("Unable to save changes to MoveEventSnapshot: ${moveEventSnapshot}")
+	    		log.errlor("Unable to save changes to MoveEventSnapshot: ${moveEventSnapshot}")
 			
 			moveEvent.calcMethod = MoveEvent.METHOD_MANUAL
 		} else {

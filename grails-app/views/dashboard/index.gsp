@@ -141,6 +141,7 @@
 						Move Status vs. Plan
 					<br/>
 					<span id="manualSumStatusSpan" style="display: none;width: 10px;">
+						<span style="font-weight: normal;font-size: 12px;">Manual :</span> <input type="checkbox" name="manual" value="" id="checkBoxId"  /> 
 						<input type="text" value="" name="manualSummaryStatus" id="manualSummaryStatusId" size="3" maxlength="3" onblur="validateManulaSummary(this.value)"/>&nbsp;
 						<input type="button" value="Save" onclick="changeEventSummary()"/>
 					</span>
@@ -795,7 +796,7 @@
 			
 			var snapshot = dataPointStep.snapshot;
 			var moveBundleId = snapshot.moveBundleId;
-			
+			var calcMethod = snapshot.calcMethod
 			var steps = snapshot.steps;
 			var revSum = snapshot.revSum;
 			var planSum = snapshot.planSum
@@ -819,6 +820,11 @@
 				$("#moveEventStatus").html("GREEN")
 			}
 			updateSummaryGauge("summary_gauge", sumDialInd);
+			if(calcMethod == "M"){
+				$('#checkBoxId').attr("checked","checked")
+			} else {
+				$('#checkBoxId').removeAttr("checked")
+			}
 			$("#manualSummaryStatusId").val( sumDialInd );
 			$("#spanPlanned").html(convertTime(offset, planSum.compTime))
 			
@@ -1152,11 +1158,10 @@
 	function changeEventSummary(){
 		var value = $("#manualSummaryStatusId").val()
 		if(validateManulaSummary( value )){
-			var moveEvent = $("#moveEventId").val();
-			${remoteFunction(controller:"moveEvent",action:'updateEventSumamry', 
-					params:'\'moveEventId=\' + moveEvent +\'&value=\'+ value', 
-					onComplete:'updateDash( $("#defaultBundleId").val() )')}
-			$("#manualSumStatusSpan").hide();
+		var checkbox = $('#checkBoxId').is(":checked");
+		var moveEvent = $("#moveEventId").val();
+		${remoteFunction(controller:'moveEvent',action:'updateEventSumamry', params:'\'moveEventId=\'+moveEvent+\'&value=\'+value+\'&checkbox=\'+checkbox', onComplete:'updateDash( $("#defaultBundleId").val() )')};
+		$("#manualSumStatusSpan").hide();
 		}
 	}
 	// FUNCTION TO SET THE STEP DIV WIDTH.
