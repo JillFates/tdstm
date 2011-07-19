@@ -53,8 +53,10 @@
 			</td>
 		</tr>
 		<tr>
-			<td>Power (typical):</td>
-			<td><input type="text" name="powerUse" id="powerUseId" value="${modelInstance.powerUse}" >&nbsp;Watts</td>
+			<td>Power :</td>
+			<td><input type="text" name="powerUse" id="powerUseId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? Math.round(modelInstance?.powerUse / 110 ) : modelInstance?.powerUse}" >&nbsp;
+			<g:select id="ptype" name='powerType' value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE }" from="${['Watts','Amps']}" > </g:select>
+                 </td>
 		</tr>
 		<tr>
 		<td>Front image:</label></td>

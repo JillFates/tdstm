@@ -136,8 +136,11 @@
 			</td>
 			
 			<td class="buttonR">
-				<br /><br />
-				<input type="submit" class="submit" value="Generate" />
+				<table style="border: 0"><tr><td nowrap="nowrap">
+				Display in: <g:select id="powerType" name='powerType' value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE}" style="float:right; margin-right:510px;" from="${['Watts','Amps']}"> </g:select>
+				</td></tr><tr></tr><td>
+				<input type="submit" class="submit" value="Generate" /></td></tr> </table>
+				</div>
 			</td>
 		</tr>
 	</tbody>

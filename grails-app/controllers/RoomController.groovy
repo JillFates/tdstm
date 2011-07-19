@@ -288,20 +288,21 @@ class RoomController {
 		   		powerX += powerUse
 		   }
 	   }
-	   powerA = Math.round(powerA) 
-	   powerB = Math.round(powerB) 
-	   powerC = Math.round(powerC) 
-	   powerX = Math.round(powerX) 
+	   def powerType = session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE
+	   powerA = Math.round(powerType != "Watts" ? powerA / 110 : powerA ) 
+	   powerB = Math.round(powerType != "Watts" ? powerB / 110 : powerB) 
+	   powerC = Math.round(powerType != "Watts" ? powerC / 110 : powerC) 
+	   powerX = Math.round(powerType != "Watts" ? powerX / 110 : powerX) 
 	   
-	   int rackPowerA = rack.powerA ? Math.round(rack.powerA) : 0
-	   int rackPowerB = rack.powerB ? Math.round(rack.powerB) : 0
-	   int rackPowerC = rack.powerB ? Math.round(rack.powerC) : 0
+	   int rackPowerA = rack.powerA ? Math.round(powerType != "Watts" ? rack.powerA / 110 : rack.powerA) : 0
+	   int rackPowerB = rack.powerB ? Math.round(powerType != "Watts" ? rack.powerB / 110 : rack.powerB) : 0
+	   int rackPowerC = rack.powerB ? Math.round(powerType != "Watts" ? rack.powerC / 110 : rack.powerC) : 0
 	   
 	   def redTBD = false
 	   if((powerA +powerB+ powerC+ powerX) > (rackPowerA+ rackPowerB + rackPowerC )){
 		   redTBD = true
 	   }
-	   def op="<table border=0><tr><td colspan=4 class='powertable_L'><b>Rack : ${rack.tag}</b></td></tr><tr><td class='powertable_L'>Power (w)</td>"
+	   def op="<table border=0><tr><td colspan=4 class='powertable_L'><b>Rack : ${rack.tag}</b></td></tr><tr><td class='powertable_L'>Power (${powerType})</td>"
 		   op+="<td style='background:${ powerA > rackPowerA ? 'red':''};' class='powertable_C'>A</td>"
 		   op+="<td style='background:${ powerB > rackPowerB ? 'red':''};' class='powertable_C'>B</td>"
 		   op+="<td style='background:${ powerC > rackPowerC ? 'red':''};' class='powertable_C'>C</td>"

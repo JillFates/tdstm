@@ -83,18 +83,26 @@ class ModelController {
 		for(int i = existingConnectors ; i<51; i++ ){
 			otherConnectors << i
 		}
+		def powerType = session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE
         return [modelInstance: modelInstance, modelConnectors : modelConnectors, 
-				otherConnectors:otherConnectors, modelTemplate:modelTemplate ]
+				otherConnectors:otherConnectors, modelTemplate:modelTemplate, powerType : powerType ]
     }
 
     def save = {
     	def modelId = params.modelId
-    	def modelTemplate 
+		def powerUsed = params.powerUse ? Integer.parseInt(params.powerUse) : 0
+		def powerType = params.powerType
+		if( powerType == "Amps"){
+			powerUsed = powerUsed * 110
+        }
+	    def modelTemplate 
 		if(modelId)
 			modelTemplate = Model.get(modelId)
     	params.useImage = params.useImage == 'on' ? 1 : 0
     	params.sourceTDS = params.sourceTDS == 'on' ? 1 : 0
-        def modelInstance = new Model(params)
+    	params.powerUse = powerUsed
+        def  modelInstance = new Model(params)
+		modelInstance.powerUse = powerUsed
 		def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
 		def frontImage = request.getFile('frontImage')
         if( frontImage.bytes.size() > 0 ) {
@@ -213,8 +221,14 @@ class ModelController {
     def update = {
         def modelInstance = Model.get(params.id)
         if (modelInstance) {
+			def powerUsed = params.powerUse ? Integer.parseInt(params.powerUse) : 0
+			def powerType = params.powerType
+			if( powerType == "Amps"){
+				powerUsed = powerUsed * 110
+			}
         	params.useImage = params.useImage == 'on' ? 1 : 0
         	params.sourceTDS = params.sourceTDS == 'on' ? 1 : 0
+			params.powerUse = powerUsed
             def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
     		def frontImage = request.getFile('frontImage')
             if( frontImage ) {

@@ -61,9 +61,11 @@
 			</td>
 		</tr>
 		<tr>
-			<td valign="top" class="name" nowrap="nowrap">Power (typical):</td>
-			<td><input type="text" name="powerUse" id="powerUseId" value="${modelInstance.powerUse}" >&nbsp;Watts</td>
-		</tr>
+			<td valign="top" class="name" nowrap="nowrap">Power :</td>
+			<td><input type="text" name="powerUse" id="powerUseId" value="${modelInstance.powerUse}" >&nbsp;
+			<g:select id="powerTypeId" name='powerType' from="${['Watts','Amps']}" value="${powerType}"> </g:select>
+            </td>
+        </tr>
 		<tr>
 		<td valign="top" class="name" nowrap="nowrap">Front image:</label></td>
         <td><input size="20" type="file" name="frontImage" id="frontImageId" />

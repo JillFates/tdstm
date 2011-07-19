@@ -1126,6 +1126,7 @@ class ReportsController {
 			def rackLayout = []
 			def project = Project.findById(projectId)
 			def moveBundles = MoveBundle.findAllByProject( project )
+			def powerType = params.powerType ? params.powerType : session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE
 			if(!bundleId.contains("all")){
 				def bundlesString = bundleId.toString().replace("[","(").replace("]",")")
 				moveBundles = MoveBundle.findAll("from MoveBundle m where id in ${bundlesString} ")
@@ -1206,10 +1207,11 @@ class ReportsController {
 						powerTBD += powerUse
 					}
 				}
-				powerA = Math.round(powerA)
-				powerB = Math.round(powerB)
-				powerC = Math.round(powerC)
-				powerTBD = Math.round(powerTBD)
+				powerA = Math.round(powerType != 'Watts' ? powerA / 110 : powerA )
+				powerB = Math.round(powerType != 'Watts' ? powerB / 110 : powerB)
+				powerC = Math.round(powerType != 'Watts' ? powerC / 110 : powerC)
+				powerTBD = Math.round(powerType != 'Watts' ? powerTBD / 110 : powerTBD)
+				totalPower = Math.round( powerType != 'Watts' ? totalPower /110 : totalPower)
 				reportDetails << [location:rack.location, room:rack.room, rack:rack.tag, devices:assets.size(),
 								  powerA:powerA,powerB:powerB,powerC:powerC,powerTBD:powerTBD,totalPower:totalPower]
 			}

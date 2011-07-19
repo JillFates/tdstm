@@ -90,7 +90,12 @@
 			    	      <li><a href="javascript:setUserTimeZone('EDT')">EDT</a></li>
 				</ul>
 			</div>
-	              	&nbsp;| 
+	              	<div class="tzmenu">&nbsp;and power in <span id="upId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE } </span>
+						<ul>
+						<li><a href="javascript:setPower('Watts')">Watts </a></li>
+						<li><a href="javascript:setPower('Amps')">Amps</a></li>	
+						</ul>
+					</div> &nbsp;|
 	              </strong>
               &nbsp;<g:link controller="auth" action="signOut">sign out</g:link>
           </jsec:isLoggedIn>
@@ -363,6 +368,9 @@
 		  		$(this).css('background-color','');
 	  		});
 	  	}
+	  	function setPower( p ){
+			${remoteFunction(controller:'project', action:'setPower', params:'\'p=\' + p ',	onComplete:'updateTimeZone( e )')}
+		}
 	</script>
   </body>
 </html>

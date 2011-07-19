@@ -50,8 +50,8 @@
 			</td>
 		</tr>
 		<tr>
-			<td>Power (typical):</td>
-			<td>${modelInstance?.powerUse}&nbsp;Watts</td>
+			<td>Power (${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE }):</td>
+			<td>${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE != 'Watts' ? Math.round(modelInstance?.powerUse / 110 ) : modelInstance?.powerUse}&nbsp;${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE }</td>
 		</tr>
 		<tr>
 			<td>Front image:</label></td>

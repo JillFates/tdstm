@@ -62,6 +62,10 @@ class ProjectController {
 			userPreferenceService.loadPreferences("CURR_TZ")
 			userPreferenceService.loadPreferences("CURR_BUNDLE")
 			userPreferenceService.loadPreferences("MOVE_EVENT")
+			def currPowerType = session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE
+			if(!currPowerType){
+				userPreferenceService.setPreference( "CURR_POWER_TYPE", "Watts" )
+			}
         	def projectLogo
         	if(currProjectInstance){
         		projectLogo = ProjectLogo.findByProject(currProjectInstance)
@@ -617,4 +621,12 @@ class ProjectController {
     	userPreferenceService.setPreference( "CURR_TZ", timeZone )
 		render timeZone 
     }
+	/*
+	* function to set the user preference powerType
+	*/
+	def setPower = {
+		def power = params.p
+		userPreferenceService.setPreference( "CURR_POWER_TYPE", power )
+		render power
+	}
 }
