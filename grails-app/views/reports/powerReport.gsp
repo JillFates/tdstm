@@ -85,7 +85,7 @@
 			bundles.push($(this).val())
        	});
        	
-		${remoteFunction(action:'getRackDetails', params:'\'bundles=\' +bundles', onComplete:'updateRackDetails(e)')}
+		${remoteFunction(controller:'rackLayouts', action:'getRackDetails', params:'\'bundles=\' +bundles', onComplete:'updateRackDetails(e)')}
 	}
     </script>
 </head>
