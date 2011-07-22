@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://ph1.tdsops.com/" />
+<link rel="selenium.base" href="http://localhost:8080//" />
 <title>Staff_Delete</title>
 </head>
 <body>
@@ -34,7 +34,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Administration</td>
+	<td>link=Admin</td>
 	<td></td>
 </tr>
 <tr>
@@ -44,7 +44,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>_action_show</td>
+	<td>xpath=/html/body/div/div[3]/div/div/form/div/table/tbody/tr/td/a</td>
 	<td></td>
 </tr>
 <tr>
@@ -54,7 +54,7 @@
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.0</td>
+	<td>//table.6.0</td>
 	<td>firstName</td>
 </tr>
 <tr>
@@ -63,13 +63,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>waitForText</td>
-	<td>//body/div[5]/div[1]</td>
-	<td>Show Staffclose</td>
-</tr>
-<tr>
 	<td>clickAndWait</td>
-	<td>//form[@id='showForm']/div[2]/span[2]/input</td>
+	<td>name=_action_Delete</td>
 	<td></td>
 </tr>
 <tr>
@@ -92,7 +87,6 @@
 	<td>link=${firstName}</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

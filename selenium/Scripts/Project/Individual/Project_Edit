@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
+<link rel="selenium.base" href="http://localhost:8080/" />
 <title>Project_Edit</title>
 </head>
 <body>
@@ -48,53 +48,43 @@
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//div[@id='updateShow']/table.1.1</td>
+	<td>//div[@id='updateShow']/table.0.3</td>
 	<td>projC</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//div[@id='updateShow']/table.2.1</td>
+	<td>//div[@id='updateShow']/table.1.1</td>
 	<td>projN</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//div[@id='updateShow']/table.3.1</td>
+	<td>//div[@id='updateShow']/table.2.1</td>
 	<td>desc</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//div[@id='updateShow']/table.4.1</td>
+	<td>//div[@id='updateShow']/table.2.3</td>
 	<td>comm</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//div[@id='updateShow']/table.5.1</td>
+	<td>//div[@id='updateShow']/table.3.1</td>
 	<td>sDate</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//div[@id='updateShow']/table.6.1</td>
+	<td>//div[@id='updateShow']/table.3.3</td>
 	<td>cDate</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//div[@id='updateShow']/table.9.1</td>
+	<td>//div[@id='updateShow']/table.5.1</td>
 	<td>projM</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//div[@id='updateShow']/table.10.1</td>
+	<td>//div[@id='updateShow']/table.5.3</td>
 	<td>moveM</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>//div[@id='updateShow']/table.11.1</td>
-	<td>tChange</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>//div[@id='updateShow']/table.12.1</td>
-	<td>wCode</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
@@ -152,11 +142,6 @@
 	<td>${moveM}</td>
 </tr>
 <tr>
-	<td>verifyValue</td>
-	<td>trackChanges</td>
-	<td>${tChange}</td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
 	<td>//form[@id='editProjectForm']/div[1]/table/tbody/tr[12]/td[2]</td>
 	<td></td>
@@ -193,15 +178,14 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>Project {projC} : ${projN} updated</td>
+	<td>Project ${projC} : ${projN} updated</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.4.1</td>
+	<td>//div[@id='updateShow']/table.2.3</td>
 	<td>Edited Comment</td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

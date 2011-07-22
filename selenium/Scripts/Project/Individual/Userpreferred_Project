@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://ph1.tdsops.com/" />
+<link rel="selenium.base" href="http://localhost:8080/" />
 <title>Userpreferred_Project</title>
 </head>
 <body>
@@ -43,7 +43,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=News Editor</td>
+	<td>link=News</td>
 	<td></td>
 </tr>
 <tr>
@@ -122,23 +122,23 @@
 	<td></td>
 </tr>
 <tr>
-	<td>clickAndWait</td>
-	<td>link=Dashboard</td>
+	<td>click</td>
+	<td>link=Asset Tracker</td>
 	<td></td>
 </tr>
 <tr>
 	<td>storeGetvar</td>
 	<td>projectId</td>
-	<td>projidDa</td>
+	<td>projidPm</td>
 </tr>
 <tr>
 	<td>gotoIf</td>
-	<td>${projid}==${projidDa}</td>
+	<td>${projid}==${projidPm}</td>
 	<td>label5</td>
 </tr>
 <tr>
 	<td>gotoIf</td>
-	<td>${projid}!=${projidDa}</td>
+	<td>${projid}!=${projidPm}</td>
 	<td>label6</td>
 </tr>
 <tr>
@@ -157,28 +157,28 @@
 	<td></td>
 </tr>
 <tr>
-	<td>goBackAndWait</td>
-	<td></td>
+	<td>waitForPageToLoad</td>
+	<td>60000</td>
 	<td></td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=PMO Asset Tracking</td>
+	<td>link=Dashboard</td>
 	<td></td>
 </tr>
 <tr>
 	<td>storeGetvar</td>
 	<td>projectId</td>
-	<td>projidPM</td>
+	<td>projidDa</td>
 </tr>
 <tr>
 	<td>gotoIf</td>
-	<td>${projid}==${projidPM}</td>
+	<td>${projid}==${projidDa}</td>
 	<td>label7</td>
 </tr>
 <tr>
 	<td>gotoIf</td>
-	<td>${projid}!=${projidPM}</td>
+	<td>${projid}!=${projidDa}</td>
 	<td>label8</td>
 </tr>
 <tr>
@@ -196,7 +196,6 @@
 	<td>label7</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

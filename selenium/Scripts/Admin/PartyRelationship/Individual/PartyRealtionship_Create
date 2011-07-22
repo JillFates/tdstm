@@ -33,7 +33,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Administration</td>
+	<td>link=Admin</td>
 	<td></td>
 </tr>
 <tr>
@@ -246,7 +246,6 @@
 	<td>_action_Delete</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

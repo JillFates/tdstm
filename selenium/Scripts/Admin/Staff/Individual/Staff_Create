@@ -33,7 +33,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Administration</td>
+	<td>link=Admin</td>
 	<td></td>
 </tr>
 <tr>
@@ -42,13 +42,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//table.1.1</td>
-	<td>cName</td>
-</tr>
-<tr>
 	<td>clickAndWait</td>
-	<td>_action_show</td>
+	<td>xpath=/html/body/div/div[3]/div/div/form/div/table/tbody/tr/td/a</td>
 	<td></td>
 </tr>
 <tr>
@@ -63,27 +58,27 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.0</td>
+	<td>tag.2.0</td>
 	<td>First Name</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.1</td>
+	<td>tag.2.1</td>
 	<td>Last Name</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.2</td>
+	<td>tag.2.2</td>
 	<td>User Login</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.3</td>
+	<td>tag.2.3</td>
 	<td>Date Created</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.4</td>
+	<td>tag.2.4</td>
 	<td>Last Updated</td>
 </tr>
 <tr>
@@ -129,6 +124,11 @@
 <tr>
 	<td>verifyTable</td>
 	<td>//form[@id='createDialogForm']/div[1]/table.6.0</td>
+	<td>Email</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='createDialogForm']/div[1]/table.7.0</td>
 	<td>exact:Active: *</td>
 </tr>
 <tr>
@@ -142,14 +142,14 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifySelectedLabel</td>
-	<td>//form[@id='createDialogForm']/div[1]/table/tbody/tr[2]/td[2]/select</td>
-	<td>${cName}</td>
+	<td>randomString</td>
+	<td>4|numeric</td>
+	<td>firstName</td>
 </tr>
 <tr>
 	<td>randomString</td>
 	<td>4|numeric</td>
-	<td>firstName</td>
+	<td>lastName</td>
 </tr>
 <tr>
 	<td>click</td>
@@ -164,12 +164,12 @@
 <tr>
 	<td>storeValue</td>
 	<td>//form[@id='createDialogForm']/div[1]/table/tbody/tr[3]/td[2]/input</td>
-	<td>personL</td>
+	<td>personF</td>
 </tr>
 <tr>
 	<td>type</td>
 	<td>//form[@id='createDialogForm']/div[1]/table/tbody/tr[4]/td[2]/input</td>
-	<td>sample</td>
+	<td>${lastName}</td>
 </tr>
 <tr>
 	<td>type</td>
@@ -188,15 +188,9 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>created</td>
+	<td>Person ${personF} ${lastName} created</td>
 	<td></td>
 </tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>link=${personL}</td>
-	<td></td>
-</tr>
-
 </tbody></table>
 </body>
 </html>

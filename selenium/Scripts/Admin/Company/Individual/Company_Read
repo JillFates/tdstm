@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="" />
+<link rel="selenium.base" href="http://localhost:8080/" />
 <title>Company_Read</title>
 </head>
 <body>
@@ -34,7 +34,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Administration</td>
+	<td>link=Admin</td>
 	<td></td>
 </tr>
 <tr>
@@ -44,42 +44,37 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.1</td>
+	<td>tag.2.1</td>
 	<td>Name</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.2</td>
+	<td>tag.2.2</td>
 	<td>Date Created</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.3</td>
+	<td>tag.2.3</td>
 	<td>Last Updated</td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//table.1.1</td>
-	<td>TDS</td>
-</tr>
-<tr>
 	<td>storeTable</td>
-	<td>//table.1.1</td>
+	<td>tag.3.1</td>
 	<td>cName</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.2</td>
+	<td>tag.3.2</td>
 	<td>dCreated</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.3</td>
+	<td>tag.3.3</td>
 	<td>lUpdated</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>_action_show</td>
+	<td>value = select</td>
 	<td></td>
 </tr>
 <tr>
@@ -162,7 +157,6 @@
 	<td>//table.3.1</td>
 	<td>${lUpdated}</td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

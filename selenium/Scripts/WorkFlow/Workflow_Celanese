@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://tmdev.tdsops.com/" />
+<link rel="selenium.base" href="http://localhost:8080//" />
 <title>Workflow_Celanese</title>
 </head>
 <body>
@@ -28,7 +28,7 @@
 </tr>
 <tr>
 	<td>assertTitle</td>
-	<td>Login</td>
+	<td>Login Page</td>
 	<td></td>
 </tr>
 <tr>
@@ -233,27 +233,7 @@
 </tr>
 <!--In the below step, enter the path of the XML file that contains the steps data-->
 <tr>
-	<td>loadTestData</td>
-	<td>file://C:/Users/harish.nadipalli/Desktop/Workflows/Workflow_Celanese.xml</td>
-	<td></td>
-</tr>
-<tr>
-	<td>while</td>
-	<td>!testdata.EOF()</td>
-	<td></td>
-</tr>
-<tr>
 	<td>nextTestData</td>
-	<td></td>
-	<td></td>
-</tr>
-<tr>
-	<td>assertTable</td>
-	<td>assetEntityTable.${rowid}.0</td>
-	<td>${step}</td>
-</tr>
-<tr>
-	<td>endWhile</td>
 	<td></td>
 	<td></td>
 </tr>

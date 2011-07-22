@@ -63,72 +63,77 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.1.0</td>
+	<td>//div[@id='updateShow']/table.0.2</td>
 	<td>Project Code:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.2.0</td>
+	<td>//div[@id='updateShow']/table.1.0</td>
 	<td>Project Name:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.3.0</td>
+	<td>//div[@id='updateShow']/table.1.2</td>
+	<td>Project Type:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='updateShow']/table.2.0</td>
 	<td>exact:Description:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.4.0</td>
+	<td>//div[@id='updateShow']/table.2.2</td>
 	<td>exact:Comment:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.5.0</td>
+	<td>//div[@id='updateShow']/table.3.0</td>
 	<td>Start Date:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.6.0</td>
+	<td>//div[@id='updateShow']/table.3.2</td>
 	<td>Completion Date:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.7.0</td>
+	<td>//div[@id='updateShow']/table.4.0</td>
 	<td>Associated Partner:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.8.0</td>
+	<td>//div[@id='updateShow']/table.4.2</td>
 	<td>Partner Image:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.9.0</td>
+	<td>//div[@id='updateShow']/table.5.0</td>
 	<td>Project Manager:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.10.0</td>
+	<td>//div[@id='updateShow']/table.5.2</td>
 	<td>Move Manager:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.11.0</td>
-	<td>Track Changes:</td>
+	<td>//div[@id='updateShow']/table.10.2</td>
+	<td>Display Transitions in Status bar:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.12.0</td>
+	<td>//div[@id='updateShow']/table.10.0</td>
 	<td>Workflow Code:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.13.0</td>
+	<td>//div[@id='updateShow']/table.11.0</td>
 	<td>Date Created:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//div[@id='updateShow']/table.14.0</td>
+	<td>//div[@id='updateShow']/table.11.2</td>
 	<td>Last Updated:</td>
 </tr>
 <tr>
@@ -141,7 +146,6 @@
 	<td>_action_Delete</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>
