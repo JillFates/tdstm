@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
+<link rel="selenium.base" href="http://localhost:8080//" />
 <title>Asset_Import</title>
 </head>
 <body>
@@ -63,11 +63,6 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//form[@id='importForm']/div/table.5.0</td>
-	<td>Manage Batches:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
 	<td>//form[@id='importForm']/div/table.1.1</td>
 	<td>TDS Master Spreadsheet TDS Walkthru</td>
 </tr>
@@ -80,7 +75,7 @@
 <tr>
 	<td>type</td>
 	<td>file</td>
-	<td>C:\TDSMaster_template.xls</td>
+	<td>D:\TDSMaster_template.xls</td>
 </tr>
 <tr>
 	<td>click</td>
@@ -104,7 +99,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=${Var1}</td>
+	<td>xpath=id('importForm')/x:div/x:table/x:tbody/x:tr[5]/x:td[1]/x:a</td>
 	<td></td>
 </tr>
 <tr>
@@ -128,16 +123,15 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyText</td>
-	<td>//div[7]/div/div[1]/ul/li[4]</td>
-	<td>Asset Errors: 0</td>
+	<td>verifyTextPresent</td>
+	<td>COMPLETED</td>
+	<td></td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//div[7]/div/div/table.1.6</td>
-	<td>COMPLETED</td>
+	<td>verifyText</td>
+	<td>xpath=/x:html/x:body/x:div[1]/x:div[5]/x:div/x:div[1]/x:ul/x:li[4]</td>
+	<td>Asset Errors: 0</td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

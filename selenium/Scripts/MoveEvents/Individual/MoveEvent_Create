@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
+<link rel="selenium.base" href="http://localhost:8080//" />
 <title>MoveEvent_Create</title>
 </head>
 <body>
@@ -78,27 +78,27 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.0</td>
+	<td>//table.2.0</td>
 	<td>Name</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.1</td>
+	<td>//table.2.1</td>
 	<td>Description</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.2</td>
+	<td>//table.2.2</td>
 	<td>Status</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.3</td>
-	<td>Project</td>
+	<td>//table.2.3</td>
+	<td>Calculated Type</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.4</td>
+	<td>//table.2.4</td>
 	<td>Move Bundles</td>
 </tr>
 <tr>
@@ -285,7 +285,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=PMO Asset Tracking</td>
+	<td>link=Asset Tracker</td>
 	<td></td>
 </tr>
 <tr>
@@ -293,7 +293,6 @@
 	<td>moveEventId</td>
 	<td>${eventName}</td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

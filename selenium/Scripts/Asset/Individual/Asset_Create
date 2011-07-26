@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="" />
+<link rel="selenium.base" href="http://localhost:8080/" />
 <title>Asset_Create</title>
 </head>
 <body>
@@ -48,7 +48,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='New Asset Entity']</td>
+	<td>//input[@value='New Asset']</td>
 	<td></td>
 </tr>
 <tr>
@@ -118,17 +118,12 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>hinfoId</td>
+	<td>osId</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
 	<td>serialNumberId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>usizeId</td>
 	<td></td>
 </tr>
 <tr>
@@ -178,62 +173,7 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>powerTypeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>pduPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>pduQuantityId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>pduTypeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>nicPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>remoteMgmtPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>fiberCabinetId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>fiberTypeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>fiberQuantityId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>hbaPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>kvmDeviceId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>kvmPortId</td>
+	<td>osId</td>
 	<td></td>
 </tr>
 <tr>
@@ -243,7 +183,7 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>newOrOldId</td>
+	<td>planStatusId</td>
 	<td></td>
 </tr>
 <tr>
@@ -318,18 +258,13 @@
 </tr>
 <tr>
 	<td>type</td>
-	<td>hinfoId</td>
+	<td>osId</td>
 	<td>test-asset-hinfo</td>
 </tr>
 <tr>
 	<td>type</td>
 	<td>serialNumberId</td>
 	<td>test-asset-sn</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>usizeId</td>
-	<td>2</td>
 </tr>
 <tr>
 	<td>select</td>
@@ -377,53 +312,13 @@
 	<td>10</td>
 </tr>
 <tr>
-	<td>select</td>
-	<td>powerTypeId</td>
-	<td>label=110V Fixed</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>pduPortId</td>
-	<td>2</td>
-</tr>
-<tr>
-	<td>select</td>
-	<td>pduQuantityId</td>
-	<td>label=1</td>
-</tr>
-<tr>
-	<td>select</td>
-	<td>pduTypeId</td>
-	<td>label=C13</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>nicPortId</td>
-	<td>1</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>remoteMgmtPortId</td>
-	<td>1</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>kvmDeviceId</td>
-	<td>test-asset-kvm</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>kvmPortId</td>
-	<td>1</td>
-</tr>
-<tr>
 	<td>type</td>
 	<td>truckId</td>
 	<td>1</td>
 </tr>
 <tr>
 	<td>select</td>
-	<td>newOrOldId</td>
+	<td>planStatusId</td>
 	<td>label=Old</td>
 </tr>
 <tr>
@@ -446,7 +341,6 @@
 	<td>created</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

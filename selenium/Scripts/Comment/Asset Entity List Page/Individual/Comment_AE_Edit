@@ -44,6 +44,11 @@
 </tr>
 <!--If there is a comment existing for the first asset, this test edits that comment else it creates a new comment and edits it-->
 <tr>
+	<td>clickAndWait</td>
+	<td>link=List Assets</td>
+	<td></td>
+</tr>
+<tr>
 	<td>click</td>
 	<td>//span/a/img</td>
 	<td></td>
@@ -105,7 +110,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>xpath=//html/body/div/div[2]/div[1]/table/tbody/tr/td[2][node()='test comment - ${Comment}']</td>
+	<td>xpath=//html/body/div/div[2]/div[1]/table/tbody/tr/td[2]</td>
 	<td></td>
 </tr>
 <tr>
@@ -291,42 +296,12 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='Edit' and @type='button' and @onclick=&quot;commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')&quot;]</td>
+	<td>xpath=id('link_3515')/x:img</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>updateCommentTable.0.1</td>
-	<td>${createdAt}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>updateCommentTable.1.1</td>
-	<td>${createdBy}</td>
-</tr>
-<tr>
-	<td>verifySelectedLabel</td>
-	<td>commentTypeEditId</td>
-	<td>${cType}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>updateCommentTable.3.1</td>
-	<td>${categorY}</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
 	<td>//input[@value='Update' and @type='button' and @onclick=&quot;resolveValidate('editCommentForm','updateCommentId');&quot;]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyValue</td>
-	<td>commentEditId</td>
-	<td>${Comnt}</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>//input[@value='Delete' and @type='button' and @onclick=&quot;var booConfirm = confirm('Are you sure?');if(booConfirm)new Ajax.Request('/tds-0.1/assetEntity/deleteComment',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never')},parameters:'id=' + $('#updateCommentId').val() +'&amp;assetEntity='+$('#createAssetCommentId').val() });&quot;]</td>
 	<td></td>
 </tr>
 <tr>
@@ -354,7 +329,6 @@
 	<td>commentTdId</td>
 	<td>edited here</td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

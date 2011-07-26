@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
+<link rel="selenium.base" href="http://localhost:8080//" />
 <title>BundleTeam_CRUD</title>
 </head>
 <body>
@@ -110,21 +110,26 @@
 <tr>
 	<td>verifyTable</td>
 	<td>//table.0.2</td>
-	<td>Team Members</td>
+	<td>Role</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
 	<td>//table.0.3</td>
-	<td>Date Created</td>
+	<td>Team Members</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
 	<td>//table.0.4</td>
-	<td>Last Updated</td>
+	<td>Date Created</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
 	<td>//table.0.5</td>
+	<td>Last Updated</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//table.0.6</td>
 	<td>Comment</td>
 </tr>
 <tr>
@@ -161,17 +166,17 @@
 <tr>
 	<td>verifyTable</td>
 	<td>//table.3.0</td>
-	<td>exact:Comment:</td>
+	<td>Role*</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
 	<td>//table.4.0</td>
-	<td>Is Disbanded:</td>
+	<td>exact:Comment:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.4.1</td>
-	<td>Y N</td>
+	<td>//table.5.0</td>
+	<td>Is Disbanded:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
@@ -310,7 +315,7 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.1</td>
+	<td>//table.3.1</td>
 	<td>random comment - ${commenT}</td>
 </tr>
 <!--Reading the Bundle Team-->
@@ -346,27 +351,27 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.1</td>
+	<td>//table.3.1</td>
 	<td>random comment - ${commenT}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.3.1</td>
+	<td>//table.4.1</td>
 	<td>Y</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.4.1</td>
+	<td>//table.5.1</td>
 	<td>${aStaff}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.5.0</td>
+	<td>//table.6.0</td>
 	<td>Date Created:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.6.0</td>
+	<td>//table.7.0</td>
 	<td>Last Updated:</td>
 </tr>
 <tr>
@@ -417,7 +422,7 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.3.0</td>
+	<td>//table.4.0</td>
 	<td>exact:Comment:</td>
 </tr>
 <tr>
@@ -427,13 +432,8 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.4.0</td>
+	<td>//table.5.0</td>
 	<td>Is Disbanded:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.4.1</td>
-	<td>Y N</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
@@ -492,7 +492,7 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.1</td>
+	<td>//table.3.1</td>
 	<td>comment - ${commenT}</td>
 </tr>
 <!--Deleting Bundle Team-->

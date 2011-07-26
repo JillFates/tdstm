@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
+<link rel="selenium.base" href="http://localhost:8080//" />
 <title>MoveNews_CRUD</title>
 </head>
 <body>
@@ -44,7 +44,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=News Editor</td>
+	<td>link=News</td>
 	<td></td>
 </tr>
 <tr>
@@ -222,7 +222,7 @@
 <!--Editing the Move News-->
 <tr>
 	<td>clickAndWait</td>
-	<td>link=News Editor</td>
+	<td>link=News</td>
 	<td></td>
 </tr>
 <tr>
@@ -358,7 +358,7 @@
 <!--Verifying for User preffered Move Event in PMO Asset Tracking page-->
 <tr>
 	<td>clickAndWait</td>
-	<td>link=PMO Asset Tracking</td>
+	<td>link=Asset Tracker</td>
 	<td></td>
 </tr>
 <tr>

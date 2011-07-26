@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
+<link rel="selenium.base" href="http://localhost:8080/" />
 <title>Reports_All</title>
 </head>
 <body>
@@ -118,7 +118,7 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>link=Cleaning Team Worksheets</td>
+	<td>link=Logistics Team Worksheets</td>
 	<td></td>
 </tr>
 <tr>
@@ -133,7 +133,7 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>link=Rack Elevations</td>
+	<td>link=Racks (old)</td>
 	<td></td>
 </tr>
 <tr>
@@ -365,17 +365,17 @@
 <tr>
 	<td>verifyTable</td>
 	<td>//table.3.1</td>
-	<td>Include resolved issues in report</td>
+	<td>Include comments in report</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.4.0</td>
-	<td>Generate</td>
+	<td>//table.4.1</td>
+	<td>Include resolved issues in report</td>
 </tr>
 <!--Rack Elevations page-->
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Rack Elevations</td>
+	<td>link=Racks (old)</td>
 	<td></td>
 </tr>
 <tr>

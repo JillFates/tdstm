@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
+<link rel="selenium.base" href="http://localhost:8080//" />
 <title>Asset_Filter</title>
 </head>
 <body>
@@ -39,418 +39,63 @@
 </tr>
 <tr>
 	<td>verifyTitle</td>
-	<td>Asset Entity List</td>
+	<td>Asset Import/Export</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=List Assets</td>
 	<td></td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>assetEntityTable.1.2</td>
+	<td>tag.3.2</td>
 	<td>asset1</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>assetEntityTable.2.2</td>
+	<td>tag.4.2</td>
 	<td>asset2</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>assetEntityTable.1.10</td>
+	<td>tag.3.10</td>
 	<td>serialNo1</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>assetEntityTable.2.10</td>
+	<td>tag.4.10</td>
 	<td>serialNo2</td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>link=Filter</td>
+	<td>storeTable</td>
+	<td>tag.4.3</td>
+	<td>model</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>tag.1.2</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>link=Filter</td>
+	<td>//div[@onclick=&quot;createDynFilter(this, 'tag','assetName')&quot;]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>waitForText</td>
-	<td>//div[@id='filterPane']/h2</td>
-	<td>Filter</td>
+	<td>type</td>
+	<td>dynFilterInput</td>
+	<td>${asset1}</td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.0.0</td>
-	<td>Asset Name</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.1.0</td>
-	<td>Manufacturer</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.2.0</td>
-	<td>Model</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.3.0</td>
-	<td>Asset Type</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.4.0</td>
-	<td>Asset Tag</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.5.0</td>
-	<td>Serial Number</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.6.0</td>
-	<td>Source Location</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.7.0</td>
-	<td>Source Room</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.8.0</td>
-	<td>Source Rack</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.9.0</td>
-	<td>Target Location</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.10.0</td>
-	<td>Target Room</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.11.0</td>
-	<td>Target Rack</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.12.0</td>
-	<td>Fiber Type</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.13.0</td>
-	<td>Fiber Quantity</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.14.0</td>
-	<td>Power Type</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.15.0</td>
-	<td>Pdu Type</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.16.0</td>
-	<td>Pdu Quantity</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.17.0</td>
-	<td>Pdu Port</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.18.0</td>
-	<td>Has Kvm</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.19.0</td>
-	<td>Has Remote Mgmt</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.20.0</td>
-	<td>Application</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.21.0</td>
-	<td>App Owner</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.22.0</td>
-	<td>App Sme</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.23.0</td>
-	<td>Short Name</td>
+	<td>keyPressAndWait</td>
+	<td>dynFilterInput</td>
+	<td>13</td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>filter.op.assetName</td>
+	<td>//table[@id='tag']/tbody[@class='tbody']/tr[@id='tag_row1']/td[3]/a</td>
 	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>filter.op.assetName</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.assetName</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.manufacturer</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.model</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.assetType</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.assetTag</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.serialNumber</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.sourceLocation</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.sourceRoom</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.sourceRack</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.targetLocation</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.targetRoom</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.targetRack</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.fiberType</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>filter.op.fiberQuantity</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.fiberQuantity</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.powerType</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.pduType</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.pduQuantity</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.pduPort</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.hasKvm</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.hasRemoteMgmt</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.application</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.appOwner</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.appSme</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>filter.op.shortName</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.0.1</td>
-	<td>ILike NotILike Like NotLike Equal NotEqual</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.1.1</td>
-	<td>ILike NotILike Like NotLike Equal NotEqual IsNull IsNotNull</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.2.1</td>
-	<td>ILike NotILike Like NotLike Equal NotEqual IsNull IsNotNull</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.3.1</td>
-	<td>ILike NotILike Like NotLike Equal NotEqual IsNull IsNotNull</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.4.1</td>
-	<td>ILike NotILike Like NotLike Equal NotEqual</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.5.1</td>
-	<td>ILike NotILike Like NotLike Equal NotEqual</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.6.1</td>
-	<td>ILike NotILike Like NotLike Equal NotEqual IsNull IsNotNull</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.7.1</td>
-	<td>ILike NotILike Like NotLike Equal NotEqual IsNull IsNotNull</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.8.1</td>
-	<td>ILike NotILike Like NotLike Equal NotEqual IsNull IsNotNull</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.9.1</td>
-	<td>ILike NotILike Like NotLike Equal NotEqual IsNull IsNotNull</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.10.1</td>
-	<td>ILike NotILike Like NotLike Equal NotEqual IsNull IsNotNull</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.11.1</td>
-	<td>ILike NotILike Like NotLike Equal NotEqual IsNull IsNotNull</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.12.1</td>
-	<td>ILike NotILike Like NotLike Equal NotEqual IsNull IsNotNull</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.13.1</td>
-	<td>Equal NotEqual LessThan LessThanEquals GreaterThan GreaterThanEquals Between IsNull IsNotNull</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.14.1</td>
-	<td>ILike NotILike Like NotLike Equal NotEqual IsNull IsNotNull</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.15.1</td>
-	<td>ILike NotILike Like NotLike Equal NotEqual IsNull IsNotNull</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.16.1</td>
-	<td>Equal NotEqual LessThan LessThanEquals GreaterThan GreaterThanEquals Between IsNull IsNotNull</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.17.1</td>
-	<td>ILike NotILike Like NotLike Equal NotEqual IsNull IsNotNull</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.18.1</td>
-	<td>Equal NotEqual LessThan LessThanEquals GreaterThan GreaterThanEquals Between IsNull IsNotNull</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.19.1</td>
-	<td>Equal NotEqual LessThan LessThanEquals GreaterThan GreaterThanEquals Between IsNull IsNotNull</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.20.1</td>
-	<td>ILike NotILike Like NotLike Equal NotEqual</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.21.1</td>
-	<td>ILike NotILike Like NotLike Equal NotEqual</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.22.1</td>
-	<td>ILike NotILike Like NotLike Equal NotEqual</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='filterForm']/table.23.1</td>
-	<td>ILike NotILike Like NotLike Equal NotEqual IsNull IsNotNull</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -514,46 +159,6 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>fiberType</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>fiberQuantity</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>powerType</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>pduType</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>pduQuantity</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>pduPort</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>hasKvm</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>hasRemoteMgmt</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
 	<td>application</td>
 	<td></td>
 </tr>
@@ -573,271 +178,30 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>sort</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>//input[@id='order' and @name='order' and @value='desc']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>order</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>//input[@value='Cancel']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>//input[@value='Clear']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>_action_filter</td>
+	<td>click</td>
+	<td>xpath=/x:html/x:body/x:div[13]/x:div[1]/x:a/x:span</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='Cancel']</td>
+	<td>link=List Assets</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>link=Filter</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>filter.op.assetName</td>
-	<td></td>
-</tr>
-<tr>
-	<td>select</td>
-	<td>filter.op.assetName</td>
-	<td>label=ILike</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//option[@value='ILike']</td>
+	<td>//div[@onclick=&quot;createDynFilter(this, 'tag','modelName')&quot;]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>assetName</td>
-	<td>To test Clear button</td>
+	<td>dynFilterInput</td>
+	<td>${model}</td>
 </tr>
 <tr>
-	<td>click</td>
-	<td>//input[@value='Clear']</td>
-	<td></td>
+	<td>keyPress</td>
+	<td>dynFilterInput</td>
+	<td>13</td>
 </tr>
-<tr>
-	<td>verifyValue</td>
-	<td>assetName</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>filter.op.assetName</td>
-	<td></td>
-</tr>
-<tr>
-	<td>select</td>
-	<td>filter.op.assetName</td>
-	<td>label=Like</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//option[@value='Like']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>assetName</td>
-	<td>${asset1}</td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>_action_filter</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>link=Change Filter</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Filter Applied!</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>assetEntityTable.1.2</td>
-	<td>${asset1}</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>link=Change Filter</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifySelectedLabel</td>
-	<td>filter.op.assetName</td>
-	<td>Like</td>
-</tr>
-<tr>
-	<td>verifyValue</td>
-	<td>assetName</td>
-	<td>${asset1}</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>filter.op.assetName</td>
-	<td></td>
-</tr>
-<tr>
-	<td>select</td>
-	<td>filter.op.assetName</td>
-	<td>label=NotLike</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//option[@value='NotLike']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>_action_filter</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementNotPresent</td>
-	<td>link=${asset1}</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>link=Change Filter</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>filter.op.assetName</td>
-	<td></td>
-</tr>
-<tr>
-	<td>select</td>
-	<td>filter.op.assetName</td>
-	<td>label=Like</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//option[@value='Like']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>assetName</td>
-	<td>${asset2}</td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>_action_filter</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>assetEntityTable.1.2</td>
-	<td>${asset2}</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>link=Change Filter</td>
-	<td></td>
-</tr>
-<tr>
-	<td>waitForText</td>
-	<td>//div[@id='filterPane']/h2</td>
-	<td>Filter</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//input[@value='Clear']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>filter.op.serialNumber</td>
-	<td></td>
-</tr>
-<tr>
-	<td>select</td>
-	<td>filter.op.serialNumber</td>
-	<td>label=Like</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//select[@id='filter.op.serialNumber']/option[4]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>serialNumber</td>
-	<td>${serialNo1}</td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>_action_filter</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>link=Change Filter</td>
-	<td></td>
-</tr>
-<tr>
-	<td>waitForText</td>
-	<td>//div[@id='filterPane']/h2</td>
-	<td>Filter</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//input[@value='Clear']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>filter.op.serialNumber</td>
-	<td></td>
-</tr>
-<tr>
-	<td>select</td>
-	<td>filter.op.serialNumber</td>
-	<td>label=Like</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//select[@id='filter.op.serialNumber']/option[4]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>serialNumber</td>
-	<td>${serialNo2}</td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>_action_filter</td>
-	<td></td>
-</tr>
-
 </tbody></table>
 </body>
 </html>

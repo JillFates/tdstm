@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://tmdev.tdsops.com/" />
+<link rel="selenium.base" href="http://localhost:8080//>
 <title>MoveEvent_Edit</title>
 </head>
 <body>
@@ -78,27 +78,27 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.0</td>
+	<td>//table.2.0</td>
 	<td>Name</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.1</td>
+	<td>//table.2.1</td>
 	<td>Description</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.2</td>
+	<td>//table.2.2</td>
 	<td>Status</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.3</td>
-	<td>Project</td>
+	<td>//table.2.3</td>
+	<td>Calculated Type</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.4</td>
+	<td>//table.2.4</td>
 	<td>Move Bundles</td>
 </tr>
 <tr>
@@ -108,22 +108,22 @@
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.0</td>
+	<td>//table.3.0</td>
 	<td>EventName</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.1</td>
+	<td>//table.3.1</td>
 	<td>Desc</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.3</td>
+	<td>//table.3.3</td>
 	<td>Proj</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.4</td>
+	<td>//table.3.4</td>
 	<td>MoveBundles</td>
 </tr>
 <tr>
@@ -135,11 +135,6 @@
 	<td>verifyTitle</td>
 	<td>Show Move Event</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.0.1</td>
-	<td>${Proj}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
@@ -179,16 +174,6 @@
 <tr>
 	<td>verifyTitle</td>
 	<td>Edit Move Event</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.1.1</td>
-	<td>${Proj}</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>link=${Proj}</td>
 	<td></td>
 </tr>
 <tr>
@@ -241,7 +226,6 @@
 	<td>//table.2.1</td>
 	<td>modified here</td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

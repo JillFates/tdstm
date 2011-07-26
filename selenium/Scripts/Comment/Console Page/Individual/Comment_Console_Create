@@ -138,12 +138,6 @@
 	<td>//input[@value='Create']</td>
 	<td></td>
 </tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>xpath=//html/body/div/div[2]/div[1]/table/tbody/tr/td[2][node()='test comment - ${Comment}']</td>
-	<td></td>
-</tr>
-
 </tbody></table>
 </body>
 </html>

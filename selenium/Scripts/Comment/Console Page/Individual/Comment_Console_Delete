@@ -45,7 +45,7 @@
 <!--If there is a comment existing for the first asset, this test deletes that comment else it creates a new comment and deletes it.-->
 <tr>
 	<td>click</td>
-	<td>//td[8]/a/img</td>
+	<td>xpath=id('icon_8960')/x:a/x:img</td>
 	<td></td>
 </tr>
 <tr>
@@ -115,11 +115,6 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>xpath=//html/body/div/div[2]/div[1]/table/tbody/tr/td[2][node()='test comment - ${Comment}']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
 	<td>//input[@value='Delete' and @type='button' and @onclick=&quot;var booConfirm = confirm('Are you sure?');if(booConfirm)new Ajax.Request('/tds-0.1/assetEntity/deleteComment',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e ,'never')},parameters:'id=' + $('#commentId').val() +'&amp;assetEntity='+$('#createAssetCommentId').val() });&quot;]</td>
 	<td></td>
 </tr>
@@ -140,12 +135,12 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//div[2]/div[1]/table/tbody/tr/td[2]</td>
+	<td>xpath=id('link_3530')/x:img</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='Delete' and @type='button' and @onclick=&quot;var booConfirm = confirm('Are you sure?');if(booConfirm)new Ajax.Request('/tds-0.1/assetEntity/deleteComment',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e ,'never')},parameters:'id=' + $('#commentId').val() +'&amp;assetEntity='+$('#createAssetCommentId').val() });&quot;]</td>
+	<td>xpath=/html/body/div[14]/div[2]/form/div[2]/span[2]/input</td>
 	<td></td>
 </tr>
 <tr>
@@ -163,7 +158,6 @@
 	<td>commentsListDialog</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>
