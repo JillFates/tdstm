@@ -12,11 +12,6 @@
 <tr><td rowspan="1" colspan="3">MoveEvent_CRUD</td></tr>
 </thead><tbody>
 <tr>
-	<td>setSpeed</td>
-	<td>2500</td>
-	<td></td>
-</tr>
-<tr>
 	<td>storeEval</td>
 	<td>javascript{var startTime=new Date().getTime(); startTime;}</td>
 	<td>tdssuitestart</td>
@@ -300,16 +295,6 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Dashboard</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifySelectedLabel</td>
-	<td>moveEvent</td>
-	<td>${eventName}</td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
 	<td>link=Asset Tracker</td>
 	<td></td>
 </tr>
@@ -321,6 +306,11 @@
 <tr>
 	<td>clickAndWait</td>
 	<td>link=Events</td>
+	<td></td>
+</tr>
+<tr>
+	<td>setSpeed</td>
+	<td>2500</td>
 	<td></td>
 </tr>
 <!--Read Move Event-->

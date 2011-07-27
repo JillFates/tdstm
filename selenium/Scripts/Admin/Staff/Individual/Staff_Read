@@ -34,17 +34,12 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Administration</td>
+	<td>link=Admin</td>
 	<td></td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
 	<td>link=Company</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>_action_show</td>
 	<td></td>
 </tr>
 <tr>
@@ -59,47 +54,47 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.0</td>
+	<td>//table.2.0</td>
 	<td>First Name</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.1</td>
+	<td>//table.2.1</td>
 	<td>Last Name</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.2</td>
+	<td>//table.2.2</td>
 	<td>User Login</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.3</td>
+	<td>//table.2.3</td>
 	<td>Date Created</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.4</td>
+	<td>//table.2.4</td>
 	<td>Last Updated</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.0</td>
+	<td>//table.3.0</td>
 	<td>firstName</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.1</td>
+	<td>//table.3.1</td>
 	<td>lastName</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.3</td>
+	<td>//table.3.3</td>
 	<td>dateCreated</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.4</td>
+	<td>//table.3.4</td>
 	<td>lastUpdated</td>
 </tr>
 <tr>
@@ -140,17 +135,22 @@
 <tr>
 	<td>verifyTable</td>
 	<td>//form[@id='showForm']/div[1]/table.5.0</td>
-	<td>exact:Active:</td>
+	<td>Email:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
 	<td>//form[@id='showForm']/div[1]/table.6.0</td>
-	<td>Date Created:</td>
+	<td>exact:Active:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
 	<td>//form[@id='showForm']/div[1]/table.7.0</td>
-	<td>Last Updated:</td>
+	<td>Department:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//form[@id='showForm']/div[1]/table.8.0</td>
+	<td>Location:</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -182,7 +182,6 @@
 	<td>lastUpdated</td>
 	<td>${lastUpdated}</td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

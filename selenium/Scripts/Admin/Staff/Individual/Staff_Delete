@@ -44,7 +44,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>xpath=/html/body/div/div[3]/div/div/form/div/table/tbody/tr/td/a</td>
+	<td>xpath=/html/body/div/div[3]/div/div/form/div/table/tbody/tr/td/a/input</td>
 	<td></td>
 </tr>
 <tr>
@@ -54,7 +54,7 @@
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.6.0</td>
+	<td>//table.10.0</td>
 	<td>firstName</td>
 </tr>
 <tr>
@@ -64,8 +64,8 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
+	<td>//form[@id='showForm']/div[2]/span[2]/input</td>
 	<td>name=_action_Delete</td>
-	<td></td>
 </tr>
 <tr>
 	<td>assertConfirmation</td>
