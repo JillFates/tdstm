@@ -43,5 +43,20 @@ class MoveBundle extends Party {
     def getAssetQty(){
     	return AssetEntity.countByMoveBundle(this)
     }
-
+	/** 
+	 * @author: Lokanada Reddy
+	 * @param : projectId, currentTime
+	 * @return : List of move bundles
+	 */
+	static def getActiveBundlesByProject( projectId, timeNow ){
+		def moveBundles = MoveBundle.createCriteria().list {
+			and {
+				le("startTime", timeNow)
+				ge("completionTime", timeNow)
+			}
+			order("startTime", "desc")
+		}
+		
+		return projectId ? moveBundles.findAll{it.project.id == projectId } : moveBundles
+	}
 }

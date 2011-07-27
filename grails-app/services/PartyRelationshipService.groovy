@@ -269,6 +269,7 @@ class PartyRelationshipService {
             map.put("name", team.partyIdTo.firstName+" "+ team.partyIdTo.lastName)
             map.put("role", team.roleTypeCodeTo)
             map.put("staff", team.partyIdTo)
+			map.put("id", team.partyIdTo?.id)
             list<<map
         }
         return list 

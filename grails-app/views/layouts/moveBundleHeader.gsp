@@ -131,6 +131,7 @@
 	        		<li><g:link class="home" controller="assetEntity" action="list" >Assets</g:link></li></li>
 		                <li><g:link class="home" controller="moveEvent" action="show" >Events</g:link> </li>
 	        		<li><g:link class="home" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]" style="background-color:#003366">Bundles</g:link></li>
+	        		<li><g:link class="home" controller="clientTeams" params="[projectId:currProjObj?.id]">Teams</g:link></li>s
 	        	</jsec:lacksAllRoles>
 	        	<jsec:hasAnyRole in="['ADMIN']">
 	        		<li><g:link class="home" controller="newsEditor" params="[projectId:currProjObj?.id]">News</g:link></li>
