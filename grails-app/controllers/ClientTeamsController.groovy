@@ -10,10 +10,13 @@ class ClientTeamsController {
 	def stateEngineService 
 	def jdbcTemplate
 	def clientTeamsService
+	def workflowService
 	
 	def static final statusDetails = ["missing":"Unknown", "cabledDetails":"Cabled with Details","empty":"Empty","cabled":"Cabled"]
-	protected static targetTeamType = ['MOVE_TECH':'target_team_id', 'CLEANER':'target_team_log_id','SYS_ADMIN':'target_team_sa_id',"DB_ADMIN":'target_team_dba_id']
-	protected static sourceTeamType = ['MOVE_TECH':'source_team_id', 'CLEANER':'source_team_log_id','SYS_ADMIN':'source_team_sa_id',"DB_ADMIN":'source_team_dba_id']
+	protected static targetTeamColumns = ['MOVE_TECH':'target_team_id', 'CLEANER':'target_team_log_id','SYS_ADMIN':'target_team_sa_id',"DB_ADMIN":'target_team_dba_id']
+	protected static sourceTeamColumns = ['MOVE_TECH':'source_team_id', 'CLEANER':'source_team_log_id','SYS_ADMIN':'source_team_sa_id',"DB_ADMIN":'source_team_dba_id']
+	protected static targetTeamType = ['MOVE_TECH':'targetTeamMt', 'CLEANER':'targetTeamLog','SYS_ADMIN':'targetTeamSa',"DB_ADMIN":'targetTeamDba']
+	protected static sourceTeamType = ['MOVE_TECH':'sourceTeamMt', 'CLEANER':'sourceTeamLog','SYS_ADMIN':'sourceTeamSa',"DB_ADMIN":'sourceTeamDba']
 	
     def index = { redirect(action: list ,params:params) }
 	/**
@@ -41,8 +44,6 @@ class ClientTeamsController {
 		def now = GormUtil.convertInToGMT( "now","EDT" )
 		def timeNow = now.getTime()
 		def moveBundles = MoveBundle.getActiveBundlesByProject( Integer.parseInt(projectId), now )
-		println"moveBundles--->"+moveBundles
-		println"loginUser.id-->"+loginUser.id
 		moveBundles.each{ moveBundle ->
 			partyRelationshipService.getBundleTeamInstanceList( moveBundle ).each {
 				if( hasRole || it.teamMembers.id.contains(loginUser.id) ){
@@ -110,14 +111,18 @@ class ClientTeamsController {
         def ipState = new ArrayList()
         def moveBundleInstance = MoveBundle.findById( bundleId )
 		def projectTeam = ProjectTeam.read( teamId )
+		def workflowCode = moveBundleInstance.project.workflowCode
+		def workflow = Workflow.findByProcess(workflowCode)
+		def swimlane = Swimlane.findByNameAndWorkflow(projectTeam.role, workflow )
+		println"swimlane-->"+swimlane
 		flash.message = ""
-        def holdState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Hold" ) 
+        def holdState = stateEngineService.getStateIdAsInt( workflowCode, "Hold" ) 
         if ( params.location == "source" ) {
-            rdyState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Release" )
-            ipState.add( stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Unracking" ) )
+            rdyState = stateEngineService.getStateIdAsInt( workflowCode, "Release" )
+            ipState.add( stateEngineService.getStateIdAsInt( workflowCode, "Unracking" ) )
         } else {
-            rdyState = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Staged" )
-            ipState.add(  stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Reracking" ) )
+            rdyState = stateEngineService.getStateIdAsInt( workflowCode, "Staged" )
+            ipState.add(  stateEngineService.getStateIdAsInt( workflowCode, "Reracking" ) )
         }
         def countQuery = """select a.asset_entity_id as id, a.asset_tag as assetTag, a.source_rack as sourceRack, 
 						a.source_rack_position as sourceRackPosition, a.target_rack as targetRack,
@@ -128,14 +133,14 @@ class ClientTeamsController {
         				left join model m on (a.model_id = m.model_id )
 			            where a.move_bundle_id = $bundleId"""
         def query = new StringBuffer (countQuery)
-        if ( params.location == "s" ) {
-            stateVal = stateEngineService.getStateId ( moveBundleInstance.project.workflowCode, "Unracked" )
-            query.append (" and a.${sourceTeamType.get(projectTeam.role)} = $teamId" )
-            countQuery +=" and a.${sourceTeamType.get(projectTeam.role)} = $teamId"
+        if ( params.location == "source" ) {
+            stateVal = stateEngineService.getStateId ( workflowCode, "Unracked" )
+            query.append (" and a.${sourceTeamColumns.get(projectTeam.role)} = $teamId" )
+            countQuery +=" and a.${sourceTeamColumns.get(projectTeam.role)} = $teamId"
         } else {
-        	stateVal = stateEngineService.getStateId ( moveBundleInstance.project.workflowCode, "Reracked" )
-            query.append (" and a.${targetTeamType.get(projectTeam.role)} = $teamId" )
-            countQuery += " and a.${targetTeamType.get(projectTeam.role)} = $teamId" 
+        	stateVal = stateEngineService.getStateId ( workflowCode, "Reracked" )
+            query.append (" and a.${targetTeamColumns.get(projectTeam.role)} = $teamId" )
+            countQuery += " and a.${targetTeamColumns.get(projectTeam.role)} = $teamId" 
         }
         allSize = jdbcTemplate.queryForList ( query.toString() + " group by a.asset_entity_id ").size()
         if ( tab == "Todo" ) {
@@ -158,8 +163,11 @@ class ClientTeamsController {
         				"p.current_state_id < $rdyState desc , a.source_rack, a.source_rack_position" )
         }
         proAssetMap = jdbcTemplate.queryForList ( query.toString() )
+		println"proAssetMap-->"+proAssetMap
         todoSize = proAssetMap.size()
+		println"rdyState-->"+rdyState
         proAssetMap.each {
+			println"it.currentStateId-->"+it.currentStateId
             if ( it.currentStateId ) {
                 if ( it.minstate == holdState ) {
                     colorCss = "asset_hold"
@@ -240,9 +248,9 @@ class ClientTeamsController {
 			   def teamName
 			   def teamIdFromDB
 				   if ( params.location == "source" ) {
-					   if ( assetItem.sourceTeamMt ) {
-						   teamIdFromDB = ( assetItem.sourceTeamMt.id ).toString()
-						   teamName = assetItem.sourceTeamMt.name
+					   if ( assetItem[sourceTeamType.get(loginTeam.role)] ) {
+						   teamIdFromDB = ( assetItem[sourceTeamType.get(loginTeam.role)]?.id ).toString()
+						   teamName = assetItem[sourceTeamType.get(loginTeam.role)].name
 					   } else {
 						   flash.message += message ( code : "<li>The asset [${assetItem.assetName}] is not assigned to team [${loginTeam}] </li>" )
 						   if ( checkHome ) {
@@ -260,9 +268,9 @@ class ClientTeamsController {
 						   }
 					   }
 				   } else {
-					   if ( assetItem.targetTeamMt ) {
-						   teamIdFromDB = ( assetItem.targetTeamMt.id ).toString()
-						   teamName = assetItem.targetTeamMt.name
+					   if ( assetItem[targetTeamType.get(loginTeam.role)] ) {
+						   teamIdFromDB = ( assetItem[targetTeamType.get(loginTeam.role)].id ).toString()
+						   teamName = assetItem[targetTeamType.get(loginTeam.role)].name
 					   } else {
 						   flash.message += message( code : "<li>The asset [${assetItem.assetName}] is not assigned to team [${loginTeam}] </li>" )
 						   if ( checkHome ) {
@@ -321,7 +329,9 @@ class ClientTeamsController {
 							   return;
 						   }
 					   }
-					   taskList = stateEngineService.getTasks ( moveBundleInstance.project.workflowCode, "MOVE_TECH", stateVal )
+					   println"loginTeam.role-->"+loginTeam.role
+					   taskList = stateEngineService.getTasks ( moveBundleInstance.project.workflowCode, loginTeam.role, stateVal )
+					   println"taskList-->"+taskList
 					   taskSize = taskList.size()
 					   if ( taskSize == 1 ) {
 						   if ( taskList.contains ( "Hold" ) ) {
@@ -340,6 +350,8 @@ class ClientTeamsController {
 							   }
 							   
 						   }
+					   } else {
+					   		flash.message += message ( code : "<li>NO ACTIONS FOR ASSET. Please contact manager </li>" )
 					   }
 					   assetComment = AssetComment.findAllByAssetEntityAndCommentType( assetItem,'instruction' )
 					   def stateLabel = stateEngineService.getStateLabel( moveBundleInstance.project.workflowCode, transitionStates[0].stateTo )
@@ -371,6 +383,137 @@ class ClientTeamsController {
 				   }
 		   }
 	   }
-		
    }
+   /**------------------------------------------------------------------------------------------------------
+   * To do the transition
+   * @author Lokanada
+   * @param  assetComment, team, location, actionLabel, search, user
+   * @return redirect to Asset details page if transition flag is busy otherwise redirect to asset task page
+   *--------------------------------------------------------------------------------------------------------*/
+  def doTransition = {
+		println"params------->"+params
+		def bundleId = params.bundleId
+		def moveBundleInstance = MoveBundle.findById( bundleId )
+		def query = new StringBuffer ("from AssetEntity ae where ae.moveBundle=${moveBundleInstance.id} and ae.assetTag = :search ")
+		def asset = AssetEntity.find( query.toString(), [ search : params.search ] )
+    	if(asset){
+            def loginTeam = ProjectTeam.findById(params.teamId)
+            def actionLabel = params.actionLabel
+            //def projectAssetMap = ProjectAssetMap.findByAsset( asset )
+            def holdId = stateEngineService.getStateId( moveBundleInstance.project.workflowCode, "Hold" )
+            def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+                    										"where t.asset_entity_id = ${asset.id} and voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
+                											"order by date_created desc, stateTo desc limit 1 ")
+            def currentState = ""
+            if(transitionStates.size()){
+            	currentState = stateEngineService.getState( moveBundleInstance.project.workflowCode, transitionStates[0].stateTo )
+            }
+            def flags = stateEngineService.getFlags( moveBundleInstance.project.workflowCode, "MOVE_TECH", currentState, actionLabel )
+            def loginUser = UserLogin.findByUsername( SecurityUtils.subject.principal )
+            def workflow = workflowService.createTransition( moveBundleInstance.project.workflowCode, "MOVE_TECH", actionLabel, asset, moveBundleInstance, loginUser, loginTeam, params.enterNote )
+            if ( workflow.success ) {
+            	if(params.location == 'source' && asset[sourceTeamType.get(loginTeam.role)].id != loginTeam.id ){
+        			asset[sourceTeamType.get(loginTeam.role)] = loginTeam
+					asset.save(flush:true)
+        		} else if(params.location == 'target' && asset[targetTeamType.get(loginTeam.role)].id != loginTeam.id ){
+        			asset[targetTeamType.get(loginTeam.role)] = loginTeam
+					asset.save(flush:true)
+        		}
+            	if(flags?.contains("busy")){
+            		flash.message = message ( code : workflow.message )
+                    redirect ( action:'assetSearch', params:params)
+            	} else {
+            		redirect ( action: 'myTasks', 
+            			params:[ "bundleId":params.bundleId, "teamId":params.teamId, "projectId":params.projectId,
+            			         "location":params.location, "tab":"Todo" 
+            			         ])
+            	}
+            } else {
+                flash.message = message ( code : workflow.message )
+                redirect ( action:'assetSearch',params:params)
+            }
+    	} else {
+    		flash.message = 'Asset not found'
+            redirect ( action:'assetSearch',params:params)
+    	}
+	}
+  /**------------------------------------------------------------------------------
+  * To change the state of an asset to hold
+  * @author Lokanada Reddy
+  * @param  String enterNote, String team, String location, String bundle
+  * @return boolean for indication of transitions
+  *------------------------------------------------------------------------------*/
+  def placeOnHold = {
+	  def enterNote = params.enterNote
+	  def moveBundleInstance = MoveBundle.findById( params.bundleId )
+	  if ( params.similarComment == 'nosimilar' ) {
+		  clientTeamsService.appendCommentsToRemainderList( params, session )
+	  }
+	  def loginTeam = ProjectTeam.findById(params.teamId)
+	  def query = new StringBuffer ("from AssetEntity ae where ae.moveBundle=${moveBundleInstance.id} and ae.assetTag = :search ")
+	  def asset = AssetEntity.find( query.toString(), [ search : params.search ] )
+	  def redirectAction = "myTasks"
+	  if(asset){
+		  def loginUser = UserLogin.findByUsername ( SecurityUtils.subject.principal )
+		  def workflow
+			  workflow = workflowService.createTransition ( moveBundleInstance.project.workflowCode, loginTeam.role, "Hold", asset,moveBundleInstance, loginUser, loginTeam, params.enterNote )
+			  if ( workflow.success ) {
+				 
+				  if(params.location == 'source' && asset[sourceTeamType.get(loginTeam.role)].id != loginTeam.id ){
+					  asse[sourceTeamType.get(loginTeam.role)] = loginTeam
+					  asset.save(flush:true)
+				  } else if(params.location == 'target' && asset[targetTeamType.get(loginTeam.role)]?.id != loginTeam.id ){
+					  asset[targetTeamType.get(loginTeam.role)] = loginTeam
+					  asset.save(flush:true)
+				  }
+				 
+				  def assetComment = new AssetComment()
+				  assetComment.comment = enterNote
+				  assetComment.assetEntity = asset
+				  assetComment.commentType = 'issue'
+				  assetComment.category = 'moveday'
+				  assetComment.createdBy = loginUser.person
+				  assetComment.save()
+				  redirect ( action: 'myTasks',
+					  			params:["bundleId":params.bundleId, "teamId":params.teamId, "projectId":params.projectId,
+									  	"location":params.location, "tab":"Todo"
+								  		])
+			 } else {
+				 flash.message = message ( code : workflow.message )
+				 redirect ( action : 'myTasks',
+							 params:["bundleId":params.bundleId, "teamId":params.teamId, "projectId":params.projectId,
+									 "location":params.location, "tab":"Todo"
+									 ])
+			 }
+
+		 } else {
+			flash.message = 'Asset not found'
+            redirect ( action:'assetSearch',params:params)
+		 }
+  	}
+  /**----------------------------------------------------------------------------------
+  * @author Lokanada Reddy
+  * @param  String assetTag, project,bundle
+  * @return Create a Comment for AssetEntity from client team station
+  *----------------------------------------------------------------------------------*/
+  def addComment = {
+	 def loginUser = UserLogin.findByUsername ( SecurityUtils.subject.principal )
+	 def query = new StringBuffer ("from AssetEntity ae where ae.moveBundle=${moveBundleInstance.id} and ae.assetTag = :search ")
+	 def asset = AssetEntity.find( query.toString(), [ search : params.search ] )
+	 if(asset){
+		 def assetComment = new AssetComment()
+			 assetComment.comment = params.enterNote
+			 if ( params.similarComment == "nosimilar" ) {
+				 clientTeamsService.appendCommentsToRemainderList( params, session )
+			 }
+			 assetComment.assetEntity = asset
+			 assetComment.commentType = 'comment'
+			 assetComment.category = 'moveday'
+			 assetComment.createdBy = loginUser.person
+			 assetComment.save()
+	 } else {
+		 flash.message = "Asset not found"
+	 }
+	 redirect ( action:'assetSearch',params:params)
+  }
 }

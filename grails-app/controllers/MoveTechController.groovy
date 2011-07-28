@@ -848,6 +848,7 @@ class MoveTechController {
      * @return redirect to Asset details page if transition flag is busy otherwise redirect to asset task page   
      *--------------------------------------------------------------------------------------------------------*/
 	def unRack = {
+		println"params------->"+params
         def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
         if( principal ) {
         	def asset = getAssetEntity ( params.search, params.user )

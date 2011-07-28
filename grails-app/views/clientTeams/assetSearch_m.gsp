@@ -34,7 +34,7 @@
 	        	}
 	        }   
        }  
-       function doTransition( actionType ){
+       function placeOnHold( actionType ){
 	       if(validation( actionType )){
 	       		  var splittedComment
 			      var enterNote = document.assetSearchForm.enterNote.value;
@@ -48,19 +48,19 @@
 				  }
 	       		if(actionType != 'hold'){
 	       			document.assetSearchForm.action = "addComment";
-	       			//document.assetSearchForm.submit();
+	       			document.assetSearchForm.submit();
 	       		}else {
-	       			document.assetSearchForm.action = "placeHold";
-	       			//document.assetSearchForm.submit();
+	       			document.assetSearchForm.action = "placeOnHold";
+	       			document.assetSearchForm.submit();
 	       		}
 	       }else {
 	       		return false;
 	       }
        }
-       function unRack(){ 
+       function doTransition(){ 
 	       if(doCheckValidation()){  
-		      	document.assetSearchForm.action = "unRack";      
-       			//document.assetSearchForm.submit();       
+		      	document.assetSearchForm.action = "doTransition";      
+       			document.assetSearchForm.submit();       
 	       }else{
 	       		return false;
 	       }
@@ -116,7 +116,7 @@
 	<div class="mainbody" style="border:0px solid #e7e7e7; width:220px;">
 	<div class="colum_techlogin">
 		<table border=0 cellpadding=0 cellspacing=0><tr>
-			<td><g:link params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId]' class="home" >Home</g:link></td>
+			<td><g:link action='home' params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId]' class="home" >Home</g:link></td>
 			<td><g:link action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"tab":"Todo","fMess":"fMess"]' class="my_task">My Tasks</g:link></td>
 			<td><a href="#" class="asset_search_select">Asset</a></td>
 		</tr></table>
@@ -128,7 +128,6 @@
 			<input name="projectId" type="hidden" value="${projectId}" />
 			<input name="label" type="hidden" value="${label}"  />
 			<input name="actionLabel" type="hidden" value="${actionLabel}"  />
-			<input name="user" type="hidden" value="mt"  />
 			<input name="similarComment" id="similarComment" type="hidden" value="nosimilar"/>
 
 	 	<div id="mydiv" onclick="this.style.display = 'none';">
@@ -164,7 +163,7 @@
 			</g:if>
 			<g:if test ="${actionLabel}">	
 			<tr>
-			<td colspan="2" style="text-align:center;"><input type="button" value="${label}" onclick="return unRack();" class="action_button"/></td>
+			<td colspan="2" style="text-align:center;"><input type="button" value="${label}" onclick="return doTransition();" class="action_button"/></td>
 			</tr>
 		</table>
 		</td>
@@ -188,10 +187,10 @@
 			<textarea rows="2" cols="100" style="width:188px;padding:0px;" title="Enter Note..." id="enterNote" name="enterNote" onkeydown="textCounter($('#enterNote'), 255)" onkeyup="textCounter($('#enterNote'), 255)"></textarea>
 			</td></tr>		
 			<tr><td class="button_style" colspan=1 style="text-align:center;">
-				<input type="button" value="Comment" onclick="return doTransition('comment');" class="action_button_small"/>
+				<input type="button" value="Comment" onclick="return placeOnHold('comment');" class="action_button_small"/>
 			</td>
 			<td class="button_style" colspan=1 style="text-align:center;">
-				<input type="button" value="HOLD" onclick="return doTransition('hold');" class="action_button_hold" />
+				<input type="button" value="HOLD" onclick="return placeOnHold('hold');" class="action_button_hold" />
 				</td>
 			</tr>	
 		</table>
