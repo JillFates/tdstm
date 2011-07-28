@@ -38,8 +38,38 @@
 	<td></td>
 </tr>
 <tr>
+	<td>storeTextPresent</td>
+	<td>Show Move Bundle</td>
+	<td>Var1</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${Var1}==true</td>
+	<td>label5</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${Var1}==false</td>
+	<td>label6</td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label5</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>xpath=/html/body/div/div[6]/div/span/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label6</td>
+	<td></td>
+</tr>
+<tr>
 	<td>storeTable</td>
-	<td>//table.1.0</td>
+	<td>//table.3.0</td>
 	<td>mBundle</td>
 </tr>
 <tr>
@@ -69,22 +99,22 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.2</td>
+	<td>//table.0.3</td>
 	<td>Team Members</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.3</td>
+	<td>//table.0.4</td>
 	<td>Date Created</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.4</td>
+	<td>//table.0.5</td>
 	<td>Last Updated</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.5</td>
+	<td>//table.0.6</td>
 	<td>Comment</td>
 </tr>
 <tr>
@@ -104,22 +134,22 @@
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.2</td>
+	<td>//table.1.3</td>
 	<td>tMembers</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.3</td>
+	<td>//table.1.4</td>
 	<td>dCreated</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.4</td>
+	<td>//table.1.5</td>
 	<td>lUpdated</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.5</td>
+	<td>//table.1.6</td>
 	<td>commenT</td>
 </tr>
 <tr>
@@ -174,23 +204,18 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.3.0</td>
+	<td>//table.4.0</td>
 	<td>exact:Comment:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.4.0</td>
+	<td>//table.5.0</td>
 	<td>Is Disbanded:</td>
 </tr>
 <tr>
 	<td>verifyValue</td>
 	<td>comment</td>
 	<td>${commenT}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.4.1</td>
-	<td>Y N</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
@@ -259,10 +284,9 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.1</td>
+	<td>//table.3.1</td>
 	<td>modified comment</td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

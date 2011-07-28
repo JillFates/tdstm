@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://hyd-tdsserver:8080" />
+<link rel="selenium.base" href="http://localhost:8080//" />
 <title>MoveBundle_Read</title>
 </head>
 <body>
@@ -38,18 +38,48 @@
 	<td></td>
 </tr>
 <tr>
+	<td>storeTextPresent</td>
+	<td>Show Move Bundle</td>
+	<td>Var1</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${Var1}==true</td>
+	<td>label3</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${Var1}==false</td>
+	<td>label4</td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label3</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>xpath=/html/body/div/div[6]/div/span/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label4</td>
+	<td></td>
+</tr>
+<tr>
 	<td>storeTable</td>
-	<td>//table.1.0</td>
+	<td>//table.3.0</td>
 	<td>Bund1</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.1</td>
+	<td>//table.3.1</td>
 	<td>desc</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.2</td>
+	<td>//table.3.2</td>
 	<td>order</td>
 </tr>
 <tr>
@@ -59,12 +89,12 @@
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.4</td>
+	<td>//table.3.4</td>
 	<td>stime</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.5</td>
+	<td>//table.3.5</td>
 	<td>ctime</td>
 </tr>
 <tr>
@@ -89,13 +119,8 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.1</td>
-	<td>${stime}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.3.1</td>
-	<td>${ctime}</td>
+	<td>//table.7.1</td>
+	<td>${order}</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -113,11 +138,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//table.7.1</td>
-	<td>${order}</td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
 	<td>_action_Edit</td>
 	<td></td>
@@ -127,7 +147,6 @@
 	<td>_action_Delete</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

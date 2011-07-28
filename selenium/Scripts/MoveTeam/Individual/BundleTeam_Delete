@@ -38,8 +38,38 @@
 	<td></td>
 </tr>
 <tr>
+	<td>storeTextPresent</td>
+	<td>Show Move Bundle</td>
+	<td>Var1</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${Var1}==true</td>
+	<td>label5</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${Var1}==false</td>
+	<td>label6</td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label5</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>xpath=/html/body/div/div[6]/div/span/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label6</td>
+	<td></td>
+</tr>
+<tr>
 	<td>storeTable</td>
-	<td>//table.1.0</td>
+	<td>//table.3.0</td>
 	<td>mBundle</td>
 </tr>
 <tr>
@@ -69,22 +99,22 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.2</td>
+	<td>//table.0.3</td>
 	<td>Team Members</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.3</td>
+	<td>//table.0.4</td>
 	<td>Date Created</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.4</td>
+	<td>//table.0.5</td>
 	<td>Last Updated</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.5</td>
+	<td>//table.0.6</td>
 	<td>Comment</td>
 </tr>
 <tr>
@@ -152,7 +182,6 @@
 	<td>deleted</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>
