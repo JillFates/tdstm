@@ -4,17 +4,17 @@
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="selenium.base" href="" />
-<title>Comment_Console_Read</title>
+<title>Comment_Console_Edit</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">Comment_Console_Read</td></tr>
+<tr><td rowspan="1" colspan="3">Comment_Console_Edit</td></tr>
 </thead><tbody>
 <!--Pre-Requisite: There should be atleast one asset in the user selected project and move bundle as the test picks up the first asset in Console page and performs the actions.-->
 <tr>
 	<td>setSpeed</td>
-	<td>5000</td>
+	<td>700</td>
 	<td></td>
 </tr>
 <tr>
@@ -42,15 +42,45 @@
 	<td>link=Console</td>
 	<td></td>
 </tr>
-<!--If there is a comment existing for the first asset, this test reads the comment else it creates new comment and reads it-->
+<!--If there is a comment existing for the first asset, this test edits that comment else it creates a new comment and edits it-->
+<tr>
+	<td>label</td>
+	<td>label5</td>
+	<td></td>
+</tr>
 <tr>
 	<td>click</td>
-	<td>//td[8]/a/img</td>
+	<td>//td[9]/a/img</td>
 	<td></td>
 </tr>
 <tr>
 	<td>storeTextPresent</td>
-	<td>Show Asset Commentsclose</td>
+	<td>There were no results found.</td>
+	<td>Text1</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${Text1}==true</td>
+	<td>label7</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${Text1}==false</td>
+	<td>label8</td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label8</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>xpath=/html/body/div/div[5]/div/div/table/tbody/tr[2]/td/table/tbody/tr/td/div/form/div/table/tbody/tr/td[8]/div/a/img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeTextPresent</td>
+	<td>Show Asset Comments</td>
 	<td>Var1</td>
 </tr>
 <tr>
@@ -74,14 +104,19 @@
 	<td></td>
 </tr>
 <tr>
-	<td>click</td>
-	<td>link=New Comment</td>
+	<td>verifyTable</td>
+	<td>createCommentTable.0.0</td>
+	<td>Comment Type:</td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Create Asset Comment</td>
 	<td></td>
 </tr>
 <tr>
 	<td>select</td>
 	<td>commentType</td>
-	<td>label=comment</td>
+	<td>index=3</td>
 </tr>
 <tr>
 	<td>click</td>
@@ -91,58 +126,38 @@
 <tr>
 	<td>randomString</td>
 	<td>numeric|4</td>
-	<td>Comment</td>
+	<td>Test</td>
 </tr>
 <tr>
 	<td>type</td>
 	<td>comment</td>
-	<td>test comment - ${Comment}</td>
+	<td>${Test}</td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='Create' and @type='button']</td>
+	<td>//input[@ value='Create']</td>
 	<td></td>
 </tr>
-<!--Reading comment-->
+<tr>
+	<td>gotolabel</td>
+	<td>label5</td>
+	<td></td>
+</tr>
+<!--Editing comment-->
+<tr>
+	<td>gotolabel</td>
+	<td>label3</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label2</td>
+	<td></td>
+</tr>
 <tr>
 	<td>click</td>
-	<td>xpath=//html/body/div/div[2]/div[1]/table/tbody/tr/td[2][node()='test comment - ${Comment}']</td>
+	<td>xpath=/html/body/div[14]/div[2]/div/table/tbody/tr/td/a/img</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>showCommentTable.0.0</td>
-	<td>Created At:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>showCommentTable.1.0</td>
-	<td>Created By:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>showCommentTable.2.0</td>
-	<td>Comment Type:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>showCommentTable.3.0</td>
-	<td>exact:Category:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>showCommentTable.4.0</td>
-	<td>comment Code:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>showCommentTable.5.0</td>
-	<td>Must Verify:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>showCommentTable.6.0</td>
-	<td>exact:Comment:</td>
 </tr>
 <tr>
 	<td>storeTable</td>
@@ -160,58 +175,78 @@
 	<td>cType</td>
 </tr>
 <tr>
+	<td>storeTable</td>
+	<td>showCommentTable.4.1</td>
+	<td>cCode</td>
+</tr>
+<tr>
+	<td>storeValue</td>
+	<td>commentTdId</td>
+	<td>Comnt</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Edit']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.3.1</td>
-	<td>moveday</td>
+	<td>updateCommentTable.0.1</td>
+	<td>${createdAt}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>updateCommentTable.1.1</td>
+	<td>${createdBy}</td>
+</tr>
+<tr>
+	<td>verifySelectedLabel</td>
+	<td>commentTypeEditId</td>
+	<td>${cType}</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//input[@value='Update']</td>
+	<td></td>
 </tr>
 <tr>
 	<td>verifyValue</td>
-	<td>commentTdId</td>
-	<td>test comment - ${Comment}</td>
+	<td>commentEditId</td>
+	<td>${Comnt}</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Edit' and @type='button' and @onclick=&quot;commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')&quot;]</td>
+	<td>//input[@value='Delete']</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>//input[@value='Delete' and @type='button' and @onclick=&quot;var booConfirm = confirm('Are you sure?');if(booConfirm)new Ajax.Request('/tds-0.1/assetEntity/deleteComment',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e ,'never')},parameters:'id=' + $('#commentId').val() +'&amp;assetEntity='+$('#createAssetCommentId').val() });&quot;]</td>
-	<td></td>
+	<td>type</td>
+	<td>commentEditId</td>
+	<td>edited here</td>
 </tr>
 <tr>
-	<td>gotolabel</td>
-	<td>label3</td>
+	<td>click</td>
+	<td>//input[@value='Update' and @type='button' and @onclick=&quot;resolveValidate('editCommentForm','updateCommentId');&quot;]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>label</td>
-	<td>label2</td>
+	<td>label3</td>
 	<td></td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>listCommentsTable.1.1</td>
-	<td>ftComment</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>listCommentsTable.1.2</td>
-	<td>cmtType</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>listCommentsTable.1.5</td>
-	<td>categorY</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>listCommentsTable.1.6</td>
-	<td>cCode</td>
-</tr>
-<tr>
 	<td>click</td>
-	<td>//div[2]/div[1]/table/tbody/tr[1]/td[2]</td>
+	<td>xpath=//html/body/div/div[2]/div[1]/table/tbody/tr/td[2][node()='edited here']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>commentTdId</td>
+	<td>edited here</td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Show Asset Comment</td>
 	<td></td>
 </tr>
 <tr>
@@ -221,8 +256,18 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
+	<td>showCommentTable.0.1</td>
+	<td>${createdAt}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
 	<td>showCommentTable.1.0</td>
 	<td>Created By:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>showCommentTable.1.1</td>
+	<td>${createdBy}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
@@ -231,8 +276,13 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
+	<td>showCommentTable.2.1</td>
+	<td>${cType}</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
 	<td>showCommentTable.3.0</td>
-	<td>exact:Category:</td>
+	<td>Category:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
@@ -245,46 +295,15 @@
 	<td>Must Verify:</td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>showCommentTable.6.0</td>
-	<td>exact:Comment:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>showCommentTable.2.1</td>
-	<td>${cmtType}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>showCommentTable.3.1</td>
-	<td>moveday</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>showCommentTable.4.1</td>
-	<td>${cCode}</td>
-</tr>
-<tr>
-	<td>verifyValue</td>
-	<td>commentTdId</td>
-	<td>${ftComment}</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>//input[@value='Edit' and @type='button' and @onclick=&quot;commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')&quot;]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>//input[@value='Delete' and @type='button' and @onclick=&quot;var booConfirm = confirm('Are you sure?');if(booConfirm)new Ajax.Request('/tds-0.1/assetEntity/deleteComment',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e ,'never')},parameters:'id=' + $('#commentId').val() +'&amp;assetEntity='+$('#createAssetCommentId').val() });&quot;]</td>
+	<td>click</td>
+	<td>xpath=/x:html/x:body/x:div[14]/x:div[1]/x:a/x:span</td>
 	<td></td>
 </tr>
 <tr>
 	<td>label</td>
-	<td>label3</td>
+	<td>label7</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

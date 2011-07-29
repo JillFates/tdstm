@@ -587,11 +587,11 @@ document.createDialogForm.company.value = ${companyId}
         } 
         if(workPhone){
             if (isNaN(workPhone)) { alert("The Work phone number contains illegal characters.");returnVal = false }
-	        if (!(workPhone.length == 10)) { alert("The Work phone number is the wrong length. Make sure you included an area code.\n");returnVal = false }
+	        if (!(workPhone.length == 10)) { alert("The Work phone number is the wrong length. Make sure you included an area code.");returnVal = false }
         }
         if(mobilePhone){
             if (isNaN(mobilePhone)) { alert("The Mobile phone number contains illegal characters.");returnVal = false }
-	        if (!(mobilePhone.length == 10)) { alert("The Mobile phone number is the wrong length. Make sure you included an area code.\n");returnVal = false }
+	        if (!(mobilePhone.length == 10)) { alert("The Mobile phone number is the wrong length. Make sure you included an area code.");returnVal = false }
         }
         return returnVal
     }

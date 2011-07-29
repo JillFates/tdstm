@@ -4,12 +4,12 @@
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="selenium.base" href="" />
-<title>Comment_Console_Delete</title>
+<title>Comment_Console_Edit</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">Comment_Console_Delete</td></tr>
+<tr><td rowspan="1" colspan="3">Comment_Console_Edit</td></tr>
 </thead><tbody>
 <!--Pre-Requisite: There should be atleast one asset in the user selected project and move bundle as the test picks up the first asset in Console page and performs the actions.-->
 <tr>
@@ -42,15 +42,40 @@
 	<td>link=Console</td>
 	<td></td>
 </tr>
-<!--If there is a comment existing for the first asset, this test deletes that comment else it creates a new comment and deletes it.-->
+<!--If there is a comment existing for the first asset, this test edits that comment else it creates a new comment and edits it-->
 <tr>
-	<td>click</td>
-	<td>xpath=id('icon_8960')/x:a/x:img</td>
+	<td>label</td>
+	<td>label5</td>
 	<td></td>
 </tr>
 <tr>
 	<td>storeTextPresent</td>
-	<td>Show Asset Commentsclose</td>
+	<td>There were no results found.</td>
+	<td>Text1</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${Text1}==true</td>
+	<td>label7</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${Text1}==false</td>
+	<td>label8</td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label8</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>xpath=/html/body/div/div[5]/div/div/table/tbody/tr[2]/td/table/tbody/tr/td/div/form/div/table/tbody/tr/td[8]/div/a/img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeTextPresent</td>
+	<td>Show Asset Comments</td>
 	<td>Var1</td>
 </tr>
 <tr>
@@ -74,24 +99,19 @@
 	<td></td>
 </tr>
 <tr>
-	<td>click</td>
-	<td>//a[contains(text(),'New<br />Comment')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>//table[@id='createCommentTable']/tbody/tr[1]/td[1]/label</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyTable</td>
-	<td>createCommentTable.0.1</td>
-	<td>please select issue instruction comment&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Must Verify</td>
+	<td>createCommentTable.0.0</td>
+	<td>Comment Type:</td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Create Asset Comment</td>
+	<td></td>
 </tr>
 <tr>
 	<td>select</td>
 	<td>commentType</td>
-	<td>label=comment</td>
+	<td>index=3</td>
 </tr>
 <tr>
 	<td>click</td>
@@ -101,28 +121,24 @@
 <tr>
 	<td>randomString</td>
 	<td>numeric|4</td>
-	<td>Comment</td>
+	<td>Test</td>
 </tr>
 <tr>
 	<td>type</td>
 	<td>comment</td>
-	<td>test comment - ${Comment}</td>
+	<td>${Test}</td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='Create']</td>
+	<td>//input[@ value='Create']</td>
 	<td></td>
 </tr>
 <tr>
-	<td>click</td>
-	<td>//input[@value='Delete' and @type='button' and @onclick=&quot;var booConfirm = confirm('Are you sure?');if(booConfirm)new Ajax.Request('/tds-0.1/assetEntity/deleteComment',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e ,'never')},parameters:'id=' + $('#commentId').val() +'&amp;assetEntity='+$('#createAssetCommentId').val() });&quot;]</td>
+	<td>gotolabel</td>
+	<td>label5</td>
 	<td></td>
 </tr>
-<tr>
-	<td>assertConfirmation</td>
-	<td>Are you sure?</td>
-	<td></td>
-</tr>
+<!--Editing comment-->
 <tr>
 	<td>gotolabel</td>
 	<td>label3</td>
@@ -135,27 +151,37 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>xpath=id('link_3530')/x:img</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>xpath=/html/body/div[14]/div[2]/form/div[2]/span[2]/input</td>
-	<td></td>
-</tr>
-<tr>
-	<td>assertConfirmation</td>
-	<td>Are you sure?</td>
-	<td></td>
-</tr>
-<tr>
-	<td>label</td>
-	<td>label3</td>
+	<td>xpath=/html/body/div[14]/div[2]/div/table/tbody/tr/td/a/img</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>commentsListDialog</td>
+	<td>//input[@value='Update']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>commentEditId</td>
+	<td>${Comnt}</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//input[@value='Delete']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Delete']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertConfirmation</td>
+	<td>Delete Asset, are you sure?</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label7</td>
 	<td></td>
 </tr>
 </tbody></table>

@@ -228,7 +228,7 @@
 </tr>
 <tr>
 	<td>assertAlert</td>
-	<td>The Work phone number is the wrong length. Make sure you included an area code.<br /></td>
+	<td>The Work phone number is the wrong length. Make sure you included an area code.</td>
 	<td></td>
 </tr>
 <tr>
@@ -258,7 +258,7 @@
 </tr>
 <tr>
 	<td>assertAlert</td>
-	<td>The Mobile phone number is the wrong length. Make sure you included an area code.<br /></td>
+	<td>The Mobile phone number is the wrong length. Make sure you included an area code.</td>
 	<td></td>
 </tr>
 <tr>
@@ -274,6 +274,16 @@
 <tr>
 	<td>click</td>
 	<td>//input[@value='Create']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>${firstName}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>${personF}</td>
 	<td></td>
 </tr>
 <tr>
@@ -293,19 +303,19 @@
 	<td>TestUser${firstName}</td>
 </tr>
 <tr>
-	<td>keyPress</td>
+	<td>keyPressAndWait</td>
 	<td>dynFilterInput</td>
 	<td>13</td>
 </tr>
 <tr>
-	<td>click</td>
+	<td>clickAndWait</td>
 	<td>link=${personF}</td>
 	<td></td>
 </tr>
 <tr>
-	<td>waitForText</td>
+	<td>verifyTextPresent</td>
 	<td>//body/div[5]/div[1]</td>
-	<td>Show Staffclose</td>
+	<td>Show Staff</td>
 </tr>
 <tr>
 	<td>verifyValue</td>
@@ -425,7 +435,7 @@
 	<td>TestUser${firstName}</td>
 </tr>
 <tr>
-	<td>keyPress</td>
+	<td>keyPressAndWait</td>
 	<td>dynFilterInput</td>
 	<td>13</td>
 </tr>
@@ -440,8 +450,13 @@
 	<td></td>
 </tr>
 <tr>
-	<td>waitForPageToLoad</td>
+	<td>assertConfirmation</td>
+	<td>Are you sure?</td>
 	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>deleted</td>
 	<td></td>
 </tr>
 <tr>
@@ -450,13 +465,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>storeEval</td>
-	<td>javascript{var endTime=new Date().getTime(); var tdsdur=endTime -storedVars['tdssuitestart'];tdsdur;}</td>
-	<td>tdssuiteduration</td>
-</tr>
-<tr>
-	<td>echo</td>
-	<td>javascript{var tdsdur=storedVars['tdssuiteduration'];alert('It took ' + tdsdur + 'msec to run');'suite duration '+tdsdur+' msec';}</td>
+	<td>verifyElementNotPresent</td>
+	<td>link=${firstName}</td>
 	<td></td>
 </tr>
 </tbody></table>
