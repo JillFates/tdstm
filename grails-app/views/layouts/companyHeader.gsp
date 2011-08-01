@@ -79,13 +79,7 @@
 			    	      <li><a href="javascript:setUserTimeZone('EDT')">EDT</a></li>
 			              </ul>
 		            </div>
-	              	<div class="tzmenu">&nbsp;and power in <span id="upId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE } </span>
-						<ul>
-						<li><a href="javascript:setPower('Watts')">Watts </a></li>
-						<li><a href="javascript:setPower('Amps')">Amps</a></li>	
-						</ul>
-					</div> &nbsp;|
-	              </strong>
+	              	</strong>
               </g:remoteLink>
               &nbsp;<g:link controller="auth" action="signOut">sign out</g:link>
           </jsec:isLoggedIn>
@@ -227,6 +221,17 @@
                     <g:select name="timeZone" id="timeZoneId" from="${['GMT','PST','PDT','MST','MDT','CST','CDT','EST','EDT']}" 
                     value="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/>
                   </td>
+                   <tr class="prop">
+                     <td valign="top" class="name">
+                       <label for="title">Power In:</label>
+                        </td>
+                       <td valign="top" class="value">
+                    <g:select name="powerType" id="powerTypeId" from="${['Watts','Amps']}" 
+                    value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE}"/>
+                    </td>
+                   
+                  
+                  </tr>
                 </tr>
               </tbody>
             </table>
@@ -272,7 +277,7 @@
 	        }
 	        if(returnVal){
 				${remoteFunction(controller:'person', action:'updatePerson', 
-						params:'\'id=\' + $(\'#personId\').val() +\'&firstName=\'+$(\'#firstNameId\').val() +\'&lastName=\'+$(\'#lastNameId\').val()+\'&nickName=\'+$(\'#nickNameId\').val()+\'&title=\'+$(\'#titleId\').val()+\'&password=\'+$(\'#passwordId\').val()+\'&timeZone=\'+$(\'#timeZoneId\').val()+\'&email=\'+$(\'#emailId\').val()+\'&expiryDate=\'+$(\'#expiryDateId\').val()', 
+						params:'\'id=\' + $(\'#personId\').val() +\'&firstName=\'+$(\'#firstNameId\').val() +\'&lastName=\'+$(\'#lastNameId\').val()+\'&nickName=\'+$(\'#nickNameId\').val()+\'&title=\'+$(\'#titleId\').val()+\'&password=\'+$(\'#passwordId\').val()+\'&timeZone=\'+$(\'#timeZoneId\').val()+\'&powerType=\'+$(\'#powerTypeId\').val()+\'&email=\'+$(\'#emailId\').val()+\'&expiryDate=\'+$(\'#expiryDateId\').val()', 
 						onComplete:'updateWelcome(e)')}
 	        }
 		}
@@ -281,6 +286,7 @@
 		  	$("#loginUserId").html(ret[0].name)
 		  	$("#tzId").html(ret[0].tz)
 		  	$("#personDialog").dialog('close')
+		  	window.location.reload()
 	  	}
 	  	function setUserTimeZone( tz ){
 	  		${remoteFunction(controller:'project', action:'setUserTimeZone', 

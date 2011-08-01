@@ -359,6 +359,7 @@ class PersonController {
 				userLogin.save();
 				
 				userPreferenceService.setPreference( "CURR_TZ", params.timeZone )
+				userPreferenceService.setPreference( "CURR_POWER_TYPE", params.powerType )
 				userPreferenceService.loadPreferences("CURR_TZ")
 			}
 			ret << [name:personInstance.firstName, tz:getSession().getAttribute( "CURR_TZ" )?.CURR_TZ]

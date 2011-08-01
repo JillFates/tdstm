@@ -50,8 +50,12 @@
 			</td>
 		</tr>
 		<tr>
-			<td>Power (${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE }):</td>
-			<td>${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE != 'Watts' ? Math.round(modelInstance?.powerUse / 110 ) : modelInstance?.powerUse}&nbsp;${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE }</td>
+			<td>Power :</td>
+			<td><span id="powerSpanId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE != 'Watts' ? Math.round(modelInstance?.powerUse / 110 ) : modelInstance?.powerUse}</span>
+			<input type="hidden" name="powerUse" id="powerUseId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? Math.round(modelInstance?.powerUse / 110 ) : modelInstance?.powerUse}" >&nbsp;
+			<g:select id="powertype" name='powerType' value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE }" from="${['Watts','Amps']}" onchange="updatePowerType(this.value)"> </g:select>
+                 
+			</td>
 		</tr>
 		<tr>
 			<td>Front image:</label></td>
@@ -225,6 +229,17 @@ function showMergeDialog(){
 	$("#showMergeDialog").dialog('option', 'height', 530 )
     $("#showMergeDialog").dialog('open')
 }
+function updatePowerType( value){
+	var preference
+	if(value=="Watts"){
+		preference=$('#powerUseId').val()*110;
+	} else{
+		preference=Math.round($('#powerUseId').val()/110);
+	}
+	$('#powerUseId').val(preference);
+	$("#powerSpanId").html(preference)
+	${remoteFunction(controller:'project', action:'setPower', params:'\'p=\' + value ')}
+}	
 </script>
 </div>
 </body>

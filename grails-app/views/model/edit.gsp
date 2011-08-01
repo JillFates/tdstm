@@ -55,7 +55,7 @@
 		<tr>
 			<td>Power :</td>
 			<td><input type="text" name="powerUse" id="powerUseId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? Math.round(modelInstance?.powerUse / 110 ) : modelInstance?.powerUse}" >&nbsp;
-			<g:select id="ptype" name='powerType' value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE }" from="${['Watts','Amps']}" > </g:select>
+			<g:select id="ptype" name='powerType' value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE }" from="${['Watts','Amps']}" onchange="updatePowerType(this.value)"> </g:select>
                  </td>
 		</tr>
 		<tr>
@@ -337,6 +337,16 @@
 			}
 		});
 	}
+	function updatePowerType( value){
+		var preference
+		if(value=="Watts"){
+			preference = $('#powerUseId').val()*110;
+		} else{
+			preference = Math.round($('#powerUseId').val()/110);
+		}
+		$('#powerUseId').val(preference);
+		${remoteFunction(controller:'project', action:'setPower', params:'\'p=\' + value ')}
+	}	
 </script>
 </body>
 </html>

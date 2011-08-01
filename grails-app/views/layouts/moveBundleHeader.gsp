@@ -90,12 +90,7 @@
 			    	      <li><a href="javascript:setUserTimeZone('EDT')">EDT</a></li>
 				</ul>
 			</div>
-	              	<div class="tzmenu">&nbsp;and power in <span id="upId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE } </span>
-						<ul>
-						<li><a href="javascript:setPower('Watts')">Watts </a></li>
-						<li><a href="javascript:setPower('Amps')">Amps</a></li>	
-						</ul>
-					</div> &nbsp;|
+	              &nbsp;|
 	              </strong>
               &nbsp;<g:link controller="auth" action="signOut">sign out</g:link>
           </jsec:isLoggedIn>
@@ -131,7 +126,6 @@
 	        		<li><g:link class="home" controller="assetEntity" action="list" >Assets</g:link></li></li>
 		                <li><g:link class="home" controller="moveEvent" action="show" >Events</g:link> </li>
 	        		<li><g:link class="home" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]" style="background-color:#003366">Bundles</g:link></li>
-	        		<li><g:link class="home" controller="clientTeams" params="[projectId:currProjObj?.id]">Teams</g:link></li>s
 	        	</jsec:lacksAllRoles>
 	        	<jsec:hasAnyRole in="['ADMIN']">
 	        		<li><g:link class="home" controller="newsEditor" params="[projectId:currProjObj?.id]">News</g:link></li>
@@ -288,6 +282,17 @@
                     value="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/>
                   </td>
                 </tr>
+                <tr class="prop">
+                     <td valign="top" class="name">
+                       <label for="title">Power In:</label>
+                        </td>
+                       <td valign="top" class="value">
+                    <g:select name="powerType" id="powerTypeId" from="${['Watts','Amps']}" 
+                    value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE}"/>
+                    </td>
+                   
+                  
+                  </tr>
               </tbody>
             </table>
           </div>
@@ -343,7 +348,7 @@
 	        }
 	        if(returnVal){
 				${remoteFunction(controller:'person', action:'updatePerson', 
-						params:'\'id=\' + $(\'#personId\').val() +\'&firstName=\'+$(\'#firstNameId\').val() +\'&lastName=\'+$(\'#lastNameId\').val()+\'&nickName=\'+$(\'#nickNameId\').val()+\'&title=\'+$(\'#titleId\').val()+\'&password=\'+$(\'#passwordId\').val()+\'&timeZone=\'+$(\'#timeZoneId\').val()+\'&email=\'+$(\'#emailId\').val()+\'&expiryDate=\'+$(\'#expiryDateId\').val()', 
+						params:'\'id=\' + $(\'#personId\').val() +\'&firstName=\'+$(\'#firstNameId\').val() +\'&lastName=\'+$(\'#lastNameId\').val()+\'&nickName=\'+$(\'#nickNameId\').val()+\'&title=\'+$(\'#titleId\').val()+\'&password=\'+$(\'#passwordId\').val()+\'&timeZone=\'+$(\'#timeZoneId\').val()+\'&powerType=\'+$(\'#powerTypeId\').val()+\'&email=\'+$(\'#emailId\').val()+\'&expiryDate=\'+$(\'#expiryDateId\').val()', 
 						onComplete:'updateWelcome(e)')}
 	        }
 		}
@@ -352,6 +357,7 @@
 		  	$("#loginUserId").html(ret[0].name)
 		  	$("#tzId").html(ret[0].tz)
 		  	$("#personDialog").dialog('close')
+		  	window.location.reload()
 	  	}
 	  	function setUserTimeZone( tz ){
 	  		${remoteFunction(controller:'project', action:'setUserTimeZone', 
