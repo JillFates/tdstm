@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
+<link rel="selenium.base" href="http://localhost:8080/" />
 <title>MoveBundle_EditDashboardSteps</title>
 </head>
 <body>
@@ -38,8 +38,38 @@
 	<td></td>
 </tr>
 <tr>
+	<td>storeTextPresent</td>
+	<td>Show Move Bundle</td>
+	<td>Var1</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${Var1}==true</td>
+	<td>label1</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${Var1}==false</td>
+	<td>label2</td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Bundle List</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label2</td>
+	<td></td>
+</tr>
+<tr>
 	<td>storeTable</td>
-	<td>//table.1.0</td>
+	<td>//table.3.0</td>
 	<td>Bund1</td>
 </tr>
 <tr>
@@ -63,7 +93,7 @@
 	<td></td>
 </tr>
 <tr>
-	<td>check</td>
+	<td>click</td>
 	<td>checkbox_10</td>
 	<td></td>
 </tr>
@@ -80,11 +110,6 @@
 <tr>
 	<td>verifyEditable</td>
 	<td>completionTime_10</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>duration_10</td>
 	<td></td>
 </tr>
 <tr>
@@ -128,16 +153,10 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>assetEntityTable.1.1</td>
-	<td>${stime}</td>
+	<td>verifyTextPresent</td>
+	<td>MoveBundle ${Bund1} updated</td>
+	<td></td>
 </tr>
-<tr>
-	<td>verifyTable</td>
-	<td>assetEntityTable.1.2</td>
-	<td>${ctime}</td>
-</tr>
-
 </tbody></table>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
+<link rel="selenium.base" href="http://localhost:8080/" />
 <title>AssetImport_TeamAssignment_Console_MoveEvent_MoveNews_Creation</title>
 </head>
 <body>
@@ -35,7 +35,7 @@
 <tr>
 	<td>type</td>
 	<td>file</td>
-	<td>C:\Users\harish.nadipalli.BOSTONLOGIX\Desktop\TDSMaster_template.xls</td>
+	<td>D:\TDSMaster_template.xls</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
@@ -59,7 +59,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=${batches}</td>
+	<td>xpath=/html/body/div/div[5]/div/form/div/table/tbody/tr[5]/td/a</td>
 	<td></td>
 </tr>
 <tr>
@@ -98,13 +98,13 @@
 	<td></td>
 </tr>
 <tr>
-	<td>storeElementPresent</td>
-	<td>link=${BundleName}</td>
+	<td>storeTable</td>
+	<td>tag.3.0</td>
 	<td>var1</td>
 </tr>
 <tr>
-	<td>echo</td>
-	<td>${var1}</td>
+	<td>clickAndWait</td>
+	<td>link=${var1}</td>
 	<td></td>
 </tr>
 <tr>
@@ -113,72 +113,12 @@
 	<td></td>
 </tr>
 <tr>
-	<td>gotoIf</td>
-	<td>${var1}==false</td>
-	<td>label1</td>
-</tr>
-<tr>
-	<td>echo</td>
-	<td>${var1}</td>
-	<td></td>
-</tr>
-<tr>
 	<td>label</td>
 	<td>label4</td>
 	<td></td>
 </tr>
 <tr>
-	<td>gotoIf</td>
-	<td>${var1}==true</td>
-	<td>label2</td>
-</tr>
-<tr>
-	<td>label</td>
-	<td>label1</td>
-	<td></td>
-</tr>
-<tr>
-	<td>echo</td>
-	<td>${var1}</td>
-	<td></td>
-</tr>
-<tr>
-	<td>echo</td>
-	<td>label1</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=Next</td>
-	<td></td>
-</tr>
-<tr>
-	<td>storeElementPresent</td>
-	<td>link=${BundleName}</td>
-	<td>var1</td>
-</tr>
-<tr>
-	<td>gotoIf</td>
-	<td>${var1}==false</td>
-	<td>label3</td>
-</tr>
-<tr>
-	<td>gotoIf</td>
-	<td>${var1}==true</td>
-	<td>label4</td>
-</tr>
-<tr>
-	<td>label</td>
-	<td>label2</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=${BundleName}</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
+	<td>click</td>
 	<td>link=Bundle Asset Assignment</td>
 	<td></td>
 </tr>
@@ -195,51 +135,16 @@
 <tr>
 	<td>assertSelectedLabel</td>
 	<td>bundleRightId</td>
-	<td>${BundleName}</td>
+	<td>${var1}</td>
 </tr>
 <tr>
-	<td>storeTableRows</td>
-	<td>assetsLeftTableId</td>
-	<td>p</td>
-</tr>
-<tr>
-	<td>echo</td>
-	<td>${p}</td>
-	<td></td>
-</tr>
-<tr>
-	<td>store</td>
-	<td>1</td>
-	<td>loop1</td>
-</tr>
-<tr>
-	<td>while</td>
-	<td>${loop1}&lt;${p}</td>
+	<td>click</td>
+	<td>xpath=/html/body/div/div[6]/div/div/table/tbody/tr/td/table/tbody/tr[2]/td[3]/form/div/table/tbody/tr/td[2]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//form/div/table/tbody/tr[${loop1}]/td[1]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>storeEval</td>
-	<td>storedVars['loop1'] = ${loop1}+1</td>
-	<td></td>
-</tr>
-<tr>
-	<td>echo</td>
-	<td>${loop1}</td>
-	<td></td>
-</tr>
-<tr>
-	<td>endWhile</td>
-	<td></td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//a[@id='add']/img</td>
+	<td>xpath=/html/body/div/div[6]/div/div/table/tbody/tr/td/table/tbody/tr[2]/td[2]/span[2]/a/img</td>
 	<td></td>
 </tr>
 <tr>
@@ -260,27 +165,17 @@
 <tr>
 	<td>verifySelectedLabel</td>
 	<td>moveBundle</td>
-	<td>${BundleName}</td>
+	<td>${var1}</td>
 </tr>
 <tr>
 	<td>verifySelectOptions</td>
 	<td>filterTeam</td>
-	<td>All Teams,TestCode-${teamCode},UnAssigned</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='bundleTeamAssetForm']/div/table/tbody/tr[1]/td[2]/table.0.0</td>
-	<td>Unrack Plan</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='bundleTeamAssetForm']/div/table/tbody/tr[1]/td[2]/table.0.1</td>
-	<td>Rerack Plan</td>
+	<td>All Teams,teamcode,UnAssigned</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
 	<td>teamAssetCountTable.1.0</td>
-	<td>TestCode-${teamCode}</td>
+	<td>teamcode</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
@@ -291,31 +186,6 @@
 	<td>storeTable</td>
 	<td>teamAssetCountTable.2.1</td>
 	<td>assetCount</td>
-</tr>
-<tr>
-	<td>select</td>
-	<td>team</td>
-	<td>label=TestCode-${teamCode}</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//option[@value='TestCode-${teamCode}']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>waitForPageToLoad</td>
-	<td></td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>assetTable.1.7</td>
-	<td>TestCode-${teamCode}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>teamAssetCountTable.1.1</td>
-	<td>${assetCount}</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
@@ -336,37 +206,27 @@
 <tr>
 	<td>verifySelectedLabel</td>
 	<td>moveBundleId</td>
-	<td>${BundleName}</td>
+	<td>${var1}</td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//div[@id='midDiv']/table/tbody/tr/td[1]/table.0.0</td>
-	<td>TestName-${teamName}</td>
+	<td>verifyElementPresent</td>
+	<td>xpath=/html/body/div/div[5]/div/div/table/tbody/tr/td/div/table/tbody/tr/td[2]/div/table/tbody/tr/td/table/tbody/tr/th</td>
+	<td>teamname</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
 	<td>//form[@id='dashboardForm']/div/table/tbody/tr/td[1]/label</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='midDiv']/table/tbody/tr/td[2]/table.0.0</td>
-	<td>Cleaning</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='midDiv']/table/tbody/tr/td[3]/table.0.0</td>
-	<td>Transport</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//td[3]/div/table.0.0</td>
-	<td>exact:TOTALS:</td>
+	<td>Move Bundle:</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>createSnapshotId</td>
-	<td></td>
+	<td>xpath=/html/body/div/div[5]/div/div/table/tbody/tr/td/div/table/tbody/tr/td[2]/div/table/tbody/tr/td[2]/table/tbody/tr/th</td>
+	<td>Transport</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=/html/body/div/div[5]/div/div/table/tbody/tr/td/div/table/tbody/tr/td[3]/table/tbody/tr/th</td>
+	<td>TOTALS:</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -374,34 +234,29 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//td/div/table/tbody/tr/td[1]/div/table.1.0</td>
+	<td>verifyElementPresent</td>
+	<td>xpath=/x:html/x:body/x:div[1]/x:div[5]/x:div/x:div/x:table/x:tbody/x:tr[1]/x:td/x:div/x:table/x:tbody/x:tr/x:td[1]/x:table/x:tbody/x:tr[2]/x:td</td>
 	<td>Names</td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//td/div/table/tbody/tr/td[1]/div/table.2.0</td>
+	<td>verifyElementPresent</td>
+	<td>xpath=/x:html/x:body/x:div[1]/x:div[5]/x:div/x:div/x:table/x:tbody/x:tr[1]/x:td/x:div/x:table/x:tbody/x:tr/x:td[1]/x:table/x:tbody/x:tr[3]/x:td</td>
 	<td>Location</td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//td/div/table/tbody/tr/td[1]/div/table.3.0</td>
+	<td>verifyElementPresent</td>
+	<td>xpath=/x:html/x:body/x:div[1]/x:div[5]/x:div/x:div/x:table/x:tbody/x:tr[1]/x:td/x:div/x:table/x:tbody/x:tr/x:td[1]/x:table/x:tbody/x:tr[4]/x:td</td>
 	<td>Latest Asset</td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//td/div/table/tbody/tr/td[1]/div/table.4.0</td>
-	<td>Source (Pending/Avail/Done/Total)</td>
+	<td>verifyElementPresent</td>
+	<td>xpath=/x:html/x:body/x:div[1]/x:div[5]/x:div/x:div/x:table/x:tbody/x:tr[1]/x:td/x:div/x:table/x:tbody/x:tr/x:td[1]/x:table/x:tbody/x:tr[5]/x:td</td>
+	<td>Source</td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//td/div/table/tbody/tr/td[1]/div/table.5.0</td>
-	<td>Target (Pending/Avail/Done/Total)</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='midDiv']/table/tbody/tr/td[1]/table.5.0</td>
-	<td>${assetCount} / 0 / 0 / ${assetCount} @</td>
+	<td>verifyElementPresent</td>
+	<td>xpath=/x:html/x:body/x:div[1]/x:div[5]/x:div/x:div/x:table/x:tbody/x:tr[1]/x:td/x:div/x:table/x:tbody/x:tr/x:td[1]/x:table/x:tbody/x:tr[6]/x:td</td>
+	<td>Target </td>
 </tr>
 <!--Asset List Block-->
 <tr>
@@ -435,11 +290,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showChangeStatusDialog']/form/table.1.0</td>
-	<td>Ready</td>
-</tr>
-<tr>
 	<td>type</td>
 	<td>enterNote</td>
 	<td>recording in selenium</td>
@@ -455,254 +305,164 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//form[@id='assetListForm']/table.2.4</td>
-	<td>Ready</td>
-</tr>
-<tr>
 	<td>click</td>
 	<td>//td[1]/a/img</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.0.0</td>
-	<td>exact:Asset Name*</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.0.0</td>
-	<td>Short Name</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.0.0</td>
-	<td>exact:Asset Tag*</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.1.0</td>
-	<td>Asset Type</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.1.0</td>
-	<td>Manufacturer</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.1.0</td>
-	<td>Model</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.2.0</td>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[1]/x:td[1]</td>
 	<td>Application</td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.2.0</td>
-	<td>AppOwner</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.2.0</td>
-	<td>SME</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.3.0</td>
-	<td>IP Address</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.3.0</td>
-	<td>HINFO</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.3.0</td>
-	<td>Serial #</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.4.0</td>
-	<td>U Size</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.4.0</td>
-	<td>Rail Type</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.4.0</td>
-	<td>Source Location</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.5.0</td>
-	<td>Source Room</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.5.0</td>
-	<td>Source Rack/Cab</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.5.0</td>
-	<td>Source Position</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.6.0</td>
-	<td>Target Location</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.6.0</td>
-	<td>Target Room</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.6.0</td>
-	<td>Target Rack/Cab</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.7.0</td>
-	<td>Target Position</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.7.0</td>
-	<td>powerType</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.7.0</td>
-	<td>PDU Port</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.8.0</td>
-	<td>PDU Port Qty</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.8.0</td>
-	<td>PDU Type</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.8.0</td>
-	<td>NIC Port</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.9.0</td>
-	<td>Remote Mgmt Port</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.9.0</td>
-	<td>Fiber Cabinet</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.9.0</td>
-	<td>Fiber Type</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.10.0</td>
-	<td>Fiber Qty</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.10.0</td>
-	<td>Fiber Port</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.10.0</td>
-	<td>KVM Device</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.11.0</td>
-	<td>KVM Port</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.11.0</td>
-	<td>Truck</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.11.0</td>
-	<td>Old/New</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.12.0</td>
-	<td>Priority</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.12.0</td>
-	<td>Cart</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.12.0</td>
-	<td>Shelf</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.13.0</td>
-	<td>Custom1</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.13.0</td>
-	<td>Custom2</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.13.0</td>
-	<td>Custom3</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.14.0</td>
-	<td>Custom4</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.14.0</td>
-	<td>Custom5</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.14.0</td>
-	<td>Custom6</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.15.0</td>
-	<td>Custom7</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.15.0</td>
-	<td>Custom8</td>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[1]/x:td[3]</td>
+	<td>AssetName*</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Edit' and @type='button' and @onclick='return editAssetDialog()']</td>
-	<td></td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[2]/x:td[3]</td>
+	<td>exact:Asset Tag*</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[2]/x:td[5]</td>
+	<td>Asset Type</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[3]/x:td[1]</td>
+	<td>Manufacturer</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[3]/x:td[3]</td>
+	<td>Model</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[12]/x:td[5]</td>
+	<td>AppOwner</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[13]/x:td[1]</td>
+	<td>SME</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[3]/x:td[5]</td>
+	<td>IP Address</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[12]/x:td[3]</td>
+	<td>Rail Type</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[4]/x:td[3]</td>
+	<td>Source Location</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[4]/x:td[5]</td>
+	<td>Source Room</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[5]/x:td[1]</td>
+	<td>Source Rack/Cab</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[5]/x:td[4]</td>
+	<td>Source Position</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[6]/x:td[3]</td>
+	<td>Target Location</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[6]/x:td[5]</td>
+	<td>Target Room</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[7]/x:td[1]</td>
+	<td>Target Rack/Cab</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[7]/x:td[3]</td>
+	<td>Target Position</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[11]/x:td[3]</td>
+	<td>Truck</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[13]/x:td[5]</td>
+	<td>Plan Status</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[13]/x:td[3]</td>
+	<td>Priority</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[11]/x:td[5]</td>
+	<td>Cart</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[12]/x:td[1]</td>
+	<td>Shelf</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[8]/x:td[3]</td>
+	<td>Custom1</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[8]/x:td[5]</td>
+	<td>Custom2</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[9]/x:td[1]</td>
+	<td>Custom3</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[9]/x:td[3]</td>
+	<td>Custom4</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[9]/x:td[5]</td>
+	<td>Custom5</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[10]/x:td[1]</td>
+	<td>Custom6</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[10]/x:td[3]</td>
+	<td>Custom7</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[10]/x:td[5]</td>
+	<td>Custom8</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -715,248 +475,158 @@
 	<td></td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.0.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[1]/x:td[2]</td>
 	<td>field1</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.0.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[1]/x:td[4]</td>
 	<td>field2</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.0.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[2]/x:td[4]</td>
 	<td>field3</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.1.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[2]/x:td[6]</td>
 	<td>field4</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.1.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[3]/x:td[2]</td>
 	<td>field5</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.1.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[3]/x:td[4]</td>
 	<td>field6</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.2.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[12]/x:td[6]</td>
 	<td>field7</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.2.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[13]/x:td[2]</td>
 	<td>field8</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.2.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[3]/x:td[6]</td>
 	<td>field9</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.3.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[12]/x:td[4]</td>
 	<td>field10</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.3.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[4]/x:td[4]</td>
 	<td>field11</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.3.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[4]/x:td[6]</td>
 	<td>field12</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.4.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[5]/x:td[2]</td>
 	<td>field13</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.4.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[5]/x:td[4]</td>
 	<td>field14</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.4.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[6]/x:td[4]</td>
 	<td>field15</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.5.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[6]/x:td[6]</td>
 	<td>field16</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.5.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[7]/x:td[2]</td>
 	<td>field17</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.5.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[7]/x:td[4]</td>
 	<td>field18</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.6.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[13]/x:td[5]</td>
 	<td>field19</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.6.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[13]/x:td[4]</td>
 	<td>field20</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.6.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[11]/x:td[6]</td>
 	<td>field21</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.7.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[12]/x:td[2]</td>
 	<td>field22</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.7.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[8]/x:td[4]</td>
 	<td>field23</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.7.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[8]/x:td[6]</td>
 	<td>field24</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.8.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[9]/x:td[2]</td>
 	<td>field25</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.8.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[9]/x:td[4]</td>
 	<td>field26</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.8.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[9]/x:td[6]</td>
 	<td>field27</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.9.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[10]/x:td[2]</td>
 	<td>field28</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.9.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[10]/x:td[4]</td>
 	<td>field29</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.9.1</td>
+	<td>storeTextPresent</td>
+	<td>xpath=id('showDiv')/x:table/x:tbody/x:tr[10]/x:td[8]</td>
 	<td>field30</td>
 </tr>
 <tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.10.1</td>
-	<td>field31</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.10.1</td>
-	<td>field32</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.10.1</td>
-	<td>field33</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.11.1</td>
-	<td>field34</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.11.1</td>
-	<td>field35</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.11.1</td>
-	<td>field36</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.12.1</td>
-	<td>field37</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.12.1</td>
-	<td>field38</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.12.1</td>
-	<td>field39</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.13.1</td>
-	<td>field40</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.13.1</td>
-	<td>field41</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.13.1</td>
-	<td>field42</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.14.1</td>
-	<td>field43</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.14.1</td>
-	<td>field44</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[3]/table.14.1</td>
-	<td>field45</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[1]/table.15.1</td>
-	<td>field46</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table/tbody/tr/td[2]/table.15.1</td>
-	<td>field47</td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>//input[@value='Edit' and @type='button' and @onclick='return editAssetDialog()']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Fields marked ( * ) are mandatory</td>
+	<td>click</td>
+	<td>xpath=/html/body/div[14]/div[2]/form/div[2]/span/input</td>
 	<td></td>
 </tr>
 <tr>
@@ -978,11 +648,6 @@
 	<td>verifyElementPresent</td>
 	<td>editassetTypeId</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>editassetTypeId</td>
-	<td>please selectArrayCabinetCable ManagementCacheBladeBlade ChassisControllerDiskDisplayEnclosureEncryptorHVAC UnitKVMKVM SwitchLoad BalancerModemMonitorMultiplexerNetwork SwitchNSPOpticalPatch PanelPCPDUPower StripRackReservedRouterSANServerShelfSnifferStorageSwitchTapeTelecom SwitchUPSVMVPNWorkstationOther</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -1016,28 +681,13 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>edithinfoId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
 	<td>editserialNumberId</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>editusizeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
 	<td>editrailTypeId</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>editrailTypeId</td>
-	<td>please selectRailsSnap RailsScrew RailsEarsShelfNone</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -1081,97 +731,12 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>editpowerTypeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>editpowerTypeId</td>
-	<td>please select110V Fixed110V Switch220V Fixed220V Switch</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editpduPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editpduQuantityId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>editpduQuantityId</td>
-	<td>please select123456</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editpduTypeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>editpduTypeId</td>
-	<td>please selectC13C14C15C16C17C18C19C20IEC 309</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editnicPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editremoteMgmtPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editfiberCabinetId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editfiberTypeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editfiberQuantityId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>edithbaPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editkvmDeviceId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editkvmPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
 	<td>edittruckId</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>editnewOrOldId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>editnewOrOldId</td>
-	<td>please selectOldNew</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editpriorityId</td>
+	<td>editplanStatusId</td>
 	<td></td>
 </tr>
 <tr>
@@ -1231,17 +796,17 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Update Asset Entity']</td>
+	<td>//input[@value='Update Asset']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Delete' and @type='button' and @onclick=&quot;return editDialogDeleteRemove('delete')&quot;]</td>
+	<td>//input[@value='Delete'] </td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Remove From Project' and @type='button']</td>
+	<td>//input[@value='Remove From Project']</td>
 	<td></td>
 </tr>
 <tr>
@@ -1275,34 +840,29 @@
 	<td>tgtPos</td>
 </tr>
 <tr>
+	<td>storeValue</td>
+	<td>edittargetRoomId</td>
+	<td>tgtrm</td>
+</tr>
+<tr>
 	<td>type</td>
 	<td>editshortNameId</td>
 	<td>edited</td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='Update Asset Entity']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//td[1]/a/img</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.1.1</td>
-	<td>edited</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[12]/div[1]/a/span</td>
+	<td>xpath=/html/body/div[14]/div[2]/form/div[2]/span/input</td>
 	<td></td>
 </tr>
 <!--Asset Details block-->
 <tr>
+	<td>storeTable</td>
+	<td>tag.3.2</td>
+	<td>Table1</td>
+</tr>
+<tr>
 	<td>click</td>
-	<td>//form/table/tbody/tr[1]/td[3]</td>
+	<td>link=${Table1}</td>
 	<td></td>
 </tr>
 <tr>
@@ -1342,28 +902,8 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//form[@id='assetdetailsForm']/table.0.0</td>
-	<td>exact:Change:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='asset']/table.2.0</td>
-	<td>exact:Model: ${modeL}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='asset']/table.3.0</td>
-	<td>Src Rack: / ${srcRack} / ${srcPos}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
 	<td>//div[@id='asset']/table.4.0</td>
-	<td>Tgt Rack: / ${tgtRack} / ${tgtPos}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='asset']/table.5.0</td>
-	<td>exact:Status: Ready</td>
+	<td>Tgt Rack: ${tgtrm} / ${tgtRack} / ${tgtPos}</td>
 </tr>
 <tr>
 	<td>storeElementPresent</td>
@@ -1401,19 +941,9 @@
 	<td></td>
 </tr>
 <tr>
-	<td>select</td>
-	<td>stateSelectId</td>
-	<td>label=Released</td>
-</tr>
-<tr>
 	<td>click</td>
 	<td>//input[@value='Submit']</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='assetListForm']/table.2.4</td>
-	<td>Released</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -1487,16 +1017,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//form[@id='assetListForm']/table.2.0</td>
-	<td>No records found</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='assetListForm']/table.0.1</td>
-	<td>Show All&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;X</td>
-</tr>
-<tr>
 	<td>click</td>
 	<td>//tr[@id='rowId']/td[2]/a/span/u</td>
 	<td></td>
@@ -1528,13 +1048,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyTitle</td>
-	<td>Move Event List</td>
-	<td></td>
-</tr>
-<tr>
 	<td>clickAndWait</td>
-	<td>link=Create New</td>
+	<td>link=New Event</td>
 	<td></td>
 </tr>
 <tr>
@@ -1589,18 +1104,8 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Create']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
 	<td>_action_list</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifySelectedLabel</td>
-	<td>projectId</td>
-	<td>${Pcode} : ${Pname}</td>
 </tr>
 <tr>
 	<td>type</td>
@@ -1685,12 +1190,7 @@
 <!--News Editor page-->
 <tr>
 	<td>clickAndWait</td>
-	<td>link=News Editor</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTitle</td>
-	<td>Move Event News</td>
+	<td>link=News</td>
 	<td></td>
 </tr>
 <tr>
@@ -1704,53 +1204,38 @@
 	<td>${MEname}</td>
 </tr>
 <tr>
-	<td>verifyText</td>
-	<td>moveBundleId</td>
-	<td>All ${BundleName}</td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>All Active Archived</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
 	<td>viewFilterId</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.0</td>
+	<td>tag.2.0</td>
 	<td>Created At</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.1</td>
+	<td>tag.2.1</td>
 	<td>Created By</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.2</td>
-	<td>Type</td>
+	<td>tag.2.2</td>
+	<td>Comment Type</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.3</td>
-	<td>Comment</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>assetEntityTable.0.4</td>
+	<td>tag.2.4</td>
 	<td>Resolution</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.5</td>
+	<td>tag.2.5</td>
 	<td>Resolved At</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>assetEntityTable.0.6</td>
+	<td>tag.2.6</td>
 	<td>Resolved By</td>
 </tr>
 <tr>
@@ -1839,129 +1324,18 @@
 	<td>//input[@value='Create']</td>
 	<td></td>
 </tr>
-<tr>
-	<td>verifyTable</td>
-	<td>assetEntityTable.1.3</td>
-	<td>&quot;Test Desc-${MNdesc}&quot;</td>
-</tr>
 <!--Editing the Move News-->
-<tr>
-	<td>click</td>
-	<td>//tr[@id='commentsRowId_0']/td[4]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>assertText</td>
-	<td>//table[@id='showCommentTable']/tbody/tr[1]/td[1]/label</td>
-	<td>Created At:</td>
-</tr>
-<tr>
-	<td>assertText</td>
-	<td>//table[@id='showCommentTable']/tbody/tr[2]/td[1]/label</td>
-	<td>Created By:</td>
-</tr>
-<tr>
-	<td>assertText</td>
-	<td>//table[@id='showCommentTable']/tbody/tr[3]/td[1]/label</td>
-	<td>Comment Type:</td>
-</tr>
-<tr>
-	<td>assertText</td>
-	<td>//table[@id='showCommentTable']/tbody/tr[6]/td[1]/label</td>
-	<td>exact:Comment:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>showCommentTable.6.0</td>
-	<td>Resolved / Archived:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>showCommentTable.7.0</td>
-	<td>exact:Resolution:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>showCommentTable.8.0</td>
-	<td>Resolved At:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>showCommentTable.9.0</td>
-	<td>Resolved By:</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>//input[@value='Update' and @type='submit']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>//input[@value='Cancel' and @type='button' and @onclick=&quot;this.form.reset();$('#showEditCommentDialog').dialog('close');&quot;]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyValue</td>
-	<td>commentTdId</td>
-	<td>Test Desc-${MNdesc}</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>isResolvedId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>resolutionId</td>
-	<td>test</td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>//input[@value='Update' and @type='submit']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>assetEntityTable.1.4</td>
-	<td>&quot;test&quot;</td>
-</tr>
 <tr>
 	<td>clickAndWait</td>
 	<td>link=Dashboard</td>
 	<td></td>
 </tr>
-<tr>
-	<td>verifySelectedLabel</td>
-	<td>moveEvent</td>
-	<td>${MEname}</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>link=Archive</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>//ul[@id='news_archived']/li[1]/span[2]</td>
-	<td>Test Desc-${MNdesc}</td>
-</tr>
-<!--Verifying for User preffered Move Event in PMO Asset Tracking page-->
-<tr>
-	<td>clickAndWait</td>
-	<td>link=PMO Asset Tracking</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>moveEventId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifySelectedLabel</td>
-	<td>moveEventId</td>
-	<td>${MEname}</td>
-</tr>
 <!--Creating Cleaning Team-->
+<tr>
+	<td>waitForPageToLoad</td>
+	<td>30000s</td>
+	<td></td>
+</tr>
 <tr>
 	<td>clickAndWait</td>
 	<td>link=Bundles</td>
@@ -2012,77 +1386,6 @@
 	<td>link=Console</td>
 	<td></td>
 </tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>//div[@id='midDiv']/table/tbody/tr/td[2]/table/tbody/tr[5]/td/a[5]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>assertTextPresent</td>
-	<td>Transition Manager - Mobile</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='loginForm']/div[2]/table.2.0</td>
-	<td>exact:Username:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='loginForm']/div[2]/table.3.0</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>//input[@value='Login']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>link=Home</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>link=My Tasks</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>link=Asset</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='bundleTeamAssetForm']/div[1]/table.0.0</td>
-	<td>Log out</td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Currently Logged in as:</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='bundleTeamAssetForm']/div[2]/table.1.1</td>
-	<td>${Pname}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='bundleTeamAssetForm']/div[2]/table.2.1</td>
-	<td>${BundleName}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='bundleTeamAssetForm']/div[2]/table.3.1</td>
-	<td>Cleaning Team Name</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='bundleTeamAssetForm']/div[2]/table.5.1</td>
-	<td>Source</td>
-</tr>
-
 </tbody></table>
 </body>
 </html>
