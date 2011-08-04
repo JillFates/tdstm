@@ -101,6 +101,17 @@
 			</div>
 		</div>
       		</g:form>
+      	<div>
+      	<table style="border: 0px;">
+        	<tbody>
+            	<tr>
+					<td style="height: 2px;" nowrap="nowrap">
+                    	<g:link class="home" controller="clientTeams" params="[projectId:projectId, viewMode:'web']" class="sign_out" style="width:75px;">Use full site</g:link>
+                    </td>
+				</tr>
+			</tbody>
+		</table>
+      	</div>
   	</div>
 <script type="text/javascript" >setFocus();</script>
 </body>

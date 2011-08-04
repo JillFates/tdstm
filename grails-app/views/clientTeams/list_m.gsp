@@ -26,8 +26,11 @@
         <div style="width: 200px;" class="message">${flash.message}</div>
         </g:if>
         <div style="float: left; padding-left: 2px; width: 98%; margin-top: 2px;">
-		<img src="${createLinkTo(dir:'images',file:'tds_movetech.jpg')}" border="0" alt="tds" />
-        </div>
+         <td style="text-align: center;">
+        <span style="color: #328714; font: bold 15px arial;">Transition Manager - Mobile</span>
+         </td>
+		<!--<img src="${createLinkTo(dir:'images',file:'tds_movetech.jpg')}" border="0" alt="tds" />
+        --></div>
 
         <div style="float: left; width: 100%; margin: 4px 0; text-align: center;">
         <table style="border: 0px;">
@@ -38,40 +41,36 @@
                                 <g:link controller="auth" action="signOut" class="sign_out">Log out</g:link>
                                 </td>
                         </tr>
-                        <tr>
-                                <td style="text-align: center;">
-                                <span style="color: #328714; font: bold 15px arial;">Transition Manager - Mobile</span>
-                                </td>
-                        </tr>
                 </tbody>
         </table>
+                          <span style="color:#328714; font= 10px arial; float:left;">Select Team To Use:</span>
         <table>
         	<thead>
 				<tr>
-					<th>Team Name</th>
+					<th>Team</th>
 					<th>Role</th>
-					<th>Team Members</th>
+					<th>Members</th>
               	</tr>
 			</thead>
             <tbody>
             	<g:each in="${projectTeams}" status="i" var="projectTeamInstance">
 					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="submitLoginForm('${projectTeamInstance?.projectTeam?.moveBundle.id}','${projectTeamInstance?.projectTeam?.id}','source')">
-                        <td><b>${projectTeamInstance?.projectTeam?.name}-Sources</b></td>
+                        <td><b>${projectTeamInstance?.projectTeam?.name}-src</b></td>
                         <td><g:if test="${projectTeamInstance?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.projectTeam?.role}" /></g:if></td>
 						<td>
 							<g:each in="${projectTeamInstance?.teamMembers}" var="teamMember">
-			 					<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName},</g:if> ${teamMember?.staff?.firstName} <g:if test="${teamMember?.staff?.title}">- ${teamMember?.staff?.title}</g:if> <br/>
+			 					<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName},</g:if> ${teamMember?.staff?.firstName}  <br/>
 							</g:each>
 						</td>
             		</tr>
 				</g:each>
 				<g:each in="${projectTeams}" status="i" var="projectTeamInstance">
 					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="submitLoginForm('${projectTeamInstance?.projectTeam?.moveBundle.id}','${projectTeamInstance?.projectTeam?.id}','target')">
-                        <td><b>${projectTeamInstance?.projectTeam?.name}-Target</b></td>
+                        <td><b>${projectTeamInstance?.projectTeam?.name}-trg</b></td>
                         <td><g:if test="${projectTeamInstance?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.projectTeam?.role}" /></g:if></td>
 						<td>
 							<g:each in="${projectTeamInstance?.teamMembers}" var="teamMember">
-			 					<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName},</g:if> ${teamMember?.staff?.firstName} <g:if test="${teamMember?.staff?.title}">- ${teamMember?.staff?.title}</g:if> <br/>
+			 					<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName},</g:if> ${teamMember?.staff?.firstName}  <br/>
 							</g:each>
 						</td>
             		</tr>

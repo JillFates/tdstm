@@ -31,7 +31,6 @@ class ClientTeamsController {
 		if(!projectId){
 			projectId = session.getAttribute("CURR_PROJ")?.CURR_PROJ;
 		}
-		println"session.getAttribute->"+session.getAttribute("CURR_PROJ")?.CURR_PROJ
 		def viewMode = params.viewMode
 		if(!viewMode){
 			viewMode = session.getAttribute("TEAM_VIEW_MODE") ? session.getAttribute("TEAM_VIEW_MODE") : 'web'
@@ -78,9 +77,12 @@ class ClientTeamsController {
 			projectTeamInstance.currentLocation = "Target"
 			projectTeamInstance.save()
 		}
-				
+		def projectId = params.projectId
+		if(!projectId){
+			projectId = session.getAttribute("CURR_PROJ")?.CURR_PROJ;
+		}
 		render ( view:'home_m',
-				 model:[ projectTeam:teamName, members:teamMembers, project:Project.read(params.projectId), loc:location, 
+				 model:[ projectTeam:teamName, members:teamMembers, project:Project.read(projectId), loc:location, 
 						bundleId:bundleId, bundleName:bundleInstance.name, teamId: teamId, location: location ])
 		/*if(viewMode != 'web'){
 			render( view:'home_m', model:[ projectTeams:'', projectId:params.projectId ] )
@@ -114,7 +116,6 @@ class ClientTeamsController {
 		def workflowCode = moveBundleInstance.project.workflowCode
 		def workflow = Workflow.findByProcess(workflowCode)
 		def swimlane = Swimlane.findByNameAndWorkflow(projectTeam.role, workflow )
-		println"swimlane-->"+swimlane
 		flash.message = ""
         def holdState = stateEngineService.getStateIdAsInt( workflowCode, "Hold" ) 
         if ( params.location == "source" ) {
@@ -163,11 +164,8 @@ class ClientTeamsController {
         				"p.current_state_id < $rdyState desc , a.source_rack, a.source_rack_position" )
         }
         proAssetMap = jdbcTemplate.queryForList ( query.toString() )
-		println"proAssetMap-->"+proAssetMap
         todoSize = proAssetMap.size()
-		println"rdyState-->"+rdyState
         proAssetMap.each {
-			println"it.currentStateId-->"+it.currentStateId
             if ( it.currentStateId ) {
                 if ( it.minstate == holdState ) {
                     colorCss = "asset_hold"
@@ -329,9 +327,7 @@ class ClientTeamsController {
 							   return;
 						   }
 					   }
-					   println"loginTeam.role-->"+loginTeam.role
 					   taskList = stateEngineService.getTasks ( moveBundleInstance.project.workflowCode, loginTeam.role, stateVal )
-					   println"taskList-->"+taskList
 					   taskSize = taskList.size()
 					   if ( taskSize == 1 ) {
 						   if ( taskList.contains ( "Hold" ) ) {
@@ -391,7 +387,6 @@ class ClientTeamsController {
    * @return redirect to Asset details page if transition flag is busy otherwise redirect to asset task page
    *--------------------------------------------------------------------------------------------------------*/
   def doTransition = {
-		println"params------->"+params
 		def bundleId = params.bundleId
 		def moveBundleInstance = MoveBundle.findById( bundleId )
 		def query = new StringBuffer ("from AssetEntity ae where ae.moveBundle=${moveBundleInstance.id} and ae.assetTag = :search ")

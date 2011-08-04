@@ -121,6 +121,7 @@
 			<li id="assetMenuId"><g:link class="home" controller="assetEntity" action="assetImport" >Assets</g:link></li>
 			<li><g:link class="home" controller="moveEvent" action="show" >Events</g:link> </li>
 			<li><g:link class="home" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles</g:link></li>
+			<li><g:link class="home" controller="clientTeams" params="[projectId:currProjObj?.id]">Teams</g:link></li>
 	        </jsec:lacksAllRoles>
 	        <jsec:hasAnyRole in="['ADMIN']">
 			<li><g:link class="home" controller="newsEditor" params="[projectId:currProjObj?.id]">News</g:link></li>

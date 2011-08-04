@@ -605,10 +605,10 @@ function onInvokeAction(id) {
 										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','')"><u>${bundleTeam?.sourceAssets}</u></a>
 										<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 										<g:if test="${bundleTeam.team?.role != 'CLEANER'}">
-										<a title="Login as.."  href="#" onclick="window.open('../moveTech/login?username=mt-${moveBundleInstance.id}-${bundleTeam?.team?.id}-s','mtwindow','menubar=1,resizable=1,width=320,height=480'); ">@</a>
+										<a title="Login as.." href="#" onclick="window.open('../clientTeams/home?bundleId=${moveBundleInstance.id}&teamId=${bundleTeam?.team?.id}&location=source','mtwindow','menubar=1,resizable=1,width=320,height=480'); ">@</a>
 										</g:if>
 										<g:else>
-										<a title="Login as.." href="../moveTech/login?username=ct-${moveBundleInstance.id}-${bundleTeam?.team?.id}-s">@</a>
+										<a title="Login as.." href="#" onclick="window.open('../clientTeams/home?bundleId=${moveBundleInstance.id}&teamId=${bundleTeam?.team?.id}&location=source','mtwindow','menubar=1,resizable=1,width=320,height=480'); ">@</a>
 										</g:else>
 										</jsec:lacksAllRoles>
 									</td>
@@ -621,10 +621,10 @@ function onInvokeAction(id) {
 										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','')"><u>${bundleTeam?.targetAssets}</u></a>
 										<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 										<g:if test="${bundleTeam.team?.role != 'CLEANER'}">
-										<a title="Login as.." href="#" onclick="window.open('../moveTech/login?username=mt-${moveBundleInstance.id}-${bundleTeam?.team?.id}-t','mtwindow','menubar=1,resizable=1,width=320,height=480'); ">@</a>
+										<a title="Login as.." href="#" onclick="window.open('../clientTeams/home?bundleId=${moveBundleInstance.id}&teamId=${bundleTeam?.team?.id}&location=target','mtwindow','menubar=1,resizable=1,width=320,height=480'); ">@</a>
 										</g:if>
 										<g:else>
-										<a title="Login as.." href="../moveTech/login?username=ct-${moveBundleInstance.id}-${bundleTeam?.team?.id}-t">@</a>
+										<a title="Login as.." href="#" onclick="window.open('../clientTeams/home?bundleId=${moveBundleInstance.id}&teamId=${bundleTeam?.team?.id}&location=target','mtwindow','menubar=1,resizable=1,width=320,height=480'); ">@</a>
 										</g:else>
 										</jsec:lacksAllRoles>
 									</td>
