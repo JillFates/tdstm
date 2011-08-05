@@ -1,8 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="layout" content="projectHeader" />
 <title>My Tasks</title>
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 <%--<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
 	 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.move_tech_dialog.css')}" /> 
@@ -99,19 +100,17 @@
 					</tbody>
 				</table>
 			</div>
-			<div>
+		</div>
+      		</g:form>
       		<table style="border: 0px;">
                 <tbody>
                 	<tr>
                     	<td style="height: 2px;" nowrap="nowrap">
-                        	<g:link class="home" controller="clientTeams" params="[projectId:projectId, viewMode:'web']" class="sign_out" style="width:75px;">Full site</g:link>
+                        	<g:link class="home" action="list" params="[projectId:projectId, viewMode:'mobile']" class="sign_out" style="width:75px;">Mobile Site</g:link>
 						</td>
 					</tr>
 				</tbody>
         	</table>
-      		</div>
-		</div>
-      		</g:form>
   	</div>
 <script type="text/javascript" >setFocus();</script>
 </body>

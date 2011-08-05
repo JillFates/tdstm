@@ -26,13 +26,12 @@
         <div style="width: 200px;" class="message">${flash.message}</div>
         </g:if>
         <div style="float: left; padding-left: 2px; width: 98%; margin-top: 2px;">
-         <td style="text-align: center;">
+		 <td style="text-align: center;">
         <span style="color: #328714; font: bold 15px arial;">Transition Manager - Mobile</span>
          </td>
-		<!--<img src="${createLinkTo(dir:'images',file:'tds_movetech.jpg')}" border="0" alt="tds" />
-        --></div>
+		</div>
 
-        <div style="float: left; width: 100%; margin: 4px 0; text-align: center;">
+ 		<div style="float: left; width: 100%; margin: 4px 0; text-align: center;">
         <table style="border: 0px;">
                 <tbody>
                         <tr>
@@ -43,7 +42,7 @@
                         </tr>
                 </tbody>
         </table>
-                          <span style="color:#328714; font= 10px arial; float:left;">Select Team To Use:</span>
+        <span style="color:#328714; font: bold 13px arial; float:left;">Select Team To Use:</span>
         <table>
         	<thead>
 				<tr>
@@ -55,7 +54,7 @@
             <tbody>
             	<g:each in="${projectTeams}" status="i" var="projectTeamInstance">
 					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="submitLoginForm('${projectTeamInstance?.projectTeam?.moveBundle.id}','${projectTeamInstance?.projectTeam?.id}','source')">
-                        <td><b>${projectTeamInstance?.projectTeam?.name}-src</b></td>
+                        <td><b>${projectTeamInstance?.projectTeam?.name}(src)</b></td>
                         <td><g:if test="${projectTeamInstance?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.projectTeam?.role}" /></g:if></td>
 						<td>
 							<g:each in="${projectTeamInstance?.teamMembers}" var="teamMember">
@@ -66,7 +65,7 @@
 				</g:each>
 				<g:each in="${projectTeams}" status="i" var="projectTeamInstance">
 					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="submitLoginForm('${projectTeamInstance?.projectTeam?.moveBundle.id}','${projectTeamInstance?.projectTeam?.id}','target')">
-                        <td><b>${projectTeamInstance?.projectTeam?.name}-trg</b></td>
+                        <td><b>${projectTeamInstance?.projectTeam?.name}(trg)</b></td>
                         <td><g:if test="${projectTeamInstance?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.projectTeam?.role}" /></g:if></td>
 						<td>
 							<g:each in="${projectTeamInstance?.teamMembers}" var="teamMember">

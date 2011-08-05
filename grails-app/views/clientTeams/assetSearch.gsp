@@ -1,6 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="layout" content="projectHeader" />
 <title>Asset</title>
 <jq:plugin name="jquery"/>
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
@@ -286,7 +288,7 @@
        		<tbody>
             	<tr>
                    	<td style="height: 2px;" nowrap="nowrap">
-                    	<g:link class="home" controller="clientTeams" params="[projectId:projectId, viewMode:'web']" class="sign_out" style="width:75px;">Use full site</g:link>
+                    	<g:link class="home" action="list" params="[projectId:projectId, viewMode:'mobile']" class="sign_out" style="width:75px;">Mobile site</g:link>
                     </td>
                 </tr>
 			</tbody>

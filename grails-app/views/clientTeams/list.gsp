@@ -5,13 +5,18 @@
         <title>Teams List</title>
     </head>
     <body>
+    <g:form action="home" name="loginForm">
+        <input type="hidden" name="bundleId" id="bundleId"/>
+        <input type="hidden" name="teamId" id="teamId"/>
+        <input type="hidden" name="location" id="locationId"/>
+        <input type="hidden" name="projectId" value="${projectId}"/>
     <div class="body">
             <h1>Teams List</h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-           		<span class="menuButton"><g:link class="list" action="list" params="[projectId:projectId, viewMode:'mobile']">Use mobile site</g:link></span>
+           		<span class="menuButton"><g:link class="list" action="list" params="[projectId:projectId, viewMode:'mobile']">Mobile Site</g:link></span>
         	</div>
             <div style="margin-top: 5px;" class='list'>
             <table>
@@ -24,7 +29,7 @@
 			</thead>
             <tbody>
             	<g:each in="${projectTeams}" status="i" var="projectTeamInstance">
-					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}"onclick="submitLoginForm('${projectTeamInstance?.projectTeam?.moveBundle.id}','${projectTeamInstance?.projectTeam?.id}','source')">
                         <td><b>${projectTeamInstance?.projectTeam?.name}-Sources</b></td>
                         <td><g:if test="${projectTeamInstance?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.projectTeam?.role}" /></g:if></td>
 						<td>
@@ -35,7 +40,7 @@
             		</tr>
 				</g:each>
 				<g:each in="${projectTeams}" status="i" var="projectTeamInstance">
-					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="submitLoginForm('${projectTeamInstance?.projectTeam?.moveBundle.id}','${projectTeamInstance?.projectTeam?.id}','target')">
                         <td><b>${projectTeamInstance?.projectTeam?.name}-Target</b></td>
                         <td><g:if test="${projectTeamInstance?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.projectTeam?.role}" /></g:if></td>
 						<td>
@@ -52,5 +57,15 @@
         	</table>
             </div>
         </div>
+        </g:form>
+ <script type="text/javascript">
+    function submitLoginForm( bundleId,teamId,location){
+	var form = document.forms["loginForm"] ;
+	form.bundleId.value = bundleId;
+	form.teamId.value = teamId;
+	form.location.value = location;
+	form.submit();
+}
+</script>
     </body>
 </html>

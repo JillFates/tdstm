@@ -81,14 +81,13 @@ class ClientTeamsController {
 		if(!projectId){
 			projectId = session.getAttribute("CURR_PROJ")?.CURR_PROJ;
 		}
-		render ( view:'home_m',
-				 model:[ projectTeam:teamName, members:teamMembers, project:Project.read(projectId), loc:location, 
+		if(viewMode != 'web'){
+			   render ( view:'home_m',model:[ projectTeam:teamName, members:teamMembers, project:Project.read(params.projectId), loc:location, 
 						bundleId:bundleId, bundleName:bundleInstance.name, teamId: teamId, location: location ])
-		/*if(viewMode != 'web'){
-			render( view:'home_m', model:[ projectTeams:'', projectId:params.projectId ] )
-		} else {
-			return [ projectTeams:'', projectId:params.projectId ]
-		}*/
+		}else{
+			 return [projectTeam:teamName, members:teamMembers, project:Project.read(params.projectId), loc:location, 
+						bundleId:bundleId, bundleName:bundleInstance.name, teamId: teamId, location: location]
+		}		
 	}
 	/**
 	 * @author : lokanada
@@ -110,12 +109,14 @@ class ClientTeamsController {
         def assetList = []
         def colorCss
         def rdyState
+		def viewMode = session.getAttribute("TEAM_VIEW_MODE")        
         def ipState = new ArrayList()
         def moveBundleInstance = MoveBundle.findById( bundleId )
 		def projectTeam = ProjectTeam.read( teamId )
 		def workflowCode = moveBundleInstance.project.workflowCode
+		def role = projectTeam.role ? projectTeam.role : "MOVE_TECH"		
 		def workflow = Workflow.findByProcess(workflowCode)
-		def swimlane = Swimlane.findByNameAndWorkflow(projectTeam.role, workflow )
+	    def swimlane = Swimlane.findByNameAndWorkflow(role, workflow )
 		flash.message = ""
         def holdState = stateEngineService.getStateIdAsInt( workflowCode, "Hold" ) 
         if ( params.location == "source" ) {
@@ -136,12 +137,12 @@ class ClientTeamsController {
         def query = new StringBuffer (countQuery)
         if ( params.location == "source" ) {
             stateVal = stateEngineService.getStateId ( workflowCode, "Unracked" )
-            query.append (" and a.${sourceTeamColumns.get(projectTeam.role)} = $teamId" )
-            countQuery +=" and a.${sourceTeamColumns.get(projectTeam.role)} = $teamId"
+            query.append (" and a.${sourceTeamColumns.get(role)} = $teamId" )
+            countQuery +=" and a.${sourceTeamColumns.get(role)} = $teamId"
         } else {
         	stateVal = stateEngineService.getStateId ( workflowCode, "Reracked" )
-            query.append (" and a.${targetTeamColumns.get(projectTeam.role)} = $teamId" )
-            countQuery += " and a.${targetTeamColumns.get(projectTeam.role)} = $teamId" 
+			query.append (" and a.${targetTeamColumns.get(role)} = $teamId" )
+            countQuery += " and a.${targetTeamColumns.get(role)} = $teamId" 
         }
         allSize = jdbcTemplate.queryForList ( query.toString() + " group by a.asset_entity_id ").size()
         if ( tab == "Todo" ) {
@@ -191,9 +192,13 @@ class ClientTeamsController {
         if(!flash.message){
         	flash.message = message
         }
-        render (view:'myTasks_m', model:[ bundleId:bundleId, teamId:teamId, projectId:params.projectId, location:params.location, 
-                assetList:assetList, allSize:allSize, todoSize:todoSize, 'tab':tab
-                ])
+        if (viewMode !='web'){
+            render (view:'myTasks_m', model:[ bundleId:bundleId, teamId:teamId, projectId:params.projectId, location:params.location, 
+                    assetList:assetList, allSize:allSize, todoSize:todoSize, 'tab':tab])
+		} else{ 
+		      return[bundleId:bundleId, teamId:teamId,moveBundleInstance:moveBundleInstance, projectId:params.projectId, location:params.location, projectTeam:projectTeam,
+              assetList:assetList, allSize:allSize, todoSize:todoSize, 'tab':tab,workflowCode:workflowCode,workflow:workflow,swimlane:swimlane]
+		}
 	}
 	/**
 	* @author : Lokanada
@@ -212,6 +217,7 @@ class ClientTeamsController {
 	   def search = params.search
 	   def bundleId = params.bundleId
 	   def projectId = params.projectId
+	   def viewMode = session.getAttribute("TEAM_VIEW_MODE")
 	   def stateVal
 	   def taskList
 	   def taskSize
@@ -370,12 +376,16 @@ class ClientTeamsController {
 												   hasImageExist:assetItem.model.rearImage && assetItem.model?.useImage ? true : false,
 												   rackUposition : rackUposition ]
 					   }
-						   
-					   render ( view:'assetSearch_m',
-						   model:[ projMap:projMap, assetComment:assetComment?assetComment :"", stateVal:stateVal, bundleId:bundleId,
+					   if (viewMode!='web'){
+					       render ( view:'assetSearch_m',model:[ projMap:projMap, assetComment:assetComment?assetComment :"", stateVal:stateVal, bundleId:bundleId,
 								   teamId:teamId, projectId:projectId, location:params.location, search:params.search, label:label,
-								   actionLabel:actionLabel, commentsList: commentsList, stateLabel: stateLabel, assetCablingDetails : assetCablingDetails
-								   ])
+								   actionLabel:actionLabel, commentsList: commentsList, stateLabel: stateLabel, assetCablingDetails : assetCablingDetails])
+					   }else{
+					         return [ projMap:projMap, assetComment:assetComment?assetComment :"", stateVal:stateVal, bundleId:bundleId,
+								      teamId:teamId, projectId:projectId, location:params.location, search:params.search, label:label,
+								      actionLabel:actionLabel, commentsList: commentsList, stateLabel: stateLabel, assetCablingDetails : assetCablingDetails]
+					   
+					   }
 				   }
 		   }
 	   }
@@ -492,6 +502,7 @@ class ClientTeamsController {
   * @return Create a Comment for AssetEntity from client team station
   *----------------------------------------------------------------------------------*/
   def addComment = {
+	 def moveBundleInstance = MoveBundle.findById( params.bundleId )
 	 def loginUser = UserLogin.findByUsername ( SecurityUtils.subject.principal )
 	 def query = new StringBuffer ("from AssetEntity ae where ae.moveBundle=${moveBundleInstance.id} and ae.assetTag = :search ")
 	 def asset = AssetEntity.find( query.toString(), [ search : params.search ] )
