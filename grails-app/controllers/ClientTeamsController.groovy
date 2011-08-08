@@ -136,11 +136,13 @@ class ClientTeamsController {
 			            where a.move_bundle_id = $bundleId"""
         def query = new StringBuffer (countQuery)
         if ( params.location == "source" ) {
-            stateVal = stateEngineService.getStateId ( workflowCode, "Unracked" )
+			def maxSource = swimlane.maxSource ? swimlane.maxSource : "Unracked" 
+            stateVal = stateEngineService.getStateId ( workflowCode, maxSource )
             query.append (" and a.${sourceTeamColumns.get(role)} = $teamId" )
             countQuery +=" and a.${sourceTeamColumns.get(role)} = $teamId"
         } else {
-        	stateVal = stateEngineService.getStateId ( workflowCode, "Reracked" )
+			def maxTarget = swimlane.maxTarget ? swimlane.maxTarget : "Reracked"
+        	stateVal = stateEngineService.getStateId ( workflowCode, maxTarget )
 			query.append (" and a.${targetTeamColumns.get(role)} = $teamId" )
             countQuery += " and a.${targetTeamColumns.get(role)} = $teamId" 
         }
@@ -413,9 +415,9 @@ class ClientTeamsController {
             if(transitionStates.size()){
             	currentState = stateEngineService.getState( moveBundleInstance.project.workflowCode, transitionStates[0].stateTo )
             }
-            def flags = stateEngineService.getFlags( moveBundleInstance.project.workflowCode, "MOVE_TECH", currentState, actionLabel )
+            def flags = stateEngineService.getFlags( moveBundleInstance.project.workflowCode, loginTeam.role, currentState, actionLabel )
             def loginUser = UserLogin.findByUsername( SecurityUtils.subject.principal )
-            def workflow = workflowService.createTransition( moveBundleInstance.project.workflowCode, "MOVE_TECH", actionLabel, asset, moveBundleInstance, loginUser, loginTeam, params.enterNote )
+            def workflow = workflowService.createTransition( moveBundleInstance.project.workflowCode, loginTeam.role, actionLabel, asset, moveBundleInstance, loginUser, loginTeam, params.enterNote )
             if ( workflow.success ) {
             	if(params.location == 'source' && asset[sourceTeamType.get(loginTeam.role)].id != loginTeam.id ){
         			asset[sourceTeamType.get(loginTeam.role)] = loginTeam
