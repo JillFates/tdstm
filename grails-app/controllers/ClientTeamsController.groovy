@@ -137,12 +137,12 @@ class ClientTeamsController {
         def query = new StringBuffer (countQuery)
         if ( params.location == "source" ) {
 			def maxSource = swimlane.maxSource ? swimlane.maxSource : "Unracked" 
-            stateVal = stateEngineService.getStateId ( workflowCode, maxSource )
+            stateVal = stateEngineService.getStateIdAsInt ( workflowCode, maxSource )
             query.append (" and a.${sourceTeamColumns.get(role)} = $teamId" )
             countQuery +=" and a.${sourceTeamColumns.get(role)} = $teamId"
         } else {
 			def maxTarget = swimlane.maxTarget ? swimlane.maxTarget : "Reracked"
-        	stateVal = stateEngineService.getStateId ( workflowCode, maxTarget )
+        	stateVal = stateEngineService.getStateIdAsInt ( workflowCode, maxTarget )
 			query.append (" and a.${targetTeamColumns.get(role)} = $teamId" )
             countQuery += " and a.${targetTeamColumns.get(role)} = $teamId" 
         }
@@ -154,19 +154,19 @@ class ClientTeamsController {
         if( params.sort != null ){
         	if( params.sort == "source_rack" ) {
         		query.append(" order by min(cast(t.state_to as UNSIGNED INTEGER)) = $holdState desc ,"+
-        					"p.current_state_id in ${ipState.toString().replace(']',')').replace('[','(')} desc, p.current_state_id = $rdyState desc, "+
+        					"(p.current_state_id < ${stateVal} and p.current_state_id > $rdyState ) desc, p.current_state_id > $rdyState desc, "+
         					"p.current_state_id < $rdyState desc , a.$params.sort $params.order, a.source_rack_position $params.order" )
         	}else {
         		query.append(" order by min(cast(t.state_to as UNSIGNED INTEGER)) = $holdState desc ,"+
-        					"p.current_state_id in ${ipState.toString().replace(']',')').replace('[','(')} desc, p.current_state_id = $rdyState desc, "+
+        					"(p.current_state_id < ${stateVal} and p.current_state_id > $rdyState ) desc, p.current_state_id > $rdyState desc, "+
         					"p.current_state_id < $rdyState desc , a.$params.sort $params.order" )
         	}
         }else {
         	query.append(" order by min(cast(t.state_to as UNSIGNED INTEGER)) = $holdState desc ,"+
-        				"p.current_state_id in ${ipState.toString().replace(']',')').replace('[','(')} desc, p.current_state_id = $rdyState desc, "+
+        				"(p.current_state_id < ${stateVal} and p.current_state_id > $rdyState ) desc, p.current_state_id > $rdyState desc, "+
         				"p.current_state_id < $rdyState desc , a.source_rack, a.source_rack_position" )
         }
-        proAssetMap = jdbcTemplate.queryForList ( query.toString() )
+	 	proAssetMap = jdbcTemplate.queryForList ( query.toString() )
         todoSize = proAssetMap.size()
         proAssetMap.each {
             if ( it.currentStateId ) {
@@ -174,7 +174,7 @@ class ClientTeamsController {
                     colorCss = "asset_hold"
                 } else if ( it.currentStateId == rdyState ) {
                     colorCss = "asset_ready"
-                } else if ( ipState.contains( it.currentStateId ) ) {
+                } else if ( it.currentStateId < stateVal  && it.currentStateId > rdyState ) {
                     colorCss = "asset_process"
                 } else if ( ( it.currentStateId > holdState ) && ( it.currentStateId < rdyState ) ) {
                     colorCss = "asset_pending"
