@@ -52,11 +52,10 @@ class AuthController {
 					 *  call userPreferenceService.updateLastLogin( params.username ) to update the last login time
 					 */
 					userPreferenceService.updateLastLogin( params.username )
-					
-		            def browserTest = request.getHeader("User-Agent").contains("IEMobile")
+		            def browserTest = request.getHeader("User-Agent").toLowerCase().contains("mobile")
 					
 		            if(browserTest) {
-		            	redirect(controller:'walkThrough')
+		            	redirect(controller:'clientTeams', params:[viewMode:'mobile'])
 		            } else {
 		            	redirect(controller:'projectUtil')
 		            }
