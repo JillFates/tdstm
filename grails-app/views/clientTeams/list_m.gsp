@@ -54,7 +54,7 @@
             <tbody>
             	<g:each in="${projectTeams}" status="i" var="projectTeamInstance">
 					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="submitLoginForm('${projectTeamInstance?.projectTeam?.moveBundle.id}','${projectTeamInstance?.projectTeam?.id}','source')">
-                        <td><b>${projectTeamInstance?.projectTeam?.name}(src)</b></td>
+                        <td><b>${projectTeamInstance?.projectTeam?.name} src</b></td>
                         <td><g:if test="${projectTeamInstance?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.projectTeam?.role}" /></g:if></td>
 						<td>
 							<g:each in="${projectTeamInstance?.teamMembers}" var="teamMember">
@@ -65,7 +65,7 @@
 				</g:each>
 				<g:each in="${projectTeams}" status="i" var="projectTeamInstance">
 					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="submitLoginForm('${projectTeamInstance?.projectTeam?.moveBundle.id}','${projectTeamInstance?.projectTeam?.id}','target')">
-                        <td><b>${projectTeamInstance?.projectTeam?.name}(trg)</b></td>
+                        <td><b>${projectTeamInstance?.projectTeam?.name} trg</b></td>
                         <td><g:if test="${projectTeamInstance?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.projectTeam?.role}" /></g:if></td>
 						<td>
 							<g:each in="${projectTeamInstance?.teamMembers}" var="teamMember">
