@@ -289,25 +289,36 @@ class RoomController {
 		   }
 	   }
 	   def powerType = session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE
-	   powerA = Math.round(powerType != "Watts" ? powerA / 110 : powerA ) 
-	   powerB = Math.round(powerType != "Watts" ? powerB / 110 : powerB) 
-	   powerC = Math.round(powerType != "Watts" ? powerC / 110 : powerC) 
-	   powerX = Math.round(powerType != "Watts" ? powerX / 110 : powerX) 
+	   powerA = powerType != "Watts" ?  powerA ? (powerA / 110).toFloat().round(1) : 0.0 : powerA ? Math.round(powerA):0 
+	   powerB = powerType != "Watts" ?  powerB ? (powerB / 110).toFloat().round(1) : 0.0 : powerB ? Math.round(powerB):0
+	   powerC = powerType != "Watts" ?  powerC ? (powerC / 110).toFloat().round(1) : 0.0 : powerC ? Math.round(powerC):0
+	   powerX = powerType != "Watts" ?  powerX ? (powerX / 110).toFloat().round(1) : 0.0 : powerX ? Math.round(powerX):0
+	 
+	
+	  
 	   
-	   int rackPowerA = rack.powerA ? Math.round(powerType != "Watts" ? rack.powerA / 110 : rack.powerA) : 0
-	   int rackPowerB = rack.powerB ? Math.round(powerType != "Watts" ? rack.powerB / 110 : rack.powerB) : 0
-	   int rackPowerC = rack.powerB ? Math.round(powerType != "Watts" ? rack.powerC / 110 : rack.powerC) : 0
-	   
-	   def redTBD = false
+	    def rackPowerA = powerType != "Watts" ? rack.powerA ? (rack.powerA / 110).toFloat().round(1) : 0.0 : rack.powerA ? Math.round(rack.powerA) : 0
+	    def rackPowerB = powerType != "Watts" ? rack.powerB ? (rack.powerB / 110).toFloat().round(1) : 0.0 : rack.powerB ? Math.round(rack.powerB) : 0
+	    def rackPowerC = powerType != "Watts" ? rack.powerC ? (rack.powerC / 110).toFloat().round(1) : 0.0 : rack.powerC ? Math.round(rack.powerC) : 0
+ 	    def redTBD = false
 	   if((powerA +powerB+ powerC+ powerX) > (rackPowerA+ rackPowerB + rackPowerC )){
 		   redTBD = true
 	   }
-	   def op="<table border=0><tr><td colspan=4 class='powertable_L'><b>Rack : ${rack.tag}</b></td></tr><tr><td class='powertable_L'>Power (${powerType})</td>"
-		   op+="<td style='background:${ powerA > rackPowerA ? 'red':''};' class='powertable_C'>A</td>"
-		   op+="<td style='background:${ powerB > rackPowerB ? 'red':''};' class='powertable_C'>B</td>"
-		   op+="<td style='background:${ powerC > rackPowerC ? 'red':''};' class='powertable_C'>C</td>"
-		   op+="<td style='background:${redTBD ? 'red':''};' class='powertable_C'>TBD</td>"
-		   op+="</tr><tr><td class='powertable_R'>&nbsp;In Rack:</td><td class='powertable_R'>${rackPowerA}</td><td class='powertable_R'>${rackPowerB}</td><td class='powertable_R'>${rackPowerC}</td><td class='powertable_R'>&nbsp;</td></tr><tr><td class='powertable_R'>&nbsp;Used:</td><td class='powertable_R'>${powerA}</td><td class='powertable_R'>${powerB}</td><td class='powertable_R'>${powerC}</td><td class='powertable_R'>${powerX}</td></tr></table>"
+	   def op="""<table border=0><tr><td colspan=4 class='powertable_L'><b>Rack : ${rack.tag}</b></td></tr>
+		   <tr>
+		   	   <td class='powertable_L'>Power (${powerType})</td>
+			   <td style='background:${ powerA > rackPowerA ? 'red':''};' class='powertable_C'>A</td>
+			   <td style='background:${ powerB > rackPowerB ? 'red':''};' class='powertable_C'>B</td>
+			   <td style='background:${ powerC > rackPowerC ? 'red':''};' class='powertable_C'>C</td>
+			   <td style='background:${redTBD ? 'red':''};' class='powertable_C'>TBD</td>
+		   </tr>
+		   <tr>
+			   <td class='powertable_R'>&nbsp;In Rack:</td><td class='powertable_R'>${rackPowerA}</td>
+			   <td class='powertable_R'>${rackPowerB}</td><td class='powertable_R'>${rackPowerC}</td>
+			   <td class='powertable_R'>&nbsp;</td></tr><tr><td class='powertable_R'>&nbsp;Used:</td>
+			   <td class='powertable_R'>${powerA}</td><td class='powertable_R'>${powerB}</td><td class='powertable_R'>${powerC}</td>
+			   <td class='powertable_R'>${powerX}</td>
+		   </tr></table>"""
 		   
 		render  op
    }

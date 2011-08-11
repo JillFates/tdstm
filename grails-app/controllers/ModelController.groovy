@@ -90,7 +90,7 @@ class ModelController {
 
     def save = {
     	def modelId = params.modelId
-		def powerUsed = params.powerUse ? Integer.parseInt(params.powerUse) : 0
+		def powerUsed = params.powerUse ? Float.parseFloat(params.powerUse) : 0
 		def powerType = params.powerType
 		if( powerType == "Amps"){
 			powerUsed = powerUsed * 110
@@ -221,7 +221,7 @@ class ModelController {
     def update = {
         def modelInstance = Model.get(params.id)
         if (modelInstance) {
-			def powerUsed = params.powerUse ? Integer.parseInt(params.powerUse) : 0
+			def powerUsed = params.powerUse ? Float.parseFloat(params.powerUse) : 0
 			def powerType = params.powerType
 			if( powerType == "Amps"){
 				powerUsed = powerUsed * 110
