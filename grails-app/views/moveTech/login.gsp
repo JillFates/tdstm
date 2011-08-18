@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta http-equiv="refresh" content="0; url=/tdstm/">
+<meta http-equiv="refresh" content="3; url=/tdstm/">
 <title>Login</title>
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
