@@ -22,6 +22,7 @@
         <input type="hidden" name="teamId" id="teamId"/>
         <input type="hidden" name="location" id="locationId"/>
         <input type="hidden" name="projectId" value="${projectId}"/>
+        <input type="hidden" name="username" id="usernameId" value="${projectId}"/>
         <g:if test="${flash.message}">
         <div style="width: 200px;" class="message">${flash.message}</div>
         </g:if>
@@ -53,7 +54,7 @@
 			</thead>
             <tbody>
             	<g:each in="${projectTeams}" status="i" var="projectTeamInstance">
-					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="submitLoginForm('${projectTeamInstance?.projectTeam?.moveBundle.id}','${projectTeamInstance?.projectTeam?.id}','source')">
+					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="submitLoginForm('${projectTeamInstance?.projectTeam?.moveBundle.id}','${projectTeamInstance?.projectTeam?.id}','${projectTeamInstance?.projectTeam?.role}','source')">
                         <td><b>${projectTeamInstance?.projectTeam?.name} src</b></td>
                         <td><g:if test="${projectTeamInstance?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.projectTeam?.role}" /></g:if></td>
 						<td>
@@ -64,7 +65,7 @@
             		</tr>
 				</g:each>
 				<g:each in="${projectTeams}" status="i" var="projectTeamInstance">
-					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="submitLoginForm('${projectTeamInstance?.projectTeam?.moveBundle.id}','${projectTeamInstance?.projectTeam?.id}','target')">
+					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="submitLoginForm('${projectTeamInstance?.projectTeam?.moveBundle.id}','${projectTeamInstance?.projectTeam?.id}','${projectTeamInstance?.projectTeam?.role}','target')">
                         <td><b>${projectTeamInstance?.projectTeam?.name} trg</b></td>
                         <td><g:if test="${projectTeamInstance?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.projectTeam?.role}" /></g:if></td>
 						<td>
@@ -87,11 +88,15 @@
 </div>
 <div class="logo"></div>
 <script type="text/javascript">
-function submitLoginForm( bundleId,teamId,location){
+function submitLoginForm( bundleId,teamId,role,location){
 	var form = document.forms["loginForm"]
 	form.bundleId.value = bundleId
 	form.teamId.value = teamId
 	form.location.value = location
+	if(role == "CLEANER"){
+		form.username.value = "ct-"+ bundleId+"-"+teamId+"-s"
+		form.action = "../moveTech/signIn"
+	}
 	form.submit();
 }
 </script>

@@ -604,8 +604,8 @@ function onInvokeAction(id) {
 										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_done')"><u>${bundleTeam?.unrackedAssets}<span style="font-weight: normal;">dn</span></u></a> = 
 										<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','')"><u>${bundleTeam?.sourceAssets}</u></a>
 										<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
-										<g:if test="${bundleTeam.team?.role != 'CLEANER'}">
-										<a title="Login as.." href="#" onclick="window.open('../clientTeams/home?bundleId=${moveBundleInstance.id}&teamId=${bundleTeam?.team?.id}&location=source','mtwindow','menubar=1,resizable=1,width=320,height=480'); ">@</a>
+										<g:if test="${bundleTeam.team?.role == 'CLEANER'}">
+										<a title="Login as.." href="../moveTech/signIn?username=ct-${moveBundleInstance.id}-${bundleTeam?.team?.id}-s" target="new">@</a>
 										</g:if>
 										<g:else>
 										<a title="Login as.." href="../moveTech/login?username=ct-${moveBundleInstance.id}-${bundleTeam?.team?.id}-s">@</a>
@@ -620,8 +620,8 @@ function onInvokeAction(id) {
 										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_done')"><u> ${bundleTeam?.rerackedAssets}<span style="font-weight: normal;">dn</span></u> </a> = 
 										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','')"><u>${bundleTeam?.targetAssets}</u></a>
 										<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
-										<g:if test="${bundleTeam.team?.role != 'CLEANER'}">
-										<a title="Login as.." href="#" onclick="window.open('../clientTeams/home?bundleId=${moveBundleInstance.id}&teamId=${bundleTeam?.team?.id}&location=target','mtwindow','menubar=1,resizable=1,width=320,height=480'); ">@</a>
+										<g:if test="${bundleTeam.team?.role == 'CLEANER'}">
+										<a title="Login as.." href="../moveTech/signIn?username=ct-${moveBundleInstance.id}-${bundleTeam?.team?.id}-t" target="new">@</a>
 										</g:if>
 										<g:else>
 										<a title="Login as.." href="../moveTech/login?username=ct-${moveBundleInstance.id}-${bundleTeam?.team?.id}-s">@</a>
