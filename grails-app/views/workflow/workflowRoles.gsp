@@ -7,7 +7,7 @@
 </head>
 <body>
 <div class="body">
-<g:form action="updateWorkflowRoles">
+<g:form name="myForm" action="updateWorkflowRoles" >
 <div class="steps_table" style="text-align: left;">
 	<span class="span"><b>Workflow Roles</b></span>
 
@@ -55,16 +55,20 @@
 	</tr>
 </table>
 </div>
-
 <div id="tableContainer" class="list" style="margin-left: 5px;margin-right: 10px;">
 <table cellpadding="0" cellspacing="0" style="border:1px solid #63A242;width: 600px;">
 	<thead>
 		<tr>
 			<th style="padding: 5px 6px">Transitions</th>
 			
-			<g:each in="${swimlanes}" var="swimlane">
-				<th class="name" style="width: 80px;">${swimlane?.actorId}</th>
+			<g:each status="i" in="${swimlanes}"  var="swimlane">
+				<th> <input type="text" style= " border:none ;  width: 100px; background-color:inherit; padding: 5px 6px; font-weight: bold; "  value='${swimlane?.actorId}' readOnly=true id='textBox${i}' class="name"  onclick= "changeTitle(this.id,'button${i}')" ></input>   
+				     <input type="hidden" name="id" id="workFlow${i}" value="${workflow?.id}" />
+				     <input type="hidden" name="name" id="name${i}" value="${swimlane?.name}" />
+				     <input type='button' id='button${i}' value="save" style='display:none' onclick="saveWorkflowId('textBox${i}',this.id,'workFlow${i}','name${i}')"/>
+				     </th>
 			</g:each>
+			
 		</tr>
 	</thead>
 	<tbody id="workflowRolesBody">
@@ -98,13 +102,15 @@
 		</g:if>
 		<g:else>
 			<tr><td colspan="40" class="no_records">No records found</td></tr>
-		</g:else>
+		</g:else>	
 	</tbody>
 </table>
 </div>
 </g:form>
 </div>
 <script type="text/javascript">
+
+var buffer = "";
 function setAction(){
 	if(confirm('Are you sure?')){
 		$("form").attr("action","workflowList")
@@ -113,6 +119,28 @@ function setAction(){
 		return false;
 	}
 }
+function changeTitle(textBox,button){
+  $('#'+textBox).attr('readOnly',false);
+  $('#'+textBox).css('border','solid black 1px');
+  $('#'+textBox).css('background','white');
+  $('#'+button).css('display','inline','border','solid black 1px');
+  $('#'+button).css('background','yellow');
+}
+function saveWorkflowId(textBox,button,workFlow,name){
+  var actorId = $('#'+textBox).val();
+  var workFlowId = $('#'+workFlow).val();
+  var swimlaneName =$('#'+name).val();
+  ${remoteFunction(controller:'workflow', action:'saveActorName', params:'\'actorId=\' + actorId +\'&workflow=\'+workFlowId +\'&swimlaneName=\'+swimlaneName',before:'setBuffer(actorId)', onSuccess: 'setHeader(textBox,button)')};
+}
+function setBuffer(actorId){
+	buffer = actorId;
+}
+function setHeader(headerId, buttonId){
+	 $('#'+headerId).val(buffer);
+	 $('#'+headerId).css("background-color", "inherit");
+	 $('#'+headerId).css("border", "none");
+     $('#'+buttonId).css("display","none");
+ }
 </script>
 </body>
 </html>

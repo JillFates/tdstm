@@ -398,4 +398,24 @@ class WorkflowController {
 			}
 			return count
 	}
+	/**
+	 *  Update Swimlane actor Id thru ajax request
+	 *  @author : Dinesh
+	 *  @param : workflow, swimlaneName, actorId
+	 *  @return : updated actorId
+	 */
+	def saveActorName={
+		def actorId = params.actorId
+		def workFlowId = params.workflow
+		def swimLaneName = params.swimlaneName
+		def workFlow = Workflow.read( workFlowId )
+		def swimlane = Swimlane.findWhere( name : swimLaneName , workflow : workFlow )
+		swimlane?.actorId = actorId
+		if(!swimlane.save(flush:true)){
+			println"Error while updating swimlane : "
+			swimlane.errors.each { println it }
+		}
+		render actorId
+	}
+	
 }
