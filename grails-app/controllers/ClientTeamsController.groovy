@@ -168,24 +168,34 @@ class ClientTeamsController {
         }
 	 	proAssetMap = jdbcTemplate.queryForList ( query.toString() )
         todoSize = proAssetMap.size()
+		def sortOrder = 5
         proAssetMap.each {
             if ( it.currentStateId ) {
                 if ( it.minstate == holdState ) {
                     colorCss = "asset_hold"
+					sortOrder = 1
                 } else if ( it.currentStateId == rdyState ) {
                     colorCss = "asset_ready"
+					sortOrder = 3
                 } else if ( it.currentStateId < stateVal  && it.currentStateId > rdyState ) {
                     colorCss = "asset_process"
+					sortOrder = 2
                 } else if ( ( it.currentStateId > holdState ) && ( it.currentStateId < rdyState ) ) {
                     colorCss = "asset_pending"
+					sortOrder = 4
                 } else if ( ( it.currentStateId >= rdyState ) ) {
                     colorCss = "asset_done"
+					sortOrder = 5
                 }
             } else {
             	colorCss = "asset_pending"
+				sortOrder = 4
             }
-            assetList << [ item:it, cssVal:colorCss ]
+            assetList << [ item:it, cssVal:colorCss, sortOrder:sortOrder ]
         }
+		assetList.sort {
+			it.sortOrder
+		}
         if ( tab == "All" ) {
         	countQuery += " and (p.current_state_id < $stateVal or t.state_to = $holdState) group by a.asset_entity_id" 
             todoSize = jdbcTemplate.queryForList ( countQuery ).size()

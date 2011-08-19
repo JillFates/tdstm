@@ -608,7 +608,7 @@ function onInvokeAction(id) {
 										<a title="Login as.." href="../moveTech/signIn?username=ct-${moveBundleInstance.id}-${bundleTeam?.team?.id}-s">@</a>
 										</g:if>
 										<g:else>
-										<a title="Login as.." href="#" onclick="window.open('../clientTeams/home?bundleId=${moveBundleInstance.id}&teamId=${bundleTeam?.team?.id}&location=source','mtwindow','menubar=1,resizable=1,width=320,height=480'); ">@</a>
+										<a title="Login as.." href="#" onclick="window.open('../clientTeams/home?bundleId=${moveBundleInstance.id}&teamId=${bundleTeam?.team?.id}&location=source','mtwindow','menubar=1,resizable=1,scrollbars=1,width=320,height=480'); ">@</a>
 										</g:else>
 										</jsec:lacksAllRoles>
 									</td>
@@ -624,7 +624,7 @@ function onInvokeAction(id) {
 										<a title="Login as.." href="../moveTech/signIn?username=ct-${moveBundleInstance.id}-${bundleTeam?.team?.id}-t">@</a>
 										</g:if>
 										<g:else>
-										<a title="Login as.." href="#" onclick="window.open('../clientTeams/home?bundleId=${moveBundleInstance.id}&teamId=${bundleTeam?.team?.id}&location=target','mtwindow','menubar=1,resizable=1,width=320,height=480'); ">@</a>
+										<a title="Login as.." href="#" onclick="window.open('../clientTeams/home?bundleId=${moveBundleInstance.id}&teamId=${bundleTeam?.team?.id}&location=target','mtwindow','menubar=1,resizable=1,scrollbars=1,width=320,height=480'); ">@</a>
 										</g:else>
 										</jsec:lacksAllRoles>
 									</td>
