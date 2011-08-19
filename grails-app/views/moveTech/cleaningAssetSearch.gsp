@@ -1,10 +1,18 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta name="layout" content="projectHeader" />
 <title>Asset</title>
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}"/>
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}"/>
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}"/>
+	<link type="image/x-icon" rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
 	
+	<g:javascript library="prototype" />
+	<jq:plugin name="jquery.combined" />
+
 	<script language="JavaScript" type="text/javascript">
 	/*--------------------------------------------------------
 	* function to call printjob when user press on 1,2,3 or 4
@@ -455,7 +463,7 @@ function mySelect(x)
       }
     </script>
 </head>
-<body>
+<body onload="InitData()">
 <div id="serverInfoDialog" title="Server Info" onclick="$('#serverInfoDialog').dialog('close')">
 </div>
 <OBJECT id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C" CODEBASE="${createLinkTo(dir:'resource',file:'TFORMer60.cab')}"></OBJECT>
@@ -663,7 +671,6 @@ function mySelect(x)
 		      	return true;
 		      }
 	     }
-		InitData()
 		</script>
 </body>
 </html>
