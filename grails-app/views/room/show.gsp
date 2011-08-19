@@ -51,7 +51,7 @@
 					</label><br />
 				</div>
 				</td>
-				<td style="padding-left: 400px;" id="rackPowerTd">
+				<td style="padding-left: 200px;" id="rackPowerTd">
 					
 				</td>
 			</tr>
