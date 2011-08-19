@@ -949,24 +949,30 @@ class MoveTechController {
                 rdyState = stateEngineService.getStateIdAsInt( moveBundleInstance?.project.workflowCode, "Cleaned" )
                 ipState = stateEngineService.getStateIdAsInt( moveBundleInstance?.project.workflowCode, "Staged" )
             }
+			def sortOrder = 4
             proAssetMap.each {
                 if ( it.currentStateId ) {
 	                if ( it.minstate == holdState ) {
 	                    colorCss = "asset_hold"
+						sortOrder = 1
 	                } else if ( it.currentStateId == ipState ) {
 	                    colorCss = "asset_ready"
+						sortOrder = 2
 	                } else if ( ( it.currentStateId > holdState ) && ( it.currentStateId < ipState ) ) {
 	                    colorCss = "asset_pending"
+						sortOrder = 3
 	                } else if ( ( it.currentStateId >= rdyState ) ) {
 	                    colorCss = "asset_done"
+						sortOrder = 4
 	                }
                 } else {
                 	colorCss = "asset_pending"
+					sortOrder = 3
                 }
-                assetList << [ item:it, cssVal:colorCss ]
+                assetList << [ item:it, cssVal:colorCss, sortOrder:sortOrder ]
             }
             assetList.sort {
-                it.cssVal
+               it.sortOrder
             }
             if ( tab == "All" ) {
                 query.append (" and (p.current_state_id < $stateVal or t.state_to = $holdState ) group by a.asset_entity_id")

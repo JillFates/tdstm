@@ -1,18 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<meta name="layout" content="projectHeader" />
 <title>My Tasks</title>
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}"/>
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}"/>
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
-	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 	
-	<g:javascript library="prototype" />
-	<jq:plugin name="jquery.combined" />
-	
-
  	<script type="text/javascript">
 	$(document).ready(function() {
 	$("#serverInfoDialog").dialog({ autoOpen: false })	       
