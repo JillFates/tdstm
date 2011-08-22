@@ -14,7 +14,9 @@ br.page-break-after {
 .racktop_label {
 	postition: relative;
 	top: 30%;
-	background-color: transparent;
+	background-color: white;
+	text-align: center ;
+	margin-top: 21%;
 }
 .racktop_h {
 	width:60px;

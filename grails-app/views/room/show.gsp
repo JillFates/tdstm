@@ -51,7 +51,7 @@
 					</label><br />
 				</div>
 				</td>
-				<td style="padding-left: 200px;" id="rackPowerTd">
+				<td style="padding-left: 200px; align:right;" id="rackPowerTd">
 					
 				</td>
 			</tr>
@@ -82,7 +82,7 @@
 				</g:if>
 				<g:else>
 					<div style="position:absolute;top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="room_${rack.rackType}_${rack.front}">
-						<div class="racktop_label">${rack.tag}</div>
+						<div class="racktop_label" >${rack.tag}</div>
 					</div>
 				</g:else>
 		</g:each>
