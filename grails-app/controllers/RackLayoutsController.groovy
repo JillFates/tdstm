@@ -510,8 +510,8 @@ class RackLayoutsController {
 									<div class="rack_menu"><img src="../i/rack_add2.png"/>
 										<ul>
 											<li><a href="javascript:createBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}')">Create asset  </a></li>
-											<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}')">Assign asset </a></li>
-											<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}')">Reassign asset </a></li>
+											<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}','assign')">Assign asset </a></li>
+											<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}','reassign')">Reassign asset </a></li>
 										</ul>
 									</div></td>"""
 					} else {

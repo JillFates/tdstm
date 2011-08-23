@@ -98,10 +98,10 @@ function updateAssetBladeInfo(source,blade,position){
 	$("#"+target+"BladeChassisId").val(blade)
 	$("#"+target+"BladePositionId").val(position)
 }
-function listBladeDialog(source,blade,position){
+function listBladeDialog(source,blade,position, assign){
 	jQuery.ajax({
 		url: "../room/getBladeAssetsListToAddRack",
-		data: "source="+source+"&blade="+blade+"&position="+position,
+		data: "source="+source+"&blade="+blade+"&position="+position+"&assign="+assign,
 		type:'POST',
 		success: function(data) {
 			if(data != null && data != ""){
@@ -114,15 +114,16 @@ function listBladeDialog(source,blade,position){
 		}
 	});
 }
-function editBladeDialog(assetId,source,blade,position){
+function editBladeDialog(assetId,source,blade,position, bundleId ){
 	openAssetEditDialig(assetId)
-	setTimeout("updateBladeEditForm('"+source+"','"+blade+"','"+position+"')",1000);
+	setTimeout("updateBladeEditForm('"+source+"','"+blade+"','"+position+"',"+bundleId+")",1000);
 }
-function updateBladeEditForm(source,blade,position){
+function updateBladeEditForm(source,blade,position, bundleId){
 	var target = source != '1' ? 'target' : 'source'
 	$("#editassetTypeId").val("Blade")	
 	$("#edit"+target+"BladeChassisId").val(blade)
 	$("#edit"+target+"BladePositionId").val(position)
+	$("#editmoveBundleId").val(bundleId)
 }
 /********************************************************************************************************
  * Cabling script
