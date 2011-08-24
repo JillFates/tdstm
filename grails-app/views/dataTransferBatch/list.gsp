@@ -121,6 +121,11 @@
 		            <span class="button"><input type="button" value="New" class="create" onClick="#"/></span>
 	        	</g:form>
         	</div> -->
+        	<script type="text/javascript">
+        	$.post("${createLink(action:'updateAssetRacks')}", {
+        		ajax: 'true'
+        	});
+        	</script>
         </div>
     </body>
 </html>

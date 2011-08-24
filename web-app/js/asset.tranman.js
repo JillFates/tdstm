@@ -914,7 +914,8 @@ function showManufacturer(id){
 			$("#showManuName").html( manufacturer.name )
 			$("#showManuAka").html( manufacturer.aka )
 			$("#showManuDescription").html( manufacturer.description )
-			$("#manufacturerId").val( manufacturer.id )
+			alert('asdf')
+			$("#show_manufacturerId").val( manufacturer.id )
 			$("#manufacturerShowDialog").dialog("open")
 		}
 	})
@@ -925,7 +926,7 @@ function showModel(id){
 		evalScripts:true,
 		onComplete:function(e){
 			var model = eval('(' + e.responseText + ')')
-			$("#modelId").val( model.id )
+			$("#show_modelId").val( model.id )
 			$("#showManufacturer").html( model.manufacturer )
 			$("#showModelName").html( model.modelName )
 			$("#showModelAka").html( model.aka )
