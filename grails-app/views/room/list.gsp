@@ -278,7 +278,7 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 	<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
 	<div class="buttons">
 	    <g:form controller="manufacturer" action="edit" target="new">
-	        <input type="hidden" name="id" id="manufacturerId" />
+	        <input type="hidden" name="id" id="show_manufacturerId" />
 	        <span class="button"><input type="submit" class="edit" value="Edit" onclick="$('#manufacturerShowDialog').dialog('close')"/></span>
 	    </g:form>
 	</div>
@@ -354,7 +354,7 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
 <div class="buttons"> 
 	<g:form action="edit" controller="model" target="new">
-		<input name="id" type="hidden" id="modelId"/>
+		<input name="id" type="hidden" id="show_modelId"/>
 		<span class="button">
 			<input type="submit" class="edit" value="Edit"></input>
 		</span>

@@ -717,12 +717,16 @@ class AssetEntityController {
 		def modelId = params.model
 		if( modelId )
 			params["model"] = Model.get(modelId)
-				
+		def bundleId = getSession().getAttribute( "CURR_BUNDLE" )?.CURR_BUNDLE
         def assetEntityInstance = new AssetEntity(params)
         def projectId = params.projectId
         def projectInstance = Project.findById( projectId )
         assetEntityInstance.project = projectInstance
         assetEntityInstance.owner = projectInstance.client
+		
+		if(bundleId)
+			assetEntityInstance.moveBundle = MoveBundle.read(Long.parseLong( bundleId ))
+			
         if(!assetEntityInstance.hasErrors() && assetEntityInstance.save()) {
         	assetEntityInstance.updateRacks()
 			 

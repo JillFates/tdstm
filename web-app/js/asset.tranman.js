@@ -56,6 +56,8 @@ Array.prototype.contains = function (element) {
     	$('#createFormTbodyId').css('display','block');
 	      
 	    new Ajax.Request('../assetEntity/getAutoCompleteDate?autoCompParams='+autoComp,{asynchronous:true,evalScripts:true,onComplete:function(e){createAutoComplete(e);}})
+	    $("#assetTypeId").val("Server")
+		updateManufacturerOptions("Server", null, 1)
  }
  function filedRequiredMess( table ){
 	 
@@ -914,7 +916,6 @@ function showManufacturer(id){
 			$("#showManuName").html( manufacturer.name )
 			$("#showManuAka").html( manufacturer.aka )
 			$("#showManuDescription").html( manufacturer.description )
-			alert('asdf')
 			$("#show_manufacturerId").val( manufacturer.id )
 			$("#manufacturerShowDialog").dialog("open")
 		}

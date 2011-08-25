@@ -12,8 +12,21 @@ def attributeSet = EavAttributeSet.findByAttributeSetName('Server')
  */
 AssetEntity.executeUpdate("UPDATE from AssetEntity set assetType = 'Server' where assetType is null")
 def eavAttribute = EavAttribute.findByAttributeCode("assetType")
+def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
+EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[assetTypeAttribute])
 def assetTypes = AssetEntity.findAll("From AssetEntity group by assetType")
+
 assetTypes?.assetType?.each{ option->
+   try{
+      def integerAssetType =  Integer.parseInt(option)
+	  option = 'Server'
+	  AssetEntity.executeUpdate("Update AssetEntity set assetType = 'Server' where assetType = '${integerAssetType}'")
+	  println "Error : AssetType has wrong value::::::::::"+integerAssetType
+    }  catch(Exception ex){
+		if(!option){
+			option = 'Server'
+		}
+    }
 	def eavAttributeOption = EavAttributeOption.findByValueAndAttribute(option,eavAttribute)
 	if( !eavAttributeOption ){
 		eavAttributeOption = new EavAttributeOption(
