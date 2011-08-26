@@ -81,8 +81,8 @@ class RoomController {
 
     def update = {
         def roomInstance = Room.get(params.id)
+		def powerType = session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE
 		List rackIds = request.getParameterValues("rackId")
-
         if (roomInstance) {
     		roomInstance.roomName = params.roomName
 			roomInstance.location = params.location
@@ -96,9 +96,14 @@ class RoomController {
 						rack.tag = params["tag_"+rack.id]
 	                	rack.roomX = params["roomX_"+rack.id] ? Integer.parseInt(params["roomX_"+rack.id]) : 0
 	                	rack.roomY = params["roomY_"+rack.id] ? Integer.parseInt(params["roomY_"+rack.id]) : 0
-	                	rack.powerA = params["powerA_"+rack.id] ? Integer.parseInt(params["powerA_"+rack.id]) : 0
-	                	rack.powerB = params["powerB_"+rack.id] ? Integer.parseInt(params["powerB_"+rack.id]) : 0
-	                	rack.powerC = params["powerC_"+rack.id] ? Integer.parseInt(params["powerC_"+rack.id]) : 0
+	                	rack.powerA = params["powerA_"+rack.id] ? Float.parseFloat(params["powerA_"+rack.id]) : 0
+						rack.powerB = params["powerB_"+rack.id] ? Float.parseFloat(params["powerB_"+rack.id]) : 0
+						rack.powerC = params["powerC_"+rack.id] ? Float.parseFloat(params["powerC_"+rack.id]) : 0
+						if(powerType != "Watts"){
+							rack.powerA = rack.powerA * 110
+							rack.powerB = rack.powerB * 110
+							rack.powerC = rack.powerC * 110
+						}
 						rack.rackType = params["rackType_"+rack.id]
 						rack.front = params["front_"+rack.id]
 	                	rack.save(flush:true)

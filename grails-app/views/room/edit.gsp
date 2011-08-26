@@ -74,9 +74,9 @@
 			<th>X</th>
 			<th>Y</th>
 			<th>Front</th>
-			<th>A</th>
-			<th>B</th>
-			<th>C</th>
+			<th>A(${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE})</th>
+			<th>B(${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE})</th>
+			<th>C(${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE})</th>
 			<th>Type</th>
 			<th>Assets</th>
 		</tr>
@@ -89,9 +89,9 @@
 				<td><input type="text" id="roomXId_${rack.id}" name="roomX_${rack.id}" value="${rack.roomX}" size="3" readonly="readonly" /></td>
 				<td><input type="text" id="roomYId_${rack.id}" name="roomY_${rack.id}" value="${rack.roomY}" size="3" readonly="readonly" /></td>
 				<td><g:select id="frontId_${rack.id}" name="front_${rack.id}" from="${Rack.constraints.front.inList}" value="${rack.front}" onchange="updateRackStyle(${rack.id}, this.value, jQuery('#rackTypeId_'+${rack.id}).val())"></g:select></td>
-				<td><input type="text" name="powerA_${rack.id}" value="${rack.powerA}"  size="3" /></td>
-				<td><input type="text" name="powerB_${rack.id}" value="${rack.powerB}" size="3" /></td>
-				<td><input type="text" name="powerC_${rack.id}" value="${rack.powerC}" size="3" /></td>
+				<td><input type="text" name="powerA_${rack.id}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerA ? (rack.powerA / 110).toFloat().round(1) : 0.0 : rack.powerA ? Math.round(rack.powerA):0}" size="3" /></td>
+				<td><input type="text" name="powerB_${rack.id}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerB ? (rack.powerB / 110).toFloat().round(1) : 0.0 : rack.powerB ? Math.round(rack.powerB):0}" size="3" /></td>
+				<td><input type="text" name="powerC_${rack.id}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerC ? (rack.powerC / 110).toFloat().round(1) : 0.0 : rack.powerC ? Math.round(rack.powerC):0}" size="3" /></td>
 				<td><g:select id="rackTypeId_${rack.id}" name="rackType_${rack.id}" from="${Rack.constraints.rackType.inList}" value="${rack.rackType}" onchange="updateRackStyle(${rack.id}, jQuery('#frontId_'+${rack.id}).val(), this.value)"></g:select></td>
 				<td>${rack.assets.size()}&nbsp;&nbsp;&nbsp;
 				<g:if test="${rack.assets.size() == 0}">
@@ -109,9 +109,9 @@
 				<td><input type="text" id="roomXId_${rack}" name="roomX_${rack}" value="" size="3" readonly="readonly" /></td>
 				<td><input type="text" id="roomYId_${rack}" name="roomY_${rack}" value="" size="3" readonly="readonly" /></td>
 				<td><g:select id="frontId_${rack}" name="front_${rack}" from="${Rack.constraints.front.inList}" onchange="updateRackStyle(${rack}, this.value, jQuery('#rackTypeId_'+${rack}).val())"></g:select></td>
-				<td><input type="text" name="powerA_${rack}" value="${new Rack().powerA}"  size="3" /></td>
-				<td><input type="text" name="powerB_${rack}" value="${new Rack().powerB}" size="3" /></td>
-				<td><input type="text" name="powerC_${rack}" value="${new Rack().powerC}" size="3" /></td>
+				<td><input type="text" name="powerA_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerA/ 110 ).toFloat().round(1) : new Rack().powerA}"  size="3" /></td>
+				<td><input type="text" name="powerB_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerB/ 110 ).toFloat().round(1) : new Rack().powerB}" size="3" /></td>
+				<td><input type="text" name="powerC_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerC/ 110 ).toFloat().round(1) : new Rack().powerC}" size="3" /></td>
 				<td><g:select id="rackTypeId_${rack}" name="rackType_${rack}" from="${Rack.constraints.rackType.inList}" value="Rack" onchange="updateRackStyle(${rack}, jQuery('#frontId_'+${rack}).val(), this.value)"></g:select></td>
 				<td>0&nbsp;&nbsp;&nbsp;<a href="javascript:verifyAndDeleteRacks(${rack})"><span class="clear_filter"><u>X</u></span></a></td>
 			</tr>
