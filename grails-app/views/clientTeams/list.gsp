@@ -29,31 +29,42 @@
               	</tr>
 			</thead>
             <tbody>
-            	<g:each in="${projectTeams}" status="i" var="projectTeamInstance">
-					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}"onclick="submitLoginForm('${projectTeamInstance?.projectTeam?.moveBundle.id}','${projectTeamInstance?.projectTeam?.id}','${projectTeamInstance?.projectTeam?.role}','source')">
-                        <td><b>${projectTeamInstance?.projectTeam?.name} (src)</b></td>
+            	<g:each in="${sourceTeams}" status="i" var="projectTeamInstance">
+            	<tr class="${(i % 2) == 0 ? 'odd' : 'even'}"onclick="submitLoginForm('${projectTeamInstance?.projectTeam?.moveBundle.id}','${projectTeamInstance?.projectTeam?.id}','${projectTeamInstance?.projectTeam?.role}','source')">
+
+                      <td><b>${projectTeamInstance?.projectTeam?.name} (src)</b></td>
                         <td><g:if test="${projectTeamInstance?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.projectTeam?.role}" /></g:if></td>
 						<td>
 							<g:each in="${projectTeamInstance?.teamMembers}" var="teamMember">
-			 					<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName},</g:if> ${teamMember?.staff?.firstName} <g:if test="${teamMember?.staff?.title}">- ${teamMember?.staff?.title}</g:if> <br/>
+			 					 <g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName}</g:if> 
+			 					  <br/>
 							</g:each>
 						</td>
-            		</tr>
+            	
+            	
+            			</tr>
+            		
 				</g:each>
-				<g:each in="${projectTeams}" status="i" var="projectTeamInstance">
-					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="submitLoginForm('${projectTeamInstance?.projectTeam?.moveBundle.id}','${projectTeamInstance?.projectTeam?.id}','${projectTeamInstance?.projectTeam?.role}','target')">
+				
+				
+				<g:each in="${targetTeams}" status="i" var="projectTeamInstance">
+				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="submitLoginForm('${projectTeamInstance?.projectTeam?.moveBundle.id}','${projectTeamInstance?.projectTeam?.id}','${projectTeamInstance?.projectTeam?.role}','target')">
+					
                         <td><b>${projectTeamInstance?.projectTeam?.name} (trg)</b></td>
                         <td><g:if test="${projectTeamInstance?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.projectTeam?.role}" /></g:if></td>
 						<td>
 							<g:each in="${projectTeamInstance?.teamMembers}" var="teamMember">
-			 					<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName},</g:if> ${teamMember?.staff?.firstName} <g:if test="${teamMember?.staff?.title}">- ${teamMember?.staff?.title}</g:if> <br/>
+			 					<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName}</g:if> 
 							</g:each>
 						</td>
+            		
+            
             		</tr>
 				</g:each>
-				<g:if test="${projectTeams.size() == 0}">
+			
+				<g:if test="${sourceTeams?.size() == 0 && targetTeams?.size() == 0}">
 				<tr><td colspan="3" class="no_records">No records found</td></tr>
-				</g:if>
+			    </g:if>
 			</tbody>
         	</table>
             </div>

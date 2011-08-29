@@ -53,7 +53,7 @@
               	</tr>
 			</thead>
             <tbody>
-            	<g:each in="${projectTeams}" status="i" var="projectTeamInstance">
+            	<g:each in="${sourceTeams}" status="i" var="projectTeamInstance">
 					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="submitLoginForm('${projectTeamInstance?.projectTeam?.moveBundle.id}','${projectTeamInstance?.projectTeam?.id}','${projectTeamInstance?.projectTeam?.role}','source')">
                         <td><b>${projectTeamInstance?.projectTeam?.name} (S)</b></td>
                         <td><g:if test="${projectTeamInstance?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.projectTeam?.role}" /></g:if></td>
@@ -64,7 +64,7 @@
 						</td>
             		</tr>
 				</g:each>
-				<g:each in="${projectTeams}" status="i" var="projectTeamInstance">
+				<g:each in="${targetTeams}" status="i" var="projectTeamInstance">
 					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="submitLoginForm('${projectTeamInstance?.projectTeam?.moveBundle.id}','${projectTeamInstance?.projectTeam?.id}','${projectTeamInstance?.projectTeam?.role}','target')">
                         <td><b>${projectTeamInstance?.projectTeam?.name} (T)</b></td>
                         <td><g:if test="${projectTeamInstance?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.projectTeam?.role}" /></g:if></td>
@@ -75,7 +75,7 @@
 						</td>
             		</tr>
 				</g:each>
-				<g:if test="${projectTeams.size() == 0}">
+				<g:if test="${sourceTeams?.size() == 0 && targetTeams?.size()== 0}">
 				<tr><td colspan="3" class="no_records">There are no active teams for you.</td></tr>
 				</g:if>
 			</tbody>

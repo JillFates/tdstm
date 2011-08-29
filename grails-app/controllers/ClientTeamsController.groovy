@@ -25,7 +25,8 @@ class ClientTeamsController {
 	 * @return : List of teams that are belongs to current project, and if project user preference not exist list all teams
 	 */
 	def list = {
-		def projectTeams = []
+		def sourceTeams = []
+		def targetTeams = []
 		userPreferenceService.loadPreferences("CURR_PROJ")
 		def projectId = params.projectId
 		if(!projectId){
@@ -36,7 +37,7 @@ class ClientTeamsController {
 			viewMode = session.getAttribute("TEAM_VIEW_MODE") ? session.getAttribute("TEAM_VIEW_MODE") : 'web'
 		}
 		session.setAttribute("TEAM_VIEW_MODE", viewMode)
-		
+	
 		def subject = SecurityUtils.subject
 		def hasRole = subject.hasRole("ADMIN") || subject.hasRole("PROJECT_ADMIN") || subject.hasRole("SUPERVISOR")
 		def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
@@ -46,15 +47,24 @@ class ClientTeamsController {
 		moveBundles.each{ moveBundle ->
 			partyRelationshipService.getBundleTeamInstanceList( moveBundle ).each {
 				if( hasRole || it.teamMembers.id.contains(loginUser.id) ){
-					projectTeams << it
+					def teamId = it.projectTeam.id
+					def hasSourceAssets = AssetEntity.find("from AssetEntity WHERE sourceTeamMt = $teamId OR sourceTeamSa = $teamId OR sourceTeamDba = $teamId")
+					if(hasSourceAssets || it.projectTeam.role =="CLEANER"){
+						sourceTeams << it
+					}
+					def hasTargetAssets = AssetEntity.find("from AssetEntity WHERE targetTeamMt = $teamId OR targetTeamSa = $teamId OR targetTeamDba = $teamId")
+					if(hasTargetAssets && !it.projectTeam.role =="CLEANER"){
+						targetTeams << it
+					}
 				}
 			}
 		}
-		if(viewMode != 'web'){
-			render( view:'list_m', model:[ projectTeams:projectTeams, projectId:projectId ] )
+		if( viewMode != 'web'){
+			render( view:'list_m', model:[ sourceTeams:sourceTeams , targetTeams:targetTeams, projectId:projectId ] )
 		} else {
-			return [ projectTeams:projectTeams, projectId:projectId ]
+			return [ sourceTeams:sourceTeams , targetTeams:targetTeams , projectId:projectId ]
 		}
+		
 	}
 	/**
 	 * @author : lokanada
