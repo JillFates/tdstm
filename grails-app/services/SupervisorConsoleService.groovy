@@ -1,3 +1,5 @@
+import org.jsecurity.SecurityUtils;
+
 /*---------------------------------------
  * @author : Lokanath Reddy
  *--------------------------------------*/
@@ -28,14 +30,32 @@ class SupervisorConsoleService {
 		def projectId = params.projectId 
 		projectId = projectId ? projectId : userPreferenceService.getSession().getAttribute( "CURR_PROJ" )?.CURR_PROJ
         def projectInstance = Project.findById( projectId )
+		
+		def role 
+		if(filterTeam){
+			role = ProjectTeam.read(filterTeam)?.role
+		}
+		if(!role){
+			def subject = SecurityUtils.subject
+			if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
+				role = "SUPERVISOR"
+			} else if(subject.hasRole("MANAGER")){
+				role = "MANAGER"
+			}
+		}
+		def swimlane = Swimlane.findByNameAndWorkflow( role, Workflow.findByProcess(projectInstance.workflowCode) )
         def cleanedId = stateEngineService.getStateId( projectInstance.workflowCode, "Cleaned" )
         def onCartId = stateEngineService.getStateId( projectInstance.workflowCode, "OnCart" )
         def onTruckId = stateEngineService.getStateId( projectInstance.workflowCode, "OnTruck" )
 	    def offTruckId = stateEngineService.getStateId( projectInstance.workflowCode, "OffTruck" )
-        def rerackedId = stateEngineService.getStateId( projectInstance.workflowCode, "Reracked" )
+        
+		def maxTarget = swimlane.maxTarget ? swimlane.maxTarget : "Reracked"
+		def rerackedId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, maxTarget ) )
+			
         def stagedId = stateEngineService.getStateId( projectInstance.workflowCode, "Staged" )
-        def unrackedId = stateEngineService.getStateId( projectInstance.workflowCode, "Unracked" )
-        def releasedId = stateEngineService.getStateId( projectInstance.workflowCode, "Release" )
+        def maxSource = swimlane.maxSource ? swimlane.maxSource : "Unracked"
+		def unrackedId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, maxSource ) )
+		def releasedId = stateEngineService.getStateId( projectInstance.workflowCode, "Release" )
         def holdId = stateEngineService.getStateId( projectInstance.workflowCode, "Hold" )
         def queryForConsole = new StringBuffer("select max(at.date_created) as dateCreated, ae.asset_entity_id as id, ae.priority, "+
 						"ae.asset_tag as assetTag, ae.asset_name as assetName, ae.source_team_id as sourceTeamMt, ae.target_team_id as " + 
