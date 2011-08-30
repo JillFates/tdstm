@@ -30,12 +30,12 @@
 			</thead>
             <tbody>
             	<g:each in="${sourceTeams}" status="i" var="projectTeamInstance">
-            	<tr class="${(i % 2) == 0 ? 'odd' : 'even'}"onclick="submitLoginForm('${projectTeamInstance?.projectTeam?.moveBundle.id}','${projectTeamInstance?.projectTeam?.id}','${projectTeamInstance?.projectTeam?.role}','source')">
+            	<tr class="teamstatus_${projectTeamInstance?.cssClass}"onclick="submitLoginForm('${projectTeamInstance?.team?.projectTeam?.moveBundle.id}','${projectTeamInstance?.team?.projectTeam?.id}','${projectTeamInstance?.team?.projectTeam?.role}','source')">
 
-                      <td><b>${projectTeamInstance?.projectTeam?.name} (src)</b></td>
-                        <td><g:if test="${projectTeamInstance?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.projectTeam?.role}" /></g:if></td>
+                      <td><b>${projectTeamInstance?.team?.projectTeam?.name} (src)</b></td>
+                        <td><g:if test="${projectTeamInstance?.team?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.team?.projectTeam?.role}" /></g:if></td>
 						<td>
-							<g:each in="${projectTeamInstance?.teamMembers}" var="teamMember">
+							<g:each in="${projectTeamInstance?.team?.teamMembers}" var="teamMember">
 			 					 <g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName}</g:if> 
 			 					  <br/>
 							</g:each>
@@ -45,15 +45,13 @@
             			</tr>
             		
 				</g:each>
-				
-				
 				<g:each in="${targetTeams}" status="i" var="projectTeamInstance">
-				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="submitLoginForm('${projectTeamInstance?.projectTeam?.moveBundle.id}','${projectTeamInstance?.projectTeam?.id}','${projectTeamInstance?.projectTeam?.role}','target')">
+				<tr class="teamstatus_${projectTeamInstance?.cssClass}" onclick="submitLoginForm('${projectTeamInstance?.team?.projectTeam?.moveBundle.id}','${projectTeamInstance?.team?.projectTeam?.id}','${projectTeamInstance?.team?.projectTeam?.role}','target')">
 					
-                        <td><b>${projectTeamInstance?.projectTeam?.name} (trg)</b></td>
-                        <td><g:if test="${projectTeamInstance?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.projectTeam?.role}" /></g:if></td>
+                        <td><b>${projectTeamInstance?.team?.projectTeam?.name} (trg)</b></td>
+                        <td><g:if test="${projectTeamInstance?.team?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.team?.projectTeam?.role}" /></g:if></td>
 						<td>
-							<g:each in="${projectTeamInstance?.teamMembers}" var="teamMember">
+							<g:each in="${projectTeamInstance?.team?.teamMembers}" var="teamMember">
 			 					<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName}</g:if> 
 							</g:each>
 						</td>

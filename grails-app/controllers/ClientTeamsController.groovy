@@ -45,24 +45,96 @@ class ClientTeamsController {
 		def timeNow = now.getTime()
 		def moveBundles = MoveBundle.getActiveBundlesByProject( Integer.parseInt(projectId), now )
 		moveBundles.each{ moveBundle ->
+			def bundleAssetsList = AssetEntity.findAllWhere( moveBundle : moveBundle )
 			partyRelationshipService.getBundleTeamInstanceList( moveBundle ).each {
 				if( hasRole || it.teamMembers.id.contains(loginUser.id) ){
 					def teamId = it.projectTeam.id
+					def headColor = 'done'
+					def role = it.projectTeam?.role
+					def swimlane = Swimlane.findByNameAndWorkflow(role ? role : "MOVE_TECH", Workflow.findByProcess(moveBundle.project.workflowCode) )
+					
 					def hasSourceAssets = AssetEntity.find("from AssetEntity WHERE sourceTeamMt = $teamId OR sourceTeamSa = $teamId OR sourceTeamDba = $teamId")
-					if(hasSourceAssets || it.projectTeam.role =="CLEANER"){
-						sourceTeams << it
+					if(hasSourceAssets || role =="CLEANER"){
+						def sourceAssetsList = bundleAssetsList.findAll{it[sourceTeamType.get(role)]?.id == teamId }
+						def sourceAssets = sourceAssetsList.size()
+						
+						def unrackingId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, "Unracking" ) )
+						def releasedId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, "Release" ) )
+						def maxSource = swimlane.maxSource ? swimlane.maxSource : "Unracked"
+						def maxSourceId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, maxSource ) )
+						
+						if(role =="CLEANER"){
+							unrackingId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, "Unracked" ) )
+							releasedId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, "Unracked" ) )
+							maxSourceId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, "Cleaned" ) )
+						}
+						def unrackingAssets = sourceAssetsList.findAll{it.currentStatus == unrackingId }.size()
+						def sourceAvailassets = sourceAssetsList.findAll{it.currentStatus >= releasedId && it.currentStatus < maxSourceId }.size()
+						def unrackedAssets = sourceAssetsList.findAll{it.currentStatus >= maxSourceId }.size()
+						
+						if(unrackingAssets > 0 && sourceAssets > 0){
+							headColor = 'process'
+						} else if(sourceAvailassets > 0){
+							headColor = 'ready'
+						} else if(sourceAssets != unrackedAssets && sourceAssets > 0){
+							headColor = 'pending'
+						}
+						sourceTeams << [team:it,cssClass:headColor]
 					}
+					headColor = "done"
 					def hasTargetAssets = AssetEntity.find("from AssetEntity WHERE targetTeamMt = $teamId OR targetTeamSa = $teamId OR targetTeamDba = $teamId")
-					if(hasTargetAssets && !it.projectTeam.role =="CLEANER"){
-						targetTeams << it
+					if(hasTargetAssets && !(role =="CLEANER")){
+						
+						def maxTarget = swimlane.maxTarget ? swimlane.maxTarget : "Reracked"
+						def maxTargetId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, maxTarget ) )
+						def rerackingId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, "Reracking" ) )
+						def stagedId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, "Staged" ) )
+						
+						def targetAssetsList = bundleAssetsList.findAll{it[targetTeamType.get(role)]?.id == teamId }
+						def targetAssets = targetAssetsList.size()
+							
+						def rerackingAssets = targetAssetsList.findAll{it.currentStatus == rerackingId }.size()
+						
+						def rerackedAssets = targetAssetsList.findAll{it.currentStatus >= maxTargetId }.size()
+								
+						def targetAvailAssets = targetAssetsList.findAll{it.currentStatus >= stagedId && it.currentStatus < maxTargetId }.size()
+		
+						
+						if(rerackingAssets > 0 && targetAssets > 0){
+							headColor = 'process'
+						} else if(targetAvailAssets > 0){
+							headColor = 'ready'
+						} else if(targetAssets != rerackedAssets && targetAssets > 0){
+							headColor = 'pending'
+						}
+						
+						targetTeams << [team:it,cssClass:headColor]
 					}
 				}
 			}
 		}
-		if( viewMode != 'web'){
-			render( view:'list_m', model:[ sourceTeams:sourceTeams , targetTeams:targetTeams, projectId:projectId ] )
+/*		def headColor = 'done'
+		if(projectTeam.currentLocation != "Target"){
+			if(unrackingAssets > 0 && sourceAssets > 0){
+				headColor = 'process'
+			} else if(sourceAvailassets > 0){
+				headColor = 'ready'
+			} else if(sourceAssets != unrackedAssets && sourceAssets > 0){
+				headColor = 'pending'
+			}
 		} else {
-			return [ sourceTeams:sourceTeams , targetTeams:targetTeams , projectId:projectId ]
+			if(rerackingAssets > 0 && targetAssets > 0){
+				headColor = 'process'
+			} else if(targetAvailAssets > 0){
+				headColor = 'ready'
+			} else if(targetAssets != rerackedAssets && targetAssets > 0){
+				headColor = 'pending'
+			}
+		}*/
+		if( viewMode != 'web'){
+			render( view:'list_m', model:[ sourceTeams:sourceTeams , targetTeams:targetTeams, projectId:projectId] )
+		} else {
+			return [ sourceTeams:sourceTeams , targetTeams:targetTeams , projectId:projectId]
 		}
 		
 	}
