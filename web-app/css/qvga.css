@@ -144,9 +144,21 @@ font-weight: bold;
 	margin-left:13px;
 	background-color:none;
 }
+#mobtitle {
+	height: 21px; 
+	width: 200px;
+	text-align: center;
+	float: left; 
+	margin:auto 0px;
+	color: white; 
+	font-weight: bold;
+	border:1px solid #444; 
+	margin:0px;
+	padding:auto 0px;
+}
 .mobmenu {
 	height: 21px; 
-	width: 50px; 
+	width: 40px; 
 	float: left; 
 	-webkit-border-radius: 2px;
 	-moz-border-radius: 2px;
@@ -165,12 +177,11 @@ font-weight: bold;
 	border:2px solid #507028; 
 	border-top-color: #444; 
 	border-left-color: #444; 
-	margin:0px;
 	background:#444;
 	padding:auto 0px;
 }
 .mobbutton {
-	color: #5b5e5c; 
+	color: white; 
 	border:1px solid #02322A; 
 	margin:2px 5px 5px 5px; 
 	height:15px; 
@@ -181,104 +192,21 @@ font-weight: bold;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
 }
-.home {
-	height:21px; 
-	width:45px; 
-	float:left; 
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
-	margin:auto 0px;
+.mobbutton_deselected {
 	color: white; 
-	font-weight: normal;
-	border:1px solid #444; 
-	margin:0px;
-	padding:auto 0px;
-	text-align:center;
-}
-.home_select {
-	height:21px; 
-	width:45px; 
-	float:left; 
-   -webkit-border-radius: 2px;
-   -moz-border-radius: 2px;
-	margin:auto 0px;
-	color: white; 
-	font-weight: bold;
-	border:2px solid #507028; 
-	border-top-color: #444; 
-	border-left-color: #444; 
-	margin:0px;
-	background:#444;
-	padding:auto 0px;
-	text-align:center;
-	vertical-align: bottom;
-}
-.my_task {
-	height:21px; 
-	width:60px; 
-	float:left; 
-   -webkit-border-radius: 5px;
-   -moz-border-radius: 5px;
-	margin:auto 0px;
-	color: white; 
-	font-weight: normal;
-	border:2px solid #444; 
-	margin:0px;
-	padding:auto 0px;
-	text-align:center;
-}
-.my_task_select{
-	height:21px; 
-	width:60px; 
-	float:left; 
-   -webkit-border-radius: 5px;
-   -moz-border-radius: 5px;
-	margin:auto 0px;
-	color: white; 
-	font-weight: bold;
-	border:2px solid #507028; 
-	border-top-color: #444; 
-	border-left-color: #444; 
-	background:#444;
-	margin:0px;
-	padding:auto 0px;
-	text-align:center;
-}
-.asset_search {
-	height:21px; 
-	width:63px; 
-	float:left; 
-   -webkit-border-radius: 5px;
-   -moz-border-radius: 5px;
-	margin:auto 0px;
-	color: grey; 
-	font-weight: normal;
-	border:2px solid #444; 
-	margin:0px;
-	padding:auto 0px;
-	text-align:center;
-}
-.asset_search_select {
-	height:21px; 
-	width:63px; 
-	float:left; 
-   -webkit-border-radius: 5px;
-   -moz-border-radius: 5px;
-	margin:auto 0px;
-	color: white; 
-	font-weight: bold;
-	text-decoration: none;
-	border:2px solid #507028; 
-	border-top-color: #444; 
-	border-left-color: #444; 
-	background:#444;
-	margin:0px;
-	padding:auto 0px;
-	text-align:center;
+	border:1px solid #02322A; 
+	margin:2px 5px 5px 5px; 
+	height:15px; 
+	padding:1px 2px 1px 3px; 
+	width:50px; 
+	background:#02322A; 
+	float:left;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
 }
 .tab {
 	padding-top:4px;
-	padding-left:1px;
+	padding-left:0px;
 	padding-right:0px;
 	padding-bottom:0px;
 	width:50px;
@@ -294,32 +222,37 @@ font-weight: bold;
 }
 .tab_search input {
 	color: #5b5e5c; 
-	border:1px solid #5b5e5c; 
+	border:1px solid #507028; 
 	margin:0px; 
 	padding:1px;
 }
-.tab_select {
-	color: #5b5e5c; 
-	border:1px solid #5b5e5c;
+a.tab_select {
+	color: white; 
+	border:2px solid #507028;
+	border-bottom-color: black;
 	margin:2px;
-	background:#aaefb8;
+	background:black;
 	padding:2px;
-   -webkit-border-radius: 5px;
-   -moz-border-radius: 5px;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0px;
 }
-.tab_deselect {
-	color: #5b5e5c; 
-	border:1px solid #5b5e5c;
+a.tab_deselect {
+	color: grey; 
+	border:2px solid #507028;
 	margin:2px;
 	padding:2px;
-   -webkit-border-radius: 5px;
-   -moz-border-radius: 5px;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0px;
 }
 .sort_column {
 	color: #5b5e5c; 
 	border:1px  solid #5b5e5c; 
 	margin:2px;
-	background:#aaefb8;
+	background:#CCC;
 	padding:2px;
 }
 .sign_out {
@@ -355,12 +288,14 @@ font-weight: bold;
 	margin-bottom: 5px;
 	margin-top: 5px;
 	background-color: LightGreen; 
+	color:black;
 	position: relative;
 }
 #cablingPanel div {
 	position: absolute; 
 	left: 0; 
 	top: 0
+	color:black;
 }
 .connector_Bottom{
 	margin-top: 19px;
@@ -373,6 +308,9 @@ font-weight: bold;
 }
 .connector_Top{
 	margin-top: -13px;
+}
+#connectorModelBody{
+	color: black;
 }
 .cabling_div {
 	border:1px solid #63A242;

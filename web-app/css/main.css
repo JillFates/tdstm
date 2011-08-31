@@ -171,15 +171,19 @@ th.desc a {
     background-image: url(../images/skin/sorted_desc.gif);
 }
 .teamstatus_pending {
+	color: black;
 	background-color:#ccc;
 }
 .teamstatus_ready {
+	color: black;
 	background-color:#33ff00;
 }
 .teamstatus_process {
+	color: black;
 	background-color:#66ffff;
 }
 .teamstatus_done {
+	color: black;
 	background-color:#fff;
 }
 

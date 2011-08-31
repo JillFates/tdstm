@@ -28,9 +28,9 @@
         </g:if>
         <div style="float: left; padding-left: 2px; width: 98%; margin-top: 2px;">
 		 <td style="text-align: center;">
-        <span style="color: #328714; font: bold 15px arial;">Transition Manager - Mobile</span>
-         </td>
-		</div>
+	<div class="mainbody" style="width: 220px; border:0;" >
+		<a href="#" id="mobtitle">Transition Manager - Mobile</a></td>
+	</div>
 
  		<div style="float: left; width: 100%; margin: 4px 0; text-align: center;">
         <table style="border: 0px;">
@@ -43,7 +43,7 @@
                         </tr>
                 </tbody>
         </table>
-        <span style="color:#328714; font: bold 13px arial; float:left;">Select Team To Use:</span>
+        <span style="color: white; font: bold 13px arial; float:left;">Select Team To Use:</span>
         <table>
         	<thead>
 				<tr>

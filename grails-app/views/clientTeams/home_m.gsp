@@ -76,7 +76,7 @@ dt {
 						<dt>Bundle:&nbsp;</dt><dd>${bundleName}</dd> 
 						<dt>Team:&nbsp;</dt><dd>${projectTeam}</dd>
 						<dt>Members:&nbsp;</dt><dd>${members}</dd>              					     
-						<dt>Action:&nbsp;</dt><dd>${loc}</dd>
+						<dt>Location:&nbsp;</dt><dd>${loc}</dd>
 					</dl>
 				</div>
 				</g:form>

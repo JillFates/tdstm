@@ -33,7 +33,7 @@
 		<table border=0 cellpadding=0 cellspacing=0><tr>
 		<td><g:link class="mobmenu" controller="clientTeams" params="[projectId:project?.id]">Teams</g:link></td>
 		<td><g:link action='home' params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId]' class="mobmenu">Home</g:link></td>
-		<td><a href="#" class="mobmenu mobselect">My Tasks</a></td>
+		<td><a href="#" class="mobmenu mobselect">Tasks</a></td>
 		<td><a href="#" class="mobmenu">Asset</a></td>
 		</tr></table>
 
@@ -100,17 +100,6 @@
 					</tbody>
 				</table>
 			</div>
-			<div>
-      		<table style="border: 0px;">
-                <tbody>
-                	<tr>
-                    	<td style="height: 2px;" nowrap="nowrap">
-                        	<g:link class="home" controller="clientTeams" params="[projectId:projectId, viewMode:'web']" class="mobbutton" style="width:75px;">Full site</g:link>
-						</td>
-					</tr>
-				</tbody>
-        	</table>
-      		</div>
 		</div>
       		</g:form>
   	</div>
