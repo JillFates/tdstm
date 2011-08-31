@@ -31,9 +31,10 @@
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody" style="width: 220px;" >
 		<table border=0 cellpadding=0 cellspacing=0><tr>
-		<td><g:link action='home' params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId]' class="home">Home</g:link></td>
-		<td><a href="#" class="my_task_select">My Tasks</a></td>
-		<td><a href="#" class="asset_search">Asset</a></td>
+		<td><g:link class="mobmenu" controller="clientTeams" params="[projectId:project?.id]">Teams</g:link></td>
+		<td><g:link action='home' params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId]' class="mobmenu">Home</g:link></td>
+		<td><a href="#" class="mobmenu mobselect">My Tasks</a></td>
+		<td><a href="#" class="mobmenu">Asset</a></td>
 		</tr></table>
 
       		<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">
@@ -104,7 +105,7 @@
                 <tbody>
                 	<tr>
                     	<td style="height: 2px;" nowrap="nowrap">
-                        	<g:link class="home" controller="clientTeams" params="[projectId:projectId, viewMode:'web']" class="sign_out" style="width:75px;">Full site</g:link>
+                        	<g:link class="home" controller="clientTeams" params="[projectId:projectId, viewMode:'web']" class="mobbutton" style="width:75px;">Full site</g:link>
 						</td>
 					</tr>
 				</tbody>

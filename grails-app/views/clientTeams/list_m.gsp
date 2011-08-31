@@ -37,8 +37,8 @@
                 <tbody>
                         <tr>
                                 <td style="height: 2px;" nowrap="nowrap">
-                                <g:link class="home" controller="clientTeams" params="[projectId:projectId, viewMode:'web']" class="sign_out" style="width:75px;">Use full site</g:link>
-                                <g:link controller="auth" action="signOut" class="sign_out">Log out</g:link>
+                                <g:link class="home" controller="clientTeams" params="[projectId:projectId, viewMode:'web']" class="mobbutton" style="width:75px;">Use full site</g:link>
+                                <g:link controller="auth" action="signOut" class="mobbutton">Log out</g:link>
                                 </td>
                         </tr>
                 </tbody>

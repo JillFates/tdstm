@@ -116,9 +116,10 @@
 	<div class="mainbody" style="border:0px solid #e7e7e7; width:220px;">
 	<div class="colum_techlogin">
 		<table border=0 cellpadding=0 cellspacing=0><tr>
-			<td><g:link action='home' params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId]' class="home" >Home</g:link></td>
+			<td><g:link class="mobmenu" controller="clientTeams" params="[projectId:project?.id]">Teams</g:link></td>
+			<td><g:link action='home' params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId]' class="mobmenu">Home</g:link></td>
 			<td><g:link action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"tab":"Todo","fMess":"fMess"]' class="my_task">My Tasks</g:link></td>
-			<td><a href="#" class="asset_search_select">Asset</a></td>
+			<td><a href="#" class="mobmenu mobselect">Asset</a></td>
 		</tr></table>
 
 		<g:form name="assetSearchForm" action="assetSearch">
@@ -286,7 +287,7 @@
        		<tbody>
             	<tr>
                    	<td style="height: 2px;" nowrap="nowrap">
-                    	<g:link class="home" controller="clientTeams" params="[projectId:projectId, viewMode:'web']" class="sign_out" style="width:75px;">Use full site</g:link>
+                    	<g:link class="home" controller="clientTeams" params="[projectId:projectId, viewMode:'web']" class="mobbutton" style="width:75px;">Use full site</g:link>
                     </td>
                 </tr>
 			</tbody>

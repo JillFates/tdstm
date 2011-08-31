@@ -1,3 +1,17 @@
+body {
+    background: black;
+    color: white;
+	font: 11px "HelveticaNeue-Light","Helvetica Neue",Helvetica,Arial,Verdana,sans-serif;
+}
+.mainbody {
+	background: #444;
+	color: white;
+	font: 11px "HelveticaNeue-Light","Helvetica Neue",Helvetica,Arial,Verdana,sans-serif;
+}
+
+.border_bundle_team {
+	background: #444;
+}
 
 .colum_techlogin{
 	width:220px;
@@ -34,6 +48,10 @@ dt {
    float: left;
    margin-right: 2px;
  }  
+
+table {
+	border: 1px solid black;
+}
 
 .asset_details_block{
 	font-size:9px;
@@ -80,10 +98,19 @@ dt {
 }
 
 th {
-   background-color: #000000;
-   color: #ffffff;
+	background-color: #000000;
+	color: #ffffff;
 	font-weight:bold;
 }
+td {
+	font: 11px "HelveticaNeue-Light","Helvetica Neue",Helvetica,Arial,Verdana,sans-serif;
+}
+
+a:link, a:visited, a:hover {
+color: white;
+font-weight: bold;
+}
+
 .action_button {
 	background-color:#aaefb8;
 	width: 200px;
@@ -117,15 +144,53 @@ th {
 	margin-left:13px;
 	background-color:none;
 }
+.mobmenu {
+	height: 21px; 
+	width: 50px; 
+	float: left; 
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	margin:auto 0px;
+	color: white; 
+	font-weight: normal;
+	border:1px solid #444; 
+	margin:0px;
+	padding:auto 0px;
+}
+.mobselect {
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	color: white; 
+	font-weight: bold;
+	border:2px solid #507028; 
+	border-top-color: #444; 
+	border-left-color: #444; 
+	margin:0px;
+	background:#444;
+	padding:auto 0px;
+}
+.mobbutton {
+	color: #5b5e5c; 
+	border:1px solid #02322A; 
+	margin:2px 5px 5px 5px; 
+	height:15px; 
+	padding:1px 2px 1px 3px; 
+	width:50px; 
+	background:#507028; 
+	float:left;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+}
 .home {
 	height:21px; 
 	width:45px; 
 	float:left; 
-   -webkit-border-radius: 5px;
-   -moz-border-radius: 5px;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
 	margin:auto 0px;
-	color: #5b5e5c; 
-	border:1px solid #5b5e5c; 
+	color: white; 
+	font-weight: normal;
+	border:1px solid #444; 
 	margin:0px;
 	padding:auto 0px;
 	text-align:center;
@@ -134,15 +199,19 @@ th {
 	height:21px; 
 	width:45px; 
 	float:left; 
-   -webkit-border-radius: 5px;
-   -moz-border-radius: 5px;
+   -webkit-border-radius: 2px;
+   -moz-border-radius: 2px;
 	margin:auto 0px;
-	color: #5b5e5c; 
-	border:1px solid #5b5e5c; 
+	color: white; 
+	font-weight: bold;
+	border:2px solid #507028; 
+	border-top-color: #444; 
+	border-left-color: #444; 
 	margin:0px;
-	background:#aaefb8;
+	background:#444;
 	padding:auto 0px;
 	text-align:center;
+	vertical-align: bottom;
 }
 .my_task {
 	height:21px; 
@@ -151,8 +220,9 @@ th {
    -webkit-border-radius: 5px;
    -moz-border-radius: 5px;
 	margin:auto 0px;
-	color: #5b5e5c; 
-	border:1px solid #5b5e5c; 
+	color: white; 
+	font-weight: normal;
+	border:2px solid #444; 
 	margin:0px;
 	padding:auto 0px;
 	text-align:center;
@@ -164,10 +234,13 @@ th {
    -webkit-border-radius: 5px;
    -moz-border-radius: 5px;
 	margin:auto 0px;
-	color: #5b5e5c; 
-	border:1px solid #5b5e5c; 
+	color: white; 
+	font-weight: bold;
+	border:2px solid #507028; 
+	border-top-color: #444; 
+	border-left-color: #444; 
+	background:#444;
 	margin:0px;
-	background:#aaefb8;
 	padding:auto 0px;
 	text-align:center;
 }
@@ -178,8 +251,9 @@ th {
    -webkit-border-radius: 5px;
    -moz-border-radius: 5px;
 	margin:auto 0px;
-	color: #5b5e5c; 
-	border:1px solid #5b5e5c; 
+	color: grey; 
+	font-weight: normal;
+	border:2px solid #444; 
 	margin:0px;
 	padding:auto 0px;
 	text-align:center;
@@ -191,10 +265,14 @@ th {
    -webkit-border-radius: 5px;
    -moz-border-radius: 5px;
 	margin:auto 0px;
-	color: #5b5e5c; 
-	border:1px solid #5b5e5c;
+	color: white; 
+	font-weight: bold;
+	text-decoration: none;
+	border:2px solid #507028; 
+	border-top-color: #444; 
+	border-left-color: #444; 
+	background:#444;
 	margin:0px;
-	background:#aaefb8;
 	padding:auto 0px;
 	text-align:center;
 }

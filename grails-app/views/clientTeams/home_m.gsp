@@ -38,9 +38,10 @@ dt {
 	<div class="mainbody" style="width: 220px; border:0;" >
 	<div class="border_bundle_team" style="border:0px;">
 		<table border=0 cellpadding="0" cellspacing="0"><tr>
-		<td><a href="#" class="home_select">Home</a></td>
-		<td><g:link action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":project?.id,"tab":"Todo"]' class="my_task">My Tasks</g:link></td>
-		<td><a href="#" class="asset_search">Asset</a>
+		<td><g:link class="mobmenu" controller="clientTeams" params="[projectId:project?.id]">Teams</g:link></td>
+		<td><a href="#" class="mobmenu mobselect">Home</a></td>
+		<td><g:link action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":project?.id,"tab":"Todo"]' class="mobmenu">My Tasks</g:link></td>
+		<td><a href="#" class="mobmenu">Asset</a>
 		</tr></table>
 			<div class="w_techlog" style="border:0px;">
 				<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">      					
@@ -57,7 +58,6 @@ dt {
 								Scan Asset:<br/>
 								<input type="text" size="12" value="" name="search" autocorrect="off" autocapitalize="off" />
 							</td>
-							<td valign="middle"><g:link class="home" controller="clientTeams" params="[projectId:project?.id]" class='sign_out'>Teams</g:link></td>
 						</tr>
 					  </table>
 				</div>
@@ -84,7 +84,7 @@ dt {
                 <tbody>
                  	<tr>
                     	<td style="height: 2px;" nowrap="nowrap">
-                          	<g:link class="home" controller="clientTeams" params="[projectId:projectId, viewMode:'web']" class="sign_out" style="width:75px;">Use full site</g:link>
+                          	<g:link class="home" controller="clientTeams" params="[projectId:projectId, viewMode:'web']" class="mobbutton" style="width:75px;">Use full site</g:link>
 						</td>
 					</tr>
                 </tbody>
