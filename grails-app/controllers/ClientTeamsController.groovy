@@ -58,18 +58,20 @@ class ClientTeamsController {
 						def sourceAssetsList = bundleAssetsList.findAll{it[sourceTeamType.get(role)]?.id == teamId }
 						def sourceAssets = sourceAssetsList.size()
 						
-						def unrackingId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, "Unracking" ) )
-						def releasedId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, "Release" ) )
+						def minSource = swimlane.minSource ? swimlane.minSource : "Release"
+						def minSourceId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, minSource ) )
+						
 						def maxSource = swimlane.maxSource ? swimlane.maxSource : "Unracked"
 						def maxSourceId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, maxSource ) )
 						
+						def unrackingAssets = sourceAssetsList.findAll{it.currentStatus > minSourceId &&  it.currentStatus < maxSourceId }.size()
+						
 						if(role =="CLEANER"){
-							unrackingId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, "Unracked" ) )
-							releasedId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, "Unracked" ) )
+							minSourceId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, "Unracked" ) )
 							maxSourceId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, "Cleaned" ) )
+							unrackingAssets = sourceAssetsList.findAll{it.currentStatus == minSourceId }.size()
 						}
-						def unrackingAssets = sourceAssetsList.findAll{it.currentStatus == unrackingId }.size()
-						def sourceAvailassets = sourceAssetsList.findAll{it.currentStatus >= releasedId && it.currentStatus < maxSourceId }.size()
+						def sourceAvailassets = sourceAssetsList.findAll{it.currentStatus >= minSourceId && it.currentStatus < maxSourceId }.size()
 						def unrackedAssets = sourceAssetsList.findAll{it.currentStatus >= maxSourceId }.size()
 						
 						if(unrackingAssets > 0 && sourceAssets > 0){
@@ -84,20 +86,22 @@ class ClientTeamsController {
 					headColor = "done"
 					def hasTargetAssets = AssetEntity.find("from AssetEntity WHERE targetTeamMt = $teamId OR targetTeamSa = $teamId OR targetTeamDba = $teamId")
 					if(hasTargetAssets && !(role =="CLEANER")){
+						def minTarget = swimlane.minTarget ? swimlane.maxTarget : "Staged"
+						def minTargetId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, minTarget ) )
 						
 						def maxTarget = swimlane.maxTarget ? swimlane.maxTarget : "Reracked"
 						def maxTargetId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, maxTarget ) )
 						def rerackingId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, "Reracking" ) )
-						def stagedId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, "Staged" ) )
+						
 						
 						def targetAssetsList = bundleAssetsList.findAll{it[targetTeamType.get(role)]?.id == teamId }
 						def targetAssets = targetAssetsList.size()
 							
-						def rerackingAssets = targetAssetsList.findAll{it.currentStatus == rerackingId }.size()
+						def rerackingAssets = targetAssetsList.findAll{it.currentStatus > minTargetId &&  it.currentStatus < maxTargetId }.size()
 						
 						def rerackedAssets = targetAssetsList.findAll{it.currentStatus >= maxTargetId }.size()
 								
-						def targetAvailAssets = targetAssetsList.findAll{it.currentStatus >= stagedId && it.currentStatus < maxTargetId }.size()
+						def targetAvailAssets = targetAssetsList.findAll{it.currentStatus >= minTargetId && it.currentStatus < maxTargetId }.size()
 		
 						
 						if(rerackingAssets > 0 && targetAssets > 0){
@@ -201,13 +205,7 @@ class ClientTeamsController {
 	    def swimlane = Swimlane.findByNameAndWorkflow(role, workflow )
 		flash.message = ""
         def holdState = stateEngineService.getStateIdAsInt( workflowCode, "Hold" ) 
-        if ( params.location == "source" ) {
-            rdyState = stateEngineService.getStateIdAsInt( workflowCode, "Release" )
-            ipState.add( stateEngineService.getStateIdAsInt( workflowCode, "Unracking" ) )
-        } else {
-            rdyState = stateEngineService.getStateIdAsInt( workflowCode, "Staged" )
-            ipState.add(  stateEngineService.getStateIdAsInt( workflowCode, "Reracking" ) )
-        }
+		
         def countQuery = """select a.asset_entity_id as id, a.asset_tag as assetTag, a.source_rack as sourceRack, 
 						a.source_rack_position as sourceRackPosition, a.target_rack as targetRack,
 			            min(cast(t.state_to as UNSIGNED INTEGER)) as minstate,
@@ -220,11 +218,16 @@ class ClientTeamsController {
         if ( params.location == "source" ) {
 			def maxSource = swimlane.maxSource ? swimlane.maxSource : "Unracked" 
             stateVal = stateEngineService.getStateIdAsInt ( workflowCode, maxSource )
+			def minSource = swimlane.minSource ? swimlane.minSource : "Release"
+			rdyState = stateEngineService.getStateIdAsInt( workflowCode, minSource )
+			
             query.append (" and a.${sourceTeamColumns.get(role)} = $teamId" )
             countQuery +=" and a.${sourceTeamColumns.get(role)} = $teamId"
         } else {
 			def maxTarget = swimlane.maxTarget ? swimlane.maxTarget : "Reracked"
         	stateVal = stateEngineService.getStateIdAsInt ( workflowCode, maxTarget )
+			def minTarget = swimlane.minTarget ? swimlane.maxTarget : "Staged"
+			rdyState = stateEngineService.getStateIdAsInt( workflowCode, minTarget )
 			query.append (" and a.${targetTeamColumns.get(role)} = $teamId" )
             countQuery += " and a.${targetTeamColumns.get(role)} = $teamId" 
         }
@@ -265,7 +268,7 @@ class ClientTeamsController {
                 } else if ( ( it.currentStateId > holdState ) && ( it.currentStateId < rdyState ) ) {
                     colorCss = "asset_pending"
 					sortOrder = 4
-                } else if ( ( it.currentStateId >= rdyState ) ) {
+                } else if ( ( it.currentStateId >= stateVal ) ) {
                     colorCss = "asset_done"
 					sortOrder = 5
                 }

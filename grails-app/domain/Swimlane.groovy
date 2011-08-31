@@ -4,6 +4,8 @@ class Swimlane {
 	String actorId
 	String maxSource = "Unracked"
 	String maxTarget = "Reracked"
+	String minSource = "Release"
+	String minTarget = "Staged"
 	
 	static belongsTo = [ workflow : Workflow ]
 	static hasMany  = [ WorkflowTransitionMap ]
@@ -14,6 +16,8 @@ class Swimlane {
 		workflow( blank:false, nullable:false )
 		maxSource( blank:true, nullable:true )
 		maxTarget( blank:false, nullable:false )
+		minSource( blank:true, nullable:true )
+		minTarget( blank:false, nullable:false )
 	}
 	
 	static mapping = {

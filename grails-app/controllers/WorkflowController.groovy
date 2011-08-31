@@ -250,6 +250,7 @@ class WorkflowController {
 		def workflow = Workflow.get( workflowId )
 		def swimlanes = Swimlane.findAllByWorkflow( workflow )
 		def onTruck = WorkflowTransition.findByWorkflowAndCode( workflow, "OnTruck" )?.transId
+		def hold =  WorkflowTransition.findByWorkflowAndCode( workflow, "hold" )?.transId
 		def currentTransition = WorkflowTransition.get( currentStatus )
 		def workflowTransitions = WorkflowTransition.findAll("FROM WorkflowTransition w where w.workflow = ? AND w.code not in ('SourceWalkthru','TargetWalkthru') ", [ workflow ] )
 		swimlanes.each{ role->
@@ -277,10 +278,13 @@ class WorkflowController {
 			}
 			def maxSourceId = jdbcTemplate.queryForInt("SELECT Max(trans_id) FROM workflow_transition_map where swimlane_id = ${role.id} and trans_id < ${onTruck}")
 			def maxTargetId = jdbcTemplate.queryForInt("SELECT Max(trans_id) FROM workflow_transition_map where swimlane_id = ${role.id} and trans_id >= ${onTruck}")
-
+            def minSourceId = jdbcTemplate.queryForInt("SELECT Min(trans_id) FROM workflow_transition_map where swimlane_id = ${role.id} and trans_id < ${onTruck} and trans_id > ${hold}")
+			def minTargetId = jdbcTemplate.queryForInt("SELECT Min(trans_id) FROM workflow_transition_map where swimlane_id = ${role.id} and trans_id >= ${onTruck}")
+			
 			role.maxTarget = stateEngineService.getState( workflow.process, maxTargetId )
 			role.maxSource = stateEngineService.getState( workflow.process, maxSourceId )
-			
+			role.minTarget = stateEngineService.getState( workflow.process, minTargetId )
+			role.minSource = stateEngineService.getState( workflow.process, minSourceId )
 			if(!role.save( flush:true )){
 				role.errors.each {  println it}
 			}
