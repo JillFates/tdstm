@@ -24,10 +24,35 @@
    document.bundleTeamAssetForm.submit();
    
    }
+	function updateOrientation(){
+		var displayStr = "Orientation : ";
+		switch(window.orientation) {
+                    case 0:
+			displayStr += "Portrait";
+			var elems = document.getElementsByClassName("col2");
+			for(var i = 0; i < elems.length; i++) elems[i].style.display = "none";
+                    break;
+                    case -90:
+			displayStr += "Landscape (right, screen turned clockwise)";
+			var elems = document.getElementsByClassName("col2");
+			for(var i = 0; i < elems.length; i++) elems[i].style.display = "block";
+                    break;
+                    case 90:
+			displayStr += "Landscape (left, screen turned counterclockwise)";
+			var elems = document.getElementsByClassName("col2");
+			for(var i = 0; i < elems.length; i++) elems[i].style.display = "block";
+                    break;
+                    case 180:
+			displayStr += "Portrait (upside-down portrait)";
+			var elems = document.getElementsByClassName("col2");
+			for(var i = 0; i < elems.length; i++) elems[i].style.display = "none";
+                    break;
+                }
+		document.bundleTeamAssetForm.search.value = displayStr;
+	}
 </script>      
-        
 </head>
-<body>
+<body onorientationchange="updateOrientation();">
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody" style="width: 220px;" >
 		<table border=0 cellpadding=0 cellspacing=0><tr>
@@ -79,22 +104,24 @@
              			<table id="assetTable" style="height:80px;">
               				<thead>
                 				<tr>
-                  				<g:sortableColumn class="sort_column" style="width:60px;" action="myTasks" property="asset_tag" title="AssetTag" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
-                  				<g:sortableColumn class="sort_column" style="width:65px;" action="myTasks" property="source_rack" title="Rack/Pos" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
-                  				<g:sortableColumn class="sort_column" action="myTasks" property="model" title="Model" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
+                  				<g:sortableColumn class="sort_column col1" style="width:60px;" action="myTasks" property="asset_tag" title="AssetTag" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
+                  				<g:sortableColumn class="sort_column col2" style="width:60px, display:none;" action="myTasks" property="asset_name" title="AssetName" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
+                  				<g:sortableColumn class="sort_column col3" style="width:65px;" action="myTasks" property="source_rack" title="Rack/Pos" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
+                  				<g:sortableColumn class="sort_column col4" action="myTasks" property="model" title="Model" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
 						</tr>
 					</thead>
 					<tbody>
 						<g:each status="i" in="${assetList}" var="assetList">
 							<tr class="${assetList.cssVal}"  onclick="assetSubmit('${assetList?.item?.assetTag}');">
-								<td class="asset_details_block">${assetList?.item?.assetTag}</td>
+								<td class="asset_details_block col1">${assetList?.item?.assetTag}</td>
+								<td class="asset_details_block col2" style="display:none;">${assetList?.item?.assetName}</td>
 								<g:if test="${location == 's'}">
-								<td class="asset_details_block">${assetList?.item?.sourceRack}/${assetList?.item?.sourceRackPosition}</td>
+								<td class="asset_details_block col3">${assetList?.item?.sourceRack}/${assetList?.item?.sourceRackPosition}</td>
 								</g:if>
 								<g:else>
-								<td class="asset_details_block">${assetList?.item?.targetRack}/${assetList?.item?.targetRackPosition}</td>
+								<td class="asset_details_block col3">${assetList?.item?.targetRack}/${assetList?.item?.targetRackPosition}</td>
 								</g:else>
-								<td class="asset_details_block">${assetList?.item?.model}</td>
+								<td class="asset_details_block col4">${assetList?.item?.model}</td>
 							</tr>
 						</g:each>
 					</tbody>
