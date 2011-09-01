@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>My Tasks</title>
+	<title>My Tasks</title>
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 <%--<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
@@ -116,11 +116,10 @@
 				<div style="color: red;"><ul>${flash.message}</ul></div>
 			</g:if> 
 		</div>		
-           	<div style="float:left; width:220px; margin:5px 5px;"><b>My Tasks:</b></div>
-		<div style="float:left; width:210px; margin:2px 0; ">              								
-		<table style="border:0px;width:210px;">
+		<div style="float:left; width:220px; margin:2px 0; ">              								
+		<table style="border:0px;width:220px;">
 		<tr>
-			<td><b>My Tasks:</b></td>
+			<td><b>Tasks:</b></td>
 			<td id="todoId" class="tab">
 				<g:if test="${tab && tab == 'Todo'}">
 				  <g:link class="tab_select" action="myTasks"  params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link>

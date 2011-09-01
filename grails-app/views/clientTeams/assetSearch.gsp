@@ -1,15 +1,14 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="projectHeader" />
-<title>Asset</title>
+	<title>Asset</title>
 <jq:plugin name="jquery"/>
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-<meta name="viewport" content="height=device-height,width=220" />
 	
 <script type="text/javascript">
         window.addEventListener('load', function(){
@@ -115,7 +114,7 @@
 <body>
 	<a name="top"></a>
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
-	<div class="mainbody" style="border:0px solid #e7e7e7; width:220px;">
+	<div class="mainbody">
 	<div class="menu4">
 		<ul>
 			<li><g:link class="mobmenu" controller="clientTeams" params="[projectId:project?.id]">Teams</g:link></li>
@@ -142,14 +141,14 @@
 		<div class="clear" style="margin:2px;"></div>
 
 		<g:if test="${projMap}">			
-		<table style="border:0px; width=220">
+		<table style="border:0px; width=420">
 			<tr><td style="padding:0px;"><b>Asset</b>:&nbsp;<input name="search" type="text" size="12" value="${search}" id="search" autocorrect="off" autocapitalize="off"  />&nbsp;<a href="#detail">(Details...)</a></td>
 			</tr>
 	
  			<g:if test="${assetComment}">
 			<tr><td><table style="border:0px; width=100%">
 				<tr>
-					<td style="width:219px"><strong><u>Instructions</u></strong></td>
+					<td style="width:419px"><strong><u>Instructions</u></strong></td>
 					<td><strong><u>Confirm</u></strong></td>
 				</tr>
 				<g:each status="i" in="${assetComment}" var="comments">
@@ -244,7 +243,7 @@
 		</div>
 	</g:form>
 	</div>
-	<div class="cabling_div">
+	<div class="cabling_div" style"width:420px;">
 		<div id="cablingPanel" style="height: auto;">
 		<g:if test="${projMap?.asset?.model?.rearImage && projMap?.asset?.model?.useImage == 1}">
 			<img src="${createLink(controller:'model', action:'getRearImage', id:projMap?.asset?.model?.id)}" />

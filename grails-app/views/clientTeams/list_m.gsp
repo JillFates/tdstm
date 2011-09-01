@@ -10,21 +10,16 @@
 <meta name="viewport" content="width=device-width,width=220" />
 </head>
 <body>
-<div id="spinner" class="spinner" style="display: none;">
-<img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
-</div>
-<div class="mainbody" style="width: auto;">
-<div class="colum_techlogin_login" style="float:left;">
-<div class="w_techlog_login" style="height: auto">
+	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
+	<div class="mainbody">
+		<div id="mobtitle">Transition Manager - Mobile</div>
+	<div class="w_techlog_login" style="height: auto">
 	<g:form action="home" name="loginForm">
         <input type="hidden" name="bundleId" id="bundleId"/>
         <input type="hidden" name="teamId" id="teamId"/>
         <input type="hidden" name="location" id="locationId"/>
         <input type="hidden" name="projectId" value="${projectId}"/>
         <input type="hidden" name="username" id="usernameId" value="${projectId}"/>
-        <div style="float: left; padding-left: 2px; width: 98%; margin-top: 2px;">
-	<div class="mainbody" style="width: 220px; border:0;" >
-		<div id="mobtitle">Transition Manager - Mobile</div>
 	<div class="menu4">
 		<ul>
 			<li><a href="#" class="mobmenu mobselect">Teams</a></li>
@@ -52,9 +47,9 @@
 	<span style="font: bold 13px arial; float:left;">Select Team to use:</span>
 	<table>
 		<thead><tr>
-			<th>Team (loc)</th>
-			<th>Role</th>
-			<th>Members</th>
+			<th class="sort_column">Team (loc)</th>
+			<th class="sort_column">Role</th>
+			<th class="sort_column">Members</th>
 		</tr></thead>
 		<tbody>
             	<g:each in="${sourceTeams}" status="i" var="projectTeamInstance">

@@ -1,12 +1,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="projectHeader" />
-<title>Team Home</title>
+	<title>Team Home</title>
 <jq:plugin name="jquery"/>
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-<meta name="viewport" content="height=device-height,width=220" />
 
 <style type="text/css">
 dt {
@@ -33,11 +32,9 @@ dt {
 </script>  
 </head>
 <body>
-	<div id="spinner" class="spinner" style="display: none;"><img
-		src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
-	</div>
+	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody">
-	<div class="menu4" style="border:0px;">
+	<div class="menu4">
 		<ul>
 			<li><g:link class="mobmenu" controller="clientTeams" params="[projectId:project?.id]">Teams</g:link></li>
 			<li><g:link class="mobmenu mobselect" action='home' params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId]'>Home</g:link></li>
@@ -82,15 +79,7 @@ dt {
 					</dl>
 				</div>
 				</g:form>
-				<table style="border: 0px;">
-                <tbody>
-                 	<tr>
-                    	<td style="height: 2px;" nowrap="nowrap">
                           	<g:link class="home" action="list" params="[projectId:projectId, viewMode:'mobile']" class="mobbutton" style="width:75px;">Mobile Site</g:link>
-						</td>
-					</tr>
-                </tbody>
-        		</table>
 			</div>
 		</div>
 	</div>
