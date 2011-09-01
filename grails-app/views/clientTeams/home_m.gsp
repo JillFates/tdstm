@@ -36,14 +36,16 @@ dt {
 		src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 	</div>
 	<div class="mainbody">
-	<div class="border_bundle_team" style="border:0px;">
+		<div id="mobtitle">Transition Manager - Mobile</div>
+	<div class="menu4">
 		<ul>
 			<li><g:link class="mobmenu" controller="clientTeams" params="[projectId:project?.id]">Teams</g:link></li>
 			<li><g:link class="mobmenu mobselect" action='home' params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId]'>Home</g:link></li>
 			<li><g:link class="mobmenu" action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":project?.id,"tab":"Todo"]'>Tasks</g:link></li>
 			<li><a href="#" class="mobmenu">Asset</a></li>
 		</ul>
-			<div class="w_techlog" style="border:0px;">
+	</div>
+	<div class="w_techlog" style="border:0px;">
 				<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">      					
 					      <input name="bundleId" type="hidden" value="${bundleId}" />
 							<input name="teamId" type="hidden" value="${teamId}" />

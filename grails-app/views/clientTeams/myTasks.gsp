@@ -30,12 +30,15 @@
 <body>
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody" style="width: 220px;" >
+	<div class="menu4">
 		<ul>
 			<li><g:link class="mobmenu" controller="clientTeams" params="[projectId:project?.id]">Teams</g:link></li>
 			<li><g:link class="mobmenu" action='home' params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId]'>Home</g:link></li>
 			<li><g:link class="mobmenu mobselect" action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":project?.id,"tab":"Todo"]'>Tasks</g:link></li>
 			<li><a href="#" class="mobmenu">Asset</a></li>
 		</ul>
+	</div>
+
 		<div class="timebar" ><div id="timebar" ></div></div>
 
       		<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">
