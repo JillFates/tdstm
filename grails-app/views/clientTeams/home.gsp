@@ -36,12 +36,12 @@ dt {
 	<div id="spinner" class="spinner" style="display: none;"><img
 		src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 	</div>
-	<div class="mainbody" style="width: 220px; border:0;" >
+	<div class="mainbody">
 	<div class="border_bundle_team" style="border:0px;">
 		<ul>
 			<li><g:link class="mobmenu" controller="clientTeams" params="[projectId:project?.id]">Teams</g:link></li>
-			<li><a href="#" class="mobmenu mobselect">Home</a></li>
-			<li><g:link action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":project?.id,"tab":"Todo"]' class="mobmenu">Tasks</g:link></li>
+			<li><g:link class="mobmenu mobselect" action='home' params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId]'>Home</g:link></li>
+			<li><g:link class="mobmenu" action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":project?.id,"tab":"Todo"]'>Tasks</g:link></li>
 			<li><a href="#" class="mobmenu">Asset</a></li>
 		</ul>
 			<div class="w_techlog" style="border:0px;">
@@ -59,7 +59,6 @@ dt {
 								Scan Asset:<br/>
 								<input type="text" size="12" value="" name="search" autocorrect="off" autocapitalize="off" />
 							</td>
-							<td valign="middle"><g:link class="home" controller="clientTeams" params="[projectId:project?.id]" class='sign_out'>Teams</g:link></td>
 						</tr>
 					  </table>
 				</div>
@@ -78,7 +77,7 @@ dt {
 						<dt>Bundle:&nbsp;</dt><dd>${bundleName}</dd> 
 						<dt>Team:&nbsp;</dt><dd>${projectTeam}</dd>
 						<dt>Members:&nbsp;</dt><dd>${members}</dd>              					     
-						<dt>Action:&nbsp;</dt><dd>${loc}</dd>
+						<dt>Location:&nbsp;</dt><dd>${loc}</dd>
 					</dl>
 				</div>
 				</g:form>
@@ -86,7 +85,7 @@ dt {
                 <tbody>
                  	<tr>
                     	<td style="height: 2px;" nowrap="nowrap">
-                          	<g:link class="home" action="list" params="[projectId:projectId, viewMode:'mobile']" class="sign_out" style="width:75px;">Mobile Site</g:link>
+                          	<g:link class="home" action="list" params="[projectId:projectId, viewMode:'mobile']" class="mobbutton" style="width:75px;">Mobile Site</g:link>
 						</td>
 					</tr>
                 </tbody>

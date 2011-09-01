@@ -160,16 +160,63 @@ font-weight: bold;
 }
 .mobmenu {
 	height: 21px; 
-	width: 40px; 
+	width: auto; 
 	float: left; 
-	-webkit-border-radius: 2px;
-	-moz-border-radius: 2px;
 	margin:auto 0px;
 	color: white; 
 	font-weight: normal;
+font: bold 12px Tahoma;
+text-align: center;
 	border:1px solid #444; 
 	margin:0px;
-	padding:auto 0px;
+padding: 2px 8px;
+}
+.border_bundle_team {
+    width:100%;
+    height:auto;
+    float:left;
+    background:#444;
+    margin-top:0px;
+}
+.border_bundle_team ul {
+    width:auto;
+    padding-top:0px;
+    margin:0px;
+    padding-left:0px;
+}
+.border_bundle_team ul li {
+    display:inline;
+}
+.border_bundle_team ul li a {
+    width:auto;
+    float: left;
+    height:21px;
+    text-decoration: none;
+    text-align:center;
+    font:bold 12px Tahoma;
+    color:#9acaee;
+    padding:2px 8px;
+    border-right:1px solid #666;
+}
+.border_bundle_team .title1 {
+    width:auto;
+    float: left;
+    height:21px;
+    text-decoration: none;
+    text-align:center;
+    font: bold 12px Arial;
+    color:#F0F0F0;
+    padding:2px 8px;
+    border-right:1px solid #666;
+}
+.border_bundle_team li a:hover, .border_bundle_team li.current a {
+    color: white;
+}
+.border_bundle_team ul li a:visited  {
+    color: white;
+}
+.border_bundle_team ul li a:hover   {
+    color: yellow;
 }
 .mobselect {
 	-webkit-border-radius: 2px;

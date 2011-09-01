@@ -7,7 +7,7 @@
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-<meta name="viewport" content="width=device-width,width=220" />
+<meta name="viewport" content="height=device-height,width=220" />
 	
 <script type="text/javascript">
         window.addEventListener('load', function(){
@@ -115,13 +115,12 @@
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody" style="border:0px solid #e7e7e7; width:220px;">
 	<div class="colum_techlogin">
-		<table border=0 cellpadding=0 cellspacing=0><tr>
-			<td><g:link class="mobmenu" action="list" params="[projectId:projectId, viewMode:'mobile']">Teams</g:link></td>
-			<td><g:link action='home' params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId]' class="mobmenu">Home</g:link></td>
-			<td><g:link action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"tab":"Todo","fMess":"fMess"]' class="mobmenu">Tasks</g:link></td>
-			<td><a href="#" class="mobmenu mobselect">Asset</a></td>
-		</tr></table>
-
+		<ul>
+			<li><g:link class="mobmenu" action="list" params="[projectId:projectId, viewMode:'mobile']">Teams</g:link></li>
+			<li><g:link class="mobmenu" action='home' params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId]'>Home</g:link></li>
+			<li><g:link class="mobmenu" action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":project?.id,"tab":"Todo"]'>Tasks</g:link></li>
+			<li><a href="#" class="mobmenu mobselect">Asset</a></li>
+		</ul>
 		<g:form name="assetSearchForm" action="assetSearch">
 			<input name="bundleId" type="hidden" value="${bundleId}" />
 			<input name="teamId" type="hidden" value="${teamId}" />

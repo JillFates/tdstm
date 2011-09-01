@@ -5,7 +5,7 @@
 <jq:plugin name="jquery"/>
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-<meta name="viewport" content="width=device-width,width=220" />
+<meta name="viewport" content="height=device-height,width=220" />
 
 <style type="text/css">
 dt {
@@ -37,13 +37,12 @@ dt {
 	</div>
 	<div class="mainbody">
 	<div class="border_bundle_team" style="border:0px;">
-		<table border=0 cellpadding="0" cellspacing="0"><tr><td>
 		<ul>
 			<li><g:link class="mobmenu" controller="clientTeams" params="[projectId:project?.id]">Teams</g:link></li>
-			<li><a href="#" class="mobmenu mobselect">Home</a></li>
-			<li><g:link action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":project?.id,"tab":"Todo"]' class="mobmenu">Tasks</g:link></li>
+			<li><g:link class="mobmenu mobselect" action='home' params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId]'>Home</g:link></li>
+			<li><g:link class="mobmenu" action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":project?.id,"tab":"Todo"]'>Tasks</g:link></li>
 			<li><a href="#" class="mobmenu">Asset</a></li>
-		</td></tr></table>
+		</ul>
 			<div class="w_techlog" style="border:0px;">
 				<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">      					
 					      <input name="bundleId" type="hidden" value="${bundleId}" />

@@ -20,23 +20,23 @@
    function setFocus(){
     document.bundleTeamAssetForm.search.focus();
    }
+
    function assetSubmit(searchVal){
-   
    document.bundleTeamAssetForm.search.value = searchVal; 
    document.bundleTeamAssetForm.submit();
-   
    }
 </script>      
 </head>
 <body>
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody" style="width: 220px;" >
-		<table border=0 cellpadding=0 cellspacing=0><tr>
-		<td><g:link class="mobmenu" controller="clientTeams" params="[projectId:project?.id]">Teams</g:link></td>
-		<td><g:link action='home' params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId]' class="mobmenu">Home</g:link></td>
-		<td><a href="#" class="mobmenu mobselect">My Tasks</a></td>
-		<td><a href="#" class="mobmenu">Asset</a></td>
-		</tr></table>
+		<ul>
+			<li><g:link class="mobmenu" controller="clientTeams" params="[projectId:project?.id]">Teams</g:link></li>
+			<li><g:link class="mobmenu" action='home' params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId]'>Home</g:link></li>
+			<li><g:link class="mobmenu mobselect" action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":project?.id,"tab":"Todo"]'>Tasks</g:link></li>
+			<li><a href="#" class="mobmenu">Asset</a></li>
+		</ul>
+		<div class="timebar" ><div id="timebar" ></div></div>
 
       		<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">
       					
@@ -45,9 +45,17 @@
 		<input name="location" type="hidden" value="${location}" />
 		<input name="projectId" type="hidden" value="${projectId}" />
 		<input name="tab" type="hidden" value="${tab}" />								              	
+		<div id="mydiv" onclick="this.style.display = 'none';setFocus()">						            
+ 			<g:if test="${flash.message}">
+				<br />
+				<div style="color: red;"><ul>${flash.message}</ul></div>
+			</g:if> 
+		</div>		
+           	<div style="float:left; width:220px; margin:5px 5px;"><b>My Tasks:</b></div>
 		<div style="float:left; width:210px; margin:2px 0; ">              								
 		<table style="border:0px;width:210px;">
 		<tr>
+			<td><b>My Tasks:</b></td>
 			<td id="todoId" class="tab">
 				<g:if test="${tab && tab == 'Todo'}">
 				  <g:link class="tab_select" action="myTasks"  params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link>
@@ -68,13 +76,6 @@
 		</tr>
 		</table>
 		</div> 
-		<div id="mydiv" onclick="this.style.display = 'none';setFocus()">						            
- 			<g:if test="${flash.message}">
-				<br />
-				<div style="color: red;"><ul>${flash.message}</ul></div>
-			</g:if> 
-		</div>		
-           	<div style="float:left; width:220px; margin:5px 5px;"><b>My Tasks:</b></div>
             	<div id="assetTable" style="float:left;width:220px; ">
            		<div style=" width:220px; ">          
              			<table id="assetTable" style="height:80px;">
