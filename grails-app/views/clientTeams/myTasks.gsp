@@ -4,6 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="projectHeader" />
 <title>My Tasks</title>
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 <%--<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
 	 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.move_tech_dialog.css')}" /> 
@@ -26,15 +27,15 @@
    
    }
 </script>      
-        
 </head>
 <body>
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody" style="width: 220px;" >
 		<table border=0 cellpadding=0 cellspacing=0><tr>
-		<td><g:link action='home' params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId]' class="home">Home</g:link></td>
-		<td><a href="#" class="my_task_select">My Tasks</a></td>
-		<td><a href="#" class="asset_search">Asset</a></td>
+		<td><g:link class="mobmenu" controller="clientTeams" params="[projectId:project?.id]">Teams</g:link></td>
+		<td><g:link action='home' params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId]' class="mobmenu">Home</g:link></td>
+		<td><a href="#" class="mobmenu mobselect">My Tasks</a></td>
+		<td><a href="#" class="mobmenu">Asset</a></td>
 		</tr></table>
 
       		<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">
@@ -80,7 +81,8 @@
               				<thead>
                 				<tr>
                   				<g:sortableColumn class="sort_column" style="width:60px;" action="myTasks" property="asset_tag" title="AssetTag" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
-                  				<g:sortableColumn class="sort_column" style="width:65px;" action="myTasks" property="source_rack" title="Rack/Pos" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
+                  				<g:sortableColumn class="sort_column" style="width:60px;" action="myTasks" property="asset_name" title="AssetName" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
+                  				<g:sortableColumn class="sort_column" style="width:60px;" action="myTasks" property="source_rack" title="Rack/Pos" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
                   				<g:sortableColumn class="sort_column" action="myTasks" property="model" title="Model" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
 						</tr>
 					</thead>
@@ -88,6 +90,7 @@
 						<g:each status="i" in="${assetList}" var="assetList">
 							<tr class="${assetList.cssVal}"  onclick="assetSubmit('${assetList?.item?.assetTag}');">
 								<td class="asset_details_block">${assetList?.item?.assetTag}</td>
+								<td class="asset_details_block col2" style="display:none;">${assetList?.item?.assetName}</td>
 								<g:if test="${location == 's'}">
 								<td class="asset_details_block">${assetList?.item?.sourceRack}/${assetList?.item?.sourceRackPosition}</td>
 								</g:if>
@@ -105,11 +108,11 @@
       		<table style="border: 0px;">
                 <tbody>
                 	<tr>
-                    	<td style="height: 2px;" nowrap="nowrap">
-                        	<g:link class="home" action="list" params="[projectId:projectId, viewMode:'mobile']" class="sign_out" style="width:75px;">Mobile Site</g:link>
-						</td>
-					</tr>
-				</tbody>
+                    		<td style="height: 2px;" nowrap="nowrap">
+                        	<g:link class="mobbutton" action="myTasks" params="[projectId:projectId, "bundleId":bundleId,"teamId":teamId,"location":location,"projectId":project?.id,"tab":"Todo", viewMode:'mobile']" class="mobbutton" style="width:75px;">Mobile Site</g:link>
+				</td>
+			</tr>
+		</tbody>
         	</table>
   	</div>
 <script type="text/javascript" >setFocus();</script>

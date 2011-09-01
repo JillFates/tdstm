@@ -5,7 +5,7 @@
 <jq:plugin name="jquery"/>
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-<meta name="viewport" content="height=device-height,width=220" />
+<meta name="viewport" content="width=device-width,width=220" />
 
 <style type="text/css">
 dt {
@@ -35,12 +35,12 @@ dt {
 	<div id="spinner" class="spinner" style="display: none;"><img
 		src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 	</div>
-	<div class="mainbody" style="width: 220px; border:0;" >
+	<div class="mainbody">
 	<div class="border_bundle_team" style="border:0px;">
 		<table border=0 cellpadding="0" cellspacing="0"><tr>
 		<td><g:link class="mobmenu" controller="clientTeams" params="[projectId:project?.id]">Teams</g:link></td>
 		<td><a href="#" class="mobmenu mobselect">Home</a></td>
-		<td><g:link action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":project?.id,"tab":"Todo"]' class="mobmenu">My Tasks</g:link></td>
+		<td><g:link action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":project?.id,"tab":"Todo"]' class="mobmenu">Tasks</g:link></td>
 		<td><a href="#" class="mobmenu">Asset</a>
 		</tr></table>
 			<div class="w_techlog" style="border:0px;">

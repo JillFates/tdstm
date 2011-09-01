@@ -7,7 +7,7 @@
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-<meta name="viewport" content="height=device-height,width=220" />
+<meta name="viewport" content="width=device-width,width=220" />
 	
 <script type="text/javascript">
         window.addEventListener('load', function(){
@@ -116,9 +116,9 @@
 	<div class="mainbody" style="border:0px solid #e7e7e7; width:220px;">
 	<div class="colum_techlogin">
 		<table border=0 cellpadding=0 cellspacing=0><tr>
-			<td><g:link class="mobmenu" controller="clientTeams" params="[projectId:project?.id]">Teams</g:link></td>
+			<td><g:link class="mobmenu" action="list" params="[projectId:projectId, viewMode:'mobile']">Teams</g:link></td>
 			<td><g:link action='home' params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId]' class="mobmenu">Home</g:link></td>
-			<td><g:link action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"tab":"Todo","fMess":"fMess"]' class="my_task">My Tasks</g:link></td>
+			<td><g:link action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"tab":"Todo","fMess":"fMess"]' class="mobmenu">Tasks</g:link></td>
 			<td><a href="#" class="mobmenu mobselect">Asset</a></td>
 		</tr></table>
 
@@ -146,11 +146,11 @@
 	
  			<g:if test="${assetComment}">
 			<tr><td><table style="border:0px; width=100%">
-			<tr>
-				<td style="width:219px"><strong><u>Instructions</u></strong></td>
-				<td><strong><u>Confirm</u></strong></td>
-			</tr>
-			<g:each status="i" in="${assetComment}" var="comments">
+				<tr>
+					<td style="width:219px"><strong><u>Instructions</u></strong></td>
+					<td><strong><u>Confirm</u></strong></td>
+				</tr>
+				<g:each status="i" in="${assetComment}" var="comments">
 				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 					<td>${comments.comment}</td>
 					<g:if test="${comments.mustVerify == 1}">
@@ -160,18 +160,20 @@
 						<td>&nbsp;</td>
 					</g:else>
 				</tr>
-			</g:each>
+				</g:each>
+				</table>
+				</td>
+			</tr>
 			</g:if>
 			<g:if test ="${actionLabel}">	
 			<tr>
-			<td colspan="2" style="text-align:center;"><input type="button" value="${label}" onclick="return doTransition();" class="action_button"/></td>
+				<td colspan=2 class="heading"><a class="heading" href="#task">Task for ${projMap?.asset?.assetName}:</a></td>
+			</tr><tr>
+				<td colspan="2" style="text-align:center;"><input type="button" value="${label}" onclick="return doTransition();" class="action_button"/></td>
 			</tr>
+			</g:if>
 		</table>
-		</td>
-		</tr>
 		</g:if>
-	</table>
-	</g:if>
 
 	<div class="clear" style="margin:4px;"></div>
 		<a name="comments"></a>
@@ -281,17 +283,6 @@
 			</g:each>
 			</tbody>
 		</table>
-		</div>
-		<div>
-			<table style="border: 0px;">
-       		<tbody>
-            	<tr>
-                   	<td style="height: 2px;" nowrap="nowrap">
-                    	<g:link class="home" controller="clientTeams" params="[projectId:projectId, viewMode:'web']" class="mobbutton" style="width:75px;">Use full site</g:link>
-                    </td>
-                </tr>
-			</tbody>
-       		</table>
 		</div>
 	</div>
 	</div>
