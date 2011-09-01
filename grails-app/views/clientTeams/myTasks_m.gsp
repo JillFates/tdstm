@@ -119,7 +119,7 @@
 		<div style="float:left; width:220px; margin:2px 0; ">              								
 		<table style="border:0px;width:220px;">
 		<tr>
-			<td><b>Tasks:</b></td>
+			<td style="border:2px solid #507028;"><b>Tasks:</b></td>
 			<td id="todoId" class="tab">
 				<g:if test="${tab && tab == 'Todo'}">
 				  <g:link class="tab_select" action="myTasks"  params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link>

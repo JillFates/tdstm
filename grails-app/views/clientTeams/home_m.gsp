@@ -1,11 +1,12 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Team Home</title>
+	<title>Team Home</title>
 <jq:plugin name="jquery"/>
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-<meta name="viewport" content="height=device-height,width=220" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+	<meta name="viewport" content="height=device-height,width=220" />
 
 <style type="text/css">
 dt {
@@ -43,7 +44,7 @@ dt {
 			<li><a href="#" class="mobmenu">Asset</a></li>
 		</ul>
 	</div>
-	<div class="w_techlog" style="border:0px;">
+	<div class="mobbody">
 				<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">      					
 					      <input name="bundleId" type="hidden" value="${bundleId}" />
 							<input name="teamId" type="hidden" value="${teamId}" />
@@ -81,14 +82,10 @@ dt {
 				</div>
 				</g:form>
 				<table style="border: 0px;">
-                <tbody>
-                 	<tr>
-                    	<td style="height: 2px;" nowrap="nowrap">
-                          	<g:link class="home" controller="clientTeams" params="[projectId:projectId, viewMode:'web']" class="mobbutton" style="width:75px;">Use full site</g:link>
-						</td>
-					</tr>
-                </tbody>
-        		</table>
+				<tbody><tr><td style="height: 2px;" nowrap="nowrap">
+					<g:link class="mobbutton" controller="clientTeams" params="[projectId:projectId, viewMode:'web']" style="width:75px;">Use full site</g:link>
+				</td></tr></tbody>
+				</table>
 			</div>
 		</div>
 	</div>

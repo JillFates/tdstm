@@ -168,7 +168,7 @@
 			</g:if>
 			<g:if test ="${actionLabel}">	
 			<tr>
-				<td colspan=2 class="heading"><a class="heading" href="#task">Task for ${projMap?.asset?.assetName}:</a></td>
+				<td colspan=2 class="heading"><a class="heading" href="#detail">Task for ${projMap?.asset?.assetName}:</a></td>
 			</tr><tr>
 				<td colspan="2" style="text-align:center;"><input type="button" value="${label}" onclick="return doTransition();" class="action_button"/></td>
 			</tr>
@@ -178,7 +178,7 @@
 
 	<div class="clear" style="margin:4px;"></div>
 		<a name="comments"></a>
-		<table width="100%">
+		<table style"width:420px;">
 			<tr>
 				<td class="heading" colspan=2><a class="heading" href="#comments">Other Actions</a></td>
 			</tr>
@@ -207,7 +207,7 @@
 
 			<div style="margin:2px;" class="reset" ></div>
 
-			<table width="100%">
+			<table style"width:420px;">
 			<tr>
 				<td class="heading"><a href="#detail">Details</a></td>
 				<td><span style="float:right;"><a href="#top">Top</a></span></td>
@@ -243,7 +243,7 @@
 		</div>
 	</g:form>
 	</div>
-	<div class="cabling_div" style"width:420px;">
+	<div class="cabling_div" style="width:420px;">
 		<div id="cablingPanel" style="height: auto;">
 		<g:if test="${projMap?.asset?.model?.rearImage && projMap?.asset?.model?.useImage == 1}">
 			<img src="${createLink(controller:'model', action:'getRearImage', id:projMap?.asset?.model?.id)}" />

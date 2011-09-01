@@ -1,25 +1,18 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-        <title>Teams List</title>
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+	<title>Teams List</title>
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
-<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 <g:javascript library="application" />
-<meta name="viewport" content="width=device-width,width=220" />
+	<meta name="viewport" content="height=device-height,width=220" />
 </head>
 <body>
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody">
 		<div id="mobtitle">Transition Manager - Mobile</div>
-	<div class="w_techlog_login" style="height: auto">
-	<g:form action="home" name="loginForm">
-        <input type="hidden" name="bundleId" id="bundleId"/>
-        <input type="hidden" name="teamId" id="teamId"/>
-        <input type="hidden" name="location" id="locationId"/>
-        <input type="hidden" name="projectId" value="${projectId}"/>
-        <input type="hidden" name="username" id="usernameId" value="${projectId}"/>
 	<div class="menu4">
 		<ul>
 			<li><a href="#" class="mobmenu mobselect">Teams</a></li>
@@ -28,6 +21,13 @@
 			<li><a href="#" class="mobmenu">Asset</a></li>
 		</ul>
 	</div>
+	<div class="mobbody">
+	<g:form action="home" name="loginForm">
+        <input type="hidden" name="bundleId" id="bundleId"/>
+        <input type="hidden" name="teamId" id="teamId"/>
+        <input type="hidden" name="location" id="locationId"/>
+        <input type="hidden" name="projectId" value="${projectId}"/>
+        <input type="hidden" name="username" id="usernameId" value="${projectId}"/>
 	<g:if test="${flash.message}">
 		<div style="width: 200px;" class="message">${flash.message}</div>
 	</g:if>
@@ -35,14 +35,10 @@
 
  		<div style="float: left; width: 100%; margin: 4px 0; text-align: center;">
         <table style="border: 0px;">
-                <tbody>
-                        <tr>
-                                <td style="height: 2px;" nowrap="nowrap">
-                                <g:link class="home" controller="clientTeams" params="[projectId:projectId, viewMode:'web']" class="mobbutton" style="width:75px;">Use full site</g:link>
+                <tbody><tr><td style="height: 2px;" nowrap="nowrap">
+                                <g:link class="mobbutton" controller="clientTeams" params="[projectId:projectId, viewMode:'web']" tyle="width:75px;">Use full site</g:link>
                                 <g:link controller="auth" action="signOut" class="mobbutton">Log out</g:link>
-                                </td>
-                        </tr>
-                </tbody>
+                </td></tr></tbody>
         </table>
 	<span style="font: bold 13px arial; float:left;">Select Team to use:</span>
 	<table>

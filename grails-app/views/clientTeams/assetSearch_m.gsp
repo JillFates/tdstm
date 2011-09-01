@@ -168,7 +168,7 @@
 			</g:if>
 			<g:if test ="${actionLabel}">	
 			<tr>
-				<td colspan=2 class="heading"><a class="heading" href="#task">Task for ${projMap?.asset?.assetName}:</a></td>
+				<td colspan=2 class="heading"><a class="heading" href="#detail">Task for ${projMap?.asset?.assetName}:</a></td>
 			</tr><tr>
 				<td colspan="2" style="text-align:center;"><input type="button" value="${label}" onclick="return doTransition();" class="action_button"/></td>
 			</tr>

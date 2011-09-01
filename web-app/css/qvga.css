@@ -29,8 +29,8 @@ body {
 
 }
 
-.colum_techlogin_login{
-	width:237px;
+.mobbody{
+	width:220px;
 	height:auto;
 	margin:0px;
 }
@@ -218,14 +218,13 @@ padding: 2px 8px;
 .menu4 ul li a:hover   {
     color: yellow;
 }
-.mobselect {
-	-webkit-border-radius: 2px;
-	-moz-border-radius: 2px;
+a.mobselect {
 	color: yellow; 
 	font-weight: bold;
 	border:2px solid #507028; 
 	border-top-color: #444; 
 	border-left-color: #444; 
+	border-right-color: #507028;
 	background:#444;
 	padding:auto 0px;
 }
