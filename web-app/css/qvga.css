@@ -182,6 +182,14 @@ font-weight: bold;
 	background:#444;
 	padding:auto 0px;
 }
+.timebar {
+  width:220px;height:5px;background-Color:grey;
+}
+
+#timebar {
+  width:30px;height:5px;background-Color:green;color:white;text-Align:center;
+}
+
 .mobbutton {
 	color: white; 
 	border:1px solid #02322A; 
