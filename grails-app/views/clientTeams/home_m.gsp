@@ -37,12 +37,13 @@ dt {
 	</div>
 	<div class="mainbody">
 	<div class="border_bundle_team" style="border:0px;">
-		<table border=0 cellpadding="0" cellspacing="0"><tr>
-		<td><g:link class="mobmenu" controller="clientTeams" params="[projectId:project?.id]">Teams</g:link></td>
-		<td><a href="#" class="mobmenu mobselect">Home</a></td>
-		<td><g:link action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":project?.id,"tab":"Todo"]' class="mobmenu">Tasks</g:link></td>
-		<td><a href="#" class="mobmenu">Asset</a>
-		</tr></table>
+		<table border=0 cellpadding="0" cellspacing="0"><tr><td>
+		<ul>
+			<li><g:link class="mobmenu" controller="clientTeams" params="[projectId:project?.id]">Teams</g:link></li>
+			<li><a href="#" class="mobmenu mobselect">Home</a></li>
+			<li><g:link action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":project?.id,"tab":"Todo"]' class="mobmenu">Tasks</g:link></li>
+			<li><a href="#" class="mobmenu">Asset</a></li>
+		</td></tr></table>
 			<div class="w_techlog" style="border:0px;">
 				<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">      					
 					      <input name="bundleId" type="hidden" value="${bundleId}" />

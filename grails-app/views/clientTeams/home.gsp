@@ -38,11 +38,12 @@ dt {
 	</div>
 	<div class="mainbody" style="width: 220px; border:0;" >
 	<div class="border_bundle_team" style="border:0px;">
-		<table border=0 cellpadding="0" cellspacing="0"><tr>
-		<td><a href="#" class="home_select">Home</a></td>
-		<td><g:link action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":project?.id,"tab":"Todo"]' class="my_task">My Tasks</g:link></td>
-		<td><a href="#" class="asset_search">Asset</a>
-		</tr></table>
+		<ul>
+			<li><g:link class="mobmenu" controller="clientTeams" params="[projectId:project?.id]">Teams</g:link></li>
+			<li><a href="#" class="mobmenu mobselect">Home</a></li>
+			<li><g:link action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":project?.id,"tab":"Todo"]' class="mobmenu">Tasks</g:link></li>
+			<li><a href="#" class="mobmenu">Asset</a></li>
+		</ul>
 			<div class="w_techlog" style="border:0px;">
 				<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">      					
 					      <input name="bundleId" type="hidden" value="${bundleId}" />
