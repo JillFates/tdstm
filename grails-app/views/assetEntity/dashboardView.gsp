@@ -602,7 +602,7 @@ function onInvokeAction(id) {
 										<g:if test="${bundleTeam.team?.role == 'CLEANER'}">
 											<a href="#" onclick="filterByDataPoints('source','','source_pend_clean')"><u>${bundleTeam?.sourcePendAssets}<span style="font-weight: normal;">pend</span></u></a> +
 											<a href="#" onclick="filterByDataPoints('source','','source_avail_clean')"><u style="color: green;">${bundleTeam?.sourceAvailassets}<span style="font-weight: normal;">rdy</span></u></a> +
-											<a href="#" onclick="filterByDataPoints('source','','source_done_clean')"><u>${bundleTeam?.unrackedAssets}<span style="font-weight: normal;">dn</span></u></a> = 
+											<a href="#" onclick="filterByDataPoints('source','','source_done_clean')"><u>${bundleTeam?.maxSourceAssets}<span style="font-weight: normal;">dn</span></u></a> = 
 											<a href="#" onclick="filterByDataPoints('source','','')"><u>${bundleTeam?.sourceAssets}</u></a>
 											<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 											<a title="Login as.." href="../moveTech/signIn?username=ct-${moveBundleInstance.id}-${bundleTeam?.team?.id}-s">@</a>
@@ -611,7 +611,7 @@ function onInvokeAction(id) {
 										<g:else>
 											<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_pend')"><u>${bundleTeam?.sourcePendAssets}<span style="font-weight: normal;">pend</span></u></a> +
 											<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_avail')"><u style="color: green;">${bundleTeam?.sourceAvailassets}<span style="font-weight: normal;">rdy</span></u></a> +
-											<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_done')"><u>${bundleTeam?.unrackedAssets}<span style="font-weight: normal;">dn</span></u></a> = 
+											<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_done')"><u>${bundleTeam?.maxSourceAssets}<span style="font-weight: normal;">dn</span></u></a> = 
 											<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','')"><u>${bundleTeam?.sourceAssets}</u></a>
 											<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 											<a title="Login as.." href="#" onclick="window.open('../clientTeams/home?bundleId=${moveBundleInstance.id}&teamId=${bundleTeam?.team?.id}&location=source','mtwindow','menubar=1,resizable=1,scrollbars=1,width=320,height=480'); ">@</a>
@@ -624,7 +624,7 @@ function onInvokeAction(id) {
 										<g:if test="${bundleTeam.team?.role != 'CLEANER'}">
 										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_pend')"><u>${bundleTeam?.targetPendAssets}<span style="font-weight: normal;">pend</span></u> </a> +
 										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_avail')"><u style="color: green;">${bundleTeam?.targetAvailAssets}<span style="font-weight: normal;">rdy</span></u> </a> +
-										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_done')"><u> ${bundleTeam?.rerackedAssets}<span style="font-weight: normal;">dn</span></u> </a> = 
+										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_done')"><u> ${bundleTeam?.maxTargetAssets}<span style="font-weight: normal;">dn</span></u> </a> = 
 										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','')"><u>${bundleTeam?.targetAssets}</u></a>
 										<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 										<a title="Login as.." href="#" onclick="window.open('../clientTeams/home?bundleId=${moveBundleInstance.id}&teamId=${bundleTeam?.team?.id}&location=target','mtwindow','menubar=1,resizable=1,scrollbars=1,width=320,height=480'); ">@</a>

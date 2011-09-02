@@ -43,20 +43,30 @@ class SupervisorConsoleService {
 				role = "MANAGER"
 			}
 		}
-		def swimlane = Swimlane.findByNameAndWorkflow( role, Workflow.findByProcess(projectInstance.workflowCode) )
+		def releasedId = stateEngineService.getStateId( projectInstance.workflowCode, "Release" )
+		def holdId = stateEngineService.getStateId( projectInstance.workflowCode, "Hold" )
         def cleanedId = stateEngineService.getStateId( projectInstance.workflowCode, "Cleaned" )
         def onCartId = stateEngineService.getStateId( projectInstance.workflowCode, "OnCart" )
         def onTruckId = stateEngineService.getStateId( projectInstance.workflowCode, "OnTruck" )
 	    def offTruckId = stateEngineService.getStateId( projectInstance.workflowCode, "OffTruck" )
-        
+		def unrackedId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "Unracked" ) )
+		def rerackedId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "Reracked" ) )
+		def stagedId = stateEngineService.getStateId( projectInstance.workflowCode, "Staged" )
+		
+		def swimlane = Swimlane.findByNameAndWorkflow( role, Workflow.findByProcess(projectInstance.workflowCode) )
+		
+		def minSource = swimlane.minSource ? swimlane.minSource : "Release"
+		def minSourceId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, minSource ) )
+		def minTarget = swimlane.minTarget ? swimlane.minTarget : "Staged"
+		def minTargetId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, minTarget ) )
+		
+		def maxSource = swimlane.maxSource ? swimlane.maxSource : "Unracked"
+		def maxSourceId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, maxSource ) )
 		def maxTarget = swimlane.maxTarget ? swimlane.maxTarget : "Reracked"
-		def rerackedId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, maxTarget ) )
-			
-        def stagedId = stateEngineService.getStateId( projectInstance.workflowCode, "Staged" )
-        def maxSource = swimlane.maxSource ? swimlane.maxSource : "Unracked"
-		def unrackedId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, maxSource ) )
-		def releasedId = stateEngineService.getStateId( projectInstance.workflowCode, "Release" )
-        def holdId = stateEngineService.getStateId( projectInstance.workflowCode, "Hold" )
+		def maxTargetId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, maxTarget ) )
+        
+		
+		
         def queryForConsole = new StringBuffer("select max(at.date_created) as dateCreated, ae.asset_entity_id as id, ae.priority, "+
 						"ae.asset_tag as assetTag, ae.asset_name as assetName, ae.source_team_id as sourceTeamMt, ae.target_team_id as " + 
 						"targetTeamMt, pm.current_state_id as currentState, min(cast(at.state_to as UNSIGNED INTEGER)) as minstate FROM asset_entity ae " +
@@ -102,17 +112,17 @@ class SupervisorConsoleService {
 				
 				switch( assetStatus ) {
 				
-					case "source_avail" 		: queryForConsole.append(" and pm.current_state_id >= $releasedId and pm.current_state_id < $unrackedId ")
+					case "source_avail" 		: queryForConsole.append(" and pm.current_state_id >= $minSourceId and pm.current_state_id < $maxSourceId ")
 										  		  break;
-					case "source_done"  		: queryForConsole.append(" and pm.current_state_id >= $unrackedId ")
+					case "source_done"  		: queryForConsole.append(" and pm.current_state_id >= $maxSourceId ")
 										  		  break;
-					case "target_avail" 		: queryForConsole.append(" and pm.current_state_id >= $stagedId and pm.current_state_id < $rerackedId")
+					case "target_avail" 		: queryForConsole.append(" and pm.current_state_id >= $minTargetId and pm.current_state_id < $maxTargetId")
 										          break;
-					case "target_done"  		: queryForConsole.append(" and pm.current_state_id >= $rerackedId ")
+					case "target_done"  		: queryForConsole.append(" and pm.current_state_id >= $maxTargetId ")
 										          break;
-					case "source_pend"  		: queryForConsole.append(" and (pm.current_state_id < $releasedId or pm.current_state_id is null) ")
+					case "source_pend"  		: queryForConsole.append(" and (pm.current_state_id < $minSourceId or pm.current_state_id is null) ")
 					  					          break;
-					case "target_pend"  		: queryForConsole.append(" and (pm.current_state_id < $stagedId or pm.current_state_id is null) ")
+					case "target_pend"  		: queryForConsole.append(" and (pm.current_state_id < $minTargetId or pm.current_state_id is null) ")
 					  					          break;
 					case "source_pend_clean"  	: queryForConsole.append(" and (pm.current_state_id < $unrackedId or pm.current_state_id is null) ")
 					  							  break;

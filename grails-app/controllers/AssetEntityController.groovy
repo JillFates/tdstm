@@ -1133,14 +1133,12 @@ class AssetEntityController {
 			def holdId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "Hold" ) )
 			def releasedId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "Release" ) )
 			
-			def unrackingId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "Unracking" ) )
 			def unrackedId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "Unracked" ) )
 			
 			def cleanedId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "Cleaned" ) )
 			def onCartId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "OnCart" ) )
 			def stagedId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "Staged" ) )
 			
-			def rerackingId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "Reracking" ) )
 			def rerackedId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "Reracked" ) )
 			
 			def onTruckId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "OnTruck" ) )
@@ -1171,6 +1169,13 @@ class AssetEntityController {
 			projectTeamList.each{ projectTeam->
 				def swimlane = Swimlane.findByNameAndWorkflow(projectTeam.role ? projectTeam.role : "MOVE_TECH", Workflow.findByProcess(projectInstance.workflowCode) )
 				
+				def minSource = swimlane.minSource ? swimlane.minSource : "Release"
+				def minSourceId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, minSource ) )
+				
+				def minTarget = swimlane.minTarget ? swimlane.minTarget : "Staged"
+				def minTargetId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, minTarget ) )
+				
+				
 				def maxSource = swimlane.maxSource ? swimlane.maxSource : "Unracked"
 				def maxSourceId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, maxSource ) )
 				
@@ -1189,13 +1194,13 @@ class AssetEntityController {
 
 				def sourceAssets = sourceAssetsList.size()
 					
-				def sourcePendAssets = sourceAssetsList.findAll{it.currentStatus < releasedId || !it.currentStatus }.size()
+				def sourcePendAssets = sourceAssetsList.findAll{it.currentStatus < minSourceId || !it.currentStatus }.size()
 
-				def unrackingAssets = sourceAssetsList.findAll{it.currentStatus == unrackingId }.size()
+				def sourceProcessAssets = sourceAssetsList.findAll{it.currentStatus > minSourceId && it.currentStatus < maxSourceId }.size()
 				
-				def unrackedAssets = sourceAssetsList.findAll{it.currentStatus >= maxSourceId }.size()
+				def maxSourceAssets = sourceAssetsList.findAll{it.currentStatus >= maxSourceId }.size()
 		            	
-				def sourceAvailassets = sourceAssetsList.findAll{it.currentStatus >= releasedId && it.currentStatus < maxSourceId }.size() 
+				def sourceAvailassets = sourceAssetsList.findAll{it.currentStatus >= minSourceId && it.currentStatus < maxSourceId }.size() 
 
 				if(projectTeam?.role == "CLEANER"){
 					
@@ -1205,7 +1210,7 @@ class AssetEntityController {
 					
 					unrackingAssets = bundleAssetsList.findAll{ it.currentStatus == maxSourceId }.size()
 					
-					unrackedAssets = bundleAssetsList.findAll{ it.currentStatus >= cleanedId }.size()
+					maxSourceAssets = bundleAssetsList.findAll{ it.currentStatus >= cleanedId }.size()
 						
 					sourceAvailassets = bundleAssetsList.findAll{ it.currentStatus == maxSourceId }.size()
 					
@@ -1213,13 +1218,13 @@ class AssetEntityController {
 				def targetAssetsList = bundleAssetsList.findAll{it[targetTeamType.get(teamRole)]?.id == teamId }
 		        def targetAssets = targetAssetsList.size()
 		            
-		        def targetPendAssets = targetAssetsList.findAll{it.currentStatus < stagedId || !it.currentStatus }.size()
+		        def targetPendAssets = targetAssetsList.findAll{it.currentStatus < minTargetId || !it.currentStatus }.size()
 		            	
-		        def rerackingAssets = targetAssetsList.findAll{it.currentStatus == rerackingId }.size() 
+				def targetProcessAssets = targetAssetsList.findAll{it.currentStatus > minTargetId && it.currentStatus < maxTargetId }.size()
 				
-				def rerackedAssets = targetAssetsList.findAll{it.currentStatus >= maxTargetId }.size()
+				def maxTargetAssets = targetAssetsList.findAll{it.currentStatus >= maxTargetId }.size()
 		            	
-		        def targetAvailAssets = targetAssetsList.findAll{it.currentStatus >= stagedId && it.currentStatus < maxTargetId }.size()
+		        def targetAvailAssets = targetAssetsList.findAll{it.currentStatus >= minTargetId && it.currentStatus < maxTargetId }.size()
 
 				def latestAssetCreated = AssetTransition.findAll("FROM AssetTransition a where a.assetEntity = ? and a.projectTeam = ? Order By a.id desc",[projectTeam.latestAsset, projectTeam],[max:1])
 				def elapsedTime = "00:00m"
@@ -1230,26 +1235,26 @@ class AssetEntityController {
 				
 				def headColor = 'done'
 				if(projectTeam.currentLocation != "Target"){
-					if(unrackingAssets > 0 && sourceAssets > 0){
+					if(sourceProcessAssets > 0 && sourceAssets > 0){
 						headColor = 'process'
 					} else if(sourceAvailassets > 0){
 						headColor = 'ready'
-					} else if(sourceAssets != unrackedAssets && sourceAssets > 0){
+					} else if(sourceAssets != maxSourceAssets && sourceAssets > 0){
 						headColor = 'pending'
 					}
 				} else {
-					if(rerackingAssets > 0 && targetAssets > 0){
+					if(targetProcessAssets > 0 && targetAssets > 0){
 						headColor = 'process'
 					} else if(targetAvailAssets > 0){
 						headColor = 'ready'
-					} else if(targetAssets != rerackedAssets && targetAssets > 0){
+					} else if(targetAssets != maxTargetAssets && targetAssets > 0){
 						headColor = 'pending'
 					}
 				}
 		        bundleTeams <<[team:projectTeam,members:member, sourceAssets:sourceAssets, 
-							   unrackedAssets:unrackedAssets, sourceAvailassets:sourceAvailassets , 
+							   maxSourceAssets:maxSourceAssets, sourceAvailassets:sourceAvailassets , 
 							   targetAvailAssets:targetAvailAssets , targetAssets:targetAssets, 
-							   rerackedAssets:rerackedAssets, sourcePendAssets:sourcePendAssets, headColor:headColor,
+							   maxTargetAssets:maxTargetAssets, sourcePendAssets:sourcePendAssets, headColor:headColor,
 							   targetPendAssets:targetPendAssets, elapsedTime:elapsedTime, eventActive : projectTeam.moveBundle.moveEvent?.inProgress  ]
 			}
 								
