@@ -36,8 +36,9 @@
 			<li><a href="#" class="mobmenu">Asset</a></li>
 		</ul>
 	</div>
-		<div class="timebar" ><div id="timebar" ></div></div>
-
+	<div class="timebar" ><div id="timebar" ></div>
+	</div>
+	<div class="mobbodyweb">
       		<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">
       					
 	        <input name="bundleId" type="hidden" value="${bundleId}" />
@@ -71,13 +72,11 @@
 				  <g:link class="tab_deselect" action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"tab":"All"]'>All&nbsp;(${allSize})</g:link>
 				</g:else>
 			</td>
-			<td class="tab_search" style="border-bottom:2px solid #507028;"><input  type="text" size="08" value="" id="search" name="search" autocorrect="off" autocapitalize="off" /></td>
+			<td class="tab_search"><input  type="text" size="08" value="" id="search" name="search" autocorrect="off" autocapitalize="off" /></td>
 		</tr>
 		</table>
 		</div>
-		<br />
-            	<div id="assetTable" style="float:left;width:220px; ">
-           		<div style=" width:220px; ">          
+            	<div id="assetTableDiv" style="float:left;width:220px; ">
              			<table id="assetTable" style="height:80px;">
               				<thead>
                 				<tr>

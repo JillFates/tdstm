@@ -16,7 +16,7 @@
 	}, false);
 
 	function setFocus(){
-	document.bundleTeamAssetForm.search.focus();
+		document.bundleTeamAssetForm.search.focus();
 	}
 	
 	function assetSubmit(searchVal){
@@ -101,8 +101,9 @@
 			<li><a href="#" class="mobmenu">Asset</a></li>
 		</ul>
 	</div>
-		<div class="timebar" ><div id="timebar" ></div></div>
-
+	<div class="timebar" ><div id="timebar" ></div>
+	</div>
+	<div class="mobbody">
       		<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">
       					
 	        <input name="bundleId" type="hidden" value="${bundleId}" />
@@ -119,7 +120,7 @@
 		<div style="float:left; width:220px; margin:2px 0; ">              								
 		<table style="border:0px;width:220px;">
 		<tr>
-			<td style="border:2px solid #507028;"><b>Tasks:</b></td>
+			<td style="border-bottom:2px solid #507028;"><b>Tasks:</b></td>
 			<td id="todoId" class="tab">
 				<g:if test="${tab && tab == 'Todo'}">
 				  <g:link class="tab_select" action="myTasks"  params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link>
@@ -140,8 +141,7 @@
 		</tr>
 		</table>
 		</div> 
-            	<div id="assetTable" style="float:left;width:220px; ">
-           		<div style=" width:220px; ">          
+            	<div id="assetTableDiv" style="float:left;width:220px; ">
              			<table id="assetTable" style="height:80px;">
               				<thead>
                 				<tr>

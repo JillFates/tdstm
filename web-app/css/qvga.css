@@ -1,6 +1,6 @@
 body {
-    background: white;
-    color: black;
+	background: white;
+	color: black;
 	font: 11px "HelveticaNeue-Light","Helvetica Neue",Helvetica,Arial,Verdana,sans-serif;
 }
 .mainbody {
@@ -31,6 +31,11 @@ body {
 
 .mobbody{
 	width:220px;
+	height:auto;
+	margin:0px;
+}
+.mobbodyweb{
+	width:420px;
 	height:auto;
 	margin:0px;
 }
@@ -138,12 +143,6 @@ font-weight: bold;
 	padding-top:0px;
 	text-align: right;
 }
-.tech_head {
-	float:left; 
-	width:200px; 
-	margin-left:13px;
-	background-color:none;
-}
 #mobtitle {
 	height: 25px; 
 	width: 220px;
@@ -229,7 +228,7 @@ a.mobselect {
 	padding:auto 0px;
 }
 .timebar {
-  width:220px;height:5px;background-Color:grey;
+  float:left;width:220px;height:5px;background-Color:grey;
 }
 
 #timebar {
@@ -268,6 +267,7 @@ a.mobselect {
 	width:50px;
 }
 .tab_search {
+	border-bottom:2px solid #507028;
 	padding-top:0px;
 	padding-left:1px;
 	padding-right:0px;
@@ -310,19 +310,6 @@ a.tab_deselect {
 	background:#CCC;
 	padding:2px;
 }
-.sign_out {
-	color: #5b5e5c; 
-	border:1px solid #5b5e5c; 
-	margin:2px 5px 5px 5px; 
-	height:15px; 
-	padding:1px 2px 1px 3px; 
-	width:50px; 
-	background:#aaefb8; 
-	float:left;
-   -webkit-border-radius: 5px;
-   -moz-border-radius: 5px;
-}
-
 .comment_font {
 	font-size: 12px;
 }
