@@ -9,6 +9,7 @@
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 	
 	<g:javascript library="prototype" />
 	<jq:plugin name="jquery.combined" />
@@ -466,15 +467,19 @@ function mySelect(x)
 <body onload="InitData()">
 <div id="serverInfoDialog" title="Server Info" onclick="$('#serverInfoDialog').dialog('close')">
 </div>
-<OBJECT id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C" CODEBASE="${createLinkTo(dir:'resource',file:'TFORMer60.cab')}"></OBJECT>
+<OBJECT id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C" CODEBASE="${createLinkTo(dir:'resource',file:'TFORMer60.cab')}" style="height:1px;"></OBJECT>
 		
 		<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 			<div class="mainbody" style="width: 100%;">
 			<div class="colum_techlogin" style="float: left;">
-			<div style="float: left; width: 97.5%; margin-left: 20px; margin-top:17px;">
-		        	<g:link params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"ct"]' style="height:18px; padding-top:3px; width:45px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">Home</g:link>
-					<g:link action="cleaningAssetTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]' style="height:18px; padding-top:3px; width:60px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;padding:auto 0px;text-align:center;">My Tasks</g:link>
-					<a href="#" style="height:18px; padding-top:3px; width:63px; float:left; margin:auto 0px;color: #5b5e5c; border:1px solid #5b5e5c; margin:0px;background:#aaefb8;padding:auto 0px;text-align:center;">Asset</a>
+				<div class="menu4">
+				<ul>
+					<li><g:link class="mobmenu" controller="clientTeams" params="[projectId:project?.id]">Teams</g:link></li>
+					<li><g:link class="mobmenu" params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"ct"]'>Home</g:link></li>
+					<li><g:link class="mobmenu" action="logisticsMyTasks" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>My Tasks</g:link></li>
+					<li><g:link class="mobmenu mobselect" action="logisticsAssetSearch" params='["bundle":bundle,"menu":"true","team":team,"location":location,"project":project,"user":"ct"]'>Asset</g:link></li>
+				</ul>
+				</div>
 			</div>
 			<div style="float: left; width: 100%; margin: 5px 0;">
 				<g:form	name="assetSearchForm" action="cleaningAssetSearch">
