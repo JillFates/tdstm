@@ -1208,7 +1208,7 @@ class AssetEntityController {
 					
 					sourcePendAssets = bundleAssetsList.findAll{ it.currentStatus < maxSourceId || !it.currentStatus }.size()
 					
-					unrackingAssets = bundleAssetsList.findAll{ it.currentStatus == maxSourceId }.size()
+					sourceProcessAssets = bundleAssetsList.findAll{ it.currentStatus == maxSourceId }.size()
 					
 					maxSourceAssets = bundleAssetsList.findAll{ it.currentStatus >= cleanedId }.size()
 						
