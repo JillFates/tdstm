@@ -27,9 +27,7 @@
 		<div class="message">${flash.message}</div>
 	</g:if>
 	<span style="font: bold 13px arial; float:left;">Select Team to use:</span>
-	<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-		<span class="menuButton"><g:link class="list" action="list" params="[projectId:projectId, viewMode:'mobile']">Mobile Site</g:link></span>
-	</div>
+
 	<div style="margin-top: 5px;" class='list'>
 	<table>
 		<thead><tr>
@@ -68,7 +66,7 @@
 	</div>
         </div>
         </g:form>
-                          	<g:link class="home" action="list" params="[projectId:projectId, viewMode:'mobile']" class="mobbutton" style="width:75px;">Mobile Site</g:link>
+                          	<g:link class="mobbutton" action="list" params="[projectId:projectId, viewMode:'mobile']" class="mobbutton" style="width:75px;">Mobile Site</g:link>
 
 <script type="text/javascript">
    function submitLoginForm( bundleId,teamId,role,location){

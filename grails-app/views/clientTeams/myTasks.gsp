@@ -54,7 +54,7 @@
 		<div style="float:left; width:220px; margin:2px 0; ">              								
 		<table style="border:0px;width:220px;">
 		<tr>
-			<td><b>Tasks:</b></td>
+			<td style="border-bottom:2px solid #507028;"><b>Tasks:</b></td>
 			<td id="todoId" class="tab">
 				<g:if test="${tab && tab == 'Todo'}">
 				  <g:link class="tab_select" action="myTasks"  params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link>
@@ -71,10 +71,11 @@
 				  <g:link class="tab_deselect" action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"tab":"All"]'>All&nbsp;(${allSize})</g:link>
 				</g:else>
 			</td>
-			<td class="tab_search"><input  type="text" size="08" value="" id="search" name="search" autocorrect="off" autocapitalize="off" /></td>
+			<td class="tab_search" style="border-bottom:2px solid #507028;"><input  type="text" size="08" value="" id="search" name="search" autocorrect="off" autocapitalize="off" /></td>
 		</tr>
 		</table>
-		</div> 
+		</div>
+		<br />
             	<div id="assetTable" style="float:left;width:220px; ">
            		<div style=" width:220px; ">          
              			<table id="assetTable" style="height:80px;">
@@ -105,6 +106,7 @@
 			</div>
 		</div>
       		</g:form>
+      		<br />
                           	<g:link class="mobbutton" action="list" params="[projectId:projectId, viewMode:'mobile']" class="mobbutton" style="width:75px;">Mobile Site</g:link>
 	</div>
 <script type="text/javascript">setFocus();</script>

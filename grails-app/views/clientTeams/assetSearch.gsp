@@ -146,9 +146,9 @@
 			</tr>
 	
  			<g:if test="${assetComment}">
-			<tr><td><table style="border:0px; width=100%">
+			<tr><td><table style="border:0px; width=420">
 				<tr>
-					<td style="width:419px"><strong><u>Instructions</u></strong></td>
+					<td style="width:420px"><strong><u>Instructions</u></strong></td>
 					<td><strong><u>Confirm</u></strong></td>
 				</tr>
 				<g:each status="i" in="${assetComment}" var="comments">
@@ -207,7 +207,7 @@
 
 			<div style="margin:2px;" class="reset" ></div>
 
-			<table style"width:420px;">
+			<table style="width:420px;">
 			<tr>
 				<td class="heading"><a href="#detail">Details</a></td>
 				<td><span style="float:right;"><a href="#top">Top</a></span></td>
