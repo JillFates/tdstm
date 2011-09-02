@@ -482,7 +482,7 @@ function mySelect(x)
 				</div>
 			</div>
 			<div style="float: left; width: 100%; margin: 5px 0;">
-				<g:form	name="assetSearchForm" action="cleaningAssetSearch">
+				<g:form	name="assetSearchForm" action="logisticsAssetSearch">
 					<input name="bundle" type="hidden" value="${bundle}" />
 					<input type="hidden" name="printCheck" id="printCheck" value="notprinted"/>
 					<input type="hidden" name="urlPath" id="urlPath" value="<g:createLinkTo dir="resource" file="racking_label.tff" absolute="true"/>"/>
