@@ -81,16 +81,17 @@
               				<thead>
                 				<tr>
                   				<g:sortableColumn class="sort_column" style="width:60px;" action="myTasks" property="asset_tag" title="AssetTag" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
-                  				<g:sortableColumn class="sort_column" style="width:60px;display:none;" action="myTasks" property="asset_name" title="AssetName" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
+                  				<g:sortableColumn class="sort_column" style="width:60px;" action="myTasks" property="asset_name" title="AssetName" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
                   				<g:sortableColumn class="sort_column" style="width:60px;" action="myTasks" property="source_rack" title="Rack/Pos" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
                   				<g:sortableColumn class="sort_column" action="myTasks" property="model" title="Model" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
+                  				<th class="sort_column sortable"><a href="javascript:">Status</a></th>
 						</tr>
 					</thead>
 					<tbody>
 						<g:each status="i" in="${assetList}" var="assetList">
 							<tr class="${assetList.cssVal}"  onclick="assetSubmit('${assetList?.item?.assetTag}');">
 								<td class="asset_details_block">${assetList?.item?.assetTag}</td>
-								<td class="asset_details_block col2" style="display:none;">${assetList?.item?.assetName}</td>
+								<td class="asset_details_block col2">${assetList?.item?.assetName}</td>
 								<g:if test="${location == 's'}">
 								<td class="asset_details_block">${assetList?.item?.sourceRack}/${assetList?.item?.sourceRackPosition}</td>
 								</g:if>
@@ -98,6 +99,7 @@
 								<td class="asset_details_block">${assetList?.item?.targetRack}/${assetList?.item?.targetRackPosition}</td>
 								</g:else>
 								<td class="asset_details_block">${assetList?.item?.model}</td>
+								<td class="asset_details_block">${assetList?.nextStatus}</td>
 							</tr>
 						</g:each>
 					</tbody>

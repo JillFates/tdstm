@@ -206,7 +206,7 @@ class ClientTeamsController {
 		flash.message = ""
         def holdState = stateEngineService.getStateIdAsInt( workflowCode, "Hold" ) 
 		
-        def countQuery = """select a.asset_entity_id as id, a.asset_tag as assetTag, a.source_rack as sourceRack, 
+        def countQuery = """select a.asset_entity_id as id, a.asset_tag as assetTag, a.asset_name as assetName, a.source_rack as sourceRack, 
 						a.source_rack_position as sourceRackPosition, a.target_rack as targetRack,
 			            min(cast(t.state_to as UNSIGNED INTEGER)) as minstate,
 			            a.target_rack_position as targetRackPosition, m.name as model, p.current_state_id as currentStateId 
@@ -276,8 +276,19 @@ class ClientTeamsController {
             	colorCss = "asset_pending"
 				sortOrder = 4
             }
-            assetList << [ item:it, cssVal:colorCss, sortOrder:sortOrder ]
+			def stateValue = stateEngineService.getState(workflow.process , it.currentStateId)
+		
+			def currentStateId = it.currentStateId
+			
+			def taskLists = stateEngineService.getTasks(workflow.process , role , stateValue)?.findAll{
+										stateEngineService.getStateIdAsInt(workflow.process , it) > currentStateId }
+
+			def nextStatus = taskLists.size() > 0 ? taskLists[0] : ""
+			  
+            assetList << [ item:it, cssVal:colorCss, sortOrder:sortOrder , nextStatus : nextStatus ]
+			
         }
+		   
 		assetList.sort {
 			it.sortOrder
 		}
@@ -289,6 +300,7 @@ class ClientTeamsController {
         if(!flash.message){
         	flash.message = message
         }
+		
         if (viewMode !='web'){
             render (view:'myTasks_m', model:[ bundleId:bundleId, teamId:teamId, projectId:params.projectId, location:params.location, 
                     assetList:assetList, allSize:allSize, todoSize:todoSize, 'tab':tab])
@@ -430,7 +442,8 @@ class ClientTeamsController {
 							   return;
 						   }
 					   }
-					   taskList = stateEngineService.getTasks ( moveBundleInstance.project.workflowCode, loginTeam.role, stateVal )
+					   taskList = stateEngineService.getTasks ( moveBundleInstance.project.workflowCode, loginTeam.role, stateVal )?.findAll{
+										stateEngineService.getStateIdAsInt(moveBundleInstance.project.workflowCode, it) > stateEngineService.getStateIdAsInt(moveBundleInstance.project.workflowCode , stateVal)}
 					   taskSize = taskList.size()
 					   if ( taskSize == 1 ) {
 						   if ( taskList.contains ( "Hold" ) ) {
