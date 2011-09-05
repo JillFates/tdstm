@@ -614,7 +614,7 @@ function onInvokeAction(id) {
 											<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_done')"><u>${bundleTeam?.maxSourceAssets}<span style="font-weight: normal;">dn</span></u></a> = 
 											<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','')"><u>${bundleTeam?.sourceAssets}</u></a>
 											<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
-											<a title="Login as.." href="#" onclick="window.open('../clientTeams/home?bundleId=${moveBundleInstance.id}&teamId=${bundleTeam?.team?.id}&location=source7&viewMode=mobile','mtwindow','menubar=1,resizable=1,scrollbars=1,width=230,height=480'); ">@</a>
+											<a title="Login as.." href="#" onclick="window.open('../clientTeams/home?bundleId=${moveBundleInstance.id}&teamId=${bundleTeam?.team?.id}&location=source&viewMode=mobile','mtwindow','menubar=1,resizable=1,scrollbars=1,width=230,height=480'); ">@</a>
 											</jsec:lacksAllRoles>
 										</g:else>
 									</td>

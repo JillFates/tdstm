@@ -14,9 +14,9 @@ class Swimlane {
 		actorId( blank:false, nullable:false )
 		name( blank:false, nullable:false )
 		workflow( blank:false, nullable:false )
-		maxSource( blank:true, nullable:true )
+		maxSource( blank:false, nullable:false )
 		maxTarget( blank:false, nullable:false )
-		minSource( blank:true, nullable:true )
+		minSource( blank:false, nullable:false )
 		minTarget( blank:false, nullable:false )
 	}
 	
