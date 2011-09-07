@@ -33,7 +33,7 @@
 				<ul>
 					<li><g:link class="mobmenu" controller="clientTeams" params="['projectId':projectId]">Teams</g:link></li>
 		        		<li><a href="#" class="mobmenu mobselect">Home</a></li>
-					<li><g:link class="mobmenu" action="logisticsMyTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"tab":"Todo"]'>My Tasks</g:link></li>
+					<li><g:link class="mobmenu" action="logisticsMyTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"tab":"Todo"]'>Tasks</g:link></li>
 					<li><g:link class="mobmenu" action="logisticsAssetSearch" params='["bundleId":bundleId,"menu":"true","teamId":teamId,"location":location,"projectId":projectId,"user":"ct"]'>Asset</g:link></li>
 				</ul>
 				</div>

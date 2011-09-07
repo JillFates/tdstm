@@ -1,10 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta name="layout" content="projectHeader" />
-<title>Asset</title>
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+	<meta name="layout" content="projectHeader" />
+	<title>Asset</title>
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 
 <script language="JavaScript" type="text/javascript">
 	/*--------------------------------------------------------
@@ -119,9 +119,9 @@ function retrieve_field(obj) {
 	</script>
 <script type="text/javascript">
 	$(document).ready(function() {
-	$("#serverInfoDialog").dialog({ autoOpen: false })	       
+		$("#serverInfoDialog").dialog({ autoOpen: false })
 	})
-	</script>
+</script>
 <script type="text/javascript" language="Javascript1.2">var sHint = "C:\\temp\\output";
 //=============================================================================
 // PRINT HERE
@@ -456,160 +456,118 @@ function mySelect(x)
     </script>
 </head>
 <body>
-	<div id="serverInfoDialog" title="Server Info"
-		onclick="$('#serverInfoDialog').dialog('close')"></div>
+	<div id="serverInfoDialog" title="Server Info" onclick="$('#serverInfoDialog').dialog('close')"></div>
 	<OBJECT id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C"
 		CODEBASE="${createLinkTo(dir:'resource',file:'TFORMer60.cab')}"
 		style="height: 1px;"></OBJECT>
-
-	<div id="spinner" class="spinner" style="display: none;">
-		<img src="${createLinkTo(dir:'images',file:'spinner.gif')}"
-			alt="Spinner" />
-	</div>
 	<div class="mainbody" style="width: 100%;">
-		<div class="colum_techlogin" style="float: left;">
-			<div class="menu4">
-				<ul>
-					<li><g:link class="mobmenu" controller="clientTeams"
-							params="[projectId:projectId]">Teams</g:link>
-					</li>
-					<li><g:link class="mobmenu"
-							params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"user":"ct"]'>Home</g:link>
-					</li>
-					<li><g:link class="mobmenu" action="logisticsMyTasks"
-							params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"tab":"Todo"]'>My Tasks</g:link>
-					</li>
-					<li><g:link class="mobmenu mobselect"
-							action="logisticsAssetSearch"
-							params='["bundleId":bundleId,"menu":"true","teamId":teamId,"location":location,"projectId":projectId,"user":"ct"]'>Asset</g:link>
-					</li>
-				</ul>
-			</div>
+	<div class="menu4">
+		<ul>
+			<li><g:link class="mobmenu" controller="clientTeams" params="[projectId:projectId]">Teams</g:link></li>
+			<li><g:link class="mobmenu" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"user":"ct"]'>Home</g:link></li>
+			<li><g:link class="mobmenu" action="logisticsMyTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"tab":"Todo"]'>Tasks</g:link></li>
+			<li><g:link class="mobmenu mobselect" action="logisticsAssetSearch" params='["bundleId":bundleId,"menu":"true","teamId":teamId,"location":location,"projectId":projectId,"user":"ct"]'>Asset</g:link></li>
+		</ul>
+	</div>
+	</div>
+	<div style="float: left; width: 100%; margin: 5px 0;">
+		<g:form name="assetSearchForm" action="logisticsAssetSearch">
+			<input name="bundleId" type="hidden" value="${bundleId}" />
+			<input type="hidden" name="printCheck" id="printCheck" value="notprinted" />
+			<input type="hidden" name="urlPath" id="urlPath" value="<g:createLinkTo dir="resource" file="racking_label.tff" absolute="true"/>" />
+			<input name="teamId" type="hidden" value="${teamId}" />
+			<input name="location" type="hidden" value="${location}" />
+			<input name="projectId" type="hidden" value="${projectId}" />
+			<input name="search" type="hidden" value="${search}" />
+			<input name="label" type="hidden" value="${label}" />
+			<input name="actionLabel" type="hidden" value="${actionLabel}" />
+			<input name="user" type="hidden" value="ct" />
+			<input name="assetPage" type="hidden" value="assetPage" />
+			<input name="serverName" type="hidden" value="${projMap?.asset?.assetName}" />
+			<input name="model" type="hidden" value="${projMap?.asset?.model}" />
+			<input name="cart" type="hidden" value="${projMap?.asset?.cart}" />
+			<input name="shelf" type="hidden" value="${projMap?.asset?.shelf}" />
+			<input name="room" type="hidden" value="${projMap?.asset?.targetRoom}" />
+			<input name="rack" type="hidden" value="${projMap?.asset?.targetRack}" />
+			<input name="upos" type="hidden" value="${projMap?.asset?.targetRackPosition}" />
+			<input name="assetTag" type="hidden" value="${projMap?.asset?.assetTag}" />
+			<input name="cartQty" type="hidden" value="${cartQty}" />
+			<input name="similarComment" id="similarComment" type="hidden" value="nosimilar" />
+		<div style="float: right; margin-right: 10px; margin-top: -20px;">
+			<input type="text" name="textSearch" id="textSearchId" size="10" />&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}" />
 		</div>
-		<div style="float: left; width: 100%; margin: 5px 0;">
-			<g:form name="assetSearchForm" action="logisticsAssetSearch">
-				<input name="bundleId" type="hidden" value="${bundleId}" />
-				<input type="hidden" name="printCheck" id="printCheck"
-					value="notprinted" />
-				<input type="hidden" name="urlPath" id="urlPath"
-					value="<g:createLinkTo dir="resource" file="racking_label.tff" absolute="true"/>" />
-				<input name="teamId" type="hidden" value="${teamId}" />
-				<input name="location" type="hidden" value="${location}" />
-				<input name="projectId" type="hidden" value="${projectId}" />
-				<input name="search" type="hidden" value="${search}" />
-				<input name="label" type="hidden" value="${label}" />
-				<input name="actionLabel" type="hidden" value="${actionLabel}" />
-				<input name="user" type="hidden" value="ct" />
-				<input name="assetPage" type="hidden" value="assetPage" />
-				<input name="serverName" type="hidden"
-					value="${projMap?.asset?.assetName}" />
-				<input name="model" type="hidden" value="${projMap?.asset?.model}" />
-				<input name="cart" type="hidden" value="${projMap?.asset?.cart}" />
-				<input name="shelf" type="hidden" value="${projMap?.asset?.shelf}" />
-				<input name="room" type="hidden"
-					value="${projMap?.asset?.targetRoom}" />
-				<input name="rack" type="hidden"
-					value="${projMap?.asset?.targetRack}" />
-				<input name="upos" type="hidden"
-					value="${projMap?.asset?.targetRackPosition}" />
-				<input name="assetTag" type="hidden"
-					value="${projMap?.asset?.assetTag}" />
-				<input name="cartQty" type="hidden" value="${cartQty}" />
-				<input name="similarComment" id="similarComment" type="hidden"
-					value="nosimilar" />
-
-				<div style="float: right; margin-right: 10px; margin-top: -20px;">
-					<input type="text" name="textSearch" id="textSearchId" size="10" />&nbsp;<img
-						src="${createLinkTo(dir:'images',file:'search.png')}" />
-				</div>
-				<div id="mydiv" onclick='$("#mydiv").hide()'>
-					<g:if test="${flash.message}">
-						<div style="color: red;">
-							<ul>
-								<li>${flash.message}</li>
-								<g:each status="i" in="${issuecomments}" var="comments">
-									<g:if test="${assetIssueCommentListSize == 1}">
-										<dl>
-											<dt></dt>
-											<dd>${comments}</dd>
-										</dl>
-									</g:if>
-									<g:else>
-										<dl>
-											<dt></dt>
-											<dd>${comments}&nbsp;( reason ${i+1} )</dd>
-										</dl>
-									</g:else>
-								</g:each>
-							</ul>
-						</div>
-					</g:if>
-				</div>
-				<div
-					style="width: 100%; height: auto; border: 1px solid #5F9FCF; margin-top: 10px; padding: 10px 0;">
-					<span
-						style="position: absolute; text-align: center; width: auto; margin: -17px 0 0 10px; padding: 0px 8px; background: #ffffff;"><b>Asset
-							Details</b>
-					</span>
-
-					<g:if test="${projMap}">
-						<dl>
-							<dt style="margin-left: 10px;">Asset Tag:</dt>
-							<dd>${projMap?.asset?.assetTag}</dd>
-							<dt style="margin-top: 8px; margin-left: 10px;">Asset Name:</dt>
-							<dd style="margin-top: 8px;">${projMap?.asset?.assetName}</dd>
-							<dt style="margin-top: 8px; margin-left: 10px;">Manufacturer:</dt>
-							<dd style="margin-top: 8px; min-width: 25px;">
-								${projMap?.asset?.manufacturer}</dd>
-							<dt style="margin-top: 8px; margin-left: 10px;">Model:</dt>
-							<dd style="margin-top: 8px;">${projMap?.asset?.model}</dd>
-							<dt style="margin-top: 8px; margin-left: 10px;">Unrack Team:</dt>
-							<dd style="margin-top: 8px;">${teamMembers}</dd>
-							<dt style="margin-top: 8px; margin-left: 10px;">Cart/Shelf:</dt>
-							<dd style="margin-top: 8px;">
-								${projMap?.asset?.cart}/${projMap?.asset?.shelf}</dd>
-							<dt style="margin-top: 8px; margin-left: 10px;">Current
-								State:</dt>
-							<dd style="margin-top: 8px;">${stateVal}</dd>
-						</dl>
+		<div id="mydiv" onclick="$('#mydiv').hide();setFocus();">						            
+			<g:if test="${flash.message}">
+				<div style="color: red;float: left;">
+				<ul><li>${flash.message}</li>					
+				<g:each status="i" in="${issuecomments}" var="comments">
+					<g:if test="${assetIssueCommentListSize == 1}">
+						<dl><dt></dt><dd>${comments}</dd></dl>
 					</g:if>
 					<g:else>
-						<dl>
-							<dt style="margin-left: 10px;">Asset Tag:</dt>
-							<dd>&nbsp;</dd>
-							<dt style="margin-left: 10px;">Asset Name:</dt>
-							<dd>&nbsp;</dd>
-							<dt style="margin-left: 10px;">Manufacturer:</dt>
-							<dd>&nbsp;</dd>
-							<dt style="margin-left: 10px;">Model:</dt>
-							<dd>&nbsp;</dd>
-							<dt style="margin-left: 10px;">Unrack Team:</dt>
-							<dd>&nbsp;</dd>
-							<dt style="margin-left: 10px;">Cart/Shelf:</dt>
-							<dd>&nbsp;</dd>
-							<dt style="margin-left: 10px;">Current State:</dt>
-							<dd>&nbsp;</dd>
-						</dl>
+					    	<dl><dt></dt><dd>${comments}&nbsp;( reason ${i+1} )</dd></dl>
 					</g:else>
+				</g:each>
+				</ul>
 				</div>
-				<g:if test="${browserTest == true}">
-					<div style="color: red;">
-						<ul>
-							<li>Please note that in order to print barcode labels you
-								will need to use the Internet Explorer browser</li>
-						</ul>
-					</div>
-				</g:if>
-				<div
-					style="width: 100%; height: auto; border: 1px solid #5F9FCF; margin-top: 10px; padding: 10px 0;">
-					<span
-						style="position: absolute; text-align: center; width: auto; margin: -17px 0 0 10px; padding: 0px 8px; background: #ffffff;"><b>Label
+			</g:if>
+		</div>
+		<div style="width: 100%; height: auto; border: 1px solid #5F9FCF; margin-top: 10px; padding: 10px 0;">
+		<span style="position: absolute; text-align: center; width: auto; margin: -17px 0 0 10px; padding: 0px 8px; background: #ffffff;"><b>Asset Details</b></span>
+
+			<g:if test="${projMap}">
+			<dl>
+				<dt style="margin-left: 10px;">Asset Tag:</dt>
+				<dd>${projMap?.asset?.assetTag}</dd>
+				<dt style="margin-top: 8px; margin-left: 10px;">Asset Name:</dt>
+				<dd style="margin-top: 8px;">${projMap?.asset?.assetName}</dd>
+				<dt style="margin-top: 8px; margin-left: 10px;">Manufacturer:</dt>
+				<dd style="margin-top: 8px; min-width: 25px;">${projMap?.asset?.manufacturer}</dd>
+				<dt style="margin-top: 8px; margin-left: 10px;">Model:</dt>
+				<dd style="margin-top: 8px;">${projMap?.asset?.model}</dd>
+				<dt style="margin-top: 8px; margin-left: 10px;">Unrack Team:</dt>
+				<dd style="margin-top: 8px;">${teamMembers}</dd>
+				<dt style="margin-top: 8px; margin-left: 10px;">Cart/Shelf:</dt>
+				<dd style="margin-top: 8px;">${projMap?.asset?.cart}/${projMap?.asset?.shelf}</dd>
+				<dt style="margin-top: 8px; margin-left: 10px;">Current State:</dt>
+				<dd style="margin-top: 8px;">${stateVal}</dd>
+			</dl>
+			</g:if>
+			<g:else>
+			<dl>
+				<dt style="margin-left: 10px;">Asset Tag:</dt>
+				<dd>&nbsp;</dd>
+				<dt style="margin-left: 10px;">Asset Name:</dt>
+				<dd>&nbsp;</dd>
+				<dt style="margin-left: 10px;">Manufacturer:</dt>
+				<dd>&nbsp;</dd>
+				<dt style="margin-left: 10px;">Model:</dt>
+				<dd>&nbsp;</dd>
+				<dt style="margin-left: 10px;">Unrack Team:</dt>
+				<dd>&nbsp;</dd>
+				<dt style="margin-left: 10px;">Cart/Shelf:</dt>
+				<dd>&nbsp;</dd>
+				<dt style="margin-left: 10px;">Current State:</dt>
+				<dd>&nbsp;</dd>
+			</dl>
+			</g:else>
+		</div>
+		<g:if test="${browserTest == true}">
+			<div style="color: red;">
+				<ul>
+					<li>Please note that in order to print barcode labels you
+						will need to use the Internet Explorer browser</li>
+				</ul>
+			</div>
+		</g:if>
+		<div style="width: 100%; height: auto; border: 1px solid #5F9FCF; margin-top: 10px; padding: 10px 0;">
+			<span style="position: absolute; text-align: center; width: auto; margin: -17px 0 0 10px; padding: 0px 8px; background: #ffffff;"><b>Label
 							Printing</b>
-					</span>
-					<table style="margin-top: 10px; border: 0px;">
-						<g:if test="${projMap && browserTest != true}">
-							<tr>
-								<td style="width: 85%;"><b>Quantity: </b><select
+			</span>
+			<table style="margin-top: 10px; border: 0px;">
+			<g:if test="${projMap && browserTest != true}">
+				<tr>
+					<td style="width: 85%;"><b>Quantity: </b><select
 									name="labels" id="labelQuantity"
 									onkeyup="if(event.keyCode == 13 ){startprintjob();}">
 										<option value="1">1</option>

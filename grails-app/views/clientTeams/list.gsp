@@ -74,7 +74,7 @@
 	form.teamId.value = teamId;
 	form.location.value = location;
 	if(role == "CLEANER"){
-		form.action = "logisticsHome"
+		form.action = "logisticsHome";
 	}
 	form.submit();
 }

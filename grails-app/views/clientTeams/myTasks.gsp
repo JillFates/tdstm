@@ -26,7 +26,6 @@
 </script>      
 </head>
 <body>
-	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody">
 	<div class="menu4">
 		<ul>
@@ -36,18 +35,16 @@
 			<li><a href="#" class="mobmenu">Asset</a></li>
 		</ul>
 	</div>
-	<div class="timebar" ><div id="timebar" ></div>
-	</div>
+	<div class="timebar" ><div id="timebar" ></div></div>
 	<div class="mobbodyweb">
       		<g:form method="post" name="bundleTeamAssetForm" action="assetSearch">
-      					
-	        <input name="bundleId" type="hidden" value="${bundleId}" />
-		<input name="teamId" type="hidden" value="${teamId}" />
-		<input name="location" type="hidden" value="${location}" />
-		<input name="projectId" type="hidden" value="${projectId}" />
-		<input name="tab" type="hidden" value="${tab}" />								              	
-		<div id="mydiv" onclick="this.style.display = 'none';setFocus()">						            
- 			<g:if test="${flash.message}">
+			<input name="bundleId" type="hidden" value="${bundleId}" />
+			<input name="teamId" type="hidden" value="${teamId}" />
+			<input name="location" type="hidden" value="${location}" />
+			<input name="projectId" type="hidden" value="${projectId}" />
+			<input name="tab" type="hidden" value="${tab}" />								              	
+		<div id="mydiv" onclick="this.style.display = 'none';setFocus();">						            
+			<g:if test="${flash.message}">
 				<br />
 				<div style="color: red;"><ul>${flash.message}</ul></div>
 			</g:if> 
@@ -76,39 +73,39 @@
 		</tr>
 		</table>
 		</div>
-            	<div id="assetTableDiv" style="float:left;width:220px; ">
-             			<table id="assetTable" style="height:80px;">
-              				<thead>
-                				<tr>
-                  				<g:sortableColumn class="sort_column" style="width:60px;" action="myTasks" property="asset_tag" title="AssetTag" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
-                  				<g:sortableColumn class="sort_column" style="width:60px;" action="myTasks" property="asset_name" title="AssetName" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
-                  				<g:sortableColumn class="sort_column" style="width:60px;" action="myTasks" property="source_rack" title="Rack/Pos" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
-                  				<g:sortableColumn class="sort_column" action="myTasks" property="model" title="Model" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
-                  				<th class="sort_column sortable"><a href="javascript:">Status</a></th>
-						</tr>
-					</thead>
-					<tbody>
-						<g:each status="i" in="${assetList}" var="assetList">
-							<tr class="${assetList.cssVal}"  onclick="assetSubmit('${assetList?.item?.assetTag}');">
-								<td class="asset_details_block">${assetList?.item?.assetTag}</td>
-								<td class="asset_details_block col2">${assetList?.item?.assetName}</td>
-								<g:if test="${location == 's'}">
-								<td class="asset_details_block">${assetList?.item?.sourceRack}/${assetList?.item?.sourceRackPosition}</td>
-								</g:if>
-								<g:else>
-								<td class="asset_details_block">${assetList?.item?.targetRack}/${assetList?.item?.targetRackPosition}</td>
-								</g:else>
-								<td class="asset_details_block">${assetList?.item?.model}</td>
-								<td class="asset_details_block">${assetList?.nextStatus}</td>
-							</tr>
-						</g:each>
-					</tbody>
-				</table>
-			</div>
+		<div id="assetTableDiv" style="float:left;width:220px; ">
+			<table id="assetTable" style="height:80px;">
+			<thead>
+				<tr>
+					<g:sortableColumn class="sort_column" style="width:60px;" action="myTasks" property="asset_tag" title="AssetTag" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:60px;" action="myTasks" property="asset_name" title="AssetName" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:60px;" action="myTasks" property="source_rack" title="Rack/Pos" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" action="myTasks" property="model" title="Model" params="['bundleId':bundleId, 'teamId':teamId, 'tab':tab,'location':location,'projectId':projectId ]"></g:sortableColumn>
+					<th class="sort_column sortable"><a href="javascript:">Status</a></th>
+				</tr>
+			</thead>
+			<tbody>
+			<g:each status="i" in="${assetList}" var="assetList">
+				<tr class="${assetList.cssVal}"  onclick="assetSubmit('${assetList?.item?.assetTag}');">
+					<td class="asset_details_block">${assetList?.item?.assetTag}</td>
+					<td class="asset_details_block col2">${assetList?.item?.assetName}</td>
+					<g:if test="${location == 's'}">
+						<td class="asset_details_block">${assetList?.item?.sourceRack}/${assetList?.item?.sourceRackPosition}</td>
+					</g:if>
+					<g:else>
+						<td class="asset_details_block">${assetList?.item?.targetRack}/${assetList?.item?.targetRackPosition}</td>
+					</g:else>
+					<td class="asset_details_block">${assetList?.item?.model}</td>
+					<td class="asset_details_block">${assetList?.nextStatus}</td>
+				</tr>
+			</g:each>
+			</tbody>
+			</table>
+		</div>
 		</div>
       		</g:form>
       		<br />
-                          	<g:link class="mobbutton" action="list" params="[projectId:projectId, viewMode:'mobile']" class="mobbutton" style="width:75px;">Mobile Site</g:link>
+		<g:link class="mobbutton" action="list" params="[projectId:projectId, viewMode:'mobile']" class="mobbutton" style="width:75px;float:left;">Mobile Site</g:link>
 	</div>
 <script type="text/javascript">setFocus();</script>
 </body>

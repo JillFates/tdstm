@@ -85,8 +85,7 @@
 	form.teamId.value = teamId;
 	form.location.value = location;
 	if(role == "CLEANER"){
-		form.username.value = "ct-"+ bundleId+"-"+teamId+"-s"
-		form.action = "../moveTech/signIn"
+		form.action = "logisticsHome";
 	}
 	form.submit();
 }
