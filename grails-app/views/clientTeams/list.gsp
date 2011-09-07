@@ -13,7 +13,6 @@
         <input type="hidden" name="teamId" id="teamId"/>
         <input type="hidden" name="location" id="locationId"/>
         <input type="hidden" name="projectId" value="${projectId}"/>
-        <input type="hidden" name="username" id="usernameId" value="${projectId}"/>
     <div class="body">
 	<div class="menu4">
 		<ul>
@@ -75,7 +74,6 @@
 	form.teamId.value = teamId;
 	form.location.value = location;
 	if(role == "CLEANER"){
-		form.username.value = "ct-"+ bundleId+"-"+teamId+"-s"
 		form.action = "logisticsHome"
 	}
 	form.submit();

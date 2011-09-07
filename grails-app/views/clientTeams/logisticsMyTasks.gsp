@@ -40,25 +40,25 @@
 			<div class="colum_techlogin" style="float:left;">
 				<div class="menu4">
 				<ul>
-					<li><g:link class="mobmenu" controller="clientTeams" params="[projectId:project?.id]">Teams</g:link></li>
-					<li><g:link class="mobmenu" params='["bundle":bundle,"team":team,"location":location,"project":project,"user":"ct"]'>Home</g:link></li>
-					<li><g:link class="mobmenu mobselect" action="logisticsMyTask" params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>My Tasks</g:link></li>
-					<li><g:link class="mobmenu" action="logisticsAssetSearch" params='["bundle":bundle,"menu":"true","team":team,"location":location,"project":project,"user":"ct"]'>Asset</g:link></li>
+					<li><g:link class="mobmenu" controller="clientTeams" params="[projectId:projectId]">Teams</g:link></li>
+					<li><g:link class="mobmenu" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"user":"ct"]'>Home</g:link></li>
+					<li><g:link class="mobmenu mobselect" action="logisticsMyTask" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"tab":"Todo"]'>My Tasks</g:link></li>
+					<li><g:link class="mobmenu" action="logisticsAssetSearch" params='["bundleId":bundleId,"menu":"true","teamId":teamId,"location":location,"projectId":projectId,"user":"ct"]'>Asset</g:link></li>
 				</ul>
 				</div>
 			</div>			
 			<div class="w_techlog" style="margin-top:15px; height:auto;">				
       			<g:form method="post" name="bundleTeamAssetForm" action="logisticsAssetSearch">      					
-					<input name="bundle" type="hidden" value="${bundle}" />
-					<input name="team" type="hidden" value="${team}" />
+					<input name="bundleId" type="hidden" value="${bundleId}" />
+					<input name="teamId" type="hidden" value="${teamId}" />
 					<input name="location" type="hidden" value="${location}" />
-					<input name="project" type="hidden" value="${project}" />
+					<input name="projectId" type="hidden" value="${projectId}" />
 					<input name="tab" type="hidden" value="${tab}" />								              	
 			<div style="float:left; width:100%; margin:5px 0; ">              								
               		<table style="border:0px;">
 					<tr>
-					<td id="todoId"><g:link style="color: #5b5e5c; border:1px solid #5b5e5c; margin:5px;background:#aaefb8;padding:2px;" action="logisticsMyTasks"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link></td>
-					<td id="allId"><g:link  style="color: #5b5e5c; border:1px solid #5b5e5c; margin:5px;padding:2px;margin-right:300px;" action="logisticsMyTasks"  params='["bundle":bundle,"team":team,"location":location,"project":project,"tab":"All"]'>All&nbsp;(${allSize})</g:link></td>
+					<td id="todoId"><g:link style="color: #5b5e5c; border:1px solid #5b5e5c; margin:5px;background:#aaefb8;padding:2px;" action="logisticsMyTasks"  params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"tab":"Todo"]'>Todo&nbsp;(${todoSize})</g:link></td>
+					<td id="allId"><g:link  style="color: #5b5e5c; border:1px solid #5b5e5c; margin:5px;padding:2px;margin-right:300px;" action="logisticsMyTasks"  params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"tab":"All"]'>All&nbsp;(${allSize})</g:link></td>
 					<td style="text-align:right;"><input  type="text" size="10" value="" id="search" name="search" />&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/></td></tr>
 					</table>
 					</div>  

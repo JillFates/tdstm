@@ -506,7 +506,7 @@ class ClientTeamsController {
    * @param  assetComment, team, location, actionLabel, search, user
    * @return redirect to Asset details page if transition flag is busy otherwise redirect to asset task page
    *--------------------------------------------------------------------------------------------------------*/
-  def doTransition = {
+   def doTransition = {
 		def bundleId = params.bundleId
 		def moveBundleInstance = MoveBundle.findById( bundleId )
 		def query = new StringBuffer ("from AssetEntity ae where ae.moveBundle=${moveBundleInstance.id} and ae.assetTag = :search ")
@@ -552,33 +552,36 @@ class ClientTeamsController {
             redirect ( action:'assetSearch',params:params)
     	}
 	}
-  /**------------------------------------------------------------------------------
-  * To change the state of an asset to hold
-  * @author Lokanada Reddy
-  * @param  String enterNote, String team, String location, String bundle
-  * @return boolean for indication of transitions
-  *------------------------------------------------------------------------------*/
-  def placeOnHold = {
+   /**------------------------------------------------------------------------------
+    * To change the state of an asset to hold
+    * @author Lokanada Reddy
+    * @param  String enterNote, String team, String location, String bundle
+    * @return boolean for indication of transitions
+    *------------------------------------------------------------------------------*/
+   def placeOnHold = {
 	  def enterNote = params.enterNote
 	  def moveBundleInstance = MoveBundle.findById( params.bundleId )
 	  if ( params.similarComment == 'nosimilar' ) {
 		  clientTeamsService.appendCommentsToRemainderList( params, session )
 	  }
 	  def loginTeam = ProjectTeam.findById(params.teamId)
+	  def role = loginTeam.role
+	  def action = role != "CLEANER" ? "assetSearch" : "logisticsAssetSearch"
 	  def query = new StringBuffer ("from AssetEntity ae where ae.moveBundle=${moveBundleInstance.id} and ae.assetTag = :search ")
 	  def asset = AssetEntity.find( query.toString(), [ search : params.search ] )
 	  def redirectAction = "myTasks"
 	  if(asset){
+		  action = role != "CLEANER" ? "myTasks" : "logisticsMyTasks"
 		  def loginUser = UserLogin.findByUsername ( SecurityUtils.subject.principal )
 		  def workflow
-			  workflow = workflowService.createTransition ( moveBundleInstance.project.workflowCode, loginTeam.role, "Hold", asset,moveBundleInstance, loginUser, loginTeam, params.enterNote )
+			  workflow = workflowService.createTransition ( moveBundleInstance.project.workflowCode, role, "Hold", asset,moveBundleInstance, loginUser, loginTeam, params.enterNote )
 			  if ( workflow.success ) {
 				 
-				  if(params.location == 'source' && asset[sourceTeamType.get(loginTeam.role)].id != loginTeam.id ){
-					  asse[sourceTeamType.get(loginTeam.role)] = loginTeam
+				  if(params.location == 'source' && asset[sourceTeamType.get(role)].id != loginTeam.id ){
+					  asse[sourceTeamType.get(role)] = loginTeam
 					  asset.save(flush:true)
-				  } else if(params.location == 'target' && asset[targetTeamType.get(loginTeam.role)]?.id != loginTeam.id ){
-					  asset[targetTeamType.get(loginTeam.role)] = loginTeam
+				  } else if(params.location == 'target' && asset[targetTeamType.get(role)]?.id != loginTeam.id ){
+					  asset[targetTeamType.get(role)] = loginTeam
 					  asset.save(flush:true)
 				  }
 				 
@@ -589,13 +592,13 @@ class ClientTeamsController {
 				  assetComment.category = 'moveday'
 				  assetComment.createdBy = loginUser.person
 				  assetComment.save()
-				  redirect ( action: 'myTasks',
+				  redirect ( action: action,
 					  			params:["bundleId":params.bundleId, "teamId":params.teamId, "projectId":params.projectId,
 									  	"location":params.location, "tab":"Todo"
 								  		])
 			 } else {
 				 flash.message = message ( code : workflow.message )
-				 redirect ( action : 'myTasks',
+				 redirect ( action : action,
 							 params:["bundleId":params.bundleId, "teamId":params.teamId, "projectId":params.projectId,
 									 "location":params.location, "tab":"Todo"
 									 ])
@@ -603,33 +606,347 @@ class ClientTeamsController {
 
 		 } else {
 			flash.message = 'Asset not found'
-            redirect ( action:'assetSearch',params:params)
+            redirect ( action:action,params:params)
 		 }
   	}
-  /**----------------------------------------------------------------------------------
-  * @author Lokanada Reddy
-  * @param  String assetTag, project,bundle
-  * @return Create a Comment for AssetEntity from client team station
-  *----------------------------------------------------------------------------------*/
-  def addComment = {
-	 def moveBundleInstance = MoveBundle.findById( params.bundleId )
-	 def loginUser = UserLogin.findByUsername ( SecurityUtils.subject.principal )
-	 def query = new StringBuffer ("from AssetEntity ae where ae.moveBundle=${moveBundleInstance.id} and ae.assetTag = :search ")
-	 def asset = AssetEntity.find( query.toString(), [ search : params.search ] )
-	 if(asset){
-		 def assetComment = new AssetComment()
-			 assetComment.comment = params.enterNote
-			 if ( params.similarComment == "nosimilar" ) {
-				 clientTeamsService.appendCommentsToRemainderList( params, session )
-			 }
-			 assetComment.assetEntity = asset
-			 assetComment.commentType = 'comment'
-			 assetComment.category = 'moveday'
-			 assetComment.createdBy = loginUser.person
-			 assetComment.save()
-	 } else {
-		 flash.message = "Asset not found"
-	 }
-	 redirect ( action:'assetSearch',params:params)
-  }
+   /**----------------------------------------------------------------------------------
+    * @author Lokanada Reddy
+    * @param  String assetTag, project,bundle
+    * @return Create a Comment for AssetEntity from client team station
+    *----------------------------------------------------------------------------------*/
+   def addComment = {
+	   def moveBundleInstance = MoveBundle.findById( params.bundleId )
+	   def loginTeam = ProjectTeam.findById(params.teamId)
+	   def role = loginTeam.role
+	   def action = role != "CLEANER" ? "assetSearch" : "logisticsAssetSearch"
+	   def loginUser = UserLogin.findByUsername ( SecurityUtils.subject.principal )
+	   def query = new StringBuffer ("from AssetEntity ae where ae.moveBundle=${moveBundleInstance.id} and ae.assetTag = :search ")
+	   def asset = AssetEntity.find( query.toString(), [ search : params.search ] )
+	   if(asset){
+		   def assetComment = new AssetComment()
+		   assetComment.comment = params.enterNote
+		   if ( params.similarComment == "nosimilar" ) {
+			   clientTeamsService.appendCommentsToRemainderList( params, session )
+		   }
+		   assetComment.assetEntity = asset
+		   assetComment.commentType = 'comment'
+		   assetComment.category = 'moveday'
+		   assetComment.createdBy = loginUser.person
+		   assetComment.save()
+	   } else {
+	   	   flash.message = "Asset not found"
+	   }
+	   redirect ( action: action, params:params)
+   }
+   /**--------------------------------------------
+    * @author lokanada
+    * @params : logistics team Id, bundle id
+    * @return : Team details
+    *--------------------------------------------*/
+   def logisticsHome = {
+	   def bundleId = params.bundleId
+	   def teamId = params.teamId
+	   def location = params.location
+	   def projectTeamInstance = ProjectTeam.findById( teamId )
+	   def teamMembers = partyRelationshipService.getTeamMemberNames( teamId )
+	   def bundleInstance = MoveBundle.findById(params.bundleId)	
+	   projectTeamInstance.currentLocation = "Source"
+	   projectTeamInstance.save()
+	   def teamLocation = projectTeamInstance.currentLocation
+
+	 render ( view:'logisticsHome' , model:[ projectTeam:projectTeamInstance, members:teamMembers, projectId:params.projectId,
+												   loc:teamLocation, bundleId:params.bundleId ,bundleName:bundleInstance.name, teamId:teamId,
+												   location:location, project: bundleInstance.project])
+			 
+   }
+   /**-------------------------------------------------------------------------------------------
+    * To view the list of assets for that particular bundleId, teamId and location on logistics screen
+    * @author Mallikarjun
+    * @param  String bundleId, String teamId, String location
+    * @return Array of arguments  
+    *--------------------------------------------------------------------------------------------*/
+   def logisticsMyTasks = {
+	   def bundleId = params.bundleId
+	   def tab = params.tab
+	   def teamId = params.teamId
+	   def assetList = []
+	   def colorCss
+	   def issuecomments
+	   def assetIssueCommentListSize
+	   def moveBundleInstance = MoveBundle.findById( bundleId )
+	   def query = new StringBuffer("""select a.asset_entity_id as id, a.asset_tag as assetTag,
+				 a.source_rack as sourceRack, a.source_rack_position as sourceRackPosition,
+				 a.target_rack as targetRack, a.target_rack_position as targetRackPosition,
+				 min(cast(t.state_to as UNSIGNED INTEGER)) as minstate,
+				 m.name as model, p.current_state_id as currentStateId from asset_entity a
+				 left join asset_transition t on(a.asset_entity_id = t.asset_entity_id and t.voided = 0)
+				 left join project_asset_map p on (a.asset_entity_id = p.asset_id)
+				 left join model m on (a.model_id = m.model_id)
+				 where a.move_bundle_id = $bundleId """)
+		 
+	   def stateVal = stateEngineService.getStateId ( moveBundleInstance?.project.workflowCode, "Cleaned" )
+	   def allSize = jdbcTemplate.queryForList( query.toString() +" group by a.asset_entity_id" ).size()
+	   def holdState = stateEngineService.getStateIdAsInt( moveBundleInstance?.project.workflowCode, "Hold" )
+	   if ( tab == "Todo" ) {
+		   query.append ( " and ( p.current_state_id < $stateVal or t.state_to = $holdState )" )
+	   }
+	   def proAssetMap = jdbcTemplate.queryForList ( query.toString() +" group by a.asset_entity_id" )
+	   def todoSize = proAssetMap.size()
+	   def rdyState = stateEngineService.getStateIdAsInt( moveBundleInstance?.project.workflowCode, "Cleaned" )
+	   def ipState = stateEngineService.getStateIdAsInt( moveBundleInstance?.project.workflowCode, "Unracked" )
+	   def sortOrder = 4
+	   proAssetMap.each {
+		   if ( it.currentStateId ) {
+			   if ( it.minstate == holdState ) {
+				   colorCss = "asset_hold"
+				   sortOrder = 1
+			   } else if ( it.currentStateId == ipState ) {
+			   		colorCss = "asset_ready"
+					sortOrder = 2
+			   } else if ( ( it.currentStateId > holdState ) && ( it.currentStateId < ipState ) ) {
+			   		colorCss = "asset_pending"
+					sortOrder = 3
+			   } else if ( ( it.currentStateId >= rdyState ) ) {
+			   		colorCss = "asset_done"
+					sortOrder = 4
+			   }
+		   } else {
+		   		colorCss = "asset_pending"
+				sortOrder = 3
+		   }
+		   		assetList << [ item:it, cssVal:colorCss, sortOrder:sortOrder ]
+	   }
+	   assetList.sort {
+		   it.sortOrder
+	   }
+	   if ( tab == "All" ) {
+		   query.append (" and (p.current_state_id < $stateVal or t.state_to = $holdState ) group by a.asset_entity_id")
+		   todoSize = jdbcTemplate.queryForList ( query.toString() ).size()
+	   }
+	   def assetIssueCommentList
+	   if ( params.issueAssetId ) {
+		   def assetItem = AssetEntity.findById( params.issueAssetId )
+		   assetIssueCommentList = AssetComment.findAll("from AssetComment ac where ac.assetEntity = ${assetItem.id} and ac.commentType = 'issue' and ac.isResolved = 0 ")
+		   assetIssueCommentListSize = assetIssueCommentList.size()
+	   }
+	   return[ bundleId:bundleId, teamId:teamId, projectId:params.projectId, location:params.location,
+		   		assetList:assetList, allSize:allSize, todoSize:todoSize, 'tab':tab, issuecomments: assetIssueCommentList,
+				assetIssueCommentListSize: assetIssueCommentListSize
+	   		]
+   }
+   /**-----------------------------------------------------------------------------
+    * To view the details and to change the state of an asset for logistics screen
+   	* @author Mallikarjun
+    * @param  String search, String teamId, String location
+    * @return Array of arguments   
+    *-----------------------------------------------------------------------------*/
+	def logisticsAssetSearch = {
+		def browserTest = false
+		if ( !request.getHeader( "User-Agent" ).contains( "MSIE" ) ) {
+			browserTest = true
+		}
+		def textSearch = params.textSearch
+		def assetItem
+		def assetComment
+		def projMap = []
+		def teamId = params.teamId
+		def search = params.search
+		if ( textSearch ) {
+			search = textSearch
+		}
+		def stateVal
+		def taskList
+		def taskSize
+		def label
+		def actionLabel
+		def teamMembers
+		def loginTeam
+		def issuecomments
+		def assetIssueCommentListSize
+		def moveBundleId = params.bundleId
+		moveBundleId = moveBundleId ? moveBundleId : session.getAttribute( "CURR_BUNDLE" )?.CURR_BUNDLE
+		def moveBundleInstance = MoveBundle.findById( moveBundleId )
+		if ( teamId ) {
+			loginTeam = ProjectTeam.findById ( params.teamId )
+		}
+		def commentsList = clientTeamsService.getCommentsFromRemainderList( session )
+		flash.message = ""
+		if ( params.menu == "true" ) {
+			render(view:'logisticsAssetSearch',
+					model:[ projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundleId:moveBundleId,
+						teamId:params.teamId, projectId:params.projectId, location:params.location, search:search,
+						label:label, actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList
+					])
+			return;
+		} else if ( search != null ) {
+			def query = "from AssetEntity where moveBundle=${moveBundleInstance.id} and assetTag = :search "
+			assetItem = AssetEntity.find ( query.toString(), [ search : search ] )
+			if ( assetItem == null ) {
+				flash.message = message ( code : "Asset Tag number '${search}' was not located" )
+				if ( textSearch ) {
+					render ( view:'logisticsAssetSearch',
+							model:[ projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundleId:moveBundleId,
+								teamId:params.teamId, projectId:params.projectId, location:params.location,
+								search:search, label:label, actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList
+							])
+					return;
+				} else {
+					redirect( action:'logisticsTask',
+							params:[ "bundleId":moveBundleId, "teamId":params.teamId, "projectId":params.projectId,
+								"location":params.location, "tab":params.tab
+							])
+					return;
+				}
+			} else {
+				teamMembers = partyRelationshipService.getTeamMemberNames( assetItem.sourceTeamMt?.id )
+				def membersCount = ( ( teamMembers.toString() ).tokenize("/") ).size()
+				teamMembers = membersCount + "(" + teamMembers.toString() + ")"
+				def bundleId = assetItem.moveBundle?.id
+				def holdId = stateEngineService.getStateId( moveBundleInstance.project.workflowCode, "Hold" )
+				def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+						"where t.asset_entity_id = ${assetItem.id} and voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
+						"order by date_created desc, stateTo desc limit 1 ")
+				projMap = ProjectAssetMap.findByAsset( assetItem )
+				if( !transitionStates.size()) {
+					flash.message = message ( code : " No actions for this asset " )
+					if ( textSearch ) {
+						render(view:'logisticsAssetSearch',
+								model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment, stateVal:stateVal,
+									bundleId:moveBundleId, teamId:params.teamId, projectId:params.projectId, location:params.location,
+									search:search, label:label, actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList
+								])
+						return;
+					} else {
+						redirect ( action: 'logisticsMyTasks',
+								params:[ "bundleId":moveBundleId, "teamId":params.teamId, "projectId":params.projectId,
+									"location":params.location,"tab":params.tab
+								])
+						return;
+					}
+				} else {
+					stateVal = stateEngineService.getState ( moveBundleInstance.project.workflowCode, transitionStates[0].stateTo )
+					if ( stateVal == "Hold" ) {
+						def assetIssueCommentList = AssetComment.findAll("from AssetComment ac where ac.assetEntity = ${assetItem.id} and ac.commentType = 'issue' and ac.isResolved = 0")
+						assetIssueCommentListSize = assetIssueCommentList.size()
+						flash.message = message ( code :"The asset is currently on HOLD because: " )
+						if ( textSearch ) {
+							render ( view:'logisticsAssetSearch',
+									model:[	teamMembers:teamMembers, projMap:projMap,assetComment:assetComment, stateVal:stateVal,
+										bundleId:moveBundleId, teamId:params.teamId, projectId:params.projectId, location:params.location,
+										search:search, label:label, actionLabel:actionLabel, browserTest:browserTest,
+										issuecomments: assetIssueCommentList, assetIssueCommentListSize: assetIssueCommentListSize,
+										commentsList: commentsList
+									])
+							return;
+						} else {
+							redirect ( action: 'logisticsMyTasks',
+									params:[ "bundleId":moveBundleId, "teamId":params.teamId, "projectId":params.projectId,
+										"location":params.location,"tab":params.tab, "issueAssetId" : String.valueOf( assetItem.id )
+									])
+							return;
+						}
+					}
+					taskList = stateEngineService.getTasks ( moveBundleInstance.project.workflowCode, "CLEANER", stateVal )
+					taskSize = taskList.size()
+					if ( taskSize == 1 ) {
+						if ( taskList.contains ( "Hold" ) ) {
+							flash.message = message ( code : "NO ACTIONS FOR ASSET. You may place it on hold to alert the move coordinator" )
+						} else {
+							actionLabel = taskList[0]
+							label =	stateEngineService.getStateLabel ( moveBundleInstance.project.workflowCode, stateEngineService.getStateIdAsInt(moveBundleInstance.project.workflowCode,actionLabel) )
+						}
+
+					} else if ( taskSize > 1 ) {
+						taskList.each {
+							if ( it != "Hold" && !actionLabel ) {
+								actionLabel = it
+								label =	stateEngineService.getStateLabel ( moveBundleInstance.project.workflowCode, stateEngineService.getStateIdAsInt(moveBundleInstance.project.workflowCode,it) )
+								return;
+							}
+						}
+					}
+					assetComment = AssetComment.findAllByAssetEntityAndCommentType( assetItem,'instruction' )
+					def cleanedId = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Cleaned" )
+					def cartAssetCountQuery = new StringBuffer(" select count(a.asset_entity_id) as assetCount from asset_entity a "+
+							"left join project_asset_map p on ( a.asset_entity_id = p.asset_id  ) " +
+							"where a.cart = '$assetItem.cart' and a.move_bundle_id = $bundleId "+
+							"and p.project_id = $assetItem.project.id and p.current_state_id < $cleanedId ")
+					def cartAssetCount = jdbcTemplate.queryForInt( cartAssetCountQuery.toString() )
+					def cartQty
+					if ( cartAssetCount == 1 ) {
+						def totalCartAssetCountQuery = new StringBuffer(" select count(a.asset_entity_id) as assetCount from asset_entity a "+
+								"where a.cart = '$assetItem.cart' and a.move_bundle_id = $bundleId "+
+								"and a.project_id = $assetItem.project.id ")
+						cartQty = jdbcTemplate.queryForInt( totalCartAssetCountQuery.toString() )
+						flash.message = "This is the last asset for cart "+assetItem.cart+" which should contain "+cartQty+" assest(s)"
+					}
+					render ( view:'logisticsAssetSearch',
+							model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment ? assetComment :"", stateVal:stateVal, bundleId:moveBundleId,
+								teamId:params.teamId, projectId:params.projectId, location:params.location, search:search, label:label,
+								actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList, cartQty: cartQty
+							])
+				}
+			}
+		}
+
+	}
+	/**--------------------------------------------------------------------------------------------------------
+	 * To change the state of an asset to CLEANER
+	 * @author lokanada
+	 * @param  String assetComment, String teamId, String location, String actionLabel, String search, String user
+	 * @return Message with boolean for indication of transitions
+	 *-------------------------------------------------------------------------------------------------------*/
+	def cleaning = {
+		def asset = getAssetEntity ( params.search, params.user )//AssetEntity.findByAssetTag(params.search)
+		if(asset){
+			def bundleId = asset.moveBundle
+			//def moveBundleInstance = MoveBundle.findById( params.bundleId )
+			def actionLabel = params.actionLabel
+			def loginUser = UserLogin.findByUsername ( principal )
+			def loginTeam = ProjectTeam.findById(params.teamId)
+			def workflow = workflowService.createTransition ( asset.project.workflowCode, "CLEANER", actionLabel, asset, bundleId, loginUser, loginTeam, params.enterNote )
+			if ( workflow.success ) {
+				def projMap = []
+				def stateVal = null
+				def label = null
+				actionLabel = null
+				render(view: 'logisticsAssetSearch',
+						model:[ projMap:projMap, stateVal:stateVal, "search":params.search, "bundleId":params.bundleId,
+							"teamId":params.teamId, "projectId":params.projectId, "location":params.location, "tab":"Todo", label:label,
+							actionLabel:actionLabel
+						])
+			} else {
+				flash.message = message ( code : workflow.message )
+				redirect ( action:'logisticsAssetSearch',
+						params:[ "bundleId":params.bundleId, "teamId":params.teamId, "projectId":params.projectId, "location":params.location,
+							"search":params.search, "label":params.label, "actionLabel":actionLabel
+						])
+			}
+		} else {
+			flash.message = "Asset not found"
+			redirect ( action:'logisticsAssetSearch', params:params)
+		}
+	}
+
+	/**--------------------------------------------------------------------------------------
+	 * To cancel asset search in logistics screen
+	 * @author Lokanada
+	 * @param  String actionLabel, String teamId, String location, String search, String user
+	 * @return render the logisticsAssetSearch with required params
+	 *--------------------------------------------------------------------------------------*/
+	def cancelAssetSearch = {
+		def asset = getAssetEntity ( params.search, params.user )
+		if(asset){
+			def bundleId = asset.moveBundle
+			def loginUser = UserLogin.findByUsername ( principal )
+			def teamId
+			def projMap = []
+			render(view: 'logisticsAssetSearch',
+					model:[	projMap:projMap, "search":params.search, "bundleId":params.bundleId, "teamId":params.teamId,
+						"projectId":params.projectId, "location":params.location, "tab":"Todo" ])
+		} else {
+			flash.message = "Asset not found"
+			redirect ( action:'logisticsAssetSearch', params:params)
+		}
+	}
 }

@@ -605,7 +605,7 @@ function onInvokeAction(id) {
 											<a href="#" onclick="filterByDataPoints('source','','source_done_clean')"><u>${bundleTeam?.maxSourceAssets}<span style="font-weight: normal;">dn</span></u></a> = 
 											<a href="#" onclick="filterByDataPoints('source','','')"><u>${bundleTeam?.sourceAssets}</u></a>
 											<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
-											<a title="Login as.." href="../moveTech/signIn?username=ct-${moveBundleInstance.id}-${bundleTeam?.team?.id}-s">@</a>
+											<a title="Login as.." href="../clientTeams/logisticsHome?bundleId=${moveBundleInstance.id}&teamId=${bundleTeam?.team?.id}">@</a>
 											</jsec:lacksAllRoles>
 										</g:if>
 										<g:else>
