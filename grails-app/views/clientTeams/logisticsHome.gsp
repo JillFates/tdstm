@@ -16,7 +16,8 @@
 		for (i = 0; i < window.TF.GetOSPrintersCount(); i++){
 			dropdown.push(window.TF.GetOSPrinter(i))
 		}
-		${remoteFunction(action:'setPrintersIntoSession', params:'\'dropdown=\' + dropdown')}
+
+		${remoteFunction(controller:'moveTech', action:'setPrintersIntoSession', params:'\'dropdown=\' + dropdown')}
 	}
 	function setUserTimeZone( tz ){
 		${remoteFunction(controller:'project', action:'setUserTimeZone', params:'\'tz=\' + tz')}

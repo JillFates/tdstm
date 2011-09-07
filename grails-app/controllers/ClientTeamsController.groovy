@@ -857,13 +857,8 @@ class ClientTeamsController {
 						}
 
 					} else if ( taskSize > 1 ) {
-						taskList.each {
-							if ( it != "Hold" && !actionLabel ) {
-								actionLabel = it
-								label =	stateEngineService.getStateLabel ( moveBundleInstance.project.workflowCode, stateEngineService.getStateIdAsInt(moveBundleInstance.project.workflowCode,it) )
-								return;
-							}
-						}
+						actionLabel = taskList.find{it=="Cleaned"}
+						label =	!actionLabel ?: stateEngineService.getStateLabel ( moveBundleInstance.project.workflowCode, stateEngineService.getStateIdAsInt(moveBundleInstance.project.workflowCode,actionLabel) )
 					}
 					assetComment = AssetComment.findAllByAssetEntityAndCommentType( assetItem,'instruction' )
 					def cleanedId = stateEngineService.getStateIdAsInt( moveBundleInstance.project.workflowCode, "Cleaned" )
@@ -897,12 +892,13 @@ class ClientTeamsController {
 	 * @return Message with boolean for indication of transitions
 	 *-------------------------------------------------------------------------------------------------------*/
 	def cleaning = {
-		def asset = getAssetEntity ( params.search, params.user )//AssetEntity.findByAssetTag(params.search)
+		def query = "from AssetEntity where moveBundle=${params.bundleId} and assetTag = :search "
+		def asset = AssetEntity.find ( query.toString(), [ search : params.search ] )
 		if(asset){
 			def bundleId = asset.moveBundle
 			//def moveBundleInstance = MoveBundle.findById( params.bundleId )
 			def actionLabel = params.actionLabel
-			def loginUser = UserLogin.findByUsername ( principal )
+			def loginUser = UserLogin.findByUsername ( SecurityUtils.subject.principal )
 			def loginTeam = ProjectTeam.findById(params.teamId)
 			def workflow = workflowService.createTransition ( asset.project.workflowCode, "CLEANER", actionLabel, asset, bundleId, loginUser, loginTeam, params.enterNote )
 			if ( workflow.success ) {
@@ -935,10 +931,10 @@ class ClientTeamsController {
 	 * @return render the logisticsAssetSearch with required params
 	 *--------------------------------------------------------------------------------------*/
 	def cancelAssetSearch = {
-		def asset = getAssetEntity ( params.search, params.user )
+		def query = "from AssetEntity where moveBundle=${params.bundleId} and assetTag = :search "
+		def asset = AssetEntity.find ( query.toString(), [ search : params.search ] )
 		if(asset){
 			def bundleId = asset.moveBundle
-			def loginUser = UserLogin.findByUsername ( principal )
 			def teamId
 			def projMap = []
 			render(view: 'logisticsAssetSearch',
