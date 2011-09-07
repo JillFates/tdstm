@@ -163,7 +163,7 @@ function updateXYPositions(id){
 		x = left-3
 		$("#"+id).css("left",x+"px")
 	}
-	if(parseInt(left) <= parseInt(y)){
+	if(parseInt(top) <= parseInt(y)){
 		y = top-2;
 		$("#"+id).css("top",y+"px")
 	}
