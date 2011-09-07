@@ -28,13 +28,13 @@
 	<div class="menu4">
 		<ul>
 			<li><g:link class="mobmenu" controller="clientTeams" params="[projectId:projectId]">Teams</g:link></li>
-			<li><g:link class="mobmenu" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"user":"ct"]'>Home</g:link></li>
+			<li><g:link class="mobmenu" action="logisticsHome" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"user":"ct"]'>Home</g:link></li>
 			<li><g:link class="mobmenu mobselect" action="logisticsMyTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"tab":"Todo"]'>Tasks</g:link></li>
 			<li><g:link class="mobmenu" action="logisticsAssetSearch" params='["bundleId":bundleId,"menu":"true","teamId":teamId,"location":location,"projectId":projectId,"user":"ct"]'>Asset</g:link></li>
 		</ul>
-	</div>
+</div>
 	<div class="timebar" ><div id="timebar" ></div></div>
-	<div class="mobbodyweb" style="margin-top:15px;">				
+	<div class="mobbodyweb">				
       		<g:form method="post" name="bundleTeamAssetForm" action="logisticsAssetSearch">      					
 			<input name="bundleId" type="hidden" value="${bundleId}" />
 			<input name="teamId" type="hidden" value="${teamId}" />
