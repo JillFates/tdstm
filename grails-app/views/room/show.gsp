@@ -51,10 +51,10 @@
 					</label><br />
 				</div>
 				</td>
-				<td style="width:150px">
+				<td style="width:150px;padding:0px;">
 					<table style="width: auto; border: none">
-					<tr><td colspan="3">Select Capacity View: <select name="CapacityHighlight" value="None" />
-					<select name="CapacityView" size="5">
+					<tr><td colspan="1">Select Capacity View: <select name="CapacityView" size="5">
+						<option label="None"></option>
 						<option label="Power"></option>
 						<option label="Space"></option>
 						<option label="Heat"></option>
