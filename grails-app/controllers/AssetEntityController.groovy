@@ -776,7 +776,7 @@ class AssetEntityController {
     		attributeOptions.each{option ->
     			options<<[option:option.value]
     		}
-			if( !bundleMoveAndClientTeams.contains(it.attribute.attributeCode) && it.attribute.attributeCode != "currentStatus" ){
+			if( !bundleMoveAndClientTeams.contains(it.attribute.attributeCode) && it.attribute.attributeCode != "currentStatus" && it.attribute.attributeCode != "usize" ){
 				def frontEndLabel = it.attribute.frontendLabel
 				if( customLabels.contains( frontEndLabel ) ){
 					frontEndLabel = project[it.attribute.attributeCode] ? project[it.attribute.attributeCode] : frontEndLabel 
@@ -856,7 +856,7 @@ class AssetEntityController {
 	            	assetEntityInstance.updateRacks()
 	            	def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
 	            	entityAttributeInstance.each{
-	                	if( !bundleMoveAndClientTeams.contains(it.attribute.attributeCode) && it.attribute.attributeCode != "currentStatus" ){
+	                	if( !bundleMoveAndClientTeams.contains(it.attribute.attributeCode) && it.attribute.attributeCode != "currentStatus" && it.attribute.attributeCode != "usize" ){
 	                		assetItems << [id:assetEntityInstance.id, attributeCode:it.attribute.attributeCode, 
 	                		               frontendInput:it.attribute.frontendInput, 
 	                		               value:assetEntityInstance.(it.attribute.attributeCode) ? assetEntityInstance.(it.attribute.attributeCode).toString() : ""]
@@ -907,7 +907,7 @@ class AssetEntityController {
     		attributeOptions.each{option ->
     			options<<[option:option.value]
     		}
-    		if( it.attribute.attributeCode != "moveBundle" && !bundleMoveAndClientTeams.contains(it.attribute.attributeCode) && it.attribute.attributeCode != "currentStatus"){
+    		if( it.attribute.attributeCode != "moveBundle" && !bundleMoveAndClientTeams.contains(it.attribute.attributeCode) && it.attribute.attributeCode != "currentStatus" && it.attribute.attributeCode != "usize"){
     			def frontEndLabel = it.attribute.frontendLabel
 				if( customLabels.contains( frontEndLabel ) ){
 					frontEndLabel = project[it.attribute.attributeCode] ? project[it.attribute.attributeCode] : frontEndLabel 
@@ -934,7 +934,7 @@ class AssetEntityController {
     		entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntity.attributeSet.id order by eav.sortOrder ")
         }
     	entityAttributeInstance.each{
-    		if( !bundleMoveAndClientTeams.contains(it.attribute.attributeCode) && it.attribute.attributeCode != "currentStatus"){
+    		if( !bundleMoveAndClientTeams.contains(it.attribute.attributeCode) && it.attribute.attributeCode != "currentStatus" && it.attribute.attributeCode != "usize"){
     			items<<[ attributeCode:it.attribute.attributeCode, frontendInput:it.attribute.frontendInput ]
     		}
     	}

@@ -1,5 +1,3 @@
-
-
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -68,7 +66,7 @@
     </script>
   </head>
   <body>   
-    <div class="nav" style="border: 1px solid #CCCCCC; height: 11px;width: 219px; margin:9px 14px 0px">
+    <div class="nav" style="border: 1px solid #CCCCCC; height: 11px;width: 250px; margin:9px 14px 0px">
 			<span class="menuButton"><g:link class="list" action="list">Bundle List</g:link></span>
 		    <jsec:hasRole name="ADMIN">
 		    	<span class="menuButton"><g:link class="create" action="create" params="[projectId:projectId]">New Bundle</g:link></span>

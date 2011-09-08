@@ -146,13 +146,13 @@ if(kvmPortAttribute) {
 /*
  * usize
  */
-def usizeAttribute = EavAttribute.findByAttributeCode('usize')
+/*def usizeAttribute = EavAttribute.findByAttributeCode('usize')
 if(usizeAttribute) {
 	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[usizeAttribute])
 	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[usizeAttribute])
 	DataTransferAttributeMap.executeUpdate("Delete from DataTransferAttributeMap where eavAttribute = ?",[usizeAttribute])
 	EavAttribute.executeUpdate("Delete from EavAttribute where id = ?",[usizeAttribute.id])
-}
+}*/
 /*
  * remoteMgmtPort
  */
@@ -637,6 +637,76 @@ if(!dbAdminTargetDataTransferMapWalkThru){
 } else {
 	DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'TargetTeamDba',sheetName='Servers' where eavAttribute = ?",[targetTeamDbaAttribute])
 }
+
+/**
+ *  Create usize
+ */
+def usizeAttribute = EavAttribute.findByAttributeCode('usize')
+if(usizeAttribute){
+	EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'usize', frontendLabel='Usize' where id = ?",[usizeAttribute.id])
+} else {
+	usizeAttribute = new EavAttribute( attributeCode : "usize",
+			backendType : 'String',
+			frontendInput : 'text',
+			frontendLabel : 'Usize',
+			note : 'this field is used for just import',
+			sortOrder : 347,
+			entityType:entityType,
+			isRequired:0,
+			isUnique:0,
+			defaultValue:"1",
+			validation:'No validation'
+			)
+	if ( !usizeAttribute.validate() || !usizeAttribute.save(flush:true) ) {
+		println"Unable to create usizeAttribute : "
+		usizeAttribute.errors.allErrors.each() {println"\n"+it }
+	}
+}
+
+def usizeEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(usizeAttribute,attributeSet)
+if(usizeEavEntityAttribute){
+	EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'usize' where attributeCode = 'usize'")
+} else {
+	usizeEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:usizeAttribute,eavAttributeSet:attributeSet)
+	if ( !usizeEavEntityAttribute.validate() || !usizeEavEntityAttribute.save(flush:true) ) {
+		println"Unable to create usizeEavEntityAttribute : " +
+				usizeEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
+	}
+}
+
+def usizeDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,usizeAttribute)
+if( !usizeDataTransferMapMaster ){
+	usizeDataTransferMapMaster = new DataTransferAttributeMap(columnName:"usize",
+			sheetName:"Servers",
+			dataTransferSet : masterDataTransferSet,
+			eavAttribute:usizeAttribute,
+			validation:"NO Validation",
+			isRequired:0
+			)
+	if ( !usizeDataTransferMapMaster.validate() || !usizeDataTransferMapMaster.save(flush:true) ) {
+		println"Unable to create usizeDataTransferMapMaster : " +
+				usizeDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
+	}
+} else {
+	DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'usize',sheetName='Servers' where eavAttribute = ?",[usizeAttribute])
+}
+
+def usizeDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,usizeAttribute)
+if(!usizeDataTransferMapWalkThru){
+	usizeDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"usize",
+			sheetName:"Servers",
+			dataTransferSet : walkThruDataTransferSet,
+			eavAttribute:usizeAttribute,
+			validation:"NO Validation",
+			isRequired:0
+			)
+	if ( !usizeDataTransferMapWalkThru.validate() || !usizeDataTransferMapWalkThru.save(flush:true) ) {
+		println"Unable to create usizeDataTransferMapWalkThru : " +
+				usizeDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
+	}
+} else {
+	DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'usize',sheetName='Servers' where eavAttribute = ?",[usizeAttribute])
+}
 /*
  * Set Attributes order 
  */
@@ -722,6 +792,10 @@ EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 345, attribu
 EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 345 where attribute = ?",[EavAttribute.findByAttributeCode('sourceTeamDba')])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'targetTeamDba' where attributeCode = 'targetTeamDba'")
 EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 346 where attribute = ?",[EavAttribute.findByAttributeCode('targetTeamDba')])
+
+EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 347, attributeCode = 'usize' where attributeCode = 'usize'")
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 347 where attribute = ?",[EavAttribute.findByAttributeCode('usize')])
+
 
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 350 where attributeCode = 'truck'")
 EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 350 where attribute = ?",[EavAttribute.findByAttributeCode('truck')])
