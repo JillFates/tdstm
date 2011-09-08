@@ -51,26 +51,28 @@
 					</label><br />
 				</div>
 				</td>
-				<td style="width:150px;padding:0px;">
-					<table style="width: auto; border: none">
-					<tr><td colspan="1">Select Capacity View: <select name="CapacityView" size="5">
-						<option label="None"></option>
+				<td class="cap_tab" style="width:150px">
+					Capacity View:&nbsp;<select name="capacityView" size="1">
+						<option label="None" value="None"></option>
 						<option label="Power"></option>
 						<option label="Space"></option>
 						<option label="Heat"></option>
 						<option label="Weight"></option>
-						<option label="Ethernet"></option>
-					</select></td></tr>
-					<tr><td>&nbsp;</td><td class="rack_cap20">&nbsp;</td><td id="#cap20">&nbsp;</td></tr>
-					<tr><td>&nbsp;</td><td class="rack_cap32">&nbsp;</td><td id="#cap32">&nbsp;</td></tr>
-					<tr><td>&nbsp;</td><td class="rack_cap44">&nbsp;</td><td id="#cap44">&nbsp;</td></tr>
-					<tr><td>&nbsp;</td><td class="rack_cap56">&nbsp;</td><td id="#cap56">&nbsp;</td></tr>
-					<tr><td>&nbsp;</td><td class="rack_cap68">&nbsp;</td><td id="#cap68">&nbsp;</td></tr>
-					<tr><td>&nbsp;</td><td class="rack_cap80">&nbsp;</td><td id="#cap80">&nbsp;</td></tr>
+						<option label="Ethernet" value="Ethernet"></option>
+					<table class="cap_tab" style="width: auto; border: none;">
+					<tr><td class="cap_tab" colspan="2">
+						<input type="radio" name="capacityType" value="Used" />
+						<input type="radio" name="capacityType" checked="checked" value="Remaining" />
+					</td></tr>
+					<tr><td class="cap_tab" >&nbsp;</td><td class="cap_tab" class="rack_cap20" id="#cap20">&nbsp;</td></tr>
+					<tr><td class="cap_tab" >&nbsp;</td><td class="cap_tab" class="rack_cap32" id="#cap32">&nbsp;</td></tr>
+					<tr><td class="cap_tab" >&nbsp;</td><td class="cap_tab" class="rack_cap44" id="#cap44">&nbsp;</td></tr>
+					<tr><td class="cap_tab" >&nbsp;</td><td class="cap_tab" class="rack_cap56" id="#cap56">&nbsp;</td></tr>
+					<tr><td class="cap_tab" >&nbsp;</td><td class="cap_tab" class="rack_cap68" id="#cap68">&nbsp;</td></tr>
+					<tr><td class="cap_tab" >&nbsp;</td><td class="cap_tab" class="rack_cap80" id="#cap80">&nbsp;</td></tr>
 					</table>
 				</td>
 				<td style="padding-left: 50px; align:right;" id="rackPowerTd">
-					
 				</td>
 			</tr>
 		</tbody>
@@ -167,10 +169,12 @@ function updateRackPower(rackId){
 		}
 	});
 	$("#editDialog").dialog("close")
-    $("#createRoomDialog").dialog("close")
-    $("#mergeRoomDialog").dialog("close")
-    $("#createDialog").dialog("close")
-    $("#listDialog").dialog("close")
+	$("#createRoomDialog").dialog("close")
+	$("#mergeRoomDialog").dialog("close")
+	$("#createDialog").dialog("close")
+	$("#listDialog").dialog("close")
+}
+function capacityView{
 }
 </script>
 </body>

@@ -432,8 +432,9 @@ table.rack_elevation table.bladeTable td.errorBlade {
 .roomLayoutTable td {
 	border-top: 1px solid black;
 }
-.rack_cap_table{
+.cap_tab{
 	padding:1px;
+	font:10px verdana, arial, helvetica, sans-serif;
 }
 .rack_cap20{
 	background-color: #66FE66;
