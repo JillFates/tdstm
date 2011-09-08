@@ -51,7 +51,25 @@
 					</label><br />
 				</div>
 				</td>
-				<td style="padding-left: 200px; align:right;" id="rackPowerTd">
+				<td style="width:150px">
+					<table style="width: auto; border: none">
+					<tr><td colspan="3">Select Capacity View: <select name="CapacityHighlight" value="None" />
+					<select name="CapacityView" size="5">
+						<option label="Power"></option>
+						<option label="Space"></option>
+						<option label="Heat"></option>
+						<option label="Weight"></option>
+						<option label="Ethernet"></option>
+					</select></td></tr>
+					<tr><td>&nbsp;</td><td class="rack_cap20">&nbsp;</td><td id="#cap20">&nbsp;</td></tr>
+					<tr><td>&nbsp;</td><td class="rack_cap32">&nbsp;</td><td id="#cap32">&nbsp;</td></tr>
+					<tr><td>&nbsp;</td><td class="rack_cap44">&nbsp;</td><td id="#cap44">&nbsp;</td></tr>
+					<tr><td>&nbsp;</td><td class="rack_cap56">&nbsp;</td><td id="#cap56">&nbsp;</td></tr>
+					<tr><td>&nbsp;</td><td class="rack_cap68">&nbsp;</td><td id="#cap68">&nbsp;</td></tr>
+					<tr><td>&nbsp;</td><td class="rack_cap80">&nbsp;</td><td id="#cap80">&nbsp;</td></tr>
+					</table>
+				</td>
+				<td style="padding-left: 50px; align:right;" id="rackPowerTd">
 					
 				</td>
 			</tr>
