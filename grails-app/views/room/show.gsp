@@ -52,6 +52,8 @@
 				</div>
 				</td>
 				<td class="cap_tab" style="width:150px">
+					<table class="cap_tab" style="width: auto; padding:1px; border: none;">
+					<tr><td class="cap_tab" rowspan="2">
 					Capacity View:&nbsp;<select name="capacityView" size="1">
 						<option label="None" value="None"></option>
 						<option label="Power"></option>
@@ -59,16 +61,14 @@
 						<option label="Heat"></option>
 						<option label="Weight"></option>
 						<option label="Ethernet" value="Ethernet"></option>
-					<table class="cap_tab" style="width: auto; padding:1px; border: none;">
-					<tr><td class="cap_tab" colspan="2">
-						<input type="radio" name="capacityType" value="Used" />Used&nbsp;
+					</td><td class="cap_tab rack_cap20" id="#cap20">&nbsp;</td></tr>
+					<tr><td class="cap_tab rack_cap32" id="#cap32">&nbsp;</td></tr>
+					<tr><td class="cap_tab" rowspan="3">
+						<input type="radio" name="capacityType" value="Used" />Used&nbsp;<br />
 						<input type="radio" name="capacityType" checked="checked" value="Remaining" />Remaining
-					</td></tr>
-					<tr><td class="cap_tab" >&nbsp;</td><td class="cap_tab rack_cap20" id="#cap20">&nbsp;</td></tr>
-					<tr><td class="cap_tab" >&nbsp;</td><td class="cap_tab rack_cap32" id="#cap32">&nbsp;</td></tr>
-					<tr><td class="cap_tab" >&nbsp;</td><td class="cap_tab rack_cap44" id="#cap44">&nbsp;</td></tr>
-					<tr><td class="cap_tab" >&nbsp;</td><td class="cap_tab rack_cap56" id="#cap56">&nbsp;</td></tr>
-					<tr><td class="cap_tab" >&nbsp;</td><td class="cap_tab rack_cap68" id="#cap68">&nbsp;</td></tr>
+					</td><td class="cap_tab rack_cap44" id="#cap44">&nbsp;</td></tr>
+					<tr><td class="cap_tab rack_cap56" id="#cap56">&nbsp;</td></tr>
+					<tr><td class="cap_tab rack_cap68" id="#cap68">&nbsp;</td></tr>
 					<tr><td class="cap_tab" >&nbsp;</td><td class="cap_tab rack_cap80" id="#cap80">&nbsp;</td></tr>
 					</table>
 				</td>
