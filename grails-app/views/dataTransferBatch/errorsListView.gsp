@@ -54,5 +54,9 @@
                 </table>
             </div>
         </div>
+         <script type="text/javascript">
+			$('#assetMenu').show();
+			$('#reportsMenu').hide();
+		</script>
     </body>
 </html>

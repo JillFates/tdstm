@@ -502,8 +502,6 @@ class AssetEntityController {
                             sheet.addCell(customColumn)
 						}
 					}
-					// Hardcode the Usize at the end of all columns
-					sheet.addCell(new Label(columnNameListSize+1,0, "Usize"))
 					
                     for ( int r = 1; r <= assetSize; r++ ) {
                         //Add assetId for walkthrough template only.
@@ -514,11 +512,12 @@ class AssetEntityController {
                         }
                         for ( int coll = 0; coll < columnNameListSize; coll++ ) {
                             def addContentToSheet
-	                                                        	
-                            if ( asset[r-1].(dataTransferAttributeMap.eavAttribute.attributeCode[coll]) == null ) {
+	                        def attribute = dataTransferAttributeMap.eavAttribute.attributeCode[coll]
+                            if ( attribute != "usize" && asset[r-1][attribute] == null ) {
                                 addContentToSheet = new Label( map[columnNameList.get(coll)], r, "" )
-                            } 
-                            else {
+                            } else if(attribute == "usize"){
+								addContentToSheet = new Label(map[columnNameList.get(coll)], r, asset[r-1]?.model?.usize?.toString() ?:"" )
+                            }else {
                             	//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode 
                             	if( bundleMoveAndClientTeams.contains(dataTransferAttributeMap.eavAttribute.attributeCode[coll]) ) {
                             		addContentToSheet = new Label( map[columnNameList.get(coll)], r, String.valueOf(asset[r-1].(dataTransferAttributeMap.eavAttribute.attributeCode[coll]).teamCode) )
@@ -528,10 +527,6 @@ class AssetEntityController {
                             }
                             sheet.addCell( addContentToSheet )
                         }
-						// add model Usize at the end of all columns
-						if(asset[r-1]?.model?.usize){
-							sheet.addCell(new Number(columnNameListSize+1,r, asset[r-1]?.model?.usize))
-	                    }
                     } 
                     //update data from Asset Comment table to EXCEL
                     for( int sl=0;  sl < sheetNamesLength; sl++ ) {
@@ -1645,7 +1640,6 @@ class AssetEntityController {
 	        if(assetEntity.targetTeamMt){
 	        	targetQuery.append(" and id != $assetEntity.targetTeamMt.id ")
 	        }
-	        println"cssClass-->"+cssClass
 	        def sourceTeamMts = ProjectTeam.findAll(sourceQuery.toString())
 	        def targetTeamMts = ProjectTeam.findAll(targetQuery.toString())
 		    assetList <<['assetEntity':assetEntity, 'sourceTeamMt':sourceTeamMt, 'targetTeamMt':targetTeamMt, 

@@ -156,6 +156,10 @@ class DataTransferBatchController {
 	    									assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
 	    								}
 										break;
+									case "usize":
+										// Skip the insertion
+										break;
+									
 									default:
 										if( it.eavAttribute.backendType == "int"){
 		    								def correctedPos

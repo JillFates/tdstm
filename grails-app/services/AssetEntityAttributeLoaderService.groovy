@@ -351,6 +351,8 @@ class AssetEntityAttributeLoaderService {
 						updateChangeConflicts( dataTransferBatch, dtValue )
 						errorConflictCount+=1
 					}
+				} else if( attribName == "usize"){
+					// skip the validation
 				}else if( dtValue.eavAttribute.backendType == "int" ){
 					def correctedPos
 					try {
@@ -449,6 +451,7 @@ class AssetEntityAttributeLoaderService {
 		try{
 		//assetEntity.assetType = assetEntity.assetType ? assetEntity.assetType : "Server"
 		def dtvManufacturer = dtvList.find{it.eavAttribute.attributeCode == "manufacturer"}
+		def dtvUsize = dtvList.find{it.eavAttribute.attributeCode == "usize"}?.importValue
 		if(modelValue && dtvManufacturer){
 			def manufacturerName = dtvManufacturer?.correctedValue ? dtvManufacturer?.correctedValue : dtvManufacturer?.importValue
 			def manufacturerInstance = manufacturerName ? Manufacturer.findByName(manufacturerName) : null
@@ -474,7 +477,7 @@ class AssetEntityAttributeLoaderService {
 						def dtvAssetType = dtvList.find{it.eavAttribute.attributeCode == "assetType"}
 						def assetType = dtvAssetType?.correctedValue ? dtvAssetType?.correctedValue : dtvAssetType?.importValue
 						assetType = assetType ? assetType : "Server"
-						modelInstance = new Model( modelName:modelValue, manufacturer:manufacturerInstance, assetType:assetType, sourceTDS : 0 )
+						modelInstance = new Model( modelName:modelValue, manufacturer:manufacturerInstance, assetType:assetType, sourceTDS : 0, usize : dtvUsize ?: 1 )
 						if ( !modelInstance.validate() || !modelInstance.save(flush:true) ) {
 							def etext = "Unable to create modelInstance" +
 			                GormUtil.allErrorsString( modelInstance )
