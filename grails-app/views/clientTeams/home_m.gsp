@@ -71,7 +71,7 @@ dt {
 					<b>Timezone:</b> <g:select name="timeZone" id="timeZoneId" from="${['GMT','PST','PDT','MST','MDT','CST','CDT','EST','EDT']}" 
                     			value="${session.getAttribute('CURR_TZ')?.CURR_TZ ? session.getAttribute('CURR_TZ')?.CURR_TZ : 'EDT'}" onchange="setUserTimeZone(this.value)"/>
 					<br />
-					<b>Currently Logged in as:</b>
+					<b>Current Team:</b>
 					<dl compact>
 						<dt>Project:&nbsp;</dt><dd>${project?.name}</dd>
 						<dt>Bundle:&nbsp;</dt><dd>${bundleName}</dd> 

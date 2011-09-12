@@ -25,9 +25,9 @@
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
 	</g:if>
-	<span style="font: bold 13px arial; float:left;">Select Team to use:</span>
+	<span style="font: bold 13px arial; float:left; margin-top: 10px;">Select Team to use:</span>
 
-	<div style="margin-top: 5px;" class='list'>
+	<div class='list'>
 	<table>
 		<thead><tr>
 			<th>Team Name (loc)</th>
