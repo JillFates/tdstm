@@ -4,8 +4,8 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="projectHeader" />
 	<title>Team Home</title>
-<jq:plugin name="jquery"/>
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+	<jq:plugin name="jquery"/>
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 
 <style type="text/css">
 dt {
@@ -79,7 +79,7 @@ dt {
 					</dl>
 				</div>
 				</g:form>
-                          	<g:link class="home" action="list" params="[projectId:projectId, viewMode:'mobile']" class="mobbutton" style="width:75px;">Mobile Site</g:link>
+                          	<g:link class="mobfooter" action="list" params="[projectId:projectId, viewMode:'mobile']">Use Mobile Site</g:link>
 			</div>
 		</div>
 	</div>

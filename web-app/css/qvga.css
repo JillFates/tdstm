@@ -37,7 +37,7 @@ body {
 .mobbodyweb{
 	width:420px;
 	height:auto;
-	margin:5px 0px;
+	margin:0px;
 }
 
 .w_techlog_login{
@@ -235,6 +235,23 @@ a.mobselect {
   width:30px;height:5px;background-Color:green;color:white;text-Align:center;
 }
 
+.mobfooter {
+	border:0px solid #02322A; 
+	margin:0px; 
+	height:20px; 
+	padding:3px; 
+	width:100%; 
+	text-decoration: none;
+	text-align:center;
+	font: bold 11px Arial;
+	color: white;
+	background:black;
+	position: absolute;
+	bottom:0px;
+	left:0px;
+	-webkit-border-radius: 0px;
+	-moz-border-radius: 0px;
+}
 .mobbutton {
 	color: white; 
 	border:1px solid #02322A; 

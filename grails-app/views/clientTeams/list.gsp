@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="projectHeader" />
 	<title>Teams List</title>
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
@@ -13,7 +13,7 @@
         <input type="hidden" name="teamId" id="teamId"/>
         <input type="hidden" name="location" id="locationId"/>
         <input type="hidden" name="projectId" value="${projectId}"/>
-    <div class="body">
+	<div class="mainbody">
 	<div class="menu4">
 		<ul>
 			<li><a href="#" class="mobmenu mobselect">Teams</a></li>
@@ -65,7 +65,7 @@
 	</div>
         </div>
         </g:form>
-                          	<g:link class="mobbutton" action="list" params="[projectId:projectId, viewMode:'mobile']" class="mobbutton" style="width:75px;">Mobile Site</g:link>
+	<g:link class="mobfooter" action="list" params="[projectId:projectId, viewMode:'mobile']">Use Mobile Site</g:link>
 
 <script type="text/javascript">
    function submitLoginForm( bundleId,teamId,role,location){

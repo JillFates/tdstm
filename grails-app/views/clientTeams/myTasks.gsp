@@ -105,7 +105,7 @@
 		</div>
       		</g:form>
       		<br />
-		<g:link class="mobbutton" action="list" params="[projectId:projectId, viewMode:'mobile']" class="mobbutton" style="width:75px;float:left;">Mobile Site</g:link>
+		<g:link class="mobfooter" action="list" params="[projectId:projectId, viewMode:'mobile']">Use Mobile Site</g:link>
 	</div>
 <script type="text/javascript">setFocus();</script>
 </body>

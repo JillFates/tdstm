@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>Team Home</title>
-<jq:plugin name="jquery"/>
+	<jq:plugin name="jquery"/>
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
@@ -81,11 +81,7 @@ dt {
 					</dl>
 				</div>
 				</g:form>
-				<table style="border: 0px;">
-				<tbody><tr><td style="height: 2px;" nowrap="nowrap">
-					<g:link class="mobbutton" controller="clientTeams" params="[projectId:projectId, viewMode:'web']" style="width:75px;">Use full site</g:link>
-				</td></tr></tbody>
-				</table>
+				<g:link class="mobfooter" controller="clientTeams" params="[projectId:projectId, viewMode:'web']">Use Full Site</g:link>
 			</div>
 		</div>
 	</div>

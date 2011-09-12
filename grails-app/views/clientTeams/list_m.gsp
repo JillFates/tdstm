@@ -4,9 +4,9 @@
 	<title>Teams List</title>
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-<g:javascript library="application" />
+	<g:javascript library="application" />
 	<meta name="viewport" content="height=device-height,width=220" />
 </head>
 <body>
@@ -36,7 +36,6 @@
  		<div style="float: left; width: 100%; margin: 4px 0; text-align: center;">
         <table style="border: 0px;">
                 <tbody><tr><td style="height: 2px;" nowrap="nowrap">
-                                <g:link class="mobbutton" controller="clientTeams" params="[projectId:projectId, viewMode:'web']" tyle="width:75px;">Use full site</g:link>
                                 <g:link controller="auth" action="signOut" class="mobbutton">Log out</g:link>
                 </td></tr></tbody>
         </table>
@@ -78,6 +77,8 @@
 	</div>
         </div>
         </g:form>
+	<g:link class="mobfooter" controller="clientTeams" params="[projectId:projectId, viewMode:'web']">Use Full Site</g:link>
+
 <script type="text/javascript">
    function submitLoginForm( bundleId,teamId,role,location){
 	var form = document.forms["loginForm"] ;
