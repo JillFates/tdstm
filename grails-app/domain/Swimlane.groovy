@@ -14,10 +14,10 @@ class Swimlane {
 		actorId( blank:false, nullable:false )
 		name( blank:false, nullable:false )
 		workflow( blank:false, nullable:false )
-		maxSource( blank:false, nullable:false )
-		maxTarget( blank:false, nullable:false )
-		minSource( blank:false, nullable:false )
-		minTarget( blank:false, nullable:false )
+		maxSource( blank:true, nullable:true )
+		maxTarget( blank:true, nullable:true )
+		minSource( blank:true, nullable:true )
+		minTarget( blank:true, nullable:true )
 	}
 	
 	static mapping = {
