@@ -53,19 +53,19 @@
 				</td>
 				<td class="cap_tab" style="width:150px">
 					<table class="cap_tab" style="width: auto; padding:1px; border: none;">
-					<tr><td class="cap_tab" rowspan="2">
-					Capacity View:&nbsp;<select name="capacityView" size="1">
+					<tr><td class="cap_tab" rowspan="2"><b>Capacity View:</b>&nbsp;<select name="capacityView" size="1">
 						<option label="None" value="None"></option>
-						<option label="Power"></option>
-						<option label="Space"></option>
-						<option label="Heat"></option>
-						<option label="Weight"></option>
-						<option label="Ethernet" value="Ethernet"></option>
+						<option label="Space" value="Space"></option>
+						<option label="Power" value="Power"></option>
+						<option label="Heat" disabled="disabled"></option>
+						<option label="Weight" disabled="disabled"></option>
+						<option label="Ethernet" value="Ethernet" disabled="disabled"></option>
+						<option label="Fiber" value="Fiber" disabled="disabled"></option>
 					</td><td class="cap_tab rack_cap20" id="#cap20">&nbsp;</td></tr>
 					<tr><td class="cap_tab rack_cap32" id="#cap32">&nbsp;</td></tr>
 					<tr><td class="cap_tab" rowspan="3">
-						<input type="radio" name="capacityType" value="Used" />Used&nbsp;<br />
-						<input type="radio" name="capacityType" checked="checked" value="Remaining" />Remaining
+						<input type="radio" name="capacityType" value="Used" />&nbsp;Used&nbsp;<br />
+						<input type="radio" name="capacityType" checked="checked" value="Remaining" />&nbsp;Remaining
 					</td><td class="cap_tab rack_cap44" id="#cap44">&nbsp;</td></tr>
 					<tr><td class="cap_tab rack_cap56" id="#cap56">&nbsp;</td></tr>
 					<tr><td class="cap_tab rack_cap68" id="#cap68">&nbsp;</td></tr>
@@ -80,7 +80,7 @@
 </div>
 <div id="roomLayout" style="width: 1100px; overflow-x: auto; border: 2px solid black">
 	<input id="selectedRackId" type="hidden">
-	<div id="room_layout" style="position:relative;width: 700px;height: 800px;overflow-x: auto; border: 0px solid black;float: left;">
+	<div id="room_layout" style="position:relative;width: 650px;height: 800px;overflow-x: auto; border: 0px solid black;float: left;">
 		<table cellpadding="0" cellspacing="0" style="width:auto;height:auto;border:0px" id="room_layout_table">
 			<g:set var="numrows" value="${1}" />
 			<g:while test="${numrows < roomInstance.roomDepth / 2 }">
@@ -107,7 +107,7 @@
 				</g:else>
 		</g:each>
 </div>
-	<div style="float: left; margin-left: 50px;width: 350px;" id="rackLayout">
+	<div style="float: right; margin-left: 20px;width: 350px;" id="rackLayout">
 <table cellpadding=2 class="rack_elevation back">
 	<tr><th>U</th><th>Device</th><th>Bundle</th></tr>
 	<tr><td class='rack_upos'>42</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
