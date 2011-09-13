@@ -281,10 +281,22 @@ class WorkflowController {
             def minSourceId = jdbcTemplate.queryForInt("SELECT Min(trans_id) FROM workflow_transition_map where swimlane_id = ${role.id} and trans_id < ${onTruck} and trans_id > ${hold}")
 			def minTargetId = jdbcTemplate.queryForInt("SELECT Min(trans_id) FROM workflow_transition_map where swimlane_id = ${role.id} and trans_id >= ${onTruck}")
 			
-			role.maxTarget = stateEngineService.getState( workflow.process, maxTargetId )
-			role.maxSource = stateEngineService.getState( workflow.process, maxSourceId )
-			role.minTarget = stateEngineService.getState( workflow.process, minTargetId )
-			role.minSource = stateEngineService.getState( workflow.process, minSourceId )
+			if(minSourceId){
+				def workflowTransition = WorkflowTransitionMap.findAllBySwimlaneAndTransId(role,minSourceId, [sort:"transId", order:"asc"])?.workflowTransition
+				def minProcessIds = workflowTransition?.findAll { it.transId < minSourceId }?.sort{it.transId}
+				minSourceId = minProcessIds.transId[0]
+				role.minSource = minSourceId ? stateEngineService.getState( workflow.process, minSourceId ) : null
+			}
+			if(minTargetId){
+				def workflowTransition = WorkflowTransitionMap.findAllBySwimlaneAndTransId(role,minTargetId, [sort:"transId", order:"asc"])?.workflowTransition
+				def minProcessIds = workflowTransition?.findAll { it.transId < minTargetId }?.sort{it.transId}
+				minTargetId = minProcessIds.transId[0]
+				role.minTarget = minTargetId ? stateEngineService.getState( workflow.process, minTargetId ) : null
+			}
+			
+			role.maxTarget = maxTargetId ? stateEngineService.getState( workflow.process, maxTargetId ) : null
+			role.maxSource = maxSourceId ? stateEngineService.getState( workflow.process, maxSourceId ) : null
+			
 			if(!role.save( flush:true )){
 				role.errors.each {  println it}
 			}
