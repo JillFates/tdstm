@@ -29,7 +29,14 @@
 						<input type="button" class="submit" value="Cancel" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
 						<input type="submit" class="submit" value="Update" />
 					</td>
-					<td class="buttonR" style="padding-left: 200px;">
+					<td class="buttonR" style="padding-left: 200px;vertical-align:top;">
+						<select <b>Add to Room:</b>&nbsp;<select name="addToRoom" size="1" onchange="createRack()">
+						<option label="Select to add" value="None"></option>
+						<option label="Rack" value="Add Rack"></option>
+						<option label="UPS" value="Add UPS" disabled="disabled"></option>
+						<option label="CRAC" value="Add CRAC" disabled="disabled"></option>
+						<option label="Layout Object" value="Add Object" disabled="disabled"></option>
+
 						<input type="button" class="submit" value="Add Rack" onclick="createRack()" />
 					</td>
 				</tr>

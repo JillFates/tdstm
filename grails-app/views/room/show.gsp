@@ -9,7 +9,7 @@
 	<table style="width: auto; border: none">
 		<tbody>
 			<tr>
-				<td class="buttonR">
+				<td class="buttonR" style="vertical-align:top">
 				<div>
 				<g:select id="roomId" name="id" from="${roomInstanceList}" value="${roomInstance.id}" optionKey="id" optionValue="${{it.location +' / '+it.roomName}}" onchange="${remoteFunction(action:'show', params:'\'id=\'+this.value+\'&moveBundleId=\'+$(\'#bundleId\').val()+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}" />
 				<br />
@@ -24,7 +24,7 @@
 				</g:form>
 				</div>
 				</td>
-				<td>
+				<td style="vertical-align:top">
 				<div style="width: 150px"><label><b>Highlight:</b></label><br /><br />
 				<label><b>Bundle</b></label><br />
 					<g:select id="bundleId" name="moveBundle" from="${moveBundleList}" value="${moveBundleId}" optionKey="id" optionValue="name" noSelection="${['':'Select Bundle...']}" 
