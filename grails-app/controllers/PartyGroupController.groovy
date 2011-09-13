@@ -22,10 +22,9 @@ class PartyGroupController {
 		} else {
 			session.companyFilters = params
 		}
-		def sort = params.sort ? params.sort : 'name'
-		def order = params.order ? params.order : 'asc'
-		def query = "from PartyGroup as p where partyType = 'COMPANY'"
-		def partyGroupList = PartyGroup.findAll( query )
+		def sort = params.sort ? params.sort : 'lastUpdated'
+		def order = params.order ? params.order : 'desc'
+		def partyGroupList = PartyGroup.findAllByPartyType( PartyType.read("COMPANY") ,[sort:sort, order:order])
 		// Statements for JMESA integration
     	TableFacade tableFacade = new TableFacadeImpl("tag",request)
         tableFacade.items = partyGroupList
