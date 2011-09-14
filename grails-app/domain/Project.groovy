@@ -10,6 +10,7 @@ class Project extends PartyGroup {
 	PartyGroup client
     String workflowCode
     String projectType = "Standard"
+	Integer lastAssetId
     
 	// Custom field labels
     	String custom1
@@ -44,6 +45,7 @@ class Project extends PartyGroup {
 		custom6( blank:true, nullable:true )
 		custom7( blank:true, nullable:true )
 		custom8( blank:true, nullable:true )
+		lastAssetId( blank:true, nullable:true )
 	}
 
 	static mapping  = {

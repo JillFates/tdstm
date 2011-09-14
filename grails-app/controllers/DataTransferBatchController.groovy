@@ -187,7 +187,19 @@ class DataTransferBatchController {
 			    								if( ( ( it.correctedValue == null || assetEntity."$attribName" != it.correctedValue ) && assetEntity."$attribName" != it.importValue) || isNewValidate == "true"  ) {
 			    									isModified = "true"
 													if(("$attribName" == "assetTag" || "$attribName" == "assetName" ) && !it.importValue){
-														assetEntity."$attribName" = assetEntity?.id ? "TDS${assetEntity?.id}" :"TDS${projectId}${rowId+1}${dataTransferBatch.id}"
+														if(assetEntity?.id){
+															assetEntity."$attribName" = "TDS-${assetEntity?.id}"
+														} else {
+															def lastAssetId = projectInstance.lastAssetId
+															if(!lastAssetId){
+																lastAssetId = jdbcTemplate.queryForInt("select max(asset_entity_id) FROM asset_entity WHERE project_id = ${projectInstance.id}")
+															}
+															while(AssetEntity.findByAssetTagAndProject("TDS-${lastAssetId}",projectInstance)){
+																lastAssetId = lastAssetId+1
+															}
+															assetEntity."$attribName" = "TDS-${lastAssetId}"
+															projectInstance.lastAssetId = lastAssetId + 1
+														}
 													} else {
 														assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
 													}
@@ -254,6 +266,10 @@ class DataTransferBatchController {
     					}
     				}
     				dataTransferBatch.statusCode = 'COMPLETED'
+					if(!projectInstance.save(flush:true)){
+						println"Error while updating project.lastAssetId : ${projectInstance}"
+						projectInstance.errors.each { println it }
+					}
     				dataTransferBatch.save(flush:true)
 					/* update assets racks, cabling data once process done */
 					updateAssetsCabling( modelAssetsList, existingAssetsList )

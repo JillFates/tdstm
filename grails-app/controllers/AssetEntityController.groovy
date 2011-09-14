@@ -718,7 +718,22 @@ class AssetEntityController {
         def projectInstance = Project.findById( projectId )
         assetEntityInstance.project = projectInstance
         assetEntityInstance.owner = projectInstance.client
-		
+		if(!params.assetTag){
+			def lastAssetId = projectInstance.lastAssetId
+			if(!lastAssetId){
+				lastAssetId = jdbcTemplate.queryForInt("select max(asset_entity_id) FROM asset_entity WHERE project_id = ${projectInstance.id}")
+			}
+			while(AssetEntity.findByAssetTagAndProject("TDS-${lastAssetId}",projectInstance)){
+				lastAssetId = lastAssetId+1
+			}
+			assetEntityInstance.assetTag = "TDS-${lastAssetId}"
+			projectInstance.lastAssetId = lastAssetId + 1
+			if(!projectInstance.save(flush:true)){
+				println"Error while updating project.lastAssetId : ${projectInstance}"
+				projectInstance.errors.each { println it }
+			}
+		}
+	
 		if(bundleId)
 			assetEntityInstance.moveBundle = MoveBundle.read(Long.parseLong( bundleId ))
 			
@@ -846,7 +861,9 @@ class AssetEntityController {
 				
 	        	assetEntityInstance.properties = map
 	        	assetEntityInstance.lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
-				
+				if(!assetEntityInstance.assetTag){
+					assetEntityInstance.assetTag = "TDS-${assetEntityInstance.id}"
+				}
 	            if(!assetEntityInstance.hasErrors() && assetEntityInstance.save()) {
 	            	assetEntityInstance.updateRacks()
 	            	def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
