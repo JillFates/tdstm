@@ -51,27 +51,60 @@
 					</label><br />
 				</div>
 				</td>
-				<td class="cap_tab" style="width:150px">
-					<table class="cap_tab" style="width: auto; padding:1px; border: none;">
-					<tr><td class="cap_tab" rowspan="2"><b>Capacity View:</b>&nbsp;<select name="capacityView" size="1">
-						<option label="None" value="None"></option>
-						<option label="Space" value="Space"></option>
-						<option label="Power" value="Power"></option>
-						<option label="Heat" disabled="disabled"></option>
-						<option label="Weight" disabled="disabled"></option>
-						<option label="Ethernet" value="Ethernet" disabled="disabled"></option>
-						<option label="Fiber" value="Fiber" disabled="disabled"></option>
-						</select>
-					</td><td class="cap_tab rack_cap20" id="#cap20">&nbsp;</td></tr>
-					<tr><td class="cap_tab rack_cap32" id="#cap32">&nbsp;</td></tr>
-					<tr><td class="cap_tab" rowspan="3">
-						<input type="radio" name="capacityType" value="Used" />&nbsp;Used&nbsp;<br />
-						<input type="radio" name="capacityType" checked="checked" value="Remaining" />&nbsp;Remaining
-					</td><td class="cap_tab rack_cap44" id="#cap44">&nbsp;</td></tr>
-					<tr><td class="cap_tab rack_cap56" id="#cap56">&nbsp;</td></tr>
-					<tr><td class="cap_tab rack_cap68" id="#cap68">&nbsp;</td></tr>
-					<tr><td class="cap_tab" >&nbsp;</td><td class="cap_tab rack_cap80" id="#cap80">&nbsp;</td></tr>
-					</table>
+				<td class="cap_tab">
+					<div style="float: left;">
+						<table class="cap_tab"
+							style="width: auto; padding: 1px; border: none;">
+							<tr>
+								<td class="cap_tab"><b>Capacity View:</b></td>
+							</tr>
+							<tr>
+								<td class="cap_tab">
+									<select name="capacityView" size="1" onchange="capacityView()" id="capacityViewId">
+										<option label="None" value="None">None</option>
+										<option label="Space" value="Space">Space</option>
+										<option label="Power" value="Power">Power</option>
+										<option label="Heat" value="Heat" disabled="disabled">Heat</option>
+										<option label="Weight" value="Weight" disabled="disabled">Weight</option>
+										<option label="Ethernet" value="Ethernet" disabled="disabled">Ethernet</option>
+										<option label="Fiber" value="Fiber" disabled="disabled">Fiber</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td class="cap_tab" rowspan="3">
+									<input type="radio" name="capacityType" value="Used" onclick="capacityView()"/>&nbsp;Used&nbsp;<br /> 
+									<input type="radio" name="capacityType" checked="checked" value="Remaining" onclick="capacityView()"/>&nbsp;Remaining
+								</td>
+							</tr>
+							<tr>
+								<td class="cap_tab">&nbsp;</td>
+							</tr>
+						</table>
+					</div>
+					<div  id="scale_div" style="float: left;display: none;" >
+						<table class="scale_tab"
+							style="width: auto; padding: 1px; border: none;">
+							<tr>
+								<td class="cap_tab rack_cap20" id="cap20">&nbsp;</td>
+							</tr>
+							<tr>
+								<td class="cap_tab rack_cap32" id="cap32">&nbsp;</td>
+							</tr>
+							<tr>
+								<td class="cap_tab rack_cap44" id="cap44">&nbsp;</td>
+							</tr>
+							<tr>
+								<td class="cap_tab rack_cap56" id="cap56">&nbsp;</td>
+							</tr>
+							<tr>
+								<td class="cap_tab rack_cap68" id="cap68">&nbsp;</td>
+							</tr>
+							<tr>
+								<td class="cap_tab rack_cap80" id="cap80">&nbsp;</td>
+							</tr>
+						</table>
+					</div>
 				</td>
 				<td style="padding-left: 50px; align:right;" id="rackPowerTd">
 				</td>
@@ -95,14 +128,14 @@
 		</table>
 			<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack" status='i'>
 				<g:if test="${rack.rackType == 'Rack'}">
-					<g:remoteLink controller="rackLayouts" action="save" params="[moveBundleId:moveBundleId,rackId:rack.id,backView:'off',showCabling:'off',otherBundle:'on',bundleName:'on',hideIcons:'on']" onSuccess="updateRackPower(${rack.id})" onComplete="jQuery('#rackLayout').html(e.responseText);">
-					<div style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'rack_highlight_'+rack.front : source=='true' && rack.source == 1 ? 'rack_highlight_'+rack.front : target == 'true' && rack.source == 0 ? 'rack_highlight_'+rack.front : rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_'+rack.front }">
+					<g:remoteLink controller="rackLayouts" action="save" params="[moveBundleId:moveBundleId,rackId:rack.id,backView:'off',showCabling:'off',otherBundle:'on',bundleName:'on',hideIcons:'on']" onSuccess="alert(${rack.id});updateRackPower(${rack.id})" onComplete="jQuery('#rackLayout').html(e.responseText);">
+					<div id="rack_${rack.id}" style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'rack_highlight_'+rack.front : source=='true' && rack.source == 1 ? 'rack_highlight_'+rack.front : target == 'true' && rack.source == 0 ? 'rack_highlight_'+rack.front : rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_'+rack.front }">
 						<div id="rack_div_${i}" class="racktop_label" onclick="$('#selectedRackId').val(this.id)">${rack.tag}</div>
 					</div>
 					</g:remoteLink>
 				</g:if>
 				<g:else>
-					<div style="position:absolute;top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="room_${rack.rackType}_${rack.front}">
+					<div id="rack_${rack.id}" style="position:absolute;top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="room_${rack.rackType}_${rack.front}">
 						<div class="racktop_label" >${rack.tag}</div>
 					</div>
 				</g:else>
@@ -175,7 +208,33 @@ function updateRackPower(rackId){
 	$("#createDialog").dialog("close")
 	$("#listDialog").dialog("close")
 }
-function capacityView{
+function capacityView(){
+	var capacityView = $("#capacityViewId").val()
+	var capacityType = $('input[name=capacityType]:checked').val()
+	var roomId = "${roomInstance.id}"
+	jQuery.ajax({
+		url: "getCapacityView",
+		data: "roomId="+roomId+"&capacityView="+capacityView+"&capacityType="+capacityType,
+		type:'POST',
+		success: function(data) {
+			$("#cap20").html(data.view["cap20"])
+			$("#cap32").html(data.view["cap32"])
+			$("#cap44").html(data.view["cap44"])
+			$("#cap56").html(data.view["cap56"])
+			$("#cap68").html(data.view["cap68"])
+			$("#cap80").html(data.view["cap80"])
+			$("#scale_div").show()
+			var racks = data.racks
+			for(i=0; i< racks.length; i++){
+				$("#rack_"+racks[i]).addClass(data.rackData[racks[i]])
+			}
+		}
+	});
+	$("#editDialog").dialog("close")
+	$("#createRoomDialog").dialog("close")
+	$("#mergeRoomDialog").dialog("close")
+	$("#createDialog").dialog("close")
+	$("#listDialog").dialog("close")
 }
 </script>
 </body>

@@ -405,4 +405,81 @@ class RoomController {
 	   }
 	   render stringToReturn
    }
+	/**
+	 * Room Capacity Scaling
+	 */
+	def getCapacityView = {
+		def capacityData = [:]
+		def room = Room.read(params.roomId)
+		def racks = Rack.findAllByRoom(room)
+		def rackData = [:]
+		def maxU = 42
+		def maxPower = 1
+		racks.each{rack->
+			def rackPower = rack.powerA + rack.powerB + rack.powerB
+			if( maxPower < rackPower ){
+				maxPower = rackPower
+			}
+			/**
+			 * TODO : Logic to display the Racks color.
+			 * If Used, rack_cap20 = max_power * 20%, rack_cap20 = max_U * 20%
+			 * Remaining, rack_cap20 = max_power * 80%, rack_cap20 = max_U * 80%
+			 * For now i hard coded.
+			 */
+			rackData["${rack.id}"] = "rack_cap56"
+		}
+		
+		// Implement the Scale display
+		capacityData.rackData = rackData
+		capacityData.racks = racks.id
+		def powerType = session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE
+		powerType = powerType ?: "Watts"
+		maxPower = powerType != "Watts" ? Math.round(maxPower / 110) : maxPower
+		// Added switch to use if we use other capacityViews 
+		switch(params.capacityView){
+			case "Space":
+				if(params.capacityType != "Used"){
+					capacityData.view = [
+							cap20:"${Math.round(maxU*0.8)} RU",
+							cap32:"${Math.round(maxU*0.68)} RU",
+							cap44:"${Math.round(maxU*0.56)} RU",
+							cap56:"${Math.round(maxU*0.44)} RU",
+							cap68:"${Math.round(maxU*0.32)} RU",
+							cap80:"${Math.round(maxU*0.2)} RU"
+						]
+				} else {
+					capacityData.view = [
+							cap20:"${Math.round(maxU*0.2)} RU",
+							cap32:"${Math.round(maxU*0.32)} RU",
+							cap44:"${Math.round(maxU*0.44)} RU",
+							cap56:"${Math.round(maxU*0.56)} RU",
+							cap68:"${Math.round(maxU*0.68)} RU",
+							cap80:"${Math.round(maxU*0.8)} RU"
+						]
+				}
+				break;
+			case "Power":
+				if(params.capacityType != "Used"){
+					capacityData.view = [
+							cap20:"${Math.round(maxPower*0.8)} ${powerType}",
+							cap32:"${Math.round(maxPower*0.68)} ${powerType}",
+							cap44:"${Math.round(maxPower*0.56)} ${powerType}",
+							cap56:"${Math.round(maxPower*0.44)} ${powerType}",
+							cap68:"${Math.round(maxPower*0.32)} ${powerType}",
+							cap80:"${Math.round(maxPower*0.2)} ${powerType}"
+						]
+				} else {
+					capacityData.view = [
+							cap20:"${Math.round(maxPower*0.2)} ${powerType}",
+							cap32:"${Math.round(maxPower*0.32)} ${powerType}",
+							cap44:"${Math.round(maxPower*0.44)} ${powerType}",
+							cap56:"${Math.round(maxPower*0.56)} ${powerType}",
+							cap68:"${Math.round(maxPower*0.68)} ${powerType}",
+							cap80:"${Math.round(maxPower*0.8)} ${powerType}"
+						]
+				}
+				break;
+		}
+		render capacityData as JSON
+	}
 }
