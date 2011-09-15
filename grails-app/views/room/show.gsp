@@ -27,7 +27,7 @@
 				<td style="vertical-align:top">
 				<div style="width: 150px"><label><b>Highlight:</b></label><br /><br />
 				<label><b>Bundle</b></label><br />
-					<g:select id="bundleId" name="moveBundle" from="${moveBundleList}" value="${moveBundleId}" optionKey="id" optionValue="name" noSelection="${['':'Select Bundle...']}" 
+					<g:select id="bundleId" name="moveBundle" from="${moveBundleList}" value="${moveBundleId}" optionKey="id" optionValue="name" noSelection="${['':'All']}" 
 						onchange="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val() +\'&moveBundleId=\'+this.value', onComplete:'openRoomView(e)')}" />
 				</div>
 				</td>
@@ -61,6 +61,7 @@
 						<option label="Weight" disabled="disabled"></option>
 						<option label="Ethernet" value="Ethernet" disabled="disabled"></option>
 						<option label="Fiber" value="Fiber" disabled="disabled"></option>
+						</select>
 					</td><td class="cap_tab rack_cap20" id="#cap20">&nbsp;</td></tr>
 					<tr><td class="cap_tab rack_cap32" id="#cap32">&nbsp;</td></tr>
 					<tr><td class="cap_tab" rowspan="3">
