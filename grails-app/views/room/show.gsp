@@ -128,7 +128,7 @@
 		</table>
 			<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack" status='i'>
 				<g:if test="${rack.rackType == 'Rack'}">
-					<g:remoteLink controller="rackLayouts" action="save" params="[moveBundleId:moveBundleId,rackId:rack.id,backView:'off',showCabling:'off',otherBundle:'on',bundleName:'on',hideIcons:'on']" onSuccess="alert(${rack.id});updateRackPower(${rack.id})" onComplete="jQuery('#rackLayout').html(e.responseText);">
+					<g:remoteLink controller="rackLayouts" action="save" params="[moveBundleId:moveBundleId,rackId:rack.id,backView:'off',showCabling:'off',otherBundle:'on',bundleName:'on',hideIcons:'on']" onSuccess="updateRackPower(${rack.id})" onComplete="jQuery('#rackLayout').html(e.responseText);">
 					<div id="rack_${rack.id}" style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'rack_highlight_'+rack.front : source=='true' && rack.source == 1 ? 'rack_highlight_'+rack.front : target == 'true' && rack.source == 0 ? 'rack_highlight_'+rack.front : rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_'+rack.front }">
 						<div id="rack_div_${i}" class="racktop_label" onclick="$('#selectedRackId').val(this.id)">${rack.tag}</div>
 					</div>
@@ -217,16 +217,33 @@ function capacityView(){
 		data: "roomId="+roomId+"&capacityView="+capacityView+"&capacityType="+capacityType,
 		type:'POST',
 		success: function(data) {
-			$("#cap20").html(data.view["cap20"])
-			$("#cap32").html(data.view["cap32"])
-			$("#cap44").html(data.view["cap44"])
-			$("#cap56").html(data.view["cap56"])
-			$("#cap68").html(data.view["cap68"])
-			$("#cap80").html(data.view["cap80"])
-			$("#scale_div").show()
-			var racks = data.racks
-			for(i=0; i< racks.length; i++){
-				$("#rack_"+racks[i]).addClass(data.rackData[racks[i]])
+			if(data != "None"){
+				var racks = data.racks
+				$("#cap20").addClass("rack_cap20").html(data.view["cap20"])
+				$("#cap32").addClass("rack_cap32").html(data.view["cap32"])
+				$("#cap44").addClass("rack_cap44").html(data.view["cap44"])
+				$("#cap56").addClass("rack_cap56").html(data.view["cap56"])
+				$("#cap68").addClass("rack_cap68").html(data.view["cap68"])
+				$("#cap80").addClass("rack_cap80").html(data.view["cap80"])
+				
+				$("#scale_div").show()
+				for(i=0; i< racks.length; i++){
+					$("#rack_"+racks[i]).removeClass("rack_cap20")	
+					$("#rack_"+racks[i]).removeClass("rack_cap32")
+					$("#rack_"+racks[i]).removeClass("rack_cap44")
+					$("#rack_"+racks[i]).removeClass("rack_cap56")
+					$("#rack_"+racks[i]).removeClass("rack_cap68")
+					$("#rack_"+racks[i]).removeClass("rack_cap80")
+					$("#rack_"+racks[i]).addClass(data.rackData[racks[i]])
+				}
+			} else {
+				$(".rack_cap20").removeClass("rack_cap20")	
+				$(".rack_cap32").removeClass("rack_cap32")
+				$(".rack_cap44").removeClass("rack_cap44")
+				$(".rack_cap56").removeClass("rack_cap56")
+				$(".rack_cap68").removeClass("rack_cap68")
+				$(".rack_cap80").removeClass("rack_cap80")
+				$("#scale_div").hide()
 			}
 		}
 	});

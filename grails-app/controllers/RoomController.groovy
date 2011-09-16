@@ -412,33 +412,113 @@ class RoomController {
 		def capacityData = [:]
 		def room = Room.read(params.roomId)
 		def racks = Rack.findAllByRoom(room)
+		def capacityView = params.capacityView
+		def capacityType = params.capacityType
 		def rackData = [:]
 		def maxU = 42
 		def maxPower = 1
+		def location = room.source == 1 ? "source" : "target"
 		racks.each{rack->
-			def rackPower = rack.powerA + rack.powerB + rack.powerB
+			def rackPower = rack.powerA + rack.powerB + rack.powerC
 			if( maxPower < rackPower ){
 				maxPower = rackPower
 			}
-			/**
-			 * TODO : Logic to display the Racks color.
-			 * If Used, rack_cap20 = max_power * 20%, rack_cap20 = max_U * 20%
-			 * Remaining, rack_cap20 = max_power * 80%, rack_cap20 = max_U * 80%
-			 * For now i hard coded.
-			 */
-			rackData["${rack.id}"] = "rack_cap56"
+			
+			def assetsInRack = location == "source" ? AssetEntity.findAllByRackSource(rack) : AssetEntity.findAllByRackTarget(rack)
+			def usedRacks = 0
+			def powerUsed = 0
+			assetsInRack.each{ assetEntity ->
+				usedRacks += assetEntity?.model?.usize ? assetEntity?.model?.usize : 1
+				def powerConnectors = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.toPower is not null AND cap.fromConnectorNumber.type = ? AND cap.fromAsset = ? ",["Power",assetEntity])
+				def powerConnectorsAssigned = powerConnectors.size()
+				def totalPower = assetEntity.model?.powerUse ? assetEntity.model?.powerUse : 0
+				if(powerConnectorsAssigned){
+					def powerUseForConnector = totalPower ? totalPower / powerConnectorsAssigned : 0
+					powerConnectors.each{ cables ->
+						powerUsed += powerUseForConnector
+					}
+				}
+			}
+			switch(capacityView){
+				case "Space":
+					if(capacityType != "Used"){
+						usedRacks = maxU - usedRacks
+						if(usedRacks <= Math.round(maxU*0.2)){
+							rackData["${rack.id}"] = "rack_cap80"
+						}else if(usedRacks >  Math.round(maxU*0.2)  && usedRacks <= Math.round(maxU*0.32)){
+							rackData["${rack.id}"] = "rack_cap68"
+						}else if(usedRacks >=  Math.round(maxU*0.32) && usedRacks <= Math.round(maxU*0.44)){
+							rackData["${rack.id}"] = "rack_cap56"
+						}else if(usedRacks >=  Math.round(maxU*0.44) && usedRacks <= Math.round(maxU*0.56)){
+							rackData["${rack.id}"] = "rack_cap44"
+						}else if(usedRacks >=  Math.round(maxU*0.56) && usedRacks <= Math.round(maxU*0.68)){
+							rackData["${rack.id}"] = "rack_cap32"
+						}else if(usedRacks >=  Math.round(maxU*0.68)){
+							rackData["${rack.id}"] = "rack_cap20"
+						} 
+						
+					}else{
+						if(usedRacks <= Math.round(maxU*0.2)){
+							rackData["${rack.id}"] = "rack_cap20"
+						}else if(usedRacks >  Math.round(maxU*0.2)  && usedRacks <= Math.round(maxU*0.32)){
+							rackData["${rack.id}"] = "rack_cap32"
+						}else if(usedRacks >  Math.round(maxU*0.32) && usedRacks <= Math.round(maxU*0.44)){
+							rackData["${rack.id}"] = "rack_cap44"
+						}else if(usedRacks >  Math.round(maxU*0.44) && usedRacks <= Math.round(maxU*0.56)){
+							rackData["${rack.id}"] = "rack_cap56"
+						}else if(usedRacks >  Math.round(maxU*0.56) && usedRacks <= Math.round(maxU*0.68)){
+							rackData["${rack.id}"] = "rack_cap68"
+						}else if(usedRacks >  Math.round(maxU*0.68)){
+							rackData["${rack.id}"] = "rack_cap80"
+						}
+						
+					}
+					break;
+			  case "Power":
+				     if(capacityType != "Used"){
+						powerUsed = rackPower - powerUsed
+						if(powerUsed <= Math.round(rackPower*0.2) ){
+							rackData["${rack.id}"] = "rack_cap80"
+						}else if (powerUsed > Math.round(rackPower*0.2)  && powerUsed  <= Math.round(rackPower*0.32) ){
+						    rackData["${rack.id}"] = "rack_cap68"
+						}else if (powerUsed > Math.round(rackPower*0.32) && powerUsed <= Math.round(rackPower*0.44) ){
+						    rackData["${rack.id}"] = "rack_cap56"
+						}else if (powerUsed > Math.round(rackPower*0.44) && powerUsed <= Math.round(rackPower*0.56) ){
+						    rackData["${rack.id}"] = "rack_cap44"
+						}else if (powerUsed > Math.round(rackPower*0.56) && powerUsed <= Math.round(rackPower*0.68) ){
+						    rackData["${rack.id}"] = "rack_cap32"
+					    }else if (powerUsed > Math.round(rackPower*0.68) ){
+						    rackData["${rack.id}"] = "rack_cap20"
+					    }
+					}else{
+						if(powerUsed <= Math.round(rackPower*0.2) ){
+							rackData["${rack.id}"] = "rack_cap20"
+						}else if (powerUsed > Math.round(rackPower*0.2) && powerUsed <= Math.round(rackPower*0.32) ){
+						    rackData["${rack.id}"] = "rack_cap32"
+						}else if (powerUsed > Math.round(rackPower*0.32) && powerUsed <= Math.round(rackPower*0.44) ){
+						    rackData["${rack.id}"] = "rack_cap44"
+						}else if (powerUsed > Math.round(rackPower*0.44) && powerUsed <= Math.round(rackPower*0.56) ){
+						    rackData["${rack.id}"] = "rack_cap56"
+						}else if (powerUsed > Math.round(rackPower*0.56) && powerUsed <= Math.round(rackPower*0.68) ){
+						    rackData["${rack.id}"] = "rack_cap68"
+					    }else if (powerUsed > Math.round(rackPower*0.68) ){
+						    rackData["${rack.id}"] = "rack_cap80"
+					    }
+					}
+					break;
+			}
 		}
 		
-		// Implement the Scale display
+		// Implement the Scale display  
 		capacityData.rackData = rackData
 		capacityData.racks = racks.id
 		def powerType = session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE
 		powerType = powerType ?: "Watts"
 		maxPower = powerType != "Watts" ? Math.round(maxPower / 110) : maxPower
 		// Added switch to use if we use other capacityViews 
-		switch(params.capacityView){
+		switch(capacityView){
 			case "Space":
-				if(params.capacityType != "Used"){
+				if(capacityType != "Used"){
 					capacityData.view = [
 							cap20:"${Math.round(maxU*0.8)} RU",
 							cap32:"${Math.round(maxU*0.68)} RU",
@@ -459,7 +539,7 @@ class RoomController {
 				}
 				break;
 			case "Power":
-				if(params.capacityType != "Used"){
+				if(capacityType != "Used"){
 					capacityData.view = [
 							cap20:"${Math.round(maxPower*0.8)} ${powerType}",
 							cap32:"${Math.round(maxPower*0.68)} ${powerType}",
@@ -480,6 +560,10 @@ class RoomController {
 				}
 				break;
 		}
-		render capacityData as JSON
+		if(capacityData.view){
+			render capacityData as JSON
+		} else {
+			render "None"
+		}
 	}
 }
