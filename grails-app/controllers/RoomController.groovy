@@ -411,7 +411,7 @@ class RoomController {
 	def getCapacityView = {
 		def capacityData = [:]
 		def room = Room.read(params.roomId)
-		def racks = Rack.findAllByRoom(room)
+		def racks = Rack.findAllByRoomAndRackType(room,"Rack")
 		def capacityView = params.capacityView
 		def capacityType = params.capacityType
 		def rackData = [:]
