@@ -100,9 +100,10 @@ class RackLayoutsController {
 			if(racks.size() == 0 && rackId){
 				racks = Rack.findAllById(rackId)
 				moveBundles = []
-				if(params.moveBundleId){
-					moveBundles = MoveBundle.findAllById(params.moveBundleId)
-					bundleId = [params.moveBundleId]
+				bundleId = request.getParameterValues("moveBundleId")
+				if(bundleId && !bundleId.contains("all")){
+					def moveBundleId = bundleId.collect{id->Long.parseLong(id)}
+					moveBundles = MoveBundle.findAllByIdInList(moveBundleId)
 				}
 			}
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ	

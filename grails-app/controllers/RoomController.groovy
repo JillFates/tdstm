@@ -45,17 +45,36 @@ class RoomController {
         def roomInstance = Room.get(params.id)
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		userPreferenceService.setPreference( "CURR_ROOM", "${roomInstance?.id}" )
-		def project = Project.findById( projectId )
-		def roomInstanceList = Room.findAllByProject( project, [sort:"roomName",order:'asc'])
-		def moveBundleList = MoveBundle.findAllByProject( project )
         if (!roomInstance) {
 			userPreferenceService.removePreference("CURR_ROOM")
             flash.message = "Current Room not found"
             redirect(action: "list", params:[viewType : "list"])
         }
         else {
-            [roomInstance: roomInstance, roomInstanceList:roomInstanceList, moveBundleList:moveBundleList, 
-			 moveBundleId:params.moveBundleId, source:params.source, target:params.target, projectId : projectId]
+			def project = Project.findById( projectId )
+			def roomInstanceList = Room.findAllByProject( project, [sort:"roomName",order:'asc'])
+			def moveBundleList = []
+			def moveBundleId = params.moveBundleId
+			def racksList = []
+			if(moveBundleId && !moveBundleId.contains("all")){
+				def bundles = moveBundleId.split(",").collect{id-> Long.parseLong(id) }
+				moveBundleList = MoveBundle.findAllByIdInList(bundles)
+				moveBundleList.each{ moveBundle->
+					moveBundle.sourceRacks.findAll{it.room.id == roomInstance.id}.each{ sourceRack->
+						if( !racksList.contains( sourceRack ) )
+							racksList.add( sourceRack )
+					}
+					moveBundle.targetRacks.findAll{it.room.id == roomInstance.id}.each{ targetRack->
+						if( !racksList.contains( targetRack ) )
+							racksList.add( targetRack )
+					}
+				}
+			} else {
+				racksList = Rack.findAllByRoom(roomInstance)
+				moveBundleList = [id:'all']
+			}
+            [roomInstance: roomInstance, roomInstanceList:roomInstanceList, moveBundleList:moveBundleList, project:project,
+			 racksList: racksList, source:params.source, target:params.target, projectId : projectId]
         }
     }
 
