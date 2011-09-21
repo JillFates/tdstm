@@ -50,7 +50,7 @@ class ClientTeamsController {
 				if( hasRole || it.teamMembers.id.contains(loginUser.id) ){
 					def teamId = it.projectTeam.id
 					def headColor = 'done'
-					def role = it.projectTeam?.role
+					def role = it.projectTeam?.role ? it.projectTeam?.role : "MOVE_TECH"
 					def swimlane = Swimlane.findByNameAndWorkflow(role ? role : "MOVE_TECH", Workflow.findByProcess(moveBundle.project.workflowCode) )
 					
 					def hasSourceAssets = AssetEntity.find("from AssetEntity WHERE sourceTeamMt = $teamId OR sourceTeamSa = $teamId OR sourceTeamDba = $teamId")
