@@ -12,6 +12,7 @@
 				<td class="buttonR" style="vertical-align:top">
 				<div>
 				<g:select id="roomId" name="id" from="${roomInstanceList}" value="${roomInstance.id}" optionKey="id" optionValue="${{it.location +' / '+it.roomName}}" onchange="getRackDetails()"/>
+				<input type="hidden" id="selectedRackId" value="">
 				<br />
 
 				<g:form action="list">
@@ -194,9 +195,12 @@
 <script type="text/javascript">
 initializeRacksInRoom( [] )
 function updateRackPower(rackId){
+	$("#selectedRackId").val(rackId)
+	var capacityView = $("#capacityViewId").val()
+	var capacityType = $('input[name=capacityType]:checked').val()
 	jQuery.ajax({
 		url: "getRackPowerData",
-		data: "rackId="+rackId,
+		data: "roomId="+$('#roomId').val()+"&rackId="+rackId+"&capacityView="+capacityView+"&capacityType="+capacityType,
 		type:'POST',
 		success: function(data) {
 			$("#rackPowerTd").html(data)
@@ -245,6 +249,7 @@ function capacityView(){
 				$(".rack_cap80").removeClass("rack_cap80")
 				$("#scale_div").hide()
 			}
+			 updateRackPower($("#selectedRackId").val())
 		}
 	});
 	$("#editDialog").dialog("close")

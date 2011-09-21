@@ -54,7 +54,7 @@
 		</table>
 		<g:each in="${rackInstanceList}" var="rack">
 			<g:if test="${rack.rackType == 'Rack'}">
-				<div align="center"  id="rack_${rack.id}" style="top:${rack.roomY}px; left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="${rack?.hasBelongsToMoveBundle(moveBundleId) ? 'rack_highlight' : source=='true' && rack.source == 1 ? 'rack_highlight' : target == 'true' && rack.source == 0 ? 'rack_highlight' : rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_L' }">
+				<div align="center"  id="rack_${rack.id}" style="top:${rack.roomY}px; left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="${ rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_L' }">
 					<span id="rackLabel_${rack.id}"><br>${rack.tag}</br></span>
 				</div>
 			</g:if>

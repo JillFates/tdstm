@@ -93,8 +93,7 @@ class RoomController {
             redirect(action: "list")
         }
         else {
-            [roomInstance: roomInstance, rackInstanceList:rackInstanceList, moveBundleList:moveBundleList,
-			 moveBundleId:params.moveBundleId, source:params.source, target:params.target, newRacks : newRacks]
+            [roomInstance: roomInstance, rackInstanceList:rackInstanceList, newRacks : newRacks]
         }
     }
 
@@ -278,57 +277,112 @@ class RoomController {
     *  Return Power details as string to show at room layout.
     */
    def getRackPowerData = {
-	   def rackId = params.rackId
-	   def rack = Rack.get(rackId)
+	   def room = Room.read(params.roomId)
+	   def racks = Rack.findAllByRoom(room)
+	   def location = room.source == 1 ? "source" : "target"
+	   def powerType = session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE
+	   def totalPower = 0
+	   def totalSpace = 0
+	   def spaceUsed = 0
+	   def powerUsed = 0
+	   racks.each{ obj->
+		   totalPower += obj.powerA + obj.powerB + obj.powerC
+		   totalSpace += obj.model?.usize ?: 42
+		   def assetsInRack = location == "source" ? AssetEntity.findAllByRackSource(obj) : AssetEntity.findAllByRackTarget(obj)
+		   assetsInRack.each{ assetEntity ->
+			   spaceUsed += assetEntity?.model?.usize ? assetEntity?.model?.usize : 1
+			   def powerConnectors = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.toPower is not null AND cap.fromConnectorNumber.type = ? AND cap.fromAsset = ? ",["Power",assetEntity])
+			   def powerConnectorsAssigned = powerConnectors.size()
+			   def rackPower = assetEntity.model?.powerUse ? assetEntity.model?.powerUse : 0
+			   if(powerConnectorsAssigned){
+				   def powerUseForConnector = rackPower ? rackPower / powerConnectorsAssigned : 0
+				   powerConnectors.each{ cables ->
+					   powerUsed += powerUseForConnector
+				   }
+			   }
+		   }
+	   }
+	   if(params.capacityType != "Used") {
+		   spaceUsed = totalSpace - spaceUsed
+		   powerUsed = totalPower - powerUsed
+	   }
+	   powerUsed = powerType != "Watts" ?  powerUsed ? (powerUsed / 110).toFloat().round(1) : 0.0 : powerUsed ? Math.round(powerUsed):0
+	   totalPower = powerType != "Watts" ?  totalPower ? (totalPower / 110).toFloat().round(1) : 0.0 : totalPower ? Math.round(totalPower):0
 	   def powerA = 0
 	   def powerB = 0
 	   def powerC = 0
 	   def powerX = 0
-	   def assets = AssetEntity.findAllByRackSource( rack )
-	   if(rack.source != 1){
-	   		assets = AssetEntity.findAllByRackTarget( rack )
-	   }
-	   assets.each{ asset->
-		   def assetPowerCabling = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.fromConnectorNumber.type = ? AND cap.fromAsset = ? ",["Power",asset])
-		   def powerConnectors = assetPowerCabling.size()
-		   def powerConnectorsAssigned = assetPowerCabling.findAll{it.toPower != null && it.toPower != '' }.size()
+	   def rackPowerA = 0
+	   def rackPowerB = 0
+	   def rackPowerC = 0
+	   def spaceString = ""
+	   def thisRackUsedSpace = 0
+	   def thisRackTotalSpace = 42
+	   def rackId = params.rackId
+	   if(rackId){
+		   def rack = Rack.get(rackId)
+		   def assets = AssetEntity.findAllByRackSource( rack )
+		   if(rack.source != 1){
+				   assets = AssetEntity.findAllByRackTarget( rack )
+		   }
+		   thisRackTotalSpace = rack.model?.usize ?: 42
 		   
-		   def powerUse = asset.model?.powerUse ? asset.model?.powerUse : 0
-		   if(powerConnectorsAssigned){
-			   def powerUseForConnector = powerUse ? powerUse / powerConnectorsAssigned : 0
-			   assetPowerCabling.each{ cables ->
-				   if(cables.toPower){
-					   switch(cables.toPower){
-						   case "A": powerA += powerUseForConnector
-						   break;
-						   case "B": powerB += powerUseForConnector
-						   break;
-						   case "C": powerC += powerUseForConnector
-						   break;
+		   def assetsInRack = location == "source" ? AssetEntity.findAllByRackSource(rack) : AssetEntity.findAllByRackTarget(rack)
+		   assetsInRack.each{ assetEntity ->
+			   thisRackUsedSpace += assetEntity?.model?.usize ? assetEntity?.model?.usize : 1
+		   }
+		   spaceString = params.capacityType != "Used" ? (thisRackTotalSpace-thisRackUsedSpace)+" remaining of "+thisRackTotalSpace+" RU" : thisRackUsedSpace+" used of "+thisRackTotalSpace+" RU"
+		   assets.each{ asset->
+			   def assetPowerCabling = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.fromConnectorNumber.type = ? AND cap.fromAsset = ? ",["Power",asset])
+			   def powerConnectors = assetPowerCabling.size()
+			   def powerConnectorsAssigned = assetPowerCabling.findAll{it.toPower != null && it.toPower != '' }.size()
+			   
+			   def powerUse = asset.model?.powerUse ? asset.model?.powerUse : 0
+			   if(powerConnectorsAssigned){
+				   def powerUseForConnector = powerUse ? powerUse / powerConnectorsAssigned : 0
+				   assetPowerCabling.each{ cables ->
+					   if(cables.toPower){
+						   switch(cables.toPower){
+							   case "A": powerA += powerUseForConnector
+							   break;
+							   case "B": powerB += powerUseForConnector
+							   break;
+							   case "C": powerC += powerUseForConnector
+							   break;
+						   }
 					   }
 				   }
+			   } else {
+			   		powerX += powerUse
 			   }
-		   } else {
-		   		powerX += powerUse
 		   }
+		   powerA = powerType != "Watts" ?  powerA ? (powerA / 110).toFloat().round(1) : 0.0 : powerA ? Math.round(powerA):0
+		   powerB = powerType != "Watts" ?  powerB ? (powerB / 110).toFloat().round(1) : 0.0 : powerB ? Math.round(powerB):0
+		   powerC = powerType != "Watts" ?  powerC ? (powerC / 110).toFloat().round(1) : 0.0 : powerC ? Math.round(powerC):0
+		   powerX = powerType != "Watts" ?  powerX ? (powerX / 110).toFloat().round(1) : 0.0 : powerX ? Math.round(powerX):0
+		   
+		   rackPowerA = powerType != "Watts" ? rack.powerA ? (rack.powerA / 110).toFloat().round(1) : 0.0 : rack.powerA ? Math.round(rack.powerA) : 0
+		   rackPowerB = powerType != "Watts" ? rack.powerB ? (rack.powerB / 110).toFloat().round(1) : 0.0 : rack.powerB ? Math.round(rack.powerB) : 0
+		   rackPowerC = powerType != "Watts" ? rack.powerC ? (rack.powerC / 110).toFloat().round(1) : 0.0 : rack.powerC ? Math.round(rack.powerC) : 0
+			
 	   }
-	   def powerType = session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE
-	   powerA = powerType != "Watts" ?  powerA ? (powerA / 110).toFloat().round(1) : 0.0 : powerA ? Math.round(powerA):0 
-	   powerB = powerType != "Watts" ?  powerB ? (powerB / 110).toFloat().round(1) : 0.0 : powerB ? Math.round(powerB):0
-	   powerC = powerType != "Watts" ?  powerC ? (powerC / 110).toFloat().round(1) : 0.0 : powerC ? Math.round(powerC):0
-	   powerX = powerType != "Watts" ?  powerX ? (powerX / 110).toFloat().round(1) : 0.0 : powerX ? Math.round(powerX):0
-	 
-	
 	  
 	   
-	    def rackPowerA = powerType != "Watts" ? rack.powerA ? (rack.powerA / 110).toFloat().round(1) : 0.0 : rack.powerA ? Math.round(rack.powerA) : 0
-	    def rackPowerB = powerType != "Watts" ? rack.powerB ? (rack.powerB / 110).toFloat().round(1) : 0.0 : rack.powerB ? Math.round(rack.powerB) : 0
-	    def rackPowerC = powerType != "Watts" ? rack.powerC ? (rack.powerC / 110).toFloat().round(1) : 0.0 : rack.powerC ? Math.round(rack.powerC) : 0
- 	    def redTBD = false
+	   def redTBD = false
 	   if((powerA +powerB+ powerC+ powerX) > (rackPowerA+ rackPowerB + rackPowerC )){
 		   redTBD = true
 	   }
-	   def op="""<table border=0><tr><td colspan=4 class='powertable_L'><b>Rack : ${rack.tag}</b></td></tr>
+	   def op="""<table border=0>
+		   <tr>
+		   		<td class='powertable_L'>Totals</td>
+		   		<td colspan=2 class='powertable_L' nowrap>Space: $spaceUsed / $totalSpace</td>
+		   		<td colspan=2 class='powertable_L' nowrap>Power(${powerType}): $powerUsed / $totalPower</td>
+		   </tr>
+		   <tr><td>&nbsp;</td></tr>
+		   <tr>
+		   		<td colspan=2 class='powertable_L'><b>Rack : ${room.roomName}</b></td>
+		   		<td colspan=2 class='powertable_L' nowrap>${spaceString}</td>
+		   </tr>
 		   <tr>
 		   	   <td class='powertable_L'>Power (${powerType})</td>
 			   <td style='background:${ powerA > rackPowerA ? 'red':''};' class='powertable_C'>A</td>
