@@ -61,6 +61,37 @@
 			</td>
 		</tr>
 		<tr>
+		<tr>
+			<td valign="top" class="name" nowrap="nowrap">Model Height:
+			<td>
+				<input type="text" name="height" id="heightId" value=""/>
+				
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" class="name" nowrap="nowrap">Model Weight:
+			<td>
+				<input type="text" name="weight" id="weightId" value=""/>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" class="name" nowrap="nowrap">Model Depth:
+			<td>
+				<input type="text" name="depth" id="depthId" value=""/>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" class="name" nowrap="nowrap">Model Width:
+			<td>
+				<input type="text" name="width" id="widthId" value=""/>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" class="name" nowrap="nowrap">Layout Style:
+			<td>
+				<input type="text" name="layoutStyle" id="layoutStyle" value=""/>
+			</td>
+		</tr>
 			<td valign="top" class="name" nowrap="nowrap">Power :</td>
 			<td><input type="text" name="powerUse" id="powerUseId" value="${modelInstance.powerUse}" >&nbsp;
 			<g:select id="powerTypeId" name='powerType' from="${['Watts','Amps']}" value="${powerType}"> </g:select>
@@ -76,6 +107,7 @@
         <td><input size="20" type="file" name="rearImage" id="rearImageId" />
         </td>
         </tr>
+        
         <tr>
         	<td>Use Image:</td>
 	        <td>

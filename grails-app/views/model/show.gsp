@@ -50,6 +50,26 @@
 			</td>
 		</tr>
 		<tr>
+			<td>Model Height:</td>
+			<td>${modelInstance?.height}</td>
+		</tr>
+		<tr>
+			<td>Model Weight:</td>
+			<td>${modelInstance?.weight}</td>
+		</tr>
+		<tr>
+			<td>Model Depth:</td>
+			<td>${modelInstance?.depth}</td>
+		</tr>
+		<tr>
+			<td>Model Width:</td>
+			<td>${modelInstance?.width}</td>
+		</tr>
+		<tr>
+			<td>Layout Style:</td>
+			<td>${modelInstance?.layoutStyle}</td>
+		</tr>
+		<tr>
 			<td>Power :</td>
 			<td><span id="powerSpanId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts' ? modelInstance?.powerUse ? (modelInstance?.powerUse / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerUse}</span>
 			<input type="hidden" name="powerUse" id="powerUseId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? modelInstance?.powerUse ? (modelInstance?.powerUse / 110 )?.toFloat()?.round(1) : 0.0 : modelInstance?.powerUse}" >&nbsp;

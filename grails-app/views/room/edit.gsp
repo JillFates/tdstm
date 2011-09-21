@@ -30,10 +30,10 @@
 						<input type="submit" class="submit" value="Update" />
 					</td>
 					<td class="buttonR" style="padding-left: 200px;vertical-align:top;">
-						<b>Add to Room:</b>&nbsp;<input type="button" class="submit" value="Rack" onclick="createRack()" />
-						<input type="button" class="submit" value="UPS" onclick="createRack()" />
-						<input type="button" class="submit" value="CRAC" onclick="createRack()" />
-						<input type="button" class="submit" value="Object" onclick="createRack()" />
+						<b>Add to Room:</b>&nbsp;<input type="button" class="submit" value="Rack" onclick="createRack(this.value)" />
+						<input type="button" class="submit" value="UPS" onclick="createRack(this.value)" />
+						<input type="button" class="submit" value="CRAC" onclick="createRack(this.value)" />
+						<input type="button" class="submit" value="Object" onclick="createRack(this.value)" />
 					</td>
 				</tr>
 			</tbody>
@@ -54,7 +54,7 @@
 		</table>
 		<g:each in="${rackInstanceList}" var="rack">
 			<g:if test="${rack.rackType == 'Rack'}">
-				<div align="center"  id="rack_${rack.id}" style="top:${rack.roomY}px; left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="${rack.hasBelongsToMoveBundle(moveBundleId) ? 'rack_highlight' : source=='true' && rack.source == 1 ? 'rack_highlight' : target == 'true' && rack.source == 0 ? 'rack_highlight' : rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_L' }">
+				<div align="center"  id="rack_${rack.id}" style="top:${rack.roomY}px; left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="${rack?.hasBelongsToMoveBundle(moveBundleId) ? 'rack_highlight' : source=='true' && rack.source == 1 ? 'rack_highlight' : target == 'true' && rack.source == 0 ? 'rack_highlight' : rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_L' }">
 					<span id="rackLabel_${rack.id}"><br>${rack.tag}</br></span>
 				</div>
 			</g:if>
@@ -192,11 +192,21 @@ function verifyAndDeleteRacks(id){
 		}
 	});
 }
-function createRack(){
+function createRack(value){
 	var newRackId = $("#rackCount").val()
 	$("#rackEditRow_"+newRackId).show()
 	$("#rack_"+newRackId).show()
 	$("#rackCount").val( parseInt(newRackId)+1 )
+	if(value=="CRAC"){
+		$("#rackTypeId_"+newRackId).val('CRAC')
+		updateRackStyle(newRackId,'L','CRAC')
+	}else if(value=="UPS"){
+		$("#rackTypeId_"+newRackId).val('UPS')
+		updateRackStyle(newRackId,'L','UPS')
+	}else if(value=="Object"){
+		$("#rackTypeId_"+newRackId).val('Object')
+		updateRackStyle(newRackId,'L','Object')
+	}
 }
 function changeLabel(id,value){
 	$("#rackLabel_"+id).html(value)

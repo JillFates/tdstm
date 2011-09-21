@@ -53,6 +53,46 @@
 			</td>
 		</tr>
 		<tr>
+			<td>Model Height:</td>
+			<td><input type="text" name="modelHeight" id="heightId" value="${modelInstance?.height}">
+			<g:hasErrors bean="${modelInstance}" field="modelHeight">
+					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelHeight" /></div>
+				</g:hasErrors>
+			 </td>
+		</tr>
+		<tr>
+			<td>Model Weight:</td>
+			<td><input type="text" name="modelWeight" id="weightId" value="${modelInstance?.weight}">
+			<g:hasErrors bean="${modelInstance}" field="modelWeight">
+					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelWeight" /></div>
+				</g:hasErrors>
+			 </td>
+		</tr>
+		<tr>
+			<td>Model Depth:</td>
+			<td><input type="text" name="modelDepth" id="depthId" value="${modelInstance?.depth}">
+			<g:hasErrors bean="${modelInstance}" field="modelDepth">
+					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelDepth" /></div>
+				</g:hasErrors>
+			 </td>
+		</tr>
+		<tr>
+			<td>Model Width:</td>
+			<td><input type="text" name="modelWidth" id="widthId" value="${modelInstance?.width}">
+			<g:hasErrors bean="${modelInstance}" field="modelWidth">
+					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelWidth" /></div>
+				</g:hasErrors>
+			 </td>
+		</tr>
+		<tr>
+			<td>Layout Style:</td>
+			<td><input type="text" name="layoutStyle" id="layoutStyleId" value="${modelInstance?.layoutStyle}">
+			<g:hasErrors bean="${modelInstance}" field="layoutStyle">
+					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="layoutStyle" /></div>
+				</g:hasErrors>
+			 </td>
+		</tr>
+		<tr>
 			<td>Power :</td>
 			<td><input type="text" name="powerUse" id="powerUseId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (modelInstance?.powerUse / 110 ).toFloat().round(1) : modelInstance?.powerUse}" >&nbsp;
 			<g:select id="ptype" name='powerType' value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE }" from="${['Watts','Amps']}" onchange="updatePowerType(this.value)"> </g:select>
@@ -68,6 +108,7 @@
 	        <td><input size="20" type="file" name="rearImage" id="rearImageId" />
 	        </td>
         </tr>
+        
         <tr>
         	<td>Use Image:</td>
 	        <td>

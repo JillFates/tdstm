@@ -256,6 +256,11 @@ class ModelController {
                 	rearImage = modelInstance.rearImage
                 }
             }
+		
+			modelInstance.height = params.modelHeight != "" ? Integer.parseInt(params.modelHeight):0 
+			modelInstance.weight = params.modelWeight != "" ? Integer.parseInt(params.modelWeight):0 
+			modelInstance.depth  = params.modelDepth  != "" ? Integer.parseInt(params.modelDepth):0 
+			modelInstance.width  = params.modelWidth  != "" ? Integer.parseInt(params.modelWidth):0
             modelInstance.properties = params
             modelInstance.rearImage = rearImage
             modelInstance.frontImage = frontImage

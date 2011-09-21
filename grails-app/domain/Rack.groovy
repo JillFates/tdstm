@@ -28,7 +28,7 @@ class Rack {
 		powerA( blank:true, nullable:true )
 		powerB( blank:true, nullable:true )
 		powerC( blank:true, nullable:true )
-		rackType( blank:true, nullable:true, inList: ["Rack","CRAC","DoorL","DoorR"] )
+		rackType( blank:true, nullable:true, inList: ["Rack","CRAC","DoorL","DoorR","UPS","Object"] )
 		front( blank:true, nullable:true, inList: ["L","R","T","B"] )
 		manufacturer( blank:true, nullable:true )
 		model( blank:true, nullable:true )
@@ -38,6 +38,9 @@ class Rack {
 		id column:'rack_id'
 		sourceAssets sort:'sourceRackPosition'
 		targetAssets sort:'targetRackPosition'
+		columns {
+			rackType sqlType: 'varchar(20)'
+		}
 	}
 	
 	static Rack findOrCreateWhere(params) {
