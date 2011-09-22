@@ -33,7 +33,7 @@
 				</div>
 				</td>
 				<td class="buttonR">
-				<div style="width: 150px">
+				<div style="width: 100px">
 				<label for="sourceView">
 					<g:if test="${source == 'true'}">
 					<input type="checkbox" name="sourceView" id="sourceView" value="" checked="checked" onclick="getRackDetails()" />&nbsp;Source

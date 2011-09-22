@@ -111,9 +111,9 @@ function showAssetDialog( e , action ) {
 		    
 		    var labelTdE = ""
 	    	if(attribute.attributeCode == "manufacturer" && attribute.value != "" && attribute.value != null){
-	    		labelTdE = "<td style='width:25%;background:#f3f4f6;font-style:underline;' nowrap><a href='javascript:showManufacturer("+attribute.manufacturerId+")'>"+attribute.label+"</a></td>"
+	    		labelTdE = "<td style='width:25%;background:#f3f4f6;' nowrap><a href='javascript:showManufacturer("+attribute.manufacturerId+")' style='color:#00E'>"+attribute.label+"</a></td>"
 		    } else if(attribute.attributeCode == "model"&& attribute.value != "" && attribute.value != null ){
-		    	labelTdE = "<td style='width:25%;background:#f3f4f6;font-style:underline;' nowrap><a href='javascript:showModel("+attribute.modelId+")'>"+attribute.label+"</a></td>"
+		    	labelTdE = "<td style='width:25%;background:#f3f4f6;' nowrap><a href='javascript:showModel("+attribute.modelId+")' style='color:#00E'>"+attribute.label+"</a></td>"
 		    } else {
 		    	labelTdE = "<td style='background:#f3f4f6;width:25%;' nowrap>"+attribute.label+"</td>"
 		    }
@@ -125,9 +125,9 @@ function showAssetDialog( e , action ) {
 		    }
 		    var inputTd = ""
 		    if(attribute.attributeCode == "manufacturer"){
-		    	inputTd = "<td style='width:25%;color:#00f;font-style:underline;' nowrap><a href='javascript:showManufacturer("+attribute.manufacturerId+")'>"+attribute.value+"</a></td>"
+		    	inputTd = "<td style='width:25%;color:#00f;' nowrap><a href='javascript:showManufacturer("+attribute.manufacturerId+")' style='color:#00E'>"+attribute.value+"</a></td>"
 		    } else if(attribute.attributeCode == "model"){
-		    	inputTd = "<td style='width:25%;color:#00f;font-style:underline;' nowrap><a href='javascript:showModel("+attribute.modelId+")'>"+attribute.value+"</a></td>"
+		    	inputTd = "<td style='width:25%;color:#00f;' nowrap><a href='javascript:showModel("+attribute.modelId+")' style='color:#00E'>"+attribute.value+"</a></td>"
 		    } else {
 		    	inputTd = "<td style='width:25%;' nowrap>"+attribute.value+"</td>"
 		    }

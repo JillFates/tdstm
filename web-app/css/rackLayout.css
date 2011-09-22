@@ -148,6 +148,12 @@ br.page-break-after {
 }
 .room_mt {
 }
+.powertable_H {
+	background: #ddd;
+	padding: 1px;
+	font-weight: bold;
+	text-align:left;
+}
 .powertable_L {
 	width: 60px;
 	padding: 1px;
