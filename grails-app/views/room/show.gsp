@@ -6,7 +6,7 @@
 <b> Data Center / Room View </b>
 </span>
 <div class="dialog" style="border: 1px solid black;">
-	<table style="width: auto; border: none">
+	<table style="width: 100%; border: none">
 		<tbody>
 			<tr>
 				<td class="buttonR" style="vertical-align:top">
@@ -52,10 +52,9 @@
 					</label><br />
 				</div>
 				</td>
-				<td class="cap_tab">
+				<td class="cap_tab" style="vertical-align:top">
 					<div style="float: left;">
-						<table class="cap_tab"
-							style="width: auto; padding: 1px; border: none;">
+						<table class="cap_tab" style="width: auto; padding: 1px; border: none;">
 							<tr>
 								<td class="cap_tab"><b>Capacity View:</b></td>
 							</tr>
@@ -107,7 +106,7 @@
 						</table>
 					</div>
 				</td>
-				<td style="padding-left: 50px; align:right;" id="rackPowerTd">
+				<td style="padding-left: 20px; align:right;" id="rackPowerTd">
 				</td>
 			</tr>
 		</tbody>

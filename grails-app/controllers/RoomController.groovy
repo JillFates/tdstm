@@ -316,6 +316,10 @@ class RoomController {
 	   def rackPowerB = 0
 	   def rackPowerC = 0
 	   def spaceString = ""
+	   def powerString = "W"
+	   if(powerType != "Watts"){
+		powerString = "A"
+	   }
 	   def thisRackUsedSpace = 0
 	   def thisRackTotalSpace = 42
 	   def rackId = params.rackId
@@ -375,16 +379,16 @@ class RoomController {
 	   def op="""<table border=0>
 		   <tr>
 		   		<td class='powertable_L'>Totals</td>
-		   		<td colspan=2 class='powertable_L' nowrap>Space: $spaceUsed / $totalSpace</td>
-		   		<td colspan=2 class='powertable_L' nowrap>Power(${powerType}): $powerUsed / $totalPower</td>
+		   		<td colspan=2 class='powertable_L' >Space:<br />$spaceUsed / $totalSpace</td>
+		   		<td colspan=2 class='powertable_L' >Power(${powerString}):<br />$powerUsed / $totalPower</td>
 		   </tr>
 		   <tr><td>&nbsp;</td></tr>
 		   <tr>
 		   		<td colspan=2 class='powertable_L'><b>Rack : ${room.roomName}</b></td>
-		   		<td colspan=2 class='powertable_L' nowrap>${spaceString}</td>
+		   		<td colspan=3 class='powertable_L' nowrap>${spaceString}</td>
 		   </tr>
 		   <tr>
-		   	   <td class='powertable_L'>Power (${powerType})</td>
+		   	   <td class='powertable_L'>Power (${powerString})</td>
 			   <td style='background:${ powerA > rackPowerA ? 'red':''};' class='powertable_C'>A</td>
 			   <td style='background:${ powerB > rackPowerB ? 'red':''};' class='powertable_C'>B</td>
 			   <td style='background:${ powerC > rackPowerC ? 'red':''};' class='powertable_C'>C</td>

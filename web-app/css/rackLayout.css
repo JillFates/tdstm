@@ -568,7 +568,7 @@ table.rack_elevation table.bladeTable td.errorBlade {
 	position:absolute;
 }
 .cap_tab{
-	padding:1px;
+	padding:1px 5px;
 	font:10px verdana, arial, helvetica, sans-serif;
 }
 .rack_cap20{
@@ -578,14 +578,17 @@ table.rack_elevation table.bladeTable td.errorBlade {
 	background-color: #ade85a;
 }
 .rack_cap44{
-	background-color: #FFF566;
+	background-color: palegreen;
 }
 .rack_cap56{
-	background-color: #FFC966;
+	background-color: #FFF566;
 }
 .rack_cap68{
-	background-color: #FF8F65;
+	background-color: #FFC966;
 }
 .rack_cap80{
+	background-color: #FF8F65;
+}
+.rack_cap100{
 	background-color: #FF544B;
 }
