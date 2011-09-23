@@ -1224,9 +1224,6 @@ Comment</a></span></div>
 		onClick="return editAssetDialog()" /></span> <span class="button"><g:actionSubmit 
 		class="delete" onclick="return confirm('Delete Asset, are you sure?');"
 		value="Delete" /></span>
-		<span class="button"><g:actionSubmit action="remove"
-		class="delete"  onclick="return confirm('Remove Asset from project, are you sure?');"
-		value="Remove From Project" /></span>
 		</div>
 </g:form></div>
 
@@ -1244,9 +1241,6 @@ Comment</a></span></div>
 	</span> <span class="button"><input type="button"
 		class="delete" onclick="return editDialogDeleteRemove('delete')"
 		value="Delete" /></span>
-		<span class="button"><input type="button"
-		class="delete"  onclick="return editDialogDeleteRemove('remove');"
-		value="Remove From Project" /></span>
 		</div>
 </g:form></div>
 

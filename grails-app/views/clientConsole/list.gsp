@@ -548,7 +548,6 @@ Comment</a></span></div>
 	<input type="hidden" name="clientList" value="clientList" />
 	<span class="button"><input type="button" class="edit" value="Edit" onClick="return editAssetDialog()" /></span>
 	<span class="button"><g:actionSubmit class="delete" onclick="return confirm('Delete Asset, are you sure?');" value="Delete" /></span>
-	<span class="button"><g:actionSubmit action="remove" class="delete"  onclick="return confirm('Remove Asset from project, are you sure?');" value="Remove From Project" /></span>
 	</div>
 	</g:if>
 </g:form></div>
@@ -566,7 +565,6 @@ Comment</a></span></div>
 	<div class="buttons"><span class="button">
 	<input type="button" class="save" value="Update Asset" onClick="${remoteFunction(controller:'assetEntity', action:'getAssetAttributes', params:'\'assetId=\' + document.editForm.id.value ', onComplete:'callUpdateDialog(e)')}" />
 	</span> <span class="button"><input type="button" class="delete" onclick="return editDialogDeleteRemove('delete')" value="Delete" /></span>
-		<span class="button"><input type="button" class="delete" onclick="return editDialogDeleteRemove('remove');" value="Remove From Project" /></span>
 		</div>
 	</g:if>
 </g:form></div>
