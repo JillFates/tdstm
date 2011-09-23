@@ -156,7 +156,7 @@
 							<tr class="${assetList.cssVal}"  onclick="assetSubmit('${assetList?.item?.assetTag}');">
 								<td class="asset_details_block col1">${assetList?.item?.assetTag}</td>
 								<td class="asset_details_block col2" style="display:none;">${assetList?.item?.assetName}</td>
-								<g:if test="${location == 's'}">
+								<g:if test="${location == 'source'}">
 								<td class="asset_details_block col3">${assetList?.item?.sourceRack}/${assetList?.item?.sourceRackPosition}</td>
 								</g:if>
 								<g:else>

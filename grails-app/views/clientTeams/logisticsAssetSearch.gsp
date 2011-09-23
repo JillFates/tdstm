@@ -284,7 +284,7 @@ function mySelect(x)
         var rack;
         var pos;       
         var asset = eval('(' + e.responseText + ')');    
-        if(loc == 's'){
+        if(loc == 'source'){
         location = asset[0].item.sourceLocation
         room = asset[0].item.sourceRoom
         rack = asset[0].item.sourceRack

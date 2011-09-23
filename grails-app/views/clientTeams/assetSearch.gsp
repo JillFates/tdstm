@@ -219,7 +219,7 @@
 				<dt>Asset Name:</dt><dd>&nbsp;${projMap?.asset?.assetName}</dd>
 				<dt>Model:</dt><dd>&nbsp;${projMap?.asset?.model}</dd>
 				<dt>Serial #:</dt><dd>&nbsp;${projMap?.asset?.serialNumber}</dd>
-				<g:if test="${location == 's'}">			   	
+				<g:if test="${location == 'source'}">			   	
 			   		<dt>Location:</dt><dd>&nbsp;${projMap?.asset?.sourceLocation}</dd>
 			   		<dt>Room:</dt><dd>&nbsp;${projMap?.asset?.sourceRoom}</dd>
 			   		<dt>Rack/Pos:</dt><dd>&nbsp;${projMap?.asset?.sourceRack}/${projMap?.asset?.sourceRackPosition}</dd>
