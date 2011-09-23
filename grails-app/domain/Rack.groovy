@@ -68,7 +68,13 @@ class Rack {
 		def rack = results ? results[0] : null
 		if( !rack )
 			try{
-				rack = new Rack(params).save()
+				rack = new Rack(params)
+				if(!rack.model){
+					rack.model = Model.findByModelNameAndAssetType("Unknown","Rack")
+				}
+				if(!rack.save()){
+					rack.errors.allErrors.each{println it}
+				}
 			} catch(Exception ex){
 				println"$ex"
 			}

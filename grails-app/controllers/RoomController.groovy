@@ -60,7 +60,7 @@ class RoomController {
 				def bundles = moveBundleId.split(",").collect{id-> Long.parseLong(id) }
 				moveBundleList = MoveBundle.findAllByIdInList(bundles)
 				moveBundleList.each{ moveBundle->
-					moveBundle.sourceRacks.findAll{it.room.id == roomInstance.id}.each{ sourceRack->
+					moveBundle.sourceRacks.findAll{it.room?.id == roomInstance.id}.each{ sourceRack->
 						if( !racksList.contains( sourceRack ) )
 							racksList.add( sourceRack )
 					}
@@ -118,9 +118,9 @@ class RoomController {
 						rack.powerB = params["powerB_"+rack.id] ? Float.parseFloat(params["powerB_"+rack.id]) : 0
 						rack.powerC = params["powerC_"+rack.id] ? Float.parseFloat(params["powerC_"+rack.id]) : 0
 						if(powerType != "Watts"){
-							rack.powerA = rack.powerA * 110
-							rack.powerB = rack.powerB * 110
-							rack.powerC = rack.powerC * 110
+							rack.powerA = Math.round(rack.powerA * 110)
+							rack.powerB = Math.round(rack.powerB * 110)
+							rack.powerC = Math.round(rack.powerC * 110)
 						}
 						rack.rackType = params["rackType_"+rack.id]
 						rack.front = params["front_"+rack.id]
@@ -139,9 +139,14 @@ class RoomController {
 							if(newRack){
 								newRack.roomX = params["roomX_"+id] ? Integer.parseInt(params["roomX_"+id]) : 0
 								newRack.roomY = params["roomY_"+id] ? Integer.parseInt(params["roomY_"+id]) : 0
-								newRack.powerA = params["powerA_"+id] ? Integer.parseInt(params["powerA_"+id]) : 0
-								newRack.powerB = params["powerB_"+id] ? Integer.parseInt(params["powerB_"+id]) : 0
-								newRack.powerC = params["powerC_"+id] ? Integer.parseInt(params["powerC_"+id]) : 0
+								newRack.powerA = params["powerA_"+id] ? Float.parseFloat(params["powerA_"+id]) : 0
+								newRack.powerB = (params["powerB_"+id]) ? Float.parseFloat(params["powerB_"+id]) : 0
+								newRack.powerC = (params["powerC_"+id]) ? Float.parseFloat(params["powerC_"+id]) : 0
+								if(powerType != "Watts"){
+									newRack.powerA = Math.round(newRack.powerA * 110)
+									newRack.powerB = Math.round(newRack.powerB * 110)
+									newRack.powerC = Math.round(newRack.powerC * 110)
+								}
 								newRack.rackType = params["rackType_"+id]
 								newRack.front = params["front_"+id]
 								newRack.save(flush:true)
@@ -323,8 +328,9 @@ class RoomController {
 	   def thisRackUsedSpace = 0
 	   def thisRackTotalSpace = 42
 	   def rackId = params.rackId
+	   def rack
 	   if(rackId){
-		   def rack = Rack.get(rackId)
+		   rack = Rack.get(rackId)
 		   def assets = AssetEntity.findAllByRackSource( rack )
 		   if(rack.source != 1){
 				   assets = AssetEntity.findAllByRackTarget( rack )
@@ -384,7 +390,7 @@ class RoomController {
 		   </tr>
 		   <tr><td>&nbsp;</td></tr>
 		   <tr>
-		   		<td colspan=2 class='powertable_L'><b>Rack : ${rack.tag}</b></td>
+		   		<td colspan=2 class='powertable_L'><b>Rack : ${rack?.tag}</b></td>
 		   		<td colspan=3 class='powertable_L' nowrap>${spaceString}</td>
 		   </tr>
 		   <tr>

@@ -108,6 +108,7 @@ class RackLayoutsController {
 			}
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ	
 			racks.each { rack ->
+				maxUSize = rack?.model?.usize ?: 42
 				def assetDetails = []
 				def assetDetail = []
 				def finalAssetList = []

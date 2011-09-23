@@ -40,7 +40,19 @@ assetTypes?.assetType?.each{ option->
 		}
 	}
 }
-
+println"**********************Create Rack asset entity option***************************************"
+def eavAttributeOption = EavAttributeOption.findByValueAndAttribute("Rack",eavAttribute)
+if( !eavAttributeOption ){
+	eavAttributeOption = new EavAttributeOption(
+			value : "Rack",
+			attribute : eavAttribute
+			)
+	if ( !eavAttributeOption.validate() || !eavAttributeOption.save(flush:true) ) {
+		def etext = "Unable to create eavAttributeOption" +
+				GormUtil.allErrorsString( eavAttributeOption )
+		println etext
+	 }
+}
 println"**************Delete Asset properties ***************"
 /*
  * Power
