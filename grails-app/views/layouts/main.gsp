@@ -223,7 +223,26 @@
       </div>
     </div>
     <script type="text/javascript">
- // Update person details 
+   // making timout for idle pages 
+    var timerId;
+	    timerId = window.setTimeout("timeOut()",(60000 * 120));
+	    
+	    function resetTimer() {
+	        window.clearTimeout(timerId);
+	        timerId = window.setTimeout("timeOut()",(60000 * 120));
+	    }
+	    function timeOut()
+	    {
+	        ${remoteFunction(controller:'auth',action:'signOut',onComplete:'sessionExpireOverlay()')};
+	    }
+	    function sessionExpireOverlay()
+	    {
+	    	window.parent.location = self.location;
+	    }
+	       $(document).keydown(function(){ resetTimer(); });
+	       $(document).mousedown(function(){ resetTimer(); });
+
+    // Update person details 
 	function updatePersonDetails( e ){
 		var personDetails = eval("(" + e.responseText + ")");
 		$("#personId").val(personDetails.person.id)

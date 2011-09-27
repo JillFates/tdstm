@@ -19,6 +19,24 @@
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dropDown.css')}" />    
    
    <script type="text/javascript">
+		   var timerId;
+		   timerId = window.setTimeout("timeOut()",(60000 * 120));
+		   
+		   function resetTimer() {
+		       window.clearTimeout(timerId);
+		       timerId = window.setTimeout("timeOut()",(60000 * 120));
+		   }
+		   function timeOut()
+		   {
+		       ${remoteFunction(controller:'auth',action:'signOut',onComplete:'sessionExpireOverlay()')};
+		   }
+		   function sessionExpireOverlay()
+		   {
+		   	  window.parent.location = self.location;
+		   }
+		      $(document).keydown(function(){ resetTimer(); });
+		      $(document).mousedown(function(){ resetTimer(); });
+   
    		$(document).ready(function() {
       		$("#personDialog").dialog({ autoOpen: false })
       		${remoteFunction(controller:'userLogin', action:'updateLastPageLoad')}

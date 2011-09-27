@@ -290,6 +290,25 @@
       </div>
     </div>
     <script type="text/javascript">
+	    var timerId;
+	    timerId = window.setTimeout("timeOut()",(60000 * 120));
+	    
+	    function resetTimer() {
+	        window.clearTimeout(timerId);
+	        timerId = window.setTimeout("timeOut()",(60000 * 120));
+	    }
+	    function timeOut()
+	    {
+	         ${remoteFunction(controller:'auth',action:'signOut',onComplete:'sessionExpireOverlay()')};
+	    }
+	    function sessionExpireOverlay()
+	    {
+	    	window.parent.location = self.location;
+	    }
+	       $(document).keydown(function(){ resetTimer(); });
+	       $(document).mousedown(function(){ resetTimer(); });
+       
+   
 	    /*---------------------------------------------------
 		* Script to load the marquee to scroll the live news
 		*--------------------------------------------------*/
@@ -366,6 +385,7 @@
 		function setPower( p ){
 			${remoteFunction(controller:'project', action:'setPower', params:'\'p=\' + p ',	onComplete:'updateTimeZone( e )')}
 		}
+	  
 	</script>
   </body>
 </html>

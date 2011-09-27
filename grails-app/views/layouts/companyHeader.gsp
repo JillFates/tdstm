@@ -17,13 +17,31 @@
     <jq:plugin name="jquery.combined" />
     <g:layoutHead />
     <script type="text/javascript">
-   		$(document).ready(function() {
+	    var timerId;
+	    timerId = window.setTimeout("timeOut()",(60000 * 120));
+	    
+	    function resetTimer() {
+	        window.clearTimeout(timerId);
+	        timerId = window.setTimeout("timeOut()",(60000 * 120));
+	    }
+	    function timeOut()
+	    {
+	        ${remoteFunction(controller:'auth',action:'signOut',onComplete:'sessionExpireOverlay()')};
+	    }
+	    function sessionExpireOverlay()
+	    {
+	    	window.parent.location = self.location;
+	    }
+		    $(document).keydown(function(){ resetTimer(); });
+		    $(document).mousedown(function(){ resetTimer(); });
+
+       $(document).ready(function() {
       		$("#personDialog").dialog({ autoOpen: false })
       		${remoteFunction(controller:'userLogin', action:'updateLastPageLoad')}
      	})
      	var emailRegExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/
      	var dateRegExpForExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([APap][Mm])$/;
-   </script>
+    </script>
     </head>
     <% def currProj = session.getAttribute("CURR_PROJ");
        def setImage = session.getAttribute("setImage");
