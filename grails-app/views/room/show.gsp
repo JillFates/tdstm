@@ -36,18 +36,18 @@
 				<div style="width: 100px">
 				<label for="sourceView">
 					<g:if test="${source == 'true'}">
-					<input type="checkbox" name="sourceView" id="sourceView" value="" checked="checked" onclick="getRackDetails()" />&nbsp;Source
+					<input type="hidden" name="sourceView" id="sourceView" value="" checked="checked" onclick="getRackDetails()" />&nbsp;Source
 					</g:if>
 					<g:else>
-					<input type="checkbox" name="sourceView" id="sourceView" value="" onclick="getRackDetails()" />&nbsp;Source
+					<input type="hidden" name="sourceView" id="sourceView" value="" onclick="getRackDetails()" />&nbsp;Source
 					</g:else>
 					</label><br />
 				<label for="targetView">
 					<g:if test="${target == 'true'}">
-					<input type="checkbox" name="targetView" id="targetView" value="" checked="checked" onclick="getRackDetails()" />&nbsp;Target
+					<input type="hidden" name="targetView" id="targetView" value="" checked="checked" onclick="getRackDetails()" />&nbsp;Target
 					</g:if>
 					<g:else>
-					<input type="checkbox" name="targetView" id="targetView" value="" onclick="getRackDetails()" />&nbsp;Target
+					<input type="hidden" name="targetView" id="targetView" value="" onclick="getRackDetails()" />&nbsp;Target
 					</g:else>
 					</label><br />
 				</div>

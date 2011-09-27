@@ -384,9 +384,9 @@ class RoomController {
 	   }
 	   def op="""<table style='width:270px;border:0px;'>
 		   <tr>
-		   		<td class='powertable_H'>Totals: </td>
-		   		<td colspan=2 class='powertable_H' >Space:<br />$spaceUsed / $totalSpace</td>
-		   		<td colspan=2 class='powertable_H' >Power(${powerString}):<br />$powerUsed / $totalPower</td>
+		   		<td class='powertable_H'>Room <br />Totals: </td>
+		   		<td colspan=2 class='powertable_H' >Space: (RU)<br />$spaceUsed / $totalSpace</td>
+		   		<td colspan=2 class='powertable_H' >Power (${powerString}):<br />$powerUsed / $totalPower</td>
 		   </tr>
 		   <tr><td>&nbsp;</td></tr>
 		   <tr>
