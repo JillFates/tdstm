@@ -54,7 +54,12 @@
 		</table>
 		<g:each in="${rackInstanceList}" var="rack">
 			<g:if test="${rack.rackType == 'Rack'}">
+			 <g:if test="${rack.model?.layoutStyle == null}">	
 				<div align="center"  id="rack_${rack.id}" style="top:${rack.roomY}px; left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="${ rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_L' }">
+				</g:if>
+				<g:else>
+				<div align="center"  id="rack_${rack.id}" style="top:${rack.roomY}px; left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="${rack.model?.layoutStyle}">
+				</g:else>
 					<span id="rackLabel_${rack.id}"><br>${rack.tag}</br></span>
 				</div>
 			</g:if>

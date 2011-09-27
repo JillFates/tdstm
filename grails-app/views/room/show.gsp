@@ -3,7 +3,7 @@
 <div class="body">
 <div id="roomListView">
 <span class="span">
-<b> Data Center / Room View </b>
+<b> Data Center / Room View ${rack?.model?.layoutStyle} </b>
 </span>
 <div class="dialog" style="border: 1px solid black;">
 	<table style="width: 100%; border: none">
@@ -129,7 +129,12 @@
 			<g:each in="${racksList}" var="rack" status='i'>
 				<g:if test="${rack.rackType == 'Rack'}">
 					<g:remoteLink controller="rackLayouts" action="save" params="[moveBundleId:moveBundleList.id,rackId:rack.id,backView:'off',showCabling:'off',otherBundle:'on',bundleName:'on',hideIcons:'on']" onSuccess="updateRackPower(${rack.id})" onComplete="jQuery('#rackLayout').html(e.responseText);">
-					<div id="rack_${rack.id}" style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="${rack.hasBelongsToMoveBundle(moveBundleList.id) ? 'rack_highlight_'+rack.front : source=='true' && rack.source == 1 ? 'rack_highlight_'+rack.front : target == 'true' && rack.source == 0 ? 'rack_highlight_'+rack.front : rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_'+rack.front }">
+	                 <g:if test="${rack?.model?.layoutStyle == null}">			
+					    <div id="rack_${rack.id}" style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack?.roomX ? rack.roomX : 0}px;" class="${rack.hasBelongsToMoveBundle(moveBundleList.id) ? 'rack_highlight_'+rack.front : source=='true' && rack.source == 1 ? 'rack_highlight_'+rack.front : target == 'true' && rack.source == 0 ? 'rack_highlight_'+rack.front : rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_'+rack.front }">
+					 </g:if>
+					 <g:else>
+					     <div id="rack_${rack.id}" style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="${rack.model?.layoutStyle}">
+					 </g:else>
 						<div id="rack_div_${i}" class="racktop_label" onclick="$('#selectedRackId').val(this.id)">${rack.tag}</div>
 					</div>
 					</g:remoteLink>
