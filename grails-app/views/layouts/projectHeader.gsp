@@ -119,18 +119,13 @@
 			<li><g:link class="home" controller="rackLayouts" action="create">Racks</g:link></li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 			<li id="assetMenuId"><g:link class="home" controller="assetEntity" action="assetImport" >Assets</g:link></li>
+			<li id="assetMenuId"><g:link class="home" controller="assetEntity" action="assetImport" >Apps</g:link></li>
 			<li><g:link class="home" controller="moveEvent" action="show" >Events</g:link> </li>
 			<li><g:link class="home" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles</g:link></li>
 			<li><g:link class="home" controller="clientTeams" params="[projectId:currProjObj?.id]">Teams</g:link></li>
 	        </jsec:lacksAllRoles>
-	        <jsec:hasAnyRole in="['ADMIN']">
-			<li><g:link class="home" controller="newsEditor" params="[projectId:currProjObj?.id]">News</g:link></li>
-	        </jsec:hasAnyRole>
 	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
 			<li><g:link class="home" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console</g:link></li>
-	        </jsec:hasAnyRole>
-	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
-			<li><g:link class="home" controller="cartTracking" action="cartTracking" params="[projectId:currProjObj?.id]">Carts</g:link></li>
 	        </jsec:hasAnyRole>
 	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER','OBSERVER']">
 			<li><g:link class="home" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link> </li>
@@ -143,9 +138,24 @@
 	        <ul>
 	    		<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link> </li>
 			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Assets</g:link></li>
+			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Apps</g:link></li>
+			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List DBs</g:link></li>
 		</ul>
-		</div>
-		<div class="menu2" id="reportsMenu" style="background-color:#003366;display: none;">
+	    </div>
+	    <div class="menu2" id="consoleMenu" style="background-color:#003366;display: none;">
+	        <ul>
+	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
+			<li><g:link class="home" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console</g:link></li>
+	        </jsec:hasAnyRole>
+	        <jsec:hasAnyRole in="['ADMIN']">
+			<li><g:link class="home" controller="newsEditor" params="[projectId:currProjObj?.id]">News</g:link></li>
+	        </jsec:hasAnyRole>
+	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+			<li><g:link class="home" controller="cartTracking" action="cartTracking" params="[projectId:currProjObj?.id]">Carts</g:link></li>
+	        </jsec:hasAnyRole>
+		</ul>
+	    </div>
+	    <div class="menu2" id="reportsMenu" style="background-color:#003366;display: none;">
 			<ul>
 			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Login Badges']">Login Badges</g:link> </li>
 			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Asset Tag']">Asset Tags</g:link> </li>
