@@ -150,6 +150,12 @@ function validateCreateNewsForm(){
 </script>
 </head>
 <body>
+<script type="text/javascript">
+	  		$('#assetMenu').hide();
+	  		$('#bundleMenu').hide();
+	  		$('#consoleMenu').show();
+	  		$('#reportsMenu').hide();
+</script>
 <div class="body">
 <g:form action="newsEditorList" name="newsEditorForm" method="get">
 <div>

@@ -43,15 +43,13 @@
      	})      
      	var emailRegExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/
      	var dateRegExpForExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([APap][Mm])$/;
-     	
    	</script>
   </head>	
-    
     <% def currProj = session.getAttribute("CURR_PROJ");
     def setImage = session.getAttribute("setImage");
+    def projectId = currProj.CURR_PROJ ;
     def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
     def moveBundleId = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE ;
-    def projectId = currProj.CURR_PROJ ;
     def currProjObj;
     def moveEvent;
     if( projectId != null){
@@ -62,22 +60,19 @@
     }
     def isIE6 = request.getHeader("User-Agent").contains("MSIE 6");
     %>    
-   
-
-
   <body>
     
     <div class="main_body">
 
       <div class="tds_header">
-      <g:if test="${setImage}">
       	<div class="header_left">
-    	  <img src="${createLink(controller:'project', action:'showImage', id:setImage)} " style="height: 30px;"/>
-        </div> 
+      <g:if test="${setImage}">
+    	  <img src="${createLink(controller:'project', action:'showImage', id:setImage)}" style="height: 30px;"/>
       </g:if>
       <g:else>
      	 <a href="http://www.transitionaldata.com/" target="new"><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;border: 0px"/></a>
      </g:else>
+        </div> 
       <div class="title">&nbsp;Transition Manager
       	<g:if test="${currProjObj}"> - ${currProjObj.name} </g:if>
       	<g:if test="${moveEvent}"> : ${moveEvent?.name}</g:if>
@@ -108,7 +103,6 @@
 			    	      <li><a href="javascript:setUserTimeZone('EDT')">EDT</a></li>
 				</ul>
 			</div>
-	              &nbsp;|
 	              </strong>
               &nbsp;<g:link controller="auth" action="signOut">sign out</g:link>
           </jsec:isLoggedIn>
@@ -117,11 +111,10 @@
       </div>
 
       <!--
-<div class="menu1">
-<ul>
-    <li><g:link class="home" controller="projectUtil">Main</g:link></li>
-    <li><g:link class="home" controller="projectUtil"
-        action="searchList">Search</g:link></li>
+	<div class="menu1">
+	<ul>
+		<li><g:link class="home" controller="projectUtil">Main</g:link></li>
+		<li><g:link class="home" controller="projectUtil" action="searchList">Search</g:link></li>
     <jsec:hasRole name="PROJECT_ADMIN">
         <li><g:link class="home" controller="project" action="create">Add</g:link>
         </li>
@@ -139,30 +132,35 @@
 	        	<li><g:link class="home" controller="projectUtil">Project </g:link> </li>
 	        	<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 	        		<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
-	        		<li><g:link class="home" controller="rackLayouts" action="create">Rooms</g:link></li>
+	        	</jsec:lacksAllRoles>
+			<li><g:link class="home" controller="room">Rooms</g:link></li>
 	        		<li><g:link class="home" controller="rackLayouts" action="create">Racks</g:link></li>
-	        		<li><g:link class="home" controller="assetEntity" action="list" >Assets</g:link></li></li>
+	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
+	        		<li id="assetMenuId"><g:link class="home" controller="assetEntity" action="assetImport" >Assets</g:link></li>
+			<li><g:link class="home" controller="assetEntity" action="list" >Apps</g:link></li>
+			<li>&nbsp;</li>
 		                <li><g:link class="home" controller="moveEvent" action="show" >Events</g:link> </li>
 	        		<li><g:link class="home" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]" style="background-color:#003366">Bundles</g:link></li>
 	        		<li><g:link class="home" controller="clientTeams" params="[projectId:currProjObj?.id]">Teams</g:link></li>
-	        	</jsec:lacksAllRoles>
-	        	<jsec:hasAnyRole in="['ADMIN']">
-	        		<li><g:link class="home" controller="newsEditor" params="[projectId:currProjObj?.id]">News</g:link></li>
-	        	</jsec:hasAnyRole>
+			<li>&nbsp;</li>
+	        </jsec:lacksAllRoles>
 	       		<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
 	        		<li><g:link class="home" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console</g:link></li>
 	        	</jsec:hasAnyRole>
-	        	<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
-	        		<li><g:link class="home" controller="cartTracking" action="cartTracking" params="[projectId:currProjObj?.id]">Carts</g:link></li>
 	        		<li><g:link class="home" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link> </li>
-	        	</jsec:hasAnyRole>
-	        	<jsec:hasAnyRole in="['ADMIN','MANAGER','OBSERVER','SUPERVISOR']">
 	        		<li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker</g:link> </li>
-	        	</jsec:hasAnyRole>
 	         	<jsec:lacksAllRoles in="['MANAGER','OBSERVER']">
 	         		<li><a href="#" onclick="showReportsMenu();this.style.background='#003366';">Reports</a></li>
 	         	</jsec:lacksAllRoles>
 			</ul>
+	    </div>
+	    <div class="menu2" id="assetMenu" style="background-color:#003366;display: none;">
+	        <ul>
+	    		<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link> </li>
+			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Assets</g:link></li>
+			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Apps</g:link></li>
+			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List DBs</g:link></li>
+		</ul>
 	    </div>
 		<div class="menu2" id="bundleMenu" style="background-color:#003366;">
 			<ul>
@@ -181,17 +179,20 @@
 				<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'cart Asset']">Logistics Team Worksheets</g:link></li>
 				<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Transportation Asset List']">Transport Worksheets</g:link></li>
 				<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Issue Report']">Issue Report</g:link></li>
-				<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Rack Layout']">Rack (old)</g:link></li>
+				<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Rack Layout']">Racks (old)</g:link></li>
 				<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'MoveResults']">Move Results</g:link></li>
 				<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'CablingQA']">Cabling QA</g:link></li>
 				<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'CablingConflict']">Cabling Conflict</g:link></li>
 				<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'CablingData']">Cabling Data</g:link></li>
+				<li><g:link class="home" controller="reports" action="powerReport">Power</g:link></li>
 			</ul>
 		</div>
 		<div class="menu2" id="assetMenu" style="background-color:#003366;display: none;">
 			<ul>
 				<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Assets</g:link></li>
-	          	<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link> </li>
+				<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Assets</g:link></li>
+				<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Apps</g:link></li>
+				<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List DBs</g:link></li>
 			</ul>
 		</div>
 		<g:if test="${moveEvent && moveEvent?.inProgress == 'true'}">
@@ -387,9 +388,10 @@
 		  	window.location.href = sURL;
 	  	}
 	  	function showReportsMenu(){
-	  		$('#reportsMenu').show();
 	  		$('#assetMenu').hide();
 	  		$('#bundleMenu').hide();
+	  		$('#consoleMenu').hide();
+	  		$('#reportsMenu').show();
 	  		$('li a').each(function() {
 		  		$(this).css('background-color','');
 	  		});

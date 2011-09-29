@@ -119,19 +119,21 @@
 			<li><g:link class="home" controller="rackLayouts" action="create">Racks</g:link></li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 			<li id="assetMenuId"><g:link class="home" controller="assetEntity" action="assetImport" >Assets</g:link></li>
-			<li id="assetMenuId"><g:link class="home" controller="assetEntity" action="assetImport" >Apps</g:link></li>
+			<li><g:link class="home" controller="assetEntity" action="list" >Apps</g:link></li>
+			<li>&nbsp;</li>
 			<li><g:link class="home" controller="moveEvent" action="show" >Events</g:link> </li>
 			<li><g:link class="home" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles</g:link></li>
 			<li><g:link class="home" controller="clientTeams" params="[projectId:currProjObj?.id]">Teams</g:link></li>
+			<li>&nbsp;</li>
 	        </jsec:lacksAllRoles>
 	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
 			<li><g:link class="home" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console</g:link></li>
 	        </jsec:hasAnyRole>
-	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER','OBSERVER']">
 			<li><g:link class="home" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link> </li>
 			<li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker</g:link> </li>
-	        </jsec:hasAnyRole>
-	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"><li><a href="#" onclick="showReportsMenu();this.style.background='#003366';">Reports</a></li></jsec:lacksAllRoles>
+	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']">
+	        	<li><a href="#" onclick="showReportsMenu();this.style.background='#003366';">Reports</a></li>
+	        </jsec:lacksAllRoles>
 	      </ul>
 	    </div>
 	    <div class="menu2" id="assetMenu" style="background-color:#003366;display: none;">
@@ -395,7 +397,6 @@
 		function setPower( p ){
 			${remoteFunction(controller:'project', action:'setPower', params:'\'p=\' + p ',	onComplete:'updateTimeZone( e )')}
 		}
-	  
 	</script>
   </body>
 </html>

@@ -22,17 +22,20 @@
 
 </head>
 <body >
-<div title="Change Status" id="changeStatusDialog"
-	style="background-color: #808080;display: none;">
-<form name="changeStatusForm"><input type="hidden" name="asset"
-	id="asset" /> <input type="hidden" name="projectId" id="projectId"
-	value="${projectId}" />
-	<input type="hidden" name="moveBundle" id="moveBundle"
-	value="${moveBundleInstance?.id}" />
+<script type="text/javascript">
+	  		$('#assetMenu').hide();
+	  		$('#bundleMenu').hide();
+	  		$('#consoleMenu').show();
+	  		$('#reportsMenu').hide();
+</script>
+<div title="Change Status" id="changeStatusDialog" style="background-color: #808080;display: none;">
+	<form name="changeStatusForm">
+	<input type="hidden" name="asset" id="asset" />
+	<input type="hidden" name="projectId" id="projectId" value="${projectId}" />
+	<input type="hidden" name="moveBundle" id="moveBundle" value="${moveBundleInstance?.id}" />
 <table style="border: 0px; width: 100%">
 	<tr>
-		<td width="40%"><strong>Change status for selected
-		devices to:</strong></td>
+		<td width="40%"><strong>Change status for selected devices to:</strong></td>
 		<td width="60%"></td>
 	</tr>
 	<tr>

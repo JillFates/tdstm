@@ -261,6 +261,12 @@
 </script>
 </head>
 <body>
+<script type="text/javascript">
+	  		$('#assetMenu').hide();
+	  		$('#bundleMenu').hide();
+	  		$('#consoleMenu').show();
+	  		$('#reportsMenu').hide();
+</script>
 <div style="width: 69%;margin-left: 1px; margin-top:1px; border: 1px solid #CCCCCC;" class="body">
 <g:form name="cartTrackingForm" action="cartTracking" method="post">
 	<div style="width: 100%;">
