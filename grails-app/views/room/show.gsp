@@ -1,15 +1,15 @@
 <html>
 <body>
-<div class="body">
-<div id="roomListView">
+<div class="body" style="width:98%;">
+<div id="roomListView"></div>
 <span class="span">
-<b> Data Center / Room View </b>
+<h1 style="margin: 0px;">Room View</h1>
 </span>
 <div class="dialog" style="border: 1px solid black;">
 	<table style="width: 100%; border: none">
 		<tbody>
 			<tr>
-				<td class="buttonR" style="vertical-align:top">
+				<td class="buttonR" style="vertical-align:top;width:240px;">
 				<div>
 				<g:select id="roomId" name="id" from="${roomInstanceList}" value="${roomInstance.id}" optionKey="id" optionValue="${{it.location +' / '+it.roomName}}" onchange="getRackDetails()"/>
 				<input type="hidden" id="selectedRackId" value="">
@@ -25,16 +25,16 @@
 				</g:form>
 				</div>
 				</td>
-				<td style="vertical-align:top">
+				<td style="vertical-align:top;width:240px;">
 				<div style="width: 150px"><label><b>Highlight:</b></label><br /><br />
 				<label><b>Bundle</b></label><br />
 					<g:select id="bundleId" name="moveBundleId" from="${MoveBundle.findAllByProject(project)}" value="${moveBundleList.id}" optionKey="id" optionValue="name" noSelection="${['all':'All']}" multiple="multiple" size="3"
 					  onChange="getRackDetails()"/>
 				</div>
 				</td>
-				<td class="buttonR">
-				<div style="width: 100px">
-				<label for="sourceView">
+				<td style="vertical-align:top;width:50px;">
+				<div style="width: 50px">
+				<label for="sourceView" style="display:none">
 					<g:if test="${source == 'true'}">
 					<input type="hidden" name="sourceView" id="sourceView" value="" checked="checked" onclick="getRackDetails()" />&nbsp;Source
 					</g:if>
@@ -42,7 +42,7 @@
 					<input type="hidden" name="sourceView" id="sourceView" value="" onclick="getRackDetails()" />&nbsp;Source
 					</g:else>
 					</label><br />
-				<label for="targetView">
+				<label for="targetView" style="display:none">
 					<g:if test="${target == 'true'}">
 					<input type="hidden" name="targetView" id="targetView" value="" checked="checked" onclick="getRackDetails()" />&nbsp;Target
 					</g:if>
@@ -52,7 +52,7 @@
 					</label><br />
 				</div>
 				</td>
-				<td class="cap_tab" style="vertical-align:top">
+				<td class="cap_tab" style="vertical-align:top;width:250px;">
 					<div style="float: left;">
 						<table class="cap_tab" style="width: auto; padding: 1px; border: none;">
 							<tr>
@@ -109,7 +109,7 @@
 						</table>
 					</div>
 				</td>
-				<td style="padding-left: 20px; align:right;" id="rackPowerTd">
+				<td style="align:right;padding:0px;" id="rackPowerTd">
 				</td>
 			</tr>
 		</tbody>
@@ -128,6 +128,9 @@
 					</g:while>
 				</tr ><!-- ${numrows++} -->
 			</g:while>
+			<tr>
+			<td colspan="${roomInstance.roomWidth /2}">Floor ${roomInstance.roomWidth}ft x ${roomInstance.roomDepth}ft = ${roomInstance.roomWidth * roomInstance.roomDepth} sqft</td>
+			</tr>
 		</table>
 			<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack" status='i'>
 				<g:if test="${rack.rackType == 'Rack'}">

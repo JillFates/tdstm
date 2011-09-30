@@ -94,7 +94,7 @@
 	<tbody>
 		<tr>
 			<td>
-				<h1 style="margin: 0px;">Rack View</h1>
+				<h1 style="margin: 2px;">Rack View</h1>
 				<label><b>Bundle</b></label><br />
 				<select id="bundleId" name="moveBundle" multiple="multiple" size="3" onchange="getRackDetails(this.id)" style="width:150px">
 					<option value="all" selected="selected">All</option>

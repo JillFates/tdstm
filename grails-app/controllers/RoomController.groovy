@@ -382,7 +382,7 @@ class RoomController {
 	   if((powerA +powerB+ powerC+ powerX) > (rackPowerA+ rackPowerB + rackPowerC )){
 		   redTBD = true
 	   }
-	   def op="""<table style='width:270px;border:0px;'>
+	   def op="""<table style='width:300px;border:0px;'>
 		   <tr>
 		   		<td class='powertable_H'>Room <br />Totals: </td>
 		   		<td colspan=2 class='powertable_H' >Space: (RU)<br />$spaceUsed / $totalSpace</td>
@@ -528,34 +528,34 @@ class RoomController {
 						usedRacks = maxU - usedRacks
 						if(usedRacks <= Math.round(maxU*0.2)){
 							rackData["${rack.id}"] = "rack_cap100"
-						}else if(usedRacks >  Math.round(maxU*0.2)  && usedRacks <= Math.round(maxU*0.32)){
+						}else if(usedRacks <= Math.round(maxU*0.32)){
 							rackData["${rack.id}"] = "rack_cap80"
-						}else if(usedRacks >  Math.round(maxU*0.32) && usedRacks <= Math.round(maxU*0.44)){
+						}else if(usedRacks <= Math.round(maxU*0.44)){
 							rackData["${rack.id}"] = "rack_cap68"
-						}else if(usedRacks >  Math.round(maxU*0.44) && usedRacks <= Math.round(maxU*0.56)){
+						}else if(usedRacks <= Math.round(maxU*0.56)){
 							rackData["${rack.id}"] = "rack_cap56"
-						}else if(usedRacks >  Math.round(maxU*0.56) && usedRacks <= Math.round(maxU*0.68)){
+						}else if(usedRacks <= Math.round(maxU*0.68)){
 							rackData["${rack.id}"] = "rack_cap44"
-						}else if(usedRacks >  Math.round(maxU*0.68) && usedRacks <=  Math.round(maxU*0.80)){
+						}else if(usedRacks <=  Math.round(maxU*0.80)){
 							rackData["${rack.id}"] = "rack_cap32"
-						}else if(usedRacks >  Math.round(maxU*0.80)){
+						}else{
 						    rackData["${rack.id}"] = "rack_cap20"
 						}
 						
 					}else{
 						if(usedRacks <= Math.round(maxU*0.2)){
 							rackData["${rack.id}"] = "rack_cap20"
-						}else if(usedRacks >  Math.round(maxU*0.2)  && usedRacks <= Math.round(maxU*0.32)){
+						}else if(usedRacks <= Math.round(maxU*0.32)){
 							rackData["${rack.id}"] = "rack_cap32"
-						}else if(usedRacks >  Math.round(maxU*0.32) && usedRacks <= Math.round(maxU*0.44)){
+						}else if(usedRacks <= Math.round(maxU*0.44)){
 							rackData["${rack.id}"] = "rack_cap44"
-						}else if(usedRacks >  Math.round(maxU*0.44) && usedRacks <= Math.round(maxU*0.56)){
+						}else if(usedRacks <= Math.round(maxU*0.56)){
 							rackData["${rack.id}"] = "rack_cap56"
-						}else if(usedRacks >  Math.round(maxU*0.56) && usedRacks <= Math.round(maxU*0.68)){
+						}else if(usedRacks <= Math.round(maxU*0.68)){
 							rackData["${rack.id}"] = "rack_cap68"
-						}else if(usedRacks >  Math.round(maxU*0.68) && usedRacks <= Math.round(maxU*0.80)){
+						}else if(usedRacks <= Math.round(maxU*0.80)){
 							rackData["${rack.id}"] = "rack_cap80"
-						}else if(usedRacks >  Math.round(maxU*0.80)){
+						}else{
 						    rackData["${rack.id}"] = "rack_cap100"
 						}
 						
@@ -565,31 +565,35 @@ class RoomController {
 				     if(capacityType != "Used"){
 						powerUsed = rackPower - powerUsed
 						if(powerUsed <= Math.round(rackPower*0.2) ){
-							rackData["${rack.id}"] = "rack_cap80"
-						}else if (powerUsed > Math.round(rackPower*0.2)  && powerUsed  <= Math.round(rackPower*0.32) ){
+							rackData["${rack.id}"] = "rack_cap100"
+						}else if (powerUsed  <= Math.round(rackPower*0.32) ){
+						    rackData["${rack.id}"] = "rack_cap80"
+						}else if (powerUsed <= Math.round(rackPower*0.44) ){
 						    rackData["${rack.id}"] = "rack_cap68"
-						}else if (powerUsed > Math.round(rackPower*0.32) && powerUsed <= Math.round(rackPower*0.44) ){
+						}else if (powerUsed <= Math.round(rackPower*0.56) ){
 						    rackData["${rack.id}"] = "rack_cap56"
-						}else if (powerUsed > Math.round(rackPower*0.44) && powerUsed <= Math.round(rackPower*0.56) ){
+						}else if (powerUsed <= Math.round(rackPower*0.68) ){
 						    rackData["${rack.id}"] = "rack_cap44"
-						}else if (powerUsed > Math.round(rackPower*0.56) && powerUsed <= Math.round(rackPower*0.68) ){
+						}else if (powerUsed <= Math.round(rackPower*0.80) ){
 						    rackData["${rack.id}"] = "rack_cap32"
-					    }else if (powerUsed > Math.round(rackPower*0.68) ){
+						}else{
 						    rackData["${rack.id}"] = "rack_cap20"
 					    }
 					}else{
 						if(powerUsed <= Math.round(rackPower*0.2) ){
 							rackData["${rack.id}"] = "rack_cap20"
-						}else if (powerUsed > Math.round(rackPower*0.2) && powerUsed <= Math.round(rackPower*0.32) ){
+						}else if (powerUsed <= Math.round(rackPower*0.32) ){
 						    rackData["${rack.id}"] = "rack_cap32"
-						}else if (powerUsed > Math.round(rackPower*0.32) && powerUsed <= Math.round(rackPower*0.44) ){
+						}else if (powerUsed <= Math.round(rackPower*0.44) ){
 						    rackData["${rack.id}"] = "rack_cap44"
-						}else if (powerUsed > Math.round(rackPower*0.44) && powerUsed <= Math.round(rackPower*0.56) ){
+						}else if (powerUsed <= Math.round(rackPower*0.56) ){
 						    rackData["${rack.id}"] = "rack_cap56"
-						}else if (powerUsed > Math.round(rackPower*0.56) && powerUsed <= Math.round(rackPower*0.68) ){
+						}else if (powerUsed <= Math.round(rackPower*0.68) ){
 						    rackData["${rack.id}"] = "rack_cap68"
-					    }else if (powerUsed > Math.round(rackPower*0.68) ){
+						}else if (powerUsed <= Math.round(rackPower*0.80) ){
 						    rackData["${rack.id}"] = "rack_cap80"
+						}else{
+						    rackData["${rack.id}"] = "rack_cap100"
 					    }
 					}
 					break;
@@ -607,44 +611,46 @@ class RoomController {
 			case "Space":
 				if(capacityType != "Used"){
 					capacityData.view = [
-							cap20:"${Math.round(maxU*1)} RU",
-							cap32:"${Math.round(maxU*0.8)} RU",
-							cap44:"${Math.round(maxU*0.68)} RU",
-							cap56:"${Math.round(maxU*0.56)} RU",
-							cap68:"${Math.round(maxU*0.44)} RU",
-							cap80:"${Math.round(maxU*0.32)} RU",
-							cap100:"${Math.round(maxU*0.20)} RU"
+							cap20:"${Math.round(maxU*0.80)}+ RU",
+							cap32:"${Math.round(maxU*0.68)}+ RU",
+							cap44:"${Math.round(maxU*0.56)}+ RU",
+							cap56:"${Math.round(maxU*0.44)}+ RU",
+							cap68:"${Math.round(maxU*0.32)}+ RU",
+							cap80:"${Math.round(maxU*0.20)}+ RU",
+							cap100:"< ${Math.round(maxU*0.2)} RU"
 						]
 				} else {
 					capacityData.view = [
-							cap20:"${Math.round(maxU*0.2)} RU",
-							cap32:"${Math.round(maxU*0.32)} RU",
-							cap44:"${Math.round(maxU*0.44)} RU",
-							cap56:"${Math.round(maxU*0.56)} RU",
-							cap68:"${Math.round(maxU*0.68)} RU",
-							cap80:"${Math.round(maxU*0.8)} RU",
-							cap100:"${Math.round(maxU*1)} RU"
+							cap20:"< ${Math.round(maxU*0.2)} RU",
+							cap32:"${Math.round(maxU*0.20)}+ RU",
+							cap44:"${Math.round(maxU*0.32)}+ RU",
+							cap56:"${Math.round(maxU*0.44)}+ RU",
+							cap68:"${Math.round(maxU*0.56)}+ RU",
+							cap80:"${Math.round(maxU*0.68)}+ RU",
+							cap100:"${Math.round(maxU*0.8)}+ RU"
 						]
 				}
 				break;
 			case "Power":
 				if(capacityType != "Used"){
 					capacityData.view = [
-							cap20:"${Math.round(maxPower*0.8)} ${powerType}",
-							cap32:"${Math.round(maxPower*0.68)} ${powerType}",
-							cap44:"${Math.round(maxPower*0.56)} ${powerType}",
-							cap56:"${Math.round(maxPower*0.44)} ${powerType}",
-							cap68:"${Math.round(maxPower*0.32)} ${powerType}",
-							cap80:"${Math.round(maxPower*0.2)} ${powerType}"
+							cap20:"${Math.round(maxPower*0.80)}+ ${powerType}",
+							cap32:"${Math.round(maxPower*0.68)}+ ${powerType}",
+							cap44:"${Math.round(maxPower*0.56)}+ ${powerType}",
+							cap56:"${Math.round(maxPower*0.44)}+ ${powerType}",
+							cap68:"${Math.round(maxPower*0.32)}+ ${powerType}",
+							cap80:"${Math.round(maxPower*0.20)}+ ${powerType}",
+							cap100:"< ${Math.round(maxPower*0.2)} ${powerType}"
 						]
 				} else {
 					capacityData.view = [
-							cap20:"${Math.round(maxPower*0.2)} ${powerType}",
-							cap32:"${Math.round(maxPower*0.32)} ${powerType}",
-							cap44:"${Math.round(maxPower*0.44)} ${powerType}",
-							cap56:"${Math.round(maxPower*0.56)} ${powerType}",
-							cap68:"${Math.round(maxPower*0.68)} ${powerType}",
-							cap80:"${Math.round(maxPower*0.8)} ${powerType}"
+							cap20:"< ${Math.round(maxPower*0.2)} ${powerType}",
+							cap32:"${Math.round(maxPower*0.20)}+ ${powerType}",
+							cap44:"${Math.round(maxPower*0.32)}+ ${powerType}",
+							cap56:"${Math.round(maxPower*0.44)}+ ${powerType}",
+							cap68:"${Math.round(maxPower*0.56)}+ ${powerType}",
+							cap80:"${Math.round(maxPower*0.68)}+ ${powerType}",
+							cap100:"${Math.round(maxPower*0.8)}+ ${powerType}"
 						]
 				}
 				break;

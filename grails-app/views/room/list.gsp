@@ -29,11 +29,11 @@ $(document).ready(function() {
 </script>
 </head>
 <body>
-<div class="body" style="margin-top: 10px;">
+<div class="body" style="margin-top: 10px;width:98%;">
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
-<div id="roomListView">
+<div id="roomListView" style="width:500px;">
 <g:if test="${roomId && viewType != 'list'}">
 <script type="text/javascript">
 ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomView(e)')}
