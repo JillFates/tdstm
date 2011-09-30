@@ -3,7 +3,7 @@
 <div class="body">
 <div id="roomListView">
 <span class="span">
-<b> Data Center / Room View ${rack?.model?.layoutStyle} </b>
+<b> Data Center / Room View </b>
 </span>
 <div class="dialog" style="border: 1px solid black;">
 	<table style="width: 100%; border: none">
@@ -29,7 +29,7 @@
 				<div style="width: 150px"><label><b>Highlight:</b></label><br /><br />
 				<label><b>Bundle</b></label><br />
 					<g:select id="bundleId" name="moveBundleId" from="${MoveBundle.findAllByProject(project)}" value="${moveBundleList.id}" optionKey="id" optionValue="name" noSelection="${['all':'All']}" multiple="multiple" size="3"
-						onchange="getRackDetails()" />
+					  onChange="getRackDetails()"/>
 				</div>
 				</td>
 				<td class="buttonR">
@@ -103,6 +103,9 @@
 							<tr>
 								<td class="cap_tab rack_cap80" id="cap80">&nbsp;</td>
 							</tr>
+							<tr>
+								<td class="cap_tab rack_cap100" id="cap100">&nbsp;</td>
+							</tr>
 						</table>
 					</div>
 				</td>
@@ -126,7 +129,7 @@
 				</tr ><!-- ${numrows++} -->
 			</g:while>
 		</table>
-			<g:each in="${racksList}" var="rack" status='i'>
+			<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack" status='i'>
 				<g:if test="${rack.rackType == 'Rack'}">
 					<g:remoteLink controller="rackLayouts" action="save" params="[moveBundleId:moveBundleList.id,rackId:rack.id,backView:'off',showCabling:'off',otherBundle:'on',bundleName:'on',hideIcons:'on']" onSuccess="updateRackPower(${rack.id})" onComplete="jQuery('#rackLayout').html(e.responseText);">
 	                 <g:if test="${rack?.model?.layoutStyle == null}">			
@@ -233,6 +236,7 @@ function capacityView(){
 				$("#cap56").addClass("rack_cap56").html(data.view["cap56"])
 				$("#cap68").addClass("rack_cap68").html(data.view["cap68"])
 				$("#cap80").addClass("rack_cap80").html(data.view["cap80"])
+				$("#cap100").addClass("rack_cap100").html(data.view["cap100"])
 				
 				$("#scale_div").show()
 				for(i=0; i< racks.length; i++){
@@ -242,6 +246,7 @@ function capacityView(){
 					$("#rack_"+racks[i]).removeClass("rack_cap56")
 					$("#rack_"+racks[i]).removeClass("rack_cap68")
 					$("#rack_"+racks[i]).removeClass("rack_cap80")
+					$("#rack_"+racks[i]).removeClass("rack_cap100")
 					$("#rack_"+racks[i]).addClass(data.rackData[racks[i]])
 				}
 			} else {
@@ -251,6 +256,7 @@ function capacityView(){
 				$(".rack_cap56").removeClass("rack_cap56")
 				$(".rack_cap68").removeClass("rack_cap68")
 				$(".rack_cap80").removeClass("rack_cap80")
+				$(".rack_cap100").removeClass("rack_cap100")
 				$("#scale_div").hide()
 			}
 			 updateRackPower($("#selectedRackId").val())

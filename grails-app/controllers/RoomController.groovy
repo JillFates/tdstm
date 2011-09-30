@@ -60,11 +60,11 @@ class RoomController {
 				def bundles = moveBundleId.split(",").collect{id-> Long.parseLong(id) }
 				moveBundleList = MoveBundle.findAllByIdInList(bundles)
 				moveBundleList.each{ moveBundle->
-					moveBundle.sourceRacks.findAll{it.room?.id == roomInstance.id}.each{ sourceRack->
+					moveBundle.sourceRacks.findAll{it.room?.id == roomInstance?.id}.each{ sourceRack->
 						if( !racksList.contains( sourceRack ) )
 							racksList.add( sourceRack )
 					}
-					moveBundle.targetRacks.findAll{it.room.id == roomInstance.id}.each{ targetRack->
+					moveBundle.targetRacks.findAll{it.room?.id == roomInstance?.id}.each{ targetRack->
 						if( !racksList.contains( targetRack ) )
 							racksList.add( targetRack )
 					}
@@ -527,18 +527,20 @@ class RoomController {
 					if(capacityType != "Used"){
 						usedRacks = maxU - usedRacks
 						if(usedRacks <= Math.round(maxU*0.2)){
-							rackData["${rack.id}"] = "rack_cap80"
+							rackData["${rack.id}"] = "rack_cap100"
 						}else if(usedRacks >  Math.round(maxU*0.2)  && usedRacks <= Math.round(maxU*0.32)){
+							rackData["${rack.id}"] = "rack_cap80"
+						}else if(usedRacks >  Math.round(maxU*0.32) && usedRacks <= Math.round(maxU*0.44)){
 							rackData["${rack.id}"] = "rack_cap68"
-						}else if(usedRacks >=  Math.round(maxU*0.32) && usedRacks <= Math.round(maxU*0.44)){
+						}else if(usedRacks >  Math.round(maxU*0.44) && usedRacks <= Math.round(maxU*0.56)){
 							rackData["${rack.id}"] = "rack_cap56"
-						}else if(usedRacks >=  Math.round(maxU*0.44) && usedRacks <= Math.round(maxU*0.56)){
+						}else if(usedRacks >  Math.round(maxU*0.56) && usedRacks <= Math.round(maxU*0.68)){
 							rackData["${rack.id}"] = "rack_cap44"
-						}else if(usedRacks >=  Math.round(maxU*0.56) && usedRacks <= Math.round(maxU*0.68)){
+						}else if(usedRacks >  Math.round(maxU*0.68) && usedRacks <=  Math.round(maxU*0.80)){
 							rackData["${rack.id}"] = "rack_cap32"
-						}else if(usedRacks >=  Math.round(maxU*0.68)){
-							rackData["${rack.id}"] = "rack_cap20"
-						} 
+						}else if(usedRacks >  Math.round(maxU*0.80)){
+						    rackData["${rack.id}"] = "rack_cap20"
+						}
 						
 					}else{
 						if(usedRacks <= Math.round(maxU*0.2)){
@@ -551,8 +553,10 @@ class RoomController {
 							rackData["${rack.id}"] = "rack_cap56"
 						}else if(usedRacks >  Math.round(maxU*0.56) && usedRacks <= Math.round(maxU*0.68)){
 							rackData["${rack.id}"] = "rack_cap68"
-						}else if(usedRacks >  Math.round(maxU*0.68)){
+						}else if(usedRacks >  Math.round(maxU*0.68) && usedRacks <= Math.round(maxU*0.80)){
 							rackData["${rack.id}"] = "rack_cap80"
+						}else if(usedRacks >  Math.round(maxU*0.80)){
+						    rackData["${rack.id}"] = "rack_cap100"
 						}
 						
 					}
@@ -603,12 +607,13 @@ class RoomController {
 			case "Space":
 				if(capacityType != "Used"){
 					capacityData.view = [
-							cap20:"${Math.round(maxU*0.8)} RU",
-							cap32:"${Math.round(maxU*0.68)} RU",
-							cap44:"${Math.round(maxU*0.56)} RU",
-							cap56:"${Math.round(maxU*0.44)} RU",
-							cap68:"${Math.round(maxU*0.32)} RU",
-							cap80:"${Math.round(maxU*0.2)} RU"
+							cap20:"${Math.round(maxU*1)} RU",
+							cap32:"${Math.round(maxU*0.8)} RU",
+							cap44:"${Math.round(maxU*0.68)} RU",
+							cap56:"${Math.round(maxU*0.56)} RU",
+							cap68:"${Math.round(maxU*0.44)} RU",
+							cap80:"${Math.round(maxU*0.32)} RU",
+							cap100:"${Math.round(maxU*0.20)} RU"
 						]
 				} else {
 					capacityData.view = [
@@ -617,7 +622,8 @@ class RoomController {
 							cap44:"${Math.round(maxU*0.44)} RU",
 							cap56:"${Math.round(maxU*0.56)} RU",
 							cap68:"${Math.round(maxU*0.68)} RU",
-							cap80:"${Math.round(maxU*0.8)} RU"
+							cap80:"${Math.round(maxU*0.8)} RU",
+							cap100:"${Math.round(maxU*1)} RU"
 						]
 				}
 				break;
