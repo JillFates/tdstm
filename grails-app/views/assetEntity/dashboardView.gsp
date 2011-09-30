@@ -460,7 +460,12 @@ function onInvokeAction(id) {
 </head>
 
 <body>
-
+<script type="text/javascript">
+	  		$('#assetMenu').hide();
+	  		$('#bundleMenu').hide();
+	  		$('#consoleMenu').show();
+	  		$('#reportsMenu').hide();
+</script>
 <div title="Change Status" id="showChangeStatusDialog"
 	style="background-color: #808080; display: none;">
 <form name="changeStatusForm" method="post">

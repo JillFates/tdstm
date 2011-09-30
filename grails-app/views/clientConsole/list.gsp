@@ -22,12 +22,6 @@
 
 </head>
 <body >
-<script type="text/javascript">
-	  		$('#assetMenu').hide();
-	  		$('#bundleMenu').hide();
-	  		$('#consoleMenu').show();
-	  		$('#reportsMenu').hide();
-</script>
 <div title="Change Status" id="changeStatusDialog" style="background-color: #808080;display: none;">
 	<form name="changeStatusForm">
 	<input type="hidden" name="asset" id="asset" />

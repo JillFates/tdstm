@@ -142,6 +142,7 @@
 			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Assets</g:link></li>
 			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Apps</g:link></li>
 			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List DBs</g:link></li>
+			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Files</g:link></li>
 		</ul>
 	    </div>
 	    <div class="menu2" id="consoleMenu" style="background-color:#003366;display: none;">
