@@ -323,7 +323,7 @@ class RoomController {
 	   def spaceString = ""
 	   def powerString = "W"
 	   if(powerType != "Watts"){
-		powerString = "A"
+		powerString = "Amps"
 	   }
 	   def thisRackUsedSpace = 0
 	   def thisRackTotalSpace = 42
@@ -395,10 +395,10 @@ class RoomController {
 		   </tr>
 		   <tr>
 		   	   <td class='powertable_L'>Power (${powerString})</td>
-			   <td style='background:${ powerA > rackPowerA ? 'red':''};' class='powertable_C'>A</td>
-			   <td style='background:${ powerB > rackPowerB ? 'red':''};' class='powertable_C'>B</td>
-			   <td style='background:${ powerC > rackPowerC ? 'red':''};' class='powertable_C'>C</td>
-			   <td style='background:${redTBD ? 'red':''};' class='powertable_C'>TBD</td>
+			   <td style='background:${ powerA > rackPowerA ? 'red':''};' class='powertable_R'>A</td>
+			   <td style='background:${ powerB > rackPowerB ? 'red':''};' class='powertable_R'>B</td>
+			   <td style='background:${ powerC > rackPowerC ? 'red':''};' class='powertable_R'>C</td>
+			   <td style='background:${redTBD ? 'red':''};' class='powertable_R'>TBD</td>
 		   </tr>
 		   <tr>
 			   <td class='powertable_R'>&nbsp;In Rack:</td><td class='powertable_R'>${rackPowerA}</td>
