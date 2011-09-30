@@ -111,6 +111,8 @@
 			
 			<th class="sortable">Header</th>
 			
+			<th class="sortable">Effort</th>
+			
 			<th class="sortable">Action</th>
 			
 		</tr>
@@ -135,6 +137,8 @@
 				<td class="name">${transitions.transition?.color}</td>
 				
 				<td class="name">${transitions.transition?.header}</td>
+				
+				<td class="name">${transitions.transition?.effort}</td>
 				
 				<td class="name">
 				<g:if test="${transitions.donotDelete}">
@@ -182,6 +186,8 @@
 			
 			<th class="sortable">Header</th>
 			
+			<th class="sortable">Effort</th>
+			
 			<th class="sortable">Action</th>
 			
 		</tr>
@@ -192,15 +198,15 @@
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
 				<td nowrap="nowrap">
-					<input type="text" name="code_${transitions.transition.id}" id="codeId_${transitions.transition.id}" value="${transitions.transition?.code}" onchange="validateField(this.value, this.id, 'Code')"/>
+					<input type="text" name="code_${transitions.transition.id}" id="codeId_${transitions.transition.id}" value="${transitions.transition?.code}" onchange="validateField(this.value, this.id, 'Code')" style="width: 100px;"/>
 				</td>
 				
 				<td nowrap="nowrap">
-					<input type="text" name="name_${transitions.transition.id}" id="nameId_${transitions.transition.id}" value="${transitions.transition?.name}"  onchange="validateField(this.value, this.id, 'Name')"/>
+					<input type="text" name="name_${transitions.transition.id}" id="nameId_${transitions.transition.id}" value="${transitions.transition?.name}"  onchange="validateField(this.value, this.id, 'Name')" style="width: 100px;"/>
 				</td>
 				
 				<td nowrap="nowrap">
-					<input type="text" name="dashboardLabel_${transitions.transition.id}" id="dashboardLabelId_${transitions.transition.id}" value="${transitions.transition?.dashboardLabel}"/>
+					<input type="text" name="dashboardLabel_${transitions.transition.id}" id="dashboardLabelId_${transitions.transition.id}" value="${transitions.transition?.dashboardLabel}" style="width: 100px;"/>
 				</td>
 				
 				<td nowrap="nowrap">
@@ -212,15 +218,18 @@
 				</td>
 
 				<td nowrap="nowrap">
-					<input type="text" name="predecessor_${transitions.transition.id}" id="predecessorId_${transitions.transition.id}" value="${transitions.transition?.predecessor}"  style="width: 60px;" maxlength="3"  onchange="validateField(this.value, this.id, 'predecessor')"/>
+					<input type="text" name="predecessor_${transitions.transition.id}" id="predecessorId_${transitions.transition.id}" value="${transitions.transition?.predecessor}"  style="width: 50px;" maxlength="3"  onchange="validateField(this.value, this.id, 'predecessor')"/>
 				</td>
 
 				<td nowrap="nowrap">
-					<input type="text" name="color_${transitions.transition.id}" id="colorId_${transitions.transition.id}" value="${transitions.transition?.color}"/>
+					<input type="text" name="color_${transitions.transition.id}" id="colorId_${transitions.transition.id}" value="${transitions.transition?.color}"  style="width: 60px;" maxlength="7"/>
 				</td>
 				
 				<td nowrap="nowrap">
-					<input type="text" name="header_${transitions.transition.id}" id="headerId_${transitions.transition.id}" value="${transitions.transition?.header}"  style="width: 60px;" maxlength="7"/>
+					<input type="text" name="header_${transitions.transition.id}" id="headerId_${transitions.transition.id}" value="${transitions.transition?.header}"  style="width: 50px;" maxlength="7"/>
+				</td>
+				<td nowrap="nowrap">
+					<input type="text" name="effort_${transitions.transition.id}" id="effortId_${transitions.transition.id}" value="${transitions.transition?.effort}"  style="width: 50px;" maxlength="4"/>
 				</td>
 				<td nowrap="nowrap">
 				<g:if test="${transitions.donotDelete}">
@@ -366,7 +375,8 @@ function addStep( type ){
 							"</select></td>"+
 						"<td><input type='text' name='predecessor_"+additionalSteps+"' id='predecessorId_"+additionalSteps+"'  style='width: 60px;' maxlength='3'  onchange=\"validateField(this.value, this.id, 'predecessor')\"/></td>"+
 						"<td><input type='text' name='color_"+additionalSteps+"' id='colorId_"+additionalSteps+"' /></td>"+
-						"<td><input type='text' name='header_"+additionalSteps+"' id='headerId_"+additionalSteps+"'   style='width: 60px;' maxlength='7'/></td>"+
+						"<td><input type='text' name='header_"+additionalSteps+"' id='headerId_"+additionalSteps+"'   style='width: 50px;' maxlength='7'/></td>"+
+						"<td><input type='text' name='effort_"+additionalSteps+"' id='effortId_"+additionalSteps+"'   style='width: 50px;' maxlength='7'/></td>"+
 					"<tr>"
 	$("#additionalStepsId").val(additionalSteps)
 	$("#"+type+"WorkflowStepsTbody").append(stepRow)

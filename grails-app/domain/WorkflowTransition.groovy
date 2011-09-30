@@ -11,6 +11,7 @@ class WorkflowTransition {
 	String dashboardLabel
 	Integer predecessor
 	String header
+	Integer effort
 
 	static belongsTo = [ workflow : Workflow ]
 	static hasMany  = [ WorkflowTransitionMap ]
@@ -25,6 +26,7 @@ class WorkflowTransition {
 		dashboardLabel( blank:true, nullable:true)
 		predecessor( blank:true, nullable:true)
 		header( blank:true, nullable:true)
+		effort( blank:true, nullable:true)
 	}	
 	
 	static mapping  = {

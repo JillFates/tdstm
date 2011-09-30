@@ -35,7 +35,6 @@ class WorkflowController {
 	 *---------------------------------------------*/
 	def workflowList = {
 		def workflowId = params.workflow
-		
 		def workflowTransitionsList = []
 		def workflow
 		def workflowTransitions
@@ -132,18 +131,19 @@ class WorkflowController {
 					def stdWorkflowTransitions = WorkflowTransition.findAllByWorkflow( stdWorkflow )
 					stdWorkflowTransitions.each{ stdWorkflowTransition ->
 						def workflowTransition = new WorkflowTransition(workflow : workflowInstance,
-																		code : stdWorkflowTransition.code, 
-																		name : stdWorkflowTransition.name,
-																		transId : stdWorkflowTransition.transId,
-																		type : stdWorkflowTransition.type,	
-																		color : stdWorkflowTransition.color,
-																		dashboardLabel : stdWorkflowTransition.dashboardLabel,
-																		predecessor : stdWorkflowTransition.predecessor,
-																		header : stdWorkflowTransition.header
-																		)
-							if (  workflowTransition.validate() && workflowTransition.save( flush:true) ) {
-								log.debug(" Workfolw step \"${workflowTransition}\" created")
-							} 
+							code : stdWorkflowTransition.code, 
+							name : stdWorkflowTransition.name,
+							transId : stdWorkflowTransition.transId,
+							type : stdWorkflowTransition.type,	
+							color : stdWorkflowTransition.color,
+							dashboardLabel : stdWorkflowTransition.dashboardLabel,
+							predecessor : stdWorkflowTransition.predecessor,
+							header : stdWorkflowTransition.header,
+							effort : stdWorkflowTransition.effort
+							)
+						if (  workflowTransition.validate() && workflowTransition.save( flush:true) ) {
+							log.debug(" Workfolw step \"${workflowTransition}\" created")
+						} 
 					}
 					/* Create workflow roles based on the template roles*/
 					def swimlanes = Swimlane.findAllByWorkflow( workflowInstance )
@@ -194,6 +194,7 @@ class WorkflowController {
 				workflowTransition.dashboardLabel = params["dashboardLabel_"+workflowTransition.id]
 				workflowTransition.predecessor = params["predecessor_"+workflowTransition.id] ? Integer.parseInt( params["predecessor_"+workflowTransition.id] ) : null
 				workflowTransition.header = params["header_"+workflowTransition.id]
+				workflowTransition.effort = params["effort_"+workflowTransition.id]
 				if (  ! workflowTransition.validate() || ! workflowTransition.save( flush:true) ) {
 					//workflowTransition.errors.allErrors.each() { flash.message += it }
 				} else {
@@ -204,15 +205,16 @@ class WorkflowController {
 			def additionalSteps = Integer.parseInt(params.additionalSteps)
 			for(int i=1; i <= additionalSteps; i++){
 				def workflowTransition = new WorkflowTransition(workflow : workflow,
-																code : params["code_$i"], 
-																name : params["name_$i"],
-																transId : params["transId_$i"] ? Integer.parseInt( params["transId_$i"] ) : null,
-																type : params["type_$i"],	
-																color : params["color_$i"],
-																dashboardLabel : params["dashboardLabel_$i"],
-																predecessor : params["predecessor_$i"] ? Integer.parseInt( params["predecessor_$i"] ) : null,
-																header : params["header_$i"]		
-																)
+					code : params["code_$i"], 
+					name : params["name_$i"],
+					transId : params["transId_$i"] ? Integer.parseInt( params["transId_$i"] ) : null,
+					type : params["type_$i"],	
+					color : params["color_$i"],
+					dashboardLabel : params["dashboardLabel_$i"],
+					predecessor : params["predecessor_$i"] ? Integer.parseInt( params["predecessor_$i"] ) : null,
+					header : params["header_$i"],		
+					effort : params["effort_$i"]
+					)
 				
 				if (  ! workflowTransition.validate() || ! workflowTransition.save( flush:true) ) {
 					flash.message += "["+workflowTransition.code +"]"
