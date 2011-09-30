@@ -36,11 +36,11 @@ class SecurityFilters {
                 if(controllerName == 'moveTech' && principal == null){
                 	return true
                 } else if( controllerName != 'auth' && principal == null ) {
-                	flash.message = "Your login has expired and must login again."
+                	flash.message = "Your login session has expired.  Please login again."
                 	redirect(controller:'auth', action:'login')
                 	return false					
  	           	} else if( controllerName == 'auth' && principal == null && actionName == 'home') {
- 	           		flash.message = "Your login has expired and must login again."
+ 	           		flash.message = "Your login session has expired.  Please login again."
                 	redirect(controller:'auth', action:'login')
                 	return false
  	           	}
