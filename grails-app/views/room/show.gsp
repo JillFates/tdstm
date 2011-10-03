@@ -72,9 +72,21 @@
 								</td>
 							</tr>
 							<tr>
-								<td class="cap_tab" rowspan="3">
-									<input type="radio" name="capacityType" value="Used" onclick="capacityView()"/>&nbsp;Used&nbsp;<br /> 
-									<input type="radio" name="capacityType" checked="checked" value="Remaining" onclick="capacityView()"/>&nbsp;Remaining
+								<td>
+									<label for="Used" ><input type="radio" name="capacityType" id="Used" value="Used" onclick="capacityView()"/>&nbsp;Used&nbsp;<br /></label>
+									<label for="Remaining" ><input type="radio" name="capacityType" id="Remaining" checked="checked" value="Remaining" onclick="capacityView()"/>&nbsp;Remaining<br/></label>
+									<label for="otherBundle" >
+										<g:if test="${moveBundleList.id?.contains('all')}">
+											<input type="checkbox" name="otherBundle" id="otherBundle" disabled="disabled" onclick="getRackLayout( $('#selectedRackId').val() )"/>
+										</g:if><g:else>
+											<input type="checkbox" name="otherBundle" id="otherBundle" onclick="getRackLayout( $('#selectedRackId').val() )"/>
+										</g:else>
+										&nbsp;w/ other bundles</label>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									
 								</td>
 							</tr>
 							<tr>
@@ -134,7 +146,7 @@
 		</table>
 			<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack" status='i'>
 				<g:if test="${rack.rackType == 'Rack'}">
-					<g:remoteLink controller="rackLayouts" action="save" params="[moveBundleId:moveBundleList.id,rackId:rack.id,backView:'off',showCabling:'off',otherBundle:'on',bundleName:'on',hideIcons:'on']" onSuccess="updateRackPower(${rack.id})" onComplete="jQuery('#rackLayout').html(e.responseText);">
+					<a href="#" onclick="getRackLayout(${rack.id })">
 	                 <g:if test="${rack?.model?.layoutStyle == null}">			
 					    <div id="rack_${rack.id}" style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack?.roomX ? rack.roomX : 0}px;" class="${rack.hasBelongsToMoveBundle(moveBundleList.id) ? 'rack_highlight_'+rack.front : source=='true' && rack.source == 1 ? 'rack_highlight_'+rack.front : target == 'true' && rack.source == 0 ? 'rack_highlight_'+rack.front : rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_'+rack.front }">
 					 </g:if>
@@ -143,7 +155,7 @@
 					 </g:else>
 						<div id="rack_div_${i}" class="racktop_label" onclick="$('#selectedRackId').val(this.id)">${rack.tag}</div>
 					</div>
-					</g:remoteLink>
+					</a>
 				</g:if>
 				<g:else>
 					<div id="rack_${rack.id}" style="position:absolute;top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="room_${rack.rackType}_${rack.front}">
@@ -204,13 +216,19 @@
 </div>
 <script type="text/javascript">
 initializeRacksInRoom( [] )
+capacityView()
 function updateRackPower(rackId){
 	$("#selectedRackId").val(rackId)
 	var capacityView = $("#capacityViewId").val()
 	var capacityType = $('input[name=capacityType]:checked').val()
+	var moveBundleId = ''
+	$("#bundleId option:selected").each(function () {
+		moveBundleId +="moveBundleId="+$(this).val()+"&"
+   	});
+	var otherBundle = $("#otherBundle").is(":checked") ? 'on' : ''
 	jQuery.ajax({
 		url: "getRackPowerData",
-		data: "roomId="+$('#roomId').val()+"&rackId="+rackId+"&capacityView="+capacityView+"&capacityType="+capacityType,
+		data: moveBundleId+"roomId="+$('#roomId').val()+"&rackId="+rackId+"&capacityView="+capacityView+"&capacityType="+capacityType+"&otherBundle="+otherBundle,
 		type:'POST',
 		success: function(data) {
 			$("#rackPowerTd").html(data)
@@ -276,8 +294,18 @@ function getRackDetails(){
 	$("#bundleId option:selected").each(function () {
 		bundles.push($(this).val())
    	});
-   	
-	${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()+\'&moveBundleId=\'+bundles+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')', onComplete:'openRoomView(e)')}
+   	var otherBundle = $("#otherBundle").val()
+	${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()+\'&moveBundleId=\'+bundles+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')+\'&otherBundle=\'+otherBundle', onComplete:'openRoomView(e)')}
+}
+function getRackLayout( rackId ){
+	if(rackId){
+		var otherBundle = $("#otherBundle").is(":checked") ? 'on' : ''
+		var moveBundleId = ''
+		$("#bundleId option:selected").each(function () {
+			moveBundleId +="moveBundleId="+$(this).val()+"&"
+	   	});
+		new Ajax.Request('../rackLayouts/save',{asynchronous:true,evalScripts:true,onSuccess:function(e){updateRackPower( rackId )},onComplete:function(e){jQuery('#rackLayout').html(e.responseText);},parameters:moveBundleId+'rackId='+rackId+'&backView=off&showCabling=off&otherBundle='+otherBundle+'&bundleName=on&hideIcons=on'});return false;
+	}
 }
 </script>
 </body>

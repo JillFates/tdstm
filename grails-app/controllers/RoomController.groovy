@@ -290,13 +290,19 @@ class RoomController {
 	   def totalSpace = 0
 	   def spaceUsed = 0
 	   def powerUsed = 0
+	   def moveBundles = MoveBundle.findAllByProject( room.project )
+	   List bundleId = request.getParameterValues("moveBundleId")
+	   if((bundleId && !bundleId.contains("all")) && params.otherBundle != "on"){
+		   def moveBundleId = bundleId.collect{id->Long.parseLong(id)}
+		   moveBundles = MoveBundle.findAllByIdInList(moveBundleId)
+	   }
 	   racks.each{ obj->
 		   totalPower += obj.powerA + obj.powerB + obj.powerC
 		   totalSpace += obj.model?.usize ?: 42
 		   def assetsInRack = location == "source" ? AssetEntity.findAllByRackSource(obj) : AssetEntity.findAllByRackTarget(obj)
-		   assetsInRack.each{ assetEntity ->
+		   assetsInRack.findAll{moveBundles.id?.contains(it.moveBundle.id)}.each{ assetEntity ->
 			   spaceUsed += assetEntity?.model?.usize ? assetEntity?.model?.usize : 1
-			   def powerConnectors = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.toPower is not null AND cap.fromConnectorNumber.type = ? AND cap.fromAsset = ? ",["Power",assetEntity])
+			   def powerConnectors = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.fromConnectorNumber.type = ? AND cap.fromAsset = ? ",["Power",assetEntity])
 			   def powerConnectorsAssigned = powerConnectors.size()
 			   def rackPower = assetEntity.model?.powerUse ? assetEntity.model?.powerUse : 0
 			   if(powerConnectorsAssigned){
@@ -338,11 +344,11 @@ class RoomController {
 		   thisRackTotalSpace = rack.model?.usize ?: 42
 		   
 		   def assetsInRack = location == "source" ? AssetEntity.findAllByRackSource(rack) : AssetEntity.findAllByRackTarget(rack)
-		   assetsInRack.each{ assetEntity ->
+		   assetsInRack.findAll{moveBundles.id?.contains(it.moveBundle.id)}.each{ assetEntity ->
 			   thisRackUsedSpace += assetEntity?.model?.usize ? assetEntity?.model?.usize : 1
 		   }
 		   spaceString = params.capacityType != "Used" ? (thisRackTotalSpace-thisRackUsedSpace)+" remaining of "+thisRackTotalSpace+" RU" : thisRackUsedSpace+" used of "+thisRackTotalSpace+" RU"
-		   assets.each{ asset->
+		   assets.findAll{moveBundles.id?.contains(it.moveBundle.id)}.each{ asset->
 			   def assetPowerCabling = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.fromConnectorNumber.type = ? AND cap.fromAsset = ? ",["Power",asset])
 			   def powerConnectors = assetPowerCabling.size()
 			   def powerConnectorsAssigned = assetPowerCabling.findAll{it.toPower != null && it.toPower != '' }.size()
@@ -388,25 +394,31 @@ class RoomController {
 		   		<td colspan=2 class='powertable_H' >Space: (RU)<br />$spaceUsed / $totalSpace</td>
 		   		<td colspan=2 class='powertable_H' >Power (${powerString}):<br />$powerUsed / $totalPower</td>
 		   </tr>
-		   <tr><td>&nbsp;</td></tr>
-		   <tr>
-		   		<td colspan=2 class='powertable_L'><b>Rack : ${rack?.tag}</b></td>
-		   		<td colspan=3 class='powertable_L' nowrap>${spaceString}</td>
-		   </tr>
-		   <tr>
-		   	   <td class='powertable_L'>Power (${powerString})</td>
-			   <td style='background:${ powerA > rackPowerA ? 'red':''};' class='powertable_R'>A</td>
-			   <td style='background:${ powerB > rackPowerB ? 'red':''};' class='powertable_R'>B</td>
-			   <td style='background:${ powerC > rackPowerC ? 'red':''};' class='powertable_R'>C</td>
-			   <td style='background:${redTBD ? 'red':''};' class='powertable_R'>TBD</td>
-		   </tr>
-		   <tr>
-			   <td class='powertable_R'>&nbsp;In Rack:</td><td class='powertable_R'>${rackPowerA}</td>
-			   <td class='powertable_R'>${rackPowerB}</td><td class='powertable_R'>${rackPowerC}</td>
-			   <td class='powertable_R'>&nbsp;</td></tr><tr><td class='powertable_R'>&nbsp;Used:</td>
-			   <td class='powertable_R'>${powerA}</td><td class='powertable_R'>${powerB}</td><td class='powertable_R'>${powerC}</td>
-			   <td class='powertable_R'>${powerX}</td>
-		   </tr></table>"""
+		   <tr><td>&nbsp;</td></tr>"""
+	   if(rack){
+		   op += """
+				   <tr>
+				   		<td colspan=2 class='powertable_L'><b>Rack : ${rack?.tag ?:""}</b></td>
+				   		<td colspan=3 class='powertable_L' nowrap>${spaceString}</td>
+				   </tr>
+				   <tr>
+				   	   <td class='powertable_L'>Power (${powerString})</td>
+					   <td style='background:${ powerA > rackPowerA ? 'red':''};' class='powertable_R'>A</td>
+					   <td style='background:${ powerB > rackPowerB ? 'red':''};' class='powertable_R'>B</td>
+					   <td style='background:${ powerC > rackPowerC ? 'red':''};' class='powertable_R'>C</td>
+					   <td style='background:${redTBD ? 'red':''};' class='powertable_R'>TBD</td>
+				   </tr>
+				   <tr>
+					   <td class='powertable_R'>&nbsp;In Rack:</td><td class='powertable_R'>${rackPowerA}</td>
+					   <td class='powertable_R'>${rackPowerB}</td><td class='powertable_R'>${rackPowerC}</td>
+					   <td class='powertable_R'>&nbsp;</td></tr><tr><td class='powertable_R'>&nbsp;Used:</td>
+					   <td class='powertable_R'>${powerA}</td><td class='powertable_R'>${powerB}</td><td class='powertable_R'>${powerC}</td>
+					   <td class='powertable_R'>${powerX}</td>
+				   </tr></table>"""
+	   } else {
+	   	op += "</table>"
+	   }
+		   
 		   
 		render  op
    }
