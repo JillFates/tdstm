@@ -228,8 +228,7 @@ class ReportsController {
    			 	                'completedAt':GormUtil.convertInToUserTZ( projectInstance?.completionDate, tzId ), 'bundleName':bundleInstance?.name,
    			 	                'teamName':teamPartyGroup?.name +"-"+teamMembers, 'teamMembers':teamMembers,
    			 	                'location':"Source Team", 'rack':"SourceRack",'rackPos':"SourceRackPosition",'truck':asset.truck, 
-   			 	                'room':asset.sourceRoom, 'PDU':'','NIC':'','kvmPort':'', 
-   			 	                'hbaPort':'', 'instructions':assetCommentString, 'sourcetargetLoc':"s",
+   			 	                'room':asset.sourceRoom,  'instructions':assetCommentString, 'sourcetargetLoc':"s",
 								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
     		}
     		//Target List of Assets
@@ -269,8 +268,7 @@ class ReportsController {
    				                'completedAt':GormUtil.convertInToUserTZ( projectInstance?.completionDate, tzId ), 'bundleName':bundleInstance?.name, 
    				                'teamName':teamPartyGroup?.name +"-"+teamMembers, 'teamMembers':teamMembers,
    				                'location':"Target Team", 'rack':"TargetRack",'rackPos':"TargetRackPosition",
-   				                'truck':(asset.truck ? asset.truck : "")+"\n"+cartShelf,'room':asset.targetRoom,'PDU':'','NIC':'', 
-   				                'kvmPort':'', 'hbaPort':'','instructions':assetCommentString,'sourcetargetLoc':"t",
+   				                'truck':(asset.truck ? asset.truck : "")+"\n"+cartShelf,'room':asset.targetRoom,'instructions':assetCommentString,'sourcetargetLoc':"t",
 								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
     		}
     		//No assets were found for selected MoveBundle,Team and Location

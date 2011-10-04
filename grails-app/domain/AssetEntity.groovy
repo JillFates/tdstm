@@ -23,9 +23,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String railType
 	String ipAddress
 	String os
-	Integer hasRemoteMgmt =0
 	String planStatus
-	String nicPort
 	String truck
 	String appOwner = ""
 	String appSme = ""
@@ -87,8 +85,6 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		ipAddress( blank:true, nullable:true )
 		os( blank:true, nullable:true )
 		planStatus( blank:true, nullable:true )
-		nicPort( blank:true, nullable:true )
-		hasRemoteMgmt( blank:true, nullable:true )
 		truck( blank:true, nullable:true )		
 		project( nullable:false )
 		application( blank:true, nullable:false )
