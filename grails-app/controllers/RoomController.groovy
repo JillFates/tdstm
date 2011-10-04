@@ -300,7 +300,7 @@ class RoomController {
 		   totalPower += obj.powerA + obj.powerB + obj.powerC
 		   totalSpace += obj.model?.usize ?: 42
 		   def assetsInRack = location == "source" ? AssetEntity.findAllByRackSource(obj) : AssetEntity.findAllByRackTarget(obj)
-		   assetsInRack.findAll{moveBundles.id?.contains(it.moveBundle.id)}.each{ assetEntity ->
+		   assetsInRack.findAll{it.moveBundle && moveBundles?.id?.contains(it.moveBundle?.id)}.each{ assetEntity ->
 			   spaceUsed += assetEntity?.model?.usize ? assetEntity?.model?.usize : 1
 			   def powerConnectors = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.fromConnectorNumber.type = ? AND cap.fromAsset = ? ",["Power",assetEntity])
 			   def powerConnectorsAssigned = powerConnectors.size()
@@ -512,10 +512,10 @@ class RoomController {
 		def rackData = [:]
 		def maxU = 42
 		def maxPower = 1
-		def location = room.source == 1 ? "source" : "target"
+		def location = room?.source == 1 ? "source" : "target"
 		racks.each{rack->
 			def rackPower = rack.powerA + rack.powerB + rack.powerC
-			if( maxPower < rackPower ){
+			if( rackPower && maxPower < rackPower ){
 				maxPower = rackPower
 			}
 			

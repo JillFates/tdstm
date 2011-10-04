@@ -77,7 +77,7 @@
 									<label for="Remaining" ><input type="radio" name="capacityType" id="Remaining" checked="checked" value="Remaining" onclick="capacityView()"/>&nbsp;Remaining<br/></label>
 									<label for="otherBundle" >
 										<g:if test="${moveBundleList.id?.contains('all')}">
-											<input type="checkbox" name="otherBundle" id="otherBundle" disabled="disabled" onclick="getRackLayout( $('#selectedRackId').val() )"/>
+											<input type="checkbox" name="otherBundle" id="otherBundle" disabled="disabled"  checked="checked" onclick="getRackLayout( $('#selectedRackId').val() )"/>
 										</g:if><g:else>
 											<input type="checkbox" name="otherBundle" id="otherBundle" onclick="getRackLayout( $('#selectedRackId').val() )"/>
 										</g:else>

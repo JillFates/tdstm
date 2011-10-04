@@ -89,7 +89,7 @@ class Rack {
 		def assets = this.source == 1 ? sourceAssets : targetAssets
 		if(!moveBundleId.contains("all")){
 			moveBundleId.each{ id->
-				returnVal = assets.moveBundle.id.contains(id)
+				returnVal = returnVal ?: assets.moveBundle.id.contains(id)
 			}
 		}
 		return returnVal
