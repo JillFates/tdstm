@@ -121,7 +121,7 @@
 						</table>
 					</div>
 				</td>
-				<td style="align:right;padding:0px;" id="rackPowerTd">
+				<td style="vertical-align:top;width:310px;padding:0px;" id="rackPowerTd">
 				</td>
 			</tr>
 		</tbody>
@@ -141,7 +141,7 @@
 				</tr ><!-- ${numrows++} -->
 			</g:while>
 			<tr>
-			<td colspan="${roomInstance.roomWidth /2}">Floor ${roomInstance.roomWidth}ft x ${roomInstance.roomDepth}ft = ${roomInstance.roomWidth * roomInstance.roomDepth} sqft</td>
+			<td colspan="${numcols -1}">Floor ${roomInstance.roomWidth}ft x ${roomInstance.roomDepth}ft = ${roomInstance.roomWidth * roomInstance.roomDepth} sqft</td>
 			</tr>
 		</table>
 			<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack" status='i'>
