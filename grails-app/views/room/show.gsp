@@ -130,7 +130,7 @@
 <div id="roomLayout" style="width: 1100px; overflow-x: auto; border: 2px solid black">
 	<input id="selectedRackId" type="hidden">
 	<div id="room_layout" style="position:relative;width: 650px;height: 800px;overflow-x: auto; border: 0px solid black;float: left;">
-		<table cellpadding="0" cellspacing="0" style="width:auto;height:auto;border:0px" id="room_layout_table">
+		<table cellpadding="0" cellspacing="0" style="width:${roomInstance.roomWidth * 40 / 2}px;height:auto;border:0px" id="room_layout_table">
 			<g:set var="numrows" value="${1}" />
 			<g:while test="${numrows < roomInstance.roomDepth / 2 }">
 				<tr>
@@ -261,7 +261,7 @@ function capacityView(){
 				
 				$("#scale_div").show()
 				for(i=0; i< racks.length; i++){
-					$("#rack_"+racks[i]).removeClass("rack_cap20")	
+					$("#rack_"+racks[i]).removeClass("rack_cap20")
 					$("#rack_"+racks[i]).removeClass("rack_cap32")
 					$("#rack_"+racks[i]).removeClass("rack_cap44")
 					$("#rack_"+racks[i]).removeClass("rack_cap56")
@@ -271,7 +271,7 @@ function capacityView(){
 					$("#rack_"+racks[i]).addClass(data.rackData[racks[i]])
 				}
 			} else {
-				$(".rack_cap20").removeClass("rack_cap20")	
+				$(".rack_cap20").removeClass("rack_cap20")
 				$(".rack_cap32").removeClass("rack_cap32")
 				$(".rack_cap44").removeClass("rack_cap44")
 				$(".rack_cap56").removeClass("rack_cap56")
