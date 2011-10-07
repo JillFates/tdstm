@@ -81,7 +81,7 @@ class ClientTeamsController {
 						} else if(sourceAssets != unrackedAssets && sourceAssets > 0){
 							headColor = 'pending'
 						}
-						sourceTeams << [team:it,cssClass:headColor]
+						sourceTeams << [team:it,moveBundle:moveBundle.name,cssClass:headColor]
 					}
 					headColor = "done"
 					def hasTargetAssets = AssetEntity.find("from AssetEntity WHERE targetTeamMt = $teamId OR targetTeamSa = $teamId OR targetTeamDba = $teamId")
@@ -112,7 +112,7 @@ class ClientTeamsController {
 							headColor = 'pending'
 						}
 						
-						targetTeams << [team:it,cssClass:headColor]
+						targetTeams << [team:it,moveBundle:moveBundle.name,cssClass:headColor]
 					}
 				}
 			}

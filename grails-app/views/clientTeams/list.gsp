@@ -33,6 +33,7 @@
 			<th>Team Name (loc)</th>
 			<th>Role</th>
 			<th>Team Members</th>
+			<th>Move Bundle</th>
 		</tr></thead>
 		<tbody>
             	<g:each in="${sourceTeams}" status="i" var="projectTeamInstance">
@@ -44,7 +45,9 @@
 								<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName}</g:if><br/>
 							</g:each>
 						</td>
+						<td><b>${projectTeamInstance?.moveBundle}</b></td>
             		</tr>
+            		
 				</g:each>
 				<g:each in="${targetTeams}" status="i" var="projectTeamInstance">
 				<tr class="teamstatus_${projectTeamInstance?.cssClass}" onclick="submitLoginForm('${projectTeamInstance?.team?.projectTeam?.moveBundle.id}','${projectTeamInstance?.team?.projectTeam?.id}','${projectTeamInstance?.team?.projectTeam?.role}','target')">
@@ -55,6 +58,7 @@
 			 					<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName}</g:if> 
 							</g:each>
 						</td>
+						<td><b>${projectTeamInstance?.moveBundle}</b></td>
             		</tr>
 				</g:each>
 				<g:if test="${sourceTeams?.size() == 0 && targetTeams?.size() == 0}">

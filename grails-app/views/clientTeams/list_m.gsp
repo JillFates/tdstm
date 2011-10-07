@@ -45,6 +45,7 @@
 			<th class="sort_column">Team (loc)</th>
 			<th class="sort_column">Role</th>
 			<th class="sort_column">Members</th>
+			<th class="sort_column">Move Bundle</th>
 		</tr></thead>
 		<tbody>
             	<g:each in="${sourceTeams}" status="i" var="projectTeamInstance">
@@ -56,6 +57,7 @@
 								<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName}</g:if><br/>
 							</g:each>
 						</td>
+						<td><b>${projectTeamInstance?.moveBundle}</b></td>
             		</tr>
 				</g:each>
 				<g:each in="${targetTeams}" status="i" var="projectTeamInstance">
@@ -67,6 +69,7 @@
 			 					<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName}</g:if> 
 							</g:each>
 						</td>
+						<td><b>${projectTeamInstance?.moveBundle}</b></td>
             		</tr>
 				</g:each>
 				<g:if test="${sourceTeams?.size() == 0 && targetTeams?.size() == 0}">
