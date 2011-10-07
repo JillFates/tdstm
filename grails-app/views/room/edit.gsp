@@ -94,8 +94,8 @@
 					<input type="hidden" name="rackId" value="${rack.id}"/>
 					<input type="text" name="tag_${rack.id}" value="${rack.tag}" size="5" onchange="changeLabel(${rack.id},this.value)"/>
 				</td>
-				<td><input type="text" id="roomXId_${rack.id}" name="roomX_${rack.id}" value="${rack.roomX}" size="3" readonly="readonly" /></td>
-				<td><input type="text" id="roomYId_${rack.id}" name="roomY_${rack.id}" value="${rack.roomY}" size="3" readonly="readonly" /></td>
+				<td><input type="text" id="roomXId_${rack.id}" name="roomX_${rack.id}" value="${rack.roomX}" size="3"  onkeyup="changeRackPosition(${rack.id},this.value, 'left')" /></td>
+				<td><input type="text" id="roomYId_${rack.id}" name="roomY_${rack.id}" value="${rack.roomY}" size="3"  onkeyup="changeRackPosition(${rack.id},this.value, 'top')" /></td>
 				<td><g:select id="frontId_${rack.id}" name="front_${rack.id}" from="${Rack.constraints.front.inList}" value="${rack.front}" onchange="updateRackStyle(${rack.id}, this.value, jQuery('#rackTypeId_'+${rack.id}).val())"></g:select></td>
 				<td><input type="text" name="powerA_${rack.id}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerA ? (rack.powerA / 110).toFloat().round(1) : 0.0 : rack.powerA ? Math.round(rack.powerA):0}" size="3" /></td>
 				<td><input type="text" name="powerB_${rack.id}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerB ? (rack.powerB / 110).toFloat().round(1) : 0.0 : rack.powerB ? Math.round(rack.powerB):0}" size="3" /></td>
@@ -114,8 +114,8 @@
 					<input type="hidden" name="rackId" value="${rack}"/>
 					<input type="text" name="tag_${rack}" value="" size="5" onchange="changeLabel(${rack},this.value)"/>
 				</td>
-				<td><input type="text" id="roomXId_${rack}" name="roomX_${rack}" value="" size="3" readonly="readonly" /></td>
-				<td><input type="text" id="roomYId_${rack}" name="roomY_${rack}" value="" size="3" readonly="readonly" /></td>
+				<td><input type="text" id="roomXId_${rack}" name="roomX_${rack}" value="" size="3" onkeyup="changeRackPosition(${rack},this.value, 'left')" /></td>
+				<td><input type="text" id="roomYId_${rack}" name="roomY_${rack}" value="" size="3" onkeyup="changeRackPosition(${rack},this.value, 'top')" /></td>
 				<td><g:select id="frontId_${rack}" name="front_${rack}" from="${Rack.constraints.front.inList}" onchange="updateRackStyle(${rack}, this.value, jQuery('#rackTypeId_'+${rack}).val())"></g:select></td>
 				<td><input type="text" name="powerA_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerA/ 110 ).toFloat().round(1) : new Rack().powerA}"  size="3" /></td>
 				<td><input type="text" name="powerB_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerB/ 110 ).toFloat().round(1) : new Rack().powerB}" size="3" /></td>
@@ -227,6 +227,13 @@ function updateRackStyle(id, frontValue, rackTypeValue){
 		$("#rack_"+id).addClass("room_"+rackTypeValue+"_"+frontValue )
 	}
 	updateXYPositions("rack_"+id)
+}
+function changeRackPosition(rackId, value, position){
+	if(!isNaN(value)){
+		$("#rack_"+rackId).css(position,value+"px")
+	} else {
+		alert("Please enter Numerics")
+	}
 }
 </script>
 </body>
