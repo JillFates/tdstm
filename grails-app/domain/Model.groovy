@@ -86,7 +86,7 @@ class Model {
 		updatedBy( blank:true, nullable:true )
 		validatedBy( blank:true, nullable:true )
 		sourceURL( blank:true, nullable:true )
-		modelStatus( blank:true, nullable:true inList:['new','full','valid')
+		modelStatus( blank:true, nullable:true, inList:['new','full','valid'])
 		modelScope( blank:true, nullable:true )
 	}
 	
