@@ -11,7 +11,7 @@ class Model {
 	byte[] rearImage
 	Integer useImage = 0
 	Integer height
-    Integer weight 
+	Integer weight 
 	Integer depth
 	Integer width
 	String layoutStyle	
@@ -20,6 +20,17 @@ class Model {
 	Integer bladeCount
 	Integer bladeLabelCount
 	String bladeHeight = 'Half'
+	String productLine
+	String modelFamily
+	String endOfLifeDate
+	String endOfLifeStatus
+	String createdBy
+	String updatedBy
+	String validatedBy
+	String sourceURL
+	String modelStatus
+	String modelScope
+
 	
 	// files to sync data for multiple Transition Manager instances
 	Integer sourceTDS = 1
@@ -67,7 +78,16 @@ class Model {
         })
 		sourceTDS( blank:true, nullable:true )
 		sourceTDSVersion( blank:true, nullable:true )
-		
+		productLine( blank:true, nullable:true )
+		modelFamily( blank:true, nullable:true )
+		endOfLifeDate( blank:true, nullable:true )
+		endOfLifeStatus( blank:true, nullable:true )
+		createdBy( blank:true, nullable:true )
+		updatedBy( blank:true, nullable:true )
+		validatedBy( blank:true, nullable:true )
+		sourceURL( blank:true, nullable:true )
+		modelStatus( blank:true, nullable:true inList:['new','full','valid')
+		modelScope( blank:true, nullable:true )
 	}
 	
 	static mapping  = {	
