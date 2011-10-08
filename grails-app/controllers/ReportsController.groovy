@@ -34,56 +34,59 @@ class ReportsController {
 			browserTest = true
 		}
 		switch (reportId) {
-            case "Rack Layout" :  
-				            	userPreferenceService.loadPreferences("CURR_BUNDLE")
-					            def currentBundle = getSession().getAttribute("CURR_BUNDLE")
-					        	render( view:'rackLayout',
-					        			model:[moveBundleInstanceList: moveBundleInstanceList, 
-											   projectInstance:projectInstance, currentBundle:currentBundle])
-            					break;
-            case "cart Asset":  
-				            	render( view:'cartAssetReport',
-				            			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
-						        break;
-            case "Issue Report":  
-				            	render( view:'issueReport',
-				            			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
-						        break;
-            case "Transportation Asset List":  
-				            	render( view:'transportationAssetReport',
-				            			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
-						        break;
-            case "Asset Tag" :
-				            	render( view:'assetTagLabel',
-				            			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance,
-											   browserTest: browserTest])
-						        break;
-
-            case "Login Badges":  
-					        	render( view:'loginBadgeLabelReport',
-					        			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, 
-											   browserTest: browserTest])
-								break;
-            case "MoveResults" :
-            					def moveEventInstanceList = MoveEvent.findAllByProject( projectInstance )
-								render( view:'moveResults', model:[moveEventInstanceList : moveEventInstanceList ])
-								break;
-            case "CablingQA":  
-				            	render( view:'cablingQAReport',
-				            			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, type:'QA'])
-						        break;
-			case "CablingConflict":  
-				            	render( view:'cablingQAReport',
-				            			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, type:'conflict'])
-						        break;
-			case "CablingData":  
-						    	render( view:'cablingData',
-						    			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance ])
-						        break;
-            default: 
-				            	render( view:'teamWorkSheets',
-				            			model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
-						        break;
+	case "Home" :
+					render( view:'home',
+						model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
+						break;
+	case "Rack Layout" :  
+					userPreferenceService.loadPreferences("CURR_BUNDLE")
+					def currentBundle = getSession().getAttribute("CURR_BUNDLE")
+					render( view:'rackLayout',
+						model:[moveBundleInstanceList: moveBundleInstanceList, 
+						projectInstance:projectInstance, currentBundle:currentBundle])
+						break;
+	case "cart Asset":  
+					render( view:'cartAssetReport',
+						model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
+						break;
+	case "Issue Report":  
+					render( view:'issueReport',
+						model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
+						break;
+	case "Transportation Asset List":  
+					render( view:'transportationAssetReport',
+						model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
+						break;
+	case "Asset Tag" :
+					render( view:'assetTagLabel',
+						model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance,
+						browserTest: browserTest])
+						break;
+	case "Login Badges":  
+					render( view:'loginBadgeLabelReport',
+						model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, 
+						browserTest: browserTest])
+						break;
+	case "MoveResults" :
+					def moveEventInstanceList = MoveEvent.findAllByProject( projectInstance )
+					render( view:'moveResults', model:[moveEventInstanceList : moveEventInstanceList ])
+						break;
+	case "CablingQA":  
+					render( view:'cablingQAReport',
+						model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, type:'QA'])
+						break;
+	case "CablingConflict":
+					render( view:'cablingQAReport',
+						model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, type:'conflict'])
+						break;
+	case "CablingData":  
+					render( view:'cablingData',
+						model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance ])
+						break;
+	default: 
+					render( view:'teamWorkSheets',
+						model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
+						break;
 		}
     }
 //  Generate a TeamSheet jasper Report  

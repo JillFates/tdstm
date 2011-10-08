@@ -1,0 +1,129 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta name="layout" content="projectHeader" />
+        <title>Transition Manager Reports Home</title>
+    </head>
+<body>
+<div class="body">
+<div>&nbsp;</div>
+<div>
+<g:if test="${flash.message}"><div class="message">${flash.message}</div>
+</g:if>
+<table style="border: 0">
+	<tr>
+		<td style="vertical-align:top">
+			<div>
+			<h1 style="margin-right: 0px;"><b>Admin</b></h1>
+			<table>
+				<thead>
+					<tr>
+						<th>Report</th>
+						<th>Web</th>
+						<th>Excel</th>
+						<th>PDF</th>
+					</tr>
+				</thead>
+				<tbody>
+				<tr><td><a href="#">admin report1</a></td><td>W</td><td>E</td><td>P</td></tr>
+				</tbody>
+			</table>
+			</div>
+		</td>
+		<td style="vertical-align:top">
+			<div>
+			<h1 style="margin-right: 0px;"><b>Move Plan</b></h1>
+			<table>
+				<thead>
+					<thead>
+						<tr>
+							<th>Report</th>
+						<th>Report</th>
+						<th>Web</th>
+						<th>Excel</th>
+						<th>PDF</th>
+					</tr>
+				</thead>
+				<tbody>
+				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Login+Badges" class="home">Login Badges</a> </td><td>W</td><td>E</td><td>P</td></tr>
+				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Asset+Tag" class="home">Asset Tags</a> </td><td>W</td><td>E</td><td>P</td></tr>
+				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Team+Worksheets" class="home">Move Team Worksheets</a> </td><td>W</td><td>E</td><td>P</td></tr>
+				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=cart+Asset" class="home">Logistics Team Worksheets</a></td><td>W</td><td>E</td><td>P</td></tr>
+				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Transportation+Asset+List" class="home">Transport Worksheets</a></td><td>W</td><td>E</td><td>P</td></tr>
+				</tbody>
+			</table>
+			</div>
+		</td>
+		<td style="vertical-align:top">
+			<div>
+			<h1 style="margin-right: 0px;"><b>Move Day</b></h1>
+			<table>
+				<thead>
+					<thead>
+						<tr>
+							<th>Report</th>
+						<th>Report</th>
+						<th>Web</th>
+						<th>Excel</th>
+						<th>PDF</th>
+					</tr>
+				</thead>
+				<tbody>
+			<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Issue+Report" class="home">Issue Report</a> </td><td>W</td><td>E</td><td>P</td></tr>
+			<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=MoveResults" class="home">Move Results</a> </td><td>W</td><td>E</td><td>P</td></tr>
+			<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingQA" class="home">Cabling QA</a> </td><td>W</td><td>E</td><td>P</td></tr>
+				</tbody>
+			</table>
+			</div>
+		</td>
+		<td style="vertical-align:top">
+			<div>
+			<h1 style="margin-right: 0px;"><b>Application</b></h1>
+			<table>
+				<thead>
+					<thead>
+						<tr>
+							<th>Report</th>
+						<th>Report</th>
+						<th>Web</th>
+						<th>Excel</th>
+						<th>PDF</th>
+					</tr>
+				</thead>
+				<tbody>
+				<tr>
+				<tr><td><a href="#">app report1</a></td><td>W</td><td>E</td><td>P</td>
+				</tr>
+				</tbody>
+			</table>
+			</div>
+		</td>
+		<td style="vertical-align:top">
+			<div>
+			<h1 style="margin-right: 0px;"><b>Infrastructure</b></h1>
+			<table>
+				<thead>
+					<thead>
+						<tr>
+							<th>Report</th>
+						<th>Report</th>
+						<th>Web</th>
+						<th>Excel</th>
+						<th>PDF</th>
+					</tr>
+				</thead>
+				<tbody>
+			<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Rack+Layout" class="home">Racks (old)</a> </td><td>W</td><td>E</td><td>P</td></tr>
+			<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingConflict" class="home">Cabling Conflict</a> </td><td>W</td><td>E</td><td>P</td></tr>
+			<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingData" class="home">Cabling Data</a> </td><td>W</td><td>E</td><td>P</td></tr>
+			<tr><td><a href="/tdstm/reports/powerReport" class="home">Power</a> </td><td>W</td><td>E</td><td>P</td></tr>
+				</tbody>
+			</table>
+			</div>
+		</td>
+	</tr>
+</table>
+</div>
+</div>
+</body>
+</html>
