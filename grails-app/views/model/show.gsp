@@ -50,20 +50,20 @@
 			<td>${modelInstance?.usize}</td>
 		</tr>
 		<tr>
-			<td>Model Height:</td>
+			<td>Height (inches):</td>
 			<td>${modelInstance?.height}</td>
 		</tr>
 		<tr>
-			<td>Model Weight:</td>
-			<td>${modelInstance?.weight}</td>
+			<td>Width:</td>
+			<td>${modelInstance?.width}</td>
 		</tr>
 		<tr>
-			<td>Model Depth:</td>
+			<td>Depth:</td>
 			<td>${modelInstance?.depth}</td>
 		</tr>
 		<tr>
-			<td>Model Width:</td>
-			<td>${modelInstance?.width}</td>
+			<td>Weight (lbs):</td>
+			<td>${modelInstance?.weight}</td>
 		</tr>
 		<tr>
 			<td>Layout Style:</td>

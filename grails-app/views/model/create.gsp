@@ -62,32 +62,32 @@
 		</tr>
 		<tr>
 		<tr>
-			<td valign="top" class="name" nowrap="nowrap">Model Height:
+			<td valign="top" class="name" nowrap="nowrap">Model Height:</td>
 			<td>
 				<input type="text" name="height" id="heightId" value=""/>
 				
 			</td>
 		</tr>
 		<tr>
-			<td valign="top" class="name" nowrap="nowrap">Model Weight:
-			<td>
-				<input type="text" name="weight" id="weightId" value=""/>
-			</td>
-		</tr>
-		<tr>
-			<td valign="top" class="name" nowrap="nowrap">Model Depth:
-			<td>
-				<input type="text" name="depth" id="depthId" value=""/>
-			</td>
-		</tr>
-		<tr>
-			<td valign="top" class="name" nowrap="nowrap">Model Width:
+			<td valign="top" class="name" nowrap="nowrap">Model Width:</td>
 			<td>
 				<input type="text" name="width" id="widthId" value=""/>
 			</td>
 		</tr>
 		<tr>
-			<td valign="top" class="name" nowrap="nowrap">Layout Style:
+			<td valign="top" class="name" nowrap="nowrap">Model Depth:</td>
+			<td>
+				<input type="text" name="depth" id="depthId" value=""/>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" class="name" nowrap="nowrap">Model Weight:</td>
+			<td>
+				<input type="text" name="weight" id="weightId" value=""/>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" class="name" nowrap="nowrap">Layout Style:</td>
 			<td>
 				<input type="text" name="layoutStyle" id="layoutStyle" value=""/>
 			</td>
