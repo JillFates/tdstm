@@ -32,7 +32,9 @@
 			<td>${modelInstance?.manufacturer?.name}</td>
 		</tr>
 		<tr>
-			<td>Model Name:</td>
+			<td>Model Name: <a href="#" 
+			onclick="MyGoogle=window.open('http://www.google.com/#sclient=psy-ab&q='+escape('${modelInstance?.manufacturer?.name}'+' '+'${modelInstance?.modelName}'+' specifications'),'MyGoogle','toolbar=yes,location=yes,menubar=yes,scrollbars=yes,resizable=yes'); return false">G?</a>
+			</td>
 			<td>${modelInstance?.modelName}</td>
 		</tr>
 		<tr>
@@ -45,9 +47,7 @@
 		</tr>
 		<tr>
 			<td>Usize:</td>
-			<td>
-				${modelInstance?.usize}
-			</td>
+			<td>${modelInstance?.usize}</td>
 		</tr>
 		<tr>
 			<td>Model Height:</td>
@@ -262,7 +262,7 @@ function updatePowerType( value){
 	$('#powerUseId').val(preference);
 	$("#powerSpanId").html(preference);
 	${remoteFunction(controller:'project', action:'setPower', params:'\'p=\' + value ')}
-}	
+}
 </script>
 </div>
 </body>
