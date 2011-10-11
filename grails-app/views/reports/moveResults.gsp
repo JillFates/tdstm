@@ -51,9 +51,5 @@
 </g:form>
 </div>
 </div>
-<script type="text/javascript">
-$('#reportsMenu').show();
-$('#assetMenu').hide();
-</script>
 </body>
 </html>

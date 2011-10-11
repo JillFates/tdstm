@@ -330,8 +330,6 @@ var sHint = "C:\\temp\\output";
 </div>
 </div>
 <script type="text/javascript">
-$('#reportsMenu').show();
-$('#assetMenu').hide();
 InitData()
 </script>
 </body>

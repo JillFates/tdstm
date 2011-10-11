@@ -209,8 +209,6 @@ function mySelect(x)
 </div>
 </div>
 <script type="text/javascript">
-$('#reportsMenu').show();
-$('#assetMenu').hide();
 InitData()
 </script>
 </body>

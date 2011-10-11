@@ -20,7 +20,9 @@ class ReportsController {
 	def jdbcTemplate
 	def supervisorConsoleService
 	
-    def index = { }
+	def index = { 
+		render(view:'home')
+	}
     
     // Generate Report Dialog
     def getBundleListForReportDialog = {

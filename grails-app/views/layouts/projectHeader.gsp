@@ -132,7 +132,7 @@
 			<li><g:link class="home" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link> </li>
 			<li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker</g:link> </li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']">
-	        	<li><a href="#" onclick="showReportsMenu();this.style.background='#003366';">Reports</a></li>
+	        	<li><g:link class="home" controller="reports" params="[projectId:currProjObj?.id]">Reports</g:link></li>
 	        </jsec:lacksAllRoles>
 	      </ul>
 	    </div>
@@ -158,7 +158,7 @@
 	        </jsec:hasAnyRole>
 		</ul>
 	    </div>
-	    <div class="menu2" id="reportsMenu" style="background-color:#003366;display: none;">
+	    <!-- <div class="menu2" id="reportsMenu" style="background-color:#003366;display: none;">
 			<ul>
 			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Login Badges']">Login Badges</g:link> </li>
 			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Asset Tag']">Asset Tags</g:link> </li>
@@ -173,7 +173,7 @@
 			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'CablingData']">Cabling Data</g:link></li>
 			<li><g:link class="home" controller="reports" action="powerReport">Power</g:link></li>
 			</ul>
-		</div>
+		</div> -->
 		<g:if test="${moveEvent && moveEvent?.inProgress == 'true'}">
 			<div class="menu3" id="head_crawler" >
 				<div id="crawlerHead">${moveEvent.name} Move Event Status <span id="moveEventStatus"></span>. News: </div>

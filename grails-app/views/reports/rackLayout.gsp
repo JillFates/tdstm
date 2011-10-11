@@ -123,8 +123,6 @@
 </div>
 </div>
 <script type="text/javascript">
-$('#reportsMenu').show();
-$('#assetMenu').hide();
 var bundleObj = $("#bundleId")
 $('#target').attr('checked','true');
 bundleObj.val('${currentBundle?.CURR_BUNDLE}')
