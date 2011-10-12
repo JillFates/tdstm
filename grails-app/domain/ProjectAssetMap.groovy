@@ -2,6 +2,7 @@
  * This domain is used to manage the many-to-many relationship of assets that are owned 
  * by a company but can be associated to one or more projects.
  * */
+import com.tds.asset.AssetEntity;
 import com.tdssrc.grails.GormUtil
 class ProjectAssetMap {
 	Project project

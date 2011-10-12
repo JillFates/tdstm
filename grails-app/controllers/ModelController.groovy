@@ -1,18 +1,24 @@
-import com.tdssrc.grails.GormUtil;
 import grails.converters.JSON
+
+import java.io.*
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+
+import jxl.*
+import jxl.read.biff.*
+import jxl.write.*
+
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
 import org.jmesa.limit.Limit
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.io.*
-import jxl.*
-import jxl.write.*
-import jxl.read.biff.*
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.jsecurity.SecurityUtils
 import org.springframework.web.multipart.*
 import org.springframework.web.multipart.commons.*
-import org.jsecurity.SecurityUtils
+
+import com.tds.asset.AssetCableMap
+import com.tds.asset.AssetEntity
+import com.tdssrc.grails.GormUtil
 
 class ModelController {
 	
@@ -220,7 +226,7 @@ class ModelController {
 
     def update = {
         def modelInstance = Model.get(params.id)
-        if (modelInstance) {
+		if (modelInstance) {
 			def powerUsed = params.powerUse ? Float.parseFloat(params.powerUse) : 0
 			def powerType = params.powerType
 			if( powerType == "Amps"){

@@ -1,9 +1,13 @@
 import grails.converters.JSON
-import org.jsecurity.SecurityUtils
+
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import com.tdssrc.grails.GormUtil
-import javax.servlet.http.HttpSession
+import org.jsecurity.SecurityUtils
+
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetEntity
+import com.tds.asset.AssetTransition
 import com.tdssrc.eav.*
+import com.tdssrc.grails.GormUtil
 class ClientConsoleController {
 	
 	 protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8']

@@ -1,3 +1,7 @@
+import com.tds.asset.AssetCableMap
+import com.tds.asset.AssetEntity
+import com.tdssrc.grails.GormUtil
+
 
 def modelInstancesList = Model.list([sort:'modelName',order:'asc'])
 

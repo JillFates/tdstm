@@ -1,3 +1,4 @@
+package com.tds.asset
 import com.tdssrc.grails.GormUtil
 class AssetComment {
 	

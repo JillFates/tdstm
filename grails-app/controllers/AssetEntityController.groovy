@@ -1,20 +1,30 @@
-import java.io.*
-import jxl.*
-import jxl.write.*
-import jxl.read.biff.*
-import org.springframework.web.multipart.*
-import org.springframework.web.multipart.commons.*
 import grails.converters.JSON
-import org.jsecurity.SecurityUtils
-import com.tdssrc.eav.*
-import org.codehaus.groovy.grails.commons.ApplicationHolder
-import com.tdssrc.grails.GormUtil
+
+import java.io.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+
+import jxl.*
+import jxl.read.biff.*
+import jxl.write.*
+import net.tds.util.jmesa.AssetEntityBean
+
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
 import org.jmesa.limit.Limit
-import net.tds.util.jmesa.AssetEntityBean
+import org.jsecurity.SecurityUtils
+import org.springframework.web.multipart.*
+import org.springframework.web.multipart.commons.*
+
+import com.tds.asset.ApplicationAssetMap
+import com.tds.asset.AssetCableMap
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetEntity
+import com.tds.asset.AssetEntityVarchar
+import com.tds.asset.AssetTransition
+import com.tdssrc.eav.*
+import com.tdssrc.grails.GormUtil
 
 class AssetEntityController {	
 
@@ -648,7 +658,7 @@ class AssetEntityController {
             ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${assetEntityInstance.id}")
             AssetTransition.executeUpdate("delete from AssetTransition ast where ast.assetEntity = ${assetEntityInstance.id}")
             AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity = ${assetEntityInstance.id}")
-            ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset = ${assetEntityInstance.id}")
+			ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset = ${assetEntityInstance.id}")
             AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar aev where aev.assetEntity = ${assetEntityInstance.id}")
             ProjectTeam.executeUpdate("update ProjectTeam pt set pt.latestAsset = null where pt.latestAsset = ${assetEntityInstance.id}")
 			AssetCableMap.executeUpdate("delete AssetCableMap where fromAsset = ? ",[assetEntityInstance])

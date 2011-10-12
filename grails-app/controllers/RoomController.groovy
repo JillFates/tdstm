@@ -1,4 +1,7 @@
-import grails.converters.JSON;
+import grails.converters.JSON
+
+import com.tds.asset.AssetCableMap
+import com.tds.asset.AssetEntity
 
 class RoomController {
 

@@ -1,7 +1,12 @@
-import com.tdssrc.eav.EavAttributeSet
-import com.tdssrc.eav.EavAttribute
 import grails.converters.JSON
+
 import org.jsecurity.SecurityUtils
+
+import com.tds.asset.AssetCableMap
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetEntity
+import com.tdssrc.eav.EavAttribute
+import com.tdssrc.eav.EavAttributeSet
 class DataTransferBatchController {
     def sessionFactory
     def assetEntityAttributeLoaderService
@@ -88,6 +93,7 @@ class DataTransferBatchController {
 			    					def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, assetEntity, dtvList, projectInstance )
 			    					flag = validateResultList[0]?.flag
 			    					errorConflictCount = errorConflictCount+validateResultList[0]?.errorConflictCount 
+									println"Asset Errors--->"+flag
 			    					if( flag == 0 ) {
 			    						isNewValidate = "false"
 			    					}else {
@@ -175,6 +181,8 @@ class DataTransferBatchController {
 													assetEntity."$attribName" = correctedPos 
 		    	        						}
 		    								} catch ( Exception ex ) {
+												println"=================================="
+												ex.printStackTrace()
 		    									errorConflictCount+=1
 		    									it.hasError = 1
 		    									it.errorText = "format error"
@@ -205,6 +213,7 @@ class DataTransferBatchController {
 													}
 			    								}
 		    								} catch ( Exception ex ) {
+											ex.printStackTrace()
 		    									errorConflictCount+=1
 		    									it.hasError = 1
 		    									it.errorText = "Asset Tag should not be blank"

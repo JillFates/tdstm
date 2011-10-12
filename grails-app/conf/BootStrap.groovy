@@ -1,8 +1,9 @@
 import org.jsecurity.crypto.hash.Sha1Hash
+
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetEntity
 import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
-
-import java.text.SimpleDateFormat
 
 class BootStrap {
 	def assetEntityAttributeLoaderService
@@ -299,13 +300,6 @@ return
 
 
 		// -------------------------------
-		// Create Applications
-		// -------------------------------
-		def raiserApp = new Application(
-			name: "Raiser's Edge",
-			appCode: "RE", environment:"Production",
-			owner: cedars).save()
-		// -------------------------------
 		// Create moveEvent Details
 		// -------------------------------
 		println "MOVE EVENT"
@@ -402,12 +396,6 @@ return
 			[ projStaffType, cedarsProject, projectRole, personTransport, techRole ],
 			[ projStaffType, cedarsProject, projectRole, personRita, managerRole ],
 			[ projStaffType, cedarsProject, projectRole, personWarren, observerRole ],
-
-			// Application / staff relationships
-			[ appRelaType, raiserApp, applicationRole, personNBonner, appOwnerRole ],
-			[ appRelaType, raiserApp, applicationRole, personAMaslac, appSMERole ],
-			[ appRelaType, raiserApp, applicationRole, personHKim, appPCRole ],
-			[ appRelaType, raiserApp, applicationRole, personLCoronado, appSCRole ],
 
 			// TimeWarner Relationships
 			[ projCompanyType, twProject, projectRole, tds, companyRole ],

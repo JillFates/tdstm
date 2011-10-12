@@ -1,3 +1,6 @@
+import com.tds.asset.AssetEntity
+import com.tds.asset.AssetTransition
+
 class MoveBundle extends Party {	
     Project project
     String name

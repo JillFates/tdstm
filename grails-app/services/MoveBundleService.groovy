@@ -1,4 +1,11 @@
 import org.springframework.dao.IncorrectResultSizeDataAccessException
+
+import com.tds.asset.ApplicationAssetMap
+import com.tds.asset.AssetCableMap
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetEntity
+import com.tds.asset.AssetEntityVarchar
+import com.tds.asset.AssetTransition
 import com.tdssrc.grails.GormUtil
 
 class MoveBundleService {

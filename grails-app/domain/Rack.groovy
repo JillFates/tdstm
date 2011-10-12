@@ -1,3 +1,5 @@
+import com.tds.asset.AssetEntity;
+
 class Rack {
 	Project project
 	Integer source

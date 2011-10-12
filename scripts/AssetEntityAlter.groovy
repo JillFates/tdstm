@@ -1,4 +1,5 @@
 
+import com.tds.asset.AssetEntity;
 import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
 

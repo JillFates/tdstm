@@ -1,5 +1,10 @@
 import grails.converters.JSON
+
 import org.jsecurity.SecurityUtils
+
+import com.tds.asset.AssetCableMap
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
 /*------------------------------------------------------------
  * Controller for Walk Through Process

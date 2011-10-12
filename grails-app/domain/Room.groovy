@@ -1,3 +1,4 @@
+import com.tds.asset.AssetEntity;
 import com.tdssrc.grails.GormUtil
 class Room {
 	String roomName

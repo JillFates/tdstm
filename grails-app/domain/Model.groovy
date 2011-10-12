@@ -1,3 +1,4 @@
+import com.tds.asset.AssetEntity;
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.eav.EavAttribute
 class Model {
@@ -30,7 +31,6 @@ class Model {
 	String sourceURL
 	String modelStatus
 	String modelScope
-
 	
 	// files to sync data for multiple Transition Manager instances
 	Integer sourceTDS = 1

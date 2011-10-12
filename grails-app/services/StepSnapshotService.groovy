@@ -1,6 +1,8 @@
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.runtime.TimeCategory
+
+import com.tds.asset.AssetEntity;
 import com.tdssrc.grails.GormUtil
 
 class StepSnapshotService {

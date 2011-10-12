@@ -5,7 +5,9 @@
 import org.jsecurity.authc.UsernamePasswordToken
 import org.jsecurity.SecurityUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder*/
-import grails.converters.JSON
+import com.tds.asset.AssetCableMap
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
 class MoveTechController {
     def jsecSecurityManager

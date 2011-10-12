@@ -1,3 +1,4 @@
+<%@page import="com.tds.asset.AssetComment"%>
 <html>
 <head>
 <title>Walkthru&gt; Asset Menu</title>

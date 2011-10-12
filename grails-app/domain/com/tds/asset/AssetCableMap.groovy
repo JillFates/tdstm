@@ -1,3 +1,4 @@
+package com.tds.asset
 class AssetCableMap {
 	String cable
 	AssetEntity fromAsset

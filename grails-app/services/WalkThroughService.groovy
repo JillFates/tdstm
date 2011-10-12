@@ -1,3 +1,6 @@
+import com.tds.asset.AssetEntity
+import com.tds.asset.AssetTransition
+
 /*------------------------------------------------------------
  * Service for Walkthru Process
  * @author : Lokanath Reddy

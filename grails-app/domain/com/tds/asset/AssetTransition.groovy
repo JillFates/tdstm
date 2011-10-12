@@ -1,8 +1,14 @@
+package com.tds.asset
 /*
  * An AssetTransition is used to record the state change or transition of an asset from
  * one state to another at a particular time and by whom.  
  */
+import MoveBundle
+import ProjectTeam
+import UserLogin
+
 import com.tdssrc.grails.GormUtil
+
 class AssetTransition {
 
 	String stateFrom

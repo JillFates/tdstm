@@ -1,5 +1,5 @@
+import com.tds.asset.AssetTransition
 import com.tdssrc.grails.GormUtil
-import org.jsecurity.SecurityUtils
 class UserLogin {
 	String username
 	String password

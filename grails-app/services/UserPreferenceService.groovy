@@ -1,6 +1,14 @@
-import org.jsecurity.SecurityUtils
 import javax.servlet.http.HttpSession
+
+import org.jsecurity.SecurityUtils
 import org.springframework.web.context.request.RequestContextHolder
+
+import com.tds.asset.ApplicationAssetMap
+import com.tds.asset.AssetCableMap
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetEntity
+import com.tds.asset.AssetEntityVarchar
+import com.tds.asset.AssetTransition
 import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
 class UserPreferenceService  {
