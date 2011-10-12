@@ -1,5 +1,8 @@
 
 import grails.test.*
+
+import com.tds.asset.AssetCableMap
+import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
 
 class CablingTests extends GrailsUnitTestCase {
