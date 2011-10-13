@@ -1,6 +1,7 @@
 import com.tds.asset.AssetEntity;
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.eav.EavAttribute
+import org.jsecurity.SecurityUtils;
 class Model {
 	String modelName
 	String description
@@ -23,14 +24,17 @@ class Model {
 	String bladeHeight = 'Half'
 	String productLine
 	String modelFamily
-	String endOfLifeDate
+	Date endOfLifeDate
 	String endOfLifeStatus
-	String createdBy
-	String updatedBy
-	String validatedBy
+	Person createdBy
+	Person updatedBy
+	Person validatedBy
 	String sourceURL
-	String modelStatus
-	String modelScope
+	String modelStatus = 'new'
+	Project modelScope
+	
+	
+
 	
 	// files to sync data for multiple Transition Manager instances
 	Integer sourceTDS = 1
@@ -80,7 +84,7 @@ class Model {
 		sourceTDSVersion( blank:true, nullable:true )
 		productLine( blank:true, nullable:true )
 		modelFamily( blank:true, nullable:true )
-		endOfLifeDate( blank:true, nullable:true )
+		endOfLifeDate(nullable:true)
 		endOfLifeStatus( blank:true, nullable:true )
 		createdBy( blank:true, nullable:true )
 		updatedBy( blank:true, nullable:true )
@@ -95,6 +99,9 @@ class Model {
 		columns {
 			id column:'model_id'
 			modelName column: 'name'
+			createdBy column: 'created_by'
+			updatedBy column: 'updated_by'
+			validatedBy column: 'validated_by'
 			frontImage sqlType:'LONGBLOB'
 			rearImage sqlType:'LONGBLOB'
 			useImage sqltype: 'tinyint'
@@ -117,6 +124,10 @@ class Model {
 			bladeCount = null
 			bladeLabelCount = null
 		}
+		def principal = SecurityUtils.subject?.principal
+		if( principal ){
+			createdBy  = UserLogin.findByUsername( principal )?.person
+		}
 	}
 	def beforeUpdate = {
 		if(assetType == "Blade Chassis"){
@@ -130,6 +141,10 @@ class Model {
 			bladeRows = null
 			bladeCount = null
 			bladeLabelCount = null
+		}
+		def principal = SecurityUtils.subject?.principal
+		if( principal ){
+			updatedBy  = UserLogin.findByUsername( principal )?.person
 		}
 	}
 	def getAssetTypeList(){

@@ -111,11 +111,11 @@ function showAssetDialog( e , action ) {
 		    
 		    var labelTdE = ""
 	    	if(attribute.attributeCode == "manufacturer" && attribute.value != "" && attribute.value != null){
-	    		labelTdE = "<td style='width:25%;background:#f3f4f6;' nowrap><a href='javascript:showManufacturer("+attribute.manufacturerId+")' style='color:#00E'>"+attribute.label+"</a></td>"
+	    		labelTdE = "<td style='width:25%;background:#f3f4f6;' nowrap><a href='javascript:showManufacturer("+attribute.manufacturerId+")' style='color:#00E'>"+attribute.label+"</a>"
 		    } else if(attribute.attributeCode == "model"&& attribute.value != "" && attribute.value != null ){
-		    	labelTdE = "<td style='width:25%;background:#f3f4f6;' nowrap><a href='javascript:showModel("+attribute.modelId+")' style='color:#00E'>"+attribute.label+"</a></td>"
+		    	labelTdE = "<td style='width:25%;background:#f3f4f6;' nowrap><a href='javascript:showModel("+attribute.modelId+")' style='color:#00E'>"+attribute.label+"</a>"
 		    } else {
-		    	labelTdE = "<td style='background:#f3f4f6;width:25%;' nowrap>"+attribute.label+"</td>"
+		    	labelTdE = "<td style='background:#f3f4f6;width:25%;' nowrap>"+attribute.label
 		    }
 		    
 		    if(requiredFields.contains(attribute.attributeCode)){
@@ -123,6 +123,9 @@ function showAssetDialog( e , action ) {
 			    labelTd += spanAst 
 			    labelTdE += spanAst
 		    }
+		    labelTd +="</td>"
+		    labelTdE +="</td>"
+		    	
 		    var inputTd = ""
 		    if(attribute.attributeCode == "manufacturer"){
 		    	inputTd = "<td style='width:25%;color:#00f;' nowrap><a href='javascript:showManufacturer("+attribute.manufacturerId+")' style='color:#00E'>"+attribute.value+"</a></td>"

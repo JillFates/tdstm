@@ -39,6 +39,7 @@
                              <jmesa:htmlColumn width="50px" property="assetsCount" sortable="true" filterable="true" title="Assets">${modelInstance.assetsCount}</jmesa:htmlColumn>
                              <jmesa:htmlColumn width="50px" property="sourceTDSVersion" sortable="true" filterable="true" title="Version">${modelInstance.sourceTDSVersion}</jmesa:htmlColumn>
                              <jmesa:htmlColumn width="50px" property="source" sortable="true" filterable="true" title="Source TDS">${modelInstance.source}</jmesa:htmlColumn>
+                             <jmesa:htmlColumn width="50px" property="modelStatus" sortable="true" filterable="true" title="Model Status">${modelInstance.modelStatus}</jmesa:htmlColumn>
                         </jmesa:htmlRow>
                     </jmesa:htmlTable>
                 </jmesa:tableFacade>

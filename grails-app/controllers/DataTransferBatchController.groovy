@@ -93,7 +93,6 @@ class DataTransferBatchController {
 			    					def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, assetEntity, dtvList, projectInstance )
 			    					flag = validateResultList[0]?.flag
 			    					errorConflictCount = errorConflictCount+validateResultList[0]?.errorConflictCount 
-									println"Asset Errors--->"+flag
 			    					if( flag == 0 ) {
 			    						isNewValidate = "false"
 			    					}else {

@@ -5,6 +5,7 @@
     <title>Model Template</title>
     <g:javascript src="drag_drop.js" />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
+    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
   </head>
   <body>
 <div class="body">
@@ -15,7 +16,7 @@
 <fieldset>
 <legend><b>Create Model Template</b></legend>
 <g:form action="list" enctype="multipart/form-data">
-<div style="margin-left: 10px;margin-right: 10px; float: left;width: auto;">
+<div style="margin-left: 10px;margin-right: 10px; width: auto;">
 <table>
 	<tbody>
 		<tr>
@@ -31,8 +32,6 @@
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="manufacturer" /></div>
 				</g:hasErrors>
 			</td>
-		</tr>
-		<tr>
 			<td valign="top" class="name" nowrap="nowrap"><b>Model Name:<span style="color: red">*</span></b></td>
 			<td>
 				<input type="text" name="modelName" id="modelNameId" value="${modelInstance?.modelName}">
@@ -47,34 +46,26 @@
 				<input type="text" name="aka" id="akaId" value="${modelInstance?.aka}">
 				<g:hasErrors bean="${modelInstance}" field="aka">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="aka" /></div>
-				</g:hasErrors> 
-			</td>
-		</tr>
+				</g:hasErrors>
+			 </td>
+			 <td valign="top" class="name" nowrap="nowrap">Asset Type:</td>
+			 <td><g:select id="assetTypeId" name="assetType" from="${modelInstance.assetTypeList}" value="${modelInstance.assetType}" onchange="showBladeFields(this.value)"></g:select></td> 
 		<tr>
-			<td valign="top" class="name" nowrap="nowrap">Asset Type:</td>
-			<td><g:select id="assetTypeId" name="assetType" from="${modelInstance.assetTypeList}" value="${modelInstance.assetType}" onchange="showBladeFields(this.value)"></g:select></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name">Usize:</td>
+			 <td valign="top" class="name">Usize:</td>
 			<td>
 				<g:select id="usizeId" name="usize" from="${modelInstance.constraints.usize.inList}" value="${modelInstance.usize}"></g:select>
 			</td>
-		</tr>
-		<tr>
-		<tr>
 			<td valign="top" class="name" nowrap="nowrap">Model Height:</td>
 			<td>
 				<input type="text" name="height" id="heightId" value=""/>
-				
 			</td>
+			
 		</tr>
 		<tr>
 			<td valign="top" class="name" nowrap="nowrap">Model Width:</td>
 			<td>
 				<input type="text" name="width" id="widthId" value=""/>
 			</td>
-		</tr>
-		<tr>
 			<td valign="top" class="name" nowrap="nowrap">Model Depth:</td>
 			<td>
 				<input type="text" name="depth" id="depthId" value=""/>
@@ -85,40 +76,68 @@
 			<td>
 				<input type="text" name="weight" id="weightId" value=""/>
 			</td>
-		</tr>
-		<tr>
 			<td valign="top" class="name" nowrap="nowrap">Layout Style:</td>
 			<td>
 				<input type="text" name="layoutStyle" id="layoutStyle" value=""/>
 			</td>
 		</tr>
+		<tr>
+			<td valign="top" class="name" nowrap="nowrap">Product Line:</td>
+			<td>
+				<input type="text" name="productLine" id="productLine" value=""/>
+			</td>
+			<td valign="top" class="name" nowrap="nowrap">Model Family:</td>
+			<td>
+				<input type="text" name="modelFamily" id="modelFamily" value=""/>
+			</td>
+		</tr>
+		<tr>
+			<td><label for="endOfLifeDate"> End of Life Date:</label></td>
+				     <td class="value ${hasErrors(bean:modelInstance ,field:'endOfLifeDate','errors')}">
+				    <script type="text/javascript" charset="utf-8">
+                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+                     </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="endOfLifeDate" id="endOfLifeDateId"
+					value="<tds:convertDate date="${modelInstance?.endOfLifeDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" />
+       			 <g:hasErrors bean="${modelInstance}" field="endOfLifeDate">
+					<div class="errors">
+						<g:renderErrors bean="${modelInstance}" as="list" field="endOfLifeDate" />
+					</div>
+				 </g:hasErrors>
+				</td>
+				<td valign="top" class="name" nowrap="nowrap">End of Life Status:</td>
+			<td>
+				<input type="text" name="endOfLifeStatus" id="endOfLifeStatus" value=""/>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" class="name" nowrap="nowrap">Source URL : </td>
+			<td>
+				<input type="text" name="sourceURL " id="sourceURL " value=""/>
+			</td>
+			<td valign="top" class="name" nowrap="nowrap">Model Status :</td>
+			<td>
+				<g:select id="modelStatus" name='modelStatus' value ='${modelInstance.modelStatus}' from="${['new','full','valid']}" > </g:select>
+			</td>
+		</tr>
+			<td>
+				<input type = "hidden" id="modelScope" name='modelScope' > </input>
+			</td>
+		<tr>
+			
 			<td valign="top" class="name" nowrap="nowrap">Power :</td>
 			<td><input type="text" name="powerUse" id="powerUseId" value="${modelInstance.powerUse}" >&nbsp;
 			<g:select id="powerTypeId" name='powerType' from="${['Watts','Amps']}" value="${powerType}"> </g:select>
-            </td>
-        </tr>
-		<tr>
-		<td valign="top" class="name" nowrap="nowrap">Front image:</label></td>
-        <td><input size="20" type="file" name="frontImage" id="frontImageId" />
-		</td>
+			<td valign="top" class="name">Notes:</td>
+		    <td><input type="text" name="description" id="descriptionId" value="${modelInstance.description}" > </td>
 		</tr>
 		<tr>
-        <td valign="top" class="name" nowrap="nowrap">Rear image:</td>
-        <td><input size="20" type="file" name="rearImage" id="rearImageId" />
-        </td>
-        </tr>
-        
-        <tr>
-        	<td>Use Image:</td>
-	        <td>
-	        	<g:if test="${modelTemplate?.useImage}">
-	       			<input type="checkbox" name="useImage" id="useImageId"  checked="checked" onclick="showImage(this.id)"/>
-		        </g:if>
-		        <g:else>
-		        	<input type="checkbox" name="useImage" id="useImageId" onclick="showImage(this.id)"/>
-		        </g:else>
-	        </td>
-        </tr>
+            <td valign="top" class="name" nowrap="nowrap">Front image:</label></td>
+            <td><input size="20" type="file" name="frontImage" id="frontImageId" />
+		    </td>
+		    <td valign="top" class="name" nowrap="nowrap">Rear image:</td>
+            <td><input size="20" type="file" name="rearImage" id="rearImageId" />
+            </td>
+		</tr>
 		<tr id="bladeRowsId" style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
 			<td valign="top" class="name">Blade Rows:</td>
 			<td><input type="text" name="bladeRows" value="${modelInstance.bladeRows}" > 
@@ -150,7 +169,16 @@
 			</td>
 		</tr>
 		<tr>
-        	<td>Source TDS:</td>
+		<td>Use Image:</td>
+	        <td>
+	        	<g:if test="${modelTemplate?.useImage}">
+	       			<input type="checkbox" name="useImage" id="useImageId"  checked="checked" onclick="showImage(this.id)"/>
+		        </g:if>
+		        <g:else>
+		        	<input type="checkbox" name="useImage" id="useImageId" onclick="showImage(this.id)"/>
+		        </g:else>
+	        </td>
+		 <td>Source TDS:</td>
 	        <td>
 	        	<g:if test="${modelTemplate?.sourceTDS}">
 	       			<input type="checkbox" name="sourceTDS" id="sourceTDSId"  checked="checked" />
@@ -160,20 +188,13 @@
 		        </g:else>
 	        </td>
         </tr>
-		 <tr>
-			<td valign="top" class="name">Notes:</td>
-			<td><input type="text" name="description" id="descriptionId" value="${modelInstance.description}" > </td>
-		</tr>
-		<tr>
-			<td colspan="2">
-				<div class="buttons" style="margin-left: 10px;margin-right: 10px;"> 
-					<span class="button">
-						<g:actionSubmit class="save" action="save" value="Save" onclick="return validateForm()"></g:actionSubmit>
-						 <span class="menuButton"><g:link class="list" action="list"  params="[filter:true]">Cancel</g:link></span>
-					</span>
-				</div>
+        <tr>
+        <td valign="top" class="name" nowrap="nowrap">Validated By:</td>
+			<td>
+				<input type="text" name="validatedBy" id="validatedBy" value="" readonly="readonly"/>
 			</td>
-		</tr>
+         
+       </tr>
 	</tbody>
 </table>
 </div>
@@ -243,10 +264,23 @@
 			</tbody>
 		</table>
 	</div>
+	<tr>
+			<td colspan="2">
+				<div class="buttons" style="margin-left: 10px;margin-right: 10px;"> 
+					<span class="button">
+						<g:actionSubmit class="save" action="save" value="Save" onclick="return validateForm()"></g:actionSubmit>
+						 <span class="menuButton"><g:link class="list" action="list"  params="[filter:true]">Cancel</g:link></span>
+					</span>
+				</div>
+			</td>
+		</tr>
 </div>
+
 </g:form>
 </fieldset>
+
 </div>
+
 <script type="text/javascript">
 	$('#connectorCount').val(${modelConnectors ? modelConnectors.size() : 0});
 	var image = "${modelTemplate?.rearImage}"
@@ -356,6 +390,8 @@
 		}
 	}
 	showBladeFields($("#assetTypeId").val())
+	
+		
 </script>
 </body>
 </html>

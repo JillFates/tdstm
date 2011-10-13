@@ -24,67 +24,74 @@
 <div style="border: 0px;margin-top: 5px;">
 <fieldset>
 <legend><b>Show Model Template</b></legend>
-<div style="margin-left: 10px;margin-right: 10px; float: left;width: auto;">
+<div style="margin-left: 10px;margin-right: 10px;width: auto;">
 <table style="border: 0px;">
 	<tbody>
 		<tr>
 			<td>Manufacturer:</td>
 			<td>${modelInstance?.manufacturer?.name}</td>
-		</tr>
-		<tr>
 			<td>Model Name: <a href="#" 
-			onclick="MyGoogle=window.open('http://www.google.com/#sclient=psy-ab&q='+escape('${modelInstance?.manufacturer?.name}'+' '+'${modelInstance?.modelName}'+' specifications'),'MyGoogle','toolbar=yes,location=yes,menubar=yes,scrollbars=yes,resizable=yes'); return false">G?</a>
+			 onclick="MyGoogle=window.open('http://www.google.com/#sclient=psy-ab&q='+escape('${modelInstance?.manufacturer?.name}'+' '+'${modelInstance?.modelName}'+' specifications'),'MyGoogle','toolbar=yes,location=yes,menubar=yes,scrollbars=yes,resizable=yes'); return false">G?</a>
 			</td>
 			<td>${modelInstance?.modelName}</td>
 		</tr>
 		<tr>
 			<td>AKA:</td>
 			<td>${modelInstance?.aka}</td>
-		</tr>
-		<tr>
 			<td>Asset Type:</td>
 			<td>${modelInstance?.assetType}</td>
 		</tr>
 		<tr>
 			<td>Usize:</td>
 			<td>${modelInstance?.usize}</td>
-		</tr>
-		<tr>
 			<td>Height (inches):</td>
 			<td>${modelInstance?.height}</td>
 		</tr>
 		<tr>
 			<td>Width:</td>
 			<td>${modelInstance?.width}</td>
-		</tr>
-		<tr>
 			<td>Depth:</td>
 			<td>${modelInstance?.depth}</td>
 		</tr>
 		<tr>
 			<td>Weight (lbs):</td>
 			<td>${modelInstance?.weight}</td>
-		</tr>
-		<tr>
 			<td>Layout Style:</td>
 			<td>${modelInstance?.layoutStyle}</td>
 		</tr>
 		<tr>
-			<td>Power :</td>
-			<td><span id="powerSpanId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts' ? modelInstance?.powerUse ? (modelInstance?.powerUse / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerUse}</span>
+			<td>Product Line:</td>
+			<td>${modelInstance?.productLine}</td>
+			<td>Model Family:</td>
+			<td>${modelInstance?.modelFamily}</td>
+		</tr>
+		<tr>
+		    <td>End of Life Date:</td>
+		    <td><tds:convertDate date="${modelInstance?.endOfLifeDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+            <td>End of Life Status:</td>
+			<td>${modelInstance?.endOfLifeStatus}</td>
+        </tr>
+		<tr>
+		    <td>Source URL:</td>
+			<td>${modelInstance?.sourceURL}</td>
+			<td>Model Status:</td>
+			<td>${modelInstance?.modelStatus}</td>
+		</tr>
+		<tr>
+			<td>Power : <td><span id="powerSpanId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts' ? modelInstance?.powerUse ? (modelInstance?.powerUse / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerUse}</span>
 			<input type="hidden" name="powerUse" id="powerUseId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? modelInstance?.powerUse ? (modelInstance?.powerUse / 110 )?.toFloat()?.round(1) : 0.0 : modelInstance?.powerUse}" >&nbsp;
 			<g:select id="powertype" name='powerType' value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE }" from="${['Watts','Amps']}" onchange="updatePowerType( this.value)"> </g:select>
             </td>
+             <td>Notes:</td>
+			<td>${modelInstance?.description}</td>
 		</tr>
 		<tr>
-			<td>Front image:</label></td>
+            <td>Front image:</label></td>
         	<td>
         	<g:if test="${modelInstance.frontImage}">
         	<img src="${createLink(controller:'model', action:'getFrontImage', id:modelInstance.id)}" style="height: 50px;width: 100px;"/>
         	</g:if>
-        	</td>
-		</tr>
-		<tr>
+            </td>
         	<td>Rear image:</td>
         	<td>
         	<g:if test="${modelInstance.rearImage}">
@@ -92,17 +99,7 @@
         	</g:if>
         	</td>
         </tr>
-        <tr>
-        	<td>Use Image:</td>
-	        <td>
-		        <g:if test="${modelInstance.useImage}">
-		        	<input type="checkbox" name="useImage" id="useImageId" checked="checked" disabled="disabled"/>
-		        </g:if>
-		        <g:else>
-		       	 <input type="checkbox" name="useImage" id="useImageId" disabled="disabled"/>
-		        </g:else>
-	        </td>
-        </tr>
+        	
 		<tr style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
 			<td>Blade Rows:</td>
 			<td>${modelInstance?.bladeRows}</td>
@@ -120,6 +117,15 @@
 			<td>${modelInstance?.bladeHeight}</td>
 		</tr>
 		<tr>
+		   <td>Use Image:</td>
+	        <td>
+		        <g:if test="${modelInstance.useImage}">
+		        	<input type="checkbox" name="useImage" id="useImageId" checked="checked" disabled="disabled"/>
+		        </g:if>
+		        <g:else>
+		       	 <input type="checkbox" name="useImage" id="useImageId" disabled="disabled"/>
+		        </g:else>
+	        </td>
         	<td>Source TDS:</td>
 	        <td>
 		        <g:if test="${modelInstance.sourceTDS}">
@@ -131,22 +137,14 @@
 	        </td>
         </tr>
 		<tr>
-			<td>Notes:</td>
-			<td>${modelInstance?.description}</td>
+		    <td>Created By :</td>
+			<td>${modelInstance?.createdBy}</td>
+			<td>Updated By:</td>
+			<td>${modelInstance?.updatedBy}</td>
 		</tr>
 		<tr>
-			<td colspan="2">
-				<div class="buttons" style="margin-left: 10px;margin-right: 10px;"> 
-					<g:form action="update" >
-						<input name="id" value="${modelInstance.id}" type="hidden"/>
-						<span class="button">
-							<g:actionSubmit class="edit" action="edit" value="Edit"></g:actionSubmit>
-							<span class="button"><input class="create" type="button" value="Merge" onclick="showMergeDialog()"/></span>
-							<g:actionSubmit class="delete" action="delete" value="Delete" onclick="return validateModelDependency(${modelInstance.id})"></g:actionSubmit>
-						</span>
-					</g:form>
-				</div>
-			</td>
+		    <td>Validated By:</td>
+			<td>${modelInstance?.validatedBy}</td>
 		</tr>
 	</tbody>
 </table>
@@ -222,6 +220,20 @@
             </tbody>
         </table>
 	</div>
+	<tr>
+			<td colspan="2">
+				<div class="buttons" style="margin-left: 10px;margin-right: 10px;"> 
+					<g:form action="update" >
+						<input name="id" value="${modelInstance.id}" type="hidden"/>
+						<span class="button">
+							<g:actionSubmit class="edit" action="edit" value="Edit"></g:actionSubmit>
+							<span class="button"><input class="create" type="button" value="Merge" onclick="showMergeDialog()"/></span>
+							<g:actionSubmit class="delete" action="delete" value="Delete" onclick="return validateModelDependency(${modelInstance.id})"></g:actionSubmit>
+						</span>
+					</g:form>
+				</div>
+			</td>
+		</tr>
 </div>
 </fieldset>
 <script type="text/javascript">

@@ -98,6 +98,18 @@ class ModelController {
     	def modelId = params.modelId
 		def powerUsed = params.powerUse ? Float.parseFloat(params.powerUse) : 0
 		def powerType = params.powerType
+		def endOfLifeDate = params.endOfLifeDate
+		def formatter = new SimpleDateFormat("MM/dd/yyyy");
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		def principal = SecurityUtils.subject?.principal
+		def user
+		
+		if( principal ){
+			user  = UserLogin.findByUsername( principal )
+		}
+		if(endOfLifeDate){
+			params.endOfLifeDate =  GormUtil.convertInToGMT(formatter.parse(endOfLifeDate), tzId)
+		}
 		if( powerType == "Amps"){
 			powerUsed = powerUsed * 110
         }
@@ -109,6 +121,9 @@ class ModelController {
     	params.powerUse = powerUsed
         def  modelInstance = new Model(params)
 		modelInstance.powerUse = powerUsed
+		if(params?.modelStatus=='valid'){
+			modelInstance.validatedBy = user?.person
+		}
 		def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
 		def frontImage = request.getFile('frontImage')
         if( frontImage.bytes.size() > 0 ) {
@@ -226,7 +241,18 @@ class ModelController {
 
     def update = {
         def modelInstance = Model.get(params.id)
-		if (modelInstance) {
+		def endOfLifeDate = params.endOfLifeDate
+		def formatter = new SimpleDateFormat("MM/dd/yyyy");
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		def principal = SecurityUtils.subject?.principal
+		def user
+		if(endOfLifeDate){
+			params.endOfLifeDate =  GormUtil.convertInToGMT(formatter.parse(endOfLifeDate), tzId)
+		}
+		if( principal ){
+			user  = UserLogin.findByUsername( principal )
+		}
+        if (modelInstance) {
 			def powerUsed = params.powerUse ? Float.parseFloat(params.powerUse) : 0
 			def powerType = params.powerType
 			if( powerType == "Amps"){
@@ -267,10 +293,13 @@ class ModelController {
 			modelInstance.weight = params.modelWeight != "" ? Integer.parseInt(params.modelWeight):0 
 			modelInstance.depth  = params.modelDepth  != "" ? Integer.parseInt(params.modelDepth):0 
 			modelInstance.width  = params.modelWidth  != "" ? Integer.parseInt(params.modelWidth):0
+            if(modelInstance.modelStatus != 'valid' && params?.modelStatus=='valid'){
+			   modelInstance.validatedBy = user?.person
+			}
             modelInstance.properties = params
             modelInstance.rearImage = rearImage
             modelInstance.frontImage = frontImage
-            if (!modelInstance.hasErrors() && modelInstance.save(flush: true)) {
+			if (!modelInstance.hasErrors() && modelInstance.save(flush: true)) {
             	def connectorCount = Integer.parseInt(params.connectorCount)
 				if(connectorCount > 0){
 		        	for(int i=1; i<=connectorCount; i++){

@@ -5,6 +5,7 @@
     <title>Model Template</title>
     <g:javascript src="drag_drop.js" />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
+    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
   </head>
   <body>
 <div class="body">
@@ -19,20 +20,18 @@
 <fieldset>
 <legend><b>Edit Model Template</b></legend>
 <g:form action="save"  enctype="multipart/form-data">
-<div style="margin-left: 10px;margin-right: 10px; float: left;width: auto;">
+<div style="margin-left: 10px;margin-right: 10px; width: auto;">
 <table style="border: 0px;">
 	<tbody>
 		<tr>
 			<td>Manufacturer:</td>
 			<td><g:select id="manufacturerId" name="manufacturer.id" from="${Manufacturer.list([sort:'name',order:'asc'])}" optionKey="id" value="${modelInstance?.manufacturer.id}"></g:select></td>
-		</tr>
-		<tr>
-			<td>Model Name:</td>
+		    <td>Model Name:</td>
 			<td><input type="text" name="modelName" id="modelNameId" value="${modelInstance?.modelName}">
 			<g:hasErrors bean="${modelInstance}" field="modelName">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelName" /></div>
 				</g:hasErrors>
-			 </td>
+			</td>
 		</tr>
 		<tr>
 			<td>AKA:</td>
@@ -40,9 +39,7 @@
 			<g:hasErrors bean="${modelInstance}" field="aka">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="aka" /></div>
 				</g:hasErrors>
-			 </td>
-		</tr>
-		<tr>
+			</td>
 			<td>Asset Type:</td>
 			<td><g:select id="assetTypeId" name="assetType" from="${modelInstance.assetTypeList}" value="${modelInstance.assetType}" onchange="showBladeFields(this.value)"></g:select></td>
 		</tr>
@@ -51,14 +48,12 @@
 			<td>
 				<g:select id="usizeId" name="usize" from="${modelInstance.constraints.usize.inList}" value="${modelInstance.usize}"></g:select>
 			</td>
-		</tr>
-		<tr>
 			<td>Height (inches):</td>
 			<td><input type="text" name="modelHeight" id="heightId" value="${modelInstance?.height}">
 			<g:hasErrors bean="${modelInstance}" field="modelHeight">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelHeight" /></div>
 				</g:hasErrors>
-			 </td>
+			</td>
 		</tr>
 		<tr>
 			<td>Width:</td>
@@ -66,15 +61,13 @@
 			<g:hasErrors bean="${modelInstance}" field="modelWidth">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelWidth" /></div>
 				</g:hasErrors>
-			 </td>
-		</tr>
-		<tr>
+			</td>
 			<td>Depth:</td>
 			<td><input type="text" name="modelDepth" id="depthId" value="${modelInstance?.depth}">
 			<g:hasErrors bean="${modelInstance}" field="modelDepth">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelDepth" /></div>
 				</g:hasErrors>
-			 </td>
+			</td>
 		</tr>
 		<tr>
 			<td>Weight:</td>
@@ -82,33 +75,78 @@
 			<g:hasErrors bean="${modelInstance}" field="modelWeight">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelWeight" /></div>
 				</g:hasErrors>
-			 </td>
-		</tr>
-		<tr>
+			</td>
 			<td>Layout Style:</td>
 			<td><input type="text" name="layoutStyle" id="layoutStyleId" value="${modelInstance?.layoutStyle}">
 			<g:hasErrors bean="${modelInstance}" field="layoutStyle">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="layoutStyle" /></div>
 				</g:hasErrors>
-			 </td>
+			</td>
+		</tr>
+		<tr>
+			<td>Product Line:</td>
+			<td><input type="text" name="productLine" id="productLineId" value="${modelInstance?.productLine}">
+			<g:hasErrors bean="${modelInstance}" field="layoutStyle">
+					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="productLine" /></div>
+				</g:hasErrors>
+			</td>
+		    <td>Model Family:</td>
+			<td><input type="text" name="modelFamily" id="modelFamilyId" value="${modelInstance?.modelFamily}">
+			<g:hasErrors bean="${modelInstance}" field="layoutStyle">
+					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelFamily" /></div>
+				</g:hasErrors>
+			</td>
+		</tr>
+		<tr>
+             <td valign="top" class="name"><label for="endOfLifeDate">End of Life Date:</label></td>
+                <td valign="top" class="value ${hasErrors(bean:modelInstance,field:'endOfLifeDate','errors')}">
+                  <script type="text/javascript" charset="utf-8">
+                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+                  </script>
+                 <input type="text" class="dateRange" size="15" style="width:112px;height:14px;" name="endOfLifeDate" id="endOfLifeDateId"
+                   value="<tds:convertDate date="${modelInstance?.endOfLifeDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" />
+			   <g:hasErrors bean="${projectInstance}" field="startDate">
+                   <div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="endOfLifeDate" /></div>
+               </g:hasErrors>
+                </td>
+            <td>End of Life Status:</td>
+			<td><input type="text" name="endOfLifeStatus" id="endOfLifeStatusId" value="${modelInstance?.endOfLifeStatus}">
+			<g:hasErrors bean="${modelInstance}" field="endOfLifeStatus">
+					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="endOfLifeStatus" /></div>
+				</g:hasErrors>
+			</td>
+		<tr>
+			<td>Source URL :</td>
+			<td><input type="text" name="sourceURL" id="sourceURLId" value="${modelInstance?.sourceURL}">
+			<g:hasErrors bean="${modelInstance}" field="sourceURL">
+					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="sourceURL" /></div>
+				</g:hasErrors>
+			</td>
+			<td>Model Status :</td>
+			<td><g:select id="modelStatus" name='modelStatus' value ="${modelInstance?.modelStatus}" from="${['new','full','valid']}"> </g:select>
+			<g:hasErrors bean="${modelInstance}" field="modelStatus">
+					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelStatus" /></div>
+				</g:hasErrors>
+			</td>
+		</tr>
+		<tr>
+			
 		</tr>
 		<tr>
 			<td>Power:</td>
 			<td><input type="text" name="powerUse" id="powerUseId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (modelInstance?.powerUse / 110 ).toFloat().round(1) : modelInstance?.powerUse}" >&nbsp;
 			<g:select id="ptype" name='powerType' value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE }" from="${['Watts','Amps']}" onchange="updatePowerType(this.value)"> </g:select>
-                 </td>
+            <td>Notes:</td>
+			<td><input type="text" name="description" id="descriptionId" value="${modelInstance.description}"> </td>
 		</tr>
 		<tr>
 		<td>Front image:</label></td>
         <td><input size="20" type="file" name="frontImage" id="frontImageId" />
 		</td>
-		</tr>
-		<tr>
-        	<td>Rear image:</td>
+		<td>Rear image:</td>
 	        <td><input size="20" type="file" name="rearImage" id="rearImageId" />
 	        </td>
-        </tr>
-        
+		</tr>
         <tr>
         	<td>Use Image:</td>
 	        <td>
@@ -117,6 +155,15 @@
 	        </g:if>
 	        <g:else>
 	        	<input type="checkbox" name="useImage" id="useImageId" onclick="showImage(this.id)"/>
+	        </g:else>
+	        </td>
+	        <td>Source TDS:</td>
+	        <td>
+	        <g:if test="${modelInstance.sourceTDS}">
+	       		<input type="checkbox" name="sourceTDS" id="sourceTDSId"  checked="checked" />
+	        </g:if>
+	        <g:else>
+	        	<input type="checkbox" name="sourceTDS" id="sourceTDSId" />
 	        </g:else>
 	        </td>
         </tr>
@@ -150,32 +197,15 @@
 				<g:select id="bladeHeightId" name="bladeHeight" from="${modelInstance.constraints.bladeHeight.inList}" value="${modelInstance.bladeHeight}"></g:select>
 			</td>
 		</tr>
-		<tr>
-        	<td>Source TDS:</td>
-	        <td>
-	        <g:if test="${modelInstance.sourceTDS}">
-	       		<input type="checkbox" name="sourceTDS" id="sourceTDSId"  checked="checked" />
-	        </g:if>
-	        <g:else>
-	        	<input type="checkbox" name="sourceTDS" id="sourceTDSId" />
-	        </g:else>
-	        </td>
-        </tr>
         <tr>
-			<td>Notes:</td>
-			<td><input type="text" name="description" id="descriptionId" value="${modelInstance.description}"> </td>
+			<td>Created By :</td>
+			<td>${modelInstance?.createdBy}</td>
+			<td>Updated By :</td>
+			<td>${modelInstance?.updatedBy}</td>
 		</tr>
 		<tr>
-			<td colspan="2">
-				<div class="buttons" style="margin-left: 10px;margin-right: 10px;"> 
-					<input name="id" value="${modelInstance.id}" type="hidden"/>
-					<span class="button">
-						<g:actionSubmit class="save" action="update" value="Update" onclick="return validateForm()"></g:actionSubmit>
-						<g:actionSubmit class="delete" action="delete" value="Delete"></g:actionSubmit>
-						<g:actionSubmit class="show" action="cancel" value="Cancel"></g:actionSubmit>
-					</span>
-				</div>
-			</td>
+			<td>Validated By :</td>
+			<td>${modelInstance?.validatedBy}</td>
 		</tr>
 	</tbody>
 </table>
@@ -246,10 +276,24 @@
 			</tbody>
 		</table>
 	</div>
+	<tr>
+			<td colspan="2">
+				<div class="buttons" style="margin-left: 10px;margin-right: 10px;"> 
+					<input name="id" value="${modelInstance.id}" type="hidden"/>
+					<span class="button">
+						<g:actionSubmit class="save" action="update" value="Update" onclick="return validateForm()"></g:actionSubmit>
+						<g:actionSubmit class="delete" action="delete" value="Delete"></g:actionSubmit>
+						<g:actionSubmit class="show" action="cancel" value="Cancel"></g:actionSubmit>
+					</span>
+				</div>
+			</td>
+		</tr>
 </div>
 </g:form>
 </fieldset>
+
 </div>
+
 <script type="text/javascript">
 	//$('#connectorCount').val(${modelConnectors.size()});
 	var image = "${modelInstance.rearImage}"
