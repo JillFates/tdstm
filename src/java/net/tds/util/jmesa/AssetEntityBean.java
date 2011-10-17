@@ -17,6 +17,12 @@ private static final long serialVersionUID = 1L;
 	private String cssClass;
 	private boolean checkVal;
 	
+	private String application;
+	private String appOwner;
+	private String appSme;
+	private String moveBundle;
+	private String planStatus; 
+	
 	public AssetEntityBean() {
 		
 	}
@@ -99,5 +105,44 @@ private static final long serialVersionUID = 1L;
 
 	public void setCheckVal(boolean checkVal) {
 		this.checkVal = checkVal;
+	}
+	public String getApplication() {
+		return application;
+	}
+
+	public void setApplication(String application) {
+		this.application = application;
+	}
+
+	public String getAppOwner() {
+		return appOwner;
+	}
+
+	public void setAppOwner(String appOwner) {
+		this.appOwner = appOwner;
+	}
+
+	public String getAppSme() {
+		return appSme;
+	}
+
+	public void setAppSme(String appSme) {
+		this.appSme = appSme;
+	}
+
+	public String getMoveBundle() {
+		return moveBundle;
+	}
+
+	public void setMoveBundle(String moveBundle) {
+		this.moveBundle = moveBundle;
+	}
+
+	public String getplanStatus() {
+		return planStatus;
+	}
+
+	public void setplanStatus(String planStatus) {
+		this.planStatus = planStatus;
 	}
 }

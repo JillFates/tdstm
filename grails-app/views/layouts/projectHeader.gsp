@@ -119,7 +119,7 @@
 			<li><g:link class="home" controller="rackLayouts" action="create">Racks</g:link></li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 			<li id="assetMenuId"><g:link class="home" controller="assetEntity" action="assetImport" >Assets</g:link></li>
-			<li><g:link class="home" controller="assetEntity" action="list" >Apps</g:link></li>
+			<li><g:link class="home" controller="application" action="list" >Apps</g:link></li>
 			<li>&nbsp;</li>
 			<li><g:link class="home" controller="moveEvent" action="show" >Events</g:link> </li>
 			<li><g:link class="home" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles</g:link></li>
@@ -140,7 +140,7 @@
 	        <ul>
 	    		<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link> </li>
 			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Assets</g:link></li>
-			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Apps</g:link></li>
+			<li><g:link class="home" controller="application" action="list"  params="[projectId:currProjObj?.id]">List Apps</g:link></li>
 			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List DBs</g:link></li>
 			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Files</g:link></li>
 		</ul>
