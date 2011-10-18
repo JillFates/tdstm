@@ -1,272 +1,204 @@
-
-
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <g:javascript src="asset.tranman.js" />
-
-
-		<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
-		<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
-		<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
-		<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
-		<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
-		
-        <title>Edit Application</title>
-    </head>
-    <body>
-       <div class="body">
-            <g:form method="post" >
-                <input type="hidden" name="id" value="${applicationInstance?.id}" />
-                <div class="dialog">
-                    <table>
-                        <tbody>
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="assetName">Name:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'name','errors')}">
-                                    <input type="text" id="name" name="name" value="${applicationInstance.assetName}"/>
-                                </td>
-                                <td valign="top" class="name">
-                                  Desc:
-                                </td>
-                                <td>
-                                    <input type="text" id="name" name="Desc" value="This Application Support the XYZ Business"/>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="assetType">Type:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'assetType','errors')}">
-                                    <input type="text" id="name" name="assetType" value="${applicationInstance.assetType}"/>
-                                </td>
-                               <td valign="top" class="name">
-                                    <label for="supportType">Support:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'supportType','errors')}">
-                                    <input type="text" id="name" name="supportType" value="${applicationInstance.supportType}"/>
-                                </td>
-                                <td valign="top" class="name">
-                                    <label for="appFunction">Function:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'appFunction','errors')}">
-                                    <input type="text" id="name" name="appFunction" value="${applicationInstance.appFunction}"/>
-                                </td>
-                                <td valign="top" class="name">
-                                    <label for="userConcurrent">ConCurren:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'userConcurrent','errors')}">
-                                    <input type="text" id="name" name="userConcurrent" value="${applicationInstance.userConcurrent}"/>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="appVendor">Vendor:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'appVendor','errors')}">
-                                    <input type="text" id="name" name="appVendor" value="${applicationInstance.appVendor}"/>
-                                </td>
-                               <td valign="top" class="name">
-                                    <label for="sme">SME1:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'sme','errors')}">
-                                    <input type="text" id="name" name="sme" value="${applicationInstance.sme}"/>
-                                </td>
-                                <td valign="top" class="name">
-                                    <label for="environment">Enviorn:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'environment','errors')}">
-                                    <input type="text" id="name" name="environment" value="${applicationInstance.environment}"/>
-                                </td>
-                                <td valign="top" class="name">
-                                    <label for="userLocations">User Loc:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'userLocations','errors')}">
-                                    <input type="text" id="name" name="userLocations" value="${applicationInstance.userLocations}"/>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="appVersion">Version:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'appVersion','errors')}">
-                                    <input type="text" id="name" name="appVersion" value="${applicationInstance.appVersion}"/>
-                                </td>
-                               <td valign="top" class="name">
-                                    <label for="sme2">SME2:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'sme2','errors')}">
-                                    <input type="text" id="name" name="sme2" value="${applicationInstance.sme2}"/>
-                                </td>
-                                <td valign="top" class="name">
-                                    <label for="criticality">criticality:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'criticality','errors')}">
-                                    <input type="text" id="name" name="criticality" value="${applicationInstance.criticality}"/>
-                                </td>
-                                <td valign="top" class="name">
-                                    <label for="userConcurrent">ConCurren:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'userConcurrent','errors')}">
-                                    <input type="text" id="name" name="userConcurrent" value="${applicationInstance.userConcurrent}"/>
-                                </td>
-                            </tr>
-                             <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="appTech">Tech.:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'appTech','errors')}">
-                                    <input type="text" id="name" name="appTech" value="${applicationInstance.appTech}"/>
-                                </td>
-                               <td valign="top" class="name">
-                                    <label for="businessUnit">Bus Unit:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'businessUnit','errors')}">
-                                    <input type="text" id="name" name="businessUnit" value="${applicationInstance.businessUnit}"/>
-                                </td>
-                                <td valign="top" class="name">
-                                    <label for="moveBundle">Bundle:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'moveBundle','errors')}">
-                                    <input type="text" id="name" name="moveBundle" value="${applicationInstance.moveBundle}"/>
-                                </td>
-                                <td valign="top" class="name">
-                                    <label for="useFrequency">Use Freq:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'userConcurrent','errors')}">
-                                    <input type="text" id="name" name="useFrequency" value="${applicationInstance.userConcurrent}"/>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="appSource">Source:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'appSource','errors')}">
-                                    <input type="text" id="name" name="appSource" value="${applicationInstance.appSource}"/>
-                                </td>
-                               <td valign="top" class="name">
-                                    <label for="owner">Owner:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'owner','errors')}">
-                                    <input type="text" id="name" name="owner" value="${applicationInstance.owner}"/>
-                                </td>
-                                <td valign="top" class="name">
-                                    <label for="planStatus">Plan Status:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'planStatus','errors')}">
-                                    <input type="text" id="name" name="planStatus" value="${applicationInstance.planStatus}"/>
-                                </td>
-                                <td valign="top" class="name">
-                                    <label for="useFrequency">DR RPO:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'drRpoDesc','errors')}">
-                                    <input type="text" id="name" name="useFrequency" value="${applicationInstance.drRpoDesc}"/>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="license">License:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'license','errors')}">
-                                    <input type="text" id="name" name="license" value="${applicationInstance.license}"/>
-                                </td>
-                               <td valign="top" class="name">
-                                    Retire:
-                                </td>
-                                <td><input type="text" id="name" name="Retire" value="Retire"/>
-                                </td>
-                                <td>&nbsp;</td>
-						        <td>&nbsp;</td>
-                                <td valign="top" class="name">
-                                    <label for="drRtoDesc">DR RTO:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'drRtoDesc','errors')}">
-                                    <input type="text" id="name" name="drRtoDesc" value="${applicationInstance.drRtoDesc}"/>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td>&nbsp;</td>
-						        <td>&nbsp;</td>
-                               <td valign="top" class="name">
-                                   Main Exp.
-                                </td>
-                                <td><input type="text" id="name" name="name" value="12/1/2011"/>
-                                </td>
-                                <td>&nbsp;</td>
-						        <td>&nbsp;</td>
-                                <td valign="top" class="name">
-                                    <label for="drRtoDesc">DR RTO:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'drRtoDesc','errors')}">
-                                    <input type="text" id="name" name="drRtoDesc" value="${applicationInstance.drRtoDesc}"/>
-                                </td>
-                            </tr>
-                    </table>
-                </div>
-       <div>
-			<div style="float: left; margin-bottom: 10px;">
-				<h1>Supports:</h1>
-				<table style="width: 400px;">
-					<thead>
-						<tr>
-						<th>Frequency</th>
-						<th>Asset</th>
-						<th>Type</th>
-						<th>Status</th>
-						</tr>
-					</thead>
-					<tbody>
-					<g:each in="${supportAssets}" var="support">
-						<tr>
-							<td>${support?.comment}</td>
-							<td>${support?.asset}</td>
-							<td><g:select id="selectId" value=${support.type}
-									from="${AssetDependency.constraints.type.inList}" />
-							</td>
-							<td><g:select id="typeId" value=${support.status}
-									from="${AssetDependency.constraints.status.inList}" />
-							</td>
-						</tr>
-					</g:each>
-					</tbody>
-				</table>
-			</div>
-			<div style="float: left; margin-left: 10px;">
-				<h1>Is dependent on:</h1>
-				<table style="width: 400px;">
-					<thead>
-						<tr>
-						<th>Frequency</th>
-						<th>Asset</th>
-						<th>Type</th>
-						<th>Status</th>
-						</tr>
-					</thead>
-					<tbody>
-					<g:each in="${dependentAssets}" var="dependent">
-						<tr>
-							<td>${dependent.dataFlowFreq}</td>
-							<td>${dependent.dependent}</td>
-							<td>${support.type}</td>
-							<td>${support.status}</td>
-						</tr>
-					</g:each>
-					</tbody>
-				</table>
-			</div>
-		</div>
-        <div class="buttons">
-                    <span class="button"><g:actionSubmit class="save" value="Update" /></span>
+<g:form method="post">
+	<input type="hidden" name="id" value="${applicationInstance?.id}" />
+	<table style="border: 0">
+		<tr>
+			<td colspan="2">
+				<div class="dialog">
+					<table>
+						<tbody>
+							<tr>
+								<td class="label" nowrap="nowrap"><label for="assetName">App Name</label></td>
+								<td ><input type="text" id="assetName" name="assetName" value="${applicationInstance.assetName}" /></td>
+								<td class="label" nowrap="nowrap">Description</td>
+								<td colspan="3"><input type="text" id="description" name="description"value="This Application Support the XYZ Business" size="50"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="label" nowrap="nowrap"><label for="assetType">App Type</label></td>
+								<td ><g:select from="${assetTypeOptions}" id="assetType" name="assetType" value="${applicationInstance.assetType}" /></td>
+								<td class="label" nowrap="nowrap"><label for="supportType">Support</label>
+								</td>
+								<td ><input type="text" id="supportType"
+									name="supportType" value="${applicationInstance.supportType}" />
+								</td>
+								<td class="label" nowrap="nowrap"><label for="appFunction">Function</label>
+								</td>
+								<td ><input type="text" id="appFunction"
+									name="appFunction" value="${applicationInstance.appFunction}" />
+								</td>
+								<td class="label" nowrap="nowrap"><label for="userConcurrent">Users</label>
+								</td>
+								<td ><input type="text" id="userId" name="userCount" value="${applicationInstance.userCount}" />
+								</td>
+							</tr>
+							<tr>
+								<td class="label" nowrap="nowrap"><label for="appVendor">Vendor</label></td>
+								<td ><input type="text" id="appVendor"
+									name="appVendor" value="${applicationInstance.appVendor}" />
+								</td>
+								<td class="label" nowrap="nowrap"><label for="sme">SME1</label></td>
+								<td ><input type="text" id="sme" name="sme"
+									value="${applicationInstance.sme}" />
+								</td>
+								<td class="label" nowrap="nowrap"><label for="environment">Environment</label>
+								</td>
+								<td ><g:select id="environment" name="environment" from="${applicationInstance.constraints.environment.inList}" value="${applicationInstance.environment}"></g:select>
+								</td>
+								<td class="label" nowrap="nowrap"><label for="userLocations">User Location</label>
+								</td>
+								<td ><input type="text" id="userLocations"
+									name="userLocations"
+									value="${applicationInstance.userLocations}" />
+								</td>
+							</tr>
+							<tr>
+								<td class="label" nowrap="nowrap"><label for="appVersion">Version</label>
+								</td>
+								<td ><input type="text" id="appVersion"
+									name="appVersion" value="${applicationInstance.appVersion}" />
+								</td>
+								<td class="label" nowrap="nowrap"><label for="sme2">SME2</label></td>
+								<td ><input type="text" id="sme2" name="sme2"
+									value="${applicationInstance.sme2}" />
+								</td>
+								<td class="label" nowrap="nowrap"><label for="criticality">Criticality</label>
+								</td>
+								<td ><g:select id="criticality" name="criticality" from="${applicationInstance.constraints.criticality.inList}" value="${applicationInstance.criticality}"></g:select></td>
+								<td class="label" nowrap="nowrap"><label for="userConcurrent">Concurrent</label>
+								</td>
+								<td ><input type="text" id="userConcurrent"	name="userConcurrent" value="${applicationInstance.userConcurrent}" />
+								</td>
+							</tr>
+							<tr>
+								<td class="label" nowrap="nowrap"><label for="appTech">Tech.</label></td>
+								<td ><input type="text" id="appTech" name="appTech" value="${applicationInstance.appTech}" />
+								</td>
+								<td class="label" nowrap="nowrap"><label for="businessUnit">Bus	Unit</label>
+								</td>
+								<td ><input type="text" id="businessUnit" name="businessUnit" value="${applicationInstance.businessUnit}" />
+								</td>
+								<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
+								<td ><g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${applicationInstance.moveBundle}" optionKey="id" optionValue="name"/>
+								</td>
+								<td class="label" nowrap="nowrap"><label for="useFrequency">Use	Frequency</label>
+								</td>
+								<td ><input type="text" id="useFrequency" name="useFrequency" value="${applicationInstance.userConcurrent}" />
+								</td>
+							</tr>
+							<tr>
+								<td class="label" nowrap="nowrap"><label for="appSource">Source</label></td>
+								<td ><input type="text" id="appSource"	name="appSource" value="${applicationInstance.appSource}" />
+								</td>
+								<td class="label" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
+								<td ><input type="text" id="appOwner" name="appOwner"	value="${applicationInstance.appOwner}" />
+								</td>
+								<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label>
+								</td>
+								<td ><g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${applicationInstance.planStatus}" />
+								</td>
+								<td class="label" nowrap="nowrap"><label for="drRpoDesc">DR RPO</label>
+								</td>
+								<td ><input type="text" id="drRpoDesc"	name="drRpoDesc" value="${applicationInstance.drRpoDesc}" />
+								</td>
+							</tr>
+							<tr>
+								<td class="label" nowrap="nowrap"><label for="license">License</label></td>
+								<td ><input type="text" id="license" name="license" value="${applicationInstance.license}" />
+								</td>
+								<td class="label" nowrap="nowrap">Retire</td>
+								<td ><script type="text/javascript">
+				                    $(document).ready(function(){
+				                      $("#retireDate").datetimepicker();
+				                    });
+								</script> 
+								<input type="text" class="dateRange" size="15" style="width: 132px; height: 14px;" id="retireDate" name="retireDate"
+                                   value="<tds:convertDateTime date="${applicationInstance?.retireDate}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
+                                   onchange="isValidDate(this.value)"/>
+								</td>
+								<td class="label" nowrap="nowrap">Maint Exp.</td>
+								<td >
+								<script type="text/javascript">
+				                    $(document).ready(function(){
+				                      $("#maintExpDate").datetimepicker();
+				                    });
+								</script> 
+								<input type="text" class="dateRange" size="15" style="width: 132px; height: 14px;" id="maintExpDate" name="maintExpDate"
+                                   value="<tds:convertDateTime date="${applicationInstance?.maintExpDate}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
+                                   onchange="isValidDate(this.value)"/>
+								</td>
+								<td class="label" nowrap="nowrap"><label for="drRtoDesc">DR RTO</label>
+								</td>
+								<td ><input type="text" id="drRtoDesc"	name="drRtoDesc" value="${applicationInstance.drRtoDesc}" />
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div></td>
+		</tr>
+		<tr>
+			<td>
+				<div>
+					<h1>Supports:</h1>
+					<table style="width: 400px;">
+						<thead>
+							<tr>
+								<th>Frequency</th>
+								<th>Asset</th>
+								<th>Type</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							<g:each in="${supportAssets}" var="support">
+								<tr>
+									<td>${support?.dataFlowFreq}</td>
+									<td>${support?.asset}</td>
+									<td><g:select id="selectId" value=${support.type}
+											from="${AssetDependency.constraints.type.inList}" />
+									</td>
+									<td><g:select id="typeId" value=${support.status}
+											from="${AssetDependency.constraints.status.inList}" />
+									</td>
+								</tr>
+							</g:each>
+						</tbody>
+					</table>
+				</div></td>
+			<td>
+				<div>
+					<h1>Is dependent on:</h1>
+					<table style="width: 400px;">
+						<thead>
+							<tr>
+								<th>Frequency</th>
+								<th>Asset</th>
+								<th>Type</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody>
+						<g:each in="${supportAssets}" var="support">
+							<tr>
+								<td>${support?.dataFlowFreq}</td>
+								<td>${support?.dependent}</td>
+								<td><g:select id="selectId" value=${support.type}
+										from="${AssetDependency.constraints.type.inList}" />
+								</td>
+								<td><g:select id="typeId" value=${support.status}
+										from="${AssetDependency.constraints.status.inList}" />
+								</td>
+							</tr>
+						</g:each>
+						</tbody>
+					</table>
+				</div></td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<div class="buttons">
+					<span class="button"><g:actionSubmit class="save" value="Update" /></span>
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
-                </div>
-            </g:form>
-        </div>
-	<script type="text/javascript">
-	    $('#assetMenu').show();
-	    $('#reportsMenu').hide();
-    </script>
-    </body>
-</html>
+                </div></td>
+		</tr>
+	</table>
+</g:form>

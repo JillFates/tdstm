@@ -27,6 +27,10 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String costCenter
 	String maintContract
 	Date maintExpDate
+	Date retireDate
+	String description
+	
+	
 	
 	String custom1
 	String custom2
@@ -107,6 +111,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		costCenter( blank:true, nullable:true )
 		maintContract( blank:true, nullable:true )
 		maintExpDate( blank:true, nullable:true )
+		retireDate( blank:true, nullable:true )
+		description( blank:true, nullable:true )
 		
 		custom1( blank:true, nullable:true )
 		custom2( blank:true, nullable:true )
