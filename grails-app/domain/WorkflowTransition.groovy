@@ -12,6 +12,7 @@ class WorkflowTransition {
 	Integer predecessor
 	String header
 	Integer effort
+	Integer duration
 
 	static belongsTo = [ workflow : Workflow ]
 	static hasMany  = [ WorkflowTransitionMap ]
@@ -27,6 +28,7 @@ class WorkflowTransition {
 		predecessor( blank:true, nullable:true)
 		header( blank:true, nullable:true)
 		effort( blank:true, nullable:true)
+		duration( blank:true, nullable:true)
 	}	
 	
 	static mapping  = {

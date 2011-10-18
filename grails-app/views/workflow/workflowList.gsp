@@ -113,6 +113,8 @@
 			
 			<th class="sortable">Effort</th>
 			
+			<th class="sortable">Duration</th>
+			
 			<th class="sortable">Action</th>
 			
 		</tr>
@@ -139,6 +141,8 @@
 				<td class="name">${transitions.transition?.header}</td>
 				
 				<td class="name">${transitions.transition?.effort}</td>
+				
+				<td class="name">${transitions.transition?.duration}</td>
 				
 				<td class="name">
 				<g:if test="${transitions.donotDelete}">
@@ -188,6 +192,8 @@
 			
 			<th class="sortable">Effort</th>
 			
+			<th class="sortable">Duration</th>
+			
 			<th class="sortable">Action</th>
 			
 		</tr>
@@ -230,6 +236,9 @@
 				</td>
 				<td nowrap="nowrap">
 					<input type="text" name="effort_${transitions.transition.id}" id="effortId_${transitions.transition.id}" value="${transitions.transition?.effort}"  style="width: 50px;" maxlength="4"/>
+				</td>
+				<td nowrap="nowrap">
+					<input type="text" name="duration_${transitions.transition.id}" id="durationId_${transitions.transition.id}" value="${transitions.transition?.duration}"  style="width: 50px;" maxlength="4"/>
 				</td>
 				<td nowrap="nowrap">
 				<g:if test="${transitions.donotDelete}">
@@ -377,6 +386,7 @@ function addStep( type ){
 						"<td><input type='text' name='color_"+additionalSteps+"' id='colorId_"+additionalSteps+"' /></td>"+
 						"<td><input type='text' name='header_"+additionalSteps+"' id='headerId_"+additionalSteps+"'   style='width: 50px;' maxlength='7'/></td>"+
 						"<td><input type='text' name='effort_"+additionalSteps+"' id='effortId_"+additionalSteps+"'   style='width: 50px;' maxlength='7'/></td>"+
+						"<td><input type='text' name='duration_"+additionalSteps+"' id='durationId_"+additionalSteps+"'   style='width: 50px;' maxlength='7'/></td>"+
 					"<tr>"
 	$("#additionalStepsId").val(additionalSteps)
 	$("#"+type+"WorkflowStepsTbody").append(stepRow)
