@@ -37,7 +37,6 @@
 				<thead>
 					<thead>
 						<tr>
-							<th>Report</th>
 						<th>Report</th>
 						<th>Web</th>
 						<th>Excel</th>
@@ -61,7 +60,6 @@
 				<thead>
 					<thead>
 						<tr>
-							<th>Report</th>
 						<th>Report</th>
 						<th>Web</th>
 						<th>Excel</th>
@@ -83,7 +81,6 @@
 				<thead>
 					<thead>
 						<tr>
-							<th>Report</th>
 						<th>Report</th>
 						<th>Web</th>
 						<th>Excel</th>
@@ -105,7 +102,6 @@
 				<thead>
 					<thead>
 						<tr>
-							<th>Report</th>
 						<th>Report</th>
 						<th>Web</th>
 						<th>Excel</th>
