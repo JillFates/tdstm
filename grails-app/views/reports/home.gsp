@@ -20,12 +20,12 @@
 					<tr>
 						<th>Report</th>
 						<th>Web</th>
-						<th>Excel</th>
+						<th>E</th>
 						<th>PDF</th>
 					</tr>
 				</thead>
 				<tbody>
-				<tr><td><a href="#">admin report1</a></td><td>W</td><td>E</td><td>P</td></tr>
+				<tr><td><a href="#">admin report1</a></td><td style="width:12px">W</td><td style="width:12px">E</td><td style="width:12px">P</td></tr>
 				</tbody>
 			</table>
 			</div>
@@ -39,16 +39,16 @@
 						<tr>
 						<th>Report</th>
 						<th>Web</th>
-						<th>Excel</th>
+						<th>E</th>
 						<th>PDF</th>
 					</tr>
 				</thead>
 				<tbody>
-				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Login+Badges" class="home">Login Badges</a> </td><td>W</td><td>E</td><td>P</td></tr>
-				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Asset+Tag" class="home">Asset Tags</a> </td><td>W</td><td>E</td><td>P</td></tr>
-				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Team+Worksheets" class="home">Move Team Worksheets</a> </td><td>W</td><td>E</td><td>P</td></tr>
-				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=cart+Asset" class="home">Logistics Team Worksheets</a></td><td>W</td><td>E</td><td>P</td></tr>
-				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Transportation+Asset+List" class="home">Transport Worksheets</a></td><td>W</td><td>E</td><td>P</td></tr>
+				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Login+Badges" class="home">Login Badges</a> </td><td style="width:12px">W</td><td style="width:12px"> </td><td style="width:12px"> </td></tr>
+				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Asset+Tag" class="home">Asset Tags</a> </td><td style="width:12px">W</td><td style="width:12px"> </td><td style="width:12px"> </td></tr>
+				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Team+Worksheets" class="home">Move Team Worksheets</a> </td><td style="width:12px"> </td><td style="width:12px"> </td><td style="width:12px">P</td></tr>
+				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=cart+Asset" class="home">Logistics Team Worksheets</a></td><td style="width:12px"> </td><td style="width:12px"> </td><td style="width:12px">P</td></tr>
+				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Transportation+Asset+List" class="home">Transport Worksheets</a></td><td style="width:12px"> </td><td style="width:12px"> </td><td style="width:12px">P</td></tr>
 				</tbody>
 			</table>
 			</div>
@@ -62,14 +62,14 @@
 						<tr>
 						<th>Report</th>
 						<th>Web</th>
-						<th>Excel</th>
+						<th>E</th>
 						<th>PDF</th>
 					</tr>
 				</thead>
 				<tbody>
-			<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Issue+Report" class="home">Issue Report</a> </td><td>W</td><td>E</td><td>P</td></tr>
-			<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=MoveResults" class="home">Move Results</a> </td><td>W</td><td>E</td><td>P</td></tr>
-			<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingQA" class="home">Cabling QA</a> </td><td>W</td><td>E</td><td>P</td></tr>
+			<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Issue+Report" class="home">Issue Report</a> </td><td style="width:12px"> </td><td style="width:12px">E</td><td style="width:12px">P</td></tr>
+			<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=MoveResults" class="home">Move Results</a> </td><td style="width:12px"> </td><td style="width:12px">E</td><td style="width:12px">P</td></tr>
+			<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingQA" class="home">Cabling QA</a> </td><td style="width:12px"> </td><td style="width:12px"> </td><td style="width:12px">P</td></tr>
 				</tbody>
 			</table>
 			</div>
@@ -83,13 +83,13 @@
 						<tr>
 						<th>Report</th>
 						<th>Web</th>
-						<th>Excel</th>
+						<th>E</th>
 						<th>PDF</th>
 					</tr>
 				</thead>
 				<tbody>
 				<tr>
-				<tr><td><a href="#">app report1</a></td><td>W</td><td>E</td><td>P</td>
+				<tr><td><a href="#">app report1</a></td><td style="width:12px">W</td><td style="width:12px">E</td><td style="width:12px">P</td>
 				</tr>
 				</tbody>
 			</table>
@@ -104,15 +104,15 @@
 						<tr>
 						<th>Report</th>
 						<th>Web</th>
-						<th>Excel</th>
+						<th>E</th>
 						<th>PDF</th>
 					</tr>
 				</thead>
 				<tbody>
-			<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Rack+Layout" class="home">Racks (old)</a> </td><td>W</td><td>E</td><td>P</td></tr>
-			<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingConflict" class="home">Cabling Conflict</a> </td><td>W</td><td>E</td><td>P</td></tr>
-			<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingData" class="home">Cabling Data</a> </td><td>W</td><td>E</td><td>P</td></tr>
-			<tr><td><a href="/tdstm/reports/powerReport" class="home">Power</a> </td><td>W</td><td>E</td><td>P</td></tr>
+			<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Rack+Layout" class="home">Racks (old)</a> </td><td style="width:12px">W</td><td style="width:12px"> </td><td style="width:12px">P</td></tr>
+			<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingConflict" class="home">Cabling Conflict</a> </td><td style="width:12px"> </td><td style="width:12px"> </td><td style="width:12px">P</td></tr>
+			<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingData" class="home">Cabling Data</a> </td><td style="width:12px"> </td><td style="width:12px"> </td><td style="width:12px">P</td></tr>
+			<tr><td><a href="/tdstm/reports/powerReport" class="home">Power</a> </td><td style="width:12px">W</td><td style="width:12px">E</td><td style="width:12px">P</td></tr>
 				</tbody>
 			</table>
 			</div>
