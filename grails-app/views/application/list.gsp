@@ -49,7 +49,7 @@ $(document).ready(function() {
 						</g:remoteLink>
 						</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="application" sortable="true" title="Application" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="appSme_${assetEntityInstance.id}" onclick="getAppDetails(${assetEntityInstance.id} )">${assetEntityInstance.application}</span>
+		        		<span id="appSme_${assetEntityInstance.id}" onclick="getAppDetails(${assetEntityInstance.id} )">${assetEntityInstance.assetName}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="appOwner"   sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<span id="appSme_${assetEntityInstance.id}" onclick="getAppDetails(${assetEntityInstance.id} )">${assetEntityInstance.appOwner}</span>
