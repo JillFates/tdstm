@@ -25,12 +25,12 @@ Array.prototype.contains = function (element) {
     		for (var i=0; i < length; i ++ ) {
     			var attribute = assetEntityAttributes[i]
     			
-    			var labelTd = "<td style='background:#f3f4f6;width:25%;' nowrap>"+attribute.label+""
+    			var labelTd = "<td class='label' nowrap><label>"+attribute.label+""
 			    if(requiredFields.contains(attribute.attributeCode)){
 			    	var spanAst = "<span style='color:red;'>*</span>"//document.createElement("span")
 				    labelTd += spanAst 
 			    }
-			    labelTd +="</td>"
+			    labelTd +="</label></td>"
 			      
 			    var inputTd = "<td>";
 			    inputTd += getInputType(attribute,'');
@@ -107,15 +107,15 @@ function showAssetDialog( e , action ) {
 		for (var i=0; i < length; i++ ) {
 		   	var attribute = assetEntityAttributes[i];
 			      
-		    var labelTd = "<td style='background:#f3f4f6;width:25%;' nowrap>"+attribute.label+""
+		    var labelTd = "<td class='label' nowrap><label>"+attribute.label+""
 		    
 		    var labelTdE = ""
 	    	if(attribute.attributeCode == "manufacturer" && attribute.value != "" && attribute.value != null){
-	    		labelTdE = "<td style='width:25%;background:#f3f4f6;' nowrap><a href='javascript:showManufacturer("+attribute.manufacturerId+")' style='color:#00E'>"+attribute.label+"</a>"
+	    		labelTdE = "<td class='label' nowrap><label><a href='javascript:showManufacturer("+attribute.manufacturerId+")' style='color:#00E'>"+attribute.label+"</a>"
 		    } else if(attribute.attributeCode == "model"&& attribute.value != "" && attribute.value != null ){
-		    	labelTdE = "<td style='width:25%;background:#f3f4f6;' nowrap><a href='javascript:showModel("+attribute.modelId+")' style='color:#00E'>"+attribute.label+"</a>"
+		    	labelTdE = "<td class='label' nowrap><label><a href='javascript:showModel("+attribute.modelId+")' style='color:#00E'>"+attribute.label+"</a>"
 		    } else {
-		    	labelTdE = "<td style='background:#f3f4f6;width:25%;' nowrap>"+attribute.label
+		    	labelTdE = "<td class='label' nowrap>"+attribute.label
 		    }
 		    
 		    if(requiredFields.contains(attribute.attributeCode)){
@@ -123,8 +123,8 @@ function showAssetDialog( e , action ) {
 			    labelTd += spanAst 
 			    labelTdE += spanAst
 		    }
-		    labelTd +="</td>"
-		    labelTdE +="</td>"
+		    labelTd +="</label></td>"
+		    labelTdE +="</label></td>"
 		    	
 		    var inputTd = ""
 		    if(attribute.attributeCode == "manufacturer"){
