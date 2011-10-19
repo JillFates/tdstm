@@ -1,0 +1,160 @@
+import org.jmesa.facade.TableFacade
+import org.jmesa.facade.TableFacadeImpl
+import org.jmesa.limit.Limit
+import net.tds.util.jmesa.AssetEntityBean
+import com.tds.asset.Files
+import com.tds.asset.Application
+import com.tds.asset.ApplicationAssetMap
+import com.tds.asset.AssetCableMap
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetDependency
+import com.tds.asset.AssetEntity
+import com.tds.asset.AssetEntityVarchar
+import com.tds.asset.AssetTransition
+import com.tdssrc.eav.EavAttribute
+import com.tdssrc.eav.EavAttributeOption
+import java.text.SimpleDateFormat
+import com.tdssrc.grails.GormUtil
+class FilesController {
+	
+	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+	
+	def index ={
+	     redirect(action : list)
+		 	
+	}
+	def list={
+		def projectId = params.projectId ? params.projectId : getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def project = Project.read(projectId)
+		def fileInstanceList = Files.findAllByProject(project)
+		def filesList = new ArrayList();
+		fileInstanceList.each {fileentity ->
+			AssetEntityBean filesEntity = new AssetEntityBean();
+			filesEntity.setId(fileentity.id)
+			filesEntity.setFileFormat(fileentity.fileFormat)
+			filesEntity.setFileSize(fileentity.fileSize)
+			filesEntity.setMoveBundle(fileentity?.moveBundle?.name)
+			filesEntity.setplanStatus(fileentity.planStatus)
+			filesList.add(filesEntity)
+		}
+		TableFacade tableFacade = new TableFacadeImpl("tag", request)
+		try{
+			tableFacade.items = filesList
+			Limit limit = tableFacade.limit
+			if(limit.isExported()){
+				tableFacade.setExportTypes(response,limit.getExportType())
+				tableFacade.setColumnProperties("id","fileFormat","fileSize","moveBundle","planStatus","assetTag","manufacturer","model","assetType","ipAddress","os","sourceLocation","sourceRoom","sourceRack","sourceRackPosition","sourceBladeChassis","sourceBladePosition","targetLocation","targetRoom","targetRack","targetRackPosition","targetBladeChassis","targetBladePosition","custom1","custom2","custom3","custom4","custom5","custom6","custom7","custom8","moveBundle","sourceTeamMt","targetTeamMt","sourceTeamLog","targetTeamLog","sourceTeamSa","targetTeamSa","sourceTeamDba","targetTeamDba","truck","cart","shelf","railType","appOwner","appSme","priority")
+				tableFacade.render()
+			}else
+				return [filesList : filesList , projectId: projectId]
+		}catch(Exception e){
+			return [filesList : null,projectId: projectId]
+		}
+		
+	}
+	def create ={
+		def fileInstance = new Files(appOwner:'TDS')
+		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
+		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
+		def planStatusAttribute = EavAttribute.findByAttributeCode('planStatus')
+		def planStatusOptions = EavAttributeOption.findAllByAttribute(planStatusAttribute)
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def project = Project.read(projectId)
+		def moveBundleList = MoveBundle.findAllByProject(project)
+
+		[fileInstance:fileInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
+					planStatusOptions:planStatusOptions?.value, projectId:projectId]
+	}
+	def save = {
+		
+				def filesInstance = new Files(params)
+				if(!filesInstance.hasErrors() && filesInstance.save()) {
+					flash.message = "Files ${filesInstance.id} created"
+					redirect(action:list,id:filesInstance.id)
+				}
+				else {
+					flash.message = "Database not created"
+					filesInstance.errors.allErrors.each{ flash.message += it}
+					redirect(action:list,id:filesInstance.id)
+				}
+		
+			
+	 }
+	def show ={
+		def id = params.id
+		def filesInstance = Files.get( id )
+		if(!filesInstance) {
+			flash.message = "Application not found with id ${params.id}"
+			redirect(action:list)
+		}
+		else {
+			def assetEntity = AssetEntity.get(id)
+			def dependentAssets = AssetDependency.findAllByAsset(assetEntity)
+			def supportAssets = AssetDependency.findAllByDependent(assetEntity)
+			[ filesInstance : filesInstance,supportAssets: supportAssets, dependentAssets:dependentAssets]
+		}
+	}
+	def edit ={
+		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
+		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
+		def planStatusAttribute = EavAttribute.findByAttributeCode('planStatus')
+		def planStatusOptions = EavAttributeOption.findAllByAttribute(planStatusAttribute)
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def project = Project.read(projectId)
+		def moveBundleList = MoveBundle.findAllByProject(project)
+
+		def id = params.id
+		def fileInstance = Files.get( id )
+		if(!fileInstance) {
+			flash.message = "Application not found with id ${params.id}"
+			redirect(action:list)
+		}
+		else {
+			def assetEntity = AssetEntity.get(id)
+			def dependentAssets = AssetDependency.findAllByAsset(assetEntity)
+			def supportAssets = AssetDependency.findAllByDependent(assetEntity)
+
+			[fileInstance:fileInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
+						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, dependentAssets:dependentAssets]
+		}
+		
+	}
+	def update ={
+		def filesInstance = Files.get(params.id)
+		filesInstance.properties = params
+		if(!filesInstance.hasErrors() && filesInstance.save()) {
+			flash.message = "Application ${filesInstance.assetName} Updated"
+			redirect(action:list,id:filesInstance.id)
+		}
+		else {
+			flash.message = "Application not created"
+			filesInstance.errors.allErrors.each{ flash.message += it }
+			redirect(action:list,id:filesInstance.id)
+		}
+
+    }
+	def delete = {
+		def filesInstance = Files.get( params.id )
+		def assetEntityInstance = AssetEntity.get(params.id)
+		if(assetEntityInstance) {
+			def assetName = assetEntityInstance.assetName
+			ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${assetEntityInstance.id}")
+			AssetTransition.executeUpdate("delete from AssetTransition ast where ast.assetEntity = ${assetEntityInstance.id}")
+			AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity = ${assetEntityInstance.id}")
+			ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset = ${assetEntityInstance.id}")
+			AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar aev where aev.assetEntity = ${assetEntityInstance.id}")
+			ProjectTeam.executeUpdate("update ProjectTeam pt set pt.latestAsset = null where pt.latestAsset = ${assetEntityInstance.id}")
+			AssetCableMap.executeUpdate("delete AssetCableMap where fromAsset = ? ",[assetEntityInstance])
+			AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
+										   toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
+										   where toAsset = ?""",[assetEntityInstance])
+			AssetEntity.executeUpdate("delete from AssetEntity ae where ae.id = ${assetEntityInstance.id}")
+			Files.executeUpdate("delete from Database d where d.id = ${filesInstance.id}")
+			flash.message = "Files ${assetName} deleted"
+		}
+		else {
+			flash.message = "Files not found with id ${params.id}"
+		}
+		redirect( action:list )
+	}
+}

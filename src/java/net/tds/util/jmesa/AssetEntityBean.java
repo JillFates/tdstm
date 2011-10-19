@@ -23,6 +23,12 @@ private static final long serialVersionUID = 1L;
 	private String moveBundle;
 	private String planStatus; 
 	
+	private String dbFormat;
+	private Integer dbSize;
+	
+	private String fileFormat;
+	private Integer fileSize;
+	
 	public AssetEntityBean() {
 		
 	}
@@ -144,5 +150,37 @@ private static final long serialVersionUID = 1L;
 
 	public void setplanStatus(String planStatus) {
 		this.planStatus = planStatus;
+	}
+
+	public String getDbFormat() {
+		return dbFormat;
+	}
+
+	public void setDbFormat(String dbFormat) {
+		this.dbFormat = dbFormat;
+	}
+
+	public Integer getDbSize() {
+		return dbSize;
+	}
+
+	public void setDbSize(Integer dbSize) {
+		this.dbSize = dbSize;
+	}
+
+	public String getFileFormat() {
+		return fileFormat;
+	}
+
+	public void setFileFormat(String fileFormat) {
+		this.fileFormat = fileFormat;
+	}
+
+	public Integer getFileSize() {
+		return fileSize;
+	}
+
+	public void setFileSize(Integer fileSize) {
+		this.fileSize = fileSize;
 	}
 }

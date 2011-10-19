@@ -141,8 +141,8 @@
 	    		<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link> </li>
 			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Assets</g:link></li>
 			<li><g:link class="home" controller="application" action="list"  params="[projectId:currProjObj?.id]">List Apps</g:link></li>
-			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List DBs</g:link></li>
-			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Files</g:link></li>
+			<li><g:link class="home" controller="database" params="[projectId:currProjObj?.id]">List DBs</g:link></li>
+			<li><g:link class="home" controller="files" params="[projectId:currProjObj?.id]">List Files</g:link></li>
 		</ul>
 	    </div>
 	    <div class="menu2" id="consoleMenu" style="background-color:#003366;display: none;">
