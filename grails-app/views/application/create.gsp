@@ -135,35 +135,41 @@
 				</div></td>
 		</tr>
 		<tr>
-			<td>
-				<div>
-					<h1>Supports:</h1>
-					<table style="width: 400px;">
+			<td valign="top">
+				<div style="width: 400px;">
+					<span style="float: left;"><h1>Supports:</h1></span>
+					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('support')"></span>
+					<br/>
+					<table style="width: 100%;">
 						<thead>
 							<tr>
 								<th>Frequency</th>
 								<th>Asset</th>
 								<th>Type</th>
 								<th>Status</th>
+								<th>&nbsp;</th>
 							</tr>
 						</thead>
-						<tbody>
+						<tbody id="createSupportsList">
 						</tbody>
 					</table>
 				</div></td>
-			<td>
-				<div>
-					<h1>Is dependent on:</h1>
-					<table style="width: 400px;">
+			<td valign="top">
+				<div  style="width: 400px;">
+					<span style="float: left;"><h1>Is dependent on:</h1></span>
+					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('dependent')"></span>
+					<br/>
+					<table style="width: 100%;">
 						<thead>
 							<tr>
 								<th>Frequency</th>
 								<th>Asset</th>
 								<th>Type</th>
 								<th>Status</th>
+								<th>&nbsp;</th>
 							</tr>
 						</thead>
-						<tbody>
+						<tbody id="createDependentsList">
 						</tbody>
 					</table>
 				</div></td>
@@ -171,6 +177,8 @@
 		<tr>
 			<td colspan="2">
 				<div class="buttons">
+					<input name="dependentCount" id="dependentCount" type="hidden" value="0">
+					<input  name="supportCount"  id="supportCount" type="hidden" value="0">
 					<input name="attributeSet.id" type="hidden" value="1">
 					<input name="project.id" type="hidden" value="${projectId}">
 					<span class="button"><g:actionSubmit class="save" value="Save" /> </span>

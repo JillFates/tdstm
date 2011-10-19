@@ -20,7 +20,7 @@ class AssetDependency {
 	static constraints = {
 		asset( blank:false, nullable:false )
 		dependent(blank:true, nullable:true)
-		type ( blank:false, nullable:false ,inList:[
+		type( blank:false, nullable:false ,inList:[
 													"Unknown",
 													"Runs On",
 													"Hosts" ,

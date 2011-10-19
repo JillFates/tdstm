@@ -5,6 +5,7 @@ import net.tds.util.jmesa.AssetEntityBean
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
 import org.jmesa.limit.Limit
+import org.jsecurity.SecurityUtils
 
 import com.tds.asset.Application
 import com.tds.asset.ApplicationAssetMap
@@ -31,16 +32,16 @@ class ApplicationController {
 		def projectId = params.projectId ? params.projectId : getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
 		def workFlow = project.workflowCode
-		def assetEntityList = Application.findAllByProject(project)
+		def appEntityList = Application.findAllByProject(project)
 		def appBeanList = new ArrayList()
-		assetEntityList.each {appAssetEntity->
+		appEntityList.each { appEntity->
 			AssetEntityBean appBeanInstance = new AssetEntityBean();
-			appBeanInstance.setId(appAssetEntity.id)
-			appBeanInstance.setApplication(appAssetEntity.application)
-			appBeanInstance.setAppOwner(appAssetEntity.appOwner)
-			appBeanInstance.setAppSme(appAssetEntity.appSme)
-			appBeanInstance.setMoveBundle(appAssetEntity.moveBundle?.name)
-			appBeanInstance.setplanStatus(appAssetEntity.planStatus)
+			appBeanInstance.setId(appEntity.id)
+			appBeanInstance.setAssetName(appEntity.assetName)
+			appBeanInstance.setAppOwner(appEntity.appOwner)
+			appBeanInstance.setAppSme(appEntity.appSme)
+			appBeanInstance.setMoveBundle(appEntity.moveBundle?.name)
+			appBeanInstance.setplanStatus(appEntity.planStatus)
 			appBeanList.add(appBeanInstance)
 		}
 		TableFacade tableFacade = new TableFacadeImpl("tag", request)
@@ -49,12 +50,13 @@ class ApplicationController {
 			Limit limit = tableFacade.limit
 			if(limit.isExported()){
 				tableFacade.setExportTypes(response,limit.getExportType())
-				tableFacade.setColumnProperties("id","application","assetName","shortName","serialNumber","assetTag","manufacturer","model","assetType","ipAddress","os","sourceLocation","sourceRoom","sourceRack","sourceRackPosition","sourceBladeChassis","sourceBladePosition","targetLocation","targetRoom","targetRack","targetRackPosition","targetBladeChassis","targetBladePosition","custom1","custom2","custom3","custom4","custom5","custom6","custom7","custom8","moveBundle","sourceTeamMt","targetTeamMt","sourceTeamLog","targetTeamLog","sourceTeamSa","targetTeamSa","sourceTeamDba","targetTeamDba","truck","cart","shelf","railType","appOwner","appSme","priority")
+				tableFacade.setColumnProperties("id","application","appOwner","appSme","movebundle","planStatus")
 				tableFacade.render()
-			}else
-				return [assetEntityList : appBeanList , projectId: projectId]
+			} else {
+				return [assetEntityList : appBeanList , projectId: projectId, assetDependency: new AssetDependency()]
+			}
 		}catch(Exception e){
-			return [assetEntityList : null,projectId: projectId]
+			return [assetEntityList : null, projectId: projectId]
 		}
 	}
 	def create ={
@@ -85,6 +87,52 @@ class ApplicationController {
 		def applicationInstance = new Application(params)
 		if(!applicationInstance.hasErrors() && applicationInstance.save()) {
 			flash.message = "Application ${applicationInstance.id} created"
+			def supportCount = Integer.parseInt(params.supportCount)
+			def principal = SecurityUtils.subject.principal
+			def loginUser = UserLogin.findByUsername(principal)
+			for(int i=0; i< supportCount; i++){
+				def supportAsset = params["asset_support_"+i]
+				if(supportAsset){
+					def asset = AssetEntity.findByAssetNameAndProject(supportAsset, applicationInstance.project)
+					if(asset){
+						def assetDependency = new AssetDependency()
+						assetDependency.asset = asset
+						assetDependency.dependent = applicationInstance
+						assetDependency.dataFlowFreq = params["dataFlowFreq_support_"+i]
+						assetDependency.type = params["dtype_support_"+i]
+						assetDependency.status = params["status_support_"+i]
+						assetDependency.updatedBy = loginUser?.person
+						assetDependency.createdBy = loginUser?.person
+						if ( !assetDependency.validate() || !assetDependency.save() ) {
+							def etext = "Unable to create assetDependency" +
+							GormUtil.allErrorsString( assetDependency )
+					       	println etext
+						}
+					}
+				}
+			}
+			def dependentCount = Integer.parseInt(params.dependentCount)
+			for(int i=0; i< dependentCount; i++){
+				def dependentAsset = params["asset_dependent_"+i]
+				if(dependentAsset){
+					def asset = AssetEntity.findByAssetNameAndProject(dependentAsset, applicationInstance.project)
+					if(asset){
+						def assetDependency = new AssetDependency()
+						assetDependency.asset = applicationInstance
+						assetDependency.dependent = asset
+						assetDependency.dataFlowFreq = params["dataFlowFreq_dependent_"+i]
+						assetDependency.type = params["dtype_dependent_"+i]
+						assetDependency.status = params["status_dependent_"+i]
+						assetDependency.updatedBy = loginUser?.person
+						assetDependency.createdBy = loginUser?.person
+						if ( !assetDependency.validate() || !assetDependency.save() ) {
+							def etext = "Unable to create assetDependency" +
+							GormUtil.allErrorsString( assetDependency )
+							   println etext
+						}
+					}
+				}
+			}
 			redirect(action:list,id:applicationInstance.id)
 		}
 		else {

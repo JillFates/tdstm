@@ -19,7 +19,7 @@ function onInvokeAction(id) {
 }
 function onInvokeExportAction(id) {
     var parameterString = createParameterStringForLimit(id);
-    location.href = 'listApps?' + parameterString;
+    location.href = 'list?' + parameterString;
 }
 $(document).ready(function() {
 	$("#createAppView").dialog({ autoOpen: false })
@@ -39,29 +39,29 @@ $(document).ready(function() {
 <div class="message">${flash.message}</div>
 </g:if>
 <div id= "jmesaId">
-	<form name="listAppsForm" action="listApps">
-		<jmesa:tableFacade id="tag" items="${assetEntityList}" maxRows="50" exportTypes="csv,excel" stateAttr="restore" var="assetEntityInstance" autoFilterAndSort="true" maxRowsIncrements="50,100,200">
+	<form name="listAppsForm" action="list">
+		<jmesa:tableFacade id="tag" items="${assetEntityList}" maxRows="50" exportTypes="csv,excel" stateAttr="restore" var="appEntityInstance" autoFilterAndSort="true" maxRowsIncrements="50,100,200">
 		    <jmesa:htmlTable style=" border-collapse: separate" editable="true">
 		        <jmesa:htmlRow highlighter="true">
 		        	<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" >
-		        		<g:remoteLink controller="assetEntity" action="editShow" id="${assetEntityInstance.id}" >
+		        		<g:remoteLink controller="assetEntity" action="editShow" id="${appEntityInstance.id}" >
 							<img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/>
 						</g:remoteLink>
 						</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="application" sortable="true" title="Application" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="appSme_${assetEntityInstance.id}" onclick="getAppDetails(${assetEntityInstance.id} )">${assetEntityInstance.assetName}</span>
+		        	<jmesa:htmlColumn property="assetName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        		<span id="appSme_${appEntityInstance.id}" onclick="getAppDetails(${appEntityInstance.id} )">${appEntityInstance.assetName}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="appOwner"   sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="appSme_${assetEntityInstance.id}" onclick="getAppDetails(${assetEntityInstance.id} )">${assetEntityInstance.appOwner}</span>
+		        		<span id="appSme_${appEntityInstance.id}" onclick="getAppDetails(${appEntityInstance.id} )">${appEntityInstance.appOwner}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="appSme" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="appSme_${assetEntityInstance.id}" onclick="getAppDetails(${assetEntityInstance.id} )">${assetEntityInstance.appSme}</span>
+		        		<span id="appSme_${appEntityInstance.id}" onclick="getAppDetails(${appEntityInstance.id} )">${appEntityInstance.appSme}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="moveBundle" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="moveBundle_${assetEntityInstance.id}" onclick="getAppDetails(${assetEntityInstance.id} )">${assetEntityInstance.moveBundle}</span>
+		        		<span id="moveBundle_${appEntityInstance.id}" onclick="getAppDetails(${appEntityInstance.id} )">${appEntityInstance.moveBundle}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="planStatus" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="planStatus_${assetEntityInstance.id}" onclick="getAppDetails(${assetEntityInstance.id} )">${assetEntityInstance.planStatus}</span>
+		        		<span id="planStatus_${appEntityInstance.id}" onclick="getAppDetails(${appEntityInstance.id} )">${appEntityInstance.planStatus}</span>
 		        	</jmesa:htmlColumn>
 		        	
 		        </jmesa:htmlRow>
@@ -75,6 +75,16 @@ $(document).ready(function() {
 <div id="createAppView" style="display: none;" title="Create Applicaiton"></div>
 <div id="showAppView" style="display: none;" title="Show Applicaiton"></div>
 <div id="editAppView" style="display: none;" title="Edit Application"></div>
+<div style="display: none;">
+<table id="assetDependencyRow">
+	<tr>
+		<td><g:select name="dataFlowFreq" from="${assetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
+		<td><input type="text" name="asset"/></td>
+		<td><g:select name="dtype" from="${assetDependency.constraints.type.inList}"></g:select></td>
+		<td><g:select name="status" from="${assetDependency.constraints.status.inList}"></g:select></td>
+	</tr>
+	</table>
+</div>
 </div>
 <script type ="text/javascript">
 function createAppView(e){
@@ -84,7 +94,7 @@ function createAppView(e){
 	 $("#createAppView").dialog('option', 'position', ['center','top']);
 	 $("#createAppView").dialog('open');
 	 $("#editAppView").dialog('close');
-	 $("#sAppView").dialog('close');
+	 $("#showAppView").dialog('close');
 }
 function getAppDetails(value){
 	   var val = value
@@ -121,6 +131,19 @@ function isValidDate( date ){
   	} 
   	return returnVal;
   }
+function addAssetDependency( type ){
+	var rowNo = $("#"+type+"Count").val()
+	var rowData = $("#assetDependencyRow tr").html().replace("dataFlowFreq","dataFlowFreq_"+type+"_"+rowNo).replace("asset","asset_"+type+"_"+rowNo).replace("dtype","dtype_"+type+"_"+rowNo).replace("status","status_"+type+"_"+rowNo)
+	if(type!="support"){
+		$("#createDependentsList").append("<tr id='row_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
+	} else {
+		$("#createSupportsList").append("<tr id='row_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
+	}
+	$("#"+type+"Count").val(parseInt(rowNo)+1)
+}
+function deleteRow( rowId ){
+	$("#"+rowId).remove()
+}
 </script>
 </body>
 </html>

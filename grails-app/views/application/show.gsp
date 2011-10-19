@@ -171,7 +171,7 @@
 									${support?.dataFlowFreq}
 								</td>
 								<td>
-									${support?.asset}
+									${support?.asset?.assetName}
 								</td>
 								<td>
 									${support.type}
@@ -204,7 +204,7 @@
 									${dependent.dataFlowFreq}
 								</td>
 								<td>
-									${dependent.dependent}
+									${dependent.dependent?.assetName}
 								</td>
 								<td>
 									${dependent.type}

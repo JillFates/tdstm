@@ -15,11 +15,9 @@ class Application extends AssetEntity{
 	String appAccess
 	String appSource
 	String license
-	String supportType
 	String businessUnit
 	String criticality
 	String appFunction
-	String environment
 	String useFrequency
 	String userLocations
 	String userConcurrent
@@ -40,11 +38,9 @@ class Application extends AssetEntity{
 		appAccess( blank:true, nullable:true )
 		appSource( blank:true, nullable:true )
 		license( blank:true, nullable:true )
-		supportType( blank:true, nullable:true )
 		businessUnit( blank:true, nullable:true )
 		criticality( blank:true, nullable:true ,inList:['Critical','Major','Minor','Trivial','Routine'] )
 		appFunction( blank:true, nullable:true )
-		environment( blank:true, nullable:true, inList:['Production','Development','Staging'] )
 		useFrequency( blank:true, nullable:true )
 		userLocations( blank:true, nullable:true )
 		userConcurrent( blank:true, nullable:true )

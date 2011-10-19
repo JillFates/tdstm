@@ -136,7 +136,7 @@
 				</div></td>
 		</tr>
 		<tr>
-			<td>
+			<td valign="top">
 				<div>
 					<h1>Supports:</h1>
 					<table style="width: 400px;">
@@ -151,20 +151,18 @@
 						<tbody>
 							<g:each in="${supportAssets}" var="support">
 								<tr>
-									<td>${support?.dataFlowFreq}</td>
-									<td>${support?.asset}</td>
-									<td><g:select id="selectId" value=${support.type}
-											from="${AssetDependency.constraints.type.inList}" />
+									<td><g:select id="selectId" value="${support.dataFlowFreq}" from="${support.constraints.dataFlowFreq.inList}" /></td>
+									<td><input type="text" name="asset" value="${support?.asset?.assetName}"/></td>
+									<td><g:select id="selectId" value="${support.type}" from="${support.constraints.type.inList}" />
 									</td>
-									<td><g:select id="typeId" value=${support.status}
-											from="${AssetDependency.constraints.status.inList}" />
+									<td><g:select id="typeId" value="${support.status}"	from="${support.constraints.status.inList}" />
 									</td>
 								</tr>
 							</g:each>
 						</tbody>
 					</table>
 				</div></td>
-			<td>
+			<td valign="top">
 				<div>
 					<h1>Is dependent on:</h1>
 					<table style="width: 400px;">
@@ -177,15 +175,13 @@
 							</tr>
 						</thead>
 						<tbody>
-						<g:each in="${supportAssets}" var="support">
+						<g:each in="${dependentAssets}" var="dependent">
 							<tr>
-								<td>${support?.dataFlowFreq}</td>
-								<td>${support?.dependent}</td>
-								<td><g:select id="selectId" value=${support.type}
-										from="${AssetDependency.constraints.type.inList}" />
+								<td><g:select id="selectId" value="${dependent.dataFlowFreq}" from="${dependent.constraints.dataFlowFreq.inList}" /></td>
+								<td><input type="text" name="asset" value="${dependent?.dependent?.assetName}"/></td>
+								<td><g:select id="selectId" value="${dependent.type}" from="${dependent.constraints.type.inList}" />
 								</td>
-								<td><g:select id="typeId" value=${support.status}
-										from="${AssetDependency.constraints.status.inList}" />
+								<td><g:select id="typeId" value="${dependent.status}" from="${dependent.constraints.status.inList}" />
 								</td>
 							</tr>
 						</g:each>

@@ -29,8 +29,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	Date maintExpDate
 	Date retireDate
 	String description
-	
-	
+	String supportType
+	String environment
 	
 	String custom1
 	String custom2
@@ -113,6 +113,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		maintExpDate( blank:true, nullable:true )
 		retireDate( blank:true, nullable:true )
 		description( blank:true, nullable:true )
+		supportType( blank:true, nullable:true )
+		environment( blank:true, nullable:true, inList:['Production','Development','Staging'] )
 		
 		custom1( blank:true, nullable:true )
 		custom2( blank:true, nullable:true )
