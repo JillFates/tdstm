@@ -41,7 +41,7 @@ function onInvokeExportAction(id) {
 </script>
 <script type="text/javascript">	
 	   		
-	    	function createDialog(){
+	function createDialog(){
 		      $("#createDialog").dialog('option', 'width', 950)
 		      $("#createDialog").dialog('option', 'position', ['center','top']);
 		      if($('#createFormTbodyId')){
@@ -59,34 +59,33 @@ function onInvokeExportAction(id) {
 		      ${remoteFunction(action:'getAttributes', params:'\'attribSet=\' + $("#attributeSetId").val() ', onComplete:'generateCreateForm(e)')}
 		    }
 		    
-		    function editAssetDialog() {
+	function editAssetDialog() {
 		      $("#showDialog").dialog("close")
 		      $("#editDialog").dialog('option', 'width', 'auto')
 		      $("#editDialog").dialog('option', 'position', ['center','top']);
 		      $("#editDialog").dialog("open")
-		
 		    }
 		    
-		    function showEditAsset(e) {
+	function showEditAsset(e) {
 		      var assetEntityAttributes = eval('(' + e.responseText + ')')
-			  if (assetEntityAttributes != "") {
-			  		var trObj = $("#assetRow_"+assetEntityAttributes[0].id)
-			  		trObj.css('background','#65a342');
+			if (assetEntityAttributes != "") {
+				var trObj = $("#assetRow_"+assetEntityAttributes[0].id)
+				trObj.css('background','#65a342');
 		    		var length = assetEntityAttributes.length
-				      	for (var i=0; i < length; i ++) {
-				      		var attribute = assetEntityAttributes[i]
-				      		var tdId = $("#"+attribute.attributeCode+'_'+attribute.id)
-				      		if(tdId != null ){
-				      				tdId.html( attribute.value )
-				      		}
+				for (var i=0; i < length; i ++) {
+					var attribute = assetEntityAttributes[i]
+					var tdId = $("#"+attribute.attributeCode+'_'+attribute.id)
+					if(tdId != null ){
+						tdId.html( attribute.value )
 				      	}
-				  $("#editDialog").dialog("close")
-				} else {
-					alert("Asset is not updated, Please check the required fields")
+				}
+				$("#editDialog").dialog("close")
+			} else {
+				alert("Asset is not updated, Please check the required fields")
 				}
       		}
 		    
-      		function validateAssetEntity(formname) {
+	function validateAssetEntity(formname) {
       			var attributeSet = $("#attributeSetId").val();
       			if(attributeSet || formname == 'editForm'){
       				var assetName = document.forms[formname].assetName.value.replace(/^\s*/, "").replace(/\s*$/, "");
@@ -102,10 +101,10 @@ function onInvokeExportAction(id) {
 	      			return false;
       			}
       		}
-      		function showAssetDetails( assetId ){
-      			${remoteFunction(action:'editShow', params:'\'id=\'+assetId', before:'document.showForm.id.value = assetId;document.editForm.id.value = assetId;', onComplete:"showAssetDialog(e , 'show')")}
+	function showAssetDetails( assetId ){
+		${remoteFunction(action:'editShow', params:'\'id=\'+assetId', before:'document.showForm.id.value = assetId;document.editForm.id.value = assetId;', onComplete:"showAssetDialog(e , 'show')")}
       		}
-	    </script>
+</script>
 <filterpane:includes />
 </head>
 <body>
@@ -182,8 +181,7 @@ function onInvokeExportAction(id) {
 	</form>
 </div>
 <div class="buttons"><g:form>
-	<span class="button"><input type="button"
-		value="New Asset" class="create" onClick="createDialog()" /></span>
+	<span class="button"><input type="button" value="New Asset" class="create" onClick="createDialog()" /></span>
 </g:form></div>
 </div> <%-- End of Body --%>
 <div id="createDialog" title="Create Asset" style="display: none;">
@@ -200,11 +198,11 @@ function onInvokeExportAction(id) {
 		<table id="createFormTbodyId"></table>
 
 	</div>
-	
-	<div class="buttons"><input type="hidden" name="projectId"
-		value="${projectId }" /> <span class="button"><input
-		class="save" type="submit" value="Create"
-		onclick="return validateAssetEntity('createForm');" /></span></div>
+	<div class="buttons">
+		<input type="hidden" name="projectId" value="${projectId }" />
+		<span class="button"><input class="save" type="submit" value="Create" onclick="return validateAssetEntity('createForm');" />
+		</span>
+	</div>
 </g:form></div>
 <div id="showDialog" title="Show Asset" style="display: none;">
 <g:form action="save" method="post" name="showForm">
@@ -212,14 +210,13 @@ function onInvokeExportAction(id) {
 	
 	</div>
 	<div class="buttons">
-	<input type="hidden" name="id" value="" />
-	<input type="hidden" name="projectId" value="${projectId}" />
-	 <span class="button"><input
-		type="button" class="edit" value="Edit"
-		onClick="return editAssetDialog()" /></span> <span class="button"><g:actionSubmit 
-		class="delete" onclick="return confirm('Delete Asset, are you sure?');"
-		value="Delete" /></span>
-		</div>
+		<input type="hidden" name="id" value="" />
+		<input type="hidden" name="projectId" value="${projectId}" />
+		<span class="button"><input type="button" class="edit" value="Edit" onClick="return editAssetDialog()" />
+		</span>
+		<span class="button"><g:actionSubmit class="delete" onclick="return confirm('Delete Asset, are you sure?');" value="Delete" />
+		</span>
+	</div>
 </g:form></div>
 
 <div id="editDialog" title="Edit Asset" style="display: none;">
@@ -229,12 +226,12 @@ function onInvokeExportAction(id) {
 	<div class="dialog" id="editDiv">
 	
 	</div>
-	<div class="buttons"><span class="button">
-	<input type="button" class="save" value="Update Asset" onClick="if(validateAssetEntity('editForm'))  ${remoteFunction(action:'getAssetAttributes', params:'\'assetId=\' + document.editForm.id.value ', onComplete:'callUpdateDialog(e)')}" />
-	</span> <span class="button"><input type="button"
-		class="delete" onclick="return editDialogDeleteRemove('delete')"
-		value="Delete" /></span>
-		</div>
+	<div class="buttons">
+		<span class="button"><input type="button" class="save" value="Update Asset" onClick="if(validateAssetEntity('editForm')) ${remoteFunction(action:'getAssetAttributes', params:'\'assetId=\' + document.editForm.id.value ', onComplete:'callUpdateDialog(e)')}" />
+		</span>
+		<span class="button"><input type="button" class="delete" onclick="return editDialogDeleteRemove('delete')" value="Delete" />
+		</span>
+	</div>
 </g:form></div>
 
 <div id="commentsListDialog" title="Show Asset Comments" style="display: none;">
@@ -277,54 +274,41 @@ function onInvokeExportAction(id) {
 	<input type="hidden" name="category" value="general"/>
 	<div class="dialog" style="border: 1px solid #5F9FCF">
 	<div>
-	<table id="createCommentTable" style="border: 0px;">
-		
-			<tr class="prop" >
-				<td valign="top" class="name"><label for="commentType">Comment
-				Type:</label></td>
-				<td valign="top" style="width: 20%;" ><g:select id="commentType"
-					name="commentType"
-					from="${AssetComment.constraints.commentType.inList}" value=""
-					noSelection="['':'please select']" onChange="commentChange('#createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
-				
-				<input type="checkbox"
-					id="mustVerifyEdit" name="mustVerify" value="0"
-					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
-					<label for="mustVerify">Must
-				Verify</label>
-				</td>				
-			</tr>
-			<tr class="prop">
-				<td valign="top" class="name"><label for="comment">Comment:</label>
-				</td>
-				<td valign="top" class="value">
-				<textarea cols="80" rows="5" id="comment" name="comment" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea>
-				</td>
-			</tr>
-		
+		<table id="createCommentTable" style="border: 0px;">
+		<tr class="prop" >
+			<td valign="top" class="name"><label for="commentType">Comment Type:</label></td>
+			<td valign="top" style="width: 20%;" >
+				<g:select id="commentType" name="commentType" from="${AssetComment.constraints.commentType.inList}" value=""
+				noSelection="['':'please select']" onChange="commentChange('#createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
+
+			<input type="checkbox" id="mustVerifyEdit" name="mustVerify" value="0"
+				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
+			<label for="mustVerify">Must Verify</label>
+			</td>				
+		</tr>
+		<tr class="prop">
+			<td valign="top" class="name"><label for="comment">Comment:</label></td>
+			<td valign="top" class="value">
+				<textarea cols="80" rows="3" id="comment" name="comment" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea>
+			</td>
+		</tr>
 	</table>
 	</div>
 	<div id="createResolveDiv" style="display: none;">
 		<table id="createResolveTable" style="border: 0px" >
-            <tr class="prop">
-            	<td valign="top" class="name">
-                <label for="isResolved">Resolved:</label>
-                </td>
-                <td valign="top" class="value">
-                <input type="checkbox" id="isResolved" name="isResolved" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
-                </td>
-            </tr>
-          
-            <tr class="prop">
-				<td valign="top" class="name">
-                <label for="resolution">Resolution:</label>
-                </td>
-				<td valign="top" class="value">
-                <textarea cols="80" rows="5" id="resolution" name="resolution" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea>
-                </td>
-            </tr> 
-                
-            </table>
+		<tr class="prop">
+			<td valign="top" class="name"><label for="isResolved">Resolved:</label></td>
+			<td valign="top" class="value">
+				<input type="checkbox" id="isResolved" name="isResolved" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
+			</td>
+		</tr>
+		<tr class="prop">
+			<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
+			<td valign="top" class="value">
+				<textarea cols="80" rows="3" id="resolution" name="resolution" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea>
+			</td>
+		</tr> 
+		</table>
             </div>
 		
 	</div>
@@ -337,208 +321,173 @@ function onInvokeExportAction(id) {
 <div class="dialog" style="border: 1px solid #5F9FCF"><input name="id" value="" id="commentId"
 	type="hidden"/>
 	<div>
-<table id="showCommentTable" style="border: 0px;">
-	
-	<tr>
-	<td valign="top" class="name"><label for="dateCreated">Created
-			At:</label></td>
-			<td valign="top" class="value" id="dateCreatedId" ></td>
-	</tr>
+	<table id="showCommentTable" style="border: 0px;">
 		<tr>
-	<td valign="top" class="name"><label for="createdBy">Created
-			By:</label></td>
+			<td valign="top" class="name"><label for="dateCreated">Created At:</label></td>
+			<td valign="top" class="value" id="dateCreatedId" ></td>
+		</tr>
+		<tr>
+			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
 			<td valign="top" class="value" id="createdById" ></td>
-	</tr>
-		
+		</tr>
 		<tr class="prop">
-			<td valign="top" class="name"><label for="commentType">Comment
-			Type:</label></td>
+			<td valign="top" class="name"><label for="commentType">Comment Type:</label></td>
 			<td valign="top" class="value" id="commentTypeTdId" ></td>
 		</tr>
-		
 		<tr>
-	<td valign="top" class="name"><label for="category">Category:
-			</label></td>
+			<td valign="top" class="name"><label for="category">Category:</label></td>
 			<td valign="top" class="value" id="categoryTdId" ></td>
-	</tr>
-	
-	<tr class="prop">
-	<td valign="top" class="name"><label for="commentCode">comment
-			Code:</label></td>
+		</tr>
+		<tr class="prop">
+			<td valign="top" class="name"><label for="commentCode">comment Code:</label></td>
 			<td valign="top" class="value" id="commentCodeTdId" ></td>
-	</tr>
-	
-		<tr class="prop">
-			<td valign="top" class="name"><label for="mustVerify">Must
-			Verify:</label></td>
-			<td valign="top" class="value" id="verifyTdId"><input
-				type="checkbox" id="mustVerifyShowId" name="mustVerify" value="0"
-				disabled="disabled" /></td>
 		</tr>
 		<tr class="prop">
-			<td valign="top" class="name"><label for="comment">Comment:</label>
+			<td valign="top" class="name"><label for="mustVerify">Must Verify:</label></td>
+			<td valign="top" class="value" id="verifyTdId">
+				<input type="checkbox" id="mustVerifyShowId" name="mustVerify" value="0" disabled="disabled" />
 			</td>
-			<td valign="top" class="value" ><textarea cols="80" rows="5"
-					id="commentTdId" readonly="readonly"></textarea> </td>
 		</tr>
-		</table>
-		</div>
-		<div id="showResolveDiv" style="display: none;">
+		<tr class="prop">
+			<td valign="top" class="name"><label for="comment">Comment:</label></td>
+			<td valign="top" class="value" >
+				<textarea cols="80" rows="3" id="commentTdId" readonly="readonly"></textarea>
+			</td>
+		</tr>
+	</table>
+	</div>
+	<div id="showResolveDiv" style="display: none;">
 		<table id="showResolveTable" style="border: 0px">
 		<tr class="prop">
-			<td valign="top" class="name"><label for="isResolved">Is
-			Resolved:</label></td>
-			<td valign="top" class="value" id="resolveTdId"><input
-				type="checkbox" id="isResolvedId" name="isResolved" value="0"
-				disabled="disabled" /></td>
+			<td valign="top" class="name"><label for="isResolved">Is Resolved:</label></td>
+			<td valign="top" class="value" id="resolveTdId">
+				<input type="checkbox" id="isResolvedId" name="isResolved" value="0" disabled="disabled" />
+			</td>
 		</tr>
 		<tr class="prop">
-			<td valign="top" class="name"><label for="resolution">Resolution:</label>
+			<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
+			<td valign="top" class="value" >
+				<textarea cols="80" rows="3" id="resolutionId" readonly="readonly"></textarea>
 			</td>
-			<td valign="top" class="value" ><textarea cols="80" rows="5"
-					id="resolutionId" readonly="readonly"></textarea> </td>
 		</tr>
-			<tr>
-	<td valign="top" class="name"><label for="dateResolved">Resolved
-			At:</label></td>
-			<td valign="top" class="value" id="dateResolvedId" ></td>
-	</tr>
 		<tr>
-	<td valign="top" class="name"><label for="resolvedBy">Resolved
-			By:</label></td>
+			<td valign="top" class="name"><label for="dateResolved">Resolved At:</label></td>
+			<td valign="top" class="value" id="dateResolvedId" ></td>
+		</tr>
+		<tr>
+			<td valign="top" class="name"><label for="resolvedBy">Resolved By:</label></td>
 			<td valign="top" class="value" id="resolvedById" ></td>
-	</tr>
-	
-</table>
-</div>
-<div class="buttons"><span class="button"> <input
-	class="edit" type="button" value="Edit"
-	onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 'auto');$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
-</span> <span class="button"> <input class="delete" type="button"
-	value="Delete"
+		</tr>	
+	</table>
+	</div>
+	<div class="buttons"><span class="button">
+	<input class="edit" type="button" value="Edit"
+		onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 'auto');$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
+	</span>
+	<span class="button"> <input class="delete" type="button" value="Delete"
 	onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + $(\'#commentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'never\')')}" />
-</span></div>
-</div></div>
-<div id="editCommentDialog" title="Edit Asset Comment"
-	style="display: none;"><g:form action="updateComment"
-	method="post" name="editCommentForm">
-	<div class="dialog" style="border: 1px solid #5F9FCF">
+	</span>
+	</div>
+</div>
+</div>
+<div id="editCommentDialog" title="Edit Asset Comment" style="display: none;">
+<g:form action="updateComment" method="post" name="editCommentForm">
+<div class="dialog" style="border: 1px solid #5F9FCF">
 	<input type="hidden" name="id" id="updateCommentId" value=""/>
 	<div>
 	<table id="updateCommentTable" style="border: 0px;">
-		
-		
-			<tr>
-	<td valign="top" class="name"><label for="dateCreated">Created
-			At:</label></td>
-			<td valign="top" class="value" id="dateCreatedEditId"  />
-	</tr>
 		<tr>
-	<td valign="top" class="name"><label for="createdBy">Created
-			By:</label></td>
+			<td valign="top" class="name"><label for="dateCreated">Created At:</label></td>
+			<td valign="top" class="value" id="dateCreatedEditId"  />
+		</tr>
+		<tr>
+			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
 			<td valign="top" class="value" id="createdByEditId" />
-	</tr>
-			<tr class="prop" >
-				<td valign="top" class="name"><label for="commentType">Comment
-				Type:</label></td>
-				<td valign="top" style="width: 20%;" >
+		</tr>
+		<tr class="prop" >
+			<td valign="top" class="name"><label for="commentType">Comment Type:</label></td>
+			<td valign="top" style="width: 20%;" >
 				<jsec:hasAnyRole in="['ADMIN','PROJ_MGR']">
-				<g:select id="commentTypeEditId"
-					name="commentType"
+					<g:select id="commentTypeEditId" name="commentType"
 					from="${AssetComment.constraints.commentType.inList}" value=""
 					 onChange="commentChange('#editResolveDiv','editCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
 				</jsec:hasAnyRole>
 				<jsec:lacksAllRoles in="['ADMIN','PROJ_MGR']">
-				
-				<input type="text" id="commentTypeEditId" name="commentType" readonly style="border: 0;"/>&nbsp;&nbsp;&nbsp;&nbsp;
+					<input type="text" id="commentTypeEditId" name="commentType" readonly style="border: 0;"/>&nbsp;&nbsp;&nbsp;&nbsp;
 				</jsec:lacksAllRoles>				
 				<input type="checkbox" id="mustVerifyEditId" name="mustVerify" value="0"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
-					<label for="mustVerify">Must
-				Verify</label>
-				</td>
-			</tr>
-			<tr class="prop">
-				<td valign="top" class="name"><label for="category">Category:</label>
-				</td>
-				<td valign="top" class="value" id="categoryEditId" ></td>
-			</tr>
-			<tr class="prop">
-				<td valign="top" class="name"><label for="commentCode">Comment Code:</label>
-				</td>
-				<td valign="top" class="value" id="commentCodeEditId" ></td>
-			</tr>
-			<tr class="prop">
-				<td valign="top" class="name"><label for="comment">Comment:</label>
-				</td>
-				<td valign="top" class="value"><textarea cols="80" rows="5"
-					id="commentEditId" name="comment" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea></td>
-			</tr>
-			</table>
-			
-			</div>
-			<div id="editResolveDiv" style="display: none;">
-		<table id="updateResolveTable" style="border: 0px;">
-            <tr class="prop">
-            	<td valign="top" class="name">
-                <label for="isResolved">Resolved:</label>
-                </td>
-                <td valign="top" class="value">
-                <input type="checkbox" id="isResolvedEditId" name="isResolved" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
-                </td>
-            </tr>
-          
-            <tr class="prop">
-				<td valign="top" class="name">
-                <label for="resolution">Resolution:</label>
-                </td>
-				<td valign="top" class="value">
-                <textarea cols="80" rows="5" id="resolutionEditId" name="resolution" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea>
-                </td>
-            </tr> 
-               <tr>
-	<td valign="top" class="name"><label for="dateResolved">Resolved
-			At:</label></td>
-			<td valign="top" class="value" id="dateResolvedEditId" ></td>
-	</tr>
-		<tr>
-	<td valign="top" class="name"><label for="resolvedBy">Resolved
-			By:</label></td>
-			<td valign="top" class="value" id="resolvedByEditId"  ></td>
-	</tr>
-            </table>
-            </div>
-		
-		
-
+				<label for="mustVerify">Must Verify</label>
+			</td>
+		</tr>
+		<tr class="prop">
+			<td valign="top" class="name"><label for="category">Category:</label></td>
+			<td valign="top" class="value" id="categoryEditId" ></td>
+		</tr>
+		<tr class="prop">
+			<td valign="top" class="name"><label for="commentCode">Comment Code:</label></td>
+			<td valign="top" class="value" id="commentCodeEditId" ></td>
+		</tr>
+		<tr class="prop">
+			<td valign="top" class="name"><label for="comment">Comment:</label></td>
+			<td valign="top" class="value">
+				<textarea cols="80" rows="3" id="commentEditId" name="comment" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea>
+			</td>
+		</tr>
+	</table>		
 	</div>
+	<div id="editResolveDiv" style="display: none;">
+	<table id="updateResolveTable" style="border: 0px;">
+		<tr class="prop">
+			<td valign="top" class="name"><label for="isResolved">Resolved:</label></td>
+			<td valign="top" class="value">
+				<input type="checkbox" id="isResolvedEditId" name="isResolved" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
+			</td>
+		</tr>
+		<tr class="prop">
+			<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
+			<td valign="top" class="value">
+				<textarea cols="80" rows="3" id="resolutionEditId" name="resolution" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea>
+			</td>
+		</tr> 
+		<tr>
+			<td valign="top" class="name"><label for="dateResolved">Resolved At:</label></td>
+			<td valign="top" class="value" id="dateResolvedEditId" ></td>
+		</tr>
+		<tr>
+			<td valign="top" class="name"><label for="resolvedBy">Resolved By:</label></td>
+			<td valign="top" class="value" id="resolvedByEditId" ></td>
+		</tr>
+	</table>
+	</div>
+</div>
 
-	<div class="buttons"><span class="button"> <input
-		class="save" type="button" value="Update"
-		onclick="resolveValidate('editCommentForm','updateCommentId');" />
-	</span> <span class="button"> <input class="delete" type="button"
-		value="Delete"
+<div class="buttons"><span class="button">
+	<input class="save" type="button" value="Update" onclick="resolveValidate('editCommentForm','updateCommentId');" />
+	</span>
+	<span class="button"> <input class="delete" type="button" value="Delete"
 		onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment', params:'\'id=\' + $(\'#updateCommentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'never\')')}" />
-	</span></div>
+	</span>
+</div>
 </g:form>
 </div>
 <div id="manufacturerShowDialog" title="Show Manufacturer">
 	<div class="dialog">
 		<table>
 	    	<tbody>
-				<tr class="prop">
-	            	<td valign="top" class="name">Name:</td>
-					<td valign="top" class="value" id="showManuName"></td>
-				</tr>
-	            <tr>
-	 				<td valign="top" class="name">AKA:</td>
-					<td valign="top" class="value"  id="showManuAka"></td>
-				</tr>
-	            <tr class="prop">
-	            	<td valign="top" class="name">Description:</td>
-					<td valign="top" class="value" id="showManuDescription"></td>
-				</tr>
-			</tbody>
+		<tr class="prop">
+			<td valign="top" class="name">Name:</td>
+			<td valign="top" class="value" id="showManuName"></td>
+		</tr>
+		<tr>
+			<td valign="top" class="name">AKA:</td>
+			<td valign="top" class="value"  id="showManuAka"></td>
+		</tr>
+		<tr class="prop">
+			<td valign="top" class="name">Description:</td>
+			<td valign="top" class="value" id="showManuDescription"></td>
+		</tr>
+		</tbody>
 		</table>
 	</div>
 	<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
@@ -552,8 +501,8 @@ function onInvokeExportAction(id) {
 </div>
 <div id="modelShowDialog"  title="Show Model">
 <div class="dialog">
-<table>
-	<tbody>
+	<table>
+		<tbody>
 		<tr>
 			<td valign="top" class="name">Manufacturer:</td>
 			<td valign="top" class="value" id="showManufacturer"></td>
@@ -580,16 +529,16 @@ function onInvokeExportAction(id) {
 		</tr>
 		<tr>
 			<td valign="top" class="name">Front image:</label></td>
-        	<td valign="top" class="value" id="showModelFrontImage"></td>
+			<td valign="top" class="value" id="showModelFrontImage"></td>
 		</tr>
 		<tr>
-        	<td valign="top" class="name">Rear image:</td>
-        	<td valign="top" class="value" id="showModelRearImage"></td>
-        </tr>
-        <tr>
-        	<td valign="top" class="name">Use Image:</td>
-	        <td valign="top" class="value" id="showModelUseImage"></td>
-        </tr>
+			<td valign="top" class="name">Rear image:</td>
+			<td valign="top" class="value" id="showModelRearImage"></td>
+		</tr>
+		<tr>
+			<td valign="top" class="name">Use Image:</td>
+			<td valign="top" class="value" id="showModelUseImage"></td>
+	        </tr>
 		<tr id="showModelBladeRowsTr">
 			<td valign="top" class="name">Blade Rows:</td>
 			<td valign="top" class="value" id="showModelBladeRows"></td>
@@ -607,15 +556,15 @@ function onInvokeExportAction(id) {
 			<td valign="top" class="value" id="showModelBladeHeight"></td>
 		</tr>
 		<tr>
-        	<td valign="top" class="name">Source TDS:</td>
-	        <td valign="top" class="value" id="showModelSourceTds"></td>
-        </tr>
+			<td valign="top" class="name">Source TDS:</td>
+			<td valign="top" class="value" id="showModelSourceTds"></td>
+	        </tr>
 		<tr>
 			<td valign="top" class="name">Notes:</td>
 			<td valign="top" class="value" id="showModelNotes"></td>
 		</tr>
-	</tbody>
-</table>
+		</tbody>
+	</table>
 </div>
 <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
 <div class="buttons"> 
