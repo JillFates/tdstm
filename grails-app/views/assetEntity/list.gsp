@@ -4,17 +4,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <title>Asset List</title>
-
-
+<g:javascript src="asset.tranman.js" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
 
-<g:javascript src="asset.tranman.js" />
-<script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
 <link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
+<script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
+
 <script type="text/javascript">
 function onInvokeAction(id) {
     setExportToLimit(id, '');
@@ -24,9 +23,7 @@ function onInvokeExportAction(id) {
     var parameterString = createParameterStringForLimit(id);
     location.href = 'list?' + parameterString;
 }
-</script>
-<script type="text/javascript">
-	      $(document).ready(function() {
+$(document).ready(function() {
 	        $("#showDialog").dialog({ autoOpen: false })
 	        $("#editDialog").dialog({ autoOpen: false })
 	        $("#createDialog").dialog({ autoOpen: false })
@@ -239,26 +236,17 @@ function onInvokeExportAction(id) {
 	<div class="list">
 		<table id="listCommentsTable">
 		<thead>
-	        <tr >
-	                        
-	          <th nowrap>Action</th>
-	          
-	          <th nowrap>Comment</th>
-	                        
-	          <th nowrap>Comment Type</th>
-	          
-	          <th nowrap>Resolved</th>
-	                        
-	          <th nowrap>Must Verify</th>
-	          
-	          <th nowrap>Category</th>  
-	          
-	          <th nowrap>Comment Code</th>                     
-	                   	    
-	        </tr>
-	    </thead>
+		<tr>
+			<th nowrap>Action</th>
+			<th nowrap>Comment</th>
+			<th nowrap>Comment Type</th>
+			<th nowrap>Resolved</th>
+			<th nowrap>Must Verify</th>
+			<th nowrap>Category</th>  
+			<th nowrap>Comment Code</th>                     
+		</tr>
+		</thead>
 		<tbody id="listCommentsTbodyId">
-		
 		</tbody>
 		</table>
 	</div>
@@ -266,18 +254,17 @@ function onInvokeExportAction(id) {
 		<span class="menuButton"><a class="create" href="#" onclick="$('#statusId').val('');$('#createResolveDiv').css('display','none');$('#createCommentDialog').dialog('option', 'width', 'auto');$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();" >New Comment</a></span>
 	</div>
 </div>
-<div id="createCommentDialog" title="Create Asset Comment"
-	style="display: none;"><input type="hidden" name="assetEntity.id"
-	id="createAssetCommentId" value=""/> <input type="hidden"
-	name="status" id="statusId" value=""/> <g:form
-	action="saveComment" method="post" name="createCommentForm">
-	<input type="hidden" name="category" value="general"/>
+<div id="createCommentDialog" title="Create Asset Comment" style="display: none;">
+	<input type="hidden" name="assetEntity.id" id="createAssetCommentId" value="" />
+	<input type="hidden" name="status" id="statusId" value="" />
+	<g:form action="saveComment" method="post" name="createCommentForm">
+		<input type="hidden" name="category" value="general" />
 	<div class="dialog" style="border: 1px solid #5F9FCF">
 	<div>
 		<table id="createCommentTable" style="border: 0px;">
 		<tr class="prop" >
 			<td valign="top" class="name"><label for="commentType">Comment Type:</label></td>
-			<td valign="top" style="width: 20%;" >
+			<td valign="top" style="width: 20%;">
 				<g:select id="commentType" name="commentType" from="${AssetComment.constraints.commentType.inList}" value=""
 				noSelection="['':'please select']" onChange="commentChange('#createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
 
@@ -579,7 +566,6 @@ function onInvokeExportAction(id) {
 </div>
 <script type="text/javascript">
 $('#assetMenu').show();
-$('#reportsMenu').hide();
 </script>
 </body>
 </html>
