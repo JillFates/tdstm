@@ -18,10 +18,12 @@ import com.tds.asset.AssetTransition
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.GormUtil
+
 class ApplicationController {
 	def partyRelationshipService
+	def assetEntityService
+	
 	def index = {
-
 		redirect(action:list,params:params)
 	}
 
@@ -85,54 +87,9 @@ class ApplicationController {
 			params.retireDate =  GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
 		}
 		def applicationInstance = new Application(params)
-		if(!applicationInstance.hasErrors() && applicationInstance.save()) {
+		if(!applicationInstance.hasErrors() && applicationInstance.save(flush:true)) {
 			flash.message = "Application ${applicationInstance.id} created"
-			def supportCount = Integer.parseInt(params.supportCount)
-			def principal = SecurityUtils.subject.principal
-			def loginUser = UserLogin.findByUsername(principal)
-			for(int i=0; i< supportCount; i++){
-				def supportAsset = params["asset_support_"+i]
-				if(supportAsset){
-					def asset = AssetEntity.findByAssetNameAndProject(supportAsset, applicationInstance.project)
-					if(asset){
-						def assetDependency = new AssetDependency()
-						assetDependency.asset = asset
-						assetDependency.dependent = applicationInstance
-						assetDependency.dataFlowFreq = params["dataFlowFreq_support_"+i]
-						assetDependency.type = params["dtype_support_"+i]
-						assetDependency.status = params["status_support_"+i]
-						assetDependency.updatedBy = loginUser?.person
-						assetDependency.createdBy = loginUser?.person
-						if ( !assetDependency.validate() || !assetDependency.save() ) {
-							def etext = "Unable to create assetDependency" +
-							GormUtil.allErrorsString( assetDependency )
-					       	println etext
-						}
-					}
-				}
-			}
-			def dependentCount = Integer.parseInt(params.dependentCount)
-			for(int i=0; i< dependentCount; i++){
-				def dependentAsset = params["asset_dependent_"+i]
-				if(dependentAsset){
-					def asset = AssetEntity.findByAssetNameAndProject(dependentAsset, applicationInstance.project)
-					if(asset){
-						def assetDependency = new AssetDependency()
-						assetDependency.asset = applicationInstance
-						assetDependency.dependent = asset
-						assetDependency.dataFlowFreq = params["dataFlowFreq_dependent_"+i]
-						assetDependency.type = params["dtype_dependent_"+i]
-						assetDependency.status = params["status_dependent_"+i]
-						assetDependency.updatedBy = loginUser?.person
-						assetDependency.createdBy = loginUser?.person
-						if ( !assetDependency.validate() || !assetDependency.save() ) {
-							def etext = "Unable to create assetDependency" +
-							GormUtil.allErrorsString( assetDependency )
-							   println etext
-						}
-					}
-				}
-			}
+			assetEntityService.createOrUpdateApplicationDependencies(params, applicationInstance)
 			redirect(action:list,id:applicationInstance.id)
 		}
 		else {
@@ -197,8 +154,9 @@ class ApplicationController {
 		}
 		def applicationInstance = Application.get(params.id)
 		applicationInstance.properties = params
-		if(!applicationInstance.hasErrors() && applicationInstance.save()) {
+		if(!applicationInstance.hasErrors() && applicationInstance.save(flush:true)) {
 			flash.message = "Application ${applicationInstance.assetName} Updated"
+			assetEntityService.createOrUpdateApplicationDependencies(params, applicationInstance)
 			redirect(action:list,id:applicationInstance.id)
 		}
 		else {
@@ -222,6 +180,7 @@ class ApplicationController {
 			AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
 										   toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
 										   where toAsset = ?""",[assetEntityInstance])
+			AssetDependency.executeUpdate("delete AssetDependency where asset = ? or dependent = ? ",[applicationInstance, applicationInstance])
 			AssetEntity.executeUpdate("delete from AssetEntity ae where ae.id = ${assetEntityInstance.id}")
 			Application.executeUpdate("delete from Application a where a.id = ${applicationInstance.id}")
 			flash.message = "Application ${assetName} deleted"
@@ -231,4 +190,5 @@ class ApplicationController {
 		}
 		redirect( action:list )
 	}
+	
 }

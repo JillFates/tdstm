@@ -11,11 +11,10 @@
 								${applicationInstance.assetName}
 							</td>
 							<td class="label" nowrap="nowrap">Description</td>
-							<td colspan="3">This Application Support the XYZ Business</td>
+							<td colspan="3">${applicationInstance.description}</td>
 						</tr>
 						<tr>
-							<td class="label" nowrap="nowrap"><label for="assetType">App
-									Type</label>
+							<td class="label" nowrap="nowrap"><label for="assetType">Type</label>
 							</td>
 							<td>
 								${applicationInstance.assetType}
@@ -165,8 +164,8 @@
 						</tr>
 					</thead>
 					<tbody>
-						<g:each in="${supportAssets}" var="support">
-							<tr>
+						<g:each in="${supportAssets}" var="support" status="i">
+							<tr onclick="getAppDetails(${support?.asset?.id})" class="${i%2? 'odd':'even' }">
 								<td>
 									${support?.dataFlowFreq}
 								</td>
@@ -198,8 +197,8 @@
 						</tr>
 					</thead>
 					<tbody>
-						<g:each in="${dependentAssets}" var="dependent">
-							<tr>
+						<g:each in="${dependentAssets}" var="dependent" status="i">
+							<tr onclick="getAppDetails(${dependent.dependent?.id})" class="${i%2? 'odd':'even' }">
 								<td>
 									${dependent.dataFlowFreq}
 								</td>

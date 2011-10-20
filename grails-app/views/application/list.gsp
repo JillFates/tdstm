@@ -1,3 +1,4 @@
+<%@page import="com.tds.asset.Application;"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -30,7 +31,7 @@ $(document).ready(function() {
 })
 </script>
 
-<title>APPLICATION LIST</title>
+<title>Application list</title>
 </head>
 <body>
 <div class="body">
@@ -44,11 +45,8 @@ $(document).ready(function() {
 		    <jmesa:htmlTable style=" border-collapse: separate" editable="true">
 		        <jmesa:htmlRow highlighter="true">
 		        	<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" >
-		        		<g:remoteLink controller="assetEntity" action="editShow" id="${appEntityInstance.id}" >
-							<img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/>
-						</g:remoteLink>
 						</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="assetName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        	<jmesa:htmlColumn property="assetName" title="Name" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<span id="appSme_${appEntityInstance.id}" onclick="getAppDetails(${appEntityInstance.id} )">${appEntityInstance.assetName}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="appOwner"   sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
@@ -79,7 +77,7 @@ $(document).ready(function() {
 <table id="assetDependencyRow">
 	<tr>
 		<td><g:select name="dataFlowFreq" from="${assetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
-		<td><input type="text" name="asset"/></td>
+		<td><g:select name="asset" from="${Application.findAllByAssetType('Application')}" optionKey="id" optionValue="assetName"></g:select></td>
 		<td><g:select name="dtype" from="${assetDependency.constraints.type.inList}"></g:select></td>
 		<td><g:select name="status" from="${assetDependency.constraints.status.inList}"></g:select></td>
 	</tr>
@@ -135,9 +133,9 @@ function addAssetDependency( type ){
 	var rowNo = $("#"+type+"Count").val()
 	var rowData = $("#assetDependencyRow tr").html().replace("dataFlowFreq","dataFlowFreq_"+type+"_"+rowNo).replace("asset","asset_"+type+"_"+rowNo).replace("dtype","dtype_"+type+"_"+rowNo).replace("status","status_"+type+"_"+rowNo)
 	if(type!="support"){
-		$("#createDependentsList").append("<tr id='row_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
+		$("#createDependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
 	} else {
-		$("#createSupportsList").append("<tr id='row_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
+		$("#createSupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
 	}
 	$("#"+type+"Count").val(parseInt(rowNo)+1)
 }

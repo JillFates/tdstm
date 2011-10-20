@@ -9,12 +9,12 @@
 								<td class="label" nowrap="nowrap"><label for="assetName">App Name</label></td>
 								<td ><input type="text" id="assetName" name="assetName" value="${applicationInstance.assetName}" tabindex="11"/></td>
 								<td class="label" nowrap="nowrap">Description</td>
-								<td colspan="3"><input type="text" id="description" name="description"value="This Application Support the XYZ Business" size="50" tabindex="21"/>
+								<td colspan="3"><input type="text" id="description" name="description" value="" size="50" tabindex="21"/>
 								</td>
 							</tr>
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="assetType">App Type</label></td>
-								<td ><g:select from="${assetTypeOptions}" id="assetType" name="assetType" value="${applicationInstance.assetType}"  tabindex="12"/></td>
+								<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
+								<td ><input type="text" id="assetType" name="assetType" value="Application" readonly="readonly"/></td>
 								<td class="label" nowrap="nowrap"><label for="supportType">Support</label>
 								</td>
 								<td ><input type="text" id="supportType"
