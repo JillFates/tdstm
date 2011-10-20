@@ -528,3 +528,14 @@ td .label {
 	width: 10%;
 	padding: 0px 6px;
 }
+
+td .dep-Valid {
+	background: LightGreen; 
+}
+
+td .dep-Unknown {
+	background: LightYellow; 
+}
+td .dep-Questioned {
+	background: LightPink; 
+}

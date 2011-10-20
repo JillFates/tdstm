@@ -6,7 +6,7 @@
 						<tr class="prop">
 							<td class="label" nowrap="nowrap"><label for="assetName">App
 									Name</label></td>
-							<td>${databaseInstance?.assetName}</td>
+							<td style="font-weight:bold;">${databaseInstance?.assetName}</td>
 
 							<td class="label" nowrap="nowrap">Description</td>
 							<td colspan="3">This Application the XYZ Business</td>
@@ -69,7 +69,7 @@
 				<thead>
 					<tr>
 						<th>Frequency</th>
-						<th>Asset</th>
+						<th>Name</th>
 						<th>Type</th>
 						<th>Status</th>
 					</tr>
@@ -77,10 +77,10 @@
 				<tbody>
 					<g:each in="${supportAssets}" var="support">
 						<tr>
-							<td>${support?.dataFlowFreq}</td>
-							<td>${support?.asset}</td>
-							<td>${support.type}</td>
-							<td>${support.status}</td>
+							<td class="dep-${support.status}">${support?.dataFlowFreq}</td>
+							<td class="dep-${support.status}">${support?.asset}</td>
+							<td class="dep-${support.status}">${support.type}</td>
+							<td class="dep-${support.status}">${support.status}</td>
 						
 						</tr>
 					</g:each>
@@ -94,7 +94,7 @@
 				<thead>
 					<tr>
 						<th>Frequency</th>
-						<th>Asset</th>
+						<th>Name</th>
 						<th>Type</th>
 						<th>Status</th>
 					</tr>
@@ -102,10 +102,10 @@
 				<tbody>
 					<g:each in="${dependentAssets}" var="dependent">
 						<tr>
-							<td>${dependent.dataFlowFreq}</td>
-							<td>${dependent.dependent}</td>
-							<td>${dependent.type}</td>
-							<td>${dependent.status}</td>
+							<td class="dep-${dependent.status}">${dependent.dataFlowFreq}</td>
+							<td class="dep-${dependent.status}">${dependent.dependent}</td>
+							<td class="dep-${dependent.status}">${dependent.type}</td>
+							<td class="dep-${dependent.status}">${dependent.status}</td>
 						
 						</tr>
 					</g:each>

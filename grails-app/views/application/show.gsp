@@ -1,13 +1,12 @@
 <table style="border: 0">
 	<tr>
-		<td colspan="2"><div class="dialog">
+		<td colspan="2"><div class="dialog" onclick="editApp(${applicationInstance?.id})">
 				<table>
 					<tbody>
 						<tr>
-							<td class="label" nowrap="nowrap"><label for="assetName">App
-									Name</label>
+							<td class="label" nowrap="nowrap"><label for="assetName">App Name</label>
 							</td>
-							<td>
+							<td style="font-weight:bold;">
 								${applicationInstance.assetName}
 							</td>
 							<td class="label" nowrap="nowrap">Description</td>
@@ -29,8 +28,7 @@
 							<td>
 								${applicationInstance.appFunction}
 							</td>
-							<td class="label" nowrap="nowrap"><label
-								for="userConcurrent">Users</label>
+							<td class="label" nowrap="nowrap"><label for="userConcurrent">Users</label>
 							</td>
 							<td>${applicationInstance.userCount}</td>
 						</tr>
@@ -50,8 +48,7 @@
 							<td>
 								${applicationInstance.environment}
 							</td>
-							<td class="label" nowrap="nowrap"><label for="userLocations">User
-									Location</label></td>
+							<td class="label" nowrap="nowrap"><label for="userLocations">User Location</label></td>
 							<td>
 								${applicationInstance.userLocations}
 							</td>
@@ -72,8 +69,7 @@
 							<td>
 								${applicationInstance.criticality}
 							</td>
-							<td class="label" nowrap="nowrap"><label
-								for="userConcurrent">Concurrent</label>
+							<td class="label" nowrap="nowrap"><label for="userConcurrent">Concurrent</label>
 							</td>
 							<td>
 								${applicationInstance.userConcurrent}
@@ -85,8 +81,7 @@
 							<td>
 								${applicationInstance.appTech}
 							</td>
-							<td class="label" nowrap="nowrap"><label for="businessUnit">Bus
-									Unit</label></td>
+							<td class="label" nowrap="nowrap"><label for="businessUnit">Bus Unit</label></td>
 							<td>
 								${applicationInstance.businessUnit}
 							</td>
@@ -95,8 +90,7 @@
 							<td>
 								${applicationInstance.moveBundle}
 							</td>
-							<td class="label" nowrap="nowrap"><label for="useFrequency">Use
-									Frequency</label></td>
+							<td class="label" nowrap="nowrap"><label for="useFrequency">Use Frequency</label></td>
 							<td>
 								${applicationInstance.userConcurrent}
 							</td>
@@ -107,19 +101,16 @@
 							<td>
 								${applicationInstance.appSource}
 							</td>
-							<td class="label" nowrap="nowrap"><label for="appOwner">App
-									Owner</label>
+							<td class="label" nowrap="nowrap"><label for="appOwner">App Owner</label>
 							</td>
 							<td>
 								${applicationInstance.appOwner}
 							</td>
-							<td class="label" nowrap="nowrap"><label for="planStatus">Plan
-									Status</label></td>
+							<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
 							<td>
 								${applicationInstance.planStatus}
 							</td>
-							<td class="label" nowrap="nowrap"><label for="drRpoDesc">DR
-									RPO</label></td>
+							<td class="label" nowrap="nowrap"><label for="drRpoDesc">DR RPO</label></td>
 							<td>
 								${applicationInstance.drRpoDesc}
 							</td>
@@ -139,8 +130,7 @@
 									date="${applicationInstance?.maintExpDate}" formate="12hrs"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							</td>
-							<td class="label" nowrap="nowrap"><label for="drRtoDesc">DR
-									RTO</label></td>
+							<td class="label" nowrap="nowrap"><label for="drRtoDesc">DR RTO</label></td>
 							<td>
 								${applicationInstance.drRtoDesc}
 							</td>
@@ -158,7 +148,7 @@
 					<thead>
 						<tr>
 							<th>Frequency</th>
-							<th>Asset</th>
+							<th>Name</th>
 							<th>Type</th>
 							<th>Status</th>
 						</tr>
@@ -166,16 +156,16 @@
 					<tbody>
 						<g:each in="${supportAssets}" var="support" status="i">
 							<tr onclick="getAppDetails(${support?.asset?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
-								<td>
+								<td class="dep-${support.status}">
 									${support?.dataFlowFreq}
 								</td>
-								<td>
+								<td class="dep-${support.status}">
 									${support?.asset?.assetName}
 								</td>
-								<td>
+								<td class="dep-${support.status}">
 									${support.type}
 								</td>
-								<td>
+								<td class="dep-${support.status}">
 									${support.status}
 								</td>
 							</tr>
@@ -191,7 +181,7 @@
 					<thead>
 						<tr>
 							<th>Frequency</th>
-							<th>Asset</th>
+							<th>Name</th>
 							<th>Type</th>
 							<th>Status</th>
 						</tr>
@@ -199,16 +189,16 @@
 					<tbody>
 						<g:each in="${dependentAssets}" var="dependent" status="i">
 							<tr onclick="getAppDetails(${dependent.dependent?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
-								<td>
+								<td class="dep-${dependent.status}">
 									${dependent.dataFlowFreq}
 								</td>
-								<td>
+								<td class="dep-${dependent.status}">
 									${dependent.dependent?.assetName}
 								</td>
-								<td>
+								<td class="dep-${dependent.status}">
 									${dependent.type}
 								</td>
-								<td>
+								<td class="dep-${dependent.status}">
 									${dependent.status}
 								</td>
 							</tr>
