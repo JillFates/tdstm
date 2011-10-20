@@ -165,7 +165,7 @@
 					</thead>
 					<tbody>
 						<g:each in="${supportAssets}" var="support" status="i">
-							<tr onclick="getAppDetails(${support?.asset?.id})" class="${i%2? 'odd':'even' }">
+							<tr onclick="getAppDetails(${support?.asset?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
 								<td>
 									${support?.dataFlowFreq}
 								</td>
@@ -198,7 +198,7 @@
 					</thead>
 					<tbody>
 						<g:each in="${dependentAssets}" var="dependent" status="i">
-							<tr onclick="getAppDetails(${dependent.dependent?.id})" class="${i%2? 'odd':'even' }">
+							<tr onclick="getAppDetails(${dependent.dependent?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
 								<td>
 									${dependent.dataFlowFreq}
 								</td>
