@@ -48,15 +48,15 @@ $(document).ready(function() {
 					<jmesa:htmlColumn property="id" sortable="false" filterable="false"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions">
 					</jmesa:htmlColumn>
+					<jmesa:htmlColumn property="assetName" title="Name" sortable="true"
+						filterable="true"
+						cellEditor="org.jmesa.view.editor.BasicCellEditor">
+						<a href="javascript:getDbDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.assetName}</a>
+					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="dbFormat" sortable="true"
 						title="DBFormat" filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
 						<a href="javascript:getDbDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.dbFormat}</a>
-					</jmesa:htmlColumn>
-					<jmesa:htmlColumn property="dbSize" title="DBSize" sortable="true"
-						filterable="true"
-						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<a href="javascript:getDbDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.dbSize}</a>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="moveBundle" sortable="true"
 						filterable="true"
@@ -114,6 +114,8 @@ function showDbView(e){
 	 $("#showDBView").dialog('option', 'width', 'auto')
 	 $("#showDBView").dialog('option', 'position', ['center','top']);
 	 $("#showDBView").dialog('open');
+	 $("#createDBView").dialog('close');
+	 $("#editDBView").dialog('close');
 }
 function createDbView(e){
 	 var resp = e.responseText;
@@ -121,6 +123,8 @@ function createDbView(e){
 	 $("#createDBView").dialog('option', 'width', 'auto')
 	 $("#createDBView").dialog('option', 'position', ['center','top']);
 	 $("#createDBView").dialog('open');
+	 $("#showDBView").dialog('close');
+	 $("#editDBView").dialog('close');
 }
 function editDb(value){
      var val = value
@@ -132,6 +136,8 @@ function editDbView(e){
 	 $("#editDBView").dialog('option', 'width', 'auto')
 	 $("#editDBView").dialog('option', 'position', ['center','top']);
 	 $("#editDBView").dialog('open');
+	 $("#showDBView").dialog('close');
+	 $("#createDBView").dialog('close');
 }
 function addAssetDependency( type ){
 	var rowNo = $("#"+type+"Count").val()

@@ -39,7 +39,7 @@ class DatabaseController {
 			dataBeanInstance.setId(dataBaseentity.id)
 			dataBeanInstance.setAssetType(dataBaseentity.assetType)
 			dataBeanInstance.setDbFormat(dataBaseentity.dbFormat)
-			dataBeanInstance.setDbSize(dataBaseentity.dbSize)
+			dataBeanInstance.setAssetName(dataBaseentity.assetName)
 			dataBeanInstance.setMoveBundle(dataBaseentity?.moveBundle?.name)
 			dataBeanInstance.setplanStatus(dataBaseentity.planStatus)
 			databaseList.add(dataBeanInstance)
@@ -111,7 +111,7 @@ class DatabaseController {
 				}
 				def dbInstance = new Database(params)
 				if(!dbInstance.hasErrors() && dbInstance.save()) {
-					flash.message = "Database ${dbInstance.id} created"
+					flash.message = "Database ${dbInstance.assetName} created"
 					assetEntityService.createOrUpdateDatabaseDependencies(params, dbInstance)
 			        redirect(action:list,id:dbInstance.id)
 		 	    }else {

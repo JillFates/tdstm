@@ -49,6 +49,11 @@ $(document).ready(function() {
 					<jmesa:htmlColumn property="id" sortable="false" filterable="false"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions">
 					</jmesa:htmlColumn>
+					<jmesa:htmlColumn property="assetName" title="Name"
+						sortable="true" filterable="true"
+						cellEditor="org.jmesa.view.editor.BasicCellEditor">
+						<a href="javascript:getFilesDetails('${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.assetName}</a>
+					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="fileFormat" sortable="true"
 						title="FileFormat" filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
@@ -115,6 +120,8 @@ function showFileView(e){
 	 $("#showFilesView").dialog('option', 'width', 'auto')
 	 $("#showFilesView").dialog('option', 'position', ['center','top']);
 	 $("#showFilesView").dialog('open');
+	 $("#createFilesView").dialog('close');
+	 $("#editFilesView").dialog('close');
 }
 function createFileView(e){
 	 var resp = e.responseText;
@@ -122,6 +129,8 @@ function createFileView(e){
 	 $("#createFilesView").dialog('option', 'width', 'auto')
 	 $("#createFilesView").dialog('option', 'position', ['center','top']);
 	 $("#createFilesView").dialog('open');
+	 $("#showFilesView").dialog('close');
+	 $("#editFilesView").dialog('close');
 }
 function editFile(value){
 	var resp = value
@@ -133,6 +142,8 @@ function editFileView(e){
 	 $("#editFilesView").dialog('option', 'width', 'auto')
 	 $("#editFilesView").dialog('option', 'position', ['center','top']);
 	 $("#editFilesView").dialog('open');
+	 $("#showFilesView").dialog('close');
+	 $("#createFilesView").dialog('close');
 }
 function addAssetDependency( type ){
 	var rowNo = $("#"+type+"Count").val()

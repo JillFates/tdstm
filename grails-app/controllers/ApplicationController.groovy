@@ -99,7 +99,7 @@ class ApplicationController {
 		}
 		def applicationInstance = new Application(params)
 		if(!applicationInstance.hasErrors() && applicationInstance.save(flush:true)) {
-			flash.message = "Application ${applicationInstance.id} created"
+			flash.message = "Application ${applicationInstance.assetName} created"
 			assetEntityService.createOrUpdateApplicationDependencies(params, applicationInstance)
 			redirect(action:list,id:applicationInstance.id)
 		}

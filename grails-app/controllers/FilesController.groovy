@@ -33,6 +33,7 @@ class FilesController {
 			AssetEntityBean filesEntity = new AssetEntityBean();
 			filesEntity.setId(fileentity.id)
 			filesEntity.setAssetType(fileentity.assetType)
+			filesEntity.setAssetName(fileentity.assetName)
 			filesEntity.setFileFormat(fileentity.fileFormat)
 			filesEntity.setFileSize(fileentity.fileSize)
 			filesEntity.setMoveBundle(fileentity?.moveBundle?.name)
@@ -77,7 +78,7 @@ class FilesController {
 		
 				def filesInstance = new Files(params)
 				if(!filesInstance.hasErrors() && filesInstance.save()) {
-					flash.message = "File ${filesInstance.id} created"
+					flash.message = "File ${filesInstance.assetName} created"
 					assetEntityService.createOrUpdateFilesDependencies(params, filesInstance)
 			        redirect(action:list,id:filesInstance.id)
 				}
