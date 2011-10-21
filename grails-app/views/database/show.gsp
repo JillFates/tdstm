@@ -14,8 +14,7 @@
 						</tr>
 
 						<tr class="prop">
-							<td class="label" nowrap="nowrap"><label for="assetType">App
-									Type</label></td>
+							<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
 							<td>${databaseInstance?.assetType}</td>
 
 							<td class="label" nowrap="nowrap"><label for="supportType">Support
@@ -37,8 +36,8 @@
 							</label></td>
 							<td>${databaseInstance?.dbSize}</td>
 							<td class="label" nowrap="nowrap">Retire</td>
-							<td><tds:convertDateTime
-									date="${databaseInstance?.retireDate}" formate="12hrs"
+							<td><tds:convertDate
+									date="${databaseInstance?.retireDate}"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							</td>
 						</tr>
@@ -48,8 +47,8 @@
 							</td>
 							<td>${databaseInstance?.moveBundle}</td>
 							<td class="label" nowrap="nowrap">Maint Exp.</td>
-							<td><tds:convertDateTime
-									date="${databaseInstance?.maintExpDate}" formate="12hrs"
+							<td><tds:convertDate
+									date="${databaseInstance?.maintExpDate}"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							</td>
 							<td class="label" nowrap="nowrap"><label for="planStatus">Plan
@@ -62,6 +61,7 @@
 				</table>
 			</div></td>
 	</tr>
+	<tr>
 	<td valign="top">
 		<div>
 			<h1>Supports:</h1>

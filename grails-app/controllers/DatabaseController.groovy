@@ -1,6 +1,8 @@
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
 import org.jmesa.limit.Limit
+import org.jsecurity.SecurityUtils
+
 import net.tds.util.jmesa.AssetEntityBean
 import com.tds.asset.Database
 import com.tds.asset.Application
@@ -20,7 +22,7 @@ import com.tdssrc.grails.GormUtil
 class DatabaseController {
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-
+    def assetEntityService  
     def index = {
 		redirect(action: "list", params: params)
     }
@@ -48,7 +50,7 @@ class DatabaseController {
 				tableFacade.setColumnProperties("id","dbFormat","dbSize","moveBundle","planStatus")
 				tableFacade.render()
 			}else
-				return [databaseList : databaseList , projectId: projectId]
+				return [databaseList : databaseList , projectId: projectId ,assetDependency: new AssetDependency()]
 		}catch(Exception e){
 			return [databaseList : null,projectId: projectId]
 		}
@@ -88,7 +90,7 @@ class DatabaseController {
 	
 	def save = {
 		
-				def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+				def formatter = new SimpleDateFormat("MM/dd/yyyy")
 				def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 				def maintExpDate = params.maintExpDate
 				if(maintExpDate){
@@ -98,17 +100,17 @@ class DatabaseController {
 				if(retireDate){
 					params.retireDate =  GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
 				}
-				def dbInstanse = new Database(params)
-				if(!dbInstanse.hasErrors() && dbInstanse.save()) {
-					flash.message = "Database ${dbInstanse.id} created"
-					redirect(action:list,id:dbInstanse.id)
-					
-				}
-				else {
+				def dbInstance = new Database(params)
+				if(!dbInstance.hasErrors() && dbInstance.save()) {
+					flash.message = "Database ${dbInstance.id} created"
+					assetEntityService.createOrUpdateDatabaseDependencies(params, dbInstance)
+			        redirect(action:list,id:dbInstance.id)
+		 	    }else {
 					flash.message = "Database not created"
-					dbInstanse.errors.allErrors.each{ flash.message += it  }
-					redirect(action:list,id:dbInstanse.id)
+					dbInstance.errors.allErrors.each{ flash.message += it  }
+					redirect(action:list,id:dbInstance.id)
 				}
+				
 		
 			
      }
@@ -124,7 +126,7 @@ class DatabaseController {
 		def id = params.id
 		def databaseInstance = Database.get( id )
 		if(!databaseInstance) {
-			flash.message = "Application not found with id ${params.id}"
+			flash.message = "DataBase not found with id ${params.id}"
 			redirect(action:list)
 		}
 		else {
@@ -139,7 +141,7 @@ class DatabaseController {
 		}
 	
 	def update ={
-		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+		def formatter = new SimpleDateFormat("MM/dd/yyyy")
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def maintExpDate = params.maintExpDate
 		if(maintExpDate){
@@ -152,11 +154,12 @@ class DatabaseController {
 		def databaseInstance = Database.get(params.id)
 		databaseInstance.properties = params
 		if(!databaseInstance.hasErrors() && databaseInstance.save()) {
-			flash.message = "Application ${databaseInstance.assetName} Updated"
+			flash.message = "DataBase ${databaseInstance.assetName} Updated"
+			assetEntityService.createOrUpdateDatabaseDependencies(params, databaseInstance)
 			redirect(action:list,id:databaseInstance.id)
 		}
 		else {
-			flash.message = "Application not created"
+			flash.message = "DataBase not created"
 			databaseInstance.errors.allErrors.each{ flash.message += it }
 			redirect(action:list,id:databaseInstance.id)
 		}

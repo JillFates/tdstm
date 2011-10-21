@@ -1,3 +1,5 @@
+<%@page import="com.tds.asset.Database"%>
+<%@page import="com.tds.asset.AssetEntity"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -8,7 +10,7 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
-
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
 <link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
 <script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
 <script type="text/javascript">
@@ -31,6 +33,10 @@ $(document).ready(function() {
 
 <title>DATABASE LIST</title>
 </head>
+
+<g:if test="${flash.message}">
+<div class="message">${flash.message}</div>
+</g:if>
 
 <div id="jmesaId" class="body">
 	<h1>DB List</h1>
@@ -83,6 +89,16 @@ $(document).ready(function() {
 	<div id="createDBView" style="display: none;" title="Create DB"></div>
 	<div id="showDBView" style="display: none;" title="Show DB"></div>
 	<div id="editDBView" style="display: none;" title="Edit DB"></div>
+	<div style="display: none;">
+     <table id="assetDependencyRow">
+	  <tr>
+		<td><g:select name="dataFlowFreq" from="${assetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
+		<td><g:select name="asset" from="${Database.findAllByAssetType('DataBase')}" optionKey="id" optionValue="assetName"></g:select></td>
+		<td><g:select name="dtype" from="${assetDependency.constraints.type.inList}"></g:select></td>
+		<td><g:select name="status" from="${assetDependency.constraints.status.inList}"></g:select></td>
+	</tr>
+	</table>
+    </div>
 </div>
 
 </div>
@@ -118,6 +134,19 @@ function editDbView(e){
 	 $("#editDBView").dialog('option', 'width', 'auto')
 	 $("#editDBView").dialog('option', 'position', ['center','top']);
 	 $("#editDBView").dialog('open');
+}
+function addAssetDependency( type ){
+	var rowNo = $("#"+type+"Count").val()
+	var rowData = $("#assetDependencyRow tr").html().replace("dataFlowFreq","dataFlowFreq_"+type+"_"+rowNo).replace("asset","asset_"+type+"_"+rowNo).replace("dtype","dtype_"+type+"_"+rowNo).replace("status","status_"+type+"_"+rowNo)
+	if(type!="support"){
+		$("#createDependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
+	} else {
+		$("#createSupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
+	}
+	$("#"+type+"Count").val(parseInt(rowNo)+1)
+}
+function deleteRow( rowId ){
+	$("#"+rowId).remove()
 }
 
 </script>

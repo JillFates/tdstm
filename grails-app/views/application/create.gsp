@@ -104,27 +104,25 @@
 								<td class="label" nowrap="nowrap"><label for="license">License</label></td>
 								<td ><input type="text" id="license" name="license" value="${applicationInstance.license}" tabindex="18" />
 								</td>
-								<td class="label" nowrap="nowrap">Retire</td>
-								<td ><script type="text/javascript">
-				                    $(document).ready(function(){
-				                      $("#retireDate").datetimepicker();
-				                    });
-								</script> 
-								<input type="text" class="dateRange" size="15" style="width: 132px; height: 14px;" id="retireDate" name="retireDate"
-                                   value="<tds:convertDateTime date="${applicationInstance?.retireDate}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
-                                   onchange="isValidDate(this.value)" tabindex="27" />
+								<td class="label"><label for="retireDate">Retire
+									Date:</label>
 								</td>
-								<td class="label" nowrap="nowrap">Maint Exp.</td>
-								<td >
-								<script type="text/javascript">
-				                    $(document).ready(function(){
-				                      $("#maintExpDate").datetimepicker();
-				                    });
-								</script> 
-								<input type="text" class="dateRange" size="15" style="width: 132px; height: 14px;" id="maintExpDate" name="maintExpDate"
-                                   value="<tds:convertDateTime date="${applicationInstance?.maintExpDate}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
-                                   onchange="isValidDate(this.value)" tabindex="28" />
-								</td>
+								<td valign="top"
+									class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}">
+								    <script type="text/javascript" charset="utf-8">
+				                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+				                    </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="retireDate" id="retireDate"
+									value="<tds:convertDate date="${applicationInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" > 
+							     </td>
+								<td  class="label"><label for="maintExpDate">Maint Exp.
+									</label></td>
+									<td valign="top"
+										class="value ${hasErrors(bean:applicationInstance,field:'maintExpDate','errors')}">
+									    <script type="text/javascript" charset="utf-8">
+					                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+					                    </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="maintExpDate" id="maintExpDate"
+										value="<tds:convertDate date="${applicationInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" > 
+									</td>
 								<td class="label" nowrap="nowrap"><label for="drRtoDesc">DR RTO</label>
 								</td>
 								<td ><input type="text" id="drRtoDesc"	name="drRtoDesc" value="${applicationInstance.drRtoDesc}" tabindex="46" />
@@ -144,7 +142,7 @@
 						<thead>
 							<tr>
 								<th>Frequency</th>
-								<th>Asset</th>
+								<th>Name</th>
 								<th>Type</th>
 								<th>Status</th>
 								<th>&nbsp;</th>
@@ -163,7 +161,7 @@
 						<thead>
 							<tr>
 								<th>Frequency</th>
-								<th>Asset</th>
+								<th>Name</th>
 								<th>Type</th>
 								<th>Status</th>
 								<th>&nbsp;</th>

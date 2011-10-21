@@ -18,7 +18,7 @@ import com.tdssrc.grails.GormUtil
 class FilesController {
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-	
+	def assetEntityService
 	def index ={
 	     redirect(action : list)
 		 	
@@ -46,7 +46,7 @@ class FilesController {
 				tableFacade.setColumnProperties("id","fileFormat","fileSize","moveBundle","planStatus","assetTag","manufacturer","model","assetType","ipAddress","os","sourceLocation","sourceRoom","sourceRack","sourceRackPosition","sourceBladeChassis","sourceBladePosition","targetLocation","targetRoom","targetRack","targetRackPosition","targetBladeChassis","targetBladePosition","custom1","custom2","custom3","custom4","custom5","custom6","custom7","custom8","moveBundle","sourceTeamMt","targetTeamMt","sourceTeamLog","targetTeamLog","sourceTeamSa","targetTeamSa","sourceTeamDba","targetTeamDba","truck","cart","shelf","railType","appOwner","appSme","priority")
 				tableFacade.render()
 			}else
-				return [filesList : filesList , projectId: projectId]
+				return [filesList : filesList , projectId: projectId ,assetDependency: new AssetDependency()]
 		}catch(Exception e){
 			return [filesList : null,projectId: projectId]
 		}
@@ -69,11 +69,12 @@ class FilesController {
 		
 				def filesInstance = new Files(params)
 				if(!filesInstance.hasErrors() && filesInstance.save()) {
-					flash.message = "Files ${filesInstance.id} created"
-					redirect(action:list,id:filesInstance.id)
+					flash.message = "File ${filesInstance.id} created"
+					assetEntityService.createOrUpdateFilesDependencies(params, filesInstance)
+			        redirect(action:list,id:filesInstance.id)
 				}
 				else {
-					flash.message = "Database not created"
+					flash.message = "File not created"
 					filesInstance.errors.allErrors.each{ flash.message += it}
 					redirect(action:list,id:filesInstance.id)
 				}
@@ -84,7 +85,7 @@ class FilesController {
 		def id = params.id
 		def filesInstance = Files.get( id )
 		if(!filesInstance) {
-			flash.message = "Application not found with id ${params.id}"
+			flash.message = "File not found with id ${params.id}"
 			redirect(action:list)
 		}
 		else {
@@ -106,7 +107,7 @@ class FilesController {
 		def id = params.id
 		def fileInstance = Files.get( id )
 		if(!fileInstance) {
-			flash.message = "Application not found with id ${params.id}"
+			flash.message = "File not found with id ${params.id}"
 			redirect(action:list)
 		}
 		else {
@@ -123,11 +124,12 @@ class FilesController {
 		def filesInstance = Files.get(params.id)
 		filesInstance.properties = params
 		if(!filesInstance.hasErrors() && filesInstance.save()) {
-			flash.message = "Application ${filesInstance.assetName} Updated"
+			flash.message = "File ${filesInstance.assetName} Updated"
+			assetEntityService.createOrUpdateFilesDependencies(params, filesInstance)
 			redirect(action:list,id:filesInstance.id)
 		}
 		else {
-			flash.message = "Application not created"
+			flash.message = "File not created"
 			filesInstance.errors.allErrors.each{ flash.message += it }
 			redirect(action:list,id:filesInstance.id)
 		}

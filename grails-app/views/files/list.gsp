@@ -1,3 +1,5 @@
+<%@page import="com.tds.asset.Files" %>
+<%@page import="com.tds.asset.AssetEntity"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -31,6 +33,9 @@ $(document).ready(function() {
 
 <title>Files List</title>
 </head>
+<g:if test="${flash.message}">
+<div class="message">${flash.message}</div>
+</g:if>
 
 <div id="jmesaId" class="body">
 	<h1>Files List</h1>
@@ -83,6 +88,16 @@ $(document).ready(function() {
 	<div id="createFilesView" style="display: none;" title="Create Files"></div>
 	<div id="showFilesView" style="display: none;" title="Show Files"></div>
 	<div id="editFilesView" style="display: none;" title="Edit Files"></div>
+	<div style="display: none;">
+     <table id="assetDependencyRow">
+	  <tr>
+		<td><g:select name="dataFlowFreq" from="${assetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
+		<td><g:select name="asset" from="${Files.findAllByAssetType('File')}" optionKey="id" optionValue="assetName"></g:select></td>
+		<td><g:select name="dtype" from="${assetDependency.constraints.type.inList}"></g:select></td>
+		<td><g:select name="status" from="${assetDependency.constraints.status.inList}"></g:select></td>
+	</tr>
+	</table>
+    </div>
 </div>
 
 </div>
@@ -119,5 +134,18 @@ function editFileView(e){
 	 $("#editFilesView").dialog('option', 'width', 'auto')
 	 $("#editFilesView").dialog('option', 'position', ['center','top']);
 	 $("#editFilesView").dialog('open');
+}
+function addAssetDependency( type ){
+	var rowNo = $("#"+type+"Count").val()
+	var rowData = $("#assetDependencyRow tr").html().replace("dataFlowFreq","dataFlowFreq_"+type+"_"+rowNo).replace("asset","asset_"+type+"_"+rowNo).replace("dtype","dtype_"+type+"_"+rowNo).replace("status","status_"+type+"_"+rowNo)
+	if(type!="support"){
+		$("#createDependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
+	} else {
+		$("#createSupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
+	}
+	$("#"+type+"Count").val(parseInt(rowNo)+1)
+}
+function deleteRow( rowId ){
+	$("#"+rowId).remove()
 }
 </script>

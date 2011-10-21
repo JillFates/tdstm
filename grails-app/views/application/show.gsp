@@ -122,11 +122,11 @@
 								${applicationInstance.license}
 							</td>
 							<td class="label" nowrap="nowrap">Retire</td>
-							<td><tds:convertDateTime
-									date="${applicationInstance?.retireDate}" formate="12hrs"
+							<td><tds:convertDate
+									date="${applicationInstance?.retireDate}"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
 							<td class="label" nowrap="nowrap">Maint Exp.</td>
-							<td><tds:convertDateTime
+							<td><tds:convertDate
 									date="${applicationInstance?.maintExpDate}" formate="12hrs"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							</td>

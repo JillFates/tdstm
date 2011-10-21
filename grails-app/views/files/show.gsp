@@ -53,6 +53,7 @@
 				</table>
 			</div></td>
 	</tr>
+	<tr>
 	<td valign="top">
 		<div>
 			<h1>Supports:</h1>

@@ -76,7 +76,7 @@ class ApplicationController {
 	}
 	def save = {
 
-		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+		def formatter = new SimpleDateFormat("MM/dd/yyyy")
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def maintExpDate = params.maintExpDate
 		if(maintExpDate){
@@ -142,7 +142,7 @@ class ApplicationController {
 	}
 
 	def update ={
-		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+		def formatter = new SimpleDateFormat("MM/dd/yyyy")
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def maintExpDate = params.maintExpDate
 		if(maintExpDate){

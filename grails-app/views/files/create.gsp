@@ -1,13 +1,12 @@
-<%@page import="com.tds.asset.AssetEntity"%>
 <g:form method="post">
-	<table style="border: 0">
+	<table style="border: 0;width:1000px">
 		<tr>
 			<td colspan="2">
 				<div class="dialog">
 					<table>
 						<tbody>
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="assetName">App
+								<td class="label" nowrap="nowrap"><label for="assetName">File
 										Name</label>
 								</td>
 								<td><input type="text" id="assetName" name="assetName"
@@ -21,11 +20,11 @@
 							</tr>
 
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="assetType">App
+								<td class="label" nowrap="nowrap"><label for="assetType">
 										Type</label>
 								</td>
-								<td><g:select from="${assetTypeOptions}" id="assetType"
-										name="assetType" value="${fileInstance.assetType}" />
+								<td><input type="text" id="assetType" name="assetType"
+									value="File" readonly="readonly" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="supportType">Support</label>
 								</td>
@@ -42,7 +41,7 @@
 								<td class="label" nowrap="nowrap"><label for="environment">Enviorn
 								</label>
 								</td>
-								<td><g:select id="environment" name="environment" from="${AssetEntity.constraints.environment.inList}"/>
+								<td><g:select id="environment" name="environment" from="${com.tds.asset.AssetEntity.constraints.environment.inList}"/>
 								</td>
 								<td class="label" nowrap="nowrap"><label for="fileSize">Size
 								</label>
@@ -70,44 +69,50 @@
 			</td>
 		</tr>
 		<tr>
-			<td>
-				<div>
-					<h1>Supports:</h1>
-					<table style="width: 400px;">
+			<td valign="top">
+				<div style="width: 400px;">
+					<span style="float: left;"><h1>Supports:</h1></span>
+					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('support')"></span>
+					<br/>
+					<table style="width: 100%;">
 						<thead>
 							<tr>
 								<th>Frequency</th>
-								<th>Asset</th>
+								<th>Name</th>
 								<th>Type</th>
 								<th>Status</th>
+								<th>&nbsp;</th>
 							</tr>
 						</thead>
-						<tbody>
+						<tbody id="createSupportsList">
 						</tbody>
 					</table>
-				</div>
-			</td>
-			<td>
-				<div>
-					<h1>Is dependent on:</h1>
-					<table style="width: 400px;">
+				</div></td>
+			<td valign="top">
+				<div  style="width: 400px;">
+					<span style="float: left;"><h1>Is dependent on:</h1></span>
+					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('dependent')"></span>
+					<br/>
+					<table style="width: 100%;">
 						<thead>
 							<tr>
 								<th>Frequency</th>
-								<th>Asset</th>
+								<th>Name</th>
 								<th>Type</th>
 								<th>Status</th>
+								<th>&nbsp;</th>
 							</tr>
 						</thead>
-						<tbody>
+						<tbody id="createDependentsList">
 						</tbody>
 					</table>
-				</div>
-			</td>
+				</div></td>
 		</tr>
 		<tr>
 			<td colspan="2">
 				<div class="buttons">
+				<input name="dependentCount" id="dependentCount" type="hidden" value="0">
+					<input  name="supportCount"  id="supportCount" type="hidden" value="0">
 					<input name="attributeSet.id" type="hidden" value="1"> <input
 						name="project.id" type="hidden" value="${projectId}"> <span
 						class="button"><g:actionSubmit class="save" value="Save" />
