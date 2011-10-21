@@ -1,8 +1,9 @@
+import net.tds.util.jmesa.AssetEntityBean
+
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
 import org.jmesa.limit.Limit
-import net.tds.util.jmesa.AssetEntityBean
-import com.tds.asset.Files
+
 import com.tds.asset.Application
 import com.tds.asset.ApplicationAssetMap
 import com.tds.asset.AssetCableMap
@@ -11,10 +12,10 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetTransition
+import com.tds.asset.Database
+import com.tds.asset.Files
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
-import java.text.SimpleDateFormat
-import com.tdssrc.grails.GormUtil
 class FilesController {
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -31,6 +32,7 @@ class FilesController {
 		fileInstanceList.each {fileentity ->
 			AssetEntityBean filesEntity = new AssetEntityBean();
 			filesEntity.setId(fileentity.id)
+			filesEntity.setAssetType(fileentity.assetType)
 			filesEntity.setFileFormat(fileentity.fileFormat)
 			filesEntity.setFileSize(fileentity.fileSize)
 			filesEntity.setMoveBundle(fileentity?.moveBundle?.name)
@@ -38,6 +40,10 @@ class FilesController {
 			filesList.add(filesEntity)
 		}
 		TableFacade tableFacade = new TableFacadeImpl("tag", request)
+		def servers = AssetEntity.findAllByAssetTypeAndProject('Server',project)
+		def applications = Application.findAllByAssetTypeAndProject('Application',project)
+		def dbs = Database.findAllByAssetTypeAndProject('Database',project)
+		def files = Files.findAllByAssetTypeAndProject('Files',project)
 		try{
 			tableFacade.items = filesList
 			Limit limit = tableFacade.limit
@@ -46,9 +52,11 @@ class FilesController {
 				tableFacade.setColumnProperties("id","fileFormat","fileSize","moveBundle","planStatus","assetTag","manufacturer","model","assetType","ipAddress","os","sourceLocation","sourceRoom","sourceRack","sourceRackPosition","sourceBladeChassis","sourceBladePosition","targetLocation","targetRoom","targetRack","targetRackPosition","targetBladeChassis","targetBladePosition","custom1","custom2","custom3","custom4","custom5","custom6","custom7","custom8","moveBundle","sourceTeamMt","targetTeamMt","sourceTeamLog","targetTeamLog","sourceTeamSa","targetTeamSa","sourceTeamDba","targetTeamDba","truck","cart","shelf","railType","appOwner","appSme","priority")
 				tableFacade.render()
 			}else
-				return [filesList : filesList , projectId: projectId ,assetDependency: new AssetDependency()]
+				return [filesList : filesList , projectId: projectId ,assetDependency: new AssetDependency(),
+					servers : servers, applications : applications, dbs : dbs, files : files]
 		}catch(Exception e){
-			return [filesList : null,projectId: projectId]
+			return [filesList : null,projectId: projectId,
+					servers : servers, applications : applications, dbs : dbs, files : files]
 		}
 		
 	}

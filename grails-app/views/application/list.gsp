@@ -1,4 +1,4 @@
-<%@page import="com.tds.asset.Application;"%>
+<%@page import="com.tds.asset.AssetEntity;com.tds.asset.Application;com.tds.asset.Database;com.tds.asset.Files;"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -48,19 +48,19 @@ $(document).ready(function() {
 		        	<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" >
 						</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="assetName" title="Name" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="appSme_${appEntityInstance.id}" onclick="getAppDetails(${appEntityInstance.id} )">${appEntityInstance.assetName}</span>
+		        		<span id="appSme_${appEntityInstance.id}" onclick="getAppDetails('${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.assetName}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="appOwner"   sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="appSme_${appEntityInstance.id}" onclick="getAppDetails(${appEntityInstance.id} )">${appEntityInstance.appOwner}</span>
+		        		<span id="appSme_${appEntityInstance.id}" onclick="getAppDetails('${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.appOwner}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="appSme" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="appSme_${appEntityInstance.id}" onclick="getAppDetails(${appEntityInstance.id} )">${appEntityInstance.appSme}</span>
+		        		<span id="appSme_${appEntityInstance.id}" onclick="getAppDetails('${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.appSme}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="moveBundle" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="moveBundle_${appEntityInstance.id}" onclick="getAppDetails(${appEntityInstance.id} )">${appEntityInstance.moveBundle}</span>
+		        		<span id="moveBundle_${appEntityInstance.id}" onclick="getAppDetails('${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.moveBundle}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="planStatus" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="planStatus_${appEntityInstance.id}" onclick="getAppDetails(${appEntityInstance.id} )">${appEntityInstance.planStatus}</span>
+		        		<span id="planStatus_${appEntityInstance.id}" onclick="getAppDetails('${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.planStatus}</span>
 		        	</jmesa:htmlColumn>
 		        	
 		        </jmesa:htmlRow>
@@ -78,11 +78,18 @@ $(document).ready(function() {
 <table id="assetDependencyRow">
 	<tr>
 		<td><g:select name="dataFlowFreq" from="${assetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
-		<td><g:select name="asset" from="${Application.findAllByAssetType('Application')}" optionKey="id" optionValue="assetName"></g:select></td>
+		<td><g:select name="entity" from="['Server','Application','DB','Files']" onchange='updateAssetsList(this.name, this.value)'></g:select></td>
+		<td><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></td>
 		<td><g:select name="dtype" from="${assetDependency.constraints.type.inList}"></g:select></td>
 		<td><g:select name="status" from="${assetDependency.constraints.status.inList}"></g:select></td>
 	</tr>
 	</table>
+</div>
+<div style="display: none;">
+<span id="Server"><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+<span id="Application"><g:select name="asset" from="${applications}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+<span id="DB"><g:select name="asset" from="${dbs}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+<span id="Files"><g:select name="asset" from="${files}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 </div>
 </div>
 <script type ="text/javascript">
@@ -95,9 +102,11 @@ function createAppView(e){
 	 $("#editAppView").dialog('close');
 	 $("#showAppView").dialog('close');
 }
-function getAppDetails(value){
+function getAppDetails(type, value){
+	if(type == "Application"){
 	   var val = value
 	   ${remoteFunction(action:'show', params:'\'id=\' + value ', onComplete:'showAppView(e)')}
+	}
 }
 function showAppView(e){
 	 var resp = e.responseText;
@@ -129,10 +138,10 @@ function isValidDate( date ){
       	returnVal  =  false;
   	} 
   	return returnVal;
-  }
+}
 function addAssetDependency( type ){
 	var rowNo = $("#"+type+"Count").val()
-	var rowData = $("#assetDependencyRow tr").html().replace("dataFlowFreq","dataFlowFreq_"+type+"_"+rowNo).replace("asset","asset_"+type+"_"+rowNo).replace("dtype","dtype_"+type+"_"+rowNo).replace("status","status_"+type+"_"+rowNo)
+	var rowData = $("#assetDependencyRow tr").html().replace("dataFlowFreq","dataFlowFreq_"+type+"_"+rowNo).replace("asset","asset_"+type+"_"+rowNo).replace("dtype","dtype_"+type+"_"+rowNo).replace("status","status_"+type+"_"+rowNo).replace("entity","entity_"+type+"_"+rowNo)
 	if(type!="support"){
 		$("#createDependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
 	} else {
@@ -142,6 +151,10 @@ function addAssetDependency( type ){
 }
 function deleteRow( rowId ){
 	$("#"+rowId).remove()
+}
+function updateAssetsList( name, value ){
+	var idValues = name.split("_")
+	$("select[name='asset_"+idValues[1]+"_"+idValues[2]+"']").html($("#"+value+" select").html())
 }
 </script>
 </body>

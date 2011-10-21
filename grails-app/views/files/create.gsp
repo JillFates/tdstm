@@ -6,8 +6,7 @@
 					<table>
 						<tbody>
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="assetName">File
-										Name</label>
+								<td class="label" nowrap="nowrap"><label for="assetName">Name<span style="color: red;">*</span></label>
 								</td>
 								<td><input type="text" id="assetName" name="assetName"
 									value="${fileInstance.assetName}" />
@@ -24,13 +23,13 @@
 										Type</label>
 								</td>
 								<td><input type="text" id="assetType" name="assetType"
-									value="File" readonly="readonly" />
+									value="Files" readonly="readonly" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="supportType">Support</label>
 								</td>
 								<td><input type="text" id="supportType" name="supportType"
 									value="${fileInstance.supportType}" /></td>
-								<td class="label" nowrap="nowrap"><label for="fileFormat">Format</label>
+								<td class="label" nowrap="nowrap"><label for="fileFormat">Format<span style="color: red;">*</span></label>
 								</td>
 								<td><input type="text" id="fileFormat" name="fileFormat"
 									value="${fileInstance.fileFormat}" />
@@ -38,12 +37,12 @@
 							</tr>
 
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="environment">Enviorn
+								<td class="label" nowrap="nowrap"><label for="environment">Environment
 								</label>
 								</td>
 								<td><g:select id="environment" name="environment" from="${com.tds.asset.AssetEntity.constraints.environment.inList}"/>
 								</td>
-								<td class="label" nowrap="nowrap"><label for="fileSize">Size
+								<td class="label" nowrap="nowrap"><label for="fileSize">Size<span style="color: red;">*</span>
 								</label>
 								</td>
 								<td><input type="text" id="fileSize" name="fileSize"
@@ -70,7 +69,7 @@
 		</tr>
 		<tr>
 			<td valign="top">
-				<div style="width: 400px;">
+				<div style="width: auto;">
 					<span style="float: left;"><h1>Supports:</h1></span>
 					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('support')"></span>
 					<br/>
@@ -78,6 +77,7 @@
 						<thead>
 							<tr>
 								<th>Frequency</th>
+								<th>Entity Type</th>
 								<th>Name</th>
 								<th>Type</th>
 								<th>Status</th>
@@ -89,7 +89,7 @@
 					</table>
 				</div></td>
 			<td valign="top">
-				<div  style="width: 400px;">
+				<div  style="width: auto;">
 					<span style="float: left;"><h1>Is dependent on:</h1></span>
 					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('dependent')"></span>
 					<br/>
@@ -97,6 +97,7 @@
 						<thead>
 							<tr>
 								<th>Frequency</th>
+								<th>Entity Type</th>
 								<th>Name</th>
 								<th>Type</th>
 								<th>Status</th>

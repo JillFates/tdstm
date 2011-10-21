@@ -4,7 +4,7 @@
 				<table>
 					<tbody>
 						<tr>
-							<td class="label" nowrap="nowrap"><label for="assetName">App Name</label>
+							<td class="label" nowrap="nowrap"><label for="assetName">Name</label>
 							</td>
 							<td style="font-weight:bold;">
 								${applicationInstance.assetName}
@@ -148,6 +148,7 @@
 					<thead>
 						<tr>
 							<th>Frequency</th>
+							<th>Entity Type</th>
 							<th>Name</th>
 							<th>Type</th>
 							<th>Status</th>
@@ -155,9 +156,12 @@
 					</thead>
 					<tbody>
 						<g:each in="${supportAssets}" var="support" status="i">
-							<tr onclick="getAppDetails(${support?.asset?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
+							<tr onclick="getAppDetails('${support?.asset?.assetType}', ${support?.asset?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
 								<td class="dep-${support.status}">
 									${support?.dataFlowFreq}
+								</td>
+								<td class="dep-${support.status}">
+									${support?.asset?.assetType}
 								</td>
 								<td class="dep-${support.status}">
 									${support?.asset?.assetName}
@@ -181,6 +185,7 @@
 					<thead>
 						<tr>
 							<th>Frequency</th>
+							<th>Entity Type</th>
 							<th>Name</th>
 							<th>Type</th>
 							<th>Status</th>
@@ -188,9 +193,12 @@
 					</thead>
 					<tbody>
 						<g:each in="${dependentAssets}" var="dependent" status="i">
-							<tr onclick="getAppDetails(${dependent.dependent?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
+							<tr onclick="getAppDetails('${dependent.dependent?.assetType}', ${dependent.dependent?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
 								<td class="dep-${dependent.status}">
 									${dependent.dataFlowFreq}
+								</td>
+								<td class="dep-${dependent.status}">
+									${dependent.dependent?.assetType}
 								</td>
 								<td class="dep-${dependent.status}">
 									${dependent.dependent?.assetName}

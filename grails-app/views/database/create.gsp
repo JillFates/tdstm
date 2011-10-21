@@ -1,13 +1,12 @@
 <g:form method="post">
-	<table style="border: 0;width:1000px">
+	<table style="border: 0">
 		<tr>
 			<td colspan="2">
 				<div class="dialog">
 					<table>
 						<tbody>
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="assetName">DB
-										Name</label>
+								<td class="label" nowrap="nowrap"><label for="assetName">Name<span style="color: red;">*</span></label>
 								</td>
 								<td><input type="text" id="assetName" name="assetName"
 									value="${databaseInstance.assetName}" />
@@ -24,12 +23,12 @@
 										Type</label>
 								</td>
 								<td><input type="text" id="assetType" name="assetType" readonly="readonly"
-									value="DataBase" /></td>
+									value="Database" /></td>
 								<td class="label" nowrap="nowrap"><label for="supportType">Support</label>
 								</td>
 								<td><input type="text" id="supportType" name="supportType"
 									value="${databaseInstance.supportType}" /></td>
-								<td class="label" nowrap="nowrap"><label for="dbFormat">Format</label>
+								<td class="label" nowrap="nowrap"><label for="dbFormat">Format<span style="color: red;">*</span></label>
 								</td>
 								<td><input type="text" id="dbFormat" name="dbFormat"
 									value="${databaseInstance.dbFormat}" />
@@ -38,12 +37,12 @@
 
 							<tr>
 
-								<td class="label" nowrap="nowrap"><label for="environment">Enviorn
+								<td class="label" nowrap="nowrap"><label for="environment">Environment
 								</label>
 								</td>
 								<td><g:select id="environment" name="environment" from="${com.tds.asset.AssetEntity.constraints.environment.inList}"/>
 								</td>
-								<td class="label" nowrap="nowrap"><label for="dbSize">Size
+								<td class="label" nowrap="nowrap"><label for="dbSize">Size<span style="color: red;">*</span>
 								</label>
 								</td>
 								<td><input type="text" id="dbSize" name="dbSize" value="${databaseInstance.dbSize}" />
@@ -89,7 +88,7 @@
 		</tr>
 				<tr>
 			<td valign="top">
-				<div style="width: 400px;">
+				<div style="width: auto;">
 					<span style="float: left;"><h1>Supports:</h1></span>
 					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('support')"></span>
 					<br/>
@@ -97,6 +96,7 @@
 						<thead>
 							<tr>
 								<th>Frequency</th>
+								<th>Entity Type</th>
 								<th>Asset</th>
 								<th>Type</th>
 								<th>Status</th>
@@ -108,7 +108,7 @@
 					</table>
 				</div></td>
 			<td valign="top">
-				<div  style="width: 400px;">
+				<div  style="width: auto;">
 					<span style="float: left;"><h1>Is dependent on:</h1></span>
 					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('dependent')"></span>
 					<br/>
@@ -116,6 +116,7 @@
 						<thead>
 							<tr>
 								<th>Frequency</th>
+								<th>Entity Type</th>
 								<th>Asset</th>
 								<th>Type</th>
 								<th>Status</th>

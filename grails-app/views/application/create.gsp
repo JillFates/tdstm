@@ -6,7 +6,7 @@
 					<table>
 						<tbody>
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="assetName">App Name</label></td>
+								<td class="label" nowrap="nowrap"><label for="assetName">Name<span style="color: red;">*</span></label></td>
 								<td ><input type="text" id="assetName" name="assetName" value="${applicationInstance.assetName}" tabindex="11"/></td>
 								<td class="label" nowrap="nowrap">Description</td>
 								<td colspan="3"><input type="text" id="description" name="description" value="" size="50" tabindex="21"/>
@@ -134,7 +134,7 @@
 		</tr>
 		<tr>
 			<td valign="top">
-				<div style="width: 400px;">
+				<div style="width: auto;">
 					<span style="float: left;"><h1>Supports:</h1></span>
 					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('support')"></span>
 					<br/>
@@ -142,6 +142,7 @@
 						<thead>
 							<tr>
 								<th>Frequency</th>
+								<th>Entity Type</th>
 								<th>Name</th>
 								<th>Type</th>
 								<th>Status</th>
@@ -153,7 +154,7 @@
 					</table>
 				</div></td>
 			<td valign="top">
-				<div  style="width: 400px;">
+				<div style="width: auto;">
 					<span style="float: left;"><h1>Is dependent on:</h1></span>
 					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('dependent')"></span>
 					<br/>
@@ -161,6 +162,7 @@
 						<thead>
 							<tr>
 								<th>Frequency</th>
+								<th>Entity Type</th>
 								<th>Name</th>
 								<th>Type</th>
 								<th>Status</th>

@@ -7,8 +7,7 @@
 					<table>
 						<tbody>
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="assetName">App
-										Name</label>
+								<td class="label" nowrap="nowrap"><label for="assetName">Name<span style="color: red;">*</span></label>
 								</td>
 								<td><input type="text" id="assetName" name="assetName"
 									value="${fileInstance.assetName}" />
@@ -30,7 +29,7 @@
 								<td><input type="text" id="supportType" name="supportType"
 									value="${fileInstance.supportType}" /></td>
 								<td class="label" nowrap="nowrap"><label for="fileFormat">
-										Format</label>
+										Format<span style="color: red;">*</span></label>
 								</td>
 								<td><input type="text" id="fileFormat" name="fileFormat"
 									value="${fileInstance.fileFormat}" /></td>
@@ -38,11 +37,11 @@
 
 							<tr>
 
-								<td class="label" nowrap="nowrap"><label for="environment">Enviorn</label>
+								<td class="label" nowrap="nowrap"><label for="environment">Environment</label>
 								</td>
 								<td><g:select id="environment" name="environment" from="${com.tds.asset.AssetEntity.constraints.environment.inList}" value="${fileInstance.environment}" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="fileSize">Size</label>
+								<td class="label" nowrap="nowrap"><label for="fileSize">Size<span style="color: red;">*</span></label>
 								</td>
 								<td><input type="text" id="fileSize" name="fileSize"
 									value="${fileInstance.fileSize}" /></td>

@@ -1,5 +1,4 @@
-<%@page import="com.tds.asset.Files" %>
-<%@page import="com.tds.asset.AssetEntity"%>
+<%@page import="com.tds.asset.AssetEntity;com.tds.asset.Application;com.tds.asset.Database;com.tds.asset.Files;"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -20,7 +19,7 @@ function onInvokeAction(id) {
 }
 function onInvokeExportAction(id) {
     var parameterString = createParameterStringForLimit(id);
-    location.href = 'listApps?' + parameterString;
+    location.href = 'list?' + parameterString;
 }
 $(document).ready(function() {
 	$("#createFilesView").dialog({ autoOpen: false })
@@ -33,12 +32,14 @@ $(document).ready(function() {
 
 <title>Files List</title>
 </head>
+<body>
+<div class="body">
+<h1>Files List</h1>
 <g:if test="${flash.message}">
 <div class="message">${flash.message}</div>
 </g:if>
 
 <div id="jmesaId" class="body">
-	<h1>Files List</h1>
 	<form name="listFileForm" action="list">
 		<jmesa:tableFacade id="tag" items="${filesList}" maxRows="50"
 			exportTypes="csv,excel" stateAttr="restore" var="fileInstance"
@@ -47,32 +48,26 @@ $(document).ready(function() {
 				<jmesa:htmlRow highlighter="true">
 					<jmesa:htmlColumn property="id" sortable="false" filterable="false"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions">
-						<g:remoteLink controller="assetEntity" action="editShow"
-							id="${fileInstance.id}">
-							<img
-								src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}"
-								border="0px" />
-						</g:remoteLink>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="fileFormat" sortable="true"
 						title="FileFormat" filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<a href="javascript:getFilesDetails(${fileInstance.id})">${fileInstance.fileFormat}</a>
+						<a href="javascript:getFilesDetails('${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.fileFormat}</a>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="fileSize" title="FileSize"
 						sortable="true" filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<a href="javascript:getFilesDetails(${fileInstance.id})">${fileInstance.fileSize}</a>
+						<a href="javascript:getFilesDetails('${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.fileSize}</a>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="moveBundle" sortable="true"
 						filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<a href="javascript:getFilesDetails(${fileInstance.id})">${fileInstance.moveBundle}</a>
+						<a href="javascript:getFilesDetails('${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.moveBundle}</a>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="planStatus" sortable="true"
 						filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<a href="javascript:getFilesDetails(${fileInstance.id})">${fileInstance.planStatus}</a>
+						<a href="javascript:getFilesDetails('${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.planStatus}</a>
 					</jmesa:htmlColumn>
 
 				</jmesa:htmlRow>
@@ -92,23 +87,27 @@ $(document).ready(function() {
      <table id="assetDependencyRow">
 	  <tr>
 		<td><g:select name="dataFlowFreq" from="${assetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
-		<td><g:select name="asset" from="${Files.findAllByAssetType('File')}" optionKey="id" optionValue="assetName"></g:select></td>
+		<td><g:select name="entity" from="['Server','Application','DB','Files']" onchange='updateAssetsList(this.name, this.value)'></g:select></td>
+		<td><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></td>
 		<td><g:select name="dtype" from="${assetDependency.constraints.type.inList}"></g:select></td>
 		<td><g:select name="status" from="${assetDependency.constraints.status.inList}"></g:select></td>
 	</tr>
 	</table>
     </div>
+     <div style="display: none;">
+		<span id="Server"><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+		<span id="Application"><g:select name="asset" from="${applications}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+		<span id="DB"><g:select name="asset" from="${dbs}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+		<span id="Files"><g:select name="asset" from="${files}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+	</div>
 </div>
-
 </div>
-
-<div id="dbShowView" style="display: none;"></div>
-
-</html>
 <script type="text/javascript">
- function getFilesDetails(value){
-	   var val = value
-	   ${remoteFunction(action:'show', params:'\'id=\' + val ', onComplete:"showFileView(e)")}
+ function getFilesDetails(type, value){
+	 if(type == "Files"){
+	  	var val = value
+	   	${remoteFunction(action:'show', params:'\'id=\' + val ', onComplete:"showFileView(e)")}
+	 }
 }
 function showFileView(e){
 	 var resp = e.responseText;
@@ -137,7 +136,7 @@ function editFileView(e){
 }
 function addAssetDependency( type ){
 	var rowNo = $("#"+type+"Count").val()
-	var rowData = $("#assetDependencyRow tr").html().replace("dataFlowFreq","dataFlowFreq_"+type+"_"+rowNo).replace("asset","asset_"+type+"_"+rowNo).replace("dtype","dtype_"+type+"_"+rowNo).replace("status","status_"+type+"_"+rowNo)
+	var rowData = $("#assetDependencyRow tr").html().replace("dataFlowFreq","dataFlowFreq_"+type+"_"+rowNo).replace("asset","asset_"+type+"_"+rowNo).replace("dtype","dtype_"+type+"_"+rowNo).replace("status","status_"+type+"_"+rowNo).replace("entity","entity_"+type+"_"+rowNo)
 	if(type!="support"){
 		$("#createDependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
 	} else {
@@ -148,4 +147,11 @@ function addAssetDependency( type ){
 function deleteRow( rowId ){
 	$("#"+rowId).remove()
 }
+function updateAssetsList( name, value ){
+	var idValues = name.split("_")
+	$("select[name='asset_"+idValues[1]+"_"+idValues[2]+"']").html($("#"+value+" select").html())
+}
+
 </script>
+</body>
+</html>

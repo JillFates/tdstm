@@ -4,8 +4,7 @@
 				<table>
 					<tbody>
 						<tr class="prop">
-							<td class="label" nowrap="nowrap"><label for="assetName">App
-									Name</label></td>
+							<td class="label" nowrap="nowrap"><label for="assetName">Name</label></td>
 							<td style="font-weight:bold;">${databaseInstance?.assetName}</td>
 
 							<td class="label" nowrap="nowrap">Description</td>
@@ -28,7 +27,7 @@
 
 						<tr class="prop">
 
-							<td class="label" nowrap="nowrap"><label for="environment">Enviorn
+							<td class="label" nowrap="nowrap"><label for="environment">Environment
 							</label></td>
 							<td>${databaseInstance?.environment}</td>
 
@@ -69,16 +68,18 @@
 				<thead>
 					<tr>
 						<th>Frequency</th>
+						<th>Entity Type</th>
 						<th>Name</th>
 						<th>Type</th>
 						<th>Status</th>
 					</tr>
 				</thead>
 				<tbody>
-					<g:each in="${supportAssets}" var="support">
-						<tr>
+					<g:each in="${supportAssets}" var="support" status="i">
+						<tr onclick="getDbDetails('${support?.asset?.assetType}', ${support?.asset?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
 							<td class="dep-${support.status}">${support?.dataFlowFreq}</td>
-							<td class="dep-${support.status}">${support?.asset}</td>
+							<td class="dep-${support.status}">${support?.asset?.assetType}</td>
+							<td class="dep-${support.status}">${support?.asset?.assetName}</td>
 							<td class="dep-${support.status}">${support.type}</td>
 							<td class="dep-${support.status}">${support.status}</td>
 						
@@ -94,16 +95,18 @@
 				<thead>
 					<tr>
 						<th>Frequency</th>
+						<th>Entity Type</th>
 						<th>Name</th>
 						<th>Type</th>
 						<th>Status</th>
 					</tr>
 				</thead>
 				<tbody>
-					<g:each in="${dependentAssets}" var="dependent">
-						<tr>
+					<g:each in="${dependentAssets}" var="dependent" status="i">
+						<tr onclick="getDbDetails('${dependent.dependent?.assetType}', ${dependent.dependent?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
 							<td class="dep-${dependent.status}">${dependent.dataFlowFreq}</td>
-							<td class="dep-${dependent.status}">${dependent.dependent}</td>
+							<td class="dep-${dependent.status}">${dependent.dependent?.assetType}</td>
+							<td class="dep-${dependent.status}">${dependent.dependent?.assetName}</td>
 							<td class="dep-${dependent.status}">${dependent.type}</td>
 							<td class="dep-${dependent.status}">${dependent.status}</td>
 						

@@ -8,6 +8,7 @@ private static final long serialVersionUID = 1L;
 	
 	private long id;
 	private String assetTag;
+	private String assetType;
 	private String assetName;
 	private String commentType;
 	private Integer priority;
@@ -47,6 +48,14 @@ private static final long serialVersionUID = 1L;
 
 	public void setAssetTag(String assetTag) {
 		this.assetTag = assetTag;
+	}
+
+	public String getAssetType() {
+		return assetType;
+	}
+
+	public void setAssetType(String assetType) {
+		this.assetType = assetType;
 	}
 
 	public String getAssetName() {

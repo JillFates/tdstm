@@ -1,4 +1,3 @@
-<%@page import="com.tds.asset.Application;"%>
 <g:form method="post">
 	<input type="hidden" name="id" value="${applicationInstance?.id}" />
 	<table style="border: 0">
@@ -8,7 +7,7 @@
 					<table>
 						<tbody>
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="assetName">App Name</label></td>
+								<td class="label" nowrap="nowrap"><label for="assetName">Name<span style="color: red;">*</span></label></td>
 								<td ><input type="text" id="assetName" name="assetName" value="${applicationInstance.assetName}" tabindex="11"/></td>
 								<td class="label" nowrap="nowrap">Description</td>
 								<td colspan="3"><input type="text" id="description" name="description" value="" size="50" tabindex="21"/>
@@ -136,7 +135,7 @@
 		</tr>
 		<tr>
 			<td valign="top">
-				<div style="width: 400px;">
+				<div style="width: auto;">
 					<span style="float: left;"><h1>Supports:</h1></span>
 					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('support')"></span>
 					<br/>
@@ -144,6 +143,7 @@
 						<thead>
 							<tr>
 								<th>Frequency</th>
+								<th>Entity Type</th>
 								<th>Name</th>
 								<th>Type</th>
 								<th>Status</th>
@@ -154,7 +154,8 @@
 							<g:each in="${supportAssets}" var="support" status="i">
 								<tr id='row_s_${i}'>
 									<td><g:select name="dataFlowFreq_support_${i}" value="${support.dataFlowFreq}" from="${support.constraints.dataFlowFreq.inList}" /></td>
-									<td><g:select name="asset_support_${i}" from="${com.tds.asset.Application.findAllByAssetType('application')}" value="${support?.asset?.id}" optionKey="id" optionValue="assetName"></g:select></td>
+									<td><g:select name="entity_support_${i}" from="['Server','Application','DB','Files']" onchange='updateAssetsList(this.name, this.value)' value="${support?.asset?.assetType}"></g:select></td>
+									<td><g:select name="asset_support_${i}" from="${com.tds.asset.Application.findAllByAssetType('application')}" value="${support?.asset?.id}" optionKey="id" optionValue="assetName"  style="width:90px;"></g:select></td>
 									<td><g:select name="dtype_support_${i}" value="${support.type}" from="${support.constraints.type.inList}" />
 									</td>
 									<td><g:select name="status_support_${i}" value="${support.status}"	from="${support.constraints.status.inList}" />
@@ -166,7 +167,7 @@
 					</table>
 				</div></td>
 			<td valign="top">
-				<div style="width: 400px;">
+				<div style="width: auto;">
 					<span style="float: left;"><h1>Is dependent on:</h1></span>
 					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('dependent')"></span>
 					<br/>
@@ -174,6 +175,7 @@
 						<thead>
 							<tr>
 								<th>Frequency</th>
+								<th>Entity Type</th>
 								<th>Name</th>
 								<th>Type</th>
 								<th>Status</th>
@@ -184,7 +186,8 @@
 						<g:each in="${dependentAssets}" var="dependent" status="i">
 							<tr id='row_d_${i}'>
 								<td><g:select name="dataFlowFreq_dependent_${i}" value="${dependent.dataFlowFreq}" from="${dependent.constraints.dataFlowFreq.inList}" /></td>
-								<td><g:select name="asset_dependent_${i}" from="${com.tds.asset.Application.findAllByAssetType('application')}" value="${dependent?.dependent?.id}" optionKey="id" optionValue="assetName"></g:select></td>
+								<td><g:select name="entity_dependent_${i}" from="['Server','Application','DB','Files']" onchange='updateAssetsList(this.name, this.value)' value="${dependent?.dependent?.assetType}"></g:select></td>
+								<td><g:select name="asset_dependent_${i}" from="${com.tds.asset.Application.findAllByAssetType('application')}" value="${dependent?.dependent?.id}" optionKey="id" optionValue="assetName"  style="width:90px;"></g:select></td>
 								<td><g:select name="dtype_dependent_${i}" value="${dependent.type}" from="${dependent.constraints.type.inList}" />
 								</td>
 								<td><g:select name="status_dependent_${i}" value="${dependent.status}" from="${dependent.constraints.status.inList}" />

@@ -1,10 +1,11 @@
+import java.text.SimpleDateFormat
+
+import net.tds.util.jmesa.AssetEntityBean
+
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
 import org.jmesa.limit.Limit
-import org.jsecurity.SecurityUtils
 
-import net.tds.util.jmesa.AssetEntityBean
-import com.tds.asset.Database
 import com.tds.asset.Application
 import com.tds.asset.ApplicationAssetMap
 import com.tds.asset.AssetCableMap
@@ -13,9 +14,10 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetTransition
+import com.tds.asset.Database
+import com.tds.asset.Files
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
-import java.text.SimpleDateFormat
 import com.tdssrc.grails.GormUtil
 
 
@@ -35,6 +37,7 @@ class DatabaseController {
 		databaseInstanceList.each {dataBaseentity ->
 			AssetEntityBean dataBeanInstance = new AssetEntityBean();
 			dataBeanInstance.setId(dataBaseentity.id)
+			dataBeanInstance.setAssetType(dataBaseentity.assetType)
 			dataBeanInstance.setDbFormat(dataBaseentity.dbFormat)
 			dataBeanInstance.setDbSize(dataBaseentity.dbSize)
 			dataBeanInstance.setMoveBundle(dataBaseentity?.moveBundle?.name)
@@ -42,6 +45,10 @@ class DatabaseController {
 			databaseList.add(dataBeanInstance)
 		}
 		TableFacade tableFacade = new TableFacadeImpl("tag", request)
+		def servers = AssetEntity.findAllByAssetTypeAndProject('Server',project)
+		def applications = Application.findAllByAssetTypeAndProject('Application',project)
+		def dbs = Database.findAllByAssetTypeAndProject('Database',project)
+		def files = Files.findAllByAssetTypeAndProject('Files',project)
 		try{
 			tableFacade.items = databaseList
 			Limit limit = tableFacade.limit
@@ -50,9 +57,11 @@ class DatabaseController {
 				tableFacade.setColumnProperties("id","dbFormat","dbSize","moveBundle","planStatus")
 				tableFacade.render()
 			}else
-				return [databaseList : databaseList , projectId: projectId ,assetDependency: new AssetDependency()]
+				return [databaseList : databaseList , projectId: projectId ,assetDependency: new AssetDependency(),
+					servers : servers, applications : applications, dbs : dbs, files : files]
 		}catch(Exception e){
-			return [databaseList : null,projectId: projectId]
+			return [databaseList : null,projectId: projectId,
+					servers : servers, applications : applications, dbs : dbs, files : files]
 		}
 		
 		

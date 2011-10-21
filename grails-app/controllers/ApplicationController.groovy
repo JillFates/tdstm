@@ -1,3 +1,7 @@
+import org.jmesa.limit.Limit
+
+import com.tds.asset.AssetEntity
+
 import java.text.SimpleDateFormat
 
 import net.tds.util.jmesa.AssetEntityBean
@@ -5,7 +9,6 @@ import net.tds.util.jmesa.AssetEntityBean
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
 import org.jmesa.limit.Limit
-import org.jsecurity.SecurityUtils
 
 import com.tds.asset.Application
 import com.tds.asset.ApplicationAssetMap
@@ -15,6 +18,8 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetTransition
+import com.tds.asset.Database
+import com.tds.asset.Files
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.GormUtil
@@ -40,6 +45,7 @@ class ApplicationController {
 			AssetEntityBean appBeanInstance = new AssetEntityBean();
 			appBeanInstance.setId(appEntity.id)
 			appBeanInstance.setAssetName(appEntity.assetName)
+			appBeanInstance.setAssetType(appEntity.assetType)
 			appBeanInstance.setAppOwner(appEntity.appOwner)
 			appBeanInstance.setAppSme(appEntity.appSme)
 			appBeanInstance.setMoveBundle(appEntity.moveBundle?.name)
@@ -47,6 +53,10 @@ class ApplicationController {
 			appBeanList.add(appBeanInstance)
 		}
 		TableFacade tableFacade = new TableFacadeImpl("tag", request)
+		def servers = AssetEntity.findAllByAssetTypeAndProject('Server',project)
+		def applications = Application.findAllByAssetTypeAndProject('Application',project)
+		def dbs = Database.findAllByAssetTypeAndProject('Database',project)
+		def files = Files.findAllByAssetTypeAndProject('Files',project)
 		try{
 			tableFacade.items = appBeanList
 			Limit limit = tableFacade.limit
@@ -55,10 +65,11 @@ class ApplicationController {
 				tableFacade.setColumnProperties("id","application","appOwner","appSme","movebundle","planStatus")
 				tableFacade.render()
 			} else {
-				return [assetEntityList : appBeanList , projectId: projectId, assetDependency: new AssetDependency()]
+				return [assetEntityList : appBeanList , projectId: projectId, assetDependency: new AssetDependency(),
+					servers : servers, applications : applications, dbs : dbs, files : files]
 			}
 		}catch(Exception e){
-			return [assetEntityList : null, projectId: projectId]
+			return [assetEntityList : null, projectId: projectId , servers : servers, applications : applications, dbs : dbs, files : files]
 		}
 	}
 	def create ={

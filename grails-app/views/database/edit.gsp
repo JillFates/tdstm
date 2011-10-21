@@ -8,8 +8,7 @@
 					<table>
 						<tbody>
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="assetName">App
-										Name</label>
+								<td class="label" nowrap="nowrap"><label for="assetName">Name<span style="color: red;">*</span></label>
 								</td>
 								<td><input type="text" id="assetName" name="assetName"
 									value="${databaseInstance.assetName}" />
@@ -25,13 +24,13 @@
 										Type</label>
 								</td>
 								<td><input type="text" id="assetType" name="assetType" readonly="readonly"
-									value="DataBase" /></td>
+									value="${databaseInstance.assetType}" /></td>
 								<td class="label" nowrap="nowrap"><label for="supportType">Support</label>
 								</td>
 								<td><input type="text" id="supportType" name="supportType"
 									value="${databaseInstance.supportType}" /></td>
 								<td class="label" nowrap="nowrap"><label for="dbFormat">
-										Format</label>
+										Format<span style="color: red;">*</span></label>
 								</td>
 								<td><input type="text" id="dbFormat" name="dbFormat"
 									value="${databaseInstance.dbFormat}" />
@@ -39,11 +38,11 @@
 
 							<tr>
 
-								<td class="label" nowrap="nowrap"><label for="environment">Enviorn</label>
+								<td class="label" nowrap="nowrap"><label for="environment">Environment</label>
 								</td>
 								<td><g:select id="environment" name="environment" from="${com.tds.asset.AssetEntity.constraints.environment.inList}" value="${databaseInstance.environment}" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="dbSize">Size</label>
+								<td class="label" nowrap="nowrap"><label for="dbSize">Size<span style="color: red;">*</span></label>
 								</td>
 								<td><input type="text" id="dbSize" name="dbSize"
 									value="${databaseInstance.dbSize}" /></td>
