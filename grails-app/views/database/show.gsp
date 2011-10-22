@@ -16,21 +16,21 @@
 							<td>${databaseInstance?.assetType}</td>
 							<td class="label" nowrap="nowrap"><label for="supportType">Support</label></td>
 							<td>${databaseInstance?.supportType}</td>
-							<td class="label" nowrap="nowrap"><label for="dbFormat">Format</label></td>
-							<td>${databaseInstance?.dbFormat}</td>
-						</tr>
-						<tr class="prop">
 							<td class="label" nowrap="nowrap"><label for="environment">Environment</label></td>
 							<td>${databaseInstance?.environment}</td>
-							<td class="label" nowrap="nowrap"><label for="dbSize">Size</label></td>
-							<td>${databaseInstance?.dbSize}</td>
+						</tr>
+						<tr class="prop">
+							<td class="label" nowrap="nowrap"><label for="dbFormat">Format</label></td>
+							<td>${databaseInstance?.dbFormat}</td>
 							<td class="label" nowrap="nowrap">Retire</td>
 							<td><tds:convertDate date="${databaseInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							</td>
-						</tr>
-						<tr class="prop">
 							<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
 							<td>${databaseInstance?.moveBundle}</td>
+						</tr>
+						<tr class="prop">
+							<td class="label" nowrap="nowrap"><label for="dbSize">Size</label></td>
+							<td>${databaseInstance?.dbSize}</td>
 							<td class="label" nowrap="nowrap">Maint Exp.</td>
 							<td><tds:convertDate date="${databaseInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
 							<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
