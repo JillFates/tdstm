@@ -26,7 +26,6 @@ $(document).ready(function() {
 	$("#showFilesView").dialog({ autoOpen: false })
 	$("#editFilesView").dialog({ autoOpen: false })
 	$('#assetMenu').show();
-	$('#reportsMenu').hide();
 })
 </script>
 

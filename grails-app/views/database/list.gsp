@@ -26,7 +26,6 @@ $(document).ready(function() {
 	$("#createDBView").dialog({ autoOpen: false })
 	$("#editDBView").dialog({ autoOpen: false })
 	$('#assetMenu').show();
-	$('#reportsMenu').hide();
 })
 </script>
 
@@ -101,9 +100,9 @@ $(document).ready(function() {
 			onclick="${remoteFunction(action:'create', onComplete:'createDbView(e)')}" />
 		</span>
 	</div>
-	<div id="createDBView" style="display: none;" title="Create DB"></div>
-	<div id="showDBView" style="display: none;" title="Show DB"></div>
-	<div id="editDBView" style="display: none;" title="Edit DB"></div>
+	<div id="createDBView" style="display: none;" title="Create Database"></div>
+	<div id="showDBView" style="display: none;" title="Show Database"></div>
+	<div id="editDBView" style="display: none;" title="Edit Database"></div>
 	<div style="display: none;">
      <table id="assetDependencyRow">
 	  <tr>

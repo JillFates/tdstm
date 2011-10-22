@@ -24,11 +24,10 @@ function onInvokeExportAction(id) {
     location.href = 'list?' + parameterString;
 }
 $(document).ready(function() {
+	$('#assetMenu').show();
 	$("#createAppView").dialog({ autoOpen: false })
 	$("#showAppView").dialog({ autoOpen: false })
 	$("#editAppView").dialog({ autoOpen: false })
-	$('#assetMenu').show();
-	$('#reportsMenu').hide();
 })
 </script>
 
@@ -50,7 +49,7 @@ $(document).ready(function() {
 						<span id="icon_${appEntityInstance.id}">
 							<g:if test="${appEntityInstance.commentType == 'issue'}">
 								<g:remoteLink controller="assetEntity" action="listComments" id="${appEntityInstance.id}" before='setAssetId(${appEntityInstance.id});'	onComplete="listCommentsDialog( e ,'never' );">
-									<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}"	border="0px"/>
+									<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="0px"/>
 								</g:remoteLink>
 							</g:if>
 							<g:elseif test="${appEntityInstance.commentType == 'comment'}">
