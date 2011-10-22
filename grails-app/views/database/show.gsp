@@ -1,60 +1,40 @@
 <table style="border: 0">
 	<tr>
-		<td colspan="2"><div class="dialog">
+		<td colspan="2">
+			<div class="dialog">
 				<table>
 					<tbody>
 						<tr class="prop">
 							<td class="label" nowrap="nowrap"><label for="assetName">Name</label></td>
 							<td style="font-weight:bold;">${databaseInstance?.assetName}</td>
-
 							<td class="label" nowrap="nowrap">Description</td>
-							<td colspan="3">This Application the XYZ Business</td>
+							<td colspan="3">${databaseInstance.description}</td>
 
 						</tr>
-
 						<tr class="prop">
 							<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
 							<td>${databaseInstance?.assetType}</td>
-
-							<td class="label" nowrap="nowrap"><label for="supportType">Support
-							</label></td>
+							<td class="label" nowrap="nowrap"><label for="supportType">Support</label></td>
 							<td>${databaseInstance?.supportType}</td>
-
-							<td class="label" nowrap="nowrap"><label for="dbFormat">
-									Format </label></td>
+							<td class="label" nowrap="nowrap"><label for="dbFormat">Format</label></td>
 							<td>${databaseInstance?.dbFormat}</td>
 						</tr>
-
 						<tr class="prop">
-
-							<td class="label" nowrap="nowrap"><label for="environment">Environment
-							</label></td>
+							<td class="label" nowrap="nowrap"><label for="environment">Environment</label></td>
 							<td>${databaseInstance?.environment}</td>
-
-							<td class="label" nowrap="nowrap"><label for="dbSize">Size
-							</label></td>
+							<td class="label" nowrap="nowrap"><label for="dbSize">Size</label></td>
 							<td>${databaseInstance?.dbSize}</td>
 							<td class="label" nowrap="nowrap">Retire</td>
-							<td><tds:convertDate
-									date="${databaseInstance?.retireDate}"
-									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+							<td><tds:convertDate date="${databaseInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							</td>
 						</tr>
-
 						<tr class="prop">
-							<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label>
-							</td>
+							<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
 							<td>${databaseInstance?.moveBundle}</td>
 							<td class="label" nowrap="nowrap">Maint Exp.</td>
-							<td><tds:convertDate
-									date="${databaseInstance?.maintExpDate}"
-									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
-							</td>
-							<td class="label" nowrap="nowrap"><label for="planStatus">Plan
-									Status</label>
-							</td>
+							<td><tds:convertDate date="${databaseInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
+							<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
 							<td>${databaseInstance?.planStatus}</td>
-
 						</tr>
 					</tbody>
 				</table>
@@ -90,7 +70,7 @@
 		</div></td>
 	<td valign="top">
 		<div>
-			<h1>Is dependent on:</h1>
+			<h1>Depends on:</h1>
 			<table style="width: 400px;">
 				<thead>
 					<tr>
@@ -109,7 +89,6 @@
 							<td class="dep-${dependent.status}">${dependent.dependent?.assetName}</td>
 							<td class="dep-${dependent.status}">${dependent.type}</td>
 							<td class="dep-${dependent.status}">${dependent.status}</td>
-						
 						</tr>
 					</g:each>
 				</tbody>
@@ -121,10 +100,8 @@
 			<div class="buttons">
 				<g:form>
 					<input type="hidden" name="id" value="${databaseInstance?.id}" />
-					<span class="button"><input type="button" class="edit"
-						value="Edit" onclick="editDb(${databaseInstance?.id})" /> </span>
-					<span class="button"><g:actionSubmit class="delete"
-							onclick="return confirm('Are you sure?');" value="Delete" /> </span>
+					<span class="button"><input type="button" class="edit" value="Edit" onclick="editDb(${databaseInstance?.id})" /> </span>
+					<span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /> </span>
 				</g:form>
 			</div>
 		</td>
