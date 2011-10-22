@@ -44,31 +44,54 @@ $(document).ready(function() {
 			exportTypes="csv,excel" stateAttr="restore" var="dataBaseInstance"
 			autoFilterAndSort="true" maxRowsIncrements="50,100,200">
 			<jmesa:htmlTable style=" border-collapse: separate" editable="true">
-				<jmesa:htmlRow highlighter="true">
+				<jmesa:htmlRow highlighter="true" style="cursor: pointer;">
 					<jmesa:htmlColumn property="id" sortable="false" filterable="false"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions">
+						<a href="javascript:editDb(${dataBaseInstance?.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
+						<span id="icon_${dataBaseInstance.id}">
+							<g:if test="${dataBaseInstance.commentType == 'issue'}">
+								<g:remoteLink controller="assetEntity" action="listComments" id="${dataBaseInstance.id}" before='setAssetId(${dataBaseInstance.id});'	onComplete="listCommentsDialog( e ,'never' );">
+									<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}"	border="0px"/>
+								</g:remoteLink>
+							</g:if>
+							<g:elseif test="${dataBaseInstance.commentType == 'comment'}">
+								<g:remoteLink controller="assetEntity" action="listComments" id="${dataBaseInstance.id}" before="setAssetId(${dataBaseInstance.id});" onComplete="listCommentsDialog( e ,'never' ); ">
+									<img src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px"/>
+								</g:remoteLink>
+							</g:elseif>
+							<g:else>
+							<a onclick="createNewAssetComment(${dataBaseInstance.id});">
+								<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px"/>
+							</a>
+							</g:else>
+						</span>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="assetName" title="Name" sortable="true"
 						filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<a href="javascript:getDbDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.assetName}</a>
+							<span onclick="getDbDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.assetName}</span>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="dbFormat" sortable="true"
-						title="DBFormat" filterable="true"
+						title="DB Format" filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<a href="javascript:getDbDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.dbFormat}</a>
+						<span onclick="getDbDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.dbFormat}</a>/
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="moveBundle" sortable="true"
 						filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<a href="javascript:getDbDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.moveBundle}</a>
+						<span onclick="getDbDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.moveBundle}</span>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="planStatus" sortable="true"
 						filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<a href="javascript:getDbDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.planStatus}</a>
+						<span onclick="getDbDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.planStatus}</span>
 					</jmesa:htmlColumn>
-
+					<jmesa:htmlColumn property="depUp" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        		<span onclick="getDbDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id} )">${dataBaseInstance.depUp}</span>
+		        	</jmesa:htmlColumn>
+		        	<jmesa:htmlColumn property="depDown" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        		<span onclick="getDbDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id} )">${dataBaseInstance.depDown}</span>
+		        	</jmesa:htmlColumn>
 				</jmesa:htmlRow>
 			</jmesa:htmlTable>
 		</jmesa:tableFacade>
@@ -95,7 +118,7 @@ $(document).ready(function() {
     <div style="display: none;">
 		<span id="Server"><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 		<span id="Application"><g:select name="asset" from="${applications}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
-		<span id="DB"><g:select name="asset" from="${dbs}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+		<span id="Database"><g:select name="asset" from="${dbs}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 		<span id="Files"><g:select name="asset" from="${files}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 	</div>
 </div>

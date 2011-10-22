@@ -11,7 +11,7 @@
 								<td><input type="text" id="assetName" name="assetName"
 									value="${databaseInstance.assetName}" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="assetName">Description</label></td>
+								<td class="label" nowrap="nowrap"><label for="description">Description</label></td>
 								<td colspan="3"><input type="text" id="description"
 									name="description"
 									value="${databaseInstance.description}" size="50" />
@@ -64,12 +64,12 @@
 								<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label>
 								</td>
 								<td><g:select from="${moveBundleList}" id="moveBundle"
-										name="moveBundle.id" value="${databaseInstance.moveBundle}"
+										name="moveBundle.id" value="${databaseInstance?.moveBundle}"
 										optionKey="id" optionValue="name" /></td>
 								<td  class="label"><label for="maintExpDate">Maint Exp.
 									</label></td>
 									<td valign="top"
-										class="value ${hasErrors(bean:projectInstance,field:'maintExpDate','errors')}">
+										class="value ${hasErrors(bean:databaseInstance,field:'maintExpDate','errors')}">
 									    <script type="text/javascript" charset="utf-8">
 					                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 					                    </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="maintExpDate" id="maintExpDate"

@@ -42,6 +42,7 @@ class ApplicationController {
 		def appEntityList = Application.findAllByProject(project)
 		def appBeanList = new ArrayList()
 		appEntityList.each { appEntity->
+			def assetEntity = AssetEntity.get(appEntity.id)
 			AssetEntityBean appBeanInstance = new AssetEntityBean();
 			appBeanInstance.setId(appEntity.id)
 			appBeanInstance.setAssetName(appEntity.assetName)
@@ -50,6 +51,17 @@ class ApplicationController {
 			appBeanInstance.setAppSme(appEntity.appSme)
 			appBeanInstance.setMoveBundle(appEntity.moveBundle?.name)
 			appBeanInstance.setplanStatus(appEntity.planStatus)
+			appBeanInstance.setDepUp(AssetDependency.countByDependent(assetEntity))
+			appBeanInstance.setDepDown(AssetDependency.countByAsset(assetEntity))
+			
+			if(AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
+				appBeanInstance.setCommentType("issue")
+			} else if(AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id)){
+				appBeanInstance.setCommentType("comment")
+			} else {
+				appBeanInstance.setCommentType("blank")
+			}
+			
 			appBeanList.add(appBeanInstance)
 		}
 		TableFacade tableFacade = new TableFacadeImpl("tag", request)
@@ -146,7 +158,7 @@ class ApplicationController {
 			def dependentAssets = AssetDependency.findAllByAsset(assetEntity)
 			def supportAssets = AssetDependency.findAllByDependent(assetEntity)
 
-			[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
+			[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project : project,
 						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, dependentAssets:dependentAssets]
 		}
 

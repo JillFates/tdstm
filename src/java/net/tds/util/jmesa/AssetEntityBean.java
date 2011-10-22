@@ -2,10 +2,9 @@ package net.tds.util.jmesa;
 
 import java.io.Serializable;
 
-
 public class AssetEntityBean implements Serializable {
-private static final long serialVersionUID = 1L;
-	
+	private static final long serialVersionUID = 1L;
+
 	private long id;
 	private String assetTag;
 	private String assetType;
@@ -17,21 +16,24 @@ private static final long serialVersionUID = 1L;
 	private String status;
 	private String cssClass;
 	private boolean checkVal;
-	
+
 	private String application;
 	private String appOwner;
 	private String appSme;
 	private String moveBundle;
-	private String planStatus; 
-	
+	private String planStatus;
+
 	private String dbFormat;
 	private Integer dbSize;
-	
+
 	private String fileFormat;
 	private Integer fileSize;
-	
+
+	private Integer depUp; // dependencies support count
+	private Integer depDown; // dependencies down count
+
 	public AssetEntityBean() {
-		
+
 	}
 
 	public long getId() {
@@ -121,6 +123,7 @@ private static final long serialVersionUID = 1L;
 	public void setCheckVal(boolean checkVal) {
 		this.checkVal = checkVal;
 	}
+
 	public String getApplication() {
 		return application;
 	}
@@ -191,5 +194,21 @@ private static final long serialVersionUID = 1L;
 
 	public void setFileSize(Integer fileSize) {
 		this.fileSize = fileSize;
+	}
+
+	public Integer getDepUp() {
+		return depUp;
+	}
+
+	public void setDepUp(Integer depUp) {
+		this.depUp = depUp;
+	}
+
+	public Integer getDepDown() {
+		return depDown;
+	}
+
+	public void setDepDown(Integer depDown) {
+		this.depDown = depDown;
 	}
 }

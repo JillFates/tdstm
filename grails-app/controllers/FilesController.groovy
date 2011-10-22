@@ -30,6 +30,7 @@ class FilesController {
 		def fileInstanceList = Files.findAllByProject(project)
 		def filesList = new ArrayList();
 		fileInstanceList.each {fileentity ->
+			def assetEntity = AssetEntity.get(fileentity.id)
 			AssetEntityBean filesEntity = new AssetEntityBean();
 			filesEntity.setId(fileentity.id)
 			filesEntity.setAssetType(fileentity.assetType)
@@ -38,6 +39,15 @@ class FilesController {
 			filesEntity.setFileSize(fileentity.fileSize)
 			filesEntity.setMoveBundle(fileentity?.moveBundle?.name)
 			filesEntity.setplanStatus(fileentity.planStatus)
+			filesEntity.setDepUp(AssetDependency.countByDependent(assetEntity))
+			filesEntity.setDepDown(AssetDependency.countByAsset(assetEntity))
+			if(AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
+				filesEntity.setCommentType("issue")
+			} else if(AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id)){
+				filesEntity.setCommentType("comment")
+			} else {
+				filesEntity.setCommentType("blank")
+			}
 			filesList.add(filesEntity)
 		}
 		TableFacade tableFacade = new TableFacadeImpl("tag", request)
@@ -124,7 +134,7 @@ class FilesController {
 			def dependentAssets = AssetDependency.findAllByAsset(assetEntity)
 			def supportAssets = AssetDependency.findAllByDependent(assetEntity)
 
-			[fileInstance:fileInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
+			[fileInstance:fileInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project : project,
 						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, dependentAssets:dependentAssets]
 		}
 		

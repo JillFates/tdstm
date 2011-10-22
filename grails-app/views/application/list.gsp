@@ -1,4 +1,4 @@
-<%@page import="com.tds.asset.AssetEntity;com.tds.asset.Application;com.tds.asset.Database;com.tds.asset.Files;"%>
+<%@page import="com.tds.asset.AssetEntity;com.tds.asset.Application;com.tds.asset.Database;com.tds.asset.Files;com.tds.asset.AssetComment;"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -44,23 +44,47 @@ $(document).ready(function() {
 	<form name="listAppsForm" action="list">
 		<jmesa:tableFacade id="tag" items="${assetEntityList}" maxRows="50" exportTypes="csv,excel" stateAttr="restore" var="appEntityInstance" autoFilterAndSort="true" maxRowsIncrements="50,100,200">
 		    <jmesa:htmlTable style=" border-collapse: separate" editable="true">
-		        <jmesa:htmlRow highlighter="true">
-		        	<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" >
-						</jmesa:htmlColumn>
+		        <jmesa:htmlRow highlighter="true" style="cursor: pointer;">
+		        	<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" nowrap>
+		        		<a href="javascript:editApp(${appEntityInstance?.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
+						<span id="icon_${appEntityInstance.id}">
+							<g:if test="${appEntityInstance.commentType == 'issue'}">
+								<g:remoteLink controller="assetEntity" action="listComments" id="${appEntityInstance.id}" before='setAssetId(${appEntityInstance.id});'	onComplete="listCommentsDialog( e ,'never' );">
+									<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}"	border="0px"/>
+								</g:remoteLink>
+							</g:if>
+							<g:elseif test="${appEntityInstance.commentType == 'comment'}">
+								<g:remoteLink controller="assetEntity" action="listComments" id="${appEntityInstance.id}" before="setAssetId(${appEntityInstance.id});" onComplete="listCommentsDialog( e ,'never' ); ">
+									<img src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px"/>
+								</g:remoteLink>
+							</g:elseif>
+							<g:else>
+							<a onclick="createNewAssetComment(${appEntityInstance.id});">
+								<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px"/>
+							</a>
+							</g:else>
+						</span>
+					</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="assetName" title="Name" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="appSme_${appEntityInstance.id}" onclick="getAppDetails('${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.assetName}</span>
+		        		<span onclick="getAppDetails('${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.assetName}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="appOwner"   sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="appSme_${appEntityInstance.id}" onclick="getAppDetails('${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.appOwner}</span>
+		        		<span onclick="getAppDetails('${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.appOwner}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="appSme" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="appSme_${appEntityInstance.id}" onclick="getAppDetails('${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.appSme}</span>
+		        		<span onclick="getAppDetails('${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.appSme}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="moveBundle" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="moveBundle_${appEntityInstance.id}" onclick="getAppDetails('${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.moveBundle}</span>
+		        		<span onclick="getAppDetails('${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.moveBundle}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="planStatus" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="planStatus_${appEntityInstance.id}" onclick="getAppDetails('${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.planStatus}</span>
+		        		<span onclick="getAppDetails('${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.planStatus}</span>
+		        	</jmesa:htmlColumn>
+		        	<jmesa:htmlColumn property="depUp" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        		<span onclick="getAppDetails('${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.depUp}</span>
+		        	</jmesa:htmlColumn>
+		        	<jmesa:htmlColumn property="depDown" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        		<span onclick="getAppDetails('${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.depDown}</span>
 		        	</jmesa:htmlColumn>
 		        	
 		        </jmesa:htmlRow>
@@ -88,7 +112,7 @@ $(document).ready(function() {
 <div style="display: none;">
 <span id="Server"><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 <span id="Application"><g:select name="asset" from="${applications}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
-<span id="DB"><g:select name="asset" from="${dbs}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+<span id="Database"><g:select name="asset" from="${dbs}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 <span id="Files"><g:select name="asset" from="${files}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 </div>
 </div>

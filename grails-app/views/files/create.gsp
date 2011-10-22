@@ -1,5 +1,5 @@
 <g:form method="post">
-	<table style="border: 0;width:1000px">
+	<table style="border: 0;">
 		<tr>
 			<td colspan="2">
 				<div class="dialog">

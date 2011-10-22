@@ -35,6 +35,7 @@ class DatabaseController {
 		def databaseInstanceList = Database.findAllByProject(project)
 		def databaseList = new ArrayList();
 		databaseInstanceList.each {dataBaseentity ->
+			def assetEntity = AssetEntity.get(dataBaseentity.id)
 			AssetEntityBean dataBeanInstance = new AssetEntityBean();
 			dataBeanInstance.setId(dataBaseentity.id)
 			dataBeanInstance.setAssetType(dataBaseentity.assetType)
@@ -42,6 +43,15 @@ class DatabaseController {
 			dataBeanInstance.setAssetName(dataBaseentity.assetName)
 			dataBeanInstance.setMoveBundle(dataBaseentity?.moveBundle?.name)
 			dataBeanInstance.setplanStatus(dataBaseentity.planStatus)
+			dataBeanInstance.setDepUp(AssetDependency.countByDependent(assetEntity))
+			dataBeanInstance.setDepDown(AssetDependency.countByAsset(assetEntity))
+			if(AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
+				dataBeanInstance.setCommentType("issue")
+			} else if(AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id)){
+				dataBeanInstance.setCommentType("comment")
+			} else {
+				dataBeanInstance.setCommentType("blank")
+			}
 			databaseList.add(dataBeanInstance)
 		}
 		TableFacade tableFacade = new TableFacadeImpl("tag", request)
@@ -143,7 +153,7 @@ class DatabaseController {
 			def dependentAssets = AssetDependency.findAllByAsset(assetEntity)
 			def supportAssets = AssetDependency.findAllByDependent(assetEntity)
 
-			[databaseInstance:databaseInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
+			[databaseInstance:databaseInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project:project,
 						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, dependentAssets:dependentAssets]
 		}
 		
