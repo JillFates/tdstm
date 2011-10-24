@@ -17,12 +17,16 @@ import org.jsecurity.SecurityUtils
 import org.springframework.web.multipart.*
 import org.springframework.web.multipart.commons.*
 
+import com.tds.asset.Application
 import com.tds.asset.ApplicationAssetMap
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
+import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetTransition
+import com.tds.asset.Database
+import com.tds.asset.Files
 import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
 
@@ -43,6 +47,8 @@ class AssetEntityController {
 	def moveBundleService
 	def sessionFactory 
 	def assetEntityAttributeLoaderService
+	def assetEntityService
+	
     protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8']
 	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
 	protected static targetTeamType = ['MOVE_TECH':'targetTeamMt', 'CLEANER':'targetTeamLog','SYS_ADMIN':'targetTeamSa',"DB_ADMIN":'targetTeamDba']
@@ -629,6 +635,10 @@ class AssetEntityController {
         }
         def project = Project.findById( projectId )
         def assetEntityInstanceList = AssetEntity.findAllByProject( project, params ) 
+		def servers = AssetEntity.findAllByAssetTypeAndProject('Server',project)
+		def applications = Application.findAllByAssetTypeAndProject('Application',project)
+		def dbs = Database.findAllByAssetTypeAndProject('Database',project)
+		def files = Files.findAllByAssetTypeAndProject('Files',project)
 		try{
 		TableFacade tableFacade = new TableFacadeImpl("tag",request)
         tableFacade.items = assetEntityInstanceList
@@ -638,9 +648,11 @@ class AssetEntityController {
             tableFacade.setColumnProperties("id","application","assetName","shortName","serialNumber","assetTag","manufacturer","model","assetType","ipAddress","os","sourceLocation","sourceRoom","sourceRack","sourceRackPosition","sourceBladeChassis","sourceBladePosition","targetLocation","targetRoom","targetRack","targetRackPosition","targetBladeChassis","targetBladePosition","custom1","custom2","custom3","custom4","custom5","custom6","custom7","custom8","moveBundle","sourceTeamMt","targetTeamMt","sourceTeamLog","targetTeamLog","sourceTeamSa","targetTeamSa","sourceTeamDba","targetTeamDba","truck","cart","shelf","railType","appOwner","appSme","priority")
             tableFacade.render()
         }else
-            return [assetEntityInstanceList : assetEntityInstanceList,projectId: projectId]
+            return [assetEntityInstanceList : assetEntityInstanceList,projectId: projectId, servers : servers, 
+				applications : applications, dbs : dbs, files : files, assetDependency: new AssetDependency()]
 		} catch(Exception ex ){
-			return [assetEntityInstanceList : null,projectId: projectId]
+			return [assetEntityInstanceList : null,projectId: projectId, servers : servers, 
+				applications : applications, dbs : dbs, files : files, assetDependency: new AssetDependency()]
 		}
         
         /*[ assetEntityInstanceList: assetEntityInstanceList, projectId: projectId,maxVal : params.max,
@@ -715,19 +727,23 @@ class AssetEntityController {
      * @return assetList Page
      * ------------------------------------------ */
     def save = {
-    	def manufacturerId = params.manufacturer
-		if( manufacturerId )
-			params["manufacturer"] = Manufacturer.get(manufacturerId)
-		
-		def modelId = params.model
-		if( modelId )
-			params["model"] = Model.get(modelId)
+		def formatter = new SimpleDateFormat("MM/dd/yyyy")
+		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
+		def maintExpDate = params.maintExpDate
+		if(maintExpDate){
+			params.maintExpDate =  GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
+		}
+		def retireDate = params.retireDate
+		if(retireDate){
+			params.retireDate =  GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
+		}
+			
 		def bundleId = getSession().getAttribute( "CURR_BUNDLE" )?.CURR_BUNDLE
-        def assetEntityInstance = new AssetEntity(params)
-        def projectId = params.projectId
-        def projectInstance = Project.findById( projectId )
-        assetEntityInstance.project = projectInstance
-        assetEntityInstance.owner = projectInstance.client
+		def assetEntityInstance = new AssetEntity(params)
+		def projectId = params.projectId ? params.projectId : getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectInstance = Project.findById( projectId )
+		assetEntityInstance.project = projectInstance
+		assetEntityInstance.owner = projectInstance.client
 		if(!params.assetTag){
 			def lastAssetId = projectInstance.lastAssetId
 			if(!lastAssetId){
@@ -743,31 +759,28 @@ class AssetEntityController {
 				projectInstance.errors.each { println it }
 			}
 		}
-	
-		if(bundleId)
-			assetEntityInstance.moveBundle = MoveBundle.read(Long.parseLong( bundleId ))
-			
-        if(!assetEntityInstance.hasErrors() && assetEntityInstance.save()) {
-        	assetEntityInstance.updateRacks()
-			 
+
+		if(!assetEntityInstance.hasErrors() && assetEntityInstance.save()) {
+			assetEntityInstance.updateRacks()
+
 			if(assetEntityInstance.model){
 				assetEntityAttributeLoaderService.createModelConnectors( assetEntityInstance )
 			}
-
-            flash.message = "AssetEntity ${assetEntityInstance.assetName} created"
+			assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance)
+			flash.message = "AssetEntity ${assetEntityInstance.assetName} created"
 			if(params.redirectTo == "room"){
 				redirect( controller:'room',action:list, params:[projectId: projectId] )
 			} else if(params.redirectTo == "rack"){
 				redirect( controller:'rackLayouts',action:'create', params:[projectId: projectId] )
 			} else {
-            	redirect( action:list, params:[projectId: projectId] )
+				redirect( action:list, params:[projectId: projectId] )
 			}
-        }
-        else {
-        	
-        	flash.message = "AssetEntity ${assetEntityInstance.assetName} not created"
-        	def etext = "Unable to Update Asset" +
-						GormUtil.allErrorsString( assetEntityInstance )
+		}
+		else {
+
+			flash.message = "AssetEntity ${assetEntityInstance.assetName} not created"
+			def etext = "Unable to Update Asset" +
+					GormUtil.allErrorsString( assetEntityInstance )
 			println etext
 			if(params.redirectTo == "room"){
 				redirect( controller:'room',action:list, params:[projectId: projectId] )
@@ -776,8 +789,9 @@ class AssetEntityController {
 			} else {
 				redirect( action:list, params:[projectId: projectId] )
 			}
-        }
-    }
+		}
+	}
+    
     /*--------------------------------------------------------
      * remote link for asset entity dialog.
      *@param assetEntityId
@@ -1708,7 +1722,7 @@ class AssetEntityController {
     		userPreferenceService.setPreference( "SUPER_CONSOLE_REFRESH", "${timer}" )
     	}
     	def timeToUpdate = getSession().getAttribute("SUPER_CONSOLE_REFRESH")
-    	updateTime <<[updateTime:timeToUpdate] 
+    	updateTime <<[updateTime:timeToUpdate]
     	render updateTime as JSON
     }
     /*-------------------------------------------
@@ -1865,4 +1879,138 @@ class AssetEntityController {
         }
     	render statusMsg
     }
+	def create ={
+		def assetEntityInstance = new AssetEntity(appOwner:'TDS')
+
+		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
+		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
+		def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",["Server"])?.manufacturer
+		
+		def planStatusAttribute = EavAttribute.findByAttributeCode('planStatus')
+		def planStatusOptions = EavAttributeOption.findAllByAttribute(planStatusAttribute)
+
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def project = Project.read(projectId)
+
+		def moveBundleList = MoveBundle.findAllByProject(project)
+
+		def railTypeAttribute = EavAttribute.findByAttributeCode('railType')
+		def railTypeOption = EavAttributeOption.findAllByAttribute(railTypeAttribute)
+
+		def priorityAttribute = EavAttribute.findByAttributeCode('priority')
+		def priorityOption = EavAttributeOption.findAllByAttribute(priorityAttribute)
+
+		[assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
+					planStatusOptions:planStatusOptions?.value, projectId:projectId ,railTypeOption:railTypeOption?.value,
+					priorityOption:priorityOption?.value ,project:project, manufacturers:manufacturers]
+
+
+
+	}
+	def show ={
+		def items = []
+		def assetEntityInstance = AssetEntity.get( params.id )
+		def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
+		def projectId = getSession().getAttribute( "CURR_PROJ" )?.CURR_PROJ
+		def project = Project.findById( projectId )
+		def attributeOptions
+		def options
+		def frontEndLabel
+		def dependentAssets
+		def supportAssets
+		
+		entityAttributeInstance.each{
+			attributeOptions = EavAttributeOption.findAllByAttribute( it.attribute,[sort:'value',order:'asc'] )
+			options = []
+			attributeOptions.each{option ->
+				options<<[option:option.value]
+			}
+			if( !bundleMoveAndClientTeams.contains(it.attribute.attributeCode) && it.attribute.attributeCode != "currentStatus" && it.attribute.attributeCode != "usize" ){
+				frontEndLabel = it.attribute.frontendLabel
+				if( customLabels.contains( frontEndLabel ) ){
+					frontEndLabel = project[it.attribute.attributeCode] ? project[it.attribute.attributeCode] : frontEndLabel
+				}
+			}
+		}
+		if(!assetEntityInstance) {
+			flash.message = "Asset not found with id ${params.id}"
+			redirect(action:list)
+		}
+		else {
+			 dependentAssets = AssetDependency.findAllByAsset(assetEntityInstance)
+		     supportAssets 	= AssetDependency.findAllByDependent(assetEntityInstance)
+		}
+		[label:frontEndLabel, assetEntityInstance:assetEntityInstance,supportAssets: supportAssets, dependentAssets:dependentAssets]
+	}
+	def edit ={
+		def assetEntityInstance = AssetEntity.get(params.id)
+		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
+		
+		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
+		def planStatusAttribute = EavAttribute.findByAttributeCode('planStatus')
+		
+		def planStatusOptions = EavAttributeOption.findAllByAttribute(planStatusAttribute)
+		
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def project = Project.read(projectId)
+		
+		def moveBundleList = MoveBundle.findAllByProject(project)
+		
+		def railTypeAttribute = EavAttribute.findByAttributeCode('railType')
+		def railTypeOption = EavAttributeOption.findAllByAttribute(railTypeAttribute)
+		
+		def priorityAttribute = EavAttribute.findByAttributeCode('priority')
+		def priorityOption = EavAttributeOption.findAllByAttribute(priorityAttribute)
+		
+		
+		def dependentAssets = AssetDependency.findAllByAsset(assetEntityInstance)
+		def supportAssets = AssetDependency.findAllByDependent(assetEntityInstance)
+
+		[assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
+					planStatusOptions:planStatusOptions?.value, projectId:projectId, project: project, railTypeOption:railTypeOption?.value,
+					priorityOption:priorityOption?.value,dependentAssets:dependentAssets,supportAssets:supportAssets]
+
+	}
+	def update={
+		def formatter = new SimpleDateFormat("MM/dd/yyyy")
+		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
+		def maintExpDate = params.maintExpDate
+		if(maintExpDate){
+			params.maintExpDate =  GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
+		}
+		def retireDate = params.retireDate
+		if(retireDate){
+			params.retireDate =  GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
+		}
+		def assetEntityInstance = AssetEntity.get(params.id)
+		assetEntityInstance.properties = params
+		if(!assetEntityInstance.hasErrors() && assetEntityInstance.save(flush:true)) {
+			flash.message = "Asset ${assetEntityInstance.assetName} Updated"
+			assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance)
+			redirect(action:list,id:assetEntityInstance.id)
+		}
+		else {
+			flash.message = "Asset not created"
+			assetEntityInstance.errors.allErrors.each{ flash.message += it }
+			redirect(action:list,id:assetEntityInstance.id)
+		}
+
+
+	}
+
+	def getManufacturersList = {
+		def assetType = params.assetType
+		def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
+		render (view :'manufacturerView' , model:[manufacturers : manufacturers])
+	}
+	def getModelsList = {
+		def manufacturer = params.manufacturer
+		def assetType = params.assetType
+		def models
+		if(manufacturer){
+			def manufacturerInstance = Manufacturer.read(manufacturer)
+			models = manufacturerInstance ? Model.findAllByManufacturer( manufacturerInstance,[sort:'modelName',order:'asc'] )?.findAll{it.assetType == assetType } : null
+		}
+		render (view :'ModelView' , model:[models : models])
+	}
 }

@@ -9,7 +9,80 @@ import com.tdssrc.grails.GormUtil
 class AssetEntityService {
 
     static transactional = true
-
+	
+	def createOrUpdateAssetEntityDependencies(def params, def assetEntityInstance) {
+		
+		def principal = SecurityUtils.subject.principal
+		def loginUser = UserLogin.findByUsername(principal)
+		
+		def supportCount = Integer.parseInt(params.supportCount)
+		AssetDependency.executeUpdate("delete AssetDependency where dependent = ? ",[assetEntityInstance])
+		
+		for(int i=0; i< supportCount; i++){
+			def supportAsset = params["asset_support_"+i]
+			if(supportAsset){
+				def asset = AssetEntity.findByIdAndProject(supportAsset, assetEntityInstance.project)
+				if(asset){
+					def assetDependency = AssetDependency.findByAssetAndDependent(asset,assetEntityInstance)
+					if(assetDependency){
+						assetDependency.dataFlowFreq = params["dataFlowFreq_support_"+i]
+						assetDependency.type = params["dtype_support_"+i]
+						assetDependency.status = params["status_support_"+i]
+						assetDependency.updatedBy = loginUser?.person
+					} else {
+						assetDependency = new AssetDependency(
+																asset : asset,
+																dependent : assetEntityInstance,
+																dataFlowFreq : params["dataFlowFreq_support_"+i],
+																type : params["dtype_support_"+i],
+																status : params["status_support_"+i],
+																updatedBy : loginUser?.person,
+																createdBy : loginUser?.person
+																)
+					}
+					if ( !assetDependency.validate() || !assetDependency.save() ) {
+						def etext = "Unable to create assetDependency" +
+						GormUtil.allErrorsString( assetDependency )
+						   println etext
+					}
+				}
+			}
+		}
+		
+		def dependentCount = Integer.parseInt(params.dependentCount)
+		AssetDependency.executeUpdate("delete AssetDependency where asset = ? ",[assetEntityInstance])
+		
+		for(int i=0; i< dependentCount; i++){
+			def dependentAsset = params["asset_dependent_"+i]
+			if(dependentAsset){
+				def asset = AssetEntity.findByIdAndProject(dependentAsset, assetEntityInstance.project)
+				if(asset){
+					def assetDependency = AssetDependency.findByAssetAndDependent(assetEntityInstance,asset)
+					if(assetDependency){
+						assetDependency.dataFlowFreq = params["dataFlowFreq_dependent_"+i]
+						assetDependency.type = params["dtype_dependent_"+i]
+						assetDependency.status = params["status_dependent_"+i]
+						assetDependency.updatedBy = loginUser?.person
+					} else {
+						assetDependency = new AssetDependency(
+																asset : assetEntityInstance,
+																dependent : asset,
+																dataFlowFreq : params["dataFlowFreq_dependent_"+i],
+																type : params["dtype_dependent_"+i],
+																status : params["status_dependent_"+i],
+																updatedBy : loginUser?.person,
+																createdBy : loginUser?.person
+																)
+					}
+					if ( !assetDependency.validate() || !assetDependency.save() ) {
+						def etext = "Unable to create assetDependency" +
+						GormUtil.allErrorsString( assetDependency )
+						   println etext
+					}
+				}
+			}
+		}
+	}
     def createOrUpdateApplicationDependencies(def params, def applicationInstance) {
 		
 		def principal = SecurityUtils.subject.principal

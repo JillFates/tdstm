@@ -1,4 +1,4 @@
-<%@page import="com.tds.asset.AssetComment;"%>
+<%@page import="com.tds.asset.AssetComment;com.tds.asset.AssetEntity;com.tds.asset.Application;com.tds.asset.Database;com.tds.asset.Files;com.tds.asset.AssetComment;"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -10,6 +10,7 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
 
 <link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
 <script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
@@ -34,6 +35,9 @@ $(document).ready(function() {
 	        $("#manufacturerShowDialog").dialog({ autoOpen: false })
 	        $("#modelShowDialog").dialog({ autoOpen: false })
 	        $("#filterPane").draggable()
+	        $("#showAssetList").dialog({autoOpen: false})
+	        $("#createAsset").dialog({autoOpen: false})
+	        $("#editAsset").dialog({autoOpen: false})
 })
 </script>
 <script type="text/javascript">	
@@ -99,7 +103,7 @@ $(document).ready(function() {
       			}
       		}
 	function showAssetDetails( assetId ){
-		${remoteFunction(action:'editShow', params:'\'id=\'+assetId', before:'document.showForm.id.value = assetId;document.editForm.id.value = assetId;', onComplete:"showAssetDialog(e , 'show')")}
+		${remoteFunction(action:'show', params:'\'id=\'+assetId', before:'document.showForm.id.value = assetId;document.editForm.id.value = assetId;', onComplete:"showAssetDialog(e)")}
       		}
 </script>
 <filterpane:includes />
@@ -178,7 +182,7 @@ $(document).ready(function() {
 	</form>
 </div>
 <div class="buttons"><g:form>
-	<span class="button"><input type="button" value="New Asset" class="create" onClick="createDialog()" /></span>
+	<span class="button"><input type="button" value="New Asset" class="create" onClick="createAssetPage()" /></span>
 </g:form></div>
 </div> <%-- End of Body --%>
 <div id="createDialog" title="Create Asset" style="display: none;">
@@ -554,8 +558,30 @@ $(document).ready(function() {
 	</table>
 </div>
 <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+<div id ="createAsset" style="display: none" title="Create Asset"></div>
+<div id ="showAssetList" style="display: none" title="Show Asset"></div>
+<div id ="editAsset" style="display: none" title="Edit Asset"></div>
+
+<div style="display: none;">
+<table id="assetDependencyRow">
+	<tr>
+		<td><g:select name="dataFlowFreq" from="${assetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
+		<td><g:select name="entity" from="['Server','Application','Database','Files']" onchange='updateAssetsList(this.name, this.value)'></g:select></td>
+		<td><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></td>
+		<td><g:select name="dtype" from="${assetDependency.constraints.type.inList}"></g:select></td>
+		<td><g:select name="status" from="${assetDependency.constraints.status.inList}"></g:select></td>
+	</tr>
+	</table>
+</div>
+<div style="display: none;">
+<span id="Server"><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+<span id="Application"><g:select name="asset" from="${applications}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+<span id="Database"><g:select name="asset" from="${dbs}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+<span id="Files"><g:select name="asset" from="${files}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+</div>
 <div class="buttons"> 
 	<g:form action="edit" controller="model" target="new">
+	<input type="hidden" name="assetId" value="${assetEntityInstance?.id}" />
 		<input name="id" type="hidden" id="show_modelId"/>
 		<span class="button">
 			<input type="submit" class="edit" value="Edit"></input>
@@ -566,6 +592,81 @@ $(document).ready(function() {
 </div>
 <script type="text/javascript">
 $('#assetMenu').show();
+
+function showAssetDialog(e){
+    var resp = e.responseText;
+	$("#showAssetList").html(resp);
+	$("#showAssetList").dialog('option', 'width', 'auto');
+	$("#showAssetList").dialog('option', 'position', ['center','top']);
+	$("#showAssetList").dialog('open');
+}
+function createAssetPage(){
+	${remoteFunction(action:'create', onComplete:'showCreateView(e)')}
+	
+}
+function showCreateView(e){
+	var resp = e.responseText;
+	$("#createAsset").html(resp)	
+	$("#createAsset").dialog('option', 'width', 'auto');
+	$("#createAsset").dialog('option', 'position', ['center','top']);
+	$("#createAsset").dialog('open');
+}
+function selectManufacturer(value){
+	var val = value;
+	${remoteFunction(action:'getManufacturersList', params:'\'assetType=\' + val ', onComplete:'showManufacView(e)' )}
+	}
+function showManufacView(e){
+	alert("WARNING : Change of Asset Type may impact on Manufacturer and Model, Do you want to continue ?");
+    var resp = e.responseText;
+    $("#manufacturerId").html(resp);
+    $("#manufacturers").removeAttr("multiple")
+}
+function selectModel(value){
+	var val = value;
+	var assetType = $("#assetTypeId").val() ;
+	${remoteFunction(action:'getModelsList', params:'\'assetType=\' +assetType +\'&manufacturer=\'+ val', onComplete:'showModelView(e)' )}
+	}
+function showModelView(e){
+	alert("WARNING : Change of Manufacturer may impact on Model data, Do you want to continue ?")
+    var resp = e.responseText;
+    $("#modelId").html(resp);
+    $("#models").removeAttr("multiple")
+}
+function createEditPage(value){
+	var val = value
+	${remoteFunction(action:'edit',params:'\'id=\' + val ', onComplete:'showEditView(e)')}
+	
+}
+function showEditView(e){
+	var resp = e.responseText;
+	$("#editAsset").html(resp)	
+	$("#editAsset").dialog('option', 'width', 'auto');
+	$("#editAsset").dialog('option', 'position', ['center','top']);
+	$("#editAsset").dialog('open');
+}
+function addAssetDependency( type ){
+	var rowNo = $("#"+type+"Count").val()
+	var rowData = $("#assetDependencyRow tr").html().replace("dataFlowFreq","dataFlowFreq_"+type+"_"+rowNo).replace("asset","asset_"+type+"_"+rowNo).replace("dtype","dtype_"+type+"_"+rowNo).replace("status","status_"+type+"_"+rowNo).replace("entity","entity_"+type+"_"+rowNo)
+	if(type!="support"){
+		$("#createDependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
+	} else {
+		$("#createSupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
+	}
+	$("#"+type+"Count").val(parseInt(rowNo)+1)
+}
+function deleteRow( rowId ){
+	$("#"+rowId).remove()
+}
+function updateAssetsList( name, value ){
+	var idValues = name.split("_")
+	$("select[name='asset_"+idValues[1]+"_"+idValues[2]+"']").html($("#"+value+" select").html())
+}
+function getAppDetails(type, value){
+	if(type == "Server"){
+	   var val = value
+	   ${remoteFunction(action:'show', params:'\'id=\' + value ', onComplete:'showAssetDialog(e)')}
+	}
+}
 </script>
 </body>
 </html>

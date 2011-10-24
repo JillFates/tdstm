@@ -1,0 +1,1 @@
+<g:select id = "manufacturers" name="manufacturer.id" from="${manufacturers}" optionKey="id" optionValue="name" noSelection="${['':' Unassigned']}" onChange="selectModel(this.value)" />

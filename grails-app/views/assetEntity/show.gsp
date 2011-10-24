@@ -1,189 +1,296 @@
-
-
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="main" />
-        <title>Show AssetEntity</title>
-    </head>
-    <body>
-        <div class="nav">
-            <span class="menuButton"><a class="home" href="${createLinkTo(dir:'')}">Home</a></span>
-            <span class="menuButton"><g:link class="list" action="list">AssetEntity List</g:link></span>
-            <span class="menuButton"><g:link class="create" action="create">New AssetEntity</g:link></span>
-        </div>
-        <div class="body">
-            <h1>Show AssetEntity</h1>
-            <g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
-            </g:if>
-            <div class="dialog">
-                <table>
-                    <tbody>
-
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Id:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:assetEntityInstance, field:'id')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Server Name:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:assetEntityInstance, field:'serverName')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Model:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:assetEntityInstance, field:'model')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Source Location:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:assetEntityInstance, field:'sourceLocation')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Target Location:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:assetEntityInstance, field:'targetLocation')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Source Rack:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:assetEntityInstance, field:'sourceRack')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Target Rack:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:assetEntityInstance, field:'targetRack')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Position:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:assetEntityInstance, field:'position')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Unit Size:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:assetEntityInstance, field:'unitSize')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Project:</td>
-                            
-                            <td valign="top" class="value"><g:link controller="project" action="show" id="${assetEntityInstance?.project?.id}">${assetEntityInstance?.project?.encodeAsHTML()}</g:link></td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Asset Type:</td>
-                            
-                            <td valign="top" class="value"><g:link controller="assetType" action="show" id="${assetEntityInstance?.assetType?.id}">${assetEntityInstance?.assetType?.encodeAsHTML()}</g:link></td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Asset Name:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:assetEntityInstance, field:'assetName')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Asset Tag:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:assetEntityInstance, field:'assetTag')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Serial Number:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:assetEntityInstance, field:'serialNumber')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Device Function:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:assetEntityInstance, field:'deviceFunction')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Asset Entity Varchars:</td>
-                            
-                            <td  valign="top" style="text-align:left;" class="value">
-                                <ul>
-                                <g:each var="a" in="${assetEntityInstance.assetEntityVarchars}">
-                                    <li><g:link controller="assetEntityVarchar" action="show" id="${a.id}">${a?.encodeAsHTML()}</g:link></li>
-                                </g:each>
-                                </ul>
-                            </td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Attribute Set:</td>
-                            
-                            <td valign="top" class="value"><g:link controller="eavAttributeSet" action="show" id="${assetEntityInstance?.attributeSet?.id}">${assetEntityInstance?.attributeSet?.encodeAsHTML()}</g:link></td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Date Created:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:assetEntityInstance, field:'dateCreated')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Entity Attribute:</td>
-                            
-                            <td  valign="top" style="text-align:left;" class="value">
-                                <ul>
-                                <g:each var="e" in="${assetEntityInstance.entityAttribute}">
-                                    <li><g:link controller="eavEntityAttribute" action="show" id="${e.id}">${e?.encodeAsHTML()}</g:link></li>
-                                </g:each>
-                                </ul>
-                            </td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Last Updated:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:assetEntityInstance, field:'lastUpdated')}</td>
-                            
-                        </tr>
-                    
-                    </tbody>
-                </table>
-            </div>
-            <div class="buttons">
-                <g:form>
-                    <input type="hidden" name="id" value="${assetEntityInstance?.id}" />
-                    <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
-                    <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
-                </g:form>
-            </div>
-        </div>
-    </body>
-</html>
+<g:form method="post">
+	<table style="border:0;width:1000px;">
+		<tr>
+			<td colspan="2">
+				<div class="dialog">
+					<table>
+						<tbody>
+							<tr class="prop">
+								<td class="label" nowrap="nowrap"><label for="assetName">App Name</label></td>
+								<td >${assetEntityInstance.assetName}</td>
+								
+								<td class="label" nowrap="nowrap"><label for="application">Application</label></td>
+								<td >${assetEntityInstance.application}</td>
+								
+								<td ><td class="label">Source</td>
+								     <td class="label">Target</td>
+								</td>
+								<td class="label" nowrap="nowrap"><label for="custom1">Cust1</label>
+								</td>
+								<td >${assetEntityInstance.custom1}
+								</td>
+								
+								
+							</tr>
+							<tr class="prop">
+								<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
+								<td >${assetEntityInstance.assetType}</td>
+								<td class="label" nowrap="nowrap"><label for="priority">Priority</label>
+								</td>
+								<td >${assetEntityInstance.priority}
+								</td>
+								<td class="label" nowrap="nowrap"><label for="sourceLocation">Location</label>
+								<td>${assetEntityInstance.sourceLocation}</td>
+									<td>${assetEntityInstance.targetLocation}</td>
+								</td>
+								<td class="label" nowrap="nowrap"><label for="custom2">Cust2</label>
+								</td>
+								<td >${assetEntityInstance.custom2}
+								</td>
+								
+								
+							</tr>
+							<tr class="prop">
+								<td class="label" nowrap="nowrap"><label for="manufacturer">Manufacturer</label>
+								</td>
+								 <td >
+								   ${assetEntityInstance.manufacturer} 
+								</td>
+								<td class="label" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
+								<td >${assetEntityInstance.ipAddress}
+								</td>
+								<td class="label" nowrap="nowrap"><label for="sourceRoom">Room</label>
+								<td>${assetEntityInstance.sourceRoom}</td>
+									<td>${assetEntityInstance.targetRoom}</td>
+								</td>
+								<td class="label" nowrap="nowrap"><label for="custom3">Cust3</label>
+								</td>
+								<td >${assetEntityInstance.custom3}
+								</td>
+								
+								
+							</tr>
+							<tr class="prop">
+								<td class="label" nowrap="nowrap"><label for="model">Model</label>
+								</td>
+								<td>
+								${assetEntityInstance.model}
+								</td>
+								
+								<td class="label" nowrap="nowrap"><label for="assetTag">Tag</label></td>
+								<td >${assetEntityInstance.assetTag}</td>
+								
+								<td class="label" nowrap="nowrap"><label for="sourceRack">Rack/Cab</label>
+								<td>${assetEntityInstance.sourceRack}</td>
+									<td>${assetEntityInstance.targetRack}</td>
+								</td>
+								<td class="label" nowrap="nowrap"><label for="custom4">Cust4</label>
+								</td>
+								<td >${assetEntityInstance.custom4}
+								</td>
+								
+								
+							</tr>
+							<tr class="prop">
+								<td class="label" nowrap="nowrap"><label for="shortName">Alt Name</label></td>
+								<td >${assetEntityInstance.shortName}
+								</td>
+								<td class="label" nowrap="nowrap"><label for="os">OS</label></td>
+								<td >${assetEntityInstance.os}
+								</td>
+								<td class="label" nowrap="nowrap"><label for="sourceRack">Position</label>
+								<td>${assetEntityInstance.sourceRackPosition}</td>
+									<td>${assetEntityInstance.targetRackPosition}</td>
+								</td>
+								<td class="label" nowrap="nowrap"><label for="custom5">Cust5</label>
+								</td>
+								<td >${assetEntityInstance.custom5}
+								</td>
+								
+								
+							</tr>
+							<tr class="prop">
+								<td class="label" nowrap="nowrap"><label for="serialNumber">S/N</label></td>
+								<td >${assetEntityInstance.serialNumber}
+								</td>
+								<td class="label" nowrap="nowrap"><label for="maintContract">Maint</label></td>
+								<td >${assetEntityInstance.maintContract}
+								</td>
+								<td class="label" nowrap="nowrap"><label for="sourceBladeChassis">Blade</label>
+								<td>${assetEntityInstance.sourceBladeChassis}</td>
+									<td>${assetEntityInstance.targetBladeChassis}</td>
+								</td>
+								<td class="label" nowrap="nowrap"><label for="custom6">Cust6</label>
+								</td>
+								 <td >${assetEntityInstance.custom6}
+								</td>
+								
+								
+								
+								
+							</tr>
+							<tr class="prop">
+								<td class="label" nowrap="nowrap"><label for="appOwner">owner</label></td>
+								<td >${assetEntityInstance.owner}</td>
+								<td class="label"><label for="retireDate">Retire
+									Date:</label>
+								</td>
+								<td><tds:convertDate
+									date="${assetEntityInstance?.retireDate}"
+									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+							</td>
+								 
+								<td class="label" nowrap="nowrap"><label for="sourceBladePosition">Blade Position</label>
+								<td>${assetEntityInstance.sourceBladePosition}</td>
+									<td>${assetEntityInstance.targetBladePosition}</td>
+								</td>
+								<td class="label" nowrap="nowrap"><label for="custom7">Cust7</label>
+								</td>
+								 <td >${assetEntityInstance.custom7}
+								</td>
+								
+								
+								
+							</tr>
+							<tr class="prop">
+								<td  class="label"><label for="maintExpDate">Maint Exp.
+									</label></td>
+									<td><tds:convertDate
+									date="${assetEntityInstance?.maintExpDate}"
+									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+							        </td>
+								<td class="label" nowrap="nowrap"><label for="railType">Rail Type</label>
+								</td>
+								 <td >${assetEntityInstance.railType}
+								</td>
+								
+								
+								
+								<td>&nbsp</td>
+								<td>&nbsp</td>
+								<td>&nbsp</td>
+								<td class="label" nowrap="nowrap"><label for="custom8">Cust8</label>
+								</td>
+								 <td >${assetEntityInstance.custom8}
+								</td>
+								
+							</tr>
+							<tr class="prop">
+							       <td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
+								<td >${assetEntityInstance.moveBundle}
+								</td>
+							   <td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
+								<td >${assetEntityInstance.planStatus}
+								</td>
+								<td>&nbsp</td>
+								<td>&nbsp</td>
+								<td>&nbsp</td>
+							    
+								<td class="label" nowrap="nowrap"><label for="truck">Truck</label>
+								</td>
+								<td >${assetEntityInstance.truck}
+								</td>
+							
+							</tr>
+							
+							<tr class="prop">
+							    <td class="label" nowrap="nowrap"><label for="cart">Cart</label>
+								</td>
+								 <td >${assetEntityInstance.cart}
+								</td>
+								<td class="label" nowrap="nowrap"><label for="shelf">Shelf</label>
+								</td>
+								 <td >${assetEntityInstance.shelf}
+								</td>
+								<td>&nbsp</td>
+								<td>&nbsp</td>
+								<td>&nbsp</td>
+							    <td class="label" nowrap="nowrap"><label for="appSme">SME</label>
+								</td>
+								 <td >${assetEntityInstance.appSme}
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div></td>
+		</tr>
+			<tr>
+		<td valign="top">
+			<div>
+				<h1>Supports:</h1>
+				<table style="width: 400px;">
+					<thead>
+						<tr>
+							<th>Frequency</th>
+							<th>Entity Type</th>
+							<th>Name</th>
+							<th>Type</th>
+							<th>Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						<g:each in="${supportAssets}" var="support" status="i">
+							<tr onclick="getAppDetails('${support?.asset?.assetType}', ${support?.asset?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
+								<td class="dep-${support.status}">
+									${support?.dataFlowFreq}
+								</td>
+								<td class="dep-${support.status}">
+									${support?.asset?.assetType}
+								</td>
+								<td class="dep-${support.status}">
+									${support?.asset?.assetName}
+								</td>
+								<td class="dep-${support.status}">
+									${support.type}
+								</td>
+								<td class="dep-${support.status}">
+									${support.status}
+								</td>
+							</tr>
+						</g:each>
+					</tbody>
+				</table>
+			</div>
+		</td>
+		<td valign="top">
+			<div>
+				<h1>Is dependent on:</h1>
+				<table style="width: 400px;">
+					<thead>
+						<tr>
+							<th>Frequency</th>
+							<th>Entity Type</th>
+							<th>Name</th>
+							<th>Type</th>
+							<th>Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						<g:each in="${dependentAssets}" var="dependent" status="i">
+							<tr onclick="getAppDetails('${dependent.dependent?.assetType}', ${dependent.dependent?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
+								<td class="dep-${dependent.status}">
+									${dependent.dataFlowFreq}
+								</td>
+								<td class="dep-${dependent.status}">
+									${dependent.dependent?.assetType}
+								</td>
+								<td class="dep-${dependent.status}">
+									${dependent.dependent?.assetName}
+								</td>
+								<td class="dep-${dependent.status}">
+									${dependent.type}
+								</td>
+								<td class="dep-${dependent.status}">
+									${dependent.status}
+								</td>
+							</tr>
+						</g:each>
+					</tbody>
+				</table>
+			</div>
+		</td>
+	</tr>
+		<tr>
+			<td colspan="2">
+				<div class="buttons">
+					<input name="attributeSet.id" type="hidden" value="1">
+					<input name="project.id" type="hidden" value="${projectId}">
+					<input type="hidden" name="id" value="${assetEntityInstance?.id}" />
+					<span class="button"><input type="button" class="edit"
+						value="Edit" onclick="createEditPage(${assetEntityInstance?.id})" /> </span>
+					<span class="button"><g:actionSubmit class="delete"
+							onclick="return confirm('Are you sure?');" value="Delete" /> </span>
+				</div></td>
+		</tr>
+	</table>
+</g:form>
