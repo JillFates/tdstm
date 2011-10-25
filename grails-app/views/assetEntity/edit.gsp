@@ -156,19 +156,9 @@
 								<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
 								<td><g:select id="planStatus" name ="planStatus" from="${planStatusOptions}" value= "${assetEntityInstance.planStatus}" noSelection="${['':' Please Select']}" tabindex="39"/></td>
 								<td>&nbsp</td>
-								<td class="label" nowrap="nowrap"><label for="cart">Cart</label></td>
-								<td><input type="text" id="cart" name="cart" value="${assetEntityInstance.cart}" size=6 tabindex="62" /></td>
-							</tr>
-							<tr>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-								<td class="label" nowrap="nowrap"><label for="shelf">Shelf</label></td>
-								<td ><input type="text" id="shelf" name="shelf" value="${assetEntityInstance.shelf}" size=6 tabindex="63"/></td>
+								<td class="label" nowrap="nowrap"><label for="cart">Cart / Shelf</label></td>
+								<td><input type="text" id="cart" name="cart" value="${assetEntityInstance.cart}" size=3 tabindex="62" />
+								<input type="text" id="shelf" name="shelf" value="${assetEntityInstance.shelf}" size=3 tabindex="63"/></td>
 							</tr>
 						</tbody>
 					</table>

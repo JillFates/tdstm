@@ -7,194 +7,118 @@
 						<tbody>
 							
 							<tr  class="prop">
-							   <td>&nbsp</td>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-								<td ><td class="label">Source</td>
-								     <td class="label">Target</td>
-								</td>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-							
-							
-							
-							</tr>
-							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="assetName">Name</label></td>
-								<td >${assetEntityInstance.assetName}</td>
-								
-								<td class="label" nowrap="nowrap"><label for="priority">Priority</label>
-								</td>
-								<td >${assetEntityInstance.priority}</td>
-								
-								<td class="label" nowrap="nowrap"><label for="sourceLocation">Location</label>
-								<td>${assetEntityInstance.sourceLocation}</td>
-									<td>${assetEntityInstance.targetLocation}</td>
-								</td>
-								<td class="label" nowrap="nowrap"><label for="custom1">Custom1</label>
-								</td>
-								<td >${assetEntityInstance.custom1}
-								</td>
-								
-								
+								<td style="font-weight:bold">${assetEntityInstance.assetName}</td>
+								<td>&nbsp</td>
+								<td>&nbsp</td>
+								<td>&nbsp</td>
+								<td class="label_sm">Source</td>
+								<td class="label_sm">Target</td>
+								<td class="label" nowrap="nowrap"><label for="custom1">Custom1</label></td>
+								<td >${assetEntityInstance.custom1}</td>
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
 								<td >${assetEntityInstance.assetType}</td>
+								<td class="label" nowrap="nowrap"><label for="priority">Priority</label></td>
+								<td >${assetEntityInstance.priority}</td>
+								<td class="label" nowrap="nowrap"><label for="sourceLocation">Location</label></td>
+								<td>${assetEntityInstance.sourceLocation}</td>
+								<td>${assetEntityInstance.targetLocation}</td>
+								<td class="label" nowrap="nowrap"><label for="custom2">Custom2</label></td>
+								<td >${assetEntityInstance.custom2}</td>
+							</tr>
+							<tr class="prop">
+								<td class="label" nowrap="nowrap"><label for="manufacturer">Manufacturer</label></td>
+								<td >${assetEntityInstance.manufacturer}</td>
 								<td class="label" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
-								<td >${assetEntityInstance.ipAddress}
-								</td>
-								<td class="label" nowrap="nowrap"><label for="sourceRoom">Room</label>
+								<td >${assetEntityInstance.ipAddress}</td>
+								<td class="label" nowrap="nowrap"><label for="sourceRoom">Room</label></td>
 								<td>${assetEntityInstance.sourceRoom}</td>
-									<td>${assetEntityInstance.targetRoom}</td>
-								</td>
-								<td class="label" nowrap="nowrap"><label for="custom2">Custom2</label>
-								</td>
-								<td >${assetEntityInstance.custom2}
-								</td>
-								
-								
+								<td>${assetEntityInstance.targetRoom}</td>
+								<td class="label" nowrap="nowrap"><label for="custom3">Custom3</label></td>
+								<td >${assetEntityInstance.custom3}</td>
 							</tr>
 							<tr class="prop">
-								<td class="label" nowrap="nowrap"><label for="manufacturer">Manufacturer</label>
-								</td>
-								 <td >
-								   ${assetEntityInstance.manufacturer} 
-								</td>
+								<td class="label" nowrap="nowrap"><label for="model">Model</label></td>
+								<td>${assetEntityInstance.model}</td>
 								<td class="label" nowrap="nowrap"><label for="os">OS</label></td>
-								<td >${assetEntityInstance.os}
-								</td>
-								<td class="label" nowrap="nowrap"><label for="sourceRack">Rack/Cab</label>
+								<td >${assetEntityInstance.os}</td>
+								<td class="label" nowrap="nowrap"><label for="sourceRack">Rack/Cab</label></td>
 								<td>${assetEntityInstance.sourceRack}</td>
-									<td>${assetEntityInstance.targetRack}</td>
-								</td>
-								<td class="label" nowrap="nowrap"><label for="custom3">Custom3</label>
-								</td>
-								<td >${assetEntityInstance.custom3}
-								</td>
-								
-								
-							</tr>
-							<tr class="prop">
-								<td class="label" nowrap="nowrap"><label for="model">Model</label>
-								</td>
-								<td>
-								${assetEntityInstance.model}
-								</td>
-								<td class="label" nowrap="nowrap"><label for="supportType">Support Type</label></td>
-								<td >${assetEntityInstance.supportType}</td>
-								
-								<td class="label" nowrap="nowrap"><label for="sourceRack">Position</label>
-								<td>${assetEntityInstance.sourceRackPosition}</td>
-									<td>${assetEntityInstance.targetRackPosition}</td>
-								</td>
-								
-								<td class="label" nowrap="nowrap"><label for="custom4">Custom4</label>
-								</td>
-								<td >${assetEntityInstance.custom4}
-								</td>
-								
-								
+								<td>${assetEntityInstance.targetRack}</td>
+								<td class="label" nowrap="nowrap"><label for="custom4">Custom4</label></td>
+								<td >${assetEntityInstance.custom4}</td>
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="shortName">Alt Name</label></td>
-								<td >${assetEntityInstance.shortName}
-								</td>
-								<td class="label"><label for="retireDate">Retire
-									Date:</label>
-								</td>
-								<td><tds:convertDate
-									date="${assetEntityInstance?.retireDate}"
-							  		timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
-							    </td>
-								<td class="label" nowrap="nowrap"><label for="sourceBladeChassis">Blade</label>
-								<td>${assetEntityInstance.sourceBladeChassis}</td>
-									<td>${assetEntityInstance.targetBladeChassis}</td>
-								</td>
-								<td class="label" nowrap="nowrap"><label for="custom5">Custom5</label>
-								</td>
-								<td >${assetEntityInstance.custom5}
-								</td>
-								
-								
+								<td >${assetEntityInstance.shortName}</td>
+								<td class="label" nowrap="nowrap"><label for="supportType">Support Type</label></td>
+								<td >${assetEntityInstance.supportType}</td>
+								<td class="label" nowrap="nowrap"><label for="sourceRack">Position</label></td>
+								<td>${assetEntityInstance.sourceRackPosition}</td>
+								<td>${assetEntityInstance.targetRackPosition}</td>
+								<td class="label" nowrap="nowrap"><label for="custom5">Custom5</label></td>
+								<td >${assetEntityInstance.custom5}</td>
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="serialNumber">S/N</label></td>
-								<td >${assetEntityInstance.serialNumber}
+								<td >${assetEntityInstance.serialNumber}</td>
+								<td class="label"><label for="retireDate">Retire Date:</label></td>
+								<td><tds:convertDate date="${assetEntityInstance?.retireDate}"
+							  		timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 								</td>
-								<td  class="label"><label for="maintExpDate">Maint Exp.
-									</label></td>
-									<td><tds:convertDate
-									date="${assetEntityInstance?.maintExpDate}"
+								<td class="label" nowrap="nowrap"><label for="sourceBladeChassis">Blade</label></td>
+								<td>${assetEntityInstance.sourceBladeChassis}</td>
+								<td>${assetEntityInstance.targetBladeChassis}</td>
+								<td class="label" nowrap="nowrap"><label for="custom6">Custom6</label></td>
+								<td >${assetEntityInstance.custom6}</td>
+							</tr>
+							<tr class="prop">
+								<td class="label" nowrap="nowrap"><label for="assetTag">Tag</label></td>
+								<td >${assetEntityInstance.assetTag}</td>
+								<td class="label"><label for="maintExpDate">Maint Exp.</label></td>
+								<td><tds:convertDate date="${assetEntityInstance?.maintExpDate}"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							        </td>
-								<td class="label" nowrap="nowrap"><label for="sourceBladePosition">Blade Position</label>
+								<td class="label" nowrap="nowrap"><label for="sourceBladePosition">Blade Position</label></td>
 								<td>${assetEntityInstance.sourceBladePosition}</td>
-									<td>${assetEntityInstance.targetBladePosition}</td>
-								</td>
-								<td class="label" nowrap="nowrap"><label for="custom6">Custom6</label>
-								</td>
-								 <td >${assetEntityInstance.custom6}
-								</td>
-								
-								
-								
-								
+								<td>${assetEntityInstance.targetBladePosition}</td>
+								<td class="label" nowrap="nowrap"><label for="custom7">Custom7</label></td>
+								<td >${assetEntityInstance.custom7}</td>
 							</tr>
 							<tr class="prop">
-							     <td class="label" nowrap="nowrap"><label for="assetTag">Tag</label></td>
-								<td >${assetEntityInstance.assetTag}</td>
-								<td class="label" nowrap="nowrap"><label for="shelf">Shelf</label>
-								</td>
-								 <td >${assetEntityInstance.shelf}
-								</td>
-								
-								<td class="label" nowrap="nowrap"><label for="virtualHost">Virtual Host</label>
+								<td class="label" nowrap="nowrap"><label for="railType">Rail Type</label></td>
+								<td >${assetEntityInstance.railType}</td>
+								<td>&nbsp</td>
+								<td>&nbsp</td>
+								<td class="label" nowrap="nowrap"><label for="virtualHost">Virtual Host</label></td>
 								<td>${assetEntityInstance.virtualHost}</td>
-									<td>&nbsp</td>
-								</td>
-								<td class="label" nowrap="nowrap"><label for="custom7">Custom7</label>
-								</td>
-								 <td >${assetEntityInstance.custom7}
-								</td>
-								
-								
-								
+								<td>&nbsp</td>
+								<td class="label" nowrap="nowrap"><label for="custom8">Custom8</label></td>
+								<td >${assetEntityInstance.custom8}</td>
 							</tr>
 							<tr class="prop">
-								<td class="label" nowrap="nowrap"><label for="truck">Truck</label>
-								</td>
-								<td >${assetEntityInstance.truck}
-								</td>
-								<td class="label" nowrap="nowrap"><label for="railType">Rail Type</label>
-								</td>
-								 <td >${assetEntityInstance.railType}
-								</td>
+								<td>&nbsp</td>
+								<td>&nbsp</td>
+								<td>&nbsp</td>
+								<td>&nbsp</td>
 								<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
-								<td >${assetEntityInstance.moveBundle}
+								<td >${assetEntityInstance.moveBundle}</td>
 								<td>&nbsp</td>
-								</td>
-								<td class="label" nowrap="nowrap"><label for="custom8">Custom8</label>
-								</td>
-								 <td >${assetEntityInstance.custom8}
-								</td>
-								
+								<td class="label" nowrap="nowrap"><label for="truck">Truck</label></td>
+								<td >${assetEntityInstance.truck}</td>
 							</tr>
 							<tr class="prop">
-							       <td class="label" nowrap="nowrap"><label for="cart">Cart</label>
-								</td>
-								 <td >${assetEntityInstance.cart}
-								</td>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-							   <td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
-								<td >${assetEntityInstance.planStatus}
-								</td>
 								<td>&nbsp</td>
 								<td>&nbsp</td>
 								<td>&nbsp</td>
-							
+								<td>&nbsp</td>
+								<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
+								<td >${assetEntityInstance.planStatus}</td>
+								<td>&nbsp</td>
+								<td class="label" nowrap="nowrap"><label for="cart">Cart/Shelf</label></td>
+								<td >${assetEntityInstance.cart}/${assetEntityInstance.shelf}</td>							
 							</tr>
 							
 						</tbody>
