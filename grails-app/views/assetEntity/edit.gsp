@@ -142,9 +142,7 @@
 								<td>&nbsp</td>
 								<td>&nbsp</td>
 								<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
-								<td ><g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${assetEntityInstance.moveBundle}" optionKey="id" optionValue="name" tabindex="38" noSelection="${['':' Please Select']}"/>
-								</td>
-								<td>&nbsp</td>
+								<td colspan="2"><g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${assetEntityInstance.moveBundle}" optionKey="id" optionValue="name" tabindex="38" noSelection="${['':' Please Select']}"/>val:${assetEntityInstance.moveBundle}</td>
 								<td class="label" nowrap="nowrap"><label for="truck">Truck</label></td>
 								<td ><input type="text" id="truck" name="truck" value="${assetEntityInstance.truck}" size=6 tabindex="61"/></td>
 							</tr>
@@ -154,8 +152,7 @@
 								<td>&nbsp</td>
 								<td>&nbsp</td>
 								<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
-								<td><g:select id="planStatus" name ="planStatus" from="${planStatusOptions}" value= "${assetEntityInstance.planStatus}" noSelection="${['':' Please Select']}" tabindex="39"/></td>
-								<td>&nbsp</td>
+								<td colspan="2"><g:select id="planStatus" name ="planStatus" from="${planStatusOptions}" value= "${assetEntityInstance.planStatus}" noSelection="${['':' Please Select']}" tabindex="39"/></td>
 								<td class="label" nowrap="nowrap"><label for="cart">Cart / Shelf</label></td>
 								<td><input type="text" id="cart" name="cart" value="${assetEntityInstance.cart}" size=3 tabindex="62" />
 								<input type="text" id="shelf" name="shelf" value="${assetEntityInstance.shelf}" size=3 tabindex="63"/></td>
