@@ -26,6 +26,10 @@ $(document).ready(function() {
 	$("#createDBView").dialog({ autoOpen: false })
 	$("#editDBView").dialog({ autoOpen: false })
 	$('#assetMenu').show();
+    $("#commentsListDialog").dialog({ autoOpen: false })
+    $("#createCommentDialog").dialog({ autoOpen: false })
+    $("#showCommentDialog").dialog({ autoOpen: false })
+    $("#editCommentDialog").dialog({ autoOpen: false })
 })
 </script>
 
@@ -37,6 +41,7 @@ $(document).ready(function() {
 <g:if test="${flash.message}">
 <div class="message">${flash.message}</div>
 </g:if>
+<input type="hidden" id="role" value="role"/>
 <div id="jmesaId" class="body">
 	<form name="listDBForm" action="list">
 		<jmesa:tableFacade id="tag" items="${databaseList}" maxRows="50"
@@ -59,7 +64,7 @@ $(document).ready(function() {
 								</g:remoteLink>
 							</g:elseif>
 							<g:else>
-							<a onclick="createNewAssetComment(${dataBaseInstance.id});">
+							<a href="javascript:createNewAssetComment(${appEntityInstance.id});">
 								<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px"/>
 							</a>
 							</g:else>
@@ -95,6 +100,7 @@ $(document).ready(function() {
 			</jmesa:htmlTable>
 		</jmesa:tableFacade>
 	</form>
+	
 	<div class="buttons">
 		<span class="button"><input type="button" class="save" value="Create DB"
 			onclick="${remoteFunction(action:'create', onComplete:'createDbView(e)')}" />
@@ -121,7 +127,7 @@ $(document).ready(function() {
 		<span id="Files"><g:select name="asset" from="${files}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 	</div>
 </div>
-
+<g:render template="../assetentity/commentCrud"/>
 </div>
 <script type="text/javascript">
  function getDbDetails(type, value){

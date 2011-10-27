@@ -387,22 +387,6 @@ function onInvokeAction(id) {
 		$("#assetStatusId").val('');
 		$("form#dashboardForm").submit();
 	}
-	function createNewAssetComment( asset ){
-		setAssetId( asset );
-		timedUpdate('never');
-		$('#statusId').val('new');
-		$('#createCommentDialog').dialog('option', 'width', 'auto');
-		$('#createCommentDialog').dialog('open');
-		$('#commentsListDialog').dialog('close');
-		$('#editCommentDialog').dialog('close');
-		$('#showCommentDialog').dialog('close');
-		$('#showDialog').dialog('close');
-		$('#editDialog').dialog('close');
-		$('#createDialog').dialog('close');
-		$('#filterDialog').dialog('close');
-		document.createCommentForm.mustVerify.value=0;
-		document.createCommentForm.reset();
-	}
 	function showfilterDialog(){
 		timedUpdate('never')
 		$('#createCommentDialog').dialog('close');

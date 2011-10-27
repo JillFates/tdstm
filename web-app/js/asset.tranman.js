@@ -977,3 +977,18 @@ function showModel(id){
 		}
 	})
 }
+function createNewAssetComment( asset ){
+	setAssetId( asset );
+	$('#statusId').val('new');
+	$('#createCommentDialog').dialog('option', 'width', 'auto');
+	$('#createCommentDialog').dialog('open');
+	$('#commentsListDialog').dialog('close');
+	$('#editCommentDialog').dialog('close');
+	$('#showCommentDialog').dialog('close');
+	$('#showDialog').dialog('close');
+	$('#editDialog').dialog('close');
+	$('#createDialog').dialog('close');
+	$('#filterDialog').dialog('close');
+	document.createCommentForm.mustVerify.value=0;
+	document.createCommentForm.reset();
+}

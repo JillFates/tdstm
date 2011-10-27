@@ -28,6 +28,10 @@ $(document).ready(function() {
 	$("#createAppView").dialog({ autoOpen: false })
 	$("#showAppView").dialog({ autoOpen: false })
 	$("#editAppView").dialog({ autoOpen: false })
+	$("#commentsListDialog").dialog({ autoOpen: false })
+	$("#createCommentDialog").dialog({ autoOpen: false })
+    $("#showCommentDialog").dialog({ autoOpen: false })
+    $("#editCommentDialog").dialog({ autoOpen: false })
 })
 </script>
 
@@ -39,6 +43,7 @@ $(document).ready(function() {
 <g:if test="${flash.message}">
 <div class="message">${flash.message}</div>
 </g:if>
+<input type="hidden" id="role" value="role"/>
 <div id= "jmesaId">
 	<form name="listAppsForm" action="list">
 		<jmesa:tableFacade id="tag" items="${assetEntityList}" maxRows="50" exportTypes="csv,excel" stateAttr="restore" var="appEntityInstance" autoFilterAndSort="true" maxRowsIncrements="50,100,200">
@@ -58,7 +63,7 @@ $(document).ready(function() {
 								</g:remoteLink>
 							</g:elseif>
 							<g:else>
-							<a onclick="createNewAssetComment(${appEntityInstance.id});">
+							<a href="javascript:createNewAssetComment(${appEntityInstance.id});">
 								<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px"/>
 							</a>
 							</g:else>
@@ -91,6 +96,7 @@ $(document).ready(function() {
 		</jmesa:tableFacade>
 	</form>
 </div>
+<g:render template="../assetentity/commentCrud"/>
 <div class="buttons"> 
 		<span class="button"><input type="button" class="save" value="Create App" onclick="${remoteFunction(action:'create', onComplete:'createAppView(e)')}"/></span>
 </div>

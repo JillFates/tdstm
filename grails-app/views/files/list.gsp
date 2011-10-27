@@ -26,6 +26,10 @@ $(document).ready(function() {
 	$("#showFilesView").dialog({ autoOpen: false })
 	$("#editFilesView").dialog({ autoOpen: false })
 	$('#assetMenu').show();
+    $("#commentsListDialog").dialog({ autoOpen: false })
+    $("#createCommentDialog").dialog({ autoOpen: false })
+    $("#showCommentDialog").dialog({ autoOpen: false })
+    $("#editCommentDialog").dialog({ autoOpen: false })
 })
 </script>
 
@@ -37,7 +41,7 @@ $(document).ready(function() {
 <g:if test="${flash.message}">
 <div class="message">${flash.message}</div>
 </g:if>
-
+<input type="hidden" id="role" value="role"/>
 <div id="jmesaId" class="body">
 	<form name="listFileForm" action="list">
 		<jmesa:tableFacade id="tag" items="${filesList}" maxRows="50"
@@ -47,7 +51,7 @@ $(document).ready(function() {
 				<jmesa:htmlRow highlighter="true" style="cursor: pointer;">
 					<jmesa:htmlColumn property="id" sortable="false" filterable="false"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions">
-						<span onclick="editFile(${fileInstance?.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
+						    <img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
 						<span id="icon_${fileInstance.id}">
 							<g:if test="${fileInstance.commentType == 'issue'}">
 								<g:remoteLink controller="assetEntity" action="listComments" id="${fileInstance.id}" before='setAssetId(${fileInstance.id});'	onComplete="listCommentsDialog( e ,'never' );">
@@ -60,7 +64,7 @@ $(document).ready(function() {
 								</g:remoteLink>
 							</g:elseif>
 							<g:else>
-							<a onclick="createNewAssetComment(${fileInstance.id});">
+							<a href="javascript:createNewAssetComment(${appEntityInstance.id});">
 								<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px"/>
 							</a>
 							</g:else>
@@ -102,6 +106,7 @@ $(document).ready(function() {
 			</jmesa:htmlTable>
 		</jmesa:tableFacade>
 	</form>
+	<g:render template="../assetentity/commentCrud"/>
 	<div class="buttons">
 		<span class="button"><input type="button" class="save"
 			value="Create Files"
