@@ -106,7 +106,7 @@ $(document).ready(function() {
 			</jmesa:htmlTable>
 		</jmesa:tableFacade>
 	</form>
-	<g:render template="../assetentity/commentCrud"/>
+	<g:render template="../assetEntity/commentCrud"/>
 	<div class="buttons">
 		<span class="button"><input type="button" class="save"
 			value="Create Files"

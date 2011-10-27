@@ -127,7 +127,7 @@ $(document).ready(function() {
 		<span id="Files"><g:select name="asset" from="${files}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 	</div>
 </div>
-<g:render template="../assetentity/commentCrud"/>
+<g:render template="../assetEntity/commentCrud"/>
 </div>
 <script type="text/javascript">
  function getDbDetails(type, value){

@@ -96,7 +96,7 @@ $(document).ready(function() {
 		</jmesa:tableFacade>
 	</form>
 </div>
-<g:render template="../assetentity/commentCrud"/>
+<g:render template="../assetEntity/commentCrud"/>
 <div class="buttons"> 
 		<span class="button"><input type="button" class="save" value="Create App" onclick="${remoteFunction(action:'create', onComplete:'createAppView(e)')}"/></span>
 </div>
