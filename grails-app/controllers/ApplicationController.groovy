@@ -51,8 +51,8 @@ class ApplicationController {
 			appBeanInstance.setAppSme(appEntity.appSme)
 			appBeanInstance.setMoveBundle(appEntity.moveBundle?.name)
 			appBeanInstance.setplanStatus(appEntity.planStatus)
-			appBeanInstance.setDepUp(AssetDependency.countByDependent(assetEntity))
-			appBeanInstance.setDepDown(AssetDependency.countByAsset(assetEntity))
+			appBeanInstance.setDepUp(AssetDependency.countByDependentAndStatus(assetEntity, "Validated"))
+			appBeanInstance.setDepDown(AssetDependency.countByAssetAndStatus(assetEntity, "Validated"))
 			
 			if(AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
 				appBeanInstance.setCommentType("issue")

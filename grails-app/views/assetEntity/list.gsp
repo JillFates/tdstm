@@ -118,20 +118,18 @@ $(document).ready(function() {
 <input type="hidden" id="role" value="role"/>
 <div>
 	<form name="assetEntityForm" action="list">
-		<jmesa:tableFacade id="tag" items="${assetEntityInstanceList}" maxRows="25" exportTypes="csv,excel" stateAttr="restore" var="assetEntityInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
+		<jmesa:tableFacade id="tag" items="${assetEntityList}" maxRows="25" exportTypes="csv,excel" stateAttr="restore" var="assetEntityInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
 		    <jmesa:htmlTable style=" border-collapse: separate">
 		        <jmesa:htmlRow highlighter="true">
 		        	<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" >
-		        		<g:remoteLink controller="assetEntity" action="editShow" id="${assetEntityInstance.id}" before="document.showForm.id.value = ${assetEntityInstance.id};document.editForm.id.value = ${assetEntityInstance.id};" onComplete="showAssetDialog( e , 'edit');">
-							<img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/>
-						</g:remoteLink>
+		        		<a href="javascript:createEditPage(${assetEntityInstance.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
 						<span id="icon_${assetEntityInstance.id}">
-							<g:if test="${AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetEntityInstance,'issue',0])}">
+							<g:if test="${assetEntityInstance.commentType == 'issue'}">
 								<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
 									<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="0px"/>
 								</g:remoteLink>
 							</g:if>
-							<g:elseif test="${AssetComment.findByAssetEntity(assetEntityInstance)}">
+							<g:elseif test="${assetEntityInstance.commentType == 'comment'}">
 							<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
 								<img src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px"/>
 							</g:remoteLink>
@@ -176,6 +174,12 @@ $(document).ready(function() {
 		        	<jmesa:htmlColumn property="moveBundleName" title="Move Bundle" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<span id="moveBundle_${assetEntityInstance.id}" onclick="showAssetDetails( ${assetEntityInstance.id} )">${assetEntityInstance.moveBundle}</span>
 		        	</jmesa:htmlColumn>
+		        	<jmesa:htmlColumn property="depUp" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        		<span onclick="getAppDetails('${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.depUp}</span>
+		        	</jmesa:htmlColumn>
+		        	<jmesa:htmlColumn property="depDown" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        		<span onclick="getAppDetails('${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.depDown}</span>
+		        	</jmesa:htmlColumn>
 		        </jmesa:htmlRow>
 			</jmesa:htmlTable>
 		</jmesa:tableFacade>
@@ -192,7 +196,7 @@ $(document).ready(function() {
 
 		<table style="border: 0px;">
 			<tr class="prop">
-				<td valign="top" class="name" ><label for="attributeSet">Attribute Set:</label><span style="padding-left: 46px;"><g:select optionKey="id" from="${com.tdssrc.eav.EavAttributeSet.list()}" id="attributeSetId" name="attributeSet.id" value="${assetEntityInstance?.attributeSet?.id}" noSelection="['':'select']" 
+				<td valign="top" class="name" ><label for="attributeSet">Attribute Set:</label><span style="padding-left: 46px;"><g:select optionKey="id" from="${com.tdssrc.eav.EavAttributeSet.list()}" id="attributeSetId" name="attributeSet.id" noSelection="['':'select']" 
 				 onchange="${remoteFunction(action:'getAttributes', params:'\'attribSet=\' + this.value ', onComplete:'generateCreateForm(e)')}"></g:select></span> </td>
 			</tr>
 		</table>
@@ -599,6 +603,8 @@ function showAssetDialog(e){
 	$("#showAssetList").dialog('option', 'width', 'auto');
 	$("#showAssetList").dialog('option', 'position', ['center','top']);
 	$("#showAssetList").dialog('open');
+	$("#createAsset").dialog('close');
+	$("#editAsset").dialog('close');
 }
 function createAssetPage(){
 	${remoteFunction(action:'create', onComplete:'showCreateView(e)')}
@@ -610,6 +616,8 @@ function showCreateView(e){
 	$("#createAsset").dialog('option', 'width', 'auto');
 	$("#createAsset").dialog('option', 'position', ['center','top']);
 	$("#createAsset").dialog('open');
+	$("#showAssetList").dialog('close');
+	$("#editAsset").dialog('close');
 }
 function selectManufacturer(value){
 	var val = value;
@@ -643,6 +651,8 @@ function showEditView(e){
 	$("#editAsset").dialog('option', 'width', 'auto');
 	$("#editAsset").dialog('option', 'position', ['center','top']);
 	$("#editAsset").dialog('open');
+	$("#createAsset").dialog('close');
+	$("#showAssetList").dialog('close');
 }
 function addAssetDependency( type ){
 	var rowNo = $("#"+type+"Count").val()

@@ -35,7 +35,7 @@
 								<td class="label" nowrap="nowrap"><label for="manufacturer">Manufacturer</label></td>
 								 <td >
 								 <div id="manufacturerId">
-								   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${assetEntityInstance.manufacturer}" onChange="selectModel(this.value)" optionKey="id" optionValue="name" noSelection="${['':' Unassigned']}" tabindex="13"/>
+								   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${assetEntityInstance.manufacturer.id}" onChange="selectModel(this.value)" optionKey="id" optionValue="name" noSelection="${['':' Unassigned']}" tabindex="13"/>
 								 </div>
 								</td>
 								<td class="label" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
@@ -54,7 +54,7 @@
 								<td class="label" nowrap="nowrap"><label for="model">Model</label></td>
 								<td>
 								<div id="modelId">
-								   <g:select id="model" name ="model.id" from="${models}" value= "${assetEntityInstance.model}" noSelection="${['':' Unassigned']}" tabindex="14"/>
+								   <g:select id="model" name ="model.id" from="${models}" value= "${assetEntityInstance.model.id}" optionKey="id" optionValue="modelName"  noSelection="${['':' Unassigned']}" tabindex="14"/>
 								 </div>
 								</td>
 								<td class="label" nowrap="nowrap"><label for="os">OS</label></td>
@@ -142,7 +142,7 @@
 								<td>&nbsp</td>
 								<td>&nbsp</td>
 								<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
-								<td colspan="2"><g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${assetEntityInstance.moveBundle}" optionKey="id" optionValue="name" tabindex="38" noSelection="${['null':' Please Select']}"/>val:${assetEntityInstance.moveBundle}</td>
+								<td colspan="2"><g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${assetEntityInstance.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="38" noSelection="${['null':' Please Select']}"/>val:${assetEntityInstance.moveBundle}</td>
 								<td class="label" nowrap="nowrap"><label for="truck">Truck</label></td>
 								<td ><input type="text" id="truck" name="truck" value="${assetEntityInstance.truck}" size=6 tabindex="61"/></td>
 							</tr>

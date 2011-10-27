@@ -622,41 +622,59 @@ class AssetEntityController {
      *-------------------------------------------*/
     def list = {
     	
-       /* userPreferenceService.loadPreferences("MAX_ASSET_LIST")
-        def userMax = getSession().getAttribute("MAX_ASSET_LIST")
-        if(userMax.MAX_ASSET_LIST){
-        	if(!params.max) params.max = userMax.MAX_ASSET_LIST
-        }else{
-        	if(!params.max) params.max = 50
-        }*/
         def projectId = params.projectId
         if(projectId == null || projectId == ""){
         	projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
         }
         def project = Project.findById( projectId )
         def assetEntityInstanceList = AssetEntity.findAllByProject( project, params ) 
+		def assetEntityList =  new ArrayList()
+		assetEntityInstanceList.each { assetEntity->
+			AssetEntityBean assetBeanInstance = new AssetEntityBean();
+			assetBeanInstance.setId(assetEntity.id)
+			assetBeanInstance.setAssetName(assetEntity.assetName)
+			assetBeanInstance.setAssetType(assetEntity.assetType)
+			assetBeanInstance.setAssetTag(assetEntity.assetTag)
+			assetBeanInstance.setModel(assetEntity.model?.modelName)
+			assetBeanInstance.setSourceLocation(assetEntity.sourceLocation)
+			assetBeanInstance.setSourceRack(assetEntity.sourceRack)
+			assetBeanInstance.setTargetLocation(assetEntity.targetLocation)
+			assetBeanInstance.setTargetRack(assetEntity.targetRack)
+			assetBeanInstance.setMoveBundle(assetEntity.moveBundle?.name)
+			assetBeanInstance.setSerialNumber(assetEntity.serialNumber)
+			assetBeanInstance.setDepUp(AssetDependency.countByDependentAndStatus(assetEntity, "Validated"))
+			assetBeanInstance.setDepDown(AssetDependency.countByAssetAndStatus(assetEntity, "Validated"))
+			
+			if(AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
+				assetBeanInstance.setCommentType("issue")
+			} else if(AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id)){
+				assetBeanInstance.setCommentType("comment")
+			} else {
+				assetBeanInstance.setCommentType("blank")
+			}
+			
+			assetEntityList.add(assetBeanInstance)
+		}
 		def servers = AssetEntity.findAllByAssetTypeAndProject('Server',project)
 		def applications = Application.findAllByAssetTypeAndProject('Application',project)
 		def dbs = Database.findAllByAssetTypeAndProject('Database',project)
 		def files = Files.findAllByAssetTypeAndProject('Files',project)
 		try{
 		TableFacade tableFacade = new TableFacadeImpl("tag",request)
-        tableFacade.items = assetEntityInstanceList
+        tableFacade.items = assetEntityList
         Limit limit = tableFacade.limit
 		if(limit.isExported()){
             tableFacade.setExportTypes(response,limit.getExportType())
             tableFacade.setColumnProperties("id","application","assetName","shortName","serialNumber","assetTag","manufacturer","model","assetType","ipAddress","os","sourceLocation","sourceRoom","sourceRack","sourceRackPosition","sourceBladeChassis","sourceBladePosition","targetLocation","targetRoom","targetRack","targetRackPosition","targetBladeChassis","targetBladePosition","custom1","custom2","custom3","custom4","custom5","custom6","custom7","custom8","moveBundle","sourceTeamMt","targetTeamMt","sourceTeamLog","targetTeamLog","sourceTeamSa","targetTeamSa","sourceTeamDba","targetTeamDba","truck","cart","shelf","railType","appOwner","appSme","priority")
             tableFacade.render()
         }else
-            return [assetEntityInstanceList : assetEntityInstanceList,projectId: projectId, servers : servers, 
+            return [assetEntityList : assetEntityList,projectId: projectId, servers : servers, 
 				applications : applications, dbs : dbs, files : files, assetDependency: new AssetDependency()]
 		} catch(Exception ex ){
 			return [assetEntityInstanceList : null,projectId: projectId, servers : servers, 
 				applications : applications, dbs : dbs, files : files, assetDependency: new AssetDependency()]
 		}
         
-        /*[ assetEntityInstanceList: assetEntityInstanceList, projectId: projectId,maxVal : params.max,
-		  filterParams: com.zeddware.grails.plugins.filterpane.FilterUtils.extractFilterParams(params)]*/
     }   
     /* ----------------------------------------
      * delete assetEntity
@@ -1947,6 +1965,9 @@ class AssetEntityController {
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
+		def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetEntityInstance.assetType])?.manufacturer
+		def models = assetEntityInstance.manufacturer ? Model.findAllByManufacturer( assetEntityInstance.manufacturer,[sort:'modelName',order:'asc'] )?.findAll{it.assetType == assetEntityInstance.assetType } : []
+
 		def planStatusAttribute = EavAttribute.findByAttributeCode('planStatus')
 		
 		def planStatusOptions = EavAttributeOption.findAllByAttribute(planStatusAttribute)
@@ -1968,7 +1989,8 @@ class AssetEntityController {
 
 		[assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 					planStatusOptions:planStatusOptions?.value, projectId:projectId, project: project, railTypeOption:railTypeOption?.value,
-					priorityOption:priorityOption?.value,dependentAssets:dependentAssets,supportAssets:supportAssets]
+					priorityOption:priorityOption?.value,dependentAssets:dependentAssets,supportAssets:supportAssets,
+					manufacturers:manufacturers, models:models]
 
 	}
 	def update={

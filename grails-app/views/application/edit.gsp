@@ -78,7 +78,7 @@
 								<td ><input type="text" id="businessUnit" name="businessUnit" value="${applicationInstance.businessUnit}" tabindex="25" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
-								<td ><g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${applicationInstance.moveBundle}" optionKey="id" optionValue="name" tabindex="34" />
+								<td ><g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${applicationInstance.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="34" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="useFrequency">Use	Frequency</label>
 								</td>

@@ -48,7 +48,7 @@
 									<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label>
 								</td>
 								<td><g:select from="${moveBundleList}" id="moveBundle"
-										name="moveBundle.id" value="${fileInstance.moveBundle}"
+										name="moveBundle.id" value="${fileInstance.moveBundle?.id}"
 										optionKey="id" optionValue="name" />
 								</td>
 							</tr>

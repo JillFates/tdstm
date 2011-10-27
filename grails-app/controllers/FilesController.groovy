@@ -39,8 +39,8 @@ class FilesController {
 			filesEntity.setFileSize(fileentity.fileSize)
 			filesEntity.setMoveBundle(fileentity?.moveBundle?.name)
 			filesEntity.setplanStatus(fileentity.planStatus)
-			filesEntity.setDepUp(AssetDependency.countByDependent(assetEntity))
-			filesEntity.setDepDown(AssetDependency.countByAsset(assetEntity))
+			filesEntity.setDepUp(AssetDependency.countByDependentAndStatus(assetEntity, "Validated"))
+			filesEntity.setDepDown(AssetDependency.countByAssetAndStatus(assetEntity, "Validated"))
 			if(AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
 				filesEntity.setCommentType("issue")
 			} else if(AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id)){

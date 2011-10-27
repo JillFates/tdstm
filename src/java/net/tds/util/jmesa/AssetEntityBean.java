@@ -31,6 +31,14 @@ public class AssetEntityBean implements Serializable {
 
 	private Integer depUp; // dependencies support count
 	private Integer depDown; // dependencies down count
+	
+	private String model;
+	private String sourceLocation;
+	private String sourceRack;
+	private String targetLocation;
+	private String targetRack;
+	private String serialNumber;
+
 
 	public AssetEntityBean() {
 
@@ -210,5 +218,53 @@ public class AssetEntityBean implements Serializable {
 
 	public void setDepDown(Integer depDown) {
 		this.depDown = depDown;
+	}
+
+	public String getModel() {
+		return model;
+	}
+
+	public void setModel(String model) {
+		this.model = model;
+	}
+
+	public String getSourceLocation() {
+		return sourceLocation;
+	}
+
+	public void setSourceLocation(String sourceLocation) {
+		this.sourceLocation = sourceLocation;
+	}
+
+	public String getSourceRack() {
+		return sourceRack;
+	}
+
+	public void setSourceRack(String sourceRack) {
+		this.sourceRack = sourceRack;
+	}
+
+	public String getTargetLocation() {
+		return targetLocation;
+	}
+
+	public void setTargetLocation(String targetLocation) {
+		this.targetLocation = targetLocation;
+	}
+
+	public String getTargetRack() {
+		return targetRack;
+	}
+
+	public void setTargetRack(String targetRack) {
+		this.targetRack = targetRack;
+	}
+
+	public String getSerialNumber() {
+		return serialNumber;
+	}
+
+	public void setSerialNumber(String serialNumber) {
+		this.serialNumber = serialNumber;
 	}
 }
