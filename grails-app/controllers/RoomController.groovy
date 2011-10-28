@@ -2,6 +2,9 @@ import grails.converters.JSON
 
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetEntity
+import com.tds.asset.Application
+import com.tds.asset.Database
+import com.tds.asset.Files
 
 class RoomController {
 
@@ -22,8 +25,13 @@ class RoomController {
 		def roomInstanceList = Room.findAllByProject( project, params )
 		def roomId = getSession().getAttribute( "CURR_ROOM" )?.CURR_ROOM
 		def roomInstance = new Room()
+		def servers = AssetEntity.findAllByAssetTypeAndProject('Server',project)
+		def applications = Application.findAllByAssetTypeAndProject('Application',project)
+		def dbs = Database.findAllByAssetTypeAndProject('Database',project)
+		def files = Files.findAllByAssetTypeAndProject('Files',project)
 		[roomInstanceList: roomInstanceList, roomInstanceTotal: roomInstanceList.size(), 
-		 projectId:projectId, roomId:roomId, viewType:params.viewType, roomInstance:roomInstance]
+		 projectId:projectId, roomId:roomId, viewType:params.viewType, roomInstance:roomInstance, servers : servers, 
+				applications : applications, dbs : dbs, files : files]
     }
 
     def create = {

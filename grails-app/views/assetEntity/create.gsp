@@ -23,10 +23,10 @@
 								</td>
 								<td ><g:select id="priority" name ="priority" from="${priorityOption}" value= "${assetEntityInstance.priority}" noSelection="${['':' Please Select']}" tabindex="21"/>
 								</td>
-								<td class="label" nowrap="nowrap"><label for="sourceLocation">Location</label></td>
-								<td><input type="text" id="sourceLocation"
+								<td class="label" nowrap="nowrap"><label for="sourceLocationId">Location</label></td>
+								<td><input type="text" id="sourceLocationId"
 									name="sourceLocation" value="${assetEntityInstance.sourceLocation}" size=10 tabindex="31"/></td>
-									<td><input type="text" id="targetLocation"
+									<td><input type="text" id="targetLocationId"
 									name="targetLocation" value="${assetEntityInstance.targetLocation}" size=10 tabindex="41"/></td>
 								<td class="label" nowrap="nowrap"><label for="custom2">Custom2</label></td>
 								<td ><input type="text" id="custom2" name="custom2" value="${assetEntityInstance.custom2}" size=8 tabindex="51"/></td>
@@ -42,10 +42,10 @@
 								<td ><input type="text" id="ipAddress" name="ipAddress"
 									value="${assetEntityInstance.ipAddress}" tabindex="22"/>
 								</td>
-								<td class="label" nowrap="nowrap"><label for="sourceRoom">Room</label></td>
-								<td><input type="text" id="sourceRoom"
+								<td class="label" nowrap="nowrap"><label for="sourceRoomId">Room</label></td>
+								<td><input type="text" id="sourceRoomId"
 									name="sourceRoom" value="${assetEntityInstance.sourceRoom}" size=10 tabindex="32"/></td>
-									<td><input type="text" id="targetRoom"
+									<td><input type="text" id="targetRoomId"
 									name="targetRoom" value="${assetEntityInstance.targetRoom}" size=10 tabindex="42" /></td>
 								<td class="label" nowrap="nowrap"><label for="custom3">Custom3</label></td>
 								<td ><input type="text" id="custom3" name="custom3" value="${assetEntityInstance.custom3}" size=8 tabindex="52" /></td>
@@ -59,10 +59,10 @@
 								</td>
 								<td class="label" nowrap="nowrap"><label for="os">OS</label></td>
 								<td ><input type="text" id="os" name="os" value="${assetEntityInstance.os}"  tabindex="24"/></td>
-								<td class="label" nowrap="nowrap"><label for="sourceRack">Rack/Cab</label></td>
-								<td><input type="text" id="sourceRack"
+								<td class="label" nowrap="nowrap"><label for="sourceRackId">Rack/Cab</label></td>
+								<td><input type="text" id="sourceRackId"
 									name="sourceRack" value="${assetEntityInstance.sourceRack}" size=10 tabindex="33"/></td>
-									<td><input type="text" id="targetRack"
+									<td><input type="text" id="targetRackId"
 									name="targetRack" value="${assetEntityInstance.targetRack}" size=10 tabindex="44" /></td>
 								<td class="label" nowrap="nowrap"><label for="custom4">Custom4</label></td>
 								<td ><input type="text" id="custom4" name="custom4" value="${assetEntityInstance.custom4}" size=8 tabindex="53" /></td>
@@ -77,10 +77,10 @@
 									value="${assetEntityInstance.supportType}" tabindex="26"/>
 								</td>
 								
-								<td class="label" nowrap="nowrap"><label for="sourceRack">Position</label>
-								<td><input type="text" id="sourceRackPosition"
+								<td class="label" nowrap="nowrap"><label for="sourceRackPositionId">Position</label>
+								<td><input type="text" id="sourceRackPositionId"
 									name="sourceRackPosition" value="${assetEntityInstance.sourceRackPosition}" size=10 tabindex="34" /></td>
-									<td><input type="text" id="targetRackPosition"
+									<td><input type="text" id="targetRackPositionId"
 									name="targetRackPosition" value="${assetEntityInstance.targetRackPosition}" size=10 tabindex="44"/></td>
 								</td>
 								<td class="label" nowrap="nowrap"><label for="custom5">Custom5</label></td>
@@ -209,6 +209,7 @@
 		<tr>
 			<td colspan="2">
 				<div class="buttons">
+			        <input type="hidden" name="redirectTo" value="${redirectTo}"/>
 					<input name="attributeSet.id" type="hidden" value="1">
 					<input name="project.id" type="hidden" value="${projectId}">
 					<input name="dependentCount" id="dependentCount" type="hidden" value="0">

@@ -35,7 +35,7 @@
 								<td class="label" nowrap="nowrap"><label for="manufacturer">Manufacturer</label></td>
 								 <td >
 								 <div id="manufacturerId">
-								   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${assetEntityInstance.manufacturer.id}" onChange="selectModel(this.value)" optionKey="id" optionValue="name" noSelection="${['':' Unassigned']}" tabindex="13"/>
+								   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${assetEntityInstance.manufacturer?.id}" onChange="selectModel(this.value)" optionKey="id" optionValue="name" noSelection="${['':' Unassigned']}" tabindex="13"/>
 								 </div>
 								</td>
 								<td class="label" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
@@ -54,7 +54,7 @@
 								<td class="label" nowrap="nowrap"><label for="model">Model</label></td>
 								<td>
 								<div id="modelId">
-								   <g:select id="model" name ="model.id" from="${models}" value= "${assetEntityInstance.model.id}" optionKey="id" optionValue="modelName"  noSelection="${['':' Unassigned']}" tabindex="14"/>
+								   <g:select id="model" name ="model.id" from="${models}" value= "${assetEntityInstance.model?.id}" optionKey="id" optionValue="modelName"  noSelection="${['':' Unassigned']}" tabindex="14"/>
 								 </div>
 								</td>
 								<td class="label" nowrap="nowrap"><label for="os">OS</label></td>
@@ -231,6 +231,7 @@
 		<tr>
 			<td colspan="2">
 				<div class="buttons">
+					<input type="hidden" name="redirectTo" value="${redirectTo}" />
 				    <input name="dependentCount" id="dependentCount" type="hidden" value="${dependentAssets.size()}">
 					<input  name="supportCount"  id="supportCount" type="hidden" value="${supportAssets.size()}">
 					<input name="attributeSet.id" type="hidden" value="1">

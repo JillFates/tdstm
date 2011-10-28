@@ -6,6 +6,7 @@
 <meta name="layout" content="projectHeader" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="room.rack.combined.js"/>
 <title>Rack View</title>
@@ -72,6 +73,9 @@
 	    $("#listDialog").dialog({ autoOpen: false })
 	    $("#manufacturerShowDialog").dialog({ autoOpen: false })
 	    $("#modelShowDialog").dialog({ autoOpen: false })
+	    $("#showAssetList").dialog({autoOpen: false})
+	    $("#createAsset").dialog({autoOpen: false})
+	    $("#editAsset").dialog({autoOpen: false})
 	})
 	// Script to get the combined rack list
 	function getRackDetails( objId ){
@@ -356,7 +360,30 @@
 </div>
 </jsec:hasAnyRole>
 </div>
+<div id ="createAsset" style="display: none" title="Create Asset"></div>
+<div id ="showAssetList" style="display: none" title="Show Asset"></div>
+<div id ="editAsset" style="display: none" title="Edit Asset">
+</div>
 
+<div style="display: none;">
+<table id="assetDependencyRow">
+	<tr>
+	
+		<td><g:select name="dataFlowFreq" from="${com.tds.asset.AssetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
+		<td><g:select name="entity" from="['Server','Application','Database','Files']" onchange='updateAssetsList(this.name, this.value)'></g:select></td>
+		<td><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></td>
+		<td><g:select name="dtype" from="${com.tds.asset.AssetDependency.constraints.type.inList}"></g:select></td>
+		<td><g:select name="status" from="${com.tds.asset.AssetDependency.constraints.status.inList}"></g:select></td>
+	</tr>
+	</table>
+</div>
+<div style="display: none;">
+<span id="Server"><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+<span id="Application"><g:select name="asset" from="${applications}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+<span id="Database"><g:select name="asset" from="${dbs}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+<span id="Files"><g:select name="asset" from="${files}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+</div>
+</div>
 <script type="text/javascript">
 
 	$(document).ready(function() {
@@ -373,11 +400,79 @@
 			$('#commit').val($(this).val());
 		});
 	});
-	
-	/*
-		RACK Autocomplete functionality
-	*/
-	${remoteFunction(action:'getAutoCompleteDetails', params:'\'field=rack\'', onComplete:"updateAutoComplete( e , 'rack')" )};
+	function createAssetPage(source,rack,roomName,location,position){
+		var val ="rack"
+		${remoteFunction(action:'create', params:'\'redirectTo=\' + val ' ,controller:'assetEntity', onComplete:'showCreateView(e, source,rack,roomName,location,position)')}
+	}
+	function showCreateView(e, source,rack,roomName,location,position){
+		var resp = e.responseText;
+		$("#createAsset").html(resp)	
+		$("#createAsset").dialog('option', 'width', 'auto');
+		$("#createAsset").dialog('option', 'position', ['center','top']);
+		$("#createAsset").dialog('open');
+		$("#showAssetList").dialog('close');
+		$("#editAsset").dialog('close');
+		updateAssetInfo(source,rack,roomName,location,position)
+	}
+	function selectManufacturer(value){
+		var val = value;
+		${remoteFunction(action:'getManufacturersList',controller:'assetEntity', params:'\'assetType=\' + val ', onComplete:'showManufacView(e)' )}
+		}
+	function showManufacView(e){
+		alert("WARNING : Change of Asset Type may impact on Manufacturer and Model, Do you want to continue ?");
+	    var resp = e.responseText;
+	    $("#manufacturerId").html(resp);
+	    $("#manufacturers").removeAttr("multiple")
+	}
+	function selectModel(value){
+		var val = value;
+		var assetType = $("#assetTypeId").val() ;
+		${remoteFunction(action:'getModelsList',controller:'assetEntity', params:'\'assetType=\' +assetType +\'&manufacturer=\'+ val', onComplete:'showModelView(e)' )}
+		}
+	function showModelView(e){
+		alert("WARNING : Change of Manufacturer may impact on Model data, Do you want to continue ?")
+	    var resp = e.responseText;
+	    $("#modelId").html(resp);
+	    $("#models").removeAttr("multiple")
+	}
+	function createEditPage(value){
+		var val = value
+		var redirectTo="rack"
+		${remoteFunction(action:'edit',controller:'assetEntity',params:'\'id=\' + val +\'&redirectTo=\'+redirectTo' , onComplete:'showEditView(e);' )}
+		
+	}
+	function showEditView(e){
+		var resp = e.responseText;
+		$("#editAsset").html(resp)	
+		$("#editAsset").dialog('option', 'width', 'auto');
+		$("#editAsset").dialog('option', 'position', ['center','top']);
+		$("#editAsset").dialog('open');
+		$("#createAsset").dialog('close');
+		$("#showAssetList").dialog('close');
+	}
+	function addAssetDependency( type ){
+		var rowNo = $("#"+type+"Count").val()
+		var rowData = $("#assetDependencyRow tr").html().replace("dataFlowFreq","dataFlowFreq_"+type+"_"+rowNo).replace("asset","asset_"+type+"_"+rowNo).replace("dtype","dtype_"+type+"_"+rowNo).replace("status","status_"+type+"_"+rowNo).replace("entity","entity_"+type+"_"+rowNo)
+		if(type!="support"){
+			$("#createDependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
+		} else {
+			$("#createSupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
+		}
+		$("#"+type+"Count").val(parseInt(rowNo)+1)
+	}
+	function deleteRow( rowId ){
+		$("#"+rowId).remove()
+	}
+	function updateAssetsList( name, value ){
+		var idValues = name.split("_")
+		$("select[name='asset_"+idValues[1]+"_"+idValues[2]+"']").html($("#"+value+" select").html())
+	}
+	function getAppDetails(type, value){
+		if(type == "Server"){
+		   var val = value
+		   ${remoteFunction(action:'show', params:'\'id=\' + value ', onComplete:'showAssetDialog(e)')}
+		}
+	}
 </script>
 </body>
 </html>

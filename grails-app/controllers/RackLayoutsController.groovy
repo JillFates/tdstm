@@ -6,6 +6,9 @@ import org.jsecurity.SecurityUtils
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
+import com.tds.asset.Application
+import com.tds.asset.Database
+import com.tds.asset.Files
 
 class RackLayoutsController {
 	def userPreferenceService
@@ -25,13 +28,18 @@ class RackLayoutsController {
 		/* set first bundle as default if user pref not exist */
 		def isCurrentBundle = true
 		def models = AssetEntity.findAll('FROM AssetEntity WHERE project = ? GROUP BY model',[ projectInstance ])?.model
+		def servers = AssetEntity.findAllByAssetTypeAndProject('Server',projectInstance)
+		def applications = Application.findAllByAssetTypeAndProject('Application',projectInstance)
+		def dbs = Database.findAllByAssetTypeAndProject('Database',projectInstance)
+		def files = Files.findAllByAssetTypeAndProject('Files',projectInstance)
 		if(!currentBundle){
 			currentBundle = moveBundleInstanceList[0]?.id?.toString()
 			isCurrentBundle = false
 		}
 		
 		return [moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, projectId:projectId,
-				currentBundle:currentBundle, isCurrentBundle : isCurrentBundle, models:models]
+				currentBundle:currentBundle, isCurrentBundle : isCurrentBundle, models:models ,servers:servers, 
+				applications : applications, dbs : dbs, files : files]
 	}
 	
 	def save = {
@@ -333,7 +341,7 @@ class RackLayoutsController {
 								bladeTable = generateBladeLayout(it, overlapAsset, isAdmin, hideIcons)
 							}
 							if(isAdmin){
-								assetTag += "<a href='javascript:openAssetEditDialig(${overlapAsset?.id})' >"+trimString(assetTagValue.replace('~-','-'))+"</a>" 
+								assetTag += "<a href='javascript:createEditPage(${overlapAsset?.id})' >"+trimString(assetTagValue.replace('~-','-'))+"</a>" 
 								if(hasBlades){
 									assetTag += "<br/>"+bladeTable
 								}
@@ -353,7 +361,7 @@ class RackLayoutsController {
 						}
 						cabling = !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : ""
 						if(isAdmin){
-							assetTag += "<a href='javascript:openAssetEditDialig(${overlappedAsset?.id})' >"+trimString(assetTagValue.replace('~-','-'))+"</a>"
+							assetTag += "<a href='javascript:createEditPage(${overlappedAsset?.id})' >"+trimString(assetTagValue.replace('~-','-'))+"</a>"
 							if(hasBlades){
 								assetTag += "<br/>"+bladeTable
 							}
@@ -437,7 +445,7 @@ class RackLayoutsController {
 				if(isAdmin && hideIcons == "on"){
 				row.append("""<div class="rack_menu"><img src="../i/rack_add2.png">
 							<ul>
-								<li><a href="javascript:createDialog('${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Create asset  </a></li>
+								<li><a href="javascript:createAssetPage('${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Create asset  </a></li>
 								<li><a href="javascript:listDialog('','','asc','${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Assign asset </a></li>
 								<li><a href="javascript:listDialog('all','','asc','${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Reassign asset </a></li>
 							</ul></img></div>&nbsp;</td><td>&nbsp;</td>""")
@@ -508,7 +516,7 @@ class RackLayoutsController {
 					if((bladeSpan == 2) &&  hasError )
 						bladeTable += "<td class='errorBlade' style='height:${tdHeight}px'>&nbsp;</td>"
 					else if(isAdmin)
-						bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href='javascript:openAssetEditDialig(${blade.id})' title='${tag.replace('<br/>','')}'>${taglabel}</a></td>"
+						bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href='javascript:createEditPage(${blade.id})' title='${tag.replace('<br/>','')}'>${taglabel}</a></td>"
 					else
 						bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px' title='${tag.replace('<br/>','')}'>${taglabel}</td>"
 				} else {

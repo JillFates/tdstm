@@ -656,6 +656,7 @@ class AssetEntityController {
 			assetEntityList.add(assetBeanInstance)
 		}
 		def servers = AssetEntity.findAllByAssetTypeAndProject('Server',project)
+		println "servers"+servers
 		def applications = Application.findAllByAssetTypeAndProject('Application',project)
 		def dbs = Database.findAllByAssetTypeAndProject('Database',project)
 		def files = Files.findAllByAssetTypeAndProject('Files',project)
@@ -1917,10 +1918,10 @@ class AssetEntityController {
 
 		def priorityAttribute = EavAttribute.findByAttributeCode('priority')
 		def priorityOption = EavAttributeOption.findAllByAttribute(priorityAttribute)
-
+		
 		[assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 					planStatusOptions:planStatusOptions?.value, projectId:projectId ,railTypeOption:railTypeOption?.value,
-					priorityOption:priorityOption?.value ,project:project, manufacturers:manufacturers]
+					priorityOption:priorityOption?.value ,project:project, manufacturers:manufacturers,redirectTo:params?.redirectTo ]
 
 
 
@@ -1974,7 +1975,7 @@ class AssetEntityController {
 		
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
-		
+
 		def moveBundleList = MoveBundle.findAllByProject(project)
 		
 		def railTypeAttribute = EavAttribute.findByAttributeCode('railType')
@@ -1986,14 +1987,16 @@ class AssetEntityController {
 		
 		def dependentAssets = AssetDependency.findAllByAsset(assetEntityInstance)
 		def supportAssets = AssetDependency.findAllByDependent(assetEntityInstance)
-
+		
 		[assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 					planStatusOptions:planStatusOptions?.value, projectId:projectId, project: project, railTypeOption:railTypeOption?.value,
 					priorityOption:priorityOption?.value,dependentAssets:dependentAssets,supportAssets:supportAssets,
-					manufacturers:manufacturers, models:models]
+					manufacturers:manufacturers, models:models,redirectTo:params?.redirectTo]
 
 	}
 	def update={
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
+
 		def formatter = new SimpleDateFormat("MM/dd/yyyy")
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def maintExpDate = params.maintExpDate
@@ -2009,7 +2012,13 @@ class AssetEntityController {
 		if(!assetEntityInstance.hasErrors() && assetEntityInstance.save(flush:true)) {
 			flash.message = "Asset ${assetEntityInstance.assetName} Updated"
 			assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance)
-			redirect(action:list,id:assetEntityInstance.id)
+			if(params.redirectTo == "room"){
+				redirect( controller:'room',action:list, params:[projectId: projectId] )
+			} else if(params.redirectTo == "rack"){
+				redirect( controller:'rackLayouts',action:'create', params:[projectId: projectId] )
+			} else {
+				redirect( action:list)
+			}
 		}
 		else {
 			flash.message = "Asset not created"
