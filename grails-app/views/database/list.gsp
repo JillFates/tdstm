@@ -78,7 +78,7 @@ $(document).ready(function() {
 					<jmesa:htmlColumn property="dbFormat" sortable="true"
 						title="DB Format" filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getDbDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.dbFormat}</a>/
+						<span onclick="getDbDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.dbFormat}</a>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="moveBundle" sortable="true"
 						filterable="true"
@@ -155,8 +155,8 @@ function createDbView(e){
 	 $("#editDBView").dialog('close');
 }
 function editDb(value){
-     var val = value
-     ${remoteFunction(action:'edit', params:'\'id=\' + val ', onComplete:'editDbView(e)')}
+	var val = value
+	${remoteFunction(action:'edit', params:'\'id=\' + val ', onComplete:'editDbView(e)')}
 }
 function editDbView(e){
 	 var resp = e.responseText;
