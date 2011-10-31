@@ -141,7 +141,7 @@
 					</thead>
 					<tbody>
 						<g:each in="${supportAssets}" var="support" status="i">
-							<tr onclick="getAppDetails('${support?.asset?.assetType}', ${support?.asset?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
+							<tr onclick="getEntityDetails('${support?.asset?.assetType}', ${support?.asset?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
 								<td class="dep-${support.status}">
 									${support?.dataFlowFreq}
 								</td>
@@ -178,7 +178,7 @@
 					</thead>
 					<tbody>
 						<g:each in="${dependentAssets}" var="dependent" status="i">
-							<tr onclick="getAppDetails('${dependent.dependent?.assetType}', ${dependent.dependent?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
+							<tr onclick="getEntityDetails('${dependent.dependent?.assetType}', ${dependent.dependent?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
 								<td class="dep-${dependent.status}">
 									${dependent.dataFlowFreq}
 								</td>
@@ -208,7 +208,7 @@
 					<input name="project.id" type="hidden" value="${projectId}">
 					<input type="hidden" name="id" value="${assetEntityInstance?.id}" />
 					<span class="button"><input type="button" class="edit"
-						value="Edit" onclick="createEditPage(${assetEntityInstance?.id})" /> </span>
+						value="Edit" onclick="editEntity('Server', ${assetEntityInstance?.id})" /> </span>
 					<span class="button"><g:actionSubmit class="delete"
 							onclick="return confirm('Are you sure?');" value="Delete" /> </span>
 				</div></td>

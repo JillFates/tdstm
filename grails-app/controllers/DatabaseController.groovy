@@ -43,8 +43,8 @@ class DatabaseController {
 			dataBeanInstance.setAssetName(dataBaseentity.assetName)
 			dataBeanInstance.setMoveBundle(dataBaseentity?.moveBundle?.name)
 			dataBeanInstance.setplanStatus(dataBaseentity.planStatus)
-			dataBeanInstance.setDepUp(AssetDependency.countByDependentAndStatus(assetEntity, "Validated"))
-			dataBeanInstance.setDepDown(AssetDependency.countByAssetAndStatus(assetEntity, "Validated"))
+			dataBeanInstance.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
+			dataBeanInstance.setDepDown(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
 			if(AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
 				dataBeanInstance.setCommentType("issue")
 			} else if(AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id)){
@@ -123,11 +123,11 @@ class DatabaseController {
 				if(!dbInstance.hasErrors() && dbInstance.save()) {
 					flash.message = "Database ${dbInstance.assetName} created"
 					assetEntityService.createOrUpdateDatabaseDependencies(params, dbInstance)
-			        redirect(action:list,id:dbInstance.id)
+			        redirect(action:list)
 		 	    }else {
 					flash.message = "Database not created"
 					dbInstance.errors.allErrors.each{ flash.message += it  }
-					redirect(action:list,id:dbInstance.id)
+					redirect(action:list)
 				}
 				
 		
@@ -175,12 +175,12 @@ class DatabaseController {
 		if(!databaseInstance.hasErrors() && databaseInstance.save()) {
 			flash.message = "DataBase ${databaseInstance.assetName} Updated"
 			assetEntityService.createOrUpdateDatabaseDependencies(params, databaseInstance)
-			redirect(action:list,id:databaseInstance.id)
+			redirect(action:list)
 		}
 		else {
 			flash.message = "DataBase not created"
 			databaseInstance.errors.allErrors.each{ flash.message += it }
-			redirect(action:list,id:databaseInstance.id)
+			redirect(action:list)
 		}
 		
 	}

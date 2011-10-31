@@ -39,8 +39,8 @@ class FilesController {
 			filesEntity.setFileSize(fileentity.fileSize)
 			filesEntity.setMoveBundle(fileentity?.moveBundle?.name)
 			filesEntity.setplanStatus(fileentity.planStatus)
-			filesEntity.setDepUp(AssetDependency.countByDependentAndStatus(assetEntity, "Validated"))
-			filesEntity.setDepDown(AssetDependency.countByAssetAndStatus(assetEntity, "Validated"))
+			filesEntity.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
+			filesEntity.setDepDown(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
 			if(AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
 				filesEntity.setCommentType("issue")
 			} else if(AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id)){
@@ -90,12 +90,12 @@ class FilesController {
 				if(!filesInstance.hasErrors() && filesInstance.save()) {
 					flash.message = "File ${filesInstance.assetName} created"
 					assetEntityService.createOrUpdateFilesDependencies(params, filesInstance)
-			        redirect(action:list,id:filesInstance.id)
+			        redirect(action:list)
 				}
 				else {
 					flash.message = "File not created"
 					filesInstance.errors.allErrors.each{ flash.message += it}
-					redirect(action:list,id:filesInstance.id)
+					redirect(action:list)
 				}
 		
 			
@@ -145,12 +145,12 @@ class FilesController {
 		if(!filesInstance.hasErrors() && filesInstance.save()) {
 			flash.message = "File ${filesInstance.assetName} Updated"
 			assetEntityService.createOrUpdateFilesDependencies(params, filesInstance)
-			redirect(action:list,id:filesInstance.id)
+			redirect(action:list)
 		}
 		else {
 			flash.message = "File not created"
 			filesInstance.errors.allErrors.each{ flash.message += it }
-			redirect(action:list,id:filesInstance.id)
+			redirect(action:list)
 		}
 
     }

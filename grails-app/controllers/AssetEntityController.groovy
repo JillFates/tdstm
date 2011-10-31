@@ -642,8 +642,8 @@ class AssetEntityController {
 			assetBeanInstance.setTargetRack(assetEntity.targetRack)
 			assetBeanInstance.setMoveBundle(assetEntity.moveBundle?.name)
 			assetBeanInstance.setSerialNumber(assetEntity.serialNumber)
-			assetBeanInstance.setDepUp(AssetDependency.countByDependentAndStatus(assetEntity, "Validated"))
-			assetBeanInstance.setDepDown(AssetDependency.countByAssetAndStatus(assetEntity, "Validated"))
+			assetBeanInstance.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
+			assetBeanInstance.setDepDown(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
 			
 			if(AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
 				assetBeanInstance.setCommentType("issue")
@@ -2023,7 +2023,7 @@ class AssetEntityController {
 		else {
 			flash.message = "Asset not created"
 			assetEntityInstance.errors.allErrors.each{ flash.message += it }
-			redirect(action:list,id:assetEntityInstance.id)
+			redirect(action:list)
 		}
 
 

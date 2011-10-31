@@ -49,11 +49,10 @@ class ApplicationController {
 			appBeanInstance.setAssetType(appEntity.assetType)
 			appBeanInstance.setAppOwner(appEntity.appOwner)
 			appBeanInstance.setAppSme(appEntity.appSme)
-			appBeanInstance.setAppUrl(appEntity.appUrl)
 			appBeanInstance.setMoveBundle(appEntity.moveBundle?.name)
 			appBeanInstance.setplanStatus(appEntity.planStatus)
-			appBeanInstance.setDepUp(AssetDependency.countByDependentAndStatus(assetEntity, "Validated"))
-			appBeanInstance.setDepDown(AssetDependency.countByAssetAndStatus(assetEntity, "Validated"))
+			appBeanInstance.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
+			appBeanInstance.setDepDown(AssetDependency.countByAssetAndStatusNotEqual(assetEntity, "Validated"))
 			
 			if(AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
 				appBeanInstance.setCommentType("issue")
@@ -114,12 +113,12 @@ class ApplicationController {
 		if(!applicationInstance.hasErrors() && applicationInstance.save(flush:true)) {
 			flash.message = "Application ${applicationInstance.assetName} created"
 			assetEntityService.createOrUpdateApplicationDependencies(params, applicationInstance)
-			redirect(action:list,id:applicationInstance.id)
+			redirect(action:list)
 		}
 		else {
 			flash.message = "Application not created"
 			applicationInstance.errors.allErrors.each{ flash.message += it }
-			redirect(action:list,id:applicationInstance.id)
+			redirect(action:list)
 		}
 
 	}
@@ -181,12 +180,12 @@ class ApplicationController {
 		if(!applicationInstance.hasErrors() && applicationInstance.save(flush:true)) {
 			flash.message = "Application ${applicationInstance.assetName} Updated"
 			assetEntityService.createOrUpdateApplicationDependencies(params, applicationInstance)
-			redirect(action:list,id:applicationInstance.id)
+			redirect(action:list)
 		}
 		else {
 			flash.message = "Application not created"
 			applicationInstance.errors.allErrors.each{ flash.message += it }
-			redirect(action:list,id:applicationInstance.id)
+			redirect(action:list)
 		}
 	}
 	def delete = {

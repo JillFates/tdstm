@@ -4,6 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <g:javascript src="asset.tranman.js" />
+<g:javascript src="entity.crud.js" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
@@ -22,10 +23,10 @@ function onInvokeExportAction(id) {
     location.href = 'list?' + parameterString;
 }
 $(document).ready(function() {
-	$("#showDBView").dialog({ autoOpen: false })
-	$("#createDBView").dialog({ autoOpen: false })
-	$("#editDBView").dialog({ autoOpen: false })
 	$('#assetMenu').show();
+	$("#createEntityView").dialog({ autoOpen: false })
+	$("#showEntityView").dialog({ autoOpen: false })
+	$("#editEntityView").dialog({ autoOpen: false })
     $("#commentsListDialog").dialog({ autoOpen: false })
     $("#createCommentDialog").dialog({ autoOpen: false })
     $("#showCommentDialog").dialog({ autoOpen: false })
@@ -51,7 +52,7 @@ $(document).ready(function() {
 				<jmesa:htmlRow highlighter="true" style="cursor: pointer;">
 					<jmesa:htmlColumn property="id" sortable="false" filterable="false"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions">
-						<a href="javascript:editDb(${dataBaseInstance?.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
+						<a href="javascript:editEntity('${dataBaseInstance?.assetType}',${dataBaseInstance?.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
 						<span id="icon_${dataBaseInstance.id}">
 							<g:if test="${dataBaseInstance.commentType == 'issue'}">
 								<g:remoteLink controller="assetEntity" action="listComments" id="${dataBaseInstance.id}" before='setAssetId(${dataBaseInstance.id});'	onComplete="listCommentsDialog( e ,'never' );">
@@ -73,28 +74,28 @@ $(document).ready(function() {
 					<jmesa:htmlColumn property="assetName" title="Name" sortable="true"
 						filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-							<span onclick="getDbDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.assetName}</span>
+							<span onclick="getEntityDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.assetName}</span>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="dbFormat" sortable="true"
 						title="DB Format" filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getDbDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.dbFormat}</a>
+						<span onclick="getEntityDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.dbFormat}</a>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="moveBundle" sortable="true"
 						filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getDbDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.moveBundle}</span>
+						<span onclick="getEntityDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.moveBundle}</span>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="planStatus" sortable="true"
 						filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getDbDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.planStatus}</span>
+						<span onclick="getEntityDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.planStatus}</span>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="depUp" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span onclick="getDbDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id} )">${dataBaseInstance.depUp}</span>
+		        		<span onclick="getEntityDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id} )">${dataBaseInstance.depUp}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="depDown" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span onclick="getDbDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id} )">${dataBaseInstance.depDown}</span>
+		        		<span onclick="getEntityDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id} )">${dataBaseInstance.depDown}</span>
 		        	</jmesa:htmlColumn>
 				</jmesa:htmlRow>
 			</jmesa:htmlTable>
@@ -103,12 +104,12 @@ $(document).ready(function() {
 	
 	<div class="buttons">
 		<span class="button"><input type="button" class="save" value="Create DB"
-			onclick="${remoteFunction(action:'create', onComplete:'createDbView(e)')}" />
+			onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Database\')')}" />
 		</span>
 	</div>
-	<div id="createDBView" style="display: none;" title="Create Database"></div>
-	<div id="showDBView" style="display: none;" title="Show Database"></div>
-	<div id="editDBView" style="display: none;" title="Edit Database"></div>
+<div id="createEntityView" style="display: none;" ></div>
+<div id="showEntityView" style="display: none;"></div>
+<div id="editEntityView" style="display: none;"></div>
 	<div style="display: none;">
      <table id="assetDependencyRow">
 	  <tr>
@@ -129,61 +130,5 @@ $(document).ready(function() {
 </div>
 <g:render template="../assetEntity/commentCrud"/>
 </div>
-<script type="text/javascript">
- function getDbDetails(type, value){
-	 if(type == "Database"){
-	     var val = value
-	     ${remoteFunction(action:'show',controller:'database', params:'\'id=\' + val ', onComplete:"showDbView(e)")}
-	 }
-}
-function showDbView(e){
-	 var resp = e.responseText;
-	 $("#showDBView").html(resp);
-	 $("#showDBView").dialog('option', 'width', 'auto')
-	 $("#showDBView").dialog('option', 'position', ['center','top']);
-	 $("#showDBView").dialog('open');
-	 $("#createDBView").dialog('close');
-	 $("#editDBView").dialog('close');
-}
-function createDbView(e){
-	 var resp = e.responseText;
-	 $("#createDBView").html(resp);
-	 $("#createDBView").dialog('option', 'width', 'auto')
-	 $("#createDBView").dialog('option', 'position', ['center','top']);
-	 $("#createDBView").dialog('open');
-	 $("#showDBView").dialog('close');
-	 $("#editDBView").dialog('close');
-}
-function editDb(value){
-	var val = value
-	${remoteFunction(action:'edit', params:'\'id=\' + val ', onComplete:'editDbView(e)')}
-}
-function editDbView(e){
-	 var resp = e.responseText;
-	 $("#editDBView").html(resp);
-	 $("#editDBView").dialog('option', 'width', 'auto')
-	 $("#editDBView").dialog('option', 'position', ['center','top']);
-	 $("#editDBView").dialog('open');
-	 $("#showDBView").dialog('close');
-	 $("#createDBView").dialog('close');
-}
-function addAssetDependency( type ){
-	var rowNo = $("#"+type+"Count").val()
-	var rowData = $("#assetDependencyRow tr").html().replace("dataFlowFreq","dataFlowFreq_"+type+"_"+rowNo).replace("asset","asset_"+type+"_"+rowNo).replace("dtype","dtype_"+type+"_"+rowNo).replace("status","status_"+type+"_"+rowNo).replace("entity","entity_"+type+"_"+rowNo)
-	if(type!="support"){
-		$("#createDependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
-	} else {
-		$("#createSupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
-	}
-	$("#"+type+"Count").val(parseInt(rowNo)+1)
-}
-function deleteRow( rowId ){
-	$("#"+rowId).remove()
-}
-function updateAssetsList( name, value ){
-	var idValues = name.split("_")
-	$("select[name='asset_"+idValues[1]+"_"+idValues[2]+"']").html($("#"+value+" select").html())
-}
-</script>
 </body>
 </html>

@@ -4,12 +4,12 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <g:javascript src="asset.tranman.js" />
+<g:javascript src="entity.crud.js" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
-
 <link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
 <script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
 <script type="text/javascript">
@@ -22,10 +22,10 @@ function onInvokeExportAction(id) {
     location.href = 'list?' + parameterString;
 }
 $(document).ready(function() {
-	$("#createFilesView").dialog({ autoOpen: false })
-	$("#showFilesView").dialog({ autoOpen: false })
-	$("#editFilesView").dialog({ autoOpen: false })
 	$('#assetMenu').show();
+	$("#createEntityView").dialog({ autoOpen: false })
+	$("#showEntityView").dialog({ autoOpen: false })
+	$("#editEntityView").dialog({ autoOpen: false })
     $("#commentsListDialog").dialog({ autoOpen: false })
     $("#createCommentDialog").dialog({ autoOpen: false })
     $("#showCommentDialog").dialog({ autoOpen: false })
@@ -51,7 +51,7 @@ $(document).ready(function() {
 				<jmesa:htmlRow highlighter="true" style="cursor: pointer;">
 					<jmesa:htmlColumn property="id" sortable="false" filterable="false"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions">
-						    <img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
+						<a href="javascript:editEntity('${fileInstance?.assetType}',${fileInstance?.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
 						<span id="icon_${fileInstance.id}">
 							<g:if test="${fileInstance.commentType == 'issue'}">
 								<g:remoteLink controller="assetEntity" action="listComments" id="${fileInstance.id}" before='setAssetId(${fileInstance.id});'	onComplete="listCommentsDialog( e ,'never' );">
@@ -73,33 +73,33 @@ $(document).ready(function() {
 					<jmesa:htmlColumn property="assetName" title="Name"
 						sortable="true" filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getFilesDetails('${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.assetName}</span>
+						<span onclick="getEntityDetails('${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.assetName}</span>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="fileFormat" sortable="true"
 						title="File Format" filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getFilesDetails('${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.fileFormat}</span>
+						<span onclick="getEntityDetails('${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.fileFormat}</span>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="fileSize" title="File Size"
 						sortable="true" filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getFilesDetails('${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.fileSize}</span>
+						<span onclick="getEntityDetails('${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.fileSize}</span>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="moveBundle" sortable="true"
 						filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getFilesDetails('${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.moveBundle}</span>
+						<span onclick="getEntityDetails('${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.moveBundle}</span>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="planStatus" sortable="true"
 						filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getFilesDetails('${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.planStatus}</span>
+						<span onclick="getEntityDetails('${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.planStatus}</span>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="depUp" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span onclick="getFilesDetails('${fileInstance.assetType}', ${fileInstance.id} )">${fileInstance.depUp}</span>
+		        		<span onclick="getEntityDetails('${fileInstance.assetType}', ${fileInstance.id} )">${fileInstance.depUp}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="depDown" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span onclick="getFilesDetails('${fileInstance.assetType}', ${fileInstance.id} )">${fileInstance.depDown}</span>
+		        		<span onclick="getEntityDetails('${fileInstance.assetType}', ${fileInstance.id} )">${fileInstance.depDown}</span>
 		        	</jmesa:htmlColumn>
 
 				</jmesa:htmlRow>
@@ -110,13 +110,13 @@ $(document).ready(function() {
 	<div class="buttons">
 		<span class="button"><input type="button" class="save"
 			value="Create Files"
-			onclick="${remoteFunction(action:'create', onComplete:'createFileView(e)')}" />
+			onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Files\')')}" />
 		</span>
 	</div>
-	<div id="createFilesView" style="display: none;" title="Create Files"></div>
-	<div id="showFilesView" style="display: none;" title="Show Files"></div>
-	<div id="editFilesView" style="display: none;" title="Edit Files"></div>
-	<div style="display: none;">
+<div id="createEntityView" style="display: none;" ></div>
+<div id="showEntityView" style="display: none;"></div>
+<div id="editEntityView" style="display: none;"></div>	
+<div style="display: none;">
      <table id="assetDependencyRow">
 	  <tr>
 		<td><g:select name="dataFlowFreq" from="${assetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
@@ -135,62 +135,5 @@ $(document).ready(function() {
 	</div>
 </div>
 </div>
-<script type="text/javascript">
- function getFilesDetails(type, value){
-	 if(type == "Files"){
-	  	var val = value
-	   	${remoteFunction(action:'show', params:'\'id=\' + val ', onComplete:"showFileView(e)")}
-	 }
-}
-function showFileView(e){
-	 var resp = e.responseText;
-	 $("#showFilesView").html(resp);
-	 $("#showFilesView").dialog('option', 'width', 'auto')
-	 $("#showFilesView").dialog('option', 'position', ['center','top']);
-	 $("#showFilesView").dialog('open');
-	 $("#createFilesView").dialog('close');
-	 $("#editFilesView").dialog('close');
-}
-function createFileView(e){
-	 var resp = e.responseText;
-	 $("#createFilesView").html(resp);
-	 $("#createFilesView").dialog('option', 'width', 'auto')
-	 $("#createFilesView").dialog('option', 'position', ['center','top']);
-	 $("#createFilesView").dialog('open');
-	 $("#showFilesView").dialog('close');
-	 $("#editFilesView").dialog('close');
-}
-function editFile(value){
-	var resp = value
-	${remoteFunction(action:'edit', params:'\'id=\' + value ', onComplete:'editFileView(e)')}
-}
-function editFileView(e){
-	 var resp = e.responseText;
-	 $("#editFilesView").html(resp);
-	 $("#editFilesView").dialog('option', 'width', 'auto')
-	 $("#editFilesView").dialog('option', 'position', ['center','top']);
-	 $("#editFilesView").dialog('open');
-	 $("#showFilesView").dialog('close');
-	 $("#createFilesView").dialog('close');
-}
-function addAssetDependency( type ){
-	var rowNo = $("#"+type+"Count").val()
-	var rowData = $("#assetDependencyRow tr").html().replace("dataFlowFreq","dataFlowFreq_"+type+"_"+rowNo).replace("asset","asset_"+type+"_"+rowNo).replace("dtype","dtype_"+type+"_"+rowNo).replace("status","status_"+type+"_"+rowNo).replace("entity","entity_"+type+"_"+rowNo)
-	if(type!="support"){
-		$("#createDependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
-	} else {
-		$("#createSupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
-	}
-	$("#"+type+"Count").val(parseInt(rowNo)+1)
-}
-function deleteRow( rowId ){
-	$("#"+rowId).remove()
-}
-function updateAssetsList( name, value ){
-	var idValues = name.split("_")
-	$("select[name='asset_"+idValues[1]+"_"+idValues[2]+"']").html($("#"+value+" select").html())
-}
-
-</script>
 </body>
 </html>
