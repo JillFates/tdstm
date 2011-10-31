@@ -1,6 +1,6 @@
 <table style="border: 0">
 	<tr>
-		<td colspan="2"><div class="dialog" onclick="editApp(${applicationInstance?.id})">
+		<td colspan="2"><div class="dialog" ondblclick="editApp(${applicationInstance?.id})">
 				<table>
 					<tbody>
 						<tr>
@@ -131,8 +131,12 @@
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							</td>
 							<td class="label" nowrap="nowrap"><label for="drRtoDesc">DR RTO</label></td>
-							<td>
-								${applicationInstance.drRtoDesc}
+							<td>${applicationInstance.drRtoDesc}
+							</td>
+						</tr>
+						<tr>
+							<td class="label" nowrap="nowrap"><label for="license">URL</label></td>
+							<td colspan="7"><a href="${applicationInstance.url}">${applicationInstance.url}</a>
 							</td>
 						</tr>
 					</tbody>

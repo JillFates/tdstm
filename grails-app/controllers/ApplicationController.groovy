@@ -49,6 +49,7 @@ class ApplicationController {
 			appBeanInstance.setAssetType(appEntity.assetType)
 			appBeanInstance.setAppOwner(appEntity.appOwner)
 			appBeanInstance.setAppSme(appEntity.appSme)
+			appBeanInstance.setAppUrl(appEntity.appUrl)
 			appBeanInstance.setMoveBundle(appEntity.moveBundle?.name)
 			appBeanInstance.setplanStatus(appEntity.planStatus)
 			appBeanInstance.setDepUp(AssetDependency.countByDependentAndStatus(assetEntity, "Validated"))

@@ -7,37 +7,37 @@
 						<tbody>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="assetName">Name<span style="color: red;">*</span></label></td>
-								<td ><input type="text" id="assetName" name="assetName" value="${applicationInstance.assetName}" tabindex="11"/></td>
+								<td ><input type="text" id="assetName" name="assetName" value="${applicationInstance.assetName}" tabindex="11" /></td>
 								<td class="label" nowrap="nowrap">Description</td>
-								<td colspan="3"><input type="text" id="description" name="description" value="" size="50" tabindex="21"/>
+								<td colspan="3"><input type="text" id="description" name="description" value="" size="50" tabindex="21" />
 								</td>
 							</tr>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
-								<td ><input type="text" id="assetType" name="assetType" value="Application" readonly="readonly"/></td>
+								<td ><input type="text" id="assetType" name="assetType" value="Application" readonly="readonly" /></td>
 								<td class="label" nowrap="nowrap"><label for="supportType">Support</label>
 								</td>
 								<td ><input type="text" id="supportType"
-									name="supportType" value="${applicationInstance.supportType}"  tabindex="22"/>
+									name="supportType" value="${applicationInstance.supportType}"  tabindex="22" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="appFunction">Function</label>
 								</td>
 								<td ><input type="text" id="appFunction"
-									name="appFunction" value="${applicationInstance.appFunction}"  tabindex="31"/>
+									name="appFunction" value="${applicationInstance.appFunction}"  tabindex="31" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="userConcurrent">Users</label>
 								</td>
-								<td ><input type="text" id="userId" name="userCount" value="${applicationInstance.userCount}"  tabindex="41"/>
+								<td ><input type="text" id="userId" name="userCount" value="${applicationInstance.userCount}"  tabindex="41" />
 								</td>
 							</tr>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="appVendor">Vendor</label></td>
 								<td ><input type="text" id="appVendor"
-									name="appVendor" value="${applicationInstance.appVendor}"  tabindex="13"/>
+									name="appVendor" value="${applicationInstance.appVendor}"  tabindex="13" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="sme">SME1</label></td>
 								<td ><input type="text" id="sme" name="sme"
-									value="${applicationInstance.sme}"  tabindex="23"/>
+									value="${applicationInstance.sme}"  tabindex="23" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="environment">Environment</label>
 								</td>
@@ -47,18 +47,18 @@
 								</td>
 								<td ><input type="text" id="userLocations"
 									name="userLocations"
-									value="${applicationInstance.userLocations}"  tabindex="42"/>
+									value="${applicationInstance.userLocations}"  tabindex="42" />
 								</td>
 							</tr>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="appVersion">Version</label>
 								</td>
 								<td ><input type="text" id="appVersion"
-									name="appVersion" value="${applicationInstance.appVersion}"  tabindex="14"/>
+									name="appVersion" value="${applicationInstance.appVersion}"  tabindex="14" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="sme2">SME2</label></td>
 								<td ><input type="text" id="sme2" name="sme2"
-									value="${applicationInstance.sme2}"  tabindex="24"/>
+									value="${applicationInstance.sme2}"  tabindex="24" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="criticality">Criticality</label>
 								</td>
@@ -104,28 +104,33 @@
 								<td class="label" nowrap="nowrap"><label for="license">License</label></td>
 								<td ><input type="text" id="license" name="license" value="${applicationInstance.license}" tabindex="18" />
 								</td>
-								<td class="label"><label for="retireDate">Retire
-									Date:</label>
+								<td class="label"><label for="retireDate">Retire Date:</label>
 								</td>
 								<td valign="top"
 									class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}">
 								    <script type="text/javascript" charset="utf-8">
-				                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-				                    </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="retireDate" id="retireDate"
-									value="<tds:convertDate date="${applicationInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" > 
-							     </td>
-								<td  class="label"><label for="maintExpDate">Maint Exp.
-									</label></td>
-									<td valign="top"
+									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+									</script>
+									<input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="retireDate" id="retireDate"
+									value="<tds:convertDate date="${applicationInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />" > 
+								</td>
+								<td  class="label"><label for="maintExpDate">Maint Exp.</label></td>
+								<td valign="top"
 										class="value ${hasErrors(bean:applicationInstance,field:'maintExpDate','errors')}">
-									    <script type="text/javascript" charset="utf-8">
-					                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-					                    </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="maintExpDate" id="maintExpDate"
-										value="<tds:convertDate date="${applicationInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" > 
-									</td>
+								    <script type="text/javascript" charset="utf-8">
+									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+									</script>
+									<input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="maintExpDate" id="maintExpDate"
+									value="<tds:convertDate date="${applicationInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />" > 
+								</td>
 								<td class="label" nowrap="nowrap"><label for="drRtoDesc">DR RTO</label>
 								</td>
 								<td ><input type="text" id="drRtoDesc"	name="drRtoDesc" value="${applicationInstance.drRtoDesc}" tabindex="46" />
+								</td>
+							</tr>
+							<tr>
+								<td class="label" nowrap="nowrap"><label for="license">URL</label></td>
+								<td colspan="7"><input type="text" id="url" name="url" value="${applicationInstance.url}" size=20 tabindex="19" />
 								</td>
 							</tr>
 						</tbody>
@@ -136,7 +141,7 @@
 			<td valign="top">
 				<div style="width: auto;">
 					<span style="float: left;"><h1>Supports:</h1></span>
-					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('support')"></span>
+					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('support')" /></span>
 					<br/>
 					<table style="width: 100%;">
 						<thead>
@@ -156,7 +161,7 @@
 			<td valign="top">
 				<div style="width: auto;">
 					<span style="float: left;"><h1>Is dependent on:</h1></span>
-					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('dependent')"></span>
+					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('dependent')" /></span>
 					<br/>
 					<table style="width: 100%;">
 						<thead>
@@ -177,10 +182,10 @@
 		<tr>
 			<td colspan="2">
 				<div class="buttons">
-					<input name="dependentCount" id="dependentCount" type="hidden" value="0">
-					<input  name="supportCount"  id="supportCount" type="hidden" value="0">
-					<input name="attributeSet.id" type="hidden" value="1">
-					<input name="project.id" type="hidden" value="${projectId}">
+					<input name="dependentCount" id="dependentCount" type="hidden" value="0" />
+					<input  name="supportCount"  id="supportCount" type="hidden" value="0" />
+					<input name="attributeSet.id" type="hidden" value="1" />
+					<input name="project.id" type="hidden" value="${projectId}" />
 					<span class="button"><g:actionSubmit class="save" value="Save" /> </span>
 				</div></td>
 		</tr>
