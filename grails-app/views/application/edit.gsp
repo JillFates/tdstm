@@ -42,13 +42,13 @@
 								</td>
 								<td class="label" nowrap="nowrap"><label for="environment">Environment</label>
 								</td>
-								<td ><g:select id="environment" name="environment" from="${applicationInstance.constraints.environment.inList}" value="${applicationInstance.environment}"  tabindex="32" /></g:select>
+								<td ><g:select id="environment" name="environment" from="${applicationInstance.constraints.environment.inList}" value="${applicationInstance.environment}"  tabindex="32"></g:select>
 								</td>
 								<td class="label" nowrap="nowrap"><label for="userLocations">User Location</label>
 								</td>
 								<td ><input type="text" id="userLocations"
 									name="userLocations"
-									value="${applicationInstance.userLocations}"  tabindex="42"/>
+									value="${applicationInstance.userLocations}"  tabindex="42" />
 								</td>
 							</tr>
 							<tr>
