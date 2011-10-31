@@ -95,7 +95,7 @@ class ApplicationController {
 		def moveBundleList = MoveBundle.findAllByProject(project)
 
 		[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
-					planStatusOptions:planStatusOptions?.value, projectId:projectId]
+					planStatusOptions:planStatusOptions?.value, projectId:projectId, project:project]
 	}
 	def save = {
 

@@ -13,7 +13,7 @@
 								<td>&nbsp</td>
 								<td class="label_sm">Source</td>
 								<td class="label_sm">Target</td>
-								<td class="label" nowrap="nowrap"><label for="custom1">Custom1</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom1">${assetEntityInstance.project.custom1 ?: 'Custom1' }</label></td>
 								<td ><input type="text" id="custom1" name="custom1" value="${assetEntityInstance.custom1}" size=8 tabindex="51"/></td>
 							</tr>
 							<tr>
@@ -28,7 +28,7 @@
 									name="sourceLocation" value="${assetEntityInstance.sourceLocation}" size=10 tabindex="31"/></td>
 									<td><input type="text" id="targetLocation"
 									name="targetLocation" value="${assetEntityInstance.targetLocation}" size=10 tabindex="41"/></td>
-								<td class="label" nowrap="nowrap"><label for="custom2">Custom2</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom2">${assetEntityInstance.project.custom2 ?: 'Custom2' }</label></td>
 								<td ><input type="text" id="custom2" name="custom2" value="${assetEntityInstance.custom2}" size=8 tabindex="51"/></td>
 							</tr>
 							<tr>
@@ -47,7 +47,7 @@
 									name="sourceRoom" value="${assetEntityInstance.sourceRoom}" size=10 tabindex="32"/></td>
 									<td><input type="text" id="targetRoom"
 									name="targetRoom" value="${assetEntityInstance.targetRoom}" size=10 tabindex="42" /></td>
-								<td class="label" nowrap="nowrap"><label for="custom3">Custom3</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom3">${assetEntityInstance.project.custom3 ?: 'Custom3' }</label></td>
 								<td ><input type="text" id="custom3" name="custom3" value="${assetEntityInstance.custom3}" size=8 tabindex="52" /></td>
 							</tr>
 							<tr>
@@ -64,7 +64,7 @@
 									name="sourceRack" value="${assetEntityInstance.sourceRack}" size=10 tabindex="33"/></td>
 									<td><input type="text" id="targetRack"
 									name="targetRack" value="${assetEntityInstance.targetRack}" size=10 tabindex="44" /></td>
-								<td class="label" nowrap="nowrap"><label for="custom4">Custom4</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom4">${assetEntityInstance.project.custom4 ?: 'Custom4' }</label></td>
 								<td ><input type="text" id="custom4" name="custom4" value="${assetEntityInstance.custom4}" size=8 tabindex="53" /></td>
 							</tr>
 							<tr>
@@ -83,7 +83,7 @@
 									<td><input type="text" id="targetRackPosition"
 									name="targetRackPosition" value="${assetEntityInstance.targetRackPosition}" size=10 tabindex="44"/></td>
 								</td>
-								<td class="label" nowrap="nowrap"><label for="custom5">Custom5</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom5">${assetEntityInstance.project.custom5 ?: 'Custom5' }</label></td>
 								<td ><input type="text" id="custom5" name="custom5" value="${assetEntityInstance.custom5}" size=8 tabindex="54"/></td>
 							</tr>
 							<tr>
@@ -103,7 +103,7 @@
 									name="sourceBladeChassis" value="${assetEntityInstance.sourceBladeChassis}" size=10 tabindex="35"/></td>
 									<td><input type="text" id="targetBladeChassis"
 									name="targetBladeChassis" value="${assetEntityInstance.targetBladeChassis}" size=10 tabindex="45" /></td>
-								<td class="label" nowrap="nowrap"><label for="custom6">Custom6</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom6">${assetEntityInstance.project.custom6 ?: 'Custom6' }</label></td>
 								<td ><input type="text" id="custom6" name="custom6" value="${assetEntityInstance.custom6}" size=8 tabindex="55" /></td>
 							</tr>
 							<tr>
@@ -121,7 +121,7 @@
 									name="sourceBladePosition" value="${assetEntityInstance.sourceBladePosition}" size=10 tabindex="36"/></td>
 									<td><input type="text" id="targetBladePosition"
 									name="targetBladePosition" value="${assetEntityInstance.targetBladePosition}" size=10 tabindex="46" /></td>
-								<td class="label" nowrap="nowrap"><label for="custom7">Custom7</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom7">${assetEntityInstance.project.custom7 ?: 'Custom7' }</label></td>
 								<td ><input type="text" id="custom7" name="custom7" value="${assetEntityInstance.custom7}" size=8 tabindex="56"/></td>
 							</tr>
 							<tr>
@@ -133,7 +133,7 @@
 								<td><input type="text" id="virtualHost"
 									name="virtualHost" value="${assetEntityInstance.virtualHost}" size=10 tabindex="37"/></td>
 								<td>&nbsp</td>
-								<td class="label" nowrap="nowrap"><label for="custom8">Custom8</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom8">${assetEntityInstance.project.custom8 ?: 'Custom8' }</label></td>
 								<td ><input type="text" id="custom8" name="custom8" value="${assetEntityInstance.custom8}" size=8 tabindex="57" /></td>
 							</tr>
 							<tr>

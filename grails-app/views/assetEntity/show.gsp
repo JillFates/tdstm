@@ -14,7 +14,7 @@
 								<td>&nbsp</td>
 								<td class="label_sm">Source</td>
 								<td class="label_sm">Target</td>
-								<td class="label" nowrap="nowrap"><label for="custom1">Custom1</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom1">${assetEntityInstance.project.custom1 ?: 'Custom1' }</label></td>
 								<td >${assetEntityInstance.custom1}</td>
 							</tr>
 							<tr class="prop">
@@ -25,7 +25,7 @@
 								<td class="label" nowrap="nowrap"><label for="sourceLocation">Location</label></td>
 								<td>${assetEntityInstance.sourceLocation}</td>
 								<td>${assetEntityInstance.targetLocation}</td>
-								<td class="label" nowrap="nowrap"><label for="custom2">Custom2</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom2">${assetEntityInstance.project.custom2 ?: 'Custom2' }</label></td>
 								<td >${assetEntityInstance.custom2}</td>
 							</tr>
 							<tr class="prop">
@@ -36,7 +36,7 @@
 								<td class="label" nowrap="nowrap"><label for="sourceRoom">Room</label></td>
 								<td>${assetEntityInstance.sourceRoom}</td>
 								<td>${assetEntityInstance.targetRoom}</td>
-								<td class="label" nowrap="nowrap"><label for="custom3">Custom3</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom3">${assetEntityInstance.project.custom3 ?: 'Custom3' }</label></td>
 								<td >${assetEntityInstance.custom3}</td>
 							</tr>
 							<tr class="prop">
@@ -47,7 +47,7 @@
 								<td class="label" nowrap="nowrap"><label for="sourceRack">Rack/Cab</label></td>
 								<td>${assetEntityInstance.sourceRack}</td>
 								<td>${assetEntityInstance.targetRack}</td>
-								<td class="label" nowrap="nowrap"><label for="custom4">Custom4</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom4">${assetEntityInstance.project.custom4 ?: 'Custom4' }</label></td>
 								<td >${assetEntityInstance.custom4}</td>
 							</tr>
 							<tr class="prop">
@@ -58,7 +58,7 @@
 								<td class="label" nowrap="nowrap"><label for="sourceRack">Position</label></td>
 								<td>${assetEntityInstance.sourceRackPosition}</td>
 								<td>${assetEntityInstance.targetRackPosition}</td>
-								<td class="label" nowrap="nowrap"><label for="custom5">Custom5</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom5">${assetEntityInstance.project.custom5 ?: 'Custom5' }</label></td>
 								<td >${assetEntityInstance.custom5}</td>
 							</tr>
 							<tr class="prop">
@@ -71,7 +71,7 @@
 								<td class="label" nowrap="nowrap"><label for="sourceBladeChassis">Blade</label></td>
 								<td>${assetEntityInstance.sourceBladeChassis}</td>
 								<td>${assetEntityInstance.targetBladeChassis}</td>
-								<td class="label" nowrap="nowrap"><label for="custom6">Custom6</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom6">${assetEntityInstance.project.custom6 ?: 'Custom6' }</label></td>
 								<td >${assetEntityInstance.custom6}</td>
 							</tr>
 							<tr class="prop">
@@ -84,7 +84,7 @@
 								<td class="label" nowrap="nowrap"><label for="sourceBladePosition">Blade Position</label></td>
 								<td>${assetEntityInstance.sourceBladePosition}</td>
 								<td>${assetEntityInstance.targetBladePosition}</td>
-								<td class="label" nowrap="nowrap"><label for="custom7">Custom7</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom7">${assetEntityInstance.project.custom7 ?: 'Custom7' }</label></td>
 								<td >${assetEntityInstance.custom7}</td>
 							</tr>
 							<tr class="prop">
@@ -95,7 +95,7 @@
 								<td class="label" nowrap="nowrap"><label for="virtualHost">Virtual Host</label></td>
 								<td>${assetEntityInstance.virtualHost}</td>
 								<td>&nbsp</td>
-								<td class="label" nowrap="nowrap"><label for="custom8">Custom8</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom8">${assetEntityInstance.project.custom8 ?: 'Custom8' }</label></td>
 								<td >${assetEntityInstance.custom8}</td>
 							</tr>
 							<tr class="prop">
