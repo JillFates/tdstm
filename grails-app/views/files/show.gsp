@@ -1,6 +1,6 @@
 <table style="border: 0">
 	<tr>
-		<td colspan="2"><div class="dialog">
+		<td colspan="2"><div class="dialog" ondblclick="editApp(${filesInstance?.id})">
 				<table>
 					<tbody>
 						<tr class="prop">

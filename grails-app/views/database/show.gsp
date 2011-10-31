@@ -1,7 +1,7 @@
 <table style="border: 0">
 	<tr>
 		<td colspan="2">
-			<div class="dialog">
+			<div class="dialog" ondblclick="editApp(${databaseInstance?.id})">
 				<table>
 					<tbody>
 						<tr class="prop">
