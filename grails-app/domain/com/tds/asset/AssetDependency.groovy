@@ -33,7 +33,10 @@ class AssetDependency {
 		dataFlowFreq(blank:true, nullable:true, inList:[
 													"Unknown",
 													"constant",
-													"batch"
+													"hourly",
+													"daily",
+													"weekly",
+													"monthly"
 												])
 		dataFlowDirection(blank:false, nullable:false , inList:[
 													"Unknown",

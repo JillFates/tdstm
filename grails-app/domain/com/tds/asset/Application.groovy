@@ -39,7 +39,7 @@ class Application extends AssetEntity{
 		appSource( blank:true, nullable:true )
 		license( blank:true, nullable:true )
 		businessUnit( blank:true, nullable:true )
-		criticality( blank:true, nullable:true ,inList:['Critical','Major','Imporant','Minor'] )
+		criticality( blank:true, nullable:true ,inList:['Critical','Major','Important','Minor'] )
 		appFunction( blank:true, nullable:true )
 		useFrequency( blank:true, nullable:true )
 		userLocations( blank:true, nullable:true )
