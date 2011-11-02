@@ -131,7 +131,7 @@
 							</tr>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="license">URL</label></td>
-								<td colspan="7"><input type="text" id="url" name="url" value="${applicationInstance.url}" size=20 tabindex="19" />
+								<td colspan="7"><input type="text" id="url" name="url" value="${applicationInstance.url}" size=50 tabindex="19" />
 								</td>
 							</tr>
 						</tbody>
