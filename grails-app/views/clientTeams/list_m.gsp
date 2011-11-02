@@ -36,7 +36,7 @@
  		<div style="float: left; width: 100%; margin: 4px 0; text-align: center;">
         <table style="border: 0px;">
                 <tbody><tr><td style="height: 2px;" nowrap="nowrap">
-                                <g:link controller="auth" action="signOut" class="mobbutton">Log out</g:link>
+                  <g:link controller="auth" action="signOut" class="mobbutton">Log out</g:link>
                 </td></tr></tbody>
         </table>
 	<span style="font: bold 13px arial; float:left;">Select Team to use:</span>
@@ -50,37 +50,37 @@
 		<tbody>
             	<g:each in="${sourceTeams}" status="i" var="projectTeamInstance">
 			<tr class="teamstatus_${projectTeamInstance?.cssClass}" onclick="submitLoginForm('${projectTeamInstance?.team?.projectTeam?.moveBundle.id}','${projectTeamInstance?.team?.projectTeam?.id}','${projectTeamInstance?.team?.projectTeam?.role}','source')">
-			<td><b>${projectTeamInstance?.team?.projectTeam?.name} (S)</b></td>
-			<td><g:if test="${projectTeamInstance?.team?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.team?.projectTeam?.role}" /></g:if></td>
-						<td>
-							<g:each in="${projectTeamInstance?.team?.teamMembers}" var="teamMember">
-								<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName}</g:if><br/>
-							</g:each>
-						</td>
-						<td><b>${projectTeamInstance?.moveBundle}</b></td>
-            		</tr>
+				<td><b>${projectTeamInstance?.team?.projectTeam?.name} (S)</b></td>
+				<td><g:if test="${projectTeamInstance?.team?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.team?.projectTeam?.role}" /></g:if></td>
+				<td>
+				<g:each in="${projectTeamInstance?.team?.teamMembers}" var="teamMember">
+					<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName}</g:if><br/>
 				</g:each>
-				<g:each in="${targetTeams}" status="i" var="projectTeamInstance">
-				<tr class="teamstatus_${projectTeamInstance?.cssClass}" onclick="submitLoginForm('${projectTeamInstance?.team?.projectTeam?.moveBundle.id}','${projectTeamInstance?.team?.projectTeam?.id}','${projectTeamInstance?.team?.projectTeam?.role}','target')">
-			<td><b>${projectTeamInstance?.team?.projectTeam?.name} (T)</b></td>
-                        <td><g:if test="${projectTeamInstance?.team?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.team?.projectTeam?.role}" /></g:if></td>
-						<td>
-							<g:each in="${projectTeamInstance?.team?.teamMembers}" var="teamMember">
-			 					<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName}</g:if> 
-							</g:each>
-						</td>
-						<td><b>${projectTeamInstance?.moveBundle}</b></td>
+				</td>
+				<td><b>${projectTeamInstance?.moveBundle}</b></td>
             		</tr>
+		</g:each>
+		<g:each in="${targetTeams}" status="i" var="projectTeamInstance">
+			<tr class="teamstatus_${projectTeamInstance?.cssClass}" onclick="submitLoginForm('${projectTeamInstance?.team?.projectTeam?.moveBundle.id}','${projectTeamInstance?.team?.projectTeam?.id}','${projectTeamInstance?.team?.projectTeam?.role}','target')">
+				<td><b>${projectTeamInstance?.team?.projectTeam?.name} (T)</b></td>
+                        	<td><g:if test="${projectTeamInstance?.team?.projectTeam?.role}"><g:message code="ProjectTeam.role.${projectTeamInstance?.team?.projectTeam?.role}" /></g:if></td>
+				<td>
+				<g:each in="${projectTeamInstance?.team?.teamMembers}" var="teamMember">
+			 		<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName}</g:if> 
 				</g:each>
-				<g:if test="${sourceTeams?.size() == 0 && targetTeams?.size() == 0}">
-				<tr><td colspan="3" class="no_records">There are no active teams for you.</td></tr>
-				</g:if>
-			</tbody>
+				</td>
+				<td><b>${projectTeamInstance?.moveBundle}</b></td>
+            		</tr>
+		</g:each>
+			<g:if test="${sourceTeams?.size() == 0 && targetTeams?.size() == 0}">
+			<tr><td colspan="3" class="no_records">There are no active teams for you.</td></tr>
+			</g:if>
+		</tbody>
 		</table>
 	</div>
         </div>
         </g:form>
-	<g:link class="mobfooter" controller="clientTeams" params="[projectId:projectId, viewMode:'web']">Use Full Site</g:link>
+	<g:link class="mobfooter" controller="clientTeams" style="color:white;" params="[projectId:projectId, viewMode:'web']">Use Full Site</g:link>
 
 <script type="text/javascript">
    function submitLoginForm( bundleId,teamId,role,location){
