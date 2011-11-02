@@ -341,7 +341,7 @@ class RackLayoutsController {
 								bladeTable = generateBladeLayout(it, overlapAsset, isAdmin, hideIcons)
 							}
 							if(isAdmin){
-								assetTag += "<a href='javascript:createEditPage(${overlapAsset?.id})' >"+trimString(assetTagValue.replace('~-','-'))+"</a>" 
+								assetTag += """<a href="javascript:getEntityDetails('${overlapAsset?.assetType}',${overlapAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>" 
 								if(hasBlades){
 									assetTag += "<br/>"+bladeTable
 								}
@@ -361,7 +361,7 @@ class RackLayoutsController {
 						}
 						cabling = !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : ""
 						if(isAdmin){
-							assetTag += "<a href='javascript:createEditPage(${overlappedAsset?.id})' >"+trimString(assetTagValue.replace('~-','-'))+"</a>"
+							assetTag += """<a href="javascript:getEntityDetails('${overlappedAsset?.assetType}',${overlappedAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>"
 							if(hasBlades){
 								assetTag += "<br/>"+bladeTable
 							}
@@ -445,7 +445,7 @@ class RackLayoutsController {
 				if(isAdmin && hideIcons == "on"){
 				row.append("""<div class="rack_menu"><img src="../i/rack_add2.png">
 							<ul>
-								<li><a href="javascript:createAssetPage('${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Create asset  </a></li>
+								<li><a href="javascript:createAssetPage('Server','${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Create asset  </a></li>
 								<li><a href="javascript:listDialog('','','asc','${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Assign asset </a></li>
 								<li><a href="javascript:listDialog('all','','asc','${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Reassign asset </a></li>
 							</ul></img></div>&nbsp;</td><td>&nbsp;</td>""")
@@ -516,7 +516,7 @@ class RackLayoutsController {
 					if((bladeSpan == 2) &&  hasError )
 						bladeTable += "<td class='errorBlade' style='height:${tdHeight}px'>&nbsp;</td>"
 					else if(isAdmin)
-						bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href='javascript:createEditPage(${blade.id})' title='${tag.replace('<br/>','')}'>${taglabel}</a></td>"
+						bladeTable += """<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href="javascript:getEntityDetails('Blade',${blade.id})" title='${tag.replace('<br/>','')}'>${taglabel}</a></td>"""
 					else
 						bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px' title='${tag.replace('<br/>','')}'>${taglabel}</td>"
 				} else {

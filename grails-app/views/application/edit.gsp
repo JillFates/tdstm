@@ -209,6 +209,7 @@
 				<div class="buttons">
 					<input name="dependentCount" id="dependentCount" type="hidden" value="${dependentAssets.size()}" />
 					<input name="supportCount"  id="supportCount" type="hidden" value="${supportAssets.size()}" />
+					<input name="redirectTo" type="hidden" value="$('#redirectTo').val()">
 					<span class="button"><g:actionSubmit class="save" value="Update" /></span>
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
                 </div></td>

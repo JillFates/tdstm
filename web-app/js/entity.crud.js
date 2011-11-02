@@ -7,6 +7,7 @@ function createEntityView(e, type){
 	 $("#editEntityView").dialog('close');
 	 $("#showEntityView").dialog('close');
 	 updateTitle(type)
+	 //updateAssetInfo(source,rack,roomName,location,position)
 }
 function getEntityDetails(type, value){
 	 switch(type){
@@ -88,4 +89,27 @@ function updateTitle( type ){
 	$("#createEntityView").dialog( "option", "title", 'Create '+type );
 	$("#showEntityView").dialog( "option", "title", 'Show '+type );
 	$("#editEntityView").dialog( "option", "title", 'Edit '+type );
+}
+function selectManufacturer(value){
+	var val = value;
+	new Ajax.Request('../assetEntity/getManufacturersList?assetType='+val,{asynchronous:true,evalScripts:true,onComplete:function(e){showManufacView(e);}})
+	//${remoteFunction(action:'getManufacturersList', params:'\'assetType=\' + val ', onComplete:'showManufacView(e)' )}
+	}
+function showManufacView(e){
+	alert("WARNING : Change of Asset Type may impact on Manufacturer and Model, Do you want to continue ?");
+    var resp = e.responseText;
+    $("#manufacturerId").html(resp);
+    $("#manufacturers").removeAttr("multiple")
+}
+function selectModel(value){
+	var val = value;
+	var assetType = $("#assetTypeId").val() ;
+	new Ajax.Request('../assetEntity/getModelsList?assetType='+assetType+'&manufacturer='+val,{asynchronous:true,evalScripts:true,onComplete:function(e){showModelView(e);}})
+	//${remoteFunction(action:'getModelsList', params:'\'assetType=\' +assetType +\'&manufacturer=\'+ val', onComplete:'showModelView(e)' )}
+}
+function showModelView(e){
+	alert("WARNING : Change of Manufacturer may impact on Model data, Do you want to continue ?")
+    var resp = e.responseText;
+    $("#modelId").html(resp);
+    $("#models").removeAttr("multiple")
 }

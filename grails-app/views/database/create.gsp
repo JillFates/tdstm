@@ -101,6 +101,7 @@
 			<div class="buttons">
 				<input name="dependentCount" id="dependentCount" type="hidden" value="0" />
 				<input name="supportCount" id="supportCount" type="hidden" value="0" />
+				<input name="redirectTo" type="hidden" value="$('#redirectTo').val()">
 				<input name="attributeSet.id" type="hidden" value="1" />
 				<input name="project.id" type="hidden" value="${projectId}" />
 				<span class="button"><g:actionSubmit class="save" value="Save" /></span>

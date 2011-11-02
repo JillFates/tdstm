@@ -31,6 +31,8 @@ $(document).ready(function() {
     $("#createCommentDialog").dialog({ autoOpen: false })
     $("#showCommentDialog").dialog({ autoOpen: false })
     $("#editCommentDialog").dialog({ autoOpen: false })
+	$("#manufacturerShowDialog").dialog({ autoOpen: false })
+	$("#modelShowDialog").dialog({ autoOpen: false })
 })
 </script>
 
@@ -43,6 +45,7 @@ $(document).ready(function() {
 <div class="message">${flash.message}</div>
 </g:if>
 <input type="hidden" id="role" value="role"/>
+<input type="hidden" id="redirectTo" value="database"/>
 <div id="jmesaId" class="body">
 	<form name="listDBForm" action="list">
 		<jmesa:tableFacade id="tag" items="${databaseList}" maxRows="50"
@@ -129,6 +132,7 @@ $(document).ready(function() {
 	</div>
 </div>
 <g:render template="../assetEntity/commentCrud"/>
+<g:render template="../assetEntity/modelDialog"/>
 </div>
 </body>
 </html>

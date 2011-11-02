@@ -48,6 +48,7 @@ $(document).ready(function() {
 	<div class="message">${flash.message}</div>
 </g:if>
 <input type="hidden" id="role" value="role"/>
+<input type="hidden" id="redirectTo" value="assetEntity"/>
 <div>
 	<form name="assetEntityForm" action="list">
 		<jmesa:tableFacade id="tag" items="${assetEntityList}" maxRows="25" exportTypes="csv,excel" stateAttr="restore" var="assetEntityInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
@@ -122,101 +123,7 @@ $(document).ready(function() {
 </g:form></div>
 </div> <%-- End of Body --%>
 <g:render template="commentCrud"/>
-<div id="manufacturerShowDialog" title="Show Manufacturer">
-	<div class="dialog">
-		<table>
-	    	<tbody>
-		<tr class="prop">
-			<td valign="top" class="name">Name:</td>
-			<td valign="top" class="value" id="showManuName"></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name">AKA:</td>
-			<td valign="top" class="value"  id="showManuAka"></td>
-		</tr>
-		<tr class="prop">
-			<td valign="top" class="name">Description:</td>
-			<td valign="top" class="value" id="showManuDescription"></td>
-		</tr>
-		</tbody>
-		</table>
-	</div>
-	<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
-	<div class="buttons">
-	    <g:form controller="manufacturer" action="edit" target="new">
-	        <input type="hidden" name="id" id="show_manufacturerId" />
-	        <span class="button"><input type="submit" class="edit" value="Edit" onclick="$('#manufacturerShowDialog').dialog('close')"/></span>
-	    </g:form>
-	</div>
-	</jsec:hasAnyRole>
-</div>
-<div id="modelShowDialog"  title="Show Model">
-<div class="dialog">
-	<table>
-		<tbody>
-		<tr>
-			<td valign="top" class="name">Manufacturer:</td>
-			<td valign="top" class="value" id="showManufacturer"></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name">Model Name:</td>
-			<td valign="top" class="value" id="showModelName"></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name">AKA:</td>
-			<td valign="top" class="value" id="showModelAka"></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name">Asset Type:</td>
-			<td valign="top" class="value" id="showModelAssetType"></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name">Usize:</td>
-			<td valign="top" class="value" id="showModelUsize"></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name">Power (typical):</td>
-			<td valign="top" class="value" id="showModelPower"></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name">Front image:</label></td>
-			<td valign="top" class="value" id="showModelFrontImage"></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name">Rear image:</td>
-			<td valign="top" class="value" id="showModelRearImage"></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name">Use Image:</td>
-			<td valign="top" class="value" id="showModelUseImage"></td>
-	        </tr>
-		<tr id="showModelBladeRowsTr">
-			<td valign="top" class="name">Blade Rows:</td>
-			<td valign="top" class="value" id="showModelBladeRows"></td>
-		</tr>
-		<tr id="showModelBladeCountTr">
-			<td valign="top" class="name">Blade Count:</td>
-			<td valign="top" class="value" id="showModelBladeCount"></td>
-		</tr>
-		<tr id="showModelBladLabelCountTr">
-			<td valign="top" class="name">Blade Label Count:</td>
-			<td valign="top" class="value" id="showModelBladLabelCount"></td>
-		</tr>
-		<tr id="showModelBladeHeightTr">
-			<td valign="top" class="name">Blade Height:</td>
-			<td valign="top" class="value" id="showModelBladeHeight"></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name">Source TDS:</td>
-			<td valign="top" class="value" id="showModelSourceTds"></td>
-	        </tr>
-		<tr>
-			<td valign="top" class="name">Notes:</td>
-			<td valign="top" class="value" id="showModelNotes"></td>
-		</tr>
-		</tbody>
-	</table>
-</div>
+<g:render template="modelDialog"/>
 <div id="createEntityView" style="display: none;"></div>
 <div id="showEntityView" style="display: none;"></div>
 <div id="editEntityView" style="display: none;"></div>
@@ -237,41 +144,8 @@ $(document).ready(function() {
 	<span id="Database"><g:select name="asset" from="${dbs}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 	<span id="Files"><g:select name="asset" from="${files}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 </div>
-<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
-<div class="buttons"> 
-	<g:form action="edit" controller="model" target="new">
-	<input type="hidden" name="assetId" value="${assetEntityInstance?.id}" />
-		<input name="id" type="hidden" id="show_modelId"/>
-		<span class="button">
-			<input type="submit" class="edit" value="Edit"></input>
-		</span>
-	</g:form>
-</div>
-</jsec:hasAnyRole>
-</div>
 <script type="text/javascript">
 $('#assetMenu').show();
-function selectManufacturer(value){
-	var val = value;
-	${remoteFunction(action:'getManufacturersList', params:'\'assetType=\' + val ', onComplete:'showManufacView(e)' )}
-	}
-function showManufacView(e){
-	alert("WARNING : Change of Asset Type may impact on Manufacturer and Model, Do you want to continue ?");
-    var resp = e.responseText;
-    $("#manufacturerId").html(resp);
-    $("#manufacturers").removeAttr("multiple")
-}
-function selectModel(value){
-	var val = value;
-	var assetType = $("#assetTypeId").val() ;
-	${remoteFunction(action:'getModelsList', params:'\'assetType=\' +assetType +\'&manufacturer=\'+ val', onComplete:'showModelView(e)' )}
-	}
-function showModelView(e){
-	alert("WARNING : Change of Manufacturer may impact on Model data, Do you want to continue ?")
-    var resp = e.responseText;
-    $("#modelId").html(resp);
-    $("#models").removeAttr("multiple")
-}
 </script>
 </body>
 </html>

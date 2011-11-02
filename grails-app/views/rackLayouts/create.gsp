@@ -9,6 +9,7 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="room.rack.combined.js"/>
+<g:javascript src="entity.crud.js" />
 <title>Rack View</title>
 <script type="text/javascript">
 	function updateRackDetails(e) {
@@ -74,8 +75,9 @@
 	    $("#manufacturerShowDialog").dialog({ autoOpen: false })
 	    $("#modelShowDialog").dialog({ autoOpen: false })
 	    $("#showAssetList").dialog({autoOpen: false})
-	    $("#createAsset").dialog({autoOpen: false})
-	    $("#editAsset").dialog({autoOpen: false})
+	   	$("#createEntityView").dialog({autoOpen: false})
+	   	$("#showEntityView").dialog({autoOpen: false})
+	    $("#editEntityView").dialog({autoOpen: false})
 	})
 	// Script to get the combined rack list
 	function getRackDetails( objId ){
@@ -94,6 +96,7 @@
 	<div class="message">${flash.message}</div>
 </g:if>
 <div class="dialog">
+<input type="hidden" id="redirectTo" value="rackLayouts"/>
 <g:form action="save" name="rackLayoutCreate" method="post" target="_blank" onsubmit="return submitForm(this)" style="border: 1px solid black; width: 100%">
 <table style="width:auto; border: none">
 	<tbody>
@@ -155,37 +158,11 @@
 <div id="rackLayout" style="width:100%; overflow-x:auto; border: 1px solid black">
 
 </div>
-<div id="createDialog" title="Create Asset" style="display: none;">
-<g:form action="save" controller="assetEntity" method="post" name="createForm" >
-
-	<div class="dialog" id="createDiv" >
-		<table id="createFormTbodyId"></table>
-	</div>
-	
-	<div class="buttons">
-	<input type="hidden" name="projectId" value="${projectId }" />
-	<input type="hidden" id="attributeSetId" name="attributeSet.id" value="" />
-	<input type="hidden" name="redirectTo" value="rack" />
-	<span class="button"><input class="save" type="submit" value="Create" onclick="return validateAssetEntity('createForm');" /></span>
-	</div>
-</g:form></div>
 <div id="listDialog" title="Asset List" style="display: none;">
 		<div class="dialog" >
 			<table id="listDiv">
 			</table>
 		</div>
-</div>
-<div id="editDialog" title="Edit Asset" style="display: none;">
-	<g:form method="post" name="editForm">
-		<input type="hidden" name="id" id="editFormId" value="" />
-		<div class="dialog" id="editDiv">
-		</div>
-		<div class="buttons">
-			<span class="button">
-				<input class="save" type="button" style="font-size: 12px;" value="Update Asset" onClick="${remoteFunction(controller:'assetEntity', action:'getAssetAttributes', params:'\'assetId=\' + $(\'#editFormId\').val() ', onComplete:'callUpdateDialog(e);openSelectedRackLayout()')}" />
-			</span>
-		</div>
-	</g:form>
 </div>
 <div style="display: none;" id="cablingDialogId">
 	<div id="cablingPanel" style="height: auto; ">
@@ -254,116 +231,11 @@
 		</table>
 	</div>
 </div>
-<div id="manufacturerShowDialog" title="Show Manufacturer">
-	<div class="dialog">
-		<table>
-	    	<tbody>
-				<tr class="prop">
-	            	<td valign="top" class="name">Name:</td>
-					<td valign="top" class="value" id="showManuName"></td>
-				</tr>
-	            <tr>
-	 				<td valign="top" class="name">AKA:</td>
-					<td valign="top" class="value"  id="showManuAka"></td>
-				</tr>
-	            <tr class="prop">
-	            	<td valign="top" class="name">Description:</td>
-					<td valign="top" class="value" id="showManuDescription"></td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
-	<div class="buttons">
-	    <g:form controller="manufacturer" action="edit" target="new">
-	        <input type="hidden" name="id" id="show_manufacturerId" />
-	        <span class="button"><input type="submit" class="edit" value="Edit" onclick="$('#manufacturerShowDialog').dialog('close')"/></span>
-	    </g:form>
-	</div>
-	</jsec:hasAnyRole >
-</div>
-<div id="modelShowDialog"  title="Show Model">
-<div class="dialog">
-<table>
-	<tbody>
-		<tr>
-			<td valign="top" class="name">Manufacturer:</td>
-			<td valign="top" class="value" id="showManufacturer"></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name">Model Name:</td>
-			<td valign="top" class="value" id="showModelName"></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name">AKA:</td>
-			<td valign="top" class="value" id="showModelAka"></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name">Asset Type:</td>
-			<td valign="top" class="value" id="showModelAssetType"></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name">Usize:</td>
-			<td valign="top" class="value" id="showModelUsize"></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name">Power (typical):</td>
-			<td valign="top" class="value" id="showModelPower"></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name">Front image:</label></td>
-        	<td valign="top" class="value" id="showModelFrontImage"></td>
-		</tr>
-		<tr>
-        	<td valign="top" class="name">Rear image:</td>
-        	<td valign="top" class="value" id="showModelRearImage"></td>
-        </tr>
-        <tr>
-        	<td valign="top" class="name">Use Image:</td>
-	        <td valign="top" class="value" id="showModelUseImage"></td>
-        </tr>
-		<tr id="showModelBladeRowsTr">
-			<td valign="top" class="name">Blade Rows:</td>
-			<td valign="top" class="value" id="showModelBladeRows"></td>
-		</tr>
-		<tr id="showModelBladeCountTr">
-			<td valign="top" class="name">Blade Count:</td>
-			<td valign="top" class="value" id="showModelBladeCount"></td>
-		</tr>
-		<tr id="showModelBladLabelCountTr">
-			<td valign="top" class="name">Blade Label Count:</td>
-			<td valign="top" class="value" id="showModelBladLabelCount"></td>
-		</tr>
-		<tr id="showModelBladeHeightTr">
-			<td valign="top" class="name">Blade Height:</td>
-			<td valign="top" class="value" id="showModelBladeHeight"></td>
-		</tr>
-		<tr>
-        	<td valign="top" class="name">Source TDS:</td>
-	        <td valign="top" class="value" id="showModelSourceTds"></td>
-        </tr>
-		<tr>
-			<td valign="top" class="name">Notes:</td>
-			<td valign="top" class="value" id="showModelNotes"></td>
-		</tr>
-	</tbody>
-</table>
-</div>
-<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
-<div class="buttons"> 
-	<g:form action="edit" controller="model" target="new">
-		<input name="id" type="hidden" id="show_modelId"/>
-		<span class="button">
-			<input type="submit" class="edit" value="Edit"></input>
-		</span>
-	</g:form>
-</div>
-</jsec:hasAnyRole>
-</div>
-<div id ="createAsset" style="display: none" title="Create Asset"></div>
-<div id ="showAssetList" style="display: none" title="Show Asset"></div>
-<div id ="editAsset" style="display: none" title="Edit Asset">
-</div>
+<g:render template="../assetEntity/commentCrud"/>
+<g:render template="../assetEntity/modelDialog"/>
+<div id ="createEntityView" style="display: none"></div>
+<div id ="showEntityView" style="display: none" ></div>
+<div id ="editEntityView" style="display: none" ></div>
 
 <div style="display: none;">
 <table id="assetDependencyRow">
@@ -400,78 +272,8 @@
 			$('#commit').val($(this).val());
 		});
 	});
-	function createAssetPage(source,rack,roomName,location,position){
-		var val ="rack"
-		${remoteFunction(action:'create', params:'\'redirectTo=\' + val ' ,controller:'assetEntity', onComplete:'showCreateView(e, source,rack,roomName,location,position)')}
-	}
-	function showCreateView(e, source,rack,roomName,location,position){
-		var resp = e.responseText;
-		$("#createAsset").html(resp)	
-		$("#createAsset").dialog('option', 'width', 'auto');
-		$("#createAsset").dialog('option', 'position', ['center','top']);
-		$("#createAsset").dialog('open');
-		$("#showAssetList").dialog('close');
-		$("#editAsset").dialog('close');
-		updateAssetInfo(source,rack,roomName,location,position)
-	}
-	function selectManufacturer(value){
-		var val = value;
-		${remoteFunction(action:'getManufacturersList',controller:'assetEntity', params:'\'assetType=\' + val ', onComplete:'showManufacView(e)' )}
-		}
-	function showManufacView(e){
-		alert("WARNING : Change of Asset Type may impact on Manufacturer and Model, Do you want to continue ?");
-	    var resp = e.responseText;
-	    $("#manufacturerId").html(resp);
-	    $("#manufacturers").removeAttr("multiple")
-	}
-	function selectModel(value){
-		var val = value;
-		var assetType = $("#assetTypeId").val() ;
-		${remoteFunction(action:'getModelsList',controller:'assetEntity', params:'\'assetType=\' +assetType +\'&manufacturer=\'+ val', onComplete:'showModelView(e)' )}
-		}
-	function showModelView(e){
-		alert("WARNING : Change of Manufacturer may impact on Model data, Do you want to continue ?")
-	    var resp = e.responseText;
-	    $("#modelId").html(resp);
-	    $("#models").removeAttr("multiple")
-	}
-	function createEditPage(value){
-		var val = value
-		var redirectTo="rack"
-		${remoteFunction(action:'edit',controller:'assetEntity',params:'\'id=\' + val +\'&redirectTo=\'+redirectTo' , onComplete:'showEditView(e);' )}
-		
-	}
-	function showEditView(e){
-		var resp = e.responseText;
-		$("#editAsset").html(resp)	
-		$("#editAsset").dialog('option', 'width', 'auto');
-		$("#editAsset").dialog('option', 'position', ['center','top']);
-		$("#editAsset").dialog('open');
-		$("#createAsset").dialog('close');
-		$("#showAssetList").dialog('close');
-	}
-	function addAssetDependency( type ){
-		var rowNo = $("#"+type+"Count").val()
-		var rowData = $("#assetDependencyRow tr").html().replace("dataFlowFreq","dataFlowFreq_"+type+"_"+rowNo).replace("asset","asset_"+type+"_"+rowNo).replace("dtype","dtype_"+type+"_"+rowNo).replace("status","status_"+type+"_"+rowNo).replace("entity","entity_"+type+"_"+rowNo)
-		if(type!="support"){
-			$("#createDependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
-		} else {
-			$("#createSupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
-		}
-		$("#"+type+"Count").val(parseInt(rowNo)+1)
-	}
-	function deleteRow( rowId ){
-		$("#"+rowId).remove()
-	}
-	function updateAssetsList( name, value ){
-		var idValues = name.split("_")
-		$("select[name='asset_"+idValues[1]+"_"+idValues[2]+"']").html($("#"+value+" select").html())
-	}
-	function getAppDetails(type, value){
-		if(type == "Server"){
-		   var val = value
-		   ${remoteFunction(action:'show', params:'\'id=\' + value ', onComplete:'showAssetDialog(e)')}
-		}
+	function createAssetPage(type,source,rack,roomName,location,position){
+		${remoteFunction(action:'create',controller:'assetEntity', onComplete:'createEntityView(e,type)')}
 	}
 </script>
 </body>

@@ -32,7 +32,15 @@
 								<td ><input type="text" id="custom2" name="custom2" value="${assetEntityInstance.custom2}" size=8 tabindex="51"/></td>
 							</tr>
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="manufacturer">Manufacturer</label></td>
+								<td class="label" nowrap="nowrap">
+									
+									<g:if test="${assetEntityInstance.manufacturer?.id}">
+										<a href='javascript:showManufacturer(${assetEntityInstance.manufacturer?.id})' style='color:#00E'>Manufacturer</a>
+									</g:if>
+									<g:else>
+										<label for="manufacturer">Manufacturer</label>
+									</g:else>	
+								</td>
 								 <td >
 								 <div id="manufacturerId">
 								   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${assetEntityInstance.manufacturer?.id}" onChange="selectModel(this.value)" optionKey="id" optionValue="name" noSelection="${['':' Unassigned']}" tabindex="13"/>
@@ -51,7 +59,14 @@
 								<td ><input type="text" id="custom3" name="custom3" value="${assetEntityInstance.custom3}" size=8 tabindex="52" /></td>
 							</tr>
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="model">Model</label></td>
+								<td class="label" nowrap="nowrap">
+									<g:if test="${assetEntityInstance.model?.id}">
+										<a href='javascript:showModel(${assetEntityInstance.model?.id})' style='color:#00E'>Model</a>
+									</g:if>
+									<g:else>
+										<label for="model">Model</label>
+									</g:else>
+								</td>
 								<td>
 								<div id="modelId">
 								   <g:select id="model" name ="model.id" from="${models}" value= "${assetEntityInstance.model?.id}" optionKey="id" optionValue="modelName"  noSelection="${['':' Unassigned']}" tabindex="14"/>
@@ -237,6 +252,7 @@
 					<input name="attributeSet.id" type="hidden" value="1">
 					<input name="project.id" type="hidden" value="${projectId}">
 					<input name="id" type="hidden" value="${assetEntityInstance.id}">
+					<input name="redirectTo" type="hidden" value="$('#redirectTo').val()">
 					<span class="button"><g:actionSubmit class="save" value="Update" /> </span>
 				</div></td>
 		</tr>

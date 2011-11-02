@@ -656,7 +656,6 @@ class AssetEntityController {
 			assetEntityList.add(assetBeanInstance)
 		}
 		def servers = AssetEntity.findAllByAssetTypeAndProject('Server',project)
-		println "servers"+servers
 		def applications = Application.findAllByAssetTypeAndProject('Application',project)
 		def dbs = Database.findAllByAssetTypeAndProject('Database',project)
 		def files = Files.findAllByAssetTypeAndProject('Files',project)
@@ -684,7 +683,7 @@ class AssetEntityController {
      * --------------------------------------- */
     def delete = {
         def assetEntityInstance = AssetEntity.get( params.id )
-        def projectId = params.projectId
+        def projectId = params.projectId ? params.projectId : getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
         if(assetEntityInstance) {
             ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${assetEntityInstance.id}")
             AssetTransition.executeUpdate("delete from AssetTransition ast where ast.assetEntity = ${assetEntityInstance.id}")
@@ -1442,15 +1441,21 @@ class AssetEntityController {
 		    //Statements for JMESA integration
 	    	TableFacade tableFacade = new TableFacadeImpl("tag",request)
 	        tableFacade.items = assetBeansList
-	        
+    		
+	        def servers = AssetEntity.findAllByAssetTypeAndProject('Server',projectInstance)
+			def applications = Application.findAllByAssetTypeAndProject('Application',projectInstance)
+			def dbs = Database.findAllByAssetTypeAndProject('Database',projectInstance)
+			def files = Files.findAllByAssetTypeAndProject('Files',projectInstance)
+			
 		    return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams, 
-					assetBeansList:assetBeansList, moveBundleInstance:moveBundleInstance, 
+					assetBeansList:assetBeansList, moveBundleInstance:moveBundleInstance, project : projectInstance,
 					supportTeam:supportTeam, totalUnracked:totalUnracked, totalSourceAvail:totalSourceAvail, 
 					totalTargetAvail:totalTargetAvail, totalReracked:totalReracked, totalAsset:totalAssetsSize, 
 					timeToUpdate : timeToUpdate ? timeToUpdate.SUPER_CONSOLE_REFRESH : "never", showAll : showAll,
 					applicationList : applicationList, appOwnerList : appOwnerList, appSmeList : appSmeList, 
 		            transitionStates : transitionStates, params:params, totalAssetsOnHold:totalAssetsOnHold,
-					totalSourcePending: totalSourcePending, totalTargetPending: totalTargetPending, role: role, teamType:teamType ]
+					totalSourcePending: totalSourcePending, totalTargetPending: totalTargetPending, role: role, teamType:teamType, assetDependency: new AssetDependency() ,
+					servers:servers , applications:applications ,dbs:dbs,files:files]
 		} else {
 			flash.message = "Please create bundle to view Console"	
 			redirect(controller:'project',action:'show',params:["id":params.projectId])

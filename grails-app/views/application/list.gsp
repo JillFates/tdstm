@@ -31,6 +31,8 @@ $(document).ready(function() {
 	$("#createCommentDialog").dialog({ autoOpen: false })
     $("#showCommentDialog").dialog({ autoOpen: false })
     $("#editCommentDialog").dialog({ autoOpen: false })
+    $("#manufacturerShowDialog").dialog({ autoOpen: false })
+	$("#modelShowDialog").dialog({ autoOpen: false })
 })
 </script>
 
@@ -43,6 +45,7 @@ $(document).ready(function() {
 <div class="message">${flash.message}</div>
 </g:if>
 <input type="hidden" id="role" value="role"/>
+<input type="hidden" id="redirectTo" value="application"/>
 <div id= "jmesaId">
 	<form name="listAppsForm" action="list">
 		<jmesa:tableFacade id="tag" items="${assetEntityList}" maxRows="50" exportTypes="csv,excel" stateAttr="restore" var="appEntityInstance" autoFilterAndSort="true" maxRowsIncrements="50,100,200">
@@ -96,6 +99,7 @@ $(document).ready(function() {
 	</form>
 </div>
 <g:render template="../assetEntity/commentCrud"/>
+<g:render template="../assetEntity/modelDialog"/>
 <div class="buttons"> 
 		<span class="button"><input type="button" class="save" value="Create App" onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Application\')')}"/></span>
 </div>

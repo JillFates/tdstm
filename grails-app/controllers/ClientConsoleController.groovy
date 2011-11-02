@@ -3,9 +3,13 @@ import grails.converters.JSON
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.jsecurity.SecurityUtils
 
+import com.tds.asset.Application
 import com.tds.asset.AssetComment
+import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetTransition
+import com.tds.asset.Database
+import com.tds.asset.Files
 import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
 class ClientConsoleController {
@@ -245,6 +249,11 @@ class ClientConsoleController {
 				}
 				attributesList << [attributeCode: attribute.attributeCode, frontendLabel:frontendLabel]
 			}
+			def servers = AssetEntity.findAllByAssetTypeAndProject('Server',projectInstance)
+			def applications = Application.findAllByAssetTypeAndProject('Application',projectInstance)
+			def dbs = Database.findAllByAssetTypeAndProject('Database',projectInstance)
+			def files = Files.findAllByAssetTypeAndProject('Files',projectInstance)
+			
             return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,
 				column1List:column1List, column2List:column2List,column3List:column3List, column4List:column4List,projectId:projectId, lastPoolTime : lastPoolTime,
                 processTransitionList:processTransitionList,projectId:projectId,column2Value:params.column2,column1Value:params.column1,
@@ -252,7 +261,8 @@ class ClientConsoleController {
                 headerCount:headerCount,browserTest:browserTest, myForm : params.myForm, role : role,
                 moveEventInstance:moveEventInstance, moveEventsList:moveEventsList,
                 isAdmin:subject.hasRole("ADMIN"), isManager:subject.hasRole("MANAGER"), isProjManager:subject.hasRole("PROJ_MGR"),
-				columns:columns, assetsInView:assetsInView, totalAssets:totalAssets, attributesList:attributesList ]
+				columns:columns, assetsInView:assetsInView, totalAssets:totalAssets, attributesList:attributesList, servers : servers, 
+				applications : applications, dbs : dbs, files : files, assetDependency: new AssetDependency(), project:projectInstance ]
     	
         } else {
     		flash.message = "Please create move event and bundle to view PMO Dashboard"

@@ -212,6 +212,7 @@
 					<input name="project.id" type="hidden" value="${projectId}" />
 					<input name="dependentCount" id="dependentCount" type="hidden" value="0" />
 					<input  name="supportCount"  id="supportCount" type="hidden" value="0" />
+					<input name="redirectTo" type="hidden" value="$('#redirectTo').val()">
 					<span class="button"><g:actionSubmit class="save" value="Save" /> </span>
 				</div></td>
 		</tr>

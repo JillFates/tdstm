@@ -30,7 +30,7 @@
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="manufacturer">Manufacturer</label></td>
-								<td >${assetEntityInstance.manufacturer}</td>
+								<td ><a href='javascript:showManufacturer(${assetEntityInstance.manufacturer?.id})' style='color:#00E'>${assetEntityInstance.manufacturer}</a></td>
 								<td class="label" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
 								<td >${assetEntityInstance.ipAddress}</td>
 								<td class="label" nowrap="nowrap"><label for="sourceRoom">Room</label></td>
@@ -41,7 +41,7 @@
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="model">Model</label></td>
-								<td>${assetEntityInstance.model}</td>
+								<td><a href='javascript:showModel(${assetEntityInstance.model?.id})' style='color:#00E'>${assetEntityInstance.model}</a></td>
 								<td class="label" nowrap="nowrap"><label for="os">OS</label></td>
 								<td >${assetEntityInstance.os}</td>
 								<td class="label" nowrap="nowrap"><label for="sourceRack">Rack/Cab</label></td>
