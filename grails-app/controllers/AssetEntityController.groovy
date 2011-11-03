@@ -627,7 +627,7 @@ class AssetEntityController {
         	projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
         }
         def project = Project.findById( projectId )
-        def assetEntityInstanceList = AssetEntity.findAllByProject( project, params ) 
+        		def assetEntityInstanceList = AssetEntity.findAllByProjectAndAssetTypeNotInList( project,["Application","Database","Files"], params ) 
 		def assetEntityList =  new ArrayList()
 		assetEntityInstanceList.each { assetEntity->
 			AssetEntityBean assetBeanInstance = new AssetEntityBean();
