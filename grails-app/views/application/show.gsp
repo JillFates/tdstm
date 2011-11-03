@@ -136,7 +136,7 @@
 						</tr>
 						<tr>
 							<td class="label" nowrap="nowrap"><label for="license">URL</label></td>
-							<td colspan="7"><a href="${applicationInstance.url}">${applicationInstance.url}</a>
+							<td colspan="7"><a href="${applicationInstance.url}" style="color:#00E">${applicationInstance.url}</a>
 							</td>
 						</tr>
 					</tbody>
