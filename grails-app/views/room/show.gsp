@@ -5,6 +5,7 @@
 <span class="span">
 <h1 style="margin: 0px;">Room View</h1>
 </span>
+<input type="hidden" id="redirectTo" value="room"/>
 <div class="dialog" style="border: 1px solid black;">
 	<table style="width: 100%; border: none">
 		<tbody>

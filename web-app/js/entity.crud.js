@@ -1,4 +1,4 @@
-function createEntityView(e, type){
+function createEntityView(e, type,source,rack,roomName,location,position){
 	 var resp = e.responseText;
 	 $("#createEntityView").html(resp);
 	 $("#createEntityView").dialog('option', 'width', 'auto')
@@ -7,21 +7,21 @@ function createEntityView(e, type){
 	 $("#editEntityView").dialog('close');
 	 $("#showEntityView").dialog('close');
 	 updateTitle(type)
-	 //updateAssetInfo(source,rack,roomName,location,position)
+	 updateAssetInfo(source,rack,roomName,location,position)
 }
-function getEntityDetails(type, value){
+function getEntityDetails(redirectTo, type, value){
 	 switch(type){
 	 case "Application":
-		new Ajax.Request('../application/show?id='+value,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Application');}})
+		new Ajax.Request('../application/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Application');}})
 		break;
 	 case "Database":
-		new Ajax.Request('../database/show?id='+value,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Database');}})
+		new Ajax.Request('../database/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Database');}})
 		break;
 	 case "Files":
-		new Ajax.Request('../files/show?id='+value,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Files');}})
+		new Ajax.Request('../files/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Files');}})
 		break;
 	 default :
-		new Ajax.Request('../assetEntity/show?id='+value,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Server');}})
+		new Ajax.Request('../assetEntity/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Server');}})
 	 }
 }
 function showEntityView(e, type){
@@ -34,22 +34,25 @@ function showEntityView(e, type){
 	 $("#createEntityView").dialog('close');
 	 updateTitle(type)
 }
-function editEntity(type, value){
+function editEntity(redirectTo,type, value, source,rack,roomName,location,position){
+	if(redirectTo == "rack"){
+		redirectTo = $('#redirectTo').val() == 'room' ? 'room' : 'rack'
+	}
 	 switch(type){
 		 case "Application":
-			new Ajax.Request('../application/edit?id='+value,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Application');}})
+			new Ajax.Request('../application/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Application',source,rack,roomName,location,position);}})
 			break;
 		 case "Database":
-			new Ajax.Request('../database/edit?id='+value,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Database');}})
+			new Ajax.Request('../database/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Database',source,rack,roomName,location,position);}})
 			break;
 		 case "Files":
-			new Ajax.Request('../files/edit?id='+value,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Files');}})
+			new Ajax.Request('../files/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Files',source,rack,roomName,location,position);}})
 			break;
 		 default :
-			 new Ajax.Request('../assetEntity/edit?id='+value,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Server');}})
+			 new Ajax.Request('../assetEntity/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Server',source,rack,roomName,location,position);}})
 	 }
 }
-function editEntityView(e, type){
+function editEntityView(e, type,source,rack,roomName,location,position){
      var resps = e.responseText;
      $("#editEntityView").html(resps);
 	 $("#editEntityView").dialog('option', 'width', 'auto')
@@ -57,6 +60,7 @@ function editEntityView(e, type){
 	 $("#editEntityView").dialog('open');
 	 $("#showEntityView").dialog('close');
 	 $("#createEntityView").dialog('close');
+	 updateAssetInfo(source,rack,roomName,location,position)
 	 updateTitle(type)
 }
 function isValidDate( date ){

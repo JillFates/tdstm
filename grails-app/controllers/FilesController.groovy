@@ -111,7 +111,7 @@ class FilesController {
 			def assetEntity = AssetEntity.get(id)
 			def dependentAssets = AssetDependency.findAllByAsset(assetEntity)
 			def supportAssets = AssetDependency.findAllByDependent(assetEntity)
-			[ filesInstance : filesInstance,supportAssets: supportAssets, dependentAssets:dependentAssets]
+			[ filesInstance : filesInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo]
 		}
 	}
 	def edit ={
@@ -135,7 +135,8 @@ class FilesController {
 			def supportAssets = AssetDependency.findAllByDependent(assetEntity)
 
 			[fileInstance:fileInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project : project,
-						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, dependentAssets:dependentAssets]
+						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, 
+						dependentAssets:dependentAssets, redirectTo : params.redirectTo]
 		}
 		
 	}
@@ -145,7 +146,31 @@ class FilesController {
 		if(!filesInstance.hasErrors() && filesInstance.save()) {
 			flash.message = "File ${filesInstance.assetName} Updated"
 			assetEntityService.createOrUpdateFilesDependencies(params, filesInstance)
-			redirect(action:list)
+			switch(params.redirectTo){
+				case "room":
+					redirect( controller:'room',action:list )
+					break;
+				case "rack":
+					redirect( controller:'rackLayouts',action:'create' )
+					break;
+				case "console":
+					redirect( controller:'assetEntity', action:"dashboardView", params:[showAll:'show'])
+					break;
+				case "clientConsole":
+					redirect( controller:'clientConsole', action:list)
+					break;
+				case "assetEntity":
+					redirect( controller:'assetEntity', action:list)
+					break;
+				case "database":
+					redirect( controller:'database', action:list)
+					break;
+				case "application":
+					redirect( controller:'application', action:list)
+					break;
+				default:
+					redirect( action:list)
+			}
 		}
 		else {
 			flash.message = "File not created"

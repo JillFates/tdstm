@@ -48,14 +48,13 @@ $(document).ready(function() {
 	<div class="message">${flash.message}</div>
 </g:if>
 <input type="hidden" id="role" value="role"/>
-<input type="hidden" id="redirectTo" value="assetEntity"/>
 <div>
 	<form name="assetEntityForm" action="list">
 		<jmesa:tableFacade id="tag" items="${assetEntityList}" maxRows="25" exportTypes="csv,excel" stateAttr="restore" var="assetEntityInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
 		    <jmesa:htmlTable style=" border-collapse: separate">
 		        <jmesa:htmlRow highlighter="true">
 		        	<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" >
-		        		<a href="javascript:editEntity('${assetEntityInstance?.assetType}',${assetEntityInstance.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
+		        		<a href="javascript:editEntity('assetEntity','${assetEntityInstance?.assetType}',${assetEntityInstance.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
 						<span id="icon_${assetEntityInstance.id}">
 							<g:if test="${assetEntityInstance.commentType == 'issue'}">
 								<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
@@ -75,43 +74,43 @@ $(document).ready(function() {
 						</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="application" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span onclick="getEntityDetails('${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.application}</span>
+		        		<span onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.application}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="assetName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<a id="assetName_${assetEntityInstance.id}" href="javascript:getEntityDetails('${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.assetName}</a>
+		        		<a id="assetName_${assetEntityInstance.id}" href="javascript:getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.assetName}</a>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="modelName" title="Model" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="model_${assetEntityInstance.id}" onclick="getEntityDetails('${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.model}</span>
+		        		<span id="model_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.model}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="sourceLocation" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="sourceLocation_${assetEntityInstance.id}" onclick="getEntityDetails('${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.sourceLocation}</span>
+		        		<span id="sourceLocation_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.sourceLocation}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="sourceRack" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="sourceRack_${assetEntityInstance.id}" onclick="getEntityDetails('${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.sourceRack}</span>
+		        		<span id="sourceRack_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.sourceRack}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="targetLocation" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="targetLocation_${assetEntityInstance.id}" onclick="getEntityDetails('${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.targetLocation}</span>
+		        		<span id="targetLocation_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.targetLocation}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="targetRack" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="targetRack_${assetEntityInstance.id}" onclick="getEntityDetails('${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.targetRack}</span>
+		        		<span id="targetRack_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.targetRack}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="assetType" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="assetType_${assetEntityInstance.id}" onclick="getEntityDetails('${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.assetType}</span>
+		        		<span id="assetType_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.assetType}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="assetTag" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="assetTag_${assetEntityInstance.id}" onclick="getEntityDetails('${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.assetTag}</span>
+		        		<span id="assetTag_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.assetTag}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="serialNumber" title="Serial #" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="serialNumber_${assetEntityInstance.id}" onclick="getEntityDetails('${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.serialNumber}</span>
+		        		<span id="serialNumber_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.serialNumber}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="moveBundleName" title="Move Bundle" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="moveBundle_${assetEntityInstance.id}" onclick="getEntityDetails('${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.moveBundle}</span>
+		        		<span id="moveBundle_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.moveBundle}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="depUp" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span onclick="getEntityDetails('${assetEntityInstance.assetType}','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.depUp}</span>
+		        		<span onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.depUp}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="depDown" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span onclick="getEntityDetails('${assetEntityInstance.assetType}','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.depDown}</span>
+		        		<span onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.depDown}</span>
 		        	</jmesa:htmlColumn>
 		        </jmesa:htmlRow>
 			</jmesa:htmlTable>

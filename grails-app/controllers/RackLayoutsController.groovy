@@ -341,7 +341,7 @@ class RackLayoutsController {
 								bladeTable = generateBladeLayout(it, overlapAsset, isAdmin, hideIcons)
 							}
 							if(isAdmin){
-								assetTag += """<a href="javascript:getEntityDetails('${overlapAsset?.assetType}',${overlapAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>" 
+								assetTag += """<a href="javascript:getEntityDetails('rack','${overlapAsset?.assetType}',${overlapAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>" 
 								if(hasBlades){
 									assetTag += "<br/>"+bladeTable
 								}
@@ -361,7 +361,7 @@ class RackLayoutsController {
 						}
 						cabling = !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : ""
 						if(isAdmin){
-							assetTag += """<a href="javascript:getEntityDetails('${overlappedAsset?.assetType}',${overlappedAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>"
+							assetTag += """<a href="javascript:getEntityDetails('rack','${overlappedAsset?.assetType}',${overlappedAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>"
 							if(hasBlades){
 								assetTag += "<br/>"+bladeTable
 							}
@@ -516,7 +516,7 @@ class RackLayoutsController {
 					if((bladeSpan == 2) &&  hasError )
 						bladeTable += "<td class='errorBlade' style='height:${tdHeight}px'>&nbsp;</td>"
 					else if(isAdmin)
-						bladeTable += """<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href="javascript:getEntityDetails('Blade',${blade.id})" title='${tag.replace('<br/>','')}'>${taglabel}</a></td>"""
+						bladeTable += """<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href="javascript:getEntityDetails('rack','Blade',${blade.id})" title='${tag.replace('<br/>','')}'>${taglabel}</a></td>"""
 					else
 						bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px' title='${tag.replace('<br/>','')}'>${taglabel}</td>"
 				} else {

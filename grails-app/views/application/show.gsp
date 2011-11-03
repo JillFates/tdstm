@@ -1,6 +1,6 @@
 <table style="border: 0">
 	<tr>
-		<td colspan="2"><div class="dialog" ondblclick="editEntity('Application', ${applicationInstance?.id})">
+		<td colspan="2"><div class="dialog" ondblclick="editEntity('${redirectTo}', 'Application', ${applicationInstance?.id})">
 				<table>
 					<tbody>
 						<tr>
@@ -160,7 +160,7 @@
 					</thead>
 					<tbody>
 						<g:each in="${supportAssets}" var="support" status="i">
-							<tr onclick="getEntityDetails('${support?.asset?.assetType}', ${support?.asset?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
+							<tr onclick="getEntityDetails('${redirectTo}','${support?.asset?.assetType}', ${support?.asset?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
 								<td class="dep-${support.status}">
 									${support?.dataFlowFreq}
 								</td>
@@ -197,7 +197,7 @@
 					</thead>
 					<tbody>
 						<g:each in="${dependentAssets}" var="dependent" status="i">
-							<tr onclick="getEntityDetails('${dependent.dependent?.assetType}', ${dependent.dependent?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
+							<tr onclick="getEntityDetails('${redirectTo}','${dependent.dependent?.assetType}', ${dependent.dependent?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
 								<td class="dep-${dependent.status}">
 									${dependent.dataFlowFreq}
 								</td>
@@ -226,7 +226,7 @@
 				<g:form>
 					<input type="hidden" name="id" value="${applicationInstance?.id}" />
 					<span class="button"><input type="button" class="edit"
-						value="Edit" onclick="editEntity('Application',${applicationInstance?.id})" /> </span>
+						value="Edit" onclick="editEntity('${redirectTo}','Application',${applicationInstance?.id})" /> </span>
 					<span class="button"><g:actionSubmit class="delete"
 							onclick="return confirm('Are you sure?');" value="Delete" /> </span>
 				</g:form>

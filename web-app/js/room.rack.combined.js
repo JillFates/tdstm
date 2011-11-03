@@ -1,7 +1,8 @@
 
 function openAssetEditDialig( id ){
 	$("#editFormId").val(id)
-	new Ajax.Request('../assetEntity/editShow?id='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetDialog( e , 'edit');}})
+	 var redirectTo = $('#redirectTo').val() == 'room' ? 'room' : 'rack'
+	new Ajax.Request('../assetEntity/edit?id='+id+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetDialog( e , 'edit');}})
 }
 function showEditAsset(e) {
 	var assetEntityAttributes = eval('(' + e.responseText + ')')
@@ -15,13 +16,8 @@ function showEditAsset(e) {
 	}
 }
 function createDialog(source,rack,roomName,location,position){
-	$("#createDialog").dialog('option', 'width', 950)
-    $("#createDialog").dialog('option', 'position', ['center','top']);
-    $("#editDialog").dialog("close")
-    $("#listDialog").dialog("close")
-    $("#createDialog").dialog("open")
-    $("#attributeSetId").val(1)
-    new Ajax.Request('../assetEntity/getAttributes?attribSet='+$("#attributeSetId").val(),{asynchronous:true,evalScripts:true,onComplete:function(e){generateCreateForm(e);updateAssetInfo(source,rack,roomName,location,position);}})
+    var redirectTo = $('#redirectTo').val() == 'room' ? 'room' : 'rack'
+    new Ajax.Request('../assetEntity/create?redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e);updateAssetInfo(source,rack,roomName,location,position);}})
   }
 function updateAssetInfo(source,rack,roomName,location,position){
 	var target = source != '1' ? 'target' : 'source'
@@ -84,13 +80,8 @@ function openSelectedRackLayout(){
     $("#cablingDialogId").dialog("close")
 }
 function createBladeDialog(source,blade,position){
-	$("#createDialog").dialog('option', 'width', 950)
-    $("#createDialog").dialog('option', 'position', ['center','top']);
-    $("#editDialog").dialog("close")
-    $("#listDialog").dialog("close")
-    $("#createDialog").dialog("open")
-    $("#attributeSetId").val(1)
-    new Ajax.Request('../assetEntity/getAttributes?attribSet='+$("#attributeSetId").val(),{asynchronous:true,evalScripts:true,onComplete:function(e){generateCreateForm(e);updateAssetBladeInfo(source,blade,position);}})
+	var redirectTo = $('#redirectTo').val() == 'room' ? 'room' : 'rack'
+    new Ajax.Request('../assetEntity/create?redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e);updateAssetBladeInfo(source,blade,position);}})
 }
 function updateAssetBladeInfo(source,blade,position){
 	var target = source != '1' ? 'target' : 'source'

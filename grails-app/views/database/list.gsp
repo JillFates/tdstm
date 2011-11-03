@@ -45,7 +45,6 @@ $(document).ready(function() {
 <div class="message">${flash.message}</div>
 </g:if>
 <input type="hidden" id="role" value="role"/>
-<input type="hidden" id="redirectTo" value="database"/>
 <div id="jmesaId" class="body">
 	<form name="listDBForm" action="list">
 		<jmesa:tableFacade id="tag" items="${databaseList}" maxRows="50"
@@ -55,7 +54,7 @@ $(document).ready(function() {
 				<jmesa:htmlRow highlighter="true" style="cursor: pointer;">
 					<jmesa:htmlColumn property="id" sortable="false" filterable="false"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions">
-						<a href="javascript:editEntity('${dataBaseInstance?.assetType}',${dataBaseInstance?.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
+						<a href="javascript:editEntity('database','${dataBaseInstance?.assetType}',${dataBaseInstance?.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
 						<span id="icon_${dataBaseInstance.id}">
 							<g:if test="${dataBaseInstance.commentType == 'issue'}">
 								<g:remoteLink controller="assetEntity" action="listComments" id="${dataBaseInstance.id}" before='setAssetId(${dataBaseInstance.id});'	onComplete="listCommentsDialog( e ,'never' );">
@@ -77,28 +76,28 @@ $(document).ready(function() {
 					<jmesa:htmlColumn property="assetName" title="Name" sortable="true"
 						filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-							<span onclick="getEntityDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.assetName}</span>
+							<span onclick="getEntityDetails('database','${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.assetName}</span>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="dbFormat" sortable="true"
 						title="DB Format" filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getEntityDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.dbFormat}</a>
+						<span onclick="getEntityDetails('database','${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.dbFormat}</a>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="moveBundle" sortable="true"
 						filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getEntityDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.moveBundle}</span>
+						<span onclick="getEntityDetails('database','${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.moveBundle}</span>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="planStatus" sortable="true"
 						filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getEntityDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.planStatus}</span>
+						<span onclick="getEntityDetails('database','${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.planStatus}</span>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="depUp" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span onclick="getEntityDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id} )">${dataBaseInstance.depUp}</span>
+		        		<span onclick="getEntityDetails('database','${dataBaseInstance.assetType}', ${dataBaseInstance.id} )">${dataBaseInstance.depUp}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="depDown" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span onclick="getEntityDetails('${dataBaseInstance.assetType}', ${dataBaseInstance.id} )">${dataBaseInstance.depDown}</span>
+		        		<span onclick="getEntityDetails('database','${dataBaseInstance.assetType}', ${dataBaseInstance.id} )">${dataBaseInstance.depDown}</span>
 		        	</jmesa:htmlColumn>
 				</jmesa:htmlRow>
 			</jmesa:htmlTable>

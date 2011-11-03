@@ -46,7 +46,6 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 </g:if>
 <g:else>
 <fieldset><legend><b>Room List</b></legend>
-<input type="hidden" id="redirectTo" value="room"/>
 <g:form action="create" >
 <div style="float: left; width: auto;">
 <table>
@@ -337,8 +336,8 @@ function validateForm(){
 		return false
 	}
 }
-function createAssetPage(type){
-	   ${remoteFunction(action:'create',controller:'assetEntity', onComplete:'createEntityView(e,type)')}
+function createAssetPage(type,source,rack,roomName,location,position){
+	   ${remoteFunction(action:'create',controller:'assetEntity',params:['redirectTo':'room'], onComplete:'createEntityView(e,type,source,rack,roomName,location,position)')}
 }
 </script>
 </body>

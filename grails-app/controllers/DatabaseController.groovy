@@ -89,7 +89,7 @@ class DatabaseController {
 			def assetEntity = AssetEntity.get(id)
 			def dependentAssets = AssetDependency.findAllByAsset(assetEntity)
 			def supportAssets = AssetDependency.findAllByDependent(assetEntity)
-			[ databaseInstance : databaseInstance,supportAssets: supportAssets, dependentAssets:dependentAssets]
+			[ databaseInstance : databaseInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo]
 		}
 	}
 	
@@ -154,7 +154,8 @@ class DatabaseController {
 			def supportAssets = AssetDependency.findAllByDependent(assetEntity)
 
 			[databaseInstance:databaseInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project:project,
-						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, dependentAssets:dependentAssets]
+						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, 
+						dependentAssets:dependentAssets, redirectTo : params.redirectTo]
 		}
 		
 		}
@@ -175,7 +176,31 @@ class DatabaseController {
 		if(!databaseInstance.hasErrors() && databaseInstance.save()) {
 			flash.message = "DataBase ${databaseInstance.assetName} Updated"
 			assetEntityService.createOrUpdateDatabaseDependencies(params, databaseInstance)
-			redirect(action:list)
+			switch(params.redirectTo){
+				case "room":
+					redirect( controller:'room',action:list )
+					break;
+				case "rack":
+					redirect( controller:'rackLayouts',action:'create' )
+					break;
+				case "console":
+					redirect( controller:'assetEntity', action:"dashboardView", params:[showAll:'show'])
+					break;
+				case "clientConsole":
+					redirect( controller:'clientConsole', action:list)
+					break;
+				case "assetEntity":
+					redirect( controller:'assetEntity', action:list)
+					break;
+				case "application":
+					redirect( controller:'application', action:list)
+					break;
+				case "files":
+					redirect( controller:'files', action:list)
+					break;
+				default:
+					redirect( action:list)
+			}
 		}
 		else {
 			flash.message = "DataBase not created"

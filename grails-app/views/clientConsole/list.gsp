@@ -25,7 +25,6 @@
 
 </head>
 <body >
-<input type="hidden" id="redirectTo" value="clientConsole"/>
 <div title="Change Status" id="changeStatusDialog" style="background-color: #808080;display: none;">
 	<form name="changeStatusForm">
 	<input type="hidden" name="asset" id="asset" />
@@ -824,7 +823,7 @@
 			if( idArray[0] == "comment"  ) {
 				${remoteFunction(controller:'assetEntity', action:'listComments', params:'\'id=\'+assetId', before:'setAssetId(assetId);',onComplete:'listCommentsDialog( e ,\"action\");')}
 			}else if( idArray[0] == "asset"  ) {
-				getEntityDetails('Server',assetId);
+				getEntityDetails('clientConsole','Server',assetId);
 			}else if( idArray[0] == "task" ) {
 				${remoteFunction( action:"getTask", params:'\'assetEntity=\'+assetId', onComplete:'showChangeStatusDialog(e);')}
 			}

@@ -355,11 +355,11 @@ class RoomController {
 		   thisRackTotalSpace = rack.model?.usize ?: 42
 		   
 		   def assetsInRack = location == "source" ? AssetEntity.findAllByRackSource(rack) : AssetEntity.findAllByRackTarget(rack)
-		   assetsInRack.findAll{moveBundles.id?.contains(it.moveBundle.id)}.each{ assetEntity ->
+		   assetsInRack.findAll{moveBundles.id?.contains(it.moveBundle?.id)}.each{ assetEntity ->
 			   thisRackUsedSpace += assetEntity?.model?.usize ? assetEntity?.model?.usize : 1
 		   }
 		   spaceString = params.capacityType != "Used" ? (thisRackTotalSpace-thisRackUsedSpace)+" remaining of "+thisRackTotalSpace+" RU" : thisRackUsedSpace+" used of "+thisRackTotalSpace+" RU"
-		   assets.findAll{moveBundles.id?.contains(it.moveBundle.id)}.each{ asset->
+		   assets.findAll{moveBundles?.id?.contains(it.moveBundle?.id)}.each{ asset->
 			   def assetPowerCabling = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.fromConnectorNumber.type = ? AND cap.fromAsset = ? ",["Power",asset])
 			   def powerConnectors = assetPowerCabling.size()
 			   def powerConnectorsAssigned = assetPowerCabling.findAll{it.toPower != null && it.toPower != '' }.size()
@@ -465,7 +465,7 @@ class RoomController {
 								</tbody>""")
 	   if(assetEntityList.size() > 0){
 		   assetEntityList.eachWithIndex{ obj, i ->
-			   stringToReturn.append("""<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="editDialog( ${obj.id},'${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">
+			   stringToReturn.append("""<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="editEntity( 'rack','${obj.assetType}',${obj.id},'${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">
 											<td>${obj.assetName}</td>
 											<td>${obj.assetTag}</td>
 											<td>${obj.model ? obj.model.modelName : ''}</td>

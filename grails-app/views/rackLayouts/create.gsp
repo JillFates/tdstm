@@ -96,7 +96,6 @@
 	<div class="message">${flash.message}</div>
 </g:if>
 <div class="dialog">
-<input type="hidden" id="redirectTo" value="rackLayouts"/>
 <g:form action="save" name="rackLayoutCreate" method="post" target="_blank" onsubmit="return submitForm(this)" style="border: 1px solid black; width: 100%">
 <table style="width:auto; border: none">
 	<tbody>
@@ -273,7 +272,7 @@
 		});
 	});
 	function createAssetPage(type,source,rack,roomName,location,position){
-		${remoteFunction(action:'create',controller:'assetEntity', onComplete:'createEntityView(e,type)')}
+		${remoteFunction(action:'create',controller:'assetEntity',params:['redirectTo':'rack'], onComplete:'createEntityView(e,type,source,rack,roomName,location,position)')}
 	}
 </script>
 </body>

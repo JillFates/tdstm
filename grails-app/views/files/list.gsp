@@ -44,7 +44,6 @@ $(document).ready(function() {
 <div class="message">${flash.message}</div>
 </g:if>
 <input type="hidden" id="role" value="role"/>
-<input type="hidden" id="redirectTo" value="files"/>
 <div id="jmesaId" class="body">
 	<form name="listFileForm" action="list">
 		<jmesa:tableFacade id="tag" items="${filesList}" maxRows="50"
@@ -54,7 +53,7 @@ $(document).ready(function() {
 				<jmesa:htmlRow highlighter="true" style="cursor: pointer;">
 					<jmesa:htmlColumn property="id" sortable="false" filterable="false"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions">
-						<a href="javascript:editEntity('${fileInstance?.assetType}',${fileInstance?.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
+						<a href="javascript:editEntity('files','${fileInstance?.assetType}',${fileInstance?.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
 						<span id="icon_${fileInstance.id}">
 							<g:if test="${fileInstance.commentType == 'issue'}">
 								<g:remoteLink controller="assetEntity" action="listComments" id="${fileInstance.id}" before='setAssetId(${fileInstance.id});'	onComplete="listCommentsDialog( e ,'never' );">
@@ -76,33 +75,33 @@ $(document).ready(function() {
 					<jmesa:htmlColumn property="assetName" title="Name"
 						sortable="true" filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getEntityDetails('${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.assetName}</span>
+						<span onclick="getEntityDetails('files','${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.assetName}</span>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="fileFormat" sortable="true"
 						title="File Format" filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getEntityDetails('${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.fileFormat}</span>
+						<span onclick="getEntityDetails('files','${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.fileFormat}</span>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="fileSize" title="File Size"
 						sortable="true" filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getEntityDetails('${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.fileSize}</span>
+						<span onclick="getEntityDetails('files','${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.fileSize}</span>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="moveBundle" sortable="true"
 						filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getEntityDetails('${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.moveBundle}</span>
+						<span onclick="getEntityDetails('files','${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.moveBundle}</span>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="planStatus" sortable="true"
 						filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getEntityDetails('${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.planStatus}</span>
+						<span onclick="getEntityDetails('files','${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.planStatus}</span>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="depUp" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span onclick="getEntityDetails('${fileInstance.assetType}', ${fileInstance.id} )">${fileInstance.depUp}</span>
+		        		<span onclick="getEntityDetails('files','${fileInstance.assetType}', ${fileInstance.id} )">${fileInstance.depUp}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="depDown" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span onclick="getEntityDetails('${fileInstance.assetType}', ${fileInstance.id} )">${fileInstance.depDown}</span>
+		        		<span onclick="getEntityDetails('files','${fileInstance.assetType}', ${fileInstance.id} )">${fileInstance.depDown}</span>
 		        	</jmesa:htmlColumn>
 
 				</jmesa:htmlRow>

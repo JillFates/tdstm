@@ -695,6 +695,7 @@ class AssetEntityController {
 			AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
 											toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
 											where toAsset = ?""",[assetEntityInstance])
+			AssetDependency.executeUpdate("delete AssetDependency where asset = ? or dependent = ? ",[assetEntityInstance, assetEntityInstance])
 			AssetEntity.executeUpdate("delete from AssetEntity ae where ae.id = ${assetEntityInstance.id}")
           
             flash.message = "AssetEntity ${assetEntityInstance.assetName} deleted"         
@@ -1932,6 +1933,7 @@ class AssetEntityController {
 
 	}
 	def show ={
+		println"params------>"+params.redirectTo
 		def items = []
 		def assetEntityInstance = AssetEntity.get( params.id )
 		def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
@@ -1942,7 +1944,6 @@ class AssetEntityController {
 		def frontEndLabel
 		def dependentAssets
 		def supportAssets
-		
 		entityAttributeInstance.each{
 			attributeOptions = EavAttributeOption.findAllByAttribute( it.attribute,[sort:'value',order:'asc'] )
 			options = []
@@ -1964,7 +1965,8 @@ class AssetEntityController {
 			 dependentAssets = AssetDependency.findAllByAsset(assetEntityInstance)
 		     supportAssets 	= AssetDependency.findAllByDependent(assetEntityInstance)
 		}
-		[label:frontEndLabel, assetEntityInstance:assetEntityInstance,supportAssets: supportAssets, dependentAssets:dependentAssets]
+		[label:frontEndLabel, assetEntityInstance:assetEntityInstance,supportAssets: supportAssets, 
+			dependentAssets:dependentAssets, redirectTo : params.redirectTo]
 	}
 	def edit ={
 		def assetEntityInstance = AssetEntity.get(params.id)
@@ -2000,6 +2002,7 @@ class AssetEntityController {
 
 	}
 	def update={
+		def redirectTo = params.redirectTo
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 
 		def formatter = new SimpleDateFormat("MM/dd/yyyy")
@@ -2017,12 +2020,30 @@ class AssetEntityController {
 		if(!assetEntityInstance.hasErrors() && assetEntityInstance.save(flush:true)) {
 			flash.message = "Asset ${assetEntityInstance.assetName} Updated"
 			assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance)
-			if(params.redirectTo == "room"){
-				redirect( controller:'room',action:list, params:[projectId: projectId] )
-			} else if(params.redirectTo == "rack"){
-				redirect( controller:'rackLayouts',action:'create', params:[projectId: projectId] )
-			} else {
-				redirect( action:list)
+			switch(redirectTo){
+				case "room":
+					redirect( controller:'room',action:list, params:[projectId: projectId] )
+					break;
+				case "rack":
+					redirect( controller:'rackLayouts',action:'create', params:[projectId: projectId] )
+					break;
+				case "console":
+					redirect( action:dashboardView, params:[projectId: projectId, showAll:'show'])
+					break;
+				case "clientConsole":
+					redirect( controller:'clientConsole', action:list, params:[projectId: projectId])
+					break;
+				case "application":
+					redirect( controller:'application', action:list, params:[projectId: projectId])
+					break;
+				case "database":
+					redirect( controller:'database', action:list, params:[projectId: projectId])
+					break;
+				case "files":
+					redirect( controller:'files', action:list, params:[projectId: projectId])
+					break;
+				default:
+					redirect( action:list)
 			}
 		}
 		else {

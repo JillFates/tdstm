@@ -763,7 +763,7 @@ function onInvokeAction(id) {
 											</span>
 										</g:if>
 									</jsec:hasAnyRole>
-									<a id="${assetEntityBean.id}" href="javascript:getEntityDetails('Server', ${assetEntityBean.id} )">
+									<a id="${assetEntityBean.id}" href="javascript:getEntityDetails('console','Server', ${assetEntityBean.id} )">
 										<img src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px" />
 									</a>
 									<span style="display: none;" id="image_${assetEntityBean.id}" class="selected" >

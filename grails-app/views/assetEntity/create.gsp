@@ -98,10 +98,10 @@
 				        				</script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="retireDate" id="retireDate" tabindex="27"
 									value="<tds:convertDate date="${assetEntityInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" tabindex="27" />" > 
 								</td>
-								<td class="label" nowrap="nowrap"><label for="sourceBladeChassis">Blade</label></td>
-								<td><input type="text" id="sourceBladeChassis"
+								<td class="label" nowrap="nowrap"><label for="sourceBladeChassisId">Blade</label></td>
+								<td><input type="text" id="sourceBladeChassisId"
 									name="sourceBladeChassis" value="${assetEntityInstance.sourceBladeChassis}" size=10 tabindex="35"/></td>
-									<td><input type="text" id="targetBladeChassis"
+									<td><input type="text" id="targetBladeChassisId"
 									name="targetBladeChassis" value="${assetEntityInstance.targetBladeChassis}" size=10 tabindex="45" /></td>
 								<td class="label" nowrap="nowrap"><label for="custom6">${project.custom6 ?: 'Custom6' }</label></td>
 								<td ><input type="text" id="custom6" name="custom6" value="${assetEntityInstance.custom6}" size=8 tabindex="55" /></td>
@@ -116,10 +116,10 @@
 					                    </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="maintExpDate" id="maintExpDate" tabindex="28"
 									value="<tds:convertDate date="${assetEntityInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />" > 
 								</td>
-								<td class="label" nowrap="nowrap"><label for="sourceBladePosition">Blade Position</label></td>
-								<td><input type="text" id="sourceBladePosition"
+								<td class="label" nowrap="nowrap"><label for="sourceBladePositionId">Blade Position</label></td>
+								<td><input type="text" id="sourceBladePositionId"
 									name="sourceBladePosition" value="${assetEntityInstance.sourceBladePosition}" size=10 tabindex="36"/></td>
-									<td><input type="text" id="targetBladePosition"
+									<td><input type="text" id="targetBladePositionId"
 									name="targetBladePosition" value="${assetEntityInstance.targetBladePosition}" size=10 tabindex="46" /></td>
 								<td class="label" nowrap="nowrap"><label for="custom7">${project.custom7 ?: 'Custom7' }</label></td>
 								<td ><input type="text" id="custom7" name="custom7" value="${assetEntityInstance.custom7}" size=8 tabindex="56" /></td>
@@ -207,12 +207,11 @@
 		<tr>
 			<td colspan="2">
 				<div class="buttons">
-			        <input type="hidden" name="redirectTo" value="${redirectTo}" />
 					<input name="attributeSet.id" type="hidden" value="1">
 					<input name="project.id" type="hidden" value="${projectId}" />
 					<input name="dependentCount" id="dependentCount" type="hidden" value="0" />
 					<input  name="supportCount"  id="supportCount" type="hidden" value="0" />
-					<input name="redirectTo" type="hidden" value="$('#redirectTo').val()">
+					<input name="redirectTo" type="hidden" value="${redirectTo}">
 					<span class="button"><g:actionSubmit class="save" value="Save" /> </span>
 				</div></td>
 		</tr>

@@ -133,7 +133,7 @@ class ApplicationController {
 			def assetEntity = AssetEntity.get(id)
 			def dependentAssets = AssetDependency.findAllByAsset(assetEntity)
 			def supportAssets = AssetDependency.findAllByDependent(assetEntity)
-			[ applicationInstance : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets]
+			[ applicationInstance : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo]
 		}
 	}
 
@@ -159,7 +159,8 @@ class ApplicationController {
 			def supportAssets = AssetDependency.findAllByDependent(assetEntity)
 
 			[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project : project,
-						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, dependentAssets:dependentAssets]
+						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, 
+						dependentAssets:dependentAssets, redirectTo : params.redirectTo]
 		}
 
 	}
@@ -180,7 +181,31 @@ class ApplicationController {
 		if(!applicationInstance.hasErrors() && applicationInstance.save(flush:true)) {
 			flash.message = "Application ${applicationInstance.assetName} Updated"
 			assetEntityService.createOrUpdateApplicationDependencies(params, applicationInstance)
-			redirect(action:list)
+			switch(params.redirectTo){
+				case "room":
+					redirect( controller:'room',action:list )
+					break;
+				case "rack":
+					redirect( controller:'rackLayouts',action:'create' )
+					break;
+				case "console":
+					redirect( controller:'assetEntity', action:"dashboardView", params:[showAll:'show'])
+					break;
+				case "clientConsole":
+					redirect( controller:'clientConsole', action:list)
+					break;
+				case "assetEntity":
+					redirect( controller:'assetEntity', action:list)
+					break;
+				case "database":
+					redirect( controller:'database', action:list)
+					break;
+				case "files":
+					redirect( controller:'files', action:list)
+					break;
+				default:
+					redirect( action:list)
+			}
 		}
 		else {
 			flash.message = "Application not created"
