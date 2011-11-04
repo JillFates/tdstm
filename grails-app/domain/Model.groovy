@@ -142,10 +142,6 @@ class Model {
 			bladeCount = null
 			bladeLabelCount = null
 		}
-		def principal = SecurityUtils.subject?.principal
-		if( principal ){
-			updatedBy  = UserLogin.findByUsername( principal )?.person
-		}
 	}
 	def getAssetTypeList(){
 		return EavAttributeOption.findAllByAttribute(EavAttribute.findByAttributeCode("assetType"),[sort:'value',order:'asc'])?.value

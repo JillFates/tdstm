@@ -123,11 +123,17 @@
 				</g:hasErrors>
 			</td>
 			<td>Model Status :</td>
+			<g:if test="${modelInstance.powerUse >0}">
 			<td><g:select id="modelStatus" name='modelStatus' value ="${modelInstance?.modelStatus}" from="${['new','full','valid']}"> </g:select>
 			<g:hasErrors bean="${modelInstance}" field="modelStatus">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelStatus" /></div>
 				</g:hasErrors>
 			</td>
+			</g:if>
+			<g:else>
+				<td>${modelInstance?.modelStatus}
+			</td>
+			</g:else>
 		</tr>
 		<tr>
 			

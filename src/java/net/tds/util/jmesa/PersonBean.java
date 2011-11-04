@@ -16,7 +16,16 @@ public class PersonBean implements Serializable {
 	private String userLogin;
 	private Date dateCreated;
 	private Date lastUpdated;
+	private Integer modelScore;
 	
+	public Integer getModelScore() {
+		return modelScore;
+	}
+
+	public void setModelScore(Integer modelScore) {
+		this.modelScore = modelScore;
+	}
+
 	public PersonBean() {
 		
 	}

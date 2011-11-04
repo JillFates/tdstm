@@ -97,6 +97,19 @@
 					            </g:hasErrors>
                                 </td>
                             </tr> 
+                             <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="modelScore">Model Score:</label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean:personInstance,field:'modelScore','errors')}">
+                                    <input type="text" maxlength="64" id="modelScore" name="modelScore" value="${fieldValue(bean:personInstance,field:'modelScore')}" readonly="readonly"/>
+                                <g:hasErrors bean="${personInstance}" field="modelScore">
+					            <div class="errors">
+					                <g:renderErrors bean="${personInstance}" as="list" field="modelScore"/>
+					            </div>
+					            </g:hasErrors>
+                                </td>
+                            </tr> 
                         
                         </tbody>
                     </table>

@@ -69,6 +69,14 @@
 			<td valign="top" class="value"><tds:convertDateTime date="${personInstance?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 
 		</tr>
+		
+		<tr class="prop">
+			<td valign="top" class="name">Model Score:</td>
+
+			<td valign="top" class="value">${fieldValue(bean:personInstance,
+			field:'modelScore')}</td>
+
+		</tr>
 
 	</tbody>
 </table>

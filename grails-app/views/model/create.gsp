@@ -116,7 +116,7 @@
 			</td>
 			<td valign="top" class="name" nowrap="nowrap">Model Status :</td>
 			<td>
-				<g:select id="modelStatus" name='modelStatus' value ='${modelInstance.modelStatus}' from="${['new','full','valid']}" > </g:select>
+				<g:select id="modelStatus" name='modelStatus' value ='${modelInstance.modelStatus}' from="${['new']}" > </g:select>
 			</td>
 		</tr>
 			<td>

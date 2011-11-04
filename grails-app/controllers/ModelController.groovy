@@ -106,6 +106,18 @@ class ModelController {
 		
 		if( principal ){
 			user  = UserLogin.findByUsername( principal )
+			def person = user.person
+			def score = person?.modelScore? person?.modelScore:0
+			if(user && person){
+				     if(params?.modelStatus == "new"||params?.modelStatus=="full" ){
+						    person.modelScore = score+10
+					 }else{
+					        person.modelScore = score+20
+					 }
+					if(!person.save(flush:true)){
+						person.errors.allErrors.each{ println it }
+				    }				
+				}
 		}
 		if(endOfLifeDate){
 			params.endOfLifeDate =  GormUtil.convertInToGMT(formatter.parse(endOfLifeDate), tzId)
@@ -207,13 +219,14 @@ class ModelController {
 
     def show = {
         def modelInstance = Model.get(params.id)
+		def subject = SecurityUtils.subject
         if (!modelInstance) {
         	flash.message = "Model not found with Id ${params.id}"
             redirect(action: "list")
         }
         else {
         	def modelConnectors = ModelConnector.findAllByModel( modelInstance,[sort:"id"] )
-            return [ modelInstance : modelInstance, modelConnectors : modelConnectors ]
+            return [ modelInstance : modelInstance, modelConnectors : modelConnectors,isAdmin:subject.hasRole("ADMIN") ]
         }
     }
 
@@ -241,11 +254,32 @@ class ModelController {
 
     def update = {
         def modelInstance = Model.get(params.id)
+		def modelStatus = modelInstance?.modelStatus 
 		def endOfLifeDate = params.endOfLifeDate
 		def formatter = new SimpleDateFormat("MM/dd/yyyy");
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def principal = SecurityUtils.subject?.principal
 		def user
+		def person
+		if( principal ){
+			user  = UserLogin.findByUsername( principal )
+		    person = user.person
+			if(user && person){
+				def score = person?.modelScore ?: 0
+				if(params?.modelStatus == "full" && modelStatus != params?.modelStatus){
+					person.modelScore = score+20
+				}else if(params?.modelStatus == "valid" && modelStatus != params?.modelStatus){
+					if(modelInstance?.validatedBy?.id == person?.id && modelInstance.updatedBy?.id != person?.id ){
+						person.modelScore = score+20
+					} else {
+						person.modelScore = score+50
+					}
+				}
+				if(!person.save(flush:true)){
+					person.errors.allErrors.each{println it}
+				}
+		     }
+		}
 		if(endOfLifeDate){
 			params.endOfLifeDate =  GormUtil.convertInToGMT(formatter.parse(endOfLifeDate), tzId)
 		}
@@ -262,7 +296,7 @@ class ModelController {
         	params.sourceTDS = params.sourceTDS == 'on' ? 1 : 0
 			params.powerUse = powerUsed
             def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
-    		def frontImage = request.getFile('frontImage')
+    		def frontImage = request?.getFile('frontImage')
             if( frontImage ) {
     			if( frontImage.getContentType() && frontImage.getContentType() != "application/octet-stream"){
     				if (! okcontents.contains(frontImage.getContentType())) {
@@ -275,7 +309,7 @@ class ModelController {
             		frontImage = modelInstance.frontImage
             	}
             }
-            def rearImage = request.getFile('rearImage')
+            def rearImage = request?.getFile('rearImage')
             if( rearImage ) {
     			if( rearImage.getContentType() && rearImage.getContentType() != "application/octet-stream"){
     				if (! okcontents.contains(rearImage.getContentType())) {
@@ -293,8 +327,11 @@ class ModelController {
 			modelInstance.weight = params.modelWeight != "" ? Integer.parseInt(params.modelWeight):0 
 			modelInstance.depth  = params.modelDepth  != "" ? Integer.parseInt(params.modelDepth):0 
 			modelInstance.width  = params.modelWidth  != "" ? Integer.parseInt(params.modelWidth):0
-            if(modelInstance.modelStatus != 'valid' && params?.modelStatus=='valid'){
+            if( params?.modelStatus == 'valid' && modelStatus == 'full'){
 			   modelInstance.validatedBy = user?.person
+			   modelInstance.updatedBy =  modelInstance.updatedBy
+			}else{
+			   modelInstance.updatedBy = person
 			}
             modelInstance.properties = params
             modelInstance.rearImage = rearImage
@@ -438,7 +475,14 @@ class ModelController {
 
     def delete = {
         def modelInstance = Model.get(params.id)
-        if (modelInstance) {
+		def principal = SecurityUtils.subject?.principal
+		def user
+		def person
+		if( principal ){
+			user  = UserLogin.findByUsername( principal )
+		    person = user.person
+		}
+        if(modelInstance) {
             try {
             	AssetEntity.executeUpdate("update AssetEntity set model = null where model = ?",[modelInstance])
 				
@@ -448,6 +492,18 @@ class ModelController {
 														where toConnectorNumber in (from ModelConnector where model = ${modelInstance.id})""")
             	ModelConnector.executeUpdate("delete ModelConnector where model = ?",[modelInstance])
                 modelInstance.delete(flush: true)
+				if(user){
+					int bonusScore = person?.modelScoreBonus ? person?.modelScoreBonus:0
+				    person.modelScoreBonus = bonusScore+1
+					int score =  person.modelScore
+					person.modelScore = score+bonusScore;
+				}
+				if(!person.save(flush:true)){
+					person.errors.allErrors.each{
+						println it
+						}
+				}
+				
                 flash.message = "${modelInstance} deleted"
                 redirect(action: "list")
             } catch (org.springframework.dao.DataIntegrityViolationException e) {
@@ -570,14 +626,27 @@ class ModelController {
 			def aka = new StringBuffer(toModel.aka ? toModel.aka+"," : "")
 			aka.append(fromModel.modelName)
 			aka.append(fromModel.aka ? ","+fromModel.aka : "")
-			
+						
 			// Delete model record
 			fromModel.delete()
 			sessionFactory.getCurrentSession().flush();
 			
-			toModel.aka = aka 
+			toModel.aka = aka
+			
 			if(!toModel.hasErrors())
 				toModel.save(flush:true)
+				def principal = SecurityUtils.subject?.principal
+				def user
+				if( principal ){
+					user = UserLogin.findByUsername( principal )
+					def person = user.person
+					def bonusScore = person.modelScoreBonus ? person.modelScoreBonus:0
+					if(user){
+						person.modelScoreBonus = bonusScore+10
+						person.modelScore = person.modelScoreBonus + person.modelScore
+					    person.save(flush:true)
+					}
+		}
 		} else {
 			//	Delete model record
 			fromModel.delete()
@@ -947,4 +1016,21 @@ class ModelController {
 						]
     	render modelMap as JSON
     }
+	def validateModel={
+		def modelInstance = Model.get(params.id)
+		def principal = SecurityUtils.subject?.principal
+		def user
+		if(principal){
+			user  = UserLogin.findByUsername( principal )
+		    def  person = user.person
+			modelInstance.validatedBy = person
+			modelInstance.modelStatus = "valid"
+			
+		}
+		if(!modelInstance.save(flush:true)){
+			modelInstance.errors.allErrors.each { println it }
+		}
+		flash.message = "${modelInstance.modelName} Validated"
+		render (view: "show",model:[id: modelInstance.id,modelInstance:modelInstance])
+		}
 }

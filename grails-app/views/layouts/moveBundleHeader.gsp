@@ -51,6 +51,8 @@
     def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
     def moveBundleId = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE ;
     def currProjObj;
+	def personId = session.getAttribute("LOGIN_PERSON").id
+	def person = Person.get(personId)
     def moveEvent;
     if( projectId != null){
       currProjObj = Project.findById(projectId)
@@ -87,7 +89,7 @@
 				<span><img title="Note: MS IE6 has limited capability so functions have been reduced." src="${createLinkTo(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
 			</g:if>
 			<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">
-				Welcome,&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name } </span>
+				Welcome,&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name }(${person?.modelScore}) </span>
 			</g:remoteLink>
 			</div>
 			<div class="tzmenu">&nbsp;-&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' }</span>

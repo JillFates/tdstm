@@ -37,6 +37,7 @@ class PersonController {
 			personBean.setId(it.id)
 			personBean.setFirstName(it.firstName)
 			personBean.setLastName(it.lastName)
+			personBean.setModelScore(it.modelScore)
 			def userLogin = UserLogin.findByPerson(it);
 			if(userLogin){
 				personBean.setUserLogin(userLogin.username)
@@ -129,7 +130,7 @@ class PersonController {
         if(personInstance) {
             personInstance.properties = params
             if ( !personInstance.hasErrors() && personInstance.save() ) {
-            	if(companyId != ""){
+            	if(companyId != null ){
     	            def companyParty = Party.findById(companyId)
     	            partyRelationshipService.updatePartyRelationshipPartyIdFrom("STAFF", companyParty, 'COMPANY', personInstance, "STAFF")
                 }

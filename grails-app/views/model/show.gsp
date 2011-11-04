@@ -229,6 +229,12 @@
 							<g:actionSubmit class="edit" action="edit" value="Edit"></g:actionSubmit>
 							<span class="button"><input class="create" type="button" value="Merge" onclick="showMergeDialog()"/></span>
 							<g:actionSubmit class="delete" action="delete" value="Delete" onclick="return validateModelDependency(${modelInstance.id})"></g:actionSubmit>
+							<g:if test="${isAdmin && modelInstance?.modelStatus=='full'}">
+							  <input type="button" class="edit" value="Validate" onclick="validateModel(${modelInstance.id})"/>
+							</g:if>
+							<g:else>
+							  <input type="button" class="edit" value="Validate" disabled="disabled" />
+							</g:else>
 						</span>
 					</g:form>
 				</div>
@@ -274,6 +280,14 @@ function updatePowerType( value){
 	$('#powerUseId').val(preference);
 	$("#powerSpanId").html(preference);
 	${remoteFunction(controller:'project', action:'setPower', params:'\'p=\' + value ')}
+}
+function validateModel(id){
+    if(confirm("All data in this model is reasonable and valid ?")){
+    	${remoteFunction(action:'validateModel', params:'\'id=\' + id ',onComplete="updatePage()")}
+    }
+}
+function updatePage(){
+	window.location.reload();
 }
 </script>
 </div>

@@ -49,6 +49,8 @@
     def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
     def moveBundleId = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE ;
     def currProjObj;
+	def personId = session.getAttribute("LOGIN_PERSON").id
+	def person = Person.get(personId)
     if( projectId != null){
       currProjObj = Project.findById(projectId)
     }
@@ -82,7 +84,7 @@
             <g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">
 			<strong>
 			<div style="float: left;">
-				Welcome,&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name } </span>
+				Welcome,&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name }(${person?.modelScore}) </span>
 			</div>
 			<div class="tzmenu">&nbsp;-&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' }</span>
 				time<ul>   
