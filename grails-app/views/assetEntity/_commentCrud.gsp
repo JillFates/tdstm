@@ -43,7 +43,7 @@
 		<tr class="prop">
 			<td valign="top" class="name"><label for="comment">Comment:</label></td>
 			<td valign="top" class="value">
-				<textarea cols="80" rows="3" id="comment" name="comment" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea>
+				<textarea cols="80" rows="4" id="comment" name="comment" ></textarea>
 			</td>
 		</tr>
 	</table>
@@ -59,7 +59,7 @@
 		<tr class="prop">
 			<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
 			<td valign="top" class="value">
-				<textarea cols="80" rows="3" id="resolution" name="resolution" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea>
+				<textarea cols="80" rows="4" id="resolution" name="resolution" ></textarea>
 			</td>
 		</tr> 
 		</table>
@@ -105,7 +105,7 @@
 		<tr class="prop">
 			<td valign="top" class="name"><label for="comment">Comment:</label></td>
 			<td valign="top" class="value" >
-				<textarea cols="80" rows="3" id="commentTdId" readonly="readonly"></textarea>
+				<textarea cols="80" rows="4" id="commentTdId" readonly="readonly"></textarea>
 			</td>
 		</tr>
 	</table>
@@ -185,7 +185,7 @@
 		<tr class="prop">
 			<td valign="top" class="name"><label for="comment">Comment:</label></td>
 			<td valign="top" class="value">
-				<textarea cols="80" rows="3" id="commentEditId" name="comment" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea>
+				<textarea cols="80" rows="4" id="commentEditId" name="comment" ></textarea>
 			</td>
 		</tr>
 	</table>		
@@ -201,7 +201,7 @@
 		<tr class="prop">
 			<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
 			<td valign="top" class="value">
-				<textarea cols="80" rows="3" id="resolutionEditId" name="resolution" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea>
+				<textarea cols="80" rows="3" id="resolutionEditId" name="resolution" ></textarea>
 			</td>
 		</tr> 
 		<tr>
