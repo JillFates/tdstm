@@ -117,3 +117,11 @@ function showModelView(e){
     $("#modelId").html(resp);
     $("#models").removeAttr("multiple")
 }
+function showComment(id , action){
+	   var id = id
+	   if(action =='edit'){
+	   new Ajax.Request('../assetEntity/showComment?id='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog(e, 'edit');}})
+	   }else{
+		   new Ajax.Request('../assetEntity/showComment?id='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog(e, 'show');}})
+	   }
+}

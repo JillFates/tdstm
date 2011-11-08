@@ -97,7 +97,10 @@ class DatabaseController {
 			} else {
 				assetComment ="blank"
 			}
-			[ databaseInstance : databaseInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo, assetComment:assetComment]
+			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
+			
+			[ databaseInstance : databaseInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo, 
+			  assetComment:assetComment, assetCommentList:assetCommentList]
 		}
 	}
 	

@@ -119,7 +119,9 @@ class FilesController {
 			} else {
 				assetComment = "blank" 
 			}
-			[ filesInstance : filesInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment]
+			
+			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
+			[ filesInstance : filesInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment, assetCommentList:assetCommentList]
 		}
 	}
 	def edit ={

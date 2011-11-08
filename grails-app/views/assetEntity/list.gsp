@@ -107,10 +107,10 @@ $(document).ready(function() {
 		        		<span id="moveBundle_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.moveBundle}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="depUp" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.depUp}</span>
+		        		<span onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.depUp}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="depDown" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.depDown}</span>
+		        		<span onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.depDown}</span>
 		        	</jmesa:htmlColumn>
 		        </jmesa:htmlRow>
 			</jmesa:htmlTable>

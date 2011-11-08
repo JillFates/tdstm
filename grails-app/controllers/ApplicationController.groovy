@@ -141,8 +141,9 @@ class ApplicationController {
 			} else {
 				assetComment = "blank"
 			}
-			
-			[ applicationInstance : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment]
+			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)						
+		
+			[ applicationInstance : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment, assetCommentList:assetCommentList]
 		}
 	}
 

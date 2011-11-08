@@ -1970,8 +1970,9 @@ class AssetEntityController {
 		} else {
 			assetComment = "blank"
 		}
+		def assetCommentList = AssetComment.findAllByAssetEntity(assetEntityInstance)
 		[label:frontEndLabel, assetEntityInstance:assetEntityInstance,supportAssets: supportAssets,
-					dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment]
+					dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment, assetCommentList:assetCommentList]
 	}
 	def edit ={
 		def assetEntityInstance = AssetEntity.get(params.id)

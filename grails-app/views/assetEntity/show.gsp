@@ -203,6 +203,38 @@
 	</tr>
 		<tr>
 			<td colspan="2">
+				<div class="list">
+				<table id="listCommentsTable">
+				<thead>
+				<tr>
+					<th nowrap>Action</th>
+					<th nowrap>Comment</th>
+					<th nowrap>Comment Type</th>
+					<th nowrap>Resolved</th>
+					<th nowrap>Must Verify</th>
+					<th nowrap>Category</th>  
+					<th nowrap>Comment Code</th>                     
+				</tr>
+				</thead>
+				<tbody id="listCommentsTbodyIds">
+				<g:each status="i" in="${assetCommentList}"  var="commentList">
+				<tr style="cursor: pointer;">
+					<td><a href ="javascript:showComment(${commentList.id},'edit')" ><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a></td>
+					<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.comment}</td>
+					<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.commentType}</td>
+					<td ><g:if test ="${commentList.commentType =='issue' && commentList.isResolved == 1}"><g:checkBox name="myCheckbox" value="${true}" disabled="true"/></g:if><g:else>&nbsp</g:else></td>
+					<td ><g:if test ="${commentList.mustVerify == 1}"></g:if><g:else><g:checkBox name="myVerifyBox" value="${true}" disabled="true"/></g:else></td>
+					<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.category}</td>
+					<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.commentCode}</td>
+				</tr>
+				</g:each>
+				</tbody>
+				</table>
+			</div>
+			</td>
+	</tr>
+		<tr>
+			<td colspan="2">
 				<div class="buttons">
 					<input name="attributeSet.id" type="hidden" value="1">
 					<input name="project.id" type="hidden" value="${projectId}">
@@ -213,17 +245,17 @@
 					onclick="return confirm('Are you sure?');" value="Delete" /> </span>
 				<g:if test="${assetComment == 'issue'}">
 						<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
-							<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="=0px" />&nbsp&nbspComment
+							<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="=0px" style="margin-bottom: -4px;"/>&nbsp&nbspComment
 						</g:remoteLink>
 				</g:if>
 				<g:elseif test="${assetComment == 'comment'}">
 					<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
-						<img src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px"/>&nbsp&nbspComment
+						<img src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px" style="margin-bottom: -4px;"/>&nbsp&nbspComment
 					</g:remoteLink>
 				</g:elseif>
 			    <g:else>
 					<a href="javascript:createNewAssetComment(${assetEntityInstance.id});">
-						<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px"/>&nbsp&nbspComment
+						<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" style="margin-bottom: -4px;"/>&nbsp&nbspComment
 					</a>
 				</g:else>
 				</div></td>
