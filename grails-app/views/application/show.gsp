@@ -229,6 +229,21 @@
 						value="Edit" onclick="editEntity('${redirectTo}','Application',${applicationInstance?.id})" /> </span>
 					<span class="button"><g:actionSubmit class="delete"
 							onclick="return confirm('Are you sure?');" value="Delete" /> </span>
+					<g:if test="${assetComment == 'issue'}">
+						<g:remoteLink controller="assetEntity" action="listComments" id="${applicationInstance.id}" before="setAssetId('${applicationInstance.id}');" onComplete="listCommentsDialog(e,'never');">
+							<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="=0px" />&nbsp&nbspComment
+						</g:remoteLink>
+					</g:if>
+				    <g:elseif test="${assetComment == 'comment'}">
+						<g:remoteLink controller="assetEntity" action="listComments" id="${applicationInstance.id}" before="setAssetId('${applicationInstance.id}');" onComplete="listCommentsDialog(e,'never');">
+							<img src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px"/>&nbsp&nbspComment
+						</g:remoteLink>
+				    </g:elseif>
+					<g:else>
+						<a href="javascript:createNewAssetComment(${applicationInstance.id});">
+							<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px"/>&nbsp&nbspComment
+						</a>
+				    </g:else>
 				</g:form>
 			</div></td>
 	</tr>

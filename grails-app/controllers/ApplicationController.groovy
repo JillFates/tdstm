@@ -131,9 +131,18 @@ class ApplicationController {
 		}
 		else {
 			def assetEntity = AssetEntity.get(id)
+			def assetComment 
 			def dependentAssets = AssetDependency.findAllByAsset(assetEntity)
 			def supportAssets = AssetDependency.findAllByDependent(assetEntity)
-			[ applicationInstance : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo]
+			if(AssetComment.find("from AssetComment where assetEntity = ${applicationInstance?.id} and commentType = ? and isResolved = ?",['issue',0])){
+				assetComment = "issue"
+			} else if(AssetComment.find('from AssetComment where assetEntity = '+ applicationInstance?.id)){
+				assetComment = "comment"
+			} else {
+				assetComment = "blank"
+			}
+			
+			[ applicationInstance : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment]
 		}
 	}
 

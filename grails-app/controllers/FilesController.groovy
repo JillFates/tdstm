@@ -111,7 +111,15 @@ class FilesController {
 			def assetEntity = AssetEntity.get(id)
 			def dependentAssets = AssetDependency.findAllByAsset(assetEntity)
 			def supportAssets = AssetDependency.findAllByDependent(assetEntity)
-			[ filesInstance : filesInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo]
+			def assetComment
+			if(AssetComment.find("from AssetComment where assetEntity = ${filesInstance?.id} and commentType = ? and isResolved = ?",['issue',0])){
+				assetComment = "issue"
+			} else if(AssetComment.find('from AssetComment where assetEntity = '+ filesInstance?.id)){
+				assetComment = "comment"
+			} else {
+				assetComment = "blank" 
+			}
+			[ filesInstance : filesInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment]
 		}
 	}
 	def edit ={
