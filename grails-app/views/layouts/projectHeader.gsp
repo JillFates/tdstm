@@ -290,9 +290,15 @@
                     <g:select name="powerType" id="powerTypeId" from="${['Watts','Amps']}" 
                     value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE}"/>
                     </td>
-                  
-                  
                   </tr>  
+                  <tr class="prop">
+                     <td valign="top" class="name">
+                       <label for="title">Model Score:</label>
+                     </td>
+                     <td valign="top" class="value">
+                       <input type="text" name ="modelScore" id ="modelScoreId" readonly="readonly" value="${person?.modelScore}"/>
+                     </td>
+                  </tr> 
                 </tr>
               </tbody>
             </table>
