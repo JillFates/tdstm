@@ -2025,6 +2025,7 @@ class AssetEntityController {
 		assetEntityInstance.properties = params
 		if(!assetEntityInstance.hasErrors() && assetEntityInstance.save(flush:true)) {
 			flash.message = "Asset ${assetEntityInstance.assetName} Updated"
+			assetEntityInstance.updateRacks()
 			assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance)
 			switch(redirectTo){
 				case "room":

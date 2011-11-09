@@ -52,9 +52,9 @@
 								</td>
 								<td class="label" nowrap="nowrap"><label for="sourceRoomId">Room</label></td>
 								<td><input type="text" id="sourceRoomId"
-									name="sourceRoom" value="${assetEntityInstance.sourceRoom}" size=10 tabindex="32"/></td>
+									name="sourceRoom" value="${assetEntityInstance.roomSource?.roomName}" size=10 tabindex="32"/></td>
 									<td><input type="text" id="targetRoomId"
-									name="targetRoom" value="${assetEntityInstance.targetRoom}" size=10 tabindex="42" /></td>
+									name="targetRoom" value="${assetEntityInstance.roomTarget?.roomName}" size=10 tabindex="42" /></td>
 								<td class="label" nowrap="nowrap"><label for="custom3">${assetEntityInstance.project.custom3 ?: 'Custom3' }</label></td>
 								<td ><input type="text" id="custom3" name="custom3" value="${assetEntityInstance.custom3}" size=8 tabindex="52" /></td>
 							</tr>
@@ -76,9 +76,9 @@
 								<td ><input type="text" id="os" name="os" value="${assetEntityInstance.os}"  tabindex="24"/></td>
 								<td class="label" nowrap="nowrap"><label for="sourceRackId">Rack/Cab</label></td>
 								<td><input type="text" id="sourceRackId"
-									name="sourceRack" value="${assetEntityInstance.sourceRack}" size=10 tabindex="33"/></td>
+									name="sourceRack" value="${assetEntityInstance.rackSource?.tag}" size=10 tabindex="33"/></td>
 									<td><input type="text" id="targetRackId"
-									name="targetRack" value="${assetEntityInstance.targetRack}" size=10 tabindex="44" /></td>
+									name="targetRack" value="${assetEntityInstance.rackTarget?.tag}" size=10 tabindex="44" /></td>
 								<td class="label" nowrap="nowrap"><label for="custom4">${assetEntityInstance.project.custom4 ?: 'Custom4' }</label></td>
 								<td ><input type="text" id="custom4" name="custom4" value="${assetEntityInstance.custom4}" size=8 tabindex="53" /></td>
 							</tr>

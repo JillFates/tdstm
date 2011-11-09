@@ -34,8 +34,8 @@
 								<td class="label" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
 								<td >${assetEntityInstance.ipAddress}</td>
 								<td class="label" nowrap="nowrap"><label for="sourceRoom">Room</label></td>
-								<td>${assetEntityInstance.sourceRoom}</td>
-								<td>${assetEntityInstance.targetRoom}</td>
+								<td>${assetEntityInstance.roomSource?.roomName}</td>
+								<td>${assetEntityInstance.roomTarget?.roomName}</td>
 								<td class="label" nowrap="nowrap"><label for="custom3">${assetEntityInstance.project.custom3 ?: 'Custom3' }</label></td>
 								<td >${assetEntityInstance.custom3}</td>
 							</tr>
@@ -45,8 +45,8 @@
 								<td class="label" nowrap="nowrap"><label for="os">OS</label></td>
 								<td >${assetEntityInstance.os}</td>
 								<td class="label" nowrap="nowrap"><label for="sourceRack">Rack/Cab</label></td>
-								<td>${assetEntityInstance.sourceRack}</td>
-								<td>${assetEntityInstance.targetRack}</td>
+								<td>${assetEntityInstance.rackSource?.tag}</td>
+								<td>${assetEntityInstance.rackTarget?.tag}</td>
 								<td class="label" nowrap="nowrap"><label for="custom4">${assetEntityInstance.project.custom4 ?: 'Custom4' }</label></td>
 								<td >${assetEntityInstance.custom4}</td>
 							</tr>
