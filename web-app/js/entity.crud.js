@@ -21,7 +21,6 @@ function getEntityDetails(redirectTo, type, value){
 		new Ajax.Request('../files/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Files');}})
 		break;
 	 default :
-		 alert('asdfasdfasdf asdfasdf asdfasdf asdfasdf asdfadf')
 		new Ajax.Request('../assetEntity/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Server');}})
 	 }
 }
@@ -36,7 +35,6 @@ function showEntityView(e, type){
 	 updateTitle(type)
 }
 function editEntity(redirectTo,type, value, source,rack,roomName,location,position){
-	alert(type)
 	if(redirectTo == "rack"){
 		redirectTo = $('#redirectTo').val() == 'room' ? 'room' : 'rack'
 	}
@@ -51,7 +49,6 @@ function editEntity(redirectTo,type, value, source,rack,roomName,location,positi
 			new Ajax.Request('../files/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Files',source,rack,roomName,location,position);}})
 			break;
 		 default :
-			 alert('asdfasdfasdf asdfasdf asdfasdf asdfasdf asdfadf')
 			 new Ajax.Request('../assetEntity/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Server',source,rack,roomName,location,position);}})
 	 }
 }
@@ -93,7 +90,6 @@ function updateAssetsList( name, value ){
 	$("select[name='asset_"+idValues[1]+"_"+idValues[2]+"']").html($("#"+value+" select").html())
 }
 function updateTitle( type ){
-	alert(type)
 	$("#createEntityView").dialog( "option", "title", 'Create '+type );
 	$("#showEntityView").dialog( "option", "title", 'Show '+type );
 	$("#editEntityView").dialog( "option", "title", 'Edit '+type );
