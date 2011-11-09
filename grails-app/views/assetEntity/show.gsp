@@ -201,10 +201,11 @@
 			</div>
 		</td>
 	</tr>
+	<g:if test="${assetCommentList.size() > 0 }">
 		<tr>
 			<td colspan="2">
 				<div class="list">
-				<table id="listCommentsTable">
+				<table id="listCommentsTables">
 				<thead>
 				<tr>
 					<th nowrap>Action</th>
@@ -233,6 +234,7 @@
 			</div>
 			</td>
 	</tr>
+	</g:if>
 		<tr>
 			<td colspan="2">
 				<div class="buttons">

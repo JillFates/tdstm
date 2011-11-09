@@ -30,6 +30,10 @@ $(document).ready(function() {
 	$("#createEntityView").dialog({autoOpen: false})
 	$("#showEntityView").dialog({autoOpen: false})
     $("#editEntityView").dialog({autoOpen: false})
+    $("#commentsListDialog").dialog({ autoOpen: false })
+    $("#createCommentDialog").dialog({ autoOpen: false })
+    $("#showCommentDialog").dialog({ autoOpen: false })
+    $("#editCommentDialog").dialog({ autoOpen: false })
 })
 </script>
 </head>
@@ -240,6 +244,7 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 <div id ="createEntityView" style="display: none" ></div>
 <div id ="showEntityView" style="display: none"></div>
 <div id ="editEntityView" style="display: none"></div>
+<input type="hidden" id="role" value="role"/>
 
 <div style="display: none;">
 <table id="assetDependencyRow">
