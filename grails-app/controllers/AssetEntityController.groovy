@@ -3,6 +3,7 @@ import grails.converters.JSON
 import java.io.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.util.Date;
 
 import jxl.*
 import jxl.read.biff.*
@@ -2076,5 +2077,26 @@ class AssetEntityController {
 			models = manufacturerInstance ? Model.findAllByManufacturer( manufacturerInstance,[sort:'modelName',order:'asc'] )?.findAll{it.assetType == assetType } : null
 		}
 		render (view :'ModelView' , model:[models : models])
+	}
+	/**
+	 * Render comments list form.
+	 */
+	def listComment = {
+		def projectId = params.projectId
+		if(projectId == null || projectId == ""){
+			projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		}
+		def project = Project.findById( projectId )
+		def assetEntityInstance = AssetEntity.findAllByProject(project)
+		def assetCommentList = AssetComment.findAll("From AssetComment a where a.assetEntity.project = :project",[project:project])
+		TableFacade tableFacade = new TableFacadeImpl("tag",request)
+        tableFacade.items = assetCommentList
+        Limit limit = tableFacade.limit
+		if(limit.isExported()){
+            tableFacade.setExportTypes(response,limit.getExportType())
+            tableFacade.setColumnProperties("comment","commentType","assetEntity","mustVerify","isResolved","resolution","resolvedBy","createdBy","commentCode","category","displayOption")
+			tableFacade.render()
+        }else
+	 return [assetCommentList:assetCommentList]
 	}
 }

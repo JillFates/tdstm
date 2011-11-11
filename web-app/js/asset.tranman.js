@@ -992,3 +992,6 @@ function createNewAssetComment( asset ){
 	document.createCommentForm.mustVerify.value=0;
 	document.createCommentForm.reset();
 }
+function showAssetComment(id ,type){
+	new Ajax.Request('../assetEntity/showComment?id='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, type );}})
+}
