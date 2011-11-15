@@ -223,9 +223,6 @@
 
 <div class="body">
 <h1>Create Project</h1>
-<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-<span class="menuButton"><g:link class="list" action="list">Project List</g:link></span>
-</div>
 <br/>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
@@ -467,6 +464,11 @@
 </g:form></div>
 <g:javascript>
       initialize();
-    </g:javascript>
+</g:javascript>
+<script>
+	currentMenuId = "#projectMenu";
+	$("#projectMenuId a").css('background-color','#003366')
+	showSubMenu(currentMenuId);
+</script>
 </body>
 </html>

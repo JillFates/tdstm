@@ -7,7 +7,7 @@
         <title>Move Bundle Team List</title>
     </head>
     <body>
-    	    	
+
         <div class="body">
             <h1>Move Bundle Team List</h1>
             <g:if test="${flash.message}">
@@ -17,56 +17,43 @@
                 <table>
                     <thead>
                         <tr>
-                        
-							<th>Team Code</th>
-
-                   	        <th>Team Name</th>
-                   	        
-							<th>Role</th>
-							
-							<th>Team Members</th>
-							                        
-                   	        <th>Date Created</th>
-                        	
-                        	<th>Last Updated</th>
-                        	
-                        	<th>Comment</th>
-                        
+				<th>Team Code</th>
+				<th>Team Name</th>
+				<th>Role</th>
+				<th>Team Members</th>
+				<th>Date Created</th>
+				<th>Last Updated</th>
+				<th>Comment</th>
                         </tr>
                     </thead>
                     <tbody>
                     <g:each in="${projectTeamInstanceList}" status="i" var="projectTeamInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                        
-                            <td><g:link action="show" id="${projectTeamInstance?.projectTeam.id}" params="[bundleId:bundleInstance?.id]">${projectTeamInstance?.projectTeam?.teamCode}</g:link></td>
-                        
-                            <td>${projectTeamInstance?.projectTeam?.name}</td>
-                            
-                            <td><g:if test="${projectTeamInstance?.projectTeam?.role}"> <g:message code="ProjectTeam.role.${projectTeamInstance?.projectTeam?.role}" /></g:if></td>
-                             
-                            <td>
-                            	<g:each in="${projectTeamInstance?.teamMembers}" var="teamMember">
-			 					<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if><g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName},</g:if> ${teamMember?.staff?.firstName} <g:if test="${teamMember?.staff?.title}">- ${teamMember?.staff?.title}</g:if> <br/>
-								</g:each>
-							</td>
-                            
-                            <td><tds:convertDateTime date="${projectTeamInstance?.projectTeam?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-
-                            <td><tds:convertDateTime date="${projectTeamInstance?.projectTeam?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-                            
-                            <td>${projectTeamInstance?.projectTeam?.comment}</td>
-                            
-                        </tr>
+				<td><g:link action="show" id="${projectTeamInstance?.projectTeam.id}" params="[bundleId:bundleInstance?.id]">${projectTeamInstance?.projectTeam?.teamCode}</g:link></td>
+				<td>${projectTeamInstance?.projectTeam?.name}</td>
+				<td><g:if test="${projectTeamInstance?.projectTeam?.role}"> <g:message code="ProjectTeam.role.${projectTeamInstance?.projectTeam?.role}" /></g:if></td>
+				<td>
+				<g:each in="${projectTeamInstance?.teamMembers}" var="teamMember">
+					<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if>
+					<g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName},</g:if>
+					${teamMember?.staff?.firstName}
+					<g:if test="${teamMember?.staff?.title}">- ${teamMember?.staff?.title}</g:if> <br/>
+				</g:each>
+				</td>
+				<td><tds:convertDateTime date="${projectTeamInstance?.projectTeam?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+				<td><tds:convertDateTime date="${projectTeamInstance?.projectTeam?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+				<td>${projectTeamInstance?.projectTeam?.comment}</td>
+			</tr>
                     </g:each>
                     </tbody>
                 </table>
             </div>
             <div class="buttons">
-            		<g:form>
-            		<input type="hidden" name="bundleId" value="${bundleInstance?.id}" />
-					<span class="button"><g:actionSubmit class="create" action="Create" value="New Project Team" /></span>
-					</g:form>
-				</div>
-			</div>            
+		<g:form>
+			<input type="hidden" name="bundleId" value="${bundleInstance?.id}" />
+			<span class="button"><g:actionSubmit class="create" action="Create" value="New Project Team" /></span>
+		</g:form>
+            </div>
+	</div>            
     </body>
 </html>

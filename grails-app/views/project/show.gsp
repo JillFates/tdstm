@@ -12,25 +12,22 @@
 	
   </head>
   <body>
-  
+
   <g:if test="${flash.message}">
       <div class="message">${flash.message}</div>
     </g:if>
    
     <div class="body">
-    <h1>Show Project</h1>
+    <h1>Project</h1>
         
-    <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-      <span class="menuButton"><g:link class="list" action="list">Project List</g:link></span>
       <jsec:hasRole name="ADMIN">
+    <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
         <span class="menuButton"><g:link class="create" action="create">New Project</g:link></span>
-      </jsec:hasRole>
     </div>
+      </jsec:hasRole>
     <br/>
-   
-   
-    
-  	    <div class="dialog" id="updateShow">
+  	
+    <div class="dialog" id="updateShow">
       <table>
         <tbody>
 
@@ -83,23 +80,36 @@
             <td valign="top" class="value">${projectPartner?.partyIdTo}</td>
 
             <td valign="top" class="name">Partner Image:</td>
+
 			<g:if test="${projectLogoForProject}">
+
             <td valign="top" class="value"><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;"/></td>
+
 			</g:if>
+
           </tr>
 
           <tr class="prop">
             <td valign="top" class="name">Project Manager:</td>
             <td valign="top" class="value">
+
                 <g:if test="${projectManager?.partyIdTo?.lastName}">${projectManager?.partyIdTo?.lastName},</g:if>
+
                 <g:if test="${projectManager?.partyIdTo?.firstName}"> ${projectManager?.partyIdTo?.firstName}</g:if>
+
                 <g:if test="${projectManager?.partyIdTo?.title}"> - ${projectManager?.partyIdTo?.title}</g:if>
+
             </td>
+
             <td valign="top" class="name">Move Manager:</td>
             <td valign="top" class="value">
+
 	            <g:if test="${moveManager?.partyIdTo?.lastName}">${moveManager?.partyIdTo?.lastName},</g:if>
+
 	            <g:if test="${moveManager?.partyIdTo?.firstName}"> ${moveManager?.partyIdTo?.firstName}</g:if>
+
 	            <g:if test="${moveManager?.partyIdTo?.title}"> - ${moveManager?.partyIdTo?.title}</g:if>
+
             </td>
           </tr>
 
@@ -148,6 +158,7 @@
             
           </tr>
           <tr class="prop">
+
             <td valign="top" class="name">Workflow Code:</td>
 
             <td valign="top" class="value">${fieldValue(bean:projectInstance, field:'workflowCode')}</td>
@@ -155,6 +166,7 @@
 			<td valign="top" class="name">Display Transitions in Status bar:</td>
 
             <td valign="top" class="value"><g:message code="project.trackChanges.${bean:projectInstance?.trackChanges}" /></td>
+
           </tr>
 
           <tr class="prop">
@@ -171,7 +183,7 @@
         </tbody>
       </table>
     </div>   
-    
+
     <div class="buttons">
       <g:form>
         <input type="hidden" name="id" value="${projectInstance?.id}" />
@@ -185,5 +197,10 @@
         </jsec:hasRole>
       </g:form>
     </div></div>
-  </body>
+<script>
+	currentMenuId = "#projectMenu";
+	$("#projectMenuId a").css('background-color','#003366')
+	showSubMenu(currentMenuId);
+</script>
+</body>
 </html>
