@@ -70,4 +70,8 @@
             </div>
   </div>
  <g:render template="commentCrud"/> 
+ <script>
+	currentMenuId = "#assetMenu";
+	$("#assetMenuId a").css('background-color','#003366')
+</script>
 </html>

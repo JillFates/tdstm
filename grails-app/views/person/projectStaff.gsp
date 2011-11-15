@@ -124,6 +124,9 @@
 	<div class="message">${flash.message}</div>
 </g:if>
 
+<div class="buttons">
+	<span class="button"><input type="button" class="create" value="Add" onclick="showAddProjectStaff()"/></span>
+</div>
 <div class="list">
 <table>
 	<thead>
@@ -152,9 +155,6 @@
 	</tbody>
 </table>
 </div>
-	<div class="buttons">
-		<span class="button"><input type="button" class="create" value="Add" onclick="showAddProjectStaff()"/></span>
-	</div>
 </div>
 <div id="editPerson" style="display: none;" title="Edit Staff">
             <g:form method="post" action="updateStaff" name="editForm" onsubmit="return validateEditForm()">
@@ -379,5 +379,9 @@
                 </div>
             </g:formRemote>
 </div>
+<script>
+	currentMenuId = "#projectMenu";
+	$("#projectMenuId a").css('background-color','#003366')
+</script>
 </body>
 </html>

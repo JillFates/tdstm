@@ -9,7 +9,7 @@
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}"  />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}"  />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
-	
+
   </head>
   <body>
 
@@ -200,7 +200,6 @@
 <script>
 	currentMenuId = "#projectMenu";
 	$("#projectMenuId a").css('background-color','#003366')
-	showSubMenu(currentMenuId);
 </script>
 </body>
 </html>

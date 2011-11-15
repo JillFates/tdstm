@@ -49,7 +49,6 @@ function onInvokeExportAction(id) {
 <script>
 	currentMenuId = "#projectMenu";
 	$("#projectMenuId a").css('background-color','#003366')
-	showSubMenu(currentMenuId);
 </script>
 </body>
 </html>

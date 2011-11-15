@@ -1,7 +1,7 @@
 <table style="border: 0">
 	<tr>
 		<td colspan="2">
-			<div class="dialog" ondblclick="editApp(${databaseInstance?.id})">
+			<div class="dialog" ondblclick="editEntity('Database',${databaseInstance?.id})">
 				<table>
 					<tbody>
 						<tr class="prop">
@@ -157,3 +157,7 @@
 		</td>
 	</tr>
 </table>
+<script>
+	currentMenuId = "#assetMenu";
+	$("#assetMenuId a").css('background-color','#003366')
+</script>

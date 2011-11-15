@@ -17,7 +17,7 @@
     <g:layoutHead />
    
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dropDown.css')}" />    
-   
+
    <script type="text/javascript">
    		$(document).ready(function() {
       		$("#personDialog").dialog({ autoOpen: false })
@@ -138,7 +138,7 @@
 		<div class="menu2" id="projectMenu" style="background-color:#003366;display: none;">
 		<ul onmouseout="showSubMenu(currentMenuId)">
 			<li><g:link class="home" controller="project" action="list">List Projects</g:link> </li>
-			<g:if test="${currProjObj}"><li><g:link class="home" controller="projectUtil">${currProjObj.name}</g:link> </li></g:if>
+			<g:if test="${currProjObj}"><li class="title1"><g:link class="home" controller="projectUtil">${currProjObj.name}</g:link></li></g:if>
 			<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 			<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
 			</jsec:lacksAllRoles>
@@ -158,7 +158,7 @@
 		<ul onmouseout="showSubMenu(currentMenuId)">
 				<li><g:link class="home" controller="moveBundle" action="list">List</g:link></li>
 				<li class="title1">Move Bundle: ${MoveBundle.findById( moveBundleId )?.name}</li>
-				<li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundleId]" >Team </g:link> </li>
+				<li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundleId]" >Team</g:link> </li>
 				<li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId]" >Bundle Asset Assignment</g:link> </li>
 				<li><g:link class="home" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleId, rack:'UnrackPlan']" >Bundle Team Assignment </g:link> </li>
 				<li><g:link class="home" controller="walkThrough" >Walkthrough</g:link> </li>
@@ -403,8 +403,12 @@
 	  		$('#assetMenu').hide();
 	  		$('#bundleMenu').hide();
 	  		$('#consoleMenu').hide();
-	  		$(e).show();
+	  		if(e!=""){
+		  		$(e).show();
+	  		}
 	  	}
+		showSubMenu(currentMenuId);
+
 		function setPower( p ){
 			${remoteFunction(controller:'project', action:'setPower', params:'\'p=\' + p ',	onComplete:'updateTimeZone( e )')}
 		}

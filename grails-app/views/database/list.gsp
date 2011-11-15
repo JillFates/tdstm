@@ -133,5 +133,9 @@ $(document).ready(function() {
 <g:render template="../assetEntity/commentCrud"/>
 <g:render template="../assetEntity/modelDialog"/>
 </div>
+<script>
+	currentMenuId = "#assetMenu";
+	$("#assetMenuId a").css('background-color','#003366')
+</script>
 </body>
 </html>

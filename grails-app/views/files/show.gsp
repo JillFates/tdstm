@@ -1,6 +1,34 @@
 <table style="border: 0">
 	<tr>
-		<td colspan="2"><div class="dialog" ondblclick="editApp(${filesInstance?.id})">
+		<td colspan="2">
+			<div class="buttons">
+				<g:form>
+					<input type="hidden" name="id" value="${filesInstance?.id}" />
+					<span class="button"><input type="button" class="edit"
+						value="Edit" onclick="editEntity('${redirectTo}','Files', ${filesInstance?.id})" /> </span>
+					<span class="button"><g:actionSubmit class="delete"
+							onclick="return confirm('Are you sure?');" value="Delete" /> </span>
+					<g:if test="${assetComment == 'issue'}">
+						<g:remoteLink controller="assetEntity" action="listComments" id="${filesInstance.id}" before="setAssetId('${filesInstance.id}');" onComplete="listCommentsDialog(e,'never');">
+							<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="=0px" style="margin-bottom: -4px;"/>&nbsp&nbspComment
+						</g:remoteLink>
+					</g:if>
+				    <g:elseif test="${assetComment == 'comment'}">
+						<g:remoteLink controller="assetEntity" action="listComments" id="${filesInstance.id}" before="setAssetId('${filesInstance.id}');" onComplete="listCommentsDialog(e,'never');">
+							<img src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px" style="margin-bottom: -4px;"/>&nbsp&nbspComment
+						</g:remoteLink>
+					</g:elseif>
+					<g:else>
+						<a href="javascript:createNewAssetComment(${filesInstance.id});">
+							<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" style="margin-bottom: -4px;"/>&nbsp&nbspComment
+						</a>
+				    </g:else>
+				</g:form>
+			</div>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2"><div class="dialog" ondblclick="editEntity('Files', ${filesInstance?.id})">
 				<table>
 					<tbody>
 						<tr class="prop">
@@ -141,32 +169,8 @@
 			</div>
 	     </tr>
 	     </g:if>
-	<tr>
-		<td colspan="2">
-			<div class="buttons">
-				<g:form>
-					<input type="hidden" name="id" value="${filesInstance?.id}" />
-					<span class="button"><input type="button" class="edit"
-						value="Edit" onclick="editEntity('${redirectTo}','Files', ${filesInstance?.id})" /> </span>
-					<span class="button"><g:actionSubmit class="delete"
-							onclick="return confirm('Are you sure?');" value="Delete" /> </span>
-					<g:if test="${assetComment == 'issue'}">
-						<g:remoteLink controller="assetEntity" action="listComments" id="${filesInstance.id}" before="setAssetId('${filesInstance.id}');" onComplete="listCommentsDialog(e,'never');">
-							<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="=0px" style="margin-bottom: -4px;"/>&nbsp&nbspComment
-						</g:remoteLink>
-					</g:if>
-				    <g:elseif test="${assetComment == 'comment'}">
-						<g:remoteLink controller="assetEntity" action="listComments" id="${filesInstance.id}" before="setAssetId('${filesInstance.id}');" onComplete="listCommentsDialog(e,'never');">
-							<img src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px" style="margin-bottom: -4px;"/>&nbsp&nbspComment
-						</g:remoteLink>
-					</g:elseif>
-					<g:else>
-						<a href="javascript:createNewAssetComment(${filesInstance.id});">
-							<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" style="margin-bottom: -4px;"/>&nbsp&nbspComment
-						</a>
-				    </g:else>
-				</g:form>
-			</div>
-		</td>
-	</tr>
 </table>
+<script>
+	currentMenuId = "#assetMenu";
+	$("#assetMenuId a").css('background-color','#003366')
+</script>

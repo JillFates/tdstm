@@ -45,6 +45,12 @@ $(document).ready(function() {
 </g:if>
 <input type="hidden" id="role" value="role"/>
 <div id="jmesaId" class="body">
+	<div class="buttons">
+		<span class="button"><input type="button" class="save"
+			value="Create Files"
+			onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Files\')')}" />
+		</span>
+	</div>
 	<form name="listFileForm" action="list">
 		<jmesa:tableFacade id="tag" items="${filesList}" maxRows="50"
 			exportTypes="csv,excel" stateAttr="restore" var="fileInstance"
@@ -108,12 +114,6 @@ $(document).ready(function() {
 			</jmesa:htmlTable>
 		</jmesa:tableFacade>
 	</form>
-	<div class="buttons">
-		<span class="button"><input type="button" class="save"
-			value="Create Files"
-			onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Files\')')}" />
-		</span>
-	</div>
 <div id="createEntityView" style="display: none;" ></div>
 <div id="showEntityView" style="display: none;"></div>
 <div id="editEntityView" style="display: none;"></div>	
@@ -138,5 +138,9 @@ $(document).ready(function() {
 </div>
 <g:render template="../assetEntity/commentCrud"/>
 <g:render template="../assetEntity/modelDialog"/>
+<script>
+	currentMenuId = "#assetMenu";
+	$("#assetMenuId a").css('background-color','#003366')
+</script>
 </body>
 </html>

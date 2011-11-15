@@ -130,3 +130,7 @@
 	</tr>
 </table>
 </g:form>
+<script>
+	currentMenuId = "#assetMenu";
+	$("#assetMenuId a").css('background-color','#003366')
+</script>
