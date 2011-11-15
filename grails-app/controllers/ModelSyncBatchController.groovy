@@ -1,3 +1,4 @@
+import com.tdssrc.grails.GormUtil
 class ModelSyncBatchController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -27,7 +28,7 @@ class ModelSyncBatchController {
 					if( !manufacturerInstance ){
 						manufacturerInstance = Manufacturer.findByName( manufacturerSync.name )
 						if(!manufacturerInstance){
-							manufacturerInstance = new Manufacturer( name : manufacturerSync.name, 
+							manufacturerInstance = new Manufacturer( name : manufacturerSync.name,  
 																	 aka:manufacturerSync.aka,
 																	 description : manufacturerSync.description 
 																	)
@@ -70,7 +71,7 @@ class ModelSyncBatchController {
 					def manufacturer = Manufacturer.findByName(modelSync.manufacturerName)
 					def modelInstance = Model.findWhere(id:modelSync.modelTempId,modelName : modelSync.modelName,assetType : modelSync.assetType )
 					if( !modelInstance ){
-						modelInstance = Model.findByNameAndAssetType( modelSync.name,modelSync.assetType )
+						modelInstance = Model.findByModelNameAndAssetType( modelSync.modelName,modelSync.assetType )
 						if(!modelInstance){
 							modelInstance = new Model( modelName : modelSync.modelName, 
 													   aka : modelSync.aka,
@@ -82,18 +83,32 @@ class ModelSyncBatchController {
 													   bladeCount : modelSync.bladeCount,
 													   bladeLabelCount : modelSync.bladeLabelCount,
 													   sourceTDSVersion : 1,
-													   manufacturer : manufacturer
+													   manufacturer : manufacturer,
+													   height : modelSync?.height,
+													   weight : modelSync?.weight,
+													   depth : modelSync?.depth,
+													   width : modelSync?.width,
+													   layoutStyle : modelSync.layoutStyle,
+													   productLine : modelSync.productLine,
+													   modelFamily : modelSync.modelFamily,
+													   endOfLifeDate : modelSync.endOfLifeDate,
+													   endOfLifeStatus : modelSync.endOfLifeStatus,
+													   createdBy : modelSync.createdBy,
+													   sourceURL : modelSync.sourceURL,
+													   modelStatus : modelSync.modelStatus,
+													   modelScope : modelSync.modelScope
 													  )
 							if ( !modelInstance.validate() || !modelInstance.save() ) {
 								def etext = "Unable to create modelInstance" +
 								GormUtil.allErrorsString( modelInstance )
 								println etext
+								modelInstance.errors.allErrors.each { println it }
 							} else {
+							 
 								modelAdded ++
 							}
 						} else{
 							if(modelInstance.sourceTDSVersion < modelSync.sourceTDSVersion){
-								
 								modelInstance.aka = modelSync.aka
 								modelInstance.description = modelSync.description 
 								modelInstance.powerUse = modelSync.powerUse
@@ -103,6 +118,21 @@ class ModelSyncBatchController {
 								modelInstance.bladeLabelCount = modelSync.bladeLabelCount
 								modelInstance.sourceTDSVersion = modelSync.sourceTDSVersion
 								modelInstance.manufacturer = manufacturer
+								modelInstance.height = modelSync.height
+								modelInstance.weight = modelSync.weight
+								modelInstance.depth = modelSync.depth
+								modelInstance.width = modelSync.width
+								modelInstance.layoutStyle = modelSync.layoutStyle
+								modelInstance.productLine = modelSync.productLine
+								modelInstance.modelFamily = modelSync.modelFamily
+								modelInstance.endOfLifeDate = modelSync.endOfLifeDate
+								modelInstance.endOfLifeStatus = modelSync.endOfLifeStatus
+								modelInstance.createdBy = modelSync.createdBy
+								modelInstance.updatedBy = modelSync.updatedBy
+								modelInstance.sourceURL = modelSync.sourceURL
+								modelInstance.modelStatus = modelSync.modelStatus
+								modelInstance.modelScope = modelSync.modelScope
+								
 								if ( !modelInstance.validate() || !modelInstance.save() ) {
 									def etext = "Unable to create modelInstance" +
 									GormUtil.allErrorsString( modelInstance )
@@ -114,8 +144,8 @@ class ModelSyncBatchController {
 						}
 					} else {
 						if(modelInstance.sourceTDSVersion < modelSync.sourceTDSVersion){
-							
-							modelInstance.aka = modelSync.aka
+						    
+						    modelInstance.aka = modelSync.aka
 							modelInstance.description = modelSync.description 
 							modelInstance.powerUse = modelSync.powerUse
 							modelInstance.usize = modelSync.usize
@@ -124,6 +154,21 @@ class ModelSyncBatchController {
 							modelInstance.bladeLabelCount = modelSync.bladeLabelCount
 							modelInstance.sourceTDSVersion = modelSync.sourceTDSVersion
 							modelInstance.manufacturer = manufacturer
+							modelInstance.height = modelSync.height
+							modelInstance.weight = modelSync.weight
+							modelInstance.depth = modelSync.depth
+							modelInstance.width = modelSync.width
+							modelInstance.layoutStyle = modelSync.layoutStyle
+							modelInstance.productLine = modelSync.productLine
+							modelInstance.modelFamily = modelSync.modelFamily
+							modelInstance.endOfLifeDate = modelSync.endOfLifeDate
+							modelInstance.endOfLifeStatus = modelSync.endOfLifeStatus
+							modelInstance.createdBy = modelSync.createdBy
+							modelInstance.updatedBy = modelSync.updatedBy
+							modelInstance.validatedBy = modelSync.validatedBy
+							modelInstance.sourceURL = modelSync.sourceURL
+							modelInstance.modelStatus = modelSync.modelStatus
+							modelInstance.modelScope = modelSync.modelScope
 							
 							if ( !modelInstance.validate() || !modelInstance.save() ) {
 								def etext = "Unable to create modelInstance" +
@@ -201,8 +246,8 @@ class ModelSyncBatchController {
 			modelSyncBatch.statusCode = "COMPLETED"
 			modelSyncBatch.save()
 		}catch (Exception e) {
-			status.setRollbackOnly()
 			flash.message = "Import Batch process failed"
+			e.printStackTrace();
 		}
     	redirect(action: "list", params: params)
     }

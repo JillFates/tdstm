@@ -715,7 +715,23 @@ class ModelController {
 				modelSheet.addCell( new Label( 11, r+1, String.valueOf(models[r].powerUse ? models[r].powerUse : "" )) )
 				modelSheet.addCell( new Label( 12, r+1, String.valueOf(models[r].sourceTDSVersion ? models[r].sourceTDSVersion : 1 )) )
 				modelSheet.addCell( new Label( 13, r+1, String.valueOf(models[r].useImage == 1 ? "yes" : "no" )) )
-				modelSheet.addCell( new Label( 14, r+1, String.valueOf(models[r].usize)) )
+				modelSheet.addCell( new Label( 14, r+1, String.valueOf(models[r].usize ? models[r].usize : "")) )
+				modelSheet.addCell( new Label( 15, r+1, String.valueOf(models[r].height ? models[r].height : "")) )
+				modelSheet.addCell( new Label( 16, r+1, String.valueOf(models[r].weight ? models[r].weight : "")) )
+				modelSheet.addCell( new Label( 17, r+1, String.valueOf(models[r].depth ? models[r].depth : "")) )
+				modelSheet.addCell( new Label( 18, r+1, String.valueOf(models[r].width ? models[r].width : "")) )
+				modelSheet.addCell( new Label( 19, r+1, String.valueOf(models[r].layoutStyle ? models[r].layoutStyle: "")) )
+				modelSheet.addCell( new Label( 20, r+1, String.valueOf(models[r].productLine ? models[r].productLine :"")) )
+				modelSheet.addCell( new Label( 21, r+1, String.valueOf(models[r].modelFamily ? models[r].modelFamily :"")) )
+				modelSheet.addCell( new Label( 22, r+1, String.valueOf(models[r].endOfLifeDate ? models[r].endOfLifeDate :"")) )
+				modelSheet.addCell( new Label( 23, r+1, String.valueOf(models[r].endOfLifeStatus ? models[r].endOfLifeStatus :"")) )
+				modelSheet.addCell( new Label( 24, r+1, String.valueOf(models[r].createdBy ? models[r].createdBy :"")) )
+				modelSheet.addCell( new Label( 25, r+1, String.valueOf(models[r].updatedBy ? models[r].updatedBy :"")) )
+				modelSheet.addCell( new Label( 26, r+1, String.valueOf(models[r].validatedBy ? models[r].validatedBy : "")) )
+				modelSheet.addCell( new Label( 27, r+1, String.valueOf(models[r].sourceURL ? models[r].sourceURL :"")) )
+				modelSheet.addCell( new Label( 28, r+1, String.valueOf(models[r].modelStatus ? models[r].modelStatus:"")) )
+				modelSheet.addCell( new Label( 29, r+1, String.valueOf(models[r].modelScope ? models[r].modelScope :"")) )
+
 			}
 			def connectorSheet = book.getSheet("connector")
 			def connectors = ModelConnector.findAll("FROM ModelConnector where model.sourceTDS = 1 order by model.id")
@@ -763,7 +779,7 @@ class ModelController {
 	        def sheetNameMap = new HashMap()
 	        //get column name and sheets
 			sheetNameMap.put( "manufacturer", ["manufacturer_id", "name", "aka", "description"] )
-			sheetNameMap.put( "model", ["model_id", "name","aka","description","manufacturer_id","manufacturer_name","asset_type","blade_count","blade_label_count","blade_rows","sourcetds","power_use","sourcetdsversion","use_image","usize"] )
+			sheetNameMap.put( "model", ["model_id", "name","aka","description","manufacturer_id","manufacturer_name","asset_type","blade_count","blade_label_count","blade_rows","sourcetds","power_use","sourcetdsversion","use_image","usize","height","weight","depth","width", "layout_style","product_line","model_family","end_of_life_date","end_of_life_status","created_by","updated_by","validated_by","sourceurl","model_status","model_scope"] )
 			sheetNameMap.put( "connector", ["model_connector_id", "connector", "connector_posx", "connector_posy", "label", "label_position", "model_id", "model_name", "connector_option", "status", "type"] )
 			
 	        try {
@@ -841,8 +857,11 @@ class ModelController {
 						for ( int r = 1; r < sheetrows ; r++ ) {
 							def valueList = new StringBuffer("(")
 		             		def manuId
+							def createdPersonId
+							def updatedPersonId
+							def validatedPersonId
+							def projectId
 		                 	for( int cols = 0; cols < modelCol; cols++ ) {
-		                 		
 								switch(modelSheet.getCell( cols, 0 ).contents){
 								case "manufacturer_name" : 
 									def manuName = modelSheet.getCell( cols, r ).contents
@@ -881,6 +900,48 @@ class ModelController {
 								case "sourcetdsversion" : 
 									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
 									break;
+								case "height" :
+									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									break;
+								case "weight" :
+									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									break;
+								case "depth" :
+									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									break;
+								case "width" :
+									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									break;
+								case "model_scope" :
+								    def modelScope = modelSheet.getCell( cols, r ).contents
+									projectId = Project.findByProjectCode(modelScope)?.id
+									//valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									break;
+								case "end_of_life_date" :
+								    def endOfLifeDate = modelSheet.getCell( cols, r ).contents
+									if(endOfLifeDate){
+									valueList.append("'"+(modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+"',")
+									}else{
+									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									}
+									break;
+								/*case "end_of_life_status" :
+									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									break;*/
+								case "created_by" :
+								    def createdByName = modelSheet.getCell( cols, r ).contents
+									createdPersonId = Person.findByFirstName(createdByName)?.id
+									break;
+								case "updated_by" :
+									def updatedByName = modelSheet.getCell( cols, r ).contents
+									updatedPersonId = Person.findByFirstName(updatedByName)?.id
+									//valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									break;
+								case "validated_by" :
+									def validatedByName = modelSheet.getCell( cols, r ).contents
+									validatedPersonId = Person.findByFirstName(validatedByName)?.id
+									//valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									break;
 								default : 
 									valueList.append("'"+modelSheet.getCell( cols, r ).contents.replace("'","\\'")+"',")
 									break;
@@ -889,13 +950,14 @@ class ModelController {
 		                 	}
 		             		try{
 		             			if(manuId){
-			             			jdbcTemplate.update("insert into model_sync( model_temp_id, name,aka, description,manufacturer_temp_id,manufacturer_name,asset_type,blade_count,blade_label_count,blade_rows,front_image,power_use,sourcetdsversion,use_image,usize,batch_id,manufacturer_id ) values "+valueList.toString()+"${modelSyncBatch.id}, $manuId)")
+		             				jdbcTemplate.update("insert into model_sync( model_temp_id, name,aka, description,manufacturer_temp_id,manufacturer_name,asset_type,blade_count,blade_label_count,blade_rows,front_image,power_use,sourcetdsversion,use_image,usize,height,weight,depth,width,layout_style,product_line,model_family,end_of_life_date,end_of_life_status,sourceurl,model_status,batch_id,manufacturer_id,created_by_id,updated_by_id,validated_by_id, model_scope_id ) values "+valueList.toString()+"${modelSyncBatch.id}, $manuId, $createdPersonId, $updatedPersonId, $validatedPersonId, $projectId) ")
 									modelAdded = r
 		             			} else {
 		             				modelSkipped += ( r +1 )
 		             			}
 		             		} catch (Exception e) {
 		             			modelSkipped += ( r +1 )
+								 e.printStackTrace()
 		             		}
 		                }
 					}

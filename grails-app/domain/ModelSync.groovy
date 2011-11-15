@@ -1,3 +1,6 @@
+import java.util.Date
+
+
 
 class ModelSync {
 	long modelTempId
@@ -10,6 +13,11 @@ class ModelSync {
 	byte[] frontImage
 	byte[] rearImage
 	Integer useImage
+	Integer height
+	Integer weight
+	Integer depth
+	Integer width
+	String layoutStyle
 	
 	// Blade chassis fields
 	Integer bladeRows
@@ -21,6 +29,17 @@ class ModelSync {
 	Integer sourceTDSVersion
 	long manufacturerTempId
 	String manufacturerName
+	
+	String productLine
+	String modelFamily
+	Date endOfLifeDate
+	String endOfLifeStatus
+	Person createdBy
+	Person updatedBy
+	Person validatedBy
+	String sourceURL
+	String modelStatus
+	Project modelScope
 	
 	String importStatus
 	ModelSyncBatch batch
@@ -45,6 +64,21 @@ class ModelSync {
 		sourceTDS( blank:true, nullable:true )
 		sourceTDSVersion( blank:true, nullable:true )
 		importStatus(blank:true, nullable:true )
+		height( blank:true, nullable:true )
+		weight( blank:true, nullable:true )
+		depth( blank:true, nullable:true )
+		width( blank:true, nullable:true )
+		layoutStyle( blank:true, nullable:true )
+		productLine( blank:true, nullable:true )
+		modelFamily( blank:true, nullable:true )
+		endOfLifeDate(nullable:true)
+		endOfLifeStatus( blank:true, nullable:true )
+		createdBy( blank:true, nullable:true )
+		updatedBy( blank:true, nullable:true )
+		validatedBy( blank:true, nullable:true )
+		sourceURL( blank:true, nullable:true )
+		modelStatus( blank:true, nullable:true, inList:['new','full','valid'])
+		modelScope( blank:true, nullable:true )
 	}
 	
 	static mapping  = {	
