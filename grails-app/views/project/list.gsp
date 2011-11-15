@@ -1,5 +1,3 @@
-
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -25,6 +23,12 @@ function onInvokeExportAction(id) {
 	<div class="message">${flash.message}</div>
 </g:if>
 <div>
+	<div class="buttons"> 
+		<g:form action="create" method="post">
+		<span class="button"><g:actionSubmit class="save" action="Create" value="Create Project" /></span>
+		<span class="button"><input type="button" class="save" onclick="javascript:location.href='../projectUtil/createDemo'" value="Create Demo Project" /></span>
+		</g:form>
+	</div>
 	<form name="projectForm" action="list">
          <jmesa:tableFacade id="tag" items="${projectList}" maxRows="25" stateAttr="restore" var="projectInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
              <jmesa:htmlTable style=" border-collapse: separate">
@@ -40,13 +44,12 @@ function onInvokeExportAction(id) {
              </jmesa:htmlTable>
          </jmesa:tableFacade>
      </form>
-	<div class="buttons"> 
-		<g:form action="create" method="post">
-		<span class="button"><g:actionSubmit class="save" action="Create" value="Create Project" /></span>
-		<span class="button"><input type="button" class="save" onclick="javascript:location.href='../projectUtil/createDemo'" value="Create Demo Project" /></span>
-		</g:form>
-	</div>
 </div>
 </div>
+<script>
+	currentMenuId = "#projectMenu";
+	$("#projectMenuId a").css('background-color','#003366')
+	showSubMenu(currentMenuId);
+</script>
 </body>
 </html>
