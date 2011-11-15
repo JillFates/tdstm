@@ -121,8 +121,7 @@
 			<li><g:link class="home" controller="rackLayouts" action="create">Racks</g:link></li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 			<li id="assetMenuId"><g:link class="home" controller="assetEntity" action="assetImport" >Assets</g:link></li>
-			<li><g:link class="home" controller="application" action="list" >Apps</g:link></li>
-			<li>&nbsp;</li>
+			<li id="appMenuId"><g:link class="home" onmouseover="showSubMenu('#assetMenu')" controller="application" action="list" >Apps</g:link></li>
 			<li><g:link class="home" controller="moveEvent" action="show" >Events</g:link> </li>
 			<li><g:link class="home" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles</g:link></li>
 			<li><g:link class="home" controller="clientTeams" params="[projectId:currProjObj?.id]">Teams</g:link></li>
@@ -138,16 +137,30 @@
 	        </jsec:lacksAllRoles>
 	      </ul>
 	    </div>
-	    <div class="menu2" id="assetMenu" style="background-color:#003366;display: none;">
-	        <ul>
-	    		<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link> </li>
+		<div class="menu2" id="adminMenu" style="background-color:#003366;display: none;">
+		<ul>
+			<jsec:hasRole name="ADMIN">
+			<li><g:link class="home" controller="auth" action="home">Admin</g:link> </li>
+			<li><g:link class="home" controller="workflow" action="home">Workflows </g:link> </li>
+			<li><g:link class="home" controller="partyGroup" id="${partyGroup}">Company</g:link></li>
+			<li><g:link class="home" controller="person" id="${partyGroup}">Staff</g:link></li>
+			<li><g:link class="home" controller="userLogin" id="${partyGroup}">Users</g:link></li>
+			<li><g:link class="home" controller="manufacturer" id="${partyGroup}">Manufacturers</g:link></li>
+			<li><g:link class="home" controller="model" id="${partyGroup}">Models</g:link></li>
+			<li><g:link class="home" controller="model" action="importExport">Sync</g:link></li>
+		</jsec:hasRole>
+		</ul>
+		</div>
+		<div class="menu2" id="assetMenu" style="background-color:#003366;display: none;">
+		<ul>
+			<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link> </li>
 			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Assets</g:link></li>
 			<li><g:link class="home" controller="application" action="list"  params="[projectId:currProjObj?.id]">List Apps</g:link></li>
 			<li><g:link class="home" controller="database" params="[projectId:currProjObj?.id]">List DBs</g:link></li>
 			<li><g:link class="home" controller="files" params="[projectId:currProjObj?.id]">List Files</g:link></li>
-		    <li><g:link class="home" controller="assetEntity" action="listComment" params="[projectId:currProjObj?.id]">List Comments</g:link></li>
+			<li><g:link class="home" controller="assetEntity" action="listComment" params="[projectId:currProjObj?.id]">List Comments</g:link></li>
 		</ul>
-	    </div>
+		</div>
 	    <div class="menu2" id="consoleMenu" style="background-color:#003366;display: none;">
 	        <ul>
 	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
@@ -161,22 +174,6 @@
 	        </jsec:hasAnyRole>
 		</ul>
 	    </div>
-	    <!-- <div class="menu2" id="reportsMenu" style="background-color:#003366;display: none;">
-			<ul>
-			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Login Badges']">Login Badges</g:link> </li>
-			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Asset Tag']">Asset Tags</g:link> </li>
-			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Team Worksheets']">Move Team Worksheets</g:link> </li>
-			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'cart Asset']">Logistics Team Worksheets</g:link></li>
-			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Transportation Asset List']">Transport Worksheets</g:link></li>
-			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Issue Report']">Issue Report</g:link></li>
-			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Rack Layout']">Racks (old)</g:link></li>
-			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'MoveResults']">Move Results</g:link></li>
-			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'CablingQA']">Cabling QA</g:link></li>
-			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'CablingConflict']">Cabling Conflict</g:link></li>
-			<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'CablingData']">Cabling Data</g:link></li>
-			<li><g:link class="home" controller="reports" action="powerReport">Power</g:link></li>
-			</ul>
-		</div> -->
 		<g:if test="${moveEvent && moveEvent?.inProgress == 'true'}">
 			<div class="menu3" id="head_crawler" >
 				<div id="crawlerHead">${moveEvent.name} Move Event Status <span id="moveEventStatus"></span>. News: </div>
@@ -397,12 +394,13 @@
 		  	var sURL = unescape(window.location);
 		  	window.location.href = sURL;
 	  	}
-	  	function showReportsMenu(){
-	  		$('#reportsMenu').show();
+	  	function showSubMenu(e){
+	  		$('#adminMenu').hide();
+	  		$('#projectMenu').hide();
 	  		$('#assetMenu').hide();
-	  		$('li a').each(function() {
-		  		$(this).css('background-color','');
-	  		});
+	  		$('#bundleMenu').hide();
+	  		$('#consoleMenu').hide();
+	  		$(e).show();
 	  	}
 		function setPower( p ){
 			${remoteFunction(controller:'project', action:'setPower', params:'\'p=\' + p ',	onComplete:'updateTimeZone( e )')}
