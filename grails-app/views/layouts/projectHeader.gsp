@@ -111,24 +111,20 @@
 	      <div class="menu2">
 	      <ul>
 		<jsec:hasRole name="ADMIN">
-			<li><g:link class="home" controller="auth" action="home">Admin</g:link> </li>
+			<li><g:link class="home" onmouseover="showSubMenu('#adminMenu')" controller="auth" action="home">Admin</g:link> </li>
 		</jsec:hasRole>
-			<li><g:link class="home" controller="projectUtil">Project </g:link> </li>
-	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
-			<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
-	        </jsec:lacksAllRoles>
+			<li><g:link class="home"  onmouseover="showSubMenu('#projectMenu')" controller="projectUtil">Project </g:link> </li>
 			<li><g:link class="home" controller="room">Rooms</g:link></li>
 			<li><g:link class="home" controller="rackLayouts" action="create">Racks</g:link></li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
-			<li id="assetMenuId"><g:link class="home" controller="assetEntity" action="assetImport" >Assets</g:link></li>
-			<li id="appMenuId"><g:link class="home" onmouseover="showSubMenu('#assetMenu')" controller="application" action="list" >Apps</g:link></li>
+			<li id="assetMenuId"><g:link class="home" onmouseover="showSubMenu('#assetMenu')" controller="assetEntity" action="assetImport" >Assets</g:link></li>
 			<li><g:link class="home" controller="moveEvent" action="show" >Events</g:link> </li>
-			<li><g:link class="home" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles</g:link></li>
+			<li><g:link class="home" onmouseover="showSubMenu('#bundleMenu')" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles</g:link></li>
 			<li><g:link class="home" controller="clientTeams" params="[projectId:currProjObj?.id]">Teams</g:link></li>
 			<li>&nbsp;</li>
 	        </jsec:lacksAllRoles>
 	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
-			<li><g:link class="home" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console</g:link></li>
+			<li><g:link class="home" onmouseover="showSubMenu('#consoleMenu')" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console</g:link></li>
 	        </jsec:hasAnyRole>
 			<li><g:link class="home" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link> </li>
 			<li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker</g:link> </li>
@@ -151,6 +147,15 @@
 		</jsec:hasRole>
 		</ul>
 		</div>
+		<div class="menu2" id="projectMenu" style="background-color:#003366;display: none;">
+		<ul>
+			<li><g:link class="home" controller="projectUtil" action="list">List Projects</g:link> </li>
+			<g:if test="${currProjObj}"><li><g:link class="home" controller="projectUtil">${currProjObj.name}</g:link> </li></g:if>
+			<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
+			<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
+			</jsec:lacksAllRoles>
+		</ul>
+		</div>
 		<div class="menu2" id="assetMenu" style="background-color:#003366;display: none;">
 		<ul>
 			<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link> </li>
@@ -160,6 +165,16 @@
 			<li><g:link class="home" controller="files" params="[projectId:currProjObj?.id]">List Files</g:link></li>
 			<li><g:link class="home" controller="assetEntity" action="listComment" params="[projectId:currProjObj?.id]">List Comments</g:link></li>
 		</ul>
+		</div>
+		<div class="menu2" id="bundleMenu" style="background-color:#003366;display:none;">
+			<ul>
+				<li><g:link class="home" controller='moveBundle" action="list">List</g:link></li>
+				<li class="title1">Move Bundle: ${MoveBundle.findById( moveBundleId )?.name}</li>
+				<li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundleId]" >Team </g:link> </li>
+				<li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId]" >Bundle Asset Assignment</g:link> </li>
+				<li><g:link class="home" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleId, rack:'UnrackPlan']" >Bundle Team Assignment </g:link> </li>
+				<li><g:link class="home" controller="walkThrough" >Walkthrough</g:link> </li>
+			</ul>
 		</div>
 	    <div class="menu2" id="consoleMenu" style="background-color:#003366;display: none;">
 	        <ul>
