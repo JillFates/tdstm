@@ -12,8 +12,8 @@ def attributeSet = EavAttributeSet.findByAttributeSetName('Server')
  * Set Server as AssetEntity default type
  */
 AssetEntity.executeUpdate("UPDATE from AssetEntity set assetType = 'Server' where assetType is null")
-def eavAttribute = EavAttribute.findByAttributeCode("assetType")
-def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
+def eavAttribute = EavAttribute.findByAttributeCodeAndEntityType("assetType",entityType)
+def assetTypeAttribute = EavAttribute.findByAttributeCodeAndEntityType('assetType',entityType)
 EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[assetTypeAttribute])
 def assetTypes = AssetEntity.findAll("From AssetEntity group by assetType")
 
@@ -58,7 +58,7 @@ println"**************Delete Asset properties ***************"
 /*
  * Power
  */
-def powerTypeAttribute = EavAttribute.findByAttributeCode('powerType')
+def powerTypeAttribute = EavAttribute.findByAttributeCodeAndEntityType('powerType',entityType)
 if(powerTypeAttribute) {
 	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[powerTypeAttribute])
 	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[powerTypeAttribute])
@@ -68,7 +68,7 @@ if(powerTypeAttribute) {
 /*
  * PDU
  */
-def pduPortAttribute = EavAttribute.findByAttributeCode('pduPort')
+def pduPortAttribute = EavAttribute.findByAttributeCodeAndEntityType('pduPort',entityType)
 if(pduPortAttribute) {
 		EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[pduPortAttribute])
 		EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[pduPortAttribute])
@@ -76,7 +76,7 @@ if(pduPortAttribute) {
 		EavAttribute.executeUpdate("Delete from EavAttribute where id = ?",[pduPortAttribute.id])
 	}
 
-def pduQuantityAttribute = EavAttribute.findByAttributeCode('pduQuantity')
+def pduQuantityAttribute = EavAttribute.findByAttributeCodeAndEntityType('pduQuantity',entityType)
 if(pduQuantityAttribute) {
 	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[pduQuantityAttribute])
 	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[pduQuantityAttribute])
@@ -84,7 +84,7 @@ if(pduQuantityAttribute) {
 	EavAttribute.executeUpdate("Delete from EavAttribute where id = ?",[pduQuantityAttribute.id])
 }
 
-def pduTypeAttribute = EavAttribute.findByAttributeCode('pduType')
+def pduTypeAttribute = EavAttribute.findByAttributeCodeAndEntityType('pduType',entityType)
 if(pduTypeAttribute) {
 	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[pduTypeAttribute])
 	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[pduTypeAttribute])
@@ -94,7 +94,7 @@ if(pduTypeAttribute) {
  /*
   * NIC
   */
-def nicPortAttribute = EavAttribute.findByAttributeCode('nicPort')
+def nicPortAttribute = EavAttribute.findByAttributeCodeAndEntityType('nicPort',entityType)
 if(nicPortAttribute) {
 	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[nicPortAttribute])
 	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[nicPortAttribute])
@@ -105,7 +105,7 @@ if(nicPortAttribute) {
 /*
  * Fiber
  */
-def fiberCabinetAttribute = EavAttribute.findByAttributeCode('fiberCabinet')
+def fiberCabinetAttribute = EavAttribute.findByAttributeCodeAndEntityType('fiberCabinet',entityType)
 if(fiberCabinetAttribute) {
 	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[fiberCabinetAttribute])
 	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[fiberCabinetAttribute])
@@ -113,7 +113,7 @@ if(fiberCabinetAttribute) {
 	EavAttribute.executeUpdate("Delete from EavAttribute where id = ?",[fiberCabinetAttribute.id])
 }
 
-def fiberTypeAttribute = EavAttribute.findByAttributeCode('fiberType')
+def fiberTypeAttribute = EavAttribute.findByAttributeCodeAndEntityType('fiberType',entityType)
 if(fiberTypeAttribute) {
 	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[fiberTypeAttribute])
 	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[fiberTypeAttribute])
@@ -121,7 +121,7 @@ if(fiberTypeAttribute) {
 	EavAttribute.executeUpdate("Delete from EavAttribute where id = ?",[fiberTypeAttribute.id])
 }
 
-def fiberQuantityAttribute = EavAttribute.findByAttributeCode('fiberQuantity')
+def fiberQuantityAttribute = EavAttribute.findByAttributeCodeAndEntityType('fiberQuantity',entityType)
 if(fiberQuantityAttribute) {
 	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[fiberQuantityAttribute])
 	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[fiberQuantityAttribute])
@@ -131,7 +131,7 @@ if(fiberQuantityAttribute) {
 /*
  *  HBA
  */
-def hbaPortAttribute = EavAttribute.findByAttributeCode('hbaPort')
+def hbaPortAttribute = EavAttribute.findByAttributeCodeAndEntityType('hbaPort',entityType)
 if(hbaPortAttribute) {
 	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[hbaPortAttribute])
 	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[hbaPortAttribute])
@@ -141,7 +141,7 @@ if(hbaPortAttribute) {
 /*
  * KVM 
  */
-def kvmDeviceAttribute = EavAttribute.findByAttributeCode('kvmDevice')
+def kvmDeviceAttribute = EavAttribute.findByAttributeCodeAndEntityType('kvmDevice',entityType)
 if(kvmDeviceAttribute) {
 	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[kvmDeviceAttribute])
  	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[kvmDeviceAttribute])
@@ -149,7 +149,7 @@ if(kvmDeviceAttribute) {
  	EavAttribute.executeUpdate("Delete from EavAttribute where id = ?",[kvmDeviceAttribute.id])
 }
 
-def kvmPortAttribute = EavAttribute.findByAttributeCode('kvmPort')
+def kvmPortAttribute = EavAttribute.findByAttributeCodeAndEntityType('kvmPort',entityType)
 if(kvmPortAttribute) {
  	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[kvmPortAttribute])
  	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[kvmPortAttribute])
@@ -159,7 +159,7 @@ if(kvmPortAttribute) {
 /*
  * usize
  */
-/*def usizeAttribute = EavAttribute.findByAttributeCode('usize')
+/*def usizeAttribute = EavAttribute.findByAttributeCodeAndEntityType('usize')
 if(usizeAttribute) {
 	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[usizeAttribute])
 	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[usizeAttribute])
@@ -169,7 +169,7 @@ if(usizeAttribute) {
 /*
  * remoteMgmtPort
  */
-def remoteMgmtPortAttribute = EavAttribute.findByAttributeCode('remoteMgmtPort')
+def remoteMgmtPortAttribute = EavAttribute.findByAttributeCodeAndEntityType('remoteMgmtPort',entityType)
 if(remoteMgmtPortAttribute) {
 	EavAttributeOption.executeUpdate("Delete from EavAttributeOption where attribute = ?",[remoteMgmtPortAttribute])
 	EavEntityAttribute.executeUpdate("Delete from EavEntityAttribute where attribute = ?",[remoteMgmtPortAttribute])
@@ -179,12 +179,12 @@ if(remoteMgmtPortAttribute) {
 /*
  * replace newOrOld with planStatus
  */
-def newOrOldAttribute = EavAttribute.findByAttributeCode('newOrOld')
+def newOrOldAttribute = EavAttribute.findByAttributeCodeAndEntityType('newOrOld',entityType)
 if(newOrOldAttribute) {
 	DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'PlanStatus' where eavAttribute = ?",[newOrOldAttribute])
 	EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'planStatus', frontendLabel='Plan Status' where id = ?",[newOrOldAttribute.id])
 }
-def planStatusAttribute = EavAttribute.findByAttributeCode('planStatus')
+def planStatusAttribute = EavAttribute.findByAttributeCodeAndEntityType('planStatus',entityType)
 if(planStatusAttribute) {
 	DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'PlanStatus' where eavAttribute = ?",[planStatusAttribute])
 	EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'planStatus', frontendLabel='Plan Status' where id = ?",[planStatusAttribute.id])
@@ -193,12 +193,12 @@ if(planStatusAttribute) {
 /*
  * replace hinfo with os
  */
-def hinfoAttribute = EavAttribute.findByAttributeCode('hinfo')
+def hinfoAttribute = EavAttribute.findByAttributeCodeAndEntityType('hinfo',entityType)
 if(hinfoAttribute) {
 	DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'OS' where eavAttribute = ?",[hinfoAttribute])
 	EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'os', frontendLabel = 'OS' where id = ?",[hinfoAttribute.id])
 }
-def osAttribute = EavAttribute.findByAttributeCode('os')
+def osAttribute = EavAttribute.findByAttributeCodeAndEntityType('os',entityType)
 if(osAttribute) {
 	DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'OS' where eavAttribute = ?",[osAttribute])
 	EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'os', frontendLabel = 'OS' where id = ?",[osAttribute.id])
@@ -210,12 +210,12 @@ EavAttribute.executeUpdate("Update from EavAttribute set frontendInput='text' wh
 /*
 * replace sourceTeam with sourceTeamMt
 */
-def sourceTeamAttribute = EavAttribute.findByAttributeCode('sourceTeam')
+def sourceTeamAttribute = EavAttribute.findByAttributeCodeAndEntityType('sourceTeam',entityType)
 if(sourceTeamAttribute) {
    DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'SourceTeamMt' where eavAttribute = ?",[sourceTeamAttribute])
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'sourceTeamMt', frontendLabel='Source Team Mt' where id = ?",[sourceTeamAttribute.id])
 }
-def sourceTeamMtAttribute = EavAttribute.findByAttributeCode('sourceTeamMt')
+def sourceTeamMtAttribute = EavAttribute.findByAttributeCodeAndEntityType('sourceTeamMt',entityType)
 if(sourceTeamMtAttribute) {
    DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'SourceTeamMt' where eavAttribute = ?",[sourceTeamMtAttribute])
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'sourceTeamMt', frontendLabel='Source Team Mt' where id = ?",[sourceTeamMtAttribute.id])
@@ -223,12 +223,12 @@ if(sourceTeamMtAttribute) {
 /*
 * replace targetTeam with targetTeamMt
 */
-def targetTeamAttribute = EavAttribute.findByAttributeCode('targetTeam')
+def targetTeamAttribute = EavAttribute.findByAttributeCodeAndEntityType('targetTeam',entityType)
 if(targetTeamAttribute) {
    DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'TargetTeamMt' where eavAttribute = ?",[targetTeamAttribute])
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'targetTeamMt', frontendLabel='Target Team Mt' where id = ?",[targetTeamAttribute.id])
 }
-def targetTeamMtAttribute = EavAttribute.findByAttributeCode('targetTeamMt')
+def targetTeamMtAttribute = EavAttribute.findByAttributeCodeAndEntityType('targetTeamMt',entityType)
 if(targetTeamMtAttribute) {
    DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'TargetTeamMt' where eavAttribute = ?",[targetTeamMtAttribute])
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'targetTeamMt', frontendLabel='Target Team Mt' where id = ?",[targetTeamMtAttribute.id])
@@ -236,7 +236,7 @@ if(targetTeamMtAttribute) {
 /**
 *  Create Source Team Logistics
 */
-def sourceTeamLogAttribute = EavAttribute.findByAttributeCode('sourceTeamLog')
+def sourceTeamLogAttribute = EavAttribute.findByAttributeCodeAndEntityType('sourceTeamLog',entityType)
 if(sourceTeamLogAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'sourceTeamLog', frontendLabel='Source Team Log' where id = ?",[sourceTeamLogAttribute.id])
 } else {
@@ -306,7 +306,7 @@ if(!logisticsSourceDataTransferMapWalkThru){
 /**
  *  Create Target Team Logistics
  */
-def targetTeamLogAttribute = EavAttribute.findByAttributeCode('targetTeamLog')
+def targetTeamLogAttribute = EavAttribute.findByAttributeCodeAndEntityType('targetTeamLog',entityType)
 if(targetTeamLogAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'targetTeamLog', frontendLabel='Target Team Log' where id = ?",[targetTeamLogAttribute.id])
 } else {
@@ -375,7 +375,7 @@ if(!logisticsTargetDataTransferMapWalkThru){
 /**
 *  Create Source Team SysAdmin
 */
-def sourceTeamSaAttribute = EavAttribute.findByAttributeCode('sourceTeamSa')
+def sourceTeamSaAttribute = EavAttribute.findByAttributeCodeAndEntityType('sourceTeamSa',entityType)
 if(sourceTeamSaAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'sourceTeamSa', frontendLabel='Source Team Sa' where id = ?",[sourceTeamSaAttribute.id])
 } else {
@@ -445,7 +445,7 @@ if(!sysAdminSourceDataTransferMapWalkThru){
 /**
  *  Create Target Team SysAdmin
  */
-def targetTeamSaAttribute = EavAttribute.findByAttributeCode('targetTeamSa')
+def targetTeamSaAttribute = EavAttribute.findByAttributeCodeAndEntityType('targetTeamSa',entityType)
 if(targetTeamSaAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'targetTeamSa', frontendLabel='Target Team Sa' where id = ?",[targetTeamSaAttribute.id])
 } else {
@@ -514,7 +514,7 @@ if(!sysAdminTargetDataTransferMapWalkThru){
 /**
 *  Create Source Team DbAdmin
 */
-def sourceTeamDbaAttribute = EavAttribute.findByAttributeCode('sourceTeamDba')
+def sourceTeamDbaAttribute = EavAttribute.findByAttributeCodeAndEntityType('sourceTeamDba',entityType)
 if(sourceTeamDbaAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'sourceTeamDba', frontendLabel='Source Team Dba' where id = ?",[sourceTeamDbaAttribute.id])
 } else {
@@ -584,7 +584,7 @@ if(!dbAdminSourceDataTransferMapWalkThru){
 /**
  *  Create Target Team DbAdmin
  */
-def targetTeamDbaAttribute = EavAttribute.findByAttributeCode('targetTeamDba')
+def targetTeamDbaAttribute = EavAttribute.findByAttributeCodeAndEntityType('targetTeamDba',entityType)
 if(targetTeamDbaAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'targetTeamDba', frontendLabel='Target Team Dba' where id = ?",[targetTeamDbaAttribute.id])
 } else {
@@ -654,7 +654,7 @@ if(!dbAdminTargetDataTransferMapWalkThru){
 /**
  *  Create usize
  */
-def usizeAttribute = EavAttribute.findByAttributeCode('usize')
+def usizeAttribute = EavAttribute.findByAttributeCodeAndEntityType('usize',entityType)
 if(usizeAttribute){
 	EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'usize', frontendLabel='Usize' where id = ?",[usizeAttribute.id])
 } else {
@@ -724,107 +724,107 @@ if(!usizeDataTransferMapWalkThru){
  * Set Attributes order 
  */
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 10 where attributeCode = 'application'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 10 where attribute = ?",[EavAttribute.findByAttributeCode('application')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 10 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('application',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 20 where attributeCode = 'assetName'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 20 where attribute = ?",[EavAttribute.findByAttributeCode('assetName')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 20 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('assetName',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 30 where attributeCode = 'shortName'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 30 where attribute = ?",[EavAttribute.findByAttributeCode('shortName')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 30 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('shortName',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 40 where attributeCode = 'serialNumber'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 40 where attribute = ?",[EavAttribute.findByAttributeCode('serialNumber')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 40 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('serialNumber',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 50 where attributeCode = 'assetTag'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 50 where attribute = ?",[EavAttribute.findByAttributeCode('assetTag')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 50 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('assetTag',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 60 where attributeCode = 'assetType'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 60 where attribute = ?",[EavAttribute.findByAttributeCode('assetType')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 60 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('assetType',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 70 where attributeCode = 'manufacturer'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 70 where attribute = ?",[EavAttribute.findByAttributeCode('manufacturer')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 70 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('manufacturer',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 80 where attributeCode = 'model'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 80 where attribute = ?",[EavAttribute.findByAttributeCode('model')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 80 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('model',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 100 where attributeCode = 'ipAddress'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 100 where attribute = ?",[EavAttribute.findByAttributeCode('ipAddress')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 100 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('ipAddress',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 110 where attributeCode = 'os'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 110 where attribute = ?",[EavAttribute.findByAttributeCode('os')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 110 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('os',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 120 where attributeCode = 'sourceLocation'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 120 where attribute = ?",[EavAttribute.findByAttributeCode('sourceLocation')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 120 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('sourceLocation',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 130 where attributeCode = 'sourceRoom'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 130 where attribute = ?",[EavAttribute.findByAttributeCode('sourceRoom')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 130 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('sourceRoom',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 140 where attributeCode = 'sourceRack'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 140 where attribute = ?",[EavAttribute.findByAttributeCode('sourceRack')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 140 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('sourceRack',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 150 where attributeCode = 'sourceRackPosition'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 150 where attribute = ?",[EavAttribute.findByAttributeCode('sourceRackPosition')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 150 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('sourceRackPosition',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 160 where attributeCode = 'sourceBladeChassis'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 160 where attribute = ?",[EavAttribute.findByAttributeCode('sourceBladeChassis')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 160 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('sourceBladeChassis',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 170 where attributeCode = 'sourceBladePosition'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 170 where attribute = ?",[EavAttribute.findByAttributeCode('sourceBladePosition')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 170 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('sourceBladePosition',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 180 where attributeCode = 'targetLocation'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 180 where attribute = ?",[EavAttribute.findByAttributeCode('targetLocation')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 180 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('targetLocation',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 190 where attributeCode = 'targetRoom'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 190 where attribute = ?",[EavAttribute.findByAttributeCode('targetRoom')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 190 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('targetRoom',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 200 where attributeCode = 'targetRack'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 200 where attribute = ?",[EavAttribute.findByAttributeCode('targetRack')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 200 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('targetRack',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 210 where attributeCode = 'targetRackPosition'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 210 where attribute = ?",[EavAttribute.findByAttributeCode('targetRackPosition')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 210 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('targetRackPosition',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 220 where attributeCode = 'targetBladeChassis'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 220 where attribute = ?",[EavAttribute.findByAttributeCode('targetBladeChassis')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 220 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('targetBladeChassis',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 230 where attributeCode = 'targetBladePosition'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 230 where attribute = ?",[EavAttribute.findByAttributeCode('targetBladePosition')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 230 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('targetBladePosition',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 240 where attributeCode = 'custom1'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 240 where attribute = ?",[EavAttribute.findByAttributeCode('custom1')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 240 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('custom1',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 250 where attributeCode = 'custom2'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 250 where attribute = ?",[EavAttribute.findByAttributeCode('custom2')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 250 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('custom2',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 260 where attributeCode = 'custom3'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 260 where attribute = ?",[EavAttribute.findByAttributeCode('custom3')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 260 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('custom3',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 270 where attributeCode = 'custom4'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 270 where attribute = ?",[EavAttribute.findByAttributeCode('custom4')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 270 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('custom4',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 280 where attributeCode = 'custom5'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 280 where attribute = ?",[EavAttribute.findByAttributeCode('custom5')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 280 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('custom5',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 290 where attributeCode = 'custom6'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 290 where attribute = ?",[EavAttribute.findByAttributeCode('custom6')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 290 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('custom6',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 300 where attributeCode = 'custom7'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 300 where attribute = ?",[EavAttribute.findByAttributeCode('custom7')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 300 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('custom7',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 310 where attributeCode = 'custom8'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 310 where attribute = ?",[EavAttribute.findByAttributeCode('custom8')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 310 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('custom8',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 320 where attributeCode = 'moveBundle'")
 
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 320 where attribute = ?",[EavAttribute.findByAttributeCode('moveBundle')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 320 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('moveBundle',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 330, attributeCode = 'sourceTeamMt' where attributeCode in ('sourceTeam','sourceTeamMt')")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 330 where attribute = ?",[EavAttribute.findByAttributeCode('sourceTeamMt')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 330 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('sourceTeamMt',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 340, attributeCode = 'targetTeamMt' where attributeCode in ('targetTeam','targetTeamMt')")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 340 where attribute = ?",[EavAttribute.findByAttributeCode('targetTeamMt')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 340 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('targetTeamMt',entityType)])
 
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 341, attributeCode = 'sourceTeamLog' where attributeCode = 'sourceTeamLog'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 341 where attribute = ?",[EavAttribute.findByAttributeCode('sourceTeamLog')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 341 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('sourceTeamLog',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 342, attributeCode = 'targetTeamLog' where attributeCode = 'targetTeamLog'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 342 where attribute = ?",[EavAttribute.findByAttributeCode('targetTeamLog')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 342 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('targetTeamLog',entityType)])
 
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 343, attributeCode = 'sourceTeamSa' where attributeCode = 'sourceTeamSa'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 343 where attribute = ?",[EavAttribute.findByAttributeCode('sourceTeamLog')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 343 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('sourceTeamLog',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 344, attributeCode = 'targetTeamSa' where attributeCode = 'targetTeamSa'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 344 where attribute = ?",[EavAttribute.findByAttributeCode('targetTeamSa')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 344 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('targetTeamSa',entityType)])
 
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 345, attributeCode = 'sourceTeamDba' where attributeCode = 'sourceTeamDba'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 345 where attribute = ?",[EavAttribute.findByAttributeCode('sourceTeamDba')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 345 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('sourceTeamDba',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'targetTeamDba' where attributeCode = 'targetTeamDba'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 346 where attribute = ?",[EavAttribute.findByAttributeCode('targetTeamDba')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 346 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('targetTeamDba',entityType)])
 
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 347, attributeCode = 'usize' where attributeCode = 'usize'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 347 where attribute = ?",[EavAttribute.findByAttributeCode('usize')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 347 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('usize',entityType)])
 
 
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 350 where attributeCode = 'truck'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 350 where attribute = ?",[EavAttribute.findByAttributeCode('truck')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 350 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('truck',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 360 where attributeCode = 'cart'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 360 where attribute = ?",[EavAttribute.findByAttributeCode('cart')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 360 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('cart',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 370 where attributeCode = 'shelf'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 370 where attribute = ?",[EavAttribute.findByAttributeCode('shelf')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 370 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('shelf',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 380 where attributeCode = 'railType'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 380 where attribute = ?",[EavAttribute.findByAttributeCode('railType')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 380 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('railType',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 390 where attributeCode = 'appOwner'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 390 where attribute = ?",[EavAttribute.findByAttributeCode('appOwner')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 390 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('appOwner',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 400 where attributeCode = 'appSme'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 400 where attribute = ?",[EavAttribute.findByAttributeCode('appSme')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 400 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('appSme',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 410 where attributeCode = 'priority'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 410 where attribute = ?",[EavAttribute.findByAttributeCode('priority')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 410 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('priority',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 420 where attributeCode = 'planStatus'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 420 where attribute = ?",[EavAttribute.findByAttributeCode('planStatus')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 420 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('planStatus',entityType)])
 EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 430 where attributeCode = 'currentStatus'")
-EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 430 where attribute = ?",[EavAttribute.findByAttributeCode('currentStatus')])
+EavEntityAttribute.executeUpdate("UPDATE from EavEntityAttribute set sortOrder= 430 where attribute = ?",[EavAttribute.findByAttributeCodeAndEntityType('currentStatus',entityType)])

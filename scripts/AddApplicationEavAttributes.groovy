@@ -16,27 +16,10 @@ if(!appAttributeSet){
 	appAttributeSet = new EavAttributeSet( attributeSetName:'Application', entityType:appEntityType, sortOrder:20 ).save(flush:true)
 }
 
-def dbEntityType = EavEntityType.findByEntityTypeCode("Database")
-if(!dbEntityType){
-	dbAttributeSet = new EavEntityType( entityTypeCode:'Database', domainName:'Database', isAuditable:1  ).save(flush:true)
-}
-def dbAttributeSet = EavAttributeSet.findByAttributeSetName("Database")
-if(!dbAttributeSet){
-	dbAttributeSet = new EavAttributeSet( attributeSetName:'Database', entityType:dbEntityType, sortOrder:20 ).save(flush:true)
-}
-
-def filesEntityType = EavEntityType.findByEntityTypeCode("Files")
-if(!filesEntityType){
-	filesAttributeSet = new EavEntityType( entityTypeCode:'Files', domainName:'Files', isAuditable:1  ).save(flush:true)
-}
-def filesAttributeSet = EavAttributeSet.findByAttributeSetName("Files")
-if(!filesAttributeSet){
-	filesAttributeSet = new EavAttributeSet( attributeSetName:'Files', entityType:filesEntityType, sortOrder:20 ).save(flush:true)
-}
 /**
  *  Create Name
  */
-def nameAttribute = EavAttribute.findByAttributeCode('name')
+def nameAttribute = EavAttribute.findByAttributeCodeAndEntityType('name',appEntityType)
 if(nameAttribute){
 	EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'name', frontendLabel='Name' where id = ?",[nameAttribute.id])
 } else {
@@ -105,7 +88,7 @@ if(!nameDataTransferMapWalkThru){
 /**
 *  Create Vendor
 */
-def vendorAttribute = EavAttribute.findByAttributeCode('vendor')
+def vendorAttribute = EavAttribute.findByAttributeCodeAndEntityType('vendor',appEntityType)
 if(vendorAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'vendor', frontendLabel='Vendor' where id = ?",[vendorAttribute.id])
 } else {
@@ -174,7 +157,7 @@ if(!vendorDataTransferMapWalkThru){
 /**
 *  Create Version
 */
-def versionAttribute = EavAttribute.findByAttributeCode('version')
+def versionAttribute = EavAttribute.findByAttributeCodeAndEntityType('version',appEntityType)
 if(versionAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'version', frontendLabel='Version' where id = ?",[versionAttribute.id])
 } else {
@@ -243,7 +226,7 @@ if(!versionDataTransferMapWalkThru){
 /**
 *  Create Technology
 */
-def technologyAttribute = EavAttribute.findByAttributeCode('technology')
+def technologyAttribute = EavAttribute.findByAttributeCodeAndEntityType('technology',appEntityType)
 if(technologyAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'technology', frontendLabel='Technology' where id = ?",[technologyAttribute.id])
 } else {
@@ -312,7 +295,7 @@ if(!technologyDataTransferMapWalkThru){
 /**
 *  Create AccessType
 */
-def accessTypeAttribute = EavAttribute.findByAttributeCode('accessType')
+def accessTypeAttribute = EavAttribute.findByAttributeCodeAndEntityType('accessType',appEntityType)
 if(accessTypeAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'accessType', frontendLabel='AccessType' where id = ?",[accessTypeAttribute.id])
 } else {
@@ -381,7 +364,7 @@ if(!accessTypeDataTransferMapWalkThru){
 /**
 *  Create Source
 */
-def sourceAttribute = EavAttribute.findByAttributeCode('source')
+def sourceAttribute = EavAttribute.findByAttributeCodeAndEntityType('source',appEntityType)
 if(sourceAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'source', frontendLabel='Source' where id = ?",[sourceAttribute.id])
 } else {
@@ -450,7 +433,7 @@ if(!sourceDataTransferMapWalkThru){
 /**
 *  Create License
 */
-def licenseAttribute = EavAttribute.findByAttributeCode('license')
+def licenseAttribute = EavAttribute.findByAttributeCodeAndEntityType('license',appEntityType)
 if(licenseAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'license', frontendLabel='License' where id = ?",[licenseAttribute.id])
 } else {
@@ -519,7 +502,7 @@ if(!licenseDataTransferMapWalkThru){
 /**
 *  Create Description
 */
-def descriptionAttribute = EavAttribute.findByAttributeCode('description')
+def descriptionAttribute = EavAttribute.findByAttributeCodeAndEntityType('description',appEntityType)
 if(descriptionAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'description', frontendLabel='Description' where id = ?",[descriptionAttribute.id])
 } else {
@@ -588,7 +571,7 @@ if(!descriptionDataTransferMapWalkThru){
 /**
 *  Create SupportType
 */
-def supportTypeAttribute = EavAttribute.findByAttributeCode('supportType')
+def supportTypeAttribute = EavAttribute.findByAttributeCodeAndEntityType('supportType',appEntityType)
 if(supportTypeAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'supportType', frontendLabel='SupportType' where id = ?",[supportTypeAttribute.id])
 } else {
@@ -657,7 +640,7 @@ if(!supportTypeDataTransferMapWalkThru){
 /**
 *  Create SME
 */
-def smeAttribute = EavAttribute.findByAttributeCode('sme')
+def smeAttribute = EavAttribute.findByAttributeCodeAndEntityType('sme',appEntityType)
 if(smeAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'sme', frontendLabel='SME' where id = ?",[smeAttribute.id])
 } else {
@@ -726,7 +709,7 @@ if(!smeDataTransferMapWalkThru){
 /**
 *  Create SME2
 */
-def sme2Attribute = EavAttribute.findByAttributeCode('sme2')
+def sme2Attribute = EavAttribute.findByAttributeCodeAndEntityType('sme2',appEntityType)
 if(sme2Attribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'sme2', frontendLabel='SME2' where id = ?",[sme2Attribute.id])
 } else {
@@ -795,7 +778,7 @@ if(!sme2DataTransferMapWalkThru){
 /**
 *  Create BusinessUnit
 */
-def businessUnitAttribute = EavAttribute.findByAttributeCode('businessUnit')
+def businessUnitAttribute = EavAttribute.findByAttributeCodeAndEntityType('businessUnit',appEntityType)
 if(businessUnitAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'businessUnit', frontendLabel='BusinessUnit' where id = ?",[businessUnitAttribute.id])
 } else {
@@ -864,7 +847,7 @@ if(!businessUnitDataTransferMapWalkThru){
 /**
 *  Create Owner
 */
-def ownerAttribute = EavAttribute.findByAttributeCode('owner')
+def ownerAttribute = EavAttribute.findByAttributeCodeAndEntityType('owner',appEntityType)
 if(ownerAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'owner', frontendLabel='Owner' where id = ?",[ownerAttribute.id])
 } else {
@@ -933,7 +916,7 @@ if(!ownerDataTransferMapWalkThru){
 /**
 *  Create Retire
 */
-def retireAttribute = EavAttribute.findByAttributeCode('retire')
+def retireAttribute = EavAttribute.findByAttributeCodeAndEntityType('retire',appEntityType)
 if(retireAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'retire', frontendLabel='Retire' where id = ?",[retireAttribute.id])
 } else {
@@ -1002,7 +985,7 @@ if(!retireDataTransferMapWalkThru){
 /**
 *  Create MaintExp
 */
-def maintExpAttribute = EavAttribute.findByAttributeCode('maintExp')
+def maintExpAttribute = EavAttribute.findByAttributeCodeAndEntityType('maintExp',appEntityType)
 if(maintExpAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'maintExp', frontendLabel='MaintExp' where id = ?",[maintExpAttribute.id])
 } else {
@@ -1071,7 +1054,7 @@ if(!maintExpDataTransferMapWalkThru){
 /**
 *  Create Function
 */
-def functionAttribute = EavAttribute.findByAttributeCode('function')
+def functionAttribute = EavAttribute.findByAttributeCodeAndEntityType('function',appEntityType)
 if(functionAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'function', frontendLabel='Function' where id = ?",[functionAttribute.id])
 } else {
@@ -1140,7 +1123,7 @@ if(!functionDataTransferMapWalkThru){
 /**
 *  Create Environment
 */
-def environmentAttribute = EavAttribute.findByAttributeCode('environment')
+def environmentAttribute = EavAttribute.findByAttributeCodeAndEntityType('environment',appEntityType)
 if(environmentAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'environment', frontendLabel='Environment' where id = ?",[environmentAttribute.id])
 } else {
@@ -1209,7 +1192,7 @@ if(!environmentDataTransferMapWalkThru){
 /**
 *  Create Criticality
 */
-def criticalityAttribute = EavAttribute.findByAttributeCode('criticality')
+def criticalityAttribute = EavAttribute.findByAttributeCodeAndEntityType('criticality',appEntityType)
 if(criticalityAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'criticality', frontendLabel='Criticality' where id = ?",[criticalityAttribute.id])
 } else {
@@ -1278,7 +1261,7 @@ if(!criticalityDataTransferMapWalkThru){
 /**
 *  Create MoveBundle
 */
-def moveBundleAttribute = EavAttribute.findByAttributeCode('moveBundle')
+def moveBundleAttribute = EavAttribute.findByAttributeCodeAndEntityType('moveBundle',appEntityType)
 if(moveBundleAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'moveBundle', frontendLabel='MoveBundle' where id = ?",[moveBundleAttribute.id])
 } else {
@@ -1347,7 +1330,7 @@ if(!moveBundleDataTransferMapWalkThru){
 /**
 *  Create PlanStatus
 */
-def planStatusAttribute = EavAttribute.findByAttributeCode('planStatus')
+def planStatusAttribute = EavAttribute.findByAttributeCodeAndEntityType('planStatus',appEntityType)
 if(planStatusAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'planStatus', frontendLabel='PlanStatus' where id = ?",[planStatusAttribute.id])
 } else {
@@ -1416,7 +1399,7 @@ if(!planStatusDataTransferMapWalkThru){
 /**
 *  Create TotalUsers
 */
-def totalUsersAttribute = EavAttribute.findByAttributeCode('totalUsers')
+def totalUsersAttribute = EavAttribute.findByAttributeCodeAndEntityType('totalUsers',appEntityType)
 if(totalUsersAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'totalUsers', frontendLabel='TotalUsers' where id = ?",[totalUsersAttribute.id])
 } else {
@@ -1485,7 +1468,7 @@ if(!totalUsersDataTransferMapWalkThru){
 /**
 *  Create UserLocations
 */
-def userLocationsAttribute = EavAttribute.findByAttributeCode('userLocations')
+def userLocationsAttribute = EavAttribute.findByAttributeCodeAndEntityType('userLocations',appEntityType)
 if(userLocationsAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'userLocations', frontendLabel='UserLocations' where id = ?",[userLocationsAttribute.id])
 } else {
@@ -1554,7 +1537,7 @@ if(!userLocationsDataTransferMapWalkThru){
 /**
 *  Create ConcurrentUsers
 */
-def concurrentUsersAttribute = EavAttribute.findByAttributeCode('concurrentUsers')
+def concurrentUsersAttribute = EavAttribute.findByAttributeCodeAndEntityType('concurrentUsers',appEntityType)
 if(concurrentUsersAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'concurrentUsers', frontendLabel='ConcurrentUsers' where id = ?",[concurrentUsersAttribute.id])
 } else {
@@ -1623,7 +1606,7 @@ if(!concurrentUsersDataTransferMapWalkThru){
 /**
 *  Create Frequency
 */
-def frequencyAttribute = EavAttribute.findByAttributeCode('frequency')
+def frequencyAttribute = EavAttribute.findByAttributeCodeAndEntityType('frequency',appEntityType)
 if(frequencyAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'frequency', frontendLabel='Frequency' where id = ?",[frequencyAttribute.id])
 } else {
@@ -1692,7 +1675,7 @@ if(!frequencyDataTransferMapWalkThru){
 /**
 *  Create RPO
 */
-def rpoAttribute = EavAttribute.findByAttributeCode('rpo')
+def rpoAttribute = EavAttribute.findByAttributeCodeAndEntityType('rpo',appEntityType)
 if(rpoAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'rpo', frontendLabel='RPO' where id = ?",[rpoAttribute.id])
 } else {
@@ -1761,7 +1744,7 @@ if(!rpoDataTransferMapWalkThru){
 /**
 *  Create RTO
 */
-def rtoAttribute = EavAttribute.findByAttributeCode('rto')
+def rtoAttribute = EavAttribute.findByAttributeCodeAndEntityType('rto',appEntityType)
 if(rtoAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'rto', frontendLabel='RTO' where id = ?",[rtoAttribute.id])
 } else {
@@ -1831,7 +1814,7 @@ if(!rtoDataTransferMapWalkThru){
 /**
 *  Create DowntimeTolerance
 */
-def downtimeToleranceAttribute = EavAttribute.findByAttributeCode('downtimeTolerance')
+def downtimeToleranceAttribute = EavAttribute.findByAttributeCodeAndEntityType('downtimeTolerance',appEntityType)
 if(downtimeToleranceAttribute){
    EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'downtimeTolerance', frontendLabel='DowntimeTolerance' where id = ?",[downtimeToleranceAttribute.id])
 } else {
