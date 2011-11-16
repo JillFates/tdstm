@@ -1,8 +1,9 @@
-<%@page import="com.tds.asset.AssetEntity;com.tds.asset.Application;com.tds.asset.Database;com.tds.asset.Files;com.tds.asset.AssetComment;"%>
+<%@page import="com.tds.asset.AssetComment;com.tds.asset.AssetEntity;com.tds.asset.Application;com.tds.asset.Database;com.tds.asset.Files;com.tds.asset.AssetComment;"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
+<title>Application list</title>
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
@@ -11,8 +12,10 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
+
 <link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
 <script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
+
 <script type="text/javascript">
 function onInvokeAction(id) {
     setExportToLimit(id, '');
@@ -23,26 +26,26 @@ function onInvokeExportAction(id) {
     location.href = 'list?' + parameterString;
 }
 $(document).ready(function() {
-	$('#assetMenu').show();
-	$("#createEntityView").dialog({ autoOpen: false })
-	$("#showEntityView").dialog({ autoOpen: false })
-	$("#editEntityView").dialog({ autoOpen: false })
-	$("#commentsListDialog").dialog({ autoOpen: false })
-	$("#createCommentDialog").dialog({ autoOpen: false })
-    $("#showCommentDialog").dialog({ autoOpen: false })
-    $("#editCommentDialog").dialog({ autoOpen: false })
-    $("#manufacturerShowDialog").dialog({ autoOpen: false })
-	$("#modelShowDialog").dialog({ autoOpen: false })
+			$("#createEntityView").dialog({ autoOpen: false })
+			$("#showEntityView").dialog({ autoOpen: false })
+			$("#editEntityView").dialog({ autoOpen: false })
+	        $("#commentsListDialog").dialog({ autoOpen: false })
+	        $("#createCommentDialog").dialog({ autoOpen: false })
+	        $("#showCommentDialog").dialog({ autoOpen: false })
+	        $("#editCommentDialog").dialog({ autoOpen: false })
+	        $("#manufacturerShowDialog").dialog({ autoOpen: false })
+	        $("#modelShowDialog").dialog({ autoOpen: false })
+	        $("#filterPane").draggable()
+	        
 })
 </script>
-
-<title>Application list</title>
 </head>
 <body>
+
 <div class="body">
 <h1>Application List</h1>
 <g:if test="${flash.message}">
-<div class="message">${flash.message}</div>
+	<div class="message">${flash.message}</div>
 </g:if>
 <input type="hidden" id="role" value="role"/>
 <div id= "jmesaId">
@@ -91,7 +94,6 @@ $(document).ready(function() {
 		        	<jmesa:htmlColumn property="depDown" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<span onclick="getEntityDetails('application','${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.depDown}</span>
 		        	</jmesa:htmlColumn>
-		        	
 		        </jmesa:htmlRow>
 			</jmesa:htmlTable>
 		</jmesa:tableFacade>
@@ -106,7 +108,7 @@ $(document).ready(function() {
 <div id="showEntityView" style="display: none;"></div>
 <div id="editEntityView" style="display: none;"></div>
 <div style="display: none;">
-<table id="assetDependencyRow">
+	<table id="assetDependencyRow">
 	<tr>
 		<td><g:select name="dataFlowFreq" from="${assetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
 		<td><g:select name="entity" from="['Server','Application','Database','Files']" onchange='updateAssetsList(this.name, this.value)'></g:select></td>
@@ -117,11 +119,14 @@ $(document).ready(function() {
 	</table>
 </div>
 <div style="display: none;">
-<span id="Server"><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
-<span id="Application"><g:select name="asset" from="${applications}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
-<span id="Database"><g:select name="asset" from="${dbs}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
-<span id="Files"><g:select name="asset" from="${files}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+	<span id="Server"><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+	<span id="Application"><g:select name="asset" from="${applications}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+	<span id="Database"><g:select name="asset" from="${dbs}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+	<span id="Files"><g:select name="asset" from="${files}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 </div>
-</div>
+<script>
+	currentMenuId = "#assetMenu";
+	$("#assetMenuId a").css('background-color','#003366')
+</script>
 </body>
 </html>

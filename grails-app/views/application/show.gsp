@@ -282,3 +282,7 @@
 			</div></td>
 	</tr>
 </table>
+<script>
+	currentMenuId = "#assetMenu";
+	$("#assetMenuId a").css('background-color','#003366')
+</script>

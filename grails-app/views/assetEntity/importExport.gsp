@@ -124,9 +124,9 @@
         </div>
     </g:form>
     </div>
-    <script type="text/javascript">
-		$('#assetMenu').show();
-		$('#reportsMenu').hide();
-	</script>
+<script>
+	currentMenuId = "#assetMenu";
+	$("#assetMenuId a").css('background-color','#003366')
+</script>
   </body>
 </html>

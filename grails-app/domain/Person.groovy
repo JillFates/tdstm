@@ -10,8 +10,8 @@ class Person extends Party {
 	String location
 	String workPhone
 	String mobilePhone
-	Integer modelScore
-	Integer modelScoreBonus
+	Integer modelScore = 0
+	Integer modelScoreBonus = 0
 
 
 	/*

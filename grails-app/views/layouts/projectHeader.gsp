@@ -11,7 +11,8 @@
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
     <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" type="text/css"/>
-	<g:javascript library="prototype" />
+    
+    <g:javascript library="prototype" />
     <jq:plugin name="jquery.combined" />
     <g:javascript src="crawler.js" />
     <g:layoutHead />
@@ -22,7 +23,7 @@
    		$(document).ready(function() {
       		$("#personDialog").dialog({ autoOpen: false })
       		${remoteFunction(controller:'userLogin', action:'updateLastPageLoad')}
-     	})    	
+     	})
      	var emailRegExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/
      	var dateRegExpForExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([APap][Mm])$/;
      	var currentMenuId = "";
@@ -46,7 +47,6 @@
     def isIE6 = request.getHeader("User-Agent").contains("MSIE 6");
     %>
   <body>
-   
     <div class="main_body">
 
       <div class="tds_header">
@@ -138,7 +138,7 @@
 		<div class="menu2" id="projectMenu" style="background-color:#003366;display: none;">
 		<ul onmouseout="showSubMenu(currentMenuId)">
 			<li><g:link class="home" controller="project" action="list">List Projects</g:link> </li>
-			<g:if test="${currProjObj}"><li class="title1"><g:link class="home" controller="projectUtil">${currProjObj.name}</g:link></li></g:if>
+			<g:if test="${currProjObj}"><li><g:link class="home" controller="projectUtil">Project: ${currProjObj.name}</g:link></li></g:if>
 			<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 			<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
 			</jsec:lacksAllRoles>
@@ -157,11 +157,11 @@
 		<div class="menu2" id="bundleMenu" style="background-color:#003366;display:none;">
 		<ul onmouseout="showSubMenu(currentMenuId)">
 				<li><g:link class="home" controller="moveBundle" action="list">List</g:link></li>
-				<li class="title1">Move Bundle: ${MoveBundle.findById( moveBundleId )?.name}</li>
-				<li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundleId]" >Team</g:link> </li>
+				<li><g:link class="home" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundle: ${MoveBundle.findById( moveBundleId )?.name}</g:link></li>
+				<li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundleId]" >Team</g:link></li>
 				<li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId]" >Bundle Asset Assignment</g:link> </li>
 				<li><g:link class="home" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleId, rack:'UnrackPlan']" >Bundle Team Assignment </g:link> </li>
-				<li><g:link class="home" controller="walkThrough" >Walkthrough</g:link> </li>
+				<li><g:link class="home" controller="walkThrough" >Walkthrough</g:link></li>
 			</ul>
 		</div>
 	    <div class="menu2" id="consoleMenu" style="background-color:#003366;display: none;">
@@ -291,8 +291,8 @@
                     <g:select name="powerType" id="powerTypeId" from="${['Watts','Amps']}" 
                     value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE}"/>
                     </td>
-                  </tr>  
-                  <tr class="prop">
+                  </tr>
+                   <tr class="prop">
                      <td valign="top" class="name">
                        <label for="title">Model Score:</label>
                      </td>
@@ -342,9 +342,7 @@
 			neutral: 150,
 			savedirection: false
 		});
-	    if($("#assetMenu").is(":visible")){
-		  	$("#assetMenuId a").css('background-color','#003366')
-	  	}
+
 	  	// Update person details 
 		function updatePersonDetails( e ){
 			var personDetails = eval("(" + e.responseText + ")");
