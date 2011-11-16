@@ -1,21 +1,26 @@
-
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="companyHeader" />
-        <title>Show UserLogin</title>
+        <meta name="layout" content="projectHeader" />
+        <title>UserLogin</title>
     </head>
     <body>
         
         <div class="body">
-            <h1>Show UserLogin</h1>
+            <h1>UserLogin</h1>
+
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
+
 	            <span class="menuButton"><g:link class="list" action="list" id="${companyId}"  params="[filter:true]">UserLogin List</g:link></span>
+
 	            <jsec:hasRole name="ADMIN">
+
 	            <span class="menuButton"><g:link class="create" action="create" params="[companyId:companyId]">New UserLogin</g:link></span>
+
 	            </jsec:hasRole>
+
         	</div>
+
         	<br/>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
@@ -26,10 +31,15 @@
 
                     
 						<tr class="prop">
+
                             <td valign="top" class="name">Username:</td>
+
                             
+
                             <td valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'username')}</td>
+
                             
+
                         </tr>                    
                         <tr class="prop">
                             <td valign="top" class="name">Person:</td>
@@ -44,11 +54,17 @@
                             
                         </tr>
                     	<tr class="prop">
+
                             <td valign="top" class="name">Active:</td>
+
                             	
+
                             <td valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'active')}</td>
+
                             
+
                         </tr>
+
                         
                         <tr class="prop">
                             <td valign="top" class="name">Created Date:</td>
@@ -63,6 +79,7 @@
                             <td valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.lastLogin}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
                             
                         </tr>
+
                         
                     
                     </tbody>
@@ -79,5 +96,9 @@
             </div>
             </jsec:hasRole>
         </div>
+<script>
+	currentMenuId = "#adminMenu";
+	$("#adminMenuId a").css('background-color','#003366')
+</script>
     </body>
 </html>

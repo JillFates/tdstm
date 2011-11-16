@@ -3,31 +3,51 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="companyHeader" />
+        <meta name="layout" content="projectHeader" />
         <title>Create UserLogin</title>
+
 			 <script type="text/javascript">  
+
 			   $().ready(function() {  
+
 			    $('#add').click(function() {  
+
 			     return !$('#availableRoleId option:selected').remove().appendTo('#assignedRoleId');  
+
 			    });  
+
 			    $('#remove').click(function() {  
+
 			     return !$('#assignedRoleId option:selected').remove().appendTo('#availableRoleId');  
+
 			    });  
+
 			   });
+
 			   function selectAllAssigned(){
+
 			   	$('#assignedRoleId').each(function(){  
+
 					$("#assignedRoleId option").attr("selected","selected");  
+
    				});
+
 			   }
+
 			  </script>          
     </head>
     <body>
+
     
         <div class="body">
             <h1>Create UserLogin</h1>
+
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
+
             <span class="menuButton"><g:link class="list" action="list" id="${companyId}"  params="[filter:true]">UserLogin List</g:link></span>
+
         </div>
+
         <br/>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
@@ -46,14 +66,19 @@
                                     <label for="person"><b>Person:&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'person','errors')}">
+
                                 <g:if test="${personInstance}">
+
 	                                <g:select optionKey="id" from="${personInstance}" name="person.id" value="${personInstance?.id}" ></g:select>
 	                                <input type="hidden" name="personId" value="${personInstance?.id}" >
+
                                 </g:if>
+
                                 <g:else>
                                     <g:select optionKey="id" from="${Person.executeQuery('from Person p where p.id not in (select person.id from UserLogin u) order by p.firstName')}" name="person.id" value="${userLoginInstance?.person?.id}" ></g:select>
                                     
                                 </g:else>
+
                                 <g:hasErrors bean="${userLoginInstance}" field="person">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="person"/>
@@ -108,66 +133,123 @@
 					            </g:hasErrors>
 					            </td>
                             </tr>
+
                             <tr class="prop">
+
                                 <td valign="top" class="name">
+
                                     <label for="active"><b>Active:&nbsp;<span style="color: red">*</span></b></label>
+
                                 </td>
+
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'active','errors')}">
+
                                     <g:select id="active" name="active" from="${userLoginInstance.constraints.active.inList}" value="${userLoginInstance.active}" ></g:select>
                                 <g:hasErrors bean="${userLoginInstance}" field="active">
+
 					            <div class="errors">
+
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="active"/>
+
 					            </div>
+
 					            </g:hasErrors>
+
                                 </td>
+
                             </tr> 
                             <tr class="prop">
                                 <td valign="top" class="value" colspan="2">
+
                                 <table style="border: none;">
+
                                 <tr>
+
                                <td valign="top" class="name">
+
                                     <label >Available Roles:</label>
+
                                 </td>
+
                                 <td valign="top" class="name">
+
                                     <label >&nbsp;</label>
+
                                 </td>
+
                                 <td valign="top" class="name">
+
                                     <label >Assigned Roles:</label>
+
                                 </td>
+
                                 </tr>
+
                                 <tr>
+
 	                                <td valign="top" class="name">
+
 		                                <select name="availableRole" id="availableRoleId" multiple="multiple" size="10" style="width: 250px">
+
 			                                <g:each in="${RoleType.list()}" var="availableRoles">
+
 			                                	<option value="${availableRoles.id}">${availableRoles}</option>
+
 			                                </g:each>
+
 		                                </select>
+
 	                                </td>
+
 	                                <td valign="middle" style="vertical-align:middle" >
+
 		                                <span style="white-space: nowrap;height: 100px;" > <a href="#" id="add">
+
 										<img  src="${createLinkTo(dir:'images',file:'right-arrow.png')}" style="float: left; border: none;"/>
+
 										</a></span><br/><br/><br/><br/>
+
 		                                <span style="white-space: nowrap;"> <a href="#" id="remove">
+
 		                                <img  src="${createLinkTo(dir:'images',file:'left-arrow.png')}" style="float: left; border: none;"/>
+
 		                                </a></span>
+
 	                                </td>
+
 	                                <td valign="top" class="name">
+
 		                                <select name="assignedRole" id="assignedRoleId" multiple="multiple" size="10" style="width: 250px">
+
 			                                <g:if test="${assignedRole}">
+
 				                                <g:each in="${assignedRole}" var="assignedRole">
+
 				                                	<option value="${assignedRole}" selected="selected">${RoleType.findById(assignedRole)}</option>
+
 				                                </g:each>
+
 			                                </g:if>
+
 			                                <g:else>
+
 			                                	<option value="USER" selected="selected">${RoleType.findById('USER')}</option>
+
 			                                </g:else>
+
 		                                </select>
+
 	                                </td>
+
                                 </tr>
+
                                 </table>
+
                                 </td>
+
                                 
                             </tr> 
+
                                                    
                         </tbody>
                     </table>
@@ -177,5 +259,9 @@
                 </div>
             </g:form>
         </div>
+<script>
+	currentMenuId = "#adminMenu";
+	$("#adminMenuId a").css('background-color','#003366')
+</script>
     </body>
 </html>
