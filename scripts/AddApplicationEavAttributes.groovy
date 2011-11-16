@@ -19,11 +19,11 @@ if(!appAttributeSet){
 /**
  *  Create Name
  */
-def nameAttribute = EavAttribute.findByAttributeCodeAndEntityType('name',appEntityType)
+def nameAttribute = EavAttribute.findByAttributeCodeAndEntityType('assetName',appEntityType)
 if(nameAttribute){
-	EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'name', frontendLabel='Name' where id = ?",[nameAttribute.id])
+	EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'assetName', frontendLabel='Name' where id = ?",[nameAttribute.id])
 } else {
-	nameAttribute = new EavAttribute( attributeCode : "name",
+	nameAttribute = new EavAttribute( attributeCode : "assetName",
 			backendType : 'String',
 			frontendInput : 'text',
 			frontendLabel : 'Name',
@@ -43,9 +43,9 @@ if(nameAttribute){
 
 def nameEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(nameAttribute,appAttributeSet)
 if(nameEavEntityAttribute){
-	EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'name' where attributeCode = 'name'")
+	EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 10, attributeCode = 'assetName' where attributeCode = 'assetName'")
 } else {
-	nameEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:nameAttribute,eavAttributeSet:appAttributeSet)
+	nameEavEntityAttribute = new EavEntityAttribute(sortOrder:10,attribute:nameAttribute,eavAttributeSet:appAttributeSet)
 	if ( !nameEavEntityAttribute.validate() || !nameEavEntityAttribute.save(flush:true) ) {
 		println"Unable to create nameEavEntityAttribute : " +
 				nameEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -54,7 +54,7 @@ if(nameEavEntityAttribute){
 
 def nameDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,nameAttribute)
 if( !nameDataTransferMapMaster ){
-	nameDataTransferMapMaster = new DataTransferAttributeMap(columnName:"name",
+	nameDataTransferMapMaster = new DataTransferAttributeMap(columnName:"assetName",
 			sheetName:"Applications",
 			dataTransferSet : masterDataTransferSet,
 			eavAttribute:nameAttribute,
@@ -66,12 +66,12 @@ if( !nameDataTransferMapMaster ){
 				nameDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
 	}
 } else {
-	DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'name',sheetName='Applications' where eavAttribute = ?",[nameAttribute])
+	DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'assetName',sheetName='Applications' where eavAttribute = ?",[nameAttribute])
 }
 
 def nameDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,nameAttribute)
 if(!nameDataTransferMapWalkThru){
-	nameDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"name",
+	nameDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"assetName",
 			sheetName:"Applications",
 			dataTransferSet : walkThruDataTransferSet,
 			eavAttribute:nameAttribute,
@@ -83,21 +83,21 @@ if(!nameDataTransferMapWalkThru){
 				nameDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
 	}
 } else {
-	DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'name',sheetName='Applications' where eavAttribute = ?",[nameAttribute])
+	DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'assetName',sheetName='Applications' where eavAttribute = ?",[nameAttribute])
 }
 /**
 *  Create Vendor
 */
-def vendorAttribute = EavAttribute.findByAttributeCodeAndEntityType('vendor',appEntityType)
+def vendorAttribute = EavAttribute.findByAttributeCodeAndEntityType('appVendor',appEntityType)
 if(vendorAttribute){
-   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'vendor', frontendLabel='Vendor' where id = ?",[vendorAttribute.id])
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'appVendor', frontendLabel='Vendor' where id = ?",[vendorAttribute.id])
 } else {
-   vendorAttribute = new EavAttribute( attributeCode : "vendor",
+   vendorAttribute = new EavAttribute( attributeCode : "appVendor",
 		   backendType : 'String',
 		   frontendInput : 'text',
 		   frontendLabel : 'Vendor',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 20,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -112,9 +112,9 @@ if(vendorAttribute){
 
 def vendorEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(vendorAttribute,appAttributeSet)
 if(vendorEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'vendor' where attributeCode = 'vendor'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 20, attributeCode = 'appVendor' where attributeCode = 'appVendor'")
 } else {
-   vendorEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:vendorAttribute,eavAttributeSet:appAttributeSet)
+   vendorEavEntityAttribute = new EavEntityAttribute(sortOrder:20,attribute:vendorAttribute,eavAttributeSet:appAttributeSet)
    if ( !vendorEavEntityAttribute.validate() || !vendorEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create vendorEavEntityAttribute : " +
 			   vendorEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -123,7 +123,7 @@ if(vendorEavEntityAttribute){
 
 def vendorDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,vendorAttribute)
 if( !vendorDataTransferMapMaster ){
-   vendorDataTransferMapMaster = new DataTransferAttributeMap(columnName:"vendor",
+   vendorDataTransferMapMaster = new DataTransferAttributeMap(columnName:"appVendor",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:vendorAttribute,
@@ -135,12 +135,12 @@ if( !vendorDataTransferMapMaster ){
 			   vendorDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'vendor',sheetName='Applications' where eavAttribute = ?",[vendorAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appVendor',sheetName='Applications' where eavAttribute = ?",[vendorAttribute])
 }
 
 def vendorDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,vendorAttribute)
 if(!vendorDataTransferMapWalkThru){
-   vendorDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"vendor",
+   vendorDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"appVendor",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:vendorAttribute,
@@ -152,21 +152,21 @@ if(!vendorDataTransferMapWalkThru){
 			   vendorDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'vendor',sheetName='Applications' where eavAttribute = ?",[vendorAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appVendor',sheetName='Applications' where eavAttribute = ?",[vendorAttribute])
 }
 /**
 *  Create Version
 */
-def versionAttribute = EavAttribute.findByAttributeCodeAndEntityType('version',appEntityType)
+def versionAttribute = EavAttribute.findByAttributeCodeAndEntityType('appVersion',appEntityType)
 if(versionAttribute){
-   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'version', frontendLabel='Version' where id = ?",[versionAttribute.id])
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'appVersion', frontendLabel='Version' where id = ?",[versionAttribute.id])
 } else {
-   versionAttribute = new EavAttribute( attributeCode : "version",
+   versionAttribute = new EavAttribute( attributeCode : "appVersion",
 		   backendType : 'String',
 		   frontendInput : 'text',
 		   frontendLabel : 'Version',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 30,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -181,9 +181,9 @@ if(versionAttribute){
 
 def versionEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(versionAttribute,appAttributeSet)
 if(versionEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'version' where attributeCode = 'version'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 30, attributeCode = 'appVersion' where attributeCode = 'appVersion'")
 } else {
-   versionEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:versionAttribute,eavAttributeSet:appAttributeSet)
+   versionEavEntityAttribute = new EavEntityAttribute(sortOrder:30,attribute:versionAttribute,eavAttributeSet:appAttributeSet)
    if ( !versionEavEntityAttribute.validate() || !versionEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create versionEavEntityAttribute : " +
 			   versionEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -192,7 +192,7 @@ if(versionEavEntityAttribute){
 
 def versionDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,versionAttribute)
 if( !versionDataTransferMapMaster ){
-   versionDataTransferMapMaster = new DataTransferAttributeMap(columnName:"version",
+   versionDataTransferMapMaster = new DataTransferAttributeMap(columnName:"appVersion",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:versionAttribute,
@@ -204,12 +204,12 @@ if( !versionDataTransferMapMaster ){
 			   versionDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'version',sheetName='Applications' where eavAttribute = ?",[versionAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appVersion',sheetName='Applications' where eavAttribute = ?",[versionAttribute])
 }
 
 def versionDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,versionAttribute)
 if(!versionDataTransferMapWalkThru){
-   versionDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"version",
+   versionDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"appVersion",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:versionAttribute,
@@ -221,21 +221,21 @@ if(!versionDataTransferMapWalkThru){
 			   versionDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'version',sheetName='Applications' where eavAttribute = ?",[versionAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appVersion',sheetName='Applications' where eavAttribute = ?",[versionAttribute])
 }
 /**
 *  Create Technology
 */
-def technologyAttribute = EavAttribute.findByAttributeCodeAndEntityType('technology',appEntityType)
+def technologyAttribute = EavAttribute.findByAttributeCodeAndEntityType('appTech',appEntityType)
 if(technologyAttribute){
-   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'technology', frontendLabel='Technology' where id = ?",[technologyAttribute.id])
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'appTech', frontendLabel='Technology' where id = ?",[technologyAttribute.id])
 } else {
-   technologyAttribute = new EavAttribute( attributeCode : "technology",
+   technologyAttribute = new EavAttribute( attributeCode : "appTech",
 		   backendType : 'String',
 		   frontendInput : 'text',
 		   frontendLabel : 'Technology',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 40,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -250,9 +250,9 @@ if(technologyAttribute){
 
 def technologyEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(technologyAttribute,appAttributeSet)
 if(technologyEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'technology' where attributeCode = 'technology'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 40, attributeCode = 'appTech' where attributeCode = 'appTech'")
 } else {
-   technologyEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:technologyAttribute,eavAttributeSet:appAttributeSet)
+   technologyEavEntityAttribute = new EavEntityAttribute(sortOrder:40,attribute:technologyAttribute,eavAttributeSet:appAttributeSet)
    if ( !technologyEavEntityAttribute.validate() || !technologyEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create technologyEavEntityAttribute : " +
 			   technologyEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -261,7 +261,7 @@ if(technologyEavEntityAttribute){
 
 def technologyDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,technologyAttribute)
 if( !technologyDataTransferMapMaster ){
-   technologyDataTransferMapMaster = new DataTransferAttributeMap(columnName:"technology",
+   technologyDataTransferMapMaster = new DataTransferAttributeMap(columnName:"appTech",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:technologyAttribute,
@@ -273,12 +273,12 @@ if( !technologyDataTransferMapMaster ){
 			   technologyDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'technology',sheetName='Applications' where eavAttribute = ?",[technologyAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appTech',sheetName='Applications' where eavAttribute = ?",[technologyAttribute])
 }
 
 def technologyDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,technologyAttribute)
 if(!technologyDataTransferMapWalkThru){
-   technologyDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"technology",
+   technologyDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"appTech",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:technologyAttribute,
@@ -290,21 +290,21 @@ if(!technologyDataTransferMapWalkThru){
 			   technologyDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'technology',sheetName='Applications' where eavAttribute = ?",[technologyAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appTech',sheetName='Applications' where eavAttribute = ?",[technologyAttribute])
 }
 /**
 *  Create AccessType
 */
-def accessTypeAttribute = EavAttribute.findByAttributeCodeAndEntityType('accessType',appEntityType)
+def accessTypeAttribute = EavAttribute.findByAttributeCodeAndEntityType('appAccess',appEntityType)
 if(accessTypeAttribute){
-   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'accessType', frontendLabel='AccessType' where id = ?",[accessTypeAttribute.id])
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'appAccess', frontendLabel='AccessType' where id = ?",[accessTypeAttribute.id])
 } else {
-   accessTypeAttribute = new EavAttribute( attributeCode : "accessType",
+   accessTypeAttribute = new EavAttribute( attributeCode : "appAccess",
 		   backendType : 'String',
 		   frontendInput : 'text',
 		   frontendLabel : 'AccessType',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 50,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -319,9 +319,9 @@ if(accessTypeAttribute){
 
 def accessTypeEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(accessTypeAttribute,appAttributeSet)
 if(accessTypeEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'accessType' where attributeCode = 'accessType'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 50, attributeCode = 'appAccess' where attributeCode = 'appAccess'")
 } else {
-   accessTypeEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:accessTypeAttribute,eavAttributeSet:appAttributeSet)
+   accessTypeEavEntityAttribute = new EavEntityAttribute(sortOrder:50,attribute:accessTypeAttribute,eavAttributeSet:appAttributeSet)
    if ( !accessTypeEavEntityAttribute.validate() || !accessTypeEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create accessTypeEavEntityAttribute : " +
 			   accessTypeEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -330,7 +330,7 @@ if(accessTypeEavEntityAttribute){
 
 def accessTypeDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,accessTypeAttribute)
 if( !accessTypeDataTransferMapMaster ){
-   accessTypeDataTransferMapMaster = new DataTransferAttributeMap(columnName:"accessType",
+   accessTypeDataTransferMapMaster = new DataTransferAttributeMap(columnName:"appAccess",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:accessTypeAttribute,
@@ -342,12 +342,12 @@ if( !accessTypeDataTransferMapMaster ){
 			   accessTypeDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'accessType',sheetName='Applications' where eavAttribute = ?",[accessTypeAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appAccess',sheetName='Applications' where eavAttribute = ?",[accessTypeAttribute])
 }
 
 def accessTypeDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,accessTypeAttribute)
 if(!accessTypeDataTransferMapWalkThru){
-   accessTypeDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"accessType",
+   accessTypeDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"appAccess",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:accessTypeAttribute,
@@ -359,21 +359,21 @@ if(!accessTypeDataTransferMapWalkThru){
 			   accessTypeDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'accessType',sheetName='Applications' where eavAttribute = ?",[accessTypeAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appAccess',sheetName='Applications' where eavAttribute = ?",[accessTypeAttribute])
 }
 /**
 *  Create Source
 */
-def sourceAttribute = EavAttribute.findByAttributeCodeAndEntityType('source',appEntityType)
+def sourceAttribute = EavAttribute.findByAttributeCodeAndEntityType('appSource',appEntityType)
 if(sourceAttribute){
-   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'source', frontendLabel='Source' where id = ?",[sourceAttribute.id])
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'appSource', frontendLabel='Source' where id = ?",[sourceAttribute.id])
 } else {
-   sourceAttribute = new EavAttribute( attributeCode : "source",
+   sourceAttribute = new EavAttribute( attributeCode : "appSource",
 		   backendType : 'String',
 		   frontendInput : 'text',
 		   frontendLabel : 'Source',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 60,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -388,9 +388,9 @@ if(sourceAttribute){
 
 def sourceEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(sourceAttribute,appAttributeSet)
 if(sourceEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'source' where attributeCode = 'source'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 60, attributeCode = 'appSource' where attributeCode = 'appSource'")
 } else {
-   sourceEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:sourceAttribute,eavAttributeSet:appAttributeSet)
+   sourceEavEntityAttribute = new EavEntityAttribute(sortOrder:60,attribute:sourceAttribute,eavAttributeSet:appAttributeSet)
    if ( !sourceEavEntityAttribute.validate() || !sourceEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create sourceEavEntityAttribute : " +
 			   sourceEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -399,7 +399,7 @@ if(sourceEavEntityAttribute){
 
 def sourceDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,sourceAttribute)
 if( !sourceDataTransferMapMaster ){
-   sourceDataTransferMapMaster = new DataTransferAttributeMap(columnName:"source",
+   sourceDataTransferMapMaster = new DataTransferAttributeMap(columnName:"appSource",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:sourceAttribute,
@@ -411,12 +411,12 @@ if( !sourceDataTransferMapMaster ){
 			   sourceDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'source',sheetName='Applications' where eavAttribute = ?",[sourceAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appSource',sheetName='Applications' where eavAttribute = ?",[sourceAttribute])
 }
 
 def sourceDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,sourceAttribute)
 if(!sourceDataTransferMapWalkThru){
-   sourceDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"source",
+   sourceDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"appSource",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:sourceAttribute,
@@ -428,7 +428,7 @@ if(!sourceDataTransferMapWalkThru){
 			   sourceDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'source',sheetName='Applications' where eavAttribute = ?",[sourceAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appSource',sheetName='Applications' where eavAttribute = ?",[sourceAttribute])
 }
 /**
 *  Create License
@@ -442,7 +442,7 @@ if(licenseAttribute){
 		   frontendInput : 'text',
 		   frontendLabel : 'License',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 70,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -457,9 +457,9 @@ if(licenseAttribute){
 
 def licenseEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(licenseAttribute,appAttributeSet)
 if(licenseEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'license' where attributeCode = 'license'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 70, attributeCode = 'license' where attributeCode = 'license'")
 } else {
-   licenseEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:licenseAttribute,eavAttributeSet:appAttributeSet)
+   licenseEavEntityAttribute = new EavEntityAttribute(sortOrder:70,attribute:licenseAttribute,eavAttributeSet:appAttributeSet)
    if ( !licenseEavEntityAttribute.validate() || !licenseEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create licenseEavEntityAttribute : " +
 			   licenseEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -511,7 +511,7 @@ if(descriptionAttribute){
 		   frontendInput : 'text',
 		   frontendLabel : 'Description',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 80,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -526,9 +526,9 @@ if(descriptionAttribute){
 
 def descriptionEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(descriptionAttribute,appAttributeSet)
 if(descriptionEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'description' where attributeCode = 'description'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 80, attributeCode = 'description' where attributeCode = 'description'")
 } else {
-   descriptionEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:descriptionAttribute,eavAttributeSet:appAttributeSet)
+   descriptionEavEntityAttribute = new EavEntityAttribute(sortOrder:80,attribute:descriptionAttribute,eavAttributeSet:appAttributeSet)
    if ( !descriptionEavEntityAttribute.validate() || !descriptionEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create descriptionEavEntityAttribute : " +
 			   descriptionEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -580,7 +580,7 @@ if(supportTypeAttribute){
 		   frontendInput : 'text',
 		   frontendLabel : 'SupportType',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 90,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -595,9 +595,9 @@ if(supportTypeAttribute){
 
 def supportTypeEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(supportTypeAttribute,appAttributeSet)
 if(supportTypeEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'supportType' where attributeCode = 'supportType'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 90, attributeCode = 'supportType' where attributeCode = 'supportType'")
 } else {
-   supportTypeEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:supportTypeAttribute,eavAttributeSet:appAttributeSet)
+   supportTypeEavEntityAttribute = new EavEntityAttribute(sortOrder:90,attribute:supportTypeAttribute,eavAttributeSet:appAttributeSet)
    if ( !supportTypeEavEntityAttribute.validate() || !supportTypeEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create supportTypeEavEntityAttribute : " +
 			   supportTypeEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -649,7 +649,7 @@ if(smeAttribute){
 		   frontendInput : 'text',
 		   frontendLabel : 'SME',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 100,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -664,9 +664,9 @@ if(smeAttribute){
 
 def smeEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(smeAttribute,appAttributeSet)
 if(smeEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'sme' where attributeCode = 'sme'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 100, attributeCode = 'sme' where attributeCode = 'sme'")
 } else {
-   smeEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:smeAttribute,eavAttributeSet:appAttributeSet)
+   smeEavEntityAttribute = new EavEntityAttribute(sortOrder:100,attribute:smeAttribute,eavAttributeSet:appAttributeSet)
    if ( !smeEavEntityAttribute.validate() || !smeEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create smeEavEntityAttribute : " +
 			   smeEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -718,7 +718,7 @@ if(sme2Attribute){
 		   frontendInput : 'text',
 		   frontendLabel : 'SME2',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 110,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -733,9 +733,9 @@ if(sme2Attribute){
 
 def sme2EavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(sme2Attribute,appAttributeSet)
 if(sme2EavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'sme2' where attributeCode = 'sme2'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 120, attributeCode = 'sme2' where attributeCode = 'sme2'")
 } else {
-   sme2EavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:sme2Attribute,eavAttributeSet:appAttributeSet)
+   sme2EavEntityAttribute = new EavEntityAttribute(sortOrder:120,attribute:sme2Attribute,eavAttributeSet:appAttributeSet)
    if ( !sme2EavEntityAttribute.validate() || !sme2EavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create sme2EavEntityAttribute : " +
 			   sme2EavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -787,7 +787,7 @@ if(businessUnitAttribute){
 		   frontendInput : 'text',
 		   frontendLabel : 'BusinessUnit',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 130,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -802,9 +802,9 @@ if(businessUnitAttribute){
 
 def businessUnitEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(businessUnitAttribute,appAttributeSet)
 if(businessUnitEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'businessUnit' where attributeCode = 'businessUnit'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 130, attributeCode = 'businessUnit' where attributeCode = 'businessUnit'")
 } else {
-   businessUnitEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:businessUnitAttribute,eavAttributeSet:appAttributeSet)
+   businessUnitEavEntityAttribute = new EavEntityAttribute(sortOrder:130,attribute:businessUnitAttribute,eavAttributeSet:appAttributeSet)
    if ( !businessUnitEavEntityAttribute.validate() || !businessUnitEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create businessUnitEavEntityAttribute : " +
 			   businessUnitEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -856,7 +856,7 @@ if(ownerAttribute){
 		   frontendInput : 'text',
 		   frontendLabel : 'Owner',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 140,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -871,9 +871,9 @@ if(ownerAttribute){
 
 def ownerEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(ownerAttribute,appAttributeSet)
 if(ownerEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'owner' where attributeCode = 'owner'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 140, attributeCode = 'owner' where attributeCode = 'owner'")
 } else {
-   ownerEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:ownerAttribute,eavAttributeSet:appAttributeSet)
+   ownerEavEntityAttribute = new EavEntityAttribute(sortOrder:140,attribute:ownerAttribute,eavAttributeSet:appAttributeSet)
    if ( !ownerEavEntityAttribute.validate() || !ownerEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create ownerEavEntityAttribute : " +
 			   ownerEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -916,16 +916,16 @@ if(!ownerDataTransferMapWalkThru){
 /**
 *  Create Retire
 */
-def retireAttribute = EavAttribute.findByAttributeCodeAndEntityType('retire',appEntityType)
+def retireAttribute = EavAttribute.findByAttributeCodeAndEntityType('retireDate',appEntityType)
 if(retireAttribute){
-   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'retire', frontendLabel='Retire' where id = ?",[retireAttribute.id])
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'retireDate', frontendLabel='Retire' where id = ?",[retireAttribute.id])
 } else {
-   retireAttribute = new EavAttribute( attributeCode : "retire",
+   retireAttribute = new EavAttribute( attributeCode : "retireDate",
 		   backendType : 'String',
 		   frontendInput : 'text',
 		   frontendLabel : 'Retire',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 150,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -940,9 +940,9 @@ if(retireAttribute){
 
 def retireEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(retireAttribute,appAttributeSet)
 if(retireEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'retire' where attributeCode = 'retire'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 150, attributeCode = 'retireDate' where attributeCode = 'retireDate'")
 } else {
-   retireEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:retireAttribute,eavAttributeSet:appAttributeSet)
+   retireEavEntityAttribute = new EavEntityAttribute(sortOrder:150,attribute:retireAttribute,eavAttributeSet:appAttributeSet)
    if ( !retireEavEntityAttribute.validate() || !retireEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create retireEavEntityAttribute : " +
 			   retireEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -951,7 +951,7 @@ if(retireEavEntityAttribute){
 
 def retireDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,retireAttribute)
 if( !retireDataTransferMapMaster ){
-   retireDataTransferMapMaster = new DataTransferAttributeMap(columnName:"retire",
+   retireDataTransferMapMaster = new DataTransferAttributeMap(columnName:"retireDate",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:retireAttribute,
@@ -963,12 +963,12 @@ if( !retireDataTransferMapMaster ){
 			   retireDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'retire',sheetName='Applications' where eavAttribute = ?",[retireAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'retireDate',sheetName='Applications' where eavAttribute = ?",[retireAttribute])
 }
 
 def retireDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,retireAttribute)
 if(!retireDataTransferMapWalkThru){
-   retireDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"retire",
+   retireDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"retireDate",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:retireAttribute,
@@ -980,21 +980,21 @@ if(!retireDataTransferMapWalkThru){
 			   retireDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'retire',sheetName='Applications' where eavAttribute = ?",[retireAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'retireDate',sheetName='Applications' where eavAttribute = ?",[retireAttribute])
 }
 /**
 *  Create MaintExp
 */
-def maintExpAttribute = EavAttribute.findByAttributeCodeAndEntityType('maintExp',appEntityType)
+def maintExpAttribute = EavAttribute.findByAttributeCodeAndEntityType('maintExpDate',appEntityType)
 if(maintExpAttribute){
-   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'maintExp', frontendLabel='MaintExp' where id = ?",[maintExpAttribute.id])
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'maintExpDate', frontendLabel='MaintExp' where id = ?",[maintExpAttribute.id])
 } else {
-   maintExpAttribute = new EavAttribute( attributeCode : "maintExp",
+   maintExpAttribute = new EavAttribute( attributeCode : "maintExpDate",
 		   backendType : 'String',
 		   frontendInput : 'text',
 		   frontendLabel : 'MaintExp',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 160,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -1009,9 +1009,9 @@ if(maintExpAttribute){
 
 def maintExpEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(maintExpAttribute,appAttributeSet)
 if(maintExpEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'maintExp' where attributeCode = 'maintExp'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 160, attributeCode = 'maintExpDate' where attributeCode = 'maintExpDate'")
 } else {
-   maintExpEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:maintExpAttribute,eavAttributeSet:appAttributeSet)
+   maintExpEavEntityAttribute = new EavEntityAttribute(sortOrder:160,attribute:maintExpAttribute,eavAttributeSet:appAttributeSet)
    if ( !maintExpEavEntityAttribute.validate() || !maintExpEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create maintExpEavEntityAttribute : " +
 			   maintExpEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -1020,7 +1020,7 @@ if(maintExpEavEntityAttribute){
 
 def maintExpDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,maintExpAttribute)
 if( !maintExpDataTransferMapMaster ){
-   maintExpDataTransferMapMaster = new DataTransferAttributeMap(columnName:"maintExp",
+   maintExpDataTransferMapMaster = new DataTransferAttributeMap(columnName:"maintExpDate",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:maintExpAttribute,
@@ -1032,12 +1032,12 @@ if( !maintExpDataTransferMapMaster ){
 			   maintExpDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'maintExp',sheetName='Applications' where eavAttribute = ?",[maintExpAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'maintExpDate',sheetName='Applications' where eavAttribute = ?",[maintExpAttribute])
 }
 
 def maintExpDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,maintExpAttribute)
 if(!maintExpDataTransferMapWalkThru){
-   maintExpDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"maintExp",
+   maintExpDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"maintExpDate",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:maintExpAttribute,
@@ -1049,21 +1049,21 @@ if(!maintExpDataTransferMapWalkThru){
 			   maintExpDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'maintExp',sheetName='Applications' where eavAttribute = ?",[maintExpAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'maintExpDate',sheetName='Applications' where eavAttribute = ?",[maintExpAttribute])
 }
 /**
 *  Create Function
 */
-def functionAttribute = EavAttribute.findByAttributeCodeAndEntityType('function',appEntityType)
+def functionAttribute = EavAttribute.findByAttributeCodeAndEntityType('appFunction',appEntityType)
 if(functionAttribute){
-   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'function', frontendLabel='Function' where id = ?",[functionAttribute.id])
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'appFunction', frontendLabel='Function' where id = ?",[functionAttribute.id])
 } else {
-   functionAttribute = new EavAttribute( attributeCode : "function",
+   functionAttribute = new EavAttribute( attributeCode : "appFunction",
 		   backendType : 'String',
 		   frontendInput : 'text',
 		   frontendLabel : 'Function',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 170,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -1078,9 +1078,9 @@ if(functionAttribute){
 
 def functionEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(functionAttribute,appAttributeSet)
 if(functionEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'function' where attributeCode = 'function'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 170, attributeCode = 'appFunction' where attributeCode = 'appFunction'")
 } else {
-   functionEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:functionAttribute,eavAttributeSet:appAttributeSet)
+   functionEavEntityAttribute = new EavEntityAttribute(sortOrder:170,attribute:functionAttribute,eavAttributeSet:appAttributeSet)
    if ( !functionEavEntityAttribute.validate() || !functionEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create functionEavEntityAttribute : " +
 			   functionEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -1089,7 +1089,7 @@ if(functionEavEntityAttribute){
 
 def functionDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,functionAttribute)
 if( !functionDataTransferMapMaster ){
-   functionDataTransferMapMaster = new DataTransferAttributeMap(columnName:"function",
+   functionDataTransferMapMaster = new DataTransferAttributeMap(columnName:"appFunction",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:functionAttribute,
@@ -1101,12 +1101,12 @@ if( !functionDataTransferMapMaster ){
 			   functionDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'function',sheetName='Applications' where eavAttribute = ?",[functionAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appFunction',sheetName='Applications' where eavAttribute = ?",[functionAttribute])
 }
 
 def functionDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,functionAttribute)
 if(!functionDataTransferMapWalkThru){
-   functionDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"function",
+   functionDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"appFunction",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:functionAttribute,
@@ -1118,7 +1118,7 @@ if(!functionDataTransferMapWalkThru){
 			   functionDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'function',sheetName='Applications' where eavAttribute = ?",[functionAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appFunction',sheetName='Applications' where eavAttribute = ?",[functionAttribute])
 }
 /**
 *  Create Environment
@@ -1132,7 +1132,7 @@ if(environmentAttribute){
 		   frontendInput : 'text',
 		   frontendLabel : 'Environment',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 180,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -1147,9 +1147,9 @@ if(environmentAttribute){
 
 def environmentEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(environmentAttribute,appAttributeSet)
 if(environmentEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'environment' where attributeCode = 'environment'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 180, attributeCode = 'environment' where attributeCode = 'environment'")
 } else {
-   environmentEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:environmentAttribute,eavAttributeSet:appAttributeSet)
+   environmentEavEntityAttribute = new EavEntityAttribute(sortOrder:180,attribute:environmentAttribute,eavAttributeSet:appAttributeSet)
    if ( !environmentEavEntityAttribute.validate() || !environmentEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create environmentEavEntityAttribute : " +
 			   environmentEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -1201,7 +1201,7 @@ if(criticalityAttribute){
 		   frontendInput : 'text',
 		   frontendLabel : 'Criticality',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 190,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -1216,9 +1216,9 @@ if(criticalityAttribute){
 
 def criticalityEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(criticalityAttribute,appAttributeSet)
 if(criticalityEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'criticality' where attributeCode = 'criticality'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 190, attributeCode = 'criticality' where attributeCode = 'criticality'")
 } else {
-   criticalityEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:criticalityAttribute,eavAttributeSet:appAttributeSet)
+   criticalityEavEntityAttribute = new EavEntityAttribute(sortOrder:190,attribute:criticalityAttribute,eavAttributeSet:appAttributeSet)
    if ( !criticalityEavEntityAttribute.validate() || !criticalityEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create criticalityEavEntityAttribute : " +
 			   criticalityEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -1270,7 +1270,7 @@ if(moveBundleAttribute){
 		   frontendInput : 'text',
 		   frontendLabel : 'MoveBundle',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 200,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -1285,9 +1285,9 @@ if(moveBundleAttribute){
 
 def moveBundleEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(moveBundleAttribute,appAttributeSet)
 if(moveBundleEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'moveBundle' where attributeCode = 'moveBundle'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 200, attributeCode = 'moveBundle' where attributeCode = 'moveBundle'")
 } else {
-   moveBundleEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:moveBundleAttribute,eavAttributeSet:appAttributeSet)
+   moveBundleEavEntityAttribute = new EavEntityAttribute(sortOrder:200,attribute:moveBundleAttribute,eavAttributeSet:appAttributeSet)
    if ( !moveBundleEavEntityAttribute.validate() || !moveBundleEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create moveBundleEavEntityAttribute : " +
 			   moveBundleEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -1339,7 +1339,7 @@ if(planStatusAttribute){
 		   frontendInput : 'text',
 		   frontendLabel : 'PlanStatus',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 210,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -1354,9 +1354,9 @@ if(planStatusAttribute){
 
 def planStatusEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(planStatusAttribute,appAttributeSet)
 if(planStatusEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'planStatus' where attributeCode = 'planStatus'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 210, attributeCode = 'planStatus' where attributeCode = 'planStatus'")
 } else {
-   planStatusEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:planStatusAttribute,eavAttributeSet:appAttributeSet)
+   planStatusEavEntityAttribute = new EavEntityAttribute(sortOrder:210,attribute:planStatusAttribute,eavAttributeSet:appAttributeSet)
    if ( !planStatusEavEntityAttribute.validate() || !planStatusEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create planStatusEavEntityAttribute : " +
 			   planStatusEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -1399,16 +1399,16 @@ if(!planStatusDataTransferMapWalkThru){
 /**
 *  Create TotalUsers
 */
-def totalUsersAttribute = EavAttribute.findByAttributeCodeAndEntityType('totalUsers',appEntityType)
+def totalUsersAttribute = EavAttribute.findByAttributeCodeAndEntityType('userCount',appEntityType)
 if(totalUsersAttribute){
-   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'totalUsers', frontendLabel='TotalUsers' where id = ?",[totalUsersAttribute.id])
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'userCount', frontendLabel='TotalUsers' where id = ?",[totalUsersAttribute.id])
 } else {
-   totalUsersAttribute = new EavAttribute( attributeCode : "totalUsers",
+   totalUsersAttribute = new EavAttribute( attributeCode : "userCount",
 		   backendType : 'String',
 		   frontendInput : 'text',
 		   frontendLabel : 'TotalUsers',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 220,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -1423,9 +1423,9 @@ if(totalUsersAttribute){
 
 def totalUsersEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(totalUsersAttribute,appAttributeSet)
 if(totalUsersEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'totalUsers' where attributeCode = 'totalUsers'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 220, attributeCode = 'userCount' where attributeCode = 'userCount'")
 } else {
-   totalUsersEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:totalUsersAttribute,eavAttributeSet:appAttributeSet)
+   totalUsersEavEntityAttribute = new EavEntityAttribute(sortOrder:220,attribute:totalUsersAttribute,eavAttributeSet:appAttributeSet)
    if ( !totalUsersEavEntityAttribute.validate() || !totalUsersEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create totalUsersEavEntityAttribute : " +
 			   totalUsersEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -1434,7 +1434,7 @@ if(totalUsersEavEntityAttribute){
 
 def totalUsersDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,totalUsersAttribute)
 if( !totalUsersDataTransferMapMaster ){
-   totalUsersDataTransferMapMaster = new DataTransferAttributeMap(columnName:"totalUsers",
+   totalUsersDataTransferMapMaster = new DataTransferAttributeMap(columnName:"userCount",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:totalUsersAttribute,
@@ -1446,12 +1446,12 @@ if( !totalUsersDataTransferMapMaster ){
 			   totalUsersDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'totalUsers',sheetName='Applications' where eavAttribute = ?",[totalUsersAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'userCount',sheetName='Applications' where eavAttribute = ?",[totalUsersAttribute])
 }
 
 def totalUsersDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,totalUsersAttribute)
 if(!totalUsersDataTransferMapWalkThru){
-   totalUsersDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"totalUsers",
+   totalUsersDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"userCount",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:totalUsersAttribute,
@@ -1463,7 +1463,7 @@ if(!totalUsersDataTransferMapWalkThru){
 			   totalUsersDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'totalUsers',sheetName='Applications' where eavAttribute = ?",[totalUsersAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'userCount',sheetName='Applications' where eavAttribute = ?",[totalUsersAttribute])
 }
 /**
 *  Create UserLocations
@@ -1477,7 +1477,7 @@ if(userLocationsAttribute){
 		   frontendInput : 'text',
 		   frontendLabel : 'UserLocations',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 230,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -1492,9 +1492,9 @@ if(userLocationsAttribute){
 
 def userLocationsEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(userLocationsAttribute,appAttributeSet)
 if(userLocationsEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'userLocations' where attributeCode = 'userLocations'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 230, attributeCode = 'userLocations' where attributeCode = 'userLocations'")
 } else {
-   userLocationsEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:userLocationsAttribute,eavAttributeSet:appAttributeSet)
+   userLocationsEavEntityAttribute = new EavEntityAttribute(sortOrder:230,attribute:userLocationsAttribute,eavAttributeSet:appAttributeSet)
    if ( !userLocationsEavEntityAttribute.validate() || !userLocationsEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create userLocationsEavEntityAttribute : " +
 			   userLocationsEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -1537,16 +1537,16 @@ if(!userLocationsDataTransferMapWalkThru){
 /**
 *  Create ConcurrentUsers
 */
-def concurrentUsersAttribute = EavAttribute.findByAttributeCodeAndEntityType('concurrentUsers',appEntityType)
+def concurrentUsersAttribute = EavAttribute.findByAttributeCodeAndEntityType('userConcurrent',appEntityType)
 if(concurrentUsersAttribute){
-   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'concurrentUsers', frontendLabel='ConcurrentUsers' where id = ?",[concurrentUsersAttribute.id])
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'userConcurrent', frontendLabel='ConcurrentUsers' where id = ?",[concurrentUsersAttribute.id])
 } else {
-   concurrentUsersAttribute = new EavAttribute( attributeCode : "concurrentUsers",
+   concurrentUsersAttribute = new EavAttribute( attributeCode : "userConcurrent",
 		   backendType : 'String',
 		   frontendInput : 'text',
 		   frontendLabel : 'ConcurrentUsers',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 240,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -1561,9 +1561,9 @@ if(concurrentUsersAttribute){
 
 def concurrentUsersEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(concurrentUsersAttribute,appAttributeSet)
 if(concurrentUsersEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'concurrentUsers' where attributeCode = 'concurrentUsers'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 240, attributeCode = 'userConcurrent' where attributeCode = 'userConcurrent'")
 } else {
-   concurrentUsersEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:concurrentUsersAttribute,eavAttributeSet:appAttributeSet)
+   concurrentUsersEavEntityAttribute = new EavEntityAttribute(sortOrder:240,attribute:concurrentUsersAttribute,eavAttributeSet:appAttributeSet)
    if ( !concurrentUsersEavEntityAttribute.validate() || !concurrentUsersEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create concurrentUsersEavEntityAttribute : " +
 			   concurrentUsersEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -1572,7 +1572,7 @@ if(concurrentUsersEavEntityAttribute){
 
 def concurrentUsersDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,concurrentUsersAttribute)
 if( !concurrentUsersDataTransferMapMaster ){
-   concurrentUsersDataTransferMapMaster = new DataTransferAttributeMap(columnName:"concurrentUsers",
+   concurrentUsersDataTransferMapMaster = new DataTransferAttributeMap(columnName:"userConcurrent",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:concurrentUsersAttribute,
@@ -1584,12 +1584,12 @@ if( !concurrentUsersDataTransferMapMaster ){
 			   concurrentUsersDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'concurrentUsers',sheetName='Applications' where eavAttribute = ?",[concurrentUsersAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'userConcurrent',sheetName='Applications' where eavAttribute = ?",[concurrentUsersAttribute])
 }
 
 def concurrentUsersDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,concurrentUsersAttribute)
 if(!concurrentUsersDataTransferMapWalkThru){
-   concurrentUsersDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"concurrentUsers",
+   concurrentUsersDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"userConcurrent",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:concurrentUsersAttribute,
@@ -1601,21 +1601,21 @@ if(!concurrentUsersDataTransferMapWalkThru){
 			   concurrentUsersDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'concurrentUsers',sheetName='Applications' where eavAttribute = ?",[concurrentUsersAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'userConcurrent',sheetName='Applications' where eavAttribute = ?",[concurrentUsersAttribute])
 }
 /**
 *  Create Frequency
 */
-def frequencyAttribute = EavAttribute.findByAttributeCodeAndEntityType('frequency',appEntityType)
+def frequencyAttribute = EavAttribute.findByAttributeCodeAndEntityType('useFrequency',appEntityType)
 if(frequencyAttribute){
-   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'frequency', frontendLabel='Frequency' where id = ?",[frequencyAttribute.id])
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'useFrequency', frontendLabel='Frequency' where id = ?",[frequencyAttribute.id])
 } else {
-   frequencyAttribute = new EavAttribute( attributeCode : "frequency",
+   frequencyAttribute = new EavAttribute( attributeCode : "useFrequency",
 		   backendType : 'String',
 		   frontendInput : 'text',
 		   frontendLabel : 'Frequency',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 250,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -1630,9 +1630,9 @@ if(frequencyAttribute){
 
 def frequencyEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(frequencyAttribute,appAttributeSet)
 if(frequencyEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'frequency' where attributeCode = 'frequency'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 250, attributeCode = 'useFrequency' where attributeCode = 'useFrequency'")
 } else {
-   frequencyEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:frequencyAttribute,eavAttributeSet:appAttributeSet)
+   frequencyEavEntityAttribute = new EavEntityAttribute(sortOrder:250,attribute:frequencyAttribute,eavAttributeSet:appAttributeSet)
    if ( !frequencyEavEntityAttribute.validate() || !frequencyEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create frequencyEavEntityAttribute : " +
 			   frequencyEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -1641,7 +1641,7 @@ if(frequencyEavEntityAttribute){
 
 def frequencyDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,frequencyAttribute)
 if( !frequencyDataTransferMapMaster ){
-   frequencyDataTransferMapMaster = new DataTransferAttributeMap(columnName:"frequency",
+   frequencyDataTransferMapMaster = new DataTransferAttributeMap(columnName:"useFrequency",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:frequencyAttribute,
@@ -1653,12 +1653,12 @@ if( !frequencyDataTransferMapMaster ){
 			   frequencyDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'frequency',sheetName='Applications' where eavAttribute = ?",[frequencyAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'useFrequency',sheetName='Applications' where eavAttribute = ?",[frequencyAttribute])
 }
 
 def frequencyDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,frequencyAttribute)
 if(!frequencyDataTransferMapWalkThru){
-   frequencyDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"frequency",
+   frequencyDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"useFrequency",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:frequencyAttribute,
@@ -1670,21 +1670,21 @@ if(!frequencyDataTransferMapWalkThru){
 			   frequencyDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'frequency',sheetName='Applications' where eavAttribute = ?",[frequencyAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'useFrequency',sheetName='Applications' where eavAttribute = ?",[frequencyAttribute])
 }
 /**
 *  Create RPO
 */
-def rpoAttribute = EavAttribute.findByAttributeCodeAndEntityType('rpo',appEntityType)
+def rpoAttribute = EavAttribute.findByAttributeCodeAndEntityType('drRpoDesc',appEntityType)
 if(rpoAttribute){
-   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'rpo', frontendLabel='RPO' where id = ?",[rpoAttribute.id])
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'drRpoDesc', frontendLabel='RPO' where id = ?",[rpoAttribute.id])
 } else {
-   rpoAttribute = new EavAttribute( attributeCode : "rpo",
+   rpoAttribute = new EavAttribute( attributeCode : "drRpoDesc",
 		   backendType : 'String',
 		   frontendInput : 'text',
 		   frontendLabel : 'RPO',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 260,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -1699,9 +1699,9 @@ if(rpoAttribute){
 
 def rpoEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(rpoAttribute,appAttributeSet)
 if(rpoEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'rpo' where attributeCode = 'rpo'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 260, attributeCode = 'drRpoDesc' where attributeCode = 'drRpoDesc'")
 } else {
-   rpoEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:rpoAttribute,eavAttributeSet:appAttributeSet)
+   rpoEavEntityAttribute = new EavEntityAttribute(sortOrder:260,attribute:rpoAttribute,eavAttributeSet:appAttributeSet)
    if ( !rpoEavEntityAttribute.validate() || !rpoEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create rpoEavEntityAttribute : " +
 			   rpoEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -1710,7 +1710,7 @@ if(rpoEavEntityAttribute){
 
 def rpoDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,rpoAttribute)
 if( !rpoDataTransferMapMaster ){
-   rpoDataTransferMapMaster = new DataTransferAttributeMap(columnName:"rpo",
+   rpoDataTransferMapMaster = new DataTransferAttributeMap(columnName:"drRpoDesc",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:rpoAttribute,
@@ -1722,12 +1722,12 @@ if( !rpoDataTransferMapMaster ){
 			   rpoDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'rpo',sheetName='Applications' where eavAttribute = ?",[rpoAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'drRpoDesc',sheetName='Applications' where eavAttribute = ?",[rpoAttribute])
 }
 
 def rpoDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,rpoAttribute)
 if(!rpoDataTransferMapWalkThru){
-   rpoDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"rpo",
+   rpoDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"drRpoDesc",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:rpoAttribute,
@@ -1739,21 +1739,21 @@ if(!rpoDataTransferMapWalkThru){
 			   rpoDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'rpo',sheetName='Applications' where eavAttribute = ?",[rpoAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'drRpoDesc',sheetName='Applications' where eavAttribute = ?",[rpoAttribute])
 }
 /**
 *  Create RTO
 */
-def rtoAttribute = EavAttribute.findByAttributeCodeAndEntityType('rto',appEntityType)
+def rtoAttribute = EavAttribute.findByAttributeCodeAndEntityType('drRtoDesc',appEntityType)
 if(rtoAttribute){
-   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'rto', frontendLabel='RTO' where id = ?",[rtoAttribute.id])
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'drRtoDesc', frontendLabel='RTO' where id = ?",[rtoAttribute.id])
 } else {
-   rtoAttribute = new EavAttribute( attributeCode : "rto",
+   rtoAttribute = new EavAttribute( attributeCode : "drRtoDesc",
 		   backendType : 'String',
 		   frontendInput : 'text',
 		   frontendLabel : 'RTO',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 270,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -1768,9 +1768,9 @@ if(rtoAttribute){
 
 def rtoEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(rtoAttribute,appAttributeSet)
 if(rtoEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'rto' where attributeCode = 'rto'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 270, attributeCode = 'drRtoDesc' where attributeCode = 'drRtoDesc'")
 } else {
-   rtoEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:rtoAttribute,eavAttributeSet:appAttributeSet)
+   rtoEavEntityAttribute = new EavEntityAttribute(sortOrder:270,attribute:rtoAttribute,eavAttributeSet:appAttributeSet)
    if ( !rtoEavEntityAttribute.validate() || !rtoEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create rtoEavEntityAttribute : " +
 			   rtoEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -1779,7 +1779,7 @@ if(rtoEavEntityAttribute){
 
 def rtoDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,rtoAttribute)
 if( !rtoDataTransferMapMaster ){
-   rtoDataTransferMapMaster = new DataTransferAttributeMap(columnName:"rto",
+   rtoDataTransferMapMaster = new DataTransferAttributeMap(columnName:"drRtoDesc",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:rtoAttribute,
@@ -1791,12 +1791,12 @@ if( !rtoDataTransferMapMaster ){
 			   rtoDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'rto',sheetName='Applications' where eavAttribute = ?",[rtoAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'drRtoDesc',sheetName='Applications' where eavAttribute = ?",[rtoAttribute])
 }
 
 def rtoDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,rtoAttribute)
 if(!rtoDataTransferMapWalkThru){
-   rtoDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"rto",
+   rtoDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"drRtoDesc",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:rtoAttribute,
@@ -1808,22 +1808,22 @@ if(!rtoDataTransferMapWalkThru){
 			   rtoDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'rto',sheetName='Applications' where eavAttribute = ?",[rtoAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'drRtoDesc',sheetName='Applications' where eavAttribute = ?",[rtoAttribute])
 }
 
 /**
 *  Create DowntimeTolerance
 */
-def downtimeToleranceAttribute = EavAttribute.findByAttributeCodeAndEntityType('downtimeTolerance',appEntityType)
+def downtimeToleranceAttribute = EavAttribute.findByAttributeCodeAndEntityType('moveDowntimeTolerance',appEntityType)
 if(downtimeToleranceAttribute){
-   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'downtimeTolerance', frontendLabel='DowntimeTolerance' where id = ?",[downtimeToleranceAttribute.id])
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'moveDowntimeTolerance', frontendLabel='DowntimeTolerance' where id = ?",[downtimeToleranceAttribute.id])
 } else {
-   downtimeToleranceAttribute = new EavAttribute( attributeCode : "downtimeTolerance",
+   downtimeToleranceAttribute = new EavAttribute( attributeCode : "moveDowntimeTolerance",
 		   backendType : 'String',
 		   frontendInput : 'text',
 		   frontendLabel : 'DowntimeTolerance',
 		   note : 'this field is used for just import',
-		   sortOrder : 10,
+		   sortOrder : 280,
 		   entityType:appEntityType,
 		   isRequired:0,
 		   isUnique:0,
@@ -1838,9 +1838,9 @@ if(downtimeToleranceAttribute){
 
 def downtimeToleranceEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(downtimeToleranceAttribute,appAttributeSet)
 if(downtimeToleranceEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 346, attributeCode = 'downtimeTolerance' where attributeCode = 'downtimeTolerance'")
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 280, attributeCode = 'moveDowntimeTolerance' where attributeCode = 'moveDowntimeTolerance'")
 } else {
-   downtimeToleranceEavEntityAttribute = new EavEntityAttribute(sortOrder:346,attribute:downtimeToleranceAttribute,eavAttributeSet:appAttributeSet)
+   downtimeToleranceEavEntityAttribute = new EavEntityAttribute(sortOrder:280,attribute:downtimeToleranceAttribute,eavAttributeSet:appAttributeSet)
    if ( !downtimeToleranceEavEntityAttribute.validate() || !downtimeToleranceEavEntityAttribute.save(flush:true) ) {
 	   println"Unable to create downtimeToleranceEavEntityAttribute : " +
 			   downtimeToleranceEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
@@ -1849,7 +1849,7 @@ if(downtimeToleranceEavEntityAttribute){
 
 def downtimeToleranceDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,downtimeToleranceAttribute)
 if( !downtimeToleranceDataTransferMapMaster ){
-   downtimeToleranceDataTransferMapMaster = new DataTransferAttributeMap(columnName:"downtimeTolerance",
+   downtimeToleranceDataTransferMapMaster = new DataTransferAttributeMap(columnName:"moveDowntimeTolerance",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:downtimeToleranceAttribute,
@@ -1861,12 +1861,12 @@ if( !downtimeToleranceDataTransferMapMaster ){
 			   downtimeToleranceDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'downtimeTolerance',sheetName='Applications' where eavAttribute = ?",[downtimeToleranceAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'moveDowntimeTolerance',sheetName='Applications' where eavAttribute = ?",[downtimeToleranceAttribute])
 }
 
 def downtimeToleranceDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,downtimeToleranceAttribute)
 if(!downtimeToleranceDataTransferMapWalkThru){
-   downtimeToleranceDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"downtimeTolerance",
+   downtimeToleranceDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"moveDowntimeTolerance",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:downtimeToleranceAttribute,
@@ -1878,5 +1878,5 @@ if(!downtimeToleranceDataTransferMapWalkThru){
 			   downtimeToleranceDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'downtimeTolerance',sheetName='Applications' where eavAttribute = ?",[downtimeToleranceAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'moveDowntimeTolerance',sheetName='Applications' where eavAttribute = ?",[downtimeToleranceAttribute])
 }
