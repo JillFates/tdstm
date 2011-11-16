@@ -1,7 +1,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="companyHeader" />
+<meta name="layout" content="projectHeader" />
 <title>Orphan records list</title>
 <g:javascript src="orphanData.js" />
 <style type="text/css">
@@ -98,6 +98,10 @@ a:hover {
 		$("#queryTextDialog").dialog('option', 'width', 500)
 		$('#queryTextDialog').dialog('open')
 	}
+</script>
+<script>
+	currentMenuId = "#adminMenu";
+	$("#adminMenuId a").css('background-color','#003366')
 </script>
 </body>
 </html>

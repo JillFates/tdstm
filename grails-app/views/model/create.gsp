@@ -1,7 +1,7 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="layout" content="companyHeader" />
+    <meta name="layout" content="projectHeader" />
     <title>Model Template</title>
     <g:javascript src="drag_drop.js" />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
@@ -392,6 +392,10 @@
 	showBladeFields($("#assetTypeId").val())
 	
 		
+</script>
+<script>
+	currentMenuId = "#adminMenu";
+	$("#adminMenuId a").css('background-color','#003366')
 </script>
 </body>
 </html>

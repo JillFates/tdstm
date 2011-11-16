@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="layout" content="companyHeader" />
+        <meta name="layout" content="projectHeader" />
         <title>Model List</title>
         <script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
 
@@ -24,6 +24,11 @@
             <div class="message">${flash.message}</div>
             </g:if>
             <div>
+            <div class="buttons"> 
+            <g:form action="create" method="post">
+				<span class="button"><g:actionSubmit class="save" action="Create" value="Create Model" /></span>
+			</g:form>
+			</div>
             <form name="modelForm" action="list">
                 <jmesa:tableFacade id="tag" items="${modelsList}" maxRows="25" stateAttr="restore" var="modelInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
                     <jmesa:htmlTable style=" border-collapse: separate">
@@ -46,11 +51,10 @@
             </form>
             </div>
             <div><span>Note : Power displayed in watts.</span></div>
-            <div class="buttons"> 
-            <g:form action="create" method="post">
-				<span class="button"><g:actionSubmit class="save" action="Create" value="Create Model" /></span>
-			</g:form>
-			</div>
         </div>
+<script>
+	currentMenuId = "#adminMenu";
+	$("#adminMenuId a").css('background-color','#003366')
+</script>
     </body>
 </html>

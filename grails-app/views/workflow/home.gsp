@@ -1,7 +1,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="companyHeader" />
+<meta name="layout" content="projectHeader" />
 <title>Workflows</title>
 </head>
 <body>
@@ -57,6 +57,10 @@ function showWorkflowList( workflowId ){
 	$("#workflowId").val( workflowId );
 	$("form[name=workflowForm]").submit();
 }
+</script>
+<script>
+	currentMenuId = "#adminMenu";
+	$("#adminMenuId a").css('background-color','#003366')
 </script>
 </body>
 </html>

@@ -3,16 +3,19 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="companyHeader" />
-        <title>Show Company</title>
+        <meta name="layout" content="projectHeader" />
+        <title>Company</title>
     </head>
     <body>
        
         <div class="body">
-			<h1>Show Company</h1>
+
+			<h1>Company</h1>
+
 			<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-	            <span class="menuButton"><g:link class="list" action="list" params="[filter:true]">Company List</g:link></span>
+
         	</div>
+
         	<br/>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
@@ -32,8 +35,11 @@
                             <td valign="top" class="name">Comment:</td>
                             
                             <td valign="top" class="value">
+
                             <textarea name="comment" cols="80" rows="3"	readonly="readonly" >${fieldValue(bean:partyGroupInstance, field:'comment')}</textarea>
+
                             
+
                             </td>
                             
                         </tr>
@@ -63,5 +69,9 @@
                 </g:form>
             </div>
         </div>
+<script>
+	currentMenuId = "#adminMenu";
+	$("#adminMenuId a").css('background-color','#003366')
+</script>
     </body>
 </html>

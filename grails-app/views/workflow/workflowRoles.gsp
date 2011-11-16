@@ -1,7 +1,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="companyHeader" />
+<meta name="layout" content="projectHeader" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dashboard.css')}" />
 <title>Workflow Roles</title>
 </head>
@@ -14,7 +14,6 @@
 <div class="buttons" style="margin-left: 10px;margin-right: 10px;text-align: left;"> 
 	<input type="hidden" name="workflow" value="${workflow?.id}" />
     <input type="hidden" name="currentStatus" value="${workflowTransition?.id}" />
-	<span class="menuButton"><g:link class="list" action="home">Workflow List</g:link></span>
 	<span class="button"><input type="submit" class="edit" value="Update" /></span>
 	<span class="button"><input type="submit" class="delete" onclick="return setAction()" value="Cancel" /></span>
 </div>
@@ -141,6 +140,10 @@ function setHeader(headerId, buttonId){
 	 $('#'+headerId).css("border", "none");
      $('#'+buttonId).css("display","none");
  }
+</script>
+<script>
+	currentMenuId = "#adminMenu";
+	$("#adminMenuId a").css('background-color','#003366')
 </script>
 </body>
 </html>

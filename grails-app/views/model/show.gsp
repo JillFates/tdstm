@@ -1,7 +1,7 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="layout" content="companyHeader" />
+    <meta name="layout" content="projectHeader" />
     <title>Model Template</title>
     <g:javascript src="drag_drop.js" />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
@@ -14,7 +14,6 @@
   <body>
 <div class="body">
 <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-            <span class="menuButton"><g:link class="list" action="list" params="[filter:true]">Model List</g:link></span>
             <span class="menuButton"><g:link class="create" action="create">New Model</g:link></span>
             <span class="menuButton"><g:link class="create" action="create" params="[modelId:modelInstance.id]">New Model(copy this)</g:link></span>
         </div>
@@ -23,7 +22,7 @@
             </g:if>
 <div style="border: 0px;margin-top: 5px;">
 <fieldset>
-<legend><b>Show Model Template</b></legend>
+<legend><b>Model Template</b></legend>
 <div style="margin-left: 10px;margin-right: 10px;width: auto;">
 <table style="border: 0px;">
 	<tbody>
@@ -291,5 +290,9 @@ function updatePage(){
 }
 </script>
 </div>
+<script>
+	currentMenuId = "#adminMenu";
+	$("#adminMenuId a").css('background-color','#003366')
+</script>
 </body>
 </html>

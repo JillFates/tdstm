@@ -1,13 +1,12 @@
-
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="companyHeader" />
+        <meta name="layout" content="projectHeader" />
         <title>Edit Company</title>
+
     </head>
     <body>
-   
+
         <div class="body">
             <h1>Edit Company</h1>
             <g:if test="${flash.message}">
@@ -59,5 +58,9 @@
                 </div>
             </g:form>
         </div>
+<script>
+	currentMenuId = "#adminMenu";
+	$("#adminMenuId a").css('background-color','#003366')
+</script>
     </body>
 </html>

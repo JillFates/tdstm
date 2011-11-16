@@ -1,17 +1,18 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="companyHeader" />
+        <meta name="layout" content="projectHeader" />
         <title>Create Company</title>
+
         <g:javascript>
         function textCounter(field, maxlimit){
-	      if (field.value.length > maxlimit){ // if too long...trim it!
-	      	  field.value = field.value.substring(0, maxlimit);
-		      return false;
-	      } else {
-	      	return true;
-	      }
-      	}
+			if (field.value.length > maxlimit){ // if too long...trim it!
+				field.value = field.value.substring(0, maxlimit);
+				return false;
+			} else {
+				return true;
+			}
+		}
         </g:javascript>
     </head>
     <body>
@@ -33,6 +34,7 @@
 					                <g:renderErrors bean="${partyGroupInstance}" as="list" idCheck/>
 					            </div>
 					            </g:hasErrors>
+
                            <!--  <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="partyType">Party Type:</label>
@@ -75,6 +77,7 @@
 					            </g:hasErrors>
                                 </td>
                             </tr> 
+
                         </tbody>
                     </table>
                 </div>
@@ -83,5 +86,9 @@
                 </div>
             </g:form>
         </div>
+<script>
+	currentMenuId = "#adminMenu";
+	$("#adminMenuId a").css('background-color','#003366')
+</script>
     </body>
 </html>

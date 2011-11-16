@@ -135,5 +135,9 @@ a:hover {
 </table>
 </div>
 </div>
+<script>
+	currentMenuId = "#adminMenu";
+	$("#adminMenuId a").css('background-color','#003366')
+</script>
 </body>
 </html>

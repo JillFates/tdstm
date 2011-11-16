@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="companyHeader" />
+        <meta name="layout" content="projectHeader" />
         <title>Model Sync Batch List</title>
     </head>
     <body>
@@ -68,5 +68,9 @@
                 </table>
             </div>
         </div>
+<script>
+	currentMenuId = "#adminMenu";
+	$("#adminMenuId a").css('background-color','#003366')
+</script>
     </body>
 </html>

@@ -44,6 +44,7 @@
     if( moveEventId != null){
     	moveEvent = MoveEvent.findById(moveEventId)
     }
+    def partyGroup = session.getAttribute("PARTYGROUP")?.PARTYGROUP ;
     def isIE6 = request.getHeader("User-Agent").contains("MSIE 6");
     %>
   <body>
@@ -122,7 +123,7 @@
 	      </ul>
 	    </div>
 		<div class="menu2" id="adminMenu" style="background-color:#003366;display: none;">
-		<ul onmouseout="showSubMenu(currentMenuId)">
+		<ul >
 			<jsec:hasRole name="ADMIN">
 			<li><g:link class="home" controller="auth" action="home">Admin</g:link> </li>
 			<li><g:link class="home" controller="workflow" action="home">Workflows </g:link> </li>
@@ -136,7 +137,7 @@
 		</ul>
 		</div>
 		<div class="menu2" id="projectMenu" style="background-color:#003366;display: none;">
-		<ul onmouseout="showSubMenu(currentMenuId)">
+		<ul >
 			<li><g:link class="home" controller="project" action="list">List Projects</g:link> </li>
 			<g:if test="${currProjObj}"><li><g:link class="home" controller="projectUtil">Project: ${currProjObj.name}</g:link></li></g:if>
 			<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
@@ -145,7 +146,7 @@
 		</ul>
 		</div>
 		<div class="menu2" id="assetMenu" style="background-color:#003366;display: none;">
-		<ul onmouseout="showSubMenu(currentMenuId)">
+		<ul >
 			<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link> </li>
 			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Assets</g:link></li>
 			<li><g:link class="home" controller="application" action="list"  params="[projectId:currProjObj?.id]">List Apps</g:link></li>
@@ -155,7 +156,7 @@
 		</ul>
 		</div>
 		<div class="menu2" id="bundleMenu" style="background-color:#003366;display:none;">
-		<ul onmouseout="showSubMenu(currentMenuId)">
+		<ul >
 				<li><g:link class="home" controller="moveBundle" action="list">List</g:link></li>
 				<li><g:link class="home" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundle: ${MoveBundle.findById( moveBundleId )?.name}</g:link></li>
 				<li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundleId]" >Team</g:link></li>
@@ -165,7 +166,7 @@
 			</ul>
 		</div>
 	    <div class="menu2" id="consoleMenu" style="background-color:#003366;display: none;">
-		<ul onmouseout="showSubMenu(currentMenuId)">
+		<ul >
 	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
 			<li><g:link class="home" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console</g:link></li>
 	        </jsec:hasAnyRole>

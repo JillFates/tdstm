@@ -1,15 +1,15 @@
-
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="companyHeader" />
+        <meta name="layout" content="projectHeader" />
         <title>Create Staff</title>         
     </head>
     <body>
+
    
         <div class="body">
             <h1>Create Staff</h1>
+
 	        <br>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
@@ -97,5 +97,9 @@
                 </div>
             </g:form>
         </div>
+<script>
+	currentMenuId = "#adminMenu";
+	$("#adminMenuId a").css('background-color','#003366')
+</script>
     </body>
 </html>

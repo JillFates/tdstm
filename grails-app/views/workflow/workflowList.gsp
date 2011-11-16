@@ -1,7 +1,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="companyHeader" />
+<meta name="layout" content="projectHeader" />
 <title>Workflow</title>
 <script type="text/javascript"> var showOption = 'show'</script>
 </head>
@@ -408,6 +408,10 @@ function checkInputData(){
 	}
 	return returnVal
 }
+</script>
+<script>
+	currentMenuId = "#adminMenu";
+	$("#adminMenuId a").css('background-color','#003366')
 </script>
 </body>
 </html>

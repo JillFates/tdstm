@@ -57,12 +57,11 @@
     def partyGroup = session.getAttribute("PARTYGROUP")?.PARTYGROUP ;
     def isIE6 = request.getHeader("User-Agent").contains("MSIE 6");
     %>
-
   <body>
     <div class="main_body">
 
       <div class="tds_header">
-       	<div class="header_left">
+      	<div class="header_left">
       		<g:if test="${setImage}">
     	  		<img src="${createLink(controller:'project', action:'showImage', id:setImage)}" style="height: 30px;"/>
     	  	</g:if>
@@ -70,11 +69,11 @@
      			<a href="http://www.transitionaldata.com/" target="new"><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;border: 0px"/></a>      	    	 
     		</g:else>
     	</div>
-    	<div class="title">&nbsp;Transition Manager 
+      <div class="title">&nbsp;Transition Manager
       	<g:if test="${currProjObj}"> - ${currProjObj.name} </g:if>
       	<g:if test="${moveEventId}"> : ${MoveEvent.findById( moveEventId )?.name}</g:if>
       	<g:if test="${moveBundleId}"> : ${MoveBundle.findById( moveBundleId )?.name}</g:if>
-       </div>
+      </div>
         <div class="header_right"><br />
           <div style="font-weight: bold;">
           <jsec:isLoggedIn>
@@ -88,7 +87,7 @@
 			</div>
 			<div class="tzmenu">&nbsp;-&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' }</span>
 				time<ul>   
-			    	      <li><a href="javascript:setUserTimeZone('GMT')">GMT </a></li>
+				<li><a href="javascript:setUserTimeZone('GMT')">GMT</a></li>
 			    	      <li><a href="javascript:setUserTimeZone('PST')">PST</a></li>
 			    	      <li><a href="javascript:setUserTimeZone('PDT')">PDT</a></li>
 			    	      <li><a href="javascript:setUserTimeZone('MST')">MST</a></li>
@@ -154,8 +153,6 @@
     <div id="personDialog" title="Edit Person" style="display:none;">
       <div class="dialog">
           <div class="dialog">
-          
-          
             <table>
               <tbody>
               <tr>
@@ -233,7 +230,7 @@
                     </jsec:lacksAllRoles>
                   </td>
                 </tr>
-                 <tr class="prop">
+                <tr class="prop">
                   <td valign="top" class="name">
                     <label for="title">Time Zone:</label>
                   </td>
@@ -241,7 +238,7 @@
                     <g:select name="timeZone" id="timeZoneId" from="${['GMT','PST','PDT','MST','MDT','CST','CDT','EST','EDT']}" 
                     value="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/>
                   </td>
-                   <tr class="prop">
+                  <tr class="prop">
                      <td valign="top" class="name">
                        <label for="title">Power In:</label>
                         </td>

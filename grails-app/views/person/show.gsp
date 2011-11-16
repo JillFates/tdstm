@@ -3,14 +3,14 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="companyHeader" />
-<title>Show Staff</title>
+<meta name="layout" content="projectHeader" />
+<title>Staff</title>
 </head>
 <body>
 
 <div class="body">
 
-<h1>Show Staff</h1>
+<h1>Staff</h1>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
@@ -92,5 +92,9 @@
 </g:form></div>
 </jsec:hasRole>
 </div>
+<script>
+	currentMenuId = "#adminMenu";
+	$("#adminMenuId a").css('background-color','#003366')
+</script>
 </body>
 </html>

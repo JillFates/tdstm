@@ -1,7 +1,7 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="layout" content="companyHeader" />
+    <meta name="layout" content="projectHeader" />
     <title>Sync Management</title>
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'progressbar.css')}" />
   </head>
@@ -43,5 +43,9 @@
         </g:form>
       
     </div>
+<script>
+	currentMenuId = "#adminMenu";
+	$("#adminMenuId a").css('background-color','#003366')
+</script>
   </body>
 </html>

@@ -3,7 +3,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="companyHeader" />
+        <meta name="layout" content="projectHeader" />
         <title>Manufacturer List</title>
         <script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
         <link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
@@ -24,6 +24,11 @@
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
+            <div class="buttons">
+				<g:form>
+			    	<span class="button"><g:actionSubmit class="create" value="New Manufacturer" action="create" /></span>
+			    </g:form>
+			</div>
             <div>
             	<form name="modelForm" action="list">
 	                <jmesa:tableFacade id="tag" items="${manufacturersList}" maxRows="25" stateAttr="restore" var="manufacturer" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
@@ -40,11 +45,10 @@
 	                </jmesa:tableFacade>
 	            </form>
             </div>
-            <div class="buttons">
-				<g:form>
-			    	<span class="button"><g:actionSubmit class="create" value="New Manufacturer" action="create" /></span>
-			    </g:form>
-			</div>
         </div>
+<script>
+	currentMenuId = "#adminMenu";
+	$("#adminMenuId a").css('background-color','#003366')
+</script>
     </body>
 </html>

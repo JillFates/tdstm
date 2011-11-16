@@ -1,9 +1,7 @@
-
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="companyHeader" />
+        <meta name="layout" content="projectHeader" />
         <title>Company List</title>
         <script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
 		<link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
@@ -15,12 +13,18 @@
 		</script>
     </head>
     <body>
+
     	
         <div class="body">
             <h1>Company List</h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
+            <div class="buttons">
+                <g:form>
+                    <span class="button"><g:actionSubmit class="create" value="New" action="create" /></span>
+                </g:form>
+            </div>
             <div>
 	            <form name="companyForm">
 			         <jmesa:tableFacade id="tag" items="${partyGroupList}" maxRows="25" stateAttr="restore" var="partyGroupInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
@@ -39,11 +43,10 @@
 			         </jmesa:tableFacade>
 			     </form>
 		  	</div>
-            <div class="buttons">
-                <g:form>
-                    <span class="button"><g:actionSubmit class="create" value="New" action="create" /></span>
-                </g:form>
-            </div>
         </div>
+<script>
+	currentMenuId = "#adminMenu";
+	$("#adminMenuId a").css('background-color','#003366')
+</script>
     </body>
 </html>

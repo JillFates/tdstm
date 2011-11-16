@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="companyHeader" />
+        <meta name="layout" content="projectHeader" />
         <title>Show Manufacturer</title>
         <script type="text/javascript">
 			$(document).ready(function() {
@@ -12,7 +12,6 @@
     <body>
         <div class="body">
          <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-            <span class="menuButton"><g:link class="list" action="list"  params="[filter:true]">Manufacturer List</g:link></span>
             <span class="menuButton"><g:link class="create" action="create">New Manufacturer</g:link></span>
         </div>
             <h1>Show Manufacturer</h1>
@@ -78,5 +77,9 @@
             $("#showMergeDialog").dialog('open')
         }
         </script>
+<script>
+	currentMenuId = "#adminMenu";
+	$("#adminMenuId a").css('background-color','#003366')
+</script>
     </body>
 </html>
