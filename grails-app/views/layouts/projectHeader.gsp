@@ -34,6 +34,7 @@
     def projectId = currProj.CURR_PROJ ;
     def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
     def moveBundleId = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE ;
+	def moveBundleName = moveBundleId ? MoveBundle.findById( moveBundleId ) : 'UNSELECTED'
     def currProjObj;
     def moveEvent;
 	def personId = session.getAttribute("LOGIN_PERSON").id
@@ -62,7 +63,7 @@
       <div class="title">&nbsp;Transition Manager
       	<g:if test="${currProjObj}"> - ${currProjObj.name} </g:if>
       	<g:if test="${moveEvent}"> : ${moveEvent?.name}</g:if>
-      	<g:if test="${moveBundleId}"> : ${MoveBundle.findById( moveBundleId )?.name}</g:if>
+      	<g:if test="${moveBundleId}"> : ${moveBundleName}</g:if>
       </div>
         <div class="header_right"><br />
           <div style="font-weight: bold;">
@@ -158,7 +159,7 @@
 		<div class="menu2" id="bundleMenu" style="background-color:#003366;display:none;">
 		<ul >
 				<li><g:link class="home" controller="moveBundle" action="list">List</g:link></li>
-				<li><g:link class="home" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundle: ${MoveBundle.findById( moveBundleId )?.name}</g:link></li>
+				<li><g:link class="home" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundle: ${moveBundleName}</g:link></li>
 				<li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundleId]" >Team</g:link></li>
 				<li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId]" >Bundle Asset Assignment</g:link> </li>
 				<li><g:link class="home" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleId, rack:'UnrackPlan']" >Bundle Team Assignment </g:link> </li>
