@@ -219,8 +219,15 @@
 <div class="buttons"><span class="button">
 	<input class="save" type="button" value="Update" onclick="resolveValidate('editCommentForm','updateCommentId','${rediectTo}');" />
 	</span>
-	<span class="button"> <input class="delete" type="button" value="Delete"
+	<span class="button"> 
+	<g:if test="${rediectTo}">
+	<input class="delete" type="button" value="Delete"
+		onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment',controller:'assetEntity', params:'\'id=\' + $(\'#updateCommentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'updateCommentsLists()')}" />
+	</g:if>
+	<g:else>
+	<input class="delete" type="button" value="Delete"
 		onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment',controller:'assetEntity', params:'\'id=\' + $(\'#updateCommentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'never\')')}" />
+	</g:else>
 	</span>
 </div>
 </g:form>

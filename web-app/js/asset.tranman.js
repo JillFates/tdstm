@@ -647,6 +647,7 @@ function showAssetDialog( e , action ) {
 	      	 $('#mustVerifyEditId').val(assetComments[0].assetComment.mustVerify)
 	      	 $('#isResolvedEditId').val(assetComments[0].assetComment.isResolved)
 	      	 if(action == 'edit'){
+	      		commentChangeEdit('editResolveDiv','editCommentForm');
 		      	$("#editCommentDialog").dialog('option', 'width', 'auto')
 		      	$("#editCommentDialog").dialog('option', 'position', ['center','top']);
 		      	$("#editCommentDialog").dialog("open")
@@ -708,7 +709,7 @@ function showAssetDialog( e , action ) {
 				  var link = document.createElement('a');
 				  link.href = '#'
 				  link.id = 'link_'+assetComments[0].assetComment.id
-				  link.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+assetComments[0].assetComment.id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );commentChangeEdit('editResolveDiv','editCommentForm');}})} //;return false
+				  link.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+assetComments[0].assetComment.id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );}})} //;return false
 			      var commentText = document.createTextNode(truncate(assetComments[0].assetComment.comment));
 			      var typeText = document.createTextNode(assetComments[0].assetComment.commentType);
 			      
