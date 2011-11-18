@@ -54,7 +54,7 @@ if(nameEavEntityAttribute){
 
 def nameDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,nameAttribute)
 if( !nameDataTransferMapMaster ){
-	nameDataTransferMapMaster = new DataTransferAttributeMap(columnName:"assetName",
+	nameDataTransferMapMaster = new DataTransferAttributeMap(columnName:"Name",
 			sheetName:"Applications",
 			dataTransferSet : masterDataTransferSet,
 			eavAttribute:nameAttribute,
@@ -71,7 +71,7 @@ if( !nameDataTransferMapMaster ){
 
 def nameDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,nameAttribute)
 if(!nameDataTransferMapWalkThru){
-	nameDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"assetName",
+	nameDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Name",
 			sheetName:"Applications",
 			dataTransferSet : walkThruDataTransferSet,
 			eavAttribute:nameAttribute,
@@ -83,7 +83,7 @@ if(!nameDataTransferMapWalkThru){
 				nameDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
 	}
 } else {
-	DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'assetName',sheetName='Applications' where eavAttribute = ?",[nameAttribute])
+	DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Name',sheetName='Applications' where eavAttribute = ?",[nameAttribute])
 }
 /**
 *  Create Vendor
@@ -123,7 +123,7 @@ if(vendorEavEntityAttribute){
 
 def vendorDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,vendorAttribute)
 if( !vendorDataTransferMapMaster ){
-   vendorDataTransferMapMaster = new DataTransferAttributeMap(columnName:"appVendor",
+   vendorDataTransferMapMaster = new DataTransferAttributeMap(columnName:"Vendor",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:vendorAttribute,
@@ -135,12 +135,12 @@ if( !vendorDataTransferMapMaster ){
 			   vendorDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appVendor',sheetName='Applications' where eavAttribute = ?",[vendorAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Vendor',sheetName='Applications' where eavAttribute = ?",[vendorAttribute])
 }
 
 def vendorDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,vendorAttribute)
 if(!vendorDataTransferMapWalkThru){
-   vendorDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"appVendor",
+   vendorDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Vendor",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:vendorAttribute,
@@ -152,7 +152,7 @@ if(!vendorDataTransferMapWalkThru){
 			   vendorDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appVendor',sheetName='Applications' where eavAttribute = ?",[vendorAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Vendor',sheetName='Applications' where eavAttribute = ?",[vendorAttribute])
 }
 /**
 *  Create Version
@@ -192,7 +192,7 @@ if(versionEavEntityAttribute){
 
 def versionDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,versionAttribute)
 if( !versionDataTransferMapMaster ){
-   versionDataTransferMapMaster = new DataTransferAttributeMap(columnName:"appVersion",
+   versionDataTransferMapMaster = new DataTransferAttributeMap(columnName:"Version",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:versionAttribute,
@@ -204,12 +204,12 @@ if( !versionDataTransferMapMaster ){
 			   versionDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appVersion',sheetName='Applications' where eavAttribute = ?",[versionAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Version',sheetName='Applications' where eavAttribute = ?",[versionAttribute])
 }
 
 def versionDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,versionAttribute)
 if(!versionDataTransferMapWalkThru){
-   versionDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"appVersion",
+   versionDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Version",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:versionAttribute,
@@ -221,7 +221,7 @@ if(!versionDataTransferMapWalkThru){
 			   versionDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appVersion',sheetName='Applications' where eavAttribute = ?",[versionAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Version',sheetName='Applications' where eavAttribute = ?",[versionAttribute])
 }
 /**
 *  Create Technology
@@ -261,7 +261,7 @@ if(technologyEavEntityAttribute){
 
 def technologyDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,technologyAttribute)
 if( !technologyDataTransferMapMaster ){
-   technologyDataTransferMapMaster = new DataTransferAttributeMap(columnName:"appTech",
+   technologyDataTransferMapMaster = new DataTransferAttributeMap(columnName:"Technology",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:technologyAttribute,
@@ -273,12 +273,12 @@ if( !technologyDataTransferMapMaster ){
 			   technologyDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appTech',sheetName='Applications' where eavAttribute = ?",[technologyAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Technology',sheetName='Applications' where eavAttribute = ?",[technologyAttribute])
 }
 
 def technologyDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,technologyAttribute)
 if(!technologyDataTransferMapWalkThru){
-   technologyDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"appTech",
+   technologyDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Technology",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:technologyAttribute,
@@ -290,7 +290,7 @@ if(!technologyDataTransferMapWalkThru){
 			   technologyDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appTech',sheetName='Applications' where eavAttribute = ?",[technologyAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Technology',sheetName='Applications' where eavAttribute = ?",[technologyAttribute])
 }
 /**
 *  Create AccessType
@@ -330,7 +330,7 @@ if(accessTypeEavEntityAttribute){
 
 def accessTypeDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,accessTypeAttribute)
 if( !accessTypeDataTransferMapMaster ){
-   accessTypeDataTransferMapMaster = new DataTransferAttributeMap(columnName:"appAccess",
+   accessTypeDataTransferMapMaster = new DataTransferAttributeMap(columnName:"AccessType",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:accessTypeAttribute,
@@ -342,12 +342,12 @@ if( !accessTypeDataTransferMapMaster ){
 			   accessTypeDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appAccess',sheetName='Applications' where eavAttribute = ?",[accessTypeAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'AccessType',sheetName='Applications' where eavAttribute = ?",[accessTypeAttribute])
 }
 
 def accessTypeDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,accessTypeAttribute)
 if(!accessTypeDataTransferMapWalkThru){
-   accessTypeDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"appAccess",
+   accessTypeDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"AccessType",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:accessTypeAttribute,
@@ -359,7 +359,7 @@ if(!accessTypeDataTransferMapWalkThru){
 			   accessTypeDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appAccess',sheetName='Applications' where eavAttribute = ?",[accessTypeAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'AccessType',sheetName='Applications' where eavAttribute = ?",[accessTypeAttribute])
 }
 /**
 *  Create Source
@@ -399,7 +399,7 @@ if(sourceEavEntityAttribute){
 
 def sourceDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,sourceAttribute)
 if( !sourceDataTransferMapMaster ){
-   sourceDataTransferMapMaster = new DataTransferAttributeMap(columnName:"appSource",
+   sourceDataTransferMapMaster = new DataTransferAttributeMap(columnName:"Source",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:sourceAttribute,
@@ -411,12 +411,12 @@ if( !sourceDataTransferMapMaster ){
 			   sourceDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appSource',sheetName='Applications' where eavAttribute = ?",[sourceAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Source',sheetName='Applications' where eavAttribute = ?",[sourceAttribute])
 }
 
 def sourceDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,sourceAttribute)
 if(!sourceDataTransferMapWalkThru){
-   sourceDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"appSource",
+   sourceDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Source",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:sourceAttribute,
@@ -428,7 +428,7 @@ if(!sourceDataTransferMapWalkThru){
 			   sourceDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appSource',sheetName='Applications' where eavAttribute = ?",[sourceAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Source',sheetName='Applications' where eavAttribute = ?",[sourceAttribute])
 }
 /**
 *  Create License
@@ -468,7 +468,7 @@ if(licenseEavEntityAttribute){
 
 def licenseDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,licenseAttribute)
 if( !licenseDataTransferMapMaster ){
-   licenseDataTransferMapMaster = new DataTransferAttributeMap(columnName:"license",
+   licenseDataTransferMapMaster = new DataTransferAttributeMap(columnName:"License",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:licenseAttribute,
@@ -480,12 +480,12 @@ if( !licenseDataTransferMapMaster ){
 			   licenseDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'license',sheetName='Applications' where eavAttribute = ?",[licenseAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'License',sheetName='Applications' where eavAttribute = ?",[licenseAttribute])
 }
 
 def licenseDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,licenseAttribute)
 if(!licenseDataTransferMapWalkThru){
-   licenseDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"license",
+   licenseDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"License",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:licenseAttribute,
@@ -497,7 +497,7 @@ if(!licenseDataTransferMapWalkThru){
 			   licenseDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'license',sheetName='Applications' where eavAttribute = ?",[licenseAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'License',sheetName='Applications' where eavAttribute = ?",[licenseAttribute])
 }
 /**
 *  Create Description
@@ -537,7 +537,7 @@ if(descriptionEavEntityAttribute){
 
 def descriptionDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,descriptionAttribute)
 if( !descriptionDataTransferMapMaster ){
-   descriptionDataTransferMapMaster = new DataTransferAttributeMap(columnName:"description",
+   descriptionDataTransferMapMaster = new DataTransferAttributeMap(columnName:"Description",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:descriptionAttribute,
@@ -549,12 +549,12 @@ if( !descriptionDataTransferMapMaster ){
 			   descriptionDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'description',sheetName='Applications' where eavAttribute = ?",[descriptionAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Description',sheetName='Applications' where eavAttribute = ?",[descriptionAttribute])
 }
 
 def descriptionDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,descriptionAttribute)
 if(!descriptionDataTransferMapWalkThru){
-   descriptionDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"description",
+   descriptionDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Description",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:descriptionAttribute,
@@ -566,7 +566,7 @@ if(!descriptionDataTransferMapWalkThru){
 			   descriptionDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'description',sheetName='Applications' where eavAttribute = ?",[descriptionAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Description',sheetName='Applications' where eavAttribute = ?",[descriptionAttribute])
 }
 /**
 *  Create SupportType
@@ -606,7 +606,7 @@ if(supportTypeEavEntityAttribute){
 
 def supportTypeDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,supportTypeAttribute)
 if( !supportTypeDataTransferMapMaster ){
-   supportTypeDataTransferMapMaster = new DataTransferAttributeMap(columnName:"supportType",
+   supportTypeDataTransferMapMaster = new DataTransferAttributeMap(columnName:"SupportType",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:supportTypeAttribute,
@@ -618,12 +618,12 @@ if( !supportTypeDataTransferMapMaster ){
 			   supportTypeDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'supportType',sheetName='Applications' where eavAttribute = ?",[supportTypeAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'SupportType',sheetName='Applications' where eavAttribute = ?",[supportTypeAttribute])
 }
 
 def supportTypeDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,supportTypeAttribute)
 if(!supportTypeDataTransferMapWalkThru){
-   supportTypeDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"supportType",
+   supportTypeDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"SupportType",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:supportTypeAttribute,
@@ -635,7 +635,7 @@ if(!supportTypeDataTransferMapWalkThru){
 			   supportTypeDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'supportType',sheetName='Applications' where eavAttribute = ?",[supportTypeAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'SupportType',sheetName='Applications' where eavAttribute = ?",[supportTypeAttribute])
 }
 /**
 *  Create SME
@@ -675,7 +675,7 @@ if(smeEavEntityAttribute){
 
 def smeDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,smeAttribute)
 if( !smeDataTransferMapMaster ){
-   smeDataTransferMapMaster = new DataTransferAttributeMap(columnName:"sme",
+   smeDataTransferMapMaster = new DataTransferAttributeMap(columnName:"SME",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:smeAttribute,
@@ -687,12 +687,12 @@ if( !smeDataTransferMapMaster ){
 			   smeDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'sme',sheetName='Applications' where eavAttribute = ?",[smeAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'SME',sheetName='Applications' where eavAttribute = ?",[smeAttribute])
 }
 
 def smeDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,smeAttribute)
 if(!smeDataTransferMapWalkThru){
-   smeDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"sme",
+   smeDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"SME",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:smeAttribute,
@@ -704,7 +704,7 @@ if(!smeDataTransferMapWalkThru){
 			   smeDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'sme',sheetName='Applications' where eavAttribute = ?",[smeAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'SME',sheetName='Applications' where eavAttribute = ?",[smeAttribute])
 }
 /**
 *  Create SME2
@@ -744,7 +744,7 @@ if(sme2EavEntityAttribute){
 
 def sme2DataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,sme2Attribute)
 if( !sme2DataTransferMapMaster ){
-   sme2DataTransferMapMaster = new DataTransferAttributeMap(columnName:"sme2",
+   sme2DataTransferMapMaster = new DataTransferAttributeMap(columnName:"SME2",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:sme2Attribute,
@@ -756,12 +756,12 @@ if( !sme2DataTransferMapMaster ){
 			   sme2DataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'sme2',sheetName='Applications' where eavAttribute = ?",[sme2Attribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'SME2',sheetName='Applications' where eavAttribute = ?",[sme2Attribute])
 }
 
 def sme2DataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,sme2Attribute)
 if(!sme2DataTransferMapWalkThru){
-   sme2DataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"sme2",
+   sme2DataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"SME2",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:sme2Attribute,
@@ -773,7 +773,7 @@ if(!sme2DataTransferMapWalkThru){
 			   sme2DataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'sme2',sheetName='Applications' where eavAttribute = ?",[sme2Attribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'SME2',sheetName='Applications' where eavAttribute = ?",[sme2Attribute])
 }
 /**
 *  Create BusinessUnit
@@ -813,7 +813,7 @@ if(businessUnitEavEntityAttribute){
 
 def businessUnitDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,businessUnitAttribute)
 if( !businessUnitDataTransferMapMaster ){
-   businessUnitDataTransferMapMaster = new DataTransferAttributeMap(columnName:"businessUnit",
+   businessUnitDataTransferMapMaster = new DataTransferAttributeMap(columnName:"BusinessUnit",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:businessUnitAttribute,
@@ -825,12 +825,12 @@ if( !businessUnitDataTransferMapMaster ){
 			   businessUnitDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'businessUnit',sheetName='Applications' where eavAttribute = ?",[businessUnitAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'BusinessUnit',sheetName='Applications' where eavAttribute = ?",[businessUnitAttribute])
 }
 
 def businessUnitDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,businessUnitAttribute)
 if(!businessUnitDataTransferMapWalkThru){
-   businessUnitDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"businessUnit",
+   businessUnitDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"BusinessUnit",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:businessUnitAttribute,
@@ -842,7 +842,7 @@ if(!businessUnitDataTransferMapWalkThru){
 			   businessUnitDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'businessUnit',sheetName='Applications' where eavAttribute = ?",[businessUnitAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'BusinessUnit',sheetName='Applications' where eavAttribute = ?",[businessUnitAttribute])
 }
 /**
 *  Create Owner
@@ -882,7 +882,7 @@ if(ownerEavEntityAttribute){
 
 def ownerDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,ownerAttribute)
 if( !ownerDataTransferMapMaster ){
-   ownerDataTransferMapMaster = new DataTransferAttributeMap(columnName:"owner",
+   ownerDataTransferMapMaster = new DataTransferAttributeMap(columnName:"Owner",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:ownerAttribute,
@@ -894,12 +894,12 @@ if( !ownerDataTransferMapMaster ){
 			   ownerDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'owner',sheetName='Applications' where eavAttribute = ?",[ownerAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Owner',sheetName='Applications' where eavAttribute = ?",[ownerAttribute])
 }
 
 def ownerDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,ownerAttribute)
 if(!ownerDataTransferMapWalkThru){
-   ownerDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"owner",
+   ownerDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Owner",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:ownerAttribute,
@@ -911,7 +911,7 @@ if(!ownerDataTransferMapWalkThru){
 			   ownerDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'owner',sheetName='Applications' where eavAttribute = ?",[ownerAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Owner',sheetName='Applications' where eavAttribute = ?",[ownerAttribute])
 }
 /**
 *  Create Retire
@@ -951,7 +951,7 @@ if(retireEavEntityAttribute){
 
 def retireDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,retireAttribute)
 if( !retireDataTransferMapMaster ){
-   retireDataTransferMapMaster = new DataTransferAttributeMap(columnName:"retireDate",
+   retireDataTransferMapMaster = new DataTransferAttributeMap(columnName:"Retire",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:retireAttribute,
@@ -963,12 +963,12 @@ if( !retireDataTransferMapMaster ){
 			   retireDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'retireDate',sheetName='Applications' where eavAttribute = ?",[retireAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Retire',sheetName='Applications' where eavAttribute = ?",[retireAttribute])
 }
 
 def retireDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,retireAttribute)
 if(!retireDataTransferMapWalkThru){
-   retireDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"retireDate",
+   retireDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Retire",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:retireAttribute,
@@ -980,7 +980,7 @@ if(!retireDataTransferMapWalkThru){
 			   retireDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'retireDate',sheetName='Applications' where eavAttribute = ?",[retireAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Retire',sheetName='Applications' where eavAttribute = ?",[retireAttribute])
 }
 /**
 *  Create MaintExp
@@ -1020,7 +1020,7 @@ if(maintExpEavEntityAttribute){
 
 def maintExpDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,maintExpAttribute)
 if( !maintExpDataTransferMapMaster ){
-   maintExpDataTransferMapMaster = new DataTransferAttributeMap(columnName:"maintExpDate",
+   maintExpDataTransferMapMaster = new DataTransferAttributeMap(columnName:"MaintExp",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:maintExpAttribute,
@@ -1032,12 +1032,12 @@ if( !maintExpDataTransferMapMaster ){
 			   maintExpDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'maintExpDate',sheetName='Applications' where eavAttribute = ?",[maintExpAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'MaintExp',sheetName='Applications' where eavAttribute = ?",[maintExpAttribute])
 }
 
 def maintExpDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,maintExpAttribute)
 if(!maintExpDataTransferMapWalkThru){
-   maintExpDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"maintExpDate",
+   maintExpDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"MaintExp",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:maintExpAttribute,
@@ -1049,7 +1049,7 @@ if(!maintExpDataTransferMapWalkThru){
 			   maintExpDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'maintExpDate',sheetName='Applications' where eavAttribute = ?",[maintExpAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'MaintExp',sheetName='Applications' where eavAttribute = ?",[maintExpAttribute])
 }
 /**
 *  Create Function
@@ -1089,7 +1089,7 @@ if(functionEavEntityAttribute){
 
 def functionDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,functionAttribute)
 if( !functionDataTransferMapMaster ){
-   functionDataTransferMapMaster = new DataTransferAttributeMap(columnName:"appFunction",
+   functionDataTransferMapMaster = new DataTransferAttributeMap(columnName:"Function",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:functionAttribute,
@@ -1101,12 +1101,12 @@ if( !functionDataTransferMapMaster ){
 			   functionDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appFunction',sheetName='Applications' where eavAttribute = ?",[functionAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Function',sheetName='Applications' where eavAttribute = ?",[functionAttribute])
 }
 
 def functionDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,functionAttribute)
 if(!functionDataTransferMapWalkThru){
-   functionDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"appFunction",
+   functionDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Function",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:functionAttribute,
@@ -1118,7 +1118,7 @@ if(!functionDataTransferMapWalkThru){
 			   functionDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'appFunction',sheetName='Applications' where eavAttribute = ?",[functionAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Function',sheetName='Applications' where eavAttribute = ?",[functionAttribute])
 }
 /**
 *  Create Environment
@@ -1158,7 +1158,7 @@ if(environmentEavEntityAttribute){
 
 def environmentDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,environmentAttribute)
 if( !environmentDataTransferMapMaster ){
-   environmentDataTransferMapMaster = new DataTransferAttributeMap(columnName:"environment",
+   environmentDataTransferMapMaster = new DataTransferAttributeMap(columnName:"Environment",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:environmentAttribute,
@@ -1170,12 +1170,12 @@ if( !environmentDataTransferMapMaster ){
 			   environmentDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'environment',sheetName='Applications' where eavAttribute = ?",[environmentAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Environment',sheetName='Applications' where eavAttribute = ?",[environmentAttribute])
 }
 
 def environmentDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,environmentAttribute)
 if(!environmentDataTransferMapWalkThru){
-   environmentDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"environment",
+   environmentDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Environment",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:environmentAttribute,
@@ -1187,7 +1187,7 @@ if(!environmentDataTransferMapWalkThru){
 			   environmentDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'environment',sheetName='Applications' where eavAttribute = ?",[environmentAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Environment',sheetName='Applications' where eavAttribute = ?",[environmentAttribute])
 }
 /**
 *  Create Criticality
@@ -1227,7 +1227,7 @@ if(criticalityEavEntityAttribute){
 
 def criticalityDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,criticalityAttribute)
 if( !criticalityDataTransferMapMaster ){
-   criticalityDataTransferMapMaster = new DataTransferAttributeMap(columnName:"criticality",
+   criticalityDataTransferMapMaster = new DataTransferAttributeMap(columnName:"Criticality",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:criticalityAttribute,
@@ -1239,12 +1239,12 @@ if( !criticalityDataTransferMapMaster ){
 			   criticalityDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'criticality',sheetName='Applications' where eavAttribute = ?",[criticalityAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Criticality',sheetName='Applications' where eavAttribute = ?",[criticalityAttribute])
 }
 
 def criticalityDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,criticalityAttribute)
 if(!criticalityDataTransferMapWalkThru){
-   criticalityDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"criticality",
+   criticalityDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Criticality",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:criticalityAttribute,
@@ -1256,7 +1256,7 @@ if(!criticalityDataTransferMapWalkThru){
 			   criticalityDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'criticality',sheetName='Applications' where eavAttribute = ?",[criticalityAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Criticality',sheetName='Applications' where eavAttribute = ?",[criticalityAttribute])
 }
 /**
 *  Create MoveBundle
@@ -1296,7 +1296,7 @@ if(moveBundleEavEntityAttribute){
 
 def moveBundleDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,moveBundleAttribute)
 if( !moveBundleDataTransferMapMaster ){
-   moveBundleDataTransferMapMaster = new DataTransferAttributeMap(columnName:"moveBundle",
+   moveBundleDataTransferMapMaster = new DataTransferAttributeMap(columnName:"MoveBundle",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:moveBundleAttribute,
@@ -1308,12 +1308,12 @@ if( !moveBundleDataTransferMapMaster ){
 			   moveBundleDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'moveBundle',sheetName='Applications' where eavAttribute = ?",[moveBundleAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'MoveBundle',sheetName='Applications' where eavAttribute = ?",[moveBundleAttribute])
 }
 
 def moveBundleDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,moveBundleAttribute)
 if(!moveBundleDataTransferMapWalkThru){
-   moveBundleDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"moveBundle",
+   moveBundleDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"MoveBundle",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:moveBundleAttribute,
@@ -1325,7 +1325,7 @@ if(!moveBundleDataTransferMapWalkThru){
 			   moveBundleDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'moveBundle',sheetName='Applications' where eavAttribute = ?",[moveBundleAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'MoveBundle',sheetName='Applications' where eavAttribute = ?",[moveBundleAttribute])
 }
 /**
 *  Create PlanStatus
@@ -1365,7 +1365,7 @@ if(planStatusEavEntityAttribute){
 
 def planStatusDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,planStatusAttribute)
 if( !planStatusDataTransferMapMaster ){
-   planStatusDataTransferMapMaster = new DataTransferAttributeMap(columnName:"planStatus",
+   planStatusDataTransferMapMaster = new DataTransferAttributeMap(columnName:"PlanStatus",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:planStatusAttribute,
@@ -1377,12 +1377,12 @@ if( !planStatusDataTransferMapMaster ){
 			   planStatusDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'planStatus',sheetName='Applications' where eavAttribute = ?",[planStatusAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'PlanStatus',sheetName='Applications' where eavAttribute = ?",[planStatusAttribute])
 }
 
 def planStatusDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,planStatusAttribute)
 if(!planStatusDataTransferMapWalkThru){
-   planStatusDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"planStatus",
+   planStatusDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"PlanStatus",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:planStatusAttribute,
@@ -1394,7 +1394,7 @@ if(!planStatusDataTransferMapWalkThru){
 			   planStatusDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'planStatus',sheetName='Applications' where eavAttribute = ?",[planStatusAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'PlanStatus',sheetName='Applications' where eavAttribute = ?",[planStatusAttribute])
 }
 /**
 *  Create TotalUsers
@@ -1434,7 +1434,7 @@ if(totalUsersEavEntityAttribute){
 
 def totalUsersDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,totalUsersAttribute)
 if( !totalUsersDataTransferMapMaster ){
-   totalUsersDataTransferMapMaster = new DataTransferAttributeMap(columnName:"userCount",
+   totalUsersDataTransferMapMaster = new DataTransferAttributeMap(columnName:"TotalUsers",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:totalUsersAttribute,
@@ -1446,12 +1446,12 @@ if( !totalUsersDataTransferMapMaster ){
 			   totalUsersDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'userCount',sheetName='Applications' where eavAttribute = ?",[totalUsersAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'TotalUsers',sheetName='Applications' where eavAttribute = ?",[totalUsersAttribute])
 }
 
 def totalUsersDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,totalUsersAttribute)
 if(!totalUsersDataTransferMapWalkThru){
-   totalUsersDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"userCount",
+   totalUsersDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"TotalUsers",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:totalUsersAttribute,
@@ -1463,7 +1463,7 @@ if(!totalUsersDataTransferMapWalkThru){
 			   totalUsersDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'userCount',sheetName='Applications' where eavAttribute = ?",[totalUsersAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'TotalUsers',sheetName='Applications' where eavAttribute = ?",[totalUsersAttribute])
 }
 /**
 *  Create UserLocations
@@ -1503,7 +1503,7 @@ if(userLocationsEavEntityAttribute){
 
 def userLocationsDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,userLocationsAttribute)
 if( !userLocationsDataTransferMapMaster ){
-   userLocationsDataTransferMapMaster = new DataTransferAttributeMap(columnName:"userLocations",
+   userLocationsDataTransferMapMaster = new DataTransferAttributeMap(columnName:"UserLocations",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:userLocationsAttribute,
@@ -1515,12 +1515,12 @@ if( !userLocationsDataTransferMapMaster ){
 			   userLocationsDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'userLocations',sheetName='Applications' where eavAttribute = ?",[userLocationsAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'UserLocations',sheetName='Applications' where eavAttribute = ?",[userLocationsAttribute])
 }
 
 def userLocationsDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,userLocationsAttribute)
 if(!userLocationsDataTransferMapWalkThru){
-   userLocationsDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"userLocations",
+   userLocationsDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"UserLocations",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:userLocationsAttribute,
@@ -1532,7 +1532,7 @@ if(!userLocationsDataTransferMapWalkThru){
 			   userLocationsDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'userLocations',sheetName='Applications' where eavAttribute = ?",[userLocationsAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'UserLocations',sheetName='Applications' where eavAttribute = ?",[userLocationsAttribute])
 }
 /**
 *  Create ConcurrentUsers
@@ -1572,7 +1572,7 @@ if(concurrentUsersEavEntityAttribute){
 
 def concurrentUsersDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,concurrentUsersAttribute)
 if( !concurrentUsersDataTransferMapMaster ){
-   concurrentUsersDataTransferMapMaster = new DataTransferAttributeMap(columnName:"userConcurrent",
+   concurrentUsersDataTransferMapMaster = new DataTransferAttributeMap(columnName:"ConcurrentUsers",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:concurrentUsersAttribute,
@@ -1584,12 +1584,12 @@ if( !concurrentUsersDataTransferMapMaster ){
 			   concurrentUsersDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'userConcurrent',sheetName='Applications' where eavAttribute = ?",[concurrentUsersAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'ConcurrentUsers',sheetName='Applications' where eavAttribute = ?",[concurrentUsersAttribute])
 }
 
 def concurrentUsersDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,concurrentUsersAttribute)
 if(!concurrentUsersDataTransferMapWalkThru){
-   concurrentUsersDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"userConcurrent",
+   concurrentUsersDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"ConcurrentUsers",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:concurrentUsersAttribute,
@@ -1601,7 +1601,7 @@ if(!concurrentUsersDataTransferMapWalkThru){
 			   concurrentUsersDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'userConcurrent',sheetName='Applications' where eavAttribute = ?",[concurrentUsersAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'ConcurrentUsers',sheetName='Applications' where eavAttribute = ?",[concurrentUsersAttribute])
 }
 /**
 *  Create Frequency
@@ -1641,7 +1641,7 @@ if(frequencyEavEntityAttribute){
 
 def frequencyDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,frequencyAttribute)
 if( !frequencyDataTransferMapMaster ){
-   frequencyDataTransferMapMaster = new DataTransferAttributeMap(columnName:"useFrequency",
+   frequencyDataTransferMapMaster = new DataTransferAttributeMap(columnName:"Frequency",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:frequencyAttribute,
@@ -1653,12 +1653,12 @@ if( !frequencyDataTransferMapMaster ){
 			   frequencyDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'useFrequency',sheetName='Applications' where eavAttribute = ?",[frequencyAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Frequency',sheetName='Applications' where eavAttribute = ?",[frequencyAttribute])
 }
 
 def frequencyDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,frequencyAttribute)
 if(!frequencyDataTransferMapWalkThru){
-   frequencyDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"useFrequency",
+   frequencyDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Frequency",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:frequencyAttribute,
@@ -1670,7 +1670,7 @@ if(!frequencyDataTransferMapWalkThru){
 			   frequencyDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'useFrequency',sheetName='Applications' where eavAttribute = ?",[frequencyAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Frequency',sheetName='Applications' where eavAttribute = ?",[frequencyAttribute])
 }
 /**
 *  Create RPO
@@ -1710,7 +1710,7 @@ if(rpoEavEntityAttribute){
 
 def rpoDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,rpoAttribute)
 if( !rpoDataTransferMapMaster ){
-   rpoDataTransferMapMaster = new DataTransferAttributeMap(columnName:"drRpoDesc",
+   rpoDataTransferMapMaster = new DataTransferAttributeMap(columnName:"RPO",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:rpoAttribute,
@@ -1722,12 +1722,12 @@ if( !rpoDataTransferMapMaster ){
 			   rpoDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'drRpoDesc',sheetName='Applications' where eavAttribute = ?",[rpoAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'RPO',sheetName='Applications' where eavAttribute = ?",[rpoAttribute])
 }
 
 def rpoDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,rpoAttribute)
 if(!rpoDataTransferMapWalkThru){
-   rpoDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"drRpoDesc",
+   rpoDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"RPO",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:rpoAttribute,
@@ -1739,7 +1739,7 @@ if(!rpoDataTransferMapWalkThru){
 			   rpoDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'drRpoDesc',sheetName='Applications' where eavAttribute = ?",[rpoAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'RPO',sheetName='Applications' where eavAttribute = ?",[rpoAttribute])
 }
 /**
 *  Create RTO
@@ -1779,7 +1779,7 @@ if(rtoEavEntityAttribute){
 
 def rtoDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,rtoAttribute)
 if( !rtoDataTransferMapMaster ){
-   rtoDataTransferMapMaster = new DataTransferAttributeMap(columnName:"drRtoDesc",
+   rtoDataTransferMapMaster = new DataTransferAttributeMap(columnName:"RTO",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:rtoAttribute,
@@ -1791,12 +1791,12 @@ if( !rtoDataTransferMapMaster ){
 			   rtoDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'drRtoDesc',sheetName='Applications' where eavAttribute = ?",[rtoAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'RTO',sheetName='Applications' where eavAttribute = ?",[rtoAttribute])
 }
 
 def rtoDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,rtoAttribute)
 if(!rtoDataTransferMapWalkThru){
-   rtoDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"drRtoDesc",
+   rtoDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"RTO",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:rtoAttribute,
@@ -1808,7 +1808,7 @@ if(!rtoDataTransferMapWalkThru){
 			   rtoDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'drRtoDesc',sheetName='Applications' where eavAttribute = ?",[rtoAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'RTO',sheetName='Applications' where eavAttribute = ?",[rtoAttribute])
 }
 
 /**
@@ -1849,7 +1849,7 @@ if(downtimeToleranceEavEntityAttribute){
 
 def downtimeToleranceDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,downtimeToleranceAttribute)
 if( !downtimeToleranceDataTransferMapMaster ){
-   downtimeToleranceDataTransferMapMaster = new DataTransferAttributeMap(columnName:"moveDowntimeTolerance",
+   downtimeToleranceDataTransferMapMaster = new DataTransferAttributeMap(columnName:"DowntimeTolerance",
 		   sheetName:"Applications",
 		   dataTransferSet : masterDataTransferSet,
 		   eavAttribute:downtimeToleranceAttribute,
@@ -1861,12 +1861,12 @@ if( !downtimeToleranceDataTransferMapMaster ){
 			   downtimeToleranceDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'moveDowntimeTolerance',sheetName='Applications' where eavAttribute = ?",[downtimeToleranceAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'DowntimeTolerance',sheetName='Applications' where eavAttribute = ?",[downtimeToleranceAttribute])
 }
 
 def downtimeToleranceDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,downtimeToleranceAttribute)
 if(!downtimeToleranceDataTransferMapWalkThru){
-   downtimeToleranceDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"moveDowntimeTolerance",
+   downtimeToleranceDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"DowntimeTolerance",
 		   sheetName:"Applications",
 		   dataTransferSet : walkThruDataTransferSet,
 		   eavAttribute:downtimeToleranceAttribute,
@@ -1878,5 +1878,5 @@ if(!downtimeToleranceDataTransferMapWalkThru){
 			   downtimeToleranceDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'moveDowntimeTolerance',sheetName='Applications' where eavAttribute = ?",[downtimeToleranceAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'DowntimeTolerance',sheetName='Applications' where eavAttribute = ?",[downtimeToleranceAttribute])
 }

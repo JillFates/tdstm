@@ -167,7 +167,11 @@ class AssetEntityController {
 		def project
 		def dataTransferSet = params.dataTransferSet
 		def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
-		def dataTransferAttributeMap = DataTransferAttributeMap.findAllByDataTransferSet( dataTransferSetInstance )
+		def serverDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance, "Servers" )
+		println"serverDTAMap-->"+serverDTAMap.columnName
+		def appDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance, "Applications" )
+		def databaseDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance, "Databases" )
+		def filesDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance, "Files" )
 		try {
 			projectId = params["projectIdImport"]
 			if ( projectId == null || projectId == "" ) {
@@ -190,32 +194,35 @@ class AssetEntityController {
 		CommonsMultipartFile file = ( CommonsMultipartFile ) mpr.getFile("file")
 		// create workbook
 		def workbook
-		def sheet
 		def titleSheet
-		def sheetColumnNames = [:]
-		def sheetNameMap = [:]
-		def list = new ArrayList()
+		def sheetNameMap = ['Title','Servers','Applications','Databases','Files','Dependencies']
+		def appNameMap = [:]
+		def databaseNameMap = [:]
+		def filesNameMap = [:]
+		def serverColumnslist = new ArrayList()
 		Date exportTime
 		def dataTransferAttributeMapSheetName
 		//get column name and sheets
-		dataTransferAttributeMap.eachWithIndex { item, pos ->
+		serverDTAMap.eachWithIndex { item, pos ->
 			if(customLabels.contains( item.columnName )){
 				def customLabel = project[item.eavAttribute?.attributeCode] ? project[item.eavAttribute?.attributeCode] : item.columnName
-				list.add( customLabel )
+				serverColumnslist.add( customLabel )
 			} else {
-				list.add( item.columnName )
+				serverColumnslist.add( item.columnName )
 			}
-			sheetNameMap.put( "sheetName", (item.sheetName).trim() )
 		}
+		def appColumnslist = appDTAMap.columnName
+		def databaseColumnslist = databaseDTAMap.columnName
+		def filesColumnslist = filesDTAMap.columnName
+		
 		try {
 			workbook = Workbook.getWorkbook( file.inputStream )
 			def sheetNames = workbook.getSheetNames()
 			def flag = 0
 			def sheetNamesLength = sheetNames.length
 			for( int i=0;  i < sheetNamesLength; i++ ) {
-				if ( sheetNameMap.containsValue(sheetNames[i].trim()) ) {
+				if ( sheetNameMap.contains(sheetNames[i].trim()) ) {
 					flag = 1
-					sheet = workbook.getSheet( sheetNames[i] )
 				}
 			}
 			titleSheet = workbook.getSheet( "Title" )
@@ -228,26 +235,63 @@ class AssetEntityController {
 					redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
 					return;
 				}
-
-			}else {
-				flag = 1
+	
+			} else {
+				flag = 0
 			}
 			if( flag == 0 ) {
 				flash.message = " Sheet not found, Please check it."
 				redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
 				return;
 			} else {
+				def serverSheet = workbook.getSheet( "Servers" )
+				def appSheet = workbook.getSheet( "Applications" )
+				def databaseSheet = workbook.getSheet( "Databases" )
+				def filesSheet = workbook.getSheet( "Databases" )
+				def serverColumnNames = [:]
+				def appColumnNames = [:]
+				def databaseColumnNames = [:]
+				def filesColumnNames = [:]
 				//check for column
-				def col = sheet.getColumns()
-				for ( int c = 0; c < col; c++ ) {
-					def cellContent = sheet.getCell( c, 0 ).contents
-					sheetColumnNames.put(cellContent, c)
+				def serverCol = serverSheet.getColumns()
+				for ( int c = 0; c < serverCol; c++ ) {
+					def serverCellContent = serverSheet.getCell( c, 0 ).contents
+					serverColumnNames.put(serverCellContent, c)
 				}
-				def checkCol = checkHeader( list, sheetColumnNames )
+				def appCol = appSheet.getColumns()
+				for ( int c = 0; c < appCol; c++ ) {
+					def appCellContent = appSheet.getCell( c, 0 ).contents
+					appColumnNames.put(appCellContent, c)
+				}
+				def databaseCol = databaseSheet.getColumns()
+				for ( int c = 0; c < databaseCol; c++ ) {
+					def databaseCellContent = databaseSheet.getCell( c, 0 ).contents
+					databaseColumnNames.put(databaseCellContent, c)
+				}
+				def filesCol = filesSheet.getColumns()
+				for ( int c = 0; c < filesCol; c++ ) {
+					def filesCellContent = filesSheet.getCell( c, 0 ).contents
+					filesColumnNames.put(filesCellContent, c)
+				}
 				// Statement to check Headers if header are not found it will return Error message
-				if ( checkCol == false ) {
-					missingHeader = missingHeader.replaceFirst(",","")
-					flash.message = " Column Headers : ${missingHeader} not found, Please check it."
+				if ( !checkHeader( serverColumnslist, serverColumnNames ) ) {
+					def missingHeader = missingHeader.replaceFirst(",","")
+					flash.message = " Server Column Headers : ${missingHeader} not found, Please check it."
+					redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+					return;
+				} else if ( !checkHeader( appColumnslist, appColumnNames ) ) {
+					def missingHeader = missingHeader.replaceFirst(",","")
+					flash.message = " Applciations Column Headers : ${missingHeader} not found, Please check it."
+					redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+					return;
+				} else if ( !checkHeader( databaseColumnslist, databaseColumnNames ) ) {
+					def missingHeader = missingHeader.replaceFirst(",","")
+					flash.message = " Databases Column Headers : ${missingHeader} not found, Please check it."
+					redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+					return;
+				} else if ( !checkHeader( filesColumnslist, filesColumnNames ) ) {
+					def missingHeader = missingHeader.replaceFirst(",","")
+					flash.message = " Files Column Headers : ${missingHeader} not found, Please check it."
 					redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
 					return;
 				} else {
@@ -265,65 +309,189 @@ class AssetEntityController {
 					dataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
 					if(dataTransferBatch.save()){
 						session.setAttribute("BATCH_ID",dataTransferBatch.id)
-						def eavAttributeInstance
-						def colNo = 0
-						for (int index = 0; index < col; index++) {
-							if(sheet.getCell( index, 0 ).contents == "Server"){
-								colNo = index
+						def serverColNo = 0
+						for (int index = 0; index < serverCol; index++) {
+							if(serverSheet.getCell( index, 0 ).contents == "Server"){
+								serverColNo = index
 							}
 						}
-						def sheetrows = sheet.rows
+						def serverSheetrows = serverSheet.rows
 						def assetsCount = 0
-						for (int row = 1; row < sheetrows; row++) {
-							def server = sheet.getCell( colNo, row ).contents
+						for (int row = 1; row < serverSheetrows; row++) {
+							def server = serverSheet.getCell( serverColNo, row ).contents
 							if(server){
 								assetsCount = row
 							}
 						}
+						def appColNo = 0
+						for (int index = 0; index < appCol; index++) {
+							if(appSheet.getCell( index, 0 ).contents == "Name"){
+								appColNo = index
+							}
+						}
+						def appSheetrows = appSheet.rows
+						def appCount = 0
+						for (int row = 1; row < appSheetrows; row++) {
+							def name = appSheet.getCell( appColNo, row ).contents
+							if(name){
+								appCount = row
+							}
+						}
+						def databaseSheetrows = databaseSheet.rows
+						def databaseCount = 0
+						for (int row = 1; row < databaseSheetrows; row++) {
+							def name = databaseSheet.getCell( appColNo, row ).contents
+							if(name){
+								databaseCount = row
+							}
+						}
+						def filesSheetrows = filesSheet.rows
+						def filesCount = 0
+						for (int row = 1; row < filesSheetrows; row++) {
+							def name = filesSheet.getCell( appColNo, row ).contents
+							if(name){
+								filesCount = row
+							}
+						}
 						session.setAttribute("TOTAL_ASSETS",assetsCount)
-						for ( int r = 1; r < sheetrows ; r++ ) {
-							def server = sheet.getCell( colNo, r ).contents
+						for ( int r = 1; r < serverSheetrows ; r++ ) {
+							def server = serverSheet.getCell( serverColNo, r ).contents
 							if(server){
 								def dataTransferValueList = new StringBuffer()
-								for( int cols = 0; cols < col; cols++ ) {
+								for( int cols = 0; cols < serverCol; cols++ ) {
 									def dataTransferAttributeMapInstance
-									def projectCustomLabel = projectCustomLabels[sheet.getCell( cols, 0 ).contents.toString()]
+									def projectCustomLabel = projectCustomLabels[serverSheet.getCell( cols, 0 ).contents.toString()]
 									if(projectCustomLabel){
-										dataTransferAttributeMapInstance = dataTransferAttributeMap.find{it.columnName == projectCustomLabel}
+										dataTransferAttributeMapInstance = serverDTAMap.find{it.columnName == projectCustomLabel}
 									} else {
-										dataTransferAttributeMapInstance = dataTransferAttributeMap.find{it.columnName == sheet.getCell( cols, 0 ).contents}
+										dataTransferAttributeMapInstance = serverDTAMap.find{it.columnName == serverSheet.getCell( cols, 0 ).contents}
 									}
-
-									//dataTransferAttributeMapInstance = DataTransferAttributeMap.findByColumnName(sheet.getCell( cols, 0 ).contents)
+	
+									//dataTransferAttributeMapInstance = DataTransferAttributeMap.findByColumnName(serverSheet.getCell( cols, 0 ).contents)
 									if( dataTransferAttributeMapInstance != null ) {
 										def assetId
-										if( sheetColumnNames.containsKey("assetId") && (sheet.getCell( 0, r ).contents != "") ) {
+										if( serverColumnNames.containsKey("assetId") && (serverSheet.getCell( 0, r ).contents != "") ) {
 											try{
-												assetId = Integer.parseInt(sheet.getCell( 0, r ).contents)
+												assetId = Integer.parseInt(serverSheet.getCell( 0, r ).contents)
 											} catch( NumberFormatException ex ) {
 												flash.message = "AssetId should be Integer"
 												redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
 												return;
 											}
 										}
-										def dataTransferValues = "("+assetId+",'"+sheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+dataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
+										def dataTransferValues = "("+assetId+",'"+serverSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+dataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
 										dataTransferValueList.append(dataTransferValues)
 										dataTransferValueList.append(",")
-										/*dataTransferValue = new DataTransferValue()
-										 eavAttributeInstance = dataTransferAttributeMapInstance.eavAttribute
-										 dataTransferValue.importValue = sheet.getCell( cols, r ).contents
-										 dataTransferValue.rowId = r
-										 dataTransferValue.dataTransferBatch = dataTransferBatch
-										 dataTransferValue.eavAttribute = eavAttributeInstance
-										 if( sheetColumnNames.containsKey("assetId") && (sheet.getCell( 0, r ).contents != "") ) {
-										 dataTransferValue.assetEntityId = Integer.parseInt(sheet.getCell( 0, r ).contents)
-										 }
-										 if ( dataTransferValue.save() ) {
-										 added = r
-										 } else {
-										 skipped += ( r +1 )
-										 }
-										 */
+									}
+								}
+								try{
+									println"dataTransferValueList--"+dataTransferValueList
+									jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
+									added = r
+								} catch (Exception e) {
+									println"e-->"+e
+									skipped += ( r +1 )
+								}
+							}
+							if (r%50 == 0){
+								sessionFactory.getCurrentSession().flush();
+								sessionFactory.getCurrentSession().clear();
+							}
+						}
+						//  Process applciation
+						for ( int r = 1; r < appSheetrows ; r++ ) {
+							def name = appSheet.getCell( appColNo, r ).contents
+							if(name){
+								def dataTransferValueList = new StringBuffer()
+								for( int cols = 0; cols < appCol; cols++ ) {
+									def dataTransferAttributeMapInstance = appDTAMap.find{it.columnName == appSheet.getCell( cols, 0 ).contents}
+	
+									if( dataTransferAttributeMapInstance != null ) {
+										def assetId
+										if( appColumnNames.containsKey("appId") && (appSheet.getCell( 0, r ).contents != "") ) {
+											try{
+												assetId = Integer.parseInt(appSheet.getCell( 0, r ).contents)
+											} catch( NumberFormatException ex ) {
+												flash.message = "AppId should be Integer"
+												redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+												return;
+											}
+										}
+										def dataTransferValues = "("+assetId+",'"+appSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+dataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
+										dataTransferValueList.append(dataTransferValues)
+										dataTransferValueList.append(",")
+									}
+								}
+								try{
+									jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
+									added = r
+								} catch (Exception e) {
+									skipped += ( r +1 )
+								}
+							}
+							if (r%50 == 0){
+								sessionFactory.getCurrentSession().flush();
+								sessionFactory.getCurrentSession().clear();
+							}
+						}
+						//  Process database
+						for ( int r = 1; r < databaseSheetrows ; r++ ) {
+							def name = databaseSheet.getCell( appColNo, r ).contents
+							if(name){
+								def dataTransferValueList = new StringBuffer()
+								for( int cols = 0; cols < databaseCol; cols++ ) {
+									def dataTransferAttributeMapInstance = databaseDTAMap.find{it.columnName == databaseSheet.getCell( cols, 0 ).contents}
+	
+									if( dataTransferAttributeMapInstance != null ) {
+										def assetId
+										if( databaseColumnNames.containsKey("dbId") && (databaseSheet.getCell( 0, r ).contents != "") ) {
+											try{
+												assetId = Integer.parseInt(databaseSheet.getCell( 0, r ).contents)
+											} catch( NumberFormatException ex ) {
+												flash.message = "DBId should be Integer"
+												redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+												return;
+											}
+										}
+										def dataTransferValues = "("+assetId+",'"+databaseSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+dataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
+										dataTransferValueList.databaseend(dataTransferValues)
+										dataTransferValueList.databaseend(",")
+									}
+								}
+								try{
+									jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
+									added = r
+								} catch (Exception e) {
+									skipped += ( r +1 )
+								}
+							}
+							if (r%50 == 0){
+								sessionFactory.getCurrentSession().flush();
+								sessionFactory.getCurrentSession().clear();
+							}
+						}
+						//  Process files
+						for ( int r = 1; r < filesSheetrows ; r++ ) {
+							def name = filesSheet.getCell( appColNo, r ).contents
+							if(name){
+								def dataTransferValueList = new StringBuffer()
+								for( int cols = 0; cols < filesCol; cols++ ) {
+									def dataTransferAttributeMapInstance = filesDTAMap.find{it.columnName == filesSheet.getCell( cols, 0 ).contents}
+	
+									if( dataTransferAttributeMapInstance != null ) {
+										def assetId
+										if( filesColumnNames.containsKey("filesId") && (filesSheet.getCell( 0, r ).contents != "") ) {
+											try{
+												assetId = Integer.parseInt(filesSheet.getCell( 0, r ).contents)
+											} catch( NumberFormatException ex ) {
+												flash.message = "filesId should be Integer"
+												redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+												return;
+											}
+										}
+										def dataTransferValues = "("+assetId+",'"+filesSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+dataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
+										dataTransferValueList.filesend(dataTransferValues)
+										dataTransferValueList.filesend(",")
 									}
 								}
 								try{
@@ -363,7 +531,7 @@ class AssetEntityController {
 							}
 						}
 					}
-
+	
 				} // generate error message
 				workbook.close()
 				if (skipped.size() > 0) {
@@ -375,11 +543,13 @@ class AssetEntityController {
 				return;
 			}
 		} catch( NumberFormatException ex ) {
+			ex.printStackTrace()
 			flash.message = ex
 			redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
 			return;
 		} catch( Exception ex ) {
-			flash.message = grailsApplication.metadata[ 'app.file.format' ]
+			ex.printStackTrace()
+			flash.message = grailsApplication.metadata[ 'app.file.format' ]+ex
 			redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
 			return;
 		}
@@ -412,7 +582,7 @@ class AssetEntityController {
 			}
 		}
 		def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
-		def dataTransferAttributeMap = DataTransferAttributeMap.findAllByDataTransferSet( dataTransferSetInstance )
+		def dataTransferAttributeMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Servers" )
 		def project = Project.findById( projectId )
 		if ( projectId == null || projectId == "" ) {
 			flash.message = " Project Name is required. "
