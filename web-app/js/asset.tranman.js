@@ -659,6 +659,7 @@ function showAssetDialog( e , action ) {
 	      	 }
 	      	timedUpdate('never')
 		}
+		
 	}
 	function addCommentsToList( e ){
 		var status = $('#statusId').val();
@@ -858,7 +859,7 @@ var iconObj = $('#icon_'+assetComments.assetComment.assetEntity.id);
 iconObj.html(link)
 }
 
-function resolveValidate(formName,idVal){
+function resolveValidate(formName, idVal, redirectTo){
 	var type = 	document.forms[formName].commentType.value;
 	if(type != "issue"){
 		document.forms[formName].isResolved.value = 0;
@@ -866,6 +867,7 @@ function resolveValidate(formName,idVal){
 	var resolveBoo = document.forms[formName].isResolved.checked;
 	var resolveVal = document.forms[formName].resolution.value;
 	var assetId = $("#"+idVal).val()
+	
 	if(type == ""){
 		alert('Please select comment type');
 		return false;
@@ -876,8 +878,12 @@ function resolveValidate(formName,idVal){
 					timedUpdate($("#selectTimedId").val())
 				}
 				new Ajax.Request('../assetEntity/saveComment?assetEntity.id='+parseInt(assetId)+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value+'&category='+document.forms[formName].category.value,{asynchronous:true,evalScripts:true,onComplete:function(e){addCommentsToList(e);}})
-			}else{
-				new Ajax.Request('../assetEntity/updateComment?id='+parseInt(assetId)+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value,{asynchronous:true,evalScripts:true,onComplete:function(e){updateCommentsOnList(e);}})
+			} else {
+				if(redirectTo){
+					new Ajax.Request('../assetEntity/updateComment?id='+parseInt(assetId)+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value,{asynchronous:true,evalScripts:true,onComplete:function(e){updateCommentsLists();}})			
+				} else {
+					new Ajax.Request('../assetEntity/updateComment?id='+parseInt(assetId)+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value,{asynchronous:true,evalScripts:true,onComplete:function(e){updateCommentsOnList(e);}})
+				}
 			}
 		}else{
 			alert('Please enter resolution');
@@ -890,7 +896,11 @@ function resolveValidate(formName,idVal){
 			}
 			new Ajax.Request('../assetEntity/saveComment?assetEntity.id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value+'&category='+document.forms[formName].category.value,{asynchronous:true,evalScripts:true,onComplete:function(e){addCommentsToList(e);}})
 		}else{
-			new Ajax.Request('../assetEntity/updateComment?id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value,{asynchronous:true,evalScripts:true,onComplete:function(e){updateCommentsOnList(e);}})
+			if( redirectTo ){
+				new Ajax.Request('../assetEntity/updateComment?id='+parseInt(assetId)+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value,{asynchronous:true,evalScripts:true,onComplete:function(e){updateCommentsLists();}})	
+			} else {
+				new Ajax.Request('../assetEntity/updateComment?id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value,{asynchronous:true,evalScripts:true,onComplete:function(e){updateCommentsOnList(e);}})
+			}
 		}
 	}
 }
@@ -994,4 +1004,8 @@ function createNewAssetComment( asset ){
 }
 function showAssetComment(id ,type){
 	new Ajax.Request('../assetEntity/showComment?id='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, type );}})
+}
+function updateCommentsLists(){
+	$('#editCommentDialog').dialog('close');
+	window.location.reload();
 }

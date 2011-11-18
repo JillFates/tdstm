@@ -2090,13 +2090,14 @@ class AssetEntityController {
 		def assetEntityInstance = AssetEntity.findAllByProject(project)
 		def assetCommentList = AssetComment.findAll("From AssetComment a where a.assetEntity.project = :project",[project:project])
 		TableFacade tableFacade = new TableFacadeImpl("tag",request)
-        tableFacade.items = assetCommentList
-        Limit limit = tableFacade.limit
+		tableFacade.items = assetCommentList
+		Limit limit = tableFacade.limit
 		if(limit.isExported()){
-            tableFacade.setExportTypes(response,limit.getExportType())
-            tableFacade.setColumnProperties("comment","commentType","assetEntity","mustVerify","isResolved","resolution","resolvedBy","createdBy","commentCode","category","displayOption")
+			tableFacade.setExportTypes(response,limit.getExportType())
+			tableFacade.setColumnProperties("comment","commentType","assetEntity","mustVerify","isResolved","resolution","resolvedBy","createdBy","commentCode","category","displayOption")
 			tableFacade.render()
-        }else
-	 return [assetCommentList:assetCommentList]
+		} else {
+			return [assetCommentList:assetCommentList,rediectTo:'comment']
+		}
 	}
 }
