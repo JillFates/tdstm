@@ -168,7 +168,6 @@ class AssetEntityController {
 		def dataTransferSet = params.dataTransferSet
 		def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
 		def serverDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance, "Servers" )
-		println"serverDTAMap-->"+serverDTAMap.columnName
 		def appDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance, "Applications" )
 		def databaseDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance, "Databases" )
 		def filesDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance, "Files" )
@@ -247,7 +246,7 @@ class AssetEntityController {
 				def serverSheet = workbook.getSheet( "Servers" )
 				def appSheet = workbook.getSheet( "Applications" )
 				def databaseSheet = workbook.getSheet( "Databases" )
-				def filesSheet = workbook.getSheet( "Databases" )
+				def filesSheet = workbook.getSheet( "Files" )
 				def serverColumnNames = [:]
 				def appColumnNames = [:]
 				def databaseColumnNames = [:]
@@ -582,7 +581,11 @@ class AssetEntityController {
 			}
 		}
 		def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
-		def dataTransferAttributeMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Servers" )
+		def serverDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Servers" )
+		def appDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Applications" )
+		def dbDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Databases" )
+		def fileDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Files" )
+		
 		def project = Project.findById( projectId )
 		if ( projectId == null || projectId == "" ) {
 			flash.message = " Project Name is required. "
@@ -592,10 +595,13 @@ class AssetEntityController {
 		def asset
 		def assetEntityInstance
 		if(bundle[0] == "" ) {
-			asset = AssetEntity.findAllByProject( project )
+			asset = AssetEntity.findAllByProjectAndAssetTypeNotInList( project,["Application","Database","Files"], params )
 		} else {
 			asset = AssetEntity.findAll( "from AssetEntity m where m.project = project and m.moveBundle in ( $bundleList )" )
 		}
+		def application = Application.findAllByProject( project )
+		def database = Database.findAllByProject( project )
+		def files = Files.findAllByProject( project )
 		//get template Excel
 		def workbook
 		def book
@@ -614,46 +620,115 @@ class AssetEntityController {
 			response.setHeader( "Content-Disposition", "attachment; filename= ${exportType}-${filename}.xls" )
 			//create workbook and sheet
 			book = Workbook.createWorkbook( response.getOutputStream(), workbook )
-			def sheet
+			def serverSheet
+			def appSheet
+			def dbSheet
+			def fileSheet
 			def titleSheet
-			//check for column
-			def map = [:]
-			def sheetColumnNames = [:]
-			def columnNameList = new ArrayList()
-			def sheetNameMap = [:]
-			def dataTransferAttributeMapSheetName
-			//get columnNames in to map
-			dataTransferAttributeMap.eachWithIndex { item, pos ->
-				map.put( item.columnName, null )
-				columnNameList.add(item.columnName)
-				sheetNameMap.put( "sheetName", (item.sheetName).trim() )
+
+			def serverMap = [:]
+			def serverSheetColumnNames = [:]
+			def serverColumnNameList = new ArrayList()
+			def serverSheetNameMap = [:]
+			def serverDataTransferAttributeMapSheetName
+
+			def appMap = [:]
+			def appSheetColumnNames = [:]
+			def appColumnNameList = new ArrayList()
+			def appSheetNameMap = [:]
+			def appDataTransferAttributeMapSheetName
+
+			def dbMap = [:]
+			def dbSheetColumnNames = [:]
+			def dbColumnNameList = new ArrayList()
+			def dbSheetNameMap = [:]
+			def dbDataTransferAttributeMapSheetName
+
+			def fileMap = [:]
+			def fileSheetColumnNames = [:]
+			def fileColumnNameList = new ArrayList()
+			def fileSheetNameMap = [:]
+			def fileDataTransferAttributeMapSheetName
+
+			serverDTAMap.eachWithIndex { item, pos ->
+				serverMap.put( item.columnName, null )
+				serverColumnNameList.add(item.columnName)
+				serverSheetNameMap.put( "sheetName", (item.sheetName).trim() )
+			}
+			appDTAMap.eachWithIndex { item, pos ->
+				appMap.put( item.columnName, null )
+				appColumnNameList.add(item.columnName)
+				appSheetNameMap.put( "sheetName", (item.sheetName).trim() )
+			}
+			dbDTAMap.eachWithIndex { item, pos ->
+				dbMap.put( item.columnName, null )
+				dbColumnNameList.add(item.columnName)
+				dbSheetNameMap.put( "sheetName", (item.sheetName).trim() )
+			}
+			fileDTAMap.eachWithIndex { item, pos ->
+				fileMap.put( item.columnName, null )
+				fileColumnNameList.add(item.columnName)
+				fileSheetNameMap.put( "sheetName", (item.sheetName).trim() )
 			}
 			def sheetNames = book.getSheetNames()
 			def flag = 0
 			def sheetNamesLength = sheetNames.length
 			for( int i=0;  i < sheetNamesLength; i++ ) {
-				if ( sheetNameMap.containsValue( sheetNames[i].trim()) ) {
+				if ( serverSheetNameMap.containsValue( sheetNames[i].trim()) ) {
 					flag = 1
-					sheet = book.getSheet( sheetNames[i] )
+					
 				}
 			}
+			serverSheet = book.getSheet( sheetNames[1] )
+			appSheet = book.getSheet( sheetNames[2] )
+			dbSheet = book.getSheet( sheetNames[3] )
+			fileSheet = book.getSheet( sheetNames[4] )
+			
 			if( flag == 0 ) {
 				flash.message = " Sheet not found, Please check it."
 				redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
 				return;
 			} else {
-				def col = sheet.getColumns()
-				for ( int c = 0; c < col; c++ ) {
-					def cellContent = sheet.getCell( c, 0 ).contents
-					sheetColumnNames.put(cellContent, c)
-					if( map.containsKey( cellContent ) ) {
-						map.put( cellContent, c )
+				def serverCol = serverSheet.getColumns()
+				for ( int c = 0; c < serverCol; c++ ) {
+					def serverCellContent = serverSheet.getCell( c, 0 ).contents
+					serverSheetColumnNames.put(serverCellContent, c)
+					if( serverMap.containsKey( serverCellContent ) ) {
+						serverMap.put( serverCellContent, c )
+					}
+				}
+				def appCol = appSheet.getColumns()
+				for ( int c = 0; c < appCol; c++ ) {
+					def appCellContent = appSheet.getCell( c, 0 ).contents
+					appSheetColumnNames.put(appCellContent, c)
+					if( appMap.containsKey( appCellContent ) ) {
+						appMap.put( appCellContent, c )
+						
+					}
+				}
+				def dbCol = dbSheet.getColumns()
+				for ( int c = 0; c < dbCol; c++ ) {
+					def dbCellContent = dbSheet.getCell( c, 0 ).contents
+					dbSheetColumnNames.put(dbCellContent, c)
+					if( dbMap.containsKey( dbCellContent ) ) {
+						dbMap.put( dbCellContent, c )
+					}
+				}
+				def filesCol = fileSheet.getColumns()
+				for ( int c = 0; c < filesCol; c++ ) {
+					def fileCellContent = fileSheet.getCell( c, 0 ).contents
+					fileSheetColumnNames.put(fileCellContent, c)
+					if( fileMap.containsKey( fileCellContent ) ) {
+						fileMap.put( fileCellContent, c )
 					}
 				}
 				//calling method to check for Header
-				def checkCol = checkHeader( columnNameList, sheetColumnNames )
+				def serverCheckCol = serverCheckHeader( serverColumnNameList, serverSheetColumnNames )
+				def appCheckCol = appCheckHeader( appColumnNameList, appSheetColumnNames )
+				def dbCheckCol = dbCheckHeader( dbColumnNameList, dbSheetColumnNames )
+				def filesCheckCol = filesCheckHeader( fileColumnNameList, fileSheetColumnNames )
 				// Statement to check Headers if header are not found it will return Error message
-				if ( checkCol == false ) {
+				if ( serverCheckCol == false || appCheckCol == false || dbCheckCol == false || filesCheckCol == false) {
 					missingHeader = missingHeader.replaceFirst(",","")
 					flash.message = " Column Headers : ${missingHeader} not found, Please check it."
 					redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
@@ -678,43 +753,127 @@ class AssetEntityController {
 					}
 					//update data from Asset Entity table to EXCEL
 					def assetSize = asset.size()
-					def columnNameListSize = columnNameList.size()
+					def appSize = application.size()
+					def dbSize = database.size()
+					def fileSize = files.size()
+					def serverColumnNameListSize = serverColumnNameList.size()
+					def appcolumnNameListSize = appColumnNameList.size()
+					def dbcolumnNameListSize = dbColumnNameList.size()
+					def filecolumnNameListSize = fileColumnNameList.size()
 					// update column header
-					for ( int head =0; head <= sheetColumnNames.size(); head++ ) {
-						def cellData = sheet.getCell(head,0)?.getContents()
-						def attributeMap = dataTransferAttributeMap.find{it.columnName ==  cellData }?.eavAttribute
+					for ( int head =0; head <= serverSheetColumnNames.size(); head++ ) {
+						def cellData = serverSheet.getCell(head,0)?.getContents()
+						def attributeMap = serverDTAMap.find{it.columnName ==  cellData }?.eavAttribute
 						if(attributeMap?.attributeCode && customLabels.contains( cellData )){
 							def columnLabel = project[attributeMap?.attributeCode] ? project[attributeMap?.attributeCode] : cellData
 							def customColumn = new Label(head,0, columnLabel )
-							sheet.addCell(customColumn)
+							serverSheet.addCell(customColumn)
 						}
 					}
-
-					for ( int r = 1; r <= assetSize; r++ ) {
-						//Add assetId for walkthrough template only.
-						if( sheetColumnNames.containsKey("assetId") ) {
-							def integerFormat = new WritableCellFormat (NumberFormats.INTEGER)
-							def addAssetId = new Number(0, r, (asset[r-1].id))
-							sheet.addCell( addAssetId )
-						}
-						for ( int coll = 0; coll < columnNameListSize; coll++ ) {
-							def addContentToSheet
-							def attribute = dataTransferAttributeMap.eavAttribute.attributeCode[coll]
-							if ( attribute != "usize" && asset[r-1][attribute] == null ) {
-								addContentToSheet = new Label( map[columnNameList.get(coll)], r, "" )
-							} else if(attribute == "usize"){
-								addContentToSheet = new Label(map[columnNameList.get(coll)], r, asset[r-1]?.model?.usize?.toString() ?:"" )
-							}else {
-								//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
-								if( bundleMoveAndClientTeams.contains(dataTransferAttributeMap.eavAttribute.attributeCode[coll]) ) {
-									addContentToSheet = new Label( map[columnNameList.get(coll)], r, String.valueOf(asset[r-1].(dataTransferAttributeMap.eavAttribute.attributeCode[coll]).teamCode) )
-								}else {
-									addContentToSheet = new Label( map[columnNameList.get(coll)], r, String.valueOf(asset[r-1].(dataTransferAttributeMap.eavAttribute.attributeCode[coll])) )
-								}
+                    if(params.asset=='asset'){
+						for ( int r = 1; r <= assetSize; r++ ) {
+							//Add assetId for walkthrough template only.
+							if( serverSheetColumnNames.containsKey("assetId") ) {
+								def integerFormat = new WritableCellFormat (NumberFormats.INTEGER)
+								def addAssetId = new Number(0, r, (asset[r-1].id))
+								serverSheet.addCell( addAssetId )
 							}
-							sheet.addCell( addContentToSheet )
+							for ( int coll = 0; coll < serverColumnNameListSize; coll++ ) {
+								def addContentToSheet
+								def attribute = serverDTAMap.eavAttribute.attributeCode[coll]
+								if ( attribute != "usize" && asset[r-1][attribute] == null ) {
+									addContentToSheet = new Label( serverMap[serverColumnNameList.get(coll)], r, "" )
+								} else if(attribute == "usize"){
+									addContentToSheet = new Label(serverMap[serverColumnNameList.get(coll)], r, asset[r-1]?.model?.usize?.toString() ?:"" )
+								}else {
+									//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
+									if( bundleMoveAndClientTeams.contains(serverDTAMap.eavAttribute.attributeCode[coll]) ) {
+										addContentToSheet = new Label( serverMap[serverColumnNameList.get(coll)], r, String.valueOf(asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll]).teamCode) )
+									}else {
+										addContentToSheet = new Label( serverMap[serverColumnNameList.get(coll)], r, String.valueOf(asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll])) )
+									}
+								}
+								serverSheet.addCell( addContentToSheet )
+							}
 						}
 					}
+					if(params.application=='application'){
+						for ( int r = 1; r <= appSize; r++ ) {
+							//Add assetId for walkthrough template only.
+							if( appSheetColumnNames.containsKey("appId") ) {
+								def integerFormat = new WritableCellFormat (NumberFormats.INTEGER)
+								def addAppId = new Number(0, r, (asset[r-1].id))
+								appSheet.addCell( addAppId )
+							}
+							for ( int coll = 0; coll < appcolumnNameListSize; coll++ ) {
+								def addContentToSheet
+								def attribute = appDTAMap.eavAttribute.attributeCode[coll]
+								addContentToSheet = new Label( appMap[appColumnNameList.get(coll)], r, "" )
+									//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
+								if ( application[r-1][attribute] == null ) {
+									addContentToSheet = new Label( appMap[appColumnNameList.get(coll)], r, "" )
+								}else {
+									if( bundleMoveAndClientTeams.contains(appDTAMap.eavAttribute.attributeCode[coll]) ) {
+										addContentToSheet = new Label( appMap[appColumnNameList.get(coll)], r, String.valueOf(application[r-1].(appDTAMap.eavAttribute.attributeCode[coll]).teamCode) )
+									}else {
+										addContentToSheet = new Label( appMap[appColumnNameList.get(coll)], r, String.valueOf(application[r-1].(appDTAMap.eavAttribute.attributeCode[coll])) )
+									}
+								}
+								appSheet.addCell( addContentToSheet )
+							 }
+							}
+					}
+					if(params.database=='database'){
+						for ( int r = 1; r <= dbSize; r++ ) {
+							//Add assetId for walkthrough template only.
+							if( dbSheetColumnNames.containsKey("dbId") ) {
+								def integerFormat = new WritableCellFormat (NumberFormats.INTEGER)
+								def addDBId = new Number(0, r, (database[r-1].id))
+								dbSheet.addCell( addDBId )
+							}
+							for ( int coll = 0; coll < dbcolumnNameListSize; coll++ ) {
+								def addContentToSheet
+								def attribute = dbDTAMap.eavAttribute.attributeCode[coll]
+									//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
+								if ( database[r-1][attribute] == null ) {
+									addContentToSheet = new Label(  dbMap[dbColumnNameList.get(coll)], r, "" )
+								}else {
+									if( bundleMoveAndClientTeams.contains(dbDTAMap.eavAttribute.attributeCode[coll]) ) {
+										addContentToSheet = new Label( dbMap[dbColumnNameList.get(coll)], r, String.valueOf(database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll]).teamCode) )
+									}else {
+										addContentToSheet = new Label( dbMap[dbColumnNameList.get(coll)], r, String.valueOf(database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll])) )
+									}
+								}
+								dbSheet.addCell( addContentToSheet )
+							}
+						}
+					}
+					if(params.files=='files'){
+						for ( int r = 1; r <= fileSize; r++ ) {
+							//Add assetId for walkthrough template only.
+							if( fileSheetColumnNames.containsKey("filesId") ) {
+								def integerFormat = new WritableCellFormat (NumberFormats.INTEGER)
+								def addFileId = new Number(0, r, (files[r-1].id))
+								fileSheet.addCell( addFileId )
+							}
+							for ( int coll = 0; coll < filecolumnNameListSize; coll++ ) {
+								def addContentToSheet
+								def attribute = fileDTAMap.eavAttribute.attributeCode[coll]
+								if ( files[r-1][attribute] == null ) {
+									addContentToSheet = new Label( fileMap[fileColumnNameList.get(coll)], r, "" )
+								}else {
+									//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
+									if( bundleMoveAndClientTeams.contains(fileDTAMap.eavAttribute.attributeCode[coll]) ) {
+										addContentToSheet = new Label( fileMap[fileColumnNameList.get(coll)], r, String.valueOf(files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll]).teamCode) )
+									}else {
+										addContentToSheet = new Label( fileMap[fileColumnNameList.get(coll)], r, String.valueOf(files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll])) )
+									}
+								}
+								fileSheet.addCell( addContentToSheet )
+							}
+						}
+					}
+				}
 					//update data from Asset Comment table to EXCEL
 					for( int sl=0;  sl < sheetNamesLength; sl++ ) {
 						def commentIt = new ArrayList()
@@ -756,9 +915,10 @@ class AssetEntityController {
 					book.close()
 					render( view: "importExport" )
 				}
-			}
 		} catch( Exception fileEx ) {
+		   
 			flash.message = "Exception occurred wile exporting Excel. "
+			fileEx.printStackTrace();
 			redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
 			return;
 		}
@@ -769,10 +929,55 @@ class AssetEntityController {
 	 * @author Mallikarjun
 	 * @return bollenValue 
 	 *------------------------------------------------------- */  
-	def checkHeader( def list, def sheetColumnNames  ) {
+	def serverCheckHeader( def list, def serverSheetColumnNames  ) {
 		def listSize = list.size()
 		for ( int coll = 0; coll < listSize; coll++ ) {
-			if( sheetColumnNames.containsKey( list[coll] ) ) {
+			if( serverSheetColumnNames.containsKey( list[coll] ) ) {
+				//Nonthing to perform.
+			} else {
+				missingHeader = missingHeader + ", " + list[coll]
+			}
+		}
+		if( missingHeader == "" ) {
+			return true
+		} else {
+			return false
+		}
+	}
+	def appCheckHeader( def list, def appSheetColumnNames  ) {
+		def listSize = list.size()
+		for ( int coll = 0; coll < listSize; coll++ ) {
+			if( appSheetColumnNames.containsKey( list[coll] ) ) {
+				//Nonthing to perform.
+			} else {
+				missingHeader = missingHeader + ", " + list[coll]
+			}
+		}
+		if( missingHeader == "" ) {
+			return true
+		} else {
+			return false
+		}
+	}
+	def dbCheckHeader( def list, def dbSheetColumnNames  ) {
+		def listSize = list.size()
+		for ( int coll = 0; coll < listSize; coll++ ) {
+			if( dbSheetColumnNames.containsKey( list[coll] ) ) {
+				//Nonthing to perform.
+			} else {
+				missingHeader = missingHeader + ", " + list[coll]
+			}
+		}
+		if( missingHeader == "" ) {
+			return true
+		} else {
+			return false
+		}
+	}
+	def filesCheckHeader( def list, def fileSheetColumnNames  ) {
+		def listSize = list.size()
+		for ( int coll = 0; coll < listSize; coll++ ) {
+			if( fileSheetColumnNames.containsKey( list[coll] ) ) {
 				//Nonthing to perform.
 			} else {
 				missingHeader = missingHeader + ", " + list[coll]
