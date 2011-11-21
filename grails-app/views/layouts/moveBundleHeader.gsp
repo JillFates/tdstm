@@ -129,16 +129,16 @@
 	      <div class="menu2">
 	      	<ul>
 	            <jsec:hasRole name="ADMIN">
-	                <li><g:link class="home" controller="auth" action="home">Admin</g:link> </li>
+	                <li><g:link class="home" controller="auth" action="home" onmouseover="showSubMenu('#adminMenu')">Admin</g:link> </li>
 	            </jsec:hasRole>
-	        	<li><g:link class="home" controller="projectUtil">Project </g:link> </li>
+	        	<li><g:link class="home" controller="projectUtil" onmouseover="showSubMenu('#projectMenu')">Project </g:link> </li>
 	        	<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
-	        		<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
+	        		<li><g:link class="home" controller="person" action="projectStaff"  params="[projectId:currProjObj?.id]" >Staff</g:link></li>
 	        	</jsec:lacksAllRoles>
 			<li><g:link class="home" controller="room">Rooms</g:link></li>
 	        		<li><g:link class="home" controller="rackLayouts" action="create">Racks</g:link></li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
-	        		<li id="assetMenuId"><g:link class="home" controller="assetEntity" action="assetImport" >Assets</g:link></li>
+	        		<li id="assetMenuId"><g:link class="home" controller="assetEntity" action="assetImport" onmouseover="showSubMenu('#assetMenu')" >Assets</g:link></li>
 			<li><g:link class="home" controller="assetEntity" action="list" >Apps</g:link></li>
 			<li>&nbsp;</li>
 		                <li><g:link class="home" controller="moveEvent" action="show" >Events</g:link> </li>
@@ -147,9 +147,9 @@
 			<li>&nbsp;</li>
 	        </jsec:lacksAllRoles>
 	       		<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
-	        		<li><g:link class="home" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console</g:link></li>
+	        		<li><g:link class="home" controller="assetEntity" action="dashboardView" onmouseover="showSubMenu('#consoleMenu')" params="[projectId:currProjObj?.id, 'showAll':'show']">Console</g:link></li>
 	        	</jsec:hasAnyRole>
-	        		<li><g:link class="home" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link> </li>
+	        		<li><g:link class="home" controller="dashboard"   params="[projectId:currProjObj?.id]">Dashboard</g:link> </li>
 	        		<li><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker</g:link> </li>
 	         	<jsec:lacksAllRoles in="['MANAGER','OBSERVER']">
 	         		<li><g:link class="home" controller="reports" params="[projectId:currProjObj?.id]">Reports</g:link></li>
@@ -173,6 +173,62 @@
 				<li><g:link class="home" controller="walkThrough" >Walkthrough</g:link> </li>
 			</ul>
 		</div>
+		<div class="menu2" id="adminMenu" style="background-color:#003366;display: none;">
+		<ul >
+			<jsec:hasRole name="ADMIN">
+			<li><g:link class="home" controller="auth" action="home">Admin</g:link> </li>
+			<li><g:link class="home" controller="workflow" action="home">Workflows </g:link> </li>
+			<li><g:link class="home" controller="partyGroup" id="${partyGroup}">Company</g:link></li>
+			<li><g:link class="home" controller="person" id="${partyGroup}">Staff</g:link></li>
+			<li><g:link class="home" controller="userLogin" id="${partyGroup}">Users</g:link></li>
+			<li><g:link class="home" controller="manufacturer" id="${partyGroup}">Manufacturers</g:link></li>
+			<li><g:link class="home" controller="model" id="${partyGroup}">Models</g:link></li>
+			<li><g:link class="home" controller="model" action="importExport">Sync</g:link></li>
+		</jsec:hasRole>
+		</ul>
+		</div>
+		<div class="menu2" id="projectMenu" style="background-color:#003366;display: none;">
+		<ul >
+			<li><g:link class="home" controller="project" action="list">List Projects</g:link> </li>
+			<g:if test="${currProjObj}"><li><g:link class="home" controller="projectUtil">Project: ${currProjObj.name}</g:link></li></g:if>
+			<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
+			<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
+			</jsec:lacksAllRoles>
+		</ul>
+		</div>
+		<div class="menu2" id="assetMenu" style="background-color:#003366;display: none;">
+		<ul >
+			<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link> </li>
+			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Assets</g:link></li>
+			<li><g:link class="home" controller="application" action="list"  params="[projectId:currProjObj?.id]">List Apps</g:link></li>
+			<li><g:link class="home" controller="database" params="[projectId:currProjObj?.id]">List DBs</g:link></li>
+			<li><g:link class="home" controller="files" params="[projectId:currProjObj?.id]">List Files</g:link></li>
+			<li><g:link class="home" controller="assetEntity" action="listComment" params="[projectId:currProjObj?.id]">List Comments</g:link></li>
+		</ul>
+		</div>
+		<div class="menu2" id="bundleMenu" style="background-color:#003366;display:none;">
+		<ul >
+				<li><g:link class="home" controller="moveBundle" action="list">List</g:link></li>
+				<li><g:link class="home" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundle: ${moveBundleName}</g:link></li>
+				<li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundleId]" >Team</g:link></li>
+				<li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId]" >Bundle Asset Assignment</g:link> </li>
+				<li><g:link class="home" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleId, rack:'UnrackPlan']" >Bundle Team Assignment </g:link> </li>
+				<li><g:link class="home" controller="walkThrough" >Walkthrough</g:link></li>
+			</ul>
+		</div>
+	    <div class="menu2" id="consoleMenu" style="background-color:#003366;display: none;">
+		<ul >
+	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
+			<li><g:link class="home" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console</g:link></li>
+	        </jsec:hasAnyRole>
+	        <jsec:hasAnyRole in="['ADMIN']">
+			<li><g:link class="home" controller="newsEditor" params="[projectId:currProjObj?.id]">News</g:link></li>
+	        </jsec:hasAnyRole>
+	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+			<li><g:link class="home" controller="cartTracking" action="cartTracking" params="[projectId:currProjObj?.id]">Carts</g:link></li>
+	        </jsec:hasAnyRole>
+		</ul>
+	    </div>
 		<!-- <div class="menu2" id="reportsMenu" style="background-color:#003366;display: none;">
 			<ul>
 				<li><g:link class="home" controller="reports" action="getBundleListForReportDialog" params="[reportId:'Login Badges']">Login Badges</g:link> </li>
@@ -404,6 +460,17 @@
 		  		$(this).css('background-color','');
 	  		});
 	  	}
+	  	function showSubMenu(e){
+	  		$('#adminMenu').hide();
+	  		$('#projectMenu').hide();
+	  		$('#assetMenu').hide();
+	  		$('#bundleMenu').hide();
+	  		$('#consoleMenu').hide();
+	  		if(e!=""){
+		  		$(e).show();
+	  		}
+	  	}
+		showSubMenu(currentMenuId);
 	  	function setPower( p ){
 			${remoteFunction(controller:'project', action:'setPower', params:'\'p=\' + p ',	onComplete:'updateTimeZone( e )')}
 		}
