@@ -30,11 +30,12 @@ import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.eav.EavEntityType
 
 class AssetEntityController {
 
 	def missingHeader = ""
-	def added = 0
+	int added = 0
 	def skipped = []
 
 	def partyRelationshipService
@@ -159,7 +160,10 @@ class AssetEntityController {
 	def upload = {
 		sessionFactory.getCurrentSession().flush();
 		sessionFactory.getCurrentSession().clear();
-		session.setAttribute("BATCH_ID",0)
+		session.setAttribute("SERVER_BATCH_ID",0)
+		session.setAttribute("APP_BATCH_ID",0)
+		session.setAttribute("DB_BATCH_ID",0)
+		session.setAttribute("FILES_BATCH_ID",0)
 		session.setAttribute("TOTAL_ASSETS",0)
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		//get project Name
@@ -299,15 +303,6 @@ class AssetEntityController {
 					def principal = subject.principal
 					def userLogin = UserLogin.findByUsername( principal )
 					//Add Data to dataTransferBatch.
-					def dataTransferBatch = new DataTransferBatch()
-					dataTransferBatch.statusCode = "PENDING"
-					dataTransferBatch.transferMode = "I"
-					dataTransferBatch.dataTransferSet = dataTransferSetInstance
-					dataTransferBatch.project = project
-					dataTransferBatch.userLogin = userLogin
-					dataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
-					if(dataTransferBatch.save()){
-						session.setAttribute("BATCH_ID",dataTransferBatch.id)
 						def serverColNo = 0
 						for (int index = 0; index < serverCol; index++) {
 							if(serverSheet.getCell( index, 0 ).contents == "Server"){
@@ -353,156 +348,212 @@ class AssetEntityController {
 							}
 						}
 						session.setAttribute("TOTAL_ASSETS",assetsCount)
-						for ( int r = 1; r < serverSheetrows ; r++ ) {
-							def server = serverSheet.getCell( serverColNo, r ).contents
-							if(server){
-								def dataTransferValueList = new StringBuffer()
-								for( int cols = 0; cols < serverCol; cols++ ) {
-									def dataTransferAttributeMapInstance
-									def projectCustomLabel = projectCustomLabels[serverSheet.getCell( cols, 0 ).contents.toString()]
-									if(projectCustomLabel){
-										dataTransferAttributeMapInstance = serverDTAMap.find{it.columnName == projectCustomLabel}
-									} else {
-										dataTransferAttributeMapInstance = serverDTAMap.find{it.columnName == serverSheet.getCell( cols, 0 ).contents}
-									}
-	
-									//dataTransferAttributeMapInstance = DataTransferAttributeMap.findByColumnName(serverSheet.getCell( cols, 0 ).contents)
-									if( dataTransferAttributeMapInstance != null ) {
-										def assetId
-										if( serverColumnNames.containsKey("assetId") && (serverSheet.getCell( 0, r ).contents != "") ) {
-											try{
-												assetId = Integer.parseInt(serverSheet.getCell( 0, r ).contents)
-											} catch( NumberFormatException ex ) {
-												flash.message = "AssetId should be Integer"
-												redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
-												return;
-											}
+						if(params.asset == 'asset'){
+							def eavEntityType = EavEntityType.findByDomainName('AssetEntity')
+							def serverDataTransferBatch = new DataTransferBatch()
+							serverDataTransferBatch.statusCode = "PENDING"
+							serverDataTransferBatch.transferMode = "I"
+							serverDataTransferBatch.dataTransferSet = dataTransferSetInstance
+							serverDataTransferBatch.project = project
+							serverDataTransferBatch.userLogin = userLogin
+							serverDataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
+							serverDataTransferBatch.eavEntityType = eavEntityType
+							if(serverDataTransferBatch.save()){
+							 session.setAttribute("SERVER_BATCH_ID",serverDataTransferBatch.id)
+							}
+							for ( int r = 1; r < serverSheetrows ; r++ ) {
+								def server = serverSheet.getCell( serverColNo, r ).contents
+								if(server){
+									def dataTransferValueList = new StringBuffer()
+									for( int cols = 0; cols < serverCol; cols++ ) {
+										def dataTransferAttributeMapInstance
+										def projectCustomLabel = projectCustomLabels[serverSheet.getCell( cols, 0 ).contents.toString()]
+										if(projectCustomLabel){
+											dataTransferAttributeMapInstance = serverDTAMap.find{it.columnName == projectCustomLabel}
+										} else {
+											dataTransferAttributeMapInstance = serverDTAMap.find{it.columnName == serverSheet.getCell( cols, 0 ).contents}
 										}
-										def dataTransferValues = "("+assetId+",'"+serverSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+dataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
-										dataTransferValueList.append(dataTransferValues)
-										dataTransferValueList.append(",")
+		
+										//dataTransferAttributeMapInstance = DataTransferAttributeMap.findByColumnName(serverSheet.getCell( cols, 0 ).contents)
+										if( dataTransferAttributeMapInstance != null ) {
+											def assetId
+											if( serverColumnNames.containsKey("assetId") && (serverSheet.getCell( 0, r ).contents != "") ) {
+												try{
+													assetId = Integer.parseInt(serverSheet.getCell( 0, r ).contents)
+												} catch( NumberFormatException ex ) {
+													flash.message = "AssetId should be Integer"
+													redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+													return;
+												}
+											}
+											def dataTransferValues = "("+assetId+",'"+serverSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+serverDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
+											dataTransferValueList.append(dataTransferValues)
+											dataTransferValueList.append(",")
+											//println "dataTransferValueList"+dataTransferValueList
+										}
+									}
+									try{
+										jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
+										added = r + added
+									} catch (Exception e) {
+										println"e-->"+e
+										skipped += ( r +1 )
 									}
 								}
-								try{
-									println"dataTransferValueList--"+dataTransferValueList
-									jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
-									added = r
-								} catch (Exception e) {
-									println"e-->"+e
-									skipped += ( r +1 )
+								if (r%50 == 0){
+									sessionFactory.getCurrentSession().flush();
+									sessionFactory.getCurrentSession().clear();
 								}
 							}
-							if (r%50 == 0){
-								sessionFactory.getCurrentSession().flush();
-								sessionFactory.getCurrentSession().clear();
-							}
-						}
+       					}
 						//  Process applciation
-						for ( int r = 1; r < appSheetrows ; r++ ) {
-							def name = appSheet.getCell( appColNo, r ).contents
-							if(name){
-								def dataTransferValueList = new StringBuffer()
-								for( int cols = 0; cols < appCol; cols++ ) {
-									def dataTransferAttributeMapInstance = appDTAMap.find{it.columnName == appSheet.getCell( cols, 0 ).contents}
-	
-									if( dataTransferAttributeMapInstance != null ) {
-										def assetId
-										if( appColumnNames.containsKey("appId") && (appSheet.getCell( 0, r ).contents != "") ) {
-											try{
-												assetId = Integer.parseInt(appSheet.getCell( 0, r ).contents)
-											} catch( NumberFormatException ex ) {
-												flash.message = "AppId should be Integer"
-												redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
-												return;
+						if(params.application=='application'){
+							def eavEntityType = EavEntityType.findByDomainName('Application')
+							def appDataTransferBatch = new DataTransferBatch()
+							appDataTransferBatch.statusCode = "PENDING"
+							appDataTransferBatch.transferMode = "I"
+							appDataTransferBatch.dataTransferSet = dataTransferSetInstance
+							appDataTransferBatch.project = project
+							appDataTransferBatch.userLogin = userLogin
+							appDataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
+							appDataTransferBatch.eavEntityType = eavEntityType
+							if(appDataTransferBatch.save()){
+							 session.setAttribute("APP_BATCH_ID",appDataTransferBatch.id)
+							}
+							for ( int r = 1; r < appSheetrows ; r++ ) {
+								def name = appSheet.getCell( appColNo, r ).contents
+								if(name){
+									def dataTransferValueList = new StringBuffer()
+									for( int cols = 0; cols < appCol; cols++ ) {
+										def dataTransferAttributeMapInstance = appDTAMap.find{it.columnName == appSheet.getCell( cols, 0 ).contents}
+		
+										if( dataTransferAttributeMapInstance != null ) {
+											def assetId
+											if( appColumnNames.containsKey("appId") && (appSheet.getCell( 0, r ).contents != "") ) {
+												try{
+													assetId = Integer.parseInt(appSheet.getCell( 0, r ).contents)
+												} catch( NumberFormatException ex ) {
+													flash.message = "AppId should be Integer"
+													redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+													return;
+												}
 											}
+											def dataTransferValues = "("+assetId+",'"+appSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+appDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
+											dataTransferValueList.append(dataTransferValues)
+											dataTransferValueList.append(",")
 										}
-										def dataTransferValues = "("+assetId+",'"+appSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+dataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
-										dataTransferValueList.append(dataTransferValues)
-										dataTransferValueList.append(",")
+									}
+									try{
+										jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
+										added = r + added
+									} catch (Exception e) {
+										skipped += ( r +1 )
 									}
 								}
-								try{
-									jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
-									added = r
-								} catch (Exception e) {
-									skipped += ( r +1 )
+								if (r%50 == 0){
+									sessionFactory.getCurrentSession().flush();
+									sessionFactory.getCurrentSession().clear();
 								}
-							}
-							if (r%50 == 0){
-								sessionFactory.getCurrentSession().flush();
-								sessionFactory.getCurrentSession().clear();
 							}
 						}
 						//  Process database
-						for ( int r = 1; r < databaseSheetrows ; r++ ) {
-							def name = databaseSheet.getCell( appColNo, r ).contents
-							if(name){
-								def dataTransferValueList = new StringBuffer()
-								for( int cols = 0; cols < databaseCol; cols++ ) {
-									def dataTransferAttributeMapInstance = databaseDTAMap.find{it.columnName == databaseSheet.getCell( cols, 0 ).contents}
-	
-									if( dataTransferAttributeMapInstance != null ) {
-										def assetId
-										if( databaseColumnNames.containsKey("dbId") && (databaseSheet.getCell( 0, r ).contents != "") ) {
-											try{
-												assetId = Integer.parseInt(databaseSheet.getCell( 0, r ).contents)
-											} catch( NumberFormatException ex ) {
-												flash.message = "DBId should be Integer"
-												redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
-												return;
+						if(params.database=='database'){
+							def eavEntityType = EavEntityType.findByDomainName('Database')
+							def dbDataTransferBatch = new DataTransferBatch()
+							dbDataTransferBatch.statusCode = "PENDING"
+							dbDataTransferBatch.transferMode = "I"
+							dbDataTransferBatch.dataTransferSet = dataTransferSetInstance
+							dbDataTransferBatch.project = project
+							dbDataTransferBatch.userLogin = userLogin
+							dbDataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
+							dbDataTransferBatch.eavEntityType = eavEntityType
+							if(dbDataTransferBatch.save()){
+							  session.setAttribute("DB_BATCH_ID",dbDataTransferBatch.id)
+							}
+							for ( int r = 1; r < databaseSheetrows ; r++ ) {
+								def name = databaseSheet.getCell( appColNo, r ).contents
+								if(name){
+									def dataTransferValueList = new StringBuffer()
+									for( int cols = 0; cols < databaseCol; cols++ ) {
+										def dataTransferAttributeMapInstance = databaseDTAMap.find{it.columnName == databaseSheet.getCell( cols, 0 ).contents}
+		
+										if( dataTransferAttributeMapInstance != null ) {
+											def assetId
+											if( databaseColumnNames.containsKey("dbId") && (databaseSheet.getCell( 0, r ).contents != "") ) {
+												try{
+													assetId = Integer.parseInt(databaseSheet.getCell( 0, r ).contents)
+												} catch( NumberFormatException ex ) {
+													flash.message = "DBId should be Integer"
+													redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+													return;
+												}
 											}
+											def dataTransferValues = "("+assetId+",'"+databaseSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+dbDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
+											dataTransferValueList.append(dataTransferValues)
+											dataTransferValueList.append(",")
 										}
-										def dataTransferValues = "("+assetId+",'"+databaseSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+dataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
-										dataTransferValueList.databaseend(dataTransferValues)
-										dataTransferValueList.databaseend(",")
+									}
+									try{
+										jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
+										added = r + added
+									} catch (Exception e) {
+										skipped += ( r +1 )
 									}
 								}
-								try{
-									jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
-									added = r
-								} catch (Exception e) {
-									skipped += ( r +1 )
+								if (r%50 == 0){
+									sessionFactory.getCurrentSession().flush();
+									sessionFactory.getCurrentSession().clear();
 								}
-							}
-							if (r%50 == 0){
-								sessionFactory.getCurrentSession().flush();
-								sessionFactory.getCurrentSession().clear();
-							}
+							  }
 						}
 						//  Process files
-						for ( int r = 1; r < filesSheetrows ; r++ ) {
-							def name = filesSheet.getCell( appColNo, r ).contents
-							if(name){
-								def dataTransferValueList = new StringBuffer()
-								for( int cols = 0; cols < filesCol; cols++ ) {
-									def dataTransferAttributeMapInstance = filesDTAMap.find{it.columnName == filesSheet.getCell( cols, 0 ).contents}
-	
-									if( dataTransferAttributeMapInstance != null ) {
-										def assetId
-										if( filesColumnNames.containsKey("filesId") && (filesSheet.getCell( 0, r ).contents != "") ) {
-											try{
-												assetId = Integer.parseInt(filesSheet.getCell( 0, r ).contents)
-											} catch( NumberFormatException ex ) {
-												flash.message = "filesId should be Integer"
-												redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
-												return;
+						if(params.files=='files'){
+							def eavEntityType = EavEntityType.findByDomainName('Files')
+							def fileDataTransferBatch = new DataTransferBatch()
+							fileDataTransferBatch.statusCode = "PENDING"
+							fileDataTransferBatch.transferMode = "I"
+							fileDataTransferBatch.dataTransferSet = dataTransferSetInstance
+							fileDataTransferBatch.project = project
+							fileDataTransferBatch.userLogin = userLogin
+							fileDataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
+							fileDataTransferBatch.eavEntityType = eavEntityType
+							if(fileDataTransferBatch.save()){
+							  session.setAttribute("FILES_BATCH_ID",fileDataTransferBatch.id)
+							}
+							for ( int r = 1; r < filesSheetrows ; r++ ) {
+								def name = filesSheet.getCell( appColNo, r ).contents
+								if(name){
+									def dataTransferValueList = new StringBuffer()
+									for( int cols = 0; cols < filesCol; cols++ ) {
+										def dataTransferAttributeMapInstance = filesDTAMap.find{it.columnName == filesSheet.getCell( cols, 0 ).contents}
+		
+										if( dataTransferAttributeMapInstance != null ) {
+											def assetId
+											if( filesColumnNames.containsKey("filesId") && (filesSheet.getCell( 0, r ).contents != "") ) {
+												try{
+													assetId = Integer.parseInt(filesSheet.getCell( 0, r ).contents)
+												} catch( NumberFormatException ex ) {
+													flash.message = "filesId should be Integer"
+													redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+													return;
+												}
 											}
+											String dataTransferValues = "("+assetId+",'"+filesSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+fileDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
+											dataTransferValueList.append(dataTransferValues)
+											dataTransferValueList.append(",")
 										}
-										def dataTransferValues = "("+assetId+",'"+filesSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+dataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
-										dataTransferValueList.filesend(dataTransferValues)
-										dataTransferValueList.filesend(",")
+									}
+									try{
+										jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
+										added = r + added
+									} catch (Exception e) {
+										skipped += ( r +1 )
 									}
 								}
-								try{
-									jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
-									added = r
-								} catch (Exception e) {
-									skipped += ( r +1 )
+								if (r%50 == 0){
+									sessionFactory.getCurrentSession().flush();
+									sessionFactory.getCurrentSession().clear();
 								}
-							}
-							if (r%50 == 0){
-								sessionFactory.getCurrentSession().flush();
-								sessionFactory.getCurrentSession().clear();
 							}
 						}
 						for( int i=0;  i < sheetNamesLength; i++ ) {
@@ -529,7 +580,6 @@ class AssetEntityController {
 								}
 							}
 						}
-					}
 	
 				} // generate error message
 				workbook.close()
@@ -723,10 +773,10 @@ class AssetEntityController {
 					}
 				}
 				//calling method to check for Header
-				def serverCheckCol = serverCheckHeader( serverColumnNameList, serverSheetColumnNames )
-				def appCheckCol = appCheckHeader( appColumnNameList, appSheetColumnNames )
-				def dbCheckCol = dbCheckHeader( dbColumnNameList, dbSheetColumnNames )
-				def filesCheckCol = filesCheckHeader( fileColumnNameList, fileSheetColumnNames )
+				def serverCheckCol = checkHeader( serverColumnNameList, serverSheetColumnNames )
+				def appCheckCol = checkHeader( appColumnNameList, appSheetColumnNames )
+				def dbCheckCol = checkHeader( dbColumnNameList, dbSheetColumnNames )
+				def filesCheckCol = checkHeader( fileColumnNameList, fileSheetColumnNames )
 				// Statement to check Headers if header are not found it will return Error message
 				if ( serverCheckCol == false || appCheckCol == false || dbCheckCol == false || filesCheckCol == false) {
 					missingHeader = missingHeader.replaceFirst(",","")
@@ -929,55 +979,10 @@ class AssetEntityController {
 	 * @author Mallikarjun
 	 * @return bollenValue 
 	 *------------------------------------------------------- */  
-	def serverCheckHeader( def list, def serverSheetColumnNames  ) {
+	def checkHeader( def list, def serverSheetColumnNames  ) {
 		def listSize = list.size()
 		for ( int coll = 0; coll < listSize; coll++ ) {
 			if( serverSheetColumnNames.containsKey( list[coll] ) ) {
-				//Nonthing to perform.
-			} else {
-				missingHeader = missingHeader + ", " + list[coll]
-			}
-		}
-		if( missingHeader == "" ) {
-			return true
-		} else {
-			return false
-		}
-	}
-	def appCheckHeader( def list, def appSheetColumnNames  ) {
-		def listSize = list.size()
-		for ( int coll = 0; coll < listSize; coll++ ) {
-			if( appSheetColumnNames.containsKey( list[coll] ) ) {
-				//Nonthing to perform.
-			} else {
-				missingHeader = missingHeader + ", " + list[coll]
-			}
-		}
-		if( missingHeader == "" ) {
-			return true
-		} else {
-			return false
-		}
-	}
-	def dbCheckHeader( def list, def dbSheetColumnNames  ) {
-		def listSize = list.size()
-		for ( int coll = 0; coll < listSize; coll++ ) {
-			if( dbSheetColumnNames.containsKey( list[coll] ) ) {
-				//Nonthing to perform.
-			} else {
-				missingHeader = missingHeader + ", " + list[coll]
-			}
-		}
-		if( missingHeader == "" ) {
-			return true
-		} else {
-			return false
-		}
-	}
-	def filesCheckHeader( def list, def fileSheetColumnNames  ) {
-		def listSize = list.size()
-		for ( int coll = 0; coll < listSize; coll++ ) {
-			if( fileSheetColumnNames.containsKey( list[coll] ) ) {
 				//Nonthing to perform.
 			} else {
 				missingHeader = missingHeader + ", " + list[coll]

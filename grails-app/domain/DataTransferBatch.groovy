@@ -1,4 +1,5 @@
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.eav.EavEntityType
 class DataTransferBatch {
 	Date dateCreated
 	String statusCode
@@ -10,7 +11,7 @@ class DataTransferBatch {
 	
 	static hasMany = [ dataTransferValue:DataTransferValue ]
 	
-	static belongsTo = [ dataTransferSet : DataTransferSet, project : Project, userLogin : UserLogin ]
+	static belongsTo = [ dataTransferSet : DataTransferSet, project : Project, userLogin : UserLogin, eavEntityType : EavEntityType ]
 	
 	static mapping = {
 		version false

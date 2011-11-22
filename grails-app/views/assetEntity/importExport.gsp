@@ -75,6 +75,15 @@
                 <tr>
                 	<td valign="top" class="buttonR"><g:link controller="dataTransferBatch" params="[projectId:projectId]">Manage Batches: ${dataTransferBatchs}</g:link></td>
                 	<td valign="top" class="name">&nbsp;</td>
+                	 
+                </tr>
+                <tr><td colspan="2">
+	                <span><input type="checkbox" id="assetId" name="asset" value="asset" checked="checked"/>&nbsp;<label for="assetId">Asset</label></span>&nbsp;
+	                <span><input type="checkbox" id="applicationId" name="application" value="application"/>&nbsp;<label for="applicationId">Application</label></span>&nbsp;
+	                <span><input type="checkbox" id="filesId" name="files" value="files"  />&nbsp;<label for="filesId">Files</label></span>&nbsp;
+	                <span><input type="checkbox" id="databaseId" name="database" value="database" />&nbsp;<label for="databaseId">Database</label></span>&nbsp;
+	                <span><input type="checkbox" id="dependencyId" name="dependency" value="dependency" />&nbsp;<label for="dependencyId">dependency</label></span>&nbsp;
+	                </td>
                 </tr>
               </tbody>
             </table>
@@ -112,13 +121,14 @@
               <tr>
                 <td class="buttonR" colspan="5"><input class="button" type="submit" value="Generate"/></td>
               </tr>
-              <tr>
-                <td><input type="checkbox" id="assetId" name="asset" value="asset" checked="checked"/>&nbsp;<label for="assetId">Asset</label></td>
-                <td><input type="checkbox" id="applicationId" name="application" value="application"/>&nbsp;<label for="applicationId">Application</label></td>
-                <td><input type="checkbox" id="filesId" name="files" value="files"  />&nbsp;<label for="filesId">Files</label></td>
-                <td><input type="checkbox" id="databaseId" name="database" value="database" />&nbsp;<label for="databaseId">Database</label></td>
-                <td><input type="checkbox" id="dependencyId" name="dependency" value="dependency" />&nbsp;<label for="dependencyId">dependency</label></td>
-                </tr>
+              <tr><td colspan="2">
+	                <span><input type="checkbox" id="assetId" name="asset" value="asset" checked="checked"/>&nbsp;<label for="assetId">Asset</label></span>&nbsp;
+	                <span><input type="checkbox" id="applicationId" name="application" value="application"/>&nbsp;<label for="applicationId">Application</label></span>&nbsp;
+	                <span><input type="checkbox" id="filesId" name="files" value="files"  />&nbsp;<label for="filesId">Files</label></span>&nbsp;
+	                <span><input type="checkbox" id="databaseId" name="database" value="database" />&nbsp;<label for="databaseId">Database</label></span>&nbsp;
+	                <span><input type="checkbox" id="dependencyId" name="dependency" value="dependency" />&nbsp;<label for="dependencyId">dependency</label></span>&nbsp;
+	                </td>
+               </tr>
             </tbody>
           </table>
         </div>
