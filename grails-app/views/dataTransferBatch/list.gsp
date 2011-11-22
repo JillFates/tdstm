@@ -71,6 +71,8 @@
                         
                    	        <th>Set</th>
                    	        
+                   	        <th>Asset Type</th>
+                   	        
                    	        <th>Assets</th>
                         
                    	        <th>Errors</th>
@@ -92,6 +94,8 @@
                             <td>${dataTransferBatch?.userLogin?.person?.lastName} ${dataTransferBatch?.userLogin?.person?.firstName}</td>
                         
                             <td>${dataTransferBatch?.dataTransferSet?.title}</td>
+                            
+                            <td>${dataTransferBatch?.eavEntityType?.domainName}</td>
                         
                             <td>${DataTransferValue.executeQuery('select count(d.id) from DataTransferValue d where d.dataTransferBatch = '+ dataTransferBatch?.id +' group by rowId' ).size()}</td>
                             
@@ -101,7 +105,21 @@
                             
                             <td>
 	                            <g:if test="${dataTransferBatch?.statusCode == 'PENDING'}">
-	                            	<g:link action="process" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<a href="#">Void</a>
+	                                <g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'AssetEntity'}">
+	                            	   <g:link action="serverProcess" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<a href="#">Void</a>
+	                                </g:if> 
+	                                 <g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'Application'}">
+	                            	   <g:link action="appProcess" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<a href="#">Void</a>
+	                                 </g:if> 
+	                                 <g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'Database'}">
+	                            	   <g:link action="dbProcess" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<a href="#">Void</a>
+	                                 </g:if>
+	                                 <g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'Files'}">
+	                            	   <g:link action="fileProcess" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<a href="#">Void</a>
+	                                 </g:if> 
+	                                  <g:if test="${dataTransferBatch?.eavEntityType?.domainName == null}">
+	                            	   <g:link action="serverProcess" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<a href="#">Void</a>
+	                                 </g:if>                     
 	                            </g:if>
 	                             <g:else>
 	                            	<a href="#">Remove</a><g:if test="${dataTransferBatch?.hasErrors == 1}">|<a href="errorsListView?id=${dataTransferBatch?.id}">View Errors</a></g:if>
