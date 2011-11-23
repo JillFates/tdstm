@@ -4,13 +4,12 @@
 <div id="roomListView"></div>
 <input type="hidden" id="redirectTo" value="room"/>
 <div class="dialog" style="border: 1px solid black;">
-	<table style="width: 100%; border: none">
+	<table style="width: 100%; border: none;border-spacing:0px;">
 		<tbody>
 			<tr>
 				<td class="buttonR" style="vertical-align:top;width:240px;">
 				<div>
-				<span class="span"><h1 style="margin: 0px;">Room View</h1>
-				</span>
+				<h1 style="margin: 0px;">Room View</h1><br />
 				<g:select id="roomId" name="id" from="${roomInstanceList}" value="${roomInstance.id}" optionKey="id" optionValue="${{it.location +' / '+it.roomName}}" onchange="getRackDetails()"/>
 				<input type="hidden" id="selectedRackId" value="">
 				<br />
@@ -87,8 +86,7 @@
 						</table>
 					</div>
 					<div  id="scale_div" style="float: left;display: none;" >
-						<table class="scale_tab"
-							style="width: auto; padding: 0px; border: none;">
+						<table class="scale_tab" style="width: auto; padding: 0px; border: none;border-collapse: collapse;">
 							<tr>
 								<td class="cap_tab rack_cap20" id="cap20">&nbsp;</td>
 							</tr>
