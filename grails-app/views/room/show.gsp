@@ -2,9 +2,6 @@
 <body>
 <div class="body" style="width:98%;">
 <div id="roomListView"></div>
-<span class="span">
-<h1 style="margin: 0px;">Room View</h1>
-</span>
 <input type="hidden" id="redirectTo" value="room"/>
 <div class="dialog" style="border: 1px solid black;">
 	<table style="width: 100%; border: none">
@@ -12,6 +9,8 @@
 			<tr>
 				<td class="buttonR" style="vertical-align:top;width:240px;">
 				<div>
+				<span class="span"><h1 style="margin: 0px;">Room View</h1>
+				</span>
 				<g:select id="roomId" name="id" from="${roomInstanceList}" value="${roomInstance.id}" optionKey="id" optionValue="${{it.location +' / '+it.roomName}}" onchange="getRackDetails()"/>
 				<input type="hidden" id="selectedRackId" value="">
 				<br />
@@ -26,7 +25,7 @@
 				</g:form>
 				</div>
 				</td>
-				<td style="vertical-align:top;width:240px;">
+				<td style="vertical-align:top;width:180px;">
 				<div style="width: 150px"><label><b>Highlight:</b></label><br /><br />
 				<label><b>Bundle</b></label><br />
 					<g:select id="bundleId" name="moveBundleId" from="${MoveBundle.findAllByProject(project)}" value="${moveBundleList.id}" optionKey="id" optionValue="name" noSelection="${['all':'All']}" multiple="multiple" size="3"
@@ -85,19 +84,11 @@
 										&nbsp;w/ other bundles</label>
 								</td>
 							</tr>
-							<tr>
-								<td>
-									
-								</td>
-							</tr>
-							<tr>
-								<td class="cap_tab">&nbsp;</td>
-							</tr>
 						</table>
 					</div>
 					<div  id="scale_div" style="float: left;display: none;" >
 						<table class="scale_tab"
-							style="width: auto; padding: 1px; border: none;">
+							style="width: auto; padding: 0px; border: none;">
 							<tr>
 								<td class="cap_tab rack_cap20" id="cap20">&nbsp;</td>
 							</tr>

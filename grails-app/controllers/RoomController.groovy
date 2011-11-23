@@ -399,13 +399,13 @@ class RoomController {
 	   if((powerA +powerB+ powerC+ powerX) > (rackPowerA+ rackPowerB + rackPowerC )){
 		   redTBD = true
 	   }
-	   def op="""<table style='width:300px;border:0px;'>
+	   def op="""<table style='width:300px;padding:0px;border:0px;'>
 		   <tr>
 		   		<td class='powertable_H'>Room <br />Totals: </td>
 		   		<td colspan=2 class='powertable_H' >Space: (RU)<br />$spaceUsed / $totalSpace</td>
 		   		<td colspan=2 class='powertable_H' >Power (${powerString}):<br />$powerUsed / $totalPower</td>
 		   </tr>
-		   <tr><td>&nbsp;</td></tr>"""
+		   <tr><td class='powertable_L'>&nbsp;</td></tr>"""
 	   if(rack){
 		   op += """
 				   <tr>
