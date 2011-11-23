@@ -205,6 +205,10 @@ class AssetEntityController {
 		def serverColumnslist = new ArrayList()
 		Date exportTime
 		def dataTransferAttributeMapSheetName
+		int serverAdded  = 0
+		int appAdded   = 0
+		int dbAdded  = 0
+		int filesAdded = 0
 		//get column name and sheets
 		serverDTAMap.eachWithIndex { item, pos ->
 			if(customLabels.contains( item.columnName )){
@@ -389,12 +393,11 @@ class AssetEntityController {
 											def dataTransferValues = "("+assetId+",'"+serverSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+serverDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
 											dataTransferValueList.append(dataTransferValues)
 											dataTransferValueList.append(",")
-											//println "dataTransferValueList"+dataTransferValueList
 										}
 									}
 									try{
 										jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
-										added = r + added
+										serverAdded = r
 									} catch (Exception e) {
 										println"e-->"+e
 										skipped += ( r +1 )
@@ -445,7 +448,7 @@ class AssetEntityController {
 									}
 									try{
 										jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
-										added = r + added
+										appAdded = r
 									} catch (Exception e) {
 										skipped += ( r +1 )
 									}
@@ -495,7 +498,7 @@ class AssetEntityController {
 									}
 									try{
 										jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
-										added = r + added
+										dbAdded = r
 									} catch (Exception e) {
 										skipped += ( r +1 )
 									}
@@ -545,7 +548,7 @@ class AssetEntityController {
 									}
 									try{
 										jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
-										added = r + added
+										filesAdded = r 
 									} catch (Exception e) {
 										skipped += ( r +1 )
 									}
@@ -583,6 +586,7 @@ class AssetEntityController {
 	
 				} // generate error message
 				workbook.close()
+				added = serverAdded + appAdded   + dbAdded + filesAdded 
 				if (skipped.size() > 0) {
 					flash.message = " File Uploaded Successfully with ${added} records. and  ${skipped} Records skipped Please click the Manage Batches to review and post these changes."
 				} else {
