@@ -160,10 +160,7 @@ class AssetEntityController {
 	def upload = {
 		sessionFactory.getCurrentSession().flush();
 		sessionFactory.getCurrentSession().clear();
-		session.setAttribute("SERVER_BATCH_ID",0)
-		session.setAttribute("APP_BATCH_ID",0)
-		session.setAttribute("DB_BATCH_ID",0)
-		session.setAttribute("FILES_BATCH_ID",0)
+		session.setAttribute("BATCH_ID",0)
 		session.setAttribute("TOTAL_ASSETS",0)
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		//get project Name
@@ -306,6 +303,10 @@ class AssetEntityController {
 					def subject = SecurityUtils.subject
 					def principal = subject.principal
 					def userLogin = UserLogin.findByUsername( principal )
+					int assetsCount = 0
+					int appCount = 0
+					int databaseCount = 0
+					int filesCount = 0
 					//Add Data to dataTransferBatch.
 						def serverColNo = 0
 						for (int index = 0; index < serverCol; index++) {
@@ -314,11 +315,13 @@ class AssetEntityController {
 							}
 						}
 						def serverSheetrows = serverSheet.rows
-						def assetsCount = 0
-						for (int row = 1; row < serverSheetrows; row++) {
-							def server = serverSheet.getCell( serverColNo, row ).contents
-							if(server){
-								assetsCount = row
+						if(params.asset=='asset'){
+						    assetsCount 
+							for (int row = 1; row < serverSheetrows; row++) {
+								def server = serverSheet.getCell( serverColNo, row ).contents
+								if(server){
+									assetsCount = row
+								}
 							}
 						}
 						def appColNo = 0
@@ -328,30 +331,36 @@ class AssetEntityController {
 							}
 						}
 						def appSheetrows = appSheet.rows
-						def appCount = 0
-						for (int row = 1; row < appSheetrows; row++) {
-							def name = appSheet.getCell( appColNo, row ).contents
-							if(name){
-								appCount = row
+						if(params.application == 'application'){
+							appCount 
+							for (int row = 1; row < appSheetrows; row++) {
+								def name = appSheet.getCell( appColNo, row ).contents
+								if(name){
+									appCount = row
+								}
 							}
 						}
 						def databaseSheetrows = databaseSheet.rows
-						def databaseCount = 0
-						for (int row = 1; row < databaseSheetrows; row++) {
-							def name = databaseSheet.getCell( appColNo, row ).contents
-							if(name){
-								databaseCount = row
+						if(params.database=='database'){
+							databaseCount 
+							for (int row = 1; row < databaseSheetrows; row++) {
+								def name = databaseSheet.getCell( appColNo, row ).contents
+								if(name){
+									databaseCount = row
+								}
 							}
 						}
 						def filesSheetrows = filesSheet.rows
-						def filesCount = 0
-						for (int row = 1; row < filesSheetrows; row++) {
-							def name = filesSheet.getCell( appColNo, row ).contents
-							if(name){
-								filesCount = row
+						if(params.files=='files'){
+							filesCount 
+							for (int row = 1; row < filesSheetrows; row++) {
+								def name = filesSheet.getCell( appColNo, row ).contents
+								if(name){
+									filesCount = row
+								}
 							}
 						}
-						session.setAttribute("TOTAL_ASSETS",assetsCount)
+						session.setAttribute("TOTAL_ASSETS",(assetsCount+filesCount+databaseCount+appCount))
 						if(params.asset == 'asset'){
 							def eavEntityType = EavEntityType.findByDomainName('AssetEntity')
 							def serverDataTransferBatch = new DataTransferBatch()
@@ -363,7 +372,7 @@ class AssetEntityController {
 							serverDataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
 							serverDataTransferBatch.eavEntityType = eavEntityType
 							if(serverDataTransferBatch.save()){
-							 session.setAttribute("SERVER_BATCH_ID",serverDataTransferBatch.id)
+							 session.setAttribute("BATCH_ID",serverDataTransferBatch.id)
 							}
 							for ( int r = 1; r < serverSheetrows ; r++ ) {
 								def server = serverSheet.getCell( serverColNo, r ).contents
@@ -421,7 +430,7 @@ class AssetEntityController {
 							appDataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
 							appDataTransferBatch.eavEntityType = eavEntityType
 							if(appDataTransferBatch.save()){
-							 session.setAttribute("APP_BATCH_ID",appDataTransferBatch.id)
+							 session.setAttribute("BATCH_ID",appDataTransferBatch.id)
 							}
 							for ( int r = 1; r < appSheetrows ; r++ ) {
 								def name = appSheet.getCell( appColNo, r ).contents
@@ -461,6 +470,7 @@ class AssetEntityController {
 						}
 						//  Process database
 						if(params.database=='database'){
+							session.setAttribute("TOTAL_ASSETS",databaseCount)
 							def eavEntityType = EavEntityType.findByDomainName('Database')
 							def dbDataTransferBatch = new DataTransferBatch()
 							dbDataTransferBatch.statusCode = "PENDING"
@@ -471,7 +481,7 @@ class AssetEntityController {
 							dbDataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
 							dbDataTransferBatch.eavEntityType = eavEntityType
 							if(dbDataTransferBatch.save()){
-							  session.setAttribute("DB_BATCH_ID",dbDataTransferBatch.id)
+							  session.setAttribute("BATCH_ID",dbDataTransferBatch.id)
 							}
 							for ( int r = 1; r < databaseSheetrows ; r++ ) {
 								def name = databaseSheet.getCell( appColNo, r ).contents
@@ -511,6 +521,7 @@ class AssetEntityController {
 						}
 						//  Process files
 						if(params.files=='files'){
+							session.setAttribute("TOTAL_ASSETS",filesCount)
 							def eavEntityType = EavEntityType.findByDomainName('Files')
 							def fileDataTransferBatch = new DataTransferBatch()
 							fileDataTransferBatch.statusCode = "PENDING"
@@ -521,7 +532,7 @@ class AssetEntityController {
 							fileDataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
 							fileDataTransferBatch.eavEntityType = eavEntityType
 							if(fileDataTransferBatch.save()){
-							  session.setAttribute("FILES_BATCH_ID",fileDataTransferBatch.id)
+							  session.setAttribute("BATCH_ID",fileDataTransferBatch.id)
 							}
 							for ( int r = 1; r < filesSheetrows ; r++ ) {
 								def name = filesSheet.getCell( appColNo, r ).contents
@@ -585,7 +596,7 @@ class AssetEntityController {
 						}
 	
 				} // generate error message
-				workbook.close()
+				workbook.close()		
 				added = serverAdded + appAdded   + dbAdded + filesAdded 
 				if (skipped.size() > 0) {
 					flash.message = " File Uploaded Successfully with ${added} records. and  ${skipped} Records skipped Please click the Manage Batches to review and post these changes."
@@ -2231,10 +2242,12 @@ class AssetEntityController {
 		def progressData = []
 		def batchId = session.getAttribute("BATCH_ID")
 		def total = session.getAttribute("TOTAL_ASSETS")
+		println "total"+total
 		if ( batchId ){
 			importedData = jdbcTemplate.queryForList("select count(distinct row_id) as rows from data_transfer_value where data_transfer_batch_id="+batchId).rows
 		}
 		progressData<<[imported:importedData,total:total]
+		println "progressData"+progressData
 		render progressData as JSON
 	}
 	/* --------------------------------------
