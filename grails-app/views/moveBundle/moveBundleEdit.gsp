@@ -222,5 +222,9 @@
         </div>
       </g:form>
     </div>
+    <script>
+		currentMenuId = "#bundleMenu";
+		$("#bundleMenuId a").css('background-color','#003366')
+    </script>
   </body>
 </html>

@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="layout" content="moveBundleHeader" />
+    <meta name="layout" content="projectHeader" />
     <title>Bundle Team Assignment</title>
 	
     <script type="text/javascript">
@@ -576,5 +576,9 @@
 			</table>
 	    </div>
     </div>
+    <script>
+		currentMenuId = "#bundleMenu";
+		$("#bundleMenuId a").css('background-color','#003366')
+   </script>
 </body>
 </html>

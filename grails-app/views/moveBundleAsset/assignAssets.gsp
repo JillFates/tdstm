@@ -1,7 +1,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="moveBundleHeader" />
+<meta name="layout" content="projectHeader" />
 <title>Assign Assets</title>
 	<script type="text/javascript">
 			   $().ready(function() {  
@@ -344,6 +344,8 @@
 			<!-- <tr align="right"><td colspan="2" ><input type="button" value="Done"> </td> </tr> -->
 <script type="text/javascript">
 initialize()
+	currentMenuId = "#bundleMenu";
+	$("#bundleMenuId a").css('background-color','#003366')
 </script>
 </body>
 </html>
