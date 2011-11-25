@@ -2242,12 +2242,10 @@ class AssetEntityController {
 		def progressData = []
 		def batchId = session.getAttribute("BATCH_ID")
 		def total = session.getAttribute("TOTAL_ASSETS")
-		println "total"+total
 		if ( batchId ){
 			importedData = jdbcTemplate.queryForList("select count(distinct row_id) as rows from data_transfer_value where data_transfer_batch_id="+batchId).rows
 		}
 		progressData<<[imported:importedData,total:total]
-		println "progressData"+progressData
 		render progressData as JSON
 	}
 	/* --------------------------------------

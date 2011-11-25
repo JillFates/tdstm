@@ -73,7 +73,7 @@ class DataTransferBatchController {
     		def existingAssetsList = new ArrayList()
     		try{
     			dataTransferBatch = DataTransferBatch.get(params.batchId)
-    			if(dataTransferBatch.eavEntityType?.domainName == "AssetEntity"){
+				if(dataTransferBatch.eavEntityType?.domainName == "AssetEntity"){
     				batchRecords = DataTransferValue.executeQuery("select count( distinct rowId  ) from DataTransferValue where dataTransferBatch = $dataTransferBatch.id ")[0]
     				def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = "+
     															"$dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
@@ -279,11 +279,12 @@ class DataTransferBatchController {
     					}
     				}
     				dataTransferBatch.statusCode = 'COMPLETED'
+					dataTransferBatch.save(flush:true)
+					
 					if(!projectInstance.save(flush:true)){
 						println"Error while updating project.lastAssetId : ${projectInstance}"
 						projectInstance.errors.each { println it }
 					}
-    				dataTransferBatch.save(flush:true)
 					/* update assets racks, cabling data once process done */
 					updateAssetsCabling( modelAssetsList, existingAssetsList )
     			}

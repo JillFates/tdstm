@@ -20,6 +20,8 @@ class DataTransferAttributeMap {
 			id column:'id'
 			isRequired sqlType:'smallint'
 		}
+		eavAttribute lazy: false
+		
 	}
 	
 	static constraints = {
