@@ -243,6 +243,7 @@
 		</div>
 	</g:form>
 	</div>
+	<br />
 	<div class="cabling_div">
 		<div id="cablingPanel" style="height: auto;">
 		<g:if test="${projMap?.asset?.model?.rearImage && projMap?.asset?.model?.useImage == 1}">

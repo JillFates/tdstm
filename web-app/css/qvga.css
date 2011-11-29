@@ -376,8 +376,9 @@ a.tab_deselect {
 }
 .cabling_div {
 	border:1px solid #63A242;
+	float: left;
 	height: auto;
-	width:220px; 
+	width: 220px; 
 	overflow: auto;
 }
 .cabling_div th {
