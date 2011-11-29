@@ -141,7 +141,7 @@
 		<div class="clear" style="margin:2px;"></div>
 
 		<g:if test="${projMap}">			
-		<table style="border:0px; width=420">
+		<table style="border:0px; width:420px;">
 			<tr><td style="padding:0px;"><b>Asset</b>:&nbsp;<input name="search" type="text" size="12" value="${search}" id="search" autocorrect="off" autocapitalize="off"  />&nbsp;<a href="#detail">(Details...)</a></td>
 			</tr>
 	
@@ -178,7 +178,7 @@
 
 	<div class="clear" style="margin:4px;"></div>
 		<a name="comments"></a>
-		<table style"width:420px;">
+		<table style="width:420px;">
 			<tr>
 				<td class="heading" colspan=2><a class="heading" href="#comments">Other Actions</a></td>
 			</tr>

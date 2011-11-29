@@ -141,12 +141,12 @@
 		<div class="clear" style="margin:2px;"></div>
 
 		<g:if test="${projMap}">			
-		<table style="border:0px; width=220">
+		<table>
 			<tr><td style="padding:0px;"><b>Asset</b>:&nbsp;<input name="search" type="text" size="12" value="${search}" id="search" autocorrect="off" autocapitalize="off"  />&nbsp;<a href="#detail">(Details...)</a></td>
 			</tr>
 	
  			<g:if test="${assetComment}">
-			<tr><td><table style="border:0px; width=100%">
+			<tr><td><table style="border:0px;">
 				<tr>
 					<td style="width:219px"><strong><u>Instructions</u></strong></td>
 					<td><strong><u>Confirm</u></strong></td>
@@ -178,7 +178,7 @@
 
 	<div class="clear" style="margin:4px;"></div>
 		<a name="comments"></a>
-		<table width="100%">
+		<table>
 			<tr>
 				<td class="heading" colspan=2><a class="heading" href="#comments">Other Actions</a></td>
 			</tr>
@@ -207,7 +207,7 @@
 
 			<div style="margin:2px;" class="reset" ></div>
 
-			<table width="100%">
+			<table>
 			<tr>
 				<td class="heading"><a href="#detail">Details</a></td>
 				<td><span style="float:right;"><a href="#top">Top</a></span></td>
