@@ -128,7 +128,7 @@
 		<table id="room_layout_table" cellpadding="0" cellspacing="0" style="width:${tilecols * 42}px;height:auto;border:0px">
 			<g:while test="${numrows <= tilerows }">
 				<tr>
-					<g:set var="numcols" value="1" />
+					<g:set var="numcols" value="${1}" />
 					<g:while test="${numcols <= tilecols }">
 						<td class="room_tile" numcols="${numcols++}">&nbsp;</td>
 					</g:while>
