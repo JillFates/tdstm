@@ -119,19 +119,23 @@
 </div>
 <div id="roomLayout_body" style="width: 1100px; overflow-x: auto; border: 2px solid black">
 	<input id="selectedRackId" type="hidden">
+	<g:set var="numrows" value="1" />
+	<g:set var="tilerows" value="${roomInstance.roomDepth / 2}" />
+	<g:set var="numcols" value="1" />
+	<g:set var="tilecols" value="${roomInstance.roomWidth / 2}" />
+
 	<div id="room_layout" style="position:relative;width: 650px;height: 800px;overflow-x: auto; border: 0px solid black;float: left;">
-		<table id="room_layout_table" cellpadding="0" cellspacing="0" style="width:${roomInstance.roomWidth * 42 / 2}px;height:auto;border:0px">
-			<g:set var="numrows" value="${1}" />
-			<g:while test="${numrows < roomInstance.roomDepth / 2 }">
+		<table id="room_layout_table" cellpadding="0" cellspacing="0" style="width:${tilecols * 42}px;height:auto;border:0px">
+			<g:while test="${numrows <= tilerows }">
 				<tr>
-					<g:set var="numcols" value="${1}" />
-					<g:while test="${numcols < roomInstance.roomWidth / 2 }">
+					<g:set var="numcols" value="1" />
+					<g:while test="${numcols <= tilecols }">
 						<td class="room_tile" numcols="${numcols++}">&nbsp;</td>
 					</g:while>
 				</tr ><!-- ${numrows++} -->
 			</g:while>
 			<tr>
-			<td colspan="${numcols -1}">Floor ${roomInstance.roomWidth}ft x ${roomInstance.roomDepth}ft = ${roomInstance.roomWidth * roomInstance.roomDepth} sqft</td>
+			<td colspan="${tilecols}">Floor ${roomInstance.roomWidth}ft x ${roomInstance.roomDepth}ft = ${roomInstance.roomWidth * roomInstance.roomDepth} sqft</td>
 			</tr>
 		</table>
 			<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack" status='i'>
