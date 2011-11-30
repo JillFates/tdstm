@@ -119,9 +119,9 @@
 </div>
 <div id="roomLayout_body" style="width: 1100px; overflow-x: auto; border: 2px solid black">
 	<input id="selectedRackId" type="hidden">
-	<g:set var="numrows" value="1" />
+	<g:set var="numrows" value="${1}" />
 	<g:set var="tilerows" value="${roomInstance.roomDepth / 2}" />
-	<g:set var="numcols" value="1" />
+	<g:set var="numcols" value="${1}" />
 	<g:set var="tilecols" value="${roomInstance.roomWidth / 2}" />
 
 	<div id="room_layout" style="position:relative;width: 650px;height: 800px;overflow-x: auto; border: 0px solid black;float: left;">
