@@ -124,8 +124,8 @@
 	<g:set var="numcols" value="${1}" />
 	<g:set var="tilecols" value="${roomInstance.roomWidth / 2}" />Width:${roomInstance.roomWidth}&nbsp;cols:${tilecols}<br/>
 
-	<div id="room_layout" style="position:relative;width: 650px;height: 800px;overflow-x: auto; border: 0px solid black;float: left;">
-		<table id="room_layout_table" cellpadding="0" cellspacing="0" style="height:auto;border:0px">
+	<div id="room_layout" style="position:relative; width:650px; height:800px; overflow:auto; border:0px; float:left;">
+		<table id="room_layout_table" cellpadding="0" cellspacing="0" style="width:${tilecols *42}px; height:auto; border:0px;">
 			<g:while test="${numrows <= tilerows }">
 				<tr>
 					<g:set var="numcols" value="${1}" />
