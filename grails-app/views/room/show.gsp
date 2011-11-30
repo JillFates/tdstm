@@ -120,7 +120,7 @@
 <div id="roomLayout_body" style="width: 1100px; overflow-x: auto; border: 2px solid black">
 	<input id="selectedRackId" type="hidden">
 	<div id="room_layout" style="position:relative;width: 650px;height: 800px;overflow-x: auto; border: 0px solid black;float: left;">
-		<table id="room_layout_table" cellpadding="0" cellspacing="0" style="width:auto;height:auto;border:0px">
+		<table id="room_layout_table" cellpadding="0" cellspacing="0" style="width:${roomInstance.roomWidth * 42 / 2}px;height:auto;border:0px">
 			<g:set var="numrows" value="${1}" />
 			<g:while test="${numrows < roomInstance.roomDepth / 2 }">
 				<tr>

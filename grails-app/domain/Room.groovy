@@ -3,8 +3,8 @@ import com.tdssrc.grails.GormUtil
 class Room {
 	String roomName
 	String location
-	Integer roomWidth = 25
-	Integer roomDepth = 25
+	Integer roomWidth = 24
+	Integer roomDepth = 24
 	Project project
 	
 	// Groovy time stime stamps
