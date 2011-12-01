@@ -134,9 +134,6 @@
 					</g:while>
 				</tr ><!-- ${numrows++} -->
 			</g:while>
-			<tr>
-			<td colspan="${tilecols}">Floor ${roomInstance.roomWidth}ft x ${roomInstance.roomDepth}ft = ${roomInstance.roomWidth * roomInstance.roomDepth} sqft</td>
-			</tr>
 		</table>
 			<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack" status='i'>
 				<g:if test="${rack.rackType == 'Rack'}">
@@ -157,6 +154,7 @@
 					</div>
 				</g:else>
 		</g:each>
+		<span>Floor ${roomInstance.roomWidth}ft x ${roomInstance.roomDepth}ft = ${roomInstance.roomWidth * roomInstance.roomDepth} sqft</span>
 </div>
 	<div style="float: right; margin-left: 20px;width: 350px;" id="rackLayout">
 <table cellpadding=2 class="rack_elevation back">

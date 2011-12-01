@@ -264,17 +264,6 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 <span id="Database"><g:select name="asset" from="${dbs}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 <span id="Files"><g:select name="asset" from="${files}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 </div>
-<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
-<div class="buttons"> 
-	<g:form action="edit" controller="model" target="new">
-		<input name="id" type="hidden" id="show_modelId"/>
-		<span class="button">
-			<input type="submit" class="edit" value="Edit"></input>
-		</span>
-	</g:form>
-</div>
-</jsec:hasAnyRole>
-
 <script type="text/javascript">
 function openRoomView(e){
 	var resp = e.responseText
