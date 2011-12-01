@@ -194,6 +194,7 @@ class MoveBundleController {
             if( completionTime ){
             	moveBundleInstance.completionTime =  GormUtil.convertInToGMT(formatter.parse( completionTime ), tzId)
             }
+			moveBundleInstance.tempForUpdate = Math.random().toString()
             if(moveBundleInstance.validate(true) && moveBundleInstance.save() ) {
             	def stepsList = stateEngineService.getDashboardSteps( moveBundleInstance.project.workflowCode )
 				stepsList.each{

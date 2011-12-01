@@ -12,10 +12,6 @@
 
 			<h1>Company</h1>
 
-			<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-
-        	</div>
-
         	<br/>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>

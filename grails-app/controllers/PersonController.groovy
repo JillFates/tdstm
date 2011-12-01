@@ -129,6 +129,7 @@ class PersonController {
         def companyId = params.company
         if(personInstance) {
             personInstance.properties = params
+			personInstance.tempForUpdate = Math.random().toString()
             if ( !personInstance.hasErrors() && personInstance.save() ) {
             	if(companyId != null ){
     	            def companyParty = Party.findById(companyId)

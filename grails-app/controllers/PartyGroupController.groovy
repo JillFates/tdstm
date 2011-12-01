@@ -77,6 +77,7 @@ class PartyGroupController {
         //partyGroupInstance.lastUpdated = new Date()
         if(partyGroupInstance) {
             partyGroupInstance.properties = params
+			partyGroupInstance.tempForUpdate = Math.random().toString()
             if(!partyGroupInstance.hasErrors() && partyGroupInstance.save()) {
                 flash.message = "PartyGroup ${partyGroupInstance} updated"
                 redirect(action:show,id:partyGroupInstance.id)

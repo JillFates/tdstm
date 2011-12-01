@@ -3,6 +3,7 @@ class Party {
 	Date dateCreated
 	Date lastUpdated
 	PartyType partyType
+	String tempForUpdate
 	
 	/*
 	 * Fields Validations
@@ -11,6 +12,7 @@ class Party {
 		dateCreated( nullable:true )
 		lastUpdated( nullable:true )
 		partyType( nullable:true )
+		tempForUpdate(nullable:true)
 	}
 
 	/*
