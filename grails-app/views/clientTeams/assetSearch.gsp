@@ -205,8 +205,6 @@
 	 	<div>
 			<g:if test="${projMap}">
 
-			<div style="margin:2px;" class="reset" ></div>
-
 			<table style="width:420px;">
 			<tr>
 				<td class="heading"><a href="#detail">Details</a></td>
@@ -242,6 +240,8 @@
 		</g:if>
 		</div>
 	</g:form>
+		<div style="margin:2px;" class="reset" ></div>
+
 		<div class="cabling_div" style="width:420px;">
 		<div id="cablingPanel" style="height: auto;">
 		<g:if test="${projMap?.asset?.model?.rearImage && projMap?.asset?.model?.useImage == 1}">
