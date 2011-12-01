@@ -47,5 +47,9 @@
 		     	<span class="menuButton"><g:link class="create" action="create">Create New</g:link></span>
             </div>
         </div>
+<script>
+	currentMenuId = "";
+	$("#eventMenuId a").css('background-color','#003366')
+</script>
     </body>
 </html>

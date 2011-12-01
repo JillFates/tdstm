@@ -106,5 +106,9 @@
             $("#moveBundleList").html( moveBundlesString )
         }
         </script>
+<script>
+	currentMenuId = "";
+	$("#eventMenuId a").css('background-color','#003366')
+</script>
     </body>
 </html>

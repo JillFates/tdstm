@@ -107,5 +107,9 @@
                 </div>
             </g:form>
         </div>
+<script>
+	currentMenuId = "";
+	$("#eventMenuId a").css('background-color','#003366')
+</script>
     </body>
 </html>

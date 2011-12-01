@@ -334,5 +334,9 @@ function createAssetPage(type,source,rack,roomName,location,position){
 	   ${remoteFunction(action:'create',controller:'assetEntity',params:['redirectTo':'room'], onComplete:'createEntityView(e,type,source,rack,roomName,location,position)')}
 }
 </script>
+<script>
+	currentMenuId = "";
+	$("#roomMenuId a").css('background-color','#003366')
+</script>
 </body>
 </html>

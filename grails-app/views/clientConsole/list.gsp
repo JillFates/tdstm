@@ -1009,5 +1009,9 @@
 	}
 /*]]>*/
 </script>
+<script>
+	currentMenuId = "";
+	$("#assetTrackerMenuId a").css('background-color','#003366')
+</script>
 </body>
 </html>

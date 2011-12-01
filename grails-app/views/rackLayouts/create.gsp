@@ -280,5 +280,9 @@
 		${remoteFunction(action:'create',controller:'assetEntity',params:['redirectTo':'rack'], onComplete:'createEntityView(e,type,source,rack,roomName,location,position)')}
 	}
 </script>
+<script>
+	currentMenuId = "";
+	$("#rackMenuId a").css('background-color','#003366')
+</script>
 </body>
 </html>

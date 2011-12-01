@@ -19,9 +19,9 @@
 				<thead>
 					<tr>
 						<th>Report</th>
-						<th>Web</th>
+						<th>W</th>
 						<th>E</th>
-						<th>PDF</th>
+						<th>P</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -38,9 +38,9 @@
 					<thead>
 						<tr>
 						<th>Report</th>
-						<th>Web</th>
+						<th>W</th>
 						<th>E</th>
-						<th>PDF</th>
+						<th>P</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -61,9 +61,9 @@
 					<thead>
 						<tr>
 						<th>Report</th>
-						<th>Web</th>
+						<th>W</th>
 						<th>E</th>
-						<th>PDF</th>
+						<th>P</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -82,9 +82,9 @@
 					<thead>
 						<tr>
 						<th>Report</th>
-						<th>Web</th>
+						<th>W</th>
 						<th>E</th>
-						<th>PDF</th>
+						<th>P</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -103,9 +103,9 @@
 					<thead>
 						<tr>
 						<th>Report</th>
-						<th>Web</th>
+						<th>W</th>
 						<th>E</th>
-						<th>PDF</th>
+						<th>P</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -121,5 +121,9 @@
 </table>
 </div>
 </div>
+<script>
+	currentMenuId = "";
+	$("#reportMenuId a").css('background-color','#003366')
+</script>
 </body>
 </html>

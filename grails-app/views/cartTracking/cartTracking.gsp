@@ -423,6 +423,9 @@ $("#reassignAssetDiv").bind('dialogclose', function(){
     });   		
 });	
 </g:javascript>
+<script>
+	currentMenuId = "#consoleMenu";
+	$("#consoleMenuId a").css('background-color','#003366')
+</script>
 </body>
-
 </html>

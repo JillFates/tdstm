@@ -411,5 +411,9 @@ function textCounter(fieldId, maxlimit) {
     }
 }
 </script>
+<script>
+	currentMenuId = "#consoleMenu";
+	$("#consoleMenuId a").css('background-color','#003366')
+</script>
 </body>
 </html>

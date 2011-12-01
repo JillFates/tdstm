@@ -1186,5 +1186,9 @@
 	    }
 	}
 	</script>
+<script>
+	currentMenuId = "";
+	$("#dashboardMenuId a").css('background-color','#003366')
+</script>
 </div>
 </html>
