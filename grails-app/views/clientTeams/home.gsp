@@ -69,7 +69,7 @@ dt {
 					<b>Timezone:</b> <g:select name="timeZone" id="timeZoneId" from="${['GMT','PST','PDT','MST','MDT','CST','CDT','EST','EDT']}" 
                     			value="${session.getAttribute('CURR_TZ')?.CURR_TZ ? session.getAttribute('CURR_TZ')?.CURR_TZ : 'EDT'}" onchange="setUserTimeZone(this.value)"/>
 					<br />
-					<b>Current Team:</b>
+					<b>Team: ${projectTeam}</b>
 					<dl compact>
 						<dt>Project:&nbsp;</dt><dd>${project?.name}</dd>
 						<dt>Bundle:&nbsp;</dt><dd>${bundleName}</dd> 
@@ -79,7 +79,7 @@ dt {
 					</dl>
 				</div>
 				</g:form>
-                          	<g:link class="mobfooter" action="list" params="[projectId:projectId, viewMode:'mobile']">Use Mobile Site</g:link>
+				<g:link class="mobfooter" action="list" style="color:white;" params="[projectId:projectId, viewMode:'mobile']">Use Mobile Site</g:link>
 			</div>
 		</div>
 	</div>

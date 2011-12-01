@@ -242,8 +242,7 @@
 		</g:if>
 		</div>
 	</g:form>
-	</div>
-	<div class="cabling_div" style="width:420px;">
+		<div class="cabling_div" style="width:420px;">
 		<div id="cablingPanel" style="height: auto;">
 		<g:if test="${projMap?.asset?.model?.rearImage && projMap?.asset?.model?.useImage == 1}">
 			<img src="${createLink(controller:'model', action:'getRearImage', id:projMap?.asset?.model?.id)}" />
@@ -284,6 +283,7 @@
 			</g:each>
 			</tbody>
 		</table>
+		</div>
 		</div>
 	</div>
 	</div>

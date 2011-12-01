@@ -80,7 +80,7 @@
 	</div>
         </div>
         </g:form>
-	<g:link class="mobfooter" controller="clientTeams" style="color:white;" params="[projectId:projectId, viewMode:'web']">Use Full Site</g:link>
+		<g:link class="mobfooter" controller="clientTeams" style="color:white;" params="[projectId:projectId, viewMode:'web']">Use Full Site</g:link>
 
 <script type="text/javascript">
    function submitLoginForm( bundleId,teamId,role,location){
