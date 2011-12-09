@@ -101,7 +101,7 @@
 	      <div class="menu2">
 	      <ul>
 		<jsec:hasRole name="ADMIN">
-			<li id="adminMenuId"><g:link class="home" onmouseover="showSubMenu('#adminMenu')" controller="auth" action="home">Admin</g:link> </li>
+			<li id="adminMenuId"><g:link class="home" onmouseover="showMegaMenu('#adminMegaMenu')" controller="auth" action="home">Admin</g:link> </li>
 		</jsec:hasRole>
 			<li id="projectMenuId"><g:link class="home"  onmouseover="showSubMenu('#projectMenu')" controller="projectUtil">Project </g:link> </li>
 			<li id="roomMenuId"><g:link class="home" controller="room">Rooms</g:link></li>
@@ -123,6 +123,38 @@
 	        </jsec:lacksAllRoles>
 	      </ul>
 	    </div>
+		<div class="megamenu" id="adminMegaMenu" style="background-color:white;display: none;">
+				<jsec:hasRole name="ADMIN">
+			<div><span class="megamenuSection">Administration</span>
+				<ul >
+					<li><g:link class="mmlink" controller="auth" action="home">Admin</g:link> </li>
+					<li><a class="mmlink" href="https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp">help</a></li>
+				</ul>
+			</div>
+			<div><span class="megamenuSection">Manage Clients</span>
+				<ul >
+					<li><g:link class="mmlink" controller="partyGroup" id="${partyGroup}">Company</g:link></li>
+					<li><g:link class="mmlink" controller="person" id="${partyGroup}">Staff</g:link></li>
+					<li><g:link class="mmlink" controller="userLogin" id="${partyGroup}">Users</g:link></li>
+					<li><a class="mmlink" href="https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMCreatePerson">help</a></li>
+				</ul>
+			</div>
+			<div><span class="megamenuSection">Manage Workflows</span>
+				<ul >
+					<li><g:link class="mmlink" controller="workflow" action="home">Workflows </g:link> </li>
+					<li><a class="mmlink" href="https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMManageWorkflows">help</a></li>
+				</ul>
+			</div>
+			<div><span class="megamenuSection">Manage Model Library</span>
+				<ul >
+					<li><g:link class="mmlink" controller="manufacturer" id="${partyGroup}">Manufacturers</g:link></li>
+					<li><g:link class="mmlink" controller="model" id="${partyGroup}">Models</g:link></li>
+					<li><g:link class="mmlink" controller="model" action="importExport">Sync</g:link></li>
+					<li><a class="mmlink" href="https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp">help</a></li>
+				</ul>
+			</div>
+			</jsec:hasRole>
+		</div>
 		<div class="menu2" id="adminMenu" style="background-color:#003366;display: none;">
 		<ul >
 			<jsec:hasRole name="ADMIN">
@@ -396,6 +428,16 @@
 	  	function updateTimeZone( e ){
 		  	var sURL = unescape(window.location);
 		  	window.location.href = sURL;
+	  	}
+	  	function showMegaMenu(e){
+	  		$('#adminMegaMenu').hide();
+	  		$('#projectMegaMenu').hide();
+	  		$('#assetMegaMenu').hide();
+	  		$('#bundleMegaMenu').hide();
+	  		$('#consoleMegaMenu').hide();
+	  		if(e!=""){
+		  		$(e).show();
+	  		}
 	  	}
 	  	function showSubMenu(e){
 	  		$('#adminMenu').hide();
