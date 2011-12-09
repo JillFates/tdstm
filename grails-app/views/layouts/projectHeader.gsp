@@ -125,34 +125,36 @@
 	    </div>
 		<div class="megamenu" id="adminMegaMenu" style="background-color:white;display: none;">
 				<jsec:hasRole name="ADMIN">
-			<div><span class="megamenuSection">Administration</span>
+				<table><tr>
+			<td><span class="megamenuSection">Administration</span>
 				<ul >
 					<li><g:link class="mmlink" controller="auth" action="home">Admin</g:link> </li>
 					<li><a class="mmlink" href="https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp">help</a></li>
 				</ul>
-			</div>
-			<div><span class="megamenuSection">Manage Clients</span>
+			</td>
+			<td><span class="megamenuSection">Manage Clients</span>
 				<ul >
 					<li><g:link class="mmlink" controller="partyGroup" id="${partyGroup}">Company</g:link></li>
 					<li><g:link class="mmlink" controller="person" id="${partyGroup}">Staff</g:link></li>
 					<li><g:link class="mmlink" controller="userLogin" id="${partyGroup}">Users</g:link></li>
 					<li><a class="mmlink" href="https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMCreatePerson">help</a></li>
 				</ul>
-			</div>
-			<div><span class="megamenuSection">Manage Workflows</span>
+			</td>
+			<td><span class="megamenuSection">Manage Workflows</span>
 				<ul >
 					<li><g:link class="mmlink" controller="workflow" action="home">Workflows </g:link> </li>
 					<li><a class="mmlink" href="https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMManageWorkflows">help</a></li>
 				</ul>
-			</div>
-			<div><span class="megamenuSection">Manage Model Library</span>
+			</td>
+			<td><span class="megamenuSection">Manage Model Library</span>
 				<ul >
 					<li><g:link class="mmlink" controller="manufacturer" id="${partyGroup}">Manufacturers</g:link></li>
 					<li><g:link class="mmlink" controller="model" id="${partyGroup}">Models</g:link></li>
 					<li><g:link class="mmlink" controller="model" action="importExport">Sync</g:link></li>
 					<li><a class="mmlink" href="https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp">help</a></li>
 				</ul>
-			</div>
+			</td>
+			</tr></table>
 			</jsec:hasRole>
 		</div>
 		<div class="menu2" id="adminMenu" style="background-color:#003366;display: none;">

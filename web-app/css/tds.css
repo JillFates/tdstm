@@ -182,58 +182,43 @@
 	color:#ffffff;
 }
 
-.megamenu
-{
+.megamenu {
 	width:600px;
 	height:auto;
 	float:left;
 	background:white;
 	margin-top:0px;
 }
-.megamenu ul
-{
+.megamenu ul {
 	width:auto;
 	padding-top:0px;
 	margin:0px;
 	padding-left:0px;
 }
-.megamenu ul li
-{
-	display:inline;
+.megamenu ul li {
+	display:list-item;
 }
-.megamenu ul li a
-{
+.megamenu ul li a {
 	width:auto;
-	float: left;
 	height:16px;
 	text-decoration: none;
 	text-align:left;
-	font:bold 11px Tahoma;
+	font: 11px Tahoma;
 	color:blue;
 	padding:2px 6px;
 }
-.megamenu .megamenuSection
-{
+.megamenu .megamenuSection {
 	width:auto;
 	float: left;
 	height:14px;
 	text-decoration: none;
 	text-align:center;
 	font: bold 12px Tahoma;
-	color:#F0F0F0;
+	color:#black;
 	padding:2px 6px;
-	border-right:1px solid #CCCCCC;
 }
-.megamenu li a:hover, .megamenu li.current a
-{
-	color:green;
-}
-.megamenu ul li a:visited  {
-	color:lightblue;
-}
-	 
 .megamenu ul li a:hover   {
-	color:#ffffff;
+	color:green;
 }
 
 .menu3
