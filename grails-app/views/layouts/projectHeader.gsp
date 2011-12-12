@@ -123,7 +123,8 @@
 	        </jsec:lacksAllRoles>
 	      </ul>
 	    </div>
-		<div class="megamenu" id="adminMegaMenu" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="mclosetime()" style="background-color:white;display: none;">
+	    
+		<div class="megamenu" id="adminMegaMenu" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="mclosetime()" style="display: none;">
 			<jsec:hasRole name="ADMIN">
 			<table><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">Administration</span><br />
@@ -176,11 +177,11 @@
 		</ul>
 		</div>
 
-		<div class="megamenu" id="projectMegaMenu" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" style="background-color:white;display: none;">
+		<div class="megamenu" id="projectMegaMenu" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" style="display: none;">
 			<table><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">Project</span><br />
 				<ul >
-					<li><g:link class="mmlink" controller="project" action="home">List Projects</g:link></li>
+					<li><g:link class="mmlink" controller="project" action="list">List Projects</g:link></li>
 					<jsec:hasRole name="ADMIN">
 					<li><g:link class="mmlink" controller="project" action="create">Create Project</g:link></li>
 					</jsec:hasRole>
@@ -214,7 +215,7 @@
 		</ul>
 		</div>
 
-		<div class="megamenu" id="assetMegaMenu" onmouseover="showMegaMenu('#assetMegaMenu')" onmouseout="mclosetime()" style="background-color:white;display: none;">
+		<div class="megamenu" id="assetMegaMenu" onmouseover="showMegaMenu('#assetMegaMenu')" onmouseout="mclosetime()" style="display: none;">
 				<table><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">Manage Data</span><br />
 				<ul >
@@ -279,7 +280,7 @@
 		</ul>
 		</div>
 
-		<div class="megamenu" id="bundleMegaMenu" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" style="background-color:white;display: none;">
+		<div class="megamenu" id="bundleMegaMenu" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" style="display: none;">
 				<table><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">Events</span><br />
 				<ul >
@@ -308,10 +309,10 @@
 			<g:if test="${currProjObj}">
 			<td style="vertical-align:top"><span class="megamenuSection">For ${moveBundleName}:</span><br />
 				<ul >
-					<li><g:link class="home" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundle Settings</g:link></li>
+					<li><g:link class="mmlink" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundle Settings</g:link></li>
 					<li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId]" >Bundled Assets</g:link> </li>
-					<li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundleId]" >List Teams</g:link></li>
-					<li><g:link class="home" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleId, rack:'UnrackPlan']" >Assign Assets to Teams</g:link> </li>
+					<li><g:link class="mmlink" controller="projectTeam" action="list" params="[bundleId:moveBundleId]" >List Teams</g:link></li>
+					<li><g:link class="mmlink" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleId, rack:'UnrackPlan']" >Assign Assets to Teams</g:link> </li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
 					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
