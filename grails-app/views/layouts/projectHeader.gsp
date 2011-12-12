@@ -104,26 +104,26 @@
 			<li id="adminMenuId"><g:link class="home" onmouseover="showMegaMenu('#adminMegaMenu')" controller="auth" action="home">Admin</g:link> </li>
 		</jsec:hasRole>
 			<li id="projectMenuId"><g:link class="home" onmouseover="showMegaMenu('#projectMegaMenu')" controller="projectUtil">Project </g:link> </li>
-			<li id="roomMenuId"><g:link class="home" controller="room">Rooms</g:link></li>
-			<li id="rackMenuId"><g:link class="home" controller="rackLayouts" action="create">Racks</g:link></li>
+			<li id="roomMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="room">Rooms</g:link></li>
+			<li id="rackMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="rackLayouts" action="create">Racks</g:link></li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 			<li id="assetMenuId"><g:link class="home" onmouseover="showSubMenu('#assetMegaMenu')" controller="assetEntity" action="assetImport" >Assets</g:link></li>
-			<li id="eventMenuId"><g:link class="home" controller="moveEvent" action="show" >Events</g:link> </li>
+			<li id="eventMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="moveEvent" action="show" >Events</g:link> </li>
 			<li id="bundleMenuId"><g:link class="home" onmouseover="showSubMenu('#bundleMenu')" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles</g:link></li>
-			<li id="teamMenuId"><g:link class="home" controller="clientTeams" params="[projectId:currProjObj?.id]">Teams</g:link></li>
+			<li id="teamMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="clientTeams" params="[projectId:currProjObj?.id]">Teams</g:link></li>
 			<li>&nbsp;</li>
 	        </jsec:lacksAllRoles>
 	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
 			<li id="consoleMenuId"><g:link class="home" onmouseover="showSubMenu('#consoleMenu')" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console</g:link></li>
 	        </jsec:hasAnyRole>
-			<li id="dashboardMenuId"><g:link class="home" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link> </li>
-			<li id="assetTrackerMenuId"><g:link class="home" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker</g:link> </li>
+			<li id="dashboardMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link> </li>
+			<li id="assetTrackerMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker</g:link> </li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']">
-	        	<li id="reportMenuId"><g:link class="home" controller="reports" params="[projectId:currProjObj?.id]">Reports</g:link></li>
+	        	<li id="reportMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="reports" params="[projectId:currProjObj?.id]">Reports</g:link></li>
 	        </jsec:lacksAllRoles>
 	      </ul>
 	    </div>
-		<div class="megamenu" id="adminMegaMenu" onmouseout="showMegaMenu('')" style="background-color:white;display: none;">
+		<div class="megamenu" id="adminMegaMenu" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="mclosetime()" style="background-color:white;display: none;">
 				<jsec:hasRole name="ADMIN">
 				<table><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">Administration</span><br />
@@ -176,7 +176,7 @@
 		</ul>
 		</div>
 
-		<div class="megamenu" id="projectMegaMenu" onmouseout="showMegaMenu('')" style="background-color:white;display: none;">
+		<div class="megamenu" id="projectMegaMenu" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" style="background-color:white;display: none;">
 				<table><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">Project</span><br />
 				<ul >
@@ -526,9 +526,25 @@
 	  		$('#consoleMegaMenu').hide();
 	  		if(e!=""){
 		  		$(e).show();
+				mcancelclosetime();	// cancel close timer
+				megamenuitem = e;
 	  		}
 	  	}
-	  	function showSubMenu(e){
+	  	function closeMegaMenu() {
+			if(megamenuitem) $(megamenuitem).hide();
+	  	}
+	  	// set close timer
+		function mclosetime() {
+			closetimer = window.setTimeout(closeMegaMenu, timeout);
+		}
+		// cancel close timer
+		function mcancelclosetime() {
+		if(closetimer) {
+			window.clearTimeout(closetimer);
+			closetimer = null;
+			}
+		}
+	  	function showSubMenu(e) {
 	  		$('#adminMenu').hide();
 	  		$('#projectMenu').hide();
 	  		$('#assetMenu').hide();
@@ -540,6 +556,11 @@
 	  		}
 	  	}
 		showSubMenu(currentMenuId);
+
+		var timeout = 500;
+		var closetimer = 0;
+		var megamenuitem = 0;
+		document.onclick = closeMegaMenu;// close mega when click-out
 
 		function setPower( p ){
 			${remoteFunction(controller:'project', action:'setPower', params:'\'p=\' + p ',	onComplete:'updateTimeZone( e )')}
