@@ -183,17 +183,18 @@
 }
 
 .megamenu {
+	z-index:10
 	position:absolute;
-	top:50px;
+	top:48px;
 	left:0px;
 	width:600px;
 	height:auto;
 	float:left;
 	background:AliceBlue;
 	margin-top:0px;
-	-moz-box-shadow: 10px 10px 5px #888;
-	-webkit-box-shadow: 10px 10px 5px #888;
-	box-shadow: 6px 6px 3px #888;
+	-moz-box-shadow: 6px 6px 6px #888;
+	-webkit-box-shadow: 6px 6px 6px #888;
+	box-shadow: 6px 6px 6px #888;
 }
 #projectMegaMenu {
 	left:50px;
@@ -204,6 +205,10 @@
 }
 #bundleMegaMenu {
 	left:250px;
+	width:450px;
+}
+#consoleMegaMenu {
+	left:410px;
 	width:450px;
 }
 .megamenu ul {
@@ -221,7 +226,7 @@
 	height:16px;
 	text-decoration: none;
 	text-align:left;
-	font: 11px Tahoma;
+	font: 12px Tahoma;
 	color:blue;
 	padding:2px 6px;
 }
@@ -230,7 +235,7 @@
 	height:14px;
 	text-decoration: none;
 	text-align:center;
-	font: bold 12px Tahoma;
+	font: normal 12px Tahoma;
 	color:#black;
 	padding:2px 6px;
 }

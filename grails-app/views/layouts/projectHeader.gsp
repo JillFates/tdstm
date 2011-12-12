@@ -74,7 +74,7 @@
 				<span><img title="Note: MS IE6 has limited capability so functions have been reduced." src="${createLinkTo(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
 			</g:if>
 			<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">
-			Welcome,&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name } <g:if test="${person?.modelScore}"> (${person?.modelScore})</g:if> </span>
+			&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name } <g:if test="${person?.modelScore}"><span style="font-weight:normal"> (${person?.modelScore})</span></g:if> </span>
 			</g:remoteLink>
 			</div>
 			<div class="tzmenu">&nbsp;-&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' }</span>
@@ -107,14 +107,14 @@
 			<li id="roomMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="room">Rooms</g:link></li>
 			<li id="rackMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="rackLayouts" action="create">Racks</g:link></li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
-			<li id="assetMenuId"><g:link class="home" onmouseover="showSubMenu('#assetMegaMenu')" controller="assetEntity" action="assetImport" >Assets</g:link></li>
+			<li id="assetMenuId"><g:link class="home" onmouseover="showMegaMenu('#assetMegaMenu')" controller="assetEntity" action="assetImport" >Assets</g:link></li>
 			<li id="eventMenuId"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" controller="moveEvent" action="show" >Events</g:link> </li>
 			<li id="bundleMenuId"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles</g:link></li>
 			<li id="teamMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="clientTeams" params="[projectId:currProjObj?.id]">Teams</g:link></li>
 			<li>&nbsp;</li>
 	        </jsec:lacksAllRoles>
 	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
-			<li id="consoleMenuId"><g:link class="home" onmouseover="showSubMenu('#consoleMenu')" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console</g:link></li>
+			<li id="consoleMenuId"><g:link class="home" onmouseover="showMegaMenu('#consoleMegaMenu')" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console</g:link></li>
 	        </jsec:hasAnyRole>
 			<li id="dashboardMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link> </li>
 			<li id="assetTrackerMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker</g:link> </li>
@@ -331,6 +331,47 @@
 				<li><g:link class="home" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleId, rack:'UnrackPlan']" >Bundle Team Assignment </g:link> </li>
 				<li><g:link class="home" controller="walkThrough" >Walkthrough</g:link></li>
 			</ul>
+		</div>
+
+		<div class="megamenu" id="consoleMegaMenu" onmouseover="showMegaMenu('#consoleMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+				<table><tr>
+			<td style="vertical-align:top"><span class="megamenuSection">Supervisor Console</span><br />
+				<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
+				<ul >
+					<li><g:link class="mmlink" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show','teamType':'MOVE']">Supervise Move Techs</g:link></li>
+					<li><g:link class="mmlink" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show','teamType':'ADMIN']">Supervise Admins</g:link></li>
+					<li>&nbsp;</li>
+					<jsec:hasRole name="ADMIN">
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
+					</jsec:hasRole>
+				</ul>
+				</jsec:hasAnyRole>
+			</td>
+			<td style="vertical-align:top"><span class="megamenuSection">News</span><br />
+		        <jsec:hasAnyRole in="['ADMIN']">
+				<ul >
+					<li><g:link class="mmlink" controller="newsEditor" params="[projectId:currProjObj?.id]">List News Items</g:link></li>
+					<li>Create News Item</li>
+					<li>&nbsp;</li>
+					<jsec:hasRole name="ADMIN">
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
+					</jsec:hasRole>
+				</ul>
+		        </jsec:hasAnyRole>
+			</td>
+			<td style="vertical-align:top"><span class="megamenuSection">Cart Tracker</span><br />
+				<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+				<ul >
+					<li><g:link class="mmlink" controller="cartTracking" action="cartTracking" params="[projectId:currProjObj?.id]">Cart Status</g:link></li>
+					<li>Truck GPS Tracking</li>
+					<li>&nbsp;</li>
+					<jsec:hasRole name="ADMIN">
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
+					</jsec:hasRole>
+				</ul>
+				</jsec:hasAnyRole>
+			</td>
+			</tr></table>
 		</div>
 	    <div class="menu2" id="consoleMenu" style="background-color:#003366;display: none;">
 		<ul >
