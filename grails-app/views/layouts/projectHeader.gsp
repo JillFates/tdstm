@@ -108,8 +108,8 @@
 			<li id="rackMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="rackLayouts" action="create">Racks</g:link></li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 			<li id="assetMenuId"><g:link class="home" onmouseover="showSubMenu('#assetMegaMenu')" controller="assetEntity" action="assetImport" >Assets</g:link></li>
-			<li id="eventMenuId"><g:link class="home" onmouseover="showMegaMenu('#bundleMenu')" controller="moveEvent" action="show" >Events</g:link> </li>
-			<li id="bundleMenuId"><g:link class="home" onmouseover="showMegaMenu('#bundleMenu')" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles</g:link></li>
+			<li id="eventMenuId"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" controller="moveEvent" action="show" >Events</g:link> </li>
+			<li id="bundleMenuId"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles</g:link></li>
 			<li id="teamMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="clientTeams" params="[projectId:currProjObj?.id]">Teams</g:link></li>
 			<li>&nbsp;</li>
 	        </jsec:lacksAllRoles>
@@ -181,7 +181,9 @@
 			<td style="vertical-align:top"><span class="megamenuSection">Project</span><br />
 				<ul >
 					<li><g:link class="mmlink" controller="project" action="home">List Projects</g:link></li>
-					<li>&nbsp;</li>
+					<jsec:hasRole name="ADMIN">
+					<li><g:link class="mmlink" controller="project" action="create">Create Project</g:link></li>
+					</jsec:hasRole>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
 					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>

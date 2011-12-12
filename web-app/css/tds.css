@@ -189,7 +189,7 @@
 	width:600px;
 	height:auto;
 	float:left;
-	background:white;
+	background:AliceBlue;
 	margin-top:0px;
 	-moz-box-shadow: 10px 10px 5px #888;
 	-webkit-box-shadow: 10px 10px 5px #888;
@@ -197,14 +197,13 @@
 }
 #projectMegaMenu {
 	left:50px;
-	width:300px:
+	width:300px;
 }
 #assetMegaMenu {
 	left:200px;
 }
 .megamenu ul {
 	width:auto;
-	float:left;
 	padding-top:0px;
 	margin:0px;
 	padding-left:0px;
@@ -212,12 +211,10 @@
 }
 .megamenu ul li {
 	display:list-item;
-	float:left;
 }
 .megamenu ul li a {
 	width:auto;
 	height:16px;
-	float:left;
 	text-decoration: none;
 	text-align:left;
 	font: 11px Tahoma;
@@ -226,7 +223,6 @@
 }
 .megamenu .megamenuSection {
 	width:auto;
-	float: left;
 	height:14px;
 	text-decoration: none;
 	text-align:center;
