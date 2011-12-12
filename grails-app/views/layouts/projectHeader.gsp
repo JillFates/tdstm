@@ -180,7 +180,7 @@
 				<table><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">Project</span><br />
 				<ul >
-					<li><g:link class="mmlink" controller="project" action="home">List Projects</g:link> </li>
+					<li><g:link class="mmlink" controller="project" action="home">List Projects</g:link></li>
 					<li>&nbsp;</li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
@@ -191,8 +191,8 @@
 			<g:if test="${currProjObj}">
 			<td style="vertical-align:top"><span class="megamenuSection">For ${currProjObj.name}</span><br />
 				<ul >
-					<li><g:link class="home" controller="projectUtil">Project Settings</g:link></li>
-					<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Project Staff</g:link></li>
+					<li><g:link class="mmlink" controller="projectUtil">Project Settings</g:link></li>
+					<li><g:link class="mmlink" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Project Staff</g:link></li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
 					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
@@ -212,13 +212,13 @@
 		</ul>
 		</div>
 
-		<div class="megamenu" id="assetMegaMenu" onmouseout="showMegaMenu('')" style="background-color:white;display: none;">
+		<div class="megamenu" id="assetMegaMenu" onmouseover="showMegaMenu('#assetMegaMenu')" onmouseout="mclosetime()" style="background-color:white;display: none;">
 				<table><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">Manage Data</span><br />
 				<ul >
-					<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link></li>
-					<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Manage Batches</g:link></li>
-					<li><g:link class="home" controller="assetEntity" action="listComment" params="[projectId:currProjObj?.id]">List Comments</g:link></li>
+					<li><g:link class="mmlink" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link></li>
+					<li><g:link class="mmlink" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Manage Batches</g:link></li>
+					<li><g:link class="mmlink" controller="assetEntity" action="listComment" params="[projectId:currProjObj?.id]">List Comments</g:link></li>
 					<jsec:hasRole name="ADMIN">
 					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
 					</jsec:hasRole>
@@ -236,7 +236,7 @@
 			</td>
 			<td style="vertical-align:top"><span class="megamenuSection">Applications</span><br />
 				<ul >
-					<li><g:link class="home" controller="application" action="list"  params="[projectId:currProjObj?.id]">List Apps</g:link></li>
+					<li><g:link class="mmlink" controller="application" action="list"  params="[projectId:currProjObj?.id]">List Apps</g:link></li>
 					<li>&nbsp;</li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
@@ -246,7 +246,7 @@
 			</td>
 			<td style="vertical-align:top"><span class="megamenuSection">Databases</span><br />
 				<ul >
-					<li><g:link class="home" controller="database" params="[projectId:currProjObj?.id]">List DBs</g:link></li>
+					<li><g:link class="mmlink" controller="database" params="[projectId:currProjObj?.id]">List DBs</g:link></li>
 					<li>&nbsp;</li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
@@ -256,7 +256,7 @@
 			</td>
 			<td style="vertical-align:top"><span class="megamenuSection">Files</span><br />
 				<ul >
-					<li><g:link class="home" controller="files" params="[projectId:currProjObj?.id]">List Files</g:link></li>
+					<li><g:link class="mmlink" controller="files" params="[projectId:currProjObj?.id]">List Files</g:link></li>
 					<li>&nbsp;</li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
