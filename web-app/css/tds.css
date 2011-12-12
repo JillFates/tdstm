@@ -198,6 +198,9 @@
 #projectMegaMenu {
 	left:50px;
 }
+#assetMegaMenu {
+	left:200px;
+}
 .megamenu ul {
 	width:auto;
 	padding-top:0px;
