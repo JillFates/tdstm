@@ -126,13 +126,15 @@
 		<div class="megamenu" id="adminMegaMenu" style="background-color:white;display: none;">
 				<jsec:hasRole name="ADMIN">
 				<table><tr>
-			<td><span class="megamenuSection">Administration</span>
+			<td style="vertical-align:top"><span class="megamenuSection">Administration</span><br />
 				<ul >
 					<li><g:link class="mmlink" controller="auth" action="home">Admin</g:link> </li>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
 					<li><a class="mmlink" href="https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp">help</a></li>
 				</ul>
 			</td>
-			<td><span class="megamenuSection">Manage Clients</span>
+			<td style="vertical-align:top"><span class="megamenuSection">Manage Clients</span><br />
 				<ul >
 					<li><g:link class="mmlink" controller="partyGroup" id="${partyGroup}">Company</g:link></li>
 					<li><g:link class="mmlink" controller="person" id="${partyGroup}">Staff</g:link></li>
@@ -140,13 +142,15 @@
 					<li><a class="mmlink" href="https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMCreatePerson">help</a></li>
 				</ul>
 			</td>
-			<td><span class="megamenuSection">Manage Workflows</span>
+			<td style="vertical-align:top"><span class="megamenuSection">Manage Workflows</span><br />
 				<ul >
 					<li><g:link class="mmlink" controller="workflow" action="home">Workflows </g:link> </li>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
 					<li><a class="mmlink" href="https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMManageWorkflows">help</a></li>
 				</ul>
 			</td>
-			<td><span class="megamenuSection">Manage Model Library</span>
+			<td style="vertical-align:top"><span class="megamenuSection">Manage Model Library</span><br />
 				<ul >
 					<li><g:link class="mmlink" controller="manufacturer" id="${partyGroup}">Manufacturers</g:link></li>
 					<li><g:link class="mmlink" controller="model" id="${partyGroup}">Models</g:link></li>

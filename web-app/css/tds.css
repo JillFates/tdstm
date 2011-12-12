@@ -183,6 +183,9 @@
 }
 
 .megamenu {
+	position:absolute;
+	top:50px;
+	left:0px;
 	width:600px;
 	height:auto;
 	float:left;
@@ -194,6 +197,7 @@
 	padding-top:0px;
 	margin:0px;
 	padding-left:0px;
+	list-style-type:none;
 }
 .megamenu ul li {
 	display:list-item;
@@ -218,7 +222,7 @@
 	padding:2px 6px;
 }
 .megamenu ul li a:hover   {
-	color:green;
+	color:darkblue;
 }
 
 .menu3
