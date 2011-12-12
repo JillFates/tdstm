@@ -123,7 +123,7 @@
 	        </jsec:lacksAllRoles>
 	      </ul>
 	    </div>
-		<div class="megamenu" id="adminMegaMenu" style="background-color:white;display: none;">
+		<div class="megamenu" id="adminMegaMenu" onmouseoout="showMegaMenu('')" style="background-color:white;display: none;">
 				<jsec:hasRole name="ADMIN">
 				<table><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">Administration</span><br />
@@ -131,7 +131,7 @@
 					<li><g:link class="mmlink" controller="auth" action="home">Admin</g:link> </li>
 					<li>&nbsp;</li>
 					<li>&nbsp;</li>
-					<li><a class="mmlink" href="https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp');">help</a></li>
 				</ul>
 			</td>
 			<td style="vertical-align:top"><span class="megamenuSection">Manage Clients</span><br />
@@ -451,6 +451,7 @@
 	  		$('#assetMenu').hide();
 	  		$('#bundleMenu').hide();
 	  		$('#consoleMenu').hide();
+	  		showMegaMenu('');
 	  		if(e!=""){
 		  		$(e).show();
 	  		}

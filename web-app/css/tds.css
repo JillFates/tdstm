@@ -191,6 +191,9 @@
 	float:left;
 	background:white;
 	margin-top:0px;
+	-moz-box-shadow: 10px 10px 5px #888;
+	-webkit-box-shadow: 10px 10px 5px #888;
+	box-shadow: 10px 10px 5px #888;
 }
 .megamenu ul {
 	width:auto;
