@@ -121,9 +121,9 @@
 				<td><input type="text" id="roomXId_${rack}" name="roomX_${rack}" value="" size="3" onkeyup="changeRackPosition(${rack},this.value, 'left')" /></td>
 				<td><input type="text" id="roomYId_${rack}" name="roomY_${rack}" value="" size="3" onkeyup="changeRackPosition(${rack},this.value, 'top')" /></td>
 				<td><g:select id="frontId_${rack}" name="front_${rack}" from="${Rack.constraints.front.inList}" onchange="updateRackStyle(${rack}, this.value, jQuery('#rackTypeId_'+${rack}).val())"></g:select></td>
-				<td><input type="text" name="powerA_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerA/ 110 ).toFloat().round(1) : new Rack().powerA}"  size="3" /></td>
-				<td><input type="text" name="powerB_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerB/ 110 ).toFloat().round(1) : new Rack().powerB}" size="3" /></td>
-				<td><input type="text" name="powerC_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerC/ 110 ).toFloat().round(1) : new Rack().powerC}" size="3" /></td>
+				<td><input type="text" id = "newPowerA_${rack}" name="powerA_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerA/ 110 ).toFloat().round(1) : new Rack().powerA}"  size="3" /></td>
+				<td><input type="text" id = "newPowerB_${rack}" name="powerB_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerB/ 110 ).toFloat().round(1) : new Rack().powerB}" size="3" /></td>
+				<td><input type="text" id = "newPowerC_${rack}" name="powerC_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerC/ 110 ).toFloat().round(1) : new Rack().powerC}" size="3" /></td>
 				<td><g:select id="rackTypeId_${rack}" name="rackType_${rack}" from="${Rack.constraints.rackType.inList}" value="Rack" onchange="updateRackStyle(${rack}, jQuery('#frontId_'+${rack}).val(), this.value)"></g:select></td>
 				<td>0&nbsp;&nbsp;&nbsp;<a href="javascript:verifyAndDeleteRacks(${rack})"><span class="clear_filter"><u>X</u></span></a></td>
 			</tr>
@@ -201,7 +201,7 @@ function verifyAndDeleteRacks(id){
 		}
 	});
 }
-function createRack(value){
+function createRack(value){	
 	var newRackId = $("#rackCount").val()
 	$("#rackEditRow_"+newRackId).show()
 	$("#rack_"+newRackId).show()
@@ -209,12 +209,18 @@ function createRack(value){
 	if(value=="CRAC"){
 		$("#rackTypeId_"+newRackId).val('CRAC')
 		updateRackStyle(newRackId,'L','CRAC')
+		$("#newPowerA_"+newRackId).val('0')
+		$("#newPowerB_"+newRackId).val('0')
 	}else if(value=="UPS"){
 		$("#rackTypeId_"+newRackId).val('UPS')
 		updateRackStyle(newRackId,'L','UPS')
+		$("#newPowerA_"+newRackId).val('0')
+		$("#newPowerB_"+newRackId).val('0')
 	}else if(value=="Object"){
 		$("#rackTypeId_"+newRackId).val('Object')
 		updateRackStyle(newRackId,'L','Object')
+		$("#newPowerA_"+newRackId).val('0')
+		$("#newPowerB_"+newRackId).val('0')
 	}
 }
 function changeLabel(id,value){
