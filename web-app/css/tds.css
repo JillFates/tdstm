@@ -183,7 +183,7 @@
 }
 
 .megamenu {
-	z-index:10
+	z-index:10;
 	position:absolute;
 	top:48px;
 	left:0px;
@@ -198,6 +198,10 @@
 }
 #projectMegaMenu {
 	left:50px;
+	width:300px;
+}
+#racksMegaMenu {
+	left:100px;
 	width:300px;
 }
 #assetMegaMenu {
@@ -226,7 +230,7 @@
 	height:16px;
 	text-decoration: none;
 	text-align:left;
-	font: 12px Tahoma;
+	font: bold 12px Tahoma;
 	color:blue;
 	padding:2px 6px;
 }

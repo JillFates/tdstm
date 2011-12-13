@@ -104,8 +104,8 @@
 			<li id="adminMenuId"><g:link class="home" onmouseover="showMegaMenu('#adminMegaMenu')" controller="auth" action="home">Admin</g:link> </li>
 		</jsec:hasRole>
 			<li id="projectMenuId"><g:link class="home" onmouseover="showMegaMenu('#projectMegaMenu')" controller="projectUtil">Project </g:link> </li>
-			<li id="roomMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="room">Rooms</g:link></li>
-			<li id="rackMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="rackLayouts" action="create">Racks</g:link></li>
+			<li id="roomMenuId"><g:link class="home" onmouseover="showMegaMenu('#racksMegaMenu')" controller="room">Rooms</g:link></li>
+			<li id="rackMenuId"><g:link class="home" onmouseover="showMegaMenu('#racksMegaMenu')" controller="rackLayouts" action="create">Racks</g:link></li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 			<li id="assetMenuId"><g:link class="home" onmouseover="showMegaMenu('#assetMegaMenu')" controller="assetEntity" action="assetImport" >Assets</g:link></li>
 			<li id="eventMenuId"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" controller="moveEvent" action="show" >Events</g:link> </li>
@@ -213,6 +213,34 @@
 			<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
 			</jsec:lacksAllRoles>
 		</ul>
+		</div>
+
+		<div class="megamenu" id="racksMegaMenu" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+				<table><tr>
+			<td style="vertical-align:top"><span class="megamenuSection">Rooms</span><br />
+				<ul >
+					<li><g:link class="mmlink" params="[viewType:list]" controller="room">List Rooms</g:link></li>
+					<li>&nbsp;</li>
+					<jsec:hasRole name="ADMIN">
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
+					</jsec:hasRole>
+				</ul>
+			</td>
+			<td style="vertical-align:top"><span class="megamenuSection">Racks</span><br />
+				<ul >
+					<li><g:link class="mmlink" controller="rackLayouts" action="create">Racks</g:link></li>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
+					<jsec:hasRole name="ADMIN">
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
+					</jsec:hasRole>
+				</ul>
+			</td>
+			<g:if test="${currProjObj}">
+			<td style="vertical-align:top"><span class="megamenuSection">For ${moveBundleName}:</span><br />
+			</td>
+			</g:if>
+			</tr></table>
 		</div>
 
 		<div class="megamenu" id="assetMegaMenu" onmouseover="showMegaMenu('#assetMegaMenu')" onmouseout="mclosetime()" style="display: none;">
@@ -351,7 +379,7 @@
 		        <jsec:hasAnyRole in="['ADMIN']">
 				<ul >
 					<li><g:link class="mmlink" controller="newsEditor" params="[projectId:currProjObj?.id]">List News Items</g:link></li>
-					<li>Create News Item</li>
+					<li><a class="mmlink" href="#">Create News Item</a></li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
 					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
@@ -363,7 +391,7 @@
 				<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
 				<ul >
 					<li><g:link class="mmlink" controller="cartTracking" action="cartTracking" params="[projectId:currProjObj?.id]">Cart Status</g:link></li>
-					<li>Truck GPS Tracking</li>
+					<li><a class="mmlink" href="#">Truck GPS Tracking</a></li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
 					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
@@ -607,6 +635,7 @@
 	  	function showMegaMenu(e){
 	  		$('#adminMegaMenu').hide();
 	  		$('#projectMegaMenu').hide();
+	  		$('#racksMegaMenu').hide();
 	  		$('#assetMegaMenu').hide();
 	  		$('#bundleMegaMenu').hide();
 	  		$('#consoleMegaMenu').hide();
