@@ -137,15 +137,15 @@
 			</td>
 			<td style="vertical-align:top"><span class="megamenuSection">Manage Clients</span><br />
 				<ul >
-					<li><g:link class="mmlink" controller="partyGroup" id="${partyGroup}">Company</g:link></li>
-					<li><g:link class="mmlink" controller="person" id="${partyGroup}">Staff</g:link></li>
-					<li><g:link class="mmlink" controller="userLogin" id="${partyGroup}">Users</g:link></li>
+					<li><g:link class="mmlink" controller="partyGroup" id="${partyGroup}">List Companies</g:link></li>
+					<li><g:link class="mmlink" controller="person" id="${partyGroup}">List Staff</g:link></li>
+					<li><g:link class="mmlink" controller="userLogin" id="${partyGroup}">List Users</g:link></li>
 					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMCreatePerson?cover=print');">help</a></li>
 				</ul>
 			</td>
 			<td style="vertical-align:top"><span class="megamenuSection">Manage Workflows</span><br />
 				<ul >
-					<li><g:link class="mmlink" controller="workflow" action="home">Workflows </g:link> </li>
+					<li><g:link class="mmlink" controller="workflow" action="home">List Workflows </g:link> </li>
 					<li>&nbsp;</li>
 					<li>&nbsp;</li>
 					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMManageWorkflows?cover=print');">help</a></li>
@@ -219,7 +219,7 @@
 				<table><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">Rooms</span><br />
 				<ul >
-					<li><g:link class="mmlink" params="[viewType:list]" controller="room">List Rooms</g:link></li>
+					<li><g:link class="mmlink" params="[viewType:'list']" controller="room">List Rooms</g:link></li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
 					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
@@ -236,10 +236,6 @@
 					</jsec:hasRole>
 				</ul>
 			</td>
-			<g:if test="${currProjObj}">
-			<td style="vertical-align:top"><span class="megamenuSection">For ${moveBundleName}:</span><br />
-			</td>
-			</g:if>
 			</tr></table>
 		</div>
 
@@ -341,7 +337,6 @@
 					<li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId]" >Bundled Assets</g:link> </li>
 					<li><g:link class="mmlink" controller="projectTeam" action="list" params="[bundleId:moveBundleId]" >List Teams</g:link></li>
 					<li><g:link class="mmlink" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleId, rack:'UnrackPlan']" >Assign Assets to Teams</g:link> </li>
-					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
 					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
 					</jsec:hasRole>
