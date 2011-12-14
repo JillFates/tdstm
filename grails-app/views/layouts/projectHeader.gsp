@@ -208,7 +208,7 @@
 		<div class="menu2" id="projectMenu" style="background-color:#003366;display: none;">
 		<ul >
 			<li><g:link class="home" controller="project" action="list">List Projects</g:link> </li>
-			<g:if test="${currProjObj}"><li><g:link class="home" controller="projectUtil">Project: ${currProjObj.name}</g:link></li></g:if>
+			<g:if test="${currProjObj}"><li><g:link class="home" controller="projectUtil">Project: <strong>${currProjObj.name}</strong></g:link></li></g:if>
 			<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 			<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
 			</jsec:lacksAllRoles>
@@ -220,6 +220,7 @@
 			<td style="vertical-align:top"><span class="megamenuSection">Rooms</span><br />
 				<ul >
 					<li><g:link class="mmlink" params="[viewType:'list']" controller="room">List Rooms</g:link></li>
+					<li>&nbsp;</li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
 					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
@@ -312,7 +313,6 @@
 					<li><g:link class="mmlink" controller="project" action="create">Create Event</g:link></li>
 					<li>&nbsp;</li>
 					<li>&nbsp;</li>
-					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
 					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
 					</jsec:hasRole>
@@ -324,14 +324,13 @@
 					<li><g:link class="mmlink" controller="moveBundle" action="create">Create Bundle</g:link></li>
 					<li>&nbsp;</li>
 					<li>&nbsp;</li>
-					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
 					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
 					</jsec:hasRole>
 				</ul>
 			</td>
 			<g:if test="${currProjObj}">
-			<td style="vertical-align:top"><span class="megamenuSection">For ${moveBundleName}:</span><br />
+			<td style="vertical-align:top"><span class="megamenuSection">For <strong>${moveBundleName}</strong>:</span><br />
 				<ul >
 					<li><g:link class="mmlink" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundle Settings</g:link></li>
 					<li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId]" >Bundled Assets</g:link> </li>
