@@ -426,7 +426,8 @@ class PmoAssetTrackingService {
 				LEFT JOIN model m ON (ae.model_id = m.model_id )
 				LEFT JOIN manufacturer mf ON (ae.manufacturer_id = mf.manufacturer_id )
                 LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id and at.voided = 0 and at.type='process')
-				where ae.project_id = $projectId and ae.move_bundle_id  in ${bundles} GROUP BY ae.asset_entity_id ) ae WHERE  1 = 1""")
+				where ae.project_id = $projectId and ae.move_bundle_id  in ${bundles} and ae.asset_type not in ('Application','Files','Database')
+				GROUP BY ae.asset_entity_id ) ae WHERE  1 = 1""")
 				
 		if(column1Value !="" && column1Value!= null){
 			if(column1Value == 'blank'){
