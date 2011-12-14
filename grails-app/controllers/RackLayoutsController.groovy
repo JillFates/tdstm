@@ -19,6 +19,7 @@ class RackLayoutsController {
 	def static final statusDetails = ["missing":"Unknown", "cabledDetails":"Assigned","empty":"Empty","cabled":"Cabled"]
 	
 	def create = {
+		def rackFilters = session.getAttribute( "RACK_FILTERS")
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
 		def projectInstance = Project.findById( projectId )
@@ -39,10 +40,11 @@ class RackLayoutsController {
 		
 		return [moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, projectId:projectId,
 				currentBundle:currentBundle, isCurrentBundle : isCurrentBundle, models:models ,servers:servers, 
-				applications : applications, dbs : dbs, files : files]
+				applications : applications, dbs : dbs, files : files, rackFilters:rackFilters]
 	}
 	
 	def save = {
+		session.setAttribute( "RACK_FILTERS", params )
 		List bundleId = request.getParameterValues("moveBundle")
 		def maxUSize = 42
 		if(bundleId == "null") {

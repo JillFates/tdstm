@@ -20,6 +20,29 @@
       	var targetRacks = rackDetails[0].targetRackList;
       	generateOptions(sourceSelectObj,sourceRacks,'none');
       	generateOptions(targetSelectObj,targetRacks,'all');
+      	
+      	var hideIcons = "${rackFilters.hideIcons}"
+        if(hideIcons == "on"){
+            $("#hideIcons").attr("checked",true)
+        }
+      	var backView = "${rackFilters.backView}"
+        if(backView == "on"){
+                $("#backView").attr("checked",true)
+        }
+      	var frontView = "${rackFilters.frontView}"
+        if(frontView == "on"){
+                $("#frontView").attr("checked",true)
+        }
+      	var bundleName = "${rackFilters.bundleName}"
+        if(bundleName == "on"){
+                $("#bundleName").attr("checked",true)
+         }
+      	var sourcerack = "${rackFilters.sourcerack}"
+        $("#sourceRackIdSelect").val(sourcerack)
+        
+            
+        var targetrack = "${rackFilters.targetrack}"
+        $("#targetRackIdSelect").val(targetrack)
       	/* Start with generated default */
       	$('input[value=Generate]').click();
      }
@@ -85,7 +108,7 @@
 	})
 	// Script to get the combined rack list
 	function getRackDetails( objId ){
-		var bundles = new Array()
+        var bundles = new Array()
 		$("#"+objId+" option:selected").each(function () {
 			bundles.push($(this).val())
        	});
@@ -105,14 +128,9 @@
 	<tbody>
 		<tr>
 			<td>
-				<h1 style="margin: 2px;">Rack View</h1>
+				<h1 style="margin: 2px;">Rack View${rackFilters.moveBundle}</h1>
 				<label><b>Bundle</b></label><br />
-				<select id="bundleId" name="moveBundle" multiple="multiple" size="3" onchange="getRackDetails(this.id)" style="width:150px">
-					<option value="all" selected="selected">All</option>
-					<g:each in="${moveBundleInstanceList}" var="moveBundleList">
-						<option value="${moveBundleList?.id}">${moveBundleList?.name}</option>
-					</g:each>
-				</select>
+				<g:select id="bundleId" name="moveBundle" from="${moveBundleInstanceList}" value="${rackFilters.moveBundle}" optionKey="id" optionValue="name" multiple="multiple" size="3" onchange="getRackDetails(this.id)" style="width:150px" noSelection="['all':'All']"/>
 			</td>
 			
 			<td>
@@ -267,7 +285,6 @@
 		var isCurrentBundle = '${isCurrentBundle}'
 		var bundleId = 'all';
 		if(isCurrentBundle == "true"){
-			bundleObj.val('${currentBundle}');
 			bundleId = bundleObj.val();
 		}
 		${remoteFunction(action:'getRackDetails', params:'\'bundles=\' + bundleId', onComplete:'updateRackDetails(e)')};
