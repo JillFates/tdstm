@@ -124,11 +124,22 @@
 			</td>
 		<tr>
 			
-			<td valign="top" class="name" nowrap="nowrap">Power :</td>
+			<td valign="top" class="name" nowrap="nowrap">Power Used:</td>
 			<td><input type="text" name="powerUse" id="powerUseId" value="${modelInstance.powerUse}" >&nbsp;
-			<g:select id="powerTypeId" name='powerType' from="${['Watts','Amps']}" value="${powerType}"> </g:select>
-			<td valign="top" class="name">Notes:</td>
+			<g:select id="powerTypeId" name='powerType' from="${['Watts','Amps']}" value="${powerType}"> </g:select></td>
+			<td valign="top" class="name" nowrap="nowrap">  Power Nameplate :</td>
+			<td><input type="text" name="powerNameplate" id="powerNameplateId" value="${modelInstance.powerNameplate}" >&nbsp;
+			<g:select id="powerNameplateTypeId" name='powerNameplateType' from="${['Watts','Amps']}" value=""> </g:select></td>
+			
+		</tr>
+		<tr>
+		    <td valign="top" class="name" nowrap="nowrap">Power Design :</td>
+            <td><input type="text" name="powerDesign" id="powerDesignId" value="${modelInstance.powerDesign}" >&nbsp;
+			<g:select id="powerDesignTypeId" name='powerDesignType' from="${['Watts','Amps']}" value=""> </g:select></td>
+			
+		    <td valign="top" class="name">Notes:</td>
 		    <td><input type="text" name="description" id="descriptionId" value="${modelInstance.description}" > </td>
+            </td>
 		</tr>
 		<tr>
             <td valign="top" class="name" nowrap="nowrap">Front image:</label></td>

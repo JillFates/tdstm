@@ -97,6 +97,8 @@ class ModelController {
     def save = {
     	def modelId = params.modelId
 		def powerUsed = params.powerUse ? Float.parseFloat(params.powerUse) : 0
+		def powerDesign = params.powerDesign ? Float.parseFloat(params.powerDesign) : 0
+		def powerNameplate = params.powerNameplate ? Float.parseFloat(params.powerNameplate) : 0
 		def powerType = params.powerType
 		def endOfLifeDate = params.endOfLifeDate
 		def formatter = new SimpleDateFormat("MM/dd/yyyy");
@@ -125,6 +127,12 @@ class ModelController {
 		if( powerType == "Amps"){
 			powerUsed = powerUsed * 110
         }
+		if(params.powerDesignType == "Amps"){
+			powerDesign = powerDesign * 110
+		}
+		if(params.powerNameplateType == "Amps"){
+			powerNameplate =  powerNameplate * 110
+		}
 	    def modelTemplate 
 		if(modelId)
 			modelTemplate = Model.get(modelId)
@@ -133,6 +141,8 @@ class ModelController {
     	params.powerUse = powerUsed
         def  modelInstance = new Model(params)
 		modelInstance.powerUse = powerUsed
+		modelInstance.powerDesign = powerDesign
+		modelInstance.powerNameplate = powerNameplate
 		if(params?.modelStatus=='valid'){
 			modelInstance.validatedBy = user?.person
 		}
@@ -288,13 +298,23 @@ class ModelController {
 		}
         if (modelInstance) {
 			def powerUsed = params.powerUse ? Float.parseFloat(params.powerUse) : 0
+			def powerNameplate = params.powerNameplate ? Float.parseFloat(params.powerNameplate) : 0
+			def powerDesign = params.powerDesign ? Float.parseFloat(params.powerDesign) : 0
 			def powerType = params.powerType
 			if( powerType == "Amps"){
 				powerUsed = powerUsed * 110
 			}
+			if( params.powerNameplateType == "Amps"){
+				powerNameplate = powerNameplate * 110
+			}
+			if( params.powerDesignType == "Amps"){
+				powerDesign = powerDesign * 110
+			}
         	params.useImage = params.useImage == 'on' ? 1 : 0
         	params.sourceTDS = params.sourceTDS == 'on' ? 1 : 0
 			params.powerUse = powerUsed
+			params.powerNameplate = powerNameplate
+			params.powerDesign = powerDesign
             def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
     		def frontImage = request?.getFile('frontImage')
             if( frontImage ) {

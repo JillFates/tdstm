@@ -77,14 +77,25 @@
 			<td>${modelInstance?.modelStatus}</td>
 		</tr>
 		<tr>
-			<td>Power : <td><span id="powerSpanId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts' ? modelInstance?.powerUse ? (modelInstance?.powerUse / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerUse}</span>
+			<td>Power Used : <td><span id="powerSpanId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts' ? modelInstance?.powerUse ? (modelInstance?.powerUse / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerUse}</span>
 			<input type="hidden" name="powerUse" id="powerUseId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? modelInstance?.powerUse ? (modelInstance?.powerUse / 110 )?.toFloat()?.round(1) : 0.0 : modelInstance?.powerUse}" >&nbsp;
-			<g:select id="powertype" name='powerType' value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE }" from="${['Watts','Amps']}" onchange="updatePowerType( this.value)"> </g:select>
+			<g:select id="powertype" name='powerType' value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE }" from="${['Watts','Amps']}" onchange="updatePowerType( this.value , this.name)"> </g:select>
             </td>
-             <td>Notes:</td>
-			<td>${modelInstance?.description}</td>
+           <td> Power Nameplate : <td><span id="namePlatePowerSpanId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts' ? modelInstance?.powerNameplate ? (modelInstance?.powerNameplate / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerNameplate}</span>
+			<input type="hidden" name="powerNameplate" id="powerNameplateId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? modelInstance?.powerNameplate ? (modelInstance?.powerNameplate / 110 )?.toFloat()?.round(1) : 0.0 : modelInstance?.powerNameplate}" >&nbsp;
+			<g:select id="powerNameplateTypeId" name='powerNameplateType' value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE }" from="${['Watts','Amps']}" onchange="updatePowerType( this.value , this.name)"> </g:select>
+            </td>
+             
 		</tr>
 		<tr>
+            <td>Power Design: <td><span id="PowerDesignSpanId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts' ? modelInstance?.powerDesign ? (modelInstance?.powerDesign / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerDesign}</span>
+			<input type="hidden" name="powerDesign" id="powerDesignId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? modelInstance?.powerDesign ? (modelInstance?.powerDesign / 110 )?.toFloat()?.round(1) : 0.0 : modelInstance?.powerDesign}" >&nbsp;
+			<g:select id="powerDesignTypeId" name='powerDesignType' value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE }" from="${['Watts','Amps']}" onchange="updatePowerType( this.value , this.name)"> </g:select>
+            </td>
+        	<td>Notes:</td>
+			<td>${modelInstance?.description}</td>
+        </tr>
+        <tr>
             <td>Front image:</label></td>
         	<td>
         	<g:if test="${modelInstance.frontImage}">
@@ -97,8 +108,7 @@
         	<img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}"  style="height: 50px;width: 100px;" id="rearImageId"/>
         	</g:if>
         	</td>
-        </tr>
-        	
+        </tr>	
 		<tr style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
 			<td>Blade Rows:</td>
 			<td>${modelInstance?.bladeRows}</td>
@@ -266,18 +276,42 @@ function showMergeDialog(){
     $("#showMergeDialog").dialog('open')
 }
 
-function updatePowerType( value){
-
+function updatePowerType(value,name){
 	var preference
-	if(value=="Watts"){
+	if(value=="Watts" && name =="powerType"){
 		preference=$('#powerUseId').val()*110;
 		preference= preference.toFixed(0)
-	} else{
+		$('#powerUseId').val(preference);
+		$("#powerSpanId").html(preference);
+	}else if(value=="Watts" && name == "powerNameplateType"){
+		preference=$('#powerNameplateId').val()*110;
+		preference= preference.toFixed(0)
+		$('#powerNameplateId').val(preference);
+		$("#namePlatePowerSpanId").html(preference);
+	}else if(value=="Watts" && name == "powerDesignType"){
+		preference=$('#powerDesignId').val()*110;
+		preference= preference.toFixed(0)
+		$('#powerDesignId').val(preference);
+		$("#PowerDesignSpanId").html(preference);
+	}
+	else if(value=="Amps" && name == "powerType"){
 		preference= $('#powerUseId').val()/110;
 		preference= preference.toFixed(1)
+		$('#powerUseId').val(preference);
+		$("#powerSpanId").html(preference);
 	}
-	$('#powerUseId').val(preference);
-	$("#powerSpanId").html(preference);
+	else if(value=="Amps" && name == "powerNameplateType"){
+		preference= $('#powerNameplateId').val()/110;
+		preference= preference.toFixed(1)
+		$('#powerNameplateId').val(preference);
+		$("#namePlatePowerSpanId").html(preference);
+	}
+	else {
+		preference= $('#powerDesignId').val()/110;
+		preference= preference.toFixed(1)
+		$('#powerDesignId').val(preference);
+		$("#PowerDesignSpanId").html(preference);
+	}
 	${remoteFunction(controller:'project', action:'setPower', params:'\'p=\' + value ')}
 }
 function validateModel(id){

@@ -32,6 +32,8 @@ class Model {
 	String sourceURL
 	String modelStatus = 'new'
 	Project modelScope
+	Integer powerNameplate
+	Integer powerDesign 
 	
 	
 
@@ -92,6 +94,8 @@ class Model {
 		sourceURL( blank:true, nullable:true )
 		modelStatus( blank:true, nullable:true, inList:['new','full','valid'])
 		modelScope( blank:true, nullable:true )
+		powerNameplate( blank:true, nullable:true )
+		powerDesign( blank:true, nullable:true )
 	}
 	
 	static mapping  = {	
