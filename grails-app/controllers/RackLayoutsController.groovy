@@ -44,6 +44,7 @@ class RackLayoutsController {
 	}
 	
 	def save = {
+		println"params----->"+params
 		session.setAttribute( "RACK_FILTERS", params )
 		List bundleId = request.getParameterValues("moveBundle")
 		def maxUSize = 42
@@ -733,7 +734,7 @@ class RackLayoutsController {
 					cableDiagram.append("<div class='cablingPanel' style='height:auto;background-color:#FFF'>")
 					cableDiagram.append("<img src=\'${createLink(controller:'model', action:'getRearImage', id:assetEntity?.model?.id)}\' />")
 				} else {
-					cableDiagram.append("<div class='cablingPanel' style='height: "+assetEntity.model.usize*30+"px'>")
+					cableDiagram.append("<div class='cablingPanel' style='height: "+(assetEntity?.model?.usize ? assetEntity?.model?.usize*30 : 30)+"px'>")
 				}
 				def assetCableMapList = AssetCableMap.findAllByFromAsset( assetEntity )
 				assetCableMapList.each {assetCable->
