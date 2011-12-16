@@ -160,25 +160,25 @@
 	border-right:1px solid #CCCCCC;
 }
 .menu2 li a:hover, .menu2 li.current a {
-	color:#ffffff;
+	color:#eeeeee;
 }
 .menu2 ul li a:visited  {
 	color:#9acaee;
 }
-	 
 .menu2 ul li a:hover   {
-	color:#ffffff;
+	color:#eeeeee;
+	background:lightblue;
 }
 
 .megamenu {
 	z-index:10;
 	position:absolute;
-	top:48px;
+	top:50px;
 	left:0px;
 	width:600px;
 	height:auto;
 	float:left;
-	background:AliceBlue;
+	background:lightblue;
 	margin-top:0px;
 	-moz-box-shadow: 3px 3px 3px #888;
 	-webkit-box-shadow: 3px 3px 3px #888;
@@ -189,19 +189,23 @@
 	width:300px;
 }
 #racksMegaMenu {
-	left:100px;
+	left:105px;
 	width:250px;
 }
 #assetMegaMenu {
-	left:200px;
+	left:205px;
 }
 #bundleMegaMenu {
-	left:250px;
+	left:255px;
 	width:450px;
 }
 #consoleMegaMenu {
-	left:410px;
+	left:424px;
 	width:450px;
+}
+#reportsMegaMenu {
+	left:480px;
+	width:600px;
 }
 .megamenu ul {
 	width:auto;
@@ -234,7 +238,9 @@
 .megamenu ul li a:hover   {
 	color:darkblue;
 	background:lightblue;
-
+}
+.mmtable {
+	border:0px;
 }
 
 .menu3 {
