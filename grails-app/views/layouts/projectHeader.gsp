@@ -674,14 +674,27 @@
 	  		$('#assetMegaMenu').hide();
 	  		$('#bundleMegaMenu').hide();
 	  		$('#consoleMegaMenu').hide();
+	  		$('#reportsMegaMenu').hide();
 	  		if(e!=""){
 		  		$(e).show();
 				mcancelclosetime();	// cancel close timer
 				megamenuitem = e;
+				if(e == "#adminMegaMenu"){$("#adminMenuId a").css('background-color','lightblue')}
+				if(e == "#projectMegaMenu"){$("#projectMenuId a").css('background-color','lightblue')}
+				if(e == "#racksMegaMenu"){$("#racksMenuId a").css('background-color','lightblue')}
+				if(e == "#assetMegaMenu"){$("#assetMenuId a").css('background-color','lightblue')}
+				if(e == "#bundleMegaMenu"){$("#bundleMenuId a").css('background-color','lightblue')}
+				if(e == "#reportsMegaMenu"){$("#reportsMenuId a").css('background-color','lightblue')}
 	  		}
 	  	}
 	  	function closeMegaMenu() {
 			if(megamenuitem) $(megamenuitem).hide();
+			if(currentMenuId == "#adminMenu"){$("#adminMenuId a").css('background-color','#003366')}
+			if(currentMenuId == "#projectMenu"){$("#projectMenuId a").css('background-color','#003366')}
+			if(currentMenuId == "#racksMenu"){$("#racksMenuId a").css('background-color','#003366')}
+			if(currentMenuId == "#assetMenu"){$("#assetMenuId a").css('background-color','#003366')}
+			if(currentMenuId == "#bundleMenu"){$("#bundleMenuId a").css('background-color','#003366')}
+			if(currentMenuId == "#reportsMenu"){$("#reportsMenuId a").css('background-color','#003366')}
 	  	}
 	  	// set close timer
 		function mclosetime() {

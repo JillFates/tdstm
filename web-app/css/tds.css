@@ -127,6 +127,9 @@
 	float:left;
 	background:#0366b0;
 	margin-top:0px;
+	-moz-box-shadow: 0px 3px 3px #888;
+	-webkit-box-shadow: 0px 3px 3px #888;
+	box-shadow: 0px 3px 3px #888;
 }
 .menu2 ul {
 	width:auto;
@@ -159,14 +162,14 @@
 	padding:2px 6px;
 	border-right:1px solid #CCCCCC;
 }
-.menu2 li a:hover, .menu2 li.current a {
-	color:#eeeeee;
+.menu2 ul li a:hover, .menu2 ul li.current a {
+	color:#darkblue;
 }
 .menu2 ul li a:visited  {
 	color:#9acaee;
 }
 .menu2 ul li a:hover   {
-	color:#eeeeee;
+	color:darkblue;
 	background:lightblue;
 }
 
@@ -189,22 +192,22 @@
 	width:300px;
 }
 #racksMegaMenu {
-	left:105px;
+	left:148px;
 	width:250px;
 }
 #assetMegaMenu {
-	left:205px;
+	left:250px;
 }
 #bundleMegaMenu {
-	left:255px;
+	left:300px;
 	width:450px;
 }
 #consoleMegaMenu {
-	left:424px;
+	left:465px;
 	width:450px;
 }
 #reportsMegaMenu {
-	left:480px;
+	left:158px;
 	width:600px;
 }
 .megamenu ul {
