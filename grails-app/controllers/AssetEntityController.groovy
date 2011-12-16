@@ -1145,6 +1145,7 @@ class AssetEntityController {
 		def formatter = new SimpleDateFormat("MM/dd/yyyy")
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def maintExpDate = params.maintExpDate
+		session.setAttribute("USE_FILTERS", "true")
 		if(maintExpDate){
 			params.maintExpDate =  GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
 		}
@@ -2404,6 +2405,7 @@ class AssetEntityController {
 
 	}
 	def update={
+		session.setAttribute("USE_FILTERS","true")
 		def redirectTo = params.redirectTo
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 

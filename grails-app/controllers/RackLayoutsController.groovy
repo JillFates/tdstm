@@ -19,7 +19,20 @@ class RackLayoutsController {
 	def static final statusDetails = ["missing":"Unknown", "cabledDetails":"Assigned","empty":"Empty","cabled":"Cabled"]
 	
 	def create = {
-		def rackFilters = session.getAttribute( "RACK_FILTERS")
+		def targetRack= ""
+		def sourceRack= ""
+		def bundle= ""
+		def rackFilters
+		
+		if(session.getAttribute("USE_FILTERS")=="true"){
+			rackFilters = session.getAttribute( "RACK_FILTERS")
+			if(rackFilters){
+				targetRack = rackFilters?.targetrack ? rackFilters?.targetrack?.toString().replace("[","").replace("]","") : ""
+				sourceRack = rackFilters?.sourcerack ? rackFilters?.sourcerack?.toString().replace("[","").replace("]","") : ""
+				bundle = rackFilters?.moveBundle ? rackFilters?.moveBundle?.toString().replace("[","").replace("]","") : ""
+			}
+		}
+		
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
 		def projectInstance = Project.findById( projectId )
@@ -37,14 +50,16 @@ class RackLayoutsController {
 			currentBundle = moveBundleInstanceList[0]?.id?.toString()
 			isCurrentBundle = false
 		}
-		
+		session.removeAttribute("USE_FILTERS")
+		session.removeAttribute("RACK_FILTERS")
 		return [moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, projectId:projectId,
 				currentBundle:currentBundle, isCurrentBundle : isCurrentBundle, models:models ,servers:servers, 
-				applications : applications, dbs : dbs, files : files, rackFilters:rackFilters]
+				applications : applications, dbs : dbs, files : files, rackFilters:rackFilters, targetRackFilter:targetRack,
+				bundle:bundle,sourceRackFilter:sourceRack]
 	}
 	
 	def save = {
-		println"params----->"+params
+		
 		session.setAttribute( "RACK_FILTERS", params )
 		List bundleId = request.getParameterValues("moveBundle")
 		def maxUSize = 42

@@ -44,6 +44,31 @@
         if(showCabling == "on"){
                 $("#showCabling").attr("checked",true)
         }
+      	var targetList = "${targetRackFilter}"
+      	var targetArray =	targetList.split(",")
+      	if(targetArray.length>1 || targetList!=""){
+	        for(i=0; i<targetArray.length;i++){
+	            var optvalue = targetArray[i].trim();
+	            $("#targetRackIdSelect option[value="+optvalue+"]").attr('selected', 'selected');
+	            $("#targetRackIdSelect option[value='']").attr('selected', false);
+	 	    }
+	    }else{
+		  $("#targetRackIdSelect option[value='']").attr('selected', 'selected');
+		}
+		
+      	var sourceList = "${sourceRackFilter}"
+        	var sourceArray =	sourceList.split(",")
+        	if(sourceArray.length>1 || sourceList!=""){
+  	        for(i=0; i<sourceArray.length;i++){
+  	            var optsourcevalue = sourceArray[i].trim();
+  	            $("#sourceRackIdSelect option[value="+optsourcevalue+"]").attr('selected', 'selected');
+  	            $("#sourceRackIdSelect option[value='']").attr('selected', false);
+  	            $("#sourceRackIdSelect option[value='none']").attr('selected', false);
+  	 	    }
+  	    } else{
+        		$("#sourceRackIdSelect option[value='']").attr('selected', 'selected');
+        		$("#sourceRackIdSelect option[value='none']").attr('selected', false);
+          }
       	/* Start with generated default */
       	$('input[value=Generate]').click();
      }
@@ -288,12 +313,21 @@
 
 	$(document).ready(function() {
 		var bundleObj = $("#bundleId");
-		var isCurrentBundle = '${isCurrentBundle}'
-		var bundleId = 'all';
-		if(isCurrentBundle == "true"){
-			bundleObj.val('${currentBundle}');
-			bundleId = bundleObj.val();
+		var bundle = "${bundle}"
+	    var bundleArray =	bundle.split(",")
+      	if(bundleArray.length>0){
+	        for(i=0; i<bundleArray.length;i++){
+	            var optvalue = bundleArray[i].trim();
+	            $("#bundleId option[value="+optvalue+"]").attr('selected', 'selected');
+	 	    }
+	    } else {
+		    var isCurrentBundle = '${isCurrentBundle}'
+		    $("#bundleId option[value='all']").attr('selected', true);	    
+			if(isCurrentBundle == "true"){
+				bundleObj.val('${currentBundle}');
+			}
 		}
+		var bundleId = bundleObj.val();
 		${remoteFunction(action:'getRackDetails', params:'\'bundles=\' + bundleId', onComplete:'updateRackDetails(e)')};
 		
 		$('input.submit').click(function() {
