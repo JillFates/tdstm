@@ -210,6 +210,10 @@
 	left:158px;
 	width:600px;
 }
+#userMegaMenu {
+	float:right;
+	width:300px;
+}
 .megamenu ul {
 	width:auto;
 	padding-top:0px;

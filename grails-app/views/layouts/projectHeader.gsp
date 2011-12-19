@@ -73,7 +73,7 @@
 			<g:if test="${isIE6}">
 				<span><img title="Note: MS IE6 has limited capability so functions have been reduced." src="${createLinkTo(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
 			</g:if>
-			<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">
+			<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onmouseover="showMegaMenu('#userMegaMenu')" onmouseout="mclosetime()" onComplete="updatePersonDetails(e)">
 			&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name } <g:if test="${person?.modelScore}"><span style="font-weight:normal"> (${person?.modelScore})</span></g:if> </span>
 			</g:remoteLink>
 			</div>
@@ -114,12 +114,12 @@
 			<li>&nbsp;</li>
 	        </jsec:lacksAllRoles>
 	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
-			<li id="consoleMenuId"><g:link class="home" onmouseover="showMegaMenu('#consoleMegaMenu')" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console</g:link></li>
+			<li id="consoleMenuId"><g:link class="home" onmouseover="showMegaMenu('#consoleMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console</g:link></li>
 	        </jsec:hasAnyRole>
 			<li id="dashboardMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link> </li>
 			<li id="assetTrackerMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker</g:link> </li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']">
-	        	<li id="reportMenuId"><g:link class="home" onmouseover="showMegaMenu('#reportsMegaMenu')" controller="reports" params="[projectId:currProjObj?.id]">Reports</g:link></li>
+	        	<li id="reportMenuId"><g:link class="home" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" controller="reports" params="[projectId:currProjObj?.id]">Reports</g:link></li>
 	        </jsec:lacksAllRoles>
 	      </ul>
 	    </div>
@@ -449,6 +449,21 @@
 			</td>
 			</tr></table>
 		</div>
+
+		<div class="megamenu" id="userMegaMenu" onmouseover="showMegaMenu('#userMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+			<table class="mmtable"><tr>
+			<td style="vertical-align:top"><span class="megamenuSection">${session.getAttribute("LOGIN_PERSON").name }</span><br />
+				<ul >
+					<li>users name</li>
+					<li>Account settings...</li>
+					<li>&nbsp;</li>
+					<li>Model Score: ${person?.modelScore} </li>
+				</ul>
+			</td>
+			<td style="vertical-align:top"><span class="megamenuSection">Sign out</span><br />
+			</td>
+			</tr></table>
+		</div>
 				<g:if test="${moveEvent && moveEvent?.inProgress == 'true'}">
 			<div class="menu3" id="head_crawler" >
 				<div id="crawlerHead">${moveEvent.name} Move Event Status <span id="moveEventStatus"></span>. News: </div>
@@ -675,6 +690,7 @@
 	  		$('#bundleMegaMenu').hide();
 	  		$('#consoleMegaMenu').hide();
 	  		$('#reportsMegaMenu').hide();
+	  		$('#userMegaMenu').hide();
 	  		if(e!=""){
 		  		$(e).show();
 				mcancelclosetime();	// cancel close timer
@@ -684,17 +700,27 @@
 				if(e == "#racksMegaMenu"){$("#racksMenuId a").css('background-color','lightblue')}
 				if(e == "#assetMegaMenu"){$("#assetMenuId a").css('background-color','lightblue')}
 				if(e == "#bundleMegaMenu"){$("#bundleMenuId a").css('background-color','lightblue')}
+				if(e == "#consoleMegaMenu"){$("#consoleMenuId a").css('background-color','lightblue')}
 				if(e == "#reportsMegaMenu"){$("#reportsMenuId a").css('background-color','lightblue')}
+				if(e == "#userMegaMenu"){$("#userMenuId a").css('background-color','lightblue')}
 	  		}
 	  	}
 	  	function closeMegaMenu() {
 			if(megamenuitem) $(megamenuitem).hide();
+			$("#adminMenuId a").css('background-color','#0366b0');
+			$("#projectMenuId a").css('background-color','#0366b0');
+			$("#racksMenuId a").css('background-color','#0366b0');
+			$("#assetMenuId a").css('background-color','#0366b0');
+			$("#bundleMenuId a").css('background-color','#0366b0');
+			$("#reportsMenuId a").css('background-color','#0366b0');
+			$("#userMenuId a").css('background-color','#0366b0');
 			if(currentMenuId == "#adminMenu"){$("#adminMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#projectMenu"){$("#projectMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#racksMenu"){$("#racksMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#assetMenu"){$("#assetMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#bundleMenu"){$("#bundleMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#reportsMenu"){$("#reportsMenuId a").css('background-color','#003366')}
+			if(currentMenuId == "#userMenu"){$("#userMenuId a").css('background-color','#003366')}
 	  	}
 	  	// set close timer
 		function mclosetime() {
