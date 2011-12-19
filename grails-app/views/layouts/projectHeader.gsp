@@ -74,7 +74,7 @@
 				<span><img title="Note: MS IE6 has limited capability so functions have been reduced." src="${createLinkTo(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
 			</g:if>
 			<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onmouseover="showMegaMenu('#userMegaMenu')" onmouseout="mclosetime()" onComplete="updatePersonDetails(e)">
-			&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name } <g:if test="${person?.modelScore}"><span style="font-weight:normal"> (${person?.modelScore})</span></g:if> </span>
+			&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name } <g:if test="${person?.modelScore}"><span style="font-weight:normal"> (${person?.modelScore})</span><apan class="ui-icon ui-icon-triangle-1-s"></span></g:if> </span>
 			</g:remoteLink>
 			</div>
 			<div class="tzmenu">&nbsp;-&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' }</span>
@@ -697,8 +697,9 @@
 				megamenuitem = e;
 				if(e == "#adminMegaMenu"){$("#adminMenuId a").css('background-color','lightblue')}
 				if(e == "#projectMegaMenu"){$("#projectMenuId a").css('background-color','lightblue')}
-				if(e == "#racksMegaMenu"){$("#racksMenuId a").css('background-color','lightblue')}
+				if(e == "#racksMegaMenu"){$("#rackMenuId a").css('background-color','lightblue')}
 				if(e == "#assetMegaMenu"){$("#assetMenuId a").css('background-color','lightblue')}
+				if(e == "#bundleMegaMenu"){$("#bundleMenuId a").css('background-color','lightblue')}
 				if(e == "#bundleMegaMenu"){$("#bundleMenuId a").css('background-color','lightblue')}
 				if(e == "#consoleMegaMenu"){$("#consoleMenuId a").css('background-color','lightblue')}
 				if(e == "#reportsMegaMenu"){$("#reportsMenuId a").css('background-color','lightblue')}
@@ -709,7 +710,7 @@
 			if(megamenuitem) $(megamenuitem).hide();
 			$("#adminMenuId a").css('background-color','#0366b0');
 			$("#projectMenuId a").css('background-color','#0366b0');
-			$("#racksMenuId a").css('background-color','#0366b0');
+			$("#rackMenuId a").css('background-color','#0366b0');
 			$("#assetMenuId a").css('background-color','#0366b0');
 			$("#bundleMenuId a").css('background-color','#0366b0');
 			$("#consoleMenuId a").css('background-color','#0366b0');
@@ -717,7 +718,7 @@
 			$("#userMenuId a").css('background-color','#0366b0');
 			if(currentMenuId == "#adminMenu"){$("#adminMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#projectMenu"){$("#projectMenuId a").css('background-color','#003366')}
-			if(currentMenuId == "#racksMenu"){$("#racksMenuId a").css('background-color','#003366')}
+			if(currentMenuId == "#racksMenu"){$("#rackMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#assetMenu"){$("#assetMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#bundleMenu"){$("#bundleMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#consoleMenu"){$("#consoleMenuId a").css('background-color','#003366')}
