@@ -101,7 +101,7 @@
 	      <div class="menu2">
 	      <ul>
 		<jsec:hasRole name="ADMIN">
-			<li id="adminMenuId"><g:link class="home" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="mclosetime()" controller="auth" action="home">Admin</g:link></li>
+			<li id="adminMenuId"><g:link class="home" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="mclosetime()" controller="auth" action="home">Admin <apan class="ui-icon ui-icon-triangle-1-s"></span></g:link></li>
 		</jsec:hasRole>
 			<li id="projectMenuId"><g:link class="home" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" controller="projectUtil">Client/Project</g:link></li>
 			<li id="roomMenuId"><g:link class="home" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" controller="room">Rooms</g:link></li>
@@ -119,7 +119,7 @@
 			<li id="dashboardMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link> </li>
 			<li id="assetTrackerMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker</g:link> </li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']">
-	        	<li id="reportMenuId"><g:link class="home" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" controller="reports" params="[projectId:currProjObj?.id]">Reports</g:link></li>
+	        	<li id="reportsMenuId"><g:link class="home" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" controller="reports" params="[projectId:currProjObj?.id]">Reports</g:link></li>
 	        </jsec:lacksAllRoles>
 	      </ul>
 	    </div>
@@ -449,7 +449,7 @@
 			</td>
 			</tr></table>
 		</div>
-
+		<div></div>
 		<div class="megamenu" id="userMegaMenu" onmouseover="showMegaMenu('#userMegaMenu')" onmouseout="mclosetime()" style="display: none;">
 			<table class="mmtable"><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">${session.getAttribute("LOGIN_PERSON").name }</span><br />
@@ -712,6 +712,7 @@
 			$("#racksMenuId a").css('background-color','#0366b0');
 			$("#assetMenuId a").css('background-color','#0366b0');
 			$("#bundleMenuId a").css('background-color','#0366b0');
+			$("#consoleMenuId a").css('background-color','#0366b0');
 			$("#reportsMenuId a").css('background-color','#0366b0');
 			$("#userMenuId a").css('background-color','#0366b0');
 			if(currentMenuId == "#adminMenu"){$("#adminMenuId a").css('background-color','#003366')}
@@ -719,6 +720,7 @@
 			if(currentMenuId == "#racksMenu"){$("#racksMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#assetMenu"){$("#assetMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#bundleMenu"){$("#bundleMenuId a").css('background-color','#003366')}
+			if(currentMenuId == "#consoleMenu"){$("#consoleMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#reportsMenu"){$("#reportsMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#userMenu"){$("#userMenuId a").css('background-color','#003366')}
 	  	}

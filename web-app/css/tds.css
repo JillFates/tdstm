@@ -177,10 +177,9 @@
 	z-index:10;
 	position:absolute;
 	top:50px;
-	left:0px;
+	left:auto;
 	width:600px;
 	height:auto;
-	float:left;
 	background:lightblue;
 	margin-top:0px;
 	-moz-box-shadow: 3px 3px 3px #888;
@@ -211,7 +210,7 @@
 	width:600px;
 }
 #userMegaMenu {
-	float:right;
+	right:0px;
 	width:300px;
 }
 .megamenu ul {
