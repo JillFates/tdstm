@@ -691,6 +691,7 @@
 	  		$('#consoleMegaMenu').hide();
 	  		$('#reportsMegaMenu').hide();
 	  		$('#userMegaMenu').hide();
+			resetmenu2();
 	  		if(e!=""){
 		  		$(e).show();
 				mcancelclosetime();	// cancel close timer
@@ -708,6 +709,9 @@
 	  	}
 	  	function closeMegaMenu() {
 			if(megamenuitem) $(megamenuitem).hide();
+			resetmenu2();
+		}
+	  	function resetmenu2 () {
 			$("#adminMenuId a").css('background-color','#0366b0');
 			$("#projectMenuId a").css('background-color','#0366b0');
 			$("#rackMenuId a").css('background-color','#0366b0');
@@ -747,6 +751,7 @@
 		  		$(e).show();
 	  		}
 	  	}
+	  	
 		showSubMenu(currentMenuId);
 
 		var timeout = 500;
