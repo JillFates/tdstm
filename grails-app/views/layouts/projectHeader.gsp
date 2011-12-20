@@ -74,7 +74,7 @@
 				<span><img title="Note: MS IE6 has limited capability so functions have been reduced." src="${createLinkTo(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
 			</g:if>
 			<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onmouseover="showMegaMenu('#userMegaMenu')" onmouseout="mclosetime()" onComplete="updatePersonDetails(e)">
-			&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name } <g:if test="${person?.modelScore}"><span style="font-weight:normal"> (${person?.modelScore})</span><apan class="ui-icon ui-icon-triangle-1-s"></span></g:if> </span>
+			&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name } <g:if test="${person?.modelScore}"><span style="font-weight:normal"> (${person?.modelScore})</span><span class="ui-icon ui-icon-triangle-1-s"></span></g:if> </span>
 			</g:remoteLink>
 			</div>
 			<div class="tzmenu">&nbsp;-&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' }</span>
