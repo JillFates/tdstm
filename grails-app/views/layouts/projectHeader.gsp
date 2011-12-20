@@ -696,19 +696,23 @@
 		  		$(e).show();
 				mcancelclosetime();	// cancel close timer
 				megamenuitem = e;
-				if(e == "#adminMegaMenu"){$("#adminMenuId a").css('background-color','lightblue');$("#userMenuId a").css('color','#0366b0');}
-				if(e == "#projectMegaMenu"){$("#projectMenuId a").css('background-color','lightblue');$("#userMenuId a").css('color','#0366b0');}
-				if(e == "#racksMegaMenu"){$("#rackMenuId a").css('background-color','lightblue');$("#userMenuId a").css('color','#0366b0');}
-				if(e == "#assetMegaMenu"){$("#assetMenuId a").css('background-color','lightblue');$("#userMenuId a").css('color','#0366b0');}
-				if(e == "#bundleMegaMenu"){$("#bundleMenuId a").css('background-color','lightblue');$("#userMenuId a").css('color','#0366b0');}
+				if(e == "#adminMegaMenu"){$("#adminMenuId a").css('background-color','lightblue');$("#adminMenuId a").css('color','#0366b0');}
+				if(e == "#projectMegaMenu"){$("#projectMenuId a").css('background-color','lightblue');$("#projectMenuId a").css('color','#0366b0');}
+				if(e == "#racksMegaMenu"){
+					$("#roomMenuId a").css('background-color','lightblue');
+					$("#roomMenuId a").css('color','#0366b0');}
+					$("#rackMenuId a").css('background-color','lightblue');
+					$("#rackMenuId a").css('color','#0366b0');
+				}
+				if(e == "#assetMegaMenu"){$("#assetMenuId a").css('background-color','lightblue');$("#assetMenuId a").css('color','#0366b0');}
 				if(e == "#bundleMegaMenu"){
 					$("#eventMenuId a").css('background-color','lightblue');
 					$("#eventMenuId a").css('color','#0366b0');
 					$("#bundleMenuId a").css('background-color','lightblue');
-					$("#userMenuId a").css('color','#0366b0');
+					$("#bundleMenuId a").css('color','#0366b0');
 				}
-				if(e == "#consoleMegaMenu"){$("#consoleMenuId a").css('background-color','lightblue');$("#userMenuId a").css('color','#0366b0');}
-				if(e == "#reportsMegaMenu"){$("#reportsMenuId a").css('background-color','lightblue');$("#userMenuId a").css('color','#0366b0');}
+				if(e == "#consoleMegaMenu"){$("#consoleMenuId a").css('background-color','lightblue');$("#consoleMenuId a").css('color','#0366b0');}
+				if(e == "#reportsMegaMenu"){$("#reportsMenuId a").css('background-color','lightblue');$("#reportsMenuId a").css('color','#0366b0');}
 				if(e == "#userMegaMenu"){$("#userMenuId a").css('background-color','lightblue');$("#userMenuId a").css('color','#0366b0');}
 	  		}
 	  	}
@@ -718,16 +722,27 @@
 		}
 	  	function resetmenu2 () {
 			$("#adminMenuId a").css('background-color','#0366b0');
+			$("#adminMenuId a").css('color','#036');
 			$("#projectMenuId a").css('background-color','#0366b0');
+			$("#projectMenuId a").css('color','#036');
+			$("#roomMenuId a").css('background-color','#0366b0');
+			$("#roomMenuId a").css('color','#036');
 			$("#rackMenuId a").css('background-color','#0366b0');
+			$("#rackMenuId a").css('color','#036');
 			$("#assetMenuId a").css('background-color','#0366b0');
+			$("#assetMenuId a").css('color','#036');
 			$("#eventMenuId a").css('background-color','#0366b0');
+			$("#eventMenuId a").css('color','#036');
 			$("#bundleMenuId a").css('background-color','#0366b0');
+			$("#bundleMenuId a").css('color','#036');
 			$("#consoleMenuId a").css('background-color','#0366b0');
+			$("#consoleMenuId a").css('color','#036');
 			$("#reportsMenuId a").css('background-color','#0366b0');
+			$("#reportsMenuId a").css('color','#036');
 			$("#userMenuId a").css('background-color','#0366b0');
 			if(currentMenuId == "#adminMenu"){$("#adminMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#projectMenu"){$("#projectMenuId a").css('background-color','#003366')}
+			if(currentMenuId == "#roomsMenu"){$("#roomMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#racksMenu"){$("#rackMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#assetMenu"){$("#assetMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#eventMenu"){$("#eventMenuId a").css('background-color','#003366')}
