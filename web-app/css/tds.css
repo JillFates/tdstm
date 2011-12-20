@@ -165,9 +165,6 @@
 .menu2 ul li a:hover, .menu2 ul li.current a {
 	color:#darkblue;
 }
-.menu2 ul li a:visited  {
-	color:#9acaee;
-}
 .menu2 ul li a:hover   {
 	color:#036;
 	background:lightblue;

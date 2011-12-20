@@ -701,7 +701,12 @@
 				if(e == "#racksMegaMenu"){$("#rackMenuId a").css('background-color','lightblue');$("#userMenuId a").css('color','#0366b0');}
 				if(e == "#assetMegaMenu"){$("#assetMenuId a").css('background-color','lightblue');$("#userMenuId a").css('color','#0366b0');}
 				if(e == "#bundleMegaMenu"){$("#bundleMenuId a").css('background-color','lightblue');$("#userMenuId a").css('color','#0366b0');}
-				if(e == "#bundleMegaMenu"){$("#bundleMenuId a").css('background-color','lightblue');$("#userMenuId a").css('color','#0366b0');}
+				if(e == "#bundleMegaMenu"){
+					$("#eventMenuId a").css('background-color','lightblue');
+					$("#eventMenuId a").css('color','#0366b0');
+					$("#bundleMenuId a").css('background-color','lightblue');
+					$("#userMenuId a").css('color','#0366b0');
+				}
 				if(e == "#consoleMegaMenu"){$("#consoleMenuId a").css('background-color','lightblue');$("#userMenuId a").css('color','#0366b0');}
 				if(e == "#reportsMegaMenu"){$("#reportsMenuId a").css('background-color','lightblue');$("#userMenuId a").css('color','#0366b0');}
 				if(e == "#userMegaMenu"){$("#userMenuId a").css('background-color','lightblue');$("#userMenuId a").css('color','#0366b0');}
@@ -716,6 +721,7 @@
 			$("#projectMenuId a").css('background-color','#0366b0');
 			$("#rackMenuId a").css('background-color','#0366b0');
 			$("#assetMenuId a").css('background-color','#0366b0');
+			$("#eventMenuId a").css('background-color','#0366b0');
 			$("#bundleMenuId a").css('background-color','#0366b0');
 			$("#consoleMenuId a").css('background-color','#0366b0');
 			$("#reportsMenuId a").css('background-color','#0366b0');
@@ -724,6 +730,7 @@
 			if(currentMenuId == "#projectMenu"){$("#projectMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#racksMenu"){$("#rackMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#assetMenu"){$("#assetMenuId a").css('background-color','#003366')}
+			if(currentMenuId == "#eventMenu"){$("#eventMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#bundleMenu"){$("#bundleMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#consoleMenu"){$("#consoleMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#reportsMenu"){$("#reportsMenuId a").css('background-color','#003366')}
