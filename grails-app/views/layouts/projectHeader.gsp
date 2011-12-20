@@ -700,7 +700,7 @@
 				if(e == "#projectMegaMenu"){$("#projectMenuId a").css('background-color','lightblue');$("#projectMenuId a").css('color','#0366b0');}
 				if(e == "#racksMegaMenu"){
 					$("#roomMenuId a").css('background-color','lightblue');
-					$("#roomMenuId a").css('color','#0366b0');}
+					$("#roomMenuId a").css('color','#0366b0');
 					$("#rackMenuId a").css('background-color','lightblue');
 					$("#rackMenuId a").css('color','#0366b0');
 				}
