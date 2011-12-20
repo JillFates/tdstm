@@ -101,7 +101,7 @@
 	      <div class="menu2">
 	      <ul>
 		<jsec:hasRole name="ADMIN">
-			<li id="adminMenuId"><g:link class="home" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="mclosetime()" controller="auth" action="home">Admin <apan class="ui-icon ui-icon-triangle-1-s"></span></g:link></li>
+			<li id="adminMenuId"><g:link class="home" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="mclosetime()" controller="auth" action="home">Admin&nbsp;<span class="ui-icon ui-icon-triangle-1-s"></span></g:link></li>
 		</jsec:hasRole>
 			<li id="projectMenuId"><g:link class="home" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" controller="projectUtil">Client/Project</g:link></li>
 			<li id="roomMenuId"><g:link class="home" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" controller="room">Rooms</g:link></li>
