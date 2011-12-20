@@ -722,23 +722,23 @@
 		}
 	  	function resetmenu2 () {
 			$("#adminMenuId a").css('background-color','#0366b0');
-			$("#adminMenuId a").css('color','#036');
+			$("#adminMenuId a").css('color','#9ACAEE');
 			$("#projectMenuId a").css('background-color','#0366b0');
-			$("#projectMenuId a").css('color','#036');
+			$("#projectMenuId a").css('color','#9ACAEE');
 			$("#roomMenuId a").css('background-color','#0366b0');
-			$("#roomMenuId a").css('color','#036');
+			$("#roomMenuId a").css('color','#9ACAEE');
 			$("#rackMenuId a").css('background-color','#0366b0');
-			$("#rackMenuId a").css('color','#036');
+			$("#rackMenuId a").css('color','#9ACAEE');
 			$("#assetMenuId a").css('background-color','#0366b0');
-			$("#assetMenuId a").css('color','#036');
+			$("#assetMenuId a").css('color','#9ACAEE');
 			$("#eventMenuId a").css('background-color','#0366b0');
-			$("#eventMenuId a").css('color','#036');
+			$("#eventMenuId a").css('color','#9ACAEE');
 			$("#bundleMenuId a").css('background-color','#0366b0');
-			$("#bundleMenuId a").css('color','#036');
+			$("#bundleMenuId a").css('color','#9ACAEE');
 			$("#consoleMenuId a").css('background-color','#0366b0');
-			$("#consoleMenuId a").css('color','#036');
+			$("#consoleMenuId a").css('color','#9ACAEE');
 			$("#reportsMenuId a").css('background-color','#0366b0');
-			$("#reportsMenuId a").css('color','#036');
+			$("#reportsMenuId a").css('color','#9ACAEE');
 			$("#userMenuId a").css('background-color','#0366b0');
 			if(currentMenuId == "#adminMenu"){$("#adminMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#projectMenu"){$("#projectMenuId a").css('background-color','#003366')}
