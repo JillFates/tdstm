@@ -169,7 +169,7 @@
 	color:#9acaee;
 }
 .menu2 ul li a:hover   {
-	color:darkblue;
+	color:#036;
 	background:lightblue;
 }
 
@@ -229,7 +229,7 @@
 	text-decoration: none;
 	text-align:left;
 	font: bold 12px Arial, san-serif;
-	color:blue;
+	color:#0366b0;
 	padding:2px 6px;
 }
 .megamenu .megamenuSection {
@@ -238,11 +238,11 @@
 	text-decoration: none;
 	text-align:center;
 	font: normal 12px Arial, san-serif;
-	color:#black;
+	color:black;
 	padding:2px 6px;
 }
 .megamenu ul li a:hover   {
-	color:darkblue;
+	color:#036;
 	background:lightblue;
 }
 .mmtable {
