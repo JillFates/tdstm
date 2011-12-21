@@ -17,7 +17,12 @@
 var roomId = "${roomId}"
 var viewType = "${viewType}"
 if(roomId && viewType != 'list'){
-${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomView(e)')}
+var rackId = "${filterRackId}"
+if(rackId){
+	${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'getTimeOut(rackId)')}
+}else{
+	${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomView(e)')}	
+}
 }
 $(document).ready(function() {
     $("#editDialog").dialog({ autoOpen: false })
@@ -44,8 +49,8 @@ $(document).ready(function() {
 </g:if>
 <div id="roomListView" style="width:500px;">
 <g:if test="${roomId && viewType != 'list'}">
-<script type="text/javascript">
-${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomView(e)')}
+<script type="text/javascript">      
+${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomView(e)')}   
 </script>
 </g:if>
 <g:else>
@@ -330,8 +335,18 @@ function validateForm(){
 		return false
 	}
 }
-function createAssetPage(type,source,rack,roomName,location,position){
-	   ${remoteFunction(action:'create',controller:'assetEntity',params:['redirectTo':'room'], onComplete:'createEntityView(e,type,source,rack,roomName,location,position)')}
+function getTimeOut(rackId){
+	setTimeout("getRackLayout( rackId )",300);
+}
+function getRackLayout( rackId ){
+	if(rackId){
+		var otherBundle = $("#otherBundle").is(":checked") ? 'on' : ''
+		var moveBundleId = ''
+		$("#bundleId option:selected").each(function () {
+			moveBundleId +="moveBundleId="+$(this).val()+"&"
+	   	});
+		new Ajax.Request('../rackLayouts/save',{asynchronous:true,evalScripts:true,onSuccess:function(e){updateRackPower( rackId )},onComplete:function(e){jQuery('#rackLayout').html(e.responseText);},parameters:moveBundleId+'rackId='+rackId+'&backView=off&showCabling=off&otherBundle='+otherBundle+'&bundleName=on&hideIcons=on'});return false;
+	}
 }
 </script>
 <script>

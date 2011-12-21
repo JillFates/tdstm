@@ -211,6 +211,7 @@ initializeRacksInRoom( [] )
 capacityView()
 function updateRackPower(rackId){
 	$("#selectedRackId").val(rackId)
+	$("#redirectTo").val("room_"+rackId)
 	var capacityView = $("#capacityViewId").val()
 	var capacityType = $('input[name=capacityType]:checked').val()
 	var moveBundleId = ''
@@ -289,15 +290,10 @@ function getRackDetails(){
    	var otherBundle = $("#otherBundle").val()
 	${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()+\'&moveBundleId=\'+bundles+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')+\'&otherBundle=\'+otherBundle', onComplete:'openRoomView(e)')}
 }
-function getRackLayout( rackId ){
-	if(rackId){
-		var otherBundle = $("#otherBundle").is(":checked") ? 'on' : ''
-		var moveBundleId = ''
-		$("#bundleId option:selected").each(function () {
-			moveBundleId +="moveBundleId="+$(this).val()+"&"
-	   	});
-		new Ajax.Request('../rackLayouts/save',{asynchronous:true,evalScripts:true,onSuccess:function(e){updateRackPower( rackId )},onComplete:function(e){jQuery('#rackLayout').html(e.responseText);},parameters:moveBundleId+'rackId='+rackId+'&backView=off&showCabling=off&otherBundle='+otherBundle+'&bundleName=on&hideIcons=on'});return false;
-	}
+
+function createAssetPage(type,source,rack,roomName,location,position){
+	var room = $("#redirectTo").val();
+	   ${remoteFunction(action:'create',controller:'assetEntity',params:'\'redirectTo=\'+room', onComplete:'createEntityView(e,type,source,rack,roomName,location,position)')}
 }
 </script>
 </body>

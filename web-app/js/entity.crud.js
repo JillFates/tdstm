@@ -36,7 +36,7 @@ function showEntityView(e, type){
 }
 function editEntity(redirectTo,type, value, source,rack,roomName,location,position){
 	if(redirectTo == "rack"){
-		redirectTo = $('#redirectTo').val() == 'room' ? 'room' : 'rack'
+		redirectTo = $('#redirectTo').val() == 'rack' ? 'rack' : $('#redirectTo').val()
 	}
 	 switch(type){
 		 case "Application":

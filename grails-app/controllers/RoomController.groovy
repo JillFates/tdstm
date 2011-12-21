@@ -16,6 +16,7 @@ class RoomController {
     }
 
     def list = {
+		def rackIds = session.getAttribute("RACK_ID")
         params.max = Math.min(params.max ? params.int('max') : 100, 100)
 		def projectId = params.projectId
     	if(projectId == null || projectId == ""){
@@ -31,7 +32,7 @@ class RoomController {
 		def files = Files.findAllByAssetTypeAndProject('Files',project)
 		[roomInstanceList: roomInstanceList, roomInstanceTotal: roomInstanceList.size(), 
 		 projectId:projectId, roomId:roomId, viewType:params.viewType, roomInstance:roomInstance, servers : servers, 
-				applications : applications, dbs : dbs, files : files]
+				applications : applications, dbs : dbs, files : files ,filterRackId:rackIds]
     }
 
     def create = {
@@ -53,6 +54,7 @@ class RoomController {
     }
 
     def show = {
+		session.removeAttribute("RACK_ID")
         def roomInstance = Room.get(params.id)
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		userPreferenceService.setPreference( "CURR_ROOM", "${roomInstance?.id}" )

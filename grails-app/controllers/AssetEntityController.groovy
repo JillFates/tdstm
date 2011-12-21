@@ -1145,6 +1145,7 @@ class AssetEntityController {
 		def formatter = new SimpleDateFormat("MM/dd/yyyy")
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def maintExpDate = params.maintExpDate
+		def redirectTo = params?.redirectTo
 		session.setAttribute("USE_FILTERS", "true")
 		if(maintExpDate){
 			params.maintExpDate =  GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
@@ -1152,6 +1153,12 @@ class AssetEntityController {
 		def retireDate = params.retireDate
 		if(retireDate){
 			params.retireDate =  GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
+		}
+		if(redirectTo.contains("room_")){
+			def newRedirectTo = redirectTo.split("_")
+			redirectTo = newRedirectTo[0]
+			def rackId = newRedirectTo[1]
+			session.setAttribute("RACK_ID", rackId)
 		}
 
 		def bundleId = getSession().getAttribute( "CURR_BUNDLE" )?.CURR_BUNDLE
@@ -1184,9 +1191,9 @@ class AssetEntityController {
 			}
 			assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance)
 			flash.message = "AssetEntity ${assetEntityInstance.assetName} created"
-			if(params.redirectTo == "room"){
+			if(redirectTo == "room"){
 				redirect( controller:'room',action:list, params:[projectId: projectId] )
-			} else if(params.redirectTo == "rack"){
+			} else if(redirectTo == "rack"){
 				redirect( controller:'rackLayouts',action:'create', params:[projectId: projectId] )
 			} else {
 				redirect( action:list, params:[projectId: projectId] )
@@ -2416,6 +2423,12 @@ class AssetEntityController {
 			params.maintExpDate =  GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
 		}
 		def retireDate = params.retireDate
+		if(redirectTo.contains("room_")){
+			def newRedirectTo = redirectTo.split("_")
+			redirectTo = newRedirectTo[0]
+			def rackId = newRedirectTo[1]
+			session.setAttribute("RACK_ID", rackId)
+			}
 		if(retireDate){
 			params.retireDate =  GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
 		}
