@@ -13,10 +13,10 @@ class ProjectTeamController {
      * 	Return all of the teams associated to the project
      */
     def list = {
-        def bundleId = params.bundleId
+        def bundleId = params.bundleId		
         if(!bundleId){
-        	userPreferenceService.loadPreferences("CURR_BUNDLE")
-            bundleId = getSession().getAttribute("CURR_BUNDLE").CURR_BUNDLE
+           def project = Project.findById(params.projectId)
+		   bundleInstance = MoveBundle.findByProject(project)
         }
         def bundleInstance = MoveBundle.findById(bundleId)
         def projectTeamInstanceList = partyRelationshipService.getBundleTeamInstanceList( bundleInstance  )

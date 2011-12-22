@@ -310,7 +310,7 @@
 			<td style="vertical-align:top"><span class="megamenuSection">Events</span><br />
 				<ul >
 					<li><g:link class="mmlink" controller="moveEvent" action="list" >List Events</g:link> </li>
-					<li><g:link class="mmlink" controller="project" action="create">Create Event</g:link></li>
+					<li><g:link class="mmlink" controller="moveEvent" action="create">Create Event</g:link></li>
 					<li>&nbsp;</li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
@@ -321,7 +321,7 @@
 			<td style="vertical-align:top"><span class="megamenuSection">Bundles</span><br />
 				<ul >
 					<li><g:link class="mmlink" controller="moveBundle" action="list" >List Bundles</g:link> </li>
-					<li><g:link class="mmlink" controller="moveBundle" action="create">Create Bundle</g:link></li>
+					<li><g:link class="mmlink" controller="moveBundle" action="create"  params="[projectId:currProjObj?.id]">Create Bundle</g:link></li>
 					<li>&nbsp;</li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
@@ -333,9 +333,9 @@
 			<td style="vertical-align:top"><span class="megamenuSection">For <strong>${moveBundleName}</strong>:</span><br />
 				<ul >
 					<li><g:link class="mmlink" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundle Settings</g:link></li>
-					<li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId]" >Bundled Assets</g:link> </li>
-					<li><g:link class="mmlink" controller="projectTeam" action="list" params="[bundleId:moveBundleId]" >List Teams</g:link></li>
-					<li><g:link class="mmlink" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleId, rack:'UnrackPlan']" >Assign Assets to Teams</g:link> </li>
+					<li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId,projectId:projectId]" >Bundled Assets</g:link> </li>
+					<li><g:link class="mmlink" controller="projectTeam" action="list" params="[bundleId:moveBundleId,projectId:projectId]" >List Teams</g:link></li>
+					<li><g:link class="mmlink" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleId, rack:'UnrackPlan', projectId:projectId]" >Assign Assets to Teams</g:link> </li>
 					<jsec:hasRole name="ADMIN">
 					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
 					</jsec:hasRole>
@@ -349,8 +349,8 @@
 				<li><g:link class="home" controller="moveBundle" action="list">List</g:link></li>
 				<li><g:link class="home" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundle: ${moveBundleName}</g:link></li>
 				<li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundleId]" >Team</g:link></li>
-				<li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId]" >Bundle Asset Assignment</g:link> </li>
-				<li><g:link class="home" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleId, rack:'UnrackPlan']" >Bundle Team Assignment </g:link> </li>
+				<li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId,projectId:projectId]" >Bundle Asset Assignment</g:link> </li>
+				<li><g:link class="home" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleId, rack:'UnrackPlan', projectId:projectId]" >Bundle Team Assignment </g:link> </li>
 				<li><g:link class="home" controller="walkThrough" >Walkthrough</g:link></li>
 			</ul>
 		</div>
@@ -373,7 +373,7 @@
 		        <jsec:hasAnyRole in="['ADMIN']">
 				<ul >
 					<li><g:link class="mmlink" controller="newsEditor" params="[projectId:currProjObj?.id]">List News Items</g:link></li>
-					<li><a class="mmlink" href="#">Create News Item</a></li>
+					<li><a class="mmlink" href="javascript:openCreateNewsDialog()">Create News Item</a></li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
 					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
@@ -427,7 +427,7 @@
 		        <jsec:hasAnyRole in="['ADMIN']">
 				<ul >
 					<li><g:link class="mmlink" controller="newsEditor" params="[projectId:currProjObj?.id]">List News Items</g:link></li>
-					<li><a class="mmlink" href="#">Create News Item</a></li>
+					<li><a class="mmlink" href="javascript:openCreateNewsDialog()">Create News Item</a></li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
 					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>

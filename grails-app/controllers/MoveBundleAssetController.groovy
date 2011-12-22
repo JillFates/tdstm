@@ -98,8 +98,8 @@ class MoveBundleAssetController {
     def assignAssetsToBundle = {
     	def bundleId = params.bundleId
     	if(!bundleId){
-        	userPreferenceService.loadPreferences("CURR_BUNDLE")
-            bundleId = getSession().getAttribute("CURR_BUNDLE").CURR_BUNDLE
+           def project  = Project.findById(params.projectId)
+		   moveBundleInstance = MoveBundle.findByProject(project)
         }
     	def moveBundleInstance = MoveBundle.findById( bundleId )
     	def moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $moveBundleInstance.project.id")
@@ -317,7 +317,13 @@ class MoveBundleAssetController {
             userPreferenceService.loadPreferences("CURR_BUNDLE")
     		bundleId = getSession().getAttribute("CURR_BUNDLE").CURR_BUNDLE
     	}
-    	def bundleInstance = MoveBundle.findById(bundleId)
+		def bundleInstance 
+		if(bundleId){
+		   bundleInstance =  MoveBundle.findById(bundleId)
+		}else{
+		   def project = Project.findById(params.projectId)
+		   bundleInstance = MoveBundle.findByProject(project)
+		}
     	def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.role = '${params.role}' " )
     	def teamAssetCounts = []
     	def cartAssetCounts
