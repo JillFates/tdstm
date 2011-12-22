@@ -336,7 +336,7 @@ function validateForm(){
 	}
 }
 function getTimeOut(rackId){
-	setTimeout("getRackLayout( rackId )",300);
+	setTimeout("getRackLayout( rackId )",600);
 }
 function getRackLayout( rackId ){
 	if(rackId){
