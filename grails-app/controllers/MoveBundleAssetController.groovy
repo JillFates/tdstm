@@ -97,11 +97,11 @@ class MoveBundleAssetController {
 	 */
     def assignAssetsToBundle = {
     	def bundleId = params.bundleId
+		def moveBundleInstance = MoveBundle.findById( bundleId )
     	if(!bundleId){
            def project  = Project.findById(params.projectId)
 		   moveBundleInstance = MoveBundle.findByProject(project)
         }
-    	def moveBundleInstance = MoveBundle.findById( bundleId )
     	def moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $moveBundleInstance.project.id")
     	def currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $moveBundleInstance.id")
     	def moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $moveBundleInstance.project.id ")

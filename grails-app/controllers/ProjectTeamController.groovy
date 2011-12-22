@@ -14,11 +14,11 @@ class ProjectTeamController {
      */
     def list = {
         def bundleId = params.bundleId		
+		def bundleInstance = MoveBundle.findById(bundleId)
         if(!bundleId){
            def project = Project.findById(params.projectId)
 		   bundleInstance = MoveBundle.findByProject(project)
         }
-        def bundleInstance = MoveBundle.findById(bundleId)
         def projectTeamInstanceList = partyRelationshipService.getBundleTeamInstanceList( bundleInstance  )
         //ProjectTeam.findAllByProject(projectInstance)
     	 
