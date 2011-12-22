@@ -131,8 +131,8 @@
 				<ul >
 					<li><g:link class="mmlink" controller="auth" action="home">Admin Portal</g:link> </li>
 					<li>&nbsp;</li>
-					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManReleaseNotes?cover=print');">Release Notes</a></li>
-					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMAdminPortal?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMReleaseNotes?cover=print','help');">Release Notes</a></li>
+					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMAdminPortal?cover=print','help');">help</a></li>
 				</ul>
 			</td>
 			<td style="vertical-align:top"><span class="megamenuSection">Manage Clients</span><br />
@@ -140,7 +140,7 @@
 					<li><g:link class="mmlink" controller="partyGroup" id="${partyGroup}">List Companies</g:link></li>
 					<li><g:link class="mmlink" controller="person" id="${partyGroup}">List Staff</g:link></li>
 					<li><g:link class="mmlink" controller="userLogin" id="${partyGroup}">List Users</g:link></li>
-					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMCreatePerson?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMCreatePerson?cover=print','help');">help</a></li>
 				</ul>
 			</td>
 			<td style="vertical-align:top"><span class="megamenuSection">Manage Workflows</span><br />
@@ -148,7 +148,7 @@
 					<li><g:link class="mmlink" controller="workflow" action="home">List Workflows </g:link> </li>
 					<li>&nbsp;</li>
 					<li>&nbsp;</li>
-					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMManageWorkflows?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMManageWorkflows?cover=print','help');">help</a></li>
 				</ul>
 			</td>
 			<td style="vertical-align:top"><span class="megamenuSection">Manage Model Library</span><br />
@@ -156,7 +156,7 @@
 					<li><g:link class="mmlink" controller="manufacturer" id="${partyGroup}">Manufacturers</g:link></li>
 					<li><g:link class="mmlink" controller="model" id="${partyGroup}">Models</g:link></li>
 					<li><g:link class="mmlink" controller="model" action="importExport">Sync</g:link></li>
-					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMModelLibrary?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMModelLibrary?cover=print','help');">help</a></li>
 				</ul>
 			</td>
 			</tr></table>
@@ -187,7 +187,7 @@
 					</jsec:hasRole>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMClientProjectSettings?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMClientProjectSettings?cover=print','help');">help</a></li>
 					</jsec:hasRole>
 				</ul>
 			</td>
@@ -198,7 +198,7 @@
 					<li><g:link class="mmlink" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Project Staff</g:link></li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMProjectStaff?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMProjectStaff?cover=print','help');">help</a></li>
 					</jsec:hasRole>
 				</ul>
 			</td>
@@ -223,7 +223,7 @@
 					<li>&nbsp;</li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
 					</jsec:hasRole>
 				</ul>
 			</td>
@@ -233,7 +233,7 @@
 					<li>&nbsp;</li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
 					</jsec:hasRole>
 				</ul>
 			</td>
@@ -248,7 +248,7 @@
 					<li><g:link class="mmlink" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Manage Batches</g:link></li>
 					<li><g:link class="mmlink" controller="assetEntity" action="listComment" params="[projectId:currProjObj?.id]">List Comments</g:link></li>
 					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
 					</jsec:hasRole>
 				</ul>
 			</td>
@@ -258,7 +258,7 @@
 					<li>&nbsp;</li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
 					</jsec:hasRole>
 				</ul>
 			</td>
@@ -268,7 +268,7 @@
 					<li>&nbsp;</li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
 					</jsec:hasRole>
 				</ul>
 			</td>
@@ -278,7 +278,7 @@
 					<li>&nbsp;</li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
 					</jsec:hasRole>
 				</ul>
 			</td>
@@ -288,7 +288,7 @@
 					<li>&nbsp;</li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
 					</jsec:hasRole>
 				</ul>
 			</td>
@@ -314,7 +314,7 @@
 					<li>&nbsp;</li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
 					</jsec:hasRole>
 				</ul>
 			</td>
@@ -325,7 +325,7 @@
 					<li>&nbsp;</li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
 					</jsec:hasRole>
 				</ul>
 			</td>
@@ -337,7 +337,7 @@
 					<li><g:link class="mmlink" controller="projectTeam" action="list" params="[bundleId:moveBundleId,projectId:projectId]" >List Teams</g:link></li>
 					<li><g:link class="mmlink" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleId, rack:'UnrackPlan', projectId:projectId]" >Assign Assets to Teams</g:link> </li>
 					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
 					</jsec:hasRole>
 				</ul>
 			</td>
@@ -364,7 +364,7 @@
 					<li><g:link class="mmlink" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show','teamType':'ADMIN']">Supervise Admins</g:link></li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
 					</jsec:hasRole>
 				</ul>
 				</jsec:hasAnyRole>
@@ -376,7 +376,7 @@
 					<li><a class="mmlink" href="javascript:openCreateNewsDialog()">Create News Item</a></li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
 					</jsec:hasRole>
 				</ul>
 		        </jsec:hasAnyRole>
@@ -388,7 +388,7 @@
 					<li><a class="mmlink" href="#">Truck GPS Tracking</a></li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
 					</jsec:hasRole>
 				</ul>
 				</jsec:hasAnyRole>
@@ -414,11 +414,13 @@
 			<td style="vertical-align:top"><span class="megamenuSection">Discovery</span><br />
 				<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
 				<ul >
-					<li><g:link class="mmlink" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show','teamType':'MOVE']">Supervise Move Techs</g:link></li>
-					<li><g:link class="mmlink" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show','teamType':'ADMIN']">Supervise Admins</g:link></li>
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Rack+Layout" class="home">Racks (old)</a> </li>
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingConflict" class="home">Cabling Conflict</a> </li>
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingData" class="home">Cabling Data</a> </li>
+					<li><a href="/tdstm/reports/powerReport" class="home">Power</a> </li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
 					</jsec:hasRole>
 				</ul>
 				</jsec:hasAnyRole>
@@ -426,11 +428,13 @@
 			<td style="vertical-align:top"><span class="megamenuSection">Planning</span><br />
 		        <jsec:hasAnyRole in="['ADMIN']">
 				<ul >
-					<li><g:link class="mmlink" controller="newsEditor" params="[projectId:currProjObj?.id]">List News Items</g:link></li>
-					<li><a class="mmlink" href="javascript:openCreateNewsDialog()">Create News Item</a></li>
-					<li>&nbsp;</li>
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Login+Badges" class="home">Login Badges</a> </li>
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Asset+Tag" class="home">Asset Tags</a> </li>
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Team+Worksheets" class="home">Move Team Worksheets</a> </li>
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=cart+Asset" class="home">Logistics Team Worksheets</a></li>
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Transportation+Asset+List" class="home">Transport Worksheets</a></li>
 					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
 					</jsec:hasRole>
 				</ul>
 		        </jsec:hasAnyRole>
@@ -438,11 +442,13 @@
 			<td style="vertical-align:top"><span class="megamenuSection">Move Day</span><br />
 				<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
 				<ul >
-					<li><g:link class="mmlink" controller="cartTracking" action="cartTracking" params="[projectId:currProjObj?.id]">Cart Status</g:link></li>
-					<li><a class="mmlink" href="#">Truck GPS Tracking</a></li>
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Issue+Report" class="home">Issue Report</a> </li>
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=MoveResults" class="home">Move Results</a> </li>
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingQA" class="home">Cabling QA</a> </li>
+					<li>&nbsp;</li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print');">help</a></li>
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
 					</jsec:hasRole>
 				</ul>
 				</jsec:hasAnyRole>
@@ -455,12 +461,16 @@
 			<td style="vertical-align:top"><span class="megamenuSection">${session.getAttribute("LOGIN_PERSON").name }</span><br />
 				<ul >
 					<li>users name</li>
-					<li>Account settings...</li>
+					<li><g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">Account settings...</g:remoteLink>
+					</g:remoteLink></li>
 					<li>&nbsp;</li>
 					<li>Model Score: ${person?.modelScore} </li>
 				</ul>
 			</td>
-			<td style="vertical-align:top"><span class="megamenuSection">Sign out</span><br />
+			<td style="vertical-align:top">
+				<ul >
+					<li><g:link class="mmlink" controller="auth" action="signOut">Sign out</g:link></li>
+				</ul>
 			</td>
 			</tr></table>
 		</div>
