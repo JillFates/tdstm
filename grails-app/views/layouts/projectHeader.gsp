@@ -604,7 +604,7 @@
             <span class="button"><input type="button" class="edit" value="Update" onclick="changePersonDetails()"/></span>
             <span class="button"><input type="button" class="delete" onclick="jQuery('#personDialog').dialog('close')" value="Cancel" /></span>
           </div>
-          
+          <g:render template="../newsEditor/newsEditor"></g:render>
       </div>
     </div>
     <script type="text/javascript">
