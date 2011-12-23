@@ -74,7 +74,7 @@
 				<span><img title="Note: MS IE6 has limited capability so functions have been reduced." src="${createLinkTo(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
 			</g:if>
 			<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onmouseover="showMegaMenu('#userMegaMenu')" onmouseout="mclosetime()" onComplete="updatePersonDetails(e)">
-			&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name } <g:if test="${person?.modelScore}"><span style="font-weight:normal"> (${person?.modelScore})</span><span class="ui-icon ui-icon-triangle-1-s"></span></g:if> </span>
+			&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name } <a id="userAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a> </span>
 			</g:remoteLink>
 			</div>
 			<div class="tzmenu">&nbsp;-&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' }</span>
@@ -460,10 +460,10 @@
 			<table class="mmtable"><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">${session.getAttribute("LOGIN_PERSON").name }</span><br />
 				<ul >
-					<li>users name</li>
 					<li><g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">Account settings...</g:remoteLink></li>
+					<li><a href="#">Reset preferences</a></li>
 					<li>&nbsp;</li>
-					<li>Model Score: ${person?.modelScore} </li>
+					<g:if test="${person?.modelScore}"><li>Model Score: ${person?.modelScore} </li></g:if>
 				</ul>
 			</td>
 			<td style="vertical-align:top">
@@ -775,13 +775,13 @@
 			$("#reportsMenuId a").css('background-color','#0366b0');
 			$("#reportsMenuId a").css('color','#9ACAEE');
 			$("#userMenuId a").css('background-color','#0366b0');
-			$("#adminAnchor").css("display","inline")
-	  		$("#projectAnchor").css("display","inline")
-	  		$("#rackAnchor").css("display","inline")
-	  		$("#bundleAnchor").css("display","inline")
-	  		$("#consoleAnchor").css("display","inline")
-	  		$("#reportAnchor").css("display","inline")
-	  		$("#assetAnchor").css("display","inline")
+			$("#adminAnchor").css('color','#9ACAEE')
+			$("#projectAnchor").css('color','#9ACAEE')
+			$("#rackAnchor").css('color','#9ACAEE')
+			$("#assetAnchor").css('color','#9ACAEE')
+			$("#bundleAnchor").css('color','#9ACAEE')
+			$("#consoleAnchor").css('color','#9ACAEE')
+			$("#reportAnchor").css('color','#9ACAEE')
 			if(currentMenuId == "#adminMenu"){$("#adminMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#projectMenu"){$("#projectMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#roomsMenu"){$("#roomMenuId a").css('background-color','#003366')}
