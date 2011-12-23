@@ -461,8 +461,7 @@
 			<td style="vertical-align:top"><span class="megamenuSection">${session.getAttribute("LOGIN_PERSON").name }</span><br />
 				<ul >
 					<li>users name</li>
-					<li><g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">Account settings...</g:remoteLink>
-					</g:remoteLink></li>
+					<li><g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">Account settings...</g:remoteLink></li>
 					<li>&nbsp;</li>
 					<li>Model Score: ${person?.modelScore} </li>
 				</ul>
