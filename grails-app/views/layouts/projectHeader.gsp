@@ -101,25 +101,25 @@
 	      <div class="menu2">
 	      <ul>
 		<jsec:hasRole name="ADMIN">
-			<li id="adminMenuId"><g:link class="home" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="mclosetime()" controller="auth" action="home">Admin<a id="adminAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: none"></a></g:link></li>
+			<li id="adminMenuId"><g:link class="home" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="mclosetime()" controller="auth" action="home">Admin<a id="adminAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
 		</jsec:hasRole>
-			<li id="projectMenuId"><g:link class="home" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" controller="projectUtil">Client/Project<a id="projectAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: none"></a></g:link></li>
+			<li id="projectMenuId"><g:link class="home" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" controller="projectUtil">Client/Project<a id="projectAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
 			<li id="roomMenuId"><g:link class="home" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" controller="room">Rooms</g:link></li>
-			<li id="rackMenuId"><g:link class="home" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" controller="rackLayouts" action="create">Racks<a id="rackAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: none"></a></g:link></li>
+			<li id="rackMenuId"><g:link class="home" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" controller="rackLayouts" action="create">Racks<a id="rackAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
-			<li id="assetMenuId"><g:link class="home" onmouseover="showMegaMenu('#assetMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="assetImport">Assets<a id="assetAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: none"></a></g:link></li>
+			<li id="assetMenuId"><g:link class="home" onmouseover="showMegaMenu('#assetMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="assetImport">Assets<a id="assetAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
 			<li id="eventMenuId"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" controller="moveEvent" action="show" >Events<a id="eventAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: none"></a></g:link></li>
-			<li id="bundleMenuId"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles<a id="bundleAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: none"></a></g:link></li>
-			<li id="teamMenuId"><g:link class="home" onmouseover="showMegaMenu('')" onmouseout="mclosetime()" controller="clientTeams" params="[projectId:currProjObj?.id]">Teams<a id="teamAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: none"></a></g:link></li>
+			<li id="bundleMenuId"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles<a id="bundleAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
+			<li id="teamMenuId"><g:link class="home" onmouseover="showMegaMenu('')" onmouseout="mclosetime()" controller="clientTeams" params="[projectId:currProjObj?.id]">Teams<a id="teamAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
 			<li>&nbsp;</li>
 	        </jsec:lacksAllRoles>
 	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
-			<li id="consoleMenuId"><g:link class="home" onmouseover="showMegaMenu('#consoleMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console<a id="consoleAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: none"></a></g:link></li>
+			<li id="consoleMenuId"><g:link class="home" onmouseover="showMegaMenu('#consoleMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console<a id="consoleAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
 	        </jsec:hasAnyRole>
-			<li id="dashboardMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard<a id="dashboardAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: none"></a></g:link></li>
-			<li id="assetTrackerMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker<a id="trackerAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: none"></a></g:link></li>
+			<li id="dashboardMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard<a id="dashboardAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
+			<li id="assetTrackerMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker<a id="trackerAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']">
-	        	<li id="reportsMenuId"><g:link class="home" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" controller="reports" params="[projectId:currProjObj?.id]">Reports<a id="reportAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: none"></a></g:link></li>
+	        	<li id="reportsMenuId"><g:link class="home" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" controller="reports" params="[projectId:currProjObj?.id]">Reports<a id="reportAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
 	        </jsec:lacksAllRoles>
 	      </ul>
 	    </div>
@@ -372,8 +372,8 @@
 			<td style="vertical-align:top"><span class="megamenuSection">News</span><br />
 		        <jsec:hasAnyRole in="['ADMIN']">
 				<ul >
-					<li><g:link class="mmlink" controller="newsEditor" params="[projectId:currProjObj?.id]">List News Items</g:link></li>
-					<li><a class="mmlink" href="javascript:openCreateNewsDialog()">Create News Item</a></li>
+					<li><g:link class="mmlink" controller="newsEditor" params="[projectId:currProjObj?.id]">List News</g:link></li>
+					<li><a class="mmlink" href="javascript:openCreateNewsDialog()">Create News</a></li>
 					<li>&nbsp;</li>
 					<jsec:hasRole name="ADMIN">
 					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
@@ -425,7 +425,7 @@
 				</ul>
 				</jsec:hasAnyRole>
 			</td>
-			<td style="vertical-align:top"><span class="megamenuSection">Planning</span><br />
+			<td style="vertical-align:top"><span class="megamenuSection">Move Prep</span><br />
 		        <jsec:hasAnyRole in="['ADMIN']">
 				<ul >
 					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Login+Badges" class="home">Login Badges</a> </li>
@@ -700,20 +700,21 @@
 	  		$('#consoleMegaMenu').hide();
 	  		$('#reportsMegaMenu').hide();
 	  		$('#userMegaMenu').hide();
-	  		$("#adminAnchor").css("display","none")
-	  		$("#projectAnchor").css("display","none")
-	  		$("#rackAnchor").css("display","none")
-	  		$("#bundleAnchor").css("display","none")
-	  		$("#consoleAnchor").css("display","none")
-	  		$("#reportAnchor").css("display","none")
-	  		$("#assetAnchor").css("display","none")
 			resetmenu2();
 	  		if(e!=""){
 		  		$(e).show();
 				mcancelclosetime();	// cancel close timer
 				megamenuitem = e;
-				if(e == "#adminMegaMenu"){$("#adminMenuId a").css('background-color','lightblue');$("#adminMenuId a").css('color','#0366b0');$("#adminAnchor").css("display","inline")}
-				if(e == "#projectMegaMenu"){$("#projectMenuId a").css('background-color','lightblue');$("#projectMenuId a").css('color','#0366b0');$("#projectAnchor").css("display","inline")}
+				if(e == "#adminMegaMenu"){
+					$("#adminMenuId a").css('background-color','lightblue');
+					$("#adminMenuId a").css('color','#0366b0');
+					$("#adminAnchor").css("display","inline")
+				}
+				if(e == "#projectMegaMenu"){
+					$("#projectMenuId a").css('background-color','lightblue');
+					$("#projectMenuId a").css('color','#0366b0');
+					$("#projectAnchor").css("display","inline")
+				}
 				if(e == "#racksMegaMenu"){
 					$("#roomMenuId a").css('background-color','lightblue');
 					$("#roomMenuId a").css('color','#0366b0');
@@ -721,7 +722,11 @@
 					$("#rackMenuId a").css('color','#0366b0');
 					$("#rackAnchor").css("display","inline")
 				}
-				if(e == "#assetMegaMenu"){$("#assetMenuId a").css('background-color','lightblue');$("#assetMenuId a").css('color','#0366b0');$("#assetAnchor").css("display","inline")}
+				if(e == "#assetMegaMenu"){
+					$("#assetMenuId a").css('background-color','lightblue');
+					$("#assetMenuId a").css('color','#0366b0');
+					$("#assetAnchor").css("display","inline")
+				}
 				if(e == "#bundleMegaMenu"){
 					$("#eventMenuId a").css('background-color','lightblue');
 					$("#eventMenuId a").css('color','#0366b0');
@@ -729,9 +734,21 @@
 					$("#bundleMenuId a").css('color','#0366b0');
 					$("#bundleAnchor").css("display","inline")
 				}
-				if(e == "#consoleMegaMenu"){$("#consoleMenuId a").css('background-color','lightblue');$("#consoleMenuId a").css('color','#0366b0');$("#consoleAnchor").css("display","inline")}
-				if(e == "#reportsMegaMenu"){$("#reportsMenuId a").css('background-color','lightblue');$("#reportsMenuId a").css('color','#0366b0');$("#reportAnchor").css("display","inline")}
-				if(e == "#userMegaMenu"){$("#userMenuId a").css('background-color','lightblue');$("#userMenuId a").css('color','#0366b0');$("#adminAnchor").css("display","inline")}
+				if(e == "#consoleMegaMenu"){
+					$("#consoleMenuId a").css('background-color','lightblue');
+					$("#consoleMenuId a").css('color','#0366b0');
+					$("#consoleAnchor").css("display","inline")
+				}
+				if(e == "#reportsMegaMenu"){
+					$("#reportsMenuId a").css('background-color','lightblue');
+					$("#reportsMenuId a").css('color','#0366b0');
+					$("#reportAnchor").css("display","inline")
+				}
+				if(e == "#userMegaMenu"){
+					$("#userMenuId a").css('background-color','lightblue');
+					$("#userMenuId a").css('color','#0366b0');
+					$("#adminAnchor").css("display","inline")
+				}
 	  		}
 	  	}
 	  	function closeMegaMenu() {
@@ -758,13 +775,13 @@
 			$("#reportsMenuId a").css('background-color','#0366b0');
 			$("#reportsMenuId a").css('color','#9ACAEE');
 			$("#userMenuId a").css('background-color','#0366b0');
-			$("#adminAnchor").css("display","none")
-	  		$("#projectAnchor").css("display","none")
-	  		$("#rackAnchor").css("display","none")
-	  		$("#bundleAnchor").css("display","none")
-	  		$("#consoleAnchor").css("display","none")
-	  		$("#reportAnchor").css("display","none")
-	  		$("#assetAnchor").css("display","none")
+			$("#adminAnchor").css("display","inline")
+	  		$("#projectAnchor").css("display","inline")
+	  		$("#rackAnchor").css("display","inline")
+	  		$("#bundleAnchor").css("display","inline")
+	  		$("#consoleAnchor").css("display","inline")
+	  		$("#reportAnchor").css("display","inline")
+	  		$("#assetAnchor").css("display","inline")
 			if(currentMenuId == "#adminMenu"){$("#adminMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#projectMenu"){$("#projectMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#roomsMenu"){$("#roomMenuId a").css('background-color','#003366')}
