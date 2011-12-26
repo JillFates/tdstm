@@ -61,4 +61,21 @@ class Project extends PartyGroup {
 	String toString() {
 		"$projectCode : $name"
 	}
+	
+	static def getActiveProject( timeNow ){
+		def project = Project.createCriteria().list {
+			and {
+				ge("completionDate", timeNow)
+			}
+		}
+		return  project
+	}
+	static def getCompletedProject( timeNow ){
+		def project = Project.createCriteria().list {
+			and {
+				le("completionDate", timeNow)
+			}
+		}
+		return  project
+	}
 }

@@ -22,16 +22,22 @@ class ProjectController {
     		def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
 			def sort = params.sort ? params.sort : 'dateCreated' 
 			def order = params.order ? params.order : 'desc'
-    	if(isAdmin){	
-        	  projectList = Project.findAll([sort:sort, order:order])
-    	}else{
-    		def userCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' "+
-								"and partyIdTo = ${loginUser.person.id} and roleTypeCodeFrom = 'COMPANY' and roleTypeCodeTo = 'STAFF' ")
-			def query = "from Project p where p.id in (select pr.partyIdFrom from PartyRelationship pr where "+
+		    def now = GormUtil.convertInToGMT( "now",session.getAttribute("CURR_TZ")?.CURR_TZ )
+		if(params._action_List=="Show Completed Project"){
+			projectList = Project.getCompletedProject( now )
+		}
+		else{
+			if(isAdmin){
+				projectList = Project.getActiveProject( now )
+			}else{
+				def userCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' "+
+						"and partyIdTo = ${loginUser.person.id} and roleTypeCodeFrom = 'COMPANY' and roleTypeCodeTo = 'STAFF' ")
+				def query = "from Project p where p.id in (select pr.partyIdFrom from PartyRelationship pr where "+
 						"pr.partyIdTo = ${userCompany?.partyIdFrom?.id} and roleTypeCodeFrom = 'PROJECT') or "+
 						"p.client = ${userCompany?.partyIdFrom?.id} order by ${sort} ${order}"
-    			projectList = Project.findAll(query)
-    	}
+				projectList = Project.findAll(query)
+			}
+		}
 		TableFacade tableFacade = new TableFacadeImpl("tag",request)
         tableFacade.items = projectList
         Limit limit = tableFacade.limit

@@ -27,6 +27,7 @@ function onInvokeExportAction(id) {
 		<g:form action="create" method="post">
 		<span class="button"><g:actionSubmit class="save" action="Create" value="Create Project" /></span>
 		<span class="button"><input type="button" class="save" onclick="javascript:location.href='../projectUtil/createDemo'" value="Create Demo Project" /></span>
+		<span class="button"><g:actionSubmit class="save" action="List" value="Show Completed Projects"/></span>
 		</g:form>
 	</div>
 	<form name="projectForm" action="list">
@@ -49,6 +50,7 @@ function onInvokeExportAction(id) {
 <script>
 	currentMenuId = "#projectMenu";
 	$("#projectMenuId a").css('background-color','#003366')
+	
 </script>
 </body>
 </html>
