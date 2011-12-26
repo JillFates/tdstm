@@ -181,7 +181,7 @@
 			<table class="mmtable"><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">Client/Project</span><br />
 				<ul >
-					<li><g:link class="mmlink" controller="project" action="list">List Projects</g:link></li>
+					<li><g:link class="mmlink" controller="project" action="list" params="[active:'active']">List Projects</g:link></li>
 					<jsec:hasRole name="ADMIN">
 					<li><g:link class="mmlink" controller="project" action="create">Create Project</g:link></li>
 					</jsec:hasRole>
@@ -207,7 +207,7 @@
 		</div>
 		<div class="menu2" id="projectMenu" style="background-color:#003366;display: none;">
 		<ul >
-			<li><g:link class="home" controller="project" action="list">List Projects</g:link> </li>
+			<li><g:link class="home" controller="project" action="list" params="[active:'active']">List Projects</g:link> </li>
 			<g:if test="${currProjObj}"><li><g:link class="home" controller="projectUtil">Project: ${currProjObj.name}</g:link></li></g:if>
 			<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 			<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>

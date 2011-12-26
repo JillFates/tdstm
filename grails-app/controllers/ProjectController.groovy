@@ -16,6 +16,9 @@ class ProjectController {
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
     def list = {
+			if(params.active=="active"){
+				session.removeAttribute("COMPLETED_PROJ")
+			}
     		def projectList
     		def partyProjectList
     		def isAdmin = SecurityUtils.getSubject().hasRole("ADMIN")
@@ -24,6 +27,10 @@ class ProjectController {
 			def order = params.order ? params.order : 'desc'
 		    def now = GormUtil.convertInToGMT( "now",session.getAttribute("CURR_TZ")?.CURR_TZ )
 		if(params._action_List=="Show Completed Projects"){
+			projectList = Project.getCompletedProject( now )
+			session.setAttribute("COMPLETED_PROJ", "COMPLETE")
+		}
+		else if(session.getAttribute("COMPLETED_PROJ")=="COMPLETE"){
 			projectList = Project.getCompletedProject( now )
 		}
 		else{
