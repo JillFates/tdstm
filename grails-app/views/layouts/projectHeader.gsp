@@ -101,7 +101,7 @@
 	      <div class="menu2">
 	      <ul>
 		<jsec:hasRole name="ADMIN">
-			<li id="adminMenuId"><g:link class="home" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="mclosetime()" controller="auth" action="home">Admin<a id="adminAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
+			<li id="adminMenuId"><g:link class="home menuhideright" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="mclosetime()" controller="auth" action="home">Admin<a id="adminAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
 		</jsec:hasRole>
 			<li id="projectMenuId"><g:link class="home" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" controller="projectUtil">Client/Project<a id="projectAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
 			<li id="roomMenuId"><g:link class="home" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" controller="room">Rooms</g:link></li>
@@ -110,14 +110,14 @@
 			<li id="assetMenuId"><g:link class="home" onmouseover="showMegaMenu('#assetMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="assetImport">Assets<a id="assetAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
 			<li id="eventMenuId"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" controller="moveEvent" action="show" >Events<a id="eventAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: none"></a></g:link></li>
 			<li id="bundleMenuId"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles<a id="bundleAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
-			<li id="teamMenuId"><g:link class="home" onmouseover="showMegaMenu('')" onmouseout="mclosetime()" controller="clientTeams" params="[projectId:currProjObj?.id]">Teams<a id="teamAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
+			<li id="teamMenuId"><g:link class="home" onmouseover="showMegaMenu('')" onmouseout="mclosetime()" controller="clientTeams" params="[projectId:currProjObj?.id]">Teams</g:link></li>
 			<li>&nbsp;</li>
 	        </jsec:lacksAllRoles>
 	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
 			<li id="consoleMenuId"><g:link class="home" onmouseover="showMegaMenu('#consoleMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console<a id="consoleAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
 	        </jsec:hasAnyRole>
-			<li id="dashboardMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard<a id="dashboardAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
-			<li id="assetTrackerMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker<a id="trackerAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
+			<li id="dashboardMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link></li>
+			<li id="assetTrackerMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker</g:link></li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']">
 	        	<li id="reportsMenuId"><g:link class="home" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" controller="reports" params="[projectId:currProjObj?.id]">Reports<a id="reportAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
 	        </jsec:lacksAllRoles>
@@ -463,7 +463,9 @@
 					<li><g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">Account settings...</g:remoteLink></li>
 					<li><a href="#">Reset preferences</a></li>
 					<li>&nbsp;</li>
-					<g:if test="${person?.modelScore}"><li>Model Score: ${person?.modelScore} </li></g:if>
+					<g:if test="${person?.modelScore}">
+					<li><a href="/tdstm/person/list/18?maxRows=25&tag_tr_=true&tag_p_=1&tag_mr_=25&tag_s_5_modelScore=desc">Model Score: ${person?.modelScore}</a></li>
+					</g:if>
 				</ul>
 			</td>
 			<td style="vertical-align:top">

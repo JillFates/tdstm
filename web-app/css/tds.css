@@ -169,7 +169,9 @@
 	color:#036;
 	background:lightblue;
 }
-
+.menuhideright {
+	border-right:0px;
+}
 .megamenu {
 	z-index:10;
 	position:absolute;
