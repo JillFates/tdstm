@@ -149,7 +149,7 @@
 	font:bold 12px Tahoma, Arial, san-serif;
 	color:#9acaee;
 	padding:2px 6px;
-	border-right:1px solid #CCCCCC;
+	border-right:1px solid #1376C0;
 }
 .menu2 .title1 {
 	width:auto;
@@ -160,7 +160,7 @@
 	font: bold 12px Tahoma, Arial, san-serif;
 	color:#F0F0F0;
 	padding:2px 6px;
-	border-right:1px solid #CCCCCC;
+	border-right:1px solid #1376C0;
 }
 .menu2 ul li a:hover, .menu2 ul li.current a {
 	color:#darkblue;
@@ -168,6 +168,7 @@
 .menu2 ul li a:hover   {
 	color:#036;
 	background:lightblue;
+	border-right:1px solid lightblue;
 }
 .menu2 ul li a .menuhideright {
 	border-right:0px;
@@ -190,22 +191,22 @@
 	width:300px;
 }
 #racksMegaMenu {
-	left:172px;
+	left:175px;
 	width:250px;
 }
 #assetMegaMenu {
-	left:286px;
+	left:289px;
 }
 #bundleMegaMenu {
-	left:348px;
+	left:351px;
 	width:450px;
 }
 #consoleMegaMenu {
-	left:525px;
+	left:529px;
 	width:450px;
 }
 #reportsMegaMenu {
-	left:230px;
+	left:249px;
 	width:600px;
 }
 #userMegaMenu {
