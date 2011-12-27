@@ -2,7 +2,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="projectHeader" />
-    <title>Model Template</title>
+    <title>Model</title>
     <g:javascript src="drag_drop.js" />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
     <script type="text/javascript">
@@ -22,15 +22,15 @@
             </g:if>
 <div style="border: 0px;margin-top: 5px;">
 <fieldset>
-<legend><b>Model Template</b></legend>
+<legend><b>Model</b></legend>
 <div style="margin-left: 10px;margin-right: 10px;width: auto;">
 <table style="border: 0px;">
 	<tbody>
 		<tr>
 			<td>Manufacturer:</td>
 			<td>${modelInstance?.manufacturer?.name}</td>
-			<td>Model Name: <a href="#" 
-			 onclick="MyGoogle=window.open('http://www.google.com/#sclient=psy-ab&q='+escape('${modelInstance?.manufacturer?.name}'+' '+'${modelInstance?.modelName}'+' specifications'),'MyGoogle','toolbar=yes,location=yes,menubar=yes,scrollbars=yes,resizable=yes'); return false">G?</a>
+			<td>Model Name: (<a href="#" 
+			 onclick="MyGoogle=window.open('http://www.google.com/#sclient=psy-ab&q='+escape('${modelInstance?.manufacturer?.name}'+' '+'${modelInstance?.modelName}'+' specifications'),'MyGoogle','toolbar=yes,location=yes,menubar=yes,scrollbars=yes,resizable=yes'); return false">search</a>)
 			</td>
 			<td>${modelInstance?.modelName}</td>
 		</tr>
@@ -44,13 +44,10 @@
 			<td>Usize:</td>
 			<td>${modelInstance?.usize}</td>
 			<td>Height (inches):</td>
-			<td>${modelInstance?.height}</td>
-		</tr>
-		<tr>
-			<td>Width:</td>
-			<td>${modelInstance?.width}</td>
-			<td>Depth:</td>
-			<td>${modelInstance?.depth}</td>
+			<td>${modelInstance?.height}&nbsp;
+				W:${modelInstance?.width}&nbsp;
+				D:${modelInstance?.depth}
+			</td>
 		</tr>
 		<tr>
 			<td>Weight (lbs):</td>
@@ -71,26 +68,14 @@
 			<td>${modelInstance?.endOfLifeStatus}</td>
         </tr>
 		<tr>
-		    <td>Source URL:</td>
-			<td>${modelInstance?.sourceURL}</td>
-			<td>Model Status:</td>
-			<td>${modelInstance?.modelStatus}</td>
-		</tr>
-		<tr>
-			<td>Power Used : <td><span id="powerSpanId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts' ? modelInstance?.powerUse ? (modelInstance?.powerUse / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerUse}</span>
-			<input type="hidden" name="powerUse" id="powerUseId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? modelInstance?.powerUse ? (modelInstance?.powerUse / 110 )?.toFloat()?.round(1) : 0.0 : modelInstance?.powerUse}" >&nbsp;
-			<g:select id="powertype" name='powerType' value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE }" from="${['Watts','Amps']}" onchange="updatePowerType( this.value , this.name)"> </g:select>
-            </td>
-           <td> Power Nameplate : <td><span id="namePlatePowerSpanId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts' ? modelInstance?.powerNameplate ? (modelInstance?.powerNameplate / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerNameplate}</span>
-			<input type="hidden" name="powerNameplate" id="powerNameplateId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? modelInstance?.powerNameplate ? (modelInstance?.powerNameplate / 110 )?.toFloat()?.round(1) : 0.0 : modelInstance?.powerNameplate}" >&nbsp;
-			<g:select id="powerNameplateTypeId" name='powerNameplateType' value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE }" from="${['Watts','Amps']}" onchange="updatePowerType( this.value , this.name)"> </g:select>
-            </td>
-             
-		</tr>
-		<tr>
-            <td>Power Design: <td><span id="PowerDesignSpanId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts' ? modelInstance?.powerDesign ? (modelInstance?.powerDesign / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerDesign}</span>
-			<input type="hidden" name="powerDesign" id="powerDesignId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? modelInstance?.powerDesign ? (modelInstance?.powerDesign / 110 )?.toFloat()?.round(1) : 0.0 : modelInstance?.powerDesign}" >&nbsp;
-			<g:select id="powerDesignTypeId" name='powerDesignType' value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE }" from="${['Watts','Amps']}" onchange="updatePowerType( this.value , this.name)"> </g:select>
+			<td>Power (max/design/avg) :</td>
+				<span id="namePlatePowerSpanId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts' ? modelInstance?.powerNameplate ? (modelInstance?.powerNameplate / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerNameplate}</span>
+				<input type="hidden" name="powerNameplate" id="powerNameplateId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? modelInstance?.powerNameplate ? (modelInstance?.powerNameplate / 110 )?.toFloat()?.round(1) : 0.0 : modelInstance?.powerNameplate}" >&nbsp;
+				<span id="PowerDesignSpanId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts' ? modelInstance?.powerDesign ? (modelInstance?.powerDesign / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerDesign}</span>
+				<input type="hidden" name="powerDesign" id="powerDesignId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? modelInstance?.powerDesign ? (modelInstance?.powerDesign / 110 )?.toFloat()?.round(1) : 0.0 : modelInstance?.powerDesign}" >&nbsp;
+				<span id="powerSpanId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts' ? modelInstance?.powerUse ? (modelInstance?.powerUse / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerUse}</span>
+				<input type="hidden" name="powerUse" id="powerUseId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? modelInstance?.powerUse ? (modelInstance?.powerUse / 110 )?.toFloat()?.round(1) : 0.0 : modelInstance?.powerUse}" >&nbsp;
+				<g:select id="powertype" name='powerType' value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE }" from="${['Watts','Amps']}" onchange="updatePowerType( this.value , this.name)"> </g:select>
             </td>
         	<td>Notes:</td>
 			<td>${modelInstance?.description}</td>
@@ -98,15 +83,15 @@
         <tr>
             <td>Front image:</label></td>
         	<td>
-        	<g:if test="${modelInstance.frontImage}">
-        	<img src="${createLink(controller:'model', action:'getFrontImage', id:modelInstance.id)}" style="height: 50px;width: 100px;"/>
-        	</g:if>
+	        	<g:if test="${modelInstance.frontImage}">
+    	    	<img src="${createLink(controller:'model', action:'getFrontImage', id:modelInstance.id)}" style="height: 50px;width: 100px;"/>
+        		</g:if>
             </td>
         	<td>Rear image:</td>
         	<td>
-        	<g:if test="${modelInstance.rearImage}">
-        	<img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}"  style="height: 50px;width: 100px;" id="rearImageId"/>
-        	</g:if>
+        		<g:if test="${modelInstance.rearImage}">
+        		<img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}"  style="height: 50px;width: 100px;" id="rearImageId"/>
+        		</g:if>
         	</td>
         </tr>	
 		<tr style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
@@ -135,6 +120,10 @@
 		       	 <input type="checkbox" name="useImage" id="useImageId" disabled="disabled"/>
 		        </g:else>
 	        </td>
+        </tr>
+		<tr>
+		    <td>Created By :</td>
+			<td>${modelInstance?.createdBy}</td>
         	<td>Source TDS:</td>
 	        <td>
 		        <g:if test="${modelInstance.sourceTDS}">
@@ -144,16 +133,18 @@
 		       	 <input type="checkbox" name="sourceTDS" id="sourceTDSId" disabled="disabled"/>
 		        </g:else>
 	        </td>
-        </tr>
+		</tr>
 		<tr>
-		    <td>Created By :</td>
-			<td>${modelInstance?.createdBy}</td>
 			<td>Updated By:</td>
 			<td>${modelInstance?.updatedBy}</td>
+		    <td>Source URL:</td>
+			<td>${modelInstance?.sourceURL}</td>
 		</tr>
 		<tr>
 		    <td>Validated By:</td>
 			<td>${modelInstance?.validatedBy}</td>
+			<td>Model Status:</td>
+			<td>${modelInstance?.modelStatus}</td>
 		</tr>
 	</tbody>
 </table>

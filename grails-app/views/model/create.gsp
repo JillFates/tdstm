@@ -2,7 +2,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="projectHeader" />
-    <title>Model Template</title>
+    <title>Model - New</title>
     <g:javascript src="drag_drop.js" />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
@@ -14,7 +14,7 @@
             </g:if>
 <div class="steps_table" style="border: 0px;">
 <fieldset>
-<legend><b>Create Model Template</b></legend>
+<legend><b>Create Model</b></legend>
 <g:form action="list" enctype="multipart/form-data">
 <div style="margin-left: 10px;margin-right: 10px; width: auto;">
 <table>
@@ -51,15 +51,15 @@
 			 <td valign="top" class="name" nowrap="nowrap">Asset Type:</td>
 			 <td><g:select id="assetTypeId" name="assetType" from="${modelInstance.assetTypeList}" value="${modelInstance.assetType}" onchange="showBladeFields(this.value)"></g:select></td> 
 		<tr>
-			 <td valign="top" class="name">Usize:</td>
+			<td valign="top" class="name">Usize:</td>
 			<td>
 				<g:select id="usizeId" name="usize" from="${modelInstance.constraints.usize.inList}" value="${modelInstance.usize}"></g:select>
 			</td>
 			<td valign="top" class="name" nowrap="nowrap">Model Height:</td>
 			<td>
-				<input type="text" name="height" id="heightId" value=""/>
-			W:<input type="text" name="width" id="widthId" value=""/>
-			D:<input type="text" name="depth" id="depthId" value=""/>
+				<input type="text" size="3" name="height" id="heightId" value=""/>
+			W:<input type="text" size="3" name="width" id="widthId" value=""/>
+			D:<input type="text" size="3" name="depth" id="depthId" value=""/>
 			</td>
 		</tr>
 		<tr>
@@ -106,9 +106,9 @@
 		<tr>
 			<td valign="top" class="name" nowrap="nowrap">Power (Max/Design/Avg):</td>
 			<td>
-				<input type="text" name="powerNameplate" id="powerNameplateId" value="${modelInstance.powerNameplate}" >&nbsp;
-				<input type="text" name="powerDesign" id="powerDesignId" value="${modelInstance.powerDesign}" >&nbsp;
-				<input type="text" name="powerUse" id="powerUseId" value="${modelInstance.powerUse}" >&nbsp;
+				<input type="text" size="4" name="powerNameplate" id="powerNameplateId" value="${modelInstance.powerNameplate}" >&nbsp;
+				<input type="text" size="4" name="powerDesign" id="powerDesignId" value="${modelInstance.powerDesign}" >&nbsp;
+				<input type="text" size="4" name="powerUse" id="powerUseId" value="${modelInstance.powerUse}" >&nbsp;
 				<g:select id="powerTypeId" name='powerType' from="${['Watts','Amps']}" value="${powerType}"> </g:select></td>
 			</td>
 		    <td valign="top" class="name">Notes:</td>
@@ -173,21 +173,22 @@
 	        </td>
         </tr>
 		<tr>
+			<td></td>
+			<td></td>
 			<td valign="top" class="name" nowrap="nowrap">Source URL : </td>
 			<td>
 				<input type="text" name="sourceURL " id="sourceURL " value=""/>
+			</td>
+		</tr>
+        <tr>
+			<td valign="top" class="name" nowrap="nowrap">Validated By:</td>
+			<td>
+				<input type="text" name="validatedBy" id="validatedBy" value="" readonly="readonly"/>
 			</td>
 			<td valign="top" class="name" nowrap="nowrap">Model Status :</td>
 			<td>
 				<g:select id="modelStatus" name='modelStatus' value ='${modelInstance.modelStatus}' from="${['new']}" > </g:select>
 			</td>
-		</tr>
-        <tr>
-        <td valign="top" class="name" nowrap="nowrap">Validated By:</td>
-			<td>
-				<input type="text" name="validatedBy" id="validatedBy" value="" readonly="readonly"/>
-			</td>
-         
        </tr>
 	</tbody>
 </table>

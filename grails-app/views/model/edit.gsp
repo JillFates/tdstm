@@ -2,7 +2,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="projectHeader" />
-    <title>Model Template</title>
+    <title>Model - Edit</title>
     <g:javascript src="drag_drop.js" />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
@@ -17,7 +17,7 @@
             </g:if>
 <div style="border: 0px;margin-top: 5px;" >
 <fieldset>
-<legend><b>Edit Model Template</b></legend>
+<legend><b>Edit Model</b></legend>
 <g:form action="save"  enctype="multipart/form-data">
 <div style="margin-left: 10px;margin-right: 10px; width: auto;">
 <table style="border: 0px;">
