@@ -58,17 +58,8 @@
 			<td valign="top" class="name" nowrap="nowrap">Model Height:</td>
 			<td>
 				<input type="text" name="height" id="heightId" value=""/>
-			</td>
-			
-		</tr>
-		<tr>
-			<td valign="top" class="name" nowrap="nowrap">Model Width:</td>
-			<td>
-				<input type="text" name="width" id="widthId" value=""/>
-			</td>
-			<td valign="top" class="name" nowrap="nowrap">Model Depth:</td>
-			<td>
-				<input type="text" name="depth" id="depthId" value=""/>
+			W:<input type="text" name="width" id="widthId" value=""/>
+			D:<input type="text" name="depth" id="depthId" value=""/>
 			</td>
 		</tr>
 		<tr>
@@ -93,7 +84,7 @@
 		</tr>
 		<tr>
 			<td><label for="endOfLifeDate"> End of Life Date:</label></td>
-				     <td class="value ${hasErrors(bean:modelInstance ,field:'endOfLifeDate','errors')}">
+			<td class="value ${hasErrors(bean:modelInstance ,field:'endOfLifeDate','errors')}">
 				    <script type="text/javascript" charset="utf-8">
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                      </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="endOfLifeDate" id="endOfLifeDateId"
@@ -103,51 +94,33 @@
 						<g:renderErrors bean="${modelInstance}" as="list" field="endOfLifeDate" />
 					</div>
 				 </g:hasErrors>
-				</td>
-				<td valign="top" class="name" nowrap="nowrap">End of Life Status:</td>
+			</td>
+			<td valign="top" class="name" nowrap="nowrap">End of Life Status:</td>
 			<td>
 				<input type="text" name="endOfLifeStatus" id="endOfLifeStatus" value=""/>
 			</td>
 		</tr>
-		<tr>
-			<td valign="top" class="name" nowrap="nowrap">Source URL : </td>
 			<td>
-				<input type="text" name="sourceURL " id="sourceURL " value=""/>
-			</td>
-			<td valign="top" class="name" nowrap="nowrap">Model Status :</td>
-			<td>
-				<g:select id="modelStatus" name='modelStatus' value ='${modelInstance.modelStatus}' from="${['new']}" > </g:select>
-			</td>
-		</tr>
-			<td>
-				<input type = "hidden" id="modelScope" name='modelScope' > </input>
+				<input type = "hidden" id="modelScope" name='modelScope' />
 			</td>
 		<tr>
-			
-			<td valign="top" class="name" nowrap="nowrap">Power Used:</td>
-			<td><input type="text" name="powerUse" id="powerUseId" value="${modelInstance.powerUse}" >&nbsp;
-			<g:select id="powerTypeId" name='powerType' from="${['Watts','Amps']}" value="${powerType}"> </g:select></td>
-			<td valign="top" class="name" nowrap="nowrap">  Power Nameplate :</td>
-			<td><input type="text" name="powerNameplate" id="powerNameplateId" value="${modelInstance.powerNameplate}" >&nbsp;
-			<g:select id="powerNameplateTypeId" name='powerNameplateType' from="${['Watts','Amps']}" value=""> </g:select></td>
-			
-		</tr>
-		<tr>
-		    <td valign="top" class="name" nowrap="nowrap">Power Design :</td>
-            <td><input type="text" name="powerDesign" id="powerDesignId" value="${modelInstance.powerDesign}" >&nbsp;
-			<g:select id="powerDesignTypeId" name='powerDesignType' from="${['Watts','Amps']}" value=""> </g:select></td>
-			
+			<td valign="top" class="name" nowrap="nowrap">Power (Max/Design/Avg):</td>
+			<td>
+				<input type="text" name="powerNameplate" id="powerNameplateId" value="${modelInstance.powerNameplate}" >&nbsp;
+				<input type="text" name="powerDesign" id="powerDesignId" value="${modelInstance.powerDesign}" >&nbsp;
+				<input type="text" name="powerUse" id="powerUseId" value="${modelInstance.powerUse}" >&nbsp;
+				<g:select id="powerTypeId" name='powerType' from="${['Watts','Amps']}" value="${powerType}"> </g:select></td>
+			</td>
 		    <td valign="top" class="name">Notes:</td>
-		    <td><input type="text" name="description" id="descriptionId" value="${modelInstance.description}" > </td>
-            </td>
+		    <td>
+		    	<input type="text" name="description" id="descriptionId" value="${modelInstance.description}" > </td>
+			</td>
 		</tr>
 		<tr>
-            <td valign="top" class="name" nowrap="nowrap">Front image:</label></td>
-            <td><input size="20" type="file" name="frontImage" id="frontImageId" />
-		    </td>
-		    <td valign="top" class="name" nowrap="nowrap">Rear image:</td>
-            <td><input size="20" type="file" name="rearImage" id="rearImageId" />
-            </td>
+			<td valign="top" class="name" nowrap="nowrap">Front image:</label></td>
+			<td><input size="20" type="file" name="frontImage" id="frontImageId" /></td>
+			<td valign="top" class="name" nowrap="nowrap">Rear image:</td>
+			<td><input size="20" type="file" name="rearImage" id="rearImageId" /></td>
 		</tr>
 		<tr id="bladeRowsId" style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
 			<td valign="top" class="name">Blade Rows:</td>
@@ -199,6 +172,16 @@
 		        </g:else>
 	        </td>
         </tr>
+		<tr>
+			<td valign="top" class="name" nowrap="nowrap">Source URL : </td>
+			<td>
+				<input type="text" name="sourceURL " id="sourceURL " value=""/>
+			</td>
+			<td valign="top" class="name" nowrap="nowrap">Model Status :</td>
+			<td>
+				<g:select id="modelStatus" name='modelStatus' value ='${modelInstance.modelStatus}' from="${['new']}" > </g:select>
+			</td>
+		</tr>
         <tr>
         <td valign="top" class="name" nowrap="nowrap">Validated By:</td>
 			<td>
