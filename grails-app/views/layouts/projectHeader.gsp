@@ -65,7 +65,7 @@
       	<g:if test="${moveEvent}"> : ${moveEvent?.name}</g:if>
       	<g:if test="${moveBundleId}"> : ${moveBundleName}</g:if>
       </div>
-        <div class="header_right"><br />
+        <div class="header_right" id="userMenuId"><br />
           <div style="font-weight: bold;">
           <jsec:isLoggedIn>
 			<strong>
@@ -102,7 +102,7 @@
 	      <ul>
 		<jsec:hasRole name="ADMIN">
 			<li id="adminMenuId"><g:link class="home menuhideright" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="mclosetime()" controller="auth" action="home">Admin
-			<a id="adminAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
+			<a id="adminAnchor" class="ui-icon ui-icon-triangle-1-s" href="javascript:showMegaMenu('#adminMegaMenu')" style="display: inline"></a></g:link></li>
 		</jsec:hasRole>
 			<li id="projectMenuId"><g:link class="home" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" controller="projectUtil">Client/Project
 				<a id="projectAnchor" class="ui-icon ui-icon-triangle-1-s" href="javascript:showMegaMenu('#projectMegaMenu')" style="display: inline"></a></g:link></li>
@@ -127,7 +127,7 @@
 			<li id="assetTrackerMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker</g:link></li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']">
 	        	<li id="reportsMenuId"><g:link class="home" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" controller="reports" params="[projectId:currProjObj?.id]">Reports
-	        	<a id="reportAnchor" class="ui-icon ui-icon-triangle-1-s" href="javascript:showMegaMenu('#racksMegaMenu')" style="display: inline"></a></g:link></li>
+	        	<a id="reportAnchor" class="ui-icon ui-icon-triangle-1-s" href="javascript:showMegaMenu('#reportsMegaMenu')" style="display: inline"></a></g:link></li>
 	        </jsec:lacksAllRoles>
 	      </ul>
 	    </div>
@@ -755,9 +755,7 @@
 					$("#reportAnchor").css("display","inline")
 				}
 				if(e == "#userMegaMenu"){
-					$("#userMenuId a").css('background-color','lightblue');
-					$("#userMenuId a").css('color','#0366b0');
-					$("#adminAnchor").css("display","inline")
+					$("#userMenuId").css('background-color','lightblue');
 				}
 	  		}
 	  	}
@@ -784,7 +782,7 @@
 			$("#consoleMenuId a").css('color','#9ACAEE');
 			$("#reportsMenuId a").css('background-color','#0366b0');
 			$("#reportsMenuId a").css('color','#9ACAEE');
-			$("#userMenuId a").css('background-color','#0366b0');
+			$("#userMenuId").css('background-color','#5F9FCF');
 			$("#adminAnchor").css('color','#9ACAEE')
 			$("#projectAnchor").css('color','#9ACAEE')
 			$("#rackAnchor").css('color','#9ACAEE')
@@ -801,7 +799,7 @@
 			if(currentMenuId == "#bundleMenu"){$("#bundleMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#consoleMenu"){$("#consoleMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#reportsMenu"){$("#reportsMenuId a").css('background-color','#003366')}
-			if(currentMenuId == "#userMenu"){$("#userMenuId a").css('background-color','#003366')}
+			if(currentMenuId == "#userMenu"){$("#userMenuId").css('background-color','#5F9FCF')}
 	  	}
 	  	// set close timer
 		function mclosetime() {
