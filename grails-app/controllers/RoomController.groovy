@@ -1,14 +1,18 @@
 import grails.converters.JSON
 
+import org.apache.poi.hssf.record.formula.functions.T
+
+import com.tds.asset.Application
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetEntity
-import com.tds.asset.Application
 import com.tds.asset.Database
 import com.tds.asset.Files
+import org.hibernate.SessionFactory
 
 class RoomController {
 
 	def userPreferenceService
+	SessionFactory sessionFactory
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def index = {
@@ -175,17 +179,24 @@ class RoomController {
 			rack.sourceAssets.each{assetEntity ->
 				assetEntity.sourceRack = rack.tag
 				assetEntity.sourceRoom = roomInstance.roomName
-				assetEntity.save(flush:true)
+				assetEntity.save()
 	        }
 			rack.targetAssets.each{assetEntity ->
 				assetEntity.targetRack = rack.tag
 				assetEntity.targetRoom = roomInstance.roomName
-				assetEntity.save(flush:true)
+				assetEntity.save()
 	        }
     	}
+		flush()
     	redirect(action: "show", id: params.id)
     }
-
+	
+	private void flush() {
+		def hbSession = sessionFactory.currentSession
+		hbSession.flush()
+		hbSession.clear()
+	}
+	
     def delete = {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.get(projectId)
