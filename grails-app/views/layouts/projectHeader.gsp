@@ -91,7 +91,7 @@
 				</ul>
 			</div>
 			</strong>
-              &nbsp;<g:link controller="auth" action="signOut">sign out</g:link>
+              &nbsp;-&nbsp;<g:link controller="auth" action="signOut">sign out</g:link>
           </jsec:isLoggedIn>
           </div>
         </div>
@@ -103,9 +103,11 @@
 		<jsec:hasRole name="ADMIN">
 			<li id="adminMenuId"><g:link class="home menuhideright" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="mclosetime()" controller="auth" action="home">Admin<a id="adminAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
 		</jsec:hasRole>
-			<li id="projectMenuId"><g:link class="home" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" controller="projectUtil">Client/Project<a id="projectAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
+			<li id="projectMenuId"><g:link class="home" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" controller="projectUtil">Client/Project
+				<a id="projectAnchor" class="ui-icon ui-icon-triangle-1-s" href="javascript:showMegaMenu('#projectMegaMenu')" style="display: inline"></a></g:link></li>
 			<li id="roomMenuId"><g:link class="home" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" controller="room">Rooms</g:link></li>
-			<li id="rackMenuId"><g:link class="home" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" controller="rackLayouts" action="create">Racks<a id="rackAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
+			<li id="rackMenuId"><g:link class="home" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" controller="rackLayouts" action="create">Racks
+				<a id="rackAnchor" class="ui-icon ui-icon-triangle-1-s" href="javascript:showMegaMenu('#racksMegaMenu')" style="display: inline"></a></g:link></li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 			<li id="assetMenuId"><g:link class="home" onmouseover="showMegaMenu('#assetMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="assetImport">Assets<a id="assetAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a></g:link></li>
 			<li id="eventMenuId"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" controller="moveEvent" action="show" >Events<a id="eventAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: none"></a></g:link></li>
@@ -153,9 +155,9 @@
 			</td>
 			<td style="vertical-align:top"><span class="megamenuSection">Manage Model Library</span><br />
 				<ul >
-					<li><g:link class="mmlink" controller="manufacturer" id="${partyGroup}">Manufacturers</g:link></li>
-					<li><g:link class="mmlink" controller="model" id="${partyGroup}">Models</g:link></li>
-					<li><g:link class="mmlink" controller="model" action="importExport">Sync</g:link></li>
+					<li><g:link class="mmlink" controller="manufacturer" id="${partyGroup}">List Manufacturers</g:link></li>
+					<li><g:link class="mmlink" controller="model" id="${partyGroup}">List Models</g:link></li>
+					<li><g:link class="mmlink" controller="model" action="importExport">Sync Libraries</g:link></li>
 					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMModelLibrary?cover=print','help');">help</a></li>
 				</ul>
 			</td>

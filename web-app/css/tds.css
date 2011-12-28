@@ -187,22 +187,22 @@
 	box-shadow: 3px 3px 3px #888;
 }
 #projectMegaMenu {
-	left:64px;
+	left:65px;
 	width:300px;
 }
 #racksMegaMenu {
-	left:175px;
+	left:176px;
 	width:250px;
 }
 #assetMegaMenu {
-	left:289px;
+	left:290px;
 }
 #bundleMegaMenu {
-	left:351px;
+	left:353px;
 	width:450px;
 }
 #consoleMegaMenu {
-	left:529px;
+	left:533px;
 	width:450px;
 }
 #reportsMegaMenu {
