@@ -43,8 +43,8 @@
 		<tr>
 			<td>Usize:</td>
 			<td>${modelInstance?.usize}</td>
-			<td>Height (inches):</td>
-			<td>${modelInstance?.height}&nbsp;
+			<td>Dimensions (inches):</td>
+			<td>H:${modelInstance?.height}&nbsp;
 				W:${modelInstance?.width}&nbsp;
 				D:${modelInstance?.depth}
 			</td>
@@ -69,10 +69,13 @@
         </tr>
 		<tr>
 			<td>Power (max/design/avg) :</td>
+			<td>
 				<span id="namePlatePowerSpanId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts' ? modelInstance?.powerNameplate ? (modelInstance?.powerNameplate / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerNameplate}</span>
 				<input type="hidden" name="powerNameplate" id="powerNameplateId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? modelInstance?.powerNameplate ? (modelInstance?.powerNameplate / 110 )?.toFloat()?.round(1) : 0.0 : modelInstance?.powerNameplate}" >&nbsp;
+
 				<span id="PowerDesignSpanId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts' ? modelInstance?.powerDesign ? (modelInstance?.powerDesign / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerDesign}</span>
 				<input type="hidden" name="powerDesign" id="powerDesignId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? modelInstance?.powerDesign ? (modelInstance?.powerDesign / 110 )?.toFloat()?.round(1) : 0.0 : modelInstance?.powerDesign}" >&nbsp;
+
 				<span id="powerSpanId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts' ? modelInstance?.powerUse ? (modelInstance?.powerUse / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerUse}</span>
 				<input type="hidden" name="powerUse" id="powerUseId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? modelInstance?.powerUse ? (modelInstance?.powerUse / 110 )?.toFloat()?.round(1) : 0.0 : modelInstance?.powerUse}" >&nbsp;
 				<g:select id="powertype" name='powerType' value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE }" from="${['Watts','Amps']}" onchange="updatePowerType( this.value , this.name)"> </g:select>
@@ -274,12 +277,12 @@ function updatePowerType(value,name){
 		preference= preference.toFixed(0)
 		$('#powerUseId').val(preference);
 		$("#powerSpanId").html(preference);
-	}else if(value=="Watts" && name == "powerNameplateType"){
+
 		preference=$('#powerNameplateId').val()*110;
 		preference= preference.toFixed(0)
 		$('#powerNameplateId').val(preference);
 		$("#namePlatePowerSpanId").html(preference);
-	}else if(value=="Watts" && name == "powerDesignType"){
+
 		preference=$('#powerDesignId').val()*110;
 		preference= preference.toFixed(0)
 		$('#powerDesignId').val(preference);
@@ -290,14 +293,12 @@ function updatePowerType(value,name){
 		preference= preference.toFixed(1)
 		$('#powerUseId').val(preference);
 		$("#powerSpanId").html(preference);
-	}
-	else if(value=="Amps" && name == "powerNameplateType"){
+
 		preference= $('#powerNameplateId').val()/110;
 		preference= preference.toFixed(1)
 		$('#powerNameplateId').val(preference);
 		$("#namePlatePowerSpanId").html(preference);
-	}
-	else {
+
 		preference= $('#powerDesignId').val()/110;
 		preference= preference.toFixed(1)
 		$('#powerDesignId').val(preference);
