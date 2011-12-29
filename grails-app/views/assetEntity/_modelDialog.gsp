@@ -51,9 +51,16 @@
 			<td valign="top" class="value" id="showModelUsize"></td>
 		</tr>
 		<tr>
-			<td valign="top" class="name">Power (typical):</td>
-			<td valign="top" class="value" id="showModelPower"></td>
+		    <td valign="top" class="name">Power (max/design/avg) :</td>
+		    <td>
+			  <span id="namePlatePowerSpanId"></span>/
+
+			  <span id="PowerDesignSpanId"></span>/
+
+			  <span id="powerSpanId"></span>
+			</td>
 		</tr>
+
 		<tr>
 			<td valign="top" class="name">Front image:</label></td>
 			<td valign="top" class="value" id="showModelFrontImage"></td>

@@ -948,7 +948,9 @@ function showModel(id){
 			$("#showModelNotes").html( model.description )
 			$("#showModelAssetType").html( model.assetType )
 			$("#showModelUsize").html( model.usize )
-			$("#showModelPower").html( model.powerUse )
+			$("#namePlatePowerSpanId").html( model.powerNameplate )
+			$("#PowerDesignSpanId").html( model.powerDesign )
+			$("#powerSpanId").html( model.powerUse )
 			
 			if(model.frontImage != ''){
 				$("#showModelFrontImage").html( "<img src='../model/getFrontImage/"+model.id+"' style='height: 50px; width: 100px;' id='rearImageId'>" )
@@ -984,6 +986,7 @@ function showModel(id){
 			} else {
 				$("#showModelSourceTds").html( "<input type='checkbox' disabled='disabled'/>" )
 			}
+			
 			$("#modelShowDialog").dialog("open")
 		}
 	})

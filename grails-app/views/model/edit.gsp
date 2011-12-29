@@ -111,7 +111,7 @@
 		<tr>
 			<td>Power (Max/Design/Avg):</td>
 			<td>
-				<input type="text" size="4" name="powerNameplate" id="powerNameplateId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (modelInstance?.powerNameplate / 110 ).toFloat().round(1) : modelInstance?.powerNameplate}" >&nbsp;
+				<input type="text" size="4" name="powerNameplate" id="powerNameplateId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (modelInstance?.powerNameplate / 110 ).toFloat().round(1) : modelInstance?.powerNameplate}" onblur="changePowerValue()" ><a id ="namePlateId"  title="Make standard values from nameplate" style="cursor: pointer;" onclick="setStanderdPower()"> >> </a>
 				<input type="text" size="4" name="powerDesign" id="powerDesignId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (modelInstance?.powerDesign / 110 ).toFloat().round(1) : modelInstance?.powerDesign}" >&nbsp;
 				<input type="text" size="4" name="powerUse" id="powerUseId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (modelInstance?.powerUse / 110 ).toFloat().round(1) : modelInstance?.powerUse}" >&nbsp;
 				<g:select id="ptype" name='powerType' value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE }" from="${['Watts','Amps']}" onchange="updatePowerType(this.value, this.name)"> </g:select>
@@ -425,36 +425,59 @@
 	}
 	function updatePowerType( value , name){
 		var preference
-		if(value=="Watts" && name =="powerType"){
+		var designPrefernce
+		var namePlatePrefernce
+		if(value=="Watts" ){
 			preference=$('#powerUseId').val()*110;
 			preference= preference.toFixed(0)
 			$('#powerUseId').val(preference);
-		}else if(value=="Watts" && name == "powerNameplateType"){
-			preference=$('#powerNameplateId').val()*110;
-			preference= preference.toFixed(0)
-			$('#powerNameplateId').val(preference);
-		}else if(value=="Watts" && name == "powerDesignType"){
-			preference=$('#powerDesignId').val()*110;
-			preference= preference.toFixed(0)
-			$('#powerDesignId').val(preference);
-		}
-		else if(value=="Amps" && name == "powerType"){
+			
+			designPrefernce=$('#powerDesignId').val()*110;
+			designPrefernce= designPrefernce.toFixed(0)
+			$('#powerDesignId').val(designPrefernce);
+			
+			namePlatePrefernce=$('#powerNameplateId').val()*110;
+			namePlatePrefernce= namePlatePrefernce.toFixed(0)
+			$('#powerNameplateId').val(namePlatePrefernce);
+		}else {
 			preference= $('#powerUseId').val()/110;
 			preference= preference.toFixed(1)
 			$('#powerUseId').val(preference);
+			
+			designPrefernce=$('#powerDesignId').val()/110;
+			designPrefernce= designPrefernce.toFixed(1)
+			$('#powerDesignId').val(designPrefernce);
+			
+			namePlatePrefernce=$('#powerNameplateId').val()/110;
+			namePlatePrefernce= namePlatePrefernce.toFixed(1)
+			$('#powerNameplateId').val(namePlatePrefernce);
 		}
-		else if(value=="Amps" && name == "powerNameplateType"){
-			preference= $('#powerNameplateId').val()/110;
-			preference= preference.toFixed(1)
-			$('#powerNameplateId').val(preference);
-		}
-		else {
-			preference= $('#powerDesignId').val()/110;
-			preference= preference.toFixed(1)
-			$('#powerDesignId').val(preference);
-		}
+		
 		${remoteFunction(controller:'project', action:'setPower', params:'\'p=\' + value ')}
 	}	
+
+
+	function changePowerValue(){
+		var pType = $("#ptype").val()
+		var namePlatePower = $("#powerNameplateId").val()
+		var powerDesign = $("#powerDesignId").val()	
+		var powerUse= $("#powerUseId").val()
+		if(powerDesign == 0 || powerDesign == 0.0  ){
+		  $("#powerDesignId").val(parseInt(namePlatePower)*0.8)  
+		}
+	    if(powerUse == 0 || powerUse == 0.0 ){
+	      $("#powerUseId").val(parseInt(namePlatePower)*0.6)
+		}
+	  }
+
+	function setStanderdPower(){
+		var namePlatePower = $("#powerNameplateId").val()
+		var powerDesign = $("#powerDesignId").val()	
+		var powerUse= $("#powerUseId").val()
+		$("#powerDesignId").val((parseInt(namePlatePower)*0.8).toFixed(0))  
+	    $("#powerUseId").val((parseInt(namePlatePower)*0.6).toFixed(0))
+    }
+    
 </script>
 <script>
 	currentMenuId = "#adminMenu";

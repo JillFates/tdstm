@@ -126,13 +126,9 @@ class ModelController {
 		}
 		if( powerType == "Amps"){
 			powerUsed = powerUsed * 110
-        }
-		if(params.powerDesignType == "Amps"){
 			powerDesign = powerDesign * 110
-		}
-		if(params.powerNameplateType == "Amps"){
 			powerNameplate =  powerNameplate * 110
-		}
+        }
 	    def modelTemplate 
 		if(modelId)
 			modelTemplate = Model.get(modelId)
@@ -303,11 +299,7 @@ class ModelController {
 			def powerType = params.powerType
 			if( powerType == "Amps"){
 				powerUsed = powerUsed * 110
-			}
-			if( params.powerNameplateType == "Amps"){
 				powerNameplate = powerNameplate * 110
-			}
-			if( params.powerDesignType == "Amps"){
 				powerDesign = powerDesign * 110
 			}
         	params.useImage = params.useImage == 'on' ? 1 : 0
@@ -1079,11 +1071,22 @@ class ModelController {
 	def getModelAsJSON = {
     	def id = params.id
     	def model = Model.get(params.id)
+		def powerUsed = model.powerUse
+		def powerNameplate = model.powerNameplate
+		def powerDesign = model.powerDesign
+		if( session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts'){
+			powerUsed = powerUsed / 110
+			powerUsed = powerUsed.toDouble().round(1)
+			powerNameplate = powerNameplate / 110
+			powerNameplate = powerNameplate.toDouble().round(1)
+			powerDesign = powerDesign / 110
+			powerDesign = powerDesign.toDouble().round(1)
+		}
 		def modelMap = [id:model.id,
 						modelName:model.modelName,
 						description:model.description,
 						assetType:model.assetType,
-						powerUse:model.powerUse,
+						powerUse:powerUsed,
 						aka:model.aka,
 						usize:model.usize,
 						frontImage:model.frontImage ? model.frontImage : '',
@@ -1095,6 +1098,9 @@ class ModelController {
 						bladeHeight:model.bladeHeight,
 						bladeHeight:model.bladeHeight,
 						sourceTDSVersion:model.sourceTDSVersion,
+						powerNameplate: powerNameplate,
+						powerDesign : powerDesign
+						
 						]
     	render modelMap as JSON
     }
