@@ -187,7 +187,7 @@
 	box-shadow: 3px 3px 3px #888;
 }
 #projectMegaMenu {
-	left:65px;
+	gleft:65px;
 	width:300px;
 }
 #racksMegaMenu {
@@ -196,6 +196,7 @@
 }
 #assetMegaMenu {
 	left:290px;
+	width:490px;
 }
 #bundleMegaMenu {
 	left:354px;
