@@ -73,8 +73,9 @@
 			<g:if test="${isIE6}">
 				<span><img title="Note: MS IE6 has limited capability so functions have been reduced." src="${createLinkTo(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
 			</g:if>
-			<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onmouseover="showMegaMenu('#userMegaMenu')" onmouseout="mclosetime()" onComplete="updatePersonDetails(e)">
-			&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name } <a id="userAnchor" class="ui-icon ui-icon-triangle-1-s" style="display: inline"></a> </span>
+			<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onmouseover="showMegaMenu('#userMegaMenu')" onmouseout="mclosetime()" onComplete="updatePersonDetails(e)" style="float:left;display:inline">
+			&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name }
+				<a id="userAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#userMegaMenu')" href="javascript:showMegaMenu('#userMegaMenu')" style="float:left;display:inline"></a> </span>
 			</g:remoteLink>
 			</div>
 			<div class="tzmenu">&nbsp;-&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' }</span>
@@ -91,7 +92,7 @@
 				</ul>
 			</div>
 			</strong>
-              &nbsp;-&nbsp;<g:link controller="auth" action="signOut">sign out</g:link>
+              &nbsp;&nbsp;<g:link controller="auth" action="signOut"></g:link>
           </jsec:isLoggedIn>
           </div>
         </div>
@@ -102,32 +103,32 @@
 	      <ul>
 		<jsec:hasRole name="ADMIN">
 			<li id="adminMenuId"><g:link class="home menuhideright" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="mclosetime()" controller="auth" action="home">Admin
-			<a id="adminAnchor" class="ui-icon ui-icon-triangle-1-s" href="javascript:showMegaMenu('#adminMegaMenu')" style="display: inline"></a></g:link></li>
+				<a id="adminAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#adminMegaMenu')" href="javascript:showMegaMenu('#adminMegaMenu')" style="display: inline"></a></g:link></li>
 		</jsec:hasRole>
 			<li id="projectMenuId"><g:link class="home" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" controller="projectUtil">Client/Project
-				<a id="projectAnchor" class="ui-icon ui-icon-triangle-1-s" href="javascript:showMegaMenu('#projectMegaMenu')" style="display: inline"></a></g:link></li>
+				<a id="projectAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#projectMegaMenu')" href="javascript:showMegaMenu('#projectMegaMenu')" style="display: inline"></a></g:link></li>
 			<li id="roomMenuId"><g:link class="home" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" controller="room">Rooms</g:link></li>
 			<li id="rackMenuId"><g:link class="home" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" controller="rackLayouts" action="create">Racks
-				<a id="rackAnchor" class="ui-icon ui-icon-triangle-1-s" href="javascript:showMegaMenu('#racksMegaMenu')" style="display: inline"></a></g:link></li>
+				<a id="rackAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#racksMegaMenu')" href="javascript:showMegaMenu('#racksMegaMenu')" style="display: inline"></a></g:link></li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
 			<li id="assetMenuId"><g:link class="home" onmouseover="showMegaMenu('#assetMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="assetImport">Assets
-				<a id="assetAnchor" class="ui-icon ui-icon-triangle-1-s" href="javascript:showMegaMenu('#assetMegaMenu')" style="display: inline"></a></g:link></li>
+				<a id="assetAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#assetMegaMenu')" href="javascript:showMegaMenu('#assetMegaMenu')" style="display: inline"></a></g:link></li>
 			<li id="eventMenuId"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" controller="moveEvent" action="show" >Events
 			</g:link></li>
 			<li id="bundleMenuId"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles
-				<a id="bundleAnchor" class="ui-icon ui-icon-triangle-1-s" href="javascript:showMegaMenu('#bundleMegaMenu')" style="display: inline"></a></g:link></li>
+				<a id="bundleAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#bundleMegaMenu')" href="javascript:showMegaMenu('#bundleMegaMenu')" style="display: inline"></a></g:link></li>
 			<li id="teamMenuId"><g:link class="home" onmouseover="showMegaMenu('')" onmouseout="mclosetime()" controller="clientTeams" params="[projectId:currProjObj?.id]">Teams</g:link></li>
 			<li>&nbsp;</li>
 	        </jsec:lacksAllRoles>
 	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
 			<li id="consoleMenuId"><g:link class="home" onmouseover="showMegaMenu('#consoleMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console
-				<a id="consoleAnchor" class="ui-icon ui-icon-triangle-1-s" href="javascript:showMegaMenu('#consoleMegaMenu')" style="display: inline"></a></g:link></li>
+				<a id="consoleAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#consoleMegaMenu')" href="javascript:showMegaMenu('#consoleMegaMenu')" style="display: inline"></a></g:link></li>
 	        </jsec:hasAnyRole>
 			<li id="dashboardMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link></li>
 			<li id="assetTrackerMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker</g:link></li>
 	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']">
 	        	<li id="reportsMenuId"><g:link class="home" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" controller="reports" params="[projectId:currProjObj?.id]">Reports
-	        	<a id="reportAnchor" class="ui-icon ui-icon-triangle-1-s" href="javascript:showMegaMenu('#reportsMegaMenu')" style="display: inline"></a></g:link></li>
+	        	<a id="reportAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#reportsMegaMenu')" href="javascript:showMegaMenu('#reportsMegaMenu')" style="display: inline"></a></g:link></li>
 	        </jsec:lacksAllRoles>
 	      </ul>
 	    </div>
@@ -782,7 +783,7 @@
 			$("#consoleMenuId a").css('color','#9ACAEE');
 			$("#reportsMenuId a").css('background-color','#0366b0');
 			$("#reportsMenuId a").css('color','#9ACAEE');
-			$("#userMenuId").css('background-color','#5F9FCF');
+			$("#userMenuId").css('background-color','');
 			$("#adminAnchor").css('color','#9ACAEE')
 			$("#projectAnchor").css('color','#9ACAEE')
 			$("#rackAnchor").css('color','#9ACAEE')
@@ -799,7 +800,7 @@
 			if(currentMenuId == "#bundleMenu"){$("#bundleMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#consoleMenu"){$("#consoleMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#reportsMenu"){$("#reportsMenuId a").css('background-color','#003366')}
-			if(currentMenuId == "#userMenu"){$("#userMenuId").css('background-color','#5F9FCF')}
+			if(currentMenuId == "#userMenu"){$("#userMenuId").css('background-color','')}
 	  	}
 	  	// set close timer
 		function mclosetime() {
