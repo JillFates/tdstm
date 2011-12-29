@@ -47,8 +47,9 @@
 			<td>
 				<g:select id="usizeId" name="usize" from="${modelInstance.constraints.usize.inList}" value="${modelInstance.usize}"></g:select>
 			</td>
-			<td>Height (inches):</td>
-			<td><input type="text" size="3" name="modelHeight" id="heightId" value="${modelInstance?.height}">
+			<td>Dimensions(inches):</td>
+			<td>
+			H:<input type="text" size="3" name="modelHeight" id="heightId" value="${modelInstance?.height}">
 				<g:hasErrors bean="${modelInstance}" field="modelHeight">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelHeight" /></div>
 				</g:hasErrors>

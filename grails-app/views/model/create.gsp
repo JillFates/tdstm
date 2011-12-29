@@ -55,9 +55,9 @@
 			<td>
 				<g:select id="usizeId" name="usize" from="${modelInstance.constraints.usize.inList}" value="${modelInstance.usize}"></g:select>
 			</td>
-			<td valign="top" class="name" nowrap="nowrap">Model Height:</td>
+			<td valign="top" class="name" nowrap="nowrap">Dimensions(inches):</td>
 			<td>
-				<input type="text" size="3" name="height" id="heightId" value=""/>
+			H:<input type="text" size="3" name="height" id="heightId" value=""/>
 			W:<input type="text" size="3" name="width" id="widthId" value=""/>
 			D:<input type="text" size="3" name="depth" id="depthId" value=""/>
 			</td>
