@@ -106,36 +106,7 @@
 				<a id="adminAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#adminMegaMenu')" href="javascript:showMegaMenu('#adminMegaMenu')" style="display: inline"></a></g:link></li>
 		</jsec:hasRole>
 			<li id="projectMenuId"><g:link class="home" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" controller="projectUtil">Client/Project
-				<a id="projectAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#projectMegaMenu')" href="javascript:showMegaMenu('#projectMegaMenu')" style="display: inline"></a></g:link>
-		<div class="megamenu" id="projectMegaMenu" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" style="display: none;">
-			<table class="mmtable"><tr>
-			<td style="vertical-align:top"><span class="megamenuSection">Client/Project</span><br />
-				<ul >
-					<li><g:link class="mmlink" controller="project" action="list" params="[active:'active']">List Projects</g:link></li>
-					<jsec:hasRole name="ADMIN">
-					<li><g:link class="mmlink" controller="project" action="create">Create Project</g:link></li>
-					</jsec:hasRole>
-					<li>&nbsp;</li>
-					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMClientProjectSettings?cover=print','help');">help</a></li>
-					</jsec:hasRole>
-				</ul>
-			</td>
-			<g:if test="${currProjObj}">
-			<td style="vertical-align:top"><span class="megamenuSection">For <strong>${currProjObj.name}</strong></span><br />
-				<ul >
-					<li><g:link class="mmlink" controller="projectUtil">Project Settings</g:link></li>
-					<li><g:link class="mmlink" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Project Staff</g:link></li>
-					<li>&nbsp;</li>
-					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMProjectStaff?cover=print','help');">help</a></li>
-					</jsec:hasRole>
-				</ul>
-			</td>
-			</g:if>
-			</tr></table>
-		</div>
-			</li>
+				<a id="projectAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#projectMegaMenu')" href="javascript:showMegaMenu('#projectMegaMenu')" style="display: inline"></a></g:link></li>
 			<li id="roomMenuId"><g:link class="home" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" controller="room">Rooms</g:link></li>
 			<li id="rackMenuId"><g:link class="home" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" controller="rackLayouts" action="create">Racks
 				<a id="rackAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#racksMegaMenu')" href="javascript:showMegaMenu('#racksMegaMenu')" style="display: inline"></a></g:link></li>
@@ -215,6 +186,34 @@
 		</ul>
 		</div>
 
+		<div class="megamenu" id="projectMegaMenu" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+			<table class="mmtable"><tr>
+			<td style="vertical-align:top"><span class="megamenuSection">Client/Project</span><br />
+				<ul >
+					<li><g:link class="mmlink" controller="project" action="list" params="[active:'active']">List Projects</g:link></li>
+					<jsec:hasRole name="ADMIN">
+					<li><g:link class="mmlink" controller="project" action="create">Create Project</g:link></li>
+					</jsec:hasRole>
+					<li>&nbsp;</li>
+					<jsec:hasRole name="ADMIN">
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMClientProjectSettings?cover=print','help');">help</a></li>
+					</jsec:hasRole>
+				</ul>
+			</td>
+			<g:if test="${currProjObj}">
+			<td style="vertical-align:top"><span class="megamenuSection">For <strong>${currProjObj.name}</strong></span><br />
+				<ul >
+					<li><g:link class="mmlink" controller="projectUtil">Project Settings</g:link></li>
+					<li><g:link class="mmlink" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Project Staff</g:link></li>
+					<li>&nbsp;</li>
+					<jsec:hasRole name="ADMIN">
+					<li><a class="mmlink" href="javascript:window.open('javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMProjectStaff?cover=print','help');">help</a></li>
+					</jsec:hasRole>
+				</ul>
+			</td>
+			</g:if>
+			</tr></table>
+		</div>
 		<div class="menu2" id="projectMenu" style="background-color:#003366;display: none;">
 		<ul >
 			<li><g:link class="home" controller="project" action="list" params="[active:'active']">List Projects</g:link> </li>
@@ -834,6 +833,15 @@
 	  	//page load startup stuff
 	  	
 		showSubMenu(currentMenuId);
+		
+		//set up mega menus to align with menu2 items
+		//admin and user mega menus are to the edges
+		document.getElementById('#projectMegaMenu').style.left = document.getElementById('#projectMenuId').style.left;
+		document.getElementById('#racksMegaMenu').style.left = document.getElementById('#roomMenuId').style.left;
+		document.getElementById('#assetMegaMenu').style.left = document.getElementById('#assetMenuId').style.left;
+		document.getElementById('#bundleMegaMenu').style.left = document.getElementById('#eventMenuId').style.left;
+		document.getElementById('#consoleMegaMenu').style.left = document.getElementById('#consoleMenuId').style.left;
+		document.getElementById('#reportsMegaMenu').style.left = document.getElementById('#reportsMenuId').style.left;
 
 		var timeout = 500;
 		var closetimer = 0;
