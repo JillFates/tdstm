@@ -11,7 +11,7 @@ class ModelSyncBatchController {
         //params.max = Math.min(params.max ? params.int('max') : 20, 100)
         [modelSyncBatchInstanceList: ModelSyncBatch.list([sort:'id',order:'desc']), modelSyncBatchInstanceTotal: ModelSyncBatch.count()]
     }
-    
+
     def process = {
     	def modelBatch = params.batchId
 		def modelSyncBatch = ModelSyncBatch.get(modelBatch)
@@ -77,6 +77,8 @@ class ModelSyncBatchController {
 													   aka : modelSync.aka,
 													   description : modelSync.description,
 													   assetType : modelSync.assetType,
+													   powerNameplate : modelSync.powerNameplate,
+													   powerDesign : modelSync.powerDesign,
 													   powerUse : modelSync.powerUse,
 													   usize : modelSync.usize,
 													   bladeRows : modelSync.bladeRows,
@@ -111,6 +113,8 @@ class ModelSyncBatchController {
 							if(modelInstance.sourceTDSVersion < modelSync.sourceTDSVersion){
 								modelInstance.aka = modelSync.aka
 								modelInstance.description = modelSync.description 
+								modelInstance.powerNameplate = modelSync.powerNameplate
+								modelInstance.powerDesign = modelSync.powerDesign
 								modelInstance.powerUse = modelSync.powerUse
 								modelInstance.usize = modelSync.usize
 								modelInstance.bladeRows = modelSync.bladeRows
@@ -147,6 +151,8 @@ class ModelSyncBatchController {
 						    
 						    modelInstance.aka = modelSync.aka
 							modelInstance.description = modelSync.description 
+							modelInstance.powerNameplate = modelSync.powerNameplate
+							modelInstance.powerDesign = modelSync.powerDesign
 							modelInstance.powerUse = modelSync.powerUse
 							modelInstance.usize = modelSync.usize
 							modelInstance.bladeRows = modelSync.bladeRows
