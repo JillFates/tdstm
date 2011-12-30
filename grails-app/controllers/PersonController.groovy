@@ -383,16 +383,7 @@ class PersonController {
 		def prePreference = UserPreference.findAllByUserLogin(personInstance).preferenceCode
 		prePreference.each{ preference->
 		  def preferenceInstance = UserPreference.findByPreferenceCodeAndUserLogin(preference,personInstance)
-		  if((preferenceInstance.preferenceCode) =="CURR_PROJ" ){
-		  }
-		  else if((preferenceInstance.preferenceCode) =="CURR_BUNDLE"){
-		  }
-		  else if((preferenceInstance.preferenceCode) =="PARTYGROUP"){
-		  }
-		  else {
-			  preferenceInstance.delete(flush:true)
-		  }
-		     userPreferenceService.loadPreferences(preferenceInstance.preferenceCode)
+			 preferenceInstance.delete(flush:true)
 		}
 		return person
 	}
