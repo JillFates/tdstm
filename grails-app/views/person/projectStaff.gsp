@@ -271,7 +271,7 @@
                 </div>
             </g:form>
 </div>
-<div id="showPerson" style="display: none;height:auto" title="Show Staff">
+<div id="showPerson" style="display: none;height:auto" title="Staff Detail">
                 <input type="hidden" name="id" value="" />
                 <input type="hidden" name="projectId" value="${projectId}" />
                 <div class="dialog">
