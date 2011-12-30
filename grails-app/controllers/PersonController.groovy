@@ -218,7 +218,6 @@ class PersonController {
         def map = new HashMap()
         def personInstance = Person.get( params.id )
         def role = params.role
-		println "role ::::::::::"+role
         def company = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $personInstance.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'")
         if(company == null){
         	map.put("companyId","")
