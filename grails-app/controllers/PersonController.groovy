@@ -1,11 +1,16 @@
 import grails.converters.JSON
-import java.text.SimpleDateFormat
-import org.jsecurity.crypto.hash.Sha1Hash
-import com.tdssrc.grails.GormUtil
+
 import java.text.DateFormat
+import java.text.SimpleDateFormat
+
+import net.tds.util.jmesa.PersonBean
+
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
-import net.tds.util.jmesa.PersonBean
+import org.jsecurity.SecurityUtils
+import org.jsecurity.crypto.hash.Sha1Hash
+
+import com.tdssrc.grails.GormUtil
 class PersonController {
     
 	def partyRelationshipService
@@ -213,11 +218,13 @@ class PersonController {
         def map = new HashMap()
         def personInstance = Person.get( params.id )
         def role = params.role
+		println "role ::::::::::"+role
         def company = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $personInstance.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'")
         if(company == null){
         	map.put("companyId","")
         }else{
             map.put("companyId",company.partyIdFrom.id)
+			map.put("companyName",company.partyIdFrom.name)
         }
         map.put("id", personInstance.id)
         map.put("firstName", personInstance.firstName)
@@ -268,10 +275,12 @@ class PersonController {
 	def projectStaff = {
 		def projectId = params.projectId
 		def submit = params.submit
+		def role = ""
+		def subject = SecurityUtils.subject
 		def projectStaff = partyRelationshipService.getProjectStaff( projectId )	
 		def companiesStaff = partyRelationshipService.getProjectCompaniesStaff( projectId )
 		def projectCompanies = partyRelationshipService.getProjectCompanies( projectId )
-		return [ projectStaff:projectStaff, companiesStaff:companiesStaff, projectCompanies:projectCompanies, projectId:projectId, submit:submit ]
+		return [ projectStaff:projectStaff, companiesStaff:companiesStaff, projectCompanies:projectCompanies, projectId:projectId, submit:submit, isAdmin:subject.hasRole("ADMIN") ]
 	}
 	/*
 	 *	Method to add Staff to project through Ajax Overlay 

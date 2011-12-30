@@ -13,6 +13,7 @@
     <script type="text/javascript">
 	    $(document).ready(function(){
 		        $("#editPerson").dialog({ autoOpen: false });
+		        $("#showPerson").dialog({ autoOpen: false });
 	      	});
 	    
 	    $(document).ready(function(){
@@ -47,6 +48,21 @@
 				$("#editPerson").dialog( "open" );
 		
 		 	}
+	      	function showPersonDialog( e ){
+	      		var person = eval('(' + e.responseText + ')')
+	      		
+                $("#showCompanyId").html( person.companyName )      		
+				$("#showFirstName").html( person.firstName )
+				$("#showLastName").html( person.lastName )
+				$("#showNickName").html( person.nickName)
+				$("#showTitle").html( person.title)
+				$("#showEmail").html( person.email )
+				$("#showActive").html( person.active )
+				$("#showRole").html( person.role )
+				
+				$("#showPerson").dialog('option', 'width', 350)
+				$("#showPerson").dialog( "open" );
+		    }
 		 	
 		 	// function for add staff form dialog
 		 	function showAddProjectStaff(){
@@ -143,11 +159,13 @@
 	<tbody>
 		<g:each in="${projectStaff}" status="i" var="projectStaff">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-
+              <g:if test="${isAdmin }">
 				<td><g:remoteLink controller="person" action="editStaff" id="${projectStaff?.staff.id}" params="[role:projectStaff?.role.id]" onComplete ="editPersonDialog( e );">${projectStaff?.name}</g:remoteLink></td>
-
+              </g:if>
+              <g:else>
+				<td><g:remoteLink controller="person" action="editStaff" id="${projectStaff?.staff.id}" params="[role:projectStaff?.role.id]" onComplete ="showPersonDialog( e );">${projectStaff?.name}</g:remoteLink></td>
+              </g:else>
 				<td>${projectStaff?.company[0]}</td>
-				
 				<td>${projectStaff?.role}</td>
 
 			</tr>
@@ -250,6 +268,90 @@
                     <span class="button"><input type="submit" class="save" value="Update"  /></span>
                 </div>
             </g:form>
+</div>
+<div id="showPerson" style="display: none;height:auto" title="Show Staff">
+                <input type="hidden" name="id" value="" />
+                <input type="hidden" name="projectId" value="${projectId}" />
+                <div class="dialog">
+                    <table >
+                        <tbody style="height:350px">
+                        <tr>
+							<td colspan="2"><div>  </div> </td>
+							</tr>
+                     <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label><b>Company:</b> </label>
+                                </td>
+                                <td valign="top" class="value ">
+								<span name="company" id="showCompanyId"></span>
+                                </td>
+                            </tr> 
+                        
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="firstName"><b>First Name </b></label>
+                                </td>
+                                <td valign="top" class="value ">
+                                    <span id="showFirstName" name="firstName" value=""></span>
+                                </td>
+                            </tr> 
+                        
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="lastName"><b>Last Name:</b></label>
+                                </td>
+                                <td valign="top" class="name">
+                                    <span id="showLastName" name="lastName" value=""></span>
+                                </td>
+                            </tr> 
+                        
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="nickName"><b>Nick Name:</b></label>
+                                </td>
+                                <td valign="top" class="value ">
+                                    <span id="showNickName" name="nickName" value=""></span>
+                                </td>
+                            </tr> 
+                        	 <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="title"><b>Title:</b></label>
+                                </td>
+                                <td valign="top" class="name">
+                                    <span id="showTitle" name="title" value=""></span>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+			                	<td valign="top" class="name">
+			                    	<label for="email"><b>Email:</b></label>
+						        </td>
+			                    <td valign="top" class="name">
+			                        <span id="showEmail"  value=""></span>
+								</td>
+					       </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="active"><b>Active:</b></label>
+                                </td>
+                                <td valign="top" class="name">
+                                <span name="active" id="showActive" ></span>
+                                </select>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="active"><b>Role:</b></label>
+                                </td>
+	                                <td valign="top" class="value ">
+	                                <span name="active" id="showRole" ></span>
+                                </td>
+                            </tr> 
+                        
+                        </tbody>
+                    </table>
+                </div>
+                
+                
 </div>
 <div class="body" id="addProjectStaff" style="display: none;" title="Add staff to project" >
 <div >
