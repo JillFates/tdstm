@@ -367,4 +367,24 @@ class PersonController {
 			ret << [name:personInstance.firstName, tz:getSession().getAttribute( "CURR_TZ" )?.CURR_TZ]
 			render  ret as JSON
     }
+	
+	def resetPreferences ={
+		def person = Person.findById(params.user)
+		def personInstance = UserLogin.findByPerson(person)
+		def prePreference = UserPreference.findAllByUserLogin(personInstance).preferenceCode
+		prePreference.each{ preference->
+		  def preferenceInstance = UserPreference.findByPreferenceCodeAndUserLogin(preference,personInstance)
+		  if((preferenceInstance.preferenceCode) =="CURR_PROJ" ){
+		  }
+		  else if((preferenceInstance.preferenceCode) =="CURR_BUNDLE"){
+		  }
+		  else if((preferenceInstance.preferenceCode) =="PARTYGROUP"){
+		  }
+		  else {
+			  preferenceInstance.delete(flush:true)
+		  }
+		     userPreferenceService.loadPreferences(preferenceInstance.preferenceCode)
+		}
+		return person
+	}
 }

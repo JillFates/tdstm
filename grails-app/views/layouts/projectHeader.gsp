@@ -465,12 +465,12 @@
 			</tr></table>
 		</div>
 		<div></div>
-		<div class="megamenu" id="userMegaMenu" onmouseover="showMegaMenu('#userMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+		<div class="megamenu" id="userMegaMenu" onmouseover="showMegaMenu('#userMegaMenu')" onmouseout="mclosetime()" style="display: none; width:370px">
 			<table class="mmtable"><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">${session.getAttribute("LOGIN_PERSON").name }</span><br />
 				<ul >
 					<li><g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">Account settings...</g:remoteLink></li>
-					<li><a href="#">Reset preferences</a></li>
+					<li><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${session.getAttribute('LOGIN_PERSON').id}" onclick="resetPreference(this.name)">Reset preferences</a><a href="#" id="newpreferenceId" style="display:none;" >Preferences were reset</a></li>
 					<li>&nbsp;</li>
 					<g:if test="${person?.modelScore}">
 					<li><a href="/tdstm/person/list/18?maxRows=25&tag_tr_=true&tag_p_=1&tag_mr_=25&tag_s_5_modelScore=desc">Model Score: ${person?.modelScore}</a></li>
@@ -828,6 +828,13 @@
 
 		function setPower( p ){
 			${remoteFunction(controller:'project', action:'setPower', params:'\'p=\' + p ',	onComplete:'updateTimeZone( e )')}
+		}
+		function resetPreference(user){
+			${remoteFunction(controller:'person', action:'resetPreferences', params:'\'user=\' + user ',onComplete:'changeResetMessage()')}
+	   }
+	    function changeResetMessage(){
+               $("#resetPreferenceId").fadeTo("fast", .5).removeAttr("onClick"); 
+			   $("#newpreferenceId").css("display","inline")
 		}
 	  	
 	  	//page load startup stuff
