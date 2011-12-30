@@ -222,6 +222,7 @@ function createRack(value){
 		$("#newPowerA_"+newRackId).val('0')
 		$("#newPowerB_"+newRackId).val('0')
 	}
+	$("#roomLayout").css("width","auto")
 }
 function changeLabel(id,value){
 	$("#rackLabel_"+id).html(value)

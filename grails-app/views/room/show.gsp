@@ -3,7 +3,7 @@
 <div class="body" style="width:98%;">
 <div id="roomListView"></div>
 <input type="hidden" id="redirectTo" value="room"/>
-<div class="dialog" style="border: 1px solid black;">
+<div class="dialog" style="border: 1px solid black;width: 1203px;overflow-x: auto;">
 	<table style="width: 100%; border: none;border-spacing:0px;">
 		<tbody>
 			<tr>
@@ -117,7 +117,7 @@
 		</tbody>
 	</table>
 </div>
-<div id="roomLayout_body" style="width: 1100px; overflow-x: auto; border: 2px solid black">
+<div id="roomLayout_body" style="width: 1200px; overflow-x: auto; border: 2px solid black">
 	<input id="selectedRackId" type="hidden">
 	<g:set var="numrows" value="${1}" />
 	<g:set var="tilerows" value="${roomInstance.roomDepth / 2}" />
