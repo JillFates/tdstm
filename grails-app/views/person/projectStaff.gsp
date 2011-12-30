@@ -141,7 +141,9 @@
 </g:if>
 
 <div class="buttons">
+ <g:if test="${isAdmin }">
 	<span class="button"><input type="button" class="create" value="Add" onclick="showAddProjectStaff()"/></span>
+ </g:if> 
 </div>
 <div class="list">
 <table>
