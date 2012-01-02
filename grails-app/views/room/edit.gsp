@@ -137,6 +137,7 @@
 <script type="text/javascript">
 initializeRacksInRoom( ${rackInstanceList.id} )
 function submitForm(form){
+	
  	if($("#locationId").val() == '') {
  		alert("Please enter location")
  	} else if($("#roomNameId").val() == '') {
@@ -150,6 +151,7 @@ function submitForm(form){
 				$("#roomShowView").html(data)
 				$("#roomShowView").show()
 				$("#roomListView").hide()
+			 	$("#room_layout").css("height","auto")
 			}
 		});
  	}

@@ -271,11 +271,15 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 </div>
 <script type="text/javascript">
 function openRoomView(e){
+	
 	var resp = e.responseText
 	$("#roomShowView").html(resp)
 	$("#roomShowView").show()
 	$("#roomListView").hide()
+	
+	$("#room_layout").css("height","auto")
 }
+
 
 function enableActions(){
 	var inputCheckBox = $("input:checkbox")
