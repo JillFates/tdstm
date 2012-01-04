@@ -391,18 +391,18 @@
 		var powerDesign = $("#powerDesignId").val()	
 		var powerUse= $("#powerUseId").val()
 		if(powerDesign == ""){
-		  $("#powerDesignId").val(parseInt(namePlatePower)*0.8)  
+		  $("#powerDesignId").val(parseInt(namePlatePower)*0.5)  
 		}
 	    if(powerUse == ""){
-	      $("#powerUseId").val(parseInt(namePlatePower)*0.6)
+	      $("#powerUseId").val(parseInt(namePlatePower)*0.33)
 		}
 	}
 	function setStanderdPower(){
 		var namePlatePower = $("#powerNameplateId").val()
 		var powerDesign = $("#powerDesignId").val()	
 		var powerUse= $("#powerUseId").val()
-		$("#powerDesignId").val((parseInt(namePlatePower)*0.8).toFixed(0))  
-	    $("#powerUseId").val((parseInt(namePlatePower)*0.6).toFixed(0))
+		$("#powerDesignId").val((parseInt(namePlatePower)*0.5).toFixed(0))  
+	    $("#powerUseId").val((parseInt(namePlatePower)*0.33).toFixed(0))
     }
 </script>
 <script>

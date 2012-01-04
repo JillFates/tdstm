@@ -464,10 +464,10 @@
 		var powerDesign = $("#powerDesignId").val()	
 		var powerUse= $("#powerUseId").val()
 		if(powerDesign == 0 || powerDesign == 0.0  ){
-		  $("#powerDesignId").val(parseInt(namePlatePower)*0.8)  
+		  $("#powerDesignId").val(parseInt(namePlatePower)*0.5)  
 		}
 	    if(powerUse == 0 || powerUse == 0.0 ){
-	      $("#powerUseId").val(parseInt(namePlatePower)*0.6)
+	      $("#powerUseId").val(parseInt(namePlatePower)*0.33)
 		}
 	  }
 
@@ -475,8 +475,8 @@
 		var namePlatePower = $("#powerNameplateId").val()
 		var powerDesign = $("#powerDesignId").val()	
 		var powerUse= $("#powerUseId").val()
-		$("#powerDesignId").val((parseInt(namePlatePower)*0.8).toFixed(0))  
-	    $("#powerUseId").val((parseInt(namePlatePower)*0.6).toFixed(0))
+		$("#powerDesignId").val((parseInt(namePlatePower)*0.5).toFixed(0))  
+	    $("#powerUseId").val((parseInt(namePlatePower)*0.33).toFixed(0))
     }
     
 </script>
