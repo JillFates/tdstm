@@ -18,7 +18,7 @@
           <div class="dialog">
             <table>
               <thead>
-              	<tr><th colspan="2">Import/Export</th></tr>
+              	<tr><th colspan="3">Import/Export</th></tr>
               </thead>
               <tbody>
               
