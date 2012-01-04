@@ -32,13 +32,14 @@ function onInvokeAction(id) {
 					 <jmesa:htmlColumn property="description" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${moveBundle?.description}</jmesa:htmlColumn>
 					 <jmesa:htmlColumn property="operationalOrder" title="Order" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${moveBundle?.operationalOrder}</jmesa:htmlColumn>
 					 <jmesa:htmlColumn property="assetQty" title="Asset Qty" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${moveBundle?.assetQty}</jmesa:htmlColumn>
-                     <jmesa:htmlColumn property="dateCreated" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor"><tds:convertDateTime date="${moveBundle?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>
-                     <jmesa:htmlColumn property="lastUpdated" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor"><tds:convertDateTime date="${moveBundle?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>
+                     <jmesa:htmlColumn property="startTime" title="Start" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor"><tds:convertDateTime date="${moveBundle?.startTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>
+                     <jmesa:htmlColumn property="completionTime" title="Completion" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor"><tds:convertDateTime date="${moveBundle?.completionTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>
                  </jmesa:htmlRow>
              </jmesa:htmlTable>
          </jmesa:tableFacade>
      </form>
   </div>
+
   <div class="buttons"> 
   <g:form>
 	<input type="hidden" id="projectId" name="projectId" value="${projectId}"/>
