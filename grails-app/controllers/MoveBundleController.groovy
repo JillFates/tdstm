@@ -26,7 +26,7 @@ class MoveBundleController {
 
     def list = {
     	
-    	if(!params.sort) params.sort = 'name'
+    	if(!params.sort) params.sort = 'startTime'
     	if(!params.order) params.order = 'asc'
     	def projectId = params.projectId
     	if(projectId == null || projectId == ""){
