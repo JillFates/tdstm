@@ -3,7 +3,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="companyHeader" />
+        <meta name="layout" content="projectHeader" />
         <title>UserLogin List</title>
         <link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
 		<script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
@@ -16,12 +16,17 @@
 	        
     </head>
     <body>
+
     
         <div class="body">
             <h1>UserLogin List</h1>
+
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
+
             <span class="menuButton"><g:link class="create" action="create" params="[companyId:companyId]">New UserLogin</g:link></span>
+
         </div>
+
         <br/>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
