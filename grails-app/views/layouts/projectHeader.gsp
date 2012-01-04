@@ -105,127 +105,12 @@
 			<li id="adminMenuId"><g:link class="home menuhideright" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="mclosetime()" controller="auth" action="home">Admin
 				<a id="adminAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#adminMegaMenu')" href="javascript:showMegaMenu('#adminMegaMenu')" style="display: inline"></a></g:link></li>
 		</jsec:hasRole>
-			<li id="projectMenuId"><g:link class="home" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" controller="projectUtil">Client/Project
-				<a id="projectAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#projectMegaMenu')" href="javascript:showMegaMenu('#projectMegaMenu')" style="display: inline"></a></g:link></li>
-			<li id="roomMenuId"><g:link class="home" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" controller="room">Rooms</g:link></li>
-			<li id="rackMenuId"><g:link class="home" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" controller="rackLayouts" action="create">Racks
-				<a id="rackAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#racksMegaMenu')" href="javascript:showMegaMenu('#racksMegaMenu')" style="display: inline"></a></g:link></li>
-	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
-			<li id="assetMenuId"><g:link class="home" onmouseover="showMegaMenu('#assetMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="assetImport">Assets
-				<a id="assetAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#assetMegaMenu')" href="javascript:showMegaMenu('#assetMegaMenu')" style="display: inline"></a></g:link></li>
-			<li id="eventMenuId"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" controller="moveEvent" action="show" >Events
-			</g:link></li>
-			<li id="bundleMenuId"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles
-				<a id="bundleAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#bundleMegaMenu')" href="javascript:showMegaMenu('#bundleMegaMenu')" style="display: inline"></a></g:link></li>
-			<li id="teamMenuId"><g:link class="home" onmouseover="showMegaMenu('')" onmouseout="mclosetime()" controller="clientTeams" params="[projectId:currProjObj?.id]">Teams</g:link></li>
-			<li>&nbsp;</li>
-	        </jsec:lacksAllRoles>
-	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
-			<li id="consoleMenuId"><g:link class="home" onmouseover="showMegaMenu('#consoleMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console
-				<a id="consoleAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#consoleMegaMenu')" href="javascript:showMegaMenu('#consoleMegaMenu')" style="display: inline"></a></g:link></li>
-	        </jsec:hasAnyRole>
-			<li id="dashboardMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link></li>
-			<li id="assetTrackerMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker</g:link></li>
-	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']">
-	        	<li id="reportsMenuId"><g:link class="home" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" controller="reports" params="[projectId:currProjObj?.id]">Reports
-	        	<a id="reportAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#reportsMegaMenu')" href="javascript:showMegaMenu('#reportsMegaMenu')" style="display: inline"></a></g:link></li>
-	        </jsec:lacksAllRoles>
-	      </ul>
-	    </div>
-	    
-		<div class="megamenu" id="adminMegaMenu" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="mclosetime()" style="display: none;">
-			<jsec:hasRole name="ADMIN">
-			<table class="mmtable"><tr>
-			<td style="vertical-align:top"><span class="megamenuSection">Administration</span><br />
-				<ul >
-					<li><g:link class="mmlink" controller="auth" action="home">Admin Portal</g:link> </li>
-					<li>&nbsp;</li>
-					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMReleaseNotes?cover=print','help');">Release Notes</a></li>
-					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMAdminPortal?cover=print','help');">help</a></li>
-				</ul>
-			</td>
-			<td style="vertical-align:top"><span class="megamenuSection">Manage Clients</span><br />
-				<ul >
-					<li><g:link class="mmlink" controller="partyGroup" id="${partyGroup}">List Companies</g:link></li>
-					<li><g:link class="mmlink" controller="person" id="${partyGroup}">List Staff</g:link></li>
-					<li><g:link class="mmlink" controller="userLogin" id="${partyGroup}">List Users</g:link></li>
-					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMCreatePerson?cover=print','help');">help</a></li>
-				</ul>
-			</td>
-			<td style="vertical-align:top"><span class="megamenuSection">Manage Workflows</span><br />
-				<ul >
-					<li><g:link class="mmlink" controller="workflow" action="home">List Workflows </g:link> </li>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
-					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMManageWorkflows?cover=print','help');">help</a></li>
-				</ul>
-			</td>
-			<td style="vertical-align:top"><span class="megamenuSection">Manage Model Library</span><br />
-				<ul >
-					<li><g:link class="mmlink" controller="manufacturer" id="${partyGroup}">List Manufacturers</g:link></li>
-					<li><g:link class="mmlink" controller="model" id="${partyGroup}">List Models</g:link></li>
-					<li><g:link class="mmlink" controller="model" action="importExport">Sync Libraries</g:link></li>
-					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMModelLibrary?cover=print','help');">help</a></li>
-				</ul>
-			</td>
-			</tr></table>
-			</jsec:hasRole>
-		</div>
-		<div class="menu2" id="adminMenu" style="background-color:#003366;display: none;">
-		<ul >
-			<jsec:hasRole name="ADMIN">
-			<li><g:link class="home" controller="auth" action="home">Admin</g:link> </li>
-			<li><g:link class="home" controller="workflow" action="home">Workflows </g:link> </li>
-			<li><g:link class="home" controller="partyGroup" id="${partyGroup}">Company</g:link></li>
-			<li><g:link class="home" controller="person" id="${partyGroup}">Staff</g:link></li>
-			<li><g:link class="home" controller="userLogin" id="${partyGroup}">Users</g:link></li>
-			<li><g:link class="home" controller="manufacturer" id="${partyGroup}">Manufacturers</g:link></li>
-			<li><g:link class="home" controller="model" id="${partyGroup}">Models</g:link></li>
-			<li><g:link class="home" controller="model" action="importExport">Sync</g:link></li>
-		</jsec:hasRole>
-		</ul>
-		</div>
-
-		<div class="megamenu" id="projectMegaMenu" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" style="display: none;">
-			<table class="mmtable"><tr>
-			<td style="vertical-align:top"><span class="megamenuSection">Client/Project</span><br />
-				<ul >
-					<li><g:link class="mmlink" controller="project" action="list" params="[active:'active']">List Projects</g:link></li>
-					<jsec:hasRole name="ADMIN">
-					<li><g:link class="mmlink" controller="project" action="create">Create Project</g:link></li>
-					</jsec:hasRole>
-					<li>&nbsp;</li>
-					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMClientProjectSettings?cover=print','help');">help</a></li>
-					</jsec:hasRole>
-				</ul>
-			</td>
-			<g:if test="${currProjObj}">
-			<td style="vertical-align:top"><span class="megamenuSection">For <strong>${currProjObj.name}</strong></span><br />
-				<ul >
-					<li><g:link class="mmlink" controller="projectUtil">Project Settings</g:link></li>
-					<li><g:link class="mmlink" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Project Staff</g:link></li>
-					<li>&nbsp;</li>
-					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMProjectStaff?cover=print','help');">help</a></li>
-					</jsec:hasRole>
-				</ul>
-			</td>
-			</g:if>
-			</tr></table>
-		</div>
-		<div class="menu2" id="projectMenu" style="background-color:#003366;display: none;">
-		<ul >
-			<li><g:link class="home" controller="project" action="list" params="[active:'active']">List Projects</g:link> </li>
-			<g:if test="${currProjObj}"><li><g:link class="home" controller="projectUtil">Project: ${currProjObj.name}</g:link></li></g:if>
-			<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
-			<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
-			</jsec:lacksAllRoles>
-		</ul>
-		</div>
-
-		<div class="megamenu" id="racksMegaMenu" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" style="display: none;">
-			<table class="mmtable"><tr>
+			<li id="projectMenuId"  ><g:link class="home" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" controller="projectUtil">Client/Project
+				<a id="projectAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#projectMegaMenu')" href="javascript:showMegaMenu('#projectMegaMenu')" style="display: inline"></a></g:link>
+				</li>
+			<li id="roomMenuId" style="position:relative; float: left;"><g:link class="home" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" controller="room">Rooms</g:link>
+			<div class="megamenu rooms" id="racksMegaMenu" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+			<table class="mmtable room_rack" ><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">Rooms</span><br />
 				<ul >
 					<li><g:link class="mmlink" params="[viewType:'list']" controller="room">List Rooms</g:link></li>
@@ -248,9 +133,18 @@
 			</td>
 			</tr></table>
 		</div>
-
-		<div class="megamenu" id="assetMegaMenu" onmouseover="showMegaMenu('#assetMegaMenu')" onmouseout="mclosetime()" style="display: none;">
-			<table class="mmtable"><tr>
+			</li>
+			<li id="rackMenuId" ><g:link class="home" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" controller="rackLayouts" action="create">Racks
+				<a id="rackAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#racksMegaMenu')" href="javascript:showMegaMenu('#racksMegaMenu')" style="float: left"></a></g:link>
+				
+				
+				
+				</li>
+	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
+			<li id="assetMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('#assetMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="assetImport">Assets
+				<a id="assetAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#assetMegaMenu')" href="javascript:showMegaMenu('#assetMegaMenu')" style="display: inline"></a></g:link>
+			<div class="megamenu rooms" id="assetMegaMenu" onmouseover="showMegaMenu('#assetMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+			<table class="mmtable room_rack"><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">Manage Data</span><br />
 				<ul >
 					<li><g:link class="mmlink" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link></li>
@@ -279,43 +173,35 @@
 					<jsec:hasRole name="ADMIN">
 					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
 					</jsec:hasRole>
-				</ul>
-			</td>
-			<td style="vertical-align:top"><span class="megamenuSection">Databases</span><br />
-				<ul >
-					<li><g:link class="mmlink" controller="database" params="[projectId:currProjObj?.id]">List DBs</g:link></li>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
-					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
-					</jsec:hasRole>
-				</ul>
-			</td>
-			<td style="vertical-align:top"><span class="megamenuSection">Files</span><br />
-				<ul >
-					<li><g:link class="mmlink" controller="files" params="[projectId:currProjObj?.id]">List Files</g:link></li>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
-					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
-					</jsec:hasRole>
-				</ul>
-			</td>
-			</tr></table>
-		</div>
-		<div class="menu2" id="assetMenu" style="background-color:#003366;display: none;">
-		<ul >
-			<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link> </li>
-			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Assets</g:link></li>
-			<li><g:link class="home" controller="application" action="list"  params="[projectId:currProjObj?.id]">List Apps</g:link></li>
-			<li><g:link class="home" controller="database" params="[projectId:currProjObj?.id]">List DBs</g:link></li>
-			<li><g:link class="home" controller="files" params="[projectId:currProjObj?.id]">List Files</g:link></li>
-			<li><g:link class="home" controller="assetEntity" action="listComment" params="[projectId:currProjObj?.id]">List Comments</g:link></li>
-		</ul>
-		</div>
-
-		<div class="megamenu" id="bundleMegaMenu" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" style="display: none;">
-			<table class="mmtable"><tr>
+						</ul>
+					</td>
+					<td style="vertical-align:top"><span class="megamenuSection">Databases</span><br />
+						<ul >
+							<li><g:link class="mmlink" controller="database" params="[projectId:currProjObj?.id]">List DBs</g:link></li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+							<jsec:hasRole name="ADMIN">
+							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
+							</jsec:hasRole>
+						</ul>
+					</td>
+					<td style="vertical-align:top"><span class="megamenuSection">Files</span><br />
+						<ul >
+							<li><g:link class="mmlink" controller="files" params="[projectId:currProjObj?.id]">List Files</g:link></li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+							<jsec:hasRole name="ADMIN">
+							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
+							</jsec:hasRole>
+						</ul>
+					</td>
+					</tr></table>
+				</div>	
+			</li>
+			<li id="eventMenuId" style="position:relative; float: left;"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" controller="moveEvent" action="show" >Events </g:link>
+			
+			<div class="megamenu rooms" id="bundleMegaMenu" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+			<table class="mmtable " ><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">Events</span><br />
 				<ul >
 					<li><g:link class="mmlink" controller="moveEvent" action="list" >List Events</g:link> </li>
@@ -342,7 +228,7 @@
 			<td style="vertical-align:top"><span class="megamenuSection">For <strong>${moveBundleName}</strong>:</span><br />
 				<ul >
 					<li><g:link class="mmlink" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundle Settings</g:link></li>
-					<li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId,projectId:projectId]" >Bundled Assets</g:link> </li>
+					</br><li><g:link class="mmlink" controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId,projectId:projectId]" >Bundled Assets</g:link> </li>
 					<li><g:link class="mmlink" controller="projectTeam" action="list" params="[bundleId:moveBundleId,projectId:projectId]" >List Teams</g:link></li>
 					<li><g:link class="mmlink" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleId, rack:'UnrackPlan', projectId:projectId]" >Assign Assets to Teams</g:link> </li>
 					<jsec:hasRole name="ADMIN">
@@ -353,20 +239,21 @@
 			</g:if>
 			</tr></table>
 		</div>
-		<div class="menu2" id="bundleMenu" style="background-color:#003366;display:none;">
-		<ul >
-				<li><g:link class="home" controller="moveBundle" action="list">List</g:link></li>
-				<li><g:link class="home" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundle: ${moveBundleName}</g:link></li>
-				<li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundleId]" >Team</g:link></li>
-				<li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId,projectId:projectId]" >Bundle Asset Assignment</g:link> </li>
-				<li><g:link class="home" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleId, rack:'UnrackPlan', projectId:projectId]" >Bundle Team Assignment </g:link> </li>
-				<li><g:link class="home" controller="walkThrough" >Walkthrough</g:link></li>
-			</ul>
-		</div>
-
-		<div class="megamenu" id="consoleMegaMenu" onmouseover="showMegaMenu('#consoleMegaMenu')" onmouseout="mclosetime()" style="display: none;">
-			<table class="mmtable"><tr>
-			<td style="vertical-align:top"><span class="megamenuSection">Supervisor Console</span><br />
+			
+			</li>
+			<li id="bundleMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles
+				<a id="bundleAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#bundleMegaMenu')" href="javascript:showMegaMenu('#bundleMegaMenu')" style="display: inline"></a></g:link>
+			          
+			</li>
+			<li id="teamMenuId"><g:link class="home" onmouseover="showMegaMenu('')" onmouseout="mclosetime()" controller="clientTeams" params="[projectId:currProjObj?.id]">Teams</g:link></li>
+			<li>&nbsp;</li>
+	        </jsec:lacksAllRoles>
+	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
+			<li id="consoleMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('#consoleMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console
+				<a id="consoleAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#consoleMegaMenu')" href="javascript:showMegaMenu('#consoleMegaMenu')" style="display: inline"></a></g:link>
+			    <div class="megamenu rooms" id="consoleMegaMenu" onmouseover="showMegaMenu('#consoleMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+			<table class="mmtable room_rack"><tr>
+			<td style="vertical-align:top"  ><span class="megamenuSection">Supervisor Console</span><br />
 				<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
 				<ul >
 					<li><g:link class="mmlink" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show','teamType':'MOVE']">Supervise Move Techs</g:link></li>
@@ -404,6 +291,185 @@
 			</td>
 			</tr></table>
 		</div>
+			
+			</li>
+	        </jsec:hasAnyRole>
+			<li id="dashboardMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('')" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link></li>
+			<li id="assetTrackerMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker</g:link></li>
+	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']">
+	        	<li id="reportsMenuId" style="position:relative; float: left;"><g:link class="home" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" controller="reports" params="[projectId:currProjObj?.id]">Reports
+	        	<a id="reportAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#reportsMegaMenu')" href="javascript:showMegaMenu('#reportsMegaMenu')" style="display: inline"></a></g:link>
+	       <div class="megamenu rooms" id="reportsMegaMenu" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+			<table class="mmtable "><tr>
+			<td style="vertical-align:top"><span class="megamenuSection">Discovery</span><br />
+				<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
+				<ul >
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Rack+Layout" class="home mmlink">Racks (old)</a> </li>
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingConflict" class="home mmlink">Cabling Conflict</a> </li>
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingData" class="home mmlink">Cabling Data</a> </li>
+					<li><a href="/tdstm/reports/powerReport" class="home mmlink">Power</a> </li>
+					<li>&nbsp;</li>
+					<jsec:hasRole name="ADMIN">
+					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
+					</jsec:hasRole>
+				</ul>
+				</jsec:hasAnyRole>
+			</td>
+			<td style="vertical-align:top"><span class="megamenuSection">Move Prep</span><br />
+		        <jsec:hasAnyRole in="['ADMIN']">
+				<ul >
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Login+Badges" class="home mmlink">Login Badges</a> </li>
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Asset+Tag" class="home mmlink">Asset Tags</a> </li>
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Team+Worksheets" class="home mmlink">Move Team Worksheets</a> </li>
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=cart+Asset" class="home mmlink">Logistics Team Worksheets</a></li>
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Transportation+Asset+List" class="home mmlink">Transport Worksheets</a></li>
+					<jsec:hasRole name="ADMIN">
+					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
+					</jsec:hasRole>
+				</ul>
+		        </jsec:hasAnyRole>
+			</td>
+			<td style="vertical-align:top"><span class="megamenuSection">Move Day</span><br />
+				<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+				<ul >
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Issue+Report" class="home mmlink">Issue Report</a> </li>
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=MoveResults" class="home mmlink">Move Results</a> </li>
+					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingQA" class="home mmlink">Cabling QA</a> </li>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
+					<jsec:hasRole name="ADMIN">
+					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
+					</jsec:hasRole>
+				</ul>
+				</jsec:hasAnyRole>
+			</td>
+			</tr></table>
+		</div>
+	        </li>
+	        </jsec:lacksAllRoles>
+	      </ul>
+	    </div>
+	    
+		
+		<div class="menu2" id="adminMenu" style="background-color:#003366;display: none;">
+		<ul >
+			<jsec:hasRole name="ADMIN">
+			<li><g:link class="home" controller="auth" action="home">Admin</g:link> </li>
+			<li><g:link class="home" controller="workflow" action="home">Workflows </g:link> </li>
+			<li><g:link class="home" controller="partyGroup" id="${partyGroup}">Company</g:link></li>
+			<li><g:link class="home" controller="person" id="${partyGroup}">Staff</g:link></li>
+			<li><g:link class="home" controller="userLogin" id="${partyGroup}">Users</g:link></li>
+			<li><g:link class="home" controller="manufacturer" id="${partyGroup}">Manufacturers</g:link></li>
+			<li><g:link class="home" controller="model" id="${partyGroup}">Models</g:link></li>
+			<li><g:link class="home" controller="model" action="importExport">Sync</g:link></li>
+		</jsec:hasRole>
+		</ul>
+		</div>
+		<div class="megamenu" id="projectMegaMenu" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+			<table class="mmtable"><tr>
+			<td style="vertical-align:top"><span class="megamenuSection">Client/Project</span><br />
+				<ul >
+					<li><g:link class="mmlink" controller="project" action="list" params="[active:'active']">List Projects</g:link></li>
+					<jsec:hasRole name="ADMIN">
+					<li><g:link class="mmlink" controller="project" action="create">Create Project</g:link></li>
+					</jsec:hasRole>
+					<li>&nbsp;</li>
+					<jsec:hasRole name="ADMIN">
+					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMClientProjectSettings?cover=print','help');">help</a></li>
+					</jsec:hasRole>
+				</ul>
+			</td>
+			<g:if test="${currProjObj}">
+			<td style="vertical-align:top"><span class="megamenuSection">For <strong>${currProjObj.name}</strong></span><br />
+				<ul >
+					<li><g:link class="mmlink" controller="projectUtil">Project Settings</g:link></li>
+					<li><g:link class="mmlink" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Project Staff</g:link></li>
+					<li>&nbsp;</li>
+					<jsec:hasRole name="ADMIN">
+					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMProjectStaff?cover=print','help');">help</a></li>
+					</jsec:hasRole>
+				</ul>
+			</td>
+			</g:if>
+			</tr></table>
+		</div>
+		<div class="menu2" id="projectMenu" style="background-color:#003366;display: none;">
+		<ul >
+			<li><g:link class="home" controller="project" action="list" params="[active:'active']">List Projects</g:link> </li>
+			<g:if test="${currProjObj}"><li><g:link class="home" controller="projectUtil">Project: ${currProjObj.name}</g:link></li></g:if>
+			<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
+			<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
+			</jsec:lacksAllRoles>
+		</ul>
+		</div>
+        <div class="megamenu " id="adminMegaMenu" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+			<jsec:hasRole name="ADMIN">
+			<table class="mmtable room_rack"><tr>
+			<td style="vertical-align:top"><span class="megamenuSection">Administration</span><br />
+				<ul >
+					<li><g:link class="mmlink" controller="auth" action="home">Admin Portal</g:link> </li>
+					<li>&nbsp;</li>
+					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMReleaseNotes?cover=print','help');">Release Notes</a></li>
+					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMAdminPortal?cover=print','help');">help</a></li>
+				</ul>
+			</td>
+			<td style="vertical-align:top"><span class="megamenuSection">Manage Clients</span><br />
+				<ul >
+					<li><g:link class="mmlink" controller="partyGroup" id="${partyGroup}">List Companies</g:link></li>
+					<li><g:link class="mmlink" controller="person" id="${partyGroup}">List Staff</g:link></li>
+					<li><g:link class="mmlink" controller="userLogin" id="${partyGroup}">List Users</g:link></li>
+					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMCreatePerson?cover=print','help');">help</a></li>
+				</ul>
+			</td>
+			<td style="vertical-align:top"><span class="megamenuSection">Manage Workflows</span><br />
+				<ul >
+					<li><g:link class="mmlink" controller="workflow" action="home">List Workflows </g:link> </li>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
+					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMManageWorkflows?cover=print','help');">help</a></li>
+				</ul>
+			</td>
+			<td style="vertical-align:top"><span class="megamenuSection">Manage Model Library</span><br />
+				<ul >
+					<li><g:link class="mmlink" controller="manufacturer" id="${partyGroup}">List Manufacturers</g:link></li>
+					<li><g:link class="mmlink" controller="model" id="${partyGroup}">List Models</g:link></li>
+					<li><g:link class="mmlink" controller="model" action="importExport">Sync Libraries</g:link></li>
+					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMModelLibrary?cover=print','help');">help</a></li>
+				</ul>
+			</td>
+			</tr></table>
+			</jsec:hasRole>
+		</div>
+		
+		
+
+		
+
+		
+		<div class="menu2" id="assetMenu" style="background-color:#003366;display: none;">
+		<ul >
+			<li><g:link class="home" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]">Import/Export</g:link> </li>
+			<li><g:link class="home" controller="assetEntity" params="[projectId:currProjObj?.id]">List Assets</g:link></li>
+			<li><g:link class="home" controller="application" action="list"  params="[projectId:currProjObj?.id]">List Apps</g:link></li>
+			<li><g:link class="home" controller="database" params="[projectId:currProjObj?.id]">List DBs</g:link></li>
+			<li><g:link class="home" controller="files" params="[projectId:currProjObj?.id]">List Files</g:link></li>
+			<li><g:link class="home" controller="assetEntity" action="listComment" params="[projectId:currProjObj?.id]">List Comments</g:link></li>
+		</ul>
+		</div>
+
+		
+		<div class="menu2" id="bundleMenu" style="background-color:#003366;display:none;">
+		<ul >
+				<li><g:link class="home" controller="moveBundle" action="list">List</g:link></li>
+				<li><g:link class="home" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundle: ${moveBundleName}</g:link></li>
+				<li><g:link class="home" controller="projectTeam" action="list" params="[bundleId:moveBundleId]" >Team</g:link></li>
+				<li><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId,projectId:projectId]" >Bundle Asset Assignment</g:link> </li>
+				<li><g:link class="home" controller="moveBundleAsset" action="bundleTeamAssignment" params="[bundleId:moveBundleId, rack:'UnrackPlan', projectId:projectId]" >Bundle Team Assignment </g:link> </li>
+				<li><g:link class="home" controller="walkThrough" >Walkthrough</g:link></li>
+			</ul>
+		</div>
+
+		
 	    <div class="menu2" id="consoleMenu" style="background-color:#003366;display: none;">
 		<ul >
 	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
@@ -418,52 +484,7 @@
 		</ul>
 	    </div>
 
-		<div class="megamenu" id="reportsMegaMenu" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" style="display: none;">
-			<table class="mmtable"><tr>
-			<td style="vertical-align:top"><span class="megamenuSection">Discovery</span><br />
-				<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
-				<ul >
-					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Rack+Layout" class="home">Racks (old)</a> </li>
-					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingConflict" class="home">Cabling Conflict</a> </li>
-					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingData" class="home">Cabling Data</a> </li>
-					<li><a href="/tdstm/reports/powerReport" class="home">Power</a> </li>
-					<li>&nbsp;</li>
-					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
-					</jsec:hasRole>
-				</ul>
-				</jsec:hasAnyRole>
-			</td>
-			<td style="vertical-align:top"><span class="megamenuSection">Move Prep</span><br />
-		        <jsec:hasAnyRole in="['ADMIN']">
-				<ul >
-					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Login+Badges" class="home">Login Badges</a> </li>
-					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Asset+Tag" class="home">Asset Tags</a> </li>
-					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Team+Worksheets" class="home">Move Team Worksheets</a> </li>
-					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=cart+Asset" class="home">Logistics Team Worksheets</a></li>
-					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Transportation+Asset+List" class="home">Transport Worksheets</a></li>
-					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
-					</jsec:hasRole>
-				</ul>
-		        </jsec:hasAnyRole>
-			</td>
-			<td style="vertical-align:top"><span class="megamenuSection">Move Day</span><br />
-				<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
-				<ul >
-					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Issue+Report" class="home">Issue Report</a> </li>
-					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=MoveResults" class="home">Move Results</a> </li>
-					<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingQA" class="home">Cabling QA</a> </li>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
-					<jsec:hasRole name="ADMIN">
-					<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
-					</jsec:hasRole>
-				</ul>
-				</jsec:hasAnyRole>
-			</td>
-			</tr></table>
-		</div>
+		
 		<div></div>
 		<div class="megamenu" id="userMegaMenu" onmouseover="showMegaMenu('#userMegaMenu')" onmouseout="mclosetime()" style="display: none; width:370px">
 			<table class="mmtable"><tr>
@@ -737,6 +758,7 @@
 					$("#assetMenuId a").css('background-color','lightblue');
 					$("#assetMenuId a").css('color','#0366b0');
 					$("#assetAnchor").css("display","inline")
+					
 				}
 				if(e == "#bundleMegaMenu"){
 					$("#eventMenuId a").css('background-color','lightblue');

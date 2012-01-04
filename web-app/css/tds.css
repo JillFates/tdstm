@@ -223,7 +223,7 @@
 	list-style-type:none;
 }
 .megamenu ul li {
-	display:list-item;
+	display:table;
 }
 .megamenu ul li a {
 	width:auto;
@@ -232,7 +232,7 @@
 	text-align:left;
 	font: bold 12px Arial, san-serif;
 	color:#0366b0;
-	padding:2px 6px;
+	padding:0px 6px;
 }
 .megamenu .megamenuSection {
 	width:auto;
@@ -606,4 +606,10 @@ td .dep-Unknown {
 }
 td .dep-Questioned {
 	background: LightPink; 
+}
+.rooms {
+	display: none;  left:0px  !important;    position: absolute  !important; top: 21px; 
+}
+.mmtable .mmlink { 
+	border-right:0px !important;
 }
