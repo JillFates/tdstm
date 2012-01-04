@@ -14,7 +14,7 @@
 	<tr>
 		<td style="vertical-align:top">
 			<div>
-			<h1 style="margin-right: 0px;"><b>Admin</b></h1>
+			<h1 style="margin-right: 0px;"><b>Discovery</b></h1>
 			<table>
 				<thead>
 					<tr>
@@ -32,7 +32,7 @@
 		</td>
 		<td style="vertical-align:top">
 			<div>
-			<h1 style="margin-right: 0px;"><b>Move Plan</b></h1>
+			<h1 style="margin-right: 0px;"><b>Move Prep</b></h1>
 			<table>
 				<thead>
 					<thead>
