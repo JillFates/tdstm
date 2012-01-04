@@ -12,7 +12,7 @@
         <div class="message">${flash.message}</div>
       </g:if>
       
-        <h1 style="font-size: 12px;">Import or export TDS model data. Only synchronizes those with the Source TDS flag.</h1>
+        <h1 style="font-size: 12px;">Import or export TDS model data. This feature only synchronizes those with the Source TDS flag.</h1>
         <g:form action="upload" method="post" name="importForm" enctype="multipart/form-data" >
           <input type="hidden" value="${projectId}" name="projectIdImport" />
           <div class="dialog">
@@ -22,21 +22,20 @@
               </thead>
               <tbody>
               
+
                 <tr>
                   <td><label for="file">File:</label></td>
-                  <td><input size="40" type="file" name="file" id="file" />
-                  </td>
-                </tr>              
-                
-                <tr>
+                  <td><input size="40" type="file" name="file" id="file" /></td>
                   <td class="buttonR"><input class="button" type="submit" value="Import" /></td>
-                  <td class="buttonR"><g:actionSubmit value="Export" /></td>
                 </tr>
-                
-                <tr>
+				<tr>
+					<td colspan="2">&nbsp;</td>
                 	<td valign="top" class="buttonR"><g:link controller="modelSyncBatch" >Manage Imports: ${batchCount}</g:link></td>
-                	<td valign="top" class="name">&nbsp;</td>
                 </tr>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+					<td class="buttonR"><g:actionSubmit value="Export" /></td>
+				</tr>              
               </tbody>
             </table>
           </div>
