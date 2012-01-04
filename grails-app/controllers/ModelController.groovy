@@ -793,7 +793,7 @@ class ModelController {
 	        def sheetNameMap = new HashMap()
 	        //get column name and sheets
 			sheetNameMap.put( "manufacturer", ["manufacturer_id", "name", "aka", "description"] )
-			sheetNameMap.put( "model", ["model_id", "name","aka","description","manufacturer_id","manufacturer_name","asset_type","blade_count","blade_label_count","blade_rows","sourcetds","power_use","sourcetdsversion","use_image","usize","height","weight","depth","width", "layout_style","product_line","model_family","end_of_life_date","end_of_life_status","created_by","updated_by","validated_by","sourceurl","model_status","model_scope"] )
+			sheetNameMap.put( "model", ["model_id", "name","aka","description","manufacturer_id","manufacturer_name","asset_type","blade_count","blade_label_count","blade_rows","sourcetds","power_nameplate","power_design","power_use","sourcetdsversion","use_image","usize","height","weight","depth","width", "layout_style","product_line","model_family","end_of_life_date","end_of_life_status","created_by","updated_by","validated_by","sourceurl","model_status","model_scope"] )
 			sheetNameMap.put( "connector", ["model_connector_id", "connector", "connector_posx", "connector_posy", "label", "label_position", "model_id", "model_name", "connector_option", "status", "type"] )
 			
 	        try {
@@ -898,6 +898,12 @@ class ModelController {
 									}
 									valueList.append(useImage+",")
 									break;
+								case "power_nameplate" : 
+									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									break;
+								case "power_design" : 
+									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									break;
 								case "power_use" : 
 									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
 									break;
@@ -964,7 +970,7 @@ class ModelController {
 		                 	}
 		             		try{
 		             			if(manuId){
-		             				jdbcTemplate.update("insert into model_sync( model_temp_id, name,aka, description,manufacturer_temp_id,manufacturer_name,asset_type,blade_count,blade_label_count,blade_rows,front_image,power_use,sourcetdsversion,use_image,usize,height,weight,depth,width,layout_style,product_line,model_family,end_of_life_date,end_of_life_status,sourceurl,model_status,batch_id,manufacturer_id,created_by_id,updated_by_id,validated_by_id, model_scope_id ) values "+valueList.toString()+"${modelSyncBatch.id}, $manuId, $createdPersonId, $updatedPersonId, $validatedPersonId, $projectId) ")
+		             				jdbcTemplate.update("insert into model_sync( model_temp_id, name,aka, description,manufacturer_temp_id,manufacturer_name,asset_type,blade_count,blade_label_count,blade_rows,front_image,power_nameplate,power_design,power_use,sourcetdsversion,use_image,usize,height,weight,depth,width,layout_style,product_line,model_family,end_of_life_date,end_of_life_status,sourceurl,model_status,batch_id,manufacturer_id,created_by_id,updated_by_id,validated_by_id, model_scope_id ) values "+valueList.toString()+"${modelSyncBatch.id}, $manuId, $createdPersonId, $updatedPersonId, $validatedPersonId, $projectId) ")
 									modelAdded = r
 		             			} else {
 		             				modelSkipped += ( r +1 )
