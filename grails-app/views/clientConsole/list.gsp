@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<title>Asset Tracking</title>
+<title>Asset Tracker</title>
 
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
@@ -97,7 +97,7 @@
 					</span>
 				</g:if>				
 			</td>
-			<td style="padding: 0px;"><h1>PMO Asset Tracking</h1></td>
+			<td style="padding: 0px;"><h1>Asset Tracker</h1></td>
 			<g:if test="${isAdmin || isProjManager || isManager}">
 			<td style="text-align: left;width: 400px;">
 				<span>
