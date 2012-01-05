@@ -520,10 +520,9 @@
           <div class="dialog">
             <table>
               <tbody>
-              <tr>
-				<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+				<tr>
+					<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 				</tr>
-
               	<tr class="prop">
                 	<td valign="top" class="name">
                     	<label for="password">Password:&nbsp;</label>
@@ -535,13 +534,13 @@
 				</tr>
 
                 <tr class="prop">
-                  <td valign="top" class="name">
-                    <label for="firstName"><b>First Name:&nbsp;<span style="color: red">*</span></b></label>
-                  </td>
-                  <td valign="top" class="value">
-                    <input type="text" maxlength="64" id="firstNameId" name="firstName"/>
-                  </td>
-                </tr>
+					<td valign="top" class="name">
+						<label for="firstName"><b>First Name:&nbsp;<span style="color: red">*</span></b></label>
+					</td>
+					<td valign="top" class="value">
+						<input type="text" maxlength="64" id="firstNameId" name="firstName"/>
+					</td>
+				</tr>
 
                 <tr class="prop">
                   <td valign="top" class="name">
@@ -577,50 +576,49 @@
                   </td>
                 </tr>
                 <tr class="prop">
-                  <td valign="top" class="name">
-                    <label for="nickName"><b>Expiry Date:<span style="color: red">*</span></label>
-                  </td>
-                  <td valign="top" class="value">
-                   <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
-                   <script type="text/javascript">
+					<td valign="top" class="name">
+						<label for="nickName"><b>Expiry Date:<span style="color: red">*</span></label>
+					</td>
+					<td valign="top" class="value">
+					<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+						<script type="text/javascript">
 						$(document).ready(function(){
 				        	$("#expiryDateId").datetimepicker();
 				        });
-				    </script>
-				    
-                    <input type="text" maxlength="64" id="expiryDateId" name="expiryDate"/>
+					    </script>
+        	            <input type="text" maxlength="64" id="expiryDateId" name="expiryDate"/>
                     </jsec:hasAnyRole>
                     <jsec:lacksAllRoles in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
-                    <input type="text" maxlength="64" id="expiryDateId" name="expiryDate" readonly="readonly" style="background: none;border: 0"/>
+						<input type="text" maxlength="64" id="expiryDateId" name="expiryDate" readonly="readonly" style="background: none;border: 0"/>
                     </jsec:lacksAllRoles>
-                  </td>
-                </tr>
+					</td>
+				</tr>
                 <tr class="prop">
-                  <td valign="top" class="name">
-                    <label for="title">Time Zone:</label>
-                  </td>
-                  <td valign="top" class="value">
-                    <g:select name="timeZone" id="timeZoneId" from="${['GMT','PST','PDT','MST','MDT','CST','CDT','EST','EDT']}" 
-                    value="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/>
-                  </td>
-                  <tr class="prop">
-                     <td valign="top" class="name">
+					<td valign="top" class="name">
+						<label for="title">Time Zone:</label>
+					</td>
+					<td valign="top" class="value">
+						<g:select name="timeZone" id="timeZoneId" from="${['GMT','PST','PDT','MST','MDT','CST','CDT','EST','EDT']}" 
+						value="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/>
+					</td>
+				</tr>
+				<tr class="prop">
+					<td valign="top" class="name">
                        <label for="title">Power In:</label>
-                        </td>
-                       <td valign="top" class="value">
-                    <g:select name="powerType" id="powerTypeId" from="${['Watts','Amps']}" 
-                    value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE}"/>
-                    </td>
-                  </tr>
-                   <tr class="prop">
-                     <td valign="top" class="name">
+					</td>
+					<td valign="top" class="value">
+						<g:select name="powerType" id="powerTypeId" from="${['Watts','Amps']}" 
+						value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE}"/>
+					</td>
+				</tr>
+				<tr class="prop">
+					<td valign="top" class="name">
                        <label for="title">Model Score:</label>
-                     </td>
-                     <td valign="top" class="value">
+					</td>
+					<td valign="top" class="value">
                        <input type="text" name ="modelScore" id ="modelScoreId" readonly="readonly" value="${person?.modelScore}"/>
-                     </td>
-                  </tr> 
-                </tr>
+					</td>
+				</tr>
               </tbody>
             </table>
           </div>
