@@ -84,8 +84,9 @@
 								<td class="label" nowrap="nowrap"><label for="sourceBladePosition">Blade Position</label></td>
 								<td>${assetEntityInstance.sourceBladePosition}</td>
 								<td>${assetEntityInstance.targetBladePosition}</td>
-								<td class="label" nowrap="nowrap"><label for="custom7">${assetEntityInstance.project.custom7 ?: 'Custom7' }</label></td>
-								<td >${assetEntityInstance.custom7}</td>
+								<td colspan="2" class="label" nowrap="nowrap">
+									<a href="javascript:window.open('${assetEntityInstance.custom7}','help');">${assetEntityInstance.project.custom7 ?: 'Custom7' }</a>
+								</td>
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="railType">Rail Type</label></td>
@@ -95,8 +96,9 @@
 								<td class="label" nowrap="nowrap"><label for="virtualHost">Virtual Host</label></td>
 								<td>${assetEntityInstance.virtualHost}</td>
 								<td>&nbsp</td>
-								<td class="label" nowrap="nowrap"><label for="custom8">${assetEntityInstance.project.custom8 ?: 'Custom8' }</label></td>
-								<td >${assetEntityInstance.custom8}</td>
+								<td colspan="2" class="label" nowrap="nowrap">
+									<a href="javascript:window.open('${assetEntityInstance.custom8}','help');">${assetEntityInstance.project.custom8 ?: 'Custom8' }</a>
+								</td>
 							</tr>
 							<tr class="prop">
 								<td>&nbsp</td>
