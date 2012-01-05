@@ -210,7 +210,7 @@ class ModelSyncBatchController {
 								GormUtil.allErrorsString( connectorInstance )
 								println etext
 							} else {
-								connectorsAssed ++
+								connectorsAdded ++
 							}
 						} else {
 							if(connectorInstance.model.sourceTDSVersion <= connectorSync.model.sourceTDSVersion){
