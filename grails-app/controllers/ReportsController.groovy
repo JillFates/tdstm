@@ -1195,10 +1195,10 @@ class ReportsController {
 				assets.each{ asset->
 					def assetPowerCabling = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.fromConnectorNumber.type = ? AND cap.fromAsset = ?",["Power",asset])
 					def powerConnectors = assetPowerCabling.findAll{it.toPower != null && it.toPower != '' }.size()
-					def powerUse = asset.model?.powerUse ? asset.model?.powerUse : 0
-					totalPower += powerUse
+					def powerDesign = asset.model?.powerDesign ? asset.model?.powerDesign : 0
+					totalPower += powerDesign
 					if(powerConnectors){
-						def powerUseForConnector = powerUse ? powerUse / powerConnectors : 0
+						def powerUseForConnector = powerDesign ? powerDesign / powerConnectors : 0
 						assetPowerCabling.each{ cables ->
 							if(cables.toPower){
 								switch(cables.toPower){
@@ -1212,7 +1212,7 @@ class ReportsController {
 							}
 						}
 					} else {
-						powerTBD += powerUse
+						powerTBD += powerDesign
 					}
 				}
 				powerA = powerType != "Watts" ?  powerA ? (powerA / 110).toFloat().round(1) : 0.0 : powerA ? Math.round(powerA):0 

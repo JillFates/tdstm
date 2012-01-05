@@ -328,7 +328,7 @@ class RoomController {
 			   spaceUsed += assetEntity?.model?.usize ? assetEntity?.model?.usize : 1
 			   def powerConnectors = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.fromConnectorNumber.type = ? AND cap.fromAsset = ? ",["Power",assetEntity])
 			   def powerConnectorsAssigned = powerConnectors.size()
-			   def rackPower = assetEntity.model?.powerUse ? assetEntity.model?.powerUse : 0
+			   def rackPower = assetEntity.model?.powerDesign ? assetEntity.model?.powerDesign : 0
 			   if(powerConnectorsAssigned){
 				   def powerUseForConnector = rackPower ? rackPower / powerConnectorsAssigned : 0
 				   powerConnectors.each{ cables ->
@@ -377,9 +377,9 @@ class RoomController {
 			   def powerConnectors = assetPowerCabling.size()
 			   def powerConnectorsAssigned = assetPowerCabling.findAll{it.toPower != null && it.toPower != '' }.size()
 			   
-			   def powerUse = asset.model?.powerUse ? asset.model?.powerUse : 0
+			   def powerDesign = asset.model?.powerDesign ? asset.model?.powerDesign : 0
 			   if(powerConnectorsAssigned){
-				   def powerUseForConnector = powerUse ? powerUse / powerConnectorsAssigned : 0
+				   def powerUseForConnector = powerDesign ? powerDesign / powerConnectorsAssigned : 0
 				   assetPowerCabling.each{ cables ->
 					   if(cables.toPower){
 						   switch(cables.toPower){
@@ -550,7 +550,7 @@ class RoomController {
 				usedRacks += assetEntity?.model?.usize ? assetEntity?.model?.usize : 1
 				def powerConnectors = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.toPower is not null AND cap.fromConnectorNumber.type = ? AND cap.fromAsset = ? ",["Power",assetEntity])
 				def powerConnectorsAssigned = powerConnectors.size()
-				def totalPower = assetEntity.model?.powerUse ? assetEntity.model?.powerUse : 0
+				def totalPower = assetEntity.model?.powerDesign ? assetEntity.model?.powerDesign : 0
 				if(powerConnectorsAssigned){
 					def powerUseForConnector = totalPower ? totalPower / powerConnectorsAssigned : 0
 					powerConnectors.each{ cables ->

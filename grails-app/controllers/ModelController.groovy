@@ -67,7 +67,7 @@ class ModelController {
         Limit limit = tableFacade.limit
 		if(limit.isExported()){
             tableFacade.setExportTypes(response,limit.getExportType())
-            tableFacade.setColumnProperties("modelName","manufacturer","description","assetType","powerUse","noOfConnectors")
+            tableFacade.setColumnProperties("modelName","manufacturer","description","assetType","powerDesign","noOfConnectors")
             tableFacade.render()
         }else
             return [modelsList : modelsList]
@@ -96,9 +96,9 @@ class ModelController {
 
     def save = {
     	def modelId = params.modelId
-		def powerUsed = params.powerUse ? Float.parseFloat(params.powerUse) : 0
-		def powerDesign = params.powerDesign ? Float.parseFloat(params.powerDesign) : 0
 		def powerNameplate = params.powerNameplate ? Float.parseFloat(params.powerNameplate) : 0
+		def powerDesign = params.powerDesign ? Float.parseFloat(params.powerDesign) : 0
+		def powerUsed = params.powerUse ? Float.parseFloat(params.powerUse) : 0
 		def powerType = params.powerType
 		def endOfLifeDate = params.endOfLifeDate
 		def formatter = new SimpleDateFormat("MM/dd/yyyy");
@@ -125,9 +125,9 @@ class ModelController {
 			params.endOfLifeDate =  GormUtil.convertInToGMT(formatter.parse(endOfLifeDate), tzId)
 		}
 		if( powerType == "Amps"){
-			powerUsed = powerUsed * 110
-			powerDesign = powerDesign * 110
 			powerNameplate =  powerNameplate * 110
+			powerDesign = powerDesign * 110
+			powerUsed = powerUsed * 110
         }
 	    def modelTemplate 
 		if(modelId)
@@ -293,20 +293,20 @@ class ModelController {
 			user  = UserLogin.findByUsername( principal )
 		}
         if (modelInstance) {
-			def powerUsed = params.powerUse ? Float.parseFloat(params.powerUse) : 0
 			def powerNameplate = params.powerNameplate ? Float.parseFloat(params.powerNameplate) : 0
 			def powerDesign = params.powerDesign ? Float.parseFloat(params.powerDesign) : 0
+			def powerUsed = params.powerUse ? Float.parseFloat(params.powerUse) : 0
 			def powerType = params.powerType
 			if( powerType == "Amps"){
-				powerUsed = powerUsed * 110
 				powerNameplate = powerNameplate * 110
 				powerDesign = powerDesign * 110
+				powerUsed = powerUsed * 110
 			}
         	params.useImage = params.useImage == 'on' ? 1 : 0
         	params.sourceTDS = params.sourceTDS == 'on' ? 1 : 0
-			params.powerUse = powerUsed
 			params.powerNameplate = powerNameplate
 			params.powerDesign = powerDesign
+			params.powerUse = powerUsed
             def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
     		def frontImage = request?.getFile('frontImage')
             if( frontImage ) {
@@ -1079,16 +1079,16 @@ class ModelController {
 	def getModelAsJSON = {
     	def id = params.id
     	def model = Model.get(params.id)
-		def powerUsed = model.powerUse
 		def powerNameplate = model.powerNameplate
 		def powerDesign = model.powerDesign
+		def powerUsed = model.powerUse
 		if( session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts'){
-			powerUsed = powerUsed / 110
-			powerUsed = powerUsed.toDouble().round(1)
 			powerNameplate = powerNameplate / 110
 			powerNameplate = powerNameplate.toDouble().round(1)
 			powerDesign = powerDesign / 110
 			powerDesign = powerDesign.toDouble().round(1)
+			powerUsed = powerUsed / 110
+			powerUsed = powerUsed.toDouble().round(1)
 		}
 		def modelMap = [id:model.id,
 						modelName:model.modelName,
