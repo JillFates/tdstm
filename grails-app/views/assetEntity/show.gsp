@@ -239,6 +239,7 @@
 	</g:if>
 		<tr>
 			<td colspan="2">
+			<jsec:hasAnyRole in="['ADMIN','PROJ_MGR','PROJECT_ADMIN','SUPERVISOR']">
 				<div class="buttons">
 					<input name="attributeSet.id" type="hidden" value="1">
 					<input name="project.id" type="hidden" value="${projectId}">
@@ -262,7 +263,9 @@
 						<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" style="margin-bottom: -4px;"/>&nbsp&nbspComment
 					</a>
 				</g:else>
-				</div></td>
+				</div>
+			</jsec:hasAnyRole>
+			</td>
 		</tr>
 	</table>
 </g:form>
