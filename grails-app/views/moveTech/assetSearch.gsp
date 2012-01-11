@@ -68,17 +68,17 @@
               
        function doCheckValidation(){
 	   var j = 0;
-       var boxes = document.getElementsByTagName('input'); 
+       var boxes = document.getElementsByName('myCheckbox'); 
 		for (i = 0; i < boxes.length; i++) {
           if (boxes[i].type == 'checkbox'){
                if(boxes[i].checked == false){
        			j=1;
        		 }
            }
-     	}      
+     	}  
        if(j == 0){     
        		return true;
-       }else{
+       } else{
        		alert("Please check to confirm all instructions");                                   
       	 	return false;
        }     

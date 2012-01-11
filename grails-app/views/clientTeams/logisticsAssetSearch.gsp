@@ -386,7 +386,7 @@ function mySelect(x)
       	}
         function doCheckValidation(){
 		    var j = 0;
-	        var boxes = document.getElementsByTagName('input'); 
+	        var boxes = document.getElementsByName('checkChange'); 
 			for (i = 0; i < boxes.length; i++) {
 	          if (boxes[i].type == 'checkbox'){
 	               if(boxes[i].checked == false){
