@@ -10,6 +10,7 @@ class ProjectController {
     def userPreferenceService
     def partyRelationshipService
     def stateEngineService
+	def projectService
     def index = { redirect(action:list,params:params) }
 
     // the delete, save and update actions only accept POST requests
@@ -27,23 +28,12 @@ class ProjectController {
 			def order = params.order ? params.order : 'desc'
 		    def now = GormUtil.convertInToGMT( "now",session.getAttribute("CURR_TZ")?.CURR_TZ )
 		if(params._action_List=="Show Completed Projects"){
-			projectList = Project.getCompletedProject( now )
+			projectList = projectService.getCompletedProject( now, isAdmin, sort, order )
 			session.setAttribute("COMPLETED_PROJ", "COMPLETE")
-		}
-		else if(session.getAttribute("COMPLETED_PROJ")=="COMPLETE"){
-			projectList = Project.getCompletedProject( now )
-		}
-		else{
-			if(isAdmin){
-				projectList = Project.getActiveProject( now )
-			}else{
-				def userCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' "+
-						"and partyIdTo = ${loginUser.person.id} and roleTypeCodeFrom = 'COMPANY' and roleTypeCodeTo = 'STAFF' ")
-				def query = "from Project p where p.id in (select pr.partyIdFrom from PartyRelationship pr where "+
-						"pr.partyIdTo = ${userCompany?.partyIdFrom?.id} and roleTypeCodeFrom = 'PROJECT') or "+
-						"p.client = ${userCompany?.partyIdFrom?.id} order by ${sort} ${order}"
-				projectList = Project.findAll(query)
-			}
+		} else if(session.getAttribute("COMPLETED_PROJ")=="COMPLETE"){
+			projectList = projectService.getCompletedProject( now, isAdmin, sort, order )
+		} else {
+			projectList = projectService.getActiveProject( now, isAdmin, sort, order )
 		}
 		TableFacade tableFacade = new TableFacadeImpl("tag",request)
         tableFacade.items = projectList
