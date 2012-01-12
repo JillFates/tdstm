@@ -19,7 +19,7 @@ class ProjectService {
 			def query = "from Project p where p.id in (select pr.partyIdFrom from PartyRelationship pr where "+
 					"pr.partyIdTo = ${userCompany?.partyIdFrom?.id} and roleTypeCodeFrom = 'PROJECT') or "+
 					"p.client = ${userCompany?.partyIdFrom?.id} order by ${sort} ${order}"
-			projects = Project.findAll(query).findAll{it.completionDate.getTime() < timeNow.getTime()}
+			projects = Project.findAll(query).findAll{it.completionDate && it.completionDate.getTime() < timeNow.getTime()}
 		}
 		
 		return  projects
@@ -39,7 +39,7 @@ class ProjectService {
 			def query = "from Project p where p.id in (select pr.partyIdFrom from PartyRelationship pr where "+
 					"pr.partyIdTo = ${userCompany?.partyIdFrom?.id} and roleTypeCodeFrom = 'PROJECT') or "+
 					"p.client = ${userCompany?.partyIdFrom?.id} order by ${sort} ${order}"
-			projects = Project.findAll(query).findAll{it.completionDate.getTime() > timeNow.getTime()}
+			projects = Project.findAll(query).findAll{it.completionDate && it.completionDate.getTime() > timeNow.getTime()}
 		}
 		
 		return  projects
