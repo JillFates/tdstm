@@ -1,18 +1,20 @@
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta name="layout" content="projectHeader" />
-	<title>Client Dashboard</title>
-	
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dashboard.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tabcontent.css')}" />
-	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-	<%--<g:javascript src="FusionCharts.js" /> --%> 
-	<g:javascript src="yahoo.ui.dashboard.js" />
-	<%--
-	<script type="text/javascript">
-	/* render the individual step dial data*/
-	function stepDialData( dialInd ){
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="layout" content="projectHeader" />
+<title>Client Dashboard</title>
+<link type="text/css" rel="stylesheet"
+	href="${createLinkTo(dir:'css',file:'dashboard.css')}" />
+<link type="text/css" rel="stylesheet"
+	href="${createLinkTo(dir:'css',file:'tabcontent.css')}" />
+<link rel="shortcut icon"
+	href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+<%--<g:javascript src="FusionCharts.js" /> --%>
+<g:javascript src="yahoo.ui.dashboard.js" />
+<%--
+		<script type="text/javascript">
+		/* render the individual step dial data*/
+		function stepDialData( dialInd ){
 		var xmlData = "<chart bgAlpha='0' bgColor='eeeded' lowerLimit='0' upperLimit='100' numberSuffix='' animation='0'"+
 			" showValues='0' rotateValues='1' placeValuesInside='1' "+
 			" showBorder='0' basefontColor='000000' chartTopMargin='15' chartBottomMargin='15' chartLeftMargin='5'"+
@@ -61,47 +63,50 @@
 			" <styles><definition><style name='RectShadow' type='shadow' strength='0'/></definition>"+
 			" <application><apply toObject='Grp1' styles='RectShadow' /></application></styles></chart>"
     }
-	</script> --%> 
+	</script> --%>
 </head>
-<div  class="body_bg">
-<a name="page_up"></a>
-<div id="doc">
-	
+<div class="body_bg">
+	<a name="page_up"></a>
+	<div id="doc">
+
 		<!-- Body Starts here-->
 		<div id="bodycontent">
-		<!--Header Starts here-->
-		<div id="header">
-			<div style="float: left;padding-top: 2px;">
+			<!--Header Starts here-->
+			<div id="header">
+				<div style="float: left; padding-top: 2px;">
 					<g:form action="index" controller="dashboard" name="dashboardForm">
-					<span>
-					
-						<label for="moveEvent"><b>Event:</b></label>&nbsp;<select id="moveEvent" name="moveEvent" onchange="document.dashboardForm.submit();">
-							<g:each status="i" in="${moveEventsList}" var="moveEventInstance">
-								<option value="${moveEventInstance?.id}">${moveEventInstance?.name}</option>
-							</g:each>
-						</select>
-					</span>
+						<span> <label for="moveEvent"><b>Event:</b> </label>&nbsp;<select
+							id="moveEvent" name="moveEvent"
+							onchange="document.dashboardForm.submit();">
+								<g:each status="i" in="${moveEventsList}"
+									var="moveEventInstance">
+									<option value="${moveEventInstance?.id}">
+										${moveEventInstance?.name}
+									</option>
+								</g:each>
+						</select> </span>
 					</g:form>
-			</div>
-			<div style="height: 35px;display: none;" >
-					<label>
-					  <select name="timezone" id="timezone" onChange="setUserPrefTimeZone()" class="selecttext">
-					    <option value="0">GMT</option>
-					    <option value="-8">PST</option>
-					    <option value="-7">PDT</option>
-					    <option value="-7">MST</option>
-					    <option value="-6">MDT</option>
-					    <option value="-6">CST</option>
-					    <option value="-5">CDT</option>
-					    <option value="-5">EST</option>
-					    <option value="-4">EDT</option>
-					  </select>
-					</label>
-			</div>
-			<div style="float: right;width: 150px;padding-top: 2px;">
+				</div>
+				<div style="height: 35px; display: none;">
+					<label> <select name="timezone" id="timezone"
+						onChange="setUserPrefTimeZone()" class="selecttext">
+							<option value="0">GMT</option>
+							<option value="-8">PST</option>
+							<option value="-7">PDT</option>
+							<option value="-7">MST</option>
+							<option value="-6">MDT</option>
+							<option value="-6">CST</option>
+							<option value="-5">CDT</option>
+							<option value="-5">EST</option>
+							<option value="-4">EDT</option>
+					</select> </label>
+				</div>
+				<div style="float: right; width: 150px; padding-top: 2px;">
 					<div style="float: right;">
-						<input type="button" value="Update:" id="update" onclick="getMoveEventNewsDetails($('#moveEvent').val());"/> 
-						<select name="updateTime" id="updateTimeId" class="selecttext" onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'timedUpdate(e.responseText)') }">
+						<input type="button" value="Update:" id="update"
+							onclick="getMoveEventNewsDetails($('#moveEvent').val());" /> <select
+							name="updateTime" id="updateTimeId" class="selecttext"
+							onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'timedUpdate(e.responseText)') }">
 							<option value="30000">30s</option>
 							<option value="60000">1m</option>
 							<option value="120000">2m</option>
@@ -111,159 +116,200 @@
 						</select>
 					</div>
 					<%-- <div style="float: right;padding: 3px 0px;"> <a href="#page_down" class="nav_button">Page Down</a></div> --%>
+				</div>
+				<input type="hidden" id="typeId" value="${params.type}"> <input
+					type="hidden" id="stateId" value="${params.state}"> <input
+					type="hidden" id="maxLenId" value="${params.maxLen}"> <input
+					type="hidden" id="sortId" value="${params.sort}">
 			</div>
-			<input type="hidden" id="typeId" value="${params.type}">
-			<input type="hidden" id="stateId" value="${params.state}">
-			<input type="hidden" id="maxLenId" value="${params.maxLen}">
-			<input type="hidden" id="sortId" value="${params.sort}">
-		</div>
-		<!-- Header Ends here-->
-		<div id="bodytop">
-			<div id="plan_summary">
-				<div id="topindleft">
-					<div id="summary_gauge_div" align="center"> 
-					<g:if test="${isAdmin || isProjManager }">
-						<a href="#manualSummary" onclick="javascript:$('#manualSumStatusSpan').show();">
-							<img id="summary_gauge" alt="Move Event Summary" src="${createLinkTo(dir:'i/dials',file:'dial-50.png')}" style="border: 0px;">
-						</a>
-					</g:if>
-					<g:else>
-						<img id="summary_gauge" alt="Move Event Summary" src="${createLinkTo(dir:'i/dials',file:'dial-50.png')}" style="border: 0px;">
-					</g:else>
-					</div>
-					<%--
+			<!-- Header Ends here-->
+			<div id="bodytop">
+				<div id="plan_summary">
+					<div id="topindleft">
+						<div id="summary_gauge_div" align="center">
+							<g:if test="${isAdmin || isProjManager }">
+								<a href="#manualSummary"
+									onclick="javascript:$('#manualSumStatusSpan').show();"> <img
+									id="summary_gauge" alt="Move Event Summary"
+									src="${createLinkTo(dir:'i/dials',file:'dial-50.png')}"
+									style="border: 0px;"> </a>
+							</g:if>
+							<g:else>
+								<img id="summary_gauge" alt="Move Event Summary"
+									src="${createLinkTo(dir:'i/dials',file:'dial-50.png')}"
+									style="border: 0px;">
+							</g:else>
+						</div>
+						<%--
 					<script language="JavaScript">
 						var summarychart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "summary_gauge", "280", "136", "0", "0");
 	        			//summarychart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'summary_gauge.xml')}");
 	        			 summarychart.setDataXML( summaryDialData( "50" ) )
 						summarychart.render("summary_gauge_div");
 					</script>  --%>
-						Move Status vs. Plan
-					<br/>
-					<span id="manualSumStatusSpan" style="display: none;width: 10px;">
-						<span style="font-weight: normal;font-size: 12px;">Manual :</span> <input type="checkbox" name="manual" value="" id="checkBoxId"  /> 
-						<input type="text" value="" name="manualSummaryStatus" id="manualSummaryStatusId" size="3" maxlength="3" onblur="validateManulaSummary(this.value)"/>&nbsp;
-						<input type="button" value="Save" onclick="changeEventSummary()"/>
-					</span>
-				</div>
-				<div class="topleftcontent">
+						Move Status vs. Plan <br /> <span id="manualSumStatusSpan"
+							style="display: none; width: 10px;"> <span
+							style="font-weight: normal; font-size: 12px;">Manual :</span> <input
+							type="checkbox" name="manual" value="" id="checkBoxId" /> <input
+							type="text" value="" name="manualSummaryStatus"
+							id="manualSummaryStatusId" size="3" maxlength="3"
+							onblur="validateManulaSummary(this.value)" />&nbsp; <input
+							type="button" value="Save" onclick="changeEventSummary()" /> </span>
+					</div>
+					<div class="topleftcontent">
 						Planned Completion<br>
 						<!--12/12: 07:00 AM EST&#13;-->
 						<span id="spanPlanned"></span>
-				</div>
-			</div>
-			<div id="revised_summary" >
-				<div id="topindright" style="display: none;">
-					<div id="revised_gauge_div" align="center">
-					<img id="revised_gauge" alt="Move Event Revised Summary" src="${createLinkTo(dir:'i/dials',file:'dial-50.png')}">
 					</div>
-					<%--<script language="JavaScript">
+				</div>
+				<div id="revised_summary">
+					<div id="topindright" style="display: none;">
+						<div id="revised_gauge_div" align="center">
+							<img id="revised_gauge" alt="Move Event Revised Summary"
+								src="${createLinkTo(dir:'i/dials',file:'dial-50.png')}">
+						</div>
+						<%--<script language="JavaScript">
 						var revisedChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "revised_gauge", "280", "136", "0", "0");
 						//summarychart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'revised_gauge.xml')}");
 						revisedChart.setDataXML( revisedDialData( "50" ) )
 						revisedChart.render("revised_gauge_div");
-					</script>  --%> 
+					</script>  --%>
 						Status vs. Revised Plan
-				</div>
-				<div class="toprightcontent" id="revised_gauge_content" style="display: none;">
-					Confidence inÂ Revised Plan<br>
-					<span class="high">High</span><br>
-					<span class="redfont">Planned Completion:&#13;
-					<!--12/12: 07:00 AM EST&#13;-->
-					<br />
-					<span id="spanRevised"></span></span>
+					</div>
+					<div class="toprightcontent" id="revised_gauge_content"
+						style="display: none;">
+						Confidence in Revised Plan<br> <span class="high">High</span><br>
+						<span class="redfont">Planned Completion:&#13; <!--12/12: 07:00 AM EST&#13;-->
+							<br /> <span id="spanRevised"></span>
+						</span>
+					</div>
 				</div>
 			</div>
-		</div>
-		<!-- News section starts here-->
-		<div id="newssection">
-			<div id="newstop">
-				<div id="newsheading"> Move News </div>
-				<div id="newsmenu">
-				    <ul id="newstabs" class="shadetabs">
-				    	<li><a href="#" rel="news_live_div" class="selected">Live</a></li>
-				    	<li><a href="#" rel="news_archived_div" onmouseup="javascript:setCrossobjTop()">Archive</a></li>
-				    </ul>
+			<!-- News section starts here-->
+			<div id="newssection">
+				<div id="newstop">
+					<div id="newsheading">Move News</div>
+					<div id="newsmenu">
+						<ul id="newstabs" class="shadetabs">
+							<li><a href="#" rel="news_live_div" class="selected">Live</a>
+							</li>
+							<li><a href="#" rel="news_archived_div"
+								onmouseup="javascript:setCrossobjTop()">Archive</a>
+							</li>
+						</ul>
+					</div>
+					<div style="float: right; margin-right: 5px;">
+						<input type="button" value="Add News" onclick="opencreateNews()">
+					</div>
 				</div>
-				<div style="float: right; margin-right: 5px;">
-					<input type="button" value="Add News" onclick="openCreateNewsDialog()">
-				</div>	
- 			</div>
-			<div style="clear:both"></div>
-			<div id="newsblock">
-				<div id="newsbox">
-					<div id="container" style="position:absolute;width:900px;height:70px;overflow:hidden;border:0px solid grey">
-						<div id="content" style="position:relative;width:900px;left:0px;top:-5px">
-							<div id="news_live_div" class="tabcontent">
-								<ul id="news_live" class="newscroll">
-								</ul>
-							</div>
-							<div id="news_archived_div" class="tabcontent">
-								<ul id="news_archived" class="newscroll">
-								</ul>
+				<div style="clear: both"></div>
+				<div id="newsblock">
+					<div id="newsbox">
+						<div id="container"
+							style="position: absolute; width: 900px; height: 70px; overflow: hidden; border: 0px solid grey">
+							<div id="content"
+								style="position: relative; width: 900px; left: 0px; top: -5px">
+								<div id="news_live_div" class="tabcontent">
+									<ul id="news_live" class="newscroll">
+									</ul>
+								</div>
+								<div id="news_archived_div" class="tabcontent">
+									<ul id="news_archived" class="newscroll">
+									</ul>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>			
-				<div id="newsarrows">
-					<div id="toparrow">
-						<a href="javascript:moveup()"><img src="${createLinkTo(dir:'images',file:'up_arrow.png')}" alt="scroll up" width="10" height="6" border="0" /></a>
-					</div>
-					<div id="bottomarrow">
-						<a href="javascript:movedown()"><img src="${createLinkTo(dir:'images',file:'down_arrow.png')}" alt="scroll down" width="10" height="6" border="0" /></a>
+					<div id="newsarrows">
+						<div id="toparrow">
+							<a href="javascript:moveup()"><img
+								src="${createLinkTo(dir:'images',file:'up_arrow.png')}"
+								alt="scroll up" width="10" height="6" border="0" />
+							</a>
+						</div>
+						<div id="bottomarrow">
+							<a href="javascript:movedown()"><img
+								src="${createLinkTo(dir:'images',file:'down_arrow.png')}"
+								alt="scroll down" width="10" height="6" border="0" />
+							</a>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-<!-- News section ends here-->
-<!-- Bundle Sections starts here-->
-		<div id="bdlsection">
-			<div id="bdltabs">
-				<span style="line-height: 28px;">&nbsp;</span>
-				<g:each in="${moveBundleList}" status="i" var="moveBundle">
-					<span id="spnBundle${moveBundle.id}" class="${ i == 0 ? 'mbhactive' : 'mbhinactive' }" onClick="updateDash(${moveBundle.id})">
-					${moveBundle.name}</span>&nbsp;&nbsp;
+			<!-- News section ends here-->
+			<!-- Bundle Sections starts here-->
+			<div id="bdlsection">
+				<div id="bdltabs">
+					<span style="line-height: 28px;">&nbsp;</span>
+					<g:each in="${moveBundleList}" status="i" var="moveBundle">
+						<span id="spnBundle${moveBundle.id}"
+							class="${ i == 0 ? 'mbhactive' : 'mbhinactive' }"
+							onClick="updateDash(${moveBundle.id})"> ${moveBundle.name}
+						</span>&nbsp;&nbsp;
 				</g:each>
-			</div>
-			<div id="leftcol">
-				<ul id="btitle" >
-					<li>Step</li>
-					<li><span class="percentage">In Percentage</span></li>
-					<!-- <li><span class="percentage">Completion</span></li> -->
-					<li>Planned Start</li>
-					<li>Planned&nbsp;Completion</li>
-					<li>Actual Start</li>
-					<li >Actual&nbsp;Completion</li>
-				</ul>
-			</div>
-			<div id="leftarrow"><a href="javascript:void(0);" id="move-left"><img src="${createLinkTo(dir:'images',file:'left_arrow.png')}" alt="back" border="0" width="16" height="23" align="right"></a></div>
-			<div class="mod">
-				<div id="themes">
-				<input type="hidden" value="${moveBundleList ? moveBundleList[0]?.id : ''}" id="defaultBundleId">
-				<g:each in="${moveBundleList}" status="i" var="moveBundle">
-					<div id="bundlediv${moveBundle.id}" class="${i == 0 ? 'show_bundle_step' : 'hide_bundle_step'}">
-						<g:each in="${MoveBundleStep.findAll('FROM MoveBundleStep mbs where mbs.moveBundle='+moveBundle.id+' ORDER BY mbs.transitionId')}" status="j" var="moveBundleStep">
-							<div style="float:left;width:130px;" >
-								<ul class="bdetails">
-									<li class="heading" title="${moveBundleStep.label}">
-										<g:if test="${moveBundleStep.label.length()>10}">
-											${moveBundleStep.label.substring(0,11)}..
-										</g:if>
-										<g:else>
-											${moveBundleStep.label}
-										</g:else>
-									</li>
-									<li id="percentage_${moveBundle.id}_${moveBundleStep.transitionId}" > </li>
-									<!-- <li class="actfinish1"><span id="completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li> -->
-									<li class="schstart"><span id="plan_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
-									<li class="schfinish"><span id="plan_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
-									<li class="actstart" id="li_start_${moveBundle.id}_${moveBundleStep.transitionId}"><span id="act_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
-									<li class="actfinish" id="li_finish_${moveBundle.id}_${moveBundleStep.transitionId}"><span id="act_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
-								</ul>
-								<div id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}" align="center" style="display: none;">
-									<jsec:hasAnyRole in="['ADMIN']"><img id="chart_${moveBundle.id}_${moveBundleStep.transitionId}" src="${createLinkTo(dir:'i/dials',file:'dial-50sm.png')}"></jsec:hasAnyRole>
-								</div>
-								<%-- <jsec:hasAnyRole in="['ADMIN']">
+				</div>
+				<div id="leftcol">
+					<ul id="btitle">
+						<li>Step</li>
+						<li><span class="percentage">In Percentage</span>
+						</li>
+						<!-- <li><span class="percentage">Completion</span></li> -->
+						<li>Planned Start</li>
+						<li>Planned&nbsp;Completion</li>
+						<li>Actual Start</li>
+						<li>Actual&nbsp;Completion</li>
+					</ul>
+				</div>
+				<div id="leftarrow">
+					<a href="javascript:void(0);" id="move-left"><img
+						src="${createLinkTo(dir:'images',file:'left_arrow.png')}"
+						alt="back" border="0" width="16" height="23" align="right">
+					</a>
+				</div>
+				<div class="mod">
+					<div id="themes">
+						<input type="hidden"
+							value="${moveBundleList ? moveBundleList[0]?.id : ''}"
+							id="defaultBundleId">
+						<g:each in="${moveBundleList}" status="i" var="moveBundle">
+							<div id="bundlediv${moveBundle.id}"
+								class="${i == 0 ? 'show_bundle_step' : 'hide_bundle_step'}">
+								<g:each
+									in="${MoveBundleStep.findAll('FROM MoveBundleStep mbs where mbs.moveBundle='+moveBundle.id+' ORDER BY mbs.transitionId')}"
+									status="j" var="moveBundleStep">
+									<div style="float: left; width: 130px;">
+										<ul class="bdetails">
+											<li class="heading" title="${moveBundleStep.label}"><g:if
+													test="${moveBundleStep.label.length()>10}">
+													${moveBundleStep.label.substring(0,11)}..
+										</g:if> <g:else>
+													${moveBundleStep.label}
+												</g:else></li>
+											<li
+												id="percentage_${moveBundle.id}_${moveBundleStep.transitionId}">
+											</li>
+											<!-- <li class="actfinish1"><span id="completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li> -->
+											<li class="schstart"><span
+												id="plan_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
+											<li class="schfinish"><span
+												id="plan_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
+											<li class="actstart"
+												id="li_start_${moveBundle.id}_${moveBundleStep.transitionId}"><span
+												id="act_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
+											<li class="actfinish"
+												id="li_finish_${moveBundle.id}_${moveBundleStep.transitionId}"><span
+												id="act_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
+										</ul>
+										<div
+											id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}"
+											align="center" style="display: none;">
+											<jsec:hasAnyRole in="['ADMIN']">
+												<img
+													id="chart_${moveBundle.id}_${moveBundleStep.transitionId}"
+													src="${createLinkTo(dir:'i/dials',file:'dial-50sm.png')}">
+											</jsec:hasAnyRole>
+										</div>
+										<%-- <jsec:hasAnyRole in="['ADMIN']">
 								<script language="JavaScript">
 							         var stepchart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "chart_${moveBundle.id}_${moveBundleStep.transitionId}", "100", "75", "0", "0");
 							         //stepchart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'step_gauge.xml')}");
@@ -271,156 +317,191 @@
 							         stepchart.render("chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}");
 								</script>  
 								</jsec:hasAnyRole> --%>
+									</div>
+								</g:each>
 							</div>
 						</g:each>
 					</div>
-				</g:each>
+				</div>
+				<div id="rightarrow">
+					<a href="javascript:void(0);" id="move-right"><img
+						src="${createLinkTo(dir:'images',file:'right_arrow.png')}"
+						alt="back" border="0" width="16" height="23" align="right">
+					</a>
 				</div>
 			</div>
-<div id="rightarrow"><a href="javascript:void(0);" id="move-right"><img src="${createLinkTo(dir:'images',file:'right_arrow.png')}" alt="back" border="0" width="16" height="23" align="right"></a></div>
+			<div style="text-align: right; padding: 4px 0px;">
+				<%--<a href="#page_up" class="nav_button" style="nowrap:nowrap;">Page Up</a> --%>
+			</div>
 		</div>
-		<div style="text-align: right;padding:4px 0px;">
-			<%--<a href="#page_up" class="nav_button" style="nowrap:nowrap;">Page Up</a> --%>
-		</div>
-	</div>
 
-<!-- Bundle Sections ends here-->
+		<!-- Bundle Sections ends here-->
 
-<!-- Footer starts here-->
-	<div style="clear:both"></div>
-	<!--<div id="crawler">
+		<!-- Footer starts here-->
+		<div style="clear: both"></div>
+		<!--<div id="crawler">
 		<div id="mycrawler"><div id="mycrawlerId" style="width: 900px;margin-top: -6px;" >.</div></div>
 	</div>-->
-<!-- Footer Ends here-->
-<!-- Body Ends here-->
-<a name="page_down"></a>
-</div>
-<div id="createNewsDialog" title="Create News Comment" style="display: none;">
-	<input name="moveEvent.id" value="${moveEvent?.id}" type="hidden" id="moveEventId"/>
+		<!-- Footer Ends here-->
+		<!-- Body Ends here-->
+		<a name="page_down"></a>
+	</div>
+	<div id="createNews" title="Create News Comment" style="display: none;">
+		<input name="moveEvent.id" value="${moveEvent?.id}" type="hidden"
+			id="moveEventId" />
 		<div class="dialog" style="border: 1px solid #5F9FCF">
-		<table id="createCommentTable" style="border: 0px">
-			<tr>
-				<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
-			</tr>
-			<tr>
-		<td valign="top" class="name"><label>Comment Type:</label></td>
-				<td valign="top" class="value" > 
-				<select disabled="disabled">
-				<option>News</option>
-				</select>
-				</td>
-		</tr>
-			<tr class="prop">
-				<td valign="top" class="name"><label for="messageId"><b>Comment:&nbsp;<span style="color: red">*</span></b></label>
-				</td>
-				<td valign="top" class="value"><textarea cols="80" rows="5"
-					id="messageId" name="message" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea></td>
-			</tr>
-			<tr class="prop">
-				<td valign="top" class="name" nowrap="nowrap"><label for="isArchivedId" >Resolved / Archived:</label></td>
-				<td valign="top" class="value" id="archivedTdId">
-				<input type="checkbox" id="isArchivedId" value="0" onclick="updateHidden('isArchivedId','isArchivedHiddenId')"/>
-				<input type="hidden" name="isArchived" value="0" id="isArchivedHiddenId"/>
-				</td>
-			</tr>
-			<tr class="prop">
-				<td valign="top" class="name"><label for="resolutionNewsId">Resolution:</label>
-				</td>
-				<td valign="top" class="value" ><textarea cols="80" rows="5"
-						id="resolutionNewsId" name="resolution" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea> </td>
-			</tr>
-			
-		</table>
-		</div>
-		<div class="buttons"><span class="button"> 
-		<input class="save" type="button" value="Create" onclick="return submitCreateNewsForm()"/></span>
-		<span class="button"> 
-	<input class="delete" type="button" value="Cancel" onclick="resetCreateNewsForm();"/>
-	</span>
-		</div>
-</div>
-<div id="showEditCommentDialog" title="Edit Issue Comment"
-	style="display: none;">
-	<div class="dialog" style="border: 1px solid #5F9FCF">
-	<input name="id" value="" id="commentId" type="hidden"/>
-	<input name="commentType" value="" id="commentTypeId" type="hidden"/>
-	<input name="moveEvent.id" value="${moveEvent?.id}" type="hidden"/>
-		<div>
-	<table id="showCommentTable" style="border: 0px">
-		
-		<tr>
-		<td valign="top" class="name"><label for="dateCreated">Created
-				At:</label></td>
-				<td valign="top" class="value" id="dateCreatedId" ></td>
-		</tr>
-			<tr>
-		<td valign="top" class="name"><label for="createdBy">Created
-				By:</label></td>
-				<td valign="top" class="value" id="createdById" ></td>
-		</tr>
-		<tr>
-		<td valign="top" class="name"><label>Comment Type:</label></td>
-				<td valign="top" class="value" > 
-				<select disabled="disabled" id="commentTypeOption">
-				<option>Issue</option>
-				</select>
-				</td>
-		</tr>
-		<tr id="displayOptionTr">
-			
-		<td valign="top" class="name" nowrap="nowrap">
-			<label for="category">User / Generic Cmt:</label></td>
-				<td valign="top" class="value" id="displayOption" >
-				<input type="radio" name="displayOption" value="U" checked="checked" id="displayOptionUid"/>&nbsp;
-				<span style="vertical-align: text-top;">User Comment</span>&nbsp;&nbsp;&nbsp;
-				<input type="radio" name="displayOption" value="G" id="displayOptionGid"/>&nbsp;
-				<span style="vertical-align:text-top;">Generic Comment&nbsp;</span>
-				</td>
-		</tr>
-		<tr class="prop" id="assetTrId">
-		<td valign="top" class="name"><label for="assetTdId">Asset:</label></td>
-				<td valign="top" class="value"><input type="text" disabled="disabled" id="assetTdId"/></td>
-		</tr>
-			<tr class="prop">
-				<td valign="top" class="name"><label for="comment">Comment:</label>
-				</td>
-				<td valign="top" class="value" ><textarea cols="80" rows="5"
-						id="commentTdId" name="comment" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea> </td>
-			</tr>
-			<tr class="prop">
-				<td valign="top" class="name" nowrap="nowrap"><label for="isResolved" >Resolved / Archived:</label></td>
-				<td valign="top" class="value" id="resolveTdId">
-				<input type="checkbox" id="isResolvedId" value="0" onclick="updateHidden('isResolvedId','isResolvedHiddenId')"/>
-				<input type="hidden" name="isResolved" value="0" id="isResolvedHiddenId"/>
-				</td>
-			</tr>
-			<tr class="prop">
-				<td valign="top" class="name"><label for="resolution">Resolution:</label>
-				</td>
-				<td valign="top" class="value" ><textarea cols="80" rows="5"
-						id="resolutionId" name="resolution" onkeydown="textCounter(this.id,255)"  onkeyup="textCounter(this.id,255)"></textarea> </td>
-			</tr>
+			<table id="createCommentTable" style="border: 0px">
 				<tr>
-		<td valign="top" class="name"><label for="dateResolved">Resolved
-				At:</label></td>
-				<td valign="top" class="value" id="dateResolvedId" ></td>
-		</tr>
-			<tr>
-		<td valign="top" class="name"><label for="resolvedBy">Resolved
-				By:</label></td>
-				<td valign="top" class="value" id="resolvedById" ></td>
-		</tr>
-		
-	</table>
+					<td colspan="2"><div class="required">Fields marked ( *
+							) are mandatory</div></td>
+				</tr>
+				<tr>
+					<td valign="top" class="name"><label>Comment Type:</label>
+					</td>
+					<td valign="top" class="value"><select disabled="disabled">
+							<option>News</option>
+					</select></td>
+				</tr>
+				<tr class="prop">
+					<td valign="top" class="name"><label for="messageId"><b>Comment:&nbsp;<span
+								style="color: red">*</span>
+						</b>
+					</label></td>
+					<td valign="top" class="value"><textarea cols="80" rows="5"
+							id="messageNews" name="message"
+							onkeydown="textCounter(this.id,255)"
+							onkeyup="textCounter(this.id,255)"></textarea>
+					</td>
+				</tr>
+				<tr class="prop">
+					<td valign="top" class="name" nowrap="nowrap"><label
+						for="isArchiveId">Resolved / Archived:</label>
+					</td>
+					<td valign="top" class="value" id="archivedTdId"><input
+						type="checkbox" id="isArchivedId" value="0"
+						onclick="updateHidden('isArchivedId','isArchivedHiddenId')" /> <input
+						type="hidden" name="isArchived" value="0" id="isArchivedHiddenId" />
+					</td>
+				</tr>
+				<tr class="prop">
+					<td valign="top" class="name"><label for="resolutionNews">Resolution:</label>
+					</td>
+					<td valign="top" class="value"><textarea cols="80" rows="5"
+							id="resolutionNews" name="resolution"
+							onkeydown="textCounter(this.id,255)"
+							onkeyup="textCounter(this.id,255)"></textarea></td>
+				</tr>
+
+			</table>
+		</div>
+		<div class="buttons">
+			<span class="button"> <input class="save" type="button"
+				value="Create" onclick="return submitCreateNewsForm()" />
+			</span> <span class="button"> <input class="delete" type="button"
+				value="Cancel" onclick="resetCreateNewsForm();" /> </span>
+		</div>
 	</div>
-	<div class="buttons"><span class="button"> 
-	<input class="save" type="button" value="Update" onclick="return submitUpdateNewsForm()"/>
-	</span> <span class="button"> 
-	<input class="delete" type="button" value="Cancel" onclick="timedUpdate( $('#updateTimeId').val() );$('#showEditCommentDialog').dialog('close');"/>
-	</span></div>
+	<div id="showEditCommentDialog" title="Edit Issue Comment"
+		style="display: none;">
+		<div class="dialog" style="border: 1px solid #5F9FCF">
+			<input name="id" value="" id="commentId" type="hidden" /> <input
+				name="commentType" value="" id="commentTypeId" type="hidden" /> <input
+				name="moveEvent.id" value="${moveEvent?.id}" type="hidden" />
+			<div>
+				<table id="showCommentTable" style="border: 0px">
+
+					<tr>
+						<td valign="top" class="name"><label for="dateCreated">Created
+								At:</label>
+						</td>
+						<td valign="top" class="value" id="dateCreatedId"></td>
+					</tr>
+					<tr>
+						<td valign="top" class="name"><label for="createdBy">Created
+								By:</label>
+						</td>
+						<td valign="top" class="value" id="createdById"></td>
+					</tr>
+					<tr>
+						<td valign="top" class="name"><label>Comment Type:</label>
+						</td>
+						<td valign="top" class="value"><select disabled="disabled"
+							id="commentTypeOption">
+								<option>Issue</option>
+						</select></td>
+					</tr>
+					<tr id="displayOptionTr">
+
+						<td valign="top" class="name" nowrap="nowrap"><label
+							for="category">User / Generic Cmt:</label>
+						</td>
+						<td valign="top" class="value" id="displayOption"><input
+							type="radio" name="displayOption" value="U" checked="checked"
+							id="displayOptionUid" />&nbsp; <span
+							style="vertical-align: text-top;">User Comment</span>&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="displayOption" value="G"
+							id="displayOptionGid" />&nbsp; <span
+							style="vertical-align: text-top;">Generic Comment&nbsp;</span></td>
+					</tr>
+					<tr class="prop" id="assetTrId">
+						<td valign="top" class="name"><label for="assetTdId">Asset:</label>
+						</td>
+						<td valign="top" class="value"><input type="text"
+							disabled="disabled" id="assetTdId" />
+						</td>
+					</tr>
+					<tr class="prop">
+						<td valign="top" class="name"><label for="comment">Comment:</label>
+						</td>
+						<td valign="top" class="value"><textarea cols="80" rows="5"
+								id="commentTdId" name="comment"
+								onkeydown="textCounter(this.id,255)"
+								onkeyup="textCounter(this.id,255)"></textarea></td>
+					</tr>
+					<tr class="prop">
+						<td valign="top" class="name" nowrap="nowrap"><label
+							for="isResolved">Resolved / Archived:</label>
+						</td>
+						<td valign="top" class="value" id="resolveTdId"><input
+							type="checkbox" id="isResolvedId" value="0"
+							onclick="updateHidden('isResolvedId','isResolvedHiddenId')" /> <input
+							type="hidden" name="isResolved" value="0" id="isResolvedHiddenId" />
+						</td>
+					</tr>
+					<tr class="prop">
+						<td valign="top" class="name"><label for="resolution">Resolution:</label>
+						</td>
+						<td valign="top" class="value"><textarea cols="80" rows="5"
+								id="resolutionId" name="resolution"
+								onkeydown="textCounter(this.id,255)"
+								onkeyup="textCounter(this.id,255)"></textarea></td>
+					</tr>
+					<tr>
+						<td valign="top" class="name"><label for="dateResolved">Resolved
+								At:</label>
+						</td>
+						<td valign="top" class="value" id="dateResolvedId"></td>
+					</tr>
+					<tr>
+						<td valign="top" class="name"><label for="resolvedBy">Resolved
+								By:</label>
+						</td>
+						<td valign="top" class="value" id="resolvedById"></td>
+					</tr>
+
+				</table>
+			</div>
+			<div class="buttons">
+				<span class="button"> <input class="save" type="button"
+					value="Update" onclick="return submitUpdateNewsForm()" /> </span> <span
+					class="button"> <input class="delete" type="button"
+					value="Cancel"
+					onclick="timedUpdate( $('#updateTimeId').val() );$('#showEditCommentDialog').dialog('close');" />
+				</span>
+			</div>
+		</div>
 	</div>
-</div>
-<script type="text/javascript">
+	<script type="text/javascript">
 	var eventType = "load"
 	var hasTimedOut = false;
 	var modWidth
@@ -448,7 +529,7 @@
 	        autoOpen: false,
 	        resizable: false
  		});
-	    $("#createNewsDialog").dialog({
+	    $("#createNews").dialog({
 	        autoOpen: false,
 	        resizable: false
  		});
@@ -562,7 +643,11 @@
 	/* Function to load the data for a particular MoveEvent */
 	var doUpdate = true
 	function getMoveEventNewsDetails( moveEvent ){
-		$("#createNewsDialog").dialog("close");
+		$("#createNews").dialog("close");
+		$("#messageNews").val("");
+		$("#resolutionNews").val("");
+		$('#isArchivedId').attr("checked",false)
+		$('#isResolvedId').attr("checked",false)
 		$("#showEditCommentDialog").dialog("close");
 		updateDash( $("#defaultBundleId").val() );
 	<%--	if(dialReload && doUpdate){
@@ -990,12 +1075,12 @@
 	/*
 	will popup the dialog to create news
 	*/
-	function openCreateNewsDialog(){
+	function opencreateNews(){
 		timedUpdate('never');
-		$("#createNewsDialog").dialog('option', 'width', 'auto');
-		$("#createNewsDialog").dialog('option', 'position', ['center','top']);
+		$("#createNews").dialog('option', 'width', 'auto');
+		$("#createNews").dialog('option', 'position', ['center','top']);
 		$("#showEditCommentDialog").dialog("close");
-		$('#createNewsDialog').dialog('open');
+		$('#createNews').dialog('open');
 	}
 	function updateHidden(checkBoxId,hiddenId){
 		var resolve = $("#"+checkBoxId).is(':checked');
@@ -1010,9 +1095,9 @@
 	*/
 	function submitCreateNewsForm(){
 		var moveEvent = $("#moveEventId").val();
-		var resolveBoo = $("#isArchivedId").is(':checked');
-		var resolveVal = $("#resolutionNewsId").val();
-		var news = $("#messageId").val()
+		var resolveBoo = $("#isResolvedId").is(':checked');
+	    var resolveVal = $("#resolutionNews").val();
+	    var news = $("#messageNews").val()
 		var validate = false;
 		if(moveEvent){
 			if(resolveBoo && resolveVal == ""){
@@ -1027,17 +1112,17 @@
 		}
 		if(validate){
 			timedUpdate( $("#updateTimeId").val() );
-			${remoteFunction(action:'saveNews', 
-					params:'\'moveEvent.id=\' + moveEvent +\'&message=\'+ news +\'&isArchived=\'+$(\'#isArchivedHiddenId\').val()+\'&resolution=\'+$(\'#resolutionNewsId\').val()', 
+			${remoteFunction(controller:'newsEditor',action:'saveNews', 
+					params:'\'moveEvent.id=\' + moveEvent +\'&message=\'+ news +\'&isArchived=\'+$(\'#isArchivedHiddenId\').val()+\'&resolution=\'+$(\'#resolutionNews\').val()+\'&isResolved=\'+$(\'#isResolvedHiddenId\').val()', 
 					onComplete:'getMoveEventNewsDetails(moveEvent)')}
 		}
 	}
 	function resetCreateNewsForm(){
-		$("#messageId").val("");
+		$("#messageNews").val("");
 		$('#isArchivedHiddenId').val("0");
-		$('#resolutionNewsId').val("")
+		$('#resolutionNews').val("")
 		$('#isArchivedId').attr("checked",false)
-		$('#createNewsDialog').dialog('close');
+		$('#createNews').dialog('close');
 		timedUpdate( $("#updateTimeId").val() );
 	}
 	/* will popup the dialog to edit news */
@@ -1118,7 +1203,7 @@
 			$("#showEditCommentDialog").dialog('option', 'width', 'auto');
 			$("#showEditCommentDialog").dialog('option', 'position', ['center','top']);
 			$("#showEditCommentDialog").dialog("open");
-			$("#createNewsDialog").dialog("close");
+			$("#createNews").dialog("close");
 			}
 	}
 	/* will submit news edit form*/
