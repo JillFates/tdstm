@@ -1,4 +1,4 @@
-<g:form method="post">
+ 	<g:form method="post">
 	<table style="border:0;width:1000px;">
 		<tr>
 			<td colspan="2">
@@ -255,8 +255,9 @@
 					<input name="attributeSet.id" type="hidden" value="1">
 					<input name="project.id" type="hidden" value="${projectId}">
 					<input type="hidden" name="id" value="${assetEntityInstance?.id}" />
-					<span class="button"><input type="button" class="edit"
-						value="Edit" onclick="editEntity('${redirectTo}','Server', ${assetEntityInstance?.id})" /> </span>
+					<span class="button">
+					<input type="button" class="edit" value="Edit" onclick="editEntity('${redirectTo}','Server', ${assetEntityInstance?.id})" /> </span>
+					<input type ="hidden" id = "dstPath" name = "dstPath" value ="${redirectTo}"/>
 					<span class="button"><g:actionSubmit class="delete"
 					onclick="return confirm('Are you sure?');" value="Delete" /> </span>
 				<g:if test="${assetComment == 'issue'}">

@@ -37,7 +37,6 @@ class AssetEntityController {
 	def missingHeader = ""
 	int added = 0
 	def skipped = []
-
 	def partyRelationshipService
 	def stateEngineService
 	def workflowService
@@ -1078,6 +1077,7 @@ class AssetEntityController {
 	 * @return assetEntityList
 	 * --------------------------------------- */
 	def delete = {
+		def redirectAsset = params.dstPath
 		def assetEntityInstance = AssetEntity.get( params.id )
 		def projectId = params.projectId ? params.projectId : getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		if(assetEntityInstance) {
@@ -1095,17 +1095,47 @@ class AssetEntityController {
 			AssetEntity.executeUpdate("delete from AssetEntity ae where ae.id = ${assetEntityInstance.id}")
 
 			flash.message = "AssetEntity ${assetEntityInstance.assetName} deleted"
+			if(redirectAsset.contains("room_")){
+				def newredirectAsset = redirectAsset.split("_")
+				redirectAsset = newredirectAsset[0]
+				def rackId = newredirectAsset[1]
+				session.setAttribute("RACK_ID", rackId)
+				}
+			switch(redirectAsset){
+				case "room":
+					redirect( controller:'room',action:list, params:[projectId: projectId] )
+					break;
+				case "rack":
+					redirect( controller:'rackLayouts',action:'create', params:[projectId: projectId] )
+					break;
+				case "console":
+					redirect( action:dashboardView, params:[projectId: projectId, showAll:'show'])
+					break;
+				case "dashboardView":
+					redirect( action:dashboardView, params:[projectId: projectId, showAll:'show'])
+					break;
+				case "clientConsole":
+					redirect( controller:'clientConsole', action:list, params:[projectId: projectId])
+					break;
+				case "application":
+					redirect( controller:'application', action:list, params:[projectId: projectId])
+					break;
+				case "database":
+					redirect( controller:'database', action:list, params:[projectId: projectId])
+					break;
+				case "files":
+					redirect( controller:'files', action:list, params:[projectId: projectId])
+					break;
+				default:
+					redirect( action:list)
+			}
+			
 		}
 		else {
 			flash.message = "AssetEntity not found with id ${params.id}"
 		}
-		if ( params.clientList ){
-			redirect( controller:"clientConsole", action:"list", params:[projectId:projectId, moveBundle:params.moveBundleId] )
-		} else if ( params.moveBundleId ) {
-			redirect( action:dashboardView, params:[projectId:projectId, moveBundle:params.moveBundleId, showAll : params.showAll] )
-		} else {
-			redirect( action:list, params:[projectId:projectId] )
-		}
+		
+		
 	}
 
 	/*--------------------------------------------------
@@ -2405,6 +2435,8 @@ class AssetEntityController {
 		def dependentAssets = AssetDependency.findAllByAsset(assetEntityInstance)
 		def supportAssets = AssetDependency.findAllByDependent(assetEntityInstance)
 
+		
+		
 		[assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 					planStatusOptions:planStatusOptions?.value, projectId:projectId, project: project, railTypeOption:railTypeOption?.value,
 					priorityOption:priorityOption?.value,dependentAssets:dependentAssets,supportAssets:supportAssets,
@@ -2415,7 +2447,6 @@ class AssetEntityController {
 		session.setAttribute("USE_FILTERS","true")
 		def redirectTo = params.redirectTo
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
-
 		def formatter = new SimpleDateFormat("MM/dd/yyyy")
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def maintExpDate = params.maintExpDate

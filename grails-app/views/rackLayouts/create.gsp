@@ -150,6 +150,7 @@
 </g:if>
 <div class="dialog">
 <g:form action="save" name="rackLayoutCreate" method="post" target="_blank" onsubmit="return submitForm(this)" style="border: 1px solid black; width: 100%">
+<input type="hidden" id="redirectTo" value="rack"/>
 <table style="width:auto; border: none">
 	<tbody>
 		<tr>

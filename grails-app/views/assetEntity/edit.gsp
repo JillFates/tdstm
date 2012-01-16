@@ -251,9 +251,10 @@
 					<input name="attributeSet.id" type="hidden" value="1">
 					<input name="project.id" type="hidden" value="${projectId}">
 					<input name="id" type="hidden" value="${assetEntityInstance.id}">
+					<input type = "hidden" id = "dstPath" name = "dstPath" value ="${redirectTo}"/>
 					<input name="redirectTo" type="hidden" value="${redirectTo}">
 					<span class="button"><g:actionSubmit class="save" value="Update" /> </span>
-					<span class="button"><g:actionSubmit class="delete"	onclick="return confirm('Are you sure?');" value="Delete" /> </span>
+					<span class="button"><g:actionSubmit class="delete"	onclick=" return confirm('Are you sure?');" value="Delete" /> </span>
 				</div></td>
 		</tr>
 	</table>

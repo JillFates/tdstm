@@ -1,6 +1,7 @@
 <%@page import="com.tds.asset.AssetCableMap;com.tds.asset.AssetDependency;com.tds.asset.AssetEntity;com.tds.asset.Application;com.tds.asset.Database;com.tds.asset.Files;"%>
 <html>
 <head>
+
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
@@ -43,6 +44,8 @@ $(document).ready(function() {
 </script>
 </head>
 <body>
+
+<input type = "hidden" id = "dstPath" name = "dstPath" value ="room"/>
 <div class="body" style="margin-top: 10px;width:98%;">
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
@@ -56,6 +59,7 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 <g:else>
 <fieldset><legend><b>Room List</b></legend>
 <g:form action="create" >
+
 <div style="float: left; width: auto;">
 <table>
 	<thead>
@@ -97,6 +101,7 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 		<input type="button" class="edit" value="Create Room" onclick="$('#createRoomDialog').dialog('open');$('#mergeRoomDialog').dialog('close')"/>
 		<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
 			<span class="button"><input class="create" id="mergeId" type="button" value="Merge" onclick="showMergeDialog()" style="display: none;"/></span>
+			
 			<g:actionSubmit class="delete" action="delete" id="deleteId" value="Delete" style="display: none;"/>
 		</jsec:hasAnyRole>
 	</span>
