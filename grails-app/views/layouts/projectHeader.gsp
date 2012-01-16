@@ -143,9 +143,9 @@
 			</li>
 			</jsec:hasRole>
 
-			<li id="projectMenuId"  ><g:link class="home" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" controller="projectUtil">Client/Project
+			<li id="projectMenuId" style="position:relative; float: left;" ><g:link class="home" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" controller="projectUtil">Client/Project
 				<a id="projectAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#projectMegaMenu')" href="javascript:showMegaMenu('#projectMegaMenu')" style="display: inline"></a></g:link>
-				<div class="megamenu" id="projectMegaMenu" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+				<div class="megamenu client" id="projectMegaMenu" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" style="display: none;">
 					<table class="mmtable"><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Client/Project</span><br />
 						<ul >

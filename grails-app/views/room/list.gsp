@@ -354,7 +354,7 @@ function getRackLayout( rackId ){
 }
 </script>
 <script>
-	currentMenuId = "";
+	currentMenuId = "#roomsMenu";
 	$("#roomMenuId a").css('background-color','#003366')
 </script>
 </body>

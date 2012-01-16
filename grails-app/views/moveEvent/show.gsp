@@ -93,7 +93,7 @@
             </div>
         </div>
 <script>
-	currentMenuId = "";
+	currentMenuId = "#eventMenu";
 	$("#eventMenuId a").css('background-color','#003366')
 </script>
     </body>

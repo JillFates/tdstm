@@ -339,7 +339,7 @@
 	}
 </script>
 <script>
-	currentMenuId = "";
+	currentMenuId = "#racksMenu";
 	$("#rackMenuId a").css('background-color','#003366')
 </script>
 </body>

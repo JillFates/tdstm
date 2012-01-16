@@ -610,6 +610,7 @@ td .dep-Questioned {
 .rooms {
 	display: none;  left:0px  !important;    position: absolute  !important; top: 20px; 
 }
+.client { display: none;  left:0px  !important;    position: absolute  !important; top:20px;}
 .mmtable .mmlink { 
 	border-right:0px !important;
 }
