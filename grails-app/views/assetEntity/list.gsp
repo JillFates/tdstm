@@ -79,7 +79,7 @@ $(document).ready(function() {
 		        	<jmesa:htmlColumn property="assetName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<a id="assetName_${assetEntityInstance.id}" href="javascript:getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.assetName}</a>
 		        	</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="modelName" title="Model" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        	<jmesa:htmlColumn property="model" title="Model" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<span id="model_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.model}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="sourceLocation" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
