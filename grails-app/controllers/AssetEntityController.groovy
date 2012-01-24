@@ -3,7 +3,7 @@ import grails.converters.JSON
 import java.io.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.util.Date;
+import java.util.Date
 
 import jxl.*
 import jxl.read.biff.*
@@ -1571,7 +1571,9 @@ class AssetEntityController {
 	 * 	@return:	AssetEntity details and Transition details for all MoveBundle Teams
 	 *--------------------------------------------------------------------------------------*/
 	def dashboardView = {
-		def showAll = params.showAll
+		def filterAttr = [tag_f_priority:params.tag_f_priority,tag_f_assetTag:params.tag_f_assetTag,tag_f_assetName:params.tag_f_assetName,tag_f_status:params.tag_f_status,tag_f_sourceTeamMt:params.tag_f_sourceTeamMt,tag_f_targetTeamMt:params.tag_f_targetTeamMt,tag_f_commentType:params.tag_f_commentType,tag_s_1_priority:params.tag_s_1_priority,tag_s_2_assetTag:params.tag_s_2_assetTag,tag_s_3_assetName:params.tag_s_3_assetName,tag_s_4_status:params.tag_s_4_status,tag_s_5_sourceTeamMt:params.tag_s_5_sourceTeamMt,tag_s_6_targetTeamMt:params.tag_s_6_targetTeamMt,tag_s_7_commentType:params.tag_s_7_commentType]
+		session.setAttribute('filterAttr', filterAttr)
+	    def showAll = params.showAll
 		def projectId = params.projectId
 		def bundleId = params.moveBundle
 		def currentState = params.currentState
@@ -2444,7 +2446,9 @@ class AssetEntityController {
 					manufacturers:manufacturers, models:models,redirectTo:params?.redirectTo]
 
 	}
+	
 	def update={
+		def attribute = session.getAttribute('filterAttr')
 		def filterAttr = session.getAttribute('filterAttributes')
 		session.setAttribute("USE_FILTERS","true")
 		def redirectTo = params.redirectTo
@@ -2479,7 +2483,7 @@ class AssetEntityController {
 					redirect( controller:'rackLayouts',action:'create', params:[projectId: projectId] )
 					break;
 				case "console":
-					redirect( action:dashboardView, params:[projectId: projectId, showAll:'show',tag_f_assetName:params.tag_f_assetName])
+					redirect( action:dashboardView, params:[projectId: projectId, showAll:'show',tag_f_assetName:params.tag_f_assetName,tag_f_priority:attribute.tag_f_priority,tag_f_assetTag:attribute.tag_f_assetTag,tag_f_assetName:attribute.tag_f_assetName,tag_f_status:attribute.tag_f_status,tag_f_sourceTeamMt:attribute.tag_f_sourceTeamMt,tag_f_targetTeamMt:attribute.tag_f_targetTeamMt,tag_f_commentType:attribute.tag_f_commentType,tag_s_1_priority:attribute.tag_s_1_priority,tag_s_2_assetTag:attribute.tag_s_2_assetTag,tag_s_3_assetName:attribute.tag_s_3_assetName,tag_s_4_status:attribute.tag_s_4_status,tag_s_5_sourceTeamMt:attribute.tag_s_5_sourceTeamMt,tag_s_6_targetTeamMt:attribute.tag_s_6_targetTeamMt,tag_s_7_commentType:attribute.tag_s_7_commentType])
 					break;
 				case "clientConsole":
 					redirect( controller:'clientConsole', action:list, params:[projectId: projectId])
