@@ -131,6 +131,7 @@ class RackLayoutsController {
 			
 			def racks = sourceRacks + targetRacks
 			if(racks.size() == 0 && rackId){
+				session.setAttribute('RACK_ID',rackId)
 				redirectTo = 'room'
 				racks = Rack.findAllById(rackId)
 				moveBundles = []
