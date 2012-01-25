@@ -240,7 +240,7 @@
 			<!-- Bundle Sections starts here-->
 			<div id="bdlsection">
 				<div id="bdltabs">
-					<span style="line-height: 28px;">&nbsp;</span>
+       					<span style="line-height: 28px;">&nbsp;</span>
 					<g:each in="${moveBundleList}" status="i" var="moveBundle">
 						<span id="spnBundle${moveBundle.id}"
 							class="${ i == 0 ? 'mbhactive' : 'mbhinactive' }"
@@ -773,7 +773,11 @@
 		        		deltaTemp = deltaTemp * -1
 		        		sign = "-"
 		        	}
-		        	tsource2 = "("+sign + parseInt( deltaTemp / 60 ) +"h "+ deltaTemp % 60 +"m)"
+		        	if((parseInt( deltaTemp / 60 ))<10){
+		        		tsource2 = "("+sign + parseInt( deltaTemp / 60 ) +"h "+ deltaTemp % 60 +"m)"
+		        	} else {
+		        	    tsource2 = "("+sign + parseInt( deltaTemp / 60 ) +"h"+"+)"
+		        	}
 		        }
 			} else {
 		    	temp = trimAll(source);
