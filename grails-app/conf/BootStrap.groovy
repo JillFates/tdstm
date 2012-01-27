@@ -12,6 +12,34 @@ class BootStrap {
 
 	// Don't load bootstrap if production environment
 // TODO : JPM Disabled BootStrap for testing
+  //..........................
+  		//Permissions
+  		//............................
+  		def permissionsList = [
+  			
+  			[ PermissionGroup.NAVIGATION, "AdminMenuView"],
+  			[ PermissionGroup.NAVIGATION, "RackMenuView"],
+  			[ PermissionGroup.NAVIGATION, "AssetMenuView"],
+  			[ PermissionGroup.NAVIGATION, "EventMenuView"],
+  			[ PermissionGroup.NAVIGATION, "BundleMenuView"],
+  			[ PermissionGroup.NAVIGATION, "ReportMenuView"],
+  			[ PermissionGroup.NAVIGATION, "HelpMenuView"]
+  			]
+  	
+  		permissionsList.each {
+			def permission = Permissions.findByPermissionGroupAndPermissionItem(it[0], it[1])
+			if(!permission){
+				permission = new Permissions(
+							  				permissionGroup: it[0],
+							  				permissionItem: it[1],
+							  				)
+				if ( !permission.validate() || ! permission.save() ) {
+					def etext = "Unable to create permission ${it[0]}" +
+					GormUtil.allErrorsString( permission )
+					println etext
+				}
+			}
+  		}
 return
 	if ( grails.util.GrailsUtil.environment.equals("production") ) return
     	

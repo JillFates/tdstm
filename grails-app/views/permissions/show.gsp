@@ -2,14 +2,14 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="projectHeader" />
-    <title>Show Permissions</title>
+    <title>Show Role Permissions</title>
   </head>
   <body>
   <g:if test="${flash.message}">
       <div class="message">${flash.message}</div>
     </g:if>
     <div class="body">
-    <h1>Permissions</h1>
+    <h1>Role Permissions</h1>
     <div class="list" id="updateShow">
 			<table>
 				<thead>
@@ -34,7 +34,7 @@
 							</td>
 							<g:each in="${Permissions.Roles.values()}" var='role'>
 								<td style="text-align: center;">
-									${RolePermissions.findByRoleAndPermission(role, permission) ? 'yes' :'-'}
+									${RolePermissions.findByRoleAndPermission(role.toString(), permission) ? 'yes' :'-'}
 								</td>
 							</g:each>
 						</tr>

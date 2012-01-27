@@ -2,14 +2,14 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="projectHeader" />
-    <title>Update Permissions</title>
+    <title>Update Role Permissions</title>
   </head>
   <body>
   <g:if test="${flash.message}">
       <div class="message">${flash.message}</div>
     </g:if>
     <div class="body">
-    <h1>Edit Permissions</h1>
+    <h1>Role Permissions</h1>
     <g:form action="update">
     <div class="list" id="updateShow">
 			<table>
@@ -35,11 +35,11 @@
 							</td>
 							<g:each in="${Permissions.Roles.values()}" var='role'>
 								<td style="text-align: center;">
-									<g:if test="${RolePermissions.findByRoleAndPermission(role, permission)}">
-										<input type="checkbox" name="role_${permission.id}_${role.id}" checked="checked"> 
+									<g:if test="${RolePermissions.findByRoleAndPermission(role.toString(), permission)}">
+										<input type="checkbox" name="role_${permission.id}_${role.toString()}" checked="checked"> 
 									</g:if>
 									<g:else>
-										<input type="checkbox" name="role_${permission.id}_${role.id}"> 
+										<input type="checkbox" name="role_${permission.id}_${role.toString()}"> 
 									</g:else>
 								</td>
 							</g:each>

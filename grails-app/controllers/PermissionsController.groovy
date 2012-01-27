@@ -24,10 +24,10 @@ class PermissionsController {
 		def roles = Permissions.Roles.values()
 		permissions.each{ permission ->
 			roles.each { role ->
-				def param = params["role_${permission.id}_${role.id}"]
+				def param = params["role_${permission.id}_${role.toString()}"]
 				if(param && param == "on"){
 					def rolePermissions = new RolePermissions(
-												role : role,
+												role : role.toString(),
 												permission : permission
 											)
 					if(!rolePermissions.save(flush:true)){

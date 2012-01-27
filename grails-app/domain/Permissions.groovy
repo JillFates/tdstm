@@ -9,7 +9,7 @@ class Permissions {
 		version false 
 	}
 	static constraints = {
-		permissionItem( blank:false, nullable:false )
+		permissionItem( blank:false, nullable:false,unique:'permissionGroup' )
 		permissionGroup( blank:false, nullable:false )
 	}
 }
