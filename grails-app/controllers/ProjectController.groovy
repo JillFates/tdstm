@@ -17,16 +17,17 @@ class ProjectController {
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
     def list = {
-			if(params.active=="active"){
-				session.removeAttribute("COMPLETED_PROJ")
-			}
-    		def projectList
-    		def partyProjectList
-    		def isAdmin = SecurityUtils.getSubject().hasRole("ADMIN")
-    		def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
-			def sort = params.sort ? params.sort : 'dateCreated' 
-			def order = params.order ? params.order : 'desc'
-		    def now = GormUtil.convertInToGMT( "now",session.getAttribute("CURR_TZ")?.CURR_TZ )
+		def active
+		if(params.active=="active"){
+			session.removeAttribute("COMPLETED_PROJ")
+		}
+		def projectList
+		def partyProjectList
+		def isAdmin = SecurityUtils.getSubject().hasRole("ADMIN")
+		def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
+		def sort = params.sort ? params.sort : 'dateCreated' 
+		def order = params.order ? params.order : 'desc'
+	    def now = GormUtil.convertInToGMT( "now",session.getAttribute("CURR_TZ")?.CURR_TZ )
 		if(params._action_List=="Show Completed Projects"){
 			projectList = projectService.getCompletedProject( now, isAdmin, sort, order )
 			session.setAttribute("COMPLETED_PROJ", "COMPLETE")
@@ -43,7 +44,7 @@ class ProjectController {
             tableFacade.setColumnProperties("projectCode","name","comment")
             tableFacade.render()
         }else
-        	return [ projectList:projectList ]
+        	return [ projectList:projectList, active:params.active]
     }
     /*
      *  return the details of Project

@@ -24,18 +24,23 @@ function onInvokeExportAction(id) {
 </g:if>
 <div>
 	<div class="buttons"> 
-		<g:form action="create" method="post">
+		<g:form action="list" method="post">
 		<span class="button"><g:actionSubmit class="save" action="Create" value="Create Project" /></span>
 		<span class="button"><input type="button" class="save" onclick="javascript:location.href='../projectUtil/createDemo'" value="Create Demo Project" /></span>
-		<span class="button"><g:actionSubmit class="save" action="List" value="Show Completed Projects"/></span>
-		</g:form>
+		<g:if test="${active == 'false'}">
+			<span class="menuButton"> <g:link class="save" controller="project" action="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">Show Active Projects</g:link></span>		
+		</g:if >
+		<g:else>
+			<span class="menuButton"><g:link class="save"controller="project" action="list" params="[active:'false',_action_List:'Show Completed Projects']" >Show Completed Projects </g:link></span>
+		</g:else>
+		</g:form>															
 	</div>
 	<form name="projectForm" action="list">
          <jmesa:tableFacade id="tag" items="${projectList}" maxRows="25" stateAttr="restore" var="projectInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
              <jmesa:htmlTable style=" border-collapse: separate">
                  <jmesa:htmlRow highlighter="true">
                      <jmesa:htmlColumn property="projectCode" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-						<g:link controller="project" action="addUserPreference" params="['selectProject':projectInstance.projectCode]">${projectInstance.projectCode}</g:link>
+					 <g:link controller="project" action="addUserPreference" params="['selectProject':projectInstance.projectCode]">${projectInstance.projectCode}</g:link>
 					 </jmesa:htmlColumn>
 					 <jmesa:htmlColumn property="name" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${projectInstance.name}</jmesa:htmlColumn>
                      <jmesa:htmlColumn property="startDate" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor"><tds:convertDateTime date="${projectInstance?.startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>

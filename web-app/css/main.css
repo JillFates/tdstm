@@ -325,8 +325,6 @@ th.desc a {
 	clear:both;
 }
 
-
-
 .clear_filter {
 
 	font-size: 14px;
@@ -335,4 +333,10 @@ th.desc a {
 
 	vertical-align: baseline;
 
+}
+
+.menuButton a.save {
+   background: transparent url(../images/skin/database_save.png) 5px 50% no-repeat;
+    color: #333;
+    padding-left: 25px;
 }
