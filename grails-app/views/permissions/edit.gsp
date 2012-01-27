@@ -27,21 +27,23 @@
 				<tbody>
 					<g:each var="permissionGroup" in="${permissions}" var="permission" status="i">
 						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" align="center">
-							<td style="text-align: center;">
+							<td style="text-align: left;">
 								${permission.permissionGroup.key}
 							</td>
-							<td style="text-align: center;">
+							<td style="text-align: left;">
 								${permission.permissionItem}
 							</td>
 							<g:each in="${Permissions.Roles.values()}" var='role'>
-								<td style="text-align: center;">
-									<g:if test="${RolePermissions.findByRoleAndPermission(role.toString(), permission)}">
+								<g:if test="${RolePermissions.findByRoleAndPermission(role.toString(), permission)}">
+									<td style="text-align: center;background-color:lightGreen;">
 										<input type="checkbox" name="role_${permission.id}_${role.toString()}" checked="checked"> 
-									</g:if>
-									<g:else>
+									</td>
+								</g:if>
+								<g:else>
+									<td style="text-align: center;">
 										<input type="checkbox" name="role_${permission.id}_${role.toString()}"> 
-									</g:else>
-								</td>
+									</td>
+								</g:else>
 							</g:each>
 						</tr>
 					</g:each>

@@ -26,14 +26,14 @@
 				<tbody>
 					<g:each var="permissionGroup" in="${permissions}" var="permission" status="i">
 						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" align="center">
-							<td style="text-align: center;">
+							<td style="text-align: left;">
 								${permission.permissionGroup.key}
 							</td>
-							<td style="text-align: center;">
+							<td style="text-align: left;">
 								${permission.permissionItem}
 							</td>
 							<g:each in="${Permissions.Roles.values()}" var='role'>
-								<td style="text-align: center;">
+								<td style="text-align: center;background-color:lightGreen;">
 									${RolePermissions.findByRoleAndPermission(role.toString(), permission) ? 'yes' :'-'}
 								</td>
 							</g:each>
