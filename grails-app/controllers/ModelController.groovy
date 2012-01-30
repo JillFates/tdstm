@@ -711,6 +711,11 @@ class ModelController {
 			
 			def modelSheet = book.getSheet("model")
 			def models = Model.findAllBySourceTDS(1)
+			if(params.exportCheckbox){
+				models = Model.findAllBySourceTDS(1)
+			} else {
+				models =Model.findAll()
+			}
 			
 			for ( int r = 0; r < models.size(); r++ ) {
 				modelSheet.addCell( new Label( 0, r+1, String.valueOf(models[r].id )) )
@@ -856,11 +861,13 @@ class ModelController {
 	                 //check for column
 	 				def modelSheet = workbook.getSheet( "model" )
 					def modelCol = modelSheet.getColumns()
+					//def colContain = modelCol.
 					for ( int c = 0; c < modelCol; c++ ) {
 						def cellContent = modelSheet.getCell( c, 0 ).contents
 						modelSheetColumnNames.put(cellContent, c)
 					}
 	                missingHeader = checkHeader( sheetNameMap.get("model"), modelSheetColumnNames )
+					def onlyTds 
 					// Statement to check Headers if header are not found it will return Error message
 					if ( missingHeader != "" ) {
 						flash.message = " Column Headers : ${missingHeader} not found, Please check it."
@@ -869,6 +876,7 @@ class ModelController {
 					} else {
 						def sheetrows = modelSheet.rows
 						for ( int r = 1; r < sheetrows ; r++ ) {
+							onlyTds = false
 							def valueList = new StringBuffer("(")
 		             		def manuId
 							def createdPersonId
@@ -914,6 +922,7 @@ class ModelController {
 									int isTDS = 0
 									if(modelSheet.getCell( cols, r ).contents.toLowerCase() == "tds"){
 										isTDS = 1
+										onlyTds = true
 									}
 									valueList.append(isTDS+",")
 									break;
@@ -969,9 +978,18 @@ class ModelController {
 		                 									
 		                 	}
 		             		try{
-		             			if(manuId){
-		             				jdbcTemplate.update("insert into model_sync( model_temp_id, name,aka, description,manufacturer_temp_id,manufacturer_name,asset_type,blade_count,blade_label_count,blade_rows,front_image,power_nameplate,power_design,power_use,sourcetdsversion,use_image,usize,height,weight,depth,width,layout_style,product_line,model_family,end_of_life_date,end_of_life_status,sourceurl,model_status,batch_id,manufacturer_id,created_by_id,updated_by_id,validated_by_id, model_scope_id ) values "+valueList.toString()+"${modelSyncBatch.id}, $manuId, $createdPersonId, $updatedPersonId, $validatedPersonId, $projectId) ")
-									modelAdded = r
+		             			if(manuId){ 
+									 if(params.importCheckbox ){
+										 if(onlyTds == true) {
+											jdbcTemplate.update("insert into model_sync( model_temp_id, name,aka, description,manufacturer_temp_id,manufacturer_name,asset_type,blade_count,blade_label_count,blade_rows,sourcetds,power_nameplate,power_design,power_use,sourcetdsversion,use_image,usize,height,weight,depth,width,layout_style,product_line,model_family,end_of_life_date,end_of_life_status,sourceurl,model_status,batch_id,manufacturer_id,created_by_id,updated_by_id,validated_by_id, model_scope_id ) values "+valueList.toString()+"${modelSyncBatch.id}, $manuId, $createdPersonId, $updatedPersonId, $validatedPersonId, $projectId)")
+											modelAdded = r                                                                                                                                                                                                                    
+										 } else {
+										 	modelSkipped += ( r +1 )
+										 }	
+									 } else {
+									 	jdbcTemplate.update("insert into model_sync( model_temp_id, name,aka, description,manufacturer_temp_id,manufacturer_name,asset_type,blade_count,blade_label_count,blade_rows,sourcetds,power_nameplate,power_design,power_use,sourcetdsversion,use_image,usize,height,weight,depth,width,layout_style,product_line,model_family,end_of_life_date,end_of_life_status,sourceurl,model_status,batch_id,manufacturer_id,created_by_id,updated_by_id,validated_by_id, model_scope_id ) values "+valueList.toString()+"${modelSyncBatch.id}, $manuId, $createdPersonId, $updatedPersonId, $validatedPersonId, $projectId) ")
+										 modelAdded = r
+									 }	  
 		             			} else {
 		             				modelSkipped += ( r +1 )
 		             			}
