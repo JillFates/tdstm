@@ -15,7 +15,8 @@ class CustomSecurityTagLib {
 	def hasPermissionToAnyRole = { attrs ->
 		def returnVal = false
 		def roles = attrs['roles'];
-		def permission = attrs['permission']
+		def permissionItem = attrs['permission']
+		def permission = Permissions.findByPermissionItem(permissionItem)
 		
 		def subject = SecurityUtils.subject
 		def hasRoles = subject.hasRoles(roles)
@@ -35,7 +36,8 @@ class CustomSecurityTagLib {
 	def hasPermission = { attrs ->
 		def returnVal = false
 		def role = attrs['roles'];
-		def permission = attrs['permission']
+		def permissionItem = attrs['permission']
+		def permission = Permissions.findByPermissionItem(permissionItem)
 		
 		def subject = SecurityUtils.subject
 		def hasRole = subject.hasRole(role)
@@ -55,7 +57,8 @@ class CustomSecurityTagLib {
 	def lacksPermissionToAllRole = { attrs ->
 		def returnVal = true
 		def roles = attrs['roles'];
-		def permission = attrs['permission']
+		def permissionItem = attrs['permission']
+		def permission = Permissions.findByPermissionItem(permissionItem)
 		
 		def subject = SecurityUtils.subject
 		def hasRoles = subject.hasRoles(roles)
