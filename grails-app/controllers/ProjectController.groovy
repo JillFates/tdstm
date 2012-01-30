@@ -44,7 +44,7 @@ class ProjectController {
             tableFacade.setColumnProperties("projectCode","name","comment")
             tableFacade.render()
         }else
-        	return [ projectList:projectList, active:params.active]
+        	return [ projectList:projectList]
     }
     /*
      *  return the details of Project
