@@ -33,9 +33,12 @@
 								${permission.permissionItem}
 							</td>
 							<g:each in="${Permissions.Roles.values()}" var='role'>
-								<td style="text-align: center;background-color:lightGreen;">
-									${RolePermissions.findByRoleAndPermission(role.toString(), permission) ? 'yes' :'-'}
-								</td>
+								<g:if test="${RolePermissions.findByRoleAndPermission(role.toString(), permission)}">
+									<td style="text-align: center;background-color:lightGreen;">Yes</td>
+								</g:if>
+								<g:else>
+									<td style="text-align: center;">-</td>
+								</g:else>
 							</g:each>
 						</tr>
 					</g:each>
