@@ -2,7 +2,7 @@
 	<table style="border:0;width:1000px;">
 		<tr>
 			<td colspan="2">
-				<div class="dialog" ondblclick="editEntity('Server', ${assetEntityInstance?.id})">
+				<div class="dialog" ondblclick="editEntity('${redirectTo}','Server', ${assetEntityInstance?.id})">
 					<table>
 						<tbody>
 							
