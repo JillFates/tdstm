@@ -160,6 +160,9 @@ class ClientConsoleController {
 			resultList.each{
 				def stateId = 0
 				def assetId = it.id
+				def assets = AssetEntity.get(assetId)
+				def asset = AssetTransition.findByAssetEntity(assets)
+				def lastUpdate = asset?.dateCreated
 				def htmlTd = []
 				def maxstate = it.maxstate
                 def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
@@ -229,7 +232,7 @@ class ClientConsoleController {
                     htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass tranCell\"  >&nbsp;</td>"
                 }
                 assetEntityList << [id: assetId, asset:it, transitions:htmlTd, checkVal:check, 
-									currentStatus : it.currentStatus ? stateEngineService.getState(projectInstance.workflowCode,it.currentStatus) : "" ]
+									currentStatus : it.currentStatus ? stateEngineService.getState(projectInstance.workflowCode,it.currentStatus) : "" , lastUpdate:lastUpdate]
 			}
 
 			userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")

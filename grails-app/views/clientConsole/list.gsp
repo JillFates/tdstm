@@ -207,6 +207,7 @@
 					</g:each>
 				</select>
 			</th>
+			<g:sortableColumn property="updated" title="Updated" params="['projectId':projectId]" />
 
 			<g:if test="${browserTest}">
 			<g:each in="${processTransitionList}"  var="task">
@@ -281,6 +282,11 @@
 				<g:else>
 					${assetEntity.currentStatus}&nbsp;
 				</g:else>
+			</td>
+			<td>
+			<tds:convertDateTime date="${assetEntity.lastUpdate}"
+							  		timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+			  
 			</td>
 			<g:each in="${assetEntity.transitions}" var="transition">${transition}</g:each>
 			</tr>
