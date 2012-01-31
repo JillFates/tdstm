@@ -701,6 +701,21 @@ class ReportsController {
     								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
     			}
     		}
+			if( params.newsInfo == "true" ) {
+				def moveEvent = MoveEvent.findByProject(projectInstance)
+				def moveEventNewsList=MoveEventNews.findAllByMoveEvent(moveEvent)
+				moveEventNewsList.each{ moveEventNews ->
+					moveEventNews?.resolution = moveEventNews?.resolution ? moveEventNews?.resolution : ''
+					reportFields <<['assetName':'', 'assetTag':'', 'sourceTargetRoom':'','model':'',
+								'commentCode':"",'commentType':"news",
+								'occuredAt':GormUtil.convertInToUserTZ( moveEventNews?.dateCreated, tzId ),
+								'createdBy':moveEventNews?.createdBy.toString(),
+								'issue':moveEventNews.message +"/"+  moveEventNews?.resolution , 'bundleNames':'','projectName':projectInstance?.name,
+								'clientName':projectInstance?.client?.name,
+								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
+				}
+
+			}
     		if(reportFields.size() <= 0) {    		
         		flash.message = " No Issues Were found for  selected values  "
         		redirect( action:'getBundleListForReportDialog', params:[reportId: 'Issue Report'] )

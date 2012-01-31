@@ -66,12 +66,19 @@
 		<td style="width:auto;"><input id="resolvedCheck" type="checkbox" name="resolvedCheck" checked="checked" onclick="checkBoxChange(this.id, 'reportResolveInfo', this.checked)"/>Include resolved issues in report</td>
 		</tr>
 		<tr>
+		<tr>
+		<td>
+		</td>
+		<td style="width:auto;"><input id="newsCheck" type="checkbox" name="newsCheck" checked="checked" onclick="checkBoxChange(this.id, 'newsInfoId', this.checked)"/>Include news in report</td>
+		</tr>
+		<tr>
 			<td class="buttonR"><g:jasperReport controller="reports" action="issueReport" jasper="issueReport" format="PDF,XLS" name="Generate">
 				<input type="hidden" name="moveBundle" id="moveBundle" value="null" />
 				<input type="hidden" name="reportSort" id="reportSort" value="id" />
 				<input type="hidden" name="reportResolveInfo" id="reportResolveInfo" value="true" />
 				<input type="hidden" name="commentCode" id="commentCodeId"/>
 				<input type="hidden" name="commentInfo" id="commentInfoId" value="true" />
+				<input type="hidden" name="newsInfo" id="newsInfoId" value="true"/>
 				</g:jasperReport>
 			</td>
 		</tr>
