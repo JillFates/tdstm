@@ -36,14 +36,9 @@ class RolePermissions {
 		return returnVal
 	}
 	
-	static Boolean hasPermissionToAnyRole(role, permission){
+	static Boolean hasPermissionToAnyRole(roles, permission){
 		def returnVal = false
-		def rolePermissions = RolePermissions.createCriteria().list {
-			and {
-				'in' ('role', role)
-				eq('permission', permission )
-			}
-		}
+		def rolePermissions = RolePermissions.findAllByPermissionAndRoleInList(permission,roles)
 		if(rolePermissions.size()>0){
 			returnVal = true
 		}
