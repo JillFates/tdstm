@@ -28,7 +28,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td colspan="2"><div class="dialog" ondblclick="editEntity('Files', ${filesInstance?.id})">
+		<td colspan="2"><div class="dialog" ondblclick="editEntity('${redirectTo}','Files', ${filesInstance?.id})">
 				<table>
 					<tbody>
 						<tr class="prop">

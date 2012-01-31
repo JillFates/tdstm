@@ -1,7 +1,7 @@
 <table style="border: 0">
 	<tr>
 		<td colspan="2">
-			<div class="dialog" ondblclick="editEntity('Database',${databaseInstance?.id})">
+			<div class="dialog" ondblclick="editEntity('${redirectTo}','Database',${databaseInstance?.id})">
 				<table>
 					<tbody>
 						<tr class="prop">
