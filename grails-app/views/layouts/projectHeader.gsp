@@ -158,9 +158,9 @@
 					<td style="vertical-align:top"><span class="megamenuSection">Client/Project</span><br />
 						<ul >
 							<li><g:link class="mmlink" controller="project" action="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">List Projects</g:link></li>
-							<jsec:hasRole name="ADMIN">
+							<tds:hasPermission permission='ProjectHeaderView'>
 							<li><g:link class="mmlink" controller="project" action="create"  onclick="hideMegaMenu('projectMegaMenu')">Create Project</g:link></li>
-							</jsec:hasRole>
+							</tds:hasPermission>
 							<li>&nbsp;</li>
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMClientProjectSettings?cover=print','help');"  onclick="hideMegaMenu('projectMegaMenu')">help</a></li>
@@ -209,11 +209,12 @@
 					</tr></table>
 				</div>
 			</li>
+			<tds:hasPermission permission='RackMenuView'>
 			<li id="rackMenuId" ><g:link class="home" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" controller="rackLayouts" action="create">Racks
 				<a id="rackAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#racksMegaMenu')" href="javascript:showMegaMenu('#racksMegaMenu')" style="float: left"></a></g:link>
 				</li>
-
-	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
+            </tds:hasPermission>
+	        <tds:hasPermission permission='AssetMenuView'>
 			<li id="assetMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('#assetMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="assetImport">Assets
 				<a id="assetAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#assetMegaMenu')" href="javascript:showMegaMenu('#assetMegaMenu')" style="display: inline"></a></g:link>
 				<div class="megamenu rooms" id="assetMegaMenu" onmouseover="showMegaMenu('#assetMegaMenu')" onmouseout="mclosetime()" style="display: none;">
@@ -271,6 +272,8 @@
 					</tr></table>
 				</div>	
 			</li>
+			</tds:hasPermission>
+			<tds:hasPermission permission='EventMenuView'>
 			<li id="eventMenuId" style="position:relative; float: left;"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" controller="moveEvent" action="show" >Events </g:link>
 			
 				<div class="megamenu rooms" id="bundleMegaMenu" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" style="display: none;">
@@ -313,21 +316,22 @@
 					</tr></table>
 				</div>
 			</li>
+			</tds:hasPermission>
+			<tds:hasPermission permission='BundleMenuView'>
 			<li id="bundleMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles
 				<a id="bundleAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#bundleMegaMenu')" href="javascript:showMegaMenu('#bundleMegaMenu')" style="display: inline"></a></g:link>
 			</li>
 
 			<li id="teamMenuId"><g:link class="home" onmouseover="showMegaMenu('')" onmouseout="mclosetime()" controller="clientTeams" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('bundleMegaMenu')">Teams</g:link></li>
 			<li>&nbsp;</li>
-	        </jsec:lacksAllRoles>
-
-	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
+            </tds:hasPermission>
+	        <tds:hasPermission permission='ProjectHeaderView'>
 			<li id="consoleMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('#consoleMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console
 				<a id="consoleAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#consoleMegaMenu')" href="javascript:showMegaMenu('#consoleMegaMenu')" style="display: inline"></a></g:link>
 			    <div class="megamenu rooms" id="consoleMegaMenu" onmouseover="showMegaMenu('#consoleMegaMenu')" onmouseout="mclosetime()" style="display: none;">
 					<table class="mmtable room_rack"><tr>
 					<td style="vertical-align:top"  ><span class="megamenuSection">Supervisor Console</span><br />
-					<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
+					<tds:hasPermission permission='ProjectHeaderView'>
 						<ul>
 							<li><g:link class="mmlink" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show','teamType':'MOVE']" onclick="hideMegaMenu('consoleMegaMenu')">Supervise Move Techs</g:link></li>
 							<li><g:link class="mmlink" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show','teamType':'ADMIN']" onclick="hideMegaMenu('consoleMegaMenu')">Supervise Admins</g:link></li>
@@ -336,10 +340,10 @@
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('consoleMegaMenu')">help</a></li>
 							</tds:hasPermission>
 						</ul>
-						</jsec:hasAnyRole>
+						</tds:hasPermission>
 					</td>
 					<td style="vertical-align:top"><span class="megamenuSection">News</span><br />
-			        <jsec:hasAnyRole in="['ADMIN']">
+			        <tds:hasPermission permission='ProjectHeaderView'>
 						<ul>
 							<li><g:link class="mmlink" controller="newsEditor" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('consoleMegaMenu')">List News</g:link></li>
 							<li><a class="mmlink" href="javascript:openCreateNewsDialog()" onclick="hideMegaMenu('consoleMegaMenu')">Create News</a></li>
@@ -348,10 +352,10 @@
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('consoleMegaMenu')">help</a></li>
 							</tds:hasPermission>
 						</ul>
-			        </jsec:hasAnyRole>
+			        </tds:hasPermission>
 					</td>
 					<td style="vertical-align:top"><span class="megamenuSection">Cart Tracker</span><br />
-					<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+					<tds:hasPermission permission='ProjectHeaderView'>
 						<ul>
 							<li><g:link class="mmlink" controller="cartTracking" action="cartTracking" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('consoleMegaMenu')">Cart Status</g:link></li>
 							<li><a class="mmlink" href="#" onclick="hideMegaMenu('consoleMegaMenu')">Truck GPS Tracking</a></li>
@@ -360,22 +364,22 @@
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('consoleMegaMenu')">help</a></li>
 							</tds:hasPermission>
 						</ul>
-					</jsec:hasAnyRole>
+					</tds:hasPermission>
 					</td>
 					</tr></table>
 				</div>
 			</li>
-	        </jsec:hasAnyRole>
+	        </tds:hasPermission>
 
 			<li id="dashboardMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('')" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link></li>
 			<li id="assetTrackerMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker</g:link></li>
-	        <jsec:lacksAllRoles in="['MANAGER','OBSERVER']">
+	        <tds:hasPermission permission='ReportMenuView'>
 			<li id="reportsMenuId" style="position:relative; float: left;"><g:link class="home" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" controller="reports" params="[projectId:currProjObj?.id]">Reports
 	        	<a id="reportAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#reportsMegaMenu')" href="javascript:showMegaMenu('#reportsMegaMenu')" style="display: inline"></a></g:link>
 				<div class="megamenu rooms" id="reportsMegaMenu" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" style="display: none;">
 					<table class="mmtable "><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Discovery</span><br />
-					<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
+					<tds:hasPermission permission='ProjectHeaderView'>
 						<ul>
 							<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Rack+Layout" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Racks (old)</a> </li>
 							<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingConflict" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Cabling Conflict</a> </li>
@@ -386,10 +390,10 @@
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('reportsMegaMenu')">help</a></li>
 							</tds:hasPermission>
 						</ul>
-					</jsec:hasAnyRole>
+					</tds:hasPermission>
 					</td>
 					<td style="vertical-align:top"><span class="megamenuSection">Move Prep</span><br />
-			        <jsec:hasAnyRole in="['ADMIN']">
+			       <tds:hasPermission permission='ProjectHeaderView'>
 						<ul >
 							<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Login+Badges" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Login Badges</a> </li>
 							<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Asset+Tag" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Asset Tags</a> </li>
@@ -400,10 +404,10 @@
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('reportsMegaMenu')">help</a></li>
 							</tds:hasPermission>
 						</ul>
-			        </jsec:hasAnyRole>
+			       </tds:hasPermission>
 					</td>
 					<td style="vertical-align:top"><span class="megamenuSection">Move Day</span><br />
-					<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+					<tds:hasPermission permission='ProjectHeaderView'>
 						<ul>
 							<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Issue+Report" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Issue Report</a> </li>
 							<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=MoveResults" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Move Results</a> </li>
@@ -414,19 +418,19 @@
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('reportsMegaMenu')">help</a></li>
 							</tds:hasPermission>
 						</ul>
-					</jsec:hasAnyRole>
+					</tds:hasPermission>
 					</td>
 					</tr></table>
 				</div>
 	        </li>
-	        </jsec:lacksAllRoles>
+	        </tds:hasPermission>
 	      </ul>
 	    </div>
 
 
 		<div class="menu2" id="adminMenu" style="background-color:#003366;display: none;">
 		<ul>
-			<jsec:hasRole name="ADMIN">
+			<tds:hasPermission permission='ProjectHeaderView'>
 			<li><g:link class="home" controller="auth" action="home">Admin</g:link> </li>
 			<li><g:link class="home" controller="workflow" action="home">Workflows </g:link> </li>
 			<li><g:link class="home" controller="partyGroup" id="${partyGroup}">Company</g:link></li>
@@ -435,17 +439,17 @@
 			<li><g:link class="home" controller="manufacturer" id="${partyGroup}">Manufacturers</g:link></li>
 			<li><g:link class="home" controller="model" id="${partyGroup}">Models</g:link></li>
 			<li><g:link class="home" controller="model" action="importExport">Sync</g:link></li>
-		</jsec:hasRole>
+		</tds:hasPermission>
 		</ul>
 		</div>
 		<div class="menu2" id="projectMenu" style="background-color:#003366;display: none;">
 		<ul>
 			<li><g:link class="home" controller="project" action="list" params="[active:'active']">List Projects</g:link> </li>
 			<g:if test="${currProjObj}"><li><g:link class="home" controller="projectUtil">Project: ${currProjObj.name}</g:link></li></g:if>
-			<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
+			<tds:hasPermission permission='ProjectHeaderView'>
 			<li><g:link class="home" controller="person" action="projectStaff" params="[projectId:currProjObj?.id]" >Staff</g:link></li>
-			</jsec:lacksAllRoles>
-		</ul>
+			</tds:hasPermission>
+			</ul>
 		</div>
 
 		<div class="menu2" id="assetMenu" style="background-color:#003366;display: none;">
@@ -472,15 +476,15 @@
 
 	    <div class="menu2" id="consoleMenu" style="background-color:#003366;display: none;">
 		<ul >
-	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','MANAGER']">
+	       <tds:hasPermission permission='ProjectHeaderView'>
 			<li><g:link class="home" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console</g:link></li>
-	        </jsec:hasAnyRole>
-	        <jsec:hasAnyRole in="['ADMIN']">
+	        </tds:hasPermission>
+	        <tds:hasPermission permission='ProjectHeaderView'>
 			<li><g:link class="home" controller="newsEditor" params="[projectId:currProjObj?.id]">News</g:link></li>
-	        </jsec:hasAnyRole>
-	        <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+	        </tds:hasPermission>
+	        <tds:hasPermission permission='ProjectHeaderView'>
 			<li><g:link class="home" controller="cartTracking" action="cartTracking" params="[projectId:currProjObj?.id]">Carts</g:link></li>
-	        </jsec:hasAnyRole>
+	        </tds:hasPermission>
 		</ul>
 	    </div>
 
@@ -588,17 +592,17 @@
 						<label for="nickName"><b>Expiry Date:<span style="color: red">*</span></label>
 					</td>
 					<td valign="top" class="value">
-					<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+					<tds:hasPermission permission='ProjectHeaderView'>
 						<script type="text/javascript">
 						$(document).ready(function(){
 				        	$("#expiryDateId").datetimepicker();
 				        });
 					    </script>
         	            <input type="text" maxlength="64" id="expiryDateId" name="expiryDate"/>
-                    </jsec:hasAnyRole>
-                    <jsec:lacksAllRoles in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+                    </tds:hasPermission>
+                    <tds:hasPermission permission='ProjectHeaderView'>
 						<input type="text" maxlength="64" id="expiryDateId" name="expiryDate" readonly="readonly" style="background: none;border: 0"/>
-                    </jsec:lacksAllRoles>
+                    </tds:hasPermission>
 					</td>
 				</tr>
                 <tr class="prop">

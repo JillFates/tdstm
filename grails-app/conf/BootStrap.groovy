@@ -23,7 +23,32 @@ class BootStrap {
   			[ PermissionGroup.NAVIGATION, "EventMenuView"],
   			[ PermissionGroup.NAVIGATION, "BundleMenuView"],
   			[ PermissionGroup.NAVIGATION, "ReportMenuView"],
-  			[ PermissionGroup.NAVIGATION, "HelpMenuView"]
+  			[ PermissionGroup.NAVIGATION, "HelpMenuView"],
+			[ PermissionGroup.NAVIGATION, "CommentCrudView"],
+			[ PermissionGroup.NAVIGATION, "ModelDialogView"],
+			[ PermissionGroup.NAVIGATION, "DashboardView"],
+			[ PermissionGroup.NAVIGATION, "AssetEntityShowView"],
+			[ PermissionGroup.NAVIGATION, "DashboardIndexView"],
+			[ PermissionGroup.NAVIGATION, "CompanyHeaderView"],
+			[ PermissionGroup.NAVIGATION, "MainLayoutView"],
+			[ PermissionGroup.NAVIGATION, "ProjectHeaderView"],
+			[ PermissionGroup.NAVIGATION, "MoveBundleEditView"],
+			[ PermissionGroup.NAVIGATION, "MoveBundleShowView"],
+			[ PermissionGroup.NAVIGATION, "MoveEventEditView"],
+			[ PermissionGroup.NAVIGATION, "MoveEventShowView"],
+			[ PermissionGroup.NAVIGATION, "PartyListView"],
+			[ PermissionGroup.NAVIGATION, "PartyShowView"],
+			[ PermissionGroup.NAVIGATION, "PartyRelationshipTypeEditView"],
+			[ PermissionGroup.NAVIGATION, "PartyRelationshipTypeShowView"],
+			[ PermissionGroup.NAVIGATION, "PersonListView"],
+			[ PermissionGroup.NAVIGATION, "PersonShowView"],
+			[ PermissionGroup.NAVIGATION, "ProjectShowView"],
+			[ PermissionGroup.NAVIGATION, "RoleTypeEditView"],
+			[ PermissionGroup.NAVIGATION, "RoleTypeShowView"],
+			[ PermissionGroup.NAVIGATION, "RoomListView"],
+			[ PermissionGroup.NAVIGATION, "RoomShowView"],
+			[ PermissionGroup.NAVIGATION, "UserLoginShowView"]
+			
   			]
   	
   		permissionsList.each {

@@ -15,9 +15,9 @@
 <div class="dialog">
 <div class="nav" style="border: 1px solid #CCCCCC; height: 11px"><span
 	class="menuButton"><g:link class="list" action="list">Party List</g:link></span>
-<jsec:hasRole name="ADMIN">
+<tds:hasPermission permission='PartyShowView'>
 	<span class="menuButton"><g:link class="create" action="create">New Party</g:link></span>
-</jsec:hasRole></div>
+</tds:hasPermission></div>
 <br>
 <table>
 	<tbody>
@@ -50,9 +50,9 @@
 		<tr class="prop">
 			<td valign="top" class="name">Party Type:</td>
 
-			<td valign="top" class="value"><jsec:hasRole name="ADMIN"><g:link controller="partyType"
-				action="show" id="${partyInstance?.partyType?.id}">${partyInstance?.partyType?.encodeAsHTML()}</g:link></jsec:hasRole>
-			<jsec:lacksRole name="ADMIN">${partyInstance?.partyType?.encodeAsHTML()}</jsec:lacksRole>
+			<td valign="top" class="value"><tds:hasPermission permission='PartyShowView'><g:link controller="partyType"
+				action="show" id="${partyInstance?.partyType?.id}">${partyInstance?.partyType?.encodeAsHTML()}</g:link></tds:hasPermission>
+			<tds:hasPermission permission='PartyShowView'>${partyInstance?.partyType?.encodeAsHTML()}</tds:hasPermission>
 			</td>
 
 		</tr>
@@ -60,13 +60,13 @@
 	</tbody>
 </table>
 </div>
-<jsec:hasRole name="ADMIN">
+<tds:hasPermission permission='PartyShowView'>
 	<div class="buttons"><g:form>
 		<input type="hidden" name="id" value="${partyInstance?.id}" />
 		<span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
 		<span class="button"><g:actionSubmit class="delete"
 			onclick="return confirm('Are you sure?');" value="Delete" /></span>
 	</g:form></div>
-</jsec:hasRole></div>
+</tds:hasPermission></div>
 </body>
 </html>

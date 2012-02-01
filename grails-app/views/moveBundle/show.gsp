@@ -68,9 +68,9 @@
   <body>   
     <div class="nav" style="border: 1px solid #CCCCCC; height: 11px;width: 250px; margin:9px 14px 0px">
 			<span class="menuButton"><g:link class="list" action="list">Bundle List</g:link></span>
-		    <jsec:hasRole name="ADMIN">
+		    <tds:hasPermission permission='MoveBundleShowView '>
 		    	<span class="menuButton"><g:link class="create" action="create" params="[projectId:projectId]">New Bundle</g:link></span>
-			</jsec:hasRole>
+			</tds:hasPermission>
 		</div>
     <div class="body" style="width: 330px;">
     	<div class="steps_table" style="float: none;">
@@ -154,11 +154,11 @@
           <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
           <span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this bundle will remove any move teams and any related step data?');" value="Delete" /></span>
           <span class="button"><g:actionSubmit class="delete" action="deleteBundleAndAssets" onclick="return confirm('WARNING: Deleting this bundle will remove any move teams, any related step data, AND ASSIGNED ASSETS? (NO UNDO)?');" value="Delete bundle and assets" /></span>
-          <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+         <tds:hasPermission permission='MoveBundleShowView '>
           	<g:if test="${showHistoryButton}">
           		<span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Are you sure you want to permanently clear transitions for assets in this bundle?');" value="Clear Asset History" action="clearBundleAssetHistory"/></span>
           	</g:if>
-          </jsec:hasAnyRole>
+          </tds:hasPermission>
         </g:form>
       </div>
     </div>

@@ -13,11 +13,11 @@
 
 	            <span class="menuButton"><g:link class="list" action="list" id="${companyId}"  params="[filter:true]">UserLogin List</g:link></span>
 
-	            <jsec:hasRole name="ADMIN">
+	            <tds:hasPermission permission='UserLoginShowView'>
 
 	            <span class="menuButton"><g:link class="create" action="create" params="[companyId:companyId]">New UserLogin</g:link></span>
 
-	            </jsec:hasRole>
+	            </tds:hasPermission>
 
         	</div>
 
@@ -85,7 +85,7 @@
                     </tbody>
                 </table>
             </div>
-            <jsec:hasRole name="ADMIN">
+            <tds:hasPermission permission='UserLoginShowView'>
             <div class="buttons">
                 <g:form>
                     <input type="hidden" name="id" value="${userLoginInstance?.id}" />
@@ -94,7 +94,7 @@
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
                 </g:form>
             </div>
-            </jsec:hasRole>
+           </tds:hasPermission>
         </div>
 <script>
 	currentMenuId = "#adminMenu";

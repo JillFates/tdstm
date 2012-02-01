@@ -20,11 +20,11 @@
     <div class="body">
     <h1>Project</h1>
         
-      <jsec:hasRole name="ADMIN">
+     <tds:hasPermission permission='ProjectShowView'>
     <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
         <span class="menuButton"><g:link class="create" action="create">New Project</g:link></span>
     </div>
-      </jsec:hasRole>
+      </tds:hasPermission>
     <br/>
   	
     <div class="dialog" id="updateShow">
@@ -187,14 +187,14 @@
     <div class="buttons">
       <g:form>
         <input type="hidden" name="id" value="${projectInstance?.id}" />
-        <jsec:hasRole name="PROJECT_ADMIN">
+        <tds:hasPermission permission='ProjectShowView'>
           <span class="button">
             <g:actionSubmit type="button" class="edit" value="Edit"/>
           </span>
-        </jsec:hasRole>
-        <jsec:hasRole name="ADMIN">
+        </tds:hasPermission>
+        <tds:hasPermission permission='ProjectShowView'>
           <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Warning: This will delete the ${projectInstance?.name} project and all of the assets, events, bundles, and any historic data?');" value="Delete" /></span>
-        </jsec:hasRole>
+        </tds:hasPermission>
       </g:form>
     </div></div>
 <script>

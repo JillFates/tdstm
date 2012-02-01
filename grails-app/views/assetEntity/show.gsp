@@ -250,7 +250,7 @@
 	</g:if>
 		<tr>
 			<td colspan="2">
-			<jsec:hasAnyRole in="['ADMIN','PROJ_MGR','PROJECT_ADMIN','SUPERVISOR']">
+			<tds:hasPermission permission='AssetEntityShowView'>
 				<div class="buttons">
 					<input name="attributeSet.id" type="hidden" value="1">
 					<input name="project.id" type="hidden" value="${projectId}">
@@ -276,7 +276,7 @@
 					</a>
 				</g:else>
 				</div>
-			</jsec:hasAnyRole>
+			</tds:hasPermission>
 			</td>
 		</tr>
 	</table>

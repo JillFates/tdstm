@@ -596,18 +596,18 @@ function onInvokeAction(id) {
 											<a href="#" onclick="filterByDataPoints('source','','source_avail_clean')"><u style="color: green;">${bundleTeam?.sourceAvailassets}<span style="font-weight: normal;">rdy</span></u></a> +
 											<a href="#" onclick="filterByDataPoints('source','','source_done_clean')"><u>${bundleTeam?.maxSourceAssets}<span style="font-weight: normal;">dn</span></u></a> = 
 											<a href="#" onclick="filterByDataPoints('source','','')"><u>${bundleTeam?.sourceAssets}</u></a>
-											<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
+											<tds:hasPermission permission='DashboardView'>
 											<a title="Login as.." href="../clientTeams/logisticsHome?bundleId=${moveBundleInstance.id}&teamId=${bundleTeam?.team?.id}">@</a>
-											</jsec:lacksAllRoles>
+											</tds:hasPermission>
 										</g:if>
 										<g:else>
 											<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_pend')"><u>${bundleTeam?.sourcePendAssets}<span style="font-weight: normal;">pend</span></u></a> +
 											<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_avail')"><u style="color: green;">${bundleTeam?.sourceAvailassets}<span style="font-weight: normal;">rdy</span></u></a> +
 											<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','source_done')"><u>${bundleTeam?.maxSourceAssets}<span style="font-weight: normal;">dn</span></u></a> = 
 											<a href="#" onclick="filterByDataPoints('source','${bundleTeam?.team?.id}','')"><u>${bundleTeam?.sourceAssets}</u></a>
-											<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
+											<tds:hasPermission permission='DashboardView'>
 											<a title="Login as.." href="#" onclick="window.open('../clientTeams/home?bundleId=${moveBundleInstance.id}&teamId=${bundleTeam?.team?.id}&location=source&viewMode=mobile','mtwindow','menubar=1,resizable=1,scrollbars=1,width=230,height=480'); ">@</a>
-											</jsec:lacksAllRoles>
+											</tds:hasPermission>
 										</g:else>
 									</td>
 								</tr>
@@ -618,9 +618,9 @@ function onInvokeAction(id) {
 										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_avail')"><u style="color: green;">${bundleTeam?.targetAvailAssets}<span style="font-weight: normal;">rdy</span></u> </a> +
 										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','target_done')"><u> ${bundleTeam?.maxTargetAssets}<span style="font-weight: normal;">dn</span></u> </a> = 
 										<a href="#" onclick="filterByDataPoints('target','${bundleTeam?.team?.id}','')"><u>${bundleTeam?.targetAssets}</u></a>
-										<jsec:lacksAllRoles in="['MANAGER','OBSERVER']"> 
+										<tds:hasPermission permission='DashboardView'>
 										<a title="Login as.." href="#" onclick="window.open('../clientTeams/home?bundleId=${moveBundleInstance.id}&teamId=${bundleTeam?.team?.id}&location=target','mtwindow','menubar=1,resizable=1,scrollbars=1,width=320,height=480'); ">@</a>
-										</jsec:lacksAllRoles>
+										</tds:hasPermission>
 										</g:if>
 										<g:else>
 											<span style="text-align: center;">N/A</span>
@@ -719,7 +719,7 @@ function onInvokeAction(id) {
 					<table>
 						<thead>
 							<tr	id="rowId" onmouseover="$('#rowId').css('background','white');">
-								<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJ_MGR']">
+								<tds:hasPermission permission='DashboardView'>
 								<td id="tdId">
 								<input id="state" type="button" value="State..." onclick="changeState()" title="Change State" />
 								<input type="hidden" name="projectId" value="${projectId}" />
@@ -731,11 +731,11 @@ function onInvokeAction(id) {
 								<input type="hidden" name="team" value="${params.team}"/>
 								<input type="hidden" name="assetLocation" value="${params.assetLocation}"/>
 								<input type="hidden" name="assetStatus" value="${params.assetStatus}"/>
-								<jsec:hasAnyRole in="['ADMIN','PROJ_MGR']">
+								<tds:hasPermission permission='DashboardView'>
 									<input id="state" type="button" value="All.." onclick="selectAll()" title="Select All" />
-								</jsec:hasAnyRole>
+								</tds:hasPermission>
 								</td>
-								</jsec:hasAnyRole>
+								</tds:hasPermission>
 								<td style="vertical-align: middle;" colspan="3">
 									<label for="showAllCheckbox"><input type="checkbox" onclick="showAllAssets()" id="showAllCheckbox"/>&nbsp;Show All&nbsp;</label>
 									&nbsp;&nbsp;<input type="button" onclick="showfilterDialog()" id="filterButtonId" value="Filter"/>
@@ -754,15 +754,15 @@ function onInvokeAction(id) {
 					<jmesa:tableFacade id="tag" items="${assetBeansList}" maxRows="25" stateAttr="restore" var="assetEntityBean" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
 			             <jmesa:htmlTable style=" border-collapse: separate" editable="true">
 			                 <jmesa:htmlRow>
-			                 	<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJ_MGR']">
+			                 	<tds:hasPermission permission='DashboardView'>
 			                 	 <jmesa:htmlColumn property="Actions" title="" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap class="${assetEntityBean?.cssClass}">
-		                         	<jsec:hasAnyRole in="['ADMIN','PROJ_MGR']">
+		                         	<tds:hasPermission permission='DashboardView'>
 										<g:if test="${assetEntityBean.checkVal == true}">
 											<span id="spanId_${assetEntityBean.id}">
 												<g:checkBox name="checkChange" id="checkId_${assetEntityBean.id}" onclick="timedUpdate('never')"></g:checkBox>
 											</span>
 										</g:if>
-									</jsec:hasAnyRole>
+									</tds:hasPermission>
 									<a id="${assetEntityBean.id}" href="javascript:getEntityDetails('console','Server', ${assetEntityBean.id} )">
 										<img src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px" />
 									</a>
@@ -770,7 +770,7 @@ function onInvokeAction(id) {
 										<img src="${createLinkTo(dir:'images',file:'row_arrow.gif')}" border="0px"/>
 									</span>
 		                         </jmesa:htmlColumn>
-								</jsec:hasAnyRole>
+								</tds:hasPermission>
 	 		                     <jmesa:htmlColumn property="priority" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 									<div id="priority_${assetEntityBean.id}" style="width: 100%"
 										onclick="assetDetails('${assetEntityBean.id}')">${assetEntityBean.priority}&nbsp;</div>

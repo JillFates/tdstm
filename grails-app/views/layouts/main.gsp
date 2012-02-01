@@ -101,9 +101,9 @@
         </div>--%>
         <div class="menu2">
       	<ul>
-            <jsec:hasRole name="ADMIN">
+           <tds:hasPermission permission='MainLayoutView '>
 		<li><g:link class="home" controller="auth" action="home">Admin</g:link> </li>
-            </jsec:hasRole>
+            </tds:hasPermission>
 		<li><g:link class="home" controller="projectUtil">Project </g:link> </li>
       </ul>
     </div>
@@ -191,7 +191,7 @@
                     <label for="nickName"><b>Expiry Date:<span style="color: red">*</span></label>
                   </td>
                   <td valign="top" class="value">
-                   <jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+                   <tds:hasPermission permission='MainLayoutView '>
                    <script type="text/javascript">
 						$(document).ready(function(){
 				        	$("#expiryDateId").datetimepicker();
@@ -199,10 +199,10 @@
 				    </script>
 				    
                     <input type="text" maxlength="64" id="expiryDateId" name="expiryDate"/>
-                    </jsec:hasAnyRole>
-                    <jsec:lacksAllRoles in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+                    </tds:hasPermission>
+                    <tds:hasPermission permission='MainLayoutView '>
                     <input type="text" maxlength="64" id="expiryDateId" name="expiryDate" readonly="readonly" style="background: none;border: 0"/>
-                    </jsec:lacksAllRoles>
+                    </tds:hasPermission>
                   </td>
                 </tr>
                  <tr class="prop">

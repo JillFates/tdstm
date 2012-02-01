@@ -9,9 +9,9 @@
 <h1>Edit RoleType</h1>
  <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 	            <span class="menuButton"><g:link class="list" action="list">RoleType List</g:link></span>
-	            <jsec:hasRole name="ADMIN">
+	             <tds:hasPermission permission='RoleTypeEditView'>
 	            <span class="menuButton"><g:link class="create" action="create">New RoleType</g:link></span>
-	            </jsec:hasRole>
+	            </tds:hasPermission>
         	</div>
         	<br/>
 <g:if test="${flash.message}">

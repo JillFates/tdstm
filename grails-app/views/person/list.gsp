@@ -149,12 +149,12 @@ document.createDialogForm.company.value = ${companyId}
 	      </jmesa:tableFacade>
 	  </form>
       </div>
-      <jsec:hasRole name="ADMIN">
+    <tds:hasPermission permission='PersonListView'>
         <div class="buttons"><g:form>
             <input type="hidden" value="${companyId}" name="companyId" />
             <span class="button"><input type="button" value="New" class="create" onClick="createDialog()"/></span>
         </g:form></div>
-    </jsec:hasRole></div>
+    </tds:hasPermission></div>
 
     <div id="dialog" title="Show Staff" style="display:none;">
 
@@ -250,14 +250,14 @@ document.createDialogForm.company.value = ${companyId}
               </tbody>
             </table>
           </div>
-          <jsec:hasRole name="ADMIN">
+          <tds:hasPermission permission='PersonListView'>
           <div class="buttons">
             <input type="hidden" id="id" name="id" value="${personInstance?.id}" />
             <input type="hidden" id="companyId" name="companyId" value="${companyId}" />
             <span class="button"><input type="button" class="edit" value="Edit" onClick="return editPersonDialog()"/></span>
             <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
           </div>
-          </jsec:hasRole>
+          </tds:hasPermission>
         </g:form>
       </div>
     </div>
@@ -402,14 +402,14 @@ document.createDialogForm.company.value = ${companyId}
               </tbody>
             </table>
           </div>
-          <jsec:hasRole name="ADMIN">
+          <tds:hasPermission permission='PersonListView'>
           <div class="buttons">
             <input type="hidden" id="id" name="id" value="${personInstance?.id}" />
             <input type="hidden" id="companyId" name="companyId" value="${companyId}" />
             <span class="button"><g:actionSubmit class="edit" value="Update"  onclick="return validatePersonForm('editForm');" /></span>
             <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
           </div>
-          </jsec:hasRole>
+          </tds:hasPermission>
         </g:form>
       </div>
 

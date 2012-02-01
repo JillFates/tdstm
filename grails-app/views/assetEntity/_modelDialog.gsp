@@ -17,14 +17,14 @@
 		</tbody>
 		</table>
 	</div>
-	<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+	<tds:hasPermission permission='ModelDialogView'>
 	<div class="buttons">
 	    <g:form controller="manufacturer" action="edit" target="new">
 	        <input type="hidden" name="id" id="show_manufacturerId" />
 	        <span class="button"><input type="submit" class="edit" value="Edit" onclick="$('#manufacturerShowDialog').dialog('close')"/></span>
 	    </g:form>
 	</div>
-	</jsec:hasAnyRole>
+	</tds:hasPermission>
 </div>
 <div id="modelShowDialog"  title="Show Model" style="display: none;">
 <div class="dialog">
@@ -100,7 +100,7 @@
 		</tbody>
 	</table>
 </div>
-<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+<tds:hasPermission permission='ModelDialogView'>
 <div class="buttons"> 
 	<g:form action="edit" controller="model" target="new">
 		<input name="id" type="hidden" id="show_modelId"/>
@@ -109,5 +109,5 @@
 		</span>
 	</g:form>
 </div>
-</jsec:hasAnyRole>
+</tds:hasPermission>
 </div>

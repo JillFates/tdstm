@@ -303,11 +303,11 @@
 										<div
 											id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}"
 											align="center" style="display: none;">
-											<jsec:hasAnyRole in="['ADMIN']">
+											<tds:hasPermission permission='DashboardIndexView'>
 												<img
 													id="chart_${moveBundle.id}_${moveBundleStep.transitionId}"
 													src="${createLinkTo(dir:'i/dials',file:'dial-50sm.png')}">
-											</jsec:hasAnyRole>
+											</tds:hasPermission>
 										</div>
 										<%-- <jsec:hasAnyRole in="['ADMIN']">
 								<script language="JavaScript">
@@ -954,11 +954,11 @@
 				}
 				var percentage = $("#percentage_"+moveBundleId+"_"+steps[i].tid).html()
 				if(percentage != "100%" && percentage != "0%"){
-					<jsec:hasAnyRole in="['ADMIN']">
+					<tds:hasPermission permission='DashboardIndexView'>
 					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).show();
 					post_init( "chart_"+moveBundleId+"_"+steps[i].tid, steps[i].dialInd )
 					//post_init( "chart_'+moveBundleId+'_'+steps[i].tid+'", '+steps[i].dialInd+' )
-					</jsec:hasAnyRole>
+					</tds:hasPermission>
 				} else {
 					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).hide();
 				}

@@ -65,7 +65,7 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 	<thead>
 		<tr>
 
-			<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']"><th><a href="#">Action</a></th></jsec:hasAnyRole>
+			 <tds:hasPermission permission='RoomListView'><th><a href="#">Action</a></th></tds:hasPermission>
 
 			<g:sortableColumn property="location" title="Data Center" />
 
@@ -81,9 +81,9 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 		<g:each in="${roomInstanceList}" status="i" var="roomInstance">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-				<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+				 <tds:hasPermission permission='RoomListView'>
 					<td><input type="checkbox" name="checkbox_${roomInstance.id}" id="checkboxId_${roomInstance.id}" onclick="enableActions()"></td>
-				</jsec:hasAnyRole>
+				</tds:hasPermission>
 				<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "location")}</td>
 				
 				<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "roomName")}</td>
@@ -99,11 +99,11 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 <div class="buttons"> 
 	<span class="button">
 		<input type="button" class="edit" value="Create Room" onclick="$('#createRoomDialog').dialog('open');$('#mergeRoomDialog').dialog('close')"/>
-		<jsec:hasAnyRole in="['ADMIN','SUPERVISOR','PROJECT_ADMIN']">
+		 <tds:hasPermission permission='RoomListView'>
 			<span class="button"><input class="create" id="mergeId" type="button" value="Merge" onclick="showMergeDialog()" style="display: none;"/></span>
 			
 			<g:actionSubmit class="delete" action="delete" id="deleteId" value="Delete" style="display: none;"/>
-		</jsec:hasAnyRole>
+		</tds:hasPermission>
 	</span>
 </div>
 </div>

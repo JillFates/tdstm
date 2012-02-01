@@ -81,7 +81,7 @@
 	</tbody>
 </table>
 </div>
-<jsec:hasRole name="ADMIN">
+<tds:hasPermission permission='PersonShowView'>
 <div class="buttons"><g:form>
 	<input type="hidden" name="id" value="${personInstance?.id}" />
 	<input type="hidden" name="companyId" value="${companyId}" />
@@ -90,7 +90,7 @@
 	<span class="button"><g:actionSubmit class="delete"
 		onclick="return confirm('Are you sure?');" value="Delete" /></span>
 </g:form></div>
-</jsec:hasRole>
+</tds:hasPermission>
 </div>
 <script>
 	currentMenuId = "#adminMenu";

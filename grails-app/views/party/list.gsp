@@ -9,12 +9,12 @@
 <body>
 <div class="body">
 <h1>Party List</h1>
-<jsec:hasRole name="ADMIN">
+<tds:hasPermission permission='PartyListView'>
 <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 
 	<span class="menuButton"><g:link class="create" action="create">New Party</g:link></span>
 </div>
-</jsec:hasRole>
+</tds:hasPermission>
 <br>
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
