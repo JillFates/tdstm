@@ -520,7 +520,8 @@ class PmoAssetTrackingService {
 				sptSa.team_code as sourceTeamSa, tptSa.team_code as targetTeamSa,
 				sptDba.team_code as sourceTeamDba, tptDba.team_code as targetTeamDba,
 				max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate, ae.custom1 as custom1, ae.custom2 as custom2,ae.custom3 as custom3,
-				ae.custom3 as custom4,ae.custom5 as custom5,ae.custom6 as custom6,ae.custom7 as custom7,ae.custom8 as custom8, ae.current_status as currentStatus
+				ae.custom3 as custom4,ae.custom5 as custom5,ae.custom6 as custom6,ae.custom7 as custom7,ae.custom8 as custom8, ae.current_status as currentStatus,
+				max(at.date_created) as updated
 				FROM asset_entity ae
 				LEFT JOIN move_bundle mb ON (ae.move_bundle_id = mb.move_bundle_id )
 				LEFT JOIN project_team sptMt ON (ae.source_team_id = sptMt.project_team_id )
@@ -572,12 +573,12 @@ class PmoAssetTrackingService {
 		if(sortby != "" && sortby != null){
 			query.append(" order by $sortby")
 		}else {
-			query.append(" order by ae.application, ae.assetName")
+			query.append(" order by updated")
 		}
 		if(order != "" && order != null){
 			query.append(" $order ")
 		}else {
-			query.append(" asc ")
+			query.append(" desc ")
 		}
 		if(limit && limit != "all"){
 			if(offset){
