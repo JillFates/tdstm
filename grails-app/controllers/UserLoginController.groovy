@@ -9,13 +9,18 @@ class UserLoginController {
     
 	def partyRelationshipService
 	def userPreferenceService
-	
-    def index = { redirect(action:list,params:params) }
 
-    // the delete, save and update actions only accept POST requests
-    def allowedMethods = [delete:'POST', save:'POST', update:'POST']
+	def index = { redirect(action:list,params:params) }
 
-    def list = {
+	// the delete, save and update actions only accept POST requests
+	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
+
+	def list = {
+ 		if(params.inactiveUsers){
+		     session.setAttribute("InActive", "InActive")	
+	    }else if(params.activeUsers ){
+		     session.removeAttribute("InActive")
+		}
 		def companyId = params.id
 		boolean filter = params.filter
 		if(filter){
@@ -27,42 +32,78 @@ class UserLoginController {
 		} else {
 			session.userFilters = params
 		}
-        if(!params.max) params.max = '20'
-        def max = Integer.parseInt( params.max )
+		if(!params.max) params.max = '20'
+		def max = Integer.parseInt( params.max )
 		def offset = params.offset ? Integer.parseInt( params.offset ) : 0
-		
-		def userLoginInstanceList 
+
+		def userLoginInstanceList
 		def userLoginSize
-		
+
 		def isCompanyAdmin = SecurityUtils.getSubject().hasRole("ADMIN")
 		if( isCompanyAdmin ){
-			if( !companyId ){
-				companyId = session.getAttribute("PARTYGROUP")?.PARTYGROUP
+			if(params.companyName ){
+				companyId  = PartyGroup.findByName(params.companyName)?.id
 			}
-			if(companyId){
+			if(params.companyName!="All"){
+				if( !companyId ){
+					companyId = session.getAttribute("PARTYGROUP")?.PARTYGROUP
+				}
+			}
+			if(companyId || params.companyName=="All"){
 				def personsList = partyRelationshipService.getCompanyStaff( companyId )
 				def personIds = ""
 				personsList.each{
 					personIds += "$it.id,"
 				}
-				personIds = personIds.substring(0,personIds.lastIndexOf(','))
-				def sort = params.sort ? params.sort : 'person.firstName'
-				def order = params.order ? params.order : 'asc'
-				userLoginInstanceList = UserLogin.findAll("from UserLogin u where u.person in ($personIds) order by u.${sort} ${order}",[max:max, offset:offset])
-				userLoginSize =  UserLogin.findAll("from UserLogin u where u.person in ($personIds)").size()
+				if(personIds){
+				    personIds = personIds.substring(0,personIds.lastIndexOf(','))
+				
+					def sort = params.sort ? params.sort : 'person.firstName'
+					def order = params.order ? params.order : 'asc'
+					if(params.activeUsers=="showActive" && params.companyName!="All"){
+						  userLoginInstanceList = UserLogin.findAll("from UserLogin u where u.person in ($personIds) and active = 'Y' order by u.${sort} ${order}",[max:max, offset:offset])
+					}else if(params.inactiveUsers){
+					      userLoginInstanceList = UserLogin.findAll("from UserLogin u where u.person in ($personIds) and active = 'N' order by u.${sort} ${order}",[max:max, offset:offset])
+					}else if(session.getAttribute("InActive")=="InActive"){
+					      userLoginInstanceList = UserLogin.findAll("from UserLogin u where u.person in ($personIds) and active = 'N' order by u.${sort} ${order}",[max:max, offset:offset])
+					}else{ 
+	            		  userLoginInstanceList = UserLogin.findAll("from UserLogin u where u.person in ($personIds) and active = 'Y' order by u.${sort} ${order}",[max:max, offset:offset])
+				    }
+					 userLoginSize =  UserLogin.findAll("from UserLogin u where u.person in ($personIds)").size()
+				}else if(params.companyName=="All" && params.inactiveUsers=="showInactive"){
+					      userLoginInstanceList = UserLogin.findAllByActive("N")
+				}else if(params.companyName=="All" && params.activeUsers=="showActive" ){
+					      userLoginInstanceList = UserLogin.findAllByActive("Y")
+				}else if(params.companyName=="All" && session.getAttribute("InActive")=="InActive"){
+					      userLoginInstanceList = UserLogin.findAllByActive("N")
+				}else if(params.inactiveUsers=="showInactive" && params.companyName=="All"){
+				       	  userLoginInstanceList = UserLogin.findAllByActive("N")
+				}else if(params.companyName=="All"){
+				       	  userLoginInstanceList = UserLogin.findAllByActive("Y")
+				}else{
+						userLoginInstanceList = []
+				}
 			} else {
 				flash.message = "Please select Company before navigating to Users"
-		        redirect(controller:'partyGroup',action:'list')
+				redirect(controller:'partyGroup',action:'list')
 			}
 		} else {
 			userLoginInstanceList = UserLogin.list( [max:max, offset:offset] )
-			userLoginSize = UserLogin.count() 
+			userLoginSize = UserLogin.count()
+		}
+		def partyGroupList = PartyGroup.findAllByPartyType( PartyType.read("COMPANY"))
+		def company
+		if(params.companyName!="All"){
+		    company = PartyGroup.findById(companyId)
 		}
 		// Statements for JMESA integration
-    	TableFacade tableFacade = new TableFacadeImpl("tag",request)
-        tableFacade.items = userLoginInstanceList
-        return [ userLoginInstanceList : userLoginInstanceList, companyId:companyId ,userLoginSize:userLoginSize]
-    }
+		TableFacade tableFacade = new TableFacadeImpl("tag",request)
+		tableFacade.items = userLoginInstanceList
+        if(params.companyName=="All"){
+			 company = "All"
+		}
+		return [ userLoginInstanceList : userLoginInstanceList, companyId:companyId ,userLoginSize:userLoginSize,partyGroupList:partyGroupList,company:company]
+	}
 
     def show = {
         def userLoginInstance = UserLogin.get( params.id )
