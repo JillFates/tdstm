@@ -22,7 +22,7 @@ function onInvokeExportAction(id) {
     location.href = 'list?' + parameterString;
 }
 $(document).ready(function() {
-	$('#assetMenu').show();
+	//$('#assetMenu').show();
 	$("#createEntityView").dialog({ autoOpen: false })
 	$("#showEntityView").dialog({ autoOpen: false })
 	$("#editEntityView").dialog({ autoOpen: false })

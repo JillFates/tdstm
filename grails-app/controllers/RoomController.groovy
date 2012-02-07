@@ -393,7 +393,7 @@ class RoomController {
 					   }
 				   }
 			   } else {
-			   		powerX += powerUse
+			   		powerX += powerUsed
 			   }
 		   }
 		   powerA = powerType != "Watts" ?  powerA ? (powerA / 110).toFloat().round(1) : 0.0 : powerA ? Math.round(powerA):0

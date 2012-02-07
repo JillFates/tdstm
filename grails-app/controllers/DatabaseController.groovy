@@ -184,7 +184,7 @@ class DatabaseController {
 		}
 		def databaseInstance = Database.get(params.id)
 		databaseInstance.properties = params
-		if(!databaseInstance.hasErrors() && databaseInstance.save()) {
+		if(!databaseInstance.hasErrors() && databaseInstance.save(flush:true)) {
 			flash.message = "DataBase ${databaseInstance.assetName} Updated"
 			assetEntityService.createOrUpdateDatabaseDependencies(params, databaseInstance)
 			switch(params.redirectTo){

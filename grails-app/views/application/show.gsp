@@ -135,6 +135,74 @@
 							</td>
 						</tr>
 						<tr>
+							<td colspan="2" class="label" nowrap="nowrap">
+								<g:if test="${(applicationInstance.custom1)?.length()>= 4 &&(applicationInstance.custom1)?.substring(0, 4)=='http'}">
+											<a href="javascript:window.open('${applicationInstance.custom1}','help');" style="color:#00E">${applicationInstance.project.custom1}</a>
+								</g:if>
+								<g:else>
+									 Custom1
+								</g:else>
+							</td>
+							<td colspan="2" class="label" nowrap="nowrap">
+								<g:if test="${(applicationInstance.custom2)?.length()>= 4 &&(applicationInstance.custom2)?.substring(0, 4)=='http'}">
+											<a href="javascript:window.open('${applicationInstance.custom2}','help');" style="color:#00E">${applicationInstance.project.custom2}</a>
+								</g:if>
+								<g:else>
+									 Custom 2
+								</g:else>
+							</td>
+							<td colspan="2" class="label" nowrap="nowrap">
+								<g:if test="${(applicationInstance.custom3)?.length()>= 4 &&(applicationInstance.custom3)?.substring(0, 4)=='http'}">
+											<a href="javascript:window.open('${applicationInstance.custom3}','help');" style="color:#00E">${applicationInstance.project.custom3}</a>
+								</g:if>
+								<g:else>
+									 Custom 3
+								</g:else>
+							</td>
+							<td colspan="2" class="label" nowrap="nowrap">
+								<g:if test="${(applicationInstance.custom4)?.length()>= 4 &&(applicationInstance.custom4)?.substring(0, 4)=='http'}">
+											<a href="javascript:window.open('${applicationInstance.custom4}','help');" style="color:#00E">${applicationInstance.project.custom4}</a>
+								</g:if>
+								<g:else>
+									 Custom 4
+								</g:else>
+							</td>
+						</tr>
+						<tr>
+						    <td colspan="2" class="label" nowrap="nowrap">
+								<g:if test="${(applicationInstance.custom5)?.length()>= 4 &&(applicationInstance.custom5)?.substring(0, 4)=='http'}">
+											<a href="javascript:window.open('${applicationInstance.custom5}','help');" style="color:#00E">${applicationInstance.project.custom5}</a>
+								</g:if>
+								<g:else>
+									 Custom 5
+								</g:else>
+							</td>
+							<td colspan="2" class="label" nowrap="nowrap">
+								<g:if test="${(applicationInstance.custom6)?.length()>= 4 &&(applicationInstance.custom6)?.substring(0, 4)=='http'}">
+											<a href="javascript:window.open('${applicationInstance.custom6}','help');" style="color:#00E">${applicationInstance.project.custom6}</a>
+								</g:if>
+								<g:else>
+									 Custom 6
+								</g:else>
+							</td>
+							<td colspan="2" class="label" nowrap="nowrap">
+								<g:if test="${(applicationInstance.custom7)?.length()>= 4 &&(applicationInstance.custom7)?.substring(0, 4)=='http'}">
+											<a href="javascript:window.open('${applicationInstance.custom7}','help');" style="color:#00E">${applicationInstance.project.custom7}</a>
+								</g:if>
+								<g:else>
+									 Custom 7
+								</g:else>
+							</td>
+							<td colspan="2" class="label" nowrap="nowrap">
+								<g:if test="${(applicationInstance.custom8)?.length()>= 4 &&(applicationInstance.custom8)?.substring(0, 4)=='http'}">
+											<a href="javascript:window.open('${applicationInstance.custom8}','help');" style="color:#00E">${applicationInstance.project.custom8}</a>
+								</g:if>
+								<g:else>
+									 Custom 8
+								</g:else>
+							</td>
+						</tr>
+						<tr>
 							<td class="label" nowrap="nowrap"><label for="license">URL</label></td>
 							<td colspan="7"><a href="${applicationInstance.url}" style="color:#00E">${applicationInstance.url}</a>
 							</td>

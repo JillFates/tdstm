@@ -36,6 +36,76 @@
 							<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
 							<td>${databaseInstance?.planStatus}</td>
 						</tr>
+						<tr>
+							<td colspan="2" class="label" nowrap="nowrap">
+								<g:if test="${(databaseInstance.custom1)?.length()>= 4 && (databaseInstance.custom1)?.substring(0, 4)=='http'}">
+											<a href="javascript:window.open('${databaseInstance.custom1}','help');" style="color:#00E">${databaseInstance.project.custom1}</a>
+								</g:if>
+								<g:else>
+									<label for="custom1">Custom1</label>
+								</g:else>
+							</td>
+							<td colspan="2" class="label" nowrap="nowrap">
+								<g:if test="${(databaseInstance.custom2)?.length()>= 4 &&(databaseInstance.custom2)?.substring(0, 4)=='http'}">
+											<a href="javascript:window.open('${databaseInstance.custom2}','help');" style="color:#00E">${databaseInstance.project.custom2}</a>
+								</g:if>
+								<g:else>
+									<label for="custom2">Custom2</label>
+								</g:else>
+							</td>
+							<td colspan="2" class="label" nowrap="nowrap">
+								<g:if test="${(databaseInstance.custom3)?.length()>= 4 &&(databaseInstance.custom3)?.substring(0, 4)=='http'}">
+											<a href="javascript:window.open('${databaseInstance.custom3}','help');" style="color:#00E">${databaseInstance.project.custom3}</a>
+								</g:if>
+								<g:else>
+									<label for="custom3">Custom3</label>
+								</g:else>
+								</td>
+						</tr>
+						<tr>
+							<td colspan="2" class="label" nowrap="nowrap">
+								<g:if test="${(databaseInstance.custom4)?.length()>= 4 &&(databaseInstance.custom4)?.substring(0, 4)=='http'}">
+											<a href="javascript:window.open('${databaseInstance.custom4}','help');" style="color:#00E">${databaseInstance.project.custom4}</a>
+								</g:if>
+								<g:else>
+									<label for="custom4">Custom4</label>
+								</g:else>
+								</td>
+							<td colspan="2" class="label" nowrap="nowrap">
+								<g:if test="${(databaseInstance.custom5)?.length()>= 4 &&(databaseInstance.custom5)?.substring(0, 4)=='http'}">
+											<a href="javascript:window.open('${databaseInstance.custom5}','help');" style="color:#00E">${databaseInstance.project.custom5}</a>
+								</g:if>
+								<g:else>
+									<label for="custom5">Custom5</label>
+								</g:else>
+							</td>
+							<td colspan="2" class="label" nowrap="nowrap">
+								<g:if test="${(databaseInstance.custom6)?.length()>= 4 &&(databaseInstance.custom6)?.substring(0, 4)=='http'}">
+											<a href="javascript:window.open('${databaseInstance.custom6}','help');" style="color:#00E">${databaseInstance.project.custom6}</a>
+								</g:if>
+								<g:else>
+									 <label for="custom6">Custom6</label>
+								</g:else>
+							</td>
+						</tr>
+					    <tr>
+							<td colspan="2" class="label" nowrap="nowrap">
+								<g:if test="${(databaseInstance.custom7)?.length()>= 4 &&(databaseInstance.custom7)?.substring(0, 4)=='http'}">
+											<a href="javascript:window.open('${databaseInstance.custom7}','help');" style="color:#00E">${databaseInstance.project.custom7}</a>
+								</g:if>
+								<g:else>
+									<label for="custom7">Custom7</label>
+								</g:else>
+							</td>
+							<td colspan="2" class="label" nowrap="nowrap">
+								<g:if test="${(databaseInstance.custom8)?.length()>= 4 &&(databaseInstance.custom8)?.substring(0, 4)=='http'}">
+											<a href="javascript:window.open('${databaseInstance.custom8}','help');" style="color:#00E">${databaseInstance.project.custom8}</a>
+								</g:if>
+								<g:else>
+									 <label for="custom7">Custom8</label>
+								</g:else>
+							</td>
+						</tr>
 					</tbody>
 				</table>
 			</div></td>

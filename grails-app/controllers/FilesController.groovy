@@ -153,7 +153,7 @@ class FilesController {
 	def update ={
 		def filesInstance = Files.get(params.id)
 		filesInstance.properties = params
-		if(!filesInstance.hasErrors() && filesInstance.save()) {
+		if(!filesInstance.hasErrors() && filesInstance.save(flush:true)) {
 			flash.message = "File ${filesInstance.assetName} Updated"
 			assetEntityService.createOrUpdateFilesDependencies(params, filesInstance)
 			switch(params.redirectTo){

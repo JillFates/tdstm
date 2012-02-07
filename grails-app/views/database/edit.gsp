@@ -48,6 +48,28 @@
 							<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
 							<td><g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${databaseInstance.planStatus}" tabindex="35" /></td>
 						</tr>
+						<tr>
+							<td class="label" nowrap="nowrap"><label for="custom1">Custom1</label></td>
+							<td><input type="text" id="custom1" name="custom1"  value="${databaseInstance.custom1}"  /></td>
+							<td class="label" nowrap="nowrap"><label for="custom1">Custom2</label></td>
+							<td><input type="text" id="custom2" name="custom2"  value="${databaseInstance.custom2}"  /></td>
+							<td class="label" nowrap="nowrap"><label for="custom3">Custom3</label></td>
+							<td><input type="text" id="custom3" name="custom3"  value="${databaseInstance.custom3}"  /></td>
+						</tr>
+						<tr>
+							<td class="label" nowrap="nowrap"><label for="custom4">Custom4</label></td>
+							<td><input type="text" id="custom4" name="custom4"  value="${databaseInstance.custom4}"  /></td>
+							<td class="label" nowrap="nowrap"><label for="custom5">Custom5</label></td>
+							<td><input type="text" id="custom5" name="custom5"  value="${databaseInstance.custom5}"  /></td>
+							<td class="label" nowrap="nowrap"><label for="custom6">Custom6</label></td>
+							<td><input type="text" id="custom6" name="custom6"  value="${databaseInstance.custom6}"  /></td>
+						</tr>
+						<tr>
+							<td class="label" nowrap="nowrap"><label for="custom7">Custom7</label></td>
+							<td><input type="text" id="custom7" name="custom7"  value="${databaseInstance.custom7}"  /></td>
+							<td class="label" nowrap="nowrap"><label for="custom8">Custom8</label></td>
+							<td><input type="text" id="custom8" name="custom8"  value="${databaseInstance.custom8}"  /></td>
+						</tr>
 					</tbody>
 				</table>
 			</div>

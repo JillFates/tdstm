@@ -102,31 +102,31 @@
 								</td>
 							</tr>
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="license">License</label></td>
-								<td ><input type="text" id="license" name="license" value="${applicationInstance.license}" tabindex="18" />
+								<td class="label" nowrap="nowrap"><label for="custom1">Custom 1</label></td>
+								<td ><input type="text" id="custom1"	name="custom1" value="${applicationInstance.custom1}"  />
 								</td>
-								<td class="label"><label for="retireDate">Retire
-									Date:</label>
+								<td class="label" nowrap="nowrap"><label for="custom1">Custom 2</label></td>
+								<td ><input type="text" id="custom2"	name="custom2" value="${applicationInstance.custom2}"  />
 								</td>
-								<td valign="top"
-									class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}">
-								    <script type="text/javascript" charset="utf-8">
-				                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-				                    </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="retireDate" id="retireDate"
-									value="<tds:convertDate date="${applicationInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />" > 
-							     </td>
-								<td  class="label"><label for="maintExpDate">Maint Exp.
-									</label></td>
-									<td valign="top"
-										class="value ${hasErrors(bean:applicationInstance,field:'maintExpDate','errors')}">
-									    <script type="text/javascript" charset="utf-8">
-					                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-					                    </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="maintExpDate" id="maintExpDate"
-										value="<tds:convertDate date="${applicationInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />" > 
-									</td>
-								<td class="label" nowrap="nowrap"><label for="drRtoDesc">DR RTO</label>
+								<td class="label" nowrap="nowrap"><label for="custom3">Custom 3</label></td>
+								<td ><input type="text" id="custom3"	name="custom3" value="${applicationInstance.custom3}"  />
 								</td>
-								<td ><input type="text" id="drRtoDesc"	name="drRtoDesc" value="${applicationInstance.drRtoDesc}" tabindex="46" />
+								<td class="label" nowrap="nowrap"><label for="custom4">Custom 4</label></td>
+								<td ><input type="text" id="custom4"	name="custom4" value="${applicationInstance.custom4}"  />
+								</td>
+							</tr>
+							<tr>
+								<td class="label" nowrap="nowrap"><label for="custom5">Custom 5</label></td>
+								<td ><input type="text" id="custom5"	name="custom5" value="${applicationInstance.custom5}"/>
+								</td>
+								<td class="label" nowrap="nowrap"><label for="custom6">Custom 6</label></td>
+								<td ><input type="text" id="custom6"	name="custom6" value="${applicationInstance.custom6}"  />
+								</td>
+								<td class="label" nowrap="nowrap"><label for="custom7">Custom 7</label></td>
+								<td ><input type="text" id="custom7"	name="custom7" value="${applicationInstance.custom7}" />
+								</td>
+								<td class="label" nowrap="nowrap"><label for="custom8">Custom 8</label></td>
+								<td ><input type="text" id="custom8"	name="custom8" value="${applicationInstance.custom8}"  />
 								</td>
 							</tr>
 							<tr>
