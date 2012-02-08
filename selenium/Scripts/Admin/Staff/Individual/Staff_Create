@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com" />
 <title>Staff_Create</title>
 </head>
 <body>
@@ -38,12 +38,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Company</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>xpath=/html/body/div/div[3]/div/div/form/div/table/tbody/tr/td/a</td>
+	<td>link=List Staff</td>
 	<td></td>
 </tr>
 <tr>
@@ -183,7 +178,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>//input[@value='Create']</td>
+	<td>css=#createDialogForm &gt; div.buttons &gt; span.button &gt; input.save</td>
 	<td></td>
 </tr>
 <tr>
@@ -194,3 +189,4 @@
 </tbody></table>
 </body>
 </html>
+

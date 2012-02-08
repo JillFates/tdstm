@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com" />
 <title>Comment_AE_Create</title>
 </head>
 <body>
@@ -94,19 +94,9 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>createCommentTable.0.1</td>
-	<td>please select issue instruction comment&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Must Verify</td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
 	<td>mustVerifyEdit</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>createCommentTable.1.0</td>
-	<td>exact:Comment:</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>

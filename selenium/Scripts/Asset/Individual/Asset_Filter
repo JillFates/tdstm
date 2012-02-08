@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://localhost:8080//" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com" />
 <title>Asset_Filter</title>
 </head>
 <body>
@@ -99,87 +99,57 @@
 </tr>
 <tr>
 	<td>waitForTextPresent</td>
-	<td>Show Asset</td>
+	<td>Show Server</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>assetName</td>
+	<td>verifyTextPresent</td>
+	<td>Name</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>manufacturer</td>
+	<td>verifyTextPresent</td>
+	<td>Manufacturer</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>model</td>
+	<td>verifyTextPresent</td>
+	<td>Model</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>assetType</td>
+	<td>verifyTextPresent</td>
+	<td>Type</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>assetTag</td>
+	<td>verifyTextPresent</td>
+	<td>Tag</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>serialNumber</td>
+	<td>verifyTextPresent</td>
+	<td>S/N</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>sourceLocation</td>
+	<td>verifyTextPresent</td>
+	<td>Location</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>sourceRoom</td>
+	<td>verifyTextPresent</td>
+	<td>Room</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>sourceRack</td>
+	<td>verifyTextPresent</td>
+	<td>Rack</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>targetLocation</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>targetRoom</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>targetRack</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>application</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>appOwner</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>appSme</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>shortName</td>
+	<td>verifyTextPresent</td>
+	<td>Alt Name</td>
 	<td></td>
 </tr>
 <tr>
@@ -188,13 +158,13 @@
 	<td></td>
 </tr>
 <tr>
-	<td>click</td>
+	<td>clickAndWait</td>
 	<td>link=List Assets</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//div[@onclick=&quot;createDynFilter(this, 'tag','modelName')&quot;]</td>
+	<td>//div[@onclick=&quot;createDynFilter(this, 'tag','model')&quot;]</td>
 	<td></td>
 </tr>
 <tr>

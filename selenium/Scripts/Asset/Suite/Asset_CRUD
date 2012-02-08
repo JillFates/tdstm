@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://localhost:8080//" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com" />
 <title>Asset_CRUD</title>
 </head>
 <body>
@@ -43,7 +43,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Project</td>
+	<td>link=Client/Project</td>
 	<td></td>
 </tr>
 <tr>
@@ -84,77 +84,57 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>attributeSetId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>select</td>
-	<td>attributeSetId</td>
-	<td>label=Server</td>
-</tr>
-<tr>
-	<td>waitForTextPresent</td>
-	<td>Fields marked ( * ) are mandatory</td>
+	<td>assetName</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>applicationId</td>
+	<td>shortName</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>assetNameId</td>
+	<td>serialNumber</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>shortNameId</td>
+	<td>assetTag</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>serialNumberId</td>
+	<td>assetType</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>assetTagId</td>
+	<td>manufacturer</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>assetTypeId</td>
+	<td>model</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>manufacturerId</td>
+	<td>ipAddress</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>modelId</td>
+	<td>os</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>ipAddressId</td>
+	<td>sourceLocation</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>osId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>sourceLocationId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>sourceRoomId</td>
+	<td>sourceRoom</td>
 	<td></td>
 </tr>
 <tr>
@@ -164,132 +144,122 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>sourceRackPositionId</td>
+	<td>sourceRackPosition</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>sourceBladeChassisId</td>
+	<td>sourceBladeChassis</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>sourceBladePositionId</td>
+	<td>sourceBladePosition</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>targetLocationId</td>
+	<td>targetLocation</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>targetRoomId</td>
+	<td>targetRoom</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>targetRackId</td>
+	<td>targetRack</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>targetRackPositionId</td>
+	<td>targetRackPosition</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>targetBladeChassisId</td>
+	<td>targetBladeChassis</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>targetBladePositionId</td>
+	<td>targetBladePosition</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>custom1Id</td>
+	<td>custom1</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>custom2Id</td>
+	<td>custom2</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>custom3Id</td>
+	<td>custom3</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>custom4Id</td>
+	<td>custom4</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>custom5Id</td>
+	<td>custom5</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>custom6Id</td>
+	<td>custom6</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>custom7Id</td>
+	<td>custom7</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>custom8Id</td>
+	<td>custom8</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>truckId</td>
+	<td>truck</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>cartId</td>
+	<td>cart</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>shelfId</td>
+	<td>shelf</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>railTypeId</td>
+	<td>railType</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>appOwnerId</td>
+	<td>priority</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>appSmeId</td>
+	<td>planStatus</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>priorityId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>planStatusId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>//input[@value='Create' and @type='submit']</td>
+	<td>//input[@value='Create']</td>
 	<td></td>
 </tr>
 <tr>
@@ -299,107 +269,92 @@
 </tr>
 <tr>
 	<td>type</td>
-	<td>assetNameId</td>
+	<td>assetName</td>
 	<td>${assetName}</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>shortNameId</td>
+	<td>shortName</td>
 	<td>test-asset-sname</td>
 </tr>
 <tr>
 	<td>select</td>
-	<td>assetTypeId</td>
+	<td>assetType</td>
 	<td>label=Server</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>applicationId</td>
-	<td>test-asset-app</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>appOwnerId</td>
-	<td>test-asset-appown</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>appSmeId</td>
-	<td>test-asset-sme</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>ipAddressId</td>
+	<td>ipAddress</td>
 	<td>test-asset-ip</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>serialNumberId</td>
+	<td>serialNumber</td>
 	<td>test-asset-sn</td>
 </tr>
 <tr>
 	<td>select</td>
-	<td>railTypeId</td>
+	<td>railType</td>
 	<td>label=Rails</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>sourceLocationId</td>
+	<td>sourceLocation</td>
 	<td>test-asset-src</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>sourceRoomId</td>
+	<td>sourceRoom</td>
 	<td>test-asset-src-rm</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>sourceRackId</td>
+	<td>sourceRack</td>
 	<td>test-asset-src-rk</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>sourceRackPositionId</td>
+	<td>sourceRackPosition</td>
 	<td>10</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>targetLocationId</td>
+	<td>targetLocation</td>
 	<td>test-asset-tgt</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>targetRoomId</td>
+	<td>targetRoom</td>
 	<td>test-asset-tgt</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>targetRackId</td>
+	<td>targetRack</td>
 	<td>test-asset-rk</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>targetRackPositionId</td>
+	<td>targetRackPosition</td>
 	<td>10</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>truckId</td>
+	<td>truck</td>
 	<td>1</td>
 </tr>
 <tr>
 	<td>select</td>
-	<td>planStatusId</td>
+	<td>planStatus</td>
 	<td>Old</td>
 </tr>
 <tr>
 	<td>select</td>
-	<td>priorityId</td>
+	<td>priority</td>
 	<td>label=1</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>//input[@value='Create' and @type='submit']</td>
+	<td>name=_action_Save</td>
 	<td></td>
 </tr>
 <tr>
@@ -485,11 +440,6 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//div[@onclick=&quot;addSortToLimit('tag','3','modelName','asc');onInvokeAction('tag', 'sort')&quot;]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
 	<td>//div[@onclick=&quot;addSortToLimit('tag','4','sourceLocation','asc');onInvokeAction('tag', 'sort')&quot;]</td>
 	<td></td>
 </tr>
@@ -529,11 +479,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>//div[@onclick=&quot;addSortToLimit('tag','11','moveBundleName','asc');onInvokeAction('tag', 'sort')&quot;]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>click</td>
 	<td>//div[@onclick=&quot;createDynFilter(this, 'tag','assetName')&quot;]</td>
 	<td></td>
@@ -554,53 +499,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table.0.1</td>
-	<td>test-asset-app</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table.0.3</td>
-	<td>${assetName}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table.0.5</td>
-	<td>test-asset-sname</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table.1.1</td>
-	<td>test-asset-sn</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table.1.5</td>
-	<td>Server</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table.2.5</td>
-	<td>test-asset-ip</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table.12.5</td>
-	<td>Old</td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>//div[@id='showDiv']/table.1.3</td>
-	<td>assetTag</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//div[@id='showDiv']/table.11.5</td>
-	<td>test-asset-appown</td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Edit' and @type='button' and @onclick='return editAssetDialog()']</td>
+	<td>//input[@value='Edit']</td>
 	<td></td>
 </tr>
 <tr>
@@ -608,35 +508,30 @@
 	<td>_action_Delete</td>
 	<td></td>
 </tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>_action_remove</td>
-	<td></td>
-</tr>
 <!--Editing the asset-->
 <tr>
 	<td>click</td>
-	<td>//input[@value='Edit' and @type='button' and @onclick='return editAssetDialog()']</td>
+	<td>css=td &gt; div.buttons &gt; span.button &gt; input.edit</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyValue</td>
-	<td>editassetNameId</td>
+	<td>assetName</td>
 	<td>${assetName}</td>
 </tr>
 <tr>
 	<td>verifyValue</td>
-	<td>editassetTagId</td>
+	<td>assetTag</td>
 	<td>${assetTag}</td>
 </tr>
 <tr>
 	<td>verifyValue</td>
-	<td>editsourceLocationId</td>
+	<td>sourceLocation</td>
 	<td>test-asset-src</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>editsourceLocationId</td>
+	<td>sourceLocation</td>
 	<td>test-asset-src is modified</td>
 </tr>
 <tr>
@@ -646,23 +541,13 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Delete' and @type='button' and @onclick=&quot;return editDialogDeleteRemove('delete')&quot;]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>//input[@value='Remove From Project' and @type='button']</td>
+	<td>//input[@value='Delete' ]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='Update Asset']</td>
+	<td>name=_action_Update</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>tag.3.4</td>
-	<td>test-asset-src is modified</td>
 </tr>
 <!--Deleting the asset-->
 <tr>

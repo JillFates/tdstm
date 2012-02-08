@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://localhost:8080//" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com" />
 <title>Staff_Delete</title>
 </head>
 <body>
@@ -39,22 +39,12 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Company</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>xpath=/html/body/div/div[3]/div/div/form/div/table/tbody/tr/td/a/input</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=Staff</td>
+	<td>link=List Staff</td>
 	<td></td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.10.0</td>
+	<td>tag.10.0</td>
 	<td>firstName</td>
 </tr>
 <tr>

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://localhost:8080/" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com" />
 <title>Asset_Create</title>
 </head>
 <body>
@@ -33,11 +33,11 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Project</td>
+	<td>link=Client/Project</td>
 	<td></td>
 </tr>
 <tr>
-	<td>click</td>
+	<td>clickAndWait</td>
 	<td>link=Assets</td>
 	<td></td>
 </tr>
@@ -52,43 +52,33 @@
 	<td></td>
 </tr>
 <tr>
-	<td>select</td>
-	<td>attributeSetId</td>
-	<td>label=Server</td>
-</tr>
-<tr>
 	<td>waitForPageToLoad</td>
 	<td></td>
 	<td></td>
 </tr>
 <tr>
-	<td>waitForTextPresent</td>
-	<td>Fields marked ( * ) are mandatory</td>
+	<td>verifyElementPresent</td>
+	<td>assetName</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>assetNameId</td>
+	<td>shortName</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>shortNameId</td>
+	<td>assetTag</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>assetTagId</td>
+	<td>assetType</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>assetTypeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>manufacturerId</td>
+	<td>manufacturer</td>
 	<td></td>
 </tr>
 <tr>
@@ -98,107 +88,92 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>applicationId</td>
+	<td>ipAddress</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>appOwnerId</td>
+	<td>os</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>appSmeId</td>
+	<td>serialNumber</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>ipAddressId</td>
+	<td>railType</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>osId</td>
+	<td>sourceLocation</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>serialNumberId</td>
+	<td>sourceRoom</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>railTypeId</td>
+	<td>sourceRack</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>sourceLocationId</td>
+	<td>sourceRackPosition</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>sourceRoomId</td>
+	<td>targetLocation</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>sourceRackId</td>
+	<td>targetRoom</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>sourceRackPositionId</td>
+	<td>targetRack</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>targetLocationId</td>
+	<td>targetRackPosition</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>targetRoomId</td>
+	<td>os</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>targetRackId</td>
+	<td>truck</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>targetRackPositionId</td>
+	<td>planStatus</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>osId</td>
+	<td>priority</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>truckId</td>
+	<td>cart</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>planStatusId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>priorityId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>cartId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>shelfId</td>
+	<td>shelf</td>
 	<td></td>
 </tr>
 <tr>
@@ -208,127 +183,97 @@
 </tr>
 <tr>
 	<td>type</td>
-	<td>assetNameId</td>
+	<td>assetName</td>
 	<td>${assetName}</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>shortNameId</td>
+	<td>shortName</td>
 	<td>test-asset-sname</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>assetTagId</td>
+	<td>assetTag</td>
 	<td>test-asset-tag</td>
 </tr>
 <tr>
-	<td>select</td>
-	<td>assetTypeId</td>
-	<td>label=Server</td>
-</tr>
-<tr>
 	<td>type</td>
-	<td>manufacturerId</td>
-	<td>test-asset-man</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>modelId</td>
-	<td>test-asset-mod</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>applicationId</td>
-	<td>test-asset-app</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>appOwnerId</td>
-	<td>test-asset-appown</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>appSmeId</td>
-	<td>test-asset-sme</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>ipAddressId</td>
+	<td>ipAddress</td>
 	<td>test-asset-ip</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>osId</td>
+	<td>os</td>
 	<td>test-asset-hinfo</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>serialNumberId</td>
+	<td>serialNumber</td>
 	<td>test-asset-sn</td>
 </tr>
 <tr>
 	<td>select</td>
-	<td>railTypeId</td>
+	<td>railType</td>
 	<td>label=Rails</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>sourceLocationId</td>
+	<td>sourceLocation</td>
 	<td>test-asset-src</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>sourceRoomId</td>
+	<td>sourceRoom</td>
 	<td>test-asset-src-rm</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>sourceRackId</td>
+	<td>sourceRack</td>
 	<td>test-asset-src-rk</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>sourceRackPositionId</td>
+	<td>sourceRackPosition</td>
 	<td>10</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>targetLocationId</td>
+	<td>targetLocation</td>
 	<td>test-asset-tgt</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>targetRoomId</td>
+	<td>targetRoom</td>
 	<td>test-asset-tgt</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>targetRackId</td>
+	<td>targetRack</td>
 	<td>test-asset-rk</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>targetRackPositionId</td>
+	<td>targetRackPosition</td>
 	<td>10</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>truckId</td>
+	<td>truck</td>
 	<td>1</td>
 </tr>
 <tr>
 	<td>select</td>
-	<td>planStatusId</td>
+	<td>planStatus</td>
 	<td>label=Old</td>
 </tr>
 <tr>
 	<td>select</td>
-	<td>priorityId</td>
+	<td>priority</td>
 	<td>label=1</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>//input[@value='Create' and @type='submit']</td>
+	<td>//input[@value='Save' and @type='submit']</td>
 	<td></td>
 </tr>
 <tr>

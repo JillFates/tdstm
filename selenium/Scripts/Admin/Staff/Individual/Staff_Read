@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com" />
 <title>Staff_Read</title>
 </head>
 <body>
@@ -54,47 +54,47 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.0</td>
+	<td>tag.2.0</td>
 	<td>First Name</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.1</td>
+	<td>tag.2.1</td>
 	<td>Last Name</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.2</td>
+	<td>tag.2.2</td>
 	<td>User Login</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.3</td>
+	<td>tag.2.3</td>
 	<td>Date Created</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.4</td>
+	<td>tag.2.4</td>
 	<td>Last Updated</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.3.0</td>
+	<td>tag.3.0</td>
 	<td>firstName</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.3.1</td>
+	<td>tag.3.1</td>
 	<td>lastName</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.3.3</td>
+	<td>tag.3.3</td>
 	<td>dateCreated</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.3.4</td>
+	<td>tag.3.4</td>
 	<td>lastUpdated</td>
 </tr>
 <tr>

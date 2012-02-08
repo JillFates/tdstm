@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com" />
 <title>Comment_AE_Edit</title>
 </head>
 <body>
@@ -81,6 +81,11 @@
 <tr>
 	<td>click</td>
 	<td>link=New Comment</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=listCommentsTable.1.0</td>
 	<td></td>
 </tr>
 <tr>
@@ -296,12 +301,12 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>xpath=id('link_3515')/x:img</td>
+	<td>//div[14]/div/a/span</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Update' and @type='button' and @onclick=&quot;resolveValidate('editCommentForm','updateCommentId');&quot;]</td>
+	<td>//input[@value='Update']</td>
 	<td></td>
 </tr>
 <tr>
@@ -311,7 +316,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='Update' and @type='button' and @onclick=&quot;resolveValidate('editCommentForm','updateCommentId');&quot;]</td>
+	<td>//input[@value='Update']</td>
 	<td></td>
 </tr>
 <tr>

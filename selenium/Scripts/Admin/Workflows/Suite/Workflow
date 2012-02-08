@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://localhost:8080//" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com" />
 <title>Workflow</title>
 </head>
 <body>
@@ -32,7 +32,7 @@
 	<td>admin</td>
 </tr>
 <tr>
-	<td>click</td>
+	<td>clickAndWait</td>
 	<td>//input[@value='Sign in']</td>
 	<td></td>
 </tr>
@@ -43,7 +43,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>link=Workflows</td>
+	<td>link=List Workflows</td>
 	<td></td>
 </tr>
 <tr>
@@ -52,33 +52,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//table.0.0</td>
-	<td>Workflow</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.0.1</td>
-	<td>Used On</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.0.2</td>
-	<td>Created On</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.0.3</td>
-	<td>Updatated On</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.0.4</td>
-	<td>Updated By</td>
-</tr>
-<tr>
 	<td>clickAndWait</td>
-	<td>//tr[7]/td[1]</td>
+	<td>//div/div/div/table/tbody/tr/td[2]</td>
 	<td></td>
 </tr>
 <tr>
@@ -93,7 +68,7 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.0</td>
+	<td>//div[3]/table.0.0</td>
 	<td>exact:Workflow:</td>
 </tr>
 <tr>
@@ -103,27 +78,27 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.0</td>
+	<td>//div[3]/table.1.0</td>
 	<td>Created On:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.0</td>
+	<td>//div[3]/table.2.0</td>
 	<td>Update On:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.3.0</td>
+	<td>//div[3]/table.3.0</td>
 	<td>Updated By:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.4.0</td>
+	<td>//div[3]/table.4.0</td>
 	<td>Used On:</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.0.1</td>
+	<td>//div[3]/table.0.1</td>
 	<td>workflowName</td>
 </tr>
 <tr>
@@ -132,29 +107,19 @@
 	<td></td>
 </tr>
 <tr>
+	<td>storeText</td>
+	<td>link=Test Proj - 02/7/2012 06:29 PM</td>
+	<td>workflowUsed</td>
+</tr>
+<tr>
 	<td>storeTable</td>
-	<td>//table.4.1</td>
+	<td>//div[3]/table.4.1</td>
 	<td>workflowUsed</td>
 </tr>
 <tr>
 	<td>echo</td>
 	<td>${workflowUsed}</td>
 	<td></td>
-</tr>
-<tr>
-	<td>storeElementPresent</td>
-	<td>//td[2]/li</td>
-	<td>Check</td>
-</tr>
-<tr>
-	<td>echo</td>
-	<td>${Check}</td>
-	<td></td>
-</tr>
-<tr>
-	<td>gotoIf</td>
-	<td>${Check}==false</td>
-	<td>label10</td>
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
@@ -204,6 +169,16 @@
 <tr>
 	<td>verifyTable</td>
 	<td>//div[@id='showWorkflowList']/table.0.8</td>
+	<td>Effort</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='showWorkflowList']/table.0.9</td>
+	<td>Duration</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>//div[@id='showWorkflowList']/table.0.10</td>
 	<td>Action</td>
 </tr>
 <tr>
@@ -218,7 +193,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=${workflowUsed}</td>
+	<td>xpath=/x:html/x:body/x:div[1]/x:div[10]/x:div/x:div/x:div[3]/x:table/x:tbody/x:tr[5]/x:td[2]/x:div/x:ul/x:li[1]/x:a</td>
 	<td></td>
 </tr>
 <tr>
@@ -239,11 +214,6 @@
 <tr>
 	<td>verifyTitle</td>
 	<td>Workflow</td>
-	<td></td>
-</tr>
-<tr>
-	<td>label</td>
-	<td>label10</td>
 	<td></td>
 </tr>
 </tbody></table>

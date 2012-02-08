@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com" />
 <title>Asset_Delete</title>
 </head>
 <body>
@@ -34,11 +34,11 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Project</td>
+	<td>link=Client/Project</td>
 	<td></td>
 </tr>
 <tr>
-	<td>click</td>
+	<td>clickAndWait</td>
 	<td>link=Assets</td>
 	<td></td>
 </tr>
@@ -65,11 +65,6 @@
 <tr>
 	<td>click</td>
 	<td>_action_Delete</td>
-	<td></td>
-</tr>
-<tr>
-	<td>assertConfirmation</td>
-	<td>Delete Asset, are you sure?</td>
 	<td></td>
 </tr>
 <tr>

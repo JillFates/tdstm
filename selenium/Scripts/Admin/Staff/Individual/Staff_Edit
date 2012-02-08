@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://localhost:8080//" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com" />
 <title>Staff_Edit</title>
 </head>
 <body>
@@ -44,7 +44,7 @@
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.3.1</td>
+	<td>tag.3.1</td>
 	<td>cName</td>
 </tr>
 <tr>
@@ -59,37 +59,37 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.0</td>
+	<td>tag.2.0</td>
 	<td>First Name</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.1</td>
+	<td>tag.2.1</td>
 	<td>Last Name</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.2</td>
+	<td>tag.2.2</td>
 	<td>User Login</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.3</td>
+	<td>tag.2.3</td>
 	<td>Date Created</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.4</td>
+	<td>tag.2.4</td>
 	<td>Last Updated</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.3.0</td>
+	<td>tag.3.0</td>
 	<td>firstName</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.3.1</td>
+	<td>tag.3.1</td>
 	<td>lastName</td>
 </tr>
 <tr>
@@ -99,12 +99,12 @@
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.3.3</td>
+	<td>tag.3.3</td>
 	<td>dateCreated</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.3.4</td>
+	<td>tag.3.4</td>
 	<td>lastUpdated</td>
 </tr>
 <tr>
@@ -164,11 +164,6 @@
 </tr>
 <tr>
 	<td>verifyValue</td>
-	<td>company</td>
-	<td>${cName}</td>
-</tr>
-<tr>
-	<td>verifyValue</td>
 	<td>//form[@id='showForm']/div[1]/table/tbody/tr[2]/td[2]/input</td>
 	<td>${firstName}</td>
 </tr>
@@ -191,11 +186,6 @@
 	<td>click</td>
 	<td>//input[@value='Edit']</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifySelectedLabel</td>
-	<td>//form[@id='createDialogForm']/div[1]/table/tbody/tr[2]/td[2]/select</td>
-	<td>${cName}</td>
 </tr>
 <tr>
 	<td>verifyValue</td>
@@ -236,11 +226,6 @@
 	<td>verifyValue</td>
 	<td>//form[@id='showForm']/div[1]/table/tbody/tr[4]/td[2]/input</td>
 	<td>edited here</td>
-</tr>
-<tr>
-	<td>verifyValue</td>
-	<td>//form[@id='editForm']/div[1]/table/tbody/tr[3]/td[2]/input</td>
-	<td>John</td>
 </tr>
 </tbody></table>
 </body>
