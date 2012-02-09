@@ -10,7 +10,7 @@
 								<td class="label" nowrap="nowrap"><label for="assetName">Name<span style="color: red;">*</span></label></td>
 								<td ><input type="text" id="assetName" name="assetName" value="${applicationInstance.assetName}" tabindex="11" /></td>
 								<td class="label" nowrap="nowrap">Description</td>
-								<td colspan="3"><input type="text" id="description" name="description" value="" size="50" tabindex="21" />
+								<td colspan="3"><input type="text" id="description" name="description" value="${applicationInstance.description}" size="50" tabindex="21" />
 								</td>
 							</tr>
 							<tr>

@@ -624,6 +624,7 @@ class AssetEntityController {
 	 *------------------------------------------------------------*/
 	def export = {
 		//get project Id
+		println "pramams:::::::::::::::::"+params
 		def projectId = params[ "projectIdExport" ]
 		def dataTransferSet = params.dataTransferSet
 		def bundle = request.getParameterValues( "bundle" )
@@ -666,6 +667,7 @@ class AssetEntityController {
 		def application = Application.findAllByProject( project )
 		def database = Database.findAllByProject( project )
 		def files = Files.findAllByProject( project )
+		
 		//get template Excel
 		def workbook
 		def book
@@ -689,6 +691,7 @@ class AssetEntityController {
 			def dbSheet
 			def fileSheet
 			def titleSheet
+			def dependencySheet
 
 			def serverMap = [:]
 			def serverSheetColumnNames = [:]
@@ -713,6 +716,7 @@ class AssetEntityController {
 			def fileColumnNameList = new ArrayList()
 			def fileSheetNameMap = [:]
 			def fileDataTransferAttributeMapSheetName
+			
 
 			serverDTAMap.eachWithIndex { item, pos ->
 				serverMap.put( item.columnName, null )
@@ -747,6 +751,7 @@ class AssetEntityController {
 			appSheet = book.getSheet( sheetNames[2] )
 			dbSheet = book.getSheet( sheetNames[3] )
 			fileSheet = book.getSheet( sheetNames[4] )
+			dependencySheet = book.getSheet( sheetNames[5] )
 			
 			if( flag == 0 ) {
 				flash.message = " Sheet not found, Please check it."
@@ -935,6 +940,34 @@ class AssetEntityController {
 								}
 								fileSheet.addCell( addContentToSheet )
 							}
+						}
+					}
+				
+					if(params.dependency=='dependency'){
+						def assetDependent = AssetDependency.findAll("from AssetDependency where asset.project = ? ",[project])
+						def dependencyMap = ['DependentId':1, 'Type':2, 'DataFlowFreq':3, 'DataFlowDirection':4, 'status':5, 'comment':6]
+						def dependencyColumnNameList = ['DependentId', 'Type', 'DataFlowFreq', 'DataFlowDirection', 'status', 'comment']
+						def DTAMap = [0:'dependent', 1:'type', 2:'dataFlowFreq', 3:'dataFlowDirection', 4:'status', 5:'comment']
+						def dependentSize = assetDependent.size()
+						for ( int r = 1; r <= dependentSize; r++ ) {
+							    //Add assetId for walkthrough template only.
+								def integerFormat = new WritableCellFormat (NumberFormats.INTEGER)
+								def addAssetDependentId = new Number(0, r, (assetDependent[r-1].asset.id))
+								dependencySheet.addCell( addAssetDependentId )
+								
+							for ( int coll = 0; coll < 6; coll++ ) {
+								def addContentToSheet
+								if ( assetDependent[r-1].(DTAMap[coll]) == null ) {
+									addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, "" )
+								}else {
+								     if(DTAMap[coll]=="dependent"){
+					                   addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, String.valueOf(assetDependent[r-1].(DTAMap[coll]).id) )
+								     }else{
+									   addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, String.valueOf(assetDependent[r-1].(DTAMap[coll])) )
+									 }
+								}
+								dependencySheet.addCell( addContentToSheet )
+							 }
 						}
 					}
 				}
@@ -1173,6 +1206,7 @@ class AssetEntityController {
 	 * @return assetList Page
 	 * ------------------------------------------ */
 	def save = {
+		println "params:::::::::::::"+params
 		def formatter = new SimpleDateFormat("MM/dd/yyyy")
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def maintExpDate = params.maintExpDate
