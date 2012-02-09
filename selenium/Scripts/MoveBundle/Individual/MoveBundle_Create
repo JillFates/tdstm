@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://localhost:8080" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com" />
 <title>MoveBundle_Create</title>
 </head>
 <body>
@@ -58,7 +58,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>xpath=/html/body/div/div[6]/div/span[2]/a</td>
+	<td>link=New Bundle</td>
 	<td></td>
 </tr>
 <tr>
@@ -209,32 +209,32 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.1</td>
+	<td>css=div.steps_table&gt;table.0.1</td>
 	<td>${BundleName}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.1</td>
+	<td>css=div.steps_table&gt;table.1.1</td>
 	<td>${BundleDesc}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.1</td>
+	<td>css=div.steps_table&gt;table.2.1</td>
 	<td>${STime}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.3.1</td>
+	<td>css=div.steps_table&gt;table.3.1</td>
 	<td>${CTime}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.4.1</td>
+	<td>css=div.steps_table&gt;table.4.1</td>
 	<td>${ProjId}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.5.1</td>
+	<td>css=div.steps_table&gt;table.5.1</td>
 	<td>${MoveId}</td>
 </tr>
 <tr>

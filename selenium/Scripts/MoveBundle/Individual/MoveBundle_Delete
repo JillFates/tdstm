@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com" />
 <title>MoveBundle_Delete</title>
 </head>
 <body>
@@ -59,7 +59,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>xpath=/html/body/div/div[6]/div/span/a</td>
+	<td>link=Bundle List</td>
 	<td></td>
 </tr>
 <tr>
@@ -69,7 +69,7 @@
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.3.0</td>
+	<td>tag.3.0</td>
 	<td>Bund1</td>
 </tr>
 <tr>

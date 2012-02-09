@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://localhost:8080//" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com" />
 <title>MoveBundle_Read</title>
 </head>
 <body>
@@ -59,7 +59,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>xpath=/html/body/div/div[6]/div/span/a</td>
+	<td>link=Bundle List</td>
 	<td></td>
 </tr>
 <tr>
@@ -69,32 +69,32 @@
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.3.0</td>
+	<td>tag.3.0</td>
 	<td>Bund1</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.3.1</td>
+	<td>tag.3.1</td>
 	<td>desc</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.3.2</td>
+	<td>tag.3.2</td>
 	<td>order</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.3</td>
+	<td>tag.3.3</td>
 	<td>aquantity</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.3.4</td>
+	<td>tag.3.4</td>
 	<td>stime</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.3.5</td>
+	<td>tag.3.5</td>
 	<td>ctime</td>
 </tr>
 <tr>
@@ -109,17 +109,17 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.1</td>
+	<td>css=div.steps_table&gt;table.0.1</td>
 	<td>${Bund1}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.1</td>
+	<td>css=div.steps_table&gt;table.1.1</td>
 	<td>${desc}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.7.1</td>
+	<td>css=div.steps_table&gt;table.7.1</td>
 	<td>${order}</td>
 </tr>
 <tr>

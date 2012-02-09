@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://localhost:8080//" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com" />
 <title>BundleTeam_Create</title>
 </head>
 <body>
@@ -64,7 +64,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>xpath=/html/body/div/div[6]/div/span/a</td>
+	<td>link=Bundle List</td>
 	<td></td>
 </tr>
 <tr>
@@ -95,11 +95,6 @@
 <tr>
 	<td>click</td>
 	<td>//form[@id='bundleCreateForm']/div[1]/table/tbody/tr[4]/td[1]/label</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>startTime</td>
 	<td></td>
 </tr>
 <tr>
@@ -211,7 +206,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Staff</td>
+	<td>link=Project Staff</td>
 	<td></td>
 </tr>
 <tr>
@@ -266,7 +261,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>xpath=/html/body/div/div[6]/div/span/a</td>
+	<td>link=Bundle List</td>
 	<td></td>
 </tr>
 <tr>
@@ -297,11 +292,6 @@
 <tr>
 	<td>click</td>
 	<td>//form[@id='bundleCreateForm']/div[1]/table/tbody/tr[4]/td[1]/label</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>startTime</td>
 	<td></td>
 </tr>
 <tr>
@@ -433,12 +423,12 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>xpath=/html/body/div/div[6]/div/span/a</td>
+	<td>link=Bundle List</td>
 	<td></td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.3.0</td>
+	<td>tag.3.0</td>
 	<td>mBundle</td>
 </tr>
 <tr>
@@ -448,7 +438,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Team</td>
+	<td>link=List Teams</td>
 	<td></td>
 </tr>
 <tr>
@@ -458,47 +448,47 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.0</td>
+	<td>css=div.list&gt; table.0.0</td>
 	<td>Team Code</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.1</td>
+	<td>css=div.list&gt; table.0.1</td>
 	<td>Team Name</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.2</td>
+	<td>css=div.list&gt; table.0.2</td>
 	<td>Role</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.3</td>
+	<td>css=div.list&gt; table.0.3</td>
 	<td>Team Members</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.4</td>
+	<td>css=div.list&gt; table.0.4</td>
 	<td>Date Created</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.5</td>
+	<td>css=div.list&gt; table.0.5</td>
 	<td>Last Updated</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.6</td>
+	<td>css=div.list&gt; table.0.6</td>
 	<td>Comment</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>_action_Create</td>
+	<td>name=_action_Create</td>
 	<td></td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>_action_Create</td>
+	<td>name=_action_Create</td>
 	<td></td>
 </tr>
 <!--Creating the Bundle Team-->
@@ -514,22 +504,22 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.0</td>
+	<td>css=div.dialog&gt; table.1.0</td>
 	<td>exact:Team Code: *</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.0</td>
+	<td>css=div.dialog&gt; table.2.0</td>
 	<td>exact:Team Name: *</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.4.0</td>
+	<td>css=div.dialog&gt; table.4.0</td>
 	<td>exact:Comment:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.5.0</td>
+	<td>css=div.dialog&gt; table.5.0</td>
 	<td>Is Disbanded:</td>
 </tr>
 <tr>
@@ -656,21 +646,6 @@
 	<td>verifyTextPresent</td>
 	<td>created</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.0.1</td>
-	<td>TestCode-${teamCode}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.1.1</td>
-	<td>TestName-${teamName}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.3.1</td>
-	<td>random comment - ${commenT}</td>
 </tr>
 </tbody></table>
 </body>

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://localhost:8080//" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com" />
 <title>MoveBundle_CRUD</title>
 </head>
 <body>
@@ -116,12 +116,12 @@
 <tr>
 	<td>verifyTable</td>
 	<td>tag.2.4</td>
-	<td>Date Created</td>
+	<td>Start</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
 	<td>tag.2.5</td>
-	<td>Last Updated</td>
+	<td>Completion</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -375,11 +375,6 @@
 	<td>verifyTextPresent</td>
 	<td>MoveBundle ${BundleName} updated</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.7.1</td>
-	<td>2</td>
 </tr>
 <!--Deleting  Move Bundle-->
 <tr>
