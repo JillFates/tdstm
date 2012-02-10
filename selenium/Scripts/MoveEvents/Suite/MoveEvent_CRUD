@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://localhost:8080//" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com" />
 <title>MoveEvent_CRUD</title>
 </head>
 <body>
@@ -128,22 +128,22 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.0</td>
+	<td>css=div.dialog&gt;table.1.0</td>
 	<td>exact:Project: *</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.0</td>
+	<td>css=div.dialog&gt;table.2.0</td>
 	<td>exact:Name: *</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.3.0</td>
+	<td>css=div.dialog&gt;table.3.0</td>
 	<td>exact:Description:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.4.0</td>
+	<td>css=div.dialog&gt;table.4.0</td>
 	<td>Move Bundle:</td>
 </tr>
 <tr>
@@ -178,12 +178,12 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.5.0</td>
+	<td>css=div.dialog&gt;table.5.0</td>
 	<td>exact:Status: *</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.5.1</td>
+	<td>css=div.dialog&gt;table.5.1</td>
 	<td>Auto Start Started Stopped</td>
 </tr>
 <!--Below two commands are to test if mandatory fields are validated in this page-->
@@ -321,17 +321,12 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.1</td>
-	<td>${Proj}</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.1.1</td>
+	<td>css=div.dialog&gt;table.1.1</td>
 	<td>${eventName}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.1</td>
+	<td>css=div.dialog&gt;table.2.1</td>
 	<td>${Desc}</td>
 </tr>
 <tr>
@@ -362,13 +357,8 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.1</td>
+	<td>css=div.dialog&gt;table.1.1</td>
 	<td>${Proj}</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>link=${Proj}</td>
-	<td></td>
 </tr>
 <tr>
 	<td>verifyValue</td>
@@ -414,11 +404,6 @@
 	<td>verifyTextPresent</td>
 	<td>MoveEvent '${eventName}' updated</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.2.1</td>
-	<td>modified here</td>
 </tr>
 <!--Deleting the MoveEvent-->
 <tr>

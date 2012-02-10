@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://localhost:8080//" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com" />
 <title>MoveEvent_Create</title>
 </head>
 <body>
@@ -78,27 +78,27 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.0</td>
+	<td>tag.2.0</td>
 	<td>Name</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.1</td>
+	<td>tag.2.1</td>
 	<td>Description</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.2</td>
+	<td>tag.2.2</td>
 	<td>Status</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.3</td>
+	<td>tag.2.3</td>
 	<td>Calculated Type</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.4</td>
+	<td>tag.2.4</td>
 	<td>Move Bundles</td>
 </tr>
 <tr>
@@ -123,22 +123,22 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.0</td>
+	<td>css=div.dialog&gt;table.1.0</td>
 	<td>exact:Project: *</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.0</td>
+	<td>css=div.dialog&gt;table.2.0</td>
 	<td>exact:Name: *</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.3.0</td>
+	<td>css=div.dialog&gt;table.3.0</td>
 	<td>exact:Description:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.4.0</td>
+	<td>css=div.dialog&gt;table.4.0</td>
 	<td>Move Bundle:</td>
 </tr>
 <tr>
@@ -173,12 +173,12 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.5.0</td>
+	<td>css=div.dialog&gt;table.5.0</td>
 	<td>exact:Status: *</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.5.1</td>
+	<td>css=div.dialog&gt;table.5.1</td>
 	<td>Auto Start Started Stopped</td>
 </tr>
 <!--Below two commands are to test if mandatory fields are validated in this page-->
@@ -287,11 +287,6 @@
 	<td>clickAndWait</td>
 	<td>link=Asset Tracker</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifySelectedLabel</td>
-	<td>moveEventId</td>
-	<td>${eventName}</td>
 </tr>
 </tbody></table>
 </body>

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://localhost:8080//" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com" />
 <title>BundleTeam_CRUD</title>
 </head>
 <body>
@@ -99,37 +99,37 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.0</td>
+	<td>css= div.list &gt;table.0.0</td>
 	<td>Team Code</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.1</td>
+	<td>css= div.list &gt;table.0.1</td>
 	<td>Team Name</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.2</td>
+	<td>css= div.list &gt;table.0.2</td>
 	<td>Role</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.3</td>
+	<td>css= div.list &gt;table.0.3</td>
 	<td>Team Members</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.4</td>
+	<td>css= div.list &gt;table.0.4</td>
 	<td>Date Created</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.5</td>
+	<td>css= div.list &gt;table.0.5</td>
 	<td>Last Updated</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.6</td>
+	<td>css= div.list &gt;table.0.6</td>
 	<td>Comment</td>
 </tr>
 <tr>
@@ -155,27 +155,27 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.0</td>
+	<td>css= div.dialog &gt;table.1.0</td>
 	<td>exact:Team Code: *</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.0</td>
+	<td>css= div.dialog &gt;table.2.0</td>
 	<td>exact:Team Name: *</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.3.0</td>
+	<td>css= div.dialog &gt;table.3.0</td>
 	<td>Role*</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.4.0</td>
+	<td>css= div.dialog &gt;table.4.0</td>
 	<td>exact:Comment:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.5.0</td>
+	<td>css= div.dialog &gt;table.5.0</td>
 	<td>Is Disbanded:</td>
 </tr>
 <tr>
@@ -305,17 +305,17 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.1</td>
+	<td>css= div.dialog &gt;table.0.1</td>
 	<td>TestCode-${teamCode}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.1</td>
+	<td>css= div.dialog &gt;table.1.1</td>
 	<td>TestName-${teamName}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.3.1</td>
+	<td>css= div.dialog &gt;table.3.1</td>
 	<td>random comment - ${commenT}</td>
 </tr>
 <!--Reading the Bundle Team-->
@@ -336,42 +336,42 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>link=Project Team List</td>
+	<td>link=List Teams</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.1</td>
+	<td>css=div.dialog&gt;table.0.1</td>
 	<td>TestCode-${teamCode}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.1</td>
+	<td>css=div.dialog&gt;table.1.1</td>
 	<td>TestName-${teamName}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.3.1</td>
+	<td>css=div.dialog&gt;table.3.1</td>
 	<td>random comment - ${commenT}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.4.1</td>
+	<td>css=div.dialog&gt;table.4.1</td>
 	<td>Y</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.5.1</td>
+	<td>css=div.dialog&gt;table.5.1</td>
 	<td>${aStaff}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.6.0</td>
+	<td>css=div.dialog&gt;table.6.0</td>
 	<td>Date Created:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.7.0</td>
+	<td>css=div.dialog&gt;table.7.0</td>
 	<td>Last Updated:</td>
 </tr>
 <tr>
@@ -402,7 +402,7 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.0</td>
+	<td>css=div.dialog&gt;table.1.0</td>
 	<td>exact:Team Code: *</td>
 </tr>
 <tr>
@@ -412,7 +412,7 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.0</td>
+	<td>css=div.dialog&gt;table.2.0</td>
 	<td>exact:Team Name: *</td>
 </tr>
 <tr>
@@ -422,7 +422,7 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.4.0</td>
+	<td>css=div.dialog&gt;table.4.0</td>
 	<td>exact:Comment:</td>
 </tr>
 <tr>
@@ -432,7 +432,7 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.5.0</td>
+	<td>css=div.dialog&gt;table.5.0</td>
 	<td>Is Disbanded:</td>
 </tr>
 <tr>
@@ -489,11 +489,6 @@
 	<td>verifyTextPresent</td>
 	<td>ProjectTeam TestCode-${teamCode} : TestName-${teamName} updated</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.3.1</td>
-	<td>comment - ${commenT}</td>
 </tr>
 <!--Deleting Bundle Team-->
 <tr>

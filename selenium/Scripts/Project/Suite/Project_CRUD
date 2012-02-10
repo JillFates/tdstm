@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://localhost:8080/" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com" />
 <title>Project_CRUD</title>
 </head>
 <body>
@@ -49,7 +49,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Project</td>
+	<td>link=Client/Project</td>
 	<td></td>
 </tr>
 <tr>
@@ -274,12 +274,12 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>link=Project List</td>
+	<td>link=List Projects</td>
 	<td></td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Project List</td>
+	<td>link=List Projects</td>
 	<td></td>
 </tr>
 <tr>
@@ -300,12 +300,12 @@
 <tr>
 	<td>verifyTable</td>
 	<td>tag.2.2</td>
-	<td>Date Created</td>
+	<td>Start Date</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
 	<td>tag.2.3</td>
-	<td>Last Updated</td>
+	<td>Completion Date</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
@@ -456,11 +456,6 @@
 	<td>verifyTitle</td>
 	<td>Show Project</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>//div[5]/div[1]</td>
-	<td>Project ${Pcode} : ${Pname} created</td>
 </tr>
 <!--Reading the Project-->
 <tr>
@@ -636,12 +631,7 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>link=Project List</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>link=New Project</td>
+	<td>link=List Projects</td>
 	<td></td>
 </tr>
 <tr>
@@ -675,11 +665,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyExpression</td>
-	<td>javascript{storedVars['dateCreated']!=storedVars['lastUpdated']}</td>
-	<td>true</td>
-</tr>
-<tr>
 	<td>verifyValue</td>
 	<td>//div[@id='updateShow']/table/tbody/tr[3]/td[2]/textarea</td>
 	<td>new</td>
@@ -693,11 +678,6 @@
 <tr>
 	<td>clickAndWait</td>
 	<td>_action_Delete</td>
-	<td></td>
-</tr>
-<tr>
-	<td>assertConfirmation</td>
-	<td>Warning: This will delete the ${Pname} project and all of the assets, events, bundles, and any historic data?</td>
 	<td></td>
 </tr>
 <tr>
