@@ -205,6 +205,8 @@ class AssetEntityController {
 		int appAdded   = 0
 		int dbAdded  = 0
 		int filesAdded = 0
+		int dependencyAdded = 0
+		int dependencyUpdated = 0
 		//get column name and sheets
 		serverDTAMap.eachWithIndex { item, pos ->
 			if(customLabels.contains( item.columnName )){
@@ -217,7 +219,9 @@ class AssetEntityController {
 		def appColumnslist = appDTAMap.columnName
 		def databaseColumnslist = databaseDTAMap.columnName
 		def filesColumnslist = filesDTAMap.columnName
-		
+	/*	def dependencyColumnList = ['DependentId','Type','DataFlowFreq','DataFlowDirection','status','comment']
+		def dependencyMap = ['DependentId':1, 'Type':2, 'DataFlowFreq':3, 'DataFlowDirection':4, 'status':5, 'comment':6]
+		def DTAMap = [0:'dependent', 1:'type', 2:'dataFlowFreq', 3:'dataFlowDirection', 4:'status', 5:'comment']*/
 		try {
 			workbook = Workbook.getWorkbook( file.inputStream )
 			def sheetNames = workbook.getSheetNames()
@@ -251,6 +255,7 @@ class AssetEntityController {
 				def appSheet = workbook.getSheet( "Applications" )
 				def databaseSheet = workbook.getSheet( "Databases" )
 				def filesSheet = workbook.getSheet( "Files" )
+				def dependencySheet = workbook.getSheet( "Dependencies" )
 				def serverColumnNames = [:]
 				def appColumnNames = [:]
 				def databaseColumnNames = [:]
@@ -306,6 +311,7 @@ class AssetEntityController {
 					int appCount = 0
 					int databaseCount = 0
 					int filesCount = 0
+					int dependencyCount = 0
 					//Add Data to dataTransferBatch.
 						def serverColNo = 0
 						for (int index = 0; index < serverCol; index++) {
@@ -356,6 +362,16 @@ class AssetEntityController {
 								def name = filesSheet.getCell( appColNo, row ).contents
 								if(name){
 									filesCount = row
+								}
+							}
+						}
+						def dependencySheetRow = dependencySheet.rows
+						if(params.dependency=='dependency'){
+							dependencyCount
+							for (int row = 1; row < filesSheetrows; row++) {
+								def name = filesSheet.getCell( appColNo, row ).contents
+								if(name){
+									dependencyCount = row
 								}
 							}
 						}
@@ -569,6 +585,70 @@ class AssetEntityController {
 								}
 							}
 						}
+						if(params.dependency=='dependency'){
+							session.setAttribute("TOTAL_ASSETS",dependencyCount)
+							def subjects = SecurityUtils.subject
+							def principals = subject.principal
+							def userLogins = UserLogin.findByUsername( principals )
+							def skippedUpdated =0
+							def skippedAdded=0
+							for ( int r = 1; r < dependencySheetRow ; r++ ) {
+									int cols = 0 ; 
+									  def name = dependencySheet.getCell( cols, r ).contents
+										def dependencyTransferValueList = new StringBuffer()
+												cols=0
+												if(dependencySheet.getCell( cols, r ).contents.replace("'","\\'")){
+												 int id = Integer.parseInt(dependencySheet.getCell( cols, r ).contents.replace("'","\\'"))
+												 AssetDependency asset =  AssetDependency.get(id)
+												 if(asset){
+													 asset.asset = AssetEntity.get(Integer.parseInt(dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")))
+													 asset.dependent = AssetEntity.get(Integer.parseInt(dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")))
+													 asset.type = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+													 asset.dataFlowFreq = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+													 asset.dataFlowDirection = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+													 asset.status = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+													 asset.comment = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+													 asset.updatedBy = userLogins.person
+													 //asset.createdBy = userLogin.person
+												   if(!asset.save(flush:true)){
+													   asset.errors.allErrors.each { println it }
+													  skipped += ( r +1 )
+													  skippedUpdated = skipped.size()
+												   }
+												}
+											  }else{
+											     AssetDependency assetDpendencyInstance = new AssetDependency()
+												 def assetId = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+												 def dependentId = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+												 if(assetId){
+												   assetDpendencyInstance.asset = AssetEntity.get(Integer.parseInt(assetId))
+												 }
+												 if(dependentId){
+												   assetDpendencyInstance.dependent = AssetEntity.get(Integer.parseInt(dependentId))
+												 }
+												  assetDpendencyInstance.type = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+												  assetDpendencyInstance.dataFlowFreq = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+												  assetDpendencyInstance.dataFlowDirection = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+												  assetDpendencyInstance.status = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+												  assetDpendencyInstance.comment = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+												  assetDpendencyInstance.createdBy = userLogins?.person
+												  assetDpendencyInstance.updatedBy = userLogins?.person
+												  if(!assetDpendencyInstance.save(flush:true)){
+													  assetDpendencyInstance.errors.allErrors.each { println it }
+													  skipped += ( r +1 )
+													  skippedAdded = skipped.size()
+												  }
+												 
+											  }
+											  dependencyAdded = (r-(skippedAdded+skippedUpdated))
+											  if (r%50 == 0){
+												  sessionFactory.getCurrentSession().flush();
+												  sessionFactory.getCurrentSession().clear();
+											  }
+									
+							}
+								
+							}
 						for( int i=0;  i < sheetNamesLength; i++ ) {
 							if(sheetNames[i] == "Comments"){
 								def commentSheet = workbook.getSheet(sheetNames[i])
@@ -596,7 +676,7 @@ class AssetEntityController {
 	
 				} // generate error message
 				workbook.close()		
-				added = serverAdded + appAdded   + dbAdded + filesAdded 
+				added = serverAdded + appAdded   + dbAdded + filesAdded + dependencyAdded
 				if (skipped.size() > 0) {
 					flash.message = " File Uploaded Successfully with ${added} records. and  ${skipped} Records skipped Please click the Manage Batches to review and post these changes."
 				} else {
@@ -624,7 +704,6 @@ class AssetEntityController {
 	 *------------------------------------------------------------*/
 	def export = {
 		//get project Id
-		println "pramams:::::::::::::::::"+params
 		def projectId = params[ "projectIdExport" ]
 		def dataTransferSet = params.dataTransferSet
 		def bundle = request.getParameterValues( "bundle" )
@@ -945,22 +1024,24 @@ class AssetEntityController {
 				
 					if(params.dependency=='dependency'){
 						def assetDependent = AssetDependency.findAll("from AssetDependency where asset.project = ? ",[project])
-						def dependencyMap = ['DependentId':1, 'Type':2, 'DataFlowFreq':3, 'DataFlowDirection':4, 'status':5, 'comment':6]
-						def dependencyColumnNameList = ['DependentId', 'Type', 'DataFlowFreq', 'DataFlowDirection', 'status', 'comment']
-						def DTAMap = [0:'dependent', 1:'type', 2:'dataFlowFreq', 3:'dataFlowDirection', 4:'status', 5:'comment']
+						def dependencyMap = ['AssetId':1,'DependentId':2, 'Type':3, 'DataFlowFreq':4, 'DataFlowDirection':5, 'status':6, 'comment':7]
+						def dependencyColumnNameList = ['AssetId','DependentId', 'Type', 'DataFlowFreq', 'DataFlowDirection', 'status', 'comment']
+						def DTAMap = [0:'asset',1:'dependent', 2:'type', 3:'dataFlowFreq', 4:'dataFlowDirection', 5:'status', 6:'comment']
 						def dependentSize = assetDependent.size()
 						for ( int r = 1; r <= dependentSize; r++ ) {
 							    //Add assetId for walkthrough template only.
 								def integerFormat = new WritableCellFormat (NumberFormats.INTEGER)
-								def addAssetDependentId = new Number(0, r, (assetDependent[r-1].asset.id))
+								def addAssetDependentId = new Number(0, r, (assetDependent[r-1].id))
 								dependencySheet.addCell( addAssetDependentId )
 								
-							for ( int coll = 0; coll < 6; coll++ ) {
+							for ( int coll = 0; coll < 7; coll++ ) {
 								def addContentToSheet
 								if ( assetDependent[r-1].(DTAMap[coll]) == null ) {
 									addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, "" )
 								}else {
 								     if(DTAMap[coll]=="dependent"){
+					                   addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, String.valueOf(assetDependent[r-1].(DTAMap[coll]).id) )
+								     }else if(DTAMap[coll]=="asset"){
 					                   addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, String.valueOf(assetDependent[r-1].(DTAMap[coll]).id) )
 								     }else{
 									   addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, String.valueOf(assetDependent[r-1].(DTAMap[coll])) )
@@ -1206,7 +1287,6 @@ class AssetEntityController {
 	 * @return assetList Page
 	 * ------------------------------------------ */
 	def save = {
-		println "params:::::::::::::"+params
 		def formatter = new SimpleDateFormat("MM/dd/yyyy")
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def maintExpDate = params.maintExpDate
