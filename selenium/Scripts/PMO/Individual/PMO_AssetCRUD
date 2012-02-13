@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://hyd-tdsserver:8080/" />
+<link rel="selenium.base" href="http://localhost:8080/" />
 <title>PMO_AssetCRUD</title>
 </head>
 <body>
@@ -34,12 +34,12 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=PMO Asset Tracking</td>
+	<td>link=Asset Tracker</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyTitle</td>
-	<td>Asset Tracking</td>
+	<td>Asset Tracker</td>
 	<td></td>
 </tr>
 <tr>
@@ -68,31 +68,6 @@
 	<td>30s 1m 2m 5m 10m Never</td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//form[@id='listForm']/div[2]/table.0.0</td>
-	<td>Actions All</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='listForm']/div[2]/table/thead/tr/th[2]/table.0.0</td>
-	<td>Application</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='listForm']/div[2]/table/thead/tr/th[3]/table.0.0</td>
-	<td>App Owner</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='listForm']/div[2]/table/thead/tr/th[4]/table.0.0</td>
-	<td>App SME</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//form[@id='listForm']/div[2]/table/thead/tr/th[5]/table.0.0</td>
-	<td>Asset Name</td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
 	<td>link=All</td>
 	<td></td>
@@ -103,638 +78,103 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.0.0</td>
-	<td>Asset Name</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.1.0</td>
-	<td>Short Name</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.2.0</td>
-	<td>Asset Tag</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.3.0</td>
-	<td>Asset Type</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.4.0</td>
-	<td>Manufacturer</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.5.0</td>
-	<td>Model</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.6.0</td>
-	<td>Application</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.7.0</td>
-	<td>AppOwner</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.8.0</td>
-	<td>SME</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.9.0</td>
-	<td>IP Address</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.10.0</td>
-	<td>HINFO</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.11.0</td>
-	<td>Serial #</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.12.0</td>
-	<td>U Size</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.13.0</td>
-	<td>Rail Type</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.14.0</td>
-	<td>Source Location</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.15.0</td>
-	<td>Source Room</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.16.0</td>
-	<td>Source Rack/Cab</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.17.0</td>
-	<td>Source Position</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.18.0</td>
-	<td>Target Location</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.19.0</td>
-	<td>Target Room</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.0.0</td>
-	<td>Target Rack/Cab</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.1.0</td>
-	<td>Target Position</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.2.0</td>
-	<td>powerType</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.3.0</td>
-	<td>PDU Port</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.4.0</td>
-	<td>PDU Port Qty</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.5.0</td>
-	<td>PDU Type</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.6.0</td>
-	<td>NIC Port</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.7.0</td>
-	<td>Remote Mgmt Port</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.8.0</td>
-	<td>Fiber Cabinet</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.9.0</td>
-	<td>Fiber Type</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.10.0</td>
-	<td>Fiber Qty</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.11.0</td>
-	<td>Fiber Port</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.12.0</td>
-	<td>KVM Device</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.13.0</td>
-	<td>KVM Port</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.14.0</td>
-	<td>Truck</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.15.0</td>
-	<td>Old/New</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.16.0</td>
-	<td>Priority</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.17.0</td>
-	<td>Cart</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[2]/table.18.0</td>
-	<td>Shelf</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>//input[@value='Edit' and @type='button' and @onclick='return editAssetDialog()']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>_action_Delete</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>_action_remove</td>
-	<td></td>
-</tr>
-<tr>
 	<td>click</td>
-	<td>//input[@value='Edit' and @type='button' and @onclick='return editAssetDialog()']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Fields marked ( * ) are mandatory</td>
+	<td>css=td &gt; div.buttons &gt; span.button &gt; input.edit</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>editassetNameId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editassetNameId</td>
+	<td>id=assetName</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>editshortNameId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editshortNameId</td>
+	<td>id=assetTypeId</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>editassetTagId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editassetTagId</td>
+	<td>id=manufacturer</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>editassetTypeId</td>
+	<td>id=model</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>id=shortName</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>id=serialNumber</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>id=assetTag</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>id=railType</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyText</td>
-	<td>editassetTypeId</td>
-	<td>please selectArrayCabinetCable ManagementCacheBladeBlade ChassisControllerDiskDisplayEnclosureEncryptorHVAC UnitKVMKVM SwitchLoad BalancerModemMonitorMultiplexerNetwork SwitchNSPOpticalPatch PanelPCPDUPower StripRackReservedRouterSANServerShelfSnifferStorageSwitchTapeTelecom SwitchUPSVMVPNWorkstationOther</td>
+	<td>id=priority</td>
+	<td>Please Select 1 2 3</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>editmanufacturerId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editmanufacturerId</td>
+	<td>id=ipAddress</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>editmodelId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editmodelId</td>
+	<td>id=os</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>editapplicationId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editapplicationId</td>
+	<td>id=sourceLocationId</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>editappOwnerId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editappOwnerId</td>
+	<td>id=targetLocationId</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>editappSmeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editappSmeId</td>
+	<td>id=sourceRoomId</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>editipAddressId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editipAddressId</td>
+	<td>id=targetRoomId</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>edithinfoId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>edithinfoId</td>
+	<td>id=sourceRackId</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>editserialNumberId</td>
+	<td>name=_action_Update</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyEditable</td>
-	<td>editserialNumberId</td>
+	<td>verifyTable</td>
+	<td>css=#editEntityView &gt; form &gt; table.2.0</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>editusizeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editusizeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editrailTypeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>editrailTypeId</td>
-	<td>please selectRailsSnap RailsScrew RailsEarsShelfNone</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editsourceLocationId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editsourceLocationId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editsourceRoomId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editsourceRoomId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editsourceRackId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editsourceRackId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editsourceRackPositionId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editsourceRackPositionId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>edittargetLocationId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>edittargetLocationId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>edittargetRoomId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>edittargetRoomId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>edittargetRackId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>edittargetRackId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>edittargetRackPositionId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>edittargetRackPositionId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editpowerTypeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>editpowerTypeId</td>
-	<td>please select110V Fixed110V Switch220V Fixed220V Switch</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editpduPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editpduPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editpduQuantityId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>editpduQuantityId</td>
-	<td>please select123456</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editpduTypeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>editpduTypeId</td>
-	<td>please selectC13C14C15C16C17C18C19C20IEC 309</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editnicPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editnicPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editremoteMgmtPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editremoteMgmtPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editfiberCabinetId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editfiberCabinetId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editfiberTypeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editfiberTypeId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editfiberQuantityId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editfiberQuantityId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>edithbaPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>edithbaPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editkvmDeviceId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editkvmDeviceId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editkvmPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editkvmPortId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>edittruckId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>edittruckId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editnewOrOldId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>editnewOrOldId</td>
-	<td>please selectOldNew</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editpriorityId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>editpriorityId</td>
-	<td>please select123</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editcartId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editcartId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>editshelfId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyEditable</td>
-	<td>editshelfId</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>//input[@value='Update Asset Entity']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>//input[@value='Delete' and @type='button' and @onclick=&quot;return editDialogDeleteRemove('delete')&quot;]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>//input[@value='Remove From Project' and @type='button']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>editshortNameId</td>
-	<td>edited here</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//input[@value='Update Asset Entity']</td>
+	<td>clickAndWait</td>
+	<td>name=_action_Update</td>
 	<td></td>
 </tr>
 <tr>
@@ -742,12 +182,7 @@
 	<td>//td[1]/img</td>
 	<td></td>
 </tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table[@id='showTbodyId']/tbody/tr/td[1]/table.1.1</td>
-	<td>edited here</td>
-</tr>
-
 </tbody></table>
 </body>
 </html>
+os

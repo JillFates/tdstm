@@ -28,7 +28,7 @@
 </tr>
 <tr>
 	<td>assertTitle</td>
-	<td>Login Page</td>
+	<td>Login</td>
 	<td></td>
 </tr>
 <tr>
@@ -48,7 +48,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=Project</td>
+	<td>link=Client/Project</td>
 	<td></td>
 </tr>
 <tr>

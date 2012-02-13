@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://localhost:8080/" />
+<link rel="selenium.base" href="http://tmdev.tdsops.com" />
 <title>Reports_All</title>
 </head>
 <body>
@@ -79,26 +79,6 @@
 <tr>
 	<td>label</td>
 	<td>label4</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=Create New</td>
-	<td></td>
-</tr>
-<tr>
-	<td>storeTable</td>
-	<td>//table.4.1</td>
-	<td>me</td>
-</tr>
-<tr>
-	<td>echo</td>
-	<td>${me}</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>link=Reports</td>
 	<td></td>
 </tr>
 <tr>
@@ -200,31 +180,6 @@
 	<td>exact:Fields marked ( * ) are mandatory</td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//table.1.0</td>
-	<td>exact:Bundles:*</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.2.0</td>
-	<td>exact:Teams:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.3.0</td>
-	<td>exact:Location:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.3.1</td>
-	<td>Both Source Target</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.4.0</td>
-	<td>Generate</td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
 	<td>moveBundleId</td>
 	<td></td>
@@ -236,7 +191,7 @@
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.1.1</td>
+	<td>css=div.dialog&gt;table.1.1</td>
 	<td>bundlesList</td>
 </tr>
 <!--Cleaning Team Worksheets page-->
@@ -257,12 +212,12 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.0</td>
+	<td>css=div.dialog&gt;table.1.0</td>
 	<td>exact:Bundles:*</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.0</td>
+	<td>css=div.dialog&gt;table.2.0</td>
 	<td>Sort By:</td>
 </tr>
 <tr>
@@ -282,12 +237,12 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.1</td>
+	<td>css=div.dialog&gt;table.1.1</td>
 	<td>${bundlesList}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.1</td>
+	<td>css=div.dialog&gt;table.2.1</td>
 	<td>Please Select Team/Asset Tag Room/Rack/UPos Truck/Cart/Shelf Asset Tag</td>
 </tr>
 <!--Transport Worksheets page-->
@@ -308,7 +263,7 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.0</td>
+	<td>css=div.dialog&gt;table.1.0</td>
 	<td>exact:Bundles:*</td>
 </tr>
 <tr>
@@ -318,12 +273,12 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.1</td>
+	<td>css=div.dialog&gt;table.1.1</td>
 	<td>${bundlesList}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.0</td>
+	<td>css=div.dialog&gt;table.2.0</td>
 	<td>Generate</td>
 </tr>
 <tr>
@@ -344,32 +299,32 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.0</td>
+	<td>css=div.dialog&gt;table.1.0</td>
 	<td>exact:Bundles:*</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.0</td>
+	<td>css=div.dialog&gt;table.2.0</td>
 	<td>Sort report by:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.1</td>
+	<td>css=div.dialog&gt;table.1.1</td>
 	<td>${bundlesList}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.1</td>
+	<td>css=div.dialog&gt;table.2.1</td>
 	<td>Asset Id Asset Name Source Location Target Location</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.3.1</td>
+	<td>css=div.dialog&gt;table.3.1</td>
 	<td>Include comments in report</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.4.1</td>
+	<td>css=div.dialog&gt;table.4.1</td>
 	<td>Include resolved issues in report</td>
 </tr>
 <!--Rack Elevations page-->
@@ -485,24 +440,9 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>//table.1.0</td>
-	<td>exact:Move Event:*</td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
 	<td>moveEvent</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.2.0</td>
-	<td>exact:Report Type:*</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>//table.2.1</td>
-	<td>Please Select Summary Report Detailed Report</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
