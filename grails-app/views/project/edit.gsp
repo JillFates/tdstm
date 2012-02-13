@@ -95,7 +95,7 @@
 			                    <div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="startDate" /></div>
 			                </g:hasErrors>
 			                </td>
-			                <td valign="top" class="name"><label for="completionDate">Completion Date:</label></td>
+			                <td valign="top" class="name"><label for="completionDate"><b>Completion Date:&nbsp;<span style="color: red">*</span></b></label></td>
 			                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'completionDate','errors')}">
 			                  <script type="text/javascript" charset="utf-8">
 			                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});

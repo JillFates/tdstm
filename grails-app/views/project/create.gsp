@@ -7,7 +7,30 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
 
 <script type="text/javascript">
-	
+
+      $(document).ready(function() {
+          var now = new Date();
+          formatDate(now,'startDate');
+          now.setDate(now.getDate() + 90) ;
+          formatDate(now,'completionDate')
+
+      })
+      function formatDate(dateValue,value)
+	  {
+    	    var M = "" + (dateValue.getMonth()+1);
+    	    var MM = "0" + M;
+    	    MM = MM.substring(MM.length-2, MM.length);
+    	    var D = "" + (dateValue.getDate());
+    	    var DD = "0" + D;
+    	    DD = DD.substring(DD.length-2, DD.length);
+    	    var YYYY = "" + (dateValue.getFullYear()); 
+	        var currentDate = MM + "/" +DD + "/" + YYYY
+	        if(value=='startDate'){
+	          $("#startDateId").val(currentDate);
+	        }else{
+	          $("#completionDateId").val(currentDate);
+		    }
+	  }
       function updateMastersList(e){
       // The response comes back as a bunch-o-JSON
 	
@@ -313,8 +336,8 @@
 					</div>
 				</g:hasErrors>
 				</td>
-				<td valign="top" class="name"><label for="completionDate">Completion
-				Date:</label></td>
+				<td valign="top" class="name"><label for="completionDate"><b>Completion
+				Date:&nbsp;<span style="color: red">*</span></b></label></td>
 				<td valign="top"
 					class="value ${hasErrors(bean:projectInstance,field:'completionDate','errors')}">
 				<script type="text/javascript" charset="utf-8">

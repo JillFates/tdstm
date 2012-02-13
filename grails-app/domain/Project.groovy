@@ -31,7 +31,7 @@ class Project extends PartyGroup {
 		description( blank:true, nullable:true )
 		trackChanges( blank:false, nullable:false, inList:['Y', 'N'] )
 		startDate( nullable:true )
-		completionDate( nullable:true )
+		completionDate(blank:false, nullable:false )
 		dateCreated( ) // related to party
 		lastUpdated( ) // related to party
 		workflowCode( blank:false, nullable:false )
