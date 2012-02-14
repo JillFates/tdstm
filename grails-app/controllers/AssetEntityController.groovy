@@ -368,14 +368,14 @@ class AssetEntityController {
 						def dependencySheetRow = dependencySheet.rows
 						if(params.dependency=='dependency'){
 							dependencyCount
-							for (int row = 1; row < filesSheetrows; row++) {
-								def name = filesSheet.getCell( appColNo, row ).contents
+							for (int row = 1; row < dependencySheetRow; row++) {
+								def name = dependencySheet.getCell( appColNo, row ).contents
 								if(name){
 									dependencyCount = row
 								}
 							}
 						}
-						session.setAttribute("TOTAL_ASSETS",(assetsCount+filesCount+databaseCount+appCount))
+						session.setAttribute("TOTAL_ASSETS",(assetsCount+filesCount+databaseCount+appCount+dependencyCount))
 						if(params.asset == 'asset'){
 							def eavEntityType = EavEntityType.findByDomainName('AssetEntity')
 							def serverDataTransferBatch = new DataTransferBatch()
