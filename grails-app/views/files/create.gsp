@@ -76,7 +76,8 @@
 								<td class="label" nowrap="nowrap"><label for="custom8">${project.custom8 ?: 'Custom8'}</label></td>
 								<td><input type="text" id="custom8" name="custom8"  value="${fileInstance?.custom8}"  /></td>
 								<td class="label" nowrap="nowrap"><label for="planStatus">PlanStatus</label></td>
-								<td><g:select from="${planStatusOptions}" id="planStatus"name="planStatus" value="${fileInstance.planStatus}" /></td>
+								<td>
+								<g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${fileInstance.planStatus}" /></td>
 							</tr>
 						</tbody>
 					</table>
