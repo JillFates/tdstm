@@ -16,10 +16,10 @@
 								<td class="label_sm">Target</td>
 								<td colspan="2" class="label" nowrap="nowrap">
 								<g:if test="${(assetEntityInstance.custom1)?.length()>= 4 && (assetEntityInstance.custom1)?.substring(0, 4)=='http'}">
-										<a href="javascript:window.open('${assetEntityInstance.custom1}','help');" style="color:#00E">${assetEntityInstance.project.custom1}</a>
+										<a href="javascript:window.open('${assetEntityInstance.custom1}','help');" style="color:#00E">${assetEntityInstance.project.custom1!=null ? assetEntityInstance.project.custom1 : 'Custom1'}</a>
 							    </g:if>
 							    <g:else>
-								   Custom1
+								   ${assetEntityInstance.project.custom1 ?:'Custom1'}
 							    </g:else>
 							    </td>
 							</td>
@@ -34,10 +34,10 @@
 								<td>${assetEntityInstance.targetLocation}</td>
 								<td colspan="2" class="label" nowrap="nowrap">
 								<g:if test="${(assetEntityInstance.custom2)?.length()>= 4 && (assetEntityInstance.custom2)?.substring(0, 4)=='http'}">
-										<a href="javascript:window.open('${assetEntityInstance.custom2}','help');" style="color:#00E">${assetEntityInstance.project.custom2}</a>
+										<a href="javascript:window.open('${assetEntityInstance.custom2}','help');" style="color:#00E">${assetEntityInstance.project.custom2!=null ? assetEntityInstance.project.custom2 : 'Custom2'}</a>
 							    </g:if>
 							    <g:else>
-								   Custom2
+								   ${assetEntityInstance.project.custom2 ?:'Custom2'}
 							    </g:else>
 							    </td>
 							</tr>
@@ -51,10 +51,10 @@
 								<td>${assetEntityInstance.roomTarget?.roomName}</td>
 								<td colspan="2" class="label" nowrap="nowrap">
 								<g:if test="${(assetEntityInstance.custom3)?.length()>= 4 && (assetEntityInstance.custom3)?.substring(0, 4)=='http'}">
-										<a href="javascript:window.open('${assetEntityInstance.custom3}','help');" style="color:#00E">${assetEntityInstance.project.custom3}</a>
+										<a href="javascript:window.open('${assetEntityInstance.custom3}','help');" style="color:#00E">${assetEntityInstance.project.custom3!=null ? assetEntityInstance.project.custom3 : 'Custom3'}</a>
 							    </g:if>
 							    <g:else>
-								   Custom3
+								   ${assetEntityInstance.project.custom3 ?:'Custom3'}
 							    </g:else>
 							    </td>
 							</tr>
@@ -68,10 +68,10 @@
 								<td>${assetEntityInstance.rackTarget?.tag}</td>
 								<td colspan="2" class="label" nowrap="nowrap">
 								<g:if test="${(assetEntityInstance.custom4)?.length()>= 4 && (assetEntityInstance.custom4)?.substring(0, 4)=='http'}">
-										<a href="javascript:window.open('${assetEntityInstance.custom4}','help');" style="color:#00E">${assetEntityInstance.project.custom4}</a>
+										<a href="javascript:window.open('${assetEntityInstance.custom4}','help');" style="color:#00E">${assetEntityInstance.project.custom4!=null ? assetEntityInstance.project.custom4 : 'Custom4'}</a>
 							    </g:if>
 							    <g:else>
-								   Custom4
+								   ${assetEntityInstance.project.custom4 ?:'Custom4'}
 							    </g:else>
 							    </td>
 							</tr>
@@ -85,10 +85,10 @@
 								<td>${assetEntityInstance.targetRackPosition}</td>
 								<td colspan="2" class="label" nowrap="nowrap">
 								<g:if test="${(assetEntityInstance.custom5)?.length()>= 4 && (assetEntityInstance.custom5)?.substring(0, 4)=='http'}">
-										<a href="javascript:window.open('${assetEntityInstance.custom5}','help');" style="color:#00E">${assetEntityInstance.project.custom5}</a>
+										<a href="javascript:window.open('${assetEntityInstance.custom5}','help');" style="color:#00E">${assetEntityInstance.project.custom5!=null ? assetEntityInstance.project.custom5 : 'Custom5'}</a>
 							    </g:if>
 							    <g:else>
-								   Custom5
+								   ${assetEntityInstance.project.custom5 ?:'Custom5'}
 							    </g:else>
 							    </td>
 							</tr>
@@ -104,10 +104,10 @@
 								<td>${assetEntityInstance.targetBladeChassis}</td>
 								<td colspan="2" class="label" nowrap="nowrap">
 								<g:if test="${(assetEntityInstance.custom6)?.length()>= 4 && (assetEntityInstance.custom6)?.substring(0, 4)=='http'}">
-										<a href="javascript:window.open('${assetEntityInstance.custom6}','help');" style="color:#00E">${assetEntityInstance.project.custom6}</a>
+										<a href="javascript:window.open('${assetEntityInstance.custom6}','help');" style="color:#00E">${assetEntityInstance.project.custom6!=null ? assetEntityInstance.project.custom6 : 'Custom6'}</a>
 							    </g:if>
 							    <g:else>
-								   Custom6
+								   ${assetEntityInstance.project.custom6 ?:'Custom6'}
 							    </g:else>
 							    </td>
 							</tr>
@@ -123,10 +123,10 @@
 								<td>${assetEntityInstance.targetBladePosition}</td>
 								<td colspan="2" class="label" nowrap="nowrap">
 									<g:if test="${(assetEntityInstance.custom7)?.length()>= 4 && (assetEntityInstance.custom7)?.substring(0, 4)=='http'}">
-										<a href="javascript:window.open('${assetEntityInstance.custom7}','help');" style="color:#00E">${assetEntityInstance.project.custom7}</a>
+										<a href="javascript:window.open('${assetEntityInstance.custom7}','help');" style="color:#00E">${assetEntityInstance.project.custom7!=null ? assetEntityInstance.project.custom7 : 'Custom7'}</a>
 							    </g:if>
 							    <g:else>
-								   Custom7
+								   ${assetEntityInstance.project.custom7 ?:'Custom7'}
 							    </g:else>
 									
 								</td>
@@ -141,10 +141,10 @@
 								<td>&nbsp</td>
 								<td colspan="2" class="label" nowrap="nowrap">
 									<g:if test="${(assetEntityInstance.custom8)?.length()>= 4 && (assetEntityInstance.custom8)?.substring(0, 4)=='http'}">
-										<a href="javascript:window.open('${assetEntityInstance.custom8}','help');" style="color:#00E">${assetEntityInstance.project.custom8}</a>
+										<a href="javascript:window.open('${assetEntityInstance.custom8}','help');" style="color:#00E">${assetEntityInstance.project.custom8!=null ? assetEntityInstance.project.custom8 : 'Custom8'}</a>
 							    </g:if>
 							    <g:else>
-								   Custom8
+								   ${assetEntityInstance.project.custom8 ?:'Custom8'}
 							    </g:else>
 								</td>
 							</tr>

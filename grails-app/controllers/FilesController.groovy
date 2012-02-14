@@ -82,7 +82,7 @@ class FilesController {
 		def moveBundleList = MoveBundle.findAllByProject(project)
 
 		[fileInstance:fileInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
-					planStatusOptions:planStatusOptions?.value, projectId:projectId]
+					planStatusOptions:planStatusOptions?.value, projectId:projectId, project:project]
 	}
 	def save = {
 		

@@ -53,30 +53,30 @@
 								</td>
 							</tr>
 							<tr>
-							<td class="label" nowrap="nowrap"><label for="custom1">Custom1</label></td>
-							<td><input type="text" id="custom1" name="custom1"  value="${fileInstance?.custom1}"  /></td>
-							<td class="label" nowrap="nowrap"><label for="custom1">Custom2</label></td>
-							<td><input type="text" id="custom2" name="custom2"  value="${fileInstance?.custom2}"  /></td>
-							<td class="label" nowrap="nowrap"><label for="custom3">Custom3</label></td>
-							<td><input type="text" id="custom3" name="custom3"  value="${fileInstance?.custom3}"  /></td>
-						</tr>
-						<tr>
-							<td class="label" nowrap="nowrap"><label for="custom4">Custom4</label></td>
-							<td><input type="text" id="custom4" name="custom4"  value="${fileInstance?.custom4}"  /></td>
-							<td class="label" nowrap="nowrap"><label for="custom5">Custom5</label></td>
-							<td><input type="text" id="custom5" name="custom5"  value="${fileInstance?.custom5}"  /></td>
-							<td class="label" nowrap="nowrap"><label for="custom6">Custom6</label></td>
-							<td><input type="text" id="custom6" name="custom6"  value="${fileInstance?.custom6}"  /></td>
-						</tr>
-						<tr>
-							<td class="label" nowrap="nowrap"><label for="custom7">Custom7</label></td>
-							<td><input type="text" id="custom7" name="custom7"  value="${fileInstance?.custom7}"  /></td>
-							<td class="label" nowrap="nowrap"><label for="custom8">Custom8</label></td>
-							<td><input type="text" id="custom8" name="custom8"  value="${fileInstance?.custom8}"  /></td>
-							<td class="label" nowrap="nowrap"><label for="planStatus">PlanStatus</label></td>
-							<td><g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${fileInstance.planStatus}" />
-								</td>
-						</tr>
+								<td class="label" nowrap="nowrap"><label for="custom1">${fileInstance.project.custom1 ?: 'Custom1'}</label></td>
+								<td><input type="text" id="custom1" name="custom1"  value="${fileInstance?.custom1}"  /></td>
+								<td class="label" nowrap="nowrap"><label for="custom1">${fileInstance.project.custom2 ?: 'Custom2'}</label></td>
+								<td><input type="text" id="custom2" name="custom2"  value="${fileInstance?.custom2}"  /></td>
+								<td class="label" nowrap="nowrap"><label for="custom3">${fileInstance.project.custom3 ?: 'Custom3'}</label></td>
+								<td><input type="text" id="custom3" name="custom3"  value="${fileInstance?.custom3}"  /></td>
+							</tr>
+							<tr>
+								<td class="label" nowrap="nowrap"><label for="custom4">${fileInstance.project.custom4 ?: 'Custom4'}</label></td>
+								<td><input type="text" id="custom4" name="custom4"  value="${fileInstance?.custom4}"  /></td>
+								<td class="label" nowrap="nowrap"><label for="custom5">${fileInstance.project.custom5 ?: 'Custom5'}</label></td>
+								<td><input type="text" id="custom5" name="custom5"  value="${fileInstance?.custom5}"  /></td>
+								<td class="label" nowrap="nowrap"><label for="custom6">${fileInstance.project.custom6 ?: 'Custom6'}</label></td>
+								<td><input type="text" id="custom6" name="custom6"  value="${fileInstance?.custom6}"  /></td>
+							</tr>
+							<tr>
+								<td class="label" nowrap="nowrap"><label for="custom7">${fileInstance.project.custom7 ?: 'Custom7'}</label></td>
+								<td><input type="text" id="custom7" name="custom7"  value="${fileInstance?.custom7}"  /></td>
+								<td class="label" nowrap="nowrap"><label for="custom8">${fileInstance.project.custom8 ?: 'Custom8'}</label></td>
+								<td><input type="text" id="custom8" name="custom8"  value="${fileInstance?.custom8}"  /></td>
+								<td class="label" nowrap="nowrap"><label for="planStatus">PlanStatus</label></td>
+								<td><g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${fileInstance.planStatus}" />
+									</td>
+							</tr>
 
 						</tbody>
 					</table>

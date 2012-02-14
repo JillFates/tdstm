@@ -115,7 +115,7 @@ class DatabaseController {
 		def moveBundleList = MoveBundle.findAllByProject(project)
 
 		[databaseInstance:databaseInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
-					planStatusOptions:planStatusOptions?.value, projectId:projectId]
+					planStatusOptions:planStatusOptions?.value, projectId:projectId, project:project]
 	}
 	
 	def save = {

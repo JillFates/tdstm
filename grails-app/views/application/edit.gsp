@@ -102,30 +102,30 @@
 								</td>
 							</tr>
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="custom1">Custom 1</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom1">${applicationInstance.project.custom1 ?: 'Custom1'} </label></td>
 								<td ><input type="text" id="custom1"	name="custom1" value="${applicationInstance.custom1}"  />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="custom1">Custom 2</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom1">${applicationInstance.project.custom2 ?: 'Custom2'}</label></td>
 								<td ><input type="text" id="custom2"	name="custom2" value="${applicationInstance.custom2}"  />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="custom3">Custom 3</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom3">${applicationInstance.project.custom3 ?: 'Custom3'}</label></td>
 								<td ><input type="text" id="custom3"	name="custom3" value="${applicationInstance.custom3}"  />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="custom4">Custom 4</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom4">${applicationInstance.project.custom4 ?: 'Custom4'}</label></td>
 								<td ><input type="text" id="custom4"	name="custom4" value="${applicationInstance.custom4}"  />
 								</td>
 							</tr>
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="custom5">Custom 5</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom5">${applicationInstance.project.custom5 ?: 'Custom5'}</label></td>
 								<td ><input type="text" id="custom5"	name="custom5" value="${applicationInstance.custom5}"/>
 								</td>
-								<td class="label" nowrap="nowrap"><label for="custom6">Custom 6</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom6">${applicationInstance.project.custom6 ?: 'Custom6'}</label></td>
 								<td ><input type="text" id="custom6"	name="custom6" value="${applicationInstance.custom6}"  />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="custom7">Custom 7</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom7">${applicationInstance.project.custom7 ?: 'Custom7'}</label></td>
 								<td ><input type="text" id="custom7"	name="custom7" value="${applicationInstance.custom7}" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="custom8">Custom 8</label></td>
+								<td class="label" nowrap="nowrap"><label for="custom8">${applicationInstance.project.custom8 ?: 'Custom8'}</label></td>
 								<td ><input type="text" id="custom8"	name="custom8" value="${applicationInstance.custom8}"  />
 								</td>
 							</tr>
