@@ -379,7 +379,7 @@ class RackLayoutsController {
 						moveBundle += (overlappedAsset?.moveBundle ? overlappedAsset?.moveBundle.name : "") + "<br/>"
 						if(overlappedAsset.model && overlappedAsset.model.assetType == 'Blade Chassis' && (!backView || showCabling != 'on') ){
 							hasBlades = true
-							bladeTable = generateBladeLayout(it, overlappedAsset,isAdmin, hideIcons)
+							bladeTable = generateBladeLayout(it, overlappedAsset,isAdmin, hideIcons, redirectTo)
 						}
 						cabling = !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : ""
 						if(isAdmin){

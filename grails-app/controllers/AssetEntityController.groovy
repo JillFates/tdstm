@@ -2635,7 +2635,7 @@ class AssetEntityController {
 		def manufacturer = params.manufacturer
 		def assetType = params.assetType
 		def models
-		if(manufacturer){
+		if(manufacturer!="null"){
 			def manufacturerInstance = Manufacturer.read(manufacturer)
 			models = manufacturerInstance ? Model.findAllByManufacturer( manufacturerInstance,[sort:'modelName',order:'asc'] )?.findAll{it.assetType == assetType } : null
 		}
