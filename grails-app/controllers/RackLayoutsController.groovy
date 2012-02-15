@@ -383,7 +383,7 @@ class RackLayoutsController {
 						}
 						cabling = !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : ""
 						if(isAdmin){
-							assetTag += """<a href="javascript:getEntityDetails('${redirectTo}','${overlappedAsset?.assetType}',${overlappedAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>"
+							assetTag += """<a href="javascript:getEntityDetails('${redirectTo}','${overlappedAsset?.assetType}',${overlappedAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>&nbsp;"
 							if(hasBlades){
 								assetTag += "<br/>"+bladeTable
 							}
