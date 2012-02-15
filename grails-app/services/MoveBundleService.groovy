@@ -198,7 +198,7 @@ class MoveBundleService {
 			LEFT OUTER JOIN project_team pt ON pt.project_team_id = atr.project_team_id
 			WHERE me.move_event_id = ${moveEventId}
 			   AND atr.is_non_applicable = 0
-			ORDER BY move_bundle_id, asset_name, transition_time"""
+			ORDER BY move_bundle_id,transition_time"""
 		def detailedResults = jdbcTemplate.queryForList(detailedQuery)
 		return detailedResults
 	 }
@@ -219,7 +219,7 @@ class MoveBundleService {
 				JOIN workflow_transition wt ON wt.trans_id = CAST(atr.state_to AS UNSIGNED INTEGER) AND wt.workflow_id = w.workflow_id
 				WHERE me.move_event_id = ${moveEventId} AND atr.is_non_applicable = 0
 				GROUP BY mb.move_bundle_id, atr.state_to
-				ORDER BY CAST(state_to AS UNSIGNED INTEGER)"""
+				ORDER BY mb.move_bundle_id,started asc"""
 		jdbcTemplate.execute(createTemp)
 		// UPDATE Start Time
 		def updateStartTime = """UPDATE tmp_step_summary

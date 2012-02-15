@@ -44,6 +44,7 @@
 			<td class="buttonR" colspan="2">
 				<input class="button" type="submit" name="generate" value="Generate XLS"/>
 				<g:actionSubmit value="Generate PDF" action="getMoveEventResultsAsPDF"/>
+				<g:actionSubmit value="Generate WEB" action="getMoveEventResultsAsWEB"/>
 			</td>
 		</tr>
 	</tbody>

@@ -440,5 +440,51 @@ class MoveEventController {
     	}
 		render "success"
      }
+	def getMoveEventResultsAsWEB = {
+		def moveEvent = params.moveEvent
+		def reportType = params.reportType
+		if(moveEvent && reportType){
+			def moveEventInstance = MoveEvent.get( moveEvent  )
+			try {
+				def moveEventResults
+				def reportFields =[]
+				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+				DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+				def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
+				if(reportType != "SUMMARY"){
+					moveEventResults = moveBundleService.getMoveEventDetailedResults( moveEvent )
+					moveEventResults.each { results->
+						reportFields <<["move_bundle_id":results.move_bundle_id, "bundle_name":results.bundle_name,
+										"asset_id":results.asset_id, "team_name":results.team_name,
+										"asset_name":results.asset_name, "voided":results.voided,
+										"from_name":results.from_name, "to_name":results.to_name,
+										"transition_time":String.valueOf(formatter.format(GormUtil.convertInToUserTZ( results.transition_time, tzId )) ),
+										"username":results.username,"timezone":tzId ? tzId : "EDT",
+										"rptTime":String.valueOf(formatter.format( currDate ) )]
+					}
+					render(view:"moveResultsWeb",model:[moveEventResults:reportFields])
+				} else {
+					moveEventResults = moveBundleService.getMoveEventSummaryResults( moveEvent )
+					moveEventResults.each { results->
+						reportFields <<["move_bundle_id":results.move_bundle_id, "bundle_name":results.bundle_name,
+										"state_to":results.state_to, "name":results.name,
+										"started":String.valueOf(formatter.format(GormUtil.convertInToUserTZ( results.started, tzId )) ),
+										"completed":String.valueOf(formatter.format(GormUtil.convertInToUserTZ( results.completed, tzId )) ),
+										"timezone":tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
+					}
+					render(view:"moveResultsWeb",model:[moveEventResults:reportFields, summary:'summary'])
+				}
+					
+			} catch( Exception ex ) {
+				flash.message = "Exception occurred while exporting data"+ex
+				redirect( controller:'reports', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
+				return;
+			}
+		} else {
+			flash.message = "Please select MoveEvent and report type. "
+			redirect( controller:'reports', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
+			return;
+		}
+	}
     
 }
