@@ -100,7 +100,6 @@ function selectManufacturer(value){
 	//${remoteFunction(action:'getManufacturersList', params:'\'assetType=\' + val ', onComplete:'showManufacView(e)' )}
 	}
 function showManufacView(e){
-	//alert("WARNING : Change of Asset Type may impact on Manufacturer and Model, Do you want to continue ?");
     var resp = e.responseText;
     $("#manufacturerId").html(resp);
     $("#manufacturers").removeAttr("multiple")
@@ -112,7 +111,6 @@ function selectModel(value){
 	//${remoteFunction(action:'getModelsList', params:'\'assetType=\' +assetType +\'&manufacturer=\'+ val', onComplete:'showModelView(e)' )}
 }
 function showModelView(e){
-	//alert("WARNING : Change of Manufacturer may impact on Model data, Do you want to continue ?")
     var resp = e.responseText;
     $("#modelId").html(resp);
     $("#models").removeAttr("multiple")
