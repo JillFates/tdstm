@@ -178,7 +178,7 @@
 					</div>
 					<div class="toprightcontent" id="revised_gauge_content"
 						style="display: none;">
-						Confidence in Revised Plan<br> <span class="high">High</span><br>
+						Confidence in Revised Plan<br> <span class="high">High</span><br>
 						<span class="redfont">Planned Completion:&#13; <!--12/12: 07:00 AM EST&#13;-->
 							<br /> <span id="spanRevised"></span>
 						</span>
@@ -198,7 +198,7 @@
 							</li>
 						</ul>
 					</div>
-					<div style="float: right; margin-right: 5px;">
+					<div style="float: left; margin-left: 5px; margin-top:12px;">
 						<input type="button" value="Add News" onclick="opencreateNews()">
 					</div>
 				</div>
@@ -667,9 +667,7 @@
 	                    $("#update").css("color","red")
 	                    if( xhr.status == "403"){
 	                    	alert("403 Forbidden occurred, user don't have permission to load the current project data.");
-	                    } else {
-	                    	alert("Sorry, there is a problem receiving updates to this page. Try reloading to resolve.");
-	                    }    
+	                    }   
                 	} else {
                 		errorCode =  xhr.status ; 
                 	}
@@ -795,7 +793,6 @@
 		    	clearInterval(handler);
 	      		doUpdate = false;
 	      		$("#update").css("color","red")
-				alert("Sorry, there is a problem receiving updates to this page. Try reloading to resolve.");
 		    }
 		}
 	    
@@ -865,9 +862,7 @@
 		          		$("#update").css("color","red")
 		            	if( xhr.status == "403"){
 		             		alert("403 Forbidden occurred, user don't have permission to load the current project data.");
-						} else {
-		             		alert("Sorry, there is a problem receiving updates to this page. Try reloading to resolve.");
-		             	}    
+						}    
 	          		} else {
 	          			errorCode = xhr.status;
 	          			doUpdate = false;
@@ -970,7 +965,6 @@
 				clearInterval(handler);
 	      		doUpdate = false;
 	      		$("#update").css("color","red")
-				alert("Sorry, there is a problem receiving updates to this page. Try reloading to resolve.");
 			}
 		}
 		
@@ -992,9 +986,7 @@
 			            	$("#update").css("color","red");
 			            	if( xhr.status == "403"){
 			             		alert("403 Forbidden occurred, user don't have permission to load the current project data.");
-			             	} else {
-				             	alert("Sorry, there is a problem receiving updates to this page. Try reloading to resolve.");
-				            }
+			             	}
 				 		} else {
 				 			errorCode = xhr.status;
 				 		}    
@@ -1056,7 +1048,6 @@
 				clearInterval(handler);
 	      		doUpdate = false;
 	      		$("#update").css("color","red")
-				alert("Sorry, there is a problem receiving updates to this page. Try reloading to resolve.");
 			}
 		} --%>
 	}
