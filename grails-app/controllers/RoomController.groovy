@@ -99,7 +99,7 @@ class RoomController {
         def roomInstance = Room.get(params.id)
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.findById( projectId )
-		def rackInstanceList = Rack.findAllByRoom(roomInstance)
+		def rackInstanceList = Rack.findAllByRoom(roomInstance , [sort:"tag"])
 		def moveBundleList = MoveBundle.findAllByProject( project )
 		def newRacks = []
 		for(int i = 50000 ; i<50051; i++ ){
