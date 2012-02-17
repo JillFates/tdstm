@@ -4,10 +4,10 @@ class ProjectService {
 
     static transactional = true
 
-    def getCompletedProject( timeNow, isAdmin, sort, order ) {
+    def getCompletedProject( timeNow, projectHasPermission, sort, order ) {
 		def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
 		def projects = []
-		if(isAdmin){
+		if(projectHasPermission){
 			projects = Project.createCriteria().list {
 				and {
 					lt("completionDate", timeNow)
@@ -24,10 +24,10 @@ class ProjectService {
 		
 		return  projects
 	}
-	def getActiveProject( timeNow, isAdmin, sort, order ) {
+	def getActiveProject( timeNow, projectHasPermission, sort, order ) {
 		def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
 		def projects = []
-		if(isAdmin){
+		if(projectHasPermission){
 			projects = Project.createCriteria().list {
 				and {
 					ge("completionDate", timeNow)

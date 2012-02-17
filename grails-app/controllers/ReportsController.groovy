@@ -437,9 +437,6 @@ class ReportsController {
 
 			def moveBundle = MoveBundle.findById(bundleId)
      		def reportsHasPermission = RolePermissions.hasPermission("reports")
-     		/*if( !isAdmin ) {
-     			isAdmin = SecurityUtils.getSubject().hasRole("PROJECT_ADMIN")
-     		}*/
         	if(location == "source"){
         		rack = request.getParameterValues("sourcerack")
         		rack.each{
@@ -1155,9 +1152,6 @@ class ReportsController {
 				moveBundles = MoveBundle.findAll("from MoveBundle m where id in ${bundlesString} ")
 			}
 			def reportsHasPermission = RolePermissions.hasPermission("reports")
-			/*if( !isAdmin ) {
-				isAdmin = SecurityUtils.getSubject().hasRole("PROJECT_ADMIN")
-			}*/
 			
 			if(request.getParameterValues("sourcerack") != ['none']) {
 				def rack = request.getParameterValues("sourcerack")
