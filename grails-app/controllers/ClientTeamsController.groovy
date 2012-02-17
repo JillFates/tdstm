@@ -42,7 +42,7 @@ class ClientTeamsController {
 		session.setAttribute("TEAM_VIEW_MODE", viewMode)
 	
 		def subject = SecurityUtils.subject
-		def hasRole = subject.hasRole("ADMIN") || subject.hasRole("PROJECT_ADMIN") || subject.hasRole("SUPERVISOR")
+		def hasClientTeamsRole = RolePermissions.hasPermission("clientTeams")
 		def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
 		def now = GormUtil.convertInToGMT( "now","EDT" )
 		def timeNow = now.getTime()
@@ -50,7 +50,7 @@ class ClientTeamsController {
 		moveBundles.each{ moveBundle ->
 			def bundleAssetsList = AssetEntity.findAllWhere( moveBundle : moveBundle )
 			partyRelationshipService.getBundleTeamInstanceList( moveBundle ).each {
-				if( hasRole || it.teamMembers.id.contains(loginUser.id) ){
+				if( hasClientTeamsRole || it.teamMembers.id.contains(loginUser.id) ){
 					def teamId = it.projectTeam.id
 					def headColor = 'done'
 					def role = it.projectTeam?.role ? it.projectTeam?.role : "MOVE_TECH"

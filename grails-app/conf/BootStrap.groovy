@@ -26,7 +26,8 @@ class BootStrap {
   			[ PermissionGroup.NAVIGATION, "HelpMenuView"],
 			[ PermissionGroup.NAVIGATION, "CommentCrudView"],
 			[ PermissionGroup.NAVIGATION, "ModelDialogView"],
-			[ PermissionGroup.NAVIGATION, "DashboardView"],
+			[ PermissionGroup.NAVIGATION, "DashBoardViewPacingMeters"],
+			[ PermissionGroup.NAVIGATION, "DashboardManualOverride"],
 			[ PermissionGroup.NAVIGATION, "AssetEntityShowView"],
 			[ PermissionGroup.NAVIGATION, "DashboardIndexView"],
 			[ PermissionGroup.NAVIGATION, "CompanyHeaderView"],
@@ -47,7 +48,20 @@ class BootStrap {
 			[ PermissionGroup.NAVIGATION, "RoleTypeShowView"],
 			[ PermissionGroup.NAVIGATION, "RoomListView"],
 			[ PermissionGroup.NAVIGATION, "RoomShowView"],
-			[ PermissionGroup.NAVIGATION, "UserLoginShowView"]
+			[ PermissionGroup.NAVIGATION, "UserLoginShowView"],
+			[ PermissionGroup.NAVIGATION, "moveEventNews"],
+			[ PermissionGroup.ASSET, "AssetEntity"],
+			[ PermissionGroup.PROJECT, "project"],
+			[ PermissionGroup.EVENT, "event"],
+			[ PermissionGroup.BUNDLE, "bundle"],
+			[ PermissionGroup.CLIENTCONSOLE, "clientConsole"],
+			[ PermissionGroup.CLIENTTEAMS, "clientTeams"],
+			[ PermissionGroup.DASHBOARD, "dashboard"],
+			[ PermissionGroup.MODEL, "model"],
+			[ PermissionGroup.PERSON, "person"],
+			[ PermissionGroup.RACKLAYOUTS, "rackLayouts"],
+			[ PermissionGroup.REPORTS, "reports"],
+			[ PermissionGroup.USERLOGIN, "userLogin"]
 			
   			]
   	

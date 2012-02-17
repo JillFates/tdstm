@@ -26,18 +26,18 @@ class AuthFilters {
 					} else if( !moveObject ){					// condition to verify the MoveEvent / moveBundle exist
 						response.sendError( 404 , "Not Found" )
 						return false
-					} else if( !subject.hasRole("ADMIN") ){		// verify the user role as ADMIN
+					} else if( RolePermissions.hasPermission("moveEventNews") ){		// verify the user role as ADMIN
+						return true;
+					} else {
 						def moveEventProjectClientStaff = PartyRelationship.find( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' "+
-															" and p.partyIdFrom = ${moveObject?.project?.client?.id} and p.roleTypeCodeFrom = 'COMPANY'"+
-															" and p.roleTypeCodeTo = 'STAFF' and p.partyIdTo = ${person.id}" )
-						if(!moveEventProjectClientStaff){		// if not ADMIN check whether user is associated to the Party that is associate to the Project.client of the moveEvent / MoveBundle 
+											" and p.partyIdFrom = ${moveObject?.project?.client?.id} and p.roleTypeCodeFrom = 'COMPANY'"+
+											" and p.roleTypeCodeTo = 'STAFF' and p.partyIdTo = ${person.id}" )
+						if(!moveEventProjectClientStaff){		// if not ADMIN check whether user is associated to the Party that is associate to the Project.client of the moveEvent / MoveBundle
 							response.sendError( 403 , "Forbidden" )
 							return false
 						} else{
 							return true;
 						}
-					} else {
-						return true;
 					}
 				}
 			} // before

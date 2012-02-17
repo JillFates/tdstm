@@ -39,8 +39,8 @@ class UserLoginController {
 		def userLoginInstanceList
 		def userLoginSize
 
-		def isCompanyAdmin = SecurityUtils.getSubject().hasRole("ADMIN")
-		if( isCompanyAdmin ){
+		def userLoginHasPermission = RolePermissions.hasPermission("userLogin")
+		if( userLoginHasPermission ){
 			if(params.companyName ){
 				companyId  = PartyGroup.findByName(params.companyName)?.id
 			}

@@ -127,7 +127,7 @@
 				<div id="plan_summary">
 					<div id="topindleft">
 						<div id="summary_gauge_div" align="center">
-							<g:if test="${isAdmin || isProjManager }">
+							<g:if test="${manualOverrideViewPermission}">
 								<a href="#manualSummary"
 									onclick="javascript:$('#manualSumStatusSpan').show();"> <img
 									id="summary_gauge" alt="Move Event Summary"
@@ -303,7 +303,7 @@
 										<div
 											id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}"
 											align="center" style="display: none;">
-											<tds:hasPermission permission='DashboardIndexView'>
+											<tds:hasPermission permission='DashBoardViewPacingMeters'>
 												<img
 													id="chart_${moveBundle.id}_${moveBundleStep.transitionId}"
 													src="${createLinkTo(dir:'i/dials',file:'dial-50sm.png')}">

@@ -5,8 +5,19 @@ public enum PermissionGroup {
 	ASSET('asset'),
 	PROJECT('project'),
 	EVENT('event'),
-	BUNDLE('bundle')
-	
+	BUNDLE('bundle'),
+	CLIENTCONSOLE('clientConsole'),
+	CLIENTTEAMS('clientTeams'),
+	DASHBOARD('dashboard'),
+	MODEL('model'),
+	PERSON('person'),
+	PROJECTUTIL('projectUtil'),
+	RACKLAYOUTS('rackLayouts'),
+	REPORTS('reports'),
+	USERLOGIN('userLogin'),
+	PMOASSETTRACKING('pmoAssetTracking'),
+	SUPERVISORCONSOLE('supervisorConsole'),
+    MOVEEVENTNEWS('moveEventNews')
 	
 	String name
 	
@@ -19,7 +30,8 @@ public enum PermissionGroup {
 	}
 	
 	static list() {
-		 [NAVIGATION,ASSET,	PROJECT,EVENT,BUNDLE]
+		 [NAVIGATION,ASSET,	PROJECT,EVENT,BUNDLE,CLIENTCONSOLE,CLIENTTEAMS,DASHBOARD,MODEL,PERSON,PROJECTUTIL,
+	      RACKLAYOUTS,REPORTS,USERLOGIN,PMOASSETTRACKING,SUPERVISORCONSOLE,MOVEEVENTNEWS]
 		}
 	String toString() {
 		return name

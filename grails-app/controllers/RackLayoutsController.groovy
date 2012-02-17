@@ -56,7 +56,7 @@ class RackLayoutsController {
 		return [moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, projectId:projectId,
 				currentBundle:currentBundle, isCurrentBundle : isCurrentBundle, models:models ,servers:servers, 
 				applications : applications, dbs : dbs, files : files, rackFilters:rackFilters, targetRackFilter:targetRack,
-				bundle:bundle,sourceRackFilter:sourceRack,isAdmin:subject.hasRole("ADMIN")]
+				bundle:bundle,sourceRackFilter:sourceRack,rackLayoutsHasPermission:RolePermissions.hasPermission("rackLayouts")]
 	}
 	
 	def save = {
@@ -86,10 +86,10 @@ class RackLayoutsController {
 				def bundlesString = bundleId.toString().replace("[","(").replace("]",")")
 				moveBundles = MoveBundle.findAll("from MoveBundle m where id in ${bundlesString} ")
 			}
-			def isAdmin = SecurityUtils.getSubject().hasRole("PROJ_MGR")
-			if( !isAdmin ) {
-				isAdmin = SecurityUtils.getSubject().hasRole("PROJECT_ADMIN")
-			}
+			def rackLayoutsHasPermission = RolePermissions.hasPermission("rackLayouts")
+			/*if( !rackLayoutsHasPermission ) {
+				rackLayoutsHasPermission =RolePermissions.hasPermission("rackLayouts")
+			}*/
 			
 			if(request && request.getParameterValues("sourcerack") != ['none']) {
 				def rack = request.getParameterValues("sourcerack")
@@ -281,10 +281,10 @@ class RackLayoutsController {
 				def backViewRows
 				def frontViewRows
 				if(backView) {
-					backViewRows = getRackLayout(isAdmin, assetDetails, includeBundleName, backView, params.showCabling, hideIcons, redirectTo)
+					backViewRows = getRackLayout(rackLayoutsHasPermission, assetDetails, includeBundleName, backView, params.showCabling, hideIcons, redirectTo)
 				}
 				if(frontView) {
-					frontViewRows = getRackLayout(isAdmin, assetDetails, includeBundleName, null, params.showCabling, hideIcons, redirectTo)
+					frontViewRows = getRackLayout(rackLayoutsHasPermission, assetDetails, includeBundleName, null, params.showCabling, hideIcons, redirectTo)
 				}
 				rackLayout << [ assetDetails : assetDetails, rack : rack.tag , room : rack.room,
 								frontViewRows : frontViewRows, backViewRows : backViewRows ]
@@ -321,7 +321,7 @@ class RackLayoutsController {
 		render rackDetails as JSON
 	}
 
-	private getRackLayout( def isAdmin, def asset, def includeBundleName, def backView, def showCabling, def hideIcons, def redirectTo ){
+	private getRackLayout( def rackLayoutsHasPermission, def asset, def includeBundleName, def backView, def showCabling, def hideIcons, def redirectTo ){
 		def rows = new StringBuffer()
 		def rowspan = 1
 		def cssClass = "empty"
@@ -360,9 +360,9 @@ class RackLayoutsController {
 							moveBundle += (overlapAsset?.moveBundle ? overlapAsset?.moveBundle.name : "") + "<br/>"
 							if(overlapAsset.model && overlapAsset.model.assetType == 'Blade Chassis' && (!backView || showCabling != 'on')){
 								hasBlades = true
-								bladeTable = generateBladeLayout(it, overlapAsset, isAdmin, hideIcons, redirectTo)
+								bladeTable = generateBladeLayout(it, overlapAsset, rackLayoutsHasPermission, hideIcons, redirectTo)
 							}
-							if(isAdmin){
+							if(rackLayoutsHasPermission){
 								assetTag += """<a href="javascript:getEntityDetails('${redirectTo}','${overlapAsset?.assetType}',${overlapAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>" 
 								if(hasBlades){
 									assetTag += "<br/>"+bladeTable
@@ -379,10 +379,10 @@ class RackLayoutsController {
 						moveBundle += (overlappedAsset?.moveBundle ? overlappedAsset?.moveBundle.name : "") + "<br/>"
 						if(overlappedAsset.model && overlappedAsset.model.assetType == 'Blade Chassis' && (!backView || showCabling != 'on') ){
 							hasBlades = true
-							bladeTable = generateBladeLayout(it, overlappedAsset,isAdmin, hideIcons, redirectTo)
+							bladeTable = generateBladeLayout(it, overlappedAsset,rackLayoutsHasPermission, hideIcons, redirectTo)
 						}
 						cabling = !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : ""
-						if(isAdmin){
+						if(rackLayoutsHasPermission){
 							assetTag += """<a href="javascript:getEntityDetails('${redirectTo}','${overlappedAsset?.assetType}',${overlappedAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>&nbsp;"
 							if(hasBlades){
 								assetTag += "<br/>"+bladeTable
@@ -464,7 +464,7 @@ class RackLayoutsController {
 				rowspan = 1
 				rackStyle = it.rackStyle
 				row.append("<td class='empty' nowrap>${it.rack}</td><td rowspan=1 class=${it.cssClass}>")
-				if(isAdmin && hideIcons == "on"){
+				if(rackLayoutsHasPermission && hideIcons == "on"){
 				row.append("""<div class="rack_menu"><img src="../i/rack_add2.png">
 							<ul>
 								<li><a href="javascript:createAssetPage('Server','${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Create asset  </a></li>
@@ -491,7 +491,7 @@ class RackLayoutsController {
 	/*************************************************
 	 * Construct Balde layout for RackLayouts report
 	 **************************************************/
-	def generateBladeLayout(def assetDetails, def assetEntity, def isAdmin, def hideIcons, def redirectTo){
+	def generateBladeLayout(def assetDetails, def assetEntity, def rackLayoutsHasPermission, def hideIcons, def redirectTo){
 		
 		def bladeTable = '<table class="bladeTable"><tr>'
 		def rowspan = assetDetails.asset?.rowspan != 0 ? assetDetails.asset?.rowspan : 1
@@ -537,12 +537,12 @@ class RackLayoutsController {
 					def hasError = assetDetails.asset.source == 1 ? blades.findAll { it.sourceBladePosition == i + bladeLabelCount }.size() > 0 : blades.findAll { it.targetBladePosition == i + bladeLabelCount }.size() > 0
 					if((bladeSpan == 2) &&  hasError )
 						bladeTable += "<td class='errorBlade' style='height:${tdHeight}px'>&nbsp;</td>"
-					else if(isAdmin)
+					else if(rackLayoutsHasPermission)
 						bladeTable += """<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href="javascript:getEntityDetails('${redirectTo}','Blade',${blade.id})" title='${tag.replace('<br/>','')}'>${taglabel}</a></td>"""
 					else
 						bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px' title='${tag.replace('<br/>','')}'>${taglabel}</td>"
 				} else {
-					if(isAdmin && hideIcons == 'on'){
+					if(rackLayoutsHasPermission && hideIcons == 'on'){
 						bladeTable += """<td class='emptyBlade' style='height:${tdHeight}px'>
 									<div class="rack_menu"><img src="../i/rack_add2.png"/>
 										<ul>

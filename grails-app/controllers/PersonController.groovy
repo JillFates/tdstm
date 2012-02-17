@@ -279,7 +279,7 @@ class PersonController {
 		def projectStaff = partyRelationshipService.getProjectStaff( projectId )	
 		def companiesStaff = partyRelationshipService.getProjectCompaniesStaff( projectId )
 		def projectCompanies = partyRelationshipService.getProjectCompanies( projectId )
-		return [ projectStaff:projectStaff, companiesStaff:companiesStaff, projectCompanies:projectCompanies, projectId:projectId, submit:submit, isAdmin:subject.hasRole("ADMIN") ]
+		return [ projectStaff:projectStaff, companiesStaff:companiesStaff, projectCompanies:projectCompanies, projectId:projectId, submit:submit, personHasPermission:RolePermissions.hasPermission("person") ]
 	}
 	/*
 	 *	Method to add Staff to project through Ajax Overlay 

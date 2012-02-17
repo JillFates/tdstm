@@ -23,18 +23,18 @@ class ProjectController {
 		}
 		def projectList
 		def partyProjectList
-		def isAdmin = SecurityUtils.getSubject().hasRole("ADMIN")
+		def projectHasPermission = RolePermissions.hasPermission("project")
 		def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
 		def sort = params.sort ? params.sort : 'dateCreated' 
 		def order = params.order ? params.order : 'desc'
 	    def now = GormUtil.convertInToGMT( "now",session.getAttribute("CURR_TZ")?.CURR_TZ )
 		if(params._action_List=="Show Completed Projects"){
-			projectList = projectService.getCompletedProject( now, isAdmin, sort, order )
+			projectList = projectService.getCompletedProject( now, projectHasPermission, sort, order )
 			session.setAttribute("COMPLETED_PROJ", "COMPLETE")
 		} else if(session.getAttribute("COMPLETED_PROJ")=="COMPLETE"){
-			projectList = projectService.getCompletedProject( now, isAdmin, sort, order )
+			projectList = projectService.getCompletedProject( now, projectHasPermission, sort, order )
 		} else {
-			projectList = projectService.getActiveProject( now, isAdmin, sort, order )
+			projectList = projectService.getActiveProject( now, projectHasPermission, sort, order )
 		}
 		TableFacade tableFacade = new TableFacadeImpl("tag",request)
         tableFacade.items = projectList

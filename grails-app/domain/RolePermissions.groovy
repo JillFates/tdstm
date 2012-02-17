@@ -1,3 +1,4 @@
+import org.jsecurity.SecurityUtils
 
 class RolePermissions {
 	String role
@@ -13,11 +14,22 @@ class RolePermissions {
     }
 	
 	// Helper methods
-	static Boolean hasPermission(role, permission){
+	static Boolean hasPermission( permissionItems){
 		def returnVal = false
-		def rolePermissions = RolePermissions.findByPermissionAndRole(permission, role)
-		if(rolePermissions){
-			returnVal = true
+		def permissionItem = permissionItems
+		def permission = Permissions.findByPermissionItem(permissionItem)
+		
+		List roles = []
+		def subject = SecurityUtils.subject
+		Permissions.Roles.values().each{
+			if(subject.hasRole(it.toString())){
+				roles << it.toString()
+			}
+		}
+		if(roles.size()>0){
+			def hasPermission = RolePermissions.hasPermissionToAnyRole(roles, permission)
+			if(hasPermission)
+				returnVal = true
 		}
 		return returnVal
 	}

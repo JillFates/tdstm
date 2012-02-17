@@ -50,11 +50,11 @@ class ProjectUtilController {
     def searchList = {
 			def projectList
     		def partyProjectList
-    		def isAdmin = SecurityUtils.getSubject().hasRole("ADMIN")
+    		def projectHasPermission = RolePermissions.hasPermission("project")
     		def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
 			def sort = params.sort ? params.sort : 'dateCreated' 
 			def order = params.order ? params.order : 'desc'
-    	if(isAdmin){	
+    	if(projectHasPermission){	
         	  projectList = Project.findAll( [sort:sort, order:order] )
     	}else{
     		def userCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' "+

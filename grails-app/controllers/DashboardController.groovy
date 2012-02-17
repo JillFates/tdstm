@@ -49,7 +49,7 @@ class DashboardController {
 		}
 		return [ moveEventsList : moveEventsList, moveEvent : moveEvent, project : project, projectLogo : projectLogo, 
 				 moveBundleList : moveBundleList, timeToUpdate : timeToUpdate ? timeToUpdate.DASHBOARD_REFRESH : "never",
-				 isAdmin:subject.hasRole("ADMIN"), isProjManager:subject.hasRole("PROJ_MGR")]
+				 manualOverrideViewPermission:RolePermissions.hasPermission("DashboardManualOverride")	]
     }
 	
 	/*---------------------------------------------------------

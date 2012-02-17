@@ -436,10 +436,10 @@ class ReportsController {
         	def rackLayout = []
 
 			def moveBundle = MoveBundle.findById(bundleId)
-     		def isAdmin = SecurityUtils.getSubject().hasRole("PROJ_MGR")
-     		if( !isAdmin ) {
+     		def reportsHasPermission = RolePermissions.hasPermission("reports")
+     		/*if( !isAdmin ) {
      			isAdmin = SecurityUtils.getSubject().hasRole("PROJECT_ADMIN")
-     		}
+     		}*/
         	if(location == "source"){
         		rack = request.getParameterValues("sourcerack")
         		rack.each{
@@ -603,10 +603,10 @@ class ReportsController {
     	            def backViewRows
     	            def frontViewRows
     	            if(backView){
-    	            	backViewRows = getRackLayout( isAdmin, assetDetails, includeBundleName, backView )
+    	            	backViewRows = getRackLayout( reportsHasPermission, assetDetails, includeBundleName, backView )
     	            }
     	            if(frontView){
-    	            	frontViewRows = getRackLayout( isAdmin, assetDetails, includeBundleName, null )
+    	            	frontViewRows = getRackLayout( reportsHasPermission, assetDetails, includeBundleName, null )
     	            }
     	            if(rackRooms.size() == 3){
     	            	rackLayout << [ assetDetails : assetDetails, rack : rackRooms[2] , room : rackRooms[1] , 
@@ -860,7 +860,7 @@ class ReportsController {
 	 * @param  : asset details
 	 * @return : rack rows
 	 *---------------------------------------*/
-	def getRackLayout( def isAdmin, def asset, def includeBundleName, def backView){
+	def getRackLayout( def reportsHasPermission, def asset, def includeBundleName, def backView){
     	def rows= new StringBuffer()
     	def rowspan = 1
     	def cssClass = "empty"
@@ -889,7 +889,7 @@ class ReportsController {
     		 			moveBundle += (assetInstance?.moveBundle ? assetInstance?.moveBundle.name : "") + "<br/>"
     		 			assetTag += "<a href='javascript:openAssetEditDialig(${assetInstance?.id})' >$it</a> <br/>"
     		 		}
-    		 		if( !isAdmin ){
+    		 		if( !reportsHasPermission ){
     		 			assetTag = it.asset?.assetTag
     		 		}
     		 		row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
@@ -1154,10 +1154,10 @@ class ReportsController {
 				def bundlesString = bundleId.toString().replace("[","(").replace("]",")")
 				moveBundles = MoveBundle.findAll("from MoveBundle m where id in ${bundlesString} ")
 			}
-			def isAdmin = SecurityUtils.getSubject().hasRole("PROJ_MGR")
-			if( !isAdmin ) {
+			def reportsHasPermission = RolePermissions.hasPermission("reports")
+			/*if( !isAdmin ) {
 				isAdmin = SecurityUtils.getSubject().hasRole("PROJECT_ADMIN")
-			}
+			}*/
 			
 			if(request.getParameterValues("sourcerack") != ['none']) {
 				def rack = request.getParameterValues("sourcerack")

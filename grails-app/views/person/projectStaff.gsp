@@ -141,7 +141,7 @@
 </g:if>
 
 <div class="buttons">
- <g:if test="${isAdmin }">
+ <g:if test="${personHasPermission }">
 	<span class="button"><input type="button" class="create" value="Add" onclick="showAddProjectStaff()"/></span>
  </g:if> 
 </div>
@@ -161,7 +161,7 @@
 	<tbody>
 		<g:each in="${projectStaff}" status="i" var="projectStaff">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-              <g:if test="${isAdmin }">
+              <g:if test="${personHasPermission }">
 				<td><g:remoteLink controller="person" action="editStaff" id="${projectStaff?.staff.id}" params="[role:projectStaff?.role.id]" onComplete ="editPersonDialog( e );">${projectStaff?.name}</g:remoteLink></td>
               </g:if>
               <g:else>

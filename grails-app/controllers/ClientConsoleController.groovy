@@ -263,7 +263,7 @@ class ClientConsoleController {
                 column3Value:params.column3,column4Value:params.column4,timeToUpdate:timeToUpdate ? timeToUpdate.CLIENT_CONSOLE_REFRESH : "never", 
                 headerCount:headerCount,browserTest:browserTest, myForm : params.myForm, role : role,
                 moveEventInstance:moveEventInstance, moveEventsList:moveEventsList,
-                isAdmin:subject.hasRole("ADMIN"), isManager:subject.hasRole("MANAGER"), isProjManager:subject.hasRole("PROJ_MGR"),
+                clientConsoleHasPermission:RolePermissions.hasPermission("clientConsole"),
 				columns:columns, assetsInView:assetsInView, totalAssets:totalAssets, attributesList:attributesList, servers : servers, 
 				applications : applications, dbs : dbs, files : files, assetDependency: new AssetDependency(), project:projectInstance ]
     	
