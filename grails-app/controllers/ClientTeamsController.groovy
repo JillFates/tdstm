@@ -42,7 +42,7 @@ class ClientTeamsController {
 		session.setAttribute("TEAM_VIEW_MODE", viewMode)
 	
 		def subject = SecurityUtils.subject
-		def hasClientTeamsRole = RolePermissions.hasPermission("clientTeams")
+		def hasClientTeamsRole = RolePermissions.hasPermission("clientTeamsList")
 		def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
 		def now = GormUtil.convertInToGMT( "now","EDT" )
 		def timeNow = now.getTime()

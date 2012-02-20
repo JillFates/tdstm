@@ -98,7 +98,7 @@
 				</g:if>				
 			</td>
 			<td style="padding: 0px;"><h1>Asset Tracker</h1></td>
-			<g:if test="${clientConsoleHasPermission}">
+			<g:if test="${clientConsoleBulkEditHasPermission}">
 			<td style="text-align: left;width: 400px;">
 				<span>
 					<input type="button" name="bulkEdit" id="bulkEditId" value="Bulk Edit" class="bulkedit_inactive" onclick="performBulkEdit()"/>
@@ -145,7 +145,7 @@
 		<tr>
 			<th style="padding-top:35px;">
 				<span>Actions</span><br />
-				<g:if test="${clientConsoleHasPermission}"> 
+				<g:if test="${clientConsoleAllHasPermission}"> 
 					<input type="button" value="State..." onclick="changeState()" title="Change State" style="width: 80px;"/><br />
 					<a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a>
 				</g:if>
@@ -225,7 +225,7 @@
 		<g:each in="${assetEntityList}" var="assetEntity">
 			<tr id="assetRow_${assetEntity.id}">
 			<td>
-			<g:if test="${clientConsoleHasPermission}">
+			<g:if test="${clientConsoleCheckBoxHasPermission}">
 			<span id="action_${assetEntity.id}">
 				<g:if test="${assetEntity.checkVal == true}">
 					<g:checkBox name="checkChange" id="checkId_${assetEntity.id}" onclick="timedUpdate('never')"></g:checkBox>
@@ -244,7 +244,7 @@
 						<img id="comment_${assetEntity.id}" src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px" />
 					</g:if>
 					<g:else>
-					<g:if test="${clientConsoleHasPermission}">
+					<g:if test="${clientConsoleCommentHasPermission}">
 						<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" onclick="createNewAssetComment(${assetEntity.id});"/>
 					</g:if>
 					</g:else>

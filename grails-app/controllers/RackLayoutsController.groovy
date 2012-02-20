@@ -86,7 +86,7 @@ class RackLayoutsController {
 				def bundlesString = bundleId.toString().replace("[","(").replace("]",")")
 				moveBundles = MoveBundle.findAll("from MoveBundle m where id in ${bundlesString} ")
 			}
-			def rackLayoutsHasPermission = RolePermissions.hasPermission("rackLayouts")
+			def rackLayoutsHasPermission = RolePermissions.hasPermission("EditAssetInRackLayout")
 			/*if( !rackLayoutsHasPermission ) {
 				rackLayoutsHasPermission =RolePermissions.hasPermission("rackLayouts")
 			}*/
