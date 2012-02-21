@@ -8,17 +8,28 @@ class PermissionsController {
 	}
 	
 	def show = {
-		def permissions = Permissions.list()
+		def permissions = Permissions.withCriteria {
+			and {
+			   order('permissionGroup','asc')
+			   order('permissionItem','asc')
+			}
+		}
 		def rolePermissions = RolePermissions.list()
 		[permissions:permissions]
 	} 
 	
 	def edit = {
-		def permissions = Permissions.list()
+		def permissions = Permissions.withCriteria {
+			and {
+			   order('permissionGroup','asc')
+			   order('permissionItem','asc')
+			}
+		}
 		[permissions:permissions]
 	}
 	
 	def update = {
+		def paramList = params.column
 		jdbcTemplate.update("delete from role_permissions")
 		def permissions = Permissions.list()
 		def roles = Permissions.Roles.values()
@@ -28,13 +39,24 @@ class PermissionsController {
 				if(param && param == "on"){
 					def rolePermissions = new RolePermissions(
 												role : role.toString(),
-												permission : permission
+												permission : permission,
 											)
 					if(!rolePermissions.save(flush:true)){
 						println"Error while updating rolePermissions : ${rolePermissions}"
 						rolePermissions.errors.each { println it }
 					}
 				}
+			}
+		}
+		for(int i : paramList){
+			def permissionInstansce = Permissions.findById(i)
+			if(permissionInstansce){
+				permissionInstansce.description = params["description_"+i]
+				if(!permissionInstansce.save(flush:true)){
+					permissionInstansce.errors.allErrors.each {  
+						println it
+				    }
+			    }
 			}
 		}
 		redirect(action:show)

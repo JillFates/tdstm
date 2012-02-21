@@ -4,6 +4,7 @@ class Permissions {
 
 	String permissionItem
 	PermissionGroup permissionGroup
+	String description
 	//Roles roles
 	static mapping = { 
 		version false 
@@ -11,5 +12,6 @@ class Permissions {
 	static constraints = {
 		permissionItem( blank:false, nullable:false,unique:true )
 		permissionGroup( blank:false, nullable:false )
+		description( blank:true , nullable:true)
 	}
 }

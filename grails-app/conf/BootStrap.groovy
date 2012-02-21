@@ -50,20 +50,17 @@ class BootStrap {
 			[ PermissionGroup.NAVIGATION, "RoomShowView"],
 			[ PermissionGroup.NAVIGATION, "UserLoginShowView"],
 			[ PermissionGroup.NAVIGATION, "ShowMoveEventNews"],
-			[ PermissionGroup.ASSET, "AssetEntity"],
 			[ PermissionGroup.PROJECT, "project"],
-			[ PermissionGroup.EVENT, "event"],
-			[ PermissionGroup.BUNDLE, "bundle"],
-			[ PermissionGroup.CLIENTCONSOLEBULKEDIT, "clientConsoleBulkEdit"],
-			[ PermissionGroup.CLIENTCONSOLEALL, "clientConsoleAll"],
-			[ PermissionGroup.CLIENTCONSOLECOMMENT, "clientConsoleComment"],
-			[ PermissionGroup.CLIENTCONSOLECHECKBOX, "clientConsoleCheckBox"],
-			[ PermissionGroup.CLIENTTEAMSLIST, "clientTeamsList"],
-			[ PermissionGroup.VALIDATEMODEL, "validateModel"],
-			[ PermissionGroup.ADDPERSON, "addPerson"],
-			[ PermissionGroup.EDITASSETINRACKLAYOUTS, "EditAssetInRackLayout"],
+			[ PermissionGroup.CLIENTCONSOLE, "clientConsoleBulkEdit"],
+			[ PermissionGroup.CLIENTCONSOLE, "clientConsoleAll"],
+			[ PermissionGroup.CLIENTCONSOLE, "clientConsoleComment"],
+			[ PermissionGroup.CLIENTCONSOLE, "clientConsoleCheckBox"],
+			[ PermissionGroup.CLIENTTEAMS, "clientTeamsList"],
+			[ PermissionGroup.MODEL, "validateModel"],
+			[ PermissionGroup.PERSON, "addPerson"],
+			[ PermissionGroup.RACKLAYOUTS, "EditAssetInRackLayout"],
 			[ PermissionGroup.REPORTS, "reports"],
-			[ PermissionGroup.USERLOGIN, "userLogin"]
+			[ PermissionGroup.USER, "userLogin"]
 			
   			]
   	

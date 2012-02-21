@@ -22,10 +22,12 @@
 								${it}
 							</th>
 						</g:each>
+						<th>Description</th>
 					</tr>
 				</thead>
 				<tbody>
 					<g:each var="permissionGroup" in="${permissions}" var="permission" status="i">
+					<input type="hidden" name="column" value="${permission.id}"/>
 						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" align="center">
 							<td style="text-align: left;">
 								${permission.permissionGroup.key}
@@ -45,6 +47,9 @@
 									</td>
 								</g:else>
 							</g:each>
+							<td style="text-align: center;"> 
+							  <input type="text" name="description_${permission.id}" value="${permission.description}" style="width:250px"> 
+							</td>
 						</tr>
 					</g:each>
 				</tbody>

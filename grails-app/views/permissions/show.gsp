@@ -21,6 +21,7 @@
 								${it}
 							</th>
 						</g:each>
+						<th>Description</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -40,6 +41,7 @@
 									<td style="text-align: center;">-</td>
 								</g:else>
 							</g:each>
+							<td style="text-align: center;">${permission.description}</td>
 						</tr>
 					</g:each>
 				</tbody>
@@ -50,7 +52,7 @@
           <span class="button">
             <g:actionSubmit type="button" class="edit" value="Edit"/>
           </span>
-      </g:form>
+  </g:form>
     </div></div>
 <script>
 	currentMenuId = "#adminMenu";
