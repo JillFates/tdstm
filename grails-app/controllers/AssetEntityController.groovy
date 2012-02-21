@@ -2457,7 +2457,7 @@ class AssetEntityController {
 		def assetEntityInstance = new AssetEntity(appOwner:'TDS')
 
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
-		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
+		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute , [sort:"value"])
 		def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",["Server"])?.manufacturer
 
 		def planStatusAttribute = EavAttribute.findByAttributeCode('planStatus')
@@ -2529,7 +2529,7 @@ class AssetEntityController {
 		def assetEntityInstance = AssetEntity.get(params.id)
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 
-		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
+		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute,[sort:"value"])
 		def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetEntityInstance.assetType])?.manufacturer
 		def models = assetEntityInstance.manufacturer ? Model.findAllByManufacturer( assetEntityInstance.manufacturer,[sort:'modelName',order:'asc'] )?.findAll{it.assetType == assetEntityInstance.assetType } : []
 
