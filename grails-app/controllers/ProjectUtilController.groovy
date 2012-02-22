@@ -50,7 +50,7 @@ class ProjectUtilController {
 	def searchList = {
 		def projectList
 		def partyProjectList
-		def projectHasPermission = RolePermissions.hasPermission("project")
+		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
 		def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
 		def sort = params.sort ? params.sort : 'dateCreated'
 		def order = params.order ? params.order : 'desc'

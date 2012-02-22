@@ -101,7 +101,7 @@
         </div>--%>
         <div class="menu2">
       	<ul>
-           <tds:hasPermission permission='MainLayoutView '>
+           <tds:hasPermission permission='AdminMenuViews '>
 		<li><g:link class="home" controller="auth" action="home">Admin</g:link> </li>
             </tds:hasPermission>
 		<li><g:link class="home" controller="projectUtil">Project </g:link> </li>
@@ -191,7 +191,7 @@
                     <label for="nickName"><b>Expiry Date:<span style="color: red">*</span></label>
                   </td>
                   <td valign="top" class="value">
-                   <tds:hasPermission permission='MainLayoutView '>
+                   <tds:hasPermission permission='PersonExpiryDate '>
                    <script type="text/javascript">
 						$(document).ready(function(){
 				        	$("#expiryDateId").datetimepicker();
@@ -200,7 +200,7 @@
 				    
                     <input type="text" maxlength="64" id="expiryDateId" name="expiryDate"/>
                     </tds:hasPermission>
-                    <tds:hasPermission permission='MainLayoutView '>
+                    <tds:hasPermission permission='PersonExpiryDate '>
                     <input type="text" maxlength="64" id="expiryDateId" name="expiryDate" readonly="readonly" style="background: none;border: 0"/>
                     </tds:hasPermission>
                   </td>

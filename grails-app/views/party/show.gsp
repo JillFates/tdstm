@@ -15,7 +15,7 @@
 <div class="dialog">
 <div class="nav" style="border: 1px solid #CCCCCC; height: 11px"><span
 	class="menuButton"><g:link class="list" action="list">Party List</g:link></span>
-<tds:hasPermission permission='PartyShowView'>
+<tds:hasPermission permission='PartyCreateView'>
 	<span class="menuButton"><g:link class="create" action="create">New Party</g:link></span>
 </tds:hasPermission></div>
 <br>
@@ -50,7 +50,7 @@
 		<tr class="prop">
 			<td valign="top" class="name">Party Type:</td>
 
-			<td valign="top" class="value"><tds:hasPermission permission='PartyShowView'><g:link controller="partyType"
+			<td valign="top" class="value"><tds:hasPermission permission='PartyTypeShowView'><g:link controller="partyType"
 				action="show" id="${partyInstance?.partyType?.id}">${partyInstance?.partyType?.encodeAsHTML()}</g:link></tds:hasPermission>
 			<tds:hasPermission permission='PartyShowView'>${partyInstance?.partyType?.encodeAsHTML()}</tds:hasPermission>
 			</td>
@@ -60,7 +60,7 @@
 	</tbody>
 </table>
 </div>
-<tds:hasPermission permission='PartyShowView'>
+<tds:hasPermission permission='PartyEditView'>
 	<div class="buttons"><g:form>
 		<input type="hidden" name="id" value="${partyInstance?.id}" />
 		<span class="button"><g:actionSubmit class="edit" value="Edit" /></span>

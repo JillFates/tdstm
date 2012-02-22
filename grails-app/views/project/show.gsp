@@ -20,7 +20,7 @@
     <div class="body">
     <h1>Project</h1>
         
-     <tds:hasPermission permission='ProjectShowView'>
+     <tds:hasPermission permission='CreateProject'>
     <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
         <span class="menuButton"><g:link class="create" action="create">New Project</g:link></span>
     </div>
@@ -187,12 +187,12 @@
     <div class="buttons">
       <g:form>
         <input type="hidden" name="id" value="${projectInstance?.id}" />
-        <tds:hasPermission permission='ProjectShowView'>
+        <tds:hasPermission permission='ProjectEditView'>
           <span class="button">
             <g:actionSubmit type="button" class="edit" value="Edit"/>
           </span>
         </tds:hasPermission>
-        <tds:hasPermission permission='ProjectShowView'>
+        <tds:hasPermission permission='ProjectDelete'>
           <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Warning: This will delete the ${projectInstance?.name} project and all of the assets, events, bundles, and any historic data?');" value="Delete" /></span>
         </tds:hasPermission>
       </g:form>

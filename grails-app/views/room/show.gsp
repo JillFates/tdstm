@@ -17,7 +17,7 @@
 				<g:form action="list">
 				<input type="hidden" name="viewType" value="list" />
 				<input type="submit" class="submit" value="List" />
-				 <tds:hasPermission permission='RoomShowView'>
+				 <tds:hasPermission permission='RoomEditView'>
 					<input type="Button" class="submit" value="Edit" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
 				</tds:hasPermission>
 

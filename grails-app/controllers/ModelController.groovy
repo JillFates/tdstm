@@ -232,7 +232,7 @@ class ModelController {
         }
         else {
         	def modelConnectors = ModelConnector.findAllByModel( modelInstance,[sort:"id"] )
-            return [ modelInstance : modelInstance, modelConnectors : modelConnectors,modelHasPermission:RolePermissions.hasPermission("validateModel") ]
+            return [ modelInstance : modelInstance, modelConnectors : modelConnectors,modelHasPermission:RolePermissions.hasPermission("ValidateModel") ]
         }
     }
 

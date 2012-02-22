@@ -303,7 +303,7 @@
 										<div
 											id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}"
 											align="center" style="display: none;">
-											<tds:hasPermission permission='DashBoardViewPacingMeters'>
+											<tds:hasPermission permission='ViewPacingMeters'>
 												<img
 													id="chart_${moveBundle.id}_${moveBundleStep.transitionId}"
 													src="${createLinkTo(dir:'i/dials',file:'dial-50sm.png')}">
@@ -949,7 +949,7 @@
 				}
 				var percentage = $("#percentage_"+moveBundleId+"_"+steps[i].tid).html()
 				if(percentage != "100%" && percentage != "0%"){
-					<tds:hasPermission permission='DashboardIndexView'>
+					<tds:hasPermission permission='ViewPacingMeters'>
 					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).show();
 					post_init( "chart_"+moveBundleId+"_"+steps[i].tid, steps[i].dialInd )
 					//post_init( "chart_'+moveBundleId+'_'+steps[i].tid+'", '+steps[i].dialInd+' )

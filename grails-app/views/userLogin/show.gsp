@@ -13,7 +13,7 @@
 
 	            <span class="menuButton"><g:link class="list" action="list" id="${companyId}"  params="[filter:true]">UserLogin List</g:link></span>
 
-	            <tds:hasPermission permission='UserLoginShowView'>
+	            <tds:hasPermission permission='CreateUserLogin'>
 
 	            <span class="menuButton"><g:link class="create" action="create" params="[companyId:companyId]">New UserLogin</g:link></span>
 
@@ -85,7 +85,7 @@
                     </tbody>
                 </table>
             </div>
-            <tds:hasPermission permission='UserLoginShowView'>
+            <tds:hasPermission permission='EditUserLogin'>
             <div class="buttons">
                 <g:form>
                     <input type="hidden" name="id" value="${userLoginInstance?.id}" />

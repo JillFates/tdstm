@@ -263,10 +263,9 @@ class ClientConsoleController {
                 column3Value:params.column3,column4Value:params.column4,timeToUpdate:timeToUpdate ? timeToUpdate.CLIENT_CONSOLE_REFRESH : "never", 
                 headerCount:headerCount,browserTest:browserTest, myForm : params.myForm, role : role,
                 moveEventInstance:moveEventInstance, moveEventsList:moveEventsList,
-                clientConsoleBulkEditHasPermission:RolePermissions.hasPermission("clientConsoleBulkEdit"),
-				clientConsoleAllHasPermission:RolePermissions.hasPermission("clientConsoleAll"),
-				clientConsoleCommentHasPermission:RolePermissions.hasPermission("clientConsoleComment"),
-				clientConsoleCheckBoxHasPermission:RolePermissions.hasPermission("clientConsoleCheckBox"),
+                clientConsoleBulkEditHasPermission:RolePermissions.hasPermission("ClientConsoleBulkEdit"),
+				clientConsoleCommentHasPermission:RolePermissions.hasPermission("ClientConsoleComment"),
+				clientConsoleCheckBoxHasPermission:RolePermissions.hasPermission("ClientConsoleCheckBox"),
 				columns:columns, assetsInView:assetsInView, totalAssets:totalAssets, attributesList:attributesList, servers : servers, 
 				applications : applications, dbs : dbs, files : files, assetDependency: new AssetDependency(), project:projectInstance ]
     	

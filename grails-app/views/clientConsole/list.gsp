@@ -145,7 +145,7 @@
 		<tr>
 			<th style="padding-top:35px;">
 				<span>Actions</span><br />
-				<g:if test="${clientConsoleAllHasPermission}"> 
+				<g:if test="${clientConsoleCheckBoxHasPermission}"> 
 					<input type="button" value="State..." onclick="changeState()" title="Change State" style="width: 80px;"/><br />
 					<a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a>
 				</g:if>

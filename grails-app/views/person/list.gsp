@@ -149,7 +149,7 @@ document.createDialogForm.company.value = ${companyId}
 	      </jmesa:tableFacade>
 	  </form>
       </div>
-    <tds:hasPermission permission='PersonListView'>
+    <tds:hasPermission permission='PersonCreateView'>
         <div class="buttons"><g:form>
             <input type="hidden" value="${companyId}" name="companyId" />
             <span class="button"><input type="button" value="New" class="create" onClick="createDialog()"/></span>
@@ -250,7 +250,7 @@ document.createDialogForm.company.value = ${companyId}
               </tbody>
             </table>
           </div>
-          <tds:hasPermission permission='PersonListView'>
+          <tds:hasPermission permission='PersonEditView'>
           <div class="buttons">
             <input type="hidden" id="id" name="id" value="${personInstance?.id}" />
             <input type="hidden" id="companyId" name="companyId" value="${companyId}" />
@@ -402,7 +402,7 @@ document.createDialogForm.company.value = ${companyId}
               </tbody>
             </table>
           </div>
-          <tds:hasPermission permission='PersonListView'>
+          <tds:hasPermission permission='PersonEditView'>
           <div class="buttons">
             <input type="hidden" id="id" name="id" value="${personInstance?.id}" />
             <input type="hidden" id="companyId" name="companyId" value="${companyId}" />

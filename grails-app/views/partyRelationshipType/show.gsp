@@ -11,7 +11,7 @@
             <h1>Show PartyRelationshipType</h1>
            <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 	            <span class="menuButton"><g:link class="list" action="list">PartyRelationshipType List</g:link></span>
-	            <tds:hasPermission permission='PartyRelationshipTypeShowView'>
+	            <tds:hasPermission permission='PartyRelationshipTypeCreateView'>
 	            <span class="menuButton"><g:link class="create" action="create">New PartyRelationshipType</g:link></span>
 	            </tds:hasPermission>
         	</div>
@@ -41,6 +41,7 @@
                     </tbody>
                 </table>
             </div>
+            <tds:hasPermission permission='PartyRelationshipTypeEditView'>
             <div class="buttons">
                 <g:form>
                     <input type="hidden" name="id" value="${partyRelationshipTypeInstance?.id}" />
@@ -48,6 +49,7 @@
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
                 </g:form>
             </div>
+            </tds:hasPermission>
         </div>
     </body>
 </html>

@@ -287,7 +287,7 @@
 	</g:if>
 		<tr>
 			<td colspan="2">
-			<tds:hasPermission permission='AssetEntityShowView'>
+			<tds:hasPermission permission='EditAndDelete'>
 				<div class="buttons">
 					<input name="attributeSet.id" type="hidden" value="1">
 					<input name="project.id" type="hidden" value="${projectId}">
