@@ -315,9 +315,9 @@
 	$(document).ready(function() {
 		var bundleObj = $("#bundleId");
 		var bundle = "${bundle}"
-	    var bundleArray =	bundle.split(",")
-      	if(bundleArray.length>0){
-	        for(i=0; i<bundleArray.length;i++){
+	    var bundleArray = bundle.split(",")
+      	if(bundleArray != null && bundleArray.size()>1){
+	        for(i=0; i < bundleArray.size();i++){
 	            var optvalue = bundleArray[i].trim();
 	            $("#bundleId option[value="+optvalue+"]").attr('selected', 'selected');
 	 	    }

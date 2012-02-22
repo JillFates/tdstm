@@ -92,7 +92,10 @@ class RackLayoutsController {
 			}*/
 			
 			if(request && request.getParameterValues("sourcerack") != ['none']) {
-				def rack = request.getParameterValues("sourcerack")
+				List rack = request.getParameterValues("sourcerack")
+				if(rack.contains("none")){
+					rack.remove("none")
+				}
 				if(rack && rack[0] == "") {
 					moveBundles.each{ bundle->
 						bundle.sourceRacks.each{ sourceRack->
@@ -111,7 +114,10 @@ class RackLayoutsController {
 			}
 
 			if(request && request.getParameterValues("targetrack") != ['none']) {
-				def rack = request.getParameterValues("targetrack")
+				List rack = request.getParameterValues("targetrack")
+				if(rack.contains("none")){
+					rack.remove("none")
+				}
 				if(rack && rack[0] == "") {
 					moveBundles.each{ bundle->
 						bundle.targetRacks.each{ targetRack->
