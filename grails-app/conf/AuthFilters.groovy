@@ -26,7 +26,7 @@ class AuthFilters {
 					} else if( !moveObject ){					// condition to verify the MoveEvent / moveBundle exist
 						response.sendError( 404 , "Not Found" )
 						return false
-					} else if( RolePermissions.hasPermission("ShowMoveEventNews") ){		// verify the user role as ADMIN
+					} else if( RolePermissions.hasPermission("MoveEventStatus") ){		// verify the user role as ADMIN
 						return true;
 					} else {
 						def moveEventProjectClientStaff = PartyRelationship.find( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' "+

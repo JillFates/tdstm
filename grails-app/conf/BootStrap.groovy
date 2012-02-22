@@ -10,74 +10,8 @@ class BootStrap {
 	def workflowService
     def init = { servletContext ->
 
-	// Don't load bootstrap if production environment
-// TODO : JPM Disabled BootStrap for testing
-  //..........................
-  		//Permissions
-  		//............................
-  		def permissionsList = [
-  			
-  			[ PermissionGroup.NAVIGATION, "AdminMenuView"],
-  			[ PermissionGroup.NAVIGATION, "RackMenuView"],
-  			[ PermissionGroup.NAVIGATION, "AssetMenuView"],
-  			[ PermissionGroup.NAVIGATION, "EventMenuView"],
-  			[ PermissionGroup.NAVIGATION, "BundleMenuView"],
-  			[ PermissionGroup.NAVIGATION, "ReportMenuView"],
-  			[ PermissionGroup.NAVIGATION, "HelpMenuView"],
-			[ PermissionGroup.NAVIGATION, "CommentCrudView"],
-			[ PermissionGroup.NAVIGATION, "ModelDialogView"],
-			[ PermissionGroup.NAVIGATION, "DashBoardViewPacingMeters"],
-			[ PermissionGroup.NAVIGATION, "DashboardManualOverride"],
-			[ PermissionGroup.NAVIGATION, "AssetEntityShowView"],
-			[ PermissionGroup.NAVIGATION, "DashboardIndexView"],
-			[ PermissionGroup.NAVIGATION, "CompanyHeaderView"],
-			[ PermissionGroup.NAVIGATION, "MainLayoutView"],
-			[ PermissionGroup.NAVIGATION, "ProjectHeaderView"],
-			[ PermissionGroup.NAVIGATION, "MoveBundleEditView"],
-			[ PermissionGroup.NAVIGATION, "MoveBundleShowView"],
-			[ PermissionGroup.NAVIGATION, "MoveEventEditView"],
-			[ PermissionGroup.NAVIGATION, "MoveEventShowView"],
-			[ PermissionGroup.NAVIGATION, "PartyListView"],
-			[ PermissionGroup.NAVIGATION, "PartyShowView"],
-			[ PermissionGroup.NAVIGATION, "PartyRelationshipTypeEditView"],
-			[ PermissionGroup.NAVIGATION, "PartyRelationshipTypeShowView"],
-			[ PermissionGroup.NAVIGATION, "PersonListView"],
-			[ PermissionGroup.NAVIGATION, "PersonShowView"],
-			[ PermissionGroup.NAVIGATION, "ProjectShowView"],
-			[ PermissionGroup.NAVIGATION, "RoleTypeEditView"],
-			[ PermissionGroup.NAVIGATION, "RoleTypeShowView"],
-			[ PermissionGroup.NAVIGATION, "RoomListView"],
-			[ PermissionGroup.NAVIGATION, "RoomShowView"],
-			[ PermissionGroup.NAVIGATION, "UserLoginShowView"],
-			[ PermissionGroup.NAVIGATION, "ShowMoveEventNews"],
-			[ PermissionGroup.PROJECT, "project"],
-			[ PermissionGroup.CLIENTCONSOLE, "clientConsoleBulkEdit"],
-			[ PermissionGroup.CLIENTCONSOLE, "clientConsoleAll"],
-			[ PermissionGroup.CLIENTCONSOLE, "clientConsoleComment"],
-			[ PermissionGroup.CLIENTCONSOLE, "clientConsoleCheckBox"],
-			[ PermissionGroup.CLIENTTEAMS, "clientTeamsList"],
-			[ PermissionGroup.MODEL, "validateModel"],
-			[ PermissionGroup.PERSON, "addPerson"],
-			[ PermissionGroup.RACKLAYOUTS, "EditAssetInRackLayout"],
-			[ PermissionGroup.REPORTS, "reports"],
-			[ PermissionGroup.USER, "userLogin"]
-			
-  			]
-  	
-  		permissionsList.each {
-			def permission = Permissions.findByPermissionGroupAndPermissionItem(it[0], it[1])
-			if(!permission){
-				permission = new Permissions(
-							  				permissionGroup: it[0],
-							  				permissionItem: it[1],
-							  				)
-				if ( !permission.validate() || ! permission.save() ) {
-					def etext = "Unable to create permission ${it[0]}" +
-					GormUtil.allErrorsString( permission )
-					println etext
-				}
-			}
-  		}
+  	// Don't load bootstrap if production environment
+	// TODO : JPM Disabled BootStrap for testing
 return
 	if ( grails.util.GrailsUtil.environment.equals("production") ) return
     	
