@@ -188,11 +188,6 @@ class ClientConsoleController {
                 
                 def assetTransitions = AssetTransition.findAll(transQuery)
                 def isHoldNa = assetTransitions.find { it.type == 'boolean' && it.stateTo == holdId.toString() }
-                def transDateCreated 
-				assetTransitions.each {
-					transDateCreated = it.dateCreated 
-				}
-                
                 processTransitionList.each() { trans ->
                     def cssClass='task_pending'
                     def transitionId = trans.transId
@@ -235,7 +230,7 @@ class ClientConsoleController {
                     htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass tranCell\"  >&nbsp;</td>"
                 }
                 assetEntityList << [id: assetId, asset:it, transitions:htmlTd, checkVal:check, 
-									currentStatus : it.currentStatus ? stateEngineService.getState(projectInstance.workflowCode,it.currentStatus) : "" , lastUpdate:transDateCreated]
+									currentStatus : it.currentStatus ? stateEngineService.getState(projectInstance.workflowCode,it.currentStatus) : ""]
 			}
 
 			userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")
