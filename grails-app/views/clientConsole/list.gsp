@@ -283,7 +283,7 @@
 					${assetEntity.currentStatus}&nbsp;
 				</g:else>
 			</td>
-			<td>
+			<td id="${assetEntity.id}_column5">
 			<tds:convertDateTime date="${assetEntity.asset.updated}"
 							  		timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 			  
@@ -704,6 +704,7 @@
 						$("#"+assetTransition.id+"_column2").html( assetTransition.column2value );
 						$("#"+assetTransition.id+"_column3").html( assetTransition.column3value );
 						$("#"+assetTransition.id+"_column4").html( assetTransition.column4value );
+						$("#"+assetTransition.id+"_column5").html( assetTransition.lastUpdated );
 						
 						var tdIdslength = assetTransition.tdId.length
 						for(j = 0; j< tdIdslength ; j++){

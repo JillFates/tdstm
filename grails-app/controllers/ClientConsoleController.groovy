@@ -1,5 +1,8 @@
 import grails.converters.JSON
 
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.jsecurity.SecurityUtils
 
@@ -447,6 +450,7 @@ class ClientConsoleController {
 		def moveEventId = params.moveEvent
 		def assetEntityList = []
 		def assetEntityAndCommentList = []
+		DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
 		if (moveEventId) {
 			def bundles
@@ -562,7 +566,7 @@ class ClientConsoleController {
 											column2value:it."${columns.column2.field}" ? columns.column2.field != "currentStatus" ? it."${columns.column2.field}" : stateEngineService.getState(projectInstance.workflowCode,it."${columns.column2.field}") : "&nbsp;",
 											column3value:it."${columns.column3.field}" ? columns.column3.field != "currentStatus" ? it."${columns.column3.field}" : stateEngineService.getState(projectInstance.workflowCode,it."${columns.column3.field}") : "&nbsp;",
 											column4value:it."${columns.column4.field}" ? columns.column4.field != "currentStatus" ? it."${columns.column4.field}" : stateEngineService.getState(projectInstance.workflowCode,it."${columns.column4.field}") : "&nbsp;",
-											tdId:tdId,	check:check]
+											tdId:tdId,	check:check ,lastUpdated:formatter.format( GormUtil.convertInToUserTZ(it.updated ,tzId) )]
 			}
 			
 			def assetCommentsList = []
