@@ -450,7 +450,7 @@ class ClientConsoleController {
 		def moveEventId = params.moveEvent
 		def assetEntityList = []
 		def assetEntityAndCommentList = []
-		DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+		DateFormat formatter = new SimpleDateFormat("hh:mm a");
 		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
 		if (moveEventId) {
 			def bundles

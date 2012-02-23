@@ -283,8 +283,8 @@
 					${assetEntity.currentStatus}&nbsp;
 				</g:else>
 			</td>
-			<td id="${assetEntity.id}_column5">
-			<tds:convertDateTime date="${assetEntity.asset.updated}"
+			<td id="${assetEntity.id}_column5" nowrap="nowrap">
+			<tds:convertDateTime date="${assetEntity.asset.updated}" formate="hh:mm"
 							  		timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 			  
 			</td>
