@@ -17,6 +17,8 @@ def permissionsList = [
 	[ PermissionGroup.NAVIGATION, "ReportMenuView"],
 	[ PermissionGroup.NAVIGATION, "HelpMenuView"],
 	[ PermissionGroup.NAVIGATION, "ConsoleMenuView"],
+	[ PermissionGroup.NAVIGATION, "DashBoardMenuView"],
+	[ PermissionGroup.NAVIGATION, "AssetTrackerMenuView"],
 	
 	[ PermissionGroup.ASSETENTITY, "CommentCrudView"],
 	[ PermissionGroup.ASSETENTITY, "ModelDialogView"],

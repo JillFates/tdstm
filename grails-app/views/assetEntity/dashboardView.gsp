@@ -596,7 +596,7 @@ function onInvokeAction(id) {
 											<a href="#" onclick="filterByDataPoints('source','','source_avail_clean')"><u style="color: green;">${bundleTeam?.sourceAvailassets}<span style="font-weight: normal;">rdy</span></u></a> +
 											<a href="#" onclick="filterByDataPoints('source','','source_done_clean')"><u>${bundleTeam?.maxSourceAssets}<span style="font-weight: normal;">dn</span></u></a> = 
 											<a href="#" onclick="filterByDataPoints('source','','')"><u>${bundleTeam?.sourceAssets}</u></a>
-											<tds:hasPermission permission='TeamLinks'>
+											<tds:hasPermission permission='TeamLinks'>  
 											<a title="Login as.." href="../clientTeams/logisticsHome?bundleId=${moveBundleInstance.id}&teamId=${bundleTeam?.team?.id}">@</a>
 											</tds:hasPermission>
 										</g:if>
