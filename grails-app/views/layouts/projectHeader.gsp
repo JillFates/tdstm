@@ -373,9 +373,12 @@
 				</div>
 			</li>
 	        </tds:hasPermission>
-
-			<li id="dashboardMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('')" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link></li>
-			<li id="assetTrackerMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker</g:link></li>
+            <tds:hasPermission permission='DashBoardMenuView'> 
+			   <li id="dashboardMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('')" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link></li>
+			</tds:hasPermission>
+			<tds:hasPermission permission='AssetTrackerMenuView'>
+			   <li id="assetTrackerMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker</g:link></li>
+			</tds:hasPermission>
 	        <tds:hasPermission permission='ReportMenuView'>
 			<li id="reportsMenuId" style="position:relative; float: left;"><g:link class="home" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" controller="reports" params="[projectId:currProjObj?.id]">Reports
 	        	<a id="reportAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#reportsMegaMenu')" href="javascript:showMegaMenu('#reportsMegaMenu')" style="display: inline"></a></g:link>

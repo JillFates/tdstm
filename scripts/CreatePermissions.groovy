@@ -4,8 +4,8 @@ import com.tdssrc.grails.GormUtil;
 
 def jdbcTemplate = ctx.getBean("jdbcTemplate")
 
-jdbcTemplate.update("DELETE FROM role_permissions")
-jdbcTemplate.update("DELETE FROM permissions")
+//jdbcTemplate.update("DELETE FROM role_permissions")
+//jdbcTemplate.update("DELETE FROM permissions")
 
 def permissionsList = [
 	
@@ -32,6 +32,7 @@ def permissionsList = [
 	
 	[ PermissionGroup.DASHBOARD, "ViewPacingMeters"],
 	[ PermissionGroup.DASHBOARD, "ManualOverride"],
+	[ PermissionGroup.DASHBOARD, "DashBoardMenuView"],
 	
 	[ PermissionGroup.CONSOLE, "ShowMoveTechsAndAdmins"],
 	[ PermissionGroup.CONSOLE, "ShowListNews"],
@@ -76,6 +77,7 @@ def permissionsList = [
 	[ PermissionGroup.ASSETTRACKER, "ClientConsoleBulkEdit"],
 	[ PermissionGroup.ASSETTRACKER, "ClientConsoleComment"],
 	[ PermissionGroup.ASSETTRACKER, "ClientConsoleCheckBox"],
+	[ PermissionGroup.ASSETTRACKER, "AssetTrackerMenuView"],
 	
 	[ PermissionGroup.CLIENTTEAMS, "ClientTeamsList"],
 	
