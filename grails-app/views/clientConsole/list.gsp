@@ -693,9 +693,7 @@
 				if(assetTransitions){
 					for( i = 0; i <assetslength ; i++){
 						var assetTransition = assetTransitions[i]
-						alert("assetTransition"+assetTransition.column1value)
 						var action = $("#action_"+assetTransition.id)
-						alert("action"+action)
 						if(action){
 							if(!assetTransition.check){
 								action.html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
@@ -741,7 +739,6 @@
 			}
 		} catch(ex){
 		//location.reload(false);
-		alert("inside catch:::::")
 			if( doUpdate ){
 				handleErrors();
 			}
