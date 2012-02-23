@@ -162,7 +162,6 @@ class ClientConsoleController {
 				def assetId = it.id
 				def assets = AssetEntity.get(assetId)
 				def asset = AssetTransition.findByAssetEntity(assets)
-				def lastUpdate = asset?.dateCreated
 				def htmlTd = []
 				def maxstate = it.maxstate
                 def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
@@ -189,7 +188,11 @@ class ClientConsoleController {
                 
                 def assetTransitions = AssetTransition.findAll(transQuery)
                 def isHoldNa = assetTransitions.find { it.type == 'boolean' && it.stateTo == holdId.toString() }
-
+                def transDateCreated 
+				assetTransitions.each {
+					transDateCreated = it.dateCreated 
+				}
+                
                 processTransitionList.each() { trans ->
                     def cssClass='task_pending'
                     def transitionId = trans.transId
@@ -232,7 +235,7 @@ class ClientConsoleController {
                     htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass tranCell\"  >&nbsp;</td>"
                 }
                 assetEntityList << [id: assetId, asset:it, transitions:htmlTd, checkVal:check, 
-									currentStatus : it.currentStatus ? stateEngineService.getState(projectInstance.workflowCode,it.currentStatus) : "" , lastUpdate:lastUpdate]
+									currentStatus : it.currentStatus ? stateEngineService.getState(projectInstance.workflowCode,it.currentStatus) : "" , lastUpdate:transDateCreated]
 			}
 
 			userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")
