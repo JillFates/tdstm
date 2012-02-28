@@ -25,7 +25,7 @@ class MoveBundleController {
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
     def list = {
-    	
+        
     	if(!params.sort) params.sort = 'startTime'
     	if(!params.order) params.order = 'asc'
     	def projectId = params.projectId
@@ -163,21 +163,23 @@ class MoveBundleController {
         	//get the all Dashboard Steps that are associated to moveBundle.project
 			def allDashboardSteps = moveBundleService.getAllDashboardSteps( moveBundleInstance )
 			def remainingSteps = allDashboardSteps.remainingSteps
+			def workflowCodes = stateEngineService.getWorkflowCode()
 		       	
         	return [ moveBundleInstance : moveBundleInstance, projectId: projectId, managers: managers, projectManager: projectManager, 
-					 moveManager: moveManager, dashboardSteps: allDashboardSteps.dashboardSteps, remainingSteps : remainingSteps]
+					 moveManager: moveManager, dashboardSteps: allDashboardSteps.dashboardSteps, remainingSteps : remainingSteps, workflowCodes:workflowCodes]
         	
         }
     }
 
     def update = {
-        def moveBundleInstance = MoveBundle.get( params.id )        
+        def moveBundleInstance = MoveBundle.get( params.id )  
         def projectId = params.projectId
         def projectManagerId = params.projectManager
     	def moveManagerId = params.moveManager 
         if( moveBundleInstance ) {
             moveBundleInstance.name = params.name
             moveBundleInstance.description = params.description
+			moveBundleInstance.workflowCode = params.workflowCode
 			if(params.moveEvent.id){
 				moveBundleInstance.moveEvent = MoveEvent.get(params.moveEvent.id)
 			} else {
@@ -196,7 +198,8 @@ class MoveBundleController {
             }
 			moveBundleInstance.tempForUpdate = Math.random().toString()
             if(moveBundleInstance.validate(true) && moveBundleInstance.save() ) {
-            	def stepsList = stateEngineService.getDashboardSteps( moveBundleInstance.project.workflowCode )
+				stateEngineService.loadWorkflowTransitionsIntoMap(moveBundleInstance.workflowCode, 'project')
+            	def stepsList = stateEngineService.getDashboardSteps( moveBundleInstance.workflowCode )
 				stepsList.each{
 					def checkbox = params["checkbox_"+it.id]
 					if(checkbox  && checkbox == 'on'){
@@ -244,10 +247,12 @@ class MoveBundleController {
     def create = {
     		
         def moveBundleInstance = new MoveBundle()
-        def projectId = params.projectId        
+        def projectId = params.projectId              
+		def projectInstance = Project.get(projectId)   
+		def workflowCodes = stateEngineService.getWorkflowCode()
         moveBundleInstance.properties = params        
         def managers = partyRelationshipService.getProjectStaff( projectId )        
-        return ['moveBundleInstance':moveBundleInstance, managers: managers, projectId: projectId ]	     
+        return ['moveBundleInstance':moveBundleInstance, managers: managers, projectId: projectId ,projectInstance:projectInstance,workflowCodes:workflowCodes]	     
 	  
     }
 

@@ -56,7 +56,7 @@ class ProjectController {
             redirect( action:list )
         } else { 
         	// load transitions details into application memory.
-        	stateEngineService.loadWorkflowTransitionsIntoMap(projectInstance.workflowCode, 'project')
+        	//stateEngineService.loadWorkflowTransitionsIntoMap(projectInstance.workflowCode, 'project')
         	userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
         	def currProj = session.getAttribute("CURR_PROJ");
         	def currProjectInstance = Project.get( currProj.CURR_PROJ )

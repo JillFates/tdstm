@@ -143,6 +143,14 @@
               <td valign="top" class="value">${fieldValue(bean:moveBundleInstance, field:'operationalOrder')}</td>
 
             </tr>
+            
+            <tr class="prop">
+              <td valign="top" class="name">WorkFlow Code</td>
+
+              <td valign="top" class="value">${fieldValue(bean:moveBundleInstance, field:'workflowCode')}</td>
+
+            </tr>
+            
 
           </tbody>
         </table>

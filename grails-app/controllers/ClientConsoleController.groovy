@@ -33,247 +33,268 @@ class ClientConsoleController {
 	 *  @return : AssetEntity Details and AssetTransition details
 	 *---------------------------------------------------*/
     def list={
-    	def headerCount = getHeaderNames()
-    	def browserTest = request.getHeader("User-Agent").contains("MSIE")
-        def projectId=params.projectId
-        def bundleId = params.moveBundle
-		def moveEventId = params.moveEvent
-        def moveBundleInstance
-		def moveEventInstance
-		//def projectMap
-        def stateVal
-        def taskVal
-        def check 
-        def projectInstance = Project.findById( projectId )
-		def moveEventsList = MoveEvent.findAll("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
-		def columns = userPreferenceService.setAssetTrackingPreference(params.column1Attribute, params.column2Attribute, params.column3Attribute, params.column4Attribute)
-		
-		def defalutBundleId = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
-		// set Pmo assetsInView into current session when changed
-		if ( !params.assetsInView ){ 
-			params.assetsInView = getSession().getAttribute("PMO_ASSETS_INVIEW")
-		} else {
-			getSession().setAttribute("PMO_ASSETS_INVIEW",params.assetsInView)
+		def moveBundleInstance
+		def moveBundle
+		def workFlowCode
+		def projectId=params.projectId
+		def browserTest = request.getHeader("User-Agent").contains("MSIE")
+		def projectInstance = Project.findById( projectId )
+		if(!params.moveBundle){
+			params.moveBundle = session.getAttribute("CURR_BUNDLE").CURR_BUNDLE
 		}
-    	
-		if(moveEventId){
-			userPreferenceService.setPreference( "MOVE_EVENT", "${moveEventId}" )
-            moveEventInstance = MoveEvent.findById(moveEventId)
-		} else {
-            userPreferenceService.loadPreferences("MOVE_EVENT")
-            def defaultEvent = getSession().getAttribute("MOVE_EVENT")
-            if(defaultEvent.MOVE_EVENT){
-            	moveEventInstance = MoveEvent.findById(defaultEvent.MOVE_EVENT)
-            	if( moveEventInstance?.project?.id != Integer.parseInt(projectId) ){
-            		moveEventInstance = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
-            	}
-            } else {
-            	moveEventInstance = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
-            }
-        }
-        
-    	if( moveEventInstance ){
-    		def bundles
-    		def moveBundleInstanceList = MoveBundle.findAll("from MoveBundle mb where mb.moveEvent = ? order by mb.name asc",[moveEventInstance])
-	        if( bundleId && bundleId != "all"  ){
-	        	userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
-	            moveBundleInstance = MoveBundle.findById(bundleId)
-				bundles = "("+bundleId+")"
-	        } else if(moveBundleInstanceList.size() > 0){
-	        	if(bundleId == "all"){
-	        		userPreferenceService.removePreference( "CURR_BUNDLE" )
-					bundles = (moveBundleInstanceList.id).toString().replace("[","(").replace("]",")")
-	        	} else if(defalutBundleId){ // check to see if there is any pref bundle exist
-	        		def defalutBundle = MoveBundle.get(defalutBundleId)
-	        		if(defalutBundle?.moveEvent?.id != moveEventInstance.id){ // check to see if preff bundle belongs to current event , if not remove the pref bundle
-	        			userPreferenceService.removePreference( "CURR_BUNDLE" )	
-						bundles = (moveBundleInstanceList.id).toString().replace("[","(").replace("]",")")
-	        		} else {
-	        			moveBundleInstance = defalutBundle
-	        			bundles = "("+defalutBundleId+")"
-	        		}
-	        	} else { // use all the bundles if pref bundle not exist
-	        		bundles = (moveBundleInstanceList.id).toString().replace("[","(").replace("]",")")
-	        	}
-	        	
+		if(params.moveBundle==null){
+			flash.message = "Select a Bundle to see Asset Tracker View "
+			redirect(controller:"moveBundle",action:"list")
+		}else{
+		    if(params.moveBundle!="all"){
+			  moveBundleInstance = MoveBundle.findByIdAndProject(params.moveBundle,Project.get(params.projectId))
+			  workFlowCode = moveBundleInstance.workflowCode
+		    }else{
+			  workFlowCode = projectInstance.workflowCode
+			}
+			stateEngineService.loadWorkflowTransitionsIntoMap(workFlowCode, 'project')
+			def headerCount = getHeaderNames(params.moveBundle)
+	        def bundleId = params.moveBundle
+			def moveEventId = params.moveEvent
+			def moveEventInstance
+			//def projectMap
+	        def stateVal
+	        def taskVal
+	        def check 
+			def moveEventsList = MoveEvent.findAll("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
+			def columns = userPreferenceService.setAssetTrackingPreference(params.column1Attribute, params.column2Attribute, params.column3Attribute, params.column4Attribute)
+			
+			def defalutBundleId = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
+			// set Pmo assetsInView into current session when changed
+			if ( !params.assetsInView ){ 
+				params.assetsInView = getSession().getAttribute("PMO_ASSETS_INVIEW")
+			} else {
+				getSession().setAttribute("PMO_ASSETS_INVIEW",params.assetsInView)
+			}
+	    	
+			if(moveEventId){
+				userPreferenceService.setPreference( "MOVE_EVENT", "${moveEventId}" )
+	            moveEventInstance = MoveEvent.findById(moveEventId)
+			} else {
+	            userPreferenceService.loadPreferences("MOVE_EVENT")
+	            def defaultEvent = getSession().getAttribute("MOVE_EVENT")
+	            if(defaultEvent.MOVE_EVENT){
+	            	moveEventInstance = MoveEvent.findById(defaultEvent.MOVE_EVENT)
+	            	if( moveEventInstance?.project?.id != Integer.parseInt(projectId) ){
+	            		moveEventInstance = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
+	            	}
+	            } else {
+	            	moveEventInstance = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
+	            }
 	        }
-    		def resultList
-    		def column1List
-			def column2List
-			def column3List
-			def column4List
-			def totalAssets = 0
-			if(bundles){
-				/*-------------get filter details----------------*/
-				
-				def temp1List = AssetEntity.executeQuery("""select distinct ae.${columns?.column1.field} , count(ae.id) from AssetEntity 
-																ae where  ae.moveBundle.id in ${bundles} group by ae.${columns?.column1.field} order by ae.${columns?.column1.field}""")
-				column1List = splitFilterExpansion( temp1List, columns?.column1.field, projectInstance )
-				
-				def temp2List = AssetEntity.executeQuery("""select distinct ae.${columns?.column2.field} , count(ae.id) from AssetEntity 
-																ae where  ae.moveBundle.id in ${bundles} group by ae.${columns?.column2.field} order by ae.${columns?.column2.field}""")
-				column2List = splitFilterExpansion( temp2List, columns?.column2.field, projectInstance  )
-				
-				def temp3List = AssetEntity.executeQuery("""select distinct ae.${columns?.column3.field} , count(ae.id) from AssetEntity 
-																ae where  ae.moveBundle.id in ${bundles} group by ae.${columns?.column3.field} order by ae.${columns?.column3.field}""")
-				column3List = splitFilterExpansion( temp3List, columns?.column3.field, projectInstance  )
-				
-				def temp4List = AssetEntity.executeQuery("""select distinct ae.${columns?.column4.field} , count(ae.id) from AssetEntity 
-																ae where  ae.moveBundle.id in ${bundles} group by ae.${columns?.column4.field} order by ae.${columns?.column4.field}""")
-				column4List = splitFilterExpansion( temp4List, columns?.column4.field, projectInstance  )
-                
-				/*-------------get asset details----------------*/
-				def returnValue = pmoAssetTrackingService.getAssetsForListView( projectId, bundles, columns, params )
-				resultList = returnValue[0]
-				
-				totalAssets = returnValue[1]
-			}
-    		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-			def today = GormUtil.convertInToGMT( "now", tzId );
-			def lastPoolTime = new java.sql.Timestamp(today.getTime())
-			def assetEntityList=[]
-			def processTransitionList=[]
-			def tempTransitions = []
-			def processTransitions= stateEngineService.getTasks(projectInstance.workflowCode, "TASK_ID")
-			processTransitions.each{
-				tempTransitions <<Integer.parseInt(it)
-			}
-			tempTransitions.sort().each{
-				def processTransition = stateEngineService.getState(projectInstance.workflowCode,it)
-				def fillColor = stateEngineService.getHeaderColor(projectInstance.workflowCode, stateEngineService.getState(projectInstance.workflowCode,it))
-				def transId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,processTransition))
-				processTransitionList<<[header:stateEngineService.getStateLabel(projectInstance.workflowCode,it),
-										transId:transId,
-										fillColor:fillColor,
-										stateType:stateEngineService.getStateType( projectInstance.workflowCode, 
-                                                        stateEngineService.getState(projectInstance.workflowCode, transId))]
-			}
-			/* user role check*/
-			def role = ""
-			def subject = SecurityUtils.subject
-			if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
-				role = "SUPERVISOR"
-			} else if(subject.hasRole("MANAGER")){
-				role = "MANAGER"
-			}
-			def holdId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Hold"))
-			def releaseId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Release"))
-			def reRackId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Reracked"))
-			def terminatedId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Terminated"))
-			resultList.each{
-				def stateId = 0
-				def assetId = it.id
-				def assets = AssetEntity.get(assetId)
-				def asset = AssetTransition.findByAssetEntity(assets)
-				def htmlTd = []
-				def maxstate = it.maxstate
-                def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-                                                                "where t.asset_entity_id = $assetId and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
-                                                                "order by date_created desc, stateTo desc limit 1 ")
-                if(transitionStates.size()){
-                    stateId = transitionStates[0].stateTo
-                }
-                if(stateId == 0){
-                    check = true
-                } else if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
-                    stateVal = stateEngineService.getState(projectInstance.workflowCode,stateId)
-                    taskVal = stateEngineService.getTasks(projectInstance.workflowCode, role ,stateVal)
-                    if(taskVal.size() == 0){
-                        check = false
-                    }else{
-                        check = true
-                    }
-                }else{
-                    check = false
-                }
-                
-                def transQuery = "from AssetTransition where assetEntity = $assetId and voided = 0"
-                
-                def assetTransitions = AssetTransition.findAll(transQuery)
-                def isHoldNa = assetTransitions.find { it.type == 'boolean' && it.stateTo == holdId.toString() }
-                processTransitionList.each() { trans ->
-                    def cssClass='task_pending'
-                    def transitionId = trans.transId
-                    def stateType = trans.stateType
-                    if(stateId != terminatedId){
-                        def assetTrans = assetTransitions.find { it.stateTo == transitionId.toString() }
-
-                        if(assetTrans?.type == 'boolean' && assetTrans?.isNonApplicable) {
-                            cssClass='asset_pending'
-                        } else if(assetTrans?.type == 'boolean' && stateType == 'boolean') {
-                            if(stateId != holdId || isHoldNa?.isNonApplicable){
-                                cssClass='task_done'
-                            } else {
-                                cssClass = (isHoldNa?.holdTimer && isHoldNa?.holdTimer?.getTime() < today.getTime()) ? 'asset_hold_overtime' : 'asset_hold'
-                            }
-                        }
-                        
-                        if(stateType != 'boolean' || transitionId == holdId){
-                        	if(stateId == holdId && !isHoldNa?.isNonApplicable){ /* check the current state, if current state = hold , show all steps in yellow */
-                                cssClass = (isHoldNa?.holdTimer && isHoldNa?.holdTimer?.getTime() < today.getTime()) ? 'asset_hold_overtime' : 'asset_hold'
-                            } else if( transitionId <= maxstate  ){
-                            	if(transitionId != holdId && assetTrans?.type != 'boolean'){
-                                    cssClass = "task_done"
-                                } else if( transitionId == holdId ){
-                                    if(isHoldNa){
-                                        cssClass='asset_pending'
-                                    } else {
-                                        cssClass='task_pending'
-                                    }
-                                } else if(assetTrans?.type == 'boolean' && assetTrans?.isNonApplicable){
-                                    cssClass='asset_pending'
-                                }
-                            }
-                        }
-                        if( assetTrans )
-                           cssClass = getRecentChangeStyle( assetTrans, cssClass )
-                    } else {
-                        cssClass='task_term'
-                    }
-                    htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass tranCell\"  >&nbsp;</td>"
-                }
-                assetEntityList << [id: assetId, asset:it, transitions:htmlTd, checkVal:check, 
-									currentStatus : it.currentStatus ? stateEngineService.getState(projectInstance.workflowCode,it.currentStatus) : ""]
-			}
-
-			userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")
-			def timeToUpdate = getSession().getAttribute("CLIENT_CONSOLE_REFRESH")
-			
-			def assetsInView = params.assetsInView && params.assetsInView != "all"? Integer.parseInt(params.assetsInView) : totalAssets
-			if ( !params.max ) params.max = assetsInView
-			if ( !params.offset ) params.offset = 0
-			
-			/* Asset Entity attributes for Filters*/
-			def attributes = EavEntityAttribute.findAll()?.attribute
-			def attributesList = []
-			attributes.each{ attribute ->
-				def frontendLabel = attribute.frontendLabel
-				if( customLabels.contains( frontendLabel ) ){
-					frontendLabel = moveEventInstance.project[attribute.attributeCode] ? moveEventInstance.project[attribute.attributeCode] : frontendLabel 
+	        
+	    	if( moveEventInstance ){
+	    		def bundles
+	    		def moveBundleInstanceList = MoveBundle.findAll("from MoveBundle mb where mb.moveEvent = ? order by mb.name asc",[moveEventInstance])
+		        if( bundleId && bundleId != "all"  ){
+		        	userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
+		            moveBundleInstance = MoveBundle.findById(bundleId)
+					bundles = "("+bundleId+")"
+		        } else if(moveBundleInstanceList.size() > 0){
+		        	if(bundleId == "all"){
+		        		userPreferenceService.removePreference( "CURR_BUNDLE" )
+						bundles = (moveBundleInstanceList.id).toString().replace("[","(").replace("]",")")
+		        	} else if(defalutBundleId){ // check to see if there is any pref bundle exist
+		        		def defalutBundle = MoveBundle.get(defalutBundleId)
+		        		if(defalutBundle?.moveEvent?.id != moveEventInstance.id){ // check to see if preff bundle belongs to current event , if not remove the pref bundle
+		        			userPreferenceService.removePreference( "CURR_BUNDLE" )	
+							bundles = (moveBundleInstanceList.id).toString().replace("[","(").replace("]",")")
+		        		} else {
+		        			moveBundleInstance = defalutBundle
+		        			bundles = "("+defalutBundleId+")"
+		        		}
+		        	} else { // use all the bundles if pref bundle not exist
+		        		bundles = (moveBundleInstanceList.id).toString().replace("[","(").replace("]",")")
+		        	}
+		        	
+		        }
+	    		def resultList
+	    		def column1List
+				def column2List
+				def column3List
+				def column4List
+				def totalAssets = 0
+				if(bundles){
+					/*-------------get filter details----------------*/
+					
+					def temp1List = AssetEntity.executeQuery("""select distinct ae.${columns?.column1.field} , count(ae.id) from AssetEntity 
+																	ae where  ae.moveBundle.id in ${bundles} group by ae.${columns?.column1.field} order by ae.${columns?.column1.field}""")
+					column1List = splitFilterExpansion( temp1List, columns?.column1.field, moveBundleInstance )
+					
+					def temp2List = AssetEntity.executeQuery("""select distinct ae.${columns?.column2.field} , count(ae.id) from AssetEntity 
+																	ae where  ae.moveBundle.id in ${bundles} group by ae.${columns?.column2.field} order by ae.${columns?.column2.field}""")
+					column2List = splitFilterExpansion( temp2List, columns?.column2.field, moveBundleInstance  )
+					
+					def temp3List = AssetEntity.executeQuery("""select distinct ae.${columns?.column3.field} , count(ae.id) from AssetEntity 
+																	ae where  ae.moveBundle.id in ${bundles} group by ae.${columns?.column3.field} order by ae.${columns?.column3.field}""")
+					column3List = splitFilterExpansion( temp3List, columns?.column3.field, moveBundleInstance  )
+					
+					def temp4List = AssetEntity.executeQuery("""select distinct ae.${columns?.column4.field} , count(ae.id) from AssetEntity 
+																	ae where  ae.moveBundle.id in ${bundles} group by ae.${columns?.column4.field} order by ae.${columns?.column4.field}""")
+					column4List = splitFilterExpansion( temp4List, columns?.column4.field, moveBundleInstance  )
+	                
+					/*-------------get asset details----------------*/
+					def returnValue = pmoAssetTrackingService.getAssetsForListView( projectId, bundles, columns, params )
+					resultList = returnValue[0]
+					totalAssets = returnValue[1]
 				}
-				attributesList << [attributeCode: attribute.attributeCode, frontendLabel:frontendLabel]
-			}
-			def servers = AssetEntity.findAllByAssetTypeAndProject('Server',projectInstance)
-			def applications = Application.findAllByAssetTypeAndProject('Application',projectInstance)
-			def dbs = Database.findAllByAssetTypeAndProject('Database',projectInstance)
-			def files = Files.findAllByAssetTypeAndProject('Files',projectInstance)
-			
-            return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,
-				column1List:column1List, column2List:column2List,column3List:column3List, column4List:column4List,projectId:projectId, lastPoolTime : lastPoolTime,
-                processTransitionList:processTransitionList,projectId:projectId,column2Value:params.column2,column1Value:params.column1,
-                column3Value:params.column3,column4Value:params.column4,timeToUpdate:timeToUpdate ? timeToUpdate.CLIENT_CONSOLE_REFRESH : "never", 
-                headerCount:headerCount,browserTest:browserTest, myForm : params.myForm, role : role,
-                moveEventInstance:moveEventInstance, moveEventsList:moveEventsList,
-                clientConsoleBulkEditHasPermission:RolePermissions.hasPermission("ClientConsoleBulkEdit"),
-				clientConsoleCommentHasPermission:RolePermissions.hasPermission("ClientConsoleComment"),
-				clientConsoleCheckBoxHasPermission:RolePermissions.hasPermission("ClientConsoleCheckBox"),
-				columns:columns, assetsInView:assetsInView, totalAssets:totalAssets, attributesList:attributesList, servers : servers, 
-				applications : applications, dbs : dbs, files : files, assetDependency: new AssetDependency(), project:projectInstance ]
-    	
-        } else {
-    		flash.message = "Please create move event and bundle to view PMO Dashboard"
-    		redirect(controller:'project',action:'show',params:["id":params.projectId])
-    	}
+	    		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+				def today = GormUtil.convertInToGMT( "now", tzId );
+				def lastPoolTime = new java.sql.Timestamp(today.getTime())
+				def assetEntityList=[]
+				def processTransitionList=[]
+				def tempTransitions = []
+				
+				def processTransitions= stateEngineService.getTasks(workFlowCode,"TASK_ID")
+				processTransitions.each{
+					tempTransitions <<Integer.parseInt(it)
+				}
+				tempTransitions.sort().each{
+					def processTransition = stateEngineService.getState(workFlowCode,it)
+					def fillColor = stateEngineService.getHeaderColor(workFlowCode, stateEngineService.getState(workFlowCode,it))
+					def transId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,processTransition))
+					processTransitionList<<[header:stateEngineService.getStateLabel(workFlowCode,it),
+											transId:transId,
+											fillColor:fillColor,
+											stateType:stateEngineService.getStateType( workFlowCode, 
+	                                                        stateEngineService.getState(workFlowCode, transId))]
+				}
+				/* user role check*/
+				def role = ""
+				def subject = SecurityUtils.subject
+				if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
+					role = "SUPERVISOR"
+				} else if(subject.hasRole("MANAGER")){
+					role = "MANAGER"
+				}
+				def holdId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,"Hold"))
+				def releaseId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,"Release"))
+				def reRackId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,"Reracked"))
+				def terminatedId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,"Terminated"))
+				resultList.each{
+					def stateId = 0
+					def assetId = it.id
+					def assets = AssetEntity.get(assetId)
+					def asset = AssetTransition.findByAssetEntity(assets)
+					def htmlTd = []
+					def maxstate = it.maxstate
+	                def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+	                                                                "where t.asset_entity_id = $assetId and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
+	                                                                "order by date_created desc, stateTo desc limit 1 ")
+	                if(transitionStates.size()){
+	                    stateId = transitionStates[0].stateTo
+	                }
+	                if(stateId == 0){
+	                    check = true
+	                } else if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
+	                    stateVal = stateEngineService.getState(workFlowCode,stateId)
+	                    taskVal = stateEngineService.getTasks(workFlowCode, role ,stateVal)
+	                    if(taskVal.size() == 0){
+	                        check = false
+	                    }else{
+	                        check = true
+	                    }
+	                }else{
+	                    check = false
+	                }
+	                
+	                def transQuery = "from AssetTransition where assetEntity = $assetId and voided = 0"
+	                
+	                def assetTransitions = AssetTransition.findAll(transQuery)
+	                def isHoldNa = assetTransitions.find { it.type == 'boolean' && it.stateTo == holdId.toString() }
+	                processTransitionList.each() { trans ->
+	                    def cssClass='task_pending'
+	                    def transitionId = trans.transId
+	                    def stateType = trans.stateType
+	                    if(stateId != terminatedId){
+	                        def assetTrans = assetTransitions.find { it.stateTo == transitionId.toString() }
+	
+	                        if(assetTrans?.type == 'boolean' && assetTrans?.isNonApplicable) {
+	                            cssClass='asset_pending'
+	                        } else if(assetTrans?.type == 'boolean' && stateType == 'boolean') {
+	                            if(stateId != holdId || isHoldNa?.isNonApplicable){
+	                                cssClass='task_done'
+	                            } else {
+	                                cssClass = (isHoldNa?.holdTimer && isHoldNa?.holdTimer?.getTime() < today.getTime()) ? 'asset_hold_overtime' : 'asset_hold'
+	                            }
+	                        }
+	                        
+	                        if(stateType != 'boolean' || transitionId == holdId){
+	                        	if(stateId == holdId && !isHoldNa?.isNonApplicable){ /* check the current state, if current state = hold , show all steps in yellow */
+	                                cssClass = (isHoldNa?.holdTimer && isHoldNa?.holdTimer?.getTime() < today.getTime()) ? 'asset_hold_overtime' : 'asset_hold'
+	                            } else if( transitionId <= maxstate  ){
+	                            	if(transitionId != holdId && assetTrans?.type != 'boolean'){
+	                                    cssClass = "task_done"
+	                                } else if( transitionId == holdId ){
+	                                    if(isHoldNa){
+	                                        cssClass='asset_pending'
+	                                    } else {
+	                                        cssClass='task_pending'
+	                                    }
+	                                } else if(assetTrans?.type == 'boolean' && assetTrans?.isNonApplicable){
+	                                    cssClass='asset_pending'
+	                                }
+	                            }
+	                        }
+	                        if( assetTrans )
+	                           cssClass = getRecentChangeStyle( assetTrans, cssClass )
+	                    } else {
+	                        cssClass='task_term'
+	                    }
+	                    htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass tranCell\"  >&nbsp;</td>"
+	                }
+	                assetEntityList << [id: assetId, asset:it, transitions:htmlTd, checkVal:check, 
+										currentStatus : it.currentStatus ? stateEngineService.getState(workFlowCode,it.currentStatus) : ""]
+				}
+	
+				userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")
+				def timeToUpdate = getSession().getAttribute("CLIENT_CONSOLE_REFRESH")
+				
+				def assetsInView = params.assetsInView && params.assetsInView != "all"? Integer.parseInt(params.assetsInView) : totalAssets
+				if ( !params.max ) params.max = assetsInView
+				if ( !params.offset ) params.offset = 0
+				
+				/* Asset Entity attributes for Filters*/
+				def attributes = EavEntityAttribute.findAll()?.attribute
+				def attributesList = []
+				attributes.each{ attribute ->
+					def frontendLabel = attribute.frontendLabel
+					if( customLabels.contains( frontendLabel ) ){
+						frontendLabel = moveEventInstance.project[attribute.attributeCode] ? moveEventInstance.project[attribute.attributeCode] : frontendLabel 
+					}
+					attributesList << [attributeCode: attribute.attributeCode, frontendLabel:frontendLabel]
+				}
+				def servers = AssetEntity.findAllByAssetTypeAndProject('Server',projectInstance)
+				def applications = Application.findAllByAssetTypeAndProject('Application',projectInstance)
+				def dbs = Database.findAllByAssetTypeAndProject('Database',projectInstance)
+				def files = Files.findAllByAssetTypeAndProject('Files',projectInstance)
+				
+				Set workflowCodeListForMoveBundle = MoveBundle.findAllByMoveEvent(moveEventInstance).workflowCode
+			    def workflowCodeListForMoveBundleLength = workflowCodeListForMoveBundle.size()
+				
+	            return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,
+					column1List:column1List, column2List:column2List,column3List:column3List, column4List:column4List,projectId:projectId, lastPoolTime : lastPoolTime,
+	                processTransitionList:processTransitionList,projectId:projectId,column2Value:params.column2,column1Value:params.column1,
+	                column3Value:params.column3,column4Value:params.column4,timeToUpdate:timeToUpdate ? timeToUpdate.CLIENT_CONSOLE_REFRESH : "never", 
+	                headerCount:headerCount,browserTest:browserTest, myForm : params.myForm, role : role,
+	                moveEventInstance:moveEventInstance, moveEventsList:moveEventsList,
+	                clientConsoleBulkEditHasPermission:RolePermissions.hasPermission("ClientConsoleBulkEdit"),
+					clientConsoleCommentHasPermission:RolePermissions.hasPermission("ClientConsoleComment"),
+					clientConsoleCheckBoxHasPermission:RolePermissions.hasPermission("ClientConsoleCheckBox"),
+					columns:columns, assetsInView:assetsInView, totalAssets:totalAssets, attributesList:attributesList, servers : servers, 
+					applications : applications, dbs : dbs, files : files, assetDependency: new AssetDependency(), project:projectInstance,
+					workflowCodeListForMoveBundleLength:workflowCodeListForMoveBundleLength ]
+	    	
+	        } else {
+	    		flash.message = "Please create move event and bundle to view PMO Dashboard"
+	    		redirect(controller:'project',action:'show',params:["id":params.projectId])
+	    	}
+		 }
 	}
 
 	/*---------------------------------------------------------
@@ -420,7 +441,7 @@ class ClientConsoleController {
 	        def loginUser = UserLogin.findByUsername(principal)
 	        def team = it.sourceTeamMt
 			     
-	        def workflow = workflowService.createTransition(projectInstance.workflowCode, role ,params.taskList,it,bundle,loginUser,team,params.enterNote)
+	        def workflow = workflowService.createTransition(bundle.workflowCode, role ,params.taskList,it,bundle,loginUser,team,params.enterNote)
 	        if(workflow.success){
 	        	if(params.enterNote != ""){
 	                def assetComment = new AssetComment()
@@ -447,11 +468,19 @@ class ClientConsoleController {
 	 *----------------------------------------------------*/
 	def getTransitions = {
 		def bundleId = params.moveBundle
+		def workFlowCode
+		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
+		if(bundleId!="all"){
+		   def moveBundleInstance = MoveBundle.get(bundleId)
+		   workFlowCode = moveBundleInstance.workflowCode
+		}else{
+		   workFlowCode = projectInstance.workflowCode
+		}
 		def moveEventId = params.moveEvent
 		def assetEntityList = []
 		def assetEntityAndCommentList = []
 		DateFormat formatter = new SimpleDateFormat("hh:mm a");
-		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
+		
 		if (moveEventId) {
 			def bundles
 			def moveEvent = MoveEvent.findById(moveEventId)
@@ -471,7 +500,7 @@ class ClientConsoleController {
 			// get the assets list
 			def resultList= pmoAssetTrackingService.getAssetsForPmoUpdate( moveEvent.project.id, bundles, params, lastPoolTime, currentPoolTime)//jdbcTemplate.queryForList(query.toString())
 			
-			def processTransitions= stateEngineService.getTasks(projectInstance.workflowCode, "TASK_ID")
+			def processTransitions= stateEngineService.getTasks(workFlowCode, "TASK_ID")
 			/* user role check*/
 			def role = ""
 			def subject = SecurityUtils.subject 
@@ -480,10 +509,10 @@ class ClientConsoleController {
 			} else if(subject.hasRole("MANAGER")){
 				 role = "MANAGER"
 			}
-			def holdId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Hold"))
-			def releaseId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Release"))
-			def reRackId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Reracked"))
-			def terminatedId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Terminated"))
+			def holdId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,"Hold"))
+			def releaseId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,"Release"))
+			def reRackId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,"Reracked"))
+			def terminatedId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,"Terminated"))
 			def columns = userPreferenceService.setAssetTrackingPreference(null, null, null, null)
 			resultList.each{
 				def stateId = 0
@@ -505,8 +534,8 @@ class ClientConsoleController {
 				if(stateId == 0){
 					check = true
 				} else if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
-					def stateVal = stateEngineService.getState(projectInstance.workflowCode,stateId)
-					def taskVal = stateEngineService.getTasks(projectInstance.workflowCode,role,stateVal)
+					def stateVal = stateEngineService.getState(workFlowCode,stateId)
+					def taskVal = stateEngineService.getTasks(workFlowCode,role,stateVal)
 					if(taskVal.size() == 0){
 						check = false
 					}else{
@@ -524,8 +553,8 @@ class ClientConsoleController {
 				processTransitions.each() { trans ->
 					def cssClass='task_pending'
                 	def transitionId = Integer.parseInt(trans)
-					def stateType = stateEngineService.getStateType( projectInstance.workflowCode, 
-									stateEngineService.getState(projectInstance.workflowCode, transitionId))
+					def stateType = stateEngineService.getStateType( workFlowCode, 
+									stateEngineService.getState(workFlowCode, transitionId))
                     if(stateId != terminatedId){
                         def assetTrans = assetTransitions.find { it.stateTo == transitionId.toString() }
                         
@@ -562,10 +591,10 @@ class ClientConsoleController {
                     }
 					tdId << [id:"${assetId+"_"+trans}", cssClass:cssClass]
 				}
-				assetEntityList << [id: assetId, column1value:it."${columns.column1.field}" ? columns.column1.field != "currentStatus" ? it."${columns.column1.field}" : stateEngineService.getState(projectInstance.workflowCode,it."${columns.column1.field}") : "&nbsp;",
-											column2value:it."${columns.column2.field}" ? columns.column2.field != "currentStatus" ? it."${columns.column2.field}" : stateEngineService.getState(projectInstance.workflowCode,it."${columns.column2.field}") : "&nbsp;",
-											column3value:it."${columns.column3.field}" ? columns.column3.field != "currentStatus" ? it."${columns.column3.field}" : stateEngineService.getState(projectInstance.workflowCode,it."${columns.column3.field}") : "&nbsp;",
-											column4value:it."${columns.column4.field}" ? columns.column4.field != "currentStatus" ? it."${columns.column4.field}" : stateEngineService.getState(projectInstance.workflowCode,it."${columns.column4.field}") : "&nbsp;",
+				assetEntityList << [id: assetId, column1value:it."${columns.column1.field}" ? columns.column1.field != "currentStatus" ? it."${columns.column1.field}" : stateEngineService.getState(workFlowCode,it."${columns.column1.field}") : "&nbsp;",
+											column2value:it."${columns.column2.field}" ? columns.column2.field != "currentStatus" ? it."${columns.column2.field}" : stateEngineService.getState(workFlowCode,it."${columns.column2.field}") : "&nbsp;",
+											column3value:it."${columns.column3.field}" ? columns.column3.field != "currentStatus" ? it."${columns.column3.field}" : stateEngineService.getState(workFlowCode,it."${columns.column3.field}") : "&nbsp;",
+											column4value:it."${columns.column4.field}" ? columns.column4.field != "currentStatus" ? it."${columns.column4.field}" : stateEngineService.getState(workFlowCode,it."${columns.column4.field}") : "&nbsp;",
 											tdId:tdId,	check:check ,lastUpdated:formatter.format( GormUtil.convertInToUserTZ(it.updated ,tzId) )]
 			}
 			
@@ -596,10 +625,18 @@ class ClientConsoleController {
 	 * @author: Mallikarjun
 	 * @return: count of tasks
 	 *----------------------------------------------------*/
-	def getHeaderNames = {
+	def getHeaderNames(moveBundle){
 		def tempTransitions = []
 		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
-		def processTransitions= stateEngineService.getTasks(projectInstance.workflowCode, "TASK_ID")
+		def workFlowCode
+		def moveBundleInstance
+		if(moveBundle!=null && moveBundle!="all"){
+		    moveBundleInstance = MoveBundle.findByIdAndProject(moveBundle,projectInstance)
+		    workFlowCode = moveBundleInstance.workflowCode
+		}else{
+		    workFlowCode = projectInstance.workflowCode
+		}
+		def processTransitions= stateEngineService.getTasks(workFlowCode, "TASK_ID")
 		processTransitions.each{
 			tempTransitions <<Integer.parseInt(it)
 		}
@@ -623,8 +660,8 @@ class ClientConsoleController {
 							"font-size='12' fill='#333333' x='-11' y='-76' font-family='verdana,arial,helvetica,sans-serif'>")
 		def count = 0
 		tempTransitions.sort().each{
-			def processTransition = stateEngineService.getStateLabel(projectInstance.workflowCode,it)
-			def fillColor = stateEngineService.getHeaderColor(projectInstance.workflowCode, stateEngineService.getState(projectInstance.workflowCode,it))
+			def processTransition = stateEngineService.getStateLabel(workFlowCode,it)
+			def fillColor = stateEngineService.getHeaderColor(workFlowCode, stateEngineService.getState(workFlowCode,it))
 			if(count == 0){
 				svgHeaderFile.append("<tspan fill='$fillColor' id='$it' onclick='parent.bulkTransitionsByHeader(this.id)'>${processTransition}</tspan>")
 			} else {
@@ -663,8 +700,8 @@ class ClientConsoleController {
 		def ids = id.split("_")
 		def transId = ids[1]
 		def assetEntity = AssetEntity.findById( ids[0] ) 
-		def state = stateEngineService.getState( assetEntity.project.workflowCode, Integer.parseInt( ids[1] ) )
-		def stateType = stateEngineService.getStateType( assetEntity.project.workflowCode, state )
+		def state = stateEngineService.getState( assetEntity.moveBundle.workflowCode, Integer.parseInt( ids[1] ) )
+		def stateType = stateEngineService.getStateType( assetEntity.moveBundle.workflowCode, state )
 		def situation = ""
 		def assetTransition
 		def menuOptions = ""
@@ -693,7 +730,13 @@ class ClientConsoleController {
 		def actions = actionId.split("_")
 		def assetEntity = AssetEntity.findById(actions[0])
 		def stateToId = Integer.parseInt(actions[1])
-		def stateTo = stateEngineService.getState( assetEntity.project.workflowCode, stateToId )
+		def workFlowCode
+		if(params.bundle !="all"){
+		   workFlowCode = assetEntity.moveBundle.workflowCode
+		}else{
+		   workFlowCode = assetEntity.project.workflowCode
+		}
+		def stateTo = stateEngineService.getState( workFlowCode, stateToId )
 		
 		def role = ""
 		def subject = SecurityUtils.subject
@@ -709,11 +752,11 @@ class ClientConsoleController {
 		}
 		def message = ""
 		if(role){
-			message = pmoAssetTrackingService.createBulkTransition(type, assetEntity, stateTo, role, loginUser, comment)
+			message = pmoAssetTrackingService.createBulkTransition(type, assetEntity, stateTo, role, loginUser, comment,params.bundle)
 		} else {
 			message = " You don't have permission to create transition"
 		}
-		def tdId = pmoAssetTrackingService.getTransitionRow( assetEntity, stateTo )
+		def tdId = pmoAssetTrackingService.getTransitionRow( assetEntity, stateTo,params.bundle )
 		render tdId as JSON
 	}
 	/*--------------------------------------------------------
@@ -757,15 +800,21 @@ class ClientConsoleController {
 	 * Validate and return the message to the user. 
 	 */
 	def getAssetsCountForBulkTransition = {
-			
 		def message = "" 
 		def transId = params.transId
 		def moveEvent = MoveEvent.findById( params.eventId )
 		def type = params.type
+		def workFlowCode 
+		if(params.bundleId!="all"){
+			def moveBundleInstance = MoveBundle.findById(params.bundleId)
+			workFlowCode = moveBundleInstance.workflowCode
+		}else{
+		    workFlowCode = moveEvent.project.workflowCode
+		}
 		
-		def stateTo = stateEngineService.getState( moveEvent.project.workflowCode, Integer.parseInt(transId) )
-		def stateType = stateEngineService.getStateType(moveEvent.project.workflowCode, stateTo)
-		def holdId = Integer.parseInt(stateEngineService.getStateId(moveEvent.project.workflowCode,"Hold"))
+		def stateTo = stateEngineService.getState( workFlowCode, Integer.parseInt(transId) )
+		def stateType = stateEngineService.getStateType(workFlowCode, stateTo)
+		def holdId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,"Hold"))
 
 		def assetEntityList = pmoAssetTrackingService.getAssetEntityListForBulkEdit( params )
 		
@@ -815,8 +864,8 @@ class ClientConsoleController {
 				def currentTransition = currentTransitions.find { it.assetId == asset.id && it.stateTo != holdId }
 				if( currentTransition ){
 					def currentStateId = currentTransition.stateTo
-					def currentState = stateEngineService.getState( asset.project.workflowCode, currentTransition.stateTo)
-					def validate = stateEngineService.canDoTask( asset.project.workflowCode, role, currentState, stateTo  ) 
+					def currentState = stateEngineService.getState( workFlowCode, currentTransition.stateTo)
+					def validate = stateEngineService.canDoTask( workFlowCode, role, currentState, stateTo  ) 
 					if(validate || stateTo =="Ready"){
 						possibleAssets += 1
 					}
@@ -847,16 +896,23 @@ class ClientConsoleController {
 		def transId = params.transId
 		def moveEvent = MoveEvent.findById( params.eventId )
 		def type = params.type
+		def workFlowCode
+		if(params.bundleId!="all"){
+			def moveBundleInstance = MoveBundle.findById(params.bundleId)
+			workFlowCode = moveBundleInstance.workflowCode
+		}else{
+			workFlowCode = moveEvent.project.workflowCode
+		}
 		
-		def stateTo = stateEngineService.getState( moveEvent.project.workflowCode, Integer.parseInt(transId) )
+		def stateTo = stateEngineService.getState( workFlowCode, Integer.parseInt(transId) )
 		
 		if(stateTo == "Hold"){
 			render ""
 			return
 		}
 		
-		def stateType = stateEngineService.getStateType(moveEvent.project.workflowCode, stateTo)
-		def holdId = Integer.parseInt(stateEngineService.getStateId(moveEvent.project.workflowCode,"Hold"))
+		def stateType = stateEngineService.getStateType(workFlowCode, stateTo)
+		def holdId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,"Hold"))
 		
 		def assetEntityList = pmoAssetTrackingService.getAssetEntityListForBulkEdit( params )
 		
@@ -878,14 +934,14 @@ class ClientConsoleController {
 	
 			if( currentTransition && type != "void"){
 				def currentStateId = currentTransition.stateTo
-				def currentState = stateEngineService.getState( asset.project.workflowCode, currentStateId)
-				def validate = stateEngineService.canDoTask( asset.project.workflowCode, role, currentState, stateTo  ) 
+				def currentState = stateEngineService.getState( workFlowCode, currentStateId)
+				def validate = stateEngineService.canDoTask( workFlowCode, role, currentState, stateTo  ) 
 				if(validate || stateTo =="Ready"){
-					pmoAssetTrackingService.createBulkTransition( type, asset, stateTo, role, loginUser, "" )
+					pmoAssetTrackingService.createBulkTransition( type, asset, stateTo, role, loginUser, "",params.bundleId)
 				}
 			} else if( ( !currentTransitions.find { it.assetId == asset.id && it.stateTo == holdId } && stateTo =="Ready") || 
 					stateType == "boolean" || type == "void") {
-				pmoAssetTrackingService.createBulkTransition( type, asset, stateTo, role, loginUser, "" )
+				pmoAssetTrackingService.createBulkTransition( type, asset, stateTo, role, loginUser, "",params.bundleId)
 			}
 		}
 		
@@ -921,11 +977,17 @@ class ClientConsoleController {
 		def moveEvent = MoveEvent.get( moveEventId )
 		def moveBundlesList = MoveBundle.findAllByMoveEvent( moveEvent )
 		def bundles = moveBundlesList.id.toString().replace("[","(").replace("]",")")
-
+		def moveBundleInstance
+		def workFlowCode    
+		if(params.bundle!="all"){
+			moveBundleInstance = MoveBundle.get(params.bundle) 
+			workFlowCode = moveBundleInstance
+		}else{
+		    workFlowCode = moveEvent.project
+		}
 		def tempList = AssetEntity.executeQuery("""select distinct ae.${columnName} , count(ae.id) from AssetEntity 
 										ae where  ae.moveBundle.id in ${bundles} group by ae.${columnName} order by ae.${columnName}""")
-		def columnList = splitFilterExpansion( tempList, columnName, moveEvent.project )
-
+		def columnList = splitFilterExpansion( tempList, columnName, workFlowCode )
 		render columnList as JSON
 	}
 	/*
@@ -947,5 +1009,20 @@ class ClientConsoleController {
 			}
 		}
 		render status
+	}
+	
+	def moveBundleList ={
+		def moveEventId = params.moveEvent
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def MoveEventInstance = MoveEvent.findByIdAndProject(moveEventId ,(Project.get(projectId)))
+		def moveBundlesList = MoveEventInstance.moveBundles
+		def BundleList = []
+		Set workflowCodeListForMoveBundle = MoveBundle.findAllByMoveEvent(MoveEventInstance).workflowCode
+		def workflowCodeListForMoveBundleLength = workflowCodeListForMoveBundle.size()
+		MoveEventInstance.moveBundles.each{moveEvent->
+			BundleList << [id:moveEvent.id, name:moveEvent.name,workflowCodeListForMoveBundleLength:workflowCodeListForMoveBundleLength]
+		}
+		BundleList.sort { it.name }
+		render BundleList as JSON
 	}
 }

@@ -9,6 +9,7 @@ class MoveBundle extends Party {
     Date completionTime				// Planned Completion Time of the MoveBundle
     Integer operationalOrder = 1  		// Order that the bundles are performed in (NOT BEING USED)
     MoveEvent moveEvent
+	String workflowCode
 	
     static constraints = {        
 		name( blank:false, nullable:false )
@@ -18,6 +19,7 @@ class MoveBundle extends Party {
 		startTime( nullable:true )
 		completionTime( nullable:true )
 		operationalOrder( nullable:false, range:1..25 )
+		workflowCode( blank:false, nullable:false )
 	}
 
 	static hasMany = [

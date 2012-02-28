@@ -93,11 +93,11 @@ class PartyRelationshipService {
     def updatePartyRelationshipPartyIdTo( def relationshipType, def partyIdFrom, def roleTypeIdFrom, def partyIdTo, def roleTypeIdTo ){
     	if ( partyIdTo != "" && partyIdTo != null ){
     		def partyRelationship = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$relationshipType' and p.partyIdFrom = $partyIdFrom and p.partyIdTo = $partyIdTo and p.roleTypeCodeFrom = '$roleTypeIdFrom' and p.roleTypeCodeTo = '$roleTypeIdTo' ")
-    		def partyTo = Party.findById( partyIdTo )
-    		def partyFrom= Party.findById( partyIdFrom )
-    		def partyRelationshipType = PartyRelationshipType.findById( relationshipType )
-    		def roleTypeFrom = RoleType.findById( roleTypeIdFrom )
-    		def roleTypeTo = RoleType.findById( roleTypeIdTo )
+    		def partyTo = Party.get( partyIdTo )
+    		def partyFrom= Party.get( partyIdFrom )
+    		def partyRelationshipType = PartyRelationshipType.get( relationshipType )
+    		def roleTypeFrom = RoleType.get( roleTypeIdFrom )
+    		def roleTypeTo = RoleType.get( roleTypeIdTo )
     		// condition to check whether partner has changed or not
     		if ( partyRelationship == null ) {
         		def otherRelationship = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$relationshipType' and p.partyIdFrom = $partyIdFrom  and p.roleTypeCodeFrom = '$roleTypeIdFrom' and p.roleTypeCodeTo = '$roleTypeIdTo' ")

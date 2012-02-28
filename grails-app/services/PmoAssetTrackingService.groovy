@@ -27,16 +27,20 @@ class PmoAssetTrackingService {
 	/*
 	 *  Will create bulk transition based on user input.
 	 */
-	def createBulkTransition(def type, def assetEntity, def stateTo, def role, def loginUser, def comment ){
+	def createBulkTransition(def type, def assetEntity, def stateTo, def role, def loginUser, def comment, def bundle ){
 		
 		def transitionStatus
 		def message = "Transaction created successfully"
-		
+		def workFlowCode
 		def assetTransitionQuery = "from AssetTransition t where t.assetEntity = ${assetEntity.id} and t.voided = 0"
-		
-		def stateType = stateEngineService.getStateType( assetEntity.project.workflowCode,stateTo)
-		def stateToId = stateEngineService.getStateId( assetEntity.project.workflowCode,stateTo)
-		def holdId = stateEngineService.getStateId( assetEntity.project.workflowCode,"Hold")
+		if(bundle!="all"){
+			workFlowCode = assetEntity.moveBundle.workflowCode
+		}else{
+		    workFlowCode = assetEntity.project.workflowCode
+		}
+		def stateType = stateEngineService.getStateType( workFlowCode,stateTo)
+		def stateToId = stateEngineService.getStateId( workFlowCode,stateTo)
+		def holdId = stateEngineService.getStateId( workFlowCode,"Hold")
 		
 		
 		def currStateQuery = "select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
@@ -52,12 +56,12 @@ class PmoAssetTrackingService {
 						assetTeansition.voided = 1
 						assetTeansition.save(flush:true)
 					}
-					transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,stateTo, assetEntity, 
+					transitionStatus = workflowService.createTransition( workFlowCode, role,stateTo, assetEntity, 
 																		assetEntity.moveBundle, loginUser, null, comment )
 					message = transitionStatus.message
 				}
 				if(stateType == "boolean" && stateTo=="VMCompleted"){
-					transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,"Completed", assetEntity, 
+					transitionStatus = workflowService.createTransition( workFlowCode, role,"Completed", assetEntity, 
 																		assetEntity.moveBundle, loginUser, null, comment )
 				}
 				break;
@@ -74,7 +78,7 @@ class PmoAssetTrackingService {
 				break;
 					
 			case "ready" :
-				transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,"Ready", assetEntity, 
+				transitionStatus = workflowService.createTransition( workFlowCode, role,"Ready", assetEntity, 
 						assetEntity.moveBundle, loginUser, null, comment )
 				message = transitionStatus.message
 				break;
@@ -85,7 +89,7 @@ class PmoAssetTrackingService {
 						assetTeansition.voided = 1
 						assetTeansition.save(flush:true)
 					}
-					transitionStatus = workflowService.createTransition( assetEntity.project.workflowCode, role,stateTo, assetEntity, 
+					transitionStatus = workflowService.createTransition( workFlowCode, role,stateTo, assetEntity, 
 																					assetEntity.moveBundle, loginUser, null, comment )
 					message = transitionStatus.message
 					def currentTransition = AssetTransition.find("from AssetTransition t where t.assetEntity = ${assetEntity.id} "+
@@ -133,12 +137,18 @@ class PmoAssetTrackingService {
 	 * @param  : Asset Entity and  state
 	 * @return : Transition row details  
 	 *----------------------------------------------------*/
-	def getTransitionRow(def assetEntity, def state){
+	def getTransitionRow(def assetEntity, def state, def bundle){
+		def workFlowCode 
+		if(bundle!="all"){
+			workFlowCode = assetEntity.moveBundle.workflowCode
+		}else{
+		    workFlowCode = assetEntity.project.workflowCode
+		}
 		def maxstate = 0
 		def currentstate = 0
 		def tdId = []
-		def holdId = Integer.parseInt(stateEngineService.getStateId(assetEntity.project.workflowCode,"Hold"))
-		def terminatedId = Integer.parseInt(stateEngineService.getStateId(assetEntity.project.workflowCode,"Terminated"))
+		def holdId = Integer.parseInt(stateEngineService.getStateId(assetEntity.moveBundle.workflowCode,"Hold"))
+		def terminatedId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,"Terminated"))
 		def currentTransition = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
 														"where t.asset_entity_id = ${assetEntity?.id} and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
 														"order by date_created desc, stateTo desc limit 1 ")
@@ -150,19 +160,19 @@ class PmoAssetTrackingService {
 		if(maxTransition){
 			maxstate = maxTransition[0].maxState
 		}
-		def processTransitions= stateEngineService.getTasks(assetEntity.project.workflowCode, "TASK_ID")
+		def processTransitions= stateEngineService.getTasks(workFlowCode, "TASK_ID")
 		
 		def naTransQuery = "from AssetTransition where assetEntity = ${assetEntity?.id} and voided = 0 and type = 'boolean' "
 		
 		def doneTransitionQuery = "from AssetTransition where assetEntity = ${assetEntity?.id} and voided = 0 and type = 'process' " 
-		tdId << [id:"${assetEntity?.id}", cssClass:stateEngineService.getState(assetEntity.project.workflowCode,currentstate)]
+		tdId << [id:"${assetEntity?.id}", cssClass:stateEngineService.getState(workFlowCode,currentstate)]
 		processTransitions.each() { trans ->
 			def cssClass='task_pending'
             if(currentstate != terminatedId){
             	
             	def transitionId = Integer.parseInt(trans)
-				def stateType = stateEngineService.getStateType( assetEntity.project.workflowCode, 
-										stateEngineService.getState(assetEntity.project.workflowCode, transitionId))
+				def stateType = stateEngineService.getStateType( workFlowCode, 
+										stateEngineService.getState(workFlowCode, transitionId))
 	            def isHoldNa = AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+holdId)
 				
 				if(AssetTransition.find(naTransQuery+" and isNonApplicable = 1 and stateTo = "+transitionId) ){
@@ -207,7 +217,7 @@ class PmoAssetTrackingService {
 	 *----------------------------------------------------*/
 	def constructManuOptions( def state, def assetEntity, def situation, def stateType ){
 		 def menuOptions = ""
-		 def holdId = Integer.parseInt(stateEngineService.getStateId(assetEntity.project.workflowCode,"Hold"))
+		 def holdId = Integer.parseInt(stateEngineService.getStateId(assetEntity.moveBundle.workflowCode,"Hold"))
 		 if(stateType != "process" && state != "Hold"){
 			 if(situation == "NA"){
 				 menuOptions = "naMenu"
@@ -227,7 +237,7 @@ class PmoAssetTrackingService {
 				 role = "MANAGER"
 			 }
 			 if(projectAssetMap){
-				 def transitionSelected = stateEngineService.getStateIdAsInt( assetEntity.project.workflowCode, state )
+				 def transitionSelected = stateEngineService.getStateIdAsInt( assetEntity.moveBundle.workflowCode, state )
 				 def currentTransition = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
 												"where t.asset_entity_id = ${assetEntity?.id} and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId )"+
 												"order by date_created desc, stateTo desc limit 1 ")
@@ -235,10 +245,10 @@ class PmoAssetTrackingService {
                  if(currentTransition.size()){
                 	 currentState = currentTransition[0].stateTo
                  }
-				 def stateVal = stateEngineService.getState(assetEntity.project.workflowCode,currentState)
+				 def stateVal = stateEngineService.getState(assetEntity.moveBundle.workflowCode,currentState)
 				 if(currentState < transitionSelected ){
-					 def roleCheck = stateEngineService.canDoTask( assetEntity.project.workflowCode, role, stateVal, state  )
-					 taskList = stateEngineService.getTasks(assetEntity.project.workflowCode,role,stateVal)
+					 def roleCheck = stateEngineService.canDoTask( assetEntity.moveBundle.workflowCode, role, stateVal, state  )
+					 taskList = stateEngineService.getTasks(assetEntity.moveBundle.workflowCode,role,stateVal)
 					 taskList.each{
 						 if(it == state){
 							 menuOptions = "doMenu"
@@ -495,7 +505,7 @@ class PmoAssetTrackingService {
 	 * @return : List of assets for PMO to update thru ajax
 	 *--------------------------------------------------------*/
 	def getAssetsForPmoUpdate( def projectId, def bundles, def params, def lastPoolTime, def currentPoolTime ){
-		
+
 		def column1Value = params.c1v
 		def column2Value = params.c2v
 		def column3Value = params.c3v

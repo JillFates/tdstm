@@ -63,16 +63,20 @@
 			<td>
 				<span style="padding-left: 10px;">
 					<label for="moveEvent"><b>Event:</b></label>&nbsp;
-					<select id="moveEventId" name="moveEvent" onchange="$('#moveBundleId').val('');document.listForm.submit()">
+					<select id="moveEventId" name="moveEvent" onchange="changeMoveBundle(this.value)">
 						<g:each status="i" in="${moveEventsList}" var="moveEventInstance">
 							<option value="${moveEventInstance?.id}">${moveEventInstance?.name}</option>
 						</g:each>
 					</select>
 				</span>
-				<span>
+				
+				
 					<label for="moveBundle"><b>Bundle:</b></label>&nbsp;
+					<span id="jsonReplace">
 					<select id="moveBundleId" name="moveBundle" onchange="document.listForm.submit()" >
-						<option value="all">All</option>	
+					    <g:if test="${workflowCodeListForMoveBundleLength < 2}">
+						  <option value="all">All</option>
+						</g:if>
 						<g:each status="i" in="${moveBundleInstanceList}" var="moveBundleInstance">
 							<option value="${moveBundleInstance?.id}">${moveBundleInstance?.name}</option>
 						</g:each>
@@ -406,6 +410,7 @@
 		// Show menu when #myDiv is clicked
 		if(role) {
 			var actionId
+			var bundle = $("#moveBundleId").val()
 			$('tbody#assetListTbody').contextMenu('transitionMenu', {
 				onContextMenu: function(e) {
 					return($(e.target).is('td.tranCell') && !$(e.target).is('td.asset_hold'));
@@ -419,20 +424,20 @@
 				},
 				bindings: {
 	        		'done': function(t) {
-			       		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=done\'', onComplete:'updateTransitionRow(e)' )};
+			       		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=done\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(e)' )};
 			        },
 			        'ready': function(t) {
-			          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=ready\'', onComplete:'updateTransitionRow(e)' )};
+			          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=ready\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(e)' )};
 			        },
 			        'NA': function(t) {
-			          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=NA\'', onComplete:'updateTransitionRow(e)' )};
+			          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=NA\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(e)' )};
 			        },
 			        'pending': function(t) {
-			          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=pending\'', onComplete:'updateTransitionRow(e)' )};
+			          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=pending\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(e)' )};
 			        },
 			        'void': function(t) {
 			          	if(confirm("Undo this specific task and any dependent (workflow) transitions. Are you sure?")){
-			          		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=void\'', onComplete:'updateTransitionRow(e)' )};
+			          		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=void\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(e)' )};
 						} else {
 			          		return false
 			         	}
@@ -450,16 +455,16 @@
 				    var action = $("#bulkActionId").val()
 				    switch (action){
 					    case "pending" :
-					    	${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=pending\'', onComplete:'updateTransitionRow(e)' )};
+					    	${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=pending\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(e)' )};
 						break;
 						case "done" :
-							${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=done\'', onComplete:'updateTransitionRow(e)' )};
+							${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=done\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(e)' )};
 						break;
 						case "NA" :
-							${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=NA\'', onComplete:'updateTransitionRow(e)' )};
+							${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=NA\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(e)' )};
 						break;
 						case "void" :
-							${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=void\'', onComplete:'updateTransitionRow(e)' )};
+							${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=void\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(e)' )};
 						break;	
 				    }
 		        } else {
@@ -501,8 +506,9 @@
 		var assetTransitions = eval('(' + e.responseText + ')');
 		var length = assetTransitions.length;
 		if(length > 0){
-			var moveEventId = $("#moveEventId").val()
-			${remoteFunction(action:'getCurrentStatusOptions', params:'\'moveEventId=\' + moveEventId ', onComplete:'updateCurrentStatusOptions(e);' )}
+			var moveEventId = $("#moveEventId").val();
+			var moveBundleName = $("#moveBundleId").val();
+			${remoteFunction(action:'getCurrentStatusOptions', params:'\'moveEventId=\' + moveEventId +\'&bundle=\'+ moveBundleName ', onComplete:'updateCurrentStatusOptions(e);' )}
 			if($("#column1Attribute").val() == 'currentStatus'){ 
 				$("#"+assetTransitions[0].id+"_column1").html(assetTransitions[0].cssClass);
 			}
@@ -669,7 +675,7 @@
 		var order = $("#orderById").val()
 		var lastPoolTime = $("#lastPoolTimeId").val();
 		${remoteFunction(action:'getTransitions', params:'\'moveBundle=\' + moveBundle +\'&moveEvent=\'+moveEvent +\'&c1f=\'+c1f+\'&c2f=\'+c2f+\'&c3f=\'+c3f+\'&c4f=\'+c4f+\'&c1v=\'+c1v+\'&c2v=\'+c2v+\'&c3v=\'+c3v+\'&c4v=\'+c4v+\'&lastPoolTime=\'+lastPoolTime+\'&offset=\'+offset+\'&max=\'+max+\'&sort=\'+sort+\'&order=\'+order', onFailure:"handleErrors()", onComplete:'updateTransitions(e);' )}
-		${remoteFunction(action:'getCurrentStatusOptions', params:'\'moveEventId=\' + moveEvent ', onComplete:'updateCurrentStatusOptions(e);' )}
+		${remoteFunction(action:'getCurrentStatusOptions', params:'\'moveEventId=\' + moveEvent +\'&bundle=\'+ moveBundle ', onComplete:'updateCurrentStatusOptions(e);' )}
 		timedUpdate($("#selectTimedId").val())
 	}
 	var doUpdate = true
@@ -699,7 +705,7 @@
 								action.html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
 							}
 						}
-
+						
 						$("#"+assetTransition.id+"_column1").html( assetTransition.column1value );
 						$("#"+assetTransition.id+"_column2").html( assetTransition.column2value );
 						$("#"+assetTransition.id+"_column3").html( assetTransition.column3value );
@@ -1013,6 +1019,31 @@
 							params:'\'transId=\' + transId +\'&bundleId=\'+bundleId+\'&eventId=\'+eventId+\'&type=\'+type+\'&c1f=\'+c1f+\'&c2f=\'+c2f+\'&c3f=\'+c3f+\'&c4f=\'+c4f+\'&c1v=\'+c1v+\'&c2v=\'+c2v+\'&c3v=\'+c3v+\'&c4v=\'+c4v+\'&offset=\'+offset+\'&max=\'+max+\'&sort=\'+sort+\'&order=\'+order', 
 							onComplete:'doAjaxCall()' )};
 		}
+	}
+
+	function changeMoveBundle(moveEventValue){
+		var moveEventnName =  moveEventValue
+		${remoteFunction(action:'moveBundleList', params:'\'moveEvent=\' + moveEventnName', onSuccess:'fillMoveBundle(e)' )};
+	}
+	
+	function fillMoveBundle(e){
+		var data = eval('(' + e.responseText + ')');
+		var selectContent = "<select id='moveBundleId' name='moveBundle'>"
+		if(data.size()==0){
+			selectContent += "<option selected='selected' value='all' >"+'All'+"</option>"
+		}
+		for (var i = 0; i < data.size(); i++){
+			if( data[i].workflowCodeListForMoveBundleLength < 2 ){
+			   selectContent += "<option selected='selected' value='all' >"+'All'+"</option>"
+			 } 
+			 selectContent += "<option value ="+data[i].id+">"+data[i].name+"</option>"
+		}
+		selectContent += "</select>"
+	    $('#jsonReplace').html(selectContent);
+		submitForm()
+	} 
+	function submitForm(){
+		document.listForm.submit()
 	}
 /*]]>*/
 </script>
