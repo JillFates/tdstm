@@ -60,7 +60,7 @@ class RackLayoutsController {
 	}
 	
 	def save = {
-		
+
 		session.setAttribute( "RACK_FILTERS", params )
 		List bundleId = request.getParameterValues("moveBundle")
 		def maxUSize = 42
@@ -93,21 +93,23 @@ class RackLayoutsController {
 			
 			if(request && request.getParameterValues("sourcerack") != ['none']) {
 				List rack = request.getParameterValues("sourcerack")
-				if(rack.contains("none")){
-					rack.remove("none")
-				}
-				if(rack && rack[0] == "") {
-					moveBundles.each{ bundle->
-						bundle.sourceRacks.each{ sourceRack->
-							if( !sourceRacks.contains( sourceRack ) )
-								sourceRacks.add( sourceRack )		
-						}
+				if(rack){
+					if(rack.contains("none")){
+						rack.remove("none")
 					}
-				} else {
-					rack.each {
-						def thisRack = Rack.get(new Long(it))
-						if( !sourceRacks.contains( thisRack ) )
-							sourceRacks.add( thisRack )
+					if(rack && rack[0] == "") {
+						moveBundles.each{ bundle->
+							bundle.sourceRacks.each{ sourceRack->
+								if( !sourceRacks.contains( sourceRack ) )
+									sourceRacks.add( sourceRack )		
+							}
+						}
+					} else {
+						rack.each {
+							def thisRack = Rack.get(new Long(it))
+							if( !sourceRacks.contains( thisRack ) )
+								sourceRacks.add( thisRack )
+						}
 					}
 				}
 				sourceRacks = sourceRacks.sort { it.tag }
@@ -115,21 +117,23 @@ class RackLayoutsController {
 
 			if(request && request.getParameterValues("targetrack") != ['none']) {
 				List rack = request.getParameterValues("targetrack")
-				if(rack.contains("none")){
-					rack.remove("none")
-				}
-				if(rack && rack[0] == "") {
-					moveBundles.each{ bundle->
-						bundle.targetRacks.each{ targetRack->
-							if( !targetRacks.contains( targetRack ) )
-								targetRacks.add( targetRack	)
-						}
+				if(rack){
+					if(rack.contains("none")){
+						rack.remove("none")
 					}
-				} else {
-					rack.each {
-						def thisRack = Rack.get(new Long(it))
-						if( !targetRacks.contains( thisRack ) )
-							targetRacks.add( thisRack )
+					if(rack && rack[0] == "") {
+						moveBundles.each{ bundle->
+							bundle.targetRacks.each{ targetRack->
+								if( !targetRacks.contains( targetRack ) )
+									targetRacks.add( targetRack	)
+							}
+						}
+					} else {
+						rack.each {
+							def thisRack = Rack.get(new Long(it))
+							if( !targetRacks.contains( thisRack ) )
+								targetRacks.add( thisRack )
+						}
 					}
 				}
 				targetRacks = targetRacks.sort { it.tag }
