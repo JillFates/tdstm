@@ -27,9 +27,9 @@
 <body >
 <div title="Change Status" id="changeStatusDialog" style="background-color: #808080;display: none;">
 	<form name="changeStatusForm">
-	<input type="hidden" name="asset" id="asset" />
+	<input type="hidden" name="asset" id="assetIds"  />
 	<input type="hidden" name="projectId" id="projectId" value="${projectId}" />
-	<input type="hidden" name="moveBundle" id="moveBundle" value="${moveBundleInstance?.id}" />
+	<input type="hidden" name="moveBundle" id="moveBundleIds"  />
 <table style="border: 0px; width: 100%">
 	<tr>
 		<td width="40%"><strong>Change status for selected devices to:</strong></td>
@@ -587,6 +587,7 @@
 		var task = eval('(' + e.responseText + ')');
 		var taskLen = task[0].item.length;
 		var options = '';
+		var moveBundle = $("#moveBundleId").val()
 		if(taskLen == 0){
 			alert('Sorry but there were no common states for the assets selected');
 			return false;
@@ -598,7 +599,8 @@
 	      	if(taskLen > 1 && task[0].item[0].state == "Hold"){
 	      		$('#taskList').children().eq(1).attr('selected',true);
 	      	}
-	       	$('#asset').val(task[0].asset);
+	       	$("#assetIds").val(task[0].asset);
+	       	$("#moveBundleIds").val(moveBundle);
 			$("#changeStatusDialog").dialog('option', 'width', 400)
 			$("#changeStatusDialog").dialog('option', 'position', ['center','top']);
 			$('#changeStatusDialog').dialog('open');
@@ -1029,6 +1031,7 @@
 	function fillMoveBundle(e){
 		var data = eval('(' + e.responseText + ')');
 		var selectContent = "<select id='moveBundleId' name='moveBundle'>"
+
 		if(data.size()==0){
 			selectContent += "<option selected='selected' value='all' >"+'All'+"</option>"
 		}
