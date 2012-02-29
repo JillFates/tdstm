@@ -219,9 +219,9 @@ class AssetEntityController {
 		def appColumnslist = appDTAMap.columnName
 		def databaseColumnslist = databaseDTAMap.columnName
 		def filesColumnslist = filesDTAMap.columnName
-	/*	def dependencyColumnList = ['DependentId','Type','DataFlowFreq','DataFlowDirection','status','comment']
-		def dependencyMap = ['DependentId':1, 'Type':2, 'DataFlowFreq':3, 'DataFlowDirection':4, 'status':5, 'comment':6]
-		def DTAMap = [0:'dependent', 1:'type', 2:'dataFlowFreq', 3:'dataFlowDirection', 4:'status', 5:'comment']*/
+		/*	def dependencyColumnList = ['DependentId','Type','DataFlowFreq','DataFlowDirection','status','comment']
+		 def dependencyMap = ['DependentId':1, 'Type':2, 'DataFlowFreq':3, 'DataFlowDirection':4, 'status':5, 'comment':6]
+		 def DTAMap = [0:'dependent', 1:'type', 2:'dataFlowFreq', 3:'dataFlowDirection', 4:'status', 5:'comment']*/
 		try {
 			workbook = Workbook.getWorkbook( file.inputStream )
 			def sheetNames = workbook.getSheetNames()
@@ -242,7 +242,7 @@ class AssetEntityController {
 					redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
 					return;
 				}
-	
+
 			} else {
 				flag = 0
 			}
@@ -313,369 +313,369 @@ class AssetEntityController {
 					int filesCount = 0
 					int dependencyCount = 0
 					//Add Data to dataTransferBatch.
-						def serverColNo = 0
-						for (int index = 0; index < serverCol; index++) {
-							if(serverSheet.getCell( index, 0 ).contents == "Server"){
-								serverColNo = index
+					def serverColNo = 0
+					for (int index = 0; index < serverCol; index++) {
+						if(serverSheet.getCell( index, 0 ).contents == "Server"){
+							serverColNo = index
+						}
+					}
+					def serverSheetrows = serverSheet.rows
+					if(params.asset=='asset'){
+						assetsCount
+						for (int row = 1; row < serverSheetrows; row++) {
+							def server = serverSheet.getCell( serverColNo, row ).contents
+							if(server){
+								assetsCount = row
 							}
 						}
-						def serverSheetrows = serverSheet.rows
-						if(params.asset=='asset'){
-						    assetsCount 
-							for (int row = 1; row < serverSheetrows; row++) {
-								def server = serverSheet.getCell( serverColNo, row ).contents
-								if(server){
-									assetsCount = row
-								}
+					}
+					def appColNo = 0
+					for (int index = 0; index < appCol; index++) {
+						if(appSheet.getCell( index, 0 ).contents == "Name"){
+							appColNo = index
+						}
+					}
+					def appSheetrows = appSheet.rows
+					if(params.application == 'application'){
+						appCount
+						for (int row = 1; row < appSheetrows; row++) {
+							def name = appSheet.getCell( appColNo, row ).contents
+							if(name){
+								appCount = row
 							}
 						}
-						def appColNo = 0
-						for (int index = 0; index < appCol; index++) {
-							if(appSheet.getCell( index, 0 ).contents == "Name"){
-								appColNo = index
+					}
+					def databaseSheetrows = databaseSheet.rows
+					if(params.database=='database'){
+						databaseCount
+						for (int row = 1; row < databaseSheetrows; row++) {
+							def name = databaseSheet.getCell( appColNo, row ).contents
+							if(name){
+								databaseCount = row
 							}
 						}
-						def appSheetrows = appSheet.rows
-						if(params.application == 'application'){
-							appCount 
-							for (int row = 1; row < appSheetrows; row++) {
-								def name = appSheet.getCell( appColNo, row ).contents
-								if(name){
-									appCount = row
-								}
+					}
+					def filesSheetrows = filesSheet.rows
+					if(params.files=='files'){
+						filesCount
+						for (int row = 1; row < filesSheetrows; row++) {
+							def name = filesSheet.getCell( appColNo, row ).contents
+							if(name){
+								filesCount = row
 							}
 						}
-						def databaseSheetrows = databaseSheet.rows
-						if(params.database=='database'){
-							databaseCount 
-							for (int row = 1; row < databaseSheetrows; row++) {
-								def name = databaseSheet.getCell( appColNo, row ).contents
-								if(name){
-									databaseCount = row
-								}
+					}
+					def dependencySheetRow = dependencySheet.rows
+					if(params.dependency=='dependency'){
+						dependencyCount
+						for (int row = 1; row < dependencySheetRow; row++) {
+							def name = dependencySheet.getCell( appColNo, row ).contents
+							if(name){
+								dependencyCount = row
 							}
 						}
-						def filesSheetrows = filesSheet.rows
-						if(params.files=='files'){
-							filesCount 
-							for (int row = 1; row < filesSheetrows; row++) {
-								def name = filesSheet.getCell( appColNo, row ).contents
-								if(name){
-									filesCount = row
-								}
-							}
+					}
+					session.setAttribute("TOTAL_ASSETS",(assetsCount+filesCount+databaseCount+appCount+dependencyCount))
+					if(params.asset == 'asset'){
+						def eavEntityType = EavEntityType.findByDomainName('AssetEntity')
+						def serverDataTransferBatch = new DataTransferBatch()
+						serverDataTransferBatch.statusCode = "PENDING"
+						serverDataTransferBatch.transferMode = "I"
+						serverDataTransferBatch.dataTransferSet = dataTransferSetInstance
+						serverDataTransferBatch.project = project
+						serverDataTransferBatch.userLogin = userLogin
+						serverDataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
+						serverDataTransferBatch.eavEntityType = eavEntityType
+						if(serverDataTransferBatch.save()){
+							session.setAttribute("BATCH_ID",serverDataTransferBatch.id)
 						}
-						def dependencySheetRow = dependencySheet.rows
-						if(params.dependency=='dependency'){
-							dependencyCount
-							for (int row = 1; row < dependencySheetRow; row++) {
-								def name = dependencySheet.getCell( appColNo, row ).contents
-								if(name){
-									dependencyCount = row
-								}
-							}
-						}
-						session.setAttribute("TOTAL_ASSETS",(assetsCount+filesCount+databaseCount+appCount+dependencyCount))
-						if(params.asset == 'asset'){
-							def eavEntityType = EavEntityType.findByDomainName('AssetEntity')
-							def serverDataTransferBatch = new DataTransferBatch()
-							serverDataTransferBatch.statusCode = "PENDING"
-							serverDataTransferBatch.transferMode = "I"
-							serverDataTransferBatch.dataTransferSet = dataTransferSetInstance
-							serverDataTransferBatch.project = project
-							serverDataTransferBatch.userLogin = userLogin
-							serverDataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
-							serverDataTransferBatch.eavEntityType = eavEntityType
-							if(serverDataTransferBatch.save()){
-							 session.setAttribute("BATCH_ID",serverDataTransferBatch.id)
-							}
-							for ( int r = 1; r < serverSheetrows ; r++ ) {
-								def server = serverSheet.getCell( serverColNo, r ).contents
-								if(server){
-									def dataTransferValueList = new StringBuffer()
-									for( int cols = 0; cols < serverCol; cols++ ) {
-										def dataTransferAttributeMapInstance
-										def projectCustomLabel = projectCustomLabels[serverSheet.getCell( cols, 0 ).contents.toString()]
-										if(projectCustomLabel){
-											dataTransferAttributeMapInstance = serverDTAMap.find{it.columnName == projectCustomLabel}
-										} else {
-											dataTransferAttributeMapInstance = serverDTAMap.find{it.columnName == serverSheet.getCell( cols, 0 ).contents}
-										}
-		
-										//dataTransferAttributeMapInstance = DataTransferAttributeMap.findByColumnName(serverSheet.getCell( cols, 0 ).contents)
-										if( dataTransferAttributeMapInstance != null ) {
-											def assetId
-											if( serverColumnNames.containsKey("assetId") && (serverSheet.getCell( 0, r ).contents != "") ) {
-												try{
-													assetId = Integer.parseInt(serverSheet.getCell( 0, r ).contents)
-												} catch( NumberFormatException ex ) {
-													flash.message = "AssetId should be Integer"
-													redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
-													return;
-												}
+						for ( int r = 1; r < serverSheetrows ; r++ ) {
+							def server = serverSheet.getCell( serverColNo, r ).contents
+							if(server){
+								def dataTransferValueList = new StringBuffer()
+								for( int cols = 0; cols < serverCol; cols++ ) {
+									def dataTransferAttributeMapInstance
+									def projectCustomLabel = projectCustomLabels[serverSheet.getCell( cols, 0 ).contents.toString()]
+									if(projectCustomLabel){
+										dataTransferAttributeMapInstance = serverDTAMap.find{it.columnName == projectCustomLabel}
+									} else {
+										dataTransferAttributeMapInstance = serverDTAMap.find{it.columnName == serverSheet.getCell( cols, 0 ).contents}
+									}
+
+									//dataTransferAttributeMapInstance = DataTransferAttributeMap.findByColumnName(serverSheet.getCell( cols, 0 ).contents)
+									if( dataTransferAttributeMapInstance != null ) {
+										def assetId
+										if( serverColumnNames.containsKey("assetId") && (serverSheet.getCell( 0, r ).contents != "") ) {
+											try{
+												assetId = Integer.parseInt(serverSheet.getCell( 0, r ).contents)
+											} catch( NumberFormatException ex ) {
+												flash.message = "AssetId should be Integer"
+												redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+												return;
 											}
-											def dataTransferValues = "("+assetId+",'"+serverSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+serverDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
-											dataTransferValueList.append(dataTransferValues)
-											dataTransferValueList.append(",")
 										}
-									}
-									try{
-										jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
-										serverAdded = r
-									} catch (Exception e) {
-										println"e-->"+e
-										skipped += ( r +1 )
+										def dataTransferValues = "("+assetId+",'"+serverSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+serverDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
+										dataTransferValueList.append(dataTransferValues)
+										dataTransferValueList.append(",")
 									}
 								}
-								if (r%50 == 0){
-									sessionFactory.getCurrentSession().flush();
-									sessionFactory.getCurrentSession().clear();
+								try{
+									jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
+									serverAdded = r
+								} catch (Exception e) {
+									println"e-->"+e
+									skipped += ( r +1 )
 								}
 							}
-       					}
-						//  Process applciation
-						if(params.application=='application'){
-							def eavEntityType = EavEntityType.findByDomainName('Application')
-							def appDataTransferBatch = new DataTransferBatch()
-							appDataTransferBatch.statusCode = "PENDING"
-							appDataTransferBatch.transferMode = "I"
-							appDataTransferBatch.dataTransferSet = dataTransferSetInstance
-							appDataTransferBatch.project = project
-							appDataTransferBatch.userLogin = userLogin
-							appDataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
-							appDataTransferBatch.eavEntityType = eavEntityType
-							if(appDataTransferBatch.save()){
-							 session.setAttribute("BATCH_ID",appDataTransferBatch.id)
+							if (r%50 == 0){
+								sessionFactory.getCurrentSession().flush();
+								sessionFactory.getCurrentSession().clear();
 							}
-							for ( int r = 1; r < appSheetrows ; r++ ) {
-								def name = appSheet.getCell( appColNo, r ).contents
-								if(name){
-									def dataTransferValueList = new StringBuffer()
-									for( int cols = 0; cols < appCol; cols++ ) {
-										def dataTransferAttributeMapInstance = appDTAMap.find{it.columnName == appSheet.getCell( cols, 0 ).contents}
-		
-										if( dataTransferAttributeMapInstance != null ) {
-											def assetId
-											if( appColumnNames.containsKey("appId") && (appSheet.getCell( 0, r ).contents != "") ) {
-												try{
-													assetId = Integer.parseInt(appSheet.getCell( 0, r ).contents)
-												} catch( NumberFormatException ex ) {
-													flash.message = "AppId should be Integer"
-													redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
-													return;
-												}
+						}
+					}
+					//  Process applciation
+					if(params.application=='application'){
+						def eavEntityType = EavEntityType.findByDomainName('Application')
+						def appDataTransferBatch = new DataTransferBatch()
+						appDataTransferBatch.statusCode = "PENDING"
+						appDataTransferBatch.transferMode = "I"
+						appDataTransferBatch.dataTransferSet = dataTransferSetInstance
+						appDataTransferBatch.project = project
+						appDataTransferBatch.userLogin = userLogin
+						appDataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
+						appDataTransferBatch.eavEntityType = eavEntityType
+						if(appDataTransferBatch.save()){
+							session.setAttribute("BATCH_ID",appDataTransferBatch.id)
+						}
+						for ( int r = 1; r < appSheetrows ; r++ ) {
+							def name = appSheet.getCell( appColNo, r ).contents
+							if(name){
+								def dataTransferValueList = new StringBuffer()
+								for( int cols = 0; cols < appCol; cols++ ) {
+									def dataTransferAttributeMapInstance = appDTAMap.find{it.columnName == appSheet.getCell( cols, 0 ).contents}
+
+									if( dataTransferAttributeMapInstance != null ) {
+										def assetId
+										if( appColumnNames.containsKey("appId") && (appSheet.getCell( 0, r ).contents != "") ) {
+											try{
+												assetId = Integer.parseInt(appSheet.getCell( 0, r ).contents)
+											} catch( NumberFormatException ex ) {
+												flash.message = "AppId should be Integer"
+												redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+												return;
 											}
-											def dataTransferValues = "("+assetId+",'"+appSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+appDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
-											dataTransferValueList.append(dataTransferValues)
-											dataTransferValueList.append(",")
 										}
-									}
-									try{
-										jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
-										appAdded = r
-									} catch (Exception e) {
-										skipped += ( r +1 )
+										def dataTransferValues = "("+assetId+",'"+appSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+appDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
+										dataTransferValueList.append(dataTransferValues)
+										dataTransferValueList.append(",")
 									}
 								}
-								if (r%50 == 0){
-									sessionFactory.getCurrentSession().flush();
-									sessionFactory.getCurrentSession().clear();
+								try{
+									jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
+									appAdded = r
+								} catch (Exception e) {
+									skipped += ( r +1 )
 								}
+							}
+							if (r%50 == 0){
+								sessionFactory.getCurrentSession().flush();
+								sessionFactory.getCurrentSession().clear();
 							}
 						}
-						//  Process database
-						if(params.database=='database'){
-							session.setAttribute("TOTAL_ASSETS",databaseCount)
-							def eavEntityType = EavEntityType.findByDomainName('Database')
-							def dbDataTransferBatch = new DataTransferBatch()
-							dbDataTransferBatch.statusCode = "PENDING"
-							dbDataTransferBatch.transferMode = "I"
-							dbDataTransferBatch.dataTransferSet = dataTransferSetInstance
-							dbDataTransferBatch.project = project
-							dbDataTransferBatch.userLogin = userLogin
-							dbDataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
-							dbDataTransferBatch.eavEntityType = eavEntityType
-							if(dbDataTransferBatch.save()){
-							  session.setAttribute("BATCH_ID",dbDataTransferBatch.id)
-							}
-							for ( int r = 1; r < databaseSheetrows ; r++ ) {
-								def name = databaseSheet.getCell( appColNo, r ).contents
-								if(name){
-									def dataTransferValueList = new StringBuffer()
-									for( int cols = 0; cols < databaseCol; cols++ ) {
-										def dataTransferAttributeMapInstance = databaseDTAMap.find{it.columnName == databaseSheet.getCell( cols, 0 ).contents}
-		
-										if( dataTransferAttributeMapInstance != null ) {
-											def assetId
-											if( databaseColumnNames.containsKey("dbId") && (databaseSheet.getCell( 0, r ).contents != "") ) {
-												try{
-													assetId = Integer.parseInt(databaseSheet.getCell( 0, r ).contents)
-												} catch( NumberFormatException ex ) {
-													flash.message = "DBId should be Integer"
-													redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
-													return;
-												}
+					}
+					//  Process database
+					if(params.database=='database'){
+						session.setAttribute("TOTAL_ASSETS",databaseCount)
+						def eavEntityType = EavEntityType.findByDomainName('Database')
+						def dbDataTransferBatch = new DataTransferBatch()
+						dbDataTransferBatch.statusCode = "PENDING"
+						dbDataTransferBatch.transferMode = "I"
+						dbDataTransferBatch.dataTransferSet = dataTransferSetInstance
+						dbDataTransferBatch.project = project
+						dbDataTransferBatch.userLogin = userLogin
+						dbDataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
+						dbDataTransferBatch.eavEntityType = eavEntityType
+						if(dbDataTransferBatch.save()){
+							session.setAttribute("BATCH_ID",dbDataTransferBatch.id)
+						}
+						for ( int r = 1; r < databaseSheetrows ; r++ ) {
+							def name = databaseSheet.getCell( appColNo, r ).contents
+							if(name){
+								def dataTransferValueList = new StringBuffer()
+								for( int cols = 0; cols < databaseCol; cols++ ) {
+									def dataTransferAttributeMapInstance = databaseDTAMap.find{it.columnName == databaseSheet.getCell( cols, 0 ).contents}
+
+									if( dataTransferAttributeMapInstance != null ) {
+										def assetId
+										if( databaseColumnNames.containsKey("dbId") && (databaseSheet.getCell( 0, r ).contents != "") ) {
+											try{
+												assetId = Integer.parseInt(databaseSheet.getCell( 0, r ).contents)
+											} catch( NumberFormatException ex ) {
+												flash.message = "DBId should be Integer"
+												redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+												return;
 											}
-											def dataTransferValues = "("+assetId+",'"+databaseSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+dbDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
-											dataTransferValueList.append(dataTransferValues)
-											dataTransferValueList.append(",")
 										}
-									}
-									try{
-										jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
-										dbAdded = r
-									} catch (Exception e) {
-										skipped += ( r +1 )
+										def dataTransferValues = "("+assetId+",'"+databaseSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+dbDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
+										dataTransferValueList.append(dataTransferValues)
+										dataTransferValueList.append(",")
 									}
 								}
-								if (r%50 == 0){
-									sessionFactory.getCurrentSession().flush();
-									sessionFactory.getCurrentSession().clear();
+								try{
+									jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
+									dbAdded = r
+								} catch (Exception e) {
+									skipped += ( r +1 )
 								}
-							  }
-						}
-						//  Process files
-						if(params.files=='files'){
-							session.setAttribute("TOTAL_ASSETS",filesCount)
-							def eavEntityType = EavEntityType.findByDomainName('Files')
-							def fileDataTransferBatch = new DataTransferBatch()
-							fileDataTransferBatch.statusCode = "PENDING"
-							fileDataTransferBatch.transferMode = "I"
-							fileDataTransferBatch.dataTransferSet = dataTransferSetInstance
-							fileDataTransferBatch.project = project
-							fileDataTransferBatch.userLogin = userLogin
-							fileDataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
-							fileDataTransferBatch.eavEntityType = eavEntityType
-							if(fileDataTransferBatch.save()){
-							  session.setAttribute("BATCH_ID",fileDataTransferBatch.id)
 							}
-							for ( int r = 1; r < filesSheetrows ; r++ ) {
-								def name = filesSheet.getCell( appColNo, r ).contents
-								if(name){
-									def dataTransferValueList = new StringBuffer()
-									for( int cols = 0; cols < filesCol; cols++ ) {
-										def dataTransferAttributeMapInstance = filesDTAMap.find{it.columnName == filesSheet.getCell( cols, 0 ).contents}
-		
-										if( dataTransferAttributeMapInstance != null ) {
-											def assetId
-											if( filesColumnNames.containsKey("filesId") && (filesSheet.getCell( 0, r ).contents != "") ) {
-												try{
-													assetId = Integer.parseInt(filesSheet.getCell( 0, r ).contents)
-												} catch( NumberFormatException ex ) {
-													flash.message = "filesId should be Integer"
-													redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
-													return;
-												}
+							if (r%50 == 0){
+								sessionFactory.getCurrentSession().flush();
+								sessionFactory.getCurrentSession().clear();
+							}
+						}
+					}
+					//  Process files
+					if(params.files=='files'){
+						session.setAttribute("TOTAL_ASSETS",filesCount)
+						def eavEntityType = EavEntityType.findByDomainName('Files')
+						def fileDataTransferBatch = new DataTransferBatch()
+						fileDataTransferBatch.statusCode = "PENDING"
+						fileDataTransferBatch.transferMode = "I"
+						fileDataTransferBatch.dataTransferSet = dataTransferSetInstance
+						fileDataTransferBatch.project = project
+						fileDataTransferBatch.userLogin = userLogin
+						fileDataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
+						fileDataTransferBatch.eavEntityType = eavEntityType
+						if(fileDataTransferBatch.save()){
+							session.setAttribute("BATCH_ID",fileDataTransferBatch.id)
+						}
+						for ( int r = 1; r < filesSheetrows ; r++ ) {
+							def name = filesSheet.getCell( appColNo, r ).contents
+							if(name){
+								def dataTransferValueList = new StringBuffer()
+								for( int cols = 0; cols < filesCol; cols++ ) {
+									def dataTransferAttributeMapInstance = filesDTAMap.find{it.columnName == filesSheet.getCell( cols, 0 ).contents}
+
+									if( dataTransferAttributeMapInstance != null ) {
+										def assetId
+										if( filesColumnNames.containsKey("filesId") && (filesSheet.getCell( 0, r ).contents != "") ) {
+											try{
+												assetId = Integer.parseInt(filesSheet.getCell( 0, r ).contents)
+											} catch( NumberFormatException ex ) {
+												flash.message = "filesId should be Integer"
+												redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+												return;
 											}
-											String dataTransferValues = "("+assetId+",'"+filesSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+fileDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
-											dataTransferValueList.append(dataTransferValues)
-											dataTransferValueList.append(",")
 										}
+										String dataTransferValues = "("+assetId+",'"+filesSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+fileDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
+										dataTransferValueList.append(dataTransferValues)
+										dataTransferValueList.append(",")
 									}
-									try{
-										jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
-										filesAdded = r 
-									} catch (Exception e) {
+								}
+								try{
+									jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
+									filesAdded = r
+								} catch (Exception e) {
+									skipped += ( r +1 )
+								}
+							}
+							if (r%50 == 0){
+								sessionFactory.getCurrentSession().flush();
+								sessionFactory.getCurrentSession().clear();
+							}
+						}
+					}
+					if(params.dependency=='dependency'){
+						session.setAttribute("TOTAL_ASSETS",dependencyCount)
+						def subjects = SecurityUtils.subject
+						def principals = subject.principal
+						def userLogins = UserLogin.findByUsername( principals )
+						def skippedUpdated =0
+						def skippedAdded=0
+						for ( int r = 1; r < dependencySheetRow ; r++ ) {
+							int cols = 0 ;
+							def name = dependencySheet.getCell( cols, r ).contents
+							def dependencyTransferValueList = new StringBuffer()
+							cols=0
+							if(dependencySheet.getCell( cols, r ).contents.replace("'","\\'")){
+								int id = Integer.parseInt(dependencySheet.getCell( cols, r ).contents.replace("'","\\'"))
+								AssetDependency asset =  AssetDependency.get(id)
+								if(asset){
+									asset.asset = AssetEntity.get(Integer.parseInt(dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")))
+									asset.dependent = AssetEntity.get(Integer.parseInt(dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")))
+									asset.type = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+									asset.dataFlowFreq = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+									asset.dataFlowDirection = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+									asset.status = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+									asset.comment = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+									asset.updatedBy = userLogins.person
+									//asset.createdBy = userLogin.person
+									if(!asset.save(flush:true)){
+										asset.errors.allErrors.each { println it }
 										skipped += ( r +1 )
+										skippedUpdated = skipped.size()
 									}
 								}
-								if (r%50 == 0){
-									sessionFactory.getCurrentSession().flush();
-									sessionFactory.getCurrentSession().clear();
+							}else{
+								AssetDependency assetDpendencyInstance = new AssetDependency()
+								def assetId = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+								def dependentId = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+								if(assetId){
+									assetDpendencyInstance.asset = AssetEntity.get(Integer.parseInt(assetId))
 								}
+								if(dependentId){
+									assetDpendencyInstance.dependent = AssetEntity.get(Integer.parseInt(dependentId))
+								}
+								assetDpendencyInstance.type = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+								assetDpendencyInstance.dataFlowFreq = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+								assetDpendencyInstance.dataFlowDirection = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+								assetDpendencyInstance.status = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+								assetDpendencyInstance.comment = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+								assetDpendencyInstance.createdBy = userLogins?.person
+								assetDpendencyInstance.updatedBy = userLogins?.person
+								if(!assetDpendencyInstance.save(flush:true)){
+									assetDpendencyInstance.errors.allErrors.each { println it }
+									skipped += ( r +1 )
+									skippedAdded = skipped.size()
+								}
+
+							}
+							dependencyAdded = (r-(skippedAdded+skippedUpdated))
+							if (r%50 == 0){
+								sessionFactory.getCurrentSession().flush();
+								sessionFactory.getCurrentSession().clear();
+							}
+
+						}
+
+					}
+					for( int i=0;  i < sheetNamesLength; i++ ) {
+						if(sheetNames[i] == "Comments"){
+							def commentSheet = workbook.getSheet(sheetNames[i])
+							for( int rowNo = 1; rowNo < commentSheet.rows; rowNo++ ) {
+								def dataTransferComment
+								def commentId = commentSheet.getCell(1,rowNo).contents
+								def assetCommentId
+								if( commentId != "" && commentId != null ) {
+									assetCommentId = Integer.parseInt(commentId)
+									dataTransferComment = DataTransferComment.findByCommentId(commentId)
+								}
+								if( dataTransferComment == null ) {
+									dataTransferComment = new DataTransferComment()
+								}
+								dataTransferComment.commentId = assetCommentId
+								dataTransferComment.assetId = Integer.parseInt(commentSheet.getCell(0,rowNo).contents)
+								dataTransferComment.commentType = commentSheet.getCell(3,rowNo).contents
+								dataTransferComment.comment = commentSheet.getCell(4,rowNo).contents
+								dataTransferComment.rowId = rowNo
+								dataTransferComment.dataTransferBatch = dataTransferBatch
+								dataTransferComment.save()
 							}
 						}
-						if(params.dependency=='dependency'){
-							session.setAttribute("TOTAL_ASSETS",dependencyCount)
-							def subjects = SecurityUtils.subject
-							def principals = subject.principal
-							def userLogins = UserLogin.findByUsername( principals )
-							def skippedUpdated =0
-							def skippedAdded=0
-							for ( int r = 1; r < dependencySheetRow ; r++ ) {
-									int cols = 0 ; 
-									  def name = dependencySheet.getCell( cols, r ).contents
-										def dependencyTransferValueList = new StringBuffer()
-												cols=0
-												if(dependencySheet.getCell( cols, r ).contents.replace("'","\\'")){
-												 int id = Integer.parseInt(dependencySheet.getCell( cols, r ).contents.replace("'","\\'"))
-												 AssetDependency asset =  AssetDependency.get(id)
-												 if(asset){
-													 asset.asset = AssetEntity.get(Integer.parseInt(dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")))
-													 asset.dependent = AssetEntity.get(Integer.parseInt(dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")))
-													 asset.type = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-													 asset.dataFlowFreq = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-													 asset.dataFlowDirection = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-													 asset.status = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-													 asset.comment = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-													 asset.updatedBy = userLogins.person
-													 //asset.createdBy = userLogin.person
-												   if(!asset.save(flush:true)){
-													   asset.errors.allErrors.each { println it }
-													  skipped += ( r +1 )
-													  skippedUpdated = skipped.size()
-												   }
-												}
-											  }else{
-											     AssetDependency assetDpendencyInstance = new AssetDependency()
-												 def assetId = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-												 def dependentId = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-												 if(assetId){
-												   assetDpendencyInstance.asset = AssetEntity.get(Integer.parseInt(assetId))
-												 }
-												 if(dependentId){
-												   assetDpendencyInstance.dependent = AssetEntity.get(Integer.parseInt(dependentId))
-												 }
-												  assetDpendencyInstance.type = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-												  assetDpendencyInstance.dataFlowFreq = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-												  assetDpendencyInstance.dataFlowDirection = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-												  assetDpendencyInstance.status = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-												  assetDpendencyInstance.comment = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-												  assetDpendencyInstance.createdBy = userLogins?.person
-												  assetDpendencyInstance.updatedBy = userLogins?.person
-												  if(!assetDpendencyInstance.save(flush:true)){
-													  assetDpendencyInstance.errors.allErrors.each { println it }
-													  skipped += ( r +1 )
-													  skippedAdded = skipped.size()
-												  }
-												 
-											  }
-											  dependencyAdded = (r-(skippedAdded+skippedUpdated))
-											  if (r%50 == 0){
-												  sessionFactory.getCurrentSession().flush();
-												  sessionFactory.getCurrentSession().clear();
-											  }
-									
-							}
-								
-							}
-						for( int i=0;  i < sheetNamesLength; i++ ) {
-							if(sheetNames[i] == "Comments"){
-								def commentSheet = workbook.getSheet(sheetNames[i])
-								for( int rowNo = 1; rowNo < commentSheet.rows; rowNo++ ) {
-									def dataTransferComment
-									def commentId = commentSheet.getCell(1,rowNo).contents
-									def assetCommentId
-									if( commentId != "" && commentId != null ) {
-										assetCommentId = Integer.parseInt(commentId)
-										dataTransferComment = DataTransferComment.findByCommentId(commentId)
-									}
-									if( dataTransferComment == null ) {
-										dataTransferComment = new DataTransferComment()
-									}
-									dataTransferComment.commentId = assetCommentId
-									dataTransferComment.assetId = Integer.parseInt(commentSheet.getCell(0,rowNo).contents)
-									dataTransferComment.commentType = commentSheet.getCell(3,rowNo).contents
-									dataTransferComment.comment = commentSheet.getCell(4,rowNo).contents
-									dataTransferComment.rowId = rowNo
-									dataTransferComment.dataTransferBatch = dataTransferBatch
-									dataTransferComment.save()
-								}
-							}
-						}
-	
+					}
+
 				} // generate error message
-				workbook.close()		
+				workbook.close()
 				added = serverAdded + appAdded   + dbAdded + filesAdded + dependencyAdded
 				if (skipped.size() > 0) {
 					flash.message = " File Uploaded Successfully with ${added} records. and  ${skipped} Records skipped Please click the Manage Batches to review and post these changes."
@@ -729,7 +729,7 @@ class AssetEntityController {
 		def appDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Applications" )
 		def dbDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Databases" )
 		def fileDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Files" )
-		
+
 		def project = Project.findById( projectId )
 		if ( projectId == null || projectId == "" ) {
 			flash.message = " Project Name is required. "
@@ -746,7 +746,7 @@ class AssetEntityController {
 		def application = Application.findAllByProject( project )
 		def database = Database.findAllByProject( project )
 		def files = Files.findAllByProject( project )
-		
+
 		//get template Excel
 		def workbook
 		def book
@@ -795,7 +795,7 @@ class AssetEntityController {
 			def fileColumnNameList = new ArrayList()
 			def fileSheetNameMap = [:]
 			def fileDataTransferAttributeMapSheetName
-			
+
 
 			serverDTAMap.eachWithIndex { item, pos ->
 				serverMap.put( item.columnName, null )
@@ -823,7 +823,7 @@ class AssetEntityController {
 			for( int i=0;  i < sheetNamesLength; i++ ) {
 				if ( serverSheetNameMap.containsValue( sheetNames[i].trim()) ) {
 					flag = 1
-					
+
 				}
 			}
 			serverSheet = book.getSheet( sheetNames[1] )
@@ -831,7 +831,7 @@ class AssetEntityController {
 			dbSheet = book.getSheet( sheetNames[3] )
 			fileSheet = book.getSheet( sheetNames[4] )
 			dependencySheet = book.getSheet( sheetNames[5] )
-			
+
 			if( flag == 0 ) {
 				flash.message = " Sheet not found, Please check it."
 				redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
@@ -851,7 +851,7 @@ class AssetEntityController {
 					appSheetColumnNames.put(appCellContent, c)
 					if( appMap.containsKey( appCellContent ) ) {
 						appMap.put( appCellContent, c )
-						
+
 					}
 				}
 				def dbCol = dbSheet.getColumns()
@@ -918,7 +918,7 @@ class AssetEntityController {
 							serverSheet.addCell(customColumn)
 						}
 					}
-                    if(params.asset=='asset'){
+					if(params.asset=='asset'){
 						for ( int r = 1; r <= assetSize; r++ ) {
 							//Add assetId for walkthrough template only.
 							if( serverSheetColumnNames.containsKey("assetId") ) {
@@ -957,7 +957,7 @@ class AssetEntityController {
 								def addContentToSheet
 								def attribute = appDTAMap.eavAttribute.attributeCode[coll]
 								addContentToSheet = new Label( appMap[appColumnNameList.get(coll)], r, "" )
-									//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
+								//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
 								if ( application[r-1][attribute] == null ) {
 									addContentToSheet = new Label( appMap[appColumnNameList.get(coll)], r, "" )
 								}else {
@@ -968,8 +968,8 @@ class AssetEntityController {
 									}
 								}
 								appSheet.addCell( addContentToSheet )
-							 }
 							}
+						}
 					}
 					if(params.database=='database'){
 						for ( int r = 1; r <= dbSize; r++ ) {
@@ -982,7 +982,7 @@ class AssetEntityController {
 							for ( int coll = 0; coll < dbcolumnNameListSize; coll++ ) {
 								def addContentToSheet
 								def attribute = dbDTAMap.eavAttribute.attributeCode[coll]
-									//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
+								//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
 								if ( database[r-1][attribute] == null ) {
 									addContentToSheet = new Label(  dbMap[dbColumnNameList.get(coll)], r, "" )
 								}else {
@@ -1021,7 +1021,7 @@ class AssetEntityController {
 							}
 						}
 					}
-				
+
 					if(params.dependency=='dependency'){
 						def assetDependent = AssetDependency.findAll("from AssetDependency where asset.project = ? ",[project])
 						def dependencyMap = ['AssetId':1,'DependentId':2, 'Type':3, 'DataFlowFreq':4, 'DataFlowDirection':5, 'status':6, 'comment':7]
@@ -1029,72 +1029,72 @@ class AssetEntityController {
 						def DTAMap = [0:'asset',1:'dependent', 2:'type', 3:'dataFlowFreq', 4:'dataFlowDirection', 5:'status', 6:'comment']
 						def dependentSize = assetDependent.size()
 						for ( int r = 1; r <= dependentSize; r++ ) {
-							    //Add assetId for walkthrough template only.
-								def integerFormat = new WritableCellFormat (NumberFormats.INTEGER)
-								def addAssetDependentId = new Number(0, r, (assetDependent[r-1].id))
-								dependencySheet.addCell( addAssetDependentId )
-								
+							//Add assetId for walkthrough template only.
+							def integerFormat = new WritableCellFormat (NumberFormats.INTEGER)
+							def addAssetDependentId = new Number(0, r, (assetDependent[r-1].id))
+							dependencySheet.addCell( addAssetDependentId )
+
 							for ( int coll = 0; coll < 7; coll++ ) {
 								def addContentToSheet
 								if ( assetDependent[r-1].(DTAMap[coll]) == null ) {
 									addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, "" )
 								}else {
-								     if(DTAMap[coll]=="dependent"){
-					                   addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, String.valueOf(assetDependent[r-1].(DTAMap[coll]).id) )
-								     }else if(DTAMap[coll]=="asset"){
-					                   addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, String.valueOf(assetDependent[r-1].(DTAMap[coll]).id) )
-								     }else{
-									   addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, String.valueOf(assetDependent[r-1].(DTAMap[coll])) )
-									 }
+									if(DTAMap[coll]=="dependent"){
+										addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, String.valueOf(assetDependent[r-1].(DTAMap[coll]).id) )
+									}else if(DTAMap[coll]=="asset"){
+										addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, String.valueOf(assetDependent[r-1].(DTAMap[coll]).id) )
+									}else{
+										addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, String.valueOf(assetDependent[r-1].(DTAMap[coll])) )
+									}
 								}
 								dependencySheet.addCell( addContentToSheet )
-							 }
-						}
-					}
-				}
-					//update data from Asset Comment table to EXCEL
-					for( int sl=0;  sl < sheetNamesLength; sl++ ) {
-						def commentIt = new ArrayList()
-						if(sheetNames[sl] == "Comments"){
-							def commentSheet = book.getSheet("Comments")
-							asset.each{
-								commentIt.add(it.id)
-							}
-							def commentList = new StringBuffer()
-							def commentSize = commentIt.size()
-							for ( int k=0; k< commentSize ; k++ ) {
-								if( k != commentSize - 1) {
-									commentList.append( commentIt[k] + "," )
-								} else {
-									commentList.append( commentIt[k] )
-								}
-							}
-							def assetcomment = AssetComment.findAll("from AssetComment cmt where cmt.assetEntity in ($commentList)")
-							def assetId
-							def commentType
-							def comment
-							def commentId
-							def assetName
-							for(int cr=1 ; cr<=assetcomment.size() ; cr++){
-								assetId = new Label(0,cr,String.valueOf(assetcomment[cr-1].assetEntity.id))
-								commentSheet.addCell(assetId)
-								commentId = new Label(1,cr,String.valueOf(assetcomment[cr-1].id))
-								commentSheet.addCell(commentId)
-								assetName = new Label(2,cr,String.valueOf(assetcomment[cr-1].assetEntity.assetName))
-								commentSheet.addCell(assetName)
-								commentType = new Label(3,cr,String.valueOf(assetcomment[cr-1].commentType))
-								commentSheet.addCell(commentType)
-								comment = new Label(4,cr,String.valueOf(assetcomment[cr-1].comment))
-								commentSheet.addCell(comment)
 							}
 						}
 					}
-					book.write()
-					book.close()
-					render( view: "importExport" )
 				}
+				//update data from Asset Comment table to EXCEL
+				for( int sl=0;  sl < sheetNamesLength; sl++ ) {
+					def commentIt = new ArrayList()
+					if(sheetNames[sl] == "Comments"){
+						def commentSheet = book.getSheet("Comments")
+						asset.each{
+							commentIt.add(it.id)
+						}
+						def commentList = new StringBuffer()
+						def commentSize = commentIt.size()
+						for ( int k=0; k< commentSize ; k++ ) {
+							if( k != commentSize - 1) {
+								commentList.append( commentIt[k] + "," )
+							} else {
+								commentList.append( commentIt[k] )
+							}
+						}
+						def assetcomment = AssetComment.findAll("from AssetComment cmt where cmt.assetEntity in ($commentList)")
+						def assetId
+						def commentType
+						def comment
+						def commentId
+						def assetName
+						for(int cr=1 ; cr<=assetcomment.size() ; cr++){
+							assetId = new Label(0,cr,String.valueOf(assetcomment[cr-1].assetEntity.id))
+							commentSheet.addCell(assetId)
+							commentId = new Label(1,cr,String.valueOf(assetcomment[cr-1].id))
+							commentSheet.addCell(commentId)
+							assetName = new Label(2,cr,String.valueOf(assetcomment[cr-1].assetEntity.assetName))
+							commentSheet.addCell(assetName)
+							commentType = new Label(3,cr,String.valueOf(assetcomment[cr-1].commentType))
+							commentSheet.addCell(commentType)
+							comment = new Label(4,cr,String.valueOf(assetcomment[cr-1].comment))
+							commentSheet.addCell(comment)
+						}
+					}
+				}
+				book.write()
+				book.close()
+				render( view: "importExport" )
+			}
 		} catch( Exception fileEx ) {
-		   
+
 			flash.message = "Exception occurred wile exporting Excel. "
 			fileEx.printStackTrace();
 			redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
@@ -1215,7 +1215,7 @@ class AssetEntityController {
 				redirectAsset = newredirectAsset[0]
 				def rackId = newredirectAsset[1]
 				session.setAttribute("RACK_ID", rackId)
-				}
+			}
 			switch(redirectAsset){
 				case "room":
 					redirect( controller:'room',action:list, params:[projectId: projectId] )
@@ -1244,13 +1244,13 @@ class AssetEntityController {
 				default:
 					redirect( action:list)
 			}
-			
+
 		}
 		else {
 			flash.message = "AssetEntity not found with id ${params.id}"
 		}
-		
-		
+
+
 	}
 
 	/*--------------------------------------------------
@@ -1687,7 +1687,7 @@ class AssetEntityController {
 	def dashboardView = {
 		def filterAttr = [tag_f_priority:params.tag_f_priority,tag_f_assetTag:params.tag_f_assetTag,tag_f_assetName:params.tag_f_assetName,tag_f_status:params.tag_f_status,tag_f_sourceTeamMt:params.tag_f_sourceTeamMt,tag_f_targetTeamMt:params.tag_f_targetTeamMt,tag_f_commentType:params.tag_f_commentType,tag_s_1_priority:params.tag_s_1_priority,tag_s_2_assetTag:params.tag_s_2_assetTag,tag_s_3_assetName:params.tag_s_3_assetName,tag_s_4_status:params.tag_s_4_status,tag_s_5_sourceTeamMt:params.tag_s_5_sourceTeamMt,tag_s_6_targetTeamMt:params.tag_s_6_targetTeamMt,tag_s_7_commentType:params.tag_s_7_commentType]
 		session.setAttribute('filterAttr', filterAttr)
-	    def showAll = params.showAll
+		def showAll = params.showAll
 		def projectId = params.projectId
 		def bundleId = params.moveBundle
 		def currentState = params.currentState
@@ -2552,15 +2552,15 @@ class AssetEntityController {
 		def dependentAssets = AssetDependency.findAllByAsset(assetEntityInstance)
 		def supportAssets = AssetDependency.findAllByDependent(assetEntityInstance)
 
-		
-		
+
+
 		[assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 					planStatusOptions:planStatusOptions?.value, projectId:projectId, project: project, railTypeOption:railTypeOption?.value,
 					priorityOption:priorityOption?.value,dependentAssets:dependentAssets,supportAssets:supportAssets,
 					manufacturers:manufacturers, models:models,redirectTo:params?.redirectTo]
 
 	}
-	
+
 	def update={
 		def attribute = session.getAttribute('filterAttr')
 		def filterAttr = session.getAttribute('filterAttributes')
@@ -2579,7 +2579,7 @@ class AssetEntityController {
 			redirectTo = newRedirectTo[0]
 			def rackId = newRedirectTo[1]
 			session.setAttribute("RACK_ID", rackId)
-			}
+		}
 		if(retireDate){
 			params.retireDate =  GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
 		}
@@ -2662,5 +2662,37 @@ class AssetEntityController {
 		} else {
 			return [assetCommentList:assetCommentList,rediectTo:'comment']
 		}
+	}
+
+	def assetOptions = {
+		def assetEntityInstance = new AssetEntity(appOwner:'TDS')
+		def planStatusAttribute = EavAttribute.findByAttributeCode('planStatus')
+		def planStatusOptions = EavAttributeOption.findAllByAttribute(planStatusAttribute)
+		return [assetEntityInstance:assetEntityInstance, planStatusOptions:planStatusOptions]
+
+	}
+	def saveAssetoptions = {
+		def planStatusAttribute = EavAttribute.findByAttributeCode('planStatus')
+		def planStatusOptions = EavAttributeOption.findAllByAttribute(planStatusAttribute)
+		def planStatusInstance = new EavAttributeOption()
+		if(params.planStatus){
+			planStatusInstance.attribute = planStatusAttribute
+			planStatusInstance.value = params.planStatus
+			if(!planStatusInstance.save(flush:true)){
+				planStatusInstance.errors.allErrors.each { println it }
+			}
+		}
+		def planStatusList = []
+		def planStatus = EavAttributeOption.findByValue(params.planStatus).id
+		planStatusList =['id':planStatus]
+		
+	    render planStatusList as JSON
+	}
+	def deleteAssetStatus ={
+		def planStatusInstance = EavAttributeOption.get(params.assetStatusId)
+		if(!planStatusInstance.delete(flush:true)){
+			planStatusInstance.errors.allErrors.each { println it }
+		}
+		render planStatusInstance.id
 	}
 }
