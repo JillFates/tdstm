@@ -70,7 +70,7 @@ environments {
 
          logger {
             // grails="error,stdout,logfile"
-            grails="debug,stdout,logfile"
+            grails="error,stdout,logfile"
             org {
                codehaus.groovy.grails.web.servlet="error,stdout,logfile"
             }
