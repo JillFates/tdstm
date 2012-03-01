@@ -69,7 +69,8 @@ environments {
          appender.'logfile.layout.ConversionPattern' = '%d{[ dd.MM.yy HH:mm:ss.SSS]} [%t] %-5p %c %x - %m%n'
 
          logger {
-            grails="error,stdout,logfile"
+            // grails="error,stdout,logfile"
+            grails="debug,stdout,logfile"
             org {
                codehaus.groovy.grails.web.servlet="error,stdout,logfile"
             }
