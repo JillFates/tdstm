@@ -43,7 +43,9 @@ function onInvokeAction(id) {
   <div class="buttons"> 
   <g:form>
 	<input type="hidden" id="projectId" name="projectId" value="${projectId}"/>
+	<tds:hasPermission permission='MoveBundleEditView '>
   	<span class="button"><g:actionSubmit	class="save" action="Create" value="Create" /></span>
+  	</tds:hasPermission>
   </g:form>
   </div>
 </div>

@@ -4,10 +4,12 @@
 			<div class="buttons">
 				<g:form>
 					<input type="hidden" name="id" value="${filesInstance?.id}" />
-					<span class="button"><input type="button" class="edit"
-						value="Edit" onclick="editEntity('${redirectTo}','Files', ${filesInstance?.id})" /> </span>
-					<span class="button"><g:actionSubmit class="delete"
+					<tds:hasPermission permission='EditAndDelete'>
+						<span class="button"><input type="button" class="edit"
+							value="Edit" onclick="editEntity('${redirectTo}','Files', ${filesInstance?.id})" /> </span>
+						<span class="button"><g:actionSubmit class="delete"
 							onclick="return confirm('Are you sure?');" value="Delete" /> </span>
+					</tds:hasPermission>
 					<g:if test="${assetComment == 'issue'}">
 						<g:remoteLink controller="assetEntity" action="listComments" id="${filesInstance.id}" before="setAssetId('${filesInstance.id}');" onComplete="listCommentsDialog(e,'never');">
 							<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="=0px" style="margin-bottom: -4px;"/>&nbsp&nbspComment
@@ -28,7 +30,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td colspan="2"><div class="dialog" ondblclick="editEntity('${redirectTo}','Files', ${filesInstance?.id})">
+		<td colspan="2"><div class="dialog" <tds:hasPermission permission='EditAndDelete'> ondblclick="editEntity('${redirectTo}','Files', ${filesInstance?.id})"</tds:hasPermission>>
 				<table>
 					<tbody>
 						<tr class="prop">

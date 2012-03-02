@@ -98,7 +98,9 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 </table>
 <div class="buttons"> 
 	<span class="button">
+	 <tds:hasPermission permission='DeleteRoom'>
 		<input type="button" class="edit" value="Create Room" onclick="$('#createRoomDialog').dialog('open');$('#mergeRoomDialog').dialog('close')"/>
+	 </tds:hasPermission>
 		 <tds:hasPermission permission='MergeRoom'>
 			<span class="button"><input class="create" id="mergeId" type="button" value="Merge" onclick="showMergeDialog()" style="display: none;"/></span>
 		 </tds:hasPermission>

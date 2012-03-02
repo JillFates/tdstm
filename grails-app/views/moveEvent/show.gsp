@@ -85,10 +85,12 @@
             </div>
             <div class="buttons">
                 <g:form>
+                <tds:hasPermission permission='MoveEventEditView'>
                     <input type="hidden" name="id" id="moveEventId"  value="${moveEventInstance?.id}" />
                     <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this Event will remove any move news and any related step data?');" value="Delete" /></span>
                     <span class="button"><input type="button" class="delete" value="Clear Dashboard History" onclick="clearHistoricData( $('#moveEventId').val() )"/></span>
+                 </tds:hasPermission>
                 </g:form>
             </div>
         </div>

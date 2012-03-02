@@ -2,7 +2,9 @@
 	<table style="border:0;width:1000px;">
 		<tr>
 			<td colspan="2">
+			<tds:hasPermission permission='EditAndDelete'>
 				<div class="dialog" ondblclick="editEntity('${redirectTo}','Server', ${assetEntityInstance?.id})">
+			</tds:hasPermission>
 					<table>
 						<tbody>
 							

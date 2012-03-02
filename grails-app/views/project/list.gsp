@@ -25,8 +25,10 @@ function onInvokeExportAction(id) {
 <div>
 	<div class="buttons"> 
 		<g:form action="list" method="post">
-		<span class="button"><g:actionSubmit class="save" action="Create" value="Create Project" /></span>
-		<span class="button"><input type="button" class="save" onclick="javascript:location.href='../projectUtil/createDemo'" value="Create Demo Project" /></span>
+		<tds:hasPermission permission='CreateProject'>
+			<span class="button"><g:actionSubmit class="save" action="Create" value="Create Project" /></span>
+			<span class="button"><input type="button" class="save" onclick="javascript:location.href='../projectUtil/createDemo'" value="Create Demo Project" /></span>
+		</tds:hasPermission>
 		<g:if test="${session.getAttribute('COMPLETED_PROJ') == 'COMPLETE'}">
 			<span class="menuButton"> <g:link class="save" controller="project" action="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">Show Active Projects</g:link></span>		
 		</g:if >

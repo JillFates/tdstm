@@ -68,7 +68,7 @@
   <body>   
     <div class="nav" style="border: 1px solid #CCCCCC; height: 11px;width: 250px; margin:9px 14px 0px">
 			<span class="menuButton"><g:link class="list" action="list">Bundle List</g:link></span>
-		    <tds:hasPermission permission='MoveBundleShowView '>
+		    <tds:hasPermission permission='MoveBundleEditView '>
 		    	<span class="menuButton"><g:link class="create" action="create" params="[projectId:projectId]">New Bundle</g:link></span>
 			</tds:hasPermission>
 		</div>
@@ -159,13 +159,13 @@
         <g:form>
           <input type="hidden" name="id" value="${moveBundleInstance?.id}" />
           <input type="hidden" name="projectId" value="${projectId}" />
-          <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
-          <span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this bundle will remove any move teams and any related step data?');" value="Delete" /></span>
-          <span class="button"><g:actionSubmit class="delete" action="deleteBundleAndAssets" onclick="return confirm('WARNING: Deleting this bundle will remove any move teams, any related step data, AND ASSIGNED ASSETS? (NO UNDO)?');" value="Delete bundle and assets" /></span>
-         <tds:hasPermission permission='MoveBundleShowView '>
-          	<g:if test="${showHistoryButton}">
+          <tds:hasPermission permission='MoveBundleEditView '>
+	          <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
+	          <span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this bundle will remove any move teams and any related step data?');" value="Delete" /></span>
+	          <span class="button"><g:actionSubmit class="delete" action="deleteBundleAndAssets" onclick="return confirm('WARNING: Deleting this bundle will remove any move teams, any related step data, AND ASSIGNED ASSETS? (NO UNDO)?');" value="Delete bundle and assets" /></span>
+          <g:if test="${showHistoryButton}">
           		<span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Are you sure you want to permanently clear transitions for assets in this bundle?');" value="Clear Asset History" action="clearBundleAssetHistory"/></span>
-          	</g:if>
+          </g:if>
           </tds:hasPermission>
         </g:form>
       </div>

@@ -8,6 +8,7 @@
   <g:if test="${flash.message}">
       <div class="message">${flash.message}</div>
     </g:if>
+    <tds:hasPermission permission='AdminMenuView'>
     <div class="body">
     <h1>Role Permissions</h1>
     <div class="list" id="updateShow">
@@ -54,6 +55,7 @@
           </span>
   </g:form>
     </div></div>
+    </tds:hasPermission>
 <script>
 	currentMenuId = "#adminMenu";
 	$("#adminMenuId a").css('background-color','#003366')

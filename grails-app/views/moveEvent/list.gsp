@@ -44,7 +44,9 @@
 			     </form>
             </div>
             <div class="paginateButtons">
+            <tds:hasPermission permission='MoveEventEditView'>
 		     	<span class="menuButton"><g:link class="create" action="create">Create New</g:link></span>
+		    </tds:hasPermission>
             </div>
         </div>
 <script>

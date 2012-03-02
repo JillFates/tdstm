@@ -54,7 +54,9 @@ $(document).ready(function() {
 		    <jmesa:htmlTable style=" border-collapse: separate">
 		        <jmesa:htmlRow highlighter="true">
 		        	<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" >
+		        	<tds:hasPermission permission='EditAndDelete'>
 		        		<a href="javascript:editEntity('assetEntity','${assetEntityInstance?.assetType}',${assetEntityInstance.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
+		        	</tds:hasPermission>
 						<span id="icon_${assetEntityInstance.id}">
 							<g:if test="${assetEntityInstance.commentType == 'issue'}">
 								<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
@@ -117,8 +119,11 @@ $(document).ready(function() {
 		</jmesa:tableFacade>
 	</form>
 </div>
+
 <div class="buttons"><g:form>
+<tds:hasPermission permission='EditAndDelete'>
 	<span class="button"><input type="button" value="New Asset" class="create" onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Server\')')}"/></span>
+</tds:hasPermission>
 </g:form></div>
 </div> <%-- End of Body --%>
 <g:render template="commentCrud"/>

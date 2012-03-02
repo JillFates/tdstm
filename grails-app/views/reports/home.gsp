@@ -12,6 +12,7 @@
 </g:if>
 <table style="border: 0">
 	<tr>
+	<tds:hasPermission permission='ShowDiscovery'>
 		<td style="vertical-align:top">
 			<div>
 			<h1 style="margin-right: 0px;"><b>Discovery</b></h1>
@@ -30,6 +31,8 @@
 			</table>
 			</div>
 		</td>
+	</tds:hasPermission>
+	<tds:hasPermission permission='ShowMovePrep'>
 		<td style="vertical-align:top">
 			<div>
 			<h1 style="margin-right: 0px;"><b>Move Prep</b></h1>
@@ -53,6 +56,8 @@
 			</table>
 			</div>
 		</td>
+		</tds:hasPermission>
+		<tds:hasPermission permission='ShowMoveDay'>
 		<td style="vertical-align:top">
 			<div>
 			<h1 style="margin-right: 0px;"><b>Move Day</b></h1>
@@ -74,6 +79,7 @@
 			</table>
 			</div>
 		</td>
+		</tds:hasPermission>
 		<td style="vertical-align:top">
 			<div>
 			<h1 style="margin-right: 0px;"><b>Application</b></h1>

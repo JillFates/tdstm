@@ -54,7 +54,9 @@ $(document).ready(function() {
 				<jmesa:htmlRow highlighter="true" style="cursor: pointer;">
 					<jmesa:htmlColumn property="id" sortable="false" filterable="false"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions">
-						<a href="javascript:editEntity('database','${dataBaseInstance?.assetType}',${dataBaseInstance?.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
+						<tds:hasPermission permission='EditAndDelete'>
+						  <a href="javascript:editEntity('database','${dataBaseInstance?.assetType}',${dataBaseInstance?.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
+						 </tds:hasPermission>
 						<span id="icon_${dataBaseInstance.id}">
 							<g:if test="${dataBaseInstance.commentType == 'issue'}">
 								<g:remoteLink controller="assetEntity" action="listComments" id="${dataBaseInstance.id}" before='setAssetId(${dataBaseInstance.id});'	onComplete="listCommentsDialog( e ,'never' );">
@@ -105,9 +107,11 @@ $(document).ready(function() {
 	</form>
 	
 	<div class="buttons">
+	<tds:hasPermission permission='EditAndDelete'>
 		<span class="button"><input type="button" class="save" value="Create DB"
 			onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Database\')')}" />
 		</span>
+	</tds:hasPermission>
 	</div>
 <div id="createEntityView" style="display: none;" ></div>
 <div id="showEntityView" style="display: none;"></div>
