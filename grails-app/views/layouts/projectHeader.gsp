@@ -389,7 +389,7 @@
 	        <tds:hasPermission permission='ReportMenuView'>
 			<li id="reportsMenuId" style="position:relative; float: left;"><g:link class="home" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" controller="reports" params="[projectId:currProjObj?.id]">Reports
 	        	<a id="reportAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#reportsMegaMenu')" href="javascript:showMegaMenu('#reportsMegaMenu')" style="display: inline"></a></g:link>
-				<div  class="megamenu rooms" id="reportsMegaMenu" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+				<div  class="megamenu reports" id="reportsMegaMenu" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" style="display: none;">
 					<table class="mmtable "><tr>
 					<tds:hasPermission permission='ShowDiscovery'>
 					<td style="vertical-align:top"><span class="megamenuSection">Discovery</span><br />
