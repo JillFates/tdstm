@@ -6,6 +6,20 @@
 <title>Asset Options</title>
 </head>
 <body>
+<div align="left" style="margin-top: 30px;">
+   <h1>Administrative Setting</h1>
+</div>
+ <div>
 	<g:render template="assetOptions"/>
+ </div>
+ <div>
+	<g:render template="assetPriority"/>
+ </div>
+ <div>
+	<g:render template="dependencyType"/>
+ </div>
+ <div>
+	<g:render template="dependencyStatus"/>
+ </div>
 </body>
 </html>

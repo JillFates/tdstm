@@ -25,6 +25,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
+import com.tds.asset.AssetOptions
 import com.tds.asset.AssetTransition
 import com.tds.asset.Database
 import com.tds.asset.Files
@@ -2665,34 +2666,82 @@ class AssetEntityController {
 	}
 
 	def assetOptions = {
-		def assetEntityInstance = new AssetEntity(appOwner:'TDS')
-		def planStatusAttribute = EavAttribute.findByAttributeCode('planStatus')
-		def planStatusOptions = EavAttributeOption.findAllByAttribute(planStatusAttribute)
-		return [assetEntityInstance:assetEntityInstance, planStatusOptions:planStatusOptions]
+		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+		
+		def priorityOption = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)
+		
+		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+		
+		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+		
+		return [planStatusOptions:planStatusOptions, priorityOption:priorityOption,dependencyType:dependencyType, dependencyStatus:dependencyStatus]
 
 	}
 	def saveAssetoptions = {
-		def planStatusAttribute = EavAttribute.findByAttributeCode('planStatus')
-		def planStatusOptions = EavAttributeOption.findAllByAttribute(planStatusAttribute)
-		def planStatusInstance = new EavAttributeOption()
-		if(params.planStatus){
-			planStatusInstance.attribute = planStatusAttribute
-			planStatusInstance.value = params.planStatus
-			if(!planStatusInstance.save(flush:true)){
-				planStatusInstance.errors.allErrors.each { println it }
-			}
-		}
+		def assetOptionInstance = new AssetOptions()
 		def planStatusList = []
-		def planStatus = EavAttributeOption.findByValue(params.planStatus).id
+		def planStatus
+		if(params.assetOptionType=="planStatus"){
+			assetOptionInstance.type = AssetOptions.AssetOptionsType.STATUS_OPTION
+			assetOptionInstance.value = params.planStatus
+			if(!assetOptionInstance.save(flush:true)){
+				assetOptionInstance.errors.allErrors.each { println it }
+			}
+			planStatus = AssetOptions.findByValue(params.planStatus).id
+			
+		}else if(params.assetOptionType=="Priority"){
+			assetOptionInstance.type = AssetOptions.AssetOptionsType.PRIORITY_OPTION
+			assetOptionInstance.value = params.priorityOption
+			if(!assetOptionInstance.save(flush:true)){
+				assetOptionInstance.errors.allErrors.each { println it }
+			}
+			planStatus = AssetOptions.findByValue(params.priorityOption).id
+			
+		}else if(params.assetOptionType=="dependency"){
+			assetOptionInstance.type = AssetOptions.AssetOptionsType.DEPENDENCY_TYPE
+			assetOptionInstance.value = params.dependencyType
+			if(!assetOptionInstance.save(flush:true)){
+				assetOptionInstance.errors.allErrors.each { println it }
+			}
+			planStatus = AssetOptions.findByValue(params.dependencyType).id
+			
+		}else {
+		    assetOptionInstance.type = AssetOptions.AssetOptionsType.DEPENDENCY_STATUS
+			assetOptionInstance.value = params.dependencyStatus
+			if(!assetOptionInstance.save(flush:true)){
+				assetOptionInstance.errors.allErrors.each { println it }
+			}
+			planStatus = AssetOptions.findByValue(params.dependencyStatus).id
+			
+		}
 		planStatusList =['id':planStatus]
 		
 	    render planStatusList as JSON
 	}
-	def deleteAssetStatus ={
-		def planStatusInstance = EavAttributeOption.get(params.assetStatusId)
-		if(!planStatusInstance.delete(flush:true)){
-			planStatusInstance.errors.allErrors.each { println it }
+	
+	def deleteAssetOptions ={
+		def assetOptionInstance
+		if(params.assetOptionType=="planStatus"){
+			 assetOptionInstance = AssetOptions.get(params.assetStatusId)
+			 if(!assetOptionInstance.delete(flush:true)){
+				assetOptionInstance.errors.allErrors.each { println it }
+			 }
+		}else if(params.assetOptionType=="Priority"){
+			assetOptionInstance = AssetOptions.get(params.priorityId)
+			if(!assetOptionInstance.delete(flush:true)){
+				assetOptionInstance.errors.allErrors.each { println it }
+			}
+		}else if(params.assetOptionType=="dependency"){
+		    assetOptionInstance = AssetOptions.get(params.dependecyId)
+			if(!assetOptionInstance.delete(flush:true)){
+				assetOptionInstance.errors.allErrors.each { println it }
+			}
+		}else{
+			assetOptionInstance = AssetOptions.get(params.dependecyId)
+			if(!assetOptionInstance.delete(flush:true)){
+				assetOptionInstance.errors.allErrors.each { println it }
+			}
 		}
-		render planStatusInstance.id
+		render assetOptionInstance.id
 	}
 }
