@@ -2543,9 +2543,6 @@ class AssetEntityController {
 		def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetEntityInstance.assetType])?.manufacturer
 		def models = assetEntityInstance.manufacturer ? Model.findAllByManufacturer( assetEntityInstance.manufacturer,[sort:'modelName',order:'asc'] )?.findAll{it.assetType == assetEntityInstance.assetType } : []
 
-		def planStatusAttribute = EavAttribute.findByAttributeCode('planStatus')
-
-		def planStatusOptions = EavAttributeOption.findAllByAttribute(planStatusAttribute)
 
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
@@ -2555,12 +2552,13 @@ class AssetEntityController {
 		def railTypeAttribute = EavAttribute.findByAttributeCode('railType')
 		def railTypeOption = EavAttributeOption.findAllByAttribute(railTypeAttribute)
 
-		def priorityAttribute = EavAttribute.findByAttributeCode('priority')
-		def priorityOption = EavAttributeOption.findAllByAttribute(priorityAttribute)
 
 
 		def dependentAssets = AssetDependency.findAllByAsset(assetEntityInstance)
 		def supportAssets = AssetDependency.findAllByDependent(assetEntityInstance)
+		
+		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+		def priorityOption = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)
 
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
